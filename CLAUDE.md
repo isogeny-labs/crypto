@@ -19,7 +19,21 @@ PDFs, SVG graphs and PNG renders into `benchmarks/<YYYYMMDD>-<slug>/` with a row
 in `benchmarks/README.md`, in the same PR (AGENTS.md "Performance results also
 land in `benchmarks/`").
 
+Every big improvement also updates the index-calculus leaderboard in the same
+PR: regenerate `docs/ic-leaderboard.html`, `docs/ic/LEADERBOARD.md` and
+`docs/ic/leaderboard.json` with `python3 scripts/build_ic_leaderboard.py`, and
+the lab browser with it. That holds for a phase or component speed-up too, as
+its own section outside tables A–C (AGENTS.md "Standing workflow rules" and
+§7b).
+
 <!-- conductor:begin -->
+Validation gate (owner, 2026-10-19): no row reaches the IC leaderboard or
+`benchmarks/README.md` without a replay certificate, a validator report and a
+matched rho reference (with the §5a band), named by the evidence directory's
+`VALIDATION.json`; pre-gate rows render as "unvalidated (pre-gate)". Rule:
+[`AGENTS.md`](AGENTS.md), "Standing workflow rules"; schema:
+[`docs/VALIDATION_GATE.md`](docs/VALIDATION_GATE.md).
+
 Before making code changes, obtain or attach to a Conductor task. Run
 `conductor check --summary "…" --scope path:…` first — if someone already holds
 those files, it will tell you who and what to do about it. Read `.conductor/WORKFLOW.md`

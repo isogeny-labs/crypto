@@ -27,6 +27,10 @@ name = "crypto"
 path = "src/main.rs"
 
 [[bin]]
+name = "ecdlp-audit"
+path = "src/bin/ecdlp_audit.rs"
+
+[[bin]]
 name = "ic"
 path = "src/bin/ic.rs"
 
@@ -129,6 +133,15 @@ path = "src/bin/endo_chain_bench.rs"
 name = "crypto_lib"
 path = "src/lib.rs"
 
+# Checkpointed native ecbench orchestration and recorded-value aggregation.
+[[bin]]
+name = "volcano-ic-driver"
+path = "research/full_volcano_graphwide_ic_20261017/execution/driver.rs"
+
+[[bin]]
+name = "volcano-ic-summarize"
+path = "research/full_volcano_graphwide_ic_20261017/execution/summarize.rs"
+
 [features]
 # Keep the existing Redis TLS behavior in normal builds. The isolated,
 # network-disabled N83 capacity worker can omit its unused native OpenSSL
@@ -175,6 +188,9 @@ result_unit_err = "allow"
 chunks_exact_to_as_chunks = "allow"
 
 [dependencies]
+volcano-cli = { path = "tools/volcano-cli" }
+# Durable per-vertex IC campaign checkpoints; matches volcano-cli's backend.
+rusqlite = { version = "0.32", features = ["bundled"] }
 # Portable CPU-time and peak-RSS measurements for ic research reports.
 libc = "0.2"
 num-bigint = { version = "0.4", features = ["rand"] }
@@ -203,6 +219,7 @@ rayon = "1.10"
 # BLAKE3 is kept as a crate: its Merkle-tree construction is too complex to
 # reimplement educationally without obscuring the learning goal.
 blake3 = "1.5"
+sha2 = "0.10"
 # DEFLATE compression. Used only by the cryptopals Set-7 CRIME demo
 # (challenge 51): the attack treats compressed-output length as a
 # side channel, so we need a real LZ77-style compressor for the
@@ -221,3 +238,19 @@ harness = false
 name = "pqc_split"
 path = "benches/pqc_split.rs"
 harness = false
+
+[[example]]
+name = "conductor_gap_study"
+path = "research/conductor_gap_cm_orbits_20261015/native/study.rs"
+
+[[example]]
+name = "conductor_gap_ecbench"
+path = "research/conductor_gap_cm_orbits_20261015/native/ecbench_next.rs"
+
+[[example]]
+name = "conductor_gap_followups"
+path = "research/conductor_gap_followups_20261016/native/followups.rs"
+
+[[example]]
+name = "conductor_gap_followup_posthoc"
+path = "research/conductor_gap_followups_20261016/native/posthoc.rs"

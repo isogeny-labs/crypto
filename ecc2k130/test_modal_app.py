@@ -70,6 +70,64 @@ with test_modal_app.patch.object(modal_app, 'computeCapability', return_value='1
                                 cwd=Path(__file__).parent, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_promoted_knobs_are_baked_and_named(self):
+        env = os.environ.copy()
+        env.update(ECC_GPU="RTX-PRO-6000", ECC_PACKED_STATE_TILE="256",
+                   ECC_PACKED_POLY_STATE="1", ECC_PACKED_CACHE_DENOM="1",
+                   ECC_PACKED_POLY_CHAIN="1", ECC_PACKED_PAIR_PRODUCTS="1",
+                   ECC_PACKED_WEIGHTED_PREFIX="2", ECC_PACKED_PERM_SIGMA="3",
+                   ECC_PACKED_COMPACT_STATE="1", ECC_PACKED_SHARED_SIGMA="1",
+                   ECC_PACKED_INLINE_POLY="3", ECC_SIGMA_FUSED="1", ECC_PACKED_CLMAD="1",
+                   ECC_PACKED_SIGMA_TABLE="1", ECC_PACKED_L2_PERSIST="1", ECC_PACKED_TAIL_LAYOUT="1")
+        script = """import test_modal_app
+import importlib
+import modal_app
+importlib.reload(modal_app)
+assert modal_app.BAKED['packedL2Persist'] is True and modal_app.BAKED['packedTailLayout'] == 1
+with test_modal_app.patch.object(modal_app, 'computeCapability', return_value='120'):
+    assert modal_app.buildFor(16, 512, 0, minBlocks=1) == (True, 'baked into the image')
+lines = ['packed direct reduction: 0', 'packed generated product: 0', 'packed native carryless multiply: 1',
+         'packed native carryless square: 0', 'packed three-limb Karatsuba: 0', 'packed compact state: 1',
+         'packed shared sigma: 1', 'packed top clmad: 0', 'packed sigma fused: 1',
+         'packed sigma table: 1 (68352 dynamic shared bytes)', 'packed L2 persist: 1',
+         'packed L2 persist window: 83886080 of 104726528 field bytes, cap 83886080',
+         'packed tail layout: 1', 'packed weighted prefix: 2', 'packed state tile: 256']
+good = dict(valid=True, raw='\\n'.join(lines))
+modal_app.checkPackedReduction(good)
+assert good['packedL2Persist'] is True and good['packedTailLayout'] == 1, good
+missing = dict(valid=True, raw='\\n'.join(l for l in lines if not l.startswith('packed tail layout')))
+modal_app.checkPackedReduction(missing)
+assert missing['valid'] is False and 'tail layout' in missing['error'], missing
+off = dict(valid=True, raw='\\n'.join(l.replace('packed L2 persist: 1', 'packed L2 persist: 0') for l in lines))
+modal_app.checkPackedReduction(off)
+assert off['valid'] is False and 'L2 persist' in off['error'], off
+"""
+        result = subprocess.run([sys.executable, "-c", script], env=env,
+                                cwd=Path(__file__).parent, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_a_checkpoint_of_another_shape_is_refused_not_restarted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            ck = os.path.join(tmp, "curve131-run8009.ck")
+            self.assertIsNone(modal_app.checkpointShapeError(ck, 96256, 16, 8009))
+            with open(ck, "wb") as fh:
+                fh.write(modal_app.packCheckpointHeader(2, 131, 385024, 16, 1, 8009, 77))
+            self.assertIsNone(modal_app.checkpointShapeError(ck, 385024, 16, 8009))
+            err = modal_app.checkpointShapeError(ck, 96256, 16, 8009)
+            self.assertIn("385024 worker threads", err)
+            self.assertIn("WORKERS=385024", err)
+            self.assertIsNotNone(modal_app.checkpointShapeError(ck, 385024, 32, 8009))
+        src = Path(__file__).with_name("modal_app.py").read_text()
+        self.assertIn("shapeError = checkpointShapeError(ckFile, workerThreads, batch, runId)", src)
+
+    def test_run_sh_selects_the_promoted_campaign_shape(self):
+        script = Path(__file__).with_name("run.sh").read_text()
+        self.assertIn('WORKERS=${WORKERS:-96256}', script)
+        self.assertIn('export ECC_PACKED_L2_PERSIST="${ECC_PACKED_L2_PERSIST:-1}"', script)
+        self.assertIn('export ECC_PACKED_TAIL_LAYOUT="${ECC_PACKED_TAIL_LAYOUT:-1}"', script)
+        campaign = Path(__file__).with_name("modal_campaign.py").read_text()
+        self.assertIn('default=1540096', campaign)
+
     def test_campaign_search_guards_gpu_and_cpu_ids_before_starting(self):
         with patch('aws.seed_registry.modal_guard', side_effect=lambda *a: nullcontext()) as guard, \
                 patch.object(modal_app, '_runSearch', return_value={'checkpoint': 'saved'}) as search:

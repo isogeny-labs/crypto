@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
   scope:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
     permissions:
       contents: read
@@ -153,6 +153,8 @@ jobs:
           /*.rs
           /**/*.rs
           /Cargo.toml
+          /tools/volcano-cli/
+          /isogeny_algos/
           /Cargo.lock
           /**/Cargo.toml
           /**/Cargo.lock
@@ -290,6 +292,8 @@ jobs:
             /*.rs
             /**/*.rs
             /Cargo.toml
+            /tools/volcano-cli/
+            /isogeny_algos/
             /Cargo.lock
             /**/Cargo.toml
             /**/Cargo.lock
@@ -369,7 +373,10 @@ jobs:
     name: Warm cache (rust)
     if: needs.scope.outputs.rust != 'false' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
     needs: [scope, build-rust-database]
-    timeout-minutes: 25
+    # Type inference over the merged tree passed 25 minutes on 2026-10-19
+    # (run 39226121956 was cancelled mid-evaluation); 45 leaves headroom.
+    # check-pr-budgets.py names this job as a budget exception.
+    timeout-minutes: 45
     runs-on: ubuntu-24.04-arm
     permissions:
       packages: read
@@ -429,7 +436,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     needs: scope
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     permissions:
       security-events: write
       packages: read
