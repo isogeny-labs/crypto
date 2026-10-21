@@ -28,6 +28,45 @@ The [raw receipts](k1107_current_source_base/receipt.json),
 [artifact manifest](k1107_current_source_base/artifact_manifest.json) are
 versioned. The verifier bound the K4405 archive to SHA-256
 `5b13e49152b0f120400930fa181a5e8cd3e8e45640bc0134389b10945b3ce333`.
-The next cross-family run is K1107 full index, rank and independently checked
-one-target recovery on the same source and public point as the selected
-fixed31 high-K arm, followed by the K5500 split-index finalist.
+
+## Full-process source bridge on an earlier public point
+
+The same current-source executable completed a K1107 root11 full-process
+control on fixture point 0 from the earlier cold-factor-base study. The exact
+one-root layout, two target workers, cancellation, source and binary hashes,
+public point and 900-second cap are in
+`k1107_current_source_full_control/launch.json`. This run built 101,708,823
+root-table entries with 1,342,177,280 allocated table bytes, reached final
+rank 1,107, and recovered scalar `3640978018804724` after 940,621 target
+probes. The raw child wall interval was 128.9140485 seconds with
+1,933,492,224 bytes peak child RSS; the producer's exclusive target interval
+was 334.80775 ms. These are local shared-host diagnostics.
+
+The independent N83 group replay checked every factor-base point and label,
+the exact ordered base and set digests, all four relation points, the target
+subgroup, recovered scalar, final rank, root11 flags, and the five exclusive
+target phases. All 15 checks passed with status
+`PASS_INDEPENDENT_FULL_REPLAY`. The full-process base dump is byte-identical
+to the compressed ordered dump above, so the versioned artifact directory
+retains the smaller launch, process, target and replay receipts while the raw
+full-process dump remains at
+`/Volumes/data/cryptanalysis/n83_k1107_full_current_source_20261021_1930/base_dump.jsonl`.
+
+Reproduce the control and replay from the repository root with:
+
+```sh
+python3 -m research.n83_highk_beyond4405_20261021.run_k1107_full_control \
+  --binary /absolute/path/to/current-source/koblitz_orbit_dlp_fast \
+  --output /absolute/path/to/new-output
+python3 -m research.n83_highk_beyond4405_20261021.verify_k1107_full_control \
+  --output /absolute/path/to/new-output
+```
+
+The versioned receipts can also be replayed with
+`--output research/n83_highk_beyond4405_20261021/k1107_current_source_full_control`
+and `--base-dump research/n83_highk_beyond4405_20261021/k1107_current_source_base/base_dump.jsonl.gz`.
+
+The next cross-family measurement pairs K1107 and the selected fixed31 high-K
+arm on the sealed previously unseen holdout point under one Tier 1 allocation,
+including the same-point rho reference. K5500's full split-index run is a
+separate finalist gate.

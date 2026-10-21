@@ -64,6 +64,12 @@ base dumps. K1107 received fresh independent arithmetic replay and an exact
 K4405 prefix check; K5500's current output is byte-identical to its prior
 independently replayed dump. Their receipts are in
 `K1107_CURRENT_SOURCE.md` and `K5500_CURRENT_SOURCE.md`.
+K1107 has now also completed a current-source full-process control on an
+earlier public point: final rank 1,107, independently replayed four-point
+relation and scalar, 128.914-second local process wall time, 334.808 ms
+exclusive target interval, and 1.933 GB peak child RSS. This is a correctness
+and source-bridge result; its Tier 1 sealed same-point comparison remains
+pending. The raw and replay receipts are in `k1107_current_source_full_control/`.
 The current source also reproduced the historical K3596 root4 ordered base
 byte for byte, with fresh independent arithmetic replay of all 596,936 usable
 points; see `K3596_CURRENT_SOURCE.md`. Its full current-source index and target
