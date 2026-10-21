@@ -193,3 +193,113 @@ commit that adds `draws/m4-15-6.jsonl` and `draws/sha256.txt`
 file verifying in its clone. The tag may be added later from a local
 checkout; it must point at `fc1eea79` or a descendant that leaves `draws/`
 unchanged.
+
+## 11. Amendment A3 (2026-10-18 21:40Z, before any draw ≥ 251 of A1 exists): a decisive A1 count, parallel draw generation, C1 on a host above 280 GB
+
+Registered by the commit that adds this section. No draw of the A1 stream
+beyond the committed 251 (draws 0–250, `draws/m4-15-6.jsonl`) has been
+generated anywhere, and no closure has run since §10's host. Owner request
+2026-10-18 (rented-hardware leads; `research/ic_leads_rented_20261018/`).
+Labels as in the header: *recorded*, *derived*, *predicted*.
+
+### 11.1 Why
+
+§4 row A was read on 2 unsatisfiable draws (42, 214) because only 2 turned
+up in 251 (*recorded*, RESULTS.md). "m·ℓ ≥ 21" is refuted by any one
+refuting draw, so that reading stands. What survives, "ℓ = 7", predicts more
+than the 2 draws can show: **every** unsatisfiable A1 draw refutes at
+degree 4. Two out of two bounds the share of A1 draws that need degree 5 or
+more only by 78 % (one-sided 95 %, `1 − 0.05^{1/2}`). A3 makes that bound
+small enough to read. Generation was the bottleneck: one process, about 70 s
+per draw (*recorded*, `draws/m4-15-6.jsonl` `secs`).
+
+### 11.2 A1 extension (cell A1 unchanged: m = 4, n = 15, ℓ = 6, N = 54, S = −9)
+
+- **Draws.** The same stream as the committed file (seed 20261018, cell seed
+  as in `examples/dreg_ladder.rs`), fixed range **draws 251 to 3250**
+  (3,000 fresh draws). The range is fixed before generation and does not
+  depend on what it finds: there is no stop at a count. *Derived*: at the
+  recorded rate 2/251 the range holds about 24 unsatisfiable draws; at the
+  Clopper–Pearson ends of that rate (0.1 %–2.8 %), 3 to 84.
+- **Parallel generation.** `dreg_ladder --shard I/J --first-draw 251
+  --max-draws 3251`, `J` = the host's vCPUs, one process per shard
+  (`run.sh gen-a3`). Every process samples every draw of the stream
+  (`ladder_sample`, cheap) and measures only its residue class, so draw `k`
+  is exactly the draw the sequential run gives at `k`; the merged file,
+  sorted by draw, is the sequential file up to `secs`.
+- **Replay control (gate).** Before any fresh draw, the same shards
+  regenerate draws `0 … J−1` and must equal the committed lines on every
+  field but `secs` (`run.sh gen-a3` compares; a mismatch stops the host with
+  nothing fresh made). Pre-run check on the authoring container (4 shards):
+  draws 0–7 and 40–43, including unsatisfiable draw 42, identical
+  (`research/ic_leads_rented_20261018/tests/shard_replay_20261018/`).
+- **Selection (fixed now).** The first **16** unsatisfiable fresh draws in
+  draw order are measured; if fewer than 16 exist in the range, all of them.
+  The first satisfiable fresh draw is the control (`--satisfiable`).
+- **Anchor.** §10 gated measurement on the committed draws. A3 replaces that
+  gate with the fixed seed, range and selection rule above, which leave no
+  choice once generation starts: the host records the merged file's sha256
+  in `runs/queue.log` and `draws/a3-sha256.txt` before the first closure,
+  checks it again before measuring, and the file is committed with the
+  result. (The pods carry no git credentials.)
+- **Closure.** As §3, `--to 4`. At most `P = ⌊A / 39 GB⌋` closures at once,
+  each under `prlimit --as = A / P` (*recorded*: 25.8 GB peak RSS per A1
+  draw, 24 min each, alone), `timeout 14400` each.
+
+### 11.3 C1 on a larger host
+
+C1 (m = 3, (19, 7), degree 5) failed to allocate at 169 GB resident under the
+184 GB cap (*recorded*); its projection was 217 GB. A3 runs it only on a host
+whose cgroup limit is at least **280 GB** (1.3 × the projection; `A` = 0.92 ×
+limit ≥ 258 GB), on draw 0 first (`DEG5_DRAWS=1`), timeout 12 h. Draws 1–3
+run only in a later launch with `DEG5_DRAWS=4` and their own host record.
+Below 280 GB it is not attempted, and that is recorded. §4 row C applies;
+read on one draw, a non-refuting saturated closure already shows degree
+≥ 6 on that draw, and a refutation reads as "degree 5 on draw 0 only".
+
+### 11.4 Decision rule for the A1 extension (fixed now)
+
+Over the measured fresh unsatisfiable draws. `R` = refute at degree 4,
+`Z` = closure saturated at degree 4 without refuting, `X` = capped,
+allocation failure or timeout (not evidence about the degree).
+
+| outcome | reading |
+|---|---|
+| control refutes | the cell's reading is void until explained (as §4) |
+| `X > (R + Z + X) / 4` | inconclusive; the counts are recorded |
+| `Z ≥ 1` | "ℓ = 7" in its strong form (degree 4 on every unsatisfiable (4, 6) draw) is **refuted**; the degree at (4, 6) is mixed; `Z / (R + Z)` is reported with its 95 % Clopper–Pearson interval |
+| `Z = 0`, `R + 2 ≥ 14` | **decisive**: "ℓ = 7" survives; the share of unsatisfiable A1 draws needing degree ≥ 5 is below `1 − 0.05^{1/(R+2)}` (95 %, pooled with draws 42 and 214; 15.3 % at R = 16) |
+| `Z = 0`, `R + 2 < 14` | consistent with "ℓ = 7", not decisive; the count is recorded |
+
+No row is a cost row, an improvement or a claim about ECC2K-130; the
+consequence for `RESEARCH_ECC2K130_DESCENT_DEGREE.md` stays a derived update
+in the result PR.
+
+### 11.5 Predictions (before the runs)
+
+1. The replay control passes (the pre-run check did).
+2. 15 to 35 unsatisfiable draws in the range (the 2/251 rate); confidence 0.6.
+3. `Z = 0` and the decisive row; confidence 0.6, as §5.1.
+4. Generation at 32 vCPU: 1.5 to 3.5 h for 3,000 draws (70 s per draw per
+   process, 32 processes, an SMT slowdown of 1 to 2×).
+5. C1 draw 0 refutes at degree 5 (§5.3 unchanged, confidence 0.7), peak RSS
+   below 260 GB.
+
+### 11.6 Hosts and cards
+
+`research/ic_leads_rented_20261018/closure_a3/LAUNCH.md` (A1 extension:
+cpu3m, 32 vCPU, 256 GB) and `research/ic_leads_rented_20261018/closure_c1/LAUNCH.md`
+(C1: a 2 × L40 GPU pod, used for its 286 GB of host memory; the GPUs are
+idle). A2, B1, B2 and C2 stay deferred.
+
+### 11.7 Disclosure after the freeze (plumbing tests only)
+
+After the commit that froze §11 (`ee7a5d972`), a local test of `pod/boot.sh a3` on the 4 vCPU,
+15 GB authoring container ran the whole job with `A3_FIRST=251 A3_END=255`
+(`research/ic_leads_rented_20261018/tests/boot_a3_20261018/`). It computed
+draws 251–254 of the frozen range, all satisfiable, with no closure on any
+unsatisfiable draw. The control closure on draw 251 was killed by the host's
+memory (exit 137). Those files are kept as test records, not in `draws/`, so
+the pod generates the whole range itself. Draws 251–254 are fixed by the
+seed, and the selection rule (§11.2) reads only draw order, so this changes
+nothing in what will be measured.
