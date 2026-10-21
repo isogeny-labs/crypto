@@ -1,0 +1,65 @@
+{
+  "python": "3.9.25",
+  "system_tests": {
+    "command": "python3 -m unittest discover -s infra/spot-system -p 'test_*.py' -v",
+    "passed": 42,
+    "result": "passed"
+  },
+  "python_compile": "passed",
+  "cfn_lint": {
+    "version": "1.46.0",
+    "result": "passed"
+  },
+  "cargo_release_library": {
+    "command": "cargo test --release --lib",
+    "result": "passed",
+    "passed": 4396,
+    "failed": 0,
+    "ignored": 118,
+    "duration_seconds": 107.83
+  },
+  "s3_download_sha256": "passed",
+  "files": {
+    "activity.py": "c22c969706fb9f2ab629b887f56dc309657896ed69e1ae7cf3dd39a38ee39d73",
+    "build_client.py": "5aa065eaf99233dc3a2540d6f0a954d7df45d7046157db269d38a9830af83122",
+    "build_template.py": "43bc66c02b0c118aa0157909f439d3361433da932ccb5d0cfa26a7eab611126e",
+    "controller.py": "ac6b8b029cc08d91bbd3f719c93ed73adaf0992a96c17dbf362d53be1ba99792",
+    "install_hooks.py": "37c58155b5f0989ea72815f844c48fa4edd4c6434f35799a9d7702931b63d115",
+    "install_services.py": "e78faa6371adb1c189df7d66975143120a580d978c05172957d501a1dc6835bc",
+    "lifecycle.py": "eff1c23cd3fbee416e570de12af55f24b33155b7d423ad5d0d87c1813817c3ed",
+    "node_service.py": "be0d8740852066c8fc3a8e43a037631a11e65fdb8260b4045210b414722ce73a",
+    "package_runtime.py": "d8943fb91010755065054414c4485d1d4b3acf843825cb4d4aeba21f2129267a",
+    "prices.py": "42614be936e747efbd9af78e057117797a823dc67549aa79be36162376b74ea6",
+    "runner.py": "eb5b201b978228362913e8e4edad57cef7f08e59cb9921fa2418517cb94b19df",
+    "test_activity.py": "d20c6517ed491acf7169278e0585f8f48290a3ada6dec53c0173f065bd0972d7",
+    "test_lifecycle.py": "cb89f42a0ed0eeded02172d97ac7b6de5c397f35d303cbae0839df426060786a",
+    "test_system.py": "1b87658238a8074a09866116cf4615dfb0ab7af167074e8aec92934978ac3e01",
+    "wake.py": "7531a30115452e754040948659e46432cd961b9edea5acd934f45efbd7acce40",
+    "worker_state.py": "3218ba2f9627f80e9afb076efae9abe7acf35cb073eb1fe63e7b5a2b6e0e8329"
+  },
+  "checkpoint_discovery": {
+    "command": "RUSTFLAGS=-C target-cpu=x86-64 cargo test --release --locked --manifest-path infra/spot-system/checkpoint-discovery/Cargo.toml",
+    "passed": 20,
+    "result": "passed",
+    "clippy": "passed",
+    "fmt": "passed",
+    "portable_build": "RUSTFLAGS=-C target-cpu=x86-64",
+    "live_timer": "active",
+    "live_workers_without_checkpoint_interface": 5,
+    "live_coverage": "partial: archive entry limit, process permissions, missing jobs manifest"
+  },
+  "native_source_sha256": {
+    "checkpoint-discovery/src/lib.rs": "85d726162fc55bcbd693336131bdab0d76ada8d1539101645d316e773c4511dd",
+    "checkpoint-discovery/src/main.rs": "7d80ca59515f1574eaeb91128f323a3ff8aef277e233f654f75cfe830a8bf067",
+    "checkpoint-discovery/tests/discovery.rs": "362a2c0ca7045bd47475d1e192122b3d1ff8191eea87e75a41fe1c8cfb485897",
+    "checkpoint-discovery/tests/recovery.rs": "ee4ab783c8899ad03a19027409516ab0067f8dad388455dbe95ae2d22d6781f3"
+  },
+  "aws_deployment": {
+    "configuration": "applied",
+    "lifecycle": "enabled",
+    "ip_cutover": "disabled",
+    "efs_bootstrap_recovery": "passed",
+    "managed_cold_boot": "blocked_by_spot_quota",
+    "evidence": "aws-deployment.json"
+  }
+}
