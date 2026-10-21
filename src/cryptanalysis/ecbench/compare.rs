@@ -16,6 +16,12 @@
 //! workloads resampled, then pairs within each.  With one workload only
 //! the second stage exists and the comparison says so.
 //!
+//! **At a band weight** (`compare_at_weight`, `ecbench compare --weight w`)
+//! every record's `S` is first replaced by its §5a priced cost
+//! `priced_S(w)` (`band::priced_s`), so the same paired statistic and
+//! interval are read with the unpriced native work charged at `w` GAE per
+//! operation.  Without a weight nothing changes, comparison ids included.
+//!
 //! **Wall time** is a practicality note.  It is compared only inside one
 //! session (same host class, interleaved), only over pairs where both
 //! runs earned the spec's `isolation_required`, only with at least five
@@ -173,6 +179,9 @@ pub struct Comparison {
     /// deserialize without it and keep their original meaning.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub quality: Option<MeasurementQuality>,
+    /// The §5a band weight the costs were priced at; absent for counted `S`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub weight: Option<f64>,
     pub verdict: String,
 }
 
@@ -293,12 +302,51 @@ pub fn compare(
     resamples: usize,
     seed: u64,
 ) -> Result<Comparison, String> {
+    compare_at_weight(a_dir, a_arm, b_dir, b_arm, resamples, seed, None)
+}
+
+/// Each record's cost replaced by its §5a priced cost at `w`.
+fn price_records(recs: &mut [Record], w: f64) -> Result<(), String> {
+    for r in recs.iter_mut().filter(|r| r.cost.s.is_some()) {
+        let (Some(g), Some(s)) = (super::band::priced_gae(r, w)?, super::band::priced_s(r, w)?)
+        else {
+            return Err(format!(
+                "record {} names an unpriced counter without a count; it has no priced cost at w = {w}",
+                r.record_id
+            ));
+        };
+        r.cost.total_gae = Some(g);
+        r.cost.s = Some(s);
+    }
+    Ok(())
+}
+
+/// `compare`, with every cost priced at the §5a band weight `weight`
+/// (GAE per native operation) when one is given.
+pub fn compare_at_weight(
+    a_dir: &Path,
+    a_arm: &str,
+    b_dir: Option<&Path>,
+    b_arm: &str,
+    resamples: usize,
+    seed: u64,
+    weight: Option<f64>,
+) -> Result<Comparison, String> {
+    if weight.is_some_and(|w| !(w.is_finite() && w >= 0.0)) {
+        return Err(
+            "the weight must be a finite number of GAE per native operation, at least 0".into(),
+        );
+    }
     let sa = read_session(a_dir)?;
-    let ra = read_records(a_dir)?;
-    let (sb, rb) = match b_dir {
+    let mut ra = read_records(a_dir)?;
+    let (sb, mut rb) = match b_dir {
         Some(d) => (read_session(d)?, read_records(d)?),
         None => (sa.clone(), ra.clone()),
     };
+    if let Some(w) = weight {
+        price_records(&mut ra, w)?;
+        price_records(&mut rb, w)?;
+    }
     let same_session = sa.session_id == sb.session_id;
     if same_session && a_arm == b_arm {
         return Err("compare two different arms".into());
@@ -462,15 +510,20 @@ pub fn compare(
             _ => format!(" ({})", wall.reasons.join("; ")),
         },
     );
-    let (comparison_id, _) = short_id(
-        "ECC1",
-        &json!({
-            "a": [a.session_id, a.arm, a.method_id],
-            "b": [b.session_id, b.arm, b.method_id],
-            "resamples": resamples,
-            "seed": seed.to_string(),
-        }),
-    )?;
+    let mut id_doc = json!({
+        "a": [a.session_id, a.arm, a.method_id],
+        "b": [b.session_id, b.arm, b.method_id],
+        "resamples": resamples,
+        "seed": seed.to_string(),
+    });
+    if let Some(w) = weight {
+        id_doc["weight"] = json!(w.to_string());
+    }
+    let (comparison_id, _) = short_id("ECC1", &id_doc)?;
+    let verdict = match weight {
+        Some(w) => format!("at w = {w} GAE per native operation (AGENTS.md §5a): {verdict}"),
+        None => verdict,
+    };
     Ok(Comparison {
         schema: COMPARISON_SCHEMA.into(),
         comparison_id,
@@ -482,6 +535,7 @@ pub fn compare(
         ops,
         wall,
         quality: Some(quality),
+        weight,
         verdict,
     })
 }
@@ -731,5 +785,44 @@ mod tests {
         assert_eq!(r, Some(1.0));
         assert_eq!(ci, Some((1.0, 1.0)));
         assert_eq!(method, "cluster");
+    }
+
+    fn r24() -> std::path::PathBuf {
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/ic_planner_validation_20261020/sessions/r24")
+    }
+
+    #[test]
+    fn no_weight_is_the_counted_comparison() {
+        let plain = compare(&r24(), "plan", None, "double-base", 200, 7).unwrap();
+        let none = compare_at_weight(&r24(), "plan", None, "double-base", 200, 7, None).unwrap();
+        assert_eq!(
+            serde_json::to_value(&plain).unwrap(),
+            serde_json::to_value(&none).unwrap()
+        );
+        assert!(plain.weight.is_none());
+    }
+
+    #[test]
+    fn a_weight_prices_both_arms_like_the_band() {
+        // ecbench band on this session: double-base 20.686 / 29.597 and plan
+        // 13.727 / 32.288 mean S at w = 0 / 1, every run paired.
+        let at = |w| {
+            compare_at_weight(&r24(), "plan", None, "double-base", 200, 7, Some(w))
+                .unwrap()
+                .ops
+                .ratio_b_over_a
+                .unwrap()
+        };
+        assert!((at(0.0) - 20.686 / 13.727).abs() < 1e-3);
+        assert!((at(1.0) - 29.597 / 32.288).abs() < 1e-3);
+        let c = compare_at_weight(&r24(), "plan", None, "double-base", 200, 7, Some(1.0)).unwrap();
+        assert_eq!(c.weight, Some(1.0));
+        assert!(c.verdict.starts_with("at w = 1 GAE"));
+        let plain = compare(&r24(), "plan", None, "double-base", 200, 7).unwrap();
+        assert_ne!(c.comparison_id, plain.comparison_id);
+        assert!(
+            compare_at_weight(&r24(), "plan", None, "double-base", 200, 7, Some(-1.0)).is_err()
+        );
     }
 }

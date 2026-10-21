@@ -239,7 +239,12 @@ enum Cmd {
         resamples: usize,
         #[arg(long, default_value_t = 20261002)]
         seed: u64,
-        /// Save to <dir>/comparisons/<a>__<b>.json.
+        /// Price every record at this AGENTS.md §5a band weight (GAE per
+        /// unpriced native operation) before pairing; counted `S` without it.
+        #[arg(long)]
+        weight: Option<f64>,
+        /// Save to <dir>/comparisons/<a>__<b>.json (`<a>__<b>__w<weight>.json`
+        /// with `--weight`).
         #[arg(long)]
         save: bool,
         #[arg(long)]
@@ -1079,14 +1084,26 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             b_dir,
             resamples,
             seed,
+            weight,
             save,
             json,
         } => {
-            let c = compare::compare(&dir, &a, b_dir.as_deref(), &b, resamples, seed)?;
+            let c = compare::compare_at_weight(
+                &dir,
+                &a,
+                b_dir.as_deref(),
+                &b,
+                resamples,
+                seed,
+                weight,
+            )?;
             if save {
                 let d = dir.join("comparisons");
                 std::fs::create_dir_all(&d).map_err(|e| e.to_string())?;
-                let f = d.join(format!("{a}__{b}.json"));
+                let f = match weight {
+                    Some(w) => d.join(format!("{a}__{b}__w{w}.json")),
+                    None => d.join(format!("{a}__{b}.json")),
+                };
                 std::fs::write(
                     &f,
                     serde_json::to_string_pretty(&c).map_err(|e| e.to_string())? + "\n",
