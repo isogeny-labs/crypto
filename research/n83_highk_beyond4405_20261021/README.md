@@ -64,6 +64,10 @@ base dumps. K1107 received fresh independent arithmetic replay and an exact
 K4405 prefix check; K5500's current output is byte-identical to its prior
 independently replayed dump. Their receipts are in
 `K1107_CURRENT_SOURCE.md` and `K5500_CURRENT_SOURCE.md`.
+The current source also reproduced the historical K3596 root4 ordered base
+byte for byte, with fresh independent arithmetic replay of all 596,936 usable
+points; see `K3596_CURRENT_SOURCE.md`. Its full current-source index and target
+run remains a separate gate.
 The earlier source snapshot, its candidate identities and custody receipt are
 retained under `identities_source_f9_snapshot`,
 `base_stage_receipts_source_f9_snapshot` and
@@ -126,7 +130,12 @@ on its exact head. A full K4500 or K4549 process has not yet been measured.
 The first broad parallel release library attempt recorded three time-limited
 `jv_cover` failures before interruption in `rust-lib-tests-parallel-failed.log`.
 Each of those tests passed on isolated replay and in the subsequent serial
-run; the serial full-suite result remains pending until that run completes.
+run. That serial full-suite run finished with 4,157 passed, 117 ignored and
+five `cryptopro_b_chain_set` failures because this sparse worktree had omitted
+its tracked frozen input file. The raw result is in
+`rust-lib-tests-serial.log`. After materializing the exact committed fixture,
+all five failed tests passed in a focused serial rerun. A new full serial run
+with the fixture present is pending in `rust-lib-tests-serial-with-fixture.log`.
 The previous RunPod campaign's conservative upper charge was $5.710216
 against its $5 ceiling, so this preparation launches no paid instance. A new
 bounded allocation needs its own reviewed budget and protocol.

@@ -27,13 +27,14 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def run(binary: Path, output: Path) -> int:
+def run(binary: Path, output: Path, *, k: int = K,
+        expected_base_hash: str = PRIOR_BASE_HASH) -> int:
     if sha256(SOURCE) != SOURCE_SHA256 or not TARGET.is_file():
         raise ValueError("current source or earlier public fixture differs")
     binary = binary.resolve(strict=True)
     output.mkdir(parents=True, exist_ok=False)
     dump = output / "base_dump.jsonl"
-    command = [str(binary), f"construct:83:1:{K}", str(TARGET), "29",
+    command = [str(binary), f"construct:83:1:{k}", str(TARGET), "29",
                str(output / "unused_targets_result.jsonl")]
     env = {key: value for key, value in os.environ.items()
            if not key.startswith("KIC_")}
@@ -59,10 +60,10 @@ def run(binary: Path, output: Path) -> int:
             header = json.loads(dump.read_text())
             if (summary.get("kind") != "compact_orbit_base_stage" or
                     summary.get("n") != 83 or summary.get("a") != 1 or
-                    summary.get("orbit_columns") != K or
-                    summary.get("factor_base_points") != 166 * K or
-                    summary.get("base_hash") != PRIOR_BASE_HASH or
-                    header.get("base_hash") != PRIOR_BASE_HASH):
+                    summary.get("orbit_columns") != k or
+                    summary.get("factor_base_points") != 166 * k or
+                    summary.get("base_hash") != expected_base_hash or
+                    header.get("base_hash") != expected_base_hash):
                 status = "IDENTITY_MISMATCH"
         except (OSError, ValueError, TypeError):
             status = "MALFORMED_OUTPUT"
