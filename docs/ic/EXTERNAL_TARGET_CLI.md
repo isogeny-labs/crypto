@@ -228,6 +228,8 @@ crypto cryptanalysis aes-linear-parity --input known-pairs.json \
 crypto cryptanalysis aes-distinguisher --technique impossible --samples 4096
 crypto cryptanalysis aes-distinguisher --technique yoyo --samples 4096
 crypto cryptanalysis aes-distinguisher --technique mixture --samples 4096
+crypto cryptanalysis aes-distinguisher --technique boomerang --samples 4096 \
+  --delta-hex 01000000000000000000000000000000
 crypto cryptanalysis aes-distinguisher --technique zero-correlation
 crypto cryptanalysis aes-cpa --input traces.json
 crypto cryptanalysis aes-cache-timing --input isolated-lookup-timings.json
@@ -242,15 +244,23 @@ and linear corpora. Each recovered result is checked against that instance.
 The rest of the AES modules have separate input models and remain outside
 this adapter; `crypto cryptanalysis sbox`, `auto`, `boomerang`, `rectangle`,
 `aes-related-key`, and `aes-visual-demo` provide other entry points.
-`aes-distinguisher` exposes four further bounded analyses: a four-round
+`aes-distinguisher` exposes five further bounded analyses: a four-round
 impossible differential, a two-versus-three-round yoyo comparison, a
 one-versus-two-round mixture identity comparison with subspace diagnostics,
-and exact zero-correlation
-mask enumeration on the AES S-box. The first three use a supplied AES-128
+an exact AES S-box boomerang connectivity table with a two-round fixed-delta
+return measurement, and exact zero-correlation mask enumeration on the AES
+S-box. The first four use a supplied AES-128
 analysis key; the S-box check concerns the public substitution table. Each
-command reports the configured sample count and its observed structural
-check. These are distinct input models and do not imply an attack on
+command reports its configured sample count and measured or structural
+result. These are distinct input models and do not imply an attack on
 full-round AES.
+
+The `boomerang` technique requires a nonzero 16-byte `--delta-hex` and a
+nonzero `--alpha` input difference at byte zero. It reports the exact public
+AES S-box off-diagonal BCT maximum plus the empirical return count for that
+fixed delta under the declared two-round model. A zero return count is a
+valid measurement, not evidence of key recovery. The command does not choose
+each delta from the ciphertexts it just observed.
 
 `aes-differential-observed` accepts caller-supplied data for the reduced
 two-round cipher (the last round omits MixColumns):

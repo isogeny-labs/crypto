@@ -310,9 +310,9 @@ enum CryptanalysisOp {
         #[arg(long, default_value_t = 0x73)]
         alpha: u8,
     },
-    /// Measure a bounded AES impossible, yoyo, mixture, or S-box zero-correlation distinguisher.
+    /// Measure a bounded AES impossible, yoyo, mixture, boomerang, or S-box zero-correlation distinguisher.
     AesDistinguisher {
-        /// `impossible` (4 rounds), `yoyo` (2 vs 3), `mixture` (1 vs 2), or `zero-correlation` (S-box).
+        /// `impossible` (4 rounds), `yoyo` (2 vs 3), `mixture` (1 vs 2), `boomerang` (2 rounds), or `zero-correlation` (S-box).
         #[arg(long)]
         technique: String,
         /// 16-byte analysis key as 32 hex digits (unused for S-box statistics).
@@ -323,9 +323,12 @@ enum CryptanalysisOp {
         samples: usize,
         #[arg(long, default_value_t = 0xdead_beef_cafe)]
         seed: u64,
-        /// Input difference at plaintext byte zero for `impossible`.
+        /// Input difference at plaintext byte zero for `impossible` and `boomerang`.
         #[arg(long, default_value_t = 0x73)]
         alpha: u8,
+        /// Required fixed 16-byte ciphertext difference for `boomerang`.
+        #[arg(long)]
+        delta_hex: Option<String>,
     },
     /// Recover an AES-128 key candidate from measured first-round S-box power traces.
     AesCpa {
@@ -1807,9 +1810,10 @@ fn cmd_aes_distinguisher(
     samples: usize,
     seed: u64,
     alpha: u8,
+    delta_hex: Option<&str>,
 ) -> Result<(), String> {
     use crypto_lib::cryptanalysis::aes::{
-        impossible, mixture, yoyo, zero_correlation, ReducedAes128,
+        boomerang, impossible, mixture, yoyo, zero_correlation, ReducedAes128,
     };
 
     if !(1..=1_000_000).contains(&samples) {
@@ -1819,7 +1823,45 @@ fn cmd_aes_distinguisher(
     let key: [u8; 16] = key_vec
         .try_into()
         .map_err(|_| "AES-128 key must be exactly 16 bytes".to_string())?;
+    if technique != "boomerang" && delta_hex.is_some() {
+        return Err("--delta-hex applies only to boomerang".into());
+    }
     match technique {
+        "boomerang" => {
+            if alpha == 0 {
+                return Err("alpha must be nonzero".into());
+            }
+            let delta_hex = delta_hex.ok_or("boomerang requires --delta-hex")?;
+            let delta_vec = from_hex(delta_hex).map_err(|e| format!("invalid delta hex: {e}"))?;
+            let delta: [u8; 16] = delta_vec
+                .try_into()
+                .map_err(|_| "boomerang delta must be exactly 16 bytes".to_string())?;
+            if delta.iter().all(|&b| b == 0) {
+                return Err("boomerang delta must be nonzero".into());
+            }
+            let mut input_delta = [0u8; 16];
+            input_delta[0] = alpha;
+            let cipher = ReducedAes128::new(&key, 2, false);
+            let report = boomerang::boomerang_with_chosen_delta(
+                &cipher,
+                &input_delta,
+                Some(delta),
+                samples,
+                seed,
+            );
+            let bct = boomerang::aes_sbox_bct();
+            let uniformity = boomerang::boomerang_uniformity(&bct);
+            println!("# AES-128 two-round fixed-delta boomerang measurement");
+            println!("trials: {}", report.trials);
+            println!("returns: {}", report.returns);
+            println!(
+                "return rate: {:.8}",
+                report.returns as f64 / report.trials as f64
+            );
+            println!("AES S-box off-diagonal BCT maximum: {uniformity}");
+            println!("input difference: {:02x} at byte 0", alpha);
+            println!("fixed ciphertext difference: {}", to_hex(&delta));
+        }
         "impossible" => {
             if alpha == 0 {
                 return Err("alpha must be nonzero".into());
@@ -1910,7 +1952,7 @@ fn cmd_aes_distinguisher(
         }
         other => {
             return Err(format!(
-                "unknown AES distinguisher '{other}'; use impossible, yoyo, mixture, or zero-correlation"
+                "unknown AES distinguisher '{other}'; use impossible, yoyo, mixture, boomerang, or zero-correlation"
             ));
         }
     }
@@ -2100,8 +2142,16 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             samples,
             seed,
             alpha,
+            delta_hex,
         } => {
-            if let Err(e) = cmd_aes_distinguisher(&technique, &key_hex, samples, seed, alpha) {
+            if let Err(e) = cmd_aes_distinguisher(
+                &technique,
+                &key_hex,
+                samples,
+                seed,
+                alpha,
+                delta_hex.as_deref(),
+            ) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }
