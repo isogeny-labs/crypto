@@ -24,7 +24,7 @@ while ((left > 0)) && jq -e '.status == "partial"' "$current" >/dev/null; do
   mkdir -p "$snapshot/certs-final"
   jq -r --arg out "$snapshot" '"ID=\""+.id+"\"; N="+.value+"; BASE_PARTS=["+([(.factors+.residuals)[]|.[0] as $p|range(.[1])|$p]|join(","))+"]; OUT=\""+$out+"\";"' "$current" > "$snapshot/input.gp"
   jq -Rs -r '"EXTRA_FACTORS=["+(split("\n")|map(select(test("^[0-9]+$")))|join(","))+"];"' "$attempt/candidate-factors.txt" >> "$snapshot/input.gp"
-  CERTIFY_INPUT="$snapshot/input.gp" "${GP_BIN:-gp}" -q -f "$here/certify_parts.gp" > "$snapshot/result.json" 2> "$snapshot/stderr.txt"
+  CERTIFY_INPUT="$snapshot/input.gp" "${GP_BIN:-gp}" -q -f -s 128000000 --default parisizemax=2000000000 "$here/certify_parts.gp" > "$snapshot/result.json" 2> "$snapshot/stderr.txt"
   jq -e '.product_verified and .known_factors_prime and .certificates_replay_valid' "$snapshot/result.json" >/dev/null
   current="$snapshot/result.json"
 done
