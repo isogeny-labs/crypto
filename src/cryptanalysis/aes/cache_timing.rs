@@ -150,6 +150,84 @@ pub fn bernstein_attack_high_nibble(plaintexts: &[[u8; 16]], timings: &[f64]) ->
     out
 }
 
+/// Estimate key-byte high nibbles from sixteen separately instrumented
+/// first-lookup timing channels. Each channel measures whether its lookup
+/// reaches the first cache line; ordinary whole-encryption timings do not
+/// satisfy this model. A tied minimum leaves that byte unresolved.
+#[derive(Clone, Debug)]
+pub struct IsolatedLookupRecovery {
+    pub high_nibbles: [Option<u8>; 16],
+    pub minimum_bucket_count: [usize; 16],
+    pub runner_up_mean_gap: [f64; 16],
+}
+
+pub fn recover_isolated_lookup_high_nibbles(
+    plaintexts: &[[u8; 16]],
+    timings_per_byte: &[Vec<f64>; 16],
+    min_samples_per_bucket: usize,
+) -> Result<IsolatedLookupRecovery, String> {
+    if min_samples_per_bucket == 0 {
+        return Err("minimum samples per bucket must be positive".into());
+    }
+    if plaintexts.is_empty() {
+        return Err("at least one plaintext is required".into());
+    }
+    let mut high_nibbles = [None; 16];
+    let mut minimum_bucket_count = [0; 16];
+    let mut runner_up_mean_gap = [0.0; 16];
+    for byte_pos in 0..16 {
+        let channel = &timings_per_byte[byte_pos];
+        if channel.len() != plaintexts.len() || channel.iter().any(|t| !t.is_finite()) {
+            return Err(format!(
+                "channel {byte_pos} must have one finite timing per plaintext"
+            ));
+        }
+        let mut sum = [0.0; 16];
+        let mut count = [0usize; 16];
+        for (plaintext, &timing) in plaintexts.iter().zip(channel) {
+            let bucket = (plaintext[byte_pos] >> 4) as usize;
+            sum[bucket] += timing;
+            count[bucket] += 1;
+        }
+        let least = *count.iter().min().unwrap();
+        minimum_bucket_count[byte_pos] = least;
+        if least < min_samples_per_bucket {
+            return Err(format!(
+                "channel {byte_pos} has only {least} samples in its least populated high-nibble bucket; need {min_samples_per_bucket}"
+            ));
+        }
+        let mut means = [0.0; 16];
+        for bucket in 0..16 {
+            means[bucket] = sum[bucket] / count[bucket] as f64;
+            if !means[bucket].is_finite() {
+                return Err(format!(
+                    "channel {byte_pos} bucket {bucket} mean overflowed"
+                ));
+            }
+        }
+        let best = (0..16)
+            .min_by(|&a, &b| means[a].total_cmp(&means[b]))
+            .unwrap();
+        let second = (0..16)
+            .filter(|&bucket| bucket != best)
+            .min_by(|&a, &b| means[a].total_cmp(&means[b]))
+            .unwrap();
+        let gap = means[second] - means[best];
+        if !gap.is_finite() {
+            return Err(format!("channel {byte_pos} mean gap overflowed"));
+        }
+        runner_up_mean_gap[byte_pos] = gap;
+        if gap > 0.0 {
+            high_nibbles[byte_pos] = Some(best as u8);
+        }
+    }
+    Ok(IsolatedLookupRecovery {
+        high_nibbles,
+        minimum_bucket_count,
+        runner_up_mean_gap,
+    })
+}
+
 /// Convenience: simulate a Bernstein-style attack end-to-end using
 /// the per-byte timing model (`simulate_single_byte_timing`).  For
 /// each byte position we collect `n_traces` timings; the bucket of
@@ -264,10 +342,9 @@ pub fn format_cache_attack_report(
     }
     s.push('\n');
     s.push_str(
-        "**Note**: this is the *high-nibble* recovery step (4 bits per byte = 64 bits of \
-         key entropy cut).  The full Bernstein attack runs a second pass to recover the \
-         low nibble — combined with a brute-force search over the remaining 2⁶⁴ candidates \
-         it's a polynomial-time break.\n",
+        "**Note**: this model estimates only the high nibble of each key byte. \
+         It leaves 64 key bits unresolved and does not implement a low-nibble \
+         recovery step or full AES-128 key recovery.\n",
     );
     s
 }
@@ -326,6 +403,33 @@ mod tests {
             "expected ≥ 14/16 high nibbles, got {}",
             report.bytes_correct
         );
+    }
+
+    #[test]
+    fn isolated_lookup_requires_bucket_coverage_and_reports_ties() {
+        let key = [0x42u8; 16];
+        let mut plaintexts = Vec::new();
+        let mut channels: [Vec<f64>; 16] = std::array::from_fn(|_| Vec::new());
+        for bucket in 0..16u8 {
+            for _ in 0..4 {
+                let plaintext = [bucket << 4; 16];
+                plaintexts.push(plaintext);
+                for channel in &mut channels {
+                    channel.push(if bucket == key[0] >> 4 { 0.0 } else { 1.0 });
+                }
+            }
+        }
+        let recovered = recover_isolated_lookup_high_nibbles(&plaintexts, &channels, 4).unwrap();
+        assert_eq!(recovered.high_nibbles, [Some(4); 16]);
+        assert_eq!(recovered.minimum_bucket_count, [4; 16]);
+        channels[0].fill(1.0);
+        let recovered = recover_isolated_lookup_high_nibbles(&plaintexts, &channels, 4).unwrap();
+        assert_eq!(recovered.high_nibbles[0], None);
+        plaintexts.pop();
+        for channel in &mut channels {
+            channel.pop();
+        }
+        assert!(recover_isolated_lookup_high_nibbles(&plaintexts, &channels, 4).is_err());
     }
 
     /// **Demo emission**.

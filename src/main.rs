@@ -335,6 +335,15 @@ enum CryptanalysisOp {
         #[arg(long)]
         known_ciphertext_hex: Option<String>,
     },
+    /// Estimate AES-128 key-byte high nibbles from sixteen isolated lookup timing channels.
+    AesCacheTiming {
+        /// JSON with plaintexts and one aligned timing channel per byte.
+        #[arg(long)]
+        input: PathBuf,
+        /// Minimum observations for each plaintext high-nibble bucket.
+        #[arg(long, default_value_t = 4)]
+        min_samples_per_bucket: usize,
+    },
     /// Reverse an established AES-128 10th-round key to the master key.
     AesDfaSchedule {
         /// Last-round AES-128 key as 32 hex digits, in column-major byte order.
@@ -1613,6 +1622,62 @@ fn cmd_aes_cpa(input: &Path, known_ciphertext_hex: Option<&str>) -> Result<(), S
     Ok(())
 }
 
+fn cmd_aes_cache_timing(input: &Path, min_samples_per_bucket: usize) -> Result<(), String> {
+    use crypto_lib::cryptanalysis::aes::cache_timing::recover_isolated_lookup_high_nibbles;
+    use serde::Deserialize;
+
+    #[derive(Deserialize)]
+    #[serde(deny_unknown_fields)]
+    struct TimingInput {
+        plaintexts: Vec<String>,
+        timings_per_byte: [Vec<f64>; 16],
+    }
+
+    let resolved = crypto_lib::store::resolve_path(input)?;
+    let bytes =
+        std::fs::read(&resolved).map_err(|e| format!("cannot read {}: {e}", input.display()))?;
+    let data: TimingInput = serde_json::from_slice(&bytes)
+        .map_err(|e| format!("invalid AES cache timing JSON: {e}"))?;
+    if !(64..=100_000).contains(&data.plaintexts.len()) {
+        return Err("AES cache timing requires 64..=100000 aligned observations".into());
+    }
+    if !(1..=data.plaintexts.len() / 16).contains(&min_samples_per_bucket) {
+        return Err("minimum samples per bucket is outside the observation count".into());
+    }
+    let mut plaintexts = Vec::with_capacity(data.plaintexts.len());
+    for (index, encoded) in data.plaintexts.iter().enumerate() {
+        let value = from_hex(encoded)
+            .map_err(|e| format!("invalid plaintext hex at index {index}: {e}"))?;
+        let block: [u8; 16] = value
+            .try_into()
+            .map_err(|_| format!("plaintext at index {index} must be 16 bytes"))?;
+        plaintexts.push(block);
+    }
+    let result = recover_isolated_lookup_high_nibbles(
+        &plaintexts,
+        &data.timings_per_byte,
+        min_samples_per_bucket,
+    )?;
+    let resolved_bytes = result.high_nibbles.iter().filter(|v| v.is_some()).count();
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&serde_json::json!({
+            "schema_version": 1,
+            "operation": "aes-cache-timing",
+            "model": "instrumented-isolated-first-lookup-cache-line",
+            "observations": plaintexts.len(),
+            "min_samples_per_bucket": min_samples_per_bucket,
+            "candidate_high_nibbles": result.high_nibbles,
+            "resolved_bytes": resolved_bytes,
+            "minimum_bucket_count": result.minimum_bucket_count,
+            "runner_up_mean_gap": result.runner_up_mean_gap,
+            "status": if resolved_bytes == 16 { "candidate" } else { "ambiguous" },
+        }))
+        .map_err(|e| e.to_string())?
+    );
+    Ok(())
+}
+
 fn cmd_aes_attack(
     technique: &str,
     key_hex: &str,
@@ -2012,6 +2077,15 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             known_ciphertext_hex,
         } => {
             if let Err(e) = cmd_aes_cpa(&input, known_ciphertext_hex.as_deref()) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesCacheTiming {
+            input,
+            min_samples_per_bucket,
+        } => {
+            if let Err(e) = cmd_aes_cache_timing(&input, min_samples_per_bucket) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }

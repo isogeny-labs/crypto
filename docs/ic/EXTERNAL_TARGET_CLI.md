@@ -152,6 +152,7 @@ crypto cryptanalysis aes-distinguisher --technique yoyo --samples 4096
 crypto cryptanalysis aes-distinguisher --technique mixture --samples 4096
 crypto cryptanalysis aes-distinguisher --technique zero-correlation
 crypto cryptanalysis aes-cpa --input traces.json
+crypto cryptanalysis aes-cache-timing --input isolated-lookup-timings.json
 crypto cryptanalysis aes-dfa --input fault-pairs.json
 crypto cryptanalysis aes-dfa-schedule --last-round-key-hex 13111d7fe3944a17f307a78b4d2b30c5
 ```
@@ -183,6 +184,7 @@ first-round Hamming-weight leakage model. Pass
 ten-round AES encryption; without that check the status is `candidate`.
 This command analyzes supplied traces. Trace acquisition and alignment
 depend on the measured device.
+
 The release CLI acceptance report is
 [`aes_cpa_public_report_20261018.json`](fixtures/aes_cpa_public_report_20261018.json).
 It uses 512 noiseless Hamming-weight samples per byte with key
@@ -193,6 +195,25 @@ of the AES S-box output at that plaintext byte XOR the matching key byte.
 The input JSON SHA-256 is
 `81b50a60c0361b33d7df6fe73cf5827942ce8dd10ff6284e931c97172a9ed2d8`.
 The known-answer ciphertext is `69c4e0d86a7b0430d8cdb78070b4c55a`.
+
+`aes-cache-timing` accepts JSON with `plaintexts` as 16-byte hex strings
+and `timings_per_byte` as sixteen arrays aligned to those plaintexts. Each
+array must measure one separately instrumented first-round lookup, with a
+faster observation when that lookup reaches cache line zero. The command
+requires 64–100,000 observations, finite timings, and at least four samples
+in every plaintext high-nibble bucket for every byte by default. It returns
+one candidate **high nibble** per key byte, the least populated bucket count,
+and the gap between the two lowest bucket means. Equal minimum means leave
+a byte unresolved. The status is `candidate` or `ambiguous`; neither means
+a full AES-128 key was recovered. Ordinary whole-encryption timings do not
+satisfy this isolated-lookup input model. The runnable public corpus and
+checked release result are
+[`aes_cache_timing_public_input.json`](fixtures/aes_cache_timing_public_input.json)
+and
+[`aes_cache_timing_public_report_20261020.json`](fixtures/aes_cache_timing_public_report_20261020.json).
+The corpus has 64 observations, with four samples in every bucket. It uses
+an exact zero-noise isolated-lookup model for a public key and is an input
+contract check, not evidence about a device's timing leakage.
 
 `aes-dfa` accepts 1–64 correct/faulted ciphertext pairs under a single-byte
 fault at the start of AES-128 round 9, before SubBytes. The input is a JSON
