@@ -106,9 +106,23 @@
    "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
    "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
   },
+<<<<<<< origin/pr-base-2156
   "planner_validation": {
    "path": "research/ic_planner_validation_20261020/analysis/summary.json",
    "sha256": "c8fb751cea39e55ebd1b322245c95a958ae8b47d393c6b6918abddcd2d4234fc"
+=======
+  "wide_producer": {
+   "path": "benchmarks/20261018-wide-producer-engineering/summary.json",
+   "sha256": "1f63f91e5f62cc4393dff6ee203b0562f3b9e92d98f45df24c9ae2777e1b3e40"
+  },
+  "t20_e2e": {
+   "path": "benchmarks/20261019-t20-n73-k600-e2e/summary.json",
+   "sha256": "6f32026f6d26a84e9fea24c2f2a444d027970a677daa27f35a520bf6418b28ba"
+  },
+  "f4_gf2_port": {
+   "path": "benchmarks/20261018-f4-gf2-port/summary.json",
+   "sha256": "a36b4262044654fb955277b5f68e5c3f69cc9677dcc7c62390225ef263fe543f"
+>>>>>>> origin/pr-2318
   },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -49657,6 +49671,510 @@
   "report": "research/la_engines_20261014/REPORT.pdf",
   "class": "engineering"
  },
+<<<<<<< origin/pr-base-2156
+=======
+ "sixsum_resolvent_component": {
+  "schema": "crypto.sixsum_s4_resolvent_summary/v1",
+  "class": "engineering",
+  "claim_scope": "n=41 Koblitz K_0, K=10 and 20, seed 20261012, 32 verified relations per cell, shared host (load ~2). No end-to-end S, no rho comparison, no key-recovery claim.",
+  "before": "2026-10-12 verdict: one S4 root solve 20-60 S3 (Berlekamp split), B2 1-8x more S3-work than the 4-sum",
+  "sources": [
+   "raw_resolvent_20261018/n41_k10_k20_split.json",
+   "raw_resolvent_20261018/n41_k10_k20_resolvent.json"
+  ],
+  "solver_cost_n41": {
+   "from_resolvent_run": {
+    "ns_s3_crate": 372.608083333,
+    "ns_s3_table": 186.872541667,
+    "ns_s4_build": 32.4666666667,
+    "ns_roots_split": 10150.762,
+    "ns_roots_resolvent": 649.407666667,
+    "resolvent_in_s3_wall": 1.74287058095,
+    "split_in_s3_wall": 27.2424632047,
+    "resolvent_in_s3_ops": 2.25108763672,
+    "split_in_s3_ops": 26.4926143671,
+    "ops_roots_split": {
+     "mul": 1710,
+     "sqr": 395,
+     "inv": 7,
+     "half_trace": 0,
+     "trace": 0,
+     "sqrt": 0
+    },
+    "ops_roots_resolvent": {
+     "mul": 70,
+     "sqr": 49,
+     "inv": 2,
+     "half_trace": 3,
+     "trace": 4,
+     "sqrt": 1
+    },
+    "resolvent_fallbacks": 0,
+    "solvers_disagree": 0,
+    "quartics": 3000
+   },
+   "from_split_run": {
+    "ns_s3_crate": 353.5685,
+    "ns_s3_table": 179.429708333,
+    "ns_s4_build": 30.1566666667,
+    "ns_roots_split": 9542.16933333,
+    "ns_roots_resolvent": 611.084666667,
+    "resolvent_in_s3_wall": 1.72833458486,
+    "split_in_s3_wall": 26.9881772085,
+    "resolvent_in_s3_ops": 2.18792025763,
+    "split_in_s3_ops": 26.4989740419,
+    "ops_roots_split": {
+     "mul": 1710,
+     "sqr": 395,
+     "inv": 7,
+     "half_trace": 0,
+     "trace": 0,
+     "sqrt": 0
+    },
+    "ops_roots_resolvent": {
+     "mul": 70,
+     "sqr": 49,
+     "inv": 2,
+     "half_trace": 3,
+     "trace": 4,
+     "sqrt": 1
+    },
+    "resolvent_fallbacks": 0,
+    "solvers_disagree": 0,
+    "quartics": 3000
+   }
+  },
+  "cells": [
+   {
+    "columns": 10,
+    "wall_s_per_relation": {
+     "4sum": 2.37265885778,
+     "b2_split": 3.89447233934,
+     "b2_resolvent": 0.349834808906
+    },
+    "s3_solves_per_relation_4sum": 5215058.71875,
+    "s4_solves_per_relation_b2": 370988.75,
+    "s4_solves_per_relation_b2_split_run": 370988.75,
+    "s3_equivalents_per_relation_wall": {
+     "4sum": 5215058.71875,
+     "b2_split": 10043952.607,
+     "b2_resolvent": 678910.946637
+    },
+    "relations": {
+     "4sum": 32,
+     "b2_split": 32,
+     "b2_resolvent": 32
+    },
+    "s4_fallbacks": 0
+   },
+   {
+    "columns": 20,
+    "wall_s_per_relation": {
+     "4sum": 0.474860922844,
+     "b2_split": 1.34079327597,
+     "b2_resolvent": 0.127945998719
+    },
+    "s3_solves_per_relation_4sum": 1009433.5625,
+    "s4_solves_per_relation_b2": 132122.0625,
+    "s4_solves_per_relation_b2_split_run": 132122.0625,
+    "s3_equivalents_per_relation_wall": {
+     "4sum": 1009433.5625,
+     "b2_split": 3577002.62903,
+     "b2_resolvent": 241783.920735
+    },
+    "relations": {
+     "4sum": 32,
+     "b2_split": 32,
+     "b2_resolvent": 32
+    },
+    "s4_fallbacks": 0
+   }
+  ],
+  "study": "research/ic_techniques_20261012/sixsum_extraction/",
+  "report": "research/ic_techniques_20261012/sixsum_extraction/REPORT_resolvent.pdf"
+ },
+ "wide_producer_component": {
+  "schema": "crypto.wide_producer_engineering/v1",
+  "date": "2026-10-18",
+  "class": "engineering",
+  "claim": "no end-to-end S claim, no rho claim; wall time of two stages of the wide (64 < n <= 127) relation producer, same binary, interleaved A/B",
+  "binary_source": "examples/koblitz_orbit_dlp_fast.rs",
+  "n": 73,
+  "scan_ns_per_probe": [
+   {
+    "k": 40,
+    "states_cap": 40000,
+    "source": "benchmarks/20261018-wide-producer-engineering/scan_k40.json",
+    "arms": {
+     "control": {
+      "median": 416.974,
+      "min": 414.268,
+      "max": 424.665,
+      "repeats": 5,
+      "ratio_to_control": 1.0
+     },
+     "lazy_canon": {
+      "median": 209.88,
+      "min": 202.99,
+      "max": 223.131,
+      "repeats": 5,
+      "ratio_to_control": 0.503
+     },
+     "prefetch": {
+      "median": 401.731,
+      "min": 374.949,
+      "max": 456.492,
+      "repeats": 5,
+      "ratio_to_control": 0.963
+     },
+     "all_three": {
+      "median": 216.989,
+      "min": 204.471,
+      "max": 244.976,
+      "repeats": 5,
+      "ratio_to_control": 0.52
+     }
+    },
+    "hits": 0
+   },
+   {
+    "k": 300,
+    "states_cap": 20000,
+    "source": "benchmarks/20261018-wide-producer-engineering/scan_k300.json",
+    "arms": {
+     "control": {
+      "median": 614.454,
+      "min": 559.287,
+      "max": 684.566,
+      "repeats": 5,
+      "ratio_to_control": 1.0
+     },
+     "lazy_canon": {
+      "median": 366.982,
+      "min": 349.307,
+      "max": 416.867,
+      "repeats": 5,
+      "ratio_to_control": 0.597
+     },
+     "prefetch": {
+      "median": 434.748,
+      "min": 386.822,
+      "max": 485.768,
+      "repeats": 5,
+      "ratio_to_control": 0.708
+     },
+     "all_three": {
+      "median": 225.573,
+      "min": 216.695,
+      "max": 250.483,
+      "repeats": 5,
+      "ratio_to_control": 0.367
+     }
+    },
+    "hits": 0
+   },
+   {
+    "k": 600,
+    "states_cap": 20000,
+    "source": "benchmarks/20261018-wide-producer-engineering/scan_k600.json",
+    "arms": {
+     "control": {
+      "median": 621.597,
+      "min": 583.105,
+      "max": 653.488,
+      "repeats": 5,
+      "ratio_to_control": 1.0
+     },
+     "lazy_canon": {
+      "median": 382.683,
+      "min": 372.011,
+      "max": 433.082,
+      "repeats": 5,
+      "ratio_to_control": 0.616
+     },
+     "prefetch": {
+      "median": 441.592,
+      "min": 422.228,
+      "max": 459.511,
+      "repeats": 5,
+      "ratio_to_control": 0.71
+     },
+     "all_three": {
+      "median": 234.967,
+      "min": 223.425,
+      "max": 302.984,
+      "repeats": 5,
+      "ratio_to_control": 0.378
+     }
+    },
+    "hits": 0
+   }
+  ],
+  "scan_control": "KIC_LAZY_CANON=0 KIC_PREFETCH=0",
+  "scan_all_switches": "KIC_LAZY_CANON=1 KIC_PREFETCH=1 KIC_BLOCKED_BLOOM=1 (lazy + prefetch alone: 232.8 vs 226.7 at K=300, same set)",
+  "index_build_seconds": [
+   {
+    "k": 300,
+    "source": "benchmarks/20261018-wide-producer-engineering/index_k300.json",
+    "arms": {
+     "serial": {
+      "median": 14.596,
+      "min": 14.392,
+      "max": 15.815,
+      "repeats": 3,
+      "ratio_to_serial": 1.0
+     },
+     "batch_inv_1thread": {
+      "median": 8.506,
+      "min": 8.213,
+      "max": 12.451,
+      "repeats": 3,
+      "ratio_to_serial": 0.583
+     },
+     "threads_only": {
+      "median": 5.825,
+      "min": 5.789,
+      "max": 6.396,
+      "repeats": 3,
+      "ratio_to_serial": 0.399
+     },
+     "threads_batch_inv": {
+      "median": 5.557,
+      "min": 4.848,
+      "max": 5.855,
+      "repeats": 3,
+      "ratio_to_serial": 0.381
+     }
+    }
+   },
+   {
+    "k": 600,
+    "source": "benchmarks/20261018-wide-producer-engineering/index_k600.json",
+    "arms": {
+     "serial": {
+      "median": 66.377,
+      "min": 60.61,
+      "max": 72.144,
+      "repeats": 2,
+      "ratio_to_serial": 1.0
+     },
+     "threads_batch_inv": {
+      "median": 29.13,
+      "min": 28.594,
+      "max": 29.665,
+      "repeats": 2,
+      "ratio_to_serial": 0.439
+     }
+    }
+   }
+  ],
+  "index_equality": "KIC_VERIFY_INDEX identical at K=150 (1,642,500 states, 1,642,050 table entries) for 4 threads + batch, 3 threads, batch alone; unit test at n=73 and symmetric n=83",
+  "e2e_identity": {
+   "spec": "construct:69:0:60",
+   "source": "benchmarks/20261018-wide-producer-engineering/e2e_n69_k60.txt",
+   "arms": 6,
+   "all_identical_to_control": true,
+   "rank_relations": 60,
+   "targets_solved": 8
+  },
+  "host": "unisolated shared 4-vCPU Xeon 2.80 GHz KVM guest, no PMU, load 3 to 6",
+  "caveats": [
+   "hits are 0 in every timed scan; the hit path is covered by the n=69 end-to-end run and unit tests",
+   "index rows: 3 repeats (K=300), 2 repeats (K=600); no A/A control",
+   "scan covers 20,000 to 40,000 states from the start of the state order",
+   "the 18,398 s of the landed n=73 K=600 run is the rank-stage wall; the serial index build is about 66 s"
+  ],
+  "report": "docs/ic/perf/WIDE_PRODUCER_ENGINEERING_20261018.md",
+  "commits": [
+   "21dccf843",
+   "0f831d70b"
+  ],
+  "study": "benchmarks/20261018-wide-producer-engineering/"
+ },
+ "t20_e2e_component": {
+  "schema": "crypto.t20_n73_k600_e2e/v1",
+  "date": "2026-10-20",
+  "class": "engineering",
+  "claim": "cold end-to-end wall of the landed n=73 K=600 single-target IC row, old wide producer against the landed one, same binary, same frozen base, target and rank seed, 3 pinned cores, 20 matched rho draws; counted S unchanged (identical probes and relations), no rho win",
+  "n": 73,
+  "k": 600,
+  "host": "4 vCPU Xeon 2.80 GHz KVM guest, 15 GiB, no PMU; IC pinned to cores 1-3, rho to core 1 via tools/isolated_bench.py; 41 isolated runs, 0 flagged contended",
+  "arms_wall_s": {
+   "O1_old": 9304.659,
+   "N1_landed": 4622.001,
+   "N2_landed_AA": 4559.385
+  },
+  "arms_cpu_s": {
+   "O1_old": 24853.4,
+   "N1_landed": 12331.4,
+   "N2_landed_AA": 12206.4
+  },
+  "old_over_new": {
+   "end_to_end_wall": {
+    "point": 2.027,
+    "lo": 2.014,
+    "hi": 2.037
+   },
+   "rank_stage_wall": {
+    "point": 2.035,
+    "lo": 2.023,
+    "hi": 2.045
+   },
+   "A_A_N1_over_N2_end_to_end_wall": {
+    "point": 1.014,
+    "lo": 1.005,
+    "hi": 1.02
+   }
+  },
+  "kill_condition": "end-to-end ratio < 1.1; not triggered",
+  "counted_S_old_over_new": 1.0,
+  "phases_s": {
+   "O1_old": {
+    "index_build": 92.4,
+    "rank_stage": 9207.7
+   },
+   "N1_landed": {
+    "index_build": 60.1,
+    "rank_stage": 4557.4
+   },
+   "N2_landed_AA": {
+    "index_build": 63.2,
+    "rank_stage": 4491.7
+   }
+  },
+  "rho": {
+   "draws": 20,
+   "wall_s_mean": 173.3,
+   "wall_s_mean_lo": 127.5,
+   "wall_s_mean_hi": 227.4,
+   "cpu_s_mean": 172.0
+  },
+  "ic_over_rho": {
+   "old_wall": {
+    "point": 53.7,
+    "lo": 40.7,
+    "hi": 73.2
+   },
+   "landed_wall": {
+    "point": 26.5,
+    "lo": 20.1,
+    "hi": 35.7
+   },
+   "old_cpu": {
+    "point": 144.5,
+    "lo": 109.7,
+    "hi": 195.7
+   },
+   "landed_cpu": {
+    "point": 71.3,
+    "lo": 54.3,
+    "hi": 96.9
+   }
+  },
+  "band_5a": {
+   "w": [
+    0.0,
+    0.1,
+    1.0
+   ],
+   "ic_S_lower_bound": [
+    0.0,
+    43.1,
+    431.2
+   ],
+   "rho_S": [
+    0.092,
+    1.459,
+    13.76
+   ],
+   "verdict": "unresolved at w=0; rho ahead for w>=0.1; no cross-method win"
+  },
+  "controls": "A/A N1/N2 1.014; scan positive control new/old 0.458 (3 rounds); estimator positive control x1.10 recovered 1.113 (1.109-1.118); replay of all three rows passes",
+  "report": "benchmarks/20261019-t20-n73-k600-e2e/t20_n73_k600_e2e_report.pdf",
+  "study": "research/t20_n73_k600_e2e_20261019/",
+  "caveats": [
+   "one old-producer run (A/A on the landed arm only)",
+   "rho draws 2-12 regenerated after the IC runs (records lost to a cleanup mistake), so rho does not bracket IC",
+   "N2 rerun after a container restart",
+   "IC 3 cores vs rho 1 core (cpu-second ratio is the matched one)",
+   "IC group additions not emitted: IC S is a lower bound"
+  ]
+ },
+ "f4_gf2_port_component": {
+  "schema": "crypto.f4_gf2_port/v1",
+  "date": "2026-10-18",
+  "class": "engineering",
+  "claim": "kernel level: no end-to-end S, no rho claim, all 20 timed draws undecided",
+  "commit": "5a0db28a4",
+  "n": 15,
+  "m": 3,
+  "ell": 5,
+  "degree": 4,
+  "n_vars": 30,
+  "draws": 20,
+  "arms": [
+   {
+    "key": "crate_full",
+    "label": "crate full readback (matrix_f4_f2_counted_with)",
+    "median_ms": 199.5,
+    "min_ms": 175.0,
+    "max_ms": 253.1,
+    "median_word_xors": 154963841,
+    "speedup_vs_crate_full": 1.0
+   },
+   {
+    "key": "crate_solver",
+    "label": "crate solver path (SolverEngine::MatrixF4 call)",
+    "median_ms": 396.7,
+    "min_ms": 368.9,
+    "max_ms": 420.7,
+    "median_word_xors": 64342540,
+    "speedup_vs_crate_full": 0.5
+   },
+   {
+    "key": "port_f5_on",
+    "label": "port decide, F5 on",
+    "median_ms": 35.6,
+    "min_ms": 33.5,
+    "max_ms": 55.7,
+    "median_word_xors": 57472744,
+    "speedup_vs_crate_full": 5.61
+   },
+   {
+    "key": "port_f5_off",
+    "label": "port decide, F5 off",
+    "median_ms": 40.1,
+    "min_ms": 37.5,
+    "max_ms": 85.5,
+    "median_word_xors": 68746716,
+    "speedup_vs_crate_full": 4.98
+   }
+  ],
+  "four_run_ranges": {
+   "port_f5_on_vs_crate_full": "5.6-6.0x",
+   "port_f5_on_vs_crate_solver": "10.4-11.2x"
+  },
+  "agreement": {
+   "koblitz_decomposition_comparisons": 160,
+   "refuted": 37,
+   "forced": 73,
+   "undecided": 50,
+   "dense_random_draws_per_degree": 20,
+   "checks": "rows bit-identical to matrix_f4_f2, decisions equal with F5 on and off, crate solver path decision equal"
+  },
+  "host": "4-vCPU KVM guest, Xeon 2.80 GHz, no PMU, shared (L0)",
+  "caveats": [
+   "kernel level: no end-to-end S, no rho claim",
+   "all 20 timed draws undecided, so the timing is a full degree-4 pass that finds nothing; decisive cases are covered by the agreement tests only",
+   "one cell and one degree; unisolated shared host",
+   "word-XOR counts are within 1.1x, so the gain is the rank-indexed build and absent readback, not the elimination",
+   "the port's counter is elimination only (F5 plan XORs not counted)",
+   "default SolverEngine unchanged"
+  ],
+  "report": "docs/ic/perf/F4_GF2_PORT_COMPARISON_20261018.md",
+  "study": "benchmarks/20261018-f4-gf2-port/"
+ },
+>>>>>>> origin/pr-2318
  "pair_table_component": {
   "schema": "ic_oracle_setup_blocked.result/v1",
   "curve": "icv1-fp32-t7319-90da43e9",

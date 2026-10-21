@@ -289,6 +289,60 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 [Frozen IC1 rows and candidate identities](../../research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json). The cold process includes base and index construction, relation rank, target recovery and producer verification. Rho's interval starts with its target-dependent walk and ends with scalar verification. This wall-time panel is kept separate from Tables A–C and their operation-unit S rankings.
 
 
+<<<<<<< origin/pr-base-2156
+=======
+## Component: wide producer probe path and index build (engineering)
+
+Class **engineering**: no end-to-end S claim, no rho claim; wall time of two stages of the wide (64 < n <= 127) relation producer, same binary, interleaved A/B. Instance size n = 73, public synthetic Koblitz fixtures, unisolated shared 4-vCPU Xeon 2.80 GHz KVM guest, no PMU, load 3 to 6. Control arm `KIC_LAZY_CANON=0 KIC_PREFETCH=0`; all-switches arm `KIC_LAZY_CANON=1 KIC_PREFETCH=1 KIC_BLOCKED_BLOOM=1 (lazy + prefetch alone: 232.8 vs 226.7 at K=300, same set)`. This panel is outside Tables A–C and moves no ranked row.
+
+| K | control ns/probe (median, min-max) | lazy key | prefetch | all switches | all / control |
+|---:|---|---|---|---|---:|
+| 40 | 417.0 (414.3-424.7) | 209.9 (203.0-223.1) | 401.7 (374.9-456.5) | 217.0 (204.5-245.0) | 0.520 |
+| 300 | 614.5 (559.3-684.6) | 367.0 (349.3-416.9) | 434.7 (386.8-485.8) | 225.6 (216.7-250.5) | 0.367 |
+| 600 | 621.6 (583.1-653.5) | 382.7 (372.0-433.1) | 441.6 (422.2-459.5) | 235.0 (223.4-303.0) | 0.378 |
+
+| K | index build serial s (median, min-max) | 4 threads + batch inversion s | ratio |
+|---:|---|---|---:|
+| 300 | 14.60 (14.39-15.81) | 5.56 (4.85-5.86) | 0.381 |
+| 600 | 66.38 (60.61-72.14) | 29.13 (28.59-29.66) | 0.439 |
+
+Identity: KIC_VERIFY_INDEX identical at K=150 (1,642,500 states, 1,642,050 table entries) for 4 threads + batch, 3 threads, batch alone; unit test at n=73 and symmetric n=83. End to end `construct:69:0:60`: 6 arms, all identical to the control (60 relations, 8 targets solved). Caveats: hits are 0 in every timed scan; the hit path is covered by the n=69 end-to-end run and unit tests; index rows: 3 repeats (K=300), 2 repeats (K=600); no A/A control; scan covers 20,000 to 40,000 states from the start of the state order; the 18,398 s of the landed n=73 K=600 run is the rank-stage wall; the serial index build is about 66 s.
+
+[Frozen summary](../../benchmarks/20261018-wide-producer-engineering/summary.json), [report](../../docs/ic/perf/WIDE_PRODUCER_ENGINEERING_20261018.md).
+
+
+## Pipeline: n = 73, K = 600 cold end to end with the landed wide producer (engineering)
+
+Class **engineering**: cold end-to-end wall of the landed n=73 K=600 single-target IC row, old wide producer against the landed one, same binary, same frozen base, target and rank seed, 3 pinned cores, 20 matched rho draws; counted S unchanged (identical probes and relations), no rho win. 4 vCPU Xeon 2.80 GHz KVM guest, 15 GiB, no PMU; IC pinned to cores 1-3, rho to core 1 via tools/isolated_bench.py; 41 isolated runs, 0 flagged contended.
+
+| arm | wall s | cpu s | index build s | rank stage s |
+|:--|---:|---:|---:|---:|
+| O1_old | 9304.7 | 24853 | 92.4 | 9207.7 |
+| N1_landed | 4622.0 | 12331 | 60.1 | 4557.4 |
+| N2_landed_AA | 4559.4 | 12206 | 63.2 | 4491.7 |
+
+Old / landed end-to-end wall **2.027** (95% 2.014-2.037); A/A 1.014; counted S old/new 1.000. IC/rho (20 matched draws): landed wall 26.5 (20.1-35.7), cpu 71.3; old wall 53.7, cpu 144.5. Section 5a band: unresolved at w=0; rho ahead for w>=0.1; no cross-method win. Controls: A/A N1/N2 1.014; scan positive control new/old 0.458 (3 rounds); estimator positive control x1.10 recovered 1.113 (1.109-1.118); replay of all three rows passes. Caveats: one old-producer run (A/A on the landed arm only); rho draws 2-12 regenerated after the IC runs (records lost to a cleanup mistake), so rho does not bracket IC; N2 rerun after a container restart; IC 3 cores vs rho 1 core (cpu-second ratio is the matched one); IC group additions not emitted: IC S is a lower bound.
+
+[Frozen summary](../../benchmarks/20261019-t20-n73-k600-e2e/summary.json), [report](../../benchmarks/20261019-t20-n73-k600-e2e/t20_n73_k600_e2e_report.pdf).
+
+
+## Component: ported rank-indexed Boolean F4 kernel (engineering)
+
+Class **engineering**: kernel level: no end-to-end S, no rho claim, all 20 timed draws undecided. Cell n = 15, m = 3, ell = 5 (30 variables), degree 4, 20 draws, same test binary, 4-vCPU KVM guest, Xeon 2.80 GHz, no PMU, shared (L0). This panel is outside Tables A–C and moves no ranked row.
+
+| arm | median ms | min–max ms | median word XORs | vs crate full |
+|---|---:|---|---:|---:|
+| crate full readback (matrix_f4_f2_counted_with) | 199.5 | 175.0–253.1 | 154,963,841 | 1.00x |
+| crate solver path (SolverEngine::MatrixF4 call) | 396.7 | 368.9–420.7 | 64,342,540 | 0.50x |
+| port decide, F5 on | 35.6 | 33.5–55.7 | 57,472,744 | 5.61x |
+| port decide, F5 off | 40.1 | 37.5–85.5 | 68,746,716 | 4.98x |
+
+Four runs: port F5 on is 5.6-6.0x the crate full path and 10.4-11.2x the crate solver path. Agreement with `matrix_f4_f2`: 160 Koblitz comparisons (37 refuted, 73 forced, 50 undecided) plus random dense systems; rows bit-identical to matrix_f4_f2, decisions equal with F5 on and off, crate solver path decision equal. Caveats: kernel level: no end-to-end S, no rho claim; all 20 timed draws undecided, so the timing is a full degree-4 pass that finds nothing; decisive cases are covered by the agreement tests only; one cell and one degree; unisolated shared host; word-XOR counts are within 1.1x, so the gain is the rank-indexed build and absent readback, not the elimination; the port's counter is elimination only (F5 plan XORs not counted); default SolverEngine unchanged.
+
+[Frozen summary](../../benchmarks/20261018-f4-gf2-port/summary.json), [report](../../docs/ic/perf/F4_GF2_PORT_COMPARISON_20261018.md).
+
+
+>>>>>>> origin/pr-2318
 ## Sources
 
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
@@ -314,8 +368,15 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_n41_n53_shared_rank_20261005/DECISION.json` — sha256 `fe55908f837840ee…`
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
+<<<<<<< origin/pr-base-2156
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
+=======
+- `research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json` — sha256 `307771287ae19521…`
+- `benchmarks/20261018-wide-producer-engineering/summary.json` — sha256 `1f63f91e5f62cc43…`
+- `benchmarks/20261019-t20-n73-k600-e2e/summary.json` — sha256 `6f32026f6d26a84e…`
+- `benchmarks/20261018-f4-gf2-port/summary.json` — sha256 `a36b4262044654fb…`
+>>>>>>> origin/pr-2318
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
