@@ -118,6 +118,10 @@ The earlier 22/22 suite is retained in `rust-example-tests.log`. The capacity
 model, Lean module, `rustfmt --check`, and `actionlint` passed. The branch
 workflow repeats the capacity, Lean, and Rust example checks with Rust 1.99.1
 on its exact head. A full K4500 or K4549 process has not yet been measured.
+The first broad parallel release library attempt recorded three time-limited
+`jv_cover` failures before interruption in `rust-lib-tests-parallel-failed.log`.
+Each of those tests passed on isolated replay and in the subsequent serial
+run; the serial full-suite result remains pending until that run completes.
 The previous RunPod campaign's conservative upper charge was $5.710216
 against its $5 ceiling, so this preparation launches no paid instance. A new
 bounded allocation needs its own reviewed budget and protocol.
