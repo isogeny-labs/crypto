@@ -58,6 +58,7 @@ pub mod gpu;
 pub mod host;
 pub mod isolab;
 pub mod isolation;
+pub mod known_log;
 pub mod methods;
 pub mod record;
 pub mod resources;
