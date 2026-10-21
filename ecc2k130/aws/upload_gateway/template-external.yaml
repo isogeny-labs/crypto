@@ -167,7 +167,7 @@ Resources:
               - !Sub arn:${AWS::Partition}:s3:::${CanonicalBucketName}/solution/*
               - !Sub arn:${AWS::Partition}:s3:::${CanonicalBucketName}/logs/runpod-ingest-*/*
           - Effect: Allow
-            Action: [s3:GetObject, s3:PutObject]
+            Action: s3:GetObject
             Resource: !Sub arn:${AWS::Partition}:s3:::${StatusBucketName}/*
           - Effect: Allow
             Action: secretsmanager:GetSecretValue
