@@ -72,6 +72,8 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "ghs_weak_n4": "research/quartic_n4_20261019/results/summary_all.json",
+    "ghs_weak_n4_primary": "research/quartic_n4_20261019/results/summary_primary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -617,6 +619,33 @@ def la_component() -> dict:
             "class": "engineering"}
 
 
+def _jsonl(rel: str) -> list[dict]:
+    return [json.loads(x) for x in (REPO / rel).read_text().splitlines() if x.strip()]
+
+
+def ghs_weak_n4() -> dict:
+    """Plane-quartic (Diem/GHS) index calculus on the GHS-weak family
+    E0/F_{q^3} with 4 | #E0(K), from research/quartic_n4_20261019. Copied from
+    its frozen summaries (rows, fits and phase exponents are computed there).
+    A whole-method cold one-target measurement against a matched plain rho on
+    one special family only; it is not a generic-curve or standard-curve row and
+    enters none of tables A-C. Prices are in F_q-multiplication equivalents at
+    0, 0.1 and 1 GAE per unpriced operation."""
+    recs = _jsonl(SOURCES["ghs_weak_n4"])
+    prim = _jsonl(SOURCES["ghs_weak_n4_primary"])
+    rows = [{"arm": r["arm"], "q": r["q"], "units_ok": r["units_ok"], "units": r["units"],
+             "rho_runs": r["rho_runs"], "ic_meq": r["ic_meq"], "rho_meq": r["rho_meq"],
+             "ratio": r["ratio"], "ratio_lo": r["ratio_lo"], "ratio_hi": r["ratio_hi"],
+             "resolved": r["resolved"]} for r in recs if "arm" in r and "q" in r]
+    fits = {"all_sizes": [r for r in recs if "fit" in r],
+            "all_sizes_phase_exponents": [r for r in recs if "phase_exponents" in r],
+            "primary_range": [r for r in prim if "fit" in r],
+            "primary_range_phase_exponents": [r for r in prim if "phase_exponents" in r]}
+    return {"rows": rows, "fits": fits, "class": "advance (restricted to the GHS-weak family)",
+            "baseline_arm": "A0r", "study": "research/quartic_n4_20261019/",
+            "report": "research/quartic_n4_20261019/README.md"}
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -1069,6 +1098,7 @@ def build() -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "ghs_weak_n4_component": ghs_weak_n4(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1100,6 +1130,72 @@ def gh(path: str, text: str | None = None) -> str:
     return f'<a href="{esc(GITHUB + path)}"><code>{esc(text or path)}</code></a>'
 
 
+def _ghs_fit_line(f: dict) -> str:
+    return (f"{f['fit']}: {f['sizes']} sizes; IC exponent {f['ic_exp_w0'][0]:.3f} "
+            f"[{f['ic_exp_w0'][1]:.3f}, {f['ic_exp_w0'][2]:.3f}], rho exponent "
+            f"{f['rho_exp_w0'][0]:.3f} [{f['rho_exp_w0'][1]:.3f}, {f['rho_exp_w0'][2]:.3f}], "
+            f"gap rho-IC {f['gap_w0'][0]:.3f} [{f['gap_w0'][1]:.3f}, {f['gap_w0'][2]:.3f}] (w=0); "
+            f"w=1: IC {f['ic_exp_w1'][0]:.3f} [{f['ic_exp_w1'][1]:.3f}, {f['ic_exp_w1'][2]:.3f}], "
+            f"rho {f['rho_exp_w1'][0]:.3f}")
+
+
+def _ghs_cells(r: dict) -> list[str]:
+    out = []
+    for i in range(3):
+        out.append(f"{r['ratio'][i]:.3g} [{r['ratio_lo'][i]:.3g}, {r['ratio_hi'][i]:.3g}]")
+    return out
+
+
+def ghs_md(g: dict) -> list[str]:
+    L = ["", "## GHS-weak E0/F_{q^3} with 4 | #E0(K): plane-quartic index calculus against matched rho", "",
+         "Whole method, cold, one target, no subgroup enumeration, in F_q-multiplication equivalents; "
+         "copied from the frozen summaries of `research/quartic_n4_20261019/`. **Restricted to one "
+         "special GHS-weak family** (E0 over F_{q^3}, #E0(K) = 4*ell): not generic curves, not "
+         "prime-order E/F_{q^3}, not any standard curve. Matched reference: plain Pollard rho "
+         "(no negation map) on the same E0(K) subgroup. Class: " + g["class"] + ". Baseline for the "
+         "improvement: arm A0r (all rational points as factor base). It moves no row of tables A–C. "
+         "Columns give IC/rho with 95% bootstrap interval at 0, 0.1 and 1 GAE per unpriced operation.", "",
+         "| arm | q | units ok | rho runs | IC/rho (w=0) | IC/rho (w=0.1) | IC/rho (w=1) | resolved |",
+         "|:--|--:|--:|--:|:--|:--|:--|:--|"]
+    for r in g["rows"]:
+        c = _ghs_cells(r)
+        L.append(f"| {r['arm']} | {r['q']} | {r['units_ok']}/{r['units']} | {r['rho_runs']} | "
+                 f"{c[0]} | {c[1]} | {c[2]} | {r['resolved']} |")
+    L += ["", "Fitted exponents (frozen summaries):", ""]
+    for f in g["fits"]["all_sizes"]:
+        L.append(f"- all sizes, {_ghs_fit_line(f)}")
+    for f in g["fits"]["primary_range"]:
+        L.append(f"- primary range q >= 4051, {_ghs_fit_line(f)}")
+    L.append("")
+    return L
+
+
+def ghs_html(g: dict) -> str:
+    P = ['<section id="ghs-weak-n4-20261019"><h2>GHS-weak E0/F<sub>q<sup>3</sup></sub>, 4 | #E0(K): '
+         'plane-quartic index calculus against matched rho</h2>'
+         '<p>Whole method, cold, one target, no subgroup enumeration, in F<sub>q</sub>-multiplication '
+         'equivalents. <strong>Restricted to one special GHS-weak family</strong> (E0 over F<sub>q^3</sub> '
+         'with #E0(K) = 4&middot;ell): not generic curves, not prime-order E/F<sub>q^3</sub>, not any '
+         'standard curve. Matched reference: plain Pollard rho (no negation map) on the same E0(K) '
+         'subgroup. Class: ' + esc(g["class"]) + '. Baseline: arm A0r. It moves no row of tables A&ndash;C. '
+         'Intervals are 95% bootstrap at 0, 0.1 and 1 GAE per unpriced operation.</p>'
+         '<div class="scroll"><table><thead><tr><th>arm</th><th>q</th><th>units ok</th><th>rho runs</th>'
+         '<th>IC/rho (w=0)</th><th>IC/rho (w=0.1)</th><th>IC/rho (w=1)</th><th>resolved</th></tr></thead><tbody>']
+    for r in g["rows"]:
+        c = _ghs_cells(r)
+        P.append(f'<tr><td>{esc(r["arm"])}</td><td class="n">{r["q"]}</td><td class="n">{r["units_ok"]}/{r["units"]}</td>'
+                 f'<td class="n">{r["rho_runs"]}</td><td>{c[0]}</td><td>{c[1]}</td><td>{c[2]}</td>'
+                 f'<td>{esc(r["resolved"])}</td></tr>')
+    P.append('</tbody></table></div><ul>')
+    for f in g["fits"]["all_sizes"]:
+        P.append(f'<li>all sizes, {esc(_ghs_fit_line(f))}</li>')
+    for f in g["fits"]["primary_range"]:
+        P.append(f'<li>primary range q &ge; 4051, {esc(_ghs_fit_line(f))}</li>')
+    P.append('</ul>' + gh(SOURCES["ghs_weak_n4"], 'Frozen summary (all sizes)') + ' ' +
+             gh(SOURCES["ghs_weak_n4_primary"], 'Frozen summary (primary range)') + '</section>')
+    return "".join(P)
+
+
 def record_cell(r: dict) -> str:
     """The curve's registry, curves.yaml and factor-base references under its slug."""
     cr, fb = r["curve_record"], r["factor_base"]
@@ -1123,7 +1219,7 @@ def markdown(doc: dict) -> str:
     L = ["# Index-calculus leaderboard", "",
          "Generated by `scripts/build_ic_leaderboard.py` from frozen evidence; the page is "
          "[`docs/ic-leaderboard.html`](../ic-leaderboard.html).  Curves are named by ICV1 slug "
-         "([`docs/curves/ICV1.md`](../curves/ICV1.md)).  No row is below its reference.", "",
+         "([`docs/curves/ICV1.md`](../curves/ICV1.md)).  No row of tables A–C is below its reference; the GHS-weak section is a special family outside them and is below its matched rho.", "",
          "**There is no single unit on this page.**  The board is three tables, A, B and C.  Each is "
          "priced in its own unit, against its own reference and floor, stated at its head.  `S`, "
          "`× reference` and `× floor` are comparable within a table and nowhere else.  The same slug "
@@ -1372,6 +1468,7 @@ def markdown(doc: dict) -> str:
         observed = session["arms"]["ic-mitm"]["cross_curve"]
         L.append(f"| {session['ell']} | {observed['ratio_floor_over_crater']:.6f} | "
                  f"{observed['ci99'][0]:.6f} to {observed['ci99'][1]:.6f} |")
+    L += ghs_md(doc["ghs_weak_n4_component"])
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -1563,8 +1660,8 @@ def page(doc: dict, standalone: bool) -> str:
              '<p class="verdict">Every curve this repository has priced end to end, with the best index-calculus '
              'recipe measured on it, against Pollard rho on the same curve and the same point. <strong>The units '
              'differ between the three tables below, and so do the references and the floors: S and the ratios '
-             'are comparable inside a table and nowhere else.</strong> <strong>Cold, set-up included, no row is '
-             'below its reference.</strong> On one unseen point of a Koblitz curve (table A) '
+             'are comparable inside a table and nowhere else.</strong> <strong>Cold, set-up included, no row of tables A–C is '
+             'below its reference.</strong> (The GHS-weak section below, a special family outside those tables, is below its matched rho.) On one unseen point of a Koblitz curve (table A) '
              f'the index calculus\'s online interval is {g3(online_lo)}–{g3(online_hi)}× faster than rho once '
              'its reusable set-up exists, but the set-up is paid first: cold it is '
              f'{g3(min(cold))}–{g3(max(cold))}× slower, and a generic walk given the same precomputation would be '
@@ -2024,6 +2121,8 @@ def page(doc: dict, standalone: bool) -> str:
         P.append(f'<tr><td>{session["ell"]}</td><td>{observed["ratio_floor_over_crater"]:.6f}</td>'
                  f'<td>{observed["ci99"][0]:.6f} to {observed["ci99"][1]:.6f}</td></tr>')
     P.append('</tbody></table>' + gh(SOURCES["conductor_gap_counts"], 'Native analysis and source records') + '</section>')
+
+    P.append(ghs_html(doc["ghs_weak_n4_component"]))
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]

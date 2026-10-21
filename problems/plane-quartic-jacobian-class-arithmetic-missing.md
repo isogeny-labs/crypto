@@ -4,7 +4,7 @@
 - **Kind:** implementation gap
 - **Affected work:** `research/ghs_cubic_genus3_build_20261012/` (Conductor T-2267); follow-up IC study `research/ghs_cubic_quartic_ic_20261012/` (T-2280 / T-2491, PR #1768)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-14
+- **Last updated:** 2026-10-19
 
 ## Problem
 
@@ -27,7 +27,8 @@ Evidence: `research/ghs_cubic_quartic_ic_20261012/results/run-20261014T0200Z.jso
 
 ## Remaining limitations
 
-- Deg-3 Pic canonical forms are not yet unique for every class (some `φ(nG)` collide after reduction); dlog uses deg-6 orbit-pair keys.
+- Canonical class-unique keys now exist (2026-10-18, W1, `src/cryptanalysis/plane_quartic_pic.rs`, study `research/quartic_pic_canonical_20261018/`): `Pic^0` of a smooth plane quartic over `F_q`, `q < 2^31`, with add, neg, double, scalar multiplication and a key that is a function of the class (echelon conics of the unique effective degree-3 divisor, or the point `P` of `K - P`). Validated by brute-force class counts against `#Jac` at `q` in {5, 7, 11, 13} on 21 instances, group-law tests, and on the three split GHS transfers at `q` in {5, 7, 11}, where the old degree-3 reduction merged 1, 7 and 20 pairs of distinct classes and the canonical keys separate all of them. Generic add costs 3523 multiplications + 44 inversions for `q` from 2^12 to 2^31 (not compared with any external implementation).
+- Still open: the other six GHS quartics are not covered by the transfer-agreement test (only the first split instance per `q` is reachable from `quartic_ic.rs` without modifying it), and `quartic_ic.rs` itself still keys its dlog on deg-6 orbit pairs (W2b is to switch to the canonical keys).
 - Dense FB-only line IC does not by itself reach the `ℓ`-part on these toys (`C(F_q)` is often 4-primary under `λ`).
 - No deployed-curve or sub-ρ claims.
 
@@ -37,3 +38,5 @@ Evidence: `research/ghs_cubic_quartic_ic_20261012/results/run-20261014T0200Z.jso
 2026-10-13: partial progress — pushforward identity / `transfer_pushforward_dlog` only (not full Pic; not pure IC).
 2026-10-13: different route executed for the hyperelliptic type only (T-2463, PR #1796).
 2026-10-14: Pic lin-equiv checks + orbit-aware pure IC on toys (T-2491 / PR #1768). Status → `resolved` for the discriminating toy checks named in "What would unblock it."
+2026-10-18: W1 canonical `Pic^0` keys and arithmetic (PR for branch `claude/quartic-pic-canonical-20261018`).
+2026-10-19 (N4, `research/quartic_n4_20261019/`): the 2026-10-14 "pure IC" smokes were subgroup enumeration (99.8-99.99% of their cost was the loop over every multiple of the generator; relation rows discarded; 0, 1 and 3 relations at q = 5, 7, 11), so they are withdrawn as index-calculus evidence; their recovered scalars and deg-6 table are correct, their degree-3 reduction merged distinct classes (1, 7, 20 pairs). A real relation-collection pipeline on canonical `Pic^0` (no enumeration) now exists (q up to 262111, 51 of 51 instances verified) and measures an exponent of 1.083 [1.040, 1.128] against matched rho's 1.485 on q >= 4051 for the GHS-weak family; lead N4 stays open. The "FB points are 4-primary" note above is not supported at q = 5, 7, 11 (all points but `P0` have a nonzero `ell`-part).

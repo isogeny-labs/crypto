@@ -288,6 +288,7 @@ pub mod pc_degree_harness;
 pub mod pdp_split;
 pub mod petit_quisquater;
 pub mod pkm_criterion;
+pub mod plane_quartic_pic;
 pub mod pohlig_hellman;
 pub mod pollard_collab;
 pub mod pollard_rho;

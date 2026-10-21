@@ -102,7 +102,7 @@ td.inst { white-space: nowrap; }
 <header>
   <span class="eyebrow">ECDLP · index calculus · current state · cites the ledger, measures nothing</span>
   <h1>Index calculus: where things stand</h1>
-  <p class="verdict">Can index calculus solve the elliptic-curve discrete logarithm faster than Pollard rho? Priced end to end on every curve this repository has measured, <strong>no.</strong> The one family below rho is hyperelliptic, at toy sizes. Nothing here threatens a deployed curve.</p>
+  <p class="verdict">Can index calculus solve the elliptic-curve discrete logarithm faster than Pollard rho? Priced end to end on every curve this repository has measured, <strong>no</strong> for generic and standard curves. Two families are below rho: hyperelliptic Jacobians at toy sizes, and one special GHS-weak elliptic family (E0 over F<sub>q<sup>3</sup></sub>, 4 | #E0(K)), 0.122&times; at q = 262111 (<a href="./#ghs-weak-n4-20261019">panel</a>). Nothing here threatens a deployed curve.</p>
   <p class="stamp">As of ledger &sect;23 and the tool programme&rsquo;s round R01 (2026-10-01). Every figure on this page is quoted from the <a href="./">scoreboard</a>, the ledger this page summarises, and from the frozen files it names. When the ledger moves, this page moves in the same pull request.</p>
 </header>
 
@@ -184,7 +184,7 @@ td.inst { white-space: nowrap; }
   <p class="lede">Each panel on the scoreboard carries a one-line summary under its title: what it measured or decided, and its class. This index lists them in ledger order; each title links to the panel. It is written from the scoreboard by <code>scripts/site/panel_index.py</code> and checked in CI, so it cannot drift from the ledger.</p>
 <!-- BEGIN panel-index -->
   <details>
-    <summary>Show all 305 panels, one line each</summary>
+    <summary>Show all 306 panels, one line each</summary>
     <ol class="index">
       <li><a href="./#lab-results">A promising average. No reliable win.</a><br>Decision: the stricter familywise upper bound is 1.034×. The frozen promotion gate failed.</li>
       <li><a href="./#rho-results-title">How does that incumbent compare with rho?</a><br>This is the pair-table incumbent. It does not rank F5 or SAT. Reusable preparation is excluded; cold costs and other curve sizes answer different questions.</li>
@@ -198,7 +198,8 @@ td.inst { white-space: nowrap; }
       <li><a href="./#lab-pipeline">What the solver actually has to do.</a><br>Reusable preparation produces factor-base logs. The online solve consumes one new public point and includes every target-dependent attempt through independent scalar verification.</li>
       <li><a href="./#lab-next">A local win is a candidate, not a final answer.</a><br>This diagram describes the proposed process. It does not claim that a fresh F5/SAT tournament has run, or that any implementation is globally fastest.</li>
       <li><a href="./#evidence-search">Open the detail you need.</a><br>The historical ledger contains other curves, cost units and questions. Its reports are preserved; they are not a combined leaderboard.</li>
-      <li><a href="./#lab-best">The best result in each regime, and what it earns.</a><br>Ranks the best verified figure in each regime by how much of the attack it prices, finding no elliptic-curve whole-method row below matched rho and the only below-rho result hyperelliptic.</li>
+      <li><a href="./#lab-best">The best result in each regime, and what it earns.</a><br>Ranks the best verified figure in each regime by how much of the attack it prices, finding no generic or standard elliptic-curve whole-method row below matched rho; the below-rho results are hyperelliptic and one special GHS-weak elliptic family.</li>
+      <li><a href="./#ghs-weak-n4-20261019">Below matched rho on one special family, with a smaller exponent.</a><br>IC/rho reads 0.122 [0.0987, 0.157] at q = 262111 (w = 0), down from above 1 at small q; all IC units verified and the order holds across 0, 0.1 and 1 GAE per unpriced operation for q ≥ 4051. Restricted to this GHS-weak family; not generic curves, not prime-order E/Fq3, not a standard curve.</li>
       <li><a href="./#conductor-gap-native-20261015">A cheap CM map helps orbit setup; the floor has a generic recurrence.</a><br>All 500 primary and 265 replication attempts verified. All 145 same-crater map/scalar comparisons have identical bases, queries, relations, ranks and recovered targets. Construction controls total 44,000 trials; this table quotes the 12,000 locally pinned trials.</li>
       <li><a href="./#cold-compact-orbit-20261003">The n37 folded table recovers targets, but misses full rank.</a><br>Finds the eager 42-orbit table pins each of eight public targets at rank 19 to 38 of 43 unknowns, so the preregistered full-rank IC/rho verdict is withheld, classed accounting.</li>
       <li><a href="./#full-rank-compact-orbit-20261003">n37 rank reaches 43/43; this cold eager table remains costly.</a><br>Reaches rank 43/43 on eight new public targets with every scalar verified, but the cold charged IC lower bound sits 22.600x the same-Q strong rho, a bounded accounting result.</li>
