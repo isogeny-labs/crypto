@@ -2086,3 +2086,60 @@ fn field_operations_are_counted_bounded_and_judged() {
     assert!(!kv["statement"].as_str().unwrap().contains("field_"));
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+/// `ecbench work` on committed records is frozen byte for byte: the
+/// snapshot in `tests/fixtures/ecbench/work-v1/expected.jsonl` was written
+/// by the binary before `bitop/v2` existed, and `--unit bitop/v1` is the
+/// same output.  `--unit bitop/v2` carries the same gates and adds the
+/// memory term.
+#[test]
+fn work_in_bitop_v1_is_frozen_and_bitop_v2_adds_memory() {
+    let fixture = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/ecbench/work-v1");
+    let expected = std::fs::read_to_string(fixture.join("expected.jsonl")).unwrap();
+    let dir = fixture.to_str().unwrap();
+    let (ok, out, err) = ecbench(&["work", dir]);
+    assert!(ok, "{err}");
+    assert_eq!(
+        out, expected,
+        "`ecbench work` output differs from the committed snapshot"
+    );
+    let (ok, out, err) = ecbench(&["work", "--unit", "bitop/v1", dir]);
+    assert!(ok, "{err}");
+    assert_eq!(
+        out, expected,
+        "`ecbench work --unit bitop/v1` differs from the committed snapshot"
+    );
+    let (ok, out, err) = ecbench(&["work", "--unit", "bitop/v2", dir]);
+    assert!(ok, "{err}");
+    assert_eq!(out.lines().count(), expected.lines().count());
+    for (l1, l2) in expected.lines().zip(out.lines()) {
+        let a: Value = serde_json::from_str(l1).unwrap();
+        let b: Value = serde_json::from_str(l2).unwrap();
+        assert_eq!(a["record_id"], b["record_id"]);
+        let (wa, wb) = (&a["work"]["Ok"], &b["work"]["Ok"]);
+        assert_eq!(wa["schema"], "ecbench.work/v1");
+        assert_eq!(wb["schema"], "ecbench.work/v2");
+        assert_eq!(wb["unit"], "bitop/v2");
+        assert_eq!(wa["bitops"], wb["bitops"], "{}", a["record_id"]);
+        assert_eq!(wb["memory_complete"], true, "{}", b["work"]);
+        assert_eq!(wb["memory_unpriced"].as_array().unwrap().len(), 0);
+        let bitops: u128 = wb["bitops"].as_str().unwrap().parse().unwrap();
+        let bits: u128 = wb["memory_bits"].as_str().unwrap().parse().unwrap();
+        assert!(bits > 0);
+        assert_eq!(wb["at"].as_str().unwrap(), (bitops * bits).to_string());
+    }
+    let (ok, _, err) = ecbench(&["work", "--unit", "bitop/v3", dir]);
+    assert!(!ok && err.contains("no unit"), "{err}");
+    // The v2 vectors the binary prints are the committed ones.
+    let (ok, out, err) = ecbench(&["bitop-vectors", "--unit", "bitop/v2"]);
+    assert!(ok, "{err}");
+    let printed: Value = serde_json::from_str(&out).unwrap();
+    let committed: Value = serde_json::from_str(
+        &std::fs::read_to_string(
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("docs/units/bitop-v2.vectors.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(printed, committed);
+}

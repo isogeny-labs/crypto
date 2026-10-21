@@ -1,4 +1,6 @@
-//! Every ecbench record priced in `bitop/v1` (`crate::cryptanalysis::bitops`).
+//! Every ecbench record priced in `bitop/v1` (`crate::cryptanalysis::bitops`),
+//! and in `bitop/v2`, the same gates plus a declared memory term
+//! ([`memory`], [`price_v2`]; `docs/units/BITOPS.md`, "bitop/v2: memory").
 //!
 //! A record's work is rebuilt from what it already carries — the curve, the
 //! phases' group operations, the native counters and the solver block — so
@@ -28,7 +30,7 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 use crate::cryptanalysis::bitops::{self, Field, Prim, Widths};
-use crate::cryptanalysis::ecbench::methods::{PhaseRecord, SolverStats};
+use crate::cryptanalysis::ecbench::methods::{FactorBaseFacts, PhaseRecord, SolverStats};
 use crate::cryptanalysis::ecbench::workload::CurveFacts;
 
 pub const WORK_SCHEMA: &str = "ecbench.work/v1";
@@ -1077,6 +1079,340 @@ pub fn summarise(
     Ok(out)
 }
 
+// ── `bitop/v2`: the memory term ──────────────────────────────────────────
+
+pub const WORK_SCHEMA_V2: &str = "ecbench.work/v2";
+
+/// A record's declared memory under `bitop/v2` (`docs/units/BITOPS.md`,
+/// "bitop/v2: memory"): each stored structure's entries times its frozen
+/// entry width, from fields the record already carries.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct Memory {
+    /// Bits by structure: `factor_base`, `matrix`, `tables`, `solver`,
+    /// `native_table`, `table`.
+    pub terms: BTreeMap<String, u128>,
+    /// Fields the rule reads that the record lacks.  Nonempty makes the
+    /// total a lower bound.
+    pub unpriced: Vec<String>,
+}
+
+impl Memory {
+    pub fn bits(&self) -> u128 {
+        self.terms.values().sum()
+    }
+}
+
+/// The counters a generic method reports its stored table through, read in
+/// this order (`bounds::MEMORY_COUNTERS`, the bound fitter's memory axis).
+fn generic_table_entries(counters: &BTreeMap<String, u64>) -> Option<u64> {
+    crate::cryptanalysis::ecbench::bounds::MEMORY_COUNTERS
+        .iter()
+        .find_map(|k| counters.get(*k))
+        .copied()
+}
+
+/// A phase's native or work-native counter, summed over the phases.
+fn phase_sum(phases: &[PhaseRecord], name: &str) -> u128 {
+    phases
+        .iter()
+        .map(|p| {
+            p.native.get(name).copied().unwrap_or(0) as u128
+                + p.work_native.get(name).copied().unwrap_or(0) as u128
+        })
+        .sum()
+}
+
+fn phase_native(phases: &[PhaseRecord], phase: &str, name: &str) -> Option<u64> {
+    phases
+        .iter()
+        .find(|p| p.name == phase)
+        .and_then(|p| p.native.get(name))
+        .copied()
+}
+
+/// Oracle-table natives a record written before the `table_insert_attempts`
+/// counter may carry instead: entries kept.
+const TABLE_ENTRY_NATIVES: &[&str] = &[
+    "pair_table_entries",
+    "fiber_table_entries",
+    "aux_bsgs_table_entries",
+];
+
+/// The memory a record declares, by the rule of `docs/units/BITOPS.md`,
+/// "Which fields a record kind is read from".
+pub fn memory(x: &Priceable, factor_base: Option<&FactorBaseFacts>, widths: &Widths) -> Memory {
+    use bitops::Entry;
+    let mut m = Memory::default();
+    let method = x.method_id;
+    fn term(m: &mut Memory, name: &str, bits: u128) {
+        *m.terms.entry(name.to_string()).or_default() += bits;
+    }
+    if !is_ic(method) {
+        let entry = if method.starts_with("bsgs") {
+            Entry::BabyStep
+        } else {
+            Entry::DistinguishedPoint
+        };
+        match generic_table_entries(x.counters) {
+            Some(n) => term(&mut m, "table", n as u128 * widths.entry_bits(entry)),
+            None => m.unpriced.push("table_entries".into()),
+        }
+        return m;
+    }
+    // The factor base, affine points.
+    match factor_base {
+        Some(fb) => term(
+            &mut m,
+            "factor_base",
+            fb.signed_points as u128 * widths.entry_bits(Entry::FactorBasePoint),
+        ),
+        None => m.unpriced.push("factor_base.signed_points".into()),
+    }
+    // The relation matrix, dense: rows × (columns + the target column).
+    let rows = x
+        .counters
+        .get("matrix_rows")
+        .copied()
+        .or_else(|| phase_native(x.phases, "linear_algebra", "rows"));
+    let columns = factor_base
+        .map(|fb| fb.columns + 1)
+        .or_else(|| phase_native(x.phases, "linear_algebra", "columns"));
+    match (rows, columns) {
+        (Some(r), Some(c)) => term(
+            &mut m,
+            "matrix",
+            r as u128 * c as u128 * widths.entry_bits(Entry::MatrixEntry),
+        ),
+        (r, c) => {
+            if r.is_none() {
+                m.unpriced.push("matrix_rows".into());
+            }
+            if c.is_none() {
+                m.unpriced.push("factor_base.columns".into());
+            }
+        }
+    }
+    // The oracle's tables.
+    if method == "ic.k4_gaudry" {
+        m.unpriced.push("oracle_table_entries".into());
+    } else if x
+        .phases
+        .iter()
+        .any(|p| p.work_native.contains_key("counted:table_insert_attempts"))
+    {
+        term(
+            &mut m,
+            "tables",
+            phase_sum(x.phases, "table_insert_attempts") * widths.entry_bits(Entry::TableEntry),
+        );
+    } else {
+        let present = TABLE_ENTRY_NATIVES.iter().any(|n| {
+            x.counters.contains_key(*n) || x.phases.iter().any(|p| p.native.contains_key(*n))
+        });
+        if present {
+            let entries: u128 = TABLE_ENTRY_NATIVES
+                .iter()
+                .map(|n| phase_sum(x.phases, n) + x.counters.get(*n).copied().unwrap_or(0) as u128)
+                .sum();
+            term(
+                &mut m,
+                "tables",
+                entries * widths.entry_bits(Entry::TableEntry),
+            );
+        } else {
+            m.unpriced.push("table_insert_attempts".into());
+        }
+    }
+    // The solver's peak, where the engine measured it.
+    if let Some(s) = x.solver {
+        if s.peak_bytes > 0 {
+            term(
+                &mut m,
+                "solver",
+                s.peak_bytes as u128 * bitops::BITS_PER_BYTE,
+            );
+        } else {
+            m.unpriced.push("solver.peak_bytes".into());
+        }
+    }
+    // A native backend's declared table.
+    if let Some(&b) = x.counters.get("native_table_bytes_uncharged") {
+        term(&mut m, "native_table", b as u128 * bitops::BITS_PER_BYTE);
+    }
+    m
+}
+
+/// A record's work in `bitop/v2`: the `bitop/v1` gates, the declared
+/// memory, and their product.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct WorkBlockV2 {
+    pub schema: String,
+    pub unit: String,
+    pub widths: Widths,
+    /// Total gates, as a decimal integer: the `bitop/v1` total of the same
+    /// record, the same integer.
+    pub bitops: String,
+    pub log2_bitops: Option<f64>,
+    pub ratio_to_floor: f64,
+    /// Counters with no gate rule; nonempty makes `bitops` a lower bound.
+    pub unpriced: Vec<String>,
+    pub known_uncounted: Vec<String>,
+    /// `unpriced` and `known_uncounted` are both empty.
+    pub complete: bool,
+    /// Bits of the structures held, as a decimal integer.
+    pub memory_bits: String,
+    pub log2_memory_bits: Option<f64>,
+    /// Bits by structure.
+    pub memory_terms: BTreeMap<String, String>,
+    /// Fields the memory rule reads that the record lacks; nonempty makes
+    /// `memory_bits` and `at` lower bounds.
+    pub memory_unpriced: Vec<String>,
+    pub memory_complete: bool,
+    /// `bitops × memory_bits`, exact, as a decimal integer.
+    pub at: String,
+    pub log2_at: Option<f64>,
+}
+
+/// The exact decimal product of two `u128`s (it can exceed `u128`).
+pub fn mul_decimal(a: u128, b: u128) -> String {
+    const BASE: u128 = 1_000_000_000;
+    let limbs = |mut v: u128| {
+        let mut out = Vec::new();
+        while v > 0 {
+            out.push(v % BASE);
+            v /= BASE;
+        }
+        out
+    };
+    let (la, lb) = (limbs(a), limbs(b));
+    if la.is_empty() || lb.is_empty() {
+        return "0".into();
+    }
+    let mut acc = vec![0u128; la.len() + lb.len()];
+    for (i, x) in la.iter().enumerate() {
+        for (j, y) in lb.iter().enumerate() {
+            acc[i + j] += x * y;
+        }
+    }
+    for i in 0..acc.len() {
+        let carry = acc[i] / BASE;
+        acc[i] %= BASE;
+        if carry > 0 && i + 1 < acc.len() {
+            acc[i + 1] += carry;
+        }
+    }
+    while acc.len() > 1 && *acc.last().unwrap() == 0 {
+        acc.pop();
+    }
+    let mut s = acc.last().unwrap().to_string();
+    for limb in acc.iter().rev().skip(1) {
+        s.push_str(&format!("{limb:09}"));
+    }
+    s
+}
+
+/// Price a record in `bitop/v2`.
+pub fn price_v2(
+    x: &Priceable,
+    factor_base: Option<&FactorBaseFacts>,
+) -> Result<WorkBlockV2, String> {
+    let v1 = price(x)?;
+    let mem = memory(x, factor_base, &v1.widths);
+    let total: u128 = v1.bitops.parse().map_err(|_| "bitops is not an integer")?;
+    let bits = mem.bits();
+    let at = mul_decimal(total, bits);
+    Ok(WorkBlockV2 {
+        schema: WORK_SCHEMA_V2.into(),
+        unit: bitops::UNIT_V2.into(),
+        widths: v1.widths,
+        bitops: v1.bitops,
+        log2_bitops: v1.log2_bitops,
+        ratio_to_floor: v1.ratio_to_floor,
+        unpriced: v1.unpriced,
+        known_uncounted: v1.known_uncounted,
+        complete: v1.complete,
+        memory_bits: bits.to_string(),
+        log2_memory_bits: (bits > 0).then(|| bitops::log2(bits)),
+        memory_terms: mem
+            .terms
+            .iter()
+            .map(|(k, v)| (k.clone(), v.to_string()))
+            .collect(),
+        memory_complete: mem.unpriced.is_empty(),
+        memory_unpriced: mem.unpriced,
+        log2_at: (total > 0 && bits > 0).then(|| bitops::log2(total) + bitops::log2(bits)),
+        at,
+    })
+}
+
+/// Price a committed record in `bitop/v2`.
+pub fn price_record_v2(
+    r: &crate::cryptanalysis::ecbench::record::Record,
+) -> Result<WorkBlockV2, String> {
+    price_v2(
+        &Priceable {
+            method_id: &r.method.id,
+            method_params: &r.method.params,
+            curve: &r.workload.curve,
+            phases: &r.phases,
+            counters: &r.counters,
+            solver: r.solver.as_ref(),
+        },
+        r.factor_base.as_ref(),
+    )
+}
+
+/// The record as the bound fitter reads it in `bitop/v2`: [`bitop_view`]
+/// with the unit renamed, and a record incomplete in memory a lower bound
+/// naming the fields it lacks (as `memory:<field>`).  The gate figures are
+/// `bitop/v1`'s.
+pub fn bitop_v2_view(
+    r: &crate::cryptanalysis::ecbench::record::Record,
+) -> Result<crate::cryptanalysis::ecbench::record::Record, String> {
+    let mut v = bitop_view(r)?;
+    let w2 = price_record_v2(r)?;
+    v.cost.unit = bitops::UNIT_V2.into();
+    v.cost.lower_bound = !w2.complete || !w2.memory_complete;
+    v.cost
+        .unpriced
+        .extend(w2.memory_unpriced.iter().map(|m| format!("memory:{m}")));
+    Ok(v)
+}
+
+/// One line of `ecbench work --unit bitop/v2`.
+#[derive(Debug, Serialize)]
+pub struct WorkLineV2 {
+    pub record_id: String,
+    pub session_id: String,
+    pub arm: String,
+    pub method: String,
+    pub params: BTreeMap<String, String>,
+    pub curve: String,
+    pub family: String,
+    pub log2_r: f64,
+    pub status: String,
+    pub warmup: bool,
+    pub total_gae: Option<f64>,
+    pub work: Result<WorkBlockV2, String>,
+}
+
+pub fn work_line_v2(r: &crate::cryptanalysis::ecbench::record::Record) -> WorkLineV2 {
+    WorkLineV2 {
+        record_id: r.record_id.clone(),
+        session_id: r.session_id.clone(),
+        arm: r.arm.clone(),
+        method: r.method.id.clone(),
+        params: r.method.params.clone(),
+        curve: r.workload.curve.slug.clone(),
+        family: r.workload.curve.family.clone(),
+        log2_r: (r.workload.curve.r as f64).log2(),
+        status: r.outcome.status.clone(),
+        warmup: r.warmup,
+        total_gae: r.cost.total_gae,
+        work: price_record_v2(r),
+    }
+}
+
 fn push_unique(v: &mut Vec<String>, s: &str) {
     if !v.iter().any(|x| x == s) {
         v.push(s.to_string());
@@ -1292,5 +1628,180 @@ mod tests {
         .unwrap();
         assert_eq!(w.phases[0].prims["modr_mul"], 50);
         assert_eq!(w.phases.len(), 1);
+    }
+
+    #[test]
+    fn memory_of_a_baby_step_table_and_of_a_walk() {
+        let c = curve("prime", 20, (1 << 19) + 21, 2);
+        let params = BTreeMap::new();
+        let ws = widths_of(&c).unwrap();
+        let at = |method: &'static str, counters: &BTreeMap<String, u64>| {
+            memory(
+                &Priceable {
+                    method_id: method,
+                    method_params: &params,
+                    curve: &c,
+                    phases: &[],
+                    counters,
+                    solver: None,
+                },
+                None,
+                &ws,
+            )
+        };
+        let bsgs: BTreeMap<String, u64> = [
+            ("inserts_uncharged".to_string(), 513u64),
+            ("lookups_uncharged".into(), 16),
+        ]
+        .into_iter()
+        .collect();
+        let m = at("bsgs.negation", &bsgs);
+        assert_eq!(m.terms["table"], 513 * (20 + 20));
+        assert!(m.unpriced.is_empty());
+        let rho: BTreeMap<String, u64> = [("distinguished_points".to_string(), 71u64)]
+            .into_iter()
+            .collect();
+        let m = at("rho.negation", &rho);
+        assert_eq!(m.terms["table"], 71 * (40 + 40));
+        assert_eq!(m.bits(), 71 * 80);
+        let m = at("rho.plain", &BTreeMap::new());
+        assert!(m.terms.is_empty());
+        assert_eq!(m.unpriced, vec!["table_entries".to_string()]);
+    }
+
+    #[test]
+    fn memory_of_an_index_calculus_record_and_what_an_older_one_lacks() {
+        // κ = 23, w = 22.
+        let c = curve("koblitz", 23, (1 << 21) + 5, 46);
+        let fb = FactorBaseFacts {
+            fb_id: String::new(),
+            fb_sha256: String::new(),
+            family: "binary-subspace".into(),
+            params: BTreeMap::new(),
+            description: String::new(),
+            signed_points: 64,
+            abscissae: 32,
+            columns: 32,
+            dimension: Some(6),
+            points_sha256: String::new(),
+        };
+        let phases = vec![
+            PhaseRecord {
+                name: "oracle_setup".into(),
+                work_native: [
+                    ("counted:table_insert_attempts".to_string(), 1u64),
+                    ("table_insert_attempts".into(), 2025),
+                ]
+                .into_iter()
+                .collect(),
+                ..Default::default()
+            },
+            PhaseRecord {
+                name: "linear_algebra".into(),
+                native: [("rows".to_string(), 17u64), ("columns".into(), 33)]
+                    .into_iter()
+                    .collect(),
+                ..Default::default()
+            },
+        ];
+        let counters: BTreeMap<String, u64> =
+            [("matrix_rows".to_string(), 17u64)].into_iter().collect();
+        let params = BTreeMap::new();
+        let x = Priceable {
+            method_id: "ic.pipeline",
+            method_params: &params,
+            curve: &c,
+            phases: &phases,
+            counters: &counters,
+            solver: None,
+        };
+        let ws = widths_of(&c).unwrap();
+        let m = memory(&x, Some(&fb), &ws);
+        assert_eq!(m.terms["factor_base"], 64 * 46);
+        assert_eq!(m.terms["matrix"], 17 * 33 * 22);
+        assert_eq!(m.terms["tables"], 2025 * 45);
+        assert!(m.unpriced.is_empty());
+        assert_eq!(m.bits(), 64 * 46 + 17 * 33 * 22 + 2025 * 45);
+        // Without the base block and the marker, and with a solver that did
+        // not measure its peak: the matrix width falls back to the phase's
+        // column count, and every other field is named, never zero.
+        let solver = SolverStats::default();
+        let older = vec![phases[1].clone()];
+        let x = Priceable {
+            phases: &older,
+            solver: Some(&solver),
+            ..x
+        };
+        let m = memory(&x, None, &ws);
+        assert_eq!(m.terms.get("factor_base"), None);
+        assert_eq!(m.terms["matrix"], 17 * 33 * 22);
+        assert_eq!(
+            m.unpriced,
+            vec![
+                "factor_base.signed_points".to_string(),
+                "table_insert_attempts".into(),
+                "solver.peak_bytes".into(),
+            ]
+        );
+        let w2 = price_v2(&x, None).unwrap();
+        let v1 = price(&x).unwrap();
+        assert!(!w2.memory_complete);
+        assert_eq!(w2.schema, WORK_SCHEMA_V2);
+        assert_eq!(w2.unit, bitops::UNIT_V2);
+        assert_eq!(w2.bitops, v1.bitops);
+        assert_eq!(w2.memory_bits, (17 * 33 * 22).to_string());
+        assert_eq!(w2.at, mul_decimal(v1.bitops.parse().unwrap(), 17 * 33 * 22));
+        // ic.k4_gaudry keeps its oracle table in no counter.
+        let x = Priceable {
+            method_id: "ic.k4_gaudry",
+            solver: None,
+            ..x
+        };
+        let m = memory(&x, None, &ws);
+        assert!(m.unpriced.contains(&"oracle_table_entries".to_string()));
+        assert!(!m.unpriced.contains(&"table_insert_attempts".to_string()));
+    }
+
+    #[test]
+    fn decimal_products_are_exact_past_u128() {
+        assert_eq!(mul_decimal(0, 5), "0");
+        assert_eq!(mul_decimal(7, 0), "0");
+        assert_eq!(
+            mul_decimal(123456789012345678901234567890, 1),
+            "123456789012345678901234567890"
+        );
+        assert_eq!(
+            mul_decimal(1_000_000_000, 1_000_000_000),
+            "1000000000000000000"
+        );
+        assert_eq!(
+            mul_decimal(u128::MAX, u128::MAX),
+            "115792089237316195423570985008687907852589419931798687112530834793049593217025"
+        );
+    }
+
+    /// The fixture records of `tests/fixtures/ecbench/work-v1` carry the
+    /// `bitop/v1` block the session wrote; the pricing must reproduce it,
+    /// and `bitop/v2` must carry the same gates.
+    #[test]
+    fn fixture_records_reprice_to_their_committed_blocks() {
+        let dir =
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/ecbench/work-v1");
+        let records = crate::cryptanalysis::ecbench::runner::read_records(&dir).unwrap();
+        assert_eq!(records.len(), 4);
+        for r in &records {
+            let committed = r.work.as_ref().expect("fixture carries a work block");
+            assert_eq!(&price_record(r).unwrap(), committed, "{}", r.record_id);
+            let v2 = price_record_v2(r).unwrap();
+            assert_eq!(v2.bitops, committed.bitops, "{}", r.record_id);
+            assert!(
+                v2.memory_complete,
+                "{}: {:?}",
+                r.record_id, v2.memory_unpriced
+            );
+            let bits: u128 = v2.memory_bits.parse().unwrap();
+            assert!(bits > 0);
+            assert_eq!(v2.at, mul_decimal(committed.bitops.parse().unwrap(), bits));
+        }
     }
 }

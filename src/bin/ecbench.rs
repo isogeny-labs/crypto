@@ -120,6 +120,11 @@ enum Cmd {
     Work {
         #[arg(num_args = 1.., required = true)]
         sessions: Vec<PathBuf>,
+        /// The unit: `bitop/v1` (the default) or `bitop/v2`, the same
+        /// gates plus the declared memory term and the area-time
+        /// product (docs/units/BITOPS.md, "bitop/v2: memory").
+        #[arg(long)]
+        unit: Option<String>,
         /// Only verified, non-warm-up records.
         #[arg(long)]
         counted: bool,
@@ -130,8 +135,13 @@ enum Cmd {
         #[arg(long)]
         summary: bool,
     },
-    /// Print the bitop/v1 test vectors (docs/units/bitop-v1.vectors.json).
-    BitopVectors,
+    /// Print the bitop/v1 test vectors (docs/units/bitop-v1.vectors.json),
+    /// or with `--unit bitop/v2` the bitop/v2 entry widths
+    /// (docs/units/bitop-v2.vectors.json).
+    BitopVectors {
+        #[arg(long)]
+        unit: Option<String>,
+    },
     /// Amortise an arm against a rho arm on the same curves, in bitop/v1:
     /// per curve, the mean reusable and per-target gates of each, their
     /// cost for T targets (rho as one walk that keeps its table, Kuhn and
@@ -445,8 +455,8 @@ enum BoundCmd {
         resamples: usize,
         #[arg(long, default_value_t = bounds::SEED)]
         seed: u64,
-        /// Fit in this unit instead of the records' own: `bitop/v1`
-        /// (docs/units/BITOPS.md).
+        /// Fit in this unit instead of the records' own: `bitop/v1` or
+        /// `bitop/v2` (docs/units/BITOPS.md).
         #[arg(long)]
         unit: Option<String>,
         /// Fit the band-priced cost at this weight in GAE per native
@@ -735,10 +745,22 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
         Cmd::Store(args) => crypto_lib::store::cli::run(&args)?,
         Cmd::Work {
             sessions,
+            unit,
             counted,
             summary,
         } => {
             use std::io::Write;
+            let v2 = match unit.as_deref() {
+                None | Some(crypto_lib::cryptanalysis::bitops::UNIT) => false,
+                Some(crypto_lib::cryptanalysis::bitops::UNIT_V2) => true,
+                Some(u) => return Err(format!("no unit `{u}`; work knows bitop/v1 and bitop/v2")),
+            };
+            if v2 && summary {
+                return Err(
+                    "--summary is in bitop/v1 only; price the records in bitop/v2 one by one"
+                        .into(),
+                );
+            }
             let stdout = std::io::stdout();
             let mut out = stdout.lock();
             if summary {
@@ -761,17 +783,30 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     if counted && !r.counts() {
                         continue;
                     }
-                    let line = crypto_lib::cryptanalysis::ecbench::work::work_line(&r);
-                    writeln!(
-                        out,
-                        "{}",
+                    let line = if v2 {
+                        let line = crypto_lib::cryptanalysis::ecbench::work::work_line_v2(&r);
                         serde_json::to_string(&line).map_err(|e| e.to_string())?
-                    )
-                    .map_err(|e| e.to_string())?;
+                    } else {
+                        let line = crypto_lib::cryptanalysis::ecbench::work::work_line(&r);
+                        serde_json::to_string(&line).map_err(|e| e.to_string())?
+                    };
+                    writeln!(out, "{line}").map_err(|e| e.to_string())?;
                 }
             }
         }
-        Cmd::BitopVectors => print_json(&crypto_lib::cryptanalysis::bitops::vectors())?,
+        Cmd::BitopVectors { unit } => match unit.as_deref() {
+            None | Some(crypto_lib::cryptanalysis::bitops::UNIT) => {
+                print_json(&crypto_lib::cryptanalysis::bitops::vectors())?
+            }
+            Some(crypto_lib::cryptanalysis::bitops::UNIT_V2) => {
+                print_json(&crypto_lib::cryptanalysis::bitops::vectors_v2())?
+            }
+            Some(u) => {
+                return Err(format!(
+                    "no unit `{u}`; the vectors are bitop/v1 and bitop/v2"
+                ))
+            }
+        },
         Cmd::Amortize {
             dir,
             arm,
