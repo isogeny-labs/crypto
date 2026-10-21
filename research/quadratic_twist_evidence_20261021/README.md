@@ -1,66 +1,96 @@
-# Quadratic-twist experiment evidence
+# Quadratic twists: full native replay and checked algebraic implications
 
-This imports the completed quadratic-twist study into the requested repository.
-It preserves the historical Python source and execution evidence as an immutable
-snapshot. The active audit is C++17 with OpenSSL; it never invokes Python.
+The full finite workload now runs in C++17. All **434 deterministic fields**
+match the frozen historical results: 942 nonsingular models, 4,188,162 ordered
+S3 triples, 113,342 ordered S4 quadruples, the subfield and trace-zero fixtures,
+all 81 toy IC logarithms, and the four transported relation collections.
+The historical Python source and records remain unchanged in their archive.
 
-## Inspect the evidence
+- [Full native replay receipt](native/runs/run-20261021T150125Z/parity.json),
+  [raw output](native/runs/run-20261021T150125Z/results.json), and
+  [execution transcript](native/runs/run-20261021T150125Z/run.log).
+- [Independent audit of 84 IC certificates](native/runs/run-20261021T150125Z/independent-ic-audit.json):
+  three headline matrices plus the 81 complete-log runs, recomputed with the
+  separate tuple-based arithmetic in [audit.cpp](audit.cpp).
+- [Tower-to-polynomial-basis certificate](native/runs/run-20261021T150125Z/basis.json).
+- [False relation, missing coverage, and false reference controls](native/controls-20261021T150300Z/run.log).
+- [Fourteen group/ring theorems](lean/TwistProof.lean) and
+  [four actual elliptic-curve Frobenius theorems](lean/FrobeniusBridge.lean), their
+  [proof map](lean/README.md), and [18-theorem proof-gate receipt](validation/lean-bridge-gate/).
+- [Three IDC1 identities](certificates/identity-index.json), each linked to the
+  exact checked Lean source. The native checker uses 32 derived points and
+  16 extra points and rejects the deliberately false identities.
+- [Exact model catalog](../../docs/curves/sources/quadratic-twist-native-20261021.json):
+  1,921 ICV1 models and 27 selected subgroup representations with full EC1 UIDs.
+  Census models with no selected cyclic generator retain that unknown explicitly.
+- [Latest report, graph, and PDF](reports/native-20261021T150125Z/README.md).
+- [Requirement status](REQUIREMENTS.md) and [remaining formal/coordination obligations](../../problems/quadratic-twist-evidence-native-parity.md).
 
-- [Historical execution log](historical/run.log)
-- [Historical raw results](historical/results.json)
-- [Historical provenance and source hashes](historical/run-metadata.json)
-- [Source-and-evidence snapshot](historical/source-and-evidence.tar.xz) and
-  [archive checksum](historical/source-and-evidence.tar.xz.sha256)
-- [Audit protocol](PROTOCOL.md), [native verifier](audit.cpp), and
-  [requirements/limitations](REQUIREMENTS.md)
-- [Final native audit receipt](audits/run-20261021T064417Z/receipt.json) and
-  [transcript](audits/run-20261021T064417Z/run.log)
-- [Positive and negative control transcript](audits/controls-20261021T064419Z/run.log)
-- [Results report and PDF](reports/README.md)
+The Lean proofs establish the stated group/ring implications, with explicit
+hypotheses. The actual Frobenius point map and rational-point lifts are now
+formalized. The twist-to-minus-eigenspace identification, summation-polynomial
+lifting and Weil-pairing bridges remain open.
+This study establishes finite correctness and specific obstructions; it supplies
+neither a general ECDLP hardness proof nor a general GHS attack or speedup result.
+Invalid-curve attacks are outside its scope; every experiment uses valid points.
 
-The snapshot is historical evidence under the repository's native-language
-policy. Its Python harness is not an active execution path or a recommended
-research implementation in this repository. Extracting it outside the repository
-retains the original reproduction commands and report.
+## Reproduce
 
-## Run the native audit
-
-Requires a C++17 compiler, OpenSSL development headers/library, `tar`, `xz`,
-`sha256sum`, and Bash. Negative controls additionally require `jq`.
+Requires C++17, OpenSSL development headers/library, Bash, tar/xz, sha256sum,
+jq, and Rust 1.99.1. The isolated Rust metadata crate reuses the repository's
+native ICV1/IDC1 implementations; it does not build a substitute Python path.
 
 ```sh
-bash research/quadratic_twist_evidence_20261021/run-audit.sh
-bash research/quadratic_twist_evidence_20261021/test-audit.sh
+study=research/quadratic_twist_evidence_20261021
+bash "$study/run-native.sh" /tmp/twist-native-fresh
+bash "$study/test-native.sh" /tmp/twist-native-fresh /tmp/twist-controls-fresh
+cargo test --release --locked --manifest-path "$study/native/metadata/Cargo.toml"
+cargo run --release --locked --manifest-path "$study/native/metadata/Cargo.toml" -- \
+  "$PWD" /tmp/twist-native-fresh/results.json /tmp/twist-metadata-fresh
+cmp /tmp/twist-metadata-fresh/curve-models.json docs/curves/sources/quadratic-twist-native-20261021.json
 ```
 
-Each command creates a fresh audit directory and refuses to overwrite it.
-It verifies the snapshot hash before extraction. The audit replays the saved
-pairing/IC certificates and the point-count examples independently in native
-code. The CI workflow runs the same checks and uploads the fresh receipts.
+Each output directory must be fresh. `run-native.sh` compiles snapshots of its
+actual sources and records their hashes, compiler, input/output digests, exit
+status, and UTC boundaries. Its snapshot duplicates `source.cpp` as `full.cpp`
+so the separate basis checker can include the same arithmetic implementation.
+The script verifies the archive and all historical manifest entries before
+accepting the separately audited new certificates.
 
-## Evidence scope
+The parity comparison excludes only process timing, source provenance, and
+SymPy version fields. It compares every historical mathematical field, including
+randomly collected relation matrices and attempt counts. The C++ integer-seeded
+MT19937 reproduces the original rejection-based integer draws. Exact sparse
+polynomial expansion over Z replaces SymPy. New output also records per-model
+S3 relation-set hashes and all 81 newly collected IC certificates, which the
+original archive did not retain individually. No timing is admitted as a benchmark.
 
-| Requirement | Status |
-| --- | --- |
-| Preserve prior source, logs, inputs and results | verified by archive and internal hashes |
-| Historical census: 942 models; 4,188,162 S3 triples; 113,342 S4 quadruples | historical Python run; not natively rerun |
-| Historical 81 complete IC recoveries | recorded by historical harness; native audit checks all scalar-pairing identities and the three saved IC certificates |
-| Native audit of three saved IC certificates | verified |
-| Native 81 scalar-pairing and 3,219 bilinearity identities | verified |
-| Corruption and false-relation rejection | checked by native controls |
-| Full native census/relation-collection parity | not implemented in this import |
-| Lean proof of the historical general theorems | not checked; Lean is unavailable in this execution environment |
-| General GHS attack or general ECDLP hardness conclusion | not implemented or established |
+For proof checks, install the pinned Lean toolchain, then run:
 
-No performance or security claim is promoted. The historical elapsed times are
-uncontrolled process provenance, not admitted algorithm timings. No leaderboard,
-benchmark row, curve registry entry, or canonical cost graph changes are made.
+```sh
+tools/lean/proof-gate.sh --out /tmp/twist-proof-receipts "$study/lean"
+```
 
-See [the validation record](validation/README.md) for repository checks that this
-environment could not run. Those checks are not described as passing.
-The [full native/formal parity problem](../../problems/quadratic-twist-evidence-native-parity.md)
-keeps the remaining implementation and proof obligations explicit.
+The scoped Actions workflow reproduces the native run, controls, certificates,
+and model catalog; the repository-wide Lean gate builds and audits the project.
 
-Native audit records remain loose because the report and review links resolve
-their individual paths. The historical source/run tree is preserved as one
-deterministic archive with an adjacent checksum.
+## Frozen provenance
+
+[Historical transcript](historical/run.log), [raw results](historical/results.json),
+[metadata](historical/run-metadata.json), [source archive](historical/source-and-evidence.tar.xz),
+and [checksum](historical/source-and-evidence.tar.xz.sha256) retain the original
+Python provenance. The earlier [import report](reports/README.md), saved audit
+sources/receipts, and failed native port/proof attempts are retained. Earlier
+statements that the full native port was missing describe that earlier record.
+
+The original certificate-only path remains available:
+
+```sh
+bash "$study/run-audit.sh"
+bash "$study/test-audit.sh"
+```
+
+No benchmark or leaderboard row is promoted. Canonical IC/rho cost graphs remain
+unchanged because there is no new admissible cost comparison. The new study graph
+shows the expanded native coverage. Research records stay loose where review,
+source, digest, and replay links name their individual paths.

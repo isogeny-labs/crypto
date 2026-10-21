@@ -1844,7 +1844,10 @@ mod tests {
             .iter()
             .filter(|curve| matches!(&curve.model, Model::Extension { .. }))
             .collect();
-        assert_eq!(extensions.len(), 1324);
+        // The original 1,324 models plus 963 native quadratic-twist models.
+        // Keep the exact count and the per-model checks below: a new registry
+        // row must preserve its full field, order, and subgroup information.
+        assert_eq!(extensions.len(), 2287);
         for curve in extensions {
             let Model::Extension {
                 p,

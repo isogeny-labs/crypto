@@ -714,6 +714,21 @@ def harvest_native_factor_base_history(reg: Registry) -> None:
         reg.add(ident, row["family"], row["params"], str(path.relative_to(REPO)), [])
 
 
+def harvest_native_quadratic_twists(reg: Registry) -> None:
+    """Assemble hash-bound native metadata; do not run curve arithmetic here."""
+    path = REPO / "docs/curves/sources/quadratic-twist-native-20261021.json"
+    if not path.exists():
+        return
+    doc = json.loads(path.read_text())
+    if doc.get("schema") != "quadratic-twist-native-models/v1":
+        raise ValueError("unsupported native quadratic-twist catalog")
+    for row in doc["models"]:
+        ident = dict(row, model_sha256=hashlib.sha256(row["model_json"].encode()).hexdigest())
+        reg.add(ident, row["family"], row["params"], str(path.relative_to(REPO)), [])
+        for rep in row["representations"]:
+            reg.represent(ident, rep["field"], rep["curve"], str(path.relative_to(REPO)))
+
+
 def build() -> tuple[dict, list[str], list[str]]:
     reg, problems, fatal = Registry(), [], []
     harvest_standards(reg)
@@ -723,6 +738,7 @@ def build() -> tuple[dict, list[str], list[str]]:
     harvest_text_koblitz(reg)
     harvest_native_standards(reg)
     harvest_native_factor_base_history(reg)
+    harvest_native_quadratic_twists(reg)
     harvest_programme_extensions(reg)
     carry_forward(reg)
     ambiguous = sorted(f"{reg.alias_text[k]!r} -> {len(v)} models"

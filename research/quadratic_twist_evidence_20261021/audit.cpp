@@ -230,7 +230,7 @@ long long count_points(long long p,long long a,long long b,long long c) {
 
 int main(int argc,char** argv) {
     try {
-        require(argc==3,"usage: audit EXTRACTED_SNAPSHOT OUTPUT_RECEIPT.json");
+        require(argc==3 || argc==4,"usage: audit EXTRACTED_SNAPSHOT OUTPUT_RECEIPT.json [NATIVE_RESULTS.json]");
         const fs::path root=argv[1]; size_t hashes=0;
         std::istringstream manifest(read(root/"SHA256SUMS")); std::string line;
         while (std::getline(manifest,line)) {
@@ -241,13 +241,14 @@ int main(int argc,char** argv) {
             require(digest(read(root/path))==line.substr(0,64),"checksum mismatch: "+name); ++hashes;
         }
         require(hashes>=10,"incomplete checksum manifest");
-        const auto results=parse(read(root/"results/results.json"));
+        const auto historical=parse(read(root/"results/results.json"));
         const auto meta=parse(read(root/"results/run-metadata.json"));
         require(meta.at("experiment_exit_code").integer()==0 && meta.at("runner_exit_code").integer()==0,"historical run failed");
         require(meta.at("sources_unchanged_during_run").boolean(),"historical input changed");
         require(meta.at("scientific_results_match_reference").boolean(),"historical reference mismatch");
-        require(results.at("source_sha256").string()==digest(read(root/"experiments.py")),"historical source binding");
-        size_t certificates=0, scalar_checks=0, bilinear_checks=0;
+        require(historical.at("source_sha256").string()==digest(read(root/"experiments.py")),"historical source binding");
+        const auto results=argc==4 ? parse(read(argv[3])) : historical;
+        size_t certificates=0, scalar_checks=0, bilinear_checks=0, new_certificates=0;
         const auto& cases=results.at("pairings");
         require(cases.kind==Json::Array && cases.items.size()==3,"expected three pairing fixtures");
         const std::vector<std::pair<long long,long long>> expected{{43,11},{67,17},{211,53}};
@@ -289,6 +290,37 @@ int main(int argc,char** argv) {
                     require(curve.weil(curve.scalar(a,P),curve.scalar(b,S),r)==f.pow(g,a*b),"bilinearity"); ++bilinear_checks;
                 }
             }
+            if (argc==4) {
+                const auto& all=item.at("all_log_certificates");
+                require(all.kind==Json::Array && all.items.size()==size_t(r),"complete native log coverage");
+                for (long long scalar=0;scalar<r;++scalar) {
+                    const auto& entry=all.items[size_t(scalar)];
+                    require(entry.at("scalar").integer()==scalar,"native scalar sequence");
+                    auto value=element(entry.at("target").string());
+                    require(curve.weil(curve.scalar(scalar,P),S,r)==value,"native per-log pairing");
+                    const auto& cert=entry.at("index_calculus");
+                    require(cert.at("recovered_log").integer()==scalar && f.pow(g,scalar)==value,"native complete recovery");
+                    require(cert.at("projection_exponent").integer()==h,"native projection");
+                    std::vector<long long> ls;
+                    for (const auto& x:cert.at("projected_factor_base_logs").items) ls.push_back(x.integer());
+                    require(ls.size()==6 && cert.at("factor_base").items.size()==ls.size(),"native factor-base size");
+                    for (size_t j=0;j<ls.size();++j) {
+                        require(cert.at("factor_base").items[j].string()=="u+"+std::to_string(j+1),"native factor-base identity");
+                        require(f.pow({static_cast<long long>(j+1),1},h)==f.pow(g,ls[j]),"native complete factor-base logs");
+                    }
+                    std::vector<std::vector<long long>> rows;
+                    for (const auto& relation:cert.at("independent_relations").items) {
+                        std::vector<long long> row;long long lhs=0;
+                        for (const auto& x:relation.at("coefficients").items) row.push_back(x.integer());
+                        require(row.size()==ls.size(),"native relation dimensions");
+                        for (size_t j=0;j<row.size();++j) lhs=mod(lhs+row[j]*ls[j],r);
+                        require(lhs==relation.at("rhs").integer(),"native complete relation equation");
+                        rows.push_back(row);
+                    }
+                    require(rows.size()==ls.size() && rank(rows,r)==ls.size(),"native complete relation rank");
+                    ++new_certificates;
+                }
+            }
             ++certificates;
         }
         const auto& smooth=results.at("no_transfer").at("smooth_twist");
@@ -302,6 +334,9 @@ int main(int argc,char** argv) {
         receipt << "{\n  \"schema\": \"quadratic-twist-historical-audit/v1\",\n  \"status\": \"passed\",\n"
                 << "  \"snapshot_manifest_files_verified\": " << hashes << ",\n"
                 << "  \"saved_ic_certificates_verified\": " << certificates << ",\n"
+                << "  \"additional_native_ic_certificates_verified\": " << new_certificates << ",\n"
+                << "  \"certificate_input_kind\": \"" << (argc==4 ? "native_full_output" : "historical") << "\",\n"
+                << "  \"certificate_input_sha256\": \"" << digest(argc==4 ? read(argv[3]) : read(root/"results/results.json")) << "\",\n"
                 << "  \"native_pairing_scalar_checks\": " << scalar_checks << ",\n"
                 << "  \"native_bilinearity_checks\": " << bilinear_checks << ",\n"
                 << "  \"native_point_count_examples_verified\": 2,\n"
@@ -310,7 +345,8 @@ int main(int argc,char** argv) {
         std::cout << "PASS: " << hashes << " historical checksum records\nPASS: " << certificates
                   << " independent native IC certificate checks\nPASS: " << scalar_checks
                   << " native scalar-pairing checks; " << bilinear_checks << " bilinearity checks\n"
-                  << "PASS: smooth/anomalous twist point counts\n";
+                  << "PASS: smooth/anomalous twist point counts\n"
+                  << "PASS: " << new_certificates << " additional native IC certificates\n";
         return 0;
     } catch (const std::exception& error) {
         std::cerr << "FAIL: " << error.what() << '\n'; return 1;

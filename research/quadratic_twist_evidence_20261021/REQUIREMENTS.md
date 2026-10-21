@@ -1,21 +1,24 @@
 # Requirement-to-evidence map
 
-| Requested/required item | Actual status | Evidence or gap |
+| Requested/required item | Status | Evidence or remaining gap |
 | --- | --- | --- |
-| PR destination `aburan28/crypto` | this import targets that repository | replacement PR links recorded in the PR description |
-| Visible proof that experiments ran | historical transcript, source hashes and raw results retained | `historical/run.log`, `historical/run-metadata.json`, archive |
-| Preserve all previous experiments | historical records/source preserved without edits | original 12-file checksum manifest inside archive |
-| Native execution in this repository | native certificate audit and controls implemented | `audit.cpp`, `run-audit.sh`, `test-audit.sh`, fresh receipts |
-| Replay the full historical census natively | not implemented | 942-model census, S3/S4 enumeration, trace-zero/subfield enumeration and relation collector need a native port |
-| Verify algebraic certificates independently | native verification complete for the three saved IC cases | matrix ranks, field logarithms, Miller pairing and public-scalar checks |
-| General written proofs | preserved as historical report | archived `report.html` and `report.py`; no stronger formal status asserted |
-| Checked Lean formalization / identity-certificate registration | not completed in this import | no Lean toolchain; historical symbolic checks are not Lean proofs or registered IDC1 certificates |
-| Repository Conductor check | unavailable (exit 127) | CLI absent; `.conductor/WORKFLOW.md` absent at base revision |
-| Repository `cargo test --release --lib` | unavailable (exit 127) | no Cargo/Rust toolchain in this environment |
-| Native compiler checks and semantic controls | passed | native audit/control transcripts |
-| Source-linked report, graph, PDF | supplied | `reports/` with recorded-data rendering source |
-| General GHS implementation / asymptotic advantage | not claimed | original study explicitly leaves both unresolved |
+| PR in `aburan28/crypto` | complete | PR #2381, extended on its existing branch |
+| Visible executed experiment evidence | verified | frozen historical logs plus native run `run-20261021T150125Z` |
+| Preserve historical source, failures, and inputs | verified | original archive unchanged; new failed port/proof attempts retained |
+| Full native census, S3 and S4 workloads | verified | 942 models; 4,188,162 triples; 113,342 quadruples; every historical deterministic field matches |
+| Full native subfield and trace-zero workloads | verified | original four trace-zero fixtures and subfield example rerun |
+| Full native relation collection and solver | verified | same seeds, relation matrices, ranks, attempt counts, and 81 complete logarithms |
+| Independent verification of saved/new IC data | verified | tuple-based auditor verifies three headline and 81 complete-log certificates |
+| Native controls | verified | false new relation, removed log certificate and false historical census count rejected |
+| Historical general readable arguments | preserved | archived report remains available with its original hypotheses |
+| Checked Lean implications and proof map | partial | 18 checked theorems, including actual Frobenius point maps and rational lifts; twist-to-minus, summation-lifting and pairing bridges remain open |
+| Algebraic identity certificates | verified for three stated identities | IDC1 certificates, 32+16 point replay, false controls, exact Lean source pointers |
+| Exact curve/model/subgroup identities | verified within stated representations | 1,921 registered monic models, 27 EC1 representations; unused subgroup choices stay unknown |
+| Shared Conductor check | blocked by unavailable tool/configuration | CLI exits 127; shared workflow/state unavailable; no reservation claimed |
+| Repository `cargo test --release --lib --locked` | passed on final code and registry | 4,474 passed, 119 existing ignores; prior count-guard and socket-sandbox failures retained in `validation/` |
+| Native metadata/backend tests | passed | 39 tests; actual registry/certificate byte replay also checked |
+| Source-linked report, graph and inspected PDF | supplied | `reports/native-20261021T150125Z/` |
+| General GHS implementation / asymptotic or hardness claim | unresolved, not established | finite examples and conditional algebra do not establish either |
 
-This import is not a native full-suite rerun or a new performance experiment.
-The native audit supplies independently recomputed certificate facts only in its
-declared fixture set. The original broad hardness question remains open.
+The original request remains broader than the finite evidence. Closing a native
+implementation gap or passing CI does not settle general ECDLP hardness.

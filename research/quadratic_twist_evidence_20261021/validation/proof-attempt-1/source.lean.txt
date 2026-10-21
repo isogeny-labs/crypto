@@ -1,0 +1,137 @@
+import Mathlib.Algebra.Group.End
+import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.Data.Nat.Prime.Basic
+import Mathlib.Tactic.Ring
+
+/-!
+Kernel proofs for the algebraic implications used by the report. The abstract
+endomorphism hypotheses are explicit. Instantiating Frobenius and the twist
+isomorphism on a Mathlib elliptic-curve point group remains a separate bridge.
+-/
+namespace TwistProof
+
+section Groups
+variable {G H : Type*} [AddCommGroup G] [AddCommGroup H]
+
+/-- A rational mixed sum has a twist contribution killed by two. -/
+theorem mixed_relation_two_torsion (φ : G →+ G) (A B : G)
+    (hA : φ A = A) (hB : φ B = -B) (hR : φ (A + B) = A + B) :
+    2 • B = 0 := by
+  have h : A + B = A + -B := by
+    calc
+      A + B = φ (A + B) := hR.symm
+      _ = φ A + φ B := map_add φ A B
+      _ = A + -B := by rw [hA, hB]
+  have hb : B = -B := add_left_cancel h
+  have hs := congrArg (fun X : G => X + B) hb
+  simpa only [two_nsmul, neg_add_cancel] using hs
+
+/-- Coprime annihilators force a group element to vanish. -/
+theorem coprime_annihilators (B : G) (m n : ℕ) (hc : Nat.Coprime m n)
+    (hm : m • B = 0) (hn : n • B = 0) : B = 0 := by
+  have hd : addOrderOf B ∣ Nat.gcd m n := Nat.dvd_gcd
+    (addOrderOf_dvd_iff_nsmul_eq_zero.mpr hm)
+    (addOrderOf_dvd_iff_nsmul_eq_zero.mpr hn)
+  rw [hc.gcd_eq_one] at hd
+  exact addOrderOf_eq_one_iff.mp (Nat.eq_one_of_dvd_one hd)
+
+/-- The mixed contribution is zero when its annihilator is odd. -/
+theorem mixed_relation_odd (φ : G →+ G) (A B : G) (r : ℕ)
+    (hr : Nat.Coprime 2 r) (hB_order : r • B = 0)
+    (hA : φ A = A) (hB : φ B = -B) (hR : φ (A + B) = A + B) :
+    B = 0 :=
+  coprime_annihilators B 2 r hr (mixed_relation_two_torsion φ A B hA hB hR) hB_order
+
+/-- No finite-group homomorphism transports a nonzero element across coprime orders. -/
+theorem finite_hom_coprime [Fintype G] [Fintype H]
+    (hc : Nat.Coprime (Fintype.card G) (Fintype.card H))
+    (f : G →+ H) (P : G) : f P = 0 := by
+  apply coprime_annihilators (f P) (Fintype.card G) (Fintype.card H) hc
+  · rw [← map_nsmul, card_nsmul_eq_zero, map_zero]
+  · exact card_nsmul_eq_zero (f P)
+
+/-- Trace plus anti-trace is twice the point, without any division at two. -/
+theorem trace_antitrace_sum (φ : G →+ G) (P : G) :
+    (P + φ P) + (P - φ P) = 2 • P := by
+  simp only [sub_eq_add_neg, two_nsmul]
+  abel
+
+/-- An involution's trace lies in its plus eigenspace. -/
+theorem trace_fixed (φ : G →+ G) (hinv : ∀ P, φ (φ P) = P) (P : G) :
+    φ (P + φ P) = P + φ P := by
+  rw [map_add, hinv, add_comm]
+
+/-- Its anti-trace lies in its minus eigenspace. -/
+theorem antitrace_negated (φ : G →+ G) (hinv : ∀ P, φ (φ P) = P) (P : G) :
+    φ (P - φ P) = -(P - φ P) := by
+  rw [map_sub, hinv, neg_sub]
+
+end Groups
+
+/-- The odd common-order divisor also divides q+1. -/
+theorem common_order_divides_q_plus_one (q N Nt r : ℕ)
+    (hsum : N + Nt = 2 * (q + 1)) (hN : r ∣ N) (hNt : r ∣ Nt)
+    (hodd : Nat.Coprime r 2) : r ∣ q + 1 := by
+  apply hodd.dvd_mul_left.mp
+  rw [← hsum]
+  exact Nat.dvd_add hN hNt
+
+section Rings
+variable {R : Type*} [CommRing R]
+
+/-- Canonical and symmetric expressions for the third summation polynomial. -/
+theorem symmetric_s3 (x y z a b : R) :
+    (x-y)^2*z^2 - 2*((x+y)*(x*y+a)+2*b)*z + (x*y-a)^2-4*b*(x+y) =
+      (x*y+x*z+y*z-a)^2 - 4*(x+y+z)*(x*y*z+b) := by ring
+
+/-- The twist parameter cancels in the Vieta expression. -/
+theorem vieta_twist_cancellation (a b d m n : R) :
+    ((a-2*d*m*n)-a)^2 - 4*(d*m^2)*(d*n^2-b+b) = 0 := by ring
+
+/-- Clearing the twist equation gives a polynomial multiple of u^2-d. -/
+theorem twist_equation_identity (u d x a b : R) :
+    u^2*(x^3+a*x+b) - d*(x^3+a*x+b) =
+      (u^2-d)*(x^3+a*x+b) := by ring
+
+/-- The x-fixing map satisfies the untwisted affine curve equation. -/
+theorem twist_affine_map (u d x y a b : R) (hu : u^2 = d)
+    (hP : d*y^2 = x^3+a*x+b) : (u*y)^2 = x^3+a*x+b := by
+  rw [mul_pow, hu, hP]
+
+/-- The monic normalization of c*y^2 = x^3+a*x+b. -/
+theorem monic_normalization (c x y a b : R) (h : c*y^2 = x^3+a*x+b) :
+    (c^2*y)^2 = (c*x)^3 + (c^2*a)*(c*x) + c^3*b := by
+  calc
+    (c^2*y)^2 = c^3*(c*y^2) := by ring
+    _ = c^3*(x^3+a*x+b) := by rw [h]
+    _ = (c*x)^3 + (c^2*a)*(c*x) + c^3*b := by ring
+
+/-- In odd characteristic, q=-1 has multiplicative order exactly two. -/
+theorem embedding_degree_two (q : R) (hq : q + 1 = 0) (h2 : (2 : R) ≠ 0) :
+    q^2 = 1 ∧ q ≠ 1 := by
+  have hq' : q = -1 := eq_neg_of_add_eq_zero_left hq
+  constructor
+  · rw [hq']; ring
+  · intro h
+    apply h2
+    rw [h] at hq
+    simpa only [one_add_one_eq_two] using hq
+
+end Rings
+
+#print axioms mixed_relation_two_torsion
+#print axioms coprime_annihilators
+#print axioms mixed_relation_odd
+#print axioms finite_hom_coprime
+#print axioms trace_antitrace_sum
+#print axioms trace_fixed
+#print axioms antitrace_negated
+#print axioms common_order_divides_q_plus_one
+#print axioms symmetric_s3
+#print axioms vieta_twist_cancellation
+#print axioms twist_equation_identity
+#print axioms twist_affine_map
+#print axioms monic_normalization
+#print axioms embedding_degree_two
+
+end TwistProof
