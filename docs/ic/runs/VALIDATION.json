@@ -1,0 +1,52 @@
+{
+  "schema": "validation-gate/v1",
+  "rows": [
+    "icv1-fp10-t5-192cb216",
+    "icv1-fp12-t19-d4a315df",
+    "icv1-fp14-tm43-158b6914",
+    "icv1-fp16-t351-d433f24e",
+    "icv1-fp18-t175-45770ebc",
+    "icv1-fp20-t1293-3c2999ba",
+    "icv1-fp22-tm1267-a5acaf6d",
+    "icv1-fp24-t1577-77336155",
+    "icv1-f2m15-t131-ed7256f0",
+    "icv1-f2m18-t393-d2c04152",
+    "icv1-f2m21-t2591-de54d72e",
+    "icv1-f2m24-tm3047-2d0c0e8c",
+    "icv1-f2m27-t12543-569dca8b"
+  ],
+  "replay_certificate": {
+    "path": "validation/replay-certificate.json",
+    "sha256": "75d1e765d0c02e444fdce532c1e752447cd613ce63956015158c0a3f8ef70d16"
+  },
+  "validator_report": {
+    "path": "validation/validator-report.json",
+    "sha256": "cbc21817929250586b540e44c36eef91c9f22269543c0461830fc5f543f60922"
+  },
+  "rho_reference": {
+    "kind": "negation",
+    "protocol": "Round 5 / ledger section 18: matched Pollard rho on the same instance, one target, the negation-map r-adding walk (A = 2), counted in GAE, verified [d]G = Q",
+    "unit": "GAE per sqrt r",
+    "binary_or_process": "ic boundary @ 43e01b10e",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 16.874943957800852,
+        "rho": 1.6219524212841376
+      },
+      "0.1": {
+        "ic": 18.694585821528534,
+        "rho": 1.7478066068744473
+      },
+      "1": {
+        "ic": 34.23577577296271,
+        "rho": 2.872481454620849
+      }
+    },
+    "gae_band_note": "geometric mean over the 13 instances of S under the section 5a band (weight w GAE per native operation, charged alike to both arms; IC natives that a pinned calibration priced are re-charged at w; the uncharged canonicalisations of rho are charged at w); per instance in docs/ic/runs/validation/band-by-instance.json",
+    "order_holds_across_band": true
+  }
+}

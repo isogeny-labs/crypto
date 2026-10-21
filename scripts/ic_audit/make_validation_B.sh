@@ -39,7 +39,7 @@ jq -n --slurpfile b docs/ic/leaderboard.json --slurpfile r "$tmp/B.json" \
       status: (if ($h | all((.claimed - .recomputed | fabs) <= .rel_tol * ((.claimed | fabs) + 1e-300))) then "pass" else "fail" end),
       independent: true,
       method: "scripts/ic_audit/recompute_B.sh: jq, no code shared with scripts/build_ic_leaderboard.py. S (IC) is the mean over the 3 repetitions of total_gae of the board recipe over sqrt r; the reference S is the mean over every matched-rho run of gae over sqrt r (per_run, not the stored mean); x reference and x floor follow.",
-      raw_data: [ {path: "../ic-boundary-ledger-round5-2026-09-22.json", sha256: $lsha},
+      raw_data: [ {path: "ic-boundary-ledger-round5-2026-09-22.json", sha256: $lsha},
                   {path: "../../../research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json", sha256: $rsha} ],
       headline: $h }' > "$out/validator-report.json"
 # --- VALIDATION.json
