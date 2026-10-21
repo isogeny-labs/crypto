@@ -1,0 +1,253 @@
+{
+  "card_id": "CARD-BLINDSPOT-10-03-r2",
+  "card_path": "research/blindspots_20261018/10-kernel-program-search/card-03-r2.yaml",
+  "card_sha256": "acc2c3f5207a232c8d76bfb48776f778cf411b391bd76363db06ceef631421ad",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-10/card-03-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-10/card-03-r2/b10",
+        "examples/blindspots_10_kernel_search.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.599,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 6.599,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/10-kernel-program-search/raw-r2/state"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-state-dir",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "cp",
+        "-t",
+        "research/blindspots_20261018/10-kernel-program-search/raw-r2/state",
+        "research/blindspots_20261018/10-kernel-program-search/raw-r2/state-1/n31-p.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "copy-first-half",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-10/card-03-r2/b10",
+        "search",
+        "--n",
+        "31",
+        "--ell",
+        "9",
+        "--arm",
+        "p",
+        "--state",
+        "research/blindspots_20261018/10-kernel-program-search/raw-r2/state",
+        "--budget",
+        "256",
+        "--max-new",
+        "128"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 186.691,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "search-n31-p-b",
+      "index": 5,
+      "outputs": {
+        "research/blindspots_20261018/10-kernel-program-search/raw-r2/state/n31-p.jsonl": "a6f3566c1796da78ad15bdf799f72215b0cd433efde84d0eb9d5e1dfca812557"
+      },
+      "seconds": 186.691,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "8de96b3b4284b5a5d949f09de5b1fc729b4066d77f34b1825fe05bced455bcbf",
+      "stdout_tail": [
+        "eval 237 affine-aligned-s2|lift0|stop0|root1|q1|sqt0|pm0|ab2|bt1|gc0 q01=  1.9845e3 phi=0.938 dom=false 4110ms",
+        "eval 238 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab4|bt2|gc0 q01=  5.1297e2 phi=0.250 dom=false 537ms",
+        "eval 239 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab4|bt0|gc0 q01=  4.1664e2 phi=0.250 dom=false 370ms",
+        "eval 240 affine-aligned-s2|lift0|stop1|root0|q1|sqt0|pm0|ab2|bt1|gc0 q01=  1.2597e3 phi=0.938 dom=false 3141ms",
+        "eval 241 sub-rand3|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt2|gc0        q01=  8.0543e2 phi=1.000 dom=false 781ms",
+        "eval 242 affine-aligned-s2|lift1|stop1|root0|q1|sqt0|pm0|ab2|bt1|gc1 q01=  3.4980e2 phi=0.938 dom=false 907ms",
+        "eval 243 affine-rand-s1|lift0|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0   q01=  2.6792e3 phi=0.875 dom=false 2800ms",
+        "eval 244 affine-aligned-s2|lift0|stop1|root0|q1|sqt0|pm0|ab2|bt2|gc0 q01=  1.5498e3 phi=0.938 dom=false 4245ms",
+        "eval 245 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab1|bt2|gc0 q01=  4.4734e2 phi=1.000 dom=false 1077ms",
+        "eval 246 coset2-s3|lift1|stop0|root0|q2|sqt0|pm0|ab2|bt1|gc0        q01=  8.4229e2 phi=0.875 dom=false 681ms",
+        "eval 247 affine-aligned-s1|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0 q01=  3.5999e2 phi=0.906 dom=false 958ms",
+        "eval 248 affine-aligned-s2|lift1|stop0|root1|q1|sqt0|pm0|ab0|bt1|gc0 q01=  6.1147e2 phi=1.000 dom=false 1206ms",
+        "eval 249 affine-aligned-s1|lift1|stop0|root0|q1|sqt0|pm0|ab2|bt1|gc0 q01=  3.6221e2 phi=0.906 dom=false 907ms",
+        "eval 250 coset2-s4|lift0|stop0|root0|q1|sqt0|pm0|ab2|bt1|gc0        q01=  3.0409e3 phi=0.938 dom=false 2756ms",
+        "eval 251 coset4-s2|lift1|stop0|root0|q1|sqt1|pm1|ab2|bt1|gc0        q01=  1.2929e3 phi=0.875 dom=false 1281ms",
+        "eval 252 affine-anti|lift1|stop0|root1|q1|sqt1|pm0|ab2|bt1|gc0      q01=       inf phi=0.000 dom=false 0ms",
+        "eval 253 affine-aligned-s2|lift0|stop0|root0|q1|sqt1|pm0|ab3|bt0|gc0 q01=  1.6641e3 phi=0.438 dom=false 2451ms",
+        "eval 254 affine-rand-s1|lift1|stop0|root0|q1|sqt0|pm0|ab2|bt1|gc0   q01=  7.7842e2 phi=0.844 dom=false 858ms",
+        "eval 255 affine-aligned-s2|lift1|stop1|root1|q1|sqt0|pm0|ab2|bt1|gc0 q01=  4.9825e2 phi=0.938 dom=false 967ms",
+        "best so far idx 64 affine-aligned-s2|lift1|stop0|root0|q1|sqt1|pm0|ab2|bt1|gc0 q01=3.1435e2 (256 of 256 evaluations done)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-10/card-03-r2/b10"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.008,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.008,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-10/card-03-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 7,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 7,
+  "commit": "bbea111c3b263a59503ed79908c4c5019ffefd27",
+  "dirty_after": [
+    "esearch/blindspots_20261018/10-kernel-program-search/raw-r2/state/n31-p.jsonl",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n31-p-b.stderr.log",
+    "research/blindspots_20261018/10-kernel-program-search/raw-r2/search-n31-p-b.stdout.log"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

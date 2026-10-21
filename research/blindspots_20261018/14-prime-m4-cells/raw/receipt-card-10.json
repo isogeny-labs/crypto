@@ -1,0 +1,190 @@
+{
+  "card_id": "CARD-BLINDSPOT-14-10",
+  "card_path": "research/blindspots_20261018/14-prime-m4-cells/card-10.yaml",
+  "card_sha256": "835e44547484a144f4f1875ffeca27b4248dd19f57c2540835985e20e986bfbb",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/14-prime-m4-cells/raw",
+        "target/blindspots-14/card-10"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.024,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-dirs",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.024,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-14/card-10/b14",
+        "examples/blindspots_14_prime_m4.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 6.257,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 6.257,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-14/card-10/b14",
+        "fullic",
+        "--bits",
+        "16",
+        "--arm",
+        "b",
+        "--bx",
+        "4",
+        "--run0",
+        "0",
+        "--runs",
+        "6",
+        "--bcap-madds",
+        "100000000000",
+        "--bcap-nnz",
+        "120000000",
+        "--bdeadline-s",
+        "400",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx4-r00-06.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 185.559,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fullic-b-b16-bx4-r00-06",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx4-r00-06.jsonl": "f69a9ca2081a58d4cca531755715ee9feb210ab77761cd9912df9cf5b9d47596"
+      },
+      "seconds": 185.559,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "f69a9ca2081a58d4cca531755715ee9feb210ab77761cd9912df9cf5b9d47596",
+      "stdout_tail": [
+        "{\"kind\":\"fullic\",\"arm\":\"b\",\"bits\":16,\"bx\":4,\"run\":0,\"ok\":true,\"attempts\":1476,\"hits\":5,\"relations\":5,\"rank\":5,\"cols\":5,\"setup\":{\"gadd\":191,\"lookup\":0,\"insert\":0,\"legendre\":11,\"sqrt\":4,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":382,\"fsqr\":253,\"finv\":191,\"build\":0},\"online\":{\"gadd\":1526,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":70,\"madd\":19663290377,\"dptest\":0,\"fmul\":3044,\"fsqr\":1534,\"finv\":1522,\"build\":125458012},\"verify\":{\"gadd\":23,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":15,\"madd\":0,\"dptest\":0,\"fmul\":46,\"fsqr\":38,\"finv\":23,\"build\":0},\"total\":{\"gadd\":1740,\"lookup\":0,\"insert\":0,\"legendre\":11,\"sqrt\":4,\"rowop\":85,\"madd\":19663290377,\"dptest\":0,\"fmul\":3472,\"fsqr\":1825,\"finv\":1736,\"build\":125458012},\"gae_total\":1740,\"native_total\":19788748489,\"n\":48383,\"ms\":37893.6,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"b\",\"bits\":16,\"bx\":4,\"run\":1,\"ok\":true,\"attempts\":600,\"hits\":5,\"relations\":5,\"rank\":5,\"cols\":5,\"setup\":{\"gadd\":183,\"lookup\":0,\"insert\":0,\"legendre\":11,\"sqrt\":4,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":366,\"fsqr\":242,\"finv\":183,\"build\":0},\"online\":{\"gadd\":670,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":53,\"madd\":7993089479,\"dptest\":0,\"fmul\":1326,\"fsqr\":672,\"finv\":663,\"build\":51669324},\"verify\":{\"gadd\":16,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":15,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":27,\"finv\":16,\"build\":0},\"total\":{\"gadd\":869,\"lookup\":0,\"insert\":0,\"legendre\":11,\"sqrt\":4,\"rowop\":68,\"madd\":7993089479,\"dptest\":0,\"fmul\":1724,\"fsqr\":941,\"finv\":862,\"build\":51669324},\"gae_total\":869,\"native_total\":8044758886,\"n\":48383,\"ms\":15158.5,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"b\",\"bits\":16,\"bx\":4,\"run\":2,\"ok\":true,\"attempts\":710,\"hits\":5,\"relations\":5,\"rank\":5,\"cols\":5,\"setup\":{\"gadd\":182,\"lookup\":0,\"insert\":0,\"legendre\":11,\"sqrt\":4,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":364,\"fsqr\":238,\"finv\":182,\"build\":0},\"online\":{\"gadd\":761,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":64,\"madd\":9458506396,\"dptest\":0,\"fmul\":1522,\"fsqr\":763,\"finv\":761,\"build\":60951802},\"verify\":{\"gadd\":21,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":15,\"madd\":0,\"dptest\":0,\"fmul\":42,\"fsqr\":35,\"finv\":21,\"build\":0},\"total\":{\"gadd\":964,\"lookup\":0,\"insert\":0,\"legendre\":11,\"sqrt\":4,\"rowop\":79,\"madd\":9458506396,\"dptest\":0,\"fmul\":1928,\"fsqr\":1036,\"finv\":964,\"build\":60951802},\"gae_total\":964,\"native_total\":9519458292,\"n\":48383,\"ms\":19078.4,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"b\",\"bits\":16,\"bx\":4,\"run\":3,\"ok\":true,\"attempts\":1901,\"hits\":5,\"relations\":5,\"rank\":5,\"cols\":5,\"setup\":{\"gadd\":186,\"lookup\":0,\"insert\":0,\"legendre\":11,\"sqrt\":4,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":372,\"fsqr\":246,\"finv\":186,\"build\":0},\"online\":{\"gadd\":1973,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":64,\"madd\":25308540871,\"dptest\":0,\"fmul\":3934,\"fsqr\":1979,\"finv\":1967,\"build\":161307169},\"verify\":{\"gadd\":20,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":15,\"madd\":0,\"dptest\":0,\"fmul\":40,\"fsqr\":35,\"finv\":20,\"build\":0},\"total\":{\"gadd\":2179,\"lookup\":0,\"insert\":0,\"legendre\":11,\"sqrt\":4,\"rowop\":79,\"madd\":25308540871,\"dptest\":0,\"fmul\":4346,\"fsqr\":2260,\"finv\":2173,\"build\":161307169},\"gae_total\":2179,\"native_total\":25469848134,\"n\":48383,\"ms\":51267.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"b\",\"bits\":16,\"bx\":4,\"run\":4,\"ok\":true,\"attempts\":1602,\"hits\":5,\"relations\":5,\"rank\":5,\"cols\":5,\"setup\":{\"gadd\":183,\"lookup\":0,\"insert\":0,\"legendre\":11,\"sqrt\":4,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":366,\"fsqr\":245,\"finv\":183,\"build\":0},\"online\":{\"gadd\":1696,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":39,\"madd\":21341876324,\"dptest\":0,\"fmul\":3378,\"fsqr\":1699,\"finv\":1689,\"build\":136162570},\"verify\":{\"gadd\":16,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":15,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":28,\"finv\":16,\"build\":0},\"total\":{\"gadd\":1895,\"lookup\":0,\"insert\":0,\"legendre\":11,\"sqrt\":4,\"rowop\":54,\"madd\":21341876324,\"dptest\":0,\"fmul\":3776,\"fsqr\":1972,\"finv\":1888,\"build\":136162570},\"gae_total\":1895,\"native_total\":21478038963,\"n\":48383,\"ms\":42784.6,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"b\",\"bits\":16,\"bx\":4,\"run\":5,\"ok\":true,\"attempts\":656,\"hits\":5,\"relations\":5,\"rank\":5,\"cols\":5,\"setup\":{\"gadd\":189,\"lookup\":0,\"insert\":0,\"legendre\":11,\"sqrt\":4,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":378,\"fsqr\":251,\"finv\":189,\"build\":0},\"online\":{\"gadd\":718,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":66,\"madd\":8739028777,\"dptest\":0,\"fmul\":1422,\"fsqr\":718,\"finv\":711,\"build\":56357788},\"verify\":{\"gadd\":21,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":15,\"madd\":0,\"dptest\":0,\"fmul\":42,\"fsqr\":36,\"finv\":21,\"build\":0},\"total\":{\"gadd\":928,\"lookup\":0,\"insert\":0,\"legendre\":11,\"sqrt\":4,\"rowop\":81,\"madd\":8739028777,\"dptest\":0,\"fmul\":1842,\"fsqr\":1005,\"finv\":921,\"build\":56357788},\"gae_total\":928,\"native_total\":8795386661,\"n\":48383,\"ms\":19303.9,\"note\":\"\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-14/card-10/b14"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-14/card-10"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "0425aa8b7bbc49f8a0ca86061049da76233cfd3f",
+  "dirty_after": [
+    "esearch/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx4-r00-06.jsonl",
+    "research/blindspots_20261018/14-prime-m4-cells/raw/card-10-fullic-b-b16-bx4-r00-06.stderr.log"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

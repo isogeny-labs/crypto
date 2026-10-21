@@ -1,0 +1,366 @@
+{
+  "card_id": "CARD-BLINDSPOT-04-02",
+  "card_path": "research/blindspots_20261018/04-presentation-search/card-02.yaml",
+  "card_sha256": "6a28c701a0e49a1f17b5511f13df0d31e909e4e7036918fa513be54a8bd1449f",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-04/card-02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-04/card-02/b04",
+        "examples/blindspots_04_presentation_search.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 7.71,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 7.71,
+      "stderr_sha256": "4dc0b77782bbda8e469851e351f2200cb2fb287e66c887fe3570f9a0c9e520c1",
+      "stderr_tail": [
+        "138 |     low: u64,",
+        "    |     ^^^",
+        "    |",
+        "    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default",
+        "",
+        "warning: fields `rss_kb` and `seed_rows` are never read",
+        "    --> examples/blindspots_04_presentation_search.rs:2656:5",
+        "     |",
+        "2647 | struct DegreeResult {",
+        "     |        ------------ fields in this struct",
+        "...",
+        "2656 |     rss_kb: u64,",
+        "     |     ^^^^^^",
+        "2657 |     seed_rows: usize,",
+        "     |     ^^^^^^^^^",
+        "     |",
+        "     = note: `DegreeResult` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis",
+        "",
+        "warning: 2 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-02/b04",
+        "cell",
+        "--n",
+        "17",
+        "--l",
+        "4",
+        "--m",
+        "3",
+        "--draw",
+        "1",
+        "--arms",
+        "a",
+        "--random",
+        "8",
+        "--planted",
+        "0",
+        "--time-limit",
+        "20",
+        "--job-time",
+        "15"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.545,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "aa-cell1",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.545,
+      "stderr_sha256": "0b960a092b5474f70f464a4e3dd86418118086930338db3744491715867d9f8d",
+      "stderr_tail": [
+        "cell n=17 l=4 m=3 draw=1 curve d1=22589 d2=105257 a=119768 b=42337 basis=[1, 109007, 72367, 7165] setup 0.1s",
+        "cell done in 0.5s"
+      ],
+      "stdout_sha256": "f58ab7025dea6d1497d553e2dbb52b51c5e12c5bfcc0278046361d463bab8b79",
+      "stdout_tail": [
+        "{\"tool\":\"b04\",\"n\":17,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":0,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":17,\"ech_rows\":17,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5541,\"matrix_cols\":3302,\"word_ops_last\":60244869,\"word_ops_total\":60249905,\"peak_basis_bytes\":636968,\"secs\":0.063,\"rss_peak_kb\":8688,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":17,\"target\":2510,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":17,\"products\":0,\"falls\":0,\"word_ops\":5036,\"peak_basis_bytes\":5152,\"rows_total\":17},{\"d\":7,\"cols\":3302,\"rank\":3084,\"target\":3302,\"out\":\"refuted\",\"secs\":0.059,\"seed_rows\":17,\"products\":5524,\"falls\":2396,\"word_ops\":60244869,\"peak_basis_bytes\":636968,\"rows_total\":5541}]}",
+        "{\"tool\":\"b04\",\"n\":17,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":1,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":17,\"ech_rows\":17,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5541,\"matrix_cols\":3302,\"word_ops_last\":59990050,\"word_ops_total\":59994972,\"peak_basis_bytes\":636152,\"secs\":0.062,\"rss_peak_kb\":8856,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":17,\"target\":2510,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":17,\"products\":0,\"falls\":0,\"word_ops\":4922,\"peak_basis_bytes\":5152,\"rows_total\":17},{\"d\":7,\"cols\":3302,\"rank\":3082,\"target\":3302,\"out\":\"refuted\",\"secs\":0.057,\"seed_rows\":17,\"products\":5524,\"falls\":2396,\"word_ops\":59990050,\"peak_basis_bytes\":636152,\"rows_total\":5541}]}",
+        "{\"tool\":\"b04\",\"n\":17,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":2,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":17,\"ech_rows\":17,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5541,\"matrix_cols\":3302,\"word_ops_last\":60135173,\"word_ops_total\":60139981,\"peak_basis_bytes\":634832,\"secs\":0.061,\"rss_peak_kb\":8944,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":17,\"target\":2510,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":17,\"products\":0,\"falls\":0,\"word_ops\":4808,\"peak_basis_bytes\":5152,\"rows_total\":17},{\"d\":7,\"cols\":3302,\"rank\":3079,\"target\":3302,\"out\":\"refuted\",\"secs\":0.057,\"seed_rows\":17,\"products\":5524,\"falls\":2396,\"word_ops\":60135173,\"peak_basis_bytes\":634832,\"rows_total\":5541}]}",
+        "{\"tool\":\"b04\",\"n\":17,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":3,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":17,\"ech_rows\":17,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5541,\"matrix_cols\":3302,\"word_ops_last\":60098191,\"word_ops_total\":60103039,\"peak_basis_bytes\":635864,\"secs\":0.070,\"rss_peak_kb\":8944,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":17,\"target\":2510,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":17,\"products\":0,\"falls\":0,\"word_ops\":4848,\"peak_basis_bytes\":5152,\"rows_total\":17},{\"d\":7,\"cols\":3302,\"rank\":3081,\"target\":3302,\"out\":\"refuted\",\"secs\":0.064,\"seed_rows\":17,\"products\":5524,\"falls\":2396,\"word_ops\":60098191,\"peak_basis_bytes\":635864,\"rows_total\":5541}]}",
+        "{\"tool\":\"b04\",\"n\":17,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":4,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":17,\"ech_rows\":17,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5541,\"matrix_cols\":3302,\"word_ops_last\":59943034,\"word_ops_total\":59947652,\"peak_basis_bytes\":634560,\"secs\":0.062,\"rss_peak_kb\":8948,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":17,\"target\":2510,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":17,\"products\":0,\"falls\":0,\"word_ops\":4618,\"peak_basis_bytes\":5152,\"rows_total\":17},{\"d\":7,\"cols\":3302,\"rank\":3078,\"target\":3302,\"out\":\"refuted\",\"secs\":0.057,\"seed_rows\":17,\"products\":5524,\"falls\":2396,\"word_ops\":59943034,\"peak_basis_bytes\":634560,\"rows_total\":5541}]}",
+        "{\"tool\":\"b04\",\"n\":17,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":5,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":17,\"ech_rows\":17,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5541,\"matrix_cols\":3302,\"word_ops_last\":59845028,\"word_ops_total\":59849232,\"peak_basis_bytes\":633880,\"secs\":0.048,\"rss_peak_kb\":8952,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":17,\"target\":2510,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":17,\"products\":0,\"falls\":0,\"word_ops\":4204,\"peak_basis_bytes\":5152,\"rows_total\":17},{\"d\":7,\"cols\":3302,\"rank\":3076,\"target\":3302,\"out\":\"refuted\",\"secs\":0.045,\"seed_rows\":17,\"products\":5524,\"falls\":2396,\"word_ops\":59845028,\"peak_basis_bytes\":633880,\"rows_total\":5541}]}",
+        "{\"tool\":\"b04\",\"n\":17,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":6,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":17,\"ech_rows\":17,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5541,\"matrix_cols\":3302,\"word_ops_last\":60249899,\"word_ops_total\":60254975,\"peak_basis_bytes\":635720,\"secs\":0.047,\"rss_peak_kb\":8952,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":17,\"target\":2510,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":17,\"products\":0,\"falls\":0,\"word_ops\":5076,\"peak_basis_bytes\":5152,\"rows_total\":17},{\"d\":7,\"cols\":3302,\"rank\":3081,\"target\":3302,\"out\":\"refuted\",\"secs\":0.044,\"seed_rows\":17,\"products\":5524,\"falls\":2396,\"word_ops\":60249899,\"peak_basis_bytes\":635720,\"rows_total\":5541}]}",
+        "{\"tool\":\"b04\",\"n\":17,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":7,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":17,\"ech_rows\":17,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5541,\"matrix_cols\":3302,\"word_ops_last\":59982845,\"word_ops_total\":59987961,\"peak_basis_bytes\":633800,\"secs\":0.048,\"rss_peak_kb\":8956,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":17,\"target\":2510,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":17,\"products\":0,\"falls\":0,\"word_ops\":5116,\"peak_basis_bytes\":5152,\"rows_total\":17},{\"d\":7,\"cols\":3302,\"rank\":3076,\"target\":3302,\"out\":\"refuted\",\"secs\":0.044,\"seed_rows\":17,\"products\":5524,\"falls\":2396,\"word_ops\":59982845,\"peak_basis_bytes\":633800,\"rows_total\":5541}]}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-02/b04",
+        "cell",
+        "--n",
+        "19",
+        "--l",
+        "4",
+        "--m",
+        "3",
+        "--draw",
+        "1",
+        "--arms",
+        "a",
+        "--random",
+        "8",
+        "--planted",
+        "0",
+        "--time-limit",
+        "20",
+        "--job-time",
+        "15"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.903,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "aa-cell2",
+      "index": 4,
+      "outputs": {},
+      "seconds": 1.903,
+      "stderr_sha256": "0595ee9750a928a3a9db5a7e2b99fd50112b980bff3198387786fd604fa67349",
+      "stderr_tail": [
+        "cell n=19 l=4 m=3 draw=1 curve d1=426861 d2=293889 a=381185 b=301406 basis=[1, 26383, 461612, 75589] setup 1.4s",
+        "cell done in 1.9s"
+      ],
+      "stdout_sha256": "1979311224e3791ddf91dbdf5cf8c5487a5b37dad4b38b176d4b9cac54dc3a2d",
+      "stdout_tail": [
+        "{\"tool\":\"b04\",\"n\":19,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":0,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":19,\"ech_rows\":19,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5711,\"matrix_cols\":3302,\"word_ops_last\":56037918,\"word_ops_total\":56043970,\"peak_basis_bytes\":616952,\"secs\":0.053,\"rss_peak_kb\":13388,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":19,\"target\":2510,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":19,\"products\":0,\"falls\":0,\"word_ops\":6052,\"peak_basis_bytes\":5760,\"rows_total\":19},{\"d\":7,\"cols\":3302,\"rank\":3034,\"target\":3302,\"out\":\"refuted\",\"secs\":0.048,\"seed_rows\":19,\"products\":5692,\"falls\":2396,\"word_ops\":56037918,\"peak_basis_bytes\":616952,\"rows_total\":5711}]}",
+        "{\"tool\":\"b04\",\"n\":19,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":1,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":19,\"ech_rows\":19,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5711,\"matrix_cols\":3302,\"word_ops_last\":56245341,\"word_ops_total\":56251887,\"peak_basis_bytes\":615008,\"secs\":0.056,\"rss_peak_kb\":13540,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":19,\"target\":2510,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":19,\"products\":0,\"falls\":0,\"word_ops\":6546,\"peak_basis_bytes\":5760,\"rows_total\":19},{\"d\":7,\"cols\":3302,\"rank\":3029,\"target\":3302,\"out\":\"refuted\",\"secs\":0.051,\"seed_rows\":19,\"products\":5692,\"falls\":2396,\"word_ops\":56245341,\"peak_basis_bytes\":615008,\"rows_total\":5711}]}",
+        "{\"tool\":\"b04\",\"n\":19,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":2,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":19,\"ech_rows\":19,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5711,\"matrix_cols\":3302,\"word_ops_last\":55910946,\"word_ops_total\":55917074,\"peak_basis_bytes\":617072,\"secs\":0.068,\"rss_peak_kb\":13540,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":19,\"target\":2510,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":19,\"products\":0,\"falls\":0,\"word_ops\":6128,\"peak_basis_bytes\":5760,\"rows_total\":19},{\"d\":7,\"cols\":3302,\"rank\":3034,\"target\":3302,\"out\":\"refuted\",\"secs\":0.063,\"seed_rows\":19,\"products\":5692,\"falls\":2396,\"word_ops\":55910946,\"peak_basis_bytes\":617072,\"rows_total\":5711}]}",
+        "{\"tool\":\"b04\",\"n\":19,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":3,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":19,\"ech_rows\":19,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5711,\"matrix_cols\":3302,\"word_ops_last\":56067689,\"word_ops_total\":56074045,\"peak_basis_bytes\":615344,\"secs\":0.076,\"rss_peak_kb\":13596,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":19,\"target\":2510,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":19,\"products\":0,\"falls\":0,\"word_ops\":6356,\"peak_basis_bytes\":5760,\"rows_total\":19},{\"d\":7,\"cols\":3302,\"rank\":3030,\"target\":3302,\"out\":\"refuted\",\"secs\":0.068,\"seed_rows\":19,\"products\":5692,\"falls\":2396,\"word_ops\":56067689,\"peak_basis_bytes\":615344,\"rows_total\":5711}]}",
+        "{\"tool\":\"b04\",\"n\":19,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":4,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":19,\"ech_rows\":19,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5711,\"matrix_cols\":3302,\"word_ops_last\":55957510,\"word_ops_total\":55964094,\"peak_basis_bytes\":617688,\"secs\":0.060,\"rss_peak_kb\":13600,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":19,\"target\":2510,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":19,\"products\":0,\"falls\":0,\"word_ops\":6584,\"peak_basis_bytes\":5760,\"rows_total\":19},{\"d\":7,\"cols\":3302,\"rank\":3036,\"target\":3302,\"out\":\"refuted\",\"secs\":0.053,\"seed_rows\":19,\"products\":5692,\"falls\":2396,\"word_ops\":55957510,\"peak_basis_bytes\":617688,\"rows_total\":5711}]}",
+        "{\"tool\":\"b04\",\"n\":19,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":5,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":19,\"ech_rows\":19,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5711,\"matrix_cols\":3302,\"word_ops_last\":56249477,\"word_ops_total\":56255985,\"peak_basis_bytes\":614776,\"secs\":0.061,\"rss_peak_kb\":13600,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":19,\"target\":2510,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":19,\"products\":0,\"falls\":0,\"word_ops\":6508,\"peak_basis_bytes\":5760,\"rows_total\":19},{\"d\":7,\"cols\":3302,\"rank\":3028,\"target\":3302,\"out\":\"refuted\",\"secs\":0.056,\"seed_rows\":19,\"products\":5692,\"falls\":2396,\"word_ops\":56249477,\"peak_basis_bytes\":614776,\"rows_total\":5711}]}",
+        "{\"tool\":\"b04\",\"n\":19,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":6,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":19,\"ech_rows\":19,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5711,\"matrix_cols\":3302,\"word_ops_last\":55867526,\"word_ops_total\":55873882,\"peak_basis_bytes\":614744,\"secs\":0.062,\"rss_peak_kb\":13612,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":19,\"target\":2510,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":19,\"products\":0,\"falls\":0,\"word_ops\":6356,\"peak_basis_bytes\":5760,\"rows_total\":19},{\"d\":7,\"cols\":3302,\"rank\":3028,\"target\":3302,\"out\":\"refuted\",\"secs\":0.057,\"seed_rows\":19,\"products\":5692,\"falls\":2396,\"word_ops\":55867526,\"peak_basis_bytes\":614744,\"rows_total\":5711}]}",
+        "{\"tool\":\"b04\",\"n\":19,\"l\":4,\"m\":3,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":7,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":19,\"ech_rows\":19,\"mindeg\":6,\"maxdeg\":6,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":7,\"D_lb\":7,\"last_degree\":7,\"recovered_ok\":null,\"matrix_rows\":5711,\"matrix_cols\":3302,\"word_ops_last\":55905102,\"word_ops_total\":55911610,\"peak_basis_bytes\":615208,\"secs\":0.063,\"rss_peak_kb\":13612,\"degrees\":[{\"d\":6,\"cols\":2510,\"rank\":19,\"target\":2510,\"out\":\"saturated\",\"secs\":0.000,\"seed_rows\":19,\"products\":0,\"falls\":0,\"word_ops\":6508,\"peak_basis_bytes\":5760,\"rows_total\":19},{\"d\":7,\"cols\":3302,\"rank\":3029,\"target\":3302,\"out\":\"refuted\",\"secs\":0.056,\"seed_rows\":19,\"products\":5692,\"falls\":2396,\"word_ops\":55905102,\"peak_basis_bytes\":615208,\"rows_total\":5711}]}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-02/b04",
+        "cell",
+        "--n",
+        "13",
+        "--l",
+        "3",
+        "--m",
+        "4",
+        "--draw",
+        "1",
+        "--arms",
+        "a",
+        "--random",
+        "8",
+        "--planted",
+        "0",
+        "--time-limit",
+        "20",
+        "--job-time",
+        "15"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.17,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "aa-cell3",
+      "index": 5,
+      "outputs": {},
+      "seconds": 2.17,
+      "stderr_sha256": "92cd81fc8b0620efa3371ad901e1c2ecfd39552ac0ae233d9e579458035d0c7f",
+      "stderr_tail": [
+        "cell n=13 l=3 m=4 draw=1 curve d1=1271 d2=5818 a=3609 b=3147 basis=[1, 7918, 4214] setup 0.0s",
+        "cell done in 2.2s"
+      ],
+      "stdout_sha256": "6e7123ad1c5e42e08b610bfcdc49a1ac1748b2bb43363b936dc04085e7baf470",
+      "stdout_tail": [
+        "{\"tool\":\"b04\",\"n\":13,\"l\":3,\"m\":4,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":0,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":13,\"ech_rows\":13,\"mindeg\":9,\"maxdeg\":12,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":11,\"D_lb\":11,\"last_degree\":11,\"recovered_ok\":null,\"matrix_rows\":5404,\"matrix_cols\":4095,\"word_ops_last\":208268777,\"word_ops_total\":475655814,\"peak_basis_bytes\":1064824,\"secs\":0.278,\"rss_peak_kb\":11548,\"degrees\":[{\"d\":9,\"cols\":4017,\"rank\":1,\"target\":4017,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":1,\"products\":0,\"falls\":0,\"word_ops\":0,\"peak_basis_bytes\":504,\"rows_total\":1},{\"d\":10,\"cols\":4083,\"rank\":4079,\"target\":4083,\"out\":\"saturated\",\"secs\":0.156,\"seed_rows\":9,\"products\":30155,\"falls\":4013,\"word_ops\":267387037,\"peak_basis_bytes\":1064824,\"rows_total\":30164},{\"d\":11,\"cols\":4095,\"rank\":2919,\"target\":4095,\"out\":\"refuted\",\"secs\":0.114,\"seed_rows\":12,\"products\":5392,\"falls\":2907,\"word_ops\":208268777,\"peak_basis_bytes\":949904,\"rows_total\":5404}]}",
+        "{\"tool\":\"b04\",\"n\":13,\"l\":3,\"m\":4,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":1,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":13,\"ech_rows\":13,\"mindeg\":9,\"maxdeg\":12,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":11,\"D_lb\":11,\"last_degree\":11,\"recovered_ok\":null,\"matrix_rows\":5404,\"matrix_cols\":4095,\"word_ops_last\":207692723,\"word_ops_total\":497592864,\"peak_basis_bytes\":1064760,\"secs\":0.318,\"rss_peak_kb\":12064,\"degrees\":[{\"d\":9,\"cols\":4017,\"rank\":1,\"target\":4017,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":1,\"products\":0,\"falls\":0,\"word_ops\":0,\"peak_basis_bytes\":504,\"rows_total\":1},{\"d\":10,\"cols\":4083,\"rank\":4071,\"target\":4083,\"out\":\"saturated\",\"secs\":0.202,\"seed_rows\":9,\"products\":30787,\"falls\":4005,\"word_ops\":289900141,\"peak_basis_bytes\":1064760,\"rows_total\":30796},{\"d\":11,\"cols\":4095,\"rank\":2919,\"target\":4095,\"out\":\"refuted\",\"secs\":0.111,\"seed_rows\":12,\"products\":5392,\"falls\":2907,\"word_ops\":207692723,\"peak_basis_bytes\":949848,\"rows_total\":5404}]}",
+        "{\"tool\":\"b04\",\"n\":13,\"l\":3,\"m\":4,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":2,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":13,\"ech_rows\":13,\"mindeg\":9,\"maxdeg\":12,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":11,\"D_lb\":11,\"last_degree\":11,\"recovered_ok\":null,\"matrix_rows\":5404,\"matrix_cols\":4095,\"word_ops_last\":208123013,\"word_ops_total\":491737284,\"peak_basis_bytes\":1064808,\"secs\":0.388,\"rss_peak_kb\":12064,\"degrees\":[{\"d\":9,\"cols\":4017,\"rank\":1,\"target\":4017,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":1,\"products\":0,\"falls\":0,\"word_ops\":0,\"peak_basis_bytes\":504,\"rows_total\":1},{\"d\":10,\"cols\":4083,\"rank\":4077,\"target\":4083,\"out\":\"saturated\",\"secs\":0.233,\"seed_rows\":9,\"products\":30586,\"falls\":4011,\"word_ops\":283614271,\"peak_basis_bytes\":1064808,\"rows_total\":30595},{\"d\":11,\"cols\":4095,\"rank\":2919,\"target\":4095,\"out\":\"refuted\",\"secs\":0.149,\"seed_rows\":12,\"products\":5392,\"falls\":2907,\"word_ops\":208123013,\"peak_basis_bytes\":949896,\"rows_total\":5404}]}",
+        "{\"tool\":\"b04\",\"n\":13,\"l\":3,\"m\":4,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":3,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":13,\"ech_rows\":13,\"mindeg\":10,\"maxdeg\":12,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":11,\"D_lb\":11,\"last_degree\":11,\"recovered_ok\":null,\"matrix_rows\":5404,\"matrix_cols\":4095,\"word_ops_last\":206769326,\"word_ops_total\":206770350,\"peak_basis_bytes\":949824,\"secs\":0.110,\"rss_peak_kb\":12064,\"degrees\":[{\"d\":10,\"cols\":4083,\"rank\":9,\"target\":4083,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":9,\"products\":0,\"falls\":0,\"word_ops\":1024,\"peak_basis_bytes\":4608,\"rows_total\":9},{\"d\":11,\"cols\":4095,\"rank\":2919,\"target\":4095,\"out\":\"refuted\",\"secs\":0.104,\"seed_rows\":12,\"products\":5392,\"falls\":2907,\"word_ops\":206769326,\"peak_basis_bytes\":949824,\"rows_total\":5404}]}",
+        "{\"tool\":\"b04\",\"n\":13,\"l\":3,\"m\":4,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":4,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":13,\"ech_rows\":13,\"mindeg\":9,\"maxdeg\":12,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":10,\"D_lb\":10,\"last_degree\":10,\"recovered_ok\":null,\"matrix_rows\":9017,\"matrix_cols\":4083,\"word_ops_last\":279225530,\"word_ops_total\":279225530,\"peak_basis_bytes\":1063944,\"secs\":0.190,\"rss_peak_kb\":12064,\"degrees\":[{\"d\":9,\"cols\":4017,\"rank\":1,\"target\":4017,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":1,\"products\":0,\"falls\":0,\"word_ops\":0,\"peak_basis_bytes\":504,\"rows_total\":1},{\"d\":10,\"cols\":4083,\"rank\":4079,\"target\":4083,\"out\":\"refuted\",\"secs\":0.185,\"seed_rows\":9,\"products\":9008,\"falls\":4013,\"word_ops\":279225530,\"peak_basis_bytes\":1063944,\"rows_total\":9017}]}",
+        "{\"tool\":\"b04\",\"n\":13,\"l\":3,\"m\":4,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":5,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":13,\"ech_rows\":13,\"mindeg\":9,\"maxdeg\":12,\"n_sols\":12,\"n_z\":12,\"n_truth_any\":12,\"n_truth_gen\":10,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"solved\",\"D\":11,\"D_lb\":11,\"last_degree\":11,\"recovered_ok\":null,\"matrix_rows\":35344,\"matrix_cols\":4095,\"word_ops_last\":244228110,\"word_ops_total\":524696378,\"peak_basis_bytes\":1064856,\"secs\":0.366,\"rss_peak_kb\":12064,\"degrees\":[{\"d\":9,\"cols\":4017,\"rank\":1,\"target\":4005,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":1,\"products\":0,\"falls\":0,\"word_ops\":0,\"peak_basis_bytes\":504,\"rows_total\":1},{\"d\":10,\"cols\":4083,\"rank\":4067,\"target\":4071,\"out\":\"saturated\",\"secs\":0.174,\"seed_rows\":9,\"products\":35532,\"falls\":4001,\"word_ops\":280468268,\"peak_basis_bytes\":1064728,\"rows_total\":35541},{\"d\":11,\"cols\":4095,\"rank\":4083,\"target\":4083,\"out\":\"saturated\",\"secs\":0.184,\"seed_rows\":12,\"products\":35332,\"falls\":4071,\"word_ops\":244228110,\"peak_basis_bytes\":1064856,\"rows_total\":35344}]}",
+        "{\"tool\":\"b04\",\"n\":13,\"l\":3,\"m\":4,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":6,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":13,\"ech_rows\":13,\"mindeg\":9,\"maxdeg\":12,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":10,\"D_lb\":10,\"last_degree\":10,\"recovered_ok\":null,\"matrix_rows\":9317,\"matrix_cols\":4083,\"word_ops_last\":263908980,\"word_ops_total\":263908980,\"peak_basis_bytes\":1057048,\"secs\":0.187,\"rss_peak_kb\":12064,\"degrees\":[{\"d\":9,\"cols\":4017,\"rank\":1,\"target\":4017,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":1,\"products\":0,\"falls\":0,\"word_ops\":0,\"peak_basis_bytes\":504,\"rows_total\":1},{\"d\":10,\"cols\":4083,\"rank\":4034,\"target\":4083,\"out\":\"refuted\",\"secs\":0.179,\"seed_rows\":9,\"products\":9308,\"falls\":3968,\"word_ops\":263908980,\"peak_basis_bytes\":1057048,\"rows_total\":9317}]}",
+        "{\"tool\":\"b04\",\"n\":13,\"l\":3,\"m\":4,\"draw\":1,\"arm\":\"a\",\"kind\":\"random\",\"t\":7,\"nv0\":12,\"elim\":0,\"nv\":12,\"eqs\":13,\"ech_rows\":13,\"mindeg\":9,\"maxdeg\":12,\"n_sols\":0,\"n_z\":0,\"n_truth_any\":0,\"n_truth_gen\":0,\"spurious_z\":0,\"complete\":true,\"sound\":true,\"planted_in\":null,\"status\":\"refuted\",\"D\":11,\"D_lb\":11,\"last_degree\":11,\"recovered_ok\":null,\"matrix_rows\":5404,\"matrix_cols\":4095,\"word_ops_last\":207134748,\"word_ops_total\":489097676,\"peak_basis_bytes\":1064464,\"secs\":0.322,\"rss_peak_kb\":14040,\"degrees\":[{\"d\":9,\"cols\":4017,\"rank\":2,\"target\":4017,\"out\":\"saturated\",\"secs\":0.001,\"seed_rows\":2,\"products\":0,\"falls\":0,\"word_ops\":63,\"peak_basis_bytes\":1008,\"rows_total\":2},{\"d\":10,\"cols\":4083,\"rank\":4055,\"target\":4083,\"out\":\"saturated\",\"secs\":0.201,\"seed_rows\":9,\"products\":35759,\"falls\":3989,\"word_ops\":281962865,\"peak_basis_bytes\":1064464,\"rows_total\":35768},{\"d\":11,\"cols\":4095,\"rank\":2919,\"target\":4095,\"out\":\"refuted\",\"secs\":0.115,\"seed_rows\":12,\"products\":5392,\"falls\":2907,\"word_ops\":207134748,\"peak_basis_bytes\":949896,\"rows_total\":5404}]}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-04/card-02/b04",
+        "cell",
+        "--n",
+        "15",
+        "--l",
+        "3",
+        "--m",
+        "4",
+        "--draw",
+        "1",
+        "--arms",
+        "a",
+        "--random",
+        "8",
+        "--planted",
+        "0",
+        "--time-limit",
+        "20",
+        "--job-time",
+        "15"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 101,
+          "seconds": 0.483,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 101,
+      "id": "aa-cell4",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.483,
+      "stderr_sha256": "7c9214c774d69e5729f0e9942d21a7a4adefc649bf719b59c799fdadefcb21a4",
+      "stderr_tail": [
+        "",
+        "thread 'main' (19823) panicked at examples/blindspots_04_presentation_search.rs:1394:9:",
+        "no factor base with enough rational elements",
+        "stack backtrace:",
+        "   0: __rustc::rust_begin_unwind",
+        "             at /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/std/src/panicking.rs:689:5",
+        "   1: core::panicking::panic_fmt",
+        "             at /rustc/2d8144b7880597b6e6d3dfd63a9a9efae3f533d3/library/core/src/panicking.rs:80:14",
+        "   2: <blindspots_04_presentation_search::Draw>::new",
+        "   3: blindspots_04_presentation_search::mode_cell",
+        "   4: blindspots_04_presentation_search::main",
+        "note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace."
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 16,
+  "commit": "6f1acb018185dc9ccbf664e76ab7461b60e90203",
+  "dirty_after": [
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell1.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell1.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell2.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell2.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell3.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell3.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell4.jsonl",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-aa-cell4.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-build.stderr.log",
+    "research/blindspots_20261018/04-presentation-search/raw/card-02-build.stdout.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-02-build.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-02-build.stdout.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-02-main-c17-4-3.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-02-main-c17-4-3.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u2.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u2.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u3.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u3.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-13-4-4-i06u0.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-13-4-4-i06u0.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-sat-13-4-4-d0.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-sat-13-4-4-d0.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-02.json"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u2.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u2.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u3.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-11-4-4-u3.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-13-4-4-i06u0.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-r-13-4-4-i06u0.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-sat-13-4-4-d0.stderr.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/card-02-sat-13-4-4-d0.stdout.log",
+    "research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-02.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 6"
+}

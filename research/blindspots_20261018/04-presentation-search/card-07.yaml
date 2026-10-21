@@ -1,0 +1,48 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-04-07
+experiment_id: BLINDSPOT-04
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/04-presentation-search/raw/receipt-card-07.json
+binds:
+  - {path: examples/blindspots_04_presentation_search.rs, sha256: 69456582617f704841172d9a239aaf78003e610d5b3239588ceacde328b40fb5}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, -p, target/blindspots-04/card-07]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, --as=4294967296, rustc, --edition, "2021", -C, opt-level=3, -C, codegen-units=1, -C, target-cpu=native, -o, target/blindspots-04/card-07/b04, examples/blindspots_04_presentation_search.rs]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/04-presentation-search/raw/card-07-build.stdout.log
+    stderr: research/blindspots_20261018/04-presentation-search/raw/card-07-build.stderr.log
+  - id: b-cell1-random
+    argv: [prlimit, --as=4294967296, target/blindspots-04/card-07/b04, cell, --n, "17", --l, "4", --m, "3", --arms, b, --dmax-b, "3", --random, "8", --planted, "0", --time-limit, "300", --job-time, "90"]
+    timeout_seconds: 320
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/04-presentation-search/raw/card-07-b-cell1-random.jsonl
+    stderr: research/blindspots_20261018/04-presentation-search/raw/card-07-b-cell1-random.log
+  - id: b-cell1-planted-a
+    argv: [prlimit, --as=4294967296, target/blindspots-04/card-07/b04, cell, --n, "17", --l, "4", --m, "3", --arms, b, --dmax-b, "3", --random, "0", --planted, "2", --time-limit, "90", --job-time, "80"]
+    timeout_seconds: 100
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/04-presentation-search/raw/card-07-b-cell1-planted-a.jsonl
+    stderr: research/blindspots_20261018/04-presentation-search/raw/card-07-b-cell1-planted-a.log
+  - id: remove-bin
+    argv: [rm, -f, target/blindspots-04/card-07/b04]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-04
+background: false
+write_scope:
+  - research/blindspots_20261018/04-presentation-search/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto."

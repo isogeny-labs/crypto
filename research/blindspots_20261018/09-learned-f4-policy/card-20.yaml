@@ -1,0 +1,46 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-09-20
+experiment_id: BLINDSPOT-09
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/09-learned-f4-policy/raw/receipt-card-20.json
+binds:
+  - {path: examples/blindspots_09_learned_f4.rs, sha256: 7e46e27eaf9f5901f74772e9fd2a5f95457ab3182cda7ffcad320fcd820e5743}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, -p, target/blindspots-09/card-20]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, "--as=4294967296", rustc, --edition, "2021", -C, "opt-level=3", -C, "codegen-units=1", -C, "target-cpu=native", -o, target/blindspots-09/card-20/b09, examples/blindspots_09_learned_f4.rs]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/card-20-build.stdout.log
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/card-20-build.stderr.log
+  - id: eval-21-5-3-test-18-21
+    argv: [prlimit, "--as=4294967296", target/blindspots-09/card-20/b09, eval, --n, "21", --ell, "5", --m, "3", --seed, "20261018", --role, test, --from, "18", --to, "21", --arms, "a,b50,c,d,p,r50", --model, research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.model, --trace, "research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.0,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.6,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.12,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.18,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.24,research/blindspots_20261018/09-learned-f4-policy/raw/model-21-5-3.trace.30", --cap, "30000000000", --rel-cap, "1.5"]
+    timeout_seconds: 236
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-18-21.jsonl
+    stderr: research/blindspots_20261018/09-learned-f4-policy/raw/eval-21-5-3-test-18-21.stderr.log
+  - id: remove-bin
+    argv: [rm, -f, target/blindspots-09/card-20/b09]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: [rmdir, target/blindspots-09/card-20]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-09
+background: false
+write_scope:
+  - research/blindspots_20261018/09-learned-f4-policy/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto."

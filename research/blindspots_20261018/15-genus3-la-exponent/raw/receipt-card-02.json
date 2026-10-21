@@ -1,0 +1,391 @@
+{
+  "card_id": "CARD-BLINDSPOT-15-02",
+  "card_path": "research/blindspots_20261018/15-genus3-la-exponent/card-02.yaml",
+  "card_sha256": "84e2fdef46349d56003b163a234fbcc64a00be7d06999e892c1d0a419926cccd",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw",
+        "target/blindspots-15/card-02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-dirs",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "target/blindspots-15/card-02/b15",
+        "examples/blindspots_15_genus3_la.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 14.262,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 14.262,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-15/card-02/b15",
+        "--bits",
+        "18",
+        "--curve",
+        "0",
+        "--kappa",
+        "1.5763",
+        "--cx",
+        "8",
+        "--streams",
+        "r2",
+        "--las",
+        "lpsgebw2@8,lpsgebw2*,lpsgebw4x4@8,lpsgebw4x4*,lpsgebl4@8,lpsgebl4*,lpsgebl1@8,lpsgebw2!1@8",
+        "--orders",
+        "research/blindspots_20261018/15-genus3-la-exponent/orders.csv",
+        "--no-c1",
+        "--no-gp-check",
+        "--out",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c0_r2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 72.547,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-b18-c0-r2",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c0_r2.jsonl": "bf40f5949c613c2a1f1a42d36c41fc88142cc8257fd70f09aa54d66aefbb604f"
+      },
+      "seconds": 72.547,
+      "stderr_sha256": "d77353856bec5291b4e4db3f95db166497910c877f120f543f358fff09ddf67d",
+      "stderr_tail": [
+        "{\"bits\":18,\"curve\":0,\"kappa\":1.5763,\"arm\":\"r2:lpsgebw2@8\",\"correct\":true,\"cost\":2034010867,\"rel_cost\":1193643590,\"la_cost\":840367277,\"cols\":5399,\"nnz\":81872,\"checks\":1,\"la_wall\":4.8,\"wall\":72.2}",
+        "{\"bits\":18,\"curve\":0,\"kappa\":1.5763,\"arm\":\"r2:lpsgebw2*\",\"correct\":true,\"cost\":2017651232,\"rel_cost\":1193643590,\"la_cost\":824007642,\"cols\":4943,\"nnz\":91020,\"checks\":1,\"la_wall\":8.6,\"wall\":72.2}",
+        "{\"bits\":18,\"curve\":0,\"kappa\":1.5763,\"arm\":\"r2:lpsgebw4x4@8\",\"correct\":true,\"cost\":2438414822,\"rel_cost\":1193643590,\"la_cost\":1244771232,\"cols\":5399,\"nnz\":81872,\"checks\":1,\"la_wall\":7.2,\"wall\":72.2}",
+        "{\"bits\":18,\"curve\":0,\"kappa\":1.5763,\"arm\":\"r2:lpsgebw4x4*\",\"correct\":true,\"cost\":2392436527,\"rel_cost\":1193643590,\"la_cost\":1198792937,\"cols\":4493,\"nnz\":105053,\"checks\":1,\"la_wall\":9.6,\"wall\":72.2}",
+        "{\"bits\":18,\"curve\":0,\"kappa\":1.5763,\"arm\":\"r2:lpsgebl4@8\",\"correct\":true,\"cost\":2690483891,\"rel_cost\":1193643590,\"la_cost\":1496840301,\"cols\":5399,\"nnz\":81872,\"checks\":1,\"la_wall\":8.4,\"wall\":72.2}",
+        "{\"bits\":18,\"curve\":0,\"kappa\":1.5763,\"arm\":\"r2:lpsgebl4*\",\"correct\":true,\"cost\":2562689154,\"rel_cost\":1193643590,\"la_cost\":1369045564,\"cols\":4493,\"nnz\":105053,\"checks\":1,\"la_wall\":9.8,\"wall\":72.2}",
+        "{\"bits\":18,\"curve\":0,\"kappa\":1.5763,\"arm\":\"r2:lpsgebl1@8\",\"correct\":true,\"cost\":2252696162,\"rel_cost\":1193643590,\"la_cost\":1059052572,\"cols\":5399,\"nnz\":81872,\"checks\":1,\"la_wall\":7.8,\"wall\":72.2}",
+        "{\"bits\":18,\"curve\":0,\"kappa\":1.5763,\"arm\":\"r2:lpsgebw2!1@8\",\"correct\":true,\"cost\":2034010867,\"rel_cost\":1193643590,\"la_cost\":840367277,\"cols\":5399,\"nnz\":81872,\"checks\":1,\"la_wall\":6.1,\"wall\":72.2}"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-15/card-02/b15",
+        "--bits",
+        "18",
+        "--curve",
+        "0",
+        "--kappa",
+        "1.5763",
+        "--cx",
+        "8",
+        "--streams",
+        "aa",
+        "--las",
+        "lpsgebw2@8",
+        "--orders",
+        "research/blindspots_20261018/15-genus3-la-exponent/orders.csv",
+        "--no-c1",
+        "--no-gp-check",
+        "--out",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c0_aa.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 16.115,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-b18-c0-aa",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c0_aa.jsonl": "b686ee683f5a9c1eca82be15f0e17281028e7c961fc16b5440c3bacdd3b07706"
+      },
+      "seconds": 16.115,
+      "stderr_sha256": "32ca02128f063f341b8b0aff05e1231c0cde706656403a4b051780f1c84cf94d",
+      "stderr_tail": [
+        "{\"bits\":18,\"curve\":0,\"kappa\":1.5763,\"arm\":\"aa:lpsgebw2@8\",\"correct\":true,\"cost\":2053128489,\"rel_cost\":1214156998,\"la_cost\":838971491,\"cols\":5400,\"nnz\":81684,\"checks\":1,\"la_wall\":5.7,\"wall\":15.8}"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-15/card-02/b15",
+        "--bits",
+        "18",
+        "--curve",
+        "1",
+        "--kappa",
+        "1.5763",
+        "--cx",
+        "8",
+        "--streams",
+        "r2",
+        "--las",
+        "lpsgebw2@8,lpsgebw2*,lpsgebw4x4@8,lpsgebw4x4*,lpsgebl4@8,lpsgebl4*,lpsgebl1@8,lpsgebw2!1@8",
+        "--orders",
+        "research/blindspots_20261018/15-genus3-la-exponent/orders.csv",
+        "--no-c1",
+        "--no-gp-check",
+        "--out",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c1_r2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 73.962,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-b18-c1-r2",
+      "index": 5,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c1_r2.jsonl": "39c8b0822d7379a116ee210bf97ff0bd893f89f29a08c4dc327e63e572d727f9"
+      },
+      "seconds": 73.962,
+      "stderr_sha256": "82e8d15cc67ce82d48754cb175a794ab67f169ecf5c278c701eb410c9cc5fc9a",
+      "stderr_tail": [
+        "{\"bits\":18,\"curve\":1,\"kappa\":1.5763,\"arm\":\"r2:lpsgebw2@8\",\"correct\":true,\"cost\":2051888268,\"rel_cost\":1207051347,\"la_cost\":844836921,\"cols\":5402,\"nnz\":82360,\"checks\":1,\"la_wall\":4.9,\"wall\":73.8}",
+        "{\"bits\":18,\"curve\":1,\"kappa\":1.5763,\"arm\":\"r2:lpsgebw2*\",\"correct\":true,\"cost\":2035380534,\"rel_cost\":1207051347,\"la_cost\":828329187,\"cols\":4942,\"nnz\":91636,\"checks\":1,\"la_wall\":8.2,\"wall\":73.8}",
+        "{\"bits\":18,\"curve\":1,\"kappa\":1.5763,\"arm\":\"r2:lpsgebw4x4@8\",\"correct\":true,\"cost\":2458267466,\"rel_cost\":1207051347,\"la_cost\":1251216119,\"cols\":5402,\"nnz\":82360,\"checks\":1,\"la_wall\":7.6,\"wall\":73.8}",
+        "{\"bits\":18,\"curve\":1,\"kappa\":1.5763,\"arm\":\"r2:lpsgebw4x4*\",\"correct\":true,\"cost\":2413469844,\"rel_cost\":1207051347,\"la_cost\":1206418497,\"cols\":4495,\"nnz\":105886,\"checks\":1,\"la_wall\":9.7,\"wall\":73.8}",
+        "{\"bits\":18,\"curve\":1,\"kappa\":1.5763,\"arm\":\"r2:lpsgebl4@8\",\"correct\":true,\"cost\":2710523691,\"rel_cost\":1207051347,\"la_cost\":1503472344,\"cols\":5402,\"nnz\":82360,\"checks\":1,\"la_wall\":8.6,\"wall\":73.8}",
+        "{\"bits\":18,\"curve\":1,\"kappa\":1.5763,\"arm\":\"r2:lpsgebl4*\",\"correct\":true,\"cost\":2583929579,\"rel_cost\":1207051347,\"la_cost\":1376878232,\"cols\":4495,\"nnz\":105886,\"checks\":1,\"la_wall\":9.9,\"wall\":73.8}",
+        "{\"bits\":18,\"curve\":1,\"kappa\":1.5763,\"arm\":\"r2:lpsgebl1@8\",\"correct\":true,\"cost\":2272062410,\"rel_cost\":1207051347,\"la_cost\":1065011063,\"cols\":5402,\"nnz\":82360,\"checks\":1,\"la_wall\":8.5,\"wall\":73.8}",
+        "{\"bits\":18,\"curve\":1,\"kappa\":1.5763,\"arm\":\"r2:lpsgebw2!1@8\",\"correct\":true,\"cost\":2051888268,\"rel_cost\":1207051347,\"la_cost\":844836921,\"cols\":5402,\"nnz\":82360,\"checks\":1,\"la_wall\":5.9,\"wall\":73.8}"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-15/card-02/b15",
+        "--bits",
+        "18",
+        "--curve",
+        "1",
+        "--kappa",
+        "1.5763",
+        "--cx",
+        "8",
+        "--streams",
+        "aa",
+        "--las",
+        "lpsgebw2@8",
+        "--orders",
+        "research/blindspots_20261018/15-genus3-la-exponent/orders.csv",
+        "--no-c1",
+        "--no-gp-check",
+        "--out",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c1_aa.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 15.376,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-b18-c1-aa",
+      "index": 6,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c1_aa.jsonl": "ec7b09d929f98af552a3be314d8c997e994178dc598ea638af257b28dc70c381"
+      },
+      "seconds": 15.376,
+      "stderr_sha256": "d228dd773256d2002796134e5ee22847115f26f8e6dad828676335720b8e09f0",
+      "stderr_tail": [
+        "{\"bits\":18,\"curve\":1,\"kappa\":1.5763,\"arm\":\"aa:lpsgebw2@8\",\"correct\":true,\"cost\":2050519419,\"rel_cost\":1207255681,\"la_cost\":843263738,\"cols\":5386,\"nnz\":82538,\"checks\":1,\"la_wall\":5.1,\"wall\":15.2}"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-15/card-02/b15",
+        "gate",
+        "r2:lpsgebw2@8",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c0_r2.jsonl",
+        "research/ic_improve4_20261015/01-genus3-relations/results/run/b18_c0_r2.jsonl",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c1_r2.jsonl",
+        "research/ic_improve4_20261015/01-genus3-relations/results/run/b18_c1_r2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "gate0-b18",
+      "index": 7,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/card-02-gate0-b18.txt": "0a05b9be23bf10b10e361fa9a4ff5b557a2bea34716ff7101f08d83a79cad29a"
+      },
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0a05b9be23bf10b10e361fa9a4ff5b557a2bea34716ff7101f08d83a79cad29a",
+      "stdout_tail": [
+        "GATE MATCH bits=18 curve=0 arm=r2:lpsgebw2@8",
+        "GATE MATCH bits=18 curve=1 arm=r2:lpsgebw2@8",
+        "GATE OK cells=2"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-15/card-02/b15"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 8,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-15/card-02"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 9,
+  "commit": "2ccaebdd8fcb28a6b74fa24ff619e69c55f10055",
+  "dirty_after": [
+    "examples/blindspots_16_gate.rs",
+    "examples/blindspots_16_size_gated_oracle.rs",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c0_aa.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c1_aa.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/b18_c1_r2.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/card-02-b18_c0_aa.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/card-02-b18_c1_aa.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/card-02-b18_c1_r2.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/card-02-gate0-b18.txt"
+  ],
+  "dirty_before": [
+    "examples/blindspots_16_size_gated_oracle.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

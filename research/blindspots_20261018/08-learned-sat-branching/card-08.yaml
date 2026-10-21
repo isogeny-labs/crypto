@@ -1,0 +1,46 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-08-08
+experiment_id: BLINDSPOT-08
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/08-learned-sat-branching/raw/receipt-card-08.json
+binds:
+  - {path: examples/blindspots_08_learned_branching.rs, sha256: 02478185f7001474c7510e5dd87f3eb5aca0d5ff5a536760f226e2fd892a280a}
+commands:
+  - id: make-bin-dir
+    argv: [mkdir, -p, target/blindspots-08/card-08]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, --as=4294967296, rustc, --edition, "2021", -C, opt-level=3, -C, codegen-units=1, -C, target-cpu=native, -o, target/blindspots-08/card-08/b08, examples/blindspots_08_learned_branching.rs]
+    timeout_seconds: 40
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/08-learned-sat-branching/raw/card-08-build.stdout.log
+    stderr: research/blindspots_20261018/08-learned-sat-branching/raw/card-08-build.stderr.log
+  - id: sec-l6-n37
+    argv: [prlimit, --as=4294967296, target/blindspots-08/card-08/b08, "cell", "--n", "37", "--ell", "6", "--np", "3", "--nr", "3", "--seed", "20261018", "--role", "8", "--models", "research/blindspots_20261018/08-learned-sat-branching/raw/model.txt", "--truth", "--cap", "150000000"]
+    timeout_seconds: 360
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/08-learned-sat-branching/raw/sec-l6-n37.jsonl
+    stderr: research/blindspots_20261018/08-learned-sat-branching/raw/sec-l6-n37.stderr.log
+  - id: remove-bin
+    argv: [rm, -f, target/blindspots-08/card-08/b08]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: [rmdir, target/blindspots-08/card-08]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-08
+background: false
+write_scope:
+  - research/blindspots_20261018/08-learned-sat-branching/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto."

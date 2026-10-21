@@ -1,0 +1,53 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-14-09
+experiment_id: BLINDSPOT-14
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+# Arm (b) at the 28-bit design cell (bx = 63) to the same cap; full IC to completion with arm (b) at bx = 3 (16 runs, 16-bit curve).
+
+receipt: research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-09.json
+binds:
+  - {path: examples/blindspots_14_prime_m4.rs, sha256: f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376}
+commands:
+  - id: make-dirs
+    argv: ["mkdir", "-p", "research/blindspots_20261018/14-prime-m4-cells/raw", "target/blindspots-14/card-09"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: build
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-14/card-09/b14", "examples/blindspots_14_prime_m4.rs"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/card-09-build.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/card-09-build.stderr.log
+  - id: tdec-b-b28-bx63
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-14/card-09/b14", "tdec", "--bits", "28", "--arms", "b", "--bx", "63", "--targets", "16", "--bcap-madds", "3000000000", "--bcap-nnz", "25000000", "--bdeadline-s", "60", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx63.jsonl"]
+    timeout_seconds: 240
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/card-09-tdec-b-b28-bx63.stderr.log
+    outputs: [research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx63.jsonl]
+  - id: fullic-b-b16-bx3
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-14/card-09/b14", "fullic", "--bits", "16", "--arm", "b", "--bx", "3", "--runs", "16", "--bcap-madds", "100000000000", "--bcap-nnz", "120000000", "--bdeadline-s", "300", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx3.jsonl"]
+    timeout_seconds: 300
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/card-09-fullic-b-b16-bx3.stderr.log
+    outputs: [research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx3.jsonl]
+  - id: remove-bin
+    argv: ["rm", "-f", "target/blindspots-14/card-09/b14"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: ["rmdir", "target/blindspots-14/card-09"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-14
+background: false
+write_scope:
+  - research/blindspots_20261018/14-prime-m4-cells/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."

@@ -1,0 +1,203 @@
+{
+  "card_id": "CARD-BLINDSPOT-14-07",
+  "card_path": "research/blindspots_20261018/14-prime-m4-cells/card-07.yaml",
+  "card_sha256": "0eed3cbcd8b299c59e7e8c056db188bc5a5095c54e6cb819928fbdd61b5b7e38",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/14-prime-m4-cells/raw",
+        "target/blindspots-14/card-07"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-dirs",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-14/card-07/b14",
+        "examples/blindspots_14_prime_m4.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 5.606,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 5.606,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-14/card-07/b14",
+        "tdec",
+        "--bits",
+        "16",
+        "--arms",
+        "b",
+        "--bx",
+        "8",
+        "--targets",
+        "16",
+        "--planted",
+        "2",
+        "--check",
+        "--t0",
+        "15",
+        "--t1",
+        "18",
+        "--bcap-madds",
+        "100000000000",
+        "--bcap-nnz",
+        "120000000",
+        "--bdeadline-s",
+        "400",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t15-18.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 161.224,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tdec-b-b16-bx8-t15-18",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t15-18.jsonl": "b22591b50645bcfa1107b3fb50ac6c2a873b4d8320ccc2b1c71c5ab01b431afa"
+      },
+      "seconds": 161.224,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "b22591b50645bcfa1107b3fb50ac6c2a873b4d8320ccc2b1c71c5ab01b431afa",
+      "stdout_tail": [
+        "{\"kind\":\"cell\",\"bits\":16,\"p\":48479,\"a\":25392,\"b\":20877,\"n\":48383,\"B\":17,\"bx\":8,\"signed\":16,\"seed\":20261018}",
+        "{\"kind\":\"setup\",\"arm\":\"b\",\"bits\":16,\"B\":17,\"bx\":8,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":14467005},\"ms\":47.083,\"note\":\"S5 interpolated on 9^5 nodes; evaluation by resultants is uncounted setup\"}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":15,\"tkind\":\"random\",\"status\":\"done\",\"dim\":0,\"brute_roots\":0,\"planted_vanishes\":null,\"steps\":28,\"max_degree\":29,\"max_rows\":11746,\"max_cols\":15492,\"peak_nnz\":4792705,\"zero_rows\":12279,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":27487449473,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":78769},\"native\":27487528242,\"ms\":52766.618}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":16,\"tkind\":\"planted\",\"status\":\"done\",\"dim\":48,\"brute_roots\":48,\"planted_vanishes\":true,\"steps\":27,\"max_degree\":29,\"max_rows\":11746,\"max_cols\":15492,\"peak_nnz\":4792717,\"zero_rows\":12145,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":27485539019,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":78769},\"native\":27485617788,\"ms\":55049.122}",
+        "{\"kind\":\"tdec\",\"arm\":\"b\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":17,\"tkind\":\"planted\",\"status\":\"done\",\"dim\":24,\"brute_roots\":24,\"planted_vanishes\":true,\"steps\":28,\"max_degree\":29,\"max_rows\":11746,\"max_cols\":15492,\"peak_nnz\":4792714,\"zero_rows\":12217,\"counts\":{\"gadd\":0,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":27486858721,\"dptest\":0,\"fmul\":0,\"fsqr\":0,\"finv\":0,\"build\":78769},\"native\":27486937490,\"ms\":53331.712}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-14/card-07/b14"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-14/card-07"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "07a57960e77a91b1ade72d8e5d0a1cc7daef6ef6",
+  "dirty_after": [
+    "esearch/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b48-r128-t32-64.jsonl",
+    "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-11-sweep-baseb.stderr.log",
+    "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-11-sweep.stderr.log",
+    "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/receipt-card-11.json",
+    "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b48-r128-t32-64-baseb.jsonl",
+    "research/blindspots_20261018/14-prime-m4-cells/raw/card-07-tdec-b-b16-bx8-t15-18.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t15-18.jsonl"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-11-build.stderr.log",
+    "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/card-11-build.stdout.log",
+    "research/blindspots_20261018/13-rho-negation-ecc2k130-plan/raw/sweep-b48-r128-t32-64.jsonl"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

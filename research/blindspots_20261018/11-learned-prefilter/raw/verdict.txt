@@ -1,0 +1,188 @@
+verdict input: 13 jsonl files, 416 rows
+cell-populations present: 13
+cell pop=S n=17 m=2 l=9: targets 20000 positives 14513 false refutations of arm b 0
+  control planted_trace lr: PASS
+   lr ALL: neg 5487 pos 14513 rate_b 0.0000 rate_c 0.0000 fr 7 delta 0.0000 [0.0000,0.0000] union 0.0007 roc0 0.0002 auc 0.6117 null_auc_max 0.6193 null_roc0_max 0.0011 -> no
+   lr   T: neg 1139 pos 6861 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.4972 null_auc_max 0.5198 null_roc0_max 0.0000 -> no
+   lr   G: neg 2169 pos 3831 rate_b 0.0000 rate_c 0.0000 fr 5 delta 0.0000 [0.0000,0.0000] union 0.0014 roc0 0.0005 auc 0.5133 null_auc_max 0.5119 null_roc0_max 0.0014 -> no
+   lr   P: neg 2179 pos 3821 rate_b 0.0000 rate_c 0.0000 fr 2 delta 0.0000 [0.0000,0.0000] union 0.0005 roc0 0.0000 auc 0.4919 null_auc_max 0.5212 null_roc0_max 0.0028 -> no
+  control planted_trace gbt: PASS
+  gbt ALL: neg 5487 pos 14513 rate_b 0.0000 rate_c 0.0000 fr 7 delta 0.0000 [0.0000,0.0000] union 0.0002 roc0 0.0000 auc 0.6203 null_auc_max 0.6263 null_roc0_max 0.0018 -> no
+  gbt   T: neg 1139 pos 6861 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.5005 null_auc_max 0.5326 null_roc0_max 0.0000 -> no
+  gbt   G: neg 2169 pos 3831 rate_b 0.0000 rate_c 0.0000 fr 3 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.5027 null_auc_max 0.5165 null_roc0_max 0.0023 -> no
+  gbt   P: neg 2179 pos 3821 rate_b 0.0000 rate_c 0.0000 fr 4 delta 0.0000 [0.0000,0.0000] union 0.0005 roc0 0.0000 auc 0.5013 null_auc_max 0.5133 null_roc0_max 0.0041 -> no
+  cost pop=S n=17 m=2 w=0: gbt filter 54.0 per target, decomposer 1244.6 per target, saved by refutation 0.0 -> net -0.0434 of decomposer work
+  cost pop=S n=17 m=2 w=0.1: gbt filter 109.2 per target, decomposer 1454.4 per target, saved by refutation 0.0 -> net -0.0751 of decomposer work
+  cost pop=S n=17 m=2 w=1: gbt filter 606.0 per target, decomposer 3342.5 per target, saved by refutation 0.0 -> net -0.1813 of decomposer work
+cell pop=S n=17 m=3 l=6: targets 20000 positives 7510 false refutations of arm b 0
+  control planted_trace lr: PASS
+   lr ALL: neg 12490 pos 7510 rate_b 0.0000 rate_c 0.0000 fr 9 delta 0.0000 [0.0000,0.0000] union 0.0010 roc0 0.0024 auc 0.5881 null_auc_max 0.5936 null_roc0_max 0.0022 -> no
+   lr   T: neg 3893 pos 4107 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.5095 null_auc_max 0.5117 null_roc0_max 0.0005 -> no
+   lr   G: neg 3810 pos 2190 rate_b 0.0000 rate_c 0.0000 fr 8 delta 0.0000 [0.0000,0.0000] union 0.0024 roc0 0.0024 auc 0.5164 null_auc_max 0.5175 null_roc0_max 0.0034 -> no
+   lr   P: neg 4787 pos 1213 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0008 roc0 0.0044 auc 0.4872 null_auc_max 0.5130 null_roc0_max 0.0044 -> no
+  control planted_trace gbt: PASS
+  gbt ALL: neg 12490 pos 7510 rate_b 0.0000 rate_c 0.0000 fr 9 delta 0.0000 [0.0000,0.0000] union 0.0026 roc0 0.0013 auc 0.6039 null_auc_max 0.6078 null_roc0_max 0.0032 -> no
+  gbt   T: neg 3893 pos 4107 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.4891 null_auc_max 0.5079 null_roc0_max 0.0000 -> no
+  gbt   G: neg 3810 pos 2190 rate_b 0.0000 rate_c 0.0000 fr 5 delta 0.0000 [0.0000,0.0000] union 0.0029 roc0 0.0016 auc 0.5150 null_auc_max 0.5154 null_roc0_max 0.0034 -> no
+  gbt   P: neg 4787 pos 1213 rate_b 0.0000 rate_c 0.0000 fr 4 delta 0.0000 [0.0000,0.0000] union 0.0044 roc0 0.0021 auc 0.5062 null_auc_max 0.5255 null_roc0_max 0.0075 -> no
+  cost pop=S n=17 m=3 w=0: gbt filter 54.0 per target, decomposer 208.2 per target, saved by refutation 0.0 -> net -0.2593 of decomposer work
+  cost pop=S n=17 m=3 w=0.1: gbt filter 107.1 per target, decomposer 212.8 per target, saved by refutation 0.0 -> net -0.5033 of decomposer work
+  cost pop=S n=17 m=3 w=1: gbt filter 585.0 per target, decomposer 253.8 per target, saved by refutation 0.0 -> net -2.3052 of decomposer work
+cell pop=S n=19 m=2 l=10: targets 20000 positives 14420 false refutations of arm b 0
+  control planted_trace lr: PASS
+   lr ALL: neg 5580 pos 14420 rate_b 0.0000 rate_c 0.0000 fr 3 delta 0.0000 [0.0000,0.0000] union 0.0004 roc0 0.0009 auc 0.6205 null_auc_max 0.6288 null_roc0_max 0.0011 -> no
+   lr   T: neg 1061 pos 6939 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.4994 null_auc_max 0.5136 null_roc0_max 0.0000 -> no
+   lr   G: neg 2177 pos 3823 rate_b 0.0000 rate_c 0.0000 fr 2 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0009 auc 0.4965 null_auc_max 0.5141 null_roc0_max 0.0023 -> no
+   lr   P: neg 2342 pos 3658 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0009 roc0 0.0013 auc 0.4938 null_auc_max 0.5162 null_roc0_max 0.0026 -> no
+  control planted_trace gbt: PASS
+  gbt ALL: neg 5580 pos 14420 rate_b 0.0000 rate_c 0.0000 fr 3 delta 0.0000 [0.0000,0.0000] union 0.0005 roc0 0.0004 auc 0.6266 null_auc_max 0.6352 null_roc0_max 0.0011 -> no
+  gbt   T: neg 1061 pos 6939 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.5039 null_auc_max 0.5264 null_roc0_max 0.0000 -> no
+  gbt   G: neg 2177 pos 3823 rate_b 0.0000 rate_c 0.0000 fr 2 delta 0.0000 [0.0000,0.0000] union 0.0014 roc0 0.0009 auc 0.4940 null_auc_max 0.5169 null_roc0_max 0.0014 -> no
+  gbt   P: neg 2342 pos 3658 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.4927 null_auc_max 0.5233 null_roc0_max 0.0017 -> no
+  cost pop=S n=19 m=2 w=0: gbt filter 57.0 per target, decomposer 2012.6 per target, saved by refutation 0.0 -> net -0.0283 of decomposer work
+  cost pop=S n=19 m=2 w=0.1: gbt filter 113.5 per target, decomposer 2476.9 per target, saved by refutation 0.0 -> net -0.0458 of decomposer work
+  cost pop=S n=19 m=2 w=1: gbt filter 622.0 per target, decomposer 6655.7 per target, saved by refutation 0.0 -> net -0.0935 of decomposer work
+cell pop=S n=23 m=2 l=12: targets 20000 positives 14591 false refutations of arm b 0
+  control planted_trace lr: PASS
+   lr ALL: neg 5409 pos 14591 rate_b 0.0000 rate_c 0.0000 fr 2 delta 0.0000 [0.0000,0.0000] union 0.0004 roc0 0.0006 auc 0.6140 null_auc_max 0.6109 null_roc0_max 0.0011 -> no
+   lr   T: neg 1130 pos 6870 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.4940 null_auc_max 0.5238 null_roc0_max 0.0000 -> no
+   lr   G: neg 2182 pos 3818 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0009 roc0 0.0014 auc 0.5172 null_auc_max 0.5144 null_roc0_max 0.0018 -> no
+   lr   P: neg 2097 pos 3903 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.5070 null_auc_max 0.5124 null_roc0_max 0.0014 -> no
+  control planted_trace gbt: PASS
+  gbt ALL: neg 5409 pos 14591 rate_b 0.0000 rate_c 0.0000 fr 9 delta 0.0000 [0.0000,0.0000] union 0.0006 roc0 0.0002 auc 0.6236 null_auc_max 0.6214 null_roc0_max 0.0013 -> no
+  gbt   T: neg 1130 pos 6870 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.5106 null_auc_max 0.5172 null_roc0_max 0.0000 -> no
+  gbt   G: neg 2182 pos 3818 rate_b 0.0000 rate_c 0.0000 fr 6 delta 0.0000 [0.0000,0.0000] union 0.0005 roc0 0.0000 auc 0.5163 null_auc_max 0.5119 null_roc0_max 0.0027 -> no
+  gbt   P: neg 2097 pos 3903 rate_b 0.0000 rate_c 0.0000 fr 3 delta 0.0000 [0.0000,0.0000] union 0.0010 roc0 0.0005 auc 0.5112 null_auc_max 0.5111 null_roc0_max 0.0014 -> no
+  cost pop=S n=23 m=2 w=0: gbt filter 62.0 per target, decomposer 6837.5 per target, saved by refutation 0.0 -> net -0.0091 of decomposer work
+  cost pop=S n=23 m=2 w=0.1: gbt filter 121.1 per target, decomposer 9041.0 per target, saved by refutation 0.0 -> net -0.0134 of decomposer work
+  cost pop=S n=23 m=2 w=1: gbt filter 653.0 per target, decomposer 28872.6 per target, saved by refutation 0.0 -> net -0.0226 of decomposer work
+cell pop=S n=23 m=3 l=8: targets 20000 positives 7185 false refutations of arm b 0
+  control planted_trace lr: PASS
+   lr ALL: neg 12815 pos 7185 rate_b 0.0000 rate_c 0.0000 fr 9 delta 0.0000 [0.0000,0.0000] union 0.0020 roc0 0.0006 auc 0.5994 null_auc_max 0.6070 null_roc0_max 0.0025 -> no
+   lr   T: neg 3830 pos 4170 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.4961 null_auc_max 0.5106 null_roc0_max 0.0000 -> no
+   lr   G: neg 4714 pos 1286 rate_b 0.0000 rate_c 0.0000 fr 4 delta 0.0000 [0.0000,0.0000] union 0.0038 roc0 0.0008 auc 0.4967 null_auc_max 0.5151 null_roc0_max 0.0049 -> no
+   lr   P: neg 4271 pos 1729 rate_b 0.0000 rate_c 0.0000 fr 5 delta 0.0000 [0.0000,0.0000] union 0.0016 roc0 0.0009 auc 0.4899 null_auc_max 0.5096 null_roc0_max 0.0037 -> no
+  control planted_trace gbt: PASS
+  gbt ALL: neg 12815 pos 7185 rate_b 0.0000 rate_c 0.0000 fr 11 delta 0.0000 [0.0000,0.0000] union 0.0030 roc0 0.0012 auc 0.6110 null_auc_max 0.6183 null_roc0_max 0.0021 -> no
+  gbt   T: neg 3830 pos 4170 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.4869 null_auc_max 0.5097 null_roc0_max 0.0000 -> no
+  gbt   G: neg 4714 pos 1286 rate_b 0.0000 rate_c 0.0000 fr 6 delta 0.0000 [0.0000,0.0000] union 0.0059 roc0 0.0013 auc 0.4928 null_auc_max 0.5171 null_roc0_max 0.0040 -> no
+  gbt   P: neg 4271 pos 1729 rate_b 0.0000 rate_c 0.0000 fr 5 delta 0.0000 [0.0000,0.0000] union 0.0023 roc0 0.0021 auc 0.5015 null_auc_max 0.5096 null_roc0_max 0.0049 -> no
+  cost pop=S n=23 m=3 w=0: gbt filter 62.0 per target, decomposer 766.5 per target, saved by refutation 0.0 -> net -0.0809 of decomposer work
+  cost pop=S n=23 m=3 w=0.1: gbt filter 118.3 per target, decomposer 784.5 per target, saved by refutation 0.0 -> net -0.1508 of decomposer work
+  cost pop=S n=23 m=3 w=1: gbt filter 625.0 per target, decomposer 946.8 per target, saved by refutation 0.0 -> net -0.6601 of decomposer work
+cell pop=S n=29 m=2 l=15: targets 20000 positives 14563 false refutations of arm b 0
+  control planted_trace lr: PASS
+   lr ALL: neg 5437 pos 14563 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0002 auc 0.6115 null_auc_max 0.6219 null_roc0_max 0.0013 -> no
+   lr   T: neg 1057 pos 6943 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.5005 null_auc_max 0.5241 null_roc0_max 0.0000 -> no
+   lr   G: neg 2170 pos 3830 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0005 auc 0.4866 null_auc_max 0.5188 null_roc0_max 0.0014 -> no
+   lr   P: neg 2210 pos 3790 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.5055 null_auc_max 0.5175 null_roc0_max 0.0023 -> no
+  control planted_trace gbt: PASS
+  gbt ALL: neg 5437 pos 14563 rate_b 0.0000 rate_c 0.0000 fr 4 delta 0.0000 [0.0000,0.0000] union 0.0006 roc0 0.0006 auc 0.6221 null_auc_max 0.6337 null_roc0_max 0.0015 -> no
+  gbt   T: neg 1057 pos 6943 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.4852 null_auc_max 0.5205 null_roc0_max 0.0000 -> no
+  gbt   G: neg 2170 pos 3830 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.4998 null_auc_max 0.5176 null_roc0_max 0.0028 -> no
+  gbt   P: neg 2210 pos 3790 rate_b 0.0000 rate_c 0.0000 fr 3 delta 0.0000 [0.0000,0.0000] union 0.0014 roc0 0.0014 auc 0.4917 null_auc_max 0.5171 null_roc0_max 0.0023 -> no
+  cost pop=S n=29 m=2 w=0: gbt filter 68.0 per target, decomposer 52809.7 per target, saved by refutation 0.0 -> net -0.0013 of decomposer work
+  cost pop=S n=29 m=2 w=0.1: gbt filter 131.0 per target, decomposer 74907.6 per target, saved by refutation 0.0 -> net -0.0017 of decomposer work
+  cost pop=S n=29 m=2 w=1: gbt filter 698.0 per target, decomposer 273788.9 per target, saved by refutation 0.0 -> net -0.0025 of decomposer work
+cell pop=U n=17 m=2 l=9: targets 20000 positives 11202 false refutations of arm b 0
+  control planted_trace lr: PASS
+   lr ALL: neg 8798 pos 11202 rate_b 0.4546 rate_c 0.0000 fr 4 delta -0.4546 [-0.4653,-0.4444] union 0.4546 roc0 0.4546 auc 0.7521 null_auc_max 0.5801 null_roc0_max 0.0011 -> no
+   lr   T: neg 4590 pos 3410 rate_b 0.8715 rate_c 0.8715 fr 0 delta 0.0000 [0.0000,0.0000] union 0.8715 roc0 0.8715 auc 0.9372 null_auc_max 0.5105 null_roc0_max 0.0022 -> no
+   lr   G: neg 2059 pos 3941 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.5001 null_auc_max 0.5127 null_roc0_max 0.0010 -> no
+   lr   P: neg 2149 pos 3851 rate_b 0.0000 rate_c 0.0000 fr 3 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.5050 null_auc_max 0.5094 null_roc0_max 0.0009 -> no
+  control planted_trace gbt: PASS
+  gbt ALL: neg 8798 pos 11202 rate_b 0.4546 rate_c 0.0000 fr 10 delta -0.4546 [-0.4644,-0.4443] union 0.4558 roc0 0.4554 auc 0.7630 null_auc_max 0.5952 null_roc0_max 0.0015 -> no
+  gbt   T: neg 4590 pos 3410 rate_b 0.8715 rate_c 0.8715 fr 0 delta 0.0000 [0.0000,0.0000] union 0.8715 roc0 0.8715 auc 0.9368 null_auc_max 0.5218 null_roc0_max 0.0026 -> no
+  gbt   G: neg 2059 pos 3941 rate_b 0.0000 rate_c 0.0000 fr 6 delta 0.0000 [0.0000,0.0000] union 0.0029 roc0 0.0019 auc 0.5120 null_auc_max 0.5169 null_roc0_max 0.0005 -> no
+  gbt   P: neg 2149 pos 3851 rate_b 0.0000 rate_c 0.0000 fr 4 delta 0.0000 [0.0000,0.0000] union 0.0019 roc0 0.0014 auc 0.5175 null_auc_max 0.5152 null_roc0_max 0.0009 -> no
+  cost pop=U n=17 m=2 w=0: gbt filter 54.0 per target, decomposer 1391.8 per target, saved by refutation 0.0 -> net -0.0388 of decomposer work
+  cost pop=U n=17 m=2 w=0.1: gbt filter 109.2 per target, decomposer 1661.7 per target, saved by refutation 0.0 -> net -0.0657 of decomposer work
+  cost pop=U n=17 m=2 w=1: gbt filter 606.0 per target, decomposer 4090.9 per target, saved by refutation 0.0 -> net -0.1481 of decomposer work
+cell pop=U n=17 m=3 l=6: targets 20000 positives 4997 false refutations of arm b 0
+  control planted_trace lr: PASS
+   lr ALL: neg 15003 pos 4997 rate_b 0.2655 rate_c 0.0000 fr 1 delta -0.2655 [-0.2726,-0.2589] union 0.2657 roc0 0.2676 auc 0.6926 null_auc_max 0.5078 null_roc0_max 0.0016 -> no
+   lr   T: neg 5994 pos 2006 rate_b 0.6647 rate_c 0.6645 fr 0 delta -0.0002 [-0.0005,0.0000] union 0.6647 roc0 0.6645 auc 0.8320 null_auc_max 0.5145 null_roc0_max 0.0015 -> no
+   lr   G: neg 4611 pos 1389 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0004 roc0 0.0024 auc 0.4986 null_auc_max 0.5168 null_roc0_max 0.0026 -> no
+   lr   P: neg 4398 pos 1602 rate_b 0.0000 rate_c 0.0002 fr 0 delta 0.0002 [0.0000,0.0007] union 0.0002 roc0 0.0048 auc 0.5105 null_auc_max 0.5161 null_roc0_max 0.0030 -> no
+  control planted_trace gbt: PASS
+  gbt ALL: neg 15003 pos 4997 rate_b 0.2655 rate_c 0.0000 fr 5 delta -0.2655 [-0.2725,-0.2591] union 0.2662 roc0 0.2667 auc 0.6966 null_auc_max 0.5009 null_roc0_max 0.0028 -> no
+  gbt   T: neg 5994 pos 2006 rate_b 0.6647 rate_c 0.6647 fr 0 delta 0.0000 [0.0000,0.0000] union 0.6647 roc0 0.6647 auc 0.8346 null_auc_max 0.5070 null_roc0_max 0.0030 -> no
+  gbt   G: neg 4611 pos 1389 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0004 roc0 0.0011 auc 0.4933 null_auc_max 0.5125 null_roc0_max 0.0033 -> no
+  gbt   P: neg 4398 pos 1602 rate_b 0.0000 rate_c 0.0000 fr 4 delta 0.0000 [0.0000,0.0000] union 0.0018 roc0 0.0030 auc 0.5088 null_auc_max 0.5155 null_roc0_max 0.0027 -> no
+  cost pop=U n=17 m=3 w=0: gbt filter 54.0 per target, decomposer 215.0 per target, saved by refutation 0.0 -> net -0.2512 of decomposer work
+  cost pop=U n=17 m=3 w=0.1: gbt filter 107.1 per target, decomposer 220.1 per target, saved by refutation 0.0 -> net -0.4866 of decomposer work
+  cost pop=U n=17 m=3 w=1: gbt filter 585.0 per target, decomposer 265.8 per target, saved by refutation 0.0 -> net -2.2008 of decomposer work
+cell pop=U n=19 m=2 l=10: targets 20000 positives 11085 false refutations of arm b 0
+  control planted_trace lr: PASS
+   lr ALL: neg 8915 pos 11085 rate_b 0.4461 rate_c 0.0000 fr 1 delta -0.4461 [-0.4566,-0.4360] union 0.4461 roc0 0.4462 auc 0.7551 null_auc_max 0.5682 null_roc0_max 0.0018 -> no
+   lr   T: neg 4543 pos 3457 rate_b 0.8754 rate_c 0.8754 fr 0 delta 0.0000 [0.0000,0.0000] union 0.8754 roc0 0.8754 auc 0.9377 null_auc_max 0.5069 null_roc0_max 0.0035 -> no
+   lr   G: neg 2136 pos 3864 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0005 auc 0.5150 null_auc_max 0.5103 null_roc0_max 0.0009 -> no
+   lr   P: neg 2236 pos 3764 rate_b 0.0000 rate_c 0.0000 fr 0 delta 0.0000 [0.0000,0.0000] union 0.0000 roc0 0.0000 auc 0.5014 null_auc_max 0.5192 null_roc0_max 0.0009 -> no
+  control planted_trace gbt: PASS
+  gbt ALL: neg 8915 pos 11085 rate_b 0.4461 rate_c 0.0000 fr 1 delta -0.4461 [-0.4568,-0.4362] union 0.4466 roc0 0.4469 auc 0.7581 null_auc_max 0.5805 null_roc0_max 0.0019 -> no
+  gbt   T: neg 4543 pos 3457 rate_b 0.8754 rate_c 0.8754 fr 0 delta 0.0000 [0.0000,0.0000] union 0.8754 roc0 0.8754 auc 0.9339 null_auc_max 0.5099 null_roc0_max 0.0035 -> no
+  gbt   G: neg 2136 pos 3864 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0014 roc0 0.0019 auc 0.5064 null_auc_max 0.5151 null_roc0_max 0.0005 -> no
+  gbt   P: neg 2236 pos 3764 rate_b 0.0000 rate_c 0.0004 fr 0 delta 0.0004 [0.0000,0.0013] union 0.0004 roc0 0.0013 auc 0.4996 null_auc_max 0.5142 null_roc0_max 0.0009 -> no
+  cost pop=U n=19 m=2 w=0: gbt filter 57.0 per target, decomposer 2407.8 per target, saved by refutation 0.0 -> net -0.0237 of decomposer work
+  cost pop=U n=19 m=2 w=0.1: gbt filter 113.5 per target, decomposer 3007.2 per target, saved by refutation 0.0 -> net -0.0377 of decomposer work
+  cost pop=U n=19 m=2 w=1: gbt filter 622.0 per target, decomposer 8402.1 per target, saved by refutation 0.0 -> net -0.0740 of decomposer work
+cell pop=U n=19 m=3 l=7: targets 20000 positives 7984 false refutations of arm b 0
+  control planted_trace lr: PASS
+   lr ALL: neg 12016 pos 7984 rate_b 0.3386 rate_c 0.0000 fr 7 delta -0.3386 [-0.3470,-0.3301] union 0.3390 roc0 0.3388 auc 0.7220 null_auc_max 0.5151 null_roc0_max 0.0019 -> no
+   lr   T: neg 5186 pos 2814 rate_b 0.7846 rate_c 0.7846 fr 0 delta 0.0000 [0.0000,0.0000] union 0.7846 roc0 0.7846 auc 0.8944 null_auc_max 0.5123 null_roc0_max 0.0042 -> no
+   lr   G: neg 3595 pos 2405 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0003 roc0 0.0000 auc 0.4924 null_auc_max 0.5143 null_roc0_max 0.0017 -> no
+   lr   P: neg 3235 pos 2765 rate_b 0.0000 rate_c 0.0000 fr 6 delta 0.0000 [0.0000,0.0000] union 0.0012 roc0 0.0006 auc 0.5049 null_auc_max 0.5124 null_roc0_max 0.0015 -> no
+  control planted_trace gbt: PASS
+  gbt ALL: neg 12016 pos 7984 rate_b 0.3386 rate_c 0.0000 fr 5 delta -0.3386 [-0.3468,-0.3299] union 0.3394 roc0 0.3393 auc 0.7264 null_auc_max 0.5185 null_roc0_max 0.0028 -> no
+  gbt   T: neg 5186 pos 2814 rate_b 0.7846 rate_c 0.7846 fr 0 delta 0.0000 [0.0000,0.0000] union 0.7846 roc0 0.7846 auc 0.8989 null_auc_max 0.5160 null_roc0_max 0.0064 -> no
+  gbt   G: neg 3595 pos 2405 rate_b 0.0000 rate_c 0.0000 fr 2 delta 0.0000 [0.0000,0.0000] union 0.0008 roc0 0.0006 auc 0.4938 null_auc_max 0.5182 null_roc0_max 0.0011 -> no
+  gbt   P: neg 3235 pos 2765 rate_b 0.0000 rate_c 0.0000 fr 3 delta 0.0000 [0.0000,0.0000] union 0.0019 roc0 0.0019 auc 0.4938 null_auc_max 0.5112 null_roc0_max 0.0012 -> no
+  cost pop=U n=19 m=3 w=0: gbt filter 57.0 per target, decomposer 378.5 per target, saved by refutation 0.0 -> net -0.1506 of decomposer work
+  cost pop=U n=19 m=3 w=0.1: gbt filter 111.4 per target, decomposer 387.0 per target, saved by refutation 0.0 -> net -0.2879 of decomposer work
+  cost pop=U n=19 m=3 w=1: gbt filter 601.0 per target, decomposer 463.0 per target, saved by refutation 0.0 -> net -1.2981 of decomposer work
+cell pop=U n=23 m=3 l=8: targets 20000 positives 5222 false refutations of arm b 0
+  control planted_trace lr: PASS
+   lr ALL: neg 14778 pos 5222 rate_b 0.2645 rate_c 0.0000 fr 2 delta -0.2645 [-0.2713,-0.2577] union 0.2649 roc0 0.2651 auc 0.6661 null_auc_max 0.5091 null_roc0_max 0.0014 -> no
+   lr   T: neg 6042 pos 1958 rate_b 0.6470 rate_c 0.6470 fr 0 delta 0.0000 [0.0000,0.0000] union 0.6470 roc0 0.6470 auc 0.8252 null_auc_max 0.5144 null_roc0_max 0.0023 -> no
+   lr   G: neg 4336 pos 1664 rate_b 0.0000 rate_c 0.0005 fr 0 delta 0.0005 [0.0000,0.0012] union 0.0005 roc0 0.0014 auc 0.5008 null_auc_max 0.5182 null_roc0_max 0.0016 -> no
+   lr   P: neg 4400 pos 1600 rate_b 0.0000 rate_c 0.0000 fr 2 delta 0.0000 [0.0000,0.0000] union 0.0007 roc0 0.0005 auc 0.4883 null_auc_max 0.5087 null_roc0_max 0.0016 -> no
+  control planted_trace gbt: PASS
+  gbt ALL: neg 14778 pos 5222 rate_b 0.2645 rate_c 0.0000 fr 5 delta -0.2645 [-0.2714,-0.2574] union 0.2659 roc0 0.2663 auc 0.6945 null_auc_max 0.5104 null_roc0_max 0.0020 -> no
+  gbt   T: neg 6042 pos 1958 rate_b 0.6470 rate_c 0.6470 fr 0 delta 0.0000 [0.0000,0.0000] union 0.6470 roc0 0.6470 auc 0.8316 null_auc_max 0.5186 null_roc0_max 0.0048 -> no
+  gbt   G: neg 4336 pos 1664 rate_b 0.0000 rate_c 0.0021 fr 0 delta 0.0021 [0.0009,0.0035] union 0.0021 roc0 0.0032 auc 0.5081 null_auc_max 0.5218 null_roc0_max 0.0023 -> no
+  gbt   P: neg 4400 pos 1600 rate_b 0.0000 rate_c 0.0000 fr 5 delta 0.0000 [0.0000,0.0000] union 0.0027 roc0 0.0030 auc 0.5007 null_auc_max 0.5203 null_roc0_max 0.0016 -> no
+  cost pop=U n=23 m=3 w=0: gbt filter 62.0 per target, decomposer 814.3 per target, saved by refutation 0.0 -> net -0.0761 of decomposer work
+  cost pop=U n=23 m=3 w=0.1: gbt filter 118.3 per target, decomposer 834.6 per target, saved by refutation 0.0 -> net -0.1417 of decomposer work
+  cost pop=U n=23 m=3 w=1: gbt filter 625.0 per target, decomposer 1017.0 per target, saved by refutation 0.0 -> net -0.6145 of decomposer work
+cell pop=U n=29 m=2 l=15: targets 20000 positives 11107 false refutations of arm b 0
+  control planted_trace lr: PASS
+   lr ALL: neg 8893 pos 11107 rate_b 0.4496 rate_c 0.0000 fr 6 delta -0.4496 [-0.4595,-0.4394] union 0.4498 roc0 0.4498 auc 0.7598 null_auc_max 0.5647 null_roc0_max 0.0015 -> no
+   lr   T: neg 4512 pos 3488 rate_b 0.8861 rate_c 0.8861 fr 0 delta 0.0000 [0.0000,0.0000] union 0.8861 roc0 0.8861 auc 0.9428 null_auc_max 0.5100 null_roc0_max 0.0027 -> no
+   lr   G: neg 2206 pos 3794 rate_b 0.0000 rate_c 0.0000 fr 4 delta 0.0000 [0.0000,0.0000] union 0.0005 roc0 0.0005 auc 0.5083 null_auc_max 0.5071 null_roc0_max 0.0009 -> no
+   lr   P: neg 2175 pos 3825 rate_b 0.0000 rate_c 0.0000 fr 2 delta 0.0000 [0.0000,0.0000] union 0.0005 roc0 0.0005 auc 0.5013 null_auc_max 0.5113 null_roc0_max 0.0014 -> no
+  control planted_trace gbt: PASS
+  gbt ALL: neg 8893 pos 11107 rate_b 0.4496 rate_c 0.0000 fr 4 delta -0.4496 [-0.4604,-0.4391] union 0.4499 roc0 0.4497 auc 0.7664 null_auc_max 0.5865 null_roc0_max 0.0015 -> no
+  gbt   T: neg 4512 pos 3488 rate_b 0.8861 rate_c 0.8861 fr 0 delta 0.0000 [0.0000,0.0000] union 0.8861 roc0 0.8861 auc 0.9420 null_auc_max 0.5093 null_roc0_max 0.0029 -> no
+  gbt   G: neg 2206 pos 3794 rate_b 0.0000 rate_c 0.0000 fr 3 delta 0.0000 [0.0000,0.0000] union 0.0009 roc0 0.0000 auc 0.5164 null_auc_max 0.5097 null_roc0_max 0.0005 -> no
+  gbt   P: neg 2175 pos 3825 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0005 roc0 0.0005 auc 0.5064 null_auc_max 0.5173 null_roc0_max 0.0000 -> no
+  cost pop=U n=29 m=2 w=0: gbt filter 68.0 per target, decomposer 68587.3 per target, saved by refutation 0.0 -> net -0.0010 of decomposer work
+  cost pop=U n=29 m=2 w=0.1: gbt filter 131.0 per target, decomposer 97353.0 per target, saved by refutation 0.0 -> net -0.0013 of decomposer work
+  cost pop=U n=29 m=2 w=1: gbt filter 698.0 per target, decomposer 356244.1 per target, saved by refutation 0.0 -> net -0.0020 of decomposer work
+cell pop=U n=29 m=3 l=10: targets 20000 positives 5195 false refutations of arm b 0
+  control planted_trace lr: PASS
+   lr ALL: neg 14805 pos 5195 rate_b 0.2712 rate_c 0.0000 fr 5 delta -0.2712 [-0.2782,-0.2640] union 0.2720 roc0 0.2719 auc 0.6812 null_auc_max 0.5092 null_roc0_max 0.0014 -> no
+   lr   T: neg 6013 pos 1987 rate_b 0.6677 rate_c 0.6677 fr 0 delta 0.0000 [0.0000,0.0000] union 0.6677 roc0 0.6677 auc 0.8367 null_auc_max 0.5145 null_roc0_max 0.0022 -> no
+   lr   G: neg 4481 pos 1519 rate_b 0.0000 rate_c 0.0000 fr 1 delta 0.0000 [0.0000,0.0000] union 0.0013 roc0 0.0016 auc 0.4973 null_auc_max 0.5130 null_roc0_max 0.0031 -> no
+   lr   P: neg 4311 pos 1689 rate_b 0.0000 rate_c 0.0000 fr 4 delta 0.0000 [0.0000,0.0000] union 0.0014 roc0 0.0009 auc 0.4979 null_auc_max 0.5160 null_roc0_max 0.0019 -> no
+  control planted_trace gbt: PASS
+  gbt ALL: neg 14805 pos 5195 rate_b 0.2712 rate_c 0.0000 fr 19 delta -0.2712 [-0.2791,-0.2640] union 0.2734 roc0 0.2713 auc 0.6905 null_auc_max 0.5068 null_roc0_max 0.0021 -> no
+  gbt   T: neg 6013 pos 1987 rate_b 0.6677 rate_c 0.6677 fr 0 delta 0.0000 [0.0000,0.0000] union 0.6677 roc0 0.6677 auc 0.8388 null_auc_max 0.5117 null_roc0_max 0.0035 -> no
+  gbt   G: neg 4481 pos 1519 rate_b 0.0000 rate_c 0.0000 fr 12 delta 0.0000 [0.0000,0.0000] union 0.0040 roc0 0.0004 auc 0.4869 null_auc_max 0.5123 null_roc0_max 0.0013 -> no
+  gbt   P: neg 4311 pos 1689 rate_b 0.0000 rate_c 0.0000 fr 7 delta 0.0000 [0.0000,0.0000] union 0.0035 roc0 0.0000 auc 0.4892 null_auc_max 0.5120 null_roc0_max 0.0012 -> no
+  cost pop=U n=29 m=3 w=0: gbt filter 68.0 per target, decomposer 3043.8 per target, saved by refutation 0.0 -> net -0.0223 of decomposer work
+  cost pop=U n=29 m=3 w=0.1: gbt filter 127.5 per target, decomposer 3125.0 per target, saved by refutation 0.0 -> net -0.0408 of decomposer work
+  cost pop=U n=29 m=3 w=1: gbt filter 663.0 per target, decomposer 3855.8 per target, saved by refutation 0.0 -> net -0.1719 of decomposer work
+false refutations of arm b over all cell-populations: 0
+VERDICT population S: MATCHES (primitive): no cell and base type gives the learned filter a refutation rate 5 points above the trace filter at zero false refutations with the null band excluded
+VERDICT population U: MATCHES (primitive): no cell and base type gives the learned filter a refutation rate 5 points above the trace filter at zero false refutations with the null band excluded
+VERDICT OVERALL (population U): MATCHES (primitive): no cell and base type gives the learned filter a refutation rate 5 points above the trace filter at zero false refutations with the null band excluded

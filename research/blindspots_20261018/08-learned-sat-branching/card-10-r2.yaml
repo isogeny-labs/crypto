@@ -1,0 +1,71 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-08-10-r2
+experiment_id: BLINDSPOT-08
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/08-learned-sat-branching/raw/receipt-card-10-r2.json
+must_not_exist:
+  - research/blindspots_20261018/08-learned-sat-branching/raw/card-10-r2-build.stdout.log
+  - research/blindspots_20261018/08-learned-sat-branching/raw/card-10-r2-build.stderr.log
+  - research/blindspots_20261018/08-learned-sat-branching/raw/summary-primary-r2.txt
+  - research/blindspots_20261018/08-learned-sat-branching/raw/summary-primary-r2.stderr.log
+  - research/blindspots_20261018/08-learned-sat-branching/raw/summary-secondary-r2.txt
+  - research/blindspots_20261018/08-learned-sat-branching/raw/summary-secondary-r2.stderr.log
+  - research/blindspots_20261018/08-learned-sat-branching/raw/summary-cms-r2.txt
+  - research/blindspots_20261018/08-learned-sat-branching/raw/summary-cms-r2.stderr.log
+binds:
+  - {path: examples/blindspots_08_learned_branching.rs, sha256: 02478185f7001474c7510e5dd87f3eb5aca0d5ff5a536760f226e2fd892a280a}
+  - {path: research/blindspots_20261018/08-learned-sat-branching/raw/test-n31-r2.jsonl, sha256: 11853e0ab0399ee8651b0c7b950638a450277717072af4a738322c883e32b205}
+  - {path: research/blindspots_20261018/08-learned-sat-branching/raw/test-n33-r2.jsonl, sha256: c6ea9e3acfcec78e9216ee696461c672f09fbacd5ef08d2798c502b95ed47886}
+  - {path: research/blindspots_20261018/08-learned-sat-branching/raw/test-n35-r2.jsonl, sha256: ee5ba2f8cb4e06d673f8e9edea5a27496ef2ce5b39890d43d77b326e1d8a2b4c}
+  - {path: research/blindspots_20261018/08-learned-sat-branching/raw/test-n37-r2.jsonl, sha256: 101e284e3fac47ecace8dc002610dc9a51a2a7d1e6787b6c839916aab5ef1332}
+  - {path: research/blindspots_20261018/08-learned-sat-branching/raw/sec-l6-n31-r2.jsonl, sha256: c4cd47c691b5cf60ecaa025bb06b40f6b7d6c97e1de1ff68be2f56b51be69f21}
+  - {path: research/blindspots_20261018/08-learned-sat-branching/raw/sec-l6-n37-r2.jsonl, sha256: f2bfbbbb77f6e0aae169c4f0f833104c404f19e401d475922309c139fcc11d90}
+  - {path: research/blindspots_20261018/08-learned-sat-branching/raw/cms-n31-planted-r2.jsonl, sha256: 4e88c3deafd4df34fc88569e00b5c76d7b0ac3235549c97b1ea628bf5fbf35ea}
+  - {path: research/blindspots_20261018/08-learned-sat-branching/raw/cms-n31-random-r2.jsonl, sha256: 1c875d31aa33c102e01514f53605d4c436a2ed7887304625858e9e2063fb88ec}
+commands:
+  - id: make-work-dir
+    argv: [mkdir, -p, target/blindspots-08/card-10-r2]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+  - id: build
+    argv: [prlimit, "--as=4294967296", rustc, --edition, "2021", -C, "opt-level=3", -C, "codegen-units=1", -C, "target-cpu=native", -o, target/blindspots-08/card-10-r2/b08, examples/blindspots_08_learned_branching.rs]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/08-learned-sat-branching/raw/card-10-r2-build.stdout.log
+    stderr: research/blindspots_20261018/08-learned-sat-branching/raw/card-10-r2-build.stderr.log
+  - id: summary-primary
+    argv: [prlimit, "--as=4294967296", target/blindspots-08/card-10-r2/b08, summarize, --files, "research/blindspots_20261018/08-learned-sat-branching/raw/test-n31-r2.jsonl,research/blindspots_20261018/08-learned-sat-branching/raw/test-n33-r2.jsonl,research/blindspots_20261018/08-learned-sat-branching/raw/test-n35-r2.jsonl,research/blindspots_20261018/08-learned-sat-branching/raw/test-n37-r2.jsonl", --sizes, "31,33,35,37", --incumbent, a, --cands, "b,b2,c", --controls, "bs,b2s,d,a2", --threshold, "1.3", --min-pairs, "100", --boots, "10000"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/08-learned-sat-branching/raw/summary-primary-r2.txt
+    stderr: research/blindspots_20261018/08-learned-sat-branching/raw/summary-primary-r2.stderr.log
+  - id: summary-secondary
+    argv: [prlimit, "--as=4294967296", target/blindspots-08/card-10-r2/b08, summarize, --files, "research/blindspots_20261018/08-learned-sat-branching/raw/sec-l6-n31-r2.jsonl,research/blindspots_20261018/08-learned-sat-branching/raw/sec-l6-n37-r2.jsonl", --sizes, "31,37", --incumbent, a, --cands, "b,b2,c", --controls, "bs,b2s,d,a2", --threshold, "1.3", --min-pairs, "12", --boots, "10000"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/08-learned-sat-branching/raw/summary-secondary-r2.txt
+    stderr: research/blindspots_20261018/08-learned-sat-branching/raw/summary-secondary-r2.stderr.log
+  - id: summary-cms
+    argv: [prlimit, "--as=4294967296", target/blindspots-08/card-10-r2/b08, summarize, --files, "research/blindspots_20261018/08-learned-sat-branching/raw/cms-n31-planted-r2.jsonl,research/blindspots_20261018/08-learned-sat-branching/raw/cms-n31-random-r2.jsonl", --sizes, "31", --incumbent, a, --cands, none, --controls, e, --min-pairs, "6", --boots, "10000"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/08-learned-sat-branching/raw/summary-cms-r2.txt
+    stderr: research/blindspots_20261018/08-learned-sat-branching/raw/summary-cms-r2.stderr.log
+  - id: remove-work-dir
+    argv: [rm, -rf, target/blindspots-08/card-10-r2]
+    timeout_seconds: 20
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-08
+background: false
+write_scope:
+  - research/blindspots_20261018/08-learned-sat-branching/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."

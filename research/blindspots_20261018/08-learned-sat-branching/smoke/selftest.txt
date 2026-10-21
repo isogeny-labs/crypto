@@ -1,0 +1,13 @@
+selftest field-axioms-and-s3-symmetry: PASS
+selftest e-form of S_4 == resultant == symmetric in 4 arguments (300 random points, n=31): PASS
+  small cells: 18 satisfiable, 24 unsatisfiable draws, 113 models in all
+selftest engine find-all == brute force over the core == field evaluation (3 orders): PASS
+selftest first-solution verdicts agree with the exact count and models verify (2 orders): PASS
+selftest chain-DP count <= direct count (degenerate solutions only add): PASS
+selftest both satisfiable and unsatisfiable draws seen: PASS
+  learner rmse on a synthetic law: linear 0.2443, gbt 0.0431
+selftest ridge fits a linear law: PASS
+selftest gbt fits a law with a step: PASS
+selftest model text round trip: PASS
+selftest rss_peak_kb 3248
+SELFTEST OK

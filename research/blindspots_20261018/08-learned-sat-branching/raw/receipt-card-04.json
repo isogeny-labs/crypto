@@ -1,0 +1,245 @@
+{
+  "card_id": "CARD-BLINDSPOT-08-04",
+  "card_path": "research/blindspots_20261018/08-learned-sat-branching/card-04.yaml",
+  "card_sha256": "c70be3fc5ad550e5493bff85c8628627c05d865bdb76b338e57d3319f2745091",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-08/card-04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-08/card-04/b08",
+        "examples/blindspots_08_learned_branching.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 7.614,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 7.614,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-08/card-04/b08",
+        "fit",
+        "--samples",
+        "research/blindspots_20261018/08-learned-sat-branching/raw/samples-n23.txt,research/blindspots_20261018/08-learned-sat-branching/raw/samples-n25.txt,research/blindspots_20261018/08-learned-sat-branching/raw/samples-n27.txt,research/blindspots_20261018/08-learned-sat-branching/raw/samples-n29.txt",
+        "--out",
+        "research/blindspots_20261018/08-learned-sat-branching/raw/model.txt",
+        "--val-ns",
+        "23,25,27,29",
+        "--val-p",
+        "2",
+        "--val-r",
+        "2",
+        "--ell",
+        "5",
+        "--seed",
+        "20261018",
+        "--kappa",
+        "0.1",
+        "--cap",
+        "200000000"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 59.166,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fit",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/08-learned-sat-branching/raw/model.txt": "00f0d29d6f0535b91ca3ab0bbc1c76dbb19085fce325c5b77aabed0479b60809"
+      },
+      "seconds": 59.166,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "7aebc7a99dde27245594eb1e08adc518a20fef8c3ed3a59330c921e53b94295e",
+      "stdout_tail": [
+        "fit: 1944 sample rows from 4 files",
+        "fit: 16 validation instances",
+        "fit: root states 24, mean oracle gain of the best first variable over the incumbent's first variable: 1.0036x",
+        "fit: validation mean log2 cost: identity 20.2961  b_lin 19.8471  b_gbt 20.3625",
+        "fit: validation mean log2 cost: b2_lin 20.5642  b2_gbt 20.6178",
+        "fit: validation mean log2 cost: cube full=lin dcut=2 k=3 19.9773",
+        "fit: validation mean log2 cost: cube full=lin dcut=2 k=5 19.9872",
+        "fit: validation mean log2 cost: cube full=lin dcut=4 k=3 20.3189",
+        "fit: validation mean log2 cost: cube full=lin dcut=4 k=5 20.3286",
+        "fit: validation mean log2 cost: cube full=lin dcut=6 k=3 20.3788",
+        "fit: validation mean log2 cost: cube full=lin dcut=6 k=5 20.3480",
+        "fit: validation mean log2 cost: cube full=gbt dcut=2 k=3 20.0141",
+        "fit: validation mean log2 cost: cube full=gbt dcut=2 k=5 20.0258",
+        "fit: validation mean log2 cost: cube full=gbt dcut=4 k=3 20.0646",
+        "fit: validation mean log2 cost: cube full=gbt dcut=4 k=5 19.9087",
+        "fit: validation mean log2 cost: cube full=gbt dcut=6 k=3 20.1044",
+        "fit: validation mean log2 cost: cube full=gbt dcut=6 k=5 19.8457",
+        "fit: wrote research/blindspots_20261018/08-learned-sat-branching/raw/model.txt"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-08/card-04/b08"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-08/card-04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "65f8ebb1bdbc44b57f8bb9da4bd3557bde9a430b",
+  "dirty_after": [
+    "esearch/blindspots_20261018/09-learned-f4-policy/smoke/control-p1.jsonl",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/fit.stderr.log",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/fit.txt",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/model.txt",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/eval-8-2-4-planted.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/eval-8-2-4-test.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/eval-8-3-3-planted.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/eval-8-3-3-test.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/fit-8-2-4.json",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/fit-8-3-3.json",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/model-8-2-4.model",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/model-8-2-4.samples.0",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/model-8-2-4.trace.0",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/model-8-3-3.model",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/model-8-3-3.samples.0",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/model-8-3-3.trace.0",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/train-8-2-4.jsonl",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/train-8-3-3.jsonl"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/09-learned-f4-policy/card-01.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-02.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-03.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-04.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-05.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-06.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-07.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-08.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-09.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-10.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-11.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-12.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-13.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-14.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-15.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-16.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-17.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-18.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-19.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-20.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-21.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-22.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-23.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-24.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-25.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/card-26.yaml",
+    "research/blindspots_20261018/09-learned-f4-policy/smoke/selftest.txt"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

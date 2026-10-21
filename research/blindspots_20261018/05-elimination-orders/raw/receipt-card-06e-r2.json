@@ -1,0 +1,213 @@
+{
+  "card_id": "CARD-BLINDSPOT-05-06e-r2",
+  "card_path": "research/blindspots_20261018/05-elimination-orders/card-06e-r2.yaml",
+  "card_sha256": "ed21ec6096dde5d1968fa93982c084db4e98f72050ac483742072058c4ca3553",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-05/card-06e-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-05/card-06e-r2/b05",
+        "examples/blindspots_05_elimination_orders.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.258,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 4.258,
+      "stderr_sha256": "68c726b2922de2b59f9658ee1bf338ad10c01ad3911f3a25af38414155bbe22c",
+      "stderr_tail": [
+        "    |",
+        "458 | fn poly_degree(p: &Poly) -> u32 {",
+        "    |    ^^^^^^^^^^^",
+        "",
+        "warning: field `nv` is never read",
+        "   --> examples/blindspots_05_elimination_orders.rs:549:5",
+        "    |",
+        "548 | struct Order {",
+        "    |        ----- field in this struct",
+        "549 |     nv: usize,",
+        "    |     ^^",
+        "",
+        "warning: constant `FIXED_ARMS` is never used",
+        "    --> examples/blindspots_05_elimination_orders.rs:1334:7",
+        "     |",
+        "1334 | const FIXED_ARMS: [&str; 6] = [\"grevlex\", \"blkLI\", \"blkIL\", \"wdeg\", \"mindeg\", \"tw\"];",
+        "     |       ^^^^^^^^^^",
+        "",
+        "warning: 4 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-05/card-06e-r2/b05",
+        "run",
+        "--draws",
+        "research/blindspots_20261018/05-elimination-orders/draws.tsv",
+        "--cell",
+        "c15-3-4",
+        "--targets",
+        "5",
+        "--arms",
+        "rand1,rand2,rand3,rand4,rand5,rand6,rand7",
+        "--time-limit",
+        "60",
+        "--total-limit",
+        "300"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 195.577,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "main-c15-3-4-t5",
+      "index": 3,
+      "outputs": {},
+      "seconds": 195.577,
+      "stderr_sha256": "ca994688df4e26669293f24323380be98b2e4d5339789449f2004c7b06648b36",
+      "stderr_tail": [
+        "c15-3-4 t5 rand1: refuted D=4 steps=17 touches=14405506039 30.1s",
+        "c15-3-4 t5 rand2: refuted D=4 steps=17 touches=13816510653 26.3s",
+        "c15-3-4 t5 rand3: refuted D=4 steps=17 touches=11236716167 22.9s",
+        "c15-3-4 t5 rand4: refuted D=4 steps=17 touches=13150076950 30.2s",
+        "c15-3-4 t5 rand5: refuted D=4 steps=17 touches=11782733585 25.3s",
+        "c15-3-4 t5 rand6: refuted D=4 steps=17 touches=16568893845 34.3s",
+        "c15-3-4 t5 rand7: refuted D=4 steps=17 touches=11418479388 26.4s"
+      ],
+      "stdout_sha256": "d655619c1d3eb2790d284134f542f3ac2cfe81fe324042dd5a5089bf07254c0b",
+      "stdout_tail": [
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"rand1\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_sel\":29928,\"pairs_gen\":89967,\"rows_max\":50681,\"cols_max\":59104,\"rc_max\":2692326763,\"nnz_max\":22783138,\"cols_sum\":166979,\"rows_sum\":130635,\"touches\":14405506039,\"build\":25906675,\"elim\":13895394361,\"back\":484205003,\"zero_red\":23193,\"new_elems\":6735,\"g_size\":6780,\"ms\":30123.0,\"ms_sym\":416.0,\"ms_elim\":27331.2,\"ms_back\":551.0,\"ms_add\":1229.3,\"rss_kb\":208020,\"step_rows\":[14,4,432,451,2034,204,446,13458,31,2204,34974,2640,2878,2668,50681,11574,5942],\"step_cols\":[63,41,1821,472,586,142,1239,21229,33,4228,59104,4234,4241,4025,53123,6910,5488],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"rand2\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_sel\":30474,\"pairs_gen\":105407,\"rows_max\":44037,\"cols_max\":53063,\"rc_max\":2041819542,\"nnz_max\":21023048,\"cols_sum\":151404,\"rows_sum\":115378,\"touches\":13816510653,\"build\":24076807,\"elim\":13100637968,\"back\":691795878,\"zero_red\":23437,\"new_elems\":7037,\"g_size\":7082,\"ms\":26346.9,\"ms_sym\":294.3,\"ms_elim\":23613.5,\"ms_back\":851.0,\"ms_add\":1176.9,\"rss_kb\":209468,\"step_rows\":[14,4,429,440,2050,202,543,13372,74,2011,28985,2216,2384,2030,44037,10899,5688],\"step_cols\":[63,24,1820,461,602,140,1336,21104,87,3925,53063,3810,3747,3387,46366,6235,5234],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"rand3\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_sel\":30571,\"pairs_gen\":94705,\"rows_max\":49184,\"cols_max\":58503,\"rc_max\":2531893952,\"nnz_max\":19774543,\"cols_sum\":165802,\"rows_sum\":128732,\"touches\":11236716167,\"build\":22672528,\"elim\":10652143272,\"back\":561900367,\"zero_red\":23356,\"new_elems\":7215,\"g_size\":7260,\"ms\":22862.9,\"ms_sym\":332.4,\"ms_elim\":20019.4,\"ms_back\":696.9,\"ms_add\":1356.9,\"rss_kb\":209468,\"step_rows\":[14,2,426,448,2040,203,437,13834,30,2300,34442,2556,2684,2482,49184,11633,6017],\"step_cols\":[63,1,1828,469,592,141,1230,21649,32,5248,58503,4150,4047,3839,51478,6969,5563],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"rand4\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_sel\":30836,\"pairs_gen\":106020,\"rows_max\":54499,\"cols_max\":57319,\"rc_max\":3083825915,\"nnz_max\":21435384,\"cols_sum\":167705,\"rows_sum\":131566,\"touches\":13150076950,\"build\":24499003,\"elim\":12561415799,\"back\":564162148,\"zero_red\":23462,\"new_elems\":7374,\"g_size\":7419,\"ms\":30197.2,\"ms_sym\":348.5,\"ms_elim\":26963.4,\"ms_back\":841.5,\"ms_add\":1531.7,\"rss_kb\":209316,\"step_rows\":[14,26,471,536,2097,214,369,13360,84,2107,33010,2373,2587,2378,54499,11524,5917],\"step_cols\":[63,73,1838,557,649,152,1162,21214,97,4021,57319,3967,3950,3735,56585,6860,5463],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"rand5\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_sel\":31045,\"pairs_gen\":104323,\"rows_max\":57504,\"cols_max\":60630,\"rc_max\":3420912960,\"nnz_max\":20581808,\"cols_sum\":180352,\"rows_sum\":137526,\"touches\":11782733585,\"build\":23064541,\"elim\":11094893630,\"back\":664775414,\"zero_red\":23746,\"new_elems\":7299,\"g_size\":7344,\"ms\":25290.6,\"ms_sym\":371.8,\"ms_elim\":22077.8,\"ms_back\":1019.2,\"ms_add\":1397.7,\"rss_kb\":209316,\"step_rows\":[14,14,433,462,2032,199,600,13046,61,2144,36583,2479,2689,2406,57504,11626,5234],\"step_cols\":[63,61,1822,483,584,137,1393,20799,63,5178,60630,5695,6265,5947,59490,6962,4780],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"rand6\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_sel\":30095,\"pairs_gen\":96366,\"rows_max\":55844,\"cols_max\":66209,\"rc_max\":3254197412,\"nnz_max\":24406866,\"cols_sum\":180737,\"rows_sum\":144050,\"touches\":16568893845,\"build\":26994225,\"elim\":15915358271,\"back\":626541349,\"zero_red\":23176,\"new_elems\":6919,\"g_size\":6964,\"ms\":34334.8,\"ms_sym\":387.6,\"ms_elim\":31564.5,\"ms_back\":777.2,\"ms_add\":1099.3,\"rss_kb\":234184,\"step_rows\":[14,5,423,453,2034,198,500,14582,70,2178,42116,2599,2815,2530,55844,11917,5772],\"step_cols\":[63,39,1815,474,586,136,1293,22400,75,4546,66209,4193,4178,3887,58273,7252,5318],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}",
+        "{\"cell\":\"c15-3-4\",\"m\":4,\"n\":15,\"ell\":3,\"nv\":42,\"target\":5,\"arm\":\"rand7\",\"solutions\":0,\"status\":\"refuted\",\"d_mat\":4,\"d_sel\":4,\"steps\":17,\"pairs_sel\":31063,\"pairs_gen\":97287,\"rows_max\":55534,\"cols_max\":60909,\"rc_max\":3204034130,\"nnz_max\":19395226,\"cols_sum\":172044,\"rows_sum\":136188,\"touches\":11418479388,\"build\":22425091,\"elim\":10851951189,\"back\":544103108,\"zero_red\":23866,\"new_elems\":7197,\"g_size\":7242,\"ms\":26385.6,\"ms_sym\":384.6,\"ms_elim\":23378.7,\"ms_back\":702.7,\"ms_add\":1416.4,\"rss_kb\":234076,\"step_rows\":[14,3,430,419,2023,194,527,13362,70,2090,37083,2473,2635,2515,55534,11203,5613],\"step_cols\":[63,22,1824,440,575,132,1320,21050,269,4110,60909,4067,3998,3872,57695,6539,5159],\"pg_edges\":681,\"pg_pairs\":861,\"width_mindeg\":32,\"width_minfill\":32}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-05/card-06e-r2/b05"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.007,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.007,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-05/card-06e-r2"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "a3962dc7a4528acdc0209cff4ea72b003703cc73",
+  "dirty_after": [
+    "research/blindspots_20261018/05-elimination-orders/raw/card-06e-r2-main-c15-3-4-t5.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-06e-r2-main-c15-3-4-t5.stdout.log"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/08-learned-sat-branching/raw/cms-n31-random-r2.jsonl",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/cms-n31-random-r2.stderr.log",
+    "research/blindspots_20261018/08-learned-sat-branching/raw/receipt-card-09b-r2.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

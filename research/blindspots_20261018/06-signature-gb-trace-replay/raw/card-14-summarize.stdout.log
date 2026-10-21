@@ -1,0 +1,68 @@
+# item 06 summary: arm X against f4, paired by target (targets 0..15)
+# cost(sigr,sign) = touches + touches(sig, held-out)/16; cost(f4r,f4n) = touches + touches(f4, held-out)/16; fallbacks are inside touches
+# R = touches(f4)/cost(X); a capped X (touchcap/timelimit) gives only the bound R <= touches(f4)/touches(X at the cap)
+cell      arm    refuted capped  gmean_R(exact)  gmean_R(<=,incl.caps)  n>=1.5  R(no trace charge)  zero(f4/X)  rc_max(f4/X)  mem(f4/X)  sym(f4/X)  fallbacks
+c13-3-4   sig     0/16   16             NaN             0.494*         0/0           NaN               NaN        NaN           NaN        NaN      0
+c13-3-4   f4r    16/16    0           0.885             0.885          0/16        0.927             1.000      1.000         3.699      1.000      16
+c13-3-4   f4n    16/16    0           1.120             1.120          2/16        1.199             1.548      0.321         3.713      0.447      0
+c13-3-4   f4rs    4/16    0           2.089             2.089          4/4         2.089           245.634      1.975         2.474      4.207      0
+c15-3-4   sig     0/16   15             NaN             1.677*         0/0           NaN               NaN        NaN           NaN        NaN      0
+c15-3-4   sig4    0/16    1             NaN             0.687*         0/0           NaN               NaN        NaN           NaN        NaN      0
+c15-3-4   sig0    0/16    1             NaN             0.679*         0/0           NaN               NaN        NaN           NaN        NaN      0
+c15-3-4   sigc    0/16    1             NaN             1.859*         0/0           NaN               NaN        NaN           NaN        NaN      0
+c15-3-4   f4rs    1/16    0           1.979             1.979          1/1         1.979           343.386      1.481         0.966      3.142      0
+c15-5-3   sig     0/16    8             NaN             0.498*         0/0           NaN               NaN        NaN           NaN        NaN      0
+c15-5-3   f4r     8/16    0           0.727             0.727          0/8         0.760             1.000      1.000         9.187      1.000      8
+c15-5-3   f4n     8/16    0           1.405             1.405          1/8         1.537             2.429      1.498         9.179      0.664      0
+c17-4-3   sig     0/16   16             NaN             0.492*         0/0           NaN               NaN        NaN           NaN        NaN      0
+c17-4-3   sig4    0/16    2             NaN             0.498*         0/0           NaN               NaN        NaN           NaN        NaN      0
+c17-4-3   sig0    0/16    2             NaN             0.499*         0/0           NaN               NaN        NaN           NaN        NaN      0
+c17-4-3   sigc    0/16    2             NaN             0.499*         0/0           NaN               NaN        NaN           NaN        NaN      0
+c17-4-3   f4r    16/16    0           0.587             0.587          0/16        0.606             1.000      1.000         4.149      1.000      16
+c17-4-3   f4n    16/16    0           1.160             1.160          0/16        1.239             2.626      0.937         4.245      0.938      0
+c17-4-3   f4rs    4/16    0           2.604             2.604          4/4         2.604           333.463      1.230         4.272      7.846      0
+c17-4-3   f4rx    4/16    0           0.999             0.999          0/4         0.999             1.000      1.000         2.043      1.000      4
+# first matrix with selection degree 4 (cumulative touches, cumulative zero reductions at its end)
+cell      target arm    touches_at_first_d4  zero_at_first_d4  (stage not reached: -)
+c13-3-4      0   f4            5307653            1459
+c13-3-4      0   sig           9958162               1
+c13-3-4      1   f4            3571575             986
+c13-3-4      1   sig           9284048               2
+c13-3-4      2   f4            5402402            1455
+c13-3-4      2   sig           9921979               1
+c13-3-4   first-d4-step gmean ratio f4/sig over 16 targets: touches 0.456, zero reductions 719.094
+c15-3-4      0   f4           12053267            1605
+c15-3-4      0   sig          20857536               2
+c15-3-4      1   f4           16680210            2135
+c15-3-4      1   sig          21655068               5
+c15-3-4      2   f4           13137512            2050
+c15-3-4      2   sig          21854394               1
+c15-3-4   first-d4-step gmean ratio f4/sig over 16 targets: touches 0.403, zero reductions 872.881
+c15-5-3      0   f4          270693958            1179
+c15-5-3      0   sig          27221767               5
+c15-5-3      1   f4          274935064            1209
+c15-5-3      1   sig          24478312               2
+c15-5-3      2   f4          270701830            1197
+c15-5-3      2   sig          25321809               3
+c15-5-3   first-d4-step gmean ratio f4/sig over 8 targets: touches 10.676, zero reductions 483.675
+c17-4-3      0   f4          194169864            2526
+c17-4-3      0   sig          50268554               3
+c17-4-3      1   f4          200048647            2528
+c17-4-3      1   sig          46782868               1
+c17-4-3      2   f4          196136188            2529
+c17-4-3      2   sig          45666520               2
+c17-4-3   first-d4-step gmean ratio f4/sig over 16 targets: touches 4.166, zero reductions 1519.015
+# sig: qualifies on 0 of 4 cells []; with the matrix and memory guard 0
+# sigr: qualifies on 0 of 4 cells []; with the matrix and memory guard 0
+# sig: R <= 1/1.5 certain (all 16 targets exact or bounded) on 2 of 4 cells ["c13-3-4", "c17-4-3"]
+# sigr on c17-4-3: BLOCKED for at least one target: the recording run of the trace did not refute (no trace)
+# sign on c17-4-3: BLOCKED for at least one target: the recording run of the trace did not refute (no trace)
+# sigr on c15-5-3: BLOCKED for at least one target: the recording run of the trace did not refute (no trace)
+# sign on c15-5-3: BLOCKED for at least one target: the recording run of the trace did not refute (no trace)
+# sigr on c13-3-4: BLOCKED for at least one target: the recording run of the trace did not refute (no trace)
+# sign on c13-3-4: BLOCKED for at least one target: the recording run of the trace did not refute (no trace)
+# sigr on c15-3-4: BLOCKED for at least one target: the recording run of the trace did not refute (no trace)
+# sign on c15-3-4: BLOCKED for at least one target: the recording run of the trace did not refute (no trace)
+# CONTROL f4rx on c17-4-3: ratio 0.9989 (4 fallbacks of 4) OK
+# arm (e) msolve: BLOCKED (not installed; no GMP/FLINT/MPFR headers; 3.8 GB disk free); would be unblocked by an msolve build with a matrix-entry counter
+VERDICT: INCONCLUSIVE (a cell has capped targets that do not bound the ratio below 1/1.5)
