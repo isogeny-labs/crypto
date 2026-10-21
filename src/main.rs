@@ -392,9 +392,9 @@ enum CryptanalysisOp {
     /// --ignored --nocapture` but accessible from the CLI.)
     Bench,
     /// Run applicable length-extension, truncated birthday, and
-    /// differential-bias checks for md4, md5, sha1, sha256, or sha3-256.
+    /// differential-bias checks for md4, md5, sha1, sha256, or SHA-3 fixed-output variants.
     HashAuto {
-        /// Hash identifier: md4, md5, sha1, sha256, or sha3-256.
+        /// Hash identifier: md4, md5, sha1, sha256, or sha3-{224,256,384,512}.
         #[arg(long)]
         hash: String,
     },

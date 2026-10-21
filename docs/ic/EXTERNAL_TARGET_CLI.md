@@ -378,3 +378,27 @@ faulted ciphertext through an injected round-9 byte fault.
 key and checks that forward expansion reproduces it. The example round key
 maps to master key `000102030405060708090a0b0c0d0e0f`. The output is in
 [`aes_dfa_schedule_public_report_20261018.json`](fixtures/aes_dfa_schedule_public_report_20261018.json).
+
+## SHA-family cryptanalysis adapters
+
+```sh
+crypto hash sha256 --hex 000102ff
+crypto hash sha3-224 --hex 000102ff
+crypto hash sha3-256 --hex 000102ff
+crypto hash sha3-384 --hex 000102ff
+crypto hash sha3-512 --hex 000102ff
+crypto cryptanalysis hash-auto --hash sha256
+crypto cryptanalysis hash-auto --hash sha3-224
+crypto cryptanalysis hash-auto --hash sha3-256
+crypto cryptanalysis hash-auto --hash sha3-384
+crypto cryptanalysis hash-auto --hash sha3-512
+```
+
+`hash-auto` runs a bounded 32-bit-truncated birthday search and a 4,096-trial
+single-input-bit differential-bias measurement for each SHA-3 fixed-output
+variant. These measurements concern truncated outputs and empirical bias;
+they do not establish collisions or differential weaknesses for the full
+digests. SHA-3 uses a sponge, so the command records that the
+Merkle-Damgård length-extension method does not apply. SHA-256 has a
+separate length-extension adapter with explicit prefix length and digest
+input. SHAKE output-length-specific attack adapters are not yet exposed.
