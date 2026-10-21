@@ -102,9 +102,13 @@
    "path": "research/la_engines_20261014/summary.json",
    "sha256": "b34650a95c5f106c8302dc5311194d8e1ffb798dff59b2669cda59818712f533"
   },
+  "pair_table_setup": {
+   "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
+   "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
+  },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
-   "sha256": "765f6e8d05ebbf75e7a3dddcbb886015274311589352b9107746976fb2a670d7"
+   "sha256": "0bc0d0f4401846519ff915db5cfb1f90ee638ba46555736de8a29e9e2888be7b"
   },
   "n83_tier1_cold_holdout": {
    "path": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
@@ -114,9 +118,13 @@
    "path": "research/ecbench_rho_optimized_20261014/RESULT.json",
    "sha256": "195f3c4e3565dc2669769893b86741cc58d95c982190f77a0052c70b7f847cf9"
   },
+  "jv_sieve_strong_rho": {
+   "path": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
+   "sha256": "8e4ff99df6a4ee539d6f8f02c5c768d0255538ddcb95eab97f1416ac388b9273"
+  },
   "registry": {
    "path": "docs/curves/registry.json",
-   "sha256": "b2ef8d0684b676a5052bb02cbf372a82bba1b6bd4ee03e4ea81676a19e5ca37d"
+   "sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf"
   },
   "curves_schema": {
    "path": "docs/curves/ic/curves.schema.json",
@@ -5648,6 +5656,1671 @@
    "fully_priced_cold_speedup": null
   }
  ],
+ "jv_sieve_weak_class": {
+  "source": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
+  "comparison_status": "withheld",
+  "comparison_blockers": [
+   "positive-control acceptance is unresolved: PROTOCOL.md says R0 S≈1.3 without a numeric tolerance",
+   "A/A acceptance is unresolved: PROTOCOL.md gives no numeric rule for samples differing beyond bootstrap intervals"
+  ],
+  "qualification": "research/jv_sieve_strong_rho_20261019/review-20261020/README.md",
+  "class": "historical measurement with comparison withheld; weak curve class only",
+  "scope": "Curves y^2 = h(x)(x - a)(x - sigma a) over F_{p^6} with full rational 2-torsion whose isogeny class contains a weak curve (about 55-63% of such curves, ledger 18.5). The class never has prime order. The cover's Jacobian has genus 3. Not a statement about any prime-order or generic curve.",
+  "rows": [
+   {
+    "p": 251,
+    "log2_l": 45.8292613842,
+    "ic_all_correct": true,
+    "ic_S": {
+     "ci95": [
+      4.63373776228,
+      34.6158912385
+     ],
+     "mean": 15.283757347,
+     "n": 16,
+     "sd": 37.3774619886
+    },
+    "ic_S_plus": {
+     "ci95": [
+      11.886846881,
+      78.9442578063
+     ],
+     "mean": 35.8428389216,
+     "n": 16,
+     "sd": 83.0058028457
+    },
+    "ic_wall_s": {
+     "ci95": [
+      26.2329069489,
+      160.356207599
+     ],
+     "mean": 74.6205832423,
+     "n": 16,
+     "sd": 165.073983431
+    },
+    "rho_S_harness": {
+     "ci95": [
+      0.635586020185,
+      1.01753253477
+     ],
+     "mean": 0.82736681204,
+     "n": 16,
+     "sd": 0.399752294921
+    },
+    "rho_S_tuned": {
+     "ci95": [
+      0.266621685998,
+      0.420773140416
+     ],
+     "mean": 0.344123174666,
+     "n": 16,
+     "sd": 0.166348638728
+    },
+    "rho_S_plus_harness": {
+     "ci95": [
+      0.742886826133,
+      1.19052645326
+     ],
+     "mean": 0.974923981909,
+     "n": 16,
+     "sd": 0.471141913524
+    },
+    "rho_S_plus_tuned": {
+     "ci95": [
+      0.379020671329,
+      0.60345208286
+     ],
+     "mean": 0.491680344536,
+     "n": 16,
+     "sd": 0.237738257334
+    },
+    "rho_steps_over_sqrt_l": {
+     "ci95": [
+      0.625917532232,
+      1.00637073562
+     ],
+     "mean": 0.822004294214,
+     "n": 16,
+     "sd": 0.399846976165
+    },
+    "rho_wall_s": {
+     "ci95": [
+      1.48107684556,
+      2.33013651981
+     ],
+     "mean": 1.90449585175,
+     "n": 16,
+     "sd": 0.896931481248
+    },
+    "rho_all_correct": true,
+    "ic_over_rho": {
+     "S_harness": {
+      "ci95": [
+       5.34543088804,
+       46.6030867547
+      ],
+      "n": 16,
+      "ratio": 18.4727706316
+     },
+     "S_plus_harness": {
+      "ci95": [
+       11.7093375167,
+       88.5613105092
+      ],
+      "n": 16,
+      "ratio": 36.7647525209
+     },
+     "S_plus_tuned": {
+      "ci95": [
+       22.9261143737,
+       175.647977124
+      ],
+      "n": 16,
+      "ratio": 72.8986613355
+     },
+     "S_tuned": {
+      "ci95": [
+       12.8580615881,
+       108.539955397
+      ],
+      "n": 16,
+      "ratio": 44.4136241676
+     }
+    },
+    "n_rho": 16,
+    "verdict": {
+     "reason": "frozen control acceptance criteria are not numerically executable",
+     "status": "withheld"
+    },
+    "band_ratio": [
+     {
+      "A_harness": {
+       "ci95": [
+        5.36913796274,
+        46.0259500778
+       ],
+       "n": 16,
+       "ratio": 18.4727706483
+      },
+      "A_tuned": {
+       "ci95": [
+        12.8110815856,
+        109.054945312
+       ],
+       "n": 16,
+       "ratio": 44.4136242077
+      },
+      "B_harness": {
+       "ci95": [
+        5.33035726111,
+        44.8490282379
+       ],
+       "n": 16,
+       "ratio": 18.4727706483
+      },
+      "B_tuned": {
+       "ci95": [
+        13.0975301873,
+        109.831490496
+       ],
+       "n": 16,
+       "ratio": 44.4136242077
+      },
+      "w": 0.0
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        44.0551751869,
+        291.758335357
+       ],
+       "n": 16,
+       "ratio": 126.118490936
+      },
+      "A_tuned": {
+       "ci95": [
+        47.8900393782,
+        314.614617698
+       ],
+       "n": 16,
+       "ratio": 137.775503827
+      },
+      "B_harness": {
+       "ci95": [
+        5.90187672821,
+        35.295344897
+       ],
+       "n": 16,
+       "ratio": 15.9488968843
+      },
+      "B_tuned": {
+       "ci95": [
+        7.98349979523,
+        47.3980134598
+       ],
+       "n": 16,
+       "ratio": 21.1169132481
+      },
+      "w": 0.1
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        49.8596797449,
+        328.601738446
+       ],
+       "n": 16,
+       "ratio": 142.256642625
+      },
+      "A_tuned": {
+       "ci95": [
+        50.097575815,
+        327.558397324
+       ],
+       "n": 16,
+       "ratio": 143.65430154
+      },
+      "B_harness": {
+       "ci95": [
+        6.26571094052,
+        29.3944078559
+       ],
+       "n": 16,
+       "ratio": 14.4208942997
+      },
+      "B_tuned": {
+       "ci95": [
+        6.65442372114,
+        31.0999200946
+       ],
+       "n": 16,
+       "ratio": 15.0106632166
+      },
+      "w": 1.0
+     }
+    ],
+    "ranked_across_band": {
+     "reason": "frozen control acceptance criteria unresolved",
+     "status": "withheld"
+    },
+    "dense_vs_sparse": {
+     "S_dense": 15.4943871385,
+     "S_dense_over_sparse": {
+      "ci95": [
+       1.00455445411,
+       1.04661596491
+      ],
+      "n": 16,
+      "ratio": 1.01378128341
+     },
+     "S_sparse": 15.283757347,
+     "descent_muls_dense_over_sparse": {
+      "ci95": [
+       1.28244667442,
+       1.28989603719
+      ],
+      "n": 16,
+      "ratio": 1.28576895729
+     },
+     "identical_descent_digest": 16,
+     "identical_outcome": 16,
+     "linear_stage_dense_over_sparse": {
+      "ci95": [
+       2.18827426565,
+       2.21910095304
+      ],
+      "n": 16,
+      "ratio": 2.20210332993
+     },
+     "paired_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+     ],
+     "pairs": 16,
+     "sparse_fallbacks_per_run": 7.5
+    },
+    "rho_arms": {
+     "R0": {
+      "ci95": [
+       1.03891875276,
+       1.76129189609
+      ],
+      "mean": 1.39571993418,
+      "n": 16,
+      "sd": 0.765041578829
+     },
+     "R1": {
+      "ci95": [
+       0.936336416452,
+       1.53826378182
+      ],
+      "mean": 1.24140338096,
+      "n": 16,
+      "sd": 0.635044581924
+     },
+     "R2": {
+      "ci95": [
+       0.81364247952,
+       1.23351937037
+      ],
+      "mean": 1.01833480338,
+      "n": 16,
+      "sd": 0.448801621211
+     },
+     "R3": {
+      "ci95": [
+       0.635586020185,
+       1.01753253477
+      ],
+      "mean": 0.82736681204,
+      "n": 16,
+      "sd": 0.399752294921
+     }
+    }
+   },
+   {
+    "p": 503,
+    "log2_l": 51.84648754,
+    "ic_all_correct": true,
+    "ic_S": {
+     "ci95": [
+      0.264396921526,
+      0.470774787291
+     ],
+     "mean": 0.362538359142,
+     "n": 16,
+     "sd": 0.220337913132
+    },
+    "ic_S_plus": {
+     "ci95": [
+      0.839353310137,
+      1.58948286234
+     ],
+     "mean": 1.19529066679,
+     "n": 16,
+     "sd": 0.799596397753
+    },
+    "ic_wall_s": {
+     "ci95": [
+      13.8302924154,
+      25.9153111411
+     ],
+     "mean": 19.4679645838,
+     "n": 16,
+     "sd": 12.7168534732
+    },
+    "rho_S_harness": {
+     "ci95": [
+      0.595965459284,
+      0.905184963686
+     ],
+     "mean": 0.758044693333,
+     "n": 16,
+     "sd": 0.326097778338
+    },
+    "rho_S_tuned": {
+     "ci95": [
+      0.250475166441,
+      0.376816498637
+     ],
+     "mean": 0.31542068819,
+     "n": 16,
+     "sd": 0.135698731206
+    },
+    "rho_S_plus_harness": {
+     "ci95": [
+      0.704164257971,
+      1.0724289994
+     ],
+     "mean": 0.893388120665,
+     "n": 16,
+     "sd": 0.384332056235
+    },
+    "rho_S_plus_tuned": {
+     "ci95": [
+      0.355148383913,
+      0.539423853848
+     ],
+     "mean": 0.450764115522,
+     "n": 16,
+     "sd": 0.193933009107
+    },
+    "rho_steps_over_sqrt_l": {
+     "ci95": [
+      0.594282240578,
+      0.90558900433
+     ],
+     "mean": 0.757434887146,
+     "n": 16,
+     "sd": 0.326171510068
+    },
+    "rho_wall_s": {
+     "ci95": [
+      11.2853505224,
+      17.2998890852
+     ],
+     "mean": 14.4129950135,
+     "n": 16,
+     "sd": 6.28370871861
+    },
+    "rho_all_correct": true,
+    "ic_over_rho": {
+     "S_harness": {
+      "ci95": [
+       0.348206185663,
+       0.639845477213
+      ],
+      "n": 16,
+      "ratio": 0.478254596768
+     },
+     "S_plus_harness": {
+      "ci95": [
+       0.934911574148,
+       1.82031524534
+      ],
+      "n": 16,
+      "ratio": 1.3379298864
+     },
+     "S_plus_tuned": {
+      "ci95": [
+       1.85271400939,
+       3.6241852519
+      ],
+      "n": 16,
+      "ratio": 2.65169880571
+     },
+     "S_tuned": {
+      "ci95": [
+       0.841773147983,
+       1.53207841054
+      ],
+      "n": 16,
+      "ratio": 1.14938040755
+     }
+    },
+    "n_rho": 16,
+    "verdict": {
+     "reason": "frozen control acceptance criteria are not numerically executable",
+     "status": "withheld"
+    },
+    "band_ratio": [
+     {
+      "A_harness": {
+       "ci95": [
+        0.351693064554,
+        0.639923797637
+       ],
+       "n": 16,
+       "ratio": 0.478254597405
+      },
+      "A_tuned": {
+       "ci95": [
+        0.838163210191,
+        1.52739955903
+       ],
+       "n": 16,
+       "ratio": 1.14938040908
+      },
+      "B_harness": {
+       "ci95": [
+        0.348582166847,
+        0.63442665516
+       ],
+       "n": 16,
+       "ratio": 0.478254597405
+      },
+      "B_tuned": {
+       "ci95": [
+        0.838815418748,
+        1.5363674759
+       ],
+       "n": 16,
+       "ratio": 1.14938040908
+      },
+      "w": 0.0
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        4.12445002607,
+        7.97342678867
+       ],
+       "n": 16,
+       "ratio": 5.81437198282
+      },
+      "A_tuned": {
+       "ci95": [
+        4.47498656525,
+        8.60940404547
+       ],
+       "n": 16,
+       "ratio": 6.35106144612
+      },
+      "B_harness": {
+       "ci95": [
+        0.485499164261,
+        0.926052290027
+       ],
+       "n": 16,
+       "ratio": 0.685997249901
+      },
+      "B_tuned": {
+       "ci95": [
+        0.640162861052,
+        1.23225912614
+       ],
+       "n": 16,
+       "ratio": 0.907234883907
+      },
+      "w": 0.1
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        4.68955068698,
+        9.07198335876
+       ],
+       "n": 16,
+       "ratio": 6.61348877371
+      },
+      "A_tuned": {
+       "ci95": [
+        4.70296982489,
+        9.05660034039
+       ],
+       "n": 16,
+       "ratio": 6.67837512198
+      },
+      "B_harness": {
+       "ci95": [
+        0.564988215946,
+        1.10094607456
+       ],
+       "n": 16,
+       "ratio": 0.811107997738
+      },
+      "B_tuned": {
+       "ci95": [
+        0.587199254977,
+        1.15404345769
+       ],
+       "n": 16,
+       "ratio": 0.844088287265
+      },
+      "w": 1.0
+     }
+    ],
+    "ranked_across_band": {
+     "reason": "frozen control acceptance criteria unresolved",
+     "status": "withheld"
+    },
+    "dense_vs_sparse": {
+     "S_dense": 0.383848601929,
+     "S_dense_over_sparse": {
+      "ci95": [
+       1.04288742838,
+       1.07871479019
+      ],
+      "n": 16,
+      "ratio": 1.05878065658
+     },
+     "S_sparse": 0.362538359142,
+     "descent_muls_dense_over_sparse": {
+      "ci95": [
+       1.28306452985,
+       1.28868573239
+      ],
+      "n": 16,
+      "ratio": 1.28572576417
+     },
+     "identical_descent_digest": 16,
+     "identical_outcome": 16,
+     "linear_stage_dense_over_sparse": {
+      "ci95": [
+       2.13854289348,
+       2.16005913077
+      ],
+      "n": 16,
+      "ratio": 2.14865942155
+     },
+     "paired_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+     ],
+     "pairs": 16,
+     "sparse_fallbacks_per_run": 3.75
+    },
+    "rho_arms": {
+     "R0": {
+      "ci95": [
+       0.901121058702,
+       1.45351488394
+      ],
+      "mean": 1.17072805147,
+      "n": 16,
+      "sd": 0.572777059864
+     },
+     "R1": {
+      "ci95": [
+       0.996766402656,
+       1.63254733901
+      ],
+      "mean": 1.31579475509,
+      "n": 16,
+      "sd": 0.670500106222
+     },
+     "R2": {
+      "ci95": [
+       0.712834662168,
+       1.23540772564
+      ],
+      "mean": 0.974414870393,
+      "n": 16,
+      "sd": 0.552714765745
+     },
+     "R3": {
+      "ci95": [
+       0.595965459284,
+       0.905184963686
+      ],
+      "mean": 0.758044693333,
+      "n": 16,
+      "sd": 0.326097778338
+     }
+    }
+   },
+   {
+    "p": 1009,
+    "log2_l": 57.8722627571,
+    "ic_all_correct": true,
+    "ic_S": {
+     "ci95": [
+      0.0160739220316,
+      0.0231315238903
+     ],
+     "mean": 0.0195420229402,
+     "n": 16,
+     "sd": 0.00742927257574
+    },
+    "ic_S_plus": {
+     "ci95": [
+      0.0553863612362,
+      0.0711028178631
+     ],
+     "mean": 0.0634631218254,
+     "n": 16,
+     "sd": 0.016579724719
+    },
+    "ic_wall_s": {
+     "ci95": [
+      6.00737008112,
+      8.19881644094
+     ],
+     "mean": 7.11640697387,
+     "n": 16,
+     "sd": 2.31086532834
+    },
+    "rho_S_harness": {
+     "ci95": [
+      0.694879600001,
+      0.939779050282
+     ],
+     "mean": 0.807747520699,
+     "n": 16,
+     "sd": 0.259932904778
+    },
+    "rho_S_tuned": {
+     "ci95": [
+      0.288652600241,
+      0.391128650478
+     ],
+     "mean": 0.336123949959,
+     "n": 16,
+     "sd": 0.108165632472
+    },
+    "rho_S_plus_harness": {
+     "ci95": [
+      0.817935940583,
+      1.10493875986
+     ],
+     "mean": 0.951989868877,
+     "n": 16,
+     "sd": 0.306351091332
+    },
+    "rho_S_plus_tuned": {
+     "ci95": [
+      0.411369514018,
+      0.559873941937
+     ],
+     "mean": 0.480366298137,
+     "n": 16,
+     "sd": 0.154583819025
+    },
+    "rho_steps_over_sqrt_l": {
+     "ci95": [
+      0.692193884169,
+      0.938013551551
+     ],
+     "mean": 0.80782483734,
+     "n": 16,
+     "sd": 0.259992391935
+    },
+    "rho_wall_s": {
+     "ci95": [
+      102.562808729,
+      138.889348148
+     ],
+     "mean": 119.706105314,
+     "n": 16,
+     "sd": 39.1469706475
+    },
+    "rho_all_correct": true,
+    "ic_over_rho": {
+     "S_harness": {
+      "ci95": [
+       0.0184848206841,
+       0.0310814246754
+      ],
+      "n": 16,
+      "ratio": 0.0241932317208
+     },
+     "S_plus_harness": {
+      "ci95": [
+       0.0531650680859,
+       0.0837222714141
+      ],
+      "n": 16,
+      "ratio": 0.0666636525242
+     },
+     "S_plus_tuned": {
+      "ci95": [
+       0.104700974695,
+       0.164831832441
+      ],
+      "n": 16,
+      "ratio": 0.132114018139
+     },
+     "S_tuned": {
+      "ci95": [
+       0.0444276445702,
+       0.074126114672
+      ],
+      "n": 16,
+      "ratio": 0.0581393350356
+     }
+    },
+    "n_rho": 16,
+    "verdict": {
+     "reason": "frozen control acceptance criteria are not numerically executable",
+     "status": "withheld"
+    },
+    "band_ratio": [
+     {
+      "A_harness": {
+       "ci95": [
+        0.0183953013422,
+        0.0309734270063
+       ],
+       "n": 16,
+       "ratio": 0.0241932317024
+      },
+      "A_tuned": {
+       "ci95": [
+        0.0444792515449,
+        0.0747372126216
+       ],
+       "n": 16,
+       "ratio": 0.0581393349914
+      },
+      "B_harness": {
+       "ci95": [
+        0.0183749344882,
+        0.0310719314541
+       ],
+       "n": 16,
+       "ratio": 0.0241932317024
+      },
+      "B_tuned": {
+       "ci95": [
+        0.0445228092287,
+        0.0742649652008
+       ],
+       "n": 16,
+       "ratio": 0.0581393349914
+      },
+      "w": 0.0
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        0.253797316864,
+        0.401515712069
+       ],
+       "n": 16,
+       "ratio": 0.320250474411
+      },
+      "A_tuned": {
+       "ci95": [
+        0.277967522544,
+        0.441312709087
+       ],
+       "n": 16,
+       "ratio": 0.349804592873
+      },
+      "B_harness": {
+       "ci95": [
+        0.0246317479938,
+        0.03801100498
+       ],
+       "n": 16,
+       "ratio": 0.0306575261218
+      },
+      "B_tuned": {
+       "ci95": [
+        0.0327860394041,
+        0.0501635154361
+       ],
+       "n": 16,
+       "ratio": 0.0405373796747
+      },
+      "w": 0.1
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        0.289054819031,
+        0.457133292663
+       ],
+       "n": 16,
+       "ratio": 0.364579381477
+      },
+      "A_tuned": {
+       "ci95": [
+        0.292722020489,
+        0.46431698631
+       ],
+       "n": 16,
+       "ratio": 0.368155567199
+      },
+      "B_harness": {
+       "ci95": [
+        0.0280824192659,
+        0.0427006091564
+       ],
+       "n": 16,
+       "ratio": 0.0345473594716
+      },
+      "B_tuned": {
+       "ci95": [
+        0.0292787113284,
+        0.0443118695297
+       ],
+       "n": 16,
+       "ratio": 0.0359508059562
+      },
+      "w": 1.0
+     }
+    ],
+    "ranked_across_band": {
+     "reason": "frozen control acceptance criteria unresolved",
+     "status": "withheld"
+    },
+    "dense_vs_sparse": {
+     "S_dense": 0.0219970310115,
+     "S_dense_over_sparse": {
+      "ci95": [
+       1.09938078259,
+       1.1484536126
+      ],
+      "n": 16,
+      "ratio": 1.12562712053
+     },
+     "S_sparse": 0.0195420229402,
+     "descent_muls_dense_over_sparse": {
+      "ci95": [
+       1.28029006386,
+       1.28542626286
+      ],
+      "n": 16,
+      "ratio": 1.28281525479
+     },
+     "identical_descent_digest": 16,
+     "identical_outcome": 16,
+     "linear_stage_dense_over_sparse": {
+      "ci95": [
+       2.08201950652,
+       2.09963172018
+      ],
+      "n": 16,
+      "ratio": 2.09063756869
+     },
+     "paired_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+     ],
+     "pairs": 16,
+     "sparse_fallbacks_per_run": 1.75
+    },
+    "rho_arms": {
+     "R0": {
+      "ci95": [
+       1.02953721523,
+       1.55395477924
+      ],
+      "mean": 1.29056980048,
+      "n": 16,
+      "sd": 0.553212566117
+     },
+     "R0_aa": {
+      "ci95": [
+       0.952417555452,
+       1.55685502138
+      ],
+      "mean": 1.24700852993,
+      "n": 16,
+      "sd": 0.633815357836
+     },
+     "R1": {
+      "ci95": [
+       1.06200906695,
+       1.56572596688
+      ],
+      "mean": 1.30106506736,
+      "n": 16,
+      "sd": 0.529043333774
+     },
+     "R2": {
+      "ci95": [
+       0.646794759328,
+       0.997603998831
+      ],
+      "mean": 0.821763992479,
+      "n": 16,
+      "sd": 0.369239659821
+     },
+     "R3": {
+      "ci95": [
+       0.694879600001,
+       0.939779050282
+      ],
+      "mean": 0.807747520699,
+      "n": 16,
+      "sd": 0.259932904778
+     },
+     "R3_aa": {
+      "ci95": [
+       0.576402643511,
+       1.09253961491
+      ],
+      "mean": 0.823493237466,
+      "n": 16,
+      "sd": 0.557092615544
+     }
+    }
+   },
+   {
+    "p": 1511,
+    "log2_l": 61.3677276715,
+    "ic_all_correct": true,
+    "ic_S": {
+     "ci95": [
+      0.00613004458383,
+      0.00819291351534
+     ],
+     "mean": 0.00704276448216,
+     "n": 16,
+     "sd": 0.00219854765334
+    },
+    "ic_S_plus": {
+     "ci95": [
+      0.0236331866856,
+      0.0273178420616
+     ],
+     "mean": 0.025401846726,
+     "n": 16,
+     "sd": 0.00390720301306
+    },
+    "ic_wall_s": {
+     "ci95": [
+      8.41531397569,
+      10.6324055796
+     ],
+     "mean": 9.38263730594,
+     "n": 16,
+     "sd": 2.33456889126
+    },
+    "rho_S_harness": {
+     "ci95": [
+      0.598186504916,
+      0.962503575386
+     ],
+     "mean": 0.780416912256,
+     "n": 16,
+     "sd": 0.374401509956
+    },
+    "rho_S_tuned": {
+     "ci95": [
+      0.250728866363,
+      0.399222355765
+     ],
+     "mean": 0.324753143991,
+     "n": 16,
+     "sd": 0.155799362392
+    },
+    "rho_S_plus_harness": {
+     "ci95": [
+      0.712134225225,
+      1.12930127456
+     ],
+     "mean": 0.91978140283,
+     "n": 16,
+     "sd": 0.441261574362
+    },
+    "rho_S_plus_tuned": {
+     "ci95": [
+      0.358360506357,
+      0.569030676367
+     ],
+     "mean": 0.464117634566,
+     "n": 16,
+     "sd": 0.222659426798
+    },
+    "rho_steps_over_sqrt_l": {
+     "ci95": [
+      0.599008247232,
+      0.9579616778
+     ],
+     "mean": 0.78056238234,
+     "n": 16,
+     "sd": 0.374487787446
+    },
+    "rho_wall_s": {
+     "ci95": [
+      287.732038112,
+      457.695843467
+     ],
+     "mean": 372.904558771,
+     "n": 16,
+     "sd": 178.637938188
+    },
+    "rho_all_correct": true,
+    "ic_over_rho": {
+     "S_harness": {
+      "ci95": [
+       0.00702865299935,
+       0.0120307140481
+      ],
+      "n": 16,
+      "ratio": 0.00902436168612
+     },
+     "S_plus_harness": {
+      "ci95": [
+       0.0221376798421,
+       0.0359757711066
+      ],
+      "n": 16,
+      "ratio": 0.0276172649804
+     },
+     "S_plus_tuned": {
+      "ci95": [
+       0.0439218027442,
+       0.0712933721269
+      ],
+      "n": 16,
+      "ratio": 0.0547314836459
+     },
+     "S_tuned": {
+      "ci95": [
+       0.0168572943572,
+       0.0289052367956
+      ],
+      "n": 16,
+      "ratio": 0.021686516705
+     }
+    },
+    "n_rho": 16,
+    "verdict": {
+     "reason": "frozen control acceptance criteria are not numerically executable",
+     "status": "withheld"
+    },
+    "band_ratio": [
+     {
+      "A_harness": {
+       "ci95": [
+        0.00702214256245,
+        0.0121531358983
+       ],
+       "n": 16,
+       "ratio": 0.00902436168457
+      },
+      "A_tuned": {
+       "ci95": [
+        0.0169316123483,
+        0.0287784404309
+       ],
+       "n": 16,
+       "ratio": 0.0216865167013
+      },
+      "B_harness": {
+       "ci95": [
+        0.00701680780092,
+        0.012054939756
+       ],
+       "n": 16,
+       "ratio": 0.00902436168457
+      },
+      "B_tuned": {
+       "ci95": [
+        0.016849344428,
+        0.029135731735
+       ],
+       "n": 16,
+       "ratio": 0.0216865167013
+      },
+      "w": 0.0
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        0.10932516224,
+        0.178721063457
+       ],
+       "n": 16,
+       "ratio": 0.136479225782
+      },
+      "A_tuned": {
+       "ci95": [
+        0.119723927826,
+        0.194407009471
+       ],
+       "n": 16,
+       "ratio": 0.149073837515
+      },
+      "B_harness": {
+       "ci95": [
+        0.0102256693264,
+        0.0166429222368
+       ],
+       "n": 16,
+       "ratio": 0.0127502036781
+      },
+      "B_tuned": {
+       "ci95": [
+        0.01352704413,
+        0.0219881760994
+       ],
+       "n": 16,
+       "ratio": 0.0168588391907
+      },
+      "w": 0.1
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        0.124627132218,
+        0.2037302692
+       ],
+       "n": 16,
+       "ratio": 0.155562793797
+      },
+      "A_tuned": {
+       "ci95": [
+        0.126207255064,
+        0.20482383598
+       ],
+       "n": 16,
+       "ratio": 0.157088684338
+      },
+      "B_harness": {
+       "ci95": [
+        0.0120388892318,
+        0.0194828856895
+       ],
+       "n": 16,
+       "ratio": 0.0149920080469
+      },
+      "B_tuned": {
+       "ci95": [
+        0.0125370880168,
+        0.0203609365197
+       ],
+       "n": 16,
+       "ratio": 0.0156009846438
+      },
+      "w": 1.0
+     }
+    ],
+    "ranked_across_band": {
+     "reason": "frozen control acceptance criteria unresolved",
+     "status": "withheld"
+    },
+    "dense_vs_sparse": {
+     "S_dense": 0.00793346324381,
+     "S_dense_over_sparse": {
+      "ci95": [
+       1.10339308925,
+       1.14695791799
+      ],
+      "n": 16,
+      "ratio": 1.12647004794
+     },
+     "S_sparse": 0.00704276448216,
+     "descent_muls_dense_over_sparse": {
+      "ci95": [
+       1.28324952755,
+       1.28608523627
+      ],
+      "n": 16,
+      "ratio": 1.28453627079
+     },
+     "identical_descent_digest": 16,
+     "identical_outcome": 16,
+     "linear_stage_dense_over_sparse": {
+      "ci95": [
+       2.07260791109,
+       2.08446078267
+      ],
+      "n": 16,
+      "ratio": 2.07813071417
+     },
+     "paired_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+     ],
+     "pairs": 16,
+     "sparse_fallbacks_per_run": 1.1875
+    },
+    "rho_arms": {
+     "R0": {
+      "ci95": [
+       0.907974566714,
+       1.37553281204
+      ],
+      "mean": 1.13690139598,
+      "n": 8,
+      "sd": 0.354715234
+     },
+     "R3": {
+      "ci95": [
+       0.598186504916,
+       0.962503575386
+      ],
+      "mean": 0.780416912256,
+      "n": 16,
+      "sd": 0.374401509956
+     }
+    }
+   },
+   {
+    "p": 1823,
+    "log2_l": 62.9925930763,
+    "ic_all_correct": true,
+    "ic_S": {
+     "ci95": [
+      0.00322759255574,
+      0.00433733430838
+     ],
+     "mean": 0.00376125356831,
+     "n": 16,
+     "sd": 0.00118477059355
+    },
+    "ic_S_plus": {
+     "ci95": [
+      0.0147965296597,
+      0.017357804385
+     ],
+     "mean": 0.0160476269915,
+     "n": 16,
+     "sd": 0.00272127154773
+    },
+    "ic_wall_s": {
+     "ci95": [
+      8.07697088644,
+      10.3336058745
+     ],
+     "mean": 9.16816843025,
+     "n": 16,
+     "sd": 2.35488143691
+    },
+    "rho_S_harness": {
+     "ci95": [
+      0.699827723776,
+      1.07099698055
+     ],
+     "mean": 0.886825414925,
+     "n": 16,
+     "sd": 0.387331513643
+    },
+    "rho_S_tuned": {
+     "ci95": [
+      0.290591373988,
+      0.446993290211
+     ],
+     "mean": 0.369033244307,
+     "n": 16,
+     "sd": 0.161179907065
+    },
+    "rho_S_plus_harness": {
+     "ci95": [
+      0.828619051045,
+      1.2671572371
+     ],
+     "mean": 1.04519254447,
+     "n": 16,
+     "sd": 0.456500519663
+    },
+    "rho_S_plus_tuned": {
+     "ci95": [
+      0.416625306609,
+      0.635553571414
+     ],
+     "mean": 0.527400373855,
+     "n": 16,
+     "sd": 0.230348913085
+    },
+    "rho_steps_over_sqrt_l": {
+     "ci95": [
+      0.706253949883,
+      1.07298236104
+     ],
+     "mean": 0.88700947175,
+     "n": 16,
+     "sd": 0.387420571791
+    },
+    "rho_wall_s": {
+     "ci95": [
+      599.715532929,
+      926.230802927
+     ],
+     "mean": 759.684175876,
+     "n": 16,
+     "sd": 344.670017955
+    },
+    "rho_all_correct": true,
+    "ic_over_rho": {
+     "S_harness": {
+      "ci95": [
+       0.00323848632741,
+       0.0057532873714
+      ],
+      "n": 16,
+      "ratio": 0.00424125595073
+     },
+     "S_plus_harness": {
+      "ci95": [
+       0.0124591853002,
+       0.0195920345786
+      ],
+      "n": 16,
+      "ratio": 0.015353751877
+     },
+     "S_plus_tuned": {
+      "ci95": [
+       0.0248613047443,
+       0.0384296764008
+      ],
+      "n": 16,
+      "ratio": 0.0304277884262
+     },
+     "S_tuned": {
+      "ci95": [
+       0.00779003049017,
+       0.0138113474237
+      ],
+      "n": 16,
+      "ratio": 0.0101921808572
+     }
+    },
+    "n_rho": 16,
+    "verdict": {
+     "reason": "frozen control acceptance criteria are not numerically executable",
+     "status": "withheld"
+    },
+    "band_ratio": [
+     {
+      "A_harness": {
+       "ci95": [
+        0.00323569470188,
+        0.00577265027918
+       ],
+       "n": 16,
+       "ratio": 0.00424125595059
+      },
+      "A_tuned": {
+       "ci95": [
+        0.00778214747364,
+        0.013868398441
+       ],
+       "n": 16,
+       "ratio": 0.0101921808569
+      },
+      "B_harness": {
+       "ci95": [
+        0.00325560690106,
+        0.00581786744188
+       ],
+       "n": 16,
+       "ratio": 0.00424125595059
+      },
+      "B_tuned": {
+       "ci95": [
+        0.007767469752,
+        0.0138644770256
+       ],
+       "n": 16,
+       "ratio": 0.0101921808569
+      },
+      "w": 0.0
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        0.0619131326559,
+        0.0972011091114
+       ],
+       "n": 16,
+       "ratio": 0.0761411252289
+      },
+      "A_tuned": {
+       "ci95": [
+        0.0676999745133,
+        0.106127123593
+       ],
+       "n": 16,
+       "ratio": 0.0831675701174
+      },
+      "B_harness": {
+       "ci95": [
+        0.00579828351288,
+        0.00904354268246
+       ],
+       "n": 16,
+       "ratio": 0.007079558707
+      },
+      "B_tuned": {
+       "ci95": [
+        0.00764003146118,
+        0.0119181803886
+       ],
+       "n": 16,
+       "ratio": 0.00936084257908
+      },
+      "w": 0.1
+     },
+     {
+      "A_harness": {
+       "ci95": [
+        0.0706740939536,
+        0.110917557444
+       ],
+       "n": 16,
+       "ratio": 0.0869065168436
+      },
+      "A_tuned": {
+       "ci95": [
+        0.0714719665374,
+        0.111947023722
+       ],
+       "n": 16,
+       "ratio": 0.0877589651744
+      },
+      "B_harness": {
+       "ci95": [
+        0.00728760574326,
+        0.0110584545166
+       ],
+       "n": 16,
+       "ratio": 0.00878730698525
+      },
+      "B_tuned": {
+       "ci95": [
+        0.00755018756937,
+        0.0114564969003
+       ],
+       "n": 16,
+       "ratio": 0.00914424074593
+      },
+      "w": 1.0
+     }
+    ],
+    "ranked_across_band": {
+     "reason": "frozen control acceptance criteria unresolved",
+     "status": "withheld"
+    },
+    "dense_vs_sparse": {
+     "S_dense": 0.00412074628188,
+     "S_dense_over_sparse": {
+      "ci95": [
+       1.06722484667,
+       1.12058634233
+      ],
+      "n": 16,
+      "ratio": 1.09557789897
+     },
+     "S_sparse": 0.00376125356831,
+     "descent_muls_dense_over_sparse": {
+      "ci95": [
+       1.28426342935,
+       1.2882852997
+      ],
+      "n": 16,
+      "ratio": 1.28634386446
+     },
+     "identical_descent_digest": 16,
+     "identical_outcome": 16,
+     "linear_stage_dense_over_sparse": {
+      "ci95": [
+       2.10789416749,
+       2.12341213227
+      ],
+      "n": 16,
+      "ratio": 2.11602036864
+     },
+     "paired_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+     ],
+     "pairs": 16,
+     "sparse_fallbacks_per_run": 0.4375
+    },
+    "rho_arms": {
+     "R0": {
+      "ci95": [
+       0.820795815768,
+       2.09082441752
+      ],
+      "mean": 1.4480314983,
+      "n": 4,
+      "sd": 0.803356938192
+     },
+     "R3": {
+      "ci95": [
+       0.699827723776,
+       1.07099698055
+      ],
+      "mean": 0.886825414925,
+      "n": 16,
+      "sd": 0.387331513643
+     }
+    }
+   }
+  ],
+  "exponent_ic": {
+   "ci95": [
+    -0.164913929408,
+    -0.0843498911977
+   ],
+   "slope": -0.122311955561
+  },
+  "exponent_rho_harness": {
+   "ci95": [
+    0.479516711319,
+    0.53774065291
+   ],
+   "slope": 0.507742327818
+  },
+  "exponent_rho_tuned": {
+   "ci95": [
+    0.480288109862,
+    0.537986005049
+   ],
+   "slope": 0.507797446866
+  },
+  "local_exponents_ic": [
+   {
+    "from_l": 62514727414000.0,
+    "ic": -0.397044857034,
+    "to_l": 4049001339970000.0
+   },
+   {
+    "from_l": 4049001339970000.0,
+    "ic": -0.199243131171,
+    "to_l": 2.63807419771e+17
+   },
+   {
+    "from_l": 2.63807419771e+17,
+    "ic": 0.0787781851172,
+    "to_l": 2.97527281887e+18
+   },
+   {
+    "from_l": 2.97527281887e+18,
+    "ic": -0.0569250628701,
+    "to_l": 9.17613978124e+18
+   }
+  ],
+  "K1_killed_at_p": null,
+  "K2_narrowed_at_p": null
+ },
  "n37_k8_k16_confirmation": {
   "curve": "icv1-f2m37-tm534059-32aad96b",
   "source": "research/ecbench_n37_k8_k16_20261004/DECISION.json",
@@ -5898,7 +7571,8 @@
    ],
    "targets": 64,
    "setup_seconds_approx": 28.0,
-   "status": "admitted online"
+   "status": "superseded (empty-table rho)",
+   "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B row 108.1: ratio is against rho with an empty distinguished-point table; Bernstein-Lange rho at equal advice is 53-317x faster online (benchmarks row 20261014-ic-next10-09-equal-advice). Cold ratio unaffected."
   },
   "exploratory_online": {
    "label": "n83 dense K1798",
@@ -5907,13 +7581,23 @@
    "complete_process_seconds": 339.068,
    "setup_inclusive_class": "diagnostic: complete IC process divided by reported rho online time; not a matched cold ratio",
    "first_integer_break_even_under_model": 306,
-   "status": "exploratory one point"
+   "status": "superseded (empty-table rho)",
+   "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B rows 108.1 and 110.1: empty-table rho, one target, L0 shared host; precomputed-table rho wins every N83 matched pair (benchmarks row 20261016-n83-precomputed-rho-control). Within-IC K1798 vs K1500 comparison unaffected."
   },
   "replay_block": {
    "identical": 120,
    "total": 168,
    "failures": 48,
-   "scope": "all inherited-F4 rows differ in solver phase counts; root-finder and rho rows identical"
+   "scope": "2026-10-13 receipt, preserved: 48 mismatches in solver phase counts. The earlier scope text 'all inherited-F4 rows differ; root-finder and rho rows identical' is withdrawn: Corrected 2026-10-20 by validation sweep (verdict: contradicted)",
+   "current": {
+    "date": "2026-10-19",
+    "identical": 72,
+    "total": 168,
+    "failures": 96,
+    "scope": "mismatches in all four IC arms (ic-f4-m2, ic-f4-m3, ic-rootfind-m2, ic-rootfind-m3; 24 rows each); open regression under investigation (sweep D, PR #2290); root-finder and rho rows are not claimed to pass",
+    "source": "claude/validation-sweep-a-leaderboard-20261019:research/validation_sweep_20261019/A-leaderboard/verdicts.jsonl (row S:frontier:rootfinder-replay-block)",
+    "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted)"
+   }
   }
  },
  "n83_tier1_cold_holdout": {
@@ -8883,6 +10567,78 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-f2m47-t4276051-826c5755",
+   "family": "binary",
+   "field": "GF(2^47)",
+   "coefficients": "a = 0x1, b = 0x52e3db551eb3",
+   "order_bits": 47,
+   "standard": [],
+   "ec1": [
+    "EC1N47Crbhba8a6d89475b"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "isogeny-class-trio B-47"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-f2m59-tm247403969-f6f9b926",
+   "family": "binary",
+   "field": "GF(2^59)",
+   "coefficients": "a = 0x1, b = 0x284697d4c7aba14",
+   "order_bits": 60,
+   "standard": [],
+   "ec1": [
+    "EC1N59Crbhff0a665d9c7b"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "shortlist-binary-59"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-f2m61-tm1864788689-c4a45971",
+   "family": "binary",
+   "field": "GF(2^61)",
+   "coefficients": "a = 0x1, b = 0x5f6337cc455b8fc",
+   "order_bits": 62,
+   "standard": [],
+   "ec1": [
+    "EC1N61Crbh3d7dc8590ff8"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "shortlist-deep-binary"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-f2m61-tm2657393969-b9ff0fb0",
+   "family": "binary",
+   "field": "GF(2^61)",
+   "coefficients": "a = 0x1, b = 0x9c60f836d06fc8",
+   "order_bits": 62,
+   "standard": [],
+   "ec1": [
+    "EC1N61Crbh854aa3d90d2d"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "isogeny-class-trio B-61"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-f2m113-tm122610772499221213-5de3030f",
    "family": "binary",
    "field": "GF(2^113)",
@@ -9803,6 +11559,48 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp7-t4-0c09e92f",
+   "family": "prime",
+   "field": "GF(p), p = 67",
+   "coefficients": "a = 46, b = 47",
+   "order_bits": 7,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp7-t2-4910f2d0",
+   "family": "prime",
+   "field": "GF(p), p = 113",
+   "coefficients": "a = 19, b = 2",
+   "order_bits": 7,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp8-tm1-1ed3feb7",
+   "family": "prime",
+   "field": "GF(p), p = 223",
+   "coefficients": "a = 208, b = 21",
+   "order_bits": 8,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp10-t5-192cb216",
    "family": "prime",
    "field": "GF(p), p = 827",
@@ -9857,6 +11655,24 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp14-tm31-68b86b70",
+   "family": "prime",
+   "field": "GF(p), p = 10007",
+   "coefficients": "a = 3, b = 6",
+   "order_bits": 14,
+   "standard": [],
+   "ec1": [
+    "EC1P14Cfph5bd49abc11ae"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "demo-10007"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp14-tm63-1a762b57",
    "family": "prime",
    "field": "GF(p), p = 11617",
@@ -9907,6 +11723,230 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp16-t177-f6096508",
+   "family": "prime",
+   "field": "GF(p), p = 40129",
+   "coefficients": "a = 40126, b = 24190",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-t3-75845e93",
+   "family": "prime",
+   "field": "GF(p), p = 40129",
+   "coefficients": "a = 40126, b = 12823",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-tm119-f1da0584",
+   "family": "prime",
+   "field": "GF(p), p = 40897",
+   "coefficients": "a = 40894, b = 20995",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-tm153-d212d6a3",
+   "family": "prime",
+   "field": "GF(p), p = 40897",
+   "coefficients": "a = 40894, b = 31301",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-t97-681128fd",
+   "family": "prime",
+   "field": "GF(p), p = 42433",
+   "coefficients": "a = 42430, b = 32244",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-tm207-d2c917dd",
+   "family": "prime",
+   "field": "GF(p), p = 42433",
+   "coefficients": "a = 42430, b = 28710",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-t253-d57d1f3b",
+   "family": "prime",
+   "field": "GF(p), p = 42689",
+   "coefficients": "a = 42686, b = 2591",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-t317-a95cf26b",
+   "family": "prime",
+   "field": "GF(p), p = 42689",
+   "coefficients": "a = 42686, b = 891",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-t13-ccb41873",
+   "family": "prime",
+   "field": "GF(p), p = 43201",
+   "coefficients": "a = 43198, b = 34109",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-t409-9f545124",
+   "family": "prime",
+   "field": "GF(p), p = 43201",
+   "coefficients": "a = 43198, b = 19785",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-t265-7d8fe610",
+   "family": "prime",
+   "field": "GF(p), p = 45697",
+   "coefficients": "a = 45694, b = 23372",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-t31-98e0cf80",
+   "family": "prime",
+   "field": "GF(p), p = 45697",
+   "coefficients": "a = 45694, b = 18044",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-tm329-30be371f",
+   "family": "prime",
+   "field": "GF(p), p = 48193",
+   "coefficients": "a = 48190, b = 6223",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-tm369-a31e193c",
+   "family": "prime",
+   "field": "GF(p), p = 48193",
+   "coefficients": "a = 48190, b = 20823",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-tm335-046566a7",
+   "family": "prime",
+   "field": "GF(p), p = 50497",
+   "coefficients": "a = 50494, b = 16983",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp16-tm41-b2db7615",
+   "family": "prime",
+   "field": "GF(p), p = 50497",
+   "coefficients": "a = 50494, b = 48314",
+   "order_bits": 16,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp16-tm393-20f8a24e",
    "family": "prime",
    "field": "GF(p), p = 53197",
@@ -9953,6 +11993,24 @@
     "bench-16bit"
    ],
    "on_board": true,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp17-t121-95219f0d",
+   "family": "prime",
+   "field": "GF(p), p = 99013",
+   "coefficients": "a = 6, b = 4",
+   "order_bits": 17,
+   "standard": [],
+   "ec1": [
+    "EC1P17Cfph80ecfa7de129"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "demo-99013"
+   ],
+   "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
   },
@@ -10123,6 +12181,38 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp20-t1143-5bef62bd",
+   "family": "prime",
+   "field": "GF(p), p = 537599",
+   "coefficients": "a = 451926, b = 332081",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-t157-e39da206",
+   "family": "prime",
+   "field": "GF(p), p = 550813",
+   "coefficients": "a = 310059, b = 228047",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [
+    "EC1P20Cfph3457d3ae5cdc"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "generated-20bit-550813"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp20-t727-cd198a38",
    "family": "prime",
    "field": "GF(p), p = 563153",
@@ -10141,10 +12231,248 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp20-tm1021-15cd4237",
+   "family": "prime",
+   "field": "GF(p), p = 570881",
+   "coefficients": "a = 570878, b = 79256",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-tm1205-9f62a0f6",
+   "family": "prime",
+   "field": "GF(p), p = 570881",
+   "coefficients": "a = 570878, b = 542689",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-t99-a84fb1f1",
+   "family": "prime",
+   "field": "GF(p), p = 684289",
+   "coefficients": "a = 684286, b = 442174",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-tm819-6a77f16b",
+   "family": "prime",
+   "field": "GF(p), p = 684289",
+   "coefficients": "a = 684286, b = 147152",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-t103-827b6ca3",
+   "family": "prime",
+   "field": "GF(p), p = 835841",
+   "coefficients": "a = 835838, b = 99670",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-tm295-e6525945",
+   "family": "prime",
+   "field": "GF(p), p = 835841",
+   "coefficients": "a = 835838, b = 381414",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-tm151-a0fa046c",
+   "family": "prime",
+   "field": "GF(p), p = 860417",
+   "coefficients": "a = 860414, b = 581626",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-tm181-f094c43b",
+   "family": "prime",
+   "field": "GF(p), p = 860417",
+   "coefficients": "a = 860414, b = 108750",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-t803-9a78737a",
+   "family": "prime",
+   "field": "GF(p), p = 894209",
+   "coefficients": "a = 894206, b = 826040",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-tm479-f2d6af3d",
+   "family": "prime",
+   "field": "GF(p), p = 894209",
+   "coefficients": "a = 894206, b = 176370",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-tm183-1f9745f6",
+   "family": "prime",
+   "field": "GF(p), p = 926977",
+   "coefficients": "a = 926974, b = 434957",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-tm29-f83c0698",
+   "family": "prime",
+   "field": "GF(p), p = 926977",
+   "coefficients": "a = 926974, b = 589785",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-t145-0a1a9267",
+   "family": "prime",
+   "field": "GF(p), p = 927233",
+   "coefficients": "a = 927230, b = 284817",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-t653-f34328c1",
+   "family": "prime",
+   "field": "GF(p), p = 927233",
+   "coefficients": "a = 927230, b = 155666",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp20-tm728-d215a2a1",
    "family": "prime",
    "field": "GF(p), p = 946177",
    "coefficients": "a = 304973, b = 530845",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-t199-d1684bf5",
+   "family": "prime",
+   "field": "GF(p), p = 970267",
+   "coefficients": "a = 344324, b = 727299",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-t1009-272b8796",
+   "family": "prime",
+   "field": "GF(p), p = 1043201",
+   "coefficients": "a = 1043198, b = 540935",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-t679-32006d05",
+   "family": "prime",
+   "field": "GF(p), p = 1043201",
+   "coefficients": "a = 1043198, b = 65971",
    "order_bits": 20,
    "standard": [],
    "ec1": [],
@@ -10169,6 +12497,24 @@
     "bench-20bit"
    ],
    "on_board": true,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp20-t383-4f71b2c3",
+   "family": "prime",
+   "field": "GF(p), p = 1048571",
+   "coefficients": "a = 1048568, b = 44",
+   "order_bits": 20,
+   "standard": [],
+   "ec1": [
+    "EC1P20Cfph0cb8fb796d66"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "ic-frontier-fp20"
+   ],
+   "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
   },
@@ -10621,6 +12967,20 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp22-tm1105-62a9d176",
+   "family": "prime",
+   "field": "GF(p), p = 2511871",
+   "coefficients": "a = 1975157, b = 977806",
+   "order_bits": 22,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp22-tm1214-827be133",
    "family": "prime",
    "field": "GF(p), p = 2654677",
@@ -10695,6 +13055,20 @@
     "generated-22bit-3290411"
    ],
    "on_board": true,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp22-t285-9fc7e3e5",
+   "family": "prime",
+   "field": "GF(p), p = 3594223",
+   "coefficients": "a = 2996944, b = 1794025",
+   "order_bits": 22,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
   },
@@ -11455,6 +13829,90 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp24-tm1119-da50644b",
+   "family": "prime",
+   "field": "GF(p), p = 8489473",
+   "coefficients": "a = 8489470, b = 1647988",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-tm3015-22c570ce",
+   "family": "prime",
+   "field": "GF(p), p = 8489473",
+   "coefficients": "a = 8489470, b = 6324222",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-t925-8af643e2",
+   "family": "prime",
+   "field": "GF(p), p = 8524801",
+   "coefficients": "a = 8524798, b = 4232094",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-tm3017-9a4f2c10",
+   "family": "prime",
+   "field": "GF(p), p = 8524801",
+   "coefficients": "a = 8524798, b = 4150753",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-t3541-4d1ee126",
+   "family": "prime",
+   "field": "GF(p), p = 10028033",
+   "coefficients": "a = 10028030, b = 2302473",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-tm4333-97a5fef2",
+   "family": "prime",
+   "field": "GF(p), p = 10028033",
+   "coefficients": "a = 10028030, b = 4810544",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp24-t6316-2e757e7a",
    "family": "prime",
    "field": "GF(p), p = 10796507",
@@ -11595,6 +14053,20 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp24-tm4507-ffb4b7f9",
+   "family": "prime",
+   "field": "GF(p), p = 11750399",
+   "coefficients": "a = 7617878, b = 9089328",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp24-t1465-0b7163ca",
    "family": "prime",
    "field": "GF(p), p = 11921101",
@@ -11608,6 +14080,34 @@
    "legacy": [
     "generated-24bit-11921101"
    ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-tm1439-8cfd2b77",
+   "family": "prime",
+   "field": "GF(p), p = 11947009",
+   "coefficients": "a = 11947006, b = 373602",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-tm2649-d5a0a251",
+   "family": "prime",
+   "field": "GF(p), p = 11947009",
+   "coefficients": "a = 11947006, b = 4095794",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -11631,6 +14131,132 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp24-t4451-d5368b2d",
+   "family": "prime",
+   "field": "GF(p), p = 13136531",
+   "coefficients": "a = 848818, b = 7381302",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-tm3573-9dca1c97",
+   "family": "prime",
+   "field": "GF(p), p = 13252609",
+   "coefficients": "a = 13252606, b = 9792151",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-tm5681-df0d0d08",
+   "family": "prime",
+   "field": "GF(p), p = 13252609",
+   "coefficients": "a = 13252606, b = 3922483",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-t5279-881c5db3",
+   "family": "prime",
+   "field": "GF(p), p = 13565441",
+   "coefficients": "a = 13565438, b = 7774082",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-tm5729-6cb667b6",
+   "family": "prime",
+   "field": "GF(p), p = 13565441",
+   "coefficients": "a = 13565438, b = 4495625",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-t2899-80eee43c",
+   "family": "prime",
+   "field": "GF(p), p = 14284289",
+   "coefficients": "a = 14284286, b = 12542401",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-t7099-b95f8805",
+   "family": "prime",
+   "field": "GF(p), p = 14284289",
+   "coefficients": "a = 14284286, b = 2454253",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-t1927-311e54e7",
+   "family": "prime",
+   "field": "GF(p), p = 14950913",
+   "coefficients": "a = 14950910, b = 14507256",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-t5257-c013bcf8",
+   "family": "prime",
+   "field": "GF(p), p = 14950913",
+   "coefficients": "a = 14950910, b = 1537486",
+   "order_bits": 24,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp24-t1059-6df599df",
    "family": "prime",
    "field": "GF(p), p = 16483309",
@@ -11643,6 +14269,24 @@
    "ec1_unresolved": null,
    "legacy": [
     "generated-24bit-16483309"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp24-tm5099-a6f137c6",
+   "family": "prime",
+   "field": "GF(p), p = 16777199",
+   "coefficients": "a = 16777196, b = 31",
+   "order_bits": 25,
+   "standard": [],
+   "ec1": [
+    "EC1P24Cfph095cb65c0da0"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "ic-frontier-fp24"
    ],
    "on_board": false,
    "curves_yaml_key": null,
@@ -14649,6 +17293,24 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp28-t28201-65099091",
+   "family": "prime",
+   "field": "GF(p), p = 268435399",
+   "coefficients": "a = 268435396, b = 3",
+   "order_bits": 28,
+   "standard": [],
+   "ec1": [
+    "EC1P28Cfph697ee600b15e"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "ic-frontier-fp28"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp29-t33232-7ef0d9f3",
    "family": "prime",
    "field": "GF(p), p = 278825831",
@@ -15243,6 +17905,57 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp32-tm101415-9b187f52",
+   "family": "prime",
+   "field": "GF(p), p = 3094378543",
+   "coefficients": "a = 608760208, b = 2109595922",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [
+    "EC1P32Cfphf694d17166d1"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "demo-32"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp32-t7319-90da43e9",
+   "family": "prime",
+   "field": "GF(p), p = 4294967291",
+   "coefficients": "a = 4294967288, b = 31",
+   "order_bits": 32,
+   "standard": [],
+   "ec1": [
+    "EC1P32Cfph06b9f59ff156"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "generic-dlp-20261017-rho-32",
+    "ic-frontier-fp32"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp36-t276049-fe2b595b",
+   "family": "prime",
+   "field": "GF(p), p = 39615550291",
+   "coefficients": "a = 0, b = 22620405809",
+   "order_bits": 36,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp36-tm47184-1daf0972",
    "family": "prime",
    "field": "GF(p), p = 68190058247",
@@ -15252,6 +17965,25 @@
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
    "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp36-t454193-44a20818",
+   "family": "prime",
+   "field": "GF(p), p = 68719476731",
+   "coefficients": "a = 68719476728, b = 33",
+   "order_bits": 36,
+   "standard": [],
+   "ec1": [
+    "EC1P36Cfphfa97d84519ef"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "generic-dlp-20261017-rho-36",
+    "ic-frontier-fp36"
+   ],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -15290,6 +18022,20 @@
    "field": "GF(p), p = 81640512137",
    "coefficients": "a = 6206588639, b = 31351229805",
    "order_bits": 37,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp40-tm506303-75549727",
+   "family": "prime",
+   "field": "GF(p), p = 649522587953",
+   "coefficients": "a = 552810359288, b = 555863716954",
+   "order_bits": 40,
    "standard": [],
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
@@ -15364,6 +18110,43 @@
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
    "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp40-t1502959-42c6aada",
+   "family": "prime",
+   "field": "GF(p), p = 1099511624389",
+   "coefficients": "a = 0, b = 7",
+   "order_bits": 40,
+   "standard": [],
+   "ec1": [
+    "EC1P40Cfph68cd046762be"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "generic-dlp-20261017-bsgs-40"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp40-tm924137-0ecaaeb9",
+   "family": "prime",
+   "field": "GF(p), p = 1099511627563",
+   "coefficients": "a = 1099511627560, b = 56",
+   "order_bits": 41,
+   "standard": [],
+   "ec1": [
+    "EC1P40Cfphd8c9e6e2886b"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "generic-dlp-20261017-rho-40",
+    "ic-frontier-fp40"
+   ],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -15509,6 +18292,42 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp44-tm1269095-f56aca35",
+   "family": "prime",
+   "field": "GF(p), p = 17592186040927",
+   "coefficients": "a = 0, b = 7",
+   "order_bits": 45,
+   "standard": [],
+   "ec1": [
+    "EC1P44Cfph1b88146a9bdb"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "generic-dlp-20261017-bsgs-44"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp44-tm6431881-43acc95d",
+   "family": "prime",
+   "field": "GF(p), p = 17592186044399",
+   "coefficients": "a = 17592186044396, b = 95",
+   "order_bits": 45,
+   "standard": [],
+   "ec1": [
+    "EC1P44Cfphb537415ab9df"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "generic-dlp-20261017-rho-44"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp45-tm403-3bb5b4de",
    "family": "prime",
    "field": "GF(p), p = 19643936473787",
@@ -15588,6 +18407,112 @@
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
    "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp47-tm8785349-43e36ce5",
+   "family": "prime",
+   "field": "GF(p), p = 140737488355213",
+   "coefficients": "a = 140737488355210, b = 15017979474618",
+   "order_bits": 48,
+   "standard": [],
+   "ec1": [
+    "EC1P47Cfph7e9290c297bc"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "isogeny-class-trio P-47"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp48-tm2395735-7a78ff24",
+   "family": "prime",
+   "field": "GF(p), p = 140737529461027",
+   "coefficients": "a = 0, b = 4",
+   "order_bits": 48,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [
+    "pinned-j0-smooth47"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp48-t14984575-af5d5615",
+   "family": "prime",
+   "field": "GF(p), p = 281474976707983",
+   "coefficients": "a = 0, b = 7",
+   "order_bits": 48,
+   "standard": [],
+   "ec1": [
+    "EC1P48Cfph1decadb90348"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "generic-dlp-20261017-bsgs-48"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp48-tm15186475-c683ebfc",
+   "family": "prime",
+   "field": "GF(p), p = 281474976710591",
+   "coefficients": "a = 281474976710588, b = 9",
+   "order_bits": 49,
+   "standard": [],
+   "ec1": [
+    "EC1P48Cfph16a1065d0035"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "generic-dlp-20261017-rho-48"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp52-tm131765273-051185e0",
+   "family": "prime",
+   "field": "GF(p), p = 4503599627369383",
+   "coefficients": "a = 0, b = 7",
+   "order_bits": 53,
+   "standard": [],
+   "ec1": [
+    "EC1P52Cfpha1d0789153ac"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "generic-dlp-20261017-bsgs-52"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp52-t113543683-af85fb1e",
+   "family": "prime",
+   "field": "GF(p), p = 4503599627370323",
+   "coefficients": "a = 4503599627370320, b = 124",
+   "order_bits": 52,
+   "standard": [],
+   "ec1": [
+    "EC1P52Cfph6ba46c698d8f"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "generic-dlp-20261017-rho-52"
+   ],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -19780,6 +22705,1658 @@
    ],
    "ec1_unresolved": null,
    "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp56-tm300120038-865aea25",
+   "family": "prime",
+   "field": "GF(p), p = 36028808184391849",
+   "coefficients": "a = 28975493881445013, b = 9683202467833646",
+   "order_bits": 56,
+   "standard": [],
+   "ec1": [
+    "EC1P56Cfphe54f87bef48a"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "shortlist-deep-tall"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp56-t379549678-9040a9fd",
+   "family": "prime",
+   "field": "GF(p), p = 36029097977635921",
+   "coefficients": "a = 19786214463993396, b = 22946819377314788",
+   "order_bits": 56,
+   "standard": [],
+   "ec1": [
+    "EC1P56Cfphc4148c9f342a"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "shortlist-deep-cycle"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp56-t5-80dc66ed",
+   "family": "prime",
+   "field": "GF(p), p = 45862249674083071",
+   "coefficients": "a = 43891474518286963, b = 10362796447069720",
+   "order_bits": 56,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp56-tm252854635-0150ced1",
+   "family": "prime",
+   "field": "GF(p), p = 72057594037927931",
+   "coefficients": "a = 72057594037927928, b = 51345021292123855",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [
+    "EC1P56Cfph835db85620a8"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "shortlist-prime-56"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-0c911b7f",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 27360660983843956, b = 12590273341627539",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-134c8e5c",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 20552434752313601, b = 39376654228525638",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-15dbcf0d",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 5676511251306802, b = 2621049441941176",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-2d772c39",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 568462271038925, b = 10148224320954761",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-31332e2d",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 17840679148766544, b = 58038599211669385",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-33affa58",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 72057593813885486, b = 72047575567926611",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-37f27576",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 70720943670454385, b = 9883918542193974",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-479ede4d",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 17125200208842780, b = 44850176891573344",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-4fafe2da",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 35845638484164480, b = 61385031313649029",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-62a5c17a",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 27285404102107866, b = 50618385978364266",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-637e7898",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 34339285286057259, b = 52529378950880422",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-6776de1b",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 11248787021150763, b = 37755318737820293",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-6cabb0c9",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 72057594640571486, b = 72057418918128611",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-716a3b02",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 44304537945123530, b = 68876559834535431",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-93ee548e",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 59497307151754396, b = 12831058818372461",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-a2d5acd4",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 62861747423497502, b = 53573538179046706",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-b6176da0",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 60980311152001057, b = 14895410233998878",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-bea94590",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 48973514515277233, b = 51715178671726106",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-d0bb665e",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 21023971336818935, b = 3628891569189010",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-d1bd1ff9",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 71533177448920825, b = 67006405196878787",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-df5fdd30",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 12724038145594054, b = 70070271419806786",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-e0162555",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 44109880952098051, b = 52744456633412255",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-e747df8f",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 52415787504785581, b = 62954169799225219",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-eabc9b41",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 41436119808741173, b = 7772643578934359",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-ee7c9be8",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 12560272556801215, b = 58576523212313400",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-f06621c1",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 68729085115388107, b = 48675709858211155",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-f271ca98",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 16154785233829830, b = 25089466699118131",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-f4508d5d",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 36459788752587406, b = 65571665853400444",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-f634c1d8",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 12423250775668576, b = 35684257606426361",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t536870914-faaea32f",
+   "family": "prime",
+   "field": "GF(p), p = 72057594692239361",
+   "coefficients": "a = 39232114878076396, b = 59518471309749175",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-024ca9c5",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 49625524187478056, b = 69147774068692579",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-03a2967f",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 44324025554964496, b = 1717873279889996",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-0b5714ed",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 23730705097854097, b = 22627568960850031",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-1689d533",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 34767198170882804, b = 35084558930316767",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-30f20748",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 27733315271671989, b = 14033737665764985",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-37849507",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 54122384355181741, b = 39224956617326212",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-3b2d0fcf",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 22421977258053966, b = 37029816927863560",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-4f0d4697",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 5987097420343927, b = 19731257464340893",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-4f15646b",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 10550974737745415, b = 23661949639690837",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-597a94ce",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 13212613377115285, b = 23438471412750437",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-5b0abc8f",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 2226594416710459, b = 10282731441754919",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-758a0414",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 15024970976555886, b = 28260155449256904",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-7e168617",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 69586330904915025, b = 55801850650856780",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-8338ca8e",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 68629723857603382, b = 13058329729395266",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-84881da1",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 71304316311956283, b = 36788552583641356",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-848acc49",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 5073026097557558, b = 55417057617951981",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-8ba9239b",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 28655819626602497, b = 66385351484448529",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-b0db2489",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 5150909388256962, b = 52361472069924709",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-d7cbcb83",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 38659121509076589, b = 7539975850123026",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-e4f7b83a",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 49660414974236074, b = 37711003793574207",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-e6d0c766",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 72057598549840069, b = 71979615803822277",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-eb371ac9",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 9301550004714454, b = 19380251278769764",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-f3f6f7e2",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 71128228002130514, b = 58153976348838612",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-f5135cd5",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 38790449587197203, b = 55605995950514628",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-tm536870941-fa49104e",
+   "family": "prime",
+   "field": "GF(p), p = 72057601940934853",
+   "coefficients": "a = 62405678563856744, b = 63394590182499356",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t354478198-afcea726",
+   "family": "prime",
+   "field": "GF(p), p = 72057980207847001",
+   "coefficients": "a = 18456521102804593, b = 19958176276690439",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [
+    "EC1P57Cfphceb0e3ab8088"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "shortlist-deep-broad"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp57-t106-c1aa2a23",
+   "family": "prime",
+   "field": "GF(p), p = 126100789566376697",
+   "coefficients": "a = 7079035723263497, b = 123501395685118050",
+   "order_bits": 57,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-0def9996",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 266699492082035241, b = 59509983697511041",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-12644cb8",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 143836879388455747, b = 32024132379292285",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-18715ea3",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 105452253589453822, b = 182985460169084749",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-25b856d6",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 264718364180182664, b = 124103994965284299",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-2768699f",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 66838798566835090, b = 156671479735238624",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-30be9540",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 98815094318446005, b = 115685924336735008",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-34614bc0",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 83172501480800152, b = 254338027607808205",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-3f106acd",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 274582408531915193, b = 107456466637422222",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-439eb11f",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 87181984163078074, b = 232143778408002309",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-4adde0aa",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 272719935033414403, b = 104920450882874114",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-4dd0b1ef",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 288228093099277441, b = 50668532689170053",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-4e8ca77a",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 198042449659644122, b = 35033607664065930",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-4fd52fda",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 168081149544452178, b = 167071291028784185",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-51f84a65",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 33804948703591471, b = 192917227295652325",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-532bde17",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 194227765493937838, b = 110906224929223993",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-577193f8",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 48225064342821860, b = 185448819232354168",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-57a67391",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 93360831074058824, b = 229097345395148681",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-58825e02",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 69618509120461662, b = 74525893531805090",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-66fe4408",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 59844315760199863, b = 25227939219970819",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-743cebb5",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 23723929799808695, b = 159701769839941851",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-826c0295",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 133553208242540548, b = 235454902088616230",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-8e4c1ddb",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 59746417955088180, b = 211384188288687007",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-91471e75",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 258579761680076133, b = 41527968528842676",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-98757378",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 38455146289115758, b = 234579676962245783",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-a03aa193",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 271831539130957439, b = 57554400593528640",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-a3cd3416",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 46518071724019384, b = 282346282987603268",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-a90b3999",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 2406514170990769, b = 39423391246564123",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-ae71d2b2",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 1372238717576878, b = 59932333294116883",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-b3b7d7f2",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 257227659345351676, b = 274083891152697439",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-b46d087f",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 207088373302043304, b = 57801338335680464",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-b75a3d6c",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 280520994641162455, b = 28498470493895163",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-b87f4a6b",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 222254701372345393, b = 161944362973619116",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-cfc4b2ea",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 50825267534612771, b = 86397269747686393",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-d00eaa85",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 53523221206771411, b = 37910641467258329",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-db9f506f",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 274606756173313775, b = 131604100811040217",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-df3777a4",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 266021201760737620, b = 134439601746193746",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-e42d3142",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 286912775953329097, b = 154834875440621753",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-e4b6b6ef",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 247701170157857617, b = 275078418223851011",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-e7fc7182",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 185428318602246664, b = 45995667605070596",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-eb0ebc0e",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 203255743866791411, b = 184154513702495895",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-eb35172c",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 73823783142543817, b = 184391548683347696",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-ece59807",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 86566630272889394, b = 37555506416750032",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-fe3a8c51",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 284452363362347, b = 248599520667184167",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp59-t1073741954-ff4d579a",
+   "family": "prime",
+   "field": "GF(p), p = 288230445959117953",
+   "coefficients": "a = 167816515505507872, b = 231345964181641611",
+   "order_bits": 59,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp60-tm226-f2aa35d3",
+   "family": "prime",
+   "field": "GF(p), p = 814409292524040673",
+   "coefficients": "a = 23803279393343871, b = 223081513837153681",
+   "order_bits": 60,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp61-t2-fefb1f9c",
+   "family": "prime",
+   "field": "GF(p), p = 1637958981148213249",
+   "coefficients": "a = 571607911220311176, b = 29329524900995129",
+   "order_bits": 61,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp61-t110-a96b94ba",
+   "family": "prime",
+   "field": "GF(p), p = 1975950516940704721",
+   "coefficients": "a = 110339798349916108, b = 405987076462987577",
+   "order_bits": 61,
+   "standard": [],
+   "ec1": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp61-t727-ddf032b6",
+   "family": "prime",
+   "field": "GF(p), p = 2305842677174433443",
+   "coefficients": "a = 2305842677174433440, b = 1126842748974135980",
+   "order_bits": 61,
+   "standard": [],
+   "ec1": [
+    "EC1P61Cfph4b4d3888d752"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "isogeny-class-trio gap d-43"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp61-t95-4d1bb712",
+   "family": "prime",
+   "field": "GF(p), p = 2305842838172865227",
+   "coefficients": "a = 2305842838172865224, b = 1873033291747189733",
+   "order_bits": 61,
+   "standard": [],
+   "ec1": [
+    "EC1P61Cfph4ec3c36833c2"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "isogeny-class-trio gap d-163"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp61-t205-983ecb51",
+   "family": "prime",
+   "field": "GF(p), p = 2305842958741183033",
+   "coefficients": "a = 0, b = 5",
+   "order_bits": 61,
+   "standard": [],
+   "ec1": [
+    "EC1P61Cfph54bb8886c801"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "isogeny-class-trio gap d-3"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp61-t7175-7e38f752",
+   "family": "prime",
+   "field": "GF(p), p = 2305842959800795691",
+   "coefficients": "a = 2305842959800795688, b = 1507406867695792627",
+   "order_bits": 61,
+   "standard": [],
+   "ec1": [
+    "EC1P61Cfphde4753195a5f"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "isogeny-class-trio gap d-19"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp61-t2279-df6b5e41",
+   "family": "prime",
+   "field": "GF(p), p = 2305842976999134887",
+   "coefficients": "a = 2305842976999134884, b = 399914583043124681",
+   "order_bits": 61,
+   "standard": [],
+   "ec1": [
+    "EC1P61Cfph1646189acdfe"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "isogeny-class-trio gap d-67"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp61-tm1604388101-9105e769",
+   "family": "prime",
+   "field": "GF(p), p = 2305843009213693951",
+   "coefficients": "a = 2305843009213693948, b = 111",
+   "order_bits": 62,
+   "standard": [],
+   "ec1": [
+    "EC1P61Cfph21ad10f63efd"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp61-tm813574577-a3b71255",
+   "family": "prime",
+   "field": "GF(p), p = 2305843009213693951",
+   "coefficients": "a = 2305843009213693948, b = 381300098124707820",
+   "order_bits": 62,
+   "standard": [],
+   "ec1": [
+    "EC1P61Cfph303b4b060ff9"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "isogeny-class-trio P-61"
+   ],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -44871,6 +49448,273 @@
   ],
   "study": "research/la_engines_20261014/",
   "report": "research/la_engines_20261014/REPORT.pdf",
+  "class": "engineering"
+ },
+ "pair_table_component": {
+  "schema": "ic_oracle_setup_blocked.result/v1",
+  "curve": "icv1-fp32-t7319-90da43e9",
+  "sessions": [
+   "ECBS1h9e263e582e51",
+   "ECBS1h90cd7a0dc213"
+  ],
+  "isolation": "L1",
+  "executions": 456,
+  "identical_executions": 456,
+  "equality_all_identical": true,
+  "aa_setup_ratio_sum": 1.01829543954,
+  "aa_setup_pair_ratio": [
+   0.695697834157,
+   1.45744483678
+  ],
+  "rows": [
+   {
+    "N": 1024,
+    "pairs": 40,
+    "setup_ms": {
+     "scalar": 216.4847054,
+     "batch": 117.47991105,
+     "blocked": 55.15085525
+    },
+    "run_ms": {
+     "scalar": 963.481533975,
+     "batch": 850.69512705,
+     "blocked": 873.593559375
+    },
+    "blocked_over_batch": {
+     "sum": 0.469449242488,
+     "min": 0.321818180008,
+     "max": 0.793568175276
+    },
+    "blocked_over_scalar": {
+     "sum": 0.254756358645,
+     "min": 0.150561326607,
+     "max": 0.43226066603
+    },
+    "batch_over_scalar": {
+     "sum": 0.542670720469,
+     "min": 0.307906329625,
+     "max": 1.0304893353
+    },
+    "run_blocked_over_batch": 1.02691731926,
+    "run_blocked_over_scalar": 0.906705036443,
+    "rss_gib": {
+     "scalar": 0.0927238464355,
+     "batch": 0.0927124023438,
+     "blocked": 0.0751457214355
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 31.8508644792,
+    "setup_gae": 1049600,
+    "gae": 2087376.475,
+    "gap_to_rho": {
+     "w0": 32.9550679408,
+     "w0_1": 32.9595038415,
+     "w1": 32.9795284417
+    }
+   },
+   {
+    "N": 2048,
+    "pairs": 40,
+    "setup_ms": {
+     "scalar": 1435.2949661,
+     "batch": 739.252516225,
+     "blocked": 237.94795745
+    },
+    "run_ms": {
+     "scalar": 1834.63993237,
+     "batch": 1136.57745603,
+     "blocked": 695.6308297
+    },
+    "blocked_over_batch": {
+     "sum": 0.321876425481,
+     "min": 0.189835324922,
+     "max": 0.444046344011
+    },
+    "blocked_over_scalar": {
+     "sum": 0.165783314977,
+     "min": 0.130079627338,
+     "max": 0.21936454013
+    },
+    "batch_over_scalar": {
+     "sum": 0.51505267815,
+     "min": 0.415550259353,
+     "max": 0.795597843775
+    },
+    "run_blocked_over_batch": 0.612039967899,
+    "run_blocked_over_scalar": 0.379164770931,
+    "rss_gib": {
+     "scalar": 0.185779571533,
+     "batch": 0.185802459717,
+     "blocked": 0.115337371826
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 71.8158040978,
+    "setup_gae": 4196352,
+    "gae": 4706516.525,
+    "gap_to_rho": {
+     "w0": 74.3055091899,
+     "w0_1": 69.0684556607,
+     "w1": 45.4272809988
+    }
+   },
+   {
+    "N": 4096,
+    "pairs": 40,
+    "setup_ms": {
+     "scalar": 8398.39837657,
+     "batch": 3816.77474975,
+     "blocked": 1036.5267769
+    },
+    "run_ms": {
+     "scalar": 8744.91070788,
+     "batch": 4148.2377343,
+     "blocked": 1429.26834437
+    },
+    "blocked_over_batch": {
+     "sum": 0.271571377632,
+     "min": 0.233611415973,
+     "max": 0.320110100836
+    },
+    "blocked_over_scalar": {
+     "sum": 0.123419577213,
+     "min": 0.10139178612,
+     "max": 0.154436621947
+    },
+    "batch_over_scalar": {
+     "sum": 0.454464598916,
+     "min": 0.348703846702,
+     "max": 0.546648591415
+    },
+    "run_blocked_over_batch": 0.344548320497,
+    "run_blocked_over_scalar": 0.163440015813,
+    "rss_gib": {
+     "scalar": 0.625324249268,
+     "batch": 0.625858306885,
+     "blocked": 0.34440612793
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 260.011478071,
+    "setup_gae": 16781312,
+    "gae": 17040097.7,
+    "gap_to_rho": {
+     "w0": 269.02553715,
+     "w0_1": 245.491008172,
+     "w1": 139.25113358
+    }
+   },
+   {
+    "N": 8192,
+    "pairs": 40,
+    "setup_ms": {
+     "scalar": 43599.3239527,
+     "batch": 20484.9251067,
+     "blocked": 5294.20863355
+    },
+    "run_ms": {
+     "scalar": 44203.583243,
+     "batch": 21102.5724954,
+     "blocked": 5918.8731119
+    },
+    "blocked_over_batch": {
+     "sum": 0.258444129328,
+     "min": 0.237098376072,
+     "max": 0.312811108428
+    },
+    "blocked_over_scalar": {
+     "sum": 0.121428686355,
+     "min": 0.108553280908,
+     "max": 0.14512823434
+    },
+    "batch_over_scalar": {
+     "sum": 0.469845017069,
+     "min": 0.423799287497,
+     "max": 0.522994618625
+    },
+    "run_blocked_over_batch": 0.280481117323,
+    "run_blocked_over_scalar": 0.133900301235,
+    "rss_gib": {
+     "scalar": 2.37266540527,
+     "batch": 2.37275314331,
+     "blocked": 1.24766540527
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 1026.13937386,
+    "setup_gae": 67117056,
+    "gae": 67249012.675,
+    "gap_to_rho": {
+     "w0": 1061.71349931,
+     "w0_1": 966.210545185,
+     "w1": 535.08987653
+    }
+   },
+   {
+    "N": 16384,
+    "pairs": 8,
+    "setup_ms": {
+     "scalar": 224141.725429,
+     "batch": 116518.995317,
+     "blocked": 28200.8154826
+    },
+    "run_ms": {
+     "scalar": 227916.430309,
+     "batch": 120399.147004,
+     "blocked": 29947.6510742
+    },
+    "blocked_over_batch": {
+     "sum": 0.2420276231,
+     "min": 0.220284488139,
+     "max": 0.260486706223
+    },
+    "blocked_over_scalar": {
+     "sum": 0.125816892989,
+     "min": 0.115080639339,
+     "max": 0.135882048543
+    },
+    "batch_over_scalar": {
+     "sum": 0.519845178735,
+     "min": 0.493623198288,
+     "max": 0.544789629813
+    },
+    "run_blocked_over_batch": 0.248736405693,
+    "run_blocked_over_scalar": 0.131397508436,
+    "rss_gib": {
+     "scalar": 9.1459197998,
+     "batch": 9.14622879028,
+     "blocked": 4.64671325684
+    },
+    "S_ratio_blocked_over_batch": {
+     "w0": 1,
+     "w0_1": 1,
+     "w1": 1
+    },
+    "S_w0": 4097.22600994,
+    "setup_gae": 268451840,
+    "gae": 268515574.875,
+    "gap_to_rho": {
+     "w0": 5110.28730377,
+     "w0_1": 4649.31623181,
+     "w1": 2567.06029454
+    }
+   }
+  ],
+  "study": "research/ic_oracle_setup_blocked_20261020/",
+  "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
   "class": "engineering"
  },
  "phases": [
