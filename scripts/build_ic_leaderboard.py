@@ -622,6 +622,12 @@ def la_component() -> dict:
             "class": "engineering"}
 
 
+NOT_VALIDATED = ("Validation standing: not validated under the 2026-10-19 gate. No replay certificate, "
+                 "validator report or §5a-banded matched-rho reference is filed for this study (no "
+                 "VALIDATION.json), so this is an engineering component, not a validated row, and its "
+                 "benchmarks/README.md row is withheld until it validates.")
+
+
 def lazy_members_component() -> dict:
     """The lazy orbit-member index of research/ecbench_lazy_orbit_members_20261018:
     ratios copied from the study's saved ecbench comparisons (figures/ratios.json).
@@ -632,7 +638,7 @@ def lazy_members_component() -> dict:
         raise SystemExit(f"{SOURCES['lazy_members']}: unexpected schema or class")
     return {"rows": d["rows"], "unit": d["unit"], "class": d["class"], "note": d["note"],
             "study": d["study"] + "/", "report": d["study"] + "/REPORT.pdf",
-            "source": SOURCES["lazy_members"]}
+            "source": SOURCES["lazy_members"], "validation": NOT_VALIDATED}
 
 
 def secs(x: float) -> str:
@@ -1311,7 +1317,7 @@ def markdown(doc: dict) -> str:
                  f"{ci(r['eager_over_rho_strong'])} | {ci(r['lazy_over_rho_strong'])} |")
     L += ["", f"[Report]({'../../' + lz['report']}) · [study](../../{lz['study']}) · "
               f"[data](../../{lz['source']}). Distance to rho is reported, not a gate; no ranking against "
-              "rho is claimed.", ""]
+              "rho is claimed.", "", lz["validation"], ""]
     for code in ("A", "B", "C"):
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
@@ -1915,7 +1921,8 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{ci(r["lazy_over_rho_strong"])}</td></tr>')
     P.append('</tbody></table></div>'
              f'<p>{gh(lz["report"], "Report")} · {gh(lz["study"], "study")} · {gh(lz["source"], "data")}. '
-             'Distance to rho is reported, not a gate; no ranking against rho is claimed.</p></section>')
+             'Distance to rho is reported, not a gate; no ranking against rho is claimed.</p>'
+             f'<p class="muted">{esc(lz["validation"])}</p></section>')
     d = doc["bounded_diagnostics"][0]
     P.append(f'<section class="card" id="bounded-n37-diagnostic"><h2>New n37 counted diagnostic, outside the priced tables</h2>'
              f'<p>On <code>{esc(d["curve"])}</code>, shared-rank K16 has {d["usable_points"]:,} actual usable '
