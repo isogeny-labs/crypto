@@ -605,8 +605,10 @@ set up in a PR and run there when a Spot instance is available.
 - **Attribution.** A pod normally cannot read the kernel log, so
   `run_amendment8.sh` records the job cgroup's OOM-kill counter
   (`memory.events`, or `memory.oom_control` under cgroup v1). It reads the
-  counter before and after the run, and adds the kernel log's OOM lines if it
-  is readable. All of this goes to `runs/<cell>.oom.txt`. A system's limit is
+  counter before and after the run. For a readable kernel log, the runner
+  takes a non-mutating pre-run snapshot and records only new OOM lines from a
+  post-run snapshot; it never clears the shared node ring buffer. The counter
+  and any new OOM lines go to `runs/<cell>.oom.txt`. A system's limit is
   attributable only if:
   - its row is a `ulimit -v` malloc failure, a timeout or ok; and
   - the record shows no OOM kill during the run.
