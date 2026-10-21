@@ -170,6 +170,45 @@ on the local host and correctly marked its output truncated; that check
 validates command execution at the upper prime range, not complete graph
 coverage there.
 
+### From a cubic j neighbour to a checked IC route
+
+For a neighbour reached by a rational odd-prime kernel, either CLI can
+construct the exact one-hop Vélu route file consumed by `solve-cubic`:
+
+```sh
+ic cubic-route-generate \
+  --input docs/ic/fixtures/cubic_f7_cofactor12_public_target.json \
+  --degree 3 --target-j 3 5 0 --seed 1 --max-samples 256 --json \
+  > /tmp/cubic-route.json
+ic solve-cubic \
+  --input docs/ic/fixtures/cubic_f7_cofactor12_public_target.json \
+  --route-file /tmp/cubic-route.json --route-id root-to-velu3 \
+  --seed 1 --max-residuals 1000 --skip-rho --json
+```
+
+The generator counts the source curve order, checks the supplied public
+points and subgroup, samples a rational kernel of the requested odd-prime
+degree in `3..=31`, and checks the Vélu codomain, point maps and subgroup
+before returning a route. `--target-j` selects an exact j-invariant from
+`cubic-graph`; omit it to accept the first checked rational-kernel edge.
+The field and subgroup bounds match `solve-cubic`; `--max-samples` is
+1–10,000. A bounded search that does not find a matching rational kernel
+exits unsuccessfully. The constructor handles edges with a rational kernel
+generator; other j-neighbours remain outside this route format.
+
+For the public p=7 source, the command selected destination j=`[3,5,0]`,
+returned the checked codomain `a=[3,5,6]`, `b=[4,4,6]`, and its output was
+accepted by `ic solve-cubic`. The solver verified the route and recovered
+scalar 5 on the source and destination. The
+[generated route](fixtures/cubic_f7_generated_route_20261021.json)
+SHA-256 is `fe9e14bfe7e53afa681b1fdad0b41be5e96779930309eb06014f4b269e9ebe0f`.
+The same route generator is exposed through `icx`; both release CLIs
+produced semantically identical route JSON and exited successfully.
+The generated route also passed a live Setec S3 push, HEAD, remote verify,
+fresh-cache `solve-cubic` fetch and scalar replay, exact-object cleanup, and
+final HEAD 404. The isolated prefix and checks are in
+[`GENERATED_CUBIC_ROUTE_S3_ACCEPTANCE_20261021.json`](../store/GENERATED_CUBIC_ROUTE_S3_ACCEPTANCE_20261021.json).
+
 The prime and cubic commands return `bounded_unknown` with a nonzero exit
 status if their configured IC budget ends without a verified scalar. These
 finite input ranges describe the implemented solvers; they do not certify

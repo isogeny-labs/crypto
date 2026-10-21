@@ -73,6 +73,8 @@ enum Action {
     SolveCubic(cubic_external::CubicArgs),
     /// Enumerate bounded rational j-neighbours over an exact cubic field.
     CubicGraph(cubic_route::GraphArgs),
+    /// Generate a checked one-hop cubic Vélu route for a rational odd-prime kernel.
+    CubicRouteGenerate(cubic_route::GenerateArgs),
     /// Solve a quadratic Boolean system with the FES kernel (CPU or GPU worker).
     Fes(FesArgs),
 }
@@ -619,6 +621,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::SolvePrime(a)) => prime_external::solve(a),
         Some(Action::SolveCubic(a)) => cubic_external::solve(a),
         Some(Action::CubicGraph(a)) => cubic_route::enumerate_j(a),
+        Some(Action::CubicRouteGenerate(a)) => cubic_route::generate(a),
         Some(Action::Fes(a)) => fes_cmd(a),
         None => {
             let name = cli
@@ -641,10 +644,17 @@ fn main() -> ExitCode {
     if report.get("operation").is_some() {
         report["software"] = provenance();
     }
-    let ok = matches!(
-        report["status"].as_str(),
-        Some("complete" | "checks_passed")
-    );
+    let ok = if matches!(
+        cli.command.as_ref(),
+        Some(Action::CubicGraph(_) | Action::CubicRouteGenerate(_))
+    ) {
+        report["operation"] != "error"
+    } else {
+        matches!(
+            report["status"].as_str(),
+            Some("complete" | "checks_passed")
+        )
+    };
     if cli.json {
         println!("{}", serde_json::to_string_pretty(&report).unwrap());
     } else {

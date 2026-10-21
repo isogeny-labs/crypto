@@ -121,6 +121,8 @@ enum Action {
     SolveCubic(cubic_external::CubicArgs),
     /// Enumerate bounded rational j-neighbours over an exact cubic field.
     CubicGraph(cubic_route::GraphArgs),
+    /// Generate a checked one-hop cubic Vélu route for a rational odd-prime kernel.
+    CubicRouteGenerate(cubic_route::GenerateArgs),
 }
 #[derive(Args)]
 #[group(required = true, multiple = false)]
@@ -179,6 +181,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::SolvePrime(args)) => prime_external::solve(args),
         Some(Action::SolveCubic(args)) => cubic_external::solve(args),
         Some(Action::CubicGraph(args)) => cubic_route::enumerate_j(args),
+        Some(Action::CubicRouteGenerate(args)) => cubic_route::generate(args),
         Some(Action::Run(args)) => experiment::run(args.clone(), cli.json),
         None => {
             if let Some(name) = &cli.profile {

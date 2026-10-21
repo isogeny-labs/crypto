@@ -37,6 +37,183 @@ pub(super) struct GraphArgs {
     seed: u64,
 }
 
+#[derive(Args, Clone)]
+pub(super) struct GenerateArgs {
+    /// Public cubic target JSON, local or a checked store reference.
+    #[arg(long)]
+    input: std::path::PathBuf,
+    /// Odd prime degree for the rational Vélu kernel (3..=31).
+    #[arg(long)]
+    degree: u64,
+    /// Optional target j-invariant as three canonical cubic-field coefficients.
+    #[arg(long, num_args = 3)]
+    target_j: Option<Vec<u64>>,
+    /// Deterministic point-sampling seed.
+    #[arg(long, default_value_t = 1)]
+    seed: u64,
+    /// Bound on rational kernel candidates to sample.
+    #[arg(long, default_value_t = 256)]
+    max_samples: usize,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PublicTarget {
+    p: u64,
+    c: u64,
+    a: [u64; 3],
+    b: [u64; 3],
+    n: u64,
+    gx: [u64; 3],
+    gy: [u64; 3],
+    qx: [u64; 3],
+    qy: [u64; 3],
+}
+
+fn cubic_order(f: &CubicField, curve: &Curve<E3>) -> u64 {
+    let p = f.p;
+    let q = (p * p * p) as usize;
+    let offset = |v: E3| ((v.0[2] * p + v.0[1]) * p + v.0[0]) as usize;
+    let mut roots = vec![0u8; q];
+    for z in 0..p {
+        for y in 0..p {
+            for x in 0..p {
+                let e = E3([x, y, z]);
+                roots[offset(f.sq(e))] += 1;
+            }
+        }
+    }
+    let mut order = 1u64;
+    for z in 0..p {
+        for y in 0..p {
+            for x in 0..p {
+                order += u64::from(roots[offset(curve::rhs(f, curve, E3([x, y, z])))]);
+            }
+        }
+    }
+    order
+}
+
+/// Construct a one-hop rational-kernel route in the exact schema accepted by
+/// `solve-cubic`. A j-neighbour without a rational kernel may be unreachable
+/// by this constructor; the bounded search reports that outcome explicitly.
+pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
+    if !(3..=31).contains(&args.degree)
+        || args.degree.is_multiple_of(2)
+        || !prime(args.degree)
+        || !(1..=10_000).contains(&args.max_samples)
+    {
+        return Err("degree must be an odd prime in 3..=31 and max-samples in 1..=10000".into());
+    }
+    let resolved = crypto_lib::store::resolve_path(&args.input)?;
+    if std::fs::metadata(&resolved)
+        .map_err(|e| e.to_string())?
+        .len()
+        > 32 * 1024 * 1024
+    {
+        return Err("cubic target input exceeds 32 MiB".into());
+    }
+    let bytes = std::fs::read(&resolved).map_err(|e| e.to_string())?;
+    if bytes.len() > 32 * 1024 * 1024 {
+        return Err("cubic target input exceeds 32 MiB".into());
+    }
+    let input: PublicTarget = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+    if !(7..=101).contains(&input.p)
+        || !prime(input.p)
+        || args.degree == input.p
+        || !(3..=2_000_000).contains(&input.n)
+        || !prime(input.n)
+        || args.degree == input.n
+    {
+        return Err("invalid cubic field, subgroup, or separable route degree".into());
+    }
+    let all = [
+        &input.a, &input.b, &input.gx, &input.gy, &input.qx, &input.qy,
+    ];
+    if input.c >= input.p || all.into_iter().flatten().any(|&v| v >= input.p) {
+        return Err("cubic target field coefficients must be canonical".into());
+    }
+    let _checked_field = Fp3::with_cube_nonresidue(input.p, input.c)?;
+    let f = CubicField {
+        p: input.p,
+        c: input.c,
+    };
+    let curve = Curve::new(E3(input.a), E3(input.b));
+    if !curve::is_smooth(&f, &curve) {
+        return Err("cubic target source curve is singular".into());
+    }
+    let g = Pt::Aff(E3(input.gx), E3(input.gy));
+    let q = Pt::Aff(E3(input.qx), E3(input.qy));
+    if !curve::on_curve(&f, &curve, &g)
+        || !curve::on_curve(&f, &curve, &q)
+        || curve::pmul(&f, &curve, &g, u128::from(input.n)) != Pt::Inf
+        || curve::pmul(&f, &curve, &q, u128::from(input.n)) != Pt::Inf
+    {
+        return Err("cubic target points fail source subgroup checks".into());
+    }
+    let requested_j = match &args.target_j {
+        None => None,
+        Some(values) if values.len() == 3 && values.iter().all(|&v| v < input.p) => {
+            Some(E3([values[0], values[1], values[2]]))
+        }
+        _ => return Err("target-j must be three canonical field coefficients".into()),
+    };
+    let order = cubic_order(&f, &curve);
+    if !order.is_multiple_of(args.degree) || !order.is_multiple_of(input.n) {
+        return Err(
+            "route degree or DLP subgroup order does not divide counted curve order".into(),
+        );
+    }
+    let cofactor = order / args.degree;
+    let mut rng = Rng::new(args.seed);
+    for _ in 0..args.max_samples {
+        let sampled = curve::random_point_f(&f, &curve, &mut rng);
+        let kernel = curve::pmul(&f, &curve, &sampled, u128::from(cofactor));
+        if kernel == Pt::Inf || curve::pmul(&f, &curve, &kernel, u128::from(args.degree)) != Pt::Inf
+        {
+            continue;
+        }
+        let iso = velu_from_point(&f, &curve, &kernel, args.degree);
+        if !curve::is_smooth(&f, &iso.cod) {
+            continue;
+        }
+        if requested_j.is_some_and(|target| curve::jinv(&f, &iso.cod) != target) {
+            continue;
+        }
+        let mapped_g = iso.eval(&f, &g);
+        let mapped_q = iso.eval(&f, &q);
+        if mapped_g == Pt::Inf
+            || mapped_q == Pt::Inf
+            || !curve::on_curve(&f, &iso.cod, &mapped_g)
+            || !curve::on_curve(&f, &iso.cod, &mapped_q)
+            || curve::pmul(&f, &iso.cod, &mapped_g, u128::from(input.n)) != Pt::Inf
+            || curve::pmul(&f, &iso.cod, &mapped_q, u128::from(input.n)) != Pt::Inf
+            || iso.eval(&f, &curve::padd(&f, &curve, &g, &g))
+                != curve::padd(&f, &iso.cod, &mapped_g, &mapped_g)
+            || iso.eval(&f, &curve::padd(&f, &curve, &q, &q))
+                != curve::padd(&f, &iso.cod, &mapped_q, &mapped_q)
+        {
+            continue;
+        }
+        let Pt::Aff(kx, ky) = kernel else {
+            unreachable!()
+        };
+        let id = format!("velu{}", args.degree);
+        return Ok(json!({
+            "schema_version":1,
+            "field_characteristic":input.p,
+            "cubic_nonresidue":input.c,
+            "curve_nodes":[
+                {"ref":"root","a":input.a,"b":input.b},
+                {"ref":"destination","a":iso.cod.a.0,"b":iso.cod.b.0}
+            ],
+            "edges":[{"id":id,"source_curve_ref":"root","target_curve_ref":"destination","degree":args.degree,"kernel_generator":[kx.0,ky.0]}],
+            "routes":[{"id":format!("root-to-velu{}",args.degree),"edge_ids":[id]}]
+        }));
+    }
+    Err(format!("bounded route search exhausted {} samples without a rational degree-{} kernel matching the requested j",args.max_samples,args.degree))
+}
+
 /// Enumerate distinct F_{p^3}-rational j-neighbours by modular polynomial.
 /// This is a graph of j-invariants; explicit point transport requires a
 /// separately certified route of curve models and kernel generators.
@@ -433,6 +610,65 @@ pub(super) fn transport(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn generated_public_f7_route_is_consumable_and_in_j_graph() {
+        let input = Path::new(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/docs/ic/fixtures/cubic_f7_cofactor12_public_target.json"
+        ));
+        let args = GenerateArgs {
+            input: input.to_path_buf(),
+            degree: 3,
+            target_j: None,
+            seed: 1,
+            max_samples: 256,
+        };
+        let graph = generate(&args).unwrap();
+        let path = std::env::temp_dir().join(format!(
+            "cubic-generated-route-{}-{}.json",
+            std::process::id(),
+            line!()
+        ));
+        std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
+        let field = Fp3::with_cube_nonresidue(7, 2).unwrap();
+        let generator = Pt3::affine(E3([1, 2, 3]), E3([1, 1, 6]));
+        let target = Pt3::affine(E3([3, 4, 6]), E3([1, 3, 5]));
+        let source = Curve3::new(field, E3([3, 6, 4]), E3([4, 4, 6]), 29, generator);
+        let result = transport(&source, target, &path, "root-to-velu3").unwrap();
+        std::fs::remove_file(path).unwrap();
+        assert_eq!(result.curve.mul(&result.curve.g, 5), result.target);
+        let f = CubicField { p: 7, c: 2 };
+        let destination_j = curve::jinv(&f, &Curve::new(result.curve.a, result.curve.b));
+        let j_graph = enumerate_j(&GraphArgs {
+            p: 7,
+            c: 2,
+            a: vec![3, 6, 4],
+            b: vec![4, 4, 6],
+            max_ell: 5,
+            max_nodes: 32,
+            seed: 1,
+        })
+        .unwrap();
+        let node = j_graph["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|node| node["j"] == json!(destination_j.0))
+            .unwrap();
+        let id = node["id"].as_u64().unwrap();
+        assert!(j_graph["edges"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|edge| edge["source"] == 0 && edge["target"] == id && edge["degree"] == 3));
+        let mut requested = args;
+        requested.target_j = Some(destination_j.0.to_vec());
+        assert_eq!(
+            generate(&requested).unwrap()["curve_nodes"][1]["a"],
+            graph["curve_nodes"][1]["a"]
+        );
+    }
 
     #[test]
     fn public_f7_j_graph_matches_exhaustive_field_roots() {
