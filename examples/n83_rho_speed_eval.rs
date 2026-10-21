@@ -261,6 +261,21 @@ impl RhoScalar for ExactScalar {
     fn mul_in(ctx: &Self::MulCtx, a: Self, b: Self) -> Self {
         Self(ctx.mul(a.0, b.0))
     }
+    type Fixed = Self;
+    fn fixed(_: &Self::MulCtx, w: Self) -> Self::Fixed {
+        w
+    }
+    #[inline(always)]
+    fn mul_fixed(ctx: &Self::MulCtx, a: Self, w: Self::Fixed) -> Self {
+        Self(ctx.mul(a.0, w.0))
+    }
+    #[inline(always)]
+    fn mul_pair_in(ctx: &Self::MulCtx, a: Self, b: Self, multiplier: Self) -> (Self, Self) {
+        (
+            Self(ctx.mul(a.0, multiplier.0)),
+            Self(ctx.mul(b.0, multiplier.0)),
+        )
+    }
     fn mul_mod(a: Self, b: Self, m: Self) -> Self {
         Self(<u64 as RhoScalar>::mul_mod(a.0, b.0, m.0))
     }
@@ -782,6 +797,18 @@ mod tests {
                 assert!(residual < 2 * u128::from(m));
                 saw_correction |= residual >= u128::from(m);
                 assert_eq!(ctx.mul(a, b), (x % u128::from(m)) as u64);
+                let fixed = ExactScalar::fixed(&ctx, ExactScalar(b));
+                assert_eq!(
+                    ExactScalar::mul_fixed(&ctx, ExactScalar(a), fixed).0,
+                    (x % u128::from(m)) as u64
+                );
+                let pair =
+                    ExactScalar::mul_pair_in(&ctx, ExactScalar(a), ExactScalar(b), ExactScalar(b));
+                assert_eq!(pair.0 .0, (x % u128::from(m)) as u64);
+                assert_eq!(
+                    pair.1 .0,
+                    (u128::from(b) * u128::from(b) % u128::from(m)) as u64
+                );
                 let expected_sum = ((u128::from(a) + u128::from(b)) % u128::from(m)) as u64;
                 assert_eq!(
                     ExactScalar::add_mod(ExactScalar(a), ExactScalar(b), ExactScalar(m)).0,
