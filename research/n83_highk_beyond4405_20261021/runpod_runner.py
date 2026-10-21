@@ -45,7 +45,11 @@ def read_allocation(path: Path) -> dict:
             receipt.get("vcpu_count", 0) < 4 or
             receipt.get("memory_in_gb", 0) < 32 or
             not isinstance(receipt.get("source_head_sha"), str) or
-            len(receipt["source_head_sha"]) != 40):
+            len(receipt["source_head_sha"]) != 40 or
+            not isinstance(receipt.get("snapshot_sha256"), str) or
+            len(receipt["snapshot_sha256"]) != 64 or
+            any(char not in "0123456789abcdef"
+                for char in receipt["snapshot_sha256"])):
         raise ValueError("fixed31 RunPod allocation identity differs")
     rate = Decimal(str(receipt["cost_per_hr"]))
     created = timestamp(receipt["created_utc"])

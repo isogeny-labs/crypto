@@ -175,6 +175,7 @@ def prepare(output: Path, binary: Path, rho_binary: Path,
     parent.write_json(output / "source.json", {
         "schema": "n83.fixed31-tier1-source/v1",
         "source_sha256": digest(ROOT / "examples/koblitz_orbit_dlp_fast.rs"),
+        "rho_source_sha256": digest(ROOT / "examples/n83_rho_optimization_eval.rs"),
         "cargo_lock_sha256": digest(ROOT / "Cargo.lock"),
         "binary_sha256": digest(ic_copy),
         "rho_binary_sha256": digest(rho_copy),

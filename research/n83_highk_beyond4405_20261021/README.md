@@ -87,6 +87,13 @@ stops before the ten-hour producer limit. Its fixture preflight passed with
 `runpod_runner.py` binds the producer to a quoted Pod, four pinned CPUs,
 the recorded cgroup envelope, source commit and ten-hour cost limit. It keeps
 the allocation receipt with the raw results.
+`launch_on_pod.sh` checks the checkout and fixture, builds both release
+examples on the Pod, runs the screen under the pinned affinity and provider
+deadline, then seals an archive with the raw child receipts and build logs.
+`verify_screen.py` replays every recovered scalar and four-point relation
+with the independent N83 group model, checks exact base/rank/index and phase
+accounting, preserves failed child rows, checks the Pod envelope and rho A/A
+noise, and emits the validated matrix consumed by `select.py`.
 `select.py` admits a fixed31 winner only from a complete independently replayed
 Tier 1 matrix, a passing same-base layout control, and all three pairwise
 exact sign tests at the Bonferroni threshold of 1/60.

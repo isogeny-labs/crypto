@@ -105,6 +105,11 @@ def select(data: dict, dispatch: dict) -> dict:
             second_wins = sum(b < a for a, b in
                               zip(times[first], times[second]))
             p_value = exact_two_sided_sign_p(first_wins, second_wins)
+            paired_logs = [math.log(b / a) for a, b in
+                           zip(times[first], times[second])]
+            mean_log = statistics.mean(paired_logs)
+            sd_log = statistics.stdev(paired_logs)
+            margin = 1.96 * sd_log / math.sqrt(POINT_COUNT)
             comparisons.append({
                 "first": first,
                 "second": second,
@@ -114,6 +119,11 @@ def select(data: dict, dispatch: dict) -> dict:
                 "two_sided_exact_sign_p": str(p_value),
                 "significant_at_one_over_60": significant_sign(
                     first_wins, second_wins),
+                "mean_log_second_over_first": mean_log,
+                "median_log_second_over_first": statistics.median(paired_logs),
+                "sample_sd_log_difference": sd_log,
+                "normal_approx_95_mean_log_interval": [
+                    mean_log - margin, mean_log + margin],
             })
     fastest = min(fixed_ids, key=geometric.__getitem__)
     selected = all(
