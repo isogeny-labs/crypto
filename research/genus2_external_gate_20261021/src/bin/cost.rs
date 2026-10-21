@@ -8,11 +8,11 @@ use std::fs;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Clone, Copy, Debug, Default)]
-struct OpCounts {
-    m: u64,
-    s: u64,
-    i: u64,
-    a: u64,
+pub(crate) struct OpCounts {
+    pub m: u64,
+    pub s: u64,
+    pub i: u64,
+    pub a: u64,
 }
 thread_local! { static OPS: Cell<OpCounts> = Cell::new(OpCounts::default()); }
 fn bump(f: impl FnOnce(&mut OpCounts)) {
@@ -22,10 +22,10 @@ fn bump(f: impl FnOnce(&mut OpCounts)) {
         c.set(v);
     });
 }
-fn reset() {
+pub(crate) fn reset() {
     OPS.with(|c| c.set(OpCounts::default()));
 }
-fn counts() -> OpCounts {
+pub(crate) fn counts() -> OpCounts {
     OPS.with(Cell::get)
 }
 impl AddAssign for OpCounts {
@@ -41,9 +41,9 @@ fn as_json(c: OpCounts) -> Value {
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-struct Counted<const P: u64>(PrimeField<P>);
+pub(crate) struct Counted<const P: u64>(PrimeField<P>);
 impl<const P: u64> Counted<P> {
-    fn new(v: u64) -> Self {
+    pub(crate) fn new(v: u64) -> Self {
         Self(PrimeField::new(v))
     }
     fn value(self) -> u64 {
@@ -126,7 +126,7 @@ impl<const P: u64> ExtField for Counted<P> {
         Self(PrimeField::random(rng))
     }
 }
-fn external<const P: u64>(d: Divisor) -> DivisorCoords<Counted<P>> {
+pub(crate) fn external<const P: u64>(d: Divisor) -> DivisorCoords<Counted<P>> {
     match d.degree {
         0 => DivisorCoords::identity(),
         1 => DivisorCoords::deg1(Counted::new(d.u[0]), Counted::new(d.v[0])),
@@ -139,7 +139,7 @@ fn external<const P: u64>(d: Divisor) -> DivisorCoords<Counted<P>> {
         _ => unreachable!(),
     }
 }
-fn native<const P: u64>(d: DivisorCoords<Counted<P>>) -> Divisor {
+pub(crate) fn native<const P: u64>(d: DivisorCoords<Counted<P>>) -> Divisor {
     match d.degree() {
         0 => Divisor::O,
         1 => Divisor {
