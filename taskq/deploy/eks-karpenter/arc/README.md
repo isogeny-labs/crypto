@@ -2,8 +2,8 @@
 
 This installs the GitHub-supported Actions Runner Controller (ARC) chart version
 `0.15.0` for `aburan28/crypto`. ARC listens for Actions jobs, starts one ephemeral
-runner pod per job, and Karpenter supplies an On-Demand EC2 node when a pod cannot
-fit. Empty nodes are consolidated after five minutes. The runner NodePool is
+runner pod per job, and Karpenter supplies a Spot EC2 node when a pod cannot
+fit. Empty runner nodes are consolidated after five minutes. The runner NodePools are
 separate from the `cpu-spot` Iso Lab measurement pool.
 
 | Scale set / `runs-on` | Pod request | Pod memory limit | Maximum runners |
@@ -12,15 +12,18 @@ separate from the `cpu-spot` Iso Lab measurement pool.
 | `crypto-eks-highmem` | 16 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
 
 The base NodePool admits x86-64 M/R instances with 8, 16 or 32 vCPUs and caps
-aggregate provisioning at 64 vCPUs and 512 GiB. An additional R-family pool
-admits one 16-vCPU node, enough for three more Linux runners at their current
-CPU and memory requests. The account's On-Demand vCPU quota was 96 during the
-live test; a 128-vCPU pool cap caused EC2
-`VcpuLimitExceeded` while ARC jobs were queued. These are capacity limits, not
-spending limits. Worker EC2, EBS and NAT traffic are billed. The existing cluster's
-idle costs continue. Linux x64 jobs are the only migration candidates; ARM,
-macOS, Windows, GPU and hardware-isolated ecbench jobs remain on their current
-runners.
+aggregate provisioning at 128 vCPUs and 1 TiB. An additional R-family pool
+admits 16-vCPU nodes and caps at 32 vCPUs and 256 GiB. The pool names and the
+`gha.dev/pool=on-demand` scheduling label are legacy; the Karpenter
+`karpenter.sh/capacity-type=spot` requirement controls the actual EC2 capacity.
+Both ARC scale sets have `minRunners: 0`. With no queued or running jobs, ARC
+removes its ephemeral runner pods and Karpenter removes empty runner nodes after
+five minutes. The managed system node group has a two-node floor for the ARC and
+cluster controllers. NodePool limits are upper bounds, not spending limits or
+guaranteed capacity; the regional Spot vCPU quota can prevent new nodes from
+launching. Worker EC2, EBS and NAT traffic are billed. Linux x64 jobs are the
+only migration candidates; ARM, macOS, Windows, GPU and hardware-isolated
+ecbench jobs remain on their current runners.
 
 ## Required access and authentication
 
@@ -118,9 +121,8 @@ The repo-specific image adds Node, Rust, C/C++, Python and common build
 libraries missing from the stock ARC image. The workflow parser, Rust/Clippy
 pilot and both pool smoke tests passed on EKS. The image still does not match
 every GitHub-hosted tool; Sage, perf, nested virtualization, macOS, ARM and GPU
-assumptions require their own runners or workflow changes. Spot is deliberately
-not used for this pool:
-interruption would fail long Actions jobs and require a new run.
+assumptions require their own runners or workflow changes. Spot interruption can
+fail a running Actions job, which then needs a new run.
 
 Sources: [GitHub ARC deployment](https://docs.github.com/en/actions/how-tos/manage-runners/use-actions-runner-controller/deploy-runner-scale-sets),
 [ARC authentication](https://docs.github.com/en/actions/how-tos/manage-runners/use-actions-runner-controller/authenticate-to-the-api),
