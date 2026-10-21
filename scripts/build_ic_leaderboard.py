@@ -77,6 +77,7 @@ SOURCES = {
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "sixsum_resolvent": "research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json",
     "wide_producer": "benchmarks/20261018-wide-producer-engineering/summary.json",
+    "t20_e2e": "benchmarks/20261019-t20-n73-k600-e2e/summary.json",
     "f4_gf2_port": "benchmarks/20261018-f4-gf2-port/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
@@ -755,6 +756,17 @@ def wide_producer_component() -> dict:
     return {**sm, "study": "benchmarks/20261018-wide-producer-engineering/"}
 
 
+def t20_e2e_component() -> dict:
+    """The landed n = 73, K = 600 row re-run cold end to end with the wide
+    producer's landed gains: frozen summary of
+    benchmarks/20261019-t20-n73-k600-e2e. Engineering: counted S is
+    unchanged, the wall time of every phase is measured; no rho win."""
+    sm = load(SOURCES["t20_e2e"])
+    if sm.get("schema") != "crypto.t20_n73_k600_e2e/v1" or sm.get("class") != "engineering":
+        raise SystemExit("review the T20 end-to-end summary before updating the leaderboard")
+    return sm
+
+
 def f4_gf2_port_component() -> dict:
     """The ported rank-indexed Boolean F4 kernel against this crate's
     matrix_f4_f2 family, same binary, on its own: the frozen summary of
@@ -1316,6 +1328,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "linear_algebra_component": la_component(),
         "sixsum_resolvent_component": sixsum_resolvent_component(),
         "wide_producer_component": wide_producer_component(),
+        "t20_e2e_component": t20_e2e_component(),
         "f4_gf2_port_component": f4_gf2_port_component(),
         "pair_table_component": pair_table_component(),
         "planner_component": planner_component(),
@@ -1827,6 +1840,22 @@ def markdown(doc: dict) -> str:
           f"to the control ({e['rank_relations']} relations, {e['targets_solved']} targets solved). "
           "Caveats: " + "; ".join(w["caveats"]) + ".",
           "", f"[Frozen summary](../../{SOURCES['wide_producer']}), [report](../../{w['report']}).", ""]
+    t = doc["t20_e2e_component"]
+    r = t["old_over_new"]["end_to_end_wall"]
+    ir = t["ic_over_rho"]
+    L += ["", "## Pipeline: n = 73, K = 600 cold end to end with the landed wide producer (engineering)", "",
+          f"Class **{t['class']}**: {t['claim']}. {t['host']}.", "",
+          "| arm | wall s | cpu s | index build s | rank stage s |", "|:--|---:|---:|---:|---:|"]
+    for a in ("O1_old", "N1_landed", "N2_landed_AA"):
+        L.append(f"| {a} | {t['arms_wall_s'][a]:.1f} | {t['arms_cpu_s'][a]:.0f} | "
+                 f"{t['phases_s'][a]['index_build']:.1f} | {t['phases_s'][a]['rank_stage']:.1f} |")
+    L += ["", f"Old / landed end-to-end wall **{r['point']:.3f}** (95% {r['lo']:.3f}-{r['hi']:.3f}); A/A "
+          f"{t['old_over_new']['A_A_N1_over_N2_end_to_end_wall']['point']:.3f}; counted S old/new "
+          f"{t['counted_S_old_over_new']:.3f}. IC/rho (20 matched draws): landed wall {ir['landed_wall']['point']:.1f} "
+          f"({ir['landed_wall']['lo']:.1f}-{ir['landed_wall']['hi']:.1f}), cpu {ir['landed_cpu']['point']:.1f}; old wall "
+          f"{ir['old_wall']['point']:.1f}, cpu {ir['old_cpu']['point']:.1f}. Section 5a band: {t['band_5a']['verdict']}. "
+          f"Controls: {t['controls']}. Caveats: " + "; ".join(t["caveats"]) + ".",
+          "", f"[Frozen summary](../../{SOURCES['t20_e2e']}), [report](../../{t['report']}).", ""]
     g = doc["f4_gf2_port_component"]
     ag = g["agreement"]
     L += ["", "## Component: ported rank-indexed Boolean F4 kernel (engineering)", "",
@@ -2674,6 +2703,25 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{esc(w["index_equality"])}. End to end <code>{esc(e["spec"])}</code>: {e["arms"]} arms identical to the control '
              f'({e["rank_relations"]} relations, {e["targets_solved"]} targets solved). Caveats: '
              + esc("; ".join(w["caveats"])) + '.</p>' + gh(SOURCES["wide_producer"], 'Frozen summary') + '</section>')
+
+    t = doc["t20_e2e_component"]
+    r = t["old_over_new"]["end_to_end_wall"]
+    ir = t["ic_over_rho"]
+    P.append('<section id="t20-n73-k600-e2e-20261020"><h2>n = 73, K = 600 cold end to end with the landed wide producer (engineering)</h2>'
+             f'<p>Class <strong>{esc(t["class"])}</strong>: {esc(t["claim"])}. {esc(t["host"])}.</p>'
+             '<div class="scroll"><table><thead><tr><th>Arm</th><th>Wall s</th><th>CPU s</th><th>Index build s</th>'
+             '<th>Rank stage s</th></tr></thead><tbody>')
+    for a in ("O1_old", "N1_landed", "N2_landed_AA"):
+        P.append(f'<tr><td>{a}</td><td>{t["arms_wall_s"][a]:.1f}</td><td>{t["arms_cpu_s"][a]:.0f}</td>'
+                 f'<td>{t["phases_s"][a]["index_build"]:.1f}</td><td>{t["phases_s"][a]["rank_stage"]:.1f}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>Old / landed end-to-end wall <strong>{r["point"]:.3f}</strong> (95% {r["lo"]:.3f}-{r["hi"]:.3f}); '
+             f'A/A {t["old_over_new"]["A_A_N1_over_N2_end_to_end_wall"]["point"]:.3f}; counted S old/new '
+             f'{t["counted_S_old_over_new"]:.3f}. IC/rho (20 matched draws): landed wall {ir["landed_wall"]["point"]:.1f} '
+             f'({ir["landed_wall"]["lo"]:.1f}-{ir["landed_wall"]["hi"]:.1f}), cpu {ir["landed_cpu"]["point"]:.1f}; old wall '
+             f'{ir["old_wall"]["point"]:.1f}, cpu {ir["old_cpu"]["point"]:.1f}. Section 5a band: {esc(t["band_5a"]["verdict"])}. '
+             f'Controls: {esc(t["controls"])}. Caveats: ' + esc("; ".join(t["caveats"])) + '.</p>'
+             + gh(SOURCES["t20_e2e"], 'Frozen summary') + '</section>')
 
     g = doc["f4_gf2_port_component"]
     ag = g["agreement"]

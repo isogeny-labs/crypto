@@ -5220,6 +5220,9 @@ mod wide {
         let mut rank_probes = 0u64;
         let mut rank_rows_without_gain = 0u64;
         let mut rank_unused_relation_check_ns = 0u128;
+        // Per-column (column, probes, attempts, wall ns) of the parallel rank
+        // stage; printed only under KIC_RANK_TRACE=1 (observation only).
+        let mut rank_column_trace: Vec<(usize, u64, u64, u128)> = Vec::new();
         let rank_threads: usize = std::env::var("KIC_RANK_THREADS")
             .ok()
             .and_then(|value| value.trim().parse::<usize>().ok())
@@ -5234,7 +5237,7 @@ mod wide {
             // arrive covering already-pivoted columns; those count as
             // rows without gain, exactly as sequential duplicates would.
             let (sender, receiver) =
-                std::sync::mpsc::channel::<(usize, u64, Relation128, u64, u128, u64)>();
+                std::sync::mpsc::channel::<(usize, u64, Relation128, u64, u128, u64, u128)>();
             std::thread::scope(|scope| {
                 let mut handles = Vec::with_capacity(rank_threads);
                 for thread in 0..rank_threads {
@@ -5251,6 +5254,7 @@ mod wide {
                         let mut thread_attempts = 0u64;
                         let mut thread_relation_check_ns = 0u128;
                         for column in (thread..base.columns).step_by(rank_threads) {
+                            let column_started = Instant::now();
                             let rep: FastPoint128 = representatives[column].map(|[x, y]| (x, y));
                             let mut attempt = 0u64;
                             loop {
@@ -5283,6 +5287,7 @@ mod wide {
                                                 probes,
                                                 thread_relation_check_ns,
                                                 thread_attempts,
+                                                column_started.elapsed().as_nanos(),
                                             ))
                                             .expect("rank receiver is alive");
                                         thread_relation_check_ns = 0;
@@ -5296,7 +5301,10 @@ mod wide {
                     }));
                 }
                 drop(sender);
-                for (column, scalar, relation, probes, relation_check_ns, attempts) in receiver {
+                for (column, scalar, relation, probes, relation_check_ns, attempts, column_ns) in
+                    receiver
+                {
+                    rank_column_trace.push((column, probes, attempts, column_ns));
                     rank_attempts += attempts;
                     rank_relations += 1;
                     rank_probes += probes;
@@ -5514,6 +5522,13 @@ mod wide {
             "target_threads":target_threads,
             "scope":"public synthetic Koblitz fixtures; shared-factor-log DLP with every stage timed in one process; no external points or key recovery",
         });
+        if std::env::var("KIC_RANK_TRACE").is_ok_and(|v| v == "1") {
+            rank_column_trace.sort_unstable();
+            summary["rank_column_trace"] = json!(rank_column_trace
+                .iter()
+                .map(|&(c, p, a, ns)| json!([c, p, a, ns as u64]))
+                .collect::<Vec<_>>());
+        }
         summary["lazy_canonical_enabled"] = json!(basis.lazy_canonical);
         summary["probe_prefetch_enabled"] = json!(index.prefetch_probes);
         summary["root_bloom_blocked"] = json!(index
