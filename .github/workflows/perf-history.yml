@@ -9,6 +9,11 @@ name: perf history
 # instruction comparison is available through check_only
 # manual dispatch; PERF_HISTORY_FAIL_ON_REGRESSION applies to that full run.
 #
+# Regressions are surfaced, never enforced: after each snapshot on main,
+# `perfhistory.py regressions` compares it with the recent range of every
+# kernel and, when something got more expensive, writes GitHub warnings, a job
+# summary table and one comment on the merged pull request that introduced it.
+#
 # The snapshots live on their own branch so that a measurement never needs a
 # commit on main and never conflicts with one.  Read them with
 #   git fetch origin perf-history && git show origin/perf-history:docs/perf/HISTORY.md
@@ -26,6 +31,7 @@ on:
       - 'scripts/perf/perfhistory.py'
       - 'scripts/perf/perfindex.py'
       - 'docs/perf/ecbench-children.json'
+      - 'docs/perf/ic-factor-base-j0.spec.json'
       - 'docs/perf/weights.json'
       - 'docs/perf/groebner-groups.json'
       - 'docs/perf/f4-f5-allocation-history.json'
@@ -45,6 +51,7 @@ on:
       - 'scripts/perf/perfhistory.py'
       - 'scripts/perf/perfindex.py'
       - 'docs/perf/ecbench-children.json'
+      - 'docs/perf/ic-factor-base-j0.spec.json'
       - 'docs/perf/weights.json'
       - 'docs/perf/groebner-groups.json'
       - 'docs/perf/f4-f5-allocation-history.json'
@@ -83,10 +90,11 @@ jobs:
   record:
     # Append one snapshot for the pushed (or dispatched) revision.
     if: github.event_name != 'pull_request' && github.event_name != 'merge_group' && !inputs.check_only
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|perf-history.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|perf-history.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 120
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -122,6 +130,8 @@ jobs:
             --md perf-history/docs/perf/HISTORY.md \
             --svg perf-history/docs/perf/history.svg \
             --json perf-history/docs/perf/history.json \
+            --panels-svg perf-history/docs/perf/history-panels.svg \
+            --factor-base-svg perf-history/docs/perf/factor-bases.svg \
             --weights docs/perf/weights.json | tee -a "$GITHUB_STEP_SUMMARY"
           {
             echo
@@ -129,6 +139,30 @@ jobs:
             sed -n '/^## Areas/,/^## Snapshots/p' perf-history/docs/perf/HISTORY.md | head -40
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Surface regressions against the recent range
+        id: regressions
+        run: |
+          python3 scripts/perf/perfhistory.py regressions \
+            --history perf-history/docs/perf/history \
+            --history-url "https://github.com/${{ github.repository }}/blob/${{ env.HISTORY_BRANCH }}/docs/perf/HISTORY.md" \
+            --md "$RUNNER_TEMP/regressions.md" --json "$RUNNER_TEMP/regressions.json" --annotate
+          cat "$RUNNER_TEMP/regressions.md" >> "$GITHUB_STEP_SUMMARY"
+          echo "count=$(python3 -c "import json;print(len(json.load(open('$RUNNER_TEMP/regressions.json'))['regressions']))")" >> "$GITHUB_OUTPUT"
+      - name: Comment on the merged pull request
+        # Only for pushes to main: a back-filled revision's PR is long closed.
+        if: github.event_name == 'push' && steps.regressions.outputs.count != '0'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pr=$(gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/pulls" --jq '.[0].number // empty')
+          if [ -z "$pr" ]; then echo "no pull request for ${{ github.sha }}"; exit 0; fi
+          {
+            cat "$RUNNER_TEMP/regressions.md"
+            echo
+            echo "<sub>Posted by the perf history workflow ([run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})). Informational; nothing is blocked.</sub>"
+          } > "$RUNNER_TEMP/comment.md"
+          gh pr comment "$pr" --repo "${{ github.repository }}" --body-file "$RUNNER_TEMP/comment.md"
       - name: Check out current report tools for historical backfills
         if: github.event_name == 'workflow_dispatch' && inputs.ref != ''
         uses: actions/checkout@v4
@@ -177,6 +211,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add docs/perf/history docs/perf/HISTORY.md docs/perf/history.svg docs/perf/history.json docs/perf/groebner
+          git add docs/perf/history-panels.svg docs/perf/factor-bases.svg 2>/dev/null || true
           if git diff --cached --quiet; then echo "nothing new"; exit 0; fi
           git commit -m "perf history: ${{ inputs.ref || github.sha }}"
           # Another run may have pushed meanwhile: rebase onto it and retry.
@@ -195,14 +230,17 @@ jobs:
             perf-history/docs/perf/HISTORY.md
             perf-history/docs/perf/history.svg
             perf-history/docs/perf/history.json
+            perf-history/docs/perf/history-panels.svg
+            perf-history/docs/perf/factor-bases.svg
             perf-history/docs/perf/groebner/
             ${{ runner.temp }}/record.log
+            ${{ runner.temp }}/regressions.md
           if-no-files-found: warn
 
   check:
     # PRs validate the history machinery; check_only dispatches retain the full comparison.
     if: github.event_name == 'pull_request' || github.event_name == 'merge_group' || inputs.check_only
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|perf-history.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|perf-history.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 90 }}
     steps:
       - uses: actions/checkout@v4

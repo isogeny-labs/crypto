@@ -49,8 +49,9 @@ use crate::cryptanalysis::ic_framework::fiber::{
 };
 use crate::cryptanalysis::ic_framework::plugins::{
     BinarySubspaceBase, CompactOrbitScanBase, CyclotomicBase, DescentAlgebraicOracle,
-    FrobeniusMitmOracle, GlvOrbitBase, KoblitzOrbitBase, MitmOracle, PrimeAbscissaBase,
-    PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, RootfindSubtractOracle, SubtractOracle,
+    FrobeniusMitmOracle, GlvOrbitBase, KoblitzOrbitBase, MitmOracle, OnbWeightBase,
+    PrimeAbscissaBase, PrimeBatchMitmOracle, PrimeProjectedAbscissaBase, RootfindSubtractOracle,
+    SubtractOracle,
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
@@ -138,7 +139,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
         },
         ParamDecl {
             name: "solver",
@@ -148,7 +149,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "linalg",
             default: Some("incremental-gauss"),
-            help: "incremental-gauss (stop at target pin), incremental-gauss-full-rank (all columns independent), incremental-gauss-full-rank-checked (also point-check each base column), structured-gauss, or sparse-cado (CADO-style filter + block Wiedemann, full-rank rule)",
+            help: "incremental-gauss (stop at target pin), incremental-gauss-full-rank (all columns independent), incremental-gauss-full-rank-checked (also point-check each base column), structured-gauss, sparse-cado = filter+wiedemann (CADO-style filter + block Wiedemann, full-rank rule), filter+lanczos, wiedemann or lanczos (no filter, block Wiedemann / block Lanczos, full-rank rule)",
         },
         ParamDecl {
             name: "targets",
@@ -1190,7 +1191,7 @@ fn solve_inner(
             super::cm_folded::solve(m, i, PrimePoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), "ic") => solve_ic_prime(m, i, curve, PrimePoint::affine(tx, ty), seed),
-        (Instance::Fp4(i), "ic") if m.id == "ic.pipeline" => {
+        (Instance::Fp4Torsion(i), "ic") if m.id == "ic.pipeline" => {
             let p = i.p();
             let target = Pt4 {
                 x: unpack_e4(p, tx),
@@ -1199,7 +1200,7 @@ fn solve_inner(
             };
             solve_ic_fp4(m, i, curve, target, seed)
         }
-        (Instance::Fp4(_), "ic") => Err(format!(
+        (Instance::Fp4Torsion(_), "ic") => Err(format!(
             "`{}` does not run on a curve over F_(p^4); ic.pipeline does",
             m.id
         )),
@@ -1303,6 +1304,24 @@ fn solve_inner(
         (Instance::Binary(i), _) => {
             let g = BinaryGroup(&i.fast);
             solve_generic(m, &g, i.generator, FastPoint::affine(tx, ty), i.r, seed)
+        }
+        (Instance::Fp4Torsion(i), _) => {
+            let p = i.p();
+            let target = Pt4 {
+                x: unpack_e4(p, tx),
+                y: unpack_e4(p, ty),
+                inf: false,
+            };
+            solve_generic(m, &i.inst.curve, i.generator, target, i.r, seed)
+        }
+        (Instance::F2m4(i), _) => {
+            let f = &i.curve.f;
+            let target = PtB {
+                x: f.unpack(tx),
+                y: f.unpack(ty),
+                inf: false,
+            };
+            solve_generic(m, &i.curve, i.generator, target, i.r, seed)
         }
         (Instance::Wide(_), _) | (Instance::Fp4(_), _) => unreachable!("returned above"),
     }
@@ -2102,12 +2121,14 @@ fn solve_ic_prime(
     let orbit = GlvOrbitBase { instance: inst };
     let kummer = PrimeKummerBase { instance: inst };
     let isogeny = PrimeIsogenyBase { instance: inst };
+    let cm_orbit = CmOrbitBase { instance: inst };
     let base: &dyn FactorBaseBuilder<_> = match fb_name.as_str() {
         "prime-abscissa" => &abscissa,
         "prime-projected-abscissa" => &projected,
         "glv-orbit" => &orbit,
         "prime-kummer" => &kummer,
         "prime-isogeny" => &isogeny,
+        "cm-scalar-orbit" => &cm_orbit,
         other => {
             return Err(format!(
                 "factor base `{other}` does not run on a prime curve"
@@ -2118,6 +2139,7 @@ fn solve_ic_prime(
     let mut subtract = SubtractOracle;
     let mut mitm = MitmOracle::new(ms);
     let mut prime_batch = PrimeBatchMitmOracle::new();
+    let mut prime_blocked = PrimeBatchMitmOracle::blocked();
     let mut mitm_fiber = FiberMitmOracle::new(ms);
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
@@ -2126,6 +2148,7 @@ fn solve_ic_prime(
         "subtract" => &mut subtract,
         "mitm" => &mut mitm,
         "mitm-prime-batch" => &mut prime_batch,
+        "mitm-prime-blocked" => &mut prime_blocked,
         "mitm-fiber" => &mut mitm_fiber,
         "rootfind-mitm" => &mut rootfind_mitm,
         "rootfind-pairs" => &mut rootfind_pairs,
@@ -2824,6 +2847,9 @@ pub fn dump_factor_base(
     if let Instance::Fp4(_) = &inst {
         return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
     }
+    if let Instance::Fp4Torsion(_) | Instance::F2m4(_) = &inst {
+        return Err("factor-base dumps cover prime and binary curves".into());
+    }
     match &inst {
         Instance::Prime(i) => {
             let abscissa = PrimeAbscissaBase { instance: i };
@@ -2920,7 +2946,9 @@ pub fn dump_factor_base(
                 build_doubles: total.doubles,
             })
         }
-        Instance::Wide(_) | Instance::Fp4(_) => unreachable!("returned above"),
+        Instance::Wide(_) | Instance::Fp4(_) | Instance::Fp4Torsion(_) | Instance::F2m4(_) => {
+            unreachable!("returned above")
+        }
     }
 }
 
