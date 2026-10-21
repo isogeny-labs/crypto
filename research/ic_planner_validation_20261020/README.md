@@ -35,7 +35,7 @@ by target and round, 24 pairs each; cluster 95% interval):
 | base 2N | 1.51 [1.40, 1.64] | 1.60 [1.50, 1.70] | 1.57 [1.49, 1.68] | **not separated**: below 1 at w = 1 |
 | `rootfind-subtract` oracle | 171 [164, 176] | 233 [226, 239] | 439 [424, 450] | confirmed |
 | full-rank stop rule | 3.64 [3.24, 4.14] | 3.84 [3.43, 4.21] | 4.56 [4.10, 5.12] | confirmed |
-| random targets | 44.9 [39.0, 50.7] | 49.1 [43.7, 54.0] | 51.5 [43.8, 58.5] | confirmed |
+| random targets | 44.8 [39.0, 50.6] | 49.1 [43.7, 54.0] | 51.5 [43.8, 58.5] | confirmed |
 | A/A (`plan-aa`) | 1.000 [1, 1] | 1.000 [1, 1] | 1.000 [1, 1] | — |
 
 Plans: `prime-abscissa:size=N` with N = 128, 175 and 323;

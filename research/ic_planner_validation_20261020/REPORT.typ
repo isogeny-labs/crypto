@@ -30,7 +30,7 @@ and therefore not named by slug.
   [base 2N], [1.51 [1.40, 1.64]], [1.60 [1.50, 1.70]], [1.57 [1.49, 1.68]], [*not separated*: below 1 at w = 1],
   [`rootfind-subtract`], [171 [164, 176]], [233 [226, 239]], [439 [424, 450]], [confirmed],
   [full-rank stop], [3.64 [3.24, 4.14]], [3.84 [3.43, 4.21]], [4.56 [4.10, 5.12]], [confirmed],
-  [random targets], [44.9 [39.0, 50.7]], [49.1 [43.7, 54.0]], [51.5 [43.8, 58.5]], [confirmed],
+  [random targets], [44.8 [39.0, 50.6]], [49.1 [43.7, 54.0]], [51.5 [43.8, 58.5]], [confirmed],
   [A/A], [1.000], [1.000], [1.000], [—],
 )
 S(alternative)/S(plan) on the registered curves, paired (ecbench `compare`, cluster 95% intervals,
