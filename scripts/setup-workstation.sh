@@ -422,29 +422,31 @@ if [ "$api" != "$trusted" ] \
   echo "gh-app-token: GH_SERVICE_API must be $trusted or a loopback URL" >&2
   exit 1
 fi
-cache="${XDG_CACHE_HOME:-$HOME/.cache}/gh-app-token"
+cache_root="${XDG_CACHE_HOME:-$HOME/.cache}/gh-app-token"
 umask 077
 
 b64url() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
 
-mint() {
+mint() (
   if [ -n "${GH_APP_ID:-}" ] && [ -n "${GH_APP_INSTALLATION_ID:-}" ]; then
-    # One cache per identity: a token minted for one API host, App or
-    # installation must never be handed out for another.
-    local id dir_id
-    id=$(printf '%s\n%s\n%s' "$api" "$GH_APP_ID" "$GH_APP_INSTALLATION_ID" \
-      | { sha256sum 2>/dev/null || shasum -a 256; } | cut -c1-32)
-    dir_id="$cache/$id"
-    mkdir -p "$dir_id"
-    local tok="$dir_id/token" exp="$dir_id/expires" now
+    local identity cache tok now cached
+    identity=$(printf '%s\n' "$host" "$api" "$GH_APP_ID" "$GH_APP_INSTALLATION_ID" |
+      openssl dgst -sha256 | awk '{print $NF}')
+    cache="$cache_root/$identity"
+    mkdir -p "$cache" || return 1
+    chmod 700 "$cache" || return 1
+    tok="$cache/token.json"
     now=$(date +%s)
-    if [ -s "$tok" ] && [ -s "$exp" ] && [ "$(cat "$exp")" -gt $((now + 300)) ]; then
-      cat "$tok"; return
+    if [ -s "$tok" ] && cached=$(jq -er --argjson now "$now" \
+      'select((.expires_at | fromdateiso8601) > ($now + 300)) | .token |
+       select(type == "string" and length > 0)' "$tok" 2>/dev/null); then
+      printf '%s\n' "$cached"; return
     fi
     local dir key jwt head body sig resp
-    dir=$(mktemp -d); trap 'rm -rf "$dir"' RETURN
+    dir=$(mktemp -d "$cache/mint.XXXXXXXX") || return 1
+    trap 'rm -rf "$dir"' EXIT
     key="$dir/key.pem"
-    if [ -n "${GH_APP_PRIVATE_KEY_FILE:-}" ]; then cp "$GH_APP_PRIVATE_KEY_FILE" "$key"
+    if [ -n "${GH_APP_PRIVATE_KEY_FILE:-}" ]; then cp "$GH_APP_PRIVATE_KEY_FILE" "$key" || return 1
     elif [ -n "${GH_APP_PRIVATE_KEY:-}" ]; then
       case "$GH_APP_PRIVATE_KEY" in
         *$'\n'*) printf '%s\n' "$GH_APP_PRIVATE_KEY" >"$key" ;;
@@ -454,28 +456,35 @@ mint() {
     fi
     head=$(printf '{"alg":"RS256","typ":"JWT"}' | b64url)
     body=$(printf '{"iat":%d,"exp":%d,"iss":"%s"}' $((now - 60)) $((now + 540)) "$GH_APP_ID" | b64url)
-    sig=$(printf '%s.%s' "$head" "$body" | openssl dgst -sha256 -sign "$key" -binary | b64url)
+    sig=$(printf '%s.%s' "$head" "$body" | openssl dgst -sha256 -sign "$key" -binary | b64url) || return 1
     jwt="$head.$body.$sig"
     # The JWT goes in a header file, not argv, so it never shows in `ps`.
     printf 'Authorization: Bearer %s\n' "$jwt" >"$dir/auth"
     resp=$(curl -fsS -X POST -H @"$dir/auth" -H 'Accept: application/vnd.github+json' \
       "$api/app/installations/$GH_APP_INSTALLATION_ID/access_tokens") \
       || { echo "gh-app-token: GitHub refused the App credentials" >&2; return 1; }
-    jq -er .token <<<"$resp" >"$tok.new"
-    date -d "$(jq -er .expires_at <<<"$resp")" +%s >"$exp" 2>/dev/null || echo $((now + 3000)) >"$exp"
-    mv "$tok.new" "$tok"
-    cat "$tok"
+    jq -e --argjson now "$now" \
+      'select((.expires_at | fromdateiso8601) > $now) |
+       select(.token | type == "string" and length > 0) |
+       {token, expires_at}' <<<"$resp" >"$dir/token.json" || return 1
+    mv "$dir/token.json" "$tok" || return 1
+    jq -r .token "$tok"
   elif [ -n "${GH_SERVICE_TOKEN:-}" ]; then
     printf '%s\n' "$GH_SERVICE_TOKEN"
   else
     echo "gh-app-token: no GitHub service credential (GH_APP_* or GH_SERVICE_TOKEN) in the environment" >&2
     return 1
   fi
-}
+)
 
 case "${1:-}" in
   git)
     [ "${2:-}" = get ] || exit 0   # store/erase: nothing to persist
+    protocol= request_host=
+    while IFS='=' read -r name value && [ -n "$name" ]; do
+      case "$name" in protocol) protocol="$value" ;; host) request_host="$value" ;; esac
+    done
+    [ "$protocol" = https ] && [ "$request_host" = "$host" ] || exit 0
     t=$(mint) || exit 0            # no credential: let git fall through
     printf 'username=x-access-token\npassword=%s\n' "$t" ;;
   gh-login)
