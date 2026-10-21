@@ -82,8 +82,8 @@ verified answers, relation rows and rank. Treat the two as a layout control.
 For base-size selection, compare K4405 fixed31, K4500 and K4549 on identical
 points. For each of the three pairs, use an exact two-sided sign test on their
 1,536 paired online intervals, dropping exact ties, with Bonferroni threshold
-`0.05/3`. Select a unique base only if it wins more often than each other
-base with both pairwise p-values below that threshold and has the lowest
+`0.05/3`. Require all three pairwise p-values below that threshold. Select a
+unique base only if it wins more often than each other base and has the lowest
 geometric mean online interval. Preserve all paired differences, confidence
 intervals, memory, setup and cold-process costs; the screen is a secondary
 multi-target ranking, not the one-target headline.
