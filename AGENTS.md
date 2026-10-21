@@ -29,6 +29,29 @@
   or a component (an engine, filter, oracle, solver or kernel), regenerates
   `docs/ic-leaderboard.html` and its twins in the same PR (§7b), even when
   no row of tables A–C moves; it is not a follow-up.
+- **Validation gate** (owner, 2026-10-19; schema and mechanics in
+  [`docs/VALIDATION_GATE.md`](docs/VALIDATION_GATE.md)). No row reaches the
+  IC leaderboard (`docs/ic/LEADERBOARD.md`, `docs/ic/leaderboard.json`,
+  `docs/ic-leaderboard.html`) or `benchmarks/README.md` unless its evidence
+  directory carries a `VALIDATION.json` pointing to three artifacts: (1) a
+  **replay certificate**, an independent replay of the recorded runs with the
+  scalars verified; (2) a **validator report**, an independent recompute of the
+  headline numbers from raw data that is in the repository; (3) a **rho
+  reference matched to the protocol**, the reference the protocol names and
+  the strongest available for that curve (negation, Frobenius or the
+  automorphism fold), priced in the same unit and the same binary or process,
+  with the §5a band at 0, 0.1 and 1 GAE. `scripts/build_ic_leaderboard.py`
+  refuses a row without them, and `scripts/validation_gate.py check` (workflow
+  `validation-gate`) fails a PR that adds or changes such a row. Existing
+  rows are not deleted: those frozen in `docs/ic/validation/PRE_GATE.json` and
+  `benchmarks/PRE_GATE.json` render as "unvalidated (pre-gate)" until a
+  validation sweep verdict
+  (`research/validation_sweep_20261019/{A-leaderboard,B-benchmarks}/verdicts.jsonl`)
+  or a `VALIDATION.json` validates them; the freeze files may only shrink. The
+  `audit-runs` skill re-audits finished runbook and ecbench sessions daily
+  (`.github/workflows/audit-runs-daily.yml`). Like the success criterion, the
+  gate decides what may be shown as a result, never whether an honest null or
+  negative result may be recorded: those stay in their research directories.
 - **Conductor:** run `conductor check --summary "…" --scope path:…` before
   editing; report scope expansion before editing outside reserved paths. Do
   not publish chat transcripts or secrets as task metadata.
@@ -416,8 +439,8 @@ in aburan28/crypto-autoresearcher.
 | --- | --- | --- |
 | frontier | design, interpretation, claims, breakthrough review | Mythos (`claude-mythos-5`), Fable 5.1 (`claude-fable-5-1`) |
 | core | the same when frontier is not needed; coordination and review | Opus 5.5 (`claude-opus-5-5`); OpenAI, GLM 5.3 and Qwen equivalents |
-| director | compiles a decided experiment into a frozen command card, then assesses the run | Sonnet 5.5 (`claude-sonnet-5-5`), [`experiment-director`](.claude/agents/experiment-director.md) |
-| mechanical | runs the card, relays tool output verbatim, computes nothing, refuses anything underspecified | Haiku 5.5 (`claude-haiku-5-5`, effort low), [`executor-mechanical`](.claude/agents/executor-mechanical.md) |
+| director | compiles a decided experiment into a task card (`tools/task_card.py`: one format in every repository, copied byte-identical from crypto-autoresearcher, never edited here), then assesses the run | Sonnet 5.5 (`claude-sonnet-5-5`), [`experiment-director`](.claude/agents/experiment-director.md) |
+| mechanical | runs the card through `tools/task_card.py run`, relays its output verbatim, computes nothing, refuses anything underspecified | Haiku 5.5 (`claude-haiku-5-5`, effort low), [`executor-mechanical`](.claude/agents/executor-mechanical.md) |
 
 - **Frontier and core keep the reasoning**: the spec and preregistration,
   analysis (`ecbench compare` and `table` read-outs), the §5a pricing band and
