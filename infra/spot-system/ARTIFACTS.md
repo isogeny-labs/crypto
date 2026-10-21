@@ -1,6 +1,6 @@
 # Published deployment artifacts
 
-Source, tests, and the staged CloudFormation template live in this directory.
+Source, tests, and the applied CloudFormation template live in this directory.
 Compiled binaries and deployment-specific inventory remain in the private S3
 bucket listed in `artifacts.json`. No AWS credentials, private SSH keys, Cairn
 identity keys, Conductor credentials, or database files are in these artifacts.
@@ -10,13 +10,15 @@ identity keys, Conductor credentials, or database files are in these artifacts.
 - `deployment_bundle`: the complete deployment folder, including the runtime,
   client installer, generated template, and observed deployment status.
 - `client_installer`: the small workstation package. Extract it and run
-  `python3 setup.py` in `spot-client/` on the machine running the coding clients.
+  `bash install_client.sh` in `spot-client/` on the machine running the coding clients.
 - `runtime`: the digest-pinned worker bundle containing the supervisor, activity
   reporter, node services and pinned node executables.
 - `checkpoint_discovery`: the portable native scanner executable, also included
   in the runtime. Its runbook is `CHECKPOINT_DISCOVERY.md`.
 - `checkpoint_selftest`: the native kill/corrupt/restore bootstrap gate, also
   included in the runtime. Its build/deployment instructions are in `AWS_DEPLOYMENT.md`.
+- `solver_checkpoint_selftest`: the real sparse-solver kill/restore bootstrap gate.
+- `native_experiment`: the portable checkpoint-capable factor-base executable.
 
 The release's `artifacts.json` sits beside the deployment bundle and is also
 committed here. It is excluded from the bundle to avoid a circular self-hash.
@@ -40,15 +42,17 @@ do not replace a bundle's content under another bundle's digest.
 
 ## Deployment status
 
-The applied stack enables managed wake/idle scaling in an isolated workspace;
-IP cutover is disabled. The first Spot launch was quota-blocked. The separate
-original host still runs its existing experiments and local Cairn/Conductor
-node bundle. `AWS_DEPLOYMENT.md` and `validation/aws-deployment.json` record the
-applied settings, quota requests and validation limits.
+The applied stack enables wake/idle scaling and guarded automatic IP failover.
+The applied Spot quota is 96 vCPUs. The original source and IP remain protected
+while its remaining experiment runs. Private encrypted memory backups run at
+15-minute boundaries, and automatic recovery passed two successive disposable
+replacement hops. The newest independent Diem copy restore also passed.
 
-Before activation, complete the recovery, workload migration, node writer-lock
-handoff and client installation gates in `README.md`. Existing non-checkpointed
-experiments do not acquire RAM recovery from these uploads.
+The laptop hooks/SSH installer is prepared; actual laptop installation and
+Codex `/hooks` trust remain client-side activation steps. New arbitrary programs
+need tested native checkpoints or explicit tested CRIU enrollment. Memory
+archives are private in the separate checkpoint namespace and are excluded from
+all software releases and GitHub. See `VALIDATION.md` for exact evidence/limits.
 
 ## Validation
 
