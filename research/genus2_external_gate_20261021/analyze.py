@@ -2,6 +2,7 @@
 """Join the frozen 1,260 targets and price complete cold one-target solves."""
 import csv
 import json
+import math
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -24,15 +25,17 @@ def price(row, arm, square, inversion, native):
         c = row["counts"]
         unit = row["source_add"]
         n = row["native"]
+        logical_cost = logical(n) + c["field_adds"] + c["bit_ops"]
         arithmetic = c["m"] + square * c["s"] + inversion * c["i"]
         divisor = unit["m"] + square * unit["s"] + inversion * unit["i"]
     else:
         c = row["counters"]
         n = c
+        logical_cost = logical(n)
         arithmetic = c["field_multiplications"] + square * c["field_squarings"] + inversion * c["field_inversions"]
         divisor = c["source_add_multiplications"] + square * c["source_add_squarings"] + inversion * c["source_add_inversions"]
     assert divisor > 0
-    return arithmetic / divisor + native * logical(n)
+    return arithmetic / divisor + native * logical_cost
 
 
 def main():
@@ -53,11 +56,12 @@ def main():
             rho = by_arm["rho_neg"][wid]
             assert p["workload"] == rho["workload"]
             assert p["workload"]["workload_sha256"] == row["workload_sha256"]
-            assert p["algorithm_seed"] == row["algorithm_seed"]
+            assert p["algorithm_seed"] == rho["algorithm_seed"] == row["algorithm_seed"]
             assert int(p["method"]["params"]["trial_cap"]) == row["cap"]
             assert p["workload"]["planted"] == row["planted"]
             assert p["outcome"]["status"] == rho["outcome"]["status"] == "verified"
-            assert [row["source_add"][k] for k in ("m", "s", "i")] == [p["counters"][f"source_add_{k}"] for k in ("multiplications", "squarings", "inversions")]
+            for control in (p, rho):
+                assert [row["source_add"][k] for k in ("m", "s", "i")] == [control["counters"][f"source_add_{k}"] for k in ("multiplications", "squarings", "inversions")]
             key = (bits, p["workload"]["curve"]["slug"], row["target_index"])
             groups[wid] = (key, {"external": row, "genus_projective": p, "rho_neg": rho})
     assert len(groups) == 1260
@@ -69,6 +73,8 @@ def main():
     slices = [("all", "all", list(groups.values()))]
     slices += [("bits", str(bits), [g for g in groups.values() if g[0][0] == bits]) for bits in BITS]
     slices += [("curve", f"{bits}:{slug}", [g for g in groups.values() if g[0][:2] == (bits, slug)]) for bits, slug in sorted(curves)]
+    control_report = json.loads(Path("research/five_leads_e2e_20261019/results/genus2-projective-summary.json").read_text())
+    control_slices = {(row["kind"], row["label"]): row["representative"] for row in control_report["summary"]}
     grid = []
     summary = []
     for kind, label, selected in slices:
@@ -85,7 +91,10 @@ def main():
                     if (square, inversion, native) == (.5, 10, .1):
                         representative = row
         ext = [arms["external"] for _, arms in selected]
-        summary.append({"kind": kind, "label": label, "targets": len(selected), "all_verified": True, "failures": 0, "exhaustions": 0, "representative": representative, "external_over_rho_band": [min(ratios_rho), max(ratios_rho)], "external_over_projective_band": [min(ratios_projective), max(ratios_projective)], "rho_win_cells": sum(x < 1 for x in ratios_rho), "projective_win_cells": sum(x < 1 for x in ratios_projective), "processed_divisors": sum(r["native"]["processed_divisors"] for r in ext), "external_additions": sum(r["native"]["external_additions_uncharged"] for r in ext), "equality_dispatches": sum(r["native"]["external_equality_dispatches_uncharged"] for r in ext)})
+        control = control_slices[kind, label]
+        assert math.isclose(representative["rho_neg_GAE"], control["rho_neg_GAE"], rel_tol=1e-12)
+        assert math.isclose(representative["genus_projective_GAE"], control["genus_projective_GAE"], rel_tol=1e-12)
+        summary.append({"kind": kind, "label": label, "targets": len(selected), "all_verified": True, "failures": 0, "exhaustions": 0, "representative": representative, "external_over_rho_band": [min(ratios_rho), max(ratios_rho)], "external_over_projective_band": [min(ratios_projective), max(ratios_projective)], "external_win_cells_vs_rho": sum(x < 1 for x in ratios_rho), "external_win_cells_vs_projective": sum(x < 1 for x in ratios_projective), "processed_divisors": sum(r["native"]["processed_divisors"] for r in ext), "external_additions": sum(r["native"]["external_additions_uncharged"] for r in ext), "equality_dispatches": sum(r["native"]["external_equality_dispatches_uncharged"] for r in ext)})
     with (result_dir / "price-grid.csv").open("w", newline="") as fh:
         writer = csv.DictWriter(fh, fieldnames=grid[0].keys())
         writer.writeheader()

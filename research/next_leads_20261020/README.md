@@ -36,12 +36,23 @@ setup cannot be separated from descent in this receipt. Scalar relation
 work/recovery costs another 13,287,315 GAE. Faster line enumeration alone
 has limited headroom on this fixture.
 
+The independently wrapped external genus-2 affine law has now solved and
+source-verified the same **1,260 targets**. At representative pricing it is
+**0.849862× the projective collector** but **2.448830× rho**; it loses to
+rho in all 36 pooled pricing cells. The full [cohort report and raw
+records](../genus2_external_gate_20261021/README.md) distinguish this
+implemented law from the still-unimplemented complete inversion-free law.
+Keeping the external run's field additions and other logical counts fixed,
+even free `M/S/I` leaves **1.307210× rho** at representative logical pricing;
+the remaining complete-law path must change more than those three primitive
+counts to cross rho on this cohort.
+
 ## Executable leads
 
 | Path | Why it is live | First decisive experiment and controls | Current status |
 | --- | --- | --- | --- |
 | **1. Target-coefficient rank collector** | The old two-choice component/cycle proxy was 1.000857× its affine incumbent and 4.483247× rho on the 1,260 targets. The projective chart processed 221.27 million divisors. | A frozen signed-potential target-coefficient preview was implemented and charged on the same 21 curves × 60 targets, with both candidate additions and valid relations retained. A cheaper one-candidate or different score remains a separate experiment. | **Measured loss:** all 1,260 source answers and replays verified; [full result](../target_rank_20261021/README.md) is **1.016333× projective** and **2.928507× rho** at the representative price. Its ordinary-merge score occurs on 99.984393% of valid relation previews. |
-| **2. Complete genus-2 law plus batchable branch arithmetic** | The existing fraction-free chart still uses a normalization inversion and 483,273 exceptional affine fallbacks. All 42 recorded Scholten models passed transformation to the monic quintic form required by the complete inversion-free [Ozbay Gürler–Hisil law](https://link.springer.com/article/10.1007/s13389-024-00351-7). An independent [Rust divisor-arithmetic implementation](https://github.com/salindne/divisor-arithmetic) exposes an optimized affine law and batched inversions; it is distinct from the published inversion-free law. | Implement the complete law and independently cross-check each addition/doubling against affine Cantor on the same 21 curves, including exceptional inputs. Compare same-host operation counts and qualified wall time against our chart, the external Rust package, and smalljac where its model applies. Batch only independent candidate additions; sequential walk steps cannot be batched unchanged. | **Correctness gate complete, speed open:** the pinned external `add(D,D)` fails 1,312/1,342 equal-input cases, but dispatching equal inputs to `double` passes [85,764 ordered additions](../genus2_external_gate_20261021/README.md) on the 21 curves against Cantor. No full-cost ratio exists. The 1.550678× fixed-logical floor still applies to backend-only changes. |
+| **2. Complete genus-2 law plus batchable branch arithmetic** | The existing fraction-free chart still uses a normalization inversion and 483,273 exceptional affine fallbacks. All 42 recorded Scholten models passed transformation to the monic quintic form required by the complete inversion-free [Ozbay Gürler–Hisil law](https://link.springer.com/article/10.1007/s13389-024-00351-7). An independent [Rust divisor-arithmetic implementation](https://github.com/salindne/divisor-arithmetic) exposes an optimized affine law and batched inversions; it is distinct from the published inversion-free law. | Implement the *complete* law and cross-check each addition/doubling against affine Cantor on the same 21 curves, including exceptional inputs. Use the exact charged, normalized-model 1,260-target collector as the control; compare complete cold cost and qualified isolated wall time. Batch only independent candidate additions; sequential walk steps cannot be batched unchanged. | **External affine variant measured:** upstream `add(D,D)` fails 1,312/1,342 equal-input cases; the equality-dispatched wrapper passes [85,764 ordered additions](../genus2_external_gate_20261021/README.md) and all **1,260 live source-verified DLPs**. It costs **0.849862× projective** but **2.448830× rho** at the representative price, and loses to rho in all 36 pooled cells. The published complete inversion-free law remains unimplemented. The original 1.550678× floor applies only to the *old* fixed counts; the new run has its own changed counts. |
 | **3. Genus-3 extension torsion → odd-kernel quotient → mapped DLP** | The F257 positive control has a Frobenius-stable order-27 subgroup over F257^6, although the rational Jacobian order has 3-adic valuation one. Thus rational rank-three torsion is an invalid gate. The 20 frozen Smith-negative p31 curves still lack an actual ell=3,5 odd-kernel screen. [Tian's construction](https://arxiv.org/html/2007.03172) needs a maximal isotropic kernel and a quotient/map. | Compute full Frobenius action on extension-field ell-torsion and Weil pairing; enumerate invariant maximal isotropic subgroups, then reconstruct quotient and evaluate a map on P/Q. Replay F257 as positive control, use deliberately nonisotropic and nonstable kernels as negative controls, then run all 20 frozen p31 inputs. For any successful candidate, run the mapped line-sieve DLP and source verification and price complete cold work against rho. | Open. The p31 order probe timed out; 15/20 one-infinity model gates and the F257 mapped DLP are only partial prerequisites. [General genus-2/3 isogeny algorithms](https://arxiv.org/abs/1709.06063) give another construction route, not a working adapter yet. |
 | **4. Quartic mapped descent and verification arithmetic** | On F257, mapped setup/descent and destination verification account for 551.48 million of 568.87 million GAE. The initial line pass is 0.72% of total. | Profile the evaluation-space Jacobian, divisor normalization, mapped descent and destination equality checks separately on F257. Replace one hotspot at a time with independent group-law cross-checks and full source verification. Compare cold single-target costs and growing-q fixtures, retaining the same map, relations, and rho controls. Treat setup reuse as a separately reported multi-target result. | Proposed. A faster relation enumerator alone would save at most 0.72% here if all other costs stay fixed. The [degree-four sieve study](https://www-fourier.univ-grenoble-alpes.fr/~viva/research/articles/SievingB.pdf) also cautions against assuming its line-sieving variant improves degree-four double-large-prime work. |
 | **5. Mixed-fiber PKM solver audit and external oracle** | Pair-table mixed/rho is 3.2222×; exhaustive polynomial/rho is 32.2975×; current F4/rho is only a **≥232,110× lower bound** because several primitives are uncharged. A tower-structure coverage bonus was absent in the earlier 18-cell screen. | Finish primitive accounting for all 540 F4-backed DLPs, export the same 180 relation-query systems to [msolve](https://github.com/algebraic-solving/msolve) and Magma F4 on the same host, and compare exact root sets with the exhaustive oracle. If a solver is materially faster, reprice the full mixed pipeline, including setup, failed queries and source checks, then test larger instances. | Proposed. The current lower bound cannot support a fastest-implementation claim or an end-to-end win. |
@@ -60,12 +71,13 @@ new measurements in this directory:
 
 The ordering is a suggested execution path based on measured bottlenecks and
 missing certificates, not a claim that any hypothesis will work. Paths 1 and
-2 should be measured individually **and** together: a solver can win against
-its current index-calculus baseline without crossing rho, and a component
-gain is not an end-to-end gain. For path 3, do not replace extension-field
-torsion by the rational-order shortcut that failed the positive control.
+2 have now been measured separately on all 1,260 targets; combining the
+rank policy with the external law would be a distinct experiment, with the
+rank policy's measured loss as its prior. For path 3, do not replace
+extension-field torsion by the rational-order shortcut that failed the
+positive control.
 
 The [five-lead report](../five_leads_e2e_20261019/REPORT.md) supplies the
 frozen protocols, raw sessions, source-verification receipts, replay audits,
-and the exact prior losses. No new DLP, kernel, or solver experiment was run
-for this portfolio; `headroom.json` is a recomputation of existing records.
+and the exact prior losses. `headroom.json` is a recomputation of those older
+records; the linked rank and external-law reports contain the new runs.

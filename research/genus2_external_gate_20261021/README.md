@@ -60,12 +60,66 @@ its ratio is **0.183808–0.291065×**. These pools weight branch types
 differently from a live collector; this is **not** an end-to-end cost or a
 ratio against rho. The inversion-free published law remains a separate path.
 
-The stage result warrants an end-to-end collector test. That test must move
-the transferred divisors into the checked normalized model once, charge the
-coordinate change, use the wrapped law for every walk and initialization
-addition, retain the complete signed relation solver, and run all 1,260
-original targets before claiming a rho comparison. The equality dispatch and
-all exceptional branches must remain charged.
+## Live 1,260-target collector
+
+The [live collector](src/bin/collector.rs) uses the same fixed 21 exact-order
+source models, 60 targets per model, algorithm seed and trial cap as the frozen
+projective and negation-rho arms: 1,260 targets at 16–40 source-order bits.
+It constructs the destination model cold for each target, charges the
+normalization to `y² = x⁵ + f₃x³ + f₂x² + f₁x + f₀`, transfers both source
+divisors, and uses the wrapped external law in jump initialization, scalar
+multiplication and every live walk step. It retains the two-choice relation
+policy and signed graph elimination. Both prospective additions and all valid
+relations are processed. A fresh source-curve multiplication checks every
+recovered scalar against the target and planted answer, and its arithmetic
+is charged. All **1,260 recovered scalars verified**; failures and
+exhaustions: **0**. The [paired analyzer](analyze.py) requires exact workload
+hashes, seeds, caps, source-addition units and planted answers, and
+independently reproduces the frozen rho and projective control totals.
+
+Complete cold one-target cost at `M + 0.5S + 10I` and **0.1 GAE per native
+logical operation** is:
+
+| Arm, 1,260 targets | GAE | Relative to rho |
+| --- | ---: | ---: |
+| Wrapped external collector | 2,666,291,893.905 | **2.448830×** |
+| Frozen projective collector | 3,137,323,980.305 | 2.881445× |
+| Frozen negation rho | 1,088,802,370.333 | 1× |
+
+The external law improves the projective collector to **0.849862×** its
+cost. It still loses to rho in **all 36 pooled pricing cells**: external/rho
+spans **1.345253–13.126486×** across `S/M = 0, 0.5, 1`, `I/M = 1, 10,
+100, 1000`, and native logical prices `0, 0.1, 1`. It beats projective in
+all 36 cells (ratio **0.813129–0.970009×**). At 40 bits, the representative
+ratio is **2.464040× rho** and **0.859296× projective**. At 16 bits, 9 of
+36 pricing cells beat rho (all with native price 1 and `I/M ≥ 10`, by at
+most 2.46%), but its representative ratio is **1.177905×**;
+the other six size slices have no rho-winning cells. None of the 21 curves
+beats rho at the representative price.
+
+The external walk processed **219,581,773** candidate divisors and made
+**220,368,293** wrapped additions, including **481,051** equal-input
+dispatches. At representative pricing its field arithmetic contributes
+1,242,998,567.405 GAE, field additions 1,090,500,768.800 GAE, and other
+native logical work 332,792,557.700 GAE. The per-target split is in the
+[raw records](results/); the complete 36-cell and per-size/per-curve prices
+are in [price-grid.csv](results/price-grid.csv) and
+[summary.json](results/summary.json). Field additions, subtraction's two
+additions, equality dispatches, graph work, transfer, and source verification
+are included in the declared pricing. These are **operation-count prices**;
+the shared host's wall time is not used to claim speed.
+
+Holding this run's field-addition and other logical counts fixed, making
+every charged multiplication, square and inversion free still leaves
+**1,423,293,326.500 GAE, or 1.307210× rho** at the representative logical
+price. This is a floor for the measured counts, not for a redesigned solver
+that changes addition or relation counts. A total-cost reduction of 59.16%
+would be needed to tie rho at this price.
+
+The verdict is a real collector improvement over the existing projective
+backend, but **no end-to-end rho advantage** at this scale or within the
+declared pricing band. The published complete inversion-free law is still a
+different, untested implementation path.
 
 Reproduce from the repository root:
 
@@ -76,7 +130,15 @@ cargo run --release --locked --manifest-path research/genus2_external_gate_20261
 cmp /tmp/genus2-external-receipt.json research/genus2_external_gate_20261021/receipt.json
 cmp /tmp/genus2-external-cohort.json research/genus2_external_gate_20261021/cohort.json
 cmp /tmp/genus2-external-cost.json research/genus2_external_gate_20261021/cost.json
+for bits in 16 20 24 28 32 36 40; do
+  cargo run --release --locked --manifest-path research/genus2_external_gate_20261021/Cargo.toml --bin collector -- "$bits" > "/tmp/genus2-external-replay-${bits}.jsonl"
+  cmp "/tmp/genus2-external-replay-${bits}.jsonl" "research/genus2_external_gate_20261021/results/order-genus-${bits}.jsonl"
+done
+python3 research/genus2_external_gate_20261021/analyze.py research/genus2_external_gate_20261021/results
 ```
 
 Raw per-model counts and zero-mismatch attestations are in
-[cost.json](cost.json). Wall time is not used for ranking on this shared host.
+[cost.json](cost.json). All seven live record files were independently
+replayed byte for byte; [replay.json](results/replay.json) freezes their
+digests and 1,260/1,260 replay result. The analyzer reconstructs the
+reported prices from the retained records and frozen controls.
