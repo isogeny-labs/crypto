@@ -289,6 +289,24 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 [Frozen IC1 rows and candidate identities](../../research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json). The cold process includes base and index construction, relation rank, target recovery and producer verification. Rho's interval starts with its target-dependent walk and ends with scalar verification. This wall-time panel is kept separate from Tables A–C and their operation-unit S rankings.
 
 
+## N83 Tier 1 sixteen-point factor-base frontier
+
+Eight exact packed-root configurations ran on sixteen sealed public points across two admitted cloud hosts, one fresh IC process and a same-point rho solve for every candidate-point pair. All 128 pairs passed independent replay. The frozen online and cold selectors both report `BOUNDED_UNKNOWN`; the cold K1107 factor-base size lowers process cost against K1120, while its root11 and root22 layouts remain unresolved.
+
+| Configuration | Actual usable points | Folded columns | Online median ms | Cold mean s | Paired rho/IC median | IC faster / 16 |
+|:--|--:|--:|--:|--:|--:|--:|
+| 1104/r11 | 183,264 | 1,104 | 113.394 | 108.382 | 16.247 | 16/16 |
+| 1104/r22 | 183,264 | 1,104 | 111.651 | 108.112 | 11.334 | 16/16 |
+| 1107/r11 | 183,762 | 1,107 | 79.820 | 104.826 | 18.507 | 16/16 |
+| 1107/r22 | 183,762 | 1,107 | 82.929 | 104.635 | 23.910 | 16/16 |
+| 1112/r11 | 184,592 | 1,112 | 195.899 | 106.596 | 12.457 | 15/16 |
+| 1112/r22 | 184,592 | 1,112 | 191.117 | 106.699 | 15.636 | 16/16 |
+| 1120/r11 | 185,920 | 1,120 | 73.487 | 108.775 | 22.355 | 16/16 |
+| 1120/r22 | 185,920 | 1,120 | 71.913 | 108.966 | 19.394 | 16/16 |
+
+[Frozen 132 IC1 rows](../../research/n83_e2e_final_holdout_20261016/ic1_rows_39005111289.json) and [provider-bound result and graph](../../research/n83_e2e_finalist_results_20261017/RESULT.md). The recorded online ratios use fresh rho while excluding reusable IC preparation; a time- or memory-matched precomputation-rho reference was not measured here. The online interval excludes reusable preparation; the separate cold column charges it. This Tier 1 wall-time panel is separate from Tables A–C and their operation-unit S rankings.
+
+
 ## Sources
 
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
@@ -318,6 +336,10 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
+- `research/n83_e2e_final_holdout_20261016/ic1_rows_39005111289.json` — sha256 `a789512e3192b960…`
+- `research/n83_e2e_final_holdout_20261016/validated_rows.json` — sha256 `b296172d92739c4d…`
+- `research/n83_e2e_final_holdout_20261016/selection.json` — sha256 `860d24e60baa552d…`
+- `research/n83_e2e_finalist_results_20261017/plot_data.json` — sha256 `a7a94eed46c23404…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
 - `docs/curves/registry.json` — sha256 `584d070fbec7e21f…`
