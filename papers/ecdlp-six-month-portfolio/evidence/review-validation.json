@@ -1,0 +1,67 @@
+{
+  "review_date": "2026-10-19",
+  "native_source_commit": "6e170e48882e1ba21dc90f95e6eba07f3879eabc",
+  "configuration": "Release; CUDA OFF; cuPQC OFF; tools OFF",
+  "compiler": "GCC 14.2.0",
+  "cmake": "4.4",
+  "configured_native_tests": 17,
+  "initial_passes": 15,
+  "initial_environment_failures": [
+    "coord: local sockets denied",
+    "ecc2k130-usecase: tracked sparse files not yet materialized"
+  ],
+  "environment_repair": "Materialized original tracked use-case files; reran only the two failed tests with network permission. Both passed.",
+  "native_coverage": "17/17 configured tests covered across initial and repaired-environment runs; CPU-only GPU test is emulation",
+  "lean_kernel_rebuilt": false,
+  "rust_library_check": "Cargo is unavailable; no Rust implementation changed",
+  "scientific_experiments_rerun": "No full historical performance corpus; fresh native correctness tests only",
+  "canonical_graphs_changed": false,
+  "canonical_graph_reason": "Retrospective of existing evidence, no new cryptographic measurement or official status transition",
+  "conductor": "Unavailable (127); no reservation claimed",
+  "manuscript_validation": {
+    "pdf_pages": 48,
+    "figure_sets": 10,
+    "source_entries": 96,
+    "locally_rechecked_source_hashes": 80,
+    "make_check": "pass: references/citations resolved; no LaTeX errors or overfull boxes",
+    "recorded_data_check": "pass: catalogue, full reading CSV/event coverage, post-integration ranges and copied values checked",
+    "visual_review": "All 48 pages rendered; all four final contact sheets inspected, with new plots and selected technical/coverage pages also examined directly.",
+    "pdf_sha256": "1440076a68f465f8f2d0dc837db760dfa537805fd7e5aa401307312fff7c049f"
+  },
+  "initial_manuscript_validation": {
+    "pdf_pages": 39,
+    "figure_sets": 8,
+    "source_entries": 72,
+    "locally_rechecked_source_hashes": 65,
+    "make_check": "pass: references/citations resolved; no LaTeX errors or overfull boxes",
+    "recorded_data_check": "pass, including catalogue manifest",
+    "visual_review": "All 39 pages rendered; text extracted and page contact sheets inspected; all eight figure sets inspected",
+    "pdf_sha256": "7271631051f4bdd93c4a83e56292b514a07679f66c2319b220e50fb9c3867a4f"
+  },
+  "expanded_review": {
+    "recorded_at": "2026-10-19T04:22:05.829795+00:00",
+    "pinned_full_read_files": 94,
+    "prior_focused_sources": 50,
+    "tracked_entries_without_reading_receipts": 305223,
+    "external_returned_texts_read": 8,
+    "literal_everything_read": false,
+    "new_byte_checks": {
+      "volcano_7937_manifest_entries": 79462,
+      "original_c_full_point_order_manifest_entries": 125
+    },
+    "scientific_replay": "No new cryptographic solver or mathematical replay in expanded pass; original native test receipts retained separately.",
+    "open_record": "problems/ecdlp-portfolio-reading-coverage.md",
+    "post_integration_sources": {
+      "full_source_reads": 1,
+      "partial_source_ranges": 1,
+      "revision": "8e4c99759fd8d9594ed207d793b07b59ebaf19f7"
+    }
+  },
+  "integration_validation": {
+    "main_revision": "8e4c99759fd8d9594ed207d793b07b59ebaf19f7",
+    "conflict": "problems/README.md: preserved both entries; placed portfolio row at end of index",
+    "source_check": "Checks cited Git revision bytes after current worktree advances.",
+    "whitespace_check": "PR scope against integration base passes. Global staged merge comparison reported pre-existing upstream PDF/SVG whitespace; those frozen upstream bytes remain unchanged.",
+    "new_scientific_tests": "None; imported upstream implementation changes are not authored by this PR."
+  }
+}

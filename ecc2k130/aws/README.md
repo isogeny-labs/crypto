@@ -656,7 +656,49 @@ Or from the Modal tree: `./run.sh ingest` (same script; sets
 Set `DATABASE_URL` to skip Secrets Manager, or `RHO_DB_HOST` plus the
 `rho/dp-rds` secret (connections use `sslmode=require` by default). Requires
 the same IAM scope as the ingest instance profile: read `dp/`, read the
-secret, write the status bucket. Multiple ingesters at once are safe.
+secret, write the status bucket.
+
+**Concurrent replicas.** Stop every older `dp_ingest.py` process before the
+first replica deployment; the old process does not take cross-host object
+locks. New builds take them by default and use the hostname as a fallback id.
+Set a stable, distinct `RHO_INGEST_REPLICA_ID` for each process (1–80 ASCII
+letters, digits, dot, underscore, or hyphen). Run one designated status
+publisher and any number of additional workers:
+
+```bash
+RHO_INGEST_REPLICA_ID=ingest-a ./ingest.sh
+RHO_INGEST_REPLICA_ID=ingest-b RHO_INGEST_WORKER_ONLY=1 ./ingest.sh
+```
+
+The publisher runs the same ingestion work; `RHO_INGEST_WORKER_ONLY=1` only
+disables its status and CloudWatch writes. Keep the publisher under systemd or
+another restart manager. If it is down, the other replicas continue ingesting
+but the public status feed stops advancing until it returns or one is
+explicitly promoted. Do not run two publishers: their local backlog summaries
+can race in `status.json`.
+
+Each replica takes a transaction-scoped PostgreSQL advisory lock for an S3
+object before downloading it. It rereads the progress row under that lock and
+skips an object another replica completed. The lock releases on commit,
+rollback, or connection loss, so a replacement replica can retry a crashed
+one. Replica-specific ordering spreads a bounded oldest window without a
+fixed fleet roster. This is a cooperative lock: **every** live ingester must
+run the replica code. The status publisher remains a separate designated role.
+
+The committed `dp_ingest_progress` row now records `ingester_id`, SHA-256 of
+the exact S3 bytes, their byte length, and S3 `VersionId` when available. The
+row and point insert share one transaction. Earlier rows have null metadata;
+do not infer an ingestion-time hash for them. Cairn's audited service-period
+receipt can identify the replica that committed each object and compare its
+stored digest with a later read of that exact S3 version. A digest in private
+RDS is still not independent public proof of the bytes or every inserted point.
+
+After each completed S3 pass, including one that found no new objects, the
+replica writes a row in `dp_ingest_polls` with its id, database timestamp,
+objects processed, and rows added. The period auditor counts these rows for
+idle-service payment. A started pass that crashed before completion has no
+poll row. The record is evidence of a pass by a process with database write
+access; it is not a remote proof that every S3 key was inspected.
 
 From outside the VPC, `rho-dp` must be publicly reachable (`ensure-access`
 enables that and opens the RDS security group). Hosts with unstable egress
@@ -667,8 +709,86 @@ VPC ingest host avoids that.
 `Name=rho-dp-ingest` inside the VPC as a systemd unit with `Restart=always`,
 publishing `status.json` to the status bucket and its journal to
 `s3://$BUCKET/logs/rho-ingest-<instance>/ingest.log` every two minutes.
-Use this when EC2 is available and you prefer a private RDS endpoint with no
-public IP allowlisting.
+Use this when EC2 is available and you prefer VPC access to RDS without
+adding public egress addresses to its allowlist.
+
+Run `AWS_PROFILE=ecc2k130 ./ingest_host.sh preflight` first. It resolves the
+security group and subnet from a running walker or, when the walker fleet is
+quiet, from a stopped ingest host. It creates nothing. On the Mac that has the
+`com.adamburan.ecc2k130-dp-ingest` LaunchAgent, preflight refuses an active
+copy whose digest differs from the source being deployed; this catches the
+otherwise invisible old publisher before any S3 upload or EC2 launch. It also
+refuses a second publisher when a local LaunchAgent or tagged EC2 publisher
+is active. Preflight reports source-bucket versioning as well. If it is
+disabled, the receipt records a content digest but an auditor can replay those
+bytes later only while the object key still names the same content. After **every** old
+ingester copy has stopped, launch exactly one publisher with
+`INGEST_ROLE=publisher ./ingest_host.sh up`, then launch additional replicas
+with `INGEST_ROLE=worker ./ingest_host.sh up`. Each EC2 hostname is the stable
+replica id used in committed progress and poll rows; the instance has an
+`IngestRole` tag, and `status` displays that role. Workers ingest and record
+polls but do not race the publisher's status or CloudWatch writes. Launches
+are billable EC2 operations, so preflight alone is the read-only check. `up`
+requires the `ecc2k130-ingest` instance profile and fails before upload or
+launch if it is unavailable; it never places AWS static keys in user-data.
+
+For Cairn operating-period payment, point `INGEST_OPERATOR_PATH` at the
+reviewed `examples/ecc2k-ingest-service/cairn_ingest_operator.py` in the Cairn checkout and
+enable the paid-service mode on **each** replica:
+
+```sh
+export INGEST_CAIRN_SERVICE=1
+export INGEST_OPERATOR_PATH=/absolute/path/to/cairn/examples/ecc2k-ingest-service/cairn_ingest_operator.py
+export INGEST_PERIOD_SECONDS=600
+AWS_PROFILE=ecc2k130 INGEST_ROLE=worker ./ingest_host.sh preflight
+# After cutover approval and the old writer's stop:
+AWS_PROFILE=ecc2k130 INGEST_ROLE=publisher ./ingest_host.sh up
+AWS_PROFILE=ecc2k130 INGEST_ROLE=worker ./ingest_host.sh up
+```
+
+Paid-service preflight requires source-bucket versioning so an auditor can
+retrieve the exact ingested object version later. It also requires the local
+operator file before any upload. `up` uploads that file by digest and checks
+its digest again on the host. The host runs the Cairn supervisor around its
+ingester, using its EC2 hostname as the shared replica id. Completed
+`period-N.json` journals and exact content-addressed status snapshots are
+copied to private `s3://$BUCKET/logs/rho-ingest-<instance>/evidence/` every
+two minutes and when the service stops. The in-progress journal is excluded;
+it cannot certify a complete period. The existing instance profile has bucket
+list/read access and write access to `logs/`, so this path needs no new static
+credential. An auditor still reviews the S3/RDS receipts and health gaps
+before signing a Cairn claim; a running supervisor alone does not authorize
+payment.
+
+**Existing EC2 host.** When account-level instance creation is unavailable,
+`install_existing_ingest_worker.sh` installs an isolated worker-only service
+on a host that already exists. It never starts a second status publisher. The
+host must have the `ecc2k130-ingest` instance profile, IMDSv2, network access
+to `rho-dp`, and `/opt/rho-ingest/venv` containing `boto3`, `psycopg[binary]`,
+and `awscli`. Place the reviewed `dp_ingest.py` and Cairn's
+`cairn_ingest_operator.py` in `/opt/rho-ingest/` and pass their full SHA-256
+digests at installation. The installer checks those bytes and pins them for
+every subsequent systemd restart. It creates a dedicated `rho-ingest` user,
+ships completed journals and exact status snapshots every two minutes to
+private versioned S3, and excludes the in-progress journal. For example, on
+the existing us-east-1 host, with the reviewed scripts already staged:
+
+```sh
+sudo env RHO_REPLICA_ID=useast1-i-0ef27108cc01acb2c \
+  RHO_DB_HOST=rho-dp.cxqyicswioh8.us-west-2.rds.amazonaws.com \
+  RHO_BUCKET=ecc2k130-590183823895 \
+  RHO_STATUS_BUCKET=ecc2k130-status-590183823895 \
+  RHO_DP_SHA256="$(sha256sum /opt/rho-ingest/dp_ingest.py | cut -d' ' -f1)" \
+  RHO_OPERATOR_SHA256="$(sha256sum /opt/rho-ingest/cairn_ingest_operator.py | cut -d' ' -f1)" \
+  ./install_existing_ingest_worker.sh
+```
+
+For a deployment review, compare those two digests to the approved source
+commit **before** running the installer; computing both from the staged files
+alone proves only internal consistency. The worker's stable replica id appears
+in `dp_ingest_polls` and the private evidence prefix. A completed period still
+needs independent S3, RDS, and host corroboration before an auditor signs a
+Cairn payment receipt. Cross-region S3 and RDS traffic is billable.
 
 **Scheduled Lambda (no host).** `./ingest_lambda.sh up` deploys the same
 program as a Lambda on a two-minute EventBridge schedule, running one
@@ -692,11 +812,12 @@ got there by living in the VPC with an instance profile. It reports what is
 missing and what to add; setting `DATABASE_URL` removes the Secrets Manager
 leg entirely.
 
-Cut over with both running — concurrent ingesters are safe, so overlapping
-proves the new path before the old one goes away — then
-`./ingest_host.sh retire <id>`. Rollback is `./ingest_lambda.sh down &&
-./ingest_host.sh up`, with no code revert, because neither `ingest.sh` nor
-`ingest_host.sh` changed.
+Do not overlap a Lambda or host still running an older `dp_ingest.py` with
+the replica build. Its writes bypass the advisory object lock and can leave
+the rollups or source receipts inconsistent. Stop it first, then start the
+replica publisher; use `./ingest_host.sh retire <id>` only for hosts confirmed
+to be superseded. A rollback to an older build requires stopping every new
+replica and recounting the store afterward.
 
 Reserved concurrency is 1 and the schedule retries 0 times. A trigger that
 arrives mid-pass is therefore dropped rather than queued, which is harmless —
@@ -709,13 +830,12 @@ quiet unless something is watching the number itself.
 
 **The store is a derived view.** `dp/` is the corpus, `merge.py` is what
 searches it for collisions, and `distinguished_points` can be dropped and
-rebuilt from S3 without losing anything. That is what makes the deployment
-mechanism acceptable: the ingest host has no key pair, no instance profile
-and no SSM agent, so the way to change its code is
-`./ingest_host.sh up` — launch a replacement, watch it drain, then
-`./ingest_host.sh retire <old-id>`. Two ingesters at once are safe; every
-insert is `ON CONFLICT DO NOTHING` on `(campaign_id, point_key)` and progress
-is committed in the same transaction as the points.
+rebuilt from S3 without losing anything. The new launcher publishes a digest
+identified code copy and uses the `ecc2k130-ingest` instance profile when it
+exists. Multiple **new** replicas are safe together because they take the
+same per-object database lock; point insertion and progress commit share one
+transaction. Idempotent point insertion alone does not make a mixed-version
+cutover safe.
 
 **Two object-key shapes are points, and reading only one is how the store
 stopped for five hours on 2026-09-17:**
