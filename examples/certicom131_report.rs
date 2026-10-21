@@ -143,14 +143,19 @@ fn main() {
             .collect();
         let mut secs: Vec<f64> = ds.iter().map(|d| d["secs"].as_f64().unwrap()).collect();
         secs.sort_by(|a, b| a.partial_cmp(b).unwrap());
-        let semi = ds[0]["semireg"].as_u64().map_or("-".into(), |x| x.to_string());
+        let semi = ds[0]["semireg"]
+            .as_u64()
+            .map_or("-".into(), |x| x.to_string());
         // Counting: group identical readings.
         let compress = |v: &[String]| {
             let mut m: BTreeMap<&str, usize> = BTreeMap::new();
             for s in v {
                 *m.entry(s.as_str()).or_default() += 1;
             }
-            m.iter().map(|(k, c)| format!("{k}×{c}")).collect::<Vec<_>>().join(" ")
+            m.iter()
+                .map(|(k, c)| format!("{k}×{c}"))
+                .collect::<Vec<_>>()
+                .join(" ")
         };
         let rs: Vec<String> = r.iter().map(|x| show(*x)).collect();
         writeln!(
@@ -198,14 +203,42 @@ fn main() {
     let ys = |d: f64| h - mb - d / max_d * (h - mt - mb);
     for d in 0..=10 {
         s.line(ml, ys(d as f64), w - mr, ys(d as f64), GRID, 1.0, "");
-        s.text(ml - 8.0, ys(d as f64) + 4.0, "end", 11.0, INK, &d.to_string());
+        s.text(
+            ml - 8.0,
+            ys(d as f64) + 4.0,
+            "end",
+            11.0,
+            INK,
+            &d.to_string(),
+        );
     }
     for l in 1..=(max_ell as u64) {
-        s.text(xs(l as f64), h - mb + 18.0, "middle", 11.0, INK, &l.to_string());
+        s.text(
+            xs(l as f64),
+            h - mb + 18.0,
+            "middle",
+            11.0,
+            INK,
+            &l.to_string(),
+        );
     }
-    s.text(w / 2.0, h - 14.0, "middle", 12.0, INK, "ℓ = dim V (the n of each cell is printed above its points)");
+    s.text(
+        w / 2.0,
+        h - 14.0,
+        "middle",
+        12.0,
+        INK,
+        "ℓ = dim V (the n of each cell is printed above its points)",
+    );
     s.raw(&format!(r#"<text transform="translate(18 {}) rotate(-90)" text-anchor="middle" font-size="12" fill="{INK}">resolving degree D</text>"#, h / 2.0));
-    s.text(w / 2.0, 22.0, "middle", 14.0, INK, "Falsifier A: FPPR m = 3 resolving degree on random binary curves, by ℓ");
+    s.text(
+        w / 2.0,
+        22.0,
+        "middle",
+        14.0,
+        INK,
+        "Falsifier A: FPPR m = 3 resolving degree on random binary curves, by ℓ",
+    );
     s.text(w / 2.0, 38.0, "middle", 11.0, "#555", "filled = measured exactly; open = lower bound ≥ D; one dot per unsatisfiable draw (jittered); orange line = gate D* ≤ 3 (m = 4–6, chained)");
     s.line(ml, ys(3.0), w - mr, ys(3.0), ORANGE, 1.5, "6 4");
     let mut label_slot: BTreeMap<u64, usize> = BTreeMap::new();
@@ -215,11 +248,24 @@ fn main() {
             if let Some((d, exact)) = rd {
                 let x = xs(*ell as f64) + (i as f64 - (cnt - 1.0) / 2.0) * (60.0 / cnt.max(6.0));
                 let col = if *exact { BLUE } else { RED };
-                s.circle(x, ys(*d as f64), 4.0, if *exact { col } else { "#fff" }, col);
+                s.circle(
+                    x,
+                    ys(*d as f64),
+                    4.0,
+                    if *exact { col } else { "#fff" },
+                    col,
+                );
             }
         }
         let slot = label_slot.entry(*ell).or_insert(0usize);
-        s.text(xs(*ell as f64), ys(0.0) - 6.0 - 12.0 * *slot as f64, "middle", 10.0, "#555", &format!("n={n}"));
+        s.text(
+            xs(*ell as f64),
+            ys(0.0) - 6.0 - 12.0 * *slot as f64,
+            "middle",
+            10.0,
+            "#555",
+            &format!("n={n}"),
+        );
         *slot += 1;
     }
     fs::write(root.join("figures/fig_dreg_vs_ell.svg"), s.finish()).unwrap();
@@ -277,13 +323,26 @@ fn main() {
     // Pool per (kind, on_curve), over cells with expected count ≥ 20.
     let mut pooled: BTreeMap<(String, bool), (f64, f64, usize)> = BTreeMap::new();
     let mut mdb = String::new();
-    writeln!(mdb, "| p (bits) | base | on-curve only | B | targets | Σ N₃ | Σ E₃ (random oracle) | N/E |").unwrap();
+    writeln!(
+        mdb,
+        "| p (bits) | base | on-curve only | B | targets | Σ N₃ | Σ E₃ (random oracle) | N/E |"
+    )
+    .unwrap();
     writeln!(mdb, "|--:|:--|:--|--:|--:|--:|--:|--:|").unwrap();
     for ((kind, on, p, bsz), a) in &acc {
         // N counts (x1<x2, x3) with multiplicity 3; E per target as in the driver.
         let e = 8.0 * a.bsz.powi(3) / (6.0 * a.r) * 3.0 * a.t;
         if *on {
-            writeln!(mdb, "| {} | {kind} | yes | {bsz} | {} | {:.0} | {:.1} | {:.3} |", 64 - p.leading_zeros(), a.t, a.n, e, a.n / e).unwrap();
+            writeln!(
+                mdb,
+                "| {} | {kind} | yes | {bsz} | {} | {:.0} | {:.1} | {:.3} |",
+                64 - p.leading_zeros(),
+                a.t,
+                a.n,
+                e,
+                a.n / e
+            )
+            .unwrap();
             if e >= 20.0 * a.t {
                 let ent = pooled.entry((kind.clone(), *on)).or_default();
                 ent.0 += a.n;
@@ -300,7 +359,13 @@ fn main() {
     for ((kind, _), (n, e, c)) in &pooled {
         let r = n / e;
         let hw = 1.96 * (3.0 * n).sqrt() / e; // each unordered triple is counted 3 times
-        writeln!(mdp, "| {kind} | {c} | {n:.0} | {e:.1} | {r:.3} | [{:.3}, {:.3}] |", r - hw, r + hw).unwrap();
+        writeln!(
+            mdp,
+            "| {kind} | {c} | {n:.0} | {e:.1} | {r:.3} | [{:.3}, {:.3}] |",
+            r - hw,
+            r + hw
+        )
+        .unwrap();
         fig_rows.push((kind.clone(), r, hw));
     }
     fs::write(root.join("tables/fb_pooled.md"), &mdp).unwrap();
@@ -308,10 +373,25 @@ fn main() {
     let mut s = Svg::new(w, h);
     let (ml, mr) = (190.0, 40.0);
     let xs = |v: f64| ml + (v - 0.5) / 1.0 * (w - ml - mr);
-    s.text(w / 2.0, 22.0, "middle", 14.0, INK, "Falsifier B: decompositions found over a structured base ÷ random-oracle expectation");
+    s.text(
+        w / 2.0,
+        22.0,
+        "middle",
+        14.0,
+        INK,
+        "Falsifier B: decompositions found over a structured base ÷ random-oracle expectation",
+    );
     s.text(w / 2.0, 38.0, "middle", 11.0, "#555", "m = 3 exact counts on the on-curve abscissae of V, pooled over cells with E ≥ 20 per target; bars: 95% Poisson interval");
     for t in [0.5, 0.75, 1.0, 1.25, 1.5] {
-        s.line(xs(t), 52.0, xs(t), h - 34.0, if t == 1.0 { INK } else { GRID }, if t == 1.0 { 1.5 } else { 1.0 }, "");
+        s.line(
+            xs(t),
+            52.0,
+            xs(t),
+            h - 34.0,
+            if t == 1.0 { INK } else { GRID },
+            if t == 1.0 { 1.5 } else { 1.0 },
+            "",
+        );
         s.text(xs(t), h - 18.0, "middle", 11.0, INK, &format!("{t}"));
     }
     for (i, (kind, r, hw)) in fig_rows.iter().enumerate() {
@@ -323,7 +403,8 @@ fn main() {
     fs::write(root.join("figures/fig_combined_count.svg"), s.finish()).unwrap();
 
     // ---- Gates figure -------------------------------------------------------
-    let g: Value = serde_json::from_str(&fs::read_to_string(root.join("gates.json")).unwrap()).unwrap();
+    let g: Value =
+        serde_json::from_str(&fs::read_to_string(root.join("gates.json")).unwrap()).unwrap();
     let mut rows: Vec<(String, f64, f64)> = Vec::new(); // label, plain gate, generous gate
     for chained in [false, true] {
         for m in 4..=6u64 {
@@ -336,7 +417,11 @@ fn main() {
                     .and_then(|r| r["gate_d"].as_u64())
                     .map_or(0.0, |x| x as f64)
             };
-            rows.push((format!("binary m={m}{}", if chained { " chained" } else { "" }), pick("plain"), pick("generous")));
+            rows.push((
+                format!("binary m={m}{}", if chained { " chained" } else { "" }),
+                pick("plain"),
+                pick("generous"),
+            ));
         }
     }
     for m in 4..=6u64 {
@@ -355,7 +440,14 @@ fn main() {
     let mut s = Svg::new(w, h);
     let (ml, mr) = (170.0, 30.0);
     let xs = |d: f64| ml + d / 9.0 * (w - ml - mr);
-    s.text(w / 2.0, 22.0, "middle", 14.0, INK, "Gates: largest solving degree D at which the family's optimised cost reaches rho");
+    s.text(
+        w / 2.0,
+        22.0,
+        "middle",
+        14.0,
+        INK,
+        "Gates: largest solving degree D at which the family's optimised cost reaches rho",
+    );
     s.text(w / 2.0, 38.0, "middle", 11.0, "#555", "filled = plain price, open = generous price (see doc §2). m = 2, 3 have no gate. Chained = unknowns (m−2)n+mℓ.");
     for d in 0..=9 {
         s.line(xs(d as f64), 52.0, xs(d as f64), h - 30.0, GRID, 1.0, "");
@@ -369,7 +461,14 @@ fn main() {
         s.circle(xs(*gen), y, 4.0, "#fff", BLUE);
     }
     s.line(xs(5.0), 52.0, xs(5.0), h - 30.0, RED, 2.0, "");
-    s.text(xs(5.0) + 4.0, 62.0, "start", 10.0, RED, "smallest measured D: 5 (ℓ=2), 6 (ℓ≥3)");
+    s.text(
+        xs(5.0) + 4.0,
+        62.0,
+        "start",
+        10.0,
+        RED,
+        "smallest measured D: 5 (ℓ=2), 6 (ℓ≥3)",
+    );
     fs::write(root.join("figures/fig_gates.svg"), s.finish()).unwrap();
     println!("{md}\n{mdp}");
 }

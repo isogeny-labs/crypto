@@ -147,7 +147,10 @@ fn s3_roots(f: Fp, sq: &Sqrt, a: u64, b: u64, x: u64, y: u64, out: &mut [u64; 2]
         out[0] = f.mul(f.sub(0, cc), f.inv(cb));
         return 1;
     }
-    let disc = f.sub(f.mul(cb, cb), f.mul(f.add(f.add(ca, ca), f.add(ca, ca)), cc));
+    let disc = f.sub(
+        f.mul(cb, cb),
+        f.mul(f.add(f.add(ca, ca), f.add(ca, ca)), cc),
+    );
     let Some(r) = sq.sqrt(disc) else {
         return 0;
     };
@@ -268,11 +271,13 @@ fn main() {
                     gen += 1;
                 }
             };
-            let mu: Vec<u64> = (0..bsz).scan(1u64, |c, _| {
-                let o = *c;
-                *c = f.mul(*c, root);
-                Some(o)
-            }).collect();
+            let mu: Vec<u64> = (0..bsz)
+                .scan(1u64, |c, _| {
+                    let o = *c;
+                    *c = f.mul(*c, root);
+                    Some(o)
+                })
+                .collect();
             let coset_g = loop {
                 let g = rng.gen_range(2..p);
                 if g != 1 {
@@ -294,7 +299,8 @@ fn main() {
                 let w = loop {
                     let w = f.pow(gen, (p - 1) / d_best);
                     // exact order d_best: check against prime factors.
-                    let ok = (2..=d_best).filter(|q| d_best % q == 0 && is_prime_u64(*q))
+                    let ok = (2..=d_best)
+                        .filter(|q| d_best % q == 0 && is_prime_u64(*q))
                         .all(|q| f.pow(w, d_best / q) != 1);
                     if ok {
                         break w;
@@ -302,7 +308,13 @@ fn main() {
                     gen += 1;
                 };
                 let mut c = 1;
-                (0..d_best).map(|_| { let o = c; c = f.mul(c, w); o }).collect()
+                (0..d_best)
+                    .map(|_| {
+                        let o = c;
+                        c = f.mul(c, w);
+                        o
+                    })
+                    .collect()
             });
             let mut rand_set: HashSet<u64> = HashSet::new();
             while (rand_set.len() as u64) < bsz {
@@ -364,11 +376,23 @@ fn main() {
     eprintln!("| bits | base | m | B | mean N_m | on-curve random-oracle E | N/E | B^(m-1) |");
     eprintln!("|--:|:--|--:|--:|--:|--:|--:|--:|");
     for (bits, name, m, b, mean, expect) in &summary {
-        let e = if name.ends_with("|on_curve") { *expect } else { f64::NAN };
+        let e = if name.ends_with("|on_curve") {
+            *expect
+        } else {
+            f64::NAN
+        };
         eprintln!(
             "| {bits} | {name} | {m} | {b:.0} | {mean:.2} | {} | {} | {:.0} |",
-            if e.is_nan() { "-".into() } else { format!("{e:.2}") },
-            if e.is_nan() { "-".into() } else { format!("{:.3}", mean / e) },
+            if e.is_nan() {
+                "-".into()
+            } else {
+                format!("{e:.2}")
+            },
+            if e.is_nan() {
+                "-".into()
+            } else {
+                format!("{:.3}", mean / e)
+            },
             b.powi(*m as i32 - 1)
         );
     }

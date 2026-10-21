@@ -44,8 +44,8 @@
 //! verdicts must hold (AGENTS.md §5a): `generous` (`κ_dec = 2^{-10}`,
 //! `κ_LA = 2^{-4}`, `ω = 2`) and `plain` (`κ_dec = κ_LA = 1`, `ω = 2.81`).
 
-use num_bigint::BigUint;
 use crypto_lib::cryptanalysis::koblitz_bench::semi_regular_dreg;
+use num_bigint::BigUint;
 use serde_json::json;
 
 /// log₂ of a big integer given in hex.
@@ -72,7 +72,9 @@ fn log2_binom(n: u64, k: u64) -> f64 {
         return f64::NEG_INFINITY;
     }
     let k = k.min(n - k);
-    (0..k).map(|i| ((n - i) as f64 / (i + 1) as f64).log2()).sum()
+    (0..k)
+        .map(|i| ((n - i) as f64 / (i + 1) as f64).log2())
+        .sum()
 }
 
 /// log₂ Σ_{k≤D} C(n, k).
@@ -117,8 +119,15 @@ fn binary_best(n: u32, m: u32, d: Option<u32>, pr: Price, chain: bool) -> (f64, 
         let per = match d {
             None => 0.0,
             Some(d) => {
-                let width = if chain { (m - 2) * n + m * ell } else { m * ell };
-                lse(0.0, pr.dec + pr.omega * log2_mono(u64::from(width), d) - 6.0)
+                let width = if chain {
+                    (m - 2) * n + m * ell
+                } else {
+                    m * ell
+                };
+                lse(
+                    0.0,
+                    pr.dec + pr.omega * log2_mono(u64::from(width), d) - 6.0,
+                )
             }
         };
         let la = pr.la + (m as f64).log2() + 2.0 * (ell as f64 - 1.0);
@@ -236,8 +245,7 @@ fn main() {
     for m in 2..=6u32 {
         for pr in PRICES {
             // (m!/2^m)·p / p^{δ(m−1)} ≤ rho  and  κ_LA·m·p^{2δ} ≤ rho.
-            let need =
-                (pp + log2_fact(m) - m as f64 - rhop) / (pp * (m as f64 - 1.0));
+            let need = (pp + log2_fact(m) - m as f64 - rhop) / (pp * (m as f64 - 1.0));
             let allow = (rhop - pr.la - (m as f64).log2()) / (2.0 * pp);
             let reach = 1.0 / ((m * (m + 1)) as f64 * 2f64.powi(m as i32 - 2));
             println!(
@@ -245,11 +253,14 @@ fn main() {
                 pr.name,
                 need / reach
             );
-            out["eccp_131"]["small_x"].as_array_mut().unwrap().push(json!({
-                "m": m, "price": pr.name, "delta_needed": need, "delta_la_cap": allow,
-                "delta_lattice_reach": reach, "shortfall": need / reach,
-                "feasible_window": need <= allow,
-            }));
+            out["eccp_131"]["small_x"]
+                .as_array_mut()
+                .unwrap()
+                .push(json!({
+                    "m": m, "price": pr.name, "delta_needed": need, "delta_la_cap": allow,
+                    "delta_lattice_reach": reach, "shortfall": need / reach,
+                    "feasible_window": need <= allow,
+                }));
         }
     }
 
@@ -267,7 +278,10 @@ fn main() {
                 .chain(std::iter::repeat_n(2, n as usize))
                 .collect();
             let d = semi_regular_dreg(nv, &degs);
-            println!("| {m} | {n} | {ell} | {nv} | {} |", d.map_or("-".into(), |x| x.to_string()));
+            println!(
+                "| {m} | {n} | {ell} | {nv} | {} |",
+                d.map_or("-".into(), |x| x.to_string())
+            );
             sr.push(json!({"m": m, "n": n, "ell": ell, "unknowns": nv, "semi_regular_d": d}));
         }
     }
