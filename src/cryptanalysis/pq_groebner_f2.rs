@@ -29,7 +29,8 @@
 //!
 //! ## What this implements
 //!
-//! - [`F2BoolMono`] — monomial as `u64` bitmask.
+//! - [`F2BoolMono`] — monomial as a [`Mask`] bitmask (`u64`; `u128` under
+//!   the `wide-vars` feature).
 //! - [`F2BoolPoly`] — sorted (DegRevLex desc) `Vec<F2BoolMono>`.
 //! - [`spoly`] — S-polynomial of two non-zero polynomials.
 //! - [`reduce`] — multivariate division-with-remainder against a basis.
@@ -70,12 +71,91 @@ use std::collections::HashSet;
 
 // ── Monomial ───────────────────────────────────────────────────────
 
+/// The bitmask a monomial is stored in: 64 bits, or 128 under the
+/// `wide-vars` feature.  Every Boolean unknown is one bit, so this is the
+/// cap on the unknowns of a system ([`MASK_BITS`]).
+#[cfg(not(feature = "wide-vars"))]
+pub type Mask = u64;
+/// See the 64-bit definition.
+#[cfg(feature = "wide-vars")]
+pub type Mask = u128;
+
+/// Unknowns a [`Mask`] can carry: 64, or 128 under `wide-vars`.
+pub const MASK_BITS: usize = Mask::BITS as usize;
+
+/// The one-bit mask of variable `k`.
+#[inline]
+pub fn bit(k: u32) -> Mask {
+    debug_assert!((k as usize) < MASK_BITS, "variable index past the mask");
+    (1 as Mask) << k
+}
+
+/// The low `n` bits of a mask: the mask of the first `n` variables, with
+/// `n = MASK_BITS` allowed.
+#[inline]
+pub fn low_bits(n: usize) -> Mask {
+    if n >= MASK_BITS {
+        Mask::MAX
+    } else {
+        ((1 as Mask) << n) - 1
+    }
+}
+
+/// The low 64 bits of each mask: the points of an enumeration that works
+/// in `u64`, read back from a solver's [`Mask`] points.
+pub fn masks_low64(points: &[Mask]) -> Vec<u64> {
+    points.iter().map(|&m| mask_low64(m)).collect()
+}
+
+/// A `u64` as a mask (zero-extended under `wide-vars`).
+#[inline]
+#[allow(clippy::useless_conversion)]
+pub fn mask_from64(x: u64) -> Mask {
+    Mask::from(x)
+}
+
+/// Feed a mask to a digest as little-endian bytes: its low 64 bits always,
+/// and the high 64 bits only when set.  A mask that fits 64 bits therefore
+/// digests the same in the 64-bit and the `wide-vars` build.
+#[inline]
+pub fn digest_mask(h: &mut blake3::Hasher, m: Mask) {
+    h.update(&mask_low64(m).to_le_bytes());
+    #[cfg(feature = "wide-vars")]
+    if (m >> 64) != 0 {
+        h.update(&((m >> 64) as u64).to_le_bytes());
+    }
+}
+
+/// A mask folded to one `u64` for hashing: the mask itself in the 64-bit
+/// build, and its halves combined under `wide-vars`.  Equal masks fold equal;
+/// callers still compare full masks.
+#[cfg(not(feature = "wide-vars"))]
+#[inline]
+pub fn mask_fold64(m: Mask) -> u64 {
+    m
+}
+
+/// See the 64-bit definition.
+#[cfg(feature = "wide-vars")]
+#[inline]
+pub fn mask_fold64(m: Mask) -> u64 {
+    (m as u64) ^ ((m >> 64) as u64).wrapping_mul(0xD6E8_FEB8_6659_FD93)
+}
+
+/// The low 64 bits of a mask, for the packed fast paths and word-sized
+/// consumers.
+#[inline]
+#[allow(clippy::unnecessary_cast)]
+pub fn mask_low64(m: Mask) -> u64 {
+    m as u64
+}
+
 /// A monomial in `F_2[v_0, …, v_{n-1}] / (v_i² − v_i)` represented as a
 /// bitmask: bit `k` is set iff `v_k` divides the monomial.
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, serde::Serialize, serde::Deserialize)]
 #[repr(transparent)]
 pub struct F2BoolMono {
-    pub mask: u64,
+    pub mask: Mask,
 }
 
 impl F2BoolMono {
@@ -86,12 +166,15 @@ impl F2BoolMono {
 
     /// A single variable `v_k`.
     pub fn var(k: u32) -> Self {
-        assert!(k < 64, "monomial cap is 64 variables");
-        F2BoolMono { mask: 1u64 << k }
+        assert!(
+            (k as usize) < MASK_BITS,
+            "monomial cap is {MASK_BITS} variables"
+        );
+        F2BoolMono { mask: bit(k) }
     }
 
     /// Build from a bitmask directly.
-    pub fn from_mask(mask: u64) -> Self {
+    pub fn from_mask(mask: Mask) -> Self {
         F2BoolMono { mask }
     }
 
@@ -158,7 +241,7 @@ pub fn cmp_mono(a: F2BoolMono, b: F2BoolMono) -> Ordering {
     if diff == 0 {
         return Ordering::Equal;
     }
-    let high = 63 - diff.leading_zeros();
+    let high = (MASK_BITS as u32 - 1) - diff.leading_zeros();
     if (a.mask >> high) & 1 == 1 {
         // a has the high-index var → a is *smaller* in DegRevLex.
         Ordering::Less
@@ -180,9 +263,54 @@ const FROM_MONOS_KEYED: usize = 16;
 /// within a degree the monomial lacking the highest differing variable is
 /// larger, i.e. the one with the *smaller* mask.  Sorting by the key is a
 /// few integer compares where the comparator recomputes two popcounts.
+#[cfg(not(feature = "wide-vars"))]
 #[inline]
-pub fn mono_key(m: F2BoolMono) -> u128 {
+pub fn mono_key(m: F2BoolMono) -> MonoKey {
     (u128::from(m.degree()) << 64) | u128::from(!m.mask)
+}
+
+/// The type of a [`mono_key`]: one `u128` for 64-bit masks (degree above
+/// the complemented mask), and the pair `(degree, !mask)` for 128-bit
+/// masks, which no single integer holds.
+#[cfg(not(feature = "wide-vars"))]
+pub type MonoKey = u128;
+/// See the 64-bit definition.
+#[cfg(feature = "wide-vars")]
+pub type MonoKey = (u32, Mask);
+
+/// [`mono_key`] for 128-bit masks: tuples compare lexicographically.
+#[cfg(feature = "wide-vars")]
+#[inline]
+pub fn mono_key(m: F2BoolMono) -> MonoKey {
+    (m.degree(), !m.mask)
+}
+
+/// A [`MonoKey`] above every monomial's key.
+#[cfg(not(feature = "wide-vars"))]
+pub const KEY_MAX: MonoKey = u128::MAX;
+/// See the 64-bit definition.
+#[cfg(feature = "wide-vars")]
+pub const KEY_MAX: MonoKey = (u32::MAX, Mask::MAX);
+
+/// A [`MonoKey`] below every monomial's key.
+#[cfg(not(feature = "wide-vars"))]
+pub const KEY_MIN: MonoKey = 0;
+/// See the 64-bit definition.
+#[cfg(feature = "wide-vars")]
+pub const KEY_MIN: MonoKey = (0, 0);
+
+/// The mask a [`mono_key`] was made from.
+#[cfg(not(feature = "wide-vars"))]
+#[inline]
+pub fn key_mask(k: MonoKey) -> Mask {
+    !(k as u64)
+}
+
+/// See the 64-bit definition.
+#[cfg(feature = "wide-vars")]
+#[inline]
+pub fn key_mask(k: MonoKey) -> Mask {
+    !k.1
 }
 
 /// The low [`PACKED_KEY_VARS`] bits of a mask.
@@ -204,22 +332,22 @@ fn packed_mask(key: u64) -> u64 {
 /// Sort monomial masks into canonical order, highest first (the order of
 /// `Reverse(mono_key)`), keying each mask once rather than once per
 /// comparison.  Duplicates stay adjacent.
-pub(crate) fn sort_masks_descending(masks: &mut [u64]) {
-    let span = masks.iter().fold(0u64, |acc, &m| acc | m);
+pub(crate) fn sort_masks_descending(masks: &mut [Mask]) {
+    let span = masks.iter().fold(0 as Mask, |acc, &m| acc | m);
     if span >> PACKED_KEY_VARS == 0 {
-        let mut keys: Vec<u64> = masks.iter().map(|&u| packed_key(u)).collect();
+        let mut keys: Vec<u64> = masks.iter().map(|&u| packed_key(mask_low64(u))).collect();
         keys.sort_unstable_by(|a, b| b.cmp(a));
         for (m, k) in masks.iter_mut().zip(keys) {
-            *m = packed_mask(k);
+            *m = mask_from64(packed_mask(k));
         }
     } else {
-        let mut keys: Vec<u128> = masks
+        let mut keys: Vec<MonoKey> = masks
             .iter()
             .map(|&u| mono_key(F2BoolMono::from_mask(u)))
             .collect();
         keys.sort_unstable_by(|a, b| b.cmp(a));
         for (m, k) in masks.iter_mut().zip(keys) {
-            *m = !(k as u64);
+            *m = key_mask(k);
         }
     }
 }
@@ -231,7 +359,7 @@ pub(crate) fn sort_masks_descending(masks: &mut [u64]) {
 /// one copy and an even number cancels; monomials whose coefficients
 /// cancel to zero are dropped.  Each mask is keyed once, as by
 /// [`sort_masks_descending`].
-pub(crate) fn sum_by_monomial(terms: &mut Vec<(u64, u64)>) {
+pub(crate) fn sum_by_monomial(terms: &mut Vec<(Mask, u64)>) {
     /// Merge the runs of equal keys of a sorted list, in place.
     fn add_equal_keys<K: Copy + Eq>(sorted: &mut Vec<(K, u64)>) {
         let mut len = 0;
@@ -247,25 +375,27 @@ pub(crate) fn sum_by_monomial(terms: &mut Vec<(u64, u64)>) {
         sorted.truncate(len);
         sorted.retain(|&(_, c)| c != 0);
     }
-    let span = terms.iter().fold(0u64, |acc, &(m, _)| acc | m);
+    let span = terms.iter().fold(0 as Mask, |acc, &(m, _)| acc | m);
     if span >> PACKED_KEY_VARS == 0 {
+        // The packed key is one `u64`, so it sits in the mask slot in
+        // place (zero-extended under `wide-vars`).
         for t in terms.iter_mut() {
-            t.0 = packed_key(t.0);
+            t.0 = mask_from64(packed_key(mask_low64(t.0)));
         }
         terms.sort_unstable_by_key(|a| std::cmp::Reverse(a.0));
         add_equal_keys(terms);
         for t in terms.iter_mut() {
-            t.0 = packed_mask(t.0);
+            t.0 = mask_from64(packed_mask(mask_low64(t.0)));
         }
     } else {
-        let mut keyed: Vec<(u128, u64)> = terms
+        let mut keyed: Vec<(MonoKey, u64)> = terms
             .iter()
             .map(|&(u, c)| (mono_key(F2BoolMono::from_mask(u)), c))
             .collect();
         keyed.sort_unstable_by_key(|a| std::cmp::Reverse(a.0));
         add_equal_keys(&mut keyed);
         terms.clear();
-        terms.extend(keyed.into_iter().map(|(k, c)| (!(k as u64), c)));
+        terms.extend(keyed.into_iter().map(|(k, c)| (key_mask(k), c)));
     }
 }
 
@@ -314,7 +444,7 @@ impl F2BoolPoly {
         } else {
             // A long list is keyed once per mask rather than once per
             // comparison (the u128 key above was half of a large rebuild).
-            let mut masks: Vec<u64> = monos.iter().map(|m| m.mask).collect();
+            let mut masks: Vec<Mask> = monos.iter().map(|m| m.mask).collect();
             sort_masks_descending(&mut masks);
             for (m, mask) in monos.iter_mut().zip(masks) {
                 *m = F2BoolMono::from_mask(mask);
@@ -385,13 +515,13 @@ impl F2BoolPoly {
 
     #[inline(always)]
     fn substitute_body(&self, var: u32, value: bool, check: bool) -> Self {
-        let bit = 1u64 << var;
+        let bit = bit(var);
         let terms = &self.terms;
         let n = terms.len();
         // Strictly decreasing `mono_key`s is canonical order; anything
         // else (the field is public) is rebuilt through `from_monos`.
         if check {
-            let mut previous = u128::MAX;
+            let mut previous = KEY_MAX;
             for t in terms {
                 let key = mono_key(*t);
                 if key >= previous {
@@ -430,8 +560,12 @@ impl F2BoolPoly {
         };
         let folded_at = |k: usize| F2BoolMono::from_mask(terms[k].mask & !bit);
         let (mut i, mut j) = (next_kept(0), next_folded(0));
-        let mut ki = if i < n { mono_key(terms[i]) } else { 0 };
-        let mut kj = if j < n { mono_key(folded_at(j)) } else { 0 };
+        let mut ki = if i < n { mono_key(terms[i]) } else { KEY_MIN };
+        let mut kj = if j < n {
+            mono_key(folded_at(j))
+        } else {
+            KEY_MIN
+        };
         while i < n && j < n {
             match ki.cmp(&kj) {
                 Ordering::Greater => {
@@ -555,7 +689,7 @@ impl F2BoolPoly {
         // After mul, sort order may change AND duplicates may appear
         // (because two distinct monos can collide on union with m), so
         // the products are re-sorted and equal pairs cancelled.
-        let mut products: Vec<u64> = self.terms.iter().map(|t| t.mask | m.mask).collect();
+        let mut products: Vec<Mask> = self.terms.iter().map(|t| t.mask | m.mask).collect();
         sort_masks_descending(&mut products);
         let mut out: Vec<F2BoolMono> = Vec::with_capacity(products.len());
         for u in products {
@@ -573,7 +707,7 @@ impl F2BoolPoly {
     }
 
     /// Evaluate at a binary point: `v[k] = (point >> k) & 1`.
-    pub fn eval(&self, point: u64) -> u32 {
+    pub fn eval(&self, point: Mask) -> u32 {
         let mut sum = 0u32;
         for t in &self.terms {
             if (point & t.mask) == t.mask {
@@ -600,15 +734,15 @@ impl F2BoolPoly {
 #[derive(Clone, Debug, Default)]
 pub(crate) struct MonoColumns {
     /// Strictly decreasing under [`cmp_mono`].
-    masks: Vec<u64>,
+    masks: Vec<Mask>,
     /// [`mono_key`] of each, so that a lookup compares integers instead
     /// of recounting degrees.
-    keys: Vec<u128>,
+    keys: Vec<MonoKey>,
 }
 
 impl MonoColumns {
     /// The distinct monomials among `masks`.
-    pub(crate) fn new(mut masks: Vec<u64>) -> Self {
+    pub(crate) fn new(mut masks: Vec<Mask>) -> Self {
         sort_masks_descending(&mut masks);
         masks.dedup();
         let keys = masks
@@ -619,7 +753,7 @@ impl MonoColumns {
     }
 
     /// The monomials' masks, in column order.
-    pub(crate) fn masks(&self) -> &[u64] {
+    pub(crate) fn masks(&self) -> &[Mask] {
         &self.masks
     }
 
@@ -630,7 +764,7 @@ impl MonoColumns {
 
     /// The column holding `mask`, if the set has it.
     #[inline]
-    pub(crate) fn column(&self, mask: u64) -> Option<usize> {
+    pub(crate) fn column(&self, mask: Mask) -> Option<usize> {
         let key = mono_key(F2BoolMono::from_mask(mask));
         // Keys decrease along the list, so a probe with a larger key
         // lies before the one sought.
@@ -652,7 +786,7 @@ impl MonoColumns {
 /// monomials, in order.  It takes the columns' masks alone, since reading
 /// back looks nothing up, so that a caller keeping rows for good can drop
 /// the keys, two thirds of a column set's memory.
-pub(crate) fn read_columns(masks: &[u64], row: &[u64], n_vars: usize) -> F2BoolPoly {
+pub(crate) fn read_columns(masks: &[Mask], row: &[u64], n_vars: usize) -> F2BoolPoly {
     let count = row.iter().map(|w| w.count_ones() as usize).sum();
     let mut terms = Vec::with_capacity(count);
     for (w, &word) in row.iter().enumerate() {
@@ -868,7 +1002,7 @@ fn reduce_counted(r: &F2BoolPoly, basis: &[F2BoolPoly], st: &mut GbStats) -> F2B
     // monomial divides stays irreducible; remembering those skips their
     // re-test on every restart.  The term and the basis element each step
     // picks, and so every count, are unchanged.
-    let mut irreducible: crate::cryptanalysis::fx_hash::FxSet<u64> = Default::default();
+    let mut irreducible: crate::cryptanalysis::fx_hash::FxSet<Mask> = Default::default();
     'outer: loop {
         if canonical {
             if let Some(t) = acc.terms.first() {
@@ -902,10 +1036,10 @@ fn reduce_counted(r: &F2BoolPoly, basis: &[F2BoolPoly], st: &mut GbStats) -> F2B
 /// A variable outside it gives coprime leading monomials, and Buchberger's
 /// first criterion already says that S-polynomial reduces to zero.
 /// Returns the variables queued, as a mask.
-fn queue_field_pairs(i: usize, g: &F2BoolPoly, field: &mut Vec<(usize, u32, u32)>) -> u64 {
+fn queue_field_pairs(i: usize, g: &F2BoolPoly, field: &mut Vec<(usize, u32, u32)>) -> Mask {
     let Some(lm) = g.lt() else { return 0 };
     let degree = lm.degree() + 1;
-    for k in 0..64u32 {
+    for k in 0..MASK_BITS as u32 {
         if lm.mask >> k & 1 == 1 {
             field.push((i, k, degree));
         }
@@ -1037,7 +1171,7 @@ pub fn groebner_basis_f2_within(
     let mut field: Vec<(usize, u32, u32)> = Vec::new();
     // `pending[i]` has bit `k` set while `(i, v_k)` is still queued, so the
     // chain criterion below can ask that in constant time.
-    let mut pending: Vec<u64> = Vec::new();
+    let mut pending: Vec<Mask> = Vec::new();
     for (i, p) in basis.iter().enumerate() {
         pending.push(queue_field_pairs(i, p, &mut field));
     }
@@ -1058,7 +1192,7 @@ pub fn groebner_basis_f2_within(
                 break;
             };
             let (i, k, degree) = field.swap_remove(min_idx);
-            pending[i] &= !(1u64 << k);
+            pending[i] &= !bit(k);
             // The chain criterion with the field equation as the third
             // element.  `lcm(LM(g_i), v_k²) = LM(g_i)·v_k`, and a multilinear
             // `LM(g_j)` divides that exactly when it divides `LM(g_i)`.  The
@@ -1242,7 +1376,7 @@ pub fn solve_system_f2(gb: &[F2BoolPoly], n_vars: usize) -> Vec<u64> {
     let total = 1u64 << n_vars;
     let mut sols = Vec::new();
     for v in 0u64..total {
-        if gb.iter().all(|p| p.eval(v) == 0) {
+        if gb.iter().all(|p| p.eval(mask_from64(v)) == 0) {
             sols.push(v);
         }
     }
@@ -1260,6 +1394,10 @@ pub fn solution_set(gb: &[F2BoolPoly], n_vars: usize) -> HashSet<u64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     #[test]
     fn mul_mono_matches_rebuilding_through_from_monos() {
@@ -1276,10 +1414,10 @@ mod tests {
             let n: usize = if trial % 4 == 3 { 64 } else { 1 + trial % 20 };
             let span = if n == 64 { u64::MAX } else { (1u64 << n) - 1 };
             let terms: Vec<F2BoolMono> = (0..(next() % 60))
-                .map(|_| F2BoolMono::from_mask(next() & span))
+                .map(|_| F2BoolMono::from_mask(mask_from64(next() & span)))
                 .collect();
             let p = F2BoolPoly::from_monos(terms, n);
-            let m = F2BoolMono::from_mask(next() & next() & span);
+            let m = F2BoolMono::from_mask(mask_from64(next() & next() & span));
             let expected = F2BoolPoly::from_monos(p.terms.iter().map(|t| t.mul(m)).collect(), n);
             assert_eq!(p.mul_mono(m), expected, "{p:?} * {m:?}");
         }
@@ -1297,7 +1435,7 @@ mod tests {
         for trial in 0..2_000 {
             let n = 1 + (trial % 12);
             let terms: Vec<F2BoolMono> = (0..(next() % 40))
-                .map(|_| F2BoolMono::from_mask(next() & ((1u64 << n) - 1)))
+                .map(|_| F2BoolMono::from_mask(mask_from64(next() & ((1u64 << n) - 1))))
                 .collect();
             let canonical = F2BoolPoly::from_monos(terms.clone(), n);
             // the field is public: an unsorted, duplicated list too
@@ -1305,7 +1443,7 @@ mod tests {
             for p in [&canonical, &raw] {
                 for var in 0..n as u32 {
                     for value in [false, true] {
-                        let bit = 1u64 << var;
+                        let bit = bit(var);
                         let expected = F2BoolPoly::from_monos(
                             p.terms
                                 .iter()
@@ -1379,7 +1517,10 @@ mod tests {
         masks.extend((0..300).map(|_| next()));
         for &a in &masks {
             for &b in &masks {
-                let (a, b) = (F2BoolMono::from_mask(a), F2BoolMono::from_mask(b));
+                let (a, b) = (
+                    F2BoolMono::from_mask(mask_from64(a)),
+                    F2BoolMono::from_mask(mask_from64(b)),
+                );
                 assert_eq!(mono_key(a).cmp(&mono_key(b)), cmp_mono(a, b), "{a:?} {b:?}");
             }
         }
@@ -1461,7 +1602,7 @@ mod tests {
             let span = if n == 64 { u64::MAX } else { (1u64 << n) - 1 };
             let mut list = || -> Vec<F2BoolMono> {
                 (0..(next() % 40))
-                    .map(|_| F2BoolMono::from_mask(next() & next() & span))
+                    .map(|_| F2BoolMono::from_mask(mask_from64(next() & next() & span)))
                     .collect()
             };
             let (s, t) = (list(), list());
@@ -1503,7 +1644,7 @@ mod tests {
             let polys: Vec<F2BoolPoly> = (0..1 + next() % 8)
                 .map(|_| {
                     let terms = (0..next() % 50)
-                        .map(|_| F2BoolMono::from_mask(next() & next() & span))
+                        .map(|_| F2BoolMono::from_mask(mask_from64(next() & next() & span)))
                         .collect();
                     F2BoolPoly::from_monos(terms, n)
                 })
@@ -1550,10 +1691,10 @@ mod tests {
         for trial in 0..2_000 {
             let n: u32 = [4, 12, 57, 58, 64][trial % 5];
             let span = if n == 64 { u64::MAX } else { (1u64 << n) - 1 };
-            let pool: Vec<u64> = (0..1 + next() % 40)
-                .map(|_| next() & next() & span)
+            let pool: Vec<Mask> = (0..1 + next() % 40)
+                .map(|_| mask_from64(next() & next() & span))
                 .collect();
-            let mut terms: Vec<(u64, u64)> = (0..next() % 120)
+            let mut terms: Vec<(Mask, u64)> = (0..next() % 120)
                 .map(|_| {
                     let m = pool[(next() % pool.len() as u64) as usize];
                     (m, next() & [0x1, 0xf, u64::MAX][trial % 3])
@@ -1564,10 +1705,10 @@ mod tests {
                 *map.entry(std::cmp::Reverse(mono_key(F2BoolMono::from_mask(m))))
                     .or_insert(0u64) ^= c;
             }
-            let expected: Vec<(u64, u64)> = map
+            let expected: Vec<(Mask, u64)> = map
                 .into_iter()
                 .filter(|&(_, c)| c != 0)
-                .map(|(k, c)| (!(k.0 as u64), c))
+                .map(|(k, c)| (key_mask(k.0), c))
                 .collect();
             sum_by_monomial(&mut terms);
             assert_eq!(terms, expected, "trial {trial}");
@@ -1695,7 +1836,7 @@ mod tests {
         let f2 = F2BoolPoly::from_monos(vec![F2BoolMono::var(1), F2BoolMono::var(3)], 4);
         let f3 = F2BoolPoly::from_monos(vec![F2BoolMono::var(0).mul(F2BoolMono::var(3))], 4);
         for f in [&f1, &f2, &f3] {
-            assert_eq!(f.eval(v_star), 0, "input system unsat at v*");
+            assert_eq!(f.eval(mask_from64(v_star)), 0, "input system unsat at v*");
         }
         let gb = groebner_basis_f2(vec![f1, f2, f3], 4);
         let sols: HashSet<u64> = solve_system_f2(&gb, 4).into_iter().collect();
@@ -1712,8 +1853,9 @@ mod tests {
     /// Gröbner basis exactly when this equals the number of solutions.
     /// A zero set cannot make that distinction; this count can.
     fn standard_monomial_count(gb: &[F2BoolPoly], n: usize) -> usize {
-        let lms: Vec<u64> = gb.iter().filter_map(|p| p.lt()).map(|l| l.mask).collect();
+        let lms: Vec<Mask> = gb.iter().filter_map(|p| p.lt()).map(|l| l.mask).collect();
         (0u64..1 << n)
+            .map(mask_from64)
             .filter(|&m| !lms.iter().any(|&l| l & !m == 0))
             .count()
     }
@@ -1737,7 +1879,7 @@ mod tests {
         assert_eq!(solve_system_f2(&gb, 3).len(), 4);
         assert_eq!(standard_monomial_count(&gb, 3), 4);
         // The reduced basis: v0 v1 + v2, v0 v2 + v2, v1 v2 + v2.
-        let lms: HashSet<u64> = gb.iter().map(|p| p.lt().unwrap().mask).collect();
+        let lms: HashSet<Mask> = gb.iter().map(|p| p.lt().unwrap().mask).collect();
         assert_eq!(lms, [0b011, 0b101, 0b110].into_iter().collect());
     }
 
@@ -1759,14 +1901,14 @@ mod tests {
                             for _ in 0..rng.gen_range(0..=3) {
                                 mask |= 1 << rng.gen_range(0..n);
                             }
-                            F2BoolMono::from_mask(mask)
+                            F2BoolMono::from_mask(mask_from64(mask))
                         })
                         .collect();
                     F2BoolPoly::from_monos(monos, n)
                 })
                 .collect();
             let truth: HashSet<u64> = (0u64..1 << n)
-                .filter(|&x| system.iter().all(|p| p.eval(x) == 0))
+                .filter(|&x| system.iter().all(|p| p.eval(mask_from64(x)) == 0))
                 .collect();
             let gb = groebner_basis_f2(system, n);
             assert!(is_boolean_groebner_basis(&gb), "case {case}: not closed");

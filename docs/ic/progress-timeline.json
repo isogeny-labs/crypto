@@ -8,6 +8,15 @@
    "source": "https://github.com/aburan28/crypto/blob/main/research/conductor_gap_cm_orbits_20261015/REPORT.md",
    "status": "All 500 primary and 265 replication attempts verified; L0; native work incompletely priced",
    "value": null
+  },
+  {
+   "anchor": "#m4-narrow-engines-wide-vars-20261020",
+   "date": "2026-10-20",
+   "label": "m = 4 decomposition-phase cost of the narrow F4, F6-IC and SAT engines in a wide-vars build, against the pair-table floor",
+   "reason_not_plotted": "A stage measurement of the decomposition phase (cost per relation against the MITM pair-table floor) with no complete cold one-target IC/rho ratio, so there is no value to plot. The floor stays 10^3-10^5 times cheaper per relation on these cells; not an improvement over the baseline.",
+   "source": "https://github.com/aburan28/crypto/blob/main/research/ic_m3_algebraic_vs_mitm_20261014/amendment-2/ANALYSIS.md",
+   "status": "F4 and F6-IC finish n = 23 and n = 29 (70 and 90 unknowns), n = 31 censored; slope 0.644 / 0.645 on n = 11-29 against 0.298 for the floor on the same cells; SAT undetermined",
+   "value": null
   }
  ],
  "question": "Verified index-calculus cost over matched Pollard rho (IC / rho), by date landed on main. Below 1 means index calculus is cheaper. The barrier is rho's own cost, 1.",

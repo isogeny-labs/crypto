@@ -356,6 +356,8 @@ mod tests {
         );
         // The variable cap clamps: at n = 41, m = 3 every ℓ with δ ≤ 4
         // needs more than 64 unknowns.
+        // (only with the 64-unknown cap; `wide-vars` raises it to 128)
+        #[cfg(not(feature = "wide-vars"))]
         assert!(delta_dimensions(41, 3, -2, 4).is_empty());
         // The dimension cap clamps too: n = 61, m = 2 asks for ℓ ≥ 29.
         assert!(delta_dimensions(61, 2, -2, 4).is_empty());

@@ -67,7 +67,7 @@ use crate::binary_ecc::{BinaryCurve, BinaryPoint};
 use crate::cryptanalysis::ic_boundary::{koblitz_instance, random_binary_instance, BinaryInstance};
 use crate::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
 use crate::cryptanalysis::pq_descent_symbolic::descend;
-use crate::cryptanalysis::pq_groebner_f2::{groebner_basis_f2_within, GbStats};
+use crate::cryptanalysis::pq_groebner_f2::{digest_mask, groebner_basis_f2_within, GbStats, Mask};
 use num_bigint::BigUint;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -383,7 +383,7 @@ pub struct EngineRun {
     /// `solved`, `unsatisfiable`, `budget` or `declined`.
     pub verdict: String,
     /// The solutions returned, sorted.
-    pub solutions: Vec<u64>,
+    pub solutions: Vec<Mask>,
     pub ops: u64,
     pub wall_ns: u64,
     pub degree_reached: Option<u32>,
@@ -474,11 +474,11 @@ fn system_blake3(
     h.update(&(n_vars as u64).to_le_bytes());
     h.update(&(eqs.len() as u64).to_le_bytes());
     for e in eqs {
-        let mut masks: Vec<u64> = e.terms.iter().map(|t| t.mask).collect();
+        let mut masks: Vec<Mask> = e.terms.iter().map(|t| t.mask).collect();
         masks.sort_unstable();
         h.update(&(masks.len() as u64).to_le_bytes());
         for m in masks {
-            h.update(&m.to_le_bytes());
+            digest_mask(&mut h, m);
         }
     }
     h.finalize().to_hex().to_string()
@@ -624,7 +624,7 @@ pub fn price_engine_cell(
         })
         .unwrap_or_else(|| engines[0].0.clone());
     let decided = |r: &EngineRun| r.verdict == "solved" || r.verdict == "unsatisfiable";
-    let reference_answer = |t: &EngineTarget| -> Option<Vec<u64>> {
+    let reference_answer = |t: &EngineTarget| -> Option<Vec<Mask>> {
         let runs = &t.runs[&reference];
         runs.iter().all(decided).then(|| runs[0].solutions.clone())
     };
@@ -879,6 +879,10 @@ pub fn format_markdown(cells: &[DescentCell]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     /// The instrumentation must report a degree that the run could
     /// actually have reached, a basis it actually returned, and a cost
@@ -942,7 +946,7 @@ mod tests {
             // Every point of the subspace, checked against the original
             // equations rather than the basis.
             let direct: std::collections::HashSet<u64> = (0..1u64 << sys.n_vars)
-                .filter(|v| sys.equations.iter().all(|e| e.eval(*v) == 0))
+                .filter(|v| sys.equations.iter().all(|e| e.eval(mask_from64(*v)) == 0))
                 .collect();
             assert_eq!(from_basis, direct, "the pruned basis changed the variety");
             if !direct.is_empty() {

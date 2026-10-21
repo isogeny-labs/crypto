@@ -33,7 +33,7 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
 use crypto_lib::cryptanalysis::koblitz_symmetrised::{build_direct_x_system, plain_terms};
-use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_from64, F2BoolMono, F2BoolPoly};
 use num_bigint::BigUint;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -287,7 +287,7 @@ fn build_rr(
 fn eval(p: &F2BoolPoly, a: u64) -> bool {
     p.terms
         .iter()
-        .fold(false, |acc, t| acc ^ (t.mask & a == t.mask))
+        .fold(false, |acc, t| acc ^ (t.mask & mask_from64(a) == t.mask))
 }
 
 fn brute_roots(polys: &[F2BoolPoly], n_vars: usize) -> u64 {

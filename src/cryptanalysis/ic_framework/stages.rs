@@ -404,7 +404,7 @@ impl BooleanSystem {
 #[derive(Clone, Debug, Serialize)]
 pub enum SolverVerdict {
     /// Solutions found, as bitmasks over the system's variables.
-    Solved(Vec<u64>),
+    Solved(Vec<crate::cryptanalysis::pq_groebner_f2::Mask>),
     /// The system is inconsistent: this target does not decompose.
     Unsatisfiable,
     /// The budget ran out.  **Not** the same as unsatisfiable, and a
@@ -592,6 +592,10 @@ impl Targets {
 #[cfg(test)]
 mod tests {
     use super::Params;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     #[test]
     fn a_plugin_spec_splits_into_name_and_parameters() {

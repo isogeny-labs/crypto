@@ -29,7 +29,7 @@ use crypto_lib::cryptanalysis::koblitz_bench::{
 };
 use crypto_lib::cryptanalysis::koblitz_groebner::{build_decomposition_system, FieldStructure};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
-use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_from64, mask_low64, F2BoolMono, F2BoolPoly};
 use num_bigint::BigUint;
 use serde_json::Value;
 
@@ -72,10 +72,10 @@ fn specialise(p: &F2BoolPoly, fixes: &[(usize, bool)]) -> F2BoolPoly {
                 if !b {
                     continue 'term;
                 }
-                m &= !(1u64 << v);
+                m &= mask_from64(!(1u64 << v));
             }
         }
-        masks.push(m);
+        masks.push(mask_low64(m));
     }
     masks.sort_unstable();
     let mut kept: Vec<u64> = Vec::new();
@@ -87,7 +87,12 @@ fn specialise(p: &F2BoolPoly, fixes: &[(usize, bool)]) -> F2BoolPoly {
         }
     }
     F2BoolPoly {
-        terms: kept.into_iter().map(|mask| F2BoolMono { mask }).collect(),
+        terms: kept
+            .into_iter()
+            .map(|mask| F2BoolMono {
+                mask: mask_from64(mask),
+            })
+            .collect(),
         n_vars: p.n_vars,
     }
 }

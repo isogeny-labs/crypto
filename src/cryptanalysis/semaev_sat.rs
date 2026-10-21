@@ -109,6 +109,7 @@ use crate::cryptanalysis::ffd_harness::{
     quad_monomial_index, weil_descend_s3_subspace, F2BoolPoly,
 };
 use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly as BoolPoly;
+use crate::cryptanalysis::pq_groebner_f2::{bit, Mask, MASK_BITS};
 use crate::cryptanalysis::sat::{Lit, Solver};
 
 // ── Encoding ────────────────────────────────────────────────────────
@@ -1054,7 +1055,7 @@ pub struct BoolSystemSatEncoding {
     pub n_vars: usize,
     /// Tseitin auxiliary for each monomial of degree ≥ 2, keyed by the
     /// monomial's variable mask.
-    pub monomial_var: std::collections::BTreeMap<u64, u32>,
+    pub monomial_var: std::collections::BTreeMap<Mask, u32>,
     /// The CDCL solver with every clause installed.
     pub solver: Solver,
     /// Set when encoding produced the empty clause (`1 = 0`), i.e. the
@@ -1065,12 +1066,12 @@ pub struct BoolSystemSatEncoding {
 impl BoolSystemSatEncoding {
     /// Decode the current model into a bitmask over the problem
     /// variables, in the same layout the Gröbner solver returns.
-    pub fn model_assignment(&self) -> u64 {
+    pub fn model_assignment(&self) -> Mask {
         let model = self.solver.model();
-        let mut out = 0u64;
+        let mut out: Mask = 0;
         for i in 0..self.n_vars {
             if model[i] {
-                out |= 1 << i;
+                out |= bit(i as u32);
             }
         }
         out
@@ -1091,7 +1092,7 @@ impl BoolSystemSatEncoding {
 pub fn encode_boolean_system(
     n_vars: usize,
     equations: &[BoolPoly],
-    blocked: &[u64],
+    blocked: &[Mask],
 ) -> BoolSystemSatEncoding {
     encode_boolean_system_with(n_vars, equations, blocked, XorEncoding::Cnf)
 }
@@ -1102,20 +1103,23 @@ pub fn encode_boolean_system(
 pub fn encode_boolean_system_with(
     n_vars: usize,
     equations: &[BoolPoly],
-    blocked: &[u64],
+    blocked: &[Mask],
     encoding: XorEncoding,
 ) -> BoolSystemSatEncoding {
-    assert!(n_vars <= 64, "problem variables are packed into a u64");
+    assert!(
+        n_vars <= MASK_BITS,
+        "problem variables are packed into a monomial mask of {MASK_BITS} bits"
+    );
     assert!(
         equations
             .iter()
             .flat_map(|eq| &eq.terms)
-            .all(|t| { n_vars == 64 || (t.mask >> n_vars) == 0 }),
+            .all(|t| { n_vars >= MASK_BITS || (t.mask >> n_vars) == 0 }),
         "monomial references a variable outside the system"
     );
 
     // One auxiliary per distinct monomial of degree ≥ 2.
-    let mut monomial_var: std::collections::BTreeMap<u64, u32> = std::collections::BTreeMap::new();
+    let mut monomial_var: std::collections::BTreeMap<Mask, u32> = std::collections::BTreeMap::new();
     for eq in equations {
         for t in &eq.terms {
             if t.mask.count_ones() >= 2 {
@@ -1226,6 +1230,10 @@ mod tests {
     use crate::cryptanalysis::binary_semaev::binary_semaev_s3;
     use crate::cryptanalysis::binary_semaev_s4::{elementary_symmetric_3, symmetrised_s4_eval};
     use crate::cryptanalysis::pq_groebner_f2::F2BoolMono;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     use crate::cryptanalysis::sat::SolveResult;
 
     /// Compare complete model sets with direct evaluation, including
@@ -1239,13 +1247,16 @@ mod tests {
                 let equations: Vec<BoolPoly> = (0..rng.gen_range(0..=6))
                     .map(|_| {
                         let terms = (0..rng.gen_range(0..=12))
-                            .map(|_| F2BoolMono::from_mask(rng.gen_range(0..(1u64 << n))))
+                            .map(|_| {
+                                F2BoolMono::from_mask(mask_from64(rng.gen_range(0..(1u64 << n))))
+                            })
                             .collect();
                         BoolPoly::from_monos(terms, n)
                     })
                     .collect();
-                let expected: std::collections::BTreeSet<u64> = (0..(1u64 << n))
-                    .filter(|&a| equations.iter().all(|e| e.eval(a) == 0))
+                let expected: std::collections::BTreeSet<Mask> = (0..(1u64 << n))
+                    .filter(|&a| equations.iter().all(|e| e.eval(mask_from64(a)) == 0))
+                    .map(mask_from64)
                     .collect();
                 for mode in [XorEncoding::Cnf, XorEncoding::Native] {
                     let mut enc = encode_boolean_system_with(n, &equations, &[], mode);
@@ -1274,7 +1285,7 @@ mod tests {
                         }
                     }
                     assert_eq!(actual, expected, "n={n}, {mode:?}");
-                    let all: Vec<u64> = expected.iter().copied().collect();
+                    let all: Vec<Mask> = expected.iter().copied().collect();
                     let mut blocked = encode_boolean_system_with(n, &equations, &all, mode);
                     assert_eq!(blocked.solver.solve(), SolveResult::Unsat);
                 }
@@ -1312,7 +1323,7 @@ mod tests {
                 // Small widths: enumerate every model and count them.
                 // A w-input parity constraint has exactly 2^{w−1}.
                 if w <= 8 {
-                    let mut blocked: Vec<u64> = Vec::new();
+                    let mut blocked: Vec<Mask> = Vec::new();
                     loop {
                         let mut e = encode_boolean_system(w, std::slice::from_ref(&eq), &blocked);
                         match e.solver.solve() {

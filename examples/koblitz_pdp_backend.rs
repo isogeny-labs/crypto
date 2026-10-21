@@ -29,6 +29,7 @@ use crypto_lib::cryptanalysis::koblitz_groebner::{
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     factor_x_n_minus_1, find_irreducible_sparse, invariant_subspace_basis, points_with_x,
 };
+use crypto_lib::cryptanalysis::pq_groebner_f2::{low_bits, mask_from64, mask_low64};
 use crypto_lib::cryptanalysis::sat::{SolveResult, SolverStats};
 use crypto_lib::cryptanalysis::semaev_sat::{
     encode_boolean_system_with, encode_semaev_s4_with, S4Options, XorEncoding,
@@ -979,11 +980,13 @@ fn native_f4(instance: VerifiedInstance, budget_seconds: u64) -> (Value, bool) {
                     source_model_valid = Some(true);
                     if batch_witness.is_none() {
                         let found = roots.iter().find_map(|root| {
-                            let x2_mask = root & ((1u64 << instance.ell) - 1);
+                            let x2_mask = root & low_bits(instance.ell);
                             let x3_mask = root >> instance.ell;
-                            let combined = (*x1_mask as u64)
-                                | (x2_mask << instance.ell)
-                                | (x3_mask << (2 * instance.ell));
+                            let combined = mask_low64(
+                                mask_from64(*x1_mask as u64)
+                                    | (x2_mask << instance.ell)
+                                    | (x3_mask << (2 * instance.ell)),
+                            );
                             source_point_witness(
                                 &instance.curve,
                                 &instance.basis,

@@ -131,13 +131,14 @@ use crate::binary_ecc::{F2mElement, IrreduciblePoly};
 use crate::cryptanalysis::inherited_f4::{ChildSystem, InheritCost, ReducedBasis};
 use crate::cryptanalysis::matrix_f5_f2::F5Criterion;
 use crate::cryptanalysis::pq_groebner_f2::{
-    cmp_mono, groebner_basis_f2, mono_key, sort_masks_descending, sum_by_monomial, F2BoolMono,
-    F2BoolPoly,
+    bit, cmp_mono, groebner_basis_f2, low_bits, mono_key, sort_masks_descending, sum_by_monomial,
+    F2BoolMono, F2BoolPoly, Mask, MASK_BITS,
 };
 
-/// Hard cap: Boolean monomials are `u64` bitmasks in
-/// [`crate::cryptanalysis::pq_groebner_f2`].
-pub const MAX_VARS: usize = 64;
+/// Hard cap: Boolean monomials are bitmasks of [`Mask`] width in
+/// [`crate::cryptanalysis::pq_groebner_f2`], so 64 unknowns, or 128 with the
+/// `wide-vars` feature.
+pub const MAX_VARS: usize = MASK_BITS;
 
 // ── Symbolic F_{2^n} arithmetic ────────────────────────────────────
 
@@ -221,7 +222,7 @@ fn field_sums_fit(st: &FieldStructure) -> bool {
 /// once.  XOR is addition over `F_2` at any multiplicity, so the
 /// coordinates read back are the same polynomials, term for term.  Every
 /// operation assumes [`field_sums_fit`].
-struct FieldSum(Vec<(u64, u64)>);
+struct FieldSum(Vec<(Mask, u64)>);
 
 impl FieldSum {
     /// `x`, at most 64 coordinates, over its support; `None` unless every
@@ -266,7 +267,7 @@ impl FieldSum {
     /// its current monomial once, as [`F2BoolPoly::add`] does.
     fn add(&self, other: &Self) -> Self {
         use std::cmp::Ordering;
-        let key = |s: u64| mono_key(F2BoolMono::from_mask(s));
+        let key = |s: Mask| mono_key(F2BoolMono::from_mask(s));
         let (a, b) = (&self.0, &other.0);
         let mut out = Vec::with_capacity(a.len() + b.len());
         let (mut i, mut j) = (0, 0);
@@ -634,7 +635,7 @@ impl SymElement {
     }
 
     /// Evaluate at a Boolean assignment, giving a concrete field element.
-    pub fn eval(&self, point: u64, n: u32) -> F2mElement {
+    pub fn eval(&self, point: Mask, n: u32) -> F2mElement {
         let mut positions = Vec::new();
         for (k, c) in self.coords.iter().enumerate() {
             if c.eval(point) == 1 {
@@ -878,7 +879,7 @@ pub struct DecompositionSystem {
 impl DecompositionSystem {
     /// The `x`-coordinate that Boolean assignment `point` gives to
     /// summand `i`, as an element of the subspace.
-    pub fn summand_x(&self, basis: &[F2mElement], point: u64, i: usize, n: u32) -> F2mElement {
+    pub fn summand_x(&self, basis: &[F2mElement], point: Mask, i: usize, n: u32) -> F2mElement {
         let mut positions = Vec::new();
         for t in 0..self.ell {
             if (point >> (i * self.ell + t)) & 1 == 1 {
@@ -1041,13 +1042,13 @@ pub fn permute_poly(p: &F2BoolPoly, perm: &[u32]) -> F2BoolPoly {
 }
 
 /// Rename the variables of a monomial or point mask by `perm[old] = new`.
-pub fn permute_mask(mask: u64, perm: &[u32]) -> u64 {
-    let mut out = 0u64;
+pub fn permute_mask(mask: Mask, perm: &[u32]) -> Mask {
+    let mut out: Mask = 0;
     let mut bits = mask;
     while bits != 0 {
         let v = bits.trailing_zeros() as usize;
         bits &= bits - 1;
-        out |= 1u64 << perm[v];
+        out |= bit(perm[v]);
     }
     out
 }
@@ -1074,17 +1075,17 @@ pub fn chain_order_interleaved(split_rule: SplitRule) -> bool {
 ///
 /// `blocks` gives block sizes in variable-index order, so block `i`
 /// owns a contiguous range of variables.
-pub fn block_degrees(mask: u64, blocks: &[usize]) -> Vec<u32> {
+pub fn block_degrees(mask: Mask, blocks: &[usize]) -> Vec<u32> {
     let mut out = Vec::with_capacity(blocks.len());
     let mut lo = 0usize;
     for &w in blocks {
-        let hi = (lo + w).min(64);
-        let window = if lo >= 64 {
+        let hi = (lo + w).min(MASK_BITS);
+        let window = if lo >= MASK_BITS {
             0
-        } else if hi - lo >= 64 {
-            u64::MAX
+        } else if hi - lo >= MASK_BITS {
+            Mask::MAX
         } else {
-            ((1u64 << (hi - lo)) - 1) << lo
+            low_bits(hi - lo) << lo
         };
         out.push((mask & window).count_ones());
         lo = hi;
@@ -1133,7 +1134,7 @@ pub fn matrix_f4_f2_blocked(
     if polys.is_empty() || blocks.len() != bounds.len() {
         return Some((Vec::new(), 0));
     }
-    let within = |mask: u64| -> bool {
+    let within = |mask: Mask| -> bool {
         block_degrees(mask, blocks)
             .iter()
             .zip(bounds)
@@ -1144,16 +1145,16 @@ pub fn matrix_f4_f2_blocked(
     // that breaks a bound on its own can only break it further after
     // multiplication.
     let total_bound: u32 = bounds.iter().sum();
-    let mut rows_monos: Vec<Vec<u64>> = Vec::new();
+    let mut rows_monos: Vec<Vec<Mask>> = Vec::new();
     for p in polys {
         for mult in monomials_up_to(n_vars, total_bound) {
             if !within(mult) {
                 continue;
             }
             let row = {
-                let mut all: Vec<u64> = p.terms.iter().map(|t| t.mask | mult).collect();
+                let mut all: Vec<Mask> = p.terms.iter().map(|t| t.mask | mult).collect();
                 all.sort_unstable();
-                let mut row: Vec<u64> = Vec::with_capacity(all.len());
+                let mut row: Vec<Mask> = Vec::with_capacity(all.len());
                 let mut i = 0;
                 while i < all.len() {
                     let mut j = i;
@@ -1183,14 +1184,14 @@ pub fn matrix_f4_f2_blocked(
         return Some((Vec::new(), 0));
     }
 
-    let mut cols: Vec<u64> = rows_monos.iter().flatten().copied().collect();
+    let mut cols: Vec<Mask> = rows_monos.iter().flatten().copied().collect();
     cols.sort_unstable();
     cols.dedup();
     if cols.len() > max_f4_cols() {
         return None;
     }
     cols.sort_by(|a, b| cmp_mono(F2BoolMono::from_mask(*a), F2BoolMono::from_mask(*b)).reverse());
-    let index: std::collections::HashMap<u64, usize> =
+    let index: std::collections::HashMap<Mask, usize> =
         cols.iter().enumerate().map(|(i, m)| (*m, i)).collect();
 
     let words = cols.len().div_ceil(64);
@@ -1227,7 +1228,7 @@ pub fn matrix_f4_f2_blocked(
 /// column: a reduced row is sparse, so testing all `cols.len()` bits of
 /// every row was about half of a full readback.  Bits at or past
 /// `cols.len()` are never read, as before.
-fn row_monos(row: &[u64], cols: &[u64]) -> Vec<F2BoolMono> {
+fn row_monos(row: &[u64], cols: &[Mask]) -> Vec<F2BoolMono> {
     let set: u32 = row.iter().map(|w| w.count_ones()).sum();
     let mut monos = Vec::with_capacity(set as usize);
     for (word_index, &packed) in row.iter().enumerate() {
@@ -1258,15 +1259,15 @@ fn poly_from_column_order(terms: Vec<F2BoolMono>, n_vars: usize) -> F2BoolPoly {
 
 /// All monomials of degree `≤ deg` over `n_vars` Boolean variables, as
 /// masks.  (In the Boolean ring a monomial is a subset of variables.)
-fn monomials_up_to(n_vars: usize, deg: u32) -> Vec<u64> {
-    let mut out = vec![0u64];
-    let mut level = vec![0u64];
+fn monomials_up_to(n_vars: usize, deg: u32) -> Vec<Mask> {
+    let mut out: Vec<Mask> = vec![0];
+    let mut level: Vec<Mask> = vec![0];
     for _ in 0..deg {
         let mut next = Vec::new();
         for &m in &level {
-            let top = 64 - m.leading_zeros();
+            let top = MASK_BITS as u32 - m.leading_zeros();
             for v in top..n_vars as u32 {
-                next.push(m | (1u64 << v));
+                next.push(m | bit(v));
             }
         }
         out.extend(next.iter().copied());
@@ -1278,13 +1279,13 @@ fn monomials_up_to(n_vars: usize, deg: u32) -> Vec<u64> {
     out
 }
 
-pub(crate) fn monomials_up_to_mask(variable_mask: u64, degree: u32) -> Vec<u64> {
-    let variables: Vec<u64> = (0..64)
-        .filter(|bit| variable_mask & (1u64 << bit) != 0)
-        .map(|bit| 1u64 << bit)
+pub(crate) fn monomials_up_to_mask(variable_mask: Mask, degree: u32) -> Vec<Mask> {
+    let variables: Vec<Mask> = (0..MASK_BITS as u32)
+        .filter(|&v| variable_mask & bit(v) != 0)
+        .map(bit)
         .collect();
-    let mut out = vec![0u64];
-    let mut level = vec![(0u64, 0usize)];
+    let mut out: Vec<Mask> = vec![0];
+    let mut level: Vec<(Mask, usize)> = vec![(0, 0)];
     for _ in 0..degree {
         let mut next = Vec::new();
         for &(monomial, start) in &level {
@@ -1301,13 +1302,13 @@ pub(crate) fn monomials_up_to_mask(variable_mask: u64, degree: u32) -> Vec<u64> 
     out
 }
 
-fn cached_monomials_up_to_mask(variable_mask: u64, degree: u32) -> std::rc::Rc<[u64]> {
+fn cached_monomials_up_to_mask(variable_mask: Mask, degree: u32) -> std::rc::Rc<[Mask]> {
     use std::cell::RefCell;
     use std::collections::HashMap;
     use std::rc::Rc;
 
     thread_local! {
-        static CACHE: RefCell<HashMap<(u64, u32), Rc<[u64]>>> = RefCell::new(HashMap::new());
+        static CACHE: RefCell<HashMap<(Mask, u32), Rc<[Mask]>>> = RefCell::new(HashMap::new());
     }
     static DISABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     let disabled = *DISABLED
@@ -1321,7 +1322,7 @@ fn cached_monomials_up_to_mask(variable_mask: u64, degree: u32) -> std::rc::Rc<[
         if let Some(schedule) = cache.get(&(variable_mask, degree)) {
             return schedule.clone();
         }
-        let schedule: Rc<[u64]> = monomials_up_to_mask(variable_mask, degree).into();
+        let schedule: Rc<[Mask]> = monomials_up_to_mask(variable_mask, degree).into();
         if cache.len() >= 128 {
             cache.clear();
         }
@@ -1330,12 +1331,8 @@ fn cached_monomials_up_to_mask(variable_mask: u64, degree: u32) -> std::rc::Rc<[
     })
 }
 
-pub(crate) fn all_variable_mask(n_vars: usize) -> u64 {
-    if n_vars >= 64 {
-        u64::MAX
-    } else {
-        (1u64 << n_vars) - 1
-    }
+pub(crate) fn all_variable_mask(n_vars: usize) -> Mask {
+    low_bits(n_vars)
 }
 
 /// Limits on one Macaulay matrix, so a too-large system degrades to
@@ -2098,7 +2095,7 @@ pub(crate) fn macaulay_rows_monos(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-) -> Option<Vec<Vec<u64>>> {
+) -> Option<Vec<Vec<Mask>>> {
     macaulay_rows_monos_with_mask(polys, n_vars, degree, all_variable_mask(n_vars), None)
 }
 
@@ -2110,14 +2107,14 @@ pub(crate) fn f5_rows_monos_with_mask(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     criterion: &F5Criterion,
-) -> Option<Vec<Vec<u64>>> {
+) -> Option<Vec<Vec<Mask>>> {
     macaulay_rows_monos_with_mask(polys, n_vars, degree, multiplier_mask, Some(criterion))
 }
 
 /// Pack monomial rows as bit-rows over `cols` (descending monomial order).
-pub(crate) fn pack_rows(rows_monos: &[Vec<u64>], cols: &[u64]) -> Vec<Vec<u64>> {
+pub(crate) fn pack_rows(rows_monos: &[Vec<Mask>], cols: &[Mask]) -> Vec<Vec<u64>> {
     let words = cols.len().div_ceil(64).max(1);
     if std::env::var("KIC_F4_HASH_COLUMN_INDEX").as_deref() != Ok("1") {
         if let Some(index) = F4ColumnIndex::dense_table(cols) {
@@ -2137,11 +2134,11 @@ pub(crate) fn pack_rows(rows_monos: &[Vec<u64>], cols: &[u64]) -> Vec<Vec<u64>> 
 // Choose the representation before packing. Separate monomorphisations avoid
 // an enum branch for every term on the sparse/high-bit hash fallback.
 fn pack_rows_with_lookup(
-    rows_monos: &[Vec<u64>],
+    rows_monos: &[Vec<Mask>],
     words: usize,
-    lookup: impl Fn(&u64) -> usize + Sync,
+    lookup: impl Fn(&Mask) -> usize + Sync,
 ) -> Vec<Vec<u64>> {
-    let pack = |monos: &Vec<u64>| {
+    let pack = |monos: &Vec<Mask>| {
         let mut row = vec![0u64; words];
         for m in monos {
             let c = lookup(m);
@@ -2217,19 +2214,19 @@ fn tail_zero_assignments(
 ) -> Vec<bool> {
     let count = 1usize << free_variables.len();
     let mut valid = vec![true; count];
-    let mut false_mask = 0u64;
-    let mut true_mask = 0u64;
-    let mut free_mask = 0u64;
-    let mut local_index = [u8::MAX; 64];
+    let mut false_mask: Mask = 0;
+    let mut true_mask: Mask = 0;
+    let mut free_mask: Mask = 0;
+    let mut local_index = [u8::MAX; MASK_BITS];
     for (variable, value) in assignment.iter().enumerate() {
         if *value == Some(false) {
-            false_mask |= 1u64 << variable;
+            false_mask |= bit(variable as u32);
         } else if *value == Some(true) {
-            true_mask |= 1u64 << variable;
+            true_mask |= bit(variable as u32);
         }
     }
     for (local, &variable) in free_variables.iter().enumerate() {
-        free_mask |= 1u64 << variable;
+        free_mask |= bit(variable as u32);
         local_index[variable] = local as u8;
     }
     let mut values = vec![false; count];
@@ -2270,10 +2267,10 @@ pub(crate) fn macaulay_rows_monos_with_mask(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     criterion: Option<&F5Criterion>,
-) -> Option<Vec<Vec<u64>>> {
-    let mut rows_monos: Vec<Vec<u64>> = Vec::new();
+) -> Option<Vec<Vec<Mask>>> {
+    let mut rows_monos: Vec<Vec<Mask>> = Vec::new();
     visit_macaulay_rows(polys, n_vars, degree, multiplier_mask, criterion, |row| {
         rows_monos.push(row.to_vec())
     })?;
@@ -2318,9 +2315,9 @@ pub(crate) fn f5_rows_monos_with_f4_count(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     criterion: &F5Criterion,
-) -> Option<(usize, Vec<Vec<u64>>)> {
+) -> Option<(usize, Vec<Vec<Mask>>)> {
     let mut rows_monos = Vec::new();
     let (_, full_count) = visit_macaulay_rows_counted::<true>(
         polys,
@@ -2343,7 +2340,7 @@ pub(crate) fn f5_rows_packed_full_columns(
     n_vars: usize,
     degree: u32,
     criterion: &F5Criterion,
-) -> Option<(usize, Vec<u64>, Vec<Vec<u64>>)> {
+) -> Option<(usize, Vec<Mask>, Vec<Vec<u64>>)> {
     const MAX_DIRECT_VARS: usize = 24;
     const MAX_DIRECT_DEGREE: usize = 4;
     if n_vars > MAX_DIRECT_VARS
@@ -2380,7 +2377,7 @@ pub(crate) fn f5_rows_packed_full_columns(
     let row_cap = max_f4_rows();
     let mut matrix = Vec::new();
     let mut full_count = 0usize;
-    let mut schedules: Vec<Option<Vec<u64>>> = vec![None; degree as usize + 1];
+    let mut schedules: Vec<Option<Vec<Mask>>> = vec![None; degree as usize + 1];
     for (i, p) in polys.iter().enumerate() {
         let pdeg = p.terms.iter().map(|t| t.degree()).max().unwrap_or(0);
         if pdeg > degree {
@@ -2448,9 +2445,9 @@ fn visit_macaulay_rows(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     criterion: Option<&F5Criterion>,
-    visit: impl FnMut(&[u64]),
+    visit: impl FnMut(&[Mask]),
 ) -> Option<usize> {
     visit_macaulay_rows_counted::<false>(
         polys,
@@ -2470,16 +2467,16 @@ fn visit_macaulay_rows_counted<const COUNT_PRUNED: bool>(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     criterion: Option<&F5Criterion>,
     row_cap: usize,
-    mut visit: impl FnMut(&[u64]),
+    mut visit: impl FnMut(&[Mask]),
 ) -> Option<(usize, usize)> {
     // The caller reads the configured cap once per build, not once per row.
     let mut selected_count = 0usize;
     let mut full_count = 0usize;
-    let mut schedules: Vec<Option<std::rc::Rc<[u64]>>> = vec![None; degree as usize + 1];
-    let mut all: Vec<u64> = Vec::new();
+    let mut schedules: Vec<Option<std::rc::Rc<[Mask]>>> = vec![None; degree as usize + 1];
+    let mut all: Vec<Mask> = Vec::new();
     for (i, p) in polys.iter().enumerate() {
         let pdeg = p
             .terms
@@ -2547,11 +2544,11 @@ fn visit_macaulay_rows_counted<const COUNT_PRUNED: bool>(
 /// constant monomial last.  Both elimination paths depend on that: it is
 /// what makes "leading column index ≥ the degree-≤1 boundary" equivalent
 /// to "this row is a linear consequence".
-pub(crate) fn macaulay_columns(rows_monos: &[Vec<u64>]) -> Option<Vec<u64>> {
+pub(crate) fn macaulay_columns(rows_monos: &[Vec<Mask>]) -> Option<Vec<Mask>> {
     let cap = max_f4_cols();
-    let mut cols: Vec<u64> = if rows_monos.len() <= 1 {
+    let mut cols: Vec<Mask> = if rows_monos.len() <= 1 {
         // A single row has no repeated support across rows to eliminate.
-        let mut cols: Vec<u64> = rows_monos.iter().flatten().copied().collect();
+        let mut cols: Vec<Mask> = rows_monos.iter().flatten().copied().collect();
         cols.sort_unstable();
         cols.dedup();
         cols
@@ -2587,7 +2584,7 @@ pub(crate) fn build_macaulay_sparse(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-) -> Option<(Vec<u64>, Vec<Vec<u32>>)> {
+) -> Option<(Vec<Mask>, Vec<Vec<u32>>)> {
     sparse_from_rows_monos(macaulay_rows_monos(polys, n_vars, degree)?)
 }
 
@@ -2602,7 +2599,7 @@ pub(crate) fn build_macaulay_sparse_f5(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-) -> Option<(Vec<u64>, Vec<Vec<u32>>)> {
+) -> Option<(Vec<Mask>, Vec<Vec<u32>>)> {
     let mask = all_variable_mask(n_vars);
     let criterion = F5Criterion::new(polys, n_vars, degree, mask);
     sparse_from_rows_monos(f5_rows_monos_with_mask(
@@ -2611,12 +2608,12 @@ pub(crate) fn build_macaulay_sparse_f5(
 }
 
 /// Column masks and per-row ascending column indices for monomial rows.
-fn sparse_from_rows_monos(rows_monos: Vec<Vec<u64>>) -> Option<(Vec<u64>, Vec<Vec<u32>>)> {
+fn sparse_from_rows_monos(rows_monos: Vec<Vec<Mask>>) -> Option<(Vec<Mask>, Vec<Vec<u32>>)> {
     if rows_monos.is_empty() {
         return Some((Vec::new(), Vec::new()));
     }
     let cols = macaulay_columns(&rows_monos)?;
-    let index: std::collections::HashMap<u64, u32> = cols
+    let index: std::collections::HashMap<Mask, u32> = cols
         .iter()
         .enumerate()
         .map(|(i, m)| (*m, i as u32))
@@ -2642,7 +2639,7 @@ pub(crate) fn build_macaulay(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-) -> Option<(Vec<u64>, Vec<Vec<u64>>)> {
+) -> Option<(Vec<Mask>, Vec<Vec<u64>>)> {
     build_macaulay_with_multiplier_mask(
         polys,
         n_vars,
@@ -2666,9 +2663,9 @@ pub(crate) fn build_inherited_macaulay(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     quadratic_generators: bool,
-) -> Option<(Vec<u64>, Vec<Vec<u64>>)> {
+) -> Option<(Vec<Mask>, Vec<Vec<u64>>)> {
     static REUSE_LAYOUT: std::sync::OnceLock<Option<bool>> = std::sync::OnceLock::new();
     let override_policy = *REUSE_LAYOUT.get_or_init(|| {
         match std::env::var("KIC_F4_INHERIT_LAYOUT_CACHE").as_deref() {
@@ -2692,15 +2689,15 @@ pub(crate) fn build_inherited_macaulay_support_local(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     quadratic_generators: bool,
-) -> Option<(Vec<u64>, Vec<Vec<u64>>)> {
+) -> Option<(Vec<Mask>, Vec<Vec<u64>>)> {
     use std::sync::atomic::Ordering::Relaxed;
     let profiling = F4_SUPPORT_LOCAL_PROFILE_ENABLED.load(Relaxed);
     if profiling {
         support_local_counters::CALLS.fetch_add(1, Relaxed);
     }
-    let support = |p: &F2BoolPoly| p.terms.iter().fold(0u64, |acc, t| acc | t.mask);
+    let support = |p: &F2BoolPoly| p.terms.iter().fold(0 as Mask, |acc, t| acc | t.mask);
     if polys.iter().all(|p| multiplier_mask & !support(p) == 0) {
         if profiling {
             support_local_counters::DELEGATED.fetch_add(1, Relaxed);
@@ -2718,7 +2715,7 @@ pub(crate) fn build_inherited_macaulay_support_local(
         if F4_SUPPORT_LOCAL_STREAM.load(Relaxed) {
             support_local_rows_stream(polys, n_vars, degree, multiplier_mask, max_f4_rows())
         } else {
-            let mut rows_monos: Vec<Vec<u64>> = Vec::new();
+            let mut rows_monos: Vec<Vec<Mask>> = Vec::new();
             for p in polys {
                 let rows = macaulay_rows_monos_with_mask(
                     std::slice::from_ref(p),
@@ -2770,13 +2767,17 @@ pub(crate) fn build_inherited_macaulay_support_local(
 /// Collect exact observed columns using the colex rank of each square-free
 /// monomial within its degree. Only the unique masks need the final order
 /// sort; the bitmap does not admit a monomial cancelled out of a row.
-fn support_local_bitmap_columns(rows: &[Vec<u64>], n_vars: usize, degree: u32) -> Option<Vec<u64>> {
+fn support_local_bitmap_columns(
+    rows: &[Vec<Mask>],
+    n_vars: usize,
+    degree: u32,
+) -> Option<Vec<Mask>> {
     const MAX_DEGREE: usize = 4;
     let degree = degree as usize;
-    if n_vars > 64 || degree > MAX_DEGREE {
+    if n_vars > MASK_BITS || degree > MAX_DEGREE {
         return None;
     }
-    let mut choose = [[0usize; MAX_DEGREE + 1]; 65];
+    let mut choose = [[0usize; MAX_DEGREE + 1]; MASK_BITS + 1];
     for n in 0..=n_vars {
         choose[n][0] = 1;
         for k in 1..=MAX_DEGREE.min(n) {
@@ -2831,11 +2832,11 @@ fn support_local_rows_stream(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     row_cap: usize,
-) -> Option<Vec<Vec<u64>>> {
+) -> Option<Vec<Vec<Mask>>> {
     let mut rows = Vec::new();
-    let mut schedules: std::collections::HashMap<(u64, u32), std::rc::Rc<[u64]>> =
+    let mut schedules: std::collections::HashMap<(Mask, u32), std::rc::Rc<[Mask]>> =
         std::collections::HashMap::new();
     let mut product = Vec::new();
     let mut odd = Vec::new();
@@ -2854,7 +2855,7 @@ fn support_local_rows_stream(
         let support = polynomial
             .terms
             .iter()
-            .fold(0u64, |mask, term| mask | term.mask);
+            .fold(0 as Mask, |mask, term| mask | term.mask);
         let local_mask = multiplier_mask & support;
         let multipliers = schedules.entry((local_mask, gap)).or_insert_with(|| {
             if local_mask == full_mask {
@@ -2894,9 +2895,9 @@ fn build_inherited_macaulay_with_layout(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     reuse_layout: bool,
-) -> Option<(Vec<u64>, Vec<Vec<u64>>)> {
+) -> Option<(Vec<Mask>, Vec<Vec<u64>>)> {
     static FUSED_PACK: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     let fused = reuse_layout
         && *FUSED_PACK.get_or_init(|| {
@@ -2967,7 +2968,7 @@ impl RowCriterion {
 
 /// A packed Macaulay matrix together with what selecting its rows cost.
 struct BuiltMacaulay<P> {
-    columns: Vec<u64>,
+    columns: Vec<Mask>,
     matrix: P,
     /// Rows the F5 criterion removed (0 under [`RowCriterion::None`]).
     rows_pruned: u64,
@@ -2976,7 +2977,7 @@ struct BuiltMacaulay<P> {
 }
 
 fn pack_rows_with_layout(
-    rows_monos: &[Vec<u64>],
+    rows_monos: &[Vec<Mask>],
     layout: &F4ColumnLayout,
     verify_exact_support: bool,
 ) -> Option<Vec<Vec<u64>>> {
@@ -3011,7 +3012,7 @@ struct FlatF2Matrix {
 }
 
 fn pack_rows_flat_with_layout(
-    rows_monos: &[Vec<u64>],
+    rows_monos: &[Vec<Mask>],
     layout: &F4ColumnLayout,
     verify_exact_support: bool,
 ) -> Option<FlatF2Matrix> {
@@ -3045,11 +3046,11 @@ fn pack_polynomials_flat_fused(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     layout: &F4ColumnLayout,
 ) -> Option<FlatF2Matrix> {
     let words = layout.columns.len().div_ceil(64);
-    let mut schedules: Vec<Option<std::rc::Rc<[u64]>>> = vec![None; degree as usize + 1];
+    let mut schedules: Vec<Option<std::rc::Rc<[Mask]>>> = vec![None; degree as usize + 1];
     let mut gaps = Vec::with_capacity(polys.len());
     let mut estimated_rows = 0usize;
     for polynomial in polys {
@@ -3128,11 +3129,11 @@ fn pack_polynomials_nested_fused<const DIRECT: bool>(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     layout: &F4ColumnLayout,
 ) -> Option<Vec<Vec<u64>>> {
     let words = layout.columns.len().div_ceil(64);
-    let mut schedules: Vec<Option<std::rc::Rc<[u64]>>> = vec![None; degree as usize + 1];
+    let mut schedules: Vec<Option<std::rc::Rc<[Mask]>>> = vec![None; degree as usize + 1];
     let mut gaps = Vec::with_capacity(polys.len());
     let mut estimated_rows = 0usize;
     for polynomial in polys {
@@ -3236,7 +3237,7 @@ fn build_macaulay_with_multiplier_mask(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     reuse_layout: bool,
     criterion: RowCriterion,
 ) -> Option<BuiltMacaulay<Vec<Vec<u64>>>> {
@@ -3285,7 +3286,7 @@ fn build_macaulay_flat_with_multiplier_mask(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     reuse_layout: bool,
     criterion: RowCriterion,
 ) -> Option<BuiltMacaulay<FlatF2Matrix>> {
@@ -3330,10 +3331,10 @@ fn build_macaulay_packed<P: Default>(
     polys: &[F2BoolPoly],
     n_vars: usize,
     degree: u32,
-    multiplier_mask: u64,
+    multiplier_mask: Mask,
     reuse_layout: bool,
     criterion: RowCriterion,
-    pack: impl Fn(&[Vec<u64>], &F4ColumnLayout, bool) -> Option<P>,
+    pack: impl Fn(&[Vec<Mask>], &F4ColumnLayout, bool) -> Option<P>,
 ) -> Option<BuiltMacaulay<P>> {
     let subprofile = std::env::var("KIC_F4_BUILD_SUBPROFILE").as_deref() == Ok("1");
     let rows_started = subprofile.then(std::time::Instant::now);
@@ -3356,7 +3357,7 @@ fn build_macaulay_packed<P: Default>(
             std::sync::atomic::Ordering::Relaxed,
         );
     }
-    let finish = |columns: Vec<u64>, matrix: P| BuiltMacaulay {
+    let finish = |columns: Vec<Mask>, matrix: P| BuiltMacaulay {
         columns,
         matrix,
         rows_pruned,
@@ -3385,7 +3386,7 @@ fn build_macaulay_packed<P: Default>(
         F4_LAYOUT_MISSES.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
     }
 
-    let cols: Vec<u64> = macaulay_columns(&rows_monos)?;
+    let cols: Vec<Mask> = macaulay_columns(&rows_monos)?;
     let layout = std::rc::Rc::new(F4ColumnLayout::new(cols));
     let matrix = pack(&rows_monos, &layout, false)?;
     if reuse_layout {
@@ -3497,12 +3498,12 @@ pub struct SupportLocalBuildProfile {
 static F4_BUILD_ROWS_NS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
 static F4_BUILD_PACK_NS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
 struct F4ColumnLayout {
-    columns: Vec<u64>,
+    columns: Vec<Mask>,
     index: F4ColumnIndex,
 }
 
 impl F4ColumnLayout {
-    fn new(columns: Vec<u64>) -> Self {
+    fn new(columns: Vec<Mask>) -> Self {
         let index = if std::env::var("KIC_F4_STD_COLUMN_HASH").as_deref() == Ok("1") {
             F4ColumnIndex::Standard(
                 columns
@@ -3535,7 +3536,7 @@ impl F4ColumnLayout {
 }
 
 enum F4ColumnIndex {
-    Standard(std::collections::HashMap<u64, usize>),
+    Standard(std::collections::HashMap<Mask, usize>),
     Fast(F4FastColumnIndex),
 }
 
@@ -3550,11 +3551,11 @@ impl F4ColumnIndex {
     /// Direct lookup only when it uses at most the entry bytes the hash
     /// map must store, excluding its spare buckets and control bytes.
     /// High-bit or sparse ranges fall back before allocating a table.
-    fn dense(columns: &[u64]) -> Option<Self> {
+    fn dense(columns: &[Mask]) -> Option<Self> {
         Self::dense_table(columns).map(|index| Self::Fast(F4FastColumnIndex::Dense(index)))
     }
 
-    fn dense_table(columns: &[u64]) -> Option<Vec<u16>> {
+    fn dense_table(columns: &[Mask]) -> Option<Vec<u16>> {
         if columns.len() > u16::MAX as usize {
             return None;
         }
@@ -3575,7 +3576,7 @@ impl F4ColumnIndex {
         Some(index)
     }
 
-    fn get(&self, monomial: &u64) -> Option<usize> {
+    fn get(&self, monomial: &Mask) -> Option<usize> {
         match self {
             Self::Standard(index) => index.get(monomial).copied(),
             Self::Fast(F4FastColumnIndex::Hashed(index)) => index.get(monomial).copied(),
@@ -3593,7 +3594,7 @@ thread_local! {
     /// Keyed by multiplier mask, degree and whether the F5 criterion
     /// selected the rows: pruning changes which monomials occur.
     static F4_LAYOUTS: std::cell::RefCell<std::collections::HashMap<
-        (u64, u32, bool),
+        (Mask, u32, bool),
         std::rc::Rc<F4ColumnLayout>,
     >> = std::cell::RefCell::new(std::collections::HashMap::new());
 }
@@ -3601,7 +3602,7 @@ thread_local! {
 /// A cached layout must obey the current column cap just like a fresh one.
 /// Reject only the cache entry: a changed system may have smaller support
 /// that the ordinary builder can still accept under the new cap.
-fn cached_f4_layout(key: (u64, u32, bool)) -> Option<std::rc::Rc<F4ColumnLayout>> {
+fn cached_f4_layout(key: (Mask, u32, bool)) -> Option<std::rc::Rc<F4ColumnLayout>> {
     let column_cap = max_f4_cols();
     F4_LAYOUTS.with(|layouts| {
         layouts
@@ -4395,11 +4396,11 @@ impl SolvingProfile {
 }
 
 /// Variables occurring in `polys`, as a bitmask.
-pub(crate) fn occurring_vars(polys: &[F2BoolPoly]) -> u64 {
+pub(crate) fn occurring_vars(polys: &[F2BoolPoly]) -> Mask {
     polys
         .iter()
         .flat_map(|p| p.terms.iter())
-        .fold(0u64, |acc, t| acc | t.mask)
+        .fold(0 as Mask, |acc, t| acc | t.mask)
 }
 
 /// Total degree of a boolean system.
@@ -4472,13 +4473,13 @@ pub fn solving_profile(polys: &[F2BoolPoly], n_vars: usize, degree: u32) -> Opti
     };
 
     let occurring = occurring_vars(polys);
-    let mut determined = 0u64;
+    let mut determined: Mask = 0;
     let mut refuted = false;
 
     // `rref_f2` moves the pivot rows to the front, so only the first
     // `rank` rows carry information.
     for row in matrix.iter().take(rank) {
-        let mut support: Vec<u64> = Vec::new();
+        let mut support: Vec<Mask> = Vec::new();
         for (c, mono) in cols.iter().enumerate().take(n_cols) {
             if row[c / 64] >> (c % 64) & 1 == 1 {
                 support.push(*mono);
@@ -4624,7 +4625,7 @@ pub mod checkpoint;
 fn finish_sparse_profile(
     polys: &[F2BoolPoly],
     degree: u32,
-    cols: &[u64],
+    cols: &[Mask],
     n_rows: usize,
     low_start: usize,
     elim: crate::cryptanalysis::sparse_macaulay::SparseElimination,
@@ -4655,10 +4656,10 @@ fn finish_sparse_profile(
     };
 
     let occurring = occurring_vars(polys);
-    let mut determined = 0u64;
+    let mut determined: Mask = 0;
     let mut refuted = false;
     for row in low.iter().take(low_rank) {
-        let mut support: Vec<u64> = Vec::new();
+        let mut support: Vec<Mask> = Vec::new();
         for k in 0..low_width {
             if row[k / 64] >> (k % 64) & 1 == 1 {
                 support.push(cols[low_start + k]);
@@ -4988,7 +4989,7 @@ pub fn fall_row_gate_augment(system: &[F2BoolPoly], n_vars: usize) -> Option<Vec
     let occurring = system
         .iter()
         .flat_map(|p| p.terms.iter())
-        .fold(0u64, |acc, t| acc | t.mask)
+        .fold(0 as Mask, |acc, t| acc | t.mask)
         .count_ones();
     if occurring == 0 || (gens as f64) < FALL_ROW_GATE_THETA * occurring as f64 {
         return None;
@@ -5024,7 +5025,7 @@ fn choose_split(
         return Some(
             (0..assignment.len())
                 .rev()
-                .find(|&v| assignment[v].is_none() && occurring & (1u64 << v) != 0)
+                .find(|&v| assignment[v].is_none() && occurring & bit(v as u32) != 0)
                 .unwrap_or(lowest),
         );
     }
@@ -5838,7 +5839,7 @@ fn linear_harvest_gate(system: &[F2BoolPoly], gpv_below_milli: u32) -> bool {
     let occurring = system
         .iter()
         .flat_map(|p| p.terms.iter())
-        .fold(0u64, |acc, t| acc | t.mask)
+        .fold(0 as Mask, |acc, t| acc | t.mask)
         .count_ones() as u64;
     gens * 1000 < gpv_below_milli as u64 * occurring
 }
@@ -5866,7 +5867,7 @@ fn linear_harvest_size_gate(
         && system
             .iter()
             .flat_map(|p| p.terms.iter())
-            .fold(0u64, |acc, t| acc | t.mask)
+            .fold(0 as Mask, |acc, t| acc | t.mask)
             .count_ones()
             >= h.or_occ_at_least
 }
@@ -5908,8 +5909,8 @@ fn split_linear_tail(
 /// the thread's stage-unit total when the node reduced.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct NodeTraceEvent {
-    pub assigned: u64,
-    pub values: u64,
+    pub assigned: Mask,
+    pub values: Mask,
     pub word_ops: u64,
 }
 
@@ -5931,11 +5932,11 @@ pub fn take_node_trace() -> Vec<NodeTraceEvent> {
 fn note_node(assignment: &[Option<bool>]) {
     NODE_TRACE.with(|t| {
         if let Some(events) = t.borrow_mut().as_mut() {
-            let (mut assigned, mut values) = (0u64, 0u64);
+            let (mut assigned, mut values): (Mask, Mask) = (0, 0);
             for (v, a) in assignment.iter().enumerate() {
                 if let Some(x) = a {
-                    assigned |= 1u64 << v;
-                    values |= u64::from(*x) << v;
+                    assigned |= bit(v as u32);
+                    values |= Mask::from(*x) << v;
                 }
             }
             events.push(NodeTraceEvent {
@@ -6094,7 +6095,7 @@ enum LinearElimination {
         /// Pivots defined by the rest, `v = Σ_{u ∈ rest} u + c`, as
         /// `(v, rest, c)`: `rest` holds no pivot, and no variable in it is
         /// defined by a later entry of the same call.
-        defined: Vec<(u32, u64, bool)>,
+        defined: Vec<(u32, Mask, bool)>,
     },
 }
 
@@ -6123,11 +6124,11 @@ fn eliminate_linear_generators(system: &[F2BoolPoly], word_ops: &mut u64) -> Lin
     if !system.iter().any(is_linear_generator) {
         return LinearElimination::Nothing;
     }
-    let mut rows: Vec<(u64, bool)> = system
+    let mut rows: Vec<(Mask, bool)> = system
         .iter()
         .filter(|p| is_linear_generator(p))
         .map(|p| {
-            p.terms.iter().fold((0u64, false), |(mask, c), t| {
+            p.terms.iter().fold((0 as Mask, false), |(mask, c), t| {
                 if t.mask == 0 {
                     (mask, !c)
                 } else {
@@ -6136,7 +6137,7 @@ fn eliminate_linear_generators(system: &[F2BoolPoly], word_ops: &mut u64) -> Lin
             })
         })
         .collect();
-    let mut pivots: Vec<(u32, u64, bool)> = Vec::new();
+    let mut pivots: Vec<(u32, Mask, bool)> = Vec::new();
     while let Some((mask, c)) = rows.pop() {
         if mask == 0 {
             if c {
@@ -6145,7 +6146,7 @@ fn eliminate_linear_generators(system: &[F2BoolPoly], word_ops: &mut u64) -> Lin
             continue;
         }
         let v = mask.trailing_zeros();
-        let bit = 1u64 << v;
+        let bit = bit(v);
         for row in rows.iter_mut().filter(|row| row.0 & bit != 0) {
             row.0 ^= mask;
             row.1 ^= c;
@@ -6159,14 +6160,14 @@ fn eliminate_linear_generators(system: &[F2BoolPoly], word_ops: &mut u64) -> Lin
         pivots.push((v, mask & !bit, c));
     }
     let n_vars = system[0].n_vars;
-    let pivot_mask = pivots.iter().fold(0u64, |acc, p| acc | (1u64 << p.0));
+    let pivot_mask = pivots.iter().fold(0 as Mask, |acc, p| acc | bit(p.0));
     let definition = |v: u32| pivots.iter().find(|p| p.0 == v).expect("a pivot");
-    let mut expansion: Vec<u64> = Vec::new();
+    let mut expansion: Vec<Mask> = Vec::new();
     let rewritten: Vec<F2BoolPoly> = system
         .iter()
         .filter(|p| !is_linear_generator(p))
         .filter_map(|p| {
-            let mut terms: Vec<u64> = Vec::with_capacity(p.terms.len());
+            let mut terms: Vec<Mask> = Vec::with_capacity(p.terms.len());
             for t in &p.terms {
                 let hit = t.mask & pivot_mask;
                 if hit == 0 {
@@ -6186,7 +6187,7 @@ fn eliminate_linear_generators(system: &[F2BoolPoly], word_ops: &mut u64) -> Lin
                         let base = expansion[k];
                         let mut r = rest;
                         while r != 0 {
-                            expansion.push(base | (1u64 << r.trailing_zeros()));
+                            expansion.push(base | bit(r.trailing_zeros()));
                             r &= r - 1;
                         }
                     }
@@ -6215,16 +6216,16 @@ fn eliminate_linear_generators(system: &[F2BoolPoly], word_ops: &mut u64) -> Lin
 /// The point an assignment denotes, each eliminated variable recovered
 /// from its definition, the latest definition first (an earlier one may
 /// name a variable a later one defines, never the reverse).
-fn point_with_definitions(assignment: &[Option<bool>], defined: &[(u32, u64, bool)]) -> u64 {
-    let mut point = 0u64;
+fn point_with_definitions(assignment: &[Option<bool>], defined: &[(u32, Mask, bool)]) -> Mask {
+    let mut point: Mask = 0;
     for (variable, value) in assignment.iter().enumerate() {
         if *value == Some(true) {
-            point |= 1u64 << variable;
+            point |= bit(variable as u32);
         }
     }
     for &(v, rest, c) in defined.iter().rev() {
         let value = ((point & rest).count_ones() & 1 == 1) ^ c;
-        point = (point & !(1u64 << v)) | ((value as u64) << v);
+        point = (point & !bit(v)) | ((value as Mask) << v);
     }
     point
 }
@@ -6244,7 +6245,7 @@ pub fn solve_boolean_system(
     equations: &[F2BoolPoly],
     n_vars: usize,
     opts: &SolveOptions,
-) -> (Vec<u64>, SolveStats) {
+) -> (Vec<Mask>, SolveStats) {
     solve_boolean_system_filtered(equations, n_vars, opts, |_| false)
 }
 
@@ -6256,8 +6257,8 @@ pub fn solve_boolean_system_filtered(
     equations: &[F2BoolPoly],
     n_vars: usize,
     opts: &SolveOptions,
-    accept: impl FnMut(u64) -> bool,
-) -> (Vec<u64>, SolveStats) {
+    accept: impl FnMut(Mask) -> bool,
+) -> (Vec<Mask>, SolveStats) {
     let opts = opts.resolve();
     solve_with_policy(
         equations,
@@ -6287,9 +6288,9 @@ pub fn solve_boolean_system_with_node_oracle(
     equations: &[F2BoolPoly],
     n_vars: usize,
     opts: &SolveOptions,
-    accept: impl FnMut(u64) -> bool,
-    node_oracle: impl FnMut(&[Option<bool>], u64) -> NodeOracleDecision,
-) -> (Vec<u64>, SolveStats) {
+    accept: impl FnMut(Mask) -> bool,
+    node_oracle: impl FnMut(&[Option<bool>], Mask) -> NodeOracleDecision,
+) -> (Vec<Mask>, SolveStats) {
     let opts = opts.resolve();
     solve_with_policy_and_oracle(
         equations,
@@ -6309,8 +6310,8 @@ fn solve_with_policy(
     n_vars: usize,
     opts: &SolveOptions,
     policy: InheritPolicy,
-    accept: impl FnMut(u64) -> bool,
-) -> (Vec<u64>, SolveStats) {
+    accept: impl FnMut(Mask) -> bool,
+) -> (Vec<Mask>, SolveStats) {
     solve_with_policy_and_oracle(equations, n_vars, opts, policy, accept, |_, _| {
         NodeOracleDecision::Continue
     })
@@ -6321,9 +6322,9 @@ fn solve_with_policy_and_oracle(
     n_vars: usize,
     opts: &SolveOptions,
     policy: InheritPolicy,
-    mut accept: impl FnMut(u64) -> bool,
-    mut node_oracle: impl FnMut(&[Option<bool>], u64) -> NodeOracleDecision,
-) -> (Vec<u64>, SolveStats) {
+    mut accept: impl FnMut(Mask) -> bool,
+    mut node_oracle: impl FnMut(&[Option<bool>], Mask) -> NodeOracleDecision,
+) -> (Vec<Mask>, SolveStats) {
     let mut stats = SolveStats::default();
     let mut out = Vec::new();
     let mut stop = false;
@@ -6367,12 +6368,12 @@ fn solve_rec(
     opts: &SolveOptions,
     policy: InheritPolicy,
     stats: &mut SolveStats,
-    out: &mut Vec<u64>,
-    accept: &mut impl FnMut(u64) -> bool,
-    node_oracle: &mut impl FnMut(&[Option<bool>], u64) -> NodeOracleDecision,
+    out: &mut Vec<Mask>,
+    accept: &mut impl FnMut(Mask) -> bool,
+    node_oracle: &mut impl FnMut(&[Option<bool>], Mask) -> NodeOracleDecision,
     stop: &mut bool,
     parent: Option<(&InheritedBases, u32, bool)>,
-    mut defined: Vec<(u32, u64, bool)>,
+    mut defined: Vec<(u32, Mask, bool)>,
 ) {
     if *stop || out.len() >= opts.max_solutions {
         return;
@@ -6404,7 +6405,7 @@ fn solve_rec(
     if parent.is_some() && early_oracle_enabled() {
         let defined_mask = defined
             .iter()
-            .fold(0u64, |mask, &(v, _, _)| mask | (1u64 << v));
+            .fold(0 as Mask, |mask, &(v, _, _)| mask | bit(v));
         match node_oracle(&assignment, defined_mask) {
             NodeOracleDecision::Continue => oracle_decided = true,
             NodeOracleDecision::Refute => {
@@ -6448,7 +6449,7 @@ fn solve_rec(
         } else {
             let defined_mask = defined
                 .iter()
-                .fold(0u64, |mask, &(v, _, _)| mask | (1u64 << v));
+                .fold(0 as Mask, |mask, &(v, _, _)| mask | bit(v));
             match node_oracle(&assignment, defined_mask) {
                 NodeOracleDecision::Continue => {}
                 NodeOracleDecision::Refute => {
@@ -6595,7 +6596,7 @@ fn solve_rec(
             }
             let defined_mask = defined
                 .iter()
-                .fold(0u64, |mask, &(v, _, _)| mask | (1u64 << v));
+                .fold(0 as Mask, |mask, &(v, _, _)| mask | bit(v));
             match node_oracle(&assignment, defined_mask) {
                 NodeOracleDecision::Continue => oracle_decided = true,
                 NodeOracleDecision::Refute => {
@@ -6700,6 +6701,10 @@ fn solve_rec(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     #[test]
     fn direct_fused_pack_matches_sorted_parity_and_exact_layout() {
@@ -6851,13 +6856,16 @@ mod tests {
         let degree = 3;
         let mut old_rows = Vec::new();
         for p in &polys {
-            let support = p.terms.iter().fold(0u64, |acc, term| acc | term.mask);
+            let support = p
+                .terms
+                .iter()
+                .fold(0u64, |acc, term| acc | mask_low64(term.mask));
             old_rows.extend(
                 macaulay_rows_monos_with_mask(
                     std::slice::from_ref(p),
                     n_vars,
                     degree,
-                    mask & support,
+                    mask & mask_from64(support),
                     None,
                 )
                 .unwrap(),
@@ -6881,8 +6889,8 @@ mod tests {
     fn support_local_bitmap_columns_match_exact_sorted_columns() {
         for n_vars in 0..=7 {
             for degree in 0..=4 {
-                let mut rows = vec![Vec::new(), Vec::new(), Vec::new()];
-                for mask in 0..(1u64 << n_vars) {
+                let mut rows: Vec<Vec<Mask>> = vec![Vec::new(), Vec::new(), Vec::new()];
+                for mask in 0..((1 as Mask) << n_vars) {
                     if mask.count_ones() <= degree {
                         rows[(mask as usize) % 3].push(mask);
                     }
@@ -6989,7 +6997,7 @@ mod tests {
             |_| false,
             |assignment, defined_mask| {
                 saw_placeholder |= defined_mask != 0
-                    && (0..4).any(|v| defined_mask & (1u64 << v) != 0 && assignment[v].is_some());
+                    && (0..4).any(|v| defined_mask & (1 << v) != 0 && assignment[v].is_some());
                 NodeOracleDecision::Continue
             },
         );
@@ -7021,7 +7029,7 @@ mod tests {
             for multiplier in monomials_up_to_mask(mask, degree - pdeg) {
                 let product = p.mul_mono(F2BoolMono::from_mask(multiplier));
                 if !product.is_zero() {
-                    let mut row: Vec<u64> = product.terms.iter().map(|t| t.mask).collect();
+                    let mut row: Vec<Mask> = product.terms.iter().map(|t| t.mask).collect();
                     row.sort_unstable();
                     expected.push(row);
                 }
@@ -7035,8 +7043,8 @@ mod tests {
 
     #[test]
     fn macaulay_columns_deduplicate_high_bit_support_in_monomial_order() {
-        let a = 1u64 << 61;
-        let b = 1u64 << 63;
+        let a: Mask = 1 << 61;
+        let b: Mask = 1 << 63;
         let rows = vec![vec![b, a | b, 0], vec![a, b, a | b], vec![b, 0]];
         assert_eq!(macaulay_columns(&rows), Some(vec![a | b, a, b, 0]));
         assert_eq!(macaulay_columns(&[vec![b, b, 0]]), Some(vec![b, 0]));
@@ -7046,7 +7054,7 @@ mod tests {
     #[test]
     fn packed_rows_match_column_positions_for_dense_sparse_and_parallel_inputs() {
         // Reconstruct each bit from its column position, without lookup tables.
-        let reference = |rows: &[Vec<u64>], columns: &[u64]| -> Vec<Vec<u64>> {
+        let reference = |rows: &[Vec<Mask>], columns: &[Mask]| -> Vec<Vec<u64>> {
             rows.iter()
                 .map(|row| {
                     let mut packed = vec![0; columns.len().div_ceil(64).max(1)];
@@ -7065,8 +7073,8 @@ mod tests {
             (0..137).map(|i| (i * 13) % 256).collect(),
             vec![1 << 63, 0, 1 << 52, (1 << 63) | (1 << 52)],
             vec![0, 1 << 20],
-            (0..u16::MAX as u64).collect(),
-            (0..=u16::MAX as u64).collect(),
+            (0..u16::MAX as Mask).collect(),
+            (0..=u16::MAX as Mask).collect(),
         ] {
             let rows = vec![
                 Vec::new(),
@@ -7084,7 +7092,7 @@ mod tests {
 
         // Wide rows cross the Rayon threshold without hundreds of thousands
         // of small row allocations in this correctness test.
-        let columns: Vec<u64> = (0..u16::MAX as u64).collect();
+        let columns: Vec<Mask> = (0..u16::MAX as Mask).collect();
         let template = vec![columns[0], columns[63], columns[64], columns[65534]];
         let words = columns.len().div_ceil(64);
         let rows = vec![template.clone(); M4RI_PARALLEL_WORDS / words + 1];
@@ -7106,7 +7114,7 @@ mod tests {
     fn dense_column_lookup_matches_a_map_and_preserves_missing_masks() {
         #[allow(dead_code)]
         enum OriginalHashIndex {
-            Standard(std::collections::HashMap<u64, usize>),
+            Standard(std::collections::HashMap<Mask, usize>),
             Fast(FastColumnMap),
         }
         assert!(
@@ -7120,27 +7128,27 @@ mod tests {
             .map(|(column, &mask)| (mask, column))
             .collect();
         let dense = F4ColumnIndex::dense(&columns).unwrap();
-        for mask in (0..32).chain([1 << 63, u64::MAX]) {
+        for mask in (0..32).chain([1 << 63, u64::MAX as Mask]) {
             assert_eq!(dense.get(&mask), reference.get(&mask).copied());
         }
         assert!(F4ColumnIndex::dense(&[]).is_none());
         assert!(F4ColumnIndex::dense(&[0, 1 << 20]).is_none());
         assert!(F4ColumnIndex::dense(&[0, 1 << 63]).is_none());
-        assert!(F4ColumnIndex::dense(&[u64::MAX]).is_none());
+        assert!(F4ColumnIndex::dense(&[u64::MAX as Mask]).is_none());
 
         // The largest encodable index is one below the missing sentinel.
-        let columns: Vec<_> = (0..u16::MAX as u64).collect();
+        let columns: Vec<Mask> = (0..u16::MAX as Mask).collect();
         let dense = F4ColumnIndex::dense(&columns).unwrap();
-        assert_eq!(dense.get(&(u16::MAX as u64 - 1)), Some(65534));
-        assert_eq!(dense.get(&(u16::MAX as u64)), None);
-        let too_many: Vec<_> = (0..=u16::MAX as u64).collect();
+        assert_eq!(dense.get(&(u16::MAX as Mask - 1)), Some(65534));
+        assert_eq!(dense.get(&(u16::MAX as Mask)), None);
+        let too_many: Vec<Mask> = (0..=u16::MAX as Mask).collect();
         assert!(F4ColumnIndex::dense(&too_many).is_none());
     }
 
     #[test]
     fn packed_readback_preserves_canonical_order_across_words_and_padding() {
         let support = [0, 2, 7, 18, 52, 60, 63];
-        let mut cols: Vec<u64> = (0..128u64)
+        let mut cols: Vec<Mask> = (0..128u64)
             .map(|subset| {
                 support.iter().enumerate().fold(0, |mask, (i, bit)| {
                     mask | if subset & (1 << i) != 0 { 1 << bit } else { 0 }
@@ -7181,7 +7189,7 @@ mod tests {
     fn fused_f5_count_matches_polynomial_products_at_every_cap_boundary() {
         let n_vars = 6;
         let mask = all_variable_mask(n_vars);
-        let from_masks = |masks: &[u64]| {
+        let from_masks = |masks: &[Mask]| {
             F2BoolPoly::from_monos(
                 masks.iter().copied().map(F2BoolMono::from_mask).collect(),
                 64,
@@ -7319,7 +7327,7 @@ mod tests {
         n_vars: usize,
         opts: &SolveOptions,
         policy: InheritPolicy,
-    ) -> (Vec<u64>, SolveStats) {
+    ) -> (Vec<Mask>, SolveStats) {
         solve_with_policy(system, n_vars, &opts.resolve(), policy, |_| false)
     }
 
@@ -7371,7 +7379,7 @@ mod tests {
                 let coords = (0..n)
                     .map(|_| {
                         let terms: Vec<F2BoolMono> = (0..next() % (1 + 6 * density))
-                            .map(|_| F2BoolMono::from_mask(next() & next() & span))
+                            .map(|_| F2BoolMono::from_mask(mask_from64(next() & next() & span)))
                             .collect();
                         if raw {
                             F2BoolPoly { terms, n_vars }
@@ -7455,7 +7463,7 @@ mod tests {
                 let coords = (0..n)
                     .map(|_| {
                         let terms: Vec<F2BoolMono> = (0..next() % (1 + 4 * density))
-                            .map(|_| F2BoolMono::from_mask(next() & next() & span))
+                            .map(|_| F2BoolMono::from_mask(mask_from64(next() & next() & span)))
                             .collect();
                         if raw {
                             F2BoolPoly { terms, n_vars }
@@ -7546,9 +7554,16 @@ mod tests {
         let sq = x.square(&st);
         let by_mul = x.mul(&x, &st);
         for point in [0u64, 1, 2, 5, 170, 341, 511] {
-            assert_eq!(sq.eval(point, n), by_mul.eval(point, n), "point {point}");
+            assert_eq!(
+                sq.eval(mask_from64(point), n),
+                by_mul.eval(mask_from64(point), n),
+                "point {point}"
+            );
             // …and against the field's squaring of the same value.
-            assert_eq!(sq.eval(point, n), x.eval(point, n).square(&irr));
+            assert_eq!(
+                sq.eval(mask_from64(point), n),
+                x.eval(mask_from64(point), n).square(&irr)
+            );
         }
     }
 
@@ -7569,12 +7584,12 @@ mod tests {
         let eqs = sym_semaev_s3(&x1, &x2, &x3, &b, &st);
 
         for point in [0u64, 1, 0b101, 0b1010_1010_1, 12345, 0o777] {
-            let v1 = x1.eval(point, n);
-            let v2 = x2.eval(point, n);
+            let v1 = x1.eval(mask_from64(point), n);
+            let v2 = x2.eval(mask_from64(point), n);
             let scalar = binary_semaev_s3(&v1, &v2, &fe(37, n), &b, &irr);
             let mut got = Vec::new();
             for (k, e) in eqs.iter().enumerate() {
-                if e.eval(point) == 1 {
+                if e.eval(mask_from64(point)) == 1 {
                     got.push(k as u32);
                 }
             }
@@ -7613,13 +7628,13 @@ mod tests {
                 let eqs = sym_semaev_s4(&x1, &x2, &x3, &x_r, &st);
                 assert_eq!(eqs.len(), n as usize);
                 for point in 0..(1u64 << n_vars) {
-                    let v1 = gf.from_element(&x1.eval(point, n));
-                    let v2 = gf.from_element(&x2.eval(point, n));
-                    let v3 = gf.from_element(&x3.eval(point, n));
+                    let v1 = gf.from_element(&x1.eval(mask_from64(point), n));
+                    let v2 = gf.from_element(&x2.eval(mask_from64(point), n));
+                    let v3 = gf.from_element(&x3.eval(mask_from64(point), n));
                     let scalar = eval_f3(v1, v2, v3, gf.from_element(&x_r), &gf);
                     let mut got = Vec::new();
                     for (k, e) in eqs.iter().enumerate() {
-                        if e.eval(point) == 1 {
+                        if e.eval(mask_from64(point)) == 1 {
                             got.push(k as u32);
                         }
                     }
@@ -7687,7 +7702,7 @@ mod tests {
             .iter()
             .flat_map(|e| e.terms.iter())
             .map(|t| t.mask)
-            .fold(0, |a, b| a | b);
+            .fold(0, |a, b| a | mask_low64(b));
         assert_eq!(top >> two, 0, "fixed system used a variable beyond 2ℓ");
     }
 
@@ -7780,7 +7795,7 @@ mod tests {
         let blocks = sys.blocks(kc.n);
 
         let roots: Vec<u64> = (0..(1u64 << sys.n_vars))
-            .filter(|&p| sys.equations.iter().all(|q| q.eval(p) == 0))
+            .filter(|&p| sys.equations.iter().all(|q| q.eval(mask_from64(p)) == 0))
             .collect();
         assert!(!roots.is_empty());
 
@@ -7790,7 +7805,11 @@ mod tests {
                 matrix_f4_f2_blocked(&sys.equations, sys.n_vars, &blocks, &bounds).unwrap();
             for r in &rows {
                 for &pt in &roots {
-                    assert_eq!(r.eval(pt), 0, "bound {bound}: blocked row misses a root");
+                    assert_eq!(
+                        r.eval(mask_from64(pt)),
+                        0,
+                        "bound {bound}: blocked row misses a root"
+                    );
                 }
             }
         }
@@ -7839,12 +7858,14 @@ mod tests {
         };
         let point = coords(&x1) | (coords(&x2) << basis.len());
         assert!(
-            sys.equations.iter().all(|e| e.eval(point) == 0),
+            sys.equations
+                .iter()
+                .all(|e| e.eval(mask_from64(point)) == 0),
             "the true decomposition must satisfy every equation"
         );
         // …and the layout helper reads the same x-coordinates back.
-        assert_eq!(sys.summand_x(basis, point, 0, kc.n), x1);
-        assert_eq!(sys.summand_x(basis, point, 1, kc.n), x2);
+        assert_eq!(sys.summand_x(basis, mask_from64(point), 0, kc.n), x1);
+        assert_eq!(sys.summand_x(basis, mask_from64(point), 1, kc.n), x2);
     }
 
     /// Degree: quadratic for `m = 2`, cubic once the chain introduces
@@ -7908,14 +7929,14 @@ mod tests {
 
             let mut brute = Vec::new();
             for pt in 0..(1u64 << sys.n_vars) {
-                if sys.equations.iter().all(|e| e.eval(pt) == 0) {
+                if sys.equations.iter().all(|e| e.eval(mask_from64(pt)) == 0) {
                     brute.push(pt);
                 }
             }
             let mut got = sols.clone();
             got.sort_unstable();
             brute.sort_unstable();
-            assert_eq!(got, brute, "x_R = {raw}");
+            assert_eq!(masks_low64(&got), brute, "x_R = {raw}");
         }
     }
 
@@ -8059,7 +8080,7 @@ mod tests {
                             for _ in 0..d {
                                 mask |= 1u64 << (next() % n_vars as u64);
                             }
-                            F2BoolMono::from_mask(mask)
+                            F2BoolMono::from_mask(mask_from64(mask))
                         })
                         .collect();
                     F2BoolPoly::from_monos(monos, n_vars)
@@ -8068,7 +8089,7 @@ mod tests {
                 .collect();
             // Roots are the truth, whichever engine found them.
             let brute: Vec<u64> = (0..(1u64 << n_vars))
-                .filter(|pt| system.iter().all(|e| e.eval(*pt) == 0))
+                .filter(|pt| system.iter().all(|e| e.eval(mask_from64(*pt)) == 0))
                 .collect();
             for split_rule in [SplitRule::LowestFree, SplitRule::HighestFree] {
                 let reference = SolveOptions {
@@ -8106,7 +8127,8 @@ mod tests {
                         "trial {trial} {split_rule:?} {policy:?}: the splitting tree differs"
                     );
                     assert_eq!(
-                        got, brute,
+                        masks_low64(&got),
+                        brute,
                         "trial {trial} {split_rule:?} {policy:?}: roots are not the variety"
                     );
                 }
@@ -8137,7 +8159,7 @@ mod tests {
                             for _ in 0..d {
                                 mask |= 1u64 << (next() % n_vars as u64);
                             }
-                            F2BoolMono::from_mask(mask)
+                            F2BoolMono::from_mask(mask_from64(mask))
                         })
                         .collect();
                     F2BoolPoly::from_monos(monos, n_vars)
@@ -8286,7 +8308,7 @@ mod tests {
                             for _ in 0..d {
                                 mask |= 1u64 << (next() % n_vars as u64);
                             }
-                            F2BoolMono::from_mask(mask)
+                            F2BoolMono::from_mask(mask_from64(mask))
                         })
                         .collect();
                     F2BoolPoly::from_monos(monos, n_vars)
@@ -8294,7 +8316,7 @@ mod tests {
                 .filter(|p| !p.is_zero())
                 .collect();
             let brute: Vec<u64> = (0..(1u64 << n_vars))
-                .filter(|pt| system.iter().all(|e| e.eval(*pt) == 0))
+                .filter(|pt| system.iter().all(|e| e.eval(mask_from64(*pt)) == 0))
                 .collect();
             for cfg in [
                 None,
@@ -8318,7 +8340,11 @@ mod tests {
                 set_linear_harvest(None);
                 got.sort_unstable();
                 got.dedup();
-                assert_eq!(got, brute, "trial {trial} {cfg:?}: roots differ");
+                assert_eq!(
+                    masks_low64(&got),
+                    brute,
+                    "trial {trial} {cfg:?}: roots differ"
+                );
             }
         }
         assert!(harvested > 0, "no harvest fired");
@@ -8360,7 +8386,7 @@ mod tests {
                             for _ in 0..d {
                                 mask |= 1u64 << (next() % n_vars as u64);
                             }
-                            F2BoolMono::from_mask(mask)
+                            F2BoolMono::from_mask(mask_from64(mask))
                         })
                         .collect();
                     F2BoolPoly::from_monos(monos, n_vars)
@@ -8368,7 +8394,7 @@ mod tests {
                 .filter(|p| !p.is_zero())
                 .collect();
             let brute: Vec<u64> = (0..(1u64 << n_vars))
-                .filter(|pt| system.iter().all(|e| e.eval(*pt) == 0))
+                .filter(|pt| system.iter().all(|e| e.eval(mask_from64(*pt)) == 0))
                 .collect();
             for engine in [
                 SolverEngine::MatrixF4 { max_degree: 3 },
@@ -8392,7 +8418,8 @@ mod tests {
                         let (mut got, stats) = solve_pinned(&system, n_vars, &opts, policy);
                         got.sort_unstable();
                         assert_eq!(
-                            got, brute,
+                            masks_low64(&got),
+                            brute,
                             "trial {trial} {engine:?} {split_rule:?} {policy:?}: roots differ"
                         );
                         eliminated += stats.eliminated;
@@ -8449,8 +8476,8 @@ mod tests {
         // Every root of the rewritten system, completed through the
         // definitions, is a root of the original, and every root of the
         // original arises that way.
-        let mut via: Vec<u64> = (0..(1u64 << n))
-            .filter(|pt| pt & 0b11 == 0 && rewritten.iter().all(|e| e.eval(*pt) == 0))
+        let mut via: Vec<Mask> = (0..(1u64 << n))
+            .filter(|pt| pt & 0b11 == 0 && rewritten.iter().all(|e| e.eval(mask_from64(*pt)) == 0))
             .map(|pt| {
                 // x1 forced, x0 a placeholder its definition overwrites,
                 // the free variables read from `pt`.
@@ -8462,8 +8489,9 @@ mod tests {
             .collect();
         via.sort_unstable();
         via.dedup();
-        let direct: Vec<u64> = (0..(1u64 << n))
-            .filter(|pt| system.iter().all(|e| e.eval(*pt) == 0))
+        let direct: Vec<Mask> = (0..(1u64 << n))
+            .filter(|pt| system.iter().all(|e| e.eval(mask_from64(*pt)) == 0))
+            .map(mask_from64)
             .collect();
         assert_eq!(via, direct);
     }
@@ -8547,7 +8575,7 @@ mod tests {
                     };
                     let (got, stats) = solve_pinned(&permuted, sys.n_vars, &opts, policy);
                     assert!(!stats.exhausted);
-                    let mut got: Vec<u64> =
+                    let mut got: Vec<Mask> =
                         got.into_iter().map(|r| permute_mask(r, &inverse)).collect();
                     got.sort_unstable();
                     assert_eq!(got, want, "m={m} x_R={raw} {policy:?}: roots differ");
@@ -8577,7 +8605,7 @@ mod tests {
             let sys =
                 build_decomposition_system(basis, &fe(raw, kc.n), &kc.curve.b, m, &st).unwrap();
             let occurring = occurring_vars(&sys.equations);
-            let rows = |support_local: bool| -> std::collections::BTreeSet<Vec<u64>> {
+            let rows = |support_local: bool| -> std::collections::BTreeSet<Vec<Mask>> {
                 let (columns, matrix) = if support_local {
                     build_inherited_macaulay_support_local(
                         &sys.equations,
@@ -8670,7 +8698,7 @@ mod tests {
                                 F2BoolMono::var(a)
                             } else {
                                 F2BoolMono {
-                                    mask: (1u64 << a) | (1u64 << b),
+                                    mask: mask_from64((1u64 << a) | (1u64 << b)),
                                 }
                             }
                         })
@@ -8682,7 +8710,7 @@ mod tests {
             // Truth by enumeration.
             let mut truth: Vec<u64> = Vec::new();
             for pt in 0u64..(1u64 << n_vars) {
-                if equations.iter().all(|e| e.eval(pt) == 0) {
+                if equations.iter().all(|e| e.eval(mask_from64(pt)) == 0) {
                     truth.push(pt);
                 }
             }
@@ -8723,7 +8751,8 @@ mod tests {
                     "case {case} rule {rule:?} ran out of budget"
                 );
                 assert_eq!(
-                    got, truth,
+                    masks_low64(&got),
+                    truth,
                     "case {case} rule {rule:?} disagrees with enumeration"
                 );
             }
@@ -8738,7 +8767,7 @@ mod tests {
     fn eval_f2(p: &F2BoolPoly, a: u64) -> bool {
         p.terms
             .iter()
-            .fold(false, |acc, t| acc ^ (t.mask & a == t.mask))
+            .fold(false, |acc, t| acc ^ (t.mask & mask_from64(a) == t.mask))
     }
 
     /// Brute-force solution count over the cube — deliberately
@@ -8803,7 +8832,7 @@ mod tests {
                             for _ in 0..(rng.gen::<u32>() % 4) {
                                 mask |= 1u64 << (rng.gen::<u32>() % n_vars as u32);
                             }
-                            F2BoolMono::from_mask(mask)
+                            F2BoolMono::from_mask(mask_from64(mask))
                         })
                         .collect();
                     F2BoolPoly::from_monos(monos, n_vars)
@@ -8896,7 +8925,7 @@ mod tests {
                             for _ in 0..(rng.gen::<u32>() % 4) {
                                 mask |= 1u64 << (rng.gen::<u32>() % n_vars as u32);
                             }
-                            F2BoolMono::from_mask(mask)
+                            F2BoolMono::from_mask(mask_from64(mask))
                         })
                         .collect();
                     F2BoolPoly::from_monos(monos, n_vars)
@@ -8993,7 +9022,7 @@ mod tests {
                             for _ in 0..(rng.gen::<u32>() % 4) {
                                 mask |= 1u64 << (rng.gen::<u32>() % n_vars as u32);
                             }
-                            F2BoolMono::from_mask(mask)
+                            F2BoolMono::from_mask(mask_from64(mask))
                         })
                         .collect();
                     F2BoolPoly::from_monos(monos, n_vars)
@@ -9057,6 +9086,10 @@ mod reference_equivalence_tests {
         build_frobenius_factor_base, find_irreducible, KoblitzCurve,
     };
     use crate::cryptanalysis::polynomial_reuse::DecompositionTemplate;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     use std::cmp::Ordering;
 
     fn old_add(p: &F2BoolPoly, q: &F2BoolPoly) -> F2BoolPoly {
@@ -9257,12 +9290,12 @@ mod reference_equivalence_tests {
                 (0..len)
                     .map(|_| {
                         let r = next();
-                        F2BoolMono::from_mask(match r % 4 {
+                        F2BoolMono::from_mask(mask_from64(match r % 4 {
                             0 => EDGE_MASKS[(r >> 8) as usize % EDGE_MASKS.len()],
                             1 => next(),
                             2 => next() & next() & 0xff,
                             _ => next() | (1 << 60),
-                        })
+                        }))
                     })
                     .collect()
             };
@@ -9332,9 +9365,9 @@ mod reference_equivalence_tests {
                 let terms: Vec<F2BoolMono> = (0..next() % (1 + density))
                     .map(|_| {
                         F2BoolMono::from_mask(if next().is_multiple_of(2) {
-                            pool[(next() % pool.len() as u64) as usize]
+                            mask_from64(pool[(next() % pool.len() as u64) as usize])
                         } else {
-                            next() & next() & span
+                            mask_from64(next() & next() & span)
                         })
                     })
                     .collect();
@@ -9447,7 +9480,7 @@ mod reference_equivalence_tests {
                     }
                     for (k, coord) in coords.iter_mut().enumerate() {
                         if spread >> k & 1 == 1 {
-                            coord.push(F2BoolMono::from_mask(u));
+                            coord.push(F2BoolMono::from_mask(mask_from64(u)));
                         }
                     }
                 }
@@ -9686,9 +9719,9 @@ mod reference_equivalence_tests {
                 let terms: Vec<F2BoolMono> = (0..next() % 12)
                     .map(|_| {
                         F2BoolMono::from_mask(if next().is_multiple_of(4) {
-                            next() & span
+                            mask_from64(next() & span)
                         } else {
-                            pool[(next() % pool.len() as u64) as usize]
+                            mask_from64(pool[(next() % pool.len() as u64) as usize])
                         })
                     })
                     .collect();
@@ -9982,4 +10015,77 @@ thread_local! {
 /// `KIC_F4_EARLY_ABORT`; a same-binary control for tests and harnesses.
 pub fn set_early_abort_mode(mode: Option<u8>) {
     EARLY_ABORT_OVERRIDE.with(|m| m.set(mode));
+}
+
+/// Systems with more than 64 unknowns, which only the `wide-vars` build
+/// accepts.
+#[cfg(all(test, feature = "wide-vars"))]
+mod wide_tests {
+    use super::*;
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, mask_from64, sort_masks_descending, sum_by_monomial, Mask,
+    };
+
+    const N: usize = 100;
+
+    /// x_0 = 1, x_1 = 1, x_2 = 0 and x_i = x_{i-1} + x_{i-2}·x_{i-3} + 1:
+    /// a triangular quadratic system whose unique root has bits above 64.
+    fn planted() -> (Vec<F2BoolPoly>, Mask) {
+        let v = |k: usize| F2BoolMono::var(k as u32);
+        let mut eqs = vec![
+            F2BoolPoly::from_monos(vec![v(0), F2BoolMono::one()], N),
+            F2BoolPoly::from_monos(vec![v(1), F2BoolMono::one()], N),
+            F2BoolPoly::from_monos(vec![v(2)], N),
+        ];
+        let mut x = vec![1u8, 1, 0];
+        for i in 3..N {
+            eqs.push(F2BoolPoly::from_monos(
+                vec![
+                    v(i),
+                    v(i - 1),
+                    F2BoolMono::from_mask(bit(i as u32 - 2) | bit(i as u32 - 3)),
+                    F2BoolMono::one(),
+                ],
+                N,
+            ));
+            x.push(x[i - 1] ^ (x[i - 2] & x[i - 3]) ^ 1);
+        }
+        let root = x.iter().enumerate().fold(
+            0 as Mask,
+            |m, (i, &b)| if b == 1 { m | bit(i as u32) } else { m },
+        );
+        (eqs, root)
+    }
+
+    #[test]
+    fn a_hundred_unknown_triangular_system_has_its_planted_root() {
+        let (eqs, root) = planted();
+        assert!(root >> 64 != 0, "the planted root must use bits above 64");
+        for e in &eqs {
+            assert_eq!(e.eval(root), 0);
+        }
+        let (sols, stats) = solve_boolean_system(&eqs, N, &SolveOptions::default());
+        assert!(!stats.unsupported);
+        assert_eq!(sols, vec![root]);
+    }
+
+    #[test]
+    fn monomial_keys_and_sums_respect_bits_above_64() {
+        let a = bit(70);
+        let b = bit(3) | bit(65);
+        let mut masks = vec![mask_from64(5), b, a, bit(64)];
+        sort_masks_descending(&mut masks);
+        assert_eq!(masks.len(), 4);
+        for w in masks.windows(2) {
+            // graded order: sorted descending means never `Less`
+            let o = cmp_mono(F2BoolMono::from_mask(w[0]), F2BoolMono::from_mask(w[1]));
+            assert_ne!(o, std::cmp::Ordering::Less, "{:?}", masks);
+        }
+        for m in [a, b, bit(64), mask_from64(5)] {
+            assert!(masks.contains(&m));
+        }
+        let mut terms = vec![(a, 1u64), (b, 1), (a, 1), (b, 1), (bit(99), 1)];
+        sum_by_monomial(&mut terms);
+        assert_eq!(terms, vec![(bit(99), 1)]);
+    }
 }

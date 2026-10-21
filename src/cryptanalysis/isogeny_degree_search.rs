@@ -124,7 +124,7 @@ use crate::binary_ecc::{F2mElement, IrreduciblePoly};
 use crate::cryptanalysis::koblitz_groebner::{
     build_decomposition_system, first_fall_degree, macaulay_profile, MacaulayProfile, MAX_VARS,
 };
-use crate::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crate::cryptanalysis::pq_groebner_f2::{F2BoolPoly, Mask};
 use std::collections::BTreeMap;
 
 pub mod ball;
@@ -212,7 +212,7 @@ pub fn full_field_basis(n: u32) -> Vec<F2mElement> {
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct LeadingFormSignature {
     /// Per equation, the sorted monomial masks of **positive** degree.
-    pub positive_part: Vec<Vec<u64>>,
+    pub positive_part: Vec<Vec<Mask>>,
     /// Per equation, the constant coefficient (`1` if the empty monomial
     /// is present).  Not part of equality — carried for reporting.
     pub constants: Vec<u8>,
@@ -236,7 +236,7 @@ pub fn leading_form_signature(equations: &[F2BoolPoly]) -> LeadingFormSignature 
     let mut positive_part = Vec::with_capacity(equations.len());
     let mut constants = Vec::with_capacity(equations.len());
     for p in equations {
-        let mut masks: Vec<u64> = p.terms.iter().map(|t| t.mask).filter(|m| *m != 0).collect();
+        let mut masks: Vec<Mask> = p.terms.iter().map(|t| t.mask).filter(|m| *m != 0).collect();
         masks.sort_unstable();
         positive_part.push(masks);
         constants.push(u8::from(p.terms.iter().any(|t| t.mask == 0)));

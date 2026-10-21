@@ -76,7 +76,9 @@ use crate::cryptanalysis::koblitz_groebner::{
     f4_word_ops_thread, solve_boolean_system, SolveOptions, SolverEngine, SplitRule,
 };
 use crate::cryptanalysis::pq_f4_f2::{groebner_basis_f4, solutions_from_reduced_basis};
-use crate::cryptanalysis::pq_groebner_f2::{groebner_basis_f2_within, solve_system_f2, F2BoolPoly};
+use crate::cryptanalysis::pq_groebner_f2::{
+    groebner_basis_f2_within, mask_from64, solve_system_f2, F2BoolPoly, Mask, MASK_BITS,
+};
 use crate::cryptanalysis::semaev_sat::XorEncoding;
 
 /// The largest system `exhaustive` and the model-enumerating solvers
@@ -108,7 +110,7 @@ fn points_satisfying(equations: &[F2BoolPoly], n_vars: usize) -> (Vec<u64>, u64)
         let mut ok = true;
         for e in equations {
             tests += e.terms.len() as u64;
-            if e.eval(v) != 0 {
+            if e.eval(mask_from64(v)) != 0 {
                 ok = false;
                 break;
             }
@@ -120,9 +122,15 @@ fn points_satisfying(equations: &[F2BoolPoly], n_vars: usize) -> (Vec<u64>, u64)
     (out, tests)
 }
 
+/// Enumeration engines work in `u64` points (at most `2^n` of them, so
+/// `n < 64`); the verdict carries [`Mask`] points.
+fn masks(points: Vec<u64>) -> Vec<Mask> {
+    points.into_iter().map(mask_from64).collect()
+}
+
 /// Check every returned point against the original equations, counting
 /// the monomial tests.  An engine's answer is never trusted unchecked.
-fn verified(points: Vec<u64>, system: &BooleanSystem, tests: &mut u64) -> Vec<u64> {
+fn verified(points: Vec<Mask>, system: &BooleanSystem, tests: &mut u64) -> Vec<Mask> {
     points
         .into_iter()
         .filter(|&v| {
@@ -153,7 +161,7 @@ impl SystemSolver for F4F2 {
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
-        shape.n_vars <= 64
+        shape.n_vars <= MASK_BITS
     }
 
     fn solve(
@@ -366,7 +374,7 @@ impl SystemSolver for HybridF4 {
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
-        shape.n_vars <= 64
+        shape.n_vars <= MASK_BITS
     }
 
     fn solve(
@@ -525,7 +533,7 @@ impl SystemSolver for CrossbredF2 {
                 } else if points.is_empty() {
                     (SolverVerdict::Unsatisfiable, ops)
                 } else {
-                    (SolverVerdict::Solved(points), ops)
+                    (SolverVerdict::Solved(masks(points)), ops)
                 }
             }
         };
@@ -613,7 +621,7 @@ impl SystemSolver for FesF2 {
         let (verdict, ops) = match found {
             None => (SolverVerdict::BudgetExceeded, 0),
             Some(points) => {
-                let points = verified(points, system, &mut tests);
+                let points = verified(masks(points), system, &mut tests);
                 // Two XORs per Gray-code step, one step per point, plus
                 // one per coefficient scattered into the tables.
                 let ops = 2 * (1u64 << n) + setup;
@@ -707,7 +715,7 @@ impl SystemSolver for FesWide {
         };
         let mut tests = 0u64;
         let candidate_count = candidates.len() as u64;
-        let points = verified(candidates, system, &mut tests);
+        let points = verified(masks(candidates), system, &mut tests);
         let mut extra = BTreeMap::new();
         extra.insert("points".into(), 1u64 << n);
         extra.insert("lanes".into(), lanes as u64);
@@ -750,7 +758,7 @@ impl SystemSolver for BuchbergerF2 {
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
-        shape.n_vars <= 64
+        shape.n_vars <= MASK_BITS
     }
 
     fn solve(
@@ -793,7 +801,7 @@ impl SystemSolver for BuchbergerF2 {
         if solutions.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)
         } else {
-            (SolverVerdict::Solved(solutions), cost)
+            (SolverVerdict::Solved(masks(solutions)), cost)
         }
     }
 }
@@ -849,7 +857,7 @@ impl SystemSolver for XlF2 {
         if solutions.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)
         } else {
-            (SolverVerdict::Solved(solutions), cost)
+            (SolverVerdict::Solved(masks(solutions)), cost)
         }
     }
 }
@@ -906,7 +914,7 @@ impl SystemSolver for SatCdcl {
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
-        shape.n_vars <= 64
+        shape.n_vars <= MASK_BITS
     }
 
     /// One model per call: a first-solution search.
@@ -1022,7 +1030,7 @@ impl SystemSolver for Exhaustive {
         if solutions.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)
         } else {
-            (SolverVerdict::Solved(solutions), cost)
+            (SolverVerdict::Solved(masks(solutions)), cost)
         }
     }
 }
@@ -1063,6 +1071,10 @@ pub fn solver_by_name(name: &str) -> Result<Box<dyn SystemSolver>, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
     use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
 
     /// `v0 + v1`, `v0·v1 + v1` — solutions are `v0 = v1 = 0` and
@@ -1087,7 +1099,7 @@ mod tests {
         cnf.set("sat_xor_encoding", "cnf");
         let mut native = Params::default();
         native.set("sat_xor_encoding", "native");
-        let reference: std::collections::BTreeSet<u64> = [0, 3].into_iter().collect();
+        let reference: std::collections::BTreeSet<Mask> = [0, 3].into_iter().collect();
         for (params, expected_native) in [(Params::default(), false), (cnf, false), (native, true)]
         {
             let (verdict, cost) = SatCdcl.solve(&sys, &params, None);
@@ -1131,12 +1143,12 @@ mod tests {
     #[test]
     fn every_solver_finds_the_same_solution_set() {
         let sys = fixture();
-        let reference: std::collections::BTreeSet<u64> =
+        let reference: std::collections::BTreeSet<Mask> =
             match Exhaustive.solve(&sys, &Params::default(), None).0 {
                 SolverVerdict::Solved(v) => v.into_iter().collect(),
                 other => panic!("the reference must solve the fixture, got {other:?}"),
             };
-        assert_eq!(reference, [0u64, 3].into_iter().collect());
+        assert_eq!(reference, [0 as Mask, 3].into_iter().collect());
 
         for solver in solver_registry() {
             // The CDCL solver returns one model rather than all of
@@ -1157,7 +1169,7 @@ mod tests {
                         );
                     }
                     if solver.name() != "sat-cdcl" {
-                        let got: std::collections::BTreeSet<u64> = found.into_iter().collect();
+                        let got: std::collections::BTreeSet<Mask> = found.into_iter().collect();
                         assert_eq!(got, reference, "{} missed a solution", solver.name());
                     }
                 }
@@ -1211,7 +1223,7 @@ mod tests {
             let mut sys = random_quadratic(n, m, &mut rng);
             // Make `planted` a root so the answer is never trivially empty.
             for e in &mut sys.equations {
-                if e.eval(planted) != 0 {
+                if e.eval(mask_from64(planted)) != 0 {
                     *e = e.add(&F2BoolPoly::one(n));
                 }
             }
@@ -1227,7 +1239,7 @@ mod tests {
                 other => panic!("trial {trial}: {other:?} on a system with a planted root"),
             };
             let (wide, scalar) = (sorted(wide), sorted(scalar));
-            assert!(scalar.contains(&planted));
+            assert!(scalar.contains(&mask_from64(planted)));
             assert_eq!(wide, scalar, "trial {trial} (n = {n}, m = {m})");
             assert!(
                 cost.op_unit.starts_with("vector XORs"),
@@ -1253,11 +1265,11 @@ mod tests {
                 for i in 0..n {
                     for j in 0..i {
                         if rng.gen_bool(0.5) {
-                            monos.push(F2BoolMono::from_mask((1u64 << i) | (1 << j)));
+                            monos.push(F2BoolMono::from_mask(mask_from64((1u64 << i) | (1 << j))));
                         }
                     }
                     if rng.gen_bool(0.5) {
-                        monos.push(F2BoolMono::from_mask(1u64 << i));
+                        monos.push(F2BoolMono::from_mask(mask_from64(1u64 << i)));
                     }
                 }
                 if rng.gen_bool(0.5) {
@@ -1277,7 +1289,7 @@ mod tests {
     /// a wrong answer — but a verdict it gives must be the right one,
     /// and every engine but CDCL (one model) must return every solution.
     fn agree_with_the_reference(sys: &BooleanSystem, label: &str) -> usize {
-        let reference: std::collections::BTreeSet<u64> =
+        let reference: std::collections::BTreeSet<Mask> =
             match Exhaustive.solve(sys, &Params::default(), None).0 {
                 SolverVerdict::Solved(v) => v.into_iter().collect(),
                 SolverVerdict::Unsatisfiable => Default::default(),
@@ -1298,7 +1310,7 @@ mod tests {
                         "{label}: {} solved an inconsistent system",
                         solver.name()
                     );
-                    let got: std::collections::BTreeSet<u64> = found.into_iter().collect();
+                    let got: std::collections::BTreeSet<Mask> = found.into_iter().collect();
                     assert!(
                         got.is_subset(&reference),
                         "{label}: {} returned a non-solution",
@@ -1391,7 +1403,7 @@ mod tests {
                 let sys = random_quadratic(n, n.saturating_sub(1).max(1), &mut rng);
                 let (fes, cost) = FesF2.solve(&sys, &Params::default(), None);
                 let (reference, _) = Exhaustive.solve(&sys, &Params::default(), None);
-                let as_set = |v: &SolverVerdict| -> std::collections::BTreeSet<u64> {
+                let as_set = |v: &SolverVerdict| -> std::collections::BTreeSet<Mask> {
                     match v {
                         SolverVerdict::Solved(p) => p.iter().copied().collect(),
                         SolverVerdict::Unsatisfiable => Default::default(),
