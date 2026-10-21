@@ -28,11 +28,22 @@
 #   SAGE_VERSION        SageMath version                       (10.9)
 #   SAGE_PREFIX         micromamba root for the Sage env       (/opt/conda-sage, or ~/.local/conda-sage without root)
 #   GO_VERSION          Go installed when go is missing/old    (1.26.9)
+#   GO_INSTALL_DIR      where that Go goes                     (/usr/local/go)
 #   NODE_MAJOR          Node.js major version                  (22)
 #   WITH_GEMINI=1       also install @google/gemini-cli
 #   WITH_LATEX=1        also install a TeX Live (papers/, iacr-eprint skill)
 #   WITH_RUST_BUILD=1   also `cargo build --release` the crypto workspace (slow)
+#   CLONE_REPOS         space-separated repos to clone when missing (all three);
+#                       repos already in $WORKSPACE are set up either way
+#
+# .claude/hooks/session-start.sh runs this in cloud sessions (docs/CONDUCTOR.md).
 set -uo pipefail   # no -e: one failed component warns and the rest still run
+
+case "${WORKSPACE_OFFLINE:-0}" in
+  0|'') ;;
+  1) exec bash "$(cd "$(dirname "$0")/.." && pwd)/scripts/private-workspace.sh" check ;;
+  *) echo "WORKSPACE_OFFLINE must be 0 or 1" >&2; exit 2 ;;
+esac
 
 ALL_COMPONENTS=(system rust go node python conductor cairn sage agents repos control-plane)
 
@@ -44,6 +55,7 @@ GO_VERSION="${GO_VERSION:-1.26.9}"
 GO_MIN="1.25"
 NODE_MAJOR="${NODE_MAJOR:-22}"
 REPOS=(crypto cryptanalysis crypto-autoresearcher)
+CLONE_REPOS="${CLONE_REPOS-${REPOS[*]}}"
 
 DRY_RUN=0
 declare -A SKIP=()
@@ -99,12 +111,16 @@ LOCAL_BIN="$HOME/.local/bin"
 mkdir -p "$LOCAL_BIN"
 export PATH="$LOCAL_BIN:$HOME/.cargo/bin:/usr/local/go/bin:$HOME/go/bin:$PATH"
 
-# Every PATH entry this script relies on, written once to the user's shell rc.
+# Every PATH entry this script relies on, written once to the user's shell rc,
+# and to $CLAUDE_ENV_FILE when a Claude Code SessionStart hook runs this.
 persist_path() {
   local line="$1" rc
+  if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
+    grep -qxF -- "$line" "$CLAUDE_ENV_FILE" 2>/dev/null || run sh -c 'printf "%s\n" "$1" >> "$2"' sh "$line" "$CLAUDE_ENV_FILE"
+  fi
   for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
     [ -f "$rc" ] || [ "$rc" = "$HOME/.bashrc" ] || continue
-    grep -qxF "$line" "$rc" 2>/dev/null || run sh -c "printf '%s\n' '$line' >> '$rc'"
+    grep -qxF -- "$line" "$rc" 2>/dev/null || run sh -c 'printf "%s\n" "$1" >> "$2"' sh "$line" "$rc"
   done
 }
 
@@ -120,6 +136,12 @@ install_system() {
         pari-gp libpari-dev postgresql postgresql-contrib libpq-dev
         poppler-utils ghostscript graphviz)
       [ "${WITH_LATEX:-0}" = 1 ] && pkgs+=(texlive-latex-extra texlive-science texlive-fonts-recommended latexmk)
+      local missing=() p
+      for p in "${pkgs[@]}"; do
+        dpkg-query -W -f='${Status}' "$p" 2>/dev/null | grep -q 'install ok installed' || missing+=("$p")
+      done
+      if [ "${#missing[@]}" -eq 0 ]; then ok "all ${#pkgs[@]} apt packages present"; return; fi
+      pkgs=("${missing[@]}")
       as_root env DEBIAN_FRONTEND=noninteractive apt-get update -qq || true
       as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends "${pkgs[@]}" \
         || warn "some apt packages failed; re-run or install them by hand"
@@ -147,8 +169,13 @@ install_rust() {
     run sh -c 'curl --proto =https --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile default'
     export PATH="$HOME/.cargo/bin:$PATH"
   fi
-  run rustup toolchain install stable --profile default --component clippy,rustfmt
-  run rustup default stable
+  # Install a toolchain only when there is none: re-running must not move an
+  # existing one to a newer stable under a session's builds.
+  if ! rustup show active-toolchain >/dev/null 2>&1; then
+    run rustup toolchain install stable --profile default
+    run rustup default stable
+  fi
+  run rustup component add clippy rustfmt
   have cargo-deny || run cargo install --locked cargo-deny || warn "cargo-deny not installed (cryptanalysis 'make suite-lint')"
   persist_path 'export PATH="$HOME/.cargo/bin:$PATH"'
   have cargo && ok "$(cargo --version)"
@@ -162,10 +189,79 @@ install_go() {
   if [ -n "$cur" ] && version_ge "$cur" "$GO_MIN"; then ok "go $cur"; return; fi
   if [ "$PKG" = brew ]; then run brew install go; return; fi
   local os=linux; [ "$OS" = Darwin ] && os=darwin
-  local tgz="go${GO_VERSION}.${os}-${GOARCH}.tar.gz"
-  run sh -c "curl -fsSL https://go.dev/dl/$tgz -o /tmp/$tgz"
-  as_root rm -rf /usr/local/go && as_root tar -C /usr/local -xzf "/tmp/$tgz" && run rm -f "/tmp/$tgz"
-  persist_path 'export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"'
+  local tgz="go${GO_VERSION}.${os}-${GOARCH}.tar.gz" dest="${GO_INSTALL_DIR:-/usr/local/go}"
+  if [ "$DRY_RUN" = 1 ]; then
+    log "would verify and stage $tgz before replacing $dest"
+    return
+  fi
+  local download expected
+  download="$(mktemp -d "${TMPDIR:-/tmp}/go-download.XXXXXXXX")" || return 1
+  # The official release index supplies the checksum for this exact archive.
+  # A failed download or validation must leave the installed toolchain intact.
+  if ! curl -fsSL --retry 2 "https://go.dev/dl/?mode=json&include=all" -o "$download/releases.json" ||
+     ! curl -fsSL --retry 2 "https://go.dev/dl/$tgz" -o "$download/$tgz"; then
+    rm -rf "$download"
+    warn "Go download failed; existing installation preserved"
+    return 1
+  fi
+  expected="$(jq -er --arg name "$tgz" \
+    '[.[].files[] | select(.filename == $name) | .sha256] | if length == 1 then .[0] else error("archive not found uniquely") end' \
+    "$download/releases.json")"
+  if [[ ! "$expected" =~ ^[0-9a-f]{64}$ ]]; then
+    rm -rf "$download"
+    warn "Go release checksum unavailable; existing installation preserved"
+    return 1
+  fi
+  # All renames occur on the destination filesystem. Keep the old installation
+  # until checksum, extraction and the staged binary's version all pass. The
+  # lock also serializes setup hooks from sibling repositories.
+  if ! as_root bash -c '
+    set -euo pipefail
+    archive=$1 expected=$2 version=$3 dest=$4
+    root=$(dirname "$dest")
+    name=$(basename "$dest")
+    case "$name" in .|..|/) echo "invalid Go installation directory" >&2; exit 1 ;; esac
+    mkdir -p "$root"
+    exec 9>"$root/.$name-install.lock"
+    flock -x 9
+    stage=$(mktemp -d "$root/.go-install.XXXXXXXX")
+    cleanup() {
+      status=$?
+      trap - EXIT
+      if [ "$status" -ne 0 ] && { [ -e "$stage/previous" ] || [ -L "$stage/previous" ]; }; then
+        if [ ! -e "$dest" ] && [ ! -L "$dest" ]; then
+          if ! mv -T "$stage/previous" "$dest"; then
+            echo "Go rollback failed; original installation retained at $stage/previous" >&2
+            exit 1
+          fi
+        else
+          echo "Go destination changed; original installation retained at $stage/previous" >&2
+          exit 1
+        fi
+      fi
+      rm -rf "$stage"
+      exit "$status"
+    }
+    trap cleanup EXIT
+    trap "exit 1" HUP INT TERM
+    cp "$archive" "$stage/archive.tar.gz"
+    printf "%s  %s\n" "$expected" "$stage/archive.tar.gz" | sha256sum -c -
+    tar -C "$stage" -xzf "$stage/archive.tar.gz"
+    [ "$(env GOROOT="$stage/go" "$stage/go/bin/go" env GOVERSION)" = "go$version" ]
+    if [ -e "$dest" ] || [ -L "$dest" ]; then
+      mv -T "$dest" "$stage/previous"
+    fi
+    mv -T "$stage/go" "$dest"
+  ' workstation-go "$download/$tgz" "$expected" "$GO_VERSION" "$dest"; then
+    rm -rf "$download"
+    warn "Go installation failed; prior installation preserved or rollback location reported above"
+    return 1
+  fi
+  rm -rf "$download"
+  local escaped_bin
+  printf -v escaped_bin '%q' "$dest/bin"
+  persist_path "export PATH=$escaped_bin:\"\$HOME/go/bin:\$PATH\""
+  export PATH="$dest/bin:$PATH"
   have go && ok "$(go version)"
 }
 
@@ -285,6 +381,11 @@ install_agents() {
 clone_repo() {
   local name="$1" dir="$WORKSPACE/$1"
   if [ -d "$dir/.git" ]; then ok "$name present at $dir"; return; fi
+  case " $CLONE_REPOS " in *" $name "*) ;; *) return 0 ;; esac
+  local free_kb; free_kb="$(df -Pk "$WORKSPACE" 2>/dev/null | awk 'NR==2{print $4}')"
+  if [ -n "$free_kb" ] && [ "$free_kb" -lt 5242880 ]; then
+    warn "<5 GiB free under $WORKSPACE, not cloning $name"; return 1
+  fi
   run git clone "https://github.com/$GITHUB_OWNER/$name.git" "$dir" || { warn "clone of $name failed"; return 1; }
 }
 

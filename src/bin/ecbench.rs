@@ -10,6 +10,7 @@
 //! ecbench table  --dir D... [--reference ARM]   the one-unit table AGENTS.md §2 asks for
 //! ecbench resources --dir D [--out F]   cold native-work, memory and PMU vectors
 //! ecbench fb --curve C --factor-base F a factor base with its points
+//! ecbench fbm --curve C --factor-base F --oracle O [--solver S]  seal an FBM1 measurement id
 //! ecbench claim build --dir D --ic X --rho Y --workload W   a vs_rho claim, checked
 //! ecbench claim attach --base-report R --independent-receipt A   attach a later replay
 //! ecbench claim check --report R       the vs_rho checker
@@ -22,6 +23,7 @@
 //! ecbench challenge spec --challenge C --candidate '{"id":"..."}' --epoch N --out spec.json
 //! ecbench challenge verdict --challenge C --dir D --epoch N --replay-all --out V.json
 //! ecbench gpu-stage --binary gpu/ecc/bench --out D --mode rho -- --iters 256
+//! ecbench gpu-match --binary gpu/ecc/bench --workload W.json --out D
 //! ```
 //!
 //! Bounds, frontiers and challenges are `docs/bounds/README.md`.
@@ -40,9 +42,9 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand};
 
 use crypto_lib::cryptanalysis::ecbench::{
-    audit, bounds, callgrind, canonical, challenge, claim, compare, db, frontier, full_price, gpu,
-    host, isolab, isolation, methods, record, resources, runner, signals, spec, stats, trend,
-    workload,
+    audit, bounds, calibration, callgrind, canonical, challenge, claim, compare, db, fbm, frontier,
+    full_price, gpu, host, isolab, isolation, methods, record, resources, runner, signals, spec,
+    stats, trend, workload,
 };
 
 #[derive(Parser)]
@@ -77,6 +79,41 @@ enum Cmd {
         /// Options forwarded to the CUDA binary after `--`.
         #[arg(last = true)]
         gpu_args: Vec<String>,
+    },
+    /// Run CUDA BSGS on a frozen EC Bench workload and verify its scalar here.
+    GpuMatch {
+        #[arg(long)]
+        binary: PathBuf,
+        /// One workload JSON exported from `ecbench plan --json` or a session.
+        #[arg(long)]
+        workload: PathBuf,
+        /// A new directory for the binary snapshot, raw streams and receipt.
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value_t = 600)]
+        timeout_seconds: u64,
+        #[arg(long, default_value = "nvidia-smi")]
+        telemetry_binary: PathBuf,
+        /// Optional verified CPU record for an exact workload identity link.
+        #[arg(long)]
+        cpu_record: Option<PathBuf>,
+        /// CUDA BSGS tuning arguments after `--`.
+        #[arg(last = true)]
+        gpu_args: Vec<String>,
+    },
+    /// Recheck a GPU receipt, raw streams, workload and scalar without a GPU.
+    GpuMatchVerify {
+        #[arg(long)]
+        dir: PathBuf,
+    },
+    /// Check A/A interval coverage and false admissions across quiet and contended sessions.
+    Calibrate {
+        #[arg(long, num_args = 1..)]
+        quiet: Vec<PathBuf>,
+        #[arg(long, num_args = 1..)]
+        contended: Vec<PathBuf>,
+        #[arg(long)]
+        out: PathBuf,
     },
     /// List every method with its parameters.
     Methods {
@@ -250,6 +287,29 @@ enum Cmd {
         /// A factor-base plug-in spec, e.g. 'koblitz-orbit:divisor=1'.
         #[arg(long)]
         factor_base: String,
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
+    /// Seal an FBM1 measurement identity (curve × FB1 × oracle × solver × instrument).
+    Fbm {
+        /// A curve spec, e.g. '{"kind":"koblitz","a":1,"n":17}'.
+        #[arg(long)]
+        curve: String,
+        /// A factor-base plug-in spec, e.g. 'binary-subspace:dimension=4'.
+        #[arg(long)]
+        factor_base: String,
+        /// Oracle plug-in string, e.g. 'mitm:m=2' or 'descent-algebraic:m=2'.
+        #[arg(long)]
+        oracle: String,
+        /// Solver plug-in string for algebraic oracles (default empty for table oracles).
+        #[arg(long, default_value = "")]
+        solver: String,
+        /// Linear algebra backend (default incremental-gauss).
+        #[arg(long, default_value = "incremental-gauss")]
+        linalg: String,
+        /// Instrument tag (default ecbench.ic_pipeline/v1).
+        #[arg(long, default_value = "ecbench.ic_pipeline/v1")]
+        instrument: String,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -548,7 +608,7 @@ fn binary_plugins() -> crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugin
     }
 }
 
-fn main() -> ExitCode {
+pub fn main() -> ExitCode {
     // Oracles this binary links that the library cannot name (see
     // `pdp3_koblitz`); registered before any run, child or replay.
     crypto_lib::cryptanalysis::ecbench::methods::register_binary_plugins(binary_plugins());
@@ -885,8 +945,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             let w = &p.workloads[ex.workload];
             let input = record::ChildInput {
                 schema: record::CHILD_INPUT_SCHEMA.into(),
-                curve: workload::CurveSpec::explicit(p.instance(ex.workload))
-                    .unwrap_or_else(|| w.curve_spec.clone()),
+                curve: w.curve_spec.for_child(p.instance(ex.workload)),
                 target_seed: w.target_seed,
                 target_index: w.target_index,
                 target_kind: w.kind(),
@@ -938,6 +997,13 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 rep.replays.iter().filter(|r| r.reproduced).count(),
                 rep.problems.len()
             );
+            if rep.records_bound == Some(false) && rep.interruption.is_some() {
+                eprintln!(
+                    "warning: interruption {}: records_bound false (no records hash binds \
+                     records.jsonl); this session must not be cited as complete",
+                    rep.interruption.as_deref().unwrap_or("")
+                );
+            }
             if exit_code && !rep.ok {
                 return Ok(ExitCode::from(1));
             }
@@ -961,6 +1027,50 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 eprintln!("GPU stage {}: see {}", receipt.status, out.display());
                 return Ok(ExitCode::from(1));
             }
+        }
+        Cmd::GpuMatch {
+            binary,
+            workload,
+            out,
+            timeout_seconds,
+            telemetry_binary,
+            cpu_record,
+            gpu_args,
+        } => {
+            let receipt = gpu::run_match(&gpu::GpuMatchOptions {
+                binary,
+                workload,
+                out,
+                timeout_seconds,
+                telemetry_binary,
+                cpu_record,
+                args: gpu_args,
+            })?;
+            print_json(&receipt)?;
+            if receipt.status != "verified" {
+                return Ok(ExitCode::from(1));
+            }
+        }
+        Cmd::GpuMatchVerify { dir } => {
+            let issues = gpu::audit_match(&dir)?;
+            print_json(&serde_json::json!({
+                "schema": "ecbench.gpu_match_audit/v1",
+                "valid": issues.is_empty(),
+                "issues": issues,
+            }))?;
+            if !issues.is_empty() {
+                return Ok(ExitCode::from(1));
+            }
+        }
+        Cmd::Calibrate {
+            quiet,
+            contended,
+            out,
+        } => {
+            let report = calibration::evaluate(&quiet, &contended)?;
+            let bytes = serde_json::to_vec_pretty(&report).map_err(|e| e.to_string())?;
+            std::fs::write(&out, bytes).map_err(|e| e.to_string())?;
+            print_json(&report)?;
         }
         Cmd::Compare {
             dir,
@@ -1075,6 +1185,47 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         dump.curve.slug,
                         dump.factor_base.signed_points,
                         dump.factor_base.columns,
+                        p.display()
+                    );
+                }
+                None => print!("{text}"),
+            }
+        }
+        Cmd::Fbm {
+            curve,
+            factor_base,
+            oracle,
+            solver,
+            linalg,
+            instrument,
+            out,
+        } => {
+            let spec: workload::CurveSpec =
+                serde_json::from_str(&curve).map_err(|e| format!("--curve: {e}"))?;
+            let dump = methods::dump_factor_base(&spec, &factor_base)?;
+            let cfg = fbm::FactorBaseMeasurementConfig {
+                schema: fbm::FBM_SCHEMA.into(),
+                curve: dump.curve.slug.clone(),
+                fb_id: dump.factor_base.fb_id.clone(),
+                fb_sha256: dump.factor_base.fb_sha256.clone(),
+                family: dump.factor_base.family.clone(),
+                fb_params: dump.factor_base.params.clone(),
+                oracle,
+                solver,
+                linalg,
+                instrument,
+            };
+            let sealed = cfg.seal()?;
+            let text = serde_json::to_string_pretty(&sealed).map_err(|e| e.to_string())? + "\n";
+            match out {
+                Some(p) => {
+                    std::fs::write(&p, &text).map_err(|e| e.to_string())?;
+                    eprintln!(
+                        "{} = {} × {} × oracle={} -> {}",
+                        sealed.fbm_id,
+                        sealed.config.curve,
+                        sealed.config.fb_id,
+                        sealed.config.oracle,
                         p.display()
                     );
                 }

@@ -7,14 +7,21 @@
     "factor-base follow-up"
   ],
   "status": "draft",
-  "status_note": "Recommendation only; no experiment run or scheduled. Freeze the native baseline, executable protocol, costs and checker before dispatch.",
-  "blocked_on": [],
+  "status_note": "Draft protocol written (PROTOCOL.md, DRAFT): frozen incumbent = frontier ic-pair (prime-abscissa + mitm:negation_folded=1, N 32/162/407/1024), 5-size x 5-oracle train grid on fresh prime_search curves, hash-frozen selection, 48-target x 2-round holdout per size, band-priced paired decision. Not frozen: needs ecbench compare --weight, then pin and record the blob. No experiment run or scheduled; sizing probes only (PROTOCOL.md section 11).",
+  "blocked_on": [
+    "note: ecbench compare has no --weight option (src/bin/ecbench.rs:228 Compare; src/cryptanalysis/ecbench/compare.rs:288 compare) and band.rs:187 ranks means without intervals, so the paired cluster-bootstrap intervals at w=0.1 and w=1 required by PROTOCOL.md section 7.2 cannot be computed natively; run.sh analyse exits 3 until it lands",
+    "note: no seeded random prime factor-base plug-in (src/cryptanalysis/ecbench/methods.rs:2125-2137 admits prime-abscissa, prime-projected-abscissa, glv-orbit, prime-kummer, prime-isogeny, cm-scalar-orbit only); random-base control replaced by a stride control unless a prime-random plug-in lands before freezing (control gap, not the primary decision)",
+    "note: freeze steps pending: merge card files and the compare --weight change, pin code.commit to that merge, commit PROTOCOL.md as FROZEN and record protocol.blob (PROTOCOL.md section 12)"
+  ],
   "links": {
     "lead": "research/factor_base_evaluation_20261015/followup_20261016/README.md",
     "notes": [
-      "research/factor_base_evaluation_20261015/README.md",
       "docs/ic/factor-base-encyclopedia/README.md",
+      "research/ecbench_rootfinding_lanes_20261013/REPORT.md",
       "research/f4_generic_field_20261015/README.md",
+      "research/factor_base_evaluation_20261015/README.md",
+      "research/ic_frontier_campaign_20261015/PROTOCOL.md",
+      "research/ic_frontier_campaign_20261015/analysis/band-prime.md",
       "research/ic_next10_20261014/03-pkm-degree/README.md"
     ],
     "prs": [
@@ -24,12 +31,12 @@
   "question": "Can joint selection of factor-base size and exact native decomposition oracle reduce complete one-target IC cost against the current verified prime-field incumbent on fresh matched workloads?",
   "decision_value": "A verified holdout reduction robust to the common native-operation pricing band promotes the selected recipe to the next IC baseline, even if rho is still cheaper. A null, failed or price-sensitive result retains the incumbent and narrows the tuning question; no coverage-only result is promoted to a pipeline improvement.",
   "protocol": {
-    "path": null,
+    "path": "PROTOCOL.md",
     "blob": null
   },
   "code": {
     "repo": "crypto",
-    "commit": "f334da9fea56bcd1480cd198d238a5e36de36108",
+    "commit": "abee07ee7337d04a7e734333669ca1bacd6c763a",
     "branch": null,
     "build": [
       [
@@ -43,21 +50,26 @@
   },
   "resources": {
     "cpus": 1,
-    "ram_gb": 16,
+    "ram_gb": 4,
     "disk_gb": 10,
     "gpu": null,
-    "est_core_hours": null,
-    "est_wall_hours": null,
-    "notes": "Proposed screening ceilings only; not estimates. Exact grid, cost derivation and caps must be frozen before ready. Existing native components are reused."
+    "est_core_hours": 2,
+    "est_wall_hours": 2,
+    "notes": "Derived in README.md from measured per-run walls (frontier Phase 1 sessions; this card's probes A-C): ~50 min of one core for identity, train (+edge extensions), holdout, panel K, replay-all audit and analysis, plus ~20 min for outputs.verify; 2 core-hours / 2 wall-hours include ~2x margin for a contended spot host. Peak process RSS ~0.66 GiB (mitm m=3, N=4096, 32 bits); ~30 MB of session records. Estimates, not measurements."
   },
   "run": {
     "argv": [
-      "TODO-freeze-native-ecbench-spec-and-command"
+      "sh",
+      "backlog/XP-20261016-prime-base-oracle-tuning/run.sh",
+      "all",
+      "{out}"
     ],
     "env": {
-      "RAYON_NUM_THREADS": "1"
+      "RAYON_NUM_THREADS": "1",
+      "PBO_CPU": "31",
+      "ECBENCH": "target/release/ecbench"
     },
-    "timeout_per_shard_s": 7200
+    "timeout_per_shard_s": 14400
   },
   "shards": {
     "count": 1,
@@ -66,17 +78,22 @@
     "stop": "all"
   },
   "checkpoint": {
-    "file": null,
-    "resume_flag": null
+    "file": "progress.txt",
+    "resume_flag": "--resume"
   },
   "outputs": {
-    "result_schema": "Draft: sealed ecbench records, exclusive phase costs, complete native-counter inventory and independent replay receipts",
-    "verify": [],
-    "land": "research/prime_base_oracle_tuning_20261016"
+    "result_schema": "ecbench sessions (ecbench.record/v1) under {out}/sessions, replay-all receipts under {out}/audits, xp-pbo.selection/v1 + FROZEN.sha256 under {out}/select, ecbench.band/v1 and compare JSON under {out}/analysis (PROTOCOL.md section 13)",
+    "verify": [
+      "sh",
+      "backlog/XP-20261016-prime-base-oracle-tuning/run.sh",
+      "verify",
+      "{out}"
+    ],
+    "land": "research/prime_base_oracle_tuning_<run-date>"
   },
   "cairn": {
     "mode": "lab-task",
-    "notes": "Not published or leased; draft only. No execution until the card is ready and a lab space is selected.",
+    "notes": "Not published or leased; draft only. One sequential shard; resumable at session granularity by rerunning the same command (--resume).",
     "space": "TBD",
     "tasks": [
       "XP-20261016-prime-base-oracle-tuning"
@@ -84,18 +101,18 @@
     "ttl_s": 86400,
     "env": {
       "name": "crypto-prime-base-tuning-draft",
-      "recipe": "TODO-freeze-environment-and-runnable-protocol"
+      "recipe": "Linux x86-64 tree at code.commit with jq, coreutils (sha256sum, taskset) and Rust; build with cargo build --release --bin ecbench; run from the repository root"
     },
     "exec": {
       "cpus": 1,
-      "memory_mb": 16384,
-      "timeout_s": 7200,
+      "memory_mb": 4096,
+      "timeout_s": 14400,
       "sandbox": "auto",
       "publish": "runs/XP-20261016-prime-base-oracle-tuning"
     },
     "funding": {
       "units": 0,
-      "rationale": "Draft has no costed runnable protocol, so no queue priority or posted reward yet. A reviewer sets funding against the existing 131072-1000000 seed-card range when ready."
+      "rationale": "Draft: not frozen, so no queue priority or posted reward yet. Derived cost is ~2 core-hours on one core; a reviewer may set funding at or below the 131072 seed-card floor once frozen."
     }
   },
   "owner_hint": "Native ecbench prime-field lane"

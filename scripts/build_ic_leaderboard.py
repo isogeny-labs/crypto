@@ -35,6 +35,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import curve_id as cid  # noqa: E402
+import validation_gate as gate  # noqa: E402
 
 REPO = cid.REPO
 OUT_JSON = REPO / "docs/ic/leaderboard.json"
@@ -71,8 +72,13 @@ SOURCES = {
     "f4_f5_f6_cross_family": "research/f4_f5_f6_cross_family_20261011/ANALYSIS.json",
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
+    "la_engines": "research/la_engines_20261014/summary.json",
+    "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
+    "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
+    "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
+    "jv_sieve_strong_rho": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
     "registry": "docs/curves/registry.json",
     "curves_schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
@@ -581,13 +587,100 @@ def families(board: list[dict]) -> dict:
     return out
 
 
-def latest_frontier_audit() -> dict:
-    """Copy the accounting-only frontier synthesis into the generated board.
+# Sizes the linear-algebra component panel shows, a subset of the study's
+# frozen amendment-5 grid (research/la_engines_20261014/PROTOCOL_AMENDMENT_5.md).
+LA_COLUMNS = (16384, 65536, 131072, 262144)
 
-    This record is deliberately separate from the ranked curve rows: its source
-    says that no admitted whole-pipeline measurement, reference, or curve moved.
+
+def la_component() -> dict:
+    """The linear-algebra phase on its own: the amendment-5 session of
+    research/la_engines_20261014, copied from its summary.json (medians and
+    per-seed ratio ranges computed there from raw/grid_amend5.jsonl). A
+    component speed-up on synthetic relation matrices: it moves no row of
+    tables A-C, which keep the solver each was measured with."""
+    sm = load(SOURCES["la_engines"])
+
+    def cell(key: str, d: int):
+        return (sm.get(key) or {}).get(str(d))
+
+    rows = []
+    for d in LA_COLUMNS:
+        rows.append({
+            "columns": d,
+            "legacy_s": cell("amend5_solve_s|legacy-bw", d),
+            "cado_style_s": cell("amend5_solve_s|cado-bw", d),
+            "legacy_over_cado_style": cell("amend5_ratio|legacy-bw/cado-bw", d),
+            "cado_nfs_s": cell("amend5_solve_s|cado-nfs", d),
+            "cado_nfs_over_ours": cell("amend5_ratio|cado-nfs/cado-bw-pos", d),
+            "core_legacy": cell("amend5_core_dim|legacy-bw", d),
+            "core_cado_style": cell("amend5_core_dim|cado-bw", d),
+            "core_cado_nfs": cell("amend5_core_dim|cado-nfs", d),
+        })
+    return {"rows": rows, "study": "research/la_engines_20261014/",
+            "report": "research/la_engines_20261014/REPORT.pdf",
+            "class": "engineering"}
+
+
+def secs(x: float) -> str:
+    """Seconds to three significant figures, trailing zeros kept: 8.00 s, 224 s."""
+    return f"{x:.0f} s" if x >= 100 else f"{x:#.3g} s"
+
+
+def pair_table_component() -> dict:
+    """The ic.pipeline oracle set-up (the |F|² pair table) on its own:
+    research/ic_oracle_setup_blocked_20261020, copied from its RESULT.json
+    (means and per-pair ratio ranges computed there by scripts/analyze.jq from
+    the session records). A component speed-up: every arm counts the same
+    additions and recovers the same logarithm, so no row of tables A-C moves."""
+    res = load(SOURCES["pair_table_setup"])
+    if res.get("schema") != "ic_oracle_setup_blocked.result/v1" or not res.get("equality_all_identical"):
+        raise SystemExit("pair-table set-up result: unexpected schema or an equality failure")
+    return {**res, "study": "research/ic_oracle_setup_blocked_20261020/",
+            "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
+            "class": "engineering"}
+
+
+PLANNER_ARMS = ["half-base", "double-base", "rootfind", "full-rank", "random-targets"]
+
+
+def planner_component() -> dict:
+    """The `ic plan` / `ic bench --auto` planner checked on six prime curves
+    outside its evidence: research/ic_planner_validation_20261020, copied from
+    analysis/summary.json (jq over ecbench compare/band/table output) and the
+    plan arm of each frozen spec. Tooling validation: the plan is the existing
+    best recipe, chosen automatically, so no row of tables A-C moves. The
+    supplementary curves are prime_search curves outside the registry and are
+    named by tag only (the study's amendment 1)."""
+    rows = []
+    for r in load(SOURCES["planner_validation"]):
+        alts = {a["arm"]: a for a in r["alternatives"]}
+        if sorted(alts) != sorted(PLANNER_ARMS) or r["aa"]["ratio"] != 1.0:
+            raise SystemExit(f"planner validation {r['curve_tag']}: unexpected arms or a failed A/A")
+        spec = load(f"research/ic_planner_validation_20261020/specs/{r['curve_tag']}.json")
+        plan = next(a for a in spec["arms"] if a["name"] == "plan")["method"]["params"]
+        primary = r["set"].startswith("primary")
+        rows.append({"tag": r["curve_tag"], "primary": primary,
+                     "curve": r["curve"] if primary else None, "log2_r": r["log2_r"],
+                     "plan": plan,
+                     "alternatives": [{k: alts[a][k] for k in ("arm", "ops_ratio", "ci95", "band_ratio", "verdict")}
+                                      for a in PLANNER_ARMS],
+                     "plan_over_rho": r["plan_over_rho"],
+                     "predicted_plan_over_rho": r["predicted_plan_over_rho"],
+                     "weights": r["weights"]})
+    return {"rows": rows, "planner": "ic-planner/1",
+            "study": "research/ic_planner_validation_20261020/",
+            "report": "research/ic_planner_validation_20261020/REPORT.pdf",
+            "class": "engineering"}
+
+
+def latest_frontier_audit() -> dict:
+    """Copy the latest performance handoff into the generated board.
+
+    The latest implementation result and prior full synthesis remain separate
+    from the ranked curve rows because no operation boundary or curve moved.
     """
     audit = load(SOURCES["frontier_audit"])
+    rho_opt = load(SOURCES["rho_optimization"])
     effect = audit.get("leaderboard_effect", {})
     cold = audit.get("canonical_koblitz_medium", {}).get("ops_leader", {})
     online = {row.get("label"): row for row in audit.get("online_boundary", [])}
@@ -601,22 +694,69 @@ def latest_frontier_audit() -> dict:
             or effect.get("generated_audit_record_required") is not True
             or cold.get("method") != "rho.signed_frobenius_strong"
             or cold.get("bound_id") != "ECBND1h05a2ea918f3c"
-            or n61.get("status") != "admitted online"
+            or n61.get("status") != "superseded (empty-table rho)"
             or n61.get("targets") != 64
-            or n83.get("status") != "exploratory one point"
+            or n83.get("status") != "superseded (empty-table rho)"
             or n83.get("targets") != 1
             or "not a matched cold ratio" not in n83.get("setup_inclusive_class", "")
             or failed.get("ok") is not False
             or failed.get("replays_identical") != 120
             or failed.get("replays_total") != 168
-            or failed.get("failures") != 48):
+            or failed.get("failures") != 48
+            or failed.get("current_main_replay", {}).get("identical") != 72
+            or failed.get("current_main_replay", {}).get("total") != 168):
         raise SystemExit("review the ECBench frontier audit before updating the leaderboard")
+    opt_callgrind = rho_opt.get("callgrind", {})
+    opt_session = rho_opt.get("ecbench_session", {})
+    opt_ops = opt_session.get("operation_comparison", {})
+    opt_wall = opt_session.get("native_wall", {})
+    opt_effect = rho_opt.get("frontier_effect", {})
+    if (rho_opt.get("schema") != "crypto.ecbench_rho_optimization/v1"
+            or rho_opt.get("classification")
+            != "engineering improvement; deterministic instruction result; native wall not admitted"
+            or rho_opt.get("implementation", {}).get("standing_method")
+            != "rho.signed_frobenius_strong"
+            or opt_callgrind.get("gate_passed") is not True
+            or opt_callgrind.get("optimized_over_archived_baseline") >= 0.85
+            or opt_callgrind.get("optimized_over_same_binary_legacy") >= 0.85
+            or opt_ops.get("ratio_optimized_over_legacy") != 1.0
+            or opt_ops.get("ci95") != [1.0, 1.0]
+            or opt_ops.get("pairs") != 240
+            or opt_session.get("replays_identical") != 720
+            or opt_session.get("measured_replays") != 720
+            or opt_wall.get("admitted_pairs") != 0
+            or opt_wall.get("status") != "descriptive only; not a result"
+            or opt_effect.get("ranked_rows_changed") is not False
+            or opt_effect.get("operation_boundary_changed") is not False
+            or opt_effect.get("implementation_throughput_improved") is not True
+            or opt_effect.get("native_wall_claim_admitted") is not False):
+        raise SystemExit("review the strong-rho optimization result before updating the leaderboard")
     return {
-        "date": audit["date"],
-        "source": SOURCES["frontier_audit"],
-        "classification": audit["classification"],
-        "ranked_rows_changed": effect["ranked_rows_changed"],
-        "reason": effect["reason"],
+        "date": rho_opt["date"],
+        "source": SOURCES["rho_optimization"],
+        "previous_source": SOURCES["frontier_audit"],
+        "classification": rho_opt["classification"],
+        "ranked_rows_changed": opt_effect["ranked_rows_changed"],
+        "reason": opt_effect["reason"],
+        "rho_optimization": {
+            "method": rho_opt["implementation"]["standing_method"],
+            "archived_baseline_ir": opt_callgrind["archived_baseline"]["solve_ir"],
+            "optimized_ir": opt_callgrind["optimized"]["solve_ir"],
+            "optimized_over_archived_baseline": opt_callgrind["optimized_over_archived_baseline"],
+            "optimized_over_same_binary_legacy": opt_callgrind["optimized_over_same_binary_legacy"],
+            "same_binary_speedup": opt_callgrind["same_binary_speedup"],
+            "ops_ratio": opt_ops["ratio_optimized_over_legacy"],
+            "ops_ci95": opt_ops["ci95"],
+            "ops_pairs": opt_ops["pairs"],
+            "session_id": opt_session["session_id"],
+            "replays_identical": opt_session["replays_identical"],
+            "measured_replays": opt_session["measured_replays"],
+            "wall_status": opt_wall["status"],
+            "wall_level": opt_wall["earned_level"],
+            "wall_median_ratio": opt_wall["optimized_over_legacy_median"],
+            "aa_median_ratio": opt_wall["optimized_aa_median"],
+            "admitted_wall_pairs": opt_wall["admitted_pairs"],
+        },
         "cold": {
             "method": cold["method"], "bound_id": cold["bound_id"],
             "ops_over_floor": cold["ops_over_floor"], "ops_ci95": cold["ops_ci95"],
@@ -626,22 +766,66 @@ def latest_frontier_audit() -> dict:
             "label": n61["label"], "rho_over_ic": n61["online_rho_over_ic"],
             "ci95": n61["online_ci95"], "targets": n61["targets"],
             "setup_seconds_approx": n61["setup_seconds_approx"], "status": n61["status"],
+            "correction": n61["correction"],
         },
         "exploratory_online": {
             "label": n83["label"], "rho_over_ic": n83["online_rho_over_ic"],
             "targets": n83["targets"], "complete_process_seconds": n83["complete_process_seconds"],
             "setup_inclusive_class": n83["setup_inclusive_class"],
             "first_integer_break_even_under_model": n83["first_integer_break_even_under_model"],
-            "status": n83["status"],
+            "status": n83["status"], "correction": n83["correction"],
         },
         "replay_block": {
             "identical": failed["replays_identical"], "total": failed["replays_total"],
             "failures": failed["failures"], "scope": failed["failure_scope"],
+            "current": failed["current_main_replay"],
         },
     }
 
 
-def build() -> dict:
+def jv_sieve_table() -> dict:
+    """Read qualified native analysis; retain descriptive fields without treating
+    missing control acceptance or incomplete original accounting as eligibility.
+    Table D stays outside the other tables because its weak class excludes
+    prime-order curves and uses its own reference and unit."""
+    sm = load(SOURCES["jv_sieve_strong_rho"])
+    rows = []
+    for e in sm["sizes"]:
+        r3 = e["rho"].get("R3")
+        if r3 is None:
+            continue
+        rows.append({
+            "p": e["p"], "log2_l": e["log2_l"], "ic_all_correct": e["ic_all_correct"],
+            "ic_S": e["ic_S"], "ic_S_plus": e["ic_S_plus"], "ic_wall_s": e["ic_wall_s"],
+            "rho_S_harness": r3["S_harness"], "rho_S_tuned": r3["S_tuned"],
+            "rho_S_plus_harness": r3["S_plus_harness"], "rho_S_plus_tuned": r3["S_plus_tuned"],
+            "rho_steps_over_sqrt_l": r3["steps_over_sqrt_l"], "rho_wall_s": r3["wall_s"],
+            "rho_all_correct": r3["all_correct"],
+            "ic_over_rho": r3["ic_over_rho"], "n_rho": r3["S_harness"]["n"], "verdict": r3["verdict"],
+            "band_ratio": r3["band_ratio_ic_over_rho"],
+            "ranked_across_band": r3["ranked_across_band_ic_below_rho"],
+            "dense_vs_sparse": e.get("dense_vs_sparse"),
+            "rho_arms": {k: v["S_harness"] for k, v in e["rho"].items()},
+        })
+    return {
+        "source": SOURCES["jv_sieve_strong_rho"],
+        "comparison_status": sm.get("comparison_status", "unqualified"),
+        "comparison_blockers": sm.get("comparison_blockers", []),
+        "qualification": "research/jv_sieve_strong_rho_20261019/review-20261020/README.md",
+        "class": "historical measurement with comparison withheld; weak curve class only",
+        "scope": "Curves y^2 = h(x)(x - a)(x - sigma a) over F_{p^6} with full rational 2-torsion whose "
+                 "isogeny class contains a weak curve (about 55-63% of such curves, ledger 18.5). The class "
+                 "never has prime order. The cover's Jacobian has genus 3. Not a statement about any "
+                 "prime-order or generic curve.",
+        "rows": rows,
+        "exponent_ic": sm["exponent_ic_muls_vs_l"], "exponent_rho_harness": sm["exponent_rho_R3_harness_muls_vs_l"],
+        "exponent_rho_tuned": sm["exponent_rho_R3_tuned_muls_vs_l"],
+        "local_exponents_ic": sm["local_exponents_ic"],
+        "K1_killed_at_p": sm.get("K1_killed_at_p"), "K2_narrowed_at_p": sm.get("K2_narrowed_at_p"),
+    }
+
+
+def build(allow_unvalidated: bool = False) -> dict:
     names = Names()
     frontier_audit = latest_frontier_audit()
     n83_holdout = load(SOURCES["n83_tier1_cold_holdout"])
@@ -924,6 +1108,10 @@ def build() -> dict:
                             "variant": r["best"].get("variant"), "source": r["source"],
                             "refs": r["curve_record"]["factor_base_refs"],
                             "link_status": r["curve_record"]["factor_base_link_status"]}
+    # The validation gate (AGENTS.md, owner rule 2026-10-19): a row is validated,
+    # frozen as unvalidated (pre-gate), or refused.
+    gate.annotate_board(board, lambda r: gate.row_digest(stable(r)),
+                        allow_unvalidated=allow_unvalidated)
     leaders = {}
     for regime in ("prime", "char2", "koblitz", "koblitz_batch"):
         rows = [r for r in board if r["regime"] == regime]
@@ -949,9 +1137,12 @@ def build() -> dict:
         "what_this_is_not": ["a measurement", "a speedup", "a claim about any curve not on it"],
         "class": "accounting",
         "sources": {k: {"path": v, "sha256": sha256(v)} for k, v in SOURCES.items()},
+        "validation_gate": {"rule": "AGENTS.md, Validation gate (owner, 2026-10-19)",
+                            "schema": gate.SCHEMA, "status_counts": gate.status_counts(board)},
         "families": families(board),
         "leaders": leaders, "board": board, "oracles": oracle_rows(names),
         "bounded_diagnostics": [bounded_diagnostic],
+        "jv_sieve_weak_class": jv_sieve_table(),
         "n37_k8_k16_confirmation": k8_confirmation,
         "n37_online_ir_diagnostic": online_ir_diagnostic,
         "n37_native_wall_diagnostic": native_wall_diagnostic,
@@ -986,6 +1177,9 @@ def build() -> dict:
         # Native analysis computes these observations; this view only copies
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
+        "linear_algebra_component": la_component(),
+        "pair_table_component": pair_table_component(),
+        "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1051,28 +1245,41 @@ def markdown(doc: dict) -> str:
     admitted = audit["admitted_online"]
     exploratory = audit["exploratory_online"]
     replay = audit["replay_block"]
+    rho = audit["rho_optimization"]
     L += [f"## Latest frontier audit ({audit['date']})", "",
-          "This accounting synthesis is published on every performance handoff. It does not replace the "
-          "curve-by-curve tables: the frozen source records that no ranked row changed.", "",
+          "This performance handoff is published beside the curve-by-curve tables. The standing rho "
+          "implementation improved, while its mathematical work and every ranked IC row stayed fixed.", "",
           "| boundary | observed result | leaderboard treatment |",
           "|:--|:--|:--|",
+          f"| Standing strong-rho implementation | complete-solve Callgrind: optimized / archived "
+          f"baseline {rho['optimized_over_archived_baseline']:.6f}× and optimized / same-binary legacy "
+          f"{rho['optimized_over_same_binary_legacy']:.6f}×; GAE {rho['ops_ratio']:.3f} "
+          f"[{rho['ops_ci95'][0]:.3f}, {rho['ops_ci95'][1]:.3f}] over {rho['ops_pairs']} pairs; "
+          f"{rho['replays_identical']}/{rho['measured_replays']} measured replays identical | "
+          f"Implementation win; operation boundary unchanged. Native wall remained {rho['wall_level']} "
+          "and is not admitted |",
           f"| Canonical medium-tier Koblitz cold operations | `{cold['method']}` / "
           f"`{cold['bound_id']}`: {cold['ops_over_floor']:.3f}× floor "
           f"[{cold['ops_ci95'][0]:.3f}, {cold['ops_ci95'][1]:.3f}], "
           f"{cold['runs']} runs at {cold['sizes']} sizes | Standing rho boundary; not an IC row |",
-          f"| Retained-setup online, `{admitted['label']}` | rho/IC "
+          f"| Retained-setup online, `{admitted['label']}` | ~~rho/IC "
           f"{admitted['rho_over_ic']:.1f}× [{admitted['ci95'][0]:.1f}, "
           f"{admitted['ci95'][1]:.1f}], {admitted['targets']} unseen targets; about "
-          f"{admitted['setup_seconds_approx']:.0f} s setup excluded | Admitted online result; "
-          "kept separate from cold ranked rows |",
-          f"| Retained-setup online, `{exploratory['label']}` | rho/IC "
+          f"{admitted['setup_seconds_approx']:.0f} s setup excluded~~ | **Superseded** (rho had an empty "
+          f"table); not an improvement. {admitted['correction']} |",
+          f"| Retained-setup online, `{exploratory['label']}` | ~~rho/IC "
           f"{exploratory['rho_over_ic']:.6f}× on {exploratory['targets']} public point; complete IC "
-          f"process {exploratory['complete_process_seconds']:.3f} s | Exploratory shared-host result; "
-          "no matched cold ratio and no rank promotion |",
-          f"| Current-binary root-finder replay-all | {replay['identical']}/{replay['total']} identical; "
-          f"{replay['failures']} inherited-F4 counter mismatches | Failed replay retained; affected "
-          "stage counters blocked from promotion |", "",
-          f"[Frozen synthesis data](../../{audit['source']}). {audit['reason']}", ""]
+          f"process {exploratory['complete_process_seconds']:.3f} s~~ | **Superseded** (rho had an empty "
+          f"table); not an improvement. {exploratory['correction']} |",
+          f"| Current-binary root-finder replay-all | current main (2026-10-19): "
+          f"{replay['current']['identical']}/{replay['current']['total']} identical; "
+          f"{replay['current']['failures']} mismatches across all four IC arms; the 2026-10-13 receipt "
+          f"recorded {replay['identical']}/{replay['total']} with {replay['failures']} inherited-F4 "
+          "mismatches | **Open regression** under investigation (sweep D, PR #2290); root-finder rows "
+          "are not claimed to pass; affected stage counters blocked from promotion. "
+          f"{replay['current']['correction']} |", "",
+          f"[Latest result data](../../{audit['source']}); "
+          f"[prior full synthesis](../../{audit['previous_source']}). {audit['reason']}", ""]
     for code in ("A", "B", "C"):
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
@@ -1087,8 +1294,8 @@ def markdown(doc: dict) -> str:
         if steps:
             L.append(f"- **Rho step:** {steps}")
         head = (["regime"] if multi else []) + ["curve", "log₂ r", "recipe", "S, IC", "S, reference",
-                                                "× reference", "S, floor", "× floor", "ok"]
-        align = (([":--"] if multi else []) + [":--", "--:", ":--", "--:", "--:", "--:", "--:", "--:", ":--"])
+                                                "× reference", "S, floor", "× floor", "ok", "validation"]
+        align = (([":--"] if multi else []) + [":--", "--:", ":--", "--:", "--:", "--:", "--:", "--:", ":--", ":--"])
         L += ["", "| " + " | ".join(head) + " |", "|" + "|".join(align) + "|"]
         for r in rows:
             b = r["best"]
@@ -1097,9 +1304,56 @@ def markdown(doc: dict) -> str:
                 f"**{times(b['ratio_rho'])}**" + (f" (was {times(b['ratio_rho_section23'])}, §23)"
                                                    if "ratio_rho_section23" in b else ""),
                 g3(r["floor_s"]), times(b["ratio_floor"]),
-                "✓" if b["verified"] else "✗"]
+                "✓" if b["verified"] else "✗", r["validation"]["status"]]
             L.append("| " + " | ".join(cells) + " |")
         L.append("")
+    D = doc["jv_sieve_weak_class"]
+    if D["comparison_status"] != "eligible":
+        L += ["## Table D: Joux-Vitse historical study, weak class only", "",
+              f"**Comparison withheld.** {D['scope']}", "",
+              "The archived report predates corrected hash accounting and executable control acceptance. "
+              "Its ratios, price-band rankings and exponent estimates are historical observations; "
+              "K1/K2 and exponent qualification are withheld. Interrupted-attempt costs are incomplete.", "",
+              f"[Review qualification](../../{D['qualification']}) · [Native analysis](../../{D['source']})", ""]
+        L += ["- " + reason for reason in D["comparison_blockers"]]
+        L += ["", "| p | R3 retained rows | recorded IC / rho correctness | comparison |",
+              "|--:|--:|:--|:--|"]
+        for row in D["rows"]:
+            L.append(f"| {row['p']} | {row['n_rho']} | {row['ic_all_correct']} / {row['rho_all_correct']} | withheld |")
+        L.append("")
+    else:
+        L += [f"## Table D: Joux-Vitse sieve on E(F_p^6), weak class only (outside tables A-C)", "",
+              f"**Scope: {D['scope']}**", "",
+              "- **Unit:** S = F_p multiplications / (331 * sqrt(l)), the harness unit of ledger 6 (331 = one affine "
+              "addition on E(F_q^3)); S+ also charges every F_p addition, lookup and native operation one multiplication.",
+              "- **Reference:** `rho.R3`, Pollard rho with the negation map, batched inversion (k = 16) and distinguished "
+              "points, on the same instances and host, priced in the harness unit and in a tuned unit "
+              "(Karatsuba products, Chung-Hasan squarings) that credits rho alone; 16 runs per size.",
+              f"- **Source:** [`{D['source']}`](../../{D['source']}). Class: {D['class']}.",
+              "- Ratios are paired by instance; intervals are 95% bootstrap over instances. "
+              "A ratio below 1 is the sieve cheaper; the gap to the strong rho is the distance remaining, not a gate.",
+              "", "| p | log2 l | S sieve | S+ sieve | S rho (harness / tuned) | S+ rho (harness / tuned) | "
+              "sieve/rho, S (harness) | sieve/rho, S (tuned) | sieve/rho, S+ (harness) | sieve/rho, S+ (tuned) | "
+              "ranked over the 5a band | ok |",
+              "|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|:--|"]
+        def ci(x, k="mean"):
+            return f"{x[k]:.4g} [{x['ci95'][0]:.4g}, {x['ci95'][1]:.4g}]"
+        def rc(x):
+            return f"{x['ratio']:.4g} [{x['ci95'][0]:.4g}, {x['ci95'][1]:.4g}]"
+        for r in D["rows"]:
+            io = r["ic_over_rho"]
+            L.append(f"| {r['p']} | {r['log2_l']:.1f} | {ci(r['ic_S'])} | {ci(r['ic_S_plus'])} | "
+                     f"{r['rho_S_harness']['mean']:.3f} / {r['rho_S_tuned']['mean']:.3f} | "
+                     f"{r['rho_S_plus_harness']['mean']:.3f} / {r['rho_S_plus_tuned']['mean']:.3f} | "
+                     f"{rc(io['S_harness'])} | {rc(io['S_tuned'])} | {rc(io['S_plus_harness'])} | {rc(io['S_plus_tuned'])} | "
+                     f"{'sieve below rho at every weight' if r['ranked_across_band'] else 'unresolved at some weight'} | "
+                     f"{'✓' if r['ic_all_correct'] and r['rho_all_correct'] else '✗'} |")
+        ex, er = D["exponent_ic"], D["exponent_rho_harness"]
+        L += ["", f"Fitted exponent of total F_p multiplications against l over the sizes above: sieve "
+              f"{ex['slope']:.3f} [{ex['ci95'][0]:.3f}, {ex['ci95'][1]:.3f}] (theory 1/3), strong rho "
+              f"{er['slope']:.3f} [{er['ci95'][0]:.3f}, {er['ci95'][1]:.3f}] (theory 1/2). "
+              f"Pre-registered kill rules: K1 fired at p = {D['K1_killed_at_p'] or 'none'}; "
+              f"K2 narrowed at p = {D['K2_narrowed_at_p'] or 'none'}.", ""]
     L += ["## Phases, as a share of S", "",
           "Shares are fractions of each row's own `S`, so they carry no unit; read each row in the "
           "table named in its first column.", "",
@@ -1270,6 +1524,78 @@ def markdown(doc: dict) -> str:
                      f"{a['folded_columns'] if a['folded_columns'] is not None else '—'} | {s_txt} | "
                      f"{qmd(q) if q else ('reference' if a['arm'] == 'rho-strong' else 'A/A control')} |")
         L.append(f"| `{c['curve']}` | {c['log2_r']:.2f} | K16 / K8 | — | — | — | — | {qmd(c['k16_over_k8'])} |")
+    L.append("")
+    la = doc["linear_algebra_component"]
+    L += ["## Linear-algebra engine, outside tables A–C", "",
+          "The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime "
+          "(class: engineering). Whole solve from relation rows to verified logarithms, median of 3 "
+          "seeds in one session; ratios are per-seed medians [min, max]. `legacy` is the filter tables "
+          "A–C were measured with; `CADO-style` is `FilterOptions::cado()` (CADO-NFS's purge and merge, "
+          "ported), the `ic logs` default since #1861; CADO-NFS ran its own purge + merge-dl + bwc on "
+          "the same matrices (+1 coefficients). Its share of S in every row above is in the phase table, "
+          f"and no row moves. Study: [{la['study']}](../../{la['study']}).", "",
+          "| columns | legacy | CADO-style | legacy / CADO-style | CADO-NFS | CADO-NFS / ours | core: legacy → CADO-style (CADO-NFS) |",
+          "|--:|--:|--:|:--|--:|:--|:--|"]
+
+    def lat(q):
+        return secs(q["median"])
+
+    def lar(q):
+        return f"{q['median']:.2f}× [{q['min']:.2f}, {q['max']:.2f}]"
+    for r in la["rows"]:
+        L.append(f"| {r['columns']:,} | {lat(r['legacy_s'])} | {lat(r['cado_style_s'])} | "
+                 f"{lar(r['legacy_over_cado_style'])} | {lat(r['cado_nfs_s'])} | {lar(r['cado_nfs_over_ours'])} | "
+                 f"{r['core_legacy']:,} → {r['core_cado_style']:,} ({r['core_cado_nfs']:,}) |")
+    L.append("")
+    pt = doc["pair_table_component"]
+    L += ["## Pair-table set-up, outside tables A–C", "",
+          f"The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on {pt['curve']}, "
+          "three builders of the same table (class: engineering). `scalar` is `mitm:negation_folded=1`, "
+          "one affine addition per pair into one hash map; `batched` is `mitm-prime-batch`, one batched "
+          "inversion per row; `blocked` is `mitm-prime-blocked`, the batched arithmetic inserted into "
+          "cache-sized packed regions. Every arm counts the same additions and recovers the same "
+          f"logarithm ({pt['identical_executions']}/{pt['executions']} executions identical), so S and "
+          "every row above are unchanged. Mean wall per run; ratios Σ blocked / Σ other over "
+          f"(target, round) pairs [per-pair min, max]; A/A {pt['aa_setup_ratio_sum']:.2f} "
+          f"[{pt['aa_setup_pair_ratio'][0]:.2f}, {pt['aa_setup_pair_ratio'][1]:.2f}]. "
+          f"Isolation {pt['isolation']}: descriptive. Study: [{pt['study']}](../../{pt['study']}).", "",
+          "| N | set-up scalar | set-up batched | set-up blocked | blocked / batched | blocked / scalar | whole run blocked / scalar | peak RSS batched → blocked |",
+          "|--:|--:|--:|--:|:--|:--|:--|:--|"]
+
+    def pts(ms):
+        return f"{ms:.0f} ms" if ms < 1000 else secs(ms / 1e3)
+
+    def ptr(q):
+        return f"{q['sum']:.2f} [{q['min']:.2f}, {q['max']:.2f}]"
+    for r in pt["rows"]:
+        L.append(f"| {r['N']:,} | {pts(r['setup_ms']['scalar'])} | {pts(r['setup_ms']['batch'])} | "
+                 f"{pts(r['setup_ms']['blocked'])} | {ptr(r['blocked_over_batch'])} | {ptr(r['blocked_over_scalar'])} | "
+                 f"{r['run_blocked_over_scalar']:.2f} | {r['rss_gib']['batch']:.2f} → {r['rss_gib']['blocked']:.2f} GiB |")
+    L.append("")
+    pl = doc["planner_component"]
+
+    def plq(a):
+        return f"{a['ops_ratio']:.3g} [{a['ci95'][0]:.3g}, {a['ci95'][1]:.3g}]"
+
+    def plcurve(r):
+        return f"`{r['curve']}`" if r["primary"] else f"{r['tag']} (supplementary)"
+    L += ["## Planner validation, outside tables A–C", "",
+          f"`ic plan` / `ic bench --auto` ({pl['planner']}) chooses every `ic.pipeline` stage of a prime-field run; "
+          "here its plan runs against every alternative one change away from it on six prime curves outside its "
+          "evidence (class: engineering). The plan is the existing best recipe, chosen automatically, so no row "
+          "above moves. Cells are S(alternative) / S(plan), ecbench `compare`, paired, cluster 95% interval, at "
+          "w = 0; the band column is the ratio at w = 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md §5a). "
+          "Supplementary curves are `prime_search` curves outside the registry, named by tag. "
+          f"Study: [{pl['study']}](../../{pl['study']}).", "",
+          "| curve | log₂ r | plan base | " + " | ".join(PLANNER_ARMS) + " | double base across the band | S(plan) / S(rho) measured | predicted |",
+          "|:--|--:|:--|" + ":--|" * len(PLANNER_ARMS) + ":--|:--|--:|"]
+    for r in pl["rows"]:
+        db = next(a for a in r["alternatives"] if a["arm"] == "double-base")
+        po = r["plan_over_rho"]
+        L.append(f"| {plcurve(r)} | {r['log2_r']:.2f} | `{r['plan']['factor_base']}` | "
+                 + " | ".join(plq(a) for a in r["alternatives"])
+                 + f" | {' / '.join(f'{x:.2f}' for x in db['band_ratio'])} ({db['verdict']}) | "
+                 f"{po['ratio']:.3g} [{po['ci95'][0]:.3g}, {po['ci95'][1]:.3g}] | {r['predicted_plan_over_rho']:.3g} |")
     L.append("")
     L += ["## Large-prime conductor-gap counted diagnostics", "",
           "Copied from native analysis: eight independent one-target workloads per fixed curve; "
@@ -1502,31 +1828,44 @@ def page(doc: dict, standalone: bool) -> str:
     admitted = audit["admitted_online"]
     exploratory = audit["exploratory_online"]
     replay = audit["replay_block"]
+    rho = audit["rho_optimization"]
     P.append(f'<section class="panel" id="frontier-audit"><h2>Latest frontier audit · '
-             f'{esc(audit["date"])} <span class="chip">accounting</span></h2>'
-             '<p>This synthesis is carried on the leaderboard even though it changes no ranked curve row. '
-             'Cold, retained-setup online, exploratory and failed-replay evidence remain separate.</p>'
+             f'{esc(audit["date"])} <span class="chip">implementation</span></h2>'
+             '<p>The standing rho implementation improved while its mathematical work and every ranked IC '
+             'row stayed fixed. Cold, retained-setup online, exploratory and failed-replay evidence remain separate.</p>'
              '<div class="scroll"><table><thead><tr><th>Boundary</th><th>Observed result</th>'
              '<th>Leaderboard treatment</th></tr></thead><tbody>'
+             '<tr><td>Standing strong-rho implementation</td>'
+             f'<td>complete-solve Callgrind: optimized / archived baseline '
+             f'{rho["optimized_over_archived_baseline"]:.6f}× and optimized / same-binary legacy '
+             f'{rho["optimized_over_same_binary_legacy"]:.6f}×; GAE {rho["ops_ratio"]:.3f} '
+             f'[{rho["ops_ci95"][0]:.3f}, {rho["ops_ci95"][1]:.3f}] over {rho["ops_pairs"]} pairs; '
+             f'{rho["replays_identical"]}/{rho["measured_replays"]} measured replays identical</td>'
+             f'<td>Implementation win; operation boundary unchanged. Native wall remained '
+             f'{esc(rho["wall_level"])} and is not admitted</td></tr>'
              '<tr><td>Canonical medium-tier Koblitz cold operations</td>'
              f'<td><code>{esc(acold["method"])}</code> / <code>{esc(acold["bound_id"])}</code>: '
              f'{acold["ops_over_floor"]:.3f}× floor [{acold["ops_ci95"][0]:.3f}, '
              f'{acold["ops_ci95"][1]:.3f}], {acold["runs"]} runs at {acold["sizes"]} sizes</td>'
              '<td>Standing rho boundary; not an IC row</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(admitted["label"])}</code></td>'
-             f'<td>rho/IC {admitted["rho_over_ic"]:.1f}× [{admitted["ci95"][0]:.1f}, '
+             f'<td><s>rho/IC {admitted["rho_over_ic"]:.1f}× [{admitted["ci95"][0]:.1f}, '
              f'{admitted["ci95"][1]:.1f}], {admitted["targets"]} unseen targets; about '
-             f'{admitted["setup_seconds_approx"]:.0f} s setup excluded</td>'
-             '<td>Admitted online result; separate from cold ranked rows</td></tr>'
+             f'{admitted["setup_seconds_approx"]:.0f} s setup excluded</s></td>'
+             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(admitted["correction"])}</td></tr>'
              f'<tr><td>Retained-setup online · <code>{esc(exploratory["label"])}</code></td>'
-             f'<td>rho/IC {exploratory["rho_over_ic"]:.6f}× on {exploratory["targets"]} public point; '
-             f'complete IC process {exploratory["complete_process_seconds"]:.3f} s</td>'
-             '<td>Exploratory shared-host result; no matched cold ratio and no rank promotion</td></tr>'
-             f'<tr><td>Current-binary root-finder replay-all</td><td>{replay["identical"]}/'
-             f'{replay["total"]} identical; {replay["failures"]} inherited-F4 counter mismatches</td>'
-             '<td>Failed replay retained; affected stage counters blocked from promotion</td></tr>'
+             f'<td><s>rho/IC {exploratory["rho_over_ic"]:.6f}× on {exploratory["targets"]} public point; '
+             f'complete IC process {exploratory["complete_process_seconds"]:.3f} s</s></td>'
+             f'<td><b>Superseded</b> (rho had an empty table); not an improvement. {esc(exploratory["correction"])}</td></tr>'
+             f'<tr><td>Current-binary root-finder replay-all</td><td>current main (2026-10-19): '
+             f'{replay["current"]["identical"]}/{replay["current"]["total"]} identical; '
+             f'{replay["current"]["failures"]} mismatches across all four IC arms; the 2026-10-13 receipt '
+             f'recorded {replay["identical"]}/{replay["total"]} with {replay["failures"]} inherited-F4 mismatches</td>'
+             '<td><b>Open regression</b> under investigation (sweep D, PR #2290); root-finder rows are not '
+             f'claimed to pass; affected stage counters blocked from promotion. {esc(replay["current"]["correction"])}</td></tr>'
              '</tbody></table></div>'
-             f'<p>{esc(audit["reason"])} {gh(audit["source"], "Frozen synthesis data")}.</p></section>')
+             f'<p>{esc(audit["reason"])} {gh(audit["source"], "Latest result data")} · '
+             f'{gh(audit["previous_source"], "prior full synthesis")}.</p></section>')
     d = doc["bounded_diagnostics"][0]
     P.append(f'<section class="card" id="bounded-n37-diagnostic"><h2>New n37 counted diagnostic, outside the priced tables</h2>'
              f'<p>On <code>{esc(d["curve"])}</code>, shared-rank K16 has {d["usable_points"]:,} actual usable '
@@ -1672,11 +2011,86 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td>{qhtml(c["k16_over_k8"])}</td></tr>')
     P.append('</tbody></table></section>')
 
+    la = doc["linear_algebra_component"]
+    P.append('<section class="card" id="linear-algebra-component"><h2>Linear-algebra engine, outside the priced tables</h2>'
+             '<p>The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime '
+             '(class: engineering). Whole solve from relation rows to verified logarithms, median of 3 seeds '
+             'in one session; ratios are per-seed medians [min, max]. <code>legacy</code> is the filter the '
+             'priced tables were measured with; <code>CADO-style</code> is CADO-NFS&#39;s purge and merge, '
+             'ported, the <code>ic logs</code> default; CADO-NFS ran its own pipeline on the same matrices. '
+             f'No row moves. <a href="https://github.com/aburan28/crypto/blob/main/{esc(la["study"])}">Study</a>.</p>')
+    P.append('<table><thead><tr><th class="n">Columns</th><th class="n">legacy</th><th class="n">CADO-style</th>'
+             '<th>legacy / CADO-style</th><th class="n">CADO-NFS</th><th>CADO-NFS / ours</th>'
+             '<th>Core: legacy → CADO-style (CADO-NFS)</th></tr></thead><tbody>')
+    for r in la["rows"]:
+        def lq(q):
+            return f'{q["median"]:.2f}× <span class="muted">[{q["min"]:.2f}, {q["max"]:.2f}]</span>'
+        P.append(f'<tr><td class="n">{r["columns"]:,}</td><td class="n">{secs(r["legacy_s"]["median"])}</td>'
+                 f'<td class="n">{secs(r["cado_style_s"]["median"])}</td><td>{lq(r["legacy_over_cado_style"])}</td>'
+                 f'<td class="n">{secs(r["cado_nfs_s"]["median"])}</td><td>{lq(r["cado_nfs_over_ours"])}</td>'
+                 f'<td>{r["core_legacy"]:,} → {r["core_cado_style"]:,} ({r["core_cado_nfs"]:,})</td></tr>')
+    P.append('</tbody></table></section>')
+    pt = doc["pair_table_component"]
+    P.append('<section class="card" id="pair-table-component"><h2>Pair-table set-up, outside the priced tables</h2>'
+             f'<p>The <code>ic.pipeline</code> oracle set-up (the negation-folded |F|² pair table) on '
+             f'<code>{esc(pt["curve"])}</code>, three builders of the same table (class: engineering): '
+             '<code>scalar</code> (<code>mitm:negation_folded=1</code>), <code>batched</code> '
+             '(<code>mitm-prime-batch</code>) and <code>blocked</code> (<code>mitm-prime-blocked</code>, '
+             'cache-sized packed regions). Every arm counts the same additions and recovers the same logarithm '
+             f'({pt["identical_executions"]}/{pt["executions"]} executions identical), so S and every row above '
+             'are unchanged. Mean wall per run; ratios Σ blocked / Σ other [per-pair min, max]; A/A '
+             f'{pt["aa_setup_ratio_sum"]:.2f} [{pt["aa_setup_pair_ratio"][0]:.2f}, {pt["aa_setup_pair_ratio"][1]:.2f}]. '
+             f'Isolation {esc(pt["isolation"])}: descriptive. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(pt["study"])}">Study</a>.</p>')
+    P.append('<table><thead><tr><th class="n">N</th><th class="n">scalar</th><th class="n">batched</th>'
+             '<th class="n">blocked</th><th>blocked / batched</th><th>blocked / scalar</th>'
+             '<th class="n">whole run blocked / scalar</th><th>peak RSS batched → blocked</th></tr></thead><tbody>')
+    for r in pt["rows"]:
+        def pq(q):
+            return f'{q["sum"]:.2f} <span class="muted">[{q["min"]:.2f}, {q["max"]:.2f}]</span>'
+
+        def pm(ms):
+            return f"{ms:.0f} ms" if ms < 1000 else secs(ms / 1e3)
+        P.append(f'<tr><td class="n">{r["N"]:,}</td><td class="n">{pm(r["setup_ms"]["scalar"])}</td>'
+                 f'<td class="n">{pm(r["setup_ms"]["batch"])}</td><td class="n">{pm(r["setup_ms"]["blocked"])}</td>'
+                 f'<td>{pq(r["blocked_over_batch"])}</td><td>{pq(r["blocked_over_scalar"])}</td>'
+                 f'<td class="n">{r["run_blocked_over_scalar"]:.2f}</td>'
+                 f'<td>{r["rss_gib"]["batch"]:.2f} → {r["rss_gib"]["blocked"]:.2f} GiB</td></tr>')
+    P.append('</tbody></table></section>')
+
+    pl = doc["planner_component"]
+    P.append('<section class="card" id="planner-validation"><h2>Planner validation, outside the priced tables</h2>'
+             f'<p><code>ic plan</code> / <code>ic bench --auto</code> ({esc(pl["planner"])}) chooses every '
+             '<code>ic.pipeline</code> stage of a prime-field run; here its plan runs against every alternative one '
+             'change away from it on six prime curves outside its evidence (class: engineering). The plan is the '
+             'existing best recipe, chosen automatically, so no row above moves. Cells are S(alternative) / S(plan), '
+             'ecbench <code>compare</code>, paired, cluster 95% interval, at w = 0; the band column is the doubled '
+             'base at w = 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md §5a). Supplementary curves are '
+             '<code>prime_search</code> curves outside the registry, named by tag. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(pl["study"])}">Study</a>.</p>')
+    P.append('<table><thead><tr><th>Curve</th><th class="n">log₂ r</th><th>plan base</th>'
+             + "".join(f"<th>{esc(a)}</th>" for a in PLANNER_ARMS)
+             + '<th>double base across the band</th><th>S(plan) / S(rho), measured</th>'
+               '<th class="n">predicted</th></tr></thead><tbody>')
+    for r in pl["rows"]:
+        def plh(a):
+            return f'{a["ops_ratio"]:.3g} <span class="muted">[{a["ci95"][0]:.3g}, {a["ci95"][1]:.3g}]</span>'
+        db = next(a for a in r["alternatives"] if a["arm"] == "double-base")
+        po = r["plan_over_rho"]
+        cname = f'<code>{esc(r["curve"])}</code>' if r["primary"] else f'{esc(r["tag"])} <span class="muted">(supplementary)</span>'
+        P.append(f'<tr><td>{cname}</td><td class="n">{r["log2_r"]:.2f}</td>'
+                 f'<td><code>{esc(r["plan"]["factor_base"])}</code></td>'
+                 + "".join(f"<td>{plh(a)}</td>" for a in r["alternatives"])
+                 + f'<td>{" / ".join(f"{x:.2f}" for x in db["band_ratio"])} <span class="muted">({esc(db["verdict"])})</span></td>'
+                 f'<td>{po["ratio"]:.3g} <span class="muted">[{po["ci95"][0]:.3g}, {po["ci95"][1]:.3g}]</span></td>'
+                 f'<td class="n">{r["predicted_plan_over_rho"]:.3g}</td></tr>')
+    P.append('</tbody></table></section>')
+
     head_cells = ('<th class="n">#</th><th>curve</th><th class="n">log₂ r</th><th>recipe</th>'
                   '<th class="n">m</th><th class="n">|F|</th><th class="n">K</th><th class="n">S, IC</th>'
                   '<th class="n">S, ref</th><th class="n">× ref</th><th class="n">S, floor</th>'
-                  '<th class="n">× floor</th><th>phases</th><th>ok</th>')
-    ncols = 14
+                  '<th class="n">× floor</th><th>phases</th><th>ok</th><th>validation</th>')
+    ncols = 15
 
     def board_rows(g: str) -> None:
         for i, r in enumerate(by_regime[g], 1):
@@ -1706,7 +2120,8 @@ def page(doc: dict, standalone: bool) -> str:
                      f'<td class="n">{b["columns"]:,}</td><td class="n">{g3(b["s"])}</td>'
                      f'<td class="n">{g3(r["reference_s"])}</td><td class="n"><span class="ratio">{times(b["ratio_rho"])}</span>{ci}</td>'
                      f'<td class="n">{g3(r["floor_s"])}</td><td class="n">{times(b["ratio_floor"])}</td><td>{phase_bar(b["phases_s"], b["s"])}</td>'
-                     f'<td>{"✓" if b["verified"] else "✗"}</td></tr>')
+                     f'<td>{"✓" if b["verified"] else "✗"}</td>'
+                     f'<td class="muted">{esc(r["validation"]["status"])}</td></tr>')
 
 
     def family_defs(code: str) -> str:
@@ -1771,6 +2186,52 @@ def page(doc: dict, standalone: bool) -> str:
              + family_defs("C"))
     family_table("C")
     P.append('</section>')
+
+
+    # Table D: the Joux-Vitse sieve, a weak class, against a strong rho.
+    D = doc["jv_sieve_weak_class"]
+    if D["comparison_status"] != "eligible":
+        P.append('<section class="panel" id="jv-sieve"><h2>Table D · Joux–Vitse historical study</h2>'
+                 f'<p><strong>Comparison withheld.</strong> {esc(D["scope"])}</p>'
+                 '<p>The archived report predates corrected hash accounting and executable control acceptance. '
+                 'Its ratios, price-band rankings and exponent estimates are historical observations; '
+                 'K1/K2 and exponent qualification are withheld. Interrupted-attempt costs are incomplete.</p>'
+                 f'<p><a href="{GITHUB}{D["qualification"]}">Review qualification</a> · '
+                 f'<a href="{GITHUB}{D["source"]}">Native analysis with explicit eligibility</a></p><ul>')
+        P.extend(f'<li>{esc(reason)}</li>' for reason in D["comparison_blockers"])
+        P.append('</ul></section>')
+    else:
+        P.append('<section class="panel" id="jv-sieve"><h2>Table D · Joux–Vitse sieve on E(F<sub>p⁶</sub>), '
+                 'weak class only <span class="chip">outside tables A–C</span></h2>'
+                 f'<p><strong>{esc(D["scope"])}</strong></p>'
+                 '<p>S = F<sub>p</sub> multiplications / (331·√ℓ), the harness unit; S⁺ also charges every F<sub>p</sub> '
+                 'addition, lookup and native operation one multiplication. Reference: Pollard rho with the negation '
+                 'map, batched inversion and distinguished points on the same instances, in the harness price and in '
+                 'a tuned price that credits rho alone. Ratios are paired by instance, intervals are 95% bootstrap; '
+                 'below 1 is the sieve cheaper, and the gap is a distance, not a gate.</p>'
+                 '<div class="scroll"><table><thead><tr><th class="n">p</th><th class="n">log₂ ℓ</th><th class="n">S sieve</th>'
+                 '<th class="n">S⁺ sieve</th><th class="n">S rho (harness / tuned)</th><th class="n">sieve/rho S (harness)</th>'
+                 '<th class="n">sieve/rho S (tuned)</th><th class="n">sieve/rho S⁺ (harness)</th>'
+                 '<th class="n">sieve/rho S⁺ (tuned)</th><th>§5a band</th></tr></thead><tbody>')
+        def _ci(x):
+            return f"{x['mean']:.4g} [{x['ci95'][0]:.3g}, {x['ci95'][1]:.3g}]"
+        def _rc(x):
+            return f"{x['ratio']:.4g} [{x['ci95'][0]:.3g}, {x['ci95'][1]:.3g}]"
+        for r in D["rows"]:
+            io = r["ic_over_rho"]
+            P.append(f'<tr><td class="n">{r["p"]}</td><td class="n">{r["log2_l"]:.1f}</td><td class="n">{_ci(r["ic_S"])}</td>'
+                     f'<td class="n">{_ci(r["ic_S_plus"])}</td>'
+                     f'<td class="n">{r["rho_S_harness"]["mean"]:.3f} / {r["rho_S_tuned"]["mean"]:.3f}</td>'
+                     f'<td class="n">{_rc(io["S_harness"])}</td><td class="n">{_rc(io["S_tuned"])}</td>'
+                     f'<td class="n">{_rc(io["S_plus_harness"])}</td><td class="n">{_rc(io["S_plus_tuned"])}</td>'
+                     f'<td>{"sieve below rho at every weight" if r["ranked_across_band"] else "unresolved at some weight"}</td></tr>')
+        ex, er = D["exponent_ic"], D["exponent_rho_harness"]
+        P.append('</tbody></table></div>'
+                 f'<p>Fitted exponent of total multiplications in ℓ: sieve {ex["slope"]:.3f} '
+                 f'[{ex["ci95"][0]:.3f}, {ex["ci95"][1]:.3f}] (theory 1/3); strong rho {er["slope"]:.3f} '
+                 f'[{er["ci95"][0]:.3f}, {er["ci95"][1]:.3f}] (theory 1/2). K1 fired at p = '
+                 f'{esc(str(D["K1_killed_at_p"] or "none"))}; K2 narrowed at p = {esc(str(D["K2_narrowed_at_p"] or "none"))}. '
+                 f'Source: <a href="{GITHUB}{D["source"]}">{esc(D["source"])}</a>.</p></section>')
 
     # Every recipe, every curve (the ladder).
     ladder = [r for r in board if r["regime"] in ("prime", "char2")]
@@ -2006,8 +2467,13 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--artifact", type=Path)
+    ap.add_argument("--allow-unvalidated", action="store_true",
+                    help="local build only: mark rows without a VALIDATION.json 'unvalidated' "
+                         "instead of refusing them (CI never passes this)")
     args = ap.parse_args()
-    doc = build()
+    if args.check and args.allow_unvalidated:
+        ap.error("--check never allows unvalidated rows")
+    doc = build(allow_unvalidated=args.allow_unvalidated)
     # Round only the JSON: rendering compares recipe rows by identity.
     outs = {OUT_JSON: json.dumps(stable(doc), indent=1, ensure_ascii=False) + "\n",
             OUT_MD: markdown(doc), OUT_HTML: page(doc, standalone=True)}

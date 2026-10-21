@@ -130,5 +130,85 @@ class Renderers(unittest.TestCase):
         self.assertEqual(j["kernels"]["x/new"]["series_ir"], [None, 7])
 
 
+def series(irs: list[int], fps: list[str] | None = None) -> list[dict]:
+    """Snapshots of one kernel `x/k` with the given Ir values, one per day."""
+    fps = fps or ["f"] * len(irs)
+    return [snap(chr(ord("a") + i), f"2026-10-{i + 1:02d}T00:00:00+00:00", [("x/k", "x", fp, ir)])
+            for i, (ir, fp) in enumerate(zip(irs, fps))]
+
+
+class Regressions(unittest.TestCase):
+    def test_flapping_between_two_levels_stays_quiet(self):
+        sc = perfhistory.step_changes(series([100, 107, 100, 107, 100, 107]), 0.08)
+        self.assertEqual(sc["regressions"], [])
+        self.assertEqual(sc["improvements"], [])
+
+    def test_rise_above_recent_max_is_flagged_against_that_max(self):
+        sc = perfhistory.step_changes(series([100, 107, 100, 120]), 0.08)
+        [r] = sc["regressions"]
+        self.assertEqual((r["id"], r["before"], r["previous"], r["after"]), ("x/k", 107, 100, 120))
+        self.assertAlmostEqual(r["ratio"], 120 / 107)
+
+    def test_drop_below_recent_min_is_an_improvement(self):
+        sc = perfhistory.step_changes(series([100, 95, 80]), 0.08)
+        self.assertEqual([r["before"] for r in sc["improvements"]], [95])
+
+    def test_window_stops_at_a_fingerprint_change(self):
+        # the old-fingerprint 200 must not hide a rise from 100 to 130
+        sc = perfhistory.step_changes(series([200, 100, 130], ["g", "f", "f"]), 0.08)
+        self.assertEqual([r["before"] for r in sc["regressions"]], [100])
+        sc = perfhistory.step_changes(series([100, 130], ["g", "f"]), 0.08)
+        self.assertEqual((sc["regressions"], sc["rebased"]), ([], ["x/k"]))
+
+    def test_markdown_never_claims_a_failure(self):
+        md = perfhistory.regressions_md(perfhistory.step_changes(series([100, 120]), 0.08), "http://h")
+        self.assertIn("| `x/k` | x | 100 | 120 | **+20.0 %** |", md)
+        self.assertIn("never a failing check", md)
+        self.assertIn("http://h", md)
+        self.assertIn("nothing to compare",
+                      perfhistory.regressions_md(perfhistory.step_changes(series([100]), 0.08), None))
+
+
+class FactorBases(unittest.TestCase):
+    def setUp(self):
+        def k(kid, ir, fb=None):
+            row = {"id": f"ic_factor_base/{kid}", "area": "ic_factor_base", "tier": "Quick", "fingerprint": "f",
+                   "ir": ir, "wall_ns": 1, "curve_label": "toy curve", "group_ops": 10}
+            if fb:
+                row["factor_base"] = fb
+            return row
+        s = snap("a", "2026-10-01T00:00:00+00:00", [("x/k", "x", "f", 1000)])
+        s["kernels"] += [k("rho", 1000),
+                         k("orbit", 5000, {"spec": "koblitz-orbit:divisor=0;1", "symmetry": "signed Frobenius",
+                                           "columns": 14, "signed_points": 443}),
+                         k("subspace", 4000, {"spec": "binary-subspace:dimension=4", "symmetry": "none",
+                                              "columns": 5, "signed_points": None})]
+        self.snaps = [s]
+        self.ch = perfhistory.chained(self.snaps, {})
+
+    def test_table_lists_symmetry_size_and_ratio_to_rho(self):
+        md = "\n".join(perfhistory.factor_base_md(self.snaps, self.ch, "fb.svg"))
+        self.assertIn("![factor bases](fb.svg)", md)
+        self.assertIn("| toy curve | `orbit` | `koblitz-orbit:divisor=0;1` | signed Frobenius | 14 | 443 | 5,000 |", md)
+        self.assertIn("| — | 4,000 | 10 | 4.0× |", md)
+        self.assertIn("| toy curve | `rho` | rho | — |", md)
+
+    def test_svg_is_well_formed_and_coloured_by_symmetry(self):
+        svg = perfhistory.svg_factor_bases(self.snaps, self.ch)
+        ET.fromstring(svg)
+        self.assertIn(perfhistory.SYMMETRY_COLORS["signed Frobenius"], svg)
+        self.assertIn("toy curve", svg)
+
+    def test_no_factor_bases_renders_nothing(self):
+        plain = [snap("a", "2026-10-01T00:00:00+00:00", [("x/k", "x", "f", 1000)])]
+        ch = perfhistory.chained(plain, {})
+        self.assertEqual((perfhistory.svg_factor_bases(plain, ch), perfhistory.factor_base_md(plain, ch, None)),
+                         ("", []))
+
+    def test_panels_svg_is_well_formed(self):
+        snaps = series([100, 107, 130])
+        ET.fromstring(perfhistory.svg_panels(snaps, perfhistory.chained(snaps, {})))
+
+
 if __name__ == "__main__":
     unittest.main()
