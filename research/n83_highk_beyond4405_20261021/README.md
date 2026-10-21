@@ -74,6 +74,11 @@ current 2026-10-21 cold-base fixtures and the merged branch's K5500 screen.
 The initial 33,368-point audit remains versioned; `fresh_exclusion_audit_v2.json`
 is the expanded current inventory. Answer sidecars are excluded from timed
 inputs. [PROTOCOL.md](PROTOCOL.md) fixes the comparison and promotion gates.
+`seal_dispatch.py` checks the source, candidate identities, independent base
+replay and fixture exclusion before writing the immutable `dispatch.json`.
+The dispatch pins the four arms, alternating screen blocks, one-target holdout,
+Tier 1 resource limits and proposed allocation ceiling. Its current status is
+`AWAITING_OWNER_BUDGET_APPROVAL`; it is a prepared experiment, not an allocation.
 
 The merged source release example suite passed 24/24 tests with Rust 1.93.1;
 its command and output are retained in `rust-example-tests-merged-source.log`.
