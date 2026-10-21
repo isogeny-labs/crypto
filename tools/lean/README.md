@@ -15,6 +15,13 @@ collects each theorem's **transitive** axioms. Only `propext`,
 `Classical.choice` and `Quot.sound` are accepted. A grep cannot do this
 check, because a `sorry` or axiom can be several imports away.
 
+The gate supplies the trust-manifest path to the audit program through
+`LEAN_AUDIT_TRUSTED_FILE`. This keeps its command-line arguments as module
+names, including under Lean 4.19, whose CLI rejects a `--trusted` argument
+after `--run`. CI installs each target's pinned toolchain before the proof
+step and retries only transient installation failures; an axiom or build
+failure remains a failure.
+
 | outcome | meaning |
 |:--|:--|
 | `ok` | kernel-checked on the standard foundations |

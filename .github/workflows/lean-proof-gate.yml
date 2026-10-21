@@ -45,8 +45,17 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install elan
         run: |
-          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain "$(cat tools/lean/lean-toolchain)"
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Install pinned Lean toolchain
+        run: |
+          version="$(cat tools/lean/lean-toolchain)"
+          for attempt in 1 2 3; do
+            if elan toolchain install "$version"; then break; fi
+            if [ "$attempt" -eq 3 ]; then exit 3; fi
+            sleep "$((attempt * 5))"
+          done
+          elan default "$version"
       - run: tools/lean/selftest/run.sh
 
   discover:
@@ -77,11 +86,23 @@ jobs:
         run: |
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Pin the toolchain for a standalone file
-        if: ${{ endsWith(matrix.target, '.lean') }}
+      - name: Install pinned Lean toolchain
+        env:
+          TARGET: ${{ matrix.target }}
         run: |
-          pin="$(dirname '${{ matrix.target }}')/lean-toolchain"
-          if [ -f "$pin" ]; then elan default "$(cat "$pin")"; else elan default "$(cat tools/lean/lean-toolchain)"; fi
+          if [ -d "$TARGET" ]; then
+            pin="$TARGET/lean-toolchain"
+          else
+            pin="$(dirname "$TARGET")/lean-toolchain"
+          fi
+          [ -f "$pin" ] || pin=tools/lean/lean-toolchain
+          version="$(cat "$pin")"
+          for attempt in 1 2 3; do
+            if elan toolchain install "$version"; then break; fi
+            if [ "$attempt" -eq 3 ]; then exit 3; fi
+            sleep "$((attempt * 5))"
+          done
+          elan default "$version"
       - name: Build and audit
         run: |
           set +e
