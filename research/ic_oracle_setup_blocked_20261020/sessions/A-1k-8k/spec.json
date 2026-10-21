@@ -1,0 +1,194 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "ic.pipeline oracle set-up: scalar vs batched vs cache-blocked pair table, |F| = 1k-8k, icv1-fp32-t7319-90da43e9",
+  "description": "research/ic_oracle_setup_blocked_20261020/PROTOCOL.md, session A. Same factor base, linalg and relation stream per size; only the table builder differs.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 4294967291,
+        "a": 4294967288,
+        "b": 31,
+        "group_order": 4294959973,
+        "r": 4294959973,
+        "gx": 2,
+        "gy": 2120051858
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261019
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "scalar-1024",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "batch-1024",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm-prime-batch:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "blocked-1024",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "scalar-2048",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2048",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "batch-2048",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2048",
+          "oracle": "mitm-prime-batch:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "blocked-2048",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2048",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "scalar-4096",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4096",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "batch-4096",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4096",
+          "oracle": "mitm-prime-batch:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "blocked-4096",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4096",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "scalar-8192",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=8192",
+          "oracle": "mitm:negation_folded=1",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "batch-8192",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=8192",
+          "oracle": "mitm-prime-batch:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "blocked-8192",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=8192",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "blocked-4096-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=4096",
+          "oracle": "mitm-prime-blocked:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261020,
+    "isolation_required": "L2",
+    "timeout_seconds": 3000
+  }
+}
