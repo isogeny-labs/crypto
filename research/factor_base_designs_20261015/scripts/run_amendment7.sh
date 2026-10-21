@@ -22,6 +22,13 @@ X2) arm=A11 t=5 ;;
 esac
 name="$cell-$arm-m4-t$t"
 mkdir -p "$out"
+# A rerun must use a fresh cell directory/prefix, preserving every old receipt.
+for previous in "$out/$name".*; do
+    if [ -e "$previous" ] || [ -L "$previous" ]; then
+        echo "evidence already exists for $name; choose a fresh output directory" >&2
+        exit 2
+    fi
+done
 pre="$out/$name.preflight.txt"
 
 # Pre-flight (Amendment 6, kept): MemTotal, the shell's memory cgroup limit
@@ -73,15 +80,27 @@ fi
     grep -m1 '^model name' /proc/cpuinfo
 } | tee "$pre"
 
-dmesg -c > /dev/null 2>&1 || true
+# Retain the kernel ring instead of clearing a host-wide diagnostic log.
+if ! dmesg > "$out/$name.dmesg-before.txt" 2> "$out/$name.dmesg-before.stderr.txt"; then
+    echo "capture_status failed" > "$out/$name.dmesg.txt"
+    echo "pre-flight: kernel log is unreadable; not running" >&2
+    exit 4
+fi
+capture_kernel() {
+    status=$?
+    trap - EXIT
+    if dmesg > "$out/$name.dmesg-after.txt" 2> "$out/$name.dmesg-after.stderr.txt"; then
+        { echo "capture_status ok"; cat "$out/$name.dmesg-after.txt"; } > "$out/$name.dmesg.txt"
+    else
+        echo "capture_status failed" > "$out/$name.dmesg.txt"
+        echo "post-run kernel capture failed; limit attribution is unverified" >&2
+        if [ "$status" -eq 0 ]; then status=4; fi
+    fi
+    exit "$status"
+}
+trap capture_kernel EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 "$bin" run --arms "$arm" --m 4 --t-min "$t" --t-max "$t" \
     --budget 14400 --grace 600 --vmem-kb "$v_kb" \
     --file "$cell-{arm}-m4-t$t" --out-dir "$out"
-
-# Attribution check (Amendment 6, kept): the kernel log's OOM lines, verbatim.
-oom=$(dmesg 2>/dev/null | grep -E 'invoked oom-killer|memory: usage|Memory cgroup out of memory|Out of memory' || true)
-if [ -n "$oom" ]; then
-    printf '%s\n' "$oom" > "$out/$name.dmesg.txt"
-else
-    echo "no kernel OOM lines for $name ($(date -u +%Y-%m-%dT%H:%M:%SZ))" > "$out/$name.dmesg.txt"
-fi
