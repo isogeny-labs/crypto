@@ -382,8 +382,18 @@ pub fn run_pipeline<G: CountedGroup>(
     } else {
         spec.linalg.as_str()
     };
+    // The loop's unknowns are the logs of `[h]P_v` (its rows read
+    // `Σ c·x − h·b·d = h·a`), so on a cofactor-`h` curve a known column
+    // log `s` enters as `h·s`; at `h = 1` this is the identity.
     let mut matrix: Box<dyn RelationSolver> = match &fb.known_logs {
-        Some(logs) => Box::new(KnownLogSolver::new(logs.clone(), ctx.r)),
+        Some(logs) => {
+            let h = ctx.cofactor % ctx.r;
+            let scaled = logs
+                .iter()
+                .map(|&s| ((s as u128 * h as u128) % ctx.r as u128) as u64)
+                .collect();
+            Box::new(KnownLogSolver::new(scaled, ctx.r))
+        }
         None => matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?,
     };
     let source = match spec.targets {
@@ -836,6 +846,51 @@ mod tests {
         assert_eq!(report.linear_algebra.work, 0);
         assert_eq!(report.linear_algebra.cost.get("row_ops"), 0);
         assert_eq!(report.linear_algebra.cost.group_ops.adds, 0);
+    }
+
+    /// **On a cofactor-16 curve** (E2's ladder, research/
+    /// generator_effect_ic_20261019) the random known-log base still
+    /// recovers the planted logarithm: the relation loop works in logs of
+    /// `[h]P`, and the solver is handed `h·s`, not `s`.
+    #[test]
+    fn known_log_random_scalars_recover_logs_on_a_cofactor_curve() {
+        use super::plugins::KnownLogBase;
+        use crate::cryptanalysis::ic_boundary::{PrimeCurve, PrimeInstance};
+        let inst = PrimeInstance {
+            name: "e2-h16".into(),
+            curve: PrimeCurve {
+                p: 8996849,
+                a: 8996846,
+                b: 4841786,
+            },
+            group_order: 8992336,
+            r: 562021,
+            cofactor: 16,
+            generator: (4890799, 2220468),
+        };
+        let mut scratch = GroupOps::default();
+        let g = inst.generator_point();
+        assert!(CountedGroup::mul(&inst.curve, &mut scratch, g, inst.r).infinity);
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let mut spec = known_log_spec(208);
+        spec.factor_base_params.set("scalars", "random");
+        for seed in [11, 12, 13] {
+            spec.seed = seed;
+            let mut oracle = MitmOracle::new(2);
+            let report = run_pipeline(
+                &ctx,
+                &spec,
+                &KnownLogBase,
+                &mut oracle,
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .expect("the configuration should run");
+            assert!(report.verified, "seed {seed}: not recovered");
+            assert_eq!(report.recovered, Some(planted));
+            assert_eq!(report.linear_algebra.cost.get("row_ops"), 0);
+        }
     }
 
     /// The base is a function of `G` and `B` alone: the same `G` gives the

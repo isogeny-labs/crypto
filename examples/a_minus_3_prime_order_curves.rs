@@ -1,20 +1,35 @@
-//! Find prime-order curves `y² = x³ − 3x + b` over `F_p` for the
-//! generator-effect study (research/generator_effect_ic_20261019).
+//! Find curves `y² = x³ − 3x + b` over `F_p` with `#E = h·r`, `r` prime,
+//! for the generator-effect study (research/generator_effect_ic_20261019).
 //!
-//! `cargo run --release --example a_minus_3_prime_order_curves -- BITS COUNT SEED [MIN_V2]`
+//! `cargo run --release --example a_minus_3_prime_order_curves -- BITS COUNT SEED [H] [MIN_V2]`
 //!
-//! With `MIN_V2`, only primes with `2^MIN_V2 | p − 1` are kept, so that the
-//! `prime-kummer` tower of height up to `MIN_V2` exists (experiment E3).
-//! The draws are those of the plain search, filtered: without the argument
-//! the output is unchanged.
+//! `H` selects the cofactor (default 1). `MIN_V2` filters for primes with
+//! `2^MIN_V2 | p − 1`, so that a `prime-kummer` tower of that height exists
+//! (experiment E3); it defaults to 0. The frozen E3 four-argument invocation
+//! ending in `6` remains an alias for `MIN_V2 = 6`; to request cofactor 6,
+//! pass `6 0`.
 //!
 //! Draws `p` with exactly `BITS` bits and `b` at random, keeps curves with
-//! prime `#E` (cofactor 1), and prints one `ecbench` `prime_explicit` curve
-//! per line.  The generator is the smallest-abscissa point, "the
-//! standard's G" of the plan; the order is counted by `prime_order`.
+//! `#E = H·r` for a prime `r > H` (default `H = 1`, prime `#E`), and prints
+//! one `ecbench` `prime_explicit` curve per line.  At `H = 1` the generator
+//! is the smallest-abscissa point, "the standard's G" of the plan, and the
+//! order is counted by `prime_order` (the E1 population, unchanged).  At
+//! `H > 1` (experiment E2's cofactor ladder) `#E` is the single multiple
+//! of a point's order in the Hasse interval, and the generator is `[H]P`
+//! for the smallest-abscissa `P` with `[H]P ≠ ∞`, of order `r`.
 use crypto_lib::cryptanalysis::challenge_ladder::is_prime_u64;
-use crypto_lib::cryptanalysis::ic_boundary::{PrimeCurve, PrimePoint};
+use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
 use rand::{rngs::StdRng, Rng, SeedableRng};
+
+fn generation_options(extra: &[u64]) -> (u64, u32) {
+    match extra {
+        [] => (1, 0),
+        // E3 froze this positional invocation before the cofactor option existed.
+        [6] => (1, 6),
+        [h] => (*h, 0),
+        [h, min_v2, ..] => (*h, *min_v2 as u32),
+    }
+}
 
 fn main() {
     let args: Vec<u64> = std::env::args()
@@ -22,7 +37,7 @@ fn main() {
         .map(|a| a.parse().expect("integer argument"))
         .collect();
     let (bits, count, seed) = (args[0] as u32, args[1] as usize, args[2]);
-    let min_v2 = args.get(3).copied().unwrap_or(0) as u32;
+    let (h, min_v2) = generation_options(args.get(3..).unwrap_or_default());
     let mut rng = StdRng::seed_from_u64(seed);
     let mut found = 0;
     while found < count {
@@ -40,21 +55,72 @@ fn main() {
         if disc == 0 {
             continue;
         }
-        let Some(r) = curve.prime_order() else {
-            continue;
+        let (order, r) = if h == 1 {
+            let Some(r) = curve.prime_order() else {
+                continue;
+            };
+            (r, r)
+        } else {
+            let Some(n) = hasse_order(&curve) else {
+                continue;
+            };
+            if n % h != 0 || n / h <= h || !is_prime_u64(n / h) {
+                continue;
+            }
+            (n, n / h)
         };
+        let mut ops = GroupOps::default();
         let g: PrimePoint = (0..p)
             .find_map(|x| {
                 let y = curve.sqrt(curve.rhs(x))?;
-                (curve.legendre(curve.rhs(x)) >= 0).then(|| PrimePoint::affine(x, y.min(p - y)))
+                let pt = PrimePoint::affine(x, y.min(p - y));
+                let g = curve.mul(&mut ops, pt, h);
+                (curve.legendre(curve.rhs(x)) >= 0 && !g.infinity).then_some(g)
             })
             .expect("a point");
         println!(
-            "{{\"kind\": \"prime_explicit\", \"p\": {p}, \"a\": {}, \"b\": {b}, \"group_order\": {r}, \"r\": {r}, \"gx\": {}, \"gy\": {}}}",
+            "{{\"kind\": \"prime_explicit\", \"p\": {p}, \"a\": {}, \"b\": {b}, \"group_order\": {order}, \"r\": {r}, \"gx\": {}, \"gy\": {}}}",
             p - 3,
             g.x,
             g.y
         );
         found += 1;
+    }
+}
+
+/// `#E(F_p)` as the one multiple of a point's order in the Hasse interval
+/// `[p+1−t, p+1+t]`, `t = ⌊2√p⌋`; `None` when the first point's order is
+/// small enough to leave several multiples there (the curve is skipped).
+fn hasse_order(curve: &PrimeCurve) -> Option<u64> {
+    let p = curve.p;
+    let pt = (0..p).find_map(|x| Some(PrimePoint::affine(x, curve.sqrt(curve.rhs(x))?)))?;
+    let t = (4 * p).isqrt();
+    let mut ops = GroupOps::default();
+    let mut acc = curve.mul(&mut ops, pt, p + 1 - t);
+    let mut hit = None;
+    for j in 0..=2 * t {
+        if acc.infinity {
+            if hit.is_some() {
+                return None;
+            }
+            hit = Some(p + 1 - t + j);
+        }
+        acc = curve.add(&mut ops, acc, pt);
+    }
+    hit
+}
+
+#[cfg(test)]
+mod tests {
+    use super::generation_options;
+
+    #[test]
+    fn cofactor_and_kummer_filter_options_keep_both_call_forms() {
+        assert_eq!(generation_options(&[]), (1, 0));
+        assert_eq!(generation_options(&[4]), (4, 0));
+        assert_eq!(generation_options(&[16]), (16, 0));
+        assert_eq!(generation_options(&[6]), (1, 6));
+        assert_eq!(generation_options(&[6, 0]), (6, 0));
+        assert_eq!(generation_options(&[4, 6]), (4, 6));
     }
 }
