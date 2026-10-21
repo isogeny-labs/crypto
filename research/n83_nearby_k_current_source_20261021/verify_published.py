@@ -234,6 +234,59 @@ def verify_selection(batch):
     return {"geometric_mean_probes": geom, "comparisons": comparisons}
 
 
+def verify_batch192_attempt():
+    root = HERE / "batch192_attempt"
+    directory = root / "k1107"
+    campaign, launch, receipt, guard = (
+        read_json(path) for path in
+        (root / "campaign.json", directory / "launch.json",
+         directory / "receipt.json", root / "host_resource_guard.json"))
+    check(campaign["target_count"] == 192 and
+          campaign["k_order"] == [1107, 1120, 1104] and
+          campaign["cap_seconds_per_child"] == 2400,
+          "batch192 frozen order or cap differs")
+    targets = read_rows(directory / "targets.jsonl")
+    public = read_rows(base.ROOT /
+                       "research/n83_highk_beyond4405_20261021/screen_targets.jsonl")
+    check(len(targets) == 192 and targets == public[:192] and
+          launch["target_sha256"] ==
+          digest((directory / "targets.jsonl").read_bytes()),
+          "batch192 public-point input differs")
+    check(launch["k"] == 1107 and
+          launch["command"][1] == "construct:83:1:1107" and
+          launch["source_sha256"] == base.SOURCE_SHA256 ==
+          base.sha256(base.SOURCE) and
+          launch["binary_sha256"] ==
+          read_json(base.HERE / "source_binary_custody.json")["binary_sha256"],
+          "batch192 source or binary differs")
+    expected_flags = {name: value for name, value in
+                      ic_environment(Path(launch["flags"]["KIC_DUMP_BASE"]).parent,
+                                     "root11_dynamic", "k1107_root11").items()
+                      if name.startswith("KIC_")}
+    check(launch["flags"] == expected_flags and launch["cap_seconds"] == 2400,
+          "batch192 flags or child cap differ")
+    check(receipt["status"] == "PROCESS_FAILED" and
+          receipt["exit_code"] == -15 and
+          receipt["base_dump_sha256"] is None and
+          guard["status"] == "STOPPED_HOST_STARTUP_DISK_GUARD" and
+          guard["signal"] == "SIGTERM" and
+          guard["receipt_sha256"] ==
+          digest((directory / "receipt.json").read_bytes()) and
+          guard["remaining_arms_not_launched"] == [1120, 1104],
+          "batch192 guard classification differs")
+    for key, filename in (("stdout_sha256", "stdout.jsonl"),
+                          ("stderr_sha256", "stderr.log"),
+                          ("target_result_sha256", "targets_result.jsonl")):
+        check(receipt[key] == digest((directory / filename).read_bytes()),
+              f"batch192 {filename} receipt differs")
+    check(not (root / "k1120").exists() and not (root / "k1104").exists(),
+          "batch192 unlaunched arms appeared")
+    return {"status": "STOPPED_HOST_STARTUP_DISK_GUARD",
+            "attempted_k": 1107, "target_count": 192,
+            "process_wall_seconds": receipt["wall_seconds"],
+            "remaining_arms_not_launched": [1120, 1104]}
+
+
 def replay():
     prior_replay = read_json(base.HERE /
                              "k1107_current_source_base/independent_replay.json")
@@ -256,6 +309,7 @@ def replay():
           archived_single["minimum_probes_on_this_point_k"] == 1120,
           "single-target summary differs")
     screen = verify_selection(batch)
+    batch192_attempt = verify_batch192_attempt()
     candidates, workloads, runs = identities.derive()
     identity_files = {
         **{f"candidate_{record['candidate_id']}.json": record
@@ -267,7 +321,7 @@ def replay():
     for filename, record in identity_files.items():
         check(read_json(identities.IDENTITIES / filename) == record,
               f"{filename} identity or measurement differs")
-    check(len(runs) == len({record["run_id"] for record in runs}) == 6,
+    check(len(runs) == len({record["run_id"] for record in runs}) == 7,
           "run IDs collide")
     return {"schema": "n83.nearby-k-current-source-published-replay/v1",
             "status": "PASS_PUBLISHED_REPLAY",
@@ -275,6 +329,7 @@ def replay():
             "source_sha256": base.SOURCE_SHA256,
             "single": [single[k] for k in ARMS],
             "batch": [batch[k] for k in ARMS],
+            "batch192_attempt": batch192_attempt,
             "candidate_ids": {k: value["candidate_id"] for
                               k, value in candidates.items()},
             "workload_ids": {kind: value["workload_id"] for

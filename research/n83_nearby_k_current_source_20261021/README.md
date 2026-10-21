@@ -28,7 +28,8 @@ Each process constructed its base and log system from empty process caches.
 | K1120 | `IC1N83Ckb1a1fb185920PDP4rootRCguidedLAgaussTDdirectISO0hc21c54dc0a94` |
 
 The one-target workload ID is `4dad9338d385`; the public-screen batch
-workload ID is `e558cc41c783`. K1107's earlier current-source one-target
+workload ID is `e558cc41c783`. The stopped 192-point public-screen
+extension has workload ID `9efc2cccff41`. K1107's earlier current-source one-target
 control is repetition `R1`, so its new one-target row is `R2`. The other
 rows are `R1`. The full `(candidate_id, workload_id, run_id)` keys and stage
 costs are in [measurement_rows.json](identities/measurement_rows.json).
@@ -76,6 +77,20 @@ substituted for individual one-target online intervals. The next performance
 comparison must pair these bases on frozen public points, resource limits,
 and same-point rho under an admitted Tier 1 envelope; high-K fixed31 and
 K5500 remain part of the wider N83 factor-base search.
+
+## Bounded 192-point extension
+
+A larger paired public-screen probe check was frozen with K1107, K1120,
+then K1104, at a 2,400-second cap per child. During the first child,
+startup-volume free space fell to 619 MiB while swap use reached
+20,303.44 MiB. The K1107 child was stopped with `SIGTERM` after
+202.168 seconds, before a base dump or target row was emitted; K1120 and
+K1104 were never launched. Its run row is
+`STOPPED_HOST_STARTUP_DISK_GUARD`, with all incomplete stage costs null.
+The [guard receipt](batch192_attempt/host_resource_guard.json) and the
+[frozen input and process receipts](batch192_attempt) preserve this attempt.
+The 16-point selector remains `BOUNDED_UNKNOWN` and the 192-point extension
+contributes no ranking data.
 
 ## Independent replay and custody
 

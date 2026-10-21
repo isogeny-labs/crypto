@@ -95,10 +95,13 @@ def workloads():
         "batch": ("first_16_public_highk_screen_points",
                   base.ROOT / "research/n83_highk_beyond4405_20261021/screen_answers.jsonl",
                   "one_cold_process_shared_factor_logs_16_targets"),
+        "batch192": ("first_192_public_highk_screen_points",
+                     base.ROOT / "research/n83_highk_beyond4405_20261021/screen_answers.jsonl",
+                     "one_cold_process_shared_factor_logs_192_targets"),
     }
     result = {}
     for kind, (law, answers_path, cache) in definitions.items():
-        directory = HERE / kind / "k1107"
+        directory = HERE / ("batch192_attempt" if kind == "batch192" else kind) / "k1107"
         input_name = "target.jsonl" if kind == "single" else "targets.jsonl"
         points = rows(directory / input_name)
         answers = rows(answers_path)[:len(points)]
@@ -186,6 +189,43 @@ def measurements(candidate_records, workload_records):
                 "replay_path": str((directory / "independent_replay.json").relative_to(HERE)),
             }
             result.append(record)
+    directory = HERE / "batch192_attempt/k1107"
+    launch, receipt, guard = (read(directory / filename) for filename in
+                              ("launch.json", "receipt.json",
+                               "../host_resource_guard.json"))
+    if (receipt["status"] != "PROCESS_FAILED" or
+            receipt["exit_code"] != -15 or
+            guard["status"] != "STOPPED_HOST_STARTUP_DISK_GUARD" or
+            guard["receipt_sha256"] != sha((directory / "receipt.json").read_bytes()) or
+            guard["remaining_arms_not_launched"] != [1120, 1104]):
+        raise ValueError("batch192 resource-guard receipt differs")
+    candidate_id = candidate_records[1107]["candidate_id"]
+    workload_id = workload_records["batch192"]["workload_id"]
+    result.append({
+        "schema": "ic1.empirical_run/v1",
+        "candidate_id": candidate_id,
+        "workload_id": workload_id,
+        "run_id": f"{candidate_id}W{workload_id}R1",
+        "run_number": 1,
+        "status": "STOPPED_HOST_STARTUP_DISK_GUARD",
+        "hardware_tier": "ordinary_shared_host_diagnostic",
+        "source_sha256": launch["source_sha256"],
+        "binary_sha256": launch["binary_sha256"],
+        "target_count": 192,
+        "exit_code": -15,
+        "process_wall_seconds": receipt["wall_seconds"],
+        "actual_usable_points": None,
+        "folded_columns": None,
+        "rank": None,
+        "probes_by_target": None,
+        "online_ms_by_target": None,
+        "one_target_online_ms": None,
+        "cold_process_ms": None,
+        "paired_rho_online_ms": None,
+        "online_speedup": None,
+        "receipt_path": str((directory / "receipt.json").relative_to(HERE)),
+        "guard_path": str((HERE / "batch192_attempt/host_resource_guard.json").relative_to(HERE)),
+    })
     return result
 
 
