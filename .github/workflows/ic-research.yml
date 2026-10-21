@@ -33,6 +33,8 @@ jobs:
         run: cargo build --release --bin ic
       - name: Parameter and synthetic pipeline checks
         run: cargo test --release --test ic_framework --test ic_progress
+      - name: Bench CLI argument and planner checks
+        run: cargo test --release --bin ic bench::tests
       - name: Archive import, row replay and frozen protocol checks
         run: cargo test --release --lib ic_framework::archive::tests
       - name: Inspect supplied example documents
