@@ -176,6 +176,26 @@
      "class": "accounting",
      "anchor": "#lab-volcano-ic",
      "source": "https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json"
+    },
+    {
+     "anchor": "#ic-tool-programme-20261001",
+     "class": "accounting",
+     "date": "2026-10-20",
+     "detail": "Rule v8: ledger section 23's six sizes (2^36.6-2^47.2, 64 public points and four A/A repeats a size, 408/408 rows checked in each of two runs of one binary) against a matched rho, the signed-Frobenius walk with its canonicalisation batched 16 lanes at a time by GFNI and funnel shifts; the control run, the same binary with rho as at rule v7, reads 3.59-11.56x. With the reusable set-up charged the index calculus costs 4.67-18.07x rho cold: 4.669x [4.34, 5.07] at 2^36.6, 18.07x [15.98, 20.58] at 2^47.2. Rho is still faster at every size. The two rho arms take identical walks on 64/64 targets a size; the index calculus's own online time is the same in both runs (0.976-1.033). The distance to rho is larger than rule v7 reported because rho was unmatched, not because the index calculus slowed; the ln-ln slope is 0.168 (t interval 0.128-0.208; rule v3: 0.176), not distinguishable from v3's. No curve with log2 r >= 50 is runnable by this single-word pipeline. Class: accounting (a corrected reference); the batched rho kernel is engineering; no advance.",
+     "label": "Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md",
+     "value": 4.669
+    },
+    {
+     "anchor": "#lab-planner-validation",
+     "class": "engineering",
+     "date": "2026-10-21",
+     "detail": "ic plan / ic bench --auto (ic-planner/1) checked on six prime curves outside its evidence, each plan against every alternative one change away from it (ecbench, 24 verified runs per arm and curve, audits OK). Best cold one-target cell on a registered curve: icv1-fp24-tm5099-a6f137c6 (log2 r 24.00), S(plan)/S(rho.negation) 14.39 [11.63, 18.45], planner prediction 12.23. Rho is cheaper on all six curves (12.6-25.8x). At w = 0 every alternative costs more than the plan; the doubled base is not separated across the band (below 1 at w = 1). Tooling validation: the plan is the existing best recipe chosen automatically; no advance, no leaderboard row moves.",
+     "label": "Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md",
+     "value": 14.39
     }
    ],
    "role": "emphasis"
@@ -750,26 +770,6 @@
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/docs/index-calculus-scoreboard.html#genus-crossover",
      "value": 0.24
-    },
-    {
-     "anchor": "#genus-crossover",
-     "class": "accounting",
-     "date": "2026-10-20",
-     "detail": "Re-priced in bitop/v1 (an accounting convention, not a physical gate count) with both arms counted at the field, mod-N, hash and word level against a full-width rho walk, on round seven's 18 rows: genus 4, p = 61, N = 16,790,591 reads 0.114 [0.096, 0.138] (95% bootstrap; was 0.24 in-situ against an 8-bit walk). Genus-4 slope of log2(IC/rho) on log2 N: -0.232 [-0.320, -0.082] (round seven in-situ -0.29 [-0.42, -0.16]). No algorithm change.",
-     "label": "bitop/v1 re-pricing: both arms counted, full-width rho",
-     "reference": "matched",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/hec_bitop_20261020/README.md",
-     "value": 0.114
-    },
-    {
-     "anchor": "#genus-crossover",
-     "class": "accounting",
-     "date": "2026-10-21",
-     "detail": "Applies the self-check policy by excluding operand re-validation: IC/rho = 0.131701 (0.132 rounded), a point estimate with no new interval. The prior total-work result remains 0.114 [0.096, 0.138] (95% bootstrap); that interval is not an interval for the policy-adjusted value. No algorithm changed.",
-     "label": "bitop/v1 with self-check policy: operand re-validation excluded",
-     "reference": "matched",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_acct4_inversion_20261021/README.md",
-     "value": 0.13170129518508364
     }
    ],
    "role": "context"

@@ -1,0 +1,61 @@
+name: audit-runs-daily
+
+# Daily re-audit of finished runbook and ecbench sessions (AGENTS.md, "Validation
+# gate"; skill .claude/skills/audit-runs).  A nonce drawn at run time picks the
+# sessions, so what is looked at today cannot be arranged in advance; the nonce
+# is in the report so a failure can be reproduced with --nonce.
+#
+# Each sampled ecbench session gets the digest checks (plan, host, records) and
+# an `ecbench verify --replay` of a few nonce-chosen runs; each sampled
+# VALIDATION.json directory is re-checked in full (pinned hashes, recomputed
+# headline numbers, matched rho band).  A hosted runner is a shared VM: the
+# replay checks counts and answers, never wall time.  The exhaustive weekly lane
+# stays in ecbench.yml.
+#
+# If this cannot run (no runner budget, a binary that will not build on a hosted
+# runner), the scheduled-task alternative in .claude/skills/audit-runs/SKILL.md
+# runs the same script.
+
+on:
+  schedule:
+    - cron: '41 5 * * *'
+  workflow_dispatch:
+    inputs:
+      sample:
+        description: 'sessions to sample'
+        default: '8'
+      nonce:
+        description: 'hex nonce to reproduce an earlier run (empty: draw one)'
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audit-runs-daily
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release --bin ecbench
+      - name: Nonce-sampled digest checks and replays
+        run: |
+          python3 scripts/audit_runs.py \
+            --sample "${{ inputs.sample || '8' }}" \
+            ${{ inputs.nonce && format('--nonce {0}', inputs.nonce) || '' }} \
+            --ecbench ./target/release/ecbench --replay 4 \
+            --out "$RUNNER_TEMP/audit-runs.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-runs-report
+          path: ${{ runner.temp }}/audit-runs.json
