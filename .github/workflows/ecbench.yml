@@ -380,7 +380,7 @@ jobs:
           ./target/release/ecbench table --dir "$RUNNER_TEMP/prime" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Database loads, twice, strictly
         run: |
-          command -v sqlite3 >/dev/null || sudo apt-get install -y -qq sqlite3
+          command -v sqlite3 >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq sqlite3; }
           for _ in 1 2; do ./target/release/ecbench db sql "$RUNNER_TEMP/prime" | sqlite3 -bail "$RUNNER_TEMP/ecbench.db"; done
           test "$(sqlite3 "$RUNNER_TEMP/ecbench.db" 'select count(*) from runs')" = 72
       - name: A vs_rho claim builds, loads, and fails closed at L0
