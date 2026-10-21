@@ -1,6 +1,6 @@
 //! AES (Advanced Encryption Standard) — FIPS 197, implemented from scratch.
 //!
-//! Supports AES-128 and AES-256 block encryption/decryption.
+//! Supports AES-128, AES-192, and AES-256 block encryption/decryption.
 //! CTR streaming mode is built on top of the block cipher.
 //! GCM authenticated encryption is provided via GHASH over GF(2¹²⁸).
 //!
