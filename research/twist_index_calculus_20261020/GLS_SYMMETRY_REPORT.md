@@ -19,7 +19,7 @@ controls. It does **not** execute a Semaev polynomial-system solver.
 | Twist symmetry on a subgroup where it genuinely acts | [Frozen GLS protocol](GLS_SYMMETRY_PROTOCOL.md), [v1 raw](gls_symmetry_results_v1.ndjson), [v2 raw](gls_symmetry_results_v2.ndjson): three curves, three physical base sizes, three target scalars, two IC arms and rho. Executed. |
 | Relation yield and orbit quotient | All 9 exact censuses, independently replayed; witness orbit and row covariance checked on every signed width-three triple. Executed. |
 | One-target full solve, cost, rho | 54 IC solves and 27 matched rho solves; all scalars independently verified. Counter and L0 timing diagnostics only. A calibrated whole-method speed comparison remains open. |
-| Polynomial relation finder and asymptotic cryptanalytic claim | Open. Exact group meet-in-middle relation search does not measure Gröbner/Semaev solving, descent complexity at large security sizes, or an external fastest implementation. |
+| Polynomial relation finder and asymptotic cryptanalytic claim | S3 scaling and global Frobenius identity proved and checked, with a counterexample to independent factor conjugation. Gröbner/Semaev solving, descent complexity at large security sizes, and an external fastest implementation remain open. |
 
 ## Geometry and the mechanism
 
@@ -43,6 +43,37 @@ physical points. This is a valid column reduction only because the DLP
 target, base points and relation sums all lie in the same invariant subgroup.
 The factor-orbit validator rejects a deliberately corrupted partner in
 all 9 negative controls.
+
+## Semaev-coordinate symmetry and its limit
+
+Write `X=x/c`. The same GLS action on an abscissa becomes ordinary
+`p`-Frobenius:
+
+`psi(x)/c = alpha² x^p/c = (x/c)^p`.
+
+For the explicit third Semaev polynomial `S3` used by the repository's
+[`line_oracle.rs`](../../src/cryptanalysis/line_oracle.rs), every term has
+twist-scaling weight four. With `A=a c²`, `B=b c³`, direct substitution
+gives the polynomial identity
+
+`S3_(A,B)(c X1,c X2,c X3) = c⁴ S3_(a,b)(X1,X2,X3)`.
+
+The right-hand polynomial has coefficients in `Fp`, so conjugating
+**all** `X_i` sends a zero to a zero. This is a genuine global symmetry
+of an abscissa relation system. The change `x↔X` is invertible and does
+not lower its degree by itself. It also does not license conjugating one
+factor variable while leaving the others and the target fixed.
+
+The independent [finite-field check](verify_gls_semaev_scaling.py) verifies
+the scaling and global Frobenius identities on 128 deterministic arbitrary
+triples per study field and constructs an actual distinct-point relation
+`G+[2]G−[3]G=O` on each twist. In the `p=211` field with `u²=2`, its
+scaled abscissas are `(8,207),(134,66),(205,3)`; `S3` is zero, but
+conjugating only the first abscissa yields `(136,208)≠0`. The exact
+[three-curve record](gls_semaev_scaling_v1.json) has the other two
+counterexamples. This settles the permitted symmetry of the small
+polynomial relation equation; it does **not** measure Gröbner solve time,
+system degree after descent, or polynomial relation yield.
 
 The exact group relation search is identical in the flat and folded arms.
 Hence **raw relation yield cannot improve from row folding alone**. This is
@@ -95,6 +126,68 @@ witness orbit span only one row. A source-linked
 checks the subgroup premise `lambda²+1=0`. This rules out the specific
 idea of getting four independent folded equations for one relation-search
 success.
+
+## Equal unknown-column budget: a post hoc relation-yield comparison
+
+The fixed-physical-base comparison above holds the oracle's search space
+constant. There is a second, practically relevant question: with **12
+unknown factor logarithms**, should one search on 12 physical points with
+independent log columns or on 12 complete `psi` orbits (24 physical
+points)? The sealed flat `B=12` base contained only six orbits, so I ran a
+stronger **orbit-distinct flat control**: one representative from each of
+the same 12 orbits used by folded `B=24`. It uses the same curve, selected
+orbits, target scalars, signed width-three oracle, stopping rule, and
+12-column matrix. The flat control charges the full 24-point orbit scan
+and geometry check, then builds its pair table over 12 representatives;
+the folded arm additionally charges eigenvalue identification. This
+comparison was formulated **after** the original run and is descriptive.
+The exact build commands, toolchain, hashes, A/A comparison, and limitations
+are in the [equal-column run receipt](GLS_EQUAL_COLUMNS_RUN.md).
+
+The new [native control](gls_distinct_control.rs) retains the v2 group
+arithmetic and emits [raw records](gls_distinct_control_v1.ndjson). A
+separately written [native verifier](gls_distinct_verify.rs), using the
+independent group law from the main verifier, recomputes its base,
+all signed triples and their scalar identities, target coverage, row rank,
+collection stopping query,
+descent query counts, and nine recovered scalars. The
+[paired audit](audit_gls_equal_columns.py) checks each control target
+against folded v2 and regenerates the [six-row CSV](gls_equal_columns_v2.csv),
+which also retains the original paired-flat comparison as a sensitivity.
+
+| `p` | Columns both arms | Covered targets flat12 → fold24 | Raw nonzero witnesses flat12 → fold24 | Queries to rank flat12 → fold24 | Cold `Fp²` multiplications flat12 → fold24 | Flat/fold cold `M` |
+| ---: | ---: | :---: | :---: | :---: | :---: | ---: |
+| 101 | 12 | 398 → 400 | 1,758 → 16,152 | 7 → 1 | 14,259 → 16,565 | 0.861 |
+| 211 | 12 | 1,658 → 13,708 | 1,760 → 16,192 | 860 → 37 | 115,865 → 56,704 | 2.043 |
+| 307 | 12 | 504 → 508 | 1,754 → 16,160 | 5 → 1 | 98,842 → 101,253 | 0.976 |
+
+![Equal-column coverage and cold count by curve](gls_equal_columns_v2.svg)
+
+At `p=211`, coverage rises from 3.75% to 31.00% of the nonzero subgroup
+(8.27-fold), and the sequential collection reaches
+rank after 23.24 times fewer generator queries, while the cold counted
+`Fp²` multiplication total falls by a factor of 2.043. The formal
+`M+w·extras` diagnostic gives flat/fold ratios 2.088 at `w=0.1` and
+2.431 at `w=1`; median group additions are 23,347 versus 3,615. At
+`p=101,307`, coverage was already saturated or nearly so, and the extra
+physical base/table setup makes the counted cold total worse (ratios below
+one). The original paired-flat sensitivity also favors folding on
+`p=211` (cold multiplication ratio 1.948), so the positive count result
+does not depend on choosing either of those two flat bases. The distinct
+control ran separately on an L0 shared host; its wall ratios are not
+isolated speed measurements. At `p=211,B=24`, the matched rho
+median still records fewer `Fp²` multiplications (49,362) than the folded
+IC median (56,704).
+
+The roughly 9.2-fold increase in **raw witnesses over all targets** is
+explained by the larger signed-triple search space:
+`8·choose(24,3) / (8·choose(12,3)) = 9.2`. Almost every candidate triple
+sums to a nonzero group point in these cells. The twist symmetry makes this
+larger physical base compatible with the *same 12 log unknowns*; it does
+not increase the success probability of an individual triple at fixed
+physical base. A real polynomial relation finder may pay different costs
+for the extra factors, so this exact-oracle advantage does not establish
+a polynomial-solver or cryptographic-size speedup.
 
 ## Cold one-target results
 
@@ -196,10 +289,10 @@ to large `r` on the basis of this code.
 | --- | --- | --- |
 | Mixed components on `E0(Fp²)` for an `E0(Fp)` target | More candidate abscissas | [Projection proof and exhaustive controls](MIXED_REPORT.md) show the anti-invariant contribution vanishes on the odd-order rational component. No independent rational-target log columns arise under those hypotheses. |
 | Attack a twist-group target directly | Twist points become legitimate factors | This GLS panel implements the direct subgroup case and finds order-four orbit folding. Relation yield is unchanged at fixed physical base. |
-| Twist-induced Frobenius factor-base orbits | Fewer unknown logs and rows needed for rank | Validated exactly in all 9 census cells and 54 IC solves; cold count benefit varies with base cost and relation density. |
+| Twist-induced Frobenius factor-base orbits | Fewer unknown logs and rows needed for rank; more physical candidates at fixed log-column budget | Validated exactly in all 9 census cells and 54 IC solves. The post hoc equal-column comparison gains coverage and cold counted cost on sparse `p=211`, but loses counted cost on the two saturated cells. |
 | Lift every relation through the automorphism | Four relations from one search hit | Every signed witness has four conjugates, but the four folded augmented rows are scalar multiples; no extra folded rank. Independent exhaustive audit and identity certificate. |
 | Quotient relation-search target orbits | Avoid repeat polynomial solves on equivalent targets | Only 15/829 and 2/254 repeats in the sparse `p=211,B=12` sequential prefixes. A phase-aware, orbit-scheduled solver remains to be implemented; the current count is only an upper bound on avoidable repeated queries. |
-| Invariant Semaev polynomial system | Smaller Gröbner basis or fewer solver branches | Mathematically plausible only if the transformed target and factor-base constraints are tracked consistently. The exact group oracle does not implement or cost this; separate system-size, solve-time, success-probability and descent tests are required. |
+| Invariant Semaev polynomial system | Global Frobenius orbit of polynomial solutions after `X=x/c` scaling | The exact S3 scaling identity and three finite-field counterexamples establish the permitted simultaneous action; single-factor conjugation fails. No smaller Gröbner basis, faster solver, or improved polynomial relation probability has been measured. |
 | Isogeny transport to a twist model | Move a DLP into a subgroup with the useful symmetry | Needs an explicit computable map, subgroup order compatibility, kernel exclusion and map cost. The earlier [isogeny control](REPORT.md) covers one small case, not a general bridge. |
 | Extra automorphisms (`j=0,1728`) or higher-degree Frobenius | Larger orbit quotient | Requires the actual subgroup scalar action and a compatible factor base; special automorphisms can also help rho, so the same-target baseline must use them. Not tested here. |
 | Weil descent or trace-zero representation | A lower-dimensional polynomial system over a subfield | Separate extension-degree and target-family assumptions; no inference from this quadratic GLS panel. |
@@ -223,7 +316,9 @@ lemmas are formalized in [GLSSymmetry.lean](GLSSymmetry.lean), pinned by
 `fold_relation_pair` prints no axioms. The Lean file assumes the group
 action laws and eigenvalue premise; it does **not** formalize the
 particular `Fp²` curve, nonsquare criterion, `psi²=-1` derivation or
-rank/cost conclusion. The full concrete formal theorem remains open.
+rank/cost conclusion. The S3 scaling identity is proved above by term
+weights and checked in finite fields, but is not formalized in Lean. The
+full concrete formal theorem remains open.
 
 Reproduce with `rustc -D warnings -O` on
 [producer v2](gls_symmetry_ic.rs),
