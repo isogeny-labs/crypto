@@ -69,7 +69,9 @@ earlier public point: final rank 1,107, independently replayed four-point
 relation and scalar, 128.914-second local process wall time, 334.808 ms
 exclusive target interval, and 1.933 GB peak child RSS. This is a correctness
 and source-bridge result; its Tier 1 sealed same-point comparison remains
-pending. The raw and replay receipts are in `k1107_current_source_full_control/`.
+pending. The current-source K1107 IC1 candidate identity is
+`IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hf1851768e85a`.
+The raw and replay receipts are in `k1107_current_source_full_control/`.
 The current source also reproduced the historical K3596 root4 ordered base
 byte for byte, with fresh independent arithmetic replay of all 596,936 usable
 points; see `K3596_CURRENT_SOURCE.md`. Its full current-source index and target
@@ -119,11 +121,15 @@ deadline, then seals an archive with the raw child receipts and build logs.
 with the independent N83 group model, checks exact base/rank/index and phase
 accounting, preserves failed child rows, checks the Pod envelope and rho A/A
 noise, and emits the validated matrix consumed by `select.py`.
-`holdout.py` schedules the selected base against same-point rho, placing
-preregistered point 0 first and alternating IC/rho order across 16 individual
-points. `verify_holdout.py` independently replays every answer and produces
-the point-0 online wall-time ratio only when its Tier 1, resource, noise and
-correctness gates pass. The Pod launcher runs this phase only after the
+`holdout.py` schedules the selected base and current-source K1107 against
+separate same-point rho controls on each of the 16 individual sealed points.
+It places preregistered point 0 first and alternates candidate and IC/rho
+order. `verify_holdout.py` independently replays every answer and produces
+the point-0 cross-family online wall-time ratio only when both Tier 1,
+resource, noise and correctness gates pass. Its 16-point paired selector
+retains `BOUNDED_UNKNOWN` for incomplete or conflicting evidence. The
+[cross-family addendum](K1107_CROSS_FAMILY_ADDENDUM.md) freezes its event
+order and selection rule. The Pod launcher runs this phase only after the
 screen selector admits a unique fixed31 base and time remains before the
 provider deadline.
 `select.py` admits a fixed31 winner only from a complete independently replayed

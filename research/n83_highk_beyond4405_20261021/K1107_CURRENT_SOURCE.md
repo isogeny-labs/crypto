@@ -42,10 +42,19 @@ probes. The raw child wall interval was 128.9140485 seconds with
 1,933,492,224 bytes peak child RSS; the producer's exclusive target interval
 was 334.80775 ms. These are local shared-host diagnostics.
 
+The canonical current-source candidate is
+`IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hf1851768e85a`.
+Its [manifest](identities/candidate_IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0hf1851768e85a.json)
+has SHA-256
+`67cbd5d4f12ab5bfe703714ab66f0c779b5d708aaa79a6399b13d4217b4f9176`.
+`derive_k1107_candidate.py` checks the earlier manifest, current source file
+at commit `3ce5b531cacb1363c6bf1c8a2c4277bf534046d1`, unchanged factor-base
+set and ordered dump, and canonical candidate hash before writing it.
+
 The independent N83 group replay checked every factor-base point and label,
 the exact ordered base and set digests, all four relation points, the target
 subgroup, recovered scalar, final rank, root11 flags, and the five exclusive
-target phases. All 15 checks passed with status
+target phases. All 17 checks passed with status
 `PASS_INDEPENDENT_FULL_REPLAY`. The full-process base dump is byte-identical
 to the compressed ordered dump above, so the versioned artifact directory
 retains the smaller launch, process, target and replay receipts while the raw

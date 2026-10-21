@@ -10,6 +10,7 @@ from pathlib import Path
 
 from research.n83_highk_beyond4405_20261021 import run_k1107_base_stage as base
 from research.n83_highk_beyond4405_20261021 import run_k1107_full_control as control
+from research.n83_highk_beyond4405_20261021 import derive_k1107_candidate as identity
 from research.n83_indexed5_20261013 import analyze as group
 
 BASE_DUMP_SHA256 = "08608f6ad2b8c66510246348933740c78d0937cae783d521514f467940edc3dc"
@@ -22,6 +23,10 @@ def verify(output: Path, base_path: Path | None = None) -> dict:
     summary = json.loads((output / "stdout.jsonl").read_text())
     result = json.loads((output / "targets_result.jsonl").read_text())
     target = json.loads((output / "target.jsonl").read_text())
+    candidate = identity.derive()
+    candidate_path = base.HERE / "identities" / f"candidate_{candidate['candidate_id']}.json"
+    if json.loads(candidate_path.read_text()) != candidate:
+        raise ValueError("current K1107 candidate manifest differs")
     public = json.loads(control.PUBLIC.read_text().splitlines()[0])
     answer = json.loads(control.ANSWERS.read_text().splitlines()[0])
     point = group.point_from_json(target)
@@ -46,6 +51,16 @@ def verify(output: Path, base_path: Path | None = None) -> dict:
     phases = [result.get(name) for name in (
         "target_query_ms", "target_pdp_ms", "target_relation_check_ms",
         "target_descent_ms", "target_recovery_check_ms")]
+    flags = launch["environment_flags"]
+    expected_flags = {
+        "KIC_INDEXED_ROOT5": "1", "KIC_INDEXED_ROOT4": "0",
+        "KIC_INDEXED5_LOAD75": "1", "KIC_INDEXED5_FIXED30": "0",
+        "KIC_INDEXED5_ID30": "0", "KIC_ROOT_ONLY11": "1",
+        "KIC_ROOT_ONLY21": "0", "KIC_ROOT_ONLY22": "0",
+        "KIC_SYMMETRIC_S3": "1", "KIC_SPARSE_CANONICAL": "1",
+        "KIC_INDEX_ROOT_BATCH": "1", "KIC_TARGET_CANCEL": "1",
+        "KIC_TARGET_THREADS": "2", "KIC_RANK_THREADS": "4",
+    }
     checks = {
         "current_source": base.sha256(base.SOURCE) == base.SOURCE_SHA256 ==
                           launch["source_sha256"],
@@ -74,6 +89,12 @@ def verify(output: Path, base_path: Path | None = None) -> dict:
                          launch["environment_flags"].get("KIC_INDEXED5_LOAD75") == "1" and
                          launch["environment_flags"].get("KIC_INDEXED5_FIXED30") == "0" and
                          launch["environment_flags"].get("KIC_INDEXED5_FIXED31") is None,
+        "candidate_flags": all(flags.get(key) == value for key, value in
+                               expected_flags.items()) and
+                           candidate["factor_base"]["ordered_base_dump_sha256"] ==
+                           base_dump_sha256 and
+                           candidate["implementation"]["source_sha256"]["ic"] ==
+                           base.SOURCE_SHA256,
         "rank": summary["rank"] == summary["orbit_columns"] == 1107,
         "index_layout": summary["root_table_layout"] == "indexed83_5byte_exact" and
                         summary["root_table_entries"] == 101708823 and
@@ -101,6 +122,8 @@ def verify(output: Path, base_path: Path | None = None) -> dict:
                   else "FAILED",
         "checks": checks,
         "source_sha256": base.SOURCE_SHA256,
+        "candidate_id": candidate["candidate_id"],
+        "candidate_manifest_sha256": base.sha256(candidate_path),
         "binary_sha256": launch["binary_sha256"],
         "usable_points": len(points),
         "folded_columns": summary["orbit_columns"],
