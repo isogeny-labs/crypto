@@ -5,5 +5,5 @@ phases:
   build:
     commands:
       - export PATH="$CODEBUILD_SRC_DIR/bin:$PATH"
-      - chmod +x bin/* remote/validate-request remote/check-ready remote/run-request
+      - chmod +x bin/* remote/validate-request remote/check-ready remote/run-request remote/verify-build
       - remote/run-request
