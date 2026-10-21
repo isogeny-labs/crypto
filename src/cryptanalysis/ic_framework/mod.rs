@@ -62,6 +62,7 @@
 //! worked example of adding a solver, how to run a sweep, and how to
 //! report what comes out.
 
+pub mod cm_orbit;
 pub mod fiber;
 pub mod large_prime;
 pub mod linalg;
@@ -98,8 +99,9 @@ pub struct PipelineSpec {
     pub solver_params: Params,
     pub targets: Targets,
     /// The matrix and stop rule: `incremental-gauss`,
-    /// `incremental-gauss-full-rank`, its `-checked` variant, or
-    /// `structured-gauss`.
+    /// `incremental-gauss-full-rank`, its `-checked` variant,
+    /// `structured-gauss`, or a deferred sparse solver (`sparse-cado`,
+    /// `filter+wiedemann`, `filter+lanczos`, `wiedemann`, `lanczos`; full-rank rule).
     pub linalg: String,
     /// Cap on targets drawn before the run gives up.
     pub max_trials: u64,
@@ -259,6 +261,17 @@ pub struct RunReport {
 /// inherited-F4 / pdp3 qualifier
 /// `word XORs (elimination, specialisation and linear elimination only)`
 /// both count; `vector XORs` / `word operations (…)` do not.
+///
+/// Accounting, not an algorithm change: before PR #1774 (merge `cd226d0ce`,
+/// 2026-10-14) only the bare unit matched, so inherited-F4 / pdp3 records
+/// left their word XORs unpriced (`solver_word_XORs_(…)_uncharged`,
+/// `lower_bound: true`) even where `docs/ic/calibration.json` pins
+/// `ns_per_word_xor`.  Since then those curves charge them (K_0/GF(2^13):
+/// 0.002304 GAE per word XOR, e.g. `ic-f4-m3` target 0 671 → 24,415 GAE at
+/// that merge, same word-XOR count),
+/// while curves without a pinned ratio still record a lower bound.  Do not
+/// compare an F4 `S` from before that merge with one after it, or a priced
+/// curve with an unpriced one: `research/f4_pricing_jump_20261018/`.
 fn is_word_xor_op_unit(op_unit: &str) -> bool {
     op_unit == "word XORs" || op_unit.starts_with("word XORs (")
 }
@@ -363,6 +376,8 @@ pub fn run_pipeline<G: CountedGroup>(
     let mut matrix: Box<dyn RelationSolver> = matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?;
     let source = match spec.targets {
         Targets::Random => TargetSource::Random,
+        Targets::Stride => TargetSource::Stride,
+        Targets::StrideRenew => TargetSource::StrideRenew,
         Targets::Walk | Targets::Residual => TargetSource::Walk,
         Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
         Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
@@ -400,7 +415,12 @@ pub fn run_pipeline<G: CountedGroup>(
     }
     measurement::begin_online(measurement::Phase::TargetQuery);
     let checked_full_rank = linalg_name == "incremental-gauss-full-rank-checked";
-    let completion = if linalg_name == "incremental-gauss-full-rank" || checked_full_rank {
+    // `sparse-cado` is a batch solver that answers only at full column
+    // rank, so it runs under the full-rank rule.
+    let completion = if linalg_name == "incremental-gauss-full-rank"
+        || checked_full_rank
+        || linalg::is_deferred_sparse(linalg_name)
+    {
         CompletionRule::FullRank
     } else {
         CompletionRule::TargetPinned
@@ -508,6 +528,22 @@ pub fn run_pipeline<G: CountedGroup>(
                     },
                     Some(ns),
                 ),
+                // Field multiplications counted by the same field whose
+                // additions the group charges (the `gaudry-d4` oracle on
+                // `E(F_{p⁴})`, `gaudry-d4-bin` on `E(F_{q⁴})`, `q = 2^m`):
+                // priced by count at the curve's own multiplications per
+                // addition, which the oracle reports.
+                (_, _)
+                    if (t.op_unit == "F_p multiplications"
+                        || t.op_unit == "F_q multiplications")
+                        && t.extra.get("fp_muls_per_add").is_some_and(|&v| v > 0) =>
+                {
+                    (
+                        t.ops as f64 / t.extra["fp_muls_per_add"] as f64,
+                        "counted",
+                        None,
+                    )
+                }
                 _ if calib.ns_per_add > 0.0 => {
                     (t.wall_ns as f64 / calib.ns_per_add, "measured", wall_per_op)
                 }
@@ -706,6 +742,62 @@ mod tests {
         assert!(report.s > 0.0 && report.s.is_finite());
         assert!(report.factor_base.columns > 0);
         assert!(report.decomposition.relations_found >= report.linear_algebra.rank);
+    }
+
+    /// **The stride reaches the walk's answer without the walk's jump
+    /// table.**  Its set-up is `S` and `R₀` (four scalar
+    /// multiplications) where the walk draws sixteen jumps at two each;
+    /// every other target costs one addition under both.
+    #[test]
+    fn the_strides_recover_the_logarithm_without_a_jump_table() {
+        let inst = roster_prime_instance(16).unwrap();
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = PrimeAbscissaBase { instance: &inst };
+        let run = |targets| {
+            let mut spec = PipelineSpec {
+                factor_base: "prime-abscissa".into(),
+                oracle: "mitm".into(),
+                targets,
+                max_trials: 2_000_000,
+                seed: 7,
+                ..Default::default()
+            };
+            spec.factor_base_params.set("size", "24");
+            spec.oracle_params.set("negation_folded", "1");
+            let mut oracle = MitmOracle::new(2);
+            run_pipeline(
+                &ctx,
+                &spec,
+                &base,
+                &mut oracle,
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .expect("the configuration should run")
+        };
+        let (walk, stride) = (run(Targets::Walk), run(Targets::Stride));
+        let renew = run(Targets::StrideRenew);
+        assert!(walk.verified && stride.verified && renew.verified);
+        assert_eq!(renew.recovered, Some(planted));
+        // One renewal a relation-bearing target, and set-up of S, T, R₀.
+        let rn = &renew.decomposition.cost;
+        assert!(rn.native.get("stride_renewals").copied().unwrap_or(0) >= 1);
+        assert!(rn.group_ops.scalar_mults >= 6 && rn.group_ops.scalar_mults < 32);
+        assert_eq!(stride.recovered, Some(planted));
+        let rel = &stride.decomposition.cost;
+        assert_eq!(rel.native.get("stride_restarts"), Some(&1));
+        assert!(rel.group_ops.scalar_mults <= 4, "{:?}", rel.group_ops);
+        assert!(walk.decomposition.cost.group_ops.scalar_mults >= 32);
+        assert_eq!(
+            rel.native.get("stride_steps").copied().unwrap_or(0) + 1,
+            stride.decomposition.targets_tried
+                + rel
+                    .native
+                    .get("direct_relations_skipped")
+                    .copied()
+                    .unwrap_or(0)
+        );
     }
 
     /// **Two oracles on the same base must agree on the answer and
@@ -1301,6 +1393,63 @@ mod tests {
         assert_eq!(result.linear_algebra.cost.get("full_rank_reached"), 1);
         assert!(result.linear_algebra.cost.get("first_target_pinned_rank") > 0);
         assert_eq!(result.verify.get("base_log_columns_checked"), 0);
+    }
+
+    /// The CADO-style batch solver behind the incremental contract must
+    /// recover the same logarithm from the same relation stream as the
+    /// dense full-rank matrix, reading at most `max(1, cols / 32)` more
+    /// relations than the full-rank point (its retry interval).
+    #[test]
+    fn sparse_cado_matches_the_full_rank_matrix_end_to_end() {
+        let inst = roster_prime_instance(16).unwrap();
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = PrimeAbscissaBase { instance: &inst };
+        let mut spec = PipelineSpec {
+            factor_base: "prime-abscissa".into(),
+            oracle: "mitm".into(),
+            targets: Targets::Walk,
+            max_trials: 2_000_000,
+            seed: 7,
+            linalg: "incremental-gauss-full-rank".into(),
+            ..Default::default()
+        };
+        spec.factor_base_params.set("size", "24");
+        spec.oracle_params.set("negation_folded", "1");
+        let run = |spec: &PipelineSpec| {
+            run_pipeline(
+                &ctx,
+                spec,
+                &base,
+                &mut MitmOracle::new(2),
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .unwrap()
+        };
+        let dense = run(&spec);
+        for name in ["wiedemann", "lanczos", "filter+lanczos", "filter+wiedemann"] {
+            spec.linalg = name.into();
+            let other = run(&spec);
+            assert!(other.verified, "{name}");
+            assert_eq!(other.recovered, dense.recovered, "{name}");
+            assert_eq!(other.linear_algebra.work_unit, "row_ops", "{name}");
+            assert!(other.linear_algebra.work > 0, "{name}");
+        }
+        spec.linalg = "sparse-cado".into();
+        let sparse = run(&spec);
+        assert!(dense.verified && sparse.verified);
+        assert_eq!(sparse.recovered, dense.recovered);
+        assert_eq!(sparse.linear_algebra.rank, dense.linear_algebra.rank);
+        assert_eq!(sparse.linear_algebra.work_unit, "row_ops");
+        assert!(sparse.linear_algebra.work > 0);
+        assert!(sparse.decomposition.relations_found >= dense.decomposition.relations_found);
+        assert!(
+            sparse.decomposition.relations_found <= dense.decomposition.relations_found + 1,
+            "{} against {} relations",
+            sparse.decomposition.relations_found,
+            dense.decomposition.relations_found
+        );
     }
 
     #[test]

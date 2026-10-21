@@ -22,15 +22,19 @@ permissions:
 jobs:
   review:
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|llm-review.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|llm-review.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    timeout-minutes: 15
     steps:
       # pull_request_target has access to secrets. Deliberately check out only
       # the trusted default branch and retrieve the PR patch as inert API data.
+      # The reviewer script uses only Node built-ins, so a sparse checkout of
+      # .github/scripts avoids cloning the multi-gigabyte repository; full
+      # checkouts stalled past the job limit in October 2026.
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.repository.default_branch }}
           persist-credentials: false
+          sparse-checkout: .github/scripts
 
       - name: Validate reviewer
         run: |

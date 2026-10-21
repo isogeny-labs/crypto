@@ -6,12 +6,18 @@ on:
       - '.github/workflows/ecc2k130-base-window-generator.yml'
       - 'examples/koblitz_base_window.rs'
       - 'research/notes/ecc2k130/base_window_screen_20261001/**'
+      - '.github/scripts/frozen_source_selector.py'
+      - '.github/scripts/test_frozen_source_selector.py'
+      - '.github/scripts/run_frozen_generator_test.py'
   push:
     branches: [main]
     paths:
       - '.github/workflows/ecc2k130-base-window-generator.yml'
       - 'examples/koblitz_base_window.rs'
       - 'research/notes/ecc2k130/base_window_screen_20261001/**'
+      - '.github/scripts/frozen_source_selector.py'
+      - '.github/scripts/test_frozen_source_selector.py'
+      - '.github/scripts/run_frozen_generator_test.py'
 
 permissions:
   contents: read
@@ -22,15 +28,18 @@ concurrency:
 
 jobs:
   parity:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-base-window-generator.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-base-window-generator.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /Cargo.toml
+            /tools/volcano-cli/
+            /isogeny_algos/
             /docs/ic/calibration.json
             /docs/ic/boundary_targets.json
             /docs/ecbench/schema.sql
@@ -38,6 +47,12 @@ jobs:
             /src/*
             /examples/koblitz_base_window.rs
             /research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock
+            /research/notes/ecc2k130/compact_frozen_source_replay_20260929/
+            /research/notes/ecc2k130/compact_s3_prefilter_20260930/FROZEN.json
+            /.github/scripts/frozen_source_selector.py
+            /.github/scripts/test_frozen_source_selector.py
+            /.github/scripts/run_frozen_generator_test.py
+            /.github/scripts/frozen-lock-source.files
             /research/notes/ecc2k130/base_window_screen_20261001/*
             /research/notes/ecc2k130/base_window_screen_20261001/development/*
             /research/notes/ecc2k130/disjoint_cold_v2_outcome_20261001/evidence_run_36803331080/raw/n41_L1024.tar.gz
@@ -45,6 +60,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Test exact historical source selection
+        run: python3 -m unittest discover -s .github/scripts -p 'test_frozen_source_selector.py' -v
       - name: Check generator formatting and Python syntax
         run: |
           rustfmt --check --edition 2021 examples/koblitz_base_window.rs
@@ -53,15 +70,20 @@ jobs:
             research/notes/ecc2k130/base_window_screen_20261001/test_generator.py
       - name: Build generator
         run: |
-          printf '%s  %s\n' \
-            ac5cd7a3459be776180afe1eb2975c76b1a88f84bd1e99aa20475927ec260a90 \
-            research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock | sha256sum -c -
-          cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
-          cargo build --locked --example koblitz_base_window
+          python3 .github/scripts/frozen_source_selector.py \
+            --repo "$GITHUB_WORKSPACE" --profile ecc2k130-base-window \
+            --target-root "$RUNNER_TEMP/base-window-pinned-sources" \
+            --report "$RUNNER_TEMP/base-window-source-selection.json"
+          python3 research/notes/ecc2k130/base_window_screen_20261001/build_historical_frozen.py \
+            --out "$RUNNER_TEMP/base-window-historical-build" --profile dev \
+            --historical-source-root "$RUNNER_TEMP/base-window-pinned-sources" \
+            --source-selection-report "$RUNNER_TEMP/base-window-source-selection.json"
       - name: Replay frozen-source toy and archived n41 controls
         run: |
-          python3 research/notes/ecc2k130/base_window_screen_20261001/test_generator.py \
-            --generator target/debug/examples/koblitz_base_window \
-            --out /tmp/base-window-source-control.json
-          cmp /tmp/base-window-source-control.json \
+          python3 .github/scripts/run_frozen_generator_test.py \
+            --generator "$RUNNER_TEMP/base-window-historical-build/target/debug/examples/koblitz_base_window" \
+            --source-root "$RUNNER_TEMP/base-window-historical-build/source" \
+            --test-module research/notes/ecc2k130/base_window_screen_20261001/test_generator.py \
+            --out "$RUNNER_TEMP/base-window-source-control.json"
+          cmp "$RUNNER_TEMP/base-window-source-control.json" \
             research/notes/ecc2k130/base_window_screen_20261001/development/SOURCE_CONTROL.json

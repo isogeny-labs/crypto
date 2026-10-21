@@ -21,7 +21,6 @@ on:
       - 'src/cryptanalysis/ic_boundary.rs'
       - 'src/cryptanalysis/binary_velu.rs'
       - 'src/cryptanalysis/koblitz_fast.rs'
-      - 'docs/index-calculus-scoreboard.html'
   workflow_dispatch:
 
 permissions:
@@ -35,7 +34,7 @@ concurrency:
 
 jobs:
   replay:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n37-complete-table-floor.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n37-complete-table-floor.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     steps:
       - uses: actions/checkout@v4
@@ -43,25 +42,29 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             Cargo.toml
+            Cargo.lock
+            tools/volcano-cli/
+            isogeny_algos/
             src
             examples/n37_complete_table_floor.rs
             examples/n37_complete_table_floor_analyze.rs
             examples/support/n37_policy_common.rs
             docs/curves/registry.json
+            docs/curves/standards/parameters.json
             docs/ecbench/schema.sql
             docs/ic/calibration.json
             docs/ic/boundary_targets.json
-            research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock
             research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json
             research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz
             research/notes/ecc2k130/n37_four_policy_support_20261003/SOURCE42.jsonl
             research/notes/ecc2k130/n37_four_policy_support_20261003/RESULT.json.gz
             research/notes/ecc2k130/n37_complete_table_floor_20261003
       - uses: Swatinem/rust-cache@v2
-      - name: Use frozen lockfile and check Rust formatting
-        run: |
-          cp research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock Cargo.lock
-          rustfmt --edition 2021 --check examples/n37_complete_table_floor.rs examples/n37_complete_table_floor_analyze.rs
+      # Builds against the root Cargo.lock: the 2026-10-02 frozen lockfile this
+      # replay used to copy in predates the volcano-cli path dependency, so
+      # `--locked` could no longer resolve the crate graph against it.
+      - name: Check Rust formatting
+        run: rustfmt --edition 2021 --check examples/n37_complete_table_floor.rs examples/n37_complete_table_floor_analyze.rs
       - name: Build native counter, decision auditor, and ecbench
         run: cargo build --release --locked --example n37_complete_table_floor --example n37_complete_table_floor_analyze --bin ecbench
       - name: Recompute all four pair-sum streams and the decision
