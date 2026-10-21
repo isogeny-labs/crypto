@@ -19,14 +19,24 @@ permissions:
 jobs:
   expspec:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: tools/expspec/go.mod
+          cache-dependency-path: tools/expspec/go.sum
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install pyyaml jsonschema
+      - name: PyYAML for tools/task_card.py (the card runner)
+        run: python -m pip install pyyaml
+      - name: Build
+        run: go -C tools/expspec build -o "$PWD/target/expspec" .
       - name: Every spec validates
-        run: python tools/expspec/expspec.py validate experiments/specs/EXP-*[0-9].yaml
-      - name: Compile-and-run loop, local and batch hosts
-        run: python -m unittest discover -s tools/expspec/tests -v
+        run: target/expspec validate experiments/specs/EXP-*[0-9].yaml
+      - name: Vet and end-to-end tests (local and batch hosts)
+        run: |
+          test -z "$(gofmt -l tools/expspec)"
+          go -C tools/expspec vet ./...
+          go -C tools/expspec test ./...

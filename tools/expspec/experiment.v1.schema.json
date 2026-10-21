@@ -688,7 +688,12 @@
     },
     "relpath": {
       "type": "string",
-      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$)).+$"
+      "minLength": 1,
+      "pattern": "^[^/]",
+      "not": {
+        "pattern": "(^|/)\\.\\.(/|$)"
+      },
+      "description": "Repo-relative: no leading /, no .. component."
     },
     "env": {
       "type": "object",

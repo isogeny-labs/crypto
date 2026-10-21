@@ -103,7 +103,7 @@ steps:
     runs_on: controller
     cells: [a1, c1, a1-control]
     needs: [deg5-control]
-    argv: [python3, tools/expspec/examples/copy_runs.py, "{{paths.collected}}/closure/runs", "{{paths.out}}", "{{cell.id}}"]   # CONFIRM: helper not written yet
+    argv: [go, run, research/dreg_closure_m4l6_20261018/copyruns.go, "{{paths.collected}}/closure/runs", "{{paths.out}}", "{{cell.id}}"]   # CONFIRM: helper not written yet
     timeout_s: 300
     on_failure: escalate
 

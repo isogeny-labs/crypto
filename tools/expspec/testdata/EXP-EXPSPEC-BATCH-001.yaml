@@ -14,7 +14,7 @@ source:
   repo: aburan28/crypto
   ref: main
   commit: COMMIT
-  frozen: [{path: research/expspec_batch_test/fake_spot.py, sha256: FSHA}]
+  frozen: [{path: research/expspec_batch_test/fakespot.go, sha256: FSHA}]
 paths: {root: research/expspec_batch_test, out: research/expspec_batch_test/out}
 cells:
   - {id: a1, params: {n: 15}, requires: {memory_gb: 64}}
@@ -32,8 +32,8 @@ steps:
     runs_on: controller
     needs: [measure]
     gates: {before: [go]}
-    argv: [python3, research/expspec_batch_test/score.py, "{{paths.collected}}/out/{{cell.id}}.json", "{{paths.out}}/{{cell.id}}.score.json"]
-    timeout_s: 60
+    argv: [go, run, research/expspec_batch_test/score.go, "{{paths.collected}}/out/{{cell.id}}.json", "{{paths.out}}/{{cell.id}}.score.json"]
+    timeout_s: 300
     outputs: ["{{paths.out}}/{{cell.id}}.score.json"]
 gates:
   - {id: go, kind: human, description: owner go per cell, ask: "Score cell {{cell.id}} (n={{cell.n}}) now.", on_fail: stop}
@@ -49,10 +49,10 @@ hosts:
       est_hourly_usd: 2.0
       cells: [a1]
       lifecycle:
-        provision: {argv: [python3, research/expspec_batch_test/fake_spot.py, run, small, a1], timeout_s: 60, capture: {handle: {json_key: id}}}
-        poll: {argv: [python3, research/expspec_batch_test/fake_spot.py, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 60}
-        collect: {argv: [python3, research/expspec_batch_test/fake_spot.py, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 60}
-        teardown: {argv: [python3, research/expspec_batch_test/fake_spot.py, terminate, "{{vars.handle}}"], timeout_s: 60}
+        provision: {argv: [go, run, research/expspec_batch_test/fakespot.go, run, small, a1], timeout_s: 300, capture: {handle: {json_key: id}}}
+        poll: {argv: [go, run, research/expspec_batch_test/fakespot.go, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 300}
+        collect: {argv: [go, run, research/expspec_batch_test/fakespot.go, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 300}
+        teardown: {argv: [go, run, research/expspec_batch_test/fakespot.go, terminate, "{{vars.handle}}"], timeout_s: 300}
         poll_every_s: 300
         lifetime_s: 3600
     - id: big
@@ -64,10 +64,10 @@ hosts:
       est_hourly_usd: 5.0
       cells: [a2]
       lifecycle:
-        provision: {argv: [python3, research/expspec_batch_test/fake_spot.py, run, big, a2], timeout_s: 60, capture: {handle: {json_key: id}}}
-        poll: {argv: [python3, research/expspec_batch_test/fake_spot.py, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 60}
-        collect: {argv: [python3, research/expspec_batch_test/fake_spot.py, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 60}
-        teardown: {argv: [python3, research/expspec_batch_test/fake_spot.py, terminate, "{{vars.handle}}"], timeout_s: 60}
+        provision: {argv: [go, run, research/expspec_batch_test/fakespot.go, run, big, a2], timeout_s: 300, capture: {handle: {json_key: id}}}
+        poll: {argv: [go, run, research/expspec_batch_test/fakespot.go, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 300}
+        collect: {argv: [go, run, research/expspec_batch_test/fakespot.go, fetch, "{{vars.handle}}", "{{paths.collected}}"], timeout_s: 300}
+        teardown: {argv: [go, run, research/expspec_batch_test/fakespot.go, terminate, "{{vars.handle}}"], timeout_s: 300}
         poll_every_s: 300
         lifetime_s: 3600
 budget: {max_cost_usd: 50, max_wall_hours: 2}

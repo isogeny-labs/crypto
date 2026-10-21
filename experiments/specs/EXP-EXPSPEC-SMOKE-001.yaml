@@ -19,7 +19,7 @@ source:
   repo: aburan28/crypto
   ref: main
   frozen:
-    - {path: research/expspec_smoke_20261020/run.py, sha256: 08f1db12456193225c23c20c0065ad74d212735a4a376bffbc676eca77faa586}
+    - {path: research/expspec_smoke_20261020/smoke.go, sha256: 515dcf4de533afbe9b444c2fef96f7ae07da2f8b52e06ccfac8f2bd97a659527}
 
 paths:
   root: research/expspec_smoke_20261020
@@ -33,16 +33,16 @@ steps:
   - id: host
     scope: per_host
     runs_on: host
-    argv: [python3, research/expspec_smoke_20261020/run.py, host, --out, "{{paths.out}}"]
-    timeout_s: 60
+    argv: [go, run, research/expspec_smoke_20261020/smoke.go, host, --out, "{{paths.out}}"]
+    timeout_s: 300
     outputs: ["{{paths.out}}/host.json"]
     on_failure: stop
   - id: measure
     scope: per_cell
     runs_on: host
     needs: [host]
-    argv: [python3, research/expspec_smoke_20261020/run.py, measure, --n, "{{cell.n}}", --out, "{{paths.out}}/cell-{{cell.id}}.json"]
-    timeout_s: 60
+    argv: [go, run, research/expspec_smoke_20261020/smoke.go, measure, --n, "{{cell.n}}", --out, "{{paths.out}}/cell-{{cell.id}}.json"]
+    timeout_s: 300
     outputs: ["{{paths.out}}/cell-{{cell.id}}.json"]
     done_when: [{kind: file_exists, path: "{{paths.out}}/cell-{{cell.id}}.json"}]
     capture: {last_cell: {json_key: cell_done}}
@@ -53,8 +53,8 @@ steps:
     scope: once
     runs_on: controller
     needs: [measure]
-    argv: [python3, research/expspec_smoke_20261020/run.py, summarize, --dir, "{{paths.out}}", --out, "{{paths.out}}/summary.json"]
-    timeout_s: 60
+    argv: [go, run, research/expspec_smoke_20261020/smoke.go, summarize, --dir, "{{paths.out}}", --out, "{{paths.out}}/summary.json"]
+    timeout_s: 300
     outputs: ["{{paths.out}}/summary.json"]
 
 gates:

@@ -1,9 +1,11 @@
 # expspec: one YAML file per experiment, compiled into task cards
 
+Design rationale, alternatives and open questions: [`docs/EXPSPEC_PROPOSAL.md`](../../docs/EXPSPEC_PROPOSAL.md).
+
 An **experiment spec** (`experiments/specs/<id>.yaml`, schema
 `crypto.experiment/v1`) is the machine-readable form of a pre-registration:
 question, cells, steps, gates, hosts, budget and the rules that will read the
-result. `tools/expspec/expspec.py` tracks the spec's run in
+result. `expspec` (Go, `tools/expspec/`) tracks the spec's run in
 `experiments/specs/<id>.state.yaml` and compiles it into
 `tools/task_card.py` frozen-command cards, one step at a time. It never runs
 an experiment command itself and never interprets a result.
@@ -16,7 +18,7 @@ executor (`executor-mechanical`, Haiku) runs each card through
 spec.
 
 ```
-  frontier/core          expspec.py (no model)            executor-mechanical (Haiku)
+  frontier/core          expspec (Go, no model)           executor-mechanical (Haiku)
   ┌──────────────┐  approve  ┌────────────────────┐  card   ┌──────────────────────────┐
   │ spec.yaml    │ ────────► │ next: ingest       │ ──────► │ python3 tools/task_card  │
   │ PROTOCOL.md  │           │  receipts, gates,  │         │   .py run <card>         │
@@ -25,11 +27,24 @@ spec.
                              └────────────────────┘
 ```
 
+## Build
+
+```bash
+go -C tools/expspec build -o "$PWD/target/expspec" .
+```
+
+`expspec` is a single Go binary (Go 1.22+; dependencies `gopkg.in/yaml.v3`
+and `santhosh-tekuri/jsonschema/v6`, schemas embedded). The cards it writes
+are run by `tools/task_card.py`, which stays Python: it is canonical in
+aburan28/crypto-autoresearcher and copied byte-identical into every
+repository, so `expspec` shells out to `python3 tools/task_card.py lint` for
+every card rather than reimplementing it.
+
 ## The loop (main session)
 
 ```bash
-python3 tools/expspec/expspec.py validate experiments/specs/EXP-FOO-001.yaml
-python3 tools/expspec/expspec.py next experiments/specs/EXP-FOO-001.yaml
+target/expspec validate experiments/specs/EXP-FOO-001.yaml
+target/expspec next experiments/specs/EXP-FOO-001.yaml
 ```
 
 `next` reads any receipts that have appeared, updates the state file and
@@ -38,14 +53,14 @@ prints exactly one JSON action:
 | action | what the main session does |
 |---|---|
 | `run_card` | Relay the output of `relay` (`task_card.py prompt <card>`) to executor-mechanical, unchanged. Run it in the background when `background` is true. When `assess` is true (an evidence step), dispatch experiment-director in assess mode on the returned text. Then call `next` again. |
-| `ask` | Ask the owner `question` word for word. Record the answer with `expspec.py answer <spec> --gate <gate> --yes/--no --by <name>`, then call `next`. |
+| `ask` | Ask the owner `question` word for word. Record the answer with `expspec answer <spec> --gate <gate> --yes/--no --by <name>`, then call `next`. |
 | `escalate` | Hand `reason` to the reasoning tier. If it decides to continue, record that with `answer --yes`; to stop, `answer --no`. A `spec_drift` escalation means the spec or the checkout must be fixed: it is not a question. |
 | `wait` | Schedule a check-in at `until` and do nothing else. Never poll. |
-| `done` | The reasoning tier runs `expspec.py facts <spec>`, applies `outcome.decision_rules`, and writes `reporting.results_file`. |
+| `done` | The reasoning tier runs `expspec facts <spec>`, applies `outcome.decision_rules`, and writes `reporting.results_file`. |
 | `stopped` | Report `reason`. Any open batch host has already been given a teardown card. |
 | `refused` | The spec does not validate or is not approved. Fix the spec. |
 
-`expspec.py ls` lists every spec in `experiments/specs/` with its spec
+`expspec ls` lists every spec in `experiments/specs/` with its spec
 status, run status, steps done, spend against budget, and what it is blocked
 on. Use it as the experiment tracker.
 
@@ -127,16 +142,17 @@ tier stays in the loop.
 ## Tests
 
 ```bash
-python3 -m unittest discover -s tools/expspec/tests -v
+go -C tools/expspec test ./...
 ```
 
-Each test builds a throwaway git repository with `task_card.py`, expspec and
+Each test builds a throwaway git repository with `task_card.py` and the
 fixtures, approves a spec with a committed decision, and plays the main
 session until `done`. Every card must pass `task_card.py lint` and run. The
 local run covers resume through `done_when`, spec drift and facts. The batch
-run uses a fake launcher with `aws_spot.py`'s verbs and covers two hosts, the
+run uses a fake launcher (`testdata/fakespot.go`) with `aws_spot.py`'s verbs and covers two hosts, the
 paid-launch ask, the human gate, STATUS tokens, collect and teardown; it also
-checks that answering no to the launch stops the run. CI:
+checks that answering no to the launch stops the run, and that a gate on a
+batch host's own step is rejected. CI:
 `.github/workflows/expspec.yml`.
 
 ## Examples
