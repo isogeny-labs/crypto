@@ -176,6 +176,26 @@
      "class": "accounting",
      "anchor": "#lab-volcano-ic",
      "source": "https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json"
+    },
+    {
+     "anchor": "#ic-tool-programme-20261001",
+     "class": "accounting",
+     "date": "2026-10-20",
+     "detail": "Rule v8: ledger section 23's six sizes (2^36.6-2^47.2, 64 public points and four A/A repeats a size, 408/408 rows checked in each of two runs of one binary) against a matched rho, the signed-Frobenius walk with its canonicalisation batched 16 lanes at a time by GFNI and funnel shifts; the control run, the same binary with rho as at rule v7, reads 3.59-11.56x. With the reusable set-up charged the index calculus costs 4.67-18.07x rho cold: 4.669x [4.34, 5.07] at 2^36.6, 18.07x [15.98, 20.58] at 2^47.2. Rho is still faster at every size. The two rho arms take identical walks on 64/64 targets a size; the index calculus's own online time is the same in both runs (0.976-1.033). The distance to rho is larger than rule v7 reported because rho was unmatched, not because the index calculus slowed; the ln-ln slope is 0.168 (t interval 0.128-0.208; rule v3: 0.176), not distinguishable from v3's. No curve with log2 r >= 50 is runnable by this single-word pipeline. Class: accounting (a corrected reference); the batched rho kernel is engineering; no advance.",
+     "label": "Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md",
+     "value": 4.669
+    },
+    {
+     "anchor": "#lab-planner-validation",
+     "class": "engineering",
+     "date": "2026-10-21",
+     "detail": "ic plan / ic bench --auto (ic-planner/1) checked on six prime curves outside its evidence, each plan against every alternative one change away from it (ecbench, 24 verified runs per arm and curve, audits OK). Best cold one-target cell on a registered curve: icv1-fp24-tm5099-a6f137c6 (log2 r 24.00), S(plan)/S(rho.negation) 14.39 [11.63, 18.45], planner prediction 12.23. Rho is cheaper on all six curves (12.6-25.8x). At w = 0 every alternative costs more than the plan; the doubled base is not separated across the band (below 1 at w = 1). Tooling validation: the plan is the existing best recipe chosen automatically; no advance, no leaderboard row moves.",
+     "label": "Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md",
+     "value": 14.39
     }
    ],
    "role": "emphasis"
@@ -867,7 +887,7 @@
    "note": "Index calculus with double large primes on Jac(C) of hyperelliptic GHS cubic covers (m = 3, r = 5) over prime F_q, q = 2^10-2^20, counted F_q plus mod-ell multiplications, one target cold, 12 paired instances per size. Rho is measured on the same Jac(C)[ell] in the same unit at q <= 2^14 only (4 single walks per size, renormalised to sqrt(pi/2)); it is not rho on the elliptic curve E0(F_q^3). The exponent result (total q^1.383 against GTTD's 4/3) is in the genus-crossover panel.",
    "points": [
     {
-     "date": "2026-10-15",
+     "date": "2026-10-17",
      "value": 0.252,
      "reference": "matched",
      "label": "Genus-3 GHS IC-2LP rebuilt baseline at q = 2^14 (04b)",
@@ -915,26 +935,8 @@
      "source": "https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l11_l12_20261016/REPORT.typ"
     }
    ]
-  },
-  {
-   "id": "ghs-weak-n4",
-   "label": "GHS-weak E/F_{q^3} via plane quartic, whole method, cold, one target (special family only)",
-   "note": "Plane-quartic (Diem/GHS) index calculus on the special GHS-weak family E0/F_{q^3} with #E0(K) = 4*ell, in F_q-multiplication equivalents, one target cold, no subgroup enumeration, against a matched plain Pollard rho (no negation map) on the same E0(K) subgroup. Not generic curves, not prime-order E/F_{q^3}, not a standard curve. Value is IC/rho with no price on unpriced native work (w = 0); the 0.1 and 1 GAE bands are in the point's detail.",
-   "points": [
-    {
-     "anchor": "#ghs-weak-n4-20261019",
-     "class": "advance",
-     "date": "2026-10-19",
-     "detail": "IC/rho 0.122 [0.099, 0.157] at q = 262111 (w = 0), 0.126 at 0.1 GAE and 0.144 at 1 GAE per unpriced operation (band-resolved, IC lower); 0.735 [0.66, 0.82] at q = 4051 and 1.08 at q = 2011 (crossover), 4.22 at q = 223. Measured cost exponent over all 11 sizes q = 223..262111: IC 0.998 [0.971, 1.023] against rho 1.486 [1.464, 1.505]; over q >= 4051 (7 sizes) IC 1.083 [1.040, 1.129], rho 1.485, gap 0.40 [0.34, 0.47]. Baseline arm A0r (all rational points as factor base) has exponent 1.985. All units verified (kG = Q). Special GHS-weak family only; plain rho without the negation map (sqrt(2) sensitivity); shared 4-core VM, L0 isolation.",
-     "label": "GHS-weak E0/F_{q^3}, 4 | #E0(K), plane-quartic IC at q = 262111",
-     "reference": "matched",
-     "source": "https://github.com/aburan28/crypto/blob/main/research/quartic_n4_20261019/README.md",
-     "value": 0.122
-    }
-   ],
-   "role": "context"
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-19"
+ "updated": "2026-10-21"
 }

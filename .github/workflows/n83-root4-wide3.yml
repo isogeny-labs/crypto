@@ -6,6 +6,10 @@ on:
     paths:
       - .github/workflows/n83-root4-wide3.yml
       - research/n83_root4_wide3_20261016/**
+  pull_request:
+    branches: [main]
+    paths:
+      - research/n83_root4_wide3_20261016/**
   workflow_dispatch:
 
 permissions:
@@ -14,8 +18,8 @@ permissions:
 jobs:
   n83-root4-wide3-preflight:
     if: github.repository == 'aburan28/crypto'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n83-root4-wide3.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n83-root4-wide3.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
     steps:
       - uses: actions/checkout@v4
       - name: Regenerate and verify fresh public fixture
