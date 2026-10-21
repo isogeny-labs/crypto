@@ -42,6 +42,21 @@ jobs:
           # The committed root lock matches the current manifest. Keep the
           # tournament's older lock intact for its retained source replays.
           cargo fetch --locked
+      - name: Resolve the interpreter's own libpython without LD_LIBRARY_PATH
+        run: |
+          # setup-python's builds carry RUNPATH /opt/hostedtoolcache/...; on a
+          # self-hosted runner the tool cache lives elsewhere, so the SAT
+          # runtime's child (which drops LD_LIBRARY_PATH) loads the system
+          # libpython and sees a different interpreter. Point that RUNPATH at
+          # this interpreter's lib; a no-op where it already exists.
+          rp=$(readelf -d "$pythonLocation/bin/python3" | sed -n 's/.*(RUNPATH).*\[\(.*\)\]/\1/p')
+          if [ -n "$rp" ] && [ ! -e "$rp" ]; then
+            sudo mkdir -p "$(dirname "$rp")"
+            sudo ln -s "$pythonLocation/lib" "$rp"
+          fi
+          env -u LD_LIBRARY_PATH "$pythonLocation/bin/python3" -I -c \
+            'import platform, sys; assert platform.python_version() == sys.argv[1], platform.python_version()' \
+            "$(python -c 'import platform; print(platform.python_version())')"
       - name: Harness and accounting regression tests
         run: |
           python -m unittest discover -s research/ic_candidate_tournament_20260915 -p 'test_*.py' -v

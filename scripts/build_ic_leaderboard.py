@@ -74,6 +74,7 @@ SOURCES = {
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
+    "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -639,6 +640,39 @@ def pair_table_component() -> dict:
             "class": "engineering"}
 
 
+PLANNER_ARMS = ["half-base", "double-base", "rootfind", "full-rank", "random-targets"]
+
+
+def planner_component() -> dict:
+    """The `ic plan` / `ic bench --auto` planner checked on six prime curves
+    outside its evidence: research/ic_planner_validation_20261020, copied from
+    analysis/summary.json (jq over ecbench compare/band/table output) and the
+    plan arm of each frozen spec. Tooling validation: the plan is the existing
+    best recipe, chosen automatically, so no row of tables A-C moves. The
+    supplementary curves are prime_search curves outside the registry and are
+    named by tag only (the study's amendment 1)."""
+    rows = []
+    for r in load(SOURCES["planner_validation"]):
+        alts = {a["arm"]: a for a in r["alternatives"]}
+        if sorted(alts) != sorted(PLANNER_ARMS) or r["aa"]["ratio"] != 1.0:
+            raise SystemExit(f"planner validation {r['curve_tag']}: unexpected arms or a failed A/A")
+        spec = load(f"research/ic_planner_validation_20261020/specs/{r['curve_tag']}.json")
+        plan = next(a for a in spec["arms"] if a["name"] == "plan")["method"]["params"]
+        primary = r["set"].startswith("primary")
+        rows.append({"tag": r["curve_tag"], "primary": primary,
+                     "curve": r["curve"] if primary else None, "log2_r": r["log2_r"],
+                     "plan": plan,
+                     "alternatives": [{k: alts[a][k] for k in ("arm", "ops_ratio", "ci95", "band_ratio", "verdict")}
+                                      for a in PLANNER_ARMS],
+                     "plan_over_rho": r["plan_over_rho"],
+                     "predicted_plan_over_rho": r["predicted_plan_over_rho"],
+                     "weights": r["weights"]})
+    return {"rows": rows, "planner": "ic-planner/1",
+            "study": "research/ic_planner_validation_20261020/",
+            "report": "research/ic_planner_validation_20261020/REPORT.pdf",
+            "class": "engineering"}
+
+
 def latest_frontier_audit() -> dict:
     """Copy the latest performance handoff into the generated board.
 
@@ -1145,6 +1179,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
         "pair_table_component": pair_table_component(),
+        "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
 
@@ -1536,6 +1571,31 @@ def markdown(doc: dict) -> str:
         L.append(f"| {r['N']:,} | {pts(r['setup_ms']['scalar'])} | {pts(r['setup_ms']['batch'])} | "
                  f"{pts(r['setup_ms']['blocked'])} | {ptr(r['blocked_over_batch'])} | {ptr(r['blocked_over_scalar'])} | "
                  f"{r['run_blocked_over_scalar']:.2f} | {r['rss_gib']['batch']:.2f} → {r['rss_gib']['blocked']:.2f} GiB |")
+    L.append("")
+    pl = doc["planner_component"]
+
+    def plq(a):
+        return f"{a['ops_ratio']:.3g} [{a['ci95'][0]:.3g}, {a['ci95'][1]:.3g}]"
+
+    def plcurve(r):
+        return f"`{r['curve']}`" if r["primary"] else f"{r['tag']} (supplementary)"
+    L += ["## Planner validation, outside tables A–C", "",
+          f"`ic plan` / `ic bench --auto` ({pl['planner']}) chooses every `ic.pipeline` stage of a prime-field run; "
+          "here its plan runs against every alternative one change away from it on six prime curves outside its "
+          "evidence (class: engineering). The plan is the existing best recipe, chosen automatically, so no row "
+          "above moves. Cells are S(alternative) / S(plan), ecbench `compare`, paired, cluster 95% interval, at "
+          "w = 0; the band column is the ratio at w = 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md §5a). "
+          "Supplementary curves are `prime_search` curves outside the registry, named by tag. "
+          f"Study: [{pl['study']}](../../{pl['study']}).", "",
+          "| curve | log₂ r | plan base | " + " | ".join(PLANNER_ARMS) + " | double base across the band | S(plan) / S(rho) measured | predicted |",
+          "|:--|--:|:--|" + ":--|" * len(PLANNER_ARMS) + ":--|:--|--:|"]
+    for r in pl["rows"]:
+        db = next(a for a in r["alternatives"] if a["arm"] == "double-base")
+        po = r["plan_over_rho"]
+        L.append(f"| {plcurve(r)} | {r['log2_r']:.2f} | `{r['plan']['factor_base']}` | "
+                 + " | ".join(plq(a) for a in r["alternatives"])
+                 + f" | {' / '.join(f'{x:.2f}' for x in db['band_ratio'])} ({db['verdict']}) | "
+                 f"{po['ratio']:.3g} [{po['ci95'][0]:.3g}, {po['ci95'][1]:.3g}] | {r['predicted_plan_over_rho']:.3g} |")
     L.append("")
     L += ["## Large-prime conductor-gap counted diagnostics", "",
           "Copied from native analysis: eight independent one-target workloads per fixed curve; "
@@ -1996,6 +2056,34 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{pq(r["blocked_over_batch"])}</td><td>{pq(r["blocked_over_scalar"])}</td>'
                  f'<td class="n">{r["run_blocked_over_scalar"]:.2f}</td>'
                  f'<td>{r["rss_gib"]["batch"]:.2f} → {r["rss_gib"]["blocked"]:.2f} GiB</td></tr>')
+    P.append('</tbody></table></section>')
+
+    pl = doc["planner_component"]
+    P.append('<section class="card" id="planner-validation"><h2>Planner validation, outside the priced tables</h2>'
+             f'<p><code>ic plan</code> / <code>ic bench --auto</code> ({esc(pl["planner"])}) chooses every '
+             '<code>ic.pipeline</code> stage of a prime-field run; here its plan runs against every alternative one '
+             'change away from it on six prime curves outside its evidence (class: engineering). The plan is the '
+             'existing best recipe, chosen automatically, so no row above moves. Cells are S(alternative) / S(plan), '
+             'ecbench <code>compare</code>, paired, cluster 95% interval, at w = 0; the band column is the doubled '
+             'base at w = 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md §5a). Supplementary curves are '
+             '<code>prime_search</code> curves outside the registry, named by tag. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(pl["study"])}">Study</a>.</p>')
+    P.append('<table><thead><tr><th>Curve</th><th class="n">log₂ r</th><th>plan base</th>'
+             + "".join(f"<th>{esc(a)}</th>" for a in PLANNER_ARMS)
+             + '<th>double base across the band</th><th>S(plan) / S(rho), measured</th>'
+               '<th class="n">predicted</th></tr></thead><tbody>')
+    for r in pl["rows"]:
+        def plh(a):
+            return f'{a["ops_ratio"]:.3g} <span class="muted">[{a["ci95"][0]:.3g}, {a["ci95"][1]:.3g}]</span>'
+        db = next(a for a in r["alternatives"] if a["arm"] == "double-base")
+        po = r["plan_over_rho"]
+        cname = f'<code>{esc(r["curve"])}</code>' if r["primary"] else f'{esc(r["tag"])} <span class="muted">(supplementary)</span>'
+        P.append(f'<tr><td>{cname}</td><td class="n">{r["log2_r"]:.2f}</td>'
+                 f'<td><code>{esc(r["plan"]["factor_base"])}</code></td>'
+                 + "".join(f"<td>{plh(a)}</td>" for a in r["alternatives"])
+                 + f'<td>{" / ".join(f"{x:.2f}" for x in db["band_ratio"])} <span class="muted">({esc(db["verdict"])})</span></td>'
+                 f'<td>{po["ratio"]:.3g} <span class="muted">[{po["ci95"][0]:.3g}, {po["ci95"][1]:.3g}]</span></td>'
+                 f'<td class="n">{r["predicted_plan_over_rho"]:.3g}</td></tr>')
     P.append('</tbody></table></section>')
 
     head_cells = ('<th class="n">#</th><th>curve</th><th class="n">log₂ r</th><th>recipe</th>'
