@@ -11,7 +11,7 @@ permissions:
 jobs:
   evidence:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 60 || 25 }}
+    timeout-minutes: 60
     defaults:
       run:
         working-directory: research/weak_curve_conjectures_20261012
