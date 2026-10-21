@@ -438,8 +438,8 @@ def benchmark_archive_errors(repo: Path, admitted: dict[str, str], base: str | N
         known[directory] = line
 
     if base:
-        old_by_dir: dict = {}
         old_archive = git_show(base, BENCHMARKS_ARCHIVE)
+        old_by_dir: dict[str, str] = {}
         if old_archive:
             try:
                 old_records = json.loads(old_archive).get("rows", [])
@@ -455,12 +455,8 @@ def benchmark_archive_errors(repo: Path, admitted: dict[str, str], base: str | N
             for directory, old_line in old_rows.items():
                 if directory not in admitted and known.get(directory) != old_line:
                     errors.append(f"removed benchmark {directory} lacks an exact archival disposition")
-            # Only a record this change adds must come from the base table; a record
-            # already archived on the base had its row removed when it was archived.
             for directory, line in known.items():
-                if old_by_dir.get(directory) == line:
-                    continue
-                if directory not in old_rows:
+                if directory not in old_rows and old_by_dir.get(directory) != line:
                     errors.append(f"archival record for {directory} does not match a row from the base table")
     return errors
 
