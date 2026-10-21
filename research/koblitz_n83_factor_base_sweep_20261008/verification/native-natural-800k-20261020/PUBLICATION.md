@@ -1,4 +1,15 @@
-# Native N83 800K raw evidence: sealed locally, S3 write denied
+# Native N83 800K raw evidence: S3 publication recovered
+
+Current status,2026-10-21UTC: access restored on replacement host. The exact
+raw archive below uploaded successfully. Fresh S3GET, all294payload hashes,
+both full native replays, original failure-refusal/prefix checks, ELF/panel
+byte comparisons and deterministic repack pass. The original verification
+sidecar also uploaded and its freshGET matches byte-for-byte. Receipts and
+downloaded-record native replay are preserved in
+[recovery-20261021](../native-natural-1m-20261020/recovery-20261021/).
+The original immutable archive and sidecar hashes are unchanged. Original
+denial/local-verification history follows; those statements describe the
+earlier blocked publication attempt, not current storage status.
 
 Status: native sweep and local archive verification complete; requested S3
 publication blocked by the migrated AWS role's missing write permission.

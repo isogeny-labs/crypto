@@ -1,12 +1,14 @@
 //! Native bounded diagnostic runner. Deliberately admits no scalar recovery or runtime winner.
 use serde_json::{json, Value};
 mod card;
+mod memory_profile;
 #[allow(dead_code)]
 #[path = "../../../src/cryptanalysis/ecbench/isolation.rs"]
 mod native_isolation;
 #[allow(dead_code)]
 #[path = "../../../src/cryptanalysis/ecbench/signals.rs"]
 pub mod native_signals;
+mod systemd_scope;
 mod cryptanalysis {
     pub mod ecbench {
         pub use crate::native_signals as signals;
@@ -190,8 +192,113 @@ fn longer_inspection_wait_does_not_extend_or_retry_mutations() {
     assert_eq!(docker_rpc_timeout(&[]), "15s");
 }
 fn inspect(name: &str) -> R<Value> {
-    let out=docker(&["inspect","--format", "{\"host\":{{json .HostConfig}},\"mounts\":{{json .Mounts}},\"state\":{{json .State}},\"image\":{{json .Image}}}",name])?;
+    let out=docker(&["inspect","--format", "{\"id\":{{json .Id}},\"host\":{{json .HostConfig}},\"mounts\":{{json .Mounts}},\"state\":{{json .State}},\"image\":{{json .Image}}}",name])?;
     Ok(serde_json::from_slice(&out.stdout)?)
+}
+
+// Diagnostic only: the Docker init PID is the timeout supervisor. Read
+// memory counters without execing a process inside the measured container.
+// Missing counters remain explicit errors, never zeros or admission evidence.
+fn unified_cgroup_path(raw: &str) -> R<std::path::PathBuf> {
+    let path = raw
+        .lines()
+        .find_map(|l| l.strip_prefix("0::"))
+        .ok_or("unified cgroup membership missing")?;
+    require(path.starts_with('/'), "cgroup path must be absolute")?;
+    require(
+        path.split('/').all(|c| c != ".." && c != "."),
+        "unsafe cgroup path",
+    )?;
+    Ok(Path::new("/sys/fs/cgroup").join(path.trim_start_matches('/')))
+}
+
+fn memory_sample(pid: u64, elapsed_ms: f64) -> Value {
+    let read_counter = |p: &Path| match fs::read_to_string(p) {
+        Ok(v) => json!({"raw":v.trim()}),
+        Err(e) => json!({"error":e.to_string()}),
+    };
+    let mut sample = json!({"schema":"n83.memory-sample/v1", "elapsed_ms":elapsed_ms,
+        "pid":pid, "scope":"Docker init process and its unified cgroup; diagnostic only"});
+    match fs::read_to_string(format!("/proc/{pid}/status")) {
+        Ok(raw) => {
+            sample["process_status"] = json!(raw
+                .lines()
+                .filter(|l| [
+                    "VmPeak:",
+                    "VmSize:",
+                    "VmHWM:",
+                    "VmRSS:",
+                    "RssAnon:",
+                    "RssFile:",
+                    "RssShmem:",
+                    "VmSwap:"
+                ]
+                .iter()
+                .any(|key| l.starts_with(key)))
+                .collect::<Vec<_>>())
+        }
+        Err(e) => sample["process_error"] = json!(e.to_string()),
+    }
+    match fs::read_to_string(format!("/proc/{pid}/cgroup"))
+        .map_err(|e| e.into())
+        .and_then(|s| unified_cgroup_path(&s))
+    {
+        Ok(path) => {
+            sample["cgroup_path"] = json!(path);
+            for key in [
+                "memory.current",
+                "memory.peak",
+                "memory.stat",
+                "memory.events",
+                "memory.max",
+                "memory.swap.max",
+            ] {
+                sample[key] = read_counter(&path.join(key));
+            }
+        }
+        Err(e) => sample["cgroup_error"] = json!(e.to_string()),
+    }
+    sample
+}
+
+fn sampled_memory_limits(sample: &Value, memory: u64) -> R<()> {
+    require(
+        sample["memory.max"]["raw"] == memory.to_string()
+            && sample["memory.swap.max"]["raw"] == "0",
+        "sampled live memory/swap limit changed or unavailable; data retained",
+    )
+}
+
+#[test]
+fn live_sample_gate_refuses_unlimited_swap_and_missing_limits() {
+    let mut v = json!({"memory.max":{"raw":"8589934592"},"memory.swap.max":{"raw":"0"}});
+    assert!(sampled_memory_limits(&v, 8u64 << 30).is_ok());
+    for raw in ["max", "1", ""] {
+        v["memory.swap.max"]["raw"] = json!(raw);
+        assert!(sampled_memory_limits(&v, 8u64 << 30).is_err());
+    }
+    assert!(sampled_memory_limits(&json!({}), 8u64 << 30).is_err());
+}
+
+#[test]
+fn memory_profile_refuses_escaping_or_nonunified_cgroups() {
+    assert_eq!(
+        unified_cgroup_path("0::/system.slice/docker-test.scope\n").unwrap(),
+        Path::new("/sys/fs/cgroup/system.slice/docker-test.scope")
+    );
+    for raw in [
+        "1:memory:/legacy",
+        "0::relative",
+        "0::/../etc",
+        "0::/x/../../etc",
+        "0::/./x",
+    ] {
+        assert!(unified_cgroup_path(raw).is_err());
+    }
+    let absent = memory_sample(u64::MAX, 1.0);
+    assert!(absent["process_error"].is_string());
+    assert!(absent["cgroup_error"].is_string());
+    assert!(absent.get("memory.current").is_none());
 }
 fn memory_limit(v: &Value) -> R<u64> {
     let bytes = match v.get("memory_limit_bytes") {
@@ -199,8 +306,8 @@ fn memory_limit(v: &Value) -> R<u64> {
         Some(n) => n.as_u64().ok_or("invalid memory limit")?,
     };
     let extended = [2048, 4096].iter().any(|&k| v["columns"] == k)
-        && v["conflicts"] == 800000u64
-        && v["wall_seconds"] == 4800u64
+        && ((v["conflicts"] == 800000u64 && v["wall_seconds"] == 4800u64)
+            || (v["conflicts"] == 1000000u64 && v["wall_seconds"] == 6000u64))
         && !v["external_solver"].is_string()
         && !v["external_solver_blake3"].is_string();
     require(
@@ -213,8 +320,13 @@ fn memory_limit(v: &Value) -> R<u64> {
 #[test]
 fn explicit_memory_extension_keeps_legacy_and_control_limits() {
     assert_eq!(memory_limit(&json!({})).unwrap(), 4u64 << 30);
-    for k in [2048, 4096] {
-        let base = json!({"columns":k,"conflicts":800000,"wall_seconds":4800,"memory_limit_bytes":8u64<<30});
+    for (k, conflicts, wall) in [
+        (2048, 800000, 4800),
+        (4096, 800000, 4800),
+        (2048, 1000000, 6000),
+        (4096, 1000000, 6000),
+    ] {
+        let base = json!({"columns":k,"conflicts":conflicts,"wall_seconds":wall,"memory_limit_bytes":8u64<<30});
         assert_eq!(memory_limit(&base).unwrap(), 8u64 << 30);
         for (field, value) in [
             ("columns", json!(0)),
@@ -424,6 +536,13 @@ fn audit(dir: &Path) -> R<Value> {
         "config changed",
     )?;
     let out = read(dir.join("outer.json"))?;
+    if cfg["systemd_swap_sync"] == true {
+        require(
+            read(dir.join("spec.json"))?["systemd_swap_sync"] == true,
+            "startup policy differs from frozen spec",
+        )?;
+        systemd_scope::audit(dir, &cfg, &out)?;
+    }
     require(
         hash(dir.join("spec.json"))? == text(&cfg, "spec_blake3")?,
         "spec changed",
@@ -438,6 +557,19 @@ fn audit(dir: &Path) -> R<Value> {
             && hash(dir.join("stderr.log"))? == text(&out, "stderr_blake3")?,
         "raw log custody mismatch",
     )?;
+    if let Some(digest) = out.get("memory_profile_blake3") {
+        require(
+            digest.as_str() == Some(hash(dir.join("memory-profile.jsonl"))?.as_str()),
+            "memory profile custody mismatch",
+        )?;
+        let live = read(dir.join("inspect-live.json"))?;
+        memory_profile::verify_complete(
+            &fs::read_to_string(dir.join("memory-profile.jsonl"))?,
+            number(&live["state"], "Pid")?,
+            memory_limit(&cfg)?,
+            out["outer_wall_ms"].as_f64().ok_or("missing outer time")?,
+        )?;
+    }
     isolation(
         &read(dir.join("inspect-live.json"))?,
         text(&cfg, "image")?,
@@ -874,11 +1006,11 @@ fn external_replay(dir: &Path) -> R<Vec<bool>> {
 
 fn validate_run_budget(columns: u64, external: bool, conflicts: u64, wall: u64) -> R<()> {
     let natural = columns != 0 && !external;
-    let wall_ceiling = if natural { 4800 } else { 900 };
+    let wall_ceiling = if natural { 6000 } else { 900 };
     let conflict_ceiling = if external {
         1_000_000
     } else if natural {
-        800_000
+        1_000_000
     } else {
         100_000
     };
@@ -939,6 +1071,10 @@ fn natural_worker_declaration_matches_frozen_cgroup_bytes() {
 fn run(spec: &Path, dir: &Path) -> R<()> {
     native_signals::install();
     let s = read(spec)?;
+    require(
+        s["systemd_swap_sync"] == true,
+        "explicit startup synchronization policy required",
+    )?;
     let wall = number(&s, "wall_seconds")?;
     let columns = number(&s, "columns")?;
     require(
@@ -1017,7 +1153,7 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         std::process::id(),
         SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos()
     );
-    let cfg = json!({"schema":"n83.native-run-config/v1","control_variant":s["control_variant"],"columns":columns,"conflicts":conflicts,"wall_seconds":wall,"memory_limit_bytes":memory,"panel":panel,"fixtures":fixtures,"worker":worker,"image":image,"source_commit":commit,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?,"source_blake3":inventory(&source)?,"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"spec_blake3":hash(spec)?,"container_name":name,"isolate":s["isolate"],"xor_engine":s["xor_engine"],"external_solver_blake3":s["external_solver_blake3"]});
+    let cfg = json!({"schema":"n83.native-run-config/v1","control_variant":s["control_variant"],"columns":columns,"conflicts":conflicts,"wall_seconds":wall,"memory_limit_bytes":memory,"panel":panel,"fixtures":fixtures,"worker":worker,"image":image,"source_commit":commit,"panel_blake3":inventory(&panel)?,"fixtures_blake3":inventory(&fixtures)?,"source_blake3":inventory(&source)?,"worker_blake3":hash(&worker)?,"runner_blake3":hash(std::env::current_exe()?)?,"spec_blake3":hash(spec)?,"container_name":name,"isolate":s["isolate"],"xor_engine":s["xor_engine"],"external_solver_blake3":s["external_solver_blake3"],"systemd_swap_sync":true});
     write(dir.join("config.json"), &cfg)?;
     write(
         dir.join("custody.json"),
@@ -1084,6 +1220,10 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
     }
     cmd.extend([
         image.into(),
+        "/bin/sh".into(),
+        "-c".into(),
+        systemd_scope::BARRIER.into(),
+        "n83-resource-barrier".into(),
         "/usr/bin/timeout".into(),
         "--signal=KILL".into(),
         format!("{wall}s"),
@@ -1094,10 +1234,12 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
     } else {
         cmd.extend(natural_worker_args(columns, conflicts, wall, memory));
     }
+    let mut owned_scope = None;
     let attempt = (|| -> R<()> {
         docker(&cmd.iter().map(String::as_str).collect::<Vec<_>>())?;
         let live = inspect(&name)?;
         write(dir.join("inspect-live.json"), &live)?;
+        owned_scope = Some(systemd_scope::unit(text(&live, "id")?)?);
         isolation(&live, image, memory)?;
         if let Some(r) = &reservation {
             require(
@@ -1105,13 +1247,27 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
                 "CPU pin differs",
             )?;
         }
+        systemd_scope::prepare_and_release(&dir, &live, memory)?;
         let mut censored = false;
+        let mut memory_log = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(dir.join("memory-profile.jsonl"))?;
+        let mut next_memory_sample = Duration::ZERO;
         loop {
             require(
                 native_signals::interrupted().is_none(),
                 "interrupted; cleanup and affinity restoration required",
             )?;
             let v = inspect(&name)?;
+            if start.elapsed() >= next_memory_sample && v["state"]["Running"] == true {
+                let pid = number(&v["state"], "Pid")?;
+                let sample = memory_sample(pid, start.elapsed().as_secs_f64() * 1000.);
+                writeln!(memory_log, "{}", sample)?;
+                memory_log.flush()?;
+                sampled_memory_limits(&sample, memory)?;
+                next_memory_sample = start.elapsed() + Duration::from_secs(60);
+            }
             if v["state"]["Running"] == false {
                 if start.elapsed() >= Duration::from_secs(wall) && v["state"]["ExitCode"] == 137 {
                     censored = true;
@@ -1133,9 +1289,10 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         docker(&["rm", &name])?;
         let absent = docker(&["ps", "-aq", "--filter", &format!("name=^{name}$")])?;
         require(absent.stdout.is_empty(), "container remains")?;
+        systemd_scope::cleanup(owned_scope.as_deref().ok_or("missing owned scope")?)?;
         write(
             dir.join("outer.json"),
-            &json!({"schema":"n83.native-outer/v1","wall_censored":censored,"outer_wall_ms":start.elapsed().as_secs_f64()*1000.,"exit_code":final_inspect["state"]["ExitCode"],"cleanup_verified":true,"stdout_blake3":hash(dir.join("stdout.log"))?,"stderr_blake3":hash(dir.join("stderr.log"))?}),
+            &json!({"schema":"n83.native-outer/v1","wall_censored":censored,"outer_wall_ms":start.elapsed().as_secs_f64()*1000.,"exit_code":final_inspect["state"]["ExitCode"],"cleanup_verified":true,"stdout_blake3":hash(dir.join("stdout.log"))?,"stderr_blake3":hash(dir.join("stderr.log"))?,"memory_profile_blake3":hash(dir.join("memory-profile.jsonl"))?,"systemd_runtime_cleanup_verified":true,"systemd_swap_sync_blake3":hash(dir.join("systemd-swap-sync.json"))?,"resource_ready_blake3":hash(dir.join("RESOURCE_READY"))?}),
         )?;
         Ok(())
     })();
@@ -1151,9 +1308,13 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
         let _ = docker(&["rm", "--force", &name]);
         let removed = docker(&["ps", "-aq", "--filter", &format!("name=^{name}$")])
             .is_ok_and(|v| v.stdout.is_empty());
+        let scope_removed = removed
+            && owned_scope
+                .as_deref()
+                .is_none_or(|name| systemd_scope::cleanup(name).is_ok());
         write(
             dir.join("failure-cleanup.json"),
-            &json!({"cleanup_verified":removed,"admitted_as_search_result":false}),
+            &json!({"cleanup_verified":removed && scope_removed,"container_removed":removed,"systemd_runtime_cleanup_verified":scope_removed,"admitted_as_search_result":false}),
         )?;
         write(
             dir.join("launcher-error.json"),
@@ -1185,6 +1346,33 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
 fn main() -> R<()> {
     let a: Vec<_> = std::env::args().collect();
     match a.get(1).map(String::as_str) {
+        Some("systemd-barrier-smoke") if a.len() == 3 => systemd_scope::smoke(Path::new(&a[2])),
+        Some("prepare-systemd-swap") if a.len() == 4 => {
+            let live = read(&a[2])?;
+            let memory = number(&live["host"], "Memory")?;
+            systemd_scope::prepare_and_release(Path::new(&a[3]), &live, memory).map(|_| ())
+        }
+        Some("check-bench-lock") if a.len() == 2 => {
+            let path = native_isolation::DEFAULT_LOCK;
+            let before = fs::metadata(path)?;
+            let _lock = native_isolation::BenchLock::acquire(path, false)?;
+            let after = fs::metadata(path)?;
+            require(
+                before.ino() == after.ino()
+                    && before.dev() == after.dev()
+                    && before.uid() == after.uid(),
+                "benchmark lock identity changed",
+            )?;
+            println!(
+                "{}",
+                json!({"status":"PASS_EXISTING_BENCHMARK_LOCK_ACQUIRE_RELEASE",
+                "path":path,"inode":after.ino(),"owner_uid":after.uid(),"scope":"instantaneous readiness; original exclusion and file identity retained"})
+            );
+            Ok(())
+        }
+        Some("summarize-memory") if a.len() == 4 => {
+            memory_profile::summarize(Path::new(&a[2]), Path::new(&a[3]))
+        }
         Some("summarize-xor") if a.len() == 4 => {
             xor_summary::summarize(Path::new(&a[2]), Path::new(&a[3]))
         }
@@ -1371,13 +1559,14 @@ fn sat_trace_distinguishes_censoring_and_rejects_forged_order() {
 }
 
 #[test]
-fn natural_budget_admits_800k_but_stays_bounded() {
+fn natural_budget_admits_1m_but_stays_bounded() {
     for columns in [2048, 4096] {
         assert!(validate_run_budget(columns, false, 200_000, 1200).is_ok());
         assert!(validate_run_budget(columns, false, 400_000, 4800).is_ok());
         assert!(validate_run_budget(columns, false, 800_000, 4800).is_ok());
-        assert!(validate_run_budget(columns, false, 800_001, 4800).is_err());
-        assert!(validate_run_budget(columns, false, 800_000, 4801).is_err());
+        assert!(validate_run_budget(columns, false, 1_000_000, 6000).is_ok());
+        assert!(validate_run_budget(columns, false, 1_000_001, 6000).is_err());
+        assert!(validate_run_budget(columns, false, 1_000_000, 6001).is_err());
         assert!(validate_run_budget(columns, false, 0, 2400).is_err());
         assert!(validate_run_budget(columns, false, 800_000, 0).is_err());
     }

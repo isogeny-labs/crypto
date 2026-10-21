@@ -231,3 +231,9 @@ aws s3 sync s3://crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_
 aws s3 sync s3://crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/a1/objects/ "$n83_replay_dir/objects/"
 target/release/examples/koblitz_n83_factor_base_export replay "$n83_replay_dir"
 ```
+
+Latest native continuation: [1M-conflict report](reports/run-20261020T1546Z/REPORT.md)
+and [publication](verification/native-natural-1m-20261020/PUBLICATION.md).
+Both final K2048/K4096 runs reach1Mconflicts with zero models/relations/rank;
+59/61memory samples pass at8GiB/zero extra swap. Earlier refusals, interruption
+and failed resource profiles remain unadmitted. No base or runtime winner is selected.

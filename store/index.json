@@ -204,6 +204,42 @@
         "p20-glv"
       ],
       "provenance": "ecbench fb --curve '{\"kind\":\"prime_search\",\"bits\":20,\"seed\":59297}' --factor-base 'glv-orbit:size=16' (commit 0f0db951ad)"
+    },
+    "evidence/n83/natural-800k-20261020/runs.tar.xz": {
+      "sha256": "d15b8935a470707e572e4aa5a2bf6ab9da04270b266859fafe3f693b04b254d6",
+      "bytes": 50310788,
+      "description": "All five native 800K attempts and raw custody, including failures",
+      "provenance": "Original immutable archive; access restored on replacement host; fresh S3 GET/replay/repack verified"
+    },
+    "evidence/n83/natural-800k-20261020/verification.tar.xz": {
+      "sha256": "264c77eae6bd71ee672136284b08a92ac57621739589c5ed68384fbe7f4b2c20",
+      "bytes": 168096,
+      "description": "Original sealed local 800K verification sidecar",
+      "provenance": "Immutable original sidecar, original qualifications retained"
+    },
+    "evidence/n83/natural-1m-20261020/pre-repeat-checkpoint-20261021.tar.xz": {
+      "sha256": "cbd453b3e37ff3cf97576ae40405ba9926eb70dfe9cd8dd90daa616b3868ecd9",
+      "bytes": 45155524,
+      "description": "All original 1M raw attempts including refusal, resource-profile rejection and host interruption; before strict repeats",
+      "provenance": "Frozen c60158235; no v18 timed run included"
+    },
+    "evidence/n83/natural-1m-20261020/pre-repeat-checkpoint-v20-20261021.tar.xz": {
+      "sha256": "dc52c9c6bd7e18b16fe0c0365efb79b21e9b06c008aa688eb95fcc72866b3026",
+      "bytes": 54769744,
+      "description": "All original 1M raw attempts including refusal, resource-profile rejection and host interruption; before strict repeats",
+      "provenance": "Frozen 66ab009b; five actual attempts; no v20 SAT arm included"
+    },
+    "evidence/n83/natural-1m-20261020/runs.tar.xz": {
+      "sha256": "98c4396b189493eba773c7d3d5e10f05f974d77cf9b811af8437c1150417c5ea",
+      "bytes": 55236480,
+      "description": "Seven native N83 1M attempts, all available raw evidence, final K2048/K4096 replay and memory profile PASS, original failures retained",
+      "provenance": "Worker unchanged; final controller66ab009b; protocols SCOPE-V20; seal-final.sh"
+    },
+    "evidence/n83/natural-1m-20261020/verification.tar.xz": {
+      "sha256": "3a7bb909928f164075ac695f58959968eaf4a692463c38b37b00d0b9bf4a0f6b",
+      "bytes": 1077344,
+      "description": "Full compact verification, exact source commits, post-main validation and report companion to native N83 1M raw archive",
+      "provenance": "seal-publish-sidecar.sh; raw98c4396b; integrated source7abf1175; experiment66ab009b"
     }
   }
 }

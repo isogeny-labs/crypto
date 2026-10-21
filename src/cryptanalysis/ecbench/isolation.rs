@@ -402,11 +402,28 @@ pub struct BenchLock {
 
 impl BenchLock {
     pub fn acquire(path: &str, wait: bool) -> Result<Self, String> {
-        let file = std::fs::OpenOptions::new()
-            .create(true)
-            .truncate(false)
-            .write(true)
-            .open(path)
+        // Linux protected_regular can reject O_CREAT on somebody else's
+        // existing file in /tmp even for root. Open the existing inode
+        // without O_CREAT; create exclusively only when it is absent.
+        // A competing creator wins the same inode, which we then open.
+        let existing = || std::fs::OpenOptions::new().write(true).open(path);
+        let file = existing()
+            .or_else(|error| {
+                if error.kind() != std::io::ErrorKind::NotFound {
+                    return Err(error);
+                }
+                std::fs::OpenOptions::new()
+                    .write(true)
+                    .create_new(true)
+                    .open(path)
+                    .or_else(|error| {
+                        if error.kind() == std::io::ErrorKind::AlreadyExists {
+                            existing()
+                        } else {
+                            Err(error)
+                        }
+                    })
+            })
             .map_err(|e| format!("cannot open lock {path}: {e}"))?;
         #[cfg(unix)]
         {
@@ -1043,6 +1060,60 @@ pub fn cpu_settings(cpu: u32) -> CpuSettings {
 
 #[cfg(test)]
 mod tests {
+    #[cfg(unix)]
+    #[test]
+    fn benchmark_lock_preserves_inode_contents_and_exclusion() {
+        use std::os::unix::fs::MetadataExt;
+        let path = std::env::temp_dir().join(format!(
+            "bench-lock-exclusion-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let name = path.to_str().unwrap();
+        let first = super::BenchLock::acquire(name, false).unwrap();
+        std::fs::write(&path, b"sentinel").unwrap();
+        let inode = std::fs::metadata(&path).unwrap().ino();
+        assert!(super::BenchLock::acquire(name, false).is_err());
+        drop(first);
+        let second = super::BenchLock::acquire(name, false).unwrap();
+        assert_eq!(std::fs::metadata(&path).unwrap().ino(), inode);
+        assert_eq!(std::fs::read(&path).unwrap(), b"sentinel");
+        drop(second);
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn root_can_open_foreign_lock_in_sticky_directory() {
+        use std::os::unix::fs::PermissionsExt;
+        if unsafe { libc::geteuid() } != 0 {
+            return;
+        }
+        let dir = std::env::temp_dir().join(format!(
+            "bench-lock-protected-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir(&dir).unwrap();
+        std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(0o1777)).unwrap();
+        let path = dir.join("lock");
+        std::fs::write(&path, b"foreign owner").unwrap();
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o600)).unwrap();
+        let cpath = std::ffi::CString::new(path.to_str().unwrap()).unwrap();
+        assert_eq!(unsafe { libc::chown(cpath.as_ptr(), 65534, 65534) }, 0);
+        let lock = super::BenchLock::acquire(path.to_str().unwrap(), false).unwrap();
+        assert!(super::BenchLock::acquire(path.to_str().unwrap(), false).is_err());
+        assert_eq!(std::fs::read(&path).unwrap(), b"foreign owner");
+        drop(lock);
+        std::fs::remove_file(path).unwrap();
+        std::fs::remove_dir(dir).unwrap();
+    }
     use super::*;
 
     #[test]

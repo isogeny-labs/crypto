@@ -1,12 +1,20 @@
 # Native N83 800K-conflict runs exceed 4 GiB
 
 - **Status:** investigating
-- **Kind:** observed resource limit; unmeasured higher-memory outcome
+- **Kind:** observed 4GiB resource limit; bounded 8GiB execution resolved, allocation cause open
 - **Affected work:** [800K protocol](../research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-800k-20261020/PROTOCOL.md)
 - **Next action owner:** N83 sweep maintainer
-- **Last updated:** 2026-10-20 UTC
+- **Last updated:** 2026-10-21 UTC
 
-## Problem
+Current outcome: both new1M-conflict/8GiB arms complete with native replay,
+continuous sampled-limit validation and verified cleanup. See the
+[1M report](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261020T1546Z/REPORT.md).
+K2048-v20 has59samples/max sampled charge5304934400bytes; K4096-v20 has61/
+5876035584bytes. All samples retain8GiB and zero extra swap. Earlier4GiB OOMs,
+rejected swap profiles and interrupted custody remain unadmitted. The exact
+SAT allocation cause and minimum memory remain unknown; no 4GiB fix is claimed.
+
+## Original problem (historical)
 
 The retained native worker cannot yet provide admitted 800000-conflict
 terminals for either public N83 base under the frozen4GiB memory limit:
@@ -34,7 +42,7 @@ subgroup2417851639230796216685689; retained query seed2026100801,m5,identitymask
 - [x] Separately frozen8GiB/no-extra-swap attempts reach800000conflicts
   with complete native terminal, original-group/query, custody/resource and
   cleanup audits; retain every original failure and all new costs separately.
-- [ ] Fresh downloaded-record replay and exact payload/archive verification.
+- [x] Original800K fresh downloaded-record replay and exact payload/archive verification.
 
 This would resolve bounded terminal execution under8GiB only, not prove the
 4GiB issue fixed, establish useful natural yield, rank, cold runtime or rho gain.
@@ -71,3 +79,28 @@ Both exact card/receipt/verbatim-relay assessments pass. This establishes
 bounded8GiB terminal execution only. Original4GiB failures remain unadmitted;
 fresh archive replay/storage custody is tracked in the publication and the
 current S3 access obstruction remains open. No minimum-memory or speed claim.
+
+2026-10-21UTC: original800K raw archive and sidecar successfully published;
+freshGET/payload/native replay/repack pass (see PUBLICATION.md recovery link).
+New1M diagnostic K4096-v16 completed terminal1M/zero but its profile is rejected:
+memory.swap.max changes0 to"max" after the first minute despite unchanged Docker
+configuration. This is a newly observed resource-envelope discrepancy, root
+cause unknown, and remains separate from the original4GiB OOM. K2048-v16 was
+interrupted during host replacement without terminal/receipt/cleanup proof.
+[Fresh protocol and live limit gate](../research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/RESTORE-V18.md)
+retain all failures and preregister two strict1M/8GiB attempts; no claim that
+those attempts are completed or that allocation causes have been profiled.
+
+2026-10-21UTC subsequent diagnosis: K2048-v19's live gate stopped at a
+nonterminal420000conflicts when sampled swap.max changed0 to"max". All28
+samples and the full failure trace are retained; native exact-relay assessment
+passes and container cleanup is verified. An idle owned-scope control
+reproduces a mechanism: kernel0/systemdMemorySwapMax=infinity becomes kernel
+"max" on resource reapply; synchronizing the owned unit property to0 yields
+0 again and preserves0 on reapply. Historical caller/trigger remains unknown.
+[Startup barrier protocol](../research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/SCOPE-V20.md)
+synchronizes the owned unit before native worker release, retains the drift
+gate, and verifies runtime-property cleanup. Native smoke and30+7guard tests
+pass; fresh4409library/118ignored,19exporter and2model-checker checks pass.
+Both new1M arms are planned, not yet completed. No allocator/minimum-memory
+claim or retrospective admission of rejected profiles.

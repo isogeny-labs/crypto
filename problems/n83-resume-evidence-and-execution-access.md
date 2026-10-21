@@ -1,10 +1,23 @@
 # N83 resume evidence, execution access and historical accounting
 
 - **Status:** open
-- **Kind:** current storage access regression; historical accounting gap
+- **Kind:** recovered storage/execution obstructions; historical accounting gap
 - **Affected work:** [primary factor-base sweep](../research/koblitz_n83_factor_base_sweep_20261008/RESULT.md)
 - **Next action owner:** N83 sweep maintainer
-- **Last updated:** 2026-10-20 UTC
+- **Last updated:** 2026-10-21 UTC
+
+Current recovery update: S3 access is restored. The original800K archive and
+sidecar now have successful PUT/freshGET checks, full payload/native replay/
+repack for raw; original1M attempts are also in a verified S3 checkpoint.
+Host shutdown interrupted K2048-v16 without receipt/terminal/cleanup proof;
+that historical gap remains explicit. Replacement-host Docker/image readiness
+passes. K2048-v18 refused before worker launch because O_CREAT on a foreign
+owned existing/tmp benchmark lock hit protected_regular. The open behavior is
+fixed without replacing the lock or changing kernel settings; root regression
+and actual inode-preserving readiness checks pass. Both final1M attempts now
+complete with native replay/profile/cleanup validation; earlier failures stay
+unadmitted. See the [1M report](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261020T1546Z/REPORT.md).
+Historical denials below are retained history, not current storage status.
 
 ## Problem
 
