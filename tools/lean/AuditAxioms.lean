@@ -2,6 +2,8 @@
 Axiom audit for the repository's Lean proof gate (tools/lean/proof-gate.sh).
 
 Usage: lake env lean --run tools/lean/AuditAxioms.lean [--trusted FILE] <Module> [<Module> ...]
+The proof gate passes the manifest in `LEAN_AUDIT_TRUSTED_FILE`, since Lean
+4.19 treats a `--trusted` program argument as a Lean command-line option.
 
 Imports the named modules, then, for every theorem declared in them (including
 submodules sharing the prefix), collects the axioms it depends on transitively.
@@ -46,13 +48,17 @@ def isNativeAxiom (a : Name) : Bool :=
 def readTrusted (path : String) : IO (List Name) := do
   let lines ← IO.FS.lines path
   return lines.toList.filterMap fun l =>
-    let n := String.ofList (((l.splitOn "#").head!).toList.filter (fun c => !c.isWhitespace))
+    let n := String.join ((((l.splitOn "#").head!).toList.filter (fun c => !c.isWhitespace)).map Char.toString)
     if n.isEmpty then none else some n.toName
 
 def main (args : List String) : IO UInt32 := do
   let (trusted, args) ← match args with
     | "--trusted" :: f :: rest => do pure ((← readTrusted f), rest)
-    | _ => pure ([], args)
+    | _ => do
+      let path ← IO.getEnv "LEAN_AUDIT_TRUSTED_FILE"
+      match path with
+      | some f => if f.isEmpty then pure ([], args) else pure ((← readTrusted f), args)
+      | none => pure ([], args)
   if args.isEmpty then
     IO.eprintln "usage: AuditAxioms [--trusted FILE] <Module> [<Module> ...]"
     return 2

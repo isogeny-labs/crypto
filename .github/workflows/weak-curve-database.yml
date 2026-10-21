@@ -256,6 +256,41 @@ jobs:
           leanchecker-args: '--fresh --verbose ResidualDiscriminant'
       - name: Audit residual-discriminant theorem axioms
         run: lake env lean ResidualDiscriminant.lean
+  p192-three-pivot-lean-proof:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: research/p192_extension_cover_20261012/lean
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build unordered-support and third-pivot theorems
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: research/p192_extension_cover_20261012/lean
+          auto-config: false
+          use-mathlib-cache: true
+          build: true
+          build-args: 'UnorderedSupport ThreePivotSupport'
+          test: false
+          lint: false
+          leanchecker: true
+          leanchecker-args: '--fresh --verbose ThreePivotSupport'
+      - name: Fresh-check unordered-support and third-pivot axioms
+        run: |
+          lake env leanchecker --fresh --verbose UnorderedSupport
+          lake env lean UnorderedSupport.lean
+          lake env lean ThreePivotSupport.lean
+  p192-three-pivot-replay:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replay every third-pivot row and independent sorted union
+        run: |
+          python3 -B research/p192_extension_cover_20261012/verify_residual_pivot002_cross.py
+          python3 -B research/p192_extension_cover_20261012/verify_three_pivot_union.py
+          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261017T2055Z/ARTIFACTS.sha256
   leaderboard-lean-proof:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
