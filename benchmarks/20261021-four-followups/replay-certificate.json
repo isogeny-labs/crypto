@@ -1,14 +1,9 @@
 {
-  "schema": "four-followups-replay-certificate/v1",
+  "schema": "four-followups-combined-replay/v1",
   "status": "verified",
   "independent": true,
   "scalars_verified": true,
-  "method": "separate archive-input process; all 35 raw JSONL files compared byte-for-byte with cmp; each run recomputes candidate and source-rho scalars on E(Fp2)",
-  "archive_sha256": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339",
-  "command": "bash research/four_followups_20261021/replay_matched.sh",
-  "matched_files": 35,
-  "candidate_solved": 6300,
-  "rho_solved": 6300,
+  "method": "factor-base byte replay and pencil non-wall replay, both with source multiplication checks",
   "runs": [
     {
       "sha256": "1f73b29938d8af24986cd1e14bb8e08db7d9d4824ccd27a1afacb19712557f2d",
@@ -149,6 +144,52 @@
     {
       "sha256": "2d4a9ad6eeb075294da6d4265a187071499e5eb7cf8aad5987da2c4fa53a8915",
       "path": "research/four_followups_20261021/results/matched/fb4-j16-bits40.jsonl"
+    },
+    {
+      "primary": "research/four_followups_20261021/results/pencil-pilot/f739-cohort.jsonl",
+      "replay": "research/four_followups_20261021/results/pencil-pilot/replay/f739-cohort.jsonl",
+      "rows": 61,
+      "scalars_verified": 60
+    },
+    {
+      "primary": "research/four_followups_20261021/results/pencil-pilot/f3371-cohort.jsonl",
+      "replay": "research/four_followups_20261021/results/pencil-pilot/replay/f3371-cohort.jsonl",
+      "rows": 61,
+      "scalars_verified": 60
+    },
+    {
+      "primary": "research/four_followups_20261021/results/pencil-pilot/f3527-cohort.jsonl",
+      "replay": "research/four_followups_20261021/results/pencil-pilot/replay/f3527-cohort.jsonl",
+      "rows": 61,
+      "scalars_verified": 60
+    },
+    {
+      "primary": "research/four_followups_20261021/results/pencil-pilot/f3931-cohort.jsonl",
+      "replay": "research/four_followups_20261021/results/pencil-pilot/replay/f3931-cohort.jsonl",
+      "rows": 61,
+      "scalars_verified": 60
+    },
+    {
+      "primary": "research/four_followups_20261021/results/pencil-pilot/f11731-cohort.jsonl",
+      "replay": "research/four_followups_20261021/results/pencil-pilot/replay/f11731-cohort.jsonl",
+      "rows": 61,
+      "scalars_verified": 60
+    },
+    {
+      "primary": "research/four_followups_20261021/results/pencil-pilot/f11887-cohort.jsonl",
+      "replay": "research/four_followups_20261021/results/pencil-pilot/replay/f11887-cohort.jsonl",
+      "rows": 61,
+      "scalars_verified": 60
+    },
+    {
+      "primary": "research/four_followups_20261021/results/pencil-pilot/f12143-cohort.jsonl",
+      "replay": "research/four_followups_20261021/results/pencil-pilot/replay/f12143-cohort.jsonl",
+      "rows": 61,
+      "scalars_verified": 60
     }
-  ]
+  ],
+  "factor_base_candidate_scalars": 6300,
+  "factor_base_rho_scalars": 6300,
+  "pencil_candidate_scalars": 420,
+  "pencil_rho_scalars": 420
 }

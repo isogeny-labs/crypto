@@ -1,0 +1,80 @@
+{
+  "schema": "four-followups-review-record/v1",
+  "date_utc": "2026-10-21",
+  "cohort": {"models": 21, "targets_per_model": 60, "target_count": 1260},
+  "price_cell": {"square_per_multiply": 0.5, "inverse_per_multiply": 10, "native_GAE_per_logical": 0.1},
+  "leads": [
+    {
+      "id": "factor_base_graph",
+      "status": "five_frozen_arms_full_cohort",
+      "candidate_target_solves": 6300,
+      "paired_rho_target_solves": 6300,
+      "candidate_source_verified": 6300,
+      "rho_source_verified": 6300,
+      "candidate_over_rho_by_arm": {
+        "full_16_jumps": 2.4488299865553076,
+        "full_8_jumps": 2.447173013560974,
+        "full_32_jumps": 2.4532781201923943,
+        "half_16_jumps": 3.0177319451102558,
+        "quarter_16_jumps": 3.9191927168942735
+      },
+      "raw": "matched/fb*-bits*.jsonl",
+      "price_grid": "matched/price-grid.csv",
+      "summary": "matched/summary.json",
+      "graph": "../factor-base-grid.svg"
+    },
+    {
+      "id": "complete_projective_law",
+      "status": "arithmetic_branches_only",
+      "one_plus_one_matched_cantor": 13608,
+      "one_plus_one_attempted": 13608,
+      "generic_one_plus_two_matched_cantor": 9492,
+      "generic_one_plus_two_attempted": 9492,
+      "cancellation_one_plus_two_matched_cantor": 1304,
+      "cancellation_one_plus_two_attempted": 1304,
+      "coincident_one_plus_two_matched_cantor": 1258,
+      "tripling_one_plus_two_matched_cantor": 42,
+      "one_plus_two_unchecked": 0,
+      "generic_two_plus_two_matched_cantor": 5040,
+      "doubling_two_plus_two_matched_cantor": 336,
+      "other_two_plus_two_branches_attempted": 0,
+      "end_to_end_target_solves": 0,
+      "candidate_over_rho": null,
+      "raw": "complete-law-branches.jsonl",
+      "graph": "../complete-law-gate.svg",
+      "second_graph": "../complete-law-2plus2.svg",
+      "pdf": "../LAW_GATE.pdf"
+    },
+    {
+      "id": "point_driven_pencil",
+      "status": "seven_models_partial_cohort",
+      "candidate_source_verified": 420,
+      "rho_source_verified": 420,
+      "independently_replayed_target_pairs": 420,
+      "remaining_cohort_targets": 840,
+      "candidate_over_rho_by_prime": {
+        "739": 12.931178361110229,
+        "3371": 246.1171102203243,
+        "3527": 267.3749413682309,
+        "3931": 332.18734853992794,
+        "11731": 4331.361006391998,
+        "11887": 3856.2386131198605,
+        "12143": 4250.094922873795
+      },
+      "raw": "pencil-pilot/f*-cohort.jsonl",
+      "price_grid": "pencil-pilot/price-grid.csv",
+      "graph": "../pencil-pilot-cost.svg",
+      "pdf": "../PENCIL_PILOT.pdf"
+    },
+    {
+      "id": "kummer_walk_arithmetic",
+      "status": "unsigned_ordinary_addition_gate_only",
+      "models_with_sign_ambiguity_witness": 21,
+      "models_checked": 21,
+      "differential_walk_target_solves": 0,
+      "candidate_over_rho": null,
+      "raw": "kummer-ambiguity.jsonl",
+      "graph": "../kummer-ambiguity.svg"
+    }
+  ]
+}

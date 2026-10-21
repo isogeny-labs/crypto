@@ -1,11 +1,11 @@
-# Four follow-ups: evidence status after the first complete sweep
+# Four follow-ups: evidence status after the factor-base sweep and pencil pilot
 
 **Scope:** four authorized leads on the 21 exact-order Scholten models and the
 original 60 one-target workloads per model. The [frozen protocol](PROTOCOL.md)
 defines the comparisons. This report records the complete factor-base/jump
-sweep and an exact Kummer ordinary-addition gate. The complete law and pencil
-collector remain open requirements; their previous results are not counted as
-new executions here. Values below are observed operation counts or values
+sweep, a 420-target pencil pilot, two branches of the published complete law,
+and an exact Kummer ordinary-addition gate. The full law and pencil cohort
+remain open requirements. Values below are observed operation counts or values
 derived from them; wall times are diagnostics only.
 
 ## Factor-base and jump sweep
@@ -68,16 +68,66 @@ binary Kummer addition on unsigned inputs alone. Differential addition with
 known differences and a sign/lift recovery rule is a separate, unimplemented
 collector path. This is a mathematical applicability gate, not a timing result.
 
+## Point-driven pencil pilot
+
+The point-driven sieve and a new sparse modular row collector solved and
+source-verified 60/60 targets on each of seven original models: p = 739,
+3,371, 3,527, 3,931, 11,731, 11,887 and 12,143. Same-process
+source-negation rho solved the same 420 targets. An independent native
+validator has rechecked both recovered scalars on all 420 targets,
+matched the rho counters to frozen controls and recomputed 21 representative
+price quantities. A separate rerun matched all non-wall fields of the seven
+61-row files. The direct F739 port
+also reproduced the prior 61-record gate after removing wall-clock fields.
+
+At `M+0.5S+10I` and 0.1 GAE per native logical operation, the complete cold
+one-target pencil/rho ratios are:
+
+| p | 60 target pairs source-verified | Modular row updates | Pencil / rho |
+| ---: | ---: | ---: | ---: |
+| 739 | 60 | 6,288,519 | 12.931178 |
+| 3,371 | 60 | 442,470,426 | 246.117110 |
+| 3,527 | 60 | 499,795,794 | 267.374941 |
+| 3,931 | 60 | 690,243,338 | 332.187349 |
+| 11,731 | 60 | 17,235,887,587 | 4,331.361006 |
+| 11,887 | 60 | 17,655,108,982 | 3,856.238613 |
+| 12,143 | 60 | 19,113,208,311 | 4,250.094923 |
+
+Full setup is charged to every target even
+though it was physically reused for 60 solves per model. The [pilot PDF](PENCIL_PILOT.pdf),
+[graph](pencil-pilot-cost.svg), [raw and price grid](results/pencil-pilot/)
+show the disaggregated values. A one-target 28-bit memory/operation run is in
+progress; no full-cohort pencil result is claimed.
+
+## Complete-law arithmetic gate
+
+An implementation directly from equations (13) and (14) of the
+[Ozbay Gürler–Hisil paper](https://link.springer.com/article/10.1007/s13389-024-00351-7)
+checked degree-one plus degree-one projective addition on every normalized
+model. **13,608/13,608** cases matched Cantor across two projective scales:
+760 inverse pairs, 752 doublings and 12,096 distinct-point additions. The
+[1+2 formulas](https://link.springer.com/article/10.1007/s13389-024-00351-7)
+matched Cantor on all 12,096 sampled cases: 9,492 generic disjoint,
+1,304 inverse-support cancellations, 1,258 repeated-support additions
+with a distinct remaining point, and 42 triplings. Generic distinct 2+2
+addition matched Cantor on 5,040 sampled cases and nonexceptional doubling
+on 336. The [raw per-model counts](results/complete-law-branches.jsonl)
+replayed byte-for-byte; the [1+1 and 1+2 graph](complete-law-gate.svg) and
+[2+2 graph](complete-law-2plus2.svg) show branch counts. Other 2+2 exceptional
+branches and full integration
+and 1,260-target DLP cohort remain unexecuted. This is an arithmetic branch
+check, not a complete-law cost.
+
 ## Requirement status
 
 | Requested lead | Status in this report | Remaining evidence |
 | --- | --- | --- |
 | Factor base / large-prime graph | Verified complete for the five frozen parameter arms, 1,260 targets each | Other policies are new experiments; qualified wall timing and external comparison before speed claims |
-| Complete inversion-free law | Not implemented | Independent implementation of the published complete formulas, exceptional-case cross-checks, 1,260 full solves and priced rho comparison |
-| Point-driven pencil collector | Not attempted on full cohort | Adapt the existing 20-target gate to all 21 models and 1,260 targets; a sparse rank solver is needed at the upper sizes, then full cold accounting and replay |
+| Complete inversion-free law | 1+1 checked on 13,608 cases, 1+2 on 12,096, generic 2+2 on 5,040 and doubling 2+2 on 336 across 21 models | Implement remaining exceptional 2+2 cases, cross-check, then run 1,260 full solves and priced rho comparison |
+| Point-driven pencil collector | 420/1,260 target pairs source-verified and independently replayed | Run the remaining models, including scalable elimination at upper sizes, then full cold accounting |
 | Kummer walk arithmetic | Partial: ordinary-addition substitution rejected by exact gate | Design differential walk with sign/lift-safe labels, then arithmetic checks and full cohort |
 
-The [PDF](REPORT.pdf) includes the two figures and this result table. The
+The [PDF](REPORT.pdf) includes all three figures and the result tables. The
 structured [manifest](results/manifest.json), [per-target table](results/matched/targets.jsonl),
 [price grid](results/matched/price-grid.csv), [summary](results/matched/summary.json) and
 [`SHA256SUMS`](SHA256SUMS) and [data dictionary](DATA_DICTIONARY.md) support independent review. The plotting script

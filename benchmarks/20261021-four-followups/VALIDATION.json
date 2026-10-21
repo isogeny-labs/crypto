@@ -2,17 +2,17 @@
   "schema": "validation-gate/v1",
   "replay_certificate": {
     "path": "replay-certificate.json",
-    "sha256": "6ac52ff4f3df051321af21c231111af47c17fb411049bc681a3e14469bb0a781"
+    "sha256": "b2ec8ca0275e6336a3f2d0e834b38b7a8a6c57d5f615b13877ac1834fcb4940c"
   },
   "validator_report": {
     "path": "validator-report.json",
-    "sha256": "d50aeb1056e87c70cffbc336441131c9c6ba34362e3c2a37beac54687dac5af7"
+    "sha256": "08dfa106aa820e53414624f60169d938f2b265cea2fb1071da8aede2240816d4"
   },
   "rho_reference": {
     "kind": "negation",
-    "protocol": "research/four_followups_20261021/PROTOCOL.md; 21 exact-order models x 60 targets each, five candidate arms, same-process source negation rho",
+    "protocol": "research/four_followups_20261021/PROTOCOL.md; factor-base five-arm full cohort and pencil seven-model pilot, each against same-process source negation rho",
     "unit": "GAE",
-    "binary_or_process": "research/four_followups_20261021/target/release/factor-base; same invocation and source-cost instrumentation",
+    "binary_or_process": "factor-base and pencil-full binaries; each executes candidate and source rho in one process",
     "matches_protocol": true,
     "strongest_available": true,
     "same_unit": true,
@@ -31,6 +31,22 @@
         "rho": 9316464418.333332
       }
     },
-    "order_holds_across_band": true
+    "order_holds_across_band": true,
+    "pencil_gae_band": {
+      "0": {
+        "ic": 699144.3809523808,
+        "rho": 62284.38095238094
+      },
+      "0.1": {
+        "ic": 4321445.680952382,
+        "rho": 334188.08095238096
+      },
+      "1": {
+        "ic": 36922157.38095238,
+        "rho": 2781321.38095238
+      }
+    },
+    "pencil_band_model_p": 739,
+    "pencil_order_holds_across_band": true
   }
 }

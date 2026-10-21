@@ -1,145 +1,8 @@
 {
-  "arms": [
-    {
-      "arm": "fb1-j16",
-      "candidate_GAE": 2666291893.9047623,
-      "candidate_over_rho": 2.4488299865553076,
-      "processed_divisors": 219581773,
-      "rho_GAE": 1088802370.3333328,
-      "source_verified": 1260,
-      "targets": 1260
-    },
-    {
-      "arm": "fb2-j16",
-      "candidate_GAE": 3285713694.8666654,
-      "candidate_over_rho": 3.0177319451102558,
-      "processed_divisors": 282983105,
-      "rho_GAE": 1088802370.3333328,
-      "source_verified": 1260,
-      "targets": 1260
-    },
-    {
-      "arm": "fb4-j16",
-      "candidate_GAE": 4267226319.9476194,
-      "candidate_over_rho": 3.9191927168942735,
-      "processed_divisors": 392583830,
-      "rho_GAE": 1088802370.3333328,
-      "source_verified": 1260,
-      "targets": 1260
-    },
-    {
-      "arm": "fb1-j8",
-      "candidate_GAE": 2664487777.7809534,
-      "candidate_over_rho": 2.447173013560974,
-      "processed_divisors": 220092171,
-      "rho_GAE": 1088802370.3333328,
-      "source_verified": 1260,
-      "targets": 1260
-    },
-    {
-      "arm": "fb1-j32",
-      "candidate_GAE": 2671135032.3523817,
-      "candidate_over_rho": 2.4532781201923943,
-      "processed_divisors": 219864588,
-      "rho_GAE": 1088802370.3333328,
-      "source_verified": 1260,
-      "targets": 1260
-    }
-  ],
-  "headline": [
-    {
-      "claimed": 2666291893.9047623,
-      "name": "fb1-j16_candidate_GAE",
-      "recomputed": 2666291893.9047623,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 1088802370.3333328,
-      "name": "fb1-j16_rho_GAE",
-      "recomputed": 1088802370.3333328,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 2.4488299865553076,
-      "name": "fb1-j16_candidate_over_rho",
-      "recomputed": 2.4488299865553076,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 3285713694.8666654,
-      "name": "fb2-j16_candidate_GAE",
-      "recomputed": 3285713694.8666654,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 1088802370.3333328,
-      "name": "fb2-j16_rho_GAE",
-      "recomputed": 1088802370.3333328,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 3.017731945110256,
-      "name": "fb2-j16_candidate_over_rho",
-      "recomputed": 3.0177319451102558,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 4267226319.9476194,
-      "name": "fb4-j16_candidate_GAE",
-      "recomputed": 4267226319.9476194,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 1088802370.3333328,
-      "name": "fb4-j16_rho_GAE",
-      "recomputed": 1088802370.3333328,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 3.9191927168942735,
-      "name": "fb4-j16_candidate_over_rho",
-      "recomputed": 3.9191927168942735,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 2664487777.7809534,
-      "name": "fb1-j8_candidate_GAE",
-      "recomputed": 2664487777.7809534,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 1088802370.3333328,
-      "name": "fb1-j8_rho_GAE",
-      "recomputed": 1088802370.3333328,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 2.447173013560974,
-      "name": "fb1-j8_candidate_over_rho",
-      "recomputed": 2.447173013560974,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 2671135032.3523817,
-      "name": "fb1-j32_candidate_GAE",
-      "recomputed": 2671135032.3523817,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 1088802370.3333328,
-      "name": "fb1-j32_rho_GAE",
-      "recomputed": 1088802370.3333328,
-      "rel_tol": 1e-11
-    },
-    {
-      "claimed": 2.4532781201923943,
-      "name": "fb1-j32_candidate_over_rho",
-      "recomputed": 2.4532781201923943,
-      "rel_tol": 1e-11
-    }
-  ],
+  "schema": "four-followups-combined-validator/v1",
+  "status": "pass",
   "independent": true,
-  "method": "separate native binary; direct raw-row recomputation",
+  "method": "separate native factor-base and pencil validators; direct raw-row arithmetic and source checks",
   "raw_data": [
     {
       "path": "../../research/four_followups_20261021/results/matched/summary.json"
@@ -248,8 +111,252 @@
     },
     {
       "path": "../../research/four_followups_20261021/results/matched/fb1-j32-bits40.jsonl"
+    },
+    {
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/summary.json"
+    },
+    {
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f739-cohort.jsonl"
+    },
+    {
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f3371-cohort.jsonl"
+    },
+    {
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f3527-cohort.jsonl"
+    },
+    {
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f3931-cohort.jsonl"
+    },
+    {
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f11731-cohort.jsonl"
+    },
+    {
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f11887-cohort.jsonl"
+    },
+    {
+      "path": "../../research/four_followups_20261021/results/pencil-pilot/f12143-cohort.jsonl"
     }
   ],
-  "schema": "four-followups-independent-validator/v1",
-  "status": "pass"
+  "headline": [
+    {
+      "claimed": 2666291893.9047623,
+      "name": "fb1-j16_candidate_GAE",
+      "recomputed": 2666291893.9047623,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 1088802370.3333328,
+      "name": "fb1-j16_rho_GAE",
+      "recomputed": 1088802370.3333328,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 2.4488299865553076,
+      "name": "fb1-j16_candidate_over_rho",
+      "recomputed": 2.4488299865553076,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 3285713694.8666654,
+      "name": "fb2-j16_candidate_GAE",
+      "recomputed": 3285713694.8666654,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 1088802370.3333328,
+      "name": "fb2-j16_rho_GAE",
+      "recomputed": 1088802370.3333328,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 3.017731945110256,
+      "name": "fb2-j16_candidate_over_rho",
+      "recomputed": 3.0177319451102558,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 4267226319.9476194,
+      "name": "fb4-j16_candidate_GAE",
+      "recomputed": 4267226319.9476194,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 1088802370.3333328,
+      "name": "fb4-j16_rho_GAE",
+      "recomputed": 1088802370.3333328,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 3.9191927168942735,
+      "name": "fb4-j16_candidate_over_rho",
+      "recomputed": 3.9191927168942735,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 2664487777.7809534,
+      "name": "fb1-j8_candidate_GAE",
+      "recomputed": 2664487777.7809534,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 1088802370.3333328,
+      "name": "fb1-j8_rho_GAE",
+      "recomputed": 1088802370.3333328,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 2.447173013560974,
+      "name": "fb1-j8_candidate_over_rho",
+      "recomputed": 2.447173013560974,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 2671135032.3523817,
+      "name": "fb1-j32_candidate_GAE",
+      "recomputed": 2671135032.3523817,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 1088802370.3333328,
+      "name": "fb1-j32_rho_GAE",
+      "recomputed": 1088802370.3333328,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 2.4532781201923943,
+      "name": "fb1-j32_candidate_over_rho",
+      "recomputed": 2.4532781201923943,
+      "rel_tol": 1E-11
+    },
+    {
+      "claimed": 4321445.680952382,
+      "name": "p739_pencil_GAE",
+      "recomputed": 4321445.680952382,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 334188.08095238096,
+      "name": "p739_rho_GAE",
+      "recomputed": 334188.08095238096,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 12.931178361110227,
+      "name": "p739_pencil_over_rho",
+      "recomputed": 12.931178361110229,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 140991560.73809522,
+      "name": "p3371_pencil_GAE",
+      "recomputed": 140991560.73809522,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 572863.7095238094,
+      "name": "p3371_rho_GAE",
+      "recomputed": 572863.7095238094,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 246.1171102203243,
+      "name": "p3371_pencil_over_rho",
+      "recomputed": 246.1171102203243,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 158568775.4047619,
+      "name": "p3527_pencil_GAE",
+      "recomputed": 158568775.4047619,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 593057.7285714286,
+      "name": "p3527_rho_GAE",
+      "recomputed": 593057.7285714286,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 267.3749413682309,
+      "name": "p3527_pencil_over_rho",
+      "recomputed": 267.3749413682309,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 216486536.1714285,
+      "name": "p3931_pencil_GAE",
+      "recomputed": 216486536.1714285,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 651700.1238095239,
+      "name": "p3931_rho_GAE",
+      "recomputed": 651700.1238095239,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 332.18734853992794,
+      "name": "p3931_pencil_over_rho",
+      "recomputed": 332.18734853992794,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 5194614290.299999,
+      "name": "p11731_pencil_GAE",
+      "recomputed": 5194614290.299999,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 1199303.0095238094,
+      "name": "p11731_rho_GAE",
+      "recomputed": 1199303.0095238094,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 4331.361006391998,
+      "name": "p11731_pencil_over_rho",
+      "recomputed": 4331.361006391998,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 5320809226.771431,
+      "name": "p11887_pencil_GAE",
+      "recomputed": 5320809226.771431,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 1379792.5285714285,
+      "name": "p11887_rho_GAE",
+      "recomputed": 1379792.5285714285,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 3856.238613119861,
+      "name": "p11887_pencil_over_rho",
+      "recomputed": 3856.2386131198605,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 5758653952.380952,
+      "name": "p12143_pencil_GAE",
+      "recomputed": 5758653952.380952,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 1354947.1380952382,
+      "name": "p12143_rho_GAE",
+      "recomputed": 1354947.1380952382,
+      "rel_tol": 1E-10
+    },
+    {
+      "claimed": 4250.094922873795,
+      "name": "p12143_pencil_over_rho",
+      "recomputed": 4250.094922873795,
+      "rel_tol": 1E-10
+    }
+  ],
+  "subreports": [
+    "factor-validator-report.json",
+    "pencil-validator-report.json"
+  ]
 }
