@@ -8,12 +8,14 @@ separate from the `cpu-spot` Iso Lab measurement pool.
 
 | Scale set / `runs-on` | Pod request | Pod memory limit | Maximum runners |
 | --- | --- | --- | --- |
-| `crypto-eks-linux` | 4 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 8 |
+| `crypto-eks-linux` | 4 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 11 |
 | `crypto-eks-highmem` | 16 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
 
-The NodePool admits x86-64 M/R instances with 8, 16 or 32 vCPUs and caps
-aggregate provisioning at 64 vCPUs and 512 GiB. The account's On-Demand vCPU
-quota was 96 during the live test; a 128-vCPU pool cap caused EC2
+The base NodePool admits x86-64 M/R instances with 8, 16 or 32 vCPUs and caps
+aggregate provisioning at 64 vCPUs and 512 GiB. An additional R-family pool
+admits one 16-vCPU node, enough for three more Linux runners at their current
+CPU and memory requests. The account's On-Demand vCPU quota was 96 during the
+live test; a 128-vCPU pool cap caused EC2
 `VcpuLimitExceeded` while ARC jobs were queued. These are capacity limits, not
 spending limits. Worker EC2, EBS and NAT traffic are billed. The existing cluster's
 idle costs continue. Linux x64 jobs are the only migration candidates; ARM,
