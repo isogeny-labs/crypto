@@ -61,12 +61,13 @@ to Lean 4.34.1. `lean Capacity.lean` passed; the exact version and all
 natural-number arithmetic; `states_monotone` and `request_monotone` preserve
 their `a ≤ b` hypotheses. No result uses `sorry`, `admit`, custom axioms,
 kernel bypasses, or native evaluation. The kernel reports only standard
-`propext` and `Quot.sound` for the structural proofs; the fixed numerical
+`propext`, `Classical.choice`, and `Quot.sound` for the structural proofs; the fixed numerical
 lemmas require no axioms.
 
 | Result | Lean declaration | Exact scope |
 | --- | --- | --- |
 | State count is monotone | `N83SplitCapacity.states_monotone` | natural `a ≤ b` |
+| ID31 slot has a unique state/selector/fingerprint decoding and fits five bytes away from the zero sentinel | `id31_slot_roundtrip`, `id31_slot_nonzero_five_bytes` | `state + 1 < 2^31`, `selector < 2`, `fingerprint < 2^8` for byte bound |
 | K5086 fits and every `K ≥ 5087` crosses the 30-bit bound | `k5086_state_fits`, `k5087_state_crosses`, `k5086_max` | this `S(K)` formula |
 | K4549 is the only split under the oriented request caps | `k5086_only_core_split` plus boundary lemmas | `K < 5086`, primary `q ≤ 2^30`, extension `q ≤ 2^28` |
 | Table, Bloom, state, and point-count arithmetic | `k5086_table_bytes`, `k5086_wide3_bloom_bucket`, `k5086_primary_wide3_bloom_bucket`, `k5086_extension_wide3_bloom_bucket`, `k5086_state_bytes`, `k5086_three_array_bytes`, `k5086_dual_bloom_bytes`, `k5086_dual_three_array_bytes`, `k5086_point_count_formula` | layout formulas and 166-point expansion assumption |
@@ -79,3 +80,56 @@ enumeration are open execution checks. The next run is an exact K5086/K4549
 index construction with base hash, state count, table/Bloom allocation, and
 full relation/scalar replay before comparing online time. Until then this is
 a capacity proposal with `candidate_id: null`.
+
+## Opt-in 31-bit state IDs and K5500 capacity
+
+The new `KIC_INDEXED5_ID31=1` slot format uses 31 bits for a state ID, one
+bit for the root selector, and eight fingerprint bits in the same five-byte
+slot. Exact root reconstruction still decides collisions. It is mutually
+exclusive with `KIC_INDEXED5_ID30=1`; the latter remains the current K5086
+protocol format. `RootOnly11`, symmetric S3 traversal, indexed five-byte
+load75/load80 sizing, and the root-index flag are required. The slot
+encoding and lookup were checked by the dedicated Rust test, including the
+largest encodable ID and an equal-slot/equal-fingerprint collision. The
+ID31 implementation source SHA-256 is
+`6876cfa98aac31b007a91437c2be9afc0d7c3532d23f0374acd8a780cbce5b13`.
+The [K128 stage receipt](runs/k128_id31/result.json) passed monolithic and
+split construction with four root threads and the same base/state counts as
+the ID30 control; it does not measure K5500 or a target solve.
+
+For the same split-table and separate-`wide3`-Bloom sizing rule, K5500 with
+primary K4549 has the following **calculated** capacity. It is a new
+proposal, not a completed factor-base comparison or an amendment to the
+sealed K5086 screen.
+
+| Quantity | Exact value | Status |
+| --- | ---: | --- |
+| `S(5500)` | 1,255,377,750 | Lean-checked arithmetic |
+| ID31 limit | `S(7193) < 2^31 ≤ S(7194)` | Lean-checked formula bound |
+| K4549 primary, K951 extension | 858,778,416 and 396,599,334 states | formula |
+| load80 requests | 1,073,473,020 and 495,749,168 | formula |
+| exact table slots | 2^31 + 2^30 | 15 GiB of five-byte slots |
+| separate `wide3` Blooms | 2^34 + 2^33 bits | 3 GiB |
+| 11-byte state array | 1,255,377,750 entries | 13,809,155,250 bytes |
+| three-array sum | state + two tables + two Blooms | 33,136,508,082 bytes (30.86 GiB) |
+| projected point count under 166-point expansion | 913,000 | actual enumeration pending |
+
+The 31-bit format permits K up to 7193 by its state-ID bound alone.
+Memory, index-construction cost, rank completion, natural-target yield,
+and online lookup cost can limit the useful base much earlier. The K5500
+three-array sum leaves about 9.14 GiB within the frozen 40 GiB sampled
+child-RSS cap, before other buffers and allocator overhead; it requires an
+actual peak-memory measurement. K5800 already needs 38.30 GiB for these
+arrays, leaving too little headroom for that pilot envelope. The K5500
+proposal retains `candidate_id: null` and measured costs `null` until its
+base is enumerated, subgroup checked, hashed, and paired on the sealed
+same-point workload.
+
+The same pinned Lean module proves the ID31 slot decode and five-byte
+nonzero bound, and `k7193_id31_max` from monotonicity,
+`k5500_core_request`, `k5500_extension_request`, the K5500 root bound,
+point-count multiplication, and byte sum. `Capacity.check.txt` records
+the successful Lean 4.34.1 build and `#print axioms` output: the fixed
+numeric lemmas are axiom-free; the structural slot lemmas use the standard
+`propext`, `Classical.choice`, and `Quot.sound` foundations. The Rust-to-Lean
+source correspondence remains open.

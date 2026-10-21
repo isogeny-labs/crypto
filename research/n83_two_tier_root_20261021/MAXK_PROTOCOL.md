@@ -16,7 +16,10 @@ enumerated, subgroup filtered, hashed, and independently replayed.
   identify the subgroup bit length.
 - IC source: [koblitz_orbit_dlp_fast.rs](../../examples/koblitz_orbit_dlp_fast.rs),
   SHA-256 `c125b638d89e418936895659f1b3bd856b4e18a6a24f1d307dec99a204833cf0`.
-  Rebuild native code on the chosen Pod and record the Pod executable hash.
+  This exact file is frozen in commit
+  `c164442ddbaa48bd869d2780e75af500258ff53d`; rebuild that revision
+  on the chosen Pod and record the Pod executable hash. The later opt-in
+  ID31 extension has a different source digest and is a separate proposal.
   The existing K4300 and K4405 exact manifests are the controls.
 - K5086 flags: `KIC_ROOT_ONLY11=1`, `KIC_SYMMETRIC_S3=1`,
   `KIC_INDEXED_ROOT5=1`, `KIC_INDEXED5_ID30=1`,
@@ -103,9 +106,11 @@ after independent scalar verification.
 The previous RunPod combined cap was exhausted. A fresh spending ceiling,
 provider rate check, binary build receipt, and exact candidate manifest are
 required before allocation; the cost cap and Pod identity remain unfilled.
-No Pod is allocated by this protocol. The current local K4405 split run is a correctness control
-and has its own 7,200-second wall, 26 GiB RSS, and 8 GiB internal-disk
-free-space guards; its result is recorded separately from Tier 1 selection.
+No Pod is allocated by this protocol. The local K4405 split correctness
+control had its own 7,200-second wall, 26 GiB RSS, and 8 GiB internal-disk
+free-space guards. The disk guard stopped it at 5,098.402 seconds before
+it emitted a target row; [RUN.md](RUN.md) records its `BOUNDED_UNKNOWN`
+classification separately from Tier 1 selection.
 
 The [RunPod GPU Models price page](https://www.runpod.io/gpu-models), checked
 2026-10-21, lists a Community Cloud RTX 3090 with 125 GB host RAM, 16 vCPUs,

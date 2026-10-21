@@ -12,7 +12,6 @@ from pathlib import Path
 
 FLAGS = {
     "KIC_INDEX_BUILD_ONLY": "1",
-    "KIC_INDEXED5_ID30": "1",
     "KIC_INDEXED5_LOAD80": "1",
     "KIC_INDEXED_ROOT5": "1",
     "KIC_INDEX_ROOT_BATCH": "1",
@@ -38,6 +37,7 @@ def run_arm(name, args, common):
     output.mkdir(parents=True, exist_ok=False)
     env = {key: value for key, value in os.environ.items() if not key.startswith("KIC_")}
     env.update(FLAGS)
+    env["KIC_INDEXED5_ID31" if args.id_bits == 31 else "KIC_INDEXED5_ID30"] = "1"
     env["KIC_INDEX_ROOT_THREADS"] = str(args.root_threads)
     if name == "split":
         env["KIC_INDEXED5_SPLIT_AT"] = str(args.split)
@@ -83,6 +83,7 @@ def main():
     parser.add_argument("--split-first", action="store_true")
     parser.add_argument("--shared-bloom", action="store_true")
     parser.add_argument("--root-threads", type=int, choices=range(1, 9), default=1)
+    parser.add_argument("--id-bits", type=int, choices=(30, 31), default=30)
     args = parser.parse_args()
     args.binary = args.binary.resolve(strict=True)
     args.target = args.target.resolve(strict=True)
@@ -95,6 +96,7 @@ def main():
               "order": ["split", "monolithic"] if args.split_first else ["monolithic", "split"],
               "shared_bloom": args.shared_bloom,
               "root_threads": args.root_threads,
+              "id_bits": args.id_bits,
               "runner_sha256": sha256(args.output / "runner.py"),
               "source_sha256": sha256(source), "binary_sha256": sha256(args.binary),
               "target_sha256": sha256(args.target)}
@@ -110,6 +112,8 @@ def main():
         valid = (all(first[key] == second[key] for key in matching)
                  and first["indexed5_split_at"] is None
                  and second["indexed5_split_at"] == args.split
+                 and first["indexed5_state_id_bits"] == args.id_bits
+                 and second["indexed5_state_id_bits"] == args.id_bits
                  and first["shared_bloom_enabled"] is False
                  and second["shared_bloom_enabled"] is args.shared_bloom
                  and first["root_table_entries"] > 0
