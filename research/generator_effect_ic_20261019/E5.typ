@@ -159,7 +159,8 @@ candidate rules, and E4b, a protocol audit.
   `G.x ≠ x_first`). It does #strong[not] cover small `h > 1`, because
   `h⁻¹ mod n` is then a large scalar. The direct check, `[h]·P_first`
   for `h ≤ 2^24` compared with `G`, is a cheap follow-up and is not run
-  here.
+  here. (Run since as E5c, #link("E5c.md")[`E5c.md`]: no match for
+  `h ≤ 2^24`, both roots, both curves.)
 - #strong[E4a, SHA-1 rules] (`x = SHA-1(seed ‖ i)`, the X9.62
   construction): not touched.
 - #strong[E4b] (protocol audit): not touched.
