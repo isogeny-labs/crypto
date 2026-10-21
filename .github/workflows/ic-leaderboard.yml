@@ -62,6 +62,8 @@ on:
       - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/la_engines_20261014/summary.json'
       - 'research/ic_oracle_setup_blocked_20261020/RESULT.json'
+      - 'research/ic_planner_validation_20261020/analysis/summary.json'
+      - 'research/ic_planner_validation_20261020/specs/*.json'
       - '.github/workflows/ic-leaderboard.yml'
       - 'scripts/build_lab_browser.py'
       - 'docs/browser/**'
@@ -69,6 +71,9 @@ on:
       - 'research/full_volcano_graphwide_ic_*/execution/campaigns/**'
       - 'research/ic_candidate_tournament_20260915/runs/**'
       - 'docs/ic/**'
+      - 'scripts/validation_gate.py'
+      - 'research/**/VALIDATION.json'
+      - 'research/validation_sweep_20261019/**'
       - 'research/notes/ecc2k130/**'
   push:
     branches: [main]
@@ -119,6 +124,8 @@ on:
       - 'research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json'
       - 'research/la_engines_20261014/summary.json'
       - 'research/ic_oracle_setup_blocked_20261020/RESULT.json'
+      - 'research/ic_planner_validation_20261020/analysis/summary.json'
+      - 'research/ic_planner_validation_20261020/specs/*.json'
       - '.github/workflows/ic-leaderboard.yml'
       - 'scripts/build_lab_browser.py'
       - 'docs/browser/**'
@@ -126,6 +133,9 @@ on:
       - 'research/full_volcano_graphwide_ic_*/execution/campaigns/**'
       - 'research/ic_candidate_tournament_20260915/runs/**'
       - 'docs/ic/**'
+      - 'scripts/validation_gate.py'
+      - 'research/**/VALIDATION.json'
+      - 'research/validation_sweep_20261019/**'
       - 'research/notes/ecc2k130/**'
   workflow_dispatch:
 
