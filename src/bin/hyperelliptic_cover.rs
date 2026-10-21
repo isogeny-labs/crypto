@@ -888,6 +888,41 @@ mod tests {
     const CURRENT_REGISTRY: &str = include_str!("../../docs/curves/registry.json");
     const CURRENT_COVER_GRAPH: &str = include_str!("../../docs/curves/cover-links.yaml");
 
+    // EC1 polynomial-basis coordinates are hex bitsets, including digit-only strings.
+    // Subgroup orders retain their separate decimal numeric encoding.
+    fn parse_catalog_binary_coordinate(text: &str, field: &Value) -> Result<BigUint, String> {
+        if field["characteristic"] != 2
+            || field["representation"] != "polynomial"
+            || field["element_encoding"]
+                != "hex polynomial coefficient bitset, least significant bit is constant"
+        {
+            return Err("unsupported binary field element encoding".into());
+        }
+        BigUint::parse_bytes(text.strip_prefix("0x").unwrap_or(text).as_bytes(), 16)
+            .ok_or_else(|| "invalid hexadecimal field element".into())
+    }
+
+    #[test]
+    fn binary_catalog_coordinates_follow_declared_hex_encoding() {
+        let field = json!({"characteristic": 2, "representation": "polynomial",
+            "element_encoding": "hex polynomial coefficient bitset, least significant bit is constant"});
+        for text in ["10", "0x10"] {
+            assert_eq!(
+                parse_catalog_binary_coordinate(text, &field).unwrap(),
+                BigUint::from(16u32)
+            );
+        }
+        assert_eq!(
+            parse_catalog_binary_coordinate("ab", &field).unwrap(),
+            BigUint::from(171u32)
+        );
+        assert!(parse_catalog_binary_coordinate("invalid", &field).is_err());
+        let mut unsupported = field;
+        unsupported["element_encoding"] = json!("decimal");
+        assert!(parse_catalog_binary_coordinate("10", &unsupported).is_err());
+        assert_eq!(parse_number("10").unwrap(), BigUint::from(10u32));
+    }
+
     fn binary_model() -> Value {
         let modulus = BigUint::from(0xbu32);
         let hash = checker::digest(format!("f2m-modulus:0x{modulus:x}").as_bytes());
@@ -982,7 +1017,31 @@ mod tests {
     fn every_current_catalog_model_reaches_the_standalone_constructor() {
         let registry: Value = serde_json::from_str(CURRENT_REGISTRY).expect("current registry");
         let rows = registry["curves"].as_array().expect("registry curve array");
-        assert_eq!(rows.len(), 2572);
+        let graph: Value = serde_json::from_str(CURRENT_COVER_GRAPH).expect("current graph");
+        let graph_rows = graph["curves"].as_array().expect("graph curve array");
+        let registry_models: std::collections::BTreeSet<_> = rows
+            .iter()
+            .map(|row| row["model_json"].as_str().expect("registry model JSON"))
+            .collect();
+        let graph_models: std::collections::BTreeSet<_> = graph_rows
+            .iter()
+            .map(|row| row["model_json"].as_str().expect("graph model JSON"))
+            .collect();
+        assert!(!registry_models.is_empty());
+        assert_eq!(
+            registry_models.len(),
+            rows.len(),
+            "duplicate registry model"
+        );
+        assert_eq!(
+            graph_models.len(),
+            graph_rows.len(),
+            "duplicate graph model"
+        );
+        assert_eq!(
+            registry_models, graph_models,
+            "registry/graph model mismatch"
+        );
         for row in rows {
             let slug = row["slug"].as_str().expect("catalog slug");
             let model: Value = serde_json::from_str(
@@ -1001,6 +1060,33 @@ mod tests {
     fn every_binary_ec1_generator_has_checked_typed_transfer_hypotheses() {
         let graph: Value = serde_json::from_str(CURRENT_COVER_GRAPH).expect("current cover graph");
         let curves = graph["curves"].as_array().expect("graph curve array");
+        let registry: Value = serde_json::from_str(CURRENT_REGISTRY).expect("current registry");
+        let binary_identities = |rows: &[Value]| {
+            let mut identities = std::collections::BTreeSet::new();
+            for row in rows {
+                let model: Value =
+                    serde_json::from_str(row["model_json"].as_str().unwrap()).unwrap();
+                if model["form"] == "y^2+xy=x^3+a*x^2+b" {
+                    for representation in row["representations"].as_array().unwrap() {
+                        assert!(
+                            identities.insert((
+                                representation["ec1"].as_str().unwrap().to_owned(),
+                                representation["curve_uid"].as_str().unwrap().to_owned(),
+                            )),
+                            "duplicate binary representation"
+                        );
+                    }
+                }
+            }
+            identities
+        };
+        let expected = binary_identities(registry["curves"].as_array().unwrap());
+        assert!(!expected.is_empty());
+        assert_eq!(
+            binary_identities(curves),
+            expected,
+            "binary registry/graph membership mismatch"
+        );
         let mut checked = 0usize;
         for row in curves {
             let model_value: Value =
@@ -1033,10 +1119,16 @@ mod tests {
                     .as_array()
                     .filter(|coordinates| coordinates.len() == 2)
                     .expect("binary generator pair");
-                let generator_x = parse_number(generator[0].as_str().expect("binary generator x"))
-                    .expect("parsed x");
-                let generator_y = parse_number(generator[1].as_str().expect("binary generator y"))
-                    .expect("parsed y");
+                let generator_x = parse_catalog_binary_coordinate(
+                    generator[0].as_str().expect("binary generator x"),
+                    &representation["field"],
+                )
+                .expect("parsed x");
+                let generator_y = parse_catalog_binary_coordinate(
+                    generator[1].as_str().expect("binary generator y"),
+                    &representation["field"],
+                )
+                .expect("parsed y");
                 assert!(
                     generator_x.bits() <= irreducible.degree as u64,
                     "{ec1}: generator x is not canonical for the declared field"
@@ -1120,7 +1212,7 @@ mod tests {
                 checked += 1;
             }
         }
-        assert_eq!(checked, 140);
+        assert_eq!(checked, expected.len());
     }
 
     #[test]

@@ -8,8 +8,8 @@ import { dirname, resolve } from "node:path";
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
-const ASSESSMENT_DATE = "2026-10-19";
-const CATALOG_COMMIT = "8e4c99759fd8d9594ed207d793b07b59ebaf19f7";
+const ASSESSMENT_DATE = "2026-10-20";
+const CATALOG_COMMIT = "8087edcdb7516a5e9c06b4389c4d5bc3806bf7d9";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
@@ -164,7 +164,7 @@ const obligations = [
   {
     id: "catalog_wide_packaged_binary",
     description:
-      "Build and publish a standalone artifact that accepts every currently supported catalog input form, including odd-characteristic extension fields and normalized target models, then replay all 2,572 direct commands against that exact artifact.",
+      "Build and publish a standalone artifact that accepts every currently supported catalog input form, including odd-characteristic extension fields and normalized target models, then replay all current direct commands against that exact artifact.",
     status: "unknown",
   },
   {
@@ -210,7 +210,7 @@ const resultTemplates = {
   "map.binary-construction.supported": {
     status: "supported",
     scope:
-      "Ordinary binary Weierstrass targets in the 165-row cubic-pullback profile, with exact Rabin-validated polynomial-basis fields and nonzero b.",
+      "Ordinary binary Weierstrass targets in the cubic-pullback profile, with exact Rabin-validated polynomial-basis fields and nonzero b.",
     rationale:
       "The uniform constructor emits H: v^2+u^2v=u^7+a*u^4+sqrt(b)*u and phi(u,v)=(u^3,u*v+sqrt(b)); all profile members match those coefficients, and the current source-level standalone constructor accepts every member of this profile.",
     evidence_refs: [
@@ -270,7 +270,7 @@ const resultTemplates = {
   "map.binary-arbitrary-pushforward.refuted": {
     status: "refuted",
     scope:
-      "Claim that the current implementation accepts and norms an arbitrary reduced class in Jac(H) for any of the 165 catalog binary covers.",
+      "Claim that the current implementation accepts and norms an arbitrary reduced class in Jac(H) for any of the catalog binary covers.",
     rationale:
       "The public entry point supports one exact fixed-GF(8) fixture, which is not a catalog row, and returns Unsupported(ArbitraryJacobianPushforward) for the catalog profiles. This refutes a catalog implementation claim, not mathematical existence of a norm.",
     evidence_refs: [
@@ -411,7 +411,7 @@ const resultTemplates = {
   "subgroup.binary-generator.supported": {
     status: "supported",
     scope:
-      "All 140 linked binary EC1 generators, using their exact catalog fields and curve coefficients.",
+      "All linked binary EC1 generators, using their exact catalog fields and curve coefficients.",
     rationale:
       "The content-addressed graph and independent semantic verifier establish each exact EC1/curve/map join; the native batch certificate then decodes that row's generator canonically and checks its binary Weierstrass equation.",
     evidence_refs: [
@@ -423,7 +423,7 @@ const resultTemplates = {
   "subgroup.binary-annihilation.supported": {
     status: "supported",
     scope:
-      "All 140 linked binary generators and their numeric catalog subgroup-order values r.",
+      "All linked binary generators and their numeric catalog subgroup-order values r.",
     rationale:
       "The native batch certificate checks [r]G=O. This proves ord(G) divides r, not by itself that ord(G)=r.",
     evidence_refs: [
@@ -455,7 +455,7 @@ const resultTemplates = {
     scope:
       "Every checked binary pullback image and its numeric catalog order value r.",
     rationale:
-      "The native batch certificate checks [r]phi^*(G)=0 for all 140 exact triples.",
+      "The native batch certificate checks [r]phi^*(G)=0 for all linked exact triples.",
     evidence_refs: [
       "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses",
     ],
@@ -465,7 +465,7 @@ const resultTemplates = {
     scope:
       "phi_*phi^*(G)=[3]G for every linked binary generator, within the typed fiber witness domain.",
     rationale:
-      "The native batch certificate compares both sides for all 140 exact triples.",
+      "The native batch certificate compares both sides for all linked exact triples.",
     evidence_refs: [
       "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses",
     ],
@@ -473,7 +473,7 @@ const resultTemplates = {
   "subgroup.binary-injective-generated.unknown": {
     status: "unknown",
     scope:
-      "The actual generated subgroup <G> for each of the 140 linked binary triples.",
+      "The actual generated subgroup <G> for each of the linked binary triples.",
     rationale:
       "The checked generator identity would imply injectivity after pullback additivity and phi_*phi^*=[3] are certified on every element of <G>; the current batch test does not certify those all-element hypotheses.",
     evidence_refs: [
@@ -506,7 +506,7 @@ const resultTemplates = {
   "subgroup.binary-inverse-recovery.supported": {
     status: "supported",
     scope:
-      "Recovery of G from the typed pull-push value [3]G using 3^{-1} mod r for all 140 linked binary triples.",
+      "Recovery of G from the typed pull-push value [3]G using 3^{-1} mod r for all linked binary triples.",
     rationale:
       "The batch certificate checks the modular inverse and exact point equality for each catalog value r; this is bounded typed-domain recovery, not a general Jacobian norm.",
     evidence_refs: [
@@ -516,7 +516,7 @@ const resultTemplates = {
   "subgroup.prime-generator.unknown": {
     status: "unknown",
     scope:
-      "Generator membership and [r]G=O replay for all 837 linked odd-characteristic EC1 representations.",
+      "Generator membership and [r]G=O replay for all linked odd-characteristic EC1 representations.",
     rationale:
       "The current ledger binds their catalog identities but does not attach a catalog-wide native generator arithmetic replay.",
     evidence_refs: [],
@@ -844,14 +844,14 @@ const IMPLEMENTATION_VERSION_PATHS = [
   "src/utils/mod.rs",
 ];
 
-async function buildSourceArtifacts() {
+async function buildSourceArtifacts(formulaInventoryCurrent) {
   return Promise.all([
     sourceArtifact(
       "docs/curves/registry.json",
       "exact ICV1/EC1 input registry",
       freshness(
         "supported",
-        "the exact input registry for all 2,572 assessed map rows",
+        "the exact input registry for all current assessed map rows",
         "The digest is computed from the current file and every membership is joined through its model hash.",
         ["docs/curves/registry.json"],
       ),
@@ -861,7 +861,7 @@ async function buildSourceArtifacts() {
       "generated curve-level geometry catalog",
       freshness(
         "supported",
-        "all 2,572 current verified-over-declared-field geometry rows",
+        "all current verified-over-declared-field geometry rows",
         "The ledger derives every map profile predicate from this exact file.",
         ["docs/curves/covers.json"],
       ),
@@ -871,7 +871,7 @@ async function buildSourceArtifacts() {
       "content-addressed ICV1/EC1/HC1/CV1 graph",
       freshness(
         "supported",
-        "2,572 exact map links, 2,570 unique cover objects, and 977 EC1 triples",
+        "exact current map links, unique cover objects, and EC1 triples",
         "The ledger records exact sorted UID memberships rather than count-only coverage.",
         ["docs/curves/cover-links.yaml"],
       ),
@@ -941,7 +941,7 @@ async function buildSourceArtifacts() {
       "standalone CLI and native binary subgroup batch certificate",
       freshness(
         "supported",
-        "all 140 exact linked binary EC1 triples at the pinned source revision",
+        "all exact linked binary EC1 triples at the pinned source revision",
         "The batch test is cited only for the checks it performs; it is not proof of every numeric order's primality.",
         ["src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses"],
       ),
@@ -1018,19 +1018,21 @@ async function buildSourceArtifacts() {
       "docs/curves/jacobian-transfers.json",
       "legacy formula-screen inventory; not a transfer certificate",
       freshness(
-        "refuted",
-        "claim that this inventory is current for the 2,572-row registry",
-        "It pins an older registry, omits current slugs, and contains modeled routes without exact HC1/CV1 subgroup certificates.",
+        formulaInventoryCurrent ? "supported" : "refuted",
+        "registry digest and exact model membership of the formula-screen inventory",
+        formulaInventoryCurrent
+          ? "The registry digest and complete slug/ICV1 membership match. These modeled formulas are not exact HC1/CV1 subgroup certificates or measured transfer evidence."
+          : "The registry digest or exact slug/ICV1 membership differs. These modeled formulas are not exact HC1/CV1 subgroup certificates or measured transfer evidence.",
         [
           "docs/curves/jacobian-transfers.json",
           "docs/curves/JACOBIAN_TRANSFERS.md",
         ],
-        "refresh_formula_inventory",
+        formulaInventoryCurrent ? undefined : "refresh_formula_inventory",
       ),
     ),
     integrityArtifact(
       "docs/curves/JACOBIAN_TRANSFERS.md",
-      "legacy formula-screen documentation pinned for the stale-inventory finding",
+      "formula-screen documentation and its explicit certification boundary",
     ),
     sourceArtifact(
       "docs/curves/COVERS.md",
@@ -1121,19 +1123,37 @@ function membership(profileId, members, domain) {
 }
 
 async function buildLedger() {
-  const [covers, graph] = await Promise.all([
+  const [registry, covers, graph] = await Promise.all([
+    readJson("docs/curves/registry.json"),
     readJson("docs/curves/covers.json"),
     readJson("docs/curves/cover-links.yaml"),
   ]);
-  assert(covers.curves.length === 2572, "unexpected covers row count");
-  assert(Object.keys(graph.maps).length === 2572, "unexpected graph map count");
-  assert(Object.keys(graph.covers).length === 2570, "unexpected graph cover count");
-  assert(graph.curves.length === 2572, "unexpected graph curve count");
-
-  const coverRowsByModel = new Map(
-    covers.curves.map((row) => [row.model_sha256, row]),
-  );
-  assert(coverRowsByModel.size === 2572, "cover rows must have unique model hashes");
+  const registryByModel = new Map();
+  for (const row of registry.curves) {
+    const digest = sha256Bytes(row.model_json);
+    assert(!registryByModel.has(digest), `duplicate registry model ${digest}`);
+    registryByModel.set(digest, row);
+  }
+  assert(registryByModel.size > 0, "empty registry");
+  const exactKeys = (actual, expected, label) => {
+    assert(canonicalJson([...actual].sort()) === canonicalJson([...expected].sort()),
+      `${label}: not the exact catalog membership`);
+  };
+  const coverRowsByModel = new Map(covers.curves.map(row => [row.model_sha256, row]));
+  assert(coverRowsByModel.size === covers.curves.length, "duplicate cover model");
+  exactKeys(coverRowsByModel.keys(), registryByModel.keys(), "cover rows");
+  const graphModels = new Set(graph.curves.map(row => row.model_sha256));
+  assert(graphModels.size === graph.curves.length, "duplicate graph model");
+  exactKeys(graphModels, registryByModel.keys(), "graph rows");
+  for (const curve of graph.curves) {
+    const row = registryByModel.get(curve.model_sha256);
+    assert(curve.model_json === row.model_json && curve.icv1_identity.slug === row.slug,
+      `registry model binding mismatch: ${row.slug}`);
+    const payloads = reps => reps.map(({ec1, curve_uid, field, curve}) => ({ec1, curve_uid, field, curve}));
+    assert(canonicalJson(payloads(curve.representations)) === canonicalJson(payloads(row.representations)),
+      `registry representation binding mismatch: ${row.slug}`);
+  }
+  const expectedSubgroups = registry.curves.reduce((n, row) => n + row.representations.length, 0);
 
   const mapMembers = new Map(
     Object.entries(profiles)
@@ -1250,33 +1270,14 @@ async function buildLedger() {
   );
   const mapCount = mapBase.reduce((sum, group) => sum + group.count, 0);
   const subgroupCount = subgroupBase.reduce((sum, group) => sum + group.count, 0);
-  assert(mapCount === 2572, `map membership count is ${mapCount}`);
-  assert(subgroupCount === 977, `subgroup membership count is ${subgroupCount}`);
-  assert(fieldBindings.size === 509, `declared-field binding count is ${fieldBindings.size}`);
-  assert(jacobianBindings.size === 2570, `Jacobian binding count is ${jacobianBindings.size}`);
-  assert(typedMapBindings.size === 2572, `typed map binding count is ${typedMapBindings.size}`);
-  const expectedMapCounts = new Map([
-    ["map.binary-cubic.same-field", 165],
-    ["map.odd-prime-quadratic.direct", 1053],
-    ["map.odd-prime-quadratic.normalized", 30],
-    ["map.odd-extension-quadratic.direct", 1324],
-  ]);
-  for (const group of mapBase) {
-    assert(
-      group.count === expectedMapCounts.get(group.profile_id),
-      `${group.profile_id}: expected ${expectedMapCounts.get(group.profile_id)}, got ${group.count}`,
-    );
-  }
-  const expectedSubgroupCounts = new Map([
-    ["subgroup.binary-degree3", 140],
-    ["subgroup.odd-degree2", 837],
-  ]);
-  for (const group of subgroupBase) {
-    assert(
-      group.count === expectedSubgroupCounts.get(group.profile_id),
-      `${group.profile_id}: expected ${expectedSubgroupCounts.get(group.profile_id)}, got ${group.count}`,
-    );
-  }
+  assert(mapCount === registryByModel.size, `map membership count is ${mapCount}`);
+  assert(subgroupCount === expectedSubgroups, `subgroup membership count is ${subgroupCount}`);
+  exactKeys(typedMapBindings.keys(), Object.keys(graph.maps), "typed map bindings");
+  exactKeys([...jacobianBindings.values()].map(value => value.record.source_cover_uid),
+    Object.keys(graph.covers), "Jacobian cover bindings");
+  const expectedFields = new Set(Object.values(graph.covers).map(cover =>
+    declaredFieldBinding(cover.record.field).field_uid));
+  exactKeys(fieldBindings.keys(), expectedFields, "declared field bindings");
 
   const f2Map =
     "urn:curve-cover-map:1:sha256:0dc60016b03df7d55ee829880508251fe8261c92a241b76a78987eeaa9787a03";
@@ -1307,12 +1308,20 @@ async function buildLedger() {
     "missing order-823 subgroup overlay target",
   );
 
+  const formulaInventory = await readJson("docs/curves/jacobian-transfers.json");
+  const formulaMembership = rows => rows.map(row => [row.slug, row.icv1]).sort((a, b) =>
+    compareText(JSON.stringify(a), JSON.stringify(b)));
+  const formulaInventoryCurrent = formulaInventory.registry_sha256 ===
+      await fileHash("docs/curves/registry.json") &&
+    canonicalJson(formulaMembership(formulaInventory.curves)) ===
+      canonicalJson(formulaMembership(registry.curves));
+
   return {
     schema_version: "cover-transfer-assessments/v2",
     status_vocabulary: ["unknown", "supported", "refuted", "not_applicable"],
     assessment_date: ASSESSMENT_DATE,
     catalog_commit: CATALOG_COMMIT,
-    source_artifacts: await buildSourceArtifacts(),
+    source_artifacts: await buildSourceArtifacts(formulaInventoryCurrent),
     claim_contract: {
       map: {
         cover_existence: "An explicit source cover exists over the stated field.",
@@ -1440,20 +1449,20 @@ async function buildLedger() {
       },
     ],
     coverage: {
-      catalog_maps: 2572,
-      unique_cover_models: 2570,
-      geometry_verified_maps: 2572,
-      ec1_representations: 977,
-      assessed_maps: 2572,
+      catalog_maps: mapCount,
+      unique_cover_models: jacobianBindings.size,
+      geometry_verified_maps: mapCount,
+      ec1_representations: subgroupCount,
+      assessed_maps: mapCount,
       unassessed_maps: 0,
-      assessed_subgroups: 977,
+      assessed_subgroups: subgroupCount,
       unassessed_subgroups: 0,
       map_membership_entries: mapCount,
       subgroup_membership_entries: subgroupCount,
       map_profiles: mapBase.length,
       subgroup_profiles: subgroupBase.length,
       scope_note:
-        "Every current map UID and every exact [EC1, curve UID, map UID] triple has one base profile. Assessment means each claim receives an explicit supported, refuted, unknown, or not-applicable result; it does not mean every transfer capability is supported.",
+        "The dated report and published-artifact receipt retain their historical catalog snapshot; current coverage is established by this ledger and independent exact-set replay. Every current map UID and every exact [EC1, curve UID, map UID] triple has one base profile. Assessment means each claim receives an explicit supported, refuted, unknown, or not-applicable result; it does not mean every transfer capability is supported.",
     },
     global_cost_accounting: [
       ["cover_construction", null, null, "Executable constructors exist, but no calibrated operation count or timing is claimed."],
@@ -1491,7 +1500,7 @@ async function buildLedger() {
         control: "identity",
         assessment: freshness(
           "supported",
-          "all 2,572 map UIDs and 977 exact EC1/curve/map triples",
+          "all current map UIDs and all exact EC1/curve/map triples",
           "The generator resolves exact content-addressed joins and rejects duplicates or missing rows.",
           [
             "scripts/build_cover_transfer_assessments.mjs",
@@ -1504,7 +1513,7 @@ async function buildLedger() {
         control: "geometry",
         assessment: freshness(
           "supported",
-          "all 2,572 fixed-family cover rows",
+          "all current fixed-family cover rows",
           "Native certificates cover defining identities, smoothness, genus, degree, separability, and infinity behavior.",
           ["src/bin/curve_cover_check/checker.rs", "docs/curves/covers.json"],
         ),
@@ -1538,7 +1547,7 @@ async function buildLedger() {
         control: "binary_catalog_subgroups",
         assessment: freshness(
           "supported",
-          "native generator-level checks for all 140 binary representations after independent exact EC1/curve/map identity joins",
+          "native generator-level checks for all linked binary representations after independent exact EC1/curve/map identity joins",
           "The semantic verifier reconstructs the exact graph joins. The native batch certificate reads those representation rows and checks generator membership, catalog-order annihilation, pullback validity, image annihilation, composition on the tested generator, and degree-inverse recovery of that generator; it does not itself validate every content UID and does not certify subgroup-wide injectivity.",
           [
             "docs/curves/cover-links.yaml",
@@ -1553,7 +1562,7 @@ async function buildLedger() {
         control: "odd_degree2_transfer",
         assessment: freshness(
           "refuted",
-          "claim that the current one-infinity odd-prime implementation supports the 2,407 even-sextic source models",
+          "claim that the current one-infinity odd-prime implementation supports the catalog even-sextic source models",
           "The current model contract and the catalog infinity configuration are structurally incompatible.",
           ["src/prime_hyperelliptic/curve.rs", "docs/curves/covers.json"],
         ),
@@ -1563,8 +1572,8 @@ async function buildLedger() {
         control: "published_artifact",
         assessment: freshness(
           "refuted",
-          "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 2,572 current catalog models",
-          "Direct artifact replay covered only its bundled 592-row registry. The historical static comparison classified 746 of the earlier 2,100 forms as inside the pinned source allowlist (160 binary and 586 direct prime-field) and 1,354 as outside it. That comparison has not been rerun against the expanded catalog and is not a 2,572-command artifact receipt. Current source accepts the new forms, but this artifact does not contain it.",
+          "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all current catalog models",
+          "Direct artifact replay covered only its bundled 592-row registry. The historical static comparison used an earlier 2,100-row partition with the source allowlist: it placed 160 binary and 586 direct prime-field forms inside that syntactic domain, and 1,324 extension-field plus 30 normalized-target forms outside it; this 746/1,354 split is not a 2,100-command artifact receipt. That historical partition does not count additions to the current catalog. Current source adds those paths but has not been published in that artifact.",
           [
             "research/cover_transfer_assessment_20261013/release_replay.txt",
             "src/bin/hyperelliptic_cover.rs#every_current_catalog_model_reaches_the_standalone_constructor",
@@ -1622,14 +1631,14 @@ async function buildLedger() {
     ],
     exploration_boundary: [
       "No search for production targets, private keys, or discrete logarithms was performed.",
-      "All 2,572 map rows and all 977 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
-      "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
-      "The 2,407 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
+      "All current map rows and all linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
+      "The catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
+      "The catalog odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
       "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",
       "Formula-screen outputs in jacobian-transfers.json were not promoted to executable or measured claims.",
       "A full cover-integrated Jacobian index-calculus solver, relation collection, linear algebra, and target decomposition remain a separate deliverable. The bounded odd-prime one-infinity solver library is outside these catalog-cover paths.",
     ],
-    open_obligations: obligations,
+    open_obligations: obligations.filter(item => !formulaInventoryCurrent || item.id !== "refresh_formula_inventory"),
     report: {
       markdown: "research/cover_transfer_assessment_20261013/README.md",
       pdf:
