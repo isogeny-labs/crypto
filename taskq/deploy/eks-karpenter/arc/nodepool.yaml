@@ -66,7 +66,7 @@ spec:
           values: [linux]
         - key: karpenter.sh/capacity-type
           operator: In
-          values: [on-demand]
+          values: [spot]
         - key: karpenter.k8s.aws/instance-category
           operator: In
           values: [m, r]
@@ -83,7 +83,60 @@ spec:
       terminationGracePeriod: 6h
   limits:
     cpu: "128"
-    memory: 768Gi
+    memory: 1Ti
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 5m
+    budgets:
+      - nodes: "0"
+        reasons: [Drifted]
+      - nodes: "100%"
+        reasons: [Empty]
+---
+# These legacy pool names and labels remain for ARC scheduling compatibility.
+# The capacity-type requirement is Spot; empty runner nodes consolidate after 5m.
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: gha-on-demand-extra
+spec:
+  template:
+    metadata:
+      labels:
+        gha.dev/pool: on-demand
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: gha
+      taints:
+        - key: gha.dev/workload
+          value: runner
+          effect: NoSchedule
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: [amd64]
+        - key: kubernetes.io/os
+          operator: In
+          values: [linux]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: [spot]
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: [r]
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: ["5"]
+        - key: karpenter.k8s.aws/instance-cpu
+          operator: In
+          values: ["16"]
+      expireAfter: Never
+      terminationGracePeriod: 6h
+  limits:
+    cpu: "32"
+    memory: 256Gi
   disruption:
     consolidationPolicy: WhenEmpty
     consolidateAfter: 5m
