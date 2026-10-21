@@ -37,11 +37,6 @@ on:
       - 'problems/catalog-cover-subgroup-certificates-incomplete.md'
       - 'research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
       - 'research/hyperelliptic_cover_infrastructure_20261006/README.md'
-      - 'examples/ecbench_open_questions_publish.rs'
-      - 'examples/ecbench_leads*.rs'
-      - 'research/ecbench_open_questions_20261014/**'
-      - 'research/ecbench_leads_20261015/**'
-      - 'tools/render_ic_dashboard.mjs'
       - '.github/workflows/curve-covers.yml'
       - '.github/workflows/release.yml'
   push:
@@ -82,11 +77,6 @@ on:
       - 'problems/catalog-cover-subgroup-certificates-incomplete.md'
       - 'research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
       - 'research/hyperelliptic_cover_infrastructure_20261006/README.md'
-      - 'examples/ecbench_open_questions_publish.rs'
-      - 'examples/ecbench_leads*.rs'
-      - 'research/ecbench_open_questions_20261014/**'
-      - 'research/ecbench_leads_20261015/**'
-      - 'tools/render_ic_dashboard.mjs'
       - '.github/workflows/curve-covers.yml'
       - '.github/workflows/release.yml'
   workflow_dispatch:
@@ -100,15 +90,13 @@ concurrency:
 
 jobs:
   certificates:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
           # verify-plan replays three immutable historical Git blobs.
           fetch-depth: 0
-      - uses: actions/setup-node@v4
-          node-version: '22'
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'
@@ -139,15 +127,17 @@ jobs:
 
   transfer-assessment:
     name: Cover transfer assessment
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v4
+        with:
           node-version: '22'
       - uses: actions/setup-python@v5
+        with:
           python-version: '3.11'
       - name: Install the pinned Draft 2020-12 validator
         run: python -m pip install jsonschema==4.23.0
@@ -160,12 +150,16 @@ jobs:
 
   transfer-lemma:
     name: Cover transfer Lean lemma
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     defaults:
       run:
         working-directory: research/cover_transfer_assessment_20261013/lean
+    steps:
+      - uses: actions/checkout@v4
       - name: Build the conditional injectivity theorem and replay it in a fresh kernel
         uses: leanprover/lean-action@v1
+        with:
           lake-package-directory: research/cover_transfer_assessment_20261013/lean
           auto-config: false
           use-mathlib-cache: true
@@ -177,7 +171,3 @@ jobs:
           leanchecker-args: '--fresh --verbose CoverTransfer'
       - name: Audit transitive axioms
         run: lake env lean AxiomAudit.lean
-      - name: Check native catalog and session browser additions
-          git fetch --no-tags --depth=1 origin a80b15bbc5c1ea4f2db2b294a9bcddc31f06fdd7
-          cargo run --release --locked --manifest-path research/ecbench_open_questions_20261014/native-publish/Cargo.toml -- --historical-inputs
-          cargo run --release --locked --manifest-path research/ecbench_open_questions_20261014/native-publish/Cargo.toml -- --check

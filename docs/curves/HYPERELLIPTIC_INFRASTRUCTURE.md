@@ -36,9 +36,9 @@ are:
 ./hyperelliptic-cover catalog-export --registry REGISTRY.json [--output covers.json]
 ```
 
-The catalog-wide assessment distinguishes its pinned source from the executable
-that has actually been published. At its catalog commit, source tests accepted
-all 2,100 assessed map inputs (2,098 distinct cover models). The pinned
+The catalog-wide assessment distinguishes current source from the executable
+that has actually been published. Current-source tests accept all 2,100 catalog
+map inputs (2,098 distinct cover models). The pinned
 `v0.1.0-main.1371` source allowlist and the current model-profile partition
 imply a 746-row syntactic support boundary: 160 binary and 586 direct
 prime-field inputs are within that allowlist, while 1,324 odd-characteristic
@@ -46,7 +46,7 @@ extension-field and 30 normalized-target inputs are outside it. That
 746/1,354 split is a static source/applicability classification, not a direct
 2,100-command replay of the published executable. The artifact was directly
 replayed only against its own bundled 592-row registry. A new release and
-direct replay of all 2,100 assessed commands remain open obligations.
+direct replay of all 2,100 current commands remain open obligations.
 
 For the first three commands, `--input -` reads standard input. Omitting
 `--output` writes JSON to standard output. Successful `catalog-export` writes
@@ -467,7 +467,7 @@ The exported catalog identifies its wrapper with
 `producer_source_sha256` is SHA-256 of the exact UTF-8 checker source, model
 normalization source, and `hyperelliptic-cover` wrapper source concatenated in
 that order. For the current source it is
-`9c40c0dc323b92669508554596b04ad3adab58071bdeff65e1c3e934ed106ee4`.
+`1f0c9492189415448ba854f717dd599fd8f96cbb33b342b9845f85001b89d9eb`.
 Thus changing any of the three producer inputs changes the provenance digest.
 Both
 `hyperelliptic-cover catalog-export` and `curve_cover_check` require callers

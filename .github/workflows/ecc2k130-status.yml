@@ -9,6 +9,11 @@ on:
     # this interval, and test_rho_status.py pins the two together.
     - cron: "*/10 * * * *"
   workflow_dispatch:
+    inputs:
+      source_connection_check:
+        description: "Read the original rho-dp endpoint and secret reference; do not publish Pages"
+        type: boolean
+        default: false
   pull_request:
     paths:
       - ".github/workflows/ecc2k130-status.yml"
@@ -78,10 +83,31 @@ concurrency:
   # PRs get their own group so they never cancel each other. Scheduled,
   # push and manual publishers share one group and admitted runs finish even
   # when the hosted runner queue is under pressure.
-  group: ${{ github.event_name == 'pull_request' && format('ecc2k130-status-pages-pr-{0}', github.event.pull_request.number) || 'ecc2k130-status-pages' }}
+  group: ${{ inputs.source_connection_check && format('ecc2k130-source-connection-{0}', github.ref) || (github.event_name == 'pull_request' && format('ecc2k130-status-pages-pr-{0}', github.event.pull_request.number) || 'ecc2k130-status-pages') }}
   cancel-in-progress: false
 
 jobs:
+  source-connection-check:
+    if: github.event_name == 'workflow_dispatch' && inputs.source_connection_check && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure source AWS identity
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-west-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Read source connection metadata
+        env:
+          RHO_SOURCE_REPORT_DEST: s3://ecc-challenges-data-104186811093/connection-checks/ecc2k130-20261019/6626ec30ad72464ddcd61618d5a9f261.pem
+        run: |
+          export RHO_SOURCE_REPORT_CERT="${RHO_SOURCE_REPORT_CERT:-$(cat scripts/rho_status/source_connection_recipient.pem)}"
+          bash scripts/rho_status/source_connection.sh
+
   # Pull requests only. A publishing run runs these same steps inside the
   # publish job, before anything is deployed, so it waits for one runner
   # rather than two. Every job here queues for the same GitHub-hosted runners
@@ -92,7 +118,7 @@ jobs:
   # pins the two step lists to each other.
   test:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -123,8 +149,8 @@ jobs:
         run: node scripts/site/test_algorithm_lab.js
 
   publish:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
-    runs-on: ubuntu-latest
+    if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && !inputs.source_connection_check
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     # 35 min so the index-only fallback plus a stretch of hour-chunk
     # backfill (300 s each, resumed next run) plus history merge and Pages
     # deploy still fit. Later runs read the rollup and finish in the old 15.
