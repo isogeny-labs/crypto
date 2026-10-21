@@ -2383,7 +2383,7 @@ fn group_of(file: &str) -> &str {
     match file.get(..3) {
         Some(
             g @ ("F1-" | "F2-" | "F3-" | "F4-" | "C1-" | "C2-" | "C3-" | "C4-" | "L1-" | "L2-"
-            | "X1-" | "X2-"),
+            | "X1-" | "X2-" | "E1-" | "E2-"),
         ) => &g[..2],
         _ => "p1",
     }
@@ -3754,12 +3754,55 @@ fn analyze6(dir: &str) {
     );
 }
 
-/// Amendment 7: X1 (A0, t = 4) and X2 (A11, t = 5) on a 64 GiB host, under
-/// Amendment 6's limit rule without the 14.5 GB cap. The pre-flight and the
-/// kernel log beside each cell's rows, the attribution check, identity with
-/// the earlier attempts, R1 and R2, the binding limit of every incomplete
-/// system, and the predictions.
-fn analyze7(dir: &str) {
+/// One re-run of the two open m = 4 cells on a larger host: Amendment 7 (X1,
+/// X2 on a 64 GiB EC2 host) and Amendment 8 (E1, E2 on the EKS high-memory
+/// runner).
+struct M4Host {
+    amendment: u32,
+    /// Row-group prefixes of the A0 t = 4 and A11 t = 5 cells.
+    a0: &'static str,
+    a11: &'static str,
+    host: &'static str,
+    /// The OOM record beside each cell's rows: `dmesg.txt` (kernel log) or
+    /// `oom.txt` (job cgroup counters, then the kernel log if readable).
+    oom_ext: &'static str,
+    /// The registered prediction for each cell: its text and the binding
+    /// limit it names.
+    a0_prediction: (&'static str, &'static str),
+    a11_prediction: (&'static str, &'static str),
+}
+
+const AMENDMENT7: M4Host = M4Host {
+    amendment: 7,
+    a0: "X1",
+    a11: "X2",
+    host: "a 64 GiB host",
+    oom_ext: "dmesg.txt",
+    a0_prediction: (
+        "A0 does not complete; binding limit time (a timeout at 14400 s)",
+        "time",
+    ),
+    a11_prediction: ("A11 does not complete; binding limit memory", "memory"),
+};
+
+const AMENDMENT8: M4Host = M4Host {
+    amendment: 8,
+    a0: "E1",
+    a11: "E2",
+    host: "the EKS high-memory runner",
+    oom_ext: "oom.txt",
+    a0_prediction: ("A0 does not complete; binding limit memory", "memory"),
+    a11_prediction: (
+        "A11 does not complete; binding limit time (a timeout at 14400 s)",
+        "time",
+    ),
+};
+
+/// The pre-flight and OOM record beside each cell's rows, the attribution
+/// check, identity with the earlier attempts, R1 and R2, the binding limit of
+/// every incomplete system, and the predictions (Amendment 6's limit rule
+/// without the 14.5 GB cap).
+fn analyze_m4_host(dir: &str, sp: &M4Host) {
     let rows = read_rows(dir);
     let group = |g: &'static str| -> Vec<&Value> {
         rows.iter()
@@ -3767,15 +3810,18 @@ fn analyze7(dir: &str) {
             .map(|(_, r)| r)
             .collect()
     };
-    let (c1, c2, l1, l2, x1, x2) = (
+    let (c1, c2, l1, l2, e0, e11) = (
         group("C1"),
         group("C2"),
         group("L1"),
         group("L2"),
-        group("X1"),
-        group("X2"),
+        group(sp.a0),
+        group(sp.a11),
     );
-    println!("Factor-base designs, Amendment 7 (X1, X2 on a 64 GiB host): rows from {dir}");
+    println!(
+        "Factor-base designs, Amendment {} ({}, {} on {}): rows from {dir}",
+        sp.amendment, sp.a0, sp.a11, sp.host
+    );
     println!("(V = min(cgroup_kB − 524288, MemTotal_kB − 524288). A system's limit is attributable only if its");
     println!(" row is a ulimit -v malloc failure or a timeout and the kernel log beside the rows has no OOM kill.");
     println!(
@@ -3828,20 +3874,53 @@ fn analyze7(dir: &str) {
             }
             None => println!("  pre-flight: MISSING (runs/{name}.preflight.txt)"),
         }
-        let dmesg = read(&format!("{name}.dmesg.txt"));
-        let kills: Vec<&str> = dmesg
+        let ext = sp.oom_ext;
+        let dmesg = read(&format!("{name}.{ext}"));
+        let mut kills: Vec<String> = dmesg
             .as_deref()
             .unwrap_or("")
             .lines()
             .filter(|l| l.contains("Killed process"))
+            .map(String::from)
             .collect();
+        // The job cgroup's OOM-kill counter, before and after the run.
+        let counter = |key: &str| -> Option<u64> {
+            dmesg
+                .as_deref()?
+                .lines()
+                .find_map(|l| l.strip_prefix(key))
+                .and_then(|v| v.trim().parse().ok())
+        };
+        let cgroup = match (
+            counter("cgroup_oom_kill_before "),
+            counter("cgroup_oom_kill_after "),
+        ) {
+            (Some(b), Some(a)) => Some(a.saturating_sub(b)),
+            _ => None,
+        };
+        if let Some(n) = cgroup.filter(|n| *n > 0) {
+            kills.push(format!(
+                "job cgroup memory.events: {n} oom_kill during the run"
+            ));
+        }
         println!(
-            "  kernel log (runs/{name}.dmesg.txt): {}",
+            "  {} (runs/{name}.{ext}): {}",
+            if ext == "oom.txt" {
+                "OOM record"
+            } else {
+                "kernel log"
+            },
             match &dmesg {
                 None => "MISSING".to_string(),
                 Some(_) => format!("{} OOM kills", kills.len()),
             }
         );
+        if ext == "oom.txt" {
+            println!(
+                "  job cgroup oom_kill during the run: {}",
+                cgroup.map_or("unreadable".to_string(), |n| n.to_string())
+            );
+        }
         for k in &kills {
             println!("    {k}");
         }
@@ -3888,19 +3967,37 @@ fn analyze7(dir: &str) {
         (all_attr, limits)
     };
 
-    let (x1_attr, x1_lim) = cell(
-        "X1: A0 m = 4, t = 4, p1, budget 14400 s + grace 600 s",
-        "X1-A0-m4-t4",
-        &x1,
+    let (a0_attr, a0_lim) = cell(
+        &format!(
+            "{}: A0 m = 4, t = 4, p1, budget 14400 s + grace 600 s",
+            sp.a0
+        ),
+        &format!("{}-A0-m4-t4", sp.a0),
+        &e0,
     );
     let a0_c2 = of_arm(&c2, "A0");
     println!(
-        "  identity: {} of {} X1 systems match C2's A0 systems, {} match L1's (cell_seed, target_seed, n_vars, n_eqs, planted_x, x_r, curve, set)",
-        same_as(&x1, &a0_c2),
-        x1.len(),
-        same_as(&x1, &l1)
+        "  identity: {} of {} {} systems match C2's A0 systems, {} match L1's (cell_seed, target_seed, n_vars, n_eqs, planted_x, x_r, curve, set)",
+        same_as(&e0, &a0_c2),
+        e0.len(),
+        sp.a0,
+        same_as(&e0, &l1)
     );
-    for r in a0_c2.iter().chain(l1.iter()) {
+    // Amendment 8 onward: the 64 GiB attempt (Amendment 7) is a prior one too.
+    let (x1, x2) = if sp.amendment >= 8 {
+        (group("X1"), group("X2"))
+    } else {
+        (Vec::new(), Vec::new())
+    };
+    if sp.amendment >= 8 {
+        println!(
+            "  identity: {} of {} {} systems match X1's",
+            same_as(&e0, &x1),
+            e0.len(),
+            sp.a0
+        );
+    }
+    for r in a0_c2.iter().chain(l1.iter()).chain(x1.iter()) {
         println!(
             "  prior attempt A0 t=4 target {}: {} at {:.1} s under ulimit -v {}, peak_rss_kb {}",
             r["target"],
@@ -3910,19 +4007,31 @@ fn analyze7(dir: &str) {
             r["peak_rss_kb"]
         );
     }
-    let (x2_attr, x2_lim) = cell(
-        "X2: A11 m = 4, t = 5, p1, budget 14400 s + grace 600 s",
-        "X2-A11-m4-t5",
-        &x2,
+    let (a11_attr, a11_lim) = cell(
+        &format!(
+            "{}: A11 m = 4, t = 5, p1, budget 14400 s + grace 600 s",
+            sp.a11
+        ),
+        &format!("{}-A11-m4-t5", sp.a11),
+        &e11,
     );
     let l2r: Vec<&Value> = group("L2r");
     println!(
-        "  identity: {} of {} X2 systems match L2's systems, {} match L2r's",
-        same_as(&x2, &l2),
-        x2.len(),
-        same_as(&x2, &l2r)
+        "  identity: {} of {} {} systems match L2's systems, {} match L2r's",
+        same_as(&e11, &l2),
+        e11.len(),
+        sp.a11,
+        same_as(&e11, &l2r)
     );
-    for r in l2.iter().chain(l2r.iter()) {
+    if sp.amendment >= 8 {
+        println!(
+            "  identity: {} of {} {} systems match X2's",
+            same_as(&e11, &x2),
+            e11.len(),
+            sp.a11
+        );
+    }
+    for r in l2.iter().chain(l2r.iter()).chain(x2.iter()) {
         println!(
             "  prior attempt A11 t=5 target {}: {} at {:.1} s under ulimit -v {}, peak_rss_kb {}",
             r["target"],
@@ -3945,21 +4054,24 @@ fn analyze7(dir: &str) {
             })
             .collect()
     };
-    let a0: Vec<&Value> = f4("A0").into_iter().chain(x1.iter().copied()).collect();
+    let a0: Vec<&Value> = f4("A0").into_iter().chain(e0.iter().copied()).collect();
     let a11: Vec<&Value> = f4("A11")
         .into_iter()
         .chain(of_arm(&c2, "A11"))
-        .chain(x2.iter().copied())
+        .chain(e11.iter().copied())
         .collect();
     println!();
     println!("════ σ and κ at m = 4, p1");
     let (n0, s0, k0) = show4(
-        "A0 m = 4 p1 (F4 via C1, X1's t = 4 cell)",
+        &format!("A0 m = 4 p1 (F4 via C1, {}'s t = 4 cell)", sp.a0),
         4,
         &cells4(a0.into_iter()),
     );
     let (n11, s11, k11) = show4(
-        "A11 m = 4 p1 (F4 via C1, C2's t = 4 cell, X2's t = 5 cell)",
+        &format!(
+            "A11 m = 4 p1 (F4 via C1, C2's t = 4 cell, {}'s t = 5 cell)",
+            sp.a11
+        ),
         4,
         &cells4(a11.into_iter()),
     );
@@ -3983,13 +4095,14 @@ fn analyze7(dir: &str) {
     println!();
     println!("════ R1: does A11's constant factor survive at m = 4, t = 4?");
     let a11_t4 = of_arm(&c2, "A11");
-    if x1.len() < 2 {
-        println!("  R1: NOT DECIDED (X1 has {} of 2 rows)", x1.len());
-    } else if done(&x1) && done(&a11_t4) {
-        let (x, y) = (mean_ops(&a11_t4), mean_ops(&x1));
+    if e0.len() < 2 {
+        println!("  R1: NOT DECIDED ({} has {} of 2 rows)", sp.a0, e0.len());
+    } else if done(&e0) && done(&a11_t4) {
+        let (x, y) = (mean_ops(&a11_t4), mean_ops(&e0));
         println!(
-            "  A11 t = 4 (C2) mean field_ops {x:.0} (log₂ {:.3}); A0 t = 4 (X1) mean field_ops {y:.0} (log₂ {:.3})",
+            "  A11 t = 4 (C2) mean field_ops {x:.0} (log₂ {:.3}); A0 t = 4 ({}) mean field_ops {y:.0} (log₂ {:.3})",
             x.log2(),
+            sp.a0,
             y.log2()
         );
         println!(
@@ -4000,14 +4113,17 @@ fn analyze7(dir: &str) {
                 "CROSSED (A11 not below A0)"
             }
         );
-    } else if x1_attr {
+    } else if a0_attr {
         println!(
             "  R1: A0 NOT MEASURABLE AT t = 4 WITHIN {} kB AND 4 h (binding limit: {}); no cost comparison",
-            v_of(&x1),
-            binding(&x1_lim)
+            v_of(&e0),
+            binding(&a0_lim)
         );
     } else {
-        println!("  R1: NOT DECIDED (a limit is not attributable; see X1 above)");
+        println!(
+            "  R1: NOT DECIDED (a limit is not attributable; see {} above)",
+            sp.a0
+        );
     }
     println!(
         "  A0 m = 4: {n0} completed cells: κ = {} ({}), σ = {} ({})",
@@ -4019,32 +4135,36 @@ fn analyze7(dir: &str) {
 
     println!();
     println!("════ R2: A11 at m = 4, t = 5");
-    if x2.len() < 2 {
-        println!("  R2: NOT DECIDED (X2 has {} of 2 rows)", x2.len());
-    } else if done(&x2) {
+    if e11.len() < 2 {
+        println!("  R2: NOT DECIDED ({} has {} of 2 rows)", sp.a11, e11.len());
+    } else if done(&e11) {
         println!(
-            "  X2 completed: the {n11}-cell series gives κ = {} ({}), σ = {} ({})",
+            "  {} completed: the {n11}-cell series gives κ = {} ({}), σ = {} ({})",
+            sp.a11,
             fmt_k(k11),
             kappa_verdict(n11, k11, 4),
             fmt_s(s11),
             verdict(n11, s11)
         );
-    } else if x2_attr {
+    } else if a11_attr {
         println!(
             "  R2: A11 NOT MEASURABLE AT m = 4, t = 5 WITHIN {} kB AND 4 h (binding limit: {}); the {n11}-cell verdicts stand: κ = {} ({}), σ = {} ({})",
-            v_of(&x2),
-            binding(&x2_lim),
+            v_of(&e11),
+            binding(&a11_lim),
             fmt_k(k11),
             kappa_verdict(n11, k11, 4),
             fmt_s(s11),
             verdict(n11, s11)
         );
     } else {
-        println!("  R2: NOT DECIDED (a limit is not attributable; see X2 above)");
+        println!(
+            "  R2: NOT DECIDED (a limit is not attributable; see {} above)",
+            sp.a11
+        );
     }
 
     println!();
-    println!("════ Predictions scorecard (Amendment 7)");
+    println!("════ Predictions scorecard (Amendment {})", sp.amendment);
     let score = |rs: &[&Value], lim: &[&str], attr: bool, want: &str| {
         if rs.len() < 2 {
             "not decided"
@@ -4059,14 +4179,18 @@ fn analyze7(dir: &str) {
         }
     };
     println!(
-        "  X1: A0 does not complete; binding limit time (a timeout at 14400 s): limits [{}]  →  {}",
-        x1_lim.join(", "),
-        score(&x1, &x1_lim, x1_attr, "time")
+        "  {}: {}: limits [{}]  →  {}",
+        sp.a0,
+        sp.a0_prediction.0,
+        a0_lim.join(", "),
+        score(&e0, &a0_lim, a0_attr, sp.a0_prediction.1)
     );
     println!(
-        "  X2: A11 does not complete; binding limit memory: limits [{}]  →  {}",
-        x2_lim.join(", "),
-        score(&x2, &x2_lim, x2_attr, "memory")
+        "  {}: {}: limits [{}]  →  {}",
+        sp.a11,
+        sp.a11_prediction.0,
+        a11_lim.join(", "),
+        score(&e11, &a11_lim, a11_attr, sp.a11_prediction.1)
     );
 }
 
@@ -4134,8 +4258,10 @@ fn main() {
         }
         "analyze" => {
             let dir = args.get(1).expect("a runs directory");
-            if args.iter().any(|a| a == "--amendment7") {
-                analyze7(dir);
+            if args.iter().any(|a| a == "--amendment8") {
+                analyze_m4_host(dir, &AMENDMENT8);
+            } else if args.iter().any(|a| a == "--amendment7") {
+                analyze_m4_host(dir, &AMENDMENT7);
             } else if args.iter().any(|a| a == "--amendment6") {
                 analyze6(dir);
             } else if args.iter().any(|a| a == "--amendment5") {
