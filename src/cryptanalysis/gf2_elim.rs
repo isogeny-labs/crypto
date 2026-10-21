@@ -46,10 +46,20 @@
 //! hardware groups them.
 //! The opt-in `KIC_GF2_REUSE_TABLE=1` keeps the table buffer across pivot
 //! blocks and clears only each table's zero entry before rebuilding it;
-//! every other addressable entry is overwritten. Its complete-call
-//! comparison is recorded in `research/gf2_table_reuse_20260929`.
+//! every other addressable entry is overwritten, so the rows and word counts
+//! are those of a fresh buffer. Its complete-call comparison is recorded in
+//! `research/gf2_table_reuse_20260929`; it stays off by default because on
+//! the 4-vCPU Xeon of `research/f5_gf2_defaults_20261017` it was not a gain
+//! on every matrix-F4 case (0.955× on n = 16, m = 24).
 
 use rayon::prelude::*;
+
+/// Whether table buffers are reused across pivot blocks (see the module
+/// documentation); off unless `KIC_GF2_REUSE_TABLE=1`.
+fn reuse_table_enabled() -> bool {
+    static REUSE_TABLE: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *REUSE_TABLE.get_or_init(|| std::env::var("KIC_GF2_REUSE_TABLE").as_deref() == Ok("1"))
+}
 
 /// Largest pattern width of one Gray-code table.
 const MAX_TABLE_BITS: usize = 8;
@@ -172,7 +182,7 @@ fn rank_row_basis_with_config(
     let bits = table_bits(rows).min(max_bits);
     let block_cap = bits * config.tables.clamp(1, 8);
     let simd = simd_kind(config.simd);
-    let reuse_table = std::env::var("KIC_GF2_REUSE_TABLE").as_deref() == Ok("1");
+    let reuse_table = reuse_table_enabled();
     let mut table = Vec::new();
     let mut rank = 0usize;
 
@@ -333,11 +343,9 @@ pub fn eliminate(
     // Preserve the measured ordering until the tiled path has a valid
     // performance comparison.  Echelon callers never need the reverse pass.
     static DEFER_ABOVE: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    static REUSE_TABLE: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     let defer_above = reduce_above
         && *DEFER_ABOVE.get_or_init(|| std::env::var("KIC_GF2_DEFER_ABOVE").as_deref() == Ok("1"));
-    let reuse_table =
-        *REUSE_TABLE.get_or_init(|| std::env::var("KIC_GF2_REUSE_TABLE").as_deref() == Ok("1"));
+    let reuse_table = reuse_table_enabled();
     eliminate_with(
         matrix,
         n_cols,
@@ -1421,6 +1429,42 @@ mod tests {
                             "rows={rows} cols={cols} density={density}"
                         );
                     }
+                }
+            }
+        }
+    }
+
+    /// Row counts from which `table_bits` reaches its largest value (512
+    /// rows and more), where every table has 256 entries and a block of
+    /// 32 pivots fills the four tables, and shapes a word either side of
+    /// a boundary: the reduced form matches the textbook's and the
+    /// echelon form has its rank and row space, for every configuration.
+    #[test]
+    fn largest_tables_and_boundary_widths_match_the_textbook() {
+        let mut rng = StdRng::seed_from_u64(31);
+        for &(rows, cols) in &[(520, 130), (700, 257), (1100, 65), (600, 63), (2, 129)] {
+            for density in [0.01, 0.5] {
+                let m = random_matrix(&mut rng, rows, cols, density);
+                let mut want = m.clone();
+                let rank = naive_rref(&mut want, cols);
+                for config in configs() {
+                    let what = format!("{rows}x{cols} d={density} {config:?}");
+                    let mut got = m.clone();
+                    let mut ops = 0;
+                    assert_eq!(
+                        eliminate(&mut got, cols, true, config, &mut ops),
+                        rank,
+                        "{what}"
+                    );
+                    assert_eq!(got, want, "{what}");
+                    let mut echelon = m.clone();
+                    assert_eq!(
+                        eliminate(&mut echelon, cols, false, config, &mut ops),
+                        rank,
+                        "{what}"
+                    );
+                    naive_rref(&mut echelon, cols);
+                    assert_eq!(echelon, want, "{what}");
                 }
             }
         }

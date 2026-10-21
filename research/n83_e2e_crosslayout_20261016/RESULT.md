@@ -69,3 +69,14 @@ candidate from the separate 16-point precision panel on fresh public points,
 with repeated A/B controls and alternating same-point rho pairs under one
 Tier 1 resource envelope. The adjacent-K screen may nominate another K for
 that holdout; its finalist must be frozen before the fresh-point run.
+
+## Visual report and benchmark history
+
+The [run report](reports/run-20261016T2314Z/report.pdf) includes all six recorded
+observations and their units, controls, source identities and interpretation
+boundary. Its [graph](reports/run-20261016T2314Z/observations.svg) is rendered
+from the unchanged IC1 rows by `plot.py`; the raw receipt copies and custody
+manifest sit beside it. The [benchmark entry](../../benchmarks/20261016-n83-crosslayout/)
+contains identical browsing copies. The canonical leaderboard, progress
+timeline and performance-gains figures retain their existing points because
+this exposed-point screen admits no new selected candidate.

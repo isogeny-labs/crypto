@@ -20,8 +20,11 @@ import os
 import pathlib
 import struct
 import sys
+import threading
 import time
+import types
 import unittest
+import uuid
 from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -36,6 +39,9 @@ def when(iso):
 LEGACY = "dp/slot-00002/1789311001-0000000000000000.bin"
 ORBIT = ("dp/slot-00140/a8b4133d5c5f414ebd1337f15603588d-0000000000791392-"
          "9c6a7dae1862f8393fe196b0c4f890e5e01f7f45615be019252b86ca3e429914.bin")
+HASH_SPAN_BODY = bytes(range(32)) * 2
+HASH_SPAN = ("dp/slot-00002/" + hashlib.sha256(HASH_SPAN_BODY).hexdigest()
+             + "-0000000000000000-0000000000000064.bin")
 
 
 class FakeS3:
@@ -67,6 +73,16 @@ class KeyShapes(unittest.TestCase):
         # object with no found_at was skipped without a word.
         self.assertIsNotNone(dp_ingest.foundAt(ORBIT, when("2026-09-17T18:47:34")))
 
+    def test_hash_span_key_uses_last_modified_and_checks_body(self):
+        t = when("2026-10-10T00:00:00")
+        self.assertEqual(dp_ingest.foundAt(HASH_SPAN, t), int(t.timestamp()))
+        self.assertTrue(dp_ingest.hashSpan(HASH_SPAN, len(HASH_SPAN_BODY),
+                                           hashlib.sha256(HASH_SPAN_BODY).hexdigest()))
+        with self.assertRaisesRegex(ValueError, "sha256"):
+            dp_ingest.hashSpan(HASH_SPAN, len(HASH_SPAN_BODY), "00" * 32)
+        with self.assertRaisesRegex(ValueError, "extent"):
+            dp_ingest.hashSpan(HASH_SPAN, len(HASH_SPAN_BODY) - 32)
+
     def test_envelopes_and_foreign_keys_are_not_points(self):
         for key in (ORBIT + ".json", "dp/slot-00002/notes.txt", "ckpt/slot-00002.ck"):
             self.assertIsNone(dp_ingest.foundAt(key, when("2026-09-17T18:47:34")), key)
@@ -84,6 +100,16 @@ class Listing(unittest.TestCase):
         self.assertEqual([o[0] for o in objects], [LEGACY, ORBIT])
         self.assertEqual([o[1] for o in objects], [200, 100])
         self.assertEqual(unrecognised, [])
+
+    def test_hash_span_listing_quarantines_bad_extent(self):
+        objects, unrecognised = self.objects([
+            (HASH_SPAN, len(HASH_SPAN_BODY), when("2026-10-10T00:00:00")),
+            (HASH_SPAN.replace("0000000000000064", "0000000000000096"),
+             len(HASH_SPAN_BODY), when("2026-10-10T00:00:00")),
+        ])
+        self.assertEqual([o[0] for o in objects], [HASH_SPAN])
+        self.assertEqual(unrecognised, [HASH_SPAN.replace("0000000000000064",
+                                                      "0000000000000096")])
 
     def test_an_unreadable_key_is_reported_not_skipped(self):
         objects, unrecognised = self.objects([
@@ -549,6 +575,25 @@ class Passes(unittest.TestCase):
         # rollback the rest of this thread's objects fail as well.
         self.assertGreaterEqual(sum(c.rollbacks for c in self.conns), 1)
 
+    def test_replicas_choose_different_bounded_work_without_partition_roster(self):
+        self.backlog(64)
+        chosen = []
+
+        def ingest(_conn, _s3, _bucket, key, _found_at, **kwargs):
+            chosen.append((kwargs["replica_id"], key))
+            return 100, 100, 0
+
+        dp_ingest.ingestObject = ingest
+        for replica in ("ingest-a", "ingest-b"):
+            dp_ingest.onePass(lambda: FakeConn([]), None, "bucket", threads=1,
+                              limit=8, replica_id=replica)
+        a = {key for replica, key in chosen if replica == "ingest-a"}
+        b = {key for replica, key in chosen if replica == "ingest-b"}
+        self.assertEqual(len(a), 8)
+        self.assertEqual(len(b), 8)
+        self.assertNotEqual(a, b)
+
+
 
 class CollisionCopy:
     def __enter__(self):
@@ -689,7 +734,7 @@ class Collisions(unittest.TestCase):
         self.assertEqual(conn.stored, [])
 
     def progressRow(self, conn):
-        return next(args for q, args in conn.queries if "INSERT INTO dp_ingest_progress" in q)
+        return next(args[:4] for q, args in conn.queries if "INSERT INTO dp_ingest_progress" in q)
 
     def test_a_re_report_from_another_object_is_counted_on_the_progress_row(self):
         # The 2026-09-20 case in miniature: Modal run 3's point already held
@@ -893,6 +938,21 @@ class Envelopes(unittest.TestCase):
         stamps = [a for q, a in conn.queries
                   if a and "INSERT INTO distinguished_points" in q]
         self.assertIn("2026-09-19 00:00:00+00", stamps[0])
+
+    def test_progress_commits_the_exact_source_digest_and_version(self):
+        class VersionedS3(EnvelopeS3):
+            def get_object(self, **kwargs):
+                response = super().get_object(**kwargs)
+                if kwargs["Key"].endswith(".bin"):
+                    response["VersionId"] = "version-7"
+                return response
+
+        conn, _ = self.ingest(VersionedS3(self.body, self.manifest()))
+        row = next(args for sql, args in conn.queries
+                   if "INSERT INTO dp_ingest_progress" in sql)
+        self.assertEqual(row[4], None)  # old single-host invocation
+        self.assertEqual(row[5], hashlib.sha256(self.body).hexdigest())
+        self.assertEqual((row[6], row[7]), ("version-7", len(self.body)))
 
 
 class CorpusFormats(unittest.TestCase):
@@ -1714,7 +1774,10 @@ class DatabaseUrl(unittest.TestCase):
         env.pop("DATABASE_URL", None)
         env["RHO_DB_HOST"] = "rho-dp.example.com"
         env["RHO_DB_SSLMODE"] = "require"
-        with mock.patch.dict(os.environ, env, clear=True):
+        boto3 = types.ModuleType("boto3")
+        boto3.client = mock.Mock()
+        with mock.patch.dict(os.environ, env, clear=True), \
+             mock.patch.dict(sys.modules, {"boto3": boto3}):
             with mock.patch("boto3.client") as client:
                 client.return_value.get_secret_value.return_value = {
                     "SecretString": '{"username":"u","password":"p/w","dbname":"d"}'
@@ -1826,8 +1889,126 @@ class _StopParsing(Exception):
     pass
 
 
-if __name__ == "__main__":
-    unittest.main()
+@unittest.skipUnless(os.environ.get("DP_INGEST_TEST_DSN"), "local PostgreSQL DSN not set")
+class PostgresReplicaIntegration(unittest.TestCase):
+    def test_two_connections_claim_one_object_and_recover_after_crash(self):
+        # Set DP_INGEST_TEST_DSN to a disposable loopback PostgreSQL cluster.
+        # This drives the real advisory lock, COPY, point insert, and progress
+        # transaction; the ordinary offline fakes cannot test lock lifetime.
+        from urllib.parse import urlsplit
+        import psycopg
+        from psycopg import sql
+
+        dsn = os.environ["DP_INGEST_TEST_DSN"]
+        if urlsplit(dsn).hostname not in ("127.0.0.1", "localhost", "::1"):
+            self.fail("integration test requires a loopback PostgreSQL DSN")
+        schema = "dp_ingest_test_" + uuid.uuid4().hex[:12]
+        admin = psycopg.connect(dsn, connect_timeout=5)
+        original_rollup = dp_ingest.applyRollup
+        setup = first = second = crashed = None
+        resume = thread = None
+
+        def connect():
+            conn = psycopg.connect(dsn, connect_timeout=5)
+            conn.execute(sql.SQL("SET search_path TO {}").format(sql.Identifier(schema)))
+            conn.commit()
+            return conn
+
+        try:
+            admin.execute(sql.SQL("CREATE SCHEMA {}").format(sql.Identifier(schema)))
+            admin.commit()
+            setup = connect()
+            setup.execute(
+                "CREATE TABLE distinguished_points ("
+                "campaign_id text NOT NULL, point_key bytea NOT NULL, "
+                "a bytea, b bytea, walk_seed bytea, worker_id text, "
+                "found_at timestamptz, PRIMARY KEY (campaign_id, point_key))")
+            setup.commit()
+            dp_ingest.ensureProgress(setup)
+            setup.close()
+
+            body = struct.pack("<QQQQ", 7, 1, 2, 3) + struct.pack("<QQQQ", 8, 4, 5, 6)
+            key = LEGACY
+            claimed, resume = threading.Event(), threading.Event()
+            calls = []
+
+            class S3:
+                def get_object(self, **kwargs):
+                    if kwargs["Key"].endswith(".json"):
+                        marker = {"sha256": hashlib.sha256(body).hexdigest(), "records": 2}
+                        return {"Body": io.BytesIO(json.dumps(marker).encode())}
+                    calls.append(kwargs["Key"])
+                    if len(calls) == 1:
+                        claimed.set()
+                        if not resume.wait(timeout=10):
+                            raise TimeoutError("first replica was not released")
+                    return {"Body": io.BytesIO(body), "VersionId": "version-1"}
+
+            dp_ingest.applyRollup = lambda *_args: None
+            first, second = connect(), connect()
+            result, errors = [], []
+
+            def ingest_first():
+                try:
+                    result.append(dp_ingest.ingestObject(
+                        first, S3(), "bucket", key, "2026-10-17 00:00:00+00",
+                        replica_id="ingest-a", expected_records=2))
+                except Exception as exc:
+                    errors.append(exc)
+
+            thread = threading.Thread(target=ingest_first)
+            thread.start()
+            try:
+                self.assertTrue(claimed.wait(timeout=10))
+                self.assertIsNone(dp_ingest.ingestObject(
+                    second, S3(), "bucket", key, "2026-10-17 00:00:00+00",
+                    replica_id="ingest-b", expected_records=2))
+            finally:
+                resume.set()
+                thread.join(timeout=15)
+            self.assertFalse(thread.is_alive())
+            self.assertEqual(errors, [])
+            self.assertEqual(result, [(2, 2, 0)])
+            self.assertEqual(calls, [key])
+            self.assertIsNone(dp_ingest.ingestObject(
+                second, S3(), "bucket", key, "2026-10-17 00:00:00+00",
+                replica_id="ingest-b", expected_records=2))
+            row = second.execute(
+                "SELECT ingester_id, records, object_sha256, object_version_id, object_bytes "
+                "FROM dp_ingest_progress WHERE campaign_id = %s AND object_key = %s",
+                (dp_ingest.CAMPAIGN, key)).fetchone()
+            self.assertEqual(row, ("ingest-a", 2, hashlib.sha256(body).hexdigest(),
+                                   "version-1", len(body)))
+            self.assertEqual(second.execute("SELECT count(*) FROM distinguished_points").fetchone(),
+                             (2,))
+            second.rollback()
+            dp_ingest.recordPoll(second, "ingest-a", 1, 2)
+            dp_ingest.recordPoll(second, "ingest-b", 0, 0)
+            self.assertEqual(second.execute(
+                "SELECT ingester_id, objects, rows_added FROM dp_ingest_polls "
+                "WHERE campaign_id = %s ORDER BY ingester_id",
+                (dp_ingest.CAMPAIGN,)).fetchall(),
+                [("ingest-a", 1, 2), ("ingest-b", 0, 0)])
+            second.rollback()
+            crashed = connect()
+            self.assertTrue(dp_ingest.claimObject(crashed, key + "-next", 2))
+            crashed.close()
+            self.assertTrue(dp_ingest.claimObject(second, key + "-next", 2))
+            second.rollback()
+        finally:
+            dp_ingest.applyRollup = original_rollup
+            if resume is not None:
+                resume.set()
+            if thread is not None and thread.is_alive():
+                thread.join(timeout=15)
+            for conn in (setup, first, second, crashed):
+                if conn is not None and not conn.closed:
+                    conn.close()
+            admin.rollback()
+            admin.execute(sql.SQL("DROP SCHEMA IF EXISTS {} CASCADE").format(sql.Identifier(schema)))
+            admin.commit()
+            admin.close()
+
 
 class TableV3Framing(unittest.TestCase):
     def test_header_is_not_a_distinguished_point(self):
@@ -1838,3 +2019,7 @@ class TableV3Framing(unittest.TestCase):
         self.assertEqual(tableRecordBody(payload), payload)
         with self.assertRaises(ValueError):
             tableRecordBody(b"ECC2KDT3" + struct.pack("<II",3,72))
+
+
+if __name__ == "__main__":
+    unittest.main()

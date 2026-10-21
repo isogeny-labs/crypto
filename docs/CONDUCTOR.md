@@ -17,6 +17,13 @@ Without them the hooks print one warning and let the edit through, the MCP
 server fails to start (`ENOENT: conductor-mcp`), and the `conductor check`
 that `CLAUDE.md` asks for cannot run. This page is how to install them.
 
+For an isolated enterprise installation, use the
+[private workspace path](PRIVATE_NETWORK.md): preinstalled compatible binaries,
+an internal Conductor endpoint, native Cairn private discovery, and optional
+WireGuard/internal DNS. `WORKSPACE_OFFLINE=1` makes the session hook and setup
+entrypoints validate local prerequisites and stop before online installers or
+public node startup. It does not run the online recipes below.
+
 ## On your own machine
 
 `scripts/setup-workstation.sh` does all of this and the rest of the stack in
@@ -98,6 +105,16 @@ it does three things.
   image on `127.0.0.1:55432`, then `conductor up --project crypto` on
   `http://localhost:8080`. With it the pre-edit hook, `conductor check` and the
   MCP tools work, but it coordinates nothing outside that container.
+- **Installs the rest of the toolchain.** It runs `scripts/setup-workstation.sh`
+  without the parts above: apt libraries (GMP, MPFR, FLINT, PARI/GP), Rust,
+  Go, Node, uv, the codex and opencode CLIs, a clone of `cryptanalysis` next
+  to this checkout (if at least 5 GiB is free), and the virtualenvs of the
+  checkouts it finds there. It skips what is already installed and never
+  moves an existing Rust toolchain. SageMath installs detached, logged to
+  `~/.local/state/workspace-tools/sage-install.log`, and skips itself below
+  10 GiB free. `CRYPTO_WORKSTATION_SETUP=0` turns this step off,
+  `CRYPTO_SETUP_SAGE=0` skips SageMath, and `CRYPTO_SETUP_CLONE` lists the
+  repositories to clone (default `cryptanalysis`; empty clones none).
 
 The first launch is the slow one: 128 s when this was tested, mostly
 fetching Go's toolchain and building cairn. The container is cached after the
