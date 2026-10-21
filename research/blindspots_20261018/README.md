@@ -112,9 +112,19 @@ section 7b).
 ## Benchmarks
 
 Twelve items copied files into `benchmarks/20261018-blindspots-*/` (01, 02, 03,
-05, 06, 07, 10, 13, 14, 15, 16, 17), and each has its row in
-`benchmarks/README.md`. Items 04, 08, 09, 11, 12, 18, 19 and 20 are not speed
-results and have no copy.
+05, 06, 07, 10, 13, 14, 15, 16, 17). Items 04, 08, 09, 11, 12, 18, 19 and 20 are
+not speed results and have no copy.
+
+None of the twelve has a row in `benchmarks/README.md` yet. The validation gate
+(owner rule 2026-10-19, `docs/VALIDATION_GATE.md`) landed while this campaign
+was open. It admits a row only when the evidence directory carries a
+`VALIDATION.json` that points to three things: an independent replay
+certificate, a validator's recompute from raw data, and a matched rho reference
+priced at 0, 0.1 and 1 GAE. These items have none of the three yet, so their
+rows are withheld rather than frozen as pre-gate, which the gate forbids for
+new rows. Each row can be added once its item is validated. Four of the twelve
+have no measured matched-rho row: 05, 07 and 16 report none, and 02's gap is
+derived, not measured. Those four cannot pass the gate as they stand.
 
 ## Instruments
 
