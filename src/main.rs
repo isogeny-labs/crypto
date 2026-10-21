@@ -15,8 +15,8 @@
 //!   pqc-fast <module> --op ...         — the speed-oriented implementations
 //!   mlwe    <attack>  ...              — ML-KEM / ML-DSA cryptanalysis
 
-mod cli_mlwe;
 mod cli_aes_observed;
+mod cli_mlwe;
 mod cli_pqc;
 mod cli_pqc_fast;
 
@@ -356,6 +356,24 @@ enum CryptanalysisOp {
         /// JSON with known pairs and optional independent verification pairs.
         #[arg(long)]
         input: PathBuf,
+    },
+    /// Infer one effective-key parity bit from an AES S-box linear approximation.
+    AesLinearParity {
+        /// JSON with one-round known plaintext/ciphertext pairs.
+        #[arg(long)]
+        input: PathBuf,
+        /// Ciphertext column in 0..=3.
+        #[arg(long)]
+        column: usize,
+        /// Ciphertext row in 0..=3.
+        #[arg(long)]
+        row: usize,
+        /// Nonzero input bit mask for the AES S-box LAT.
+        #[arg(long)]
+        input_mask: u8,
+        /// Nonzero output bit mask for the AES S-box LAT.
+        #[arg(long)]
+        output_mask: u8,
     },
     /// Reverse an established AES-128 10th-round key to the master key.
     AesDfaSchedule {
@@ -2111,6 +2129,20 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
         }
         CryptanalysisOp::AesLinearObserved { input } => {
             if let Err(e) = cli_aes_observed::linear(&input) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesLinearParity {
+            input,
+            column,
+            row,
+            input_mask,
+            output_mask,
+        } => {
+            if let Err(e) =
+                cli_aes_observed::linear_parity(&input, column, row, input_mask, output_mask)
+            {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }

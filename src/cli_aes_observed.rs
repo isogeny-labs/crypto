@@ -177,6 +177,71 @@ pub fn linear(input: &Path) -> Result<(), String> {
     Ok(())
 }
 
+/// Matsui-style single-byte parity inference for the one-round cipher.
+/// The unknown is `a·K0[input_byte] xor b·K1[output_byte]`.
+pub fn linear_parity(
+    input: &Path,
+    column: usize,
+    row: usize,
+    input_mask: u8,
+    output_mask: u8,
+) -> Result<(), String> {
+    if column > 3 || row > 3 || input_mask == 0 || output_mask == 0 {
+        return Err("column and row must be in 0..=3; both masks must be nonzero".into());
+    }
+    let data: LinearInput = serde_json::from_slice(&read(input)?).map_err(|e| e.to_string())?;
+    if !(64..=100_000).contains(&data.pairs.len()) || !data.verification_pairs.is_empty() {
+        return Err(
+            "linear parity requires 64..=100000 training pairs and no verification_pairs".into(),
+        );
+    }
+    let mut seen = HashMap::new();
+    let pairs = parsed_pairs(&data.pairs, &mut seen)?;
+    if seen.len() != pairs.len() {
+        return Err("linear parity requires distinct plaintext samples".into());
+    }
+    let lat = linear::aes_sbox_lat();
+    let signed_count = lat[input_mask as usize][output_mask as usize];
+    if signed_count == 0 {
+        return Err("the selected AES S-box mask pair has zero LAT bias".into());
+    }
+    let input_byte_position = 4 * ((column + row) % 4) + row;
+    let output_byte_position = 4 * column + row;
+    let dot = |mask: u8, value: u8| (mask & value).count_ones() & 1;
+    let zeros = pairs
+        .iter()
+        .filter(|(p, c)| {
+            dot(input_mask, p[input_byte_position]) ^ dot(output_mask, c[output_byte_position]) == 0
+        })
+        .count();
+    let (bit, margin) =
+        linear::recover_key_bit_one_round(&pairs, (column, row), input_mask, output_mask, &lat);
+    let tie = zeros * 2 == pairs.len();
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&json!({
+            "schema_version":1,
+            "model":"aes-128-reduced-one-round-no-final-mixcolumns",
+            "method":"sbox-lat-majority-vote",
+            "status":if tie {"ambiguous"} else {"candidate"},
+            "column":column,"row":row,
+            "plaintext_byte_position":input_byte_position,
+            "ciphertext_byte_position":output_byte_position,
+            "input_mask":input_mask,"output_mask":output_mask,
+            "lat_signed_count":signed_count,
+            "theoretical_bias":signed_count as f64 / 256.0,
+            "samples":pairs.len(),
+            "equation_zero_count":zeros,
+            "equation_one_count":pairs.len()-zeros,
+            "observed_zero_rate":zeros as f64 / pairs.len() as f64,
+            "majority_margin":margin,
+            "effective_key_parity_bit":if tie {None} else {Some(bit)}
+        }))
+        .map_err(|e| e.to_string())?
+    );
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -219,6 +284,18 @@ mod tests {
             invalid["pairs"][0]["ciphertext_hex"].clone();
         fs::write(&path, invalid.to_string()).unwrap();
         assert!(linear(&path).unwrap_err().contains("distinct"));
+
+        let samples = linear::known_plaintext_corpus(&one, 4096, 19);
+        let lat = linear::aes_sbox_lat();
+        let (a, b, _) = linear::max_linear_bias(&lat);
+        let inferred = linear::recover_key_bit_one_round(&samples, (0, 0), a, b, &lat).0;
+        let parity = |mask: u8, value: u8| ((mask & value).count_ones() & 1) as u8;
+        let expected = parity(a, key[0]) ^ parity(b, one.round_key(1)[0][0]);
+        assert_eq!(inferred, expected);
+        let payload = json!({"pairs":samples.iter().map(as_json).collect::<Vec<_>>()});
+        fs::write(&path, payload.to_string()).unwrap();
+        assert!(linear_parity(&path, 0, 0, a, b).is_ok());
+        assert!(linear_parity(&path, 0, 0, 0, b).is_err());
         fs::remove_file(path).unwrap();
     }
 }
