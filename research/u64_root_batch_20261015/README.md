@@ -48,8 +48,8 @@ are identical on every repetition (diff-verified, `raw/`).
 | arm | process_total (s), 3 reps | median | min | rank_stage median (ms) | target_median (ms) |
 |---|---|---|---|---|---|
 | baseline (main `9f7fb66e6b`) | 83.96 / 76.38 / 41.94 | 76.38 | 41.94 | 30 333 | 1 298 |
-| candidate (this branch) | 40.76 / 23.40 / 22.42 | 23.40 | 22.42 | 10 261 | 213 |
-| ratio (median) | — | **3.26×** | — | 2.95× | 6.09× |
+| candidate (this branch) | 40.76 / 23.40 / 22.42 | 23.40 | 22.42 | 12 303 | 259.5 |
+| ratio (median) | — | **3.26×** | — | 2.47× | 5.00× |
 | ratio (min, least-contended) | — | — | **1.87×** | — | — |
 
 Wall-clock on a shared host without `isolated_bench`; treat these as stage /
@@ -107,3 +107,5 @@ Outputs identical on all reps (3/3, diff-verified including per-target
 probe counts). Class: **engineering**. The candidate binary here includes
 both the u64 `RootBatch` change and the lift batching; the two changes are
 separate commits on the branch so each can be bisected.
+
+> Corrected 2026-10-20 (validation sweep B, 44.2): the candidate rank_stage and target_median cells were the fastest repetition (10 261 and 213), not the median; they are now the medians (12 303 and 259.5), and the earlier 2.95x and 6.09x ratios are retired. No A/A control, no frozen protocol, L0 shared host, 3 reps, 11 of 16 targets solved.
