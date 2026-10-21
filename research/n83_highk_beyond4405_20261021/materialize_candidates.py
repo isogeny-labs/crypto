@@ -12,7 +12,8 @@ ROOT = HERE.parents[1]
 TEMPLATE = (ROOT / "research/n83_root4_frontier_current_20261018/highk_20261019"
             / "identities/k4405_wide3_identity"
             / "candidate_IC1N83Ckb1a1fb731230PDP4rootRCguidedLAgaussTDdirectISO0h2f81ad5da3e7.json")
-SOURCE_SHA256 = "f9f2d6ad9585676a86f54c64f742576ca1865bd9a5f05acd25258d923f5a29c1"
+SOURCE_SHA256 = "58e3ee492093de5f6b760b96e3aba819fa479cdecd22b1adee94f0ecb26026d8"
+SOURCE_COMMIT = None
 OLD_K4405_BASE_HASH = "d64fcee7ba4975873859d256302872681c82b99fbe687ff4fba0bf3ba3a4c8d2"
 SLOTS = 1 << 31
 
@@ -42,10 +43,8 @@ def base_identity(k: int, stage: Path, original: dict) -> dict:
             summary["orbit_columns"] != k or
             summary["factor_base_points"] != 166 * k):
         raise ValueError(f"K{k} base receipt differs")
-    if k == 4405:
-        if summary["base_hash"] != OLD_K4405_BASE_HASH:
-            raise ValueError("K4405 prefix does not match archived base")
-        return copy.deepcopy(original["factor_base"])
+    if k == 4405 and summary["base_hash"] != OLD_K4405_BASE_HASH:
+        raise ValueError("K4405 prefix does not match archived base")
     dump_path = stage / f"k{k}" / "base_dump.jsonl"
     if hashlib.sha256(dump_path.read_bytes()).hexdigest() != receipt["base_dump_sha256"]:
         raise ValueError(f"K{k} base dump differs")
@@ -80,11 +79,15 @@ def materialize(stage: Path) -> list[dict]:
         record = copy.deepcopy(original)
         record["factor_base"] = base_identity(k, stage, original)
         implementation = record["implementation"]
-        implementation["source_commit"] = None
+        implementation["source_commit"] = SOURCE_COMMIT
         implementation["source_sha256"]["ic"] = SOURCE_SHA256
         flags = implementation["algorithm_flags"]
         flags["indexed5_fixed31_request"] = fixed31
         flags["indexed5_load75_request"] = not fixed31
+        flags["indexed5_load80_request"] = False
+        flags["indexed5_id31_request"] = False
+        flags["indexed5_split_at"] = None
+        flags["indexed5_split_shared_bloom"] = False
         pdp = record["point_decomposition"]
         pdp["solver_source_sha256"] = SOURCE_SHA256
         if fixed31:

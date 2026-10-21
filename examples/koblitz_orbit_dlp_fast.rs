@@ -4187,6 +4187,8 @@ mod wide {
         assert!(
             !indexed5_load80 || indexed5_table,
             "indexed five-byte load80 request requires the indexed table"
+        );
+        assert!(
             !indexed5_fixed31 || (indexed5_table && root_only11 && indexed5_id30),
             "indexed five-byte fixed31 request requires one-root ID30 states"
         );
@@ -4726,41 +4728,6 @@ mod wide {
             .map(|p| p.expect("affine representative")[0])
             .collect();
         let base_load_ms = setup_started.elapsed().as_secs_f64() * 1000.0;
-        let dump_base = || {
-            if let Ok(path) = std::env::var("KIC_DUMP_BASE") {
-                let dump = json!({
-                    "kind":"point_defined_factor_base",
-                    "n":n, "a":a,
-                    "subgroup_order":r,
-                    "field_modulus_low_terms":curve.curve.irreducible.low_terms,
-                    "orbit_columns":base.columns,
-                    "base_hash":base_hash,
-                    "factor_base_points":base.points.len(),
-                    "field_value_encoding":"base-10 strings for u128 field values",
-                    "factor_base_point_coordinates":base.points.iter().map(|p| encode_point128(*p)).collect::<Vec<_>>(),
-                    "factor_base_point_labels":base.labels,
-                    "factor_base_representatives":representatives.iter().copied().map(encode_pair128).collect::<Vec<_>>(),
-                });
-                std::fs::write(path, format!("{dump}\n")).expect("write base dump");
-            }
-        };
-        if std::env::var("KIC_BASE_BUILD_ONLY").as_deref() == Ok("1") {
-            dump_base();
-            println!(
-                "{}",
-                json!({
-                    "kind":"compact_orbit_base_stage",
-                    "status":"STAGE_DIAGNOSTIC_ONLY",
-                    "n":n,
-                    "base_hash":base_hash,
-                    "orbit_columns":base.columns,
-                    "factor_base_points":base.points.len(),
-                    "scanned_x":scanned_x,
-                    "base_load_ms":base_load_ms,
-                })
-            );
-            std::process::exit(0);
-        }
 
         let basis_started = Instant::now();
         let basis = NormalBasis128::new(&gf);
@@ -5197,7 +5164,22 @@ mod wide {
         summary["root_only11_enabled"] =
             json!(matches!(&index.states, StateStore128::RootOnly11 { .. }));
         println!("{summary}");
-        dump_base();
+        if let Ok(path) = std::env::var("KIC_DUMP_BASE") {
+            let dump = json!({
+                "kind":"point_defined_factor_base",
+                "n":n, "a":a,
+                "subgroup_order":r,
+                "field_modulus_low_terms":curve.curve.irreducible.low_terms,
+                "orbit_columns":base.columns,
+                "base_hash":base_hash,
+                "factor_base_points":base.points.len(),
+                "field_value_encoding":"base-10 strings for u128 field values",
+                "factor_base_point_coordinates":base.points.iter().map(|p| encode_point128(*p)).collect::<Vec<_>>(),
+                "factor_base_point_labels":base.labels,
+                "factor_base_representatives":representatives.iter().copied().map(encode_pair128).collect::<Vec<_>>(),
+            });
+            std::fs::write(path, format!("{dump}\n")).expect("write base dump");
+        }
         std::process::exit(0);
     }
 

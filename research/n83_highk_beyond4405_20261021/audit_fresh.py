@@ -19,6 +19,32 @@ EXTRA = (
     ("48501c90100223ebf9597ed223692c0f24ce1f8f",
      "research/n83_fresh_cold_binary_retest_20261021/fresh_targets.jsonl",
      "c604d7d42468d16636f4d0a8f6fe4caa75b91104d85287743b868e04ce5098e4"),
+    ("HEAD", "research/n83_fresh_cold_finalists_20261019/fresh_targets.jsonl",
+     "174a6c56bbd54d419df3363e700660a08578612fbb5b8d7f25ed54c5eb622e4a"),
+    ("HEAD", "research/n83_fresh_cold_finalists_20261019/historical_finalist_targets.jsonl",
+     "4eb139e73c99f0921041a911d30698997913d1e71155a8e09035ffa647e02a58"),
+    ("HEAD", "research/n83_global_bridge_20261018/fresh_targets.jsonl",
+     "a767c6acb37174593b8dd50cddfac7ed5be02498a00d199754a234606a8cbd64"),
+    ("HEAD", "research/n83_k5086_base_20261021/target.jsonl",
+     "1c9b53960953fd252d09af08afbfdff9229fbeca151285e698b3e90cb79cd656"),
+    ("HEAD", "research/n83_load80_online_pair_20261020/targets.jsonl",
+     "5d5482355731bc2362f7a3b612c70fba13ba326f97e153a4610138bda5a14abd"),
+    ("HEAD", "research/n83_root4_load80_20261020/reports/run-20261020T1604Z/raw/target.jsonl",
+     "1c9b53960953fd252d09af08afbfdff9229fbeca151285e698b3e90cb79cd656"),
+    ("HEAD", "research/n83_two_tier_root_20261021/maxk_holdout_targets.jsonl",
+     "96375c178e8315c136f190927dc3470fc84f1b7096c2e563387808928aa56d6a"),
+    ("HEAD", "research/n83_two_tier_root_20261021/maxk_screen_targets.jsonl",
+     "b99b196b43e69414c101e948ca74ea32703d1ea87ad71e0109e01b37f8cafe38"),
+    ("HEAD", "research/n83_two_tier_root_20261021/runs/base_only_k128_20261021/target.jsonl",
+     "1c9b53960953fd252d09af08afbfdff9229fbeca151285e698b3e90cb79cd656"),
+    ("HEAD", "research/n83_two_tier_root_20261021/runs/base_only_k4405_20261021/target.jsonl",
+     "1c9b53960953fd252d09af08afbfdff9229fbeca151285e698b3e90cb79cd656"),
+    ("HEAD", "research/n83_two_tier_root_20261021/runs/base_only_k5500_20261021/target.jsonl",
+     "1c9b53960953fd252d09af08afbfdff9229fbeca151285e698b3e90cb79cd656"),
+    ("HEAD", "research/n83_two_tier_root_20261021/runs/k4405_monolithic_local_7200/target.jsonl",
+     "1c9b53960953fd252d09af08afbfdff9229fbeca151285e698b3e90cb79cd656"),
+    ("HEAD", "research/n83_two_tier_root_20261021/runs/k4405_split_shared_local_7200/target.jsonl",
+     "1c9b53960953fd252d09af08afbfdff9229fbeca151285e698b3e90cb79cd656"),
 )
 
 
@@ -79,7 +105,7 @@ def audit() -> dict:
                        "other_fresh_overlap_count": overlap_fresh}
         new_seen.update(points)
     report = {
-        "schema": "n83.fixed31-exclusion/v1",
+        "schema": "n83.fixed31-exclusion/v2",
         "prior_audit_sha256": PRIOR_AUDIT_SHA256,
         "prior_files": checked,
         "prior_unique_point_count": len(seen),
@@ -89,7 +115,7 @@ def audit() -> dict:
             row["prior_overlap_count"] == row["other_fresh_overlap_count"] == 0
             for row in fresh.values()) else "OVERLAP_FOUND",
     }
-    write_once(HERE / "fresh_exclusion_audit.json",
+    write_once(HERE / "fresh_exclusion_audit_v2.json",
                (json.dumps(report, indent=2, sort_keys=True) + "\n").encode())
     return report
 

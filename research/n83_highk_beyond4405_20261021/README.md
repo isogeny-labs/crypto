@@ -25,9 +25,8 @@ and rejects a worst-case two-root load above 80% before allocation. It
 requires the exact N83 one-root, ID30 and five-byte index modes, and excludes
 the existing load75 and fixed30 sizing modes. The slot encoder and exact-key
 reconstruction are shared with the checked ID30 path. The new mode has a
-separate result flag; the earlier source and candidate identities are
-unchanged. The initial comparison will include exact K4300 and K4405 controls,
-K4405 under both sizing flags as a same-layout control, then K4500 and K4549
+separate result flag. The initial comparison includes K4405 under both sizing
+flags as a same-base layout control, then K4500 and K4549
 under fixed31. Record actual usable base counts, hashes, source and binary
 identity, memory, setup, rank, one-target online intervals, same-point rho,
 and independent arithmetic replay per run.
@@ -39,26 +38,49 @@ K4500 contains 747,000 usable points in 4,500 folded columns, with base hash
 `6f3305328b265b70f7a2d53e97be2c4b70c3da291ef4cca4693dac6dae468f95`.
 K4549 contains 755,134 usable points in 4,549 folded columns, with base hash
 `65bcc74cd45d33881bcaad17216fe724d2666072230230ed6868eb7187b968af`.
-The full ordered dumps and receipts are in the 36,005,831-byte
+`verify_base_stage.py` independently replayed every representative, subgroup
+check, signed Frobenius point and label for all three bases, checked their
+ordered K4405 prefixes, and matched the SHA-256 set hashes in the candidate
+manifests. All three arms are `PASS_INDEPENDENT_BASE_REPLAY` in
+`base_stage_validation.json` (SHA-256
+`fe7667fa4b0eeb2ca0604fc06615d2cd109c6c54a22e0b37cfd4235bb4486f8d`).
+The full ordered dumps and receipts for the merged source are in the
+53,531,559-byte
 `base_stage.tar.gz` at
-`s3://crypto-autoresearcher/factor-bases/icv1/etc/n83_fixed31_base_stage_20261021/`.
-Its SHA-256 is `92e3b0b463a8a8b1ca4591e03fc81fde631f3e4de5b4288fc63b1ba3b297b236`,
+`s3://crypto-autoresearcher/factor-bases/icv1/etc/n83_fixed31_base_stage_merged_20261021/`.
+Its SHA-256 is `5b13e49152b0f120400930fa181a5e8cd3e8e45640bc0134389b10945b3ce333`,
 confirmed by a fresh S3 download in `base_stage_custody.json`.
+`source_binary_custody.json` separately pins the executed macOS ARM64 source
+and executable to fresh S3 downloads.
 `identities/catalog.json` records the four source-bound IC1 candidate
 IDs for the K4405 load75/fixed31 controls and the two larger bases. These are
 exact candidate identities, with run costs still unknown.
+The separate split-index campaign has already enumerated and independently
+replayed a K5500 base with 913,000 usable points. This fixed31 study tests the
+largest monolithic ID30 table configurations within its 2³¹-slot capacity;
+K5500's index, rank and target measurements remain a separate frontier gate.
+The earlier source snapshot, its candidate identities and custody receipt are
+retained under `identities_source_f9_snapshot`,
+`base_stage_receipts_source_f9_snapshot` and
+`base_stage_custody_source_f9_snapshot.json`.
 
 `generate_fresh.py` sealed 1,536 new public screen points and 16 one-target
 holdout points. The respective public-stream SHA-256 values are
 `e62e8ea5b77dbcbd80217b8f994ebb571fa03647355bfb5593077c58aedfdf11`
 and `a0e1f76ddec6ae901d5e766a942ad0b35299e10f175243fe7abd0fc679040a96`.
-`audit_fresh.py` found zero overlap within these streams or against 33,368
-distinct earlier public points, including the prior high-K screen and both
-current 2026-10-21 cold-base fixtures. Answer sidecars are excluded from timed
+`audit_fresh.py` found zero overlap within these streams or against 33,602
+distinct earlier public points, including the prior high-K screen, both
+current 2026-10-21 cold-base fixtures and the merged branch's K5500 screen.
+The initial 33,368-point audit remains versioned; `fresh_exclusion_audit_v2.json`
+is the expanded current inventory. Answer sidecars are excluded from timed
 inputs. [PROTOCOL.md](PROTOCOL.md) fixes the comparison and promotion gates.
 
-The local release example suite passed 22/22 tests with Rust 1.93.1; its
-command and output are retained in `rust-example-tests.log`. The capacity
+The merged source release example suite passed 24/24 tests with Rust 1.93.1;
+its command and output are retained in `rust-example-tests-merged-source.log`.
+The merged upstream source contained an incomplete fixed31 assertion; the
+restored separator compiled in the same release build used for the new base
+stage.
+The earlier 22/22 suite is retained in `rust-example-tests.log`. The capacity
 model, Lean module, `rustfmt --check`, and `actionlint` passed. The branch
 workflow repeats the capacity, Lean, and Rust example checks with Rust 1.99.1
 on its exact head. A full K4500 or K4549 process has not yet been measured.

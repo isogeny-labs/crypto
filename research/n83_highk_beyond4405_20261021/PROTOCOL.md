@@ -3,22 +3,23 @@
 ## Frozen objects and question
 
 The question is whether a first-K signed-Frobenius factor base larger than
-K4405 improves verified one-target N83 online recovery enough to justify its
-preparation cost. The exact curve is `EC1N83Ckb1a1haacb69ee9f37`, with
+K4405 improves verified one-target N83 online recovery within the monolithic
+five-byte ID30 index's 2³¹-slot capacity, with preparation cost recorded
+separately. The exact curve is `EC1N83Ckb1a1haacb69ee9f37`, with
 `y² + xy = x³ + x² + 1` over
 `F₂[z]/(z⁸³ + z⁷ + z⁴ + z² + 1)`, subgroup order
 `8569786107849059`. The executed IC source SHA-256 is
-`f9f2d6ad9585676a86f54c64f742576ca1865bd9a5f05acd25258d923f5a29c1`.
+`58e3ee492093de5f6b760b96e3aba819fa479cdecd22b1adee94f0ecb26026d8`.
 Use a single build of this source and `Cargo.lock` for all arms on one
 allocation. Preserve the build command, compiler, target triple, binary hash
 and full algorithm flags. Do not substitute a binary from another commit.
 
 | Arm | Usable points | Folded columns | Candidate ID |
 | --- | ---: | ---: | --- |
-| K4405 load75 layout control | 731,230 | 4,405 | `IC1N83Ckb1a1fb731230PDP4rootRCguidedLAgaussTDdirectISO0h526e55e483bb` |
-| K4405 fixed31 | 731,230 | 4,405 | `IC1N83Ckb1a1fb731230PDP4rootRCguidedLAgaussTDdirectISO0hcf6464a6bfc8` |
-| K4500 fixed31 | 747,000 | 4,500 | `IC1N83Ckb1a1fb747000PDP4rootRCguidedLAgaussTDdirectISO0h6c7cff614511` |
-| K4549 fixed31 | 755,134 | 4,549 | `IC1N83Ckb1a1fb755134PDP4rootRCguidedLAgaussTDdirectISO0h07fb30f0d3de` |
+| K4405 load75 layout control | 731,230 | 4,405 | `IC1N83Ckb1a1fb731230PDP4rootRCguidedLAgaussTDdirectISO0hb06dfd803ac7` |
+| K4405 fixed31 | 731,230 | 4,405 | `IC1N83Ckb1a1fb731230PDP4rootRCguidedLAgaussTDdirectISO0h5b2a23617169` |
+| K4500 fixed31 | 747,000 | 4,500 | `IC1N83Ckb1a1fb747000PDP4rootRCguidedLAgaussTDdirectISO0h315a543f4bdb` |
+| K4549 fixed31 | 755,134 | 4,549 | `IC1N83Ckb1a1fb755134PDP4rootRCguidedLAgaussTDdirectISO0h5ba7f62522b3` |
 
 The four canonical manifests and their hashes are in `identities/catalog.json`.
 `KIC_INDEXED5_FIXED31=1` replaces `KIC_INDEXED5_LOAD75=1` only for the
@@ -33,8 +34,8 @@ The public screen contains 1,536 points with SHA-256
 The separate 16-point holdout has SHA-256
 `a0e1f76ddec6ae901d5e766a942ad0b35299e10f175243fe7abd0fc679040a96`.
 The SHA-256 domains, scalar rule, answer-sidecar hashes and curve checks are in
-`fresh_manifest.json`; `fresh_exclusion_audit.json` records zero overlap
-against 33,368 earlier public points and between the new streams. Keep answer
+`fresh_manifest.json`; `fresh_exclusion_audit_v2.json` records zero overlap
+against 33,602 earlier public points and between the new streams. Keep answer
 sidecars outside the timed worker input. Any target, source, binary, base or
 manifest mismatch aborts admission and stays in the result log.
 
@@ -49,9 +50,17 @@ denials and process peak RSS. A visible affinity mask does not establish
 Tier 0. A different provider may qualify at Tier 1 under the same receipts.
 Stop every child at a frozen 2,400-second wall cap; preserve timeout, OOM,
 partial output and failed verification rows. Retire the Pod at the allocation
-deadline even if the scientific screen remains incomplete. Set an explicit
-new spending ceiling before dispatch; the earlier campaign's conservative
-upper charge already exceeded its earlier $5 ceiling.
+deadline even if the scientific screen remains incomplete. The proposed new
+allocation envelope is at most 10 hours from provider creation to verified
+termination, at a provider-quoted rate no greater than $0.20/hour, plus a
+$0.25 reserve for billing uncertainty: an incremental ceiling of $2.25.
+The earlier campaign's conservative upper charge was $5.710216 against its
+earlier $5 ceiling, giving a combined conservative bound of $7.960216 if
+the new envelope is fully used. This new ceiling requires owner approval
+before any paid allocation. A quote above the rate cap, missing creation
+timestamp, stale predecessor Pod, or inability to confirm termination aborts
+dispatch. The watchdog terminates the Pod by the 10-hour deadline and records
+a provider absent-Pod receipt.
 
 Run the four arms on screen points 0–767 in table order and 768–1,535 in
 reverse order, with empty setup caches for each child. Include base building,
@@ -90,9 +99,11 @@ and cold-start costs separately, including failures and capped attempts.
 A claim that the selected high-K base is best across the N83 campaign also
 requires the leading lower-K finalist, currently K1107, to use this same
 source and binary on holdout point 0 with the same-point rho reference and
-Tier 1 gate. Until that cross-family row and independent replay are complete,
-the high-K selector answers only the frozen high-K frontier question. Recheck
-the K1107 identity against the current five-base retest before dispatch.
+Tier 1 gate. The separate K5500 split-index base has 913,000 enumerated usable
+points and must also receive full index, rank, one-target and replay evidence
+before a campaign-wide selection among these frozen finalists. Until those cross-family rows pass,
+the fixed31 selector answers only its frozen monolithic frontier question.
+Recheck the K1107 identity against the current five-base retest before dispatch.
 
 Archive raw stdout, stderr, telemetry, base dumps, candidate/workload/run
 manifests, provider receipt, binary and source hashes, and independent replay.

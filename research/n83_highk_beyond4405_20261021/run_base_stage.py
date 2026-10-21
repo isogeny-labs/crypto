@@ -13,7 +13,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 SOURCE = ROOT / "examples/koblitz_orbit_dlp_fast.rs"
 TARGETS = HERE / "holdout_targets.jsonl"
-SOURCE_SHA256 = "f9f2d6ad9585676a86f54c64f742576ca1865bd9a5f05acd25258d923f5a29c1"
+SOURCE_SHA256 = "58e3ee492093de5f6b760b96e3aba819fa479cdecd22b1adee94f0ecb26026d8"
 TARGETS_SHA256 = "a0e1f76ddec6ae901d5e766a942ad0b35299e10f175243fe7abd0fc679040a96"
 PRIOR_K4405_BASE_HASH = "d64fcee7ba4975873859d256302872681c82b99fbe687ff4fba0bf3ba3a4c8d2"
 K_VALUES = (4405, 4500, 4549)
@@ -35,8 +35,7 @@ def run(binary: Path, output: Path) -> None:
         env = {key: value for key, value in os.environ.items()
                if not key.startswith("KIC_")}
         env["KIC_BASE_BUILD_ONLY"] = "1"
-        if k != 4405:
-            env["KIC_DUMP_BASE"] = str(dump)
+        env["KIC_DUMP_BASE"] = str(dump)
         command = [str(binary), f"construct:83:1:{k}", str(TARGETS), "29",
                    str(arm / "unused_target_output.jsonl")]
         started = datetime.now(timezone.utc).isoformat()
@@ -62,12 +61,11 @@ def run(binary: Path, output: Path) -> None:
                     (k == 4405 and
                      summary.get("base_hash") != PRIOR_K4405_BASE_HASH)):
                 status = "IDENTITY_MISMATCH"
-            if k != 4405:
-                header = json.loads(dump.read_text())
-                if (header.get("base_hash") != summary.get("base_hash") or
-                        header.get("orbit_columns") != k or
-                        header.get("factor_base_points") != 166 * k):
-                    status = "DUMP_MISMATCH"
+            header = json.loads(dump.read_text())
+            if (header.get("base_hash") != summary.get("base_hash") or
+                    header.get("orbit_columns") != k or
+                    header.get("factor_base_points") != 166 * k):
+                status = "DUMP_MISMATCH"
         receipt = {
             "schema": "n83.fixed31-base-stage/v1",
             "status": status,
