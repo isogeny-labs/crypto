@@ -199,19 +199,20 @@ trace `-t`; the two curves have different point counts and are not
 transport. A smooth twist order would help solve a twist DLP, but by itself
 does not solve the original DLP.
 
-## Trace-map correction and remaining experiment
+## Trace-map correction and completed follow-up
 
 For arbitrary points `F_i in E(F_{p²})`, tracing a valid relation **does**
 give the original group relation `2R=sum(F_i+πF_i)`. This does not require a
 GHS cover. The twist component is exactly the kernel of that trace on odd
 order. The older [Phase 18.2 note](../ecdlp_autolab/phase18_quasi_subfield.sage)
 left trace descent uncertain and suggested a cover obstruction. The exact
-correction is: descent is algebraically valid; whether its *traced factor
-base* is small and its full relation pipeline cheaper is open. A useful next
-experiment would freeze a mixed-component extension-field factor base,
-measure unique traces and independent matrix rank, and compare complete
-one-target costs against the current index-calculus baseline and matched
-rho. This report does not substitute a toy count for that experiment.
+correction is: descent is algebraically valid; the size, rank, and cost of
+its *traced factor base* must be measured. The completed
+[mixed-component follow-up](MIXED_REPORT.md) freezes such a base, counts
+unique traces and independent matrix rank, and compares exhaustive
+one-target costs with native index calculus and rho controls. Its exact
+width-three toy results do not establish a cryptographic-size or general
+polynomial-solver speed claim.
 
 ## Reproduction and limits
 
