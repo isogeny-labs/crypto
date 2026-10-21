@@ -54,9 +54,9 @@ use crate::cryptanalysis::gls_fp2::{gls_line_base, Fp2Curve, Fp2Point, GlsInstan
 use crate::cryptanalysis::glv_invariant_base::{glv_orbit_base, AutomorphismGroup};
 use crate::cryptanalysis::ic_boundary::{
     binary_subspace_factor_base, decompose_mitm, decompose_mitm_frobenius, koblitz_factor_base,
-    prime_factor_base, prime_factor_base_strided, BinaryGroup, BinaryInstance, ColumnFold,
-    CountedGroup, FactorBase, FrobeniusPairTable, GroupOps, OracleCounters, PairTable, PrimeCurve,
-    PrimeInstance, PrimePoint, Relation,
+    prime_factor_base, prime_factor_base_cleared, prime_factor_base_strided, BinaryGroup,
+    BinaryInstance, ColumnFold, CountedGroup, FactorBase, FrobeniusPairTable, GroupOps,
+    OracleCounters, PairTable, PrimeCurve, PrimeInstance, PrimePoint, Relation,
 };
 use crate::cryptanalysis::koblitz_factor_base_search::subspace_is_trace_zero;
 use crate::cryptanalysis::koblitz_fast::FastPoint;
@@ -106,6 +106,10 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeAbscissaBase<'_> {
                 "stride",
                 "fixed nonzero abscissa stride modulo p; default 1",
             ),
+            (
+                "subgroup",
+                "1 to clear the cofactor: [h]P for the smallest-abscissa points, every base point in the order-r subgroup (charged); default 0",
+            ),
         ]
     }
 
@@ -113,7 +117,7 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeAbscissaBase<'_> {
         &self,
         _ctx: &InstanceCtx<PrimeCurve>,
         params: &Params,
-        _ops: &mut GroupOps,
+        ops: &mut GroupOps,
     ) -> Result<FactorBase<PrimePoint>, String> {
         let size = params.u64("size")? as usize;
         if size == 0 {
@@ -125,6 +129,12 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeAbscissaBase<'_> {
         })?;
         if stride == 0 || stride >= self.instance.curve.p {
             return Err("stride must lie in 1..p".into());
+        }
+        if params.flag("subgroup") {
+            if stride != 1 {
+                return Err("subgroup=1 takes the default stride".into());
+            }
+            return Ok(prime_factor_base_cleared(self.instance, size, ops));
         }
         if stride == 1 {
             Ok(prime_factor_base(self.instance, size))
@@ -393,10 +403,16 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[(
-            "dimension",
-            "F_2-dimension of the abscissa subspace; about 2^dimension abscissae",
-        )]
+        &[
+            (
+                "dimension",
+                "F_2-dimension of the abscissa subspace; about 2^dimension abscissae",
+            ),
+            (
+                "trace_kernel",
+                "1 to span the subspace inside ker Tr (needs Tr(a) = 0): every base point is then in 2E, so pair sums land in the index-2 subgroup holding the targets; default 0",
+            ),
+        ]
     }
 
     fn build(
@@ -409,9 +425,40 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
         if dim == 0 || dim > 30 {
             return Err(format!("subspace dimension {dim} outside 1..=30"));
         }
-        let basis: Vec<u64> = (0..dim).map(|k| 1u64 << k).collect();
+        let basis: Vec<u64> = if params.flag("trace_kernel") {
+            trace_kernel_basis(self.instance, dim)?
+        } else {
+            (0..dim).map(|k| 1u64 << k).collect()
+        };
         Ok(binary_subspace_factor_base(self.instance, &basis))
     }
+}
+
+/// `dim` independent elements of `ker Tr`, from `1, z, z², …`: each monomial
+/// of trace 0 as it is, each of trace 1 plus the first monomial of trace 1.
+/// A point `(x, y)` of `y² + xy = x³ + ax² + b` lies in `2E(F_{2^n})` iff
+/// `Tr(x) = Tr(a)`, so with `Tr(a) = 0` every point above the span is in
+/// `2E` (`research/isogeny_conductor_gap_round5_20261012/`, E7b; the
+/// trace-zero bases of `koblitz_factor_base_search` use the same fact).
+pub fn trace_kernel_basis(inst: &BinaryInstance, dim: u32) -> Result<Vec<u64>, String> {
+    let tr = |v: u64| inst.artin_schreier.trace(v);
+    if tr(inst.a) != 0 {
+        return Err("trace_kernel needs Tr(a) = 0: with Tr(a) = 1 the points of 2E lie over an affine hyperplane".into());
+    }
+    let t0 = (0..inst.n)
+        .map(|k| 1u64 << k)
+        .find(|&e| tr(e) == 1)
+        .ok_or("no monomial of trace 1")?;
+    let basis: Vec<u64> = (0..inst.n)
+        .map(|k| 1u64 << k)
+        .filter(|&e| e != t0)
+        .map(|e| if tr(e) == 1 { e ^ t0 } else { e })
+        .take(dim as usize)
+        .collect();
+    if basis.len() < dim as usize {
+        return Err(format!("ker Tr has dimension {} < {dim}", inst.n - 1));
+    }
+    Ok(basis)
 }
 
 /// **The Frobenius closure of a prefix subspace** (lead L5, the ordered
@@ -2741,6 +2788,69 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
 mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::koblitz_instance;
+
+    /// The cleared base lies in the order-r subgroup, and has the requested
+    /// columns (a 22-bit CM crater of round 1, h = 72).
+    #[test]
+    fn the_cofactor_cleared_prime_base_lies_in_the_prime_subgroup() {
+        use crate::cryptanalysis::ic_boundary::{PrimeCurve, PrimeInstance};
+        let inst = PrimeInstance {
+            name: "round-1 crater".into(),
+            curve: PrimeCurve {
+                p: 3785623,
+                a: 1622392,
+                b: 3244784,
+            },
+            group_order: 3785112,
+            r: 52571,
+            cofactor: 72,
+            generator: (322105, 1106556),
+        };
+        let mut ops = GroupOps::default();
+        let fb = prime_factor_base_cleared(&inst, 16, &mut ops);
+        assert_eq!(fb.columns, 16);
+        assert!(ops.doubles + ops.adds > 0, "the clearing is charged");
+        let mut scratch = GroupOps::default();
+        for &p in &fb.points {
+            assert!(inst.curve.mul(&mut scratch, p, inst.r).infinity);
+        }
+        let raw = prime_factor_base(&inst, 16);
+        let outside = raw
+            .points
+            .iter()
+            .filter(|&&p| !inst.curve.mul(&mut scratch, p, inst.r).infinity)
+            .count();
+        assert!(outside > 0, "the raw base has points outside E[r]");
+    }
+
+    /// A trace-kernel basis spans abscissae of trace 0, so on an a = 0
+    /// Koblitz curve every base point is in 2E; the default base is not.
+    #[test]
+    fn the_trace_kernel_binary_base_lies_in_two_e() {
+        let inst = koblitz_instance(0, 13).expect("K over F_2^13, a = 0");
+        let basis = trace_kernel_basis(&inst, 6).unwrap();
+        assert_eq!(basis.len(), 6);
+        for &v in &basis {
+            assert_eq!(inst.artin_schreier.trace(v), 0);
+        }
+        let g = BinaryGroup(&inst.fast);
+        let mut ops = GroupOps::default();
+        let half = inst.r * inst.cofactor / 2;
+        let in_two_e = |fb: &FactorBase<FastPoint>, ops: &mut GroupOps| {
+            fb.points
+                .iter()
+                .filter(|&&p| g.mul(ops, p, half).infinity)
+                .count()
+        };
+        let tk = binary_subspace_factor_base(&inst, &basis);
+        assert!(!tk.points.is_empty());
+        assert_eq!(in_two_e(&tk, &mut ops), tk.points.len());
+        let default: Vec<u64> = (0..6).map(|k| 1u64 << k).collect();
+        let d = binary_subspace_factor_base(&inst, &default);
+        assert!(in_two_e(&d, &mut ops) < d.points.len());
+        let ko = koblitz_instance(1, 17).expect("a = 1 over F_2^17");
+        assert!(trace_kernel_basis(&ko, 6).is_err(), "Tr(a) = 1 is refused");
+    }
 
     /// The command-line form of a multi-factor divisor, end to end from
     /// the plug-in string to the indices both Koblitz bases read.

@@ -724,6 +724,21 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
     </table></div>
     <p class="dash-footnote">E4 makes no whole-method or rho comparison; the gap changes which subgroups exist (rational E[2] on all D = &minus;7 craters and the &#8467; = 2 craters), not what a subgroup of given order costs. <a href="https://github.com/aburan28/crypto/blob/main/research/isogeny_conductor_gap_round3_20261011/README.md">Note, records, sessions and run reports</a></p>
   </section></div></details>
+<details class="dash-details"><summary>Conductor gap round 5: the cofactor penalty is self-inflicted · 18 October 2026</summary><div class="dash-detail-body"><section class="dash-section" id="isogeny-conductor-gap-round5-20261018" aria-labelledby="isogeny-gap-r5-title">
+    <div class="dash-section-head"><div><p class="dash-kicker">Relation-phase engineering and whole-method cold cost · 18 October 2026</p><h2 id="isogeny-gap-r5-title">Clearing the cofactor of the factor base beats every fiber-closed table, by about h<sup>1/3</sup>; rho stays ahead and the gap still widens.</h2>
+<p class="panel-summary">A base pushed into the targets&rsquo; subgroup multiplies yield by |H| (exponent 1.001 &plusmn; 0.036 over |H| = 2 to 200); three audited ecbench sessions (992 records) show the cofactor-cleared prime base cuts S to 0.705&times; (h = 4) and 0.275&times; (h = 72) of the best fiber-closed arm, and the trace-kernel binary base raises yield 1.48&ndash;1.94&times;.</p></div><span class="status">7.3&times; rho &middot; best cell</span></div>
+    <div class="table-scroll"><table>
+      <caption>From <code>TABLES.md</code> and <code>TABLES_E7.md</code>; E7 rows hold at every weight of the 0 / 0.1 / 1 GAE pricing band.</caption>
+      <thead><tr><th>Lead</th><th>Comparison</th><th>Measured</th><th>Class</th></tr></thead>
+      <tbody>
+        <tr><td>E6 yield</td><td>pushed-forward base on E/H &divide; direct, matched columns, 15 curves</td><td>&times;1.81 (C2) to &times;139 (|H| = 200); exponent 1.001 &plusmn; 0.036; 0 lift failures</td><td><span class="chip">stage</span> diagnostic</td></tr>
+        <tr><td>E7a cleared base</td><td>best cleared &divide; best fiber-closed, 16 curves, 18&ndash;30 bits</td><td>0.705&times; (h = 4), 0.275&times; (h = 72); predicted h<sup>&minus;1/3</sup> = 0.63, 0.24</td><td><span class="chip">engineering</span> improvement</td></tr>
+        <tr><td>E7a against rho</td><td>best cleared &divide; matched rho</td><td>7.1&ndash;27&times; across the band; slope of log<sub>2</sub>(IC/rho) 0.122 and 0.068, above 0</td><td><span class="chip">whole method</span> rho ahead</td></tr>
+        <tr><td>E7b trace kernel</td><td>Tr = 0 subspace base &divide; default, a = 0 Koblitz F<sub>2</sub><sup>19</sup>, F<sub>2</sub><sup>23</sup></td><td>yield 1.48&times;, 1.94&times;; F4 work per relation 0.87&times;, 1.39&times; better</td><td><span class="chip">stage</span> mixed</td></tr>
+      </tbody>
+    </table></div>
+    <p class="dash-footnote">The best cell, S = 14.58 against rho at 2.00 on <code>icv1-fp22-tm1504-967cbbde</code> (7.29&times;), replaces round 4&rsquo;s 8.43&times;. IC S is a lower bound (native work unpriced); every audit replayed 12 runs exactly. The cleared base dominates rounds 1&ndash;2&rsquo;s fiber-closed and partial-fiber configurations. <a href="https://github.com/aburan28/crypto/blob/main/research/isogeny_conductor_gap_round5_20261012/README.md">Note, sessions, tables and run reports</a></p>
+  </section></div></details>
 <details class="dash-details"><summary>Large-prime conductor gap: IC measured at ell = 131101 · 12 October 2026</summary><div class="dash-detail-body"><section class="panel" id="conductor-gap-ic37-20261012">
 <h2>Large-prime conductor gap: IC measured at ell = 131101 <span class="chip">accounting</span></h2>
 <p class="panel-summary">Native MITM-based IC on two fixed D = -19 CM pairs, eight independent targets per curve; both 99% floor/crater count intervals include one, and every measured execution replayed exactly.</p>
@@ -874,6 +889,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 <tr><td>2026-10-11</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Inherited F4 on a generic binary curve (pdp3-binary), m = 19, rho-negation</td><td class="n">2.283&times; <small>counted GAE lower-bound diagnostic</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#ic-f4-f5-f6-cross-family-20261011">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/f4_f5_f6_cross_family_20261011/RESULT.md">source</a></td></tr>
 <tr><td>2026-10-11</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>F6-IC on a generic binary curve (pdp3-binary), m = 19, rho-negation</td><td class="n">2,774&times; <small>counted GAE lower-bound diagnostic; not a speed bound</small></td><td>matched</td><td><span class="chip">relabelling</span></td><td><a href="#ic-f4-f5-f6-cross-family-20261011">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/f4_f5_f6_cross_family_20261011/RESULT.md">source</a></td></tr>
 <tr><td>2026-10-11</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Conductor-gap round 2: best cold cell, order-6-folded base on the j = 0 crater (D = &minus;3, 2^8, 26-bit, h = 4)</td><td class="n">12.825&times; <small>counted GAE lower-bound diagnostic; not a speed bound</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#isogeny-conductor-gap-round2-20261011">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/isogeny_conductor_gap_round2_20261011/README.md">source</a></td></tr>
+<tr><td>2026-10-18</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Conductor-gap round 5: best cold cell, cofactor-cleared MITM pair table on <code>icv1-fp22-tm1504-967cbbde</code> (h = 72, 22-bit)</td><td class="n">7.29&times; <small>counted GAE lower-bound diagnostic; not a speed bound</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#isogeny-conductor-gap-round5-20261018">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/isogeny_conductor_gap_round5_20261012/README.md">source</a></td></tr>
 <tr><td>2026-10-04</td><td>Elliptic curve, complete method-solve simulated instructions</td><td>n37 shared-rank K8 whole solve vs strong rho, 16 fresh public points</td><td class="n">3.984&times; <small>Callgrind Ir diagnostic; not online wall speed</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#n37-online-ir-20261004">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md">source</a></td></tr>
 <tr><td>2026-10-04</td><td>Elliptic curve, one-target online simulated instructions</td><td>n37 shared-rank K16 target-only vs strong rho, 16 fresh public points</td><td class="n">0.153&times; <small>target-only Callgrind Ir diagnostic; not online wall speed</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#n37-online-ir-20261004">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_online_ir_20261004/RESULT.md">source</a></td></tr>
 <tr><td>2026-10-04</td><td>Elliptic curve, hosted L1 native wall diagnostics</td><td>n37 K8 cold solve versus strong rho, frozen target zero</td><td class="n">9.009&times; <small>hosted L1 cold wall diagnostic; not admitted</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#n37-native-online-wall-20261004">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_native_online_wall_20261004/RESULT.md">source</a></td></tr>
@@ -1346,6 +1362,17 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "class": "engineering",
      "anchor": "#rootfinding-buffers-20261014",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md"
+    },
+    {
+     "anchor": "#isogeny-conductor-gap-round5-20261018",
+     "class": "engineering",
+     "date": "2026-10-18",
+     "detail": "Two audited ecbench sessions (912 records) on the 16 round-4 cofactor curves (h = 4 and 72, 18 to 30 bits). Clearing the cofactor of the small-abscissa base keeps every pair sum in E[r]; the best cleared-base arm costs 0.705x (h = 4) and 0.275x (h = 72) the best fiber-closed arm, against the predicted h^(-1/3). The best cell is S = 14.58 against the session's own rho at 2.00 on the same curve; every IC cell is above rho at every weight of the 0/0.1/1 pricing band, and log2(IC/rho) still rises with size (slope 0.122 and 0.068). IC S is a lower bound (native work unpriced); every audit replayed 12 runs exactly.",
+     "label": "Conductor-gap round 5: best cold cell, cofactor-cleared MITM pair table on icv1-fp22-tm1504-967cbbde (h = 72, 22-bit)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/isogeny_conductor_gap_round5_20261012/README.md",
+     "unit": "counted GAE lower-bound diagnostic",
+     "value": 7.29
     }
    ],
    "role": "context"

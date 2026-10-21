@@ -423,6 +423,17 @@
      "class": "engineering",
      "anchor": "#rootfinding-buffers-20261014",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md"
+    },
+    {
+     "anchor": "#isogeny-conductor-gap-round5-20261018",
+     "class": "engineering",
+     "date": "2026-10-18",
+     "detail": "Two audited ecbench sessions (912 records) on the 16 round-4 cofactor curves (h = 4 and 72, 18 to 30 bits). Clearing the cofactor of the small-abscissa base keeps every pair sum in E[r]; the best cleared-base arm costs 0.705x (h = 4) and 0.275x (h = 72) the best fiber-closed arm, against the predicted h^(-1/3). The best cell is S = 14.58 against the session's own rho at 2.00 on the same curve; every IC cell is above rho at every weight of the 0/0.1/1 pricing band, and log2(IC/rho) still rises with size (slope 0.122 and 0.068). IC S is a lower bound (native work unpriced); every audit replayed 12 runs exactly.",
+     "label": "Conductor-gap round 5: best cold cell, cofactor-cleared MITM pair table on icv1-fp22-tm1504-967cbbde (h = 72, 22-bit)",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/isogeny_conductor_gap_round5_20261012/README.md",
+     "unit": "counted GAE lower-bound diagnostic",
+     "value": 7.29
     }
    ],
    "role": "context"

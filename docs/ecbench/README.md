@@ -429,6 +429,13 @@ several generators.  `coset` stops the closure at the first multiple already
 in the subgroup.  `fiber_scale=d` (coset only) uses the subgroup
 `[d]E(F_q)[h]` instead of the whole fiber.
 
+`prime-abscissa:size=B,subgroup=1` clears the cofactor: the base is
+`[h]P` for the smallest-abscissa points (the clearing is charged), so every
+base point lies in `E[r]`.  `binary-subspace:dimension=d,trace_kernel=1`
+spans the subspace inside `ker Tr`, which needs `Tr(a) = 0`; every base point
+is then in `2E`.  Both keep the targets' subgroup closed under pair sums,
+which a raw base does not (`research/isogeny_conductor_gap_round5_20261012/`).
+
 `koblitz-standard-subspace:dimension=d` with
 `pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N` runs
 PR #1333's Groebner decomposers unmodified inside `ic.pipeline`, with no

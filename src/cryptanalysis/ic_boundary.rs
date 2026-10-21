@@ -4554,6 +4554,83 @@ pub fn prime_factor_base(inst: &PrimeInstance, size: usize) -> FactorBase<PrimeP
     fb
 }
 
+/// The cofactor-cleared base: `[h]P` for the points `P` above the
+/// smallest abscissae, until `size` distinct abscissae of `[h]P` are
+/// collected, each with its negative, one column per abscissa.
+///
+/// Every base point then lies in the order-`r` subgroup that the targets
+/// live in.  A pair sum of base points then always lands there, so a
+/// meet-in-the-middle table over this base hits a target `h` times as often
+/// as one over the raw small-abscissa base, at the same size
+/// (`research/isogeny_conductor_gap_round5_20261012/`, E7a).  The `[h]`
+/// multiplications are charged to `ops`.  With `h = 1` it is
+/// [`prime_factor_base`] with the same points.
+pub fn prime_factor_base_cleared(
+    inst: &PrimeInstance,
+    size: usize,
+    ops: &mut GroupOps,
+) -> FactorBase<PrimePoint> {
+    let start = Instant::now();
+    let curve = &inst.curve;
+    let h = inst.cofactor;
+    let mut fb = FactorBase::empty(format!("[{h}]·(smallest abscissae), {size} columns"));
+    let mut x = 1u64;
+    let mut scanned = 0u64;
+    let mut sqrts = 0u64;
+    let mut cleared = 0u64;
+    while fb.abscissae < size && x < curve.p {
+        scanned += 1;
+        let rhs = curve.rhs(x);
+        if curve.legendre(rhs) >= 0 {
+            sqrts += 1;
+            if let Some(y) = curve.sqrt(rhs) {
+                let raw = PrimePoint::affine(x, y);
+                let p = if h == 1 {
+                    raw
+                } else {
+                    cleared += 1;
+                    curve.mul(ops, raw, h)
+                };
+                if !p.infinity && !fb.x_index.contains_key(&p.x) {
+                    let y = if p.y == 0 { 0 } else { p.y.min(curve.p - p.y) };
+                    let p = PrimePoint::affine(p.x, y);
+                    let q = curve.neg(p);
+                    let col = fb.abscissae;
+                    let i = fb.points.len();
+                    fb.points.push(p);
+                    fb.col_of.push(col);
+                    fb.coef_of.push(1);
+                    if q != p {
+                        fb.points.push(q);
+                        fb.col_of.push(col);
+                        fb.coef_of.push(inst.r - 1);
+                        fb.neg_index.push(i + 1);
+                        fb.neg_index.push(i);
+                        fb.x_index.insert(p.x, vec![i, i + 1]);
+                    } else {
+                        fb.neg_index.push(i);
+                        fb.x_index.insert(p.x, vec![i]);
+                    }
+                    fb.abscissae += 1;
+                }
+            }
+        }
+        x += 1;
+    }
+    fb.columns = fb.abscissae;
+    for (i, p) in fb.points.iter().enumerate() {
+        fb.point_index.insert(curve.key(p), i);
+    }
+    fb.abscissa_list = fb.x_index.keys().copied().collect();
+    fb.abscissa_list.sort_unstable();
+    fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+    fb.cost.count("abscissae_scanned", scanned);
+    fb.cost.count("legendre_symbols", scanned);
+    fb.cost.count("sqrt_solves", sqrts);
+    fb.cost.count("cofactor_clearings", cleared);
+    fb
+}
+
 /// Coverage control: scan canonical abscissae in a fixed nonzero stride
 /// modulo p.  This changes the base while retaining the same column count
 /// and the same exact point-lift, setup and table accounting as the ordinary
