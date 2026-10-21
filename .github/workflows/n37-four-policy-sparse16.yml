@@ -73,6 +73,8 @@ jobs:
             docs/ic/calibration.json docs/ic/boundary_targets.json
           cmp Cargo.toml "$note/SOURCE_Cargo.toml"
           cp "$note/Cargo.lock" Cargo.lock
+      - name: Install rustfmt (the runner toolchain ships without it)
+        run: rustup component add rustfmt
       - name: Check source lock and formatting
         run: |
           note=research/notes/ecc2k130/n37_four_policy_sparse16_20261004

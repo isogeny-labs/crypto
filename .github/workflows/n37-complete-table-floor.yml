@@ -61,6 +61,8 @@ jobs:
       # Builds against the root Cargo.lock: the 2026-10-02 frozen lockfile this
       # replay used to copy in predates the volcano-cli path dependency, so
       # `--locked` could no longer resolve the crate graph against it.
+      - name: Install rustfmt (the runner toolchain ships without it)
+        run: rustup component add rustfmt
       - name: Check Rust formatting
         run: rustfmt --edition 2021 --check examples/n37_complete_table_floor.rs examples/n37_complete_table_floor_analyze.rs
       - name: Build native counter, decision auditor, and ecbench
