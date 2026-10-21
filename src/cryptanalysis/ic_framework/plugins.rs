@@ -32,6 +32,7 @@
 //! | `subtract` | 2 | test `R − P ∈ F` for every signed base point; no table |
 //! | `mitm` | 2 or 3 | a pair table probed once per target, or once per `R − P` |
 //! | `mitm-prime-batch` | 2 | the same folded prime pair table, built with one batched inversion per abscissa row and x-only sums |
+//! | `mitm-prime-blocked` | 2 | the same table and sums again, inserted in cache-sized pieces (many small maps, each block grouped by map) |
 //! | `mitm-frobenius` | 2 or 3 | the same on a Frobenius-folded table (Koblitz) |
 //! | `mitm-frobenius-counted` | 2 or 3 | the same table and probe, with native table setup counters |
 //! | `rootfind-subtract` | 2 or 3 | prime curves: `prime_fast`'s direct-subtraction root finding, every `x(R ∓ F_i)` of a target from one Montgomery batched inversion, then a lookup (`m = 2`) or a probe of the negation-folded pair table (`m = 3`) |
@@ -1484,14 +1485,35 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
 }
 
 /// The two-summand prime MITM search with the same probe and table keys as
-/// `mitm`, but a batched-inversion, x-only table construction.
+/// `mitm`, but a batched-inversion, x-only table construction.  The
+/// `blocked` form (`mitm-prime-blocked`) builds the same table in
+/// cache-sized pieces ([`PairTable::build_negation_folded_prime_blocked`]).
 pub struct PrimeBatchMitmOracle {
+    blocked: bool,
     table: Option<PairTable>,
 }
 
 impl PrimeBatchMitmOracle {
     pub fn new() -> Self {
-        Self { table: None }
+        Self {
+            blocked: false,
+            table: None,
+        }
+    }
+
+    pub fn blocked() -> Self {
+        Self {
+            blocked: true,
+            table: None,
+        }
+    }
+
+    fn name_str(&self) -> &'static str {
+        if self.blocked {
+            "mitm-prime-blocked"
+        } else {
+            "mitm-prime-batch"
+        }
     }
 }
 
@@ -1503,7 +1525,7 @@ impl Default for PrimeBatchMitmOracle {
 
 impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
     fn name(&self) -> &str {
-        "mitm-prime-batch"
+        self.name_str()
     }
 
     fn summands(&self) -> u32 {
@@ -1511,8 +1533,14 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
     }
 
     fn describe(&self, _params: &Params) -> String {
-        "negation-folded pair table built with batched prime-field inversions; identical MITM probe"
-            .into()
+        if self.blocked {
+            "negation-folded pair table built with batched prime-field inversions, \
+             inserted in cache-sized pieces; identical MITM probe"
+                .into()
+        } else {
+            "negation-folded pair table built with batched prime-field inversions; identical MITM probe"
+                .into()
+        }
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
@@ -1527,9 +1555,13 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
         ops: &mut GroupOps,
     ) -> Result<(), String> {
         if params.u64_or("m", 2)? != 2 || params.0.keys().any(|key| key != "m") {
-            return Err("mitm-prime-batch accepts only m=2".into());
+            return Err(format!("{} accepts only m=2", self.name_str()));
         }
-        let table = PairTable::build_negation_folded_prime_batch(ctx.group, fb)?;
+        let table = if self.blocked {
+            PairTable::build_negation_folded_prime_blocked(ctx.group, fb)?
+        } else {
+            PairTable::build_negation_folded_prime_batch(ctx.group, fb)?
+        };
         ops.merge(table.build_ops);
         self.table = Some(table);
         Ok(())
