@@ -82,6 +82,13 @@ No cross-target search state or rho collision table is reused. Actual amortized
 multi-target performance is outside this one-target experiment; do not infer it
 from setup-excluded costs.
 
+Execution correction, 2026-10-21: the first cofactor panel retained 144 rejected
+projected-control executions because `scan_cap=65536` exceeded `p=65519`.
+`specs/cofactor-v2.json` changes only that control parameter to `65518`; it
+reuses all targets, algorithm seeds and other budgets. Both sessions and their
+receipts remain. The initial projected-control comparison is incomplete; use
+the version-two session for that comparison. No primary or holdout spec changed.
+
 Run the native release library tests, touched example tests and ecbench
 integration tests. Audit each completed session with `verify --replay-all`;
 retain SHA-256 replay receipts. Recompute per-target and per-curve totals from

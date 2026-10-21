@@ -13,12 +13,12 @@ mkdir -p "$crypto_study_dir/reports" "$crypto_study_dir/sessions"
 if (($#)); then
   crypto_panels=("$@")
 else
-  crypto_panels=(smoke primary holdout generator-1 generator-2 generator-7 cofactor)
+  crypto_panels=(smoke primary holdout generator-1 generator-2 generator-7 cofactor-v2)
 fi
 crypto_status=0
 for crypto_panel in "${crypto_panels[@]}"; do
   case "$crypto_panel" in
-    smoke|primary|holdout|generator-1|generator-2|generator-7|cofactor) ;;
+    smoke|primary|holdout|generator-1|generator-2|generator-7|cofactor|cofactor-v2) ;;
     *) printf 'Unknown frozen panel: %s\n' "$crypto_panel" >&2; exit 2 ;;
   esac
   crypto_report="$crypto_study_dir/reports/run-$crypto_batch-$crypto_panel"

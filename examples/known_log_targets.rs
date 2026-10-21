@@ -193,7 +193,7 @@ fn arms(multiplier: u64, projected: bool) -> Vec<Value> {
     }
     if projected {
         let mut matched = baseline;
-        matched["params"]["factor_base"] = json!("prime-projected-abscissa:size=32,scan_cap=65536");
+        matched["params"]["factor_base"] = json!("prime-projected-abscissa:size=32,scan_cap=65518");
         out.push(json!({"name":"projected","role":"baseline","method":matched}));
     }
     out
@@ -254,7 +254,7 @@ fn specs(study: &Path, repo: &Path) -> Result<(), String> {
         .filter_map(|r| r.get("explicit").cloned())
         .collect();
     write(
-        &dir.join("cofactor.json"),
+        &dir.join("cofactor-v2.json"),
         &spec(cofactor, 2026102104, arms(1, true), false),
     )?;
     let mut hashes = BTreeMap::new();

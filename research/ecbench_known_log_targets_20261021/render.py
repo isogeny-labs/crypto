@@ -19,6 +19,8 @@ def quoted(text):
 
 def render(report):
     summary = json.loads((report / "summary.json").read_text())
+    spec = json.loads((Path(summary["session"]) / "spec.json").read_text())
+    session = json.loads((Path(summary["session"]) / "session.json").read_text())
     rows = summary["band"]["rows"]
     fig, axes = plt.subplots(1, 3, figsize=(12, 3.9), constrained_layout=True)
     colors = {"rho-neg": "#52606d", "abscissa": "#d66b34", "known-log": "#156b9a",
@@ -37,7 +39,8 @@ def render(report):
         axis.set_title(f"Native work: {weight:g} GAE / operation", fontsize=10)
         axis.grid(alpha=0.2, which="both")
         axis.legend(fontsize=8)
-    fig.suptitle(report.name + " · recorded native pricing band", fontsize=11)
+    fig.suptitle(report.name + f" · {spec['workloads']['targets_per_curve']} public targets/curve × "
+                 f"{spec['measurement']['rounds']} measured rounds", fontsize=10)
     fig.savefig(report / "cost.svg")
     fig.savefig(report / "cost.png", dpi=150)
     plt.close(fig)
@@ -54,6 +57,7 @@ def render(report):
 
 This report displays the native recorded-value summary. Each workload is one
 public target with no supplied logarithm; cold setup is charged on every run.
+The session recorded #text({quoted(session['status_counts'])}).
 Native work is priced equally on all arms at the three displayed weights.
 Uncounted work or failed recoveries block rankings. A/A controls are retained in
 the table. Raw wall times are descriptive unless the harness admits them at L2.
