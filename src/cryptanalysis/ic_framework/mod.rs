@@ -353,6 +353,15 @@ pub fn run_pipeline<G: CountedGroup>(
     let fb_started = Instant::now();
     let fb = base_builder.build(ctx, &spec.factor_base_params, &mut fb_ops)?;
     let archive_import = base_builder.name() == "archive";
+    if archive_import
+        && matches!(oracle.name(), "mitm-frobenius" | "mitm-frobenius-counted")
+        && spec.factor_base_params.get("symmetry") != Some("frobenius")
+    {
+        return Err(
+            "archive Frobenius oracle requires symmetry=frobenius and verified orbit closure"
+                .into(),
+        );
+    }
     let audit_enabled = archive_import || spec.oracle_params.flag("audit_rank");
     if audit_enabled && (fb.columns == 0 || fb.columns > 4096) {
         return Err("rank audit requires 1..4096 columns".into());
@@ -532,7 +541,7 @@ pub fn run_pipeline<G: CountedGroup>(
     });
     let cost_qualification = audit_enabled.then(|| {
         if archive_import {
-            "partial_counted_cost: archive creation, transfer, hashing, recipe replay, indexing and rank normalization are unpriced; total-cost and speedup unknown".to_string()
+            "partial_counted_cost: archive creation, transfer, instance certification, hashing, recipe replay, indexing, symmetry setup and rank normalization are unpriced; total-cost and speedup unknown".to_string()
         } else {
             "partial_counted_cost: rank normalization is unpriced; total-cost and speedup unknown".to_string()
         }

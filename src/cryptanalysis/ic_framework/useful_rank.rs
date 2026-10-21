@@ -10,6 +10,9 @@ use serde::{Deserialize, Serialize};
 use std::{collections::BTreeSet, time::Instant};
 
 const RECEIPT_BYTES: usize = 8 * 1024 * 1024;
+fn is_zero(value: &u64) -> bool {
+    *value == 0
+}
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct RowReceipt {
     pub row: Vec<u64>,
@@ -29,6 +32,11 @@ pub struct RankAudit {
     pub cofactor: u64,
     pub generator_key: u64,
     pub target_key: u64,
+    /// Explicit zero coefficients whose points satisfy [h]P = O. These
+    /// known-zero contributions create no column or independent relation.
+    /// Optional for compatibility with v1 receipts without torsion projection.
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub cofactor_kernel_points: u64,
     pub rows_seen: u64,
     pub verified_rows: u64,
     pub invalid_rows: u64,
@@ -113,14 +121,24 @@ impl<'a, G: CountedGroup> AuditedMatrix<'a, G> {
         }
         let mut ops = GroupOps::default();
         let mut columns = vec![None; fb.columns];
+        let mut cofactor_kernel_points = 0;
         for (i, &point) in fb.points.iter().enumerate() {
             let col = fb.col_of[i];
             if col >= fb.columns {
                 return Err("factor-base column out of range".into());
             }
             let coef = fb.coef_of[i] % ctx.r;
-            let inverse = invmod(coef, ctx.r).ok_or("zero factor-base coefficient")?;
             let cleared = ctx.group.mul(&mut ops, point, ctx.cofactor);
+            if coef == 0 {
+                if !ctx.group.is_identity(&cleared) {
+                    return Err(
+                        "zero factor-base coefficient for nonzero cofactor projection".into(),
+                    );
+                }
+                cofactor_kernel_points += 1;
+                continue;
+            }
+            let inverse = invmod(coef, ctx.r).ok_or("noninvertible factor-base coefficient")?;
             let canonical = ctx.group.mul(&mut ops, cleared, inverse);
             if let Some(prior) = columns[col] {
                 if prior != canonical {
@@ -158,6 +176,7 @@ impl<'a, G: CountedGroup> AuditedMatrix<'a, G> {
                 cofactor: ctx.cofactor,
                 generator_key: ctx.group.key(&ctx.generator),
                 target_key: ctx.group.key(&ctx.target),
+                cofactor_kernel_points,
                 transcript_complete: true,
                 ..Default::default()
             },

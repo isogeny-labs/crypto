@@ -1,12 +1,15 @@
 use crate::cryptanalysis::ic_boundary::{
-    koblitz_instance, roster_prime_instance, BinaryGroup, Calibration, CountedGroup, FactorBase,
-    GroupOps, IncrementalGauss, RelationSolver, RowStatus,
+    koblitz_instance, random_binary_instance, roster_prime_instance, BinaryGroup, Calibration,
+    CountedGroup, FactorBase, GroupOps, IncrementalGauss, RelationSolver, RowStatus,
 };
 use crate::cryptanalysis::ic_framework::{
     archive::{self, ArchiveInstance, BinaryArchiveBase, PrimeArchiveBase},
-    plugins::{PrimeAbscissaBase, PrimeBatchMitmOracle, SubtractOracle},
+    plugins::{
+        FrobeniusMitmOracle, KoblitzSymmetrisedBase, PrimeAbscissaBase, PrimeBatchMitmOracle,
+        SubtractOracle, SymmetrisedOracle,
+    },
     run_pipeline,
-    stages::{FactorBaseBuilder, InstanceCtx, Params, Targets},
+    stages::{DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, Targets},
     useful_rank::{self, AuditedMatrix},
     PipelineSpec,
 };
@@ -19,6 +22,321 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 static SEQ: AtomicU64 = AtomicU64::new(0);
+
+#[test]
+fn archive_symmetry_options_preserve_points_and_replay_column_maps() {
+    use crate::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
+    for (family, selected) in [(CmFamily::J0, "cubic"), (CmFamily::J1728, "quartic")] {
+        let i = generate_cm_instance(family, 10, 19, 8).unwrap();
+        let cache = Cache::new();
+        let id = store::build(
+            &Config {
+                curve: archive::prime_spec(&i),
+                recipe: Recipe::PrimeProgression {
+                    start: "0".into(),
+                    step: "1".into(),
+                    count: i.curve.p as usize,
+                },
+                max_candidates: i.curve.p as usize,
+                shard_points: 64,
+            },
+            &cache.0,
+        )
+        .unwrap();
+        let g = i.generator_point();
+        let ctx = InstanceCtx {
+            group: &i.curve,
+            generator: g,
+            target: g,
+            r: i.r,
+            cofactor: i.cofactor,
+            group_order: i.group_order,
+            name: i.name.clone(),
+            field_degree: None,
+        };
+        let builder = PrimeArchiveBase { instance: &i };
+        let mut ops = GroupOps::default();
+        let mut params = cache.params(&id);
+        params.set("symmetry", "none");
+        let plain = builder.build(&ctx, &params, &mut ops).unwrap();
+        assert_eq!(plain.columns, plain.points.len());
+        params.set("symmetry", "negation");
+        let negation = builder.build(&ctx, &params, &mut ops).unwrap();
+        params.set("symmetry", selected);
+        let folded = builder.build(&ctx, &params, &mut ops).unwrap();
+        assert_eq!(plain.points, folded.points);
+        assert_eq!(negation.points, folded.points);
+        assert!(folded.columns < negation.columns);
+        let audit = AuditedMatrix::new(
+            &ctx,
+            &folded,
+            Box::new(IncrementalGauss::new(folded.columns + 1, i.r)),
+        )
+        .unwrap();
+        useful_rank::replay(&ctx, &folded, &audit.audit).unwrap();
+        params.set("symmetry", "frobenius");
+        assert!(builder
+            .build(&ctx, &params, &mut ops)
+            .err()
+            .unwrap()
+            .contains("unavailable"));
+        params.set("symmetry", "negaton");
+        assert!(builder
+            .build(&ctx, &params, &mut ops)
+            .err()
+            .unwrap()
+            .contains("unsupported archive symmetry"));
+    }
+}
+
+#[test]
+fn generic_binary_archives_support_prime_and_composite_extension_degrees() {
+    for degree in [6, 7] {
+        let i = random_binary_instance(degree, 73, 8).unwrap();
+        let cache = Cache::new();
+        let id = store::build(
+            &Config {
+                curve: archive::binary_spec(&i),
+                recipe: Recipe::BinarySubspace {
+                    shape: Shape::Coordinate,
+                    dimension: degree as usize,
+                    seed: 1,
+                    offsets: vec!["0".into()],
+                },
+                max_candidates: 1 << degree,
+                shard_points: 32,
+            },
+            &cache.0,
+        )
+        .unwrap();
+        let ArchiveInstance::Binary(loaded) = archive::instance(&cache.0, &id).unwrap() else {
+            panic!()
+        };
+        assert_eq!(archive::binary_spec(&loaded), archive::binary_spec(&i));
+        let group = BinaryGroup(&loaded.fast);
+        let ctx = InstanceCtx {
+            group: &group,
+            generator: loaded.generator,
+            target: loaded.generator,
+            r: loaded.r,
+            cofactor: loaded.cofactor,
+            group_order: loaded.group_order,
+            name: loaded.name.clone(),
+            field_degree: Some(degree),
+        };
+        let builder = BinaryArchiveBase { instance: &loaded };
+        let mut params = cache.params(&id);
+        let mut ops = GroupOps::default();
+        let fb = builder.build(&ctx, &params, &mut ops).unwrap();
+        let audit = AuditedMatrix::new(
+            &ctx,
+            &fb,
+            Box::new(IncrementalGauss::new(fb.columns + 1, loaded.r)),
+        )
+        .unwrap();
+        useful_rank::replay(&ctx, &fb, &audit.audit).unwrap();
+        assert!(loaded.koblitz.is_none());
+        params.set("symmetry", "frobenius");
+        assert!(builder
+            .build(&ctx, &params, &mut ops)
+            .err()
+            .unwrap()
+            .contains("certified Koblitz"));
+    }
+}
+
+#[test]
+fn archived_frobenius_orbits_support_one_and_two_large_prime_relations() {
+    let mut i = koblitz_instance(0, 19).unwrap();
+    // Preserve a generator different from the catalog representative.
+    i.generator = BinaryGroup(&i.fast).mul(&mut GroupOps::default(), i.generator, 3);
+    let cache = Cache::new();
+    let id = store::build(
+        &Config {
+            curve: archive::binary_spec(&i),
+            recipe: Recipe::FrobeniusOrbits { seeds: 2, seed: 7 },
+            max_candidates: 4096,
+            shard_points: 32,
+        },
+        &cache.0,
+    )
+    .unwrap();
+    let ArchiveInstance::Binary(mut loaded) = archive::instance(&cache.0, &id).unwrap() else {
+        panic!()
+    };
+    assert!(loaded.koblitz.is_some());
+    assert_eq!(loaded.generator, i.generator);
+    assert_eq!(
+        loaded.fast.lower(loaded.generator),
+        *loaded.koblitz.as_ref().unwrap().generator()
+    );
+    let mut params = cache.params(&id);
+    params.set("symmetry", "frobenius");
+    {
+        let group = BinaryGroup(&loaded.fast);
+        let mut ops = GroupOps::default();
+        let planted = 31337 % loaded.r;
+        let ctx = InstanceCtx {
+            group: &group,
+            generator: loaded.generator,
+            target: group.mul(&mut ops, loaded.generator, planted),
+            r: loaded.r,
+            cofactor: loaded.cofactor,
+            group_order: loaded.group_order,
+            name: loaded.name.clone(),
+            field_degree: Some(loaded.n),
+        };
+        let builder = BinaryArchiveBase { instance: &loaded };
+        let fb = builder.build(&ctx, &params, &mut ops).unwrap();
+        let (_, archived_points) = store::load(&cache.0, &id).unwrap();
+        assert_eq!(fb.points.len(), archived_points.len());
+        assert_eq!(fb.columns, 2);
+        for large_primes in [0, 1, 2] {
+            let spec = PipelineSpec { factor_base: "archive".into(), factor_base_params: params.clone(),
+                oracle: "mitm-frobenius-counted".into(),
+                oracle_params: Params::parse_spec(&format!("mitm-frobenius-counted:m=3,large_primes={large_primes},lp_domain_factor=3,lp_raw_x_cap=4096")).unwrap().1,
+                targets: Targets::Random, linalg: "incremental-gauss-full-rank-checked".into(),
+                max_trials: 20000, seed: 5, ..Default::default() };
+            let report = run_pipeline(
+                &ctx,
+                &spec,
+                &builder,
+                &mut FrobeniusMitmOracle::new_counted(3, &loaded),
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .unwrap();
+            assert!(report.verified, "large_primes={large_primes}: {report:?}");
+            let audit = report.useful_rank.as_ref().unwrap();
+            assert_eq!(audit.invalid_rows, 0);
+            useful_rank::replay(&ctx, &fb, audit).unwrap();
+            assert_eq!(report.decomposition.cost.get("lp_verification_failures"), 0);
+            if large_primes != 0 {
+                assert!(report.decomposition.cost.get("lp_partials_fed") > 0);
+            }
+            if large_primes == 1 {
+                assert_eq!(report.decomposition.cost.get("lp_partials_two_large"), 0);
+            } else if large_primes == 2 {
+                assert!(report.decomposition.cost.get("lp_partials_two_large") > 0);
+            }
+        }
+    }
+    loaded.koblitz.as_mut().unwrap().lambda += 1u32;
+    let group = BinaryGroup(&loaded.fast);
+    let ctx = InstanceCtx {
+        group: &group,
+        generator: loaded.generator,
+        target: loaded.generator,
+        r: loaded.r,
+        cofactor: loaded.cofactor,
+        group_order: loaded.group_order,
+        name: loaded.name.clone(),
+        field_degree: Some(loaded.n),
+    };
+    assert!(BinaryArchiveBase { instance: &loaded }
+        .build(&ctx, &params, &mut GroupOps::default())
+        .err()
+        .unwrap()
+        .contains("coefficient replay"));
+}
+
+#[test]
+fn imported_koblitz_instance_supports_the_native_torsion_coordinate_control() {
+    let i = koblitz_instance(1, 17).unwrap();
+    let cache = Cache::new();
+    let id = store::build(
+        &Config {
+            curve: archive::binary_spec(&i),
+            recipe: Recipe::FrobeniusOrbits { seeds: 1, seed: 7 },
+            max_candidates: 4096,
+            shard_points: 32,
+        },
+        &cache.0,
+    )
+    .unwrap();
+    let ArchiveInstance::Binary(loaded) = archive::instance(&cache.0, &id).unwrap() else {
+        panic!()
+    };
+    let group = BinaryGroup(&loaded.fast);
+    let ctx = InstanceCtx {
+        group: &group,
+        generator: loaded.generator,
+        target: loaded.generator,
+        r: loaded.r,
+        cofactor: loaded.cofactor,
+        group_order: loaded.group_order,
+        name: loaded.name.clone(),
+        field_degree: Some(loaded.n),
+    };
+    let params = Params::parse_spec("koblitz-symmetrised:divisor=0;1,projected=1")
+        .unwrap()
+        .1;
+    let mut ops = GroupOps::default();
+    let fb = KoblitzSymmetrisedBase { instance: &loaded }
+        .build(&ctx, &params, &mut ops)
+        .unwrap();
+    let audit = AuditedMatrix::new(
+        &ctx,
+        &fb,
+        Box::new(IncrementalGauss::new(fb.columns + 1, loaded.r)),
+    )
+    .unwrap();
+    useful_rank::replay(&ctx, &fb, &audit.audit).unwrap();
+    assert!(audit.audit.cofactor_kernel_points > 0);
+    let mut wrong_count = audit.audit.clone();
+    wrong_count.cofactor_kernel_points += 1;
+    assert!(useful_rank::replay(&ctx, &fb, &wrong_count).is_err());
+    SymmetrisedOracle::new(2, &loaded)
+        .prepare(&ctx, &fb, &params, &mut ops)
+        .unwrap();
+    let mut false_zero = fb;
+    let nonzero = false_zero.coef_of.iter().position(|&c| c != 0).unwrap();
+    false_zero.coef_of[nonzero] = 0;
+    assert!(AuditedMatrix::new(
+        &ctx,
+        &false_zero,
+        Box::new(IncrementalGauss::new(false_zero.columns + 1, loaded.r))
+    )
+    .err()
+    .unwrap()
+    .contains("nonzero cofactor projection"));
+}
+
+#[test]
+fn shorter_subfield_action_does_not_claim_a_full_signed_frobenius_fold() {
+    let mut i = koblitz_instance(1, 9).unwrap();
+    assert_eq!(i.group_order, 518);
+    i.r = 7;
+    i.cofactor = 74;
+    let group = BinaryGroup(&i.fast);
+    let mut ops = GroupOps::default();
+    i.generator = (1..512)
+        .find_map(|x| {
+            i.points_with_x(x)
+                .into_iter()
+                .map(|p| group.mul(&mut ops, p, 74))
+                .find(|p| !p.infinity)
+        })
+        .unwrap();
+    assert!(group.mul(&mut ops, i.generator, 7).infinity);
+    let cache = Cache::new();
+    let id = store::build(
+        &Config {
+            curve: archive::binary_spec(&i),
+            recipe: Recipe::FrobeniusOrbits { seeds: 1, seed: 7 },
+            max_candidates: 512,
+            shard_points: 32,
+        },
+        &cache.0,
+    )
+    .unwrap();
+    let ArchiveInstance::Binary(loaded) = archive::instance(&cache.0, &id).unwrap() else {
+        panic!()
+    };
+    assert_eq!(loaded.r, 7);
+    assert!(loaded.koblitz.is_none());
+}
 struct Cache(PathBuf);
 impl Cache {
     fn new() -> Self {
@@ -198,6 +516,13 @@ fn binary_archive_runs_and_replays_useful_rank() {
         .unwrap()
         .contains("native binary curve mismatch"));
     let builder = BinaryArchiveBase { instance: &loaded };
+    let mut incomplete_orbits = cache.params(&id);
+    incomplete_orbits.set("symmetry", "frobenius");
+    assert!(builder
+        .build(&ctx, &incomplete_orbits, &mut ops)
+        .err()
+        .unwrap()
+        .contains("closed under signed Frobenius"));
     let spec = PipelineSpec {
         factor_base: "archive".into(),
         factor_base_params: cache.params(&id),
@@ -344,6 +669,22 @@ fn comparison_protocol_hash_and_holdout_are_frozen() {
     assert!(!confirmation.is_empty());
     assert!(confirmation.iter().all(|seed| !discovery.contains(seed)));
     assert!(protocol["total_runtime_winner"].is_null());
+    let v2_bytes = include_bytes!("../../../docs/ic/archive-technique-comparison-v2.json");
+    let v2_receipt = include_str!("../../../docs/ic/archive-technique-comparison-v2.json.sha256");
+    assert_eq!(
+        store::digest(v2_bytes),
+        v2_receipt.split_whitespace().next().unwrap()
+    );
+    let v2: serde_json::Value = serde_json::from_slice(v2_bytes).unwrap();
+    assert_eq!(
+        v2["base_selection_protocol"]["sha256"],
+        store::digest(bytes)
+    );
+    assert!(v2["total_runtime_winner"].is_null());
+    assert_eq!(
+        v2["pipeline"]["linalg"],
+        "incremental-gauss-full-rank-checked"
+    );
 }
 
 #[test]

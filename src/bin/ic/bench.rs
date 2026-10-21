@@ -59,6 +59,10 @@ pub struct BenchArgs {
     /// Content-addressed manifest: supplies the exact curve and generator.
     #[arg(long, requires = "archive_store")]
     pub archive_manifest: Option<String>,
+    /// Archive column symmetry: none, negation, frobenius, cubic or quartic.
+    /// Every multiplier is verified; Frobenius needs a closed Koblitz archive.
+    #[arg(long, requires = "archive_manifest", value_parser = ["none", "negation", "frobenius", "cubic", "quartic"])]
+    pub archive_symmetry: Option<String>,
     /// Verify every relation and retain useful-rank receipts (automatic for archives).
     #[arg(long)]
     pub audit_rank: bool,
@@ -152,7 +156,7 @@ pub struct BenchArgs {
     /// 0 (the classic oracle), 1 or 2.  Injected as the oracle's
     /// `large_primes` parameter into every configuration that does not
     /// set it; see `ic_framework::large_prime`.
-    #[arg(long)]
+    #[arg(long, value_parser = clap::value_parser!(u32).range(0..=2))]
     pub large_primes: Option<u32>,
     /// Size of the large-prime domain `D` as a multiple of `|F|` in signed
     /// points; injected as `lp_domain_factor` where the configuration
@@ -244,6 +248,21 @@ fn listing() -> Value {
         })
         .collect();
     json!({
+        "archive_techniques": [
+            {"technique": "column_symmetry", "options": archive::SYMMETRIES,
+             "status": "implemented", "gate": "exact curve action and every point multiplier; signed closure for Frobenius"},
+            {"technique": "one_or_two_large_primes", "options": [0, 1, 2],
+             "status": "implemented_for_closed_koblitz_archives",
+             "gate": "symmetry=frobenius; mitm-frobenius or mitm-frobenius-counted; m=3; bounded disjoint residual domain; only fully eliminated verified rows contribute rank"},
+            {"technique": "torsion_symmetrisation", "status": "native_control_base",
+             "gate": "koblitz-symmetrised with its matching symmetrised oracle and divisor; explicit factor-base replacement on the imported instance; not an archive point translation"},
+            {"technique": "subspaces_trace_zero_offsets_orbit_recipes", "status": "factory_recipes",
+             "gate": "recipe field checks; algebraic oracles additionally need a supported exact domain encoding"},
+            {"technique": "mitm_batching_walk_targets_and_polynomial_solvers", "status": "stage_plugins",
+             "gate": "see the registered stages and each plugin's parameters"},
+            {"technique": "gls_subfield_maps_isogenies_covers_and_new_models", "status": "extension_required",
+             "gate": "exact field/model codec, certified subgroup map and counted native backend; no transfer inferred from a curve label"}
+        ],
         "stages": [
             {
                 "stage": "factor base",
@@ -251,7 +270,8 @@ fn listing() -> Value {
                 "what_it_chooses": "which points relations are written over, and which unknown each point contributes to",
                 "plugins": [
                     {"name": "archive", "regimes": ["prime", "char2", "koblitz"],
-                     "parameters": [{"name": "store", "means": "local verified factory cache"}, {"name": "manifest", "means": "immutable SHA-256 manifest"}]},
+                     "parameters": [{"name": "store", "means": "local verified factory cache"}, {"name": "manifest", "means": "immutable SHA-256 manifest"},
+                                    {"name": "symmetry", "means": "none, negation (default), frobenius (certified closed Koblitz archive), cubic (j=0), quartic (j=1728); every point coefficient is replayed"}]},
                     {"name": "prime-abscissa", "regimes": ["prime"],
                      "parameters": [{"name": "size", "means": "abscissae in the base; the family optimum is about #E^(1/3)"}]},
                     {"name": "glv-orbit", "regimes": ["prime"],
@@ -626,6 +646,14 @@ fn run_binary(
     let fb_name = spec.factor_base.as_str();
     let or_name = spec.oracle.as_str();
     let g = BinaryGroup(&inst.fast);
+    if fb_name == "archive" && matches!(or_name, "mitm-frobenius" | "mitm-frobenius-counted") {
+        if inst.koblitz.is_none() {
+            return Err("archive Frobenius oracle requires a certified Koblitz instance".into());
+        }
+        if spec.factor_base_params.get("symmetry") != Some("frobenius") {
+            return Err("archive Frobenius oracle requires --archive-symmetry frobenius (including closure verification)".into());
+        }
+    }
     let archive = BinaryArchiveBase { instance: inst };
     let subspace = BinarySubspaceBase { instance: inst };
     let orbit = KoblitzOrbitBase { instance: inst };
@@ -820,12 +848,27 @@ fn spec_from(
             fb_params.set("manifest", id.clone());
         }
     }
+    if let Some(selected) = &defaults.archive_symmetry {
+        if fb_name != "archive" {
+            return Err("--archive-symmetry requires the archive factor base".into());
+        }
+        if fb_params
+            .get("symmetry")
+            .is_some_and(|value| value != selected)
+        {
+            return Err("conflicting archive symmetry selections".into());
+        }
+        fb_params.set("symmetry", selected.clone());
+    }
     if defaults.audit_rank {
         or_params.set("audit_rank", "true");
     }
     // The large-prime flags are defaults for the Frobenius table oracle;
     // a configuration that names them itself wins.
-    if or_name == "mitm-frobenius" {
+    if matches!(
+        or_name.as_str(),
+        "mitm-frobenius" | "mitm-frobenius-counted"
+    ) {
         if let Some(lp) = defaults.large_primes {
             if or_params.get("large_primes").is_none() {
                 or_params.set("large_primes", lp.to_string());
@@ -836,6 +879,12 @@ fn spec_from(
                 or_params.set("lp_domain_factor", c.to_string());
             }
         }
+    } else if defaults.large_primes.is_some()
+        || defaults.lp_domain_factor.is_some()
+        || or_params.get("large_primes").is_some()
+        || or_params.get("lp_domain_factor").is_some()
+    {
+        return Err("large-prime options require mitm-frobenius or mitm-frobenius-counted; no generic prime/binary residual collector is registered".into());
     }
     Ok(PipelineSpec {
         factor_base: fb_name,
@@ -1078,6 +1127,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
     if regime == "archive" {
         regime = match &instance {
             Instance::Prime(_) => "prime",
+            Instance::Binary(i) if i.koblitz.is_some() => "koblitz",
             Instance::Binary(_) => "char2",
         }
         .into();
@@ -1264,6 +1314,44 @@ mod tests {
         let mut args = bench_args(&flags);
         args.auto = true;
         assert!(run(args, true).unwrap_err().contains("archive source"));
+    }
+
+    #[test]
+    fn symmetry_and_large_prime_options_are_explicit_and_never_ignored() {
+        let mut args = bench_args(&[
+            "--archive-store",
+            "/tmp/cache",
+            "--archive-manifest",
+            "abc",
+            "--archive-symmetry",
+            "frobenius",
+            "--oracle",
+            "mitm-frobenius-counted:m=3",
+            "--large-primes",
+            "2",
+            "--lp-domain-factor",
+            "3",
+        ]);
+        let spec = spec_from(&Default::default(), &args).unwrap();
+        assert_eq!(spec.factor_base_params.get("symmetry"), Some("frobenius"));
+        assert_eq!(spec.oracle_params.get("large_primes"), Some("2"));
+        assert_eq!(spec.oracle_params.get("lp_domain_factor"), Some("3"));
+        args.oracle = Some("subtract".into());
+        assert!(spec_from(&Default::default(), &args)
+            .unwrap_err()
+            .contains("large-prime options"));
+        args.large_primes = None;
+        args.lp_domain_factor = None;
+        args.factor_base = Some("binary-subspace:dim=3".into());
+        assert!(spec_from(&Default::default(), &args)
+            .unwrap_err()
+            .contains("archive factor base"));
+        args.factor_base = Some("archive:symmetry=negation".into());
+        assert!(spec_from(&Default::default(), &args)
+            .unwrap_err()
+            .contains("conflicting archive symmetry"));
+        assert!(Cli::try_parse_from(["ic-bench", "--large-primes", "3"]).is_err());
+        assert!(Cli::try_parse_from(["ic-bench", "--archive-symmetry", "frobenius"]).is_err());
     }
 
     /// `--model-b` without `--koblitz-a` is refused when the instance is
