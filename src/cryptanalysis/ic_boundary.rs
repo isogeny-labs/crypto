@@ -5085,6 +5085,7 @@ struct PackedPairTable {
     mask: Vec<usize>,
     shift: u32,
     entries: u64,
+    insert_attempts: u64,
 }
 
 impl PackedPairTable {
@@ -5102,8 +5103,10 @@ impl PackedPairTable {
         let count = 1usize << bits;
         let reserve = expected / count + expected / count / 8 + 64;
         let mut pending: Vec<Vec<u64>> = (0..count).map(|_| Vec::with_capacity(reserve)).collect();
+        let mut insert_attempts = 0u64;
         for_each_folded_prime_sum(g, fb, ops, |key, i, j| {
             pending[table_part(key, shift)].push(key << 32 | u64::from(i) << 16 | u64::from(j));
+            insert_attempts += 1;
         })?;
         let mut base = Vec::with_capacity(count);
         let mut mask = Vec::with_capacity(count);
@@ -5142,6 +5145,7 @@ impl PackedPairTable {
             mask,
             shift,
             entries,
+            insert_attempts,
         })
     }
 
@@ -5297,9 +5301,12 @@ impl PairTable {
     ) -> Result<Self, String> {
         let start = Instant::now();
         let mut ops = GroupOps::default();
-        let mut map: FastMap<(u32, u32)> = fast_map(fb.abscissa_list.len().pow(2) + 1);
+        let a = fb.abscissa_list.len();
+        let mut attempts = 0u64;
+        let mut map: FastMap<(u32, u32)> = fast_map(a.pow(2) + 1);
         for_each_folded_prime_sum(g, fb, &mut ops, |key, i, j| {
             map.entry(key).or_insert((i, j));
+            attempts += 1;
         })?;
         Ok(Self {
             kind: "negation_folded_prime_batch",
@@ -5342,6 +5349,8 @@ impl PairTable {
         let mut ops = GroupOps::default();
         if g.p <= u64::from(u32::MAX) && fb.points.len() <= 1 << 16 {
             let packed = PackedPairTable::build(g, fb, &mut ops)?;
+            let insert_attempts = packed.insert_attempts;
+            let index_lookups = fb.abscissa_list.len() as u64;
             return Ok(Self {
                 kind: "negation_folded_prime_blocked",
                 entries: packed.entries,
@@ -5351,6 +5360,8 @@ impl PairTable {
                 packed: Some(packed),
                 build_ops: ops,
                 build_wall_ns: start.elapsed().as_nanos() as u64,
+                insert_attempts,
+                index_lookups,
             });
         }
         Self::build_negation_folded_prime_blocked_maps(g, fb, start, ops)
@@ -5375,6 +5386,7 @@ impl PairTable {
             .map(|_| fast_map(expected / count + expected / count / 8 + 64))
             .collect();
         let mut block: Vec<(u64, u32, u32)> = Vec::with_capacity(TABLE_BLOCK);
+        let mut attempts = 0u64;
         let mut sorted: Vec<(u64, u32, u32)> = vec![(0, 0, 0); TABLE_BLOCK];
         let mut offsets = vec![0usize; count + 1];
         let mut flush = |block: &mut Vec<(u64, u32, u32)>, parts: &mut [FastMap<(u32, u32)>]| {
@@ -5399,6 +5411,7 @@ impl PairTable {
             block.clear();
         };
         for_each_folded_prime_sum(g, fb, &mut ops, |key, i, j| {
+            attempts += 1;
             block.push((key, i, j));
             if block.len() == TABLE_BLOCK {
                 flush(&mut block, &mut parts);
@@ -5414,6 +5427,8 @@ impl PairTable {
             packed: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: fb.abscissa_list.len() as u64,
         })
     }
 
