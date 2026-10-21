@@ -1,0 +1,294 @@
+{
+  "schema": "crypto.lazy_columns2/v1",
+  "study": "research/ecbench_lazy_columns2_20261018",
+  "unit": "ecbench.gae, paired by target, cluster-bootstrap 95% CI",
+  "class": "engineering",
+  "note": "Copied from sessions/*/comparisons; ratio = cost of the numerator arm over the denominator arm, <1 means the numerator is cheaper. frozen_over_c2 > 1 means two columns is cheaper than the column count frozen on 2026-10-14.",
+  "rows": [
+    {
+      "session": "a0-n13",
+      "session_id": "ECBS1h5f7f47653898",
+      "curve": "icv1-f2m13-t181-515ee569",
+      "a": 0,
+      "n": 13,
+      "log2_r": 10.967946705812707,
+      "frozen_c": 1,
+      "frozen_over_c2": {
+        "ratio": 0.6368960879052264,
+        "ci95": [
+          0.6297892967848101,
+          0.6445753866481713
+        ],
+        "pairs": 96
+      },
+      "c2_over_rho_strong": {
+        "ratio": 0.5099804663902662,
+        "ci95": [
+          0.5030505758934034,
+          0.5164706571488873
+        ],
+        "pairs": 96
+      },
+      "frozen_over_rho_strong": {
+        "ratio": 0.3248045639520433,
+        "ci95": [
+          0.3190901645256131,
+          0.33024113381069986
+        ],
+        "pairs": 96
+      },
+      "c2_over_rho_frob": {
+        "ratio": 3.8157372494765642,
+        "ci95": [
+          3.6439391705727666,
+          3.9740520556040555
+        ],
+        "pairs": 96
+      },
+      "frozen_over_rho_frob": {
+        "ratio": 2.430228126665873,
+        "ci95": [
+          2.3154536461629975,
+          2.5375751782568954
+        ],
+        "pairs": 96
+      },
+      "rho_frob_aa": {
+        "ratio": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "pairs": 96
+      }
+    },
+    {
+      "session": "a1-n17",
+      "session_id": "ECBS1had6c4dfa75fc",
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": 1,
+      "n": 17,
+      "log2_r": 16.001122266128682,
+      "frozen_c": 1,
+      "frozen_over_c2": {
+        "ratio": 1.1757208272759658,
+        "ci95": [
+          1.0627732924866937,
+          1.2970743323183844
+        ],
+        "pairs": 96
+      },
+      "c2_over_rho_strong": {
+        "ratio": 0.5117343383213571,
+        "ci95": [
+          0.49002014025097124,
+          0.5350695445627935
+        ],
+        "pairs": 96
+      },
+      "frozen_over_rho_strong": {
+        "ratio": 0.601656719596705,
+        "ci95": [
+          0.544520264428319,
+          0.6653225952772599
+        ],
+        "pairs": 96
+      },
+      "c2_over_rho_frob": {
+        "ratio": 1.830421628606947,
+        "ci95": [
+          1.3969484427852947,
+          2.254694102820382
+        ],
+        "pairs": 96
+      },
+      "frozen_over_rho_frob": {
+        "ratio": 2.1520648314495805,
+        "ci95": [
+          1.592392788552178,
+          2.7516930363036383
+        ],
+        "pairs": 96
+      },
+      "rho_frob_aa": {
+        "ratio": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "pairs": 96
+      }
+    },
+    {
+      "session": "a0-n23",
+      "session_id": "ECBS1h88a016cfa7c0",
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "a": 0,
+      "n": 23,
+      "log2_r": 20.999106101271966,
+      "frozen_c": 3,
+      "frozen_over_c2": {
+        "ratio": 0.7775863328765225,
+        "ci95": [
+          0.6947339214175137,
+          0.8741415085958252
+        ],
+        "pairs": 96
+      },
+      "c2_over_rho_strong": {
+        "ratio": 1.4028658567269663,
+        "ci95": [
+          1.2361460497771115,
+          1.5779913845203057
+        ],
+        "pairs": 96
+      },
+      "frozen_over_rho_strong": {
+        "ratio": 1.0908493170500027,
+        "ci95": [
+          1.0089704489295113,
+          1.1755043085838086
+        ],
+        "pairs": 96
+      },
+      "c2_over_rho_frob": {
+        "ratio": 3.5693511178380537,
+        "ci95": [
+          2.8483235955324795,
+          4.496831866775974
+        ],
+        "pairs": 96
+      },
+      "frozen_over_rho_frob": {
+        "ratio": 2.7754786464684083,
+        "ci95": [
+          2.2515200625468363,
+          3.4079771767598985
+        ],
+        "pairs": 96
+      },
+      "rho_frob_aa": {
+        "ratio": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "pairs": 96
+      }
+    },
+    {
+      "session": "a1-n29",
+      "session_id": "ECBS1h486ae2ee8d06",
+      "curve": "icv1-f2m29-tm40309-30c52b96",
+      "a": 1,
+      "n": 29,
+      "log2_r": 15.373714813957374,
+      "frozen_c": 1,
+      "frozen_over_c2": {
+        "ratio": 0.6442999283445046,
+        "ci95": [
+          0.6254994327138864,
+          0.6652264905638415
+        ],
+        "pairs": 96
+      },
+      "c2_over_rho_strong": {
+        "ratio": 0.6145975232282742,
+        "ci95": [
+          0.6024991755059461,
+          0.6265555358464309
+        ],
+        "pairs": 96
+      },
+      "frozen_over_rho_strong": {
+        "ratio": 0.395985140176687,
+        "ci95": [
+          0.3810908435499538,
+          0.4114559587475131
+        ],
+        "pairs": 96
+      },
+      "c2_over_rho_frob": {
+        "ratio": 1.998135320667217,
+        "ci95": [
+          1.5109131112600622,
+          2.6117939863715685
+        ],
+        "pairs": 96
+      },
+      "frozen_over_rho_frob": {
+        "ratio": 1.2873984439285115,
+        "ci95": [
+          0.9709379993590274,
+          1.6857388758393541
+        ],
+        "pairs": 96
+      },
+      "rho_frob_aa": {
+        "ratio": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "pairs": 96
+      }
+    },
+    {
+      "session": "a0-n37",
+      "session_id": "ECBS1hbef0622fd5f3",
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "a": 0,
+      "n": 37,
+      "log2_r": 27.780837085548338,
+      "frozen_c": 8,
+      "frozen_over_c2": {
+        "ratio": 0.24625385150981005,
+        "ci95": [
+          0.19950885304166627,
+          0.30876359786428537
+        ],
+        "pairs": 48
+      },
+      "c2_over_rho_strong": {
+        "ratio": 15.422094853085406,
+        "ci95": [
+          12.279506012006763,
+          18.61402696653872
+        ],
+        "pairs": 48
+      },
+      "frozen_over_rho_strong": {
+        "ratio": 3.7977502559219,
+        "ci95": [
+          3.2660085483393337,
+          4.402884903485332
+        ],
+        "pairs": 48
+      },
+      "c2_over_rho_frob": {
+        "ratio": 18.42646363103823,
+        "ci95": [
+          14.427522630899313,
+          23.22544839784339
+        ],
+        "pairs": 48
+      },
+      "frozen_over_rho_frob": {
+        "ratio": 4.5375876388486045,
+        "ci95": [
+          3.752076377435198,
+          5.496711533561638
+        ],
+        "pairs": 48
+      },
+      "rho_frob_aa": {
+        "ratio": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "pairs": 48
+      }
+    }
+  ]
+}
