@@ -584,6 +584,12 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 
 <section class="dash-section" id="lab-next" aria-labelledby="next-title"><div class="dash-section-head"><div><p class="dash-kicker">05 / Tournament design</p><h2 id="next-title">A local win is a candidate, not a final answer.</h2></div></div><div class="tournament-flow" aria-label="Proposed tournament flow"><article><span class="flow-number">01 / EXPLORE</span><strong>Keep diverse candidates</strong><p>Different bases, solver families and stage combinations. Preserve alternatives with different resource tradeoffs.</p></article><article><span class="flow-number">02 / ADMIT</span><strong>Pass correctness gates</strong><p>Source identity, natural yield, failed attempts, complete costs and verified recovered answers.</p></article><article><span class="flow-number">03 / COMPARE</span><strong>Pair frozen workloads</strong><p>Same fresh point, resources and reference. Screening and untouched confirmation have separate roles.</p></article><article><span class="flow-number">04 / DECIDE</span><strong>Promote or retain</strong><p>Apply the declared uncertainty gate. Keep negative outcomes and useful alternatives for later combinations.</p></article></div><div class="next-callout"><span class="status pending">Next gate</span><div><strong>Produce both native natural-yield records.</strong><p>Use each exact pipeline, retaining failed attempts. Then freeze new target exclusions, calibrated resources and strong references before a fresh paired tournament. The three historical confirmation sets remain closed.</p></div></div><p class="dash-footnote panel-summary">This diagram describes the proposed process. It does not claim that a fresh F5/SAT tournament has run, or that any implementation is globally fastest.</p></section>
 
+<section class="dash-section" id="three-leads-e2e" aria-labelledby="three-leads-title"><h2 id="three-leads-title">Three leads: fresh complete solves</h2><p class="panel-summary">23,952 primary solves verify, including two separate 1,260-target genus-2 cohorts: field size and actual prime-subgroup size through 40 bits. Another 84 independent/unfiltered and 168 trace-filter controls verify. The complete oracle census checks 9,378,482 targets with zero disagreements.</p><p>The table selects the best tested curve and recipe per regime after observation, at the declared default S/M=0.75, I/M=10. It is an arithmetic-model diagnostic with native work unpriced, outside fully priced speed rankings. Rho is the matched negation reference. The intervals are price sensitivity, not statistical confidence intervals.</p><div class="table-scroll" role="region" aria-label="Three-leads arithmetic cost comparisons" tabindex="0"><table><thead><tr><th>Regime</th><th>Selected curve/recipe</th><th>Matched targets</th><th>Default IC/rho</th><th>12 arithmetic prices</th></tr></thead><tbody><tr id="three-leads-e2e-0"><td>Binary subfield</td><td><code>binary-q16-v2::icv1-f2m8-tm17-ec7ed2e8</code> / filtered_ic</td><td>8</td><td>2.0158</td><td>1.965–2.146</td></tr>
+<tr id="three-leads-e2e-1"><td>Odd subfield</td><td><code>odd-p5-v2::icv1-fp3k2-t4-1f351b3a</code> / structured_ic</td><td>8</td><td>2.2283</td><td>2.079–2.274</td></tr>
+<tr id="three-leads-e2e-2"><td>PKM fixed fibers</td><td><code>pkm_dickson-d2-lo8192-v2::icv1-fp14-t60-aa1a2317</code> / structured_ic</td><td>8</td><td>7.7116</td><td>6.304–8.289</td></tr>
+<tr id="three-leads-e2e-3"><td>Genus transfer, field cohort</td><td><code>genus-16-v2::icv1-fp9k2-tm342-02fbacd7</code> / genus_ic</td><td>60</td><td>5.2546</td><td>3.614–6.841</td></tr>
+<tr id="three-leads-e2e-4"><td>Genus transfer, subgroup cohort</td><td><code>order-genus-16::icv1-fp10k2-tm230-7cd9e337</code> / genus_ic</td><td>60</td><td>5.3922</td><td>3.295–7.162</td></tr>
+</tbody></table></div><p>At actual 40-bit subgroup size, the 180-target genus IC/rho-neg arithmetic ratio is 1.421–18.362 (default 11.091); rho wins all 12 price cells. Complete instrumented retired-instruction ratio is 7.487 (paired bootstrap 95% 6.657–8.372); five-pair identical-rho control range 0.9999703–1.0000121. These user-space counters include native and ledger/report overhead, and are separate from the arithmetic prices. L2 wall-time preflights rejected host contention.</p><p>Instruction counts favor some tiny subfield cases: binary q=8 gives 0.4491, q=16 gives 0.4942; odd p=5 gives 0.4363 and p=7 gives 0.4854 versus rho-neg. All 18 structured PKM cell instruction ratios exceed one (1.928–8.190). These are instrumented backend observations, not qualified wall-speed claims.</p><p>The first graph cycle is insufficient in 1,244/1,260 actual-order genus cases. PKM includes generic identity returns on tiny targets; its mechanism counts are disclosed. Binary finite coverage approaches 3/8 in the primary fixtures but is not implied by the trace theorem alone. <a href="https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/CLAIMS.md">Every original claim and verdict</a> · <a href="https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md">Frozen report and replay</a></p></section>
 <section class="dash-library-intro" id="evidence-search" aria-labelledby="library-title"><p class="dash-kicker">06 / Evidence</p><h2 id="library-title">Open the detail you need.</h2><p class="panel-summary">The historical ledger contains other curves, cost units and questions. Its reports are preserved; they are not a combined leaderboard.</p><label for="evidence-query">Search historical reports</label><input id="evidence-query" type="search" placeholder="Frobenius, F5, rho, factor base…" autocomplete="off" aria-controls="evidence-results"><p id="evidence-count" aria-live="polite"></p><ul id="evidence-results"></ul><noscript><p>Open the full ledger below and use your browser’s Find command.</p></noscript></section><details class="dash-details" id="historical-regimes"><summary>Historical best results by regime · different workloads and accounting</summary><div class="dash-detail-body"><section class="dash-section" id="lab-best" aria-labelledby="best-title" data-collapse="open"><div class="dash-section-head"><div><p class="dash-kicker">Best of all findings / Index calculus</p><h2 id="best-title">The best result in each regime, and what it earns.</h2>
 <p class="panel-summary">Ranks the best verified figure in each regime by how much of the attack it prices, finding no elliptic-curve whole-method row below matched rho and the only below-rho result hyperelliptic.</p></div><span class="status neutral">Ranked · every phase counted</span></div>
 <p class="dash-section-intro">One row per kind of measurement, each the best figure this repository has verified in that regime, with the class the repository&rsquo;s own rule assigns it. The page&rsquo;s standard for &ldquo;faster than rho&rdquo; is the first row: a whole cold method, one unseen target, against a matched rho, below one at growing size. Nothing on an elliptic curve has met it. The rows below it are what has been achieved short of that, each with the boundary it did not cross.</p>
@@ -915,6 +921,26 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 <tr><td>2026-10-14</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Prime rootfinding B48 batch-8 buffer reuse, registered 20-bit subgroup</td><td class="n">6.8747&times; <small>counted GAE lower-bound diagnostic; not a speed bound</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#rootfinding-buffers-20261014">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md">source</a></td></tr>
 <tr><td>2026-10-17</td><td>Elliptic curve, whole method, cold, one target</td><td>Volcano projected size-16 MITM, two targets; <code>icv1-fp57-t536870914-6cabb0c9</code></td><td class="n">19.215&times; <small>quotient of incomplete GAE lower bounds; diagnostic, no cost-direction claim</small></td><td>matched; L0/debug</td><td><span class="chip">accounting</span></td><td><a href="#lab-volcano-ic">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/full_volcano_graphwide_ic_20261017/execution/pilot-summary/two-comparison.json">native comparison</a></td></tr>
 <tr><td>2026-10-15</td><td>Elliptic curve, whole method, cold, one target</td><td>Joux&ndash;Vitse (n &minus; 1)-decomposition at n = 5 on E(F<sub>p&#8309;</sub>), complete DLP, p = 31 (&#8467; = 2<sup>24.8</sup>), F4 replaying a recorded trace; p = 11: 4.5&middot;10<sup>7</sup>&times; and 1.8&middot;10<sup>8</sup>&times;</td><td class="n">6.8&middot;10<sup>7</sup>&times; <small>F<sub>p</sub> multiplications against rho on the same target; extrapolated parity q &asymp; 2<sup>58.2</sup> (group 2<sup>291</sup>)</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md">source</a></td></tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<tr><td>2026-10-19</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Three-leads fresh Binary subfield</td><td class="n">2.0158&times;</td><td>matched</td><td>accounting</td><td><a href="#three-leads-e2e-0">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md">source</a></td></tr>
+<tr><td>2026-10-19</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Three-leads fresh Odd subfield</td><td class="n">2.2283&times;</td><td>matched</td><td>accounting</td><td><a href="#three-leads-e2e-1">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md">source</a></td></tr>
+<tr><td>2026-10-19</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Three-leads fresh PKM fixed fibers</td><td class="n">7.7116&times;</td><td>matched</td><td>accounting</td><td><a href="#three-leads-e2e-2">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md">source</a></td></tr>
+<tr><td>2026-10-19</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Three-leads fresh Genus transfer, field cohort</td><td class="n">5.2546&times;</td><td>matched</td><td>accounting</td><td><a href="#three-leads-e2e-3">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md">source</a></td></tr>
+<tr><td>2026-10-19</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Three-leads fresh Genus transfer, subgroup cohort</td><td class="n">5.3922&times;</td><td>matched</td><td>accounting</td><td><a href="#three-leads-e2e-4">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md">source</a></td></tr>
 <tr><td>2026-10-20</td><td>Elliptic curve, whole method, cold, one target</td><td>Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6</td><td class="n">4.669&times; <small>rho matched; rule v7 read 3.43&times; against an unmatched rho</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#ic-tool-programme-20261001">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md">source</a></td></tr>
 <tr><td>2026-10-21</td><td>Elliptic curve, whole method, cold, one target</td><td>Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)</td><td class="n">14.39&times; <small>S; [11.63, 18.45]; rho cheaper on all six curves, 12.6&ndash;25.8&times;</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#lab-planner-validation">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md">source</a></td></tr>
 </tbody><tr><td>2026-10-16</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8..12)</td><td>MITM oracle ladder to l=12: 8,068 ops at l=11, 16,092 at l=12 vs 2,098,176 / 8,390,656 quartic solves, 128 targets, 0 disagreements</td><td class="n">0.0019&times;</td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l11_l12_20261016/REPORT.typ">source</a></td></tr><tr><td>2026-10-15</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8..10)</td><td>MITM oracle ladder to l=10: 2,076 ops at l=9, 4,212 at l=10 vs 134,912 / 525,312 quartic solves, 128 targets, 0 disagreements</td><td class="n">0.0080&times;</td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l9_l10_20261015/REPORT.typ">source</a></td></tr><tr><td>2026-10-15</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8)</td><td>First sub-2<sup>2&ell;</sup> oracle at &ell;=8: MITM pair table vs pairs-and-solve, 64 targets, 0 disagreements</td><td class="n">0.0325&times;</td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l8_20261015/REPORT.typ">source</a></td></tr></table></div></details>
@@ -1346,6 +1372,61 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "class": "engineering",
      "anchor": "#rootfinding-buffers-20261014",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md"
+    },
+    {
+     "anchor": "#three-leads-e2e-0",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: binary-q16-v2::icv1-f2m8-tm17-ec7ed2e8, 8 matched targets; cold default arithmetic IC/rho-neg 2.0158; 12-price range 1.965–2.146. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh Binary subfield",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 2.0157697282272515
+    },
+    {
+     "anchor": "#three-leads-e2e-1",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: odd-p5-v2::icv1-fp3k2-t4-1f351b3a, 8 matched targets; cold default arithmetic IC/rho-neg 2.2283; 12-price range 2.079–2.274. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh Odd subfield",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 2.228297313380844
+    },
+    {
+     "anchor": "#three-leads-e2e-2",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: pkm_dickson-d2-lo8192-v2::icv1-fp14-t60-aa1a2317, 8 matched targets; cold default arithmetic IC/rho-neg 7.7116; 12-price range 6.304–8.289. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh PKM fixed fibers",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 7.711609480964212
+    },
+    {
+     "anchor": "#three-leads-e2e-3",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: genus-16-v2::icv1-fp9k2-tm342-02fbacd7, 60 matched targets; cold default arithmetic IC/rho-neg 5.2546; 12-price range 3.614–6.841. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh Genus transfer, field cohort",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 5.254596361178383
+    },
+    {
+     "anchor": "#three-leads-e2e-4",
+     "class": "accounting",
+     "date": "2026-10-19",
+     "detail": "Best tested curve/recipe after observation: order-genus-16::icv1-fp10k2-tm230-7cd9e337, 60 matched targets; cold default arithmetic IC/rho-neg 5.3922; 12-price range 3.295–7.162. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "label": "Three-leads fresh Genus transfer, subgroup cohort",
+     "reference": "matched",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
+     "unit": "cold arithmetic-model diagnostic; native unpriced",
+     "value": 5.392179273237021
     }
    ],
    "role": "context"
@@ -1365,7 +1446,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_n37_k8_k16_20261004/RESULT.md",
      "unit": "Callgrind Ir diagnostic",
-     "value": 3.6445922113828733
+     "value": 3.6445922113828737
     },
     {
      "anchor": "#n37-online-ir-20261004",
@@ -1506,7 +1587,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/notes/ecc2k130/n37_native_residual_rho_20261005/RESULT.md",
      "unit": "unisolated native batch CPU diagnostic",
-     "value": 10.766848430462483
+     "value": 10.766848430462485
     }
    ],
    "role": "context"
@@ -1590,7 +1671,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/experiments/koblitz-base-size-cold-panel-20261004/RESULT.md",
      "unit": "unisolated online wall diagnostic",
-     "value": 0.19586704770931318
+     "value": 0.1958670477093132
     },
     {
      "anchor": "#n41-n53-base-size-cold-20261004",

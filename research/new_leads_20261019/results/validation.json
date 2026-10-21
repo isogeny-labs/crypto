@@ -1,0 +1,67 @@
+{
+  "schema": "ecdlp-new-leads-screen/v1",
+  "source_revision": "1f0656cbb9e8ad76fdac2425d775870892cf2bba",
+  "baseline": "555eb93adc0d097aa9c2a702effa86110084d927",
+  "kind": "finite abstract symplectic-module correctness experiment; no DLP or speed measurement",
+  "host_class": "Linux x86_64",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "commands": [
+    "rustfmt --check --edition 2021 research/new_leads_20261019/native/kernel_screen.rs",
+    "rustc --edition 2021 -O -D warnings research/new_leads_20261019/native/kernel_screen.rs -o /tmp/new-leads-kernel-screen",
+    "timeout 300 /tmp/new-leads-kernel-screen research/new_leads_20261019/results/screen-v1",
+    "rustc --edition 2021 -C overflow-checks=yes -D warnings research/new_leads_20261019/native/kernel_screen.rs -o /tmp/new-leads-kernel-screen-debug",
+    "timeout 300 /tmp/new-leads-kernel-screen-debug /tmp/new-leads-kernel-debug",
+    "./research/new_leads_20261019/reproduce.sh /tmp/new-leads-final-replay"
+  ],
+  "exit_codes": {
+    "optimized": 0,
+    "overflow_checked_debug": 0,
+    "reproduce": 0,
+    "rustfmt": 0
+  },
+  "replay": {
+    "counts_csv_identical": true,
+    "module_witnesses_identical": true,
+    "stdout_identical": true,
+    "independent_implementation": false,
+    "independent_host": false
+  },
+  "controls": {
+    "identity_retains_all_lagrangians": true,
+    "nonisotropic_rank_three_rejected": true,
+    "every_membership_decision_checked_by_stacked_rank": true,
+    "all_model_multipliers_checked": true
+  },
+  "coverage": {
+    "ell_3": {
+      "all_rank_three_subspaces": 33880,
+      "lagrangians": 1120,
+      "model_cases": 8
+    },
+    "ell_5": {
+      "all_rank_three_subspaces": 2558556,
+      "lagrangians": 19656,
+      "model_cases": 24
+    }
+  },
+  "limits": [
+    "Abstract model modules only; actual elliptic realizability untested.",
+    "No quotient, descent, subgroup transport, DLP solve, speedup or new exponent certified.",
+    "No completeness claim over all symplectic conjugacy classes.",
+    "Five follow-up cards are draft with TODO producers/checkers and unknown runtime estimates."
+  ],
+  "pdf_review": {
+    "pages": 5,
+    "all_pages_rendered_and_visually_inspected": true,
+    "method": "PyMuPDF rendering followed by image inspection"
+  },
+  "research_python": "None; Python only records metadata and renders retained CSV/document layouts.",
+  "hashes": {
+    "PROTOCOL.md": "61e1eaa4a051941f78bd7343f76288a6005d3913b12eee987d47ecc6b93109d0",
+    "native/kernel_screen.rs": "f9e1b2b7fcd7e2d23f0c3dbe0c4964ebc89c1981dd05db3ec9b7415d3a195978",
+    "results/screen-v1/counts.csv": "c502bfc52446e32926d9d493e7e703bcdd419bb41a0c7ae57fadbfdb2429421b",
+    "results/screen-v1/modules.jsonl": "8a2decd528bbd0c1715c15297a925a16ecedf00698f50cd7420de7679409b973",
+    "results/screen-v1.log": "6879e3db3b0a02afaea4e288539f5b31d1aa33e593a499051951aedafea331dc"
+  },
+  "generated_file_hygiene": "Initial whitespace check found renderer-produced SVG trailing spaces and a PDF classified as text; SVG line endings were normalized and study-local PDF binary attributes added. Native results and inspected PDF bytes unchanged."
+}

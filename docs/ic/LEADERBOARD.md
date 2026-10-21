@@ -289,8 +289,31 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 [Frozen IC1 rows and candidate identities](../../research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json). The cold process includes base and index construction, relation rank, target recovery and producer verification. Rho's interval starts with its target-dependent walk and ends with scalar verification. This wall-time panel is kept separate from Tables A–C and their operation-unit S rankings.
 
 
+## Three leads: fresh complete solves
+
+23,952 primary solves verify, including two separate 1,260-target genus-2 cohorts. Another 84 independent/unfiltered and 168 trace-filter controls verify. These rows select the best tested curve/recipe after observation at S/M=.75, I/M=10. Native work is unpriced; these cold arithmetic diagnostics sit outside Tables A–C. All other curves and price cells remain in the frozen report.
+
+| Regime | Curve/recipe | Targets | Default IC/rho-neg | 12-price band |
+|:--|:--|--:|--:|--:|
+| Binary subfield | `binary-q16-v2::icv1-f2m8-tm17-ec7ed2e8` / filtered_ic | 8 | 2.0158 | 1.965–2.146 |
+| Odd subfield | `odd-p5-v2::icv1-fp3k2-t4-1f351b3a` / structured_ic | 8 | 2.2283 | 2.079–2.274 |
+| PKM fixed fibers | `pkm_dickson-d2-lo8192-v2::icv1-fp14-t60-aa1a2317` / structured_ic | 8 | 7.7116 | 6.304–8.289 |
+| Genus transfer, field cohort | `genus-16-v2::icv1-fp9k2-tm342-02fbacd7` / genus_ic | 60 | 5.2546 | 3.614–6.841 |
+| Genus transfer, subgroup cohort | `order-genus-16::icv1-fp10k2-tm230-7cd9e337` / genus_ic | 60 | 5.3922 | 3.295–7.162 |
+
+At actual 40-bit subgroup size the 180-target genus IC/rho-neg band is 1.421–18.362; rho wins all 12 arithmetic cells. Complete instrumented retired-instruction ratio is 7.487 [6.657,8.372], with an identical-rho A/A range of 0.9999703–1.0000121. No qualified wall-speed claim follows. [Every original claim and verdict](../../research/three_leads_e2e_20261018/CLAIMS.md).
+
+Instruction counts are a separate unit and favor some tiny subfield pipelines:
+
+- `binary-q16-v2`: 0.4942× rho-neg (instrumented backend; no qualified wall claim).
+- `binary-q8-v2`: 0.4491× rho-neg (instrumented backend; no qualified wall claim).
+- `odd-p5-v2`: 0.4363× rho-neg (instrumented backend; no qualified wall claim).
+- `odd-p7-v2`: 0.4854× rho-neg (instrumented backend; no qualified wall claim).
+
 ## Sources
 
+- `research/three_leads_e2e_20261018/results/dashboard.json` — sha256 `686c03b185c2b838…`
+- `research/three_leads_e2e_20261018/results/retired-instruction-summary.json` — sha256 `e37064968f9478e5…`
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
 - `research/ic_rho_reference_20260923/reprice/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `c810d351d86e3b09…`
 - `research/ic_rho_reference_20260923/analysis.json` — sha256 `6fd61dd71a33b809…`
@@ -320,6 +343,6 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
-- `docs/curves/registry.json` — sha256 `584d070fbec7e21f…`
+- `docs/curves/registry.json` — sha256 `e7bc24a974598923…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`

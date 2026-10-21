@@ -1,0 +1,1139 @@
+lab	UNKNOWN STEP	﻿2026-10-19T00:47:32.1100818Z Current runner version: '2.337.0'
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1120229Z ##[group]Runner Image Provisioner
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1120928Z Hosted Compute Agent
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1121399Z Version: 20261012.601
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1121985Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1122577Z Build Date: 2026-10-12T17:48:21Z
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1123222Z Worker ID: {e2db2981-a825-4773-923b-e0f2bc613560}
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1123818Z Region: westus3
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1124260Z Cloud: Azure
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1124765Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1125809Z ##[group]Operating System
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1126384Z Ubuntu
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1126829Z 24.04.5
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1127253Z LTS
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1127714Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1128173Z ##[group]Runner Image
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1128747Z Image: ubuntu-24.04
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1129221Z Version: 20261012.334.1
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1130565Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1131866Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1132696Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1133579Z ##[group]GITHUB_TOKEN Permissions
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1135165Z Contents: read
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1135666Z Metadata: read
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1136156Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1137820Z Secret source: Actions
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1138587Z Cache mode: write
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1139206Z Prepare workflow directory
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1761857Z Prepare all required actions
+lab	UNKNOWN STEP	2026-10-19T00:47:32.1799267Z Getting action download info
+lab	UNKNOWN STEP	2026-10-19T00:47:32.4537625Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+lab	UNKNOWN STEP	2026-10-19T00:47:32.5419174Z Download action repository 'dtolnay/rust-toolchain@master' (SHA:683b588c487a69d01f6c6ddf40f036ff682cc2c8)
+lab	UNKNOWN STEP	2026-10-19T00:47:32.7802359Z Download action repository 'Swatinem/rust-cache@v2' (SHA:6323deb102c322ba6fcbdcafc7e3dddab59af2b6)
+lab	UNKNOWN STEP	2026-10-19T00:47:33.7179167Z Download action repository 'actions/cache@v4' (SHA:0057852bfaa89a56745cba8c7296529d2fc39830)
+lab	UNKNOWN STEP	2026-10-19T00:47:33.9542920Z Complete job name: lab
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0160708Z ##[group]Run actions/checkout@v4
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0161508Z with:
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0161902Z   sparse-checkout-cone-mode: false
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0164086Z   sparse-checkout: /.github/scripts/
+lab	UNKNOWN STEP	/Cargo.toml
+lab	UNKNOWN STEP	/tools/volcano-cli/
+lab	UNKNOWN STEP	/isogeny_algos/
+lab	UNKNOWN STEP	/Cargo.lock
+lab	UNKNOWN STEP	/build.rs
+lab	UNKNOWN STEP	/.cargo/
+lab	UNKNOWN STEP	/rust-toolchain*
+lab	UNKNOWN STEP	/rustfmt.toml
+lab	UNKNOWN STEP	/clippy.toml
+lab	UNKNOWN STEP	/src/
+lab	UNKNOWN STEP	/tests/
+lab	UNKNOWN STEP	/examples/
+lab	UNKNOWN STEP	/benches/
+lab	UNKNOWN STEP	/experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
+lab	UNKNOWN STEP	/experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+lab	UNKNOWN STEP	/backlog/
+lab	UNKNOWN STEP	/problems/
+lab	UNKNOWN STEP	
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0166283Z   repository: aburan28/crypto
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0170240Z   token: ***
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0170632Z   ssh-strict: true
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0171012Z   ssh-user: git
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0171407Z   persist-credentials: true
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0171837Z   clean: true
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0172219Z   fetch-depth: 1
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0172591Z   fetch-tags: false
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0172988Z   show-progress: true
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0173398Z   lfs: false
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0173785Z   submodules: false
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0174179Z   set-safe-directory: true
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0174622Z   allow-unsafe-pr-checkout: false
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0175299Z env:
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0175720Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0176262Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0989006Z Syncing repository: aburan28/crypto
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0991205Z ##[group]Getting Git version info
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0991868Z Working directory is '/home/runner/work/crypto/crypto'
+lab	UNKNOWN STEP	2026-10-19T00:47:34.0992812Z [command]/usr/bin/git version
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1061422Z git version 2.55.0
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1150536Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1156249Z Temporarily overriding HOME='/home/runner/work/_temp/98f2d034-3377-43fe-b4a0-4f2cab36c84d' before making global git config changes
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1158578Z Adding repository directory to the temporary git global config as a safe directory
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1159678Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1161457Z Deleting the contents of '/home/runner/work/crypto/crypto'
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1162424Z ##[group]Initializing the repository
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1163055Z [command]/usr/bin/git init /home/runner/work/crypto/crypto
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1236382Z hint: Using 'master' as the name for the initial branch. This default branch name
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1237365Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1238268Z hint: to use in all of your new repositories, which will suppress this warning,
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1239399Z hint: call:
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1240066Z hint:
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1240784Z hint: 	git config --global init.defaultBranch <name>
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1241729Z hint:
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1242650Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1244106Z hint: 'development'. The just-created branch can be renamed via this command:
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1245301Z hint:
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1245934Z hint: 	git branch -m <name>
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1246650Z hint:
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1247588Z hint: Disable this message with "git config set advice.defaultBranchName false"
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1249207Z Initialized empty Git repository in /home/runner/work/crypto/crypto/.git/
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1251741Z [command]/usr/bin/git remote add origin https://github.com/aburan28/crypto
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1291269Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1292327Z ##[group]Disabling automatic garbage collection
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1294522Z [command]/usr/bin/git config --local gc.auto 0
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1319193Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1320422Z ##[group]Setting up auth
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1324656Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1349379Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1644431Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1674645Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1874708Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+lab	UNKNOWN STEP	2026-10-19T00:47:34.1901346Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+lab	UNKNOWN STEP	2026-10-19T00:47:34.2092968Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+lab	UNKNOWN STEP	2026-10-19T00:47:34.2123538Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:34.2130750Z ##[group]Fetching the repository
+lab	UNKNOWN STEP	2026-10-19T00:47:34.2133066Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --filter=blob:none --depth=1 origin +3c5f1a3c7e7116dafbe3f163fc6203a5c7d77cbb:refs/remotes/pull/2229/merge
+lab	UNKNOWN STEP	2026-10-19T00:47:35.3488954Z From https://github.com/aburan28/crypto
+lab	UNKNOWN STEP	2026-10-19T00:47:35.3490562Z  * [new ref]         3c5f1a3c7e7116dafbe3f163fc6203a5c7d77cbb -> pull/2229/merge
+lab	UNKNOWN STEP	2026-10-19T00:47:35.3492417Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:35.3492970Z ##[group]Determining the checkout info
+lab	UNKNOWN STEP	2026-10-19T00:47:35.3494564Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:35.3495112Z ##[group]Setting up sparse checkout
+lab	UNKNOWN STEP	2026-10-19T00:47:35.3499634Z [command]/usr/bin/git config core.sparseCheckout true
+lab	UNKNOWN STEP	2026-10-19T00:47:35.3527941Z [command]/usr/bin/git rev-parse --git-path info/sparse-checkout
+lab	UNKNOWN STEP	2026-10-19T00:47:35.3579563Z .git/info/sparse-checkout
+lab	UNKNOWN STEP	2026-10-19T00:47:35.3585753Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:35.3586369Z ##[group]Checking out the ref
+lab	UNKNOWN STEP	2026-10-19T00:47:35.3588954Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/2229/merge
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6407504Z Updating files:   0% (1/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6417724Z Updating files:   1% (19/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6430636Z Updating files:   2% (37/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6449106Z Updating files:   3% (55/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6468275Z Updating files:   4% (73/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6484932Z Updating files:   5% (91/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6500334Z Updating files:   6% (109/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6512958Z Updating files:   7% (127/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6524708Z Updating files:   8% (146/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6538772Z Updating files:   9% (164/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6555615Z Updating files:  10% (182/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6567676Z Updating files:  11% (200/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6593992Z Updating files:  12% (218/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6621479Z Updating files:  13% (236/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6642819Z Updating files:  14% (254/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6660182Z Updating files:  15% (272/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6673037Z Updating files:  16% (291/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6685402Z Updating files:  17% (309/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6701754Z Updating files:  18% (327/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6718016Z Updating files:  19% (345/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6745647Z Updating files:  20% (363/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6773086Z Updating files:  21% (381/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6796381Z Updating files:  22% (399/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6811563Z Updating files:  23% (417/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6830155Z Updating files:  24% (436/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6843914Z Updating files:  25% (454/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6860219Z Updating files:  26% (472/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6873747Z Updating files:  27% (490/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6894125Z Updating files:  28% (508/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6912852Z Updating files:  29% (526/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6928244Z Updating files:  30% (544/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6942743Z Updating files:  31% (563/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6963035Z Updating files:  32% (581/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6981060Z Updating files:  33% (599/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.6990223Z Updating files:  34% (617/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7004431Z Updating files:  35% (635/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7024549Z Updating files:  36% (653/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7034202Z Updating files:  37% (671/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7048128Z Updating files:  38% (689/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7053623Z Updating files:  39% (708/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7059442Z Updating files:  40% (726/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7064903Z Updating files:  41% (744/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7072501Z Updating files:  42% (762/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7090833Z Updating files:  43% (780/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7105009Z Updating files:  44% (798/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7117528Z Updating files:  45% (816/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7130661Z Updating files:  46% (834/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7145236Z Updating files:  47% (853/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7153597Z Updating files:  48% (871/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7163241Z Updating files:  49% (889/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7173310Z Updating files:  50% (907/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7192267Z Updating files:  51% (925/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7212645Z Updating files:  52% (943/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7232120Z Updating files:  53% (961/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7256263Z Updating files:  54% (980/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7275691Z Updating files:  55% (998/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7289810Z Updating files:  56% (1016/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7306763Z Updating files:  57% (1034/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7326063Z Updating files:  58% (1052/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7344738Z Updating files:  59% (1070/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7358211Z Updating files:  60% (1088/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7374834Z Updating files:  61% (1106/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7400706Z Updating files:  62% (1125/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7442368Z Updating files:  63% (1143/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7464209Z Updating files:  64% (1161/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7487843Z Updating files:  65% (1179/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7506827Z Updating files:  66% (1197/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7527942Z Updating files:  67% (1215/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7559330Z Updating files:  68% (1233/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7594658Z Updating files:  69% (1251/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7626273Z Updating files:  70% (1270/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7650719Z Updating files:  71% (1288/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7672792Z Updating files:  72% (1306/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7690457Z Updating files:  73% (1324/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7725928Z Updating files:  74% (1342/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7795989Z Updating files:  75% (1360/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7817807Z Updating files:  76% (1378/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7838642Z Updating files:  77% (1397/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7863057Z Updating files:  78% (1415/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7888169Z Updating files:  79% (1433/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7918086Z Updating files:  80% (1451/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7946731Z Updating files:  81% (1469/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7963219Z Updating files:  82% (1487/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7971200Z Updating files:  83% (1505/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7978416Z Updating files:  84% (1523/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.7990787Z Updating files:  85% (1542/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8000208Z Updating files:  86% (1560/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8018937Z Updating files:  87% (1578/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8033337Z Updating files:  88% (1596/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8044285Z Updating files:  89% (1614/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8060299Z Updating files:  90% (1632/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8077845Z Updating files:  91% (1650/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8104903Z Updating files:  92% (1668/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8121673Z Updating files:  93% (1687/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8136812Z Updating files:  94% (1705/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8147423Z Updating files:  95% (1723/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8160793Z Updating files:  96% (1741/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8174331Z Updating files:  97% (1759/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8190228Z Updating files:  98% (1777/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8202541Z Updating files:  99% (1795/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8202896Z Updating files: 100% (1813/1813)
+lab	UNKNOWN STEP	2026-10-19T00:47:39.8203475Z Updating files: 100% (1813/1813), done.
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9065441Z Note: switching to 'refs/remotes/pull/2229/merge'.
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9065911Z 
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9066195Z You are in 'detached HEAD' state. You can look around, make experimental
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9066596Z changes and commit them, and you can discard any commits you make in this
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9066992Z state without impacting any branches by switching back to a branch.
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9067216Z 
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9067374Z If you want to create a new branch to retain commits you create, you may
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9067750Z do so (now or later) by using -c with the switch command. Example:
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9067960Z 
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9068067Z   git switch -c <new-branch-name>
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9068217Z 
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9068356Z Or undo this operation with:
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9068498Z 
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9068573Z   git switch -
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9068685Z 
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9068874Z Turn off this advice by setting config variable advice.detachedHead to false
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9069122Z 
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9069404Z HEAD is now at 3c5f1a3 Merge 0e31bc01c443a3750ca878ca1b3060615b3a205d into 76186404ecdcd5e961cc14ac2fe66ddd0b811107
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9097128Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9134181Z [command]/usr/bin/git log -1 --format=%H
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9153140Z 3c5f1a3c7e7116dafbe3f163fc6203a5c7d77cbb
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9340326Z ##[group]Run node .github/scripts/ci-scope.mjs --materialize
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9340722Z ^[[36;1mnode .github/scripts/ci-scope.mjs --materialize^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9575000Z shell: /usr/bin/bash -e {0}
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9575222Z env:
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9575427Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:47:39.9575675Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.3997788Z materialized 116 compile-time inputs
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4808131Z ##[group]Run dtolnay/rust-toolchain@master
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4808398Z with:
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4808577Z   toolchain: 1.98
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4808755Z env:
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4808952Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4809199Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4868685Z ##[start-action display=Parse toolchain version;id=__dtolnay_rust-toolchain.parse]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4906562Z ##[group]Run if [[ -z $toolchain ]]; then
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4906851Z ^[[36;1mif [[ -z $toolchain ]]; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4907296Z ^[[36;1m  # GitHub does not enforce `required: true` inputs itself. https://github.com/actions/runner/issues/1070^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4907738Z ^[[36;1m  echo "'toolchain' is a required input" >&2^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4907988Z ^[[36;1m  exit 1^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4908271Z ^[[36;1melif [[ $toolchain =~ ^stable' '[0-9]+' '(year|month|week|day)s?' 'ago$ ]]; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4908647Z ^[[36;1m  if [[ Linux == macOS ]]; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4909066Z ^[[36;1m    echo "toolchain=1.$((($(date -v-$(sed 's/stable \([0-9]*\) \(.\).*/\1\2/' <<< $toolchain) +%s)/60/60/24-16569)/7/6))" >> $GITHUB_OUTPUT^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4909458Z ^[[36;1m  else^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4909779Z ^[[36;1m    echo "toolchain=1.$((($(date --date "${toolchain#stable }" +%s)/60/60/24-16569)/7/6))" >> $GITHUB_OUTPUT^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4910275Z ^[[36;1m  fi^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4910524Z ^[[36;1melif [[ $toolchain =~ ^stable' 'minus' '[0-9]+' 'releases?$ ]]; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4910945Z ^[[36;1m  echo "toolchain=1.$((($(date +%s)/60/60/24-16569)/7/6-${toolchain//[^0-9]/}))" >> $GITHUB_OUTPUT^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4911317Z ^[[36;1melif [[ $toolchain =~ ^1\.[0-9]+$ ]]; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4911745Z ^[[36;1m  echo "toolchain=1.$((i=${toolchain#1.}, c=($(date +%s)/60/60/24-16569)/7/6, i+9*i*(10*i<=c)+90*i*(100*i<=c)))" >> $GITHUB_OUTPUT^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4912123Z ^[[36;1melse^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4912307Z ^[[36;1m  delimiter=EOF^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4912566Z ^[[36;1m  while [[ $toolchain == *$delimiter* ]]; do delimiter+=_; done^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4912962Z ^[[36;1m  printf 'toolchain<<%s\n%s\n%s\n' "$delimiter" "$toolchain" "$delimiter" >> $GITHUB_OUTPUT^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4913299Z ^[[36;1mfi^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4968388Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4968678Z env:
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4968890Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4969145Z   toolchain: 1.98
+lab	UNKNOWN STEP	2026-10-19T00:47:57.4969322Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5071290Z ##[end-action id=__dtolnay_rust-toolchain.parse;outcome=success;conclusion=success;duration_ms=20]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5074868Z ##[start-action display=Set $CARGO_HOME;id=__dtolnay_rust-toolchain.__run]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5100191Z ##[group]Run echo CARGO_HOME=${CARGO_HOME:-"$HOME/.cargo"} >> $GITHUB_ENV
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5100570Z ^[[36;1mecho CARGO_HOME=${CARGO_HOME:-"$HOME/.cargo"} >> $GITHUB_ENV^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5147839Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5148104Z env:
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5148301Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5148534Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5217611Z ##[end-action id=__dtolnay_rust-toolchain.__run;outcome=success;conclusion=success;duration_ms=14]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5219390Z ##[start-action display=Install rustup if needed;id=__dtolnay_rust-toolchain.__run_2]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5263489Z ##[group]Run if ! command -v rustup &>/dev/null; then
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5263800Z ^[[36;1mif ! command -v rustup &>/dev/null; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5264383Z ^[[36;1m  curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused --location --silent --show-error --fail https://sh.rustup.rs | sh -s -- --default-toolchain none -y^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5264932Z ^[[36;1m  echo "$CARGO_HOME/bin" >> $GITHUB_PATH^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5265159Z ^[[36;1mfi^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5312532Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5312813Z env:
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5313021Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5313277Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5313488Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5381045Z ##[end-action id=__dtolnay_rust-toolchain.__run_2;outcome=success;conclusion=success;duration_ms=16]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5382763Z ##[start-action display=Install rustup if needed on windows;id=__dtolnay_rust-toolchain.__run_3]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5388038Z ##[end-action id=__dtolnay_rust-toolchain.__run_3;outcome=skipped;conclusion=skipped;duration_ms=0]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5398860Z ##[start-action display=rustup toolchain install 1.98;id=__dtolnay_rust-toolchain.__run_4]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5414802Z ##[group]Run set -f  # split targets and components on commas and whitespace, without glob expansion
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5415308Z ^[[36;1mset -f  # split targets and components on commas and whitespace, without glob expansion^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5415644Z ^[[36;1mflags=()^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5415863Z ^[[36;1mfor t in ${targets//,/ }; do flags+=(--target "$t"); done^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5416171Z ^[[36;1mfor c in ${components//,/ }; do flags+=(--component "$c"); done^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5416551Z ^[[36;1mif [[ $toolchain == nightly && -n $components ]]; then flags+=(--allow-downgrade); fi^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5416871Z ^[[36;1mlog=$(mktemp)^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5417061Z ^[[36;1mtrap 'rm -f "$log"' EXIT^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5417266Z ^[[36;1mfor attempt in 1 2 3 4 5; do^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5417696Z ^[[36;1m  if rustup toolchain install "$toolchain" "${flags[@]}" --profile minimal --no-self-update --force-non-host 2>&1 | tee "$log"; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5418107Z ^[[36;1m    break^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5418265Z ^[[36;1m  else^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5418421Z ^[[36;1m    status=$?^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5418587Z ^[[36;1m  fi^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5418823Z ^[[36;1m  if [[ $attempt == 5 ]] || ! grep -Fq 'checksum failed for ' "$log" \^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5419251Z ^[[36;1m      || ! grep -Fq 'this is likely due to an ongoing update of the official release server' "$log"; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5419598Z ^[[36;1m    exit "$status"^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5419777Z ^[[36;1m  fi^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5420217Z ^[[36;1m  echo "Retrying rustup toolchain install in 30 seconds (retry $attempt of 4)" >&2^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5420536Z ^[[36;1m  sleep 30^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5420697Z ^[[36;1mdone^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5467704Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5467960Z env:
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5468150Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5468399Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5468596Z   toolchain: 1.98
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5468758Z   targets: 
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5468915Z   components: 
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5469084Z   RUSTUP_PERMIT_COPY_RENAME: 1
+lab	UNKNOWN STEP	2026-10-19T00:47:57.5469281Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:47:57.6291509Z info: syncing channel updates for 1.98-x86_64-unknown-linux-gnu
+lab	UNKNOWN STEP	2026-10-19T00:47:57.9275577Z info: latest update on 2026-09-03 for version 1.98.1 (48a229cea 2026-09-01)
+lab	UNKNOWN STEP	2026-10-19T00:47:57.9276107Z info: downloading 3 components
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2492083Z 
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2551984Z   1.98-x86_64-unknown-linux-gnu installed - rustc 1.98.1 (48a229cea 2026-09-01)
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2552412Z 
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2608997Z ##[end-action id=__dtolnay_rust-toolchain.__run_4;outcome=success;conclusion=success;duration_ms=6720]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2614995Z ##[start-action display=rustup default 1.98;id=__dtolnay_rust-toolchain.__run_5]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2631116Z ##[group]Run rustup default "$toolchain" --force-non-host
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2631438Z ^[[36;1mrustup default "$toolchain" --force-non-host^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2684816Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2685080Z env:
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2685275Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2685797Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2686009Z   toolchain: 1.98
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2686173Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2784712Z info: using existing install for 1.98-x86_64-unknown-linux-gnu
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2915432Z info: default toolchain set to 1.98-x86_64-unknown-linux-gnu
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2915649Z 
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2972875Z   1.98-x86_64-unknown-linux-gnu unchanged - rustc 1.98.1 (48a229cea 2026-09-01)
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2973179Z 
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2987247Z ##[end-action id=__dtolnay_rust-toolchain.__run_5;outcome=success;conclusion=success;duration_ms=37]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.2990199Z ##[start-action display=Create cachekey;id=__dtolnay_rust-toolchain.rustc-version]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3005369Z ##[group]Run DATE=$(rustc +"$toolchain" --version --verbose | sed -ne 's/^commit-date: \(20[0-9][0-9]\)-\([01][0-9]\)-\([0-3][0-9]\)$/\1\2\3/p')
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3006046Z ^[[36;1mDATE=$(rustc +"$toolchain" --version --verbose | sed -ne 's/^commit-date: \(20[0-9][0-9]\)-\([01][0-9]\)-\([0-3][0-9]\)$/\1\2\3/p')^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3006559Z ^[[36;1mHASH=$(rustc +"$toolchain" --version --verbose | sed -ne 's/^commit-hash: //p')^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3006945Z ^[[36;1mecho "cachekey=$(echo $DATE$HASH | head -c12)" >> $GITHUB_OUTPUT^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3055859Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3056117Z env:
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3056313Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3056563Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3056763Z   toolchain: 1.98
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3056930Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3334945Z ##[end-action id=__dtolnay_rust-toolchain.rustc-version;outcome=success;conclusion=success;duration_ms=34]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3337104Z ##[start-action display=Disable incremental compilation;id=__dtolnay_rust-toolchain.__run_6]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3353657Z ##[group]Run if [ -z "${CARGO_INCREMENTAL+set}" ]; then
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3353997Z ^[[36;1mif [ -z "${CARGO_INCREMENTAL+set}" ]; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3354270Z ^[[36;1m  echo CARGO_INCREMENTAL=0 >> $GITHUB_ENV^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3354518Z ^[[36;1mfi^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3406468Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3406750Z env:
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3406962Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3407227Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3407437Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3476543Z ##[end-action id=__dtolnay_rust-toolchain.__run_6;outcome=success;conclusion=success;duration_ms=13]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3478169Z ##[start-action display=Enable colors in Cargo output;id=__dtolnay_rust-toolchain.__run_7]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3493411Z ##[group]Run if [ -z "${CARGO_TERM_COLOR+set}" ]; then
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3493696Z ^[[36;1mif [ -z "${CARGO_TERM_COLOR+set}" ]; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3493958Z ^[[36;1m  echo CARGO_TERM_COLOR=always >> $GITHUB_ENV^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3494211Z ^[[36;1mfi^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3539493Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3539760Z env:
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3540130Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3540375Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3540573Z   CARGO_INCREMENTAL: 0
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3540746Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3607071Z ##[end-action id=__dtolnay_rust-toolchain.__run_7;outcome=success;conclusion=success;duration_ms=12]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3609501Z ##[start-action display=Enable Cargo sparse registry;id=__dtolnay_rust-toolchain.__run_8]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3625336Z ##[group]Run # implemented in 1.66, stabilized in 1.68, made default in 1.70
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3625773Z ^[[36;1m# implemented in 1.66, stabilized in 1.68, made default in 1.70^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3626328Z ^[[36;1mif [ -z "${CARGO_REGISTRIES_CRATES_IO_PROTOCOL+set}" -o -f "/home/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol ]; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3627179Z ^[[36;1m  if rustc +"$toolchain" --version --verbose | grep -q '^release: 1\.6[89]\.'; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3627644Z ^[[36;1m    touch "/home/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol || true^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3628067Z ^[[36;1m    echo CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse >> $GITHUB_ENV^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3628475Z ^[[36;1m  elif rustc +"$toolchain" --version --verbose | grep -q '^release: 1\.6[67]\.'; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3628915Z ^[[36;1m    touch "/home/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol || true^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3629315Z ^[[36;1m    echo CARGO_REGISTRIES_CRATES_IO_PROTOCOL=git >> $GITHUB_ENV^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3629607Z ^[[36;1m  fi^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3629773Z ^[[36;1mfi^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3674856Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3675132Z env:
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3675338Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3675613Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3675823Z   CARGO_INCREMENTAL: 0
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3676017Z   CARGO_TERM_COLOR: always
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3676229Z   toolchain: 1.98
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3676405Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3932354Z ##[end-action id=__dtolnay_rust-toolchain.__run_8;outcome=success;conclusion=success;duration_ms=32]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3935600Z ##[start-action display=Work around spurious network errors in curl 8.0;id=__dtolnay_rust-toolchain.__run_9]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3951555Z ##[group]Run # https://rust-lang.zulipchat.com/#narrow/stream/246057-t-cargo/topic/timeout.20investigation
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3952129Z ^[[36;1m# https://rust-lang.zulipchat.com/#narrow/stream/246057-t-cargo/topic/timeout.20investigation^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3952599Z ^[[36;1mif rustc +"$toolchain" --version --verbose | grep -q '^release: 1\.7[01]\.'; then^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3952979Z ^[[36;1m  echo CARGO_HTTP_MULTIPLEXING=false >> $GITHUB_ENV^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.3953247Z ^[[36;1mfi^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4006085Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4006353Z env:
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4006551Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4006802Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4007001Z   CARGO_INCREMENTAL: 0
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4007172Z   CARGO_TERM_COLOR: always
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4007348Z   toolchain: 1.98
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4007513Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4171612Z ##[end-action id=__dtolnay_rust-toolchain.__run_9;outcome=success;conclusion=success;duration_ms=23]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4188439Z ##[start-action display=rustc +1.98 --version --verbose;id=__dtolnay_rust-toolchain.__run_10]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4204196Z ##[group]Run rustc +"$toolchain" --version --verbose
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4204490Z ^[[36;1mrustc +"$toolchain" --version --verbose^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4251969Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4252238Z env:
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4252454Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4252700Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4252908Z   CARGO_INCREMENTAL: 0
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4253086Z   CARGO_TERM_COLOR: always
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4253265Z   toolchain: 1.98
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4253425Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4402228Z rustc 1.98.1 (48a229cea 2026-09-01)
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4402633Z binary: rustc
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4402970Z commit-hash: 48a229ceaefd4985c50990b14116b6d856af0985
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4403258Z commit-date: 2026-09-01
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4403466Z host: x86_64-unknown-linux-gnu
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4403687Z release: 1.98.1
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4403882Z LLVM version: 22.1.8
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4415109Z ##[end-action id=__dtolnay_rust-toolchain.__run_10;outcome=success;conclusion=success;duration_ms=22]
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4504561Z ##[group]Run Swatinem/rust-cache@v2
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4504784Z with:
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4504945Z   prefix-key: v0-rust
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4505271Z   add-job-id-key: true
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4505463Z   add-rust-environment-hash-key: true
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4505677Z   cache-targets: true
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4505860Z   cache-all-crates: false
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4506055Z   cache-workspace-crates: false
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4506248Z   save-if: true
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4506416Z   cache-provider: github
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4506594Z   cache-bin: true
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4506758Z   lookup-only: false
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4506925Z   cmd-format: {0}
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4507076Z env:
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4507258Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4507502Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4507701Z   CARGO_INCREMENTAL: 0
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4507882Z   CARGO_TERM_COLOR: always
+lab	UNKNOWN STEP	2026-10-19T00:48:04.4508061Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7477370Z ##[group]Cache Configuration
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7477614Z Cache Provider:
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7477780Z     github
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7478090Z Workspaces:
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7478429Z     /home/runner/work/crypto/crypto
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7478789Z Cache Paths:
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7479092Z     /home/runner/.cargo/bin
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7479439Z     /home/runner/.cargo/.crates.toml
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7479807Z     /home/runner/.cargo/.crates2.json
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7480246Z     /home/runner/.cargo/registry
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7480502Z     /home/runner/.cargo/git
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7480790Z     /home/runner/work/crypto/crypto/target
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7481083Z Restore Key:
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7481331Z     v0-rust-lab-Linux-x64-ea977744
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7481638Z Cache Key:
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7481916Z     v0-rust-lab-Linux-x64-ea977744-79033886
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7482253Z .. Prefix:
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7482488Z   - v0-rust-lab-Linux-x64
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7482761Z .. Environment considered:
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7483027Z   - Rust Versions:
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7483410Z     - 1.98.1 x86_64-unknown-linux-gnu 48a229ceaefd4985c50990b14116b6d856af0985
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7483949Z     - 1.99.0 x86_64-unknown-linux-gnu b940084d7eb6a299eb4bfeb8e34901bc051e7ac4
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7484372Z   - CARGO_HOME
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7484615Z   - CARGO_INCREMENTAL
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7484867Z   - CARGO_TERM_COLOR
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7485127Z .. Lockfiles considered:
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7485441Z   - /home/runner/work/crypto/crypto/Cargo.lock
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7485811Z   - /home/runner/work/crypto/crypto/Cargo.toml
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7486355Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7486497Z 
+lab	UNKNOWN STEP	2026-10-19T00:48:05.7486596Z ... Restoring cache ...
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9493644Z No cache found.
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9625655Z ##[group]Run actions/cache@v4
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9625862Z with:
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9626019Z   path: ~/.local/cairn
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9626259Z   key: cairn-b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54-Linux
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9626629Z   enableCrossOsArchive: false
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9626839Z   fail-on-cache-miss: false
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9627036Z   lookup-only: false
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9627201Z   save-always: false
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9627358Z env:
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9627541Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9627785Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9627982Z   CARGO_INCREMENTAL: 0
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9628157Z   CARGO_TERM_COLOR: always
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9628336Z   CACHE_ON_FAILURE: false
+lab	UNKNOWN STEP	2026-10-19T00:48:05.9628511Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:48:06.0479500Z (node:2494) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+lab	UNKNOWN STEP	2026-10-19T00:48:06.0480330Z (Use `node --trace-deprecation ...` to show where the warning was created)
+lab	UNKNOWN STEP	2026-10-19T00:48:06.2421777Z Cache not found for input keys: cairn-b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54-Linux
+lab	UNKNOWN STEP	2026-10-19T00:48:06.3230382Z ##[group]Run cargo install --locked --root ~/.local/cairn --git https://github.com/aburan28/cairn --rev "$CAIRN_REV" cairn
+lab	UNKNOWN STEP	2026-10-19T00:48:06.3231044Z ^[[36;1mcargo install --locked --root ~/.local/cairn --git https://github.com/aburan28/cairn --rev "$CAIRN_REV" cairn^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:06.3284494Z shell: /usr/bin/bash -e {0}
+lab	UNKNOWN STEP	2026-10-19T00:48:06.3284699Z env:
+lab	UNKNOWN STEP	2026-10-19T00:48:06.3284891Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:48:06.3285142Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:48:06.3285340Z   CARGO_INCREMENTAL: 0
+lab	UNKNOWN STEP	2026-10-19T00:48:06.3285563Z   CARGO_TERM_COLOR: always
+lab	UNKNOWN STEP	2026-10-19T00:48:06.3285746Z   CACHE_ON_FAILURE: false
+lab	UNKNOWN STEP	2026-10-19T00:48:06.3285930Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:48:06.4621574Z ^[[1m^[[92m    Updating^[[0m git repository `https://github.com/aburan28/cairn`
+lab	UNKNOWN STEP	2026-10-19T00:48:09.4207415Z ^[[1m^[[92m  Installing^[[0m cairn v9.1.0 (https://github.com/aburan28/cairn?rev=b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54#b7f44d30)
+lab	UNKNOWN STEP	2026-10-19T00:48:09.4217747Z ^[[1m^[[92m    Updating^[[0m crates.io index
+lab	UNKNOWN STEP	2026-10-19T00:48:09.6215847Z ^[[1m^[[33mwarning^[[0m: package `chacha20 v0.10.1` in Cargo.lock is yanked in registry `crates-io`
+lab	UNKNOWN STEP	2026-10-19T00:48:09.6216536Z   ^[[1m^[[94m|^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:48:09.6216895Z   ^[[1m^[[94m= ^[[0m^[[1mhelp^[[0m: consider running without --locked
+lab	UNKNOWN STEP	2026-10-19T00:48:09.6500650Z ^[[1m^[[92m Downloading^[[0m crates ...
+lab	UNKNOWN STEP	2026-10-19T00:48:09.6755722Z ^[[1m^[[92m  Downloaded^[[0m autocfg v1.5.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.6775052Z ^[[1m^[[92m  Downloaded^[[0m aead v0.6.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.6788422Z ^[[1m^[[92m  Downloaded^[[0m base64ct v1.8.3
+lab	UNKNOWN STEP	2026-10-19T00:48:09.6807860Z ^[[1m^[[92m  Downloaded^[[0m argon2 v0.6.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.6822081Z ^[[1m^[[92m  Downloaded^[[0m blake2 v0.11.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7007609Z ^[[1m^[[92m  Downloaded^[[0m block-buffer v0.12.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7020699Z ^[[1m^[[92m  Downloaded^[[0m digest v0.10.7
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7035946Z ^[[1m^[[92m  Downloaded^[[0m chacha20 v0.10.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7058127Z ^[[1m^[[92m  Downloaded^[[0m generic-array v0.14.7
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7070697Z ^[[1m^[[92m  Downloaded^[[0m rand_core v0.6.4
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7084577Z ^[[1m^[[92m  Downloaded^[[0m block-buffer v0.10.4
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7093644Z ^[[1m^[[92m  Downloaded^[[0m ml-kem v0.3.2
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7115004Z ^[[1m^[[92m  Downloaded^[[0m cfg-if v1.0.4
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7126750Z ^[[1m^[[92m  Downloaded^[[0m spki v0.8.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7147139Z ^[[1m^[[92m  Downloaded^[[0m group v0.13.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7159617Z ^[[1m^[[92m  Downloaded^[[0m const-oid v0.10.2
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7179667Z ^[[1m^[[92m  Downloaded^[[0m classic-mceliece-rust v3.1.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7208784Z ^[[1m^[[92m  Downloaded^[[0m kem v0.3.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7217172Z ^[[1m^[[92m  Downloaded^[[0m crypto-common v0.1.7
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7225651Z ^[[1m^[[92m  Downloaded^[[0m curve25519-dalek-derive v0.1.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7237376Z ^[[1m^[[92m  Downloaded^[[0m thiserror v2.0.20
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7306886Z ^[[1m^[[92m  Downloaded^[[0m pkcs8 v0.11.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7337343Z ^[[1m^[[92m  Downloaded^[[0m ed25519 v3.0.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7355323Z ^[[1m^[[92m  Downloaded^[[0m hmac v0.13.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7377818Z ^[[1m^[[92m  Downloaded^[[0m cpufeatures v0.3.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7390947Z ^[[1m^[[92m  Downloaded^[[0m log v0.4.34
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7413590Z ^[[1m^[[92m  Downloaded^[[0m memchr v2.8.3
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7468016Z ^[[1m^[[92m  Downloaded^[[0m keccak v0.2.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7483872Z ^[[1m^[[92m  Downloaded^[[0m hybrid-array v0.4.14
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7506524Z ^[[1m^[[92m  Downloaded^[[0m zmij v1.0.23
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7524319Z ^[[1m^[[92m  Downloaded^[[0m cipher v0.5.2
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7558943Z ^[[1m^[[92m  Downloaded^[[0m itoa v1.0.18
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7575270Z ^[[1m^[[92m  Downloaded^[[0m cmov v0.5.4
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7588991Z ^[[1m^[[92m  Downloaded^[[0m ctutils v0.4.2
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7604105Z ^[[1m^[[92m  Downloaded^[[0m version_check v0.9.5
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7613714Z ^[[1m^[[92m  Downloaded^[[0m pairing v0.23.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7622514Z ^[[1m^[[92m  Downloaded^[[0m phc v0.6.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7635879Z ^[[1m^[[92m  Downloaded^[[0m signature v3.0.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7645883Z ^[[1m^[[92m  Downloaded^[[0m digest v0.9.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7655872Z ^[[1m^[[92m  Downloaded^[[0m keccak v0.1.6
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7664812Z ^[[1m^[[92m  Downloaded^[[0m subtle v2.6.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7674012Z ^[[1m^[[92m  Downloaded^[[0m crypto-common v0.2.2
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7682774Z ^[[1m^[[92m  Downloaded^[[0m rustc_version v0.4.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7692654Z ^[[1m^[[92m  Downloaded^[[0m zeroize_derive v1.5.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7700424Z ^[[1m^[[92m  Downloaded^[[0m password-hash v0.6.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7710440Z ^[[1m^[[92m  Downloaded^[[0m sponge-cursor v0.1.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7719731Z ^[[1m^[[92m  Downloaded^[[0m universal-hash v0.6.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7726956Z ^[[1m^[[92m  Downloaded^[[0m ff v0.13.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7738635Z ^[[1m^[[92m  Downloaded^[[0m inout v0.2.2
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7748313Z ^[[1m^[[92m  Downloaded^[[0m rand_core v0.10.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7760479Z ^[[1m^[[92m  Downloaded^[[0m quote v1.0.47
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7781698Z ^[[1m^[[92m  Downloaded^[[0m getrandom v0.2.17
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7804556Z ^[[1m^[[92m  Downloaded^[[0m zeroize v1.9.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7816508Z ^[[1m^[[92m  Downloaded^[[0m digest v0.11.3
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7834635Z ^[[1m^[[92m  Downloaded^[[0m sha2 v0.11.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7864231Z ^[[1m^[[92m  Downloaded^[[0m thiserror-impl v2.0.20
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7875463Z ^[[1m^[[92m  Downloaded^[[0m chacha20poly1305 v0.11.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7889540Z ^[[1m^[[92m  Downloaded^[[0m ed25519-dalek v3.0.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7915971Z ^[[1m^[[92m  Downloaded^[[0m num-traits v0.2.19
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7935964Z ^[[1m^[[92m  Downloaded^[[0m poly1305 v0.9.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7955208Z ^[[1m^[[92m  Downloaded^[[0m proc-macro2 v1.0.107
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7977778Z ^[[1m^[[92m  Downloaded^[[0m semver v1.0.28
+lab	UNKNOWN STEP	2026-10-19T00:48:09.7995602Z ^[[1m^[[92m  Downloaded^[[0m unicode-ident v1.0.24
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8016950Z ^[[1m^[[92m  Downloaded^[[0m der v0.8.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8067480Z ^[[1m^[[92m  Downloaded^[[0m serde_core v1.0.229
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8088382Z ^[[1m^[[92m  Downloaded^[[0m ml-dsa v0.1.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8110136Z ^[[1m^[[92m  Downloaded^[[0m serde_json v1.0.151
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8167494Z ^[[1m^[[92m  Downloaded^[[0m getrandom v0.4.3
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8196808Z ^[[1m^[[92m  Downloaded^[[0m module-lattice v0.2.3
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8208354Z ^[[1m^[[92m  Downloaded^[[0m rand v0.8.7
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8234361Z ^[[1m^[[92m  Downloaded^[[0m typenum v1.20.1
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8261663Z ^[[1m^[[92m  Downloaded^[[0m rand v0.10.3
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8291114Z ^[[1m^[[92m  Downloaded^[[0m sha3 v0.12.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8313492Z ^[[1m^[[92m  Downloaded^[[0m bls12_381 v0.8.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8354461Z ^[[1m^[[92m  Downloaded^[[0m shake v0.1.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8370317Z ^[[1m^[[92m  Downloaded^[[0m syn v3.0.3
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8453781Z ^[[1m^[[92m  Downloaded^[[0m syn v2.0.119
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8537906Z ^[[1m^[[92m  Downloaded^[[0m curve25519-dalek v5.0.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8613485Z ^[[1m^[[92m  Downloaded^[[0m sha3 v0.11.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8642812Z ^[[1m^[[92m  Downloaded^[[0m sha3 v0.10.9
+lab	UNKNOWN STEP	2026-10-19T00:48:09.8678147Z ^[[1m^[[92m  Downloaded^[[0m libc v0.2.189
+lab	UNKNOWN STEP	2026-10-19T00:48:09.9022795Z ^[[1m^[[92m  Downloaded^[[0m hqc-kem v0.1.0-rc.0
+lab	UNKNOWN STEP	2026-10-19T00:48:09.9772998Z ^[[1m^[[92m   Compiling^[[0m proc-macro2 v1.0.107
+lab	UNKNOWN STEP	2026-10-19T00:48:09.9773531Z ^[[1m^[[92m   Compiling^[[0m unicode-ident v1.0.24
+lab	UNKNOWN STEP	2026-10-19T00:48:09.9774505Z ^[[1m^[[92m   Compiling^[[0m quote v1.0.47
+lab	UNKNOWN STEP	2026-10-19T00:48:09.9774769Z ^[[1m^[[92m   Compiling^[[0m typenum v1.20.1
+lab	UNKNOWN STEP	2026-10-19T00:48:10.0228217Z ^[[1m^[[92m   Compiling^[[0m libc v0.2.189
+lab	UNKNOWN STEP	2026-10-19T00:48:10.2369686Z ^[[1m^[[92m   Compiling^[[0m cfg-if v1.0.4
+lab	UNKNOWN STEP	2026-10-19T00:48:10.2565816Z ^[[1m^[[92m   Compiling^[[0m cmov v0.5.4
+lab	UNKNOWN STEP	2026-10-19T00:48:10.3911025Z ^[[1m^[[92m   Compiling^[[0m ctutils v0.4.2
+lab	UNKNOWN STEP	2026-10-19T00:48:10.5351082Z ^[[1m^[[92m   Compiling^[[0m rand_core v0.10.1
+lab	UNKNOWN STEP	2026-10-19T00:48:10.6298525Z ^[[1m^[[92m   Compiling^[[0m getrandom v0.4.3
+lab	UNKNOWN STEP	2026-10-19T00:48:10.7032225Z ^[[1m^[[92m   Compiling^[[0m const-oid v0.10.2
+lab	UNKNOWN STEP	2026-10-19T00:48:10.7140874Z ^[[1m^[[92m   Compiling^[[0m version_check v0.9.5
+lab	UNKNOWN STEP	2026-10-19T00:48:10.7607258Z ^[[1m^[[92m   Compiling^[[0m syn v2.0.119
+lab	UNKNOWN STEP	2026-10-19T00:48:10.8721250Z ^[[1m^[[92m   Compiling^[[0m generic-array v0.14.7
+lab	UNKNOWN STEP	2026-10-19T00:48:11.1143383Z ^[[1m^[[92m   Compiling^[[0m getrandom v0.2.17
+lab	UNKNOWN STEP	2026-10-19T00:48:11.2412099Z ^[[1m^[[92m   Compiling^[[0m cpufeatures v0.3.0
+lab	UNKNOWN STEP	2026-10-19T00:48:11.2686083Z ^[[1m^[[92m   Compiling^[[0m subtle v2.6.1
+lab	UNKNOWN STEP	2026-10-19T00:48:11.3531237Z ^[[1m^[[92m   Compiling^[[0m rand_core v0.6.4
+lab	UNKNOWN STEP	2026-10-19T00:48:11.3891653Z ^[[1m^[[92m   Compiling^[[0m keccak v0.2.0
+lab	UNKNOWN STEP	2026-10-19T00:48:11.4441447Z ^[[1m^[[92m   Compiling^[[0m autocfg v1.5.1
+lab	UNKNOWN STEP	2026-10-19T00:48:11.4675967Z ^[[1m^[[92m   Compiling^[[0m semver v1.0.28
+lab	UNKNOWN STEP	2026-10-19T00:48:11.6411058Z ^[[1m^[[92m   Compiling^[[0m rustc_version v0.4.1
+lab	UNKNOWN STEP	2026-10-19T00:48:11.6861413Z ^[[1m^[[92m   Compiling^[[0m num-traits v0.2.19
+lab	UNKNOWN STEP	2026-10-19T00:48:11.7943008Z ^[[1m^[[92m   Compiling^[[0m sponge-cursor v0.1.0
+lab	UNKNOWN STEP	2026-10-19T00:48:11.7983952Z ^[[1m^[[92m   Compiling^[[0m curve25519-dalek v5.0.0
+lab	UNKNOWN STEP	2026-10-19T00:48:11.8866052Z ^[[1m^[[92m   Compiling^[[0m ff v0.13.1
+lab	UNKNOWN STEP	2026-10-19T00:48:11.9461318Z ^[[1m^[[92m   Compiling^[[0m block-buffer v0.10.4
+lab	UNKNOWN STEP	2026-10-19T00:48:12.0141912Z ^[[1m^[[92m   Compiling^[[0m crypto-common v0.1.7
+lab	UNKNOWN STEP	2026-10-19T00:48:12.0591121Z ^[[1m^[[92m   Compiling^[[0m syn v3.0.3
+lab	UNKNOWN STEP	2026-10-19T00:48:12.4511336Z ^[[1m^[[92m   Compiling^[[0m thiserror v2.0.20
+lab	UNKNOWN STEP	2026-10-19T00:48:12.5821419Z ^[[1m^[[92m   Compiling^[[0m zmij v1.0.23
+lab	UNKNOWN STEP	2026-10-19T00:48:12.6687009Z ^[[1m^[[92m   Compiling^[[0m serde_core v1.0.229
+lab	UNKNOWN STEP	2026-10-19T00:48:12.8037251Z ^[[1m^[[92m   Compiling^[[0m digest v0.10.7
+lab	UNKNOWN STEP	2026-10-19T00:48:12.8148045Z ^[[1m^[[92m   Compiling^[[0m group v0.13.0
+lab	UNKNOWN STEP	2026-10-19T00:48:12.9070505Z ^[[1m^[[92m   Compiling^[[0m serde_json v1.0.151
+lab	UNKNOWN STEP	2026-10-19T00:48:12.9092677Z ^[[1m^[[92m   Compiling^[[0m classic-mceliece-rust v3.1.0
+lab	UNKNOWN STEP	2026-10-19T00:48:12.9712780Z ^[[1m^[[92m   Compiling^[[0m keccak v0.1.6
+lab	UNKNOWN STEP	2026-10-19T00:48:13.0130576Z ^[[1m^[[92m   Compiling^[[0m pairing v0.23.0
+lab	UNKNOWN STEP	2026-10-19T00:48:13.7371230Z ^[[1m^[[92m   Compiling^[[0m sha3 v0.10.9
+lab	UNKNOWN STEP	2026-10-19T00:48:13.8094125Z ^[[1m^[[92m   Compiling^[[0m thiserror-impl v2.0.20
+lab	UNKNOWN STEP	2026-10-19T00:48:14.2834606Z ^[[1m^[[92m   Compiling^[[0m rand v0.8.7
+lab	UNKNOWN STEP	2026-10-19T00:48:14.2935417Z ^[[1m^[[92m   Compiling^[[0m zeroize_derive v1.5.0
+lab	UNKNOWN STEP	2026-10-19T00:48:14.6331425Z ^[[1m^[[92m   Compiling^[[0m curve25519-dalek-derive v0.1.1
+lab	UNKNOWN STEP	2026-10-19T00:48:14.6367963Z ^[[1m^[[92m   Compiling^[[0m zeroize v1.9.0
+lab	UNKNOWN STEP	2026-10-19T00:48:14.6772388Z ^[[1m^[[92m   Compiling^[[0m digest v0.9.0
+lab	UNKNOWN STEP	2026-10-19T00:48:14.7201524Z ^[[1m^[[92m   Compiling^[[0m hybrid-array v0.4.14
+lab	UNKNOWN STEP	2026-10-19T00:48:14.7316557Z ^[[1m^[[92m   Compiling^[[0m der v0.8.1
+lab	UNKNOWN STEP	2026-10-19T00:48:14.8901472Z ^[[1m^[[92m   Compiling^[[0m rand v0.10.3
+lab	UNKNOWN STEP	2026-10-19T00:48:14.9491244Z ^[[1m^[[92m   Compiling^[[0m base64ct v1.8.3
+lab	UNKNOWN STEP	2026-10-19T00:48:15.1362265Z ^[[1m^[[92m   Compiling^[[0m itoa v1.0.18
+lab	UNKNOWN STEP	2026-10-19T00:48:15.2351695Z ^[[1m^[[92m   Compiling^[[0m cairn v9.1.0 (/home/runner/.cargo/git/checkouts/cairn-fa604e7c6c3b44dd/b7f44d3)
+lab	UNKNOWN STEP	2026-10-19T00:48:15.2938146Z ^[[1m^[[92m   Compiling^[[0m memchr v2.8.3
+lab	UNKNOWN STEP	2026-10-19T00:48:15.4622006Z ^[[1m^[[92m   Compiling^[[0m crypto-common v0.2.2
+lab	UNKNOWN STEP	2026-10-19T00:48:16.2721102Z ^[[1m^[[92m   Compiling^[[0m block-buffer v0.12.1
+lab	UNKNOWN STEP	2026-10-19T00:48:16.3561159Z ^[[1m^[[92m   Compiling^[[0m digest v0.11.3
+lab	UNKNOWN STEP	2026-10-19T00:48:16.4703335Z ^[[1m^[[92m   Compiling^[[0m inout v0.2.2
+lab	UNKNOWN STEP	2026-10-19T00:48:16.5164222Z ^[[1m^[[92m   Compiling^[[0m signature v3.0.0
+lab	UNKNOWN STEP	2026-10-19T00:48:16.5301323Z ^[[1m^[[92m   Compiling^[[0m cipher v0.5.2
+lab	UNKNOWN STEP	2026-10-19T00:48:16.5871290Z ^[[1m^[[92m   Compiling^[[0m shake v0.1.0
+lab	UNKNOWN STEP	2026-10-19T00:48:16.6332642Z ^[[1m^[[92m   Compiling^[[0m universal-hash v0.6.1
+lab	UNKNOWN STEP	2026-10-19T00:48:16.6785603Z ^[[1m^[[92m   Compiling^[[0m spki v0.8.0
+lab	UNKNOWN STEP	2026-10-19T00:48:16.7171270Z ^[[1m^[[92m   Compiling^[[0m module-lattice v0.2.3
+lab	UNKNOWN STEP	2026-10-19T00:48:16.8311227Z ^[[1m^[[92m   Compiling^[[0m pkcs8 v0.11.0
+lab	UNKNOWN STEP	2026-10-19T00:48:16.8741328Z ^[[1m^[[92m   Compiling^[[0m chacha20 v0.10.1
+lab	UNKNOWN STEP	2026-10-19T00:48:16.9371407Z ^[[1m^[[92m   Compiling^[[0m poly1305 v0.9.1
+lab	UNKNOWN STEP	2026-10-19T00:48:17.0141370Z ^[[1m^[[92m   Compiling^[[0m ed25519 v3.0.0
+lab	UNKNOWN STEP	2026-10-19T00:48:17.0257105Z ^[[1m^[[92m   Compiling^[[0m aead v0.6.1
+lab	UNKNOWN STEP	2026-10-19T00:48:17.1019407Z ^[[1m^[[92m   Compiling^[[0m blake2 v0.11.0
+lab	UNKNOWN STEP	2026-10-19T00:48:17.1201426Z ^[[1m^[[92m   Compiling^[[0m sha3 v0.11.0
+lab	UNKNOWN STEP	2026-10-19T00:48:17.4211514Z ^[[1m^[[92m   Compiling^[[0m sha3 v0.12.0
+lab	UNKNOWN STEP	2026-10-19T00:48:17.4221066Z ^[[1m^[[92m   Compiling^[[0m sha2 v0.11.0
+lab	UNKNOWN STEP	2026-10-19T00:48:17.5091593Z ^[[1m^[[92m   Compiling^[[0m kem v0.3.0
+lab	UNKNOWN STEP	2026-10-19T00:48:17.5557855Z ^[[1m^[[92m   Compiling^[[0m ml-kem v0.3.2
+lab	UNKNOWN STEP	2026-10-19T00:48:17.8248702Z ^[[1m^[[92m   Compiling^[[0m hqc-kem v0.1.0-rc.0
+lab	UNKNOWN STEP	2026-10-19T00:48:18.7701143Z ^[[1m^[[92m   Compiling^[[0m ed25519-dalek v3.0.0
+lab	UNKNOWN STEP	2026-10-19T00:48:18.9381133Z ^[[1m^[[92m   Compiling^[[0m argon2 v0.6.0
+lab	UNKNOWN STEP	2026-10-19T00:48:19.0061133Z ^[[1m^[[92m   Compiling^[[0m chacha20poly1305 v0.11.0
+lab	UNKNOWN STEP	2026-10-19T00:48:19.0571256Z ^[[1m^[[92m   Compiling^[[0m ml-dsa v0.1.1
+lab	UNKNOWN STEP	2026-10-19T00:48:19.2649204Z ^[[1m^[[92m   Compiling^[[0m hmac v0.13.0
+lab	UNKNOWN STEP	2026-10-19T00:48:19.6607276Z ^[[1m^[[92m   Compiling^[[0m bls12_381 v0.8.0
+lab	UNKNOWN STEP	2026-10-19T00:48:20.2293788Z ^[[1m^[[92m   Compiling^[[0m log v0.4.34
+lab	UNKNOWN STEP	2026-10-19T00:49:09.0158193Z ^[[1m^[[92m    Finished^[[0m `release` profile [optimized] target(s) in 1m 02s
+lab	UNKNOWN STEP	2026-10-19T00:49:09.0217384Z ^[[1m^[[92m  Installing^[[0m /home/runner/.local/cairn/bin/cairn
+lab	UNKNOWN STEP	2026-10-19T00:49:09.0223006Z ^[[1m^[[92m   Installed^[[0m package `cairn v9.1.0 (https://github.com/aburan28/cairn?rev=b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54#b7f44d30)` (executable `cairn`)
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1267819Z ^[[1m^[[33mwarning^[[0m: be sure to add `/home/runner/.local/cairn/bin` to your PATH to be able to run the installed binaries
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1353926Z ##[group]Run echo "$HOME/.local/cairn/bin" >> "$GITHUB_PATH"
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1354291Z ^[[36;1mecho "$HOME/.local/cairn/bin" >> "$GITHUB_PATH"^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1354579Z ^[[36;1m"$HOME/.local/cairn/bin/cairn" version^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1414405Z shell: /usr/bin/bash -e {0}
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1414636Z env:
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1414858Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1415136Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1415366Z   CARGO_INCREMENTAL: 0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1415556Z   CARGO_TERM_COLOR: always
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1415761Z   CACHE_ON_FAILURE: false
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1415954Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1495899Z cairn 9.1.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1497200Z   ui       not embedded -- `cairn run` refuses; build with `make ui-build`
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1522114Z ##[group]Run cargo test --release --test backlog_cli -- --nocapture
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1522482Z ^[[36;1mcargo test --release --test backlog_cli -- --nocapture^[[0m
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1571720Z shell: /usr/bin/bash -e {0}
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1571917Z env:
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1572111Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1572363Z   CARGO_HOME: /home/runner/.cargo
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1572560Z   CARGO_INCREMENTAL: 0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1572741Z   CARGO_TERM_COLOR: always
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1572938Z   CACHE_ON_FAILURE: false
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1573118Z   BACKLOG_REQUIRE_CAIRN: 1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1573297Z ##[endgroup]
+lab	UNKNOWN STEP	2026-10-19T00:49:09.1935410Z ^[[1m^[[92m    Updating^[[0m crates.io index
+lab	UNKNOWN STEP	2026-10-19T00:49:09.5268354Z ^[[1m^[[92m Downloading^[[0m crates ...
+lab	UNKNOWN STEP	2026-10-19T00:49:09.5990003Z ^[[1m^[[92m  Downloaded^[[0m cpufeatures v0.3.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6035145Z ^[[1m^[[92m  Downloaded^[[0m cfg-if v1.0.5
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6069016Z ^[[1m^[[92m  Downloaded^[[0m adler2 v2.0.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6078849Z ^[[1m^[[92m  Downloaded^[[0m anstyle v1.0.14
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6091058Z ^[[1m^[[92m  Downloaded^[[0m arrayvec v0.7.8
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6115007Z ^[[1m^[[92m  Downloaded^[[0m foreign-types v0.3.2
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6137017Z ^[[1m^[[92m  Downloaded^[[0m yoke-derive v0.8.4
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6156878Z ^[[1m^[[92m  Downloaded^[[0m anstream v1.0.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6218223Z ^[[1m^[[92m  Downloaded^[[0m once_cell v1.21.4
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6239343Z ^[[1m^[[92m  Downloaded^[[0m icu_provider v2.3.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6260725Z ^[[1m^[[92m  Downloaded^[[0m shlex v2.0.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6271153Z ^[[1m^[[92m  Downloaded^[[0m socket2 v0.6.5
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6285548Z ^[[1m^[[92m  Downloaded^[[0m base64 v0.21.7
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6315467Z ^[[1m^[[92m  Downloaded^[[0m either v1.18.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6454697Z ^[[1m^[[92m  Downloaded^[[0m zerovec v0.11.8
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6502988Z ^[[1m^[[92m  Downloaded^[[0m anstyle-parse v1.0.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6600527Z ^[[1m^[[92m  Downloaded^[[0m fallible-iterator v0.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6640360Z ^[[1m^[[92m  Downloaded^[[0m crossbeam-deque v0.8.8
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6693223Z ^[[1m^[[92m  Downloaded^[[0m blake3 v1.8.7
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6757778Z ^[[1m^[[92m  Downloaded^[[0m anstyle-query v1.1.5
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6768047Z ^[[1m^[[92m  Downloaded^[[0m bytes v1.12.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6797393Z ^[[1m^[[92m  Downloaded^[[0m arcstr v1.2.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6807861Z ^[[1m^[[92m  Downloaded^[[0m smallvec v1.16.2
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6818836Z ^[[1m^[[92m  Downloaded^[[0m tinystr v0.8.4
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6836628Z ^[[1m^[[92m  Downloaded^[[0m clap v4.6.7
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6918020Z ^[[1m^[[92m  Downloaded^[[0m crossbeam-utils v0.8.23
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6941930Z ^[[1m^[[92m  Downloaded^[[0m cc v1.6.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6969732Z ^[[1m^[[92m  Downloaded^[[0m clap_derive v4.6.7
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6987337Z ^[[1m^[[92m  Downloaded^[[0m idna_adapter v1.2.2
+lab	UNKNOWN STEP	2026-10-19T00:49:09.6994833Z ^[[1m^[[92m  Downloaded^[[0m crossbeam-epoch v0.9.21
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7015493Z ^[[1m^[[92m  Downloaded^[[0m fallible-streaming-iterator v0.1.9
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7023416Z ^[[1m^[[92m  Downloaded^[[0m hex v0.4.3
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7036950Z ^[[1m^[[92m  Downloaded^[[0m constant_time_eq v0.4.2
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7052720Z ^[[1m^[[92m  Downloaded^[[0m syn v3.0.6
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7145279Z ^[[1m^[[92m  Downloaded^[[0m sha2 v0.10.9
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7166264Z ^[[1m^[[92m  Downloaded^[[0m displaydoc v0.2.7
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7183890Z ^[[1m^[[92m  Downloaded^[[0m openssl v0.10.81
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7269697Z ^[[1m^[[92m  Downloaded^[[0m combine v4.6.8
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7305496Z ^[[1m^[[92m  Downloaded^[[0m ahash v0.8.12
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7327004Z ^[[1m^[[92m  Downloaded^[[0m clap_builder v4.6.7
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7386925Z ^[[1m^[[92m  Downloaded^[[0m clap_lex v1.1.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7396494Z ^[[1m^[[92m  Downloaded^[[0m num-integer v0.1.47
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7409235Z ^[[1m^[[92m  Downloaded^[[0m rayon v1.12.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7492721Z ^[[1m^[[92m  Downloaded^[[0m writeable v0.6.4
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7511081Z ^[[1m^[[92m  Downloaded^[[0m bitflags v2.13.2
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7548203Z ^[[1m^[[92m  Downloaded^[[0m rand_chacha v0.3.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7558370Z ^[[1m^[[92m  Downloaded^[[0m ryu v1.0.23
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7583851Z ^[[1m^[[92m  Downloaded^[[0m icu_collections v2.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7633104Z ^[[1m^[[92m  Downloaded^[[0m openssl-macros v0.1.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7639017Z ^[[1m^[[92m  Downloaded^[[0m potential_utf v0.1.6
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7647372Z ^[[1m^[[92m  Downloaded^[[0m heck v0.5.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7658096Z ^[[1m^[[92m  Downloaded^[[0m litemap v0.8.3
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7676040Z ^[[1m^[[92m  Downloaded^[[0m form_urlencoded v1.2.2
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7682608Z ^[[1m^[[92m  Downloaded^[[0m rand v0.8.8
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7708290Z ^[[1m^[[92m  Downloaded^[[0m utf8_iter v1.0.4
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7716483Z ^[[1m^[[92m  Downloaded^[[0m zerotrie v0.2.5
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7747470Z ^[[1m^[[92m  Downloaded^[[0m colorchoice v1.0.5
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7755066Z ^[[1m^[[92m  Downloaded^[[0m hashbrown v0.14.5
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7792418Z ^[[1m^[[92m  Downloaded^[[0m icu_normalizer_data v2.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7809008Z ^[[1m^[[92m  Downloaded^[[0m native-tls v0.2.18
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7820797Z ^[[1m^[[92m  Downloaded^[[0m utf8parse v0.2.2
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7828524Z ^[[1m^[[92m  Downloaded^[[0m idna v1.1.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7857093Z ^[[1m^[[92m  Downloaded^[[0m xxhash-rust v0.8.19
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7870987Z ^[[1m^[[92m  Downloaded^[[0m rayon-core v1.13.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7900670Z ^[[1m^[[92m  Downloaded^[[0m simd-adler32 v0.3.10
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7915817Z ^[[1m^[[92m  Downloaded^[[0m sha1_smol v1.0.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7926079Z ^[[1m^[[92m  Downloaded^[[0m rusqlite v0.32.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7974249Z ^[[1m^[[92m  Downloaded^[[0m find-msvc-tools v0.1.14
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7987369Z ^[[1m^[[92m  Downloaded^[[0m ppv-lite86 v0.2.21
+lab	UNKNOWN STEP	2026-10-19T00:49:09.7997657Z ^[[1m^[[92m  Downloaded^[[0m url v2.5.8
+lab	UNKNOWN STEP	2026-10-19T00:49:09.8017909Z ^[[1m^[[92m  Downloaded^[[0m num-bigint v0.5.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.8057000Z ^[[1m^[[92m  Downloaded^[[0m stable_deref_trait v1.2.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.8064002Z ^[[1m^[[92m  Downloaded^[[0m zerovec-derive v0.11.6
+lab	UNKNOWN STEP	2026-10-19T00:49:09.8077323Z ^[[1m^[[92m  Downloaded^[[0m zerofrom v0.1.8
+lab	UNKNOWN STEP	2026-10-19T00:49:09.8084974Z ^[[1m^[[92m  Downloaded^[[0m hashlink v0.9.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.8098847Z ^[[1m^[[92m  Downloaded^[[0m redis v1.7.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.8210717Z ^[[1m^[[92m  Downloaded^[[0m icu_normalizer v2.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.8287551Z ^[[1m^[[92m  Downloaded^[[0m synstructure v0.14.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.8295735Z ^[[1m^[[92m  Downloaded^[[0m cpufeatures v0.2.17
+lab	UNKNOWN STEP	2026-10-19T00:49:09.8306578Z ^[[1m^[[92m  Downloaded^[[0m serde v1.0.229
+lab	UNKNOWN STEP	2026-10-19T00:49:09.8334601Z ^[[1m^[[92m  Downloaded^[[0m libc v0.2.190
+lab	UNKNOWN STEP	2026-10-19T00:49:09.8711743Z ^[[1m^[[92m  Downloaded^[[0m vcpkg v0.2.15
+lab	UNKNOWN STEP	2026-10-19T00:49:09.9145071Z ^[[1m^[[92m  Downloaded^[[0m zlib-rs v0.6.8
+lab	UNKNOWN STEP	2026-10-19T00:49:09.9188476Z ^[[1m^[[92m  Downloaded^[[0m flate2 v1.1.10
+lab	UNKNOWN STEP	2026-10-19T00:49:09.9228197Z ^[[1m^[[92m  Downloaded^[[0m is_terminal_polyfill v1.70.2
+lab	UNKNOWN STEP	2026-10-19T00:49:09.9236063Z ^[[1m^[[92m  Downloaded^[[0m num-bigint v0.4.8
+lab	UNKNOWN STEP	2026-10-19T00:49:09.9273684Z ^[[1m^[[92m  Downloaded^[[0m miniz_oxide v0.9.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.9294252Z ^[[1m^[[92m  Downloaded^[[0m serde_derive v1.0.229
+lab	UNKNOWN STEP	2026-10-19T00:49:09.9317924Z ^[[1m^[[92m  Downloaded^[[0m yoke v0.8.3
+lab	UNKNOWN STEP	2026-10-19T00:49:09.9332262Z ^[[1m^[[92m  Downloaded^[[0m icu_properties v2.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:09.9357291Z ^[[1m^[[92m  Downloaded^[[0m libsqlite3-sys v0.30.1
+lab	UNKNOWN STEP	2026-10-19T00:49:09.9842975Z ^[[1m^[[92m  Downloaded^[[0m zerocopy v0.8.60
+lab	UNKNOWN STEP	2026-10-19T00:49:10.0012682Z ^[[1m^[[92m  Downloaded^[[0m icu_locale_core v2.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:10.0067916Z ^[[1m^[[92m  Downloaded^[[0m percent-encoding v2.3.2
+lab	UNKNOWN STEP	2026-10-19T00:49:10.0075251Z ^[[1m^[[92m  Downloaded^[[0m strsim v0.11.1
+lab	UNKNOWN STEP	2026-10-19T00:49:10.0085580Z ^[[1m^[[92m  Downloaded^[[0m crc32fast v1.5.2
+lab	UNKNOWN STEP	2026-10-19T00:49:10.0101725Z ^[[1m^[[92m  Downloaded^[[0m foreign-types-shared v0.1.1
+lab	UNKNOWN STEP	2026-10-19T00:49:10.0107209Z ^[[1m^[[92m  Downloaded^[[0m openssl-probe v0.2.1
+lab	UNKNOWN STEP	2026-10-19T00:49:10.0116016Z ^[[1m^[[92m  Downloaded^[[0m unicode-ident v1.0.26
+lab	UNKNOWN STEP	2026-10-19T00:49:10.0137396Z ^[[1m^[[92m  Downloaded^[[0m icu_properties_data v2.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:10.0222100Z ^[[1m^[[92m  Downloaded^[[0m pkg-config v0.3.34
+lab	UNKNOWN STEP	2026-10-19T00:49:10.0233584Z ^[[1m^[[92m  Downloaded^[[0m zerofrom-derive v0.1.8
+lab	UNKNOWN STEP	2026-10-19T00:49:10.0241574Z ^[[1m^[[92m  Downloaded^[[0m openssl-sys v0.9.117
+lab	UNKNOWN STEP	2026-10-19T00:49:10.1088794Z ^[[1m^[[92m   Compiling^[[0m proc-macro2 v1.0.107
+lab	UNKNOWN STEP	2026-10-19T00:49:10.1089219Z ^[[1m^[[92m   Compiling^[[0m unicode-ident v1.0.26
+lab	UNKNOWN STEP	2026-10-19T00:49:10.1104446Z ^[[1m^[[92m   Compiling^[[0m quote v1.0.47
+lab	UNKNOWN STEP	2026-10-19T00:49:10.1115830Z ^[[1m^[[92m   Compiling^[[0m shlex v2.0.1
+lab	UNKNOWN STEP	2026-10-19T00:49:10.1662498Z ^[[1m^[[92m   Compiling^[[0m cfg-if v1.0.5
+lab	UNKNOWN STEP	2026-10-19T00:49:10.1936454Z ^[[1m^[[92m   Compiling^[[0m find-msvc-tools v0.1.14
+lab	UNKNOWN STEP	2026-10-19T00:49:10.2163736Z ^[[1m^[[92m   Compiling^[[0m stable_deref_trait v1.2.1
+lab	UNKNOWN STEP	2026-10-19T00:49:10.2312759Z ^[[1m^[[92m   Compiling^[[0m version_check v0.9.5
+lab	UNKNOWN STEP	2026-10-19T00:49:10.2416401Z ^[[1m^[[92m   Compiling^[[0m vcpkg v0.2.15
+lab	UNKNOWN STEP	2026-10-19T00:49:10.3201380Z ^[[1m^[[92m   Compiling^[[0m cc v1.6.0
+lab	UNKNOWN STEP	2026-10-19T00:49:10.3887464Z ^[[1m^[[92m   Compiling^[[0m pkg-config v0.3.34
+lab	UNKNOWN STEP	2026-10-19T00:49:10.7271662Z ^[[1m^[[92m   Compiling^[[0m libc v0.2.190
+lab	UNKNOWN STEP	2026-10-19T00:49:10.7290971Z ^[[1m^[[92m   Compiling^[[0m zerocopy v0.8.60
+lab	UNKNOWN STEP	2026-10-19T00:49:10.8681240Z ^[[1m^[[92m   Compiling^[[0m syn v3.0.6
+lab	UNKNOWN STEP	2026-10-19T00:49:11.5121074Z ^[[1m^[[92m   Compiling^[[0m litemap v0.8.3
+lab	UNKNOWN STEP	2026-10-19T00:49:11.6291778Z ^[[1m^[[92m   Compiling^[[0m writeable v0.6.4
+lab	UNKNOWN STEP	2026-10-19T00:49:11.7990888Z ^[[1m^[[92m   Compiling^[[0m openssl-sys v0.9.117
+lab	UNKNOWN STEP	2026-10-19T00:49:11.8020561Z ^[[1m^[[92m   Compiling^[[0m generic-array v0.14.7
+lab	UNKNOWN STEP	2026-10-19T00:49:11.8592000Z ^[[1m^[[92m   Compiling^[[0m utf8_iter v1.0.4
+lab	UNKNOWN STEP	2026-10-19T00:49:11.9306299Z ^[[1m^[[92m   Compiling^[[0m icu_properties_data v2.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:12.0006396Z ^[[1m^[[92m   Compiling^[[0m icu_normalizer_data v2.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:12.0644412Z ^[[1m^[[92m   Compiling^[[0m smallvec v1.16.2
+lab	UNKNOWN STEP	2026-10-19T00:49:12.0723319Z ^[[1m^[[92m   Compiling^[[0m autocfg v1.5.1
+lab	UNKNOWN STEP	2026-10-19T00:49:12.2839577Z ^[[1m^[[92m   Compiling^[[0m num-traits v0.2.19
+lab	UNKNOWN STEP	2026-10-19T00:49:12.3597485Z ^[[1m^[[92m   Compiling^[[0m syn v2.0.119
+lab	UNKNOWN STEP	2026-10-19T00:49:12.5557311Z ^[[1m^[[92m   Compiling^[[0m ahash v0.8.12
+lab	UNKNOWN STEP	2026-10-19T00:49:12.6241223Z ^[[1m^[[92m   Compiling^[[0m crossbeam-utils v0.8.23
+lab	UNKNOWN STEP	2026-10-19T00:49:12.7282053Z ^[[1m^[[92m   Compiling^[[0m typenum v1.20.1
+lab	UNKNOWN STEP	2026-10-19T00:49:13.7151182Z ^[[1m^[[92m   Compiling^[[0m synstructure v0.14.0
+lab	UNKNOWN STEP	2026-10-19T00:49:14.0767540Z ^[[1m^[[92m   Compiling^[[0m bitflags v2.13.2
+lab	UNKNOWN STEP	2026-10-19T00:49:14.1051616Z ^[[1m^[[92m   Compiling^[[0m crossbeam-epoch v0.9.21
+lab	UNKNOWN STEP	2026-10-19T00:49:14.1901226Z ^[[1m^[[92m   Compiling^[[0m once_cell v1.21.4
+lab	UNKNOWN STEP	2026-10-19T00:49:14.2651451Z ^[[1m^[[92m   Compiling^[[0m serde_core v1.0.229
+lab	UNKNOWN STEP	2026-10-19T00:49:14.5781017Z ^[[1m^[[92m   Compiling^[[0m zerofrom-derive v0.1.8
+lab	UNKNOWN STEP	2026-10-19T00:49:14.8391105Z ^[[1m^[[92m   Compiling^[[0m yoke-derive v0.8.4
+lab	UNKNOWN STEP	2026-10-19T00:49:15.0171278Z ^[[1m^[[92m   Compiling^[[0m zerovec-derive v0.11.6
+lab	UNKNOWN STEP	2026-10-19T00:49:15.3501336Z ^[[1m^[[92m   Compiling^[[0m zerofrom v0.1.8
+lab	UNKNOWN STEP	2026-10-19T00:49:15.4101448Z ^[[1m^[[92m   Compiling^[[0m displaydoc v0.2.7
+lab	UNKNOWN STEP	2026-10-19T00:49:15.5541503Z ^[[1m^[[92m   Compiling^[[0m yoke v0.8.3
+lab	UNKNOWN STEP	2026-10-19T00:49:15.6691673Z ^[[1m^[[92m   Compiling^[[0m getrandom v0.2.17
+lab	UNKNOWN STEP	2026-10-19T00:49:15.6892124Z ^[[1m^[[92m   Compiling^[[0m zerovec v0.11.8
+lab	UNKNOWN STEP	2026-10-19T00:49:15.8172118Z ^[[1m^[[92m   Compiling^[[0m zerotrie v0.2.5
+lab	UNKNOWN STEP	2026-10-19T00:49:15.8205284Z ^[[1m^[[92m   Compiling^[[0m libsqlite3-sys v0.30.1
+lab	UNKNOWN STEP	2026-10-19T00:49:15.8581676Z ^[[1m^[[92m   Compiling^[[0m memchr v2.8.3
+lab	UNKNOWN STEP	2026-10-19T00:49:15.9651253Z ^[[1m^[[92m   Compiling^[[0m utf8parse v0.2.2
+lab	UNKNOWN STEP	2026-10-19T00:49:16.0031400Z ^[[1m^[[92m   Compiling^[[0m zmij v1.0.23
+lab	UNKNOWN STEP	2026-10-19T00:49:16.1161318Z ^[[1m^[[92m   Compiling^[[0m foreign-types-shared v0.1.1
+lab	UNKNOWN STEP	2026-10-19T00:49:16.1321063Z ^[[1m^[[92m   Compiling^[[0m crossbeam-deque v0.8.8
+lab	UNKNOWN STEP	2026-10-19T00:49:16.1416590Z ^[[1m^[[92m   Compiling^[[0m tinystr v0.8.4
+lab	UNKNOWN STEP	2026-10-19T00:49:16.1531229Z ^[[1m^[[92m   Compiling^[[0m potential_utf v0.1.6
+lab	UNKNOWN STEP	2026-10-19T00:49:16.2243561Z ^[[1m^[[92m   Compiling^[[0m icu_collections v2.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:16.2298452Z ^[[1m^[[92m   Compiling^[[0m openssl v0.10.81
+lab	UNKNOWN STEP	2026-10-19T00:49:16.2554207Z ^[[1m^[[92m   Compiling^[[0m icu_locale_core v2.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:16.3201816Z ^[[1m^[[92m   Compiling^[[0m foreign-types v0.3.2
+lab	UNKNOWN STEP	2026-10-19T00:49:16.3561636Z ^[[1m^[[92m   Compiling^[[0m anstyle-parse v1.0.0
+lab	UNKNOWN STEP	2026-10-19T00:49:16.7415771Z ^[[1m^[[92m   Compiling^[[0m openssl-macros v0.1.1
+lab	UNKNOWN STEP	2026-10-19T00:49:16.7772212Z ^[[1m^[[92m   Compiling^[[0m rand_core v0.6.4
+lab	UNKNOWN STEP	2026-10-19T00:49:16.8486172Z ^[[1m^[[92m   Compiling^[[0m num-integer v0.1.47
+lab	UNKNOWN STEP	2026-10-19T00:49:16.9251522Z ^[[1m^[[92m   Compiling^[[0m icu_provider v2.3.1
+lab	UNKNOWN STEP	2026-10-19T00:49:17.1851218Z ^[[1m^[[92m   Compiling^[[0m icu_normalizer v2.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:17.3211538Z ^[[1m^[[92m   Compiling^[[0m icu_properties v2.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:18.1721255Z ^[[1m^[[92m   Compiling^[[0m idna_adapter v1.2.2
+lab	UNKNOWN STEP	2026-10-19T00:49:18.5772022Z ^[[1m^[[92m   Compiling^[[0m hashbrown v0.14.5
+lab	UNKNOWN STEP	2026-10-19T00:49:18.6371249Z ^[[1m^[[92m   Compiling^[[0m ppv-lite86 v0.2.21
+lab	UNKNOWN STEP	2026-10-19T00:49:18.8921732Z ^[[1m^[[92m   Compiling^[[0m crypto-common v0.1.7
+lab	UNKNOWN STEP	2026-10-19T00:49:18.9521957Z ^[[1m^[[92m   Compiling^[[0m block-buffer v0.10.4
+lab	UNKNOWN STEP	2026-10-19T00:49:19.0811366Z ^[[1m^[[92m   Compiling^[[0m anstyle-query v1.1.5
+lab	UNKNOWN STEP	2026-10-19T00:49:19.1117657Z ^[[1m^[[92m   Compiling^[[0m percent-encoding v2.3.2
+lab	UNKNOWN STEP	2026-10-19T00:49:19.2712046Z ^[[1m^[[92m   Compiling^[[0m rayon-core v1.13.0
+lab	UNKNOWN STEP	2026-10-19T00:49:19.3306498Z ^[[1m^[[92m   Compiling^[[0m serde_json v1.0.151
+lab	UNKNOWN STEP	2026-10-19T00:49:19.3762240Z ^[[1m^[[92m   Compiling^[[0m colorchoice v1.0.5
+lab	UNKNOWN STEP	2026-10-19T00:49:19.4081733Z ^[[1m^[[92m   Compiling^[[0m crc32fast v1.5.2
+lab	UNKNOWN STEP	2026-10-19T00:49:19.4239142Z ^[[1m^[[92m   Compiling^[[0m serde v1.0.229
+lab	UNKNOWN STEP	2026-10-19T00:49:19.5081635Z ^[[1m^[[92m   Compiling^[[0m anstyle v1.0.14
+lab	UNKNOWN STEP	2026-10-19T00:49:19.5402242Z ^[[1m^[[92m   Compiling^[[0m is_terminal_polyfill v1.70.2
+lab	UNKNOWN STEP	2026-10-19T00:49:19.5741656Z ^[[1m^[[92m   Compiling^[[0m itoa v1.0.18
+lab	UNKNOWN STEP	2026-10-19T00:49:19.6732056Z ^[[1m^[[92m   Compiling^[[0m native-tls v0.2.18
+lab	UNKNOWN STEP	2026-10-19T00:49:19.7141104Z ^[[1m^[[92m   Compiling^[[0m anstream v1.0.0
+lab	UNKNOWN STEP	2026-10-19T00:49:20.0791354Z ^[[1m^[[92m   Compiling^[[0m form_urlencoded v1.2.2
+lab	UNKNOWN STEP	2026-10-19T00:49:20.2281944Z ^[[1m^[[92m   Compiling^[[0m hashlink v0.9.1
+lab	UNKNOWN STEP	2026-10-19T00:49:20.3391783Z ^[[1m^[[92m   Compiling^[[0m digest v0.10.7
+lab	UNKNOWN STEP	2026-10-19T00:49:20.4541284Z ^[[1m^[[92m   Compiling^[[0m rand_chacha v0.3.1
+lab	UNKNOWN STEP	2026-10-19T00:49:20.6500987Z ^[[1m^[[92m   Compiling^[[0m idna v1.1.0
+lab	UNKNOWN STEP	2026-10-19T00:49:21.6172014Z ^[[1m^[[92m   Compiling^[[0m serde_derive v1.0.229
+lab	UNKNOWN STEP	2026-10-19T00:49:22.7212429Z ^[[1m^[[92m   Compiling^[[0m blake3 v1.8.7
+lab	UNKNOWN STEP	2026-10-19T00:49:22.8701793Z ^[[1m^[[92m   Compiling^[[0m fallible-streaming-iterator v0.1.9
+lab	UNKNOWN STEP	2026-10-19T00:49:22.9491299Z ^[[1m^[[92m   Compiling^[[0m simd-adler32 v0.3.10
+lab	UNKNOWN STEP	2026-10-19T00:49:23.6761561Z ^[[1m^[[92m   Compiling^[[0m fallible-iterator v0.3.0
+lab	UNKNOWN STEP	2026-10-19T00:49:23.7981834Z ^[[1m^[[92m   Compiling^[[0m strsim v0.11.1
+lab	UNKNOWN STEP	2026-10-19T00:49:23.9326614Z ^[[1m^[[92m   Compiling^[[0m heck v0.5.0
+lab	UNKNOWN STEP	2026-10-19T00:49:24.0411123Z ^[[1m^[[92m   Compiling^[[0m openssl-probe v0.2.1
+lab	UNKNOWN STEP	2026-10-19T00:49:24.1761383Z ^[[1m^[[92m   Compiling^[[0m bytes v1.12.1
+lab	UNKNOWN STEP	2026-10-19T00:49:24.4181783Z ^[[1m^[[92m   Compiling^[[0m log v0.4.34
+lab	UNKNOWN STEP	2026-10-19T00:49:24.5361252Z ^[[1m^[[92m   Compiling^[[0m cpufeatures v0.2.17
+lab	UNKNOWN STEP	2026-10-19T00:49:24.5601242Z ^[[1m^[[92m   Compiling^[[0m clap_lex v1.1.1
+lab	UNKNOWN STEP	2026-10-19T00:49:24.7741226Z ^[[1m^[[92m   Compiling^[[0m adler2 v2.0.1
+lab	UNKNOWN STEP	2026-10-19T00:49:24.8261090Z ^[[1m^[[92m   Compiling^[[0m miniz_oxide v0.9.1
+lab	UNKNOWN STEP	2026-10-19T00:49:24.8507677Z ^[[1m^[[92m   Compiling^[[0m clap_builder v4.6.7
+lab	UNKNOWN STEP	2026-10-19T00:49:24.9201246Z ^[[1m^[[92m   Compiling^[[0m combine v4.6.8
+lab	UNKNOWN STEP	2026-10-19T00:49:26.1091769Z ^[[1m^[[92m   Compiling^[[0m sha2 v0.10.9
+lab	UNKNOWN STEP	2026-10-19T00:49:27.8251296Z ^[[1m^[[92m   Compiling^[[0m clap_derive v4.6.7
+lab	UNKNOWN STEP	2026-10-19T00:49:31.3118254Z ^[[1m^[[92m   Compiling^[[0m url v2.5.8
+lab	UNKNOWN STEP	2026-10-19T00:49:33.1792085Z ^[[1m^[[92m   Compiling^[[0m rand v0.8.8
+lab	UNKNOWN STEP	2026-10-19T00:49:33.9966915Z ^[[1m^[[92m   Compiling^[[0m num-bigint v0.5.1
+lab	UNKNOWN STEP	2026-10-19T00:49:34.8289096Z ^[[1m^[[92m   Compiling^[[0m zeroize_derive v1.5.0
+lab	UNKNOWN STEP	2026-10-19T00:49:35.1056203Z ^[[1m^[[92m   Compiling^[[0m socket2 v0.6.5
+lab	UNKNOWN STEP	2026-10-19T00:49:35.7611160Z ^[[1m^[[92m   Compiling^[[0m arrayvec v0.7.8
+lab	UNKNOWN STEP	2026-10-19T00:49:35.8376214Z ^[[1m^[[92m   Compiling^[[0m sha1_smol v1.0.1
+lab	UNKNOWN STEP	2026-10-19T00:49:35.8921532Z ^[[1m^[[92m   Compiling^[[0m cpufeatures v0.3.1
+lab	UNKNOWN STEP	2026-10-19T00:49:35.9196412Z ^[[1m^[[92m   Compiling^[[0m either v1.18.0
+lab	UNKNOWN STEP	2026-10-19T00:49:36.0371213Z ^[[1m^[[92m   Compiling^[[0m constant_time_eq v0.4.2
+lab	UNKNOWN STEP	2026-10-19T00:49:36.0431523Z ^[[1m^[[92m   Compiling^[[0m xxhash-rust v0.8.19
+lab	UNKNOWN STEP	2026-10-19T00:49:36.1321069Z ^[[1m^[[92m   Compiling^[[0m arcstr v1.2.0
+lab	UNKNOWN STEP	2026-10-19T00:49:36.3249779Z ^[[1m^[[92m   Compiling^[[0m ryu v1.0.23
+lab	UNKNOWN STEP	2026-10-19T00:49:36.3320982Z ^[[1m^[[92m   Compiling^[[0m isogeny_algos v0.1.0 (/home/runner/work/crypto/crypto/isogeny_algos)
+lab	UNKNOWN STEP	2026-10-19T00:49:36.5331163Z ^[[1m^[[92m   Compiling^[[0m redis v1.7.1
+lab	UNKNOWN STEP	2026-10-19T00:49:37.8191322Z ^[[1m^[[92m   Compiling^[[0m rayon v1.12.0
+lab	UNKNOWN STEP	2026-10-19T00:49:39.7001233Z ^[[1m^[[92m   Compiling^[[0m zeroize v1.9.0
+lab	UNKNOWN STEP	2026-10-19T00:49:39.7981788Z ^[[1m^[[92m   Compiling^[[0m flate2 v1.1.10
+lab	UNKNOWN STEP	2026-10-19T00:49:40.1961484Z ^[[1m^[[92m   Compiling^[[0m num-bigint v0.4.8
+lab	UNKNOWN STEP	2026-10-19T00:49:43.8941426Z ^[[1m^[[92m   Compiling^[[0m clap v4.6.7
+lab	UNKNOWN STEP	2026-10-19T00:49:43.9251496Z ^[[1m^[[92m   Compiling^[[0m hex v0.4.3
+lab	UNKNOWN STEP	2026-10-19T00:49:44.1041297Z ^[[1m^[[92m   Compiling^[[0m subtle v2.6.1
+lab	UNKNOWN STEP	2026-10-19T00:49:44.1871200Z ^[[1m^[[92m   Compiling^[[0m base64 v0.21.7
+lab	UNKNOWN STEP	2026-10-19T00:50:05.3301136Z ^[[1m^[[92m   Compiling^[[0m rusqlite v0.32.1
+lab	UNKNOWN STEP	2026-10-19T00:50:07.0611404Z ^[[1m^[[92m   Compiling^[[0m volcano-cli v0.1.0 (/home/runner/work/crypto/crypto/tools/volcano-cli)
+lab	UNKNOWN STEP	2026-10-19T00:50:12.2911399Z ^[[1m^[[92m   Compiling^[[0m crypto v0.1.0 (/home/runner/work/crypto/crypto)
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4198735Z ^[[1m^[[92m    Finished^[[0m `release` profile [optimized] target(s) in 6m 28s
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4451930Z ^[[1m^[[92m     Running^[[0m tests/backlog_cli.rs (target/release/deps/backlog_cli-52a104bee5837ded)
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4463175Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4463407Z running 15 tests
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4508809Z test an_unsupported_cairn_version_is_refused ... ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4539639Z test cairn_post_is_a_dry_run_by_default_and_refuses_a_blocked_checker_or_a_lab_task ... ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4553217Z test cairn_post_refuses_plain_http_nodes ... ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4826043Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4828898Z test concurrent_claims_resolve_to_one_holder_after_sync ... FAILED
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4851224Z thread 'concurrent_claims_resolve_to_one_holder_after_sync' (8849) panicked at tests/backlog_cli.rs:401:9:
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4870972Z task                                                 state      holder                   cont  exp  rel  runs
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4873833Z XP-20261015-pkm-m3-n21-m4-n20/shard-0                held       box-a                       1    0    0  -
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4874556Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4874901Z note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4889461Z test ids_are_checked_on_every_subcommand ... ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4924826Z test list_orders_by_funding_then_id_including_unfunded_drafts ... ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4950102Z test a_conflicted_found_still_stops_every_runner ... ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4960402Z "/home/runner/work/crypto/crypto/target/release/backlog" "--root" "/tmp/backlog-it-8832-new" "validate" "--all" exited Some(1)
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4961209Z stdout:
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4961539Z XP-20261015-demo-search: FAILED
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4961986Z   error: blocked_on: a blocked card names what blocks it
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4962550Z   error: authors[0]: still TODO: fill it in before leaving draft
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4963132Z   error: cairn.env.recipe: still TODO: fill it in before leaving draft
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4963779Z   error: cairn.funding.rationale: still TODO: fill it in before leaving draft
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4964409Z   error: code.branch: still TODO: fill it in before leaving draft
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4964983Z   error: code.build[0][4]: still TODO: fill it in before leaving draft
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4965576Z   error: decision_value: still TODO: fill it in before leaving draft
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4966147Z   error: links.lead: still TODO: fill it in before leaving draft
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4966710Z   error: outputs.land: still TODO: fill it in before leaving draft
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4967472Z   error: question: still TODO: fill it in before leaving draft
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4968052Z   error: resources.notes: still TODO: fill it in before leaving draft
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4968631Z   error: run.argv[0]: still TODO: fill it in before leaving draft
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4969101Z 1 of 1 cards failed
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4969344Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4969539Z stderr:
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4969762Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.4982455Z test new_scaffolds_a_draft_that_validates_and_refuses_to_leave_draft_with_todos ... ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5181771Z test the_checker_binary_exit_codes ... ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5227523Z "/home/runner/work/crypto/crypto/target/release/backlog" "--root" "/home/runner/work/crypto/crypto" "validate" "--all" "--no-git" exited Some(1)
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5228375Z test the_committed_cards_validate ... FAILED
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5228866Z stdout:
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5229274Z XP-20261015-conductor-96-point-maps: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5229749Z XP-20261015-conductor-complete-cost: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5230438Z XP-20261015-conductor-coordinate-seeds: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5230934Z XP-20261015-conductor-d43-replication: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5231415Z XP-20261015-conductor-original96-floor: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5231948Z XP-20261015-conductor-prime-field-pdp: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5232448Z XP-20261015-kummer-p224-depth: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5232936Z XP-20261015-p192-isogeny-aux-search-t48: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5233418Z XP-20261015-pkm-m3-n21-m4-n20: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5233863Z XP-20261015-shape-g1-frozen-cells: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5234337Z XP-20261016-conductor-dose-response: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5234866Z XP-20261016-conductor-interleaved-crossover: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5235389Z XP-20261016-conductor-orbit-overlap: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5235934Z XP-20261016-conductor-rho-partition-control: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5236493Z XP-20261016-conductor-yield-distribution: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5237011Z XP-20261016-prime-base-oracle-tuning: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5237525Z   warning: cairn.env.recipe: still TODO
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5238222Z   warning: run.argv[0]: still TODO
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5238666Z XP-20261016-prime61-horizontal-class: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5239192Z XP-20261016-screenshot-factor-base-port: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5239699Z XP-20261017-full-volcano-graphwide-ic: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5240352Z   warning: cairn.env.recipe: still TODO
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5240841Z XP-20261017-quintic-support-frobenius: FAILED
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5241464Z   error: outputs.verify: placeholder {artifact} in "{artifact}" has no value
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5242094Z 1 of 20 cards failed
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5242375Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5242590Z stderr:
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5242844Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5242971Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5243379Z thread 'the_committed_cards_validate' (8985) panicked at tests/backlog_cli.rs:67:5:
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5244086Z XP-20261015-conductor-96-point-maps: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5244611Z XP-20261015-conductor-complete-cost: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5245156Z XP-20261015-conductor-coordinate-seeds: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5245650Z XP-20261015-conductor-d43-replication: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5246160Z XP-20261015-conductor-original96-floor: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5246667Z XP-20261015-conductor-prime-field-pdp: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5247174Z XP-20261015-kummer-p224-depth: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5247636Z XP-20261015-p192-isogeny-aux-search-t48: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5248126Z XP-20261015-pkm-m3-n21-m4-n20: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5248564Z XP-20261015-shape-g1-frozen-cells: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5249041Z XP-20261016-conductor-dose-response: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5249558Z XP-20261016-conductor-interleaved-crossover: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5250208Z XP-20261016-conductor-orbit-overlap: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5250719Z XP-20261016-conductor-rho-partition-control: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5251259Z XP-20261016-conductor-yield-distribution: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5251864Z XP-20261016-prime-base-oracle-tuning: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5252333Z   warning: cairn.env.recipe: still TODO
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5252953Z   warning: run.argv[0]: still TODO
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5253446Z XP-20261016-prime61-horizontal-class: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5253938Z XP-20261016-screenshot-factor-base-port: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5254445Z XP-20261017-full-volcano-graphwide-ic: ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5254918Z   warning: cairn.env.recipe: still TODO
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5255407Z XP-20261017-quintic-support-frobenius: FAILED
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5256031Z   error: outputs.verify: placeholder {artifact} in "{artifact}" has no value
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5256623Z 1 of 20 cards failed
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5256901Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5264650Z test the_p192_cards_checker_pins_t_48 ... ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5307091Z test the_stop_rule_fails_closed_on_a_missing_lab ... ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5409715Z "/home/runner/work/crypto/crypto/target/release/backlog" "--root" "/home/runner/work/crypto/crypto" "cairn-publish" "XP-20261017-quintic-support-frobenius" "--lab" "/tmp/backlog-it-8832-publish-all/A" "--identity" "/tmp/backlog-it-8832-publish-all/one.identity.json" exited Some(2)
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5411362Z stdout:
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5411497Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5411596Z stderr:
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5412617Z backlog: XP-20261017-quintic-support-frobenius does not validate (error: outputs.verify: placeholder {artifact} in "{artifact}" has no value); run `backlog validate XP-20261017-quintic-support-frobenius`
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5413526Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5413530Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5413841Z thread 'every_seed_card_publishes_unchanged' (8858) panicked at tests/backlog_cli.rs:847:9:
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5414385Z XP-20261017-quintic-support-frobenius
+lab	UNKNOWN STEP	2026-10-19T00:55:37.5415636Z test every_seed_card_publishes_unchanged ... FAILED
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6498065Z test first_success_found_is_set_only_on_a_checked_published_artifact ... ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6585711Z test publish_claim_exec_release_and_status_round_trip ... ok
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6585939Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6586013Z failures:
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6586126Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6586458Z failures:
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6586679Z     concurrent_claims_resolve_to_one_holder_after_sync
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6586941Z     every_seed_card_publishes_unchanged
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6587198Z     the_committed_cards_validate
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6587383Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6587650Z test result: FAILED. 12 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6588002Z 
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6588740Z ^[[1m^[[91merror^[[0m: test failed, to rerun pass `--test backlog_cli`
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6649042Z ##[error]Process completed with exit code 101.
+lab	UNKNOWN STEP	2026-10-19T00:55:37.6742880Z Post job cleanup.
+lab	UNKNOWN STEP	2026-10-19T00:55:37.7389038Z [command]/usr/bin/git version
+lab	UNKNOWN STEP	2026-10-19T00:55:37.7450006Z git version 2.55.0
+lab	UNKNOWN STEP	2026-10-19T00:55:37.7476482Z Temporarily overriding HOME='/home/runner/work/_temp/fad456f7-4fe6-4a09-977d-46264348cc69' before making global git config changes
+lab	UNKNOWN STEP	2026-10-19T00:55:37.7477184Z Adding repository directory to the temporary git global config as a safe directory
+lab	UNKNOWN STEP	2026-10-19T00:55:37.7480789Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+lab	UNKNOWN STEP	2026-10-19T00:55:37.7509125Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+lab	UNKNOWN STEP	2026-10-19T00:55:37.7535578Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+lab	UNKNOWN STEP	2026-10-19T00:55:37.7801222Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+lab	UNKNOWN STEP	2026-10-19T00:55:37.7827786Z http.https://github.com/.extraheader
+lab	UNKNOWN STEP	2026-10-19T00:55:37.7836198Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+lab	UNKNOWN STEP	2026-10-19T00:55:37.7863970Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+lab	UNKNOWN STEP	2026-10-19T00:55:37.8129001Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+lab	UNKNOWN STEP	2026-10-19T00:55:37.8159620Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+lab	UNKNOWN STEP	2026-10-19T00:55:37.8550569Z Cleaning up orphan processes
+lab	UNKNOWN STEP	2026-10-19T00:55:37.8775060Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+validate	Every card validates; ready cards pin a commit on main	﻿2026-10-19T01:02:12.7833516Z ##[group]Run ./target/release/backlog validate --all --merged-into origin/main
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7834214Z ^[[36;1m./target/release/backlog validate --all --merged-into origin/main^[[0m
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7892262Z shell: /usr/bin/bash -e {0}
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7892564Z env:
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7892848Z   CAIRN_REV: b7f44d30d989e8e1ba7aa2a67d9ff8d2cea5db54
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7893229Z   CARGO_HOME: /home/runner/.cargo
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7893523Z   CARGO_INCREMENTAL: 0
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7893780Z   CARGO_TERM_COLOR: always
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7894041Z   CACHE_ON_FAILURE: false
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7894287Z ##[endgroup]
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7978511Z XP-20261015-conductor-96-point-maps: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7979634Z XP-20261015-conductor-complete-cost: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7981334Z XP-20261015-conductor-coordinate-seeds: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7982618Z XP-20261015-conductor-d43-replication: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7984080Z XP-20261015-conductor-original96-floor: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7985649Z XP-20261015-conductor-prime-field-pdp: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7987265Z XP-20261015-kummer-p224-depth: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7989069Z XP-20261015-p192-isogeny-aux-search-t48: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7990721Z XP-20261015-pkm-m3-n21-m4-n20: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7992262Z XP-20261015-shape-g1-frozen-cells: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7993647Z XP-20261016-conductor-dose-response: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7995227Z XP-20261016-conductor-interleaved-crossover: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7996572Z XP-20261016-conductor-orbit-overlap: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7997981Z XP-20261016-conductor-rho-partition-control: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.7999322Z XP-20261016-conductor-yield-distribution: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.8000613Z XP-20261016-prime-base-oracle-tuning: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.8000980Z   warning: cairn.env.recipe: still TODO
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.8001315Z   warning: run.argv[0]: still TODO
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.8002083Z XP-20261016-prime61-horizontal-class: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.8003580Z XP-20261016-screenshot-factor-base-port: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.8025438Z XP-20261017-full-volcano-graphwide-ic: ok
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.8025840Z   warning: cairn.env.recipe: still TODO
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.8045094Z XP-20261017-quintic-support-frobenius: FAILED
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.8045655Z   error: outputs.verify: placeholder {artifact} in "{artifact}" has no value
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.8046078Z 1 of 20 cards failed
+validate	Every card validates; ready cards pin a commit on main	2026-10-19T01:02:12.8055847Z ##[error]Process completed with exit code 1.
