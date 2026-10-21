@@ -1,7 +1,7 @@
 {
   "schema_version": "ecdlp-audit-plan/v1",
   "record_state": "mock_non_authoritative",
-  "plan_uid": "urn:ecdlp-audit-plan:1:sha256:14a9c9cb881f474d232ee3470271d607c31cc08707738c74fbac2b062525e712",
+  "plan_uid": "urn:ecdlp-audit-plan:1:sha256:f5e0185c7f5282cc6468c644cc2b5fe6811475412d7db678f60060e1542a272b",
   "title": "Comprehensive elliptic-curve private-key recovery audit",
   "as_of": "2026-10-14",
   "authoritative": false,
@@ -136,7 +136,7 @@
         {
           "id": "WS1-D1",
           "kind": "artifact_replay",
-          "description": "Fresh standalone artifact and exact 2,572-input replay receipt.",
+          "description": "Fresh standalone artifact and exact 2,584-input replay receipt.",
           "path": null,
           "artifact_sha256": null,
           "status": "not_attempted",
@@ -150,7 +150,7 @@
           "kind": "review_receipt",
           "description": "Partial CI, Lean, semantic replay, and review evidence; final closure remains open.",
           "path": "research/cover_transfer_assessment_20261013/README.md",
-          "artifact_sha256": "5714653dbd3c82e7515eb6801e7e6d8af71c3afe85bc051db1aa5e12057e1ee2",
+          "artifact_sha256": "7f7014cd8f0fd8a620d62e73dc5fc651f2c94e7b12c16691479a733a572b5f00",
           "status": "partial",
           "acceptance_gate_ids": [
             "WS1-G3"
@@ -171,7 +171,7 @@
           "id": "WS1-G2",
           "required": true,
           "claim_status": "unknown",
-          "scope": "The exact fresh artifact replays all 2,572 current cover inputs and retains failures and unsupported results.",
+          "scope": "The exact fresh artifact replays all 2,584 current cover inputs and retains failures and unsupported results.",
           "rationale": "The published package was not replayed against all current inputs.",
           "evidence_refs": [],
           "obligation_id": "catalog-wide-packaged-replay"
@@ -945,7 +945,7 @@
       "workstream_id": "WS1",
       "status": "open",
       "required": true,
-      "description": "Replay all 2,572 current inputs against the exact fresh package.",
+      "description": "Replay all 2,584 current inputs against the exact fresh package.",
       "exit_evidence": "Per-input manifest, commands, results, failures, resource accounting, and independent replay receipt."
     },
     {
