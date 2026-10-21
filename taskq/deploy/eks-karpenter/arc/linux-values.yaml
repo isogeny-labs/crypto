@@ -36,7 +36,8 @@ template:
         command: ["/home/runner/run.sh"]
         resources:
           requests:
-            cpu: "4"
+            # Two runner/Docker pairs fit an 8-vCPU R node after reservations.
+            cpu: 2800m
             memory: 24Gi
             ephemeral-storage: 10Gi
           limits:

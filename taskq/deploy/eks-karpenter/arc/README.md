@@ -8,7 +8,7 @@ separate from the `cpu-spot` Iso Lab measurement pool.
 
 | Scale set / `runs-on` | Pod request | Pod memory limit | Maximum runners |
 | --- | --- | --- | --- |
-| `crypto-eks-linux` | 4 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 11 |
+| `crypto-eks-linux` | 2.8 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 11 |
 | `crypto-eks-highmem` | 16 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
 
 The base NodePool admits x86-64 M/R instances with 8, 16 or 32 vCPUs and caps
@@ -129,3 +129,42 @@ Sources: [GitHub ARC deployment](https://docs.github.com/en/actions/how-tos/mana
 [ARC routing](https://docs.github.com/en/actions/how-tos/manage-runners/use-actions-runner-controller/use-arc-in-a-workflow),
 [GitHub self-hosted runner security](https://docs.github.com/en/actions/reference/security/secure-use),
 [Karpenter NodePools](https://karpenter.sh/docs/concepts/nodepools/).
+
+## Iso Lab build queue
+
+`isolab-values.yaml` defines `crypto-isolab`, a separate one-job ARC queue on
+the existing runner nodes. Its runner requests 1.5 CPUs and 12 GiB (limits
+2 CPUs/16 GiB); the Docker sidecar uses the namespace defaults. This can use
+spare CPU on the memory-rich runner nodes without joining the general CI
+backlog. `minRunners: 0` allows it to idle at zero. It does not reserve EC2
+capacity or change the benchmark pool's 64-vCPU cap.
+
+Install this scale set separately, without resetting other live runner settings:
+
+```sh
+helm upgrade --install crypto-isolab \
+  oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
+  --version 0.15.0 --namespace arc-runners --atomic --wait --timeout 10m \
+  -f taskq/deploy/eks-karpenter/arc/isolab-values.yaml
+gh variable set ISOLAB_ACTIONS_RUNNER --repo aburan28/crypto --body crypto-isolab
+```
+
+The Iso Lab workflow uses this queue for manual runs and same-repository PRs;
+fork PRs retain the hosted runner. Delete the variable to restore hosted
+routing. Existing queued jobs retain their original routing. The builder has
+no AWS OIDC permission; only the main-branch publishing job obtains AWS
+credentials. Benchmark pods still use the dedicated `cpu-spot` nodes and
+the same L2, replay, A/A and S3 verification gates.
+
+A regional Spot quota can block both general CI and benchmark nodes even when
+a NodePool is below its own cap. Account for other Spot hosts and the managed
+system group before dispatching; a larger quota alone does not launch instances.
+
+The ordinary Linux scale set requests 2.8 CPUs per runner (its 4-CPU limit
+is unchanged). With the 0.5-CPU Docker sidecar, two runner pods request 6.6
+CPUs and 56 GiB, fitting an 8-vCPU R node after kube/system reservations and
+DaemonSets. The previous 4-CPU request allowed only one runner per node,
+even when more than half of its RAM was free. The live 11-runner limit is
+recorded in `linux-values.yaml`. Existing running pods keep their original
+resources; replacement pods adopt the new requests. This changes CI capacity
+only, never the dedicated benchmark pod's Guaranteed resources.

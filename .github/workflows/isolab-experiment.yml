@@ -26,7 +26,7 @@ permissions:
   contents: read
 jobs:
   contracts:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_ACTIONS_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -46,7 +46,7 @@ jobs:
   build:
     needs: contracts
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_ACTIONS_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 60
     permissions:
       contents: read
@@ -95,7 +95,7 @@ jobs:
   experiment:
     needs: build
     if: github.ref == 'refs/heads/main'
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|isolab-experiment.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|isolab-experiment.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && vars.ISOLAB_ACTIONS_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 90
     permissions:
       contents: read
@@ -116,6 +116,14 @@ jobs:
         with:
           name: isolab-build-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/isolab-build
+      - name: Install publisher tools when absent
+        run: |
+          set -euo pipefail
+          if ! command -v aws >/dev/null; then
+            curl --fail --silent --show-error --location https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o "$RUNNER_TEMP/awscliv2.zip"
+            unzip -q "$RUNNER_TEMP/awscliv2.zip" -d "$RUNNER_TEMP/awscli-install"
+            sudo "$RUNNER_TEMP/awscli-install/aws/install"
+          fi
       - name: Read the experiment spec from the tested commit
         env:
           GH_TOKEN: ${{ github.token }}
@@ -124,8 +132,10 @@ jobs:
           set -euo pipefail
           [[ "$SOURCE_REVISION" =~ ^[a-f0-9]{40}$ ]]
           [[ "$SPEC_PATH" =~ ^[a-zA-Z0-9_./-]+\.json$ && "$SPEC_PATH" != /* && "/$SPEC_PATH/" != *"/../"* ]]
-          gh api "repos/$GITHUB_REPOSITORY/contents/$SPEC_PATH?ref=$SOURCE_REVISION" --jq .content \
-            | tr -d '\n' | base64 -d > "$RUNNER_TEMP/isolab-spec.json"
+          curl --fail --silent --show-error \
+            -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/contents/$SPEC_PATH?ref=$SOURCE_REVISION" \
+            | jq -er .content | tr -d '\n' | base64 -d > "$RUNNER_TEMP/isolab-spec.json"
       - name: Obtain temporary AWS credentials
         uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
         with:
