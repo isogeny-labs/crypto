@@ -4,11 +4,12 @@ set -euo pipefail
 study=research/four_followups_20261021
 binary="$study/target/release/factor-base"
 test -x "$binary"
-mkdir -p "$study/results"
+output_dir="${FOUR_FOLLOWUPS_OUTPUT_DIR:-$study/results}"
+mkdir -p "$output_dir"
 
 run_arm() {
   local denominator="$1" jumps="$2" bits="$3"
-  local stem="$study/results/fb${denominator}-j${jumps}-bits${bits}"
+  local stem="$output_dir/fb${denominator}-j${jumps}-bits${bits}"
   if /usr/bin/time -f 'elapsed_s=%e exit=%x' "$binary" "$bits" "$denominator" "$jumps" > "$stem.jsonl" 2> "$stem.time"; then
     printf '%s status=ok rows=%s\n' "$stem" "$(wc -l < "$stem.jsonl")"
   else

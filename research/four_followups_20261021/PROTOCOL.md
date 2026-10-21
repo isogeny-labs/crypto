@@ -53,6 +53,15 @@ arms must run to completion or retain an explicit exhaustion/failure record.
 The run files use one JSON object per target and an arm-specific immutable
 name. A single-target test is only a correctness gate, never the full result.
 
+For benchmark-row eligibility, the final v2 records also execute source
+negation-rho in the **same binary and process** on each exact target, with an
+independent source scalar check and its own charged counts. The analyzer must
+match those fresh rho results against the archived controls and confirm that
+the candidate counts are identical to the earlier v1 arm. The v1 arm files
+remain archived as the pre-matched reference; v2 files go in
+`results/matched/`. The primary rho comparator for v2 is its fresh in-process
+arm, not a reweighted external session.
+
 ## Publication format
 
 The standardized `results/manifest.json` identifies the revision, source

@@ -544,7 +544,24 @@ fn run_row(row: Value, bits: u64, policy: Policy) -> Value {
     let _ = instrument.curve.add(instrument.generator, twice);
     let source_add = instrument.curve.f.counts();
     assert!(source_add.m > 0);
-    json!({"schema":"four-followups-factor-base-record/v1","workload_id":w["workload_id"],"workload_sha256":w["workload_sha256"],"bits":bits,"p":p,"target_index":w["target_index"],"algorithm_seed":seed.to_string(),"cap":cap,"planted":w["planted"],"recovered":out.recovered,"verified":verified,"exhausted":out.exhausted,"counts":out.counts,"source_add":source_add,"native":out.native,"phases":out.phases,"detail":out.detail})
+    // Run the protocol's strongest source reference in this same executable
+    // on the same target. Keep its own independent source verification charge.
+    let mut rho = solve_rho(&inst, target, seed, cap, true, false);
+    let rho_verified = if let Some(k) = rho.recovered {
+        let verifier = inst.fresh();
+        let got = verifier.curve.mul(verifier.generator, k);
+        let c = verifier.curve.f.counts();
+        rho.counts = rho.counts + c;
+        rho.phases.push(NativePhase {
+            name: "source_verification".into(),
+            counts: c,
+        });
+        got == target && k == w["planted"].as_u64().unwrap()
+    } else {
+        false
+    };
+    json!({"schema":"four-followups-factor-base-record/v2","workload_id":w["workload_id"],"workload_sha256":w["workload_sha256"],"bits":bits,"p":p,"target_index":w["target_index"],"algorithm_seed":seed.to_string(),"cap":cap,"planted":w["planted"],"recovered":out.recovered,"verified":verified,"exhausted":out.exhausted,"counts":out.counts,"source_add":source_add,"native":out.native,"phases":out.phases,"detail":out.detail,
+    "rho":{"recovered":rho.recovered,"verified":rho_verified,"exhausted":rho.exhausted,"counts":rho.counts,"source_add":source_add,"native":rho.native,"phases":rho.phases,"detail":rho.detail}})
 }
 fn main() {
     let args: Vec<String> = std::env::args().collect();
