@@ -8,7 +8,7 @@ separate from the `cpu-spot` Iso Lab measurement pool.
 
 | Scale set / `runs-on` | Pod request | Pod memory limit | Maximum runners |
 | --- | --- | --- | --- |
-| `crypto-eks-linux` | 2.8 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 8 |
+| `crypto-eks-linux` | 2.8 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 7 |
 | `crypto-eks-highmem` | 14 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
 
 The two general CI pools each cap provisioning at 16 vCPUs and 128 GiB,
@@ -180,7 +180,7 @@ The ordinary Linux scale set requests 2.8 CPUs per runner (its 4-CPU limit
 is unchanged). With the 0.5-CPU Docker sidecar, two runner pods request 6.6
 CPUs and 56 GiB, fitting an 8-vCPU R node after kube/system reservations and
 DaemonSets. The previous 4-CPU request allowed only one runner per node,
-even when more than half of its RAM was free. The 8-runner limit is
+even when more than half of its RAM was free. The 7-runner limit is
 recorded in `linux-values.yaml`. Existing running pods keep their original
 resources; replacement pods adopt the new requests. This changes CI capacity
 only, never the dedicated benchmark pod's Guaranteed resources.
@@ -198,6 +198,14 @@ When migrating from the old M-family nodes, cordon them and let active jobs
 finish. Lowering a NodePool limit does not remove its existing nodes. Verify
 that the old nodes have become empty and terminated before counting their
 vCPUs as available; do not drain active experiment jobs. Reduce the general
-scale set to eight runners after its active count falls to eight or fewer.
+scale set to seven runners; ARC removes idle runners and preserves assigned jobs.
 The checked-in values describe the final allocation. All queues idle at zero
 and all empty CI nodes consolidate after five minutes.
+
+The general queue stops at seven runners although its nodes can fit eight.
+The remaining 3.3-CPU/28-GiB runner slot leaves room for the Iso Lab source
+builder (1.5 CPU/12 GiB) and publisher (2 CPU/16 GiB including Docker) on the
+same R-family nodes. After node/DaemonSet reservations, their combined 3.5-CPU
+request still fits the vacant slot and existing spare CPU. This prevents the
+general queue from occupying all memory while a commit build or publication
+waits. The extra queues share the existing 32-vCPU general-pool cap.
