@@ -102,17 +102,13 @@
    "path": "research/la_engines_20261014/summary.json",
    "sha256": "b34650a95c5f106c8302dc5311194d8e1ffb798dff59b2669cda59818712f533"
   },
-  "sixsum_resolvent": {
-   "path": "research/ic_techniques_20261012/sixsum_extraction/resolvent_summary.json",
-   "sha256": "307771287ae195218cc671c3082c52d32f3b32ac0263a702f097157ff54c7ede"
+  "pair_table_setup": {
+   "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
+   "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
   },
-  "wide_producer": {
-   "path": "benchmarks/20261018-wide-producer-engineering/summary.json",
-   "sha256": "1f63f91e5f62cc4393dff6ee203b0562f3b9e92d98f45df24c9ae2777e1b3e40"
-  },
-  "f4_gf2_port": {
-   "path": "benchmarks/20261018-f4-gf2-port/summary.json",
-   "sha256": "a36b4262044654fb955277b5f68e5c3f69cc9677dcc7c62390225ef263fe543f"
+  "planner_validation": {
+   "path": "research/ic_planner_validation_20261020/analysis/summary.json",
+   "sha256": "c8fb751cea39e55ebd1b322245c95a958ae8b47d393c6b6918abddcd2d4234fc"
   },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -125,22 +121,6 @@
   "rho_optimization": {
    "path": "research/ecbench_rho_optimized_20261014/RESULT.json",
    "sha256": "195f3c4e3565dc2669769893b86741cc58d95c982190f77a0052c70b7f847cf9"
-  },
-  "n83_precomp_rho_k600_run1": {
-   "path": "research/20261016-n83-precomputed-rho-control/records/run-38855595549/k600/analysis.json",
-   "sha256": "5eff3fd1336881afc098054cdd5242297402db32b4c704e689eb838d2d6921d1"
-  },
-  "n83_precomp_rho_k600_run2": {
-   "path": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k600/analysis.json",
-   "sha256": "2cafd393386abcbcece6da1c16ea976b89e46ad60e60dd0bd32325fb5bd45423"
-  },
-  "n83_precomp_rho_k3300_run2": {
-   "path": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k3300/analysis.json",
-   "sha256": "fc4981fe5e7a99ca3a5c0440506f704e25bd47fe4dfdf96afc76fed303710d68"
-  },
-  "pair_table_setup": {
-   "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
-   "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
   },
   "jv_sieve_strong_rho": {
    "path": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
@@ -159,6 +139,13 @@
    "sha256": "d746982903f0f87aada3b0db349dab6a8ffe285c4a1bd16553c41c0273f80fba"
   }
  },
+ "validation_gate": {
+  "rule": "AGENTS.md, Validation gate (owner, 2026-10-19)",
+  "schema": "validation-gate/v1",
+  "status_counts": {
+   "unvalidated (pre-gate)": 28
+  }
+ },
  "families": {
   "A": {
    "title": "Koblitz, one target",
@@ -175,8 +162,6 @@
    "unit_short": "batched-addition units",
    "ref_short": "one-target rho",
    "rows": 6,
-   "gae_rows": 0,
-   "gae_unpinned_rows": 0,
    "canonical_step_units": [
     4.60273174732,
     5.39421535943
@@ -202,8 +187,6 @@
    "unit_short": "GAE",
    "ref_short": "matched negation-map rho",
    "rows": 13,
-   "gae_rows": 13,
-   "gae_unpinned_rows": 0,
    "canonical_step_units": null,
    "rho_step_units_as_built": null
   },
@@ -222,8 +205,6 @@
    "unit_short": "batched-addition units, per target",
    "ref_short": "32-target batch rho",
    "rows": 9,
-   "gae_rows": 0,
-   "gae_unpinned_rows": 0,
    "canonical_step_units": [
     1.79795983513,
     2.29989035767
@@ -536,28 +517,14 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
-   "gae_pin": {
-    "priced_in_gae": true,
-    "unpinned": false,
-    "pinned": [
-     "ns_per_double",
-     "ns_per_lookup",
-     "ns_per_row_op",
-     "ns_per_sqrt",
-     "ns_per_word_xor",
-     "ns_per_legendre",
-     "ns_per_inversion"
-    ],
-    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
-   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_fp10_t5_192cb216",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 10,
@@ -565,7 +532,14 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "docs/ic/runs",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -814,28 +788,14 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
-   "gae_pin": {
-    "priced_in_gae": true,
-    "unpinned": false,
-    "pinned": [
-     "ns_per_double",
-     "ns_per_lookup",
-     "ns_per_row_op",
-     "ns_per_sqrt",
-     "ns_per_word_xor",
-     "ns_per_legendre",
-     "ns_per_inversion"
-    ],
-    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
-   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_fp12_t19_d4a315df",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 32,
@@ -843,7 +803,14 @@
     "variant": "mitm_m2_negfold_walk",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "docs/ic/runs",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -1092,28 +1059,14 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
-   "gae_pin": {
-    "priced_in_gae": true,
-    "unpinned": false,
-    "pinned": [
-     "ns_per_double",
-     "ns_per_lookup",
-     "ns_per_row_op",
-     "ns_per_sqrt",
-     "ns_per_word_xor",
-     "ns_per_legendre",
-     "ns_per_inversion"
-    ],
-    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
-   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_fp14_tm43_158b6914",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 26,
@@ -1121,7 +1074,14 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "docs/ic/runs",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -1370,28 +1330,14 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
-   "gae_pin": {
-    "priced_in_gae": true,
-    "unpinned": false,
-    "pinned": [
-     "ns_per_double",
-     "ns_per_lookup",
-     "ns_per_row_op",
-     "ns_per_sqrt",
-     "ns_per_word_xor",
-     "ns_per_legendre",
-     "ns_per_inversion"
-    ],
-    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
-   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_fp16_t351_d433f24e",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 40,
@@ -1399,7 +1345,14 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "docs/ic/runs",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -1648,28 +1601,14 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
-   "gae_pin": {
-    "priced_in_gae": true,
-    "unpinned": false,
-    "pinned": [
-     "ns_per_double",
-     "ns_per_lookup",
-     "ns_per_row_op",
-     "ns_per_sqrt",
-     "ns_per_word_xor",
-     "ns_per_legendre",
-     "ns_per_inversion"
-    ],
-    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
-   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_fp18_t175_45770ebc",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 64,
@@ -1677,7 +1616,14 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "docs/ic/runs",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -1926,28 +1872,14 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
-   "gae_pin": {
-    "priced_in_gae": true,
-    "unpinned": false,
-    "pinned": [
-     "ns_per_double",
-     "ns_per_lookup",
-     "ns_per_row_op",
-     "ns_per_sqrt",
-     "ns_per_word_xor",
-     "ns_per_legendre",
-     "ns_per_inversion"
-    ],
-    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
-   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_fp20_t1293_3c2999ba",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 102,
@@ -1955,7 +1887,14 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "docs/ic/runs",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -2204,28 +2143,14 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
-   "gae_pin": {
-    "priced_in_gae": true,
-    "unpinned": false,
-    "pinned": [
-     "ns_per_double",
-     "ns_per_lookup",
-     "ns_per_row_op",
-     "ns_per_sqrt",
-     "ns_per_word_xor",
-     "ns_per_legendre",
-     "ns_per_inversion"
-    ],
-    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
-   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_fp22_tm1267_a5acaf6d",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 148,
@@ -2233,7 +2158,14 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "docs/ic/runs",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -2482,28 +2414,14 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
-   "gae_pin": {
-    "priced_in_gae": true,
-    "unpinned": false,
-    "pinned": [
-     "ns_per_double",
-     "ns_per_lookup",
-     "ns_per_row_op",
-     "ns_per_sqrt",
-     "ns_per_word_xor",
-     "ns_per_legendre",
-     "ns_per_inversion"
-    ],
-    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
-   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_fp24_t1577_77336155",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 222,
@@ -2511,7 +2429,14 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "docs/ic/runs",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -2714,28 +2639,14 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
-   "gae_pin": {
-    "priced_in_gae": true,
-    "unpinned": false,
-    "pinned": [
-     "ns_per_double",
-     "ns_per_lookup",
-     "ns_per_row_op",
-     "ns_per_as_solve",
-     "ns_per_s4_pair",
-     "ns_per_word_xor",
-     "ns_per_frobenius"
-    ],
-    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
-   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m15_t131_ed7256f0",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 30,
@@ -2743,7 +2654,14 @@
     "variant": "mitm_m2_negfold_walk",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "docs/ic/runs",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -2946,28 +2864,14 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
-   "gae_pin": {
-    "priced_in_gae": true,
-    "unpinned": false,
-    "pinned": [
-     "ns_per_double",
-     "ns_per_lookup",
-     "ns_per_row_op",
-     "ns_per_as_solve",
-     "ns_per_s4_pair",
-     "ns_per_word_xor",
-     "ns_per_frobenius"
-    ],
-    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
-   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m18_t393_d2c04152",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 30,
@@ -2975,7 +2879,14 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "docs/ic/runs",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -3178,28 +3089,14 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
-   "gae_pin": {
-    "priced_in_gae": true,
-    "unpinned": false,
-    "pinned": [
-     "ns_per_double",
-     "ns_per_lookup",
-     "ns_per_row_op",
-     "ns_per_as_solve",
-     "ns_per_s4_pair",
-     "ns_per_word_xor",
-     "ns_per_frobenius"
-    ],
-    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
-   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m21_t2591_de54d72e",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 62,
@@ -3207,7 +3104,14 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "docs/ic/runs",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -3410,28 +3314,14 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
-   "gae_pin": {
-    "priced_in_gae": true,
-    "unpinned": false,
-    "pinned": [
-     "ns_per_double",
-     "ns_per_lookup",
-     "ns_per_row_op",
-     "ns_per_as_solve",
-     "ns_per_s4_pair",
-     "ns_per_word_xor",
-     "ns_per_frobenius"
-    ],
-    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
-   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m24_tm3047_2d0c0e8c",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 134,
@@ -3439,7 +3329,14 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "docs/ic/runs",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -3642,28 +3539,14 @@
    "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
    "round": "Round 5 (2026-09-22), reference §18 (2026-09-23)",
    "class": "accounting",
-   "gae_pin": {
-    "priced_in_gae": true,
-    "unpinned": false,
-    "pinned": [
-     "ns_per_double",
-     "ns_per_lookup",
-     "ns_per_row_op",
-     "ns_per_as_solve",
-     "ns_per_s4_pair",
-     "ns_per_word_xor",
-     "ns_per_frobenius"
-    ],
-    "record": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json instances[].calibration_pinned.pinned"
-   },
    "family": "B",
    "curve_record": {
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m27_t12543_569dca8b",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 254,
@@ -3671,7 +3554,14 @@
     "variant": "mitm_m2_negfold_walk_balanced",
     "source": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "docs/ic/runs",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -3765,11 +3655,6 @@
    },
    "source": "research/ic_tool_program/rule/v3/analysis.json",
    "before_source": "research/ic_single_target_20260930/analysis.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
    "class": "accounting",
    "family": "A",
@@ -3777,9 +3662,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m47_t22705043_f4e44623",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 5264,
@@ -3787,7 +3672,14 @@
     "variant": "koblitz_one_target",
     "source": "research/ic_tool_program/rule/v3/analysis.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_tool_program/rule/v3",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -3881,11 +3773,6 @@
    },
    "source": "research/ic_tool_program/rule/v3/analysis.json",
    "before_source": "research/ic_single_target_20260930/analysis.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
    "class": "accounting",
    "family": "A",
@@ -3893,9 +3780,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m57_tm747311035_c1f545af",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 7296,
@@ -3903,7 +3790,14 @@
     "variant": "koblitz_one_target",
     "source": "research/ic_tool_program/rule/v3/analysis.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_tool_program/rule/v3",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -3997,11 +3891,6 @@
    },
    "source": "research/ic_tool_program/rule/v3/analysis.json",
    "before_source": "research/ic_single_target_20260930/analysis.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
    "class": "accounting",
    "family": "A",
@@ -4009,9 +3898,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m41_tm2308219_7f48b14a",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 6560,
@@ -4019,7 +3908,14 @@
     "variant": "koblitz_one_target",
     "source": "research/ic_tool_program/rule/v3/analysis.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_tool_program/rule/v3",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -4113,11 +4009,6 @@
    },
    "source": "research/ic_tool_program/rule/v3/analysis.json",
    "before_source": "research/ic_single_target_20260930/analysis.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
    "class": "accounting",
    "family": "A",
@@ -4125,9 +4016,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m53_tm56619371_dac20a85",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 27984,
@@ -4135,7 +4026,14 @@
     "variant": "koblitz_one_target",
     "source": "research/ic_tool_program/rule/v3/analysis.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_tool_program/rule/v3",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -4229,11 +4127,6 @@
    },
    "source": "research/ic_tool_program/rule/v3/analysis.json",
    "before_source": "research/ic_single_target_20260930/analysis.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
    "class": "accounting",
    "family": "A",
@@ -4241,9 +4134,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m59_tm943548413_98844ecc",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 30208,
@@ -4251,7 +4144,14 @@
     "variant": "koblitz_one_target",
     "source": "research/ic_tool_program/rule/v3/analysis.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_tool_program/rule/v3",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -4345,11 +4245,6 @@
    },
    "source": "research/ic_tool_program/rule/v3/analysis.json",
    "before_source": "research/ic_single_target_20260930/analysis.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "rule v3: §23's comparison at baseline v3 (2026-10-06); before marks §23 (2026-09-30)",
    "class": "accounting",
    "family": "A",
@@ -4357,9 +4252,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m61_t158598901_ab42b6c5",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 39040,
@@ -4367,7 +4262,14 @@
     "variant": "koblitz_one_target",
     "source": "research/ic_tool_program/rule/v3/analysis.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_tool_program/rule/v3",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -4476,11 +4378,6 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -4488,9 +4385,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m19_tm797_9c54981b",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 304,
@@ -4498,7 +4395,14 @@
     "variant": "koblitz_collection_m3_aimed",
     "source": "research/ic_descent_20260930/analysis-isolated.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_descent_20260930",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -4607,11 +4511,6 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -4619,9 +4518,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m23_tm5197_1f85e9e1",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 368,
@@ -4629,7 +4528,14 @@
     "variant": "koblitz_collection_m3_aimed",
     "source": "research/ic_descent_20260930/analysis-isolated.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_descent_20260930",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -4738,11 +4644,6 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -4750,9 +4651,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m45_tm6236725_40939294",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 720,
@@ -4760,7 +4661,14 @@
     "variant": "koblitz_collection_m3_aimed",
     "source": "research/ic_descent_20260930/analysis-isolated.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_descent_20260930",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -4869,11 +4777,6 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -4881,9 +4784,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m37_tm534059_32aad96b",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 592,
@@ -4891,7 +4794,14 @@
     "variant": "koblitz_collection_m3_aimed",
     "source": "research/ic_descent_20260930/analysis-isolated.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_descent_20260930",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -5000,11 +4910,6 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -5012,9 +4917,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m43_tm998717_e2e742b0",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 1376,
@@ -5022,7 +4927,14 @@
     "variant": "koblitz_collection_m3_aimed",
     "source": "research/ic_descent_20260930/analysis-isolated.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_descent_20260930",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -5131,11 +5043,6 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -5143,9 +5050,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m47_t22705043_f4e44623",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 5264,
@@ -5153,7 +5060,14 @@
     "variant": "koblitz_collection_m3_aimed",
     "source": "research/ic_descent_20260930/analysis-isolated.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_descent_20260930",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -5262,11 +5176,6 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -5274,9 +5183,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m41_tm2308219_7f48b14a",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 6560,
@@ -5284,7 +5193,14 @@
     "variant": "koblitz_collection_m3_aimed",
     "source": "research/ic_descent_20260930/analysis-isolated.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_descent_20260930",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -5393,11 +5309,6 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -5405,9 +5316,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m53_tm56619371_dac20a85",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 27984,
@@ -5415,7 +5326,14 @@
     "variant": "koblitz_collection_m3_aimed",
     "source": "research/ic_descent_20260930/analysis-isolated.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_descent_20260930",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   },
   {
@@ -5524,11 +5442,6 @@
     "verified": true
    },
    "source": "research/ic_descent_20260930/analysis-isolated.json",
-   "gae_pin": {
-    "priced_in_gae": false,
-    "unpinned": false,
-    "pinned": null
-   },
    "round": "§22 isolated re-run (2026-09-30); before marks §21 and §22's baseline on main",
    "class": "engineering",
    "family": "C",
@@ -5536,9 +5449,9 @@
     "registry": "docs/curves/registry.json",
     "schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
-    "curves_yaml_key": "icv1_f2m61_t158598901_ab42b6c5",
+    "curves_yaml_key": null,
     "factor_base_refs": [],
-    "factor_base_link_status": "not_reconciled"
+    "factor_base_link_status": "no_curves_yaml_record"
    },
    "factor_base": {
     "points": 39040,
@@ -5546,7 +5459,14 @@
     "variant": "koblitz_collection_m3_aimed",
     "source": "research/ic_descent_20260930/analysis-isolated.json",
     "refs": [],
-    "link_status": "not_reconciled"
+    "link_status": "no_curves_yaml_record"
+   },
+   "validation": {
+    "status": "unvalidated (pre-gate)",
+    "evidence_dir": "research/ic_descent_20260930",
+    "reasons": [
+     "VALIDATION.json is missing"
+    ]
    }
   }
  ],
@@ -7859,9 +7779,6 @@
    "targets": 64,
    "setup_seconds_approx": 28.0,
    "status": "superseded (empty-table rho)",
-   "precomputed_rho": {
-    "status": "not run: no Bernstein-Lange precomputed-rho control exists for the n61 instance"
-   },
    "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B row 108.1: ratio is against rho with an empty distinguished-point table; Bernstein-Lange rho at equal advice is 53-317x faster online (benchmarks row 20261014-ic-next10-09-equal-advice). Cold ratio unaffected."
   },
   "exploratory_online": {
@@ -7872,86 +7789,7 @@
    "setup_inclusive_class": "diagnostic: complete IC process divided by reported rho online time; not a matched cold ratio",
    "first_integer_break_even_under_model": 306,
    "status": "superseded (empty-table rho)",
-   "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B rows 108.1 and 110.1: empty-table rho, one target, L0 shared host; precomputed-table rho wins every N83 matched pair (benchmarks row 20261016-n83-precomputed-rho-control). Within-IC K1798 vs K1500 comparison unaffected.",
-   "precomputed_rho": {
-    "status": "not run for K1798: the n83 control measured K3300 and K600, a different factor base and a different run, so neither is a matched reference for this row"
-   }
-  },
-  "precomputed_rho_control": {
-   "readme": "research/20261016-n83-precomputed-rho-control/README.md",
-   "rows": [
-    {
-     "k": "K3300",
-     "arm": "(a') table walks = IC setup wall, 1 thread",
-     "source": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k3300/analysis.json",
-     "ic_median_ms": 32.78367,
-     "precomputed_rho_median_ms": 8.113225,
-     "ic_over_precomputed_rho": 3.74397251134,
-     "ci95": [
-      2.65110714379,
-      11.0466601892
-     ],
-     "targets": 16
-    },
-    {
-     "k": "K3300",
-     "arm": "(b) table = IC max RSS",
-     "source": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k3300/analysis.json",
-     "ic_median_ms": 32.78367,
-     "precomputed_rho_median_ms": 1.166846,
-     "ic_over_precomputed_rho": 40.6069049775,
-     "ci95": [
-      24.2694988488,
-      71.7150779186
-     ],
-     "targets": 16
-    },
-    {
-     "k": "K600",
-     "arm": "(a') table walks = IC setup wall, 1 thread",
-     "source": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k600/analysis.json",
-     "ic_median_ms": 563.8835245,
-     "precomputed_rho_median_ms": 5.171888,
-     "ic_over_precomputed_rho": 81.5222228726,
-     "ci95": [
-      46.3507359086,
-      236.590887956
-     ],
-     "targets": 16
-    },
-    {
-     "k": "K600",
-     "arm": "(a) 650 s table walks <= IC setup wall",
-     "source": "research/20261016-n83-precomputed-rho-control/records/run-38855595549/k600/analysis.json",
-     "ic_median_ms": 580.2756445,
-     "precomputed_rho_median_ms": 3.3333905,
-     "ic_over_precomputed_rho": 214.7322697,
-     "ci95": [
-      47.9380691924,
-      483.837096224
-     ],
-     "targets": 16
-    },
-    {
-     "k": "K600",
-     "arm": "(b) table = IC max RSS",
-     "source": "research/20261016-n83-precomputed-rho-control/records/run-38878565324/k600/analysis.json",
-     "ic_median_ms": 563.8835245,
-     "precomputed_rho_median_ms": 1.189073,
-     "ic_over_precomputed_rho": 395.530825225,
-     "ci95": [
-      177.934097024,
-      1134.45033434
-     ],
-     "targets": 16
-    }
-   ],
-   "range": [
-    3.74397251134,
-    395.530825225
-   ],
-   "direction": "IC online / precomputed-rho online, median of paired per-target ratios; above 1 means precomputed rho is faster online",
-   "scope": "Neither factor base is the K1798 instance of the frontier-audit row"
+   "correction": "Corrected 2026-10-20 by validation sweep (verdict: contradicted), sweep-B rows 108.1 and 110.1: empty-table rho, one target, L0 shared host; precomputed-table rho wins every N83 matched pair (benchmarks row 20261016-n83-precomputed-rho-control). Within-IC K1798 vs K1500 comparison unaffected."
   },
   "replay_block": {
    "identical": 120,
@@ -8504,7 +8342,7 @@
   "yaml": "docs/curves/ic/curves.yaml",
   "yaml_records": 27,
   "board_curves": 24,
-  "board_curves_in_yaml": 24,
+  "board_curves_in_yaml": 0,
   "board_curves_factor_base_reconciled": 0
  },
  "exponents": {
@@ -8817,8 +8655,8 @@
     "K_0/F_2^13"
    ],
    "on_board": false,
-   "curves_yaml_key": "toy13_kb1",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m13-tm181-25e736d2",
@@ -8998,8 +8836,8 @@
     "K_1/2^19"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m19_tm797_9c54981b",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m21-t2795-26779965",
@@ -9059,8 +8897,8 @@
     "K_1/F_2^23"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m23_tm5197_1f85e9e1",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m23-tm5197-a023238e",
@@ -9275,8 +9113,8 @@
     "K_0/F_2^37"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m37_tm534059_32aad96b",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m39-t1481485-829ef1d1",
@@ -9317,8 +9155,8 @@
     "K_0/F_2^41"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m41_tm2308219_7f48b14a",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m43-tm998717-e2e742b0",
@@ -9338,8 +9176,8 @@
     "K_1/F_2^43"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m43_tm998717_e2e742b0",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m45-tm6236725-40939294",
@@ -9359,8 +9197,8 @@
     "K_1/F_2^45"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m45_tm6236725_40939294",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m47-t22705043-f4e44623",
@@ -9380,8 +9218,8 @@
     "K_1/F_2^47"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m47_t22705043_f4e44623",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m53-tm56619371-dac20a85",
@@ -9401,8 +9239,8 @@
     "K_0/F_2^53"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m53_tm56619371_dac20a85",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m57-tm747311035-c1f545af",
@@ -9422,8 +9260,8 @@
     "K_0/F_2^57"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m57_tm747311035_c1f545af",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m59-tm943548413-98844ecc",
@@ -9443,8 +9281,8 @@
     "K_1/F_2^59"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m59_tm943548413_98844ecc",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m61-t158598901-ab42b6c5",
@@ -9464,8 +9302,8 @@
     "K_0/F_2^61"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m61_t158598901_ab42b6c5",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m67-tm19346764963-82c84cca",
@@ -9713,8 +9551,8 @@
     "K_0/2^131"
    ],
    "on_board": false,
-   "curves_yaml_key": "ecc2k130_pb",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m137-t574016314927011818501-11ceb4d6",
@@ -10158,8 +9996,8 @@
     "random-binary-n15-b524b"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m15_t131_ed7256f0",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m15-t5-d9fb183e",
@@ -10446,8 +10284,8 @@
     "random-binary-n18-b6507"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m18_t393_d2c04152",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m19-t121-4ae443c4",
@@ -10644,8 +10482,8 @@
     "random-binary-n21-b1b6f3b"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m21_t2591_de54d72e",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m21-t2845-e2683765",
@@ -10824,8 +10662,8 @@
     "random-binary-n24-b5fc9da"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m24_tm3047_2d0c0e8c",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m25-t4775-4830dca7",
@@ -10878,8 +10716,8 @@
     "random-binary-n27-b845462"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_f2m27_t12543_569dca8b",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-f2m27-t20811-3d0fd5a1",
@@ -11984,8 +11822,8 @@
     "bench-10bit"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_fp10_t5_192cb216",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-fp12-tm53-6c9ff4bb",
@@ -12020,8 +11858,8 @@
     "bench-12bit"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_fp12_t19_d4a315df",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-fp14-tm31-68b86b70",
@@ -12088,8 +11926,8 @@
     "bench-14bit"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_fp14_tm43_158b6914",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-fp16-t177-f6096508",
@@ -12362,8 +12200,8 @@
     "bench-16bit"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_fp16_t351_d433f24e",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-fp17-t121-95219f0d",
@@ -12472,8 +12310,8 @@
     "bench-18bit"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_fp18_t175_45770ebc",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-fp19-t241-08557336",
@@ -12866,8 +12704,8 @@
     "bench-20bit"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_fp20_t1293_3c2999ba",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-fp20-t383-4f71b2c3",
@@ -13424,8 +13262,8 @@
     "generated-22bit-3290411"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_fp22_tm1267_a5acaf6d",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-fp22-t285-9fc7e3e5",
@@ -14404,8 +14242,8 @@
     "generated-24bit-10935329"
    ],
    "on_board": true,
-   "curves_yaml_key": "icv1_fp24_t1577_77336155",
-   "factor_base_link_status": "not_reconciled"
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
   },
   {
    "slug": "icv1-fp24-t2705-27cbb01b",
@@ -49819,398 +49657,6 @@
   "report": "research/la_engines_20261014/REPORT.pdf",
   "class": "engineering"
  },
- "sixsum_resolvent_component": {
-  "schema": "crypto.sixsum_s4_resolvent_summary/v1",
-  "class": "engineering",
-  "claim_scope": "n=41 Koblitz K_0, K=10 and 20, seed 20261012, 32 verified relations per cell, shared host (load ~2). No end-to-end S, no rho comparison, no key-recovery claim.",
-  "before": "2026-10-12 verdict: one S4 root solve 20-60 S3 (Berlekamp split), B2 1-8x more S3-work than the 4-sum",
-  "sources": [
-   "raw_resolvent_20261018/n41_k10_k20_split.json",
-   "raw_resolvent_20261018/n41_k10_k20_resolvent.json"
-  ],
-  "solver_cost_n41": {
-   "from_resolvent_run": {
-    "ns_s3_crate": 372.608083333,
-    "ns_s3_table": 186.872541667,
-    "ns_s4_build": 32.4666666667,
-    "ns_roots_split": 10150.762,
-    "ns_roots_resolvent": 649.407666667,
-    "resolvent_in_s3_wall": 1.74287058095,
-    "split_in_s3_wall": 27.2424632047,
-    "resolvent_in_s3_ops": 2.25108763672,
-    "split_in_s3_ops": 26.4926143671,
-    "ops_roots_split": {
-     "mul": 1710,
-     "sqr": 395,
-     "inv": 7,
-     "half_trace": 0,
-     "trace": 0,
-     "sqrt": 0
-    },
-    "ops_roots_resolvent": {
-     "mul": 70,
-     "sqr": 49,
-     "inv": 2,
-     "half_trace": 3,
-     "trace": 4,
-     "sqrt": 1
-    },
-    "resolvent_fallbacks": 0,
-    "solvers_disagree": 0,
-    "quartics": 3000
-   },
-   "from_split_run": {
-    "ns_s3_crate": 353.5685,
-    "ns_s3_table": 179.429708333,
-    "ns_s4_build": 30.1566666667,
-    "ns_roots_split": 9542.16933333,
-    "ns_roots_resolvent": 611.084666667,
-    "resolvent_in_s3_wall": 1.72833458486,
-    "split_in_s3_wall": 26.9881772085,
-    "resolvent_in_s3_ops": 2.18792025763,
-    "split_in_s3_ops": 26.4989740419,
-    "ops_roots_split": {
-     "mul": 1710,
-     "sqr": 395,
-     "inv": 7,
-     "half_trace": 0,
-     "trace": 0,
-     "sqrt": 0
-    },
-    "ops_roots_resolvent": {
-     "mul": 70,
-     "sqr": 49,
-     "inv": 2,
-     "half_trace": 3,
-     "trace": 4,
-     "sqrt": 1
-    },
-    "resolvent_fallbacks": 0,
-    "solvers_disagree": 0,
-    "quartics": 3000
-   }
-  },
-  "cells": [
-   {
-    "columns": 10,
-    "wall_s_per_relation": {
-     "4sum": 2.37265885778,
-     "b2_split": 3.89447233934,
-     "b2_resolvent": 0.349834808906
-    },
-    "s3_solves_per_relation_4sum": 5215058.71875,
-    "s4_solves_per_relation_b2": 370988.75,
-    "s4_solves_per_relation_b2_split_run": 370988.75,
-    "s3_equivalents_per_relation_wall": {
-     "4sum": 5215058.71875,
-     "b2_split": 10043952.607,
-     "b2_resolvent": 678910.946637
-    },
-    "relations": {
-     "4sum": 32,
-     "b2_split": 32,
-     "b2_resolvent": 32
-    },
-    "s4_fallbacks": 0
-   },
-   {
-    "columns": 20,
-    "wall_s_per_relation": {
-     "4sum": 0.474860922844,
-     "b2_split": 1.34079327597,
-     "b2_resolvent": 0.127945998719
-    },
-    "s3_solves_per_relation_4sum": 1009433.5625,
-    "s4_solves_per_relation_b2": 132122.0625,
-    "s4_solves_per_relation_b2_split_run": 132122.0625,
-    "s3_equivalents_per_relation_wall": {
-     "4sum": 1009433.5625,
-     "b2_split": 3577002.62903,
-     "b2_resolvent": 241783.920735
-    },
-    "relations": {
-     "4sum": 32,
-     "b2_split": 32,
-     "b2_resolvent": 32
-    },
-    "s4_fallbacks": 0
-   }
-  ],
-  "study": "research/ic_techniques_20261012/sixsum_extraction/",
-  "report": "research/ic_techniques_20261012/sixsum_extraction/REPORT_resolvent.pdf"
- },
- "wide_producer_component": {
-  "schema": "crypto.wide_producer_engineering/v1",
-  "date": "2026-10-18",
-  "class": "engineering",
-  "claim": "no end-to-end S claim, no rho claim; wall time of two stages of the wide (64 < n <= 127) relation producer, same binary, interleaved A/B",
-  "binary_source": "examples/koblitz_orbit_dlp_fast.rs",
-  "n": 73,
-  "scan_ns_per_probe": [
-   {
-    "k": 40,
-    "states_cap": 40000,
-    "source": "benchmarks/20261018-wide-producer-engineering/scan_k40.json",
-    "arms": {
-     "control": {
-      "median": 416.974,
-      "min": 414.268,
-      "max": 424.665,
-      "repeats": 5,
-      "ratio_to_control": 1.0
-     },
-     "lazy_canon": {
-      "median": 209.88,
-      "min": 202.99,
-      "max": 223.131,
-      "repeats": 5,
-      "ratio_to_control": 0.503
-     },
-     "prefetch": {
-      "median": 401.731,
-      "min": 374.949,
-      "max": 456.492,
-      "repeats": 5,
-      "ratio_to_control": 0.963
-     },
-     "all_three": {
-      "median": 216.989,
-      "min": 204.471,
-      "max": 244.976,
-      "repeats": 5,
-      "ratio_to_control": 0.52
-     }
-    },
-    "hits": 0
-   },
-   {
-    "k": 300,
-    "states_cap": 20000,
-    "source": "benchmarks/20261018-wide-producer-engineering/scan_k300.json",
-    "arms": {
-     "control": {
-      "median": 614.454,
-      "min": 559.287,
-      "max": 684.566,
-      "repeats": 5,
-      "ratio_to_control": 1.0
-     },
-     "lazy_canon": {
-      "median": 366.982,
-      "min": 349.307,
-      "max": 416.867,
-      "repeats": 5,
-      "ratio_to_control": 0.597
-     },
-     "prefetch": {
-      "median": 434.748,
-      "min": 386.822,
-      "max": 485.768,
-      "repeats": 5,
-      "ratio_to_control": 0.708
-     },
-     "all_three": {
-      "median": 225.573,
-      "min": 216.695,
-      "max": 250.483,
-      "repeats": 5,
-      "ratio_to_control": 0.367
-     }
-    },
-    "hits": 0
-   },
-   {
-    "k": 600,
-    "states_cap": 20000,
-    "source": "benchmarks/20261018-wide-producer-engineering/scan_k600.json",
-    "arms": {
-     "control": {
-      "median": 621.597,
-      "min": 583.105,
-      "max": 653.488,
-      "repeats": 5,
-      "ratio_to_control": 1.0
-     },
-     "lazy_canon": {
-      "median": 382.683,
-      "min": 372.011,
-      "max": 433.082,
-      "repeats": 5,
-      "ratio_to_control": 0.616
-     },
-     "prefetch": {
-      "median": 441.592,
-      "min": 422.228,
-      "max": 459.511,
-      "repeats": 5,
-      "ratio_to_control": 0.71
-     },
-     "all_three": {
-      "median": 234.967,
-      "min": 223.425,
-      "max": 302.984,
-      "repeats": 5,
-      "ratio_to_control": 0.378
-     }
-    },
-    "hits": 0
-   }
-  ],
-  "scan_control": "KIC_LAZY_CANON=0 KIC_PREFETCH=0",
-  "scan_all_switches": "KIC_LAZY_CANON=1 KIC_PREFETCH=1 KIC_BLOCKED_BLOOM=1 (lazy + prefetch alone: 232.8 vs 226.7 at K=300, same set)",
-  "index_build_seconds": [
-   {
-    "k": 300,
-    "source": "benchmarks/20261018-wide-producer-engineering/index_k300.json",
-    "arms": {
-     "serial": {
-      "median": 14.596,
-      "min": 14.392,
-      "max": 15.815,
-      "repeats": 3,
-      "ratio_to_serial": 1.0
-     },
-     "batch_inv_1thread": {
-      "median": 8.506,
-      "min": 8.213,
-      "max": 12.451,
-      "repeats": 3,
-      "ratio_to_serial": 0.583
-     },
-     "threads_only": {
-      "median": 5.825,
-      "min": 5.789,
-      "max": 6.396,
-      "repeats": 3,
-      "ratio_to_serial": 0.399
-     },
-     "threads_batch_inv": {
-      "median": 5.557,
-      "min": 4.848,
-      "max": 5.855,
-      "repeats": 3,
-      "ratio_to_serial": 0.381
-     }
-    }
-   },
-   {
-    "k": 600,
-    "source": "benchmarks/20261018-wide-producer-engineering/index_k600.json",
-    "arms": {
-     "serial": {
-      "median": 66.377,
-      "min": 60.61,
-      "max": 72.144,
-      "repeats": 2,
-      "ratio_to_serial": 1.0
-     },
-     "threads_batch_inv": {
-      "median": 29.13,
-      "min": 28.594,
-      "max": 29.665,
-      "repeats": 2,
-      "ratio_to_serial": 0.439
-     }
-    }
-   }
-  ],
-  "index_equality": "KIC_VERIFY_INDEX identical at K=150 (1,642,500 states, 1,642,050 table entries) for 4 threads + batch, 3 threads, batch alone; unit test at n=73 and symmetric n=83",
-  "e2e_identity": {
-   "spec": "construct:69:0:60",
-   "source": "benchmarks/20261018-wide-producer-engineering/e2e_n69_k60.txt",
-   "arms": 6,
-   "all_identical_to_control": true,
-   "rank_relations": 60,
-   "targets_solved": 8
-  },
-  "host": "unisolated shared 4-vCPU Xeon 2.80 GHz KVM guest, no PMU, load 3 to 6",
-  "caveats": [
-   "hits are 0 in every timed scan; the hit path is covered by the n=69 end-to-end run and unit tests",
-   "index rows: 3 repeats (K=300), 2 repeats (K=600); no A/A control",
-   "scan covers 20,000 to 40,000 states from the start of the state order",
-   "the 18,398 s of the landed n=73 K=600 run is the rank-stage wall; the serial index build is about 66 s"
-  ],
-  "report": "docs/ic/perf/WIDE_PRODUCER_ENGINEERING_20261018.md",
-  "commits": [
-   "21dccf843",
-   "0f831d70b"
-  ],
-  "study": "benchmarks/20261018-wide-producer-engineering/"
- },
- "f4_gf2_port_component": {
-  "schema": "crypto.f4_gf2_port/v1",
-  "date": "2026-10-18",
-  "class": "engineering",
-  "claim": "kernel level: no end-to-end S, no rho claim, all 20 timed draws undecided",
-  "commit": "5a0db28a4",
-  "n": 15,
-  "m": 3,
-  "ell": 5,
-  "degree": 4,
-  "n_vars": 30,
-  "draws": 20,
-  "arms": [
-   {
-    "key": "crate_full",
-    "label": "crate full readback (matrix_f4_f2_counted_with)",
-    "median_ms": 199.5,
-    "min_ms": 175.0,
-    "max_ms": 253.1,
-    "median_word_xors": 154963841,
-    "speedup_vs_crate_full": 1.0
-   },
-   {
-    "key": "crate_solver",
-    "label": "crate solver path (SolverEngine::MatrixF4 call)",
-    "median_ms": 396.7,
-    "min_ms": 368.9,
-    "max_ms": 420.7,
-    "median_word_xors": 64342540,
-    "speedup_vs_crate_full": 0.5
-   },
-   {
-    "key": "port_f5_on",
-    "label": "port decide, F5 on",
-    "median_ms": 35.6,
-    "min_ms": 33.5,
-    "max_ms": 55.7,
-    "median_word_xors": 57472744,
-    "speedup_vs_crate_full": 5.61
-   },
-   {
-    "key": "port_f5_off",
-    "label": "port decide, F5 off",
-    "median_ms": 40.1,
-    "min_ms": 37.5,
-    "max_ms": 85.5,
-    "median_word_xors": 68746716,
-    "speedup_vs_crate_full": 4.98
-   }
-  ],
-  "four_run_ranges": {
-   "port_f5_on_vs_crate_full": "5.6-6.0x",
-   "port_f5_on_vs_crate_solver": "10.4-11.2x"
-  },
-  "agreement": {
-   "koblitz_decomposition_comparisons": 160,
-   "refuted": 37,
-   "forced": 73,
-   "undecided": 50,
-   "dense_random_draws_per_degree": 20,
-   "checks": "rows bit-identical to matrix_f4_f2, decisions equal with F5 on and off, crate solver path decision equal"
-  },
-  "host": "4-vCPU KVM guest, Xeon 2.80 GHz, no PMU, shared (L0)",
-  "caveats": [
-   "kernel level: no end-to-end S, no rho claim",
-   "all 20 timed draws undecided, so the timing is a full degree-4 pass that finds nothing; decisive cases are covered by the agreement tests only",
-   "one cell and one degree; unisolated shared host",
-   "word-XOR counts are within 1.1x, so the gain is the rank-indexed build and absent readback, not the elimination",
-   "the port's counter is elimination only (F5 plan XORs not counted)",
-   "default SolverEngine unchanged"
-  ],
-  "report": "docs/ic/perf/F4_GF2_PORT_COMPARISON_20261018.md",
-  "study": "benchmarks/20261018-f4-gf2-port/"
- },
  "pair_table_component": {
   "schema": "ic_oracle_setup_blocked.result/v1",
   "curve": "icv1-fp32-t7319-90da43e9",
@@ -50476,6 +49922,596 @@
   ],
   "study": "research/ic_oracle_setup_blocked_20261020/",
   "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
+  "class": "engineering"
+ },
+ "planner_component": {
+  "rows": [
+   {
+    "tag": "r24",
+    "primary": true,
+    "curve": "icv1-fp24-tm5099-a6f137c6",
+    "log2_r": 24.0004370277,
+    "plan": {
+     "factor_base": "prime-abscissa:size=128",
+     "oracle": "mitm-prime-blocked:m=2",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "alternatives": [
+     {
+      "arm": "half-base",
+      "ops_ratio": 1.56104545835,
+      "ci95": [
+       1.35382880238,
+       1.76987089779
+      ],
+      "band_ratio": [
+       1.56104545835,
+       1.63062432238,
+       1.8968517227
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "double-base",
+      "ops_ratio": 1.50698313363,
+      "ci95": [
+       1.397423393,
+       1.64030305007
+      ],
+      "band_ratio": [
+       1.50698313363,
+       1.38466830351,
+       0.916658948911
+      ],
+      "verdict": "not separated across the band"
+     },
+     {
+      "arm": "rootfind",
+      "ops_ratio": 170.557363651,
+      "ci95": [
+       163.774297952,
+       176.023766193
+      ],
+      "band_ratio": [
+       170.557363651,
+       165.323302839,
+       145.296381979
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "full-rank",
+      "ops_ratio": 3.64139836056,
+      "ci95": [
+       3.2372107207,
+       4.14031432988
+      ],
+      "band_ratio": [
+       3.64139836056,
+       3.79277858158,
+       4.37199991936
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "random-targets",
+      "ops_ratio": 44.8492518944,
+      "ci95": [
+       38.9584162034,
+       50.6450271009
+      ],
+      "band_ratio": [
+       44.8492518944,
+       39.6262549541,
+       19.6416674384
+      ],
+      "verdict": "confirmed"
+     }
+    ],
+    "plan_over_rho": {
+     "ratio": 14.3904568961,
+     "ci95": [
+      11.6319321443,
+      18.4487260721
+     ]
+    },
+    "predicted_plan_over_rho": 12.2339566525,
+    "weights": [
+     0.0,
+     0.1,
+     1.0
+    ]
+   },
+   {
+    "tag": "r26",
+    "primary": true,
+    "curve": "icv1-fp26-tm1775-7e8fb6df",
+    "log2_r": 25.3461752358,
+    "plan": {
+     "factor_base": "prime-abscissa:size=175",
+     "oracle": "mitm-prime-blocked:m=2",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "alternatives": [
+     {
+      "arm": "half-base",
+      "ops_ratio": 1.54709508591,
+      "ci95": [
+       1.40798838882,
+       1.69113579293
+      ],
+      "band_ratio": [
+       1.54709508591,
+       1.61853691374,
+       1.89247817576
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "double-base",
+      "ops_ratio": 1.59549272431,
+      "ci95": [
+       1.49848060233,
+       1.69757383593
+      ],
+      "band_ratio": [
+       1.59549272431,
+       1.46861566525,
+       0.982109892118
+      ],
+      "verdict": "not separated across the band"
+     },
+     {
+      "arm": "rootfind",
+      "ops_ratio": 233.194953437,
+      "ci95": [
+       226.455589272,
+       239.474435888
+      ],
+      "band_ratio": [
+       233.194953437,
+       226.118916622,
+       198.986093821
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "full-rank",
+      "ops_ratio": 3.83856602755,
+      "ci95": [
+       3.43470869234,
+       4.21160231011
+      ],
+      "band_ratio": [
+       3.83856602755,
+       4.00242088241,
+       4.63071675742
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "random-targets",
+      "ops_ratio": 49.0955388101,
+      "ci95": [
+       43.7428627194,
+       53.9607556135
+      ],
+      "band_ratio": [
+       49.0955388101,
+       43.3897727383,
+       21.5112065528
+      ],
+      "verdict": "confirmed"
+     }
+    ],
+    "plan_over_rho": {
+     "ratio": 14.5570823042,
+     "ci95": [
+      11.1850657838,
+      19.5701635276
+     ]
+    },
+    "predicted_plan_over_rho": 14.4531973778,
+    "weights": [
+     0.0,
+     0.1,
+     1.0
+    ]
+   },
+   {
+    "tag": "r28",
+    "primary": true,
+    "curve": "icv1-fp28-t28201-65099091",
+    "log2_r": 27.999848126,
+    "plan": {
+     "factor_base": "prime-abscissa:size=323",
+     "oracle": "mitm-prime-blocked:m=2",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "alternatives": [
+     {
+      "arm": "half-base",
+      "ops_ratio": 1.43362047982,
+      "ci95": [
+       1.27724546767,
+       1.59523434039
+      ],
+      "band_ratio": [
+       1.43362047982,
+       1.49845864563,
+       1.74499789068
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "double-base",
+      "ops_ratio": 1.5676959954,
+      "ci95": [
+       1.48715834678,
+       1.67531950422
+      ],
+      "band_ratio": [
+       1.5676959954,
+       1.43541030886,
+       0.932410063818
+      ],
+      "verdict": "not separated across the band"
+     },
+     {
+      "arm": "rootfind",
+      "ops_ratio": 438.924240143,
+      "ci95": [
+       423.878997548,
+       450.398022023
+      ],
+      "band_ratio": [
+       438.924240143,
+       424.814974231,
+       371.166205442
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "full-rank",
+      "ops_ratio": 4.55816271878,
+      "ci95": [
+       4.10125899508,
+       5.11872885133
+      ],
+      "band_ratio": [
+       4.55816271878,
+       4.75655421556,
+       5.51091376953
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "random-targets",
+      "ops_ratio": 51.541742058,
+      "ci95": [
+       43.7929662192,
+       58.4758474158
+      ],
+      "band_ratio": [
+       51.541742058,
+       45.4584348755,
+       22.3273986802
+      ],
+      "verdict": "confirmed"
+     }
+    ],
+    "plan_over_rho": {
+     "ratio": 21.6790279329,
+     "ci95": [
+      17.0400728292,
+      28.2827019729
+     ]
+    },
+    "predicted_plan_over_rho": 20.0781734111,
+    "weights": [
+     0.0,
+     0.1,
+     1.0
+    ]
+   },
+   {
+    "tag": "c24",
+    "primary": false,
+    "curve": null,
+    "log2_r": 23.4737103319,
+    "plan": {
+     "factor_base": "prime-abscissa:size=113",
+     "oracle": "mitm-prime-blocked:m=2",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "alternatives": [
+     {
+      "arm": "half-base",
+      "ops_ratio": 1.53033476204,
+      "ci95": [
+       1.33354392791,
+       1.7645128807
+      ],
+      "band_ratio": [
+       1.53033476204,
+       1.59667896217,
+       1.85048561167
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "double-base",
+      "ops_ratio": 1.48894017562,
+      "ci95": [
+       1.37241233015,
+       1.65368159612
+      ],
+      "band_ratio": [
+       1.48894017562,
+       1.36947869096,
+       0.912466335635
+      ],
+      "verdict": "not separated across the band"
+     },
+     {
+      "arm": "rootfind",
+      "ops_ratio": 150.317166248,
+      "ci95": [
+       141.560752365,
+       156.339670379
+      ],
+      "band_ratio": [
+       150.317166248,
+       145.705209933,
+       128.061690565
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "full-rank",
+      "ops_ratio": 3.30166196882,
+      "ci95": [
+       2.96733291161,
+       3.67890338495
+      ],
+      "band_ratio": [
+       3.30166196882,
+       3.43343170228,
+       3.93753054565
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "random-targets",
+      "ops_ratio": 41.4706116175,
+      "ci95": [
+       35.2486029786,
+       48.2789476525
+      ],
+      "band_ratio": [
+       41.4706116175,
+       36.6429712946,
+       18.1743302854
+      ],
+      "verdict": "confirmed"
+     }
+    ],
+    "plan_over_rho": {
+     "ratio": 12.56004526,
+     "ci95": [
+      9.74560521317,
+      16.4553125884
+     ]
+    },
+    "predicted_plan_over_rho": 11.4612107091,
+    "weights": [
+     0.0,
+     0.1,
+     1.0
+    ]
+   },
+   {
+    "tag": "c28",
+    "primary": false,
+    "curve": null,
+    "log2_r": 27.6916043026,
+    "plan": {
+     "factor_base": "prime-abscissa:size=300",
+     "oracle": "mitm-prime-blocked:m=2",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "alternatives": [
+     {
+      "arm": "half-base",
+      "ops_ratio": 1.47452119613,
+      "ci95": [
+       1.34119585169,
+       1.61322545711
+      ],
+      "band_ratio": [
+       1.47452119613,
+       1.53953551266,
+       1.78486439126
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "double-base",
+      "ops_ratio": 1.54380433259,
+      "ci95": [
+       1.43821821991,
+       1.68464820617
+      ],
+      "band_ratio": [
+       1.54380433259,
+       1.41446751126,
+       0.926420277519
+      ],
+      "verdict": "not separated across the band"
+     },
+     {
+      "arm": "rootfind",
+      "ops_ratio": 412.825594327,
+      "ci95": [
+       395.197145169,
+       425.181985224
+      ],
+      "band_ratio": [
+       412.825594327,
+       398.922980008,
+       346.462030445
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "full-rank",
+      "ops_ratio": 4.15358893415,
+      "ci95": [
+       3.62202810426,
+       4.77711107035
+      ],
+      "band_ratio": [
+       4.15358893415,
+       4.32416227444,
+       4.96781383495
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "random-targets",
+      "ops_ratio": 54.0754475099,
+      "ci95": [
+       49.8136777224,
+       58.8897929005
+      ],
+      "band_ratio": [
+       54.0754475099,
+       47.6189236751,
+       23.2554936425
+      ],
+      "verdict": "confirmed"
+     }
+    ],
+    "plan_over_rho": {
+     "ratio": 21.8494573042,
+     "ci95": [
+      17.0387506212,
+      29.7851790847
+     ]
+    },
+    "predicted_plan_over_rho": 19.3259804136,
+    "weights": [
+     0.0,
+     0.1,
+     1.0
+    ]
+   },
+   {
+    "tag": "c30",
+    "primary": false,
+    "curve": null,
+    "log2_r": 29.6229663288,
+    "plan": {
+     "factor_base": "prime-abscissa:size=469",
+     "oracle": "mitm-prime-blocked:m=2",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "alternatives": [
+     {
+      "arm": "half-base",
+      "ops_ratio": 1.35597516421,
+      "ci95": [
+       1.19916195962,
+       1.5347951017
+      ],
+      "band_ratio": [
+       1.35597516421,
+       1.4174272679,
+       1.6514989798
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "double-base",
+      "ops_ratio": 1.5968795556,
+      "ci95": [
+       1.51660352283,
+       1.70490244325
+      ],
+      "band_ratio": [
+       1.5968795556,
+       1.46355025808,
+       0.955697555835
+      ],
+      "verdict": "not separated across the band"
+     },
+     {
+      "arm": "rootfind",
+      "ops_ratio": 636.549196907,
+      "ci95": [
+       615.65202926,
+       651.436894727
+      ],
+      "band_ratio": [
+       636.549196907,
+       616.28383547,
+       539.092859753
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "full-rank",
+      "ops_ratio": 4.81349092708,
+      "ci95": [
+       4.29752206309,
+       5.40199806312
+      ],
+      "band_ratio": [
+       4.81349092708,
+       5.02747298745,
+       5.8425329151
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "random-targets",
+      "ops_ratio": 58.6563997274,
+      "ci95": [
+       52.0920332565,
+       64.825538569
+      ],
+      "band_ratio": [
+       58.6563997274,
+       51.7445843305,
+       25.4174064939
+      ],
+      "verdict": "confirmed"
+     }
+    ],
+    "plan_over_rho": {
+     "ratio": 25.7802535067,
+     "ci95": [
+      19.9310716798,
+      35.1860367308
+     ]
+    },
+    "predicted_plan_over_rho": 24.5495465151,
+    "weights": [
+     0.0,
+     0.1,
+     1.0
+    ]
+   }
+  ],
+  "planner": "ic-planner/1",
+  "study": "research/ic_planner_validation_20261020/",
+  "report": "research/ic_planner_validation_20261020/REPORT.pdf",
   "class": "engineering"
  },
  "phases": [
