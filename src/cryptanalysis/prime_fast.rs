@@ -719,6 +719,22 @@ pub struct RhoConfig {
     pub seed: u64,
     /// Give up after this many total steps (0 = unlimited).
     pub max_steps: u64,
+    /// Wiener–Zuccherato look-ahead under the negation map: a flipped step
+    /// that would take the same jump again is rejected (one counted
+    /// addition) and retried with the next jump.  Off: legacy.
+    pub look_ahead: bool,
+    /// Short-cycle detection over the last `cycle_window` points of every
+    /// lane, escaping by doubling the smallest-x member and abandoning the
+    /// trail on a repeat.  0: legacy (2-cycle check against the previous
+    /// point only).
+    pub cycle_window: usize,
+    /// Table coefficients are drawn below `2^coeff_bits` (cheap table
+    /// build); 0: full range `[1, n)`.
+    pub coeff_bits: u32,
+    /// Walk starts are `T, 2T, 3T, …` for one random `T` per worker (one
+    /// addition each) instead of an independent `[a]G + [b]Q` (a joint
+    /// multiplication each).  Off: legacy.
+    pub stride_starts: bool,
 }
 
 impl RhoConfig {
@@ -748,6 +764,43 @@ impl RhoConfig {
             negation,
             seed: 1,
             max_steps: 0,
+            look_ahead: false,
+            cycle_window: 0,
+            coeff_bits: 0,
+            stride_starts: false,
+        }
+    }
+
+    /// The step-efficient single-thread configuration for a prime-order
+    /// group of order `r`: negation map with look-ahead and windowed cycle
+    /// escape, a 4..16-entry table of short-coefficient jumps, stride
+    /// starts, and `walkers · 2^dp_bits` (the lock-step detection delay)
+    /// held to about 2% of the expected `√(πr/4)` steps.
+    pub fn tuned(r: u64) -> Self {
+        let bits = 64 - r.leading_zeros();
+        let expected = (std::f64::consts::PI * r as f64 / 4.0).sqrt();
+        let table_bits = match bits {
+            0..=15 => 2,
+            16..=22 => 3,
+            _ => 4,
+        };
+        let walkers = if bits <= 30 { 32 } else { 64 };
+        let dp_bits = (0.02 * expected / walkers as f64)
+            .log2()
+            .floor()
+            .clamp(0.0, 24.0) as u32;
+        RhoConfig {
+            threads: 1,
+            walkers,
+            table_bits,
+            dp_bits,
+            negation: true,
+            seed: 1,
+            max_steps: 0,
+            look_ahead: true,
+            cycle_window: 16,
+            coeff_bits: (3 * table_bits).clamp(6, 12),
+            stride_starts: true,
         }
     }
 }
@@ -762,6 +815,56 @@ pub struct RhoResult {
     pub threads: usize,
     pub walkers_per_thread: usize,
     pub dp_bits: u32,
+    /// Group operations behind the walk, counted without touching it.
+    pub ops: RhoOpCounts,
+}
+
+/// Group operations of a [`rho_parallel`] run outside the walk steps
+/// (which are `total_steps` additions): the shared table, every walk
+/// start, the cycle-escape doublings and the collision checks.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct RhoOpCounts {
+    /// Additions/doublings of the table build (the `G + Q` sum included).
+    pub table_adds: u64,
+    pub table_doubles: u64,
+    /// The same for the first start of every walker.
+    pub initial_start_adds: u64,
+    pub initial_start_doubles: u64,
+    /// The same for every later restart (reset, cap, escape failure).
+    pub restart_adds: u64,
+    pub restart_doubles: u64,
+    /// Doublings of the 2-cycle escape.
+    pub escape_doubles: u64,
+    /// Candidate collisions checked by a scalar multiplication.
+    pub collision_checks: u64,
+    // Diagnostics, all inside `total_steps` or the counts above:
+    /// Look-ahead's rejected additions (part of `total_steps`).
+    pub look_ahead_adds: u64,
+    pub cycles_2: u64,
+    pub cycles_4: u64,
+    pub cycles_other: u64,
+    /// Trails abandoned on a repeated escape, trails capped, restarts.
+    pub abandoned: u64,
+    pub capped: u64,
+    pub restarts: u64,
+    /// Lane steps on trails that reached a distinguished point.
+    pub dp_trail_steps: u64,
+    /// Lane steps on trails that were then restarted.
+    pub lost_steps: u64,
+    /// Lane steps on trails still running when the solve ended.
+    pub in_flight_steps: u64,
+}
+
+/// Additions and doublings [`FastCurve::combine`] performs for `[u]G + [v]Q`:
+/// the `G + Q` sum, then one doubling per bit below the top and one
+/// addition per nonzero bit pair below the top (the top pair is loaded).
+pub fn combine_ops(u: u64, v: u64) -> (u64, u64) {
+    let top = 64 - (u | v).leading_zeros();
+    if top == 0 {
+        return (0, 1);
+    }
+    let low = (u | v) & ((1u64 << (top - 1)) - 1);
+    (low.count_ones() as u64 + 1, (top - 1) as u64)
 }
 
 #[derive(Clone, Copy)]
@@ -777,6 +880,7 @@ struct Shared {
     answer: Mutex<Option<u64>>,
     total_steps: AtomicU64,
     dp_count: AtomicU64,
+    ops: Mutex<RhoOpCounts>,
 }
 
 #[inline(always)]
@@ -830,9 +934,18 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
     let mut rng = StdRng::seed_from_u64(cfg.seed ^ 0xA5A5_5A5A_1234_5678);
     let table_len = 1usize << cfg.table_bits;
     let mut table = Vec::with_capacity(table_len);
+    let mut table_ops = RhoOpCounts::default();
     while table.len() < table_len {
-        let u = rng.gen_range(1..n);
-        let v = rng.gen_range(1..n);
+        let short = if cfg.coeff_bits == 0 {
+            n
+        } else {
+            n.min(1u64 << cfg.coeff_bits).max(2)
+        };
+        let u = rng.gen_range(1..short);
+        let v = rng.gen_range(1..short);
+        let (a, d) = combine_ops(u, v);
+        table_ops.table_adds += a;
+        table_ops.table_doubles += d;
         if let Some(pt) = curve.combine(g, q, u, v) {
             table.push(TableEntry { pt, u, v });
         }
@@ -843,6 +956,7 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
         answer: Mutex::new(None),
         total_steps: AtomicU64::new(0),
         dp_count: AtomicU64::new(0),
+        ops: Mutex::new(RhoOpCounts::default()),
     };
     std::thread::scope(|s| {
         for tid in 0..cfg.threads {
@@ -852,6 +966,9 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
         }
     });
     let log = (*shared.answer.lock().unwrap())?;
+    let mut ops = *shared.ops.lock().unwrap();
+    ops.table_adds = table_ops.table_adds;
+    ops.table_doubles = table_ops.table_doubles;
     let wall = started.elapsed().as_secs_f64();
     let total_steps = shared.total_steps.load(Ordering::Relaxed);
     Some(RhoResult {
@@ -863,7 +980,89 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
         threads: cfg.threads,
         walkers_per_thread: cfg.walkers,
         dp_bits: cfg.dp_bits,
+        ops,
     })
+}
+
+/// Per-lane state of one worker's lock-step walkers.
+struct Lanes {
+    xs: Vec<u64>,
+    ys: Vec<u64>,
+    as_: Vec<u64>,
+    bs: Vec<u64>,
+    prev: Vec<u64>,
+    /// Steps since the lane's last distinguished point or restart.
+    steps: Vec<u32>,
+    /// Look-ahead: jumps already tried (and rejected) from this point.
+    tried: Vec<u32>,
+    /// Look-ahead: the jump the next round must use instead of the hash's.
+    forced: Vec<usize>,
+    /// Cycle window: ring of the last `window` points per lane.
+    wx: Vec<u64>,
+    wy: Vec<u64>,
+    wa: Vec<u64>,
+    wb: Vec<u64>,
+    wpos: Vec<usize>,
+    wlen: Vec<usize>,
+    last_escape: Vec<u64>,
+}
+
+const NO_JUMP: usize = usize::MAX;
+
+impl Lanes {
+    fn new(w: usize, window: usize) -> Self {
+        let ring = w * window;
+        Lanes {
+            xs: vec![0; w],
+            ys: vec![0; w],
+            as_: vec![0; w],
+            bs: vec![0; w],
+            prev: vec![u64::MAX; w],
+            steps: vec![0; w],
+            tried: vec![0; w],
+            forced: vec![NO_JUMP; w],
+            wx: vec![u64::MAX; ring],
+            wy: vec![0; ring],
+            wa: vec![0; ring],
+            wb: vec![0; ring],
+            wpos: vec![0; w],
+            wlen: vec![0; w],
+            last_escape: vec![u64::MAX; w],
+        }
+    }
+
+    /// Put lane `i` at `[a]G + [b]Q = pt` (sign-canonical when `negation`).
+    fn place(&mut self, i: usize, curve: &FastCurve, pt: Pt, a: u64, b: u64, negation: bool) {
+        let n = curve.n;
+        let (pt, flipped) = if negation {
+            curve.canonical_sign(pt)
+        } else {
+            (pt, false)
+        };
+        self.xs[i] = pt.x;
+        self.ys[i] = pt.y;
+        self.as_[i] = if flipped { neg_mod(a, n) } else { a };
+        self.bs[i] = if flipped { neg_mod(b, n) } else { b };
+        self.prev[i] = u64::MAX;
+        self.steps[i] = 0;
+        self.tried[i] = 0;
+        self.forced[i] = NO_JUMP;
+        self.wpos[i] = 0;
+        self.wlen[i] = 0;
+        let ring = self.wx.len() / self.xs.len();
+        self.wx[i * ring..(i + 1) * ring].fill(u64::MAX);
+        self.last_escape[i] = u64::MAX;
+    }
+}
+
+/// The start-point stream of a worker: random `[a]G + [b]Q` (legacy) or
+/// `T, 2T, 3T, …` for one random `T = [ta]G + [tb]Q` (one addition per
+/// start after the first).
+struct Starts {
+    stride: Option<(Pt, u64, u64)>,
+    cur: Option<Pt>,
+    ca: u64,
+    cb: u64,
 }
 
 fn rho_worker(
@@ -878,54 +1077,107 @@ fn rho_worker(
     let f = curve.f;
     let n = curve.n;
     let w = cfg.walkers;
+    // The ring is a power of two, so the index arithmetic is a mask.
+    let window = if cfg.cycle_window == 0 {
+        0
+    } else {
+        cfg.cycle_window.next_power_of_two()
+    };
+    let mask = window.wrapping_sub(1);
+    let jumps = table.len();
+    // The tuned walk also counts the final partial round exactly; the
+    // legacy walk's `total_steps` stays as it was.
+    let tuned = cfg.look_ahead || cfg.cycle_window > 0 || cfg.stride_starts;
     let mut rng =
         StdRng::seed_from_u64(cfg.seed ^ (tid as u64 + 1).wrapping_mul(0x9E37_79B9_7F4A_7C15));
     let step_cap: u32 = (40u64 << cfg.dp_bits).max(256).min(u32::MAX as u64) as u32;
 
-    let mut xs = vec![0u64; w];
-    let mut ys = vec![0u64; w];
-    let mut as_ = vec![0u64; w];
-    let mut bs = vec![0u64; w];
-    let mut prev = vec![u64::MAX; w];
-    let mut steps = vec![0u32; w];
+    let mut lanes = Lanes::new(w, window.max(1));
     let mut d = vec![0u64; w];
     let mut js = vec![0usize; w];
     let mut reset = vec![false; w];
     let mut scratch = Vec::with_capacity(w);
+    let counts = std::cell::Cell::new(RhoOpCounts::default());
+    let initial = std::cell::Cell::new(true);
+    let starts = std::cell::RefCell::new(Starts {
+        stride: None,
+        cur: None,
+        ca: 0,
+        cb: 0,
+    });
+    let mut escape_doubles = 0u64;
+    let mut collision_checks = 0u64;
+    // Diagnostics (never charged).
+    let (mut la_adds, mut cycles_2, mut cycles_4, mut cycles_other) = (0u64, 0u64, 0u64, 0u64);
+    let (mut abandoned, mut capped, mut restarts) = (0u64, 0u64, 0u64);
+    let mut dp_trail_steps = 0u64;
 
-    let restart = |i: usize,
-                   rng: &mut StdRng,
-                   xs: &mut [u64],
-                   ys: &mut [u64],
-                   as_: &mut [u64],
-                   bs: &mut [u64],
-                   prev: &mut [u64],
-                   steps: &mut [u32]| {
+    let restart = |i: usize, rng: &mut StdRng, lanes: &mut Lanes| {
+        let mut c0 = counts.get();
+        c0.lost_steps += lanes.steps[i] as u64;
+        counts.set(c0);
         loop {
-            let a = rng.gen_range(1..n);
-            let b = rng.gen_range(1..n);
-            if let Some(pt) = curve.combine(g, q, a, b) {
-                let (pt, flipped) = if cfg.negation {
-                    curve.canonical_sign(pt)
+            let mut c = counts.get();
+            let (pt, a, b) = if cfg.stride_starts {
+                let mut st = starts.borrow_mut();
+                if st.stride.is_none() {
+                    // The stride and the first start: one full-width combine.
+                    let (ta, tb) = (rng.gen_range(1..n), rng.gen_range(1..n));
+                    let (da, dd) = combine_ops(ta, tb);
+                    c.initial_start_adds += da;
+                    c.initial_start_doubles += dd;
+                    counts.set(c);
+                    match curve.combine(g, q, ta, tb) {
+                        Some(t) => {
+                            st.stride = Some((t, ta, tb));
+                            st.cur = Some(t);
+                            st.ca = ta;
+                            st.cb = tb;
+                            (t, ta, tb)
+                        }
+                        None => continue,
+                    }
                 } else {
-                    (pt, false)
-                };
-                xs[i] = pt.x;
-                ys[i] = pt.y;
-                as_[i] = if flipped { neg_mod(a, n) } else { a };
-                bs[i] = if flipped { neg_mod(b, n) } else { b };
-                prev[i] = u64::MAX;
-                steps[i] = 0;
-                return;
-            }
+                    let (t, ta, tb) = st.stride.unwrap();
+                    if initial.get() {
+                        c.initial_start_adds += 1;
+                    } else {
+                        c.restart_adds += 1;
+                    }
+                    counts.set(c);
+                    st.ca = add_mod(st.ca, ta, n);
+                    st.cb = add_mod(st.cb, tb, n);
+                    st.cur = curve.add(st.cur, Some(t));
+                    match st.cur {
+                        Some(p) => (p, st.ca, st.cb),
+                        None => continue,
+                    }
+                }
+            } else {
+                let a = rng.gen_range(1..n);
+                let b = rng.gen_range(1..n);
+                let (da, dd) = combine_ops(a, b);
+                if initial.get() {
+                    c.initial_start_adds += da;
+                    c.initial_start_doubles += dd;
+                } else {
+                    c.restart_adds += da;
+                    c.restart_doubles += dd;
+                }
+                counts.set(c);
+                match curve.combine(g, q, a, b) {
+                    Some(pt) => (pt, a, b),
+                    None => continue,
+                }
+            };
+            lanes.place(i, curve, pt, a, b, cfg.negation);
+            return;
         }
     };
     for i in 0..w {
-        restart(
-            i, &mut rng, &mut xs, &mut ys, &mut as_, &mut bs, &mut prev, &mut steps,
-        );
+        restart(i, &mut rng, &mut lanes);
     }
-
+    initial.set(false);
     let mut local_steps = 0u64;
     let mut local_dps = 0u64;
     'outer: loop {
@@ -936,9 +1188,13 @@ fn rho_worker(
             break;
         }
         for i in 0..w {
-            let j = branch_index(xs[i], cfg.table_bits);
+            let j = if lanes.forced[i] != NO_JUMP {
+                lanes.forced[i]
+            } else {
+                branch_index(lanes.xs[i], cfg.table_bits)
+            };
             js[i] = j;
-            let dd = f.sub(table[j].pt.x, xs[i]);
+            let dd = f.sub(table[j].pt.x, lanes.xs[i]);
             if dd == 0 {
                 reset[i] = true;
                 d[i] = f.one;
@@ -950,31 +1206,126 @@ fn rho_worker(
         f.batch_inv(&mut d, &mut scratch);
         for i in 0..w {
             if reset[i] {
-                restart(
-                    i, &mut rng, &mut xs, &mut ys, &mut as_, &mut bs, &mut prev, &mut steps,
-                );
+                restarts += 1;
+                restart(i, &mut rng, &mut lanes);
                 continue;
             }
             let t = &table[js[i]];
-            let lam = f.mul(f.sub(t.pt.y, ys[i]), d[i]);
-            let x3 = f.sub(f.sub(f.sqr(lam), xs[i]), t.pt.x);
-            let mut y3 = f.sub(f.mul(lam, f.sub(xs[i], x3)), ys[i]);
-            let mut a = add_mod(as_[i], t.u, n);
-            let mut b = add_mod(bs[i], t.v, n);
+            let lam = f.mul(f.sub(t.pt.y, lanes.ys[i]), d[i]);
+            let x3 = f.sub(f.sub(f.sqr(lam), lanes.xs[i]), t.pt.x);
+            let mut y3 = f.sub(f.mul(lam, f.sub(lanes.xs[i], x3)), lanes.ys[i]);
+            let mut a = add_mod(lanes.as_[i], t.u, n);
+            let mut b = add_mod(lanes.bs[i], t.v, n);
+            let mut flipped = false;
             if cfg.negation && y3 > f.half {
                 y3 = f.p - y3;
                 a = neg_mod(a, n);
                 b = neg_mod(b, n);
+                flipped = true;
             }
-            if x3 == prev[i] {
+            // Look-ahead: a flipped step that would take the same jump
+            // again is rejected (one wasted addition) and the next round
+            // retries this lane from the same point with the next jump, so
+            // the retry rides the next batch's inversion.
+            if cfg.look_ahead
+                && flipped
+                && ((lanes.tried[i] + 1) as usize) < jumps
+                && branch_index(x3, cfg.table_bits) == js[i]
+            {
+                la_adds += 1;
+                lanes.tried[i] += 1;
+                lanes.forced[i] = (js[i] + 1) % jumps;
+                continue;
+            }
+            lanes.tried[i] = 0;
+            lanes.forced[i] = NO_JUMP;
+            if window > 0 {
+                // Short cycle: x3 is one of the last `window` points.
+                let base = i * window;
+                let len = lanes.wlen[i];
+                let pos = lanes.wpos[i];
+                let mut hit = 0usize;
+                // Unused slots hold `u64::MAX`, never an x: the common
+                // no-hit case is one branch-free pass over the ring.
+                if lanes.wx[base..base + window].contains(&x3) {
+                    for k in 1..=len {
+                        let idx = base + ((pos + window - k) & mask);
+                        if lanes.wx[idx] == x3 {
+                            hit = k;
+                            break;
+                        }
+                    }
+                }
+                if hit > 0 {
+                    match hit {
+                        2 => cycles_2 += 1,
+                        4 => cycles_4 += 1,
+                        _ => cycles_other += 1,
+                    }
+                    // Leave from the member with the smallest x.
+                    let mut best = base + ((pos + window - 1) & mask);
+                    for k in 2..=hit {
+                        let idx = base + ((pos + window - k) & mask);
+                        if lanes.wx[idx] < lanes.wx[best] {
+                            best = idx;
+                        }
+                    }
+                    let (cx, cy, ca, cb) = (
+                        lanes.wx[best],
+                        lanes.wy[best],
+                        lanes.wa[best],
+                        lanes.wb[best],
+                    );
+                    if lanes.last_escape[i] == cx {
+                        abandoned += 1;
+                        restarts += 1;
+                        restart(i, &mut rng, &mut lanes);
+                        continue;
+                    }
+                    escape_doubles += 1;
+                    match curve.double(Pt { x: cx, y: cy }) {
+                        Some(pt) => {
+                            let kept = lanes.steps[i];
+                            lanes.place(
+                                i,
+                                curve,
+                                pt,
+                                add_mod(ca, ca, n),
+                                add_mod(cb, cb, n),
+                                cfg.negation,
+                            );
+                            lanes.last_escape[i] = cx;
+                            lanes.steps[i] = kept;
+                        }
+                        None => {
+                            restarts += 1;
+                            restart(i, &mut rng, &mut lanes);
+                        }
+                    }
+                    continue;
+                }
+                let slot = base + pos;
+                lanes.wx[slot] = x3;
+                lanes.wy[slot] = y3;
+                lanes.wa[slot] = a;
+                lanes.wb[slot] = b;
+                lanes.wpos[i] = (pos + 1) & mask;
+                lanes.wlen[i] = (len + 1).min(window);
+                lanes.prev[i] = lanes.xs[i];
+                lanes.xs[i] = x3;
+                lanes.ys[i] = y3;
+                lanes.as_[i] = a;
+                lanes.bs[i] = b;
+            } else if x3 == lanes.prev[i] {
                 // Fruitless 2-cycle {prev, cur}: both members are known
                 // (prev == new).  Escape deterministically by doubling the
                 // member with the smaller x, so merged walks stay merged.
-                let (cx, cy, ca, cb) = if xs[i] < x3 {
-                    (xs[i], ys[i], as_[i], bs[i])
+                let (cx, cy, ca, cb) = if lanes.xs[i] < x3 {
+                    (lanes.xs[i], lanes.ys[i], lanes.as_[i], lanes.bs[i])
                 } else {
                     (x3, y3, a, b)
                 };
+                escape_doubles += 1;
                 match curve.double(Pt { x: cx, y: cy }) {
                     Some(pt) => {
                         let (pt, flipped) = if cfg.negation {
@@ -984,54 +1335,57 @@ fn rho_worker(
                         };
                         let a2 = add_mod(ca, ca, n);
                         let b2 = add_mod(cb, cb, n);
-                        xs[i] = pt.x;
-                        ys[i] = pt.y;
-                        as_[i] = if flipped { neg_mod(a2, n) } else { a2 };
-                        bs[i] = if flipped { neg_mod(b2, n) } else { b2 };
-                        prev[i] = u64::MAX;
+                        lanes.xs[i] = pt.x;
+                        lanes.ys[i] = pt.y;
+                        lanes.as_[i] = if flipped { neg_mod(a2, n) } else { a2 };
+                        lanes.bs[i] = if flipped { neg_mod(b2, n) } else { b2 };
+                        lanes.prev[i] = u64::MAX;
                     }
                     None => {
-                        restart(
-                            i, &mut rng, &mut xs, &mut ys, &mut as_, &mut bs, &mut prev, &mut steps,
-                        );
+                        restart(i, &mut rng, &mut lanes);
                         continue;
                     }
                 }
             } else {
-                prev[i] = xs[i];
-                xs[i] = x3;
-                ys[i] = y3;
-                as_[i] = a;
-                bs[i] = b;
+                lanes.prev[i] = lanes.xs[i];
+                lanes.xs[i] = x3;
+                lanes.ys[i] = y3;
+                lanes.as_[i] = a;
+                lanes.bs[i] = b;
             }
-            steps[i] += 1;
-            if is_distinguished(xs[i], cfg.dp_bits) {
+            lanes.steps[i] += 1;
+            let (xi, yi, ai, bi) = (lanes.xs[i], lanes.ys[i], lanes.as_[i], lanes.bs[i]);
+            if is_distinguished(xi, cfg.dp_bits) {
                 local_dps += 1;
+                dp_trail_steps += lanes.steps[i] as u64;
                 let mut dps = shared.dps.lock().unwrap();
-                match dps.get(&xs[i]) {
+                match dps.get(&xi) {
                     Some(&other) => {
-                        if (other.1, other.2) != (as_[i], bs[i]) {
-                            if let Some(k) =
-                                solve_collision(curve, g, q, (ys[i], as_[i], bs[i]), other)
-                            {
+                        if (other.1, other.2) != (ai, bi) {
+                            collision_checks += 1;
+                            if let Some(k) = solve_collision(curve, g, q, (yi, ai, bi), other) {
                                 *shared.answer.lock().unwrap() = Some(k);
                                 shared.done.store(true, Ordering::Relaxed);
                                 drop(dps);
+                                if tuned {
+                                    // The additions of the final partial round.
+                                    local_steps += i as u64 + 1;
+                                }
                                 break 'outer;
                             }
                         }
                     }
                     None => {
-                        dps.insert(xs[i], (ys[i], as_[i], bs[i]));
+                        dps.insert(xi, (yi, ai, bi));
                     }
                 }
                 drop(dps);
-                steps[i] = 0;
-            } else if steps[i] > step_cap {
+                lanes.steps[i] = 0;
+            } else if lanes.steps[i] > step_cap {
                 // Probable fruitless cycle of length ≥ 4: abandon the trail.
-                restart(
-                    i, &mut rng, &mut xs, &mut ys, &mut as_, &mut bs, &mut prev, &mut steps,
-                );
+                capped += 1;
+                restarts += 1;
+                restart(i, &mut rng, &mut lanes);
             }
         }
         local_steps += w as u64;
@@ -1044,6 +1398,25 @@ fn rho_worker(
     }
     shared.total_steps.fetch_add(local_steps, Ordering::Relaxed);
     shared.dp_count.fetch_add(local_dps, Ordering::Relaxed);
+    let in_flight: u64 = lanes.steps.iter().map(|&s| s as u64).sum();
+    let mut tot = shared.ops.lock().unwrap();
+    let c = counts.get();
+    tot.initial_start_adds += c.initial_start_adds;
+    tot.initial_start_doubles += c.initial_start_doubles;
+    tot.restart_adds += c.restart_adds;
+    tot.restart_doubles += c.restart_doubles;
+    tot.escape_doubles += escape_doubles;
+    tot.collision_checks += collision_checks;
+    tot.look_ahead_adds += la_adds;
+    tot.cycles_2 += cycles_2;
+    tot.cycles_4 += cycles_4;
+    tot.cycles_other += cycles_other;
+    tot.abandoned += abandoned;
+    tot.capped += capped;
+    tot.restarts += restarts;
+    tot.dp_trail_steps += dp_trail_steps;
+    tot.lost_steps += c.lost_steps;
+    tot.in_flight_steps += in_flight;
 }
 
 // ── Index calculus: factor base, pair table, relations, linear algebra ─
@@ -2053,5 +2426,43 @@ mod tests {
         cfg.threads = cfg.threads.min(4);
         let res = rho_parallel(&fc, g, q, &cfg).unwrap();
         assert_eq!(res.log, k);
+    }
+    /// The tuned walk (look-ahead, windowed cycle escape, stride starts,
+    /// short table) recovers the log, exercises its look-ahead and cycle
+    /// paths, and leaves the legacy configuration's output untouched.
+    #[test]
+    fn tuned_walk_exercises_look_ahead_and_cycles_and_solves() {
+        let fc = FastCurve::new("t", 53411, 4589, 186, 53117);
+        let g = fc.point(43982, 22687);
+        let (mut la, mut cyc, mut esc) = (0u64, 0u64, 0u64);
+        let mut steps = 0u64;
+        for k in (1u64..53117).step_by(997) {
+            let q = fc.mul(Some(g), k).unwrap();
+            for seed in 1..4u64 {
+                let mut cfg = RhoConfig::tuned(53117);
+                cfg.seed = seed;
+                let res = rho_parallel(&fc, g, q, &cfg).unwrap();
+                assert_eq!(res.log, k, "k={k} seed={seed}");
+                la += res.ops.look_ahead_adds;
+                cyc += res.ops.cycles_2 + res.ops.cycles_4 + res.ops.cycles_other;
+                esc += res.ops.escape_doubles;
+                steps += res.total_steps;
+                assert!(res.ops.look_ahead_adds <= res.total_steps);
+            }
+        }
+        assert!(la > 0, "look-ahead never fired");
+        assert!(cyc > 0 && esc > 0, "cycle escape never fired");
+        assert!(steps > 0);
+        // Legacy defaults: no tuned counters move.
+        let q = fc.mul(Some(g), 12345).unwrap();
+        let mut cfg = RhoConfig::for_bits(16, true);
+        cfg.threads = 1;
+        let res = rho_parallel(&fc, g, q, &cfg).unwrap();
+        assert_eq!(res.log, 12345);
+        assert_eq!(res.ops.look_ahead_adds, 0);
+        assert_eq!(
+            res.ops.cycles_2 + res.ops.cycles_4 + res.ops.cycles_other,
+            0
+        );
     }
 }

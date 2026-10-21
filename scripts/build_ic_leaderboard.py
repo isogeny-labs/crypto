@@ -74,6 +74,8 @@ SOURCES = {
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
+    "tuned_gae_table_b": "research/tuned_gae_20261020/reprice/table_b.json",
+    "tuned_gae_rho_prime_fast": "research/tuned_gae_20261020/sessions/rho_prime_fast_v2_n256/comparisons/rho-neg__rho-fast.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
@@ -624,6 +626,50 @@ def la_component() -> dict:
 def secs(x: float) -> str:
     """Seconds to three significant figures, trailing zeros kept: 8.00 s, 224 s."""
     return f"{x:.0f} s" if x >= 100 else f"{x:#.3g} s"
+
+
+def tuned_gae_component() -> dict:
+    """The tuned GAE unit (proposed, not canonical) and the rho.prime_fast reference,
+    research/tuned_gae_20261020, copied from its frozen files: reprice/table_b.json
+    (gae-reference reprice-ledger; legacy S reproduced for every recipe) and the
+    ecbench comparison of rho.prime_fast against rho.negation.  Two different things
+    share the section and are not to be read as one: the tuned unit re-prices the SAME
+    recorded counts and WIDENS every IC gap (class: accounting, not an improvement);
+    rho.prime_fast is a measured speed-up of the rho reference implementation (class:
+    engineering, on the rho side, so it moves no IC row)."""
+    tb = load(SOURCES["tuned_gae_table_b"])
+    if tb.get("gae_definition") != "tuned-batched-affine-add/v1" or not tb.get("reproduced_all") or tb.get("mismatches"):
+        raise SystemExit("tuned-GAE Table B re-price: legacy S not reproduced, or an unexpected definition")
+    rows = []
+    for i in tb["instances"]:
+        b = i["legacy_best"]
+        t = i["tuned_best"]
+        rows.append({
+            "instance": i["instance"], "regime": i["regime"], "r": i["r"],
+            "matched_rho_s": i["matched_rho_s"], "variant": b["variant"],
+            "legacy_s": b["legacy_s_recorded"], "tuned_s": b["tuned_s"],
+            "legacy_gap": b["legacy_gap_to_rho"], "tuned_gap": b["tuned_gap_to_rho"],
+            "tuned_over_legacy": b["tuned_over_legacy"],
+            "tuned_best_variant": t["variant"], "tuned_best_s": t["tuned_s"], "tuned_best_gap": t["tuned_gap_to_rho"],
+        })
+    cmp_ = load(SOURCES["tuned_gae_rho_prime_fast"])
+    if cmp_.get("schema") != "ecbench.comparison/v1" or cmp_["b"]["method"] != "rho.prime_fast":
+        raise SystemExit("rho.prime_fast comparison: unexpected schema or arm")
+    return {
+        "source": SOURCES["tuned_gae_table_b"], "rho_source": SOURCES["tuned_gae_rho_prime_fast"],
+        "gae_definition": tb["gae_definition"], "status": "proposed, not canonical",
+        "class": "unit: accounting (widens every gap; not an improvement); rho.prime_fast: engineering on the rho reference",
+        "rows": rows,
+        "rho": {
+            "comparison_id": cmp_["comparison_id"], "session_id": cmp_["a"]["session_id"],
+            "neg_mean_s": cmp_["a"]["mean_s"], "fast_mean_s": cmp_["b"]["mean_s"],
+            "ops": cmp_["ops"], "wall": cmp_["wall"],
+            "curves": [{"slug": c["slug"], "log2_r": c["log2_r"], "ratio": c["ratio_b_over_a"], "ci95": c["ci95"]}
+                       for c in cmp_["curves"]],
+            "measured": cmp_["a"]["measured"], "verified": cmp_["a"]["verified"],
+        },
+        "study": "research/tuned_gae_20261020/", "report": "research/tuned_gae_20261020/REPORT.pdf",
+    }
 
 
 def pair_table_component() -> dict:
@@ -1179,6 +1225,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
         "pair_table_component": pair_table_component(),
+        "tuned_gae_component": tuned_gae_component(),
         "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
@@ -1572,6 +1619,37 @@ def markdown(doc: dict) -> str:
                  f"{pts(r['setup_ms']['blocked'])} | {ptr(r['blocked_over_batch'])} | {ptr(r['blocked_over_scalar'])} | "
                  f"{r['run_blocked_over_scalar']:.2f} | {r['rss_gib']['batch']:.2f} → {r['rss_gib']['blocked']:.2f} GiB |")
     L.append("")
+    tg = doc["tuned_gae_component"]
+    rh = tg["rho"]
+    L += ["## Tuned GAE unit (proposed, not canonical), outside tables A–C", "",
+          f"Definition `{tg['gae_definition']}`: the group-addition equivalent is re-timed against a tuned affine "
+          "addition (Montgomery u64 / pclmulqdq GF(2^n), 256-lane batched inversion, cross-checked addition by "
+          "addition) instead of the untuned `CountedGroup::add`. The recorded operation counts do not change; each "
+          "native unit is re-priced at the tuned ratio. Tables A–C above keep the legacy unit. "
+          "**This is an accounting correction, not an improvement: every gap to the matched rho widens.** "
+          "Each row is the legacy-best recipe of Table B re-priced; legacy S is reproduced from the ledger for every "
+          "recipe (within 1e-9). The matched rho is unchanged (it counts group operations only). "
+          "Cross-host assumption: the ratios were measured on this repository's Xeon @ 2.80 GHz, not on the host "
+          f"of the legacy table. Study: [{tg['study']}](../../{tg['study']}).", "",
+          "| instance | recipe | S legacy | S tuned | tuned / legacy | gap to rho, legacy | gap to rho, tuned |",
+          "|:--|:--|--:|--:|--:|--:|--:|"]
+    for r in tg["rows"]:
+        L.append(f"| {r['instance']} | {r['variant']} | {r['legacy_s']:.2f} | {r['tuned_s']:.2f} | "
+                 f"{r['tuned_over_legacy']:.3f} | {r['legacy_gap']:.2f}× | {r['tuned_gap']:.2f}× |")
+    L += ["", "### rho.prime_fast, the prime wall reference", "",
+          "`rho.prime_fast` (`prime_fast::rho_parallel` with `RhoConfig::tuned`) against `rho.negation` on four "
+          f"prime-order curves, session `{rh['session_id']}`, {rh['verified']}/{rh['measured']} records verified per arm, "
+          "L0 (`--cpus none --allow-busy`). Operations (GAE, lower bound: canonicalisations unpriced on both): "
+          f"fast / negation = {rh['ops']['ratio_b_over_a']:.3f} [{rh['ops']['ci95'][0]:.3f}, {rh['ops']['ci95'][1]:.3f}] "
+          f"over {rh['ops']['pairs']:,} pairs; mean S {rh['neg_mean_s']:.3f} vs {rh['fast_mean_s']:.3f}. "
+          f"Wall, as the harness admitted at L0: median fast / negation = {rh['wall']['median_ratio']:.3f} "
+          "(the recorded 95% interval is degenerate at that value). A speed-up of the rho reference "
+          "implementation at equal counted work, class engineering; it moves no index-calculus row. "
+          f"Comparison: [{tg['rho_source']}](../../{tg['rho_source']}).", "",
+          "| curve | log₂ r | pairs | ops fast / negation | 95% interval |", "|:--|--:|--:|--:|:--|"]
+    for c in rh["curves"]:
+        L.append(f"| {c['slug']} | {c['log2_r']:.2f} | {rh['ops']['pairs'] // len(rh['curves']):,} | {c['ratio']:.3f} | "
+                 f"[{c['ci95'][0]:.3f}, {c['ci95'][1]:.3f}] |")
     pl = doc["planner_component"]
 
     def plq(a):
@@ -2058,6 +2136,40 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{r["rss_gib"]["batch"]:.2f} → {r["rss_gib"]["blocked"]:.2f} GiB</td></tr>')
     P.append('</tbody></table></section>')
 
+    tg = doc["tuned_gae_component"]
+    rh = tg["rho"]
+    P.append('<section class="card" id="tuned-gae"><h2>Tuned GAE unit (proposed, not canonical), outside the priced tables</h2>'
+             f'<p>Definition <code>{esc(tg["gae_definition"])}</code>: the group-addition equivalent re-timed against a tuned '
+             'affine addition (Montgomery u64 / pclmulqdq GF(2^n), 256-lane batched inversion, cross-checked addition by '
+             'addition) instead of the untuned <code>CountedGroup::add</code>. The recorded counts do not change; each native '
+             'unit is re-priced at the tuned ratio. Tables A–C keep the legacy unit. <strong>This is an accounting '
+             'correction, not an improvement: every gap to the matched rho widens.</strong> Each row is the legacy-best '
+             'recipe of Table B re-priced; legacy S is reproduced from the ledger for every recipe (within 1e-9); the '
+             'matched rho is unchanged. Cross-host assumption: ratios measured on this repository\'s Xeon @ 2.80 GHz. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(tg["study"])}">Study</a>.</p>')
+    P.append('<table><thead><tr><th>instance</th><th>recipe</th><th class="n">S legacy</th><th class="n">S tuned</th>'
+             '<th class="n">tuned / legacy</th><th class="n">gap to rho, legacy</th><th class="n">gap to rho, tuned</th>'
+             '</tr></thead><tbody>')
+    for r in tg["rows"]:
+        P.append(f'<tr><td>{esc(r["instance"])}</td><td>{esc(r["variant"])}</td><td class="n">{r["legacy_s"]:.2f}</td>'
+                 f'<td class="n">{r["tuned_s"]:.2f}</td><td class="n">{r["tuned_over_legacy"]:.3f}</td>'
+                 f'<td class="n">{r["legacy_gap"]:.2f}×</td><td class="n">{r["tuned_gap"]:.2f}×</td></tr>')
+    P.append('</tbody></table>')
+    P.append('<h3>rho.prime_fast, the prime wall reference</h3>'
+             f'<p><code>rho.prime_fast</code> against <code>rho.negation</code> on four prime-order curves, session '
+             f'<code>{esc(rh["session_id"])}</code>, {rh["verified"]}/{rh["measured"]} records verified per arm, L0. '
+             f'Operations (GAE, lower bound; canonicalisations unpriced on both): fast / negation = '
+             f'{rh["ops"]["ratio_b_over_a"]:.3f} [{rh["ops"]["ci95"][0]:.3f}, {rh["ops"]["ci95"][1]:.3f}] over '
+             f'{rh["ops"]["pairs"]:,} pairs; mean S {rh["neg_mean_s"]:.3f} vs {rh["fast_mean_s"]:.3f}. Wall as the '
+             f'harness admitted at L0: median fast / negation = {rh["wall"]["median_ratio"]:.3f} (recorded interval '
+             'degenerate at that value). A speed-up of the rho reference implementation at equal counted work, class '
+             'engineering; no index-calculus row moves. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(tg["rho_source"])}">Comparison</a>.</p>')
+    P.append('<table><thead><tr><th>curve</th><th class="n">log₂ r</th><th class="n">ops fast / negation</th>'
+             '<th>95% interval</th></tr></thead><tbody>')
+    for c in rh["curves"]:
+        P.append(f'<tr><td><code>{esc(c["slug"])}</code></td><td class="n">{c["log2_r"]:.2f}</td>'
+                 f'<td class="n">{c["ratio"]:.3f}</td><td>[{c["ci95"][0]:.3f}, {c["ci95"][1]:.3f}]</td></tr>')
     pl = doc["planner_component"]
     P.append('<section class="card" id="planner-validation"><h2>Planner validation, outside the priced tables</h2>'
              f'<p><code>ic plan</code> / <code>ic bench --auto</code> ({esc(pl["planner"])}) chooses every '

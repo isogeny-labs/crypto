@@ -599,6 +599,10 @@ fn prime_fast_rho_arm(bits: u32, seed: u64) -> Result<Arm, String> {
         negation: true,
         seed,
         max_steps: 0,
+        look_ahead: false,
+        cycle_window: 0,
+        coeff_bits: 0,
+        stride_starts: false,
     };
     let mut rng = StdRng::seed_from_u64(seed ^ u64::from(bits));
     Ok(Arm {

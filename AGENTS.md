@@ -1245,6 +1245,15 @@ workloads, under the same isolation, into the same sealed records.
   native `boundary_autolab.py claim-check --stage vs_rho`).  It passes
   only with an audit receipt from another host class that replayed both
   runs; without one it fails on that and says so.
+  The wall reference is the fastest rho for the curve family, never the
+  untuned `rho.negation`: `rho.signed_frobenius_strong` on Koblitz curves
+  (the only one `ecbench claim build` accepts today; it has no prime
+  branch), `rho.prime_fast` (`prime_fast::rho_parallel`, negation map, one
+  thread, p < 2^62, `RhoConfig::tuned`) on prime curves: 1.03x
+  `rho.negation`'s operations [0.98, 1.08] at about 0.22x its median wall
+  on 28–40-bit curves (`research/tuned_gae_20261020/`).  It is the wall
+  reference; the counted reference stays `rho.negation`.  A prime wall ratio is `rho.prime_fast` online wall over
+  IC online wall, priced under §5a, until a prime claim branch exists.
 - **Skills:** `ecbench-measure`, `ecbench-independent-runner` and
   `ecbench-extend` under `.agents/skills/`.
 

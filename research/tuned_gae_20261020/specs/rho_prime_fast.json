@@ -1,0 +1,75 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "rho.prime_fast vs rho.negation wall and GAE, p 28..40 bits",
+ "description": "The fast prime wall reference (prime_fast::rho_parallel, one thread, negation) against the untuned rho.negation on four prime-order curves; S should agree, wall per solve should not. Slugs: icv1-fp28-tm24531-24294e5d, icv1-fp32-t93403-ef655380, icv1-fp36-t360541-9f646956, icv1-fp40-tm62443-8b49d5b3.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 259182139,
+    "a": 256310742,
+    "b": 86097094,
+    "group_order": 259206671,
+    "r": 259206671,
+    "gx": 45628166,
+    "gy": 174691488
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 3642104651,
+    "a": 3608834951,
+    "b": 2170327929,
+    "group_order": 3642011249,
+    "r": 3642011249,
+    "gx": 1507077640,
+    "gy": 768273803
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 39688394183,
+    "a": 18505017641,
+    "b": 23501859795,
+    "group_order": 39688033643,
+    "r": 39688033643,
+    "gx": 36684580884,
+    "gy": 26064464920
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 909903817187,
+    "a": 567284737849,
+    "b": 258589946179,
+    "group_order": 909903879631,
+    "r": 909903879631,
+    "gx": 906316477920,
+    "gy": 570572347979
+   }
+  ],
+  "targets_per_curve": 32,
+  "target_seed": 20261020
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-fast",
+   "role": "candidate",
+   "method": {
+    "id": "rho.prime_fast"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261020,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}
