@@ -166,7 +166,8 @@ jobs:
         with:
           # Phase-B custody checks the bound Phase-A revision is an ancestor.
           fetch-depth: 0
-          filter: blob:none
+          # The verifier creates a local clone, then checks out an old implementation.
+          # That local clone needs the historical verifier blobs to be present here.
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Build frozen executables
