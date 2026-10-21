@@ -57,11 +57,40 @@ def v1_snapshot_consistent(snapshot):
         return False
 
 
+def snapshot_consistent(snapshot):
+    if snapshot.get("cgroup_interface") == "v1":
+        return v1_snapshot_consistent(snapshot)
+    if snapshot.get("cgroup_interface") != "v2":
+        return False
+    try:
+        quota, period = snapshot["cpu.max"].split()
+        cpu = dict(line.split(maxsplit=1) for line in
+                   snapshot["cpu.stat"].splitlines())
+        memory = dict(line.split(maxsplit=1) for line in
+                      snapshot["memory.events"].splitlines())
+        values = [int(snapshot[name]) for name in
+                  ("memory.current", "memory.peak", "memory.max")]
+        values += [int(cpu[name]) for name in
+                   ("usage_usec", "nr_periods", "nr_throttled")]
+        values += [int(memory[name]) for name in ("oom", "oom_kill")]
+        values += [int(quota), int(period)]
+        return (len(snapshot["cpu.max"].split()) == 2 and
+                all(value >= 0 for value in values) and
+                int(quota) >= 4 * int(period) > 0 and
+                int(snapshot["memory.max"]) >=
+                RSS_CAP_BYTES + 256 * 1024**2 and
+                int(snapshot["memory.current"]) <=
+                int(snapshot["memory.peak"]) <=
+                int(snapshot["memory.max"]))
+    except (KeyError, ValueError, TypeError, AttributeError):
+        return False
+
+
 def resources(usage):
     throttle = counter(usage, "cpu.stat", "nr_throttled")
     oom = counter(usage, "memory.events", "oom")
     kills = counter(usage, "memory.events", "oom_kill")
-    snapshots = all(v1_snapshot_consistent(usage.get(name, {}))
+    snapshots = all(snapshot_consistent(usage.get(name, {}))
                     for name in ("cgroup_before", "cgroup_after"))
     peak = usage.get("peak_rss_bytes")
     passed = (usage.get("status") == "PASS_PRODUCER" and snapshots and
@@ -70,7 +99,7 @@ def resources(usage):
     return {"status": "PASS" if passed else "FAILED_OR_INCOMPLETE",
             "peak_rss_bytes": peak, "cpu_throttled_periods_delta": throttle,
             "oom_events_delta": oom, "oom_kills_delta": kills,
-            "cgroup_v1_snapshots_consistent": snapshots}
+            "cgroup_snapshots_consistent": snapshots}
 
 
 def telemetry(phase_dir, name):
