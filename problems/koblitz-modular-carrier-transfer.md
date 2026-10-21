@@ -520,3 +520,46 @@ geometry and native field semantics remain written bridges. Explicit49
 torsion point coordinates are still uncomputed. Failed preliminary bounds
 and censored jets are retained;the protocol expands precision before the
 accepted128/64/16-coefficient construction. No IC efficiency claim is made.
+
+## Round13: ordinary500/580 closed supports; saturation beyond shared factors
+
+[Round13](../research/koblitz_modular_ic_20261018/rounds/13/REPORT.md)
+constructs the complete requested ordinary components under the written
+modular norm,pairing and descent bridges. Cyclic121 Hecke norms have
+poles504/528 and640 checked q coefficients. Their pushed ordinary
+supports are two degree50 points and four degree29 points. Exact
+7/11 kernel transport verifies24 commuting squares. All six first11
+kernel polynomials are irreducible degree5 over their base fields,giving
+two simple source degree250 points and four simple degree145 points.
+A separate parsed execution rechecks the functions,divisors and towers.
+All six closed points exhaust their scalar deck fibers. The actual C5
+table and integral augmented norm prove both projected images zero.
+Pointwise projection coordinates are not newly computed.
+
+The ordinary500/580 support exits are satisfied under that explicit
+written bridge. Whole principal-row assembly and comparison remain
+unperformed. The five other ordinary degrees1760,1880,2760,1370,2180
+remain open. The next divisor exit retains every closed point,local
+multiplicity,pole and projected image;degrees alone do not discharge it.
+The native field semantics,Rabin criterion interpretation and global
+moduli/pairing/descent geometry are not fully formalized in Lean.
+
+The four actual circuits have counterpoints after every constant repair,
+after all23/22 inverse quadrics,after all3826/3774 shared-factor quadrics,
+and after all four four-leaf Q14 quadrics. Five characteristic-two
+square-form linear relations per graph have h-depth<=5 and exclude the
+last witnesses. Nonzero scalar boundary points remain after all Q15
+repairs,but no further violated relation is exhibited for those final
+points;they alone do not prove incomplete saturation. The three-leaf
+linear family is empty,not an unsuccessful query. Full h-saturation is
+still an implementation/proof gap,not a mathematical nonexistence result.
+
+The proper quotient exit still requires complete h-saturated ideals of
+the actual presentations,verified boundary charts/gluing,and proper
+polarized F2 embeddings. Next discriminating saturation work must test
+new certified relations on the Q15 survivors or compute a full
+Rabinowitsch elimination with an equality/localization certificate.
+Neither finite Boolean restriction nor the existing round08 Kummer
+atlas suffices. Thirty-two actual-circuit certificates and structural
+identities are included among63 new named Lean theorems. No IC
+efficiency assessment or rank promotion is made.

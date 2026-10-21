@@ -1,24 +1,24 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [12](rounds/12/README.md), with its
-[report](rounds/12/REPORT.md), [PDF](rounds/12/report.pdf),
-[proof map](rounds/12/PROOF_MAP.md), [ledger](rounds/12/ledger.json)
-and exact replay. All supersingular zeros of the eight coupled functions
-now have complete closed supports and local multiplicities: 3,080 source
-points in 308 degree-10 orbits. The antidiagonal contributes degree 740
-there, leaving ordinary degree 500. All seven whole unfinished divisors
-still have ordinary supports to construct. All supersingular target
-values are killed by 8 and give zero 11-primary image under the retained
-projections. Relation ranks remain unchanged.
+The current round is [13](rounds/13/README.md), with its
+[report](rounds/13/REPORT.md), [PDF](rounds/13/report.pdf),
+[proof map](rounds/13/PROOF_MAP.md), [ledger](rounds/13/ledger.json)
+and exact replay. The ordinary antidiagonal500 consists of two simple
+degree250 closed points; product-plus-one580 consists of four simple
+degree145 points. Both retained projected images vanish for all six,
+under the written modular norm, pairing and descent bridges. Full source
+fiber algebras and24 commuting squares are exported and reparsed.
+No rank or whole principal row is promoted.
 
-Each of the four actual full homogenized quotient circuits has a certified
-false boundary point. A native saturation step emits 213,120 generated
-scalar linear relations, with h-membership depth at most 5; they need not
-be independent. The four affine open models remain available. Complete
-projective saturation, proper quotient boundaries and polarized embeddings
-remain open. Twenty-four new named Lean results include eight actual
-boundary-circuit certificates. Modular geometry and native semantics remain
-partially formalized. No IC cost or efficiency verdict is supplied.
+All four actual quotient circuits now have certified counterpoints after
+constants, inverse cancellations, shared-factor quadrics and four-leaf
+Q14 repairs. Characteristic-two square forms add five linear relations
+per circuit; nonzero boundary models still survive, which alone does not
+prove failure of saturation. Complete h-saturation, proper polarized F2
+closed embeddings, whole row assembly and five other ordinary components
+remain open. Sixty-three new named Lean results include32 actual-circuit
+certificates. Full native semantics and modular geometry remain partly
+formalized. No IC cost or efficiency verdict is supplied.
 
 Earlier evidence stays frozen:
 

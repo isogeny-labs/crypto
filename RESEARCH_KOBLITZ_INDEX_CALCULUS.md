@@ -12,20 +12,23 @@ pre-registered hypotheses)
 (ePrint 2020/1315).
 
 **Modular and low-genus carrier follow-up (2026-10-19):**
-[Round12](research/koblitz_modular_ic_20261018/rounds/12/REPORT.md)
-completes the supersingular closed zero supports and multiplicities of all
-eight coupled functions. The 3,080 source points form 308 degree-10 orbits.
-The antidiagonal splits into supersingular degree 740 and ordinary degree
-500; all seven whole unfinished divisors retain ordinary supports. Every
-supersingular target value is killed by 8, giving zero 11-primary projected
-image. Four full homogenized quotient circuits have explicit false boundary
-points and an intermediate saturation step of 213,120 generated scalar
-linear relations (membership depth at most 5, independence not claimed).
-Complete projective saturation and proper polarized quotient embeddings
-remain open. Twenty-four new named Lean results include eight actual
-boundary-circuit certificates. The written modular/deformation bridges and
-native semantics remain only partially formalized. Relation ranks stay
-12/1308 and nonzero-image 11 on 1165/1160 columns. See the
+[Round13](research/koblitz_modular_ic_20261018/rounds/13/REPORT.md)
+exhausts the ordinary antidiagonal500 as two simple degree250 closed
+points and product-plus-one580 as four simple degree145 points. Actual
+7/11 kernel transport checks24 commuting squares; the exported degree5
+fiber algebras are reparsed. All six images vanish in both retained
+projections by the integral C5 deck norm, under the written modular,
+pairing and descent bridges. No new whole principal row is assembled.
+
+The four actual quotient circuits have counterpoints after constants,
+inverse cancellation, shared-factor and four-leaf Q14 repairs. Five
+characteristic-two square relations per graph give another certified
+step. Nonzero points survive that repair; this alone does not prove
+incomplete saturation. Full h-saturation and proper polarized F2 closed
+embeddings remain open. Other ordinary supports have degrees1760,1880,
+2760,1370,2180. Sixty-three new named Lean results include32 actual-circuit
+certificates; global geometry and native semantics remain partial.
+Ranks stay12/1308 and nonzero-image11 on1165/1160 columns. See the
 [construction problem](problems/koblitz-modular-carrier-transfer.md).
 No IC cost or efficiency verdict is supplied.
 

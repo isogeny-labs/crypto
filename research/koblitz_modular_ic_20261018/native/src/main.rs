@@ -59,6 +59,7 @@ mod modular_geometry;
 mod modular_screen;
 mod n5_relations;
 mod odd07;
+mod ordinary13;
 mod polarized;
 mod quotient_geometry;
 mod quotients06;
@@ -81,6 +82,7 @@ mod round09_record;
 mod round10_record;
 mod round11_record;
 mod round12_record;
+mod round13_record;
 mod round_record;
 mod saturation10;
 mod saturation11;
@@ -361,12 +363,98 @@ fn run(out: &std::path::Path) {
 }
 fn main() {
     let args10: Vec<String> = std::env::args().collect();
+    if args10.get(1).map(String::as_str) == Some("--record-round13") {
+        round13_record::record(std::path::Path::new(
+            args10.get(2).expect("round13 complete receipts"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round13-square-colon") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::run(
+            std::path::Path::new(args10.get(2).expect("round13 Q13/Q14 and circuits")),
+        );
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round13-square-lean") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::certify(
+            std::path::Path::new(args10.get(2).expect("round13 square certificates")),
+        );
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--verify-round13") {
+        ordinary13::factor::lift::verify(std::path::Path::new(
+            args10.get(2).expect("round13 parsed functions and towers"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round13-images") {
+        ordinary13::factor::lift::images(std::path::Path::new(
+            args10.get(2).expect("round13 full ordinary fibers"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round13-pair-colon") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::pairs(std::path::Path::new(
+            args10
+                .get(2)
+                .expect("round13 actual circuits and Q13 relations"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round13-boundary-lean") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::certify(std::path::Path::new(
+            args10.get(2).expect("round13 Q13/Q14 certificates"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round13-fibers") {
+        ordinary13::factor::lift::fibers(std::path::Path::new(
+            args10
+                .get(2)
+                .expect("round13 middle candidates and fresh fiber output"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round13-middles") {
+        ordinary13::factor::lift::middles(std::path::Path::new(
+            args10
+                .get(2)
+                .expect("round13 norm supports and Phi11 input"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round13-saturation") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::run(std::path::Path::new(
+            args10
+                .get(2)
+                .expect("round13 actual circuits and constant repairs"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round13-supports") {
+        ordinary13::factor::run(std::path::Path::new(
+            args10
+                .get(2)
+                .expect("round13 norm inputs and fresh support output"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round13-norm") {
+        ordinary13::run(std::path::Path::new(
+            args10.get(2).expect("fresh round13 outputs"),
+        ));
+        return;
+    }
     if args10.get(1).map(String::as_str) == Some("--record-round12") {
-        round12_record::record(std::path::Path::new(args10.get(2).expect("fresh round records")));
+        round12_record::record(std::path::Path::new(
+            args10.get(2).expect("fresh round records"),
+        ));
         return;
     }
     if args10.get(1).map(String::as_str) == Some("--round12-constant-saturation") {
-        kummer08::descent09::polynomial10::boundary12::constants(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        kummer08::descent09::polynomial10::boundary12::constants(std::path::Path::new(
+            args10.get(2).expect("fresh outputs"),
+        ));
         return;
     }
     if args10.get(1).map(String::as_str) == Some("--verify-round12-local") {
@@ -374,11 +462,15 @@ fn main() {
         return;
     }
     if args10.get(1).map(String::as_str) == Some("--round12-boundary-lean") {
-        kummer08::descent09::polynomial10::boundary12::certify(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        kummer08::descent09::polynomial10::boundary12::certify(std::path::Path::new(
+            args10.get(2).expect("fresh outputs"),
+        ));
         return;
     }
     if args10.get(1).map(String::as_str) == Some("--round12-boundary") {
-        kummer08::descent09::polynomial10::boundary12::run(std::path::Path::new(args10.get(2).expect("fresh outputs")));
+        kummer08::descent09::polynomial10::boundary12::run(std::path::Path::new(
+            args10.get(2).expect("fresh outputs"),
+        ));
         return;
     }
     if args10.get(1).map(String::as_str) == Some("--round12-ss49") {
