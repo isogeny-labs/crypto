@@ -33,11 +33,11 @@ use crypto_lib::{
         point::Point,
     },
     hash::{
-        blake2b, blake2b_keyed, blake2s, blake2s_keyed, blake3_hash, blake3_keyed, hmac_sha1,
-        hmac_sha256, hmac_sha384, hmac_sha512, kmac128, kmac256, kmacxof128, kmacxof256, md4, md5,
-        ripemd160, sha1, sha224, sha256, sha384, sha3_224, sha3_256, sha3_384, sha3_512, sha512,
-        sha512_224, sha512_256, shake128, shake256, siphash, skein1024, skein256, skein512, sm3,
-        streebog_256, streebog_512, tiger, tiger2, whirlpool, SipKey,
+        blake2b, blake2b_keyed, blake2s, blake2s_keyed, blake3_hash, blake3_keyed, cshake128,
+        cshake256, hmac_sha1, hmac_sha256, hmac_sha384, hmac_sha512, kmac128, kmac256, kmacxof128,
+        kmacxof256, md4, md5, ripemd160, sha1, sha224, sha256, sha384, sha3_224, sha3_256,
+        sha3_384, sha3_512, sha512, sha512_224, sha512_256, shake128, shake256, siphash, skein1024,
+        skein256, skein512, sm3, streebog_256, streebog_512, tiger, tiger2, whirlpool, SipKey,
     },
     kdf::hkdf::hkdf,
     pqc::kyber::{kyber_decapsulate, kyber_encapsulate, kyber_keygen},
@@ -52,6 +52,7 @@ use crypto_lib::{
 };
 use num_bigint::BigUint;
 use std::path::{Path, PathBuf};
+use subtle::ConstantTimeEq;
 
 #[derive(Parser)]
 #[command(name = "crypto", about = "Educational cryptography library demo")]
@@ -81,9 +82,15 @@ enum Cmd {
         /// Read message bytes from a file.
         #[arg(long)]
         file: Option<PathBuf>,
-        /// Required for SHAKE; optional for BLAKE2 and Skein.
+        /// Required for SHAKE and cSHAKE; optional for BLAKE2 and Skein.
         #[arg(long)]
         output_bytes: Option<usize>,
+        /// cSHAKE customization string as hex-encoded bytes.
+        #[arg(long)]
+        custom_hex: Option<String>,
+        /// cSHAKE function-name string as hex-encoded bytes.
+        #[arg(long)]
+        function_name_hex: Option<String>,
     },
     /// Compute a built-in keyed digest or message authentication code.
     Mac {
@@ -109,6 +116,9 @@ enum Cmd {
         /// KMAC customization string as hex-encoded bytes.
         #[arg(long)]
         custom_hex: Option<String>,
+        /// Verify this hex tag in constant time instead of printing a computed tag.
+        #[arg(long)]
+        verify_tag_hex: Option<String>,
     },
     /// ECC operations (keygen)
     Ecc {
@@ -681,9 +691,27 @@ fn main() {
             hex,
             file,
             output_bytes,
-        } => match load_hash_input(message.as_deref(), hex.as_deref(), file.as_deref())
-            .and_then(|bytes| cmd_hash(&algorithm, &bytes, output_bytes))
-        {
+            custom_hex,
+            function_name_hex,
+        } => match load_hash_input(message.as_deref(), hex.as_deref(), file.as_deref()).and_then(
+            |bytes| {
+                let custom = custom_hex
+                    .as_deref()
+                    .map(|hex| from_hex(hex).map_err(|e| format!("invalid customization hex: {e}")))
+                    .transpose()?;
+                let function_name = function_name_hex
+                    .as_deref()
+                    .map(|hex| from_hex(hex).map_err(|e| format!("invalid function-name hex: {e}")))
+                    .transpose()?;
+                cmd_hash_custom(
+                    &algorithm,
+                    &bytes,
+                    output_bytes,
+                    custom.as_deref(),
+                    function_name.as_deref(),
+                )
+            },
+        ) {
             Ok(digest) => println!("{digest}"),
             Err(error) => {
                 eprintln!("hash: {error}");
@@ -699,6 +727,7 @@ fn main() {
             key_hex,
             output_bytes,
             custom_hex,
+            verify_tag_hex,
         } => {
             let result = load_hash_input(message.as_deref(), hex.as_deref(), file.as_deref())
                 .and_then(|bytes| {
@@ -709,7 +738,13 @@ fn main() {
                             from_hex(hex).map_err(|e| format!("invalid customization hex: {e}"))
                         })
                         .transpose()?;
-                    cmd_mac(&algorithm, &key, &bytes, output_bytes, custom.as_deref())
+                    let tag = cmd_mac(&algorithm, &key, &bytes, output_bytes, custom.as_deref())?;
+                    if let Some(expected) = verify_tag_hex.as_deref() {
+                        verify_mac_tag(&tag, expected)?;
+                        Ok("verified".to_string())
+                    } else {
+                        Ok(tag)
+                    }
                 });
             match result {
                 Ok(tag) => println!("{tag}"),
@@ -2651,6 +2686,31 @@ fn cmd_hash(alg: &str, bytes: &[u8], output_bytes: Option<usize>) -> Result<Stri
     Ok(digest)
 }
 
+fn cmd_hash_custom(
+    alg: &str,
+    bytes: &[u8],
+    output_bytes: Option<usize>,
+    custom: Option<&[u8]>,
+    function_name: Option<&[u8]>,
+) -> Result<String, String> {
+    if matches!(alg, "cshake128" | "cshake256") {
+        let length = match output_bytes {
+            Some(length @ 1..=1_048_576) => length,
+            _ => return Err("cSHAKE requires --output-bytes in 1..=1048576".into()),
+        };
+        let custom = custom.unwrap_or_default();
+        let function_name = function_name.unwrap_or_default();
+        return Ok(match alg {
+            "cshake128" => to_hex(&cshake128(bytes, function_name, custom, length)),
+            _ => to_hex(&cshake256(bytes, function_name, custom, length)),
+        });
+    }
+    if custom.is_some() || function_name.is_some() {
+        return Err("--custom-hex and --function-name-hex apply only to cSHAKE".into());
+    }
+    cmd_hash(alg, bytes, output_bytes)
+}
+
 fn load_mac_key(key_file: Option<&Path>, key_hex: Option<&str>) -> Result<Vec<u8>, String> {
     match (key_file, key_hex) {
         (Some(path), None) => {
@@ -2724,6 +2784,18 @@ fn cmd_mac(
         _ => return Err(format!("unknown MAC algorithm {alg:?}; use hmac-sha1, hmac-sha256, hmac-sha384, hmac-sha512, blake2b, blake2s, blake3, kmac128, kmac256, kmacxof128, kmacxof256, or siphash24")),
     };
     Ok(tag)
+}
+
+fn verify_mac_tag(computed_hex: &str, expected_hex: &str) -> Result<(), String> {
+    let expected = from_hex(expected_hex).map_err(|e| format!("invalid tag hex: {e}"))?;
+    let computed = from_hex(computed_hex).map_err(|e| format!("invalid computed tag hex: {e}"))?;
+    if expected.len() != computed.len() {
+        return Err("tag mismatch".into());
+    }
+    if computed.as_slice().ct_eq(expected.as_slice()).unwrap_u8() != 1 {
+        return Err("tag mismatch".into());
+    }
+    Ok(())
 }
 
 fn cmd_ecc_keygen() {
@@ -3136,7 +3208,9 @@ fn cmd_visual(op: VisualOp) {
 
 #[cfg(test)]
 mod hash_cli_tests {
-    use super::{cmd_hash, cmd_mac, load_hash_input, load_mac_key};
+    use super::{
+        cmd_hash, cmd_hash_custom, cmd_mac, load_hash_input, load_mac_key, verify_mac_tag,
+    };
 
     #[test]
     fn sha_variants_match_independent_abc_vectors() {
@@ -3259,5 +3333,45 @@ mod hash_cli_tests {
         std::fs::write(&path, [0, 255, 1, 128]).unwrap();
         assert_eq!(load_mac_key(Some(&path), None).unwrap(), [0, 255, 1, 128]);
         std::fs::remove_file(&path).unwrap();
+    }
+
+    #[test]
+    fn cshake_cli_matches_sp800_185_and_shake_compatibility() {
+        assert_eq!(
+            cmd_hash_custom(
+                "cshake128",
+                &[0, 1, 2, 3],
+                Some(32),
+                Some(b"Email Signature"),
+                None
+            )
+            .unwrap(),
+            "c1c36925b6409a04f1b504fcbca9d82b4017277cb5ed2b2065fc1d3814d5aaf5"
+        );
+        assert_eq!(
+            cmd_hash_custom("cshake256", &[0, 1, 2, 3], Some(64), Some(b"Email Signature"), None)
+                .unwrap(),
+            "d008828e2b80ac9d2218ffee1d070c48b8e4c87bff32c9699d5b6896eee0edd164020e2be0560858d9c00c037e34a96937c561a74c412bb4c746469527281c8c"
+        );
+        assert_eq!(
+            cmd_hash_custom("cshake128", b"abc", Some(32), None, None).unwrap(),
+            cmd_hash("shake128", b"abc", Some(32)).unwrap()
+        );
+        assert!(cmd_hash_custom("cshake128", b"abc", None, None, None).is_err());
+        assert!(cmd_hash_custom("sha256", b"abc", None, Some(b"domain"), None).is_err());
+    }
+
+    #[test]
+    fn mac_tag_verification_accepts_exact_match_and_rejects_other_tags() {
+        let tag = cmd_mac("hmac-sha256", b"key", b"abc", None, None).unwrap();
+        verify_mac_tag(&tag, &tag).unwrap();
+        let mut wrong = tag.clone().into_bytes();
+        wrong[0] = if wrong[0] == b'0' { b'1' } else { b'0' };
+        assert_eq!(
+            verify_mac_tag(&tag, std::str::from_utf8(&wrong).unwrap()).unwrap_err(),
+            "tag mismatch"
+        );
+        assert!(verify_mac_tag("abcd", "ab").is_err());
+        assert!(verify_mac_tag("abcd", "not-hex").is_err());
     }
 }

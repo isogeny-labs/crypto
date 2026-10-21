@@ -488,8 +488,17 @@ default to 64 and 32 bytes and accept lengths in `1..=64` and `1..=32`;
 their shorter digests use the algorithm's output-length parameter. Skein-256,
 Skein-512, and Skein-1024 default to 32, 64, and 128 bytes and accept
 `--output-bytes` in `1..=1048576`. Fixed-output hashes reject that flag.
-Keyed BLAKE2, HMAC, KMAC, and SipHash use the separate `crypto mac` command;
-cSHAKE customization is a separate unkeyed API.
+Keyed BLAKE2, HMAC, KMAC, and SipHash use the separate `crypto mac` command.
+cSHAKE128 and cSHAKE256 use `crypto hash` with an explicit output length and
+optional hex-encoded function name and customization strings:
+
+```sh
+crypto hash cshake128 --output-bytes 32 --custom-hex 456d61696c205369676e6174757265 --hex 00010203
+crypto hash cshake256 --output-bytes 64 --function-name-hex 54657374 --hex 00010203
+```
+
+When both strings are empty, cSHAKE produces the corresponding SHAKE output.
+Other hash algorithms reject `--custom-hex` and `--function-name-hex`.
 
 ### Keyed digests and MACs
 
@@ -503,6 +512,7 @@ crypto mac hmac-sha256 --key-file key.bin --file message.bin
 crypto mac blake2b --key-file key.bin --output-bytes 32 --hex 000102ff
 crypto mac kmac128 --key-file key.bin --output-bytes 32 --custom-hex 646f6d61696e --hex 000102ff
 crypto mac siphash24 --key-hex 000102030405060708090a0b0c0d0e0f --hex 00
+crypto mac hmac-sha256 --key-file key.bin --file message.bin --verify-tag-hex TAG
 ```
 
 The command exposes HMAC-SHA-1/256/384/512, keyed BLAKE2b/BLAKE2s,
@@ -511,3 +521,6 @@ keyed BLAKE3, KMAC128/256 and KMACXOF128/256, and SipHash-2-4. KMAC requires
 and accepts lengths up to 64 or 32 bytes. BLAKE3 requires a 32-byte key and
 SipHash a 16-byte key. SipHash prints the 64-bit result as a 16-digit
 big-endian numeric hexadecimal value. An empty key is rejected by this CLI.
+`--verify-tag-hex` compares a full-length tag in constant time after checking
+its encoding and length. It prints `verified` and exits successfully on a
+match; malformed, truncated, or different tags fail with a nonzero exit.
