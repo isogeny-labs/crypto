@@ -232,9 +232,15 @@ attack advantage against rho.
 The [query-orbit audit](gls_query_orbits_v2.csv) checks whether the
 sequential collection asks twice for target scalars related by `psi`.
 Only `p=211,B=12` has repeats before rank: 15 of 829 flat queries and
-2 of 254 folded queries. The other eight cells have none. Thus changing
-query scheduling might avoid those duplicate orbit classes, but this audit
-does not measure a rescheduled solve or a polynomial-system solver.
+2 of 254 folded queries. The other eight cells have none. Because the
+exact oracle returns **all** witnesses for each queried target and the
+folded rows of a conjugate witness orbit are scalar multiples, those two
+folded queries cannot add rank and are safely avoidable by an orbit-aware
+schedule. Deduplicating the recorded prefix removes at most
+`2/254=0.79%` of its queries; the full cold impact has not been measured.
+The 15 flat repeats are **not**
+certified redundant: conjugate rows can add independent flat rank. No
+rescheduled solve or polynomial-system solver was timed.
 
 ## Cost boundary and controls
 
@@ -291,7 +297,7 @@ to large `r` on the basis of this code.
 | Attack a twist-group target directly | Twist points become legitimate factors | This GLS panel implements the direct subgroup case and finds order-four orbit folding. Relation yield is unchanged at fixed physical base. |
 | Twist-induced Frobenius factor-base orbits | Fewer unknown logs and rows needed for rank; more physical candidates at fixed log-column budget | Validated exactly in all 9 census cells and 54 IC solves. The post hoc equal-column comparison gains coverage and cold counted cost on sparse `p=211`, but loses counted cost on the two saturated cells. |
 | Lift every relation through the automorphism | Four relations from one search hit | Every signed witness has four conjugates, but the four folded augmented rows are scalar multiples; no extra folded rank. Independent exhaustive audit and identity certificate. |
-| Quotient relation-search target orbits | Avoid repeat polynomial solves on equivalent targets | Only 15/829 and 2/254 repeats in the sparse `p=211,B=12` sequential prefixes. A phase-aware, orbit-scheduled solver remains to be implemented; the current count is only an upper bound on avoidable repeated queries. |
+| Quotient relation-search target orbits | Avoid repeat solves on equivalent folded targets | Only 2/254 folded queries in the sparse `p=211,B=12` prefix are provably redundant under the exhaustive oracle (0.79% query upper bound); the 15/829 flat repeats may add rank. A polynomial-system schedule remains unmeasured. |
 | Invariant Semaev polynomial system | Global Frobenius orbit of polynomial solutions after `X=x/c` scaling | The exact S3 scaling identity and three finite-field counterexamples establish the permitted simultaneous action; single-factor conjugation fails. No smaller Gröbner basis, faster solver, or improved polynomial relation probability has been measured. |
 | Isogeny transport to a twist model | Move a DLP into a subgroup with the useful symmetry | Needs an explicit computable map, subgroup order compatibility, kernel exclusion and map cost. The earlier [isogeny control](REPORT.md) covers one small case, not a general bridge. |
 | Extra automorphisms (`j=0,1728`) or higher-degree Frobenius | Larger orbit quotient | Requires the actual subgroup scalar action and a compatible factor base; special automorphisms can also help rho, so the same-target baseline must use them. Not tested here. |

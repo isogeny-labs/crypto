@@ -63,7 +63,7 @@ The toy producer finds $lambda$ by a charged linear scan for $x^2=-1 mod r$ and 
 - Folding reduces unknown logs from $B$ to $B/2$ in this GLS subgroup. It does not increase the number of raw hits at fixed physical base.
 - At a fixed 12-column budget, the doubled orbit-complete physical base improves coverage and collection on the sparse $p=211$ cell; cold counted cost improves there but worsens in the two saturated cells.
 - Applying $psi$ to one relation yields three more witnesses, but no new folded rank. This was checked on all signed triples.
-- A phase-aware query scheduler could avoid repeated target orbits. Among the recorded sequential prefixes, only $p=211,B=12$ has repeats: 15 of 829 flat queries and 2 of 254 folded queries. This is an upper bound on avoidable repeated queries, not a measured rescheduled solve.
+- An orbit-aware folded scheduler could remove only 2 of 254 redundant queries in the sparse $p=211,B=12$ prefix (0.79% of queries); the exact oracle returns all witnesses and conjugate folded rows are scalar multiples. The 15 of 829 flat repeats may add rank and are not safely removable. No rescheduled solver was timed.
 - For rational $E_0(F_p)$ targets, the earlier mixed-component projection theorem still blocks independent odd-order twist columns under its assumptions. This experiment does not transport such a target to the GLS twist.
 - A Semaev/Gröbner implementation must separately test whether an invariant polynomial presentation improves solve time, degree, success rate, and descent cost. The exact group oracle cannot answer that question.
 
