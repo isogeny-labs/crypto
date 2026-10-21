@@ -76,6 +76,11 @@ wins more often than each other arm below that threshold and has the
 smallest geometric-mean online time. Otherwise set
 `selected_candidate_id: null` and `BOUNDED_UNKNOWN`; the screen does not
 substitute for a single-target online result.
+The frozen [selector](select_maxk.py) consumes an independently replayed
+192-point Tier 1 matrix, requires all three exact candidate manifests and
+both reverse-order blocks, and applies this rule. A missing point, failed
+scalar replay, noisy pair, or failed exact-base stage gate leaves the
+selection `BOUNDED_UNKNOWN`.
 
 Only after a unique selection, run eight fresh one-target IC children, each
 with empty setup caches, and independently solve the same public point by
