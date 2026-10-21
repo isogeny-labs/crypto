@@ -220,6 +220,11 @@ new isolated acceptance prefix. S3 HEAD with checksum mode enabled matched
 the content SHA-256, and the exact-object cleanup ended at HEAD 404. Its
 source head, release binary hash, object key, and checks are in
 [`FINAL_CRYPTO_CLI_S3_ACCEPTANCE_20261021.json`](FINAL_CRYPTO_CLI_S3_ACCEPTANCE_20261021.json).
+The `--download` verifier was also exercised on a new 9 MiB multipart object
+in an isolated Setec acceptance prefix. HEAD-only verification, byte-level
+verification from both warm and empty caches, a fresh pull, and exact-object
+cleanup passed; the full-file SHA-256 and composite S3 checksum are in
+[`REMOTE_BYTES_S3_ACCEPTANCE_20261021.json`](REMOTE_BYTES_S3_ACCEPTANCE_20261021.json).
 
 ## For evidence
 
