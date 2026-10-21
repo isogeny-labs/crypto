@@ -35,6 +35,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import curve_id as cid  # noqa: E402
+import validation_gate as gate  # noqa: E402
 
 REPO = cid.REPO
 OUT_JSON = REPO / "docs/ic/leaderboard.json"
@@ -860,7 +861,7 @@ def jv_sieve_table() -> dict:
     }
 
 
-def build() -> dict:
+def build(allow_unvalidated: bool = False) -> dict:
     names = Names()
     frontier_audit = latest_frontier_audit()
     n83_holdout = load(SOURCES["n83_tier1_cold_holdout"])
@@ -1143,6 +1144,10 @@ def build() -> dict:
                             "variant": r["best"].get("variant"), "source": r["source"],
                             "refs": r["curve_record"]["factor_base_refs"],
                             "link_status": r["curve_record"]["factor_base_link_status"]}
+    # The validation gate (AGENTS.md, owner rule 2026-10-19): a row is validated,
+    # frozen as unvalidated (pre-gate), or refused.
+    gate.annotate_board(board, lambda r: gate.row_digest(stable(r)),
+                        allow_unvalidated=allow_unvalidated)
     leaders = {}
     for regime in ("prime", "char2", "koblitz", "koblitz_batch"):
         rows = [r for r in board if r["regime"] == regime]
@@ -1168,6 +1173,8 @@ def build() -> dict:
         "what_this_is_not": ["a measurement", "a speedup", "a claim about any curve not on it"],
         "class": "accounting",
         "sources": {k: {"path": v, "sha256": sha256(v)} for k, v in SOURCES.items()},
+        "validation_gate": {"rule": "AGENTS.md, Validation gate (owner, 2026-10-19)",
+                            "schema": gate.SCHEMA, "status_counts": gate.status_counts(board)},
         "families": families(board),
         "leaders": leaders, "board": board, "oracles": oracle_rows(names),
         "bounded_diagnostics": [bounded_diagnostic],
@@ -1324,8 +1331,8 @@ def markdown(doc: dict) -> str:
         if steps:
             L.append(f"- **Rho step:** {steps}")
         head = (["regime"] if multi else []) + ["curve", "log₂ r", "recipe", "S, IC", "S, reference",
-                                                "× reference", "S, floor", "× floor", "ok"]
-        align = (([":--"] if multi else []) + [":--", "--:", ":--", "--:", "--:", "--:", "--:", "--:", ":--"])
+                                                "× reference", "S, floor", "× floor", "ok", "validation"]
+        align = (([":--"] if multi else []) + [":--", "--:", ":--", "--:", "--:", "--:", "--:", "--:", ":--", ":--"])
         L += ["", "| " + " | ".join(head) + " |", "|" + "|".join(align) + "|"]
         for r in rows:
             b = r["best"]
@@ -1334,7 +1341,7 @@ def markdown(doc: dict) -> str:
                 f"**{times(b['ratio_rho'])}**" + (f" (was {times(b['ratio_rho_section23'])}, §23)"
                                                    if "ratio_rho_section23" in b else ""),
                 g3(r["floor_s"]), times(b["ratio_floor"]),
-                "✓" if b["verified"] else "✗"]
+                "✓" if b["verified"] else "✗", r["validation"]["status"]]
             L.append("| " + " | ".join(cells) + " |")
         L.append("")
     D = doc["jv_sieve_weak_class"]
@@ -2142,8 +2149,8 @@ def page(doc: dict, standalone: bool) -> str:
     head_cells = ('<th class="n">#</th><th>curve</th><th class="n">log₂ r</th><th>recipe</th>'
                   '<th class="n">m</th><th class="n">|F|</th><th class="n">K</th><th class="n">S, IC</th>'
                   '<th class="n">S, ref</th><th class="n">× ref</th><th class="n">S, floor</th>'
-                  '<th class="n">× floor</th><th>phases</th><th>ok</th>')
-    ncols = 14
+                  '<th class="n">× floor</th><th>phases</th><th>ok</th><th>validation</th>')
+    ncols = 15
 
     def board_rows(g: str) -> None:
         for i, r in enumerate(by_regime[g], 1):
@@ -2173,7 +2180,8 @@ def page(doc: dict, standalone: bool) -> str:
                      f'<td class="n">{b["columns"]:,}</td><td class="n">{g3(b["s"])}</td>'
                      f'<td class="n">{g3(r["reference_s"])}</td><td class="n"><span class="ratio">{times(b["ratio_rho"])}</span>{ci}</td>'
                      f'<td class="n">{g3(r["floor_s"])}</td><td class="n">{times(b["ratio_floor"])}</td><td>{phase_bar(b["phases_s"], b["s"])}</td>'
-                     f'<td>{"✓" if b["verified"] else "✗"}</td></tr>')
+                     f'<td>{"✓" if b["verified"] else "✗"}</td>'
+                     f'<td class="muted">{esc(r["validation"]["status"])}</td></tr>')
 
 
     def family_defs(code: str) -> str:
@@ -2519,8 +2527,13 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--artifact", type=Path)
+    ap.add_argument("--allow-unvalidated", action="store_true",
+                    help="local build only: mark rows without a VALIDATION.json 'unvalidated' "
+                         "instead of refusing them (CI never passes this)")
     args = ap.parse_args()
-    doc = build()
+    if args.check and args.allow_unvalidated:
+        ap.error("--check never allows unvalidated rows")
+    doc = build(allow_unvalidated=args.allow_unvalidated)
     # Round only the JSON: rendering compares recipe rows by identity.
     outs = {OUT_JSON: json.dumps(stable(doc), indent=1, ensure_ascii=False) + "\n",
             OUT_MD: markdown(doc), OUT_HTML: page(doc, standalone=True)}
