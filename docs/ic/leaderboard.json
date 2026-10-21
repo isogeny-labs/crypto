@@ -118,6 +118,10 @@
    "path": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
    "sha256": "4c296ed1a4e145cfaeff850b0a8882c5721971f607f2be2b4119d7e210c85600"
   },
+  "n83_padd_rank": {
+   "path": "research/n83_padd_rank_20261019/analysis.json",
+   "sha256": "0d993bec92eddef31976abc6f883ccf438d5017634f80fee444d59d2fee28e4f"
+  },
   "rho_optimization": {
    "path": "research/ecbench_rho_optimized_20261014/RESULT.json",
    "sha256": "195f3c4e3565dc2669769893b86741cc58d95c982190f77a0052c70b7f847cf9"
@@ -49656,6 +49660,56 @@
   "study": "research/la_engines_20261014/",
   "report": "research/la_engines_20261014/REPORT.pdf",
   "class": "engineering"
+ },
+ "n83_padd_rank_component": {
+  "source": "research/n83_padd_rank_20261019/analysis.json",
+  "study": "research/n83_padd_rank_20261019/",
+  "report": "research/n83_padd_rank_20261019/RESULT.pdf",
+  "class": "engineering",
+  "points": 20,
+  "rho_draws": 60,
+  "rho_mean_online_s": 2.03539453417,
+  "cold_s": {
+   "before": 119.898751015,
+   "after": 107.411995583,
+   "saving": 12.4867554324,
+   "saving_boot95": [
+    12.2476523461,
+    12.7229027728
+   ],
+   "ratio": 1.1162510329,
+   "ratio_boot95": [
+    1.11388500019,
+    1.11856701956
+   ]
+  },
+  "rank_s": {
+   "before": 69.6207482861,
+   "after": 57.0954778676,
+   "saving": 12.5252704184,
+   "saving_boot95": [
+    12.330376269,
+    12.7281131277
+   ],
+   "ratio": 1.21937412359,
+   "ratio_boot95": [
+    1.21547024756,
+    1.22331096474
+   ]
+  },
+  "aa_cold_ratio": 0.998336938425,
+  "aa_rank_ratio": 0.996769316587,
+  "cold_over_rho_before": 58.9068846372,
+  "cold_over_rho_before_95": [
+   50.3326199516,
+   70.3238254937
+  ],
+  "cold_over_rho_after": 52.7720762634,
+  "cold_over_rho_after_95": [
+   45.0137999672,
+   63.1528459784
+  ],
+  "kill_threshold": 1.2
  },
  "pair_table_component": {
   "schema": "ic_oracle_setup_blocked.result/v1",

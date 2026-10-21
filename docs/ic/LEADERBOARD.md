@@ -289,6 +289,18 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 [Frozen IC1 rows and candidate identities](../../research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json). The cold process includes base and index construction, relation rank, target recovery and producer verification. Rho's interval starts with its target-dependent walk and ends with scalar verification. This wall-time panel is kept separate from Tables A–C and their operation-unit S rankings.
 
 
+## N83 K1120 rank-stage component: point-addition partner roots
+
+Component speed-up on the frozen N83 K1120/root11 pipeline (class engineering), 20 points, one GitHub-hosted cloud instance, A/A control passed (cold 0.9983, rank 0.9968). It moves no row of Tables A–C: counted native operations are equal in both arms and the gain is wall-clock.
+
+| quantity | before (current producer) | after (padd) | paired saving, 95% | ratio, 95% |
+|---|---:|---:|---|---|
+| cold process s | 119.899 | 107.412 | 12.487 [12.248, 12.723] | 1.1163 [1.1139, 1.1186] |
+| rank stage s | 69.621 | 57.095 | 12.525 [12.330, 12.728] | 1.2194 [1.2155, 1.2233] |
+
+Cold IC / matched rho online (60 rho draws, mean 2.035 s): 58.9 [50.3, 70.3] before, 52.8 [45.0, 63.2] after (IC on 4 threads, rho on 1). The curve is the a = 1 curve with a 53-bit subgroup; no ECC2K-130 extrapolation is made. [Report](../../research/n83_padd_rank_20261019/RESULT.pdf).
+
+
 ## Sources
 
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
@@ -318,6 +330,7 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
+- `research/n83_padd_rank_20261019/analysis.json` — sha256 `0d993bec92eddef3…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
 - `docs/curves/registry.json` — sha256 `584d070fbec7e21f…`

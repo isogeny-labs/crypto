@@ -77,6 +77,7 @@ SOURCES = {
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
+    "n83_padd_rank": "research/n83_padd_rank_20261019/analysis.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
     "jv_sieve_strong_rho": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
     "registry": "docs/curves/registry.json",
@@ -783,6 +784,39 @@ def latest_frontier_audit() -> dict:
     }
 
 
+def n83_padd_rank_component() -> dict:
+    """The N83 K1120 rank-stage component on its own: the paired panel of
+    research/n83_padd_rank_20261019 (point-addition partner roots in the rank
+    stage), copied from its analysis.json. A component speed-up at equal
+    counted native operations: it moves no row of tables A-C, and its "before"
+    is the current producer of the same panel."""
+    a = load(SOURCES["n83_padd_rank"])
+    if (a["schema"] != "n83.padd-rank-analysis/v1" or a["status"] != "COMPLETE"
+            or a["points_valid"] != 20 or a["verdict"] != "IMPROVEMENT"
+            or not a["aa_control"]["pass"] or a["kill_condition"]["idea_does_not_transfer"]):
+        raise ValueError("N83 padd rank panel source is not a complete passing panel")
+    m, r = a["metrics"], a["rho"]["ratios"]
+
+    def pair(key: str) -> dict:
+        x = m[key]
+        return {"before": x["cur_mean"], "after": x["padd_mean"],
+                "saving": x["paired_saving_mean"], "saving_boot95": x["paired_saving_boot95"],
+                "ratio": x["ratio_cur_over_padd"], "ratio_boot95": x["ratio_boot95"]}
+
+    return {"source": SOURCES["n83_padd_rank"], "study": "research/n83_padd_rank_20261019/",
+            "report": "research/n83_padd_rank_20261019/RESULT.pdf", "class": "engineering",
+            "points": a["points_valid"], "rho_draws": a["rho"]["draws"],
+            "rho_mean_online_s": a["rho"]["mean_online_s"],
+            "cold_s": pair("cold_s"), "rank_s": pair("rank_s"),
+            "aa_cold_ratio": m["cold_s"]["aa_ratio_a_over_b"],
+            "aa_rank_ratio": m["rank_s"]["aa_ratio_a_over_b"],
+            "cold_over_rho_before": r["cur"]["ic_over_rho_online"],
+            "cold_over_rho_before_95": r["cur"]["boot95"],
+            "cold_over_rho_after": r["padd"]["ic_over_rho_online"],
+            "cold_over_rho_after_95": r["padd"]["boot95"],
+            "kill_threshold": a["kill_condition"]["rank_speedup_threshold"]}
+
+
 def jv_sieve_table() -> dict:
     """Read qualified native analysis; retain descriptive fields without treating
     missing control acceptance or incomplete original accounting as eligibility.
@@ -1178,6 +1212,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         # and renders them, outside the fully priced rankings.
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
+        "n83_padd_rank_component": n83_padd_rank_component(),
         "pair_table_component": pair_table_component(),
         "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
@@ -1642,6 +1677,26 @@ def markdown(doc: dict) -> str:
           "its target-dependent walk and ends with scalar verification. "
           "This wall-time panel is kept separate from Tables A–C and their "
           "operation-unit S rankings.", ""]
+    pr = doc["n83_padd_rank_component"]
+    L += ["", "## N83 K1120 rank-stage component: point-addition partner roots", "",
+          f"Component speed-up on the frozen N83 K1120/root11 pipeline (class {pr['class']}), "
+          f"{pr['points']} points, one GitHub-hosted cloud instance, A/A control passed "
+          f"(cold {pr['aa_cold_ratio']:.4f}, rank {pr['aa_rank_ratio']:.4f}). It moves no row of "
+          "Tables A–C: counted native operations are equal in both arms and the gain is wall-clock.", "",
+          "| quantity | before (current producer) | after (padd) | paired saving, 95% | ratio, 95% |",
+          "|---|---:|---:|---|---|"]
+    for name, key in (("cold process s", "cold_s"), ("rank stage s", "rank_s")):
+        q = pr[key]
+        L.append(f"| {name} | {q['before']:.3f} | {q['after']:.3f} | {q['saving']:.3f} "
+                 f"[{q['saving_boot95'][0]:.3f}, {q['saving_boot95'][1]:.3f}] | {q['ratio']:.4f} "
+                 f"[{q['ratio_boot95'][0]:.4f}, {q['ratio_boot95'][1]:.4f}] |")
+    L += ["", f"Cold IC / matched rho online ({pr['rho_draws']} rho draws, mean "
+          f"{pr['rho_mean_online_s']:.3f} s): {pr['cold_over_rho_before']:.1f} "
+          f"[{pr['cold_over_rho_before_95'][0]:.1f}, {pr['cold_over_rho_before_95'][1]:.1f}] before, "
+          f"{pr['cold_over_rho_after']:.1f} [{pr['cold_over_rho_after_95'][0]:.1f}, "
+          f"{pr['cold_over_rho_after_95'][1]:.1f}] after (IC on 4 threads, rho on 1). The curve is the "
+          "a = 1 curve with a 53-bit subgroup; no ECC2K-130 extrapolation is made. "
+          f"[Report](../../{pr['report']}).", ""]
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
         L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
@@ -2420,6 +2475,26 @@ def page(doc: dict, standalone: bool) -> str:
              'This Tier 1 wall-time panel uses its own unit and sits outside the '
              'operation-unit S rankings.</p>' +
              gh(n83["source"], 'Frozen IC1 rows and candidate identities') + '</section>')
+
+    pr = doc["n83_padd_rank_component"]
+    P.append('<section id="n83-padd-rank-20261019"><h2>N83 K1120 rank-stage component: point-addition partner roots</h2>'
+             f'<p>Component speed-up on the frozen N83 K1120/root11 pipeline (class {esc(pr["class"])}), '
+             f'{pr["points"]} points on one GitHub-hosted cloud instance; A/A control passed '
+             f'(cold {pr["aa_cold_ratio"]:.4f}, rank {pr["aa_rank_ratio"]:.4f}). It moves no row of '
+             'tables A–C: counted native operations are equal in both arms and the gain is wall-clock.</p>'
+             '<div class="scroll"><table><thead><tr><th>Quantity</th><th>Before (current)</th><th>After (padd)</th>'
+             '<th>Paired saving, 95%</th><th>Ratio, 95%</th></tr></thead><tbody>')
+    for name, key in (("Cold process s", "cold_s"), ("Rank stage s", "rank_s")):
+        q = pr[key]
+        P.append(f'<tr><td>{name}</td><td>{q["before"]:.3f}</td><td>{q["after"]:.3f}</td>'
+                 f'<td>{q["saving"]:.3f} [{q["saving_boot95"][0]:.3f}, {q["saving_boot95"][1]:.3f}]</td>'
+                 f'<td>{q["ratio"]:.4f} [{q["ratio_boot95"][0]:.4f}, {q["ratio_boot95"][1]:.4f}]</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>Cold IC / matched rho online ({pr["rho_draws"]} rho draws, mean {pr["rho_mean_online_s"]:.3f} s): '
+             f'{pr["cold_over_rho_before"]:.1f} [{pr["cold_over_rho_before_95"][0]:.1f}, {pr["cold_over_rho_before_95"][1]:.1f}] before, '
+             f'{pr["cold_over_rho_after"]:.1f} [{pr["cold_over_rho_after_95"][0]:.1f}, {pr["cold_over_rho_after_95"][1]:.1f}] after '
+             '(IC on 4 threads, rho on 1). a = 1 curve, 53-bit subgroup; no ECC2K-130 extrapolation.</p>' +
+             gh(pr["report"], 'Report, graph and PDF') + '</section>')
 
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '

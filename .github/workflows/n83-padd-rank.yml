@@ -1,0 +1,81 @@
+name: N83 K1120 padd rank-stage paired panel
+
+on:
+  push:
+    branches: [claude/n83-padd-rank-20261019]
+    paths:
+      - research/n83_padd_rank_20261019/trigger.txt
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n83-padd-rank-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  paired-panel:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/claude/n83-padd-rank-20261019'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Replay frozen points
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PYTHONDONTWRITEBYTECODE=1
+          mkdir -p "$RUNNER_TEMP/n83-padd-rank"
+          python3 research/n83_padd_rank_20261019/generate.py --check \
+            > "$RUNNER_TEMP/n83-padd-rank/fixture-check.json"
+          git rev-parse HEAD > "$RUNNER_TEMP/n83-padd-rank/head-sha.txt"
+          rustc --version > "$RUNNER_TEMP/n83-padd-rank/rustc-version.txt"
+          cargo --version > "$RUNNER_TEMP/n83-padd-rank/cargo-version.txt"
+
+      - name: Build and test producer and rho worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-padd-rank-target"
+          export CARGO_BUILD_JOBS=2
+          cargo test --release --locked --example koblitz_orbit_dlp_fast > \
+            "$RUNNER_TEMP/n83-padd-rank/ic-tests.log" 2>&1
+          cargo test --release --locked --example n83_rho_optimization_eval > \
+            "$RUNNER_TEMP/n83-padd-rank/rho-tests.log" 2>&1
+          cargo build --release --locked --example koblitz_orbit_dlp_fast \
+            --example n83_rho_optimization_eval > \
+            "$RUNNER_TEMP/n83-padd-rank/build.log" 2>&1
+
+      - name: Run the paired panel and same-point rho
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-padd-rank-target"
+          python3 research/n83_padd_rank_20261019/run.py \
+            --binary "$CARGO_TARGET_DIR/release/examples/koblitz_orbit_dlp_fast" \
+            --rho-binary "$CARGO_TARGET_DIR/release/examples/n83_rho_optimization_eval" \
+            --output "$RUNNER_TEMP/n83-padd-rank/results" \
+            2>&1 | tee "$RUNNER_TEMP/n83-padd-rank/run.log"
+
+      - name: Verify and analyse
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -d "$RUNNER_TEMP/n83-padd-rank/results" ]; then
+            python3 research/n83_padd_rank_20261019/analyze.py \
+              "$RUNNER_TEMP/n83-padd-rank/results" \
+              --out "$RUNNER_TEMP/n83-padd-rank/analysis.json" \
+              2>&1 | tee "$RUNNER_TEMP/n83-padd-rank/analysis.log" || true
+          fi
+
+      - name: Preserve all raw receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-padd-rank-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-padd-rank/
+          if-no-files-found: error
+          retention-days: 30
