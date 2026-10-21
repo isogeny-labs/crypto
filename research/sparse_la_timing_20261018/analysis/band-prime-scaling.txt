@@ -1,0 +1,1545 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp30-t31711-b403411a | 29.85 | filter-lanczos-0128 | 6/6 | 311.943 | 374.069 | 933.206 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | filter-lanczos-0256 | 6/6 | 179.363 | 214.775 | 533.478 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | filter-lanczos-0512 | 6/6 | 98.124 | 116.086 | 277.741 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | filter-lanczos-1024 | 6/6 | 89.771 | 101.081 | 202.872 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | filter-lanczos-2048 | 6/6 | 166.625 | 173.232 | 232.697 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | filter-lanczos-4096 | 6/6 | 557.098 | 561.231 | 598.426 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | filter-wiedemann-0128 | 6/6 | 311.943 | 374.070 | 933.212 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | filter-wiedemann-0256 | 6/6 | 179.363 | 214.775 | 533.483 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | filter-wiedemann-0512 | 6/6 | 98.124 | 116.087 | 277.746 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | filter-wiedemann-1024 | 6/6 | 89.771 | 101.082 | 202.877 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | filter-wiedemann-2048 | 6/6 | 166.625 | 173.232 | 232.703 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | filter-wiedemann-4096 | 6/6 | 557.098 | 561.231 | 598.432 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | ig-0128 | 6/6 | 54.500 | 65.274 | 162.238 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | ig-0256 | 6/6 | 36.238 | 43.050 | 104.360 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | ig-0512 | 6/6 | 24.505 | 27.714 | 56.600 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | ig-1024 | 6/6 | 41.041 | 42.514 | 55.764 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | ig-2048 | 6/6 | 137.937 | 138.591 | 144.475 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | ig-4096 | 6/6 | 540.982 | 541.432 | 545.487 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | igfr-0128 | 6/6 | 311.943 | 374.062 | 933.133 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | igfr-0256 | 6/6 | 179.363 | 214.764 | 533.366 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | igfr-0512 | 6/6 | 98.124 | 116.066 | 277.538 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | igfr-1024 | 6/6 | 89.771 | 101.034 | 202.398 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | igfr-2048 | 6/6 | 166.625 | 173.128 | 231.663 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | igfr-4096 | 6/6 | 557.098 | 561.012 | 596.241 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | lanczos-0128 | 6/6 | 311.943 | 376.606 | 958.572 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | lanczos-0256 | 6/6 | 179.363 | 226.727 | 652.996 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | lanczos-0512 | 6/6 | 98.124 | 164.762 | 764.506 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | lanczos-1024 | 6/6 | 89.771 | 352.827 | 2720.329 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | lanczos-2048 | 6/6 | 166.625 | 1338.603 | 11886.411 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | lanczos-4096 | 6/6 | 557.098 | 5684.882 | 51834.933 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | rho-neg | 6/6 | 0.891 | 0.979 | 1.769 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sg-0128 | 6/6 | 54.500 | 65.273 | 162.234 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sg-0256 | 6/6 | 36.238 | 43.049 | 104.350 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sg-0512 | 6/6 | 24.505 | 27.712 | 56.582 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sg-1024 | 6/6 | 41.041 | 42.510 | 55.731 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sg-2048 | 6/6 | 137.937 | 138.587 | 144.438 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sg-4096 | 6/6 | 540.982 | 541.423 | 545.400 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sg-aa-0128 | 6/6 | 54.500 | 65.273 | 162.234 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sg-aa-0256 | 6/6 | 36.238 | 43.049 | 104.350 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sg-aa-0512 | 6/6 | 24.505 | 27.712 | 56.582 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sg-aa-1024 | 6/6 | 41.041 | 42.510 | 55.731 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sg-aa-2048 | 6/6 | 137.937 | 138.587 | 144.438 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sg-aa-4096 | 6/6 | 540.982 | 541.423 | 545.400 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sparse-cado-0128 | 6/6 | 311.943 | 374.070 | 933.212 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sparse-cado-0256 | 6/6 | 179.363 | 214.775 | 533.483 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sparse-cado-0512 | 6/6 | 98.124 | 116.087 | 277.746 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sparse-cado-1024 | 6/6 | 89.771 | 101.082 | 202.877 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sparse-cado-2048 | 6/6 | 166.625 | 173.232 | 232.703 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | sparse-cado-4096 | 6/6 | 557.098 | 561.231 | 598.432 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | wiedemann-0128 | 6/6 | 311.943 | 378.574 | 978.252 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | wiedemann-0256 | 6/6 | 179.363 | 234.935 | 735.084 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | wiedemann-0512 | 6/6 | 98.124 | 195.988 | 1076.762 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | wiedemann-1024 | 6/6 | 89.771 | 503.941 | 4231.469 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | wiedemann-2048 | 6/6 | 166.625 | 2012.829 | 18628.664 | — |
+| icv1-fp30-t31711-b403411a | 29.85 | wiedemann-4096 | 6/6 | 557.098 | 8595.376 | 80939.878 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs filter-lanczos-0256 | filter-lanczos-0256 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs filter-lanczos-0512 | filter-lanczos-0512 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs filter-lanczos-1024 | filter-lanczos-1024 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs filter-lanczos-2048 | filter-lanczos-2048 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs filter-lanczos-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs filter-wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs filter-wiedemann-0256 | filter-wiedemann-0256 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs filter-wiedemann-0512 | filter-wiedemann-0512 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs filter-wiedemann-1024 | filter-wiedemann-1024 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs filter-wiedemann-2048 | filter-wiedemann-2048 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs filter-wiedemann-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs ig-0128 | ig-0128 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs ig-0256 | ig-0256 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs ig-0512 | ig-0512 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs ig-1024 | ig-1024 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs ig-2048 | ig-2048 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs ig-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs igfr-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs igfr-0256 | igfr-0256 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs igfr-0512 | igfr-0512 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs igfr-1024 | igfr-1024 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs igfr-2048 | igfr-2048 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs igfr-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs lanczos-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs lanczos-0256 | lanczos-0256 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs lanczos-0512 | lanczos-0512 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs lanczos-4096 | filter-lanczos-0128 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs rho-neg | rho-neg < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sg-0128 | sg-0128 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sg-0256 | sg-0256 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sg-0512 | sg-0512 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sg-1024 | sg-1024 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sg-2048 | sg-2048 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sg-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sg-aa-0128 | sg-aa-0128 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sg-aa-0256 | sg-aa-0256 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sg-aa-0512 | sg-aa-0512 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sg-aa-1024 | sg-aa-1024 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sg-aa-2048 | sg-aa-2048 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sg-aa-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sparse-cado-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sparse-cado-0256 | sparse-cado-0256 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sparse-cado-0512 | sparse-cado-0512 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sparse-cado-1024 | sparse-cado-1024 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sparse-cado-2048 | sparse-cado-2048 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs sparse-cado-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs wiedemann-0256 | wiedemann-0256 < filter-lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0128 vs wiedemann-4096 | filter-lanczos-0128 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs filter-lanczos-0512 | filter-lanczos-0512 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs filter-lanczos-1024 | filter-lanczos-1024 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs filter-lanczos-2048 | filter-lanczos-2048 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs filter-lanczos-4096 | filter-lanczos-0256 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs filter-wiedemann-0128 | filter-lanczos-0256 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs filter-wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs filter-wiedemann-0512 | filter-wiedemann-0512 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs filter-wiedemann-1024 | filter-wiedemann-1024 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs filter-wiedemann-2048 | filter-wiedemann-2048 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs filter-wiedemann-4096 | filter-lanczos-0256 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs ig-0128 | ig-0128 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs ig-0256 | ig-0256 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs ig-0512 | ig-0512 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs ig-1024 | ig-1024 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs ig-2048 | ig-2048 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs ig-4096 | filter-lanczos-0256 < ig-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs igfr-0128 | filter-lanczos-0256 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs igfr-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs igfr-0512 | igfr-0512 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs igfr-1024 | igfr-1024 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs igfr-2048 | igfr-2048 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs igfr-4096 | filter-lanczos-0256 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs lanczos-0128 | filter-lanczos-0256 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs lanczos-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs lanczos-4096 | filter-lanczos-0256 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs rho-neg | rho-neg < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sg-0128 | sg-0128 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sg-0256 | sg-0256 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sg-0512 | sg-0512 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sg-1024 | sg-1024 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sg-2048 | sg-2048 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sg-4096 | filter-lanczos-0256 < sg-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sg-aa-0128 | sg-aa-0128 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sg-aa-0256 | sg-aa-0256 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sg-aa-0512 | sg-aa-0512 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sg-aa-1024 | sg-aa-1024 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sg-aa-2048 | sg-aa-2048 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sg-aa-4096 | filter-lanczos-0256 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sparse-cado-0128 | filter-lanczos-0256 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sparse-cado-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sparse-cado-0512 | sparse-cado-0512 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sparse-cado-1024 | sparse-cado-1024 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sparse-cado-2048 | sparse-cado-2048 < filter-lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs sparse-cado-4096 | filter-lanczos-0256 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs wiedemann-0128 | filter-lanczos-0256 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0256 vs wiedemann-4096 | filter-lanczos-0256 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs filter-lanczos-1024 | filter-lanczos-1024 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs filter-lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs filter-lanczos-4096 | filter-lanczos-0512 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs filter-wiedemann-0128 | filter-lanczos-0512 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs filter-wiedemann-0256 | filter-lanczos-0512 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs filter-wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs filter-wiedemann-1024 | filter-wiedemann-1024 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs filter-wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs filter-wiedemann-4096 | filter-lanczos-0512 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs ig-0128 | ig-0128 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs ig-0256 | ig-0256 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs ig-0512 | ig-0512 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs ig-1024 | ig-1024 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs ig-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs ig-4096 | filter-lanczos-0512 < ig-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs igfr-0128 | filter-lanczos-0512 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs igfr-0256 | filter-lanczos-0512 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs igfr-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs igfr-1024 | igfr-1024 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs igfr-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs igfr-4096 | filter-lanczos-0512 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs lanczos-0128 | filter-lanczos-0512 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs lanczos-0256 | filter-lanczos-0512 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs lanczos-2048 | filter-lanczos-0512 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs lanczos-4096 | filter-lanczos-0512 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs rho-neg | rho-neg < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sg-0128 | sg-0128 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sg-0256 | sg-0256 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sg-0512 | sg-0512 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sg-1024 | sg-1024 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sg-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sg-4096 | filter-lanczos-0512 < sg-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sg-aa-0128 | sg-aa-0128 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sg-aa-0256 | sg-aa-0256 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sg-aa-0512 | sg-aa-0512 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sg-aa-1024 | sg-aa-1024 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sg-aa-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sg-aa-4096 | filter-lanczos-0512 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sparse-cado-0128 | filter-lanczos-0512 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sparse-cado-0256 | filter-lanczos-0512 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sparse-cado-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sparse-cado-1024 | sparse-cado-1024 < filter-lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sparse-cado-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs sparse-cado-4096 | filter-lanczos-0512 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs wiedemann-0128 | filter-lanczos-0512 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs wiedemann-0256 | filter-lanczos-0512 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs wiedemann-2048 | filter-lanczos-0512 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-0512 vs wiedemann-4096 | filter-lanczos-0512 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs filter-lanczos-2048 | filter-lanczos-1024 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs filter-lanczos-4096 | filter-lanczos-1024 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs filter-wiedemann-0128 | filter-lanczos-1024 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs filter-wiedemann-0256 | filter-lanczos-1024 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs filter-wiedemann-0512 | filter-lanczos-1024 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs filter-wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs filter-wiedemann-2048 | filter-lanczos-1024 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs filter-wiedemann-4096 | filter-lanczos-1024 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs ig-0128 | ig-0128 < filter-lanczos-1024 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs ig-0256 | ig-0256 < filter-lanczos-1024 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs ig-0512 | ig-0512 < filter-lanczos-1024 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs ig-1024 | ig-1024 < filter-lanczos-1024 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs ig-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs ig-4096 | filter-lanczos-1024 < ig-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs igfr-0128 | filter-lanczos-1024 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs igfr-0256 | filter-lanczos-1024 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs igfr-0512 | filter-lanczos-1024 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs igfr-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs igfr-2048 | filter-lanczos-1024 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs igfr-4096 | filter-lanczos-1024 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs lanczos-0128 | filter-lanczos-1024 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs lanczos-0256 | filter-lanczos-1024 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs lanczos-0512 | filter-lanczos-1024 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs lanczos-2048 | filter-lanczos-1024 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs lanczos-4096 | filter-lanczos-1024 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs rho-neg | rho-neg < filter-lanczos-1024 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sg-0128 | sg-0128 < filter-lanczos-1024 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sg-0256 | sg-0256 < filter-lanczos-1024 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sg-0512 | sg-0512 < filter-lanczos-1024 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sg-1024 | sg-1024 < filter-lanczos-1024 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sg-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sg-4096 | filter-lanczos-1024 < sg-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sg-aa-0128 | sg-aa-0128 < filter-lanczos-1024 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sg-aa-0256 | sg-aa-0256 < filter-lanczos-1024 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sg-aa-0512 | sg-aa-0512 < filter-lanczos-1024 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sg-aa-1024 | sg-aa-1024 < filter-lanczos-1024 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sg-aa-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sg-aa-4096 | filter-lanczos-1024 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sparse-cado-0128 | filter-lanczos-1024 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sparse-cado-0256 | filter-lanczos-1024 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sparse-cado-0512 | filter-lanczos-1024 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sparse-cado-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sparse-cado-2048 | filter-lanczos-1024 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs sparse-cado-4096 | filter-lanczos-1024 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs wiedemann-0128 | filter-lanczos-1024 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs wiedemann-0256 | filter-lanczos-1024 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs wiedemann-0512 | filter-lanczos-1024 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs wiedemann-2048 | filter-lanczos-1024 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-1024 vs wiedemann-4096 | filter-lanczos-1024 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs filter-lanczos-4096 | filter-lanczos-2048 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs filter-wiedemann-0128 | filter-lanczos-2048 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs filter-wiedemann-0256 | filter-lanczos-2048 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs filter-wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs filter-wiedemann-1024 | filter-wiedemann-1024 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs filter-wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs filter-wiedemann-4096 | filter-lanczos-2048 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs ig-0128 | ig-0128 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs ig-0256 | ig-0256 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs ig-0512 | ig-0512 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs ig-1024 | ig-1024 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs ig-2048 | ig-2048 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs ig-4096 | filter-lanczos-2048 < ig-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs igfr-0128 | filter-lanczos-2048 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs igfr-0256 | filter-lanczos-2048 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs igfr-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs igfr-1024 | igfr-1024 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs igfr-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs igfr-4096 | filter-lanczos-2048 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs lanczos-0128 | filter-lanczos-2048 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs lanczos-0256 | filter-lanczos-2048 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs lanczos-4096 | filter-lanczos-2048 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs rho-neg | rho-neg < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sg-0128 | sg-0128 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sg-0256 | sg-0256 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sg-0512 | sg-0512 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sg-1024 | sg-1024 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sg-2048 | sg-2048 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sg-4096 | filter-lanczos-2048 < sg-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sg-aa-0128 | sg-aa-0128 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sg-aa-0256 | sg-aa-0256 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sg-aa-0512 | sg-aa-0512 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sg-aa-1024 | sg-aa-1024 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sg-aa-2048 | sg-aa-2048 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sg-aa-4096 | filter-lanczos-2048 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sparse-cado-0128 | filter-lanczos-2048 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sparse-cado-0256 | filter-lanczos-2048 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sparse-cado-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sparse-cado-1024 | sparse-cado-1024 < filter-lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sparse-cado-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs sparse-cado-4096 | filter-lanczos-2048 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs wiedemann-0128 | filter-lanczos-2048 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs wiedemann-0256 | filter-lanczos-2048 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-2048 vs wiedemann-4096 | filter-lanczos-2048 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs filter-wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs filter-wiedemann-0256 | filter-wiedemann-0256 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs filter-wiedemann-0512 | filter-wiedemann-0512 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs filter-wiedemann-1024 | filter-wiedemann-1024 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs filter-wiedemann-2048 | filter-wiedemann-2048 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs filter-wiedemann-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs ig-0128 | ig-0128 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs ig-0256 | ig-0256 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs ig-0512 | ig-0512 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs ig-1024 | ig-1024 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs ig-2048 | ig-2048 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs ig-4096 | ig-4096 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs igfr-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs igfr-0256 | igfr-0256 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs igfr-0512 | igfr-0512 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs igfr-1024 | igfr-1024 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs igfr-2048 | igfr-2048 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs igfr-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs lanczos-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs lanczos-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs lanczos-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs rho-neg | rho-neg < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sg-0128 | sg-0128 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sg-0256 | sg-0256 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sg-0512 | sg-0512 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sg-1024 | sg-1024 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sg-2048 | sg-2048 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sg-4096 | sg-4096 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sg-aa-0128 | sg-aa-0128 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sg-aa-0256 | sg-aa-0256 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sg-aa-0512 | sg-aa-0512 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sg-aa-1024 | sg-aa-1024 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sg-aa-2048 | sg-aa-2048 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sg-aa-4096 | sg-aa-4096 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sparse-cado-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sparse-cado-0256 | sparse-cado-0256 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sparse-cado-0512 | sparse-cado-0512 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sparse-cado-1024 | sparse-cado-1024 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sparse-cado-2048 | sparse-cado-2048 < filter-lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs sparse-cado-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-lanczos-4096 vs wiedemann-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs filter-wiedemann-0256 | filter-wiedemann-0256 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs filter-wiedemann-0512 | filter-wiedemann-0512 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs filter-wiedemann-1024 | filter-wiedemann-1024 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs filter-wiedemann-2048 | filter-wiedemann-2048 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs filter-wiedemann-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs ig-0128 | ig-0128 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs ig-0256 | ig-0256 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs ig-0512 | ig-0512 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs ig-1024 | ig-1024 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs ig-2048 | ig-2048 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs ig-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs igfr-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs igfr-0256 | igfr-0256 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs igfr-0512 | igfr-0512 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs igfr-1024 | igfr-1024 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs igfr-2048 | igfr-2048 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs igfr-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs lanczos-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs lanczos-0256 | lanczos-0256 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs lanczos-0512 | lanczos-0512 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs lanczos-4096 | filter-wiedemann-0128 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs rho-neg | rho-neg < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sg-0128 | sg-0128 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sg-0256 | sg-0256 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sg-0512 | sg-0512 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sg-1024 | sg-1024 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sg-2048 | sg-2048 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sg-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sg-aa-0128 | sg-aa-0128 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sg-aa-0256 | sg-aa-0256 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sg-aa-0512 | sg-aa-0512 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sg-aa-1024 | sg-aa-1024 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sg-aa-2048 | sg-aa-2048 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sg-aa-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sparse-cado-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sparse-cado-0256 | sparse-cado-0256 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sparse-cado-0512 | sparse-cado-0512 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sparse-cado-1024 | sparse-cado-1024 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sparse-cado-2048 | sparse-cado-2048 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs sparse-cado-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs wiedemann-0256 | wiedemann-0256 < filter-wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0128 vs wiedemann-4096 | filter-wiedemann-0128 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs filter-wiedemann-0512 | filter-wiedemann-0512 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs filter-wiedemann-1024 | filter-wiedemann-1024 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs filter-wiedemann-2048 | filter-wiedemann-2048 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs filter-wiedemann-4096 | filter-wiedemann-0256 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs ig-0128 | ig-0128 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs ig-0256 | ig-0256 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs ig-0512 | ig-0512 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs ig-1024 | ig-1024 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs ig-2048 | ig-2048 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs ig-4096 | filter-wiedemann-0256 < ig-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs igfr-0128 | filter-wiedemann-0256 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs igfr-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs igfr-0512 | igfr-0512 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs igfr-1024 | igfr-1024 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs igfr-2048 | igfr-2048 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs igfr-4096 | filter-wiedemann-0256 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs lanczos-0128 | filter-wiedemann-0256 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs lanczos-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs lanczos-4096 | filter-wiedemann-0256 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs rho-neg | rho-neg < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sg-0128 | sg-0128 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sg-0256 | sg-0256 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sg-0512 | sg-0512 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sg-1024 | sg-1024 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sg-2048 | sg-2048 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sg-4096 | filter-wiedemann-0256 < sg-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sg-aa-0128 | sg-aa-0128 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sg-aa-0256 | sg-aa-0256 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sg-aa-0512 | sg-aa-0512 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sg-aa-1024 | sg-aa-1024 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sg-aa-2048 | sg-aa-2048 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sg-aa-4096 | filter-wiedemann-0256 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sparse-cado-0128 | filter-wiedemann-0256 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sparse-cado-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sparse-cado-0512 | sparse-cado-0512 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sparse-cado-1024 | sparse-cado-1024 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sparse-cado-2048 | sparse-cado-2048 < filter-wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs sparse-cado-4096 | filter-wiedemann-0256 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs wiedemann-0128 | filter-wiedemann-0256 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0256 vs wiedemann-4096 | filter-wiedemann-0256 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs filter-wiedemann-1024 | filter-wiedemann-1024 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs filter-wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs filter-wiedemann-4096 | filter-wiedemann-0512 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs ig-0128 | ig-0128 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs ig-0256 | ig-0256 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs ig-0512 | ig-0512 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs ig-1024 | ig-1024 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs ig-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs ig-4096 | filter-wiedemann-0512 < ig-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs igfr-0128 | filter-wiedemann-0512 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs igfr-0256 | filter-wiedemann-0512 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs igfr-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs igfr-1024 | igfr-1024 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs igfr-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs igfr-4096 | filter-wiedemann-0512 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs lanczos-0128 | filter-wiedemann-0512 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs lanczos-0256 | filter-wiedemann-0512 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs lanczos-2048 | filter-wiedemann-0512 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs lanczos-4096 | filter-wiedemann-0512 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs rho-neg | rho-neg < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sg-0128 | sg-0128 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sg-0256 | sg-0256 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sg-0512 | sg-0512 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sg-1024 | sg-1024 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sg-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sg-4096 | filter-wiedemann-0512 < sg-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sg-aa-0128 | sg-aa-0128 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sg-aa-0256 | sg-aa-0256 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sg-aa-0512 | sg-aa-0512 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sg-aa-1024 | sg-aa-1024 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sg-aa-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sg-aa-4096 | filter-wiedemann-0512 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sparse-cado-0128 | filter-wiedemann-0512 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sparse-cado-0256 | filter-wiedemann-0512 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sparse-cado-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sparse-cado-1024 | sparse-cado-1024 < filter-wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sparse-cado-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs sparse-cado-4096 | filter-wiedemann-0512 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs wiedemann-0128 | filter-wiedemann-0512 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs wiedemann-0256 | filter-wiedemann-0512 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs wiedemann-2048 | filter-wiedemann-0512 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-0512 vs wiedemann-4096 | filter-wiedemann-0512 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs filter-wiedemann-2048 | filter-wiedemann-1024 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs filter-wiedemann-4096 | filter-wiedemann-1024 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs ig-0128 | ig-0128 < filter-wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs ig-0256 | ig-0256 < filter-wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs ig-0512 | ig-0512 < filter-wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs ig-1024 | ig-1024 < filter-wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs ig-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs ig-4096 | filter-wiedemann-1024 < ig-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs igfr-0128 | filter-wiedemann-1024 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs igfr-0256 | filter-wiedemann-1024 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs igfr-0512 | filter-wiedemann-1024 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs igfr-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs igfr-2048 | filter-wiedemann-1024 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs igfr-4096 | filter-wiedemann-1024 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs lanczos-0128 | filter-wiedemann-1024 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs lanczos-0256 | filter-wiedemann-1024 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs lanczos-0512 | filter-wiedemann-1024 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs lanczos-2048 | filter-wiedemann-1024 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs lanczos-4096 | filter-wiedemann-1024 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs rho-neg | rho-neg < filter-wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sg-0128 | sg-0128 < filter-wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sg-0256 | sg-0256 < filter-wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sg-0512 | sg-0512 < filter-wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sg-1024 | sg-1024 < filter-wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sg-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sg-4096 | filter-wiedemann-1024 < sg-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sg-aa-0128 | sg-aa-0128 < filter-wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sg-aa-0256 | sg-aa-0256 < filter-wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sg-aa-0512 | sg-aa-0512 < filter-wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sg-aa-1024 | sg-aa-1024 < filter-wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sg-aa-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sg-aa-4096 | filter-wiedemann-1024 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sparse-cado-0128 | filter-wiedemann-1024 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sparse-cado-0256 | filter-wiedemann-1024 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sparse-cado-0512 | filter-wiedemann-1024 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sparse-cado-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sparse-cado-2048 | filter-wiedemann-1024 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs sparse-cado-4096 | filter-wiedemann-1024 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs wiedemann-0128 | filter-wiedemann-1024 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs wiedemann-0256 | filter-wiedemann-1024 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs wiedemann-0512 | filter-wiedemann-1024 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs wiedemann-2048 | filter-wiedemann-1024 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-1024 vs wiedemann-4096 | filter-wiedemann-1024 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs filter-wiedemann-4096 | filter-wiedemann-2048 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs ig-0128 | ig-0128 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs ig-0256 | ig-0256 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs ig-0512 | ig-0512 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs ig-1024 | ig-1024 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs ig-2048 | ig-2048 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs ig-4096 | filter-wiedemann-2048 < ig-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs igfr-0128 | filter-wiedemann-2048 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs igfr-0256 | filter-wiedemann-2048 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs igfr-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs igfr-1024 | igfr-1024 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs igfr-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs igfr-4096 | filter-wiedemann-2048 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs lanczos-0128 | filter-wiedemann-2048 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs lanczos-0256 | filter-wiedemann-2048 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs lanczos-4096 | filter-wiedemann-2048 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs rho-neg | rho-neg < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sg-0128 | sg-0128 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sg-0256 | sg-0256 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sg-0512 | sg-0512 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sg-1024 | sg-1024 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sg-2048 | sg-2048 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sg-4096 | filter-wiedemann-2048 < sg-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sg-aa-0128 | sg-aa-0128 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sg-aa-0256 | sg-aa-0256 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sg-aa-0512 | sg-aa-0512 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sg-aa-1024 | sg-aa-1024 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sg-aa-2048 | sg-aa-2048 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sg-aa-4096 | filter-wiedemann-2048 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sparse-cado-0128 | filter-wiedemann-2048 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sparse-cado-0256 | filter-wiedemann-2048 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sparse-cado-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sparse-cado-1024 | sparse-cado-1024 < filter-wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sparse-cado-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs sparse-cado-4096 | filter-wiedemann-2048 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs wiedemann-0128 | filter-wiedemann-2048 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs wiedemann-0256 | filter-wiedemann-2048 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-2048 vs wiedemann-4096 | filter-wiedemann-2048 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs ig-0128 | ig-0128 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs ig-0256 | ig-0256 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs ig-0512 | ig-0512 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs ig-1024 | ig-1024 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs ig-2048 | ig-2048 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs ig-4096 | ig-4096 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs igfr-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs igfr-0256 | igfr-0256 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs igfr-0512 | igfr-0512 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs igfr-1024 | igfr-1024 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs igfr-2048 | igfr-2048 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs igfr-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs lanczos-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs lanczos-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs lanczos-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs rho-neg | rho-neg < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sg-0128 | sg-0128 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sg-0256 | sg-0256 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sg-0512 | sg-0512 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sg-1024 | sg-1024 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sg-2048 | sg-2048 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sg-4096 | sg-4096 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sg-aa-0128 | sg-aa-0128 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sg-aa-0256 | sg-aa-0256 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sg-aa-0512 | sg-aa-0512 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sg-aa-1024 | sg-aa-1024 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sg-aa-2048 | sg-aa-2048 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sg-aa-4096 | sg-aa-4096 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sparse-cado-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sparse-cado-0256 | sparse-cado-0256 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sparse-cado-0512 | sparse-cado-0512 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sparse-cado-1024 | sparse-cado-1024 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sparse-cado-2048 | sparse-cado-2048 < filter-wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs sparse-cado-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | filter-wiedemann-4096 vs wiedemann-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0128 vs ig-0256 | ig-0256 < ig-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs ig-0512 | ig-0512 < ig-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs ig-1024 | ig-1024 < ig-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs ig-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0128 vs ig-4096 | ig-0128 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs igfr-0128 | ig-0128 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs igfr-0256 | ig-0128 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs igfr-0512 | ig-0128 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs igfr-1024 | ig-0128 < igfr-1024 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs igfr-2048 | ig-0128 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs igfr-4096 | ig-0128 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs lanczos-0128 | ig-0128 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs lanczos-0256 | ig-0128 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs lanczos-0512 | ig-0128 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs lanczos-1024 | ig-0128 < lanczos-1024 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs lanczos-2048 | ig-0128 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs lanczos-4096 | ig-0128 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs rho-neg | rho-neg < ig-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sg-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sg-0256 | sg-0256 < ig-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sg-0512 | sg-0512 < ig-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sg-1024 | sg-1024 < ig-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sg-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sg-4096 | ig-0128 < sg-4096 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sg-aa-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sg-aa-0256 | sg-aa-0256 < ig-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sg-aa-0512 | sg-aa-0512 < ig-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sg-aa-1024 | sg-aa-1024 < ig-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sg-aa-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sg-aa-4096 | ig-0128 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sparse-cado-0128 | ig-0128 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sparse-cado-0256 | ig-0128 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sparse-cado-0512 | ig-0128 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sparse-cado-1024 | ig-0128 < sparse-cado-1024 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sparse-cado-2048 | ig-0128 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs sparse-cado-4096 | ig-0128 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs wiedemann-0128 | ig-0128 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs wiedemann-0256 | ig-0128 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs wiedemann-0512 | ig-0128 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs wiedemann-1024 | ig-0128 < wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs wiedemann-2048 | ig-0128 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | ig-0128 vs wiedemann-4096 | ig-0128 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs ig-0512 | ig-0512 < ig-0256 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs ig-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0256 vs ig-2048 | ig-0256 < ig-2048 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs ig-4096 | ig-0256 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs igfr-0128 | ig-0256 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs igfr-0256 | ig-0256 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs igfr-0512 | ig-0256 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs igfr-1024 | ig-0256 < igfr-1024 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs igfr-2048 | ig-0256 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs igfr-4096 | ig-0256 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs lanczos-0128 | ig-0256 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs lanczos-0256 | ig-0256 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs lanczos-0512 | ig-0256 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs lanczos-1024 | ig-0256 < lanczos-1024 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs lanczos-2048 | ig-0256 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs lanczos-4096 | ig-0256 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs rho-neg | rho-neg < ig-0256 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sg-0128 | ig-0256 < sg-0128 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sg-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sg-0512 | sg-0512 < ig-0256 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sg-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sg-2048 | ig-0256 < sg-2048 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sg-4096 | ig-0256 < sg-4096 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sg-aa-0128 | ig-0256 < sg-aa-0128 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sg-aa-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sg-aa-0512 | sg-aa-0512 < ig-0256 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sg-aa-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sg-aa-2048 | ig-0256 < sg-aa-2048 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sg-aa-4096 | ig-0256 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sparse-cado-0128 | ig-0256 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sparse-cado-0256 | ig-0256 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sparse-cado-0512 | ig-0256 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sparse-cado-1024 | ig-0256 < sparse-cado-1024 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sparse-cado-2048 | ig-0256 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs sparse-cado-4096 | ig-0256 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs wiedemann-0128 | ig-0256 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs wiedemann-0256 | ig-0256 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs wiedemann-0512 | ig-0256 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs wiedemann-1024 | ig-0256 < wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs wiedemann-2048 | ig-0256 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | ig-0256 vs wiedemann-4096 | ig-0256 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs ig-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0512 vs ig-2048 | ig-0512 < ig-2048 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs ig-4096 | ig-0512 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs igfr-0128 | ig-0512 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs igfr-0256 | ig-0512 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs igfr-0512 | ig-0512 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs igfr-1024 | ig-0512 < igfr-1024 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs igfr-2048 | ig-0512 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs igfr-4096 | ig-0512 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs lanczos-0128 | ig-0512 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs lanczos-0256 | ig-0512 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs lanczos-0512 | ig-0512 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs lanczos-1024 | ig-0512 < lanczos-1024 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs lanczos-2048 | ig-0512 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs lanczos-4096 | ig-0512 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs rho-neg | rho-neg < ig-0512 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sg-0128 | ig-0512 < sg-0128 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sg-0256 | ig-0512 < sg-0256 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sg-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sg-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sg-2048 | ig-0512 < sg-2048 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sg-4096 | ig-0512 < sg-4096 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sg-aa-0128 | ig-0512 < sg-aa-0128 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sg-aa-0256 | ig-0512 < sg-aa-0256 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sg-aa-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sg-aa-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sg-aa-2048 | ig-0512 < sg-aa-2048 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sg-aa-4096 | ig-0512 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sparse-cado-0128 | ig-0512 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sparse-cado-0256 | ig-0512 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sparse-cado-0512 | ig-0512 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sparse-cado-1024 | ig-0512 < sparse-cado-1024 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sparse-cado-2048 | ig-0512 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs sparse-cado-4096 | ig-0512 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs wiedemann-0128 | ig-0512 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs wiedemann-0256 | ig-0512 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs wiedemann-0512 | ig-0512 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs wiedemann-1024 | ig-0512 < wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs wiedemann-2048 | ig-0512 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | ig-0512 vs wiedemann-4096 | ig-0512 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs ig-2048 | ig-1024 < ig-2048 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs ig-4096 | ig-1024 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs igfr-0128 | ig-1024 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs igfr-0256 | ig-1024 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs igfr-0512 | ig-1024 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs igfr-1024 | ig-1024 < igfr-1024 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs igfr-2048 | ig-1024 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs igfr-4096 | ig-1024 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs lanczos-0128 | ig-1024 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs lanczos-0256 | ig-1024 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs lanczos-0512 | ig-1024 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs lanczos-1024 | ig-1024 < lanczos-1024 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs lanczos-2048 | ig-1024 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs lanczos-4096 | ig-1024 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs rho-neg | rho-neg < ig-1024 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sg-0128 | ig-1024 < sg-0128 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sg-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sg-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sg-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sg-2048 | ig-1024 < sg-2048 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sg-4096 | ig-1024 < sg-4096 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sg-aa-0128 | ig-1024 < sg-aa-0128 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sg-aa-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sg-aa-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sg-aa-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sg-aa-2048 | ig-1024 < sg-aa-2048 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sg-aa-4096 | ig-1024 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sparse-cado-0128 | ig-1024 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sparse-cado-0256 | ig-1024 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sparse-cado-0512 | ig-1024 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sparse-cado-1024 | ig-1024 < sparse-cado-1024 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sparse-cado-2048 | ig-1024 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs sparse-cado-4096 | ig-1024 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs wiedemann-0128 | ig-1024 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs wiedemann-0256 | ig-1024 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs wiedemann-0512 | ig-1024 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs wiedemann-1024 | ig-1024 < wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs wiedemann-2048 | ig-1024 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | ig-1024 vs wiedemann-4096 | ig-1024 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs ig-4096 | ig-2048 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs igfr-0128 | ig-2048 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs igfr-0256 | ig-2048 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs igfr-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-2048 vs igfr-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-2048 vs igfr-2048 | ig-2048 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs igfr-4096 | ig-2048 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs lanczos-0128 | ig-2048 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs lanczos-0256 | ig-2048 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-2048 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-2048 vs lanczos-2048 | ig-2048 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs lanczos-4096 | ig-2048 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs rho-neg | rho-neg < ig-2048 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sg-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sg-0256 | sg-0256 < ig-2048 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sg-0512 | sg-0512 < ig-2048 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sg-1024 | sg-1024 < ig-2048 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sg-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sg-4096 | ig-2048 < sg-4096 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sg-aa-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sg-aa-0256 | sg-aa-0256 < ig-2048 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sg-aa-0512 | sg-aa-0512 < ig-2048 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sg-aa-1024 | sg-aa-1024 < ig-2048 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sg-aa-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sg-aa-4096 | ig-2048 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sparse-cado-0128 | ig-2048 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sparse-cado-0256 | ig-2048 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sparse-cado-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sparse-cado-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sparse-cado-2048 | ig-2048 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs sparse-cado-4096 | ig-2048 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs wiedemann-0128 | ig-2048 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs wiedemann-0256 | ig-2048 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-2048 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-2048 vs wiedemann-2048 | ig-2048 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | ig-2048 vs wiedemann-4096 | ig-2048 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs igfr-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs igfr-0256 | igfr-0256 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs igfr-0512 | igfr-0512 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs igfr-1024 | igfr-1024 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs igfr-2048 | igfr-2048 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs igfr-4096 | ig-4096 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs lanczos-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs lanczos-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs lanczos-4096 | ig-4096 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs rho-neg | rho-neg < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sg-0128 | sg-0128 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sg-0256 | sg-0256 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sg-0512 | sg-0512 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sg-1024 | sg-1024 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sg-2048 | sg-2048 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sg-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sg-aa-0128 | sg-aa-0128 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sg-aa-0256 | sg-aa-0256 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sg-aa-0512 | sg-aa-0512 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sg-aa-1024 | sg-aa-1024 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sg-aa-2048 | sg-aa-2048 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sg-aa-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sparse-cado-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sparse-cado-0256 | sparse-cado-0256 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sparse-cado-0512 | sparse-cado-0512 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sparse-cado-1024 | sparse-cado-1024 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sparse-cado-2048 | sparse-cado-2048 < ig-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs sparse-cado-4096 | ig-4096 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | ig-4096 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | ig-4096 vs wiedemann-4096 | ig-4096 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs igfr-0256 | igfr-0256 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs igfr-0512 | igfr-0512 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs igfr-1024 | igfr-1024 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs igfr-2048 | igfr-2048 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs igfr-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs lanczos-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs lanczos-0256 | lanczos-0256 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs lanczos-0512 | lanczos-0512 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs lanczos-4096 | igfr-0128 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs rho-neg | rho-neg < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sg-0128 | sg-0128 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sg-0256 | sg-0256 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sg-0512 | sg-0512 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sg-1024 | sg-1024 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sg-2048 | sg-2048 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sg-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sg-aa-0128 | sg-aa-0128 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sg-aa-0256 | sg-aa-0256 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sg-aa-0512 | sg-aa-0512 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sg-aa-1024 | sg-aa-1024 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sg-aa-2048 | sg-aa-2048 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sg-aa-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sparse-cado-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sparse-cado-0256 | sparse-cado-0256 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sparse-cado-0512 | sparse-cado-0512 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sparse-cado-1024 | sparse-cado-1024 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sparse-cado-2048 | sparse-cado-2048 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs sparse-cado-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs wiedemann-0256 | wiedemann-0256 < igfr-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0128 vs wiedemann-4096 | igfr-0128 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs igfr-0512 | igfr-0512 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs igfr-1024 | igfr-1024 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs igfr-2048 | igfr-2048 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs igfr-4096 | igfr-0256 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs lanczos-0128 | igfr-0256 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs lanczos-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs lanczos-4096 | igfr-0256 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs rho-neg | rho-neg < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sg-0128 | sg-0128 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sg-0256 | sg-0256 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sg-0512 | sg-0512 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sg-1024 | sg-1024 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sg-2048 | sg-2048 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sg-4096 | igfr-0256 < sg-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sg-aa-0128 | sg-aa-0128 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sg-aa-0256 | sg-aa-0256 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sg-aa-0512 | sg-aa-0512 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sg-aa-1024 | sg-aa-1024 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sg-aa-2048 | sg-aa-2048 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sg-aa-4096 | igfr-0256 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sparse-cado-0128 | igfr-0256 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sparse-cado-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sparse-cado-0512 | sparse-cado-0512 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sparse-cado-1024 | sparse-cado-1024 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sparse-cado-2048 | sparse-cado-2048 < igfr-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs sparse-cado-4096 | igfr-0256 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs wiedemann-0128 | igfr-0256 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0256 vs wiedemann-4096 | igfr-0256 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs igfr-1024 | igfr-1024 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs igfr-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs igfr-4096 | igfr-0512 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs lanczos-0128 | igfr-0512 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs lanczos-0256 | igfr-0512 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs lanczos-2048 | igfr-0512 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs lanczos-4096 | igfr-0512 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs rho-neg | rho-neg < igfr-0512 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sg-0128 | sg-0128 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sg-0256 | sg-0256 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sg-0512 | sg-0512 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sg-1024 | sg-1024 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sg-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sg-4096 | igfr-0512 < sg-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sg-aa-0128 | sg-aa-0128 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sg-aa-0256 | sg-aa-0256 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sg-aa-0512 | sg-aa-0512 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sg-aa-1024 | sg-aa-1024 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sg-aa-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sg-aa-4096 | igfr-0512 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sparse-cado-0128 | igfr-0512 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sparse-cado-0256 | igfr-0512 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sparse-cado-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sparse-cado-1024 | sparse-cado-1024 < igfr-0512 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sparse-cado-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs sparse-cado-4096 | igfr-0512 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs wiedemann-0128 | igfr-0512 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs wiedemann-0256 | igfr-0512 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs wiedemann-2048 | igfr-0512 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | igfr-0512 vs wiedemann-4096 | igfr-0512 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs igfr-2048 | igfr-1024 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs igfr-4096 | igfr-1024 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs lanczos-0128 | igfr-1024 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs lanczos-0256 | igfr-1024 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs lanczos-0512 | igfr-1024 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs lanczos-2048 | igfr-1024 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs lanczos-4096 | igfr-1024 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs rho-neg | rho-neg < igfr-1024 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sg-0128 | sg-0128 < igfr-1024 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sg-0256 | sg-0256 < igfr-1024 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sg-0512 | sg-0512 < igfr-1024 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sg-1024 | sg-1024 < igfr-1024 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sg-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sg-4096 | igfr-1024 < sg-4096 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sg-aa-0128 | sg-aa-0128 < igfr-1024 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sg-aa-0256 | sg-aa-0256 < igfr-1024 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sg-aa-0512 | sg-aa-0512 < igfr-1024 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sg-aa-1024 | sg-aa-1024 < igfr-1024 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sg-aa-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sg-aa-4096 | igfr-1024 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sparse-cado-0128 | igfr-1024 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sparse-cado-0256 | igfr-1024 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sparse-cado-0512 | igfr-1024 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sparse-cado-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sparse-cado-2048 | igfr-1024 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs sparse-cado-4096 | igfr-1024 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs wiedemann-0128 | igfr-1024 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs wiedemann-0256 | igfr-1024 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs wiedemann-0512 | igfr-1024 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs wiedemann-2048 | igfr-1024 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | igfr-1024 vs wiedemann-4096 | igfr-1024 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs igfr-4096 | igfr-2048 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs lanczos-0128 | igfr-2048 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs lanczos-0256 | igfr-2048 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs lanczos-4096 | igfr-2048 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs rho-neg | rho-neg < igfr-2048 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sg-0128 | sg-0128 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sg-0256 | sg-0256 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sg-0512 | sg-0512 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sg-1024 | sg-1024 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sg-2048 | sg-2048 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sg-4096 | igfr-2048 < sg-4096 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sg-aa-0128 | sg-aa-0128 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sg-aa-0256 | sg-aa-0256 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sg-aa-0512 | sg-aa-0512 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sg-aa-1024 | sg-aa-1024 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sg-aa-2048 | sg-aa-2048 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sg-aa-4096 | igfr-2048 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sparse-cado-0128 | igfr-2048 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sparse-cado-0256 | igfr-2048 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sparse-cado-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sparse-cado-1024 | sparse-cado-1024 < igfr-2048 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sparse-cado-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs sparse-cado-4096 | igfr-2048 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs wiedemann-0128 | igfr-2048 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs wiedemann-0256 | igfr-2048 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-2048 vs wiedemann-4096 | igfr-2048 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs lanczos-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs lanczos-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs lanczos-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs rho-neg | rho-neg < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sg-0128 | sg-0128 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sg-0256 | sg-0256 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sg-0512 | sg-0512 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sg-1024 | sg-1024 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sg-2048 | sg-2048 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sg-4096 | sg-4096 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sg-aa-0128 | sg-aa-0128 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sg-aa-0256 | sg-aa-0256 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sg-aa-0512 | sg-aa-0512 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sg-aa-1024 | sg-aa-1024 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sg-aa-2048 | sg-aa-2048 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sg-aa-4096 | sg-aa-4096 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sparse-cado-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sparse-cado-0256 | sparse-cado-0256 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sparse-cado-0512 | sparse-cado-0512 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sparse-cado-1024 | sparse-cado-1024 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sparse-cado-2048 | sparse-cado-2048 < igfr-4096 |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs sparse-cado-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | igfr-4096 vs wiedemann-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs lanczos-0256 | lanczos-0256 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs lanczos-0512 | lanczos-0512 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs lanczos-4096 | lanczos-0128 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs rho-neg | rho-neg < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sg-0128 | sg-0128 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sg-0256 | sg-0256 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sg-0512 | sg-0512 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sg-1024 | sg-1024 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sg-2048 | sg-2048 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sg-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sg-aa-0128 | sg-aa-0128 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sg-aa-0256 | sg-aa-0256 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sg-aa-0512 | sg-aa-0512 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sg-aa-1024 | sg-aa-1024 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sg-aa-2048 | sg-aa-2048 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sg-aa-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sparse-cado-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sparse-cado-0256 | sparse-cado-0256 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sparse-cado-0512 | sparse-cado-0512 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sparse-cado-1024 | sparse-cado-1024 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sparse-cado-2048 | sparse-cado-2048 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs sparse-cado-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs wiedemann-0256 | wiedemann-0256 < lanczos-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0128 vs wiedemann-4096 | lanczos-0128 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs lanczos-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs lanczos-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs lanczos-4096 | lanczos-0256 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs rho-neg | rho-neg < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sg-0128 | sg-0128 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sg-0256 | sg-0256 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sg-0512 | sg-0512 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sg-1024 | sg-1024 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sg-2048 | sg-2048 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sg-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sg-aa-0128 | sg-aa-0128 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sg-aa-0256 | sg-aa-0256 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sg-aa-0512 | sg-aa-0512 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sg-aa-1024 | sg-aa-1024 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sg-aa-2048 | sg-aa-2048 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sg-aa-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sparse-cado-0128 | lanczos-0256 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sparse-cado-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sparse-cado-0512 | sparse-cado-0512 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sparse-cado-1024 | sparse-cado-1024 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sparse-cado-2048 | sparse-cado-2048 < lanczos-0256 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs sparse-cado-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs wiedemann-0128 | lanczos-0256 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0256 vs wiedemann-4096 | lanczos-0256 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs lanczos-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs lanczos-2048 | lanczos-0512 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs lanczos-4096 | lanczos-0512 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs rho-neg | rho-neg < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sg-0128 | sg-0128 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sg-0256 | sg-0256 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sg-0512 | sg-0512 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sg-1024 | sg-1024 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sg-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sg-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sg-aa-0128 | sg-aa-0128 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sg-aa-0256 | sg-aa-0256 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sg-aa-0512 | sg-aa-0512 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sg-aa-1024 | sg-aa-1024 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sg-aa-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sg-aa-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sparse-cado-0128 | lanczos-0512 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sparse-cado-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sparse-cado-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sparse-cado-1024 | sparse-cado-1024 < lanczos-0512 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sparse-cado-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs sparse-cado-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs wiedemann-0128 | lanczos-0512 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs wiedemann-2048 | lanczos-0512 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-0512 vs wiedemann-4096 | lanczos-0512 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs lanczos-2048 | lanczos-1024 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs lanczos-4096 | lanczos-1024 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs rho-neg | rho-neg < lanczos-1024 |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sg-0128 | sg-0128 < lanczos-1024 |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sg-0256 | sg-0256 < lanczos-1024 |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sg-0512 | sg-0512 < lanczos-1024 |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sg-1024 | sg-1024 < lanczos-1024 |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sg-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sg-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sg-aa-0128 | sg-aa-0128 < lanczos-1024 |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sg-aa-0256 | sg-aa-0256 < lanczos-1024 |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sg-aa-0512 | sg-aa-0512 < lanczos-1024 |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sg-aa-1024 | sg-aa-1024 < lanczos-1024 |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sg-aa-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sg-aa-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sparse-cado-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sparse-cado-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sparse-cado-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sparse-cado-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sparse-cado-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs sparse-cado-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs wiedemann-2048 | lanczos-1024 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-1024 vs wiedemann-4096 | lanczos-1024 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs lanczos-4096 | lanczos-2048 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs rho-neg | rho-neg < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sg-0128 | sg-0128 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sg-0256 | sg-0256 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sg-0512 | sg-0512 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sg-1024 | sg-1024 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sg-2048 | sg-2048 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sg-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sg-aa-0128 | sg-aa-0128 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sg-aa-0256 | sg-aa-0256 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sg-aa-0512 | sg-aa-0512 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sg-aa-1024 | sg-aa-1024 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sg-aa-2048 | sg-aa-2048 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sg-aa-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sparse-cado-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sparse-cado-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sparse-cado-0512 | sparse-cado-0512 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sparse-cado-1024 | sparse-cado-1024 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sparse-cado-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs sparse-cado-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs wiedemann-0512 | wiedemann-0512 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs wiedemann-1024 | wiedemann-1024 < lanczos-2048 |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-2048 vs wiedemann-4096 | lanczos-2048 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs rho-neg | rho-neg < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sg-0128 | sg-0128 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sg-0256 | sg-0256 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sg-0512 | sg-0512 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sg-1024 | sg-1024 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sg-2048 | sg-2048 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sg-4096 | sg-4096 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sg-aa-0128 | sg-aa-0128 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sg-aa-0256 | sg-aa-0256 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sg-aa-0512 | sg-aa-0512 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sg-aa-1024 | sg-aa-1024 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sg-aa-2048 | sg-aa-2048 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sg-aa-4096 | sg-aa-4096 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sparse-cado-0128 | sparse-cado-0128 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sparse-cado-0256 | sparse-cado-0256 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sparse-cado-0512 | sparse-cado-0512 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sparse-cado-1024 | sparse-cado-1024 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sparse-cado-2048 | sparse-cado-2048 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs sparse-cado-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs wiedemann-0128 | wiedemann-0128 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs wiedemann-0256 | wiedemann-0256 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs wiedemann-0512 | wiedemann-0512 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs wiedemann-1024 | wiedemann-1024 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs wiedemann-2048 | wiedemann-2048 < lanczos-4096 |
+| icv1-fp30-t31711-b403411a | lanczos-4096 vs wiedemann-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | rho-neg vs sg-0128 | rho-neg < sg-0128 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sg-0256 | rho-neg < sg-0256 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sg-0512 | rho-neg < sg-0512 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sg-1024 | rho-neg < sg-1024 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sg-2048 | rho-neg < sg-2048 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sg-4096 | rho-neg < sg-4096 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sg-aa-0128 | rho-neg < sg-aa-0128 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sg-aa-0256 | rho-neg < sg-aa-0256 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sg-aa-0512 | rho-neg < sg-aa-0512 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sg-aa-1024 | rho-neg < sg-aa-1024 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sg-aa-2048 | rho-neg < sg-aa-2048 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sg-aa-4096 | rho-neg < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sparse-cado-0128 | rho-neg < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sparse-cado-0256 | rho-neg < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sparse-cado-0512 | rho-neg < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sparse-cado-1024 | rho-neg < sparse-cado-1024 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sparse-cado-2048 | rho-neg < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | rho-neg vs sparse-cado-4096 | rho-neg < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | rho-neg vs wiedemann-0128 | rho-neg < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | rho-neg vs wiedemann-0256 | rho-neg < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | rho-neg vs wiedemann-0512 | rho-neg < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | rho-neg vs wiedemann-1024 | rho-neg < wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | rho-neg vs wiedemann-2048 | rho-neg < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | rho-neg vs wiedemann-4096 | rho-neg < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sg-0256 | sg-0256 < sg-0128 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sg-0512 | sg-0512 < sg-0128 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sg-1024 | sg-1024 < sg-0128 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sg-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sg-4096 | sg-0128 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sg-aa-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sg-aa-0256 | sg-aa-0256 < sg-0128 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sg-aa-0512 | sg-aa-0512 < sg-0128 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sg-aa-1024 | sg-aa-1024 < sg-0128 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sg-aa-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sg-aa-4096 | sg-0128 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sparse-cado-0128 | sg-0128 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sparse-cado-0256 | sg-0128 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sparse-cado-0512 | sg-0128 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sparse-cado-1024 | sg-0128 < sparse-cado-1024 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sparse-cado-2048 | sg-0128 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs sparse-cado-4096 | sg-0128 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs wiedemann-0128 | sg-0128 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs wiedemann-0256 | sg-0128 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs wiedemann-0512 | sg-0128 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs wiedemann-1024 | sg-0128 < wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs wiedemann-2048 | sg-0128 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | sg-0128 vs wiedemann-4096 | sg-0128 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sg-0512 | sg-0512 < sg-0256 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sg-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sg-2048 | sg-0256 < sg-2048 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sg-4096 | sg-0256 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sg-aa-0128 | sg-0256 < sg-aa-0128 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sg-aa-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sg-aa-0512 | sg-aa-0512 < sg-0256 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sg-aa-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sg-aa-2048 | sg-0256 < sg-aa-2048 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sg-aa-4096 | sg-0256 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sparse-cado-0128 | sg-0256 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sparse-cado-0256 | sg-0256 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sparse-cado-0512 | sg-0256 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sparse-cado-1024 | sg-0256 < sparse-cado-1024 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sparse-cado-2048 | sg-0256 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs sparse-cado-4096 | sg-0256 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs wiedemann-0128 | sg-0256 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs wiedemann-0256 | sg-0256 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs wiedemann-0512 | sg-0256 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs wiedemann-1024 | sg-0256 < wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs wiedemann-2048 | sg-0256 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | sg-0256 vs wiedemann-4096 | sg-0256 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sg-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sg-2048 | sg-0512 < sg-2048 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sg-4096 | sg-0512 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sg-aa-0128 | sg-0512 < sg-aa-0128 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sg-aa-0256 | sg-0512 < sg-aa-0256 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sg-aa-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sg-aa-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sg-aa-2048 | sg-0512 < sg-aa-2048 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sg-aa-4096 | sg-0512 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sparse-cado-0128 | sg-0512 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sparse-cado-0256 | sg-0512 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sparse-cado-0512 | sg-0512 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sparse-cado-1024 | sg-0512 < sparse-cado-1024 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sparse-cado-2048 | sg-0512 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs sparse-cado-4096 | sg-0512 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs wiedemann-0128 | sg-0512 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs wiedemann-0256 | sg-0512 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs wiedemann-0512 | sg-0512 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs wiedemann-1024 | sg-0512 < wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs wiedemann-2048 | sg-0512 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | sg-0512 vs wiedemann-4096 | sg-0512 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sg-2048 | sg-1024 < sg-2048 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sg-4096 | sg-1024 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sg-aa-0128 | sg-1024 < sg-aa-0128 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sg-aa-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sg-aa-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sg-aa-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sg-aa-2048 | sg-1024 < sg-aa-2048 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sg-aa-4096 | sg-1024 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sparse-cado-0128 | sg-1024 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sparse-cado-0256 | sg-1024 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sparse-cado-0512 | sg-1024 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sparse-cado-1024 | sg-1024 < sparse-cado-1024 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sparse-cado-2048 | sg-1024 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs sparse-cado-4096 | sg-1024 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs wiedemann-0128 | sg-1024 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs wiedemann-0256 | sg-1024 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs wiedemann-0512 | sg-1024 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs wiedemann-1024 | sg-1024 < wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs wiedemann-2048 | sg-1024 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | sg-1024 vs wiedemann-4096 | sg-1024 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sg-2048 vs sg-4096 | sg-2048 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-2048 vs sg-aa-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-2048 vs sg-aa-0256 | sg-aa-0256 < sg-2048 |
+| icv1-fp30-t31711-b403411a | sg-2048 vs sg-aa-0512 | sg-aa-0512 < sg-2048 |
+| icv1-fp30-t31711-b403411a | sg-2048 vs sg-aa-1024 | sg-aa-1024 < sg-2048 |
+| icv1-fp30-t31711-b403411a | sg-2048 vs sg-aa-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-2048 vs sg-aa-4096 | sg-2048 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-2048 vs sparse-cado-0128 | sg-2048 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sg-2048 vs sparse-cado-0256 | sg-2048 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | sg-2048 vs sparse-cado-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-2048 vs sparse-cado-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-2048 vs sparse-cado-2048 | sg-2048 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | sg-2048 vs sparse-cado-4096 | sg-2048 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sg-2048 vs wiedemann-0128 | sg-2048 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sg-2048 vs wiedemann-0256 | sg-2048 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | sg-2048 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-2048 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-2048 vs wiedemann-2048 | sg-2048 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | sg-2048 vs wiedemann-4096 | sg-2048 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sg-4096 vs sg-aa-0128 | sg-aa-0128 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-4096 vs sg-aa-0256 | sg-aa-0256 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-4096 vs sg-aa-0512 | sg-aa-0512 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-4096 vs sg-aa-1024 | sg-aa-1024 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-4096 vs sg-aa-2048 | sg-aa-2048 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-4096 vs sg-aa-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-4096 vs sparse-cado-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-4096 vs sparse-cado-0256 | sparse-cado-0256 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-4096 vs sparse-cado-0512 | sparse-cado-0512 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-4096 vs sparse-cado-1024 | sparse-cado-1024 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-4096 vs sparse-cado-2048 | sparse-cado-2048 < sg-4096 |
+| icv1-fp30-t31711-b403411a | sg-4096 vs sparse-cado-4096 | sg-4096 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sg-4096 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-4096 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-4096 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-4096 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-4096 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-4096 vs wiedemann-4096 | sg-4096 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs sg-aa-0256 | sg-aa-0256 < sg-aa-0128 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs sg-aa-0512 | sg-aa-0512 < sg-aa-0128 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs sg-aa-1024 | sg-aa-1024 < sg-aa-0128 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs sg-aa-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs sg-aa-4096 | sg-aa-0128 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs sparse-cado-0128 | sg-aa-0128 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs sparse-cado-0256 | sg-aa-0128 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs sparse-cado-0512 | sg-aa-0128 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs sparse-cado-1024 | sg-aa-0128 < sparse-cado-1024 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs sparse-cado-2048 | sg-aa-0128 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs sparse-cado-4096 | sg-aa-0128 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs wiedemann-0128 | sg-aa-0128 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs wiedemann-0256 | sg-aa-0128 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs wiedemann-0512 | sg-aa-0128 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs wiedemann-1024 | sg-aa-0128 < wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs wiedemann-2048 | sg-aa-0128 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | sg-aa-0128 vs wiedemann-4096 | sg-aa-0128 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs sg-aa-0512 | sg-aa-0512 < sg-aa-0256 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs sg-aa-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs sg-aa-2048 | sg-aa-0256 < sg-aa-2048 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs sg-aa-4096 | sg-aa-0256 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs sparse-cado-0128 | sg-aa-0256 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs sparse-cado-0256 | sg-aa-0256 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs sparse-cado-0512 | sg-aa-0256 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs sparse-cado-1024 | sg-aa-0256 < sparse-cado-1024 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs sparse-cado-2048 | sg-aa-0256 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs sparse-cado-4096 | sg-aa-0256 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs wiedemann-0128 | sg-aa-0256 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs wiedemann-0256 | sg-aa-0256 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs wiedemann-0512 | sg-aa-0256 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs wiedemann-1024 | sg-aa-0256 < wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs wiedemann-2048 | sg-aa-0256 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | sg-aa-0256 vs wiedemann-4096 | sg-aa-0256 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs sg-aa-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs sg-aa-2048 | sg-aa-0512 < sg-aa-2048 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs sg-aa-4096 | sg-aa-0512 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs sparse-cado-0128 | sg-aa-0512 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs sparse-cado-0256 | sg-aa-0512 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs sparse-cado-0512 | sg-aa-0512 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs sparse-cado-1024 | sg-aa-0512 < sparse-cado-1024 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs sparse-cado-2048 | sg-aa-0512 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs sparse-cado-4096 | sg-aa-0512 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs wiedemann-0128 | sg-aa-0512 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs wiedemann-0256 | sg-aa-0512 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs wiedemann-0512 | sg-aa-0512 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs wiedemann-1024 | sg-aa-0512 < wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs wiedemann-2048 | sg-aa-0512 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | sg-aa-0512 vs wiedemann-4096 | sg-aa-0512 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs sg-aa-2048 | sg-aa-1024 < sg-aa-2048 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs sg-aa-4096 | sg-aa-1024 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs sparse-cado-0128 | sg-aa-1024 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs sparse-cado-0256 | sg-aa-1024 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs sparse-cado-0512 | sg-aa-1024 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs sparse-cado-1024 | sg-aa-1024 < sparse-cado-1024 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs sparse-cado-2048 | sg-aa-1024 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs sparse-cado-4096 | sg-aa-1024 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs wiedemann-0128 | sg-aa-1024 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs wiedemann-0256 | sg-aa-1024 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs wiedemann-0512 | sg-aa-1024 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs wiedemann-1024 | sg-aa-1024 < wiedemann-1024 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs wiedemann-2048 | sg-aa-1024 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | sg-aa-1024 vs wiedemann-4096 | sg-aa-1024 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-2048 vs sg-aa-4096 | sg-aa-2048 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-2048 vs sparse-cado-0128 | sg-aa-2048 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sg-aa-2048 vs sparse-cado-0256 | sg-aa-2048 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | sg-aa-2048 vs sparse-cado-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-aa-2048 vs sparse-cado-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-aa-2048 vs sparse-cado-2048 | sg-aa-2048 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | sg-aa-2048 vs sparse-cado-4096 | sg-aa-2048 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-2048 vs wiedemann-0128 | sg-aa-2048 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sg-aa-2048 vs wiedemann-0256 | sg-aa-2048 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | sg-aa-2048 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-aa-2048 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-aa-2048 vs wiedemann-2048 | sg-aa-2048 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | sg-aa-2048 vs wiedemann-4096 | sg-aa-2048 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-4096 vs sparse-cado-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-aa-4096 vs sparse-cado-0256 | sparse-cado-0256 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-4096 vs sparse-cado-0512 | sparse-cado-0512 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-4096 vs sparse-cado-1024 | sparse-cado-1024 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-4096 vs sparse-cado-2048 | sparse-cado-2048 < sg-aa-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-4096 vs sparse-cado-4096 | sg-aa-4096 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sg-aa-4096 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-aa-4096 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-aa-4096 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-aa-4096 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-aa-4096 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sg-aa-4096 vs wiedemann-4096 | sg-aa-4096 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0128 vs sparse-cado-0256 | sparse-cado-0256 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0128 vs sparse-cado-0512 | sparse-cado-0512 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0128 vs sparse-cado-1024 | sparse-cado-1024 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0128 vs sparse-cado-2048 | sparse-cado-2048 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0128 vs sparse-cado-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-0128 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-0128 vs wiedemann-0256 | wiedemann-0256 < sparse-cado-0128 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0128 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-0128 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-0128 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-0128 vs wiedemann-4096 | sparse-cado-0128 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0256 vs sparse-cado-0512 | sparse-cado-0512 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0256 vs sparse-cado-1024 | sparse-cado-1024 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0256 vs sparse-cado-2048 | sparse-cado-2048 < sparse-cado-0256 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0256 vs sparse-cado-4096 | sparse-cado-0256 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0256 vs wiedemann-0128 | sparse-cado-0256 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0256 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-0256 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-0256 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-0256 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-0256 vs wiedemann-4096 | sparse-cado-0256 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0512 vs sparse-cado-1024 | sparse-cado-1024 < sparse-cado-0512 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0512 vs sparse-cado-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-0512 vs sparse-cado-4096 | sparse-cado-0512 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0512 vs wiedemann-0128 | sparse-cado-0512 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0512 vs wiedemann-0256 | sparse-cado-0512 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0512 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-0512 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-0512 vs wiedemann-2048 | sparse-cado-0512 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | sparse-cado-0512 vs wiedemann-4096 | sparse-cado-0512 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sparse-cado-1024 vs sparse-cado-2048 | sparse-cado-1024 < sparse-cado-2048 |
+| icv1-fp30-t31711-b403411a | sparse-cado-1024 vs sparse-cado-4096 | sparse-cado-1024 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sparse-cado-1024 vs wiedemann-0128 | sparse-cado-1024 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sparse-cado-1024 vs wiedemann-0256 | sparse-cado-1024 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | sparse-cado-1024 vs wiedemann-0512 | sparse-cado-1024 < wiedemann-0512 |
+| icv1-fp30-t31711-b403411a | sparse-cado-1024 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-1024 vs wiedemann-2048 | sparse-cado-1024 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | sparse-cado-1024 vs wiedemann-4096 | sparse-cado-1024 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sparse-cado-2048 vs sparse-cado-4096 | sparse-cado-2048 < sparse-cado-4096 |
+| icv1-fp30-t31711-b403411a | sparse-cado-2048 vs wiedemann-0128 | sparse-cado-2048 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | sparse-cado-2048 vs wiedemann-0256 | sparse-cado-2048 < wiedemann-0256 |
+| icv1-fp30-t31711-b403411a | sparse-cado-2048 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-2048 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-2048 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-2048 vs wiedemann-4096 | sparse-cado-2048 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | sparse-cado-4096 vs wiedemann-0128 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-4096 vs wiedemann-0256 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-4096 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-4096 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-4096 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | sparse-cado-4096 vs wiedemann-4096 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | wiedemann-0128 vs wiedemann-0256 | wiedemann-0256 < wiedemann-0128 |
+| icv1-fp30-t31711-b403411a | wiedemann-0128 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | wiedemann-0128 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | wiedemann-0128 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | wiedemann-0128 vs wiedemann-4096 | wiedemann-0128 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | wiedemann-0256 vs wiedemann-0512 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | wiedemann-0256 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | wiedemann-0256 vs wiedemann-2048 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | wiedemann-0256 vs wiedemann-4096 | wiedemann-0256 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | wiedemann-0512 vs wiedemann-1024 | unresolved inside the band |
+| icv1-fp30-t31711-b403411a | wiedemann-0512 vs wiedemann-2048 | wiedemann-0512 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | wiedemann-0512 vs wiedemann-4096 | wiedemann-0512 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | wiedemann-1024 vs wiedemann-2048 | wiedemann-1024 < wiedemann-2048 |
+| icv1-fp30-t31711-b403411a | wiedemann-1024 vs wiedemann-4096 | wiedemann-1024 < wiedemann-4096 |
+| icv1-fp30-t31711-b403411a | wiedemann-2048 vs wiedemann-4096 | wiedemann-2048 < wiedemann-4096 |
