@@ -15,7 +15,7 @@
 //!
 //! 2. [`length_extension_attack`] — given `H(secret || m)` and `len(secret)`,
 //!    forge `H(secret || m || pad || suffix)` without knowing `secret`.
-//!    The current adapters support MD4, MD5, SHA-1, and SHA-256 without
+//!    The current adapters support MD4, MD5, SHA-1, SHA-256, and SHA-512 without
 //!    HMAC-style wrapping. Other Merkle-Damgård hashes need adapters.
 //!
 //! 3. [`birthday_collision_search`] — generic √n collision finder
@@ -236,6 +236,70 @@ impl MerkleDamgardHash for Sha256 {
         padding
     }
 }
+
+/// SHA-512 exposes all eight 64-bit chaining words in its digest.
+pub struct Sha512;
+impl HashFunction for Sha512 {
+    fn name(&self) -> &'static str {
+        "SHA-512"
+    }
+    fn output_bytes(&self) -> usize {
+        64
+    }
+    fn block_bytes(&self) -> usize {
+        128
+    }
+    fn hash(&self, message: &[u8]) -> Vec<u8> {
+        crate::hash::sha512(message).to_vec()
+    }
+}
+impl MerkleDamgardHash for Sha512 {
+    fn compress(&self, state: &mut [u8], block: &[u8]) {
+        let mut words = [0u64; 8];
+        for (i, word) in words.iter_mut().enumerate() {
+            *word = u64::from_be_bytes(state[8 * i..8 * i + 8].try_into().unwrap());
+        }
+        let block: &[u8; 128] = block.try_into().expect("SHA-512 block has 128 bytes");
+        crate::hash::sha512::compress(&mut words, block);
+        for (i, word) in words.iter().enumerate() {
+            state[8 * i..8 * i + 8].copy_from_slice(&word.to_be_bytes());
+        }
+    }
+    fn padding_for_length(&self, message_bytes: usize) -> Vec<u8> {
+        let bit_len = (message_bytes as u128) * 8;
+        let mut padding = vec![0x80];
+        while (message_bytes + padding.len()) % 128 != 112 {
+            padding.push(0);
+        }
+        padding.extend_from_slice(&bit_len.to_be_bytes());
+        padding
+    }
+}
+
+macro_rules! fixed_hash_adapter {
+    ($type:ident, $name:literal, $output:literal, $block:literal, $hash:path) => {
+        pub struct $type;
+        impl HashFunction for $type {
+            fn name(&self) -> &'static str {
+                $name
+            }
+            fn output_bytes(&self) -> usize {
+                $output
+            }
+            fn block_bytes(&self) -> usize {
+                $block
+            }
+            fn hash(&self, message: &[u8]) -> Vec<u8> {
+                $hash(message).to_vec()
+            }
+        }
+    };
+}
+fixed_hash_adapter!(Sha224, "SHA-224", 28, 64, crate::hash::sha224);
+fixed_hash_adapter!(Sha384, "SHA-384", 48, 128, crate::hash::sha384);
+fixed_hash_adapter!(Sha512_224, "SHA-512/224", 28, 128, crate::hash::sha512_224);
+fixed_hash_adapter!(Sha512_256, "SHA-512/256", 32, 128, crate::hash::sha512_256);
+fixed_hash_adapter!(Blake3, "BLAKE3", 32, 64, crate::hash::blake3_hash);
 
 // SHA-3 uses a sponge. All four fixed-output variants support generic
 // birthday and differential measurements, but not Merkle-Damgård length
@@ -568,6 +632,16 @@ pub fn auto_hash_attack_with_output_bytes(
             md.push_str(&run_birthday(&Sha256, 32, 200_000));
             md.push_str(&run_differential(&Sha256));
         }
+        "sha512" | "sha-512" => {
+            md.push_str(&run_length_extension(&Sha512));
+            md.push_str(&run_birthday(&Sha512, 32, 200_000));
+            md.push_str(&run_differential(&Sha512));
+        }
+        "sha224" | "sha-224" => md.push_str(&run_fixed_without_extension(&Sha224)),
+        "sha384" | "sha-384" => md.push_str(&run_fixed_without_extension(&Sha384)),
+        "sha512-224" | "sha-512-224" => md.push_str(&run_fixed_without_extension(&Sha512_224)),
+        "sha512-256" | "sha-512-256" => md.push_str(&run_fixed_without_extension(&Sha512_256)),
+        "blake3" => md.push_str(&run_fixed_without_extension(&Blake3)),
         "sha3-224" => md.push_str(&run_sponge(&Sha3_224)),
         "sha3" | "sha3-256" => md.push_str(&run_sponge(&Sha3_256)),
         "sha3-384" => md.push_str(&run_sponge(&Sha3_384)),
@@ -576,12 +650,22 @@ pub fn auto_hash_attack_with_output_bytes(
         "shake256" => md.push_str(&run_sponge(&Shake256(xof_len))),
         _ => {
             return Err(format!(
-                "unknown hash '{}'; try one of: md4, md5, sha1, sha256, sha3-224, sha3-256, sha3-384, sha3-512, shake128, shake256",
+                "unknown hash '{}'; try one of: md4, md5, sha1, sha224, sha256, sha384, sha512, sha512-224, sha512-256, sha3-224, sha3-256, sha3-384, sha3-512, shake128, shake256, blake3",
                 hash_name
             ));
         }
     }
     Ok(md)
+}
+
+fn run_fixed_without_extension<H: HashFunction>(hash: &H) -> String {
+    let mut report = format!(
+        "## Length extension\n\n{} has no length-extension adapter in this command. This does not establish resistance to length extension.\n\n",
+        hash.name()
+    );
+    report.push_str(&run_birthday(hash, 32, 200_000));
+    report.push_str(&run_differential(hash));
+    report
 }
 
 fn run_sponge<H: HashFunction>(hash: &H) -> String {
@@ -751,6 +835,52 @@ mod tests {
         let (forged, glue) = length_extension_attack(&h, &target, combined.len(), suffix);
         let actual_input = [&combined[..], &glue[..], &suffix[..]].concat();
         assert_eq!(h.hash(&actual_input), forged);
+    }
+
+    #[test]
+    fn length_extension_sha512_across_padding_boundary() {
+        let h = Sha512;
+        let secret = b"sha512-secret";
+        let msg = vec![0x5au8; 102];
+        let suffix = b"&admin=1";
+        let combined = [&secret[..], &msg[..]].concat();
+        assert!(combined.len() >= 112);
+        let target = h.hash(&combined);
+        let (forged, glue) = length_extension_attack(&h, &target, combined.len(), suffix);
+        let actual_input = [&combined[..], &glue[..], &suffix[..]].concat();
+        assert_eq!(h.hash(&actual_input), forged);
+        assert_eq!((combined.len() + glue.len()) % 128, 0);
+        assert_eq!(glue.len(), 128 + 112 - combined.len() + 16);
+    }
+
+    #[test]
+    fn remaining_fixed_hash_adapters_match_public_abc_vectors() {
+        assert_eq!(
+            hex(&Sha224.hash(b"abc")),
+            "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7"
+        );
+        assert_eq!(hex(&Sha384.hash(b"abc")), "cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7");
+        assert_eq!(hex(&Sha512.hash(b"abc")), "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f");
+        assert_eq!(
+            hex(&Sha512_224.hash(b"abc")),
+            "4634270f707b6a54daae7530460842e20e37ed265ceee9a43e8924aa"
+        );
+        assert_eq!(
+            hex(&Sha512_256.hash(b"abc")),
+            "53048e2681941ef99b2e29b76b4c7dabe4c2d0c634fc6d46e0e2f13107e7af23"
+        );
+        assert_eq!(
+            hex(&Blake3.hash(b"abc")),
+            "6437b3ac38465133ffb63b75273a8db548c558465d79db03fd359c6cd5bd9d85"
+        );
+        assert_eq!(
+            (
+                Sha224.block_bytes(),
+                Sha384.block_bytes(),
+                Sha512.block_bytes()
+            ),
+            (64, 128, 128)
+        );
     }
 
     #[test]

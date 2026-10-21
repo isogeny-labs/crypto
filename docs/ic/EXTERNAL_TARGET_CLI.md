@@ -388,6 +388,12 @@ crypto hash sha3-256 --hex 000102ff
 crypto hash sha3-384 --hex 000102ff
 crypto hash sha3-512 --hex 000102ff
 crypto cryptanalysis hash-auto --hash sha256
+crypto cryptanalysis hash-auto --hash sha224
+crypto cryptanalysis hash-auto --hash sha384
+crypto cryptanalysis hash-auto --hash sha512
+crypto cryptanalysis hash-auto --hash sha512-224
+crypto cryptanalysis hash-auto --hash sha512-256
+crypto cryptanalysis hash-auto --hash blake3
 crypto cryptanalysis hash-auto --hash sha3-224
 crypto cryptanalysis hash-auto --hash sha3-256
 crypto cryptanalysis hash-auto --hash sha3-384
@@ -410,3 +416,12 @@ input. SHAKE128 and SHAKE256 require an explicit `--output-bytes` value in
 as the digest, truncating the birthday search to at most 32 bits, and reports
 per-byte differential measurements. The standalone `crypto hash` command
 supports longer SHAKE outputs independently.
+
+All fixed-output SHA-2 algorithms exposed by `crypto hash`, plus BLAKE3,
+have bounded `hash-auto` birthday and differential reports. SHA-512 and
+SHA-256 expose their complete chaining state and also support the explicit
+`crypto cryptanalysis length-extension` command for a bare secret-prefix
+digest with a supplied secret length. SHA-224, SHA-384, SHA-512/224,
+SHA-512/256, and BLAKE3 have no length-extension adapter in this CLI; their
+reports make no claim that these constructions resist every extension
+technique. The birthday section concerns only a 32-bit truncated output.

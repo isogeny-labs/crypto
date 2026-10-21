@@ -392,9 +392,9 @@ enum CryptanalysisOp {
     /// --ignored --nocapture` but accessible from the CLI.)
     Bench,
     /// Run applicable length-extension, truncated birthday, and
-    /// differential-bias checks for MD4, MD5, SHA-1, SHA-256, SHA-3, or SHAKE.
+    /// differential-bias checks for MD4, MD5, SHA, SHAKE, or BLAKE3.
     HashAuto {
-        /// Hash identifier: md4, md5, sha1, sha256, sha3-{224,256,384,512}, shake128, or shake256.
+        /// Hash identifier (see hash-auto --help and error list for variants).
         #[arg(long)]
         hash: String,
         /// Required SHAKE output length in bytes (1..=64 for bounded analysis).
@@ -403,7 +403,7 @@ enum CryptanalysisOp {
     },
     /// Length-extension attack demo against a Merkle-Damgård hash.
     LengthExtension {
-        /// Hash identifier: md4, md5, sha1, or sha256.
+        /// Hash identifier: md4, md5, sha1, sha256, or sha512.
         #[arg(long)]
         hash: String,
         /// Length (in bytes) of the unknown secret prefix.
@@ -2186,7 +2186,7 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             digest_hex,
         } => {
             use crypto_lib::cryptanalysis::hash_attacks::{
-                length_extension_attack, Md4, Md5, MerkleDamgardHash, Sha1, Sha256,
+                length_extension_attack, Md4, Md5, MerkleDamgardHash, Sha1, Sha256, Sha512,
             };
             let parse = |label: &str, value: &str| {
                 from_hex(value).unwrap_or_else(|e| {
@@ -2201,6 +2201,14 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
                 eprintln!("length-extension: secret and message lengths overflow");
                 std::process::exit(2);
             });
+            if prefix_len
+                .checked_add(256)
+                .and_then(|n| n.checked_add(suffix.len()))
+                .is_none()
+            {
+                eprintln!("length-extension: padded prefix and suffix lengths overflow");
+                std::process::exit(2);
+            }
             fn report_lex<H: MerkleDamgardHash>(
                 hash: &H,
                 digest: &[u8],
@@ -2241,9 +2249,10 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
                 "md5" => report_lex(&Md5, &digest, prefix_len, &message, &suffix),
                 "sha1" => report_lex(&Sha1, &digest, prefix_len, &message, &suffix),
                 "sha256" | "sha-256" => report_lex(&Sha256, &digest, prefix_len, &message, &suffix),
+                "sha512" | "sha-512" => report_lex(&Sha512, &digest, prefix_len, &message, &suffix),
                 other => {
                     eprintln!(
-                        "error: unknown hash '{}' (try md4, md5, sha1, sha256)",
+                        "error: unknown hash '{}' (try md4, md5, sha1, sha256, sha512)",
                         other
                     );
                     std::process::exit(1);
