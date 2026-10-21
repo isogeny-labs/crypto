@@ -1503,6 +1503,14 @@ mod wide {
         }
 
         fn with_capacity_indexed83_mode(entries: usize, indexed83_id30: bool) -> Self {
+            Self::with_capacity_indexed83_mode_bloom(entries, indexed83_id30, root_bloom_enabled())
+        }
+
+        fn with_capacity_indexed83_mode_bloom(
+            entries: usize,
+            indexed83_id30: bool,
+            bloom_enabled: bool,
+        ) -> Self {
             let slots = entries
                 .checked_mul(2)
                 .expect("indexed root table request exceeds usize")
@@ -1512,7 +1520,7 @@ mod wide {
                 slots: RootSlots128::Indexed83(vec![[0u8; 5]; slots]),
                 shift: 128 - slots.trailing_zeros(),
                 len: 0,
-                bloom: root_bloom_enabled().then(|| RootBloom::with_capacity(entries)),
+                bloom: bloom_enabled.then(|| RootBloom::with_capacity(entries)),
                 packed_layout: None,
                 indexed83_id30,
             }
@@ -1934,7 +1942,7 @@ mod wide {
             PackedRootLayout, RootBloom, RootOnly11, RootOnly21, RootOnly83, RootSlots128,
             RootTable128, S3Solver128, State128, State26, State83, StateStore128,
         };
-        use crate::mix_root_bloom;
+        use crate::{mix_root_bloom, RootBloomProfile};
         use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse_wide;
 
         #[test]
@@ -2186,6 +2194,7 @@ mod wide {
                     root_from_tables(
                         &core_table,
                         Some(&extension_table),
+                        None,
                         &root_only11,
                         &basis,
                         key,
@@ -2199,6 +2208,40 @@ mod wide {
                     root_from_tables(
                         &core_table,
                         Some(&extension_table),
+                        None,
+                        &root_only11,
+                        &basis,
+                        probe,
+                    ),
+                    expected_roots.get(&probe).copied(),
+                );
+            }
+            let mut shared_bloom =
+                RootBloom::with_profile(expected_roots.len(), RootBloomProfile::Wide3);
+            for &key in expected_roots.keys() {
+                shared_bloom.insert(key);
+            }
+            core_table.bloom = None;
+            extension_table.bloom = None;
+            for (&key, &value) in &expected_roots {
+                assert_eq!(
+                    root_from_tables(
+                        &core_table,
+                        Some(&extension_table),
+                        Some(&shared_bloom),
+                        &root_only11,
+                        &basis,
+                        key,
+                    ),
+                    Some(value),
+                );
+            }
+            for probe in 1..2048u128 {
+                assert_eq!(
+                    root_from_tables(
+                        &core_table,
+                        Some(&extension_table),
+                        Some(&shared_bloom),
                         &root_only11,
                         &basis,
                         probe,
@@ -3214,6 +3257,7 @@ mod wide {
         states: StateStore128,
         table: RootTable128,
         overflow_table: Option<RootTable128>,
+        shared_bloom: Option<RootBloom>,
         split_at: Option<usize>,
         overflow_request_entries: Option<usize>,
         shifted: Vec<Vec<u128>>,
@@ -3235,10 +3279,14 @@ mod wide {
     fn root_from_tables(
         primary: &RootTable128,
         overflow: Option<&RootTable128>,
+        shared_bloom: Option<&RootBloom>,
         states: &StateStore128,
         basis: &NormalBasis128,
         key: u128,
     ) -> Option<u64> {
+        if shared_bloom.is_some_and(|bloom| !bloom.contains(key)) {
+            return None;
+        }
         primary
             .get_with_context(key, states, basis)
             .or_else(|| overflow.and_then(|table| table.get_with_context(key, states, basis)))
@@ -3250,10 +3298,15 @@ mod wide {
             root_from_tables(
                 &self.table,
                 self.overflow_table.as_ref(),
+                self.shared_bloom.as_ref(),
                 &self.states,
                 basis,
                 key,
             )
+        }
+
+        fn bloom(&self) -> Option<&RootBloom> {
+            self.shared_bloom.as_ref().or(self.table.bloom.as_ref())
         }
     }
 
@@ -3533,6 +3586,12 @@ mod wide {
         let split_at = std::env::var("KIC_INDEXED5_SPLIT_AT")
             .ok()
             .map(|value| value.parse::<usize>().expect("split K must be an integer"));
+        let shared_bloom_requested =
+            std::env::var("KIC_INDEXED5_SPLIT_SHARED_BLOOM").as_deref() == Ok("1");
+        assert!(
+            !shared_bloom_requested || (split_at.is_some() && root_bloom_enabled()),
+            "shared split Bloom requires a split index and an enabled root Bloom filter"
+        );
         let indexed4_table = std::env::var("KIC_INDEXED_ROOT4").as_deref() == Ok("1");
         let indexed4_fixed30 = std::env::var("KIC_INDEXED4_FIXED30").as_deref() == Ok("1");
         let indexed4_fixed31 = std::env::var("KIC_INDEXED4_FIXED31").as_deref() == Ok("1");
@@ -3602,6 +3661,8 @@ mod wide {
         });
         let overflow_request_entries =
             core_states.map(|core_count| indexed5_load80_request(max_states - core_count));
+        let mut shared_bloom = shared_bloom_requested
+            .then(|| RootBloom::with_capacity(indexed5_load80_request(max_states)));
         if root_only11 {
             assert!(
                 ((std::env::var("KIC_INDEXED_ROOT5").as_deref() == Ok("1")
@@ -3658,11 +3719,20 @@ mod wide {
             if indexed4_table {
                 RootTable128::with_capacity_indexed83_four(entries)
             } else {
-                RootTable128::with_capacity_indexed83_mode(entries, indexed5_id30)
+                RootTable128::with_capacity_indexed83_mode_bloom(
+                    entries,
+                    indexed5_id30,
+                    !shared_bloom_requested && root_bloom_enabled(),
+                )
             }
         });
-        let mut early_overflow_table = overflow_request_entries
-            .map(|entries| RootTable128::with_capacity_indexed83_mode(entries, indexed5_id30));
+        let mut early_overflow_table = overflow_request_entries.map(|entries| {
+            RootTable128::with_capacity_indexed83_mode_bloom(
+                entries,
+                indexed5_id30,
+                !shared_bloom_requested && root_bloom_enabled(),
+            )
+        });
         let mut states83 = if packed_state83 {
             Vec::with_capacity(max_states)
         } else {
@@ -3837,6 +3907,9 @@ mod wide {
                                             .0
                                     },
                                 );
+                                if let Some(bloom) = &mut shared_bloom {
+                                    bloom.insert(canonical);
+                                }
                             }
                         } else {
                             states_wide.push(state);
@@ -4026,6 +4099,7 @@ mod wide {
             states,
             table,
             overflow_table: early_overflow_table,
+            shared_bloom,
             split_at,
             overflow_request_entries,
             shifted,
@@ -4480,6 +4554,9 @@ mod wide {
                     "overflow_table_allocated_bytes": index.overflow_table.as_ref().map_or(0, |t| t.layout_receipt().2),
                     "root_table_allocated_bytes": index.table.layout_receipt().2 + index.overflow_table.as_ref().map_or(0, |t| t.layout_receipt().2),
                     "indexed5_split_at": index.split_at,
+                    "shared_bloom_enabled": index.shared_bloom.is_some(),
+                    "shared_bloom_bytes": index.shared_bloom.as_ref().map_or(0, RootBloom::bytes),
+                    "root_bloom_bytes": index.table.bloom.as_ref().map_or(0, RootBloom::bytes) + index.overflow_table.as_ref().and_then(|t| t.bloom.as_ref()).map_or(0, RootBloom::bytes) + index.shared_bloom.as_ref().map_or(0, RootBloom::bytes),
                     "state_digest_blake3": state_digest,
                     "table_digest_blake3": table_digest,
                     "overflow_digest_blake3": overflow_digest,
@@ -4767,8 +4844,8 @@ mod wide {
             "root_table_layout":root_table_layout,
             "root_table_slot_bytes":root_table_slot_bytes,
             "root_table_allocated_bytes":root_table_allocated_bytes + index.overflow_table.as_ref().map_or(0, |t| t.layout_receipt().2),
-            "root_bloom_enabled":index.table.bloom.is_some(),
-            "root_bloom_bytes":index.table.bloom.as_ref().map_or(0, RootBloom::bytes) + index.overflow_table.as_ref().and_then(|t| t.bloom.as_ref()).map_or(0, RootBloom::bytes),
+            "root_bloom_enabled":index.bloom().is_some(),
+            "root_bloom_bytes":index.table.bloom.as_ref().map_or(0, RootBloom::bytes) + index.overflow_table.as_ref().and_then(|t| t.bloom.as_ref()).map_or(0, RootBloom::bytes) + index.shared_bloom.as_ref().map_or(0, RootBloom::bytes),
             "sparse_canonical_enabled":basis.sparse_canonical,
             "pair_table_entries":0,
             "edge_selectors":0,
@@ -4817,18 +4894,15 @@ mod wide {
             .and_then(|table| table.bloom.as_ref())
             .map_or(0, RootBloom::bytes));
         summary["primary_table_allocated_bytes"] = json!(root_table_allocated_bytes);
+        summary["shared_bloom_enabled"] = json!(index.shared_bloom.is_some());
+        summary["shared_bloom_bytes"] =
+            json!(index.shared_bloom.as_ref().map_or(0, RootBloom::bytes));
         summary["target_cancel"] = json!(target_cancel);
-        summary["root_bloom_profile"] = json!(index
-            .table
-            .bloom
-            .as_ref()
-            .map_or("none", |bloom| bloom.profile.name()));
-        summary["root_bloom_hashes"] =
-            json!(index.table.bloom.as_ref().map_or(0, |bloom| bloom.hashes));
+        summary["root_bloom_profile"] =
+            json!(index.bloom().map_or("none", |bloom| bloom.profile.name()));
+        summary["root_bloom_hashes"] = json!(index.bloom().map_or(0, |bloom| bloom.hashes));
         summary["root_bloom_bits_per_request"] = json!(index
-            .table
-            .bloom
-            .as_ref()
+            .bloom()
             .map_or(0, |bloom| bloom.profile.bits_per_request()));
         summary["symmetric_s3_states_enabled"] = json!(index.symmetric_states);
         summary["root_table_indexed4_enabled"] = json!(index.indexed4_table);

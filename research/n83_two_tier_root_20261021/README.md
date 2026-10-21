@@ -7,6 +7,11 @@ remaining states. A lookup searches the first table before the extension,
 preserving a deterministic core-first witness for duplicate roots. Both
 tables resolve five-byte entries against the complete one-root state array,
 so a fingerprint match alone cannot produce a relation.
+`KIC_INDEXED5_SPLIT_SHARED_BLOOM=1` is a second opt-in on the split mode: one
+Bloom filter covers both tables and can reject a missing key before either
+exact-table probe. The per-table filters are disabled in this mode. The
+shared filter is sized for the full K4405 key request, so its negative answer
+is valid for the union.
 
 ## Question and fixed comparison
 
@@ -37,6 +42,10 @@ round to `2^31` and `2^27` five-byte slots. The extension adds 671,088,640
 table bytes beyond the monolithic K4405 table, plus its Bloom filter and
 allocation overhead. Memory and query cost must therefore be measured rather
 than inferred from the smaller extension.
+With the shared-filter mode, the two-table Bloom request is replaced by one
+full-base request. At K4405 and the `wide3` profile, the separate filters
+would allocate 2 GiB plus 128 MiB; the shared filter allocates 2 GiB. The
+table-byte increment remains 671,088,640.
 
 1. Run the exact-root unit control: real N83 S3 roots are partitioned at a
    small prefix, compared with a core-first reference map, and probed for
@@ -50,8 +59,9 @@ than inferred from the smaller extension.
    earlier capped campaign exceeded its $5 upper bound, so no cloud result is
    implied by these local correctness controls.
 
-Status: **implementation and correctness controls in progress**. No measured
-online row or candidate selection has been entered for this variant.
+Status: **K128 index-stage controls passed; full-size target qualification in
+progress**. No measured online row or candidate selection has been entered
+for either split variant.
 
 The bounded small-prefix stage control uses the same executable in both arms:
 
@@ -62,6 +72,9 @@ python3 research/n83_two_tier_root_20261021/run_index_smoke.py \
   --output /absolute/path/to/new_receipt_directory \
   --k 64 --split 32 --timeout-seconds 900
 ```
+
+Add `--shared-bloom` to control the shared-filter variant, and
+`--split-first` to reverse the execution order.
 
 Its `PASS_INDEX_STAGE_CONTROL` status checks the identical base hash, state
 digest, and split allocation receipts. It is an index-construction control;

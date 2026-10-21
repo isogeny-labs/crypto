@@ -40,6 +40,8 @@ def run_arm(name, args, common):
     env.update(FLAGS)
     if name == "split":
         env["KIC_INDEXED5_SPLIT_AT"] = str(args.split)
+        if args.shared_bloom:
+            env["KIC_INDEXED5_SPLIT_SHARED_BLOOM"] = "1"
     command = [str(args.binary), f"construct:83:1:{args.k}", str(args.target),
                "29", str(output / "targets_result.jsonl")]
     (output / "input.json").write_text(json.dumps({**common, "arm": name,
@@ -78,6 +80,7 @@ def main():
     parser.add_argument("--split", type=int, default=32)
     parser.add_argument("--timeout-seconds", type=int, default=900)
     parser.add_argument("--split-first", action="store_true")
+    parser.add_argument("--shared-bloom", action="store_true")
     args = parser.parse_args()
     args.binary = args.binary.resolve(strict=True)
     args.target = args.target.resolve(strict=True)
@@ -88,6 +91,7 @@ def main():
     common = {"schema": "n83.split-index-smoke/v1", "k": args.k,
               "split_at": args.split, "timeout_seconds": args.timeout_seconds,
               "order": ["split", "monolithic"] if args.split_first else ["monolithic", "split"],
+              "shared_bloom": args.shared_bloom,
               "runner_sha256": sha256(args.output / "runner.py"),
               "source_sha256": sha256(source), "binary_sha256": sha256(args.binary),
               "target_sha256": sha256(args.target)}
@@ -103,6 +107,8 @@ def main():
         valid = (all(first[key] == second[key] for key in matching)
                  and first["indexed5_split_at"] is None
                  and second["indexed5_split_at"] == args.split
+                 and first["shared_bloom_enabled"] is False
+                 and second["shared_bloom_enabled"] is args.shared_bloom
                  and first["root_table_entries"] > 0
                  and second["primary_table_entries"] > 0
                  and second["overflow_table_entries"] > 0)
