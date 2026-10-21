@@ -251,6 +251,19 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 | 8,192 | 43.6 s | 20.5 s | 5.29 s | 0.26 [0.24, 0.31] | 0.12 [0.11, 0.15] | 0.13 | 2.37 → 1.25 GiB |
 | 16,384 | 224 s | 117 s | 28.2 s | 0.24 [0.22, 0.26] | 0.13 [0.12, 0.14] | 0.13 | 9.15 → 4.65 GiB |
 
+## Planner validation, outside tables A–C
+
+`ic plan` / `ic bench --auto` (ic-planner/1) chooses every `ic.pipeline` stage of a prime-field run; here its plan runs against every alternative one change away from it on six prime curves outside its evidence (class: engineering). The plan is the existing best recipe, chosen automatically, so no row above moves. Cells are S(alternative) / S(plan), ecbench `compare`, paired, cluster 95% interval, at w = 0; the band column is the ratio at w = 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md §5a). Supplementary curves are `prime_search` curves outside the registry, named by tag. Study: [research/ic_planner_validation_20261020/](../../research/ic_planner_validation_20261020/).
+
+| curve | log₂ r | plan base | half-base | double-base | rootfind | full-rank | random-targets | double base across the band | S(plan) / S(rho) measured | predicted |
+|:--|--:|:--|:--|:--|:--|:--|:--|:--|:--|--:|
+| `icv1-fp24-tm5099-a6f137c6` | 24.00 | `prime-abscissa:size=128` | 1.56 [1.35, 1.77] | 1.51 [1.4, 1.64] | 171 [164, 176] | 3.64 [3.24, 4.14] | 44.8 [39, 50.6] | 1.51 / 1.38 / 0.92 (not separated across the band) | 14.4 [11.6, 18.4] | 12.2 |
+| `icv1-fp26-tm1775-7e8fb6df` | 25.35 | `prime-abscissa:size=175` | 1.55 [1.41, 1.69] | 1.6 [1.5, 1.7] | 233 [226, 239] | 3.84 [3.43, 4.21] | 49.1 [43.7, 54] | 1.60 / 1.47 / 0.98 (not separated across the band) | 14.6 [11.2, 19.6] | 14.5 |
+| `icv1-fp28-t28201-65099091` | 28.00 | `prime-abscissa:size=323` | 1.43 [1.28, 1.6] | 1.57 [1.49, 1.68] | 439 [424, 450] | 4.56 [4.1, 5.12] | 51.5 [43.8, 58.5] | 1.57 / 1.44 / 0.93 (not separated across the band) | 21.7 [17, 28.3] | 20.1 |
+| c24 (supplementary) | 23.47 | `prime-abscissa:size=113` | 1.53 [1.33, 1.76] | 1.49 [1.37, 1.65] | 150 [142, 156] | 3.3 [2.97, 3.68] | 41.5 [35.2, 48.3] | 1.49 / 1.37 / 0.91 (not separated across the band) | 12.6 [9.75, 16.5] | 11.5 |
+| c28 (supplementary) | 27.69 | `prime-abscissa:size=300` | 1.47 [1.34, 1.61] | 1.54 [1.44, 1.68] | 413 [395, 425] | 4.15 [3.62, 4.78] | 54.1 [49.8, 58.9] | 1.54 / 1.41 / 0.93 (not separated across the band) | 21.8 [17, 29.8] | 19.3 |
+| c30 (supplementary) | 29.62 | `prime-abscissa:size=469` | 1.36 [1.2, 1.53] | 1.6 [1.52, 1.7] | 637 [616, 651] | 4.81 [4.3, 5.4] | 58.7 [52.1, 64.8] | 1.60 / 1.46 / 0.96 (not separated across the band) | 25.8 [19.9, 35.2] | 24.5 |
+
 ## Large-prime conductor-gap counted diagnostics
 
 Copied from native analysis: eight independent one-target workloads per fixed curve; no transported targets. Counted S has unpriced native work. These observations do not enter tables A–C or change a full-cost ranking.
@@ -302,6 +315,7 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
+- `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `d34b0ab47799ca49…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`

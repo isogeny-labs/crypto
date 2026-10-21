@@ -106,6 +106,10 @@
    "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
    "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
   },
+  "planner_validation": {
+   "path": "research/ic_planner_validation_20261020/analysis/summary.json",
+   "sha256": "c8fb751cea39e55ebd1b322245c95a958ae8b47d393c6b6918abddcd2d4234fc"
+  },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
    "sha256": "d34b0ab47799ca491d94c2a8258a827ba19c4d3f1e17a2c457798d951295455f"
@@ -49715,6 +49719,596 @@
   ],
   "study": "research/ic_oracle_setup_blocked_20261020/",
   "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
+  "class": "engineering"
+ },
+ "planner_component": {
+  "rows": [
+   {
+    "tag": "r24",
+    "primary": true,
+    "curve": "icv1-fp24-tm5099-a6f137c6",
+    "log2_r": 24.0004370277,
+    "plan": {
+     "factor_base": "prime-abscissa:size=128",
+     "oracle": "mitm-prime-blocked:m=2",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "alternatives": [
+     {
+      "arm": "half-base",
+      "ops_ratio": 1.56104545835,
+      "ci95": [
+       1.35382880238,
+       1.76987089779
+      ],
+      "band_ratio": [
+       1.56104545835,
+       1.63062432238,
+       1.8968517227
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "double-base",
+      "ops_ratio": 1.50698313363,
+      "ci95": [
+       1.397423393,
+       1.64030305007
+      ],
+      "band_ratio": [
+       1.50698313363,
+       1.38466830351,
+       0.916658948911
+      ],
+      "verdict": "not separated across the band"
+     },
+     {
+      "arm": "rootfind",
+      "ops_ratio": 170.557363651,
+      "ci95": [
+       163.774297952,
+       176.023766193
+      ],
+      "band_ratio": [
+       170.557363651,
+       165.323302839,
+       145.296381979
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "full-rank",
+      "ops_ratio": 3.64139836056,
+      "ci95": [
+       3.2372107207,
+       4.14031432988
+      ],
+      "band_ratio": [
+       3.64139836056,
+       3.79277858158,
+       4.37199991936
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "random-targets",
+      "ops_ratio": 44.8492518944,
+      "ci95": [
+       38.9584162034,
+       50.6450271009
+      ],
+      "band_ratio": [
+       44.8492518944,
+       39.6262549541,
+       19.6416674384
+      ],
+      "verdict": "confirmed"
+     }
+    ],
+    "plan_over_rho": {
+     "ratio": 14.3904568961,
+     "ci95": [
+      11.6319321443,
+      18.4487260721
+     ]
+    },
+    "predicted_plan_over_rho": 12.2339566525,
+    "weights": [
+     0.0,
+     0.1,
+     1.0
+    ]
+   },
+   {
+    "tag": "r26",
+    "primary": true,
+    "curve": "icv1-fp26-tm1775-7e8fb6df",
+    "log2_r": 25.3461752358,
+    "plan": {
+     "factor_base": "prime-abscissa:size=175",
+     "oracle": "mitm-prime-blocked:m=2",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "alternatives": [
+     {
+      "arm": "half-base",
+      "ops_ratio": 1.54709508591,
+      "ci95": [
+       1.40798838882,
+       1.69113579293
+      ],
+      "band_ratio": [
+       1.54709508591,
+       1.61853691374,
+       1.89247817576
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "double-base",
+      "ops_ratio": 1.59549272431,
+      "ci95": [
+       1.49848060233,
+       1.69757383593
+      ],
+      "band_ratio": [
+       1.59549272431,
+       1.46861566525,
+       0.982109892118
+      ],
+      "verdict": "not separated across the band"
+     },
+     {
+      "arm": "rootfind",
+      "ops_ratio": 233.194953437,
+      "ci95": [
+       226.455589272,
+       239.474435888
+      ],
+      "band_ratio": [
+       233.194953437,
+       226.118916622,
+       198.986093821
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "full-rank",
+      "ops_ratio": 3.83856602755,
+      "ci95": [
+       3.43470869234,
+       4.21160231011
+      ],
+      "band_ratio": [
+       3.83856602755,
+       4.00242088241,
+       4.63071675742
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "random-targets",
+      "ops_ratio": 49.0955388101,
+      "ci95": [
+       43.7428627194,
+       53.9607556135
+      ],
+      "band_ratio": [
+       49.0955388101,
+       43.3897727383,
+       21.5112065528
+      ],
+      "verdict": "confirmed"
+     }
+    ],
+    "plan_over_rho": {
+     "ratio": 14.5570823042,
+     "ci95": [
+      11.1850657838,
+      19.5701635276
+     ]
+    },
+    "predicted_plan_over_rho": 14.4531973778,
+    "weights": [
+     0.0,
+     0.1,
+     1.0
+    ]
+   },
+   {
+    "tag": "r28",
+    "primary": true,
+    "curve": "icv1-fp28-t28201-65099091",
+    "log2_r": 27.999848126,
+    "plan": {
+     "factor_base": "prime-abscissa:size=323",
+     "oracle": "mitm-prime-blocked:m=2",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "alternatives": [
+     {
+      "arm": "half-base",
+      "ops_ratio": 1.43362047982,
+      "ci95": [
+       1.27724546767,
+       1.59523434039
+      ],
+      "band_ratio": [
+       1.43362047982,
+       1.49845864563,
+       1.74499789068
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "double-base",
+      "ops_ratio": 1.5676959954,
+      "ci95": [
+       1.48715834678,
+       1.67531950422
+      ],
+      "band_ratio": [
+       1.5676959954,
+       1.43541030886,
+       0.932410063818
+      ],
+      "verdict": "not separated across the band"
+     },
+     {
+      "arm": "rootfind",
+      "ops_ratio": 438.924240143,
+      "ci95": [
+       423.878997548,
+       450.398022023
+      ],
+      "band_ratio": [
+       438.924240143,
+       424.814974231,
+       371.166205442
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "full-rank",
+      "ops_ratio": 4.55816271878,
+      "ci95": [
+       4.10125899508,
+       5.11872885133
+      ],
+      "band_ratio": [
+       4.55816271878,
+       4.75655421556,
+       5.51091376953
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "random-targets",
+      "ops_ratio": 51.541742058,
+      "ci95": [
+       43.7929662192,
+       58.4758474158
+      ],
+      "band_ratio": [
+       51.541742058,
+       45.4584348755,
+       22.3273986802
+      ],
+      "verdict": "confirmed"
+     }
+    ],
+    "plan_over_rho": {
+     "ratio": 21.6790279329,
+     "ci95": [
+      17.0400728292,
+      28.2827019729
+     ]
+    },
+    "predicted_plan_over_rho": 20.0781734111,
+    "weights": [
+     0.0,
+     0.1,
+     1.0
+    ]
+   },
+   {
+    "tag": "c24",
+    "primary": false,
+    "curve": null,
+    "log2_r": 23.4737103319,
+    "plan": {
+     "factor_base": "prime-abscissa:size=113",
+     "oracle": "mitm-prime-blocked:m=2",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "alternatives": [
+     {
+      "arm": "half-base",
+      "ops_ratio": 1.53033476204,
+      "ci95": [
+       1.33354392791,
+       1.7645128807
+      ],
+      "band_ratio": [
+       1.53033476204,
+       1.59667896217,
+       1.85048561167
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "double-base",
+      "ops_ratio": 1.48894017562,
+      "ci95": [
+       1.37241233015,
+       1.65368159612
+      ],
+      "band_ratio": [
+       1.48894017562,
+       1.36947869096,
+       0.912466335635
+      ],
+      "verdict": "not separated across the band"
+     },
+     {
+      "arm": "rootfind",
+      "ops_ratio": 150.317166248,
+      "ci95": [
+       141.560752365,
+       156.339670379
+      ],
+      "band_ratio": [
+       150.317166248,
+       145.705209933,
+       128.061690565
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "full-rank",
+      "ops_ratio": 3.30166196882,
+      "ci95": [
+       2.96733291161,
+       3.67890338495
+      ],
+      "band_ratio": [
+       3.30166196882,
+       3.43343170228,
+       3.93753054565
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "random-targets",
+      "ops_ratio": 41.4706116175,
+      "ci95": [
+       35.2486029786,
+       48.2789476525
+      ],
+      "band_ratio": [
+       41.4706116175,
+       36.6429712946,
+       18.1743302854
+      ],
+      "verdict": "confirmed"
+     }
+    ],
+    "plan_over_rho": {
+     "ratio": 12.56004526,
+     "ci95": [
+      9.74560521317,
+      16.4553125884
+     ]
+    },
+    "predicted_plan_over_rho": 11.4612107091,
+    "weights": [
+     0.0,
+     0.1,
+     1.0
+    ]
+   },
+   {
+    "tag": "c28",
+    "primary": false,
+    "curve": null,
+    "log2_r": 27.6916043026,
+    "plan": {
+     "factor_base": "prime-abscissa:size=300",
+     "oracle": "mitm-prime-blocked:m=2",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "alternatives": [
+     {
+      "arm": "half-base",
+      "ops_ratio": 1.47452119613,
+      "ci95": [
+       1.34119585169,
+       1.61322545711
+      ],
+      "band_ratio": [
+       1.47452119613,
+       1.53953551266,
+       1.78486439126
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "double-base",
+      "ops_ratio": 1.54380433259,
+      "ci95": [
+       1.43821821991,
+       1.68464820617
+      ],
+      "band_ratio": [
+       1.54380433259,
+       1.41446751126,
+       0.926420277519
+      ],
+      "verdict": "not separated across the band"
+     },
+     {
+      "arm": "rootfind",
+      "ops_ratio": 412.825594327,
+      "ci95": [
+       395.197145169,
+       425.181985224
+      ],
+      "band_ratio": [
+       412.825594327,
+       398.922980008,
+       346.462030445
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "full-rank",
+      "ops_ratio": 4.15358893415,
+      "ci95": [
+       3.62202810426,
+       4.77711107035
+      ],
+      "band_ratio": [
+       4.15358893415,
+       4.32416227444,
+       4.96781383495
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "random-targets",
+      "ops_ratio": 54.0754475099,
+      "ci95": [
+       49.8136777224,
+       58.8897929005
+      ],
+      "band_ratio": [
+       54.0754475099,
+       47.6189236751,
+       23.2554936425
+      ],
+      "verdict": "confirmed"
+     }
+    ],
+    "plan_over_rho": {
+     "ratio": 21.8494573042,
+     "ci95": [
+      17.0387506212,
+      29.7851790847
+     ]
+    },
+    "predicted_plan_over_rho": 19.3259804136,
+    "weights": [
+     0.0,
+     0.1,
+     1.0
+    ]
+   },
+   {
+    "tag": "c30",
+    "primary": false,
+    "curve": null,
+    "log2_r": 29.6229663288,
+    "plan": {
+     "factor_base": "prime-abscissa:size=469",
+     "oracle": "mitm-prime-blocked:m=2",
+     "linalg": "incremental-gauss",
+     "targets": "walk"
+    },
+    "alternatives": [
+     {
+      "arm": "half-base",
+      "ops_ratio": 1.35597516421,
+      "ci95": [
+       1.19916195962,
+       1.5347951017
+      ],
+      "band_ratio": [
+       1.35597516421,
+       1.4174272679,
+       1.6514989798
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "double-base",
+      "ops_ratio": 1.5968795556,
+      "ci95": [
+       1.51660352283,
+       1.70490244325
+      ],
+      "band_ratio": [
+       1.5968795556,
+       1.46355025808,
+       0.955697555835
+      ],
+      "verdict": "not separated across the band"
+     },
+     {
+      "arm": "rootfind",
+      "ops_ratio": 636.549196907,
+      "ci95": [
+       615.65202926,
+       651.436894727
+      ],
+      "band_ratio": [
+       636.549196907,
+       616.28383547,
+       539.092859753
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "full-rank",
+      "ops_ratio": 4.81349092708,
+      "ci95": [
+       4.29752206309,
+       5.40199806312
+      ],
+      "band_ratio": [
+       4.81349092708,
+       5.02747298745,
+       5.8425329151
+      ],
+      "verdict": "confirmed"
+     },
+     {
+      "arm": "random-targets",
+      "ops_ratio": 58.6563997274,
+      "ci95": [
+       52.0920332565,
+       64.825538569
+      ],
+      "band_ratio": [
+       58.6563997274,
+       51.7445843305,
+       25.4174064939
+      ],
+      "verdict": "confirmed"
+     }
+    ],
+    "plan_over_rho": {
+     "ratio": 25.7802535067,
+     "ci95": [
+      19.9310716798,
+      35.1860367308
+     ]
+    },
+    "predicted_plan_over_rho": 24.5495465151,
+    "weights": [
+     0.0,
+     0.1,
+     1.0
+    ]
+   }
+  ],
+  "planner": "ic-planner/1",
+  "study": "research/ic_planner_validation_20261020/",
+  "report": "research/ic_planner_validation_20261020/REPORT.pdf",
   "class": "engineering"
  },
  "phases": [
