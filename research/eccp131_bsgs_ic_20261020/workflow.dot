@@ -12,12 +12,16 @@ digraph ecc130_workflows {
   pb [label="Interval BSGS\nverified scalar if in range", fillcolor="#e4f2e7"];
   bb [label="Interval BSGS\nverified scalar if in range", fillcolor="#e4f2e7"];
   ps [label="Prime IC structure and\nscaled pipeline", fillcolor="#fff2d6"];
+  pe [label="Exact ECCp-131 two-sum base\nB=512, 262144 distinct sums", fillcolor="#e4f2e7"];
+  pr [label="128 setup + 128 target candidates\n0 natural rows, rank 0", fillcolor="#fff2d6"];
   bf [label="Fixed-parameter IC\nselect / collect / logs / solve", fillcolor="#fff2d6"];
-  pg [label="Exact ECCp-131 IC\nrelation / rank / descent", fillcolor="#fce5e5"];
+  pg [label="Published ECCp-131 scalar and\nfull IC cost remain open", fillcolor="#fce5e5"];
 
   p -> pi -> pb;
   p -> ps;
-  ps -> pg [style=dashed, label="missing validated path"];
+  p -> pe -> pr;
+  pr -> pg [style=dashed, label="needs natural rows and target descent"];
+  ps -> pg [style=dashed, label="scaled data do not transfer"];
   b -> bi -> bb;
   b -> bf;
 

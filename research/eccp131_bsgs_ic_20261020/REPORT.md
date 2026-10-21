@@ -2,6 +2,8 @@
 
 **Recorded:** 2026-10-20; validation updated 2026-10-21. **Scope:** implementation and correctness checks, without a performance comparison or scientific state transition.
 
+**Citation provenance:** the Certicom curve and challenge pages and the Petit–Kosters–Messeng paper linked below were retrieved for this report; repository source files, raw outputs, diagrams, and problem records linked below are internal artifacts.
+
 ## Question and exact inputs
 
 Expose the published Certicom [ECCp-131 and ECC2K-130 challenge groups](https://www.certicom.com/en/curves-list) to the ECDLP and index-calculus command paths. ECCp-131 is the prime-field curve identified by the full `p`, `a`, `b`, `G`, `n`, cofactor and published `Q` in the [curve constructor](../../src/ecc/curve.rs) and [IC parameters](../../src/bin/ic/params.rs). ECC2K-130 is the distinct binary Koblitz group already carried by the [binary curve implementation](../../src/binary_ecc/curve.rs) and the fixed-parameter file in `aburan28/cryptanalysis` (`suite/docs/ic/params/ecc2k130-fixed.json`). A matching bit count does not identify a curve.
@@ -58,3 +60,35 @@ The crypto IC inspection JSON has SHA-256 `8d704ab6f3d8f53e90e086e6230f2e9fc4a6b
 ## Graph and evidence scope
 
 The existing `docs/index-calculus-scoreboard.html` and `docs/ic/progress-timeline.json` were checked for ECC2K-130 coverage. Neither receives a new result or measurement from this integration, so their canonical data and rendered copies remain current. The diagram distinguishes exact-parameter validation, bounded interval solving, the existing scaled or staged IC paths, and the missing prime-field path. Its arrows assert command flow only; they do not claim a transferred attack or a measured improvement.
+
+## Exact ECCp-131 two-sum probe added 2026-10-20
+
+This section adds an exact-curve implementation and bounded diagnostic to the earlier integration record. Its [protocol](EXACT_IC_PROBE_PROTOCOL.md) was committed before the exact `ic prime` run. The published-point acceptance criterion remains a scalar independently checked by `[x]G=Q`, obtained through natural relations, useful rank, and target descent with complete cold cost. A completed diagnostic is not a completed challenge solution.
+
+| Requested component | Current state | Direct evidence |
+| --- | --- | --- |
+| Exact field, curve, group order, generator and target | Independently checked | [PARI/GP raw output](eccp131-pari-check.out): `ellcard(E)=n`, `G` and `Q` on curve, `[n]G=[n]Q=O`; a separate [primality check](eccp131-primes.out) returned `isprime(p)=isprime(n)=1`. The [group script](eccp131-pari-check.gp), [primality script](eccp131-primes.gp), [group resource log](eccp131-pari-check.err), and [primality resource log](eccp131-primes.err) are retained. |
+| Exact small-x factor base and two-sum support | Checked at `B=512` | [PARI/GP enumeration](eccp131-pari-pair-sums.out): largest selected `x=1084`; `262144` raw and distinct sum abscissae, covering `524288` nonzero points; published `Q` is not a direct pair sum. The `ic prime` [raw JSON](ic-prime-eccp131-b512-seed131.json) agrees exactly and records base SHA-256 `364e2ffe036e3d113e7c07a7a1a116abec13bc7bfb6af23543dc67b0976c0929`. |
+| Natural setup relations and useful rank | Bounded attempt completed; zero rows | 128 seeded nonzero `[a]G` candidates, zero checked hits, setup rank 0 in the raw JSON. The separate generated prime-order control recovered a planted scalar with full setup rank. |
+| Published-point descent | Bounded attempt completed; zero hits | 128 candidates, starting with `Q` and continuing with `Q+[a]G`, zero checked hits, combined rank 0. |
+| Published scalar and complete cold solution cost | Open | The target column was undetermined and `recovered_scalar` is `null`; a full relation corpus, scalar reconstruction, and whole-solution cost have not been produced. |
+
+| Measured part of the one-thread diagnostic | Wall time or count | Scope |
+| --- | ---: | --- |
+| Enumerate 512 base abscissae | 7.33 ms | Initial yield-measurement pass. |
+| Enumerate and deduplicate 262,144 pair-sum keys | 59.28 ms | Initial yield-measurement pass. |
+| Recover eight planted decompositions | 18.84 ms | Positive controls, separate from natural relation rows. |
+| Rebuild base and keys, check 128 setup and 128 target candidates, compute rank | 420.88 ms | The bounded `ic_probe` pass, including its repeated setup. |
+| Whole executable process | 1.12 s; maximum RSS 24,477,696 bytes | Startup, executable hashing, both passes, JSON serialization and output. |
+
+The exact command was the protocol command with standard streams redirected to [stdout](ic-prime-eccp131-b512-seed131.stdout) and [stderr/resource log](ic-prime-eccp131-b512-seed131.stderr), plus an [exit-code file](ic-prime-eccp131-b512-seed131.exit). It exited 0. The JSON has SHA-256 `36c8b4192b4852c943d081c52d576e6923f0e90ff98847efe9cb28f6802cccd7` and reports executable BLAKE3 `d6c0f1498f3a8b5b0fca5d33c52be8f9061e570e23d5d91b9725acad2cdcdcb0`. The executable's embedded `git_commit` and `git_dirty` fields are `null`; source attribution therefore comes from the committed implementation `191bc9f3bb`, CLI import fix `e642691b13`, and the retained executable hash and command chronology, rather than an embedded commit attestation. The host was Darwin 25.6.0 arm64 with Rust/Cargo 1.93.1 and `Cargo.lock` SHA-256 `bf9f2d9eae5f6bfea66b0473d44bf77d63141dcc335fad01b30c420be444ea42`. The run used one Rayon thread; the JSON records 0.507 s inside the command, including repeated base setup, while `/usr/bin/time -l` recorded 1.12 s process wall and 24,477,696 bytes maximum RSS. These are costs of this bounded probe only. Its eight planted two-sum controls were detected and geometrically recovered, 8/8.
+
+The raw JSON retains the seed, candidate counts, and every successful relation witness, but does not list the missed scalar draws. The independent PARI/GP enumeration validates the factor-base support and the direct `Q` check; it does not independently replay all 255 random scalar-derived candidates. Such a replay is still required before treating the bounded miss transcript as independently verified. The exact support count and its probability calculation do not depend on those missed draws.
+
+For `B` distinct base abscissae, at most `B` doublings and `2·C(B,2)` pair sums yield at most `B²` distinct abscissae, hence at most `2B²` nonzero group points. The independent enumeration reaches this cardinality at `B=512`, so a uniformly selected nonzero group point has exact hit probability `524288/(n−1) ≈ 3.3824×10⁻³⁴ = 2⁻¹¹¹·¹⁸⁷⁵`. Even granting every hit independent rank, `B+1=513` rows would require about `2¹²⁰·¹⁹⁰³` candidates in expectation under independent uniform sampling. At the CLI's `B=8192` limit the general two-sum upper bound is `2⁻¹⁰³·¹⁸⁷⁵` per candidate. These are derived coverage and optimistic trial calculations for this two-sum construction, not timings, a general lower bound for index calculus, or a negative result about other factor bases. Zero hits in the fixed candidates add no meaningful population-rate estimate beyond the exact enumerated support.
+
+The first independent GP pair-enumeration scripts printed invalid zero counts after parser errors ([attempt 1](eccp131-pari-pair-sums-attempt1.err), [attempt 2](eccp131-pari-pair-sums-attempt2.err)); a corrected script exceeded GP's default 8 MB stack ([attempt 3](eccp131-pari-pair-sums-attempt3.err)). The retained [final script](eccp131-pari-pair-sums.gp), run with `gp -s 512000000 -q`, finished in 2.53 s process wall with 76,333,056 bytes maximum RSS. Only its successful output supports the count. PARI/GP version 2.17.3 and host information are retained in [tool output](pminus1-tool.txt).
+
+A [separate PARI/GP factorization](pminus1-output.txt) gives `p−1 = 2·5·155003179783434785924857641481313994241`, with `isprime` returning 1 for the 127-bit cofactor. The direct large smooth-divisor construction described in the retrieved [Petit–Kosters–Messeng prime-field IC paper](https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf) therefore has no large smooth divisor of this `p−1` to use; the paper's auxiliary-curve route and other relation methods remain untested here. This is a structural check, not a proof against prime-field IC.
+
+The current [problem record](../../problems/eccp131-full-parameter-index-calculus.md) now distinguishes the proved support bound for this method from the still-open challenge requirement. The refreshed [workflow diagram](workflow.svg) shows the implemented exact probe ending at zero natural rank and the separate full-solution requirement. No new performance leaderboard row or progress-fidelity claim follows from these observations.
