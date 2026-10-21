@@ -52,6 +52,10 @@ the current 30-bit state-ID boundary. [CAPACITY.md](CAPACITY.md) gives the
 exact sizing formulas, Lean-checked bound and split implication, memory
 diagram, and missing execution checks. The projected 844,276-point count is
 not an enumerated factor base; `candidate_id` stays `null`.
+The [prepared max-K comparison](MAXK_PROTOCOL.md) freezes 192 fresh screen
+points and eight disjoint holdout points with a zero-overlap audit against
+33,336 earlier public points. Cloud spending, exact base identity, and the
+new executable receipt remain gates before dispatch.
 
 1. Run the exact-root unit control: real N83 S3 roots are partitioned at a
    small prefix, compared with a core-first reference map, and probed for
