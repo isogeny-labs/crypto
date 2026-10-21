@@ -164,6 +164,11 @@ tests passed, and three touched-example tests passed. Clippy with CI's Rust
 passed. Rust 1.99 clippy encountered an unchanged PMAC lint; the global
 curve-name lint reports seven unchanged historical findings, with logs and
 empty source-diff proofs retained. These are reported, not patched here.
+Touched Rust files pass formatting. The optional whole-workspace formatter
+check reports changes in two untouched historical examples; its empty base diff
+and the full diagnostic are retained. The validation gate passes without a
+base comparison; its base comparison reports five already-archived baseline
+entries. No benchmark-index, archive or gate logic changes are made here.
 
 The registry update preserves existing models and representations and adds
 three recounted synthetic models. The guarded native incremental trait refresh
@@ -171,6 +176,9 @@ preserves all 2,748 existing trait rows and recomputes the changed representatio
 to the same traits. A subsequent full native release rebuild of all 2,751 rows
 matched it byte for byte; the earlier bounded serialized attempt timed out and
 is retained in verification.
+The [versioned cover-catalog report](catalog-update/README.md) records the three
+new models, five generator representations, regenerated geometry certificates
+and updated live assessment bindings. The older catalog report is preserved.
 
 ## Limits and next experiment
 

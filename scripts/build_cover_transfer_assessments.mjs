@@ -11,7 +11,7 @@ const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
 const ASSESSMENT_DATE = "2026-10-21";
 // Registry additions are frozen in this commit; source_artifacts also bind
 // the regenerated cover graph and every assessed implementation byte.
-const CATALOG_COMMIT = "b6d95f7390a45ea2d4fbcbb41dc10dd94c240148";
+const CATALOG_COMMIT = "9be2f56ac440b5eeedf1438094a59e8795d66936";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
@@ -1071,11 +1071,11 @@ async function buildSourceArtifacts() {
       "independent catalog-wide assessment verifier",
     ),
     integrityArtifact(
-      "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
+      "research/ecbench_known_log_targets_20261021/catalog-update/render.py",
       "PDF coverage-marker metadata normalization source",
     ),
     integrityArtifact(
-      "research/cover_transfer_assessment_20261013/README.md",
+      "research/ecbench_known_log_targets_20261021/catalog-update/README.md",
       "source-linked catalog-wide assessment report",
     ),
     integrityArtifact(
@@ -1083,31 +1083,31 @@ async function buildSourceArtifacts() {
       "published-artifact replay receipt and source/package boundary",
     ),
     integrityArtifact(
-      "research/cover_transfer_assessment_20261013/typed_correspondence.dot",
+      "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.dot",
       "assessment diagram source",
     ),
     integrityArtifact(
-      "research/cover_transfer_assessment_20261013/typed_correspondence.svg",
+      "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.svg",
       "rendered assessment diagram in SVG format",
     ),
     integrityArtifact(
-      "research/cover_transfer_assessment_20261013/typed_correspondence.png",
+      "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.png",
       "rendered assessment diagram in PNG format",
     ),
     integrityArtifact(
-      "research/cover_transfer_assessment_20261013/typed_transfer_context.dot",
+      "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.dot",
       "typed transfer-context diagram source",
     ),
     integrityArtifact(
-      "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
+      "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.svg",
       "rendered typed transfer-context diagram in SVG format",
     ),
     integrityArtifact(
-      "research/cover_transfer_assessment_20261013/typed_transfer_context.png",
+      "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.png",
       "rendered typed transfer-context diagram in PNG format",
     ),
     integrityArtifact(
-      "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
+      "research/ecbench_known_log_targets_20261021/catalog-update/CATALOG.pdf",
       "rendered catalog-wide assessment PDF",
     ),
   ]);
@@ -1633,21 +1633,21 @@ async function buildLedger() {
     ],
     open_obligations: obligations,
     report: {
-      markdown: "research/cover_transfer_assessment_20261013/README.md",
+      markdown: "research/ecbench_known_log_targets_20261021/catalog-update/README.md",
       pdf:
-        "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
+        "research/ecbench_known_log_targets_20261021/catalog-update/CATALOG.pdf",
       graph_source:
-        "research/cover_transfer_assessment_20261013/typed_correspondence.dot",
+        "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.dot",
       graph_svg:
-        "research/cover_transfer_assessment_20261013/typed_correspondence.svg",
+        "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.svg",
       graph_png:
-        "research/cover_transfer_assessment_20261013/typed_correspondence.png",
+        "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.png",
       context_graph_source:
-        "research/cover_transfer_assessment_20261013/typed_transfer_context.dot",
+        "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.dot",
       context_graph_svg:
-        "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
+        "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.svg",
       context_graph_png:
-        "research/cover_transfer_assessment_20261013/typed_transfer_context.png",
+        "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.png",
       release_receipt:
         "research/cover_transfer_assessment_20261013/release_replay.txt",
     },

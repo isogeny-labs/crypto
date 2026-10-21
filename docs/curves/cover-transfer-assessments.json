@@ -7,7 +7,7 @@
     "not_applicable"
   ],
   "assessment_date": "2026-10-21",
-  "catalog_commit": "b6d95f7390a45ea2d4fbcbb41dc10dd94c240148",
+  "catalog_commit": "9be2f56ac440b5eeedf1438094a59e8795d66936",
   "source_artifacts": [
     {
       "path": "docs/curves/registry.json",
@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "c50c0d5fb4b0064109510e6b289cc92b61f17c7509279534897c5c106a47414d",
+      "sha256": "a3a583072718df9899ccfdb5416c97060ddb495e77cc6e9718279e0ab70447a8",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -128,7 +128,7 @@
     },
     {
       "path": "src/bin/hyperelliptic_cover.rs",
-      "sha256": "3cc84bf90685c63653b96b1d7f134efacbdb37e30ea8d8762bd3d28308df0a00",
+      "sha256": "92908ec1add659fa171408061c6968604e211082fba59eaac01c54a14670f23d",
       "role": "standalone CLI and native binary subgroup batch certificate",
       "freshness": {
         "status": "supported",
@@ -484,7 +484,7 @@
     },
     {
       "path": "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
-      "sha256": "ddeafc3ccbcc4cb227c4754eb45b0fa5a3d6eda4c0064c01485e0fbe5173d4d6",
+      "sha256": "40a13555086ca016675397a877198951dfdd6976452922d517c22af4cdc9665c",
       "role": "standalone CLI and supported-model documentation",
       "freshness": {
         "status": "supported",
@@ -536,7 +536,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
-      "sha256": "4c8c50fc9ef002388803f88d2433e3d30c0db5db722560372c804549bc8d4589",
+      "sha256": "a853d1c1bab5ff8e87e348cd7cf8964372772426b8a9e3ead2ae7f3ff99f3deb",
       "role": "independent catalog-wide assessment verifier",
       "freshness": {
         "status": "supported",
@@ -548,28 +548,28 @@
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
-      "sha256": "931ff983a3ee710a23c5d7a1963ddfc878e3b51aa4a88cfedfb71044de80f2e1",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/render.py",
+      "sha256": "f2aff03d20b25c38dd21be8f01e2a227817ad62ea6f28514deaf15377e65510b",
       "role": "PDF coverage-marker metadata normalization source",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/set_pdf_metadata.py"
+          "research/ecbench_known_log_targets_20261021/catalog-update/render.py"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/README.md",
-      "sha256": "5714653dbd3c82e7515eb6801e7e6d8af71c3afe85bc051db1aa5e12057e1ee2",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/README.md",
+      "sha256": "d0203539ca347a07ce326f628863cc686054cf4523572a2ab8430ba83dbb786c",
       "role": "source-linked catalog-wide assessment report",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/README.md"
+          "research/ecbench_known_log_targets_20261021/catalog-update/README.md"
         ]
       }
     },
@@ -587,93 +587,93 @@
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/typed_correspondence.dot",
-      "sha256": "efd88a412ddf59b4a2296f84af2932164346f077faef10af9045e2f91dfbabcd",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.dot",
+      "sha256": "f72e4edde4f799a6723779b3725663c35c1d71a0af705911888855ee97439cc1",
       "role": "assessment diagram source",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/typed_correspondence.dot"
+          "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.dot"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/typed_correspondence.svg",
-      "sha256": "7a3401b4a3e7a697633cd53cc59b781ffc96a4f43e077f0a584f3073f33e6029",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.svg",
+      "sha256": "2e3dc0ec146382d9770fe5304112cf6d3ba79e49e18a7e7a93d3a4fd19361c3b",
       "role": "rendered assessment diagram in SVG format",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/typed_correspondence.svg"
+          "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.svg"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/typed_correspondence.png",
-      "sha256": "149c947691424b18bf083933a4fb73f4d9d5c1b41b5a772d46f522de8ad82bbe",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.png",
+      "sha256": "da92be936790bb207904b0a4a219cc09e10ca29ea4e0464c0831ba1d11670a60",
       "role": "rendered assessment diagram in PNG format",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/typed_correspondence.png"
+          "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.png"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.dot",
-      "sha256": "a50bc70c8a5d1e4a6a135242e9c4fadf22d4ffaa62bc7beac43268c076d27104",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.dot",
+      "sha256": "b5bde447cf4fcb3baf0e51a09e96eb4db769e6fb2a8ad6dc4b5dae4f7e5fa924",
       "role": "typed transfer-context diagram source",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/typed_transfer_context.dot"
+          "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.dot"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
-      "sha256": "06f575e687a9a920bfe40cf48382467191ed852d936b14771259976270ae0319",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.svg",
+      "sha256": "e8530ff79f69c1d0a45b12df7f38a0ffec650425e882da2982fce0d34b91aa23",
       "role": "rendered typed transfer-context diagram in SVG format",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/typed_transfer_context.svg"
+          "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.svg"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.png",
-      "sha256": "04ffe1afdd1a12fa614cff36539e7b24627b31f9d52c3c2e2343d05e828632fc",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.png",
+      "sha256": "adb47a365b9e106b15ef03e02c926079ce0ad124663d534db86605ac5d458b8d",
       "role": "rendered typed transfer-context diagram in PNG format",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/typed_transfer_context.png"
+          "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.png"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
-      "sha256": "511287c0fcf941b2ace16c3d4bed2d76ce8a65fbc97345936c0556ae3e3635de",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/CATALOG.pdf",
+      "sha256": "9b1f1d548c6c129b2c14c45c3073bd2d09c881e67bd8cc3f3c64cf55991741cc",
       "role": "rendered catalog-wide assessment PDF",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf"
+          "research/ecbench_known_log_targets_20261021/catalog-update/CATALOG.pdf"
         ]
       }
     }
@@ -76343,14 +76343,14 @@
     }
   ],
   "report": {
-    "markdown": "research/cover_transfer_assessment_20261013/README.md",
-    "pdf": "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
-    "graph_source": "research/cover_transfer_assessment_20261013/typed_correspondence.dot",
-    "graph_svg": "research/cover_transfer_assessment_20261013/typed_correspondence.svg",
-    "graph_png": "research/cover_transfer_assessment_20261013/typed_correspondence.png",
-    "context_graph_source": "research/cover_transfer_assessment_20261013/typed_transfer_context.dot",
-    "context_graph_svg": "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
-    "context_graph_png": "research/cover_transfer_assessment_20261013/typed_transfer_context.png",
+    "markdown": "research/ecbench_known_log_targets_20261021/catalog-update/README.md",
+    "pdf": "research/ecbench_known_log_targets_20261021/catalog-update/CATALOG.pdf",
+    "graph_source": "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.dot",
+    "graph_svg": "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.svg",
+    "graph_png": "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.png",
+    "context_graph_source": "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.dot",
+    "context_graph_svg": "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.svg",
+    "context_graph_png": "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.png",
     "release_receipt": "research/cover_transfer_assessment_20261013/release_replay.txt"
   },
   "migration": {
