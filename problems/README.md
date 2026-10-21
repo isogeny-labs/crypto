@@ -11,7 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [Certicom 130 CUDA/Metal physical qualification](certicom-130-gpu-hardware-qualification.md) | open | physical rho, BSGS and IC correctness on both exact curves in both repositories | existing authorized NVIDIA/Mac access, independent device/CLI replay receipts, then current-head CI/review gates |
+| [Certicom 130 CUDA/Metal physical qualification](certicom-130-gpu-hardware-qualification.md) | open | physical rho, BSGS and IC correctness on both exact curves in both repositories | complete hosted Metal library/CLI phases and physical provenance; authorized NVIDIA/Mac receipts; current-head CI/review gates |
 | [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | implemented; client activation remains | enrolled legacy process recovery | private recurring backups, fenced two-hop recovery and Diem copy restore passed; laptop installation/trust needs client access |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |
 | [Generalized rootfinding complete all-roots8x qualification](generalized-rootfinding-all-roots-8x.md) | open | novel qualified8x over matched genuine all-roots F4/F5/F6 across requested fields | native complete-output integration, independent replay, strongest external references and the unchanged hard gate |
