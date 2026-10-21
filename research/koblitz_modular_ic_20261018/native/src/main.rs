@@ -40,6 +40,7 @@ mod hash {
     }
 }
 mod census;
+mod cmray15;
 mod cofactor07;
 mod collision10;
 mod controls09;
@@ -51,6 +52,7 @@ mod forward07;
 mod gluing;
 #[path = "../../../../src/cryptanalysis/identity_certificate.rs"]
 mod identity_certificate;
+mod jets15;
 mod klein_transfer;
 mod kummer08;
 mod large_field;
@@ -62,6 +64,7 @@ mod n5_relations;
 mod odd07;
 mod ordinary13;
 mod polarized;
+mod proofs15;
 mod quotient_geometry;
 mod quotients06;
 mod quotients07;
@@ -365,6 +368,31 @@ fn run(out: &std::path::Path) {
 }
 fn main() {
     let args10: Vec<String> = std::env::args().collect();
+    match args10.get(1).map(String::as_str) {
+        Some("--record-round15") => {
+            round13_record::round15::record(std::path::Path::new(&args10[2]));
+            return;
+        }
+        Some("--round15-check-identities") => {
+            round13_record::round15::identities(std::path::Path::new(&args10[2]), false);
+            return;
+        }
+        Some("--round15-verify-sources") => {
+            round13_record::round15::verify_sources(std::path::Path::new(&args10[2]), false);
+            return;
+        }
+        Some("--round15-verify-history") => {
+            round13_record::round15::verify_sources(std::path::Path::new(&args10[2]), true);
+            return;
+        }
+        _ => {}
+    }
+    if args10.get(1).map(String::as_str) == Some("--round15-proofs") {
+        proofs15::run(std::path::Path::new(
+            args10.get(2).expect("round15 evidence"),
+        ));
+        return;
+    }
     if args10.get(1).map(String::as_str) == Some("--record-round13") {
         round13_record::record(std::path::Path::new(
             args10.get(2).expect("round13 complete receipts"),
@@ -442,6 +470,36 @@ fn main() {
     if args10.get(1).map(String::as_str) == Some("--round14-geometry") {
         quotients06::geometry14::run(std::path::Path::new(
             args10.get(2).expect("round14 actual graph inputs"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round15-theta") {
+        quotients06::theta15::run(std::path::Path::new(
+            args10.get(2).expect("round15 actual graph inputs"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round15-jets") {
+        jets15::run(std::path::Path::new(
+            args10.get(2).expect("round15 boundary inputs"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round15-cm") {
+        cmray15::run(std::path::Path::new(
+            args10.get(2).expect("round15 CM inputs"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round15-norms") {
+        ordinary13::factor::norms15::norms(std::path::Path::new(
+            args10.get(2).expect("round15 output"),
+        ));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round15-supports") {
+        ordinary13::factor::norms15::supports(std::path::Path::new(
+            args10.get(2).expect("round15 output"),
         ));
         return;
     }

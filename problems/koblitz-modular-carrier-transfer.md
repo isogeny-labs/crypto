@@ -4,7 +4,7 @@
 - **Kind:** implementation gap; low-genus existence question; partial formalization
 - **Affected work:** [investigation](../research/koblitz_modular_ic_20261018/REPORT.md), [original construction](../research/notes/ecc2k130/RESEARCH_ECC2K130_CURVE_CONSTRUCTION.md)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-18
+- **Last updated:** 2026-10-21
 
 ## Problem
 
@@ -14,8 +14,10 @@ algorithm on that factor has been constructed.
 
 The source is E_0/F_(2^131), registered as
 `icv1-f2m131-tm22283658519494248867-115e0dc5`, prime subgroup order
-`680564733841876926932320129493409985129`. The signed-character carrier
-has genus 378,708,949 and desired factor dimension 130. Neither number is
+`680564733841876926932320129493409985129`. The original signed-character carrier
+has genus 378,708,949 and desired factor dimension 130. Round15 adds a
+level1841 diamond-twisted carrier of genus45,589, containing two copies
+of that factor under its written CM/modular/descent bridge. Neither number is
 a measured recovery cost. No challenge point is imported or attacked.
 
 ## Evidence and uncertainty
@@ -617,3 +619,50 @@ geometry, cusp descent and native field semantics remain partially formal.
 All source/raw hashes, failures, capped fibers, the cyclotomic correction,
 replay and final audit receipts are retained. No IC efficiency conclusion
 is supplied; the user's assessment remains separate from these exact ranks.
+
+
+## Round15: lower-level CM and rational theta leads
+
+[Round15](../research/koblitz_modular_ic_20261018/rounds/15/REPORT.md)
+retains exact finite evidence, failures and replay in its ledger. Direct
+odd infinity-type1 CM characters at one split prime have level7p; the
+bounded scan supplies n=5/11/83/131 carriers of genus61/309/54781/45589.
+Complete Euler norms, full a2 Galois orbits and independent S,T coset genus
+checks pass. Retained LMFDB queries confirm the level77 mixed n=5 factor
+and the level539 even-twist control. No131 database row is returned;
+missing coverage is not nonexistence. A geometric order2 diamond twist
+exchanges Koblitz signs and supplies A131(E0)² without changing genus.
+The global CM/modular/Jacobian/twist argument is written in CM.md.
+
+G15 binds the actual source rotation and theta2-torsion corrections
+[15,9,15,9]; both Cartier I-C actions are invertible. Its written descent
+argument gives a rational symmetric principal bundle and3lambda target
+P242 with243 sections and pullback dimension87723. These are bundle and
+section-count results, not constructed bases or equations. Q18 proves no
+h=t first jet at all four actual Q17 models, with source-bound original
+gate certificates. The h=t² control shows why this does not settle
+projective closure or full saturation. M15/M16 exactly recover two new
+coupled norms with ordinary pushed degrees460/367. The false cusp-unit
+assumption is explicitly rejected and replaced by norm multiplicativity.
+58 new named Lean results cover universal identities and finite data;
+global geometry and implementation semantics remain partial.
+
+Acceptance tests remain separate:
+
+1. Construct a level77 Gamma_H curve model over F2, a newform-factor
+   correspondence and an evaluated n=5 map with a checked subgroup kernel.
+   The local Euler match alone does not establish injectivity. For n=131,
+   retain explicit diamond-twist descent and exact correspondence denominators.
+2. Produce the actual3Theta section basis, theta action/descent matrices,
+   invariant F2 coordinates and homogeneous ideal, then prove saturation and
+   identify its affine opens with the existing quotient. The lower target
+   dimension alone does not satisfy the proper-embedding requirement.
+3. Lift actual Q17 models along ramified h=t^e or exhibit a valid full-ideal
+   h-regularity/equality certificate. A first-jet obstruction at e=1 cannot
+   certify a false boundary point or a saturated ideal.
+4. Resolve source fibers and both images for the new ordinary pushed
+   supports460/367, assemble complete closed signed divisors and join ranks
+   on explicitly matched fresh columns. Norm factors alone promote no rank.
+
+Each possible positive result discharges only its named construction
+obligation. IC timing, solver cost and efficiency assessment remain separate.

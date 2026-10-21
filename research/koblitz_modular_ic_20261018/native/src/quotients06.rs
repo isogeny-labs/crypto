@@ -8,6 +8,8 @@ use serde_json::{json, Value};
 use std::path::Path;
 #[path = "geometry14.rs"]
 pub(crate) mod geometry14;
+#[path = "theta15.rs"]
+pub(crate) mod theta15;
 #[derive(Clone, Copy, Default, Debug, PartialEq, Eq, Serialize, Deserialize)]
 struct O {
     a: i64,

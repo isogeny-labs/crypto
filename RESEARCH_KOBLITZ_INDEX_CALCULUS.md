@@ -11,27 +11,25 @@ pre-registered hypotheses)
 *On index calculus algorithms for subfield curves*, SAC 2020
 (ePrint 2020/1315).
 
-**Modular and low-genus carrier follow-up (2026-10-20):**
-[Round14](research/koblitz_modular_ic_20261018/rounds/14/REPORT.md)
-completes the five remaining ordinary components:57 simple closed points
-of total degrees1760,1880,2760,1370,2180, with both images checked under
-the written global bridges. Forty fresh split columns have35 even and30
-odd nonzero images. The joined coupled principal rows give rank16/1348
-and nonzero-image ranks15/15. Eight separate deck-fiber rows raise these
-to20/1348 and18/17 on1200/1190 nonzero columns. They are not principal rows.
-All eight F2 closed signed divisors are complete under written Tate/moduli
-bridges:44 cusp orbits exhaust480 labels and reproduce the old product divisor.
+**Modular and low-genus carrier follow-up (2026-10-21):**
+[Round15](research/koblitz_modular_ic_20261018/rounds/15/REPORT.md)
+constructs direct odd CM characters of level7p. Exact Euler products and
+independent S,T coset enumeration give candidate carriers of genus61 for
+n=5 and45589 for n=131; a diamond quadratic twist supplies the latter's
+required sign. The modular/Jacobian/descent bridge is written. Explicit
+carrier equations, correspondences and subgroup injection remain open.
 
-Q16/Q17 add98 linear products and288 coefficient quadrics per graph,
-without a new separating scalar boundary model. Full h-saturation remains
-open; surviving models alone do not prove failure. The canonical6lambda
-target is P^7775, with actual polarization pullbacks and corrected Cartier
-character Frobenius2M^-transpose. Global section bases, descent blocks and
-proper equations remain uncomputed. Sixty-five new named Lean results
-include actual F32 row checks and identity-minor ranks, with global geometry
-and native semantics still partial. See the
-[construction problem](problems/koblitz-modular-carrier-transfer.md).
-No IC cost or efficiency verdict is supplied.
+Actual theta-class corrections and invertible Cartier I-C give a symmetric
+principal bundle and3lambda target P242 under the written theta-group
+bridge. Its243 sections are not yet constructed. Two new coupled norms
+have ordinary pushed degrees460 and367, with exact factors but new source
+fibers/images open. All four Q17 models have no h=t first jet; this does
+not exclude ramified arcs or prove full saturation. Fifty-eight new named
+Lean results cover universal identities and actual finite certificates.
+[Round14](research/koblitz_modular_ic_20261018/rounds/14/REPORT.md)'s eight
+complete signed divisors and principal/deck nonzero ranks15/15 and18/17
+remain frozen. See the [construction problem](problems/koblitz-modular-carrier-transfer.md).
+The user assesses IC implications; no cost or efficiency verdict is supplied.
 
 ## The setting
 

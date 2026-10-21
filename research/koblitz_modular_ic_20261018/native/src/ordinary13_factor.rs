@@ -4,6 +4,8 @@ use std::collections::BTreeMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
 #[path = "ordinary13_lift.rs"]
 pub(crate) mod lift;
+#[path = "norms15.rs"]
+pub(crate) mod norms15;
 #[path = "ordinary14.rs"]
 pub(crate) mod ordinary14;
 static REDUCTIONS: AtomicUsize = AtomicUsize::new(0);

@@ -1,0 +1,187 @@
+{
+  "id": "IDC1h3758dd1bd167d8b1",
+  "independence": "native issuer;128 extra points and source-bound Lean theorem",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound15.lean",
+    "sha256": "3c9f8c746befaf4547bfd3e4a42337e0ba1b3b32a9abc626b66307e91648eb53"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610211501,
+  "statement": {
+    "degree_bound": 4,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "x0",
+                      "op": "var"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "t",
+                          "op": "var"
+                        },
+                        {
+                          "args": "x1",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "y0",
+                      "op": "var"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "t",
+                          "op": "var"
+                        },
+                        {
+                          "args": "y1",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            },
+            {
+              "args": [
+                {
+                  "args": -1,
+                  "op": "const"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "x0",
+                      "op": "var"
+                    },
+                    {
+                      "args": "y0",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": -1,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": "t",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "x0",
+                          "op": "var"
+                        },
+                        {
+                          "args": "y1",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "x1",
+                          "op": "var"
+                        },
+                        {
+                          "args": "y0",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "product-first-jet",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": "t",
+              "op": "var"
+            },
+            {
+              "args": "t",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        },
+        {
+          "args": [
+            {
+              "args": "x1",
+              "op": "var"
+            },
+            {
+              "args": "y1",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "mul"
+    },
+    "source": "KoblitzRound15.product_first_jet",
+    "variables": [
+      "t",
+      "x0",
+      "x1",
+      "y0",
+      "y1"
+    ]
+  },
+  "value_digest": "7e903b695ce4e8f382377387c9c54da99cb1fb96730ccb605e3a398c1c6ddf10"
+}

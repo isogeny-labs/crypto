@@ -5,6 +5,8 @@ use serde_json::json;
 use std::{collections::BTreeMap, path::Path};
 #[path = "round14_record.rs"]
 pub(crate) mod round14;
+#[path = "round15_record.rs"]
+pub(crate) mod round15;
 fn hash(p: &Path) -> String {
     hex::encode(sha256_impl::sha256(&std::fs::read(p).unwrap()))
 }

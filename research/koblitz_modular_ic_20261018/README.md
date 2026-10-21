@@ -1,23 +1,22 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [14](rounds/14/README.md), with its
-[report](rounds/14/REPORT.md), [PDF](rounds/14/report.pdf),
-[proof map](rounds/14/PROOF_MAP.md), [ledger](rounds/14/ledger.json)
-and exact replay. The five remaining ordinary components have57 simple
-closed points and complete even/odd images under the written global bridges.
-Forty fresh split columns contain35 even and30 odd nonzero images.
-The joined coupled principal rows have rank16/1348 and nonzero-image
-rank15/15. Adding eight separate deck-fiber rows gives rank20/1348 and
-nonzero-image ranks18/17 on1200/1190 columns. Deck rows are not principal.
+The current round is [15](rounds/15/README.md), with its
+[report](rounds/15/REPORT.md), [PDF](rounds/15/report.pdf),
+[CM construction](rounds/15/CM.md), [theta descent](rounds/15/THETA.md),
+[proof map](rounds/15/PROOF_MAP.md), [ledger](rounds/15/ledger.json)
+and exact replay. Direct odd CM characters give level7p carriers of genus61
+for n=5 and45589 for n=131, with exact Euler/coset checks. A diamond
+quadratic twist supplies the required n=131 sign. Actual maps and subgroup
+injection are open; the global construction is written, not fully Lean.
 
-All eight F2 closed signed divisors are complete under written bridges:
-O28 enumerates44 closed cusp orbits and reproduces the old product divisor. Q16/Q17
-add98 linear products and288 coefficient quadrics per circuit without a
-new separating scalar witness. Full h-saturation remains uncomputed.
-The canonical6lambda polarized target is P^7775, with actual pullback
-and corrected Cartier character data; global sections and proper equations
-remain open. Sixty-five new named Lean results retain explicit geometric
-and implementation limits. No IC cost or efficiency verdict is supplied.
+Actual theta corrections give all four quotients a3lambda target P242,
+with243 sections; section bases and proper equations remain open. New
+coupled norms have ordinary pushed degrees460/367, with exact factors but
+source fibers/images uncomputed. All four actual Q17 models have no h=t
+first jet; ramified arcs and full saturation remain open. Fifty-eight new
+named Lean results cover relevant identities and finite certificates.
+Round14's complete eight divisors and ranks remain unchanged. No IC cost
+or efficiency assessment is supplied.
 
 Earlier evidence stays frozen:
 
@@ -52,3 +51,6 @@ Earlier evidence stays frozen:
 Research arithmetic and record assembly are native Rust in `native/`.
 The pinned Lean project is `lean/`. Each round has its own protocol,
 failed-attempt records, proof map, immutable raw archive and replay script.
+
+- [Round 14](rounds/14/README.md): all57 ordinary supports/images, eight closed
+  signed divisors and principal/deck nonzero ranks15/15 and18/17.

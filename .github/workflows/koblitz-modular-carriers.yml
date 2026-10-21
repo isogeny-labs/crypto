@@ -134,7 +134,19 @@ jobs:
           (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
           (cd "$round" && sha256sum -c validation-runs.tar.xz.sha256 && tar -xJf validation-runs.tar.xz && sha256sum -c validation-runs.sha256)
           "$round/REPLAY.sh"
-          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round14-verify-sources "$round"
+          # Frozen rounds pin their original source snapshot; later registrations
+          # and generators intentionally change the current source tree.
+          git fetch --no-tags origin 1f733a2963736514f644aa8cff202d6e507c9dad
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round15-verify-history "$round"
+      - name: Replay round 15 CM carriers, theta descent and new relations
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/15
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          (cd "$round" && sha256sum -c validation-runs.tar.xz.sha256 && tar -xJf validation-runs.tar.xz && sha256sum -c validation-runs.sha256)
+          "$round/REPLAY.sh"
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round15-verify-sources "$round"
       - name: Install pinned Lean
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
