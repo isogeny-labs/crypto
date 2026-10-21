@@ -6,16 +6,16 @@
     "refuted",
     "not_applicable"
   ],
-  "assessment_date": "2026-10-19",
-  "catalog_commit": "8e4c99759fd8d9594ed207d793b07b59ebaf19f7",
+  "assessment_date": "2026-10-21",
+  "catalog_commit": "9be2f56ac440b5eeedf1438094a59e8795d66936",
   "source_artifacts": [
     {
       "path": "docs/curves/registry.json",
-      "sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf",
+      "sha256": "b191dbd3946db7e7ecc52d64fe757fbf9935d604274493fc74dfc44f691fd3ae",
       "role": "exact ICV1/EC1 input registry",
       "freshness": {
         "status": "supported",
-        "scope": "the exact input registry for all 2,572 assessed map rows",
+        "scope": "the exact input registry for all 2,575 assessed map rows",
         "rationale": "The digest is computed from the current file and every membership is joined through its model hash.",
         "evidence_refs": [
           "docs/curves/registry.json"
@@ -24,11 +24,11 @@
     },
     {
       "path": "docs/curves/covers.json",
-      "sha256": "8a805888601c49557bab36082bfe0d34ed8dacb9c52471ca323b8d0e99282f08",
+      "sha256": "7cae72c6d8b3e825bdd8b4fe4edbb0266b2d45951c495f2eebed6379a582bed8",
       "role": "generated curve-level geometry catalog",
       "freshness": {
         "status": "supported",
-        "scope": "all 2,572 current verified-over-declared-field geometry rows",
+        "scope": "all 2,575 current verified-over-declared-field geometry rows",
         "rationale": "The ledger derives every map profile predicate from this exact file.",
         "evidence_refs": [
           "docs/curves/covers.json"
@@ -37,11 +37,11 @@
     },
     {
       "path": "docs/curves/cover-links.yaml",
-      "sha256": "6e15fa30558f873e6ed1290464134c0dd2f281a807c132dbdea7d586f795c763",
+      "sha256": "0ac93d81347163ce0652712428d2d8870699f9248659223c22e8d3a1d0d48260",
       "role": "content-addressed ICV1/EC1/HC1/CV1 graph",
       "freshness": {
         "status": "supported",
-        "scope": "2,572 exact map links, 2,570 unique cover objects, and 977 EC1 triples",
+        "scope": "2,575 exact map links, 2,573 unique cover objects, and 982 EC1 triples",
         "rationale": "The ledger records exact sorted UID memberships rather than count-only coverage.",
         "evidence_refs": [
           "docs/curves/cover-links.yaml"
@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "ea24b54401970d94cf84b61f053ac3c0da5a4dc7daa6eeeff18ca83ac87e71cf",
+      "sha256": "a3a583072718df9899ccfdb5416c97060ddb495e77cc6e9718279e0ab70447a8",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -128,7 +128,7 @@
     },
     {
       "path": "src/bin/hyperelliptic_cover.rs",
-      "sha256": "3cc84bf90685c63653b96b1d7f134efacbdb37e30ea8d8762bd3d28308df0a00",
+      "sha256": "92908ec1add659fa171408061c6968604e211082fba59eaac01c54a14670f23d",
       "role": "standalone CLI and native binary subgroup batch certificate",
       "freshness": {
         "status": "supported",
@@ -447,7 +447,7 @@
       "role": "legacy formula-screen inventory; not a transfer certificate",
       "freshness": {
         "status": "refuted",
-        "scope": "claim that this inventory is current for the 2,572-row registry",
+        "scope": "claim that this inventory is current for the 2,575-row registry",
         "rationale": "It pins an older registry, omits current slugs, and contains modeled routes without exact HC1/CV1 subgroup certificates.",
         "evidence_refs": [
           "docs/curves/jacobian-transfers.json",
@@ -484,7 +484,7 @@
     },
     {
       "path": "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
-      "sha256": "ddeafc3ccbcc4cb227c4754eb45b0fa5a3d6eda4c0064c01485e0fbe5173d4d6",
+      "sha256": "40a13555086ca016675397a877198951dfdd6976452922d517c22af4cdc9665c",
       "role": "standalone CLI and supported-model documentation",
       "freshness": {
         "status": "supported",
@@ -536,7 +536,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
-      "sha256": "4c8c50fc9ef002388803f88d2433e3d30c0db5db722560372c804549bc8d4589",
+      "sha256": "a853d1c1bab5ff8e87e348cd7cf8964372772426b8a9e3ead2ae7f3ff99f3deb",
       "role": "independent catalog-wide assessment verifier",
       "freshness": {
         "status": "supported",
@@ -548,28 +548,28 @@
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
-      "sha256": "931ff983a3ee710a23c5d7a1963ddfc878e3b51aa4a88cfedfb71044de80f2e1",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/render.py",
+      "sha256": "f2aff03d20b25c38dd21be8f01e2a227817ad62ea6f28514deaf15377e65510b",
       "role": "PDF coverage-marker metadata normalization source",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/set_pdf_metadata.py"
+          "research/ecbench_known_log_targets_20261021/catalog-update/render.py"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/README.md",
-      "sha256": "5714653dbd3c82e7515eb6801e7e6d8af71c3afe85bc051db1aa5e12057e1ee2",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/README.md",
+      "sha256": "d0203539ca347a07ce326f628863cc686054cf4523572a2ab8430ba83dbb786c",
       "role": "source-linked catalog-wide assessment report",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/README.md"
+          "research/ecbench_known_log_targets_20261021/catalog-update/README.md"
         ]
       }
     },
@@ -587,93 +587,93 @@
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/typed_correspondence.dot",
-      "sha256": "efd88a412ddf59b4a2296f84af2932164346f077faef10af9045e2f91dfbabcd",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.dot",
+      "sha256": "f72e4edde4f799a6723779b3725663c35c1d71a0af705911888855ee97439cc1",
       "role": "assessment diagram source",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/typed_correspondence.dot"
+          "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.dot"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/typed_correspondence.svg",
-      "sha256": "7a3401b4a3e7a697633cd53cc59b781ffc96a4f43e077f0a584f3073f33e6029",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.svg",
+      "sha256": "2e3dc0ec146382d9770fe5304112cf6d3ba79e49e18a7e7a93d3a4fd19361c3b",
       "role": "rendered assessment diagram in SVG format",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/typed_correspondence.svg"
+          "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.svg"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/typed_correspondence.png",
-      "sha256": "149c947691424b18bf083933a4fb73f4d9d5c1b41b5a772d46f522de8ad82bbe",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.png",
+      "sha256": "da92be936790bb207904b0a4a219cc09e10ca29ea4e0464c0831ba1d11670a60",
       "role": "rendered assessment diagram in PNG format",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/typed_correspondence.png"
+          "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.png"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.dot",
-      "sha256": "a50bc70c8a5d1e4a6a135242e9c4fadf22d4ffaa62bc7beac43268c076d27104",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.dot",
+      "sha256": "b5bde447cf4fcb3baf0e51a09e96eb4db769e6fb2a8ad6dc4b5dae4f7e5fa924",
       "role": "typed transfer-context diagram source",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/typed_transfer_context.dot"
+          "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.dot"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
-      "sha256": "06f575e687a9a920bfe40cf48382467191ed852d936b14771259976270ae0319",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.svg",
+      "sha256": "e8530ff79f69c1d0a45b12df7f38a0ffec650425e882da2982fce0d34b91aa23",
       "role": "rendered typed transfer-context diagram in SVG format",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/typed_transfer_context.svg"
+          "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.svg"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.png",
-      "sha256": "04ffe1afdd1a12fa614cff36539e7b24627b31f9d52c3c2e2343d05e828632fc",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.png",
+      "sha256": "adb47a365b9e106b15ef03e02c926079ce0ad124663d534db86605ac5d458b8d",
       "role": "rendered typed transfer-context diagram in PNG format",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/typed_transfer_context.png"
+          "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.png"
         ]
       }
     },
     {
-      "path": "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
-      "sha256": "511287c0fcf941b2ace16c3d4bed2d76ce8a65fbc97345936c0556ae3e3635de",
+      "path": "research/ecbench_known_log_targets_20261021/catalog-update/CATALOG.pdf",
+      "sha256": "9b1f1d548c6c129b2c14c45c3073bd2d09c881e67bd8cc3f3c64cf55991741cc",
       "role": "rendered catalog-wide assessment PDF",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
-          "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf"
+          "research/ecbench_known_log_targets_20261021/catalog-update/CATALOG.pdf"
         ]
       }
     }
@@ -978,7 +978,7 @@
     },
     "subgroup.prime-generator.unknown": {
       "status": "unknown",
-      "scope": "Generator membership and [r]G=O replay for all 837 linked odd-characteristic EC1 representations.",
+      "scope": "Generator membership and [r]G=O replay for all 842 linked odd-characteristic EC1 representations.",
       "rationale": "The current ledger binds their catalog identities but does not attach a catalog-wide native generator arithmetic replay.",
       "evidence_refs": [],
       "obligation_id": "catalog_generator_validation"
@@ -1367,8 +1367,8 @@
       },
       {
         "profile_id": "map.odd-prime-quadratic.direct",
-        "count": 1053,
-        "members_sha256": "ea341cc4d162456415ce41532a204cb620aa1f6d59088db1b7dd44ff76c79182",
+        "count": 1056,
+        "members_sha256": "c82e602d43d8676e4b313a884802fbb65a63765d3096b3ed67054de0b9f99ab0",
         "members": [
           "urn:curve-cover-map:1:sha256:0015c691789713c04c6ffc9493261d68fa4b4f19ada0dffd94c7a3db95be4238",
           "urn:curve-cover-map:1:sha256:00259ba83932bf58fef4366a3789135a334dcfcae81aebbef15693459a05179a",
@@ -1515,6 +1515,7 @@
           "urn:curve-cover-map:1:sha256:2006c3f2fdabe1b5f32341a42d855f7a2f00e92bdf5c8f046a899afef09da0ce",
           "urn:curve-cover-map:1:sha256:203f4533089de3731944edf7ac18415da3ee8c4ef2d4ff9b083a3d7a080b7649",
           "urn:curve-cover-map:1:sha256:20773db4176c0a493e2404f529487e45fdcca0669550a968c636d0c7f45e88d2",
+          "urn:curve-cover-map:1:sha256:20908e0045fa99bf194d32759ca0ed7ea3a553bda8ff040e257cfcc4c264bad9",
           "urn:curve-cover-map:1:sha256:2091c5a6323c3ee2331b1bc3df5cf1664f5a8d3f8ee21e73c001efab476512eb",
           "urn:curve-cover-map:1:sha256:209e76931257be26ab0df4feceeba859a81f5aaa89bb871a94208e51c88d428e",
           "urn:curve-cover-map:1:sha256:20be3ab51e0d0e29c9a75e9930cb83abac9f919577ac930c1b25a9169888d784",
@@ -1802,6 +1803,7 @@
           "urn:curve-cover-map:1:sha256:6c2f1c83889d03b77fff1fdd56e40943bb9ae3dc37f5e1d01cf46ac5b7ac8e05",
           "urn:curve-cover-map:1:sha256:6c48e4e72b14ede34a77a85a3db1f17d030df9b7a221e5a9bdc90746a9b6d5b8",
           "urn:curve-cover-map:1:sha256:6c7f5c6434e5a75c759a26858036dced63786cc9e94acec69f1ba4327252e82e",
+          "urn:curve-cover-map:1:sha256:6caaedbc3088a179df49bf6054d5ec8a4bc57247223b5d5437e74c193e9e1dfa",
           "urn:curve-cover-map:1:sha256:6ce98298d67aca4f77f9222c7fdc80b825c676a87e4c7dcab5d4599bb2572ed0",
           "urn:curve-cover-map:1:sha256:6ceb5068cdf9c4e80345b9934fc211a098bd9f7d8ceab59ccb69ed9011517b5b",
           "urn:curve-cover-map:1:sha256:6cf2466442ca748eed765abaeedb13eb88558b0b80cc4b7c78d7f979afded133",
@@ -2321,6 +2323,7 @@
           "urn:curve-cover-map:1:sha256:eb139386e1be70c2e624fb487a1de2359020f9afb11aeab1e44ef07207a0cedf",
           "urn:curve-cover-map:1:sha256:eb1ae406513bccd0788c8ad13af0784ef7fa8290b9e1feecd0bc4c6be1df3bfa",
           "urn:curve-cover-map:1:sha256:eb648fec5a37ad801b319b69ce12b11bc14c4a7524376a2984e1abeaed4d34d6",
+          "urn:curve-cover-map:1:sha256:eb6843b0cfc9c3326760c53a5fce57a975a4ffc54757c4e9245169eb877738dd",
           "urn:curve-cover-map:1:sha256:ebc3e36007e006cb18aa01b13888cb30587eb29f53118e0c5cf6258e4ef17f75",
           "urn:curve-cover-map:1:sha256:ebd32c4255acd7292eab34559e0103bc7071c63ae8a9a2ad19b55d9d741a9135",
           "urn:curve-cover-map:1:sha256:ec03a63a73c0f7320726fd9d16a1b184e6dc0c190b90817aab8b185ac0e51316",
@@ -4504,8 +4507,8 @@
       },
       {
         "profile_id": "subgroup.odd-degree2",
-        "count": 837,
-        "members_sha256": "7ed5e624cebaaa6f1b75b13a7874c6b46b3f70daa76c4e09b2611cdb2e19af17",
+        "count": 842,
+        "members_sha256": "0457fab497b3c23b369505dfd16f3bbe1c0ed529e6408cab13a50a9873c5be3e",
         "members": [
           [
             "EC1P10Cfphcf15d87ab724",
@@ -4628,8 +4631,33 @@
             "urn:curve-cover-map:1:sha256:4c4752706dc24007c1a8f12eebfa7d87668f69a20a017bab09eff98cc4f96db6"
           ],
           [
+            "EC1P16Cfph3324297226ce",
+            "urn:ec-record:1:sha256:3324297226ce21bd2ec790bd2f5e3f199839f2f9344b0b423f54cee31230e5d8",
+            "urn:curve-cover-map:1:sha256:6caaedbc3088a179df49bf6054d5ec8a4bc57247223b5d5437e74c193e9e1dfa"
+          ],
+          [
             "EC1P16Cfph38c70ce62cf6",
             "urn:ec-record:1:sha256:38c70ce62cf6ab6ee8cacf7d13602a8b7cd2b166b50eee900e8f09e360933cd1",
+            "urn:curve-cover-map:1:sha256:3e9bb559474172d80c139297a1f3d1ea8ce57840e1c255e90c65f951abb40d54"
+          ],
+          [
+            "EC1P16Cfph40cde753a008",
+            "urn:ec-record:1:sha256:40cde753a0088c935176e3899eef684686f9f2abe488169daa000ae678ec2d67",
+            "urn:curve-cover-map:1:sha256:3e9bb559474172d80c139297a1f3d1ea8ce57840e1c255e90c65f951abb40d54"
+          ],
+          [
+            "EC1P16Cfph65cd5b5b1d6b",
+            "urn:ec-record:1:sha256:65cd5b5b1d6bdc1ee12f99f6e928b30665fecb368f23510b0a87a73338c259cc",
+            "urn:curve-cover-map:1:sha256:20908e0045fa99bf194d32759ca0ed7ea3a553bda8ff040e257cfcc4c264bad9"
+          ],
+          [
+            "EC1P16Cfphc290cc40a72a",
+            "urn:ec-record:1:sha256:c290cc40a72ae3eb2c087eac7da78f8b65d34fe5df875248dfccdc1250b7f88d",
+            "urn:curve-cover-map:1:sha256:eb6843b0cfc9c3326760c53a5fce57a975a4ffc54757c4e9245169eb877738dd"
+          ],
+          [
+            "EC1P16Cfphdd8aeeda7644",
+            "urn:ec-record:1:sha256:dd8aeeda76442ac905fd1288b645d3da4099c8064f0b9a714729179f09515611",
             "urn:curve-cover-map:1:sha256:3e9bb559474172d80c139297a1f3d1ea8ce57840e1c255e90c65f951abb40d54"
           ],
           [
@@ -10843,6 +10871,16 @@
           "p": "273728064501339756603462468369185104987958288074891940133644204431064409085893803646700523799946827238917453720697332026264620142876572570883371"
         },
         "characteristic": "273728064501339756603462468369185104987958288074891940133644204431064409085893803646700523799946827238917453720697332026264620142876572570883371",
+        "extension_degree": 1,
+        "representation": "prime"
+      },
+      "urn:declared-field:1:sha256:7117885cfcf4f40f82831fd723c97becce38b80e7020b9d93a9bb574d676d826": {
+        "field_uid": "urn:declared-field:1:sha256:7117885cfcf4f40f82831fd723c97becce38b80e7020b9d93a9bb574d676d826",
+        "record": {
+          "label": "fp-65519",
+          "p": "65519"
+        },
+        "characteristic": "65519",
         "extension_degree": 1,
         "representation": "prime"
       },
@@ -22373,6 +22411,17 @@
           "infinity_configuration": "two_rational_points"
         }
       },
+      "urn:jacobian-context:1:sha256:4c1b4bf6e78dd8d7e03bccfaf6bf1977c26ab758fa1d6fea7167ac16e93f26a4": {
+        "jacobian_uid": "urn:jacobian-context:1:sha256:4c1b4bf6e78dd8d7e03bccfaf6bf1977c26ab758fa1d6fea7167ac16e93f26a4",
+        "record": {
+          "schema_version": "jacobian-context/v1",
+          "source_cover_uid": "urn:hc-model:1:sha256:3750c95a964c37069aaa1a6261d66b3060b4ced5d4ea3e625e609fb5cc3c1ad5",
+          "declared_field_uid": "urn:declared-field:1:sha256:7117885cfcf4f40f82831fd723c97becce38b80e7020b9d93a9bb574d676d826",
+          "dimension": 2,
+          "object": "Picard_degree_zero",
+          "infinity_configuration": "two_rational_points"
+        }
+      },
       "urn:jacobian-context:1:sha256:4c2af461f81d9f37d9cfa91c7fb4ac162a521764637c2a0d310b483c7cb8046c": {
         "jacobian_uid": "urn:jacobian-context:1:sha256:4c2af461f81d9f37d9cfa91c7fb4ac162a521764637c2a0d310b483c7cb8046c",
         "record": {
@@ -24216,6 +24265,17 @@
           "schema_version": "jacobian-context/v1",
           "source_cover_uid": "urn:hc-model:1:sha256:41f88f6fe8e36e46db04942de4b4768666c9037ad95a6081ccae78a4ebb11ae0",
           "declared_field_uid": "urn:declared-field:1:sha256:72a1b6a4f44569ed873e7c90deb5703350f1b96d2d0d194a522807b21b21604a",
+          "dimension": 2,
+          "object": "Picard_degree_zero",
+          "infinity_configuration": "two_rational_points"
+        }
+      },
+      "urn:jacobian-context:1:sha256:5d98e7f287885d5609529e92d3ae1f0a23b133b054c78d71958ba4ae96c3da9e": {
+        "jacobian_uid": "urn:jacobian-context:1:sha256:5d98e7f287885d5609529e92d3ae1f0a23b133b054c78d71958ba4ae96c3da9e",
+        "record": {
+          "schema_version": "jacobian-context/v1",
+          "source_cover_uid": "urn:hc-model:1:sha256:a235142c044807cb48f5fc80d20d5e3a9ba9f057167b41d84e8d6b4da599eaf1",
+          "declared_field_uid": "urn:declared-field:1:sha256:7117885cfcf4f40f82831fd723c97becce38b80e7020b9d93a9bb574d676d826",
           "dimension": 2,
           "object": "Picard_degree_zero",
           "infinity_configuration": "two_rational_points"
@@ -37157,6 +37217,17 @@
           "infinity_configuration": "two_rational_points"
         }
       },
+      "urn:jacobian-context:1:sha256:cf1286390114e5503df38e2cbdbce42d5c3747d05a8664a591dd4b7e59284cdd": {
+        "jacobian_uid": "urn:jacobian-context:1:sha256:cf1286390114e5503df38e2cbdbce42d5c3747d05a8664a591dd4b7e59284cdd",
+        "record": {
+          "schema_version": "jacobian-context/v1",
+          "source_cover_uid": "urn:hc-model:1:sha256:29ce0228b3db2a0b1fcb97e824b9f8f6acd1d6c00d0ee79e879987f1b5133e6b",
+          "declared_field_uid": "urn:declared-field:1:sha256:7117885cfcf4f40f82831fd723c97becce38b80e7020b9d93a9bb574d676d826",
+          "dimension": 2,
+          "object": "Picard_degree_zero",
+          "infinity_configuration": "two_rational_points"
+        }
+      },
       "urn:jacobian-context:1:sha256:cf2e68d836acae7d67eced079606aaa0b20e810f313b968f8edd82131c92d642": {
         "jacobian_uid": "urn:jacobian-context:1:sha256:cf2e68d836acae7d67eced079606aaa0b20e810f313b968f8edd82131c92d642",
         "record": {
@@ -46852,6 +46923,19 @@
           "degree": 1
         }
       },
+      "urn:curve-cover-map:1:sha256:20908e0045fa99bf194d32759ca0ed7ea3a553bda8ff040e257cfcc4c264bad9": {
+        "map_uid": "urn:curve-cover-map:1:sha256:20908e0045fa99bf194d32759ca0ed7ea3a553bda8ff040e257cfcc4c264bad9",
+        "target_icv1_slug": "icv1-fp16-tm124-317fecaa",
+        "target_model_sha256": "317fecaaf47cb3885ce59c713b57e49efe53a7410e6e3888161ff6ceac996c3c",
+        "source_cover_uid": "urn:hc-model:1:sha256:3750c95a964c37069aaa1a6261d66b3060b4ced5d4ea3e625e609fb5cc3c1ad5",
+        "source_jacobian_uid": "urn:jacobian-context:1:sha256:4c1b4bf6e78dd8d7e03bccfaf6bf1977c26ab758fa1d6fea7167ac16e93f26a4",
+        "field_relationship": {
+          "kind": "same_declared_field_identity",
+          "source_field_uid": "urn:declared-field:1:sha256:7117885cfcf4f40f82831fd723c97becce38b80e7020b9d93a9bb574d676d826",
+          "target_field_uid": "urn:declared-field:1:sha256:7117885cfcf4f40f82831fd723c97becce38b80e7020b9d93a9bb574d676d826",
+          "degree": 1
+        }
+      },
       "urn:curve-cover-map:1:sha256:2091c5a6323c3ee2331b1bc3df5cf1664f5a8d3f8ee21e73c001efab476512eb": {
         "map_uid": "urn:curve-cover-map:1:sha256:2091c5a6323c3ee2331b1bc3df5cf1664f5a8d3f8ee21e73c001efab476512eb",
         "target_icv1_slug": "icv1-fp59-t1073741954-439eb11f",
@@ -56352,6 +56436,19 @@
           "kind": "same_declared_field_identity",
           "source_field_uid": "urn:declared-field:1:sha256:4113463332479d9d7b613b9c15776faea1236d6b1d6c83bee61765297c025171",
           "target_field_uid": "urn:declared-field:1:sha256:4113463332479d9d7b613b9c15776faea1236d6b1d6c83bee61765297c025171",
+          "degree": 1
+        }
+      },
+      "urn:curve-cover-map:1:sha256:6caaedbc3088a179df49bf6054d5ec8a4bc57247223b5d5437e74c193e9e1dfa": {
+        "map_uid": "urn:curve-cover-map:1:sha256:6caaedbc3088a179df49bf6054d5ec8a4bc57247223b5d5437e74c193e9e1dfa",
+        "target_icv1_slug": "icv1-fp16-tm328-cbf43d6b",
+        "target_model_sha256": "cbf43d6b579aa64dba01e786504d73945fb2966a9523507460da99e733574a36",
+        "source_cover_uid": "urn:hc-model:1:sha256:a235142c044807cb48f5fc80d20d5e3a9ba9f057167b41d84e8d6b4da599eaf1",
+        "source_jacobian_uid": "urn:jacobian-context:1:sha256:5d98e7f287885d5609529e92d3ae1f0a23b133b054c78d71958ba4ae96c3da9e",
+        "field_relationship": {
+          "kind": "same_declared_field_identity",
+          "source_field_uid": "urn:declared-field:1:sha256:7117885cfcf4f40f82831fd723c97becce38b80e7020b9d93a9bb574d676d826",
+          "target_field_uid": "urn:declared-field:1:sha256:7117885cfcf4f40f82831fd723c97becce38b80e7020b9d93a9bb574d676d826",
           "degree": 1
         }
       },
@@ -72774,6 +72871,19 @@
           "degree": 1
         }
       },
+      "urn:curve-cover-map:1:sha256:eb6843b0cfc9c3326760c53a5fce57a975a4ffc54757c4e9245169eb877738dd": {
+        "map_uid": "urn:curve-cover-map:1:sha256:eb6843b0cfc9c3326760c53a5fce57a975a4ffc54757c4e9245169eb877738dd",
+        "target_icv1_slug": "icv1-fp16-tm166-90917c6c",
+        "target_model_sha256": "90917c6cef65c1f1d374fab93b1f5483b1931cca088f3ad19ce329e04f50d26b",
+        "source_cover_uid": "urn:hc-model:1:sha256:29ce0228b3db2a0b1fcb97e824b9f8f6acd1d6c00d0ee79e879987f1b5133e6b",
+        "source_jacobian_uid": "urn:jacobian-context:1:sha256:cf1286390114e5503df38e2cbdbce42d5c3747d05a8664a591dd4b7e59284cdd",
+        "field_relationship": {
+          "kind": "same_declared_field_identity",
+          "source_field_uid": "urn:declared-field:1:sha256:7117885cfcf4f40f82831fd723c97becce38b80e7020b9d93a9bb574d676d826",
+          "target_field_uid": "urn:declared-field:1:sha256:7117885cfcf4f40f82831fd723c97becce38b80e7020b9d93a9bb574d676d826",
+          "degree": 1
+        }
+      },
       "urn:curve-cover-map:1:sha256:ebc3e36007e006cb18aa01b13888cb30587eb29f53118e0c5cf6258e4ef17f75": {
         "map_uid": "urn:curve-cover-map:1:sha256:ebc3e36007e006cb18aa01b13888cb30587eb29f53118e0c5cf6258e4ef17f75",
         "target_icv1_slug": "icv1-fp224-t4733100108545601916421827343930821-64b69607",
@@ -75906,16 +76016,16 @@
     }
   ],
   "coverage": {
-    "catalog_maps": 2572,
-    "unique_cover_models": 2570,
-    "geometry_verified_maps": 2572,
-    "ec1_representations": 977,
-    "assessed_maps": 2572,
+    "catalog_maps": 2575,
+    "unique_cover_models": 2573,
+    "geometry_verified_maps": 2575,
+    "ec1_representations": 982,
+    "assessed_maps": 2575,
     "unassessed_maps": 0,
-    "assessed_subgroups": 977,
+    "assessed_subgroups": 982,
     "unassessed_subgroups": 0,
-    "map_membership_entries": 2572,
-    "subgroup_membership_entries": 977,
+    "map_membership_entries": 2575,
+    "subgroup_membership_entries": 982,
     "map_profiles": 4,
     "subgroup_profiles": 2,
     "scope_note": "Every current map UID and every exact [EC1, curve UID, map UID] triple has one base profile. Assessment means each claim receives an explicit supported, refuted, unknown, or not-applicable result; it does not mean every transfer capability is supported."
@@ -76031,7 +76141,7 @@
       "control": "identity",
       "assessment": {
         "status": "supported",
-        "scope": "all 2,572 map UIDs and 977 exact EC1/curve/map triples",
+        "scope": "all 2,575 map UIDs and 982 exact EC1/curve/map triples",
         "rationale": "The generator resolves exact content-addressed joins and rejects duplicates or missing rows.",
         "evidence_refs": [
           "scripts/build_cover_transfer_assessments.mjs",
@@ -76044,7 +76154,7 @@
       "control": "geometry",
       "assessment": {
         "status": "supported",
-        "scope": "all 2,572 fixed-family cover rows",
+        "scope": "all 2,575 fixed-family cover rows",
         "rationale": "Native certificates cover defining identities, smoothness, genus, degree, separability, and infinity behavior.",
         "evidence_refs": [
           "src/bin/curve_cover_check/checker.rs",
@@ -76095,7 +76205,7 @@
       "control": "odd_degree2_transfer",
       "assessment": {
         "status": "refuted",
-        "scope": "claim that the current one-infinity odd-prime implementation supports the 2,407 even-sextic source models",
+        "scope": "claim that the current one-infinity odd-prime implementation supports the 2,410 even-sextic source models",
         "rationale": "The current model contract and the catalog infinity configuration are structurally incompatible.",
         "evidence_refs": [
           "src/prime_hyperelliptic/curve.rs",
@@ -76108,8 +76218,8 @@
       "control": "published_artifact",
       "assessment": {
         "status": "refuted",
-        "scope": "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 2,572 current catalog models",
-        "rationale": "Direct artifact replay covered only its bundled 592-row registry. The historical static comparison classified 746 of the earlier 2,100 forms as inside the pinned source allowlist (160 binary and 586 direct prime-field) and 1,354 as outside it. That comparison has not been rerun against the expanded catalog and is not a 2,572-command artifact receipt. Current source accepts the new forms, but this artifact does not contain it.",
+        "scope": "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 2,575 current catalog models",
+        "rationale": "Direct artifact replay covered only its bundled 592-row registry. The historical static comparison classified 746 of the earlier 2,100 forms as inside the pinned source allowlist (160 binary and 586 direct prime-field) and 1,354 as outside it. That comparison has not been rerun against the expanded catalog and is not a 2,575-command artifact receipt. Current source accepts the new forms, but this artifact does not contain it.",
         "evidence_refs": [
           "research/cover_transfer_assessment_20261013/release_replay.txt",
           "src/bin/hyperelliptic_cover.rs#every_current_catalog_model_reaches_the_standalone_constructor"
@@ -76168,9 +76278,9 @@
   ],
   "exploration_boundary": [
     "No search for production targets, private keys, or discrete logarithms was performed.",
-    "All 2,572 map rows and all 977 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
+    "All 2,575 map rows and all 982 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
     "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
-    "The 2,407 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
+    "The 2,410 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
     "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",
     "Formula-screen outputs in jacobian-transfers.json were not promoted to executable or measured claims.",
     "A full cover-integrated Jacobian index-calculus solver, relation collection, linear algebra, and target decomposition remain a separate deliverable. The bounded odd-prime one-infinity solver library is outside these catalog-cover paths."
@@ -76208,7 +76318,7 @@
     },
     {
       "id": "catalog_wide_packaged_binary",
-      "description": "Build and publish a standalone artifact that accepts every currently supported catalog input form, including odd-characteristic extension fields and normalized target models, then replay all 2,572 direct commands against that exact artifact.",
+      "description": "Build and publish a standalone artifact that accepts every currently supported catalog input form, including odd-characteristic extension fields and normalized target models, then replay all 2,575 direct commands against that exact artifact.",
       "status": "unknown"
     },
     {
@@ -76233,14 +76343,14 @@
     }
   ],
   "report": {
-    "markdown": "research/cover_transfer_assessment_20261013/README.md",
-    "pdf": "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
-    "graph_source": "research/cover_transfer_assessment_20261013/typed_correspondence.dot",
-    "graph_svg": "research/cover_transfer_assessment_20261013/typed_correspondence.svg",
-    "graph_png": "research/cover_transfer_assessment_20261013/typed_correspondence.png",
-    "context_graph_source": "research/cover_transfer_assessment_20261013/typed_transfer_context.dot",
-    "context_graph_svg": "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
-    "context_graph_png": "research/cover_transfer_assessment_20261013/typed_transfer_context.png",
+    "markdown": "research/ecbench_known_log_targets_20261021/catalog-update/README.md",
+    "pdf": "research/ecbench_known_log_targets_20261021/catalog-update/CATALOG.pdf",
+    "graph_source": "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.dot",
+    "graph_svg": "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.svg",
+    "graph_png": "research/ecbench_known_log_targets_20261021/catalog-update/typed_correspondence.png",
+    "context_graph_source": "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.dot",
+    "context_graph_svg": "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.svg",
+    "context_graph_png": "research/ecbench_known_log_targets_20261021/catalog-update/typed_transfer_context.png",
     "release_receipt": "research/cover_transfer_assessment_20261013/release_replay.txt"
   },
   "migration": {

@@ -56,6 +56,98 @@ fn lock(dir: &Path) -> String {
 }
 
 #[test]
+fn known_log_public_targets_are_verified_replayed_and_counted_by_phase() {
+    let dir = scratch("known-log-public");
+    let spec = dir.join("spec.json");
+    let doc = serde_json::json!({
+        "schema":"ecbench.spec/v1", "label":"known-log public target replay",
+        "workloads":{
+            "curves":[{"kind":"prime_search","bits":12,"seed":59297},
+                {"kind":"koblitz","a":0,"n":13}],
+            "targets_per_curve":2,"target_seed":20261021,"target_kind":"public"},
+        "arms":[
+            {"name":"rho","role":"reference","method":{"id":"rho.negation"}},
+            {"name":"known","role":"candidate","method":{"id":"ic.known_log_mitm2_v1",
+                "params":{"size":"4","base_seed":"31","max_pair_work":"20","max_trials":"100000"}}},
+            {"name":"known-aa","role":"control","method":{"id":"ic.known_log_mitm2_v1",
+                "params":{"size":"4","base_seed":"31","max_pair_work":"20","max_trials":"100000"}}}
+        ],
+        "measurement":{"rounds":1,"warmup":0,"seed":17,
+            "isolation_required":"L0","timeout_seconds":60}
+    });
+    std::fs::write(&spec, serde_json::to_vec_pretty(&doc).unwrap()).unwrap();
+    let out = dir.join("session");
+    let (ok, _, err) = ecbench(&[
+        "run",
+        "--spec",
+        spec.to_str().unwrap(),
+        "--out",
+        out.to_str().unwrap(),
+        "--cpus",
+        "none",
+        "--lock",
+        &lock(&dir),
+        "--quiet",
+    ]);
+    assert!(ok, "run failed: {err}");
+    let records = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut candidate_count = 0;
+    for line in records.lines() {
+        let record: Value = serde_json::from_str(line).unwrap();
+        assert!(record["workload"]["planted"].is_null());
+        assert_eq!(record["outcome"]["status"], "verified");
+        if record["method"]["id"] != "ic.known_log_mitm2_v1" {
+            continue;
+        }
+        candidate_count += 1;
+        assert_eq!(record["counters"]["matrix_rows"], 0);
+        assert_eq!(record["counters"]["matrix_work"], 0);
+        assert_eq!(record["counters"]["target_equation_rank"], 1);
+        assert_eq!(record["counters"]["useful_target_relations"], 1);
+        assert_eq!(record["counters"]["pair_attempts"], 20);
+        let phases = record["phases"].as_array().unwrap();
+        let total: f64 = phases.iter().map(|p| p["gae"].as_f64().unwrap()).sum();
+        assert_eq!(Some(total), record["cost"]["total_gae"].as_f64());
+        assert_eq!(phases[0]["scalar_mults"], 4);
+        assert!(record["cost"]["unpriced"].as_array().unwrap().len() > 1);
+        let online = &record["online"];
+        assert_eq!(online["phases_ns"].as_object().unwrap().len(), 5);
+        let sum: u64 = online["phases_ns"]
+            .as_object()
+            .unwrap()
+            .values()
+            .map(|v| v.as_u64().unwrap())
+            .sum();
+        assert_eq!(Some(sum), online["wall_ns"].as_u64());
+    }
+    assert_eq!(candidate_count, 8);
+    let (ok, stdout, err) = ecbench(&[
+        "verify",
+        "--dir",
+        out.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "replay failed: {err}\n{stdout}");
+    let receipt: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(receipt["ok"], true);
+    let (ok, stdout, err) = ecbench(&[
+        "compare",
+        "--dir",
+        out.to_str().unwrap(),
+        "--a",
+        "known",
+        "--b",
+        "known-aa",
+        "--json",
+    ]);
+    assert!(ok, "A/A comparison failed: {err}");
+    let comparison: Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(comparison["ops"]["ratio_b_over_a"], 1.0);
+    assert_eq!(comparison["ops"]["ci95"], serde_json::json!([1.0, 1.0]));
+}
+
+#[test]
 fn a_session_runs_verifies_compares_and_loads() {
     let dir = scratch("session");
     let spec = dir.join("spec.json");

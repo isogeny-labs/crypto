@@ -1,0 +1,129 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "linalg": "incremental-gauss",
+          "max_trials": "2000000",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "abscissa",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.known_log_mitm2_v1",
+        "params": {
+          "base_multiplier": "1",
+          "base_seed": "20261021",
+          "max_pair_work": "1100",
+          "max_trials": "2000000",
+          "size": "32"
+        }
+      },
+      "name": "known-log",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.known_log_mitm2_v1",
+        "params": {
+          "base_multiplier": "1",
+          "base_seed": "20261021",
+          "max_pair_work": "1100",
+          "max_trials": "2000000",
+          "size": "32"
+        }
+      },
+      "name": "known-log-aa",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "linalg": "incremental-gauss",
+          "max_trials": "2000000",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "abscissa-aa",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=32,scan_cap=65536",
+          "linalg": "incremental-gauss",
+          "max_trials": "2000000",
+          "oracle": "mitm:m=2,negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "projected",
+      "role": "baseline"
+    }
+  ],
+  "description": "Frozen one-target cold-cost experiment; see ../PROTOCOL.md. Public target logs are absent.",
+  "label": "arbitrary-target known-log two-sum study",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "alternate",
+    "rounds": 5,
+    "seed": 20261021,
+    "timeout_seconds": 120,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 65516,
+        "b": 38179,
+        "group_order": 65686,
+        "gx": 65517,
+        "gy": 34281,
+        "kind": "prime_explicit",
+        "p": 65519,
+        "r": 32843
+      },
+      {
+        "a": 65516,
+        "b": 45453,
+        "group_order": 65644,
+        "gx": 64994,
+        "gy": 58144,
+        "kind": "prime_explicit",
+        "p": 65519,
+        "r": 16411
+      },
+      {
+        "a": 65516,
+        "b": 54476,
+        "group_order": 65848,
+        "gx": 21053,
+        "gy": 14407,
+        "kind": "prime_explicit",
+        "p": 65519,
+        "r": 8231
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026102104,
+    "targets_per_curve": 8
+  }
+}
