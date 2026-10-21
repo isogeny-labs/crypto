@@ -85,25 +85,28 @@ def archive_ready(output: Path) -> bool:
     return provider.archive_ready(output)
 
 
-def terminate(pod_id: str, key: str, output: Path) -> None:
-    """Use provider deletion immediately; stopping alone leaves billable storage."""
+def terminate(pod_id: str, key: str, output: Path | None) -> None:
+    """Delete a Pod and verify absence before writing the local receipt."""
     before = pod_status(pod_id, key)
+    response = None
     if before is not None:
         query = ("mutation { podTerminate(input: { podId: " +
                  json.dumps(pod_id) + " }) }")
         response = graphql(query, key)
-        write(output / "provider_terminate.json", {
-            "recorded_utc": now().isoformat(), "pod_id": pod_id,
-            "response": response})
     after = pod_status(pod_id, key)
     for _ in range(12):
         if after is None:
             break
         time.sleep(5)
         after = pod_status(pod_id, key)
-    write(output / "provider_post_terminate.json", {
-        "recorded_utc": now().isoformat(), "pod_id": pod_id,
-        "pod_present": after is not None})
+    if output is not None:
+        if response is not None:
+            write(output / "provider_terminate.json", {
+                "recorded_utc": now().isoformat(), "pod_id": pod_id,
+                "response": response})
+        write(output / "provider_post_terminate.json", {
+            "recorded_utc": now().isoformat(), "pod_id": pod_id,
+            "pod_present": after is not None})
     if after is not None:
         raise ValueError("Pod remains present after termination")
 
@@ -114,65 +117,84 @@ def watch(allocation_path: Path, host: str, port: int, output: Path,
     pod_id = receipt["pod_id"]
     deadline = runpod_runner.timestamp(receipt["stop_after_utc"])
     retire_at = deadline - RETIRE_MARGIN
-    output.mkdir(parents=True, exist_ok=False)
-    write(output / "watchdog_started.json", {
-        "schema": "n83.fixed31-watchdog-start/v1",
-        "recorded_utc": now().isoformat(), "pod_id": pod_id,
-        "allocation_sha256": provider.digest(allocation_path),
-        "retire_at_utc": retire_at.isoformat(),
-        "provider_deadline_utc": deadline.isoformat(),
-    })
-    reason = "PROVIDER_DEADLINE"
+    output_ready = False
+    transfer_recorded = False
+    reason = "WATCHDOG_START_ERROR"
     transferred = False
     ready = False
     error_type = None
     try:
-        if now() >= retire_at:
-            reason = "LATE_WATCHDOG_START"
-            return 2
-        verify_live(receipt, pod_status(pod_id, key))
-        write(output / "watchdog_ready.json", {
-            "schema": "n83.fixed31-watchdog-ready/v1",
+        output.mkdir(parents=True, exist_ok=False)
+        output_ready = True
+        write(output / "watchdog_started.json", {
+            "schema": "n83.fixed31-watchdog-start/v1",
             "recorded_utc": now().isoformat(), "pod_id": pod_id,
             "allocation_sha256": provider.digest(allocation_path),
             "retire_at_utc": retire_at.isoformat(),
+            "provider_deadline_utc": deadline.isoformat(),
         })
-        while now() < retire_at:
-            try:
-                status = remote_status(host, port)
-            except (OSError, subprocess.TimeoutExpired):
-                status = ""
-            if status.startswith("DONE "):
-                reason = "PRODUCER_DONE"
-                break
-            time.sleep(min(POLL_SECONDS, max(0, (retire_at - now()).total_seconds())))
-        seconds_left = int((retire_at - now()).total_seconds())
-        if seconds_left > 90:
-            try:
-                transferred = spool(host, port, output,
-                                    timeout=min(300, seconds_left - 60))
-            except (OSError, subprocess.TimeoutExpired):
-                transferred = False
-        ready = transferred and archive_ready(output)
+        if now() >= retire_at:
+            reason = "LATE_WATCHDOG_START"
+        else:
+            verify_live(receipt, pod_status(pod_id, key))
+            write(output / "watchdog_ready.json", {
+                "schema": "n83.fixed31-watchdog-ready/v1",
+                "recorded_utc": now().isoformat(), "pod_id": pod_id,
+                "allocation_sha256": provider.digest(allocation_path),
+                "retire_at_utc": retire_at.isoformat(),
+            })
+            reason = "PROVIDER_DEADLINE"
+            while now() < retire_at:
+                try:
+                    status = remote_status(host, port)
+                except (OSError, subprocess.TimeoutExpired):
+                    status = ""
+                if status.startswith("DONE "):
+                    reason = "PRODUCER_DONE"
+                    break
+                time.sleep(min(
+                    POLL_SECONDS,
+                    max(0, (retire_at - now()).total_seconds())))
+            seconds_left = int((retire_at - now()).total_seconds())
+            if seconds_left > 90:
+                try:
+                    transferred = spool(
+                        host, port, output,
+                        timeout=min(300, seconds_left - 60))
+                except (OSError, subprocess.TimeoutExpired):
+                    transferred = False
+            ready = transferred and archive_ready(output)
     except Exception as error:
         reason = "WATCHDOG_ERROR"
         error_type = type(error).__name__
     finally:
-        write(output / "watchdog_transfer.json", {
-            "recorded_utc": now().isoformat(), "pod_id": pod_id,
-            "reason": reason, "spool_succeeded": transferred,
-            "archive_ready": ready, "error_type": error_type,
-        })
+        if output_ready:
+            try:
+                write(output / "watchdog_transfer.json", {
+                    "recorded_utc": now().isoformat(), "pod_id": pod_id,
+                    "reason": reason, "spool_succeeded": transferred,
+                    "archive_ready": ready, "error_type": error_type,
+                })
+                transfer_recorded = True
+            except Exception as error:
+                reason = "WATCHDOG_RECEIPT_WRITE_ERROR"
+                ready = False
+                error_type = type(error).__name__
         try:
-            terminate(pod_id, key, output)
+            terminate(pod_id, key, output if output_ready else None)
         except Exception as error:
-            write(output / "provider_termination_error.json", {
-                "recorded_utc": now().isoformat(), "pod_id": pod_id,
-                "error_type": type(error).__name__,
-            })
+            if output_ready:
+                try:
+                    write(output / "provider_termination_error.json", {
+                        "recorded_utc": now().isoformat(),
+                        "pod_id": pod_id,
+                        "error_type": type(error).__name__,
+                    })
+                except Exception:
+                    pass
             raise
-    return 0 if reason == "PRODUCER_DONE" and ready else 2
-
+    return (0 if reason == "PRODUCER_DONE" and ready and transfer_recorded
+            else 2)
 
 def main() -> int:
     parser = argparse.ArgumentParser()
