@@ -288,6 +288,7 @@ const oldFront = between(page, START, END);
 const historical = section(oldFront, 'lab-best');
 const progressRaw = readFileSync(resolve(ROOT,'docs/ic/progress-timeline.json'));
 const retainedPanels = [
+  ['conductor-gap-native-20261015','Conductor-gap native controls: paired solves and generic recurrence · 15 October 2026'],
   ['cold-compact-orbit-20261003','Historical compact-orbit cold-cost panel'],
   ['full-rank-compact-orbit-20261003','Historical compact-orbit full-rank panel'],
   ['n61-compact-orbit-hosted-20261003','n61 compact-orbit autolab panels · hosted isolated reruns'],
@@ -298,12 +299,17 @@ const retainedPanels = [
   ['drastic-conductor-gap-20261012','Drastic prime conductor gaps: ECDLP on both ends · 12 October 2026'],
   ['drastic-conductor-gap-round2-20261012','Drastic prime conductor gap round 2: the j = 0 crater · 12 October 2026'],
   ['drastic-conductor-gap-round3-20261012','Drastic prime conductor gap round 3: paired targets · 12 October 2026'],
+  ['n83-tier1-cold-20261016','N83 Tier 1 cold factor-base holdout · 16 October 2026'],
   ['lab-ecbench-all','Cross-method evidence · every measured candidate'],
   ['lab-pair-claw','Pair claw of cryptanalysis#175 · same-target strong rho'],
   ['lab-progress','Research progress over time · separate regimes and references'],
   ['lab-currency','How new results update this dashboard']
 ].map(([id,label])=>{
   let html = section(oldFront,id);
+  if (id === 'conductor-gap-native-20261015') {
+    html = readFileSync(resolve(ROOT,'research/conductor_gap_cm_orbits_20261015/native/dashboard_panel.html'),'utf8').trimEnd();
+    assert.ok(html.includes(`id="${id}"`), 'Native conductor panel source lost its identity');
+  }
   if (id === 'lab-progress') {
     const marker = /(<script type="application\/json" id="progress-data">)[\s\S]*?(<\/script>)/;
     assert.ok(marker.test(html), 'Progress panel has no canonical data embed');

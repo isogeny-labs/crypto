@@ -568,8 +568,54 @@ pub fn sea_atkin_tower(
     sea_resolved(fp, e, max_ell, phis, rng, CYCLE_DEGREE, Some(&mut resolver))
 }
 
-/// Stop adding primes once at most this many candidates for t remain.
-pub const SEA_STOP_CANDIDATES: f64 = 4_194_304.0;
+/// Stop adding primes once the final search (`search_plan`) needs at most this many point
+/// additions, or fewer than the next prime would cost (`SEA_PRIME_ADDS`); 4096 is 2 sqrt(4M),
+/// a plain baby-step giant-step over 4M candidates (the earlier rule).
+pub const SEA_STOP_ADDS: f64 = 4096.0;
+/// Cost of SEA at prime l in point additions, taken as this many times l^2 (measured over
+/// 2^127 - 1: an Elkies prime near 67 takes 10-17 ms, a point addition about 1.3 us, so about
+/// 2.3 l^2; 3 performed as well as 2 and 5 in A/B runs): SEA stops once the final search is
+/// cheaper than the next prime.
+pub const SEA_PRIME_ADDS: f64 = 3.0;
+/// Largest number of residues the final search enumerates (one giant-step walk each).
+pub const SEA_MAX_RESIDUES: f64 = 4096.0;
+
+/// The final search over `count` candidates t = t0 + k m and its estimated cost in point
+/// additions, given the Atkin sets (l, allowed t mod l): enumerating the residues of k modulo
+/// the product M_A of a subset of the Atkin primes allowed by their sets (R of them) leaves
+/// J = count / M_A steps per residue, searched by baby-step giant-step with one shared table of
+/// b = sqrt(R J) baby steps; cost b + R (J / b + 2 log2 M_A) (the last term: placing each
+/// residue's walk). Atkin primes are taken greedily by their fraction |S| / l while the cost
+/// drops. Returns (cost, indices of the Atkin sets used).
+pub fn search_plan(count: f64, atkin_sets: &[(u64, Vec<u64>)]) -> (f64, Vec<usize>) {
+    let cost = |r: f64, ma: f64| {
+        let j = (count / ma).max(1.0);
+        let b = (r * j).sqrt().min(j);
+        b + r * (j / b + 2.0 * ma.log2())
+    };
+    let mut order: Vec<usize> = (0..atkin_sets.len()).collect();
+    order.sort_by(|&a, &b| {
+        let fa = atkin_sets[a].1.len() as f64 / atkin_sets[a].0 as f64;
+        let fb = atkin_sets[b].1.len() as f64 / atkin_sets[b].0 as f64;
+        fa.partial_cmp(&fb).unwrap()
+    });
+    let (mut r, mut ma) = (1.0f64, 1.0f64);
+    let mut best = cost(r, ma);
+    let mut used = vec![];
+    for i in order {
+        let (l, set) = &atkin_sets[i];
+        let (r2, ma2) = (r * set.len() as f64, ma * *l as f64);
+        if r2 > SEA_MAX_RESIDUES || ma2 > count {
+            continue;
+        }
+        let c = cost(r2, ma2);
+        if c < best {
+            (best, r, ma) = (c, r2, ma2);
+            used.push(i);
+        }
+    }
+    (best, used)
+}
 /// Candidate counts up to this are walked one point addition each; above, baby-step giant-step.
 pub const SEA_WALK_MAX: u128 = 1024;
 
@@ -579,6 +625,55 @@ pub const CYCLE_DEGREE: usize = 40;
 /// Largest tower degree F_{p^d} scanned for the Atkin-prime eigenvalue (Atkin primes whose
 /// lambda/mu has larger order are left as candidate sets). Bounds the cost per Atkin prime.
 pub const ATKIN_TOWER_MAX_DEGREE: usize = 6;
+
+/// All k in [0, count) with base = [k]step. A low-order step can repeat within
+/// the baby table: every index must survive, including repeated infinity.
+fn progression_bsgs<F: Field>(
+    f: &F,
+    e: &Curve<F::E>,
+    base: Pt<F::E>,
+    step: Pt<F::E>,
+    count: u128,
+    mut visit: impl FnMut(u128),
+) -> u64 {
+    if count == 0 {
+        return 0;
+    }
+    let bs = (count - 1).isqrt() + 1;
+    let mut baby: HashMap<Pt<F::E>, Vec<u128>> = HashMap::new();
+    let mut cur = Pt::Inf;
+    for j in 0..bs {
+        baby.entry(cur).or_default().push(j);
+        cur = padd(f, e, &cur, &step);
+    }
+    let ngiant = neg(f, &cur);
+    let mut g = base;
+    let giants = count.div_ceil(bs);
+    for i in 0..giants {
+        let start = i * bs;
+        if let Some(indices) = baby.get(&g) {
+            for &j in indices {
+                if j < count - start {
+                    visit(start + j);
+                }
+            }
+        }
+        g = padd(f, e, &g, &ngiant);
+    }
+    u64::try_from(giants).unwrap_or(u64::MAX)
+}
+
+/// A conservative point-addition estimate: scalar tests take at most two
+/// additions per bit; a fresh search costs a walk or both halves of BSGS.
+fn refine_is_cheaper(count: u128, survivors: usize, scalar_bits: usize) -> bool {
+    let search = if count <= SEA_WALK_MAX {
+        count
+    } else {
+        let bs = (count - 1).isqrt() + 1;
+        bs + count.div_ceil(bs)
+    };
+    (survivors as u128).saturating_mul(2 * scalar_bits as u128 + 2) <= search
+}
 
 /// SEA with an explicit bound on the isogeny-cycle polynomial degree (0: no cycles; t mod l
 /// only). An Elkies prime with two rational l-isogenies contributes t mod l^k for the largest k
@@ -702,10 +797,14 @@ pub fn sea_resolved<F: Field>(
                 }
             }
         }
-        // stop once the search over the candidates (Hasse width / M_E of them, ~2 sqrt(.) point
-        // additions by baby-step giant-step; the Atkin sets only filter the hits) is cheaper
-        // than another prime (roots of Phi_l(j, Y), a kernel polynomial, a Frobenius power)
-        if width.to_f64() / m.to_f64() < SEA_STOP_CANDIDATES {
+        // stop once the search over the candidates (point additions, `search_plan`: Hasse width
+        // / M_E of them, cut down by the Atkin sets it uses) is cheaper than the next prime
+        // (roots of Phi_l(j, Y), a kernel polynomial, a Frobenius power: ~ SEA_PRIME_ADDS l^2)
+        let next = (ell + 2..)
+            .find(|&k| crate::field::is_prime(k as u64))
+            .unwrap();
+        let next_cost = SEA_PRIME_ADDS * (next * next) as f64;
+        if search_plan(width.to_f64() / m.to_f64(), &atkin_sets).0 <= next_cost.max(SEA_STOP_ADDS) {
             break;
         }
         ell += 2;
@@ -720,22 +819,30 @@ pub fn sea_resolved<F: Field>(
     let count = (&(&k_hi - &k_lo) + &Int::one()).to_i128()? as u128;
     st.candidates = count;
     let q1 = &q + &Int::one();
+    let scalar_bits = (&q1 + &hasse).bits();
     let to_big = |v: &Int| -> Big { v.mag().clone() };
     let ok_atkin = |t: &Int| atkin_sets.iter().all(|(l, s)| s.contains(&t.mod_u64(*l)));
-    let neg = |p: Pt<F::E>| match p {
-        Pt::Inf => Pt::Inf,
-        Pt::Aff(x, y) => Pt::Aff(x, f.neg(y)),
-    };
     // t with [q + 1 - t] P = 0 for every sampled P (intersection over points)
     let mut cands: Option<Vec<Int>> = None;
     for _attempt in 0..12 {
         let p = random_point_f(f, e, rng);
         let mut hits = vec![];
         let t0 = &te + &(&k_lo * &m);
-        if count <= SEA_WALK_MAX {
+        if cands
+            .as_ref()
+            .is_some_and(|c| refine_is_cheaper(count, c.len(), scalar_bits))
+        {
+            // A second full BSGS is unnecessary once only a few traces remain.
+            for t in cands.take().unwrap() {
+                if pmul_big(f, e, &p, &to_big(&(&q1 - &t))) == Pt::Inf {
+                    hits.push(t);
+                }
+                st.tested += 1;
+            }
+        } else if count <= SEA_WALK_MAX {
             // walk R_k = [q + 1 - t_k] P, t_k = t0 + k m: R_{k+1} = R_k - [m] P
             let mut r = pmul_big(f, e, &p, &to_big(&(&q1 - &t0)));
-            let neg_mp = neg(pmul_big(f, e, &p, &to_big(&m)));
+            let neg_mp = neg(f, &pmul_big(f, e, &p, &to_big(&m)));
             let mut t = t0;
             for _ in 0..count {
                 if r == Pt::Inf && ok_atkin(&t) {
@@ -746,41 +853,32 @@ pub fn sea_resolved<F: Field>(
                 t = &t + &m;
             }
         } else {
-            // baby-step giant-step: [q+1-t0] P = [k m] P, k in [0, count)
+            // baby-step giant-step per residue r: [q + 1 - t0] P - [r m] P = [j M_A m] P,
+            // j < J = ceil(count / M_A); one table of baby steps [i M_A m] P, i < b, shared by
+            // all residues
             let base = pmul_big(f, e, &p, &to_big(&(&q1 - &t0)));
             let mp = pmul_big(f, e, &p, &to_big(&m));
-            let bs = (count as f64).sqrt().ceil() as u128;
-            let mut baby: HashMap<Pt<F::E>, u128> = HashMap::new();
-            let mut cur = Pt::Inf;
-            for jj in 0..bs {
-                baby.entry(cur).or_insert(jj);
-                cur = padd(f, e, &cur, &mp);
-            }
-            let ngiant = neg(cur);
-            let mut g = base;
-            let mut i = 0u128;
-            while i * bs < count {
-                if let Some(&jj) = baby.get(&g) {
-                    let kp = i * bs + jj;
-                    if kp < count {
-                        let t = &t0 + &(&Int::from(kp as i128) * &m);
-                        if ok_atkin(&t) {
-                            hits.push(t);
-                        }
-                    }
+            st.tested += progression_bsgs(f, e, base, mp, count, |kp| {
+                let t = &t0 + &(&Int::from(kp as i128) * &m);
+                if ok_atkin(&t) {
+                    hits.push(t);
                 }
-                g = padd(f, e, &g, &ngiant);
-                i += 1;
-                st.tested += 1;
-            }
+            });
         }
         let next: Vec<Int> = match cands {
             None => hits,
-            Some(c) => c.into_iter().filter(|t| hits.contains(t)).collect(),
+            // Both searches visit increasing progression indices, so hits is sorted.
+            Some(c) => c
+                .into_iter()
+                .filter(|t| hits.binary_search(t).is_ok())
+                .collect(),
         };
         if next.len() == 1 {
             cands = Some(next);
             break;
+        }
+        if next.is_empty() {
+            return None;
         }
         cands = Some(next);
     }
@@ -792,4 +890,47 @@ pub fn sea_resolved<F: Field>(
     };
     let t = found?;
     Some(((&q1 - &t).mag().clone(), st))
+}
+
+#[cfg(test)]
+mod recombination_tests {
+    use super::*;
+    use crate::field::Zp;
+
+    #[test]
+    fn progression_bsgs_matches_exhaustive_search_including_low_order_steps() {
+        for p in [5, 7, 11] {
+            let f = Zp::new(p);
+            let e = Curve::new(1, 1);
+            let mut points = vec![Pt::Inf];
+            for x in 0..p {
+                for y in 0..p {
+                    let pt = Pt::Aff(x, y);
+                    if on_curve(&f, &e, &pt) {
+                        points.push(pt);
+                    }
+                }
+            }
+            for &step in &points {
+                for &base in &points {
+                    for count in [0, 1, 2, 5, 16, 33, 1025] {
+                        let mut expected = vec![];
+                        let mut cur = Pt::Inf;
+                        for k in 0..count {
+                            if cur == base {
+                                expected.push(k);
+                            }
+                            cur = padd(&f, &e, &cur, &step);
+                        }
+                        let mut actual = vec![];
+                        progression_bsgs(&f, &e, base, step, count, |k| actual.push(k));
+                        assert_eq!(
+                            actual, expected,
+                            "p={p}, step={step:?}, base={base:?}, count={count}"
+                        );
+                    }
+                }
+            }
+        }
+    }
 }
