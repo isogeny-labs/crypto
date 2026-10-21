@@ -1,0 +1,64 @@
+name: Factor-base designs m = 4 (EKS high-memory, Amendment 8)
+# Runs research/factor_base_designs_20261015 PREREGISTRATION.md Amendment 8:
+# the two open m = 4 cells, one at a time, on the crypto-eks-highmem ARC
+# runner (Karpenter Spot node, 16 CPU, 120 GiB pod memory limit). Dispatch
+# by hand when a high-memory Spot node can be had; the jobs wait in the queue
+# until one is. Outputs are workflow artifacts; rows are committed by hand.
+on:
+  workflow_dispatch:
+    inputs:
+      cells:
+        description: Cells to run (E1 = A0 m=4 t=4, E2 = A11 m=4 t=5)
+        type: choice
+        options: [both, E1, E2]
+        default: both
+permissions:
+  contents: read
+concurrency:
+  group: fb-designs-m4-highmem
+  cancel-in-progress: false
+jobs:
+  cell:
+    strategy:
+      # One system at a time on an otherwise idle host: the scale set has one
+      # runner, and max-parallel keeps the cells sequential regardless.
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        cell: ${{ fromJSON(inputs.cells == 'both' && '["E1","E2"]' || format('["{0}"]', inputs.cells)) }}
+    runs-on: crypto-eks-highmem
+    # Two systems at 14400 s + 600 s grace each, plus the build.
+    timeout-minutes: 540
+    steps:
+      - uses: actions/checkout@v4
+      - name: Host and toolchain
+        run: |
+          set -euo pipefail
+          printf 'runner=%s commit=%s\n' "$RUNNER_NAME" "$GITHUB_SHA"
+          test "$(uname -m)" = x86_64
+          memory_bytes=$(cat /sys/fs/cgroup/memory.max)
+          printf 'memory_bytes=%s cpu_quota=%s\n' "$memory_bytes" "$(cat /sys/fs/cgroup/cpu.max)"
+          # Amendment 8 needs the 120 GiB pod; refuse anything smaller.
+          test "$memory_bytes" -ge $((112 * 1024 * 1024 * 1024))
+          rustc --version
+          cargo --version
+          image=$(awk '$1 == "image:" {print $2; exit}' taskq/deploy/eks-karpenter/arc/highmem-values.yaml)
+          echo "FB_RUNNER_IMAGE=$image" >> "$GITHUB_ENV"
+          echo "runner image (pinned at this commit): $image"
+      - name: Build fb_designs_slope (release)
+        run: cargo build --locked --release --example fb_designs_slope
+      - name: Run ${{ matrix.cell }}
+        env:
+          FB_DESIGNS_COMMIT: ${{ github.sha }}
+        run: |
+          set -eu
+          sh research/factor_base_designs_20261015/scripts/run_amendment8.sh \
+            "${{ matrix.cell }}" target/release/examples/fb_designs_slope "$RUNNER_TEMP/out"
+      - name: Upload rows and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fb-designs-amendment8-${{ matrix.cell }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/out/
+          retention-days: 90
+          if-no-files-found: warn
