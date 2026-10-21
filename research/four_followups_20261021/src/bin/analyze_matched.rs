@@ -271,6 +271,7 @@ fn main() {
             serde_json::to_string_pretty(&json!({
                 "schema":"four-followups-factor-base-matched-analysis/v1", "source_archive":ARCHIVE,
                 "baseline_replayed":baseline_replayed,"in_process_rho_verified":6300,
+                "archived_rho_counters_matched":6300,
                 "candidate_v1_records_replayed":6300,"arm_target_records":6300,"summary":summary
             }))
             .unwrap()
