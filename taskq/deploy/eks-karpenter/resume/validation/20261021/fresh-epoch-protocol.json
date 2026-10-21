@@ -1,0 +1,17 @@
+{
+  "schema": "isolab.recovery-probe.epoch/v1",
+  "parent": "recovery/probes/20261021/generation-1/COMMITTED.json",
+  "recovery_policy": "resume computation; start fresh benchmark epoch",
+  "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+  "spec_path": "taskq/deploy/eks-karpenter/l2-validation.json",
+  "instance_type": "c8a.2xlarge",
+  "request": "fresh-epoch-request.json",
+  "deadline_seconds": 900,
+  "acceptance": [
+    "all 108 executions L2 or higher",
+    "all 90 measured native replays reproduced",
+    "at least five A/A pairs admitted",
+    "all S3 artifact hashes verified"
+  ],
+  "scope": "Fresh operator-triggered epoch following recovered SHA-256 computation; not automatic harness migration and not PR2342 main Action proof"
+}

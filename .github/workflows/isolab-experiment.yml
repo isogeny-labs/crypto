@@ -43,6 +43,10 @@ jobs:
           taskq/deploy/eks-karpenter/remote/test-contract.sh
           taskq/deploy/eks-karpenter/remote/test-build-verification.sh
           taskq/deploy/eks-karpenter/remote/test-publish-image.sh
+          cargo +1.99.1 test --locked --release --manifest-path taskq/deploy/eks-karpenter/resume/fixture/Cargo.toml
+          cargo +1.99.1 run --locked --release --manifest-path taskq/deploy/eks-karpenter/resume/fixture/Cargo.toml -- \
+            verify taskq/deploy/eks-karpenter/resume/validation/20261021/progress-after.log \
+            1048576 taskq/deploy/eks-karpenter/resume/validation/20261021/progress-before.log
   build:
     needs: contracts
     if: github.event_name == 'workflow_dispatch'

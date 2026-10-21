@@ -1,11 +1,25 @@
 # Checkpoint and resume admission
 
-The current deployed EKS v1 job path uses temporary `/work` storage and has no
-verified CRIU restore contract. The standalone Spot host's CRIU recovery in
-`infra/spot-system/CRIU_LOCAL.md` is a different execution path. Until the EKS
-recovery implementation has passed a replacement-worker restore, describe EKS
-process resume as unavailable and preserve that requirement as open. Do not
-claim retries resume work or silently substitute the standalone host.
+The owner selected CRIU process checkpoints plus EBS volume snapshots, with
+computation resumed and a fresh benchmark epoch after interruption. The current
+deployed EKS v1 job path uses temporary `/work` storage and does not automate
+this policy. Its normal Job retry is not resume.
+
+An operator-controlled EKS test on 2026-10-21 did restore a UID-1000 Rust SHA-256
+process from CRIU 4.2.1 and an encrypted EBS CSI snapshot onto a new c8a.2xlarge
+Spot instance in another availability zone. It continued from iteration 48,128
+through 1,048,576, with one process start and native replay of every recorded
+hash. Read the [tested procedure and evidence](../../../../taskq/deploy/eks-karpenter/resume/README.md).
+This qualifies that fixture and configuration, not arbitrary commands, ordinary
+MCP/GitHub jobs, or unattended Spot recovery. Track the remaining integration in
+[the problem record](../../../../problems/eks-resumable-l2-experiments.md).
+
+The standalone Spot host's CRIU recovery in `infra/spot-system/CRIU_LOCAL.md`
+is a different execution path. Do not substitute it silently. Keep containerd's
+`enable_experimental_restore_via_create` disabled: the upstream CRI restore path
+does not enforce the destination security context. The tested path uses a
+dedicated operator pod and restores only a trusted child process; normal
+`isolab` experiment pods retain their Restricted admission policy.
 
 The requested EKS recovery path must bind a coherent CRIU process checkpoint
 and filesystem/volume snapshot into one committed generation. Checkpoint memory
@@ -38,6 +52,10 @@ Record interruptions explicitly, retain and censor any affected timing interval,
 recheck the new host and CPU affinity, and perform fresh warmup, L2 observation
 and A/A calibration before admitting new measurements. Do not reuse the old
 host's L2 grade or combine incomparable hosts into one benchmark interval.
+Preserve the old epoch and give the new epoch a distinct Job/Pod identity and
+S3 prefix linked to the same logical experiment. If the computation itself
+resumes, label its crossing interval as computational progress only. Do not
+turn a failed A/A or correctness check into an infrastructure retry.
 
 Use the live recovery request/status schema once implemented. Do not add an
 unrecognized `resume` field to `isolab.eks.request/v1`; its validator deliberately

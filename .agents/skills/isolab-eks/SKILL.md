@@ -11,6 +11,13 @@ This skill is shared with Claude through `.claude/skills/isolab-eks`.
 Work from the repository root. It does not grant AWS or GitHub access; use the
 caller's configured identity without copying credentials into requests or Git.
 
+The lab's recovery policy is **CRIU plus EBS volume snapshots**. Preserve
+computation progress after a Spot interruption, invalidate the interrupted
+timing interval, and start a new benchmark epoch with fresh warmup, L2 checks
+and A/A controls. Read [recovery requirements](references/recovery.md) before
+promising resumability: the ordinary v1 submission paths below do not yet
+automate this policy. A successful manual recovery test is not that integration.
+
 ## Select the submission path
 
 - **GitHub identity, callers anywhere:** dispatch `isolab-experiment.yml` on
@@ -45,11 +52,13 @@ workflow SHA, binary SHA-256 and OCI digest distinct.
    matter. The worker cap is 64 vCPUs and the account's Standard Spot quota is
    currently 96 in `us-east-2`; other consumers share it. Do not request a quota
    increase or raise pool caps implicitly. Count default instance vCPUs even
-   when SMT is disabled. `m8a.2xlarge` has verified no-SMT L2 evidence; the
-   contract default is `c8a.2xlarge`. GPU and ARM builds are separate work.
-4. For resumable work, read [recovery requirements](references/recovery.md).
-   Check the implemented recovery contract and a real restore receipt. Neither
-   a Kubernetes retry nor an EBS snapshot alone establishes process recovery.
+   when SMT is disabled. `m8a.2xlarge` and the contract default `c8a.2xlarge`
+   have verified no-SMT L2 evidence. GPU and ARM builds are separate work.
+4. For resumable work, check the implemented recovery contract and a real
+   restore receipt, using the recovery reference. If only the ordinary v1
+   submission path is available, state the integration gap before launching
+   requested resumable work; never silently submit a non-resumable substitute.
+   Neither a Kubernetes retry nor an EBS snapshot alone establishes recovery.
 
 ## Admit and verify measurements
 
