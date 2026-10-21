@@ -102,3 +102,20 @@ the repository's isolated, sealed `ecbench` same-target gate and an
 external fastest-implementation comparison. Until then use exact-count
 and L0 diagnostic language only. Check the canonical scoreboard and state
 why it changes or remains unchanged.
+
+## Post-run implementation amendment for a separate v2 run
+
+The first run, retained as \`gls_symmetry_results_v1.ndjson\`, eagerly
+enumerated the whole extension curve for **each** one-target base and
+charged an individual scalar-action replay for every folded factor. That
+audit-heavy choice obscured the intended cost of the symmetry. A separate
+v2 run will retain the exact frozen curves, point order, base, relation
+oracle, targets, stopping rules, and counters, but stop the lexicographic
+point scan once the base is complete. Both arms perform the same charged
+curve-membership, order, and \`psi\`-pair checks; the folded arm additionally
+derives and verifies \`lambda\` on the public generator. An independent
+untimed audit still checks \`psi(P_j)=[lambda]P_j\` for **every** base factor.
+The algebraic implication from the generator to all subgroup points is
+proved separately. The first raw run and its exact source stay immutable.
+Any v2 gain is labeled a post hoc implementation result, not a
+preregistered discovery.
