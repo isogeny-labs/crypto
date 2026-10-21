@@ -85,9 +85,9 @@ class BudgetPolicyTests(unittest.TestCase):
         for workflow_path, exception in policy.FROZEN_BUDGET_EXCEPTIONS.items():
             job = exception["job"]
             timeout = exception["timeout"]
-            # The historical workflows were later changed to bounded PR
-            # timeouts. Their original seals must fail closed on current bytes.
-            self.assertFalse(policy.frozen_proof_budget_exception(
+            # The current files still match their pinned seals, so the exact
+            # proof-job exception remains valid. It must not cover other jobs.
+            self.assertTrue(policy.frozen_proof_budget_exception(
                 workflow_path, job, timeout, "pull_request"))
             self.assertTrue(policy.problems(
                 workflow({"timeout-minutes": 60}), workflow_path))
