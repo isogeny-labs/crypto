@@ -636,6 +636,12 @@ def ingest_pending(spec, spec_path, state, paths, cells_by_id) -> list[str]:
         stdout_p = REPO / paths["cards"] / (Path(att["card"]).stem + ".stdout")
         stdout = stdout_p.read_text(errors="replace") if stdout_p.is_file() else ""
         name = inst["step"]
+        if name.startswith("_refresh-"):
+            inst["status"] = "done" if ok else "failed"
+            event(state, "ingest", f"{key}: {receipt['status']}")
+            if not ok:
+                problems.append(f"refresh {key} failed ({receipt['status']}, exit {cmd.get('exit_code')})")
+            continue
         if name.startswith("_"):
             phase, hidx = name[1:], inst["host"]
             h = state["hosts"][hidx]
@@ -680,20 +686,7 @@ def ingest_pending(spec, spec_path, state, paths, cells_by_id) -> list[str]:
         else:
             inst["status"], inst["reason"] = "failed", f"{receipt['status']}, exit {code}"
         event(state, "ingest", f"{key}: {inst['status']} ({receipt['status']})")
-        if inst["status"] == "done":
-            cell = cells_by_id.get(inst["cell"]) if inst["cell"] else None
-            hidx = host_index(state)
-            host = (next(c for c in spec["hosts"]["candidates"] if c["id"] == state["hosts"][hidx]["candidate"])
-                    if hidx is not None else None)
-            ctx = context(spec, paths, cell, host, hidx, state["vars"])
-            for gid in (step.get("gates") or {}).get("after", []):
-                gate = next(g for g in spec["gates"] if g["id"] == gid)
-                passed, detail = all_checks(gate, ctx, paths)
-                state["gates"][f"{gid}:{key}"] = {"result": "pass" if passed else "fail", "at": now(),
-                                                  "detail": detail}
-                if not passed:
-                    problems.append(apply_fail(spec, state, gate, inst, f"gate {gid} after {key}: {detail}"))
-        elif inst["status"] == "failed":
+        if inst["status"] == "failed":
             problems.append(apply_on_failure(spec, state, step, inst, key))
         elif inst["status"] == "censored" and "step_censored" in (spec["agent"].get("escalate_on") or []):
             problems.append(f"step_censored: {key} ({inst['reason']})")
@@ -720,8 +713,7 @@ def apply_fail(spec, state, gate, inst, text) -> str:
     mode = gate["on_fail"]
     if mode in ("skip_cell", "void_cell") and inst.get("cell"):
         mark_cell(state, inst["cell"], "not_attempted" if mode == "skip_cell" else "void", text)
-        if mode == "void_cell":
-            inst["status"] = "void"
+        inst["status"] = "not_attempted" if mode == "skip_cell" else "void"
         event(state, mode, text)
         return ""
     if mode == "stop":
@@ -800,22 +792,86 @@ def human_gate(state, gid: str, question: str) -> dict[str, Any] | None:
     if g and g["result"] == "answered_no":
         return act("stopped", reason=f"owner answered no to {gid}")
     state["gates"][gid] = {"result": "asked", "at": now(), "detail": question}
-    state["status"], state["blocked_on"] = "blocked", gid
+    if state["status"] != "stopped":
+        state["status"] = "blocked"
+    state["blocked_on"] = gid
     return act("ask", gate=gid, question=question,
                record=f"python3 tools/expspec/expspec.py answer <spec> --gate {gid} --yes|--no --by <owner>")
 
 
+def evaluate_gates(spec, spec_path, state, paths, key, inst, s, ctx, side):
+    """Use the same human, polling, and failure rules on either side of a step."""
+    for gid in (s.get("gates") or {}).get(side, []):
+        gate = next(g for g in spec["gates"] if g["id"] == gid)
+        gkey = f"{gid}:{key}"
+        if gate["kind"] == "human":
+            a = human_gate(state, gkey, render(gate["ask"], ctx))
+            if a:
+                return a
+            continue
+        prior = state["gates"].get(gkey, {})
+        if prior.get("result") == "pass":
+            continue
+        passed, detail = all_checks(gate, ctx, paths)
+        first = prior.get("first_at") or now()
+        if passed:
+            state["gates"][gkey] = {"result": "pass", "first_at": first, "at": now(), "detail": detail}
+            event(state, "gate", f"{gkey} pass")
+            continue
+        if gate["kind"] == "wait_until":
+            waited = (dt.datetime.now(dt.timezone.utc) - parse_ts(first)).total_seconds()
+            if waited < gate["max_wait_s"]:
+                state["gates"][gkey] = {"result": "waiting", "first_at": first, "at": now(),
+                                        "detail": detail}
+                if gate.get("refresh"):
+                    rkey = f"_refresh-{gid}"
+                    last = state["instances"].get(rkey, {}).get("attempts", [{}])[-1].get("carded_at")
+                    if not last or (dt.datetime.now(dt.timezone.utc) - parse_ts(last)).total_seconds() \
+                            >= gate["every_s"]:
+                        state["instances"].setdefault(rkey, {"step": rkey, "cell": None, "host": None,
+                                                             "status": "pending", "reason": None,
+                                                             "attempts": []})
+                        card = write_card(spec, spec_path, state, paths, rkey,
+                                          {"argv": render(gate["refresh"], ctx), "timeout_seconds": 600,
+                                           "success_exit_codes": [0], "outputs": [],
+                                           "must_not_exist": [], "background": False}, [])
+                        state["instances"][rkey]["status"] = "carded"
+                        return act("run_card", key=rkey, card=card,
+                                   relay=f"python3 tools/task_card.py prompt {card}",
+                                   background=False, assess=False)
+                state["status"] = "waiting"
+                return act("wait", until=_after(gate["every_s"]), reason=f"gate {gid}: {detail}")
+        state["gates"][gkey] = {"result": "fail", "first_at": first, "at": now(), "detail": detail}
+        msg = apply_fail(spec, state, gate, inst, f"gate {gid} {side} {key}: {detail}")
+        if msg.startswith("stopped"):
+            return teardown_or(spec, spec_path, state, paths, act("stopped", reason=msg))
+        if msg:
+            a = human_gate(state, f"esc-{gkey}", f"ESCALATION: {msg}. Answer yes to skip this "
+                                                 "instance and continue, no to stop.")
+            if a:
+                a["action"] = "escalate" if a["action"] == "ask" else a["action"]
+                return a
+            inst["status"], inst["reason"] = "not_attempted", msg
+        break
+    return None
+
+
 def next_action(spec, spec_path, state) -> dict[str, Any]:
+    result = _next_action(spec, spec_path, state)
+    if result["action"] == "stopped":
+        state["status"], state["blocked_on"] = "stopped", result.get("reason")
+        return teardown_or(spec, spec_path, state, resolve_paths(spec), result)
+    return result
+
+
+def _next_action(spec, spec_path, state) -> dict[str, Any]:
     paths = resolve_paths(spec)
     cells = expand_cells(spec)
     cells_by_id = {c["id"]: c for c in cells}
     cands = spec["hosts"]["candidates"]
-    if state["status"] == "stopped":
-        return act("stopped", reason=state.get("blocked_on"))
-
     problems = ingest_pending(spec, spec_path, state, paths, cells_by_id)
     if state["status"] == "stopped":
-        return teardown_or(spec, spec_path, state, paths, act("stopped", reason=state["blocked_on"]))
+        return act("stopped", reason=state.get("blocked_on"))
     for p in problems:
         gid = "esc-" + hashlib.sha256(p.encode()).hexdigest()[:10]
         a = human_gate(state, gid, f"ESCALATION: {p}. Answer yes to continue past it, no to stop the experiment.")
@@ -823,6 +879,20 @@ def next_action(spec, spec_path, state) -> dict[str, Any]:
             a["action"] = "escalate" if a["action"] == "ask" else a["action"]
             a["reason"] = p
             return a
+
+    # Complete after-gates before scheduling any dependent work. Receipts
+    # establish command completion; they do not answer human gates.
+    for key, inst in list(state["instances"].items()):
+        if inst["status"] not in OK_DONE or inst["step"].startswith("_"):
+            continue
+        step = next(s for s in spec["steps"] if s["id"] == inst["step"])
+        hidx = inst["host"]
+        host = (next(c for c in cands if c["id"] == state["hosts"][hidx]["candidate"])
+                if hidx is not None else None)
+        ctx = context(spec, paths, cells_by_id.get(inst["cell"]), host, hidx, state["vars"])
+        gate_action = evaluate_gates(spec, spec_path, state, paths, key, inst, step, ctx, "after")
+        if gate_action is not None:
+            return gate_action
 
     for key, inst in state["instances"].items():
         if inst["status"] == "carded":
@@ -890,58 +960,9 @@ def next_action(spec, spec_path, state) -> dict[str, Any]:
                 continue
             cell = cells_by_id.get(inst["cell"]) if inst["cell"] else None
             ctx = context(spec, paths, cell, host, hidx, state["vars"])
-            for gid in (s.get("gates") or {}).get("before", []):
-                gate = next(g for g in spec["gates"] if g["id"] == gid)
-                gkey = f"{gid}:{key}"
-                if gate["kind"] == "human":
-                    a = human_gate(state, gkey, render(gate["ask"], ctx))
-                    if a:
-                        return a
-                    continue
-                prior = state["gates"].get(gkey, {})
-                if prior.get("result") == "pass":
-                    continue
-                passed, detail = all_checks(gate, ctx, paths)
-                first = prior.get("first_at") or now()
-                if passed:
-                    state["gates"][gkey] = {"result": "pass", "first_at": first, "at": now(), "detail": detail}
-                    event(state, "gate", f"{gkey} pass")
-                    continue
-                if gate["kind"] == "wait_until":
-                    waited = (dt.datetime.now(dt.timezone.utc) - parse_ts(first)).total_seconds()
-                    if waited < gate["max_wait_s"]:
-                        state["gates"][gkey] = {"result": "waiting", "first_at": first, "at": now(),
-                                                "detail": detail}
-                        if gate.get("refresh"):
-                            rkey = f"_refresh-{gid}"
-                            last = state["instances"].get(rkey, {}).get("attempts", [{}])[-1].get("carded_at")
-                            if not last or (dt.datetime.now(dt.timezone.utc) - parse_ts(last)).total_seconds() \
-                                    >= gate["every_s"]:
-                                state["instances"].setdefault(rkey, {"step": rkey, "cell": None, "host": None,
-                                                                     "status": "pending", "reason": None,
-                                                                     "attempts": []})
-                                card = write_card(spec, spec_path, state, paths, rkey,
-                                                  {"argv": render(gate["refresh"], ctx), "timeout_seconds": 600,
-                                                   "success_exit_codes": [0], "outputs": [],
-                                                   "must_not_exist": [], "background": False}, [])
-                                state["instances"][rkey]["status"] = "carded"
-                                return act("run_card", key=rkey, card=card,
-                                           relay=f"python3 tools/task_card.py prompt {card}",
-                                           background=False, assess=False)
-                        state["status"] = "waiting"
-                        return act("wait", until=_after(gate["every_s"]), reason=f"gate {gid}: {detail}")
-                state["gates"][gkey] = {"result": "fail", "first_at": first, "at": now(), "detail": detail}
-                msg = apply_fail(spec, state, gate, inst, f"gate {gid} before {key}: {detail}")
-                if msg.startswith("stopped"):
-                    return teardown_or(spec, spec_path, state, paths, act("stopped", reason=msg))
-                if msg:
-                    a = human_gate(state, f"esc-{gkey}", f"ESCALATION: {msg}. Answer yes to skip this "
-                                                         "instance and continue, no to stop.")
-                    if a:
-                        a["action"] = "escalate" if a["action"] == "ask" else a["action"]
-                        return a
-                    inst["status"], inst["reason"] = "not_attempted", msg
-                break
+            gate_action = evaluate_gates(spec, spec_path, state, paths, key, inst, s, ctx, "before")
+            if gate_action is not None:
+                return gate_action
             if inst["status"] != "pending":
                 continue
             if s.get("done_when") and all(run_check(c, ctx, paths)[0] for c in s["done_when"]):
@@ -954,7 +975,7 @@ def next_action(spec, spec_path, state) -> dict[str, Any]:
                 continue
             cmd, extra = step_command(spec, s, ctx, host)
             card = write_card(spec, spec_path, state, paths, key, cmd, extra)
-            inst["cell"], inst["host"] = inst["cell"], inst["host"]
+            inst["host"] = hidx
             state["status"], state["blocked_on"] = "running", None
             return act("run_card", key=key, card=card, relay=f"python3 tools/task_card.py prompt {card}",
                        background=cmd["background"], assess=bool(s.get("evidence")))
@@ -1083,7 +1104,8 @@ def lifecycle_card(spec, spec_path, state, paths, hidx, host, phase) -> dict[str
                                "reason": None, "attempts": []}
     ctx = context(spec, paths, None, host, hidx, state["vars"])
     card = write_card(spec, spec_path, state, paths, key, lifecycle_command(spec, host, phase, ctx), [])
-    state["status"] = "running"
+    if state["status"] != "stopped":
+        state["status"] = "running"
     return act("run_card", key=key, card=card, relay=f"python3 tools/task_card.py prompt {card}",
                background=host["lifecycle"][phase]["timeout_s"] > 600, assess=False)
 
@@ -1100,6 +1122,24 @@ def teardown_or(spec, spec_path, state, paths, fallback):
         if permission(spec, "terminate_own_hosts") == "never":
             return act("escalate", reason=f"host {h['candidate']} (handle {h.get('handle')}) needs teardown "
                        "and terminate_own_hosts is never")
+        if permission(spec, "terminate_own_hosts") == "ask":
+            answer = human_gate(state, f"teardown-{hidx}",
+                                f"Terminate own host {h['candidate']} (handle {h.get('handle')}).")
+            if answer is not None:
+                if answer["action"] == "stopped":
+                    return act("escalate", reason=f"teardown declined for {h['candidate']}; "
+                               f"handle {h.get('handle')} remains active")
+                return answer
+        key = f"_teardown#{hidx}"
+        previous = state["instances"].get(key, {})
+        if previous.get("status") == "carded":
+            card = previous["attempts"][-1]["card"]
+            return act("run_card", key=key, card=card,
+                       relay=f"python3 tools/task_card.py prompt {card}",
+                       background=host["lifecycle"]["teardown"]["timeout_s"] > 600, assess=False)
+        if previous.get("status") == "failed":
+            return act("escalate", reason=f"teardown of {h['candidate']} failed; "
+                       f"terminate handle {h.get('handle')} by hand")
         return lifecycle_card(spec, spec_path, state, paths, hidx, host, "teardown")
     return fallback
 
@@ -1200,7 +1240,7 @@ def cmd_answer(args) -> int:
         print(f"gate {args.gate} is not waiting for an answer")
         return 1
     g.update(result="answered_yes" if args.yes else "answered_no", at=now(), by=args.by)
-    if state.get("blocked_on") == args.gate:
+    if state.get("blocked_on") == args.gate and state["status"] != "stopped":
         state["status"], state["blocked_on"] = "running", None
     event(state, "answer", f"{args.gate}: {'yes' if args.yes else 'no'} by {args.by}")
     save_state(path, state)

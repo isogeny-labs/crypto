@@ -78,8 +78,9 @@ class Sandbox:
         actions = []
         state_p = self.dir / rel.replace(".yaml", ".state.yaml")
         for _ in range(limit):
-            out = self.expspec("next", rel, check=False).stdout
-            act = json.loads(out)
+            result = self.expspec("next", rel, check=False)
+            assert result.stdout, result.stderr
+            act = json.loads(result.stdout)
             actions.append(act)
             if act["action"] == "run_card":
                 lint = sh(self.dir, sys.executable, "tools/task_card.py", "lint", act["card"], check=False)
@@ -89,7 +90,7 @@ class Sandbox:
                 gate = yaml.safe_load(state_p.read_text())["blocked_on"]
                 if not gate:
                     return actions
-                self.expspec("answer", rel, "--gate", gate, answer, "--by", "test-owner")
+                self.expspec("answer", rel, "--gate", gate, answer(gate) if callable(answer) else answer, "--by", "test-owner")
             elif act["action"] == "wait":
                 state = yaml.safe_load(state_p.read_text())
                 for h in state["hosts"]:
@@ -169,6 +170,59 @@ class LocalRun(unittest.TestCase):
         self.assertNotIn("measure@n10", keys)
         self.assertEqual(self.box.state(self.rel)["instances"]["measure@n10"]["status"], "skipped_done")
 
+    def test_human_after_gate_requires_answer_before_more_work(self):
+        p = self.box.dir / self.rel
+        spec = yaml.safe_load(p.read_text())
+        spec["gates"].append({"id": "owner-after", "kind": "human", "description": "review output",
+                              "ask": "Continue after this output.", "on_fail": "stop"})
+        spec["steps"][1]["gates"]["after"].append("owner-after")
+        p.write_text(yaml.safe_dump(spec))
+        commit(self.box.dir, "add after gate")
+        actions = self.box.drive(self.rel, answer="--no")
+        self.assertEqual(actions[-1]["action"], "stopped")
+        self.assertEqual([a["gate"] for a in actions if a["action"] == "ask"],
+                         ["owner-after:measure@n3"])
+        keys = [a["key"] for a in actions if a["action"] == "run_card"]
+        self.assertNotIn("measure@n10", keys)
+        self.assertEqual(self.box.state(self.rel)["status"], "stopped")
+
+    def test_refresh_receipt_resumes_wait_gate(self):
+        p = self.box.dir / self.rel
+        spec = yaml.safe_load(p.read_text())
+        spec["gates"].append({"id": "refresh-host", "kind": "wait_until", "description": "host metadata",
+                              "checks": [{"kind": "file_exists", "path": "{{paths.out}}/host.json"}],
+                              "refresh": spec["steps"][0]["argv"], "every_s": 60,
+                              "max_wait_s": 60, "on_fail": "stop"})
+        spec["steps"][0]["gates"] = {"before": ["refresh-host"]}
+        p.write_text(yaml.safe_dump(spec))
+        commit(self.box.dir, "add refresh gate")
+        actions = self.box.drive(self.rel)
+        self.assertEqual(actions[-1]["action"], "done")
+        self.assertEqual(self.box.state(self.rel)["instances"]["_refresh-refresh-host"]["status"], "done")
+
+    def test_wait_after_gate_refreshes_before_dependent_work(self):
+        p = self.box.dir / self.rel
+        spec = yaml.safe_load(p.read_text())
+        refresh = list(spec["steps"][0]["argv"])
+        refresh[-1] = "{{paths.out}}/after"
+        spec["gates"].append({"id": "after-ready", "kind": "wait_until", "description": "after metadata",
+                              "checks": [{"kind": "file_exists", "path": "{{paths.out}}/after/host.json"}],
+                              "refresh": refresh, "every_s": 60, "max_wait_s": 120, "on_fail": "stop"})
+        spec["steps"][0]["gates"] = {"after": ["after-ready"]}
+        p.write_text(yaml.safe_dump(spec))
+        commit(self.box.dir, "add wait after gate")
+        actions = self.box.drive(self.rel)
+        self.assertEqual(actions[-1]["action"], "done")
+        keys = [a["key"] for a in actions if a["action"] == "run_card"]
+        self.assertLess(keys.index("_refresh-after-ready"), keys.index("measure@n3"))
+
+    def test_resume_still_validates_cached_output(self):
+        out = self.box.dir / "research/expspec_smoke_20261020/out"
+        out.mkdir(parents=True)
+        (out / "cell-n10.json").write_text('{"n": 10, "value": 55, "ok": false}\n')
+        self.box.drive(self.rel)
+        self.assertEqual(self.box.state(self.rel)["instances"]["measure@n10"]["status"], "void")
+
 
 class BatchRun(unittest.TestCase):
     rel = "experiments/specs/EXP-EXPSPEC-BATCH-001.yaml"
@@ -206,6 +260,47 @@ class BatchRun(unittest.TestCase):
         actions = self.box.drive(self.rel, answer="--no")
         self.assertEqual(actions[-1]["action"], "stopped")
         self.assertEqual(self.box.state(self.rel)["hosts"], [])
+
+    def test_no_to_running_host_gate_tears_down_and_stays_stopped(self):
+        actions = self.box.drive(self.rel, answer=lambda g: "--yes" if g.startswith("launch-") else "--no")
+        self.assertEqual(actions[-1]["action"], "stopped")
+        state = self.box.state(self.rel)
+        self.assertEqual(state["status"], "stopped")
+        self.assertEqual(len(state["hosts"]), 1)
+        self.assertEqual(state["hosts"][0]["state"], "torn_down")
+        self.assertTrue((self.box.dir / ".fakehost" / state["hosts"][0]["handle"] / "TERMINATED").exists())
+        again = json.loads(self.box.expspec("next", self.rel).stdout)
+        self.assertEqual(again["action"], "stopped")
+
+    def test_failed_step_stop_survives_teardown(self):
+        p = self.box.dir / self.rel
+        spec = yaml.safe_load(p.read_text())
+        score = spec["steps"][2]
+        score["argv"] = ["false"]
+        score["outputs"] = []
+        score["on_failure"] = "stop"
+        p.write_text(yaml.safe_dump(spec))
+        commit(self.box.dir, "stop on failed score")
+        actions = self.box.drive(self.rel)
+        self.assertEqual(actions[-1]["action"], "stopped")
+        state = self.box.state(self.rel)
+        self.assertEqual(state["status"], "stopped")
+        self.assertEqual(len(state["hosts"]), 1)
+        self.assertEqual(state["hosts"][0]["state"], "torn_down")
+
+    def test_teardown_permission_ask_preserves_stop(self):
+        p = self.box.dir / self.rel
+        spec = yaml.safe_load(p.read_text())
+        spec["agent"]["autonomy"]["terminate_own_hosts"] = "ask"
+        p.write_text(yaml.safe_dump(spec))
+        commit(self.box.dir, "ask before teardown")
+        actions = self.box.drive(self.rel, answer=lambda g: "--no" if g.startswith("go:") else "--yes")
+        self.assertEqual(actions[-1]["action"], "stopped")
+        self.assertIn("teardown-0", [a["gate"] for a in actions if a["action"] == "ask"])
+        state = self.box.state(self.rel)
+        self.assertEqual(state["status"], "stopped")
+        self.assertEqual(len(state["hosts"]), 1)
+        self.assertEqual(state["hosts"][0]["state"], "torn_down")
 
 
 if __name__ == "__main__":
