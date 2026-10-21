@@ -1,4 +1,17 @@
-# Exact split root index on the N83 K128 control
+# N83 split root index and verified K5500 factor base
+
+The deterministic N83 orbit construction produced **913,000 distinct,
+subgroup-usable points** across 5,500 columns. Independent replay checked
+every representative, signed Frobenius orbit, label, and point for
+distinctness. The full K4405 base from the frozen prior candidate is an
+exact ordered prefix of this K5500 base. The [base record](k5500_base_record.json),
+[replay receipt](runs/base_only_k5500_20261021/verification.json), and
+[prefix check](runs/base_only_k5500_20261021/prefix_check_k4405.json)
+pin the result. The larger base's split root index, rank, and single-target
+online wall time remain to be measured.
+The new base-only exit left the normal ID31 K128 monolithic and split
+index outputs unchanged under an
+[exact stage regression](runs/k128_id31_baseonly_regression/regression_check.json).
 
 The split five-byte root index constructed 1,359,488 entries from the same
 680,000 symmetric S3 states and 21,248-point N83 factor base as the
@@ -77,8 +90,9 @@ Lean proof establishes `S(7193) < 2^31 ≤ S(7194)` for the symmetric N83
 state formula. The calculated K5500/K4549 dual-filter layout needs
 33,136,508,082 bytes (30.86 GiB) for its state array, two exact tables,
 and two Blooms. This extends the format's capacity beyond the K5086
-ID30 ceiling while retaining the same slot width. The actual K5500 base,
-peak RSS, rank, natural-target yield, and online time are open measurements;
+ID30 ceiling while retaining the same slot width. The actual K5500 base
+has been enumerated and independently replayed. Full-index peak RSS,
+rank, natural-target yield, and online time remain open;
 the [capacity proof map](CAPACITY.md) keeps `candidate_id: null`.
 
 The current-source example suite passes 23/23 tests, including an ID31

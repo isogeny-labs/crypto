@@ -1,4 +1,9 @@
-# N83 K128 split root-index stage controls
+# N83 split root-index controls and K5500 base enumeration
+
+The base-only constructor enumerated 913,000 distinct subgroup-usable N83
+points at K5500. Independent replay passed for every representative and
+signed Frobenius orbit, and the frozen K4405 base matched an exact ordered
+prefix. The split ID31 root index and online solve remain separate stages.
 
 The split five-byte root index preserved the same 21,248-point factor base,
 680,000 symmetric states, and 1,359,488 exact-root entries as the monolithic
@@ -75,6 +80,38 @@ The [input](runs/k128_id31/input.json), frozen runner, per-arm stdout,
 stderr, and process receipts are versioned. This shared-host replay is an
 index-stage correctness diagnostic; it does not supply a paired online
 speedup or the K5500 base enumeration.
+
+## Base-only enumeration and independent replay
+
+The opt-in `KIC_BASE_BUILD_ONLY=1` path writes the ordered point set and
+exits before normal-basis setup, S3 root indexing, rank, or target work.
+The [bounded runner](run_base_stage.py) froze the source and executable in
+each run directory and limited child wall time to 1,800 seconds and sampled
+RSS to 8 GiB for the two larger bases. The [independent verifier](verify_base_stage.py)
+checked exact curve and subgroup data, every representative's subgroup
+membership, all orbit coordinates and labels, closure, and distinctness.
+The versioned K4405 and K5500 dumps are gzip-compressed without changing
+their uncompressed SHA-256 digests.
+The [post-change K128 ID31 control](runs/k128_id31_baseonly_regression/regression_check.json)
+matched the prior monolithic and split base, state, exact-table digest,
+entry, allocation, and Bloom fields: `PASS_EXACT_DEFAULT_INDEX_REGRESSION`.
+
+| K | Actual points | Scanned abscissae | Base construction (ms) | Child wall (s) | Sampled peak RSS (bytes) | Replay |
+| ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 128 | 21,248 | 292 | 1,351.088 | 4.168 | 8,077,312 | [PASS](runs/base_only_k128_20261021/verification.json) |
+| 4,405 | 731,230 | 8,907 | 3,228.355 | 6.410 | 386,383,872 | [PASS](runs/base_only_k4405_20261021/verification.json) |
+| 5,500 | 913,000 | 11,041 | 6,925.237 | 10.330 | 479,117,312 | [PASS](runs/base_only_k5500_20261021/verification.json) |
+
+The K5500 [ordered dump](runs/base_only_k5500_20261021/base_dump.jsonl.gz)
+has uncompressed SHA-256
+`823782912c75d782cdd7e6c9074c94282e28a686b1dd98ea978a367514d3acdd`
+and producer BLAKE3 base hash
+`0789049953a67b51dfe23f6fa2788d11e0bb4b35d52180fc038a3ffd2c0efb5f`.
+Its [prefix receipt](runs/base_only_k5500_20261021/prefix_check_k4405.json)
+matches the first 731,230 coordinates and labels and all 4,405
+representatives to the frozen K4405 manifest. These shared-host times are
+construction diagnostics; the memory estimate in [CAPACITY.md](CAPACITY.md)
+still needs a full-index measurement before any Pod admission.
 
 ## Full-size local K4405 split control
 

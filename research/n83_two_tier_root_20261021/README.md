@@ -1,4 +1,4 @@
-# N83 K4300-prefix root index for the K4405 factor base
+# N83 split root index and factor-base extension
 
 The opt-in `KIC_INDEXED5_SPLIT_AT=4300` mode builds an exact two-table root
 index for the existing K4405 base. The first table contains states whose two
@@ -90,11 +90,22 @@ control. The [K128 ID31 replay](runs/k128_id31/result.json) passed both
 stage arms. Its [capacity proof and K5500 proposal](CAPACITY.md) are separate
 from the sealed K5086 comparison.
 
+The separate [base-only runner](run_base_stage.py) sets
+`KIC_BASE_BUILD_ONLY=1` to enumerate an orbit base and dump its exact
+ordered points before allocating the root index. The
+[independent verifier](verify_base_stage.py) replayed the K128, K4405, and
+K5500 bases, including subgroup checks for every representative and all
+signed Frobenius orbit labels. K5500 has **913,000 actual usable points**;
+the [base record](k5500_base_record.json) and
+[K4405 prefix receipt](runs/base_only_k5500_20261021/prefix_check_k4405.json)
+pin its identity. The complete IC candidate ID and online performance
+remain open until the index, rank, and target stages are measured.
+
 Its `PASS_INDEX_STAGE_CONTROL` status checks the identical base hash, state
 digest, and split allocation receipts. It is an index-construction control;
 the full K4405 target and Tier 1 online gates above remain separate.
 
-The local full-size correctness control is prepared as a capped successor to
+The local full-size correctness control was run as a capped successor to
 the monolithic load80 run. It takes the same public target point and records
 the independently known fixture scalar outside the executable's input. It
 monitors sampled RSS and writes a terminal process receipt on success,
@@ -109,9 +120,11 @@ python3 research/n83_two_tier_root_20261021/run_full_control.py \
   --variant shared --cap-seconds 7200 --rss-cap-gib 26
 ```
 
-The monolithic control terminated at its 7,200-second cap; its receipt is
-linked from [RESULT.md](RESULT.md). Run the split control only when no other
-large index is active on the host. `PASS_PROCESS` is a process
+The monolithic control terminated at its 7,200-second cap. The split control
+stopped at 5,098.402 seconds when its independent scratch-disk guard crossed
+the frozen 8 GiB free-space threshold; both receipts are linked from
+[RESULT.md](RESULT.md). Run a large index only when no other such job is
+active on the host. `PASS_PROCESS` is a process
 outcome; an independent group, relation, and scalar replay must then pass
 before entering a correctness row.
 
@@ -124,6 +137,7 @@ python3 research/n83_two_tier_root_20261021/verify_full_control.py \
 
 The verifier uses the versioned N83 group implementation and K4405 candidate
 manifest to check the exact base dump, relation sum, recovered scalar,
-single-target phase accounting, and split-table allocation. A capped process
-returns `BOUNDED_UNKNOWN`; only `PASS_INDEPENDENT_REPLAY` qualifies the local
+single-target phase accounting, and split-table allocation. It also
+classifies the versioned external disk-guard stop. A bounded stop returns
+`BOUNDED_UNKNOWN`; only `PASS_INDEPENDENT_REPLAY` qualifies the local
 correctness control.

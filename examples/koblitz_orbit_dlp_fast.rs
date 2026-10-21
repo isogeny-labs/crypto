@@ -4635,6 +4635,47 @@ mod wide {
             }
             None => header["base_hash"].as_str().unwrap().to_owned(),
         };
+        if std::env::var("KIC_BASE_BUILD_ONLY").as_deref() == Ok("1") {
+            assert!(
+                constructed.is_some(),
+                "base-only stage needs a constructed base"
+            );
+            let dump_path =
+                std::env::var("KIC_DUMP_BASE").expect("base-only stage needs KIC_DUMP_BASE");
+            let dump = json!({
+                "kind":"point_defined_factor_base",
+                "n":n, "a":a,
+                "subgroup_order":r,
+                "field_modulus_low_terms":curve.curve.irreducible.low_terms,
+                "orbit_columns":representatives.len(),
+                "base_hash":base_hash,
+                "factor_base_points":points.len(),
+                "field_value_encoding":"base-10 strings for u128 field values",
+                "factor_base_point_coordinates":points.iter().map(|p| encode_point128(*p)).collect::<Vec<_>>(),
+                "factor_base_point_labels":labels,
+                "factor_base_representatives":representatives.iter().copied().map(encode_pair128).collect::<Vec<_>>(),
+            });
+            std::fs::write(&dump_path, format!("{dump}\n")).expect("write base-only dump");
+            println!(
+                "{}",
+                json!({
+                    "kind":"compact_orbit_base_stage",
+                    "status":"STAGE_DIAGNOSTIC_ONLY",
+                    "n":n, "a":a,
+                    "subgroup_order":r,
+                    "cofactor":curve.cofactor.to_string(),
+                    "field_modulus_low_terms":curve.curve.irreducible.low_terms,
+                    "generator":encode_point128(generator),
+                    "orbit_columns":representatives.len(),
+                    "factor_base_points":points.len(),
+                    "base_hash":base_hash,
+                    "base_scanned_x":scanned_x,
+                    "base_construction_ms":setup_started.elapsed().as_secs_f64() * 1000.0,
+                    "base_dump_path":dump_path,
+                })
+            );
+            std::process::exit(0);
+        }
         let mut by_x: HashMap<u128, Vec<usize>> = HashMap::new();
         for (index, point) in points.iter().enumerate() {
             if let Some((x, _)) = point {

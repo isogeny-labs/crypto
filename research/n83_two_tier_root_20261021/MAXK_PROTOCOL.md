@@ -132,3 +132,11 @@ provider timer did not terminate its Pod. The controller and guard have
 local mock-provider creation, deletion, and absence controls; no Pod has
 been allocated with them. If the eligible Pod is unavailable, the
 dispatch stays pending without substituting a weaker memory envelope.
+
+The separately developed ID31 path has now independently enumerated a
+913,000-point K5500 base. Its [base record](k5500_base_record.json) and
+[K4405 prefix replay](runs/base_only_k5500_20261021/prefix_check_k4405.json)
+are versioned. K5500 is not an arm in this frozen three-candidate selector;
+its calculated split-index footprint, full-index memory peak, rank, and
+online performance require a separately declared comparison before a
+factor-base selection can include it.

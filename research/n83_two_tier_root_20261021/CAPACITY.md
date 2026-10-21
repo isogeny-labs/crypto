@@ -98,9 +98,9 @@ split construction with four root threads and the same base/state counts as
 the ID30 control; it does not measure K5500 or a target solve.
 
 For the same split-table and separate-`wide3`-Bloom sizing rule, K5500 with
-primary K4549 has the following **calculated** capacity. It is a new
-proposal, not a completed factor-base comparison or an amendment to the
-sealed K5086 screen.
+primary K4549 has the following capacity calculation and independently
+enumerated base. The root index and online comparison remain a proposal
+separate from the sealed K5086 screen.
 
 | Quantity | Exact value | Status |
 | --- | ---: | --- |
@@ -112,18 +112,31 @@ sealed K5086 screen.
 | separate `wide3` Blooms | 2^34 + 2^33 bits | 3 GiB |
 | 11-byte state array | 1,255,377,750 entries | 13,809,155,250 bytes |
 | three-array sum | state + two tables + two Blooms | 33,136,508,082 bytes (30.86 GiB) |
-| projected point count under 166-point expansion | 913,000 | actual enumeration pending |
+| actual usable subgroup points | 913,000 | all 5,500 representatives and 913,000 orbit points independently replayed |
+
+The [immutable base record](k5500_base_record.json) fixes the exact field,
+curve, generator, construction, source and binary hashes, and ordered-base
+digest. The base producer hash is
+`0789049953a67b51dfe23f6fa2788d11e0bb4b35d52180fc038a3ffd2c0efb5f`;
+the uncompressed ordered dump SHA-256 is
+`823782912c75d782cdd7e6c9074c94282e28a686b1dd98ea978a367514d3acdd`.
+The [compressed dump](runs/base_only_k5500_20261021/base_dump.jsonl.gz)
+replayed from the versioned archive. Its 913,000 points and labels form an
+[exact prefix extension](runs/base_only_k5500_20261021/prefix_check_k4405.json)
+of the frozen 731,230-point K4405 base. K5500's base-only source SHA-256 is
+`8c4f90114ed00c7c188f50908b177063fa03faefa646f7c0dfe08e87bb39c015`;
+the previous ID31 index-stage source above remains a separate frozen build.
 
 The 31-bit format permits K up to 7193 by its state-ID bound alone.
 Memory, index-construction cost, rank completion, natural-target yield,
 and online lookup cost can limit the useful base much earlier. The K5500
 three-array sum leaves about 9.14 GiB within the frozen 40 GiB sampled
 child-RSS cap, before other buffers and allocator overhead; it requires an
-actual peak-memory measurement. K5800 already needs 38.30 GiB for these
+actual full-index peak-memory measurement. K5800 already needs 38.30 GiB for these
 arrays, leaving too little headroom for that pilot envelope. The K5500
-proposal retains `candidate_id: null` and measured costs `null` until its
-base is enumerated, subgroup checked, hashed, and paired on the sealed
-same-point workload.
+proposal retains `candidate_id: null` and index/online costs `null` until
+the split exact-root index, full-rank log system, and sealed same-point
+workload pass their gates.
 
 The same pinned Lean module proves the ID31 slot decode and five-byte
 nonzero bound, and `k7193_id31_max` from monotonicity,

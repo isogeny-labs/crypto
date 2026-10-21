@@ -150,9 +150,11 @@ def make_pdf(path, title, paragraphs, table_rows, capacity=False):
             Spacer(1, 6),
             Paragraph('An opt-in 31-bit state ID extends the five-byte format. '
                       'The K5500/K4549 separate-filter three-array calculation '
-                      'is 30.86 GiB; base enumeration, peak RSS, rank, and '
-                      'online time remain to be measured. The pinned Lean '
-                      'module checks the ID31 formula bound and byte sum.', small),
+                      'is 30.86 GiB. The 913,000-point K5500 base passed '
+                      'independent subgroup, orbit, and distinctness replay; '
+                      'full-index peak RSS, rank, and online time remain '
+                      'open. The pinned Lean module checks the ID31 formula '
+                      'bound and byte sum.', small),
             Spacer(1, 8),
             Paragraph('Source and proof map: research/n83_two_tier_root_20261021/'
                       'CAPACITY.md and Capacity.lean; Rust source: examples/'
