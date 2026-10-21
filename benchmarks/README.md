@@ -21,6 +21,9 @@ in the [unvalidated benchmark archive](ARCHIVE.md), with their exact former row
 text, digest, reason, and source provenance. Archived rows are not measurements
 admitted by this table and cannot satisfy the validation gate.
 
+The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
+is preserved separately pending validation admission.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-20 | [`20261020-ic-planner-validation`](20261020-ic-planner-validation/) | the `ic plan` / `ic bench --auto` planner (`ic-planner/1`) on prime curves outside its evidence: ecbench `ic.pipeline` plan (`prime-abscissa` at `#E^{1/3}/2`, `mitm-prime-blocked:m=2`, `incremental-gauss`, `walk`) against one-change alternatives (half and double base, `rootfind-subtract`, full-rank stop, random targets) and an A/A, on registered `icv1-fp24-tm5099-a6f137c6`, `icv1-fp26-tm1775-7e8fb6df`, `icv1-fp28-t28201-65099091` (primary) and three unregistered `prime_search` curves (supplementary); 1,152 measured runs + 384 warmups, all verified, audits OK (72 exact replays) | at w = 0 the plan beats every alternative on all six curves (half base 1.36–1.56×, double 1.49–1.60×, rootfind 150–637×, full rank 3.30–4.81×, random targets 41.5–58.7×); at w = 1 the doubled base is 2–9% cheaper (size rule not separated across the §5a band); predicted gap to rho within 18% of measured (12.6–25.8×); engineering (tooling validation) | 4 vCPU Xeon 2.80 GHz VM, `ecbench run --cpus auto`; counts only | [`research/ic_planner_validation_20261020`](../research/ic_planner_validation_20261020/README.md) ([PDF](20261020-ic-planner-validation/REPORT.pdf)) |
