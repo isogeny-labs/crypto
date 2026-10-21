@@ -435,3 +435,32 @@ digest with a supplied secret length. SHA-224, SHA-384, SHA-512/224,
 SHA-512/256, and BLAKE3 have no length-extension adapter in this CLI; their
 reports make no claim that these constructions resist every extension
 technique. The birthday section concerns only a 32-bit truncated output.
+
+The `crypto hash` command also exposes the other built-in unkeyed digest
+implementations on text, `--hex`, or `--file` input:
+
+```sh
+crypto hash md4 --hex 616263
+crypto hash md5 --hex 616263
+crypto hash sha1 --hex 616263
+crypto hash blake2b --output-bytes 32 --hex 616263
+crypto hash blake2s --output-bytes 16 --hex 616263
+crypto hash skein256 --hex 616263
+crypto hash skein512 --output-bytes 32 --hex 616263
+crypto hash skein1024 --hex 616263
+crypto hash sm3 --hex 616263
+crypto hash streebog-256 --hex 616263
+crypto hash streebog-512 --hex 616263
+crypto hash whirlpool --hex 616263
+crypto hash tiger --hex 616263
+crypto hash tiger2 --hex 616263
+crypto hash ripemd160 --hex 616263
+```
+
+SHAKE requires `--output-bytes` in `1..=1048576`. BLAKE2b and BLAKE2s
+default to 64 and 32 bytes and accept lengths in `1..=64` and `1..=32`;
+their shorter digests use the algorithm's output-length parameter. Skein-256,
+Skein-512, and Skein-1024 default to 32, 64, and 128 bytes and accept
+`--output-bytes` in `1..=1048576`. Fixed-output hashes reject that flag.
+The keyed BLAKE2, HMAC, KMAC, cSHAKE customization, and SipHash library APIs
+have separate key or customization inputs and are outside this unkeyed command.

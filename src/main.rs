@@ -32,8 +32,9 @@ use crypto_lib::{
         point::Point,
     },
     hash::{
-        blake3_hash, sha224, sha256, sha384, sha3_224, sha3_256, sha3_384, sha3_512, sha512,
-        sha512_224, sha512_256, shake128, shake256,
+        blake2b, blake2s, blake3_hash, md4, md5, ripemd160, sha1, sha224, sha256, sha384, sha3_224,
+        sha3_256, sha3_384, sha3_512, sha512, sha512_224, sha512_256, shake128, shake256,
+        skein1024, skein256, skein512, sm3, streebog_256, streebog_512, tiger, tiger2, whirlpool,
     },
     kdf::hkdf::hkdf,
     pqc::kyber::{kyber_decapsulate, kyber_encapsulate, kyber_keygen},
@@ -65,7 +66,7 @@ struct Cli {
 #[derive(Subcommand)]
 #[allow(clippy::large_enum_variant)]
 enum Cmd {
-    /// Hash a message with SHA-2, SHA-3, SHAKE, or BLAKE3.
+    /// Hash a message with any built-in unkeyed digest algorithm.
     Hash {
         algorithm: String,
         /// UTF-8 message; use --hex or --file for arbitrary bytes.
@@ -77,7 +78,7 @@ enum Cmd {
         /// Read message bytes from a file.
         #[arg(long)]
         file: Option<PathBuf>,
-        /// Required output length in bytes for SHAKE128 and SHAKE256.
+        /// Required for SHAKE; optional for BLAKE2 and Skein.
         #[arg(long)]
         output_bytes: Option<usize>,
     },
@@ -2504,19 +2505,41 @@ fn load_hash_input(
 }
 
 fn cmd_hash(alg: &str, bytes: &[u8], output_bytes: Option<usize>) -> Result<String, String> {
-    let is_xof = matches!(alg, "shake128" | "shake256");
-    let length = if is_xof {
-        match output_bytes {
+    let length = match alg {
+        "shake128" | "shake256" => match output_bytes {
             Some(length @ 1..=1_048_576) => length,
             _ => return Err("SHAKE requires --output-bytes in 1..=1048576".into()),
+        },
+        "blake2b" => match output_bytes.unwrap_or(64) {
+            length @ 1..=64 => length,
+            _ => return Err("BLAKE2b --output-bytes must be in 1..=64".into()),
+        },
+        "blake2s" => match output_bytes.unwrap_or(32) {
+            length @ 1..=32 => length,
+            _ => return Err("BLAKE2s --output-bytes must be in 1..=32".into()),
+        },
+        "skein256" | "skein512" | "skein1024" => {
+            let default = match alg {
+                "skein256" => 32,
+                "skein512" => 64,
+                _ => 128,
+            };
+            match output_bytes.unwrap_or(default) {
+                length @ 1..=1_048_576 => length,
+                _ => return Err("Skein --output-bytes must be in 1..=1048576".into()),
+            }
         }
-    } else {
-        if output_bytes.is_some() {
-            return Err("--output-bytes applies only to SHAKE128 and SHAKE256".into());
+        _ => {
+            if output_bytes.is_some() {
+                return Err("--output-bytes applies only to SHAKE, BLAKE2, and Skein".into());
+            }
+            0
         }
-        0
     };
     let digest = match alg {
+        "md4" => to_hex(&md4(bytes)),
+        "md5" => to_hex(&md5(bytes)),
+        "sha1" | "sha-1" => to_hex(&sha1(bytes)),
         "sha224" | "sha-224" => to_hex(&sha224(bytes)),
         "sha256" | "sha-256" => to_hex(&sha256(bytes)),
         "sha384" | "sha-384" => to_hex(&sha384(bytes)),
@@ -2529,8 +2552,20 @@ fn cmd_hash(alg: &str, bytes: &[u8], output_bytes: Option<usize>) -> Result<Stri
         "sha3-512" => to_hex(&sha3_512(bytes)),
         "shake128" => to_hex(&shake128(bytes, length)),
         "shake256" => to_hex(&shake256(bytes, length)),
+        "blake2b" => to_hex(&blake2b(bytes, length)),
+        "blake2s" => to_hex(&blake2s(bytes, length)),
         "blake3" => to_hex(&blake3_hash(bytes)),
-        _ => return Err(format!("unknown algorithm {alg:?}; use sha224, sha256, sha384, sha512, sha512-224, sha512-256, sha3-224, sha3-256, sha3-384, sha3-512, shake128, shake256, or blake3")),
+        "skein256" => to_hex(&skein256(bytes, length)),
+        "skein512" => to_hex(&skein512(bytes, length)),
+        "skein1024" => to_hex(&skein1024(bytes, length)),
+        "sm3" => to_hex(&sm3(bytes)),
+        "streebog-256" => to_hex(&streebog_256(bytes)),
+        "streebog-512" => to_hex(&streebog_512(bytes)),
+        "whirlpool" => to_hex(&whirlpool(bytes)),
+        "tiger" => to_hex(&tiger(bytes)),
+        "tiger2" => to_hex(&tiger2(bytes)),
+        "ripemd160" => to_hex(&ripemd160(bytes)),
+        _ => return Err(format!("unknown algorithm {alg:?}; use md4, md5, sha1, SHA-2, SHA-3, shake128, shake256, blake2b, blake2s, blake3, skein256, skein512, skein1024, sm3, streebog-256, streebog-512, whirlpool, tiger, tiger2, or ripemd160")),
     };
     Ok(digest)
 }
@@ -2979,7 +3014,37 @@ mod hash_cli_tests {
         assert!(cmd_hash("shake128", b"abc", None).is_err());
         assert!(cmd_hash("shake128", b"abc", Some(0)).is_err());
         assert!(cmd_hash("sha256", b"abc", Some(32)).is_err());
+        assert!(cmd_hash("blake2b", b"abc", Some(65)).is_err());
+        assert!(cmd_hash("blake2s", b"abc", Some(33)).is_err());
+        assert!(cmd_hash("skein512", b"abc", Some(0)).is_err());
         assert!(cmd_hash("unknown", b"abc", None).is_err());
+    }
+
+    #[test]
+    fn additional_unkeyed_hashes_match_independent_abc_vectors() {
+        let vectors = [
+            ("md4", "a448017aaf21d8525fc10ae87aa6729d"),
+            ("md5", "900150983cd24fb0d6963f7d28e17f72"),
+            ("sha1", "a9993e364706816aba3e25717850c26c9cd0d89d"),
+            ("blake2b", "ba80a53f981c4d0d6a2797b69f12f6e94c212f14685ac4b74b12bb6fdbffa2d17d87c5392aab792dc252d5de4533cc9518d38aa8dbf1925ab92386edd4009923"),
+            ("blake2s", "508c5e8c327c14e2e1a72ba34eeb452f37458b209ed63a294d999b4c86675982"),
+            ("ripemd160", "8eb208f7e05d987a9b044a8e98c6b087f15a0bfc"),
+            ("sm3", "66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0"),
+        ];
+        for (name, expected) in vectors {
+            assert_eq!(cmd_hash(name, b"abc", None).unwrap(), expected, "{name}");
+        }
+        assert_eq!(
+            cmd_hash("blake2b", b"abc", Some(32)).unwrap(),
+            "bddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319"
+        );
+        assert_eq!(
+            cmd_hash("blake2s", b"abc", Some(16)).unwrap(),
+            "aa4938119b1dc7b87cbad0ffd200d0ae"
+        );
+        assert_eq!(cmd_hash("skein256", b"abc", None).unwrap().len(), 64);
+        assert_eq!(cmd_hash("skein512", b"abc", Some(16)).unwrap().len(), 32);
+        assert_eq!(cmd_hash("skein1024", b"abc", None).unwrap().len(), 256);
     }
 
     #[test]
