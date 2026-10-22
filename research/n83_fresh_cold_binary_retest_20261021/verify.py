@@ -26,6 +26,11 @@ prior = module('n83_finegrid_prior_verify',
                ROOT / 'research/n83_e2e_final_holdout_20261016/verify.py')
 cross = module('n83_crossfamily_structural_verify',
                ROOT / 'research/n83_compact4_crosslayout_20261016/verify.py')
+cache_module = module('n83_fresh_cold_base_replay_cache',
+                      HERE / 'base_replay_cache.py')
+base_replay_cache = cache_module.ValidatedBaseCache()
+base_replay_cache.install(prior.dynamic.group)
+base_replay_cache.install(cross.group)
 cross.target_block_mean_interval = lambda values, seed: None
 group = prior.group
 
