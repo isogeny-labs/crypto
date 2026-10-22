@@ -464,3 +464,37 @@ arms whose four-residual complete signed sets agree; a missing arm stays
 explicitly incomplete. Use an 8-GiB memory cap and 1,200-second watchdog
 per arm. A full polynomial relation stream, same-host msolve/Magma baseline
 and matched one-target rho are separate subsequent gates.
+
+## Registered mixed-pattern-only one-target polynomial IC discriminator
+
+Frozen on 22 October 2026 after the first four-residual peeling pilot
+showed complete signed-set agreement for `k=1,2,3`, before implementing
+this one-target producer. Use the same `p=37, b0=2, r=1,873,633`, public
+`[271]G` target, seed-zero 48-point `L0 ∪ L2` base and **full 61-residual
+frozen stream**. Reconstruct the base, twist eigenvalues and four folded
+columns in the producer; verify exact equality with the frozen coordinates
+and target. Do not read the known scalar when building relations or solving.
+
+For every residual, enumerate all complete signed relations from only the
+`k=1,2,3` polynomial peeling systems above. Deliberately omit both
+expensive all-one-line `S5` arms, `k=0,4`; this is a restricted factor
+decomposition strategy, not a claim that the full union polynomial system
+has been solved. Sort accepted relations by `(k, four signed terms)` and
+retain every row that raises rank after fixing the public generator
+factor log to 1. Stop on anchored rank four, or record a failure after
+all 61 residuals. Solve for the other three factor logs and target scalar,
+then verify every recovered factor log and the target by group multiplication.
+The exact group-pair oracle must not enter the counted IC path.
+
+Charge cold curve/base/eigen/orbit-map setup, `S4` interpolation, every
+`S4`/`S3` solve including failed or zero-root systems, peeling, root
+filtering, group sign verification, matrix work and answer checks in the
+same producer. Record field multiplications, group operations, modular
+operations, allocations/hash work and exclusive L0 phase times. Run the
+strongest same-target 24-fold rho in the same process and price both arms
+at 0, 0.1 and 1 group-addition equivalents; retain a separate matched-rho
+interval and count all its phases. Repeat A/A and independently replay
+the selected signed relations, orbit coefficients, rank and answer by a
+scalar-keyed subgroup-log oracle. Use an 8-GiB cap and 1,200-second
+watchdog. Treat isolated ABAB timings and same-input external Gröbner
+comparison as separate gates before a ranked whole-method speed claim.
