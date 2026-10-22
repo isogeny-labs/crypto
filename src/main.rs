@@ -68,6 +68,27 @@ struct Cli {
     command: Cmd,
 }
 
+#[cfg(test)]
+mod aes_related_differential_cli_tests {
+    use super::aes_related_differential_report;
+
+    #[test]
+    fn related_family_reports_the_mixcolumns_members_and_input_bounds() {
+        let report = aes_related_differential_report(1, 1).unwrap();
+        assert_eq!(
+            report["model"],
+            "aes-sbox-one-round-shifted-related-differential"
+        );
+        assert_eq!(report["members"].as_array().unwrap().len(), 4);
+        assert_eq!(report["members"][0]["delta_hex"], "02010103");
+        assert_eq!(report["members"][0]["diagonal"], 0);
+        assert_eq!(report["members"][3]["diagonal"], 3);
+        assert!(report["single_member_probability"].as_f64().unwrap() <= 1.0);
+        assert!(aes_related_differential_report(0, 1).is_err());
+        assert!(aes_related_differential_report(1, 0).is_err());
+    }
+}
+
 #[derive(Subcommand)]
 #[allow(clippy::large_enum_variant)]
 enum Cmd {
@@ -372,6 +393,15 @@ enum CryptanalysisOp {
         /// Required fixed 16-byte ciphertext difference for `boomerang`.
         #[arg(long)]
         delta_hex: Option<String>,
+    },
+    /// Analyze a one-round AES related-differential family from its S-box DDT.
+    AesRelatedDifferential {
+        /// Nonzero input difference for one S-box.
+        #[arg(long)]
+        alpha: u8,
+        /// Nonzero S-box output difference selected for the family.
+        #[arg(long)]
+        beta: u8,
     },
     /// Recover an AES-128 key candidate from measured first-round S-box power traces.
     AesCpa {
@@ -1927,6 +1957,47 @@ fn cmd_aes_attack(
     Ok(())
 }
 
+fn aes_related_differential_report(alpha: u8, beta: u8) -> Result<serde_json::Value, String> {
+    use crypto_lib::cryptanalysis::aes::{
+        differential::aes_sbox_ddt,
+        related_differential::{
+            classify, mix_columns_shifted_family, shifted_family_report, RelatedDifferenceClass,
+        },
+    };
+
+    if alpha == 0 || beta == 0 {
+        return Err("alpha and beta must both be nonzero".into());
+    }
+    let ddt = aes_sbox_ddt();
+    let report = shifted_family_report(&ddt, alpha, beta);
+    let family = mix_columns_shifted_family(beta);
+    let members = family
+        .iter()
+        .enumerate()
+        .map(|(index, member)| {
+            if index != 0 && classify(family[0], *member) != RelatedDifferenceClass::Shifted {
+                return Err("MixColumns family failed shifted-difference classification".into());
+            }
+            Ok(serde_json::json!({
+                "diagonal":member.diagonal,
+                "delta_hex":hex::encode(member.delta),
+                "state_difference_hex":hex::encode(member.to_state_diff())
+            }))
+        })
+        .collect::<Result<Vec<_>, String>>()?;
+    Ok(serde_json::json!({
+        "schema_version":1,
+        "model":"aes-sbox-one-round-shifted-related-differential",
+        "alpha":alpha,
+        "beta":beta,
+        "ddt_count":ddt[alpha as usize][beta as usize],
+        "single_member_probability":report.single_trail_probability,
+        "modeled_any_member_probability":report.any_member_probability,
+        "combination_assumption":"four independent S-box calls",
+        "members":members
+    }))
+}
+
 fn cmd_aes_distinguisher(
     technique: &str,
     key_hex: &str,
@@ -2277,6 +2348,15 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             ) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesRelatedDifferential { alpha, beta } => {
+            match aes_related_differential_report(alpha, beta) {
+                Ok(report) => println!("{}", serde_json::to_string_pretty(&report).unwrap()),
+                Err(e) => {
+                    eprintln!("error: {e}");
+                    std::process::exit(1);
+                }
             }
         }
         CryptanalysisOp::AesCpa {

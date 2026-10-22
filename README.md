@@ -245,6 +245,10 @@ crypto cryptanalysis length-extension --hash sha1 \
 crypto cryptanalysis aes-related-key --key-bits 256 --rounds 4
 crypto cryptanalysis aes-related-key --key-bits 128 --rounds 4 --avalanche-trials 1024
 
+# Exact one-round S-box DDT entry and four MixColumns shifted differences.
+# The combined probability uses an explicit independent-S-box-call assumption.
+crypto cryptanalysis aes-related-differential --alpha 1 --beta 1
+
 # AES visual demos — ASCII art for every major attack
 crypto cryptanalysis aes-visual-demo --demo all              # all four below
 crypto cryptanalysis aes-visual-demo --demo truncated-diff   # 4-round trail grid
