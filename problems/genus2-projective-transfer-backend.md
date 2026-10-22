@@ -9,10 +9,12 @@
 ## Problem
 
 Two projective-law collector arms now have full, source-verified 1,260-target
-operation-count comparisons. What remains open is a universal completeness
-proof for the implemented weighted law on every divisor/input branch, beyond
-the finite branch checks and successful frozen cohort; a claim that the law
-is complete for arbitrary curves or divisors cannot be made from those runs.
+operation-count comparisons. Exact coefficient certificates and written
+divisor arguments now cover every reachable branch of the implemented
+weighted law under the stated smooth-curve, odd-characteristic, valid-input,
+and nonzero-weight assumptions. Independent proof review and faithful
+formalization remain open; the frozen runs alone do not prove correctness
+for arbitrary inputs.
 
 ## Evidence and uncertainty
 
@@ -65,19 +67,27 @@ is complete for arbitrary curves or divisors cannot be made from those runs.
   certificates for same-`u`, equal-`v` doubling, including `C=0`
   degree one and `B=0` point extraction or identity.
   Shared-support outputs remain open.
-- **Suspected explanation:** None needed for the measured cost. Branch behavior
-  outside the tested finite cases remains a proof obligation.
-- **Missing capability:** A checked universal case proof for the implemented
-  weighted law on the claimed model family. Hardware speed additionally
+- **Derived or proved, 2026-10-22 shared-support follow-up:**
+  The [proof audit](../research/projective_law_followup_20261022/PROOF_AUDIT.md)
+  adds exact weighted point-extraction and `add11` certificates
+  and a written compositional argument for the distinct-`u`,
+  `B=0` cancellation and positive branches. Every reachable
+  implemented branch now has such a certificate/argument under
+  the stated smooth-curve and valid-input assumptions. Faithful
+  formalization and independent proof review remain outstanding.
+- **Suspected explanation:** None needed for the measured cost. Independent
+  review of the written branch composition remains a proof obligation.
+- **Missing capability:** Faithful mechanization or independent mathematical
+  review of the complete branch argument. Hardware speed additionally
   requires isolated timing and the applicable external arithmetic comparator.
 - **What this evidence does not establish:** Finite branch checks and successful
   cohort solves do not prove universal formula completeness or wall speed.
 
 ## What would unblock it
 
-- [ ] Prove the implemented projective addition/doubling case split covers
-  every divisor pair on the stated model family, and independently check the
-  remaining exceptional branches on the exact 42 recorded models.
+- [ ] Independently review and faithfully formalize the now-complete written
+  addition/doubling case map, including exceptional compositions and the
+  divisor-class bridge, on the stated model family.
 - [x] Replay the original 1,260 exact-order one-target workloads with unchanged identities/seeds and matched source rho; retain primitive/native counts and source-answer checks for both measured arms.
 - [ ] If claiming wall speed, run matched L2/A/A timing and the fastest available external arithmetic comparator.
 
@@ -86,10 +96,11 @@ operation-model cost. The third qualifies a hardware-speed claim.
 
 ## Next discriminating step
 
-- **Action or proof obligation:** Formalize the actual implemented case split,
-  including zero denominators and degree drops, and prove its outputs equal
-  Cantor addition for every permitted divisor pair; use an exhaustive small
-  model as a separate regression, not as the proof.
+- **Action or proof obligation:** Have an independent reviewer check the
+  exact certificates and written divisor arguments, then formalize the
+  complete case split, including zero denominators and degree drops, in a
+  pinned algebra/proof environment. Use exhaustive small models as separate
+  regressions, not as the proof.
 - **Inputs and controls:** Existing affine Jacobian, all converted quintics, origin and exceptional divisors, equal-cost source rho, unchanged target cohort.
 - **Execution limits and stop condition:** Preserve the cohort cap, 12 arithmetic prices and native sensitivity band from the [frozen protocol](../research/five_leads_e2e_20261019/protocols/genus2-choice2-v1.md); stop promotion on any mismatched class or scalar.
 - **Outcomes and next actions:** A valid proof would close universal
@@ -152,3 +163,10 @@ Equal-`v` same-`u` doubling and `B=0` shared-support paths remain open.
 output, and weighted-scale certificates for its generic, degree-one,
 and point-extraction or identity paths. Only `B=0` shared-support
 composition paths remain open in the implemented 2+2 case split.
+
+2026-10-22: Distinct-`u`, `B=0` shared support received an exact
+weighted extraction/point-addition certificate and written
+composition through the previously certified helpers. This completes
+the branch-by-branch written proof map, but no faithful Lean theorem
+or independent mathematical review has been recorded. The problem
+remains open at that stronger proof boundary.

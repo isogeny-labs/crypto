@@ -92,6 +92,13 @@ doubling certificate. It checks exact Hermite interpolation for the
 extraction when `B=0`. The divisor-class argument and remaining
 shared-support gap are in `PROOF_AUDIT.md`.
 
+Build `--bin projective-symbolic-22-shared` and redirect stdout to
+`results/symbolic-2plus2-shared.json` for the versioned shared-root
+extraction and weighted `add11` certificate. Its composition with
+the already certified point-doubling and 1+2 branches is written in
+`PROOF_AUDIT.md`. A faithful Lean theorem and independent proof
+review remain outstanding.
+
 `SHA256SUMS` gives hashes for all tracked study inputs, code, records,
 summaries, graphs, PDF, and run package. Verify it from the study directory
 with `sha256sum -c SHA256SUMS`.

@@ -1,8 +1,9 @@
 # Weighted-law proof audit, 2026-10-22
 
 This audit addresses the exact case split in `src/bin/projective_law_gate.rs` on
-the 42 recorded Scholten models. It adds a finite, deterministic audit; it
-does **not** certify universal completeness. The two already measured
+the 42 recorded Scholten models. It adds a finite, deterministic audit; that
+finite audit alone does **not** certify universal completeness. Later sections
+give exact coefficient certificates and written divisor arguments. The two already measured
 1,260-target collector arms and their cost ratios are unchanged.
 
 ## Input and execution
@@ -372,6 +373,46 @@ original divisor. These are written divisor arguments backed
 by exact polynomial identities; no Lean divisor-class theorem
 is claimed.
 
+### Distinct-`u` shared support (`B=0`)
+
+`projective-symbolic-22-shared` checks 27 exact integer-polynomial
+identities in `results/symbolic-2plus2-shared.json`. For distinct
+`u₁,u₂`, the earlier branch lemma gives `dq=q₁-q₂≠0` when `B=0`.
+The checker verifies
+`dq²uᵢ(-dr/dq)=-B` for both quadratics. Thus
+`x₀=-dr/dq` is their common support root. Their other roots are
+`x₂=-q₁-x₀` and `x₄=-q₂-x₀`; all three root formulas are checked
+after clearing `dq` denominators. Write `Z=z₁z₂`. The literal
+weighted branch constructs four points with common `z=Z³dq`,
+each `x` numerator scaled by `Z⁶`, and each `y` numerator scaled
+by `Z¹⁵wᵢ`. The point/scaling equalities prove that these are exactly
+`P₁=(x₀,v₁(x₀))`, `P₂=(x₂,v₁(x₂))`,
+`P₃=(x₀,v₂(x₀))`, and `P₄=(x₄,v₂(x₄))`.
+The checked crossed-ordinate equality shows the code's comparisons
+are exactly `y(P₁)=±y(P₃)`. The curve equation and odd
+characteristic imply one of these for valid inputs; the
+`shared_y_mismatch` return is unreachable.
+
+When the common ordinates are opposite, `P₁+P₃∼2∞`, and the
+sum is `P₂+P₄`. Distinct `u` ensures `x₂≠x₄`, so the literal
+`add11` distinct-point path applies. The same certificate checks
+its weighted output: normalized `u=(X-x₂)(X-x₄)` and `v`
+is the line through both points; two additional exact incidence
+identities check that line. This is the required divisor class.
+
+When the common ordinates agree and are zero, the opposite test
+runs first, so the cancellation argument applies. Otherwise the
+sum is `2P₁+P₂+P₄`. The code calls the certified point-doubling
+law, then `add_point_to_result` on `P₂` and `P₄`. If
+`P₂≠P₁`, adding it to `2P₁` uses the certified generic 1+2
+branch because `u_{2P₁}=(X-x₀)²`; if `P₂=P₁`, it uses the
+certified tripling branch. The final addition is dispatched
+through the certified 1+2, 1+1, or identity cases, including
+its coincident and degree-drop paths. Thus the two shared-support
+output paths follow from exact extraction/point-addition
+identities and the previously proved helper branches. This is
+a written compositional divisor argument, not a Lean theorem.
+
 Proof map: the generic 1+2 coefficient identities are discharged by
 `src/bin/projective_symbolic_12.rs` and its committed result; the
 exceptional cancellation and point-doubling identities are discharged
@@ -381,7 +422,8 @@ in `src/bin/projective_symbolic_triple.rs` and
 `src/bin/projective_symbolic_22_common.rs` and
 `src/bin/projective_symbolic_22_drop.rs` and
 `src/bin/projective_symbolic_22_mixed.rs` and
-`src/bin/projective_symbolic_22_double.rs`. The
+`src/bin/projective_symbolic_22_double.rs` and
+`src/bin/projective_symbolic_22_shared.rs`. The
 divisor-class bridge and weighted identities have no Lean declaration yet.
 A core-only Lean 4.34.1 probe found neither
 `Field` nor `Polynomial` in `Std`; completing a faithful Lean version
@@ -389,15 +431,15 @@ needs a pinned algebra library or local definitions and a verified
 divisor-class representation. No weakened conditional Lean theorem is
 claimed as the full group-law proof.
 
-### Open cases
+### Remaining review boundary
 
-A machine-checkable symbolic reduction is still needed for the
-`B=0` shared-support cancellation and positive composition branches,
-including any degree drops in their nested `add11` and `add12` calls.
-The coprime and same-`u` certificates do not discharge these paths.
-The finite audit and five
-branch-selection lemmas above do not supply these remaining identities.
-In particular, no exhaustive all-divisor
-pair enumeration was run on any of the 42 curves. No counterexample to
-the *implemented* weighted law was found in the stated finite audit;
-absence of a counterexample is not a universal proof.
+The implemented 1+1, 1+2, and 2+2 branch map now has exact
+integer-polynomial output certificates and written divisor arguments
+for each reachable case under the assumptions at the start of this
+audit. This is not a mechanized universal theorem: the divisor-class
+reasoning, branch composition, and smooth-curve hypotheses have no
+faithful Lean declarations, and an independent mathematical review
+has not yet been recorded. In particular, no exhaustive all-divisor
+pair enumeration was run on any of the 42 curves. The finite audit
+alone cannot establish universal completeness; no counterexample to
+the implemented weighted law was found in that audit.
