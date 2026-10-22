@@ -31,24 +31,24 @@ each halving doubles back to $G$. There are 137 binary targets in all.
   see the target. Drawn from `out/coverage.json`, transcribed from the
   `out/*.out` records.])
 
-== Searches (all controls found; 0 target hits)
+== Searches (all controls found; 0 target hits; † = Python snapshot)
 
 #table(columns: (auto, 1fr, auto), inset: 4pt, stroke: 0.4pt,
   [*id*], [*search and scope*], [*targets*],
   [T1], [FreeLIP `zrandomb`, seeds $1 dots 2^24$, NBITS 26/30/62, offsets 0–255], [P-224…P-521 $G_x$],
-  [T2], [FreeLIP, seed = Unix time 1990–1998, offsets 0–63], [same],
-  [T3], [FreeLIP lattice, any seed (blind on P-224/P-256 and on P-384 at NBITS 62)], [$G_x$, $G_y$],
-  [T4], [drand48 continuing the published seed run], [P-224…P-521],
-  [T5], [drand48 chunks, un-reduced $x = X mod p$], [P-224, P-256],
+  [T2], [FreeLIP, seed = Unix time 1990–1998 (offsets 0–63) or one of 52,300 encoded dates], [same],
+  [T3†], [FreeLIP lattice, any seed (blind on P-224/P-256 and on P-384 at NBITS 62)], [$G_x$, $G_y$],
+  [T4†], [drand48 continuing the published seed run], [P-224…P-521],
+  [T5†], [drand48 chunks, un-reduced $x = X mod p$], [P-224, P-256],
   [T6], [GMP 2.0.2 `mpz_random` on glibc/4.3BSD `random()`, seeds $0 dots 2^24$ and 1997–98 times], [P-curves],
   [T7], [MIRACL `bigrand`, two parameter sets, default state and `irand` seeds], [P-curves],
-  [T8], [PARI `random()`/genrand (5 packings); Maple V `rand` (control missed)], [P-curves],
-  [T9], [SHA-1 expansion of the curve seed, counters $0 dots 2^16$], [P-curves],
+  [T8†], [PARI `random()`/genrand (5 packings); Maple V `rand` (control missed)], [P-curves],
+  [T9†], [SHA-1 expansion of the curve seed, counters $0 dots 2^16$], [P-curves],
   [T10], [$G = k P_0$, $x_0 <= 12$, $k <= 2^20$], [P-curves],
-  [T11], [FreeLIP and drand48-family lattice scan], [137 binary],
-  [T12], [PARI / Maple patterns], [137 binary],
+  [T11†], [FreeLIP and drand48-family lattice scan], [137 binary],
+  [T12†], [PARI / Maple patterns], [137 binary],
   [T13], [glibc/4.3BSD `random()`, SysV/BSD/MSVC `rand()`, seeds 1997–98 $t$, $t\/2$], [B-163 seed],
-  [T14], [drand48 family, every short window: covers any one-byte edit], [B-163 seed],
+  [T14†], [drand48 family, every short window: covers any one-byte edit], [B-163 seed],
 )
 
 *Side test.* A preregistered CM-discriminant screen of the skip filter found
@@ -56,9 +56,18 @@ no split. Of the published candidates, 8 of 10 have $f = 1$ (the other two
 have $f = 5$ and $f = 3$); of the skipped, 10 of 11 do. It is superseded by H7
 in `nist_seed_skip_filter_20261017`.
 
+*Python snapshot.* T3–T5, T8, T9, T11, T12 and T14 were computed in Python
+in a standalone session. The repository forbids Python for results, so their
+sources are kept in `snapshot/` as evidence only; a native port is owed before
+they count as repository evidence. The other searches are C or PARI/GP.
+
+*FreeLIP square root.* For $p ≡ 3$ (mod 4) FreeLIP's `zsqrtmod` returns
+$a^((p+1)\/4)$ with no seed input, so the three negated $G_y$ roots were
+chosen by the lost calling code.
+
 *Caveats.* Wall times were not recorded. The invocations in `run.sh` are
-reconstructed from each record's "done:" line; T9 and T12 were re-run and
-match byte for byte. Magma, SIMATH, KANT, ZEN/BigNum and libI were not
+reconstructed from each record's "done:" line; the date-seed search was
+re-run and matches. Magma, SIMATH, KANT, ZEN/BigNum and libI were not
 tested. There has been no independent review.
 
 *What this leaves.* None of these base points or the B-163 seed is

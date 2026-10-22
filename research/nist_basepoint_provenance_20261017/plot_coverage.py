@@ -23,7 +23,7 @@ for j, t in enumerate(tests):
                                edgecolor="white" if not hatch else "#555", lw=0.6))
 ax.set_xlim(0, len(tests)); ax.set_ylim(len(rows), 0)
 ax.set_xticks([j + 0.47 for j in range(len(tests))],
-              [f"{t['id']}\n{t['label']}" for t in tests], rotation=62, ha="right", fontsize=8)
+              [f"{t['id']}{'†' if t['impl'] != 'native' else ''}\n{t['label']}" for t in tests], rotation=62, ha="right", fontsize=8)
 ax.set_yticks([i + 0.45 for i in range(len(rows))], rows, fontsize=9)
 ax.tick_params(length=0)
 for s in ax.spines.values(): s.set_visible(False)
@@ -31,6 +31,8 @@ ax.set_title("Base-point and B-163 seed provenance tests (2026-10-17): no target
              fontsize=10.5, loc="right")
 ax.legend(handles=[Patch(facecolor=STYLE[k][0], hatch=STYLE[k][1], edgecolor="#555", label=LABEL[k]) for k in STYLE],
           loc="lower left", bbox_to_anchor=(0.01, 0.02), fontsize=8.5, frameon=True, facecolor="white", edgecolor="#ccc")
-fig.tight_layout()
+fig.text(0.01, 0.01, "† computed in Python in a standalone session; sources frozen in snapshot/ as evidence (no-Python rule), native port owed",
+         fontsize=7.5, color="#555")
+fig.tight_layout(rect=(0, 0.03, 1, 1))
 fig.savefig(here / "coverage.svg")
 fig.savefig(here / "coverage.png", dpi=150)

@@ -39,24 +39,26 @@ positive control found. Light hatched: some layouts in the family were blind.
 Orange cross: the detector cannot see the target. Drawn by `plot_coverage.py`
 from `out/coverage.json`, which is transcribed from the records named there.*
 
-Every row below found its planted positive controls and no target.
+Every row below found its planted positive controls and no target. Rows
+marked † were computed in Python in a standalone session before this note was
+written; see "Python snapshot" below.
 
 | id | search | targets | scope | record |
 |---|---|---|---|---|
 | T1 | FreeLIP `zrandomb`, small seeds | P-224…P-521 `Gx` | seeds 1…2^24, NBITS ∈ {26, 30, 62}, offsets 0…255; controls P-192, prime239v1 and 2 synthetic | `freelip_brute*.out` |
-| T2 | FreeLIP, seed = Unix time | same | 1990-01-01…1999-01-01, offsets 0…63 | `freelip_ts*.out` |
-| T3 | FreeLIP lattice, any seed | `Gx`, `Gy` | 26-bit limbs of the 107-bit state, read through mod `p` | `freelip_widths.out`, `fl384w62.out` |
-| T4 | drand48, continuing the seed run | P-224…P-521 | after the published seed block, byte/word/lrand48 layouts | `samerun_bp.out` |
-| T5 | drand48 chunks, un-reduced `x = X mod p` | P-224, P-256 | 8-bit chunks with 1–2 extra, 16-bit with 1 extra | `unreduce_scan.out` |
+| T2 | FreeLIP, seed = Unix time or an encoded date | same | 1990-01-01…1999-01-01, offsets 0…63; 52,300 date-encoded seeds (`date_seeds.txt`), offsets 0…255 | `freelip_ts*.out`, `fl_list.out` |
+| T3† | FreeLIP lattice, any seed | `Gx`, `Gy` | 26-bit limbs of the 107-bit state, read through mod `p` | `freelip_widths.out`, `fl384w62.out` |
+| T4† | drand48, continuing the seed run | P-224…P-521 | after the published seed block, byte/word/lrand48 layouts | `samerun_bp.out` |
+| T5† | drand48 chunks, un-reduced `x = X mod p` | P-224, P-256 | 8-bit chunks with 1–2 extra, 16-bit with 1 extra | `unreduce_scan.out` |
 | T6 | GMP 2.0.2 `mpz_random` | P-224…P-521 `Gx`, `Gy` | glibc / 4.3BSD `random()`, 32- and 64-bit limbs, seeds 0…2^24 and 1997–98 `t`, `t/2`, depth 2048 | `gmp_bp.out` |
 | T7 | MIRACL `bigrand` | same | `(37,24,14)` and `(21,6,8)`; default state offsets < 2^20; `irand` seeds 0…2^22 and run times ±1 day; `x + j`, `j < 256` | `miracl_bp.out` |
-| T8 | PARI `random()`/genrand; Maple V `rand` | same | 5 packings, seed-agnostic, chain of ≥ 3 outputs | `libs_bp.out` |
-| T9 | SHA-1 expansion of the curve seed | same | X9.62 style, counters 0…2^16, mod `p` or truncated | `hash_bp.out` |
+| T8† | PARI `random()`/genrand; Maple V `rand` | same | 5 packings, seed-agnostic, chain of ≥ 3 outputs | `libs_bp.out` |
+| T9† | SHA-1 expansion of the curve seed | same | X9.62 style, counters 0…2^16, mod `p` or truncated | `hash_bp.out` |
 | T10 | `G = kP0` from the smallest-`x` points | same | `x0 ≤ 12`, `k ≤ 2^20` | `smallk.out` |
-| T11 | FreeLIP and drand48-family lattice | 137 binary targets | as the earlier scan | `scan_bin.out`, `scan_k.out` |
-| T12 | PARI / Maple patterns | 137 binary targets | 6 patterns | `libs_bin.out` |
+| T11† | FreeLIP and drand48-family lattice | 137 binary targets | as the earlier scan | `scan_bin.out`, `scan_k.out` |
+| T12† | PARI / Maple patterns | 137 binary targets | 6 patterns | `libs_bin.out` |
 | T13 | C library generators | B-163 seed | glibc and 4.3BSD `random()`, SysV, BSD and MSVC `rand()`; seeds 1997–98 `t`, `t/2`; depth 2048; byte and 16-bit layouts, both byte orders | `b163_brute.out.gz` |
-| T14 | drand48 family, one edit | B-163 seed | every short window at widths {8, 15, 16, 24, 31, 32}, which covers any single-byte substitution | `b163_edit.out` |
+| T14† | drand48 family, one edit | B-163 seed | every short window at widths {8, 15, 16, 24, 31, 32}, which covers any single-byte substitution | `b163_edit.out` |
 
 **Where the detector is blind.** These cells are untested, not negative:
 
@@ -71,6 +73,28 @@ Every row below found its planted positive controls and no target.
 **T13 record.** `b163_brute.out.gz` holds 23,330 lines. Every hit line is a
 planted control. Several 15-bit-generator seeds reproduce the same planted
 bytes. The 12 target layouts have 0 hits.
+
+## Python snapshot
+
+[`AGENTS.md`](../../AGENTS.md) ("Implementation language: no Python") forbids
+Python for research result generation here. Eight searches (T3–T5, T8, T9,
+T11, T12, T14) were written and run in Python in a standalone session before
+this note existed. Their sources are kept in `snapshot/` as frozen evidence of
+how the records in `out/` were made, as that section requires, and are not
+repository tooling: `run.sh` does not run them, and nothing here should
+extend them. Their results are observations until a native (Rust or C) port
+reproduces them. That port is owed before any of them is cited as repository
+evidence. The other searches (T1, T2, T6, T7, T10, T13) and the target
+construction are C or PARI/GP and re-run with `run.sh`. `plot_coverage.py`
+only lays out recorded values.
+
+## FreeLIP square root (side check)
+
+For `p ≡ 3 (mod 4)`, FreeLIP's `zsqrtmod` (lip.c) returns `a^((p+1)/4)` and
+takes no seed or generator input. Three of the six FreeLIP base points use the
+negated root, so the calling code, which is lost, chose the sign. The
+seed-parity fit for that sign (even FreeLIP seed, standard root; 6 of 6) stays
+a post-hoc lead.
 
 ## CM-discriminant screen of the skip filter (side test)
 
@@ -95,9 +119,10 @@ supersedes this screen and agrees with it.
 - **Wall times were not recorded.** The scope of each search is what its
   "done:" line states.
 - **Some invocations are reconstructed.** The ones in `run.sh` are rebuilt
-  from those lines. T9 and T12 were re-run from this directory and match
-  their records byte for byte. `fl384w62.out` and `libs_bin.out` were first
-  produced in this change.
+  from those lines. The date-seed search (`fl_list.out`) was re-run from
+  `run.sh` and matches its record. `fl384w62.out`, `libs_bin.out` and
+  `fl_list.out` were first recorded on 2026-10-22; the first two are Python
+  snapshot runs.
 - **T13 and T14 cover only the drand48 family and the five C generators.** A
   B-163 seed from another source, or with more than one edit, is untested.
   T14 assumes the 48-bit state with 24 bits of margin.
@@ -124,13 +149,13 @@ person who might know.
 
 | file | what it is |
 |---|---|
-| `src/` | every search (C, Python, GP) and the binary target lists it reads |
-| `lib/` | shared Python from the earlier study: curve constants, drand48, FreeLIP, lattice scan |
+| `src/` | the native searches (C, PARI/GP), the binary target lists and the date-seed list |
+| `snapshot/` | frozen Python sources of the † searches and their shared library; evidence, not tooling |
 | `out/` | records; `coverage.json` is the figure's transcription |
 | `coverage.svg`, `coverage.png`, `plot_coverage.py` | figure, 150 dpi render, plotting-only source |
 | `report.typ`, `report.pdf` | PDF report with the figure |
-| `run.sh` | re-runs any step into a scratch directory, never into `out/` |
+| `run.sh` | re-runs any native step into a scratch directory, never into `out/` |
 
-Reproduce: `research/nist_basepoint_provenance_20261017/run.sh t9 t12`
-(seconds). With no arguments it runs everything. Needs gcc, GMP, PARI/GP,
-gmpy2 and fpylll.
+Reproduce: `research/nist_basepoint_provenance_20261017/run.sh t2d` (about
+25 s on 4 cores). With no arguments it runs every native step. Needs gcc, GMP
+and PARI/GP.
