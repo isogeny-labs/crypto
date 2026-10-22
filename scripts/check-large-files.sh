@@ -39,7 +39,7 @@ while IFS= read -r -d '' meta && IFS= read -r -d '' path; do
     printf '%12d bytes  %s\n' "$size" "$path"
     over=$((over + 1))
   fi
-done < <(git diff --raw -z --no-abbrev --no-renames --diff-filter=AM "$base" "$head")
+done < <(git diff --raw -z --no-abbrev --no-renames --diff-filter=AMT "$base" "$head")
 
 if [ "$over" -gt 0 ]; then
   echo "check-large-files: $over file(s) over $limit bytes. Push them with 'crypto store push' and commit the store/index.json entry (AGENTS.md §13), or pack a raw run tree as runs.tar.xz (§13a)." >&2
