@@ -15,6 +15,8 @@ mod fixed;
 mod large_prime;
 #[path = "ic/params.rs"]
 mod params;
+#[path = "ic/plan.rs"]
+mod plan;
 #[path = "ic/price.rs"]
 mod price;
 #[path = "ic/prime.rs"]
@@ -91,6 +93,8 @@ enum Action {
     Corpus(corpus::CorpusArgs),
     /// Measure the degree a Weil-descent system actually reaches, against the degree a semi-regular system of the same shape would, with the operation count, wall time and peak footprint beside it.
     Descent(descent::DescentArgs),
+    /// The configuration the measured evidence says to run on a curve: every pipeline stage with its rule, reason and sources, and the expected gap to the matched rho.
+    Plan(plan::PlanArgs),
     /// Run index-calculus configurations end to end and compare them: plug a factor base, a target source, a decomposition oracle, a polynomial solver and a relation matrix together, and see every stage's cost in one unit.
     Bench(bench::BenchArgs),
     /// Price every decomposition oracle on R and on R − P + Q pairwise: does a solver charge the same for a swapped target?
@@ -153,6 +157,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Boundary(args)) => boundary::run(args.clone(), cli.json),
         Some(Action::Corpus(args)) => corpus::run(args.clone()),
         Some(Action::Descent(args)) => descent::run(args.clone(), cli.json),
+        Some(Action::Plan(args)) => plan::run(args.clone(), cli.json),
         Some(Action::Bench(args)) => bench::run(args.clone(), cli.json),
         Some(Action::Swap(args)) => boundary::swap(args.clone(), cli.json),
         Some(Action::Rho(args)) => rho::run(args.clone(), cli.json),
@@ -238,6 +243,7 @@ fn linear_algebra_summary(la: &Value) -> String {
 
 fn display(report: &Value) {
     match report["operation"].as_str() {
+        Some("plan") => plan::display(report),
         Some("inspect") => {
             println!(
                 "Curve: {}\nInspection: {}",
