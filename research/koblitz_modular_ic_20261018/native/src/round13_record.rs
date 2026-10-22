@@ -185,3 +185,6 @@ pub fn record(round: &Path) {
     round02::save(round, "ledger.json", &ledger);
     println!("Round13:ordinary500/580 complete under written bridges,all6 projected images zero;four saturation stages,full saturation open;63 new named Lean proofs,{audited} audited");
 }
+
+#[path = "round16_record.rs"]
+pub(crate) mod round16;

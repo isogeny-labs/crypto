@@ -1,5 +1,7 @@
 //! Certified products of the actual expanded K-linear forms.
 use super::*;
+#[path = "repair16.rs"]
+pub(crate) mod repair16;
 fn coefficients(rel: &Value) -> Vec<Vec<usize>> {
     let mut equations = BTreeSet::new();
     for bit in 0..360 {

@@ -666,3 +666,36 @@ Acceptance tests remain separate:
 
 Each possible positive result discharges only its named construction
 obligation. IC timing, solver cost and efficiency assessment remain separate.
+
+
+## Round16: explicit incidence, cover bases and depth6 separators
+
+[Round16](../research/koblitz_modular_ic_20261018/rounds/16/REPORT.md)
+exports F2 Tate order11/oriented7 incidence equations and the diamond
+quadratic twist of the level77 carrier. Independent actual7-torsion
+sets over q³ agree through F32, with10 positive points for each sign.
+The smooth modular normalization has genus61 under the written stabilizer
+bridge; proper normalization and the Koblitz-factor evaluator remain open.
+The actual two Frobenius factors have primitive Bezout denominator704
+and gcd degree6 modulo11. A rational projector is therefore not a
+unit-at11 subgroup transfer; arbitrary integral correspondences remain open.
+
+G16 gives four actual diagonal F32 covers with factor section bases.
+Graphs0/2 have separable degree99225; graphs1/3 have inseparable degree50176.
+Kernel actions, original-divisor trivializations,243 target sections and
+proper polarized embeddings remain open. The odd cover is the next
+explicit theta-descent input, not an evaluated target embedding.
+
+Q21 proves a source-bound quartic belongs to the h-saturation with depth6
+and rejects all four old Q17 models, without a ramification restriction.
+Q22 retains all prior constraints plus its radical boundary consequence
+and finds four new finite survivors. Full saturation remains open; the
+survivors are not yet classified as genuine or false closure points.
+Sixty-three new named Lean results certify residuals and actual finite
+exports; global modular/abelian geometry and native semantics remain written.
+
+Next acceptance tests: proper level77 normalization and integral map with
+an explicit11-primary kernel; sparse theta-kernel descent on the odd cover;
+another actual separator or genuine arc for Q22; source fibers/images for
+Round15's ordinary pushed460/367 supports. Earlier signed divisors/ranks
+stay frozen. No IC cost assessment or rank promotion occurs in Round16.

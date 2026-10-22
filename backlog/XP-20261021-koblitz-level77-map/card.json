@@ -3,23 +3,44 @@
   "id": "XP-20261021-koblitz-level77-map",
   "title": "Construct and verify the level77 n=5 modular-factor map",
   "created": "2026-10-21",
-  "authors": ["Koblitz modular carrier research"],
+  "authors": [
+    "Koblitz modular carrier research"
+  ],
   "status": "blocked",
-  "status_note": "The CM carrier construction and finite checks exist. An explicit Gamma_H curve/model and factor-map driver do not. Commands deliberately fail closed until those implementations and an independent checker are committed. No run, lease or funding is scheduled.",
-  "blocked_on": ["problem:problems/koblitz-modular-carrier-transfer.md explicit level77 equations and subgroup correspondence"],
+  "status_note": "Round16 supplies explicit affine level77 incidence and diamond-twist circuits, with independent positive F32 torsion controls. Proper normalization and an integral factor-map driver/checker remain unimplemented. Primitive sign-projector denominator704 is divisible by11; no subgroup injection is inferred. No run, lease or funding is scheduled.",
+  "blocked_on": [
+    "problem:problems/koblitz-modular-carrier-transfer.md proper level77 normalization and integral subgroup correspondence"
+  ],
   "links": {
     "lead": "research/koblitz_modular_ic_20261018/rounds/15/CM.md",
-    "notes": ["research/koblitz_modular_ic_20261018/rounds/15/PROOF_MAP.md"],
-    "prs": [2215]
+    "notes": [
+      "research/koblitz_modular_ic_20261018/rounds/15/PROOF_MAP.md",
+      "research/koblitz_modular_ic_20261018/rounds/16/CM.md"
+    ],
+    "prs": [
+      2215
+    ]
   },
   "question": "Can the genus61 level77 CM carrier supply an explicit F2 map preserving the n=5 Koblitz subgroup?",
   "decision_value": "A verified map turns the new lower-level carrier from an existence construction into an executable divisor-transfer candidate. A nonunit subgroup kernel forces a different integral correspondence or quotient. Failure to construct a model within a future frozen cap records an implementation/resource limit rather than nonexistence. No IC speed conclusion follows from any of these outcomes alone.",
-  "protocol": {"path": null, "blob": null},
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
   "code": {
     "repo": "crypto",
     "commit": null,
     "branch": "codex/koblitz-modular-ic-20261018",
-    "build": [["cargo", "build", "--release", "--locked", "--manifest-path", "research/koblitz_modular_ic_20261018/native/Cargo.toml"]]
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "research/koblitz_modular_ic_20261018/native/Cargo.toml"
+      ]
+    ]
   },
   "resources": {
     "cpus": 1,
@@ -30,23 +51,53 @@
     "est_wall_hours": null,
     "notes": "Provisional local capacity envelope only. No cost estimate exists before the model/correspondence algorithm and its pilot are specified."
   },
-  "run": {"argv": ["false"], "env": {}, "timeout_per_shard_s": 1200},
-  "shards": {"count": 1, "scheme": "single", "params": {}, "stop": "all"},
-  "checkpoint": {"file": null, "resume_flag": null},
+  "run": {
+    "argv": [
+      "false"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 1200
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
   "outputs": {
     "result_schema": "koblitz.level77-map/proposed-v1",
-    "verify": ["false"],
+    "verify": [
+      "false"
+    ],
     "land": "research/koblitz_modular_ic_20261018"
   },
   "cairn": {
     "mode": "lab-task",
     "space": "unconfigured",
-    "tasks": ["XP-20261021-koblitz-level77-map"],
+    "tasks": [
+      "XP-20261021-koblitz-level77-map"
+    ],
     "ttl_s": 86400,
-    "env": {"name": "koblitz-level77-map", "recipe": "No published executor. Freeze an implemented model/map/checker protocol before ready promotion."},
-    "exec": {"cpus": 1, "memory_mb": 16384, "timeout_s": 1200, "sandbox": "auto", "publish": "runs/XP-20261021-koblitz-level77-map"},
+    "env": {
+      "name": "koblitz-level77-map",
+      "recipe": "No published executor. Freeze an implemented model/map/checker protocol before ready promotion."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 16384,
+      "timeout_s": 1200,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261021-koblitz-level77-map"
+    },
     "notes": "No remote execution or funding action is authorized or claimed by this card.",
-    "funding": {"units": 0, "rationale": "Unscheduled implementation lead; prioritize only after a concrete driver, independent checker and cost pilot exist."}
+    "funding": {
+      "units": 0,
+      "rationale": "Unscheduled implementation lead; prioritize only after a concrete driver, independent checker and cost pilot exist."
+    }
   },
   "owner_hint": "Koblitz modular geometry"
 }

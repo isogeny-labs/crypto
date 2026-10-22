@@ -1,24 +1,28 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [15](rounds/15/README.md), with its
-[report](rounds/15/REPORT.md), [PDF](rounds/15/report.pdf),
-[CM construction](rounds/15/CM.md), [theta descent](rounds/15/THETA.md),
-[proof map](rounds/15/PROOF_MAP.md), [ledger](rounds/15/ledger.json)
-and exact replay. Direct odd CM characters give level7p carriers of genus61
-for n=5 and45589 for n=131, with exact Euler/coset checks. A diamond
-quadratic twist supplies the required n=131 sign. Actual maps and subgroup
-injection are open; the global construction is written, not fully Lean.
+The current round is [16](rounds/16/README.md), with its
+[report](rounds/16/REPORT.md), [PDF](rounds/16/report.pdf),
+[CM equations](rounds/16/CM.md), [cover sections](rounds/16/THETA.md),
+[saturation](rounds/16/SATURATION.md), [proof map](rounds/16/PROOF_MAP.md),
+[ledger](rounds/16/ledger.json) and exact replay.
 
-Actual theta corrections give all four quotients a3lambda target P242,
-with243 sections; section bases and proper equations remain open. New
-coupled norms have ordinary pushed degrees460/367, with exact factors but
-source fibers/images uncomputed. All four actual Q17 models have no h=t
-first jet; ramified arcs and full saturation remain open. Fifty-eight new
-named Lean results cover relevant identities and finite certificates.
-Round14's complete eight divisors and ranks remain unchanged. No IC cost
-or efficiency assessment is supplied.
+The level77 genus61 carrier has explicit F2 affine incidence equations and
+a derived diamond twist, with nonvacuous independent torsion checks through
+F32. Proper normalization and Koblitz-factor maps are open; the simple
+Frobenius sign-projector denominator704 fails integrality at11. Four
+polarized diagonal F32 covers now have explicit factor section bases,
+but243 target sections and proper equations still need kernel descent.
+
+A depth6 quartic separator excludes all four old Q17 boundary points for
+any ramification; four new checked Q22 survivors keep full saturation open.
+Sixty-three new named Lean results cover identities and actual finite data.
+Round15's new norm fibers/images and Round14's ranks remain unchanged.
+No IC efficiency verdict is supplied.
 
 Earlier evidence stays frozen:
+
+- [Round 15](rounds/15/README.md): direct level7p CM carriers, rational
+  theta descent, new coupled norms and first-jet obstructions.
 
 - [Round 01](REPORT.md): modular signed-character carrier and cyclic-cover bound.
 - [Round 02](rounds/02/README.md): explicit Klein transfer, geometric relations,

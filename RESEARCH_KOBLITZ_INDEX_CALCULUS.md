@@ -11,25 +11,31 @@ pre-registered hypotheses)
 *On index calculus algorithms for subfield curves*, SAC 2020
 (ePrint 2020/1315).
 
-**Modular and low-genus carrier follow-up (2026-10-21):**
-[Round15](research/koblitz_modular_ic_20261018/rounds/15/REPORT.md)
-constructs direct odd CM characters of level7p. Exact Euler products and
-independent S,T coset enumeration give candidate carriers of genus61 for
-n=5 and45589 for n=131; a diamond quadratic twist supplies the latter's
-required sign. The modular/Jacobian/descent bridge is written. Explicit
-carrier equations, correspondences and subgroup injection remain open.
+**Modular and low-genus carrier follow-up (2026-10-22):**
+[Round16](research/koblitz_modular_ic_20261018/rounds/16/REPORT.md)
+constructs explicit F2 affine level77 incidence circuits and their diamond
+twist. Exact independent torsion enumeration through F32 agrees with both;
+the smooth compact genus61 interpretation remains a written modular bridge.
+Proper normalization and the integral Koblitz-factor correspondence remain
+open. The actual sign-factor Bezout denominator704 is divisible by11,
+blocking the simple integral Frobenius coprimality projector.
 
-Actual theta-class corrections and invertible Cartier I-C give a symmetric
-principal bundle and3lambda target P242 under the written theta-group
-bridge. Its243 sections are not yet constructed. Two new coupled norms
-have ordinary pushed degrees460 and367, with exact factors but new source
-fibers/images open. All four Q17 models have no h=t first jet; this does
-not exclude ramified arcs or prove full saturation. Fifty-eight new named
-Lean results cover universal identities and actual finite certificates.
-[Round14](research/koblitz_modular_ic_20261018/rounds/14/REPORT.md)'s eight
-complete signed divisors and principal/deck nonzero ranks15/15 and18/17
-remain frozen. See the [construction problem](problems/koblitz-modular-carrier-transfer.md).
-The user assesses IC implications; no cost or efficiency verdict is supplied.
+Four determinant19 polarizations have explicit diagonal F32 finite covers
+and factor section bases. Graphs0/2 admit the selected separable odd cover
+of degree99225; graphs1/3 have an inseparable cover of degree50176.
+Theta kernel actions,243 descended target sections and proper equations
+remain open. A source-bound quartic with h-membership depth6 excludes all
+four old Q17 boundary models for arbitrary ramification. Four new checked
+Q22 survivors keep full saturation and proper quotient embeddings open.
+Sixty-three new named Lean results cover residuals and finite certificates.
+
+[Round15](research/koblitz_modular_ic_20261018/rounds/15/REPORT.md)'s
+level7p CM carriers include genus45589 for n=131 after a diamond twist.
+Its new norms of ordinary pushed degrees460/367 still need source fibers
+and images. [Round14](research/koblitz_modular_ic_20261018/rounds/14/REPORT.md)'s
+eight complete signed divisors and principal/deck nonzero ranks15/15 and
+18/17 remain frozen. See the [construction problem](problems/koblitz-modular-carrier-transfer.md).
+No IC efficiency verdict is supplied; the user assesses those implications.
 
 ## The setting
 

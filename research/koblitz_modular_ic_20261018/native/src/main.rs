@@ -39,7 +39,9 @@ mod hash {
         pub use crate::sha256_impl::*;
     }
 }
+mod carrier16;
 mod census;
+mod cm16;
 mod cmray15;
 mod cofactor07;
 mod collision10;
@@ -48,6 +50,7 @@ mod cusps14;
 mod delpezzo;
 mod delpezzo_conic;
 mod divisors10;
+mod exact16;
 mod forward07;
 mod gluing;
 #[path = "../../../../src/cryptanalysis/identity_certificate.rs"]
@@ -68,6 +71,7 @@ mod proofs15;
 mod quotient_geometry;
 mod quotients06;
 mod quotients07;
+mod ramify16;
 mod relations08;
 mod relations11;
 mod relations14;
@@ -91,7 +95,10 @@ mod round13_record;
 mod round_record;
 mod saturation10;
 mod saturation11;
+mod sections16;
+mod separator16;
 mod ss10;
+mod valuation16;
 
 fn pow(mut a: u64, mut k: u64, p: u64) -> u64 {
     let mut b = 1;
@@ -368,6 +375,64 @@ fn run(out: &std::path::Path) {
 }
 fn main() {
     let args10: Vec<String> = std::env::args().collect();
+    if args10.get(1).map(String::as_str) == Some("--round16-carrier") {
+        carrier16::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round16-repair") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::repair16::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round16-separators") {
+        separator16::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round16-valuations") {
+        valuation16::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round16-ramify") {
+        ramify16::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round16-sections") {
+        sections16::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round16-cm") {
+        cm16::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    match args10.get(1).map(String::as_str) {
+        Some("--record-round16") => {
+            round13_record::round16::record(std::path::Path::new(&args10[2]));
+            return;
+        }
+        Some("--round16-check-identities") => {
+            round13_record::round16::identities(std::path::Path::new(&args10[2]), false);
+            return;
+        }
+        Some("--round16-verify-sources") => {
+            round13_record::round16::verify_sources(std::path::Path::new(&args10[2]), None);
+            return;
+        }
+        Some("--round16-verify-history") => {
+            round13_record::round16::verify_sources(
+                std::path::Path::new(&args10[2]),
+                Some(&args10[3]),
+            );
+            return;
+        }
+        Some("--round16-manifest") => {
+            round13_record::round16::manifest(
+                std::path::Path::new(&args10[2]),
+                std::path::Path::new(&args10[3]),
+                &args10[4],
+            );
+            return;
+        }
+        _ => {}
+    }
     match args10.get(1).map(String::as_str) {
         Some("--record-round15") => {
             round13_record::round15::record(std::path::Path::new(&args10[2]));
