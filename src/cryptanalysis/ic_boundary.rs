@@ -829,6 +829,9 @@ fn powmod(mut a: u64, mut e: u64, m: u64) -> u64 {
 /// most `m`.  The inverse is unique, so the result is the one the
 /// 128-bit form returned.
 pub fn invmod(a: u64, m: u64) -> Option<u64> {
+    if let Ok(m32) = u32::try_from(m) {
+        return invmod_u32((a % m) as u32, m32).map(u64::from);
+    }
     let (mut r0, mut r1) = (m, a % m);
     // `r0 ≡ ±t0·a`, `r1 ≡ ∓t1·a (mod m)`; `neg0` is the sign of `t0`'s
     // coefficient.  Initially `m ≡ 0·a` and `a ≡ +1·a`.
@@ -849,6 +852,25 @@ pub fn invmod(a: u64, m: u64) -> Option<u64> {
     } else {
         t0 % m
     })
+}
+
+/// [`invmod`] for a modulus that fits 32 bits: the same steps on 32-bit
+/// words, whose division is the shorter instruction.  Remainders and
+/// coefficient magnitudes stay at most `m`, so nothing overflows.
+fn invmod_u32(a: u32, m: u32) -> Option<u32> {
+    let (mut r0, mut r1) = (m, a);
+    let (mut t0, mut t1) = (0u32, 1u32);
+    let mut neg0 = true;
+    while r1 != 0 {
+        let q = r0 / r1;
+        (r0, r1) = (r1, r0 - q * r1);
+        (t0, t1) = (t1, t0 + q * t1);
+        neg0 = !neg0;
+    }
+    if r0 != 1 {
+        return None;
+    }
+    Some(if neg0 { (m - t0) % m } else { t0 % m })
 }
 
 // ── Incremental Gauss–Jordan over Z/rZ ─────────────────────────────
@@ -1783,7 +1805,13 @@ fn rho_canon<G: CountedGroup, C: RhoClasses<G>>(
     if mu == 1 {
         (rep, a, b, false)
     } else {
-        (rep, mulmod(a, mu, r), mulmod(b, mu, r), mu == r - 1)
+        // `x·(r − 1) ≡ −x`: a negation costs a subtraction, not two
+        // word divisions, and gives the same reduced value.
+        if mu == r - 1 && a < r && b < r {
+            (rep, negmod(a, r), negmod(b, r), true)
+        } else {
+            (rep, mulmod(a, mu, r), mulmod(b, mu, r), mu == r - 1)
+        }
     }
 }
 
@@ -2003,9 +2031,11 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
         self.recent.clear();
         let mut last_escape: Option<u64> = None;
         let mut len = 0u64;
+        // `mix(key(x))`, carried from the previous step's tests.
+        let mut hash = mix(g.key(&x));
         loop {
             // One step, with the look-ahead when it is on.
-            let j0 = self.index(&x);
+            let j0 = ((hash >> 24) % jump_count as u64) as usize;
             let mut tried = 0usize;
             let (y, ya, yb) = loop {
                 let j = (j0 + tried) % jump_count;
@@ -2041,9 +2071,9 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             if g.is_identity(&x) {
                 return WalkEnd::Lost;
             }
+            let mut key = g.key(&x);
             // A short cycle: this point is one of the last `window`.
             if self.window > 0 {
-                let key = g.key(&x);
                 if let Some(pos) = self.recent.iter().position(|e| e.0 == key) {
                     // The cycle is the `c` most recent points.
                     let c = self.recent.len() - pos;
@@ -2084,13 +2114,15 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                     if g.is_identity(&x) {
                         return WalkEnd::Lost;
                     }
+                    key = g.key(&x);
                 }
-                self.recent.push_back((g.key(&x), x, a, b));
+                self.recent.push_back((key, x, a, b));
                 if self.recent.len() > self.window {
                     self.recent.pop_front();
                 }
             }
-            if mix(g.key(&x)) & self.dp_mask == 0 {
+            hash = mix(key);
+            if hash & self.dp_mask == 0 {
                 return WalkEnd::Distinguished(x, a, b);
             }
             if len > self.walk_cap {
