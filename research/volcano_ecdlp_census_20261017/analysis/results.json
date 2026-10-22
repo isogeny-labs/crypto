@@ -31,6 +31,33 @@
    }
   }
  },
+ "crater_ic_by_model": {
+  "icv1-fp26-tm6998-a41c0795": {
+   "families": [
+    "ctl"
+   ],
+   "mean_S": 66.99643708814081,
+   "n_rows": 1000,
+   "se": 0.8664546160901522
+  },
+  "icv1-fp26-tm6998-d53b367d": {
+   "families": [
+    "ctl"
+   ],
+   "mean_S": 72.58885449660663,
+   "n_rows": 1000,
+   "se": 0.9659732601693322
+  },
+  "icv1-fp26-tm6998-eeb6174a": {
+   "families": [
+    "D",
+    "N"
+   ],
+   "mean_S": 57.437867047569014,
+   "n_rows": 2000,
+   "se": 0.49729724415322346
+  }
+ },
  "curve_effect": {
   "V1|bsgs": {
    "F": null,
@@ -24151,8 +24178,38 @@
    }
   }
  },
+ "ic_vs_rho_cubic_crater": {
+  "families": [
+   "D",
+   "N"
+  ],
+  "n_pairs": 2000,
+  "prices": {
+   "0.0": {
+    "ci95": [
+     82.73622338808065,
+     87.04091878711725
+    ],
+    "ratio_ic_over_rho_cubic": 84.86221714641296
+   },
+   "0.1": {
+    "ci95": [
+     90.40697081296793,
+     95.16825051156752
+    ],
+    "ratio_ic_over_rho_cubic": 92.75961619096948
+   },
+   "1.0": {
+    "ci95": [
+     127.58124082847077,
+     134.6375437486628
+    ],
+    "ratio_ic_over_rho_cubic": 131.05744514971846
+   }
+  }
+ },
  "inputs_sha256": {
-  "AMENDMENTS.md": "deb547a3b7a7a269810f4b0dd7c76017d553ddb291e9f88ff3be17f7c8f8e948",
+  "AMENDMENTS.md": "48e3680b2c15724f58c785bb3aedda23b0f486ec0d3214a3b4502e618fabb2a8",
   "ANALYSIS_PLAN.md": "2ef801fc4c8fed3b367e0a55ce0c903013752ebcc1a836a6f83ca3ed9dd1fb8c",
   "FROZEN.json": "345028509a93be46f3b0867d33af90350a9dde001d90bbc51dd1771a5a98ed73",
   "census/V1/transport/D.jsonl": "a054b9c492eae6e55e83894f80be51ad4077b3daa94bf152e6454ab43ee7b534",
@@ -30349,7 +30406,7 @@
   }
  },
  "reps": 10000,
- "runtime_s": 365.68026208877563,
+ "runtime_s": 441.2256877422333,
  "schema": "volcano-census.analysis/v1",
  "seeds": {
   "bootstrap": 20261022,

@@ -396,6 +396,31 @@ def positive_control(d, V3_crater, reps):
     return out
 
 
+def crater_rho_cubic_gap(d, crater, reps):
+    """A3/F1: IC over the strongest rho on the V3 j = 0 crater (rho-cubic), D + N pairs, 0 / 0.1 / 1 GAE; row bootstrap (one curve)."""
+    x = d[(d.volcano == "V3") & (d.vertex == crater) & d.family.isin(["D", "N"]) & d.arm.isin(["ic", "rho-cubic"])]
+    key = ["spec", "workload_id", "target_index", "round"]
+    a = x[x.arm == "ic"].set_index(key)
+    b = x[x.arm == "rho-cubic"].set_index(key)
+    j = a[["S", "total_gae", "unc_total"]].join(b[["S", "total_gae", "unc_total"]], how="inner", lsuffix="_ic", rsuffix="_rho").reset_index()
+    cols = [j.S_ic * (1 + p * j.unc_total_ic / j.total_gae_ic) for p in PRICES] + [j.S_rho * (1 + p * j.unc_total_rho / j.total_gae_rho) for p in PRICES]
+    sums, cnts, osum, ocnt = boot_sums(np.zeros(len(j), int), np.zeros(len(j), int), np.column_stack(cols), reps, SEED_BOOT)
+    out = {"n_pairs": int(len(j)), "families": ["D", "N"], "prices": {}}
+    for pi, p in enumerate(PRICES):
+        rep = sums[:, 0, pi] / sums[:, 0, pi + 3]
+        out["prices"][str(p)] = {"ratio_ic_over_rho_cubic": float(osum[0, pi] / osum[0, pi + 3]), "ci95": pct(rep, 2.5, 97.5)}
+    return out
+
+
+def crater_ic_by_model(d, crater):
+    """A3/F2: IC mean S (and SE) on each Weierstrass model of the V3 crater (D/N model and the two isomorphic re-scalings)."""
+    x = d[(d.volcano == "V3") & (d.vertex == crater) & (d.arm == "ic")]
+    out = {}
+    for slug, g in x.groupby("curve_slug"):
+        out[slug] = {"families": sorted(g.family.unique().tolist()), "n_rows": int(len(g)), "mean_S": float(g.S.mean()), "se": float(g.S.std(ddof=1) / np.sqrt(len(g)))}
+    return out
+
+
 def ic_vs_rho(d, V, reps, depth):
     """PLAN s9: per level mean S(ic)/mean S(rho-neg) at 0 / 0.1 / 1 GAE per uncharged operation."""
     x = d[(d.volcano == V) & d.family.isin(ISO) & d.arm.isin(["ic", "rho-neg"])]
@@ -645,6 +670,8 @@ def main():
     # s8 / s9
     R["wall_admission"] = {V: wall_admission(d, V, reps) for V in ["V1", "V2", "V3"]}
     R["ic_vs_rho"] = {V: ic_vs_rho(d, V, reps, depth[V]) for V in ["V1", "V2", "V3"]}
+    R["ic_vs_rho_cubic_crater"] = crater_rho_cubic_gap(d, crater3, reps)
+    R["crater_ic_by_model"] = crater_ic_by_model(d, crater3)
     log("ic vs rho done")
 
     # per-vertex means for diagrams, and curve inventory

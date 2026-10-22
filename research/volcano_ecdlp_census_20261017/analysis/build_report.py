@@ -18,6 +18,11 @@ w("Study `research/volcano_ecdlp_census_20261017/`; plan `PLAN.md`, analysis pla
   "Every number below is read from `analysis/results.json` (written by `analysis/analyze.py`, 10,000 bootstrap or permutation replicates, seeds 20261022 and 20261023). "
   "**Status: observed, not established.** No speedup is claimed. Independent validation (`VALIDATION.json`) has not happened yet; this report is the analysis, not its validation.\n")
 
+w("## Erratum (A3, after independent validation)\n")
+w("The independent validator recomputed every number here (192 of 192 agree) and found two material reporting errors and six minor ones in the first version of this text; only wording changes, no estimand, margin, test, threshold or number. Corrected in place below and recorded in `AMENDMENTS.md` A3.\n")
+w("- **F1 (material).** The V3 j = 0 crater row of section 7 and the last paragraph of section 9 compared IC with `rho-neg`. On that curve the matched, strongest rho is `rho-cubic`; IC / `rho-cubic` is " + " / ".join(f"{R['ic_vs_rho_cubic_crater']['prices'][p]['ratio_ic_over_rho_cubic']:.1f}x" for p in PR) + " at 0 / 0.1 / 1 GAE. The sentence that IC's gap to rho is smaller on that curve is withdrawn.")
+w("- **F2 (material).** The 'IC is 22 to 25% cheaper on the crater' observation and its automorphism explanation are withdrawn: the crater's own isomorphic re-scalings cost IC about 67 and 73 against 57.4 on the D/N model, so it is a single-Weierstrass-model effect, refuted as a level or j = 0 effect by the negative control.")
+w("- **F3.** `rho-cubic` ran on both re-scalings; 3 is the number of curve models, not generators. **F4.** The V2 `rho-plain` Ua level-0 cell averages 13.0 Velu evaluations; it is not 'no transport'. **F5.** Holm in section 5 is across 6 tests, not 10. **F6.** Two statements in `AMENDMENTS.md` A2 are corrected by A3. **F7.** 'about 43x' is 42.4x. **F8.** The V3 BSGS offset (1.014, 1.022) is a mix-of-scalars artifact. **N1.** See the limits.\n")
 w("## 1. Verdicts\n")
 w(f"1. **Positive control first (gates everything): {'PASS' if pc['pass'] else 'FAIL'}.** On the V3 (j = 0) crater, mean S(`rho-cubic`) / mean S(`rho-neg`) = **{pc['row_bootstrap']['ratio']:.4f}**, 95% CI {ci(pc['row_bootstrap']['ci95'], lambda x: f'{x:.4f}')} "
   f"over {pc['n_pairs']} paired runs (theory 1/sqrt(3) = {pc['theory_ratio']:.4f}; pass needs the CI upper bound below 0.85). The detector sees a 42% cost reduction, so the 'equivalent' verdicts below are informative, not relabelled 'uninformative'.")
@@ -40,7 +45,7 @@ w(f"4. **Transfer:** every one of the {sum(v['n'] for v in R['recovery'].values(
 ic = R["ic_vs_rho"]
 w("5. **IC against matched `rho-neg` (distance remaining, not pass/fail):** IC costs "
   f"{ic['V1']['pooled']['0.0']['ratio_ic_over_rho']:.1f}x (V1) and {ic['V2']['pooled']['0.0']['ratio_ic_over_rho']:.1f}x (V2) the rho cost in S with nothing priced, "
-  f"{ic['V1']['pooled']['1.0']['ratio_ic_over_rho']:.1f}x and {ic['V2']['pooled']['1.0']['ratio_ic_over_rho']:.1f}x with every uncharged operation priced at 1 GAE on both arms. The order (rho ahead) holds across the whole 0 / 0.1 / 1 band at every level of V1, V2 and V3. No level improves IC's position.")
+  f"{ic['V1']['pooled']['1.0']['ratio_ic_over_rho']:.1f}x and {ic['V2']['pooled']['1.0']['ratio_ic_over_rho']:.1f}x with every uncharged operation priced at 1 GAE on both arms. The order (rho ahead) holds across the whole 0 / 0.1 / 1 band at every level of V1, V2 and V3 (on the V3 crater against its matched `rho-cubic`, A3/F1). No level improves IC's position.")
 wa = R["wall_admission"]
 w("6. **Wall time: not admitted for any (V, arm).** The A/A ratio is within [0.95, 1.05] on all three volcanoes, but only "
   f"{min(a['frac_rows_L2'] for V in wa.values() for a in V['arms'].values()) * 100:.0f}% to {max(a['frac_rows_L2'] for V in wa.values() for a in V['arms'].values()) * 100:.0f}% of rows reached isolation L2, so condition 1 fails everywhere. Wall tables are descriptive.\n")
@@ -53,7 +58,7 @@ w("- Unit: S (ecbench normalised group operations). Host: shared 4-vCPU cloud VM
 w("- Statistics: cluster bootstrap over **vertices**, then rows, stratified by level (A2.3). Rows per curve are many; levels are compared on their curves, not their solves.\n")
 
 w("## 3. Positive control\n")
-w(f"V3 crater (census vertex {pc['vertex']}), D, N and ctl rows pooled ({pc['n_slugs']} generators; `rho-cubic` was run on one of the two re-scalings), {pc['n_pairs']} paired runs. Ratio {pc['row_bootstrap']['ratio']:.4f}, 95% CI {ci(pc['row_bootstrap']['ci95'], lambda x: f'{x:.4f}')} (pair bootstrap); slug-cluster sensitivity {ci(pc['slug_cluster_sensitivity']['ci95'], lambda x: f'{x:.4f}')}. Result: **pass**.\n")
+w(f"V3 crater (census vertex {pc['vertex']}), D, N and ctl rows pooled ({pc['n_slugs']} curve models: D and N share the crater model, and `rho-cubic` ran on both re-scalings, 1,000 runs each), {pc['n_pairs']} paired runs. Ratio {pc['row_bootstrap']['ratio']:.4f}, 95% CI {ci(pc['row_bootstrap']['ci95'], lambda x: f'{x:.4f}')} (pair bootstrap); slug-cluster sensitivity {ci(pc['slug_cluster_sensitivity']['ci95'], lambda x: f'{x:.4f}')}. Result: **pass**.\n")
 
 w("## 4. Level effect: R(L) = mean S at level L / mean S at the crater\n")
 w("Cells: ratio [95% CI], verdict (E equivalent, D different, I inconclusive). Margins [0.95, 1.053] for rho and BSGS, [0.90, 1.111] for IC. Holm family (a) has "
@@ -85,7 +90,7 @@ w("![](analysis/figures/fig2_volcano_V1.svg)\n")
 w("*Figure 2a. V1 per-curve mean S for `rho-neg` and `ic` (standard `volcano-diagram/v2`). V2 and V3 are `fig2_volcano_V2/V3`. Colour scales are per panel; the spread within a level is the same size as between levels.*\n")
 
 w("## 5. Curve effect against the negative control\n")
-w("| volcano | arm | vertices | F (between / within) | permutation p | Holm p (across 10) | flagged curves (Holm p < 0.01) |")
+w("| volcano | arm | vertices | F (between / within) | permutation p | Holm p (across 6) | flagged curves (Holm p < 0.01) |")
 w("|:--|:--|--:|--:|--:|--:|:--|")
 for V in ["V1", "V2"]:
     for arm in ARMS:
@@ -104,7 +109,7 @@ for arm in ARMS:
     for x in c.get("vertices", []):
         if x["vertex"] == vv:
             others.append(f"{arm} z = {x['z']:.2f}")
-w(f"F below 1 means the original curves spread no more than their own isomorphic re-scalings. The flagged V2 curve (vertex {vv}) has z by arm: {', '.join(others)}. One curve of the 2,334 tested by the plan's rule (3 non-degenerate arms x 778 vertices), in one arm only, and the corresponding variance-ratio test is not significant after Holm; it is listed, not interpreted.\n")
+w(f"Holm is across the 6 non-degenerate (V, arm) tests; the 4 BSGS cells are degenerate and untested (A3/F5). F below 1 means the original curves spread no more than their own isomorphic re-scalings. The flagged V2 curve (vertex {vv}) has z by arm: {', '.join(others)}. One curve of the 2,334 tested by the plan's rule (3 non-degenerate arms x 778 vertices), in one arm only, and the corresponding variance-ratio test is not significant after Holm; it is listed, not interpreted.\n")
 w("![](analysis/figures/fig4_curve_vs_control.svg)\n")
 w("*Figure 4. Mean S of each original curve (D) against the mean of its two re-scalings. The grey band is the normal-approximation 99% band of the control, for display only; flags come from the permutation test.*\n")
 
@@ -155,8 +160,8 @@ n_ex = sum(1 for v in tt.values() for l in v["levels"].values() if l["ci95_exclu
 n_all = sum(len(v["levels"]) for v in tt.values())
 n_sig = sum(1 for v in tt.values() for l in v["levels"].values() if l.get("speedup_signal"))
 w(f"**Transport, then solve, against solve where born** (A2.3; per source family, arm and destination level, priced at 0 / 0.1 / 1 GAE per Velu map): {n_all} cells; the CI excludes 1 at all three prices in {n_ex} of them, "
-  f"and **{n_sig} meet the plan's speedup condition** (excludes 1 on the lower side at all three prices and disjoint from the native-instance control). The cells that exclude 1 are V1 `ic` from S (ratio about 1.2, above 1), V3 `ic` from D and Ua (about 1.2, above 1; the crater is cheaper for IC, section 9) and V2 `rho-plain` from Ua (about 0.6, **below 1**). "
-  "The V2 `rho-plain` Ua cell is the same at every level including level 0 (no transport at all), and the paired Ua/D ratio for it is equivalent to 1, so it reflects a high mean at the single source vertex (one floor curve, few rows), not a transport benefit; its CI overlaps the native-instance control CI (about 0.75 to 1.34), so it is not a signal under the plan's condition. The price band moves any ratio by at most 1.5%. Transport is at most about 1.3% of a solve in wall time for any path (medians below 0.5%) and at most about 1.3% in GAE at 1 GAE per Velu map (V2, `bsgs-neg`), far less for IC.\n")
+  f"and **{n_sig} meet the plan's speedup condition** (excludes 1 on the lower side at all three prices and disjoint from the native-instance control). The cells that exclude 1 are V1 `ic` from S (ratio about 1.2, above 1), V3 `ic` from D and Ua (about 1.2, above 1; a single-Weierstrass-model effect, section 9) and V2 `rho-plain` from Ua (about 0.6, **below 1**). "
+  "The V2 `rho-plain` Ua cell is about 0.6 at every level, although the mean Velu evaluations per path rise from 13.0 (level 0, reached by transport from floor source vertex 364) to 18.9 (A3/F4; only rows at the source vertex itself have no transport), and the paired Ua/D ratio for it is equivalent to 1, so it reflects a high mean at the single source vertex (one floor curve, few rows), not a transport benefit; its CI overlaps the native-instance control CI (about 0.75 to 1.34), so it is not a signal under the plan's condition. The price band moves any ratio by at most 1.5%. Transport is at most about 1.3% of a solve in wall time for any path (medians below 0.5%) and at most about 1.3% in GAE at 1 GAE per Velu map (V2, `bsgs-neg`), far less for IC.\n")
 w("![](analysis/figures/fig5_transport_vs_solve.svg)\n")
 w("*Figure 5. Transport ns per path against median solve wall by path length (descriptive wall).*\n")
 
@@ -165,18 +170,21 @@ w("Mean S(ic) / mean S(rho-neg), isogenous families pooled, 95% CI, with every u
   "Counts come from the run records (A2.1). Both arms still omit native work ecbench does not name, so both are lower bounds.\n")
 for V in ["V1", "V2", "V3"]:
     lv = ic[V]["levels"]
-    w(f"**{V}**" + (" (descriptive: one curve at levels 0 and 1, 2 / 4 / 8 above)" if V == "V3" else "") + "\n")
+    w(f"**{V}**" + (" (descriptive: one curve at levels 0 and 1, 2 / 4 / 8 above; reference `rho-neg` unless stated)" if V == "V3" else "") + "\n")
     w("| level | curves | price 0 | price 0.1 | price 1 | order across the band |")
     w("|--:|--:|:--|:--|:--|:--|")
     for L in sorted(lv, key=int):
         x = lv[L]
         w(f"| {L} | {x['n_curves']} | " + " | ".join(f"{x['prices'][p]['ratio_ic_over_rho']:.1f} {ci(x['prices'][p]['ci95'], lambda t: f'{t:.1f}')}" for p in PR) + f" | {x['ranking']} |")
+    if V == "V3":
+        cg = R["ic_vs_rho_cubic_crater"]["prices"]
+        w(f"| 0, matched rho = `rho-cubic` (D + N pairs, {R['ic_vs_rho_cubic_crater']['n_pairs']}) | 1 | " + " | ".join(f"{cg[p]['ratio_ic_over_rho_cubic']:.1f} {ci(cg[p]['ci95'], lambda t: f'{t:.1f}')}" for p in PR) + " | rho-cubic ahead of ic at all three prices |")
     pl = ic[V]["pooled"]
     w(f"| all | | " + " | ".join(f"{pl[p]['ratio_ic_over_rho']:.1f} {ci(pl[p]['ci95'], lambda t: f'{t:.1f}')}" for p in PR) + " | |")
     w("")
 u = ic["V1"]["uncharged"]
 w(f"Uncharged operations per run (V1): `ic` {sum(u['ic']['mean_uncharged_per_run'].values()):,.0f} (about {u['ic']['mean_unc_total_over_gae']:.1f} per charged GAE), `rho-neg` {sum(u['rho-neg']['mean_uncharged_per_run'].values()):,.0f} (about {u['rho-neg']['mean_unc_total_over_gae']:.2f} per charged GAE). "
-  "The gap to rho is therefore about 43x unpriced and 65x at 1 GAE (V1), a distance of more than an order of magnitude at this size and no level of any volcano changes it. This is the measured baseline gap, not a result for or against IC's potential.\n")
+  "The gap to rho is therefore 42.4x unpriced and 65.1x at 1 GAE (V1), a distance of more than an order of magnitude at this size and no level of any volcano changes it. This is the measured baseline gap, not a result for or against IC's potential.\n")
 w("![](analysis/figures/fig3_ic_over_rho.svg)\n")
 w("*Figure 3. IC / rho-neg by level, three prices, 95% CI (log scale).*\n")
 
@@ -195,8 +203,13 @@ w("|:--|--:|--:|--:|--:|")
 for arm in ARMS:
     d = R["v3_descriptive"][arm]
     w(f"| {arm} | " + " | ".join(f"{d[str(L)]['ratio_to_crater']:.3f}" for L in [1, 2, 3, 4]) + " |")
-w("\n**Observed, not tested:** `ic` is about 22 to 25% more expensive at every non-crater V3 level than at the j = 0 crater, while the rho and BSGS arms show nothing. "
-  "This fits IC using the 6 automorphisms of j = 0 on the crater, as the negation-folded oracle does for 2; it is one curve, one volcano and descriptive here, and it makes IC's gap to rho smaller on that curve (49x against about 60x at 0 GAE), not close to parity.\n")
+cm = R["crater_ic_by_model"]
+mods = sorted(cm.items(), key=lambda kv: kv[1]["mean_S"])
+w("\n**Observed, and refuted as a level or j = 0 effect by the study's own negative control (A3/F2):** `ic` is about 22 to 25% more expensive at every non-crater V3 level than on the crater's D and N model. "
+  "The crater's two isomorphic re-scalings, which have the same curve and the same automorphism group, cost `ic` " + " and ".join(f"{v['mean_S']:.1f} +- {v['se']:.1f} (SE, {v['n_rows']} rows, models {k[-8:]}{'' if 'ctl' not in v['families'] else ', ctl'})" for k, v in mods[1:]) + f" against {mods[0][1]['mean_S']:.1f} +- {mods[0][1]['se']:.1f} on the D/N model ({mods[0][0][-8:]}), in line with the non-crater levels (about 70 to 72). "
+  "So this is an effect of one Weierstrass model (a coordinate effect of the prime-abscissa factor base), not of the level or of j = 0. The earlier automorphism explanation is withdrawn. The same model drives the V3 D and Ua 'transport, then solve' cells of about 1.2. "
+  "BSGS shows a constant 1.014 (`bsgs`) and 1.022 (`bsgs-neg`) off the crater: this is a mix-of-scalars artifact, not a level effect. Crater rows are D + N (N uses another scalar seed, mean S(N)/S(D) = 0.946), other levels are D + Ua + Ub + N, and (3 + 0.946)/4 / ((1 + 0.946)/2) = 1.0139 (A3/F8).\n")
+w("**IC against the matched rho on the V3 crater (A3/F1).** On the j = 0 crater the strongest available rho is the automorphism-folded `rho-cubic`, not `rho-neg`. Against it IC costs " + " / ".join(f"{R['ic_vs_rho_cubic_crater']['prices'][p]['ratio_ic_over_rho_cubic']:.1f}x" for p in PR) + " at 0 / 0.1 / 1 GAE (0 GAE 95% CI " + ci(R['ic_vs_rho_cubic_crater']['prices']['0.0']['ci95'], lambda t: f'{t:.1f}') + "), larger than the gap against `rho-neg` at the non-crater V3 levels (about 60x / 65x / 90x). The earlier statement that IC's gap is smaller on that curve is withdrawn.\n")
 
 w("## 10. CV and achieved precision\n")
 w("![](analysis/figures/fig6_cv_precision.svg)\n")
@@ -207,13 +220,14 @@ w("## 11. Limits\n")
 for s in [
     "Shared 4-vCPU cloud VM; wall time is descriptive, 8 to 13% of rows were at isolation L1.",
     "One volcano per l (V1 l = 2, V2 l = 3): no replication on a second volcano of the same l, so nothing can be 'established', only observed.",
-    "V3 is descriptive (one curve per upper level, A1.2); its positive control uses one of the two ctl re-scalings for `rho-cubic`.",
+    "V3 is descriptive (one curve per upper level, A1.2); its positive control pools D, N and both ctl re-scalings (4,000 pairs).",
     "V4 (twist of V1) is censused, not measured (A1.1).",
     "5-day pause in Phase B (driver died after V2-S-L3-c0, resumed 2026-10-22); the gap is excluded from wall; no result depends on it.",
     "A1 amendments (V4, V3 shape, target seeds, rho CV, Drive, storage, clean binary) and A2 amendments (this phase, post hoc) shape the analysis; each interpretation is listed in `AMENDMENTS.md`. `ANALYSIS_PLAN.md` was frozen after data collection but before anyone inspected a Phase B cost summary. A 100-replicate smoke run of the code was inspected before the final run. `results.json` records the SHA-256 of `AMENDMENTS.md` as it stood at the final run, before A2.3 and A2.4 were appended.",
     "Curves are census vertices; the five isogenous families share a vertex and are pooled. A different clustering would change widths, not point estimates.",
     "IC and rho both leave unnamed native work unpriced; the 0 / 0.1 / 1 GAE band covers only counters ecbench names. Field-operation counts for Velu maps are a model.",
     "Small sizes only (26-bit group orders); no statement about cryptographic sizes, no speedup, no `claim`.",
+    "Methodological note N1 (validator): the frozen two-stage bootstrap (resample curves, then rows within each curve) counts within-curve variance twice when the ICC is near 0 (mixed-model ICC at most 0.0074), so its CIs are conservative by about sqrt(2). This pushes knife-edge cells toward 'inconclusive' (V1 and V2 `rho-plain` L1/L0, V1 `rho-plain` S/D). It is the pre-registered procedure and no verdict changes; read those 'inconclusive' cells as a feature of the procedure, not only of the data's precision.",
     "The analysis is Python (the plan names it); AGENTS.md prefers native code for results. The validator should re-derive the headline numbers independently.",
 ]:
     w(f"- {s}")

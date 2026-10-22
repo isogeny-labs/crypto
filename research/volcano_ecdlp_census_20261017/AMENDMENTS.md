@@ -125,3 +125,38 @@ estimand, margin, family, test or threshold in `ANALYSIS_PLAN.md`.
 4. **Python.** AGENTS.md bars Python from computing results; the plan names
    `analysis/analyze.py`, so it is Python. It reads only committed records and
    is a candidate for a native re-implementation by the validator.
+
+## A3 (2026-10-22, after independent validation; post hoc)
+
+The validator (`benchmarks/20261017-volcano-ecdlp-census/VALIDATOR_REPORT.md`,
+snapshot `fbbf7becf7`) recomputed all 192 compared numbers and found reporting
+errors. None changes an estimand, margin, family, test or threshold, and no
+number in `results.json` changes except two added fields. Corrections to
+`REPORT.md` (F1-F8) and a note (N1):
+
+- **F1.** On the V3 j = 0 crater the matched rho is `rho-cubic`, the strongest
+  available. IC is compared with it there (D + N pairs, 0 / 0.1 / 1 GAE:
+  84.9x / 92.8x / 131.1x, from the new `results.json` field
+  `ic_vs_rho_cubic_crater`). The "gap is smaller on that curve" sentence is
+  withdrawn.
+- **F2.** The "IC is 22 to 25% cheaper on the crater" observation is a
+  single-Weierstrass-model effect (field `crater_ic_by_model`: the crater's
+  two isomorphic re-scalings cost IC about 67 and 73 against 57.4 on the D/N
+  model), refuted as a level or j = 0 effect by the negative control; the
+  automorphism explanation is withdrawn.
+- **F3.** `rho-cubic` ran on both re-scalings; "3" counts curve models, not
+  generators. **F4.** The V2 `rho-plain` Ua level-0 cell averages 13.0 Velu
+  evaluations (transport from floor vertex 364), it is not "no transport".
+  **F5.** Holm in section 5 is across 6 tests. **F7.** 42.4x, not "about 43x".
+  **F8.** The V3 BSGS offset (1.014, 1.022) is a mix-of-scalars artifact.
+- **N1.** The frozen two-stage bootstrap is conservative by about sqrt(2) when
+  the ICC is near 0; stated as a limit, no verdict changed.
+- **F6, corrections to this file (A1 and A2 text is not edited).** (a) The A2
+  preamble ("written before `analyze.py` is run") is untrue for A2.3 and A2.4,
+  which were appended after the final run; `results.json` pins the
+  A2.1-A2.2 version. (b) A2.3's "five slugs (five generators) per vertex" is
+  wrong: a `curve_slug` identifies a curve model, and a vertex has 2 to 4
+  distinct models across the five isogenous families on V1 and V2 (1 to 3 on
+  V3). The resampling unit (the vertex) is unchanged.
+- `analysis/analyze.py` gained two functions for the new fields and was re-run
+  in full (same seeds); every previously reported value is unchanged.

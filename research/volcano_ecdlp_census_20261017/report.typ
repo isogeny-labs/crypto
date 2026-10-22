@@ -6,13 +6,21 @@
 <volcano-ecdlp-census-phase-c-analysis-and-report>
 Study `research/volcano_ecdlp_census_20261017/`; plan `PLAN.md`, analysis plan `ANALYSIS_PLAN.md` (frozen after data collection and before inspection), amendments `AMENDMENTS.md` (A1, A2). Every number below is read from `analysis/results.json` (written by `analysis/analyze.py`, 10,000 bootstrap or permutation replicates, seeds 20261022 and 20261023). #strong[Status: observed, not established.] No speedup is claimed. Independent validation (`VALIDATION.json`) has not happened yet; this report is the analysis, not its validation.
 
+== Erratum (A3, after independent validation)
+<erratum-a3-after-independent-validation>
+The independent validator recomputed every number here (192 of 192 agree) and found two material reporting errors and six minor ones in the first version of this text; only wording changes, no estimand, margin, test, threshold or number. Corrected in place below and recorded in `AMENDMENTS.md` A3.
+
+- #strong[F1 (material).] The V3 j \= 0 crater row of section 7 and the last paragraph of section 9 compared IC with `rho-neg`. On that curve the matched, strongest rho is `rho-cubic`; IC / `rho-cubic` is 84.9x / 92.8x / 131.1x at 0 / 0.1 / 1 GAE. The sentence that IC’s gap to rho is smaller on that curve is withdrawn.
+- #strong[F2 (material).] The 'IC is 22 to 25% cheaper on the crater' observation and its automorphism explanation are withdrawn: the crater’s own isomorphic re-scalings cost IC about 67 and 73 against 57.4 on the D/N model, so it is a single-Weierstrass-model effect, refuted as a level or j \= 0 effect by the negative control.
+- #strong[F3.] `rho-cubic` ran on both re-scalings; 3 is the number of curve models, not generators. #strong[F4.] The V2 `rho-plain` Ua level-0 cell averages 13.0 Velu evaluations; it is not 'no transport'. #strong[F5.] Holm in section 5 is across 6 tests, not 10. #strong[F6.] Two statements in `AMENDMENTS.md` A2 are corrected by A3. #strong[F7.] 'about 43x' is 42.4x. #strong[F8.] The V3 BSGS offset (1.014, 1.022) is a mix-of-scalars artifact. #strong[N1.] See the limits.
+
 == 1. Verdicts
 <verdicts>
 + #strong[Positive control first (gates everything): PASS.] On the V3 (j \= 0) crater, mean S(`rho-cubic`) / mean S(`rho-neg`) \= #strong[0.5733], 95% CI \[0.5619, 0.5850\] over 4000 paired runs (theory 1/sqrt(3) \= 0.5774; pass needs the CI upper bound below 0.85). The detector sees a 42% cost reduction, so the 'equivalent' verdicts below are informative, not relabelled 'uninformative'.
 + #strong[Level effect (V1, V2; 5 arms; 35 level ratios): 33 equivalent, 0 different, 2 inconclusive.] TOST margins are +-5% for rho and BSGS and +-10% for IC. The two inconclusive ratios are both `rho-plain` at level 1 (CI not inside the margin; neither differs from 1 after Holm). No method shows a level effect on either volcano. With one volcano per l, this is an observed absence of an effect at these margins, not an established one (PLAN §5: replication on a second volcano of the same l is missing).
 + #strong[Curve effect against the isomorphic negative control:] no variance-ratio test survives Holm (smallest adjusted p \= 0.130); BSGS is degenerate (identical S for a curve and its re-scalings). 1 curve is flagged in total (V2, `rho-plain`, vertex 69), and it is not flagged for the other arms.
 + #strong[Transfer:] every one of the 403168 measured runs recovered k (95% lower bound 0.9963 for the smallest cell). BSGS counts are identical across D, Ua, Ub and S in 100% of triples. Paired source ratios for rho-neg, rho-plain and ic: 23 of 24 equivalent, 1 inconclusive, 0 different. Transport is cheap against solving (section 6) and no 'transport, then solve' ratio is a speedup signal (0 signals).
-+ #strong[IC against matched `rho-neg` (distance remaining, not pass/fail):] IC costs 42.4x (V1) and 61.5x (V2) the rho cost in S with nothing priced, 65.1x and 92.7x with every uncharged operation priced at 1 GAE on both arms. The order (rho ahead) holds across the whole 0 / 0.1 / 1 band at every level of V1, V2 and V3. No level improves IC’s position.
++ #strong[IC against matched `rho-neg` (distance remaining, not pass/fail):] IC costs 42.4x (V1) and 61.5x (V2) the rho cost in S with nothing priced, 65.1x and 92.7x with every uncharged operation priced at 1 GAE on both arms. The order (rho ahead) holds across the whole 0 / 0.1 / 1 band at every level of V1, V2 and V3 (on the V3 crater against its matched `rho-cubic`, A3/F1). No level improves IC’s position.
 + #strong[Wall time: not admitted for any (V, arm).] The A/A ratio is within \[0.95, 1.05\] on all three volcanoes, but only 87% to 94% of rows reached isolation L2, so condition 1 fails everywhere. Wall tables are descriptive.
 
 == 2. What was measured
@@ -25,7 +33,7 @@ Study `research/volcano_ecdlp_census_20261017/`; plan `PLAN.md`, analysis plan `
 
 == 3. Positive control
 <positive-control>
-V3 crater (census vertex 0), D, N and ctl rows pooled (3 generators; `rho-cubic` was run on one of the two re-scalings), 4000 paired runs. Ratio 0.5733, 95% CI \[0.5619, 0.5850\] (pair bootstrap); slug-cluster sensitivity \[0.5588, 0.5851\]. Result: #strong[pass].
+V3 crater (census vertex 0), D, N and ctl rows pooled (3 curve models: D and N share the crater model, and `rho-cubic` ran on both re-scalings, 1,000 runs each), 4000 paired runs. Ratio 0.5733, 95% CI \[0.5619, 0.5850\] (pair bootstrap); slug-cluster sensitivity \[0.5588, 0.5851\]. Result: #strong[pass].
 
 == 4. Level effect: R(L) \= mean S at level L / mean S at the crater
 <level-effect-rl-mean-s-at-level-l-mean-s-at-the-crater>
@@ -132,7 +140,7 @@ BSGS ratios equal 1 exactly: BSGS cost depends on r and k only, and r is the sam
   columns: 7,
   align: (col, row) => (left,left,right,right,right,right,left,).at(col),
   inset: 6pt,
-  [volcano], [arm], [vertices], [F (between / within)], [permutation p], [Holm p (across 10)], [flagged curves (Holm p \< 0.01)],
+  [volcano], [arm], [vertices], [F (between / within)], [permutation p], [Holm p (across 6)], [flagged curves (Holm p \< 0.01)],
   [V1],
   [rho-neg],
   [400],
@@ -206,7 +214,7 @@ BSGS ratios equal 1 exactly: BSGS cost depends on r and k only, and r is the sam
 )
 ]
 
-F below 1 means the original curves spread no more than their own isomorphic re-scalings. The flagged V2 curve (vertex 69) has z by arm: rho-neg z \= -0.24, rho-plain z \= 4.55, ic z \= 2.91. One curve of the 2,334 tested by the plan’s rule (3 non-degenerate arms x 778 vertices), in one arm only, and the corresponding variance-ratio test is not significant after Holm; it is listed, not interpreted.
+Holm is across the 6 non-degenerate (V, arm) tests; the 4 BSGS cells are degenerate and untested (A3/F5). F below 1 means the original curves spread no more than their own isomorphic re-scalings. The flagged V2 curve (vertex 69) has z by arm: rho-neg z \= -0.24, rho-plain z \= 4.55, ic z \= 2.91. One curve of the 2,334 tested by the plan’s rule (3 non-degenerate arms x 778 vertices), in one arm only, and the corresponding variance-ratio test is not significant after Holm; it is listed, not interpreted.
 
 #image("analysis/figures/fig4_curve_vs_control.svg")
 
@@ -323,7 +331,7 @@ Transport as a fraction of the destination solve (median `solve_wall_ns` of the 
 )
 ]
 
-#strong[Transport, then solve, against solve where born] (A2.3; per source family, arm and destination level, priced at 0 / 0.1 / 1 GAE per Velu map): 240 cells; the CI excludes 1 at all three prices in 14 of them, and #strong[0 meet the plan’s speedup condition] (excludes 1 on the lower side at all three prices and disjoint from the native-instance control). The cells that exclude 1 are V1 `ic` from S (ratio about 1.2, above 1), V3 `ic` from D and Ua (about 1.2, above 1; the crater is cheaper for IC, section 9) and V2 `rho-plain` from Ua (about 0.6, #strong[below 1]). The V2 `rho-plain` Ua cell is the same at every level including level 0 (no transport at all), and the paired Ua/D ratio for it is equivalent to 1, so it reflects a high mean at the single source vertex (one floor curve, few rows), not a transport benefit; its CI overlaps the native-instance control CI (about 0.75 to 1.34), so it is not a signal under the plan’s condition. The price band moves any ratio by at most 1.5%. Transport is at most about 1.3% of a solve in wall time for any path (medians below 0.5%) and at most about 1.3% in GAE at 1 GAE per Velu map (V2, `bsgs-neg`), far less for IC.
+#strong[Transport, then solve, against solve where born] (A2.3; per source family, arm and destination level, priced at 0 / 0.1 / 1 GAE per Velu map): 240 cells; the CI excludes 1 at all three prices in 14 of them, and #strong[0 meet the plan’s speedup condition] (excludes 1 on the lower side at all three prices and disjoint from the native-instance control). The cells that exclude 1 are V1 `ic` from S (ratio about 1.2, above 1), V3 `ic` from D and Ua (about 1.2, above 1; a single-Weierstrass-model effect, section 9) and V2 `rho-plain` from Ua (about 0.6, #strong[below 1]). The V2 `rho-plain` Ua cell is about 0.6 at every level, although the mean Velu evaluations per path rise from 13.0 (level 0, reached by transport from floor source vertex 364) to 18.9 (A3/F4; only rows at the source vertex itself have no transport), and the paired Ua/D ratio for it is equivalent to 1, so it reflects a high mean at the single source vertex (one floor curve, few rows), not a transport benefit; its CI overlaps the native-instance control CI (about 0.75 to 1.34), so it is not a signal under the plan’s condition. The price band moves any ratio by at most 1.5%. Transport is at most about 1.3% of a solve in wall time for any path (medians below 0.5%) and at most about 1.3% in GAE at 1 GAE per Velu map (V2, `bsgs-neg`), far less for IC.
 
 #image("analysis/figures/fig5_transport_vs_solve.svg")
 
@@ -419,7 +427,7 @@ Mean S(ic) / mean S(rho-neg), isogenous families pooled, 95% CI, with every unch
 )
 ]
 
-#strong[V3] (descriptive: one curve at levels 0 and 1, 2 / 4 / 8 above)
+#strong[V3] (descriptive: one curve at levels 0 and 1, 2 / 4 / 8 above; reference `rho-neg` unless stated)
 
 #align(center)[#table(
   columns: 6,
@@ -456,6 +464,12 @@ Mean S(ic) / mean S(rho-neg), isogenous families pooled, 95% CI, with every unch
   [65.8 \[63.8, 68.0\]],
   [91.0 \[88.1, 94.0\]],
   [rho-neg ahead of ic at all three prices (95% CI above 1 at each)],
+  [0, matched rho \= `rho-cubic` (D + N pairs, 2000)],
+  [1],
+  [84.9 \[82.7, 87.0\]],
+  [92.8 \[90.4, 95.2\]],
+  [131.1 \[127.6, 134.6\]],
+  [rho-cubic ahead of ic at all three prices],
   [all],
   [],
   [58.8 \[57.8, 59.8\]],
@@ -465,7 +479,7 @@ Mean S(ic) / mean S(rho-neg), isogenous families pooled, 95% CI, with every unch
 )
 ]
 
-Uncharged operations per run (V1): `ic` 292,972 (about 1.9 per charged GAE), `rho-neg` 3,239 (about 0.90 per charged GAE). The gap to rho is therefore about 43x unpriced and 65x at 1 GAE (V1), a distance of more than an order of magnitude at this size and no level of any volcano changes it. This is the measured baseline gap, not a result for or against IC’s potential.
+Uncharged operations per run (V1): `ic` 292,972 (about 1.9 per charged GAE), `rho-neg` 3,239 (about 0.90 per charged GAE). The gap to rho is therefore 42.4x unpriced and 65.1x at 1 GAE (V1), a distance of more than an order of magnitude at this size and no level of any volcano changes it. This is the measured baseline gap, not a result for or against IC’s potential.
 
 #image("analysis/figures/fig3_ic_over_rho.svg")
 
@@ -535,7 +549,9 @@ One curve at levels 0 and 1, so no between-curve inference. Mean S relative to t
 )
 ]
 
-#strong[Observed, not tested:] `ic` is about 22 to 25% more expensive at every non-crater V3 level than at the j \= 0 crater, while the rho and BSGS arms show nothing. This fits IC using the 6 automorphisms of j \= 0 on the crater, as the negation-folded oracle does for 2; it is one curve, one volcano and descriptive here, and it makes IC’s gap to rho smaller on that curve (49x against about 60x at 0 GAE), not close to parity.
+#strong[Observed, and refuted as a level or j \= 0 effect by the study’s own negative control (A3/F2):] `ic` is about 22 to 25% more expensive at every non-crater V3 level than on the crater’s D and N model. The crater’s two isomorphic re-scalings, which have the same curve and the same automorphism group, cost `ic` 67.0 +- 0.9 (SE, 1000 rows, models a41c0795, ctl) and 72.6 +- 1.0 (SE, 1000 rows, models d53b367d, ctl) against 57.4 +- 0.5 on the D/N model (eeb6174a), in line with the non-crater levels (about 70 to 72). So this is an effect of one Weierstrass model (a coordinate effect of the prime-abscissa factor base), not of the level or of j \= 0. The earlier automorphism explanation is withdrawn. The same model drives the V3 D and Ua 'transport, then solve' cells of about 1.2. BSGS shows a constant 1.014 (`bsgs`) and 1.022 (`bsgs-neg`) off the crater: this is a mix-of-scalars artifact, not a level effect. Crater rows are D + N (N uses another scalar seed, mean S(N)/S(D) \= 0.946), other levels are D + Ua + Ub + N, and (3 + 0.946)/4 / ((1 + 0.946)/2) \= 1.0139 (A3/F8).
+
+#strong[IC against the matched rho on the V3 crater (A3/F1).] On the j \= 0 crater the strongest available rho is the automorphism-folded `rho-cubic`, not `rho-neg`. Against it IC costs 84.9x / 92.8x / 131.1x at 0 / 0.1 / 1 GAE (0 GAE 95% CI \[82.7, 87.0\]), larger than the gap against `rho-neg` at the non-crater V3 levels (about 60x / 65x / 90x). The earlier statement that IC’s gap is smaller on that curve is withdrawn.
 
 == 10. CV and achieved precision
 <cv-and-achieved-precision>
@@ -547,13 +563,14 @@ One curve at levels 0 and 1, so no between-curve inference. Mean S relative to t
 <limits>
 - Shared 4-vCPU cloud VM; wall time is descriptive, 8 to 13% of rows were at isolation L1.
 - One volcano per l (V1 l \= 2, V2 l \= 3): no replication on a second volcano of the same l, so nothing can be 'established', only observed.
-- V3 is descriptive (one curve per upper level, A1.2); its positive control uses one of the two ctl re-scalings for `rho-cubic`.
+- V3 is descriptive (one curve per upper level, A1.2); its positive control pools D, N and both ctl re-scalings (4,000 pairs).
 - V4 (twist of V1) is censused, not measured (A1.1).
 - 5-day pause in Phase B (driver died after V2-S-L3-c0, resumed 2026-10-22); the gap is excluded from wall; no result depends on it.
 - A1 amendments (V4, V3 shape, target seeds, rho CV, Drive, storage, clean binary) and A2 amendments (this phase, post hoc) shape the analysis; each interpretation is listed in `AMENDMENTS.md`. `ANALYSIS_PLAN.md` was frozen after data collection but before anyone inspected a Phase B cost summary. A 100-replicate smoke run of the code was inspected before the final run. `results.json` records the SHA-256 of `AMENDMENTS.md` as it stood at the final run, before A2.3 and A2.4 were appended.
 - Curves are census vertices; the five isogenous families share a vertex and are pooled. A different clustering would change widths, not point estimates.
 - IC and rho both leave unnamed native work unpriced; the 0 / 0.1 / 1 GAE band covers only counters ecbench names. Field-operation counts for Velu maps are a model.
 - Small sizes only (26-bit group orders); no statement about cryptographic sizes, no speedup, no `claim`.
+- Methodological note N1 (validator): the frozen two-stage bootstrap (resample curves, then rows within each curve) counts within-curve variance twice when the ICC is near 0 (mixed-model ICC at most 0.0074), so its CIs are conservative by about sqrt(2). This pushes knife-edge cells toward 'inconclusive' (V1 and V2 `rho-plain` L1/L0, V1 `rho-plain` S/D). It is the pre-registered procedure and no verdict changes; read those 'inconclusive' cells as a feature of the procedure, not only of the data’s precision.
 - The analysis is Python (the plan names it); AGENTS.md prefers native code for results. The validator should re-derive the headline numbers independently.
 
 == 12. Files
