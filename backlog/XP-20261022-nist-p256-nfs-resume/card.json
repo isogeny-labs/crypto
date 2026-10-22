@@ -7,13 +7,14 @@
     "NIST seed provenance research"
   ],
   "status": "draft",
-  "status_note": "Draft later allocation; not queued. Ready promotion requires the completed R03 checkpoint, merged implementation pin and selected compatible lab host.",
+  "status_note": "Draft later allocation; not queued. The finalized R04 checkpoint includes the selected native sieving job. Ready promotion requires a merged implementation pin and selected compatible lab host.",
   "blocked_on": [],
   "links": {
     "lead": "backlog/XP-20261022-nist-p256-nfs-resume/README.md",
     "notes": [
       "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R02-20261022/README.md",
-      "problems/nist-extension-twist-composite-cofactors.md"
+      "problems/nist-extension-twist-composite-cofactors.md",
+      "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R04-20261022/README.md"
     ],
     "prs": [
       2379
@@ -52,7 +53,7 @@
     "env": {
       "GP_BIN": "gp",
       "GNFS_BIN_DIR": "/opt/yafu/factor/lasieve5_64/bin",
-      "NIST_FACTOR_CHECKPOINT": "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R03-20261022/checkpoint-skipped_256_876-twist2.tar.xz",
+      "NIST_FACTOR_CHECKPOINT": "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R04-20261022/checkpoint-skipped_256_876-twist2.tar.xz",
       "NFS_POLY_BATCH": "120"
     },
     "timeout_per_shard_s": 2400
@@ -87,7 +88,7 @@
     "ttl_s": 7200,
     "env": {
       "name": "nist-yafu-c7d902-pari217",
-      "recipe": "Build pinned YAFU c7d90283972820f99b3b4920bfc1eff05c1f6342 with AVX2/BMI2, GMP and matching libecm 7.0.6 headers; make bundled native lattice sievers executable. Install PARI/GP 2.17.2, Bash, jq, GNU coreutils, xz and util-linux. Verify archive checksum and executable hashes; use compatible AVX2/BMI2 hardware. Pin the selected environment before ready promotion."
+      "recipe": "Build pinned YAFU c7d90283972820f99b3b4920bfc1eff05c1f6342 with AVX2/BMI2, GMP and matching libecm 7.0.6 headers; make bundled native lattice sievers executable. Install PARI/GP 2.17.2, Bash, jq, ripgrep, GNU coreutils, xz and util-linux. Verify archive checksum and executable hashes; use compatible AVX2/BMI2 hardware. Pin the selected environment before ready promotion."
     },
     "exec": {
       "cpus": 2,

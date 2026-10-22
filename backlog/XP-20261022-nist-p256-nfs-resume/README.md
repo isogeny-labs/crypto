@@ -5,8 +5,9 @@ bounded native resume and independent certificate verifier. R02 completed
 eight of nine targets; its [P-256 checkpoint](../../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R02-20261022/README.md)
 is the remaining 444-bit composite lineage. R03 corrected a native restore
 failure; its validated compact master checkpoint is the fallback input.
-R04 separately continues from it. Select the latest completed checkpoint
-before execution; using the R03 fallback repeats any later R04 progress.
+R04 preserves 329 validated saved records and a native-selected job for
+sieving. Its [checkpoint](../../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R04-20261022/README.md)
+is now selected by the card. Using the R03 fallback repeats R04 progress.
 This card is a later allocation, never a claim that
 another worker or cloud task is running.
 

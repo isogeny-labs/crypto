@@ -103,3 +103,18 @@ the duplicate attempt was stopped with exit 143. Native exact checks
 validated 242 saved candidates and a separate YAFU diagnostic confirmed
 resume coefficient 660. The wrapper now refuses an unrecognized master;
 R04 separately tests the corrected state with smaller checkpoint batches.
+
+R04: the production allocation ends at its outer bound with exit 137 and
+no new factor. Exact validation retains 329 records through coefficient
+900. A separately bounded diagnostic selects the best saved polynomial by
+native score and generates a sieving job; both job/parameter formats pass
+exact input and common-root checks. The native configured relation target
+is 46,000,000, with no runtime or sufficiency guarantee. The next bounded
+job can start sieving from the [R04 checkpoint](../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R04-20261022/README.md).
+
+R05: a local sieving allocation starts from that selected job, with a
+3600-second native limit and 1 GiB per-file cap. The
+[dated interim observation](../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R05-20261022/OBSERVATION.json)
+records actual native workers and raw relation progress. Final status,
+archive and replay are pending; no new factor is claimed. This does not
+close the original prime-factorization requirement.

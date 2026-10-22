@@ -7,6 +7,15 @@ fields**. Only the P-256 block-876 extension-twist order retains a composite
 cofactor, of 444 bits. [R02 results and replay](factorization/rounds/R02-20261022/README.md)
 preserve the earlier R01 evidence unchanged.
 
+[R04](factorization/rounds/R04-20261022/README.md) preserves 329 validated
+polynomial records and a native-selected job for the next P-256 sieving
+allocation. Its bounded search returned no new factor; the arithmetic
+counts above remain unchanged.
+
+[R05 interim status](factorization/rounds/R05-20261022/README.md) records
+the subsequent bounded local sieving allocation. Its dated observation is
+an active-run status; final raw archive and outcome remain pending.
+
 The [23-job runner](../../backlog/XP-20261021-nist-skipped-curves/README.md)
 and manual workflow remain available for a fresh upstream run. This study
 imports the earlier run as unchanged evidence and supplies new native
