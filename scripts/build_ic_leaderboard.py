@@ -86,6 +86,9 @@ SOURCES = {
     "quartic_dense_p37_audit": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_native_audit_v1.json",
     "quartic_dense_p13_prior": "research/twist_index_calculus_20261020/quartic_twist_2d_p13_v1.json",
     "quartic_dense_p37_prior": "research/twist_index_calculus_20261020/quartic_twist_2d_p37_v1.json",
+    "quartic_dense_tagged_p37": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_v1.json",
+    "quartic_dense_tagged_p37_aa": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_aa_v1.json",
+    "quartic_dense_tagged_p37_audit": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_native_audit_v1.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
@@ -684,6 +687,8 @@ def quartic_dense_component() -> dict:
     """Copy the audited one-target exact-oracle before/after counts."""
     rows = []
     phases = ("model", "base", "input", "eigen", "map", "table", "stream", "verification")
+    def count(data, unit):
+        return sum(data.get(f"{phase}_{unit}", 0) for phase in phases)
     for prime, order in ((13, 28_753), (37, 1_873_633)):
         after = load(SOURCES[f"quartic_dense_p{prime}"])
         repeat = load(SOURCES[f"quartic_dense_p{prime}_aa"])
@@ -705,8 +710,6 @@ def quartic_dense_component() -> dict:
                 or audit["decompositions_replayed"] != after["decompositions"]
                 or audit["point_logs_enumerated"] != order):
             raise SystemExit(f"quartic dense p={prime}: audit/rank mismatch")
-        def count(data, unit):
-            return sum(data.get(f"{phase}_{unit}", 0) for phase in phases)
         rows.append({"p": prime, "base_points": after["physical_base"],
                      "folded_columns": after["folded_columns"],
                      "before_queries": before["residuals"], "after_queries": after["residuals"],
@@ -716,7 +719,45 @@ def quartic_dense_component() -> dict:
                      "after_fp_muls": count(after, "fp_muls"),
                      "before_group_ops": count(before, "group_ops"),
                      "after_group_ops": count(after, "group_ops")})
-    return {"rows": rows, "class": "counted exact-oracle one-target improvement; no priced IC/rho row",
+    tagged = load(SOURCES["quartic_dense_tagged_p37"])
+    tagged_aa = load(SOURCES["quartic_dense_tagged_p37_aa"])
+    tagged_audit = load(SOURCES["quartic_dense_tagged_p37_audit"])
+    dense_p37 = load(SOURCES["quartic_dense_p37"])
+    timing = {"wall_ms_l0", "table_ms_l0", "tagged_path_ms_l0"}
+    if ({k: v for k, v in tagged.items() if k not in timing}
+            != {k: v for k, v in tagged_aa.items() if k not in timing}):
+        raise SystemExit("quartic tagged dense p=37: A/A mismatch")
+    if (tagged["status"] != "pass" or tagged["p"] != 37 or tagged["n"] != 1_873_633
+            or tagged["recovered"] != 271 or tagged["residuals"] != 1
+            or tagged["physical_base"] != 624 or tagged["folded_columns"] != 52
+            or tagged["rank"] != 52 or tagged["decompositions"] != 53_551
+            or tagged["decompositions_examined_to_rank"] != 115
+            or tagged["query_trace"] != dense_p37["query_trace"]
+            or tagged["selected_relations"] != dense_p37["selected_relations"]
+            or tagged["factor_logs"] != dense_p37["factor_logs"]
+            or not tagged["first_residual_signed_sets_equal"]
+            or tagged["pair_representatives"] * 12 != tagged["pair_postings"]
+            or tagged["pair_postings"] != 624 * 623
+            or tagged["table_group_ops"] != tagged["pair_representatives"]
+            or tagged_audit["status"] != "pass" or tagged_audit["recovered"] != 271
+            or tagged_audit["anchored_rank"] != 52
+            or tagged_audit["decompositions_replayed"] != tagged["decompositions"]
+            or tagged_audit["point_logs_enumerated"] != 1_873_633
+            or tagged_audit["selected_rows_replayed"] != 52
+            or count(tagged, "fp_muls") != 89_828_606
+            or count(tagged, "group_ops") != 848_000):
+        raise SystemExit("quartic tagged dense p=37: audit/count mismatch")
+    tagged_row = {"p": 37, "base_points": 624, "folded_columns": 52,
+                  "residuals": 1, "decompositions": tagged["decompositions"],
+                  "candidates_to_rank": tagged["decompositions_examined_to_rank"],
+                  "full_fp_muls": count(dense_p37, "fp_muls"),
+                  "tagged_fp_muls": count(tagged, "fp_muls"),
+                  "full_group_ops": count(dense_p37, "group_ops"),
+                  "tagged_group_ops": count(tagged, "group_ops"),
+                  "table_live_requested_bytes": tagged["table_live_requested_bytes"],
+                  "tagged_lookup_calls": tagged["tagged_lookup_calls"]}
+    return {"rows": rows, "tagged_followup": tagged_row,
+            "class": "counted exact-oracle one-target improvement; no priced IC/rho row",
             "study": "research/twist_index_calculus_20261020/",
             "report": "research/twist_index_calculus_20261020/QUARTIC_TWIST24_REPORT.pdf"}
 
@@ -1696,6 +1737,22 @@ def markdown(doc: dict) -> str:
                  f"{r['before_fp_muls']:,} → {r['after_fp_muls']:,} | "
                  f"{r['before_group_ops']:,} → {r['after_group_ops']:,} |")
     L.append("")
+    follow = qd["tagged_followup"]
+    L += ["**Combined tagged-index and dense-row follow-up, p=37.** The same 624-point base, "
+          "first residual and complete 53,551 signed decompositions reach anchored rank 52 "
+          "after 115 candidates. The direct-posting tagged table changes setup work, not "
+          "relation yield. An independent point-keyed auditor replayed all subgroup logs, "
+          "selected rows and the answer; non-timing A/A and complete full/tagged signed-set "
+          "checks pass. Counted one-target path totals include model through answer checks "
+          "inside one producer. The older full-table dense arm uses identical selected rows. "
+          "The public known-log anchor and dense extraction are generic steps, so the larger "
+          "one-row/query comparison is not twist-only. Polynomial S5, hash CPU, isolated wall "
+          "time and matched rho GAE remain unpriced.", "",
+          "| p | full dense → tagged dense Fp M | full dense → tagged dense group ops | tagged table retained requested bytes | tagged hash lookups |",
+          "|--:|:--|:--|--:|--:|",
+          f"| {follow['p']} | {follow['full_fp_muls']:,} → {follow['tagged_fp_muls']:,} | "
+          f"{follow['full_group_ops']:,} → {follow['tagged_group_ops']:,} | "
+          f"{follow['table_live_requested_bytes']:,} | {follow['tagged_lookup_calls']:,} |", ""]
     pl = doc["planner_component"]
 
     def plq(a):
@@ -2226,6 +2283,22 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{r["first_query_decompositions"]:,} / {r["candidates_to_rank"]}</td>'
                  f'<td>{r["before_fp_muls"]:,} → {r["after_fp_muls"]:,}</td>'
                  f'<td>{r["before_group_ops"]:,} → {r["after_group_ops"]:,}</td></tr>')
+    follow = qd["tagged_followup"]
+    P.append('</tbody></table><p><strong>Combined tagged-index and dense-row follow-up, p=37.</strong> '
+             'The same 624-point base and first residual give the identical complete 53,551 signed '
+             'decompositions, with anchored rank 52 after 115 candidates. The tagged table reduces setup '
+             'work without changing relation yield. The independently replayed one-target path charges model '
+             'through answer checks in one producer; A/A and signed-set equality pass. The generic known-log '
+             'anchor and dense extraction are not twist-only. Polynomial S5, hash CPU, isolated wall time and '
+             'matched rho GAE remain unpriced.</p>')
+    P.append('<table><thead><tr><th class="n">p</th><th>full dense → tagged dense Fp M</th>'
+             '<th>full dense → tagged dense group ops</th><th>tagged table retained requested bytes</th>'
+             '<th>tagged hash lookups</th></tr></thead><tbody>')
+    P.append(f'<tr><td class="n">{follow["p"]}</td>'
+             f'<td>{follow["full_fp_muls"]:,} → {follow["tagged_fp_muls"]:,}</td>'
+             f'<td>{follow["full_group_ops"]:,} → {follow["tagged_group_ops"]:,}</td>'
+             f'<td>{follow["table_live_requested_bytes"]:,}</td>'
+             f'<td>{follow["tagged_lookup_calls"]:,}</td></tr>')
     P.append('</tbody></table></section>')
 
     pl = doc["planner_component"]

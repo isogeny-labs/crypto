@@ -1,5 +1,5 @@
 #set page(paper: "a4", margin: 17mm)
-#set text(font: "Liberation Sans", size: 9pt)
+#set text(font: "Noto Sans", size: 9pt)
 #set heading(numbering: "1.")
 
 = Twist symmetry in quartic extension index calculus
@@ -178,3 +178,21 @@ On the *old* 53-residual p=37 full-2D trace, direct-posting and full signed-pair
 #image("reports/run-20261022T0720Z-quartic-tagged-direct_full-p37/tagged_pair_index.png", width: 100%)
 
 Setup plus 53 queries cost 4,041,271,806 versus 4,011,359,467 counted $F_p$ multiplications, a 1.00746-fold reduction. The 4.84-fold table-setup gain is diluted by the query stream. Its L0 wall time is not isolated; the tagged arm was slower in that shared-host observation. Dense extraction reduces the number of quadratic-size queries and gives the larger counted gain. Neither result establishes a polynomial or rho speedup.
+
+#pagebreak()
+== Combined tagged index and dense rows in one producer
+The registered p=37 combined producer charged model/base/input/eigen/map, a direct-posting tagged pair index, the first seed-zero residual, anchored rank selection, matrix solve and all answer checks in one exact group-oracle path. It used the same 624-point base and 52 folded columns as the earlier full-table dense arm. The tagged and separately charged full reference returned identical complete sets of 53,551 signed four-distinct-factor decompositions. The first 115 candidates supplied anchored rank 52/52 and the target scalar 271. The independent point-keyed auditor enumerated all 1,873,633 subgroup logs, replayed the complete hit count and selected rows, and independently recovered 271; the non-timing A/A diff is empty.
+
+#table(columns: (1.6fr,1fr,1fr,1fr), inset: 5pt,
+  [one-target counted path], [full-table dense], [tagged dense], [full/tagged],
+  [$F_p$ multiplications], [119,740,945], [89,828,606], [1.333],
+  [group operations], [1,204,356], [848,000], [1.420],
+  [table setup $F_p M$], [37,708,944], [7,796,605], [4.837],
+  [table setup group ops], [388,752], [32,396], [12.000],
+)
+
+#image("reports/run-20261022T0758Z-quartic-2d-dense-tagged-p37/dense_tagged_cost.png", width: 100%)
+
+The total deltas of 29,912,339 $F_p M$ and 356,356 group operations equal the table-setup deltas exactly; all other counted phases match. The tagged table retained 47,721,464 requested bytes and the producer peaked 78,834,528 requested bytes above pre-table allocation. Its first-residual stream recorded 777,503 hash lookups and 324,839 candidate postings. The anchored matrix needed 32,453 modular operations; 17,251,447 additional operations checked an unanchored-rank diagnostic, so the shared-host L0 wall observation of 632.080 ms is not an isolated anchored-path time. Relative to the older 53-query full-table pilot, the combined counted ratios are 45.065-fold $F_p M$ and 49.178-fold group operations. This larger difference also includes generic dense-row extraction and a public known-log anchor, not only twist symmetry.
+
+The exact-oracle path still costs about 257 times the earlier same-target 24-fold rho $F_p M$ count and 309 times its group-operation count, as separate cross-run diagnostics. Polynomial $S_5$ decomposition enumeration, hash/allocator CPU, isolated timing and a matched in-process 0/0.1/1 GAE band remain unmeasured. The full source-linked report, raw records, run/A-A PDFs, audit and protocol are in the study directory.

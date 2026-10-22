@@ -269,6 +269,12 @@ One public target `[271]G` per canonical quartic twist. The reference retains on
 | 13 | 72 / 6 | 7 → 1 | 561 / 6 | 8,096,696 → 2,045,670 | 81,076 → 18,609 |
 | 37 | 624 / 52 | 53 → 1 | 53,551 / 115 | 4,048,104,018 → 119,740,945 | 41,702,654 → 1,204,356 |
 
+**Combined tagged-index and dense-row follow-up, p=37.** The same 624-point base, first residual and complete 53,551 signed decompositions reach anchored rank 52 after 115 candidates. The direct-posting tagged table changes setup work, not relation yield. An independent point-keyed auditor replayed all subgroup logs, selected rows and the answer; non-timing A/A and complete full/tagged signed-set checks pass. Counted one-target path totals include model through answer checks inside one producer. The older full-table dense arm uses identical selected rows. The public known-log anchor and dense extraction are generic steps, so the larger one-row/query comparison is not twist-only. Polynomial S5, hash CPU, isolated wall time and matched rho GAE remain unpriced.
+
+| p | full dense → tagged dense Fp M | full dense → tagged dense group ops | tagged table retained requested bytes | tagged hash lookups |
+|--:|:--|:--|--:|--:|
+| 37 | 119,740,945 → 89,828,606 | 1,204,356 → 848,000 | 47,721,464 | 777,503 |
+
 ## Planner validation, outside tables A–C
 
 `ic plan` / `ic bench --auto` (ic-planner/1) chooses every `ic.pipeline` stage of a prime-field run; here its plan runs against every alternative one change away from it on six prime curves outside its evidence (class: engineering). The plan is the existing best recipe, chosen automatically, so no row above moves. Cells are S(alternative) / S(plan), ecbench `compare`, paired, cluster 95% interval, at w = 0; the band column is the ratio at w = 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md §5a). Supplementary curves are `prime_search` curves outside the registry, named by tag. Study: [research/ic_planner_validation_20261020/](../../research/ic_planner_validation_20261020/).
@@ -345,6 +351,9 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_native_audit_v1.json` — sha256 `4a2eda5132b9609a…`
 - `research/twist_index_calculus_20261020/quartic_twist_2d_p13_v1.json` — sha256 `05521665d6596151…`
 - `research/twist_index_calculus_20261020/quartic_twist_2d_p37_v1.json` — sha256 `4f5903b1e127b149…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_v1.json` — sha256 `7623e510ffc219c1…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_aa_v1.json` — sha256 `574fd92af4911171…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_native_audit_v1.json` — sha256 `4a2eda5132b9609a…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`

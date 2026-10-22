@@ -57,13 +57,13 @@ unsafe impl GlobalAlloc for MeteredAlloc {
 #[global_allocator]
 static ALLOCATOR: MeteredAlloc = MeteredAlloc;
 
-fn live() -> u64 {
+pub(crate) fn live() -> u64 {
     LIVE.load(Ordering::Relaxed)
 }
-fn reset_peak() {
+pub(crate) fn reset_peak() {
     PEAK.store(live(), Ordering::Relaxed);
 }
-fn peak() -> u64 {
+pub(crate) fn peak() -> u64 {
     PEAK.load(Ordering::Relaxed)
 }
 
@@ -114,12 +114,18 @@ struct Stage {
     tag: u8,
 }
 
-struct TaggedIndex {
+pub(crate) struct TaggedIndex {
     reps: Vec<Pair>,
     keys: Vec<Key>,
     key_lookup: HashMap<E4, u32>,
     postings: Vec<Posting>,
     orbit_hist: BTreeMap<usize, u64>,
+}
+
+impl TaggedIndex {
+    pub(crate) fn sizes(&self) -> (usize, usize, usize) {
+        (self.reps.len(), self.keys.len(), self.postings.len())
+    }
 }
 
 fn u(v: &Value) -> u64 {
@@ -193,7 +199,7 @@ fn transformed_pair(pair: Pair, map: &[SignedIndex]) -> Pair {
     }
 }
 
-fn build_tagged(c: &Curve4, base: &[Pt4]) -> TaggedIndex {
+pub(crate) fn build_tagged(c: &Curve4, base: &[Pt4]) -> TaggedIndex {
     assert!(base.len() <= u16::MAX as usize);
     let par = params(c);
     let by_x: HashMap<_, _> = base.iter().enumerate().map(|(i, pt)| (pt.x, i)).collect();
@@ -338,7 +344,7 @@ fn build_tagged(c: &Curve4, base: &[Pt4]) -> TaggedIndex {
     }
 }
 
-fn audit_postings(c: &Curve4, base: &[Pt4], table: &TaggedIndex) {
+pub(crate) fn audit_postings(c: &Curve4, base: &[Pt4], table: &TaggedIndex) {
     let mut seen = HashSet::new();
     for key in &table.keys {
         for posting in &table.postings[key.start as usize..(key.start + key.len) as usize] {
@@ -367,12 +373,12 @@ fn audit_postings(c: &Curve4, base: &[Pt4], table: &TaggedIndex) {
 }
 
 #[derive(Default)]
-struct QueryCounters {
-    lookups: u64,
-    candidate_postings: u64,
+pub(crate) struct QueryCounters {
+    pub(crate) lookups: u64,
+    pub(crate) candidate_postings: u64,
 }
 
-fn tagged_decompositions(
+pub(crate) fn tagged_decompositions(
     c: &Curve4,
     base: &[Pt4],
     table: &TaggedIndex,
