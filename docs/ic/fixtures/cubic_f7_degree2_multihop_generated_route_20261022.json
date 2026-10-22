@@ -1,0 +1,93 @@
+{
+  "cubic_nonresidue": 2,
+  "curve_nodes": [
+    {
+      "a": [
+        3,
+        6,
+        4
+      ],
+      "b": [
+        4,
+        4,
+        6
+      ],
+      "ref": "root"
+    },
+    {
+      "a": [
+        1,
+        3,
+        4
+      ],
+      "b": [
+        4,
+        4,
+        6
+      ],
+      "ref": "hop1"
+    },
+    {
+      "a": [
+        0,
+        6,
+        1
+      ],
+      "b": [
+        4,
+        4,
+        6
+      ],
+      "ref": "destination"
+    }
+  ],
+  "edges": [
+    {
+      "degree": 2,
+      "id": "velu2-step1",
+      "kernel_generator": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_curve_ref": "root",
+      "target_curve_ref": "hop1"
+    },
+    {
+      "degree": 2,
+      "id": "velu2-step2",
+      "kernel_generator": [
+        [
+          1,
+          4,
+          1
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "source_curve_ref": "hop1",
+      "target_curve_ref": "destination"
+    }
+  ],
+  "field_characteristic": 7,
+  "routes": [
+    {
+      "edge_ids": [
+        "velu2-step1",
+        "velu2-step2"
+      ],
+      "id": "root-to-velu2-depth2"
+    }
+  ],
+  "schema_version": 1
+}

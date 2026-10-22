@@ -323,6 +323,41 @@ The degree-2 route passed the same live store path under a separate acceptance
 prefix. Its object key, digest, fetch, replay, and cleanup checks are in
 [`GENERATED_CUBIC_DEGREE2_ROUTE_S3_ACCEPTANCE_20261022.json`](../store/GENERATED_CUBIC_DEGREE2_ROUTE_S3_ACCEPTANCE_20261022.json).
 
+`cubic-route-generate` also accepts `--max-depth` in 1–4 (default 1). Each
+hop samples at most `--max-samples` rational kernels of the same prime degree,
+checks the mapped subgroup points, and requires a destination model not
+already on the path. If `--target-j` is supplied, it applies to the final
+hop. A path that cannot be extended within the budget exits unsuccessfully.
+For the public cofactor-12 target, both `ic` and `icx` accept a generated
+two-edge degree-2 route:
+
+```sh
+ic cubic-route-generate \
+  --input docs/ic/fixtures/cubic_f7_cofactor12_public_target.json \
+  --degree 2 --max-depth 2 --seed 1 --max-samples 256 --json \
+  > /tmp/cubic-route-depth2.json
+ic solve-cubic \
+  --input docs/ic/fixtures/cubic_f7_cofactor12_public_target.json \
+  --route-file /tmp/cubic-route-depth2.json \
+  --route-id root-to-velu2-depth2 --seed 1 --max-residuals 1000 --json
+```
+
+The [generated two-edge route](fixtures/cubic_f7_degree2_multihop_generated_route_20261022.json)
+has SHA-256 `36d6222f3f1a00e5effc107ea76febfedd3d118e9f26725e2a21ed1c02ae798b`.
+The solver independently verified its two kernels, codomains, and point maps;
+the transported scalar 5 replays on the destination and original public
+curve. A degree-2 `cubic-graph` run from the intermediate curve includes the
+destination j-invariant `[2,0,4]`; selecting it with `--target-j 2 0 4`
+reproduces the two-edge route. The same-target rho reference also recovered
+scalar 5. A negative
+test mutates the second kernel and verifies rejection. These local timings
+remain diagnostics under the repository's IC measurement rules.
+The generated route passed a live Setec S3 upload, HEAD, remote download
+verification, fresh-cache `solve-cubic --route-file store:...` replay with
+same-target rho, byte comparison, pull, exact-object cleanup, and final HEAD
+404. The isolated prefix and checks are in
+[`GENERATED_CUBIC_MULTIHOP_S3_ACCEPTANCE_20261022.json`](../store/GENERATED_CUBIC_MULTIHOP_S3_ACCEPTANCE_20261022.json).
+
 The prime and cubic commands return `bounded_unknown` with a nonzero exit
 status if their configured IC budget ends without a verified scalar. These
 finite input ranges describe the implemented solvers; they do not certify

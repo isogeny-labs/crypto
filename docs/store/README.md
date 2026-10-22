@@ -227,6 +227,11 @@ live store path from empty caches. Their two logical names shared one
 content-addressed object because the message-pair fixtures are byte-identical.
 The exact-object cleanup is in
 [`HASH_OBSERVED_S3_ACCEPTANCE_20261022.json`](HASH_OBSERVED_S3_ACCEPTANCE_20261022.json).
+The generated two-edge cubic degree-2 route passed fresh-cache `solve-cubic`
+replay, including source and destination scalar checks and same-target rho.
+Its live upload, HEAD, remote download verification, pull, and exact-object
+cleanup are in
+[`GENERATED_CUBIC_MULTIHOP_S3_ACCEPTANCE_20261022.json`](GENERATED_CUBIC_MULTIHOP_S3_ACCEPTANCE_20261022.json).
 The public cubic-field cofactor-12 target input also passed a live upload,
 HEAD checksum, fresh-cache `icx solve-cubic --input store:...` fetch, scalar
 replay, remote verify, exact-object cleanup, and final HEAD 404. The first

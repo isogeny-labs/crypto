@@ -61,6 +61,9 @@ pub(super) struct GenerateArgs {
     /// Bound on rational kernel candidates to sample.
     #[arg(long, default_value_t = 256)]
     max_samples: usize,
+    /// Number of consecutive checked isogeny edges to emit (1..=4).
+    #[arg(long, default_value_t = 1)]
+    max_depth: usize,
 }
 
 #[derive(Deserialize)]
@@ -114,15 +117,19 @@ fn kernel_isogeny(
     }
 }
 
-/// Construct a one-hop rational-kernel route in the exact schema accepted by
+/// Construct a bounded rational-kernel route in the exact schema accepted by
 /// `solve-cubic`. A j-neighbour without a rational kernel may be unreachable
 /// by this constructor; the bounded search reports that outcome explicitly.
 pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
     if !(2..=31).contains(&args.degree)
         || !prime(args.degree)
         || !(1..=10_000).contains(&args.max_samples)
+        || !(1..=4).contains(&args.max_depth)
     {
-        return Err("degree must be prime in 2..=31 and max-samples in 1..=10000".into());
+        return Err(
+            "degree must be prime in 2..=31, max-samples in 1..=10000, and max-depth in 1..=4"
+                .into(),
+        );
     }
     let resolved = crypto_lib::store::resolve_path(&args.input)?;
     if std::fs::metadata(&resolved)
@@ -190,60 +197,98 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
         valuation += 1;
     }
     let mut rng = Rng::new(args.seed);
-    for _ in 0..args.max_samples {
-        let sampled = curve::random_point_f(&f, &curve, &mut rng);
-        let mut kernel = curve::pmul(&f, &curve, &sampled, u128::from(cofactor));
-        for _ in 1..valuation {
-            if kernel == Pt::Inf
-                || curve::pmul(&f, &curve, &kernel, u128::from(args.degree)) == Pt::Inf
-            {
-                break;
+    let mut current_curve = curve;
+    let mut current_g = g;
+    let mut current_q = q;
+    let mut current_ref = "root".to_string();
+    let mut seen_models = vec![curve];
+    let mut nodes = vec![json!({"ref":"root","a":input.a,"b":input.b})];
+    let mut edges = Vec::with_capacity(args.max_depth);
+    let mut edge_ids = Vec::with_capacity(args.max_depth);
+    for depth in 0..args.max_depth {
+        let final_hop = depth + 1 == args.max_depth;
+        let mut found = None;
+        for _ in 0..args.max_samples {
+            let sampled = curve::random_point_f(&f, &current_curve, &mut rng);
+            let mut kernel = curve::pmul(&f, &current_curve, &sampled, u128::from(cofactor));
+            for _ in 1..valuation {
+                if kernel == Pt::Inf
+                    || curve::pmul(&f, &current_curve, &kernel, u128::from(args.degree)) == Pt::Inf
+                {
+                    break;
+                }
+                kernel = curve::pmul(&f, &current_curve, &kernel, u128::from(args.degree));
             }
-            kernel = curve::pmul(&f, &curve, &kernel, u128::from(args.degree));
+            if kernel == Pt::Inf
+                || curve::pmul(&f, &current_curve, &kernel, u128::from(args.degree)) != Pt::Inf
+            {
+                continue;
+            }
+            let iso = kernel_isogeny(&f, &current_curve, &kernel, args.degree);
+            if !curve::is_smooth(&f, &iso.cod)
+                || (args.max_depth > 1 && seen_models.contains(&iso.cod))
+                || (final_hop
+                    && requested_j.is_some_and(|target| curve::jinv(&f, &iso.cod) != target))
+            {
+                continue;
+            }
+            let mapped_g = iso.eval(&f, &current_g);
+            let mapped_q = iso.eval(&f, &current_q);
+            if mapped_g == Pt::Inf
+                || mapped_q == Pt::Inf
+                || !curve::on_curve(&f, &iso.cod, &mapped_g)
+                || !curve::on_curve(&f, &iso.cod, &mapped_q)
+                || curve::pmul(&f, &iso.cod, &mapped_g, u128::from(input.n)) != Pt::Inf
+                || curve::pmul(&f, &iso.cod, &mapped_q, u128::from(input.n)) != Pt::Inf
+                || iso.eval(&f, &curve::padd(&f, &current_curve, &current_g, &current_g))
+                    != curve::padd(&f, &iso.cod, &mapped_g, &mapped_g)
+                || iso.eval(&f, &curve::padd(&f, &current_curve, &current_q, &current_q))
+                    != curve::padd(&f, &iso.cod, &mapped_q, &mapped_q)
+            {
+                continue;
+            }
+            let Pt::Aff(kx, ky) = kernel else {
+                unreachable!()
+            };
+            found = Some((iso.cod, mapped_g, mapped_q, kx, ky));
+            break;
         }
-        if kernel == Pt::Inf || curve::pmul(&f, &curve, &kernel, u128::from(args.degree)) != Pt::Inf
-        {
-            continue;
-        }
-        let iso = kernel_isogeny(&f, &curve, &kernel, args.degree);
-        if !curve::is_smooth(&f, &iso.cod) {
-            continue;
-        }
-        if requested_j.is_some_and(|target| curve::jinv(&f, &iso.cod) != target) {
-            continue;
-        }
-        let mapped_g = iso.eval(&f, &g);
-        let mapped_q = iso.eval(&f, &q);
-        if mapped_g == Pt::Inf
-            || mapped_q == Pt::Inf
-            || !curve::on_curve(&f, &iso.cod, &mapped_g)
-            || !curve::on_curve(&f, &iso.cod, &mapped_q)
-            || curve::pmul(&f, &iso.cod, &mapped_g, u128::from(input.n)) != Pt::Inf
-            || curve::pmul(&f, &iso.cod, &mapped_q, u128::from(input.n)) != Pt::Inf
-            || iso.eval(&f, &curve::padd(&f, &curve, &g, &g))
-                != curve::padd(&f, &iso.cod, &mapped_g, &mapped_g)
-            || iso.eval(&f, &curve::padd(&f, &curve, &q, &q))
-                != curve::padd(&f, &iso.cod, &mapped_q, &mapped_q)
-        {
-            continue;
-        }
-        let Pt::Aff(kx, ky) = kernel else {
-            unreachable!()
+        let (codomain, mapped_g, mapped_q, kx, ky) = found.ok_or_else(|| format!(
+            "bounded route search exhausted {} samples at hop {} without a fresh rational degree-{} kernel satisfying the route constraints",
+            args.max_samples, depth + 1, args.degree
+        ))?;
+        let next_ref = if final_hop {
+            "destination".to_string()
+        } else {
+            format!("hop{}", depth + 1)
         };
-        let id = format!("velu{}", args.degree);
-        return Ok(json!({
-            "schema_version":1,
-            "field_characteristic":input.p,
-            "cubic_nonresidue":input.c,
-            "curve_nodes":[
-                {"ref":"root","a":input.a,"b":input.b},
-                {"ref":"destination","a":iso.cod.a.0,"b":iso.cod.b.0}
-            ],
-            "edges":[{"id":id,"source_curve_ref":"root","target_curve_ref":"destination","degree":args.degree,"kernel_generator":[kx.0,ky.0]}],
-            "routes":[{"id":format!("root-to-velu{}",args.degree),"edge_ids":[id]}]
-        }));
+        let edge_id = if args.max_depth == 1 {
+            format!("velu{}", args.degree)
+        } else {
+            format!("velu{}-step{}", args.degree, depth + 1)
+        };
+        nodes.push(json!({"ref":next_ref,"a":codomain.a.0,"b":codomain.b.0}));
+        edges.push(json!({"id":edge_id,"source_curve_ref":current_ref,"target_curve_ref":next_ref,"degree":args.degree,"kernel_generator":[kx.0,ky.0]}));
+        edge_ids.push(edge_id);
+        seen_models.push(codomain);
+        current_curve = codomain;
+        current_g = mapped_g;
+        current_q = mapped_q;
+        current_ref = next_ref;
     }
-    Err(format!("bounded route search exhausted {} samples without a rational degree-{} kernel matching the requested j",args.max_samples,args.degree))
+    let route_id = if args.max_depth == 1 {
+        format!("root-to-velu{}", args.degree)
+    } else {
+        format!("root-to-velu{}-depth{}", args.degree, args.max_depth)
+    };
+    Ok(json!({
+        "schema_version":1,
+        "field_characteristic":input.p,
+        "cubic_nonresidue":input.c,
+        "curve_nodes":nodes,
+        "edges":edges,
+        "routes":[{"id":route_id,"edge_ids":edge_ids}]
+    }))
 }
 
 /// Enumerate distinct F_{p^3}-rational j-neighbours by modular polynomial.
@@ -676,6 +721,7 @@ mod tests {
             target_j: None,
             seed: 1,
             max_samples: 256,
+            max_depth: 1,
         };
         let graph = generate(&args).unwrap();
         let path = std::env::temp_dir().join(format!(
@@ -878,6 +924,7 @@ mod tests {
             target_j: None,
             seed: 1,
             max_samples: 256,
+            max_depth: 1,
         })
         .unwrap();
         let path = std::env::temp_dir().join(format!(
@@ -899,6 +946,47 @@ mod tests {
         let destination_j = curve::jinv(&f, &Curve::new(mapped.curve.a, mapped.curve.b));
         let phi = PhiCache::new(&Zp::new(7), &[2]).lift(|v| E3([v, 0, 0]));
         assert_eq!(phi.get(2).eval(&f, source_j, destination_j), Fp3::ZERO);
+    }
+
+    #[test]
+    fn generated_two_hop_degree_two_route_replays_on_each_edge() {
+        let input = Path::new(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/docs/ic/fixtures/cubic_f7_cofactor12_public_target.json"
+        ));
+        let graph = generate(&GenerateArgs {
+            input: input.to_path_buf(),
+            degree: 2,
+            target_j: None,
+            seed: 1,
+            max_samples: 256,
+            max_depth: 2,
+        })
+        .unwrap();
+        assert_eq!(graph["curve_nodes"].as_array().unwrap().len(), 3);
+        assert_eq!(graph["edges"].as_array().unwrap().len(), 2);
+        let path = std::env::temp_dir().join(format!(
+            "cubic-degree-two-two-hop-{}-{}.json",
+            std::process::id(),
+            line!()
+        ));
+        std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
+        let field = Fp3::with_cube_nonresidue(7, 2).unwrap();
+        let generator = Pt3::affine(E3([1, 2, 3]), E3([1, 1, 6]));
+        let target = Pt3::affine(E3([3, 4, 6]), E3([1, 3, 5]));
+        let source = Curve3::new(field, E3([3, 6, 4]), E3([4, 4, 6]), 29, generator);
+        let mapped = transport(&source, target, &path, "root-to-velu2-depth2").unwrap();
+        let mut tampered = graph;
+        tampered["edges"][1]["kernel_generator"][0] = json!([0, 0, 0]);
+        std::fs::write(&path, serde_json::to_vec(&tampered).unwrap()).unwrap();
+        assert!(transport(&source, target, &path, "root-to-velu2-depth2")
+            .err()
+            .expect("tampered second edge must fail")
+            .contains("invalid kernel"));
+        std::fs::remove_file(path).unwrap();
+        assert_eq!(mapped.receipt["hops"], 2);
+        assert_eq!(mapped.receipt["edges_verified"], 2);
+        assert_eq!(mapped.curve.mul(&mapped.curve.g, 5), mapped.target);
     }
 
     #[test]
