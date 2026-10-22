@@ -656,6 +656,11 @@ crypto cryptanalysis hash-auto --hash shake128 --output-bytes 32
 crypto cryptanalysis hash-auto --hash shake256 --output-bytes 32
 ```
 
+The `crypto hash --file` argument also accepts `store:NAME` or
+`sha256:DIGEST`. The artifact store checks the indexed content digest when
+it downloads the input into an empty cache. This applies to SHA-256,
+SHA-3, SHAKE, cSHAKE, and the other unkeyed hashes handled by the command.
+
 `hash-auto` runs a bounded 32-bit-truncated birthday search and a 4,096-trial
 single-input-bit differential-bias measurement for each SHA-3 fixed-output
 variant. These measurements concern truncated outputs and empirical bias;
@@ -721,7 +726,8 @@ Other hash algorithms reject `--custom-hex` and `--function-name-hex`.
 `crypto mac` reads exact message bytes from a UTF-8 argument, `--hex`, or
 `--file`, and reads exact key bytes from `--key-file` or `--key-hex`. Prefer
 `--key-file` for private keys so the key is not placed in shell history or
-process arguments. For example:
+process arguments. Both file options accept local paths or indexed
+`store:NAME` and `sha256:DIGEST` references. For example:
 
 ```sh
 crypto mac hmac-sha256 --key-file key.bin --file message.bin
@@ -730,6 +736,10 @@ crypto mac kmac128 --key-file key.bin --output-bytes 32 --custom-hex 646f6d61696
 crypto mac siphash24 --key-hex 000102030405060708090a0b0c0d0e0f --hex 00
 crypto mac hmac-sha256 --key-file key.bin --file message.bin --verify-tag-hex TAG
 ```
+
+A live Setec S3 acceptance used public message and key bytes to check
+SHA-256, SHA3-256, SHAKE256, and HMAC-SHA256 from an empty store cache; see
+[`HASH_MAC_FILE_S3_ACCEPTANCE_20261022.json`](../store/HASH_MAC_FILE_S3_ACCEPTANCE_20261022.json).
 
 The command exposes HMAC-SHA-1/256/384/512, keyed BLAKE2b/BLAKE2s,
 keyed BLAKE3, KMAC128/256 and KMACXOF128/256, and SipHash-2-4. KMAC requires

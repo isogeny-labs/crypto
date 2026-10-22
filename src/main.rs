@@ -132,7 +132,7 @@ enum Cmd {
         /// Hex-encoded message bytes.
         #[arg(long, conflicts_with = "file")]
         hex: Option<String>,
-        /// Read message bytes from a file.
+        /// Read message bytes from a file or checked store: reference.
         #[arg(long)]
         file: Option<PathBuf>,
         /// Required for SHAKE and cSHAKE; optional for BLAKE2 and Skein.
@@ -154,10 +154,10 @@ enum Cmd {
         /// Hex-encoded message bytes.
         #[arg(long, conflicts_with = "file")]
         hex: Option<String>,
-        /// Read message bytes from a file.
+        /// Read message bytes from a file or checked store: reference.
         #[arg(long)]
         file: Option<PathBuf>,
-        /// Read the raw key bytes from a file; avoids placing the key in argv.
+        /// Read raw key bytes from a file or checked store: reference; avoids placing the key in argv.
         #[arg(long, conflicts_with = "key_hex")]
         key_file: Option<PathBuf>,
         /// Hex-encoded key bytes, useful for public test vectors.
@@ -2956,8 +2956,11 @@ fn load_hash_input(
     match (message, hex, file) {
         (Some(message), None, None) => Ok(message.as_bytes().to_vec()),
         (None, Some(hex), None) => from_hex(hex).map_err(|e| format!("invalid input hex: {e}")),
-        (None, None, Some(file)) => std::fs::read(file)
-            .map_err(|e| format!("cannot read input file {}: {e}", file.display())),
+        (None, None, Some(file)) => {
+            let resolved = crypto_lib::store::resolve_path(file)?;
+            std::fs::read(&resolved)
+                .map_err(|e| format!("cannot read input file {}: {e}", file.display()))
+        }
         (None, None, None) => Err("provide a message, --hex, or --file".into()),
         _ => Err("provide exactly one of message, --hex, or --file".into()),
     }
@@ -3057,7 +3060,9 @@ fn cmd_hash_custom(
 fn load_mac_key(key_file: Option<&Path>, key_hex: Option<&str>) -> Result<Vec<u8>, String> {
     match (key_file, key_hex) {
         (Some(path), None) => {
-            std::fs::read(path).map_err(|e| format!("cannot read key file {}: {e}", path.display()))
+            let resolved = crypto_lib::store::resolve_path(path)?;
+            std::fs::read(&resolved)
+                .map_err(|e| format!("cannot read key file {}: {e}", path.display()))
         }
         (None, Some(hex)) => from_hex(hex).map_err(|e| format!("invalid key hex: {e}")),
         _ => Err("provide exactly one of --key-file or --key-hex".into()),

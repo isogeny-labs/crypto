@@ -244,6 +244,10 @@ live store path from empty caches. Their two logical names shared one
 content-addressed object because the message-pair fixtures are byte-identical.
 The exact-object cleanup is in
 [`HASH_OBSERVED_S3_ACCEPTANCE_20261022.json`](HASH_OBSERVED_S3_ACCEPTANCE_20261022.json).
+The direct `crypto hash --file` and `crypto mac --file/--key-file` commands
+also resolve indexed inputs. Their live SHA-256, SHA3-256, SHAKE256, and
+HMAC-SHA256 acceptance is in
+[`HASH_MAC_FILE_S3_ACCEPTANCE_20261022.json`](HASH_MAC_FILE_S3_ACCEPTANCE_20261022.json).
 The generated two-edge cubic degree-2 route passed fresh-cache `solve-cubic`
 replay, including source and destination scalar checks and same-target rho.
 Its live upload, HEAD, remote download verification, pull, and exact-object
