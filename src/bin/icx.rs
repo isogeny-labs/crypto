@@ -18,6 +18,9 @@
 //! provenance block (binary hash, git commit, host, dispatched field backend).
 
 use std::process::ExitCode;
+use std::sync::mpsc;
+use std::thread::JoinHandle;
+use std::time::{Duration, Instant};
 
 use clap::{Args, Parser, Subcommand};
 use serde_json::{json, Value};
@@ -48,6 +51,12 @@ struct Cli {
     /// Emit a machine-readable JSON report.
     #[arg(long, global = true)]
     json: bool,
+    /// Stream stage progress on stderr, including with --json.
+    #[arg(long, global = true)]
+    verbose: bool,
+    /// Seconds between live run heartbeats (implies --verbose).
+    #[arg(long, global = true, value_parser = clap::value_parser!(u64).range(1..))]
+    progress_every: Option<u64>,
 }
 
 #[derive(Subcommand)]
@@ -509,7 +518,48 @@ fn display(report: &Value) {
     }
 }
 
-fn run_cmd(args: &RunArgs, json: bool) -> Result<Value, String> {
+struct Heartbeat {
+    stop: mpsc::Sender<()>,
+    worker: Option<JoinHandle<()>>,
+}
+
+impl Heartbeat {
+    fn start(seconds: u64) -> Self {
+        let (stop, receiver) = mpsc::channel();
+        let worker = std::thread::spawn(move || {
+            let started = Instant::now();
+            while receiver
+                .recv_timeout(Duration::from_secs(seconds))
+                .is_err_and(|e| e == mpsc::RecvTimeoutError::Timeout)
+            {
+                eprintln!(
+                    "Info:Index calculus: running  elapsed {:.1}s",
+                    started.elapsed().as_secs_f64()
+                );
+            }
+        });
+        Self {
+            stop,
+            worker: Some(worker),
+        }
+    }
+}
+
+impl Drop for Heartbeat {
+    fn drop(&mut self) {
+        let _ = self.stop.send(());
+        if let Some(worker) = self.worker.take() {
+            let _ = worker.join();
+        }
+    }
+}
+
+fn run_cmd(
+    args: &RunArgs,
+    json: bool,
+    verbose: bool,
+    progress_every: Option<u64>,
+) -> Result<Value, String> {
     use crypto_lib::cryptanalysis::ic_progress::ProgressReporter;
     use crypto_lib::cryptanalysis::ic_run::{run_curve, RunConfig};
 
@@ -536,10 +586,13 @@ fn run_cmd(args: &RunArgs, json: bool) -> Result<Value, String> {
         envelope_bits: args.envelope,
         solver_budget_seconds: args.solver_budget_seconds,
     };
-    // In JSON mode the progress log would interleave with the document, so
-    // silence it; in human mode it streams the CADO-style stage lines to stderr.
-    let mut progress = ProgressReporter::new(false, json);
+    // Progress uses stderr. Keep stdout as one final JSON document even when
+    // requested stage lines are live in JSON report mode.
+    let verbose = verbose || progress_every.is_some();
+    let mut progress = ProgressReporter::new(false, json && !verbose);
+    let heartbeat = verbose.then(|| Heartbeat::start(progress_every.unwrap_or(5)));
     let result = run_curve(&curve, &cfg, &mut progress)?;
+    drop(heartbeat);
     let verified_any = result.reports.iter().any(|r| r.verified);
     if !json {
         progress.summary(&format!(
@@ -604,7 +657,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
             parameters::validate(&curve)
         }
         Some(Action::Estimate(a)) => estimate(a),
-        Some(Action::Run(a)) => run_cmd(a, cli.json),
+        Some(Action::Run(a)) => run_cmd(a, cli.json, cli.verbose, cli.progress_every),
         Some(Action::Fes(a)) => fes_cmd(a),
         None => {
             let name = cli
