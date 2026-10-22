@@ -125,6 +125,12 @@ pub struct Envelope {
     /// `none`: every run starts cold.
     pub precomputation: String,
     pub threads: u32,
+    /// An auxiliary-input oracle the problem provides, named by a label
+    /// (`static_dh:...`): the problem is then the DLP with that oracle,
+    /// not the plain ECDLP, and its bounds sit in a domain of their own.
+    /// Omitted when unset, so every plain domain keeps its id.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oracle: Option<String>,
 }
 
 impl Default for Envelope {
@@ -133,6 +139,7 @@ impl Default for Envelope {
             targets: 1,
             precomputation: "none".into(),
             threads: 1,
+            oracle: None,
         }
     }
 }
@@ -231,6 +238,13 @@ pub struct SizeRow {
     pub memory_entries_per_sqrt_r: Option<f64>,
     pub uncharged_per_sqrt_r: Option<f64>,
     pub levels: BTreeMap<String, u64>,
+    /// Mean static-DH oracle queries per run, and the mean group
+    /// operations the server spent answering them; only in an oracle
+    /// domain (see [`Envelope::oracle`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oracle_queries: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oracle_server_group_ops: Option<f64>,
 }
 
 /// `gae = C · r^α`, least squares on every verified run's `(ln r, ln gae)`.
@@ -358,6 +372,13 @@ pub struct FitOptions {
     /// Omitted from the record when unset (see `weight`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub param_rule: Option<String>,
+    /// The oracle label of the domain the arm is fitted in (see
+    /// [`Envelope::oracle`]).  An arm that queries an oracle (its records
+    /// carry `counters.oracle_queries`) must name it; an arm that does not
+    /// may name it too, to be fitted in the same domain as a reference
+    /// that queries nothing.  Omitted when unset.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oracle: Option<String>,
 }
 
 impl Default for FitOptions {
@@ -369,8 +390,30 @@ impl Default for FitOptions {
             seed: SEED,
             weight: None,
             param_rule: None,
+            oracle: None,
         }
     }
+}
+
+/// The oracle a bound's arm queried, as a resource of its own: the
+/// queries per run against `r`, fitted like `gae` (`queries = C · r^α`),
+/// and the server's work behind them.  Not part of `ops`.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct OracleResource {
+    /// The domain's oracle label.
+    pub label: String,
+    pub model: String,
+    pub model_fit: String,
+    pub points: u64,
+    pub alpha: Option<f64>,
+    pub alpha_ci95: Option<(f64, f64)>,
+    pub log2_c: Option<f64>,
+    pub r_squared: Option<f64>,
+    /// Same fit for the server's group operations.
+    pub server_alpha: Option<f64>,
+    pub server_alpha_ci95: Option<(f64, f64)>,
+    pub server_log2_c: Option<f64>,
+    pub note: String,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -392,6 +435,9 @@ pub struct Bound {
     pub provenance: Provenance,
     pub admissibility: Admissibility,
     pub fit_options: FitOptions,
+    /// Present when the arm queried an oracle.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oracle: Option<OracleResource>,
     /// Bounds this one was measured against and beat or traded with, set
     /// by the verdict that produced it.
     pub improves_on: Vec<String>,
@@ -784,13 +830,32 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
             tiers.into_iter().collect::<Vec<_>>().join(" and ")
         ));
     }
+    // An arm that queries an oracle is a method for the DLP with that
+    // oracle, not for the plain ECDLP: it must say so, and its bound goes
+    // to the domain of that problem.
+    let n_querying = recs
+        .iter()
+        .filter(|r| r.counters.contains_key("oracle_queries"))
+        .count();
+    if n_querying > 0 && n_querying != recs.len() {
+        return Err("some runs of the arm report oracle_queries and some do not".into());
+    }
+    if n_querying > 0 && opts.oracle.is_none() {
+        return Err(
+            "the arm queries a static-DH oracle (counters.oracle_queries); name the oracle in the domain with --oracle LABEL, so its bound is not set beside plain-ECDLP bounds"
+                .into(),
+        );
+    }
     let domain = Domain {
         problem: PROBLEM.into(),
         family: families.into_iter().next().unwrap().to_string(),
         target_kind: kinds.into_iter().next().unwrap(),
         unit: units.into_iter().next().unwrap(),
         tier: tiers.into_iter().next().unwrap().to_string(),
-        envelope: Envelope::default(),
+        envelope: Envelope {
+            oracle: opts.oracle.clone(),
+            ..Envelope::default()
+        },
     };
     let domain_id = domain.id()?;
 
@@ -855,6 +920,25 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
             },
             uncharged_per_sqrt_r: mean(&unch),
             levels,
+            oracle_queries: opts.oracle.as_ref().and_then(|_| {
+                mean(
+                    &ok.iter()
+                        .map(|r| r.counters.get("oracle_queries").copied().unwrap_or(0) as f64)
+                        .collect::<Vec<_>>(),
+                )
+            }),
+            oracle_server_group_ops: opts.oracle.as_ref().and_then(|_| {
+                mean(
+                    &ok.iter()
+                        .map(|r| {
+                            r.counters
+                                .get("oracle_server_group_ops")
+                                .copied()
+                                .unwrap_or(0) as f64
+                        })
+                        .collect::<Vec<_>>(),
+                )
+            }),
         });
     }
     sizes.sort_by_key(|a| a.r);
@@ -1018,6 +1102,79 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
         );
     }
 
+    // The oracle as a resource of its own: queries per sqrt(r) as an axis
+    // (zero, known, for an arm that does not query), and the fit of the
+    // queries and of the server's work against r.
+    let mut oracle_resource = None;
+    if let Some(label) = &opts.oracle {
+        let q_of = |r: &Record| r.counters.get("oracle_queries").copied().unwrap_or(0) as f64;
+        let srv_of = |r: &Record| {
+            r.counters
+                .get("oracle_server_group_ops")
+                .copied()
+                .unwrap_or(0) as f64
+        };
+        let mut q_strata: Vec<Vec<f64>> = Vec::new();
+        let mut q_pts: Vec<Vec<(f64, f64)>> = Vec::new();
+        let mut s_pts: Vec<Vec<(f64, f64)>> = Vec::new();
+        for row in &sizes {
+            let mine: Vec<&&Record> = verified
+                .iter()
+                .filter(|r| r.workload.curve.slug == row.slug)
+                .collect();
+            let ln_r = (row.r as f64).ln();
+            q_strata.push(
+                mine.iter()
+                    .map(|r| q_of(r) / (r.workload.curve.r as f64).sqrt())
+                    .collect(),
+            );
+            q_pts.push(
+                mine.iter()
+                    .map(|r| q_of(r))
+                    .filter(|q| *q > 0.0)
+                    .map(|q| (ln_r, q.ln()))
+                    .collect(),
+            );
+            s_pts.push(
+                mine.iter()
+                    .map(|r| srv_of(r))
+                    .filter(|q| *q > 0.0)
+                    .map(|q| (ln_r, q.ln()))
+                    .collect(),
+            );
+        }
+        let q_est = estimate(&q_strata, opts.resamples, opts.seed ^ 0x13);
+        dimensions.insert(
+            "oracle_queries".to_string(),
+            Dimension {
+                statistic: "mean static-DH oracle queries / sqrt(r) over verified runs (0 for an arm that does not query)".into(),
+                source: "counters.oracle_queries, workload.curve.r".into(),
+                lower_is_better: true,
+                known: q_est.is_some(),
+                value: q_est.as_ref().map(|e| e.value),
+                ci95: q_est.as_ref().and_then(|e| e.ci95),
+            },
+        );
+        if q_pts.iter().any(|s| !s.is_empty()) {
+            let (a, ci, c, r2, _) = power_law(&q_pts, opts.resamples, opts.seed ^ 0x21);
+            let (sa, sci, sc, _, _) = power_law(&s_pts, opts.resamples, opts.seed ^ 0x23);
+            oracle_resource = Some(OracleResource {
+                label: label.clone(),
+                model: "static_dh".into(),
+                model_fit: "oracle_queries = C * r^alpha (per run, least squares on every verified run, two-stage bootstrap)".into(),
+                points: q_pts.iter().map(|s| s.len() as u64).sum(),
+                alpha: a,
+                alpha_ci95: ci,
+                log2_c: c,
+                r_squared: r2,
+                server_alpha: sa,
+                server_alpha_ci95: sci,
+                server_log2_c: sc,
+                note: "queries are the problem's second resource: not in ops (gae), priced apart; the server spends one scalar multiplication by alpha per query".into(),
+            });
+        }
+    }
+
     // Stages.
     let mut names: Vec<String> = Vec::new();
     for r in &verified {
@@ -1170,6 +1327,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
         },
         admissibility,
         fit_options: opts.clone(),
+        oracle: oracle_resource,
         improves_on: vec![],
         verdict_id: None,
         notes: inputs.notes.to_string(),

@@ -11,6 +11,7 @@
 //! | [`canonical`] | canonical JSON, SHA-256 identities, derived seeds |
 //! | [`workload`] | curve constructions → ICV1-named single-target workloads |
 //! | [`methods`] | the method registry and the one `solve` every method goes through |
+//! | [`oracle`] | the static Diffie-Hellman oracle: Cheon's auxiliary inputs as a counted, separately priced resource |
 //! | [`generic`] | counted BSGS (three forms) and the kangaroo on any [`CountedGroup`] |
 //! | [`fp4`] | `E(F_{p⁴})`: the curve, its counted group and `ic.k4_gaudry` (Gaudry `k = 4`) |
 //! | [`claw`] | the four-point signed-Frobenius pair claw (aburan28/cryptanalysis#175) on a Koblitz curve |
@@ -59,6 +60,7 @@ pub mod host;
 pub mod isolab;
 pub mod isolation;
 pub mod methods;
+pub mod oracle;
 pub mod record;
 pub mod resources;
 pub mod runner;

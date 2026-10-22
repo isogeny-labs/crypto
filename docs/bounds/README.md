@@ -105,6 +105,18 @@ floor, differs). `tier` is derived from the field size — `toy` ≤ 32 bits,
 has today; a multi-target or precomputation method is a different domain, not
 a better entry in this one.
 
+An **oracle domain** carries one more envelope field, `oracle`, a label such as
+`static_dh:n-1:d=shape(0.12943,0.015)`. A method that queries an auxiliary-input
+oracle (the `cheon.*` methods query a static Diffie–Hellman oracle) solves that
+problem and not the plain ECDLP, so its bound is fitted with `ecbench bound fit
+--oracle LABEL` (refused without it) and sits in a domain of its own; the
+matched rho reference is fitted in the same domain with the same flag and
+counts zero queries. The queries are a resource of their own, never folded into
+`ops`: the bound carries them as the axis `oracle_queries` (mean queries per
+`√r`), as a fit `queries = C·r^α` with the server's group operations
+(`oracle`), and in every oracle domain the frontier reads that axis whatever
+`--axes` says. Plain domains carry no `oracle` key and keep their ids.
+
 ### 3.2 Bound
 
 | field | meaning |

@@ -23,7 +23,7 @@ use crate::cryptanalysis::ecbench::methods::{
     SolverStats,
 };
 use crate::cryptanalysis::ecbench::spec::Level;
-use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
+use crate::cryptanalysis::ecbench::workload::{CurveSpec, Instance, TargetKind, Workload};
 use crate::cryptanalysis::ic_boundary::FieldOps;
 use crate::cryptanalysis::ic_measurement;
 
@@ -166,12 +166,31 @@ pub fn child_main(input: &str) -> ChildOutput {
         if profile_solve {
             ic_measurement::callgrind_dump(b"ecbench_before_solve\0");
         }
-        let report = crate::cryptanalysis::ecbench::methods::solve(
+        // A method that queries a static-DH oracle gets the workload's
+        // server, which holds the planted scalar and answers [alpha]P; the
+        // scalar is not an argument of the solve.
+        let planted_oracle = match (
+            crate::cryptanalysis::ecbench::methods::needs_static_dh_oracle(&m.id),
+            &inst,
+            w.planted,
+        ) {
+            (true, Instance::Prime(i), Some(k)) => {
+                Some(crate::cryptanalysis::ecbench::oracle::PlantedStaticDh::new(
+                    &i.curve,
+                    u64::try_from(k).map_err(|_| "planted scalar past one word".to_string())?,
+                ))
+            }
+            _ => None,
+        };
+        let report = crate::cryptanalysis::ecbench::methods::solve_with_oracle(
             &m,
             &inst,
             &w.curve,
             &w.target,
             job.algorithm_seed,
+            planted_oracle
+                .as_ref()
+                .map(|o| o as &dyn crate::cryptanalysis::ecbench::oracle::StaticDhOracle),
         );
         if profile_solve {
             ic_measurement::callgrind_dump(b"ecbench_solve\0");

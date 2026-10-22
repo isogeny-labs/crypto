@@ -406,6 +406,10 @@ enum BoundCmd {
         /// the rule text enters the bound's method identity.
         #[arg(long)]
         param_rule: Option<String>,
+        /// Name the static-DH oracle of the domain (an arm that queries
+        /// one must; a reference that does not may, to share the domain).
+        #[arg(long)]
+        oracle: Option<String>,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -1344,6 +1348,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 seed,
                 weight,
                 param_rule,
+                oracle,
                 out,
             } => {
                 let b = bounds::bound_from_sessions(&bounds::FitInputs {
@@ -1360,6 +1365,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         seed,
                         weight,
                         param_rule,
+                        oracle,
                     },
                 })?;
                 let mut b = b;
