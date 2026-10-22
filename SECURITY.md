@@ -91,9 +91,10 @@ does not change this conclusion.
   step.  Every iteration performs one point addition and two point
   doublings, regardless of bit value, and the iteration count is
   fixed at the curve order's bit length.  Since 2026-10-22 the
-  ladder runs on `k + 2^L` and subtracts `[2^L]P` (`L` public
-  doublings), so it starts from `(P, 2P)` and never holds the
-  identity on a large-order point.  Before that it started at `O`
+  ladder runs on `k + 2^L` and subtracts `[2^L]P`, computed from
+  the public `P` by the Jacobian `Point::scalar_mul`, so it starts
+  from `(P, 2P)` and never holds the identity on a large-order
+  point.  Before that it started at `O`
   and took the `O + P` and `2·O` shortcuts through every leading
   zero bit, so wall time revealed the scalar's bit length (audit
   finding 7, `research/scalar_mul_ct_timing_20261022/`).  The variable-time

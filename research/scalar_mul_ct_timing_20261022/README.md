@@ -4,11 +4,14 @@
 [`research/generic_dlp_memory_parallelism_20261017/AUDIT_FINDINGS.md`](../generic_dlp_memory_parallelism_20261017/AUDIT_FINDINGS.md).
 
 - Protocol: [`PROTOCOL.md`](PROTOCOL.md), frozen and committed before any
-  recorded run.
-- Report: [`REPORT.pdf`](REPORT.pdf) (source `REPORT.typ`), with the figure
-  [`fig_timing.svg`](fig_timing.svg).
-- Numbers: every number here comes from [`summary.json`](summary.json),
-  which `examples/scalar_mul_timing_analyze.rs` writes from `raw/`.
+  recorded run. Amendment 1 was committed before run 2.
+- Report: [`REPORT.pdf`](REPORT.pdf) (source `REPORT.typ`), with the figures
+  [`fig_timing_run2.svg`](fig_timing_run2.svg) (the shipped fix) and
+  [`fig_timing.svg`](fig_timing.svg) (run 1).
+- Numbers: every number here comes from
+  [`summary-run2.json`](summary-run2.json) and [`summary.json`](summary.json),
+  which `examples/scalar_mul_timing_analyze.rs` writes from `raw-run2/` and
+  `raw/`.
 
 ## The leak
 
@@ -34,16 +37,21 @@ use.
   and `[j + 1]P` with `1 ≤ j < 2^(L+1)`. For a point of prime order `n`
   with `L = bits(n)`, they meet the identity only for a few scalars per bit
   position out of `n`.
-- **Exact result.** It returns `[k + 2^L]P − [2^L]P`, the subtrahend being
-  `L` doublings of the public point. That is exactly `[k mod 2^L]P`, the
-  same as before, for every point:
+- **Exact result.** It returns `[k + 2^L]P − [2^L]P`, which is exactly
+  `[k mod 2^L]P`, the same as before, for every point:
   - including points outside the order-`n` subgroup;
   - including the singular-curve probe points that
     `cryptanalysis::p192_singular_recovery` feeds `scalar_mul_secret`.
   The usual alternative, `k + n` or `k + 2n` as in OpenSSL, is exact only
   on the subgroup, and would have changed those pinned outputs.
-- **Cost.** `L` doublings added to `L` additions and `2L` doublings,
-  about a third more group operations.
+- **The subtrahend.** `[2^L]P` depends only on `P` and `L`, which are
+  public, never on `k`. So it comes from the variable-time Jacobian
+  `Point::scalar_mul`, with one inversion in all.
+  - The first version of the fix (run 1) used `L` affine doublings, which
+    cost about a third more group operations.
+  - Amendment 1 switched to the Jacobian routine at the user's request.
+  - `P` must be public, as it is for every caller: generators, public keys,
+    ciphertext points.
 
 ## Tests
 
@@ -65,21 +73,43 @@ use.
 **Arms.**
 - Before: `main` at `412b60289` plus the driver (`f7f455e7c`).
 - A′: the same binary, the A/A control.
-- After: the fix, `1dce1c654`.
+- After, in run 2: the shipped fix, `360f28a3d`.
+- After, in run 1: the affine-doublings version, `1dce1c654`.
 
-**Method.**
+**Method, per run.**
 - 5 rotated rounds, 3 repetitions per process.
 - Every process ran single-threaded under `tools/isolated_bench.py` on one
-  reserved CPU. All 15 processes were uncontended.
+  reserved CPU. All 30 processes were uncontended.
 - Scalars: 8 classes of leading zero bits, `z ∈ {0, 8, …, 224}`, with
   8 scalars each.
 - Point: the generator.
 - Pinned output: the result digest of every scalar is identical across all
-  15 runs.
+  runs.
+
+### Run 2: the shipped fix
 
 The table gives the median class time over rounds, in ms. The bracket is
 the median over rounds of each round's fraction of its own full-length
 class, so it need not equal the ratio of the two ms columns.
+
+| leading zero bits | 0 | 32 | 64 | 128 | 192 | 224 |
+|:--|--:|--:|--:|--:|--:|--:|
+| SM2, before | 98.4 (1.00) | 90.8 (0.92) | 82.0 (0.83) | 65.0 (0.67) | 48.6 (0.49) | 40.0 (0.40) |
+| SM2, after | 98.9 (1.00) | 98.5 (1.00) | 99.7 (1.02) | 99.3 (1.00) | 98.4 (1.00) | 97.4 (0.99) |
+| GOST-256 test, before | 80.8 (1.00) | 73.8 (0.89) | 67.0 (0.82) | 54.3 (0.67) | 40.0 (0.48) | 33.1 (0.41) |
+| GOST-256 test, after | 77.2 (1.00) | 81.6 (1.00) | 81.6 (1.02) | 78.1 (1.01) | 81.6 (1.09) | 81.5 (1.04) |
+
+**Verdicts** (frozen in `PROTOCOL.md`):
+- **Leak present before.** The ratio `R` of the 224-leading-zero class to
+  the full-length class was 0.34–0.47 in every round, on both curves, against
+  the threshold 0.9.
+- **Coarse leak closed after.** The largest deviation of any class from
+  the full-length class, `F`, was at most 0.138 (SM2) and 0.165 (GOST).
+  The A/A noise band `δ` is 0.296. `R` after was 0.97–1.17.
+- **Cost on full-length scalars.** SM2 0.96–1.04× (median 1.01); GOST
+  0.86–1.09× (median 0.93). Both are within this host's noise of no change.
+
+### Run 1: the first version, `[2^L]P` by affine doublings
 
 | leading zero bits | 0 | 32 | 64 | 128 | 192 | 224 |
 |:--|--:|--:|--:|--:|--:|--:|
@@ -88,23 +118,19 @@ class, so it need not equal the ratio of the two ms columns.
 | GOST-256 test, before | 70.2 (1.00) | 69.4 (0.97) | 63.6 (0.94) | 50.4 (0.74) | 38.9 (0.52) | 31.9 (0.43) |
 | GOST-256 test, after | 102.2 (1.00) | 102.3 (0.99) | 106.9 (0.98) | 101.3 (1.00) | 101.3 (0.94) | 102.4 (1.00) |
 
-**Verdicts** (frozen in `PROTOCOL.md`):
-- **Leak present before.** The ratio `R` of the 224-leading-zero class to
-  the full-length class was 0.38–0.48 in every round, on both curves, against
-  the threshold 0.9.
-- **Coarse leak closed after.** The largest deviation of any class from
-  the full-length class, `F`, was at most 0.212 (SM2) and 0.149 (GOST).
-  The A/A noise band `δ` is 0.229. `R` after was 0.86–1.08.
-- **Cost on full-length scalars.** SM2 1.29–1.42× (median 1.36); GOST
-  1.29–1.55× (median 1.52).
+- **Verdicts.** The leak was present before (`R` 0.38–0.48) and closed
+  after (`F` at most 0.212, against `δ` 0.229).
+- **Cost.** SM2 1.29–1.42× (median 1.36); GOST 1.29–1.55× (median 1.52).
 
 **Reading.**
 - Before the fix, a 32-bit scalar on these curves took about 40% of the
-  time of a full-length one.
+  time of a full-length one, in both runs.
 - After it, the class medians are within the host's A/A noise of each
-  other. The noise is wide, at 23% on this 4-vCPU guest.
+  other. The noise is wide, at 23–30% on this 4-vCPU guest.
 - The deterministic counter test is the stronger evidence that the ladder's
   work no longer depends on the length.
+- With the Jacobian subtrahend the fix costs nothing measurable. The affine
+  version cost a third or more.
 
 ## Scope
 
@@ -120,13 +146,9 @@ class, so it need not equal the ratio of the two ms columns.
 - **secp256k1 and P-256** take the projective ladders with complete
   formulas, which never had this shortcut. They are unchanged.
 
-**Possible follow-ups, not done here:**
-- `[2^L]P` could come from the Jacobian `Point::scalar_mul`, which is
-  variable-time but has public inputs, instead of `L` affine doublings.
-  That would remove most of the added cost.
-- EC-KCDSA and EC-ElGamal on P-256 and secp256k1 could call
-  `scalar_mul_secret` instead of the affine ladder, and so get the
-  limb-level constant-time projective stack.
+**Possible follow-up, not done here:** EC-KCDSA and EC-ElGamal on P-256
+and secp256k1 could call `scalar_mul_secret` instead of the affine ladder,
+and so get the limb-level constant-time projective stack.
 
 ## Why there is no `benchmarks/` row
 
@@ -141,11 +163,13 @@ which the gate permits.
 ## Files
 
 - `PROTOCOL.md`;
-- `raw/timing.jsonl`, `raw/isolation.jsonl`, `raw/manifest.json`;
-- `summary.json`;
+- `raw-run2/` and `raw/`, each holding `timing.jsonl`, `isolation.jsonl`
+  and `manifest.json`;
+- `summary-run2.json` and `summary.json`;
 - `scripts/run_arms.sh` (orchestration only), `scripts/plot.py` (layout
   only);
-- `fig_timing.{svg,png}`, `REPORT.typ`, `REPORT.pdf`.
+- `fig_timing_run2.{svg,png}`, `fig_timing.{svg,png}`, `REPORT.typ`,
+  `REPORT.pdf`.
 
 The drivers are `examples/scalar_mul_secret_timing.rs` and
 `examples/scalar_mul_timing_analyze.rs`.
