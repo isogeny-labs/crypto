@@ -1,0 +1,142 @@
+import FrobeniusBridge
+
+/-! Explicit short-Weierstrass quadratic-twist images.  The finite-field
+nonsquare hypothesis derives the Frobenius sign, rather than assuming hB. -/
+namespace TwistEmbedding
+
+open WeierstrassCurve.Affine
+
+variable {k K : Type*} [Field k] [Fintype k] [Field K] [Algebra k K]
+  [DecidableEq k] [DecidableEq K]
+
+def short {F : Type*} [Zero F] (a b : F) : WeierstrassCurve.Affine F :=
+  ⟨0, 0, 0, a, b⟩
+
+def twist (a b d : k) : WeierstrassCurve.Affine k :=
+  short (d ^ 2 * a) (d ^ 3 * b)
+
+theorem nonsquare_ne_zero {d : k} (hd : ¬IsSquare d) : d ≠ 0 := by
+  rintro rfl
+  exact hd ⟨0, by simp⟩
+
+theorem frobenius_root_neg {d : k} (hchar : ringChar k ≠ 2)
+    (hd : ¬IsSquare d) {u : K} (hu : u ^ 2 = algebraMap k K d) :
+    FiniteField.frobeniusAlgHom k K u = -u := by
+  have hd0 := nonsquare_ne_zero hd
+  have hdn : d ^ (Fintype.card k / 2) = -1 :=
+    (FiniteField.pow_dichotomy hchar hd0).resolve_left
+      (fun h => hd ((FiniteField.isSquare_iff hchar hd0).mpr h))
+  have hodd := FiniteField.odd_card_of_char_ne_two hchar
+  have hq : 2 * (Fintype.card k / 2) + 1 = Fintype.card k := by omega
+  change u ^ Fintype.card k = -u
+  rw [← hq, pow_succ, pow_mul, hu, ← map_pow, hdn]
+  simp
+
+theorem twist_image_equation (a b d x y : k) (hd : d ≠ 0)
+    (u : K) (hu : u ^ 2 = algebraMap k K d)
+    (h : (twist a b d).Equation x y) :
+    ((short a b).baseChange K).Equation
+      (algebraMap k K x / algebraMap k K d)
+      (algebraMap k K y / (algebraMap k K d * u)) := by
+  have hdK : algebraMap k K d ≠ 0 := (map_ne_zero (algebraMap k K)).mpr hd
+  have hu0 : u ≠ 0 := by
+    intro hz
+    simp [hz] at hu
+    exact hdK hu.symm
+  rw [equation_iff] at h ⊢
+  simp only [twist, short, WeierstrassCurve.baseChange, WeierstrassCurve.map,
+    map_zero, zero_mul, mul_zero, add_zero, zero_add] at h ⊢
+  have hm := congrArg (algebraMap k K) h
+  simp only [map_pow, map_add, map_mul] at hm
+  field_simp [hdK, hu0]
+  linear_combination (algebraMap k K d) * hm -
+    ((algebraMap k K x) ^ 3 + algebraMap k K a * algebraMap k K x *
+      (algebraMap k K d) ^ 2 + algebraMap k K b * (algebraMap k K d) ^ 3) * hu
+
+noncomputable def lift (a b d : k) [(short a b).IsElliptic]
+    (hd : d ≠ 0) (u : K) (hu : u ^ 2 = algebraMap k K d) :
+    (twist a b d).Point → ((short a b).baseChange K).Point
+  | .zero => .zero
+  | .some x y h => .some _ _
+      ((equation_iff_nonsingular_of_Δ_ne_zero
+        (W := (short a b).baseChange K)
+        (by simpa [WeierstrassCurve.baseChange, WeierstrassCurve.map_Δ] using
+          ((map_ne_zero (algebraMap k K)).mpr
+            (WeierstrassCurve.isUnit_Δ (short a b)).ne_zero))).mp
+        (twist_image_equation a b d x y hd u hu h.1))
+
+theorem frobenius_lift_neg (a b d : k) [(short a b).IsElliptic]
+    (hchar : ringChar k ≠ 2) (hd : ¬IsSquare d)
+    (u : K) (hu : u ^ 2 = algebraMap k K d) (P : (twist a b d).Point) :
+    FrobeniusBridge.curveFrobenius (short a b)
+      (lift a b d (nonsquare_ne_zero hd) u hu P) =
+    -lift a b d (nonsquare_ne_zero hd) u hu P := by
+  cases P with
+  | zero => change (Point.map _ : _ →+ _) 0 = -(0 : ((short a b).baseChange K).Point)
+            simp
+  | some x y h =>
+    simp only [lift, FrobeniusBridge.curveFrobenius, Point.map_some,
+      Point.neg_some, Point.some.injEq]
+    constructor
+    · simp
+    · simp [map_div₀, map_mul, frobenius_root_neg hchar hd hu, div_neg,
+        WeierstrassCurve.Affine.negY, short, WeierstrassCurve.baseChange,
+        WeierstrassCurve.map]
+
+theorem lift_injective (a b d : k) [(short a b).IsElliptic]
+    (hd : d ≠ 0) (u : K) (hu : u ^ 2 = algebraMap k K d) :
+    Function.Injective (lift a b d hd u hu) := by
+  have hdK : algebraMap k K d ≠ 0 := (map_ne_zero (algebraMap k K)).mpr hd
+  have hu0 : u ≠ 0 := by
+    intro hz
+    simp [hz] at hu
+    exact hdK hu.symm
+  rintro (_ | ⟨x,y,h⟩) (_ | ⟨x',y',h'⟩) heq
+  · rfl
+  · contradiction
+  · contradiction
+  · have hxy := Point.some.inj heq
+    apply Point.some.injEq.mpr
+    constructor
+    · apply (algebraMap k K).injective
+      exact (div_left_inj' hdK).mp hxy.1
+    · apply (algebraMap k K).injective
+      exact (div_left_inj' (mul_ne_zero hdK hu0)).mp hxy.2
+
+theorem rational_twist_relation_two_torsion (a b d : k) [(short a b).IsElliptic]
+    (hchar : ringChar k ≠ 2) (hd : ¬IsSquare d)
+    (u : K) (hu : u ^ 2 = algebraMap k K d)
+    (A R : ((short a b).baseChange k).Point) (P : (twist a b d).Point)
+    (hrel : FrobeniusBridge.rationalLift (short a b) A +
+      lift a b d (nonsquare_ne_zero hd) u hu P =
+      FrobeniusBridge.rationalLift (short a b) R) :
+    2 • lift a b d (nonsquare_ne_zero hd) u hu P = 0 :=
+  FrobeniusBridge.rational_mixed_two_torsion (short a b) A R _
+    (frobenius_lift_neg a b d hchar hd u hu P) hrel
+
+theorem rational_twist_relation_odd (a b d : k) [(short a b).IsElliptic]
+    (hchar : ringChar k ≠ 2) (hd : ¬IsSquare d)
+    (u : K) (hu : u ^ 2 = algebraMap k K d)
+    (A R : ((short a b).baseChange k).Point) (P : (twist a b d).Point)
+    (r : ℕ) (hodd : Nat.Coprime 2 r)
+    (hr : r • lift a b d (nonsquare_ne_zero hd) u hu P = 0)
+    (hrel : FrobeniusBridge.rationalLift (short a b) A +
+      lift a b d (nonsquare_ne_zero hd) u hu P =
+      FrobeniusBridge.rationalLift (short a b) R) :
+    P = 0 ∧ FrobeniusBridge.rationalLift (short a b) A =
+      FrobeniusBridge.rationalLift (short a b) R := by
+  have hz := FrobeniusBridge.rational_mixed_odd (short a b) A R _ r hodd hr
+    (frobenius_lift_neg a b d hchar hd u hu P) hrel
+  refine ⟨lift_injective a b d (nonsquare_ne_zero hd) u hu ?_, ?_⟩
+  · exact hz
+  · simpa only [hz, add_zero] using hrel
+
+#print axioms nonsquare_ne_zero
+#print axioms frobenius_root_neg
+#print axioms twist_image_equation
+#print axioms frobenius_lift_neg
+#print axioms lift_injective
+#print axioms rational_twist_relation_two_torsion
+#print axioms rational_twist_relation_odd
+
+end TwistEmbedding

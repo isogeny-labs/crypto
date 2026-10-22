@@ -6,6 +6,23 @@ S3 triples, 113,342 ordered S4 quadruples, the subfield and trace-zero fixtures,
 all 81 toy IC logarithms, and the four transported relation collections.
 The historical Python source and records remain unchanged in their archive.
 
+The [2026-10-22 mixed-relation experiment](reports/mixed-20261022T0718Z/README.md)
+adds **74,693,760 exhaustive signed words** on 274 shared odd-prime subgroup
+cases, independently checked with Rust tuple arithmetic and a multiplicity DP.
+No mixed-component counterexample or relation-rank gain appears. Nonzero
+two-torsion exceptions remain visible. Ten new Lean statements construct the
+explicit short-model twist image, prove its Frobenius negation without an
+assumed hB, and derive the single-point and finite-sum odd-order obstructions.
+There are now 28 named research theorems; full geometric formalization remains
+partial. [New raw records](native/mixed-20261022T0718Z/),
+[protocol](MIXED_RELATIONS_20261022_PROTOCOL.md),
+[proof map](lean/README.md), and [validation](validation/mixed-20261022T0718Z/README.md).
+
+Reproduce the new bounded experiment and independent controls with
+`bash research/quadratic_twist_evidence_20261021/run-mixed.sh /tmp/twist-mixed-fresh`.
+The directory must be fresh. The workflow runs this replay, and the existing
+proof gate includes the new Lean module. No general hardness or speedup follows.
+
 - [Full native replay receipt](native/runs/run-20261021T150125Z/parity.json),
   [raw output](native/runs/run-20261021T150125Z/results.json), and
   [execution transcript](native/runs/run-20261021T150125Z/run.log).
@@ -16,7 +33,7 @@ The historical Python source and records remain unchanged in their archive.
 - [False relation, missing coverage, and false reference controls](native/controls-20261021T150300Z/run.log).
 - [Fourteen group/ring theorems](lean/TwistProof.lean) and
   [four actual elliptic-curve Frobenius theorems](lean/FrobeniusBridge.lean), their
-  [proof map](lean/README.md), and [18-theorem proof-gate receipt](validation/lean-bridge-gate/).
+  [proof map](lean/README.md), and [earlier 18-theorem proof-gate receipt](validation/lean-bridge-gate/).
 - [Three IDC1 identities](certificates/identity-index.json), each linked to the
   exact checked Lean source. The native checker uses 32 derived points and
   16 extra points and rejects the deliberately false identities.

@@ -35,7 +35,7 @@ jobs:
         with:
           toolchain: '1.99.1'
       - name: Install native audit dependencies
-        run: sudo apt-get update && sudo apt-get install -y g++ libssl-dev jq xz-utils
+        run: sudo apt-get update && sudo apt-get install -y g++ libssl-dev jq xz-utils ripgrep
       - name: Audit historical certificates natively
         run: bash research/quadratic_twist_evidence_20261021/run-audit.sh
       - name: Check corrupted-source and false-relation controls
@@ -48,6 +48,10 @@ jobs:
         run: cargo test --release --locked --manifest-path research/quadratic_twist_evidence_20261021/native/metadata/Cargo.toml
       - name: Reproduce identity certificates and registered models
         run: bash research/quadratic_twist_evidence_20261021/test-metadata.sh "$RUNNER_TEMP/twist-native" "$RUNNER_TEMP/twist-metadata"
+      - name: Replay mixed Frobenius words with independent native arithmetic
+        run: bash research/quadratic_twist_evidence_20261021/run-mixed.sh "$RUNNER_TEMP/twist-mixed"
+      - name: Check mixed-audit native identity backend tests
+        run: cargo test --release --locked --manifest-path research/quadratic_twist_evidence_20261021/native/mixed-audit/Cargo.toml
       - name: Upload native audit receipts
         if: always()
         uses: actions/upload-artifact@v4
@@ -58,4 +62,5 @@ jobs:
             ${{ runner.temp }}/twist-native/
             ${{ runner.temp }}/twist-controls/
             ${{ runner.temp }}/twist-metadata/
+            ${{ runner.temp }}/twist-mixed/
           if-no-files-found: error
