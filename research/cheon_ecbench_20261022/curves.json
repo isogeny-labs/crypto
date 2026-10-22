@@ -1,0 +1,259 @@
+{
+  "schema": "cheon-ecbench-curves/v1",
+  "description": "The 14 frozen prime-order curves of research/cheon_p224_shape_20261022/curves.json (PROTOCOL.md section 3), as registry source records: short Weierstrass y^2 = x^3 + a x + b over F_p, group order n prime (cofactor 1), the generator of the ecbench workloads, and the ICV1 identity computed by the Rust constructor in the ecbench records. n -/+ 1 = d q with q prime, d about n^0.129 (minus) or n^0.211 (plus).",
+  "source": "research/cheon_p224_shape_20261022/curves.json, identities from the records of sessions/minus-20261022 and sessions/plus-20261022",
+  "curves": [
+    {
+      "family": "minus",
+      "bits": 32,
+      "d": 16,
+      "q": 201328471,
+      "p": "3221225473",
+      "a": "1276370223",
+      "b": "3125933284",
+      "group_order": "3221255537",
+      "subgroup_order": "3221255537",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x2",
+        "y": "0x19d0ef70"
+      },
+      "icv1": "ICV1:fp-3221225473:-30063:3221255537:2287418369:unk:unk:r:42a4d230df10",
+      "slug": "icv1-fp32-tm30063-42a4d230"
+    },
+    {
+      "family": "minus",
+      "bits": 36,
+      "d": 30,
+      "q": 1717985791,
+      "p": "51539607599",
+      "a": "42839962887",
+      "b": "20874427050",
+      "group_order": "51539573731",
+      "subgroup_order": "51539573731",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x1",
+        "y": "0x18dc1830e"
+      },
+      "icv1": "ICV1:fp-51539607599:33869:51539573731:17104780281:unk:unk:r:2ec6c58720eb",
+      "slug": "icv1-fp36-t33869-2ec6c587"
+    },
+    {
+      "family": "minus",
+      "bits": 40,
+      "d": 28,
+      "q": 29451143011,
+      "p": "824633720837",
+      "a": "631256874754",
+      "b": "396321534139",
+      "group_order": "824632004309",
+      "subgroup_order": "824632004309",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x1",
+        "y": "0x53955357d6"
+      },
+      "icv1": "ICV1:fp-824633720837:1716529:824632004309:238695811107:unk:unk:r:3d19b2250542",
+      "slug": "icv1-fp40-t1716529-3d19b225"
+    },
+    {
+      "family": "minus",
+      "bits": 44,
+      "d": 74,
+      "q": 178299186929,
+      "p": "13194139533349",
+      "a": "4446846082295",
+      "b": "8537060969387",
+      "group_order": "13194139832747",
+      "subgroup_order": "13194139832747",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x1",
+        "y": "0x266983fadc8"
+      },
+      "icv1": "ICV1:fp-13194139533349:-299397:13194139832747:3071729528255:unk:unk:r:25170a453686",
+      "slug": "icv1-fp44-tm299397-25170a45"
+    },
+    {
+      "family": "minus",
+      "bits": 48,
+      "d": 56,
+      "q": 3769753923137,
+      "p": "211106232533047",
+      "a": "39641408782314",
+      "b": "41864005889039",
+      "group_order": "211106219695673",
+      "subgroup_order": "211106219695673",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x6",
+        "y": "0x2af9334cb4af"
+      },
+      "icv1": "ICV1:fp-211106232533047:12837375:211106219695673:127360207720149:unk:unk:r:d282330ebcb5",
+      "slug": "icv1-fp48-t12837375-d282330e"
+    },
+    {
+      "family": "minus",
+      "bits": 52,
+      "d": 164,
+      "q": 20595730369889,
+      "p": "3377699720527897",
+      "a": "1295299755018450",
+      "b": "2616635297825668",
+      "group_order": "3377699780661797",
+      "subgroup_order": "3377699780661797",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x1",
+        "y": "0x218841f4c98a"
+      },
+      "icv1": "ICV1:fp-3377699720527897:-60133899:3377699780661797:3205567407208849:unk:unk:r:e028287da0f0",
+      "slug": "icv1-fp52-tm60133899-e028287d"
+    },
+    {
+      "family": "minus",
+      "bits": 56,
+      "d": 210,
+      "q": 257348549415703,
+      "p": "54043195528445957",
+      "a": "8102277897249688",
+      "b": "3876574820001616",
+      "group_order": "54043195377297631",
+      "subgroup_order": "54043195377297631",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x1",
+        "y": "0x203f65455f8ee0"
+      },
+      "icv1": "ICV1:fp-54043195528445957:151148327:54043195377297631:26779719516680240:unk:unk:r:021eeef86550",
+      "slug": "icv1-fp56-t151148327-021eeef8"
+    },
+    {
+      "family": "plus",
+      "bits": 32,
+      "d": 90,
+      "q": 35790841,
+      "p": "3221225473",
+      "a": "1650266196",
+      "b": "921941151",
+      "group_order": "3221175689",
+      "subgroup_order": "3221175689",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x4",
+        "y": "0x5d378fc"
+      },
+      "icv1": "ICV1:fp-3221225473:49785:3221175689:520564810:unk:unk:r:c7011f8d28f9",
+      "slug": "icv1-fp32-t49785-c7011f8d"
+    },
+    {
+      "family": "plus",
+      "bits": 36,
+      "d": 240,
+      "q": 214748903,
+      "p": "51539607599",
+      "a": "42563202063",
+      "b": "36790426922",
+      "group_order": "51539736719",
+      "subgroup_order": "51539736719",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x1",
+        "y": "0x18adcd278"
+      },
+      "icv1": "ICV1:fp-51539607599:-129119:51539736719:38535649153:unk:unk:r:ba25e0864bbf",
+      "slug": "icv1-fp36-tm129119-ba25e086"
+    },
+    {
+      "family": "plus",
+      "bits": 40,
+      "d": 398,
+      "q": 2071943113,
+      "p": "824633720837",
+      "a": "549438520351",
+      "b": "720403155216",
+      "group_order": "824633358973",
+      "subgroup_order": "824633358973",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x3",
+        "y": "0x3ad4b6a215"
+      },
+      "icv1": "ICV1:fp-824633720837:361865:824633358973:339305224919:unk:unk:r:3168d4f0ebf4",
+      "slug": "icv1-fp40-t361865-3168d4f0"
+    },
+    {
+      "family": "plus",
+      "bits": 44,
+      "d": 574,
+      "q": 22986301451,
+      "p": "13194139533349",
+      "a": "10139896036112",
+      "b": "12540980411941",
+      "group_order": "13194137032873",
+      "subgroup_order": "13194137032873",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x4",
+        "y": "0x1ef2c44b036"
+      },
+      "icv1": "ICV1:fp-13194139533349:2500477:13194137032873:5962774511816:unk:unk:r:898d24668b19",
+      "slug": "icv1-fp44-t2500477-898d2466"
+    },
+    {
+      "family": "plus",
+      "bits": 48,
+      "d": 990,
+      "q": 213238631257,
+      "p": "211106232533047",
+      "a": "149792481057423",
+      "b": "201282812286566",
+      "group_order": "211106244944429",
+      "subgroup_order": "211106244944429",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x1",
+        "y": "0x5ae03fb9557d"
+      },
+      "icv1": "ICV1:fp-211106232533047:-12411381:211106244944429:141673194569384:unk:unk:r:a81a33681ff0",
+      "slug": "icv1-fp48-tm12411381-a81a3368"
+    },
+    {
+      "family": "plus",
+      "bits": 52,
+      "d": 1836,
+      "q": 1839705722863,
+      "p": "3377699720527897",
+      "a": "675828149500061",
+      "b": "1658838600702915",
+      "group_order": "3377699707176467",
+      "subgroup_order": "3377699707176467",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x1",
+        "y": "0x128f89632dff8"
+      },
+      "icv1": "ICV1:fp-3377699720527897:13351431:3377699707176467:2578591932377781:unk:unk:r:b09ac3d18f87",
+      "slug": "icv1-fp52-t13351431-b09ac3d1"
+    },
+    {
+      "family": "plus",
+      "bits": 56,
+      "d": 2016,
+      "q": 26807140501159,
+      "p": "54043195528445957",
+      "a": "51670185159952162",
+      "b": "44313559061370316",
+      "group_order": "54043195250336543",
+      "subgroup_order": "54043195250336543",
+      "cofactor": 1,
+      "generator": {
+        "x": "0x4",
+        "y": "0x52e263e90abf2"
+      },
+      "icv1": "ICV1:fp-54043195528445957:278109415:54043195250336543:15940644298962495:unk:unk:r:2d6157a82820",
+      "slug": "icv1-fp56-t278109415-2d6157a8"
+    }
+  ]
+}
