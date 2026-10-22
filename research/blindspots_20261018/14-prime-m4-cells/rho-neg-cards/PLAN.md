@@ -51,3 +51,34 @@ Other outputs: `build.stdout.log`, `build.stderr.log`, `selftest.stdout.log`,
 About 1 to 2 minutes: build about 6 s, selftest about 25 to 60 s (recorded 21.7 s for the
 shorter selftest; the addendum adds checks), all other commands together under 5 s.
 Timeouts: build 120 s, selftest 300 s, fullic-b28 60 s, every other run 30 s.
+
+## Replay r01 (validation gate)
+
+`card-r01.yaml` (`CARD-BLINDSPOT-14-RHONEG-R01`) is an independent re-execution of
+`card-n01.yaml`: the same build argv, the same instrument pin (sha256
+1a7d51c3adcd7108de335cd7ac3b2d83a11f5ef1246b8b959271ced1f5e8710e), the same binds, the same
+14 run commands in the same order (selftest `--deep`, the 8 continuity runs, the 4 rho-neg
+runs), the same make-dirs and remove-bin steps. Only the paths differ: every output, log and
+the receipt (`receipt-r01.json`) is under `raw/rho-neg-replay/`, all in `must_not_exist`;
+write scope is that directory only; the binary `raw/rho-neg-replay/bin/b14neg` is removed by
+the last two commands; no commit pin. The card is not run, committed or pushed by its author.
+
+Which replay output must equal which recorded n01 output (n01 files are in `raw/rho-neg/`,
+replay files in `raw/rho-neg-replay/`, same file name in both):
+
+| replay file | must equal | comparison |
+|--|--|--|
+| selftest.stdout.log | raw/rho-neg/selftest.stdout.log | line-equal after stripping timing text: the ` NN ms` inside parentheses, `in N.NNs`, and the final `(N.Ns)` on the `SELFTEST OK` line; every other character equal |
+| cont-rho-b{16,20,24,28}.jsonl | same name in raw/rho-neg/ | 16 rows each, every field equal except `ms` |
+| cont-fullic-a-b{16,20,24,28}.jsonl | same name in raw/rho-neg/ | 16 rows each, every field equal except `ms` |
+| rho-neg-b{16,20,24,28}.jsonl | same name in raw/rho-neg/ | 16 rows each, every field equal except `ms` |
+| each `.stdout.log` of a run command (cont-*, rho-neg-*) | same name in raw/rho-neg/ | every field equal except `ms` (the n01 stdout is the same text as its `.jsonl`) |
+| every `.stderr.log`, build.stdout.log, build.stderr.log | same name in raw/rho-neg/ | empty in both (size 0) |
+
+Rows are compared as parsed JSON objects, row by row in file order; "every field" includes
+`counts`, `gae`, `native`, `steps`, `walks`, the seeds and every other key. Not compared:
+`ms`, the binary, the receipt (its timestamps and paths differ). As an extra check the
+continuity files of the replay (`cont-*.jsonl`) must also equal the bound recorded files
+`raw/rho-b*.jsonl` and `raw/fullic-a-b*.jsonl` in every field except `ms`, exactly as in
+the n01 "Continuity mapping" table above. Any other difference is an instrument or
+determinism defect, and the replay does not validate n01.
