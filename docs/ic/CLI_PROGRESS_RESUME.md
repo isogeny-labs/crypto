@@ -2,11 +2,30 @@
 
 `icx run CURVE --verbose --json` keeps its final JSON document on stdout and
 streams stage lines to stderr. `--progress-every SECONDS` sets the live
-heartbeat interval and implies verbose output. The current `icx run` pipeline
-does not checkpoint a partially completed relation collection or a completed
-repeat; an interrupted run still needs to restart that computation. The
-catalog, estimate, and validation commands are reports rather than long-lived
-workflows.
+heartbeat interval and implies verbose output. `icx run` can save completed
+repeats in a dedicated local directory and mirror each checkpoint to S3:
+
+```sh
+icx run p192 --bits 7 --repeats 3 --rho-runs 0 --max-trials 2000 \
+  --state-dir ./icx-state/p192-7 --s3-uri s3://my-bucket/icx/p192-7 \
+  --verbose --json
+icx run p192 --bits 7 --repeats 3 --rho-runs 0 --max-trials 2000 \
+  --state-dir ./icx-state/p192-7 --s3-uri s3://my-bucket/icx/p192-7 \
+  --resume --verbose --json
+```
+
+The directory contains `manifest.json`, `icx.ckpt`, `progress.json`, and,
+after completion, `result.json`. The checkpoint is checksummed and binds all
+run inputs and the executable digest; restart skips only fully saved repeats
+and reports their original measurements. An interrupted repeat restarts from
+its beginning, including relation collection. The original rho reference is
+reused on the same host;
+cross-host resume is accepted only with `--rho-runs 0`. The resume annotation
+names both hosts and states that per-repeat costs exclude restart setup and
+storage. A fresh local directory with `--resume --s3-uri` restores S3 state.
+One writer may use a state prefix at a time: the local lock cannot coordinate
+separate hosts. The catalog, estimate, and validation commands are reports
+rather than long-lived workflows.
 
 `isogeny_walk walk` has an opt-in, checksummed state directory in its `--out`
 path. For example:
