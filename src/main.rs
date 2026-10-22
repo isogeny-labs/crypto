@@ -445,6 +445,15 @@ enum CryptanalysisOp {
         #[arg(long)]
         known_ciphertext_hex: Option<String>,
     },
+    /// Recover an AES-128 key candidate by bit-partition difference-of-means power analysis.
+    AesDpa {
+        /// JSON with plaintexts and sixteen aligned trace arrays; accepts a checked store: reference.
+        #[arg(long)]
+        input: PathBuf,
+        /// Ciphertext for the first plaintext, to verify the recovered key.
+        #[arg(long)]
+        known_ciphertext_hex: Option<String>,
+    },
     /// Estimate AES-128 key-byte high nibbles from sixteen isolated lookup timing channels.
     AesCacheTiming {
         /// JSON with plaintexts and one aligned timing channel per byte.
@@ -1783,7 +1792,33 @@ fn cmd_aes_dfa_schedule(last_round_key_hex: &str) -> Result<(), String> {
     Ok(())
 }
 
-fn cmd_aes_cpa(input: &Path, known_ciphertext_hex: Option<&str>) -> Result<(), String> {
+#[derive(Clone, Copy)]
+enum AesPowerMethod {
+    Cpa,
+    Dpa,
+}
+
+impl AesPowerMethod {
+    fn name(self) -> &'static str {
+        match self {
+            Self::Cpa => "AES CPA",
+            Self::Dpa => "AES DPA",
+        }
+    }
+
+    fn operation(self) -> &'static str {
+        match self {
+            Self::Cpa => "aes-cpa",
+            Self::Dpa => "aes-dpa",
+        }
+    }
+}
+
+fn cmd_aes_power(
+    method: AesPowerMethod,
+    input: &Path,
+    known_ciphertext_hex: Option<&str>,
+) -> Result<(), String> {
     use crypto_lib::cryptanalysis::aes::{dpa, ReducedAes128};
     use serde::Deserialize;
 
@@ -1800,18 +1835,21 @@ fn cmd_aes_cpa(input: &Path, known_ciphertext_hex: Option<&str>) -> Result<(), S
         .len()
         > 64 * 1024 * 1024
     {
-        return Err("AES CPA trace input exceeds 64 MiB".into());
+        return Err(format!("{} trace input exceeds 64 MiB", method.name()));
     }
     let bytes =
         std::fs::read(&resolved).map_err(|e| format!("cannot read {}: {e}", input.display()))?;
     if bytes.len() > 64 * 1024 * 1024 {
-        return Err("AES CPA trace input exceeds 64 MiB".into());
+        return Err(format!("{} trace input exceeds 64 MiB", method.name()));
     }
-    let trace_input: TraceInput =
-        serde_json::from_slice(&bytes).map_err(|e| format!("invalid AES CPA trace JSON: {e}"))?;
+    let trace_input: TraceInput = serde_json::from_slice(&bytes)
+        .map_err(|e| format!("invalid {} trace JSON: {e}", method.name()))?;
     let count = trace_input.plaintexts.len();
     if !(16..=100_000).contains(&count) {
-        return Err("AES CPA requires 16..=100000 aligned traces".into());
+        return Err(format!(
+            "{} requires 16..=100000 aligned traces",
+            method.name()
+        ));
     }
     let mut plaintexts = Vec::with_capacity(count);
     for (index, encoded) in trace_input.plaintexts.iter().enumerate() {
@@ -1823,8 +1861,8 @@ fn cmd_aes_cpa(input: &Path, known_ciphertext_hex: Option<&str>) -> Result<(), S
         plaintexts.push(block);
     }
     let mut recovered = [0u8; 16];
-    let mut peak_correlation = [0.0f64; 16];
-    let mut runner_up_correlation = [0.0f64; 16];
+    let mut peak_score = [0.0f64; 16];
+    let mut runner_up_score = [0.0f64; 16];
     for byte in 0..16 {
         let traces = &trace_input.traces_per_byte[byte];
         if traces.len() != count || traces.iter().any(|v| !v.is_finite()) {
@@ -1837,10 +1875,18 @@ fn cmd_aes_cpa(input: &Path, known_ciphertext_hex: Option<&str>) -> Result<(), S
         {
             return Err(format!("trace channel {byte} has no usable variation"));
         }
-        let (candidate, correlations) = dpa::cpa_recover_byte(&plaintexts, traces, byte);
+        let (candidate, scores) = match method {
+            AesPowerMethod::Cpa => dpa::cpa_recover_byte(&plaintexts, traces, byte),
+            AesPowerMethod::Dpa => dpa::dpa_recover_byte(&plaintexts, traces, byte),
+        };
+        if matches!(method, AesPowerMethod::Dpa) && scores[candidate as usize] == 0.0 {
+            return Err(format!(
+                "trace channel {byte} has no usable DPA bit partition"
+            ));
+        }
         recovered[byte] = candidate;
-        peak_correlation[byte] = correlations[candidate as usize].abs();
-        runner_up_correlation[byte] = correlations
+        peak_score[byte] = scores[candidate as usize].abs();
+        runner_up_score[byte] = scores
             .iter()
             .enumerate()
             .filter(|(guess, _)| *guess != candidate as usize)
@@ -1859,23 +1905,36 @@ fn cmd_aes_cpa(input: &Path, known_ciphertext_hex: Option<&str>) -> Result<(), S
     let verified = known_ciphertext.map(|ciphertext| {
         ReducedAes128::new(&recovered, 10, false).encrypt(&plaintexts[0]) == ciphertext
     });
-    println!(
-        "{}",
-        serde_json::to_string_pretty(&serde_json::json!({
+    let mut report = serde_json::json!({
             "schema_version": 1,
-            "operation": "aes-cpa",
+            "operation": method.operation(),
             "model": "first-round-sbox-hamming-weight",
             "samples_per_byte": count,
             "candidate_key_hex": to_hex(&recovered),
-            "peak_abs_correlation": peak_correlation,
-            "runner_up_abs_correlation": runner_up_correlation,
             "verified": verified,
             "status": if verified == Some(true) { "complete" } else if verified == Some(false) { "verification_failed" } else { "candidate" },
-        }))
-        .map_err(|e| e.to_string())?
+    });
+    match method {
+        AesPowerMethod::Cpa => {
+            report["peak_abs_correlation"] = serde_json::json!(peak_score);
+            report["runner_up_abs_correlation"] = serde_json::json!(runner_up_score);
+        }
+        AesPowerMethod::Dpa => {
+            report["score_model"] =
+                serde_json::json!("sum-of-eight-squared-bit-partition-mean-differences");
+            report["peak_differential_energy"] = serde_json::json!(peak_score);
+            report["runner_up_differential_energy"] = serde_json::json!(runner_up_score);
+        }
+    }
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
     );
     if verified == Some(false) {
-        return Err("AES CPA candidate failed the supplied ciphertext check".into());
+        return Err(format!(
+            "{} candidate failed the supplied ciphertext check",
+            method.name()
+        ));
     }
     Ok(())
 }
@@ -2475,7 +2534,20 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             input,
             known_ciphertext_hex,
         } => {
-            if let Err(e) = cmd_aes_cpa(&input, known_ciphertext_hex.as_deref()) {
+            if let Err(e) =
+                cmd_aes_power(AesPowerMethod::Cpa, &input, known_ciphertext_hex.as_deref())
+            {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesDpa {
+            input,
+            known_ciphertext_hex,
+        } => {
+            if let Err(e) =
+                cmd_aes_power(AesPowerMethod::Dpa, &input, known_ciphertext_hex.as_deref())
+            {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }

@@ -537,6 +537,22 @@ ten-round AES encryption; without that check the status is `candidate`.
 This command analyzes supplied traces. Trace acquisition and alignment
 depend on the measured device.
 
+`aes-dpa` accepts the same checked trace JSON and optional ciphertext:
+
+```sh
+crypto cryptanalysis aes-dpa \
+  --input docs/ic/fixtures/aes_cpa_traces_public_20261022.json \
+  --known-ciphertext-hex 69c4e0d86a7b0430d8cdb78070b4c55a
+```
+
+For each first-round key-byte guess it partitions traces by each of the
+eight predicted AES S-box output bits, then sums the eight squared
+differences between the two sample means. The output reports the leading
+and runner-up energies in squared trace units. The supplied ciphertext
+checks the candidate key with a full AES-128 encryption. Without that check,
+the result remains a candidate; trace acquisition and alignment still belong
+to the measurement setup.
+
 The release CLI acceptance report is
 [`aes_cpa_public_report_20261018.json`](fixtures/aes_cpa_public_report_20261018.json).
 It uses 512 noiseless Hamming-weight samples per byte with key
