@@ -12,6 +12,11 @@ use std::time::Instant;
 
 #[path = "prime_route.rs"]
 mod route;
+pub use route::GenerateArgs as PrimeRouteGenerateArgs;
+
+pub(super) fn generate_route(args: &PrimeRouteGenerateArgs) -> Result<Value, String> {
+    route::generate(args)
+}
 
 #[derive(Args)]
 pub struct PrimeArgs {

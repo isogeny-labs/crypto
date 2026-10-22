@@ -37,11 +37,29 @@ receipt; the S3 acceptance object was deleted after the fresh pull check.
 `IW1` route before collecting IC relations:
 
 ```sh
+ic prime-route-generate --p 271 --a 1 --b 19 --n 281 \
+  --gx 3 --gy 7 --qx 231 --qy 54 \
+  --degree 11 --max-curves 3 --seed 1 --json \
+  > /tmp/prime-route.json
 ic solve-prime --p 271 --a 1 --b 19 --n 281 \
   --gx 3 --gy 7 --qx 231 --qy 54 \
-  --route-file docs/ic/fixtures/prime271_isogeny_routes.json \
+  --route-file /tmp/prime-route.json \
   --route-id IW1E11h1h1a619f4ab250 --json
 ```
+
+`prime-route-generate` is available through both `ic` and `icx`. It accepts
+the same public curve, generator, and target coordinates as `solve-prime`,
+counts and validates the group, runs a bounded one-hop certified walk, and
+independently verifies the generated `IW1` graph before emitting its route
+file. The degree must be an odd prime in 3–31 below `p-1` and distinct from
+the DLP subgroup order; `--max-curves` is 2–64. A walk with no certified
+rational route exits unsuccessfully. The command may return several route
+IDs; select one from the emitted `routes` array. The p=271 command above
+returns two verified edges and two routes, including the shown route ID.
+The generated route also passed a live Setec store push, HEAD check, remote
+verification, fresh-cache pull, `solve-prime` replay of scalar 190, and
+exact-object cleanup. Its isolated key and checks are recorded in
+[`GENERATED_PRIME_ROUTE_S3_ACCEPTANCE_20261022.json`](../store/GENERATED_PRIME_ROUTE_S3_ACCEPTANCE_20261022.json).
 
 `--route-file` also accepts an indexed `store:NAME` or `sha256:DIGEST`
 reference. The solver verifies and fetches a missing route file through the

@@ -203,6 +203,10 @@ checked against its content hash and graph certificates, and used to verify
 the scalar on the source and destination curves. The exact HEAD, fetch,
 verification, and cleanup results are in
 [`ROUTE_IC_S3_ACCEPTANCE_20261018.json`](ROUTE_IC_S3_ACCEPTANCE_20261018.json).
+The route generated directly by `ic prime-route-generate` from the public
+p=271 target passed push, HEAD, remote verification, fresh-cache pull,
+`solve-prime` scalar replay, and exact-object cleanup. Its receipt is
+[`GENERATED_PRIME_ROUTE_S3_ACCEPTANCE_20261022.json`](GENERATED_PRIME_ROUTE_S3_ACCEPTANCE_20261022.json).
 The public cubic-field cofactor-12 target input also passed a live upload,
 HEAD checksum, fresh-cache `icx solve-cubic --input store:...` fetch, scalar
 replay, remote verify, exact-object cleanup, and final HEAD 404. The first

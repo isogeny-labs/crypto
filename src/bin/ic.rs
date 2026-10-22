@@ -117,6 +117,8 @@ enum Action {
     Prime(prime::PrimeArgs),
     /// Run bounded EC index calculus on an explicit prime-field public target.
     SolvePrime(prime_external::PrimeArgs),
+    /// Generate certified prime-field IW1 isogeny routes for a public target.
+    PrimeRouteGenerate(prime_external::PrimeRouteGenerateArgs),
     /// Run bounded EC index calculus on an explicit cubic-field public target.
     SolveCubic(cubic_external::CubicArgs),
     /// Enumerate bounded rational j-neighbours over an exact cubic field.
@@ -179,6 +181,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::LargePrime(args)) => large_prime::run(args.clone()),
         Some(Action::Prime(args)) => prime::run(args.clone()),
         Some(Action::SolvePrime(args)) => prime_external::solve(args),
+        Some(Action::PrimeRouteGenerate(args)) => prime_external::generate_route(args),
         Some(Action::SolveCubic(args)) => cubic_external::solve(args),
         Some(Action::CubicGraph(args)) => cubic_route::enumerate_j(args),
         Some(Action::CubicRouteGenerate(args)) => cubic_route::generate(args),
