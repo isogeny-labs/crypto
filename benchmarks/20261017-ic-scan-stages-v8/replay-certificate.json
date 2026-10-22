@@ -1,0 +1,68 @@
+{
+  "independent": true,
+  "native_replay": {
+    "host": "Linux 6.18.44-fc-v140 x86_64",
+    "output": "../../research/ic_tool_program/validation/raw/native-replay.json",
+    "seed": "77767620d255d08ba58c8cadde0823c4",
+    "seed_file": "../../research/ic_tool_program/validation/REPLAY_SEED.md",
+    "tool": "src/bin/ic_validate.rs (ic_validate replay)"
+  },
+  "runs": [
+    {
+      "binary": "ic-r04probes-on-v8-786c06f7",
+      "binary_sha256": "c4502142b1f5fa7a63decd6cef53155f2eb40e9d3ec07788eb3b1415e9a63065",
+      "identical": true,
+      "record": "runs/k0n61/M1-T01/r2.price.json",
+      "scalars": {
+        "ic": "153752017445515",
+        "rho": "153752017445515"
+      }
+    },
+    {
+      "binary": "ic-r04probes-on-v8-786c06f7",
+      "binary_sha256": "c4502142b1f5fa7a63decd6cef53155f2eb40e9d3ec07788eb3b1415e9a63065",
+      "identical": true,
+      "record": "runs/k0n61/M1-T02/r2.price.json",
+      "scalars": {
+        "ic": "106251430450189",
+        "rho": "106251430450189"
+      }
+    },
+    {
+      "binary": "ic-r04probes-on-v8-786c06f7",
+      "binary_sha256": "c4502142b1f5fa7a63decd6cef53155f2eb40e9d3ec07788eb3b1415e9a63065",
+      "identical": true,
+      "record": "runs/k1n59/M1-T02/r1.price.json",
+      "scalars": {
+        "ic": "13711702643079",
+        "rho": "13711702643079"
+      }
+    },
+    {
+      "binary": "ic-r04probes-on-v8-786c06f7",
+      "binary_sha256": "c4502142b1f5fa7a63decd6cef53155f2eb40e9d3ec07788eb3b1415e9a63065",
+      "identical": true,
+      "record": "runs/k0n53/M1-T01/r4.price.json",
+      "scalars": {
+        "ic": "518509155375",
+        "rho": "518509155375"
+      }
+    }
+  ],
+  "scalar_verification": {
+    "certificates": 48,
+    "failures": 0,
+    "field_degrees": [
+      53,
+      59,
+      61
+    ],
+    "output": "../../research/ic_tool_program/validation/raw/certverify-S8.json",
+    "records": 24,
+    "tool": "src/bin/ic_validate.rs (ic_validate certverify)"
+  },
+  "scalars_verified": true,
+  "schema": "ic-tool-programme-replay-certificate/v2",
+  "status": "verified",
+  "what": "research/ic_tool_program/explorations/scan-stages-v8-20261017: every recorded scalar checked by an independent GF(2^m) verifier ([s]G = T, [n]G = O, [s+1]G != T), and 4 records drawn by REPLAY_SEED.md rerun natively with their own binaries, certificates and counts compared"
+}

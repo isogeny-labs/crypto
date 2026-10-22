@@ -1,0 +1,68 @@
+{
+  "independent": true,
+  "native_replay": {
+    "host": "Linux 6.18.44-fc-v140 x86_64",
+    "output": "../../research/ic_tool_program/validation/raw/native-replay.json",
+    "seed": "77767620d255d08ba58c8cadde0823c4",
+    "seed_file": "../../research/ic_tool_program/validation/REPLAY_SEED.md",
+    "tool": "src/bin/ic_validate.rs (ic_validate replay)"
+  },
+  "runs": [
+    {
+      "binary": "ic-a17-v8-fb4284d8",
+      "binary_sha256": "0db6abf3610f7fd51bbca11e815024a7e8bcec6b536eed786f40e21a317cfbc4",
+      "identical": true,
+      "record": "a17/runs/heap/k0n53/M1-T02/r5.price.json",
+      "scalars": {
+        "ic": "14868793722243",
+        "rho": "14868793722243"
+      }
+    },
+    {
+      "binary": "ic-a17-v8-fb4284d8",
+      "binary_sha256": "0db6abf3610f7fd51bbca11e815024a7e8bcec6b536eed786f40e21a317cfbc4",
+      "identical": true,
+      "record": "a17/runs/heap/k0n61/M1-T01/r2.price.json",
+      "scalars": {
+        "ic": "153752017445515",
+        "rho": "153752017445515"
+      }
+    },
+    {
+      "binary": "ic-a17-v8-fb4284d8",
+      "binary_sha256": "0db6abf3610f7fd51bbca11e815024a7e8bcec6b536eed786f40e21a317cfbc4",
+      "identical": true,
+      "record": "a17/runs/a17/k0n53/M1-T02/r6.price.json",
+      "scalars": {
+        "ic": "14868793722243",
+        "rho": "14868793722243"
+      }
+    },
+    {
+      "binary": "ic-r04probes-on-v8-786c06f7",
+      "binary_sha256": "c4502142b1f5fa7a63decd6cef53155f2eb40e9d3ec07788eb3b1415e9a63065",
+      "identical": true,
+      "record": "a17-probes/runs/v8/k1n59/M1-T01/r1.price.json",
+      "scalars": {
+        "ic": "22924121815368",
+        "rho": "22924121815368"
+      }
+    }
+  ],
+  "scalar_verification": {
+    "certificates": 312,
+    "failures": 0,
+    "field_degrees": [
+      53,
+      59,
+      61
+    ],
+    "output": "../../research/ic_tool_program/validation/raw/certverify-A17.json",
+    "records": 156,
+    "tool": "src/bin/ic_validate.rs (ic_validate certverify)"
+  },
+  "scalars_verified": true,
+  "schema": "ic-tool-programme-replay-certificate/v2",
+  "status": "verified",
+  "what": "research/ic_tool_program/explorations/A17-filter-huge-pages-20261017: every recorded scalar checked by an independent GF(2^m) verifier ([s]G = T, [n]G = O, [s+1]G != T), and 4 records drawn by REPLAY_SEED.md rerun natively with their own binaries, certificates and counts compared"
+}

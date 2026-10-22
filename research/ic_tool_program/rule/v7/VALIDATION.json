@@ -1,0 +1,44 @@
+{
+  "built_by": "src/bin/ic_validate.rs (ic_validate build)",
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "sha256": "b1db60dd0aec11f34d626872245abc1e9f2d4f7e0aa7503273f099e7b0279f1b"
+  },
+  "rho_reference": {
+    "band_basis": "the row's reported arm at its largest size (icv1-f2m61-t158598901-ab42b6c5, 2^47.2); the index calculus is timed by the clock, so it carries no unpriced native work; the canonicalisations rho's walk leaves uncharged (median 1330817.5 a process) are priced at 0, 0.1 and 1 GAE each",
+    "binary_or_process": "the row's own `ic` binary and process: both arms rebuilt from nothing each repetition, the index calculus first",
+    "gae_band": {
+      "0": {
+        "ic": 12.389421899213076,
+        "rho": 0.553865500691741
+      },
+      "0.1": {
+        "ic": 12.389421899213076,
+        "rho": 0.5642928497611611
+      },
+      "1": {
+        "ic": 12.389421899213076,
+        "rho": 0.6581389913859423
+      }
+    },
+    "ic_over_rho_canonical": 22.36900815042554,
+    "kind": "negation_frobenius",
+    "matches_protocol": true,
+    "order_holds_across_band": true,
+    "protocol": "ledger section 23's one-target rho on the same public point, in the same `ic price --single-target` process: the signed-Frobenius r-adding walk (negation and Frobenius classes), its set-up plus its walk; the walk priced at the canonical batched step this process measures (`s_rho_model`), the stronger of the two references the process records",
+    "rho_as_built": {
+      "ic_over_rho": 11.507937298777636,
+      "note": "the reference the published row quotes; it pays more than the canonical step for a walk step, so the published distance to rho is the smaller of the two",
+      "s": 1.0765979669118524
+    },
+    "same_binary_or_process": true,
+    "same_unit": true,
+    "strongest_available": true,
+    "unit": "S: cold time in v0's unit (one batched addition) over sqrt(r)"
+  },
+  "schema": "validation-gate/v1",
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "49ee1edf1bb799b71f3e19d679fb18a215942b71528a903a981bfecbae89697a"
+  }
+}

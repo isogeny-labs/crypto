@@ -1,0 +1,71 @@
+{
+  "independent": true,
+  "native_replay": {
+    "host": "Linux 6.18.44-fc-v140 x86_64",
+    "output": "../../research/ic_tool_program/validation/raw/native-replay.json",
+    "seed": "77767620d255d08ba58c8cadde0823c4",
+    "seed_file": "../../research/ic_tool_program/validation/REPLAY_SEED.md",
+    "tool": "src/bin/ic_validate.rs (ic_validate replay)"
+  },
+  "runs": [
+    {
+      "binary": "ic-r11-v6-c2af9b7c",
+      "binary_sha256": "85116c2a0da19e5e2e31d7ec1ff8d58a28406bbf9ffe30d330476a67a182315a",
+      "identical": true,
+      "record": "runs/k0n57/T22-R1.price.json",
+      "scalars": {
+        "ic": "31413311867",
+        "rho": "31413311867"
+      }
+    },
+    {
+      "binary": "ic-r11-v6-c2af9b7c",
+      "binary_sha256": "85116c2a0da19e5e2e31d7ec1ff8d58a28406bbf9ffe30d330476a67a182315a",
+      "identical": true,
+      "record": "runs/k0n41/T60-R1.price.json",
+      "scalars": {
+        "ic": "283821600993",
+        "rho": "283821600993"
+      }
+    },
+    {
+      "binary": "ic-r11-v6-c2af9b7c",
+      "binary_sha256": "85116c2a0da19e5e2e31d7ec1ff8d58a28406bbf9ffe30d330476a67a182315a",
+      "identical": true,
+      "record": "runs/k1n47/T43-R1.price.json",
+      "scalars": {
+        "ic": "69830843123",
+        "rho": "69830843123"
+      }
+    },
+    {
+      "binary": "ic-r11-v6-c2af9b7c",
+      "binary_sha256": "85116c2a0da19e5e2e31d7ec1ff8d58a28406bbf9ffe30d330476a67a182315a",
+      "identical": true,
+      "record": "runs/k0n41/T24-R1.price.json",
+      "scalars": {
+        "ic": "15665172933",
+        "rho": "15665172933"
+      }
+    }
+  ],
+  "scalar_verification": {
+    "certificates": 838,
+    "failures": 0,
+    "field_degrees": [
+      41,
+      47,
+      53,
+      57,
+      59,
+      61
+    ],
+    "output": "../../research/ic_tool_program/validation/raw/certverify-v7.json",
+    "records": 419,
+    "tool": "src/bin/ic_validate.rs (ic_validate certverify)"
+  },
+  "scalars_verified": true,
+  "schema": "ic-tool-programme-replay-certificate/v2",
+  "status": "verified",
+  "what": "research/ic_tool_program/rule/v7: every recorded scalar checked by an independent GF(2^m) verifier ([s]G = T, [n]G = O, [s+1]G != T), and 4 records drawn by REPLAY_SEED.md rerun natively with their own binaries, certificates and counts compared"
+}

@@ -1,0 +1,68 @@
+{
+  "independent": true,
+  "native_replay": {
+    "host": "Linux 6.18.44-fc-v140 x86_64",
+    "output": "../../research/ic_tool_program/validation/raw/native-replay.json",
+    "seed": "77767620d255d08ba58c8cadde0823c4",
+    "seed_file": "../../research/ic_tool_program/validation/REPLAY_SEED.md",
+    "tool": "src/bin/ic_validate.rs (ic_validate replay)"
+  },
+  "runs": [
+    {
+      "binary": "ic-r12-v7-23138d20",
+      "binary_sha256": "3ba2f76565c3f9ae54aa63d8f24a26d18cc26f18a2d68de9fd4496280e48e3db",
+      "identical": true,
+      "record": "runs/v8/k0n37/M1-T01/r6.price.json",
+      "scalars": {
+        "ic": "42306505",
+        "rho": "42306505"
+      }
+    },
+    {
+      "binary": "ic-r13-v8-ebfd2d2f",
+      "binary_sha256": "0fbb8431b99fbd8658f5e76aee9e7527af0691acd3fb32e35a5b3919c729db9d",
+      "identical": true,
+      "record": "runs/gate/k0n57/M1-T02/r2.price.json",
+      "scalars": {
+        "ic": "123932889710",
+        "rho": "123932889710"
+      }
+    },
+    {
+      "binary": "ic-r12-v7-23138d20",
+      "binary_sha256": "3ba2f76565c3f9ae54aa63d8f24a26d18cc26f18a2d68de9fd4496280e48e3db",
+      "identical": true,
+      "record": "runs/v8/k0n37/M1-T02/r3.price.json",
+      "scalars": {
+        "ic": "137880253",
+        "rho": "137880253"
+      }
+    },
+    {
+      "binary": "ic-r13-v8-ebfd2d2f",
+      "binary_sha256": "0fbb8431b99fbd8658f5e76aee9e7527af0691acd3fb32e35a5b3919c729db9d",
+      "identical": true,
+      "record": "runs/gate/k0n37/M1-T02/r4.price.json",
+      "scalars": {
+        "ic": "137880253",
+        "rho": "137880253"
+      }
+    }
+  ],
+  "scalar_verification": {
+    "certificates": 144,
+    "failures": 0,
+    "field_degrees": [
+      37,
+      53,
+      57
+    ],
+    "output": "../../research/ic_tool_program/validation/raw/certverify-A14.json",
+    "records": 72,
+    "tool": "src/bin/ic_validate.rs (ic_validate certverify)"
+  },
+  "scalars_verified": true,
+  "schema": "ic-tool-programme-replay-certificate/v2",
+  "status": "verified",
+  "what": "research/ic_tool_program/explorations/A14-prefetch-size-gate-20261017: every recorded scalar checked by an independent GF(2^m) verifier ([s]G = T, [n]G = O, [s+1]G != T), and 4 records drawn by REPLAY_SEED.md rerun natively with their own binaries, certificates and counts compared"
+}

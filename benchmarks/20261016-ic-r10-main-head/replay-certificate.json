@@ -1,0 +1,77 @@
+{
+  "independent": true,
+  "native_replay": {
+    "host": "Linux 6.18.44-fc-v140 x86_64",
+    "output": "../../research/ic_tool_program/validation/raw/native-replay.json",
+    "seed": "77767620d255d08ba58c8cadde0823c4",
+    "seed_file": "../../research/ic_tool_program/validation/REPLAY_SEED.md",
+    "tool": "src/bin/ic_validate.rs (ic_validate replay)"
+  },
+  "runs": [
+    {
+      "binary": "ic-main-92246530",
+      "binary_sha256": "d8daac9aa75ab26e4bac70810f52d8925d518f2d2645ac2f98306d935f23a653",
+      "identical": true,
+      "record": "runs/compare/cand/icv1-f2m59-tm943548413-98844ecc/M3-T05/r3.price.json",
+      "scalars": {
+        "ic": "7226862228318",
+        "rho": "7226862228318"
+      }
+    },
+    {
+      "binary": "ic-main-92246530",
+      "binary_sha256": "d8daac9aa75ab26e4bac70810f52d8925d518f2d2645ac2f98306d935f23a653",
+      "identical": true,
+      "record": "runs/holdout/cand/icv1-f2m53-tm56619371-dac20a85/M31-T153/r1.price.json",
+      "scalars": {
+        "ic": "6725733914546",
+        "rho": "6725733914546"
+      }
+    },
+    {
+      "binary": "ic-main-92246530",
+      "binary_sha256": "d8daac9aa75ab26e4bac70810f52d8925d518f2d2645ac2f98306d935f23a653",
+      "identical": true,
+      "record": "runs/holdout/cand/icv1-f2m59-tm943548413-98844ecc/M30-T151/r4.price.json",
+      "scalars": {
+        "ic": "2298990948787",
+        "rho": "2298990948787"
+      }
+    },
+    {
+      "binary": "ic-v3-995ea207-rebuilt",
+      "binary_sha256": "00cff0b04c3edb9a46076af20857fb27ba1b80f177b277b65abb4c4cf2c3f562",
+      "identical": true,
+      "record": "runs/aa/A/icv1-f2m37-tm534059-32aad96b/M1-T02/r5.price.json",
+      "scalars": {
+        "ic": "137880253",
+        "rho": "137880253"
+      }
+    }
+  ],
+  "scalar_verification": {
+    "certificates": 2246,
+    "failures": 0,
+    "field_degrees": [
+      19,
+      23,
+      31,
+      37,
+      41,
+      43,
+      45,
+      47,
+      53,
+      57,
+      59,
+      61
+    ],
+    "output": "../../research/ic_tool_program/validation/raw/certverify-R10.json",
+    "records": 1123,
+    "tool": "src/bin/ic_validate.rs (ic_validate certverify)"
+  },
+  "scalars_verified": true,
+  "schema": "ic-tool-programme-replay-certificate/v2",
+  "status": "verified",
+  "what": "research/ic_tool_program/rounds/R10-main-head: every recorded scalar checked by an independent GF(2^m) verifier ([s]G = T, [n]G = O, [s+1]G != T), and 4 records drawn by REPLAY_SEED.md rerun natively with their own binaries, certificates and counts compared"
+}
