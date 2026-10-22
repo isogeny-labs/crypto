@@ -1,0 +1,32 @@
+   Compiling crypto v0.1.0 (/private/tmp/eccp131-full-ic-20261021)
+warning: fields `gfni` and `gfni_back` are never read
+   --> src/cryptanalysis/koblitz_fast.rs:691:5
+    |
+682 | pub struct FrobeniusCanon {
+    |            -------------- fields in this struct
+...
+691 |     gfni: [[u64; 8]; 8],
+    |     ^^^^
+...
+694 |     gfni_back: [[u64; 8]; 8],
+    |     ^^^^^^^^^
+    |
+    = note: `FrobeniusCanon` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `pre` and `lanes` are never read
+    --> src/cryptanalysis/koblitz_fast.rs:1623:5
+     |
+1614 | pub struct BatchScratch {
+     |            ------------ fields in this struct
+...
+1623 |     pre: Vec<u64>,
+     |     ^^^
+1624 |     /// The folding kernel's lane products, inverted together.
+1625 |     lanes: Vec<u64>,
+     |     ^^^^^
+     |
+     = note: `BatchScratch` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: `crypto` (lib) generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 4m 11s
