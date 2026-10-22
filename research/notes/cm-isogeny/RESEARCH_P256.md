@@ -651,6 +651,27 @@ cargo test --release --lib solinas_micro_bit_correlations -- --nocapture
 Runtime: ~45 seconds for N = 10⁶ samples.  Memory: ~1 MB for
 the correlation tables.
 
+### Correction 2026-10-22: z-score scale (the figures above are kept as recorded)
+
+- Old value: max |z| = 2.46 at N = 10^6 (top 20 in [2.17, 2.46]).
+- Defect: the z-score used `sqrt(E(1-E)/n)` with `E = p_r p_c`. The null
+  standard error with estimated marginals is
+  `sqrt(p_r(1-p_r) p_c(1-p_c)/n)`; at `p_r = p_c = 1/2` the old scale was too
+  large by `sqrt(3)`, so every z was too small by about 1.73.
+- New result (same seed 42, N = 10^6, release): max |z| = 4.26 (top 20 in
+  [3.76, 4.26]), 4.26 / 2.46 = 1.73. A calibration test on independent random
+  bits and the |z| histogram versus N(0,1) are in
+  `research/solinas_correlation_recalibration_20261022/`.
+- Verdict: the null survives. 4.26 is below the 6.11 threshold printed by the
+  test (alpha 0.001 / 131,072) and consistent with a calibrated null over
+  131,072 pairs. Single seed; not an independent replication.
+- Power claim: "mild non-uniformities (~0.1% deviation at 5 sigma)" does not
+  hold as written. At N = 10^6 and marginals near 1/2 the null standard error of
+  a pair is 0.25/sqrt(N) = 2.5e-4, so 5 sigma is a joint-probability deviation
+  of about 1.25e-3 (0.125 percentage points, 0.5% relative to 0.25), and a
+  deviation of 1e-3 is 4 sigma. At the 6.11 threshold the detectable deviation
+  is about 1.5e-3.
+
 ## Final iteration: all 4 remaining TOP-3 angles
 
 ### Step A: `b`-seed deep statistical profile

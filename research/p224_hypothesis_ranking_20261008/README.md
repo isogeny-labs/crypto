@@ -192,3 +192,7 @@ deterministic.
   Petit–Kosters–Messeng method*, CTCrypt 2024.
 - Valsorda, [NIST curve seeds bounty](https://words.filippo.io/seeds-bounty/),
   2023.
+
+## Related
+
+- [Auxiliary curves explainer](auxiliary-curves-explainer.html)

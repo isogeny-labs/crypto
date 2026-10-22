@@ -1,0 +1,246 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><title>P-224 Auxiliary Curves</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; each idea = short prose + one inline SVG drawn on a shared token palette */
+:root{
+  --bg:#f6f7f4; --panel:#ffffff; --fg:#1d2420; --muted:#5b6660; --rule:#d7dcd6;
+  --p224:#2f6b4f;   /* the real curve over F_p */
+  --scalar:#8a4b14; /* the scalar world Z/n */
+  --aux:#4b4f9c;    /* made-up auxiliary objects */
+  --warn:#a33a2c;
+  --display:"Fraunces",Georgia,serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141816; --panel:#1c211e; --fg:#e4e9e5; --muted:#9aa59f; --rule:#323a35;
+  --p224:#6fc39a; --scalar:#e3a160; --aux:#9da2f0; --warn:#f08b7c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141816; --panel:#1c211e; --fg:#e4e9e5; --muted:#9aa59f; --rule:#323a35;
+  --p224:#6fc39a; --scalar:#e3a160; --aux:#9da2f0; --warn:#f08b7c; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+main{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1{font:650 2.1rem/1.15 var(--display);margin:0;text-wrap:balance}
+h2{font:650 1.35rem/1.25 var(--display);margin:0 0 6px;text-wrap:balance}
+p{margin:0 0 10px;max-width:68ch}
+.lede{font-size:1.08rem;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:6px}
+.answer{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:18px 20px}
+.answer ul{margin:6px 0 0;padding-left:20px}
+.answer li{margin-bottom:6px}
+.fig{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px;overflow-x:auto}
+.fig svg{display:block;width:100%;min-width:620px;height:auto}
+.cap{font-size:.86rem;color:var(--muted);margin-top:6px}
+code,.num{font-family:var(--mono);font-size:.9em}
+.k-p{color:var(--p224);font-weight:600}.k-s{color:var(--scalar);font-weight:600}.k-a{color:var(--aux);font-weight:600}.k-w{color:var(--warn);font-weight:600}
+table{border-collapse:collapse;font-size:.92rem;width:100%;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--rule);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:.8rem;letter-spacing:.04em;text-transform:uppercase}
+.tablewrap{overflow-x:auto}
+svg text{font-family:var(--body);fill:var(--fg)}
+svg .mono{font-family:var(--mono)}
+svg .muted{fill:var(--muted)}
+svg .lp{fill:var(--p224)}svg .ls{fill:var(--scalar)}svg .la{fill:var(--aux)}svg .lw{fill:var(--warn)}
+svg .sp{stroke:var(--p224)}svg .ss{stroke:var(--scalar)}svg .sa{stroke:var(--aux)}svg .sw{stroke:var(--warn)}svg .sr{stroke:var(--rule)}
+svg .panel{fill:var(--panel)}
+svg .fp{fill:var(--p224);fill-opacity:.12}svg .fs{fill:var(--scalar);fill-opacity:.12}svg .fa{fill:var(--aux);fill-opacity:.12}svg .fw{fill:var(--warn);fill-opacity:.12}
+svg .dp{fill:var(--p224)}svg .ds{fill:var(--scalar)}svg .da{fill:var(--aux)}svg .dw{fill:var(--warn)}
+</style>
+
+<main>
+<header>
+  <h1>What an "auxiliary curve" is, and why it isn't a hidden twin of P-224</h1>
+  <p class="lede">Cheon's attack, the curves this repository calls "auxiliary", and P-224's isogenous neighbours are three different things. This page draws each one and shows where P-224's actual numbers enter.</p>
+</header>
+
+<section class="answer">
+  <h2>Short answer</h2>
+  <ul>
+    <li>An auxiliary curve is <b>scaffolding you build yourself</b>. It is picked for a convenient group order or a convenient set of x-coordinates. It is not secretly attached to P-224 and carries no hidden information about the key.</li>
+    <li>It is <b>not an isogenous curve</b> ("isogeny", not "misogyny"). P-224's isogenous curves have exactly the same number of points, n. They are relatives, not helpers. This repo walked 20,000 of them and found no change in discrete-log cost.</li>
+    <li><b>Cheon's attack needs extra input</b>: the protocol must leak <code>[x<sup>d</sup>]G</code> as well as <code>[x]G</code>. With that leak, the attack works in the world of the secret <i>scalar</i> x. That world is <code>Z/n</code>, and the numbers that matter there are <span class="k-s">n − 1</span> and <span class="k-s">n + 1</span>. P-224's famous smooth <span class="k-p">p − 1</span> plays no part in Cheon's attack.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>1. Four worlds, and what travels between them</h2>
+  <p>Almost all the confusion comes from mixing up these four worlds. P-224's points have coordinates in <span class="k-p">F<sub>p</sub></span>. The secret key x is a number mod <span class="k-s">n</span>, the group order. An auxiliary curve lives over one of those two fields, chosen by whoever runs the attack.</p>
+  <div class="fig">
+  <svg viewBox="0 0 860 440" role="img" aria-label="Map of four worlds: P-224 over F_p, the scalar ring Z/n, auxiliary curves, and isogenous curves">
+    <!-- P-224 -->
+    <rect x="20" y="30" width="300" height="170" rx="10" class="fp sp" stroke-width="1.5"/>
+    <text x="36" y="56" font-weight="600" class="lp">P-224:  y² = x³ − 3x + b  over F_p</text>
+    <text x="36" y="78" class="muted" font-size="13">points have coordinates in F_p</text>
+    <text x="36" y="98" class="mono" font-size="12">p − 1 = 2⁹⁶·(2¹²⁸ − 1), 46-bit smooth</text>
+    <text x="36" y="118" class="mono" font-size="12">#E = n, a 224-bit prime</text>
+    <circle cx="80" cy="160" r="5" class="dp"/><text x="92" y="164" font-size="13">G</text>
+    <circle cx="210" cy="150" r="5" class="dp"/><text x="222" y="154" font-size="13">[x]G  (public key)</text>
+    <path d="M86 158 Q150 120 204 148" fill="none" class="sp" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="110" y="190" class="muted" font-size="12">x is hidden: the ECDLP</text>
+
+    <!-- scalar ring -->
+    <rect x="520" y="30" width="320" height="170" rx="10" class="fs ss" stroke-width="1.5"/>
+    <text x="536" y="56" font-weight="600" class="ls">Scalars: Z/n = F_n  (where x lives)</text>
+    <text x="536" y="78" class="muted" font-size="13">Cheon works here, through the exponent</text>
+    <text x="536" y="100" class="mono" font-size="12">n − 1 = 2²·3⁶·5·17·2153·q₁₉₅</text>
+    <text x="536" y="120" class="mono" font-size="12">n + 1 = 2·7·19·641707280681·q₁₇₇</text>
+    <text x="536" y="146" font-size="13">F_n* is a cyclic group of size n − 1:</text>
+    <text x="536" y="166" font-size="13">x = ζᵏ for a known generator ζ</text>
+
+    <!-- arrow P224 <-> scalar -->
+    <path d="M322 110 L516 110" class="ss" stroke-width="2" fill="none" marker-end="url(#ah-s)"/>
+    <text x="340" y="100" font-size="12" class="ls">a leaked [xᵈ]G is a point</text>
+    <text x="340" y="132" font-size="12" class="ls">whose scalar is a power of x</text>
+
+    <!-- aux over F_n -->
+    <rect x="520" y="250" width="320" height="170" rx="10" class="fa sa" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="536" y="276" font-weight="600" class="la">Auxiliary curve E′ over F_n</text>
+    <text x="536" y="298" class="muted" font-size="13">Kim–Cheon / Maurer: replace F_n* by</text>
+    <text x="536" y="316" class="muted" font-size="13">a group whose order you can choose</text>
+    <text x="536" y="342" font-size="13">idea: x becomes a coordinate on E′</text>
+    <text x="536" y="362" font-size="13">needs division "in the exponent"</text>
+    <text x="536" y="388" font-size="12" class="lw">repo: closed by measurement,</text>
+    <text x="536" y="404" font-size="12" class="lw">10³–10⁴ × rho at 14–20 bits</text>
+    <path d="M680 202 L680 246" class="sa" stroke-width="2" fill="none" marker-end="url(#ah-a)"/>
+
+    <!-- aux over F_p (PKM) -->
+    <rect x="20" y="250" width="300" height="170" rx="10" class="fa sa" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="36" y="276" font-weight="600" class="la">Auxiliary curve E′ over F_p (PKM)</text>
+    <text x="36" y="298" class="muted" font-size="13">used only to carve out a set V ⊂ F_p</text>
+    <text x="36" y="316" class="muted" font-size="13">of "small" x-coordinates (factor base)</text>
+    <text x="36" y="342" font-size="13">V = x-values in a chain of 2-isogenies</text>
+    <text x="36" y="362" font-size="13">on E′; never isogenous to P-224</text>
+    <text x="36" y="388" font-size="12" class="lw">repo: supersingular E′ = ordinary E′;</text>
+    <text x="36" y="404" font-size="12" class="lw">no route below rho measured</text>
+    <path d="M170 202 L170 246" class="sa" stroke-width="2" fill="none" marker-end="url(#ah-a)"/>
+    <text x="180" y="230" font-size="12" class="la">V picks which P-224 points count as "small"</text>
+
+    <!-- isogenous -->
+    <rect x="340" y="250" width="160" height="170" rx="10" class="panel sr" stroke-width="1.5"/>
+    <text x="352" y="276" font-weight="600" font-size="14">Isogenous curves</text>
+    <text x="352" y="298" class="muted" font-size="12">same F_p, same n,</text>
+    <text x="352" y="314" class="muted" font-size="12">same embedding degree</text>
+    <text x="352" y="340" font-size="12">P-224 sits on the</text>
+    <text x="352" y="356" font-size="12">surface of a depth-1</text>
+    <text x="352" y="372" font-size="12">3-volcano</text>
+    <text x="352" y="398" font-size="12" class="muted">20k walked: no DLP</text>
+    <text x="352" y="412" font-size="12" class="muted">change measured</text>
+    <path d="M300 202 L380 246" class="sr" stroke-width="2" fill="none" stroke-dasharray="3 3"/>
+    <defs>
+      <marker id="ah-s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="ds"/></marker>
+      <marker id="ah-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="da"/></marker>
+    </defs>
+  </svg>
+  </div>
+  <p class="cap">Solid boxes are fixed by the standard. Dashed boxes are objects an attacker chooses. Grey: P-224's own isogeny class. Factorisations of n ± 1 were computed natively for this page (trial division and Pollard–Brent; q₁₉₅ and q₁₇₇ are probable primes of 195 and 177 bits).</p>
+</section>
+
+<section>
+  <h2>2. How Cheon's attack actually splits x</h2>
+  <p>You are given <code>G</code>, <code>[x]G</code> and <code>[x<sup>d</sup>]G</code>, where d divides n − 1. Write the unknown as x = ζ<sup>k</sup>. Then x<sup>d</sup> lives in a much smaller subgroup of F<sub>n</sub>*, of size (n − 1)/d. You can test a guess k₁ by multiplying the leaked point by a known number, ζ<sup>−d·k₁</sup>, and comparing points. This is ordinary scalar multiplication on P-224, so it is legal. Baby-step giant-step therefore finds k mod (n − 1)/d. A second, smaller search with <code>[x]G</code> finds the rest.</p>
+  <div class="fig">
+  <svg viewBox="0 0 860 250" role="img" aria-label="Cheon's two-stage search: a large stage of size sqrt(n/d) and a small stage of size sqrt(d)">
+    <text x="20" y="28" font-weight="600">The exponent k of x = ζᵏ, split by d | n − 1</text>
+    <rect x="20" y="50" width="820" height="34" rx="6" class="fs ss" stroke-width="1.2"/>
+    <text x="30" y="72" class="mono" font-size="13">k ∈ [0, n − 1):  224 bits, unknown</text>
+    <path d="M20 96 L20 110 L640 110 L640 96" fill="none" class="ss" stroke-width="1.5"/>
+    <path d="M640 96 L640 110 L840 110 L840 96" fill="none" class="sa" stroke-width="1.5"/>
+    <rect x="20" y="124" width="620" height="44" rx="6" class="fs ss" stroke-width="1.2"/>
+    <text x="30" y="144" font-size="13" font-weight="600" class="ls">Stage 1: k mod (n − 1)/d, read off [xᵈ]G</text>
+    <text x="30" y="160" font-size="12" class="mono">cost √((n − 1)/d) ≈ 2^97.5 at d = 2^29</text>
+    <rect x="648" y="124" width="192" height="44" rx="6" class="fa sa" stroke-width="1.2"/>
+    <text x="658" y="144" font-size="13" font-weight="600" class="la">Stage 2: the rest</text>
+    <text x="658" y="160" font-size="12" class="mono">cost √d ≈ 2^14.5</text>
+    <text x="20" y="200" font-size="13">P-224's n − 1 has smooth part d = 2²·3⁶·5·17·2153 = 533,642,580 ≈ 2^29.0. The other factor is a 195-bit prime.</text>
+    <text x="20" y="222" font-size="13">So the best p − 1-style split saves about 2^14 over rho. Making [xᵈ]G yourself from [x]G is the Diffie–Hellman problem,</text>
+    <text x="20" y="242" font-size="13" class="lw">so without a leak none of this starts.</text>
+  </svg>
+  </div>
+</section>
+
+<section>
+  <h2>3. What it would cost on P-224 (derived, not run)</h2>
+  <p>These are log₂ group-operation counts from the textbook formulas, using the exact factorisations of n ± 1 above. Every Cheon row needs the protocol to hand over many powers of x. A plain ECDSA or ECDH key leaks none, so for it only the rho row applies.</p>
+  <div class="fig">
+  <svg viewBox="0 0 860 230" role="img" aria-label="Bar chart of log2 cost: rho 111.8, Cheon n-1 97.5, Cheon n+1 88.4">
+    <g font-size="12" class="muted">
+      <line x1="230" y1="30" x2="230" y2="180" class="sr"/>
+      <text x="226" y="200" text-anchor="middle">0</text>
+      <line x1="440" y1="30" x2="440" y2="180" class="sr" stroke-dasharray="2 3"/><text x="440" y="200" text-anchor="middle">40</text>
+      <line x1="650" y1="30" x2="650" y2="180" class="sr" stroke-dasharray="2 3"/><text x="650" y="200" text-anchor="middle">80</text>
+      <line x1="808" y1="30" x2="808" y2="180" class="sr" stroke-dasharray="2 3"/><text x="808" y="200" text-anchor="middle">110</text>
+      <text x="520" y="222" text-anchor="middle">log₂ of group operations (scale 5.25 px per bit)</text>
+    </g>
+    <text x="20" y="58" font-size="13" font-weight="600">Pollard rho</text>
+    <text x="20" y="74" font-size="11" class="muted">only G and [x]G</text>
+    <rect x="230" y="44" width="587" height="26" rx="3" class="dp"/>
+    <text x="760" y="62" font-size="12" class="mono" style="fill:var(--panel)">2^111.8</text>
+    <text x="20" y="108" font-size="13" font-weight="600">Cheon, n − 1</text>
+    <text x="20" y="124" font-size="11" class="muted">needs ≈ 2^29 powers / oracle calls</text>
+    <rect x="230" y="94" width="512" height="26" rx="3" class="ds"/>
+    <text x="686" y="112" font-size="12" class="mono" style="fill:var(--panel)">2^97.5</text>
+    <text x="20" y="158" font-size="13" font-weight="600">Cheon, n + 1</text>
+    <text x="20" y="174" font-size="11" class="muted">needs ≈ 2^48 powers [xⁱ]G</text>
+    <rect x="230" y="144" width="464" height="26" rx="3" class="da"/>
+    <text x="638" y="162" font-size="12" class="mono" style="fill:var(--panel)">2^88.4</text>
+  </svg>
+  </div>
+  <p class="cap">Formulas: rho √(πn/4). Cheon (n − 1): √(n/d) + √d with d = 2^29.0. Cheon (n + 1): √(n/d) + d with d = 2·7·19·641707280681 ≈ 2^47.3, using powers up to x^{2d}. A static Diffie–Hellman server (one that multiplies any point you send by its fixed key) gives one power per query; this is the Brown–Gallant setting. These are derived costs for P-224, not runs. The repo's measured Cheon runs (toy sizes, <code>research/torsion_auxiliary_inputs_20260918/</code>) put the n − 1 version at about 20× its floor, beating rho from 24 bits up.</p>
+</section>
+
+<section>
+  <h2>4. Where an auxiliary curve would fit, and why it stalls</h2>
+  <p>Cheon is stuck with divisors of n ± 1, because F<sub>n</sub>* and the norm-one torus of F<sub>n²</sub> have sizes n − 1 and n + 1. The auxiliary-curve idea is to swap in an elliptic curve <span class="k-a">E′ over F<sub>n</sub></span> whose number of points has a divisor of your choice. That would free d from n ± 1. The obstacle is mechanical. Walking on E′ means adding points, and adding points needs division. Here the "numbers" are hidden in exponents (you hold [x]G, not x), and you cannot divide inside an exponent with a few queries.</p>
+  <div class="fig">
+  <svg viewBox="0 0 860 200" role="img" aria-label="Why the auxiliary-curve route stalls: point addition on E' needs a quotient the attacker cannot form in the exponent">
+    <rect x="20" y="20" width="250" height="150" rx="10" class="fs ss" stroke-width="1.2"/>
+    <text x="34" y="46" font-weight="600" class="ls">What you hold</text>
+    <text x="34" y="72" class="mono" font-size="13">[x]G, [x²]G, …, [xᵈ]G</text>
+    <text x="34" y="96" font-size="13">you can add these points</text>
+    <text x="34" y="116" font-size="13">and multiply them by known numbers</text>
+    <text x="34" y="140" font-size="13">= any polynomial in x, in the exponent</text>
+    <path d="M272 95 L380 95" class="sa" stroke-width="2" marker-end="url(#ah-a2)" fill="none"/>
+    <rect x="384" y="20" width="220" height="150" rx="10" class="fa sa" stroke-width="1.2" stroke-dasharray="6 4"/>
+    <text x="398" y="46" font-weight="600" class="la">What E′/F_n needs</text>
+    <text x="398" y="72" class="mono" font-size="13">λ = (y₂ − y₁)/(x₂ − x₁)</text>
+    <text x="398" y="96" font-size="13">a quotient of hidden values</text>
+    <text x="398" y="116" font-size="13">a polynomial cannot give it</text>
+    <text x="398" y="140" font-size="13">without ≈ n operations</text>
+    <path d="M606 95 L700 95" class="sw" stroke-width="2" marker-end="url(#ah-w)" fill="none"/>
+    <rect x="704" y="40" width="136" height="110" rx="10" class="fw sw" stroke-width="1.2"/>
+    <text x="716" y="66" font-weight="600" class="lw">Wall</text>
+    <text x="716" y="90" font-size="12">repo measured</text>
+    <text x="716" y="108" font-size="12">10³–10⁴ × rho</text>
+    <text x="716" y="126" font-size="12">at 14–20 bits</text>
+    <defs>
+      <marker id="ah-a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="da"/></marker>
+      <marker id="ah-w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="dw"/></marker>
+    </defs>
+  </svg>
+  </div>
+  <p class="cap">The same trick does work with a full Diffie–Hellman oracle. Maurer and Wolf use an auxiliary curve over F_n with smooth order to show that discrete log reduces to Diffie–Hellman. That is a statement about how hard the two problems are relative to each other, not an attack on keys. Source: <code>research/notes/ecdlp-general/RESEARCH_TORSION_AUXILIARY_INPUTS.md</code>.</p>
+</section>
+
+<section>
+  <h2>5. The other "auxiliary curve": PKM's factor base over F_p</h2>
+  <p>Index calculus on P-224 needs a set of "small" points. Petit, Kosters and Messeng define one by its x-coordinates. Take a set <span class="k-a">V ⊂ F<sub>p</sub></span> built from a tower of low-degree maps. In one version, the maps are a chain of 2-isogenies on an auxiliary curve E′ over the same field F<sub>p</sub>. This is the one place isogenies really appear, but they act on E′, not on P-224. E′ only supplies the shape of V, which keeps the decomposition equations at low degree. For P-224 you do not even need E′. Because p − 1 = 2⁹⁶·(odd), the roots of unity μ<sub>2<sup>t</sup></sub> give the same tower shape directly, with t up to 96. That is why P-224's smooth p − 1 shows up in PKM discussions and not in Cheon's.</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>object</th><th>field</th><th>chosen by</th><th>what it buys</th><th>status in this repo</th></tr></thead>
+    <tbody>
+      <tr><td class="k-p">P-224</td><td>F_p</td><td>NIST, 1999</td><td>the target</td><td>rho 2^111.8</td></tr>
+      <tr><td>isogenous curves of P-224</td><td>F_p</td><td>nobody (forced by n)</td><td>same group order; transfer would need explicit maps</td><td>20k walked, no DLP change</td></tr>
+      <tr><td class="k-s">F_n*, torus of F_{n²}</td><td>F_n</td><td>forced by n ± 1</td><td>Cheon's split, given leaked powers</td><td>measured at toy sizes; P-224 numbers above are derived</td></tr>
+      <tr><td class="k-a">auxiliary E′ over F_n</td><td>F_n</td><td>attacker</td><td>would free d from n ± 1</td><td>closed: division in the exponent</td></tr>
+      <tr><td class="k-a">auxiliary E′ over F_p (PKM)</td><td>F_p</td><td>attacker</td><td>structured factor base V</td><td>supersingular = ordinary; solving degree still rising</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>So, is it a curve that "gives excess structure"?</h2>
+  <p>Only in the sense that a ruler gives you structure. It is a tool the attacker brings. It cannot add information that isn't already in the inputs. In Cheon's attack the extra information is the leaked powers of x, and the auxiliary group only lets you use them efficiently. With only <code>G</code> and <code>[x]G</code>, as for an ordinary P-224 key, no auxiliary curve in this repository's measurements gets below rho.</p>
+</section>
+</main>
+</body></html>
