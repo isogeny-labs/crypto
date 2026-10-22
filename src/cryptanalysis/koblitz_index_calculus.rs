@@ -3065,7 +3065,7 @@ pub fn build_subgroup_orbit_factor_base_with_cost(
     let cofactor = &kc.cofactor;
     let mut rng = StdRng::seed_from_u64(seed);
     let mut representatives: Vec<F2mElement> = Vec::new();
-    let mut seen: HashSet<u64> = HashSet::new();
+    let mut seen: FxSet<u64> = FxSet::default();
     let mut base: Option<FrobeniusFactorBase> = None;
     // Each round adds a batch of orbits and rebuilds, so the loop stops at
     // the first base that reaches `points` rather than overshooting by a
@@ -3083,7 +3083,11 @@ pub fn build_subgroup_orbit_factor_base_with_cost(
     // so skipping it changes nothing.  The abscissa set is maintained
     // here as the batches arrive, which costs one Frobenius orbit per new
     // representative rather than one per representative per round.
-    let mut abscissae: HashSet<BigUint> = HashSet::new();
+    // Only its size is read, so it holds single-word field elements: the
+    // single-word field is the same field (`from_element` is one-to-one)
+    // and squaring commutes with the change, so the count is the one a
+    // set of general elements gave.
+    let mut abscissae: FxSet<u64> = FxSet::default();
     let mut cost = FactorBaseSelectionCost::default();
     while base.as_ref().is_none_or(|b| b.points.len() < points) {
         let mut added = 0usize;
@@ -3121,11 +3125,11 @@ pub fn build_subgroup_orbit_factor_base_with_cost(
             let BinaryPoint::Affine { x, .. } = curve.lower(projected) else {
                 continue;
             };
-            let mut orbit = F2mElement::from_biguint(&x.to_biguint(), kc.n);
+            let mut orbit = curve.field.from_element(&x);
             for _ in 0..kc.extension_degree() {
-                abscissae.insert(orbit.to_biguint());
-                orbit = kc.frobenius_x(&orbit);
+                abscissae.insert(orbit);
                 if kc.frobenius_is_endomorphism {
+                    orbit = curve.field.sqr_k(orbit, kc.k);
                     cost.frobenius_squarings += u64::from(kc.k);
                 }
             }
@@ -4357,6 +4361,11 @@ enum Targets {
     /// rotation needs no scratch of its own.
     Subset {
         doubled: Vec<u32>,
+        /// `doubled`'s summands' coordinates, gathered once for the
+        /// unit, so a trial slices them instead of gathering its own
+        /// (empty when the table keeps no coordinate slices).
+        doubled_x: Vec<u64>,
+        doubled_y: Vec<u64>,
         len: usize,
         window: usize,
     },
@@ -4392,8 +4401,23 @@ impl Targets {
                 len: *len,
             },
             Targets::Subset {
-                doubled, window, ..
-            } => Scan::Indices(&doubled[offset..offset + *window]),
+                doubled,
+                doubled_x,
+                doubled_y,
+                window,
+                ..
+            } => {
+                let span = offset..offset + *window;
+                if doubled_x.is_empty() {
+                    Scan::Indices(&doubled[span])
+                } else {
+                    Scan::Gathered {
+                        idxs: &doubled[span.clone()],
+                        xs: &doubled_x[span.clone()],
+                        ys: &doubled_y[span],
+                    }
+                }
+            }
         }
     }
 }
@@ -4424,6 +4448,14 @@ pub enum Scan<'a> {
     Cyclic { start: usize, len: usize },
     /// Exactly these base indices, in this order.
     Indices(&'a [u32]),
+    /// [`Scan::Indices`] with the summands' coordinates already gathered
+    /// (`xs[i]`, `ys[i]` are index `idxs[i]`'s): the same scan, without a
+    /// per-trial gather.
+    Gathered {
+        idxs: &'a [u32],
+        xs: &'a [u64],
+        ys: &'a [u64],
+    },
 }
 
 impl Scan<'_> {
@@ -4431,7 +4463,7 @@ impl Scan<'_> {
     pub fn len(&self) -> usize {
         match self {
             Scan::Cyclic { len, .. } => *len,
-            Scan::Indices(idxs) => idxs.len(),
+            Scan::Indices(idxs) | Scan::Gathered { idxs, .. } => idxs.len(),
         }
     }
 
@@ -6619,7 +6651,7 @@ impl PairSumTable {
                 let start = start % base;
                 (start, len.min(base - start))
             }
-            Scan::Indices(_) => (0, len),
+            Scan::Indices(_) | Scan::Gathered { .. } => (0, len),
         };
         // On a folded table with a basis change, the folding kernel takes
         // the summands as coordinate slices and leaves each rest as its
@@ -6660,6 +6692,9 @@ impl PairSumTable {
                     self.curve
                         .add_many_lazy_soa(target, gather_x, gather_y, x3s, lambdas, batch)
                 }
+                Scan::Gathered { xs, ys, .. } => {
+                    self.curve.add_many_lazy_soa(target, xs, ys, x3s, lambdas, batch)
+                }
             };
             if !done {
                 x3s.clear();
@@ -6686,7 +6721,7 @@ impl PairSumTable {
                         add(&self.negated[..len - tail], rests);
                     }
                 }
-                Scan::Indices(idxs) => {
+                Scan::Indices(idxs) | Scan::Gathered { idxs, .. } => {
                     gather.clear();
                     gather.reserve(idxs.len());
                     for &i in idxs {
@@ -6732,10 +6767,10 @@ impl PairSumTable {
             // The bucket entries arrived during the filter pass: read them
             // and send for every admitted key's run before looking any up,
             // so the runs' misses overlap instead of following one another.
-            for &within in &admitted_offsets {
+            for &within in admitted_offsets.iter() {
                 self.prefetch_run(keys[within]);
             }
-            for &within in &admitted_offsets {
+            for &within in admitted_offsets.iter() {
                 let offset = lo + within;
                 let k = match scan {
                     Scan::Cyclic { .. } => {
@@ -6745,7 +6780,7 @@ impl PairSumTable {
                             offset - tail
                         }
                     }
-                    Scan::Indices(idxs) => idxs[offset] as usize,
+                    Scan::Indices(idxs) | Scan::Gathered { idxs, .. } => idxs[offset] as usize,
                 };
                 let rest = if fused {
                     FastPoint::affine(x3s[offset], 0)
@@ -9452,7 +9487,7 @@ fn projected_signed_orbit_map_fast(
     let fc = FastCurve::new(&kc.curve)?;
     let (projected, _) = project_by_frobenius_orbits(kc, &fc, fb);
     let mut representatives: Vec<FastPoint> = Vec::new();
-    let mut seen: HashSet<u64> = HashSet::new();
+    let mut seen: FxSet<u64> = FxSet::default();
     for &point in &projected {
         if point.infinity || seen.contains(&point.pack()) {
             continue;
@@ -9475,7 +9510,7 @@ fn projected_signed_orbit_map_fast(
     }
     representatives.sort_unstable_by_key(|p| p.pack());
 
-    let mut location_by_key: HashMap<u64, (usize, u32, bool)> = HashMap::new();
+    let mut location_by_key: FxMap<u64, (usize, u32, bool)> = FxMap::default();
     for (orbit, &representative) in representatives.iter().enumerate() {
         let mut current = representative;
         for k in 0..kc.n {
@@ -12644,8 +12679,17 @@ impl<'a> RelationCollector<'a> {
         let mut doubled = Vec::with_capacity(len + window);
         doubled.extend_from_slice(&idxs);
         doubled.extend_from_slice(&idxs[..window]);
+        let (doubled_x, doubled_y) = match self.pair_table() {
+            Some(pair) if !pair.negated_x.is_empty() => (
+                doubled.iter().map(|&i| pair.negated_x[i as usize]).collect(),
+                doubled.iter().map(|&i| pair.negated_y[i as usize]).collect(),
+            ),
+            _ => (Vec::new(), Vec::new()),
+        };
         Some(Targets::Subset {
             doubled,
+            doubled_x,
+            doubled_y,
             len,
             window,
         })
@@ -14005,10 +14049,6 @@ impl WordRelation {
 
 fn mul_mod_u64(a: u64, b: u64, m: u64) -> u64 {
     ((a as u128 * b as u128) % m as u128) as u64
-}
-
-fn add_mod_u64(a: u64, b: u64, m: u64) -> u64 {
-    ((a as u128 + b as u128) % m as u128) as u64
 }
 
 /// `a⁻¹ mod m` by the extended Euclidean algorithm, or `None` when
