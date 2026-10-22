@@ -877,6 +877,24 @@ specialises the 8 m = 3, ℓ = 7 draws whose degree-4 closure does not refute
   degree 5.
 - **The open question.** It is how many guesses degree 4 needs as ℓ grows.
 
+## Result 15: four guessed variables bring every ℓ = 8 draw back to degree 4
+
+`research/dreg_closure_guess_20261022/` was pre-registered. At m = 3,
+(n, ℓ) = (22, 8), N = 46, it guesses four variables (one coordinate per
+summand and one intermediate coordinate) on 4 unsatisfiable draws, all 16
+branches each, and runs the degree-4 closure on every branch.
+
+- **Registered verdict: four guesses suffice at ℓ = 8.** All 64 branches
+  refute at degree 4. The positive control (one more coordinate per summand,
+  dimensions 6, 6, 6) refutes on 4 of 4.
+- **The rule `m·(ℓ−6)` is rejected for this guess set:** it predicted 6.
+- **An upper bound only.** k = 4 is the fewest guesses the 130k-column
+  dense closure can measure at N = 46. A k that stays bounded as ℓ grows,
+  as k ≈ 1 at ℓ = 7 would suggest, is not excluded.
+- **Instrument fix.** `dreg_closure` now reads `--max-cols` against the
+  variables that occur after `--fix`. The engine's columns already ran over
+  those, and unspecialised systems are unchanged.
+
 ## Reproducing
 
 ```sh

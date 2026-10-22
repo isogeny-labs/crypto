@@ -227,8 +227,8 @@ fn main() {
             }
             if satisfiable {
                 let mut scan = Vec::new();
-                for d in (3..=to.unwrap_or(5))
-                    .take_while(|&d| monomials_up_to(occurring, d) <= max_cols)
+                for d in
+                    (3..=to.unwrap_or(5)).take_while(|&d| monomials_up_to(occurring, d) <= max_cols)
                 {
                     scan.extend(closure_refutation_scan(&sys.equations, sys.n_vars, d, d));
                 }

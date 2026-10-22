@@ -95,6 +95,12 @@ model output is `descent_degree_cost-output-20261016-scale.txt`.
    - Both surviving explanations put m = 4's rise at ℓ ≤ 7. So the m = 4
      degree-4 row (`2^68.43`) is contradicted.
    - The degree-5 rows are now the optimistic case: m = 4 at `2^71.13`.
+9. **Guess-then-degree-4 survives to ℓ = 8, with k ≤ 4 (§9, §10).**
+   - At m = 3, ℓ = 8, four guessed variables make degree 4 refute on all 64
+     branches of 4 draws. The linear rule `m·(ℓ−6)` (6 guesses) fails.
+   - At the priced m = 4, ℓ = 33 cell the hybrid beats degree 5 only if
+     k ≤ 6. Linear growth in ℓ gives about 105; a bounded k is not
+     excluded. Its best case is the `2^68.43` degree-4 row. No row moves.
 
 ## 1. What is measured
 
@@ -481,6 +487,23 @@ m = 3, ℓ = 7 draws that do not refute at degree 4.
     far worse than degree 5, so no row is added.
   - The measurement that would decide it is k at ℓ = 8 and 9.
 - **No row beats rho.**
+
+## 10. Guesses at ℓ = 8 (2026-10-22)
+
+`research/dreg_closure_guess_20261022/` guessed four variables (one per
+summand and one intermediate coordinate) on 4 unsatisfiable m = 3, ℓ = 8
+draws (N = 46), all 16 branches each.
+
+- **All 64 branches refute at degree 4**, and the dimension-6 positive
+  control refutes on 4 of 4. So k ≤ 4 at ℓ = 8; fewer is not measurable
+  in the 16 GB container.
+- **The price.** At w = 1 and the m = 4, ℓ = 33 cell (N = 394), the oracle
+  ratio `C(N, ≤5) / (2^k · C(N−k, ≤4))` is 78.2 at k = 0, 5.09 at k = 4,
+  1.30 at k = 6 and 0.66 at k = 7. The hybrid beats degree 5 there only if
+  k ≤ 6.
+- **What would move a row:** k measured to stay bounded as ℓ grows (k = 3
+  at ℓ = 8, then ℓ = 9). Even then its best case is the degree-4 row
+  `2^68.43`, `2^+7.62` over rho. The free-oracle floor binds every row.
 
 ## Scope and disclosures
 
