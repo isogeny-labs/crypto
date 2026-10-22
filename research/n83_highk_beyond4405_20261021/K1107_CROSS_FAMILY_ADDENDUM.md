@@ -48,6 +48,23 @@ or inconsistent pairs yield `BOUNDED_UNKNOWN`. The point-0 result remains the
 headline single-target comparison; this 16-point selector describes
 replication and does not replace that metric.
 
+The same 16 independently replayed processes also receive a separate
+setup-inclusive factor-base ranking. For each single-target IC child, use
+the producer's `process_total` interval with empty process caches. It covers
+base construction/loading, root-index setup, factor-log rank work and the
+target's query, PDP, relation, descent and recovery work; retain the exclusive
+setup, rank, targets and unattributed residual values whose sum is the cold
+process interval. Exclude process launch and public-point fixture creation.
+Call this `ic_cold_process_ms`, and keep it separate from the primary online
+interval. Require all 16 matched Tier 1 pairs and all four finite,
+nonnegative cold components for each child. Drop exact ties and apply the
+same strict two-sided sign threshold `p < 0.05`; select a cold-cost leader
+only if it also has the lower geometric mean cold interval. Preserve all
+16 paired cold intervals, signs and uncertainty. A missing component,
+incomplete pair, or failed noise/correctness gate yields `BOUNDED_UNKNOWN`.
+The cold-cost selector compares the two frozen families on this workload;
+K5500 and other finalist gates remain separate.
+
 The K5500 split-index finalist still requires a complete current-source
 index, rank, target, and independent replay gate before any campaign-wide
 N83 factor-base selection. The fixed31 screen selects only within its frozen
