@@ -1,0 +1,49 @@
+{
+  "date_utc": "2026-10-22",
+  "source_commit": "bbba148492a95edef67ebeadd03d1277ba3c648c",
+  "workspace": "research/cover_transfer_assessment_20261013/lean",
+  "scratch_workspace": "/var/tmp/cover-transfer-lean-replay-20261022",
+  "input_sha256": {
+    "CoverTransfer.lean": "7c1d5f12ddd3a8b83b567ee76ec694281ffaa345ed7a031ac80ca397d46a2b6f",
+    "AxiomAudit.lean": "5f9cdf963317bfac645fb6c30cd6c833e05301b26f30d0ec8767b739684100e8",
+    "lakefile.toml": "30b9d96d24da8e5be72329cbd1814aff07e31a5a27dab059e814164cc6c174fc",
+    "lake-manifest.json": "d5444d689d10ac761abe72cbf2c8a1be40bde3412bd747695383a66e1994f2c6",
+    "lean-toolchain": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b"
+  },
+  "lean_toolchain": "leanprover/lean4:v4.34.1",
+  "mathlib_revision": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+  "commands": [
+    "XDG_CACHE_HOME=/var/tmp/cover-transfer-lean-cache-20261022 lake exe cache get",
+    "lake build",
+    "lake env lean AxiomAudit.lean"
+  ],
+  "results": {
+    "cache_downloaded_and_decompressed": 8908,
+    "build_jobs": 1131,
+    "axiom_audit_theorem": "CoverTransfer.pull_injective_on_subgroup",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "logs": {
+    "cache_get": {
+      "path": "evidence/2026-10-22-cache-get.log",
+      "sha256": "98ea14df8671c56adeacd0243f835fbaeac80c18dbe075f341cdc10cefa570c6",
+      "exit_status": 0
+    },
+    "build": {
+      "path": "evidence/2026-10-22-build.log",
+      "sha256": "836650141673f1cb639f06e06f3daaf6d51a43b3959750820ad8bb2c310ce4d5",
+      "exit_status": 0
+    },
+    "axiom_audit": {
+      "path": "evidence/2026-10-22-axiom-audit.log",
+      "sha256": "b959d9db40b88979323e54ac397cce821ca562f48738f1b458ac45ea72dda0ed",
+      "exit_status": 0
+    }
+  },
+  "aborted_host_attempt": "The same pinned inputs began Mathlib checkout on the mounted home filesystem; Git waited on mounted filesystem I/O and the attempt was interrupted before cache completion or build. This is not a Lean proof failure.",
+  "scope": "Kernel acceptance and axiom dependencies of one conditional theorem; cover geometry, map construction, composition, subgroup order, and performance remain open."
+}
