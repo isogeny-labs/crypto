@@ -209,4 +209,10 @@ There is one heat map per class in `figures/volcano-<class>.png`, made from that
 
 - #strong[Scope:] 24-bit `p`, depth 3, split craters, ℓ ∈ {2, 3}, and the three methods at v1\'s parameters. No security statement is made, and no independent-host replay was run.
 
-The report PDF is #link("report.pdf")[`report.pdf`]. The figures and PDF are also in #link("../../benchmarks/20261017-isogeny-volcano-cost-v2/")[`benchmarks/20261017-isogeny-volcano-cost-v2/`]. That directory has no row in `benchmarks/README.md` yet. Under the validation gate (AGENTS.md; `docs/VALIDATION_GATE.md`), a row needs an independent replay certificate and validator report, which this executing session cannot supply for its own run.
+The report PDF is #link("report.pdf")[`report.pdf`]. The figures and PDF are also in #link("../../benchmarks/20261017-isogeny-volcano-cost-v2/")[`benchmarks/20261017-isogeny-volcano-cost-v2/`]. Its row in `benchmarks/README.md` is admitted under the validation gate (AGENTS.md; `docs/VALIDATION_GATE.md`) by an independent validator\'s `VALIDATION.json`. The validator:
+
+- replayed 583 of 583 runs, drawn from a nonce of its own;
+- re-checked every scalar with its own curve arithmetic;
+- recomputed the headline numbers from the raw records with its own program (`validation/vrecompute.rs`).
+
+The rho reference is `rho.negation` in the same sessions and binary.

@@ -187,7 +187,13 @@ examples follow: the ℓ = 2 class with the largest deficit, and the
 
 The report PDF is [`report.pdf`](report.pdf). The figures and PDF are
 also in [`benchmarks/20261017-isogeny-volcano-cost-v2/`](../../benchmarks/20261017-isogeny-volcano-cost-v2/).
-That directory has no row in `benchmarks/README.md` yet. Under the
-validation gate (AGENTS.md; `docs/VALIDATION_GATE.md`), a row needs an
-independent replay certificate and validator report, which this
-executing session cannot supply for its own run.
+Its row in `benchmarks/README.md` is admitted under the validation gate
+(AGENTS.md; `docs/VALIDATION_GATE.md`) by an independent validator's
+`VALIDATION.json`. The validator:
+
+- replayed 583 of 583 runs, drawn from a nonce of its own;
+- re-checked every scalar with its own curve arithmetic;
+- recomputed the headline numbers from the raw records with its own
+  program (`validation/vrecompute.rs`).
+
+The rho reference is `rho.negation` in the same sessions and binary.
