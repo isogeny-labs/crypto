@@ -75,6 +75,13 @@ ic bench --bits 20 \
 # A sweep: every combination in the matrix, one table.
 ic bench --sweep docs/ic/sweeps/factor-base-size.json \
     --out docs/ic/runs/my-sweep-2026-09-22.json
+
+# Let the planner choose: every stage the measured evidence says to run
+# on this curve, each with its rule, its reason, its sources and how far
+# the curve is from what was measured, and the expected gap to rho.
+ic plan --prime-bits 28                     # or --koblitz 0:41, or --binary-degree 21
+ic plan --curve @curve.json --ecbench-arm auto   # an ecbench workload curve
+ic bench --bits 24 --auto --rho-runs 8      # run the plan; explicit stages still win
 ```
 
 The table that comes out:
@@ -90,6 +97,25 @@ Read across a row and the trade-off is explicit: a bigger base raises
 the hit rate (`0.001 → 0.110`), which cuts the targets needed
 (`2219 → 757`), which raises the matrix rows (`3 → 83`). `S` is the sum
 of all of it, and it is not monotone — that is the point.
+
+### The planner (`ic plan`, `ic bench --auto`)
+
+`ic_framework::planner` reads a curve's class (prime, `j = 0`, `j = 1728`,
+random binary, Koblitz), field and subgroup size, and picks the pipeline from
+the repository's measurements: the factor base at the family optimum, the
+two-summand pair table (the cache-blocked builder when `p < 2^62`, the
+Frobenius-folded table on Koblitz curves), the target-pinned matrix for one
+target or `sparse-cado` for a log database (`--goal log-database`), and the
+target source. Each choice names its rule (`prime.oracle.blocked-table`, …),
+the study files it rests on, and whether the curve is inside the measured
+sizes (`measured`), between them (`interpolated`) or outside them
+(`extrapolated`). It also reads the measured gap to the matched rho off the
+same studies and says which to run: on every class measured so far rho is
+cheaper, so the verdict says so. A class with no measured recipe (extension
+fields, even-degree or wide Koblitz curves) gets the rho reference and no
+index-calculus plan. A plan is a hypothesis until a paired session confirms it
+on the curve (`research/ic_planner_validation_20261020`). The rule set is
+versioned (`ic-planner/1`); change a rule and the version changes with it.
 
 ---
 
