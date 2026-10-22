@@ -1,0 +1,180 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "log2_r": 16.001122266128682,
+      "arm": "ic-gen-layout-c1",
+      "runs": 96,
+      "verified": 96,
+      "mean_s": [
+        1.8453569536889924,
+        2.1418236524405967,
+        4.8100239412050465
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "log2_r": 16.001122266128682,
+      "arm": "ic-layout-c1",
+      "runs": 96,
+      "verified": 96,
+      "mean_s": [
+        2.3216446781098443,
+        2.6728874309730712,
+        5.834072206742115
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "log2_r": 16.001122266128682,
+      "arm": "ic-lazy-c1",
+      "runs": 96,
+      "verified": 96,
+      "mean_s": [
+        2.3872903147341176,
+        2.7590329051797746,
+        6.104716219190675
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "log2_r": 16.001122266128682,
+      "arm": "rho-frob",
+      "runs": 96,
+      "verified": 96,
+      "mean_s": [
+        1.240001894606958,
+        1.240001894606958,
+        1.240001894606958
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "log2_r": 16.001122266128682,
+      "arm": "rho-frob-aa",
+      "runs": 96,
+      "verified": 96,
+      "mean_s": [
+        1.240001894606958,
+        1.240001894606958,
+        1.240001894606958
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "log2_r": 16.001122266128682,
+      "arm": "rho-strong",
+      "runs": 96,
+      "verified": 96,
+      "mean_s": [
+        4.133093089792947,
+        4.133093089792947,
+        4.133093089792947
+      ],
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-gen-layout-c1",
+      "b": "ic-layout-c1",
+      "verdict": "ic-gen-layout-c1 < ic-layout-c1"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-gen-layout-c1",
+      "b": "ic-lazy-c1",
+      "verdict": "ic-gen-layout-c1 < ic-lazy-c1"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-gen-layout-c1",
+      "b": "rho-frob",
+      "verdict": "rho-frob < ic-gen-layout-c1"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-gen-layout-c1",
+      "b": "rho-frob-aa",
+      "verdict": "rho-frob-aa < ic-gen-layout-c1"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-gen-layout-c1",
+      "b": "rho-strong",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-layout-c1",
+      "b": "ic-lazy-c1",
+      "verdict": "ic-layout-c1 < ic-lazy-c1"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-layout-c1",
+      "b": "rho-frob",
+      "verdict": "rho-frob < ic-layout-c1"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-layout-c1",
+      "b": "rho-frob-aa",
+      "verdict": "rho-frob-aa < ic-layout-c1"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-layout-c1",
+      "b": "rho-strong",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-lazy-c1",
+      "b": "rho-frob",
+      "verdict": "rho-frob < ic-lazy-c1"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-lazy-c1",
+      "b": "rho-frob-aa",
+      "verdict": "rho-frob-aa < ic-lazy-c1"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "ic-lazy-c1",
+      "b": "rho-strong",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "rho-frob",
+      "b": "rho-frob-aa",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "rho-frob",
+      "b": "rho-strong",
+      "verdict": "rho-frob < rho-strong"
+    },
+    {
+      "curve": "icv1-f2m17-tm101-00378d4e",
+      "a": "rho-frob-aa",
+      "b": "rho-strong",
+      "verdict": "rho-frob-aa < rho-strong"
+    }
+  ]
+}

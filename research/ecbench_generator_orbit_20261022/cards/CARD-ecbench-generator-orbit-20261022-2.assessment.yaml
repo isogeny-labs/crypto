@@ -1,0 +1,13 @@
+card_id: CARD-ecbench-generator-orbit-20261022-2
+relay_verbatim: true
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+  - "Receipt cards/CARD-ecbench-generator-orbit-20261022-2.receipt.json (sha256 6569e40e6ec35f56b1e344e695b1156ca0a36f5e74a0b69ccb7f82f78f4f697a, as the executor reported) has status completed, commit de57ca373f79560121b266dfc75a1ebb62864870 equal to the card's commit."
+  - "Receipt argv are exactly [bash, research/ecbench_generator_orbit_20261022/run.sh] then [bash, research/ecbench_generator_orbit_20261022/check_same_algorithm.sh], in order, one attempt each, no timeout; no other command appears."
+  - "run: exit 0 in 537.095 s, stdout tail ends done a1-n29 then RUN-DONE, all 105 declared outputs present and every receipt digest equals the sha256 of the file on disk (recomputed)."
+  - "check-same-algorithm: exit 0 in 1.164 s; the seven stdout lines in the receipt equal, line for line, the seven lines the coordinator quoted from the executor's report."
+  - "Receipt dirty_after lists no path outside research/ecbench_generator_orbit_20261022/; git status shows no tracked file modified; the only dirty_before path is the card yaml itself."
+  - "Limit of the relay check: the executor's full returned text was not supplied as a file, so tools/task_card.py check-relay was not run; relay_verbatim rests on the coordinator-quoted lines (status, receipt digest, both exit codes and times, RUN-DONE, the seven check lines) matching the receipt. Save the full report to a file and run check-relay for the complete check."
+interpretation: not_assessed

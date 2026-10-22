@@ -1,0 +1,176 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-ecbench-generator-orbit-20261022-2
+experiment_id: ecbench_generator_orbit_20261022
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: de57ca373f79560121b266dfc75a1ebb62864870
+receipt: research/ecbench_generator_orbit_20261022/cards/CARD-ecbench-generator-orbit-20261022-2.receipt.json
+binds:
+- path: research/ecbench_generator_orbit_20261022/PROTOCOL.md
+  sha256: 321b2cf48181d64d403e64143fffbaad02a82cd8c1ce6c06e73dc5529b378a92
+- path: research/ecbench_generator_orbit_20261022/make_specs.sh
+  sha256: 6e4973935acd4e76469023cbd859a5e225768baba91d2f4f46b0824917fdf027
+- path: research/ecbench_generator_orbit_20261022/run.sh
+  sha256: bd6a9aafb7f91930bac45197a7157e1b0d16038b5fd4383d5c52be847f72d4b2
+- path: research/ecbench_generator_orbit_20261022/check_same_algorithm.sh
+  sha256: 03dc09a3b4b0933a344b3b881ca6bc46c2d6717a1a59a9fddc5efc698df4c48f
+- path: docs/ecbench/specs/claim-koblitz-generator-orbit-a0-n13.json
+  sha256: 2122edb75763957baf054d07c6f1d10ef877116dfe1554881931ec40b08c10fb
+- path: docs/ecbench/specs/claim-koblitz-generator-orbit-a1-n17.json
+  sha256: cecd265329fe1dbaa0eba83f891c48af93425525e867d672bc1555e6cb3fa13c
+- path: docs/ecbench/specs/claim-koblitz-generator-orbit-a0-n19.json
+  sha256: e2cadd3685dddd78f2c66b50878a232b9e377dd5c2856e6b83d4c2d43e6de97d
+- path: docs/ecbench/specs/claim-koblitz-generator-orbit-a0-n23.json
+  sha256: c70b43c056923aeb92dc1d0e2071c63968a5533a8fe39cef11d7d7ffbd4c591d
+- path: docs/ecbench/specs/claim-koblitz-generator-orbit-a1-n29.json
+  sha256: da06e431a02b05fcbff0567aa9c3fc8fca436660daf094724810fd8b459cc69e
+- path: docs/ecbench/specs/claim-koblitz-generator-orbit-a0-n31.json
+  sha256: fa35ad87d3b27a1bf12a970f04c5db981a882b6d8eb373afc0886151cfac83d6
+- path: docs/ecbench/specs/claim-koblitz-generator-orbit-a0-n37.json
+  sha256: f4c35aa4e4ecf020550b1bd4e83587026a32109e55e4116665c46b41906cf3ae
+- path: target/release/ecbench
+  sha256: f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191
+must_not_exist:
+- research/ecbench_generator_orbit_20261022/sessions
+- research/ecbench_generator_orbit_20261022/audits
+- research/ecbench_generator_orbit_20261022/tables
+- research/ecbench_generator_orbit_20261022/logs
+commands:
+- id: run
+  argv:
+  - bash
+  - research/ecbench_generator_orbit_20261022/run.sh
+  timeout_seconds: 25200
+  success_exit_codes:
+  - 0
+  stdout: research/ecbench_generator_orbit_20261022/cards/CARD-ecbench-generator-orbit-20261022-2.run.stdout
+  stderr: research/ecbench_generator_orbit_20261022/cards/CARD-ecbench-generator-orbit-20261022-2.run.stderr
+  outputs:
+  - research/ecbench_generator_orbit_20261022/sessions/a0-n13/session.json
+  - research/ecbench_generator_orbit_20261022/sessions/a0-n13/records.jsonl
+  - research/ecbench_generator_orbit_20261022/audits/audit-a0-n13.json
+  - research/ecbench_generator_orbit_20261022/tables/table-a0-n13.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a0-n13.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a0-n13.json
+  - research/ecbench_generator_orbit_20261022/logs/run-a0-n13.log
+  - research/ecbench_generator_orbit_20261022/logs/verify-a0-n13.log
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n13-ic-lazy-c1-vs-ic-layout-c1.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n13-ic-layout-c1-vs-ic-gen-layout-c1.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n13-ic-lazy-c1-vs-ic-gen-layout-c1.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n13-ic-gen-layout-c1-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n13-ic-gen-layout-c1-vs-rho-strong.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n13-ic-lazy-c1-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n13-rho-frob-aa-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/sessions/a1-n17/session.json
+  - research/ecbench_generator_orbit_20261022/sessions/a1-n17/records.jsonl
+  - research/ecbench_generator_orbit_20261022/audits/audit-a1-n17.json
+  - research/ecbench_generator_orbit_20261022/tables/table-a1-n17.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a1-n17.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a1-n17.json
+  - research/ecbench_generator_orbit_20261022/logs/run-a1-n17.log
+  - research/ecbench_generator_orbit_20261022/logs/verify-a1-n17.log
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n17-ic-lazy-c1-vs-ic-layout-c1.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n17-ic-layout-c1-vs-ic-gen-layout-c1.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n17-ic-lazy-c1-vs-ic-gen-layout-c1.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n17-ic-gen-layout-c1-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n17-ic-gen-layout-c1-vs-rho-strong.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n17-ic-lazy-c1-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n17-rho-frob-aa-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/sessions/a0-n19/session.json
+  - research/ecbench_generator_orbit_20261022/sessions/a0-n19/records.jsonl
+  - research/ecbench_generator_orbit_20261022/audits/audit-a0-n19.json
+  - research/ecbench_generator_orbit_20261022/tables/table-a0-n19.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a0-n19.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a0-n19.json
+  - research/ecbench_generator_orbit_20261022/logs/run-a0-n19.log
+  - research/ecbench_generator_orbit_20261022/logs/verify-a0-n19.log
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n19-ic-lazy-c2-vs-ic-layout-c2.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n19-ic-layout-c2-vs-ic-gen-layout-c2.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n19-ic-lazy-c2-vs-ic-gen-layout-c2.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n19-ic-gen-layout-c2-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n19-ic-gen-layout-c2-vs-rho-strong.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n19-ic-lazy-c2-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n19-rho-frob-aa-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/sessions/a0-n23/session.json
+  - research/ecbench_generator_orbit_20261022/sessions/a0-n23/records.jsonl
+  - research/ecbench_generator_orbit_20261022/audits/audit-a0-n23.json
+  - research/ecbench_generator_orbit_20261022/tables/table-a0-n23.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a0-n23.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a0-n23.json
+  - research/ecbench_generator_orbit_20261022/logs/run-a0-n23.log
+  - research/ecbench_generator_orbit_20261022/logs/verify-a0-n23.log
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n23-ic-lazy-c3-vs-ic-layout-c3.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n23-ic-layout-c3-vs-ic-gen-layout-c3.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n23-ic-lazy-c3-vs-ic-gen-layout-c3.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n23-ic-gen-layout-c3-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n23-ic-gen-layout-c3-vs-rho-strong.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n23-ic-lazy-c3-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n23-rho-frob-aa-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/sessions/a1-n29/session.json
+  - research/ecbench_generator_orbit_20261022/sessions/a1-n29/records.jsonl
+  - research/ecbench_generator_orbit_20261022/audits/audit-a1-n29.json
+  - research/ecbench_generator_orbit_20261022/tables/table-a1-n29.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a1-n29.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a1-n29.json
+  - research/ecbench_generator_orbit_20261022/logs/run-a1-n29.log
+  - research/ecbench_generator_orbit_20261022/logs/verify-a1-n29.log
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n29-ic-lazy-c1-vs-ic-layout-c1.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n29-ic-layout-c1-vs-ic-gen-layout-c1.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n29-ic-lazy-c1-vs-ic-gen-layout-c1.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n29-ic-gen-layout-c1-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n29-ic-gen-layout-c1-vs-rho-strong.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n29-ic-lazy-c1-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a1-n29-rho-frob-aa-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/sessions/a0-n31/session.json
+  - research/ecbench_generator_orbit_20261022/sessions/a0-n31/records.jsonl
+  - research/ecbench_generator_orbit_20261022/audits/audit-a0-n31.json
+  - research/ecbench_generator_orbit_20261022/tables/table-a0-n31.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a0-n31.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a0-n31.json
+  - research/ecbench_generator_orbit_20261022/logs/run-a0-n31.log
+  - research/ecbench_generator_orbit_20261022/logs/verify-a0-n31.log
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n31-ic-lazy-c2-vs-ic-layout-c2.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n31-ic-layout-c2-vs-ic-gen-layout-c2.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n31-ic-lazy-c2-vs-ic-gen-layout-c2.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n31-ic-gen-layout-c2-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n31-ic-gen-layout-c2-vs-rho-strong.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n31-ic-lazy-c2-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n31-rho-frob-aa-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/sessions/a0-n37/session.json
+  - research/ecbench_generator_orbit_20261022/sessions/a0-n37/records.jsonl
+  - research/ecbench_generator_orbit_20261022/audits/audit-a0-n37.json
+  - research/ecbench_generator_orbit_20261022/tables/table-a0-n37.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a0-n37.md
+  - research/ecbench_generator_orbit_20261022/tables/band-a0-n37.json
+  - research/ecbench_generator_orbit_20261022/logs/run-a0-n37.log
+  - research/ecbench_generator_orbit_20261022/logs/verify-a0-n37.log
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n37-ic-lazy-c8-vs-ic-layout-c8.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n37-ic-layout-c8-vs-ic-gen-layout-c8.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n37-ic-lazy-c8-vs-ic-gen-layout-c8.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n37-ic-gen-layout-c8-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n37-ic-gen-layout-c8-vs-rho-strong.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n37-ic-lazy-c8-vs-rho-frob.txt
+  - research/ecbench_generator_orbit_20261022/tables/compare-a0-n37-rho-frob-aa-vs-rho-frob.txt
+- id: check-same-algorithm
+  argv:
+  - bash
+  - research/ecbench_generator_orbit_20261022/check_same_algorithm.sh
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  - 1
+  stdout: research/ecbench_generator_orbit_20261022/cards/CARD-ecbench-generator-orbit-20261022-2.check.stdout
+  stderr: research/ecbench_generator_orbit_20261022/cards/CARD-ecbench-generator-orbit-20261022-2.check.stderr
+bus_address: executor-mechanical-ecbench-generator-orbit
+background: true
+write_scope:
+- research/ecbench_generator_orbit_20261022/
+stop_when:
+- Any command exits with a status that is not listed as a success exit code for it on the card, or times out. Report the output and exit status verbatim and run nothing further; do not retry and do not
+  edit any file.
+- The run command does not print the line RUN-DONE as the last line of its stdout.
+- The tool prints a refusal to start, exit status 2.
+- A step would write outside the write_scope paths.
+notes: The second command exits 1 when any curve line ends in FAIL; that is a reportable result, not an error to fix. Report both commands' final output lines and exit statuses exactly as the tool prints
+  them. The benchmark lock file under /tmp is written by ecbench itself and is expected.
