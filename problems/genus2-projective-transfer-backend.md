@@ -49,6 +49,11 @@ is complete for arbitrary curves or divisors cannot be made from those runs.
   now gives separate exact integer-polynomial certificates, weighted-scale
   checks, and written divisor arguments for tripling and for the generic
   `B≠0,C≠0` 2+2 branch. Exceptional 2+2 outputs remain open.
+- **Derived or proved, 2026-10-22 coprime degree-drop follow-up:**
+  The [proof audit](../research/projective_law_followup_20261022/PROOF_AUDIT.md)
+  adds an exact integer-polynomial certificate and written divisor
+  argument for the `B≠0,C=0` 2+2 degree-one branch. Same-`u` and
+  shared-support 2+2 output branches remain unproved.
 - **Suspected explanation:** None needed for the measured cost. Branch behavior
   outside the tested finite cases remains a proof obligation.
 - **Missing capability:** A checked universal case proof for the implemented
@@ -119,7 +124,10 @@ divisor-class arguments.
 
 2026-10-22: Tripling and generic coprime 2+2 received exact native
 polynomial certificates and written divisor-class arguments. The
-unproved output identities are now the exceptional 2+2 branches:
-`C=0` degree-one drop, same-`u` doubling/mixed composition, and
-`B=0` shared-support cancellation/positive composition, including
-nested degree drops. Universal completeness remains open.
+unproved output identities are now the exceptional 2+2 branches.
+
+2026-10-22: The coprime `B≠0,C=0` degree-one branch received an
+exact native polynomial certificate and written divisor argument.
+Same-`u` doubling/mixed composition and `B=0` shared-support
+cancellation/positive composition, including nested degree drops,
+remain open. Universal completeness remains open.

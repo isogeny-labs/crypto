@@ -254,13 +254,44 @@ sum class. The ten exact scale identities show that arbitrary nonzero
 input weights give the same normalized pair. This proves only the
 `B≠0,C≠0` branch of the implemented law, not its exceptional paths.
 
+### Coprime 2+2 degree-one drop (`B≠0,C=0`)
+
+`projective-symbolic-22-drop` checks eleven affine and seven weighted
+integer-polynomial equalities in `results/symbolic-2plus2-drop.json`.
+It uses the preceding notation and parameterizes `C=0` by
+`(ds,dt)=h(dq,dr)`. This covers every field input with `B≠0,C=0`:
+`B≠0` implies `(dq,dr)≠(0,0)`, and zero determinant `C`
+then makes the two difference vectors proportional. The checker
+verifies `A=B h`, so `N=Bv1-Au1` and `L=N/B=v1-hu1` have degree at
+most two and interpolate both input divisors.
+
+Put `Xnum=(q1+q2)B²+A²`. The checker expands
+`E=N²+u1u2(B²X-Xnum)` and verifies that its `X⁶,X⁴`
+coefficients vanish, its `X⁵` coefficient is `B²`, and it is
+congruent to `B²vᵢ²` modulo each `uᵢ`. The same uniqueness argument
+as in the generic branch gives `E=B²F` for any valid input curve;
+therefore `F-L²=u1u2(X-Xnum/B²)`. The literal affine code returns
+`x=Xnum/B²`. An independent cleared equality in the certificate
+identifies its `y` numerator with `-B⁴N(Xnum/B²)`, so its normalized
+ordinate is `-L(x)`. The function `y-L` has pole order five at
+infinity, four input zeros, and this one residual zero. Its inverse
+is the code's degree-one output, proving the branch's divisor class.
+
+For nonzero input weights, let `Z=z1z2` and `W=w1w2`. The literal
+weighted output satisfies `(x,y,z,w)=(Z¹⁸W² Xnum,
+Z⁴⁵W⁵ Ynum,Z⁹W B,1)`, with `Ynum` the affine code numerator;
+the seven checked identities include these scales. Normalization
+therefore gives the same point. This certificate is for `B≠0,C=0`
+only; shared support and same-`u` paths are separate.
+
 Proof map: the generic 1+2 coefficient identities are discharged by
 `src/bin/projective_symbolic_12.rs` and its committed result; the
 exceptional cancellation and point-doubling identities are discharged
 by `src/bin/projective_symbolic_12_exception.rs` and its separate
-result. Tripling and generic coprime 2+2 have independent certificates
+result. Tripling and both coprime 2+2 branches have independent certificates
 in `src/bin/projective_symbolic_triple.rs` and
-`src/bin/projective_symbolic_22_common.rs`. The
+`src/bin/projective_symbolic_22_common.rs` and
+`src/bin/projective_symbolic_22_drop.rs`. The
 divisor-class bridge and weighted identities have no Lean declaration yet.
 A core-only Lean 4.34.1 probe found neither
 `Field` nor `Polynomial` in `Std`; completing a faithful Lean version
@@ -271,11 +302,10 @@ claimed as the full group-law proof.
 ### Open cases
 
 A machine-checkable symbolic reduction is still needed for the exceptional
-2+2 output branches: `C=0` degree-one drop, same-`u` doubling and mixed
-composition, and `B=0` shared-support cancellation and positive
-composition, including any degree drops in their nested calls. The new
-generic coprime 2+2 certificate requires `B≠0,C≠0`; it does not discharge
-these cases. The finite audit and five
+2+2 output branches: same-`u` doubling and mixed composition, and
+`B=0` shared-support cancellation and positive composition, including
+any degree drops in their nested calls. The coprime certificates require
+`B≠0`; they do not discharge these cases. The finite audit and five
 branch-selection lemmas above do not supply these remaining identities.
 In particular, no exhaustive all-divisor
 pair enumeration was run on any of the 42 curves. No counterexample to

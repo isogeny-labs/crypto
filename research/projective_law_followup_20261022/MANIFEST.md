@@ -73,6 +73,12 @@ generic coprime 2+2 CRT and weighted-scale certificate. The hypotheses,
 written divisor arguments, and still-open exceptional 2+2 cases are in
 `PROOF_AUDIT.md`. Neither binary changes the frozen collector records.
 
+Build `--bin projective-symbolic-22-drop` and redirect stdout to
+`results/symbolic-2plus2-drop.json` for the versioned `B≠0,C=0`
+degree-one output certificate. It parameterizes the zero determinant
+exactly over fields, proves the affine intersection identity, and checks
+the literal weighted output scales. Prior result files stay frozen.
+
 `SHA256SUMS` gives hashes for all tracked study inputs, code, records,
 summaries, graphs, PDF, and run package. Verify it from the study directory
 with `sha256sum -c SHA256SUMS`.
