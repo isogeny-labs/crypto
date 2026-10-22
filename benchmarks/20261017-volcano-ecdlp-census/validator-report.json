@@ -1,0 +1,3056 @@
+{
+  "schema": "validation-gate/validator-report/v1",
+  "status": "fail",
+  "independent": true,
+  "study": "research/volcano_ecdlp_census_20261017",
+  "pr": "aburan28/crypto#2402",
+  "branch": "claude/volcano-ecdlp-census-phase-b-20261022",
+  "snapshot_commit": "fbbf7becf708b0565f13a41055e26051e9ee1262",
+  "status_reason": "every recomputed number matches results.json, but material reporting errors were found: F1, F2",
+  "independence": {
+    "validator": "independent validator of the volcano ECDLP census (did not write the study, its sessions, its analysis or its report)",
+    "producer_code_read": false,
+    "producer_code_not_opened": [
+      "research/volcano_ecdlp_census_20261017/analysis/analyze.py",
+      "research/volcano_ecdlp_census_20261017/analysis/extract_uncharged.py",
+      "research/volcano_ecdlp_census_20261017/analysis/figures.py",
+      "research/volcano_ecdlp_census_20261017/analysis/build_report.py",
+      "research/volcano_ecdlp_census_20261017/report.typ"
+    ],
+    "producer_claims_read": [
+      "research/volcano_ecdlp_census_20261017/REPORT.md",
+      "research/volcano_ecdlp_census_20261017/analysis/results.json (claimed values, by key)",
+      "research/volcano_ecdlp_census_20261017/analysis/analyze.log"
+    ],
+    "protocol_read": [
+      "docs/VALIDATION_GATE.md",
+      "research/volcano_ecdlp_census_20261017/PLAN.md",
+      "research/volcano_ecdlp_census_20261017/ANALYSIS_PLAN.md",
+      "research/volcano_ecdlp_census_20261017/AMENDMENTS.md (current and at commits 89e88b1f94, 6ca47a183f)",
+      "AGENTS.md (validation gate, distance to rho, section 5a, no-Python rule)",
+      "src/cryptanalysis/ecbench/audit.rs (module documentation of `ecbench verify`)"
+    ],
+    "code": "validator-written POSIX shell, mawk and jq under research/volcano_ecdlp_census_20261017/validation/: recompute.sh (driver), jmap.awk, join.awk, point_estimates.awk, curve_effect.awk, cluster_boot.awk, quantiles.sh, report_tables_check.sh, draw_sample.sh, replay_sample.sh, unc_from_records.jq, unc_compare.sh, unc_sample.sh, build_validation.sh, write_md.sh. No Python. Nothing imported or copied from analysis/*.py.",
+    "slug_to_vertex_mapping": "independent: each curve_slug's (a, b, p) from runs/slugmap is mapped to its census vertex by the j-invariant computed in jmap.awk (exact modular arithmetic, p < 2^26); census j recomputed for all 794 V1-V3 vertices (0 mismatches, (V, j) unique); 5,540 (spec, slug) pairs mapped, 0 unmapped, 0 level mismatches with the spec level; every slug has its volcano's subgroup order r",
+    "definitions_from": "ANALYSIS_PLAN.md and AMENDMENTS.md A2 only",
+    "reproduce": [
+      "V=research/volcano_ecdlp_census_20261017/validation; STUDY=$PWD/research/volcano_ecdlp_census_20261017",
+      "$V/recompute.sh $STUDY $WORK   # intermediates + bootstraps (seeds 777001-777006, ~15 min)",
+      "$V/draw_sample.sh $STUDY/runs/progress.jsonl fbbf7becf708b0565f13a41055e26051e9ee1262 > $SCR/sample.txt",
+      "$V/replay_sample.sh $STUDY target/release/ecbench $SCR $SCR/sample.txt $SCR/replay_log.jsonl   # ~75 min",
+      "$V/unc_sample.sh $STUDY $SCR $SCR/sample.txt $SCR/unc_log.jsonl",
+      "$V/build_validation.sh $STUDY $WORK $SCR benchmarks/20261017-volcano-ecdlp-census NARRATIVE.json; $V/write_md.sh benchmarks/20261017-volcano-ecdlp-census",
+      "NARRATIVE.json = the independence, report_vs_results, verdict_vocabulary, amendment_A2_audit, rho_reference_audit, section_5a_band, findings, limitations and validation_report sections of this file; SCR also holds nonce.txt and replay_start.txt"
+    ]
+  },
+  "raw_data": [
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-D-L0-c0.csv.xz",
+      "sha256": "4b4fdf3008330c7d2b80c2b88b11e82527209ce2eb5183e0f5afce9f3707a1b3"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-D-L1-c0.csv.xz",
+      "sha256": "6cedd6be2977c4ea98f9bc5b563f0f58584259e3b8454a2187ff9b22e9674381"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-D-L2-c0.csv.xz",
+      "sha256": "f68bdcb1780bcfcc7000d0d6c38ff76a0dac7816ad1a67b19a4ca6db5bced9d4"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-D-L3-c0.csv.xz",
+      "sha256": "0c8a56de4aa016ad79f26c5d9335a4635c76455345fac98aa9c365f8528a66d0"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-D-L4-c0.csv.xz",
+      "sha256": "423b8cb5b18347f73d6d1fbe23c64ea14edae4d0f74b7e7c529a4122a2e28d68"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-N-L0-c0.csv.xz",
+      "sha256": "59ca62f01ca19d2257f82bd7fd6a3317744501bb40227d88946b25866cd46268"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-N-L1-c0.csv.xz",
+      "sha256": "276dd8fb906b8d8143d592461ea60bdd0b4ae08ef6fb30929da0d4f93d2efe95"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-N-L2-c0.csv.xz",
+      "sha256": "f3b4b57743b06c85fa5d9b323f6d6ffe2274d780ad26d66f2aae8f6cd85c0957"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-N-L3-c0.csv.xz",
+      "sha256": "7cb291c23ec375ad5f50e7048d44d28ec2c3cae0eb41d4b3ccc4065fb4be3000"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-N-L4-c0.csv.xz",
+      "sha256": "d30f344e8966ad7233d9ffa79d2a4270288a4ab03c1bc784001d9c0b7a1a5709"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-S-L0-c0.csv.xz",
+      "sha256": "07b62780269e531397a231d66a1e72d8cd261d6af98be8d8edd2ab3dd97195ac"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-S-L1-c0.csv.xz",
+      "sha256": "8b6fe8401dceb956ff56a7e87b03fd631bdb26c672f93d735b90a00146aa674e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-S-L2-c0.csv.xz",
+      "sha256": "2b1b7b12164883f723590720b01ec56ac6528141bcaf15629f09c4a3683a711f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-S-L3-c0.csv.xz",
+      "sha256": "73a204ca6a4ec49877cd35dd8bbc0c0e43dc388ec3f2d5bf5bf11a96ecf684d3"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-S-L4-c0.csv.xz",
+      "sha256": "c2ff24b332332ac7db3d7a238c5aa19e61005296eae1275a2f678956270e0b74"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-Ua-L0-c0.csv.xz",
+      "sha256": "19f39fba13ab11a417c2be170d1bfbc508f8443b22b606dd9604bfef865a67c7"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-Ua-L1-c0.csv.xz",
+      "sha256": "f3248fc7d061a0bd2d1bd133cf27dfad9f0e1c4e365bdd48059dd7473198b626"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-Ua-L2-c0.csv.xz",
+      "sha256": "402015f775b8af8bdf7bed414e69ba86049dd670d7f6f69cd43fb1c54b7b4a89"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-Ua-L3-c0.csv.xz",
+      "sha256": "0060677f3d594597b00378cd0b40d67d4c694e16eeb8f85b468e54b92770d219"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-Ua-L4-c0.csv.xz",
+      "sha256": "fc302b43fa239741087b0c0575e0c68fa048fb96242ecffc9263d0fb91e17d3f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-Ub-L0-c0.csv.xz",
+      "sha256": "ef180e65cff71bff1dc657228924ba395495826b04323cdec97e5fef6c9283be"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-Ub-L1-c0.csv.xz",
+      "sha256": "24adc4e04eedb2a3f15138c2eb8f30abacbc6102b334b3244e92de411201c86c"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-Ub-L2-c0.csv.xz",
+      "sha256": "b590f52b9cfaf05a23804049d41d13655fc6a8f217d4c93aea96e2667ae60414"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-Ub-L3-c0.csv.xz",
+      "sha256": "6f466c5ff7cfc05ec90ef88edddf6733fbbe3fc19492f859d2c6cc907167a851"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-Ub-L4-c0.csv.xz",
+      "sha256": "730c931fdda7654851e1269395477d1eab2eb6ffaf0c82de8ab155742fa75460"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-ctl-L0-c0.csv.xz",
+      "sha256": "332a24e075662ddef32c1d433bd47cd6071600e66c16bca2c2ffaf028e015354"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-ctl-L1-c0.csv.xz",
+      "sha256": "ae81cbb95b742a62ea3fb509129fbde104c0c92a3a93fd62bddec4e74cc548e0"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-ctl-L2-c0.csv.xz",
+      "sha256": "3af49465d5801732e0f9a0ac7e4c5549603721c4696b58800f6b0bd5739eaa97"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-ctl-L3-c0.csv.xz",
+      "sha256": "a844980f0adf14b9ab3724453de0dab6f905fbba76506f1a40f615e0dc984863"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-ctl-L4-c0.csv.xz",
+      "sha256": "ad7e4bb83a1569bfcbf786567660e5c34fa4ec1473a76ce5840f1cae7f12140f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V1-ctl-L4-c1.csv.xz",
+      "sha256": "03eb8c6d333c8af46c0e7c47dc536f10c3af4ecde36f1abec7e82b5f628368c2"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-D-L0-c0.csv.xz",
+      "sha256": "b5f3489d7c0b89d1064fd76ac289701a5475ea9c37403f4dae1d32d325b0a57c"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-D-L1-c0.csv.xz",
+      "sha256": "69bac3729c0a8476ea4cc57e75713d672b7bf2950de456ada11674d6dd0633a5"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-D-L2-c0.csv.xz",
+      "sha256": "0edf573c79f4982e6041d565357546ca8411c4e26d8db0ffae4c4de89816629d"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-D-L3-c0.csv.xz",
+      "sha256": "be08e3f5ea4a940c939842d334f8665bc7f378e90f7fc913fddb1f68b626ff5e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-N-L0-c0.csv.xz",
+      "sha256": "e2c992f2f3a720d648a82618dc54f14ac8bd823973972f40b92f9be169307659"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-N-L1-c0.csv.xz",
+      "sha256": "29f61b0d73a002de83e8289e150f06a32599a08de1862254a840e4675d08528b"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-N-L2-c0.csv.xz",
+      "sha256": "299d553e36e5141402b2ded8710f2c3ec00ae1e0db545e28bc74ead160ad7c92"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-N-L3-c0.csv.xz",
+      "sha256": "2c3e08066351b2085ab06c17c4cf3e797dc2471e6288a10972ba49d8963eb214"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-S-L0-c0.csv.xz",
+      "sha256": "4f39d33290dc9b1078eee3c291e15d48d9084af62cd34a594ad1a021754ae9ee"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-S-L1-c0.csv.xz",
+      "sha256": "43e219a4854a77d70c5cb23f0438395cbfa968ecbc6629b829e6508130397b8e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-S-L2-c0.csv.xz",
+      "sha256": "13b21dda427ff5466168ccf62d546a4583fcbf7f64740decb685ab09a02f4d13"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-S-L3-c0.csv.xz",
+      "sha256": "d518d3eeb88e17022fd38b3206f8ea56967432daad188e57caa22367a2486e6c"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-Ua-L0-c0.csv.xz",
+      "sha256": "2ad0a8dc5eff3e9930964543896e73fe39da7c891798fcccaf8010e3529789a5"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-Ua-L1-c0.csv.xz",
+      "sha256": "ebad0766f73aa2945119f3477159aaffb423fee178d9833d006fe99c760b8f91"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-Ua-L2-c0.csv.xz",
+      "sha256": "c58150fd05b23dd99cfcd3acbacb6965cf7587b1d90f40e8da30ae273a08c2ea"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-Ua-L3-c0.csv.xz",
+      "sha256": "fb0674b932a0d06ef4e30750195608346bac01db051fed187b1535733b4bd930"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-Ub-L0-c0.csv.xz",
+      "sha256": "6410e372f7057fad7c6128f8fb29b22324fd1522f8879fec876d6ac0edc3eb7f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-Ub-L1-c0.csv.xz",
+      "sha256": "48ce2c2c04708f5fb36c57328d2950fcf7088705de015da08537c030c4e5fde9"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-Ub-L2-c0.csv.xz",
+      "sha256": "e0156b07997d8627c360db2d2c2ad839ea1aa844f61fe992163e936d0827dee4"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-Ub-L3-c0.csv.xz",
+      "sha256": "869a10c453ebdcbcb82230127877ae61dc2df48374acc42d6b48c0b7c01c248a"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-ctl-L0-c0.csv.xz",
+      "sha256": "0e1e22a819682fa7d7385b26382620bb061f625ebdba486c761e78ddaaa03805"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-ctl-L1-c0.csv.xz",
+      "sha256": "eba30141ea392e137396ba39307bbd1f9aff19b2b232c99ced66592d86295e9e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-ctl-L2-c0.csv.xz",
+      "sha256": "136eab38cc932a47c063f12b3173e1d2c3badccfd93b6d4ba082c60a1fa4bc85"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-ctl-L3-c0.csv.xz",
+      "sha256": "c1ed3b4b4af86dd0abe9587ac0ed477378d1afb5f236f93bbfd559c3353063e3"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V2-ctl-L3-c1.csv.xz",
+      "sha256": "7d0e83429bd18506be2fad5e1da5ea4929d21746fccbd1cc5d9c52040d4bde9b"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-D-L0-c0.csv.xz",
+      "sha256": "ccd6321a433d8ef9822ac6dbb009eac606c2d1587a5055f8709a6609a5aa762f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-D-L1-c0.csv.xz",
+      "sha256": "6f460d04c9bd45fb0b920b629703f39248a4e364f00a3c5ffc7e4e5b825db236"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-D-L2-c0.csv.xz",
+      "sha256": "250e518abaab0243a19ba26a3dcca4654770531c8e1c462ab94ee929b5cbda71"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-D-L3-c0.csv.xz",
+      "sha256": "0599e612bb861cfdfad51ba2b69f0b2e380082f6f62d22c673508e9ff0dbad63"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-D-L4-c0.csv.xz",
+      "sha256": "565652e8226c20b0e0afa8b8c0600e60a321b7340907ba3f743f7a6fc8c6f5c7"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-N-L0-c0.csv.xz",
+      "sha256": "10ef34af4923e3853ec0e5b46149750a7a6012eeb73dd9225e00e4d17b845d43"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-N-L1-c0.csv.xz",
+      "sha256": "fe9985beed924aaffd1de8335302f3036a74b7ae332a8e147a067cdc7d57dd8e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-N-L2-c0.csv.xz",
+      "sha256": "7c617be808f790484b67701fe1a141d2461ff7ab018d15341c732e4f19dd20ab"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-N-L3-c0.csv.xz",
+      "sha256": "be659965863fb72092c83c0cdd01ea69d2d4b93af08c0dff2607fa6d8895925b"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-N-L4-c0.csv.xz",
+      "sha256": "6a4d3396b7c16929cf1bbbcff2a1aac5bfec34e057e7cbe9b97295379a796e5f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-Ua-L1-c0.csv.xz",
+      "sha256": "e23846179cf180dc1dff195ba75e96d9e390d55985e2e6d10bab1e4d2b18a4aa"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-Ua-L2-c0.csv.xz",
+      "sha256": "2c708d97e31d9158a96c2988d543bf07519d22002de25853f8d5d9e6b6066657"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-Ua-L3-c0.csv.xz",
+      "sha256": "83208e7f5f20b2a04f254d94b57e8ca2376cb88c4723702257a049e43470698a"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-Ua-L4-c0.csv.xz",
+      "sha256": "44d369a83e66e2ce4a9e5d2f9443e8588b6fff2df4d6da923cbc177e2c349c4f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-Ub-L1-c0.csv.xz",
+      "sha256": "0014a50e6841febcd7ae9a1e1bbce4b29a41836470b4d85ac825e0a67c68d652"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-Ub-L2-c0.csv.xz",
+      "sha256": "da71a6ac48c14891060125f41bb1d5fc099548860188c66a50d03ff882f0bd3e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-Ub-L3-c0.csv.xz",
+      "sha256": "d9f1f6532e4913933bde8513c5a830bc64c599d6eb20fbd8cda2608cdbae2102"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-Ub-L4-c0.csv.xz",
+      "sha256": "1a6434ed4b9d5892073c288a239cdeae93601484ca6827268c2355875770d313"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-ctl-L0-c0.csv.xz",
+      "sha256": "44fb562fd46d2ab632c34fa0b7bb0e9f92a654eee843bf46c6bedd1f46eaef5a"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-ctl-L1-c0.csv.xz",
+      "sha256": "5b781cc479c02121b7fb48686203bc53df51e84419cae9c4fea2aff496b8a73c"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-ctl-L2-c0.csv.xz",
+      "sha256": "a4db8f249b578b4aeded00dc9a3ad9adb6ec84c16fcbf8b50f2c0e4a023d5eea"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-ctl-L3-c0.csv.xz",
+      "sha256": "724e762a710fb1383fcb15500a2caefcdd7e10f50df9515fdbd1d89ccbb09977"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/extract/V3-ctl-L4-c0.csv.xz",
+      "sha256": "a855e42a0534eb67faced035bf5f6a7b6abe6ba54e793ef9055760b7842d8502"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-D-L0-c0.csv.xz",
+      "sha256": "5b6ccad91709a51baa3a513b5781a7e711afa6f39607c7faa1ddec02c16f368f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-D-L1-c0.csv.xz",
+      "sha256": "f0cdb85fae2f7a0afbad3ca5f09bdba64eabb0861b4672205347ec4832df230f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-D-L2-c0.csv.xz",
+      "sha256": "5b28cfacba3366e94b887135bf6f713c1fa975fc90998b4b2b1f753cf9c69deb"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-D-L3-c0.csv.xz",
+      "sha256": "ad78a058d7a8f0af0b7fae2969eb95cbae805dbdf58458f680b4a0419a7042c3"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-D-L4-c0.csv.xz",
+      "sha256": "018a2ce6813be03615d238eea82e99a2d595501402ca82e806dbc17c0d469893"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-N-L0-c0.csv.xz",
+      "sha256": "f1f71f12f1d7adfc35543c6f0c02733409fcc5f83ca81be59a80c5e4f6298182"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-N-L1-c0.csv.xz",
+      "sha256": "a8958703b4c1f12db3e6a85ef187bbdeb95817bdc61144eafbd59c6d71d3d433"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-N-L2-c0.csv.xz",
+      "sha256": "be752e3595f15156c291bce2569fb7c02733bed387fb7a9523eccad24fadf077"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-N-L3-c0.csv.xz",
+      "sha256": "153357696e1c4e438891be4ff03f2bb18c5c438640aa5013e02e387bf8a1e593"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-N-L4-c0.csv.xz",
+      "sha256": "1a7dfc3677f3dec850e345f06603397579fa1c27727bce3970a0af891927234d"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-S-L0-c0.csv.xz",
+      "sha256": "a8f347bc465c44b1fc2ed8a55840b87f2649be913f6aa176a1ece6f0140d5f1e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-S-L1-c0.csv.xz",
+      "sha256": "21d5ae1e055a72b1e02ae405e204883ff989d2b895c5898f57cd10164f8567a7"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-S-L2-c0.csv.xz",
+      "sha256": "3d1514712d00a0c13973afe8b75b8f5ee3982fcb923ec6afa4f6721d161d48f1"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-S-L3-c0.csv.xz",
+      "sha256": "91c1e9354de6eca589c34bf2b9b09ef408fdfd75bb8d4eed119b6a844121e09b"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-S-L4-c0.csv.xz",
+      "sha256": "99984ee5e6b4c8611eeae6930fc48698be176046af58950623054e843ddb137f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-Ua-L0-c0.csv.xz",
+      "sha256": "67afbda8b414ce205c12e3624f59215f2927b7e41dc362d9da526c8a9081fab2"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-Ua-L1-c0.csv.xz",
+      "sha256": "1b291d9a642e63744cd4447839cbe0dc5a35f7f1ff8ad60cd3033c04e873e7be"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-Ua-L2-c0.csv.xz",
+      "sha256": "ac4e075c345effef3996df643e51f25767b33cc5357e251a66bf6e322174e83d"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-Ua-L3-c0.csv.xz",
+      "sha256": "72c12ad43b4c0e9bc2de3274d5c38495c22d83176270837416adf069bc260c5e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-Ua-L4-c0.csv.xz",
+      "sha256": "bc8a42a6ae4c13db0956266d37c93ab47a22d6c8e1b0598e878d21376c5575c4"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-Ub-L0-c0.csv.xz",
+      "sha256": "4f2f86878f142023382248fd9b210ed8f03ee8a9f565a57aabcfb145d3770e65"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-Ub-L1-c0.csv.xz",
+      "sha256": "00a998e9df81fe1e9bd8a84da84949c049fc8a58ed585955c01bbcd6b29bd619"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-Ub-L2-c0.csv.xz",
+      "sha256": "56b763063df7df758191ea054f106762afbba430547328155405a1303fbd4531"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-Ub-L3-c0.csv.xz",
+      "sha256": "b43fd57b1b103d83a6e7b1a2b36fb0a23c4f039295d2789e1e85639ce5914328"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-Ub-L4-c0.csv.xz",
+      "sha256": "7b71778901fe1ad015e771f0abd658f84898f485f1c0ec56d1b07b6c69921c33"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-ctl-L0-c0.csv.xz",
+      "sha256": "a110c2aa1282d8dc0783f7e80d05db6f28d9bf6aec6282ce17801e64aa8bb2e0"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-ctl-L1-c0.csv.xz",
+      "sha256": "990ad6f92dc65660c8e8ef2862d09aee4e92db745dd41b7bb81642de4fa67719"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-ctl-L2-c0.csv.xz",
+      "sha256": "fcbb43987cc505b923c58dfba589239224f493b9a0086b1b08e8ae1ed8222657"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-ctl-L3-c0.csv.xz",
+      "sha256": "0781c58fd8c142d3f2a61292ed203bd971cbe60bb156eace4e7004d73eef79e6"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-ctl-L4-c0.csv.xz",
+      "sha256": "5e458e31f63dc3fef20cd7122d72c2681aa299711aa8daabe323434b1f3b4a5f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V1-ctl-L4-c1.csv.xz",
+      "sha256": "95a0720e2329c3b2b62d742ee10614e59be274bb3697072fd54ab88bf25becbf"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-D-L0-c0.csv.xz",
+      "sha256": "d0629486a6093a8fcad0aa5549bd2c70669ead6548d938325a0e478e2d87b346"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-D-L1-c0.csv.xz",
+      "sha256": "2e22ca43e5ba3e53839f056b9637c491f1545daf2d9283abb958386745b66e27"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-D-L2-c0.csv.xz",
+      "sha256": "1ee417e11e5f31379e761e29571c6ce07b49711bd4c652724bf0b999a8787028"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-D-L3-c0.csv.xz",
+      "sha256": "3f6372272cf97a3b545da4fdaa0a53b85b69a4ffde7b1c220925e10584a58258"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-N-L0-c0.csv.xz",
+      "sha256": "40895688466c68ee7001ac61e7a411c89062b93bacbf64aa37da24a37c442ac8"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-N-L1-c0.csv.xz",
+      "sha256": "edd47d5d94f73b23199c8f12cabe003b517c4c5b72f2859f6e684dab13db16d9"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-N-L2-c0.csv.xz",
+      "sha256": "267c46fa92135b08a1367f37e4be4e0f6f03325d7cb4fdfccfa13911e7222501"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-N-L3-c0.csv.xz",
+      "sha256": "fec4ff7c97c2b4f1e1f7259ab4b70de18e0e0995df3f76da4f083b031c300f5e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-S-L0-c0.csv.xz",
+      "sha256": "f5acf1fcacd3a8dc9e781adc7e0ae45e51ab2068e55dafe374364d2500a0b493"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-S-L1-c0.csv.xz",
+      "sha256": "d6ecd9df36df1bf787b1119f969990f009fdd003950e154498aac500c5e08def"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-S-L2-c0.csv.xz",
+      "sha256": "edeecebfc40be810c16255c443efca79b13e6784070a7d11afd4edc1e232f89c"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-S-L3-c0.csv.xz",
+      "sha256": "995ca170558fbe538423dae429450e22bd8e2753eedb9c1ea7a0d9c1eed7858d"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-Ua-L0-c0.csv.xz",
+      "sha256": "f0d60c4ec0c20556ba55ba9ea859a4f3f6d8315ae85cbf99bcb8e6228470f3a8"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-Ua-L1-c0.csv.xz",
+      "sha256": "c2b6045a4013208454deda9a7f84eafff212712ffe133057f18699f1423307b8"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-Ua-L2-c0.csv.xz",
+      "sha256": "bb4681c4acdef32c8526d79655b0b0c5a03ada7477048a384cac5e6aee8a017b"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-Ua-L3-c0.csv.xz",
+      "sha256": "45d86b01875976fd61bb04571b429c14744a7bbd73b89271d2bd0d727c045186"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-Ub-L0-c0.csv.xz",
+      "sha256": "2676e6a26f9e80dd671e2114c4ba4707cf07b6adc0d954b050198d67a6bf09d2"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-Ub-L1-c0.csv.xz",
+      "sha256": "254a173c7b468eeb88c7a8ddf5ea98ade0a51b5829d84895ca5a3f4552326fd6"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-Ub-L2-c0.csv.xz",
+      "sha256": "087df2d223ba2572ee65a4846fa51d184b91973f0b9fb3b0b1a57ca84a176b00"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-Ub-L3-c0.csv.xz",
+      "sha256": "d4e008c916a2045183c6bf1235cc08b8cc8494a4df13084ea28246a8b3a0841e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-ctl-L0-c0.csv.xz",
+      "sha256": "05623ac1f862ebc151bbcc591b08453f0cde55a36162feff23a2678591eb542c"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-ctl-L1-c0.csv.xz",
+      "sha256": "9d88a9ec46f3c74a5054457b84350dcd2770d90d88635a912dd9786ce47338d1"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-ctl-L2-c0.csv.xz",
+      "sha256": "6bfb5abb6599de6850645f43c48433df2f47132099e40e56054c971e4a3e3ec4"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-ctl-L3-c0.csv.xz",
+      "sha256": "0d61d51e1cdd4e3640bb2e88dfa8e6b5b459684c638aecc58eb4ff584594c309"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V2-ctl-L3-c1.csv.xz",
+      "sha256": "0d7ad159a25bbecaa41c6fbba2abad43c789cef89f63b423c4621bec948be421"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-D-L0-c0.csv.xz",
+      "sha256": "dd38289a501f657d984d6dd358b7b10d33c27db834bc264d9b6e0b203b36c0b3"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-D-L1-c0.csv.xz",
+      "sha256": "e542af69c4561a1c9201c0d3f480a11aa0b9fba707ebebdd7319f09cd9be612e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-D-L2-c0.csv.xz",
+      "sha256": "2e5740db0cc983f35ce62bfbb1b2144d7db587009a58879c58e8c3aba0baee75"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-D-L3-c0.csv.xz",
+      "sha256": "7bd8bc289c42f7b7db937a23115e651aa9d5494a7fc9e6ee5c3e6ce43219520a"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-D-L4-c0.csv.xz",
+      "sha256": "a4ae764b987b6c667e978a0c068a8f791a8d84c1c707c93bf71d442a8bef5ede"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-N-L0-c0.csv.xz",
+      "sha256": "c85b813034807b5b46d7b7d12f78d6b4e339743a18b33b5338ace900fc77faac"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-N-L1-c0.csv.xz",
+      "sha256": "9a02a5e99e55c689c8d1c19777e1a033358368e14648ee4780b30926c2c0b22c"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-N-L2-c0.csv.xz",
+      "sha256": "df6fd84d90454e8f824de89878a385b98a27c45d2b7cf8e94c3dc75e1a6a4f95"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-N-L3-c0.csv.xz",
+      "sha256": "60c9d0893e7bb4b727a1ef0ab78c3c70c29e34c191e3b56f0a8bfe37525c3429"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-N-L4-c0.csv.xz",
+      "sha256": "c076aba2e1ff905b573a1902f0d52e5cf26da236cc80c98e38a9a513d488536c"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-Ua-L1-c0.csv.xz",
+      "sha256": "e537e006bac7e97741df8c4f1f0d6fe2a658eabffa189d25b4c468a4f28c0d86"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-Ua-L2-c0.csv.xz",
+      "sha256": "82a54eb1f349ea870101d03f5df3cf1419a2662dfa1cd0ca3892dc97b991b4ee"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-Ua-L3-c0.csv.xz",
+      "sha256": "955b63782b2a93a7c57a024c3e59681e2e91df5c9a6b03453be6248ca4eed01a"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-Ua-L4-c0.csv.xz",
+      "sha256": "d2d6a1078eedc9523eb16ee46691ef0ac11d4b5c8f3164e41fbebe01ba8a27c0"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-Ub-L1-c0.csv.xz",
+      "sha256": "bad180a22361a29aeff3119e106652ad958915af10e231858e751d7d0d41dbb8"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-Ub-L2-c0.csv.xz",
+      "sha256": "59c0d238a5b417dcda304868a56f0c746d6008c8d49314bdd8700a1ee4648fdd"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-Ub-L3-c0.csv.xz",
+      "sha256": "45a1765d7b3a1bbe8859f3f5e2a10961e0441f8eb6e1e8f74010425629296f6d"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-Ub-L4-c0.csv.xz",
+      "sha256": "a58c66a8323d273b8356373d1e1e686dbfce159b7288dc4de439cab72faaa646"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-ctl-L0-c0.csv.xz",
+      "sha256": "10519269c281c5f4825ea33c072355a172623a01414f6c74dbb03f0b68db01e0"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-ctl-L1-c0.csv.xz",
+      "sha256": "b4266e72913443ed175306c05b24a7387d02213affdbb605e51cf64415fee080"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-ctl-L2-c0.csv.xz",
+      "sha256": "4383d55e5961b0ccb9acd10d8650e80f6f9c81d10710d40d1d268c16c2b7be17"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-ctl-L3-c0.csv.xz",
+      "sha256": "b62835633df49ddf6ef4756ec36a734f2cf8ca9c17890e5a38cf8981f7a5d3f3"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/uncharged/V3-ctl-L4-c0.csv.xz",
+      "sha256": "a5db522605e0e0422122841563f35ee1c5731098c671618cc5de3219ff771dc4"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-D-L0-c0.json",
+      "sha256": "5cfbadc78a229f9b9eac50969bfd1e52a791a2a76c5aca2e1e119cd846390646"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-D-L1-c0.json",
+      "sha256": "e952db58446609105b7fbb5ce99b1380a3adb44f1fdb67dd7e52f88cb012ab36"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-D-L2-c0.json",
+      "sha256": "cca2745bf1e1e1d495e4c60201f93f5ff3d7e966e2c5cd8cae6a9d1d2c9126ec"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-D-L3-c0.json",
+      "sha256": "77a2c1eeefd192ae30a73810fe6c8c8c067758d9c4347c56923111539047713a"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-D-L4-c0.json",
+      "sha256": "182fd2b85a9b82adebe4d308064754f7af2968977f6e05008a1a28f7757f9921"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-N-L0-c0.json",
+      "sha256": "6e2430e4872e198945545c44dee44709e324e5b15e5085a202f81c784dabf1eb"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-N-L1-c0.json",
+      "sha256": "5700ea897d211b9fdbbd4664794d9d9df884601dabf5c23aefb4f4b035d8ec0d"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-N-L2-c0.json",
+      "sha256": "bc32c658a642f2ff9b1753515052361e941dcd639c9b2294a19ac99dca3b7a41"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-N-L3-c0.json",
+      "sha256": "0051ce7b2e7c56ff73ab828db21cff03abc957521195d580233c7be5a81a2a6e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-N-L4-c0.json",
+      "sha256": "8c9c4af129b2cb44a49fcde6b7e6cdf2c1e40549ccdacddb64ea4a3b600f86cc"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-S-L0-c0.json",
+      "sha256": "1662b6e03371663b7cc506f28136938583f4b22fd5b2b81bc801023d2f772af8"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-S-L1-c0.json",
+      "sha256": "f1e320ce1c293ba6213d3601f88fae09fca4654593068538eabc6f673019567a"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-S-L2-c0.json",
+      "sha256": "a390b9030ded99bcde3003bab1e8578f10e3c84d6e7f7c9ce6d93f82d0dc4b6c"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-S-L3-c0.json",
+      "sha256": "231093a66d8d18cff47fabe6b681ba5173768cb06d1bc326cf4ac88ceeabe2ff"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-S-L4-c0.json",
+      "sha256": "fb218a2c3bb6c5abbd2517bd97f34c0554048b276b601d55a384c4ac95223bba"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-Ua-L0-c0.json",
+      "sha256": "37473f8648a095b085ead737de1696fd15bd01c21f9ff5bfe86420d1d5c2cb0f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-Ua-L1-c0.json",
+      "sha256": "08ca636a2b85ee1ca261dc627d92b634e44fe8b7cbada61e1f18ac7fa1818c45"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-Ua-L2-c0.json",
+      "sha256": "35b7d789bbeea11eec4fb08cb385dcba8949bbc7622b1298320ed6a4c4cbca10"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-Ua-L3-c0.json",
+      "sha256": "d8fa882276d50aabdfb089e483ab63dcc239d1c830aa0e35f779346e0343be49"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-Ua-L4-c0.json",
+      "sha256": "32c0109f148d04a16504d425461e1cd513e42a4da0ec2fd4f98672aac7216d55"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-Ub-L0-c0.json",
+      "sha256": "d64adf764041fd49136f3910c38322aad52fdd1fe76f28ff0ee4fd4d2651c422"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-Ub-L1-c0.json",
+      "sha256": "0bea83db4b60fa225416393246260acdeefd7d7c8b98f4caf8e68e22256b110a"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-Ub-L2-c0.json",
+      "sha256": "6047b4b9e74d1c4063789448941e18c363e2d10326cae02ca5336b78a91ab71f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-Ub-L3-c0.json",
+      "sha256": "a91c970c3e408f312e2adba75186dcddb6f10fdb6381583a4f9830182e01ffa9"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-Ub-L4-c0.json",
+      "sha256": "d3f0ebf57227e4113abe6d8df193aa984652be42931b9f7488fcde10a0aba5f6"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-ctl-L0-c0.json",
+      "sha256": "f5b6c4b532f847c21616a4276b5783de17d7839f1e9b933a545724f11dfb98b9"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-ctl-L1-c0.json",
+      "sha256": "9e1b594a437796d3cc6124038f3b0d35e5417b9aa3797ef78e93261afd6fb644"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-ctl-L2-c0.json",
+      "sha256": "0ec52bdcfc3915f9043fe743911ff85ef59c99647f0bec7eba1961310c12ac96"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-ctl-L3-c0.json",
+      "sha256": "17f6b791359c730ece33f6d6d5d6ad63750a4ad3dc92391a43acb7d873e79fd6"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-ctl-L4-c0.json",
+      "sha256": "abbe589f2cbb3fe99b55171029be9107980ca49610b6ba2078477c9b777b8af2"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V1-ctl-L4-c1.json",
+      "sha256": "abfb3e877fa87db00c2fe011c7fd0da4fc13db7fd4815574627c697b3211f713"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-D-L0-c0.json",
+      "sha256": "b2427082c6139e6f40a1d5a565d42e6bc44153b3481b12ec5c556eb7c0703c81"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-D-L1-c0.json",
+      "sha256": "0e0da252ad272f0ffff43c3d135f5551ce078981eaaa04aaddb24e54c7b4c543"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-D-L2-c0.json",
+      "sha256": "c4a7d23519a9a7d6a540a5423eed510b9fc7ce5e08f91b3756c089c9ec021881"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-D-L3-c0.json",
+      "sha256": "60985cd9c6c8476d67a7810bf42120be5ea95eea2faac41748b55a52d83806ac"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-N-L0-c0.json",
+      "sha256": "1a0bd7dc4a1b654f74f15b6284776f967aec7ce06110f802c53d4a0e268526f0"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-N-L1-c0.json",
+      "sha256": "f84f1b45a1cc1998e5bf600e03833704a3c8fbf41005cd85843f362108e00065"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-N-L2-c0.json",
+      "sha256": "3b3b7830d51c63b3a2729d846656fb9ac52fb4835452e367d5afda89fb0eb7be"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-N-L3-c0.json",
+      "sha256": "ea0e8317783d1f2f4a8377dca1213136fbfe89bc9411c5dc57e000c49cb01ace"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-S-L0-c0.json",
+      "sha256": "99820f1dc10d0be1961780344dc7c5eeadd9d0caf96cca5d41941aa7d6390322"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-S-L1-c0.json",
+      "sha256": "e724be5589a3cb397cd477dd7ff0a62d669b4eb3296a31ac99adde3ef27582ac"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-S-L2-c0.json",
+      "sha256": "b3ac08b630c76b33a627620b28bf657a91c4627e9522ce6043bed6bc090f7a32"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-S-L3-c0.json",
+      "sha256": "304ffa4d73a996ab917027cb8f358911dd684dc4b3b463661d7ce1e4a10cc531"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-Ua-L0-c0.json",
+      "sha256": "145678b1092b5f398b54825a92fc652af4b3b50038f0d4fa8306fa228580cd02"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-Ua-L1-c0.json",
+      "sha256": "9cdddee647dd63e02fa90c11c1d964b53a70b6313277d231ef6e1c1d6f91a75f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-Ua-L2-c0.json",
+      "sha256": "4c087bac37a95bd8859f01be13e49f3d006c0266ccf8097a01167fdb6e61502e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-Ua-L3-c0.json",
+      "sha256": "734f68c341f9af0d2ade3e6449492ebcafc192b7d77967b88d06dc96912aff50"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-Ub-L0-c0.json",
+      "sha256": "daa91dd202d478fa8f29ccdcdb3fc8e704dacd3bc23db56ffa837e1a3629f2e9"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-Ub-L1-c0.json",
+      "sha256": "a63794501c432a7f04b5dd507f226ffc238664dd3649308717fd7bca67d54c95"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-Ub-L2-c0.json",
+      "sha256": "9de0ad4ecf242a7c51e95ee3f0a79982b1d2a1c5c090c8056f6c1b1f5df7688e"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-Ub-L3-c0.json",
+      "sha256": "f12a40bdea809f84699c6632fe01d9a2af44e59d70fbd8121b6bb3646e2b4e76"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-ctl-L0-c0.json",
+      "sha256": "67f177a6db7be8ed1891e2ab08c86fc1e490a4294c4a707ee343ff1d4881ee3a"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-ctl-L1-c0.json",
+      "sha256": "0834bc01b6d66570cc1a258a1e3415f202afe30984967924fdaeaa842dac5811"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-ctl-L2-c0.json",
+      "sha256": "4c20f3db2f8dd4b461dc65803da08d28757e094e81dd8648d337083145aa6477"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-ctl-L3-c0.json",
+      "sha256": "4cbbc33432b916a353c272b3ef446d8633b6419f7713db0a57f1ed30d9daaada"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V2-ctl-L3-c1.json",
+      "sha256": "5a67647856d9c2bae160efd342a55d700456145fd4af963c826bc920a9687b73"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-D-L0-c0.json",
+      "sha256": "5230ffc1a2899a87ebab87a949e0a7b46ca24bc18608163fc57ac5ff82347c51"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-D-L1-c0.json",
+      "sha256": "0e8ff5ed29b9fa99b1a40e6897f256fd9f1c9918221b57f0476a6fb1204fb20b"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-D-L2-c0.json",
+      "sha256": "68482064f093693355e8e481e457e6444b5f22f8da2627f610b5e487400f1b80"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-D-L3-c0.json",
+      "sha256": "d09a6e6c89582dedd87cbdc8ea09928c4b563cd9e8ddabf8be6005fc9839577d"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-D-L4-c0.json",
+      "sha256": "30bb57ead23c0423b03c2cd8fca56b73cb149af5e930844d85b1a0e3b7095988"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-N-L0-c0.json",
+      "sha256": "a2580ff8ff4e17b5750d6c307cf87bc113f510769308f4e4e52c87bc1cb70d0f"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-N-L1-c0.json",
+      "sha256": "539e33d70274e45197cb047fc44f9a6562b5077eba2ff2ceb14a53c8028517e4"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-N-L2-c0.json",
+      "sha256": "9bcad5c08d752c8ff9e68cba7668766e56de2f83f9929dc23816e5d01ea951fa"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-N-L3-c0.json",
+      "sha256": "939d2a85c6c9037095d89242f5adb4446d3db7be02f85593ba8205c038487b2d"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-N-L4-c0.json",
+      "sha256": "48972fa368925fd43a0ce7050eb300cf53872e0547d500ad9d32c35604d50696"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-Ua-L1-c0.json",
+      "sha256": "0047076e9d368a9ff197258ae9349899bfa805f196f89d5bd027fd5bfedf3b00"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-Ua-L2-c0.json",
+      "sha256": "7ba32b57be10a449383c55d28cb6e8990688d4cf71ad82b2233f6066e75d1204"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-Ua-L3-c0.json",
+      "sha256": "d5b81bf2bb1792859f7aa9c75be939cabcff4253c9948aa6048d4a1d075cb4ca"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-Ua-L4-c0.json",
+      "sha256": "9b60ed5373a5070fea09cbfda6d60efad8dde30c07e1c14334575bd3ef59e667"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-Ub-L1-c0.json",
+      "sha256": "98f0a50b8333344eb0f4bbe41341c4ba01ffd23694bc1d763203d2940d7f0ba5"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-Ub-L2-c0.json",
+      "sha256": "d0dc13fdfb05ffd005f716f8d3d91b80552eda41d1ee26d5133e58d3c16e5950"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-Ub-L3-c0.json",
+      "sha256": "c100fdf743b2b04a247e49c8b544c23780ddb4a20c74b0c89bebf21de57b8960"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-Ub-L4-c0.json",
+      "sha256": "741d3784fdfda8185a701859b3903f0160a6b74f9f2da232fe6cfbef12b2c347"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-ctl-L0-c0.json",
+      "sha256": "16f77524079584e040d6f4d64ca5234728ed0ecafbbec251e24fb6a593546ebb"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-ctl-L1-c0.json",
+      "sha256": "c809a411cf70e5f67e0273cc26b82064ae2bfacf8f0c05ade7a9de74eb592b37"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-ctl-L2-c0.json",
+      "sha256": "2b96aa95854b48f13e5bc6cfdb1ebe653ee47d2c799437422ca56c964e1e9077"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-ctl-L3-c0.json",
+      "sha256": "97f475b5eb3ff8428d3eb222b87933390991704d8dce8ca7419baa036f731d1c"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/slugmap/V3-ctl-L4-c0.json",
+      "sha256": "4512ff55d0339c2038773c88e0603254eedca03264200c7b3369e2be937fb63d"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/census/V1/vertices.jsonl",
+      "sha256": "e106eba66a02e548cb23d4d279b058da61e319df8a3a1f57e2d53b9054f31e84"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/census/V2/vertices.jsonl",
+      "sha256": "2fa3f23c3c476feba4b0014b70172c17471930851a1a3fd93119d4cfcb5aad80"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/census/V3/vertices.jsonl",
+      "sha256": "f3e51226dbbf35fee9f9c7bc72fa42ac92da3d12459acf8ef385add0016ab8b3"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/progress.jsonl",
+      "sha256": "c4a9afe0525ffdf25a86ccf31a7a0a2fac353692ce773e745dc7eb7ec93f11f3"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/runs/transfer_cost.jsonl",
+      "sha256": "af273ef1fc5d8552201aae4302822f6f2c9650d6b9b30efd4fb874b01d4cdcba"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/analysis/results.json",
+      "sha256": "cbb93458e57f1128104ff462206e6f4c201c1990b59ae835e20b88b07ff0905a"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/REPORT.md",
+      "sha256": "08cbac61e608856f9d060c0c953a254bcc9c8930790531130241c95b3f870b89"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/ANALYSIS_PLAN.md",
+      "sha256": "2ef801fc4c8fed3b367e0a55ce0c903013752ebcc1a836a6f83ca3ed9dd1fb8c"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/AMENDMENTS.md",
+      "sha256": "48e3680b2c15724f58c785bb3aedda23b0f486ec0d3214a3b4502e618fabb2a8"
+    },
+    {
+      "path": "../../research/volcano_ecdlp_census_20261017/PLAN.md",
+      "sha256": "f563e5e24927c5cc727f17fc5470ac129d5917fa6860adce73b0a6db20acc493"
+    }
+  ],
+  "headline_summary": {
+    "numbers": 192,
+    "agree": 192,
+    "disagree": 0,
+    "max_rel_diff_point_estimates": 3.846474796376052e-14,
+    "bootstrap_endpoints_max_mc_z": 1.4694920651983752
+  },
+  "headline": [
+    {
+      "name": "positive_control.ratio_rho-cubic_over_rho-neg.V3_crater.D+N+ctl",
+      "claimed": 0.5732765783660192,
+      "recomputed": 0.57327657836601909,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.9366272171620341e-16,
+      "agrees": true
+    },
+    {
+      "name": "positive_control.n_pairs",
+      "claimed": 4000,
+      "recomputed": 4000,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.bsgs.L1/L0",
+      "claimed": 1.0,
+      "recomputed": 1,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.bsgs.L2/L0",
+      "claimed": 1.0000000000000002,
+      "recomputed": 1,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.2204460492503126e-16,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.bsgs.L3/L0",
+      "claimed": 0.9999999999999937,
+      "recomputed": 1.000000000000002,
+      "rel_tol": 1E-9,
+      "rel_diff": 8.326672684688657e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.bsgs.L4/L0",
+      "claimed": 1.0000000000000204,
+      "recomputed": 1.0000000000000207,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.2204460492502672e-16,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.bsgs-neg.L1/L0",
+      "claimed": 1.0,
+      "recomputed": 1,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.bsgs-neg.L2/L0",
+      "claimed": 0.9999999999999998,
+      "recomputed": 1,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.220446049250313e-16,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.bsgs-neg.L3/L0",
+      "claimed": 0.9999999999999913,
+      "recomputed": 0.99999999999998834,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.9976021664879487e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.bsgs-neg.L4/L0",
+      "claimed": 1.0000000000000073,
+      "recomputed": 1.0000000000000069,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.4408920985005936e-16,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.ic.L1/L0",
+      "claimed": 0.979560435598927,
+      "recomputed": 0.97956043559892303,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.080200407652052e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.ic.L2/L0",
+      "claimed": 0.9814746808680553,
+      "recomputed": 0.98147468086805212,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.280417553477151e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.ic.L3/L0",
+      "claimed": 0.9836462666808511,
+      "recomputed": 0.9836462666808482,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.9345710564893265e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.ic.L4/L0",
+      "claimed": 1.011350659305524,
+      "recomputed": 1.0113506593055195,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.391050777136098e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.rho-neg.L1/L0",
+      "claimed": 0.9923644029377502,
+      "recomputed": 0.99236440293774852,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.6781482004067807e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.rho-neg.L2/L0",
+      "claimed": 0.9973874023673576,
+      "recomputed": 0.99738740236735779,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.226262377066277e-16,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.rho-neg.L3/L0",
+      "claimed": 1.0064913461430476,
+      "recomputed": 1.0064913461430449,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.647350391348202e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.rho-neg.L4/L0",
+      "claimed": 1.0023496598380945,
+      "recomputed": 1.0023496598380939,
+      "rel_tol": 1E-9,
+      "rel_diff": 6.645722959418092e-16,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.rho-plain.L1/L0",
+      "claimed": 1.0157989060380586,
+      "recomputed": 1.0157989060380546,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.934639882847853e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.rho-plain.L2/L0",
+      "claimed": 0.9972311195603364,
+      "recomputed": 0.99723111956034027,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.896569721872712e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.rho-plain.L3/L0",
+      "claimed": 0.9874879075449143,
+      "recomputed": 0.98748790754491023,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.159873918178832e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V1.rho-plain.L4/L0",
+      "claimed": 0.9940035946686824,
+      "recomputed": 0.99400359466868016,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.2338410657261495e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.bsgs.L1/L0",
+      "claimed": 1.0,
+      "recomputed": 1,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.bsgs.L2/L0",
+      "claimed": 0.999999999999996,
+      "recomputed": 0.99999999999999711,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.1102230246251597e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.bsgs.L3/L0",
+      "claimed": 0.9999999999999539,
+      "recomputed": 0.99999999999996247,
+      "rel_tol": 1E-9,
+      "rel_diff": 8.548717289614026e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.bsgs-neg.L1/L0",
+      "claimed": 0.9999999999999992,
+      "recomputed": 1,
+      "rel_tol": 1E-9,
+      "rel_diff": 7.771561172376096e-16,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.bsgs-neg.L2/L0",
+      "claimed": 0.9999999999999976,
+      "recomputed": 1.0000000000000069,
+      "rel_tol": 1E-9,
+      "rel_diff": 9.32587340685125e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.bsgs-neg.L3/L0",
+      "claimed": 0.9999999999999695,
+      "recomputed": 0.99999999999997213,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.66453525910045e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.ic.L1/L0",
+      "claimed": 0.9901095833465632,
+      "recomputed": 0.99010958334656496,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.79410124826403e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.ic.L2/L0",
+      "claimed": 0.9961004382491567,
+      "recomputed": 0.99610043824915873,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.006224841982665e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.ic.L3/L0",
+      "claimed": 0.9830581408669793,
+      "recomputed": 0.98305814086698295,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.7268761927263816e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.rho-neg.L1/L0",
+      "claimed": 0.9930295531318359,
+      "recomputed": 0.9930295531318386,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.683238631415254e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.rho-neg.L2/L0",
+      "claimed": 0.983789491254275,
+      "recomputed": 0.98378949125427717,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.2570337140106746e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.rho-neg.L3/L0",
+      "claimed": 0.997863681328798,
+      "recomputed": 0.99786368132880299,
+      "rel_tol": 1E-9,
+      "rel_diff": 5.0066995164713155e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.rho-plain.L1/L0",
+      "claimed": 1.0299873539379816,
+      "recomputed": 1.029987353937982,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.311598663344388e-16,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.rho-plain.L2/L0",
+      "claimed": 1.0069494326133495,
+      "recomputed": 1.0069494326133515,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.9846095341042096e-15,
+      "agrees": true
+    },
+    {
+      "name": "level_ratio.R(L).V2.rho-plain.L3/L0",
+      "claimed": 1.0188266702637607,
+      "recomputed": 1.0188266702637616,
+      "rel_tol": 1E-9,
+      "rel_diff": 8.71765969249889e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L0.price_0_GAE",
+      "claimed": 42.60068513601268,
+      "recomputed": 42.600685136012785,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.5018708038081692e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L0.price_0.1_GAE",
+      "claimed": 46.57337513779276,
+      "recomputed": 46.573375137792539,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.729488628082929e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L0.price_1_GAE",
+      "claimed": 65.4199860173233,
+      "recomputed": 65.419986017323069,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.4755995726294288e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L1.price_0_GAE",
+      "claimed": 42.05103041293087,
+      "recomputed": 42.051030412930871,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L1.price_0.1_GAE",
+      "claimed": 45.97010907451992,
+      "recomputed": 45.970109074519897,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.636987490773236e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L1.price_1_GAE",
+      "claimed": 64.57072941662689,
+      "recomputed": 64.570729416626946,
+      "rel_tol": 1E-9,
+      "rel_diff": 8.803279655405418e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L2.price_0_GAE",
+      "claimed": 41.921016597348746,
+      "recomputed": 41.921016597348711,
+      "rel_tol": 1E-9,
+      "rel_diff": 8.474779399851646e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L2.price_0.1_GAE",
+      "claimed": 45.82607814655874,
+      "recomputed": 45.82607814655875,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.5505204994581398e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L2.price_1_GAE",
+      "claimed": 64.35484469694855,
+      "recomputed": 64.354844696948533,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.2082027828863406e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L3.price_0_GAE",
+      "claimed": 41.63374583662808,
+      "recomputed": 41.633745836628165,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.047981188764385e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L3.price_0.1_GAE",
+      "claimed": 45.50839744844352,
+      "recomputed": 45.50839744844356,
+      "rel_tol": 1E-9,
+      "rel_diff": 9.368065354071064e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L3.price_1_GAE",
+      "claimed": 63.88352439406785,
+      "recomputed": 63.883524394067997,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.3357192002931594e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L4.price_0_GAE",
+      "claimed": 42.98323501813995,
+      "recomputed": 42.983235018139901,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.1571486297440477e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L4.price_0.1_GAE",
+      "claimed": 46.9936387484347,
+      "recomputed": 46.993638748434968,
+      "rel_tol": 1E-9,
+      "rel_diff": 5.745591249790805e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.L4.price_1_GAE",
+      "claimed": 66.01697638630607,
+      "recomputed": 66.016976386306112,
+      "rel_tol": 1E-9,
+      "rel_diff": 6.457818349046545e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.L0.price_0_GAE",
+      "claimed": 61.92408808269251,
+      "recomputed": 61.924088082692386,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.065394847091254e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.L0.price_0.1_GAE",
+      "claimed": 67.34411156461279,
+      "recomputed": 67.344111564612689,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.4771296360628734e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.L0.price_1_GAE",
+      "claimed": 93.27032216156583,
+      "recomputed": 93.270322161565872,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.570860607917329e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.L1.price_0_GAE",
+      "claimed": 61.7420023979193,
+      "recomputed": 61.742002397919144,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.531816199606931e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.L1.price_0.1_GAE",
+      "claimed": 67.14710552214783,
+      "recomputed": 67.147105522147783,
+      "rel_tol": 1E-9,
+      "rel_diff": 6.349129097090279e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.L1.price_1_GAE",
+      "claimed": 93.0158488961645,
+      "recomputed": 93.015848896164627,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.3750096779699626e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.L2.price_0_GAE",
+      "claimed": 62.698993865758425,
+      "recomputed": 62.69899386575829,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.153194357208781e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.L2.price_0.1_GAE",
+      "claimed": 68.20064135998172,
+      "recomputed": 68.20064135998166,
+      "rel_tol": 1E-9,
+      "rel_diff": 8.334733768964552e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.L2.price_1_GAE",
+      "claimed": 94.5466513358264,
+      "recomputed": 94.546651335826326,
+      "rel_tol": 1E-9,
+      "rel_diff": 7.515260728127506e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.L3.price_0_GAE",
+      "claimed": 61.00530567901924,
+      "recomputed": 61.005305679019052,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.0282794134275057e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.L3.price_0.1_GAE",
+      "claimed": 66.3380258182361,
+      "recomputed": 66.33802581823592,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.784844876207355e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.L3.price_1_GAE",
+      "claimed": 91.85093217277178,
+      "recomputed": 91.850932172771351,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.641494989448128e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L0.price_0_GAE",
+      "claimed": 49.023635018266866,
+      "recomputed": 49.023635018266852,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.8987762147598496e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L0.price_0.1_GAE",
+      "claimed": 53.287110483746204,
+      "recomputed": 53.287110483746211,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.3334232787436128e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L0.price_1_GAE",
+      "claimed": 73.30603466420573,
+      "recomputed": 73.306034664205725,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L1.price_0_GAE",
+      "claimed": 59.91935149715433,
+      "recomputed": 59.919351497154345,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.3716636378944953e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L1.price_0.1_GAE",
+      "claimed": 65.22666078499951,
+      "recomputed": 65.22666078499951,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L1.price_1_GAE",
+      "claimed": 90.14493634182793,
+      "recomputed": 90.144936341827929,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L2.price_0_GAE",
+      "claimed": 62.642229890992006,
+      "recomputed": 62.642229890991928,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.247715815187646e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L2.price_0.1_GAE",
+      "claimed": 68.21220208509341,
+      "recomputed": 68.212202085093438,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.166660591744049e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L2.price_1_GAE",
+      "claimed": 94.40389605052015,
+      "recomputed": 94.403896050519961,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.956922532082384e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L3.price_0_GAE",
+      "claimed": 61.95966637868488,
+      "recomputed": 61.959666378684844,
+      "rel_tol": 1E-9,
+      "rel_diff": 5.733913506065442e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L3.price_0.1_GAE",
+      "claimed": 67.46078125488121,
+      "recomputed": 67.460781254881113,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.4745750220498124e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L3.price_1_GAE",
+      "claimed": 93.29991209313302,
+      "recomputed": 93.299912093132761,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.7416465796698528e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L4.price_0_GAE",
+      "claimed": 60.45066971454979,
+      "recomputed": 60.450669714549996,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.408686691866917e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L4.price_0.1_GAE",
+      "claimed": 65.80827716016546,
+      "recomputed": 65.808277160165474,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.1594327231231637e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.L4.price_1_GAE",
+      "claimed": 90.96221991761072,
+      "recomputed": 90.962219917610327,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.3743867771263575e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.all_levels.price_0_GAE",
+      "claimed": 42.41915345070031,
+      "recomputed": 42.419153450700051,
+      "rel_tol": 1E-9,
+      "rel_diff": 6.0301859906497755e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.all_levels.price_0.1_GAE",
+      "claimed": 46.373334748030274,
+      "recomputed": 46.373334748030622,
+      "rel_tol": 1E-9,
+      "rel_diff": 7.507890955313171e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V1.all_levels.price_1_GAE",
+      "claimed": 65.13098467961635,
+      "recomputed": 65.130984679616432,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.3091331063185481e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.all_levels.price_0_GAE",
+      "claimed": 61.526682818519056,
+      "recomputed": 61.526682818520122,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.732279483982403e-14,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.all_levels.price_0.1_GAE",
+      "claimed": 66.910684084493,
+      "recomputed": 66.910684084493198,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.9733960836747134e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V2.all_levels.price_1_GAE",
+      "claimed": 92.67408788077574,
+      "recomputed": 92.67408788077681,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.1500670014808204e-14,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.all_levels.price_0_GAE",
+      "claimed": 58.8143277393736,
+      "recomputed": 58.814327739373596,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.208111633799094e-16,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.all_levels.price_0.1_GAE",
+      "claimed": 64.01542705842776,
+      "recomputed": 64.015427058427946,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.8858842280160025e-15,
+      "agrees": true
+    },
+    {
+      "name": "ic_over_rho-neg.V3.all_levels.price_1_GAE",
+      "claimed": 88.4447613470904,
+      "recomputed": 88.444761347090079,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.695523097936411e-15,
+      "agrees": true
+    },
+    {
+      "name": "rows.measured",
+      "claimed": 403168,
+      "recomputed": 403168,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "rows.all_including_warmup",
+      "claimed": 669120,
+      "recomputed": 669120,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "rows.warmup_dropped",
+      "claimed": 265952,
+      "recomputed": 265952,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "rows.verified",
+      "claimed": 403168,
+      "recomputed": 403168,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "rows.unverified",
+      "claimed": 0,
+      "recomputed": 0,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "sessions.done",
+      "claimed": 79,
+      "recomputed": 79,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "inventory.cells_volcano_family_arm",
+      "claimed": 105,
+      "recomputed": 105,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "rows.measured.V1",
+      "claimed": 151200,
+      "recomputed": 151200,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "rows.measured.V2",
+      "claimed": 150528,
+      "recomputed": 150528,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "rows.measured.V3",
+      "claimed": 101440,
+      "recomputed": 101440,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "recovery.smallest_cell_cp95_lower",
+      "claimed": 0.9963179161031344,
+      "recomputed": 0.99631791610313436,
+      "rel_tol": 0.000001,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "bsgs_identical_ops_fraction.V1.bsgs",
+      "claimed": 1.0,
+      "recomputed": 1,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "bsgs_identity_triples.V1.bsgs",
+      "claimed": 3600,
+      "recomputed": 3600,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "bsgs_identical_ops_fraction.V1.bsgs-neg",
+      "claimed": 1.0,
+      "recomputed": 1,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "bsgs_identity_triples.V1.bsgs-neg",
+      "claimed": 3600,
+      "recomputed": 3600,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "bsgs_identical_ops_fraction.V2.bsgs",
+      "claimed": 1.0,
+      "recomputed": 1,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "bsgs_identity_triples.V2.bsgs",
+      "claimed": 3584,
+      "recomputed": 3584,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "bsgs_identical_ops_fraction.V2.bsgs-neg",
+      "claimed": 1.0,
+      "recomputed": 1,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "bsgs_identity_triples.V2.bsgs-neg",
+      "claimed": 3584,
+      "recomputed": 3584,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "bsgs_identical_ops_fraction.V3.bsgs",
+      "claimed": 1.0,
+      "recomputed": 1,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "bsgs_identity_triples.V3.bsgs",
+      "claimed": 2040,
+      "recomputed": 2040,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "bsgs_identical_ops_fraction.V3.bsgs-neg",
+      "claimed": 1.0,
+      "recomputed": 1,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "bsgs_identity_triples.V3.bsgs-neg",
+      "claimed": 2040,
+      "recomputed": 2040,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V1.ic.N/D",
+      "claimed": 0.9966675619806119,
+      "recomputed": 0.99666756198061457,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.6734443466839766e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V1.ic.S/D",
+      "claimed": 0.9909760099547172,
+      "recomputed": 0.99097600995471991,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.6887989540958968e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V1.ic.Ua/D",
+      "claimed": 1.0102157265227791,
+      "recomputed": 1.0102157265227834,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.176184732440361e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V1.ic.Ub/D",
+      "claimed": 1.0023683413481521,
+      "recomputed": 1.0023683413481588,
+      "rel_tol": 1E-9,
+      "rel_diff": 6.64559910061766e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V1.rho-neg.N/D",
+      "claimed": 0.9894012817382577,
+      "recomputed": 0.98940128173825626,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.4587508209783381e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V1.rho-neg.S/D",
+      "claimed": 0.9974209972041956,
+      "recomputed": 0.99742099720419608,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.45237478552045e-16,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V1.rho-neg.Ua/D",
+      "claimed": 0.9960314486143674,
+      "recomputed": 0.99603144861437165,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.235656915697432e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V1.rho-neg.Ub/D",
+      "claimed": 0.9972792988067439,
+      "recomputed": 0.99727929880674759,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.6737311058664356e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V1.rho-plain.N/D",
+      "claimed": 1.0205632176398032,
+      "recomputed": 1.0205632176398034,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.1757065225076485e-16,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V1.rho-plain.S/D",
+      "claimed": 1.0281780359101198,
+      "recomputed": 1.028178035910118,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.7276743689898606e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V1.rho-plain.Ua/D",
+      "claimed": 1.0179461617489358,
+      "recomputed": 1.0179461617489374,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.5269100595700947e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V1.rho-plain.Ub/D",
+      "claimed": 0.9920595499794966,
+      "recomputed": 0.99205954997949908,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.46204036262321e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V2.ic.N/D",
+      "claimed": 1.017210627717586,
+      "recomputed": 1.0172106277175865,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.3657547193201114e-16,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V2.ic.S/D",
+      "claimed": 1.000930220950241,
+      "recomputed": 1.0009302209502426,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.5528677243850407e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V2.ic.Ua/D",
+      "claimed": 0.998751447432742,
+      "recomputed": 0.99875144743274435,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.3343829515399316e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V2.ic.Ub/D",
+      "claimed": 1.0151326649936823,
+      "recomputed": 1.0151326649936825,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.187345679851738e-16,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V2.rho-neg.N/D",
+      "claimed": 1.0135079597478027,
+      "recomputed": 1.0135079597478001,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.629022528607874e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V2.rho-neg.S/D",
+      "claimed": 1.007674038596431,
+      "recomputed": 1.0076740385964278,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.0849504402042346e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V2.rho-neg.Ua/D",
+      "claimed": 1.0066695119035631,
+      "recomputed": 1.0066695119035616,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.544014411975277e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V2.rho-neg.Ub/D",
+      "claimed": 1.0032625383069669,
+      "recomputed": 1.0032625383069629,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.9838055703697245e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V2.rho-plain.N/D",
+      "claimed": 1.001360380408093,
+      "recomputed": 1.0013603804080951,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.995686551440004e-15,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V2.rho-plain.S/D",
+      "claimed": 1.003244259619895,
+      "recomputed": 1.0032442596198954,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.4265312818068563e-16,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V2.rho-plain.Ua/D",
+      "claimed": 0.9946550476203238,
+      "recomputed": 0.99465504762032342,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.348567005057658e-16,
+      "agrees": true
+    },
+    {
+      "name": "paired_source_ratio.V2.rho-plain.Ub/D",
+      "claimed": 1.0044519983059885,
+      "recomputed": 1.0044519983059872,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.3263626652115396e-15,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.bsgs.L1",
+      "claimed": 1.0138208854692885,
+      "recomputed": 1.0138208854693138,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.49680050236248e-14,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.bsgs.L2",
+      "claimed": 1.0138208854692885,
+      "recomputed": 1.0138208854693145,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.562505778740438e-14,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.bsgs.L3",
+      "claimed": 1.0138208854692885,
+      "recomputed": 1.0138208854693145,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.562505778740438e-14,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.bsgs.L4",
+      "claimed": 1.0138208854692885,
+      "recomputed": 1.0138208854693145,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.562505778740438e-14,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.bsgs-neg.L1",
+      "claimed": 1.0217640086647322,
+      "recomputed": 1.0217640086646935,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.781280308301882e-14,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.bsgs-neg.L2",
+      "claimed": 1.0217640086647322,
+      "recomputed": 1.0217640086646929,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.846474796376052e-14,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.bsgs-neg.L3",
+      "claimed": 1.0217640086647322,
+      "recomputed": 1.0217640086646929,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.846474796376052e-14,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.bsgs-neg.L4",
+      "claimed": 1.0217640086647322,
+      "recomputed": 1.0217640086646929,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.846474796376052e-14,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.ic.L1",
+      "claimed": 1.2258492629680864,
+      "recomputed": 1.2258492629680846,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.4490826018031353e-15,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.ic.L2",
+      "claimed": 1.237800441694917,
+      "recomputed": 1.2378004416949158,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.0763185927821428e-15,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.ic.L3",
+      "claimed": 1.2538338031883853,
+      "recomputed": 1.2538338031883818,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.833480537664779e-15,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.ic.L4",
+      "claimed": 1.2372256040352472,
+      "recomputed": 1.2372256040352476,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.589395566998069e-16,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.rho-neg.L1",
+      "claimed": 1.0029412093689456,
+      "recomputed": 1.0029412093689438,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.7711475237097307e-15,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.rho-neg.L2",
+      "claimed": 0.9686991855924855,
+      "recomputed": 0.96869918559248425,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.2607064662088281e-15,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.rho-neg.L3",
+      "claimed": 0.9920565156919359,
+      "recomputed": 0.99205651569193254,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.357338035880352e-15,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.rho-neg.L4",
+      "claimed": 1.003351935286829,
+      "recomputed": 1.0033519352868301,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.1065140610983872e-15,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.rho-plain.L1",
+      "claimed": 0.9913369868798422,
+      "recomputed": 0.99133698687984706,
+      "rel_tol": 1E-9,
+      "rel_diff": 4.9276697762743345e-15,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.rho-plain.L2",
+      "claimed": 0.979847420186376,
+      "recomputed": 0.97984742018637827,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.2661140944045742e-15,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.rho-plain.L3",
+      "claimed": 0.9965144554071589,
+      "recomputed": 0.99651445540716244,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.565140133716284e-15,
+      "agrees": true
+    },
+    {
+      "name": "v3_descriptive_ratio_to_crater.rho-plain.L4",
+      "claimed": 0.9943297855964606,
+      "recomputed": 0.99432978559646357,
+      "rel_tol": 1E-9,
+      "rel_diff": 3.0146961399630266e-15,
+      "agrees": true
+    },
+    {
+      "name": "curve_effect_F.V1.ic",
+      "claimed": 0.9490981796144997,
+      "recomputed": 0.94909817961450071,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.0527896308561992e-15,
+      "agrees": true
+    },
+    {
+      "name": "curve_effect_F.V1.rho-neg",
+      "claimed": 0.8674327728967186,
+      "recomputed": 0.86743277289671805,
+      "rel_tol": 1E-9,
+      "rel_diff": 6.399475897813154e-16,
+      "agrees": true
+    },
+    {
+      "name": "curve_effect_F.V1.rho-plain",
+      "claimed": 1.032344936437461,
+      "recomputed": 1.0323449364374622,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.0754380492788053e-15,
+      "agrees": true
+    },
+    {
+      "name": "curve_effect_F.V2.ic",
+      "claimed": 0.9450577126032144,
+      "recomputed": 0.94505771260321514,
+      "rel_tol": 1E-9,
+      "rel_diff": 8.223372042506154e-16,
+      "agrees": true
+    },
+    {
+      "name": "curve_effect_F.V2.rho-neg",
+      "claimed": 0.8998420729975605,
+      "recomputed": 0.89984207299756069,
+      "rel_tol": 1E-9,
+      "rel_diff": 2.467595276861801e-16,
+      "agrees": true
+    },
+    {
+      "name": "curve_effect_F.V2.rho-plain",
+      "claimed": 1.1126819368461902,
+      "recomputed": 1.1126819368461909,
+      "rel_tol": 1E-9,
+      "rel_diff": 5.986740619365114e-16,
+      "agrees": true
+    },
+    {
+      "name": "aa_wall_ratio.V1",
+      "claimed": 0.9993770888318115,
+      "recomputed": 0.99937708883181164,
+      "rel_tol": 1E-9,
+      "rel_diff": 1.1109150260017614e-16,
+      "agrees": true
+    },
+    {
+      "name": "frac_rows_L2.V1.rho-neg",
+      "claimed": 0.9203333333333333,
+      "recomputed": 0.92033333333333334,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "frac_rows_L2.V1.ic",
+      "claimed": 0.8683888888888889,
+      "recomputed": 0.86838888888888888,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "aa_wall_ratio.V2",
+      "claimed": 1.0004813268356498,
+      "recomputed": 1.0004813268356498,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "frac_rows_L2.V2.rho-neg",
+      "claimed": 0.9340401785714286,
+      "recomputed": 0.93404017857142863,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "frac_rows_L2.V2.ic",
+      "claimed": 0.9162388392857143,
+      "recomputed": 0.91623883928571426,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "aa_wall_ratio.V3",
+      "claimed": 0.9978318869683495,
+      "recomputed": 0.99783188696834946,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "frac_rows_L2.V3.rho-neg",
+      "claimed": 0.9241141732283464,
+      "recomputed": 0.92411417322834644,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "frac_rows_L2.V3.ic",
+      "claimed": 0.8944881889763779,
+      "recomputed": 0.89448818897637794,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "uncharged_per_run.V1.ic",
+      "claimed": 292972.08705555554,
+      "recomputed": 292972.08705555554,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "uncharged_per_charged_gae.V1.ic",
+      "claimed": 1.9130390568367093,
+      "recomputed": 1.9130390568367093,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "uncharged_per_run.V1.rho-neg",
+      "claimed": 3239.2586666666666,
+      "recomputed": 3239.2586666666666,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "uncharged_per_charged_gae.V1.rho-neg",
+      "claimed": 0.8972329585938558,
+      "recomputed": 0.89723295859385577,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "uncharged_per_run.V2.ic",
+      "claimed": 160245.13376116072,
+      "recomputed": 160245.13376116072,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "uncharged_per_charged_gae.V2.ic",
+      "claimed": 1.8329521671357536,
+      "recomputed": 1.8329521671357536,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "uncharged_per_run.V2.rho-neg",
+      "claimed": 1251.5591517857142,
+      "recomputed": 1251.5591517857142,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "uncharged_per_charged_gae.V2.rho-neg",
+      "claimed": 0.8808078224803824,
+      "recomputed": 0.88080782248038236,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "uncharged_per_run.V3.ic",
+      "claimed": 227507.77982283465,
+      "recomputed": 227507.77982283465,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "uncharged_per_charged_gae.V3.ic",
+      "claimed": 1.8814759636592542,
+      "recomputed": 1.8814759636592542,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "uncharged_per_run.V3.rho-neg",
+      "claimed": 1883.5352362204724,
+      "recomputed": 1883.5352362204724,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "uncharged_per_charged_gae.V3.rho-neg",
+      "claimed": 0.9161346485487284,
+      "recomputed": 0.91613464854872839,
+      "rel_tol": 1E-9,
+      "rel_diff": 0,
+      "agrees": true
+    },
+    {
+      "name": "bootstrap.positive_control.ci95_lower",
+      "claimed": 0.5618795039026397,
+      "recomputed": 0.56202967975133633,
+      "rel_tol": 0.0015671726338965031,
+      "rel_diff": 0.0002672027014000955,
+      "agrees": true,
+      "mc_z": 0.6821816869066842
+    },
+    {
+      "name": "bootstrap.positive_control.ci95_upper",
+      "claimed": 0.585014725167624,
+      "recomputed": 0.58469123038275994,
+      "rel_tol": 0.0015051966116087995,
+      "rel_diff": 0.0005529686193306529,
+      "agrees": true,
+      "mc_z": 1.4694920651983752
+    },
+    {
+      "name": "bootstrap.level_ratio.V1.rho-plain.L1.ci95_lower",
+      "claimed": 0.972983926240266,
+      "recomputed": 0.97222957652163533,
+      "rel_tol": 0.003574980270639945,
+      "rel_diff": 0.0007752951495771837,
+      "agrees": true,
+      "mc_z": 0.8674678917189109
+    },
+    {
+      "name": "bootstrap.level_ratio.V1.rho-plain.L1.ci95_upper",
+      "claimed": 1.0617098168775678,
+      "recomputed": 1.0618229545029172,
+      "rel_tol": 0.003276223205874208,
+      "rel_diff": 0.00010655036686632295,
+      "agrees": true,
+      "mc_z": 0.1301031271199499
+    },
+    {
+      "name": "bootstrap.level_ratio.V1.rho-plain.L1.ci90_lower",
+      "claimed": 0.9795160623689311,
+      "recomputed": 0.97857848202544162,
+      "rel_tol": 0.0028089932862138283,
+      "rel_diff": 0.0009571873086204853,
+      "agrees": true,
+      "mc_z": 1.3630325331402326
+    },
+    {
+      "name": "bootstrap.level_ratio.V1.rho-plain.L1.ci90_upper",
+      "claimed": 1.0541755299475613,
+      "recomputed": 1.0540991032740161,
+      "rel_tol": 0.0026100530364898543,
+      "rel_diff": 7.249900170698199e-05,
+      "agrees": true,
+      "mc_z": 0.11110732340440517
+    },
+    {
+      "name": "bootstrap.ic_over_rho-neg.V1.all.price_0.ci95_lower",
+      "claimed": 41.9251773700255,
+      "recomputed": 41.920520929895929,
+      "rel_tol": 0.0009296814574628171,
+      "rel_diff": 0.00011106548431448476,
+      "agrees": true,
+      "mc_z": 0.4778646854701923
+    },
+    {
+      "name": "bootstrap.ic_over_rho-neg.V1.all.price_0.ci95_upper",
+      "claimed": 42.92615738548422,
+      "recomputed": 42.932742599054755,
+      "rel_tol": 0.0009080025414744626,
+      "rel_diff": 0.00015338441412972797,
+      "agrees": true,
+      "mc_z": 0.6758040314218007
+    },
+    {
+      "name": "bootstrap.paired_source.V1.rho-plain.S/D.ci95_lower",
+      "claimed": 0.9981268225663708,
+      "recomputed": 0.99827638111202954,
+      "rel_tol": 0.002372768331429525,
+      "rel_diff": 0.00014981677267791245,
+      "agrees": true,
+      "mc_z": 0.2525981472724147
+    },
+    {
+      "name": "bootstrap.paired_source.V1.rho-plain.S/D.ci95_upper",
+      "claimed": 1.0593423679435705,
+      "recomputed": 1.0594423211638302,
+      "rel_tol": 0.002235654673128318,
+      "rel_diff": 9.434512692478023e-05,
+      "agrees": true,
+      "mc_z": 0.1688168211337791
+    }
+  ],
+  "bootstrap_spot_checks": {
+    "implementation": "validation/cluster_boot.awk (mawk rand(), two-stage stratified cluster bootstrap, 10,000 replicates) and validation/quantiles.sh (percentile, linear interpolation at (n-1)q); seeds 777001-777005 (777006 for the V3 crater IC over rho-cubic CI in rho_reference_audit); shares no code or RNG with analysis/analyze.py",
+    "tolerance": "rel_tol of each bootstrap endpoint = 4 x sqrt(2) x sqrt(q(1-q)/10000) / phi(z_q) x bootstrap SD / |claimed| (4 SD of the difference of two independent Monte Carlo estimates); mc_z is the difference in units of that SD",
+    "replicate_summaries": {
+      "pc": {
+        "check": "pc",
+        "q0.025": 0.56202967975133633,
+        "q0.975": 0.58469123038275994,
+        "q0.05": 0.56369388028540046,
+        "q0.95": 0.58288395539741344,
+        "n": 10000,
+        "mean": 0.57330456609816893,
+        "sd": 0.00582679787677675
+      },
+      "v1rp_L1": {
+        "check": "v1rp_L1",
+        "q0.025": 0.97222957652163533,
+        "q0.975": 1.0618229545029172,
+        "q0.05": 0.97857848202544162,
+        "q0.95": 1.0540991032740161,
+        "n": 10000,
+        "mean": 1.0162025046159882,
+        "sd": 0.023017027615651567
+      },
+      "v1icrho": {
+        "check": "v1icrho",
+        "q0.025": 41.920520929895929,
+        "q0.975": 42.932742599054755,
+        "q0.05": 41.99781836926406,
+        "q0.95": 42.846128480657349,
+        "n": 10000,
+        "mean": 42.421543878393372,
+        "sd": 0.25791642553735944
+      },
+      "pair_vx": {
+        "check": "pair_vx",
+        "q0.025": 0.99827638111202954,
+        "q0.975": 1.0594423211638302,
+        "q0.05": 1.0027828525444618,
+        "q0.95": 1.0544316535124107,
+        "n": 10000,
+        "mean": 1.0282227700535145,
+        "sd": 0.015671515171932434
+      },
+      "pair_tr": {
+        "check": "pair_tr",
+        "q0.025": 1.0060871783445027,
+        "q0.975": 1.0505562852812316,
+        "q0.05": 1.0096883271828292,
+        "q0.95": 1.0470569446561178,
+        "n": 10000,
+        "mean": 1.0281129336214783,
+        "sd": 0.011342369833426904
+      }
+    },
+    "triple_only_sensitivity_V1_rho-plain_S_over_D": {
+      "ci95": [
+        1.0060871783445027,
+        1.0505562852812316
+      ],
+      "ci90": [
+        1.0096883271828292,
+        1.0470569446561178
+      ],
+      "sd": 0.011342369833426904,
+      "note": "resampling (vertex,target,round) triples without the vertex stage; SD is 1/sqrt(2) of the two-stage SD, see finding N1"
+    }
+  },
+  "row_counts": {
+    "rows_all": 669120,
+    "rows_warmup": 265952,
+    "rows_measured": 403168,
+    "warmup_not_bool": 0,
+    "no_vertex": 0,
+    "no_uncharged": 0,
+    "unc_rows": 403168,
+    "unc_dup_keys": 0,
+    "unc_unused": 0,
+    "total_gae_ne_ops_gae": 0,
+    "s_ne_S": 0
+  },
+  "report_vs_results": {
+    "summary": "Every number REPORT.md prints that I checked equals results.json as rounded; every results.json headline value I recomputed from raw data agrees to <= 3e-14 relative. The reporting errors are descriptive and interpretive (findings F1-F8), not numeric.",
+    "checked_claims": [
+      "s1.1 positive control 0.5733 [0.5619, 0.5850], 4000 paired runs, PASS",
+      "s1.2 35 level ratios: 33 equivalent, 0 different, 2 inconclusive (both rho-plain L1); no 95% CI excludes 1",
+      "s1.3 smallest Holm-adjusted variance-ratio p 0.130; one curve flagged (V2 rho-plain vertex 69; z 4.552 recomputed exactly; z rho-neg -0.236, ic 2.905)",
+      "s1.4 403,168 / 403,168 verified; smallest-cell Clopper-Pearson lower bound 0.99632 (1,000-run cells); BSGS identical in 100% of triples (3600/3600/3584/3584/2040/2040); paired source 23 equivalent, 1 inconclusive (V1 rho-plain S/D), 0 different; transport-then-solve 240 cells, 14 exclude 1 at all prices, 0 signals; price band moves any cell by at most 1.517%",
+      "s1.5 IC / rho-neg 42.4x (V1), 61.5x (V2) at 0 GAE; 65.1x, 92.7x at 1 GAE; every ranking string 'rho-neg ahead of ic at all three prices'",
+      "s1.6 / s8 A/A ratios 0.9994, 1.0005, 0.9978; L2 row fractions 86.8%-93.6%; wall not admitted",
+      "s2 79 sessions; 669,120 rows, 265,952 warm-up, 403,168 measured; curves per level V1 25/25/50/100/200, V2 14/28/84/252, V3 1/1/2/4/8; binary ac4bc5b2...; campaign session wall 12.19 h",
+      "s4 tables: 35 level-ratio cells equal results.json (report_tables_check.sh); CV column = mean of the per-level cv_S_per_row (unstated convention, consistent)",
+      "s4 mixed model: level ratios 0.977-1.038, ICC 1e-10-0.0074, V2|bsgs-neg not converged (read from results.json, not refitted)",
+      "s5 F statistics 0.867 / 1.032 / 0.949 / 0.900 / 1.113 / 0.945 recomputed exactly; BSGS degenerate confirmed (identical ops_gae; my naive F on V2 bsgs is floating-point noise)",
+      "s6 24 paired-ratio cells equal results.json; matches_transported true on 3,158 / 3,158 paths; median transport ns per path V1 d=1 2,780 ns, d=20 60,310 ns",
+      "s7 51 IC/rho cells (V1, V2, V3; levels and pooled; 0 / 0.1 / 1 GAE) equal results.json and my recompute; uncharged per run V1 ic 292,972 (1.913 per charged GAE), rho-neg 3,239 (0.897)",
+      "s9 V3 descriptive ratios (20) recomputed exactly"
+    ],
+    "table_cells_check": "report_table_cells_checked=110 (level 35, paired 24, ic_vs_rho 51) equal=110 differ=0 missing=0"
+  },
+  "verdict_vocabulary": {
+    "follows_analysis_plan": true,
+    "detail": "Level and paired ratios use exactly 'equivalent' / 'different' / 'inconclusive' (ANALYSIS_PLAN s3, s5), with TOST margins [0.95, 1/0.95] (rho, BSGS) and [0.90, 1/0.90] (ic) as frozen; the positive control uses pass/fail with the frozen 0.85 threshold; wall is 'descriptive (not admitted)' per s8; IC vs rho is 'distance remaining, not pass/fail' and ranks only where the order holds at 0, 0.1 and 1 GAE (s9, AGENTS.md s5a); the status line is 'observed, not established' as PLAN s5 requires with one volcano per l. 'uninformative' is correctly not used (the positive control passed). One label error: the s5 table header says 'Holm p (across 10)' while the Holm adjustment is across the 6 non-degenerate tests (F5)."
+  },
+  "amendment_A2_audit": {
+    "changes_estimand_margin_family_test_or_threshold": false,
+    "items": [
+      {
+        "item": "A2.1 uncharged counters from run records",
+        "effect": "data source only; estimand and formula as ANALYSIS_PLAN s9. Re-derived independently from records.jsonl for 19 sessions / 109,168 measured records (unc_from_records.jq): total_gae, s and the uncharged count match runs/uncharged and runs/extract row by row (0 mismatches). Across all 403,168 rows, runs/uncharged total_gae == extract ops_gae and s == S (0 mismatches)."
+      },
+      {
+        "item": "A2.2 A1.6 cleanup",
+        "effect": "storage only"
+      },
+      {
+        "item": "A2.3 curve = census vertex",
+        "effect": "resampling unit as ANALYSIS_PLAN s1/s3 (slug mapped to vertex). Point estimates are unaffected (pooled-row and mean-of-vertex-mean R(L) agree to 1e-14). The text 'five slugs (five generators) per vertex' is inaccurate: a curve_slug is the curve model (p, a, b), not the generator; isogenous families share models, giving 2-4 distinct slugs per vertex on V1/V2 and 1-3 on V3 (F6)."
+      },
+      {
+        "item": "A2.3 p-values and 'different' rule",
+        "effect": "no estimand or threshold change; no 95% CI excludes 1 in s3, so the rule and its precedence decided nothing"
+      },
+      {
+        "item": "A2.3 s4 per-curve p from the pooled |z*| null",
+        "effect": "fills an operational gap (3 outcomes per vertex); it is what makes any flag possible (one flag, vertex 69), so it does not suppress findings. Holm family (b) in practice = 6 non-degenerate tests (F5)."
+      },
+      {
+        "item": "A2.3 s5 paired unit",
+        "effect": "my two-stage vertex -> triple bootstrap reproduces the claimed V1 rho-plain S/D CI within Monte Carlo error (0.9983, 1.0594 vs 0.9981, 1.0593), i.e. curves are the resampling unit as ANALYSIS_PLAN s5 says; family (c) = V x {rho-neg, rho-plain, ic} x {Ua, Ub, S, N} = 24 as s5 implies"
+      },
+      {
+        "item": "A2.3 s5 transport-then-solve and 'exceeds the control spread'",
+        "effect": "defines a threshold the plan left undefined (does not change one). It is the only interpretation that decided a cell: V2 rho-plain Ua excludes 1 below at all prices at all four destination levels. See outcome_driven_assessment."
+      },
+      {
+        "item": "A2.3 s6 pair bootstrap primary, slug-cluster sensitivity",
+        "effect": "both pass; reproduced"
+      },
+      {
+        "item": "A2.3 s8 A/A definition",
+        "effect": "wall is not admitted on the L2 condition regardless"
+      },
+      {
+        "item": "A2.3 s9 pairs and priced S",
+        "effect": "as ANALYSIS_PLAN s9; reproduced exactly"
+      },
+      {
+        "item": "A2.4 Python",
+        "effect": "statement only; this validation re-derived the numbers without Python"
+      }
+    ],
+    "timing": {
+      "A2_3_A2_4_appended_after_final_run": true,
+      "evidence": "results.json inputs_sha256['AMENDMENTS.md'] = deb547a3..., the AMENDMENTS.md of commit 89e88b1f94 (A2.1-A2.2 only, 06:10:50Z); A2.3-A2.4 (sha256 48e3680b...) first appear in commit 6ca47a183f (06:35:20Z) together with results.json and analyze.py. analyze.py was never committed before the final run and the 100-replicate smoke-run output is not preserved, so 'fixed in code before the final run' cannot be checked from the record. REPORT.md s11 discloses the order correctly; the A2 preamble 'These are written before analysis/analyze.py is run' is untrue for A2.3-A2.4 (F6).",
+      "analysis_plan_frozen_before_last_session": "ANALYSIS_PLAN.md committed b8f90e22b8 at 05:52:21Z, unchanged since (sha256 2ef801fc... equals results.json's pin); last Phase B session line 05:32:41Z, 'manifest finished' note 05:55:53Z"
+    },
+    "outcome_driven_assessment": [
+      {
+        "interpretation": "vertex clustering",
+        "could_be_outcome_driven": "not excludable from the record",
+        "direction": "widens CIs relative to slug or triple resampling, which pushes toward 'inconclusive' and away from both 'equivalent' and 'different'; it does not favour the headline 'no level effect' (see N1)"
+      },
+      {
+        "interpretation": "pooled-null per-curve p",
+        "could_be_outcome_driven": "not excludable",
+        "direction": "enables the single flag; not suppressive"
+      },
+      {
+        "interpretation": "transport control = native-instance ratio, 'disjoint CI'",
+        "could_be_outcome_driven": "possible: the smoke run would have shown the V2 rho-plain Ua cells, and this definition is what classifies them as non-signals",
+        "robustness": "the conclusion does not depend on it: the denominator is the mean of the 8 rows at the single source vertex 364 (mean ops_gae 2,900 vs 1,754 at level 0, ratio 0.60484 recomputed exactly); the ratio is ~0.6 at every destination level although mean Velu evaluations rise from 13.0 to 18.9; the paired Ua/D ratio on shared k_i is 0.995 [0.965, 1.025], equivalent; PLAN s8 excludes speedup claims"
+      },
+      {
+        "interpretation": "other A2.3 items",
+        "could_be_outcome_driven": "no decision depended on them"
+      }
+    ]
+  },
+  "rho_reference_audit": {
+    "protocol_reference": "rho-neg (rho.negation) is the matched reference in every session (PLAN s1; ANALYSIS_PLAN s2, s9); rho-cubic (rho.cubic, automorphism fold) runs on the V3 crater only, as the positive control",
+    "V1": {
+      "strongest_available": "negation",
+      "is_report_reference": true,
+      "evidence": "no V1 vertex has j in {0, 1728} (400 vertices checked): Aut = {+-1}; prime field, no Frobenius fold"
+    },
+    "V2": {
+      "strongest_available": "negation",
+      "is_report_reference": true,
+      "evidence": "no V2 vertex has j in {0, 1728} (378 vertices checked)"
+    },
+    "V3_non_crater": {
+      "strongest_available": "negation",
+      "is_report_reference": true,
+      "evidence": "only V3 vertex 0 has a special j (j = 0)"
+    },
+    "V3_crater": {
+      "strongest_available": "automorphism fold (rho-cubic, order-6 automorphism group of j = 0, p = 1 mod 3)",
+      "is_report_reference": false,
+      "report_uses": "rho-neg in REPORT s7 (V3 table, level 0) and s9",
+      "ic_over_rho_cubic_D_plus_N_pairs_2000": {
+        "0": 84.862217146412931,
+        "0.1": 92.759616190969481,
+        "1": 131.05744514971849
+      },
+      "ic_over_rho_neg_same_pairs": {
+        "0": 49.023635018266852,
+        "0.1": 53.287110483746211,
+        "1": 73.306034664205725
+      },
+      "same_unit": true,
+      "same_binary": true,
+      "same_sessions_and_pairs": true,
+      "consequence": "see F1",
+      "ic_over_rho_cubic_price0_ci95_pair_bootstrap": [
+        82.730503893856209,
+        87.059046474615982
+      ],
+      "ci_method": "pair bootstrap over the 2,000 D+N (workload, target, round) pairs, 10,000 replicates, seed 777006 (validation/cluster_boot.awk)"
+    },
+    "same_unit": "S (ecbench normalised group operations; total_gae over the session floor) on every arm",
+    "same_binary_or_process": "every arm ran in the same ecbench sessions, binary sha256 ac4bc5b26f858a4d8a374208297157840af25fb1dc25ea1c19dd41360735fb35, paired on (workload, target, round)",
+    "gae_band_recomputed": {
+      "V1|0": {
+        "ic": 46.688314936919689,
+        "rho_neg": 1.1006423075175533,
+        "ratio": 42.419153450700051,
+        "n": 18000
+      },
+      "V1|0.1": {
+        "ic": 55.619971934142512,
+        "rho_neg": 1.1993955629103119,
+        "ratio": 46.373334748030622,
+        "n": 18000
+      },
+      "V1|1": {
+        "ic": 136.00488490914088,
+        "rho_neg": 2.0881748614450988,
+        "ratio": 65.130984679616432,
+        "n": 18000
+      },
+      "V2|0": {
+        "ic": 76.027065280319277,
+        "rho_neg": 1.2356763244423508,
+        "ratio": 61.526682818520122,
+        "n": 17920
+      },
+      "V2|0.1": {
+        "ic": 89.962462686971975,
+        "rho_neg": 1.3445156617046323,
+        "ratio": 66.910684084493198,
+        "n": 17920
+      },
+      "V2|1": {
+        "ic": 215.38103934685239,
+        "rho_neg": 2.3240696970650028,
+        "ratio": 92.67408788077681,
+        "n": 17920
+      },
+      "V3|0": {
+        "ic": 68.450657039601424,
+        "rho_neg": 1.163843227842877,
+        "ratio": 58.814327739373596,
+        "n": 10160
+      },
+      "V3|0.1": {
+        "ic": 81.329483631270861,
+        "rho_neg": 1.2704669384934366,
+        "ratio": 64.015427058427946,
+        "n": 10160
+      },
+      "V3|1": {
+        "ic": 197.23892295629446,
+        "rho_neg": 2.2300803343485285,
+        "ratio": 88.444761347090079,
+        "n": 10160
+      },
+      "V3crater|0": {
+        "rho_cubic": 0.67683674760077728,
+        "rho_neg": 1.1716362327307417,
+        "ic_over_cubic": 84.862217146412931,
+        "n": 2000
+      },
+      "V3crater|0.1": {
+        "rho_cubic": 0.73476658739846756,
+        "rho_neg": 1.279046021041423,
+        "ic_over_cubic": 92.759616190969481,
+        "n": 2000
+      },
+      "V3crater|1": {
+        "rho_cubic": 1.2561351455776868,
+        "rho_neg": 2.2457341158376112,
+        "ic_over_cubic": 131.05744514971849,
+        "n": 2000
+      }
+    }
+  },
+  "section_5a_band": {
+    "applied_to_both_arms": true,
+    "unpriced_counters": {
+      "ic": [
+        "sqrt_solves_uncharged",
+        "lookups_uncharged",
+        "row_ops_uncharged",
+        "legendre_symbols_uncharged",
+        "target_guard_probes_uncharged"
+      ],
+      "rho-neg": [
+        "canonicalisations_uncharged"
+      ],
+      "rho-cubic": [
+        "canonicalisations_uncharged"
+      ]
+    },
+    "formula": "priced S = S * (total_gae + p * uncharged) / total_gae, p in {0, 0.1, 1}, same p on both arms (A2.1); recomputed from runs/uncharged",
+    "order_holds_across_band": {
+      "V1": true,
+      "V2": true,
+      "V3": true,
+      "V3_crater_vs_rho_cubic": true
+    },
+    "lower_bounds": "both arms leave unnamed native work unpriced (e.g. ic walk_steps, trials, walk_pool_ops; rho walk bookkeeping); stated in REPORT s7 and s11"
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "material",
+      "where": "REPORT.md s7 (V3 table, level 0) and s9 (last paragraph)",
+      "claim": "On the V3 j = 0 crater IC's gap to rho is 49.0x / 53.3x / 73.3x (0 / 0.1 / 1 GAE), and 'it makes IC's gap to rho smaller on that curve (49x against about 60x at 0 GAE)'.",
+      "evidence": "The gap is measured against rho-neg. On the j = 0 crater the strongest available rho is the automorphism fold rho-cubic, measured in the same sessions, binary and unit (the study's own positive control: 0.5733 x rho-neg). Against it IC is 84.9x / 92.8x / 131.1x on the same 2,000 D+N pairs (0 GAE 95% CI [82.7, 87.1]): larger, not smaller, than the 59.9-62.6x / 65.2-68.2x / 90.1-94.4x at the non-crater V3 levels (against rho-neg, which is the strongest reference there). AGENTS.md (validation gate) and docs/VALIDATION_GATE.md require the gap to the strongest available reference for that curve; the report states the opposite of what the matched reference shows.",
+      "fix": "erratum: report the V3 crater row against rho-cubic (84.9 / 92.8 / 131.1) and withdraw the 'gap smaller on that curve' sentence; s1.5 'No level improves IC's position' then holds against the matched reference"
+    },
+    {
+      "id": "F2",
+      "severity": "material",
+      "where": "REPORT.md s9 ('Observed, not tested' paragraph), s6 V3 transport cells",
+      "claim": "'ic is about 22 to 25% more expensive at every non-crater V3 level than at the j = 0 crater ... This fits IC using the 6 automorphisms of j = 0 on the crater'.",
+      "evidence": "The study's own isomorphic negative control on the same crater curve contradicts the j = 0 explanation. IC mean S on the V3 crater: D/N model (slug eeb6174a, 2,000 rows) 57.44 +- 0.50 (SE); the two isomorphic re-scalings, which have the same automorphism group: 67.00 +- 0.87 (a41c0795) and 72.59 +- 0.97 (d53b367d), mean 69.79, in line with the non-crater levels (isogenous 70.4-72.0, ctl 65.2-71.7). The crater 'discount' is a property of one Weierstrass model, i.e. a coordinate effect of the prime-abscissa factor base (cf. the coordinate effect reported in benchmarks/README.md row 20261017-isogeny-volcano-cost), not of the level or of j = 0. The same model drives the V3 D and Ua 'transport then solve' cells (about 1.2). The report presents a level-shaped observation and a mechanism without the negative control that the plan put in the design for exactly this purpose.",
+      "fix": "erratum: state that the crater effect is not present on the isomorphic re-scalings (model effect), drop the automorphism explanation or label it refuted by the control"
+    },
+    {
+      "id": "F3",
+      "severity": "minor",
+      "where": "REPORT.md s3 and s11",
+      "claim": "'(3 generators; rho-cubic was run on one of the two re-scalings)'; 'its positive control uses one of the two ctl re-scalings for rho-cubic'.",
+      "evidence": "specs/V3-ctl-L0-c0.json lists both re-scalings and the rho-cubic arm; runs/extract has 1,000 measured rho-cubic rows on each (a41c0795, d53b367d); the 4,000 pairs are D 1,000 + N 1,000 + ctl 2 x 1,000. '3' is the number of distinct curve models (D and N share the crater model), not of generators (4).",
+      "fix": "erratum text only; numbers unchanged"
+    },
+    {
+      "id": "F4",
+      "severity": "minor",
+      "where": "REPORT.md s6, transport-then-solve paragraph",
+      "claim": "'The V2 rho-plain Ua cell is the same at every level including level 0 (no transport at all)'.",
+      "evidence": "Level-0 destinations are reached by transport from floor source vertex 364 (results.json transport_then_solve V2|Ua|rho-plain levels.0.mean_velu_evals = 13.0). The only zero-transport rows are those at the source vertex itself. The conclusion (a source-mean artifact, not a signal) stands: the ratio is ~0.6 at every level while Velu evaluations rise from 13.0 to 18.9.",
+      "fix": "erratum text only"
+    },
+    {
+      "id": "F5",
+      "severity": "minor",
+      "where": "REPORT.md s5 table header",
+      "claim": "'Holm p (across 10)'.",
+      "evidence": "results.json curve_effect['V2|rho-plain'].p_perm_holm = 0.12959 = 6 x 0.021598: Holm is across the 6 non-degenerate tests; the 4 BSGS cells are degenerate and untested. Across 10 the smallest adjusted p would be 0.216; no conclusion changes.",
+      "fix": "erratum text only"
+    },
+    {
+      "id": "F6",
+      "severity": "minor",
+      "where": "AMENDMENTS.md A2 preamble and A2.3 first bullet",
+      "claim": "'These are written before analysis/analyze.py is run'; 'The five isogenous families give five slugs (five generators) per vertex'.",
+      "evidence": "A2.3-A2.4 were appended after the final run (see amendment_A2_audit.timing; REPORT s11 discloses this correctly). A curve_slug identifies the model (p, a, b), not the generator; there are 2-4 distinct slugs per vertex on V1/V2 and 1-3 on V3 across the five isogenous families. The vertex resampling unit itself is right.",
+      "fix": "a new amendment record (A3) correcting both statements; AMENDMENTS.md is not rewritten"
+    },
+    {
+      "id": "F7",
+      "severity": "minor",
+      "where": "REPORT.md s7, last paragraph",
+      "claim": "'The gap to rho is therefore about 43x unpriced and 65x at 1 GAE (V1)'.",
+      "evidence": "42.42x (s1 and the table say 42.4x).",
+      "fix": "cosmetic"
+    },
+    {
+      "id": "F8",
+      "severity": "minor",
+      "where": "REPORT.md s9",
+      "claim": "'while the rho and BSGS arms show nothing'.",
+      "evidence": "BSGS shows a constant 1.014 (bsgs) and 1.022 (bsgs-neg) at every non-crater V3 level. It is a scalar-mix artifact: crater rows are D + N (N uses target seed 20261115; mean S(N)/S(D) = 0.946), other levels D + Ua + Ub + N; (3 + 0.946)/4 / ((1 + 0.946)/2) = 1.0139, matching 1.01382. Not a level effect, but unexplained in the report.",
+      "fix": "one explanatory sentence"
+    },
+    {
+      "id": "N1",
+      "severity": "methodological_note",
+      "where": "ANALYSIS_PLAN s3 / s5 bootstrap (followed as frozen)",
+      "claim": "achieved 95% half-widths of 3-4% for rho and IC level ratios, and the inconclusive verdicts.",
+      "evidence": "The frozen two-stage bootstrap (resample curves, then rows within each curve) counts the within-curve variance twice when the ICC is ~0 (mixed-model ICC <= 0.0074 here): on V1 rho-plain S/D my two-stage SD is 0.01567 versus 0.01134 resampling triples alone (ratio 1.38, about sqrt 2). The CIs are therefore conservative by about sqrt 2, which pushes knife-edge cells toward 'inconclusive': V1 rho-plain L1/L0 (90% upper 1.0542 against the margin 1.0526; V2 rho-plain L1/L0 was not re-run) and V1 rho-plain S/D (whose triple-only 95% CI [1.0061, 1.0506] excludes 1 while its 90% CI is inside the margin). This is the pre-registered procedure, so it is not an error; the report should not read 'inconclusive' there as a precision limit of the data.",
+      "fix": "none required; optional sensitivity table"
+    },
+    {
+      "id": "N2",
+      "severity": "methodological_note",
+      "where": "AMENDMENTS.md A2.3 s5 transport-then-solve",
+      "claim": "the definition of 'exceeds the control spread' for transport-then-solve.",
+      "evidence": "defined post hoc and decisive for the V2 rho-plain Ua cells; cannot be shown to predate the smoke run; conclusion robust (amendment_A2_audit.outcome_driven_assessment).",
+      "fix": "none required"
+    }
+  ],
+  "limitations": [
+    "Replay and raw-record re-derivation cover 19 of 79 sessions (seeded stratified sample, every volcano x family stratum and all three rho-cubic crater sessions); the remaining 60 rest on their Phase B audits (--replay 12) and on the extracts.",
+    "The replay used the same shared cloud VM type and CPU model (host class) and the same ecbench binary as the sessions; ecbench's env and hardware class ids differ (kernel 6.18.44-fc-v139 then, -v140 now). It is an independent re-execution of operation counts, not an independent implementation or independent hardware.",
+    "Not independently re-run: the s3 mixed model (statsmodels MixedLM), the s4 permutation p-values, the s5 transport-then-solve CIs and the remaining bootstrap CIs; five CIs were spot-checked (positive control, V1 rho-plain L1/L0 at 95% and 90%, V1 IC/rho pooled at 0 GAE, V1 rho-plain S/D).",
+    "Wall-time figures are descriptive in the study and were checked only as pooled ratios and L2 fractions.",
+    "The cost tables declare their unit (S, with GAE pricing) but report no memory; at 26-bit group orders memory is not binding, and no time-memory tradeoff is claimed.",
+    "A passing validation of this study would make its receipts admissible evidence; it would not support an ECDLP claim, a speedup, or promotion."
+  ],
+  "proposed_validation_json_rho_reference": {
+    "kind": "negation",
+    "protocol": "PLAN s1 / ANALYSIS_PLAN s9: matched rho = rho-neg (rho.negation) in every session, paired with ic on the same (workload, target, round); V3 j = 0 crater: the automorphism fold rho-cubic (rho.cubic) is the strongest available and was measured as the positive control",
+    "unit": "S (ecbench normalised group operations; total_gae over the session floor), priced at 0 / 0.1 / 1 GAE per unpriced native operation",
+    "binary_or_process": "ecbench sha256 ac4bc5b26f858a4d8a374208297157840af25fb1dc25ea1c19dd41360735fb35 (runs/progress.jsonl header), same sessions for every arm",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "order_holds_across_band": true,
+    "note": "gae_band is V1 pooled mean priced S (ic and rho-neg); gae_band_by_volcano adds V2, V3 and the V3 crater against rho-cubic",
+    "note_on_use": "for VALIDATION.json once both reports pass; gae_band is filled from rho_reference_audit.gae_band_recomputed (V1 pooled)"
+  },
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "status": "verified"
+  },
+  "validation_report": {
+    "id": "VAL-20261022-7824f7",
+    "task_id": "none issued (validation requested by the session holding PR aburan28/crypto#2402)",
+    "run_ids": "the 79 Phase B sessions of runs/progress.jsonl (status done); 19 replayed, listed in replay-certificate.json",
+    "artifact_checks": [
+      "79 session archives and audit receipts committed; 19 sampled archives hash to runs/progress.jsonl and re-audit with file maps identical to the Phase B receipts",
+      "binary target/release/ecbench sha256 equals the progress.jsonl header (ac4bc5b2...); the header records a clean committed tree (79cf5348..., clean_tree true); that commit (2026-10-17 07:01:29Z) exists in the repository object store but is not an ancestor of the PR head, because #2067 was squash-merged (runs/progress.jsonl pause note); the binary was not rebuilt from it (disk)",
+      "every runs/ and census/ input pinned in results.json inputs_sha256 hashes as pinned; ANALYSIS_PLAN.md unchanged since its freeze commit"
+    ],
+    "metric_recomputations": "headline list in this report (validator-written awk/jq from runs/extract, runs/uncharged, runs/slugmap, census)",
+    "control_checks": [
+      "positive control rho-cubic / rho-neg on the V3 crater recomputed 0.573277 (CI [0.5620, 0.5847] vs claimed [0.5619, 0.5850]); passes the frozen 0.85 rule",
+      "negative control (isomorphic re-scalings): F statistics recomputed exactly; the same control refutes the V3 crater IC interpretation (F2)",
+      "A/A wall control ratios recomputed exactly"
+    ],
+    "heuristic_validation_checks": [
+      "pre-registered prediction for the positive control: 1/sqrt(3) and the 0.85 threshold are in ANALYSIS_PLAN s6, frozen before inspection; observed 0.5733",
+      "sample integrity: seeds (measurement 20261017, targets 20261111 / 20261115, bootstrap 20261022, permutation 20261023) recorded; replay re-derives spec, plan and seeds",
+      "scale binding: 26-bit group orders, one volcano per l; stated as limits in REPORT s11"
+    ],
+    "cost_model_checks": [
+      "unit declared (S; GAE band); unpriced counters listed for every arm, references included; band applied to both arms; order holds at every price",
+      "both arms are lower bounds (unnamed native work); memory not reported (limitation)"
+    ],
+    "proof_architecture_checks": [],
+    "limitations": "see limitations",
+    "artifact_paths": [
+      "benchmarks/20261017-volcano-ecdlp-census/replay-certificate.json",
+      "benchmarks/20261017-volcano-ecdlp-census/validator-report.json",
+      "benchmarks/20261017-volcano-ecdlp-census/VALIDATOR_REPORT.md",
+      "benchmarks/20261017-volcano-ecdlp-census/replay-receipts/",
+      "research/volcano_ecdlp_census_20261017/validation/"
+    ],
+    "verdict": "failed"
+  }
+}
