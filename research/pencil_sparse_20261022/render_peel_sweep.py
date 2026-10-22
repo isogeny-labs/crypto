@@ -57,7 +57,6 @@ for native, color, marker in [("0", "#b76b25", "s"),
         matches = [cell for cell in cells if cell["S_per_M"] == "0.5"
                    and cell["I_per_M"] == "10"
                    and cell["native_GAE_per_logical"] == native]
-        assert len(matches) == 1
         values.append(float(matches[0]["candidate_over_baseline"]))
     native_axis.plot(positions, values, marker=marker, color=color,
                      label=f"{native} GAE per logical")

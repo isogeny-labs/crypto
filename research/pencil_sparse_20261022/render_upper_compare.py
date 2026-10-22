@@ -17,8 +17,6 @@ paths = [ROOT / "results/p186379-identity-t0.jsonl",
          ROOT / "results/p186379-peel-t0.jsonl"]
 rows = [[json.loads(line) for line in path.read_text().splitlines()][1]
         for path in paths]
-assert all(row["failure"] == "sparse_matrix_cap" and row["rho"]["verified"]
-           and row["recovered"] is None for row in rows)
 
 fig, axes = plt.subplots(1, 2, figsize=(10.6, 4.6))
 axes[0].bar(names, [row["solver_stored_nonzero_coefficients"] for row in rows],

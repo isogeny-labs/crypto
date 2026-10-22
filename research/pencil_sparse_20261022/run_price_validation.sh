@@ -43,3 +43,4 @@ for order in reverse affine peel; do
     "$root/results/p48383-${order}-t0.jsonl" "$stem" > /dev/null
 done
 "$root/target/release/validate-sparse" "${inputs[@]}" > /dev/null
+"$root/target/release/summarize-sparse" > /dev/null

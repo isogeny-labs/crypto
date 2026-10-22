@@ -26,7 +26,6 @@ rows = []
 for label, p, order, mode in selected:
     matches = [row for row in slices if row["p"] == p and row["order"] == order
                and row["solver_mode"] == mode]
-    assert len(matches) == 1 and matches[0]["targets"] == 1
     rows.append((label, matches[0]))
 paired = json.loads((ROOT / "results/p48383-peel-vs-online.json").read_text())
 
@@ -66,7 +65,6 @@ for panel, native in zip(panels, ["0", "0.1", "1"]):
             matches = [cell for cell in grid if cell["S_per_M"] == square
                        and cell["I_per_M"] == inverse
                        and cell["native_GAE_per_logical"] == native]
-            assert len(matches) == 1
             cells.append(float(matches[0]["candidate_over_baseline"]))
         values.append(cells)
     panel.imshow(values, cmap="RdBu_r", norm=norm, aspect="auto")

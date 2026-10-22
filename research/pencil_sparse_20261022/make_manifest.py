@@ -21,16 +21,20 @@ def digest(path):
     return sha.hexdigest()
 
 
-raw_files = sorted(path for path in RESULTS.glob("p*-*.jsonl"))
+validated = json.loads((RESULTS / "validation.json").read_text())
+repo_root = ROOT.parent.parent
+native_files = sorted((file for file in validated["files"]
+                       if file["path"].startswith(
+                           "research/pencil_sparse_20261022/results/p")),
+                      key=lambda file: file["path"])
 records = []
-for path in raw_files:
-    rows = [json.loads(line) for line in path.read_text().splitlines()]
-    assert rows[0]["schema"] == "pencil-cohort-setup/v1"
+for native in native_files:
+    path = repo_root / native["path"]
     stem = path.with_suffix("")
     exit_file = stem.with_suffix(".exit")
-    replay = RESULTS / "replay" / path.name
-    mode = rows[1].get("solver_mode", "online") if len(rows) > 1 else None
-    pre_peel_online_p28 = rows[0]["bits"] == 28 and mode == "online"
+    replay = repo_root / native["replay"] if native["replay"] else None
+    mode = native["solver_mode"]
+    pre_peel_online_p28 = native["bits"] == 28 and mode == "online"
     run_binary = (digest(ROOT / "target/release/pencil-sparse")
                   if "cap25m" in path.name else
                   PEEL_BINARY_SHA256 if mode == "peel" else ONLINE_BINARY_SHA256)
@@ -41,22 +45,20 @@ for path in raw_files:
     records.append({
         "raw_path": str(path.relative_to(ROOT)),
         "raw_sha256": digest(path),
-        "setup_bits": rows[0]["bits"],
-        "setup_p": rows[0]["p"],
+        "setup_bits": native["bits"],
+        "setup_p": native["p"],
         "solver_mode": mode,
         "run_binary_sha256": run_binary,
-        "target_rows": len(rows) - 1,
-        "verified_candidate_rows": sum(row["verified"] is True for row in rows[1:]),
-        "failed_candidate_rows": sum(row["verified"] is not True for row in rows[1:]),
-        "failure_codes": sorted({row["failure"] for row in rows[1:] if row["failure"]}),
+        "target_rows": native["targets"],
+        "verified_candidate_rows": native["verified_candidate_rows"],
+        "failed_candidate_rows": native["failed_candidate_rows"],
+        "failure_codes": native["failure_codes"],
         "process_exit": int(exit_file.read_text().strip()) if exit_file.exists() else None,
-        "replay_path": str(replay.relative_to(ROOT)) if replay.exists() else None,
-        "replay_binary_sha256": replay_binary if replay.exists() else None,
-        "replay_equivalence": ("field_equivalent_metadata_defaults"
-                               if replay.exists() and pre_peel_online_p28 else
-                               "nonwall_equal" if replay.exists() else None),
-        "replay_sha256": digest(replay) if replay.exists() else None,
-        "replay_rows": len(replay.read_text().splitlines()) - 1 if replay.exists() else None,
+        "replay_path": str(replay.relative_to(ROOT)) if replay else None,
+        "replay_binary_sha256": replay_binary if replay else None,
+        "replay_equivalence": native["replay_equivalence"],
+        "replay_sha256": digest(replay) if replay else None,
+        "replay_rows": native["replay_rows"],
     })
 
 files = sorted(path for path in ROOT.rglob("*")
@@ -74,4 +76,11 @@ manifest = {
     "records": records,
     "artifact_sha256": {str(path.relative_to(ROOT)): digest(path) for path in files},
 }
+previous_path = RESULTS / "manifest.json"
+if previous_path.exists():
+    previous = json.loads(previous_path.read_text())
+    if "amendment" in previous:
+        manifest["amendment"] = previous["amendment"]
+    manifest["extension_source_manifest_sha256"] = previous.get(
+        "extension_source_manifest_sha256", digest(previous_path))
 (RESULTS / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")

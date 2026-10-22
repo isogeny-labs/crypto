@@ -268,10 +268,31 @@ fn main() {
             assert!(["identity", "reverse", "affine"].contains(&order));
             let _ = order_work(row);
         }
-        files.push(
-            json!({"path":path,"bits":bits,"p":p,"targets":primary.len()-1,
-            "replay":if replay_ready {json!(replay_path)}else{Value::Null}}),
-        );
+        let verified_candidate_rows = primary
+            .iter()
+            .skip(1)
+            .filter(|row| row["verified"] == true)
+            .count();
+        let failure_codes: BTreeSet<String> = primary
+            .iter()
+            .skip(1)
+            .filter_map(|row| row["failure"].as_str().map(str::to_owned))
+            .collect();
+        let mode = primary
+            .get(1)
+            .and_then(|row| row["solver_mode"].as_str())
+            .unwrap_or("online");
+        files.push(json!({
+            "path":path,"bits":bits,"p":p,"targets":primary.len()-1,
+            "solver_mode":mode,"verified_candidate_rows":verified_candidate_rows,
+            "failed_candidate_rows":primary.len()-1-verified_candidate_rows,
+            "failure_codes":failure_codes,
+            "replay":if replay_ready {json!(replay_path)}else{Value::Null},
+            "replay_rows":if replay_ready {json!(primary.len()-1)}else{Value::Null},
+            "replay_equivalence":if replay_ready && bits==28 && mode=="online" {
+                json!("field_equivalent_metadata_defaults")
+            }else if replay_ready {json!("nonwall_equal")}else{Value::Null}
+        }));
     }
     let grid = fs::read_to_string(format!("{ROOT}/price-grid.csv")).unwrap();
     let mut cells = 0u64;

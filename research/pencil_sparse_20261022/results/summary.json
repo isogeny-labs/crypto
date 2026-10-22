@@ -1,8 +1,8 @@
 {
   "price_cells_below_rho": 0,
   "pricing": "cold setup included in each raw target; variable-order logical work added; wall time excluded",
-  "pricing_cells": 52128,
-  "raw_files": 32,
+  "pricing_cells": 52164,
+  "raw_files": 33,
   "requested_cohort_targets_per_order": 1260,
   "schema": "pencil-sparse-price-summary/v1",
   "slices": [
@@ -669,9 +669,26 @@
       "solver_row_updates": 18203354,
       "targets": 1,
       "verified": 0
+    },
+    {
+      "bits": 32,
+      "failures": 1,
+      "max_price_cell_ratio": null,
+      "min_price_cell_ratio": null,
+      "order": "identity",
+      "p": 186379,
+      "price_cells_below_rho": 0,
+      "raw_path": "research/pencil_sparse_20261022/results/p186379-peel-cap25m-t0.jsonl",
+      "representative": null,
+      "solver_index_ops": 4778336117,
+      "solver_mode": "peel",
+      "solver_node_order_ops": 0,
+      "solver_row_updates": 79696712,
+      "targets": 1,
+      "verified": 0
     }
   ],
   "source_verified_pairs": 1446,
   "status": "partial_with_failures",
-  "target_rows": 1448
+  "target_rows": 1449
 }

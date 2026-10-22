@@ -99,8 +99,8 @@ The [nine-curve PDF](reports/run-20261022T0534Z/RUN_REPORT.pdf),
 `results/p*-peel-vs-online.csv` file per curve preserve these prices and
 their 36-cell losses. All nine degree-peel 60-target slices have exact
 fresh non-wall replays. The [native validator](results/validation.json)
-independently checked 2,894 source scalars, 1,480 replay rows, 52,056 priced
-target cells, 72 deliberately unpriced cap cells, and 432 paired aggregate
+independently checked 2,895 source scalars, 1,482 replay rows, 52,056 priced
+target cells, 108 deliberately unpriced cap cells, and 432 paired aggregate
 cells. It reports `pass` with no missing replays. The
 [replay certificate](results/replay-certificate.json) lists every raw/replay
 pair, including the three metadata defaults normalized on old online rows.
@@ -146,9 +146,22 @@ field-equivalent non-wall replays with source scalars checked. The
 targets out of the original 1,260, leaving 717 target workloads open. The
 failed 32-bit target remains open.
 
-The separately frozen 25-million-coefficient resource extension for that
-32-bit target is queued after the completed 28-bit replays. It has no
-observed outcome or cost ratio in this report until its run record is added.
+The separately frozen 25-million-coefficient resource extension on that
+same 32-bit target also reached `sparse_matrix_cap`: rank 85,168, peak
+25,000,079 stored coefficients, 79,696,712 modular row updates, and
+4,778,336,117 recorded index operations. Its same-process rho scalar
+verified, while the candidate scalar and candidate/rho ratio are null.
+The 8 GiB address limit and 3,600-second timeout did not trigger; the
+recorded wall time is L0 diagnostic. The [three-cap PDF](reports/run-20261022T0647Z/RUN_REPORT.pdf),
+[graph](reports/run-20261022T0647Z/three-caps.svg),
+[raw row](results/p186379-peel-cap25m-t0.jsonl), and
+[process record](results/p186379-peel-cap25m-t0.status.json) retain this
+attempt separately from both 10-million-cap runs.
+Its [independent replay](results/replay/p186379-peel-cap25m-t0.jsonl) matched
+all non-wall fields. The original Python wrapper's process-status JSON is
+preserved as [historical metadata](results/p186379-peel-cap25m-t0.status-python.json);
+the current status was rederived in Rust and is field-identical. The native
+cohort summary still has 543 distinct solved targets and 717 open.
 
 The [study validation gate](VALIDATION.json) pins the independently checked
 [raw-data validator](results/validation.json), [replay certificate](results/replay-certificate.json),

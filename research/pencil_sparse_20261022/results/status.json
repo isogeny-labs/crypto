@@ -10,6 +10,12 @@
     {
       "candidate_ratio": null,
       "failure": "sparse_matrix_cap",
+      "raw_path": "results/p186379-peel-cap25m-t0.jsonl",
+      "workload_id": "Wa0fc1e72d7a0"
+    },
+    {
+      "candidate_ratio": null,
+      "failure": "sparse_matrix_cap",
       "raw_path": "results/p186379-peel-t0.jsonl",
       "workload_id": "Wa0fc1e72d7a0"
     }
@@ -108,6 +114,14 @@
       "failed": 1,
       "p": 186379,
       "raw_path": "results/p186379-identity-t0.jsonl",
+      "target_rows": 1,
+      "verified": 0
+    },
+    {
+      "bits": 32,
+      "failed": 1,
+      "p": 186379,
+      "raw_path": "results/p186379-peel-cap25m-t0.jsonl",
       "target_rows": 1,
       "verified": 0
     },
@@ -228,7 +242,22 @@
   "original_cohort_targets": 1260,
   "overall_status": "partial",
   "pending_replay_paths": [],
-  "process_outcomes": [],
+  "process_outcomes": [
+    {
+      "bits": 32,
+      "candidate_verified": false,
+      "ended_utc": "2026-10-22T06:46:26Z",
+      "exit_code": 0,
+      "failure": "sparse_matrix_cap",
+      "p": 186379,
+      "raw_rows": 2,
+      "rho_verified": true,
+      "schema": "pencil-sparse-process/v1",
+      "started_utc": "2026-10-22T06:25:48Z",
+      "status": "complete",
+      "target_index": 0
+    }
+  ],
   "schema": "pencil-sparse-cohort-status/v1",
   "source_verified_distinct_targets": 543,
   "validation_status": "pass"

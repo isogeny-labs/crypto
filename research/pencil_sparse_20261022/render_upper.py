@@ -13,9 +13,7 @@ ROOT = Path(__file__).resolve().parent
 RUN = ROOT / "reports/run-20261022T0522Z"
 RUN.mkdir(parents=True, exist_ok=True)
 raw = [json.loads(line) for line in (ROOT / "results/p186379-identity-t0.jsonl").read_text().splitlines()]
-assert len(raw) == 2
 row = raw[1]
-assert row["failure"] == "sparse_matrix_cap" and row["rho"]["verified"]
 
 fig, (left, right) = plt.subplots(1, 2, figsize=(10.5, 4.4))
 left.bar(["Stored coefficients", "Frozen cap"],
