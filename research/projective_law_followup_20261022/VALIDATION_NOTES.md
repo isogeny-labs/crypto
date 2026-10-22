@@ -55,3 +55,12 @@ rendered from the native summary by `render.py` and `tectonic REPORT.tex`;
 its three pages, three embedded graphs, text, and visible table were
 inspected. Operation-count prices are evidence here. A wall-time ranking
 would need an isolated, fastest-external-tool comparison and is not claimed.
+
+The study-level `VALIDATION.json` now pins a formal replay certificate,
+independent validator wrapper, and same-process matched negation-rho reference
+with the 0/0.1/1 logical-work band for both law arms. `make_validation.py`
+packages the already completed Rust analyzer and validator outputs; it checks
+14 raw 180-target files, 5,040 independent source scalar replays, 2,520
+archived rho-counter replays, and 576 independent price cells. The gate command
+`python3 scripts/validation_gate.py evidence research/projective_law_followup_20261022`
+returns `valid`. The wrapper does not create new DLP solves or a wall-time claim.
