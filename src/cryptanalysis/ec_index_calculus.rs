@@ -806,7 +806,19 @@ pub fn find_one_relation_counted(
     factor_base: &[FactorBaseEntry],
     max_trials: usize,
 ) -> Option<(Relation, usize)> {
-    use crate::utils::random::random_scalar;
+    let mut rng = rand::rngs::OsRng;
+    find_one_relation_counted_with_rng(curve, g, q, factor_base, max_trials, &mut rng)
+}
+
+fn find_one_relation_counted_with_rng<R: rand::RngCore>(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    factor_base: &[FactorBaseEntry],
+    max_trials: usize,
+    rng: &mut R,
+) -> Option<(Relation, usize)> {
+    use num_bigint::RandBigInt;
 
     let a_fe = curve.a_fe();
     let b_fe = curve.fe(curve.b.clone());
@@ -819,8 +831,14 @@ pub fn find_one_relation_counted(
     }
 
     for trial in 1..=max_trials {
-        let a = random_scalar(&curve.n);
-        let b = random_scalar(&curve.n);
+        let mut sample_nonzero = || loop {
+            let value = rng.gen_biguint_below(&curve.n);
+            if !value.is_zero() {
+                break value;
+            }
+        };
+        let a = sample_nonzero();
+        let b = sample_nonzero();
         // R = aG + bQ.  Use the variable-time ladder (public k, fine).
         let ag = g.scalar_mul(&a, &a_fe);
         let bq = q.scalar_mul(&b, &a_fe);
@@ -1463,6 +1481,55 @@ pub fn ec_index_calculus_dlp_staged(
     max_trials_per_relation: usize,
     max_relation_attempts: usize,
 ) -> Option<(BigUint, EcIcStageReport)> {
+    let mut rng = rand::rngs::OsRng;
+    ec_index_calculus_dlp_staged_with_rng(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        &mut rng,
+    )
+}
+
+/// Run the staged prime-field IC pipeline with a reproducible relation sampler.
+/// The seed controls relation sampling only; wall times remain host-dependent.
+pub fn ec_index_calculus_dlp_staged_seeded(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    seed: u64,
+) -> Option<(BigUint, EcIcStageReport)> {
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
+    ec_index_calculus_dlp_staged_with_rng(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        &mut rng,
+    )
+}
+
+fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    rng: &mut R,
+) -> Option<(BigUint, EcIcStageReport)> {
     use std::time::Instant;
     let total_started = Instant::now();
 
@@ -1483,9 +1550,14 @@ pub fn ec_index_calculus_dlp_staged(
         let mut failed_trials = 0usize;
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
-                if let Some(found) =
-                    find_one_relation_counted(curve, g, q, &fb, max_trials_per_relation)
-                {
+                if let Some(found) = find_one_relation_counted_with_rng(
+                    curve,
+                    g,
+                    q,
+                    &fb,
+                    max_trials_per_relation,
+                    rng,
+                ) {
                     break 'attempt Some(found);
                 }
                 attempts_exhausted += 1;

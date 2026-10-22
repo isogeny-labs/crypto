@@ -2,7 +2,7 @@
 
 use clap::Args;
 use crypto_lib::cryptanalysis::ec_index_calculus::{
-    ec_index_calculus_dlp_staged, pollard_rho_ecdlp,
+    ec_index_calculus_dlp_staged, ec_index_calculus_dlp_staged_seeded, pollard_rho_ecdlp,
 };
 use crypto_lib::ecc::{curve::CurveParams, field::FieldElement, point::Point};
 use num_bigint::BigUint;
@@ -48,6 +48,9 @@ pub struct PrimeArgs {
     max_trials_per_relation: usize,
     #[arg(long, default_value_t = 64)]
     max_relation_attempts: usize,
+    /// Reproduce the IC relation sampler; omitted uses OS randomness.
+    #[arg(long)]
+    seed: Option<u64>,
     /// Maximum Pollard-rho steps on the same target; zero skips the reference.
     #[arg(long, default_value_t = 1_000_000)]
     rho_steps: usize,
@@ -174,15 +177,27 @@ pub fn solve(args: &PrimeArgs) -> Result<Value, String> {
         .as_ref()
         .map(|t| (&t.curve, &t.generator, &t.target))
         .unwrap_or((&curve, &g, &q));
-    let ic = ec_index_calculus_dlp_staged(
-        work_curve,
-        work_g,
-        work_q,
-        args.fb_size,
-        args.extra_relations,
-        args.max_trials_per_relation,
-        args.max_relation_attempts,
-    );
+    let ic = match args.seed {
+        Some(seed) => ec_index_calculus_dlp_staged_seeded(
+            work_curve,
+            work_g,
+            work_q,
+            args.fb_size,
+            args.extra_relations,
+            args.max_trials_per_relation,
+            args.max_relation_attempts,
+            seed,
+        ),
+        None => ec_index_calculus_dlp_staged(
+            work_curve,
+            work_g,
+            work_q,
+            args.fb_size,
+            args.extra_relations,
+            args.max_trials_per_relation,
+            args.max_relation_attempts,
+        ),
+    };
     let ic_verified = ic.as_ref().is_some_and(|(x, _)| {
         work_g.scalar_mul(x, &work_curve.a_fe()) == *work_q && g.scalar_mul(x, &a_fe) == q
     });
@@ -214,6 +229,7 @@ pub fn solve(args: &PrimeArgs) -> Result<Value, String> {
             "extra_relations": args.extra_relations,
             "max_trials_per_relation": args.max_trials_per_relation,
             "max_relation_attempts": args.max_relation_attempts,
+            "seed": args.seed,
         },
         "ic": ic.map(|(x, stages)| json!({"scalar": x.to_string(), "stages": stages})),
         "isogeny_route": transported.map(|t| t.receipt),
@@ -240,6 +256,7 @@ mod tests {
             extra_relations: 64,
             max_trials_per_relation: 5000,
             max_relation_attempts: 64,
+            seed: None,
             rho_steps: 0,
             route_file: None,
             route_id: None,
@@ -266,6 +283,7 @@ mod tests {
             extra_relations: 64,
             max_trials_per_relation: 5000,
             max_relation_attempts: 64,
+            seed: None,
             rho_steps: 0,
             route_file: None,
             route_id: None,
@@ -299,6 +317,7 @@ mod tests {
             extra_relations: 0,
             max_trials_per_relation: 10,
             max_relation_attempts: 1,
+            seed: None,
             rho_steps: 0,
             route_file: None,
             route_id: None,
@@ -324,6 +343,7 @@ mod tests {
             extra_relations: 1,
             max_trials_per_relation: 100,
             max_relation_attempts: 1000,
+            seed: None,
             rho_steps: 0,
             route_file: None,
             route_id: None,
@@ -332,5 +352,44 @@ mod tests {
         args.qx = 0;
         args.qy = 4;
         assert!(solve(&args).is_ok());
+    }
+
+    #[test]
+    fn seeded_prime_relation_search_replays_counts_and_scalar() {
+        let args = PrimeArgs {
+            p: 271,
+            a: 1,
+            b: 19,
+            n: 281,
+            gx: 3,
+            gy: 7,
+            qx: 231,
+            qy: 54,
+            fb_size: 8,
+            extra_relations: 16,
+            max_trials_per_relation: 5000,
+            max_relation_attempts: 64,
+            seed: Some(42),
+            rho_steps: 0,
+            route_file: None,
+            route_id: None,
+        };
+        let first = solve(&args).unwrap();
+        let second = solve(&args).unwrap();
+        assert_eq!(first["config"]["seed"], 42);
+        assert_eq!(first["status"], "complete");
+        assert_eq!(first["ic"]["scalar"], "190");
+        assert_eq!(first["ic"]["scalar"], second["ic"]["scalar"]);
+        for field in [
+            "factor_base_size",
+            "relations_collected",
+            "relation_attempts_exhausted",
+            "trials_total",
+            "trials_per_relation_min",
+            "trials_per_relation_median",
+            "trials_per_relation_max",
+        ] {
+            assert_eq!(first["ic"]["stages"][field], second["ic"]["stages"][field]);
+        }
     }
 }

@@ -9,7 +9,7 @@ an independent multiplication of the supplied generator.
 
 ```sh
 ic solve-prime --p 271 --a 1 --b 19 --n 281 \
-  --gx 3 --gy 7 --qx 231 --qy 54 --json
+  --gx 3 --gy 7 --qx 231 --qy 54 --seed 42 --json
 ```
 
 Both `ic` and `icx` can save any report with `--out PATH`. Add
@@ -42,9 +42,16 @@ Relation collection is limited by `--fb-size`, `--extra-relations`,
 `--max-trials-per-relation`, and `--max-relation-attempts`. The JSON report
 separates factor-base construction, relations, linear algebra, and final
 verification, and includes a same-target Pollard-rho reference unless
-`--rho-steps 0` is set. The prime relation sampler currently uses the
-process random source, so a second invocation is an independent run rather
-than a bit-for-bit replay.
+`--rho-steps 0` is set. `--seed SEED` makes the IC relation sampler
+reproducible and records the seed in `config.seed`. With the same binary,
+parameters, and seed, relation counts, trial counts, and the verified scalar
+replay. Wall-clock stage timings remain host-dependent. Without `--seed`,
+relations use OS randomness. The optional same-target rho reference has its
+own sampler; use `--rho-steps 0` when comparing IC reports for relation replay.
+The public [seed replay receipt](fixtures/prime_seed_replay_20261022.json)
+records two release-CLI runs each for `ic` and `icx`, with and without a
+certified isogeny route. All four pairs matched the scalar and relation
+counters after excluding host-dependent timing fields.
 The verified public solve output used for the S3 integration check is frozen
 as [`prime271_solve_report_20261018.json`](fixtures/prime271_solve_report_20261018.json).
 Its SHA-256 is recorded in the linked
