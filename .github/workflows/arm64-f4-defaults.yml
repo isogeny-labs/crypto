@@ -2,13 +2,11 @@ name: Arm64 F4/F5 defaults measurement
 # One-off measurement on GitHub's Arm64 runners (research/arm64_f4_defaults_20261022):
 # the inherited-F4 eager rewrite through shift runs and the gate-first F6-IC order
 # (both defaults since #2043, never measured on an Arm host with each other), and the
-# GF(2) Gray-code table constants tuned on x86. Runs when this file or the study's
-# scripts change in a pull request, or on demand; arms differ by environment only.
+# GF(2) Gray-code table constants tuned on x86. Arms differ by environment only.
+# On demand only: it ran once on PR #2413 (run 39732230961, reported in the study's
+# reports/run-20261022T0705Z); a pull_request paths filter matches the whole PR diff, so
+# it re-ran on every push of that PR.
 on:
-  pull_request:
-    paths:
-      - .github/workflows/arm64-f4-defaults.yml
-      - research/arm64_f4_defaults_20261022/scripts/**
   workflow_dispatch:
     inputs:
       rounds:
