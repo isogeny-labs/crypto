@@ -70,7 +70,30 @@ struct Cli {
 
 #[cfg(test)]
 mod aes_related_differential_cli_tests {
-    use super::aes_related_differential_report;
+    use super::{aes_related_differential_report, aes_sbox_table_report};
+
+    #[test]
+    fn sbox_tables_export_exact_rows_and_reject_unknown_kind() {
+        let ddt = aes_sbox_table_report("ddt", Some(1)).unwrap();
+        let row = ddt["values"].as_array().unwrap();
+        assert_eq!(row.len(), 256);
+        assert_eq!(row[1], 2);
+        assert_eq!(
+            row.iter().map(|entry| entry.as_u64().unwrap()).sum::<u64>(),
+            256
+        );
+        let lat = aes_sbox_table_report("lat", Some(0)).unwrap();
+        assert_eq!(lat["values"][0], 128);
+        assert_eq!(lat["values"][1], 0);
+        assert_eq!(
+            aes_sbox_table_report("ddt", None).unwrap()["values"]
+                .as_array()
+                .unwrap()
+                .len(),
+            256
+        );
+        assert!(aes_sbox_table_report("unknown", None).is_err());
+    }
 
     #[test]
     fn related_family_reports_the_mixcolumns_members_and_input_bounds() {
@@ -356,6 +379,15 @@ enum CryptanalysisOp {
     Sbox {
         #[arg(long)]
         cipher: String,
+    },
+    /// Export the exact AES S-box DDT or LAT as JSON, or select one input row.
+    AesSboxTable {
+        /// `ddt` for XOR differences or `lat` for linear masks.
+        #[arg(long)]
+        kind: String,
+        /// Input difference or input mask in 0..=255; omit for all 256 rows.
+        #[arg(long)]
+        row: Option<u8>,
     },
     /// Run a bounded AES-128 differential, linear, or integral recovery.
     AesAttack {
@@ -1957,6 +1989,43 @@ fn cmd_aes_attack(
     Ok(())
 }
 
+fn aes_sbox_table_report(kind: &str, row: Option<u8>) -> Result<serde_json::Value, String> {
+    use crypto_lib::cryptanalysis::aes::{differential::aes_sbox_ddt, linear::aes_sbox_lat};
+
+    let (definition, values) = match kind {
+        "ddt" => {
+            let table = aes_sbox_ddt();
+            let values = match row {
+                Some(input) => serde_json::json!(table[input as usize]),
+                None => serde_json::json!(table),
+            };
+            ("count of x with S(x) xor S(x xor input) = output", values)
+        }
+        "lat" => {
+            let table = aes_sbox_lat();
+            let values = match row {
+                Some(input) => serde_json::json!(table[input as usize]),
+                None => serde_json::json!(table),
+            };
+            (
+                "count of x with parity(input & x) = parity(output & S(x)), minus 128",
+                values,
+            )
+        }
+        _ => return Err("kind must be ddt or lat".into()),
+    };
+    Ok(serde_json::json!({
+        "schema_version":1,
+        "sbox":"aes",
+        "kind":kind,
+        "input_row":row,
+        "row_count":if row.is_some() {1} else {256},
+        "column_count":256,
+        "definition":definition,
+        "values":values
+    }))
+}
+
 fn aes_related_differential_report(alpha: u8, beta: u8) -> Result<serde_json::Value, String> {
     use crypto_lib::cryptanalysis::aes::{
         differential::aes_sbox_ddt,
@@ -2318,6 +2387,13 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
                 }
             }
         }
+        CryptanalysisOp::AesSboxTable { kind, row } => match aes_sbox_table_report(&kind, row) {
+            Ok(report) => println!("{}", serde_json::to_string_pretty(&report).unwrap()),
+            Err(e) => {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        },
         CryptanalysisOp::AesAttack {
             technique,
             key_hex,

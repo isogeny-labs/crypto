@@ -248,6 +248,9 @@ crypto cryptanalysis aes-related-key --key-bits 128 --rounds 4 --avalanche-trial
 # Exact one-round S-box DDT entry and four MixColumns shifted differences.
 # The combined probability uses an explicit independent-S-box-call assumption.
 crypto cryptanalysis aes-related-differential --alpha 1 --beta 1
+crypto cryptanalysis aes-sbox-table --kind ddt --row 1  # 256 exact XOR-difference counts
+crypto cryptanalysis aes-sbox-table --kind lat --row 1  # 256 signed linear-bias counts
+crypto cryptanalysis aes-sbox-table --kind ddt > aes-ddt.json  # all 256 rows
 
 # AES visual demos — ASCII art for every major attack
 crypto cryptanalysis aes-visual-demo --demo all              # all four below
