@@ -24,6 +24,7 @@ and taking a phase's share of its row's total.
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import html
 import json
@@ -50,6 +51,9 @@ LEDGER = "research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md"
 LEDGER_COVERED_THROUGH = 23
 
 SOURCES = {
+    "kummer_matched_gate": "research/kummer_differential_collector_20261022/VALIDATION.json",
+    "kummer_matched_summary": "research/kummer_differential_collector_20261022/results/paired/analysis/summary.json",
+    "kummer_matched_grid": "research/kummer_differential_collector_20261022/results/paired/analysis/price-grid.csv",
     "law_report": "research/projective_law_followup_20261022/REPORT.md",
     "law_validation_gate": "research/projective_law_followup_20261022/VALIDATION.json",
     "law_wrapper": "research/projective_law_followup_20261022/results/summary-projective.json",
@@ -656,6 +660,58 @@ def pair_table_component() -> dict:
 
 
 PENCIL_PEEL_PRIMES = (739, 1151, 1187, 3371, 3527, 3931, 11731, 11887, 12143)
+
+
+def kummer_matched_component() -> dict:
+    """Copy the validated same-process, source-verified quotient collector data."""
+    study = "research/kummer_differential_collector_20261022"
+    errors = gate.check_evidence_dir(REPO / study)
+    if errors:
+        raise SystemExit(f"matched Kummer evidence gate: {errors}")
+    gate_doc = load(SOURCES["kummer_matched_gate"])
+    summary = load(SOURCES["kummer_matched_summary"])
+    if (gate_doc["rho_reference"].get("same_binary_or_process") is not True
+            or gate_doc["rho_reference"].get("matches_protocol") is not True
+            or summary.get("schema") != "kummer-differential-collector-summary/v1"
+            or summary.get("source_verified", {}).get("uncached") != 1260
+            or summary.get("targets_per_arm") != 1260
+            or summary.get("price_cells") != 288
+            or summary.get("per_arm", {}).get("uncached", {}).get("cold_win_cells") != 0):
+        raise SystemExit("matched Kummer cohort or reference changed; review the panel")
+    with (REPO / SOURCES["kummer_matched_grid"]).open(newline="") as stream:
+        grid = list(csv.DictReader(stream))
+    slices = ("bits16", "bits20", "bits24", "bits28", "bits32", "bits36", "bits40", "all")
+    if len(grid) != 288 or {row["slice"] for row in grid} != set(slices):
+        raise SystemExit("matched Kummer 8-slice price grid changed")
+    rows = []
+    for bit_slice in slices:
+        cells = [row for row in grid if row["slice"] == bit_slice]
+        representative = [row for row in cells if
+                          (row["S_per_M"], row["I_per_M"], row["native_GAE_per_logical"])
+                          == ("0.5", "10", "0.1")]
+        if (len(cells) != 36 or len(representative) != 1
+                or any(row["arm"] != "uncached" or int(row["candidate_wins"]) != 0
+                       or int(row["candidate_losses"]) != int(row["targets"])
+                       for row in cells)):
+            raise SystemExit(f"matched Kummer {bit_slice}: changed price or verification grid")
+        cell = representative[0]
+        rows.append({"slice": bit_slice.removeprefix("bits"), "targets": int(cell["targets"]),
+                     "cold_over_rho": float(cell["candidate_cold_over_rho"]),
+                     "online_over_rho": float(cell["candidate_online_over_rho"]),
+                     "below_rho_cells": 0})
+    arm = summary["per_arm"]["uncached"]
+    return {"class": "engineering", "study": study + "/",
+            "report": study + "/KUMMER_PAIRED.pdf",
+            "graph": study + "/collector-cost-paired.svg",
+            "validation": study + "/VALIDATION.json",
+            "grid": SOURCES["kummer_matched_grid"],
+            "unit": "cold GAE under the study's logical-operation price model",
+            "representative_price": "M + 0.5S + 10I; native logical operation = 0.1 GAE",
+            "source_verified_targets": 1260,
+            "cold_ratio_range": [arm["cold_ratio_min"], arm["cold_ratio_max"]],
+            "whole_cohort_win_cells": arm["cold_win_cells"],
+            "whole_cohort_loss_cells": arm["cold_loss_cells"],
+            "rows": rows}
 
 
 def pencil_peel_component() -> dict:
@@ -1289,6 +1345,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "pair_table_component": pair_table_component(),
         "projective_law_component": projective_law_component(),
         "pencil_peel_component": pencil_peel_component(),
+        "kummer_matched_component": kummer_matched_component(),
         "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
@@ -1705,6 +1762,27 @@ def markdown(doc: dict) -> str:
         L.append(f"| {r['slice']} | {r['targets']} | {r['wrapper_over_rho']:.6f} | "
                  f"{r['state_over_rho']:.6f} | {r['wrapper_below_rho_cells']}/36 | "
                  f"{r['state_below_rho_cells']}/36 |")
+    L.append("")
+    ku = doc["kummer_matched_component"]
+    L += ["## Matched Kummer differential collector, outside tables A–C", "",
+          "The uncached signed differential collector and source-negation rho run in one "
+          "process on the same 1,260 public E(Fp²) targets. Every recovered scalar is "
+          "source-verified (class: engineering). Ratios are complete cold GAE under "
+          "the study's logical-operation price model, not calibrated wall time. "
+          "The representative cell is M + 0.5S + 10I and native logical "
+          "operation = 0.1 GAE. Across the pooled 36-cell price band the "
+          f"collector/rho ratio is {ku['cold_ratio_range'][0]:.6f}–"
+          f"{ku['cold_ratio_range'][1]:.6f}; "
+          f"{ku['whole_cohort_win_cells']}/36 cells are below rho. "
+          "The arbitrary-jump signed-label sidecar remains a separate open problem. "
+          f"[Study](../../{ku['study']}) · [PDF](../../{ku['report']}) · "
+          f"[graph](../../{ku['graph']}) · [price grid](../../{ku['grid']}) · "
+          f"[validation gate](../../{ku['validation']}).", "",
+          "| Slice (bits) | Targets | Cold collector / rho | Online collector / rho | Cold cells below rho |",
+          "|:--|--:|--:|--:|--:|"]
+    for r in ku["rows"]:
+        L.append(f"| {r['slice']} | {r['targets']} | {r['cold_over_rho']:.6f} | "
+                 f"{r['online_over_rho']:.6f} | {r['below_rho_cells']}/36 |")
     L.append("")
     pp = doc["pencil_peel_component"]
     L += ["## Genus-2 pencil degree-peeling, outside tables A–C", "",
@@ -2262,6 +2340,30 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td class="n">{r["state_over_rho"]:.6f}</td>'
                  f'<td>{r["wrapper_below_rho_cells"]}/36</td>'
                  f'<td>{r["state_below_rho_cells"]}/36</td></tr>')
+    P.append('</tbody></table></section>')
+    ku = doc["kummer_matched_component"]
+    P.append('<section class="card" id="kummer-matched-component"><h2>Matched Kummer differential collector, outside the priced tables</h2>'
+             '<p>The uncached signed differential collector and source-negation rho run in one '
+             'process on the same 1,260 public E(Fp²) targets. Every scalar is source-verified '
+             '(class: engineering). Ratios are complete cold GAE under the study&#39;s '
+             'logical-operation price model, not calibrated wall time. The representative '
+             'cell is M + 0.5S + 10I, native logical operation = 0.1 GAE. '
+             f'Across the pooled 36-cell band the collector/rho ratio is {ku["cold_ratio_range"][0]:.6f}–'
+             f'{ku["cold_ratio_range"][1]:.6f}, with {ku["whole_cohort_win_cells"]}/36 cells below rho. '
+             'The arbitrary-jump signed-label sidecar remains a separate open problem. '
+             f'<a href="{GITHUB}{esc(ku["study"])}">Study</a> · '
+             f'<a href="{GITHUB}{esc(ku["report"])}">PDF</a> · '
+             f'<a href="{GITHUB}{esc(ku["graph"])}">Graph</a> · '
+             f'<a href="{GITHUB}{esc(ku["grid"])}">Price grid</a> · '
+             f'<a href="{GITHUB}{esc(ku["validation"])}">Validation gate</a>.</p>')
+    P.append('<table><thead><tr><th>Slice (bits)</th><th class="n">Targets</th>'
+             '<th class="n">Cold collector / rho</th><th class="n">Online collector / rho</th>'
+             '<th>Cold cells below rho</th></tr></thead><tbody>')
+    for r in ku["rows"]:
+        P.append(f'<tr><td>{esc(r["slice"])}</td><td class="n">{r["targets"]}</td>'
+                 f'<td class="n">{r["cold_over_rho"]:.6f}</td>'
+                 f'<td class="n">{r["online_over_rho"]:.6f}</td>'
+                 f'<td>{r["below_rho_cells"]}/36</td></tr>')
     P.append('</tbody></table></section>')
     pp = doc["pencil_peel_component"]
     P.append('<section class="card" id="pencil-peel-component"><h2>Genus-2 pencil degree-peeling, outside the priced tables</h2>'

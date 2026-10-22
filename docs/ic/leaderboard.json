@@ -10,6 +10,18 @@
  ],
  "class": "accounting",
  "sources": {
+  "kummer_matched_gate": {
+   "path": "research/kummer_differential_collector_20261022/VALIDATION.json",
+   "sha256": "8f0f53f2aa7630c22c2087c43a9f22cbeb1baae4213838e6c1738b83a162da87"
+  },
+  "kummer_matched_summary": {
+   "path": "research/kummer_differential_collector_20261022/results/paired/analysis/summary.json",
+   "sha256": "97fe6496519b1b7ec7e3e540dc197fdf0fca56025c362fa51e8874dfa0ee9833"
+  },
+  "kummer_matched_grid": {
+   "path": "research/kummer_differential_collector_20261022/results/paired/analysis/price-grid.csv",
+   "sha256": "f76aeb6758bbf4bcfd5f0895bc808e7575d9953ea2b4c72e3d81e14eb5212de2"
+  },
   "law_report": {
    "path": "research/projective_law_followup_20261022/REPORT.md",
    "sha256": "3c864364d649d46d66a0289838b07be79fcfb38aefb92be60148388077fe4b82"
@@ -32,15 +44,15 @@
   },
   "pencil_peel_validation_gate": {
    "path": "research/pencil_sparse_20261022/VALIDATION.json",
-   "sha256": "67c7817bdd29d49cd4442fb1a604028f317a2374b62ccab2d7a152a9e00f4e49"
+   "sha256": "3118dd0580b991a881cf89659c30cdf74c3b1d97817909fb6eb672601f6bc787"
   },
   "pencil_peel_report": {
    "path": "research/pencil_sparse_20261022/REPORT.md",
-   "sha256": "e71790874c332befeacfd700683121c2addba4cd1aa8914e75b5c12b9a25df4a"
+   "sha256": "1596fea6c557eb2de6926e2a2375eaba79de7b64fbab7f8bfd85c4be66e65a70"
   },
   "pencil_peel_status": {
    "path": "research/pencil_sparse_20261022/results/status.json",
-   "sha256": "d3201dc35314dad6a7e2688849122241fc871b2eba78f1734b14349a9735b517"
+   "sha256": "f74f1a8c8ef68513d3d1ec446997453c529193b863a3a344e7e2a5da2d02f213"
   },
   "pencil_peel_739": {
    "path": "research/pencil_sparse_20261022/results/p739-peel-vs-online.json",
@@ -55963,6 +55975,81 @@
     "min_peel_over_online": 0.268781308532,
     "max_peel_over_online": 1.0216024192,
     "source": "research/pencil_sparse_20261022/results/p12143-peel-vs-online.json"
+   }
+  ]
+ },
+ "kummer_matched_component": {
+  "class": "engineering",
+  "study": "research/kummer_differential_collector_20261022/",
+  "report": "research/kummer_differential_collector_20261022/KUMMER_PAIRED.pdf",
+  "graph": "research/kummer_differential_collector_20261022/collector-cost-paired.svg",
+  "validation": "research/kummer_differential_collector_20261022/VALIDATION.json",
+  "grid": "research/kummer_differential_collector_20261022/results/paired/analysis/price-grid.csv",
+  "unit": "cold GAE under the study's logical-operation price model",
+  "representative_price": "M + 0.5S + 10I; native logical operation = 0.1 GAE",
+  "source_verified_targets": 1260,
+  "cold_ratio_range": [
+   8.95968729858,
+   55.9354236345
+  ],
+  "whole_cohort_win_cells": 0,
+  "whole_cohort_loss_cells": 36,
+  "rows": [
+   {
+    "slice": "16",
+    "targets": 180,
+    "cold_over_rho": 5.42688998977,
+    "online_over_rho": 3.83673039539,
+    "below_rho_cells": 0
+   },
+   {
+    "slice": "20",
+    "targets": 180,
+    "cold_over_rho": 8.25048607478,
+    "online_over_rho": 7.13760109339,
+    "below_rho_cells": 0
+   },
+   {
+    "slice": "24",
+    "targets": 180,
+    "cold_over_rho": 12.7177569219,
+    "online_over_rho": 11.8631630648,
+    "below_rho_cells": 0
+   },
+   {
+    "slice": "28",
+    "targets": 180,
+    "cold_over_rho": 14.0925500428,
+    "online_over_rho": 13.4249112772,
+    "below_rho_cells": 0
+   },
+   {
+    "slice": "32",
+    "targets": 180,
+    "cold_over_rho": 14.391090195,
+    "online_over_rho": 13.7714907568,
+    "below_rho_cells": 0
+   },
+   {
+    "slice": "36",
+    "targets": 180,
+    "cold_over_rho": 13.5432773359,
+    "online_over_rho": 12.9338969146,
+    "below_rho_cells": 0
+   },
+   {
+    "slice": "40",
+    "targets": 180,
+    "cold_over_rho": 14.5875690011,
+    "online_over_rho": 14.0083784994,
+    "below_rho_cells": 0
+   },
+   {
+    "slice": "all",
+    "targets": 1260,
+    "cold_over_rho": 14.356662229,
+    "online_over_rho": 13.7661724141,
+    "below_rho_cells": 0
    }
   ]
  },
