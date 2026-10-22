@@ -1611,6 +1611,35 @@ mod tests {
     }
 
     #[test]
+    fn three_point_natural_rows_feed_rank_and_target_reconstruction() {
+        let mut passing = None;
+        for curve_seed in 0..20 {
+            let c = toy_curve(8, curve_seed).expect("small prime curve");
+            if !c.order_is_prime {
+                continue;
+            }
+            let base = small_x_base(&c, 2).expect("base");
+            let g = base[0];
+            let mut f = c.field.clone();
+            let Some(q) = c.mul_big(&mut f, &g, &BigUint::from(37u32)) else {
+                continue;
+            };
+            let report = exact_ic_probe_with_arity(&c, &g, &q, 2, 500, 40, 9, 3)
+                .expect("three-point natural-row probe");
+            if report.relations.iter().any(|r| r.terms.len() == 3)
+                && report.setup_rank == 2
+                && report.target_log_determined
+                && report.verified
+            {
+                passing = Some(report);
+                break;
+            }
+        }
+        let report = passing.expect("a three-point row must reach the rank and target solver");
+        assert_eq!(report.recovered_scalar.as_deref(), Some("0x25"));
+    }
+
+    #[test]
     fn exact_ic_probe_recovers_a_fresh_target_from_natural_rows() {
         let c = (0..100)
             .map(|seed| toy_curve(8, seed).expect("curve"))

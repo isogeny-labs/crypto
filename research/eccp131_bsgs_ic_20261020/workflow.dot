@@ -14,13 +14,17 @@ digraph ecc130_workflows {
   ps [label="Prime IC structure and\nscaled pipeline", fillcolor="#fff2d6"];
   pe [label="Exact ECCp-131 two-sum base\nB=512, 262144 distinct sums", fillcolor="#e4f2e7"];
   pr [label="128 setup + 128 target candidates\n0 natural rows, rank 0", fillcolor="#fff2d6"];
+  pt [label="Exact ECCp-131 three-point oracle\nchecked pair-table subtraction", fillcolor="#e4f2e7"];
+  pr3 [label="B=128, two seeds, 32 setup + 16 target each\n0 natural rows, rank 0", fillcolor="#fff2d6"];
   bf [label="Fixed-parameter IC\nselect / collect / logs / solve", fillcolor="#fff2d6"];
   pg [label="Published ECCp-131 scalar and\nfull IC cost remain open", fillcolor="#fce5e5"];
 
   p -> pi -> pb;
   p -> ps;
   p -> pe -> pr;
+  p -> pt -> pr3;
   pr -> pg [style=dashed, label="needs natural rows and target descent"];
+  pr3 -> pg [style=dashed, label="needs independent rows and target descent"];
   ps -> pg [style=dashed, label="scaled data do not transfer"];
   b -> bi -> bb;
   b -> bf;

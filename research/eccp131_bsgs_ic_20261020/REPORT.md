@@ -4,6 +4,10 @@
 
 **Citation provenance:** the Certicom curve and challenge pages and the Petit–Kosters–Messeng paper linked below were retrieved for this report; repository source files, raw outputs, diagrams, and problem records linked below are internal artifacts.
 
+## 2026-10-22 exact three-point follow-up
+
+The [bounded three-point report](reports/run-20261022T0523Z/REPORT.md), [raw process records](reports/run-20261022T0523Z/raw/), [updated workflow](workflow.svg), and [one-page PDF](reports/run-20261022T0523Z/report.pdf) document the exact ECCp-131 three-point oracle and paired EC process benchmark. The checked relation path now accepts two or three signed small-x base points and feeds the same rank and target-column solver. The four B128 exact-curve processes recorded zero natural setup rows, zero target rows, and rank zero. The full published-point chain remains the [open requirement](../../problems/eccp131-full-parameter-index-calculus.md). This addendum links new evidence without changing the scope of the 2026-10-20 checks below.
+
 ## Question and exact inputs
 
 Expose the published Certicom [ECCp-131 and ECC2K-130 challenge groups](https://www.certicom.com/en/curves-list) to the ECDLP and index-calculus command paths. ECCp-131 is the prime-field curve identified by the full `p`, `a`, `b`, `G`, `n`, cofactor and published `Q` in the [curve constructor](../../src/ecc/curve.rs) and [IC parameters](../../src/bin/ic/params.rs). ECC2K-130 is the distinct binary Koblitz group already carried by the [binary curve implementation](../../src/binary_ecc/curve.rs) and the fixed-parameter file in `aburan28/cryptanalysis` (`suite/docs/ic/params/ecc2k130-fixed.json`). A matching bit count does not identify a curve.
