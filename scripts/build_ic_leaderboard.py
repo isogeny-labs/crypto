@@ -86,9 +86,10 @@ SOURCES = {
     "quartic_dense_p37_audit": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_native_audit_v1.json",
     "quartic_dense_p13_prior": "research/twist_index_calculus_20261020/quartic_twist_2d_p13_v1.json",
     "quartic_dense_p37_prior": "research/twist_index_calculus_20261020/quartic_twist_2d_p37_v1.json",
-    "quartic_dense_tagged_p37": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_v1.json",
-    "quartic_dense_tagged_p37_aa": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_aa_v1.json",
-    "quartic_dense_tagged_p37_audit": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_native_audit_v1.json",
+    "quartic_dense_tagged_p37": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_v2.json",
+    "quartic_dense_tagged_p37_aa": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_aa_v2.json",
+    "quartic_dense_tagged_p37_audit": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_native_audit_v2.json",
+    "quartic_dense_tagged_p37_previous": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_v1.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
@@ -722,11 +723,14 @@ def quartic_dense_component() -> dict:
     tagged = load(SOURCES["quartic_dense_tagged_p37"])
     tagged_aa = load(SOURCES["quartic_dense_tagged_p37_aa"])
     tagged_audit = load(SOURCES["quartic_dense_tagged_p37_audit"])
+    tagged_previous = load(SOURCES["quartic_dense_tagged_p37_previous"])
     dense_p37 = load(SOURCES["quartic_dense_p37"])
     timing = {"wall_ms_l0", "table_ms_l0", "tagged_path_ms_l0"}
     if ({k: v for k, v in tagged.items() if k not in timing}
-            != {k: v for k, v in tagged_aa.items() if k not in timing}):
-        raise SystemExit("quartic tagged dense p=37: A/A mismatch")
+            != {k: v for k, v in tagged_aa.items() if k not in timing}
+            or {k: v for k, v in tagged.items() if k not in timing}
+            != {k: v for k, v in tagged_previous.items() if k not in timing}):
+        raise SystemExit("quartic tagged dense p=37: A/A or source-parity mismatch")
     if (tagged["status"] != "pass" or tagged["p"] != 37 or tagged["n"] != 1_873_633
             or tagged["recovered"] != 271 or tagged["residuals"] != 1
             or tagged["physical_base"] != 624 or tagged["folded_columns"] != 52
@@ -1742,8 +1746,8 @@ def markdown(doc: dict) -> str:
           "first residual and complete 53,551 signed decompositions reach anchored rank 52 "
           "after 115 candidates. The direct-posting tagged table changes setup work, not "
           "relation yield. An independent point-keyed auditor replayed all subgroup logs, "
-          "selected rows and the answer; non-timing A/A and complete full/tagged signed-set "
-          "checks pass. Counted one-target path totals include model through answer checks "
+          "selected rows and the answer; non-timing A/A, final-source parity and complete "
+          "full/tagged signed-set checks pass. Counted one-target path totals include model through answer checks "
           "inside one producer. The older full-table dense arm uses identical selected rows. "
           "The public known-log anchor and dense extraction are generic steps, so the larger "
           "one-row/query comparison is not twist-only. Polynomial S5, hash CPU, isolated wall "
@@ -2288,7 +2292,7 @@ def page(doc: dict, standalone: bool) -> str:
              'The same 624-point base and first residual give the identical complete 53,551 signed '
              'decompositions, with anchored rank 52 after 115 candidates. The tagged table reduces setup '
              'work without changing relation yield. The independently replayed one-target path charges model '
-             'through answer checks in one producer; A/A and signed-set equality pass. The generic known-log '
+             'through answer checks in one producer; A/A, final-source parity and signed-set equality pass. The generic known-log '
              'anchor and dense extraction are not twist-only. Polynomial S5, hash CPU, isolated wall time and '
              'matched rho GAE remain unpriced.</p>')
     P.append('<table><thead><tr><th class="n">p</th><th>full dense → tagged dense Fp M</th>'

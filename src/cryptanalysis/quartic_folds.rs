@@ -1052,11 +1052,11 @@ fn twist24_columns(
         for j in 0..(if combined { 4 } else { 1 }) {
             let mut image = rep;
             for _ in 0..j {
-                image = inst.frob(&curve, &image);
+                image = inst.frob(curve, &image);
             }
             let fj = pow_mod(inst.lambda_frob, j, inst.core.n);
             for k in 0..3 {
-                let transformed = inst.core.psi(&curve, &image, k);
+                let transformed = inst.core.psi(curve, &image, k);
                 let multiplier = mulm(
                     fj,
                     pow_mod(inst.core.lambda, k as u64, inst.core.n),

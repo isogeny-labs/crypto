@@ -123,6 +123,7 @@ pub(crate) struct TaggedIndex {
 }
 
 impl TaggedIndex {
+    #[allow(dead_code)] // Used by the combined producer when this example is imported as a module.
     pub(crate) fn sizes(&self) -> (usize, usize, usize) {
         (self.reps.len(), self.keys.len(), self.postings.len())
     }
