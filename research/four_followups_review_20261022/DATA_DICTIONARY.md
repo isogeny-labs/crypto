@@ -26,3 +26,18 @@ An empty numeric field means unmeasured and must not be read as zero.
 logical `GAE=0.1` rows, the requested-lead status, and source links. The
 SVG is layout from those representative rows. Per-target records and detailed
 counter definitions remain in each source study's `DATA_DICTIONARY.md`.
+
+`results/standard-targets.csv` maps all currently integrated 10,080
+target-arm observations to a common key `(bits,p,target_index,workload_id)`:
+6,300 factor-base rows, 2,520 projective-law rows, and 1,260 Kummer
+coordinate rows. The builder checks that the eight rows for each of 1,260
+distinct targets share one workload ID. `source_verified` means the public
+source scalar or label passed its source check. `candidate_dlp_verified` and
+`rho_verified` mean a complete DLP scalar was recovered and checked; they are
+empty for Kummer's coordinate-only row. Target-level costs use the same
+representative price as the report and are empty when no complete collector
+was run. `coordinate_nonzero_matches`, `coordinate_zero_outputs`, and
+`coordinate_failures` are the seven Kummer labels on that target, empty for
+other leads. `source_record` links the underlying raw file. This index keeps
+zero-coordinate cases visible and permits target-level joins without treating
+them as failed DLP solves.

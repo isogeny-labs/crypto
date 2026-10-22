@@ -9,6 +9,13 @@ empty fields and the source grid for every row. The [PDF](REPORT.pdf) presents
 the same status and selected values. These are operation-count prices, not
 isolated wall-time claims.
 
+The [standardized target index](results/standard-targets.csv) joins 10,080
+target-arm rows on the exact public workload key. It retains per-target
+representative costs, source verification, DLP verification, and Kummer's
+seven label outcomes per target. Its builder checks that all eight currently
+integrated arms agree on the 1,260 workload IDs; blank DLP fields mean that
+the coordinate gate did not run a collector.
+
 | Lead and arm | Source-verified candidate / rho solves | All-size candidate/rho | All-size candidate/external | Current scope |
 | --- | ---: | ---: | ---: | --- |
 | Factor base, full 16 jumps | 1,260 / 1,260 | 2.448830 | 1.000000 | Five frozen factor-base and jump arms completed |

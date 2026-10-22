@@ -107,6 +107,93 @@ summary = {
 }
 (OUT / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
 
+target_fields = [
+    "lead", "arm", "bits", "p", "target_index", "workload_id", "source_verified",
+    "candidate_dlp_verified", "rho_verified", "candidate_GAE", "rho_GAE",
+    "candidate_over_rho", "coordinate_nonzero_matches", "coordinate_zero_outputs",
+    "coordinate_failures", "status", "source_record",
+]
+targets = []
+
+def append_source_targets(path, lead, arm, p_key):
+    with (ROOT / path).open() as handle:
+        for line in handle:
+            source = json.loads(line)
+            verified = source.get("candidate_verified", source.get("verified", False))
+            targets.append({
+                "lead": lead, "arm": arm, "bits": source["bits"], "p": source[p_key],
+                "target_index": source["target_index"], "workload_id": source["workload_id"],
+                "source_verified": bool(verified), "candidate_dlp_verified": bool(verified),
+                "rho_verified": bool(source.get("rho_verified", verified)),
+                "candidate_GAE": source["candidate_GAE"], "rho_GAE": source["rho_GAE"],
+                "candidate_over_rho": source["candidate_over_rho"],
+                "coordinate_nonzero_matches": "", "coordinate_zero_outputs": "",
+                "coordinate_failures": "", "status": "priced_source_verified",
+                "source_record": source.get("raw_record", path),
+            })
+
+factor_path = "research/four_followups_20261021/results/matched/targets.jsonl"
+with (ROOT / factor_path).open() as handle:
+    for line in handle:
+        source = json.loads(line)
+        targets.append({
+            "lead": "factor_base", "arm": {
+                "fb1-j16": "full_16", "fb1-j8": "full_8", "fb1-j32": "full_32",
+                "fb2-j16": "half_16", "fb4-j16": "quarter_16",
+            }[source["arm"]],
+            "bits": source["bits"], "p": source["curve_p"],
+            "target_index": source["target_index"], "workload_id": source["workload_id"],
+            "source_verified": bool(source["verified"]), "candidate_dlp_verified": bool(source["verified"]),
+            "rho_verified": bool(source["verified"]),
+            "candidate_GAE": source["candidate_GAE"], "rho_GAE": source["rho_GAE"],
+            "candidate_over_rho": source["candidate_over_rho"],
+            "coordinate_nonzero_matches": "", "coordinate_zero_outputs": "",
+            "coordinate_failures": "", "status": "priced_source_verified",
+            "source_record": source["raw_record"],
+        })
+append_source_targets("research/projective_law_followup_20261022/results/targets-projective.jsonl", "projective_law", "wrapper", "p")
+append_source_targets("research/projective_law_followup_20261022/results/targets-state.jsonl", "projective_law", "retained_state", "p")
+for bits in (16, 20, 24, 28, 32, 36, 40):
+    path = f"research/kummer_coordinates_20261022/results/target-gate-{bits}.jsonl"
+    with (ROOT / path).open() as handle:
+        for line in handle:
+            source = json.loads(line)
+            statuses = [case["coordinate_status"] for case in source["cases"]]
+            passed = statuses.count("pass")
+            zero = statuses.count("zero_output")
+            failures = len(statuses) - passed - zero
+            assert passed + zero + failures == source["case_count"]
+            targets.append({
+                "lead": "kummer_walk", "arm": "coordinate_identity_gate", "bits": bits, "p": source["p"],
+                "target_index": source["target_index"], "workload_id": source["workload_id"],
+                "source_verified": bool(source["all_source_checks"] and source["source_scalar_verified"]),
+                "candidate_dlp_verified": "", "rho_verified": "", "candidate_GAE": "", "rho_GAE": "",
+                "candidate_over_rho": "", "coordinate_nonzero_matches": passed,
+                "coordinate_zero_outputs": zero, "coordinate_failures": failures,
+                "status": "identity_only_no_dlp_collector", "source_record": path,
+            })
+
+assert len(targets) == 10080, len(targets)
+assert sum(int(row["coordinate_zero_outputs"]) for row in targets if row["lead"] == "kummer_walk") == 7
+assert sum(int(row["coordinate_failures"]) for row in targets if row["lead"] == "kummer_walk") == 0
+by_input = {}
+for row in targets:
+    key = (row["bits"], row["p"], row["target_index"])
+    by_input.setdefault(key, set()).add(row["workload_id"])
+assert len(by_input) == 1260 and all(len(workloads) == 1 for workloads in by_input.values())
+assert all(bool(row["source_verified"]) for row in targets)
+assert all(
+    math.isclose(float(row["candidate_GAE"]) / float(row["rho_GAE"]), float(row["candidate_over_rho"]), rel_tol=1e-9)
+    for row in targets if row["candidate_dlp_verified"]
+)
+with (OUT / "standard-targets.csv").open("w", newline="") as handle:
+    writer = csv.DictWriter(handle, fieldnames=target_fields)
+    writer.writeheader()
+    writer.writerows(targets)
+summary["target_rows"] = len(targets)
+summary["distinct_target_keys"] = len(by_input)
+(OUT / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
+
 COLORS = {"full_16": "#1764aa", "full_8": "#16a0a0", "full_32": "#3946a5", "half_16": "#b2691b", "quarter_16": "#a03543", "wrapper": "#75832a", "retained_state": "#8647a3"}
 grouped = {}
 for row in representative:
