@@ -40,3 +40,13 @@ none links the `crypto` library.
 | `examples/blindspots_17_cyclo_cost.rs` | `research/blindspots_20261018/instruments/blindspots_17_cyclo_cost.rs` | `15030cd378f688dcf56df74cdbe385b3385ae08831908632e4da88c3f4c7e976` |
 | `examples/blindspots_19_checks.rs` | `research/blindspots_20261018/instruments/blindspots_19_checks.rs` | `751277a8c075483cb0d1edcff9ef44e76f21164e989e289c8c6a54950c158ec5` |
 | `examples/blindspots_20_quantum_classical.rs` | `research/blindspots_20261018/instruments/blindspots_20_quantum_classical.rs` | `a2e9f4a1f2529af28a1e191cc2383e6233f157f999dcf2ac240921520511e30a` |
+
+## Matched-rho copies added for the validation gate
+
+These were written after the campaign, directly here, as copies of a pinned
+instrument plus a matched rho arm. The originals above are unchanged.
+
+| file | copy of | adds | sha256 |
+|:--|:--|:--|:--|
+| `blindspots_14_prime_m4_neg.rs` | `blindspots_14_prime_m4.rs` | `rho-neg` (negation-map rho), `14-prime-m4-cells/PROTOCOL-ADDENDUM-rho-neg.md` | `1a7d51c3adcd7108de335cd7ac3b2d83a11f5ef1246b8b959271ced1f5e8710e` |
+| `blindspots_15b_genus3_la_rho.rs` | `blindspots_15_genus3_la.rs` | `--arms rho` (round-4 negation-map rho, wired in), native counters, GAE view, `15-genus3-la-exponent/PROTOCOL-ADDENDUM-matched-rho.md` | `79a821504c5b7a4639470d8e04dfd35fc6ad1a91d34bacee466461f36811e991` |
