@@ -50,6 +50,9 @@ def readTrusted (path : String) : IO (List Name) := do
     if n.isEmpty then none else some n.toName
 
 def main (args : List String) : IO UInt32 := do
+  -- Lean 4.34 forwards the `--` after `--run FILE` to this program, while
+  -- older versions consumed it. Accept both invocation forms.
+  let args := if args.head? == some "--" then args.drop 1 else args
   let (trusted, args) ← match args with
     | "--trusted" :: f :: rest => do pure ((← readTrusted f), rest)
     | _ => pure ([], args)
