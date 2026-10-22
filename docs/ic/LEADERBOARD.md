@@ -251,6 +251,16 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 | 8,192 | 43.6 s | 20.5 s | 5.29 s | 0.26 [0.24, 0.31] | 0.12 [0.11, 0.15] | 0.13 | 2.37 → 1.25 GiB |
 | 16,384 | 224 s | 117 s | 28.2 s | 0.24 [0.22, 0.26] | 0.13 [0.12, 0.14] | 0.13 | 9.15 → 4.65 GiB |
 
+## Koblitz IC set-up, outside tables A–C
+
+`ic price --single-target` set-up on the rule-v3 T01 Koblitz curves, the previous binary against round 2's code changes (class: engineering): reused per-trial scan buffers, the collector's index map and field structure built once, Fx-hashed orbit and projection maps, aimed scans with pre-gathered coordinates. Every count, recovered logarithm and in-process rho reference is identical, so no row above moves; the set-up time saved lowers the cold ratio the next re-run of table A will measure. Medians over 15 repetitions per binary, one thread, pinned; build and verify vary ±10% on unchanged code. Study: [research/ecbench_perf_round2_20261022/](../../research/ecbench_perf_round2_20261022/).
+
+| curve | set-up old | set-up new | new / old | collect old → new | IC online | rho online |
+|:--|--:|--:|--:|:--|--:|--:|
+| k0n41 | 57.2 ms | 45.9 ms | 0.803 | 36.3 → 27.5 ms | 1.19 ms | 3.0 ms |
+| k0n53 | 436.7 ms | 403.5 ms | 0.924 | 234.8 → 211.5 ms | 0.15 ms | 49.4 ms |
+| k0n61 | 1697.0 ms | 1519.6 ms | 0.895 | 1386.8 → 1198.0 ms | 7.80 ms | 28.5 ms |
+
 ## Planner validation, outside tables A–C
 
 `ic plan` / `ic bench --auto` (ic-planner/1) chooses every `ic.pipeline` stage of a prime-field run; here its plan runs against every alternative one change away from it on six prime curves outside its evidence (class: engineering). The plan is the existing best recipe, chosen automatically, so no row above moves. Cells are S(alternative) / S(plan), ecbench `compare`, paired, cluster 95% interval, at w = 0; the band column is the ratio at w = 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md §5a). Supplementary curves are `prime_search` curves outside the registry, named by tag. Study: [research/ic_planner_validation_20261020/](../../research/ic_planner_validation_20261020/).
@@ -316,6 +326,7 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
+- `research/ecbench_perf_round2_20261022/results.json` — sha256 `f63553efc31c757a…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`

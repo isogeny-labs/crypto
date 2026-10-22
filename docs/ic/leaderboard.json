@@ -110,6 +110,10 @@
    "path": "research/ic_planner_validation_20261020/analysis/summary.json",
    "sha256": "c8fb751cea39e55ebd1b322245c95a958ae8b47d393c6b6918abddcd2d4234fc"
   },
+  "koblitz_setup_round2": {
+   "path": "research/ecbench_perf_round2_20261022/results.json",
+   "sha256": "f63553efc31c757a289252f8148b00165243449dfc2ab7968cb02c20401cb8e7"
+  },
   "frontier_audit": {
    "path": "research/ecbench_frontier_20261013/frontier-data.json",
    "sha256": "0bc0d0f4401846519ff915db5cfb1f90ee638ba46555736de8a29e9e2888be7b"
@@ -49922,6 +49926,170 @@
   ],
   "study": "research/ic_oracle_setup_blocked_20261020/",
   "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
+  "class": "engineering"
+ },
+ "koblitz_setup_component": {
+  "rows": [
+   {
+    "curve": "k0n41",
+    "new_online_ms": 1.188804,
+    "new_setup_ms": 45.930636,
+    "old_online_ms": 1.20956,
+    "old_setup_ms": 57.212205,
+    "phases_ms": {
+     "build": [
+      8.075827,
+      7.585539
+     ],
+     "collect": [
+      36.276132,
+      27.524482
+     ],
+     "collect_setup": [
+      2.114578,
+      0.692146
+     ],
+     "la": [
+      0.67908,
+      0.682857
+     ],
+     "select": [
+      4.948636,
+      4.468114
+     ],
+     "select_projection": [
+      1.333714,
+      0.887468
+     ],
+     "setup": [
+      0.606443,
+      0.597391
+     ],
+     "verify": [
+      2.515236,
+      2.489765
+     ]
+    },
+    "repetitions": [
+     15,
+     15
+    ],
+    "rho_online_ms": 2.993916,
+    "setup_ratio": 0.802811847577
+   },
+   {
+    "curve": "k0n53",
+    "new_online_ms": 0.150081,
+    "new_setup_ms": 403.503327,
+    "old_online_ms": 0.14496,
+    "old_setup_ms": 436.702594,
+    "phases_ms": {
+     "build": [
+      134.525034,
+      132.334922
+     ],
+     "collect": [
+      234.796961,
+      211.542921
+     ],
+     "collect_setup": [
+      11.543386,
+      4.209701
+     ],
+     "descent_setup": [
+      1.790708,
+      0.972081
+     ],
+     "la": [
+      1.644432,
+      1.634188
+     ],
+     "logs_setup": [
+      0.676031,
+      0.762095
+     ],
+     "select": [
+      23.553621,
+      23.223813
+     ],
+     "select_projection": [
+      7.148824,
+      5.324747
+     ],
+     "setup": [
+      1.565351,
+      1.562982
+     ],
+     "verify": [
+      9.848514,
+      10.385989
+     ]
+    },
+    "repetitions": [
+     15,
+     15
+    ],
+    "rho_online_ms": 49.363318,
+    "setup_ratio": 0.923977399136
+   },
+   {
+    "curve": "k0n61",
+    "new_online_ms": 7.802531,
+    "new_setup_ms": 1519.569301,
+    "old_online_ms": 7.67537,
+    "old_setup_ms": 1697.015836,
+    "phases_ms": {
+     "build": [
+      228.703562,
+      248.27345
+     ],
+     "collect": [
+      1386.789981,
+      1197.995859
+     ],
+     "collect_setup": [
+      17.895044,
+      5.965
+     ],
+     "descent_setup": [
+      2.528055,
+      1.355241
+     ],
+     "la": [
+      2.129676,
+      2.103855
+     ],
+     "logs_setup": [
+      1.202043,
+      1.175727
+     ],
+     "select": [
+      40.090401,
+      38.469242
+     ],
+     "select_projection": [
+      11.111596,
+      9.776989
+     ],
+     "setup": [
+      1.939067,
+      2.170027
+     ],
+     "verify": [
+      13.803714,
+      14.287286
+     ]
+    },
+    "repetitions": [
+     15,
+     15
+    ],
+    "rho_online_ms": 28.454357,
+    "setup_ratio": 0.895436134869
+   }
+  ],
+  "study": "research/ecbench_perf_round2_20261022/",
+  "report": "research/ecbench_perf_round2_20261022/REPORT.pdf",
   "class": "engineering"
  },
  "planner_component": {

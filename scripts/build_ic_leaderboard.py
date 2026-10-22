@@ -75,6 +75,7 @@ SOURCES = {
     "la_engines": "research/la_engines_20261014/summary.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
+    "koblitz_setup_round2": "research/ecbench_perf_round2_20261022/results.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
@@ -640,6 +641,20 @@ def pair_table_component() -> dict:
             "class": "engineering"}
 
 
+def koblitz_setup_component() -> dict:
+    """The Koblitz `ic price` set-up on the rule-v3 T01 curves, previous
+    binary against the round-2 code changes: research/ecbench_perf_round2_20261022,
+    copied from its results.json (medians computed there by summarize.py and
+    recomputed by validator.py). A component speed-up: every count, recovered
+    logarithm and the in-process rho reference are identical, so no row of
+    tables A-C moves."""
+    res = load(SOURCES["koblitz_setup_round2"])
+    if res.get("koblitz_outputs_differing") != 0 or res.get("identical_records") != res.get("records"):
+        raise SystemExit("Koblitz set-up round 2: an output differs from the previous binary")
+    return {"rows": res["koblitz"], "study": "research/ecbench_perf_round2_20261022/",
+            "report": "research/ecbench_perf_round2_20261022/REPORT.pdf", "class": "engineering"}
+
+
 PLANNER_ARMS = ["half-base", "double-base", "rootfind", "full-rank", "random-targets"]
 
 
@@ -1179,6 +1194,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
         "pair_table_component": pair_table_component(),
+        "koblitz_setup_component": koblitz_setup_component(),
         "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
@@ -1571,6 +1587,22 @@ def markdown(doc: dict) -> str:
         L.append(f"| {r['N']:,} | {pts(r['setup_ms']['scalar'])} | {pts(r['setup_ms']['batch'])} | "
                  f"{pts(r['setup_ms']['blocked'])} | {ptr(r['blocked_over_batch'])} | {ptr(r['blocked_over_scalar'])} | "
                  f"{r['run_blocked_over_scalar']:.2f} | {r['rss_gib']['batch']:.2f} → {r['rss_gib']['blocked']:.2f} GiB |")
+    L.append("")
+    ks = doc["koblitz_setup_component"]
+    L += ["## Koblitz IC set-up, outside tables A–C", "",
+          "`ic price --single-target` set-up on the rule-v3 T01 Koblitz curves, the previous binary against "
+          "round 2's code changes (class: engineering): reused per-trial scan buffers, the collector's index map "
+          "and field structure built once, Fx-hashed orbit and projection maps, aimed scans with pre-gathered "
+          "coordinates. Every count, recovered logarithm and in-process rho reference is identical, so no row "
+          "above moves; the set-up time saved lowers the cold ratio the next re-run of table A will measure. "
+          "Medians over 15 repetitions per binary, one thread, pinned; build and verify vary ±10% on unchanged "
+          f"code. Study: [{ks['study']}](../../{ks['study']}).", "",
+          "| curve | set-up old | set-up new | new / old | collect old → new | IC online | rho online |",
+          "|:--|--:|--:|--:|:--|--:|--:|"]
+    for r in ks["rows"]:
+        c = r["phases_ms"].get("collect", [0, 0])
+        L.append(f"| {r['curve']} | {r['old_setup_ms']:.1f} ms | {r['new_setup_ms']:.1f} ms | {r['setup_ratio']:.3f} | "
+                 f"{c[0]:.1f} → {c[1]:.1f} ms | {r['new_online_ms']:.2f} ms | {r['rho_online_ms']:.1f} ms |")
     L.append("")
     pl = doc["planner_component"]
 
@@ -2056,6 +2088,25 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{pq(r["blocked_over_batch"])}</td><td>{pq(r["blocked_over_scalar"])}</td>'
                  f'<td class="n">{r["run_blocked_over_scalar"]:.2f}</td>'
                  f'<td>{r["rss_gib"]["batch"]:.2f} → {r["rss_gib"]["blocked"]:.2f} GiB</td></tr>')
+    P.append('</tbody></table></section>')
+
+    ks = doc["koblitz_setup_component"]
+    P.append('<section class="card" id="koblitz-setup-component"><h2>Koblitz IC set-up, outside the priced tables</h2>'
+             '<p><code>ic price --single-target</code> set-up on the rule-v3 T01 Koblitz curves, the previous binary '
+             'against round 2&#8217;s code changes (class: engineering). Every count, recovered logarithm and '
+             'in-process rho reference is identical, so no row above moves; the saved set-up time lowers the cold '
+             'ratio the next re-run of table A will measure. Medians over 15 repetitions per binary, one thread, '
+             'pinned; build and verify vary ±10% on unchanged code. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(ks["study"])}">Study</a>.</p>')
+    P.append('<table><thead><tr><th>Curve</th><th class="n">set-up old</th><th class="n">set-up new</th>'
+             '<th class="n">new / old</th><th>collect old → new</th><th class="n">IC online</th>'
+             '<th class="n">rho online</th></tr></thead><tbody>')
+    for r in ks["rows"]:
+        c = r["phases_ms"].get("collect", [0, 0])
+        P.append(f'<tr><td>{esc(r["curve"])}</td><td class="n">{r["old_setup_ms"]:.1f} ms</td>'
+                 f'<td class="n">{r["new_setup_ms"]:.1f} ms</td><td class="n">{r["setup_ratio"]:.3f}</td>'
+                 f'<td>{c[0]:.1f} → {c[1]:.1f} ms</td><td class="n">{r["new_online_ms"]:.2f} ms</td>'
+                 f'<td class="n">{r["rho_online_ms"]:.1f} ms</td></tr>')
     P.append('</tbody></table></section>')
 
     pl = doc["planner_component"]
