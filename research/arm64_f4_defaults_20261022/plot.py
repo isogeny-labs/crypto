@@ -56,7 +56,7 @@ for row, host in enumerate(hosts):
     ax.set_ylabel("wall time ratio, arm / t4 (median of 3 rounds)")
     ax.set_title(f"{name}: GF(2) Gray-code tables, one point per bench case", fontsize=10)
     ax.legend(fontsize=7)
-fig.suptitle(f"Arm64 defaults, {os.path.basename(run.rstrip('/'))}: ratio > 1 means the default is faster", fontsize=11)
+fig.suptitle(f"Arm64 defaults, {os.path.basename(os.path.abspath(run))}: ratio > 1 means the default is faster", fontsize=11)
 fig.tight_layout()
 fig.savefig(f"{run}/fig_arm64.svg")
 fig.savefig(f"{run}/fig_arm64.png", dpi=130)
