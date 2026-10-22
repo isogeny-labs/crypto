@@ -459,6 +459,18 @@ enum CryptanalysisOp {
         #[arg(long)]
         input: PathBuf,
     },
+    /// Measure output difference activity for caller-supplied AES block pairs.
+    AesDifferentialStatistics {
+        /// JSON with a 16-byte input difference and observed plaintext/ciphertext pairs.
+        #[arg(long)]
+        input: PathBuf,
+    },
+    /// Measure an arbitrary input/output linear parity over observed AES blocks.
+    AesLinearStatistics {
+        /// JSON with two 16-byte masks and observed plaintext/ciphertext pairs.
+        #[arg(long)]
+        input: PathBuf,
+    },
     /// Measure an observed higher-order XOR derivative over a complete AES plaintext cube.
     AesHigherOrderObserved {
         /// JSON with a base plaintext, independent directions, and all plaintext/ciphertext pairs.
@@ -2455,6 +2467,18 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
         }
         CryptanalysisOp::AesDifferentialObserved { input } => {
             if let Err(e) = cli_aes_observed::differential(&input) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesDifferentialStatistics { input } => {
+            if let Err(e) = cli_aes_observed::differential_statistics(&input) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesLinearStatistics { input } => {
+            if let Err(e) = cli_aes_observed::linear_statistics(&input) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }

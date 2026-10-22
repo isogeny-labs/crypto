@@ -218,6 +218,10 @@ own acceptance prefix. Its receipt is
 The generated two-edge degree-2 prime route passed the same path, including
 fresh-cache solver replay of scalar 5 and exact-object cleanup. Its receipt is
 [`GENERATED_PRIME_DEGREE2_MULTIHOP_S3_ACCEPTANCE_20261022.json`](GENERATED_PRIME_DEGREE2_MULTIHOP_S3_ACCEPTANCE_20261022.json).
+The observed AES differential and linear corpus commands also passed live
+upload, HEAD, remote verification, fresh-cache `store:` replay, SHA-256
+comparison, and exact-key cleanup. Their receipt is
+[`AES_OBSERVED_STATISTICS_S3_ACCEPTANCE_20261022.json`](AES_OBSERVED_STATISTICS_S3_ACCEPTANCE_20261022.json).
 The public cubic-field cofactor-12 target input also passed a live upload,
 HEAD checksum, fresh-cache `icx solve-cubic --input store:...` fetch, scalar
 replay, remote verify, exact-object cleanup, and final HEAD 404. The first

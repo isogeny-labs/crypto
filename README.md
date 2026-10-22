@@ -251,6 +251,8 @@ crypto cryptanalysis aes-related-differential --alpha 1 --beta 1
 crypto cryptanalysis aes-sbox-table --kind ddt --row 1  # 256 exact XOR-difference counts
 crypto cryptanalysis aes-sbox-table --kind lat --row 1  # 256 signed linear-bias counts
 crypto cryptanalysis aes-sbox-table --kind ddt > aes-ddt.json  # all 256 rows
+crypto cryptanalysis aes-differential-statistics --input docs/ic/fixtures/aes_differential_statistics_public.json
+crypto cryptanalysis aes-linear-statistics --input docs/ic/fixtures/aes_linear_statistics_public.json
 
 # AES visual demos — ASCII art for every major attack
 crypto cryptanalysis aes-visual-demo --demo all              # all four below

@@ -558,7 +558,9 @@ mod tests {
         let options = |binary: PathBuf| WdsatSolveOptions {
             binary,
             work_dir: Some(dir.clone()),
-            timeout: Duration::from_secs(2),
+            // On macOS a newly created executable script can spend several
+            // seconds in its first process launch before the shell starts.
+            timeout: Duration::from_secs(30),
             keep_anf: None,
         };
         let anf = "p cnf 5 0\n";

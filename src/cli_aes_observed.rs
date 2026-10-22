@@ -1,4 +1,4 @@
-//! Observed corpora for the explicitly reduced-round AES analysis models.
+//! Observed AES corpora for reduced-round recovery and general block statistics.
 use crypto_lib::cryptanalysis::aes::{differential, linear, mitm, reduced::ReducedAes128};
 use serde::Deserialize;
 use serde_json::json;
@@ -26,6 +26,13 @@ struct DifferentialInput {
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
+struct DifferentialStatisticsInput {
+    input_difference_hex: String,
+    pairs: Vec<Pair4>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct Pair2 {
     plaintext_hex: String,
     ciphertext_hex: String,
@@ -37,6 +44,14 @@ struct LinearInput {
     pairs: Vec<Pair2>,
     #[serde(default)]
     verification_pairs: Vec<Pair2>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct LinearStatisticsInput {
+    input_mask_hex: String,
+    output_mask_hex: String,
+    pairs: Vec<Pair2>,
 }
 
 #[derive(Deserialize)]
@@ -248,6 +263,125 @@ fn block(hex_text: &str) -> Result<[u8; 16], String> {
     bytes
         .try_into()
         .map_err(|_| "AES block must be exactly 16 bytes".into())
+}
+
+fn record_permutation_sample(
+    plaintext: [u8; 16],
+    ciphertext: [u8; 16],
+    forward: &mut HashMap<[u8; 16], [u8; 16]>,
+    reverse: &mut HashMap<[u8; 16], [u8; 16]>,
+) -> Result<(), String> {
+    if forward.contains_key(&plaintext) {
+        return Err("duplicate plaintext in observed corpus".into());
+    }
+    if reverse.contains_key(&ciphertext) {
+        return Err("duplicate ciphertext in observed corpus".into());
+    }
+    forward.insert(plaintext, ciphertext);
+    reverse.insert(ciphertext, plaintext);
+    Ok(())
+}
+
+fn analyze_differential_statistics(
+    data: DifferentialStatisticsInput,
+) -> Result<serde_json::Value, String> {
+    if !(1..=100_000).contains(&data.pairs.len()) {
+        return Err("differential pair count must be 1..=100000".into());
+    }
+    let input_difference = block(&data.input_difference_hex)?;
+    if input_difference.iter().all(|&byte| byte == 0) {
+        return Err("input difference must be nonzero".into());
+    }
+    let mut forward = HashMap::with_capacity(data.pairs.len() * 2);
+    let mut reverse = HashMap::with_capacity(data.pairs.len() * 2);
+    let mut histogram = [0usize; 17];
+    for (index, raw) in data.pairs.iter().enumerate() {
+        let p0 = block(&raw.p0_hex)?;
+        let p1 = block(&raw.p1_hex)?;
+        let c0 = block(&raw.c0_hex)?;
+        let c1 = block(&raw.c1_hex)?;
+        if (0..16).any(|byte| p0[byte] ^ p1[byte] != input_difference[byte]) {
+            return Err(format!("pair {index} has the wrong input difference"));
+        }
+        record_permutation_sample(p0, c0, &mut forward, &mut reverse)?;
+        record_permutation_sample(p1, c1, &mut forward, &mut reverse)?;
+        let active = (0..16).filter(|&byte| c0[byte] != c1[byte]).count();
+        histogram[active] += 1;
+    }
+    Ok(json!({
+        "schema_version":1,
+        "method":"observed-aes-block-differential-activity",
+        "status":"measured",
+        "input_difference_hex":hex::encode(input_difference),
+        "input_active_bytes":input_difference.iter().filter(|&&byte| byte != 0).count(),
+        "pairs_used":data.pairs.len(),
+        "distinct_plaintexts":forward.len(),
+        "output_active_byte_histogram":histogram,
+        "one_active_output_pairs":histogram[1]
+    }))
+}
+
+pub fn differential_statistics(input: &Path) -> Result<(), String> {
+    let data: DifferentialStatisticsInput =
+        serde_json::from_slice(&read(input)?).map_err(|e| e.to_string())?;
+    let report = analyze_differential_statistics(data)?;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+    );
+    Ok(())
+}
+
+fn analyze_linear_statistics(data: LinearStatisticsInput) -> Result<serde_json::Value, String> {
+    if !(1..=100_000).contains(&data.pairs.len()) {
+        return Err("linear pair count must be 1..=100000".into());
+    }
+    let input_mask = block(&data.input_mask_hex)?;
+    let output_mask = block(&data.output_mask_hex)?;
+    if input_mask.iter().all(|&byte| byte == 0) || output_mask.iter().all(|&byte| byte == 0) {
+        return Err("input and output masks must both be nonzero".into());
+    }
+    let mut forward = HashMap::with_capacity(data.pairs.len());
+    let mut reverse = HashMap::with_capacity(data.pairs.len());
+    let mut zero = 0usize;
+    for raw in &data.pairs {
+        let plaintext = block(&raw.plaintext_hex)?;
+        let ciphertext = block(&raw.ciphertext_hex)?;
+        record_permutation_sample(plaintext, ciphertext, &mut forward, &mut reverse)?;
+        let parity = (0..16).fold(0u32, |acc, byte| {
+            acc ^ (plaintext[byte] & input_mask[byte]).count_ones()
+                ^ (ciphertext[byte] & output_mask[byte]).count_ones()
+        }) & 1;
+        if parity == 0 {
+            zero += 1;
+        }
+    }
+    let signed = zero as i64 - (data.pairs.len() - zero) as i64;
+    Ok(json!({
+        "schema_version":1,
+        "method":"observed-aes-block-linear-parity",
+        "status":"measured",
+        "input_mask_hex":hex::encode(input_mask),
+        "output_mask_hex":hex::encode(output_mask),
+        "pairs_used":data.pairs.len(),
+        "distinct_plaintexts":forward.len(),
+        "zero_parity_pairs":zero,
+        "one_parity_pairs":data.pairs.len()-zero,
+        "signed_parity_count":signed,
+        "observed_correlation":signed as f64 / data.pairs.len() as f64,
+        "observed_bias":signed as f64 / (2 * data.pairs.len()) as f64
+    }))
+}
+
+pub fn linear_statistics(input: &Path) -> Result<(), String> {
+    let data: LinearStatisticsInput =
+        serde_json::from_slice(&read(input)?).map_err(|e| e.to_string())?;
+    let report = analyze_linear_statistics(data)?;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+    );
+    Ok(())
 }
 
 pub fn differential(input: &Path) -> Result<(), String> {
@@ -477,6 +611,73 @@ pub fn linear_parity(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn observed_block_statistics_measure_pairs_and_reject_bad_corpora() {
+        let p0 = [0u8; 16];
+        let mut p1 = p0;
+        p1[0] = 1;
+        let mut p2 = p0;
+        p2[0] = 2;
+        let mut p3 = p0;
+        p3[0] = 3;
+        let c0 = [0u8; 16];
+        let mut c1 = c0;
+        c1[0] = 0x80;
+        let mut c2 = c0;
+        c2[0] = 2;
+        let mut c3 = c0;
+        c3[0] = 3;
+        c3[1] = 1;
+        let pairs = [(p0, p1, c0, c1), (p2, p3, c2, c3)];
+        let mut input = json!({
+            "input_difference_hex":format!("01{}", "00".repeat(15)),
+            "pairs":pairs.iter().map(|(p0,p1,c0,c1)| json!({
+                "p0_hex":hex::encode(p0),"p1_hex":hex::encode(p1),
+                "c0_hex":hex::encode(c0),"c1_hex":hex::encode(c1)
+            })).collect::<Vec<_>>()
+        });
+        let parse_diff =
+            |value| serde_json::from_value::<DifferentialStatisticsInput>(value).unwrap();
+        let report = analyze_differential_statistics(parse_diff(input.clone())).unwrap();
+        assert_eq!(report["output_active_byte_histogram"][1], 1);
+        assert_eq!(report["output_active_byte_histogram"][2], 1);
+        assert_eq!(report["distinct_plaintexts"], 4);
+        input["pairs"][1]["p1_hex"] = input["pairs"][1]["p0_hex"].clone();
+        assert!(analyze_differential_statistics(parse_diff(input.clone()))
+            .unwrap_err()
+            .contains("wrong input difference"));
+        input["pairs"][1]["p1_hex"] = json!(hex::encode(p3));
+        input["pairs"][1]["c1_hex"] = input["pairs"][0]["c1_hex"].clone();
+        assert!(analyze_differential_statistics(parse_diff(input))
+            .unwrap_err()
+            .contains("duplicate ciphertext"));
+
+        let linear_pairs: Vec<_> = [(p0, c0), (p1, c1), (p2, c2), (p3, c3)]
+            .iter()
+            .map(|(p, c)| {
+                json!({
+                    "plaintext_hex":hex::encode(p),"ciphertext_hex":hex::encode(c)
+                })
+            })
+            .collect();
+        let linear_input = json!({
+            "input_mask_hex":format!("01{}", "00".repeat(15)),
+            "output_mask_hex":format!("01{}", "00".repeat(15)),
+            "pairs":linear_pairs
+        });
+        let parse_linear = |value| serde_json::from_value::<LinearStatisticsInput>(value).unwrap();
+        let report = analyze_linear_statistics(parse_linear(linear_input.clone())).unwrap();
+        assert_eq!(report["zero_parity_pairs"], 3);
+        assert_eq!(report["one_parity_pairs"], 1);
+        assert_eq!(report["signed_parity_count"], 2);
+        assert_eq!(report["observed_correlation"], 0.5);
+        let mut duplicate = linear_input;
+        duplicate["pairs"][3]["plaintext_hex"] = duplicate["pairs"][2]["plaintext_hex"].clone();
+        assert!(analyze_linear_statistics(parse_linear(duplicate))
+            .unwrap_err()
+            .contains("duplicate plaintext"));
+    }
 
     #[test]
     fn higher_order_observed_checks_complete_independent_cube() {
