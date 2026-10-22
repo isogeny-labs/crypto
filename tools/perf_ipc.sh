@@ -90,8 +90,8 @@ if [ "$selftest" = 1 ]; then
 fi
 # Probe: can this process count user-space cycles and instructions at all?
 probe=$("$PERF_BIN" stat -x, -e cycles:u,instructions:u -- true 2>&1 || true)
-if [ "$selftest" = 0 ] && grep -q '<not supported>' <<< "$probe"; then
-    unsupported "perf reports cycles:u/instructions:u <not supported>: no hardware PMU is exposed (event sources: $(ls /sys/bus/event_source/devices | tr '\n' ' '))"
+if [ "$selftest" = 0 ] && grep -qE '<not (supported|counted)>' <<< "$probe"; then
+    unsupported "perf cannot count cycles:u/instructions:u: hardware counters are unavailable (event sources: $(ls /sys/bus/event_source/devices | tr '\n' ' '))"
 fi
 if grep -qiE 'permission|access to performance monitoring' <<< "$probe"; then
     unsupported "perf_event_paranoid=$(cat /proc/sys/kernel/perf_event_paranoid) forbids counting; set it to 2 or lower"
@@ -136,6 +136,9 @@ for i in $(seq 1 "$repeat"); do
          branch_miss_rate: (if ($v.branches // 0) > 0 and $v["branch-misses"] != null then $v["branch-misses"] / $v.branches else null end)}')
     emit "$rec"
     runs+=("$rec")
+    if [ "$selftest" = 0 ] && [ "$rc" = 0 ] && ! jq -e '.ipc != null' <<< "$rec" > /dev/null; then
+        unsupported "run $i produced no usable cycles/instructions pair; raw counters retained"
+    fi
     [ "$(jq '.multiplexed | length' <<< "$rec")" = 0 ] || { [ "$status" = 0 ] && status=5; }
 done
 

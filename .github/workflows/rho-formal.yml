@@ -13,6 +13,7 @@ on:
       - 'research/rho_assurance_20261016/tla/**'
       - 'src/cryptanalysis/koblitz_strong_rho.rs'
       - 'tools/perf_ipc.sh'
+      - 'tools/test_perf_ipc.sh'
   push:
     branches: [main]
     paths:
@@ -21,6 +22,7 @@ on:
       - 'research/rho_assurance_20261016/tla/**'
       - 'src/cryptanalysis/koblitz_strong_rho.rs'
       - 'tools/perf_ipc.sh'
+      - 'tools/test_perf_ipc.sh'
   workflow_dispatch:
 
 permissions:
@@ -87,6 +89,8 @@ jobs:
         # unprivileged perf_event_open; 2 permits user-space counting of the
         # job's own processes, which is all the tool asks for.
         run: sudo sysctl -w kernel.perf_event_paranoid=2
+      - name: Test counter availability and exit statuses
+        run: bash tools/test_perf_ipc.sh
       - name: Selftest (parsing and JSON, software events)
         run: |
           tools/perf_ipc.sh --selftest --repeat 2 --steps 1000 --label ci --out selftest.jsonl -- sleep 0.05

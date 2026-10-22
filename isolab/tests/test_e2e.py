@@ -236,7 +236,13 @@ async def test_privileged_partition_and_eviction(fabric, lab):
     iso = res["placement"]["isolation"]
     assert iso["cgroup"] and iso["partition_state"] in ("isolated", "root", "member")
     assert iso["evicted"] is True and iso["irqs_moved"] >= 0
-    assert res["fidelity"]["tier"] in ("A", "B")
+    # Root/cgroup access on a VM does not guarantee movable IRQs or NUMA binding.
+    # Require the reported tier to reflect the mechanisms actually obtained.
+    if iso.get("irqs_ok") and iso.get("numa_bound"):
+        assert res["fidelity"]["tier"] in ("A", "B")
+    else:
+        assert iso.get("pinned") is True
+        assert res["fidelity"]["tier"] == "C"
     assert res["runs"][1]["cgroup"]["usage_s"] > 0 and res["runs"][1]["cgroup"]["memory_peak_bytes"] > 0
     assert res["runs"][1]["timing_source"] == "launcher"
     names = {c["name"]: c for c in res["fidelity"]["checks"]}
