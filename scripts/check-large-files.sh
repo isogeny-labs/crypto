@@ -21,6 +21,10 @@ ALLOW=(
   'docs/curves/*.json'
 )
 
+# The diff below runs in a process substitution, whose failure set -e misses.
+git rev-parse --quiet --verify "$base^{commit}" >/dev/null || { echo "check-large-files: not a commit: $base" >&2; exit 2; }
+git rev-parse --quiet --verify "$head^{commit}" >/dev/null || { echo "check-large-files: not a commit: $head" >&2; exit 2; }
+
 over=0
 # --raw -z: ":<old mode> <new mode> <old blob> <new blob> <status>\0<path>\0"
 while IFS= read -r -d '' meta && IFS= read -r -d '' path; do
@@ -35,7 +39,7 @@ while IFS= read -r -d '' meta && IFS= read -r -d '' path; do
     printf '%12d bytes  %s\n' "$size" "$path"
     over=$((over + 1))
   fi
-done < <(git diff --raw -z --no-renames --diff-filter=AM "$base" "$head")
+done < <(git diff --raw -z --no-abbrev --no-renames --diff-filter=AM "$base" "$head")
 
 if [ "$over" -gt 0 ]; then
   echo "check-large-files: $over file(s) over $limit bytes. Push them with 'crypto store push' and commit the store/index.json entry (AGENTS.md §13), or pack a raw run tree as runs.tar.xz (§13a)." >&2
