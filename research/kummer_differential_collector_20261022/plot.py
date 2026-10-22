@@ -24,7 +24,7 @@ for arm in arms:
                         native_GAE_per_logical=0.1)["candidate_cold_over_rho"]) for b in bits]
     ax1.plot(bits, y, marker=marker, color=color, linestyle="--" if arm == "uncached" else "-", label=f"{arm}, I/M={inv}")
 ax1.set_xlabel("Frozen target size (bits)")
-ax1.set_ylabel("Complete cold candidate / same-source rho")
+ax1.set_ylabel("Complete cold candidate / same-source archived rho")
 ax1.set_title("Cold ratio by bit size; S/M=0.5, native=0.1 GAE")
 ax1.grid(alpha=0.2)
 ax1.legend(fontsize=7)
@@ -42,7 +42,7 @@ ax2.set_yticks(range(3), ("0", "0.5", "1"))
 ax2.set_xlabel("Inversion price I/M")
 ax2.set_ylabel("Square price S/M")
 ax2.set_title(f"{heat_arm.title()} arm; 1,260 targets; native=0.1 GAE")
-fig.colorbar(img, ax=ax2, shrink=0.75, label="Cold candidate / rho")
+fig.colorbar(img, ax=ax2, shrink=0.75, label="Cold candidate / archived rho")
 svg = B / "collector-cost.svg"
 fig.savefig(svg, bbox_inches="tight")
 svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
@@ -52,12 +52,21 @@ with PdfPages(B / "KUMMER_COLLECTOR.pdf") as pdf:
     page = plt.figure(figsize=(8.27, 11.69))
     page.text(0.07, 0.95, "Fixed-difference Kummer collector", fontsize=17, weight="bold")
     page.text(0.07, 0.92, "KUMMER-DIFFERENTIAL-COLLECTOR-20261022", fontsize=10)
-    lines = [
-        f"Completed targets per arm: {s['targets_per_arm']}.",
+    metrics = []
+    for arm in arms:
+        v = s["per_arm"][arm]
+        metrics.extend([
+            f"{arm.title()}: {s['source_verified'][arm]} source-verified, {s['processed_divisors'][arm]:,} quotient steps.",
+            f"{arm.title()}: {s['split_relations'][arm]:,} signed splits, {s['recover_fail'][arm]:,} Recover failures.",
+            f"{arm.title()} cold ratio: {v['cold_ratio_min']:.4f}–{v['cold_ratio_max']:.4f}; wins/losses: {v['cold_win_cells']}/{v['cold_loss_cells']} cells.",
+        ])
+    lines = [f"Completed targets per arm: {s['targets_per_arm']}.", *metrics,
         f"Cold setup: {s['cold_setup_models']} unique model builds, charged in all {s['cold_model_charges']} targets.",
         f"Source transfers and source verifications: {s['cold_setup_targets']} each.",
         "Every candidate and rho answer was independently checked as k·P=Q",
         "on the original elliptic curve over Fp².",
+        "Rho is a same-source archived control from a separate process.",
+        "A matched-process rho gate is pending; these ratios use archived counts.",
         "Model setup includes root search, theta search and torsion matrices.",
         "Each cold target includes source transfer, initialization, the",
         "quotient walk, signed Recover, graph elimination and verification.",
@@ -67,11 +76,6 @@ with PdfPages(B / "KUMMER_COLLECTOR.pdf") as pdf:
         "and native cost in {0,0.1,1} GAE per declared logical operation.",
         "Ratios describe this measured implementation and frozen cohort.",
     ]
-    for arm in arms:
-        v = s["per_arm"][arm]
-        lines.insert(1, f"{arm.title()}: {s['source_verified'][arm]} source-verified, {s['processed_divisors'][arm]:,} quotient steps.")
-        lines.insert(2, f"{arm.title()}: {s['split_relations'][arm]:,} signed splits, {s['recover_fail'][arm]:,} Recover failures.")
-        lines.insert(6, f"{arm.title()} cold ratio: {v['cold_ratio_min']:.4f}–{v['cold_ratio_max']:.4f}; wins/losses: {v['cold_win_cells']}/{v['cold_loss_cells']} cells.")
     y = 0.86
     for line in lines:
         page.text(0.07, y, line, fontsize=9)
@@ -84,7 +88,7 @@ with PdfPages(B / "KUMMER_COLLECTOR.pdf") as pdf:
      for native in (0., .1, 1.):
         page = plt.figure(figsize=(8.27, 11.69))
         page.text(0.07, 0.95, f"{arm}: native={native:g} GAE/logical", fontsize=14, weight="bold")
-        page.text(0.07, 0.91, "S/M    I/M      candidate GAE          rho GAE        ratio     wins/losses", fontsize=9)
+        page.text(0.07, 0.91, "S/M    I/M      candidate GAE     archived rho GAE   ratio     wins/losses", fontsize=9)
         y = 0.88
         for row in rows:
             if row["arm"] != arm or float(row["native_GAE_per_logical"]) != native:

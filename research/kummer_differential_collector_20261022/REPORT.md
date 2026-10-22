@@ -29,9 +29,13 @@ Cold candidate cost charges each target the full fresh model root search,
 theta search and five two-torsion matrices, followed by that target's source
 transfer, signed anchor, collector and verification. The same model setup is
 charged to each of its 60 targets, without amortization. Rho costs are the
-frozen same-source `rho_neg` counters from
+frozen same-source `rho_neg` counters from a separate archived process in
 `research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst`,
-priced with the same 36-cell grid. `DATA_DICTIONARY.md` defines fields and
+priced with the same 36-cell grid. A same-process rho reference for the
+validation gate is a separate pending measurement. `DATA_DICTIONARY.md`
+defines fields and
 counting boundaries; `VALIDATION.md` gives reproduction commands. The PDF
 report `KUMMER_COLLECTOR.pdf` includes the graph and all 36 whole-cohort
-cells. Raw rows and figure files are included here for outside reanalysis.
+cells. The native `replay-certificate.json` and `validator-report.json`
+pin the source replay and headline recompute. Raw rows and figure files
+are included here for outside reanalysis.

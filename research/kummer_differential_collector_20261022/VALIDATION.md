@@ -15,6 +15,10 @@ MPLCONFIGDIR=/var/tmp/kummer-mpl uv run --with matplotlib python3 research/kumme
 When the optional cached arm finishes, run its binary and then repeat the
 native analyzer without `KUMMER_ARMS` to include both complete arms. Python
 is used only to lay out the PDF and graph from the native result files.
+The analyzer also emits `replay-certificate.json` and `validator-report.json`
+with SHA-256 pins for all raw inputs. The archived rho was collected in a
+separate process, so these artifacts document the result but do not yet
+satisfy the leaderboard's same-process rho gate.
 
 The setup binary reconstructs and matches each frozen root set, theta tuple
 and torsion matrix before emitting counts. It also recomputes each source

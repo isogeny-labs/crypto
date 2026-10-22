@@ -2,7 +2,8 @@
 
 The [protocol](PROTOCOL.md) fixes the quotient recurrence, signed relation
 rule, cohort and 36 pricing cells. Every target is joined by `workload_id`
-to a same-source rho record from the frozen archive. The native Rust
+to a same-source rho record from the frozen archive, collected in a separate
+process. The native Rust
 `src/bin/analyze.rs` recomputes all prices from operation counts, checks
 the model and target setup joins, independently replays source-field
 `kP=Q`, and verifies every candidate solve.

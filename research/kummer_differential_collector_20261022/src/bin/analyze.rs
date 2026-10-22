@@ -23,6 +23,16 @@ fn rows(path: &PathBuf) -> Vec<Value> {
         .map(|l| serde_json::from_str(l).unwrap())
         .collect()
 }
+fn digest(path: &PathBuf) -> String {
+    let output = Command::new("sha256sum").arg(path).output().unwrap();
+    assert!(output.status.success());
+    String::from_utf8(output.stdout)
+        .unwrap()
+        .split_whitespace()
+        .next()
+        .unwrap()
+        .to_string()
+}
 fn same(a: &Value, b: &Value, p: u64) -> bool {
     (0..4).all(|i| {
         (0..4).all(|j| {
@@ -256,6 +266,8 @@ fn main() {
     let here = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let root = here.parent().unwrap().parent().unwrap().to_path_buf();
     let results = here.join("results");
+    let prior: Value =
+        serde_json::from_str(&fs::read_to_string(results.join("summary.json")).unwrap()).unwrap();
     let arms: Vec<String> = std::env::var("KUMMER_ARMS")
         .unwrap_or_else(|_| "uncached,cached".to_string())
         .split(',')
@@ -278,6 +290,7 @@ fn main() {
         )
     );
     let mut records = Vec::new();
+    let mut replay_runs = Vec::new();
     let mut status = BTreeMap::new();
     let mut totals = BTreeMap::new();
     for arm in &arms {
@@ -344,6 +357,9 @@ fn main() {
                     source_check(&w["curve_spec"], &w["target"], n(&c, "recovered")),
                     "source scalar {id}"
                 );
+                replay_runs.push(json!({"arm":arm,"bits":bits,"workload_id":id,
+                    "recovered":n(&c,"recovered"),"source_scalar_verified":true,
+                    "rho_recovered":s(&rr["outcome"],"recovered").parse::<u64>().unwrap()}));
                 let online = candidate_count(&c);
                 let mut cold = online;
                 cold.add(setup_count(m, t));
@@ -465,6 +481,70 @@ fn main() {
     let summary = json!({"schema":"kummer-differential-collector-summary/v1","study_id":"KUMMER-DIFFERENTIAL-COLLECTOR-20261022",
       "targets_per_arm":1260,"arms":arms,"status":status,"source_verified":get("source_verified"),"processed_divisors":get("processed_divisors"),"split_relations":get("split_relations"),"recover_fail":get("recover_fail"),"xadd_repairs":get("xadd_repairs"),"walk_restarts":get("walk_restarts"),
       "price_cells":36*8*per_arm.len(),"candidate_cost_boundary":"cold per target: fresh model root/theta/torsion setup, source transfer, anchor, collector, and verification","cold_setup_models":21,"cold_setup_targets":1260,"cold_model_charges":1260,"per_arm":per_arm});
+    assert_eq!(
+        prior["arms"], summary["arms"],
+        "first produce a native summary for newly completed arms, then rerun for independent headline validation"
+    );
+    let mut raw_paths = vec![
+        "research/kummer_differential_collector_20261022/results/cold-model-setup.jsonl"
+            .to_string(),
+        "research/kummer_differential_collector_20261022/results/cold-target-setup.jsonl"
+            .to_string(),
+        "research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst".to_string(),
+    ];
+    for arm in &arms {
+        for bits in BITS {
+            raw_paths.push(format!("research/kummer_differential_collector_20261022/results/{arm}/collector-{bits}.jsonl"));
+        }
+    }
+    for bits in BITS {
+        raw_paths.push(format!(
+            "research/kummer_coordinates_20261022/results/target-gate-{bits}.jsonl"
+        ));
+    }
+    let raw_data: Vec<Value> = raw_paths
+        .iter()
+        .map(|p| json!({"path":p,"sha256":digest(&root.join(p))}))
+        .collect();
+    let cert = json!({"schema":"kummer-native-replay-certificate/v1","status":"verified","independent":true,
+      "scalars_verified":true,"runs":replay_runs,"raw_data":raw_data,
+      "analyzer_source_sha256":digest(&here.join("src/bin/analyze.rs")),
+      "method":"independent Rust Fp² affine scalar multiplication and exact setup/collector joins"});
+    fs::write(
+        here.join("replay-certificate.json"),
+        format!("{}\n", serde_json::to_string_pretty(&cert).unwrap()),
+    )
+    .unwrap();
+    let mut headlines = Vec::new();
+    for arm in &arms {
+        for key in ["source_verified", "processed_divisors", "split_relations"] {
+            headlines.push(json!({"name":format!("{arm}.{key}"),"claimed":prior[key][arm],"recomputed":summary[key][arm]}));
+        }
+        for key in [
+            "cold_ratio_min",
+            "cold_ratio_max",
+            "cold_win_cells",
+            "cold_loss_cells",
+        ] {
+            headlines.push(json!({"name":format!("{arm}.{key}"),"claimed":prior["per_arm"][arm][key],"recomputed":summary["per_arm"][arm][key],"rel_tol":1e-12}));
+        }
+    }
+    assert!(
+        headlines.iter().all(|h| {
+            let a = h["claimed"].as_f64().unwrap();
+            let b = h["recomputed"].as_f64().unwrap();
+            (a - b).abs() <= 1e-12 * a.abs().max(b.abs()).max(1.)
+        }),
+        "headline mismatch"
+    );
+    let report = json!({"schema":"kummer-native-validator-report/v1","status":"pass","independent":true,
+      "raw_data":raw_data,"headline":headlines,"analyzer_source_sha256":digest(&here.join("src/bin/analyze.rs")),
+      "rho_process_match":false,"rho_note":"archived same-source rho ran in a separate process; no leaderboard gate claim"});
+    fs::write(
+        here.join("validator-report.json"),
+        format!("{}\n", serde_json::to_string_pretty(&report).unwrap()),
+    )
+    .unwrap();
     fs::write(
         results.join("summary.json"),
         format!("{}\n", serde_json::to_string_pretty(&summary).unwrap()),
