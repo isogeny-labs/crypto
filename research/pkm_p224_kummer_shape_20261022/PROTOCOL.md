@@ -371,3 +371,12 @@ for a stopped cell: `D >= 6` or `D >= 7` from a productive step leaves the
 now, concurrently with the rest of the main batch (single thread each, 2 for
 R18b), if free memory at its start is at least 6 GB; otherwise after the
 batch. *(Edited before R18b started: the first draft said "after the batch".)*
+
+## 11. Amendment 3 (2026-10-22, after the ecbench sessions, no measurement affected)
+
+§4.2 said the four Solinas curves are registered (AGENTS.md §11) before they are
+cited. They are not: adding them to `docs/curves/registry.json` changes the digest
+that the cover, trait and transfer certificates bind, which needs those
+regenerated (a separate, large change). The write-up therefore names the curves by
+`(p, a, b)` and writes no slug in Markdown; the sealed sessions carry the slugs.
+Registration is left as a follow-up.

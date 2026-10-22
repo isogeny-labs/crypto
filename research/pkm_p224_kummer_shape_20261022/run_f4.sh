@@ -26,7 +26,8 @@ run() {
   echo "$(date -u +%FT%TZ) start $name: $*" >> ../progress.txt
   nice -n 10 "$bin" --engine generic --budget "$budget" --ladder-t none --planted 0 --random 2 \
     --seed $SEED --kinds kummer "$@" --out "$name.jsonl" 2> "$name.log"
-  echo "$(date -u +%FT%TZ) end $name exit $?" >> ../progress.txt
+  rc=$?
+  echo "$(date -u +%FT%TZ) end $name exit $rc" >> ../progress.txt
 }
 M2=(--m 2 --controls tower,null --t-min 1)
 M3=(--m 3 --controls tower,null --null-chain --t-min 2 --max-t-m3 4)

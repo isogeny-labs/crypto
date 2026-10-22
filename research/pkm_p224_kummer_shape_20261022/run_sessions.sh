@@ -18,8 +18,8 @@ for b in $sizes; do
     set -- $pair
     "$bin" compare --dir "$out" --a "$1" --b "$2" --save > "$here/tables/s$b.compare.$1.vs.$2.txt" 2>&1 || true
   done
-  "$bin" table --dir "$out" > "$here/tables/s$b.table.md" 2>&1
-  "$bin" band --dir "$out" --ranks --json "$here/tables/s$b.band.json" > "$here/tables/s$b.band.md" 2>&1
+  "$bin" table --dir "$out" > "$here/tables/s$b.table.txt" 2>&1
+  "$bin" band --dir "$out" --ranks --json "$here/tables/s$b.band.json" > "$here/tables/s$b.band.txt" 2>&1
   "$bin" resources --dir "$out" --out "$here/tables/s$b.resources.json" > /dev/null 2>&1
   echo "$(date -u +%FT%TZ) s$b tables done" >> "$here/progress.txt"
 done

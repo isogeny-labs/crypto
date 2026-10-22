@@ -50,8 +50,8 @@ fn recorded(m: u64, n: u64) -> Option<u64> {
     match m {
         2 => match n {
             2 => Some(3),
-            4..=10 if n % 2 == 0 => Some(4),
-            12..=18 if n % 2 == 0 => Some(5),
+            4..=10 if n.is_multiple_of(2) => Some(4),
+            12..=18 if n.is_multiple_of(2) => Some(5),
             20 | 22 => Some(6),
             _ => None,
         },
@@ -245,7 +245,10 @@ fn svg_plot(
         w - ml - mr,
         h - mt - mb
     );
-    let step = ((xhi - xlo) / 8.0).ceil().max(1.0);
+    let mut step = ((xhi - xlo) / 8.0).ceil().max(1.0);
+    if step > 1.0 && step % 2.0 == 1.0 {
+        step += 1.0;
+    }
     let mut x = xlo;
     while x <= xhi + 1e-9 {
         let px = tx(x, xlo, xhi);
@@ -446,7 +449,7 @@ fn cmd_f4(runs: &Path, out: &Path) {
     let nver_bad = rows.iter().filter(|r| r.verify_ok == Some(false)).count();
     // Q4: same width/steps across primes at one (m, N) for kummer tower
     let mut q4 = String::new();
-    let mut by_mn: BTreeMap<(u64, u64), Vec<(String, u64, u64, u64)>> = BTreeMap::new();
+    let mut by_mn: BTreeMap<(u64, u64), Vec<(String, u64, u64, u64, u64)>> = BTreeMap::new();
     for ((prime, kind, m, control, n), rs) in &cs {
         if kind == "kummer" && control == "tower" && rs.iter().all(|r| r.finished) {
             by_mn.entry((*m, *n)).or_default().push((
@@ -454,6 +457,7 @@ fn cmd_f4(runs: &Path, out: &Path) {
                 rs[0].cols,
                 rs[0].steps,
                 rs[0].d,
+                rs[0].muladds,
             ));
         }
     }
@@ -477,6 +481,15 @@ fn cmd_f4(runs: &Path, out: &Path) {
             } else {
                 "DIFFER"
             }
+        );
+        let (lo, hi) = v
+            .iter()
+            .fold((u64::MAX, 0u64), |a, x| (a.0.min(x.4), a.1.max(x.4)));
+        let _ = writeln!(
+            q4,
+            "    multiply-adds (target 0) across the {} primes: min {lo}, max {hi}, max/min {:.4}",
+            v.len(),
+            hi as f64 / lo.max(1) as f64
         );
     }
     let mut summary = String::new();
@@ -510,7 +523,6 @@ fn cmd_f4(runs: &Path, out: &Path) {
 
     // figure: D vs N, m = 2, tower per prime and null, recorded
     let mut series = Vec::new();
-    let mut ci = 0;
     let mut by_prime: BTreeMap<String, Vec<(f64, f64)>> = BTreeMap::new();
     let mut nullp: BTreeMap<String, Vec<(f64, f64)>> = BTreeMap::new();
     for ((prime, kind, m, control, n), rs) in &cs {
@@ -541,20 +553,18 @@ fn cmd_f4(runs: &Path, out: &Path) {
         series.push(Series {
             name: format!("{prime} tower"),
             pts,
-            color: PALETTE[ci % 8],
+            color: PALETTE[series.len() % 8],
             dashed: false,
         });
-        ci += 1;
     }
     for (prime, pts) in nullp {
         if prime == "SL31" || prime == "P224" {
             series.push(Series {
                 name: format!("{prime} null"),
                 pts,
-                color: PALETTE[ci % 8],
+                color: PALETTE[series.len() % 8],
                 dashed: true,
             });
-            ci += 1;
         }
     }
     svg_plot(
@@ -568,7 +578,6 @@ fn cmd_f4(runs: &Path, out: &Path) {
     );
     // figure: multiply-adds vs N at m = 2
     let mut ms_series = Vec::new();
-    let mut ci = 0;
     let mut mp: BTreeMap<String, Vec<(f64, f64)>> = BTreeMap::new();
     for ((prime, kind, m, control, n), rs) in &cs {
         if kind == "kummer" && *m == 2 && control == "tower" && rs.iter().all(|r| r.finished) {
@@ -582,10 +591,9 @@ fn cmd_f4(runs: &Path, out: &Path) {
         ms_series.push(Series {
             name: prime,
             pts,
-            color: PALETTE[ci % 8],
+            color: PALETTE[ms_series.len() % 8],
             dashed: false,
         });
-        ci += 1;
     }
     svg_plot(
         &out.join("figures/madds_vs_n.svg"),
@@ -891,7 +899,7 @@ fn cmd_price(runs: &Path, out: &Path, curves: &Path, sessions: &[PathBuf]) {
                 s / sr,
                 band.join(" / ")
             );
-            if arm.starts_with("ic-") {
+            if arm.starts_with("ic-") && !arm.contains("tf4") {
                 ratio_pts
                     .entry((fam.clone(), arm.clone()))
                     .or_default()
@@ -921,7 +929,7 @@ fn cmd_price(runs: &Path, out: &Path, curves: &Path, sessions: &[PathBuf]) {
     let rows = read_rows(runs);
     let curves_txt = fs::read_to_string(curves).unwrap();
     let mut f4 = String::from(
-        "| curve (bits, p) | F4 cell | R = columns+10 | madds / system | ns / madd | ns / GAE | M (madds per GAE) | c_F4 GAE (w=0) | S_F4 w=0 | w=0.1 | w=1 | S_F4 / S_rho(neg) w=0 | w=1 | generous M=4: S_F4 w=0 |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|\n",
+        "| curve (bits, p) | F4 cell | R = columns+10 | madds / system | ns / madd | ns / GAE | M (madds per GAE) | c_F4 GAE (w=0) | S_F4 w=0 | w=0.1 | w=1 | S_F4 / S_rho(neg), w = 0 / 0.1 / 1 | generous M=4: S_F4 w=0 | U (unpriced ops per system) |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|\n",
     );
     let wanted: [(&str, u64, u64); 2] = [("SL20", 20, 20), ("SL24", 24, 24)];
     let mut f4_pts: Vec<(f64, f64)> = Vec::new();
@@ -953,7 +961,22 @@ fn cmd_price(runs: &Path, out: &Path, curves: &Path, sessions: &[PathBuf]) {
             b: cj["b"].as_u64().unwrap(),
         };
         let r = cj["r"].as_f64().unwrap();
-        let ns_gae = ns_per_gae(&curve);
+        // The microbenchmark is noisy on a shared host: the first measurement
+        // is stored beside the tables and reused, so the report is reproducible
+        // from the committed files.
+        let cache = out.join(format!("analysis/ns_per_gae_{p}.txt"));
+        let ns_gae = match fs::read_to_string(&cache)
+            .ok()
+            .and_then(|t| t.trim().parse::<f64>().ok())
+        {
+            Some(v) => v,
+            None => {
+                let v = ns_per_gae(&curve);
+                fs::create_dir_all(out.join("analysis")).unwrap();
+                fs::write(&cache, format!("{v}\n")).unwrap();
+                v
+            }
+        };
         let madds = mean(&rs.iter().map(|x| x.muladds as f64).collect::<Vec<_>>());
         let ms = mean(&rs.iter().map(|x| x.ms).collect::<Vec<_>>());
         let ns_madd = ms * 1e6 / madds;
@@ -978,23 +1001,33 @@ fn cmd_price(runs: &Path, out: &Path, curves: &Path, sessions: &[PathBuf]) {
         let big_r = col.map(|c| (c + 10) as f64).unwrap_or(f64::NAN);
         let c0 = madds / m_conv;
         let s_of = |w: f64, m: f64| big_r * (madds / m + w * u) / r.sqrt();
-        let rho_s = table
-            .get(&("Solinas".to_string(), bits))
-            .and_then(|a| a.get("rho-neg"))
-            .map(|v| mean(&v.iter().map(|x| x.0).collect::<Vec<_>>()))
-            .unwrap_or(f64::NAN);
+        let rho_at = |w: f64| -> f64 {
+            match table
+                .get(&("Solinas".to_string(), bits))
+                .and_then(|a| a.get("rho-neg"))
+            {
+                Some(v) => {
+                    let g = mean(&v.iter().map(|x| x.1).collect::<Vec<_>>());
+                    let uu = mean(&v.iter().map(|x| x.2).collect::<Vec<_>>());
+                    let lr = log2r[&("Solinas".to_string(), bits)];
+                    (g + w * uu) / 2f64.powf(lr / 2.0)
+                }
+                None => f64::NAN,
+            }
+        };
         let _ = writeln!(
             f4,
-            "| {bits}-bit p={p} (r={r:.0}) | m=2 N={nn} t={t_f4} ({} target(s)) | {col_txt} | {madds:.3e} | {ns_madd:.3} | {ns_gae:.1} | {m_conv:.1} | {c0:.3e} | {:.3e} | {:.3e} | {:.3e} | {:.3e} | {:.3e} | {:.3e} |",
+            "| {bits}-bit p={p} (r={r:.0}) | m=2 N={nn} t={t_f4} ({} target(s)) | {col_txt} | {madds:.3e} | {ns_madd:.3} | {ns_gae:.1} | {m_conv:.1} | {c0:.3e} | {:.3e} | {:.3e} | {:.3e} | {:.3e} / {:.3e} / {:.3e} | {:.3e} | {u:.0} |",
             rs.len(),
             s_of(0.0, m_conv),
             s_of(0.1, m_conv),
             s_of(1.0, m_conv),
-            s_of(0.0, m_conv) / rho_s,
-            s_of(1.0, m_conv) / rho_s,
-            s_of(0.0, 4.0)
+            s_of(0.0, m_conv) / rho_at(0.0),
+            s_of(0.1, m_conv) / rho_at(0.1),
+            s_of(1.0, m_conv) / rho_at(1.0),
+            s_of(0.0, 4.0),
         );
-        f4_pts.push((r.log2(), s_of(0.0, m_conv) / rho_s));
+        f4_pts.push((r.log2(), s_of(0.0, m_conv) / rho_at(0.0)));
     }
     fs::write(out.join("tables/f4_priced.md"), &f4).unwrap();
     println!("{f4}");
@@ -1002,15 +1035,13 @@ fn cmd_price(runs: &Path, out: &Path, curves: &Path, sessions: &[PathBuf]) {
 
     // figure: S/S_rho by log2 r
     let mut series = Vec::new();
-    let mut ci = 0;
     for ((fam, arm), pts) in &ratio_pts {
         series.push(Series {
             name: format!("{fam} {arm}"),
             pts: pts.clone(),
-            color: PALETTE[ci % 8],
+            color: PALETTE[series.len() % 8],
             dashed: fam == "Proth",
         });
-        ci += 1;
     }
     if !f4_pts.is_empty() {
         series.push(Series {
@@ -1029,7 +1060,7 @@ fn cmd_price(runs: &Path, out: &Path, curves: &Path, sessions: &[PathBuf]) {
     svg_plot(
         &out.join("figures/s_ratio_by_size.svg"),
         "Whole-method S against matched rho (negation), by curve size",
-        "ecbench sessions (measured, mean S per arm over verified measured runs) and the derived F4 lower bound (PROTOCOL 4.4). Solid = Solinas curves, dashed = Proth controls.",
+        "ecbench sessions (measured) and the derived F4 lower bound (PROTOCOL 4.4). Solid: Solinas, dashed: Proth.",
         "log2 r",
         "S_arm / S_rho (log scale)",
         true,

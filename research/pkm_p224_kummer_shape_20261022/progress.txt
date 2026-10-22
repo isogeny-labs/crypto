@@ -66,3 +66,14 @@
 2026-10-22T06:47:24Z start R15-P224-m2-N18: --p P-224 --m 2 --controls tower --t-min 9 --max-t 9 --targets 0 --verify
 2026-10-22T06:47:42Z start R18b-SL24-m2-N24-sizing
 2026-10-22T06:59:41Z end R18b-SL24-m2-N24-sizing exit 0
+2026-10-22T07:00:35Z end R15-P224-m2-N18 exit 0
+2026-10-22T07:00:35Z start R16-SL24-m2-N20-22: --p 16760833 --m 2 --controls tower --t-min 10 --max-t 11 --targets 0
+2026-10-22T07:42:39Z start R19-SL26-m2-N22 (parallel): --p 67104769 --m 2 --controls tower --t-min 11 --max-t 11 --targets 0
+2026-10-22T07:42:39Z start R17-SL31-m3-N15 (parallel): --p 2147352577 --m 3 --controls tower --t-min 5 --max-t-m3 5 --targets 0
+2026-10-22T07:42:50Z NOTE: run_f4.sh main stopped by hand (kill of the script, not of R16's child) so that R16n, R17, R19 run in parallel via run_parallel.sh; R16 (child) continues
+2026-10-22T07:47:59Z end R16-SL24-m2-N20-22 (summary line in log; script was stopped)
+2026-10-22T07:47:59Z start R16n-SL24-m2-N22-null (parallel): --p 16760833 --m 2 --controls null --t-min 11 --max-t 11 --targets 0
+2026-10-22T08:11:52Z end R17-SL31-m3-N15 exit 0 (parallel)
+2026-10-22T08:27:41Z end R19-SL26-m2-N22 exit 0 (parallel)
+2026-10-22T08:31:22Z end R16n-SL24-m2-N22-null exit 0 (parallel)
+2026-10-22T08:31:33Z all F4 runs finished (R17 end 08:12, R19 end 08:28, R16n end 08:31 by their logs); R18 had been OOM-killed, R18b sizing stopped at --max-nnz
