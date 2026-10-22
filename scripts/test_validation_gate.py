@@ -322,6 +322,16 @@ class CiCheck(Scratch):
                                         old_readme if path == g.BENCHMARKS_README else None):
             self.assertEqual(g.benchmark_archive_errors(self.repo, {}, base="base"), [])
 
+    def test_archived_duplicate_identical_legacy_rows_need_one_disposition(self):
+        self.tree([], [])
+        self.archive()
+        old_readme = "# Benchmarks\n" + self.LINE + "\n" + self.LINE + "\n"
+        with unittest.mock.patch.object(
+            g, "git_show", side_effect=lambda ref, path:
+            old_readme if path == g.BENCHMARKS_README else None,
+        ):
+            self.assertEqual(g.benchmark_archive_errors(self.repo, {}, base="base"), [])
+
     def test_archive_row_hash_and_provenance_are_required(self):
         self.tree([], [])
         row = self.archive()
