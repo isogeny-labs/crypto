@@ -51,8 +51,8 @@ pub struct ChildInput {
     pub curve: CurveSpec,
     pub target_seed: u64,
     pub target_index: u64,
-    /// Planted or public; older inputs are planted.
-    #[serde(default, skip_serializing_if = "TargetKind::is_planted")]
+    /// Planted, planted_shared or public; older inputs are planted.
+    #[serde(default, skip_serializing_if = "TargetKind::is_plain_planted")]
     pub target_kind: TargetKind,
     pub expected_workload_id: String,
     pub method: MethodSpec,
@@ -313,6 +313,10 @@ pub struct Record {
     pub phases: Vec<PhaseRecord>,
     pub counters: BTreeMap<String, u64>,
     pub factor_base: Option<FactorBaseFacts>,
+    /// FBM1 measurement identity for this IC run (`docs/ecbench/FACTOR_BASE_PROTOCOL.md` §FBM1).
+    /// Absent on pre-FBM1 records and non-IC methods.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fbm_id: Option<String>,
     pub detail: Value,
     /// The one-target online window (AGENTS.md "IC measurements").
     #[serde(default)]

@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
 concurrency:
   group: nist-sm120-static-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   ptxas:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|nist-sm120-static.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|nist-sm120-static.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     container:
       image: nvidia/cuda:13.0.2-devel-ubuntu24.04
     strategy:
@@ -17,6 +17,7 @@ jobs:
       matrix:
         ptx: [0, 1]
         maxreg: [0, 96, 128, 160]
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 360 }}
     steps:
       - uses: actions/checkout@v4
       - name: Compile sm_120
