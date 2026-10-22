@@ -252,22 +252,23 @@ coordinate/order adapter is unavailable explicitly report `not_evaluated`;
 Curve25519 is one such record. A complete catalogue entry does not by itself
 certify its coordinates or group order.
 
-In the current file (2112 registry curves and 176 from the sources: 175
+In the current file (2572 registry curves and 176 from the sources: 175
 walked curves of the P-256 and P-224 isogeny classes and the ECC2K-130
-degree-263 descendant), `End(E)` is established for 2242 curves (954
-maximal, 1288 non-maximal) and unresolved for 32; 14 have a `Δ` that did
+degree-263 descendant), `End(E)` is established for 2700 curves (1150
+maximal, 1550 non-maximal) and unresolved for 34; 14 have a `Δ` that did
 not factor. Of the 1324 curves over `GF(p^k)`, `k > 1`, 1319 have a
 certified order (9 by generator, 1310 by point orders: 484 proved, 826
-probable). The levels behind it: 1255 decided by the scalar test on `E[ℓ]`
-(739 floors, 516 craters at depth 1), 1137 by the prime-power tests (473 one
-above the floor, 347 craters, 317 in between), 72 by the depth-1 point test
-(57 floors, 15 craters; 6 of them on binary curves), 108 by isogeny walks
-(73 craters, 20 floors, 15 in between), 17 by `j(E) = j(O_K)` in a field of
-class number 1, 13 walker certificates (each agreeing with the test), 111
-from a certified `End(E)`, 228 where `f₀` is already prime to `ℓ`. What
-stays open: 13 levels the tests only bound and 19 depth-1 primes beyond the
-point test's budget, all on `GF(p^k)` curves whose `|d_K|` is far too large
-for a walk; no prime of `v` is left above the tests' range. P-256's `Δ` factors with
+probable). The levels behind it: 1306 decided by the scalar test on `E[ℓ]`
+(787 floors, 519 craters at depth 1), 1265 by the prime-power tests (486 one
+above the floor, 370 craters, 409 in between), 74 by the depth-1 point test
+(58 floors, 16 craters; 6 of them on binary curves), 388 by isogeny walks
+(204 craters, 166 floors, 18 in between), 19 by `j(E) = j(O_K)` in a field
+of class number 1, 13 walker certificates (each agreeing with the test), 111
+from a certified `End(E)`, 243 where `f₀` is already prime to `ℓ`. What
+stays open: 34 levels, all but two on `GF(p^k)` curves whose `|d_K|` is far
+too large for a walk (13 the tests only bound, 19 at depth 1 beyond the
+point test's budget), and two on binary curves (`ℓ = 31` at depth 1 over
+`GF(2^47)`, `ℓ = 31543` over `GF(2^61)`). P-256's `Δ` factors with
 the committed hints as `−3·5·456597257999·p81·p136` (squarefree), so
 `v = 1`, `d_K = Δ` and `End(E) = O_K`, probable through its 136-bit prime
 (the 81-bit one is below the Miller–Rabin proof bound); every walked curve

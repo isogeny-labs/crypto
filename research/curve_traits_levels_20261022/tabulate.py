@@ -57,7 +57,7 @@ for x, v in zip(xs, a):
     ax.text(x + 0.2, v + 2, str(v), ha="center", fontsize=8)
 ax.set_xticks(list(xs), kinds, fontsize=8)
 ax.set_ylabel("open volcano levels (count)")
-ax.set_title("Open End(E) levels, docs/curves/traits.json (2288 curves)", fontsize=9)
+ax.set_title("Open End(E) levels, docs/curves/traits.json (2748 curves)", fontsize=9)
 ax.legend(fontsize=8)
 fig.tight_layout()
 fig.savefig(f"{out}/open_levels.svg")
