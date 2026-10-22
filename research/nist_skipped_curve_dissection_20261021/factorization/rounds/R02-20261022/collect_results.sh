@@ -10,6 +10,7 @@ mkdir -p "$raw/final"
 records=()
 for id in published_224-twist2 skipped_224_5736-twist2 skipped_256_876-twist2; do
   record="$raw/targets/$id/result.json"
+  if [[ -f $raw/nfs/$id/result.json ]]; then record="$raw/nfs/$id/result.json"; fi
   [[ -s $record ]]
   records+=("$record")
 done
