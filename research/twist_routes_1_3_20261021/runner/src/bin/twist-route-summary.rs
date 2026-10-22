@@ -96,7 +96,7 @@ fn report(
         "lean-verification" => "../../../lean/receipts/".to_string(),
         _ => format!("../../../execution-v1/runs/{run}/"),
     };
-    let mut md=format!("# {title}\n\nRun `{run}`; source freeze `{source}`. Host `a81fcf6dc864`, Debian 13 x86_64, managed four-CPU virtual host, L0. These are public synthetic small-field records. No wall-clock or full-cost improvement is admitted.\n\nRaw outputs: [run directory]({raw}). Commands, binary/input hashes, seeds, resource limits and statuses are in [execution receipts](../../../execution-v1/) and the versioned protocols in the study root. No independent-host replay is claimed.\n\n## Recorded observations\n\n| Metric | Count / recorded value |\n|:--|--:|\n");
+    let mut md=format!("# {title}\n\nRun `{run}`; source freeze `{source}`. Host `a81fcf6dc864`, Debian 13 x86_64, managed four-CPU virtual host, L0. Workloads use public synthetic fixtures or public-parameter checks. No wall-clock or full-cost improvement is admitted.\n\nRaw outputs: [run directory]({raw}). Commands, binary/input hashes, seeds, resource limits and statuses are in [execution receipts](../../../execution-v1/) and the versioned protocols in the study root. No independent-host replay is claimed.\n\n## Recorded observations\n\n| Metric | Count / recorded value |\n|:--|--:|\n");
     for (k, v) in metrics.as_object().unwrap() {
         if !v.is_object() && !v.is_array() {
             md += &format!("| {} | {} |\n", k.replace('_', " "), v);

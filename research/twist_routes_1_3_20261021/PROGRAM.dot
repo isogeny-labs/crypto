@@ -1,16 +1,16 @@
 digraph program {
-  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.30", ranksep="0.40", label="Twist-assisted IC: experiment dependencies\nOnly E00 has an implementation; other nodes are planned", labelloc=t, fontname="DejaVu Sans", fontsize=18];
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.30", ranksep="0.40", label="Twist-assisted IC: experiment dependencies\nBounded executions recorded; original full campaign remains partial", labelloc=t, fontname="DejaVu Sans", fontsize=18];
   node [shape=box, style="rounded,filled", fillcolor="#edf2f7", color="#526274", fontname="DejaVu Sans", fontsize=11, margin="0.14,0.10"];
   edge [color="#687888", arrowsize=0.7];
-  e00 [label="E00: polynomial preflight\nExact coefficients + evaluated certificates", fillcolor="#dcecf8"];
-  e01 [label="E01: trace fibers\nNull, duplicate-lift and 2-primary controls"];
-  bases [label="E02-E06: restricted bases\nCoordinate / slope / norm / divisor families\nExact projected relation census"];
-  solver [label="E07-E09: equivalent systems\nMembership encodings / solver ordering\nTorsion and Galois descent"];
-  cover [label="E10-E12: covers and maps\nComplement test / gluing / divisor norms\nSubgroup kernel and recovery"];
-  image [label="E13: restricted cover images\nSize, degree, genus and membership costs"];
-  rep [label="E14: representation controls\nTwist model / cheap constants / isogenies"];
-  pipeline [label="E15: combined pipeline panel\nMatched IC baseline + same-target rho\nAll phases, independent replay", fillcolor="#fdf0cf"];
-  side [label="E16-E17: conditional ingress\nPairing applicability / arithmetic lifts\nNo usable transfer assumed", style="rounded,filled,dashed"];
+  e00 [label="E00: polynomial preflight\nFive identities + native certificates + Lean proofs", fillcolor="#dcecf8"];
+  e01 [label="E01: trace fibers\nNine exhaustive finite trace/fiber controls"];
+  bases [label="E02-E06: restricted bases\nCoordinate / slope / norm / divisor families\n1,179 configured census rows; broader families open"];
+  solver [label="E07-E09: equivalent systems\n240 projection cells; three bounded solver attempts\nFull grid, signature reference and costing open"];
+  cover [label="E10-E12: covers and maps\nTen checked class transfers; independent orders\nThree positive toy gluing cases; P-521 module candidate"];
+  image [label="E13: restricted cover images\nBounded image census; destination solver/cost open"];
+  rep [label="E14: representation controls\nThree explicit degree-seven maps + all three duals"];
+  pipeline [label="E15: combined pipeline panel\n1,920 records; 1,704 verified identical replays\n216 empty cells; calibrated full cost/other host open", fillcolor="#fdf0cf"];
+  side [label="E16-E17: conditional ingress\nPublic applicability + known pairing positive control\nTwo 254-case height panels; target-lift/cost open", style="rounded,filled,dashed"];
   e00 -> e01;
   e00 -> cover;
   e01 -> bases;

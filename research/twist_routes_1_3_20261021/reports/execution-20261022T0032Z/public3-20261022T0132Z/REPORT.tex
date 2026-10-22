@@ -1,0 +1,126 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  10pt,
+  letterpaper,
+  landscape]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{DejaVu Serif}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=0.55in]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\emergencystretch=3em
+\sloppy
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\section{Public 3-torsion companion-module
+filter}\label{public-3-torsion-companion-module-filter}
+
+Run \texttt{public3-20261022T0132Z}; source freeze
+\texttt{36563882e86dacbbcea0d2e473aca236a116ec97}. Host
+\texttt{a81fcf6dc864}, Debian 13 x86\_64, managed four-CPU virtual host,
+L0. Workloads use public synthetic fixtures or public-parameter checks.
+No wall-clock or full-cost improvement is admitted.
+
+Raw outputs:
+\href{../../../execution-v1/runs/public3-20261022T0132Z/}{run
+directory}. Commands, binary/input hashes, seeds, resource limits and
+statuses are in \href{../../../execution-v1/}{execution receipts} and
+the versioned protocols in the study root. No independent-host replay is
+claimed.
+
+\subsection{Recorded observations}\label{recorded-observations}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule\noalign{}
+Metric & Count / recorded value \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+NIST cases & 5 \\
+NIST positive module filters & 1 \\
+geometric constructions certified & 0 \\
+parameter cases & 15 \\
+toy cross check mismatches & 0 \\
+toy cross checks & 10 \\
+\end{longtable}
+
+Vector figures and editable data accompany this report on the following pages.
+
+PARI enumerates det(M)=-1 matrices over F3 with MA=-AM for the Frobenius
+companion matrix. All ten toy counts equal the earlier E11 counts. Among
+five public NIST P-curve order pairs, only P-521 passes this necessary
+module filter, with four matrices; the other four have none. This is a
+public-parameter calculation, not a NIST DLP. The actual
+torsion/Weil-pairing bridge, principally polarized quotient, genus-two
+model and divisor maps are not constructed or certified. A positive
+count is a candidate for further construction, not a speedup or novelty
+result.
+
+The chart has no statistical interval: census counts are exact on the
+stated finite sets; solver completion counts describe these bounded
+processes only. Missing or failed computations stay unresolved. Full
+original acceptance criteria and proof/measurement gaps remain in
+\href{../../../EXPERIMENTS.md}{the requirement matrix}.
+
+\end{document}

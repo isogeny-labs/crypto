@@ -2,7 +2,7 @@
   "schema": "twist.experiment-program/v1",
   "created": "2026-10-21",
   "source_scope": "NIST prime-field P-curves; registered toy structural controls first",
-  "execution_status": "E00 arithmetic preflight completed; see reports/RESULTS.md and source freeze 66f2d617cc60160b7fece7a38759ca2c61f0bae2. E01-E17 unperformed.",
+  "execution_status": "Bounded native executions recorded across E00-E17; original full campaign remains partial. See reports/EXECUTION_RESULTS.md.",
   "global_acceptance": {
     "ic_baseline_improvement": "verified matched complete-cost reduction",
     "rho": "distance reported; crossover requires separate admitted evidence",
@@ -54,7 +54,11 @@
       "measurement_and_acceptance": "All five exact coefficient differences zero; 32 issuer and 32 domain-separated checker points pass; five false variants reject.",
       "stop_and_interpretation": "Any mismatch stops use of the affected formula; no transfer or performance claim follows from passing.",
       "prerequisites": [],
-      "status": "completed arithmetic preflight only; broader group/map/solver claims remain open"
+      "status": "verified polynomial preflight and five Lean polynomial lemmas; concrete group/map bridges remain open",
+      "execution_evidence": [
+        "reports/RESULTS.md",
+        "lean/README.md"
+      ]
     },
     {
       "id": "E01",
@@ -68,7 +72,10 @@
       "prerequisites": [
         "registered exact extension models and native point verifier"
       ],
-      "status": "planned"
+      "status": "verified exhaustive bounded fixture census; general formal bridge open",
+      "execution_evidence": [
+        "execution-v1/runs/trace-20261021T2256Z/E01-fibers.json"
+      ]
     },
     {
       "id": "E02",
@@ -82,7 +89,10 @@
       "prerequisites": [
         "E01"
       ],
-      "status": "planned"
+      "status": "partial: declared restrictions executed; full larger-field norm-y/power families open",
+      "execution_evidence": [
+        "execution-v1/runs/trace-20261021T2256Z/E02-E04-bases.json"
+      ]
     },
     {
       "id": "E03",
@@ -96,7 +106,10 @@
       "prerequisites": [
         "E01"
       ],
-      "status": "planned"
+      "status": "verified 30 finite witness-set comparisons; cost comparison open",
+      "execution_evidence": [
+        "execution-v1/runs/trace-20261021T2256Z/E03-rational-equivalence.json"
+      ]
     },
     {
       "id": "E04",
@@ -110,7 +123,10 @@
       "prerequisites": [
         "E01"
       ],
-      "status": "planned"
+      "status": "partial: norm/image controls executed; larger-field fibers and costing open",
+      "execution_evidence": [
+        "execution-v1/runs/trace-20261021T2256Z/E04-norm-controls.json"
+      ]
     },
     {
       "id": "E05",
@@ -125,7 +141,10 @@
         "E01",
         "native divisor and factorization verifier"
       ],
-      "status": "planned"
+      "status": "partial: two sparse-function/divisor controls; unsplit degree 3/4 factors open",
+      "execution_evidence": [
+        "execution-v1/runs/trace-20261021T2256Z/E05-divisors.json"
+      ]
     },
     {
       "id": "E06",
@@ -139,7 +158,10 @@
       "prerequisites": [
         "E02 or E03 or E04"
       ],
-      "status": "planned"
+      "status": "partial: 1179 configured census rows, 678 verified and 501 unsupported; decomposition cost open",
+      "execution_evidence": [
+        "execution-v1/runs/trace-20261021T2256Z/E06-census.json"
+      ]
     },
     {
       "id": "E07",
@@ -153,7 +175,10 @@
       "prerequisites": [
         "E06"
       ],
-      "status": "planned"
+      "status": "partial: 240 distinct B8/H8 projection cells verified; B12/16 and other bases open",
+      "execution_evidence": [
+        "execution-v1/runs/solver-20261022T0004Z-v3/E07-projected-equivalence.json"
+      ]
     },
     {
       "id": "E08",
@@ -168,7 +193,13 @@
         "E07",
         "calibrated external-solver adapters"
       ],
-      "status": "planned"
+      "status": "partial: three 1930-cell bounded solver attempts retained; applicable signature reference, broader grid and full costs open",
+      "execution_evidence": [
+        "execution-v1/runs/solver-20261022T0004Z-v3/E08-solver-panel.json",
+        "SOLVER_PROTOCOL_V1.md",
+        "SOLVER_PROTOCOL_V2.md",
+        "SOLVER_PROTOCOL_V3.md"
+      ]
     },
     {
       "id": "E09",
@@ -183,7 +214,10 @@
         "E07",
         "registered extension models and torsion verification"
       ],
-      "status": "planned"
+      "status": "verified bounded translated-torsion controls; general proof bridge open",
+      "execution_evidence": [
+        "execution-v1/runs/geometry-20261021T2256Z/E09-torsion.json"
+      ]
     },
     {
       "id": "E10",
@@ -198,7 +232,10 @@
         "E00",
         "native smoothness and map checker"
       ],
-      "status": "planned"
+      "status": "verified exhaustive declared-family search over 27140 parameters on ten fixtures",
+      "execution_evidence": [
+        "execution-v1/runs/geometry-20261021T2256Z/E10-cover-search.json"
+      ]
     },
     {
       "id": "E11",
@@ -213,7 +250,12 @@
         "E10",
         "gluing/complement implementation"
       ],
-      "status": "planned"
+      "status": "partial: toy module filters and two-cover search; public NIST companion filter passes P-521 only; torsion/quotient/polarization/maps remain open",
+      "execution_evidence": [
+        "execution-v1/runs/geometry-20261021T2256Z/E11-gluing.json",
+        "execution-v1/runs/public3-20261022T0132Z/pari.stdout",
+        "reports/execution-20261022T0032Z/public3-20261022T0132Z/REPORT.pdf"
+      ]
     },
     {
       "id": "E12",
@@ -228,7 +270,11 @@
         "E10 or E11",
         "native divisor-class arithmetic and norm"
       ],
-      "status": "planned"
+      "status": "partial: ten executable transfers, 5855 classes, independent PARI orders; formal/independent-host class-map bridge open",
+      "execution_evidence": [
+        "execution-v1/runs/transfer-20261021T2300Z/E12-transfers.json",
+        "execution-v1/runs/pari-20261021T2349Z/E12-pari-independent-geometry.json"
+      ]
     },
     {
       "id": "E13",
@@ -242,7 +288,10 @@
       "prerequisites": [
         "E12"
       ],
-      "status": "planned"
+      "status": "partial: low-height image census; Jacobian decomposition and useful-row cost open",
+      "execution_evidence": [
+        "execution-v1/runs/geometry-20261021T2256Z/E13-images.json"
+      ]
     },
     {
       "id": "E14",
@@ -257,7 +306,11 @@
         "E07",
         "verified map adapters"
       ],
-      "status": "planned"
+      "status": "verified bounded map/dual construction: three explicit degree-seven maps and all three algebraic duals in V2; full IC costs open",
+      "execution_evidence": [
+        "execution-v1/runs/isogeny-20261021T2320Z/E14-isogenies.json",
+        "execution-v1/runs/isogeny-20261022T0054Z-v2/E14-isogenies.json"
+      ]
     },
     {
       "id": "E15",
@@ -273,7 +326,11 @@
         "E08",
         "E12 for cover cells"
       ],
-      "status": "planned"
+      "status": "partial: 1920 native records, 1704 verified and identically replayed, 216 empty-base errors; calibrated full cost and independent host open",
+      "execution_evidence": [
+        "execution-v1/runs/ecbench-20261022T0012Z/records.jsonl",
+        "execution-v1/logs/E15-audit-v1.json"
+      ]
     },
     {
       "id": "E16",
@@ -287,7 +344,11 @@
       "prerequisites": [
         "exact public-parameter and transfer checker"
       ],
-      "status": "planned"
+      "status": "verified fifteen public-parameter checks and known degree-two pairing positive control; no NIST transfer supplied",
+      "execution_evidence": [
+        "execution-v1/runs/conditional-20261021T2256Z/E16-applicability.json",
+        "execution-v1/runs/pairing-20261022T0024Z-v2/E16-pairing-positive-control.json"
+      ]
     },
     {
       "id": "E17",
@@ -301,7 +362,13 @@
       "prerequisites": [
         "separate arithmetic-lift construction and height protocol"
       ],
-      "status": "planned"
+      "status": "partial: integral and two 254-case rational-height panels; one rank interval, target lifting and discovery cost open",
+      "execution_evidence": [
+        "execution-v1/runs/conditional-20261021T2256Z/E17-lifts.json",
+        "execution-v1/runs/pari-20261021T2349Z/E17-rational-height-and-rank.json",
+        "execution-v1/runs/pari-20261022T0020Z-original-height/E17-rational-height-and-rank.json"
+      ]
     }
-  ]
+  ],
+  "updated": "2026-10-22"
 }

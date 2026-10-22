@@ -1,3 +1,6 @@
 # Preserve raw process output, including Cargo's trailing blank line.
 reports/run-*/*.stdout whitespace=-blank-at-eof
-execution-v1/**/*.stdout whitespace=-blank-at-eof
+reports/**/*.stdout whitespace=-blank-at-eof
+reports/**/*.stderr whitespace=-blank-at-eof
+execution-v1/**/*.stdout whitespace=-blank-at-eof,-blank-at-eol
+execution-v1/**/*.stderr whitespace=-blank-at-eof,-blank-at-eol

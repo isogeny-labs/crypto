@@ -2,19 +2,19 @@
 
 Date: 2026-10-21. Scope: pursue routes 1–3 and their combinations, devise discriminating experiments, and preserve adjacent conditional routes without claiming an algorithm or novelty.
 
-This program extends [PR #2380](https://github.com/aburan28/crypto/pull/2380) and the [central tracker](../notes/index-calculus/RESEARCH_TWIST_IC_ROUTES_1_3.md). It does not substitute an unexecuted plan for measured results. Only E00 has an implementation here; E01–E17 are designed experiments, not launched jobs.
+This program extends [PR #2380](https://github.com/aburan28/crypto/pull/2380) and the [central tracker](../notes/index-calculus/RESEARCH_TWIST_IC_ROUTES_1_3.md). It does not substitute an unexecuted plan for measured results. Bounded native panels have now run; the [execution results](reports/EXECUTION_RESULTS.md) separate verified finite checks, partial measurements and remaining construction/validation gaps. The original acceptance criteria below are retained.
 
 ## Questions and deliverables
 
 | Requested item | Deliverable | Status |
 | --- | --- | --- |
-| Pursue trace restrictions | Explicit coordinate, slope, norm, multiplicative and divisor families; E01–E06 | Designed; native point/collector implementations pending |
-| Pursue covers | Explicit C_c family and complement equations, gluing alternatives, subgroup/class-map gates; E10–E13 | Designed; executable transfer not established |
-| Pursue solver symmetry | Four membership encodings, equivalent rational witnesses, torsion descent and solver panel; E07–E09 | Designed; solver adapters and matching outputs pending |
-| Pursue combinations | Representation/isogeny ablations and full factorial pipeline panel; E14–E15 | Designed; requires the component checks |
-| Preserve other angles | Exact pairing applicability and bounded characteristic-zero lifting ingress; E16–E17 | Conditional designs; no usable transfer assumed |
-| Make formula checks reproducible | Independent small Rust crate reusing the repository identity checker | E00 arithmetic preflight passed; group/map/solver interpretation remains open |
-| Preserve follow-up execution | Three versioned backlog protocols, machine-readable experiment matrix, graph and report PDF | Included in this PR; cards remain blocked until their missing drivers are available |
+| Pursue trace restrictions | Explicit coordinate, slope, norm, multiplicative and divisor families; E01–E06 | Bounded native restrictions/censuses executed; broader full-cost criteria open |
+| Pursue covers | Explicit C_c family and complement equations, gluing alternatives, subgroup/class-map gates; E10–E13 | Ten executable class transfers checked; destination solver/full cost open |
+| Pursue solver symmetry | Four membership encodings, equivalent rational witnesses, torsion descent and solver panel; E07–E09 | Equivalent systems and three bounded solver attempts executed; broader grid/full cost open |
+| Pursue combinations | Representation/isogeny ablations and full factorial pipeline panel; E14–E15 | 1,920 native factorial records; 1,704 exact verified replays; cost calibration open |
+| Preserve other angles | Exact pairing applicability and bounded characteristic-zero lifting ingress; E16–E17 | Public applicability and bounded lift/pairing controls executed; no NIST transfer supplied |
+| Make formula checks reproducible | Independent small Rust crate reusing the repository identity checker | E00 and nine explicit Lean lemmas checked; concrete field/group/map bridges remain open |
+| Preserve follow-up execution | Three versioned backlog protocols, machine-readable experiment matrix, graph and report PDF | Results and receipts recorded; cards remain blocked for unmet full-campaign criteria |
 
 ## Common mathematical contract
 
@@ -106,7 +106,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E00 — Polynomial preflight
 
-- **Route / status:** common / completed arithmetic preflight only; see reports/RESULTS.md.
+- **Route / status:** common / verified polynomial preflight and five Lean polynomial lemmas; concrete group/map bridges remain open.
 - **Question:** Do the proposed trace and complement coordinate formulas satisfy their exact cleared-denominator polynomial identities?
 - **Arms and inputs:** Five compiled statement ASTs; exact integer coefficient expansion and repository identity certificates; deliberately false +1 variants.
 - **Controls:** Exact expansion and modular evaluation are different arithmetic checks; all negative variants must reject.
@@ -116,7 +116,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E01 — Trace fibers and separation
 
-- **Route / status:** 1 / planned.
+- **Route / status:** 1 / verified exhaustive bounded fixture census; general formal bridge open.
 - **Question:** Which apparent relation gains are just multiple lifts of the same trace?
 - **Arms and inputs:** All points on the two registered odd-prime-order toy curves over the declared quadratic extension; add separate registered even-order and odd-composite controls.
 - **Controls:** Rational-only traces; pure twist trace zero; S+U with U in ker(tau); identity; rational 2-primary cases.
@@ -126,7 +126,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E02 — Coordinate boxes
 
-- **Route / status:** 1 / planned.
+- **Route / status:** 1 / partial: declared restrictions executed; full larger-field norm-y/power families open.
 - **Question:** Do small coordinate boxes create a useful small trace base with cheaper membership or decomposition?
 - **Arms and inputs:** S=(u+v omega,w+z omega) with u in U and v in V; H in {2,4,8}; enumerate both y signs and branches.
 - **Controls:** Exact-image rational base; same-size hash-selected rational base; unrestricted lift control.
@@ -136,7 +136,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E03 — Slope and real-part restrictions
 
-- **Route / status:** 1+3 / planned.
+- **Route / status:** 1+3 / verified 30 finite witness-set comparisons; cost comparison open.
 - **Question:** Does restricting u and m=z/v help beyond a rational parametrization of X=m^2-2u?
 - **Arms and inputs:** u in U and m in M, H in {2,4,8}; enforce 4dv^2=Delta_T(m); add independent v restriction as an ablation.
 - **Controls:** Same quartic witness written entirely over Fp; exact-F table; ordinary low-degree addition witnesses.
@@ -146,7 +146,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E04 — Norm and multiplicative restrictions
 
-- **Route / status:** 1 / planned.
+- **Route / status:** 1 / partial: norm/image controls executed; larger-field fibers and costing open.
 - **Question:** Can norm constraints or multiplicative structure reduce solve cost after parameterization and membership are charged?
 - **Arms and inputs:** Norm(x)=u^2-dv^2 in W; norm(y) restrictions; H-th-power or subgroup conditions only when H divides p-1; intersect with a trace-box family.
 - **Controls:** Same F without norm witnesses; same-size rational base; matched subgroup-size control; nonsquare d rescaling.
@@ -156,7 +156,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E05 — Divisors and degree-two places
 
-- **Route / status:** 1+2 / planned.
+- **Route / status:** 1+2 / partial: two sparse-function/divisor controls; unsplit degree 3/4 factors open.
 - **Question:** Can generic conjugate pairs help smooth-divisor relations when the principal pure-twist pairs are removed?
 - **Arms and inputs:** Sparse rational functions a(x)+y b(x), coefficient support frozen; distinguish x in Fp from genuinely nonrational degree-two places.
 - **Controls:** Remove divisors of x-x0 before forming rows; rational-only function family; generic degree-two-place control.
@@ -166,7 +166,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E06 — Exact relation census
 
-- **Route / status:** 1+3 / planned.
+- **Route / status:** 1+3 / partial: 1179 configured census rows, 678 verified and 501 unsupported; decomposition cost open.
 - **Question:** Which restricted bases actually span the needed target rows?
 - **Arms and inputs:** m in {2,3,4}, B in {8,12,16}; all nonidentity targets for tiny fixtures; freeze sign/orbit conventions.
 - **Controls:** Complete enumeration or MITM oracle; identical projected base and target; raw versus canonicalized rows.
@@ -176,7 +176,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E07 — Equivalent system builders
 
-- **Route / status:** 3 / planned.
+- **Route / status:** 3 / partial: 240 distinct B8/H8 projection cells verified; B12/16 and other bases open.
 - **Question:** Which membership representation avoids merely moving cost into a higher-degree constraint?
 - **Arms and inputs:** Univariate product membership, bit decomposition with proven range, selector/product chains and explicit branching.
 - **Controls:** Untwisted addition chain; exact same projected F; independently enumerated projected solutions.
@@ -186,7 +186,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E08 — Solver and ordering panel
 
-- **Route / status:** 3 / planned.
+- **Route / status:** 3 / partial: three 1930-cell bounded solver attempts retained; applicable signature reference, broader grid and full costs open.
 - **Question:** Does symmetry reduce actual solving cost against the strongest equivalent encoding?
 - **Arms and inputs:** Frozen variable orders, chain/quadratized/symmetric encodings; msolve/open reference plus available applicable F4/F5 engines.
 - **Controls:** A/A runs; untwisted witness system; redundant-variable positive/negative controls; same output verifier.
@@ -196,7 +196,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E09 — Torsion over extensions
 
-- **Route / status:** 1+3 / planned.
+- **Route / status:** 1+3 / verified bounded translated-torsion controls; general proof bridge open.
 - **Question:** Can torsion symmetry survive Galois descent without false factor-base compression?
 - **Arms and inputs:** 2-torsion over Fp^3 and combined Fp^6 where applicable; Galois-invariant coordinates and descent constraints.
 - **Controls:** No-torsion encoding; [2] map on the odd subgroup; retained extension-field cost; rational torsion special-family control.
@@ -206,7 +206,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E10 — Explicit degree-two covers
 
-- **Route / status:** 2 / planned.
+- **Route / status:** 2 / verified exhaustive declared-family search over 27140 parameters on ten fixtures.
 - **Question:** When is the complementary elliptic quotient actually the required twist?
 - **Arms and inputs:** C_c: v^2=f(u^2+c), f(c)!=0; quotient E and D_c: z^2=t f(t+c); use the explicit short complement coefficients.
 - **Controls:** Reject f(c)=0; same-j only control; trace-opposite only control; explicit Fp isomorphism check.
@@ -216,7 +216,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E11 — Gluing and alternative complements
 
-- **Route / status:** 2 / planned.
+- **Route / status:** 2 / partial: module filters and two-cover search; three positive toy module cases and the public P-521 module filter need actual torsion/polarization/quotient/map constructions.
 - **Question:** Do other gluing orders or complementary-factor constructions provide a better executable route?
 - **Arms and inputs:** Galois-equivariant 2/3-torsion gluing where applicable; recover the complement from a supplied cover; bounded typed candidate families.
 - **Controls:** Degenerate/product polarization control; incompatible Frobenius control; identical-field checks.
@@ -226,7 +226,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E12 — Jacobian arithmetic and recovery
 
-- **Route / status:** 2 / planned.
+- **Route / status:** 2 / partial: ten executable transfers, 5855 classes, independent PARI orders; formal/independent-host class-map bridge open.
 - **Question:** Does the proposed transfer work on the divisor classes the collector actually produces?
 - **Arms and inputs:** Pullback/norm on the chosen infinity model; arbitrary valid reduced classes; image subgroup order and recovery.
 - **Controls:** phi_*phi^*=[degree]; origin and ramified fibers; independent CAS; direct-E solver.
@@ -236,7 +236,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E13 — Restricted cover images
 
-- **Route / status:** 1+2 / planned.
+- **Route / status:** 1+2 / partial: low-height image census; Jacobian decomposition and useful-row cost open.
 - **Question:** Can restricting cover points give a small base without a worse membership or map problem?
 - **Arms and inputs:** All-C(Fp) control; restricted u/trace/norm supports; degree/genus ladder only with frozen factored maps.
 - **Controls:** Same projected base on E; fixed-genus image bound; independent point counts.
@@ -246,7 +246,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E14 — Model and isogeny ablations
 
-- **Route / status:** 1+2+3 / planned.
+- **Route / status:** 1+2+3 / verified bounded map/dual construction: three explicit degree-seven maps and all three algebraic duals in V2; full IC costs open.
 - **Question:** Are any savings due to cheaper constants or another isogenous representative rather than new relations?
 - **Arms and inputs:** Nonsquare d choices, x-preserving/standard twist models, fixed small-degree rational isogeny routes and verified return maps.
 - **Controls:** Equivalent direct-E representation; same source target/subgroup; conversion charged both ways.
@@ -256,7 +256,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E15 — Factorial pipeline ablation
 
-- **Route / status:** 1+2+3 / planned.
+- **Route / status:** 1+2+3 / partial: 1920 native records, 1704 verified and identically replayed, 216 empty-base errors; calibrated full cost and independent host open.
 - **Question:** Which component or combination improves the actual IC baseline?
 - **Arms and inputs:** Trace restriction on/off, cover on/off, solver symmetry on/off; pairs use equal target/base or explicitly separate changed-base studies.
 - **Controls:** Strongest current IC baseline; strongest same-target rho; direct destination generic solver; independent holdouts.
@@ -266,7 +266,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E16 — Homomorphism and pairing applicability
 
-- **Route / status:** conditional / planned.
+- **Route / status:** conditional / verified fifteen public-parameter checks and known degree-two pairing positive control; no NIST transfer supplied.
 - **Question:** Do small twist factors or a pairing actually supply an admissible transfer on the original subgroup?
 - **Arms and inputs:** Exact gcd(r,#E_tw), embedding-degree and torsion/Frobenius tests on the declared public parameters.
 - **Controls:** Trace/norm killing pure anti-invariants; translated-coset control; known small-embedding-degree positive family kept separate.
@@ -276,7 +276,7 @@ The canonical machine-readable version is [experiments.json](experiments.json). 
 
 ### E17 — Arithmetic lift and twist ingress
 
-- **Route / status:** conditional / planned.
+- **Route / status:** conditional / partial: integral and two 254-case rational-height panels; one rank interval, target lifting and discovery cost open.
 - **Question:** Could a characteristic-zero twist reduce to E while providing a usable small-height relation source?
 - **Arms and inputs:** Only twists whose parameter is square mod p for a same-E reduction; bounded height/rank/search families stated before a pilot.
 - **Controls:** Nonsquare reduction goes to the other finite-field component; fixed-lift and equal-height controls; charge discovery and target lifting.
@@ -306,7 +306,7 @@ Use the repository's single-target ecbench contract for method comparisons. Repo
 
 For solver experiments, export exactly the same systems and verify full projected solution sets before ranking. Compare with the fastest available applicable external implementation; missing Magma or other proprietary comparisons are named, not silently replaced by a weaker reference. Exponents require at least four sizes and full phase costs; two toy fixtures are not a scaling result.
 
-Per-cell execution limits are frozen after cost calibration. Stop the affected cell on a correctness mismatch. Preserve budget exhaustion as an incomplete outcome under the original envelope. A null result closes the tested family only, not every possible twist-related construction.
+For an admitted performance comparison, freeze per-cell limits after cost calibration. The initial L0 diagnostic caps were frozen before execution, with full calibration still open and no speed claim admitted. Stop the affected cell on a correctness mismatch. Preserve budget exhaustion as an incomplete outcome under the original envelope. A null result closes the tested family only, not every possible twist-related construction.
 
 ## Dependency and execution order
 
@@ -320,7 +320,7 @@ Per-cell execution limits are frozen after cost calibration. Stop the affected c
 
 See [PROGRAM.svg](PROGRAM.svg) for the dependency diagram.
 
-![Experiment dependencies; only the E00 arithmetic preflight has run](PROGRAM.pdf)
+![Experiment dependencies and bounded execution; the original full campaign remains partial](PROGRAM.pdf)
 
 The PDF includes that same diagram. No performance dashboard value changes until a result meets the repository validation gate.
 
@@ -328,11 +328,11 @@ The PDF includes that same diagram. No performance dashboard value changes until
 
 | Item | Check implemented here | Remaining proof / execution obligation |
 | --- | --- | --- |
-| Chord polynomial division and quartic expansion | Exact coefficient comparison and evaluated identity certificates in E00 | Faithful checked Lean statements; elliptic group and exceptional-chart bridge |
-| Complement coefficients and cleared model conversion | Same E00 arithmetic checks | Smoothness, complete maps, field-defined isomorphism, Jacobian maps and subgroup recovery |
-| Trace-fiber and separation statements | No new group implementation in this study | Native group census plus formal group/Frobenius bridge |
+| Chord polynomial division and quartic expansion | E00 coefficient/evaluated certificates and corresponding Lean identities | Concrete elliptic group and exceptional-chart bridge |
+| Complement coefficients and cleared model conversion | E00 arithmetic, Lean identities and ten executable toy class transfers | Faithful formal field/chart/Jacobian maps and independent arbitrary-class replay |
+| Trace-fiber and separation statements | Nine exhaustive native censuses and four conditional Weierstrass point-group Lean statements | Concrete finite-field Frobenius/twist and odd-subgroup bridge |
 | Image-size bound | A stated standard bound with explicit hypotheses | Applicable curve/morphism hypotheses and proof mapping for any selected candidate |
-| Solver equivalence and benefit | No solver measurement | E06–E08 complete projected-output checks and counted comparisons |
+| Solver equivalence and benefit | 240 distinct projection checks, bounded solver panels and native IC/replay | Broader grids, complete applicable external reference and calibrated full costs |
 | NIST-size applicability or novelty | Not established | Separate scalable construction, applicable evidence and a literature novelty audit |
 
 A certificate with proof=null is evaluated-tier, not a Lean proof. Different checker points in one process do not constitute independent-host replay. Clearing denominators certifies only a polynomial identity; it does not prove the original rational map is defined everywhere.
@@ -347,6 +347,6 @@ A certificate with proof=null is evaluated-tier, not a Lean proof. Different che
 - [Higher-genus implementation contract](../../.agents/skills/ecdlp-surfaces/references/higher-genus.md), [identity certificate contract](../../docs/identity-certificates/README.md).
 - [PR #2368](https://github.com/aburan28/crypto/pull/2368), unmerged prior mixed-component study at the time this program was written; no new replay of its results is claimed here.
 
-## Executed preflight
+## Execution evidence
 
-[E00 result report](reports/RESULTS.md): five exact polynomial coefficient checks and evaluated certificates passed; five false variants were rejected, with 22 supporting unit tests passing. E01–E17 remain unperformed. No measured speedup, transfer or novelty claim follows.
+The historical [E00 preflight report](reports/RESULTS.md) checks five exact polynomial identities and evaluated certificates, rejects five false variants, and records 22 supporting tests. The subsequent [bounded execution report](reports/EXECUTION_RESULTS.md) and per-experiment statuses above record E01–E17 execution/applicability evidence and every remaining original requirement. No calibrated speedup or novelty claim follows.

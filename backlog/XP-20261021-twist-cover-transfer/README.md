@@ -1,6 +1,6 @@
 # Twist route 2: explicit cover, Jacobian subgroup maps and destination solver
 
-- **Status:** blocked; tracking only, no run launched.
+- **Status:** blocked for the full campaign; bounded local panels completed on 2026-10-21–22.
 - **Tracker:** [routes 1–3](../../research/notes/index-calculus/RESEARCH_TWIST_IC_ROUTES_1_3.md).
 - **Blocker:** [missing constraint and solver comparison](../../problems/twist-trace-constraint-and-solver-gap.md).
 - **Prior work:** [PR #2368](https://github.com/aburan28/crypto/pull/2368), unmerged when this card was prepared.
@@ -13,7 +13,7 @@ A constructed curve with checked divisor maps and subgroup recovery would make t
 
 ## Prerequisites and next step
 
-No selected cover has a checked twist complement, supported divisor arithmetic, explicit subgroup transfer and costed destination solver for this study.
+Ten selected covers now have checked complements and executable divisor-class transfer. A costed Jacobian decomposition solver, complete accounting and independent-host class-map replay remain open.
 
 Select a bounded construction family, freeze its candidates, and certify a smooth curve, correct infinity model, induced pullback/norm, subgroup kernel and scalar recovery before benchmarking.
 
@@ -21,7 +21,7 @@ Controls: Necessary Frobenius filter separated from existence; product/direct-E 
 
 ## Cost and resources
 
-No executed pilot or native driver supports a runtime estimate, so core-hours and wall-hours are null. The one-CPU, 4-GB RAM, 1-GB disk fields are nominal card metadata, not a sizing claim or an allocation. Replace them with a justified envelope and a resumable command before readiness. The one-second timeout and `false` command deliberately fail closed; they do not describe a scientific run.
+Bounded local runs and native drivers now exist, with receipts and process limits in the execution report. Full-campaign runtime estimates remain null. The nominal card resource fields and failing sentinel describe no completed run and must be replaced before future readiness.
 
 Proposed funding is zero, below the existing funded seed cards. Nothing is posted to cairn and no spending or execution priority is changed.
 
@@ -39,3 +39,7 @@ A null result closes only the frozen candidate/question. A stage gain does not e
 ## Expanded experiment design
 
 [Route protocol](PROTOCOL.md) now defines the owned experiments, controls, falsifiers, dependencies and readiness conditions. The [18-experiment program](../../research/twist_routes_1_3_20261021/EXPERIMENTS.md) also contains the coupled trace/solver and cover/pipeline panels. No broader experiment has been launched merely by recording its design.
+
+## Bounded execution update, 2026-10-22
+
+Ten selected covers have executable class pullback/norm checks, independent PARI orders and bounded image controls. Three explicit isogenies now have algebraic duals. Positive three-gluing quotient/polarization construction, Jacobian decomposition, formal/independent-host map replay and complete costs remain open. See the [result and requirement table](../../research/twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.md), exact receipts and source/protocol freezes. All original acceptance items above remain requirements; local correctness evidence is not a complete-cost improvement. No funded or remote full campaign is running.

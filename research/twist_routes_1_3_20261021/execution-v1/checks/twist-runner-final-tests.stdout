@@ -1,0 +1,148 @@
+
+running 13 tests
+test source_sha256::tests::sha224_abc ... ok
+test source_sha256::tests::sha256_block_boundary_55 ... ok
+test source_sha256::tests::sha224_empty ... ok
+test source_sha256::tests::sha256_fips180_112byte ... ok
+test source_sha256::tests::sha256_empty ... ok
+test source_sha256::tests::sha256_fips180_56byte ... ok
+test source_sha256::tests::sha256_hello_world ... ok
+test source_sha256::tests::sha256_abc ... ok
+test source_sha256::tests::sha256_two_blocks_64 ... ok
+test source_sha256::tests::sha_extensions_agree_with_the_portable_rounds ... ok
+test source_sha256::tests::streaming_matches_one_shot_at_every_split ... ok
+test source_sha256::tests::streaming_million_a ... ok
+test source_sha256::tests::sha256_million_a ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 99 tests
+test f4_fp::degree_bound_solve_tests::truncated_run_must_not_certify_solutions ... ok
+test f4_fp::packed_set_tests::a_tail_that_does_not_pack_only_matters_to_the_element_that_divides ... ok
+test f4_fp::packed_set_tests::a_lead_that_packs_is_kept_when_the_tail_does_not ... ok
+test f4_fp::packed_set_tests::a_set_of_mixed_widths_is_not_packed ... ok
+test f4_fp::packed_set_tests::an_element_with_an_unpackable_tail_still_reduces_the_others ... ok
+test f4_fp::packed_set_tests::first_divisor_skips_only_the_skipped ... ok
+test f4_fp::packed_set_tests::empty_polynomials_and_a_modulus_of_one_are_taken_as_before ... ok
+test f4_fp::packed_set_tests::invmod_inverts ... ok
+test f4_fp::packed_set_tests::packed_monomials_behave_like_exponent_vectors ... ok
+test f4_fp::packed_set_tests::lex_bases_with_large_exponents_are_interreduced ... ok
+test f4_fp::packed_set_tests::normalise_matches_the_map_based_original ... ok
+test f4_fp::tests::autoreduce_keeps_generators_with_equal_leading_monomials ... ok
+test f4_fp::packed_set_tests::reduction_by_what_does_not_pack_falls_back ... ok
+test f4_fp::tests::avx512_lazy_accumulation_matches_scalar_at_boundaries ... ok
+test f4_fp::tests::avx2_lazy_accumulation_matches_scalar_at_boundaries ... ok
+test f4_fp::tests::barrett_matches_the_hardware_remainder ... ok
+test f4_fp::tests::blocked_pair_reduction_matches_direct_product ... ok
+test f4_fp::tests::circle_and_line_over_f7_match_buchberger ... ok
+test f4_fp::tests::degree_bound_truncates_and_reports_it ... ok
+test f4_fp::tests::hilbert_function_of_a_complete_intersection ... ok
+test f4_fp::tests::hilbert_stop_falls_back_when_the_leading_forms_are_not_regular ... ok
+test f4_fp::packed_set_tests::exponents_straddling_the_packed_range_agree_across_the_paths ... ok
+test f4_fp::tests::inconsistent_system_is_refuted ... ok
+test f4_fp::tests::narrow_arithmetic_matches_wide_rref ... ok
+test f4_fp::tests::narrow_f4_matches_wide_basis ... ok
+test f4_fp::tests::random_zero_dimensional_systems_agree_with_brute_force ... ok
+test f4_fp::tests::run_log_is_opt_in ... ok
+test f4_fp::tests::solving_degree_max_sees_the_highest_productive_step ... ok
+test f4_fp::tests::staircase_counts_standard_monomials ... ok
+test f4_fp::tests::stopping_below_a_staircase_keeps_every_solution ... ok
+test fx_hash::tests::maps_behave_like_std_maps ... ok
+test fx_hash::tests::mask_hash_spreads_masks_without_low_bits ... ok
+test groebner_f4::tests::buchberger_circle_intersect_line_over_f7 ... ok
+test groebner_f4::tests::buchberger_constant_ideal ... ok
+test f4_fp::packed_set_tests::packed_reduction_matches_the_vector_reduction ... ok
+test groebner_f4::tests::buchberger_solves_linear_system ... ok
+test groebner_f4::tests::grevlex_ordering_within_a_degree ... ok
+test groebner_f4::tests::s_polynomial_of_coprime_polys_pre_reduction ... ok
+test isogeny::tests::order_three_velu_standard_control ... ok
+test groebner_f4::tests::reduction_of_x_squared_plus_y_by_x ... ok
+test solver::tests::external_serialization_is_ascii_and_preserves_all_models ... ok
+test solver::tests::x_only_law_matches_independent_full_group ... ok
+test source_field::tests::add_mod ... ok
+test source_field::tests::inv_fermat ... ok
+test source_field::tests::inv_vartime_matches_inv ... ok
+test source_field::tests::mul_mod ... ok
+test source_field::tests::neg_vartime_matches_neg ... ok
+test source_field::tests::pow_identity ... ok
+test source_field::tests::sub_vartime_matches_sub ... ok
+test source_field::tests::sub_wrap ... ok
+test source_point::tests::double_then_add ... ok
+test jacobian::tests::transport_and_exceptional_infinity_charts ... ok
+test source_point::tests::ladder_matches_double_and_add ... ok
+test f4_fp::tests::hilbert_stop_gives_the_same_reduced_basis_as_the_plain_run ... ok
+test source_point::tests::ladder_matches_double_and_add_p256 ... ok
+test source_point::tests::neg_point ... ok
+test source_point::tests::scalar_mul_one ... ok
+test f4_fp::tests::basis_from_the_parallel_path_is_a_reduced_groebner_basis ... ok
+test source_point::tests::scalar_mul_zero ... ok
+test source_point::tests::vartime_add_double_match_reference ... ok
+test source_point::vartime_differential::composite_modulus_non_units_match_constant_time ... ok
+test source_point::vartime_differential::composite_modulus_panics_match_constant_time ... ok
+test source_point::vartime_differential::field_vartime_matches_constant_time ... ok
+test source_point::tests::scalar_mul_vartime_matches_scalar_mul ... ok
+test source_point::vartime_differential::linear_dlog_vartime_unreduced_points_match_reference_search ... ok
+test source_point::vartime_differential::linear_dlog_vartime_matches_reference_search ... ok
+test source_sha256::tests::sha224_abc ... ok
+test source_sha256::tests::sha224_empty ... ok
+test source_sha256::tests::sha256_abc ... ok
+test source_sha256::tests::sha256_block_boundary_55 ... ok
+test source_sha256::tests::sha256_empty ... ok
+test source_sha256::tests::sha256_fips180_112byte ... ok
+test source_sha256::tests::sha256_fips180_56byte ... ok
+test source_sha256::tests::sha256_hello_world ... ok
+test source_sha256::tests::sha256_million_a ... ok
+test source_sha256::tests::sha256_two_blocks_64 ... ok
+test source_sha256::tests::sha_extensions_agree_with_the_portable_rounds ... ok
+test source_sha256::tests::streaming_matches_one_shot_at_every_split ... ok
+test source_point::tests::jacobian_scalar_mul_matches_affine_double_and_add ... ok
+test source_sha256::tests::streaming_million_a ... ok
+test source_symmetrized::tests::decompose_power_sum_2 ... ok
+test source_symmetrized::tests::elementary_symmetric_sanity ... ok
+test source_symmetrized::tests::mpoly_arithmetic_sanity ... ok
+test source_symmetrized::tests::mul_keeps_constant_when_a_term_cancels ... ok
+test source_symmetrized::tests::symmetrise_s3_runs ... ok
+test toy_field::tests::quad_roots_and_group_reference ... ok
+test source_symmetrized::tests::s3_symmetrisation_reduces_monomial_count ... ok
+test toy_field::tests::sext_tower_and_torsion ... ok
+test twist_ic_algebra::tests::pair_membership_is_exact_in_both_orders ... ok
+test utils::random::tests::random_scalar_checked_rejects_empty_ranges ... ok
+test utils::encoding::tests::checked_bigint_encoder_rejects_overflow ... ok
+test utils::tests::mod_inverse_small_moduli_keep_their_behaviour ... ok
+test utils::tests::mod_inverse_of_one_mod_zero_still_divides_by_zero - should panic ... ok
+test utils::tests::mod_inverse_word_path_matches_bigint_path_at_the_edges ... ok
+test utils::tests::mod_inverse_wide_moduli_return_normalised_inverses ... ok
+test utils::tests::mod_inverse_word_path_on_fibonacci_pairs ... ok
+test source_point::tests::linear_dlog_vartime_matches_affine_search ... ok
+test utils::tests::mod_inverse_word_path_matches_bigint_path_on_random_inputs ... ok
+test source_point::vartime_differential::point_vartime_matches_constant_time ... ok
+
+test result: ok. 99 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.62s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 16 tests
+test source_sha256::tests::sha224_abc ... ok
+test source_sha256::tests::sha256_abc ... ok
+test source_sha256::tests::sha256_block_boundary_55 ... ok
+test source_sha256::tests::sha224_empty ... ok
+test source_sha256::tests::sha256_empty ... ok
+test source_sha256::tests::sha256_fips180_112byte ... ok
+test source_sha256::tests::sha256_fips180_56byte ... ok
+test source_sha256::tests::sha256_hello_world ... ok
+test source_sha256::tests::sha256_two_blocks_64 ... ok
+test source_sha256::tests::sha_extensions_agree_with_the_portable_rounds ... ok
+test source_sha256::tests::streaming_matches_one_shot_at_every_split ... ok
+test source_sha256::tests::streaming_million_a ... ok
+test tests::reduced_tate_pairing_is_nondegenerate_and_bilinear_on_positive_control ... ok
+test toy_field::tests::sext_tower_and_torsion ... ok
+test toy_field::tests::quad_roots_and_group_reference ... ok
+test source_sha256::tests::sha256_million_a ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

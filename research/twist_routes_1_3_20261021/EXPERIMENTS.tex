@@ -95,8 +95,11 @@ This program extends
 \href{https://github.com/aburan28/crypto/pull/2380}{PR \#2380} and the
 \href{../notes/index-calculus/RESEARCH_TWIST_IC_ROUTES_1_3.md}{central
 tracker}. It does not substitute an unexecuted plan for measured
-results. Only E00 has an implementation here; E01--E17 are designed
-experiments, not launched jobs.
+results. Bounded native panels have now run; the
+\href{reports/EXECUTION_RESULTS.md}{execution results} separate verified
+finite checks, partial measurements and remaining
+construction/validation gaps. The original acceptance criteria below are
+retained.
 
 \subsection{Questions and
 deliverables}\label{questions-and-deliverables}
@@ -118,27 +121,28 @@ Status
 \bottomrule\noalign{}
 \endlastfoot
 Pursue trace restrictions & Explicit coordinate, slope, norm,
-multiplicative and divisor families; E01--E06 & Designed; native
-point/collector implementations pending \\
+multiplicative and divisor families; E01--E06 & Bounded native
+restrictions/censuses executed; broader full-cost criteria open \\
 Pursue covers & Explicit C\_c family and complement equations, gluing
-alternatives, subgroup/class-map gates; E10--E13 & Designed; executable
-transfer not established \\
+alternatives, subgroup/class-map gates; E10--E13 & Ten executable class
+transfers checked; destination solver/full cost open \\
 Pursue solver symmetry & Four membership encodings, equivalent rational
-witnesses, torsion descent and solver panel; E07--E09 & Designed; solver
-adapters and matching outputs pending \\
+witnesses, torsion descent and solver panel; E07--E09 & Equivalent
+systems and three bounded solver attempts executed; broader grid/full
+cost open \\
 Pursue combinations & Representation/isogeny ablations and full
-factorial pipeline panel; E14--E15 & Designed; requires the component
-checks \\
+factorial pipeline panel; E14--E15 & 1,920 native factorial records;
+1,704 exact verified replays; cost calibration open \\
 Preserve other angles & Exact pairing applicability and bounded
-characteristic-zero lifting ingress; E16--E17 & Conditional designs; no
-usable transfer assumed \\
+characteristic-zero lifting ingress; E16--E17 & Public applicability and
+bounded lift/pairing controls executed; no NIST transfer supplied \\
 Make formula checks reproducible & Independent small Rust crate reusing
-the repository identity checker & E00 arithmetic preflight passed;
-group/map/solver interpretation remains open \\
+the repository identity checker & E00 and nine explicit Lean lemmas
+checked; concrete field/group/map bridges remain open \\
 Preserve follow-up execution & Three versioned backlog protocols,
-machine-readable experiment matrix, graph and report PDF & Included in
-this PR; cards remain blocked until their missing drivers are
-available \\
+machine-readable experiment matrix, graph and report PDF & Results and
+receipts recorded; cards remain blocked for unmet full-campaign
+criteria \\
 \end{longtable}
 
 \subsection{Common mathematical
@@ -305,8 +309,8 @@ preflight}\label{e00-polynomial-preflight}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} common / completed arithmetic preflight only;
-  see reports/RESULTS.md.
+  \textbf{Route / status:} common / verified polynomial preflight and
+  five Lean polynomial lemmas; concrete group/map bridges remain open.
 \item
   \textbf{Question:} Do the proposed trace and complement coordinate
   formulas satisfy their exact cleared-denominator polynomial
@@ -337,7 +341,8 @@ separation}\label{e01-trace-fibers-and-separation}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 1 / planned.
+  \textbf{Route / status:} 1 / verified exhaustive bounded fixture
+  census; general formal bridge open.
 \item
   \textbf{Question:} Which apparent relation gains are just multiple
   lifts of the same trace?
@@ -365,7 +370,8 @@ separation}\label{e01-trace-fibers-and-separation}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 1 / planned.
+  \textbf{Route / status:} 1 / partial: declared restrictions executed;
+  full larger-field norm-y/power families open.
 \item
   \textbf{Question:} Do small coordinate boxes create a useful small
   trace base with cheaper membership or decomposition?
@@ -393,7 +399,8 @@ restrictions}\label{e03-slope-and-real-part-restrictions}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 1+3 / planned.
+  \textbf{Route / status:} 1+3 / verified 30 finite witness-set
+  comparisons; cost comparison open.
 \item
   \textbf{Question:} Does restricting u and m=z/v help beyond a rational
   parametrization of X=m\^{}2-2u?
@@ -420,7 +427,8 @@ restrictions}\label{e04-norm-and-multiplicative-restrictions}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 1 / planned.
+  \textbf{Route / status:} 1 / partial: norm/image controls executed;
+  larger-field fibers and costing open.
 \item
   \textbf{Question:} Can norm constraints or multiplicative structure
   reduce solve cost after parameterization and membership are charged?
@@ -448,7 +456,8 @@ places}\label{e05-divisors-and-degree-two-places}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 1+2 / planned.
+  \textbf{Route / status:} 1+2 / partial: two sparse-function/divisor
+  controls; unsplit degree 3/4 factors open.
 \item
   \textbf{Question:} Can generic conjugate pairs help smooth-divisor
   relations when the principal pure-twist pairs are removed?
@@ -477,7 +486,8 @@ census}\label{e06-exact-relation-census}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 1+3 / planned.
+  \textbf{Route / status:} 1+3 / partial: 1179 configured census rows,
+  678 verified and 501 unsupported; decomposition cost open.
 \item
   \textbf{Question:} Which restricted bases actually span the needed
   target rows?
@@ -505,7 +515,8 @@ builders}\label{e07-equivalent-system-builders}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 3 / planned.
+  \textbf{Route / status:} 3 / partial: 240 distinct B8/H8 projection
+  cells verified; B12/16 and other bases open.
 \item
   \textbf{Question:} Which membership representation avoids merely
   moving cost into a higher-degree constraint?
@@ -534,7 +545,9 @@ panel}\label{e08-solver-and-ordering-panel}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 3 / planned.
+  \textbf{Route / status:} 3 / partial: three 1930-cell bounded solver
+  attempts retained; applicable signature reference, broader grid and
+  full costs open.
 \item
   \textbf{Question:} Does symmetry reduce actual solving cost against
   the strongest equivalent encoding?
@@ -563,7 +576,8 @@ extensions}\label{e09-torsion-over-extensions}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 1+3 / planned.
+  \textbf{Route / status:} 1+3 / verified bounded translated-torsion
+  controls; general proof bridge open.
 \item
   \textbf{Question:} Can torsion symmetry survive Galois descent without
   false factor-base compression?
@@ -593,7 +607,8 @@ covers}\label{e10-explicit-degree-two-covers}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 2 / planned.
+  \textbf{Route / status:} 2 / verified exhaustive declared-family
+  search over 27140 parameters on ten fixtures.
 \item
   \textbf{Question:} When is the complementary elliptic quotient
   actually the required twist?
@@ -622,7 +637,9 @@ complements}\label{e11-gluing-and-alternative-complements}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 2 / planned.
+  \textbf{Route / status:} 2 / partial: module filters and two-cover
+  search; three positive toy module cases and the public P-521 module
+  filter need actual torsion/polarization/quotient/map constructions.
 \item
   \textbf{Question:} Do other gluing orders or complementary-factor
   constructions provide a better executable route?
@@ -650,7 +667,9 @@ recovery}\label{e12-jacobian-arithmetic-and-recovery}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 2 / planned.
+  \textbf{Route / status:} 2 / partial: ten executable transfers, 5855
+  classes, independent PARI orders; formal/independent-host class-map
+  bridge open.
 \item
   \textbf{Question:} Does the proposed transfer work on the divisor
   classes the collector actually produces?
@@ -679,7 +698,8 @@ images}\label{e13-restricted-cover-images}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 1+2 / planned.
+  \textbf{Route / status:} 1+2 / partial: low-height image census;
+  Jacobian decomposition and useful-row cost open.
 \item
   \textbf{Question:} Can restricting cover points give a small base
   without a worse membership or map problem?
@@ -707,7 +727,9 @@ ablations}\label{e14-model-and-isogeny-ablations}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 1+2+3 / planned.
+  \textbf{Route / status:} 1+2+3 / verified bounded map/dual
+  construction: three explicit degree-seven maps and all three algebraic
+  duals in V2; full IC costs open.
 \item
   \textbf{Question:} Are any savings due to cheaper constants or another
   isogenous representative rather than new relations?
@@ -735,7 +757,9 @@ ablation}\label{e15-factorial-pipeline-ablation}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} 1+2+3 / planned.
+  \textbf{Route / status:} 1+2+3 / partial: 1920 native records, 1704
+  verified and identically replayed, 216 empty-base errors; calibrated
+  full cost and independent host open.
 \item
   \textbf{Question:} Which component or combination improves the actual
   IC baseline?
@@ -765,7 +789,9 @@ applicability}\label{e16-homomorphism-and-pairing-applicability}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} conditional / planned.
+  \textbf{Route / status:} conditional / verified fifteen
+  public-parameter checks and known degree-two pairing positive control;
+  no NIST transfer supplied.
 \item
   \textbf{Question:} Do small twist factors or a pairing actually supply
   an admissible transfer on the original subgroup?
@@ -793,7 +819,9 @@ ingress}\label{e17-arithmetic-lift-and-twist-ingress}
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Route / status:} conditional / planned.
+  \textbf{Route / status:} conditional / partial: integral and two
+  254-case rational-height panels; one rank interval, target lifting and
+  discovery cost open.
 \item
   \textbf{Question:} Could a characteristic-zero twist reduce to E while
   providing a usable small-height relation source?
@@ -884,10 +912,13 @@ proprietary comparisons are named, not silently replaced by a weaker
 reference. Exponents require at least four sizes and full phase costs;
 two toy fixtures are not a scaling result.
 
-Per-cell execution limits are frozen after cost calibration. Stop the
-affected cell on a correctness mismatch. Preserve budget exhaustion as
-an incomplete outcome under the original envelope. A null result closes
-the tested family only, not every possible twist-related construction.
+For an admitted performance comparison, freeze per-cell limits after
+cost calibration. The initial L0 diagnostic caps were frozen before
+execution, with full calibration still open and no speed claim admitted.
+Stop the affected cell on a correctness mismatch. Preserve budget
+exhaustion as an incomplete outcome under the original envelope. A null
+result closes the tested family only, not every possible twist-related
+construction.
 
 \subsection{Dependency and execution
 order}\label{dependency-and-execution-order}
@@ -921,8 +952,8 @@ See \url{PROGRAM.svg} for the dependency diagram.
 \begin{figure}
 \centering
 \includegraphics{PROGRAM.pdf}
-\caption{Experiment dependencies; only the E00 arithmetic preflight has
-run}
+\caption{Experiment dependencies and bounded execution; the original
+full campaign remains partial}
 \end{figure}
 
 The PDF includes that same diagram. No performance dashboard value
@@ -946,19 +977,21 @@ Remaining proof / execution obligation
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-Chord polynomial division and quartic expansion & Exact coefficient
-comparison and evaluated identity certificates in E00 & Faithful checked
-Lean statements; elliptic group and exceptional-chart bridge \\
-Complement coefficients and cleared model conversion & Same E00
-arithmetic checks & Smoothness, complete maps, field-defined
-isomorphism, Jacobian maps and subgroup recovery \\
-Trace-fiber and separation statements & No new group implementation in
-this study & Native group census plus formal group/Frobenius bridge \\
+Chord polynomial division and quartic expansion & E00
+coefficient/evaluated certificates and corresponding Lean identities &
+Concrete elliptic group and exceptional-chart bridge \\
+Complement coefficients and cleared model conversion & E00 arithmetic,
+Lean identities and ten executable toy class transfers & Faithful formal
+field/chart/Jacobian maps and independent arbitrary-class replay \\
+Trace-fiber and separation statements & Nine exhaustive native censuses
+and four conditional Weierstrass point-group Lean statements & Concrete
+finite-field Frobenius/twist and odd-subgroup bridge \\
 Image-size bound & A stated standard bound with explicit hypotheses &
 Applicable curve/morphism hypotheses and proof mapping for any selected
 candidate \\
-Solver equivalence and benefit & No solver measurement & E06--E08
-complete projected-output checks and counted comparisons \\
+Solver equivalence and benefit & 240 distinct projection checks, bounded
+solver panels and native IC/replay & Broader grids, complete applicable
+external reference and calibrated full costs \\
 NIST-size applicability or novelty & Not established & Separate scalable
 construction, applicable evidence and a literature novelty audit \\
 \end{longtable}
@@ -1002,12 +1035,14 @@ defined everywhere.
   written; no new replay of its results is claimed here.
 \end{itemize}
 
-\subsection{Executed preflight}\label{executed-preflight}
+\subsection{Execution evidence}\label{execution-evidence}
 
-\href{reports/RESULTS.md}{E00 result report}: five exact polynomial
-coefficient checks and evaluated certificates passed; five false
-variants were rejected, with 22 supporting unit tests passing. E01--E17
-remain unperformed. No measured speedup, transfer or novelty claim
-follows.
+The historical \href{reports/RESULTS.md}{E00 preflight report} checks
+five exact polynomial identities and evaluated certificates, rejects
+five false variants, and records 22 supporting tests. The subsequent
+\href{reports/EXECUTION_RESULTS.md}{bounded execution report} and
+per-experiment statuses above record E01--E17 execution/applicability
+evidence and every remaining original requirement. No calibrated speedup
+or novelty claim follows.
 
 \end{document}
