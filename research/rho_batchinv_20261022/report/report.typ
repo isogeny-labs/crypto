@@ -30,22 +30,27 @@ A/A (main × 6), then 5 interleaved A/B rounds: 32 processes under `tools/isolat
 
 #table(columns: 5, align: (left, right, right, right, left),
   [*curve*], [*main ns/step*], [*round 4 ns/step*], [*ratio*], [*A/A spread, verdict*],
-  [`icv1-f2m53-…`], [110.6], [99.0], [1.117], [7.0%: established (declared rule); ranges overlap],
+  [`icv1-f2m53-…`], [110.6], [99.0], [1.117], [7.0%: *not established* (validation, below)],
   [`icv1-f2m61-…`], [117.1], [108.8], [1.076], [14.4%: not established],
 )
 #figure(image("native-time.svg", width: 90%), caption: [Native ns per walk step, median and range over 5 rounds (`runs/time/`).])
 
-The time gain at $n$ = 53 is larger than the instruction gain (11.7% against 4.0%). One reading is that the old loop's bookkeeping also lengthened the dependent chains, but no hardware counter can test that here. Under the declared rule the $n$ = 53 gain is established. Its five-run ranges still overlap: one candidate run, at 111.7, is slower than main's fastest, at 104.0. The $n$ = 61 gain is inside its A/A spread and is not claimed.
+*The native result does not stand.* The gain at $n$ = 53 clears the A/A spread only when main's A/B median is the denominator, and those runs drifted.
+- *Drift.* Main's A/B median (110.6) is 7.5% above its own A/A median (102.9).
+- *Other readings.* Against the A/A median, the pooled baseline or the median paired ratio, the gain is 1.039–1.058, inside the 7.0% spread. One A/B round favours main.
+- *Replication.* The independent validator reran it: 16 uncontended paired rounds with the same binaries, a median paired ratio of 0.989, and 6 of 16 rounds favouring the change. That rerun's own A/A spread was 26.5%, so it cannot exclude a gain of a few percent, but it rules out 11.7%.
+
+The native effect is therefore *not established* at either size (validator findings F1–F3). The result of this round is the instruction count.
 
 == Counted cost and the §5a band
 
-The walks are identical, so every counted operation is too. At $n$ = 53 over 16 fixtures, both arms record 8,856,125 group additions and 18,262,834 unpriced native operations (canonicalizations, partition hashes, table inserts and queries). Priced at 0, 0.1 and 1 GAE, both arms come to 8,856,125, 10,682,408.4 and 27,118,959 GAE. In counted units neither arm ranks above the other. The gain is native cost per step only.
+The walks are identical, so every counted operation is too. At $n$ = 53 over 16 fixtures, both arms record 8,856,125 group additions and 18,262,834 unpriced native operations (canonicalizations, partition hashes, table inserts and queries). Priced at 0, 0.1 and 1 GAE, both arms come to 8,856,125, 10,682,408.4 and 27,118,959 GAE. In counted units neither arm ranks above the other. The gain is in instructions per step only.
 
 == Validation
 
 `benchmarks/20261022-strong-rho-batchinv/` holds the gate's three items:
 - a replay certificate: both binaries re-run, and every recovered scalar checked by an independent Python curve implementation (`verify_scalars.py`);
-- a validator report: every headline above recomputed from `runs/`;
+- a validator report: every headline above recomputed from `runs/` (status pass), with findings F1–F11, including the failed native replication;
 - the rho reference descriptor: main's strong reference, the same binary family and unit.
 
 == Scope
