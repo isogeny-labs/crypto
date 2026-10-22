@@ -65,6 +65,14 @@ and redirect stdout to `results/symbolic-1plus2-exception.json` for
 the versioned cancellation and point-doubling identities. The original
 generic `results/symbolic-1plus2.json` remains frozen.
 
+Build `--bin projective-symbolic-triple` and redirect stdout to
+`results/symbolic-tripling.json` for the versioned exact tripling identity
+and weighted-scale certificate. Build `--bin projective-symbolic-22-common`
+and redirect stdout to `results/symbolic-2plus2-common.json` for the exact
+generic coprime 2+2 CRT and weighted-scale certificate. The hypotheses,
+written divisor arguments, and still-open exceptional 2+2 cases are in
+`PROOF_AUDIT.md`. Neither binary changes the frozen collector records.
+
 `SHA256SUMS` gives hashes for all tracked study inputs, code, records,
 summaries, graphs, PDF, and run package. Verify it from the study directory
 with `sha256sum -c SHA256SUMS`.

@@ -43,7 +43,12 @@ is complete for arbitrary curves or divisors cannot be made from those runs.
   [proof audit](../research/projective_law_followup_20261022/PROOF_AUDIT.md)
   now has exact integer-polynomial certificates and written divisor
   arguments for the `K=0` cancellation and coincident-positive
-  nontripling 1+2 branches. Tripling and the 2+2 outputs remain open.
+  nontripling 1+2 branches.
+- **Derived or proved, 2026-10-22 tripling and coprime 2+2 follow-up:**
+  The same [proof audit](../research/projective_law_followup_20261022/PROOF_AUDIT.md)
+  now gives separate exact integer-polynomial certificates, weighted-scale
+  checks, and written divisor arguments for tripling and for the generic
+  `B≠0,C≠0` 2+2 branch. Exceptional 2+2 outputs remain open.
 - **Suspected explanation:** None needed for the measured cost. Branch behavior
   outside the tested finite cases remains a proof obligation.
 - **Missing capability:** A checked universal case proof for the implemented
@@ -110,5 +115,11 @@ the universal-completeness status is unchanged.
 
 2026-10-22: The `K=0` 1+2 cancellation and coincident-positive
 nontripling paths received exact symbolic certificates and written
-divisor-class arguments. Tripling and every 2+2 output identity remain
-unproved, so universal completeness is still open.
+divisor-class arguments.
+
+2026-10-22: Tripling and generic coprime 2+2 received exact native
+polynomial certificates and written divisor-class arguments. The
+unproved output identities are now the exceptional 2+2 branches:
+`C=0` degree-one drop, same-`u` doubling/mixed composition, and
+`B=0` shared-support cancellation/positive composition, including
+nested degree drops. Universal completeness remains open.

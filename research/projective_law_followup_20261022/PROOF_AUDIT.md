@@ -159,13 +159,108 @@ weighted 1+2 formula applies to `P₄+2P`. This is exactly the
 implemented `coincident_double_plus_other` path and equals the
 desired `P+D₂`. If `y=0`, the code selects cancellation first;
 the positive branch does not run. The `x₄=x` tripling formula is
-still an open output identity.
+handled by the separate exact certificate below.
 
-Proof map: the generic coefficient identities are discharged by
+### Tripling with repeated support
+
+`projective-symbolic-triple` checks five affine and eleven weighted
+integer-polynomial equalities in `results/symbolic-tripling.json`. Its
+variables are independent over `Z[x,y,a0,a1,a2,a3,alpha,mu]`; the point
+equation is applied only after the coefficient checks. Let
+`F(X)=X⁵+a3X³+a2X²+a1X+a0`, `P=(x,y)`, `k=8y³`, and
+`N(X)=aa X²+2bb X+cc`, where
+
+```text
+aa = 2F''(x)y² - F'(x)²
+bb = 2F'(x)y² - aa*x
+cc = y*k - (aa*x+2bb)*x
+Q = 3x*k² - aa²
+R = a3*k² - 4aa*bb + 3x*(Q-x*k²)
+S = aa*Q - 2bb*k²
+T = aa*R*k² - cc*k⁴.
+```
+
+The checked identities are
+
+```text
+N(x) = k*y
+k²F(X)-N(X)² = (X-x)³(k²X²+QX+R)+k²(F(x)-y²)
+k⁴N(X)-aa*k²(k²X²+QX+R)+k²S*X+T = 0.
+```
+
+The literal affine `triple` output has
+`(q3,r3,s3,t3,z3,w3)=(Q,k²R,S,T,k,1)`; its normalized
+`u=(k²X²+QX+R)/k²` and
+`v=(S/k³)X+T/k⁵`. On the curve, the first polynomial identity
+gives `F-(N/k)²=(X-x)³u`. Since `k≠0`, the function
+`y-N(X)/k` has a triple zero at `P` and two residual zeros, with a
+pole of order five at infinity. The second identity says the returned
+`v` is `-N/k` modulo `u`, so its divisor class is `3P`. The code
+reaches `triple` only in the `x₄=x`, `y=v(x)≠0` branch; `y=0`
+selects cancellation first.
+
+For arbitrary nonzero input point weights `(alpha,mu)`, the checker
+recomputes the literal weighted intermediates and proves
+`(q3,r3,s3,t3,z3,w3)` scales as
+`(alpha³²mu⁶ Q, alpha⁶⁴mu¹² k²R, alpha⁴⁸mu¹⁰ S,
+alpha⁸⁰mu¹⁶ T, alpha¹⁶mu³ k, mu)`. The normalized output is
+therefore the same affine pair. These are exact integer-polynomial
+equalities, with the divisor argument stated in writing rather than Lean.
+
+### Generic coprime 2+2 branch
+
+`projective-symbolic-22-common` checks nine affine and ten weighted
+equalities in `results/symbolic-2plus2-common.json`. Write the valid
+inputs as `uᵢ=X²+qᵢX+rᵢ`, `vᵢ=sᵢX+tᵢ`, and their coefficient
+differences as `dq,dr,ds,dt` (first minus second). The code computes
+
+```text
+B = dq*(q2*r1-q1*r2)-dr²
+A = dq*(dt*q2-ds*r2)-dr*dt
+C = dq*dt-dr*ds.
+```
+
+`B` is minus the resultant of `u1,u2`, so `B≠0` means their supports
+are coprime. The cubic numerator
+`N=B*v1-(C*X+A)*u1` is checked to satisfy
+`N≡B*v1 (mod u1)` and `N≡B*v2 (mod u2)`; hence `L=N/B`
+interpolates the four input points. The branch requires `C≠0`, so
+`L` is cubic. Define
+
+```text
+D = dq*C²+A*C
+Q = D+A*C-B²
+Rbar = A*(dq*C+A)-(s1+s2)*B*C+(q1+q2)*B²
+U = C²X²+QX+Rbar.
+```
+
+The checker expands `E=N²-u1*u2*U` and verifies that its `X⁶`
+and `X⁴` coefficients vanish, its `X⁵` coefficient is `B²`, and
+`E≡B²vᵢ² (mod uᵢ)` for both inputs. Because `B≠0`, the two
+quadratics are coprime. Both `E/B²` and the input curve `F` are
+monic quintics with no `X⁴` term and the same residues modulo their
+degree-four product. Their difference has degree at most three and is
+divisible by that product; therefore `E=B²F` exactly. Thus
+`F-L²=-(u1*u2/B²)U`. The code returns `r3=C²Rbar` and
+`z3=C`, so its normalized output `u` is `U/C²`.
+
+The checker also verifies the cleared identity
+`C⁵N+S*C²X+T = U*[-C⁴X+C³(-Cq1-A)+C²Q]`, where `S,T` are the
+literal output formulas. With `w3=B`, its normalized output
+`v=(S/(BC³))X+T/(BC⁵)` is `-L mod U`. The function
+`y-L` has pole order six at infinity and vanishes at the four input
+points and two residual points; the returned reduced divisor is their
+sum class. The ten exact scale identities show that arbitrary nonzero
+input weights give the same normalized pair. This proves only the
+`B≠0,C≠0` branch of the implemented law, not its exceptional paths.
+
+Proof map: the generic 1+2 coefficient identities are discharged by
 `src/bin/projective_symbolic_12.rs` and its committed result; the
 exceptional cancellation and point-doubling identities are discharged
 by `src/bin/projective_symbolic_12_exception.rs` and its separate
-result. The
+result. Tripling and generic coprime 2+2 have independent certificates
+in `src/bin/projective_symbolic_triple.rs` and
+`src/bin/projective_symbolic_22_common.rs`. The
 divisor-class bridge and weighted identities have no Lean declaration yet.
 A core-only Lean 4.34.1 probe found neither
 `Field` nor `Polynomial` in `Std`; completing a faithful Lean version
@@ -175,11 +270,12 @@ claimed as the full group-law proof.
 
 ### Open cases
 
-A machine-checkable symbolic reduction is still needed for every output
-branch other than the generic weighted-input 1+2 and the two exceptional
-1+2 cases just proved: show its nonzero weighted coordinates normalize
-to the Cantor sum, including tripling, 2+2 degree drops, and shared-support
-positive composition. The finite audit and five
+A machine-checkable symbolic reduction is still needed for the exceptional
+2+2 output branches: `C=0` degree-one drop, same-`u` doubling and mixed
+composition, and `B=0` shared-support cancellation and positive
+composition, including any degree drops in their nested calls. The new
+generic coprime 2+2 certificate requires `B≠0,C≠0`; it does not discharge
+these cases. The finite audit and five
 branch-selection lemmas above do not supply these remaining identities.
 In particular, no exhaustive all-divisor
 pair enumeration was run on any of the 42 curves. No counterexample to
