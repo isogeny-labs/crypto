@@ -108,3 +108,18 @@ parameters. This section records the run selection after launch, rather
 than claiming a new preregistration. Each is reported as a one-target
 observation only, with full cold cost, failed outcomes if any, and matched
 same-process rho.
+
+## Upper-size resource extension (frozen 2026-10-22 05:57 UTC)
+
+The unchanged degree-peeling rule also stopped on p=186,379 target 0 at
+the original 10-million stored-coefficient cap. To test the resource
+boundary, rerun only that same archived target with `PENCIL_MATRIX_CAP=25000000`,
+`PENCIL_SOLVER=peel`, identity order, and no other parameter changes. The
+old 10-million-cap records remain immutable controls. Limit external wall
+time to 3,600 seconds and virtual address space to 8 GiB. Record the
+process exit and all completed raw rows; if it times out or reaches the
+larger matrix or memory cap, candidate scalar and candidate/rho ratio stay
+null. The source rho control is run in the same process and checked, when
+the process reaches that phase. A single target cannot support a 32-bit
+cohort-level conclusion. The six p28 exact replays have priority on the
+shared host; launch this extension only after they finish.

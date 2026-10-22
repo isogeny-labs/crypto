@@ -483,10 +483,11 @@ struct PeelSolver {
     attempts: u64,
     max_rank: usize,
     max_stored_nonzero_coefficients: usize,
+    coefficient_cap: usize,
     failure: Option<&'static str>,
 }
 impl PeelSolver {
-    fn new(map: &LinearSolver) -> Self {
+    fn new(map: &LinearSolver, coefficient_cap: usize) -> Self {
         Self {
             nodes: map.nodes.clone(),
             field_prime: map.field_prime,
@@ -498,6 +499,7 @@ impl PeelSolver {
             attempts: 0,
             max_rank: 0,
             max_stored_nonzero_coefficients: 0,
+            coefficient_cap,
             failure: None,
         }
     }
@@ -643,7 +645,7 @@ impl PeelSolver {
                     rows[row_id] = Some(row);
                     self.max_stored_nonzero_coefficients =
                         self.max_stored_nonzero_coefficients.max(stored);
-                    if stored > 10_000_000 {
+                    if stored > self.coefficient_cap {
                         self.failure = Some("sparse_matrix_cap");
                         self.max_rank = self.max_rank.max(rank);
                         return None;
@@ -1034,6 +1036,11 @@ fn walk_label(seed: u64, walk: u64, lane: u64, modulus: u64) -> u64 {
 
 fn cohort_main(bits: u64, selected_p: u64) {
     assert!([16, 20, 24, 28, 32, 36, 40].contains(&bits));
+    let matrix_coefficient_cap: usize = std::env::var("PENCIL_MATRIX_CAP")
+        .ok()
+        .map(|value| value.parse().expect("PENCIL_MATRIX_CAP integer"))
+        .unwrap_or(10_000_000);
+    assert!((1_000_000..=25_000_000).contains(&matrix_coefficient_cap));
     let member = format!("sessions_projective_chart_v2/order-genus-{bits}/records.jsonl");
     let archive = "research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst";
     let output = Command::new("tar")
@@ -1105,7 +1112,8 @@ fn cohort_main(bits: u64, selected_p: u64) {
         "{}",
         json!({"schema":"pencil-cohort-setup/v1","bits":bits,"p":p,"r":r,
         "order":order,"cofactor":cofactor,"rational_curve_points":rational_curve_points,
-        "projected_points_checked":projected_points_checked,"field":setup_field,
+        "projected_points_checked":projected_points_checked,
+        "matrix_coefficient_cap":matrix_coefficient_cap,"field":setup_field,
         "arithmetic":setup_arithmetic})
     );
     let inst = StudyInstance {
@@ -1159,7 +1167,7 @@ fn cohort_main(bits: u64, selected_p: u64) {
         reset_arithmetic_counts();
         let mut phases = BTreeMap::new();
         let mut solver = LinearSolver::new(p, r, &rational_y);
-        let mut peel = PeelSolver::new(&solver);
+        let mut peel = PeelSolver::new(&solver, matrix_coefficient_cap);
         let mut recovered = None;
         let mut failure = None;
         let mut walks = 0;
@@ -1222,7 +1230,7 @@ fn cohort_main(bits: u64, selected_p: u64) {
                     solution_key = Some([walk_index, lambda]);
                     break 'walks;
                 }
-                if !use_peel && solver.stored_nonzero_coefficients > 10_000_000 {
+                if !use_peel && solver.stored_nonzero_coefficients > matrix_coefficient_cap {
                     failure = Some("sparse_matrix_cap");
                     break 'walks;
                 }
@@ -1270,6 +1278,7 @@ fn cohort_main(bits: u64, selected_p: u64) {
             "walks":walks,"candidate_lambdas":candidate_lambdas,"verified_relations":verified_relations,
             "rejected_candidates":rejected_candidates,"solution_key":solution_key,
             "solver_mode":solver_mode,
+            "matrix_coefficient_cap":matrix_coefficient_cap,
             "solver_nodes":solver.pivots.len(),"solver_rank":if use_peel {peel.max_rank} else {solver.rank},
             "solver_row_updates":if use_peel {peel.row_updates} else {solver.row_updates},
             "solver_inversions":if use_peel {peel.inversions} else {solver.inversions},

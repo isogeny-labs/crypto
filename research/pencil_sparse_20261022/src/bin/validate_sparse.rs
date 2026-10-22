@@ -19,6 +19,16 @@ fn trim_wall(v: &mut Value) {
             map.remove("elapsed_ns");
             map.remove("online_elapsed_ns");
             map.remove("setup_elapsed_ns");
+            // The pre-peel online binary omitted these zero/default metadata
+            // fields; the later replay binary emits them explicitly.
+            if map.get("schema").and_then(Value::as_str) == Some("pencil-cohort-target/v1") {
+                map.entry("solver_mode".to_owned())
+                    .or_insert_with(|| json!("online"));
+                map.entry("solver_attempts".to_owned())
+                    .or_insert_with(|| json!(0));
+                map.entry("solver_index_ops".to_owned())
+                    .or_insert_with(|| json!(0));
+            }
             for child in map.values_mut() {
                 trim_wall(child);
             }
@@ -183,6 +193,18 @@ fn main() {
         for row in primary.iter().skip(1) {
             assert_eq!(row["p"], p);
             assert_eq!(row["bits"], bits);
+            let matrix_cap = row["matrix_coefficient_cap"].as_u64().unwrap_or(10_000_000);
+            assert_eq!(
+                matrix_cap,
+                setup["matrix_coefficient_cap"]
+                    .as_u64()
+                    .unwrap_or(10_000_000)
+            );
+            if row["failure"] == "sparse_matrix_cap" {
+                assert_eq!(row["verified"], false);
+                assert!(row["recovered"].is_null());
+                assert!(row["solver_stored_nonzero_coefficients"].as_u64().unwrap() > matrix_cap);
+            }
             let workload_id = row["workload_id"].as_str().unwrap();
             assert!(workload_ids.insert(workload_id.to_owned()));
             let control = &source[workload_id];
@@ -340,6 +362,7 @@ fn main() {
         }
     }
     let mut paired_cells_checked = 0u64;
+    let mut headline = Vec::new();
     for entry in fs::read_dir(ROOT).unwrap() {
         let path = entry.unwrap().path();
         let name = path.file_name().unwrap().to_string_lossy();
@@ -371,6 +394,7 @@ fn main() {
         let mut below_rho_pair = 0u64;
         let mut min = f64::INFINITY;
         let mut max = f64::NEG_INFINITY;
+        let mut representative_ratios = None;
         for line in lines {
             let fields: Vec<_> = line.split(',').collect();
             assert_eq!(fields.len(), 11);
@@ -417,6 +441,7 @@ fn main() {
                     let recorded = representative[key].as_f64().unwrap();
                     assert!((recorded - expected).abs() <= 1e-10 * expected.abs().max(1.0));
                 }
+                representative_ratios = Some((ratio, csum / rsum));
             }
             paired_cells_checked += 1;
         }
@@ -435,17 +460,58 @@ fn main() {
             let recorded = pair[key].as_f64().unwrap();
             assert!((recorded - expected).abs() <= 1e-10 * expected.abs().max(1.0));
         }
+        let (paired_ratio, rho_ratio) = representative_ratios.unwrap();
+        for (suffix, claimed, recomputed) in [
+            (
+                "candidate_over_baseline",
+                pair["representative"]["candidate_over_baseline"]
+                    .as_f64()
+                    .unwrap(),
+                paired_ratio,
+            ),
+            (
+                "candidate_over_rho",
+                pair["representative"]["candidate_over_rho"]
+                    .as_f64()
+                    .unwrap(),
+                rho_ratio,
+            ),
+        ] {
+            headline.push(json!({"name":format!("{name}/{suffix}"),
+                "claimed":claimed,"recomputed":recomputed,"rel_tol":1e-10}));
+        }
     }
+    // The validation gate resolves raw_data relative to this evidence directory.
+    let evidence_paths: Vec<String> = paths
+        .iter()
+        .map(|path| {
+            path.strip_prefix(&format!("{ROOT}/"))
+                .map(|relative| format!("results/{relative}"))
+                .unwrap_or_else(|| format!("../{}", path.strip_prefix("research/").unwrap()))
+        })
+        .collect();
     let validation = json!({"schema":"pencil-sparse-validation/v1",
         "status":if missing_replays.is_empty(){"pass"}else{"partial_replays_pending"},
+        "independent":true,"raw_data":evidence_paths,"headline":headline,
         "files":files,"source_scalars_checked":scalars_checked,"replay_rows_checked":replay_rows_checked,
         "missing_replays":missing_replays,"price_cells_checked":valid_cells,
         "unpriced_cells":missing_cells,"total_cells":cells,"price_cells_below_rho":below_rho,
         "paired_comparison_cells_checked":paired_cells_checked,
-        "method":"independent native source multiplication, raw/replay non-wall equality, all-cell arithmetic recomputation"});
+        "method":"independent native source multiplication, raw/replay equality after wall removal and pre-peel online zero/default metadata normalization, all-cell arithmetic recomputation"});
     fs::write(
         format!("{ROOT}/validation.json"),
         serde_json::to_vec_pretty(&validation).unwrap(),
+    )
+    .unwrap();
+    let replay_certificate = json!({"schema":"pencil-replay-certificate/v1",
+        "status":if missing_replays.is_empty(){"verified"}else{"partial_replays_pending"},
+        "independent":true,"scalars_verified":true,"runs":files,
+        "source_scalars_checked":scalars_checked,"nonwall_rows_checked":replay_rows_checked,
+        "missing_replays":missing_replays,
+        "normalization":"wall fields removed; pre-peel online rows gain solver_mode=online, solver_attempts=0, solver_index_ops=0"});
+    fs::write(
+        format!("{ROOT}/replay-certificate.json"),
+        serde_json::to_vec_pretty(&replay_certificate).unwrap(),
     )
     .unwrap();
     println!("{}", serde_json::to_string_pretty(&validation).unwrap());

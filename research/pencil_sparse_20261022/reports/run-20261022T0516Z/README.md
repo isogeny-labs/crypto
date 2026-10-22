@@ -18,8 +18,8 @@ pairs source verified; the independent native validator checked 1,080
 recovered scalars and all 19,440 price cells. Fresh archive-input reruns
 matched all 549 setup/target records after wall fields were removed.
 
-The [PDF](RUN_REPORT.pdf) and [graph](matrix-order.svg) display the native
-[summary](../../results/summary.json). The complete per-target
-[price grid](../../results/price-grid.csv) and [validation](../../results/validation.json)
+The [PDF](RUN_REPORT.pdf) and [graph](matrix-order.svg) display the frozen
+[screen summary](../../results/small-summary.json). The screen's per-target
+[price grid](../../results/small-price-grid.csv) and [validation](../../results/small-validation.json)
 support the numbers. Derived ratio in every cell is the candidate's cold GAE
 divided by the matched rho GAE; no wall-time ratio is reported.

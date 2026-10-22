@@ -1,5 +1,6 @@
 """Render the native first-target 28-bit pencil price records."""
 
+import csv
 import json
 from pathlib import Path
 
@@ -8,6 +9,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.colors import TwoSlopeNorm
 
 ROOT = Path(__file__).resolve().parent
 RUN = ROOT / "reports/run-20261022T0550Z"
@@ -52,6 +54,39 @@ fig.tight_layout(rect=[0, 0.045, 1, 0.92])
 fig.savefig(RUN / "p28-first-targets.svg", bbox_inches="tight")
 fig.savefig(RUN / "p28-first-targets.png", dpi=160, bbox_inches="tight")
 
+with (ROOT / "results/p48383-peel-vs-online.csv").open(newline="") as stream:
+    grid = list(csv.DictReader(stream))
+band, panels = plt.subplots(1, 3, figsize=(11.5, 4.2), sharey=True)
+norm = TwoSlopeNorm(vmin=0.20, vcenter=1.0, vmax=1.06)
+for panel, native in zip(panels, ["0", "0.1", "1"]):
+    values = []
+    for inverse in ["1", "10", "100", "1000"]:
+        cells = []
+        for square in ["0", "0.5", "1"]:
+            matches = [cell for cell in grid if cell["S_per_M"] == square
+                       and cell["I_per_M"] == inverse
+                       and cell["native_GAE_per_logical"] == native]
+            assert len(matches) == 1
+            cells.append(float(matches[0]["candidate_over_baseline"]))
+        values.append(cells)
+    panel.imshow(values, cmap="RdBu_r", norm=norm, aspect="auto")
+    panel.set_xticks(range(3), ["0", "0.5", "1"])
+    panel.set_yticks(range(4), ["1", "10", "100", "1000"])
+    panel.set_title(f"Native logical = {native} GAE")
+    panel.set_xlabel("S/M")
+    for row_index, line in enumerate(values):
+        for column_index, value in enumerate(line):
+            panel.text(column_index, row_index, f"{value:.3f}",
+                       ha="center", va="center", fontsize=8,
+                       color="white" if value < 0.5 else "black")
+panels[0].set_ylabel("I/M")
+band.suptitle("p=48,383 target 0: peel / online identity across all 36 prices")
+band.text(0.5, 0.015, "Values above 1 are losses; exact aggregate prices remain in the CSV",
+          ha="center", fontsize=8)
+band.tight_layout(rect=[0, 0.05, 1, 0.91])
+band.savefig(RUN / "p28-price-band.svg", bbox_inches="tight")
+band.savefig(RUN / "p28-price-band.png", dpi=160, bbox_inches="tight")
+
 cover = plt.figure(figsize=(8.5, 11))
 cover.text(0.07, 0.94, "Pencil 28-bit first-target records", fontsize=15, weight="bold")
 cover.text(0.07, 0.90, "Six source-verified candidate/rho pairs; one target per arm.", fontsize=9)
@@ -81,5 +116,7 @@ with PdfPages(RUN / "RUN_REPORT.pdf",
              metadata={"Title": "Pencil 28-bit first-target operation prices"}) as pdf:
     pdf.savefig(cover)
     pdf.savefig(fig)
+    pdf.savefig(band)
 plt.close(cover)
 plt.close(fig)
+plt.close(band)

@@ -1,5 +1,6 @@
 """Lay out native nine-curve peel comparison records as a graph and PDF."""
 
+import csv
 import json
 from pathlib import Path
 
@@ -45,6 +46,34 @@ fig.tight_layout(rect=[0, 0.05, 1, 0.92])
 fig.savefig(RUN / "peel-nine-curves.svg", bbox_inches="tight")
 fig.savefig(RUN / "peel-nine-curves.png", dpi=160, bbox_inches="tight")
 
+native_fig, native_axis = plt.subplots(figsize=(10.5, 4.5))
+for native, color, marker in [("0", "#b76b25", "s"),
+                              ("0.1", "#255a86", "o"),
+                              ("1", "#64884d", "^")]:
+    values = []
+    for p in PS:
+        with (ROOT / f"results/p{p}-peel-vs-online.csv").open(newline="") as stream:
+            cells = list(csv.DictReader(stream))
+        matches = [cell for cell in cells if cell["S_per_M"] == "0.5"
+                   and cell["I_per_M"] == "10"
+                   and cell["native_GAE_per_logical"] == native]
+        assert len(matches) == 1
+        values.append(float(matches[0]["candidate_over_baseline"]))
+    native_axis.plot(positions, values, marker=marker, color=color,
+                     label=f"{native} GAE per logical")
+native_axis.axhline(1, color="#222222", linewidth=0.8)
+native_axis.set_xticks(positions, [f"{p:,}" for p in PS], rotation=45)
+native_axis.set_ylabel("Peel cold cost / online cold cost")
+native_axis.set_xlabel("Base field p; 60 original targets per curve")
+native_axis.grid(alpha=0.25)
+native_axis.legend(fontsize=8)
+native_fig.suptitle("Nine pencil curves: ratios at three native-work prices")
+native_fig.text(0.5, 0.015, "S/M=0.5, I/M=10; all three values come from the paired 36-cell CSVs",
+                ha="center", fontsize=8)
+native_fig.tight_layout(rect=[0, 0.05, 1, 0.92])
+native_fig.savefig(RUN / "peel-nine-native.svg", bbox_inches="tight")
+native_fig.savefig(RUN / "peel-nine-native.png", dpi=160, bbox_inches="tight")
+
 cover = plt.figure(figsize=(8.5, 11))
 cover.text(0.07, 0.94, "Exact degree-peeling pencil: nine paired curves",
            fontsize=15, weight="bold")
@@ -74,5 +103,7 @@ cover.text(0.07, 0.17, "Source: per-target JSONL, 36-cell price grid and native 
 with PdfPages(RUN / "RUN_REPORT.pdf", metadata={"Title": "Nine-curve pencil degree-peeling comparison"}) as pdf:
     pdf.savefig(cover)
     pdf.savefig(fig)
+    pdf.savefig(native_fig)
 plt.close(cover)
 plt.close(fig)
+plt.close(native_fig)

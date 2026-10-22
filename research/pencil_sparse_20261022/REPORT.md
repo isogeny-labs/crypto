@@ -7,7 +7,9 @@ separately frozen degree-peeling elimination method. Its source transfer,
 every accepted three-point Jacobian relation, recovered scalar and
 same-process source-negation-rho control use the parent implementation. The
 variable-order screen changes the column permutation; the later peel arm
-changes only exact relation elimination.
+changes only exact relation elimination. The [peeling argument](PROOF.md)
+states why degree-one rows can be removed without losing a dependency and
+which source checks certify a recovered scalar.
 
 The first completed gate has three p=739/1,151/1,187 curves, 60 targets per
 curve and three orders: 540 arm-target pairs over 180 distinct source targets.
@@ -85,13 +87,16 @@ full 36-cell range, including prices where peel was more expensive.
 | 12,143 | 0.269806 | 1,146.700226 | 24/36 | 0/36 | 0.268781–1.021602 |
 
 The [nine-curve PDF](reports/run-20261022T0534Z/RUN_REPORT.pdf),
-[graph](reports/run-20261022T0534Z/peel-nine-curves.svg), and one
+[full-band graph](reports/run-20261022T0534Z/peel-nine-curves.svg),
+[native-price graph](reports/run-20261022T0534Z/peel-nine-native.svg), and one
 `results/p*-peel-vs-online.csv` file per curve preserve these prices and
 their 36-cell losses. All nine degree-peel 60-target slices have exact
 fresh non-wall replays. The [native validator](results/validation.json)
-independently checked 2,894 source scalars and recomputed 52,056 priced
-target cells plus 432 paired aggregate cells; its current partial status
-refers only to six long-running 28-bit replays listed by path in that record.
+independently checked 2,894 source scalars, 1,480 replay rows, 52,056 priced
+target cells, 72 deliberately unpriced cap cells, and 432 paired aggregate
+cells. It reports `pass` with no missing replays. The
+[replay certificate](results/replay-certificate.json) lists every raw/replay
+pair, including the three metadata defaults normalized on old online rows.
 
 On the first p=186,379 target, the unchanged peel method also stopped at the
 10,000,000-coefficient cap: rank 84,696, peak 10,000,145 coefficients,
@@ -119,9 +124,30 @@ complete cold costs are one-target observations:
 At p=48,383, peel/online identity is 0.233555 in the representative cell
 and 0.233492–1.018367 over the 36-cell band, with 24 cells below online
 and 12 above. Both methods cost more than matched rho in every cell. The
+online reverse/identity and affine/identity representative ratios are
+0.984454 and 0.954292; each has 24 cells below identity and 12 equal.
+Their full paired grids are in `results/p48383-*-vs-identity.csv`. The
 [28-bit PDF](reports/run-20261022T0550Z/RUN_REPORT.pdf),
 [graph](reports/run-20261022T0550Z/p28-first-targets.svg),
+[36-cell heatmap](reports/run-20261022T0550Z/p28-price-band.svg),
 [paired price grid](results/p48383-peel-vs-online.csv), and raw records
 retain exact costs. These runs add only the p=48,823 and p=49,451 targets
 to the original 541 distinct solved targets; the p=48,383 target overlaps
-the original pilot. Their independent full non-wall replays are running.
+the original pilot. All six 28-bit first-target raw rows have fresh
+field-equivalent non-wall replays with source scalars checked. The
+[cohort status](results/status.json) therefore records 543 distinct solved
+targets out of the original 1,260, leaving 717 target workloads open. The
+failed 32-bit target remains open.
+
+The separately frozen 25-million-coefficient resource extension for that
+32-bit target is queued after the completed 28-bit replays. It has no
+observed outcome or cost ratio in this report until its run record is added.
+
+The [study validation gate](VALIDATION.json) pins the independently checked
+[raw-data validator](results/validation.json), [replay certificate](results/replay-certificate.json),
+and matched rho prices at native logical-work prices 0, 0.1, and 1 GAE.
+The [source symmetry check](results/rho-symmetry-check.json) computes the
+source (j)-invariant for all 15 inspected archived models. Each has
+(j^p\ne j) and (j\ne 0,1728), so these source curves have no Frobenius
+self-map or extra geometric automorphism fold beyond negation. The gate
+passes `scripts/validation_gate.py evidence research/pencil_sparse_20261022`.
