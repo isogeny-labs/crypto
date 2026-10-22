@@ -1,0 +1,57 @@
+name: Arm64 F4/F5 defaults measurement
+# One-off measurement on GitHub's Arm64 runners (research/arm64_f4_defaults_20261022):
+# the inherited-F4 eager rewrite through shift runs and the gate-first F6-IC order
+# (both defaults since #2043, never measured on an Arm host with each other), and the
+# GF(2) Gray-code table constants tuned on x86. Runs when this file or the study's
+# scripts change in a pull request, or on demand; arms differ by environment only.
+on:
+  pull_request:
+    paths:
+      - .github/workflows/arm64-f4-defaults.yml
+      - research/arm64_f4_defaults_20261022/scripts/**
+  workflow_dispatch:
+    inputs:
+      rounds:
+        description: Rounds for the inherited-F4 arms (the GF(2) arms run 3)
+        default: '5'
+permissions:
+  contents: read
+concurrency:
+  group: arm64-f4-defaults-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  measure:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04-arm, macos-latest]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    env:
+      CARGO_TERM_COLOR: never
+      OUT: arm64-out/${{ matrix.runner }}
+      ROUNDS: ${{ inputs.rounds || '5' }}
+      D: research/arm64_f4_defaults_20261022/scripts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build the two binaries
+        run: cargo build --release --example f6_ic_probe --example f4_f2_bench
+      - name: Host
+        run: sh $D/host.sh && cat $OUT/host.txt
+      - name: Inherited F4 / F6-IC arms
+        run: PROBE=target/release/examples/f6_ic_probe OUT=$OUT/inh sh $D/run_inh.sh
+      - name: GF(2) table arms
+        run: BENCH=target/release/examples/f4_f2_bench OUT=$OUT/gf2 ROUNDS=3 sh $D/run_gf2.sh
+      - name: Summary
+        if: always()
+        run: |
+          python3 research/arm64_f4_defaults_20261022/summarize.py $OUT || true
+          grep -l "exit=[^0]" $OUT/*/raw/*.status || echo "every run exited 0"
+      - name: Preserve the raw records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arm64-f4-defaults-${{ matrix.runner }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: arm64-out/
+          if-no-files-found: error
