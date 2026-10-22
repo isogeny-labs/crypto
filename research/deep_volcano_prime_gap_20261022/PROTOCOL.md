@@ -167,12 +167,18 @@ so a true `G` within ±3% should read as equivalent.
   ±5% at this size. It does not prove hardness equal for every algorithm.
   That part is the transfer theorem, with its additive cost.
 
-## Erratum (written after the build, as the sessions were starting; before any result was read)
+## Erratum (written as the sessions started, committed 08:53 UTC while they ran; before any result was read)
 
 `1 + 3 + 6 + 12 + 24 + 48 + 96 = 190`, not 191. So each side has 190
 curves, and the run counts are 380 × 2 × 6 = 4560 (`spec.json`),
 380 × 4 = 1520 (A/A) and 380 × 2 = 760 (BSGS). The walk found exactly
 190 per side with the predicted level counts. Nothing else changes.
+
+A second typo, found by the validator after the run: §3 writes the A/A
+measurement seed as `⊕ 0xAA00000000`. The code (`volcano-gap spec`) and
+`spec-aa.json` use `0xA_A000_0000` = `0xAA0000000`, the same constant
+the 2026-10-17 volcano-cost study used. The design is unaffected: the A/A
+arm only needs a seed different from the primary's.
 
 ## 9. Reproduce
 

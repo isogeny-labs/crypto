@@ -1,0 +1,37 @@
+{
+  "schema": "validation-gate/v1",
+  "note": "rho-against-rho study (no index calculus). The gae_band slots are filled as follows: \"ic\" carries the S2 side (conductor N*2^a, floor side of the prime gap) and \"rho\" the S1 side (conductor 2^a, crater side); both arms are the same rho.negation method in the same session. Values are mean S at w GAE per unpriced native operation (volcano-stats --gap band). No ranking is made: the S2/S1 ratio 0.9958 is inside the preregistered +-5% equivalence margin.",
+  "replay_certificate": {
+    "path": "../../research/deep_volcano_prime_gap_20261022/validation/replay-certificate.json",
+    "sha256": "7347722ef9bc74b5ba4b281457ad802b5e72a21e1698622438abca92cf61e308"
+  },
+  "validator_report": {
+    "path": "../../research/deep_volcano_prime_gap_20261022/validation/validator-report.json",
+    "sha256": "0d46d41b9c9037c9acba266041b804ad8fe8243fad1e743a1e55fb5a2e039784"
+  },
+  "rho_reference": {
+    "kind": "negation",
+    "protocol": "PROTOCOL.md section 3: ecbench rho.negation on every curve of both sides of the gap (D0 = -11, Aut = +-1 on every curve, so the negation map is the strongest available fold), S2/S1 contrast of mean S",
+    "unit": "counted group operations (ecbench GAE; S = GAE/sqrt(r))",
+    "binary_or_process": "ecbench sha256 a59c4014ff52100ed10c06b5d27a0572f9474d24c137fd18b24798237024f81f, session ECBS1h41a98e7c2141 (both sides interleaved in one session)",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 0.9388869951027868,
+        "rho": 0.9428819734668549
+      },
+      "0.1": {
+        "ic": 1.0327446971576488,
+        "rho": 1.037139150154617
+      },
+      "1": {
+        "ic": 1.8774640156514175,
+        "rho": 1.8854537403444882
+      }
+    },
+    "order_holds_across_band": false
+  }
+}

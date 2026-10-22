@@ -1,0 +1,68 @@
+validation_report:
+  id: VAL-20261022-d91f47
+  task_id: none (dispatched by the main session; no TASK card or review_plan supplied)
+  run_ids:
+    - ECBS1h41a98e7c2141   # run/sessions/spec, arm rho-neg, 4560 runs
+    - ECBS1h4034bfcbccc4   # run/sessions/spec-aa, arm rho-neg-aa, 1520 runs
+    - ECBS1h658495a369ec   # run/sessions/spec-bsgs, arm bsgs-neg, 760 runs
+  artifact_checks:
+    - records/plan/host hashes equal session.json records_sha256 / plan_sha256 / host_sha256 for all 3 sessions; ecbench binary sha256 a59c4014... equals session binary_sha256
+    - run/sessions/MANIFEST.sha256 passes sha256sum -c (6/6); gunzip -c of every records.jsonl.gz and plan.json.gz matches the manifest; gzip -t ok
+    - 'ecbench verify --replay 32: spec 4560/4560 verified, 32/32 identical; spec-aa 1520/1520, 32/32; spec-bsgs 760/760, 32/32; 0 problems; all 12 checks true'
+    - 'ecbench verify --replay-all: spec-bsgs 760/760 identical; spec-aa 1520/1520 identical; spec 4560/4560 identical (all three sessions replayed in full, 6840/6840)'
+    - sessions recorded git_commit f7b4d94ea with git_dirty=true (dirty diff not recorded); ecbench sources unchanged f7b4d94..HEAD
+    - run directory, analysis*.json and the .gz files untracked at validation time (working tree only); bound here by sha256
+    - amended after validation - all 23 raw_data files now committed in 5c9cce237548be80b537a26ed7c0ed51caf78f80; the validator checked each committed blob against its pinned sha256 (23/23 equal)
+  metric_recomputations:
+    - 6840/6840 records joined to curves.jsonl on (p,a,b,gx,gy); 0 unmatched; all non-warmup, verified, planted numeric, recovered == planted
+    - rho-neg runs S1 2280 / S2 2280; mean S S1 0.94288197346685487 (claimed 0.9428819734668549); S2 0.93888699510278684 (0.9388869951027868); G 0.99576301331822159 (0.9957630133182216); rel diff 0
+    - rho-neg G_l level 0 0.94123313951911602 (0.941233139519116); level 6 1.0029459437492232 (same); all 14 level means and 7 G_l bit-identical
+    - rho-neg band ratio w=0 0.99576301331822159, w=0.1 0.99576290896326392, w=1 0.99576243928869301; bit-identical to analysis.json
+    - rho-neg-aa G 1.0002366403930549 (1.000236640393055); rel diff 0
+    - bsgs-neg G 1 (1.0); max distinct cost.s per target across both sides 1 (claimed 1, counted within side)
+    - 108 values compared, all bit-identical; ecbench band per-curve means and S(1)/S(0) factors agree to <= 5.2e-16
+    - independent awk curve-cluster bootstrap / permutation (own RNG) agree with the claimed intervals to Monte Carlo precision
+  control_checks:
+    - A/A G 1.00024, 95% CI [0.95246, 1.05259] (independent [0.95157, 1.04867]) contains 1; A/A runs differ in algorithm_seed and total_gae from every paired spec run
+    - BSGS exactness holds across both sides (one cost per target on all 380 curves)
+    - 'planted S2 x 1.05: b_over_a 1.0455511639841288 = 1.05 G (rel 3.6e-15), 95% CI [1.01556, 1.07744], perm_p 0.0040: detected'
+    - 'planted S2 x 0.95: b_over_a 0.945974862652311 = 0.95 G (rel 5.9e-16), 95% CI [0.91884, 0.97482], perm_p 0.0006: detected'
+    - walk counts [1,3,6,12,24,48,96] per side; 190 distinct j per side; 0 shared
+    - 'side certificates re-run with seed 777: all_ok, 0 failed; independent bc twist test separates S1 ((Z/N)^2, probabilistic) from S2 (cyclic, proved) on all 760 models'
+    - 'planted scalars: [planted]G == target on all 6840 records (bc, independent code)'
+    - 'not checked: model and horizontal Cochran Q, vertical floor, crossed bootstrap, rho-neg:rho-neg-aa pair'
+  heuristic_validation_checks:
+    - not a heuristic-distribution experiment; the prediction is G = 1 under the transfer argument, with the decision rule frozen in PROTOCOL.md (committed 08:41:56Z, before the first session at 08:45:19Z)
+    - 'null-object control present: the A/A arm (same curves and targets, independent walk seeds) measures G under no effect; it reads 1.00024 with 1 inside its CI'
+  cost_model_checks:
+    - unit ecbench.gae (counted group-addition equivalents), S = total_gae / sqrt(r), verified exact on every record; lower_bound true; unpriced canonicalisations_uncharged (rho) and inserts/lookups_uncharged (BSGS) charged in the section 5a band at 0, 0.1, 1
+    - memory not reported (counted-cost study; timing L0, descriptive)
+  proof_architecture_checks: []
+  verdict: passed   # amended from incomplete; the only open item (inputs working-tree only) closed when 5c9cce237 committed byte-identical files, checked blob by blob (23/23). No check was re-run or changed.
+  limitations:
+    - checks ran on the working tree before the commit; their binding to 5c9cce237 rests on the 23 sha256 equalities, not on a re-run against the commit
+    - stride replay sample is predictable; mitigated by full replays (see artifact_checks)
+    - isogeny / volcano level assignment not re-derived independently (rests on volcano-gap / volcano-rho); twist N-structure and curve arithmetic were
+    - protocol A/A seed constant typo (0xAA00000000 vs code 0xA_A000_0000); erratum committed during the sessions (arithmetic only)
+    - 'scope: one class, p 52 bits, n ~ 2^40.78, D0 = -11, rho.negation and bsgs.negation; no hardness-equality or ECDLP claim'
+  artifact_paths:
+    - research/deep_volcano_prime_gap_20261022/validation/replay-certificate.json
+    - research/deep_volcano_prime_gap_20261022/validation/validator-report.json
+    - research/deep_volcano_prime_gap_20261022/validation/spec.verify.json
+    - research/deep_volcano_prime_gap_20261022/validation/spec-aa.verify.json
+    - research/deep_volcano_prime_gap_20261022/validation/spec-bsgs.verify.json
+    - research/deep_volcano_prime_gap_20261022/validation/spec.replay-all.verify.json
+    - research/deep_volcano_prime_gap_20261022/validation/spec-aa.replay-all.verify.json
+    - research/deep_volcano_prime_gap_20261022/validation/spec-bsgs.replay-all.verify.json
+    - research/deep_volcano_prime_gap_20261022/validation/band-spec.json
+    - research/deep_volcano_prime_gap_20261022/validation/certificates-seed777.json
+  sources_read:
+    - /home/user/crypto-autoresearcher/docs/agent-runtime-core.md
+    - /home/user/crypto-autoresearcher/agents/validator.md
+    - research/deep_volcano_prime_gap_20261022/PROTOCOL.md (HEAD and working-tree diff)
+    - docs/VALIDATION_GATE.md; scripts/validation_gate.py (path resolution and checks only); scripts/fixtures/validation_gate/positive/*.json
+    - run/sessions/{spec,spec-aa,spec-bsgs}/{session.json,records.jsonl (by key via jq),spec.json (measurement block)}; run/sessions/*.audit.json (summary keys)
+    - run/export-s1/curves.jsonl, run/export-s2/curves.jsonl, run/pair.json, run/certificates.json (summary and rows by key)
+    - analysis.json, analysis-plant-up.json, analysis-plant-down.json (by key)
+    - src/bin/volcano_stats.rs lines 655-760 (BSGS exactness keying), working-tree diffs of src/bin/volcano_gap.rs and src/bin/volcano_stats.rs, the A/A seed line of volcano_gap.rs
+  read_sibling_reports: false

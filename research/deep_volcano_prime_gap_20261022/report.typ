@@ -266,8 +266,9 @@ sides read about 6% above it, the walk\'s own overhead.
   [passes],
   [BSGS exactness (`bsgs-neg`, 2 targets)],
   [one cost per target on all 380 curves, `G = 1`],
-  [max distinct cost per target 1; `G` \= 1.0000, CI \[1.0000,
-  1.0000\]],
+  [`volcano-stats`: one cost per (side, target), `G` \= 1.0000, CI
+  \[1.0000, 1.0000\]. The validator counted across both sides: target 0
+  costs S \= 0.546505 on all 380 curves, target 1 S \= 0.708669],
   [exact],
   [planted S2 × 1.05],
   [detected],
@@ -287,7 +288,8 @@ sides read about 6% above it, the walk\'s own overhead.
   [passes],
   [audit],
   [`ecbench verify --replay 24`: exact],
-  [24/24 on each of the three sessions, 0 problems],
+  [24/24 on each of the three sessions, 0 problems; then every run
+  replayed by the validator (4560 + 1520 + 760, all exact)],
   [passes],
 )
 ]
@@ -367,8 +369,18 @@ sides read about 6% above it, the walk\'s own overhead.
   `--out`. The files the study uses (`curves.jsonl`, the specs) are
   unaffected.
 - #strong[Independent checks.]
-  - The validator re-ran the replays and recomputed the headline numbers
-    from raw records (#link("validation/")[`validation/`]).
+  - The independent validator (#link("validation/")[`validation/`]):
+
+    - replayed every recorded run of all three sessions: 4560, 1520 and
+      760 exact replays (`*.replay-all.verify.json`);
+    - recomputed 108 values from the raw records with `jq`/`awk`, all
+      bit-identical to `analysis.json`;
+    - ran its own bootstrap and permutation test, with its own RNG: 90%
+      \[0.9713, 1.0210\], p \= 0.78;
+    - re-certified all 760 curve models with another seed.
+
+    Receipts: `replay-certificate.json` and `validator-report.json`.
+
   - `ca volcano` (aburan28/cryptanalysis) re-walked both volcanoes
     (#link("run/crosscheck/")[`run/crosscheck/`]): same counts and 189
     verified edges per side. It prints no `j`, so curve identities were

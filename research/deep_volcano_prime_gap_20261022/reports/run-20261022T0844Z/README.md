@@ -8,7 +8,7 @@ claims here.
 
 | item | value |
 |:--|:--|
-| protocol | [`PROTOCOL.md`](../../PROTOCOL.md), frozen in commit `f7b4d94` before any measurement; erratum (190, not 191, curves per side) written as the sessions were starting, before any result was read |
+| protocol | [`PROTOCOL.md`](../../PROTOCOL.md), frozen in commit `f7b4d94` before any measurement; erratum (190, not 191, curves per side) written as the sessions started and committed at 08:53 UTC while they ran, before any result was read |
 | build | `run_pipeline.sh build run 52 6 16384 20261022 2 6 4 2` (construct, two `volcano-rho --ecbench` exports, certify, spec) |
 | run | `run_pipeline.sh run run`: three `ecbench run --cpus none --allow-busy` sessions, concurrently, one lock each |
 | start / end (UTC) | sessions started 08:45:19 (BSGS), 08:45:43 (A/A), 08:47:14 (main); ended 08:51:20, 08:57:11, 09:20:39 (2026-10-22) |
@@ -21,7 +21,7 @@ claims here.
 | session | arm (method) | workloads | runs planned / recorded / verified | failures |
 |:--|:--|:--|:--|:--|
 | main | `rho-neg` (`rho.negation`) | 760 curve models × 6 targets | 4560 / 4560 / 4560 | 0 |
-| A/A | `rho-neg-aa` (`rho.negation`, seed ⊕ 0xAA00000000) | 380 × 4 | 1520 / 1520 / 1520 | 0 |
+| A/A | `rho-neg-aa` (`rho.negation`, seed ⊕ 0xAA0000000) | 380 × 4 | 1520 / 1520 / 1520 | 0 |
 | BSGS | `bsgs-neg` (`bsgs.negation`) | 380 × 2 | 760 / 760 / 760 | 0 |
 
 Session and spec ids:

@@ -14,7 +14,8 @@ repeated as claims here.
   [protocol],
   [#link("../../PROTOCOL.md")[`PROTOCOL.md`], frozen in commit `f7b4d94`
   before any measurement; erratum (190, not 191, curves per side)
-  written as the sessions were starting, before any result was read],
+  written as the sessions started and committed at 08:53 UTC while they
+  ran, before any result was read],
   [build],
   [`run_pipeline.sh build run 52 6 16384 20261022 2 6 4 2` (construct,
   two `volcano-rho --ecbench` exports, certify, spec)],
@@ -50,7 +51,7 @@ repeated as claims here.
   [4560 / 4560 / 4560],
   [0],
   [A/A],
-  [`rho-neg-aa` (`rho.negation`, seed ⊕ 0xAA00000000)],
+  [`rho-neg-aa` (`rho.negation`, seed ⊕ 0xAA0000000)],
   [380 × 4],
   [1520 / 1520 / 1520],
   [0],
