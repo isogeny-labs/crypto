@@ -117,6 +117,7 @@ pub mod canonical_lift;
 pub mod cga_hnc;
 pub mod challenge_ladder;
 pub mod cheon_attack;
+pub mod cheon_counted;
 pub mod cipher_registry;
 pub mod cm_canonical_lift;
 pub mod coleman_integration;
