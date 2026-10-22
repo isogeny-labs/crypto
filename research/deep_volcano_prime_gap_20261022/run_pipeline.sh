@@ -20,7 +20,7 @@ build)
     a=$(jq -r .${side}_root.a "$out/pair.json"); b=$(jq -r .${side}_root.b "$out/pair.json")
     g=$(jq -r ".${side}_root.generator | map(tostring) | join(\",\")" "$out/pair.json")
     $bin/volcano-rho --curve "$p,$a,$b" --order "$ord" --generator "$g" --ell 2 --seed "$seed" \
-      --per-level 100000 --models "$models" --targets "$targets" --ecbench "$out/export-$side" \
+      --per-level 100000 --models "$models" --targets "$targets" --ecbench "$out/export-$side" --out "$out/export-$side" \
       2> "$out/export-$side.log" > /dev/null
   done
   $bin/volcano-gap certify --pair "$out/pair.json" --seed "$seed" \

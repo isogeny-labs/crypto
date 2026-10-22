@@ -44,6 +44,8 @@ struct Run {
     target: u64,
     num: f64,
     den: f64,
+    /// The solve's wall time (`time.solve_wall_ns`), descriptive only.
+    wall_ns: f64,
 }
 
 fn die(msg: &str) -> ! {
@@ -510,7 +512,34 @@ fn gap(
                    "curves_a": curves(a), "curves_b": curves(b)})
         })
         .collect();
+    // Raw (not normalised) means per curve and per (class, level), for the
+    // figures: the plotting script draws these and computes nothing.
+    let curve_means: Vec<Value> = cells
+        .iter()
+        .map(|((c, l, v), rs)| {
+            let (m, se2) = ratio_se2(rs);
+            let wall = rs.iter().map(|r| r.wall_ns).sum::<f64>() / rs.len() as f64 / 1e6;
+            json!({"class": c, "level": l, "vertex": v, "runs": rs.len(), "mean_s": m, "ci95_half": 1.96 * se2.sqrt(), "mean_wall_ms": wall})
+        })
+        .collect();
+    let level_means: Vec<Value> = group(&runs, |r| (r.class, r.level))
+        .iter()
+        .map(|((c, l), rs)| {
+            let (m, se2) = ratio_se2(rs);
+            let curves = cells.keys().filter(|(cc, ll, _)| cc == c && ll == l).count();
+            json!({"class": c, "level": l, "runs": rs.len(), "curves": curves, "mean_s": m, "ci95_half": 1.96 * se2.sqrt()})
+        })
+        .collect();
+    let side_means: Vec<Value> = [a, b]
+        .iter()
+        .map(|&c| {
+            let rs: Vec<&Run> = runs.iter().filter(|r| r.class == c).collect();
+            let (m, se2) = ratio_se2(&rs);
+            json!({"class": c, "runs": rs.len(), "mean_s": m, "ci95_half": 1.96 * se2.sqrt()})
+        })
+        .collect();
     json!({
+        "curve_means": curve_means, "level_means": level_means, "side_means": side_means,
         "a": a, "b": b, "levels": both, "runs": runs.len(), "b_over_a": obs,
         "ci90": ci90, "ci95": ci95, "boot": bs.len(),
         "bootstrap": "curves within (class, level), all runs of each",
@@ -627,6 +656,7 @@ fn main() {
                 target,
                 num: s,
                 den: 1.0,
+                wall_ns: r["time"]["solve_wall_ns"].as_f64().unwrap_or(f64::NAN),
             };
             // Planted effects (--plant-level L:x, --plant-curve V:x): the
             // analysis's own positive control, applied to S and to yield.
