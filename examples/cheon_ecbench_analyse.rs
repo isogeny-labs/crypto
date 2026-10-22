@@ -83,6 +83,7 @@ struct Obs {
 #[derive(Default)]
 struct Cell {
     n: f64,
+    n_exact: u64,
     requested: BTreeMap<String, u64>,
     runs: BTreeMap<String, Vec<Obs>>,
     failed: Vec<(String, u64, String)>,
@@ -167,7 +168,8 @@ fn main() {
             session_ids.insert(flag, rec["session_id"].as_str().unwrap().to_string());
             let bits = rec["workload"]["curve"]["field_bits"].as_u64().unwrap();
             let cell = cells.entry((fam.to_string(), bits)).or_default();
-            cell.n = rec["workload"]["curve"]["r"].as_f64().unwrap();
+            cell.n = rec["workload"]["curve"]["r"].as_u64().unwrap() as f64;
+            cell.n_exact = rec["workload"]["curve"]["r"].as_u64().unwrap();
             let mut arm = rec["arm"].as_str().unwrap().to_string();
             if flag == "--minus-naive" && arm == "rho-neg" {
                 arm = "rho-neg@naive".into();
@@ -249,6 +251,9 @@ fn main() {
     let mut t1 = vec![];
     for ((fam, bits), c) in &cells {
         for arm in all_arms(fam) {
+            if arm == "rho-neg@naive" {
+                continue;
+            }
             let Some(v) = c.runs.get(arm) else { continue };
             let ops: Vec<f64> = v.iter().map(|o| o.ops).collect();
             let req = c.requested.get(arm).copied().unwrap_or(0);
@@ -268,7 +273,7 @@ fn main() {
             writeln!(
                 md,
                 "| {fam} | {bits} | {} | {} | `{arm}` | {}/{req} | {} | {} | {} | {:.3} | {rat} | {} | {} |",
-                c.n as u64,
+                c.n_exact,
                 if d > 0 { d.to_string() } else { "".into() },
                 v.len(),
                 fmt_n(m),
@@ -311,10 +316,10 @@ fn main() {
     writeln!(md, "Each cell is `sum (ops + w U + q Q) / sum (ops_rho + w U_rho)` over the paired targets: `U` the arm's unpriced native operations (every `*_uncharged` counter, rho's included), `w` in {{0, 0.1, 1}} GAE each, the same for both arms; `Q` the oracle queries, priced at `q` in {{0, 0.1, 1}} GAE each or at the server's own work (`server`); rho has no queries. The order is **resolved** only if every one of the 12 cells is on the same side of 1; `min` and `max` are the extreme cells, the interval is the 95 % bootstrap interval of the extreme cell on the side of 1.\n").unwrap();
     writeln!(
         md,
-        "| family | bits | arm | min cell | max cell | w=0,q=0 | w=1,q=1 | w=1,q=server | order |"
+        "| family | bits | arm | min cell | max cell | w=0,q=0 | w=1,q=1 | w=1,q=server | order | 95 % interval of the extreme cell excludes 1 |"
     )
     .unwrap();
-    writeln!(md, "|:--|--:|:--|--:|--:|--:|--:|--:|:--|").unwrap();
+    writeln!(md, "|:--|--:|:--|--:|--:|--:|--:|--:|:--|:--|").unwrap();
     let mut t2 = vec![];
     for ((fam, bits), c) in &cells {
         for arm in arms_of(fam) {
@@ -336,20 +341,28 @@ fn main() {
                 .iter()
                 .cloned()
                 .fold((0, 0, f64::MIN), |a, b| if b.2 > a.2 { b } else { a });
-            let order = if hi.2 < 1.0 {
+            let (order, robust) = if hi.2 < 1.0 {
                 let ci = boot(&p, W[hi.0], hi.1, 11 + *bits);
-                format!(
-                    "cheaper than rho at all 12 prices (worst cell upper bound {:.2})",
-                    ci.1
+                (
+                    "cheaper than rho at all 12 prices".to_string(),
+                    format!(
+                        "{} (worst cell upper bound {:.2})",
+                        if ci.1 < 1.0 { "yes" } else { "no" },
+                        ci.1
+                    ),
                 )
             } else if lo.2 > 1.0 {
                 let ci = boot(&p, W[lo.0], lo.1, 13 + *bits);
-                format!(
-                    "dearer than rho at all 12 prices (best cell lower bound {:.2})",
-                    ci.0
+                (
+                    "dearer than rho at all 12 prices".to_string(),
+                    format!(
+                        "{} (best cell lower bound {:.2})",
+                        if ci.0 > 1.0 { "yes" } else { "no" },
+                        ci.0
+                    ),
                 )
             } else {
-                "unresolved".to_string()
+                ("unresolved".to_string(), "".to_string())
             };
             let cell = |w: usize, q: usize| {
                 format!(
@@ -359,21 +372,63 @@ fn main() {
             };
             writeln!(
                 md,
-                "| {fam} | {bits} | `{arm}` | {:.3} (w={}, q={}) | {:.3} (w={}, q={}) | {} | {} | {} | {order} |",
+                "| {fam} | {bits} | `{arm}` | {:.3} (w={}, q={}) | {:.3} (w={}, q={}) | {} | {} | {} | {order} | {robust} |",
                 lo.2, W[lo.0], QN[lo.1], hi.2, W[hi.0], QN[hi.1], cell(0, 0), cell(2, 2), cell(2, 3)
             )
             .unwrap();
-            t2.push(json!({"family": fam, "bits": bits, "arm": arm, "min": lo.2, "max": hi.2, "order": order,
+            t2.push(json!({"family": fam, "bits": bits, "arm": arm, "min": lo.2, "max": hi.2, "order": order, "interval_excludes_1": robust,
                 "grid": grid.iter().map(|g| json!({"w": W[g.0], "q": QN[g.1], "ratio": g.2})).collect::<Vec<_>>()}));
         }
     }
     js["table2"] = json!(t2);
+
+    // Table 2b: the gap pooled over tier medium (36 to 56 bits), per price.
+    writeln!(md, "\n### Table 2b. Gap to the matched rho, pooled over tier medium (36 to 56 bits), at every price\n").unwrap();
+    writeln!(md, "Pooled paired ratio `sum cost(Cheon) / sum cost(rho)` over every verified (curve, target) pair of 36 to 56 bits (the 32-bit toy size is left out), with a 95 % bootstrap interval over the pairs; rows are the price `w` of an unpriced native operation (both arms), columns the price `q` of an oracle query. This is a distance to rho, not a pass or fail.\n").unwrap();
+    let mut t2b = vec![];
+    for (fam, arm) in [
+        ("minus", "cheon-comb"),
+        ("minus", "cheon-naive"),
+        ("plus", "cheon-comb"),
+    ] {
+        let pooled: Vec<(&Obs, &Obs)> = cells
+            .iter()
+            .filter(|(k, _)| k.0 == fam && k.1 >= 36)
+            .flat_map(|(_, c)| pairs(c, arm))
+            .collect();
+        if pooled.is_empty() {
+            continue;
+        }
+        writeln!(
+            md,
+            "`{arm}` on the `{fam}` curves, {} pairs:\n",
+            pooled.len()
+        )
+        .unwrap();
+        writeln!(md, "| w \\ q | 0 | 0.1 | 1 | server |").unwrap();
+        writeln!(md, "|--:|--:|--:|--:|--:|").unwrap();
+        for w in W {
+            let mut row = format!("| {w} |");
+            for qi in 0..4 {
+                let r = ratio(&pooled, w, qi);
+                let ci = boot(&pooled, w, qi, 17 + qi as u64);
+                write!(row, " {:.3} [{:.3}, {:.3}] |", r, ci.0, ci.1).unwrap();
+                t2b.push(json!({"family": fam, "arm": arm, "w": w, "q": QN[qi], "ratio": r, "ci95": [ci.0, ci.1], "pairs": pooled.len()}));
+            }
+            writeln!(md, "{row}").unwrap();
+        }
+        writeln!(md).unwrap();
+    }
+    js["table2b"] = json!(t2b);
 
     writeln!(md, "\n### Table 3. Unpriced counters and the oracle's price share (means over verified runs)\n").unwrap();
     writeln!(md, "| family | bits | arm | unpriced counters (mean count) | oracle queries | server ops | server ops as % of ops |").unwrap();
     writeln!(md, "|:--|--:|:--|:--|--:|--:|--:|").unwrap();
     for ((fam, bits), c) in &cells {
         for arm in all_arms(fam) {
+            if arm == "rho-neg@naive" {
+                continue;
+            }
             let Some(v) = c.runs.get(arm) else { continue };
             let mut names: BTreeMap<&String, Vec<f64>> = BTreeMap::new();
             for o in v {
@@ -727,7 +782,7 @@ fn figures(out: &str, cells: &BTreeMap<(String, u64), Cell>, bounds: &BTreeMap<S
     std::fs::write(format!("{out}/fig1_scaling_measured.svg"), svg_wrap(pw * 2.0, ph, &body, "Fig. 1. MEASURED log2 charged operations per curve (dots = mean over verified targets, bars = min..max), ecbench sessions of research/cheon_ecbench_20261022. Lines: the sealed bound fits gae = C r^alpha over 36 to 56 bits (the 32-bit toy size is outside the fit). Oracle queries are not in these operations.")).unwrap();
 
     // Fig 2: ratio to rho per size, band over the w x q grid.
-    let mut p = Plot::new(620.0, 360.0, (30.0, 58.0), (-3.0, 5.0));
+    let mut p = Plot::new(620.0, 360.0, (30.0, 58.0), (-3.0, 7.0));
     p.axes(
         4.0,
         1.0,
@@ -773,7 +828,7 @@ fn figures(out: &str, cells: &BTreeMap<(String, u64), Cell>, bounds: &BTreeMap<S
     std::fs::write(format!("{out}/fig2_ratio_to_rho.svg"), svg_wrap(620.0, 360.0, &p.s, "Fig. 2. log2 of the Cheon/rho cost ratio per size. Dots: charged operations only (w = 0, q = 0). Bars: the full range over the 12 pricing cells (w in {0, 0.1, 1} per unpriced native operation, q in {0, 0.1, 1, server work} per oracle query, the same w for both arms). Above 0 = Cheon dearer. Where a bar crosses 0 the order is unresolved. Source: results.json table2.")).unwrap();
 
     // Fig 3: oracle queries and server cost against n.
-    let mut p = Plot::new(620.0, 360.0, (30.0, 58.0), (0.0, 14.0));
+    let mut p = Plot::new(620.0, 360.0, (30.0, 58.0), (0.0, 20.0));
     p.axes(
         4.0,
         2.0,
@@ -810,60 +865,75 @@ fn figures(out: &str, cells: &BTreeMap<(String, u64), Cell>, bounds: &BTreeMap<S
     p.legend(&leg);
     std::fs::write(format!("{out}/fig3_oracle.svg"), svg_wrap(620.0, 360.0, &p.s, "Fig. 3. MEASURED mean static-DH oracle queries per run (solid) and the group operations the server spends answering them (dashed), by size. These are outside the charged operations of Fig. 1. Source: counters.oracle_queries and oracle_server_group_ops of the Cheon comb arms.")).unwrap();
 
-    // Fig 4: phase shares.
-    let mut p = Plot::new(620.0, 340.0, (30.0, 58.0), (0.0, 100.0));
-    p.axes(
-        4.0,
-        20.0,
-        "bits of n",
-        "share of charged operations (%)",
-        "Cheon comb: where the operations go",
-    );
-    let mut leg = vec![];
-    for (fam, names, col, label) in [
-        (
-            "minus",
-            vec!["p-1:precompute", "p-1:step2:precompute"],
-            COL_A,
-            "n-1: comb-table construction",
-        ),
-        (
-            "plus",
-            vec!["p+1:poly"],
-            COL_C,
-            "n+1: polynomial multi-scalar sums",
-        ),
-        (
-            "plus",
-            vec!["p+1:step1:precompute", "p+1:step2:precompute"],
-            COL_B,
-            "n+1: comb-table construction",
-        ),
-    ] {
-        let mut pts = vec![];
-        for (k, c) in cells.iter().filter(|(k, _)| k.0 == fam) {
-            if let Some(v) = c.runs.get("cheon-comb") {
-                let sh = mean(
-                    &v.iter()
-                        .map(|o| {
-                            100.0
-                                * names
-                                    .iter()
-                                    .map(|n| o.phases.get(*n).copied().unwrap_or(0.0))
-                                    .sum::<f64>()
-                                / o.ops
-                        })
-                        .collect::<Vec<_>>(),
-                );
-                pts.push((k.1 as f64, sh));
+    // Fig 4: phase shares, one panel per family.
+    let (pw4, ph4) = (560.0, 340.0);
+    let mut body = String::new();
+    for (i, fam) in ["minus", "plus"].iter().enumerate() {
+        let mut p = Plot::new(pw4, ph4, (30.0, 58.0), (0.0, 100.0));
+        p.axes(
+            4.0,
+            20.0,
+            "bits of n",
+            "share of charged operations (%)",
+            if *fam == "minus" {
+                "n-1 comb: where the operations go"
+            } else {
+                "n+1 comb: where the operations go"
+            },
+        );
+        let mut leg = vec![];
+        let groups: Vec<(&str, &str, &str)> = if *fam == "minus" {
+            vec![
+                ("precompute", COL_B, "comb-table construction"),
+                ("baby", COL_A, "baby steps"),
+                ("giant", COL_C, "giant steps"),
+            ]
+        } else {
+            vec![
+                ("precompute", COL_B, "comb-table construction"),
+                ("poly", COL_RHO, "polynomial multi-scalar sums"),
+                ("baby", COL_A, "baby steps"),
+                ("giant", COL_C, "giant steps"),
+            ]
+        };
+        for (key, col, label) in groups {
+            let mut pts = vec![];
+            for (k, c) in cells.iter().filter(|(k, _)| k.0 == *fam) {
+                if let Some(v) = c.runs.get("cheon-comb") {
+                    let sh = mean(
+                        &v.iter()
+                            .map(|o| {
+                                100.0
+                                    * o.phases
+                                        .iter()
+                                        .filter(|(n, _)| n.contains(key))
+                                        .map(|(_, x)| *x)
+                                        .sum::<f64>()
+                                    / o.ops
+                            })
+                            .collect::<Vec<_>>(),
+                    );
+                    pts.push((k.1 as f64, sh));
+                }
             }
+            p.line(&pts, col, false, 2.0);
+            for (x, y) in &pts {
+                p.dot(*x, *y, col, 3.5);
+            }
+            leg.push((col, label, false));
         }
-        p.line(&pts, col, false, 2.0);
-        for (x, y) in &pts {
-            p.dot(*x, *y, col, 3.5);
-        }
-        leg.push((col, label, false));
+        p.legend(&leg);
+        write!(
+            body,
+            "<g transform='translate({},0)'>{}</g>",
+            i as f64 * pw4,
+            p.s
+        )
+        .unwrap();
     }
-    p.legend(&leg);
-    std::fs::write(format!("{out}/fig4_phase_shares.svg"), svg_wrap(620.0, 340.0, &p.s, "Fig. 4. MEASURED mean share of the charged operations by phase, Cheon comb arms. Source: the phases of each record.")).unwrap();
+    std::fs::write(
+        format!("{out}/fig4_phase_shares.svg"),
+        svg_wrap(pw4 * 2.0, ph4, &body, "Fig. 4. MEASURED mean share of the charged operations by phase group, Cheon comb arms (phase names containing the group word; the shift and verification phases are the remainder). Source: the phases of each record."),
+    )
+    .unwrap();
 }
