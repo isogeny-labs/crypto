@@ -1,0 +1,50 @@
+\\ Native exact validation and layout of saved YAFU polynomial candidates.
+integer(s) = {
+  my(v=Vecsmall(s), x=0, sign=1, start=1);
+  if(!#v,error("empty integer"));
+  if(v[1]==45,sign=-1;start=2);
+  if(start>#v,error("missing digits"));
+  for(i=start,#v,if(v[i]<48||v[i]>57,error("nondecimal integer"));x=10*x+v[i]-48);
+  sign*x;
+};
+{
+  my(N=integer(getenv("NFS_INPUT")), path=getenv("POLY_INPUT"), out=getenv("POLY_OUTPUT"));
+  if(N<=1,error("invalid input"));
+  my(lines=readstr(path), block=List(), a=vector(6), seen=vector(6), y0=0, hasy0=0, count=0);
+  write(out,"n: ",N);
+  foreach(lines,line,
+    my(tokens=strsplit(line,": "));
+    if(!#tokens,next);
+    if(tokens[1]=="#",
+      if(#block,error("incomplete candidate before next header"));
+      block=List();a=vector(6);seen=vector(6);hasy0=0;
+    );
+    if(!#block && tokens[1]!="#",error("candidate must begin with native score header"));
+    listput(block,line);
+    my(name=Vecsmall(tokens[1]));
+    if(#name==2 && name[1]==99 && name[2]>=48 && name[2]<=53,
+      if(#tokens!=2,error("invalid coefficient"));
+      my(k=name[2]-47);
+      if(seen[k],error("duplicate coefficient"));
+      a[k]=integer(tokens[2]);seen[k]=1;
+    );
+    if(tokens[1]=="Y0",
+      if(#tokens!=2||hasy0,error("invalid Y0"));
+      y0=integer(tokens[2]);hasy0=1;
+    );
+    if(tokens[1]=="Y1",
+      if(#tokens!=2||!hasy0||vecmin(seen)!=1||a[6]==0,error("incomplete degree-5 candidate"));
+      my(y1=integer(tokens[2]),g=gcd(y1,N));
+      if(g!=1,error("noninvertible Y1: gcd=",g));
+      my(m=-Mod(y0,N)/Mod(y1,N));
+      if(subst(Polrev(a),'x,m)!=0,error("wrong input or invalid common root"));
+      write(out,strjoin(Vec(block),"\n"));
+      count++;block=List();
+    );
+  );
+  if(#block,error("trailing incomplete candidate"));
+  if(!count,error("no complete candidates"));
+  print("{\"verified\":true,\"input\":\"",N,"\",\"candidate_count\":",count,
+    ",\"common_root_verified\":true,\"elapsed_time_record_added\":false}");
+}
+quit;
