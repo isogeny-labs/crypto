@@ -18,7 +18,8 @@ on file timestamps.
 The separate [matched report](../MATCHED_REPORT.md),
 [graph](../collector-cost-paired.svg), and [PDF](../KUMMER_PAIRED.pdf) describe
 the recorded operation-cost comparison. An isolated analyzer rebuild and two
-passes over copied raw inputs reproduced its six analysis outputs byte for
+passes over copied raw inputs reproduced its five files under
+`results/paired/analysis/` and the top-level `VALIDATION.json` byte for
 byte. All 69 entries in the study's SHA-256 manifest and all 31 raw-input
 pins in its replay certificate matched. A separate read-only curve-law check
 confirmed `kP=Q`, the declared generator order, and curve membership for all
@@ -27,6 +28,14 @@ M/S/I counts also matched the archived same-workload controls for all 1,260.
 Those latter read-only checks supplement the checked-in Rust analyzer; this
 receipt's durable source-to-executable claim rests on its explicit hashes and
 the byte-identical rebuild.
+
+A later [isolated full replay](../reports/run-20261022T1354Z/RUN.md) ran the
+retained executable on copied inputs with separate stdout, stderr,
+environment, and resource capture. It exited 0 after 1,260 candidate and
+1,260 paired rho solves. All 14 generated raw files and five independently
+recomputed analysis files are byte-identical to the archive. Its first
+copy-only launch failed before any target because the theta-model input was
+missing; the failed attempt is retained in that run report.
 
 The original run did not capture separate stdout and stderr, a standalone
 environment snapshot, CPU time, or an isolation level. The 1,507-second
