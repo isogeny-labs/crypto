@@ -1,6 +1,7 @@
 \documentclass[10pt]{article}
 \usepackage[margin=0.72in]{geometry}
 \usepackage{array}
+\usepackage{url}
 \begin{document}
 \begin{center}\Large Four follow-ups: cross-lead review packet\\[2pt]
 \normalsize Frozen public 21-model, 1,260-target cohort; 22 October 2026\end{center}
@@ -18,7 +19,24 @@ Retained weighted state & 1,260 & 1,260 & 4.179297 & 1.706651\\
 \end{tabular}\end{center}
 \noindent\textbf{Validation.} Factor-base arms have 6,300 candidate and 6,300 rho source-scalar checks. Each projective-law arm has 1,260 candidate and 1,260 rho source-scalar checks. Its independent Rust validator recomputed 576 price cells. The weighted-law arithmetic gate includes targeted exceptional cases, but finite checks do not prove universal formula completeness. Study-specific raw JSONL, validators, manifests, and hashes remain in their source directories.
 \medskip
-\noindent\textbf{Open requirements.} The integrated point-driven pencil pilot covers 541 distinct public targets; 719 original targets remain. The sparse-rank continuation is recorded separately. The Kummer coordinate gate checked 8,820 labeled cases on all 1,260 public targets: 8,813 matching nonzero xADD outputs, seven recorded zero outputs, and no wrong nonzero outputs. Its separate signed-Recover gate repaired 175 quotient zero cases and recovered all 1,260 signed targets (1,257 generic, three bounded exceptional). It has no complete labeled DLP collector, so candidate cost, rho cost, and cost ratio are null.
+\noindent\textbf{Point-driven pencil.} The validated sparse-rank continuation has 543 distinct candidate solves and 544 source-verified rho solves. One 32-bit target reached caps under both online and peel; both candidate costs and ratios are null. Another 717 original targets have no completed candidate solve. Nine 60-target curves and one 28-bit single target have all 36 paired online/peel/rho prices. The next table retains the representative prices and the number of cells where peel costs less than online; the companion pencil SVG shows all-cell ranges.
 \medskip
-\noindent\textbf{Review files.} \texttt{REPORT.md} links each source study and its raw data. \texttt{DATA\_DICTIONARY.md} defines both normalized CSV files, empty fields, and exact source references. \texttt{results/standard-targets.csv} has 10,080 rows sharing 1,260 checked workload keys and retains all seven Kummer label outcomes per target. \texttt{cost-ratios.svg} plots per-size measured ratios and omits unpriced Kummer rows. The CSVs and \texttt{results/summary.json} support independent regrouping without using this report's wording.
+\begin{center}\small\begin{tabular}{r|r|r r|r}
+$p$ & Targets & Peel/online & Peel/rho & Cells peel$<$online\\\hline
+739 & 60 & 0.898244 & 11.615357 & 24/36\\
+1,151 & 60 & 0.796603 & 22.836038 & 24/36\\
+1,187 & 60 & 0.736053 & 22.877204 & 24/36\\
+3,371 & 60 & 0.379821 & 93.480568 & 24/36\\
+3,527 & 60 & 0.393296 & 105.157423 & 24/36\\
+3,931 & 60 & 0.365357 & 121.367036 & 24/36\\
+11,731 & 60 & 0.278124 & 1,204.654657 & 24/36\\
+11,887 & 60 & 0.282829 & 1,090.655477 & 24/36\\
+12,143 & 60 & 0.269806 & 1,146.700226 & 24/36\\
+48,383 & 1 & 0.233555 & 22,644.843832 & 24/36\\
+\end{tabular}\end{center}
+\noindent Every paired curve also has 12/36 cells where peel costs more than online and 0/36 where peel costs less than rho. The 28-bit row is one target, not a cohort mean. Its 36-cell range and source paths are in the price grid; all 1,448 pencil arm-target rows, including two unpriced failures, are in the target index.
+\medskip
+\noindent\textbf{Kummer open requirement.} The coordinate gate checked 8,820 labeled cases on all 1,260 public targets: 8,813 matching nonzero xADD outputs, seven recorded zero outputs, and no wrong nonzero outputs. Its separate signed-Recover gate repaired 175 quotient zero cases and recovered all 1,260 signed targets (1,257 generic, three bounded exceptional). The priced labeled DLP collector remains open, so its candidate cost, rho cost, and ratio are null here.
+\medskip
+\noindent\textbf{Review files.} \path{REPORT.md} links each source study and its raw data. \path{DATA_DICTIONARY.md} defines both normalized CSV files, empty fields, and exact source references. The target index has 11,528 rows sharing 1,260 checked workload keys and retains all seven Kummer label outcomes per target. The two SVGs show factor-base/law and paired pencil prices. The CSVs and summary JSON support independent regrouping without using this report's wording.
 \end{document}
