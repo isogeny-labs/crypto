@@ -267,7 +267,7 @@ fn bounded(
     let mut cmd = Command::new("/bin/sh");
     cmd.args([
         "-c",
-        "ulimit -c 0; ulimit -v 786432; exec \"$@\"",
+        "ulimit -c 0; ulimit -v 4194304; exec \"$@\"",
         "twist-bounded",
         "/usr/bin/timeout",
         "--signal=TERM",

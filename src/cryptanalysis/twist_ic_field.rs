@@ -1,7 +1,17 @@
 //! Exact small-field reference arithmetic. No timing or cryptographic-size claim.
 use serde::{Deserialize, Serialize};
+use std::cell::Cell;
+thread_local! { static CALLS: Cell<u64> = const { Cell::new(0) }; }
+/// High-level reference-arithmetic calls, deliberately left unpriced.
+pub fn reference_calls() -> u64 {
+    CALLS.with(Cell::get)
+}
+fn tick() {
+    CALLS.with(|c| c.set(c.get() + 1));
+}
 
 pub fn pow(mut a: u64, mut n: u128, p: u64) -> u64 {
+    tick();
     let mut b = 1;
     while n != 0 {
         if n & 1 != 0 {
@@ -13,13 +23,16 @@ pub fn pow(mut a: u64, mut n: u128, p: u64) -> u64 {
     b
 }
 pub fn inv(a: u64, p: u64) -> u64 {
+    tick();
     assert_ne!(a % p, 0);
     pow(a, (p - 2) as u128, p)
 }
 pub fn prime(p: u64) -> bool {
+    tick();
     p >= 2 && (2..).take_while(|x| x * x <= p).all(|x| p % x != 0)
 }
 pub fn sqrt(a: u64, p: u64) -> Option<u64> {
+    tick();
     if a == 0 {
         return Some(0);
     }
@@ -67,6 +80,7 @@ pub struct Quad {
 }
 impl Quad {
     pub fn new(p: u64, a: u64, b: u64) -> Self {
+        tick();
         assert!(p > 3 && p < 32768 && prime(p));
         assert_ne!((4 * a % p * a % p * a + 27 * b % p * b) % p, 0);
         let d = (2..p)
@@ -75,28 +89,35 @@ impl Quad {
         Self { p, d, a, b }
     }
     pub fn add(self, x: Q, y: Q) -> Q {
+        tick();
         Q((x.0 + y.0) % self.p, (x.1 + y.1) % self.p)
     }
     pub fn neg(self, x: Q) -> Q {
+        tick();
         Q((self.p - x.0) % self.p, (self.p - x.1) % self.p)
     }
     pub fn sub(self, x: Q, y: Q) -> Q {
+        tick();
         self.add(x, self.neg(y))
     }
     pub fn mul(self, x: Q, y: Q) -> Q {
+        tick();
         Q(
             (x.0 * y.0 + self.d * x.1 % self.p * y.1) % self.p,
             (x.0 * y.1 + x.1 * y.0) % self.p,
         )
     }
     pub fn scale(self, x: Q, n: u64) -> Q {
+        tick();
         Q(x.0 * n % self.p, x.1 * n % self.p)
     }
     pub fn inv(self, x: Q) -> Q {
+        tick();
         let n = (x.0 * x.0 + self.p - self.d * x.1 % self.p * x.1 % self.p) % self.p;
         self.scale(self.neg(Q((self.p - x.0) % self.p, x.1)), inv(n, self.p))
     }
     pub fn sqrt(self, x: Q) -> Option<Q> {
+        tick();
         if x.1 == 0 {
             return sqrt(x.0, self.p)
                 .map(|z| Q(z, 0))
@@ -117,18 +138,22 @@ impl Quad {
         None
     }
     pub fn rhs(self, x: Q) -> Q {
+        tick();
         self.add(
             self.add(self.mul(self.mul(x, x), x), self.scale(x, self.a)),
             Q(self.b, 0),
         )
     }
     pub fn on(self, x: P) -> bool {
+        tick();
         x.is_none_or(|(x, y)| self.mul(y, y) == self.rhs(x))
     }
     pub fn pn(self, x: P) -> P {
+        tick();
         x.map(|(x, y)| (x, self.neg(y)))
     }
     pub fn frob(self, x: P) -> P {
+        tick();
         x.map(|(x, y)| {
             (
                 Q(x.0, (self.p - x.1) % self.p),
@@ -137,6 +162,7 @@ impl Quad {
         })
     }
     pub fn pa(self, x: P, y: P) -> P {
+        tick();
         let (Some((x1, y1)), Some((x2, y2))) = (x, y) else {
             return x.or(y);
         };
@@ -155,6 +181,7 @@ impl Quad {
         Some((x3, self.sub(self.mul(m, self.sub(x1, x3)), y1)))
     }
     pub fn pm(self, mut x: P, mut n: u128) -> P {
+        tick();
         let mut z = None;
         while n != 0 {
             if n & 1 != 0 {
@@ -166,9 +193,11 @@ impl Quad {
         z
     }
     pub fn trace(self, x: P) -> P {
+        tick();
         self.pa(x, self.frob(x))
     }
     pub fn rational(self) -> Vec<P> {
+        tick();
         let mut v = vec![None];
         for x in 0..self.p {
             if let Some(y) = sqrt(self.rhs(Q(x, 0)).0, self.p) {
@@ -182,6 +211,7 @@ impl Quad {
         v
     }
     pub fn points(self) -> Vec<P> {
+        tick();
         let q = (self.p * self.p) as usize;
         let mut roots = vec![None; q];
         for a in 0..self.p {
@@ -225,6 +255,7 @@ pub struct Sext {
 }
 impl Sext {
     pub fn new(e: Quad) -> Self {
+        tick();
         assert!((0..e.p).all(|x| e.rhs(Q(x, 0)).0 != 0));
         Self {
             p: e.p,
@@ -234,9 +265,11 @@ impl Sext {
         }
     }
     pub fn c(self, x: u64) -> S {
+        tick();
         S([x % self.p, 0, 0, 0, 0, 0])
     }
     pub fn add(self, x: S, y: S) -> S {
+        tick();
         let mut r = [0; 6];
         for i in 0..6 {
             r[i] = (x.0[i] + y.0[i]) % self.p;
@@ -244,9 +277,11 @@ impl Sext {
         S(r)
     }
     pub fn neg(self, x: S) -> S {
+        tick();
         S(x.0.map(|v| (self.p - v) % self.p))
     }
     pub fn sub(self, x: S, y: S) -> S {
+        tick();
         self.add(x, self.neg(y))
     }
     fn m3(self, x: &[u64], y: &[u64]) -> [u64; 3] {
@@ -263,6 +298,7 @@ impl Sext {
         [z[0], z[1], z[2]]
     }
     pub fn mul(self, x: S, y: S) -> S {
+        tick();
         let ac = self.m3(&x.0[..3], &y.0[..3]);
         let bd = self.m3(&x.0[3..], &y.0[3..]);
         let ad = self.m3(&x.0[..3], &y.0[3..]);
@@ -275,6 +311,7 @@ impl Sext {
         S(z)
     }
     pub fn pow(self, mut x: S, mut n: u128) -> S {
+        tick();
         let mut y = ONE;
         while n != 0 {
             if n & 1 != 0 {
@@ -286,6 +323,7 @@ impl Sext {
         y
     }
     pub fn inv(self, x: S) -> S {
+        tick();
         assert_ne!(x, Z);
         let y = self.pow(
             x,
@@ -295,9 +333,11 @@ impl Sext {
         y
     }
     pub fn div(self, x: S, y: S) -> S {
+        tick();
         self.mul(x, self.inv(y))
     }
     pub fn sqrt(self, x: S) -> Option<S> {
+        tick();
         if x.0[3..] == [0, 0, 0] {
             return self.sqrt_degree(x, 3).or_else(|| {
                 self.sqrt_degree(self.div(x, self.c(self.d)), 3)
@@ -351,9 +391,11 @@ impl Sext {
         Some(y)
     }
     pub fn lift(self, q: Q) -> S {
+        tick();
         S([q.0, 0, 0, q.1, 0, 0])
     }
     pub fn fp(self, s: S) -> Option<u64> {
+        tick();
         if s.0[1..].iter().all(|x| *x == 0) {
             Some(s.0[0])
         } else {
@@ -361,14 +403,17 @@ impl Sext {
         }
     }
     pub fn pn(self, x: SP) -> SP {
+        tick();
         x.map(|(x, y)| (x, self.neg(y)))
     }
     pub fn on(self, x: SP, a: S, b: S) -> bool {
+        tick();
         x.is_none_or(|(x, y)| {
             self.mul(y, y) == self.add(self.add(self.mul(self.mul(x, x), x), self.mul(a, x)), b)
         })
     }
     pub fn pa(self, x: SP, y: SP, a: S) -> SP {
+        tick();
         let (Some((x1, y1)), Some((x2, y2))) = (x, y) else {
             return x.or(y);
         };
@@ -387,6 +432,7 @@ impl Sext {
         Some((x3, self.sub(self.mul(m, self.sub(x1, x3)), y1)))
     }
     pub fn pm(self, mut x: SP, mut n: u128, a: S) -> SP {
+        tick();
         let mut z = None;
         while n != 0 {
             if n & 1 != 0 {
@@ -398,6 +444,7 @@ impl Sext {
         z
     }
     pub fn frob(self, x: SP) -> SP {
+        tick();
         x.map(|(x, y)| (self.pow(x, self.p as u128), self.pow(y, self.p as u128)))
     }
 }

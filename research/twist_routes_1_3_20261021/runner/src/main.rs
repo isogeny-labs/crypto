@@ -14,7 +14,7 @@ pub mod source_field;
 pub mod source_point;
 #[path = "../../../../src/hash/sha256.rs"]
 mod source_sha256;
-#[path = "field.rs"]
+#[path = "../../../../src/cryptanalysis/twist_ic_field.rs"]
 mod toy_field;
 mod trace;
 #[path = "../../../../src/utils/mod.rs"]

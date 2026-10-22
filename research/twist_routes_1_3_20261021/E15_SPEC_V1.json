@@ -1,0 +1,458 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "twist E15 cold bounded factorial correctness panel",
+  "description": "Ten pre-registered small prime curves, eight public single targets each; trace/cover/symmetric knobs plus nine ordinary IC configurations, strongest applicable negation rho and same-base table controls. L0 native counts only; all new construction and solver costs unpriced; no speed claim. Retain empty or undersized bases, unresolved calls and exhausted targets.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 59,
+        "a": 1,
+        "b": 13,
+        "group_order": 67,
+        "r": 67,
+        "gx": 1,
+        "gy": 29
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 827,
+        "a": 1,
+        "b": 15,
+        "group_order": 823,
+        "r": 823,
+        "gx": 2,
+        "gy": 5
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 211,
+        "a": 208,
+        "b": 171,
+        "group_order": 233,
+        "r": 233,
+        "gx": 0,
+        "gy": 63
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 251,
+        "a": 248,
+        "b": 104,
+        "group_order": 257,
+        "r": 257,
+        "gx": 2,
+        "gy": 68
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 647,
+        "a": 644,
+        "b": 378,
+        "group_order": 601,
+        "r": 601,
+        "gx": 0,
+        "gy": 158
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 751,
+        "a": 748,
+        "b": 355,
+        "group_order": 773,
+        "r": 773,
+        "gx": 0,
+        "gy": 141
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 2903,
+        "a": 2900,
+        "b": 2191,
+        "group_order": 2857,
+        "r": 2857,
+        "gx": 2,
+        "gy": 450
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 2879,
+        "a": 2876,
+        "b": 66,
+        "group_order": 2819,
+        "r": 2819,
+        "gx": 0,
+        "gy": 294
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 8501,
+        "a": 8498,
+        "b": 6578,
+        "group_order": 8389,
+        "r": 8389,
+        "gx": 0,
+        "gy": 440
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 10111,
+        "a": 10108,
+        "b": 2486,
+        "group_order": 10079,
+        "r": 10079,
+        "gx": 4,
+        "gy": 4123
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261021,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-frozen",
+      "role": "baseline",
+      "method": {
+        "id": "rho.frozen_reference"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ordinary-blocked-b8",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-abscissa:size=8",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "ordinary-roots2-b8",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-abscissa:size=8",
+          "oracle": "rootfind-subtract:m=2",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "ordinary-roots3-b8",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-abscissa:size=8",
+          "oracle": "rootfind-subtract:m=3",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "ordinary-blocked-b12",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-abscissa:size=12",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "ordinary-roots2-b12",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-abscissa:size=12",
+          "oracle": "rootfind-subtract:m=2",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "ordinary-roots3-b12",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-abscissa:size=12",
+          "oracle": "rootfind-subtract:m=3",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "ordinary-blocked-b16",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-abscissa:size=16",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "ordinary-roots2-b16",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-abscissa:size=16",
+          "oracle": "rootfind-subtract:m=2",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "ordinary-roots3-b16",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-abscissa:size=16",
+          "oracle": "rootfind-subtract:m=3",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "t0c0s0",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-twist-experiment:size=8,h=8,trace=0,cover=0",
+          "oracle": "twist-f4-product:degree=16",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "t0c0s1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-twist-experiment:size=8,h=8,trace=0,cover=0",
+          "oracle": "twist-f4-symmetric:degree=16",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "same-base-t0c0",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-twist-experiment:size=8,h=8,trace=0,cover=0",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "t0c1s0",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-twist-experiment:size=8,h=8,trace=0,cover=1",
+          "oracle": "twist-f4-product:degree=16",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "t0c1s1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-twist-experiment:size=8,h=8,trace=0,cover=1",
+          "oracle": "twist-f4-symmetric:degree=16",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "same-base-t0c1",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-twist-experiment:size=8,h=8,trace=0,cover=1",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "t1c0s0",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-twist-experiment:size=8,h=8,trace=1,cover=0",
+          "oracle": "twist-f4-product:degree=16",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "t1c0s1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-twist-experiment:size=8,h=8,trace=1,cover=0",
+          "oracle": "twist-f4-symmetric:degree=16",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "same-base-t1c0",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-twist-experiment:size=8,h=8,trace=1,cover=0",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "t1c1s0",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-twist-experiment:size=8,h=8,trace=1,cover=1",
+          "oracle": "twist-f4-product:degree=16",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "t1c1s1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-twist-experiment:size=8,h=8,trace=1,cover=1",
+          "oracle": "twist-f4-symmetric:degree=16",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "same-base-t1c1",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline_counted",
+        "params": {
+          "factor_base": "prime-twist-experiment:size=8,h=8,trace=1,cover=1",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk",
+          "max_trials": "8192",
+          "solver_budget_seconds": "0",
+          "linalg": "incremental-gauss"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 20261021,
+    "isolation_required": "L0",
+    "timeout_seconds": 30
+  }
+}

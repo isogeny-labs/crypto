@@ -69,6 +69,7 @@ use crate::cryptanalysis::koblitz_strong_rho::{
     RawPoint as StrongPoint, RawPointG, RhoField, RhoScalar, StrongRho, StrongRhoCharges,
     StrongRhoG, StrongRhoParams,
 };
+use crate::cryptanalysis::twist_ic_pipeline::{TwistExperimentBase, TwistF4Oracle};
 use rand::{rngs::StdRng, SeedableRng};
 
 /// A parameter a method reads.  `default: None` means required: a value
@@ -2121,9 +2122,11 @@ fn solve_ic_prime(
     let orbit = GlvOrbitBase { instance: inst };
     let kummer = PrimeKummerBase { instance: inst };
     let isogeny = PrimeIsogenyBase { instance: inst };
+    let twist = TwistExperimentBase;
     let cm_orbit = CmOrbitBase { instance: inst };
     let base: &dyn FactorBaseBuilder<_> = match fb_name.as_str() {
         "prime-abscissa" => &abscissa,
+        "prime-twist-experiment" => &twist,
         "prime-projected-abscissa" => &projected,
         "glv-orbit" => &orbit,
         "prime-kummer" => &kummer,
@@ -2144,8 +2147,12 @@ fn solve_ic_prime(
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
+    let mut twist_product = TwistF4Oracle::new(false);
+    let mut twist_symmetric = TwistF4Oracle::new(true);
     let oracle: &mut dyn DecompositionOracle<_> = match or_name.as_str() {
         "subtract" => &mut subtract,
+        "twist-f4-product" => &mut twist_product,
+        "twist-f4-symmetric" => &mut twist_symmetric,
         "mitm" => &mut mitm,
         "mitm-prime-batch" => &mut prime_batch,
         "mitm-prime-blocked" => &mut prime_blocked,
@@ -2857,8 +2864,10 @@ pub fn dump_factor_base(
             let orbit = GlvOrbitBase { instance: i };
             let kummer = PrimeKummerBase { instance: i };
             let isogeny = PrimeIsogenyBase { instance: i };
+            let twist = TwistExperimentBase;
             let base: &dyn FactorBaseBuilder<_> = match name.as_str() {
                 "prime-abscissa" => &abscissa,
+                "prime-twist-experiment" => &twist,
                 "prime-projected-abscissa" => &projected,
                 "glv-orbit" => &orbit,
                 "prime-kummer" => &kummer,
