@@ -109,7 +109,7 @@ The stages are in ns per scanned summand, each the mean over the clean processes
   other** and with the probes there. They are read as noise around a small effect.
 - **The lever should grow with the problem.** The filter doubles with the
   table, so beyond 2^47.2 a larger share of filter reads would miss the TLB.
-  That is where the distance to rho is largest (11.51× at 2^47.2, rule v7).
+  That is where the distance to rho is largest (18.07× at 2^47.2 against rule v8's matched rho; 11.51× against rho as built, rule v7).
 
 ## Graph and report
 

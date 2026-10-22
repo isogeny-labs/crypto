@@ -677,7 +677,8 @@ nothing missing. R09's class excludes it.
     the strong walk's time a step).
 - **The distance remaining.** Rho is still faster cold at every size:
   3.78–12.06× (rule v3: 5.23–20.97×). At the three largest sizes it is
-  7.90×, 7.40× and 12.06×, against 13.24×, 12.03× and 20.97×.
+  7.90×, 7.40× and 12.06×, against 13.24×, 12.03× and 20.97×. These are
+  against rho as built (not matched); see rule v8 below the rule at v7.
 - **Online.** The index calculus is 14.2–36.4× faster than rho on the same
   point.
 - **The gap still grows with the group,** but more slowly: as
@@ -721,6 +722,9 @@ nothing missing. R09's class excludes it.
 - **The distance remaining.** Rho is 3.43–11.51× faster cold (v6:
   3.78–12.06×; v3: 5.23–20.97×). At the three largest sizes it is 7.03×,
   6.37× and 11.51×, against the predicted 7.0×, 6.6× and 11.3×.
+- **Reference superseded (2026-10-22).** Those ratios are against rho as built,
+  which was not matched. The measured matched reference is rule v8's matched rho (signed-Frobenius canonicalisation batched 16 lanes at a time, measured at baseline v8): rho is 4.67–18.07× faster cold, and 11.75×, 10.65× and 18.07× at the three largest sizes; its same-binary control, rho as at v7, reads 3.59–11.56×
+  ([`rule/v8`](../../ic_tool_program/rule/v8/README.md)). The leaderboard's Table A cites rule v8.
 - **Online** the index calculus is 14.1–37.0× faster, as at v6: R11
   changed only the set-up.
 - **Since v3,** rho's cold lead has narrowed 1.52–1.89× at every size

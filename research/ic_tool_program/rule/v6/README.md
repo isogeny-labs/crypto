@@ -24,6 +24,8 @@ and R08 (family 6 model 207, kernel build `6.18.44-fc-v139`;
   largest sizes it is **7.90×, 7.40× and 12.06×**, against 13.24×, 12.03×
   and 20.97×.
 
+**Reference superseded (2026-10-22).** These ratios are against rho as built, which was not matched. The measured matched reference is rule v8's matched rho (signed-Frobenius canonicalisation batched 16 lanes at a time, measured at baseline v8): rho is 4.67–18.07× faster cold, and 11.75×, 10.65× and 18.07× at the three largest sizes; its same-binary control, rho as at v7, reads 3.59–11.56× ([`rule/v8`](../v8/README.md)). The leaderboard's Table A cites rule v8.
+
 ![rule v6 against rule v3](report/rho-distance.svg)
 
 PDF: [`report/report.pdf`](report/report.pdf).

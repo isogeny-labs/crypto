@@ -14,57 +14,79 @@ PDF: [`report/report.pdf`](report/report.pdf).
 
 ## Result
 
-- **15 evidence directories validated:** 14 benchmark rows and `rule/v7/`, which
-  carries the leaderboard's six rule-v7 rows.
+- **16 evidence directories validated:**
+  - 14 benchmark rows;
+  - `rule/v8/`, which carries the leaderboard's six Table A rows;
+  - `rule/v7/`, whose rows Table A cited before.
+
   `python3 scripts/validation_gate.py check --base origin/main` reports every
   row validated or frozen.
-- **Every published figure recomputes.** 2,192 figures from the raw records, including the 30 the leaderboard shows for rule v7:
-  - the five rounds' A/A, suite and holdout intervals and rule v6/v7's S figures
-    agree to 1e-9;
+- **Every published figure recomputes.** 2,240 figures from the raw records:
+  - the five rounds' A/A, suite and holdout intervals and rule v6/v7/v8's S
+    figures agree to 1e-9, as do the 30 figures Table A shows for rule v8 and
+    its control;
   - the explorations' paired cold times agree exactly, and their summaries
     agree at the three decimals they print.
-- **Every recorded scalar verifies.** 6,809 records and 13,618 certificates
+- **Every recorded scalar verifies.** 7,650 records and 15,300 certificates
   (both arms of every process) pass `[s]G = T` and `[n]G = O`, and the scalar+1
   negative control is rejected each time. The curves are GF(2^19) to GF(2^61).
-- **56 of 56 native replays are identical.** Four records per directory were
+- **64 of 64 native replays are identical.** Four records per directory were
   drawn by the seed committed in [`REPLAY_SEED.md`](REPLAY_SEED.md) (commit
-  `766d2dede`, before any replay). Each was rerun with its own recorded binary,
-  hash-checked, and reproduced the same certificates, counts and flags.
+  `766d2dede`, before any replay; amendment 1, commit `e9cdf82c0`, added rule v8
+  and v8c before they were replayed). Each was rerun and reproduced the same
+  certificates, counts and flags:
+  - every round and exploration ran with its own recorded binary, hash-checked;
+  - rule v8 and v8c ran with `ic` rebuilt from their recorded commit `370e1919`
+    (`binary_rebuilt` in each run), because the original binary was not on this
+    host.
 
-## Finding: the published distance to rho is the smaller of two
+## The reference: measured rho, and Table A on rule v8
 
-Each `ic price --single-target` process records two rho figures for the same
+Each `ic price --single-target` process records two figures for rho on the same
 point:
-- **as built:** the walk as it ran;
-- **canonical step:** the walk priced at the batched step that the same process
-  measures.
+- **rho as measured:** its set-up plus its walk, as it ran;
+- **a model:** the walk's counted operations priced at the canonical batched
+  step the same process measures (`rho_model`, which the record calls "a model
+  beside the measured interval, not a measurement of it").
 
-The rows quote rho as built. In rule v6 and v7 that rho pays 1.98 to 2.38 times
-the canonical step for each walk step (`rho_step_over_model_median`), which
-validation sweep A also found for rule v3.
+Every `VALIDATION.json` names the measured rho of the row's own process as its
+reference. That is the reference each protocol names. Its walk uses negation and
+Frobenius, which is the strongest fold for these curves in the gate's sense.
+The model is recorded beside it (`rho_canonical_step_model`) and is not a
+reference.
 
-The gate asks for the strongest available reference, so every `VALIDATION.json`
-uses the canonical-step rho. At each row's largest size the distance to rho is
-then 1.84 to 2.05 times the published one:
+The order holds across the §5a band: rho is faster at 0, 0.1 and 1 GAE for each
+of rho's uncharged canonicalisations.
 
-| row | size | IC / rho as built (published) | IC / rho, canonical step |
-|:--|:--|--:|--:|
-| rule v7 | 2^47.2 | 11.51 | 22.37 |
-| rule v6 | 2^47.2 | 12.06 | 23.48 |
-| R12 (v8) | 2^47.2 | 9.86 | 18.86 |
+**The model overstates rho.** Rule v8 measured a matched rho, its
+canonicalisation batched 16 lanes at a time. It is 1.30–1.58× faster cold than
+rho as at rule v7 on the same binary (rule v8c), while the model assumes about
+twice. At 2^47.2:
 
-Every row's values are in its `VALIDATION.json` (`rho_reference`). The order
-holds across the §5a band: rho is faster at 0, 0.1 and 1 GAE for each of rho's
-uncharged canonicalisations. The speed-ups between IC versions are unaffected,
-because both arms of each round meet the same rho.
+| reference | IC / rho at 2^47.2 |
+|:--|--:|
+| rule v7, rho as built | 11.51 |
+| rule v8, the matched rho (measured) | **18.07** |
+| rule v8, the canonical-step model | 23.32 |
+| rule v8c, rho as at v7 (same binary) | 11.56 |
 
-**The leaderboard now uses the canonical-step reference** (owner's decision,
-2026-10-22). Table A's six rule-v7 rows show `S, reference` and `× reference`
-at the canonical step, and the as-built ratio with its interval beneath. §23's
-"was" marks are recomputed the same way from §23's own `s_rho_model_mean`.
-At 2^47.2 the row reads **22.4×** (was 58.2×, §23), where it read 11.5×
-(was 31.6×). The rule-v7 validator report also recomputes these 30 displayed
-figures from the raw records, which brings its total to 78.
+**Table A now cites rule v8** (owner's decision, 2026-10-22). It shows the
+measured matched rho, 4.67–18.07×, with its published interval. Beside it are
+the same binary's control (rho as at v7) and §23's ratio against rho as built.
+An earlier commit in this PR had switched Table A to the canonical-step model.
+That was replaced on finding that the model is not a measurement.
+
+The hand-written pages that quoted rule v6 or v7 now say those ratios are
+against rho as built, which was not matched, and point to rule v8's measured
+figures:
+- `benchmarks/README.md`;
+- the programme index (`research/ic_tool_program/README.md`);
+- the ledger, `IC_TOOL_PROGRAM.md`;
+- the rule v6 and v7 results;
+- R11, R12 and A17.
+
+The measured v6 and v7 figures themselves are unchanged. The scoreboard already
+cited rule v8.
 
 ## Rows withdrawn from `benchmarks/README.md`
 
@@ -98,8 +120,13 @@ figures from the raw records, which brings its total to 78.
 - **Host:** `Linux 6.18.44-fc-v140 x86_64`, Emerald Rapids, the rounds' host
   class. The rounds ran on kernel build `-v139`. Replays compare outputs, not
   times.
-- **Binaries:** each one's SHA-256 matches the round's `analysis.json`
-  (`host.binaries`) or its `binaries.sha256`.
+- **Binaries:** each round's and exploration's SHA-256 matches its `analysis.json`
+  (`host.binaries`) or its `binaries.sha256`. Rule v8 and v8c used `ic` rebuilt
+  from `370e1919` with `--locked`. Its bytes differ from the recorded binary,
+  because a build embeds its paths.
+- **Rule v8c's setting.** Rule v8c set `KIC_RHO_CANON=scalar` (`rule/v8/run.sh`),
+  and its replays set it too. Its records differ from rule v8's only in timings,
+  so a replay confirms v8c's counts and scalars, not which canonicalisation ran.
 - **Disclosures.**
   - A first replay pass was driven by a Python script, against AGENTS.md
     ("Implementation language: no Python"). Its log is

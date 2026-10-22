@@ -1,0 +1,45 @@
+{
+  "built_by": "src/bin/ic_validate.rs (ic_validate build)",
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "sha256": "e4dd833cf53dffa26cc72451c027f2993b007c4b69a6054b5211bfc46d2a0d96"
+  },
+  "rho_reference": {
+    "band_basis": "the row's reported arm at its largest size (icv1-f2m61-t158598901-ab42b6c5, 2^47.2), against the measured rho; the index calculus is timed by the clock, so it carries no unpriced native work; the canonicalisations rho's walk leaves uncharged (median 1330817.5 a process) are priced at 0, 0.1 and 1 GAE each",
+    "binary_or_process": "the row's own `ic` binary and process: both arms rebuilt from nothing each repetition, the index calculus first",
+    "gae_band": {
+      "0": {
+        "ic": 13.39391947608154,
+        "rho": 0.7414164273596429
+      },
+      "0.1": {
+        "ic": 13.39391947608154,
+        "rho": 0.751843776429063
+      },
+      "1": {
+        "ic": 13.39391947608154,
+        "rho": 0.8456899180538442
+      }
+    },
+    "ic_over_rho": 18.065312531286118,
+    "kind": "negation_frobenius",
+    "matches_protocol": true,
+    "order_holds_across_band": true,
+    "protocol": "ledger section 23's one-target rho on the same public point, in the same `ic price --single-target` process: rule v8's matched rho, the signed-Frobenius r-adding walk (negation and Frobenius classes) with its canonicalisation batched 16 lanes at a time, its set-up plus its walk, as measured; rule v8c, the same binary with rho as at rule v7, is its control",
+    "rho_canonical_step_model": {
+      "ic_over_rho": 23.31512037838203,
+      "note": "not a reference: rho's counted walk priced at the canonical batched step the process measures, a model beside the measured interval (the record's `rho_model`); rule v8's measured matched rho sits between it and rho as built",
+      "s": 0.5744735287105999
+    },
+    "same_binary_or_process": true,
+    "same_unit": true,
+    "strongest_available": true,
+    "strongest_available_basis": "the gate's sense (docs/VALIDATION_GATE.md): the strongest symmetry fold for the curve, here negation and Frobenius (A = 2n). Implementations of that walk differ in speed: rule v8's matched rho, batched canonicalisation, measured 1.30-1.58x faster cold than rho as at v7 on the same binary",
+    "unit": "S: cold time in v0's unit (one batched addition) over sqrt(r)"
+  },
+  "schema": "validation-gate/v1",
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "a54b9c55d0a116507fd575cc69f8da6d6063d55e33c23b959dbf229b2d68e9d0"
+  }
+}

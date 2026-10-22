@@ -682,6 +682,29 @@ fn size_of(stem: &str) -> Option<String> {
     }
 }
 
+/// A rule run's S figures by size, as `mode_rule` computes them (no comparison).
+fn rule_size_figures(d: &Path) -> Vec<Value> {
+    let recs = Records::load(d);
+    let mut by_size: BTreeMap<String, Vec<&Value>> = BTreeMap::new();
+    for stem in recs.stems("runs/") {
+        if let (Some(size), Some(rec)) = (size_of(&stem), recs.first_clean(&stem)) {
+            by_size.entry(size).or_default().push(rec);
+        }
+    }
+    let mut out = Vec::new();
+    for rows in by_size.values() {
+        let col = |k: &str| {
+            rows.iter()
+                .map(|r| f(&r["median"][k]))
+                .collect::<Vec<f64>>()
+        };
+        let (setup, ic_on) = (median(&col("s_setup")), mean(&col("s_ic_online")));
+        let (rho_setup, rho_on) = (median(&col("s_rho_setup")), mean(&col("s_rho_online")));
+        out.push(json!({"curve": rows[0]["curve"], "s_ic_cold": setup + ic_on, "s_rho_as_built": rho_setup + rho_on}));
+    }
+    out
+}
+
 fn mode_rule(d: &Path) -> Report {
     let repo = repo();
     let ana = read_json(&d.join("analysis.json"));
@@ -777,8 +800,14 @@ fn mode_rule(d: &Path) -> Report {
             "rho_canonicalisations_uncharged_median": canon}),
         );
     }
-    // The leaderboard's rows from this analysis show the reference at the canonical step
-    // (scripts/build_ic_leaderboard.py): recompute what they display.
+    // The leaderboard's rows from this analysis (scripts/build_ic_leaderboard.py) show the
+    // measured rho of this run and, where a control run `<dir>c` exists (rule v8c), the
+    // control's: recompute what they display.
+    let control_dir = d.with_file_name(format!("{}c", d.file_name().unwrap().to_string_lossy()));
+    let control = control_dir
+        .join("analysis.json")
+        .exists()
+        .then(|| rule_size_figures(&control_dir));
     let board_path = repo.join("docs/ic/leaderboard.json");
     let source = rel_to(&d.join("analysis.json"), &repo);
     if let Ok(raw) = fs::read(&board_path) {
@@ -794,11 +823,7 @@ fn mode_rule(d: &Path) -> Report {
                 continue;
             };
             let slug = row["slug"].as_str().unwrap();
-            let (ic, canon, built) = (
-                f(&sz["s_ic_cold"]),
-                f(&sz["s_rho_canonical"]),
-                f(&sz["s_rho_as_built"]),
-            );
+            let (ic, rho) = (f(&sz["s_ic_cold"]), f(&sz["s_rho_as_built"]));
             rep.check(
                 format!("leaderboard {slug} S, IC"),
                 opt(&row["best"]["s"]),
@@ -806,29 +831,35 @@ fn mode_rule(d: &Path) -> Report {
                 1e-9,
             );
             rep.check(
-                format!("leaderboard {slug} S, reference (canonical step)"),
+                format!("leaderboard {slug} S, reference"),
                 opt(&row["reference_s"]),
-                Some(canon),
+                Some(rho),
                 1e-9,
             );
             rep.check(
-                format!("leaderboard {slug} x reference (canonical step)"),
+                format!("leaderboard {slug} x reference"),
                 opt(&row["best"]["ratio_rho"]),
-                Some(ic / canon),
+                Some(ic / rho),
                 1e-9,
             );
-            rep.check(
-                format!("leaderboard {slug} S, reference as built"),
-                opt(&row["reference_s_as_built"]),
-                Some(built),
-                1e-9,
-            );
-            rep.check(
-                format!("leaderboard {slug} x reference as built"),
-                opt(&row["best"]["ratio_rho_as_built"]),
-                Some(ic / built),
-                1e-9,
-            );
+            if let Some(c) = control
+                .as_ref()
+                .and_then(|c| c.iter().find(|x| x["curve"] == row["slug"]))
+            {
+                let (cic, crho) = (f(&c["s_ic_cold"]), f(&c["s_rho_as_built"]));
+                rep.check(
+                    format!("leaderboard {slug} S, reference (control)"),
+                    opt(&row["reference_s_control"]),
+                    Some(crho),
+                    1e-9,
+                );
+                rep.check(
+                    format!("leaderboard {slug} x reference (control)"),
+                    opt(&row["best"]["ratio_rho_control"]),
+                    Some(cic / crho),
+                    1e-9,
+                );
+            }
             shown += 1;
         }
         if shown > 0 {
@@ -1252,7 +1283,9 @@ fn certs_of(doc: &Value) -> Value {
     Value::Object(m)
 }
 
-fn replay(bin: &Path, scratch: &Path, dirs: &[PathBuf]) -> Value {
+/// `envs`: `DIR:KEY=VALUE`, an environment variable the run script set for that evidence
+/// directory and the records do not carry (rule v8c: `KIC_RHO_CANON=scalar`, rule/v8/run.sh).
+fn replay(bin: &Path, scratch: &Path, dirs: &[PathBuf], envs: &[String]) -> Value {
     let repo = repo();
     let s = seed(&repo);
     let mut bin_sha = HashMap::new();
@@ -1267,6 +1300,19 @@ fn replay(bin: &Path, scratch: &Path, dirs: &[PathBuf]) -> Value {
     let mut results = Vec::new();
     for d in dirs {
         let d = fs::canonicalize(d).unwrap();
+        let extra_env: Vec<(String, String)> = envs
+            .iter()
+            .filter_map(|e| {
+                let (dir, kv) = e.split_once(':')?;
+                let (k, v) = kv.split_once('=')?;
+                (fs::canonicalize(dir).ok()? == d).then(|| (k.to_string(), v.to_string()))
+            })
+            .collect();
+        // the binary the runs recorded (`runs/host.json`): a replay with another build says so
+        let recorded: Option<Value> = fs::read(d.join("runs/host.json"))
+            .ok()
+            .and_then(|b| serde_json::from_slice::<Value>(&b).ok())
+            .and_then(|h| h.get("binaries").cloned());
         let ev = rel_to(&d, &repo);
         let (files, _) = record_files(&d);
         let iso: HashMap<&str, &Vec<u8>> = files
@@ -1344,12 +1390,29 @@ fn replay(bin: &Path, scratch: &Path, dirs: &[PathBuf]) -> Value {
                     }
                 }
             }
+            if let Some(b) = recorded
+                .as_ref()
+                .and_then(|b| b.as_object())
+                .and_then(|b| b.values().find(|v| v["path_basename"] == exe.as_str()))
+            {
+                if b["sha256"] != bin_sha[&exe].as_str() {
+                    r["binary_rebuilt"] = json!({"recorded_sha256": b["sha256"], "built_from": b["built_from"],
+                        "note": "rebuilt from the recorded commit with --locked; the bytes differ (a build embeds its paths)"});
+                }
+            }
+            if !extra_env.is_empty() {
+                r["env"] = json!(extra_env
+                    .iter()
+                    .map(|(k, v)| format!("{k}={v}"))
+                    .collect::<Vec<_>>());
+            }
             let t0 = Instant::now();
             let p = Command::new(&cmd[0])
                 .args(&cmd[1..])
                 .env_clear()
                 .env("RAYON_NUM_THREADS", "1")
                 .env("PATH", "/usr/bin:/bin")
+                .envs(extra_env.iter().map(|(k, v)| (k.as_str(), v.as_str())))
                 .output()
                 .unwrap();
             r["seconds"] = json!((t0.elapsed().as_secs_f64() * 100.0).round() / 100.0);
@@ -1372,6 +1435,10 @@ fn replay(bin: &Path, scratch: &Path, dirs: &[PathBuf]) -> Value {
                 .collect();
             if certs_of(&doc) != certs_of(&new) {
                 diffs.push("certificates");
+            }
+            // with an environment override, the rho it selects must be the recorded one
+            if !extra_env.is_empty() && doc.get("rho_policy") != new.get("rho_policy") {
+                diffs.push("rho_policy");
             }
             let mut cache = HashMap::new();
             let verified = ["ic", "rho"]
@@ -1425,6 +1492,8 @@ struct Row {
     /// the arm the row reports, as a record-path prefix (rounds and explorations)
     arm: &'static str,
     evidence: &'static [&'static str],
+    /// further runs of the same evidence (key, programme dir): their scalars and replays join it
+    also: &'static [(&'static str, &'static str)],
 }
 
 const ROWS: &[Row] = &[
@@ -1433,6 +1502,7 @@ const ROWS: &[Row] = &[
         dir: "rounds/R06-scan-key",
         mode: "round",
         arm: "runs/compare/cand/",
+        also: &[],
         evidence: &["benchmarks/20261016-ic-r06-scan-key"],
     },
     Row {
@@ -1440,6 +1510,7 @@ const ROWS: &[Row] = &[
         dir: "rounds/R08-scan-fold",
         mode: "round",
         arm: "runs/compare/cand/",
+        also: &[],
         evidence: &["benchmarks/20261016-ic-r08-scan-fold"],
     },
     Row {
@@ -1447,6 +1518,7 @@ const ROWS: &[Row] = &[
         dir: "rounds/R10-main-head",
         mode: "round",
         arm: "runs/compare/cand/",
+        also: &[],
         evidence: &["benchmarks/20261016-ic-r10-main-head"],
     },
     Row {
@@ -1454,6 +1526,7 @@ const ROWS: &[Row] = &[
         dir: "rounds/R11-build-streams",
         mode: "round",
         arm: "runs/compare/cand/",
+        also: &[],
         evidence: &["benchmarks/20261016-ic-r11-build-streams"],
     },
     Row {
@@ -1461,6 +1534,7 @@ const ROWS: &[Row] = &[
         dir: "rounds/R12-admitted-prefetch",
         mode: "round",
         arm: "runs/compare/cand/",
+        also: &[],
         evidence: &["benchmarks/20261017-ic-r12-admitted-prefetch"],
     },
     Row {
@@ -1468,6 +1542,7 @@ const ROWS: &[Row] = &[
         dir: "rule/v6",
         mode: "rule",
         arm: "",
+        also: &[],
         evidence: &["benchmarks/20261016-ic-rule-v6"],
     },
     Row {
@@ -1475,16 +1550,26 @@ const ROWS: &[Row] = &[
         dir: "rule/v7",
         mode: "rule",
         arm: "",
+        also: &[],
         evidence: &[
             "benchmarks/20261016-ic-rule-v7",
             "research/ic_tool_program/rule/v7",
         ],
     },
     Row {
+        key: "v8",
+        dir: "rule/v8",
+        mode: "rule",
+        arm: "",
+        also: &[("v8c", "rule/v8c")],
+        evidence: &["research/ic_tool_program/rule/v8"],
+    },
+    Row {
         key: "A14",
         dir: "explorations/A14-prefetch-size-gate-20261017",
         mode: "exploration",
         arm: "runs/gate/",
+        also: &[],
         evidence: &["benchmarks/20261017-ic-a14-prefetch-size-gate"],
     },
     Row {
@@ -1492,6 +1577,7 @@ const ROWS: &[Row] = &[
         dir: "explorations/A15-filter-slots-20261017",
         mode: "exploration",
         arm: "runs/a15/",
+        also: &[],
         evidence: &["benchmarks/20261017-ic-a15-filter-slots"],
     },
     Row {
@@ -1499,6 +1585,7 @@ const ROWS: &[Row] = &[
         dir: "explorations/A16-huge-pages-20261017",
         mode: "exploration",
         arm: "runs/filter/",
+        also: &[],
         evidence: &["benchmarks/20261017-ic-a16-huge-pages"],
     },
     Row {
@@ -1506,6 +1593,7 @@ const ROWS: &[Row] = &[
         dir: "explorations/A17-filter-huge-pages-20261017",
         mode: "exploration",
         arm: "a17/runs/a17/",
+        also: &[],
         evidence: &["benchmarks/20261017-ic-a17-filter-huge-pages"],
     },
     Row {
@@ -1513,6 +1601,7 @@ const ROWS: &[Row] = &[
         dir: "explorations/A18-wider-base-2p47-20261017",
         mode: "exploration",
         arm: "a18/runs/v8-c400/",
+        also: &[],
         evidence: &["benchmarks/20261017-ic-a18-wider-base"],
     },
     Row {
@@ -1520,6 +1609,7 @@ const ROWS: &[Row] = &[
         dir: "explorations/A19-filter-pages-build-parts-20261017",
         mode: "exploration",
         arm: "a19/runs/a19/",
+        also: &[],
         evidence: &["benchmarks/20261017-ic-a19-filter-pages-build-parts"],
     },
     Row {
@@ -1527,6 +1617,7 @@ const ROWS: &[Row] = &[
         dir: "explorations/scan-stages-v8-20261017",
         mode: "stages",
         arm: "runs/",
+        also: &[],
         evidence: &["benchmarks/20261017-ic-scan-stages-v8"],
     },
 ];
@@ -1535,7 +1626,7 @@ struct Band {
     curve: String,
     log2_r: f64,
     s_ic: f64,
-    s_rho_canonical: f64,
+    s_rho_canonical_model: f64,
     s_rho_as_built: f64,
     canon: f64,
     sqrt_r: f64,
@@ -1560,7 +1651,7 @@ fn band_records(d: &Path, arm: &str) -> Band {
         curve: rows[0]["curve"].as_str().unwrap().into(),
         log2_r: size as f64 / 10.0,
         s_ic: med(&|m| f(&m["s_ic_cold"])),
-        s_rho_canonical: med(&|m| f(&m["s_rho_setup"]) + f(&m["s_rho_model"])),
+        s_rho_canonical_model: med(&|m| f(&m["s_rho_setup"]) + f(&m["s_rho_model"])),
         s_rho_as_built: med(&|m| f(&m["s_rho_cold"])),
         canon: median(
             &rows
@@ -1587,36 +1678,42 @@ fn band_rule(rep: &Report) -> Band {
         curve: s["curve"].as_str().unwrap().into(),
         log2_r: f(&s["log2_r"]),
         s_ic: f(&s["s_ic_cold"]),
-        s_rho_canonical: f(&s["s_rho_canonical"]),
+        s_rho_canonical_model: f(&s["s_rho_canonical"]),
         s_rho_as_built: f(&s["s_rho_as_built"]),
         canon: f(&s["rho_canonicalisations_uncharged_median"]),
         sqrt_r: f(&s["r"]).sqrt(),
     }
 }
 
-fn rho_reference(b: &Band) -> Value {
+fn rho_reference(key: &str, b: &Band) -> Value {
     let mut band = Map::new();
     let mut sides = BTreeSet::new();
     for w in ["0", "0.1", "1"] {
-        let rho = b.s_rho_canonical + w.parse::<f64>().unwrap() * b.canon / b.sqrt_r;
+        let rho = b.s_rho_as_built + w.parse::<f64>().unwrap() * b.canon / b.sqrt_r;
         sides.insert(b.s_ic > rho);
         band.insert(w.into(), json!({"ic": b.s_ic, "rho": rho}));
     }
+    let protocol = if key == "v8" {
+        "ledger section 23's one-target rho on the same public point, in the same `ic price --single-target` process: rule v8's matched rho, the signed-Frobenius r-adding walk (negation and Frobenius classes) with its canonicalisation batched 16 lanes at a time, its set-up plus its walk, as measured; rule v8c, the same binary with rho as at rule v7, is its control"
+    } else {
+        "ledger section 23's one-target rho on the same public point, in the same `ic price --single-target` process: the signed-Frobenius r-adding walk (negation and Frobenius classes), its set-up plus its walk, as measured"
+    };
     json!({
         "kind": "negation_frobenius",
-        "protocol": "ledger section 23's one-target rho on the same public point, in the same `ic price --single-target` process: the signed-Frobenius r-adding walk (negation and Frobenius classes), its set-up plus its walk; the walk priced at the canonical batched step this process measures (`s_rho_model`), the stronger of the two references the process records",
+        "protocol": protocol,
         "unit": "S: cold time in v0's unit (one batched addition) over sqrt(r)",
         "binary_or_process": "the row's own `ic` binary and process: both arms rebuilt from nothing each repetition, the index calculus first",
         "matches_protocol": true,
         "strongest_available": true,
+        "strongest_available_basis": "the gate's sense (docs/VALIDATION_GATE.md): the strongest symmetry fold for the curve, here negation and Frobenius (A = 2n). Implementations of that walk differ in speed: rule v8's matched rho, batched canonicalisation, measured 1.30-1.58x faster cold than rho as at v7 on the same binary",
         "same_unit": true,
         "same_binary_or_process": true,
         "gae_band": band,
         "order_holds_across_band": sides.len() == 1,
-        "band_basis": format!("the row's reported arm at its largest size ({}, 2^{:.1}); the index calculus is timed by the clock, so it carries no unpriced native work; the canonicalisations rho's walk leaves uncharged (median {} a process) are priced at 0, 0.1 and 1 GAE each", b.curve, b.log2_r, b.canon),
-        "ic_over_rho_canonical": b.s_ic / b.s_rho_canonical,
-        "rho_as_built": {"s": b.s_rho_as_built, "ic_over_rho": b.s_ic / b.s_rho_as_built,
-            "note": "the reference the published row quotes; it pays more than the canonical step for a walk step, so the published distance to rho is the smaller of the two"},
+        "band_basis": format!("the row's reported arm at its largest size ({}, 2^{:.1}), against the measured rho; the index calculus is timed by the clock, so it carries no unpriced native work; the canonicalisations rho's walk leaves uncharged (median {} a process) are priced at 0, 0.1 and 1 GAE each", b.curve, b.log2_r, b.canon),
+        "ic_over_rho": b.s_ic / b.s_rho_as_built,
+        "rho_canonical_step_model": {"s": b.s_rho_canonical_model, "ic_over_rho": b.s_ic / b.s_rho_canonical_model,
+            "note": "not a reference: rho's counted walk priced at the canonical batched step the process measures, a model beside the measured interval (the record's `rho_model`); rule v8's measured matched rho sits between it and rho as built"},
     })
 }
 
@@ -1646,13 +1743,41 @@ fn build(check: bool) -> i32 {
         } else {
             band_records(&d, row.arm)
         };
-        let cv = read_json(&raw.join(format!("certverify-{}.json", row.key)));
-        let ev_name = rel_to(&d, &repo);
+        let keys: Vec<&str> = std::iter::once(row.key)
+            .chain(row.also.iter().map(|(k, _)| *k))
+            .collect();
+        let cvs: Vec<Value> = keys
+            .iter()
+            .map(|k| read_json(&raw.join(format!("certverify-{k}.json"))))
+            .collect();
+        let sum = |k: &str| cvs.iter().map(|c| c[k].as_u64().unwrap()).sum::<u64>();
+        let mut degrees: BTreeSet<u64> = BTreeSet::new();
+        for c in &cvs {
+            degrees.extend(
+                c["field_degrees"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|x| x.as_u64().unwrap()),
+            );
+        }
+        let cv = json!({"status": if cvs.iter().all(|c| c["status"] == "pass") { "pass" } else { "fail" },
+            "records": sum("records"), "certificates": sum("certificates"),
+            "failures": cvs.iter().flat_map(|c| c["failures"].as_array().unwrap().clone()).collect::<Vec<_>>(),
+            "field_degrees": degrees});
+        let ev_names: Vec<String> = std::iter::once(rel_to(&d, &repo))
+            .chain(
+                row.also
+                    .iter()
+                    .map(|(_, dir)| rel_to(&prog.join(dir), &repo)),
+            )
+            .collect();
+        let ev_name = ev_names.join(" + ");
         let mine: Vec<&Value> = replays["replays"]
             .as_array()
             .unwrap()
             .iter()
-            .filter(|r| r["evidence"] == ev_name.as_str())
+            .filter(|r| ev_names.iter().any(|e| r["evidence"] == e.as_str()))
             .collect();
         for e in row.evidence {
             let ev = repo.join(e);
@@ -1685,14 +1810,16 @@ fn build(check: bool) -> i32 {
                 "what": format!("{ev_name}: every recorded scalar checked by an independent GF(2^m) verifier ([s]G = T, [n]G = O, [s+1]G != T), and {} records drawn by REPLAY_SEED.md rerun natively with their own binaries, certificates and counts compared", mine.len()),
                 "scalar_verification": {"tool": "src/bin/ic_validate.rs (ic_validate certverify)", "records": cv["records"],
                     "certificates": cv["certificates"], "failures": cv["failures"].as_array().map(Vec::len),
-                    "field_degrees": cv["field_degrees"], "output": rel_to(&raw.join(format!("certverify-{}.json", row.key)), &ev)},
+                    "field_degrees": cv["field_degrees"],
+                    "output": keys.iter().map(|k| rel_to(&raw.join(format!("certverify-{k}.json")), &ev)).collect::<Vec<_>>()},
                 "native_replay": {"tool": "src/bin/ic_validate.rs (ic_validate replay)", "seed": replays["seed"],
                     "seed_file": rel_to(&prog.join("validation/REPLAY_SEED.md"), &ev), "host": replays["host"],
                     "output": rel_to(&raw.join("native-replay.json"), &ev)},
                 "runs": mine.iter().map(|r| {
-                    let mut x = json!({"record": r["record"], "binary": r["binary"], "binary_sha256": r["binary_sha256"],
+                    let mut x = json!({"evidence": r["evidence"], "record": r["record"], "binary": r["binary"], "binary_sha256": r["binary_sha256"],
                         "identical": r["ok"], "scalars": r["scalars"]});
                     if let Some(p) = r.get("params_renamed") { x["params_renamed"] = p.clone(); }
+                    if let Some(p) = r.get("binary_rebuilt") { x["binary_rebuilt"] = p.clone(); }
                     x
                 }).collect::<Vec<_>>(),
             });
@@ -1701,21 +1828,17 @@ fn build(check: bool) -> i32 {
                 "schema": "validation-gate/v1",
                 "replay_certificate": {"path": "replay-certificate.json", "sha256": sha256_bytes(ctext.as_bytes())},
                 "validator_report": {"path": "validator-report.json", "sha256": sha256_bytes(vtext.as_bytes())},
-                "rho_reference": rho_reference(&band),
+                "rho_reference": rho_reference(row.key, &band),
                 "built_by": "src/bin/ic_validate.rs (ic_validate build)",
             });
             println!(
-                "{:4} {e}: report {} ({} figures), certificate {}, IC/rho {:.2} (as built {:.2})",
+                "{:4} {e}: report {} ({} figures), certificate {}, IC/rho {:.2} (canonical-step model {:.2})",
                 row.key,
                 vdoc["status"],
                 vdoc["headline"].as_array().unwrap().len(),
                 cert["status"],
-                man["rho_reference"]["ic_over_rho_canonical"]
-                    .as_f64()
-                    .unwrap(),
-                man["rho_reference"]["rho_as_built"]["ic_over_rho"]
-                    .as_f64()
-                    .unwrap()
+                man["rho_reference"]["ic_over_rho"].as_f64().unwrap(),
+                man["rho_reference"]["rho_canonical_step_model"]["ic_over_rho"].as_f64().unwrap()
             );
             put(ev.join("validator-report.json"), vtext);
             put(ev.join("replay-certificate.json"), ctext);
@@ -1764,6 +1887,9 @@ enum Cmd {
         scratch: PathBuf,
         #[arg(long)]
         out: PathBuf,
+        /// `DIR:KEY=VALUE`: an environment variable the run script set for that directory
+        #[arg(long = "env")]
+        envs: Vec<String>,
         dirs: Vec<PathBuf>,
     },
     /// Write every evidence directory's VALIDATION.json and its two artifacts.
@@ -1804,9 +1930,10 @@ fn main() {
             bin,
             scratch,
             out,
+            envs,
             dirs,
         } => {
-            let doc = replay(&bin, &scratch, &dirs);
+            let doc = replay(&bin, &scratch, &dirs, &envs);
             fs::write(&out, pretty(&doc)).unwrap();
             println!(
                 "{}",

@@ -98,8 +98,9 @@ geometric mean of paired ratios, with its 95% t interval.
 - **The smaller sizes' cost is on record.** v8 is 1–5% slower than v7 from
   `2^24.8` to `2^38.0`, inside the A/A rule. A candidate that runs the pass
   only above a table size is the obvious next round.
-- **The distance to matched rho is not re-measured here.** The rule at v7
-  left rho 7.03×, 6.37× and 11.51× faster cold at the three largest sizes.
+- **The distance to rho is not re-measured here.** The rule at v7
+  left rho as built (not matched) 7.03×, 6.37× and 11.51× faster cold at the three largest sizes.
+  Against rule v8's measured matched rho the distance at v8 is 11.75×, 10.65× and 18.07× ([`rule/v8`](../../rule/v8/README.md)).
 
 ## Files
 

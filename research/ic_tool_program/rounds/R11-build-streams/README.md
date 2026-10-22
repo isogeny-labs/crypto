@@ -110,8 +110,9 @@ runs:
 - **v7 is v6 plus R11's build** (`baselines.json`, `baseline.meta.json`).
   It needs no CPU feature, so it runs on every host. The claim is made for
   the reference class, where it was measured.
-- **The distance to matched rho is not re-measured here.** The rule at v6
-  left rho 7.90×, 7.40× and 12.06× faster cold at the three largest sizes.
+- **The distance to rho is not re-measured here.** The rule at v6
+  left rho as built (not matched) 7.90×, 7.40× and 12.06× faster cold at the three largest sizes.
+  Against rule v8's measured matched rho the distance at v8 is 11.75×, 10.65× and 18.07× ([`rule/v8`](../../rule/v8/README.md)).
   A rule run at v7 is the measurement; dividing those ratios by this round's
   gains is not one.
 

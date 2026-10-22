@@ -20,6 +20,7 @@ ROWS = [
     ("R12", "benchmarks/20261017-ic-r12-admitted-prefetch"),
     ("rule v6", "benchmarks/20261016-ic-rule-v6"),
     ("rule v7", "benchmarks/20261016-ic-rule-v7"),
+    ("rule v8", "research/ic_tool_program/rule/v8"),
     ("A14", "benchmarks/20261017-ic-a14-prefetch-size-gate"),
     ("A15", "benchmarks/20261017-ic-a15-filter-slots"),
     ("A16", "benchmarks/20261017-ic-a16-huge-pages"),
@@ -38,8 +39,8 @@ for label, d in ROWS:
     labels.append(label)
     figures.append(len(rep["headline"]))
     certs.append(cert["scalar_verification"]["certificates"])
-    built.append(ref["rho_as_built"]["ic_over_rho"])
-    canon.append(ref["ic_over_rho_canonical"])
+    built.append(ref["ic_over_rho"])
+    canon.append(ref["rho_canonical_step_model"]["ic_over_rho"])
     sizes.append(ref["band_basis"].split("2^")[1].split(")")[0])
 
 fig, (a, b) = plt.subplots(1, 2, figsize=(12, 5.4), gridspec_kw={"width_ratios": [1, 1.25]})
@@ -56,14 +57,14 @@ a.legend(loc="upper center", bbox_to_anchor=(0.5, -0.14), fontsize=8, ncol=1)
 a.set_xlim(10, 5000)
 
 w = 0.38
-b.bar([i - w / 2 for i in y], built, w, color="#F58518", label="rho as built (the reference the rows quote)")
-b.bar([i + w / 2 for i in y], canon, w, color="#B279A2", label="rho at its canonical step (the gate's reference)")
+b.bar([i - w / 2 for i in y], built, w, color="#F58518", label="measured rho of the row's own process (the gate's reference)")
+b.bar([i + w / 2 for i in y], canon, w, color="#B279A2", label="rho at the canonical step (a model, not a reference)")
 b.set_xticks(list(y), [f"{l}\n2^{s}" for l, s in zip(labels, sizes)], fontsize=7, rotation=90)
 b.set_ylabel("cold S, index calculus / rho  (above 1: rho faster)")
 b.axhline(1, color="black", lw=0.8)
-b.set_title("Distance to rho at each row's largest size, both references")
+b.set_title("Distance to rho at each row's largest size")
 b.legend(fontsize=8)
-fig.suptitle("Validation gate for PR #1978's IC rows: seed in REPLAY_SEED.md, 56 of 56 native replays identical", fontsize=10)
+fig.suptitle("Validation gate for PR #1978's IC rows: seed in REPLAY_SEED.md, 64 of 64 native replays identical", fontsize=10)
 fig.tight_layout()
 fig.savefig(HERE / "validation.svg")
 fig.savefig(HERE / "validation.png", dpi=150)

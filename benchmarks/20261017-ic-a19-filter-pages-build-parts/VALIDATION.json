@@ -2,38 +2,39 @@
   "built_by": "src/bin/ic_validate.rs (ic_validate build)",
   "replay_certificate": {
     "path": "replay-certificate.json",
-    "sha256": "8fbde128c8aaeb307eb8e8436ee01aa65b8977d806bc09fd7601d5102a3719f9"
+    "sha256": "bd1fd2e5962852b01d14e08379def0736483f3a34d46094a08212b7f8ea24685"
   },
   "rho_reference": {
-    "band_basis": "the row's reported arm at its largest size (icv1-f2m61-t158598901-ab42b6c5, 2^47.2); the index calculus is timed by the clock, so it carries no unpriced native work; the canonicalisations rho's walk leaves uncharged (median 1905420.5 a process) are priced at 0, 0.1 and 1 GAE each",
+    "band_basis": "the row's reported arm at its largest size (icv1-f2m61-t158598901-ab42b6c5, 2^47.2), against the measured rho; the index calculus is timed by the clock, so it carries no unpriced native work; the canonicalisations rho's walk leaves uncharged (median 1905420.5 a process) are priced at 0, 0.1 and 1 GAE each",
     "binary_or_process": "the row's own `ic` binary and process: both arms rebuilt from nothing each repetition, the index calculus first",
     "gae_band": {
       "0": {
         "ic": 10.813541273320357,
-        "rho": 0.7966432945550053
+        "rho": 1.507330999003608
       },
       "0.1": {
         "ic": 10.813541273320357,
-        "rho": 0.8115728282269994
+        "rho": 1.522260532675602
       },
       "1": {
         "ic": 10.813541273320357,
-        "rho": 0.9459386312749466
+        "rho": 1.6566263357235493
       }
     },
-    "ic_over_rho_canonical": 13.57388099194466,
+    "ic_over_rho": 7.173965957356706,
     "kind": "negation_frobenius",
     "matches_protocol": true,
     "order_holds_across_band": true,
-    "protocol": "ledger section 23's one-target rho on the same public point, in the same `ic price --single-target` process: the signed-Frobenius r-adding walk (negation and Frobenius classes), its set-up plus its walk; the walk priced at the canonical batched step this process measures (`s_rho_model`), the stronger of the two references the process records",
-    "rho_as_built": {
-      "ic_over_rho": 7.173965957356706,
-      "note": "the reference the published row quotes; it pays more than the canonical step for a walk step, so the published distance to rho is the smaller of the two",
-      "s": 1.507330999003608
+    "protocol": "ledger section 23's one-target rho on the same public point, in the same `ic price --single-target` process: the signed-Frobenius r-adding walk (negation and Frobenius classes), its set-up plus its walk, as measured",
+    "rho_canonical_step_model": {
+      "ic_over_rho": 13.57388099194466,
+      "note": "not a reference: rho's counted walk priced at the canonical batched step the process measures, a model beside the measured interval (the record's `rho_model`); rule v8's measured matched rho sits between it and rho as built",
+      "s": 0.7966432945550053
     },
     "same_binary_or_process": true,
     "same_unit": true,
     "strongest_available": true,
+    "strongest_available_basis": "the gate's sense (docs/VALIDATION_GATE.md): the strongest symmetry fold for the curve, here negation and Frobenius (A = 2n). Implementations of that walk differ in speed: rule v8's matched rho, batched canonicalisation, measured 1.30-1.58x faster cold than rho as at v7 on the same binary",
     "unit": "S: cold time in v0's unit (one batched addition) over sqrt(r)"
   },
   "schema": "validation-gate/v1",

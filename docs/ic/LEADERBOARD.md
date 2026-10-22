@@ -18,23 +18,23 @@ This performance handoff is published beside the curve-by-curve tables. The stan
 
 [Latest result data](../../research/ecbench_rho_optimized_20261014/RESULT.json); [prior full synthesis](../../research/ecbench_frontier_20261013/frontier-data.json). The standing strong-rho method, recovered answers, trajectories, charged GAE and every counter are unchanged. Existing operation ratios and bounds therefore stay fixed. Historical wall ratios remain attached to their measured binaries; this L0 study cannot reprice or promote them.
 
-## Table A: Koblitz, one target (§23, re-run at baseline v7)
+## Table A: Koblitz, one target (§23, re-run at baseline v8 with the matched rho)
 
-- **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).
-- **Reference:** One-target rho on the same point, in the same unit and the same process: its set-up plus its walk, the walk priced at the canonical batched step the process measures (`s_rho_model`), the stronger of the two rho figures each process records and the validation gate's reference; its answer replayed and verified (§23; rule v7 at baseline v7). Rho as built pays about twice the canonical step a walk step; its ratio, with its interval, is shown beneath each row's.
+- **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v8/README.md).
+- **Reference:** One-target rho on the same point, in the same unit and the same process, measured: the matched rho of rule v8, its signed-Frobenius canonicalisation batched 16 lanes at a time (its set-up plus its walk); its answer replayed and verified (§23; rule v8 at baseline v8). Beneath each row, the same binary's control with rho as at rule v7 (`KIC_RHO_CANON=scalar`, rule v8c).
 - **Floor:** √(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed Frobenius and negation, n the extension degree. Stated in steps and not rescaled to units, so × floor here divides units by steps.
 - **Targets:** one unseen public point per process, 64 per size; §23's figures on the same curve are the before marks
 - **Status:** primary comparison: one target, as AGENTS.md's one-target rule requires
-- **Rho step:** rho's walk as built costs 9.4–10.6 units a step; the canonical step costs 4.2–4.92
+- **Rho step:** rho's walk as built costs 6.42–7.79 units a step; the canonical step costs 4.35–5.08
 
 | curve | log₂ r | recipe | S, IC | S, reference | × reference | S, floor | × floor | ok | validation |
 |:--|--:|:--|--:|--:|--:|--:|--:|:--|:--|
-| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 6.03 | 0.983 | **6.14×** (was 8.58×, §23); as built 3.43× | 0.129 | 46.6× | ✓ | validated |
-| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 6.37 | 0.961 | **6.63×** (was 2.15×, §23); as built 3.97× | 0.117 | 54.2× | ✓ | validated |
-| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 6.63 | 0.696 | **9.52×** (was 14.9×, §23); as built 4.74× | 0.138 | 47.9× | ✓ | validated |
-| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 8.15 | 0.596 | **13.7×** (was 26.6×, §23); as built 7.03× | 0.122 | 66.9× | ✓ | validated |
-| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 7.82 | 0.652 | **12×** (was 27.3×, §23); as built 6.37× | 0.115 | 67.8× | ✓ | validated |
-| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 12.4 | 0.554 | **22.4×** (was 58.2×, §23); as built 11.5× | 0.113 | 109× | ✓ | validated |
+| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 6.58 | 1.41 | **4.67×** (§23, rho as built: 4.95×); rho as at v7 3.59× | 0.129 | 50.9× | ✓ | validated |
+| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 7.42 | 1.3 | **5.7×** (§23, rho as built: 1.98×); rho as at v7 4.25× | 0.117 | 63.2× | ✓ | validated |
+| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 7.36 | 1.04 | **7.07×** (§23, rho as built: 8.04×); rho as at v7 5× | 0.138 | 53.2× | ✓ | validated |
+| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 9.71 | 0.826 | **11.8×** (§23, rho as built: 14.7×); rho as at v7 7.65× | 0.122 | 79.8× | ✓ | validated |
+| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 9.21 | 0.864 | **10.7×** (§23, rho as built: 15.7×); rho as at v7 6.74× | 0.115 | 79.8× | ✓ | validated |
+| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 13.4 | 0.741 | **18.1×** (§23, rho as built: 31.6×); rho as at v7 11.6× | 0.113 | 118× | ✓ | validated |
 
 ## Table B: Prime and random-binary ladder (§18)
 
@@ -106,12 +106,12 @@ Shares are fractions of each row's own `S`, so they carry no unit; read each row
 
 | table | curve | Reusable set-up | Curve and subgroup | Workflow constructions | Factor base | Pair table | Relations (PDP) | Linear algebra | Descent | Verification |
 |:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|
-| A | `icv1-f2m47-t22705043-f4e44623` | 99.0% | — | — | — | — | — | — | 1.0% | 0.0% |
-| A | `icv1-f2m57-tm747311035-c1f545af` | 99.1% | — | — | — | — | — | — | 0.9% | 0.0% |
+| A | `icv1-f2m47-t22705043-f4e44623` | 98.9% | — | — | — | — | — | — | 1.1% | 0.0% |
+| A | `icv1-f2m57-tm747311035-c1f545af` | 99.1% | — | — | — | — | — | — | 0.8% | 0.0% |
 | A | `icv1-f2m41-tm2308219-7f48b14a` | 98.7% | — | — | — | — | — | — | 1.3% | 0.0% |
-| A | `icv1-f2m53-tm56619371-dac20a85` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
+| A | `icv1-f2m53-tm56619371-dac20a85` | 99.5% | — | — | — | — | — | — | 0.5% | 0.0% |
 | A | `icv1-f2m59-tm943548413-98844ecc` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
-| A | `icv1-f2m61-t158598901-ab42b6c5` | 99.6% | — | — | — | — | — | — | 0.4% | 0.0% |
+| A | `icv1-f2m61-t158598901-ab42b6c5` | 99.5% | — | — | — | — | — | — | 0.5% | 0.0% |
 | B | `icv1-fp10-t5-192cb216` | — | — | — | 5.3% | — | 93.0% | 0.2% | — | 1.5% |
 | B | `icv1-fp12-t19-d4a315df` | — | — | — | 30.2% | — | 68.1% | 0.4% | — | 1.4% |
 | B | `icv1-fp14-tm43-158b6914` | — | — | — | 12.3% | — | 86.5% | 0.1% | — | 1.1% |
@@ -141,12 +141,12 @@ Identity: [`docs/curves/registry.json`](../../docs/curves/registry.json). IC cur
 
 | table | curve | curves.yaml record | factor base (points, recipe) | factor-base source | refs |
 |:--|:--|:--|:--|:--|:--|
-| A | `icv1-f2m47-t22705043-f4e44623` | none | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m57-tm747311035-c1f545af` | none | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m41-tm2308219-7f48b14a` | none | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m53-tm56619371-dac20a85` | none | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m59-tm943548413-98844ecc` | none | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
-| A | `icv1-f2m61-t158598901-ab42b6c5` | none | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v7/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m47-t22705043-f4e44623` | none | 5,264, koblitz_one_target | `research/ic_tool_program/rule/v8/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m57-tm747311035-c1f545af` | none | 7,296, koblitz_one_target | `research/ic_tool_program/rule/v8/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m41-tm2308219-7f48b14a` | none | 6,560, koblitz_one_target | `research/ic_tool_program/rule/v8/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m53-tm56619371-dac20a85` | none | 27,984, koblitz_one_target | `research/ic_tool_program/rule/v8/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m59-tm943548413-98844ecc` | none | 30,208, koblitz_one_target | `research/ic_tool_program/rule/v8/analysis.json` | none (no_curves_yaml_record) |
+| A | `icv1-f2m61-t158598901-ab42b6c5` | none | 39,040, koblitz_one_target | `research/ic_tool_program/rule/v8/analysis.json` | none (no_curves_yaml_record) |
 | B | `icv1-fp10-t5-192cb216` | none | 10, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
 | B | `icv1-fp12-t19-d4a315df` | none | 32, mitm_m2_negfold_walk | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
 | B | `icv1-fp14-tm43-158b6914` | none | 26, mitm_m2_negfold_walk_balanced | `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` | none (no_curves_yaml_record) |
@@ -298,7 +298,8 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ic_constructions_20260926/analysis.json` — sha256 `e0758400806dc97f…`
 - `research/ic_descent_20260930/analysis-isolated.json` — sha256 `060359c266e779db…`
 - `research/ic_single_target_20260930/analysis.json` — sha256 `109326d7c2882b71…`
-- `research/ic_tool_program/rule/v7/analysis.json` — sha256 `af81dd9ab2879632…`
+- `research/ic_tool_program/rule/v8/analysis.json` — sha256 `4af36aef9c1b0256…`
+- `research/ic_tool_program/rule/v8c/analysis.json` — sha256 `26d1df6de4ff80a8…`
 - `docs/ic/runs/ic-oracle-pricing-lifted-2026-09-21.json` — sha256 `2271c4aa5236e2bd…`
 - `research/ecbench_n37_rank_columns_20261004/RESULT.json` — sha256 `f7b950edc74978cb…`
 - `research/ecbench_n37_k8_k16_20261004/DECISION.json` — sha256 `c4a33ffd9045a479…`
