@@ -27,17 +27,20 @@ jq -R -s 'split("\n") | map(select(length > 0) | split(" ") | {(.[0]): (.[1] | t
 jq -s 'map({(.check): .}) | add' "$W/boot_q.jsonl" > "$W/boot.json"
 jq -R -s 'split("\n") | map(select(length > 0) | split("\t") | . as $f
   | {(if $f[0] == "band" then "\($f[1])|\($f[2])" else "V3crater|\($f[1])" end):
-     ($f[3:] | map(split("=") | {(.[0]): (.[1] | tonumber)}) | add)}) | add' "$W/band.tsv" > "$W/band.json"
+     ($f[(if $f[0] == "band" then 3 else 2 end):] | map(split("=") | {(.[0]): (.[1] | tonumber)}) | add)}) | add' "$W/band.tsv" > "$W/band.json"
 
 # ---- replay certificate ------------------------------------------------------
 BIN_SHA=$(sha256sum "$REPO/target/release/ecbench" | awk '{print $1}')
 HDR_SHA=$(jq -r 'select(.type == "header") | .binary_sha256' "$STUDY/runs/progress.jsonl")
 for f in "$S"/receipts/*.json.xz; do cp -f "$f" "$OUT/replay-receipts/"; done
+RSNAP=$(cat "$S/replay_snapshot.txt")
+CHANGED=$(git -C "$STUDY" diff --name-only "$RSNAP" HEAD -- runs sessions census specs FROZEN.json PLAN.md ANALYSIS_PLAN.md | jq -R -s 'split("\n") | map(select(length > 0))')
 PB=$(jq -s 'map({ok, problems: (.problems | length), rec: .records, ver: .verified_records, rep: (.replays | length), repok: ([.replays[] | select(.reproduced)] | length), bin: .auditor_binary_sha256, env: .auditor_env_class_id, hw: .auditor_hardware_class_id}) | {sessions: length, all_ok: (map(.ok) | all), problems: (map(.problems) | add), records: (map(.rec) | add), scalars_verified_records: (map(.ver) | add), replays: (map(.rep) | add), replays_identical: (map(.repok) | add), auditor_binaries: (map(.bin) | unique), env_classes: (map(.env) | unique), hw_classes: (map(.hw) | unique), note: "committed Phase B receipts sessions/*.audit.json (ecbench verify --replay 12 per session), read, not re-run"}' "$STUDY"/sessions/*.audit.json)
 jq -n --slurpfile runs "$S/replay_log.jsonl" --slurpfile unc "$S/unc_log.jsonl" \
   --argjson pb "$PB" --arg hdrenv "$(jq -r 'select(.type == "header") | .ecbench_host | capture("env class +(?<e>[A-Za-z0-9]+)").e' "$STUDY/runs/progress.jsonl")" \
   --arg bin "$BIN_SHA" --arg hdr "$HDR_SHA" --arg nonce "$(cat "$S/nonce.txt")" \
   --arg snap "$(git -C "$REPO" rev-parse HEAD)" --arg started "$(cat "$S/replay_start.txt")" \
+  --arg rsnap "$RSNAP" --argjson changed "$CHANGED" \
   --arg rel "$REL" --argjson receipts "$(cd "$OUT/replay-receipts" && for f in *.json.xz; do printf '{"file":"replay-receipts/%s","sha256":"%s"}\n' "$f" "$(sha256sum "$f" | awk '{print $1}')"; done | jq -s .)" '
   ($runs | map(.archive_sha256_match and .audit_ok and .checks_all_true and (.problems | length == 0)
               and .records == .verified_records and .replays > 0 and .replays == .replays_reproduced
@@ -47,11 +50,15 @@ jq -n --slurpfile runs "$S/replay_log.jsonl" --slurpfile unc "$S/unc_log.jsonl" 
                and .uncharged_rows_without_record == 0 and .records_without_uncharged_row == 0 and .extract_rows_without_record == 0) | all) as $unc_ok
   | {
   schema: "validation-gate/replay-certificate/v1",
-  status: (if $all_ok and ($bin == $hdr) then "verified" else "fail" end),
+  status: (if $all_ok and ($bin == $hdr) and ($changed | length == 0) then "verified" else "fail" end),
   independent: true,
   scalars_verified: ($all_ok and ($runs | map(.records == .verified_records) | all)),
   study: "research/volcano_ecdlp_census_20261017",
   snapshot_commit: $snap,
+  replayed_at_snapshot: $rsnap,
+  replay_evidence_unchanged_since: {from: $rsnap, to: $snap, paths: ["runs/", "sessions/", "census/", "specs/", "FROZEN.json", "PLAN.md", "ANALYSIS_PLAN.md"],
+    changed_files: $changed, holds: ($changed | length == 0),
+    note: "the replay was run at replayed_at_snapshot; it applies to snapshot_commit because no session archive, audit receipt, extract, census, spec or plan file changed in between (the ecbench binary is outside git; its sha256 is re-checked below)"},
   replay_started_utc: $started,
   what_was_replayed: "Each sampled session was extracted from its committed archive sessions/<spec>.tar.xz (SHA-256 checked against runs/progress.jsonl) into a scratch directory and audited with `ecbench verify --dir <extracted> --replay-all`; the fallback `--replay 50` applies only when --replay-all exceeded 600 s (field `mode`). The audit re-derives the session from its own files (file hashes, spec and plan identity, seeds, execution order, record seals and count), re-checks every recovered logarithm [k]G = Q on every record (warm-up included), and re-executes every measured deterministic run, requiring identical answer, total, phases, counters and factor base. The receipt file map was compared with the committed Phase B audit receipt (sessions/<spec>.audit.json). The extracted copy was deleted after each session.",
   independence: {
@@ -166,9 +173,23 @@ jq --slurpfile pe "$W/pe.json" --slurpfile fs "$W/fstat.json" --slurpfile js "$W
         ci("bootstrap.ic_over_rho-neg.V1.all.price_0.ci95_upper"; .ic_vs_rho.V1.pooled["0.0"].ci95[1]; $b.v1icrho["q0.975"]; 0.975; $b.v1icrho.sd),
         ci("bootstrap.paired_source.V1.rho-plain.S/D.ci95_lower"; .paired_source["V1|rho-plain|S/D"].ci95[0]; $b.pair_vx["q0.025"]; 0.025; $b.pair_vx.sd),
         ci("bootstrap.paired_source.V1.rho-plain.S/D.ci95_upper"; .paired_source["V1|rho-plain|S/D"].ci95[1]; $b.pair_vx["q0.975"]; 0.975; $b.pair_vx.sd) ]
+    # fields added by erratum A3 (absent before it)
+    + (if .ic_vs_rho_cubic_crater then
+        [ .ic_vs_rho_cubic_crater.prices | to_entries[]
+          | h("ic_over_rho-cubic.V3_crater.D+N.price_\(pk(.key))_GAE"; .value.ratio_ic_over_rho_cubic; $band["V3crater|\(pk(.key))"].ic_over_cubic; 1e-9) ]
+        + [ h("ic_over_rho-cubic.V3_crater.n_pairs"; .ic_vs_rho_cubic_crater.n_pairs; $band["V3crater|0"].n; 1e-9),
+            ci("bootstrap.ic_over_rho-cubic.V3_crater.price_0.ci95_lower"; .ic_vs_rho_cubic_crater.prices["0.0"].ci95[0]; $b.v3c["q0.025"]; 0.025; $b.v3c.sd),
+            ci("bootstrap.ic_over_rho-cubic.V3_crater.price_0.ci95_upper"; .ic_vs_rho_cubic_crater.prices["0.0"].ci95[1]; $b.v3c["q0.975"]; 0.975; $b.v3c.sd) ]
+      else [] end)
+    + (if .crater_ic_by_model then
+        [ .crater_ic_by_model | to_entries[] | .key as $m |
+          h("crater_ic_by_model.\($m).mean_S"; .value.mean_S; $p["cm.\($m).mean"]; 1e-9),
+          h("crater_ic_by_model.\($m).se"; .value.se; $p["cm.\($m).se"]; 1e-9),
+          h("crater_ic_by_model.\($m).n_rows"; .value.n_rows; $p["cm.\($m).n"]; 1e-9) ]
+      else [] end)
   ) as $head
   | ($head | map(select(.agrees | not))) as $disagree
-  | ($n.findings | map(select(.severity == "material"))) as $material
+  | ($n.findings | map(select(.severity == "material" and ((.status // "open") | startswith("resolved") | not)))) as $material
   | {
     schema: "validation-gate/validator-report/v1",
     status: (if ($disagree | length) == 0 and ($material | length) == 0 then "pass" else "fail" end),
@@ -179,7 +200,8 @@ jq --slurpfile pe "$W/pe.json" --slurpfile fs "$W/fstat.json" --slurpfile js "$W
     snapshot_commit: $snap,
     status_reason: (if ($disagree | length) > 0 then "recomputed headline numbers disagree: \($disagree | map(.name) | join(", "))"
                     elif ($material | length) > 0 then "every recomputed number matches results.json, but material reporting errors were found: \($material | map(.id) | join(", "))"
-                    else "every recomputed headline number matches and no material reporting error was found" end),
+                    else "every recomputed headline number matches and no open material reporting error remains\(($n.findings | map(select(.severity == "material" and ((.status // "open") | startswith("resolved")))) | map(.id)) as $r | if ($r | length) > 0 then " (\($r | join(", ")) found at the previous snapshot are resolved by erratum A3)" else "" end)" end),
+    previous_validation: $n.previous_validation,
     independence: $n.independence,
     raw_data: $raw,
     headline_summary: {numbers: ($head | length), agree: ($head | map(select(.agrees)) | length), disagree: ($disagree | length),
@@ -187,7 +209,7 @@ jq --slurpfile pe "$W/pe.json" --slurpfile fs "$W/fstat.json" --slurpfile js "$W
                        bootstrap_endpoints_max_mc_z: ($head | map(select(.name | startswith("bootstrap.")) | .mc_z) | max)},
     headline: $head,
     bootstrap_spot_checks: {
-      implementation: "validation/cluster_boot.awk (mawk rand(), two-stage stratified cluster bootstrap, 10,000 replicates) and validation/quantiles.sh (percentile, linear interpolation at (n-1)q); seeds 777001-777005 (777006 for the V3 crater IC over rho-cubic CI in rho_reference_audit); shares no code or RNG with analysis/analyze.py",
+      implementation: "validation/cluster_boot.awk (two-stage stratified cluster bootstrap, 10,000 replicates, seeded combined LCG of Ecuyer (1988) computed exactly, reproducible bit for bit) and validation/quantiles.sh (percentile, linear interpolation at (n-1)q); seeds 777001-777006 (777006: V3 crater IC over rho-cubic); shares no code or RNG with analysis/analyze.py",
       tolerance: "rel_tol of each bootstrap endpoint = 4 x sqrt(2) x sqrt(q(1-q)/10000) / phi(z_q) x bootstrap SD / |claimed| (4 SD of the difference of two independent Monte Carlo estimates); mc_z is the difference in units of that SD",
       replicate_summaries: $b,
       "triple_only_sensitivity_V1_rho-plain_S_over_D": {ci95: [$b.pair_tr["q0.025"], $b.pair_tr["q0.975"]], ci90: [$b.pair_tr["q0.05"], $b.pair_tr["q0.95"]], sd: $b.pair_tr.sd,
@@ -197,6 +219,8 @@ jq --slurpfile pe "$W/pe.json" --slurpfile fs "$W/fstat.json" --slurpfile js "$W
     report_vs_results: ($n.report_vs_results + {table_cells_check: $check}),
     verdict_vocabulary: $n.verdict_vocabulary,
     amendment_A2_audit: $n.amendment_A2_audit,
+    amendment_A3_audit: $n.amendment_A3_audit,
+    erratum_verification: $n.erratum_verification,
     rho_reference_audit: ($n.rho_reference_audit + {gae_band_recomputed: $band}),
     section_5a_band: $n.section_5a_band,
     findings: $n.findings,

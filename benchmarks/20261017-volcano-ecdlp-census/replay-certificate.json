@@ -4,7 +4,24 @@
   "independent": true,
   "scalars_verified": true,
   "study": "research/volcano_ecdlp_census_20261017",
-  "snapshot_commit": "fbbf7becf708b0565f13a41055e26051e9ee1262",
+  "snapshot_commit": "8aa56299e1de220422b324a32c11886c0de1aa18",
+  "replayed_at_snapshot": "fbbf7becf708b0565f13a41055e26051e9ee1262",
+  "replay_evidence_unchanged_since": {
+    "from": "fbbf7becf708b0565f13a41055e26051e9ee1262",
+    "to": "8aa56299e1de220422b324a32c11886c0de1aa18",
+    "paths": [
+      "runs/",
+      "sessions/",
+      "census/",
+      "specs/",
+      "FROZEN.json",
+      "PLAN.md",
+      "ANALYSIS_PLAN.md"
+    ],
+    "changed_files": [],
+    "holds": true,
+    "note": "the replay was run at replayed_at_snapshot; it applies to snapshot_commit because no session archive, audit receipt, extract, census, spec or plan file changed in between (the ecbench binary is outside git; its sha256 is re-checked below)"
+  },
   "replay_started_utc": "2026-10-22T06:42:55Z",
   "what_was_replayed": "Each sampled session was extracted from its committed archive sessions/<spec>.tar.xz (SHA-256 checked against runs/progress.jsonl) into a scratch directory and audited with `ecbench verify --dir <extracted> --replay-all`; the fallback `--replay 50` applies only when --replay-all exceeded 600 s (field `mode`). The audit re-derives the session from its own files (file hashes, spec and plan identity, seeds, execution order, record seals and count), re-checks every recovered logarithm [k]G = Q on every record (warm-up included), and re-executes every measured deterministic run, requiring identical answer, total, phases, counters and factor base. The receipt file map was compared with the committed Phase B audit receipt (sessions/<spec>.audit.json). The extracted copy was deleted after each session.",
   "independence": {

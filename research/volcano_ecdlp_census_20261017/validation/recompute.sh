@@ -36,6 +36,9 @@ awk -F'\t' '{ if ($14 == "true") v++; k = $1 "|" $2 "|" $8; n[k]++; if ($14 == "
         for (x in r) printf "count.rows.%s\t%d\n", x, r[x] }' "$W/measured.tsv" >> "$W/pe.tsv"
 printf 'count.sessions\t%d\n' "$(jq -r 'select(.status == "done" and .audit_ok == true) | .spec' runs/progress.jsonl | sort -u | wc -l)" >> "$W/pe.tsv"
 for v in V1 V2; do awk -v V=$v -f "$HERE/curve_effect.awk" "$W/measured.tsv"; done | sort > "$W/curve_effect.tsv"
+# V3 crater IC mean S and SE (ddof 1) per curve model (results.json crater_ic_by_model, erratum A3)
+awk -F'\t' '$14 == "true" && $1 == "V3" && $3 == 0 && $8 == "ic" { s[$5] += $11; q[$5] += $11 * $11; n[$5]++ }
+  END { for (m in s) { mu = s[m] / n[m]; v = (q[m] - n[m] * mu * mu) / (n[m] - 1); printf "cm.%s.mean\t%.17g\ncm.%s.se\t%.17g\ncm.%s.n\t%d\n", m, mu, m, sqrt(v / n[m]), m, n[m] } }' "$W/measured.tsv" >> "$W/pe.tsv"
 awk -F'\t' 'BEGIN { P[1] = 0; P[2] = 0.1; P[3] = 1 }
   $14 == "true" && $2 != "ctl" && ($8 == "ic" || $8 == "rho-neg") { for (i = 1; i <= 3; i++) { ps = $11 * ($16 + P[i] * $18) / $16; s[$1, $8, i] += ps; n[$1, $8, i]++ } }
   $14 == "true" && $1 == "V3" && $3 == 0 && $2 != "ctl" && ($8 == "ic" || $8 == "rho-neg" || $8 == "rho-cubic") { for (i = 1; i <= 3; i++) { ps = $11 * ($16 + P[i] * $18) / $16; c[$8, i] += ps; cn[$8, i]++ } }
@@ -62,10 +65,12 @@ awk -F'\t' -v OFS='\t' '$14 == "true" && $1 == "V1" && $8 == "rho-plain" && ($2 
   END { for (k in a) if (k in b) { split(k, z, "\t"); print z[1], z[2], a[k], 1, b[k], 1; print z[1], z[2] "|" z[3], a[k], 1, b[k], 1 > "/dev/stderr" } }' "$M" > "$W/boot_pair_vx.tsv" 2> "$W/boot_pair_tr.tsv"
 awk -F'\t' -v OFS='\t' '$14 == "true" && $1 == "V3" && $3 == 0 && ($2 == "D" || $2 == "N") && ($8 == "ic" || $8 == "rho-cubic") {
   k = $2 "|" $6 "|" $7 "|" $9; if ($8 == "ic") a[k] = $11; else b[k] = $11 } END { for (k in a) if (k in b) print 1, k, a[k], 1, b[k], 1 }' "$M" > "$W/boot_v3c.tsv"
+# seeds 777001-777006 in this order; the six runs are independent, so they run in parallel
 seed=777001
 for b in pc v1rp_L1 v1icrho pair_vx pair_tr v3c; do
-  awk -v seed=$seed -v reps=10000 -f "$HERE/cluster_boot.awk" "$W/boot_$b.tsv" > "$W/rep_$b.txt"; seed=$((seed + 1))
+  awk -v seed=$seed -v reps=10000 -f "$HERE/cluster_boot.awk" "$W/boot_$b.tsv" > "$W/rep_$b.txt" & seed=$((seed + 1))
 done
-for b in pc v1rp_L1 v1icrho pair_vx pair_tr; do
+wait
+for b in pc v1rp_L1 v1icrho pair_vx pair_tr v3c; do
   "$HERE/quantiles.sh" "$W/rep_$b.txt" | awk -v f=$b -F'\t' '{ printf "%s%s\"%s\":%s", (NR == 1 ? "{\"check\":\"" f "\"," : ""), (NR == 1 ? "" : ","), $1, $2 } END { print "}" }'
 done > "$W/boot_q.jsonl"
