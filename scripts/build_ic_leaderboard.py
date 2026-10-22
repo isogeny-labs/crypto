@@ -74,6 +74,7 @@ SOURCES = {
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
     "lazy_members": "research/ecbench_lazy_orbit_members_20261018/figures/ratios.json",
+    "generator_orbit": "research/ecbench_generator_orbit_20261022/figures/summary.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -641,6 +642,45 @@ def lazy_members_component() -> dict:
             "source": SOURCES["lazy_members"], "validation": NOT_VALIDATED}
 
 
+def generator_orbit_component() -> dict:
+    """The orbit-layout table and generator-orbit base of
+    research/ecbench_generator_orbit_20261022: paired ratios and §5a band rows
+    copied from the study's saved ecbench comparisons and `ecbench band` JSON
+    (figures/summary.json). Engineering; the ranked tables A-C keep the
+    oracle each row was measured with. Its validation standing is the gate's
+    own verdict on the study directory's VALIDATION.json."""
+    d = load(SOURCES["generator_orbit"])
+    if d.get("schema") != "crypto.generator_orbit_study/v1":
+        raise SystemExit(f"{SOURCES['generator_orbit']}: unexpected schema")
+    study = "research/ecbench_generator_orbit_20261022"
+
+    def arm(c, prefix):
+        return next(a["arm"] for a in c["arms"] if a["arm"].startswith(prefix))
+
+    def cmp(c, a, b):
+        m = next(x for x in c["comparisons"] if x["a"] == a and x["b"] == b)
+        return {"ratio": m["ratio"], "ci95": m["ci95"], "pairs": m["pairs"]}
+
+    def band(c, name):
+        return next(r["mean_s"] for r in c["band"] if r["arm"] == name)
+
+    rows = []
+    for c in d["curves"]:
+        lazy, layout, gen = arm(c, "ic-lazy-"), arm(c, "ic-layout-"), arm(c, "ic-gen-layout-")
+        rows.append({"session": c["session"], "curve": c["band"][0]["curve"], "a": c["a"], "n": c["n"],
+                     "log2_r": c["log2r"], "columns": int(gen.rsplit("-c", 1)[1]),
+                     "lazy_over_layout": cmp(c, layout, lazy), "layout_over_gen": cmp(c, gen, layout),
+                     "lazy_over_gen": cmp(c, gen, lazy), "gen_over_rho_frob": cmp(c, "rho-frob", gen),
+                     "band_gen": band(c, gen), "band_lazy": band(c, lazy), "band_rho_frob": band(c, "rho-frob")})
+    errors = gate.check_evidence_dir(REPO / study)
+    validation = ("Validation standing: validated under the 2026-10-19 gate (VALIDATION.json in the study "
+                  "directory: replay certificate, validator report, §5a-banded rho-frob reference)."
+                  if not errors else NOT_VALIDATED + " Gate: " + "; ".join(errors) + ".")
+    return {"rows": rows, "unit": "ecbench.gae, paired by target, cluster-bootstrap 95% CI", "class": "engineering",
+            "weights": d["weights"], "study": study + "/", "report": study + "/REPORT.pdf",
+            "source": SOURCES["generator_orbit"], "validated": not errors, "validation": validation}
+
+
 def secs(x: float) -> str:
     """Seconds to three significant figures, trailing zeros kept: 8.00 s, 224 s."""
     return f"{x:.0f} s" if x >= 100 else f"{x:#.3g} s"
@@ -1199,6 +1239,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
         "lazy_members_component": lazy_members_component(),
+        "generator_orbit_component": generator_orbit_component(),
         "pair_table_component": pair_table_component(),
         "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
@@ -1318,6 +1359,33 @@ def markdown(doc: dict) -> str:
     L += ["", f"[Report]({'../../' + lz['report']}) · [study](../../{lz['study']}) · "
               f"[data](../../{lz['source']}). Distance to rho is reported, not a gate; no ranking against "
               "rho is claimed.", "", lz["validation"], ""]
+    go = doc["generator_orbit_component"]
+
+    def gci(x):
+        return f"{x['ratio']:.3f} [{x['ci95'][0]:.3f}, {x['ci95'][1]:.3f}]"
+
+    def gband(b):
+        return " / ".join(f"{v:.3f}" for v in b)
+    L += ["## Component improvement: orbit-layout table and generator-orbit base (2026-10-22, engineering)", "",
+          "Against the lazy orbit IC (the section above): `mitm-frobenius-layout-counted` names a hit's "
+          "Frobenius images by index and adds each orbit's own pairs once per rotation class (the same "
+          "relations as the lazy table on 960/960 run pairs); `generator_orbit=1` makes column 0 the "
+          "orbit of G, whose logarithm is known, and `stride-generator` draws targets Q + [k]G with no "
+          f"scalar multiplication. {go['unit']}; above 1 the second-named arm is cheaper. Band: mean S "
+          "with native work at w = 0 / 0.1 / 1 GAE (AGENTS.md §5a).", "",
+          "| curve | log₂ r | c | lazy ÷ layout | lazy ÷ gen-layout (net) | gen-layout ÷ rho-frob | "
+          "band S gen-layout | band S rho-frob |",
+          "|:--|--:|--:|:--|:--|:--|:--|:--|"]
+    for r in go["rows"]:
+        L.append(f"| `{r['curve']}` | {r['log2_r']:.1f} | {r['columns']} | {gci(r['lazy_over_layout'])} | "
+                 f"**{gci(r['lazy_over_gen'])}** | {gci(r['gen_over_rho_frob'])} | {gband(r['band_gen'])} | "
+                 f"{gband(r['band_rho_frob'])} |")
+    L += ["", f"[Report]({'../../' + go['report']}) · [study](../../{go['study']}) · "
+              f"[data](../../{go['source']}). At n = 29 (c = 1) the IC arm is below rho-frob at every band "
+              "weight; at one column the pipeline is a Frobenius-folded baby-step giant-step and the "
+              "crossing rests on rho-frob's fixed set-up at log₂ r = 15.4, so it is not \"faster than rho\": "
+              "the gap grows with r. At n = 19 no pinned calibration row exists and the band does not "
+              "re-price the IC natives.", "", go["validation"], ""]
     for code in ("A", "B", "C"):
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
@@ -1923,6 +1991,35 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{gh(lz["report"], "Report")} · {gh(lz["study"], "study")} · {gh(lz["source"], "data")}. '
              'Distance to rho is reported, not a gate; no ranking against rho is claimed.</p>'
              f'<p class="muted">{esc(lz["validation"])}</p></section>')
+    go = doc["generator_orbit_component"]
+
+    def gci(x):
+        return f'{x["ratio"]:.3f} [{x["ci95"][0]:.3f}, {x["ci95"][1]:.3f}]'
+
+    def gband(b):
+        return " / ".join(f"{v:.3f}" for v in b)
+    P.append('<section class="panel" id="generator-orbit"><h2>Component improvement · orbit-layout table and '
+             'generator-orbit base <span class="chip">engineering</span></h2>'
+             '<p>Against the lazy orbit IC: <code>mitm-frobenius-layout-counted</code> names a hit\'s Frobenius '
+             'images by index and adds each orbit\'s own pairs once per rotation class (same relations, 960/960 '
+             'run pairs); <code>generator_orbit=1</code> makes column 0 the orbit of G (known logarithm) and '
+             '<code>stride-generator</code> draws Q + [k]G with no scalar multiplication. '
+             f'{esc(go["unit"])}; above 1 the second-named arm is cheaper. Band: mean S at w = 0 / 0.1 / 1.</p>'
+             '<div class="scroll"><table><thead><tr><th>Curve</th><th>log₂ r</th><th>c</th><th>lazy ÷ layout</th>'
+             '<th>lazy ÷ gen-layout (net)</th><th>gen-layout ÷ rho-frob</th><th>band S gen-layout</th>'
+             '<th>band S rho-frob</th></tr></thead><tbody>')
+    for r in go["rows"]:
+        P.append(f'<tr><td><code>{esc(r["curve"])}</code></td><td>{r["log2_r"]:.1f}</td><td>{r["columns"]}</td>'
+                 f'<td>{gci(r["lazy_over_layout"])}</td><td><b>{gci(r["lazy_over_gen"])}</b></td>'
+                 f'<td>{gci(r["gen_over_rho_frob"])}</td><td>{gband(r["band_gen"])}</td>'
+                 f'<td>{gband(r["band_rho_frob"])}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>{gh(go["report"], "Report")} · {gh(go["study"], "study")} · {gh(go["source"], "data")}. '
+             'At n = 29 (c = 1) the IC arm is below rho-frob at every band weight; at one column the pipeline '
+             'is a Frobenius-folded baby-step giant-step and the crossing rests on rho-frob\'s fixed set-up at '
+             'log₂ r = 15.4, so it is not “faster than rho”: the gap grows with r. At n = 19 no pinned '
+             'calibration row exists and the band does not re-price the IC natives.</p>'
+             f'<p class="muted">{esc(go["validation"])}</p></section>')
     d = doc["bounded_diagnostics"][0]
     P.append(f'<section class="card" id="bounded-n37-diagnostic"><h2>New n37 counted diagnostic, outside the priced tables</h2>'
              f'<p>On <code>{esc(d["curve"])}</code>, shared-rank K16 has {d["usable_points"]:,} actual usable '

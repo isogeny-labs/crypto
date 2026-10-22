@@ -37,6 +37,24 @@ The Frobenius-folded pair table no longer names `σ^t(P_i)` for every base point
 
 Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates.
 
+## Component improvement: orbit-layout table and generator-orbit base (2026-10-22, engineering)
+
+Against the lazy orbit IC (the section above): `mitm-frobenius-layout-counted` names a hit's Frobenius images by index and adds each orbit's own pairs once per rotation class (the same relations as the lazy table on 960/960 run pairs); `generator_orbit=1` makes column 0 the orbit of G, whose logarithm is known, and `stride-generator` draws targets Q + [k]G with no scalar multiplication. ecbench.gae, paired by target, cluster-bootstrap 95% CI; above 1 the second-named arm is cheaper. Band: mean S with native work at w = 0 / 0.1 / 1 GAE (AGENTS.md §5a).
+
+| curve | log₂ r | c | lazy ÷ layout | lazy ÷ gen-layout (net) | gen-layout ÷ rho-frob | band S gen-layout | band S rho-frob |
+|:--|--:|--:|:--|:--|:--|:--|:--|
+| `icv1-f2m13-t181-515ee569` | 11.0 | 1 | 1.080 [1.078, 1.081] | **3.178 [2.772, 3.612]** | 0.739 [0.629, 0.866] | 1.406 / 1.536 / 2.706 | 1.987 / 1.987 / 1.987 |
+| `icv1-f2m29-tm40309-30c52b96` | 15.4 | 1 | 1.093 [1.091, 1.096] | **3.200 [2.948, 3.447]** | 0.366 [0.241, 0.523] | 0.546 / 0.611 / 1.196 | 1.569 / 1.569 / 1.569 |
+| `icv1-f2m17-tm101-00378d4e` | 16.0 | 1 | 1.032 [1.028, 1.036] | **1.274 [1.012, 1.670]** | 1.591 [1.115, 2.189] | 1.845 / 2.142 / 4.810 | 1.240 / 1.240 / 1.240 |
+| `icv1-f2m19-t797-b6cf2467` | 17.0 | 2 | 1.067 [1.064, 1.070] | **1.717 [1.532, 1.903]** | 1.154 [0.888, 1.468] | 1.081 / 1.081 / 1.081 | 0.937 / 0.937 / 0.937 |
+| `icv1-f2m31-tm90707-c95f16f5` | 20.5 | 2 | 1.052 [1.048, 1.057] | **1.916 [1.622, 2.285]** | 1.154 [0.878, 1.502] | 0.559 / 0.632 / 1.286 | 0.512 / 0.512 / 0.512 |
+| `icv1-f2m23-t5197-69e76b73` | 21.0 | 3 | 1.041 [1.038, 1.044] | **1.553 [1.362, 1.764]** | 1.934 [1.414, 2.475] | 0.838 / 0.945 / 1.908 | 0.443 / 0.443 / 0.443 |
+| `icv1-f2m37-tm534059-32aad96b` | 27.8 | 8 | 1.021 [1.018, 1.023] | **1.261 [1.071, 1.511]** | 3.886 [3.165, 4.790] | 0.772 / 0.892 / 1.965 | 0.211 / 0.211 / 0.211 |
+
+[Report](../../research/ecbench_generator_orbit_20261022/REPORT.pdf) · [study](../../research/ecbench_generator_orbit_20261022/) · [data](../../research/ecbench_generator_orbit_20261022/figures/summary.json). At n = 29 (c = 1) the IC arm is below rho-frob at every band weight; at one column the pipeline is a Frobenius-folded baby-step giant-step and the crossing rests on rho-frob's fixed set-up at log₂ r = 15.4, so it is not "faster than rho": the gap grows with r. At n = 19 no pinned calibration row exists and the band does not re-price the IC natives.
+
+Validation standing: not validated under the 2026-10-19 gate. No replay certificate, validator report or §5a-banded matched-rho reference is filed for this study (no VALIDATION.json), so this is an engineering component, not a validated row, and its benchmarks/README.md row is withheld until it validates. Gate: VALIDATION.json is missing.
+
 ## Table A: Koblitz, one target (§23, re-run at baseline v3)
 
 - **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, which is 2.3–3.2 times cheaper at baseline v3 than in §23's processes, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v3/README.md).
@@ -334,6 +352,7 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ecbench_lazy_orbit_members_20261018/figures/ratios.json` — sha256 `c86743775097e0e1…`
+- `research/ecbench_generator_orbit_20261022/figures/summary.json` — sha256 `c4f567d49a2875e7…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
