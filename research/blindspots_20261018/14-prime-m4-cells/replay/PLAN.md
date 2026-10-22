@@ -20,7 +20,7 @@ certificate is written only after the replay runs and the comparison below is do
 * New output paths only: every output, stdout, stderr and receipt is under
   `research/blindspots_20261018/14-prime-m4-cells/replay/raw/`, and every card lists them
   in `must_not_exist`, so a rerun refuses rather than overwrites.
-* Pinned commit: `f543b5523357eb11490a30fcac84d17359ce98ad` (HEAD when the cards were written).
+* Commit: not pinned (the pin was removed before the cards were committed, as in item 01's replay cards, because `task_card.py run` refuses a pin that differs from HEAD). Each receipt records the HEAD it ran at; the instrument sha256 carries code identity.
   `tools/task_card.py run` refuses when HEAD differs. If the cards are committed first, HEAD moves and
   the `commit:` line of each card must be re-pinned (then re-lint) before it is relayed.
 * Run the three cards one after another, never at the same time (wall time is descriptive, but
