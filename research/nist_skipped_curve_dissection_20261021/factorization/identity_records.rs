@@ -7,7 +7,10 @@ use crypto_lib::hash::sha256::sha256;
 use serde_json::Value;
 use std::{env, fs, path::Path};
 
-const STUDY: &str = "research/nist_skipped_curve_dissection_20261021/factorization";
+const STUDY: &str = match option_env!("NIST_FACTOR_STUDY") {
+    Some(path) => path,
+    None => "research/nist_skipped_curve_dissection_20261021/factorization",
+};
 
 // Exact decimal syntax as a constant expression; evaluation is the native
 // repository checker's modular arithmetic, not a floating-point conversion.
