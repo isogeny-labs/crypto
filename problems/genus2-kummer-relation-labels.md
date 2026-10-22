@@ -4,7 +4,7 @@
 - **Kind:** implementation and proof gap, with a proved ordinary-addition obstruction
 - **Affected work:** [four-follow-up protocol](../research/four_followups_20261021/PROTOCOL.md), Kummer walk arithmetic
 - **Next action owner:** PR #2304 follow-up
-- **Last updated:** 2026-10-21
+- **Last updated:** 2026-10-22
 
 ## Problem
 
@@ -21,23 +21,43 @@ collector priced against matched rho, not merely fast scalar multiplication.
   condition for Gaudry's fast model is met. [The ambiguity gate](../research/four_followups_20261021/results/kummer-ambiguity.jsonl)
   checked 21/21 exact-order groups: the same unsigned input K(2P)=K(-2P)
   yields different K(P+2P) and K(P-2P).
+- **Observed:** [The sign-safe reference gate](../research/kummer_walk_20261022/REPORT.md)
+  checked all 1,260 frozen source targets, 8,820 labelled differential
+  quotient cases and 630 exceptional/identity/two-torsion cases on 21 models.
+  Every test had one quotient output and one signed lift, with source labels
+  checked; the implementation uses Jacobian addition to enumerate possible
+  quotient lifts, not fast Kummer coordinates.
 - **Derived or proved:** Unsigned Kummer classes alone cannot define the
   binary ordinary addition used by this arbitrary-jump walk; the witness is
   exact for each transferred subgroup of order greater than four.
+- **Derived or proved:** `K(A), K(B), K(A-B)` uniquely fix `K(A+B)`;
+  `K(T), K(T+G)` and a signed `G` of order greater than two uniquely fix the
+  signed `T`. These identities prove the local differential/recovery rule,
+  not a closed state update under changing arbitrary jumps.
+- **Restricted obstruction:** For a state consisting only of fixed-offset
+  classes `{K(T+s):s in S}`, updating each class after a jump `J` by one xADD
+  with `K(J)` and a stored difference requires `S-J` to be contained in `S`.
+  If `J` has order `m`, every nonempty such `S` contains at least `m` offsets.
+  This rules out a constant-size sidecar of that exact form for a large-order
+  jump; it does not rule out other recurrences or walks.
 - **Suspected explanation:** A differential walk with a known difference or
   signed Jacobian anchors may allow fast Kummer pseudogroup steps, but its
   relation labels and total cost are unknown.
 - **Missing capability:** Explicit Kummer coordinates and differential
-  formulas for these models, a walk invariant that carries the required
-  difference, and a checked lift of every collected relation.
+  formulas for these models, an efficient walk invariant that updates the
+  needed difference/anchor sidecar as the arbitrary jump changes, and a
+  checked lift of every collected relation in a full collector. The local
+  signed-lift rule is reference-checked, but the required sidecar recurrence
+  is not implemented or proved efficient.
 - **What this evidence does not establish:** It does not rule out all Kummer
   collectors or yield a performance ratio to rho.
 
 ## What would unblock it
 
-- [ ] Specify and prove a walk invariant mapping each Kummer state and known
-  difference to a signed Jacobian relation label, including negation,
-  exceptional points and cycle closure.
+- [x] Prove and reference-check local differential quotient and signed-anchor
+  recovery, including negation, identity and two-torsion cases.
+- [ ] Specify and prove an efficiently updatable walk state with the needed
+  difference/anchor sidecar under changing arbitrary jumps and cycle closure.
 - [ ] Implement and cross-check the Kummer formulas against the Jacobian on
   all 21 models, then run and independently replay the 1,260 frozen targets
   with complete cold pricing and matched source rho.
@@ -47,17 +67,25 @@ second measures it. The full rational two-torsion gate alone is insufficient.
 
 ## Next discriminating step
 
-- **Action or proof obligation:** Attempt a differential step and signed
-  label recovery on the first 16-bit model, with the known-difference invariant
-  written explicitly before timing.
-- **Inputs and controls:** Exact p=739 transferred generator and relation
-  labels; affine Jacobian addition and the source-curve scalar oracle.
-- **Execution limits and stop condition:** Check all 60 frozen targets on the
-  first model only as a correctness gate; retain every exceptional failure.
-  Full-cohort execution remains required after this gate.
-- **Outcomes and next actions:** Correct labels allow a timed full collector;
-  a counterexample identifies the invariant to repair. Failure to construct
-  the invariant is an implementation/proof gap, not an impossibility theorem.
+- **Action or proof obligation:** Derive a finite sidecar update rule for
+  `K(T+G)` and each `K(T-J_i)` under the two prospective arbitrary jumps of
+  the frozen collector, or substitute a fully specified differential walk
+  whose candidate and relation distribution is measured against the control.
+- **Coordinate prerequisite:** Normalize the p=739 quintic to Rosenhain
+  form, derive theta constants and projection coordinates, then check
+  Gaudry's xDBL/xADD and the signed recovery of Chung--Costello--Smith
+  against the Jacobian, including all vanishing-denominator branches. The
+  prior rational-root gate alone does not establish this projection.
+- **Inputs and controls:** All 21 exact models; the signed Jacobian and
+  source-curve oracles; the frozen 16-jump collector and its 1,260 target
+  workload. Verify the sidecar after every jump, restart and cycle closure.
+- **Execution limits and stop condition:** Gate every exceptional branch on
+  the 16-bit model first, then run the full 1,260 paired collector if the
+  recurrence and coordinate formulas pass. Preserve failures and unmeasured
+  cost cells.
+- **Outcomes and next actions:** A closed, verified recurrence permits a
+  priced run; a counterexample requires a different state or walk. A missing
+  recurrence is an implementation/proof gap, not a global impossibility.
 - **Recheck trigger:** Explicit sign-safe differential recurrence or a new
   complete Kummer addition construction.
 
@@ -65,3 +93,8 @@ second measures it. The full rational two-torsion gate alone is insufficient.
 
 2026-10-21: Rational two-torsion and unsigned ordinary-addition gates complete.
 Differential walk, signed relation labels and the full cohort unresolved.
+
+2026-10-22: The local differential quotient and signed-anchor recovery gate
+passed 1,260 target and 630 exceptional cases. Fast coordinates, a closed
+arbitrary-jump state recurrence, and all full-collector cost ratios remain
+unresolved.
