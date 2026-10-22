@@ -342,3 +342,31 @@ height `t <= 8`; an attack needs `|V|^m ~ r`, i.e. `N ~ 224`. The measured
 `N <= 24` are 11% of that. Anything at `N ~ 224` is extrapolation (labelled).
 Per AGENTS.md "Intermediate-cost and asymmetric-access hypotheses", a bounded
 null is not nonexistence of structure.
+
+## 10. Amendment 2 (2026-10-22, after R18 ended; committed before the run it adds)
+
+**What happened (measured, from the kernel log).** R18 (SL24, `m = 2`,
+`N = 24`, one target, 2 threads, `--max-nnz 1.8e9`, `ulimit -v` 9 GB) started
+at 04:19 UTC and was killed by the kernel's memory-cgroup OOM killer at about
+06:45 UTC (`Killed process ... pkm_tower_pilot, anon-rss 6,007,580 kB`),
+invoked by another agent's process in the same container cgroup. It wrote no
+row and no log line (the pilot prints a system's line when the system ends). So
+R18 has **no `D` and no lower bound**, and per §2.2 it is recorded as out of
+budget (memory) and is not re-run. `progress.txt` shows `exit 0` for it: that is
+a bug in `run_f4.sh`'s `echo` (the `$?` it prints is the one of the `date`
+command substitution, so every `end ... exit` line of the F4 runs reads 0 and
+carries no information). Whether a run finished is read from its summary line in
+`runs/*.log` instead; the script is fixed after the batch (`run_f4.sh` in the
+final tree) and the old text is kept in this paragraph.
+
+**Added cell R18b (sizing, not a replacement for R18).** Same system as R18
+(`--p 16760833 --m 2 --controls tower --t-min 12 --max-t 12 --targets 0`,
+same seed, same engine) with `--max-nnz 600000000 --trace --budget 7200`, 2
+threads, `ulimit -v` 5 GB. It stops at the first step whose `B'` passes 6e8
+entries and reports the stop step and what F4 knew at it. A stopped run gives
+`D >= d` only from a step that added elements to the basis at degree `d` (PKM
+note §16.1); otherwise it gives no bound. Read under A1 exactly as §3 Q2 says
+for a stopped cell: `D >= 6` or `D >= 7` from a productive step leaves the
+`m = 2` line inconclusive; nothing from R18b can read H0 or H1a. R18b is run
+after the main batch (R19 included) finishes or 09:30 UTC, whichever is first;
+it is not run if free memory then is under 6 GB.
