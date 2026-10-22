@@ -7,12 +7,16 @@
 //! the seed.  Point counting is exhaustive (`PrimeCurve::point_count`),
 //! which is why the sizes stay at or below 28 bits.
 //!
+//! `--solinas n:k,...` fixes `p = 2^n - 2^k + 1` (NIST P-224 topology, `v₂(p - 1) = k`)
+//! instead of drawing `p = c·2^s + 1` (`research/pkm_p224_kummer_shape_20261022/`).
+//!
 //! `--plus` asks for `p = c·2^s − 1` instead (`v₂(p + 1) = s`, `p ≡ 3 mod
 //! 4`, the P-192 shape; `research/pkm_supersingular_aux_20261015/`).
 //!
 //! ```text
 //! cargo run --release --example prime_tower_curves -- --bits 20,22,24,26,28 --two-adicity 12 --seed 20261013 --max-cofactor 4
 //! cargo run --release --example prime_tower_curves -- --bits 20,22,24 --two-adicity 10 --plus --seed 20261016 --max-cofactor 4
+//! cargo run --release --example prime_tower_curves -- --solinas 20:14,24:14,26:12,28:16 --seed 20261022 --max-cofactor 4
 //! ```
 
 use std::env;
@@ -30,6 +34,7 @@ fn main() {
     let mut seed = 20261013u64;
     let mut max_h = 4u64;
     let mut plus = false;
+    let mut solinas: Vec<(u32, u32)> = Vec::new();
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
@@ -46,6 +51,16 @@ fn main() {
                 seed = args[i].parse().unwrap();
             }
             "--plus" => plus = true,
+            "--solinas" => {
+                i += 1;
+                solinas = args[i]
+                    .split(',')
+                    .map(|v| {
+                        let (n, k) = v.split_once(':').expect("--solinas n:k,n:k");
+                        (n.parse().unwrap(), k.parse().unwrap())
+                    })
+                    .collect();
+            }
             "--max-cofactor" => {
                 i += 1;
                 max_h = args[i].parse().unwrap();
@@ -54,16 +69,27 @@ fn main() {
         }
         i += 1;
     }
-    for b in bits {
+    // `--solinas n:k,...` fixes p = 2^n - 2^k + 1 (the NIST P-224 topology,
+    // `research/pkm_p224_kummer_shape_20261022/`) instead of drawing it.
+    if !solinas.is_empty() {
+        bits = solinas.iter().map(|&(n, _)| n).collect();
+    }
+    for (idx, b) in bits.into_iter().enumerate() {
         let mut rng = StdRng::seed_from_u64(seed ^ ((b as u64) << 40));
         // p = c·2^s + 1 (or c·2^s − 1 with --plus) with c odd and p of
         // exactly b bits.
-        let p = loop {
-            let c_bits = b - s;
-            let c = (rng.gen::<u64>() & ((1u64 << c_bits) - 1)) | (1u64 << (c_bits - 1)) | 1;
-            let p = if plus { (c << s) - 1 } else { (c << s) + 1 };
-            if is_prime_u64(p) {
-                break p;
+        let p = if let Some(&(n, k)) = solinas.get(idx) {
+            let p = (1u64 << n) - (1u64 << k) + 1;
+            assert!(is_prime_u64(p), "2^{n} - 2^{k} + 1 is not prime");
+            p
+        } else {
+            loop {
+                let c_bits = b - s;
+                let c = (rng.gen::<u64>() & ((1u64 << c_bits) - 1)) | (1u64 << (c_bits - 1)) | 1;
+                let p = if plus { (c << s) - 1 } else { (c << s) + 1 };
+                if is_prime_u64(p) {
+                    break p;
+                }
             }
         };
         // Candidates in batches of 8, counted in parallel; the first that

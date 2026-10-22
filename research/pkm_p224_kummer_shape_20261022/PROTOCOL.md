@@ -216,8 +216,14 @@ registered (AGENTS.md §11) before they are cited.
 | `rho-neg` | reference | `rho.negation` |
 | `ic-mitm` | baseline | `ic.pipeline`, `prime-kummer:t=T`, `mitm:m=3,negation_folded=1` |
 | `ic-rootfind` | candidate | `ic.pipeline`, `prime-kummer:t=T`, `rootfind-mitm:m=3` |
-| `ic-abscissa` | control | `ic.pipeline`, `prime-abscissa:size=S`, `rootfind-mitm:m=3`, `S` = the tower base's abscissa count |
+| `ic-mitm-tf4` | factor-base record for §4.4 (20- and 24-bit specs only) | `ic.pipeline`, `prime-kummer:t=10` (20-bit) or `t=12` (24-bit), `mitm:m=3,negation_folded=1`; its record supplies the on-curve `columns` of the F4 cell's height; its `S` is reported but is not a comparison arm |
 | `rho-neg-aa` | control | `rho.negation` (A/A) |
+
+*Amendment 1 (2026-10-22, before any ecbench session, F4 runs may have started):*
+the draft arm list had an `ic-abscissa` control (plain base of the tower base's
+size). It is dropped: a single `prime-abscissa:size=S` parameter cannot match two
+curves with different abscissa counts in one spec, and the prior ladder measured
+tower against plain base within 1.2% (P3 there). `ic-mitm-tf4` is added as above.
 
 `T = 8, 9, 10, 11` at 20, 24, 26, 28 bits (the prior ladder's rule
 `t = ceil((bits + log2 6)/3)`, every `t <= k`). `max_trials = 200000`,
