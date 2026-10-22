@@ -1214,6 +1214,26 @@ fn timed<T>(what: &str, slug: &str, f: impl FnOnce() -> T) -> T {
     r
 }
 
+/// Whether a prime-field model has `j(E) = j(O_K)` for a class-number-1
+/// `d_K` other than `−3, −4` (those are the `j = 0, 1728` models above).
+fn class_one_maximal(model: &Model, dk: &BigInt) -> bool {
+    let (Model::Prime { p, a, b }, Some(j_k)) = (model, class_one_j(dk)) else {
+        return false;
+    };
+    if a.is_zero() || b.is_zero() {
+        return false;
+    }
+    let pi = BigInt::from(p.clone());
+    let (a, b) = (BigInt::from(a.clone()), BigInt::from(b.clone()));
+    let a3 = BigInt::from(4) * &a * &a * &a;
+    let den = (&a3 + BigInt::from(27) * &b * &b).mod_floor(&pi);
+    if den.is_zero() {
+        return false;
+    }
+    let inv = den.modpow(&(&pi - 2u8), &pi);
+    (BigInt::from(1728) * a3 * inv).mod_floor(&pi) == j_k.mod_floor(&pi)
+}
+
 /// `j(O_K)` for the nine imaginary quadratic fields of class number 1.
 fn class_one_j(dk: &BigInt) -> Option<BigInt> {
     let j: i128 = match dk.to_i64()? {
@@ -1287,25 +1307,6 @@ fn endomorphism(
                 }
                 f0 = BigUint::one();
                 contains.push(ring.to_string());
-            }
-        }
-    }
-    // Class number 1: the curves with End(E) = O_K are the reductions of
-    // the one CM j-invariant j(O_K) (Deuring), so j(E) = j(O_K) mod p puts
-    // O_K in End(E).
-    if let (Model::Prime { p, a, b }, Some(j_k)) = (&c.model, class_one_j(&dk)) {
-        if f0 > BigUint::one() && !a.is_zero() && !b.is_zero() {
-            let pi = BigInt::from(p.clone());
-            let (a, b) = (BigInt::from(a.clone()), BigInt::from(b.clone()));
-            let a3 = BigInt::from(4) * &a * &a * &a;
-            let den = (&a3 + BigInt::from(27) * &b * &b).mod_floor(&pi);
-            if !den.is_zero() {
-                let inv = den.modpow(&(&pi - 2u8), &pi);
-                let j = (BigInt::from(1728) * a3 * inv).mod_floor(&pi);
-                if j == j_k.mod_floor(&pi) {
-                    f0 = BigUint::one();
-                    contains.push(format!("O_K (j = {j_k}, the class-number-1 CM j-invariant)"));
-                }
             }
         }
     }
@@ -1463,23 +1464,36 @@ fn endomorphism(
                     // Beyond the division polynomial: a cycle that puts ℓ
                     // outside the conductor, else (depth 1) points over
                     // GF(q^k) (points.rs).
-                    let cycles = cycles
-                        .get_or_insert_with(|| timed("cycles", &c.slug, || walk::walks(&c.model, &dk, &v_full)));
-                    let by_cycle = walk::cap(&cycles.closed, ell) == 0;
-                    let by_points = if by_cycle {
-                        None
-                    } else if *depth == 1 {
-                        small.and_then(|l| timed(&format!("depth1-points {l}"), &c.slug, || points::scalar_by_points(&c.model, &c.trace, l)))
-                    } else {
-                        None
+                    // In order: points over GF(q^k) itself (the test these
+                    // levels have always had), the walks, the twist.
+                    let depth1 = |twist: bool| {
+                        if *depth != 1 {
+                            return None;
+                        }
+                        small.and_then(|l| {
+                            timed(&format!("depth1-points {l}"), &c.slug, || {
+                                points::scalar_by_points(&c.model, &c.trace, l, twist)
+                            })
+                        })
                     };
+                    let mut by_points = depth1(false);
+                    let mut by_cycle = false;
+                    if by_points.is_none() {
+                        let cycles = cycles.get_or_insert_with(|| {
+                            timed("cycles", &c.slug, || walk::walks(&c.model, &dk, &v_full))
+                        });
+                        by_cycle = walk::cap(&cycles.closed, ell) == 0;
+                        if !by_cycle {
+                            by_points = depth1(true);
+                        }
+                    }
                     match by_points {
                         _ if by_cycle => (
                             Some(0),
                             0,
                             format!(
                                 "{}: an endomorphism of conductor prime to ℓ, the crater",
-                                walk::describe(&cycles.closed)
+                                walk::describe(&cycles.as_ref().expect("walked").closed)
                             ),
                         ),
                         Some(true) => (
@@ -1543,6 +1557,34 @@ fn endomorphism(
     // Levels still open: a closed cycle of horizontal isogenies is an
     // endomorphism whose conductor the conductor of End(E) divides
     // (walk.rs).  It must also agree with every level already resolved.
+    // Class number 1: the curves with End(E) = O_K are the reductions of
+    // the one CM j-invariant j(O_K) (Deuring), so j(E) = j(O_K) mod p puts
+    // O_K in End(E): every open level is 0, and a decided one must be.
+    if !resolved && class_one_maximal(&c.model, &dk) {
+        let j_k = class_one_j(&dk).expect("class number 1");
+        for lv in levels.iter_mut() {
+            match lv.level {
+                Some(0) => {}
+                Some(l) => {
+                    return Err(format!(
+                        "j(E) = j(O_K) = {j_k} makes End(E) = O_K, but level {l} at ℓ = {}",
+                        lv.ell
+                    ))
+                }
+                None => {
+                    lv.level = Some(0);
+                    lv.level_at_most = 0;
+                    lv.method = format!(
+                        "j(E) = j(O_K) = {j_k}, class number 1: End(E) = O_K, the crater"
+                    );
+                }
+            }
+        }
+        contains.push(format!("O_K (j = {j_k}, the class-number-1 CM j-invariant)"));
+        bound = BigUint::one();
+        exact = BigUint::one();
+        resolved = true;
+    }
     if !resolved || cycles.as_ref().is_some_and(|w| !w.closed.is_empty()) {
         let walks = cycles.get_or_insert_with(|| {
             timed("cycles-late", &c.slug, || walk::walks(&c.model, &dk, &v_full))
@@ -2236,6 +2278,7 @@ mod tests {
         let t = get("icv1-fp240-t3-5d0c27a2");
         assert_eq!(t.endomorphism.maximal, Some(true));
         assert!(t.endomorphism.contains.iter().any(|o| o.starts_with("O_K (j = ")));
+        assert!(t.endomorphism.levels.iter().all(|l| l.level == Some(0)));
         // v = 271 is beyond the scalar test, d_K = −7 has class number 1:
         // O_K would close every walk of l-isogenies in one step, and the
         // walk does not, so End(E) = Z[π], of conductor 271.

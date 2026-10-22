@@ -891,7 +891,7 @@ fn split_power(n: &BigUint, ell: u64) -> (u32, BigUint) {
 /// (`ℓ ∤ k/2`).  `None` when the model is not one this handles, the
 /// degree passes [`MAX_DEGREE`], the work would exceed
 /// [`POINT_TEST_COST`], or the search finds no certificate.
-pub fn scalar_by_points(model: &Model, trace: &BigInt, ell: u64) -> Option<bool> {
+pub fn scalar_by_points(model: &Model, trace: &BigInt, ell: u64, twist: bool) -> Option<bool> {
     // ord(λ) ≤ ℓ − 1 is found by stepping, and the extension has that
     // degree: both bound ℓ.
     if ell > super::torsion::SCALAR_TEST_MAX_ELL {
@@ -911,14 +911,15 @@ pub fn scalar_by_points(model: &Model, trace: &BigInt, ell: u64) -> Option<bool>
     };
     // E(GF(q^k)) under the cost model it has always had, up to degree
     // [`EARLY_DEGREE`].
-    if u64::from(k) <= EARLY_DEGREE {
-        let n = extension_order(&q, trace, k)?;
-        if let Some(r) = rank(k, false, &n, multiplication_cost(model, k, n.bits())?, POINT_TEST_COST) {
-            return Some(r);
+    if !twist {
+        if u64::from(k) > EARLY_DEGREE {
+            return None;
         }
+        let n = extension_order(&q, trace, k)?;
+        return rank(k, false, &n, multiplication_cost(model, k, n.bits())?, POINT_TEST_COST);
     }
-    // Then, for even k, the twist over GF(q^{k/2}), costed for the
-    // arithmetic it gets.
+    // The twist over GF(q^{k/2}) for even k, costed for the arithmetic it
+    // gets.
     if k % 2 == 1 || u64::from(k / 2) > MAX_DEGREE {
         return None;
     }
@@ -1236,7 +1237,7 @@ mod tests {
                         };
                         let tt = BigInt::from(t);
                         let poly = frobenius_is_scalar(&model, &tt, ell).unwrap();
-                        let Some(points) = scalar_by_points(&model, &tt, ell) else {
+                        let Some(points) = scalar_by_points(&model, &tt, ell, false) else {
                             continue;
                         };
                         assert_eq!(points, poly, "p={p} a={a} b={b} ℓ={ell}");
@@ -1289,7 +1290,7 @@ mod tests {
                         let Some(poly) = frobenius_is_scalar(&model, &tt, ell) else {
                             continue;
                         };
-                        let Some(points) = scalar_by_points(&model, &tt, ell) else {
+                        let Some(points) = scalar_by_points(&model, &tt, ell, false) else {
                             continue;
                         };
                         assert_eq!(points, poly, "GF(2^{n}) a={a} b={b} ℓ={ell}");
