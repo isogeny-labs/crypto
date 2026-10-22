@@ -50,8 +50,8 @@ fn recorded(m: u64, n: u64) -> Option<u64> {
     match m {
         2 => match n {
             2 => Some(3),
-            4..=8 if n % 2 == 0 => Some(4),
-            10..=18 if n % 2 == 0 => Some(5),
+            4..=10 if n % 2 == 0 => Some(4),
+            12..=18 if n % 2 == 0 => Some(5),
             20 | 22 => Some(6),
             _ => None,
         },
@@ -72,13 +72,11 @@ fn recorded(m: u64, n: u64) -> Option<u64> {
 
 #[derive(Clone, Debug)]
 struct Row {
-    run: String,
     prime: String,
     kind: String,
     control: String,
     m: u64,
     n: u64,
-    target: u64,
     d: u64,
     finished: bool,
     cols: u64,
@@ -88,7 +86,6 @@ struct Row {
     pairs: u64,
     reducers: u64,
     max_rows: u64,
-    max_nnz: u64,
     verify_ok: Option<bool>,
     backend: String,
 }
@@ -114,7 +111,6 @@ fn read_rows(dir: &Path) -> Vec<Row> {
     files.sort();
     let mut rows = Vec::new();
     for f in files {
-        let run = f.file_stem().unwrap().to_string_lossy().to_string();
         for line in fs::read_to_string(&f).unwrap().lines() {
             let Ok(v) = serde_json::from_str::<Value>(line) else {
                 continue;
@@ -131,13 +127,11 @@ fn read_rows(dir: &Path) -> Vec<Row> {
             let stopped = !v.get("stopped_step").unwrap_or(&Value::Null).is_null();
             let above = get_u(&v, "pairs_above_bound");
             rows.push(Row {
-                run: run.clone(),
                 prime: prime_id(&p),
                 kind: v["kind"].as_str().unwrap_or("").to_string(),
                 control: v["control"].as_str().unwrap_or("").to_string(),
                 m: get_u(&v, "m"),
                 n: get_u(&v, "N"),
-                target: get_u(&v, "target_index"),
                 d: get_u(&v, "solving_degree_max"),
                 finished: !timed && !stopped && above == 0,
                 cols: get_u(&v, "max_cols"),
@@ -147,7 +141,6 @@ fn read_rows(dir: &Path) -> Vec<Row> {
                 pairs: get_u(&v, "critical_pairs_reduced") + get_u(&v, "tower_pairs_reduced"),
                 reducers: get_u(&v, "reducer_rows"),
                 max_rows: get_u(&v, "max_rows"),
-                max_nnz: get_u(&v, "max_nnz"),
                 verify_ok: v
                     .get("verify")
                     .and_then(|x| x.get("ok"))
@@ -252,9 +245,9 @@ fn svg_plot(
         w - ml - mr,
         h - mt - mb
     );
-    let nx = 8;
-    for i in 0..=nx {
-        let x = xlo + (xhi - xlo) * i as f64 / nx as f64;
+    let step = ((xhi - xlo) / 8.0).ceil().max(1.0);
+    let mut x = xlo;
+    while x <= xhi + 1e-9 {
         let px = tx(x, xlo, xhi);
         let _ = write!(
             s,
@@ -264,6 +257,7 @@ fn svg_plot(
             h - mb + 16.0,
             x
         );
+        x += step;
     }
     if logy {
         let mut v = ylo;
@@ -630,7 +624,6 @@ fn ns_per_gae(curve: &PrimeCurve) -> f64 {
 
 struct Rec {
     arm: String,
-    slug: String,
     log2r: f64,
     bits: u64,
     s: f64,
@@ -639,6 +632,7 @@ struct Rec {
     counters: BTreeMap<String, u64>,
     columns: Option<u64>,
     family: String,
+    wid: String,
 }
 
 fn read_records(session: &Path) -> Vec<Rec> {
@@ -677,10 +671,6 @@ fn read_records(session: &Path) -> Vec<Rec> {
         }
         out.push(Rec {
             arm: v["arm"].as_str().unwrap_or("").to_string(),
-            slug: v["workload"]["curve"]["slug"]
-                .as_str()
-                .unwrap_or("")
-                .to_string(),
             log2r: r.log2(),
             bits: v["workload"]["curve"]["field_bits"].as_u64().unwrap_or(0),
             s: v["cost"]["s"].as_f64().unwrap_or(f64::NAN),
@@ -696,9 +686,39 @@ fn read_records(session: &Path) -> Vec<Rec> {
             counters,
             columns: v["factor_base"]["columns"].as_u64(),
             family: v["workload"]["curve_spec"]["p"].to_string(),
+            wid: v["workload"]["workload_id"]
+                .as_str()
+                .unwrap_or("")
+                .to_string(),
         });
     }
     out
+}
+
+/// 95% percentile bootstrap of mean(a)/mean(b) over independent clusters
+/// (2000 resamples, fixed xorshift seed).
+fn boot_ratio(a: &[f64], b: &[f64]) -> (f64, f64) {
+    let mut st = 0x9E3779B97F4A7C15u64;
+    let mut next = move || {
+        st ^= st << 13;
+        st ^= st >> 7;
+        st ^= st << 17;
+        st
+    };
+    let mut rs = Vec::new();
+    for _ in 0..2000 {
+        let ma = (0..a.len())
+            .map(|_| a[(next() % a.len() as u64) as usize])
+            .sum::<f64>()
+            / a.len() as f64;
+        let mb = (0..b.len())
+            .map(|_| b[(next() % b.len() as u64) as usize])
+            .sum::<f64>()
+            / b.len() as f64;
+        rs.push(ma / mb);
+    }
+    rs.sort_by(|x, y| x.partial_cmp(y).unwrap());
+    (rs[50], rs[1949])
 }
 
 fn mean(v: &[f64]) -> f64 {
@@ -779,6 +799,56 @@ fn cmd_price(runs: &Path, out: &Path, curves: &Path, sessions: &[PathBuf]) {
                 .push((r.s, r.gae, u, missing));
         }
     }
+    let mut per_wl: BTreeMap<(String, u64, String), BTreeMap<String, Vec<f64>>> = BTreeMap::new();
+    for sd in sessions {
+        for r in read_records(sd) {
+            let fam = if fam_is_solinas(&r.family) {
+                "Solinas"
+            } else {
+                "Proth"
+            }
+            .to_string();
+            per_wl
+                .entry((fam, r.bits, r.arm.clone()))
+                .or_default()
+                .entry(r.wid.clone())
+                .or_default()
+                .push(r.gae);
+        }
+    }
+    let mut gae_md = String::from(
+        "| bits | arm | Solinas mean GAE | Proth mean GAE | Solinas / Proth | 95% cluster-bootstrap (workloads) |\n|--:|:--|--:|--:|--:|:--|\n",
+    );
+    let bits_all: Vec<u64> = {
+        let mut b: Vec<u64> = per_wl.keys().map(|k| k.1).collect();
+        b.sort();
+        b.dedup();
+        b
+    };
+    for bits in &bits_all {
+        for arm in ["ic-mitm", "ic-rootfind", "rho-neg"] {
+            let get = |fam: &str| -> Vec<f64> {
+                per_wl
+                    .get(&(fam.to_string(), *bits, arm.to_string()))
+                    .map(|m| m.values().map(|v| mean(v)).collect())
+                    .unwrap_or_default()
+            };
+            let (a, b) = (get("Solinas"), get("Proth"));
+            if a.is_empty() || b.is_empty() {
+                continue;
+            }
+            let (lo, hi) = boot_ratio(&a, &b);
+            let _ = writeln!(
+                gae_md,
+                "| {bits} | {arm} | {:.0} | {:.0} | {:.3} | [{lo:.3}, {hi:.3}] |",
+                mean(&a),
+                mean(&b),
+                mean(&a) / mean(&b)
+            );
+        }
+    }
+    fs::write(out.join("tables/gae_solinas_vs_proth.md"), &gae_md).unwrap();
+    println!("{gae_md}");
     let mut ratio_pts: BTreeMap<(String, String), Vec<(f64, f64)>> = BTreeMap::new();
     for ((fam, bits), arms) in &table {
         let rho = &arms["rho-neg"];

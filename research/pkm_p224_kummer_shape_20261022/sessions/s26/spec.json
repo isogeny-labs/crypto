@@ -1,0 +1,79 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "PKM Kummer-tower IC on Solinas vs Proth curves, 26-bit p, t=10",
+  "description": "Preregistered (PROTOCOL.md 4): ic.pipeline with the Kummer tower base on a P-224-topology Solinas curve (p = 2^n - 2^k + 1) and on the prior ladder Proth curve of the same bit size, the harness mitm table oracle and the root-finding oracle, against rho with the negation map, eight one-target workloads per curve. All IC arms charge every group operation.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 67104769,
+        "a": 36772902,
+        "b": 59108565,
+        "group_order": 67098862,
+        "r": 33549431,
+        "gx": 17995644,
+        "gy": 61081356
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 40857601,
+        "a": 8702713,
+        "b": 9617118,
+        "group_order": 40854764,
+        "r": 10213691,
+        "gx": 7627366,
+        "gy": 36955409
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 202610220026
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ic-mitm",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=10",
+          "oracle": "mitm:m=3,negation_folded=1",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "ic-rootfind",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=10",
+          "oracle": "rootfind-mitm:m=3",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 203610220026,
+    "isolation_required": "L2",
+    "timeout_seconds": 3600
+  }
+}
