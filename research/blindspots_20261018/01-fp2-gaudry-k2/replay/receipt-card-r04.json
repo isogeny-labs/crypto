@@ -1,0 +1,273 @@
+{
+  "card_id": "CARD-BLINDSPOT-01-REPLAY-R04",
+  "card_path": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/card-r04.yaml",
+  "card_sha256": "42152a33a0e3ec7b2967502eaddb398d2fd9ce6816772e9c0f9606adcb738933",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r04/b01",
+        "research/blindspots_20261018/instruments/blindspots_01_fp2_gaudry.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 7.63,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 7.63,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r04/b01",
+        "run",
+        "--family",
+        "torsion",
+        "--bits",
+        "40",
+        "--idx",
+        "2",
+        "--arms",
+        "ic-a:0-1,ic-b:0-1,ic-c1:0-1,ic-c2:0-1,rho-neg:0-7",
+        "--inv-cost",
+        "4",
+        "--crosscheck",
+        "10",
+        "--quiet",
+        "--out",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 91.562,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "torsion-b40-i2",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i2.jsonl": "406cefa6cfe261510a6680de08b36f725dcead484a5888563d0aae8506f14fbd"
+      },
+      "seconds": 91.562,
+      "stderr_sha256": "76f66a5bf6e036cab3a978ff637b0ca5aa969b80665c94f22253328c66edc88b",
+      "stderr_tail": [
+        "[fp2-torsion-b40-i2-p992891] n = 985831966324, r = 246457991581, cofactor 4"
+      ],
+      "stdout_sha256": "5e99158ceff11783bf8d8998c379f3dc982107cd7924f0aa5c9382e1c99be8e5",
+      "stdout_tail": [
+        "torsion b40 i2 t0 ic-a: verified=true gae=170372279 S(w0)=343.18 S(w1)=412.56 wall=27.7s",
+        "torsion b40 i2 t1 ic-a: verified=true gae=172139797 S(w0)=346.74 S(w1)=435.30 wall=28.2s",
+        "torsion b40 i2 t0 ic-b: verified=true gae=19055050 S(w0)=38.38 S(w1)=73.34 wall=5.7s",
+        "torsion b40 i2 t1 ic-b: verified=true gae=19056891 S(w0)=38.39 S(w1)=72.75 wall=5.4s",
+        "torsion b40 i2 t0 ic-c1: verified=true gae=54154353 S(w0)=109.08 S(w1)=118.80 wall=7.9s",
+        "torsion b40 i2 t1 ic-c1: verified=true gae=52953384 S(w0)=106.67 S(w1)=115.86 wall=7.8s",
+        "torsion b40 i2 t0 ic-c2: verified=true gae=19617528 S(w0)=39.52 S(w1)=43.73 wall=3.7s",
+        "torsion b40 i2 t1 ic-c2: verified=true gae=19632250 S(w0)=39.55 S(w1)=43.75 wall=3.6s",
+        "torsion b40 i2 t0 rho-neg: verified=true gae=316326 S(w0)=0.64 S(w1)=2.54 wall=0.1s",
+        "torsion b40 i2 t1 rho-neg: verified=true gae=994796 S(w0)=2.00 S(w1)=8.01 wall=0.3s",
+        "torsion b40 i2 t2 rho-neg: verified=true gae=537441 S(w0)=1.08 S(w1)=4.32 wall=0.2s",
+        "torsion b40 i2 t3 rho-neg: verified=true gae=310931 S(w0)=0.63 S(w1)=2.50 wall=0.1s",
+        "torsion b40 i2 t4 rho-neg: verified=true gae=362660 S(w0)=0.73 S(w1)=2.91 wall=0.1s",
+        "torsion b40 i2 t5 rho-neg: verified=true gae=319735 S(w0)=0.64 S(w1)=2.57 wall=0.1s",
+        "torsion b40 i2 t6 rho-neg: verified=true gae=220296 S(w0)=0.44 S(w1)=1.76 wall=0.1s",
+        "torsion b40 i2 t7 rho-neg: verified=true gae=660801 S(w0)=1.33 S(w1)=5.32 wall=0.2s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r04/b01",
+        "run",
+        "--family",
+        "prime",
+        "--bits",
+        "40",
+        "--idx",
+        "2",
+        "--arms",
+        "ic-a:0-1,rho-neg:0-7",
+        "--inv-cost",
+        "4",
+        "--crosscheck",
+        "10",
+        "--quiet",
+        "--out",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b40-i2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 58.058,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "prime-b40-i2",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b40-i2.jsonl": "7cd4d7539ad079b9824d4628ac8f22fb11b48358a8ab7741c1841ccdfa0cb89e"
+      },
+      "seconds": 58.058,
+      "stderr_sha256": "ad86772f08aa4499155a5102c8cf0ffd666165e907a1be078915edfe64f9ba43",
+      "stderr_tail": [
+        "[fp2-prime-b40-i2-p1013063] n = 1026296762221, r = 1026296762221, cofactor 1"
+      ],
+      "stdout_sha256": "51668a2f21fd2ff82fff6299e19a1962600706b12eb95cc57b5ab999a5cfedf0",
+      "stdout_tail": [
+        "prime b40 i2 t0 ic-a: verified=true gae=171756666 S(w0)=169.54 S(w1)=214.97 wall=29.1s",
+        "prime b40 i2 t1 ic-a: verified=true gae=166364549 S(w0)=164.22 S(w1)=194.66 wall=26.8s",
+        "prime b40 i2 t0 rho-neg: verified=true gae=548620 S(w0)=0.54 S(w1)=2.16 wall=0.2s",
+        "prime b40 i2 t1 rho-neg: verified=true gae=1822399 S(w0)=1.80 S(w1)=7.19 wall=0.5s",
+        "prime b40 i2 t2 rho-neg: verified=true gae=1256708 S(w0)=1.24 S(w1)=4.96 wall=0.4s",
+        "prime b40 i2 t3 rho-neg: verified=true gae=402311 S(w0)=0.40 S(w1)=1.58 wall=0.1s",
+        "prime b40 i2 t4 rho-neg: verified=true gae=396175 S(w0)=0.39 S(w1)=1.56 wall=0.1s",
+        "prime b40 i2 t5 rho-neg: verified=true gae=192895 S(w0)=0.19 S(w1)=0.76 wall=0.1s",
+        "prime b40 i2 t6 rho-neg: verified=true gae=559474 S(w0)=0.55 S(w1)=2.20 wall=0.2s",
+        "prime b40 i2 t7 rho-neg: verified=true gae=1285557 S(w0)=1.27 S(w1)=5.07 wall=0.4s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r04/b01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.006,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.006,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r04"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "ed96923f0414a0ed6a45fe48a2b9683060d5ebf3",
+  "dirty_after": [
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r05/b01",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/gls-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b40-i2.stderr",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i2.stderr"
+  ],
+  "dirty_before": [
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r02/b01",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/bin-r03/b01",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/control-b24.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/control-b24.stderr",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/gls-b24.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/gls-b24.stderr",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/gls-b40-i0.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/instances.txt",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b24.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b24.stderr",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b24.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b24.stderr",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i0.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/replay/receipt-card-r01.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
