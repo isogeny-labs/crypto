@@ -1,0 +1,82 @@
+\pdfobjcompresslevel=0
+\documentclass[10pt]{article}
+\usepackage[margin=0.7in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,booktabs,graphicx,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,
+pdftitle={Quadratic-twist registry: cover catalog refresh},
+pdfsubject={cover-transfer-assessments/v2; catalog\_maps=4493; unique\_cover\_models=4491; geometry\_verified\_maps=4493; ec1\_representations=1004; assessed\_maps=4493; unassessed\_maps=0; assessed\_subgroups=1004; unassessed\_subgroups=0}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\begin{document}
+\begin{center}
+{\Large\bfseries Quadratic-twist registry: cover catalog refresh}\\[5pt]
+2026-10-22 \quad --- \quad bounded correctness and metadata consistency
+\end{center}
+
+The native quadratic-twist study added 1,921 exact models and 27 selected EC1
+representations. This follow-up updates the existing native cover catalog and
+its assessment for all 4,493 registry models. It corrects CI integration failures;
+it supplies no new transfer algorithm or solver claim. The input registry is
+unchanged from commit \texttt{4711f1c73887}.
+
+\begin{center}
+\begin{tabular}{lrl}
+\toprule
+Profile & Models & Same-field construction \\
+\midrule
+Ordinary binary & 165 & genus 3, degree 3 \\
+Direct odd prime & 2,011 & genus 2, degree 2 \\
+Normalized odd prime & 30 & genus 2, degree 2; explicit normalization \\
+Direct odd extension & 2,287 & genus 2, degree 2 over the declared extension \\
+\midrule
+Total & 4,493 & 4,491 distinct cover models \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The exact graph binds 538 declared fields, 4,491 Jacobian contexts, 4,493 maps,
+and 1,004 selected EC1 representations (140 binary and 864 odd-characteristic).
+Missing generators remain unknown. One assessment profile covers every map and
+every EC1/curve/map triple; classification is not blanket arithmetic support.
+
+\textbf{Evidence.} The native Rust checker recomputes equations, smoothness and
+field checks within its stated boundary, and exact HC1/CV1/ICV1/EC1 links.
+The standalone test retains every per-model assertion and now visits all 4,493
+models. The separate assessment verifier checks every formula, exact membership,
+typed context, and source digest. Commands, failed reproductions, source hashes,
+and replay outputs are retained in the adjacent validation record. The complete
+434-field native twist replay already passed CI, with the independent IC audit,
+corruption controls, metadata replay, and receipt upload.
+
+\textbf{Boundaries.} Odd base-prime validity remains the checker's explicit
+primality-screen assumption. Cover geometry is not an induced Jacobian map,
+exact subgroup-order proof, or efficient DLP transfer. Catalog-wide arbitrary
+norms, independent all-element map oracles, odd balanced-Jacobian maps, and
+proper-subfield descent remain open. The 27 added EC1 records do not promote
+the full odd profile to arithmetic or transfer support.
+
+The exact fixed-GF(8) arbitrary-class fixture remains outside this catalog.
+The old packaged artifact was replayed on 592 bundled rows; its historical
+746/1,354 allowlist comparison is not an expanded-catalog artifact replay.
+No performance, general GHS, or general ECDLP hardness conclusion follows.
+The twist-to-Frobenius-negation proof and shared Conductor access remain open.
+
+\textbf{Provenance and reproduction.} The prior dated assessment report, its
+graphs and PDF, frozen twist results, and historical receipts remain intact.
+Run \texttt{cargo run --release --locked --bin curve\_cover\_check -- --check},
+the standalone constructor tests, the deterministic assessment check, and its
+independent verifier. The source-linked README and validation record give exact
+commands. Canonical IC/rho cost graphs are unchanged: no cost comparison was run.
+
+\newpage
+\begin{center}
+{\large\bfseries Map and subgroup boundaries}\\[8pt]
+\includegraphics[width=\textwidth,height=0.87\textheight,keepaspectratio]{typed_correspondence.pdf}
+\end{center}
+\newpage
+\begin{center}
+{\large\bfseries Typed objects and executable delivery boundaries}\\[8pt]
+\includegraphics[width=\textwidth,height=0.87\textheight,keepaspectratio]{typed_transfer_context.pdf}
+\end{center}
+\end{document}

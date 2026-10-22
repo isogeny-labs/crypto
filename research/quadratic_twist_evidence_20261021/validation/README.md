@@ -21,6 +21,7 @@ unavailable checks. Earlier missing-tool statements describe the earlier environ
 | Scoped workflow and shell sources | shell syntax checked; expanded native CI supplied | `.github/workflows/quadratic-twist-evidence.yml`, three thin shell scripts |
 | Legacy registry metadata adapter | syntax compiled; no Python arithmetic path executed | metadata-only `harvest_native_quadratic_twists`; native Rust generated the records |
 | New PDF | compiled and every page visually inspected | `../reports/native-20261021T150125Z/`, `continuation/pdf-build.log` |
+| Expanded cover catalog integration | 4,493 native geometry checks; all prior records retained; independent assessment and missing-membership control pass; 26 affected binary tests pass | `catalog-ci-20261022/README.md`, `../reports/catalog-20261022/` |
 
 The full-library run requires permission for its existing localhost socket tests.
 A sandbox-restricted invocation failed nine networking tests with `PermissionDenied`.
@@ -58,7 +59,13 @@ and inspected PDF. Control directory names are stable run IDs; actual UTC
 boundaries are those printed in their transcripts. Research records remain loose
 where replay, source, digest, report and review links name their individual files.
 
-The inherited GitHub `validation-gate` archive-membership failure was documented
-on PR #2381. It concerns unchanged benchmark/gate files and has not been bypassed.
-Current-head CI still must finish before any merge. Shared Conductor access and
-the exact remaining geometric proof obligations stay open in the problem record.
+The old inherited `validation-gate` archive-membership failure was superseded by
+the refreshed base. At head `4711f1c73887`, the expanded native parity/audit,
+validation-gate, and perf-history workflows passed. The cover workflow found the
+catalog consistency failures documented and reproduced in `catalog-ci-20261022/`.
+That follow-up reruns the complete library suite (4,474 passed, 119 existing
+ignores), 26 affected binary tests, native catalog checks and independent metadata
+validation. The old benchmark/gate files remain outside this change.
+CI must still complete successfully for the resulting head before any merge.
+Shared Conductor access and the exact remaining geometric proof obligations stay
+open in the problem record.

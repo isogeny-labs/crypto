@@ -24,6 +24,9 @@ The historical Python source and records remain unchanged in their archive.
   1,921 ICV1 models and 27 selected subgroup representations with full EC1 UIDs.
   Census models with no selected cyclic generator retain that unknown explicitly.
 - [Latest report, graph, and PDF](reports/native-20261021T150125Z/README.md).
+- [Cover catalog CI follow-up](reports/catalog-20261022/README.md): native replay
+  and assessment of all 4,493 current models; earlier catalog records and dated
+  reports are retained.
 - [Requirement status](REQUIREMENTS.md) and [remaining formal/coordination obligations](../../problems/quadratic-twist-evidence-native-parity.md).
 
 The Lean proofs establish the stated group/ring implications, with explicit
