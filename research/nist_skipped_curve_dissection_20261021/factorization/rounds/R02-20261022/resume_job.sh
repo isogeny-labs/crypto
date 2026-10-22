@@ -9,8 +9,17 @@ mkdir -p "$out"
 out=$(cd -- "$out" && pwd)
 if [[ ! -f $out/input.txt ]]; then
   [[ -z $(find "$out" -mindepth 1 -maxdepth 1 -print -quit) ]] || exit 1
-  archive=${NIST_FACTOR_RAW_ARCHIVE:-$here/runs.tar.xz}
-  expected=$(awk '{print $1}' "$here/runs.tar.xz.sha256")
+  if [[ -n ${NIST_FACTOR_RAW_ARCHIVE:-} ]]; then
+    archive=$NIST_FACTOR_RAW_ARCHIVE
+    sums="$here/runs.tar.xz.sha256"
+  elif [[ -f $here/checkpoint-$id.tar.xz ]]; then
+    archive="$here/checkpoint-$id.tar.xz"
+    sums="$archive.sha256"
+  else
+    archive="$here/runs.tar.xz"
+    sums="$archive.sha256"
+  fi
+  expected=$(awk '{print $1}' "$sums")
   actual=$(sha256sum "$archive"); actual=${actual%% *}
   [[ $actual == "$expected" ]]
   stage=$(mktemp -d)
