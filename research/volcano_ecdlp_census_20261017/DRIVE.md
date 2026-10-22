@@ -18,3 +18,9 @@ Staged but NOT uploaded (the only upload path in the executor is a base64 argume
 | specs-phaseA.tar.xz (specs/, runs/) | 93708 | 23ab2d128912d092063477f4a8398a11b7f7032f96e107b5199281f247c04a0d |
 
 Phase B final note: the full `runs/progress.jsonl` is 41 KB (sha256 623e920f5f163a5c442555e5db8008f494aab390a7a39fe906e8ce492dc03407 at upload time) and lives in git; Drive holds the intermediate progress snapshots above and the per-session summary `progress-summary-20261022T055755Z.tsv` (derived with jq from the `status=done` lines, `runs/progress_summary.tsv` in git), not the full jsonl, to avoid retyping 41 KB through the model context. Archives stay in git only.
+
+### Phase C (2026-10-22)
+
+| phase | file | Drive id | bytes | SHA-256 | read back |
+|:--|:--|:--|--:|:--|:--|
+| C | REPORT-phaseC-20261022.md (abridged text version of `REPORT.md`: same verdicts and tables, per-level IC rows, volcano diagram and figure captions omitted; the full report and `report.pdf` are in git) | 1rFcbT55ZjHRdFl9WzbqLCOljAehM836e | 12719 (upload result fileSize) | not computed: the upload is an abridgement, not a byte copy | local `REPORT.md` is 20,200 bytes, so the sizes differ by design; content not re-downloaded |
