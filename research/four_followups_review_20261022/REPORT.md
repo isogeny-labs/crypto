@@ -47,10 +47,10 @@ mismatches. An exact integer-polynomial certificate and written divisor
 argument establish the generic weighted 1+2 output identity for valid
 inputs with `u(x) != 0`. A separate exact certificate covers exceptional
 1+2 cancellation, the coincident-positive branch when `x4 != x`, and
-tripling (`x4 = x`). Another exact certificate covers the coprime 2+2
-branch with `B != 0` and `C != 0`. Exceptional 2+2 output identities
-for degree drops, same-`u` doubling or mixed composition, and shared
-support remain open.
+tripling (`x4 = x`). Separate exact certificates cover coprime 2+2
+with `B != 0`, both the `C != 0` degree-two output and the `C = 0`
+degree-one drop. Same-`u` doubling or mixed composition and `B = 0`
+shared-support output identities remain open.
 
 The [Kummer coordinate evidence](../kummer_coordinates_20261022/REPORT.md)
 reports 8,813 matching nonzero xADD outputs and seven zero outputs on the
