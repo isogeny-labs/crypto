@@ -50,6 +50,16 @@ LEDGER = "research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md"
 LEDGER_COVERED_THROUGH = 23
 
 SOURCES = {
+    "law_report": "research/projective_law_followup_20261022/REPORT.md",
+    "law_validation_gate": "research/projective_law_followup_20261022/VALIDATION.json",
+    "law_wrapper": "research/projective_law_followup_20261022/results/summary-projective.json",
+    "law_state": "research/projective_law_followup_20261022/results/summary-state.json",
+    "law_validator": "research/projective_law_followup_20261022/results/independent-validation.json",
+    "pencil_peel_validation_gate": "research/pencil_sparse_20261022/VALIDATION.json",
+    "pencil_peel_report": "research/pencil_sparse_20261022/REPORT.md",
+    "pencil_peel_status": "research/pencil_sparse_20261022/results/status.json",
+    **{f"pencil_peel_{p}": f"research/pencil_sparse_20261022/results/p{p}-peel-vs-online.json"
+       for p in (739, 1151, 1187, 3371, 3527, 3931, 11731, 11887, 12143)},
     "three_leads": "research/three_leads_e2e_20261018/results/dashboard.json",
     "three_leads_instructions": "research/three_leads_e2e_20261018/results/retired-instruction-summary.json",
     "round5": "docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json",
@@ -645,6 +655,97 @@ def pair_table_component() -> dict:
             "class": "engineering"}
 
 
+PENCIL_PEEL_PRIMES = (739, 1151, 1187, 3371, 3527, 3931, 11731, 11887, 12143)
+
+
+def pencil_peel_component() -> dict:
+    """Copy the source-verified nine-curve partial cohort outside tables A–C.
+
+    The study's independent validator and replay certificate are required here;
+    this view neither promotes the incomplete 1,260-target cohort nor prices
+    wall time as a speed claim.
+    """
+    study = "research/pencil_sparse_20261022"
+    errors = gate.check_evidence_dir(REPO / study)
+    if errors:
+        raise SystemExit(f"pencil degree-peeling evidence gate: {errors}")
+    status = load(SOURCES["pencil_peel_status"])
+    if (status.get("schema") != "pencil-sparse-cohort-status/v1"
+            or status.get("validation_status") != "pass"
+            or status.get("original_cohort_targets") != 1260
+            or status.get("source_verified_distinct_targets") != 543
+            or status.get("distinct_targets_still_open") != 717):
+        raise SystemExit("pencil degree-peeling cohort status changed; review the panel")
+    rows = []
+    for p in PENCIL_PEEL_PRIMES:
+        r = load(SOURCES[f"pencil_peel_{p}"])
+        if (r.get("schema") != "pencil-sparse-paired-comparison/v1"
+                or r.get("p") != p or r.get("targets") != 60
+                or r.get("pricing_cells") != 36
+                or r.get("cells_candidate_below_baseline") != 24
+                or r.get("cells_candidate_below_rho") != 0
+                or r.get("max_candidate_over_baseline", 0) <= 1):
+            raise SystemExit(f"pencil degree-peeling p={p}: changed or incomplete frozen summary")
+        rows.append({"p": p, "targets": r["targets"],
+                     "peel_over_online": r["representative"]["candidate_over_baseline"],
+                     "peel_over_rho": r["representative"]["candidate_over_rho"],
+                     "online_over_rho": r["representative"]["baseline_over_rho"],
+                     "below_online": 24, "above_online": 12, "below_rho": 0,
+                     "min_peel_over_online": r["min_candidate_over_baseline"],
+                     "max_peel_over_online": r["max_candidate_over_baseline"],
+                     "source": SOURCES[f"pencil_peel_{p}"]})
+    return {"class": "engineering", "scope": "nine repeated pilot curves, 60 targets each",
+            "unit": "cold GAE under the study's logical-operation price model",
+            "representative_price": "M + 0.5S + 10I; native logical operation = 0.1 GAE",
+            "study": study + "/", "report": study + "/REPORT.pdf",
+            "validation": study + "/VALIDATION.json",
+            "original_targets": 1260, "source_verified_distinct_targets": 543,
+            "targets_still_open": 717, "rows": rows}
+
+
+def projective_law_component() -> dict:
+    """Copy the two source-verified full-cohort law arms outside tables A–C."""
+    study = "research/projective_law_followup_20261022"
+    errors = gate.check_evidence_dir(REPO / study)
+    if errors:
+        raise SystemExit(f"projective-law evidence gate: {errors}")
+    wrapper = load(SOURCES["law_wrapper"])
+    state = load(SOURCES["law_state"])
+    validator = load(SOURCES["law_validator"])
+    if (validator.get("schema") != "projective-law-independent-validator/v1"
+            or validator.get("status") != "pass" or validator.get("grid_cells") != 576):
+        raise SystemExit("projective-law independent validator changed")
+    for arm, name in ((wrapper, "projective"), (state, "state")):
+        if (arm.get("schema") != "projective-law-summary/v1"
+                or arm.get("arm") != name or arm.get("targets") != 1260
+                or arm.get("candidate_verified") != 1260
+                or arm.get("rho_verified") != 1260
+                or arm.get("price_cells_per_slice") != 36):
+            raise SystemExit(f"projective-law {name}: changed or incomplete frozen summary")
+    w = {r["slice"]: r for r in wrapper["summaries"]}
+    s = {r["slice"]: r for r in state["summaries"]}
+    slices = ("16", "20", "24", "28", "32", "36", "40", "all")
+    if set(w) != set(s) or set(w) != set(slices):
+        raise SystemExit("projective-law summary slices changed")
+    rows = []
+    for b in slices:
+        x, y = w[b], s[b]
+        if x["targets"] != y["targets"] or x["cells_below_rho"] < 0 or y["cells_below_rho"] < 0:
+            raise SystemExit(f"projective-law {b}: changed paired slice")
+        rows.append({"slice": b, "targets": x["targets"],
+                     "wrapper_over_rho": x["candidate_over_rho"],
+                     "state_over_rho": y["candidate_over_rho"],
+                     "wrapper_below_rho_cells": x["cells_below_rho"],
+                     "state_below_rho_cells": y["cells_below_rho"]})
+    return {"class": "engineering", "study": study + "/",
+            "report": study + "/REPORT.pdf", "validation": study + "/VALIDATION.json",
+            "unit": "cold GAE under the study's logical-operation price model",
+            "representative_price": "M + 0.5S + 10I; native logical operation = 0.1 GAE",
+            "source_verified_targets_per_arm": 1260,
+            "direct_state_over_wrapper": validator["paired_state_over_wrapper"],
+            "rows": rows}
+
+
 PLANNER_ARMS = ["half-base", "double-base", "rootfind", "full-rank", "random-targets"]
 
 
@@ -1186,6 +1287,8 @@ def build(allow_unvalidated: bool = False) -> dict:
         "three_leads_instructions": load(SOURCES["three_leads_instructions"]),
         "linear_algebra_component": la_component(),
         "pair_table_component": pair_table_component(),
+        "projective_law_component": projective_law_component(),
+        "pencil_peel_component": pencil_peel_component(),
         "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
@@ -1578,6 +1681,53 @@ def markdown(doc: dict) -> str:
         L.append(f"| {r['N']:,} | {pts(r['setup_ms']['scalar'])} | {pts(r['setup_ms']['batch'])} | "
                  f"{pts(r['setup_ms']['blocked'])} | {ptr(r['blocked_over_batch'])} | {ptr(r['blocked_over_scalar'])} | "
                  f"{r['run_blocked_over_scalar']:.2f} | {r['rss_gib']['batch']:.2f} → {r['rss_gib']['blocked']:.2f} GiB |")
+    L.append("")
+    law = doc["projective_law_component"]
+    L += ["## Complete projective genus-2 law, outside tables A–C", "",
+          "Two implementations of the complete projective law solve and source-verify "
+          "all 1,260 frozen targets each, paired with matched rho in the same process "
+          "(class: engineering). `Wrapper` normalizes after each addition; `retained state` "
+          "keeps weighted coordinates through the walk and normalizes at split candidates. "
+          "Ratios are complete cold GAE under the study's logical-operation price model, "
+          "not calibrated wall time. The representative cell is M + 0.5S + 10I and "
+          "native logical operation = 0.1 GAE. The direct retained-state / wrapper "
+          f"ratio is {law['direct_state_over_wrapper']['representative']:.6f} pooled; "
+          "over its 36-cell band it ranges "
+          f"{law['direct_state_over_wrapper']['pooled_36_cell_range'][0]:.6f}–"
+          f"{law['direct_state_over_wrapper']['pooled_36_cell_range'][1]:.6f}. "
+          "It is lower in 12 cells and higher in 24. This component is separate from "
+          "tables A–C. "
+          f"[Study](../../{law['study']}) · [PDF](../../{law['report']}) · "
+          f"[validation gate](../../{law['validation']}).", "",
+          "| Slice (bits) | Targets | Wrapper / rho | Retained state / rho | Wrapper cells below rho | State cells below rho |",
+          "|:--|--:|--:|--:|--:|--:|"]
+    for r in law["rows"]:
+        L.append(f"| {r['slice']} | {r['targets']} | {r['wrapper_over_rho']:.6f} | "
+                 f"{r['state_over_rho']:.6f} | {r['wrapper_below_rho_cells']}/36 | "
+                 f"{r['state_below_rho_cells']}/36 |")
+    L.append("")
+    pp = doc["pencil_peel_component"]
+    L += ["## Genus-2 pencil degree-peeling, outside tables A–C", "",
+          "Nine repeated pilot curves, 60 independent one-target workloads each. "
+          "The exact degree-peeling eliminator changes the relation-solver component "
+          "(class: engineering). Ratios are complete cold GAE under the study's "
+          "logical-operation price model, not calibrated wall time. The representative "
+          "cell is M + 0.5S + 10I with each native logical operation priced at 0.1 GAE. "
+          "Each curve has 24/36 price cells below the earlier online eliminator, "
+          "12/36 above it, and 0/36 below its matched source-negation rho. "
+          f"The original 1,260-target cohort has {pp['source_verified_distinct_targets']} "
+          f"distinct source-verified targets and {pp['targets_still_open']} still open; "
+          "the displayed panel is a partial cohort. The nine curves are separate "
+          "from tables A–C. "
+          f"[Study](../../{pp['study']}) · [PDF](../../{pp['report']}) · "
+          f"[validation gate](../../{pp['validation']}).", "",
+          "| p | Targets | Peel / online | Peel / matched rho | Online / matched rho | Peel / online across 36 cells | Lower / higher than online | Below rho |",
+          "|--:|--:|--:|--:|--:|:--|:--|--:|"]
+    for r in pp["rows"]:
+        L.append(f"| {r['p']:,} | {r['targets']} | {r['peel_over_online']:.6f} | "
+                 f"{r['peel_over_rho']:.6f} | {r['online_over_rho']:.6f} | "
+                 f"{r['min_peel_over_online']:.6f}–{r['max_peel_over_online']:.6f} | "
+                 f"{r['below_online']}/{r['above_online']} | {r['below_rho']}/36 |")
     L.append("")
     pl = doc["planner_component"]
 
@@ -2086,6 +2236,61 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{r["rss_gib"]["batch"]:.2f} → {r["rss_gib"]["blocked"]:.2f} GiB</td></tr>')
     P.append('</tbody></table></section>')
 
+    law = doc["projective_law_component"]
+    d = law["direct_state_over_wrapper"]
+    P.append('<section class="card" id="projective-law-component"><h2>Complete projective genus-2 law, outside the priced tables</h2>'
+             '<p>Two implementations of the complete projective law solve and source-verify '
+             'all 1,260 frozen targets each, paired with matched rho in the same process '
+             '(class: engineering). <code>Wrapper</code> normalizes after each addition; '
+             '<code>retained state</code> keeps weighted coordinates through the walk and '
+             'normalizes at split candidates. Ratios are complete cold GAE under the '
+             'study&#39;s logical-operation price model, not calibrated wall time. '
+             'The representative cell is M + 0.5S + 10I, native logical operation = 0.1 GAE. '
+             f'The direct retained-state / wrapper pooled ratio is {d["representative"]:.6f}; '
+             f'its 36-cell range is {d["pooled_36_cell_range"][0]:.6f}–'
+             f'{d["pooled_36_cell_range"][1]:.6f}, with 12 cells lower and 24 higher. '
+             'This component is separate from tables A–C. '
+             f'<a href="{GITHUB}{esc(law["study"])}">Study</a> · '
+             f'<a href="{GITHUB}{esc(law["report"])}">PDF</a> · '
+             f'<a href="{GITHUB}{esc(law["validation"])}">Validation gate</a>.</p>')
+    P.append('<table><thead><tr><th>Slice (bits)</th><th class="n">Targets</th>'
+             '<th class="n">Wrapper / rho</th><th class="n">Retained state / rho</th>'
+             '<th>Wrapper cells below rho</th><th>State cells below rho</th></tr></thead><tbody>')
+    for r in law["rows"]:
+        P.append(f'<tr><td>{esc(r["slice"])}</td><td class="n">{r["targets"]}</td>'
+                 f'<td class="n">{r["wrapper_over_rho"]:.6f}</td>'
+                 f'<td class="n">{r["state_over_rho"]:.6f}</td>'
+                 f'<td>{r["wrapper_below_rho_cells"]}/36</td>'
+                 f'<td>{r["state_below_rho_cells"]}/36</td></tr>')
+    P.append('</tbody></table></section>')
+    pp = doc["pencil_peel_component"]
+    P.append('<section class="card" id="pencil-peel-component"><h2>Genus-2 pencil degree-peeling, outside the priced tables</h2>'
+             '<p>Nine repeated pilot curves, 60 independent one-target workloads each. '
+             'The exact degree-peeling eliminator changes the relation-solver component '
+             '(class: engineering). Ratios are complete cold GAE under the study&#39;s '
+             'logical-operation price model, not calibrated wall time. The representative '
+             'cell is M + 0.5S + 10I and native logical operation = 0.1 GAE. '
+             'Each curve has 24/36 price cells below the earlier online eliminator, '
+             '12/36 above it and 0/36 below its matched source-negation rho. '
+             f'The original 1,260-target cohort has {pp["source_verified_distinct_targets"]} '
+             f'distinct source-verified targets and {pp["targets_still_open"]} still open; '
+             'this is a partial cohort, separate from tables A–C. '
+             f'<a href="{GITHUB}{esc(pp["study"])}">Study</a> · '
+             f'<a href="{GITHUB}{esc(pp["report"])}">PDF</a> · '
+             f'<a href="{GITHUB}{esc(pp["validation"])}">Validation gate</a>.</p>')
+    P.append('<table><thead><tr><th class="n">p</th><th class="n">Targets</th>'
+             '<th class="n">Peel / online</th><th class="n">Peel / rho</th>'
+             '<th class="n">Online / rho</th><th>Peel / online across 36 cells</th>'
+             '<th>Lower / higher than online</th><th>Below rho</th></tr></thead><tbody>')
+    for r in pp["rows"]:
+        P.append(f'<tr><td class="n">{r["p"]:,}</td><td class="n">{r["targets"]}</td>'
+                 f'<td class="n">{r["peel_over_online"]:.6f}</td>'
+                 f'<td class="n">{r["peel_over_rho"]:.6f}</td>'
+                 f'<td class="n">{r["online_over_rho"]:.6f}</td>'
+                 f'<td>{r["min_peel_over_online"]:.6f}–{r["max_peel_over_online"]:.6f}</td>'
+                 f'<td>{r["below_online"]}/{r["above_online"]}</td>'
+                 f'<td>{r["below_rho"]}/36</td></tr>')
+    P.append('</tbody></table></section>')
     pl = doc["planner_component"]
     P.append('<section class="card" id="planner-validation"><h2>Planner validation, outside the priced tables</h2>'
              f'<p><code>ic plan</code> / <code>ic bench --auto</code> ({esc(pl["planner"])}) chooses every '

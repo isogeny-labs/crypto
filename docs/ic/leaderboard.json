@@ -10,6 +10,74 @@
  ],
  "class": "accounting",
  "sources": {
+  "law_report": {
+   "path": "research/projective_law_followup_20261022/REPORT.md",
+   "sha256": "3c864364d649d46d66a0289838b07be79fcfb38aefb92be60148388077fe4b82"
+  },
+  "law_validation_gate": {
+   "path": "research/projective_law_followup_20261022/VALIDATION.json",
+   "sha256": "c681c8f5a8434395843becaef69b8fe733aa1135725413ad8d4a7e7cc5492907"
+  },
+  "law_wrapper": {
+   "path": "research/projective_law_followup_20261022/results/summary-projective.json",
+   "sha256": "06d11a57882fae790d1c264c60fda36c57cf642a343eec9ad8bce651a0f8d4db"
+  },
+  "law_state": {
+   "path": "research/projective_law_followup_20261022/results/summary-state.json",
+   "sha256": "74623ead9cfd9e6cfe2c6f189728bc531f23f39db494c2b0ec82bba1315c29bc"
+  },
+  "law_validator": {
+   "path": "research/projective_law_followup_20261022/results/independent-validation.json",
+   "sha256": "0803b5cbffd1d3106991f9ec665ebf887b4e07478e4d0f84586ae61afa24e3ed"
+  },
+  "pencil_peel_validation_gate": {
+   "path": "research/pencil_sparse_20261022/VALIDATION.json",
+   "sha256": "67c7817bdd29d49cd4442fb1a604028f317a2374b62ccab2d7a152a9e00f4e49"
+  },
+  "pencil_peel_report": {
+   "path": "research/pencil_sparse_20261022/REPORT.md",
+   "sha256": "e71790874c332befeacfd700683121c2addba4cd1aa8914e75b5c12b9a25df4a"
+  },
+  "pencil_peel_status": {
+   "path": "research/pencil_sparse_20261022/results/status.json",
+   "sha256": "d3201dc35314dad6a7e2688849122241fc871b2eba78f1734b14349a9735b517"
+  },
+  "pencil_peel_739": {
+   "path": "research/pencil_sparse_20261022/results/p739-peel-vs-online.json",
+   "sha256": "035e588eacbefe555b127417aae202f9e2c0a2d1052792db84ef4b0f60a97762"
+  },
+  "pencil_peel_1151": {
+   "path": "research/pencil_sparse_20261022/results/p1151-peel-vs-online.json",
+   "sha256": "afa9f04ab006c0467d87cfc0df78c6f140c4ccfb564efa7f04bfda35c62d4f8d"
+  },
+  "pencil_peel_1187": {
+   "path": "research/pencil_sparse_20261022/results/p1187-peel-vs-online.json",
+   "sha256": "c1fafa830c302b617ac6ef5f3fd02267f2ed1c912dc09187bf18197ce6da11c2"
+  },
+  "pencil_peel_3371": {
+   "path": "research/pencil_sparse_20261022/results/p3371-peel-vs-online.json",
+   "sha256": "a98060c8ccb0030c3561d1b1941a6f21778f95430b296398061e7ba00d136f54"
+  },
+  "pencil_peel_3527": {
+   "path": "research/pencil_sparse_20261022/results/p3527-peel-vs-online.json",
+   "sha256": "46bc701eb4196cab3c727fcbcdeb885841eb53da5475452fbeb669aac493b46b"
+  },
+  "pencil_peel_3931": {
+   "path": "research/pencil_sparse_20261022/results/p3931-peel-vs-online.json",
+   "sha256": "bad946ab4bb4f4e8354029f19daf26eb1c199c0f6d32330fbc83cbf7739f5bef"
+  },
+  "pencil_peel_11731": {
+   "path": "research/pencil_sparse_20261022/results/p11731-peel-vs-online.json",
+   "sha256": "862317342355c82ba03f2ee78afc068265e3cfb478e20dfaa92ba80c2e5ba82a"
+  },
+  "pencil_peel_11887": {
+   "path": "research/pencil_sparse_20261022/results/p11887-peel-vs-online.json",
+   "sha256": "a433928cee5a69a617471a4f1ce19309b7336ea9ffbeef90ec5d50f72c73928e"
+  },
+  "pencil_peel_12143": {
+   "path": "research/pencil_sparse_20261022/results/p12143-peel-vs-online.json",
+   "sha256": "4dfc5aac1d9a88fdf4c612759eaf6b681a4a525dd36d42bbe655f98d84704633"
+  },
   "three_leads": {
    "path": "research/three_leads_e2e_20261018/results/dashboard.json",
    "sha256": "686c03b185c2b838fa6b3d36f1d4c0c861e3517b285c2eb6a2c6631d54162df7"
@@ -55683,6 +55751,220 @@
   "study": "research/ic_oracle_setup_blocked_20261020/",
   "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
   "class": "engineering"
+ },
+ "projective_law_component": {
+  "class": "engineering",
+  "study": "research/projective_law_followup_20261022/",
+  "report": "research/projective_law_followup_20261022/REPORT.pdf",
+  "validation": "research/projective_law_followup_20261022/VALIDATION.json",
+  "unit": "cold GAE under the study's logical-operation price model",
+  "representative_price": "M + 0.5S + 10I; native logical operation = 0.1 GAE",
+  "source_verified_targets_per_arm": 1260,
+  "direct_state_over_wrapper": {
+   "grid": "results/price-grid-state-vs-wrapper.csv",
+   "pooled_36_cell_range": [
+    0.546762455504,
+    1.30372016114
+   ],
+   "representative": 1.10161739734
+  },
+  "rows": [
+   {
+    "slice": "16",
+    "targets": 180,
+    "wrapper_over_rho": 1.98180617269,
+    "state_over_rho": 1.86648717969,
+    "wrapper_below_rho_cells": 0,
+    "state_below_rho_cells": 3
+   },
+   {
+    "slice": "20",
+    "targets": 180,
+    "wrapper_over_rho": 2.5345930724,
+    "state_over_rho": 2.51108655527,
+    "wrapper_below_rho_cells": 0,
+    "state_below_rho_cells": 2
+   },
+   {
+    "slice": "24",
+    "targets": 180,
+    "wrapper_over_rho": 3.30301124799,
+    "state_over_rho": 3.42368912521,
+    "wrapper_below_rho_cells": 0,
+    "state_below_rho_cells": 0
+   },
+   {
+    "slice": "28",
+    "targets": 180,
+    "wrapper_over_rho": 3.47769292875,
+    "state_over_rho": 3.95977895644,
+    "wrapper_below_rho_cells": 0,
+    "state_below_rho_cells": 0
+   },
+   {
+    "slice": "32",
+    "targets": 180,
+    "wrapper_over_rho": 3.58558419305,
+    "state_over_rho": 3.75140373182,
+    "wrapper_below_rho_cells": 0,
+    "state_below_rho_cells": 0
+   },
+   {
+    "slice": "36",
+    "targets": 180,
+    "wrapper_over_rho": 3.90134280965,
+    "state_over_rho": 4.06027954337,
+    "wrapper_below_rho_cells": 0,
+    "state_below_rho_cells": 0
+   },
+   {
+    "slice": "40",
+    "targets": 180,
+    "wrapper_over_rho": 3.79333746758,
+    "state_over_rho": 4.24816900496,
+    "wrapper_below_rho_cells": 0,
+    "state_below_rho_cells": 0
+   },
+   {
+    "slice": "all",
+    "targets": 1260,
+    "wrapper_over_rho": 3.79378271761,
+    "state_over_rho": 4.17929704346,
+    "wrapper_below_rho_cells": 0,
+    "state_below_rho_cells": 0
+   }
+  ]
+ },
+ "pencil_peel_component": {
+  "class": "engineering",
+  "scope": "nine repeated pilot curves, 60 targets each",
+  "unit": "cold GAE under the study's logical-operation price model",
+  "representative_price": "M + 0.5S + 10I; native logical operation = 0.1 GAE",
+  "study": "research/pencil_sparse_20261022/",
+  "report": "research/pencil_sparse_20261022/REPORT.pdf",
+  "validation": "research/pencil_sparse_20261022/VALIDATION.json",
+  "original_targets": 1260,
+  "source_verified_distinct_targets": 543,
+  "targets_still_open": 717,
+  "rows": [
+   {
+    "p": 739,
+    "targets": 60,
+    "peel_over_online": 0.898244298191,
+    "peel_over_rho": 11.6153572318,
+    "online_over_rho": 12.9311783611,
+    "below_online": 24,
+    "above_online": 12,
+    "below_rho": 0,
+    "min_peel_over_online": 0.873216752426,
+    "max_peel_over_online": 1.04161134828,
+    "source": "research/pencil_sparse_20261022/results/p739-peel-vs-online.json"
+   },
+   {
+    "p": 1151,
+    "targets": 60,
+    "peel_over_online": 0.796603494153,
+    "peel_over_rho": 22.8360381996,
+    "online_over_rho": 28.666756256,
+    "below_online": 24,
+    "above_online": 12,
+    "below_rho": 0,
+    "min_peel_over_online": 0.768821888251,
+    "max_peel_over_online": 1.05741571612,
+    "source": "research/pencil_sparse_20261022/results/p1151-peel-vs-online.json"
+   },
+   {
+    "p": 1187,
+    "targets": 60,
+    "peel_over_online": 0.736052972668,
+    "peel_over_rho": 22.8772044172,
+    "online_over_rho": 31.0809211656,
+    "below_online": 24,
+    "above_online": 12,
+    "below_rho": 0,
+    "min_peel_over_online": 0.704783105963,
+    "max_peel_over_online": 1.04769553868,
+    "source": "research/pencil_sparse_20261022/results/p1187-peel-vs-online.json"
+   },
+   {
+    "p": 3371,
+    "targets": 60,
+    "peel_over_online": 0.379821491852,
+    "peel_over_rho": 93.4805679742,
+    "online_over_rho": 246.11711022,
+    "below_online": 24,
+    "above_online": 12,
+    "below_rho": 0,
+    "min_peel_over_online": 0.368896626382,
+    "max_peel_over_online": 1.02369521627,
+    "source": "research/pencil_sparse_20261022/results/p3371-peel-vs-online.json"
+   },
+   {
+    "p": 3527,
+    "targets": 60,
+    "peel_over_online": 0.393295730139,
+    "peel_over_rho": 105.157422786,
+    "online_over_rho": 267.374941368,
+    "below_online": 24,
+    "above_online": 12,
+    "below_rho": 0,
+    "min_peel_over_online": 0.383283055949,
+    "max_peel_over_online": 1.02995326807,
+    "source": "research/pencil_sparse_20261022/results/p3527-peel-vs-online.json"
+   },
+   {
+    "p": 3931,
+    "targets": 60,
+    "peel_over_online": 0.365357189561,
+    "peel_over_rho": 121.36703607,
+    "online_over_rho": 332.18734854,
+    "below_online": 24,
+    "above_online": 12,
+    "below_rho": 0,
+    "min_peel_over_online": 0.357003337444,
+    "max_peel_over_online": 1.02661571905,
+    "source": "research/pencil_sparse_20261022/results/p3931-peel-vs-online.json"
+   },
+   {
+    "p": 11731,
+    "targets": 60,
+    "peel_over_online": 0.278123817219,
+    "peel_over_rho": 1204.65465685,
+    "online_over_rho": 4331.36100639,
+    "below_online": 24,
+    "above_online": 12,
+    "below_rho": 0,
+    "min_peel_over_online": 0.277039429743,
+    "max_peel_over_online": 1.02275815504,
+    "source": "research/pencil_sparse_20261022/results/p11731-peel-vs-online.json"
+   },
+   {
+    "p": 11887,
+    "targets": 60,
+    "peel_over_online": 0.282828835551,
+    "peel_over_rho": 1090.65547655,
+    "online_over_rho": 3856.23861312,
+    "below_online": 24,
+    "above_online": 12,
+    "below_rho": 0,
+    "min_peel_over_online": 0.281760724637,
+    "max_peel_over_online": 1.02207226732,
+    "source": "research/pencil_sparse_20261022/results/p11887-peel-vs-online.json"
+   },
+   {
+    "p": 12143,
+    "targets": 60,
+    "peel_over_online": 0.269805791936,
+    "peel_over_rho": 1146.70022647,
+    "online_over_rho": 4250.09492287,
+    "below_online": 24,
+    "above_online": 12,
+    "below_rho": 0,
+    "min_peel_over_online": 0.268781308532,
+    "max_peel_over_online": 1.0216024192,
+    "source": "research/pencil_sparse_20261022/results/p12143-peel-vs-online.json"
+   }
+  ]
  },
  "planner_component": {
   "rows": [

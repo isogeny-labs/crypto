@@ -2030,6 +2030,53 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 <div class="dash-section" id="n83-retained-gates-20261010" style="max-width:1180px;margin:24px auto;padding:18px" aria-labelledby="n83-retained-gates-title"><div class="dash-section-head"><div><p class="dash-kicker">Degree-83 Koblitz / source and capacity / 2026-10-10</p><h2 id="n83-retained-gates-title">Structured-orbit and K2048 bases verified; bounded N83 gates retained.</h2></div><span class="status neutral">Engineering · L0</span></div><details class="dash-details"><summary>N83 retained-domain capacity and structured-orbit S3 storage, 2026-10-10</summary><div class="dash-detail-body"><p>The primary 81-bit model <code>icv1-f2m83-tm6151469093347-debefd74</code> has 57 constructed factor bases stored with verified S3 round-trips, including K1182 and K2048 signed-Frobenius bases with 196,212 and 339,968 point records and a source-derived dimension-12 closure with 332,166 point records in 2,001 orbit columns. Generic multi-limb arithmetic replay checked every point on these three additional bases; the structured object also passed a second replay after S3 download. These are engineering construction and storage observations at L0, not complete cold index-calculus runtimes.</p><div class="table-scroll"><table><caption>Guarded construction or exact preflight per N83 model; cgroup peaks under a 4 GiB zero-swap limit.</caption><thead><tr><th>Retained model</th><th>SAT variables</th><th>Clauses</th><th>Cgroup peak, bytes</th><th>Search outcome</th></tr></thead><tbody><tr><td>K64 factored S4</td><td>127,404</td><td>1,490,138</td><td>642,768,896</td><td>Construction only; search not run</td></tr><tr><td>K64 chained S3, m5</td><td>84,743</td><td>2,100,012</td><td>736,542,720</td><td>One SAT call hit 10,000 conflicts; <code>UNKNOWN_solver_cap</code>, zero relations</td></tr><tr><td>K64 chained S3, m6</td><td>105,908</td><td>2,532,398</td><td>841,170,944</td><td>Docker daemon EOF during trial; producer failure, no solver verdict</td></tr><tr><td>K256 chained S3, m5</td><td>84,743</td><td>7,443,537</td><td>1,960,288,256</td><td>Separate 8M domain-clause gate passed; one SAT call hit 10,000 conflicts, <code>UNKNOWN_solver_cap</code>, zero relations</td></tr><tr><td>K1182 chained S3, m5</td><td>84,743 required</td><td>32,142,830 required</td><td>232,259,584, preflight only</td><td><code>UNKNOWN_domain_clause_cap</code> at 12M; model and search not run</td></tr></tbody></table></div><p class="dash-footnote">The K1182 m5 gate stopped before installing a model; its 32,142,830 required domain clauses exceed the frozen 12M cap. A read-only K2048 preflight later counted 55,017,910 required clauses under the same explicit-domain encoding, also above 12M. The dimension-12 closure retains compact source-coordinate and phase structure. An exact phase-aware chained-S3 x-domain now passes small-field membership and cap tests; its N83 source preflight counts 26,265 additional variables, 872,260 clauses and 3,320 native XOR rows for m5, but no N83 model or search has been measured with it. The first K256 3M domain-clause gate returned <code>UNKNOWN_domain_clause_cap</code> at 7,195,450 required clauses. The six-summand container was later audited and removed; its original cleanup flag was invalid. Shared-host emulated-worker timings are budget diagnostics only. Complete single-target cold runtime, natural rank, and matched rho for these retained SAT/S3 variants remain unmeasured; the root-index holdout above supplies separate Tier 1 evidence and leaves its K1104/K1120 selector unresolved. Source: <a href="https://github.com/aburan28/crypto/pull/1599">PR #1599</a>, <code>research/koblitz_n83_factor_base_sweep_20261008/verification/two-hour-extension-20261010/REPORT.md</code>, <code>verification/remaining-budget-k1182-20261010/RESULT.md</code>, <code>verification/remaining-budget-k2048-20261010/RESULT.md</code> <code>verification/structured-d12-orbit-20261010/RESULT.md</code> and the worker/outer/storage receipts. The canonical progress timeline and cold leaderboard receive no point from these stage-only observations.</p></div></details></div>
 <!-- BEGIN IC EVIDENCE LIBRARY -->
 <details class="dash-library" id="evidence-library"><summary>Open the full historical ledger</summary><div id="legacy-evidence">
+<!-- BEGIN projective-law-20261022 -->
+<div class="panel" id="projective-law-20261022">
+  <div class="panel-head">
+    <h2>Complete projective genus-2 law: two full-cohort collectors <span class="chip">engineering</span></h2>
+    <p class="panel-summary">The projective wrapper and retained-state collectors each source-verify all 1,260 frozen targets and pair them with same-process negation rho. At the representative cold logical-cost price, wrapper/rho is 3.793783 and retained-state/rho is 4.179297 across the full cohort.</p>
+    <p>The wrapper normalizes after each addition; retained state keeps weighted coordinates through the walk and normalizes at split candidates. The direct retained-state/wrapper ratio is 1.101617 pooled. Across 36 price cells it ranges 0.546762&ndash;1.303720: 12 cells are lower, 24 higher. These are modeled GAE operation costs, not calibrated wall time. The representative cell is M + 0.5S + 10I with each native logical operation at 0.1 GAE.</p>
+  </div>
+  <div class="table-scroll"><table>
+    <caption>Seven 180-target bit slices and the pooled 1,260-target cohort. A below-rho cell is a price-cell observation within a slice; the pooled row has none. The <a href="https://github.com/aburan28/crypto/blob/main/research/projective_law_followup_20261022/VALIDATION.json">validation gate</a> pins source scalar replay, independent 576-cell recomputation and matched rho. <a href="https://github.com/aburan28/crypto/blob/main/research/projective_law_followup_20261022/REPORT.pdf">PDF</a> · <a href="https://github.com/aburan28/crypto/blob/main/research/projective_law_followup_20261022/direct-price-grid.svg">graph</a> · <a href="https://github.com/aburan28/crypto/blob/main/research/projective_law_followup_20261022/REPORT.md">study</a>.</caption>
+    <thead><tr><th>Slice, bits</th><th>Targets</th><th>Wrapper / rho</th><th>Retained state / rho</th><th>Wrapper below rho</th><th>State below rho</th></tr></thead>
+    <tbody>
+      <tr><td>16</td><td>180</td><td>1.981806</td><td>1.866487</td><td>0 / 36</td><td>3 / 36</td></tr>
+      <tr><td>20</td><td>180</td><td>2.534593</td><td>2.511087</td><td>0 / 36</td><td>2 / 36</td></tr>
+      <tr><td>24</td><td>180</td><td>3.303011</td><td>3.423689</td><td>0 / 36</td><td>0 / 36</td></tr>
+      <tr><td>28</td><td>180</td><td>3.477693</td><td>3.959779</td><td>0 / 36</td><td>0 / 36</td></tr>
+      <tr><td>32</td><td>180</td><td>3.585584</td><td>3.751404</td><td>0 / 36</td><td>0 / 36</td></tr>
+      <tr><td>36</td><td>180</td><td>3.901343</td><td>4.060280</td><td>0 / 36</td><td>0 / 36</td></tr>
+      <tr><td>40</td><td>180</td><td>3.793337</td><td>4.248169</td><td>0 / 36</td><td>0 / 36</td></tr>
+      <tr><td>All</td><td>1,260</td><td>3.793783</td><td>4.179297</td><td>0 / 36</td><td>0 / 36</td></tr>
+    </tbody>
+  </table></div>
+</div>
+<!-- END projective-law-20261022 -->
+<!-- BEGIN pencil-degree-peeling-20261022 -->
+<div class="panel" id="pencil-degree-peeling-20261022">
+  <div class="panel-head">
+    <h2>Genus-2 pencil degree-peeling: nine repeated pilot curves <span class="chip">engineering</span></h2>
+    <p class="panel-summary">Nine 60-target slices have source-verified pencil and matched negation-rho solves. The exact degree-peeling eliminator is below the earlier online eliminator in 24 of 36 price cells and above it in 12 on every curve. It remains above rho in all 36 cells on every curve.</p>
+    <p>Ratios are complete cold group-addition equivalents under the study&rsquo;s logical-operation price model, not calibrated wall time. The representative price is M + 0.5S + 10I, with each native logical operation at 0.1 GAE. The original 1,260-target cohort has 543 distinct source-verified targets; 717 remain open. The nine rows below are separate 60-target curves, not a claim about the unfinished cohort.</p>
+  </div>
+  <div class="table-scroll"><table>
+    <caption>Frozen paired summaries from <a href="https://github.com/aburan28/crypto/blob/main/research/pencil_sparse_20261022/REPORT.md">study report</a>; each row uses the same 60 target IDs for pencil, the earlier online eliminator, and source-negation rho. The <a href="https://github.com/aburan28/crypto/blob/main/research/pencil_sparse_20261022/VALIDATION.json">validation gate</a> pins independent replay, raw-data recomputation and the 0/0.1/1 logical-work price band. <a href="https://github.com/aburan28/crypto/blob/main/research/pencil_sparse_20261022/REPORT.pdf">PDF</a> · <a href="https://github.com/aburan28/crypto/blob/main/research/pencil_sparse_20261022/reports/run-20261022T0534Z/peel-nine-curves.svg">graph</a>.</caption>
+    <thead><tr><th>p</th><th>Peel / online</th><th>Peel / rho</th><th>Online / rho</th><th>Peel / online across 36 cells</th><th>Below / above online</th><th>Below rho</th></tr></thead>
+    <tbody>
+      <tr><td>739</td><td>0.898244</td><td>11.615357</td><td>12.931178</td><td>0.873217&ndash;1.041611</td><td>24 / 12</td><td>0 / 36</td></tr>
+      <tr><td>1,151</td><td>0.796603</td><td>22.836038</td><td>28.666756</td><td>0.768822&ndash;1.057416</td><td>24 / 12</td><td>0 / 36</td></tr>
+      <tr><td>1,187</td><td>0.736053</td><td>22.877204</td><td>31.080921</td><td>0.704783&ndash;1.047696</td><td>24 / 12</td><td>0 / 36</td></tr>
+      <tr><td>3,371</td><td>0.379821</td><td>93.480568</td><td>246.117110</td><td>0.368897&ndash;1.023695</td><td>24 / 12</td><td>0 / 36</td></tr>
+      <tr><td>3,527</td><td>0.393296</td><td>105.157423</td><td>267.374941</td><td>0.383283&ndash;1.029953</td><td>24 / 12</td><td>0 / 36</td></tr>
+      <tr><td>3,931</td><td>0.365357</td><td>121.367036</td><td>332.187349</td><td>0.357003&ndash;1.026616</td><td>24 / 12</td><td>0 / 36</td></tr>
+      <tr><td>11,731</td><td>0.278124</td><td>1,204.654657</td><td>4,331.361006</td><td>0.277039&ndash;1.022758</td><td>24 / 12</td><td>0 / 36</td></tr>
+      <tr><td>11,887</td><td>0.282829</td><td>1,090.655477</td><td>3,856.238614</td><td>0.281761&ndash;1.022072</td><td>24 / 12</td><td>0 / 36</td></tr>
+      <tr><td>12,143</td><td>0.269806</td><td>1,146.700226</td><td>4,250.094923</td><td>0.268781&ndash;1.021602</td><td>24 / 12</td><td>0 / 36</td></tr>
+    </tbody>
+  </table></div>
+</div>
+<!-- END pencil-degree-peeling-20261022 -->
 <div class="wrap">
 
   <header>

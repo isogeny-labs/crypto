@@ -251,6 +251,37 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 | 8,192 | 43.6 s | 20.5 s | 5.29 s | 0.26 [0.24, 0.31] | 0.12 [0.11, 0.15] | 0.13 | 2.37 → 1.25 GiB |
 | 16,384 | 224 s | 117 s | 28.2 s | 0.24 [0.22, 0.26] | 0.13 [0.12, 0.14] | 0.13 | 9.15 → 4.65 GiB |
 
+## Complete projective genus-2 law, outside tables A–C
+
+Two implementations of the complete projective law solve and source-verify all 1,260 frozen targets each, paired with matched rho in the same process (class: engineering). `Wrapper` normalizes after each addition; `retained state` keeps weighted coordinates through the walk and normalizes at split candidates. Ratios are complete cold GAE under the study's logical-operation price model, not calibrated wall time. The representative cell is M + 0.5S + 10I and native logical operation = 0.1 GAE. The direct retained-state / wrapper ratio is 1.101617 pooled; over its 36-cell band it ranges 0.546762–1.303720. It is lower in 12 cells and higher in 24. This component is separate from tables A–C. [Study](../../research/projective_law_followup_20261022/) · [PDF](../../research/projective_law_followup_20261022/REPORT.pdf) · [validation gate](../../research/projective_law_followup_20261022/VALIDATION.json).
+
+| Slice (bits) | Targets | Wrapper / rho | Retained state / rho | Wrapper cells below rho | State cells below rho |
+|:--|--:|--:|--:|--:|--:|
+| 16 | 180 | 1.981806 | 1.866487 | 0/36 | 3/36 |
+| 20 | 180 | 2.534593 | 2.511087 | 0/36 | 2/36 |
+| 24 | 180 | 3.303011 | 3.423689 | 0/36 | 0/36 |
+| 28 | 180 | 3.477693 | 3.959779 | 0/36 | 0/36 |
+| 32 | 180 | 3.585584 | 3.751404 | 0/36 | 0/36 |
+| 36 | 180 | 3.901343 | 4.060280 | 0/36 | 0/36 |
+| 40 | 180 | 3.793337 | 4.248169 | 0/36 | 0/36 |
+| all | 1260 | 3.793783 | 4.179297 | 0/36 | 0/36 |
+
+## Genus-2 pencil degree-peeling, outside tables A–C
+
+Nine repeated pilot curves, 60 independent one-target workloads each. The exact degree-peeling eliminator changes the relation-solver component (class: engineering). Ratios are complete cold GAE under the study's logical-operation price model, not calibrated wall time. The representative cell is M + 0.5S + 10I with each native logical operation priced at 0.1 GAE. Each curve has 24/36 price cells below the earlier online eliminator, 12/36 above it, and 0/36 below its matched source-negation rho. The original 1,260-target cohort has 543 distinct source-verified targets and 717 still open; the displayed panel is a partial cohort. The nine curves are separate from tables A–C. [Study](../../research/pencil_sparse_20261022/) · [PDF](../../research/pencil_sparse_20261022/REPORT.pdf) · [validation gate](../../research/pencil_sparse_20261022/VALIDATION.json).
+
+| p | Targets | Peel / online | Peel / matched rho | Online / matched rho | Peel / online across 36 cells | Lower / higher than online | Below rho |
+|--:|--:|--:|--:|--:|:--|:--|--:|
+| 739 | 60 | 0.898244 | 11.615357 | 12.931178 | 0.873217–1.041611 | 24/12 | 0/36 |
+| 1,151 | 60 | 0.796603 | 22.836038 | 28.666756 | 0.768822–1.057416 | 24/12 | 0/36 |
+| 1,187 | 60 | 0.736053 | 22.877204 | 31.080921 | 0.704783–1.047696 | 24/12 | 0/36 |
+| 3,371 | 60 | 0.379821 | 93.480568 | 246.117110 | 0.368897–1.023695 | 24/12 | 0/36 |
+| 3,527 | 60 | 0.393296 | 105.157423 | 267.374941 | 0.383283–1.029953 | 24/12 | 0/36 |
+| 3,931 | 60 | 0.365357 | 121.367036 | 332.187349 | 0.357003–1.026616 | 24/12 | 0/36 |
+| 11,731 | 60 | 0.278124 | 1204.654657 | 4331.361006 | 0.277039–1.022758 | 24/12 | 0/36 |
+| 11,887 | 60 | 0.282829 | 1090.655477 | 3856.238613 | 0.281761–1.022072 | 24/12 | 0/36 |
+| 12,143 | 60 | 0.269806 | 1146.700226 | 4250.094923 | 0.268781–1.021602 | 24/12 | 0/36 |
+
 ## Planner validation, outside tables A–C
 
 `ic plan` / `ic bench --auto` (ic-planner/1) chooses every `ic.pipeline` stage of a prime-field run; here its plan runs against every alternative one change away from it on six prime curves outside its evidence (class: engineering). The plan is the existing best recipe, chosen automatically, so no row above moves. Cells are S(alternative) / S(plan), ecbench `compare`, paired, cluster 95% interval, at w = 0; the band column is the ratio at w = 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md §5a). Supplementary curves are `prime_search` curves outside the registry, named by tag. Study: [research/ic_planner_validation_20261020/](../../research/ic_planner_validation_20261020/).
@@ -312,6 +343,23 @@ Instruction counts are a separate unit and favor some tiny subfield pipelines:
 
 ## Sources
 
+- `research/projective_law_followup_20261022/REPORT.md` — sha256 `3c864364d649d46d…`
+- `research/projective_law_followup_20261022/VALIDATION.json` — sha256 `c681c8f5a8434395…`
+- `research/projective_law_followup_20261022/results/summary-projective.json` — sha256 `06d11a57882fae79…`
+- `research/projective_law_followup_20261022/results/summary-state.json` — sha256 `74623ead9cfd9e6c…`
+- `research/projective_law_followup_20261022/results/independent-validation.json` — sha256 `0803b5cbffd1d310…`
+- `research/pencil_sparse_20261022/VALIDATION.json` — sha256 `67c7817bdd29d49c…`
+- `research/pencil_sparse_20261022/REPORT.md` — sha256 `e71790874c332bef…`
+- `research/pencil_sparse_20261022/results/status.json` — sha256 `d3201dc35314dad6…`
+- `research/pencil_sparse_20261022/results/p739-peel-vs-online.json` — sha256 `035e588eacbefe55…`
+- `research/pencil_sparse_20261022/results/p1151-peel-vs-online.json` — sha256 `afa9f04ab006c046…`
+- `research/pencil_sparse_20261022/results/p1187-peel-vs-online.json` — sha256 `c1fafa830c302b61…`
+- `research/pencil_sparse_20261022/results/p3371-peel-vs-online.json` — sha256 `a98060c8ccb0030c…`
+- `research/pencil_sparse_20261022/results/p3527-peel-vs-online.json` — sha256 `46bc701eb4196cab…`
+- `research/pencil_sparse_20261022/results/p3931-peel-vs-online.json` — sha256 `bad946ab4bb4f4e8…`
+- `research/pencil_sparse_20261022/results/p11731-peel-vs-online.json` — sha256 `862317342355c82b…`
+- `research/pencil_sparse_20261022/results/p11887-peel-vs-online.json` — sha256 `a433928cee5a69a6…`
+- `research/pencil_sparse_20261022/results/p12143-peel-vs-online.json` — sha256 `4dfc5aac1d9a88fd…`
 - `research/three_leads_e2e_20261018/results/dashboard.json` — sha256 `686c03b185c2b838…`
 - `research/three_leads_e2e_20261018/results/retired-instruction-summary.json` — sha256 `e37064968f9478e5…`
 - `docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json` — sha256 `28aadc91af9e4c0b…`
