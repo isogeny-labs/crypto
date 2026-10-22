@@ -423,7 +423,7 @@ screen is not imported as a map, order, or recovery certificate.
 The current source allowlist accepts all four catalog input profiles. The
 catalog-wide constructor test exercises the standalone `construct` path for
 all 2,576 models in catalog snapshot
-[8e4c9975](https://github.com/aburan28/crypto/commit/8e4c99759fd8d9594ed207d793b07b59ebaf19f7). That commit pins the three
+[228eec9a](https://github.com/aburan28/crypto/commit/228eec9a98ea9d23d6186f9c4661597ad2a2a741). That commit pins the three
 catalog files; the test assertion is part of the current source. This is
 source-level evidence, not a published-artifact claim.
 

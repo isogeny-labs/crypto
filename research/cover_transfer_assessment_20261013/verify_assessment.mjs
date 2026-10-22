@@ -795,7 +795,7 @@ check(
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "8e4c99759fd8d9594ed207d793b07b59ebaf19f7";
+const expectedCatalogCommit = "228eec9a98ea9d23d6186f9c4661597ad2a2a741";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
