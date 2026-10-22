@@ -18,6 +18,7 @@
 
 mod cli_aes;
 mod cli_aes_observed;
+mod cli_hash_observed;
 mod cli_mlwe;
 mod cli_pqc;
 mod cli_pqc_fast;
@@ -536,6 +537,18 @@ enum CryptanalysisOp {
         #[arg(long)]
         hash: String,
         /// Required SHAKE output length in bytes (1..=64 for bounded analysis).
+        #[arg(long)]
+        output_bytes: Option<usize>,
+    },
+    /// Measure output bit distances for a specified hash on observed message pairs.
+    HashDifferentialObserved {
+        /// Hash identifier accepted by `crypto hash` (including SHA-2, SHA-3, and SHAKE).
+        #[arg(long)]
+        algorithm: String,
+        /// JSON with a fixed input XOR difference and message pairs.
+        #[arg(long)]
+        input: PathBuf,
+        /// Required for SHAKE; bounded to 1..=128 bytes for this analysis.
         #[arg(long)]
         output_bytes: Option<usize>,
     },
@@ -2547,6 +2560,16 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
                     eprintln!("error: {}", e);
                     std::process::exit(1);
                 }
+            }
+        }
+        CryptanalysisOp::HashDifferentialObserved {
+            algorithm,
+            input,
+            output_bytes,
+        } => {
+            if let Err(e) = cli_hash_observed::run(&input, &algorithm, output_bytes) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
             }
         }
         CryptanalysisOp::LengthExtension {

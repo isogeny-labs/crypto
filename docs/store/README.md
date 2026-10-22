@@ -222,6 +222,11 @@ The observed AES differential and linear corpus commands also passed live
 upload, HEAD, remote verification, fresh-cache `store:` replay, SHA-256
 comparison, and exact-key cleanup. Their receipt is
 [`AES_OBSERVED_STATISTICS_S3_ACCEPTANCE_20261022.json`](AES_OBSERVED_STATISTICS_S3_ACCEPTANCE_20261022.json).
+The observed SHA-256 and SHA3-256 differential commands passed the same
+live store path from empty caches. Their two logical names shared one
+content-addressed object because the message-pair fixtures are byte-identical.
+The exact-object cleanup is in
+[`HASH_OBSERVED_S3_ACCEPTANCE_20261022.json`](HASH_OBSERVED_S3_ACCEPTANCE_20261022.json).
 The public cubic-field cofactor-12 target input also passed a live upload,
 HEAD checksum, fresh-cache `icx solve-cubic --input store:...` fetch, scalar
 replay, remote verify, exact-object cleanup, and final HEAD 404. The first

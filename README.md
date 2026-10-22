@@ -235,6 +235,8 @@ CLI:
 crypto cryptanalysis hash-auto --hash md5
 crypto cryptanalysis hash-auto --hash md4
 crypto cryptanalysis hash-auto --hash sha1
+crypto cryptanalysis hash-differential-observed --algorithm sha256 --input docs/ic/fixtures/hash_differential_sha256_public.json
+crypto cryptanalysis hash-differential-observed --algorithm sha3-256 --input docs/ic/fixtures/hash_differential_sha3_256_public.json
 
 # Length-extension demo (interactive)
 crypto cryptanalysis length-extension --hash sha1 \
