@@ -390,6 +390,8 @@ not a claim against the repository's full IC-versus-rho measurement gates.
 crypto cryptanalysis aes-attack --technique differential
 crypto cryptanalysis aes-attack --technique linear
 crypto cryptanalysis aes-attack --technique square
+crypto cryptanalysis aes-sbox-table --kind bct --row 1
+crypto cryptanalysis aes-sbox-table --kind dlct --row 1
 crypto cryptanalysis aes-differential-observed --input chosen-pairs.json
 crypto cryptanalysis aes-higher-order-observed --input plaintext-cube.json
 crypto cryptanalysis aes-linear-observed --input known-pairs.json
@@ -426,6 +428,16 @@ analysis key; the S-box check concerns the public substitution table. Each
 command reports its configured sample count and measured or structural
 result. These are distinct input models and do not imply an attack on
 full-round AES.
+
+`aes-sbox-table` exports all 256 rows or one `--row` of four exact public
+S-box tables: `ddt` counts XOR difference transitions, `lat` gives signed
+linear-approximation imbalances, `bct` counts boomerang switch solutions,
+and `dlct` gives signed differential-linear switch imbalances. BCT and DLCT
+rows include the trivial zero input or output entries; use nonzero indices
+when evaluating attack transitions. The CLI reports the entry definition
+and row and column counts with the JSON values.
+The complete BCT and DLCT exports passed a live Setec S3 round trip; see
+[`AES_SBOX_TABLES_S3_ACCEPTANCE_20261022.json`](../store/AES_SBOX_TABLES_S3_ACCEPTANCE_20261022.json).
 
 The `boomerang` technique requires a nonzero 16-byte `--delta-hex` and a
 nonzero `--alpha` input difference at byte zero. It reports the exact public

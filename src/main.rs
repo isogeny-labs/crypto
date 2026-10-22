@@ -86,6 +86,13 @@ mod aes_related_differential_cli_tests {
         let lat = aes_sbox_table_report("lat", Some(0)).unwrap();
         assert_eq!(lat["values"][0], 128);
         assert_eq!(lat["values"][1], 0);
+        let bct = aes_sbox_table_report("bct", Some(1)).unwrap();
+        assert_eq!(bct["values"][0], 256);
+        assert_eq!(bct["values"][1], 2);
+        assert_eq!(bct["values"][2], 0);
+        let dlct = aes_sbox_table_report("dlct", Some(1)).unwrap();
+        assert_eq!(dlct["values"][0], 128);
+        assert_eq!(dlct["values"][1], -4);
         assert_eq!(
             aes_sbox_table_report("ddt", None).unwrap()["values"]
                 .as_array()
@@ -381,9 +388,9 @@ enum CryptanalysisOp {
         #[arg(long)]
         cipher: String,
     },
-    /// Export the exact AES S-box DDT or LAT as JSON, or select one input row.
+    /// Export the exact AES S-box DDT, LAT, BCT, or DLCT as JSON, or select one input row.
     AesSboxTable {
-        /// `ddt` for XOR differences or `lat` for linear masks.
+        /// `ddt` differences, `lat` masks, `bct` boomerang switches, or `dlct` differential-linear switches.
         #[arg(long)]
         kind: String,
         /// Input difference or input mask in 0..=255; omit for all 256 rows.
@@ -2085,7 +2092,11 @@ fn cmd_aes_attack(
 }
 
 fn aes_sbox_table_report(kind: &str, row: Option<u8>) -> Result<serde_json::Value, String> {
-    use crypto_lib::cryptanalysis::aes::{differential::aes_sbox_ddt, linear::aes_sbox_lat};
+    use crypto_lib::cryptanalysis::aes::{
+        boomerang::aes_sbox_bct,
+        differential::aes_sbox_ddt,
+        linear::{aes_sbox_dlct, aes_sbox_lat},
+    };
 
     let (definition, values) = match kind {
         "ddt" => {
@@ -2107,7 +2118,29 @@ fn aes_sbox_table_report(kind: &str, row: Option<u8>) -> Result<serde_json::Valu
                 values,
             )
         }
-        _ => return Err("kind must be ddt or lat".into()),
+        "bct" => {
+            let table = aes_sbox_bct();
+            let values = match row {
+                Some(input) => serde_json::json!(table[input as usize]),
+                None => serde_json::json!(table),
+            };
+            (
+                "count of x with inverse(S(x) xor output) xor inverse(S(x xor input) xor output) = input",
+                values,
+            )
+        }
+        "dlct" => {
+            let table = aes_sbox_dlct();
+            let values = match row {
+                Some(input) => serde_json::json!(table[input as usize]),
+                None => serde_json::json!(table),
+            };
+            (
+                "count of x with parity(output & S(x)) = parity(output & S(x xor input)), minus 128",
+                values,
+            )
+        }
+        _ => return Err("kind must be ddt, lat, bct, or dlct".into()),
     };
     Ok(serde_json::json!({
         "schema_version":1,

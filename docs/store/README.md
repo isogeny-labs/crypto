@@ -200,6 +200,9 @@ Its live Setec acceptance receipt is
 The observed AES DPA command uses the same checked trace input format; its
 separate live acceptance receipt is
 [`AES_DPA_S3_ACCEPTANCE_20261022.json`](AES_DPA_S3_ACCEPTANCE_20261022.json).
+The complete AES BCT and DLCT JSON exports passed push, HEAD, remote byte
+verification, fresh-cache pull, and exact-object cleanup in
+[`AES_SBOX_TABLES_S3_ACCEPTANCE_20261022.json`](AES_SBOX_TABLES_S3_ACCEPTANCE_20261022.json).
 The exact key, checksums and cleanup outcome are recorded in
 [`S3_ACCEPTANCE_20261018.json`](S3_ACCEPTANCE_20261018.json).
 The separate isogeny-walk `publish`/`fetch` path was exercised on a public
