@@ -4412,6 +4412,13 @@ pub struct FactorBase<E> {
     pub cost: PhaseCost,
     /// Subspace basis (single words) when the base is a linear subspace.
     pub subspace_basis: Option<Vec<u64>>,
+    /// `Some(n)` when the builder laid the base out by signed Frobenius
+    /// orbit: `points[2(o·n + t)] = σ^t(S_o)` and `points[2(o·n + t) + 1]
+    /// = −σ^t(S_o)` for orbit seeds `S_o`, each orbit of size `2n`.  The
+    /// builder computed those images in that order (and charged its
+    /// Frobenius maps), so the index of `σ^t(P_i)` is arithmetic; `None`
+    /// promises nothing.
+    pub frobenius_orbit_layout: Option<u32>,
 }
 
 impl<E: Copy> FactorBase<E> {
@@ -4437,6 +4444,7 @@ impl<E: Copy> FactorBase<E> {
             point_index: fast_map(0),
             cost: PhaseCost::default(),
             subspace_basis: None,
+            frobenius_orbit_layout: None,
         }
     }
 
@@ -5358,6 +5366,10 @@ pub struct FrobeniusPairTable {
     /// resolves `σ^t(P)` itself and charges the Frobenius maps and the
     /// index lookup to the relation phase ([`Self::build_lazy`]).
     lazy: bool,
+    /// `true` for a table over a base laid out by orbit
+    /// ([`FactorBase::frobenius_orbit_layout`]): `σ^t(P)` is named by
+    /// index arithmetic, with no map and no lookup ([`Self::build_layout`]).
+    layout: bool,
     n: u32,
     pub entries: u64,
     pub representatives: u64,
@@ -5383,6 +5395,80 @@ impl FrobeniusPairTable {
     /// recovered pairs are those of `build`.
     pub fn build_lazy(inst: &BinaryInstance, fb: &FactorBase<FastPoint>) -> Option<Self> {
         Self::build_inner(inst, fb, |_, _| true, true)
+    }
+
+    /// The table of [`build`](Self::build) over a base laid out by
+    /// signed Frobenius orbit ([`FactorBase::frobenius_orbit_layout`]),
+    /// with the same entries, keys and recovered pairs, for less work.
+    ///
+    /// * **Members by index.** The layout puts `σ^t(P_i)` at an index
+    ///   computed from `i` and `t`, so neither the build (eager) nor a hit
+    ///   (lazy) spends a Frobenius map or a lookup to name it.
+    /// * **Half the same-orbit pairs.** For a representative `P` and
+    ///   `ε = ±1`, `ε·σ^{n−k}(P + ε·σ^k(P)) = P + ε·σ^{n−k}(P)`: the pairs
+    ///   at rotation `k` and `n − k` are one signed Frobenius orbit, so
+    ///   one key.  The build adds only `k ≤ (n−1)/2` (odd `n`); the
+    ///   pair it skips sits later in the eager build's order than its
+    ///   partner, so it never made the entry, and the map is unchanged.
+    ///
+    /// Orbits are the layout's blocks, in block order, which is the order
+    /// in which the eager build first meets them.  `None` without the
+    /// layout, at even `n`, or where [`build`](Self::build) gives `None`.
+    pub fn build_layout(inst: &BinaryInstance, fb: &FactorBase<FastPoint>) -> Option<Self> {
+        let start = Instant::now();
+        let n = inst.n as usize;
+        let f = fb.points.len();
+        if fb.frobenius_orbit_layout != Some(inst.n)
+            || n.is_multiple_of(2)
+            || !f.is_multiple_of(2 * n)
+            || f >= (1usize << FROB_INDEX_BITS)
+        {
+            return None;
+        }
+        let g = BinaryGroup(&inst.fast);
+        let canon = FrobeniusCanon::new(&inst.gf, inst.n)?;
+        let orbits = f / (2 * n);
+        let mut ops = GroupOps::default();
+        let mut canons = 0u64;
+        let mut map: FastMap<(u32, u32)> = fast_map(f * f / (4 * n) + 1);
+        for o in 0..orbits {
+            let rep = 2 * o * n;
+            // Rotations k = 0..=(n−1)/2 of the representative's own
+            // orbit, both signs, then every later orbit.
+            for j in (rep..rep + n + 1).chain(rep + 2 * n..f) {
+                let u = g.add(&mut ops, fb.points[rep], fb.points[j]);
+                if g.is_identity(&u) {
+                    continue;
+                }
+                canons += 1;
+                let (key, t_u) = canon.canon_with_shift(u.x);
+                map.entry(key)
+                    .or_insert((rep as u32, (j as u32) | (t_u << FROB_INDEX_BITS)));
+            }
+        }
+        Some(Self {
+            entries: map.len() as u64,
+            representatives: orbits as u64,
+            map,
+            canon,
+            member_of: Vec::new(),
+            lazy: false,
+            layout: true,
+            n: inst.n,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            build_canonicalisations: canons,
+            build_frobenius_maps: 0,
+            build_lookups: 0,
+        })
+    }
+
+    /// The base index of `σ^t(P_idx)` under the orbit layout: block
+    /// `idx / 2n`, rotation `(idx mod 2n) / 2` advanced by `t`, sign kept.
+    fn layout_member(&self, idx: usize, t: usize) -> usize {
+        let n = self.n as usize;
+        let (block, within) = (idx / (2 * n), idx % (2 * n));
+        block * 2 * n + 2 * ((within / 2 + t) % n) + within % 2
     }
 
     /// [`build`](Self::build) over the pairs `keep(rep, j)` admits, where
@@ -5472,6 +5558,7 @@ impl FrobeniusPairTable {
             canon,
             member_of,
             lazy,
+            layout: false,
             n: inst.n,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
@@ -5502,7 +5589,9 @@ impl FrobeniusPairTable {
         // canon = rotl^{t_u}(coords(x_u)) = rotl^{t_r}(coords(x_R)) and the
         // Frobenius is rotl by one, so x_R = σ^t(x_u) with t = t_u − t_r.
         let t = ((t_u + n - t_r) % n) as usize;
-        let (i2, j2) = if self.lazy {
+        let (i2, j2) = if self.layout {
+            (self.layout_member(i as usize, t), self.layout_member(j, t))
+        } else if self.lazy {
             (
                 self.resolve_member(g, fb, ctr, i as usize, t)?,
                 self.resolve_member(g, fb, ctr, j, t)?,
@@ -5990,6 +6079,14 @@ pub enum TargetSource {
     /// a new stride per relation makes equal step counts unequal
     /// differences.
     StrideRenew,
+    /// The target's own progression `R = Q + [k]G`, `k = 0, 1, …`: no
+    /// scalar multiplication at all and one addition a target, with
+    /// `b = 1` throughout. Every row then carries the target with the same
+    /// coefficient, so a relation pins the logarithm only beside a base
+    /// column whose logarithm is known (`generator_orbit=1`). `R` repeats
+    /// only after `r` steps, so the progression is unguarded and stops
+    /// there instead: a guard probe a target could only ever miss.
+    StrideGenerator,
 }
 
 impl TargetSource {
@@ -6004,6 +6101,7 @@ impl TargetSource {
             TargetSource::WalkSharedJumps => "walk_shared_jumps",
             TargetSource::Stride => "stride",
             TargetSource::StrideRenew => "stride_renew",
+            TargetSource::StrideGenerator => "stride_generator",
         }
     }
     pub fn is_walk(&self) -> bool {
@@ -6393,6 +6491,10 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
             stride = draw_jumps(g, generator, target, r, &mut rng, &mut rel.group_ops, 1)[0];
         }
     }
+    if targets == TargetSource::StrideGenerator {
+        // The stride is G itself: no draw, no scalar multiplication.
+        stride = (generator, 1, 0);
+    }
     if targets == TargetSource::StrideRenew {
         while g.is_identity(&renew_by.0) {
             renew_by = draw_jumps(g, generator, target, r, &mut rng, &mut rel.group_ops, 1)[0];
@@ -6598,6 +6700,31 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
                 }
                 if g.is_identity(&walk_point) {
                     walk_fresh = true;
+                    direct_skipped += 1;
+                    continue;
+                }
+                (walk_point, wa, wb, None)
+            }
+            TargetSource::StrideGenerator => {
+                if walk_fresh {
+                    // R₀ = Q: a = 0, b = 1, no group work.
+                    walk_point = target;
+                    wa = 0;
+                    wb = 1;
+                    walk_fresh = false;
+                    stride_restarts += 1;
+                } else {
+                    walk_point = g.add(&mut rel.group_ops, walk_point, stride.0);
+                    wa = addmod(wa, stride.1, r);
+                    stride_steps += 1;
+                    if wa == 0 {
+                        // k = r: the progression is back at Q and every
+                        // further target would repeat one already tried.
+                        break;
+                    }
+                }
+                if g.is_identity(&walk_point) {
+                    // Q + [k]G = O: step past it; a restart would return to Q.
                     direct_skipped += 1;
                     continue;
                 }

@@ -174,6 +174,18 @@ pub trait FactorBaseBuilder<G: CountedGroup> {
         params: &Params,
         ops: &mut GroupOps,
     ) -> Result<FactorBase<G::Elt>, String>;
+
+    /// Columns whose logarithm the base knows before any relation, in the
+    /// relation matrix's convention `x = h·log_G(seed)`. The pipeline enters
+    /// each as a unit row ahead of the relation search. Empty for every base
+    /// whose seeds are found points rather than the generator.
+    fn known_column_logs(
+        &self,
+        _ctx: &InstanceCtx<G>,
+        _params: &Params,
+    ) -> Result<Vec<(usize, u64)>, String> {
+        Ok(Vec::new())
+    }
 }
 
 /// The shape of an algebraic system, for the report's degree columns.
@@ -548,6 +560,9 @@ pub enum Targets {
     /// `Stride` with a new stride after every relation.  See
     /// `TargetSource::StrideRenew`.
     StrideRenew,
+    /// `R = Q + [k]G`: no scalar multiplication, for a base with a known
+    /// column logarithm (`generator_orbit=1`). `TargetSource::StrideGenerator`.
+    StrideGenerator,
 }
 
 impl Targets {
@@ -565,6 +580,7 @@ impl Targets {
             Targets::Residual => "residual",
             Targets::Stride => "stride",
             Targets::StrideRenew => "stride-renew",
+            Targets::StrideGenerator => "stride-generator",
         }
     }
 
@@ -582,6 +598,7 @@ impl Targets {
             "residual" => Ok(Targets::Residual),
             "stride" => Ok(Targets::Stride),
             "stride-renew" => Ok(Targets::StrideRenew),
+            "stride-generator" => Ok(Targets::StrideGenerator),
             other => Err(format!(
                 "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, stride or stride-renew"
             )),

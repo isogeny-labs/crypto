@@ -36,6 +36,7 @@
 //! | `mitm-frobenius` | 2 or 3 | the same on a Frobenius-folded table (Koblitz) |
 //! | `mitm-frobenius-counted` | 2 or 3 | the same table and probe, with native table setup counters |
 //! | `mitm-frobenius-lazy-counted` | 2 or 3 | the same entries and probe; a hit names its summands' orbit members then, not every base point at build |
+//! | `mitm-frobenius-layout-counted` | 2 or 3 | the same entries and probe on a base laid out by orbit (`compact-orbit-scan`): members named by index, and half the same-orbit pairs added |
 //! | `rootfind-subtract` | 2 or 3 | prime curves: `prime_fast`'s direct-subtraction root finding, every `x(R ∓ F_i)` of a target from one Montgomery batched inversion, then a lookup (`m = 2`) or a probe of the negation-folded pair table (`m = 3`) |
 //!
 //! The pair table is where memory buys time, and `mitm`'s
@@ -695,6 +696,19 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for KoblitzOrbitBase<'_> {
     }
 }
 
+/// `generator_orbit` of `compact-orbit-scan`: absent or 0 is the archived
+/// scan, 1 seeds column 0 with the generator's orbit.
+fn generator_orbit(params: &Params) -> Result<bool, String> {
+    match params.get("generator_orbit") {
+        None => Ok(false),
+        Some(_) => match params.u64("generator_orbit")? {
+            0 => Ok(false),
+            1 => Ok(true),
+            v => Err(format!("generator_orbit must be 0 or 1, not {v}")),
+        },
+    }
+}
+
 /// The archived compact-orbit producer's public, deterministic raw-x scan.
 /// All group work is charged to `ops`; native field and container work is
 /// retained on the base as priced counters or explicit lower-bound gaps.
@@ -726,7 +740,24 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
                 "norm",
                 "Z[tau]-multiplier closure (lead A1): also take alpha(P) for every alpha = a + b*tau of norm a^2 - ab + 2b^2 <= norm, with weight (a + b*lambda) on P's column; 0 or absent for the plain {+-tau^k} orbits",
             ),
+            (
+                "generator_orbit",
+                "1: column 0 is the signed Frobenius orbit of the generator G itself, whose logarithm is known (no lift, cofactor projection, order or eigenvalue check: the instance's lambda is used as the signed-Frobenius rho uses it), so the relation search needs one row fewer; the other columns come from the raw-x scan. 0 or absent: every column from the scan",
+            ),
         ]
+    }
+
+    fn known_column_logs(
+        &self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+    ) -> Result<Vec<(usize, u64)>, String> {
+        // x = h·log_G(seed) with seed = G (see collect_and_solve_relations).
+        Ok(if generator_orbit(params)? {
+            vec![(0, ctx.cofactor % ctx.r)]
+        } else {
+            Vec::new()
+        })
     }
 
     fn build(
@@ -766,6 +797,10 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
             }
         }
         let mut multiplier_points = 0u64;
+        let from_generator = generator_orbit(params)?;
+        if from_generator && !multipliers.is_empty() {
+            return Err("generator_orbit=1 does not combine with norm > 0".into());
+        }
         if columns == 0 || raw_x_cap == 0 || inst.n == 0 || inst.n >= 64 || inst.n.is_multiple_of(2)
         {
             return Err(
@@ -799,7 +834,53 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
         let mut frobenius_maps = 0u64;
         let mut equation_checks = 0u64;
         let max_x = raw_x_cap.min((1u64 << inst.n) - 1);
+        if from_generator {
+            // Column 0: the generator's own orbit. G is the instance's point
+            // of order r, so there is nothing to lift, project or order-check.
+            // Its coefficients use the instance's lambda unchecked, as the
+            // signed-Frobenius rho does; a wrong lambda would fail the final
+            // [d]G = Q verification that every arm pays, not return a wrong d.
+            let seed = ctx.generator;
+            if g.is_identity(&seed) || seed.x <= 1 {
+                return Err("generator_orbit=1 needs a generator with x > 1".into());
+            }
+            equation_checks += 1;
+            if !inst.fast.is_on_curve(seed) {
+                return Err("the generator is off curve".into());
+            }
+            let mut x = seed.x;
+            let mut key = x;
+            for _ in 1..inst.n {
+                x = inst.gf.sqr(x);
+                key = key.min(x);
+                key_squares += 1;
+            }
+            seen.insert(key);
+            let mut member = seed;
+            let mut coefficient = 1u64;
+            for _ in 0..inst.n {
+                equation_checks += 1;
+                if !inst.fast.is_on_curve(member) {
+                    return Err("a Frobenius image of the generator is off curve".into());
+                }
+                points.push(member);
+                col_of.push(0);
+                coef_of.push(coefficient);
+                points.push(g.neg(member));
+                col_of.push(0);
+                coef_of.push((ctx.r - coefficient) % ctx.r);
+                member = inst.fast.frobenius_k(member, 1);
+                frobenius_maps += 1;
+                coefficient = ((coefficient as u128 * lambda as u128) % ctx.r as u128) as u64;
+            }
+            if member != seed || coefficient != 1 {
+                return Err("the generator's Frobenius orbit is not closed".into());
+            }
+        }
         for raw_x in 1..=max_x {
+            if seen.len() == columns {
+                break;
+            }
             scanned += 1;
             for source_point in source_curve.points_with_x(inst.b, raw_x) {
                 let (x, y) = source_point.ok_or("raw-x lift unexpectedly returned infinity")?;
@@ -929,7 +1010,14 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
             ));
         }
         let mut fb = FactorBase::from_column_map(
-            format!("first {columns} projected signed Frobenius orbits, raw x <= {raw_x_cap}"),
+            if from_generator {
+                format!(
+                    "the generator's signed Frobenius orbit and the first {} projected orbits, raw x <= {raw_x_cap}",
+                    columns - 1
+                )
+            } else {
+                format!("first {columns} projected signed Frobenius orbits, raw x <= {raw_x_cap}")
+            },
             points,
             col_of,
             coef_of,
@@ -938,6 +1026,10 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CompactOrbitScanBase<'_> {
             |p| inst.fast.neg(*p).pack(),
             |p| p.x,
         )?;
+        // Each orbit was pushed seed-first as (σ^t(S), −σ^t(S)) for
+        // t = 0..n; multiplier orbits share a column but follow the same
+        // order, so the layout holds for them too.
+        fb.frobenius_orbit_layout = Some(inst.n);
         fb.cost.count("abscissae_scanned_uncharged", scanned);
         fb.cost.count("inversions", scanned);
         fb.cost.count("legacy_as_solves_uncharged", scanned);
@@ -1854,6 +1946,7 @@ pub struct FrobeniusMitmOracle<'i> {
     large: Option<LargePrimeCollector<'i>>,
     count_setup: bool,
     lazy_members: bool,
+    layout_members: bool,
 }
 
 impl<'i> FrobeniusMitmOracle<'i> {
@@ -1865,6 +1958,7 @@ impl<'i> FrobeniusMitmOracle<'i> {
             large: None,
             count_setup: false,
             lazy_members: false,
+            layout_members: false,
         }
     }
 
@@ -1876,6 +1970,7 @@ impl<'i> FrobeniusMitmOracle<'i> {
             large: None,
             count_setup: true,
             lazy_members: false,
+            layout_members: false,
         }
     }
 
@@ -1886,6 +1981,18 @@ impl<'i> FrobeniusMitmOracle<'i> {
     pub fn new_lazy_counted(m: u32, instance: &'i BinaryInstance) -> Self {
         Self {
             lazy_members: true,
+            ..Self::new_counted(m, instance)
+        }
+    }
+
+    /// [`new_counted`](Self::new_counted) over the table of a base laid
+    /// out by orbit ([`FrobeniusPairTable::build_layout`]): the same
+    /// entries and relations, no Frobenius map or member lookup at build
+    /// or at a hit, and the same-orbit pairs added once per rotation
+    /// class.  Refuses a base without the layout.
+    pub fn new_layout_counted(m: u32, instance: &'i BinaryInstance) -> Self {
+        Self {
+            layout_members: true,
             ..Self::new_counted(m, instance)
         }
     }
@@ -1903,7 +2010,9 @@ impl<'i> FrobeniusMitmOracle<'i> {
 
 impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
     fn name(&self) -> &str {
-        if self.lazy_members {
+        if self.layout_members {
+            "mitm-frobenius-layout-counted"
+        } else if self.lazy_members {
             "mitm-frobenius-lazy-counted"
         } else if self.count_setup {
             "mitm-frobenius-counted"
@@ -1955,8 +2064,10 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
             if self.m != 3 {
                 return Err("large_primes needs the three-summand probe loop (m=3)".into());
             }
-            if self.lazy_members {
-                return Err("large_primes is not implemented for the lazy-member table".into());
+            if self.lazy_members || self.layout_members {
+                return Err(
+                    "large_primes is not implemented for the lazy- or layout-member table".into(),
+                );
             }
             // The collector builds the classic table itself (its direct
             // path is the plain probe) and the large table beside it.
@@ -1970,7 +2081,15 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for FrobeniusMitmOracle<'_> {
             self.table = None;
             return Ok(());
         }
-        let table = if self.lazy_members {
+        if self.layout_members && fb.frobenius_orbit_layout != Some(self.instance.n) {
+            return Err(
+                "mitm-frobenius-layout-counted needs a base laid out by orbit (compact-orbit-scan)"
+                    .into(),
+            );
+        }
+        let table = if self.layout_members {
+            FrobeniusPairTable::build_layout(self.instance, fb)
+        } else if self.lazy_members {
             FrobeniusPairTable::build_lazy(self.instance, fb)
         } else {
             FrobeniusPairTable::build(self.instance, fb)
