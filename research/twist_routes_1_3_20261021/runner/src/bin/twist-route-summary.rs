@@ -90,7 +90,13 @@ fn report(
         serde_json::to_vec_pretty(metrics)?,
     )?;
     plot(&out, title, &labels, &series)?;
-    let mut md=format!("# {title}\n\nRun `{run}`; source freeze `{source}`. Host `a81fcf6dc864`, Debian 13 x86_64, managed four-CPU virtual host, L0. These are public synthetic small-field records. No wall-clock or full-cost improvement is admitted.\n\nRaw outputs: [run directory](../../../execution-v1/runs/{run}/). Commands, binary/input hashes, seeds, resource limits and statuses are in [execution receipts](../../../execution-v1/) and the versioned protocols in the study root. No independent-host replay is claimed.\n\n## Recorded observations\n\n| Metric | Count / recorded value |\n|:--|--:|\n");
+    let raw = match run {
+        "fixture-preparation" => "../../../execution-v1/".to_string(),
+        "pairing-preparation" => "../../../execution-v1/pairing-fixture/".to_string(),
+        "lean-verification" => "../../../lean/receipts/".to_string(),
+        _ => format!("../../../execution-v1/runs/{run}/"),
+    };
+    let mut md=format!("# {title}\n\nRun `{run}`; source freeze `{source}`. Host `a81fcf6dc864`, Debian 13 x86_64, managed four-CPU virtual host, L0. These are public synthetic small-field records. No wall-clock or full-cost improvement is admitted.\n\nRaw outputs: [run directory]({raw}). Commands, binary/input hashes, seeds, resource limits and statuses are in [execution receipts](../../../execution-v1/) and the versioned protocols in the study root. No independent-host replay is claimed.\n\n## Recorded observations\n\n| Metric | Count / recorded value |\n|:--|--:|\n");
     for (k, v) in metrics.as_object().unwrap() {
         if !v.is_object() && !v.is_array() {
             md += &format!("| {} | {} |\n", k.replace('_', " "), v);
@@ -228,10 +234,51 @@ fn add_pipeline(study: &Path, out: &Path) -> Result<Value> {
     fs::write(out.join(run).join("PRICING_BAND.csv"), csv)?;
     Ok(m)
 }
+fn add_metadata(study: &Path, out: &Path) -> Result<()> {
+    let fixture = load(study.join("execution-v1/fixtures.json"))?;
+    let v = &fixture["fixtures"];
+    let roles = [
+        "structural",
+        "even-control",
+        "odd-composite-control",
+        "ladder",
+    ];
+    let values: Vec<_> = roles
+        .iter()
+        .map(|r| count(v, |x| text(x, "role").starts_with(*r)))
+        .collect();
+    let rejected = fixture["rejected_ladder_candidates"]
+        .as_array()
+        .map_or(0, Vec::len);
+    let m = json!({"registered_fixture_models":rows(v).len(),"generated_ladder_fixtures":values[3],"rejected_ladder_candidates_retained":rejected});
+    report(out,"fixture-preparation","d86eb011034066532d3645369a783f44be158b1c","Frozen synthetic fixture preparation",&m,
+        "The native preparation freezes 13 exact curve/twist/extension fixtures, including eight A=-3 ordinary prime-order ladder models. Public SplitMix seed 20261021 plus declared size/replicate offsets, every rejected candidate, exact whole/subgroup orders, generators and tower-to-flat conversions are retained. This is fixture construction, not a scaling or DLP performance result. Identities are independently reconstructed by the repository's canonical Rust constructor in registry-check-v2.json.",roles.iter().map(|s|s.to_string()).collect(),vec![("fixtures",values)])?;
+    let v = load(study.join("execution-v1/pairing-fixture/pairing-fixture.json"))?;
+    let m = json!({"source_points":num(&v,"source_order"),"extension_points":num(&v,"extension_order"),"source_subgroup_order":num(&v,"r"),"known_target_controls":v["known_scalar_controls"].as_array().unwrap().len()});
+    report(out,"pairing-preparation","0145df8ff32a104d186c31eca2f04c9ee256b21d","Separate pairing-positive fixture preparation",&m,
+        "The native preparation exhaustively counts the rational and quadratic-extension groups of the separately registered supersingular F43 model, chooses a nonidentity order-11 source generator, checks the distortion point lies outside that cyclic subgroup, and records ten known-scalar controls. This fixture is separate from the ordinary/NIST study. Independent PARI and source replay occur in the later V2 control.",vec!["Fp group".into(),"Fp² group".into()],vec![("points",vec![num(&v,"source_order"),num(&v,"extension_order")])])?;
+    let audit = fs::read_to_string(study.join("lean/receipts/twist-lean-axiom-audit.stdout"))?;
+    let source = fs::read_to_string(study.join("lean/TwistRoutes.lean"))?;
+    let explicit = source
+        .lines()
+        .filter(|l| l.trim_start().starts_with("theorem "))
+        .count() as u64;
+    let ok = audit.lines().filter(|l| l.starts_with("ok ")).count() as u64;
+    let failed = audit.lines().filter(|l| l.starts_with("FAIL ")).count() as u64;
+    let trusted = audit.lines().filter(|l| l.starts_with("TRUST ")).count() as u64;
+    assert_eq!((explicit, ok, failed, trusted), (9, 13, 0, 0));
+    let m = json!({"explicit_theorems":explicit,"audited_theorems_including_generated_definitions":ok,"nonstandard_axiom_failures":failed,"compiler_trusted_proofs":trusted});
+    report(out,"lean-verification","0145df8ff32a104d186c31eca2f04c9ee256b21d","Kernel-checked polynomial and point-group lemmas",&m,
+        "Lean 4.34.1 and the locked Mathlib commit build the five exact cleared polynomial identities and four trace/eigenspace statements on the actual Mathlib Weierstrass point group. The auditor checks nine explicit theorems plus four generated defining equations on standard foundations only. The concrete Frobenius/twist embedding, odd subgroup, field/chart/Jacobian maps and cost/complexity bridges remain open. See the exact proof map in lean/README.md; none of these missing bridges is an axiom or a completed theorem.",vec!["explicit theorems".into(),"audited with definitions".into(),"nonstandard axioms".into()],vec![("declarations",vec![explicit,ok,failed])])?;
+    Ok(())
+}
 fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().collect();
     let study = Path::new(args.get(1).ok_or("study")?);
     let out = Path::new(args.get(2).ok_or("fresh report root")?);
+    if args.get(3).is_some_and(|s| s == "metadata") {
+        return add_metadata(study, out);
+    }
     if out.exists() {
         return Err("report root must be fresh".into());
     }
