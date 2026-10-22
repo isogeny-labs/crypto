@@ -262,7 +262,8 @@ impl Field for FpK {
     fn mul(&self, a: &Vec<u64>, b: &Vec<u64>) -> Vec<u64> {
         let k = self.k();
         let p = u128::from(self.p);
-        if 2 * u64::from(64 - self.p.leading_zeros()) + u64::from(64 - (4 * k as u64).leading_zeros())
+        if 2 * u64::from(64 - self.p.leading_zeros())
+            + u64::from(64 - (4 * k as u64).leading_zeros())
             <= 126
         {
             // Products are below p² and no slot sums more than 2k of

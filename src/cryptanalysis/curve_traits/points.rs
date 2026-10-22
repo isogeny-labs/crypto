@@ -27,8 +27,8 @@ use num_traits::{One, ToPrimitive, Zero};
 
 use super::arith::lucas_v;
 use super::torsion::{
-    eigen_order, jac_add, jac_double, padd, pdivrem, pinv_mod, pmul, ppow, prem, psub,
-    trim, Big2, Field, Fp, FpK, Jac, Poly, Small2,
+    eigen_order, jac_add, jac_double, padd, pdivrem, pinv_mod, pmul, ppow, prem, psub, trim, Big2,
+    Field, Fp, FpK, Jac, Poly, Small2,
 };
 use super::Model;
 use crate::cryptanalysis::semaev_decomp::Gf2;
@@ -759,7 +759,13 @@ fn short_curve<'a, F: Field>(
 
 /// `y² + xy = x³ + ax² + b` over the binary field `f` of degree `m`, or its
 /// quadratic twist `y² + xy = x³ + (a + δ)x² + b`, `Tr(δ) = 1`.
-fn binary_curve<'a, F: Field>(f: &'a F, a: F::E, b: F::E, m: u64, twist: bool) -> Option<BinaryW<'a, F>> {
+fn binary_curve<'a, F: Field>(
+    f: &'a F,
+    a: F::E,
+    b: F::E,
+    m: u64,
+    twist: bool,
+) -> Option<BinaryW<'a, F>> {
     let mut g = BinaryW { f, a, b, m };
     if twist {
         let delta = (0u64..512)
@@ -774,7 +780,13 @@ fn binary_curve<'a, F: Field>(f: &'a F, a: F::E, b: F::E, m: u64, twist: bool) -
 /// quadratic twist when `twist`, the extension built from a certified
 /// irreducible modulus.  `None` for models without the arithmetic, or `ℓ`
 /// the characteristic.
-fn on_extension<T: GroupTest>(model: &Model, ell: u64, k: u32, twist: bool, test: &T) -> Option<bool> {
+fn on_extension<T: GroupTest>(
+    model: &Model,
+    ell: u64,
+    k: u32,
+    twist: bool,
+    test: &T,
+) -> Option<bool> {
     fn over<F: Field, T: GroupTest>(
         f: &F,
         a: &F::E,
@@ -790,7 +802,13 @@ fn on_extension<T: GroupTest>(model: &Model, ell: u64, k: u32, twist: bool, test
         }
         let modulus = irreducible(f, q, k as usize, 0x1e1d)?;
         let e = Ext::new(f, modulus, q);
-        test.run(&short_curve(&e, e.constant(a), e.constant(b), order, twist)?)
+        test.run(&short_curve(
+            &e,
+            e.constant(a),
+            e.constant(b),
+            order,
+            twist,
+        )?)
     }
     /// The binary analogue, `m` the degree of the base field over GF(2).
     #[allow(clippy::too_many_arguments)]
@@ -916,7 +934,13 @@ pub fn scalar_by_points(model: &Model, trace: &BigInt, ell: u64, twist: bool) ->
             return None;
         }
         let n = extension_order(&q, trace, k)?;
-        return rank(k, false, &n, multiplication_cost(model, k, n.bits())?, POINT_TEST_COST);
+        return rank(
+            k,
+            false,
+            &n,
+            multiplication_cost(model, k, n.bits())?,
+            POINT_TEST_COST,
+        );
     }
     // The twist over GF(q^{k/2}) for even k, costed for the arithmetic it
     // gets.
@@ -1133,12 +1157,7 @@ impl GroupTest for Eigen<'_> {
 /// Frobenius is a scalar when some candidate is confirmed and is not when
 /// every one is refuted.  `None` otherwise: the search found neither, the
 /// degree passed [`MAX_POWER_DEGREE`], or the work [`POINT_TEST_COST`].
-pub fn scalar_on_power_by_points(
-    model: &Model,
-    trace: &BigInt,
-    ell: u64,
-    j: u32,
-) -> Option<bool> {
+pub fn scalar_on_power_by_points(model: &Model, trace: &BigInt, ell: u64, j: u32) -> Option<bool> {
     if j == 0 || ell > super::torsion::SCALAR_TEST_MAX_ELL {
         return None;
     }
@@ -1180,9 +1199,7 @@ pub fn scalar_on_power_by_points(
         if split_power(&order, ell).0 < 2 * j {
             continue;
         }
-        let Some(cost) = weighted_cost(model, m, order.bits()) else {
-            return None;
-        };
+        let cost = weighted_cost(model, m, order.bits())?;
         let budget = NEW_POINT_COST / cost;
         if budget < MIN_MULTIPLICATIONS {
             verdict = None;
@@ -1310,7 +1327,8 @@ mod tests {
     fn the_power_point_test_agrees_with_the_division_polynomials() {
         use crate::cryptanalysis::curve_traits::torsion::scalar_on_power;
         let mut seen = [0usize; 2];
-        let primes = (101u64..700).filter(|&p| (2..p).take_while(|d| d * d <= p).all(|d| p % d != 0));
+        let primes =
+            (101u64..700).filter(|&p| (2..p).take_while(|d| d * d <= p).all(|d| p % d != 0));
         for p in primes {
             for a in 0..6u64 {
                 for b in 1..6u64 {
@@ -1320,7 +1338,19 @@ mod tests {
                     let n = super::super::certify::count_prime(p, a, b);
                     let t = p as i64 + 1 - n as i64;
                     let delta = t * t - 4 * p as i64;
-                    for (ell, j) in [(2u64, 1u32), (2, 2), (2, 3), (2, 4), (2, 5), (3, 1), (3, 2), (3, 3), (5, 1), (5, 2), (7, 2)] {
+                    for (ell, j) in [
+                        (2u64, 1u32),
+                        (2, 2),
+                        (2, 3),
+                        (2, 4),
+                        (2, 5),
+                        (3, 1),
+                        (3, 2),
+                        (3, 3),
+                        (5, 1),
+                        (5, 2),
+                        (7, 2),
+                    ] {
                         // Interesting only where Frobenius is a scalar on
                         // E[ℓ^{j−1}]: ℓ^{2(j−1)} | Δ at least.
                         let below = (ell as i64).pow(2 * (j - 1));
@@ -1341,8 +1371,10 @@ mod tests {
                         let Some(poly) = poly else {
                             continue;
                         };
-                        let points = scalar_on_power_by_points(&model, &tt, ell, j)
-                            .unwrap_or_else(|| panic!("undecided: p={p} a={a} b={b} ℓ^{j}={ell}^{j}"));
+                        let points =
+                            scalar_on_power_by_points(&model, &tt, ell, j).unwrap_or_else(|| {
+                                panic!("undecided: p={p} a={a} b={b} ℓ^{j}={ell}^{j}")
+                            });
                         assert_eq!(points, poly, "p={p} a={a} b={b} ℓ^j={ell}^{j}");
                         seen[usize::from(points)] += 1;
                     }
@@ -1358,7 +1390,11 @@ mod tests {
         use crate::binary_ecc::{F2mElement, IrreduciblePoly};
         use crate::cryptanalysis::semaev_decomp::Gf2;
         let mut seen = [0usize; 2];
-        for (n, low) in [(7u32, vec![0u32, 1]), (8, vec![0, 2, 3, 4]), (9, vec![0, 4])] {
+        for (n, low) in [
+            (7u32, vec![0u32, 1]),
+            (8, vec![0, 2, 3, 4]),
+            (9, vec![0, 4]),
+        ] {
             let irr = IrreduciblePoly {
                 degree: n,
                 low_terms: low,

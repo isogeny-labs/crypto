@@ -1081,8 +1081,7 @@ fn settle_by_walks(
     }
     let hk = walk::class_number(dk);
     let class = |levels: &[u32]| {
-        let f: Vec<(BigUint, u32)> =
-            primes.iter().cloned().zip(levels.iter().copied()).collect();
+        let f: Vec<(BigUint, u32)> = primes.iter().cloned().zip(levels.iter().copied()).collect();
         hk.map(|h| walk::order_class_number(dk, h, &f))
     };
     let mut candidates: Vec<Vec<u32>> = vec![Vec::new()];
@@ -1113,12 +1112,12 @@ fn settle_by_walks(
                     Ok(order) => order == Some(u64::from(cy.steps)),
                     Err(()) => h.as_ref().is_none_or(|h| (h % cy.steps).is_zero()),
                 }
-        }) && walks.open.iter().all(|(l, n)| {
-            match walk::class_order(dk, &f, *l, u64::from(*n)) {
+        }) && walks.open.iter().all(
+            |(l, n)| match walk::class_order(dk, &f, *l, u64::from(*n)) {
                 Ok(order) => order.is_none(),
                 Err(()) => h.as_ref().is_none_or(|h| h > &BigUint::from(*n)),
-            }
-        })
+            },
+        )
     };
     let pinned = |survivors: &[&Vec<u32>]| {
         (0..levels.len()).all(|i| survivors.iter().all(|c| c[i] == survivors[0][i]))
@@ -1426,7 +1425,11 @@ fn endomorphism(
             };
             (Some(l), l, format!("certified by {}{how}", c.source.kind))
         } else {
-            match small.and_then(|l| timed(&format!("scalar {l}"), &c.slug, || torsion::frobenius_is_scalar(&c.model, &c.trace, l))) {
+            match small.and_then(|l| {
+                timed(&format!("scalar {l}"), &c.slug, || {
+                    torsion::frobenius_is_scalar(&c.model, &c.trace, l)
+                })
+            }) {
                 Some(true) => {
                     // Scalar on E[ℓ^s] for every s up to the largest j
                     // with j ≤ v_ℓ([End(E) : Z[π]]) = depth − level; the
@@ -1437,8 +1440,13 @@ fn endomorphism(
                         // The division polynomial f_{ℓ^{s+1}} where it is
                         // small, else points over GF(q^m) (points.rs).
                         match small.and_then(|l| {
-                            timed(&format!("power-divpoly {l}^{}", s + 1), &c.slug, || torsion::scalar_on_power(&c.model, &c.trace, l, s + 1)).or_else(|| {
-                                timed(&format!("power-points {l}^{}", s + 1), &c.slug, || points::scalar_on_power_by_points(&c.model, &c.trace, l, s + 1))
+                            timed(&format!("power-divpoly {l}^{}", s + 1), &c.slug, || {
+                                torsion::scalar_on_power(&c.model, &c.trace, l, s + 1)
+                            })
+                            .or_else(|| {
+                                timed(&format!("power-points {l}^{}", s + 1), &c.slug, || {
+                                    points::scalar_on_power_by_points(&c.model, &c.trace, l, s + 1)
+                                })
                             })
                         }) {
                             Some(true) => s += 1,
@@ -1597,20 +1605,23 @@ fn endomorphism(
                 None => {
                     lv.level = Some(0);
                     lv.level_at_most = 0;
-                    lv.method = format!(
-                        "j(E) = j(O_K) = {j_k}, class number 1: End(E) = O_K, the crater"
-                    );
+                    lv.method =
+                        format!("j(E) = j(O_K) = {j_k}, class number 1: End(E) = O_K, the crater");
                 }
             }
         }
-        contains.push(format!("O_K (j = {j_k}, the class-number-1 CM j-invariant)"));
+        contains.push(format!(
+            "O_K (j = {j_k}, the class-number-1 CM j-invariant)"
+        ));
         bound = BigUint::one();
         exact = BigUint::one();
         resolved = true;
     }
     if !resolved || cycles.as_ref().is_some_and(|w| !w.closed.is_empty()) {
         let walks = cycles.get_or_insert_with(|| {
-            timed("cycles-late", &c.slug, || walk::walks(&c.model, &dk, &v_full))
+            timed("cycles-late", &c.slug, || {
+                walk::walks(&c.model, &dk, &v_full)
+            })
         });
         timed("orders", &c.slug, || {
             settle_by_walks(&c.model, &dk, walks, &mut levels, &mut contains)
@@ -2300,7 +2311,11 @@ mod tests {
         // walk; j(E) = −640320³ mod p puts O_K in End(E) all the same.
         let t = get("icv1-fp240-t3-5d0c27a2");
         assert_eq!(t.endomorphism.maximal, Some(true));
-        assert!(t.endomorphism.contains.iter().any(|o| o.starts_with("O_K (j = ")));
+        assert!(t
+            .endomorphism
+            .contains
+            .iter()
+            .any(|o| o.starts_with("O_K (j = ")));
         assert!(t.endomorphism.levels.iter().all(|l| l.level == Some(0)));
         // v = 271 is beyond the scalar test, d_K = −7 has class number 1:
         // O_K would close every walk of l-isogenies in one step, and the

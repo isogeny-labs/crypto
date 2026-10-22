@@ -87,14 +87,13 @@ fn modular_polynomial(l: u64) -> Vec<(usize, usize, BigInt)> {
 
 /// The primes `l ≤ 19` split in `K`, prime to `v` and to `q`, ascending.
 fn degrees(dk: &BigInt, v: &BigUint, q: &BigUint) -> Vec<u64> {
-    [3u64, 5, 7, 11, 13, 17, 19].into_iter().filter(|&l| {
-        let d = dk.mod_floor(&BigInt::from(l)).to_u64().expect("small");
-        !(v % l).is_zero()
-            && !(q % l).is_zero()
-            && d != 0
-            && (1..l).any(|x| x * x % l == d)
-    })
-    .collect()
+    [3u64, 5, 7, 11, 13, 17, 19]
+        .into_iter()
+        .filter(|&l| {
+            let d = dk.mod_floor(&BigInt::from(l)).to_u64().expect("small");
+            !(v % l).is_zero() && !(q % l).is_zero() && d != 0 && (1..l).any(|x| x * x % l == d)
+        })
+        .collect()
 }
 
 /// The walks of up to [`DEGREES_TRIED`] usable degrees `l`, at their
@@ -180,7 +179,10 @@ pub const DEGREES_TRIED: usize = 3;
 
 /// The integer `c` in the field of characteristic `p`.
 fn embed<F: Field>(f: &F, c: &BigInt, p: &BigUint) -> F::E {
-    let r = c.mod_floor(&BigInt::from(p.clone())).to_biguint().expect("non-negative");
+    let r = c
+        .mod_floor(&BigInt::from(p.clone()))
+        .to_biguint()
+        .expect("non-negative");
     let base = f.int(1 << 32);
     let mut acc = f.zero();
     for digit in r.to_u32_digits().iter().rev() {
@@ -477,7 +479,11 @@ fn walk_word(p: u64, j0: u64, l: u64, max_steps: u32) -> Option<Result<u32, u32>
                         t = m(t, c);
                         r = m(r, b);
                     }
-                    if disc == 0 { 0 } else { r }
+                    if disc == 0 {
+                        0
+                    } else {
+                        r
+                    }
                 };
                 m(sub(root, g[1]), inv(2))
             }
@@ -609,9 +615,7 @@ pub fn walk_degree(model: &Model, dk: &BigInt, l: u64, max_steps: u32) -> Option
             let j = short_j(&f, &a, &b)?;
             walk(&f, p, &q, &j, l, &Roots2::Odd { order: &q }, max_steps)?
         }
-        Model::Binary {
-            n: deg, irr, b, ..
-        } => {
+        Model::Binary { n: deg, irr, b, .. } => {
             let two = BigUint::from(2u8);
             if *deg <= 63 {
                 let f = Small2(Gf2::new(irr));
@@ -645,7 +649,12 @@ pub fn walk_degree(model: &Model, dk: &BigInt, l: u64, max_steps: u32) -> Option
     };
     let steps = match result {
         Ok(r) => r,
-        Err(n) => return Some(Walked::Open { degree: l, steps: n }),
+        Err(n) => {
+            return Some(Walked::Open {
+                degree: l,
+                steps: n,
+            })
+        }
     };
     if (l as f64).log2() * f64::from(steps) > CORNACCHIA_BITS {
         // The conductor of Z[α] is near l^{r/2}: no use as a bound, and
@@ -793,9 +802,14 @@ pub fn class_order(dk: &BigInt, f: &BigUint, l: u64, limit: u64) -> Result<Optio
     let delta = delta.to_i128().ok_or(())?;
     let l = i128::from(l);
     // b² ≡ Δ (mod 4l), −l < b ≤ l.
-    let b = (-l + 1..=l).find(|b| (b * b - delta).rem_euclid(4 * l) == 0).ok_or(())?;
+    let b = (-l + 1..=l)
+        .find(|b| (b * b - delta).rem_euclid(4 * l) == 0)
+        .ok_or(())?;
     let base = reduce((l, b, (b * b - delta) / (4 * l)), delta);
-    let identity = reduce((1, delta.rem_euclid(2), (delta.rem_euclid(2) - delta) / 4), delta);
+    let identity = reduce(
+        (1, delta.rem_euclid(2), (delta.rem_euclid(2) - delta) / 4),
+        delta,
+    );
     let mut cur = base;
     for o in 1..=limit {
         if cur == identity {
@@ -904,7 +918,17 @@ mod tests {
     /// reaches the class number for a few discriminants.
     #[test]
     fn class_orders_divide_class_numbers() {
-        for d in [-23i64, -47, -71, -199, -1999, -4 * 5, -84, -3 * 49, -7 * 121] {
+        for d in [
+            -23i64,
+            -47,
+            -71,
+            -199,
+            -1999,
+            -4 * 5,
+            -84,
+            -3 * 49,
+            -7 * 121,
+        ] {
             let dk = BigInt::from(d);
             // Write d = d₀ f² with d₀ fundamental (the cases above).
             let (d0, f) = match d {
@@ -937,15 +961,35 @@ mod tests {
             assert!(best > 0 || h == BigUint::one(), "d={d}");
         }
         // h(−23) = 3: a prime above 2 is not used, but above 3 has order 3.
-        assert_eq!(class_order(&BigInt::from(-23), &BigUint::one(), 3, 10), Ok(Some(3)));
+        assert_eq!(
+            class_order(&BigInt::from(-23), &BigUint::one(), 3, 10),
+            Ok(Some(3))
+        );
         // h(−47) = 5 is prime: every non-principal class has order 5.
-        assert_eq!(class_order(&BigInt::from(-47), &BigUint::one(), 3, 10), Ok(Some(5)));
+        assert_eq!(
+            class_order(&BigInt::from(-47), &BigUint::one(), 3, 10),
+            Ok(Some(5))
+        );
     }
 
     #[test]
     fn class_numbers_match_known_values() {
-        for (d, h) in [(-3i64, 1u64), (-4, 1), (-7, 1), (-8, 1), (-15, 2), (-20, 2), (-23, 3),
-            (-47, 5), (-71, 7), (-84, 4), (-163, 1), (-199, 9), (-260, 8), (-1999, 27)] {
+        for (d, h) in [
+            (-3i64, 1u64),
+            (-4, 1),
+            (-7, 1),
+            (-8, 1),
+            (-15, 2),
+            (-20, 2),
+            (-23, 3),
+            (-47, 5),
+            (-71, 7),
+            (-84, 4),
+            (-163, 1),
+            (-199, 9),
+            (-260, 8),
+            (-1999, 27),
+        ] {
             assert_eq!(class_number(&BigInt::from(d)), Some(h), "h({d})");
         }
         // h(−3·3²) = 1, h(−4·5²) = 2, h(−7·2²) = 1, h(−23·3²) = 3·(3 − 1) = 6.
@@ -962,11 +1006,22 @@ mod tests {
     #[test]
     fn primitive_solutions_have_the_norm() {
         let mut found = 0;
-        for (d, l) in [(-7i64, 11u64), (-23, 3), (-15, 17), (-104, 5), (-4, 5), (-3, 7), (-7, 2 + 1)] {
+        for (d, l) in [
+            (-7i64, 11u64),
+            (-23, 3),
+            (-15, 17),
+            (-104, 5),
+            (-4, 5),
+            (-3, 7),
+            (-7, 2 + 1),
+        ] {
             let d = BigInt::from(d);
             for r in 1..10 {
                 if let Some((x, y)) = primitive_solution(&d, l, r) {
-                    assert_eq!(&x * &x - &d * &y * &y, BigInt::from(4) * BigInt::from(l).pow(r));
+                    assert_eq!(
+                        &x * &x - &d * &y * &y,
+                        BigInt::from(4) * BigInt::from(l).pow(r)
+                    );
                     found += 1;
                 }
             }
@@ -1053,7 +1108,9 @@ mod tests {
                 .iter()
                 .any(|(i, j, c)| *i == l as usize + 1 && *j == 0 && c.is_one()));
             let mut checked = 0;
-            'curves: for p in [1009u64, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061] {
+            'curves: for p in [
+                1009u64, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061,
+            ] {
                 for a in 1..30u64 {
                     for b in 1..30u64 {
                         if (4 * a * a * a + 27 * b * b) % p == 0 {
@@ -1066,7 +1123,8 @@ mod tests {
                         let mut sum = 0i128;
                         for (i, k, c) in &phi {
                             let c = c.mod_floor(&BigInt::from(p)).to_i128().expect("small");
-                            sum = (sum + c * pow_mod(j1, *i as u32, pi) % pi * pow_mod(j2, *k as u32, pi))
+                            sum = (sum
+                                + c * pow_mod(j1, *i as u32, pi) % pi * pow_mod(j2, *k as u32, pi))
                                 % pi;
                         }
                         assert_eq!(sum, 0, "Φ_{l} at p={p} a={a} b={b}");
@@ -1106,7 +1164,9 @@ mod tests {
     fn cycles_bound_the_conductor() {
         let mut closed = 0;
         let mut sharp = 0;
-        for p in [1009u64, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 2003, 3001, 4001] {
+        for p in [
+            1009u64, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 2003, 3001, 4001,
+        ] {
             for a in 1..10u64 {
                 'curve: for b in 1..10u64 {
                     if (4 * a * a * a + 27 * b * b) % p == 0 {
@@ -1183,11 +1243,11 @@ mod tests {
                         );
                     }
                     for cycle in &cycles {
-                    assert!(
-                        cycle.multiples.iter().any(|y| (y % f).is_zero()),
-                        "p={p} a={a} b={b}: conductor {f} divides none of {:?}",
-                        cycle.multiples
-                    );
+                        assert!(
+                            cycle.multiples.iter().any(|y| (y % f).is_zero()),
+                            "p={p} a={a} b={b}: conductor {f} divides none of {:?}",
+                            cycle.multiples
+                        );
                     }
                     // Sharp when the bounds together pin the conductor.
                     let joint = cycles.iter().fold(BigUint::from(v as u64), |acc, c| {
