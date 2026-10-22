@@ -559,6 +559,9 @@ def roster(names: Names, measured: set[str]) -> list[dict]:
         if c["family"] == "prime":
             field = f"GF(p), p = {p['p']}" if len(p["p"]) < 40 else f"GF(p), {int(p['p']).bit_length()}-bit p"
             coeff = f"a = {p['a']}, b = {p['b']}" if len(p["p"]) < 40 else "standard coefficients"
+        elif c["family"] == "extension":
+            field = f"GF({p['p']}^{p['k']})"
+            coeff = f"a = {p['a']}, b = {p['b']}"
         else:
             m = p.get("n", p.get("m"))
             field = f"GF(2^{m})"

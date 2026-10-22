@@ -482,6 +482,36 @@ fn catalog(v: &Value, basis: &Value) -> Catalog {
     c.representation(&target, f, cv, 7, 4);
     c
 }
+fn registry_row_text(row: &Value) -> String {
+    // The metadata join uses one-space indentation at each nesting level.
+    // Keep the existing registry prefix intact while matching that layout for
+    // newly appended rows. Arbitrary-precision JSON numbers stay exact.
+    let mut bytes = Vec::new();
+    let formatter = serde_json::ser::PrettyFormatter::with_indent(b" ");
+    let mut serializer = serde_json::Serializer::with_formatter(&mut bytes, formatter);
+    serde::Serialize::serialize(row, &mut serializer).unwrap();
+    String::from_utf8(bytes)
+        .unwrap()
+        .lines()
+        .map(|line| format!("  {line}"))
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+#[test]
+fn appended_registry_row_matches_metadata_layout_without_rounding() {
+    let row: Value = serde_json::from_str(
+        r#"{"aliases":[],"params":{"p":"7"},"trace":24589614856193402413}"#,
+    )
+    .unwrap();
+    let rendered = registry_row_text(&row);
+    assert_eq!(
+        rendered,
+        "  {\n   \"aliases\": [],\n   \"params\": {\n    \"p\": \"7\"\n   },\n   \"trace\": 24589614856193402413\n  }"
+    );
+    assert_eq!(serde_json::from_str::<Value>(&rendered).unwrap(), row);
+}
+
 fn append_registry(root: &Path, c: &Catalog, out: &Path, write: bool) {
     let path = root.join("docs/curves/registry.json");
     let text = fs::read_to_string(&path).unwrap();
@@ -522,8 +552,8 @@ fn append_registry(root: &Path, c: &Catalog, out: &Path, write: bool) {
     let idx = text.rfind("\n ]").expect("registry layout changed");
     let mut updated = text[..idx].to_string();
     for row in &added {
-        updated += ",\n  ";
-        updated += &serde_json::to_string(row).unwrap();
+        updated += ",\n";
+        updated += &registry_row_text(row);
     }
     updated += &text[idx..];
     let checked: Value = serde_json::from_str(&updated).unwrap();
