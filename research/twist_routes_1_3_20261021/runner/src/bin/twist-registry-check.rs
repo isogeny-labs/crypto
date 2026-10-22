@@ -76,7 +76,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!(
         "{}",
         serde_json::to_string_pretty(
-            &json!({"schema":"twist.registry-check/v1","added_models":models.len(),"extension_models_added":extensions,"all_checked":true,"checks":checked})
+            &json!({"schema":"twist.registry-check/v1","manifest_models":models.len(),"extension_models_in_manifests":extensions,"all_checked":true,"checks":checked})
         )?
     );
     Ok(())

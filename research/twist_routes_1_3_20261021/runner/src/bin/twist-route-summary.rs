@@ -1,6 +1,11 @@
 //! Native evidence aggregation and plots. Reads recorded outcomes only.
 use serde_json::{json, Value};
-use std::{collections::BTreeMap, error::Error, fs, path::Path};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    error::Error,
+    fs,
+    path::Path,
+};
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 fn load(p: impl AsRef<Path>) -> Result<Value> {
     Ok(serde_json::from_slice(&fs::read(p)?)?)
@@ -95,6 +100,134 @@ fn report(
     fs::write(out.join("REPORT.md"), md)?;
     Ok(())
 }
+#[derive(Default, serde::Serialize)]
+struct PipelineTotals {
+    attempts: u64,
+    verified: u64,
+    errors: u64,
+    unpriced_native_units: u64,
+    missing_counts: BTreeSet<String>,
+    unpriced_by_name: BTreeMap<String, u64>,
+    sum_s_lower_bound: f64,
+    sum_s_at_0_1_gae: f64,
+    sum_s_at_1_gae: f64,
+}
+fn work_count(v: &Value, name: &str) -> Option<u64> {
+    let base = name.strip_suffix("_uncharged").unwrap_or(name);
+    if let Some(n) = v["counters"]
+        .get(name)
+        .or_else(|| v["counters"].get(base))
+        .and_then(Value::as_u64)
+    {
+        return Some(n);
+    }
+    let mut found = false;
+    let mut total = 0;
+    for phase in v["phases"].as_array().into_iter().flatten() {
+        if let Some(n) = phase["native"]
+            .get(name)
+            .or_else(|| phase["native"].get(base))
+            .and_then(Value::as_u64)
+        {
+            found = true;
+            total += n;
+        }
+    }
+    found.then_some(total)
+}
+fn add_pipeline(study: &Path, out: &Path) -> Result<Value> {
+    let run = "ecbench-20261022T0012Z";
+    let dir = study.join("execution-v1/runs").join(run);
+    let records: Vec<Value> = fs::read_to_string(dir.join("records.jsonl"))?
+        .lines()
+        .filter(|x| !x.trim().is_empty())
+        .map(serde_json::from_str)
+        .collect::<std::result::Result<_, _>>()?;
+    let mut arms = BTreeMap::<String, PipelineTotals>::new();
+    let mut curves = BTreeMap::<String, PipelineTotals>::new();
+    let mut errors = BTreeMap::new();
+    for v in &records {
+        if v["warmup"] == true {
+            continue;
+        }
+        let arm = text(v, "arm");
+        let curve = text(&v["workload"]["curve"], "slug");
+        for total in [
+            arms.entry(arm.clone()).or_default(),
+            curves.entry(format!("{curve},{arm}")).or_default(),
+        ] {
+            total.attempts += 1;
+            if v["outcome"]["status"] != "verified" {
+                total.errors += 1;
+                continue;
+            }
+            total.verified += 1;
+            let mut native = 0;
+            for name in v["cost"]["unpriced"].as_array().unwrap() {
+                let name = name.as_str().unwrap();
+                match work_count(v, name) {
+                    Some(n) => {
+                        native += n;
+                        *total.unpriced_by_name.entry(name.into()).or_default() += n;
+                    }
+                    None => {
+                        total.missing_counts.insert(name.into());
+                    }
+                }
+            }
+            total.unpriced_native_units += native;
+            let s = v["cost"]["s"].as_f64().unwrap();
+            let r = v["workload"]["curve"]["r"].as_u64().unwrap() as f64;
+            total.sum_s_lower_bound += s;
+            total.sum_s_at_0_1_gae += s + 0.1 * native as f64 / r.sqrt();
+            total.sum_s_at_1_gae += s + native as f64 / r.sqrt();
+        }
+        if v["outcome"]["status"] != "verified" {
+            *errors.entry(text(&v["outcome"], "error")).or_insert(0u64) += 1;
+        }
+    }
+    let audit = load(study.join("execution-v1/logs/E15-audit-v1.json"))?;
+    assert_eq!(audit["ok"], true);
+    let mut ratios = vec![];
+    for t in [0, 1] {
+        for c in [0, 1] {
+            for s in [0, 1] {
+                let candidate = format!("t{t}c{c}s{s}");
+                let reference = format!("same-base-t{t}c{c}");
+                let a = &arms[&reference];
+                let b = &arms[&candidate];
+                ratios.push(json!({"candidate":candidate,"same_base_reference":reference,"candidate_verified":b.verified,"reference_verified":a.verified,"both_complete_on_80_workloads":a.verified==80&&b.verified==80,"missing_counter_counts":!a.missing_counts.is_empty()||!b.missing_counts.is_empty(),"candidate_over_reference_at_0":b.sum_s_lower_bound/a.sum_s_lower_bound,"candidate_over_reference_at_0_1":b.sum_s_at_0_1_gae/a.sum_s_at_0_1_gae,"candidate_over_reference_at_1":b.sum_s_at_1_gae/a.sum_s_at_1_gae,"full_cost_ranking_admitted":false}));
+            }
+        }
+    }
+    let m = json!({"executions":records.len(),"verified":records.iter().filter(|v|v["outcome"]["status"]=="verified").count(),"errors":errors.values().sum::<u64>(),"wrong_answers":records.iter().filter(|v|v["outcome"]["status"]=="wrong_answer").count(),"audit_ok":true,"identical_replays":audit["replays"].as_array().unwrap().len(),"arms":arms,"by_curve_and_arm":curves,"error_reasons":errors,"sensitivity_ratios":ratios,"full_cost_ranking_admitted":false});
+    let labels: Vec<_> = [0, 1]
+        .iter()
+        .flat_map(|t| {
+            [0, 1]
+                .iter()
+                .flat_map(move |c| [0, 1].iter().map(move |s| format!("t{t}c{c}s{s}")))
+        })
+        .collect();
+    report(out,run,"2bd6cd2e95e139fa67b2b41bea59b43ca217165b","Cold factorial IC pipeline: correctness and accounting limits",&m,
+        "Eight public one-target workloads on each of ten registered curves, 24 arms, one L0 round and no warmup. All returned logarithms are point-verified. The 216 errors are retained empty trace/cover intersections. All 1,704 verified records replay identically. The field/call, F4, symbolic and extraction work is unpriced. The CSV applies 0/0.1/1 GAE to every recorded unpriced native unit on every arm, including rho; this is a sensitivity model, not calibrated full cost. No ranking or speedup is admitted. Native compare/table wall-admission labels under a requested L0 minimum are explicitly excluded by this protocol; no wall figure is a result. Other sizes, arities, independent-host replay and closed peak-memory/accounting remain open.",labels.clone(),vec![("verified targets",labels.iter().map(|x|arms[x].verified).collect()),("empty-base errors",labels.iter().map(|x|arms[x].errors).collect())])?;
+    let mut csv=String::from("curve,arm,attempts,verified,errors,unpriced_native_units,missing_counts,S_sum_at_0,S_sum_at_0.1,S_sum_at_1\n");
+    for (key, t) in &curves {
+        csv += &format!(
+            "{key},{},{},{},{},{},{:.9},{:.9},{:.9}\n",
+            t.attempts,
+            t.verified,
+            t.errors,
+            t.unpriced_native_units,
+            t.missing_counts.len(),
+            t.sum_s_lower_bound,
+            t.sum_s_at_0_1_gae,
+            t.sum_s_at_1_gae
+        );
+    }
+    fs::write(out.join(run).join("PRICING_BAND.csv"), csv)?;
+    Ok(m)
+}
 fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().collect();
     let study = Path::new(args.get(1).ok_or("study")?);
@@ -164,7 +297,7 @@ fn main() -> Result<()> {
         let dim = |x: &Value| !invalid && !x["singular_dimension"].is_null();
         let mut ms = BTreeMap::new();
         for x in rows(&v) {
-            for y in x["external"].as_array().unwrap() {
+            for y in x["external"].as_array().into_iter().flatten() {
                 if y["basis_parsed"] == true {
                     *ms.entry(text(y, "engine")).or_insert(0u64) += 1;
                 }
@@ -173,7 +306,11 @@ fn main() -> Result<()> {
         let mut native_equal = 0;
         let mut ms_equal = BTreeMap::new();
         for x in rows(&v) {
-            for e in x["independent_ideal_equalities"].as_array().unwrap() {
+            for e in x["independent_ideal_equalities"]
+                .as_array()
+                .into_iter()
+                .flatten()
+            {
                 if e[1] == true && !invalid {
                     let n = e[0].as_str().unwrap();
                     if n == "N" {
@@ -184,7 +321,7 @@ fn main() -> Result<()> {
                 }
             }
         }
-        let m = json!({"solver_cells":rows(&v).len(),"projected_set_equivalence_cells":rows(&eq).len(),"projected_set_mismatches":count(&eq,|x|x["polynomial_and_independent_group_projection_equal"]!=true),"native_complete":count(&v,native),"native_worker_failures":count(&v,|x|x["native_exit_code"]!=0),"native_ideal_equalities_verified":native_equal,"Singular_dimensions_returned":count(&v,dim),"msolve_bases_parsed":ms,"msolve_ideal_equalities_verified":ms_equal,"external_attempt_invalid":invalid});
+        let m = json!({"solver_cells":rows(&v).len(),"projected_set_equivalence_cells":rows(&eq).len(),"projected_set_mismatches":count(&eq,|x|x["polynomial_and_independent_group_projection_equal"]!=true),"native_complete":count(&v,native),"cell_execution_or_verification_errors":count(&v,|x|x["error"].is_string()),"native_record_missing_or_nonzero":count(&v,|x|!x["native_result"].is_object()||x["native_exit_code"]!=0),"native_ideal_equalities_verified":native_equal,"Singular_dimensions_returned":count(&v,dim),"msolve_bases_parsed":ms,"msolve_ideal_equalities_verified":ms_equal,"external_attempt_invalid":invalid});
         let enc = ["product", "chain", "bits", "symmetric"];
         let labels = enc.iter().map(|s| s.to_string()).collect();
         report(
@@ -235,6 +372,26 @@ fn main() -> Result<()> {
     report(out,run,"d86eb011034066532d3645369a783f44be158b1c","Conditional homomorphism and integral-lift ingress",&m,
         "NIST P-curve checks use public parameters only: gcd(r,#twist)=1 and no embedding degree found through the recorded bound 1,024. A bound is not the exact degree. The small integral lift box is supplemented, not replaced, by the separate PARI rational-height run. No NIST DLP, pairing transfer or scalable lift attack was run.",vec!["gcd equals one".into(),"eligible r-primary hom".into()],vec![("parameter cases",vec![num(&m,"gcd_one"),num(&m,"r_primary_hom_applicable")])])?;
     summary.insert(run, m);
+    let run = "pari-20261022T0020Z-original-height";
+    let v = load(runs.join(run).join("E17-rational-height-and-rank.json"))?;
+    let m = json!({"twist_searches":rows(&v).len(),"searches_with_rational_points":count(&v,|x|num(x,"point_count")>0),"searches_with_three_term_relations":count(&v,|x|x["relations"].as_array().is_some_and(|x|!x.is_empty())),"same_E_reductions_checked":count(&v,|x|x["original_group_relation_replay"]=="verified"),"relations_outside_same_base_Fp_census":count(&v,|x|x["new_relation_outside_same_base_rational_group_census"]==true),"rank_intervals_unresolved":count(&v,|x|x["rank_lower"]!=x["rank_upper"])});
+    let structural = ["icv1-fp6-tm7-fc20da94", "icv1-fp10-t5-192cb216"];
+    report(out,run,"0145df8ff32a104d186c31eca2f04c9ee256b21d","Equal-original-height rational-lift control",&m,
+        "The same 254 twist parameters are searched at original x height 16 using enclosing standard-model height 16|d| and an exact original-height filter. This is a distinct height domain from V1. Every square-d reduction and projected triple is replayed in the ordinary group on the identical signed base. No row lies outside that same-base census. General target lifting, a complete Mordell-Weil certificate and a full-cost IC comparison remain open.",structural.iter().map(|x|x.to_string()).collect(),vec![("cases with points",structural.iter().map(|id|count(&v,|x|text(x,"fixture")==*id&&num(x,"point_count")>0)).collect()),("cases with triples",structural.iter().map(|id|count(&v,|x|text(x,"fixture")==*id&&x["relations"].as_array().is_some_and(|x|!x.is_empty()))).collect())])?;
+    summary.insert(run, m);
+    let run = "pairing-20261022T0020Z";
+    let m = json!({"public_target_controls":10,"accepted_independent_logs":0,"GP_exit_code":0,"parsed_result":false});
+    report(out,run,"0145df8ff32a104d186c31eca2f04c9ee256b21d","Pairing-control first attempt: no emitted result",&m,
+        "The GP function definition consumed its output statements on the same line. GP exited zero with no result. This attempt is unresolved and supplies no independent pairing-validation claim. V2 isolates the function definition and retries the identical inputs in a new directory.",vec!["public controls".into(),"accepted logs".into()],vec![("count",vec![10,0])])?;
+    summary.insert(run, m);
+    let run = "pairing-20261022T0024Z-v2";
+    let v = load(runs.join(run).join("E16-pairing-positive-control.json"))?;
+    let m = json!({"embedding_degree":2,"subgroup_order":11,"native_bilinearity_controls":num(&v,"native_Miller_bilinearity_controls"),"independent_PARI_logs":v["independent_PARI_logs"].as_array().unwrap().len(),"source_group_replay":v["source_group_replay"],"known_scalar_positive_control_only":true});
+    report(out,run,"e517e80b1e77778d529f51ce5a900e00cb010761","Known small-degree pairing positive control",&m,
+        "This separate supersingular control uses the registered F43 model and F43² with w²+1, r=11 and a distortion point outside the source cyclic subgroup. Native Miller arithmetic and independent PARI Tate pairing/finite-field logarithms recover all ten deliberately known scalar controls, checked again on the public source points. The GP script receives only target coordinates. This validates a known positive conditional branch; it is no ordinary/NIST transfer, novelty claim or speed result.",vec!["native bilinearity".into(),"PARI recovered logs".into()],vec![("controls passed",vec![10,10])])?;
+    summary.insert(run, m);
+    let m = add_pipeline(study, out)?;
+    summary.insert("ecbench-20261022T0012Z", m);
     fs::write(
         out.join("ANALYSIS.json"),
         serde_json::to_vec_pretty(&summary)?,
