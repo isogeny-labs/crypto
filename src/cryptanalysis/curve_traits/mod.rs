@@ -1844,7 +1844,9 @@ mod tests {
             .iter()
             .filter(|curve| matches!(&curve.model, Model::Extension { .. }))
             .collect();
-        assert_eq!(extensions.len(), 1324);
+        // The frozen roster plus 33 twist-route extension fixtures and the
+        // separate F43² pairing control; retain every per-model check below.
+        assert_eq!(extensions.len(), 1358);
         for curve in extensions {
             let Model::Extension {
                 p,
