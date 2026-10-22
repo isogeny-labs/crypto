@@ -34,6 +34,15 @@
 //! `tower stop in step` line. `--targets 1` measures target 1 alone: every
 //! target is still drawn, so it is the system a full run gives it.
 //!
+//! `--max-mem-mb N` (F4 engines) stops a step as oversize before it
+//! allocates more than `N` MB of dense blocks (`B'` and the echelon's bound),
+//! so a run that cannot fit the host ends with a lower bound instead of being
+//! killed; `--max-nnz` alone bounds `B'` by its entry count, 4 bytes an
+//! entry. `--steps-out FILE` (implies `--trace`) appends one flushed JSON
+//! line per step, with the step's degree, new elements and resident memory,
+//! so that a run the kernel kills still leaves what it learned.
+//! `--no-malloc-trim` leaves freed memory with the allocator between steps.
+//!
 //! `--kinds dickson-torus` builds the Dickson tower in its torus case
 //! (`2^t | p + 1`, `u` and `μ_{2^t}` in the norm-1 torus of `F_{p²}`; note
 //! §2.1), checked by `check_torus` before anything is measured.
@@ -71,6 +80,8 @@
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::Write;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering as AtomicOrdering};
+use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
 use crypto_lib::cryptanalysis::f4_fp::{self, F4Options, F4Report, Ordering, Poly};
@@ -1162,10 +1173,72 @@ fn memory_mb() -> Option<(u64, u64)> {
     Some((field("VmRSS:")?, field("VmHWM:")?))
 }
 
+/// `--max-mem-mb`, in bytes (0: none): the bound the F4 engines put on the
+/// dense blocks of one step (`TowerF4Options::max_bytes`).
+static MAX_BYTES: AtomicU64 = AtomicU64::new(0);
+/// `--no-malloc-trim`: leave freed memory with the allocator between steps.
+static NO_MALLOC_TRIM: AtomicBool = AtomicBool::new(false);
+/// `--steps-out`: one JSON line per finished or stopped step, flushed as the
+/// step ends, so that a run the kernel kills still leaves what it learned.
+static STEPS_OUT: Mutex<Option<File>> = Mutex::new(None);
+
+fn max_bytes() -> Option<u64> {
+    Some(MAX_BYTES.load(AtomicOrdering::Relaxed)).filter(|&b| b > 0)
+}
+
+/// Appends the step to the `--steps-out` file, if there is one.
+fn log_step_json(kind: &str, k: usize, st: &f4_fp_tower::StepTrace) {
+    let Ok(mut guard) = STEPS_OUT.lock() else {
+        return;
+    };
+    let Some(file) = guard.as_mut() else {
+        return;
+    };
+    let (rss, peak) = memory_mb().unwrap_or((0, 0));
+    let at = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| d.as_secs());
+    let line = json!({
+        "kind": kind,
+        "step": k,
+        "unix_s": at,
+        "degree": st.degree,
+        "fresh": st.fresh,
+        "cols": st.cols,
+        "residual_cols": st.residual_cols,
+        "nnz": st.nnz,
+        "dense_entries": st.dense_entries,
+        "dense_nonzeros": st.dense_nonzeros,
+        "muladds": st.muladds,
+        "ms": st.ms,
+        "rss_mb": rss,
+        "peak_rss_mb": peak,
+    });
+    let _ = writeln!(file, "{line}");
+    let _ = file.flush();
+}
+
+/// Returns the memory the allocator has freed to the system (glibc), after
+/// the trace line that reports the step's own resident size.
+#[cfg(all(target_os = "linux", target_env = "gnu"))]
+fn release_freed_memory() {
+    if !NO_MALLOC_TRIM.load(AtomicOrdering::Relaxed) {
+        // SAFETY: malloc_trim only returns free heap pages to the system.
+        unsafe {
+            libc::malloc_trim(0);
+        }
+    }
+}
+
+#[cfg(not(all(target_os = "linux", target_env = "gnu")))]
+fn release_freed_memory() {}
+
 /// One line of a tower run's step trace, with the process's memory when the
 /// step ended.
 fn print_tower_step(k: usize, st: &f4_fp_tower::StepTrace) {
     eprintln!("tower step {k}: {}", tower_step_fields(st));
+    log_step_json("step", k, st);
+    release_freed_memory();
 }
 
 /// The step a stop cut off (`TowerF4Report::stopped_step`), as far as it
@@ -1174,7 +1247,7 @@ fn print_tower_step(k: usize, st: &f4_fp_tower::StepTrace) {
 /// step's, so that no reader of traces takes it for a finished step.
 fn print_stopped_step(k: usize, oversize: bool, st: &f4_fp_tower::StepTrace) {
     let why = if oversize {
-        "oversize: --max-nnz"
+        "oversize: --max-nnz, --max-dense or --max-mem-mb"
     } else {
         "budget"
     };
@@ -1185,6 +1258,15 @@ fn print_stopped_step(k: usize, oversize: bool, st: &f4_fp_tower::StepTrace) {
     eprintln!(
         "tower stop in step {k} ({why}): {}{space}{live}",
         tower_step_fields(st)
+    );
+    log_step_json(
+        if oversize {
+            "stop_oversize"
+        } else {
+            "stop_budget"
+        },
+        k,
+        st,
     );
 }
 
@@ -1218,7 +1300,7 @@ fn tower_step_fields(st: &f4_fp_tower::StepTrace) -> String {
         format!(", memory {rss} MB (peak {peak} MB)")
     });
     format!(
-        "degree {}, {} critical + {} tower pairs, {} S-rows + {} reducers + {} promoted x {} cols, nnz {}, residue {} x {}, fresh {} (lowest degree {}), basis {}, pairs left {}, {:.1} ms (rows {:.0}, A {:.0}, B {:.0}, update {:.0}), B' {} entries, kept {} elements with {} entries, muladds {}{}{}",
+        "degree {}, {} critical + {} tower pairs, {} S-rows + {} reducers + {} promoted x {} cols, nnz {}, residue {} x {}, fresh {} (lowest degree {}), basis {}, pairs left {}, {:.1} ms (rows {:.0}, A {:.0}, B {:.0}, update {:.0}), B' {} entries ({} non-zero), kept {} elements with {} entries, muladds {}{}{}",
         st.degree,
         st.critical_pairs,
         st.tower_pairs,
@@ -1239,6 +1321,7 @@ fn tower_step_fields(st: &f4_fp_tower::StepTrace) -> String {
         st.ms_echelon,
         st.ms_update,
         st.dense_entries,
+        st.dense_nonzeros,
         st.basis_kept,
         st.basis_entries,
         st.muladds,
@@ -1336,6 +1419,9 @@ fn measure_tower(
     let mut opts = TowerF4Options::new(max_degree).with_budget(budget);
     if let Some(b) = stop_below {
         opts = opts.stopping_below(b);
+    }
+    if let Some(b) = max_bytes() {
+        opts = opts.with_max_bytes(b);
     }
     if let Some(c) = max_nnz {
         opts = opts.with_max_nnz(c);
@@ -1470,6 +1556,9 @@ fn measure_generic<F: PrimeField>(
         .collect();
     let ring_degrees: Vec<u32> = input.iter().map(GPoly::degree).collect();
     let mut opts = TowerF4Options::new(max_degree).with_budget(budget);
+    if let Some(b) = max_bytes() {
+        opts = opts.with_max_bytes(b);
+    }
     if let Some(c) = max_nnz {
         opts = opts.with_max_nnz(c);
     }
@@ -1865,6 +1954,11 @@ fn parse_args() -> Args {
             i += 1;
             continue;
         }
+        if args[i] == "--no-malloc-trim" {
+            NO_MALLOC_TRIM.store(true, AtomicOrdering::Relaxed);
+            i += 1;
+            continue;
+        }
         if args[i] == "--null-chain" {
             a.null_chain = true;
             i += 1;
@@ -1962,6 +2056,15 @@ fn parse_args() -> Args {
             }
             "--max-nnz" => a.max_nnz = Some(v.parse().expect("--max-nnz")),
             "--max-dense" => a.max_dense = Some(v.parse().expect("--max-dense")),
+            "--max-mem-mb" => {
+                let mb: u64 = v.parse().expect("--max-mem-mb");
+                MAX_BYTES.store(mb << 20, AtomicOrdering::Relaxed);
+            }
+            "--steps-out" => {
+                let file = File::create(&v).expect("--steps-out file");
+                *STEPS_OUT.lock().expect("steps file lock") = Some(file);
+                a.trace = true;
+            }
             "--sig-order" => {
                 a.sig.order = match v.as_str() {
                     "pot" => sig_fp_tower::ModuleOrder::PositionFirst,

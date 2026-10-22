@@ -380,3 +380,129 @@ that the cover, trait and transfer certificates bind, which needs those
 regenerated (a separate, large change). The write-up therefore names the curves by
 `(p, a, b)` and writes no slug in Markdown; the sealed sessions carry the slugs.
 Registration is left as a follow-up.
+
+## 12. Amendment 4 (2026-10-22, follow-up; committed before any follow-up run)
+
+This amendment adds work after the frozen round. It changes no earlier text, run,
+row or rule. R18 and R18b stay as recorded; the runs below are new cells with new
+ids (`R20...`), in `followup_20261022/`, and they do not replace R18 (§2.2's
+"not re-run" applied to the killed run; a re-run after a fix is a different
+experiment and is labelled as one).
+
+### 12.1 Why R18 died (diagnosis from recorded evidence and the source)
+
+1. `B'` is a dense block, 4 bytes an entry (`TowerF4Options::max_dense`'s own
+   documentation says so). R18b's stop line records `B'` = 785,810,929 entries
+   at step 26 of the `N = 24` system: 3.14 GB for that one block (steps 23, 24,
+   25 of the same trace: 289,092,933; 170,382,738; 165,128,367 entries).
+2. R18 was started with `--max-nnz 1.8e9`. The engine applies that number to the
+   matrix's non-zeros and, when `--max-dense` is not given, to `B'`'s entries
+   as well (`opts.max_dense.or(opts.max_nnz)`): up to 7.2 GB of `B'` was
+   allowed on a 15 GB host shared with other processes. `ulimit -v 9 GB` bounds
+   address space, not the host's free memory. There was no byte bound at all.
+3. R18b's stop line (after steps 1-25): resident 1,322 MB, address space 1,369
+   MB, **live heap 172 MB**: about 1.1 GB of freed memory stayed resident in
+   the allocator's per-thread arenas (each `B'` row was its own `Vec`, 17k x
+   4 B, interleaved across rayon threads with 138 KB transient accumulators).
+4. R18 had no `--trace`, and a system's row is written when the system ends, so
+   the kill left nothing.
+
+So step 26's elimination needs at least 3.14 GB for `B'`, about 0.3 GB for the
+basis, up to 0.6 GB for the echelon, plus retained arenas; the kernel log's
+6.0 GB resident at the kill is of that order. The scaling of the largest `B'`
+across the recorded cells (`N = 20`: 93,547,040; `N = 22`: 305,556,904 entries,
+ratio 3.27) puts the largest `B'` of `N = 24` near 1.0 x 10^9 entries (4 GB).
+*Derived, not measured past step 25.* The kill itself was triggered by another
+process's allocation (Amendment 2); the cause on this side is that the
+run's footprint was large and unbounded in bytes.
+
+### 12.2 The fix (memory only; arithmetic untouched)
+
+On the generic engine (`f4_tower_generic`), which every committed F4 row used:
+(a) `B'` is held in one slab (`slab[boff[k]..boff[k+1]]` is row `k`), one
+allocation of exactly the counted size, in place of one `Vec` per row;
+(b) `TowerF4Options::max_bytes` (`--max-mem-mb`) stops a step as oversize
+*before* it allocates `B'` and the echelon bound `q(q+1)/2` entries, so a run
+that cannot fit leaves a lower bound and its trace instead of being killed; it
+applies on top of `--max-nnz`/`--max-dense`; (c) the pilot returns freed memory
+to the system after each step (`malloc_trim`, glibc; `--no-malloc-trim` turns
+it off) and, with `--steps-out`, appends one flushed JSON line per step, so a
+kill leaves `D >= d` from the last productive step; (d) a step's number of
+non-zero `B'` entries is reported (`dense_nonzeros`, both engines). Not done:
+compressing or spilling `B'` (§12.4, P11). The operations, their order, and
+their count are unchanged by construction: the same rows are multiplied in the
+same order into the same accumulators; only where a finished row is stored
+changed.
+
+### 12.3 Pre-registered checks and cells
+
+- **E1, equivalence (what is measured did not change).** The fixed binary,
+  with the frozen flags (`--engine generic --ladder-t none --planted 0
+  --random 2 --seed 1347112276 --kinds kummer --controls tower`, one thread as
+  R4 and R16, no `--max-*`), re-measures SL20 `m = 2`, `N = 16, 18, 20`, both targets
+  (`R20a`, the cells of R4), and SL24 `N = 20`, target 0 (`R20b`). Every
+  field of each row except `ms`, `wall_s`, and the new fields must equal the
+  frozen row (R4, R16): `solving_degree_max`, `steps`, `max_cols`, `max_rows`,
+  `max_nnz`, `max_dense_entries`, `muladds`, `critical_pairs_reduced`,
+  `tower_pairs_reduced`, `reducer_rows`, `basis_len`. Any difference stops the
+  follow-up: the fix changed what is measured.
+- **E2, memory.** SL24 `m = 2`, target 0, the same flags with 2 threads and
+  `--trace`, at `N = 20` and `N = 22`: the pre-fix binary (`pilot_baseline`,
+  built from the tree as merged, before these changes) and the fixed binary,
+  alternated (baseline first); at `N = 20` also the fixed binary with
+  `MALLOC_ARENA_MAX=2` (the setting R20c uses). The quantity is the process's
+  peak resident set (`VmHWM`, read at the end of each step and at exit),
+  taken the same way for every arm. Every row must satisfy E1's equality.
+  *Prediction P9:* the fixed binary's peak at `N = 22` is at most 0.90 times
+  the baseline's. One run per arm on a shared host: a memory figure, not a
+  speed or an advance.
+- **E3, equivalence at the frontier system.** `R20c0`: the system R18 and R18b
+  ran (SL24, `m = 2`, `N = 24`, target 0), with R18b's exact flags (2 threads,
+  `--max-nnz 600000000 --trace`, seed, controls) on the fixed binary, plus
+  `--steps-out`. Steps 1-25 must equal R18b's trace line for line in `degree`,
+  S-rows, reducers, `cols`, `nnz`, `B'` entries, kept elements and entries,
+  `muladds` (the engine's count depends on the thread count through its chunk
+  size, so this check is at 2 threads, as R18b). It must stop at step 26 with
+  the same stop line (`B'` = 785,810,929, `nnz` = 499,596,237). Its per-step
+  resident set is reported beside R18b's recorded one.
+- **R20c, the frontier cell, rerun.** SL24 `m = 2`, `N = 24` (`t = 12`), target 0,
+  the frozen flags with 4 threads, `--budget 18000 --max-mem-mb 7800
+  --trace --steps-out`, `MALLOC_ARENA_MAX=2`, `nice`. Start rule: only if the
+  host's `MemAvailable` at the start is at least 10 GB and E1 and E3 held;
+  otherwise not run and reported as not run. Outcomes: *finished* (a `D`);
+  *stopped by `--max-mem-mb`* (`D >= d` from the last productive step, with the
+  step it stopped at); *stopped by budget* (the same). A stopped run is a lower
+  bound and is read as in §3 Q2; it is not re-run with a larger cap. Its
+  multiply-add count is the 4-thread count (a different chunking from R18b's),
+  so it is priced as its own row, not pooled with 2-thread rows.
+- **Size.** "The largest size that fits this host" is the largest `N` whose cell
+  finishes under the guard: `N = 22` has finished before (R16, R19) and is
+  re-measured in E2; `N = 24` is the attempt.
+
+### 12.4 Predictions (stated before the runs)
+
+- **P8.** E1, E2's rows and E3 hold on every cell, step and field: the counts are
+  bit-identical.
+- **P9.** Peak resident set at SL24 `N = 22`: fixed at most 0.90 times baseline.
+- **P10.** R20c finishes with `D = 6` or `7` (as P3), peak resident between 5.5
+  and 7.5 GB, within the 5 h budget. If it stops, it stops at the byte bound or
+  the budget, not by the kernel.
+- **P11.** At least half of `B'`'s entries are non-zero at the largest steps
+  (so a sparse encoding of `B'` would not shrink it by half; the reason it is
+  not built here). Measured by `dense_nonzeros / dense_entries`.
+- **P12.** If R20c finishes, the derived F4 arm at the 24-bit curve (§4.4, the
+  frozen formula, `R` from the s24 factor-base record) is at least 10^5 times
+  matched rho at every `w` of the band (as P7).
+
+### 12.5 Reporting
+
+Every number is labelled measured / recorded / derived / predicted. The
+distance to the matched rho is reported for every priced row (the frozen
+ecbench rows are *recorded*, unchanged; the F4 rows are *derived*). The refreshed
+tables and graphs are generated by `pkm_p224_shape_report` from a merged copy of
+the rows (frozen rows without R18/R18b's stopped N=24 rows, plus the `R20`
+rows), written to `followup_20261022/`; the frozen `tables/` and `figures/`
+are not overwritten. Registration of the four curves (the follow-up Amendment 3
+left open) is done in the same branch: `docs/curves/registry.json` and every
+file derived from it were regenerated, so README §3.2's "Not registered"
+paragraph is superseded; its text is left as it was.

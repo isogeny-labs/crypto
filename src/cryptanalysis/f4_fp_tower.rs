@@ -764,6 +764,14 @@ pub struct TowerF4Options {
     /// matrix's rows are formed when they are reduced, so its nonzeros
     /// never are.
     pub max_dense: Option<u64>,
+    /// A bound, in bytes, on the dense blocks a step allocates: the reduced
+    /// reducer block `B'` and, on the generic engine, the echelon's upper
+    /// bound `q (q + 1) / 2` entries as well. A step that would pass it
+    /// stops as `oversize` before it allocates, so a run that cannot fit
+    /// the host leaves its trace and a lower bound instead of being killed.
+    /// It applies on top of `max_dense` and `max_nnz`, never in place of
+    /// them. Unset: no bound.
+    pub max_bytes: Option<u64>,
     /// Called with each step's number (from 1) and trace as soon as the step
     /// ends, so that a run that dies still leaves its trace.
     pub on_step: Option<fn(usize, &StepTrace)>,
@@ -791,6 +799,7 @@ impl TowerF4Options {
             stop_staircase: None,
             max_nnz: None,
             max_dense: None,
+            max_bytes: None,
             on_step: None,
             on_stop: None,
             on_sig_step: None,
@@ -816,6 +825,19 @@ impl TowerF4Options {
     pub fn with_max_dense(mut self, entries: u64) -> Self {
         self.max_dense = Some(entries);
         self
+    }
+    pub fn with_max_bytes(mut self, bytes: u64) -> Self {
+        self.max_bytes = Some(bytes);
+        self
+    }
+    /// The bound on `B'`'s entries that `max_dense` (else `max_nnz`) and
+    /// `max_bytes` give together, for entries of `elem_bytes` bytes.
+    pub fn dense_entry_cap(&self, elem_bytes: usize) -> Option<u64> {
+        let by_bytes = self.max_bytes.map(|b| b / elem_bytes.max(1) as u64);
+        match (self.max_dense.or(self.max_nnz), by_bytes) {
+            (Some(a), Some(b)) => Some(a.min(b)),
+            (a, b) => a.or(b),
+        }
     }
 }
 
@@ -843,6 +865,9 @@ pub struct StepTrace {
     pub skipped_rows: usize,
     /// Entries of the reduced reducer block, dense over those columns.
     pub dense_entries: u64,
+    /// How many of those entries are non-zero (0 for a step stopped
+    /// before the block was built).
+    pub dense_nonzeros: u64,
     pub fresh: usize,
     pub fresh_min_degree: u32,
     pub muladds: u64,
@@ -1288,8 +1313,9 @@ struct ElimStats {
     skipped_rows: usize,
     /// Columns no reducer leads: those without a divisor.
     q_cols: usize,
-    /// Entries of the reduced reducer block `B'`.
+    /// Entries of the reduced reducer block `B'`, and the non-zero ones.
     dense_entries: u64,
+    dense_nonzeros: u64,
     muladds: u64,
     /// Time spent on `B'`, and on the S-rows and their echelon.
     ms_reducers: f64,
@@ -1432,7 +1458,9 @@ fn eliminate(
                 let off = q_start[piv_leads[j as usize] as usize] as usize - s0;
                 st.muladds += kern.sub(&mut acc[off..], u64::from(v), &bred[j as usize]);
             }
-            bred[k as usize] = acc.iter().map(|&x| fp.reduce(x) as u32).collect();
+            let row: Vec<u32> = acc.iter().map(|&x| fp.reduce(x) as u32).collect();
+            st.dense_nonzeros += row.iter().filter(|&&x| x != 0).count() as u64;
+            bred[k as usize] = row;
         }
     }
     let residues_started = Instant::now();
@@ -2385,7 +2413,7 @@ fn f4_tower_cached(
             s_list.len(),
             &s_row,
             opts.deadline,
-            opts.max_dense.or(opts.max_nnz),
+            opts.dense_entry_cap(4),
             opts.full_rank_exit,
             &mut st,
         );
@@ -2400,6 +2428,7 @@ fn f4_tower_cached(
         rep.rows_skipped += st.skipped_rows as u64;
         tr.residual_cols = st.q_cols;
         tr.dense_entries = st.dense_entries;
+        tr.dense_nonzeros = st.dense_nonzeros;
         tr.ms_reduce = st.ms_reducers;
         tr.ms_echelon = st.ms_residues;
         rep.max_residual_rows = rep.max_residual_rows.max(st.residual_rows);

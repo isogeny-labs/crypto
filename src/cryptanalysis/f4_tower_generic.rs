@@ -654,6 +654,7 @@ struct ElimStats {
     skipped_rows: usize,
     q_cols: usize,
     dense_entries: u64,
+    dense_nonzeros: u64,
     muladds: u64,
     ms_reducers: f64,
     ms_residues: f64,
@@ -661,6 +662,12 @@ struct ElimStats {
 
 /// Forms row `k` of a set of rows on demand.
 type FormRow<'a, E> = &'a (dyn Fn(usize) -> Row<E> + Sync);
+
+/// Row `k` of `B'`, a slice of the slab that holds them all.
+#[inline]
+fn brow<'a, E>(slab: &'a [E], boff: &[usize], k: u32) -> &'a [E] {
+    &slab[boff[k as usize]..boff[k as usize + 1]]
+}
 
 /// The pivots of an elimination (see `f4_fp_tower::Echelon`).
 struct Echelon<E> {
@@ -717,6 +724,7 @@ fn eliminate<F: PrimeField>(
     s_row: FormRow<F::Elem>,
     deadline: Option<Instant>,
     max_dense: Option<u64>,
+    max_bytes: Option<u64>,
     full_rank_exit: bool,
     st: &mut ElimStats,
 ) -> Result<Echelon<F::Elem>, Stop> {
@@ -737,6 +745,13 @@ fn eliminate<F: PrimeField>(
     let tail_len = |c: u32| nq - q_start[c as usize] as usize;
     st.dense_entries = piv_leads.iter().map(|&c| tail_len(c) as u64).sum();
     if max_dense.is_some_and(|cap| st.dense_entries > cap) {
+        return Err(Stop::Oversize);
+    }
+    // The dense blocks this call allocates: `B'`, and the echelon's rows,
+    // at most `nq (nq + 1) / 2` entries. Refused before either exists.
+    let elem_bytes = std::mem::size_of::<F::Elem>() as u64;
+    let echelon_entries = (nq as u64) * (nq as u64 + 1) / 2;
+    if max_bytes.is_some_and(|cap| (st.dense_entries + echelon_entries) * elem_bytes > cap) {
         return Err(Stop::Oversize);
     }
     let expired = AtomicBool::new(false);
@@ -760,7 +775,19 @@ fn eliminate<F: PrimeField>(
     for (i, &k) in order.iter().enumerate() {
         pos[k as usize] = i as u32;
     }
-    let mut bred: Vec<Vec<F::Elem>> = vec![Vec::new(); n_piv];
+    // `B'` lives in one slab, row `k` at `slab[boff[k]..boff[k + 1]]` (its
+    // `tail_len` entries): one allocation of exactly the counted size, in
+    // place of one vector per row, whose per-thread arenas kept the
+    // freed rows of earlier steps resident beside the next step's.
+    let mut boff = vec![0usize; n_piv + 1];
+    for k in 0..n_piv {
+        boff[k + 1] = boff[k] + tail_len(piv_leads[k]);
+    }
+    let mut slab: Vec<F::Elem> = Vec::new();
+    if slab.try_reserve_exact(boff[n_piv]).is_err() {
+        return Err(Stop::Oversize);
+    }
+    slab.resize(boff[n_piv], f.zero());
     const BLOCK: usize = 64;
     for (b, block) in order.chunks(BLOCK).enumerate() {
         let first = (b * BLOCK) as u32;
@@ -792,7 +819,7 @@ fn eliminate<F: PrimeField>(
                     let j = pivot_of[cu];
                     if pos[j as usize] < first {
                         let off = q_start[cu] as usize - s0;
-                        work += sub_row(f, &mut acc, off, &mut used, cap, v, &bred[j as usize]);
+                        work += sub_row(f, &mut acc, off, &mut used, cap, v, brow(&slab, &boff, j));
                     } else {
                         later.push((j, v));
                     }
@@ -808,13 +835,17 @@ fn eliminate<F: PrimeField>(
             let s0 = q_start[piv_leads[k as usize] as usize] as usize;
             for (j, v) in later {
                 let off = q_start[piv_leads[j as usize] as usize] as usize - s0;
-                st.muladds += sub_row(f, &mut acc, off, &mut used, cap, v, &bred[j as usize]);
+                st.muladds += sub_row(f, &mut acc, off, &mut used, cap, v, brow(&slab, &boff, j));
             }
-            let mut out = vec![f.zero(); acc.len()];
-            f.row_reduce(&acc, &mut out);
-            bred[k as usize] = out;
+            let (lo, hi) = (boff[k as usize], boff[k as usize + 1]);
+            debug_assert_eq!(hi - lo, acc.len());
+            f.row_reduce(&acc, &mut slab[lo..hi]);
         }
     }
+    st.dense_nonzeros = slab
+        .par_chunks(1 << 20)
+        .map(|c| c.iter().filter(|&&x| !f.is_zero(x)).count() as u64)
+        .sum();
     let residues_started = Instant::now();
     st.ms_reducers = (residues_started - started).as_secs_f64() * 1e3;
 
@@ -869,7 +900,7 @@ fn eliminate<F: PrimeField>(
                         &mut used[r],
                         cap,
                         v,
-                        &bred[pivot_of[c as usize] as usize],
+                        brow(&slab, &boff, pivot_of[c as usize]),
                     );
                 }
                 let residual: Vec<bool> = (0..blk.len())
@@ -1428,6 +1459,7 @@ pub fn f4_tower_generic<F: PrimeField>(
             &s_row,
             opts.deadline,
             opts.max_dense.or(opts.max_nnz),
+            opts.max_bytes,
             opts.full_rank_exit,
             &mut st,
         );
@@ -1439,6 +1471,7 @@ pub fn f4_tower_generic<F: PrimeField>(
         rep.rows_skipped += st.skipped_rows as u64;
         tr.residual_cols = st.q_cols;
         tr.dense_entries = st.dense_entries;
+        tr.dense_nonzeros = st.dense_nonzeros;
         tr.ms_reduce = st.ms_reducers;
         tr.ms_echelon = st.ms_residues;
         rep.max_residual_rows = rep.max_residual_rows.max(st.residual_rows);
@@ -1907,6 +1940,76 @@ mod tests {
             same_as_u32(Fp64::new(p), &ring, &input, &opts);
             same_as_u32(Fp224::new(&BigUint::from(p)), &ring, &input, &opts);
             same_as_u32(Fp52::new(p), &ring, &input, &opts);
+        }
+    }
+
+    /// `max_bytes` stops the first step whose dense blocks (`B'` and the
+    /// echelon's bound) would pass it, before they are allocated, and
+    /// changes nothing in the steps before it or, at the bound itself, in
+    /// any step. `B'`'s non-zero count never exceeds its entry count.
+    #[test]
+    fn max_bytes_stops_the_first_step_that_would_pass_it() {
+        let mut rng = StdRng::seed_from_u64(77);
+        let p = 2_013_265_921u64;
+        let t = 6usize;
+        let ring = random_ring(&mut rng, p, 2, t, 0, false);
+        let n = ring.n_vars();
+        let mut raw = Vec::new();
+        for a in 0..3u32 {
+            for b in 0..3u32 {
+                let mut e = vec![0u32; n];
+                e[0] = a;
+                e[t] = b;
+                raw.push((e, rng.gen_range(1..p)));
+            }
+        }
+        let input = vec![ring.from_raw(&raw)];
+        let f = Fp32::new(p);
+        let gring = GTowerRing::from_tower_ring(f.clone(), &ring);
+        let ginput: Vec<GPoly<u32>> = input.iter().map(|g| GPoly::from_rpoly(&f, g)).collect();
+        let run = |opts: TowerF4Options| f4_tower_generic(&ginput, &gring, &opts).stats;
+        let free = run(TowerF4Options::new(n as u32 + 8));
+        assert!(!free.oversize && !free.trace.is_empty());
+        assert!(free
+            .trace
+            .iter()
+            .all(|s| s.dense_nonzeros <= s.dense_entries));
+        assert!(free.trace.iter().any(|s| s.dense_nonzeros > 0));
+        let need: Vec<u64> = free
+            .trace
+            .iter()
+            .map(|s| {
+                let q = s.residual_cols as u64;
+                (s.dense_entries + q * (q + 1) / 2) * 4
+            })
+            .collect();
+        let top = *need.iter().max().unwrap();
+        let at = run(TowerF4Options::new(n as u32 + 8).with_max_bytes(top));
+        assert_eq!(fingerprint(&at), fingerprint(&free));
+        let first = need.iter().position(|&b| b == top).unwrap();
+        let under = run(TowerF4Options::new(n as u32 + 8).with_max_bytes(top - 1));
+        assert!(under.oversize);
+        assert!(under.stopped_step.is_some());
+        assert_eq!(under.trace.len(), first);
+        for (a, b) in under.trace.iter().zip(&free.trace) {
+            assert_eq!(
+                (
+                    a.degree,
+                    a.cols,
+                    a.dense_entries,
+                    a.dense_nonzeros,
+                    a.muladds,
+                    a.fresh
+                ),
+                (
+                    b.degree,
+                    b.cols,
+                    b.dense_entries,
+                    b.dense_nonzeros,
+                    b.muladds,
+                    b.fresh
+                )
+            );
         }
     }
 
