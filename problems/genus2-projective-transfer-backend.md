@@ -54,6 +54,11 @@ is complete for arbitrary curves or divisors cannot be made from those runs.
   adds an exact integer-polynomial certificate and written divisor
   argument for the `B≠0,C=0` 2+2 degree-one branch. Same-`u` and
   shared-support 2+2 output branches remain unproved.
+- **Derived or proved, 2026-10-22 same-`u` mixed follow-up:**
+  The [proof audit](../research/projective_law_followup_20261022/PROOF_AUDIT.md)
+  adds exact weighted point-extraction identities and a written
+  valid-divisor cancellation argument for the mixed same-`u` branch.
+  Equal-`v` same-`u` doubling and shared-support outputs remain open.
 - **Suspected explanation:** None needed for the measured cost. Branch behavior
   outside the tested finite cases remains a proof obligation.
 - **Missing capability:** A checked universal case proof for the implemented
@@ -131,3 +136,8 @@ exact native polynomial certificate and written divisor argument.
 Same-`u` doubling/mixed composition and `B=0` shared-support
 cancellation/positive composition, including nested degree drops,
 remain open. Universal completeness remains open.
+
+2026-10-22: Same-`u` mixed support received an exact weighted
+extraction certificate and written cancellation argument, composed
+with the previously certified non-Weierstrass point doubling.
+Equal-`v` same-`u` doubling and `B=0` shared-support paths remain open.

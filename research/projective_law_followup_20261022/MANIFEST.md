@@ -79,6 +79,12 @@ degree-one output certificate. It parameterizes the zero determinant
 exactly over fields, proves the affine intersection identity, and checks
 the literal weighted output scales. Prior result files stay frozen.
 
+Build `--bin projective-symbolic-22-mixed` and redirect stdout to
+`results/symbolic-2plus2-mixed.json` for the same-`u` mixed-support
+weighted point-extraction certificate. The valid-divisor cancellation
+argument and its use of the previously certified `dbl(P)` formula are
+in `PROOF_AUDIT.md`.
+
 `SHA256SUMS` gives hashes for all tracked study inputs, code, records,
 summaries, graphs, PDF, and run package. Verify it from the study directory
 with `sha256sum -c SHA256SUMS`.

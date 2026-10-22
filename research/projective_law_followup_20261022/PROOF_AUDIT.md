@@ -284,14 +284,44 @@ the seven checked identities include these scales. Normalization
 therefore gives the same point. This certificate is for `B≠0,C=0`
 only; shared support and same-`u` paths are separate.
 
+### Same-`u` mixed support
+
+`projective-symbolic-22-mixed` checks seven exact integer-polynomial
+identities in `results/symbolic-2plus2-mixed.json`. It verifies that the
+literal crossed-coordinate calculations in `add22_weighted` extract
+the point with affine coordinates
+`x₀=(t₂-t₁)/(s₁-s₂)` and `y₀=v₁(x₀)` whenever
+`k=s₁-s₂≠0`; the weighted output sent to `dbl` has
+`z=(z₁z₂)⁴(w₁w₂)k`, nonzero for nonzero input weights.
+
+For valid inputs with the same `u`, both `F-v₁²` and `F-v₂²` are
+divisible by `u`, so `u` divides `(v₁-v₂)(v₁+v₂)`. In the mixed
+branch `v₂≠v₁` and `v₂≠-v₁`. Both factors are nonzero. The existing
+branch-selection lemma excludes a nonzero constant `v₁-v₂`, so
+`k≠0`. If `v₁+v₂` were constant, the product would have degree
+at most one and divisibility by monic quadratic `u` would force
+the product to vanish identically, a contradiction. Thus both
+factors are linear, their product is a nonzero scalar times `u`,
+and `x₀` is one support root. At that root `v₁=v₂=y₀`;
+at the other root `v₁=-v₂`, so those two points cancel in the
+Jacobian sum. The common point cannot be Weierstrass: if `y₀=0`,
+the two distinct linear factors would share root `x₀`, forcing
+`u=(X-x₀)²` and a valid reduced divisor with doubled smooth
+Weierstrass support, which is impossible. Hence `dbl(P₀)` has a
+nonzero output weight and equals `2P₀` by the separately certified
+weighted point-doubling formula. This proves the mixed branch's
+output class. Equal-`v` same-`u` divisor doubling is a different,
+still-open branch.
+
 Proof map: the generic 1+2 coefficient identities are discharged by
 `src/bin/projective_symbolic_12.rs` and its committed result; the
 exceptional cancellation and point-doubling identities are discharged
 by `src/bin/projective_symbolic_12_exception.rs` and its separate
-result. Tripling and both coprime 2+2 branches have independent certificates
+result. Tripling, both coprime 2+2 branches, and same-`u` mixed extraction have independent certificates
 in `src/bin/projective_symbolic_triple.rs` and
 `src/bin/projective_symbolic_22_common.rs` and
-`src/bin/projective_symbolic_22_drop.rs`. The
+`src/bin/projective_symbolic_22_drop.rs` and
+`src/bin/projective_symbolic_22_mixed.rs`. The
 divisor-class bridge and weighted identities have no Lean declaration yet.
 A core-only Lean 4.34.1 probe found neither
 `Field` nor `Polynomial` in `Std`; completing a faithful Lean version
@@ -302,7 +332,7 @@ claimed as the full group-law proof.
 ### Open cases
 
 A machine-checkable symbolic reduction is still needed for the exceptional
-2+2 output branches: same-`u` doubling and mixed composition, and
+2+2 output branches: same-`u` equal-`v` doubling, and
 `B=0` shared-support cancellation and positive composition, including
 any degree drops in their nested calls. The coprime certificates require
 `B≠0`; they do not discharge these cases. The finite audit and five
