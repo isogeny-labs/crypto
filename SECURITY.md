@@ -88,9 +88,15 @@ does not change this conclusion.
   `Point::scalar_mul_ct` is used everywhere a secret scalar is
   multiplied by a curve point: ECC keypair generation
   (`d → d·G`), ECDH (`d_A · Q_B`), and the ECDSA signer's `k·G`
-  step.  Every iteration performs exactly one point addition and one
-  point doubling, regardless of bit value, and the iteration count
-  is fixed at the curve order's bit length.  The variable-time
+  step.  Every iteration performs one point addition and two point
+  doublings, regardless of bit value, and the iteration count is
+  fixed at the curve order's bit length.  Since 2026-10-22 the
+  ladder runs on `k + 2^L` and subtracts `[2^L]P` (`L` public
+  doublings), so it starts from `(P, 2P)` and never holds the
+  identity on a large-order point.  Before that it started at `O`
+  and took the `O + P` and `2·O` shortcuts through every leading
+  zero bit, so wall time revealed the scalar's bit length (audit
+  finding 7, `research/scalar_mul_ct_timing_20261022/`).  The variable-time
   `Point::scalar_mul` is retained only for the ECDSA verifier's
   `u₁·G + u₂·Q` (public inputs).
 - **Constant-time fixed-width 256-bit integer (`ct_bignum::U256`).**
@@ -156,10 +162,14 @@ does not change this conclusion.
   `EccKeyPair::from_private`, `ecdh` / `ecdh_raw`, and the ECDSA
   signer's `k·G` step — route through `scalar_mul_secret(point, k,
   curve)`, which dispatches on `curve.name` to the secp256k1 or P-256
-  projective constant-time ladder.  No supported curve falls back to
-  the legacy affine `BigUint`-backed ladder for secret scalars.  The
-  variable-time `Point::scalar_mul` is retained only for the ECDSA
-  verifier's `u₁·G + u₂·Q` (both inputs public).
+  projective constant-time ladder.  Every other curve (SM2, the GOST
+  R 34.10-2012 curves, curve-zoo curves) falls back to the affine
+  `BigUint` ladder `Point::scalar_mul_ct`, as do the SM2, GOST,
+  EC-KCDSA and EC-ElGamal routines, which call it directly.  That
+  ladder's work is uniform in the scalar's bit pattern and length,
+  but its `num-bigint` field arithmetic is not constant-time at the
+  limb level.  The variable-time `Point::scalar_mul` is retained
+  only for the ECDSA verifier's `u₁·G + u₂·Q` (both inputs public).
 - **Constant-time multi-precision integer (`ct_bignum::Uint<LIMBS>`).**
   The `U256` from earlier hardening is now `Uint<4>` — a const-generic
   fixed-width integer instantiated at the limb counts the RSA private
