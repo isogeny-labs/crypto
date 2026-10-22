@@ -17,6 +17,6 @@ for name in $(jq -r 'select(.spec)|select(.status=="done")|.spec' runs/progress.
   rm -rf $SC; mkdir -p $SC; tar -C $SC -xf $a || { echo "skip $name: extract"; continue; }
   $ECB verify --dir $SC/$name --replay 3 --out $SC/a.json > $SC/v.log 2>&1; ok=$(jq -r .ok $SC/a.json 2>/dev/null)
   rm -rf $SC
-  if [ "$ok" = true ]; then rm -rf sessions/$name; echo "removed $name"; jq -nc --arg t "$(date -u +%FT%TZ)" --arg s $name '{type:"local_dir_removed",time:$t,spec:$s,condition:"A1.6: archive committed+pushed, xz -t, sha matches progress, extract + verify --replay 3 OK"}' >> runs/progress.jsonl; else echo "skip $name: verify failed"; fi
+  if [ "$ok" = true ]; then rm -rf sessions/$name; echo "removed $name"; jq -nc --arg t "$(date -u +%FT%TZ)" --arg s $name '{type:"cleanup",time:$t,session:$s,condition:"A1.6: archive committed+pushed, xz -t, sha matches progress, extract + verify --replay 3 OK"}' >> runs/progress.jsonl; else echo "skip $name: verify failed"; fi
 done
 df -h . | tail -1
