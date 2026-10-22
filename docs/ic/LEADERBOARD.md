@@ -266,6 +266,21 @@ Two implementations of the complete projective law solve and source-verify all 1
 | 40 | 180 | 3.793337 | 4.248169 | 0/36 | 0/36 |
 | all | 1260 | 3.793783 | 4.179297 | 0/36 | 0/36 |
 
+## Matched Kummer differential collector, outside tables A–C
+
+The uncached signed differential collector and source-negation rho run in one process on the same 1,260 public E(Fp²) targets. Every recovered scalar is source-verified (class: engineering). Ratios are complete cold GAE under the study's logical-operation price model, not calibrated wall time. The representative cell is M + 0.5S + 10I and native logical operation = 0.1 GAE. Across the pooled 36-cell price band the collector/rho ratio is 8.959687–55.935424; 0/36 cells are below rho. The arbitrary-jump signed-label sidecar remains a separate open problem. [Study](../../research/kummer_differential_collector_20261022/) · [PDF](../../research/kummer_differential_collector_20261022/KUMMER_PAIRED.pdf) · [graph](../../research/kummer_differential_collector_20261022/collector-cost-paired.svg) · [price grid](../../research/kummer_differential_collector_20261022/results/paired/analysis/price-grid.csv) · [validation gate](../../research/kummer_differential_collector_20261022/VALIDATION.json).
+
+| Slice (bits) | Targets | Cold collector / rho | Online collector / rho | Cold cells below rho |
+|:--|--:|--:|--:|--:|
+| 16 | 180 | 5.426890 | 3.836730 | 0/36 |
+| 20 | 180 | 8.250486 | 7.137601 | 0/36 |
+| 24 | 180 | 12.717757 | 11.863163 | 0/36 |
+| 28 | 180 | 14.092550 | 13.424911 | 0/36 |
+| 32 | 180 | 14.391090 | 13.771491 | 0/36 |
+| 36 | 180 | 13.543277 | 12.933897 | 0/36 |
+| 40 | 180 | 14.587569 | 14.008378 | 0/36 |
+| all | 1260 | 14.356662 | 13.766172 | 0/36 |
+
 ## Genus-2 pencil degree-peeling, outside tables A–C
 
 Nine repeated pilot curves, 60 independent one-target workloads each. The exact degree-peeling eliminator changes the relation-solver component (class: engineering). Ratios are complete cold GAE under the study's logical-operation price model, not calibrated wall time. The representative cell is M + 0.5S + 10I with each native logical operation priced at 0.1 GAE. Each curve has 24/36 price cells below the earlier online eliminator, 12/36 above it, and 0/36 below its matched source-negation rho. The original 1,260-target cohort has 543 distinct source-verified targets and 717 still open; the displayed panel is a partial cohort. The nine curves are separate from tables A–C. [Study](../../research/pencil_sparse_20261022/) · [PDF](../../research/pencil_sparse_20261022/REPORT.pdf) · [validation gate](../../research/pencil_sparse_20261022/VALIDATION.json).
@@ -343,14 +358,17 @@ Instruction counts are a separate unit and favor some tiny subfield pipelines:
 
 ## Sources
 
+- `research/kummer_differential_collector_20261022/VALIDATION.json` — sha256 `8f0f53f2aa7630c2…`
+- `research/kummer_differential_collector_20261022/results/paired/analysis/summary.json` — sha256 `97fe6496519b1b7e…`
+- `research/kummer_differential_collector_20261022/results/paired/analysis/price-grid.csv` — sha256 `f76aeb6758bbf4bc…`
 - `research/projective_law_followup_20261022/REPORT.md` — sha256 `3c864364d649d46d…`
 - `research/projective_law_followup_20261022/VALIDATION.json` — sha256 `c681c8f5a8434395…`
 - `research/projective_law_followup_20261022/results/summary-projective.json` — sha256 `06d11a57882fae79…`
 - `research/projective_law_followup_20261022/results/summary-state.json` — sha256 `74623ead9cfd9e6c…`
 - `research/projective_law_followup_20261022/results/independent-validation.json` — sha256 `0803b5cbffd1d310…`
-- `research/pencil_sparse_20261022/VALIDATION.json` — sha256 `67c7817bdd29d49c…`
-- `research/pencil_sparse_20261022/REPORT.md` — sha256 `e71790874c332bef…`
-- `research/pencil_sparse_20261022/results/status.json` — sha256 `d3201dc35314dad6…`
+- `research/pencil_sparse_20261022/VALIDATION.json` — sha256 `3118dd0580b991a8…`
+- `research/pencil_sparse_20261022/REPORT.md` — sha256 `1596fea6c557eb2d…`
+- `research/pencil_sparse_20261022/results/status.json` — sha256 `f74f1a8c8ef68513…`
 - `research/pencil_sparse_20261022/results/p739-peel-vs-online.json` — sha256 `035e588eacbefe55…`
 - `research/pencil_sparse_20261022/results/p1151-peel-vs-online.json` — sha256 `afa9f04ab006c046…`
 - `research/pencil_sparse_20261022/results/p1187-peel-vs-online.json` — sha256 `c1fafa830c302b61…`

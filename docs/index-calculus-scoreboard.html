@@ -943,6 +943,7 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
 <tr><td>2026-10-19</td><td>Elliptic curve, cold counted-work diagnostics with unpriced native work</td><td>Three-leads fresh Genus transfer, subgroup cohort</td><td class="n">5.3922&times;</td><td>matched</td><td>accounting</td><td><a href="#three-leads-e2e-4">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md">source</a></td></tr>
 <tr><td>2026-10-20</td><td>Elliptic curve, whole method, cold, one target</td><td>Rule v8: the Koblitz descent at baseline v8 against a matched rho, one target cold, closest size 2^36.6</td><td class="n">4.669&times; <small>rho matched; rule v7 read 3.43&times; against an unmatched rho</small></td><td>matched</td><td><span class="chip">accounting</span></td><td><a href="#ic-tool-programme-20261001">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ic_tool_program/rule/v8/README.md">source</a></td></tr>
 <tr><td>2026-10-21</td><td>Elliptic curve, whole method, cold, one target</td><td>Planner validation (ic-planner/1): plan vs rho.negation, best registered cell icv1-fp24-tm5099-a6f137c6 (r = 2^24.0)</td><td class="n">14.39&times; <small>S; [11.63, 18.45]; rho cheaper on all six curves, 12.6&ndash;25.8&times;</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#lab-planner-validation">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md">source</a></td></tr>
+<tr><td>2026-10-22</td><td>Elliptic curve over Fp², genus-2 Kummer transfer, complete cold counted GAE</td><td>Uncached signed Kummer differential collector vs source-negation rho, 1,260 targets</td><td class="n">14.356662&times; <small>complete cold modeled GAE at M + 0.5S + 10I and native logical operation = 0.1 GAE; 36-cell range 8.959687&ndash;55.935424</small></td><td>matched</td><td><span class="chip">engineering</span></td><td><a href="#kummer-matched-20261022">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/kummer_differential_collector_20261022/MATCHED_REPORT.md">source</a></td></tr>
 </tbody><tr><td>2026-10-16</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8..12)</td><td>MITM oracle ladder to l=12: 8,068 ops at l=11, 16,092 at l=12 vs 2,098,176 / 8,390,656 quartic solves, 128 targets, 0 disagreements</td><td class="n">0.0019&times;</td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l11_l12_20261016/REPORT.typ">source</a></td></tr><tr><td>2026-10-15</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8..10)</td><td>MITM oracle ladder to l=10: 2,076 ops at l=9, 4,212 at l=10 vs 134,912 / 525,312 quartic solves, 128 targets, 0 disagreements</td><td class="n">0.0080&times;</td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l9_l10_20261015/REPORT.typ">source</a></td></tr><tr><td>2026-10-15</td><td>Binary decomposition-oracle stage (non-Koblitz, l=8)</td><td>First sub-2<sup>2&ell;</sup> oracle at &ell;=8: MITM pair table vs pairs-and-solve, 64 targets, 0 disagreements</td><td class="n">0.0325&times;</td><td>stage</td><td><span class="chip">engineering</span></td><td><a href="#rho-parity-ledger">panel</a> &middot; <a href="https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l8_20261015/REPORT.typ">source</a></td></tr></table></div></details>
 <noscript><div class="dash-detail-body"><p>The chart needs JavaScript; the table above lists every plotted point.</p></div></noscript>
 <p class="dash-footnote">What would move the heavy series below the line for good: a cold, one-target, every-phase-priced <code>S</code> below a matched rho&rsquo;s at growing size (AGENTS.md &sect;2, &sect;8). The nearest measured approaches are 1.36&times; (round 0025) and 1.314&times; in CPU time (n41). The exponent story is in the <a href="#boundary-ledger">boundary ledger</a>: no fitted exponent on an elliptic curve sits below rho&rsquo;s one half; the cover route&rsquo;s ratio falls with size but on a weak class.</p>
@@ -1939,10 +1940,29 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
      "source": "https://github.com/aburan28/crypto/blob/main/research/binary_mitm_oracle_l11_l12_20261016/REPORT.typ"
     }
    ]
+  },
+  {
+   "barrier_test": true,
+   "id": "genus2-kummer-matched-gae",
+   "label": "Elliptic curve over Fp², genus-2 Kummer transfer, complete cold counted GAE",
+   "note": "The signed differential quotient collector and source-negation rho ran on the same 1,260 public targets in one process. Cold setup is charged per target. This is a modeled operation-cost comparison, not calibrated wall time.",
+   "points": [
+    {
+     "date": "2026-10-22",
+     "value": 14.356662,
+     "reference": "matched",
+     "label": "Uncached signed Kummer differential collector vs source-negation rho, 1,260 targets",
+     "detail": "Complete cold ratio at M + 0.5S + 10I and native logical operation = 0.1 GAE. Across 36 pooled price cells the ratio is 8.959687–55.935424; 0 cells below rho. All 1,260 scalar recoveries and same-process rho controls are independently source-verified. Every 45,360 target/cell comparison is a loss. The arbitrary-jump signed-label sidecar remains unimplemented.",
+     "class": "engineering",
+     "anchor": "#kummer-matched-20261022",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/kummer_differential_collector_20261022/MATCHED_REPORT.md"
+    }
+   ],
+   "role": "context"
   }
  ],
  "unit_note": "Each point is quoted from the frozen result it links, in that result's own unit (Valgrind Ir, S, counted operations, online wall time, or isolated CPU time where marked). Direction against 1 is meaningful only for fully priced ratios; a quotient of incomplete lower bounds is diagnostic even when paired. No value on this page is computed from another.",
- "updated": "2026-10-21"
+ "updated": "2026-10-22"
 }
 </script>
 <script>
@@ -2053,6 +2073,29 @@ body { background: var(--lab-bg); color: var(--lab-ink); padding: 0 24px 48px; }
   </table></div>
 </div>
 <!-- END projective-law-20261022 -->
+<!-- BEGIN kummer-matched-20261022 -->
+<div class="panel" id="kummer-matched-20261022">
+  <div class="panel-head">
+    <h2>Matched Kummer differential collector: 1,260 source solves <span class="chip">engineering</span></h2>
+    <p class="panel-summary">The uncached signed differential collector and source-negation rho solve the same 1,260 public targets in one process. Every scalar is source-verified. At M + 0.5S + 10I with native logical work at 0.1 GAE, the complete cold collector/rho cost ratio is 14.356662.</p>
+    <p>Across the pooled 36-cell price band the cold ratio is 8.959687&ndash;55.935424, with 0/36 cells below rho. The complete 45,360 target/cell comparisons also have zero below-rho cells. Costs are modeled GAE operation counts, not calibrated wall time. The arbitrary-jump signed-label sidecar remains a separate open problem.</p>
+  </div>
+  <div class="table-scroll"><table>
+    <caption>Seven 180-target slices and the pooled cohort. The same-process <a href="https://github.com/aburan28/crypto/blob/main/research/kummer_differential_collector_20261022/VALIDATION.json">validation gate</a> pins source scalar replay, independent raw-data recomputation and matched rho. <a href="https://github.com/aburan28/crypto/blob/main/research/kummer_differential_collector_20261022/KUMMER_PAIRED.pdf">PDF</a> · <a href="https://github.com/aburan28/crypto/blob/main/research/kummer_differential_collector_20261022/collector-cost-paired.svg">graph</a> · <a href="https://github.com/aburan28/crypto/blob/main/research/kummer_differential_collector_20261022/results/paired/analysis/price-grid.csv">price grid</a>.</caption>
+    <thead><tr><th>Slice, bits</th><th>Targets</th><th>Cold collector / rho</th><th>Online collector / rho</th><th>Cold cells below rho</th></tr></thead>
+    <tbody>
+      <tr><td>16</td><td>180</td><td>5.426890</td><td>3.836730</td><td>0 / 36</td></tr>
+      <tr><td>20</td><td>180</td><td>8.250486</td><td>7.137601</td><td>0 / 36</td></tr>
+      <tr><td>24</td><td>180</td><td>12.717757</td><td>11.863163</td><td>0 / 36</td></tr>
+      <tr><td>28</td><td>180</td><td>14.092550</td><td>13.424911</td><td>0 / 36</td></tr>
+      <tr><td>32</td><td>180</td><td>14.391090</td><td>13.771491</td><td>0 / 36</td></tr>
+      <tr><td>36</td><td>180</td><td>13.543277</td><td>12.933897</td><td>0 / 36</td></tr>
+      <tr><td>40</td><td>180</td><td>14.587569</td><td>14.008378</td><td>0 / 36</td></tr>
+      <tr><td>All</td><td>1,260</td><td>14.356662</td><td>13.766172</td><td>0 / 36</td></tr>
+    </tbody>
+  </table></div>
+</div>
+<!-- END kummer-matched-20261022 -->
 <!-- BEGIN pencil-degree-peeling-20261022 -->
 <div class="panel" id="pencil-degree-peeling-20261022">
   <div class="panel-head">
