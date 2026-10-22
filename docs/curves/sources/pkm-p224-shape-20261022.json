@@ -1,0 +1,51 @@
+{
+  "schema": "ecbench.curve-source/v1",
+  "what_this_is": "The four P-224-shaped Solinas toy curves (p = 2^n - 2^k + 1, so 2^t divides p - 1) of research/pkm_p224_kummer_shape_20261022/. Parameters are copied from that directory's curves.jsonl (prime_tower_curves --solinas 20:14,24:14,26:12,28:16 --seed 20261022 --max-cofactor 4); registered so their ICV1 slugs can be cited.",
+  "source": "research/pkm_p224_kummer_shape_20261022/curves.jsonl",
+  "curves": [
+    {
+      "name": "pkm-solinas-20bit",
+      "form": "y^2=x^3+ax+b",
+      "p": 1032193,
+      "a": 115752,
+      "b": 453155,
+      "group_order": 1030723,
+      "subgroup_order": 1030723,
+      "cofactor": 1,
+      "generator": {"x": 735117, "y": 237547}
+    },
+    {
+      "name": "pkm-solinas-24bit",
+      "form": "y^2=x^3+ax+b",
+      "p": 16760833,
+      "a": 10096653,
+      "b": 5158538,
+      "group_order": 16763924,
+      "subgroup_order": 4190981,
+      "cofactor": 4,
+      "generator": {"x": 4235082, "y": 5867282}
+    },
+    {
+      "name": "pkm-solinas-26bit",
+      "form": "y^2=x^3+ax+b",
+      "p": 67104769,
+      "a": 36772902,
+      "b": 59108565,
+      "group_order": 67098862,
+      "subgroup_order": 33549431,
+      "cofactor": 2,
+      "generator": {"x": 17995644, "y": 61081356}
+    },
+    {
+      "name": "pkm-solinas-28bit",
+      "form": "y^2=x^3+ax+b",
+      "p": 268369921,
+      "a": 147431093,
+      "b": 254493867,
+      "group_order": 268377479,
+      "subgroup_order": 268377479,
+      "cofactor": 1,
+      "generator": {"x": 52438493, "y": 182736176}
+    }
+  ]
+}

@@ -2,11 +2,11 @@
   "schema": "curve-traits/2",
   "generated_by": "cargo run --release --bin curve_traits -- build",
   "what_this_is": "Traits derived from each curve's model and order (the registry, then the sources in docs/curves/trait-sources.json), with the status of each value; see docs/curves/TRAITS.md.",
-  "registry_sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf",
+  "registry_sha256": "477a94b72658169d5be39a20c978892200aa6446168d3d18ab67ee8b64ffd183",
   "inputs": [
     {
       "path": "docs/curves/registry.json",
-      "sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf"
+      "sha256": "477a94b72658169d5be39a20c978892200aa6446168d3d18ab67ee8b64ffd183"
     },
     {
       "path": "docs/curves/factor-hints.txt",
@@ -69001,6 +69001,309 @@
       }
     },
     {
+      "slug": "icv1-fp20-t1471-592e3734",
+      "family": "prime",
+      "source": {
+        "kind": "registry",
+        "path": null,
+        "curve_uid": null,
+        "registered": true
+      },
+      "field": {
+        "kind": "prime",
+        "degree": 1,
+        "size_bits": 20
+      },
+      "trace": "1471",
+      "order": "1030723",
+      "order_check": {
+        "status": "proved",
+        "method": "exhaustive point count"
+      },
+      "ordinary": true,
+      "anomalous": false,
+      "trace_ratio": 0.723939,
+      "frobenius": {
+        "disc": "-1964931",
+        "disc_primes": [
+          [
+            "3",
+            1
+          ],
+          [
+            "103",
+            1
+          ],
+          [
+            "6359",
+            1
+          ]
+        ],
+        "disc_unfactored": [],
+        "disc_status": "proved",
+        "cm_disc": "-1964931",
+        "conductor": "1",
+        "conductor_bits": 1,
+        "conductor_primes": [],
+        "conductor_unfactored": [],
+        "conductor_fraction": 0.0,
+        "status": "proved",
+        "class_number": 420,
+        "class_number_status": "proved"
+      },
+      "endomorphism": {
+        "conductor_divides": "1",
+        "conductor": "1",
+        "levels": [],
+        "maximal": true,
+        "status": "proved",
+        "contains": [
+          "Z[π]"
+        ]
+      },
+      "small_primes": [
+        {
+          "ell": 2,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 3,
+          "depth": 0,
+          "splitting": "ramified",
+          "rational_isogenies": 1
+        },
+        {
+          "ell": 5,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        },
+        {
+          "ell": 7,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        },
+        {
+          "ell": 11,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 13,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 17,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 19,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        },
+        {
+          "ell": 23,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 29,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        },
+        {
+          "ell": 31,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        }
+      ],
+      "subfield": {
+        "j_field_degree": null,
+        "definition_degree": null,
+        "base_trace": null,
+        "base_trace_sign_free": false,
+        "status": "not_applicable",
+        "method": "a prime field has no proper subfield"
+      },
+      "subgroup": {
+        "order": "1030723",
+        "bits": 20,
+        "cofactor": "1",
+        "status": "proved",
+        "source": "registry representation"
+      },
+      "embedding": {
+        "degree": "1030722",
+        "lower_bound": null,
+        "complement_bits": 1,
+        "status": "proved"
+      },
+      "twist": {
+        "order": "1033665",
+        "largest_prime_bits": 9,
+        "cofactor": "2055",
+        "status": "proved"
+      },
+      "dissect": {
+        "status": "proved",
+        "torsion": [
+          {
+            "ell": 2,
+            "frobenius": "inert",
+            "point_degree": 3,
+            "full_degree": 3,
+            "isogeny_degree": 3,
+            "all_isogenies_degree": 3,
+            "rational_isogenies": 0,
+            "psi_degrees": "3"
+          },
+          {
+            "ell": 3,
+            "frobenius": "jordan",
+            "point_degree": 2,
+            "full_degree": 6,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 3,
+            "rational_isogenies": 1,
+            "psi_degrees": "1 3"
+          },
+          {
+            "ell": 5,
+            "frobenius": "split",
+            "point_degree": 2,
+            "full_degree": 4,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 4,
+            "rational_isogenies": 2,
+            "psi_degrees": "1^2 2 4^2"
+          },
+          {
+            "ell": 7,
+            "frobenius": "split",
+            "point_degree": 6,
+            "full_degree": 6,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 3,
+            "rational_isogenies": 2
+          },
+          {
+            "ell": 11,
+            "frobenius": "inert",
+            "point_degree": 120,
+            "full_degree": 120,
+            "isogeny_degree": 12,
+            "all_isogenies_degree": 12,
+            "rational_isogenies": 0
+          },
+          {
+            "ell": 13,
+            "frobenius": "inert",
+            "point_degree": 168,
+            "full_degree": 168,
+            "isogeny_degree": 14,
+            "all_isogenies_degree": 14,
+            "rational_isogenies": 0
+          },
+          {
+            "ell": 17,
+            "frobenius": "inert",
+            "point_degree": 72,
+            "full_degree": 72,
+            "isogeny_degree": 9,
+            "all_isogenies_degree": 9,
+            "rational_isogenies": 0
+          },
+          {
+            "ell": 19,
+            "frobenius": "split",
+            "point_degree": 9,
+            "full_degree": 18,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 18,
+            "rational_isogenies": 2
+          }
+        ],
+        "conductor_ratio": {
+          "2": "1471",
+          "3": "1131648",
+          "4": "146298305"
+        },
+        "kn_factorization": {
+          "1n+1": "2^2·167·1543",
+          "1n-1": "2·3·7·11·23·97",
+          "2n+1": "3·73·9413",
+          "2n-1": "5·412289",
+          "3n+1": "2·5·373·829",
+          "3n-1": "2^3·386521",
+          "4n+1": "4122893",
+          "4n-1": "3^2·17·26947",
+          "5n+1": "2^4·3^2·13·2753",
+          "5n-1": "2·53·48619",
+          "6n+1": "7^2·126211",
+          "6n-1": "29·213253",
+          "7n+1": "2·3607531",
+          "7n-1": "2^2·3·5·19·6329",
+          "8n+1": "3·5·549719",
+          "8n-1": "7·13·31·37·79"
+        },
+        "trace_factorization": {
+          "1": "1471",
+          "2": "5·19891"
+        },
+        "twist_order": {
+          "1": "3·5·137·503",
+          "2": "5·109·1954903649"
+        },
+        "small_prime_order_index": {
+          "11": "1",
+          "13": "3",
+          "2": "3",
+          "3": "7",
+          "5": "1",
+          "7": "7"
+        },
+        "pow_distance": {
+          "order": "2^20-15",
+          "subgroup": "2^20-15"
+        },
+        "x962_invariant": "269887",
+        "hamming_x": {
+          "1": 6,
+          "2": 93
+        }
+      },
+      "keys": {
+        "char": "p",
+        "cm": "large",
+        "cofactor": "1",
+        "conductor": "1",
+        "depth": "2:0,3:0,5:0,7:0",
+        "descent": "none",
+        "descent_signed": "none",
+        "embedding": "large",
+        "end_order": "maximal",
+        "family": "prime",
+        "isogenies": "2:0,3:1,5:2,7:2",
+        "jfield": "full",
+        "ordinary": "yes",
+        "source": "registry",
+        "split": "3r5s7s11i13i",
+        "twist_cofactor": "2055"
+      }
+    },
+    {
       "slug": "icv1-fp20-t1009-272b8796",
       "family": "prime",
       "source": {
@@ -102715,6 +103018,323 @@
       }
     },
     {
+      "slug": "icv1-fp24-tm3090-db44b2b1",
+      "family": "prime",
+      "source": {
+        "kind": "registry",
+        "path": null,
+        "curve_uid": null,
+        "registered": true
+      },
+      "field": {
+        "kind": "prime",
+        "degree": 1,
+        "size_bits": 24
+      },
+      "trace": "-3090",
+      "order": "16763924",
+      "order_check": {
+        "status": "proved",
+        "method": "generator certificate: r prime, [r]G = O, r > 4√q"
+      },
+      "ordinary": true,
+      "anomalous": false,
+      "trace_ratio": -0.377382,
+      "frobenius": {
+        "disc": "-57495232",
+        "disc_primes": [
+          [
+            "2",
+            6
+          ],
+          [
+            "71",
+            1
+          ],
+          [
+            "12653",
+            1
+          ]
+        ],
+        "disc_unfactored": [],
+        "disc_status": "proved",
+        "cm_disc": "-898363",
+        "conductor": "8",
+        "conductor_bits": 4,
+        "conductor_primes": [
+          [
+            "2",
+            3
+          ]
+        ],
+        "conductor_unfactored": [],
+        "conductor_fraction": 0.232766,
+        "status": "proved",
+        "class_number": 100,
+        "class_number_status": "proved"
+      },
+      "endomorphism": {
+        "conductor_divides": "2",
+        "conductor": "2",
+        "levels": [
+          {
+            "ell": "2",
+            "depth": 3,
+            "level": 1,
+            "level_at_most": 1,
+            "method": "Frobenius is a scalar on E[ℓ^2], not on E[ℓ^3]"
+          }
+        ],
+        "maximal": false,
+        "status": "proved",
+        "contains": [
+          "Z[π]",
+          "the levels the scalar test on E[ℓ] resolves"
+        ]
+      },
+      "small_primes": [
+        {
+          "ell": 2,
+          "depth": 3,
+          "splitting": "inert",
+          "rational_isogenies": null
+        },
+        {
+          "ell": 3,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 5,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 7,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 11,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 13,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 17,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        },
+        {
+          "ell": 19,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 23,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 29,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        },
+        {
+          "ell": 31,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        }
+      ],
+      "subfield": {
+        "j_field_degree": null,
+        "definition_degree": null,
+        "base_trace": null,
+        "base_trace_sign_free": false,
+        "status": "not_applicable",
+        "method": "a prime field has no proper subfield"
+      },
+      "subgroup": {
+        "order": "4190981",
+        "bits": 22,
+        "cofactor": "4",
+        "status": "proved",
+        "source": "registry representation"
+      },
+      "embedding": {
+        "degree": "4190980",
+        "lower_bound": null,
+        "complement_bits": 1,
+        "status": "proved"
+      },
+      "twist": {
+        "order": "16757744",
+        "largest_prime_bits": 15,
+        "cofactor": "592",
+        "status": "proved"
+      },
+      "dissect": {
+        "status": "proved",
+        "torsion": [
+          {
+            "ell": 2,
+            "frobenius": "scalar",
+            "point_degree": 1,
+            "full_degree": 1,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 1,
+            "rational_isogenies": 3,
+            "psi_degrees": "1^3"
+          },
+          {
+            "ell": 3,
+            "frobenius": "inert",
+            "point_degree": 4,
+            "full_degree": 4,
+            "isogeny_degree": 2,
+            "all_isogenies_degree": 2,
+            "rational_isogenies": 0,
+            "psi_degrees": "2^2"
+          },
+          {
+            "ell": 5,
+            "frobenius": "inert",
+            "point_degree": 8,
+            "full_degree": 8,
+            "isogeny_degree": 2,
+            "all_isogenies_degree": 2,
+            "rational_isogenies": 0,
+            "psi_degrees": "4^3"
+          },
+          {
+            "ell": 7,
+            "frobenius": "inert",
+            "point_degree": 48,
+            "full_degree": 48,
+            "isogeny_degree": 8,
+            "all_isogenies_degree": 8,
+            "rational_isogenies": 0
+          },
+          {
+            "ell": 11,
+            "frobenius": "inert",
+            "point_degree": 6,
+            "full_degree": 6,
+            "isogeny_degree": 3,
+            "all_isogenies_degree": 3,
+            "rational_isogenies": 0
+          },
+          {
+            "ell": 13,
+            "frobenius": "inert",
+            "point_degree": 168,
+            "full_degree": 168,
+            "isogeny_degree": 14,
+            "all_isogenies_degree": 14,
+            "rational_isogenies": 0
+          },
+          {
+            "ell": 17,
+            "frobenius": "split",
+            "point_degree": 8,
+            "full_degree": 16,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 16,
+            "rational_isogenies": 2
+          },
+          {
+            "ell": 19,
+            "frobenius": "inert",
+            "point_degree": 360,
+            "full_degree": 360,
+            "isogeny_degree": 20,
+            "all_isogenies_degree": 20,
+            "rational_isogenies": 0
+          }
+        ],
+        "conductor_ratio": {
+          "2": "3090",
+          "3": "7212733",
+          "4": "74078318940"
+        },
+        "kn_factorization": {
+          "1n+1": "2·3·19·97·379",
+          "1n-1": "2^2·5·209549",
+          "2n+1": "8381963",
+          "2n-1": "3^4·7·14783",
+          "3n+1": "2^4·785809",
+          "3n-1": "2·43·146197",
+          "4n+1": "3·5^2·83·2693",
+          "4n-1": "11·37·41189",
+          "5n+1": "2·7·1496779",
+          "5n-1": "2^3·3·873121",
+          "6n+1": "13·1934299",
+          "6n-1": "5·1973·2549",
+          "7n+1": "2^2·3^2·11·23·3221",
+          "7n-1": "2·13·17·66373",
+          "8n+1": "271·123719",
+          "8n-1": "3·1543·7243"
+        },
+        "trace_factorization": {
+          "1": "-2·3·5·103",
+          "2": "-2·491·24413"
+        },
+        "twist_order": {
+          "1": "2^4·37·28307",
+          "2": "2^2·3^2·757·8537·1207501"
+        },
+        "small_prime_order_index": {
+          "11": "20",
+          "13": "5",
+          "2": "1",
+          "3": "5",
+          "5": "2",
+          "7": "2"
+        },
+        "pow_distance": {
+          "order": "2^24-14",
+          "subgroup": "2^22-12"
+        },
+        "x962_invariant": "14814803",
+        "hamming_x": {
+          "1": 13,
+          "2": 148
+        }
+      },
+      "keys": {
+        "char": "p",
+        "cm": "-898363",
+        "cofactor": "4",
+        "conductor": "smooth",
+        "depth": "2:3,3:0,5:0,7:0",
+        "descent": "none",
+        "descent_signed": "none",
+        "embedding": "large",
+        "end_order": "non-maximal",
+        "family": "prime",
+        "isogenies": "2:3,3:0,5:0,7:0",
+        "jfield": "full",
+        "ordinary": "yes",
+        "source": "registry",
+        "split": "3i5i7i11i13i",
+        "twist_cofactor": "592"
+      }
+    },
+    {
       "slug": "icv1-fp24-tm5099-a6f137c6",
       "family": "prime",
       "source": {
@@ -135301,6 +135921,331 @@
       }
     },
     {
+      "slug": "icv1-fp26-t5908-23ba8088",
+      "family": "prime",
+      "source": {
+        "kind": "registry",
+        "path": null,
+        "curve_uid": null,
+        "registered": true
+      },
+      "field": {
+        "kind": "prime",
+        "degree": 1,
+        "size_bits": 26
+      },
+      "trace": "5908",
+      "order": "67098862",
+      "order_check": {
+        "status": "proved",
+        "method": "generator certificate: r prime, [r]G = O, r > 4√q"
+      },
+      "ordinary": true,
+      "anomalous": false,
+      "trace_ratio": 0.360607,
+      "frobenius": {
+        "disc": "-233514612",
+        "disc_primes": [
+          [
+            "2",
+            2
+          ],
+          [
+            "3",
+            2
+          ],
+          [
+            "29",
+            1
+          ],
+          [
+            "47",
+            1
+          ],
+          [
+            "4759",
+            1
+          ]
+        ],
+        "disc_unfactored": [],
+        "disc_status": "proved",
+        "cm_disc": "-25946068",
+        "conductor": "3",
+        "conductor_bits": 2,
+        "conductor_primes": [
+          [
+            "3",
+            1
+          ]
+        ],
+        "conductor_unfactored": [],
+        "conductor_fraction": 0.11403,
+        "status": "proved",
+        "class_number": null,
+        "class_number_status": "not_evaluated"
+      },
+      "endomorphism": {
+        "conductor_divides": "3",
+        "conductor": "3",
+        "levels": [
+          {
+            "ell": "3",
+            "depth": 1,
+            "level": 1,
+            "level_at_most": 1,
+            "method": "Frobenius is not a scalar on E[ℓ]: the floor"
+          }
+        ],
+        "maximal": false,
+        "status": "proved",
+        "contains": [
+          "Z[π]",
+          "the levels the scalar test on E[ℓ] resolves"
+        ]
+      },
+      "small_primes": [
+        {
+          "ell": 2,
+          "depth": 0,
+          "splitting": "ramified",
+          "rational_isogenies": 1
+        },
+        {
+          "ell": 3,
+          "depth": 1,
+          "splitting": "inert",
+          "rational_isogenies": null
+        },
+        {
+          "ell": 5,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 7,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 11,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 13,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 17,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 19,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        },
+        {
+          "ell": 23,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        },
+        {
+          "ell": 29,
+          "depth": 0,
+          "splitting": "ramified",
+          "rational_isogenies": 1
+        },
+        {
+          "ell": 31,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        }
+      ],
+      "subfield": {
+        "j_field_degree": null,
+        "definition_degree": null,
+        "base_trace": null,
+        "base_trace_sign_free": false,
+        "status": "not_applicable",
+        "method": "a prime field has no proper subfield"
+      },
+      "subgroup": {
+        "order": "33549431",
+        "bits": 25,
+        "cofactor": "2",
+        "status": "proved",
+        "source": "registry representation"
+      },
+      "embedding": {
+        "degree": "16774715",
+        "lower_bound": null,
+        "complement_bits": 2,
+        "status": "proved"
+      },
+      "twist": {
+        "order": "67110678",
+        "largest_prime_bits": 22,
+        "cofactor": "18",
+        "status": "proved"
+      },
+      "dissect": {
+        "status": "proved",
+        "torsion": [
+          {
+            "ell": 2,
+            "frobenius": "jordan",
+            "point_degree": 1,
+            "full_degree": 2,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 2,
+            "rational_isogenies": 1,
+            "psi_degrees": "1 2"
+          },
+          {
+            "ell": 3,
+            "frobenius": "jordan",
+            "point_degree": 2,
+            "full_degree": 6,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 3,
+            "rational_isogenies": 1,
+            "psi_degrees": "1 3"
+          },
+          {
+            "ell": 5,
+            "frobenius": "inert",
+            "point_degree": 12,
+            "full_degree": 12,
+            "isogeny_degree": 3,
+            "all_isogenies_degree": 3,
+            "rational_isogenies": 0,
+            "psi_degrees": "6^2"
+          },
+          {
+            "ell": 7,
+            "frobenius": "inert",
+            "point_degree": 12,
+            "full_degree": 12,
+            "isogeny_degree": 2,
+            "all_isogenies_degree": 2,
+            "rational_isogenies": 0
+          },
+          {
+            "ell": 11,
+            "frobenius": "inert",
+            "point_degree": 40,
+            "full_degree": 40,
+            "isogeny_degree": 4,
+            "all_isogenies_degree": 4,
+            "rational_isogenies": 0
+          },
+          {
+            "ell": 13,
+            "frobenius": "inert",
+            "point_degree": 84,
+            "full_degree": 84,
+            "isogeny_degree": 7,
+            "all_isogenies_degree": 7,
+            "rational_isogenies": 0
+          },
+          {
+            "ell": 17,
+            "frobenius": "inert",
+            "point_degree": 288,
+            "full_degree": 288,
+            "isogeny_degree": 18,
+            "all_isogenies_degree": 18,
+            "rational_isogenies": 0
+          },
+          {
+            "ell": 19,
+            "frobenius": "split",
+            "point_degree": 9,
+            "full_degree": 18,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 18,
+            "rational_isogenies": 2
+          }
+        ],
+        "conductor_ratio": {
+          "2": "5908",
+          "3": "32200305",
+          "4": "586694377192"
+        },
+        "kn_factorization": {
+          "1n+1": "2^3·3·7·17^2·691",
+          "1n-1": "2·5·83^2·487",
+          "2n+1": "13·5161451",
+          "2n-1": "3^5·19·14533",
+          "3n+1": "2·43·1170329",
+          "3n-1": "2^2·61·412493",
+          "4n+1": "3·5^2·73·127·193",
+          "4n-1": "11·3137·3889",
+          "5n+1": "2^2·71·590659",
+          "5n-1": "2·3·41·681899",
+          "6n+1": "201296587",
+          "6n-1": "5·7·317·18143",
+          "7n+1": "2·3^2·11·31·38261",
+          "7n-1": "2^6·3669469",
+          "8n+1": "7·38342207",
+          "8n-1": "3·37·2417977"
+        },
+        "trace_factorization": {
+          "1": "2^2·7·211",
+          "2": "-2·11·131·34457"
+        },
+        "twist_order": {
+          "1": "2·3^2·3728371",
+          "2": "2^4·233·2801·5381·80141"
+        },
+        "small_prime_order_index": {
+          "11": "1",
+          "13": "5",
+          "2": "10",
+          "3": "2",
+          "5": "10",
+          "7": "2"
+        },
+        "pow_distance": {
+          "order": "2^26-14",
+          "subgroup": "2^25-13"
+        },
+        "x962_invariant": "55993110",
+        "hamming_x": {
+          "1": 12,
+          "2": 166
+        }
+      },
+      "keys": {
+        "char": "p",
+        "cm": "large",
+        "cofactor": "2",
+        "conductor": "smooth",
+        "depth": "2:0,3:1,5:0,7:0",
+        "descent": "none",
+        "descent_signed": "none",
+        "embedding": "large",
+        "end_order": "non-maximal",
+        "family": "prime",
+        "isogenies": "2:1,3:1,5:0,7:0",
+        "jfield": "full",
+        "ordinary": "yes",
+        "source": "registry",
+        "split": "3i5i7i11i13i",
+        "twist_cofactor": "18"
+      }
+    },
+    {
       "slug": "icv1-fp27-t16691-005dba65",
       "family": "prime",
       "source": {
@@ -155987,6 +156932,317 @@
         "source": "registry",
         "split": "3i5s7i11i13s",
         "twist_cofactor": "3362"
+      }
+    },
+    {
+      "slug": "icv1-fp28-tm7557-9dd7f10c",
+      "family": "prime",
+      "source": {
+        "kind": "registry",
+        "path": null,
+        "curve_uid": null,
+        "registered": true
+      },
+      "field": {
+        "kind": "prime",
+        "degree": 1,
+        "size_bits": 28
+      },
+      "trace": "-7557",
+      "order": "268377479",
+      "order_check": {
+        "status": "proved",
+        "method": "generator certificate: r prime, [r]G = O, r > 4√q"
+      },
+      "ordinary": true,
+      "anomalous": false,
+      "trace_ratio": -0.230649,
+      "frobenius": {
+        "disc": "-1016371435",
+        "disc_primes": [
+          [
+            "5",
+            1
+          ],
+          [
+            "17",
+            1
+          ],
+          [
+            "43",
+            1
+          ],
+          [
+            "487",
+            1
+          ],
+          [
+            "571",
+            1
+          ]
+        ],
+        "disc_unfactored": [],
+        "disc_status": "proved",
+        "cm_disc": "-1016371435",
+        "conductor": "1",
+        "conductor_bits": 1,
+        "conductor_primes": [],
+        "conductor_unfactored": [],
+        "conductor_fraction": 0.0,
+        "status": "proved",
+        "class_number": null,
+        "class_number_status": "not_evaluated"
+      },
+      "endomorphism": {
+        "conductor_divides": "1",
+        "conductor": "1",
+        "levels": [],
+        "maximal": true,
+        "status": "proved",
+        "contains": [
+          "Z[π]"
+        ]
+      },
+      "small_primes": [
+        {
+          "ell": 2,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 3,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 5,
+          "depth": 0,
+          "splitting": "ramified",
+          "rational_isogenies": 1
+        },
+        {
+          "ell": 7,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 11,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        },
+        {
+          "ell": 13,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        },
+        {
+          "ell": 17,
+          "depth": 0,
+          "splitting": "ramified",
+          "rational_isogenies": 1
+        },
+        {
+          "ell": 19,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        },
+        {
+          "ell": 23,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        },
+        {
+          "ell": 29,
+          "depth": 0,
+          "splitting": "split",
+          "rational_isogenies": 2
+        },
+        {
+          "ell": 31,
+          "depth": 0,
+          "splitting": "inert",
+          "rational_isogenies": 0
+        }
+      ],
+      "subfield": {
+        "j_field_degree": null,
+        "definition_degree": null,
+        "base_trace": null,
+        "base_trace_sign_free": false,
+        "status": "not_applicable",
+        "method": "a prime field has no proper subfield"
+      },
+      "subgroup": {
+        "order": "268377479",
+        "bits": 28,
+        "cofactor": "1",
+        "status": "proved",
+        "source": "registry representation"
+      },
+      "embedding": {
+        "degree": "268377478",
+        "lower_bound": null,
+        "complement_bits": 1,
+        "status": "proved"
+      },
+      "twist": {
+        "order": "268362365",
+        "largest_prime_bits": 14,
+        "cofactor": "17195",
+        "status": "proved"
+      },
+      "dissect": {
+        "status": "proved",
+        "torsion": [
+          {
+            "ell": 2,
+            "frobenius": "inert",
+            "point_degree": 3,
+            "full_degree": 3,
+            "isogeny_degree": 3,
+            "all_isogenies_degree": 3,
+            "rational_isogenies": 0,
+            "psi_degrees": "3"
+          },
+          {
+            "ell": 3,
+            "frobenius": "inert",
+            "point_degree": 4,
+            "full_degree": 4,
+            "isogeny_degree": 2,
+            "all_isogenies_degree": 2,
+            "rational_isogenies": 0,
+            "psi_degrees": "2^2"
+          },
+          {
+            "ell": 5,
+            "frobenius": "jordan",
+            "point_degree": 2,
+            "full_degree": 10,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 5,
+            "rational_isogenies": 1,
+            "psi_degrees": "1^2 5^2"
+          },
+          {
+            "ell": 7,
+            "frobenius": "inert",
+            "point_degree": 8,
+            "full_degree": 8,
+            "isogeny_degree": 4,
+            "all_isogenies_degree": 4,
+            "rational_isogenies": 0
+          },
+          {
+            "ell": 11,
+            "frobenius": "split",
+            "point_degree": 5,
+            "full_degree": 10,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 2,
+            "rational_isogenies": 2
+          },
+          {
+            "ell": 13,
+            "frobenius": "split",
+            "point_degree": 12,
+            "full_degree": 12,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 6,
+            "rational_isogenies": 2
+          },
+          {
+            "ell": 17,
+            "frobenius": "jordan",
+            "point_degree": 4,
+            "full_degree": 68,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 17,
+            "rational_isogenies": 1
+          },
+          {
+            "ell": 19,
+            "frobenius": "split",
+            "point_degree": 2,
+            "full_degree": 18,
+            "isogeny_degree": 1,
+            "all_isogenies_degree": 18,
+            "rational_isogenies": 2
+          }
+        ],
+        "conductor_ratio": {
+          "2": "7557",
+          "3": "211261672",
+          "4": "3624575948301"
+        },
+        "kn_factorization": {
+          "1n+1": "2^3·3^2·5·7·281·379",
+          "1n-1": "2·23·31·53^2·67",
+          "2n+1": "13·19·71·127·241",
+          "2n-1": "3·17·181·58147",
+          "3n+1": "2·11·36596929",
+          "3n-1": "2^2·373·539633",
+          "4n+1": "3·357836639",
+          "4n-1": "5·12347·17389",
+          "5n+1": "2^2·335471849",
+          "5n-1": "2·3·61·83·163·271",
+          "6n+1": "5^3·29·59·7529",
+          "6n-1": "7·41·1193·4703",
+          "7n+1": "2·3·11701·26759",
+          "7n-1": "2^4·117415147",
+          "8n+1": "7·13883·22093",
+          "8n-1": "3^3·11·37·47·4157"
+        },
+        "trace_factorization": {
+          "1": "-3·11·229",
+          "2": "-7·61·139·8081"
+        },
+        "twist_order": {
+          "1": "5·19·181·15607",
+          "2": "3^2·17·149·25589·123462953"
+        },
+        "small_prime_order_index": {
+          "11": "2",
+          "13": "1",
+          "2": "2",
+          "3": "2",
+          "5": "2",
+          "7": "2"
+        },
+        "pow_distance": {
+          "order": "2^28-16",
+          "subgroup": "2^28-16"
+        },
+        "x962_invariant": "107983917",
+        "hamming_x": {
+          "1": 15,
+          "2": 177
+        }
+      },
+      "keys": {
+        "char": "p",
+        "cm": "large",
+        "cofactor": "1",
+        "conductor": "1",
+        "depth": "2:0,3:0,5:0,7:0",
+        "descent": "none",
+        "descent_signed": "none",
+        "embedding": "large",
+        "end_order": "maximal",
+        "family": "prime",
+        "isogenies": "2:0,3:0,5:1,7:0",
+        "jfield": "full",
+        "ordinary": "yes",
+        "source": "registry",
+        "split": "3i5r7i11s13s",
+        "twist_cofactor": "17195"
       }
     },
     {

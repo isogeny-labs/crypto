@@ -23,7 +23,7 @@ writer.add_metadata(
     {
         "/Title": "Catalog-wide curve-cover transfer assessment",
         "/Subject": subject,
-        "/Creator": "Pandoc, Tectonic, pypdf 6.0.0",
+        "/Creator": "Pandoc, XeLaTeX, pypdf 6.17.0",
         "/CreationDate": "D:20261019000000Z",
         "/ModDate": "D:20261019000000Z",
     }
