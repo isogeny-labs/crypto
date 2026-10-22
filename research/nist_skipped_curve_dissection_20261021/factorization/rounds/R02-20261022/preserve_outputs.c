@@ -46,13 +46,10 @@ static void scan(void) {
 }
 
 int main(int argc, char **argv) {
-    if (argc != 4) {
-        fprintf(stderr, "usage: preserve-outputs SOURCE RETAINED OWNER_PID\n");
+    if (argc < 4) {
+        fprintf(stderr, "usage: preserve-outputs SOURCE RETAINED OWNER_PID...\n");
         return 2;
     }
-    char *end;
-    long owner = strtol(argv[3], &end, 10);
-    if (!*argv[3] || *end || owner <= 0 || owner > INT_MAX) return 2;
     if (mkdir(argv[2], 0700) != 0 && errno != EEXIST) { perror("mkdir"); return 1; }
     source_fd = open(argv[1], O_RDONLY | O_DIRECTORY | O_CLOEXEC);
     retained_fd = open(argv[2], O_RDONLY | O_DIRECTORY | O_CLOEXEC);
@@ -63,15 +60,23 @@ int main(int argc, char **argv) {
     }
     setvbuf(stdout, NULL, _IOLBF, 0);
     scan();
-    int process = (int)syscall(SYS_pidfd_open, (pid_t)owner, 0);
-    if (process < 0) {
-        if (errno == ESRCH) return 0;
-        perror("pidfd_open"); return 1;
+    struct pollfd *fds = calloc((size_t)argc - 2, sizeof(*fds));
+    if (!fds) { perror("calloc"); return 1; }
+    fds[0] = (struct pollfd){notify, POLLIN, 0};
+    int active = 0;
+    for (int i = 3; i < argc; i++) {
+        char *end;
+        long owner = strtol(argv[i], &end, 10);
+        if (!*argv[i] || *end || owner <= 0 || owner > INT_MAX) return 2;
+        int process = (int)syscall(SYS_pidfd_open, (pid_t)owner, 0);
+        if (process < 0 && errno != ESRCH) { perror("pidfd_open"); return 1; }
+        fds[i - 2] = (struct pollfd){process, POLLIN, 0};
+        if (process >= 0) active++;
     }
-    struct pollfd fds[2] = {{notify, POLLIN, 0}, {process, POLLIN, 0}};
+    if (!active) return 0;
     union { struct inotify_event align; char bytes[65536]; } buffer;
     for (;;) {
-        if (poll(fds, 2, -1) < 0) {
+        if (poll(fds, (nfds_t)argc - 2, -1) < 0) {
             if (errno == EINTR) continue;
             perror("poll"); return 1;
         }
@@ -83,9 +88,16 @@ int main(int argc, char **argv) {
             if (event->len) retain(event->name);
             offset += (ssize_t)sizeof(*event) + event->len;
         }
-        if (fds[1].revents) { scan(); break; }
+        for (int i = 1; i < argc - 2; i++) {
+            if (fds[i].fd >= 0 && fds[i].revents) {
+                close(fds[i].fd);
+                fds[i].fd = -1;
+                active--;
+            }
+        }
+        if (!active) { scan(); break; }
     }
-    close(process);
+    free(fds);
     close(notify);
     close(source_fd);
     close(retained_fd);
