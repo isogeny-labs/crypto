@@ -2,6 +2,7 @@
 
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from research.n83_highk_beyond4405_20261021 import holdout, verify_holdout
 
@@ -30,10 +31,28 @@ def rows(highk_times, k1107_times):
 class CrossFamilyHoldoutTests(unittest.TestCase):
     def test_k1107_runtime_matches_source_bound_manifest(self):
         folder = Path("/tmp/n83_k1107_manifest_gate")
-        env = holdout.ic_environment(folder, holdout.K1107_ARM)
+        source = holdout.run.ROOT / "examples/koblitz_orbit_dlp_fast.rs"
+        digest = holdout.run.digest
+        # Exercise the frozen source contract even after the repository's
+        # worker advances. The production gate still hashes the actual file.
+        def frozen_digest(path):
+            if path == source:
+                return "58e3ee492093de5f6b760b96e3aba819fa479cdecd22b1adee94f0ecb26026d8"
+            return digest(path)
+        with patch.object(holdout.run, "digest", side_effect=frozen_digest):
+            env = holdout.ic_environment(folder, holdout.K1107_ARM)
         self.assertEqual(env["KIC_DUMP_BASE"], str(folder / "base_dump.jsonl"))
         self.assertEqual(env["KIC_ROOT_ONLY11"], "1")
         self.assertEqual(env["KIC_INDEXED5_LOAD75"], "1")
+
+    def test_k1107_rejects_changed_source(self):
+        source = holdout.run.ROOT / "examples/koblitz_orbit_dlp_fast.rs"
+        digest = holdout.run.digest
+        with patch.object(holdout.run, "digest", side_effect=lambda path:
+                          "0" * 64 if path == source else digest(path)):
+            with self.assertRaisesRegex(ValueError, "candidate differs"):
+                holdout.ic_environment(Path("/tmp/n83_k1107_changed_source"),
+                                       holdout.K1107_ARM)
 
     def test_schedule_pairs_same_points_and_balances_order(self):
         schedule = holdout.events(HIGHK_ID)
