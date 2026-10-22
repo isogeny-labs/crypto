@@ -30,8 +30,9 @@ Earlier rounds:
      to one column each after the `[h]` projection.  At matched columns the
      two systems are the same size.
    - What a quotient buys is yield.  An arbitrary base pushed forward to
-     `E/H` keeps its columns and degree, but every image lies in an
-     index-`|H|` subgroup with the target.
+     `E/H` can lose columns through image collisions; every image lies in
+     an index-`|H|` subgroup with the target. Five of the 112 recorded arms
+     have one fewer column than requested, as detailed below.
    - Decompositions per target grew as `|H|^{1.001 ± 0.036}` over
      `|H| = 2` to 200, with 0 lift failures in 112 arms on 15 curves.
    - F4 cost is unchanged on targets with no solution.  Targets with a
@@ -75,6 +76,16 @@ Earlier rounds:
    - The maximum solving degree stayed 3.
 
 ## E6. Pushed-forward base, yield at matched columns
+
+The requested column counts are matched; the realized counts differ in
+five of the 112 arm records. For the h = 72 floor, the E[h] quotient has
+63 columns at c = 64. For the h = 50 crater, both the C2 and E[h]
+quotients have 31 columns at c = 32 and 63 at c = 64. The direct arms
+retain 32 or 64 columns. These image collisions mean the pooled yield
+ratios and exponent below are not a strictly equal-column comparison in
+every arm. The original counts, ratios, fit and lift checks are retained;
+see the `columns` entries in [`TABLES.md`](TABLES.md) and the run report's
+F4 discussion. No adjusted fit or new experiment is claimed here.
 
 ![Quotient over direct decompositions against |H|](reports/run-20261012T0228Z/e6_yield_ratio.svg)
 
