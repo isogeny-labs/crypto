@@ -1,17 +1,17 @@
 # Sign-safe Kummer relation labels for a genus-2 collector
 
-- **Status:** `open`
-- **Kind:** implementation and proof gap, with a proved ordinary-addition obstruction
+- **Status:** `partly resolved`; fixed-difference full collector measured, arbitrary-jump sidecar open
+- **Kind:** restricted implementation and proof gap, with a proved ordinary-addition obstruction
 - **Affected work:** [four-follow-up protocol](../research/four_followups_20261021/PROTOCOL.md), Kummer walk arithmetic
 - **Next action owner:** PR #2304 follow-up
 - **Last updated:** 2026-10-22
 
 ## Problem
 
-No differential Kummer walk with a checked sign/lift recovery rule currently
-preserves the signed relation labels required by the arbitrary-jump genus-2
-collector. The requested completion is a 1,260-target source-verified full
-collector priced against matched rho, not merely fast scalar multiplication.
+A fixed-difference differential Kummer walk now preserves checked signed
+relation labels through a full 1,260-target genus-2 collector. The original
+arbitrary-jump collector still lacks a constant-size signed sidecar update;
+its distinct recurrence and cost claim remain open.
 
 ## Evidence and uncertainty
 
@@ -32,6 +32,15 @@ collector priced against matched rho, not merely fast scalar multiplication.
   models. Each had 10 square-scale choices among 20 ordered root pairs.
   This establishes the normalized equation, not theta constants or Kummer
   projection coordinates.
+- **Observed:** [The matched full collector](../research/kummer_differential_collector_20261022/MATCHED_REPORT.md)
+  solved and source-verified all 1,260 frozen targets and ran 1,260 fresh
+  source rho controls in the same native process. Its independent replay and
+  validation gate passed. Across 36 full-cold price cells its candidate/rho
+  ratio was 8.959687–55.935424, with zero cells and zero of 45,360
+  target/cell comparisons below rho. At `S/M=0.5`, `I/M=10`, native charge
+  `0.1`, the ratio was 14.356662. The exact rows, costs, graph and PDF are
+  in that study; the [cross-lead packet](../research/four_followups_review_20261022/REPORT.md)
+  provides a common schema.
 - **Derived or proved:** Unsigned Kummer classes alone cannot define the
   binary ordinary addition used by this arbitrary-jump walk; the witness is
   exact for each transferred subgroup of order greater than four.
@@ -45,17 +54,12 @@ collector priced against matched rho, not merely fast scalar multiplication.
   If `J` has order `m`, every nonempty such `S` contains at least `m` offsets.
   This rules out a constant-size sidecar of that exact form for a large-order
   jump; it does not rule out other recurrences or walks.
-- **Suspected explanation:** A differential walk with a known difference or
-  signed Jacobian anchors may allow fast Kummer pseudogroup steps, but its
-  relation labels and total cost are unknown.
-- **Missing capability:** Explicit Kummer coordinates and differential
-  formulas for these models, an efficient walk invariant that updates the
-  needed difference/anchor sidecar as the arbitrary jump changes, and a
-  checked lift of every collected relation in a full collector. The local
-  signed-lift rule is reference-checked, but the required sidecar recurrence
-  is not implemented or proved efficient.
-- **What this evidence does not establish:** It does not rule out all Kummer
-  collectors or yield a performance ratio to rho.
+- **Remaining gap:** The fixed-difference implementation supplies explicit
+  coordinates, checked differential formulas, signed recovery and a full
+  priced collector. It does not supply the sidecar recurrence for the frozen
+  arbitrary-jump walk or a cost measurement for that specific walk.
+- **What this evidence does not establish:** The measured loss of this
+  fixed-difference collector does not bound every Kummer collector.
 
 ## What would unblock it
 
@@ -63,12 +67,12 @@ collector priced against matched rho, not merely fast scalar multiplication.
   recovery, including negation, identity and two-torsion cases.
 - [ ] Specify and prove an efficiently updatable walk state with the needed
   difference/anchor sidecar under changing arbitrary jumps and cycle closure.
-- [ ] Implement and cross-check the Kummer formulas against the Jacobian on
-  all 21 models, then run and independently replay the 1,260 frozen targets
-  with complete cold pricing and matched source rho.
+- [x] Implement and cross-check Kummer formulas against the Jacobian on all
+  21 models, then run and independently replay 1,260 frozen targets with
+  complete cold pricing and matched source rho for a fixed-difference walk.
 
-The first condition makes the proposed collector mathematically usable; the
-second measures it. The full rational two-torsion gate alone is insufficient.
+The completed measurement belongs to the fixed-difference walk. A separate
+arbitrary-jump measurement requires the still-open recurrence.
 
 ## Next discriminating step
 
@@ -107,3 +111,9 @@ unresolved.
 2026-10-22 addendum: Exact `Fp` Rosenhain normalization passed on 21/21
 models. Theta coordinates, fast Kummer operations, signed jump recurrence,
 and full-collector costs remain unresolved.
+
+2026-10-22 matched collector: Explicit fixed-difference arithmetic and signed
+recovery passed; all 1,260 candidate and same-process rho controls were
+source-verified and independently replayed. Full-cold candidate/rho ratios
+were 8.959687–55.935424 across 36 cells. The arbitrary-jump sidecar remains
+unimplemented.
