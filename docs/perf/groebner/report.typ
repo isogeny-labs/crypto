@@ -453,7 +453,12 @@ text("2026-10-21 / 43e01b10"),
 text("679,551,773"),
 text("691,602,032"),
 text("91.335"),
-text("97.133"))]
+text("97.133"),
+text("2026-10-22 / 02b37807"),
+text("679,551,773"),
+text("691,602,032"),
+text("57.057"),
+text("61.964"))]
 
 #text("Historical Python-orchestrated perf.history/v1 snapshots; no new performance run or speedup claim.")
 
@@ -465,7 +470,7 @@ text("97.133"))]
 
 #text("X positions are measured revision order, labelled with UTC commit date and revision; spacing is not elapsed time.")
 
-#text("Evidence: 89 imported perf.history/v1 snapshots; historical_sources in plot-data.json retains raw filenames, SHA-256 hashes, hosts, harnesses and sample counts.")
+#text("Evidence: 90 imported perf.history/v1 snapshots; historical_sources in plot-data.json retains raw filenames, SHA-256 hashes, hosts, harnesses and sample counts.")
 #text("Source data and provenance: plot-data.json and REPORT.md. These plots do not establish an end-to-end ECDLP gain.")
 #pagebreak()
 = Boolean solver calls: F4 and F5
@@ -918,7 +923,12 @@ text("2026-10-21 / 43e01b10"),
 text("1,790,221,126"),
 text("1,810,013,121"),
 text("174.595"),
-text("176.646"))]
+text("176.646"),
+text("2026-10-22 / 02b37807"),
+text("1,790,217,528"),
+text("1,810,009,523"),
+text("120.350"),
+text("123.189"))]
 
 #text("Historical Python-orchestrated perf.history/v1 snapshots; no new performance run or speedup claim.")
 
@@ -930,7 +940,7 @@ text("176.646"))]
 
 #text("X positions are measured revision order, labelled with UTC commit date and revision; spacing is not elapsed time.")
 
-#text("Evidence: 89 imported perf.history/v1 snapshots; historical_sources in plot-data.json retains raw filenames, SHA-256 hashes, hosts, harnesses and sample counts.")
+#text("Evidence: 90 imported perf.history/v1 snapshots; historical_sources in plot-data.json retains raw filenames, SHA-256 hashes, hosts, harnesses and sample counts.")
 #text("Source data and provenance: plot-data.json and REPORT.md. These plots do not establish an end-to-end ECDLP gain.")
 #pagebreak()
 = Complete Boolean calls: allocation history
