@@ -2,9 +2,10 @@
 """Lay out summary.json (written by examples/scalar_mul_timing_analyze.rs) as
 a figure; every plotted number is already in summary.json.
 
-    plot.py <study_dir>
+    plot.py <study_dir> [summary.json] [fig_timing]
 
-Writes fig_timing.svg and a 150 dpi PNG of it into <study_dir>.
+Writes <fig>.svg and a 150 dpi PNG of it into <study_dir>; run 2
+(PROTOCOL.md, amendment 1) is `summary-run2.json fig_timing_run2`.
 """
 import json
 import sys
@@ -29,7 +30,10 @@ plt.rcParams.update({
 })
 
 d = Path(sys.argv[1])
-s = json.loads((d / "summary.json").read_text())
+summary = sys.argv[2] if len(sys.argv) > 2 else "summary.json"
+stem = sys.argv[3] if len(sys.argv) > 3 else "fig_timing"
+run = "run 2" if "run2" in summary else "run 1"
+s = json.loads((d / summary).read_text())
 curves = s["curves"]
 
 fig, axes = plt.subplots(1, len(curves), figsize=(5 * len(curves), 4), sharey=True)
@@ -47,9 +51,9 @@ for ax, c in zip(axes, curves):
     ax.set_title(f"{c['curve']}: full-length cost after/before {c['cost_median']:.2f}×")
 axes[0].set_ylabel("time ÷ time of full-length scalars\n(median over rounds; bars: round range)")
 axes[0].legend(fontsize=8, loc="lower left")
-fig.suptitle("scalar_mul_secret on the generic affine ladder: time against scalar length, "
+fig.suptitle(f"scalar_mul_secret on the generic affine ladder ({run}): time against scalar length, "
              f"before and after (A/A band δ = {s['delta']:.3f})", fontsize=9)
 fig.tight_layout()
-fig.savefig(d / "fig_timing.svg")
-fig.savefig(d / "fig_timing.png", dpi=150)
+fig.savefig(d / f"{stem}.svg")
+fig.savefig(d / f"{stem}.png", dpi=150)
 print("figure written to", d)

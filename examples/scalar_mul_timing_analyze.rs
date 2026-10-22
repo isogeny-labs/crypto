@@ -1,9 +1,11 @@
 //! Analysis for `research/scalar_mul_ct_timing_20261022` (PROTOCOL.md):
-//! reads `raw/timing.jsonl` and `raw/isolation.jsonl`, writes
-//! `summary.json` beside them and prints a Markdown summary.
+//! reads `<raw>/timing.jsonl` and `<raw>/isolation.jsonl`, writes
+//! `<summary>` into the study directory and prints a Markdown summary.
+//! `<raw>` defaults to `raw` (run 1) and `<summary>` to `summary.json`;
+//! run 2 (PROTOCOL.md, amendment 1) is `raw-run2 summary-run2.json`.
 //!
 //! ```sh
-//! cargo run --release --example scalar_mul_timing_analyze -- research/scalar_mul_ct_timing_20261022
+//! cargo run --release --example scalar_mul_timing_analyze -- research/scalar_mul_ct_timing_20261022 [raw] [summary.json]
 //! ```
 
 use std::collections::BTreeMap;
@@ -65,9 +67,12 @@ fn digests(curve: &Value) -> Vec<String> {
 }
 
 fn main() {
-    let dir = std::path::PathBuf::from(std::env::args().nth(1).expect("study directory"));
-    let runs = read_jsonl(&dir.join("raw/timing.jsonl"));
-    let iso: BTreeMap<String, Value> = read_jsonl(&dir.join("raw/isolation.jsonl"))
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    let dir = std::path::PathBuf::from(args.first().expect("study directory"));
+    let raw = dir.join(args.get(1).map_or("raw", String::as_str));
+    let out = dir.join(args.get(2).map_or("summary.json", String::as_str));
+    let runs = read_jsonl(&raw.join("timing.jsonl"));
+    let iso: BTreeMap<String, Value> = read_jsonl(&raw.join("isolation.jsonl"))
         .into_iter()
         .map(|r| (r["label"].as_str().unwrap().to_string(), r))
         .collect();
@@ -220,10 +225,7 @@ fn main() {
         "verdicts": {"leak_present_on_A": leak_on_a, "closed_on_B": closed_on_b},
         "curves": curves_out,
     });
-    std::fs::write(
-        dir.join("summary.json"),
-        serde_json::to_string_pretty(&summary).unwrap() + "\n",
-    )
-    .expect("write summary.json");
-    eprintln!("wrote {}", dir.join("summary.json").display());
+    std::fs::write(&out, serde_json::to_string_pretty(&summary).unwrap() + "\n")
+        .expect("write summary.json");
+    eprintln!("wrote {}", out.display());
 }
