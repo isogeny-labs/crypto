@@ -53,6 +53,7 @@ jobs:
           if [ "$toolchain" = pinned ]; then toolchain=$(cat tools/lean/lean-toolchain); fi
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain "$toolchain"
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+          echo "ELAN_TOOLCHAIN=$toolchain" >> "$GITHUB_ENV"
       - run: tools/lean/selftest/run.sh
 
   discover:
