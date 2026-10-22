@@ -5199,6 +5199,9 @@ impl PairTable {
             kind: "negation_folded",
             entries: map.len() as u64,
             map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
         }
