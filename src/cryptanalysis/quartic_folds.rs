@@ -449,6 +449,8 @@ pub struct ArmReport {
     pub wiedemann_constant: f64,
     pub solved: bool,
     pub correct: bool,
+    /// Scalar recovered from the square core, retained for independent replay.
+    pub recovered: Option<u64>,
     /// Rows identical to one already kept, skipped.  On the `ψ` arm two
     /// decompositions of one target that differ by `P + ψP + ψ²P = O`
     /// fold to the same row; the control keeps them in distinct columns.
@@ -525,6 +527,7 @@ impl Arm {
         if dd.is_some_and(|dd| curve.mul(&inst.g, dd) == inst.q) {
             self.rep.solved = true;
             self.rep.correct = dd == Some(inst.d);
+            self.rep.recovered = dd;
             self.rep.unknowns = sel.len();
             self.rep.filtered_out = self.rels.len() - sel.len();
             self.rep.la_ops_last = self.rep.la_ops - before;
@@ -548,6 +551,8 @@ pub enum RhoFold {
     Negation,
     /// `{±ψ^k P}` (`j = 0` instances only).
     Psi,
+    /// The quartic twist Frobenius and cubic automorphism, order 24.
+    Twist24,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -562,6 +567,8 @@ pub struct RhoRun4F {
     /// Fruitless cycles met and escaped by doubling.
     pub cycle_escapes: u64,
     pub correct: bool,
+    /// Collision-recovered scalar, including failed or unverified candidates.
+    pub recovered: Option<u64>,
 }
 
 /// An r-adding walk with exhaustive storage on class representatives.
@@ -604,6 +611,7 @@ pub fn rho4_folded(inst: &FoldInstance4, fold: RhoFold, seed: u64) -> RhoRun4F {
                     best
                 }
             }
+            RhoFold::Twist24 => unreachable!("use rho_twist24 for this action"),
         }
     };
     let part = |pt: &Pt4| -> usize {
@@ -668,6 +676,7 @@ pub fn rho4_folded(inst: &FoldInstance4, fold: RhoFold, seed: u64) -> RhoRun4F {
         fp_muls: f.muls(),
         cycle_escapes,
         correct: found == Some(inst.d),
+        recovered: found,
     }
 }
 
@@ -839,6 +848,571 @@ pub fn run_k4_folds(
     })
 }
 
+/// The canonical model `y²=x³+b₀t³`, where `t⁴=d` and `d` is the least
+/// nonsquare, is a quadratic twist of `y²=x³+b₀` over `F_p`.  On this model
+/// the transported `p`-Frobenius preserves the existing `x∈F_p` line.
+#[derive(Clone, Copy, Debug)]
+pub struct Twist24Instance {
+    pub core: FoldInstance4,
+    pub b0: u64,
+    pub z: u64,
+    pub h2: u64,
+    pub h3_degree: usize,
+    pub h3_coeff: u64,
+    pub lambda_frob: u64,
+}
+
+impl Twist24Instance {
+    pub fn frob(&self, curve: &Curve4, pt: &Pt4) -> Pt4 {
+        if pt.inf {
+            return *pt;
+        }
+        let f = &curve.f;
+        Pt4 {
+            x: f.scale(&f.frob_p(&pt.x, self.z), self.h2),
+            y: f.mul_monomial(&f.frob_p(&pt.y, self.z), self.h3_coeff, self.h3_degree),
+            inf: false,
+        }
+    }
+}
+
+fn root_of_order(curve: &Curve4, g: &Pt4, image: &Pt4, n: u64, order: u64) -> u64 {
+    let u = (2..n)
+        .map(|a| pow_mod(a, (n - 1) / order, n))
+        .find(|&a| {
+            if order == 3 {
+                a != 1
+            } else {
+                pow_mod(a, 4, n) == n - 1
+            }
+        })
+        .expect("requested eigenvalue root does not exist");
+    (1..order)
+        .filter(|&j| order == 3 || j % 2 == 1)
+        .map(|j| pow_mod(u, j, n))
+        .find(|&l| curve.mul(g, l) == *image)
+        .expect("endomorphism is not the predicted eigenvalue")
+}
+
+pub fn construct_twist24(p: u64, b0: u64, seed: u64) -> Result<Twist24Instance, String> {
+    if p % 12 != 1 || !is_prime_u64(p) || b0 == 0 || b0 >= p {
+        return Err("p must be prime ≡1 (mod 12), and 0<b₀<p".into());
+    }
+    let f0 = Curve4::with_params(p, E4::ZERO, E4::ZERO);
+    let f = &f0.f;
+    let t = E4([0, 1, 0, 0]);
+    if f.is_square(&t) {
+        return Err("quartic generator is not a nonsquare".into());
+    }
+    let z = f.pow(&t, (p - 1) as u128);
+    if !z.in_fp() || pow_mod(z.0[0], 2, p) != p - 1 {
+        return Err("quartic generator lacks order-four Frobenius eigenvalue".into());
+    }
+    let h = f.pow(&t, (p as u128).pow(4) - 1 - (p - 1) as u128 / 2);
+    let h2 = f.sq(&h);
+    let h3 = f.mul(&h2, &h);
+    if !h2.in_fp() || h2.is_zero() {
+        return Err("Frobenius x multiplier is not in Fp".into());
+    }
+    let monomials: Vec<_> = h3.0.iter().enumerate().filter(|&(_, &v)| v != 0).collect();
+    if monomials.len() != 1 {
+        return Err("Frobenius y multiplier is not a monomial".into());
+    }
+    let (h3_degree, &h3_coeff) = monomials[0];
+    let t3 = f.mul(&f.sq(&t), &t);
+    let curve = Curve4::with_params(p, E4::ZERO, f.scale(&t3, b0));
+    let mut count = 1u64;
+    for x in 0..p {
+        let v = (pow_mod(x, 3, p) + b0) % p;
+        count += if v == 0 {
+            1
+        } else if pow_mod(v, (p - 1) / 2, p) == 1 {
+            2
+        } else {
+            0
+        };
+    }
+    let tr = (p + 1) as i128 - count as i128;
+    let tr2 = tr * tr - 2 * p as i128;
+    let tr4 = tr2 * tr2 - 2 * (p as i128).pow(2);
+    let order = (p as i128).pow(4) + 1 + tr4;
+    if order <= 0 || order > u64::MAX as i128 {
+        return Err("group order does not fit u64".into());
+    }
+    let n = order as u64;
+    if !is_prime_u64(n) || n <= 4 * p * p {
+        return Err("selected twist has no Hasse-unique prime full order".into());
+    }
+    let omega = (2..p)
+        .map(|a| pow_mod(a, (p - 1) / 3, p))
+        .find(|&a| a != 1)
+        .ok_or("no cubic automorphism")?;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x2424_474c_53);
+    let g = (1..p)
+        .find_map(|x| curve.lift_x(&f.from_fp(x), &mut rng))
+        .ok_or("the invariant line is empty")?;
+    if !curve.mul(&g, n).inf {
+        return Err("prime-order certificate failed".into());
+    }
+    let d = 271u64;
+    let mut inst = Twist24Instance {
+        core: FoldInstance4 {
+            family: Family4::Psi,
+            p,
+            a: E4::ZERO,
+            b: curve.b,
+            group_order: n,
+            n,
+            cofactor: 1,
+            g,
+            d,
+            q: curve.mul(&g, d),
+            omega,
+            lambda: 0,
+            x0: E4::ZERO,
+            c: 0,
+        },
+        b0,
+        z: z.0[0],
+        h2: h2.0[0],
+        h3_degree,
+        h3_coeff,
+        lambda_frob: 0,
+    };
+    let cubic_g = inst.core.psi(&curve, &g, 1);
+    inst.core.lambda = root_of_order(&curve, &g, &cubic_g, n, 3);
+    let frob_g = inst.frob(&curve, &g);
+    inst.lambda_frob = root_of_order(&curve, &g, &frob_g, n, 8);
+    if pow_mod(inst.lambda_frob, 4, n) != n - 1 || pow_mod(inst.core.lambda, 3, n) != 1 {
+        return Err("endomorphism eigenvalues have wrong orders".into());
+    }
+    Ok(inst)
+}
+
+/// One point per liftable abscissa, with coefficients to an orbit
+/// representative. `combined=false` is the E18 cubic fold on exactly the
+/// same physical base; `combined=true` adds twist Frobenius.
+fn twist24_points(inst: &Twist24Instance, curve: &Curve4, seed: u64) -> Vec<Pt4> {
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x1A4F_01D5);
+    let points: Vec<Pt4> = (1..inst.core.p)
+        .filter_map(|x| curve.lift_x(&curve.f.from_fp(x), &mut rng))
+        .collect();
+    assert!(!points.is_empty());
+    points
+}
+
+fn twist24_columns(
+    inst: &Twist24Instance,
+    curve: &Curve4,
+    points: Vec<Pt4>,
+    combined: bool,
+) -> FoldedBase4 {
+    let index: HashMap<u64, usize> = points
+        .iter()
+        .enumerate()
+        .map(|(i, pt)| (pt.x.0[0], i))
+        .collect();
+    let mut col = vec![usize::MAX; points.len()];
+    let mut coef = vec![0u64; points.len()];
+    let mut columns = 0;
+    for (i, &rep) in points.iter().enumerate() {
+        if col[i] != usize::MAX {
+            continue;
+        }
+        for j in 0..(if combined { 4 } else { 1 }) {
+            let mut image = rep;
+            for _ in 0..j {
+                image = inst.frob(&curve, &image);
+            }
+            let fj = pow_mod(inst.lambda_frob, j, inst.core.n);
+            for k in 0..3 {
+                let transformed = inst.core.psi(&curve, &image, k);
+                let multiplier = mulm(
+                    fj,
+                    pow_mod(inst.core.lambda, k as u64, inst.core.n),
+                    inst.core.n,
+                );
+                assert!(transformed.x.in_fp());
+                let &idx = index.get(&transformed.x.0[0]).expect("orbit left the base");
+                let v = if points[idx].y == transformed.y {
+                    multiplier
+                } else if points[idx].y == curve.f.neg(&transformed.y) {
+                    (inst.core.n - multiplier) % inst.core.n
+                } else {
+                    panic!("orbit point is neither P nor −P");
+                };
+                if col[idx] != usize::MAX {
+                    assert_eq!(col[idx], columns);
+                    assert_eq!(coef[idx], v);
+                } else {
+                    col[idx] = columns;
+                    coef[idx] = v;
+                }
+            }
+        }
+        columns += 1;
+    }
+    assert!(col.iter().all(|&v| v != usize::MAX));
+    FoldedBase4 {
+        points,
+        col,
+        coef,
+        columns,
+        points_per_column: index.len() as f64 / columns as f64,
+    }
+}
+
+pub fn twist24_base(inst: &Twist24Instance, seed: u64, combined: bool) -> FoldedBase4 {
+    let curve = inst.core.curve();
+    twist24_columns(inst, &curve, twist24_points(inst, &curve, seed), combined)
+}
+
+/// A matched rho walk on all 24 classes.  It uses E18's jump table,
+/// look-ahead, fruitless-cycle escape and charging convention.
+pub fn rho_twist24(inst: &Twist24Instance, seed: u64) -> RhoRun4F {
+    let curve = inst.core.curve();
+    let f = &curve.f;
+    let n = inst.core.n;
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x8D04_F01D);
+    let jumps = 32usize;
+    let canon = |pt: Pt4| -> (Pt4, u64) {
+        if pt.inf {
+            return (pt, 1);
+        }
+        let mut best = (pt, 1u64);
+        let mut image = pt;
+        let mut multiplier = 1u64;
+        for j in 0..4 {
+            if j > 0 {
+                image = inst.frob(&curve, &image);
+                multiplier = mulm(multiplier, inst.lambda_frob, n);
+            }
+            for k in 0..3u32 {
+                let candidate = inst.core.psi(&curve, &image, k);
+                let m = mulm(multiplier, pow_mod(inst.core.lambda, k as u64, n), n);
+                if candidate.x < best.0.x {
+                    best = (candidate, m);
+                }
+            }
+        }
+        let ny = f.neg(&best.0.y);
+        if ny < best.0.y {
+            (Pt4 { y: ny, ..best.0 }, (n - best.1) % n)
+        } else {
+            best
+        }
+    };
+    let part = |pt: &Pt4| -> usize {
+        let h = pt.x.0[0] ^ pt.x.0[1].wrapping_mul(0x9E37_79B9) ^ pt.x.0[2].rotate_left(17);
+        (mix64(h ^ pt.x.0[3].rotate_left(29)) % jumps as u64) as usize
+    };
+    let mults: Vec<(u64, u64, Pt4)> = (0..jumps)
+        .map(|_| {
+            let a = rng.gen_range(0..n);
+            let b = rng.gen_range(1..n);
+            (
+                a,
+                b,
+                curve.add(&curve.mul(&inst.core.g, a), &curve.mul(&inst.core.q, b)),
+            )
+        })
+        .collect();
+    let mut table: HashMap<Pt4, (u64, u64)> = HashMap::new();
+    let (mut steps, mut cycle_escapes) = (0u64, 0u64);
+    let mut found = None;
+    let cap = 64 * (n as f64).sqrt() as u64 + 1_000_000;
+    let mut a = rng.gen_range(0..n);
+    let mut b = rng.gen_range(1..n);
+    let (mut pt, mult) = canon(curve.add(&curve.mul(&inst.core.g, a), &curve.mul(&inst.core.q, b)));
+    a = mulm(a, mult, n);
+    b = mulm(b, mult, n);
+    while steps <= cap {
+        steps += 1;
+        if let Some(&(a2, b2)) = table.get(&pt) {
+            let db = (b + n - b2) % n;
+            if db != 0 {
+                found = Some(mulm((a2 + n - a) % n, inv_mod(db, n), n));
+                break;
+            }
+            cycle_escapes += 1;
+            let (doubled, m) = canon(curve.add(&pt, &pt));
+            pt = doubled;
+            a = mulm(mulm(2, a, n), m, n);
+            b = mulm(mulm(2, b, n), m, n);
+            continue;
+        }
+        table.insert(pt, (a, b));
+        let mut j = part(&pt);
+        let (mut next, mut m) = canon(curve.add(&pt, &mults[j].2));
+        if part(&next) == j {
+            j = (j + 1) % jumps;
+            (next, m) = canon(curve.add(&pt, &mults[j].2));
+        }
+        a = mulm((a + mults[j].0) % n, m, n);
+        b = mulm((b + mults[j].1) % n, m, n);
+        pt = next;
+    }
+    let correct = found == Some(inst.core.d)
+        && found.is_some_and(|d| curve.mul(&inst.core.g, d) == inst.core.q);
+    RhoRun4F {
+        fold: RhoFold::Twist24,
+        seed,
+        steps,
+        group_ops: curve.ops(),
+        fp_muls: f.muls(),
+        cycle_escapes,
+        correct,
+        recovered: found,
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct TwistRelationRecord {
+    pub a: u64,
+    pub b: u64,
+    pub terms: Vec<(usize, i64)>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct K4Twist24Report {
+    pub p: u64,
+    pub b0: u64,
+    pub seed: u64,
+    pub n: u64,
+    pub z: u64,
+    pub omega: u64,
+    pub lambda_frob: u64,
+    pub lambda_cubic: u64,
+    pub generator_x: [u64; 4],
+    pub generator_y: [u64; 4],
+    pub target_x: [u64; 4],
+    pub target_y: [u64; 4],
+    pub known_scalar: u64,
+    pub base_points: usize,
+    pub base_coordinates: Vec<([u64; 4], [u64; 4])>,
+    pub selected_relations: Vec<TwistRelationRecord>,
+    pub flat_rows: Vec<SparseRel>,
+    pub cubic_rows: Vec<SparseRel>,
+    pub twist24_rows: Vec<SparseRel>,
+    pub residuals: u64,
+    pub targets_computed: u64,
+    pub decompositions: u64,
+    pub targets_decomposed: u64,
+    pub decompositions_per_target: [u64; 10],
+    pub base_fp_muls: u64,
+    pub cubic_map_fp_muls: u64,
+    pub twist_map_fp_muls: u64,
+    pub table_fp_muls: u64,
+    pub stream_fp_muls: u64,
+    pub verification_fp_muls: [u64; 3],
+    pub targets_computed_at_solve: [u64; 3],
+    pub stream_fp_muls_at_solve: [u64; 3],
+    pub flat: ArmReport,
+    pub cubic: ArmReport,
+    pub twist24: ArmReport,
+    pub rho: Vec<RhoRun4F>,
+    pub wall_ms: f64,
+}
+
+fn folded_row(
+    terms: &[(usize, i64)],
+    fb: &FoldedBase4,
+    n: u64,
+    small: usize,
+    a: u64,
+    b: u64,
+) -> SparseRel {
+    let mut merged = HashMap::<usize, u64>::new();
+    for &(i, s) in terms {
+        let v = if s == 1 {
+            fb.coef[i]
+        } else {
+            (n - fb.coef[i]) % n
+        };
+        let e = merged.entry(fb.col[i]).or_insert(0);
+        *e = (*e + v) % n;
+    }
+    let mut cols: Vec<(usize, u64)> = merged.into_iter().filter(|&(_, v)| v != 0).collect();
+    cols.push((small, (n - b) % n));
+    cols.sort_unstable();
+    SparseRel { cols, rhs: a }
+}
+
+/// Three equal-physical-base IC arms and their matched rho controls.
+pub fn run_k4_twist24(
+    p: u64,
+    b0: u64,
+    seed: u64,
+    rho_runs: usize,
+) -> Result<K4Twist24Report, String> {
+    let started = Instant::now();
+    let inst = construct_twist24(p, b0, seed)?;
+    let core = &inst.core;
+    let n = core.n;
+    let curve = core.curve();
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x1A4F_01D5);
+    curve.f.reset_muls();
+    let base = twist24_points(&inst, &curve, seed);
+    let base_fp_muls = curve.f.muls();
+    let cubic_fb = twist24_columns(&inst, &curve, base.clone(), false);
+    let cubic_map_fp_muls = curve.f.muls() - base_fp_muls;
+    let twist_fb = twist24_columns(&inst, &curve, base.clone(), true);
+    let twist_map_fp_muls = curve.f.muls() - base_fp_muls - cubic_map_fp_muls;
+    assert_eq!(cubic_fb.points, twist_fb.points);
+    assert_eq!(cubic_fb.columns * 3, base.len());
+    assert_eq!(twist_fb.columns * 12, base.len());
+    let table = pair_table(&curve, &base);
+    let table_fp_muls = curve.f.muls() - base_fp_muls - cubic_map_fp_muls - twist_map_fp_muls;
+    let mut arms = [
+        Arm::new("flat", base.len()),
+        Arm::new("cubic", cubic_fb.columns),
+        Arm::new("twist24", twist_fb.columns),
+    ];
+    let (mut residuals, mut decompositions, mut targets_decomposed) = (0u64, 0u64, 0u64);
+    let mut targets_computed = 0u64;
+    let mut per_target = [0u64; 10];
+    let mut selected_relations = Vec::new();
+    let mut verification_fp_muls = [0u64; 3];
+    let mut worker_fp_muls = 0u64;
+    let mut targets_computed_at_solve = [0u64; 3];
+    let mut stream_fp_muls_at_solve = [0u64; 3];
+    while residuals < 50_000_000 && !arms.iter().all(|a| a.rep.solved) {
+        let batch: Vec<(u64, u64)> = (0..64)
+            .map(|_| (rng.gen_range(0..n), rng.gen_range(1..n)))
+            .collect();
+        let found: Vec<(u64, u64, Pt4, Vec<Vec<(usize, i64)>>, u64)> = batch
+            .par_iter()
+            .map(|&(a, b)| {
+                let c = core.curve();
+                let r = c.add(&c.mul(&core.g, a), &c.mul(&core.q, b));
+                let decs = mitm_signed(&c, &base, &table, &r);
+                (a, b, r, decs, c.f.muls())
+            })
+            .collect();
+        targets_computed += found.len() as u64;
+        worker_fp_muls += found.iter().map(|row| row.4).sum::<u64>();
+        for (a, b, r, decs, _) in found {
+            residuals += 1;
+            let mut good = Vec::new();
+            for terms in decs {
+                let mut acc = r;
+                for &(i, s) in &terms {
+                    acc = if s == 1 {
+                        curve.sub(&acc, &base[i])
+                    } else {
+                        curve.add(&acc, &base[i])
+                    };
+                }
+                if acc.inf {
+                    decompositions += 1;
+                    good.push(terms);
+                }
+            }
+            per_target[good.len().min(9)] += 1;
+            if !good.is_empty() {
+                targets_decomposed += 1;
+                let terms = good.swap_remove(rng.gen_range(0..good.len()));
+                selected_relations.push(TwistRelationRecord {
+                    a,
+                    b,
+                    terms: terms.clone(),
+                });
+                if !arms[0].rep.solved {
+                    let mut cols: Vec<(usize, u64)> = terms
+                        .iter()
+                        .map(|&(i, s)| (i, if s == 1 { 1 } else { n - 1 }))
+                        .collect();
+                    cols.push((arms[0].small, (n - b) % n));
+                    cols.sort_unstable();
+                    arms[0].push(SparseRel { cols, rhs: a });
+                }
+                if !arms[1].rep.solved {
+                    let small = arms[1].small;
+                    arms[1].push(folded_row(&terms, &cubic_fb, n, small, a, b));
+                }
+                if !arms[2].rep.solved {
+                    let small = arms[2].small;
+                    arms[2].push(folded_row(&terms, &twist_fb, n, small, a, b));
+                }
+            }
+            for (i, arm) in arms.iter_mut().enumerate() {
+                let before = curve.f.muls();
+                let was_solved = arm.rep.solved;
+                arm.attempt(core, &curve, &mut rng, residuals);
+                verification_fp_muls[i] += curve.f.muls() - before;
+                if !was_solved && arm.rep.solved {
+                    targets_computed_at_solve[i] = targets_computed;
+                    stream_fp_muls_at_solve[i] = worker_fp_muls + curve.f.muls()
+                        - base_fp_muls
+                        - cubic_map_fp_muls
+                        - twist_map_fp_muls
+                        - table_fp_muls
+                        - verification_fp_muls.iter().sum::<u64>();
+                }
+            }
+            if arms.iter().all(|arm| arm.rep.solved) {
+                break;
+            }
+        }
+    }
+    let stream_fp_muls = worker_fp_muls + curve.f.muls()
+        - base_fp_muls
+        - cubic_map_fp_muls
+        - twist_map_fp_muls
+        - table_fp_muls
+        - verification_fp_muls.iter().sum::<u64>();
+    let jobs: Vec<(RhoFold, u64)> = [RhoFold::Negation, RhoFold::Psi, RhoFold::Twist24]
+        .iter()
+        .flat_map(|&fold| (0..rho_runs as u64).map(move |k| (fold, seed * 1000 + k)))
+        .collect();
+    let rho: Vec<RhoRun4F> = jobs
+        .par_iter()
+        .map(|&(fold, s)| match fold {
+            RhoFold::Twist24 => rho_twist24(&inst, s),
+            _ => rho4_folded(core, fold, s),
+        })
+        .collect();
+    Ok(K4Twist24Report {
+        p,
+        b0,
+        seed,
+        n,
+        z: inst.z,
+        omega: core.omega,
+        lambda_frob: inst.lambda_frob,
+        lambda_cubic: core.lambda,
+        generator_x: core.g.x.0,
+        generator_y: core.g.y.0,
+        target_x: core.q.x.0,
+        target_y: core.q.y.0,
+        known_scalar: core.d,
+        base_points: base.len(),
+        base_coordinates: base.iter().map(|pt| (pt.x.0, pt.y.0)).collect(),
+        selected_relations,
+        flat_rows: arms[0].rels.clone(),
+        cubic_rows: arms[1].rels.clone(),
+        twist24_rows: arms[2].rels.clone(),
+        residuals,
+        targets_computed,
+        decompositions,
+        targets_decomposed,
+        decompositions_per_target: per_target,
+        base_fp_muls,
+        cubic_map_fp_muls,
+        twist_map_fp_muls,
+        table_fp_muls,
+        stream_fp_muls,
+        verification_fp_muls,
+        targets_computed_at_solve,
+        stream_fp_muls_at_solve,
+        flat: arms[0].rep.clone(),
+        cubic: arms[1].rep.clone(),
+        twist24: arms[2].rep.clone(),
+        rho,
+        wall_ms: started.elapsed().as_secs_f64() * 1e3,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -946,6 +1520,46 @@ mod log_tests {
 #[cfg(test)]
 mod rho_tests {
     use super::*;
+
+    #[test]
+    fn quartic_twist_action_and_line_columns_replay() {
+        let inst = construct_twist24(37, 2, 0).unwrap();
+        let curve = inst.core.curve();
+        let cubic = twist24_base(&inst, 0, false);
+        let combined = twist24_base(&inst, 0, true);
+        assert_eq!(cubic.points, combined.points);
+        assert_eq!(cubic.columns, 12);
+        assert_eq!(combined.columns, 3);
+        let h = curve.f.pow(&E4([0, 1, 0, 0]), (37u128).pow(4) - 1 - 18);
+        let h2 = curve.f.sq(&h);
+        let h3 = curve.f.mul(&h2, &h);
+        for pt in &combined.points {
+            let generic = Pt4 {
+                x: curve.f.mul(&h2, &curve.f.pow(&pt.x, 37)),
+                y: curve.f.mul(&h3, &curve.f.pow(&pt.y, 37)),
+                inf: false,
+            };
+            assert_eq!(inst.frob(&curve, pt), generic);
+            assert_eq!(inst.frob(&curve, pt), curve.mul(pt, inst.lambda_frob));
+            assert_eq!(
+                inst.core.psi(&curve, pt, 1),
+                curve.mul(pt, inst.core.lambda)
+            );
+        }
+        let a = E4([1, 2, 3, 4]);
+        let z = inst.z;
+        assert_eq!(curve.f.frob_p(&a, z), curve.f.pow(&a, 37));
+        let mut monomial = E4::ZERO;
+        monomial.0[inst.h3_degree] = inst.h3_coeff;
+        assert_eq!(
+            curve.f.mul_monomial(&a, inst.h3_coeff, inst.h3_degree),
+            curve.f.mul(&a, &monomial)
+        );
+        for seed in 0..8 {
+            let row = rho_twist24(&inst, seed);
+            assert!(row.correct && row.recovered == Some(271));
+        }
+    }
 
     /// Each walk takes the steps its class size predicts: `√(π n / 2w)`,
     /// `w = 1, 2, 6`, so the unfolded walk takes `√2` and `√6` times the
