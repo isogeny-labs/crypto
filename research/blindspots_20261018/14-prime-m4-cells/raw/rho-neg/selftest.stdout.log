@@ -1,0 +1,47 @@
+selftest: number theory ok
+selftest: cell 16 ok (p=48479, n=48383, bx=8)
+selftest: cell 20 ok (p=661603, n=660917, bx=15)
+selftest: cell 24 ok (p=10539323, n=10542893, bx=29)
+selftest: cell 28 ok (p=248685287, n=248685841, bx=63)
+selftest: S3 ok
+selftest: S5 interpolated in 0.06s
+selftest: S5 ok (vanishes on planted sums, interpolation exact)
+selftest: arm a, 16 bits: 200 targets agree with the pair table (8 decomposable); 20 planted found
+selftest: arm a, 20 bits: 200 targets agree with the pair table (13 decomposable); 20 planted found
+selftest: arm b bx=4 planted=true: dim Some(24) = brute 24 (madds 12966121, steps 12, 25 ms)
+selftest: arm b bx=4 planted=false: dim Some(0) = brute 0 (madds 13322960, steps 12, 31 ms)
+selftest: arm b bx=4 planted=true: dim Some(12) = brute 12 (madds 13293491, steps 12, 27 ms)
+selftest: arm b bx=4 planted=true: dim Some(24) = brute 24 (madds 12965615, steps 12, 26 ms)
+selftest: arm b bx=4 planted=false: dim Some(0) = brute 0 (madds 13322203, steps 12, 25 ms)
+selftest: arm b bx=4 planted=true: dim Some(12) = brute 12 (madds 13293350, steps 12, 26 ms)
+selftest: arm b bx=5 planted=true: dim Some(24) = brute 24 (madds 155233177, steps 16, 244 ms)
+selftest: arm b bx=5 planted=false: dim Some(0) = brute 0 (madds 155743427, steps 16, 234 ms)
+selftest: arm b bx=5 planted=true: dim Some(12) = brute 12 (madds 155714688, steps 16, 227 ms)
+selftest: arm b bx=5 planted=true: dim Some(24) = brute 24 (madds 155237892, steps 16, 233 ms)
+selftest: arm b bx=5 planted=false: dim Some(0) = brute 0 (madds 155745124, steps 16, 238 ms)
+selftest: arm b bx=5 planted=true: dim Some(12) = brute 12 (madds 155714299, steps 16, 249 ms)
+selftest: arm b bx=6 planted=true: dim Some(24) = brute 24 (madds 1158363890, steps 20, 2052 ms)
+selftest: arm b bx=6 planted=false: dim Some(0) = brute 0 (madds 1158902994, steps 20, 2000 ms)
+selftest: arm b bx=6 planted=true: dim Some(12) = brute 12 (madds 1158867132, steps 20, 2049 ms)
+selftest: arm b bx=6 planted=true: dim Some(24) = brute 24 (madds 1158373513, steps 20, 1958 ms)
+selftest: arm b bx=6 planted=false: dim Some(0) = brute 0 (madds 1158904240, steps 20, 1909 ms)
+selftest: arm b bx=6 planted=true: dim Some(12) = brute 12 (madds 1158866532, steps 20, 1981 ms)
+selftest: full IC arm a, 16 bits, run 0: ok, 148 attempts, 9 hits, rank 9
+selftest: full IC arm a, 16 bits, run 1: ok, 189 attempts, 12 hits, rank 9
+selftest: full IC arm a, 16 bits, run 2: ok, 158 attempts, 9 hits, rank 9
+selftest: rho 16 bits run 0: ok, 508 adds, 20 walks
+selftest: rho 16 bits run 1: ok, 310 adds, 6 walks
+selftest: rho 16 bits run 2: ok, 524 adds, 10 walks
+selftest: rho-neg canonical form ok
+selftest: rho-neg 16 bits run 0: ok, 577 adds, 338 steps, 17 walks, 0 fruitless cycles
+selftest: rho-neg 16 bits run 1: ok, 377 adds, 156 steps, 9 walks, 0 fruitless cycles
+selftest: rho-neg 16 bits run 2: ok, 349 adds, 127 steps, 8 walks, 0 fruitless cycles
+selftest: rho-neg 16 bits, 400 runs: mean steps 207.0 = 1.062 x sqrt(pi n/4) (194.9); mean online GAE 261.6; plain rho mean steps 339.7 = 1.232 x sqrt(pi n/2) (275.7), mean online GAE 366.5; plain/neg online GAE 1.401 (sqrt 2 = 1.414)
+selftest: rho-neg 16 bits fruitless handling: 140 cycles (4 of length 2), 2745 look-ahead refusals, 0 exhausted, 574 escape GAE, 5 abandoned walks
+selftest: rho-neg 20 bits, 200 runs: mean steps 727.6 = 1.010 x sqrt(pi n/4) (720.5); mean online GAE 826.9; plain rho mean steps 1131.6 = 1.111 x sqrt(pi n/2) (1018.9), mean online GAE 1226.4; plain/neg online GAE 1.483 (sqrt 2 = 1.414)
+selftest: rho-neg 20 bits fruitless handling: 146 cycles (4 of length 2), 4931 look-ahead refusals, 0 exhausted, 631 escape GAE, 0 abandoned walks
+selftest: rho-neg 24 bits, 40 runs: mean steps 2998.7 = 1.042 x sqrt(pi n/4) (2877.6); mean online GAE 3239.5; plain rho mean steps 4156.8 = 1.021 x sqrt(pi n/2) (4069.5), mean online GAE 4311.5; plain/neg online GAE 1.331 (sqrt 2 = 1.414)
+selftest: rho-neg 24 bits fruitless handling: 165 cycles (1 of length 2), 4047 look-ahead refusals, 0 exhausted, 706 escape GAE, 1 abandoned walks
+selftest: rho-neg positive control (no look-ahead, 50 runs): 289 fruitless 2-cycles detected and escaped, 50/50 solved
+selftest: reach control ok (0.05556, 0.10000, 0.11905)
+SELFTEST OK (19.7s)
