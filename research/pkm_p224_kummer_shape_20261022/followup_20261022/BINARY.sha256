@@ -1,0 +1,5 @@
+e731c65114686cfed033295f2b31960c155930b38a54ac45130ae8f47e2e32b1  pkm_tower_pilot (fixed; every follow-up run except the E2 baseline arms)
+803fae9946b0154dd9cace544c435f29df15be93d2e064354a9117c41a1759ac  pkm_tower_pilot (pre-fix baseline; E2 baseline arms only)
+fixed: built from commit cf444326b4d1106308b869890f02024fbbd41bea (the amendment and the code, committed before any follow-up run)
+pre-fix: built from the tree at 72c731766 (origin/main merged into the follow-up branch), before the memory changes
+rustc 1.97.0 (2d8144b78 2026-07-07); cargo build --release --example pkm_tower_pilot; host 4 vCPU Xeon, 15 GiB, shared

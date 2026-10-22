@@ -1,0 +1,33 @@
+# E1: fixed binary, 1 thread, against the frozen rows (R4 for SL20, R16 for SL24 N=20)
+N=16 target=0 muladds=5655588913 EQUAL
+N=16 target=1 muladds=5655591362 EQUAL
+N=18 target=0 muladds=45950099888 EQUAL
+N=18 target=1 muladds=45950131690 EQUAL
+N=20 target=0 muladds=481870230601 EQUAL
+N=20 target=1 muladds=481871397391 EQUAL
+ALL 6 ROWS EQUAL
+N=20 target=0 muladds=481871455568 EQUAL
+ALL 1 ROWS EQUAL
+-- repository comparator (pkm_tower_check compare-rows):
+6 rows compared, 0 differences
+1 rows compared, 0 differences
+
+# E2: fixed binary against the pre-fix binary, same cell, same thread count (2)
+== N=20 fixed vs pre-fix
+N=20 target=0 muladds=481961794016 EQUAL
+ALL 1 ROWS EQUAL
+== N=20 fixed + MALLOC_ARENA_MAX=2 vs pre-fix
+N=20 target=0 muladds=481961794016 EQUAL
+ALL 1 ROWS EQUAL
+== N=22 fixed vs pre-fix
+N=22 target=0 muladds=4877824907495 EQUAL
+ALL 1 ROWS EQUAL
+-- repository comparator:
+1 rows compared, 0 differences
+
+# E3: fixed binary at N=24, steps 1-25 and the stop line, against R18b's trace
+TRACES EQUAL (26 lines)
+25 steps compared, 25 identical
+
+# R20c (4 threads), steps 1-25, against R18b's trace (2 threads)
+25 steps compared, 25 identical

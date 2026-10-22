@@ -1,0 +1,27 @@
+70 distinct systems; 0 repeated measurements (0 disagreeing on a deterministic field); 0 rows in the format before `solving_degree_max`, skipped.
+
+### kummer, m = 2, tower, p = 1, f4_tower_generic
+
+| N | runs | timeouts | D (median, range) | width to solution (median) | F4 steps to solution (median) | F4 ms (median) |
+|--:|--:|--:|:--|--:|--:|--:|
+| 2 | 6 | 0 | 3 (3–3) | 4 | 2 | 0.3 |
+| 4 | 6 | 0 | 4 (4–4) | 16 | 4 | 0.3 |
+| 6 | 6 | 0 | 4 (4–4) | 56 | 6 | 1.0 |
+| 8 | 6 | 0 | 4 (4–4) | 152 | 8 | 4.5 |
+| 10 | 6 | 0 | 4 (4–4) | 337 | 10 | 17.3 |
+| 12 | 6 | 0 | 5 (5–5) | 1231 | 13 | 92.0 |
+| 14 | 6 | 0 | 5 (5–5) | 2304 | 15 | 481.0 |
+| 16 | 8 | 0 | 5 (5–5) | 4789 | 17 | 3861.5 |
+| 18 | 8 | 0 | 5 (5–5) | 8644 | 20 | 29491.4 |
+| 20 | 9 | 0 | 6 (6–6) | 33446 | 24 | 366362.0 |
+| 22 | 2 | 0 | 6 (6–6) | 51909 | 28 | 2647855.8 |
+| 24 | 1 | 0 | 6 (6–6) | 103785 | 30 | 7245424.7 |
+
+D = 3.06 + 0.131·N over N = 2…24 (12 values). Pre-registered bootstrap (targets within N): beta 95% [0.131, 0.131] (degenerate: no variance within any N); rule on it: inconclusive.
+Leave-one-N-out slopes of D: 0.118 to 0.136.
+Slope of D over the upper half, N = 14…24: 0.129.
+Final plateau: D = 6 over N = 20…24, length L = 4.
+A1 (section 11.6): inconclusive (upper-half slope 0.129 over N = 14…24, final plateau L = 4).
+log2(width) slope 0.672 per unit N over the whole range; 0.568 over the upper half.
+
+Planted-solution violations: 0 of 70 rows.

@@ -5,7 +5,7 @@
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 chrome=${CHROME:-/opt/pw-browsers/chromium-1194/chrome-linux/chrome}
-for svg in "$here"/figures/*.svg; do
+for svg in "$here"/figures/*.svg "$here"/followup_20261022/figures/*.svg; do
   png=${svg%.svg}.png
   "$chrome" --headless=new --no-sandbox --hide-scrollbars --force-device-scale-factor=1.5625 \
     --window-size=860,607 --screenshot="$png" "file://$svg" > /dev/null 2>&1
@@ -25,7 +25,7 @@ h1 { font-size: 17pt; } h2 { font-size: 13pt; } h3 { font-size: 11pt; }
 CSS
 pandoc "$here/README.md" --from gfm --to html5 --standalone --metadata title="PKM Kummer tower at P-224's 2-adic shape" \
   --include-in-header="$tmp/style.html" --resource-path="$here" -o "$tmp/report.html"
-sed -i "s#src=\"figures/#src=\"file://$here/figures/#g" "$tmp/report.html"
+sed -i -e "s#src=\"figures/#src=\"file://$here/figures/#g" -e "s#src=\"followup_20261022/figures/#src=\"file://$here/followup_20261022/figures/#g" "$tmp/report.html"
 "$chrome" --headless=new --no-sandbox --no-pdf-header-footer --print-to-pdf="$here/report.pdf" "file://$tmp/report.html" > /dev/null 2>&1
 rm -rf "$tmp"
 ls -la "$here/report.pdf"

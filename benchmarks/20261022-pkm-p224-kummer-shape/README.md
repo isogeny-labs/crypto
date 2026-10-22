@@ -16,3 +16,5 @@ lower bound 1.9 x 10^9 times rho at 20 bits. No speedup is claimed.
 independent-host replay certificate and a validator report, which this session did not have
 (one host, replays by `ecbench verify` on the same host class). The result is a null/negative
 one and stays in its research directory.
+
+Updated 2026-10-22: `report.pdf` here is the study's current report, which now carries the addendum (section 8; browsing copies of its refreshed graphs are in [`../20261022-pkm-p224-followup/`](../20261022-pkm-p224-followup/)). The graphs in this directory are the frozen ones.

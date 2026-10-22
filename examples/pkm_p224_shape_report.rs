@@ -1089,8 +1089,112 @@ fn main() {
             Path::new(&a[4]),
             &a[5..].iter().map(PathBuf::from).collect::<Vec<_>>(),
         ),
+        Some("mem") => cmd_mem(
+            Path::new(&a[2]),
+            Path::new(&a[3]),
+            &a[4..].iter().map(PathBuf::from).collect::<Vec<_>>(),
+        ),
         _ => {
-            eprintln!("usage: pkm_p224_shape_report f4 RUNS OUT | price RUNS OUT CURVES SESSION...")
+            eprintln!(
+                "usage: pkm_p224_shape_report f4 RUNS OUT | price RUNS OUT CURVES SESSION... \
+                 | mem OUT R18B_LOG STEPS_JSONL..."
+            )
         }
     }
+}
+
+/// The follow-up's memory figure (PROTOCOL.md section 12): per step of the
+/// `N = 24` system, the resident set R18b recorded before the fix (its trace
+/// log), the resident set and peak of each fixed-binary run (`--steps-out`
+/// files), and `B'` at 4 bytes an entry. Plots recorded values only.
+fn cmd_mem(out: &Path, r18b_log: &Path, steps: &[PathBuf]) {
+    fs::create_dir_all(out.join("figures")).unwrap();
+    let mut series = Vec::new();
+    // R18b's trace lines: "tower step K: ... memory X MB (peak Y MB)".
+    let mut before = Vec::new();
+    for line in fs::read_to_string(r18b_log).expect("R18b log").lines() {
+        let Some(rest) = line.strip_prefix("tower step ") else {
+            continue;
+        };
+        let Some((k, _)) = rest.split_once(':') else {
+            continue;
+        };
+        let Ok(k) = k.parse::<f64>() else { continue };
+        if let Some(i) = line.find("memory ") {
+            if let Some(x) = line[i + 7..]
+                .split_whitespace()
+                .next()
+                .and_then(|t| t.parse::<f64>().ok())
+            {
+                before.push((k, x));
+            }
+        }
+    }
+    series.push(Series {
+        name: "R18b resident (frozen)".into(),
+        pts: before,
+        color: "#d62728",
+        dashed: false,
+    });
+    let colors = ["#1f77b4", "#2ca02c", "#9467bd"];
+    let mut slab = Vec::new();
+    for (i, path) in steps.iter().enumerate() {
+        let stem = path
+            .file_name()
+            .and_then(|s| s.to_str())
+            .unwrap_or("steps")
+            .trim_end_matches(".steps.jsonl")
+            .split('-')
+            .next()
+            .unwrap_or("run")
+            .to_string();
+        let mut resident = Vec::new();
+        let mut peak = Vec::new();
+        let mut dense = Vec::new();
+        for line in fs::read_to_string(path).expect("steps file").lines() {
+            let Ok(v) = serde_json::from_str::<Value>(line) else {
+                continue;
+            };
+            if v["kind"] != "step" {
+                continue;
+            }
+            let k = v["step"].as_f64().unwrap_or(0.0);
+            resident.push((k, v["rss_mb"].as_f64().unwrap_or(0.0).max(1.0)));
+            peak.push((k, v["peak_rss_mb"].as_f64().unwrap_or(0.0).max(1.0)));
+            dense.push((
+                k,
+                (v["dense_entries"].as_f64().unwrap_or(0.0) * 4.0 / 1048576.0).max(1.0),
+            ));
+        }
+        if slab.len() < dense.len() {
+            slab = dense;
+        }
+        series.push(Series {
+            name: format!("{stem} resident (fixed)"),
+            pts: resident,
+            color: colors[i % colors.len()],
+            dashed: false,
+        });
+        series.push(Series {
+            name: format!("{stem} peak (fixed)"),
+            pts: peak,
+            color: colors[i % colors.len()],
+            dashed: true,
+        });
+    }
+    series.push(Series {
+        name: "B' at 4 B/entry".into(),
+        pts: slab,
+        color: "#7f7f7f",
+        dashed: true,
+    });
+    svg_plot(
+        &out.join("figures/memory_by_step.svg"),
+        "Resident memory per F4 step, SL24 m=2 N=24 (MB, log scale)",
+        "Recorded: R18b trace (frozen binary) and followup_20261022 steps files (fixed binary). One run each, shared host.",
+        "F4 step",
+        "MB",
+        true,
+        &series,
+    );
 }

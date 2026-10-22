@@ -367,3 +367,261 @@ Specs: [`specs/`](specs/). Sealed sessions: [`sessions/`](sessions/); audits
 ([`audits/`](audits/)): s20 and s24 320 records, 240 replays; s26 and s28 256 records, 192
 replays; every record verified, every replay reproduced, 0 problems. Run rows and logs: [`runs/`](runs/). Report PDF:
 [`report.pdf`](report.pdf).
+
+## 8. Addendum 2026-10-22: slugs, the R18 memory fault, and the `N = 24` rerun
+
+The sections above are frozen and unchanged. This addendum answers the two
+follow-ups they listed (§3.2 "Not registered"; §6 item 1 and §4 item 1: the
+`N = 24` cell and the R18 kill). Its protocol is
+[`PROTOCOL.md` §12](PROTOCOL.md) (Amendment 4), committed before any follow-up
+run; its runs, scripts and tables are in
+[`followup_20261022/`](followup_20261022/). Labels: **measured**, **recorded**
+(an earlier committed row), **derived**, **predicted**.
+
+**Verdict of the addendum.** The four Solinas curves are registered and the
+catalog files derived from the registry are regenerated. R18 died because its
+footprint (one dense block of 5.4 GB at step 27, 6.0 GB resident at the kill) was
+asked of a shared host with no byte bound and no per-step output; the fix
+bounds and records it and returns about 1 GB between steps, but **does not
+lower the peak**, which is the block itself. With the host's memory free, the
+`N = 24` cell finished: **`D = 6`**, the same as at `N = 20` and `22`, so the
+`m = 2` line is still **inconclusive** under A1 (plateau `N = 20...24`). The
+F4 arm priced at the 24-bit curve is about **7.7 x 10^10 times** matched rho.
+No row moved toward rho; this is engineering and diagnosis, not an improvement
+of the index-calculus baseline.
+
+![D against N, refreshed with N = 24](followup_20261022/figures/d_vs_n.svg)
+
+### 8.1 Registration (follow-up (a))
+
+| bits | ICV1 slug | EC1 | `p` | `#E` |
+|--:|:--|:--|:--|--:|
+| 20 | `icv1-fp20-t1471-592e3734` | `EC1P20Cfph889896aa38c5` | 1032193 | 1030723 |
+| 24 | `icv1-fp24-tm3090-db44b2b1` | `EC1P24Cfphe9a49c9b849b` | 16760833 | 16763924 |
+| 26 | `icv1-fp26-t5908-23ba8088` | `EC1P26Cfph5c2cfa4c3fe4` | 67104769 | 67098862 |
+| 28 | `icv1-fp28-tm7557-9dd7f10c` | `EC1P28Cfphe9541bad23ac` | 268369921 | 268377479 |
+
+These are the slugs the sealed sessions already carried. They are registered
+through a new source record,
+[`docs/curves/sources/pkm-p224-shape-20261022.json`](../../docs/curves/sources/pkm-p224-shape-20261022.json),
+so §3.2's "Not registered" paragraph is superseded (its text is left as it was).
+
+**How, and what was not done.** `scripts/build_curve_registry.py` run on the
+tracked tree would add 5,459 curves besides these four (it finds them in
+tracked research JSON; the committed registry never took them up), so a full
+regeneration would be a different, much larger change. The four entries the
+generator produces were spliced into the committed registry in the generator's
+own sort order and the alias map regenerated from the result; nothing else in
+the registry moved. Then every derived file was regenerated with its own tool
+and its check run: `curve_cover_check` (covers, cover links: 2,576 verified),
+`curve_traits build` and `check`, `jacobian_transfers build` and `check`,
+`update_curve_standards.py` (IC leaderboard roster), `build_lab_browser.py`,
+`build_cover_transfer_assessments.mjs --write` and `--check`, the assessment
+verifier (`verify_assessment.mjs`: 0 problems) and its schema validation, and the
+WeakCurves snapshot package (snapshot, GHS audit, property export, isogeny
+graph: each differs from before only in digest lines). Tests that read the
+catalog passed (`cargo test --release` on `curve_cover_check`,
+`curve_standards`, `hyperelliptic`, `binary_ecc::cover_transfer`,
+`hyperelliptic-cover`, `curve_traits`, `jacobian_transfer`; the Python identity
+and cover-catalog tests; `check_curve_names.py`).
+
+Things the registry change forced, stated so they are not mistaken for
+results: the assessment builder and verifier pin the catalog size, so their
+counts moved by four (2,576 maps, 2,574 unique covers, 981 EC1 representations,
+513 declared fields, 1,057 direct odd prime rows, 2,411 odd rows) and two
+semantic digests whose text carries those numerals were re-pinned after
+checking the only differences were the numerals; the assessment is pinned to
+the commit that registers the curves (`228eec9a9`); its report, graphs and PDF
+were regenerated (PDF with XeLaTeX, as Tectonic is not installed here); the
+producer-source digest in `HYPERELLIPTIC_INFRASTRUCTURE.md` follows a one-line
+test-constant change. **Not done:** three site copies
+(`website/weakcurves/dist/{snapshot,ghs_genus128_cost_audit,isogeny_graph}.json`,
+the WeakCurves README's copy step) were refused by the permission layer, so the
+package's `validate_attack_map.py` equality check fails until they are copied
+from `research/weak_curve_leaderboard_20261012/`; and its append-only
+`ARTIFACTS.sha256` was already failing on three of its Markdown files before this
+change and was not touched.
+
+### 8.2 Why R18 died (follow-up (b)), from recorded evidence
+
+1. `B'`, the reduced reducer block, is dense, 4 bytes an entry. R18b's stop line
+   recorded 785,810,929 entries at step 26 (3.14 GB). The rerun measured the
+   rest of the system (§8.4): step 27 holds **1,357,804,954 entries (5.4 GB)**.
+   R18's `anon-rss` at the kill, 6,007,580 kB (5,867 MB), is of the size of
+   that step (the rerun's peak resident set there is 5,991 MB): R18 was inside
+   step 27, killed near its own peak need, not by a leak.
+2. R18 ran with `--max-nnz 1.8e9`, which the engine also applies to `B'` when
+   `--max-dense` is not given (`max_dense.or(max_nnz)`): up to 7.2 GB of `B'`
+   was allowed, against a 15 GB host shared with other processes. `ulimit -v`
+   caps address space, not what the host has free. There was no byte bound.
+3. After step 25, R18b's stop line had 1,322 MB resident but 172 MB live heap:
+   about 1.1 GB of freed memory sat in the allocator's per-thread arenas.
+4. No `--trace`, and a row is written when a system ends: the kill left nothing.
+
+### 8.3 The fix, and what it did not change
+
+On the generic engine (every committed F4 row): `B'` in one slab instead of one
+`Vec` per row; `max_bytes` (`--max-mem-mb`), a bound on a step's dense blocks
+checked before they are allocated; `malloc_trim` after each step; `--steps-out`,
+one flushed JSON line per step; a per-step non-zero count of `B'` (both
+engines). Not built: compressing or spilling `B'`.
+
+**Checks that what is measured did not change (all passed; pre-registered, E1-E3):**
+
+| check | against | result |
+|:--|:--|:--|
+| E1: SL20 `N = 16, 18, 20` (6 rows) and SL24 `N = 20`, 1 thread | frozen R4, R16 rows | 7 of 7 rows equal in every field but the wall clock (`pkm_tower_check compare-rows`, and `check_rows.sh`) |
+| E2: SL24 `N = 20`, `22`, 2 threads, fixed against pre-fix binary | each other | equal rows (`N = 22`: 4,877,824,907,495 multiply-adds both) |
+| E3: SL24 `N = 24`, R18b's flags, steps 1-25 and the stop line | R18b's trace | 25 of 25 steps identical (`compare-trace`); the stop line equal (`B'` 785,810,929, nnz 499,596,237) |
+| R20c steps 1-25 at 4 threads | R18b's trace (2 threads) | 25 of 25 identical: the count did not depend on 2 against 4 threads (it does depend on 1 against 2: `N = 20` 481,871,455,568 against 481,961,794,016) |
+
+[`tables/equality_checks.txt`](followup_20261022/tables/equality_checks.txt).
+
+**Memory (E2, measured; one run per arm on a shared host).** Peak resident set
+(`VmHWM`) and what stays resident after the last step:
+
+| cell | arm | peak (MB) | after the last step (MB) | multiply-adds |
+|:--|:--|--:|--:|--:|
+| `N = 20`, 2 threads | pre-fix | 466 | 457 | 481,961,794,016 |
+| `N = 20` | fixed | 521 | 175 | same |
+| `N = 20` | fixed, `MALLOC_ARENA_MAX=2` | 497 | 133 | same |
+| `N = 22`, 2 threads | pre-fix | 1,536 | 1,435 | 4,877,824,907,495 |
+| `N = 22` | fixed | 1,499 | 332 | same |
+
+So the fix returns memory between steps (R18b held 1,245-1,277 MB from step 23;
+the fixed run 179-262 MB over the same steps) and **does not lower the peak**:
+-2.4% at `N = 22`, +12% at `N = 20` (the slab is allocated whole). **P9 failed**
+(predicted at most 0.90 of the baseline's peak). [`tables/e2_memory.md`](followup_20261022/tables/e2_memory.md).
+
+![resident memory by step](followup_20261022/figures/memory_by_step.svg)
+
+`B'` is not compressed. Its non-zero share is 41% at step 23, 35% at step 26,
+57% at the largest step (27), and 77% and 96% after. A bitmap with packed values
+would cut `B'` by about half only where it is under half full (steps 23-26), not
+at the largest step; and any encoding that skips zeros turns the dense AVX2/AVX-512
+axpy kernels into scalar scatters, which this round did not measure. **P11** (at
+least half of `B'` non-zero at the largest steps) holds at the largest step and
+fails at steps 23 and 26.
+
+### 8.4 The rerun, R20c (SL24, `m = 2`, `N = 24`, target 0): finished
+
+Flags as the frozen runs, 4 threads, `--max-mem-mb 7800`, `MALLOC_ARENA_MAX=2`,
+`nice`; host `MemAvailable` 13.7 GB at the start (the start rule needed 10 GB);
+started 21:34:17 UTC.
+
+| quantity | measured |
+|:--|:--|
+| outcome | finished at step 30: the target's system is inconsistent (refuted), `D = 6`, `max_cols_to_solution` 103,785 |
+| wall | 7,245 s (2.0 h), shared host, 4 threads |
+| multiply-adds | 4.2213 x 10^13 (predicted 4 x 10^13 to 5 x 10^13) |
+| largest matrix | 1,618,266,163 non-zeros (predicted 1.3 x 10^9 to 1.8 x 10^9, PROTOCOL §2.4) |
+| largest `B'` | 1,357,804,954 entries, step 27 (1.36 times my derived estimate of 1.0 x 10^9, PROTOCOL §12.1) |
+| peak resident | 5,991 MB (`VmHWM`), 5,956 MB sampled every 5 s; the byte bound (7,800) never bound |
+| pairs, rows | 354,247 critical + 98,720 tower pairs; 285,855 reducer rows; 186,749 rows at most |
+
+Steps 23-30 (all 30 in [`tables/R20c_steps.md`](followup_20261022/tables/R20c_steps.md)):
+
+| step | degree | new elements | cols | `B'` entries | non-zero | multiply-adds | s | resident after / peak (MB) |
+|--:|--:|--:|--:|--:|--:|--:|--:|:--|
+| 23 | 6 | 2,042 | 44,562 | 289,092,933 | 41% | 8.6e11 | 251 | 179 / 1,281 |
+| 24 | 5 | 953 | 29,248 | 170,382,738 | 43% | 1.2e11 | 27 | 205 / 1,281 |
+| 25 | 5 | 222 | 29,028 | 165,128,367 | 49% | 8.1e10 | 20 | 262 / 1,281 |
+| 26 | 6 | 4,189 | 67,939 | 785,810,929 | 35% | 6.0e12 | 1,822 | 427 / 3,422 |
+| 27 | 6 | 5,797 | 103,785 | 1,357,804,954 | 57% | 1.5e13 | 2,687 | 816 / 5,991 |
+| 28 | 6 | 7,364 | 91,528 | 891,092,020 | 77% | 1.6e13 | 1,978 | 1,022 / 5,991 |
+| 29 | 5 | 3,923 | 47,424 | 171,739,455 | 96% | 4.1e12 | 414 | 1,110 / 5,991 |
+| 30 | 3 | 37 | 2,325 | 84,656 | 100% | 2.3e7 | 0 | 1,000 / 5,991 |
+
+**Q2.** Pooling `m = 2` as in §2 with this row (70 systems;
+[`followup_20261022/analysis/pooled_m2_analyze.txt`](followup_20261022/analysis/pooled_m2_analyze.txt)):
+`D = 6` at `N = 20, 22, 24`; final plateau `L = 4`; upper-half slope 0.129
+over `N = 14...24`; **A1: inconclusive**. R18b's `D >= 6` is now `D = 6`. H_same:
+89 of 89 cells with a recorded value still equal (`N = 24` has none, so it is a
+90th valued cell); tower against null (65 pairs) unchanged
+([`tables/f4_summary.txt`](followup_20261022/tables/f4_summary.txt)).
+`m = 3, N = 21` was not run.
+
+### 8.5 Price and distance to matched rho (success criterion: distance, not a gate)
+
+Frozen ecbench rows are **recorded** (this directory's sessions, unchanged);
+the F4 rows are **derived** with the frozen formula (PROTOCOL §4.4, `R` from the
+s24 factor-base record). `S` at `w = 0 / 0.1 / 1` GAE per unpriced native
+operation; the ratio is to `rho.negation` of the same session at the same `w`.
+The order against rho holds at every `w` for every row (the only unresolved
+pairs are as in §3.3).
+
+| curve | arm | `S` w=0 / 0.1 / 1 | ratio to matched rho w=0 / 0.1 / 1 | label |
+|:--|:--|:--|:--|:--|
+| 20-bit | `ic-mitm` | 22.94 / 25.30 / 46.53 | 18.4 / 18.6 / 19.9 | recorded |
+| 20-bit | `ic-rootfind` | 27.54 / 29.96 / 51.69 | 22.0 / 22.1 / 22.1 | recorded |
+| 20-bit | F4, `N = 20` | 2.40e9 (all `w`) | 1.9e9 / 1.8e9 / 1.0e9 | derived, lower bound |
+| 24-bit | `ic-mitm` | 64.9 / 73.8 / 153.7 | 61.4 / 63.9 / 75.7 | recorded |
+| 24-bit | `ic-rootfind` | 68.9 / 77.7 / 157.7 | 65.1 / 67.3 / 77.7 | recorded |
+| 24-bit | **F4, `N = 24` (new)** | 8.15e10 (all `w`) | **7.7e10 / 7.1e10 / 4.0e10** | derived, lower bound |
+| 26-bit | `ic-mitm`, `ic-rootfind` | 61.2 / 74.6 / 194.8; 63.8 / 77.1 / 196.4 | 67.1 / 74.7 / 110.6; 69.9 / 77.3 / 111.4 | recorded |
+| 28-bit | `ic-mitm`, `ic-rootfind` | 70.1 / 87.5 / 244.0; 71.8 / 89.0 / 243.3 | 75.9 / 86.3 / 133.8; 77.8 / 87.8 / 133.4 | recorded |
+
+The 24-bit F4 row (`R` = 2,045 relations, the factor-base record's 2,035
+columns plus 10; `M` = 517.6 multiply-adds per GAE) uses
+the frozen conversion, ns per multiply-add = wall / multiply-adds of the
+cell, which here is a **4-thread** wall time (0.172 ns), so it understates the
+cost against a single-thread GAE; with the 1-thread conversion of R20b (0.433 ns,
+the same `N = 20` system at one thread) the row is about 1.9 x 10^11 times rho,
+and with one inversion costed as one multiplication (`M = 4`) 1.0 x 10^13 times.
+It is a lower bound (one solve per relation, no failed targets, no factor-base
+build, no linear algebra) and counts 925,571 unpriced operations per system, which
+do not move it at any `w`. It is a second priced size, but no scaling fit is
+claimed: the two ratios to rho, 1.9 x 10^9 at `N = 20` and 7.7 x 10^10 at
+`N = 24`, are 40 times apart for 4 more unknowns. **P12 held** (at least 10^5 times rho). The distance
+that remains to rho is the §3.3 table plus this row; nothing in this addendum
+changes any ecbench arm. Tables:
+[`tables/f4_priced.md`](followup_20261022/tables/f4_priced.md),
+[`tables/ecbench_arms.md`](followup_20261022/tables/ecbench_arms.md); graph:
+
+![S ratio by size](followup_20261022/figures/s_ratio_by_size.svg)
+
+### 8.6 Predictions against outcomes (PROTOCOL §12.4)
+
+| | prediction | outcome |
+|:--|:--|:--|
+| P8 | every equality check holds, counts bit-identical | **held** (E1, E2, E3, §8.3) |
+| P9 | fixed peak at most 0.90 x pre-fix at `N = 22` | **failed** (0.976; 1.12 at `N = 20`) |
+| P10 | R20c finishes, `D` 6 or 7, peak 5.5-7.5 GB, within 5 h | **held** (`D = 6`, 5.99 GB, 2.0 h) |
+| P11 | at least half of `B'` non-zero at the largest steps | **held at step 27 (57%), failed at steps 23 and 26 (41%, 35%)** |
+| P12 | F4 arm at least 10^5 x rho at `N = 24` | **held** (7.7 x 10^10) |
+
+### 8.7 Deviations, failures, limits
+
+- **E1 was started once before the amendment was committed** (20:48:41 UTC) and
+  stopped within a minute with no output read; its three files were deleted and
+  it was re-run after the commit (`cf444326b`).
+- **E2's equality** is fixed against pre-fix at the same thread count (2); the
+  frozen rows are 1-thread, so the amendment's wording ("E1's equality") could not
+  apply to them. R20c's multiply-adds equal R18b's at the steps they share (2
+  against 4 threads), where the amendment expected a different chunking.
+- **Memory figures are one run per arm** on a shared host (load average 4-7,
+  other processes' compiles and tests running); wall times are descriptive.
+  E2's `N = 22` wall times (1,718 s, 1,693 s) are not a speed comparison.
+- **The kill itself** was another process's allocation (Amendment 2); that
+  diagnosis is unchanged. What §8.2 adds is that the footprint at the kill was the
+  run's own peak.
+- **Scope.** `N = 24` is 11% of P-224's `N` (§2, "Scope"); every statement about
+  deeper `N` is extrapolation and is not made. `m = 3, N = 21` and any larger
+  `m` cell were not run. Nothing here attacks P-224.
+- **Binaries.** Fixed: `pkm_tower_pilot` sha256 `e731c65114686cfe...` built from
+  `cf444326b`; pre-fix: `803fae9946b0154d...`, built from the merged tree before
+  these changes ([`followup_20261022/BINARY.sha256`](followup_20261022/BINARY.sha256)).
+  rustc 1.97.0; 4 vCPU Xeon, 15 GiB, shared.
+
+### 8.8 Reproduce
+
+```bash
+export CARGO_TARGET_DIR=/path/to/target
+cargo build --release --example pkm_tower_pilot --example pkm_tower_check --example pkm_p224_shape_report
+BIN=... BASE=... research/pkm_p224_kummer_shape_20261022/followup_20261022/run_followup.sh E1   # then E2, E3, R20c
+followup_20261022/check_rows.sh NEW.jsonl FROZEN.jsonl; followup_20261022/check_steps.sh NEW.log OLD.log
+pkm_p224_shape_report f4 followup_20261022/merged_runs followup_20261022
+pkm_p224_shape_report price followup_20261022/merged_runs followup_20261022 curves.jsonl sessions/s20 sessions/s24 sessions/s26 sessions/s28
+pkm_p224_shape_report mem followup_20261022 runs/R18b-SL24-m2-N24-sizing.log followup_20261022/runs/R20c0-SL24-m2-N24.steps.jsonl followup_20261022/runs/R20c-SL24-m2-N24.steps.jsonl
+research/pkm_p224_kummer_shape_20261022/render.sh
+```
