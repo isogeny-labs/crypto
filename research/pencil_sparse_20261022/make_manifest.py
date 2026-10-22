@@ -61,6 +61,7 @@ for path in raw_files:
 
 files = sorted(path for path in ROOT.rglob("*")
                if path.is_file() and "target" not in path.parts
+               and "__pycache__" not in path.parts and path.suffix != ".pyc"
                and path != RESULTS / "manifest.json")
 manifest = {
     "schema": "pencil-sparse-manifest/v1",

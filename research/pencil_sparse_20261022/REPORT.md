@@ -1,5 +1,12 @@
 # Exact pencil variable-order and degree-peeling continuation
 
+The artifact manifest has an explicit post-commit amendment: four untracked
+Python bytecode cache entries were removed from its index. The amendment
+records the original manifest digest and path list. All run records, replay
+rows, counters, validation results, and the original run-binary digest are
+unchanged; `Cargo.lock` is pinned with the same digest recorded in the
+manifest.
+
 The [frozen protocol](PROTOCOL.md) reuses the original public 21-curve,
 1,260-target known-answer cohort. This report records the exact point-driven
 pencil collector with three fixed sparse-matrix variable orders and a
