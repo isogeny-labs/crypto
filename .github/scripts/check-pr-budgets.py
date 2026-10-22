@@ -76,6 +76,11 @@ NAMED_BUDGET_EXCEPTIONS = {
         # The workflow's pull_request budget expression evaluates to 45.
         "reason": "ecbench harness; cancelled at the 25-minute cap on #2135, #2149 and #2153 (2026-10-18)",
     },
+    (".github/workflows/release.yml", "isogeny"): {
+        "timeout": 45,
+        # The workflow's pull_request budget expression evaluates to 45.
+        "reason": "Release isogeny matrix (x86_64-pc-windows-msvc, windows-latest); cancelled at the 25-minute cap on 22 PRs while main's push run took 24.9 minutes (2026-10-22)",
+    },
     (".github/workflows/ic-producer.yml", "archived-producer"): {
         "timeout": 45,
         # The workflow's pull_request budget expression evaluates to 45.
