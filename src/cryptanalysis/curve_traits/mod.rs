@@ -698,6 +698,8 @@ pub struct Frobenius {
     /// `d_K`, the fundamental discriminant of `Q(π)`.
     pub cm_disc: Option<String>,
     /// `v = [O_K : Z[π]]`; a lower bound when `status` is `bounded`.
+    /// The sentinel `0` is used only with `not_applicable` when Δ = 0:
+    /// there is no quadratic Frobenius field or such conductor.
     pub conductor: String,
     pub conductor_bits: u64,
     pub conductor_primes: Factors,
@@ -835,6 +837,26 @@ pub struct CurveTraits {
 fn frobenius(c: &RegistryCurve, fx: &Factoring) -> Result<(Frobenius, BigInt), String> {
     let q = BigInt::from(c.model.q());
     let delta: BigInt = &c.trace * &c.trace - BigInt::from(4u8) * &q;
+    if delta.is_zero() {
+        return Ok((
+            Frobenius {
+                disc: "0".into(),
+                disc_primes: Vec::new(),
+                disc_unfactored: Vec::new(),
+                disc_status: Status::NotApplicable,
+                cm_disc: None,
+                conductor: "0".into(),
+                conductor_bits: 0,
+                conductor_primes: Vec::new(),
+                conductor_unfactored: Vec::new(),
+                conductor_fraction: None,
+                status: Status::NotApplicable,
+                class_number: None,
+                class_number_status: Status::NotApplicable,
+            },
+            delta,
+        ));
+    }
     let fac = fx.factor(delta.magnitude());
     let split = arith::split_discriminant(&delta, &fac);
     if let (Some(end), Some(dk)) = (&c.end, &split.cm_disc) {
@@ -882,6 +904,11 @@ fn frobenius(c: &RegistryCurve, fx: &Factoring) -> Result<(Frobenius, BigInt), S
 }
 
 fn small_primes(delta: &BigInt, characteristic: &BigUint) -> Vec<SmallPrime> {
+    // The ordinary quadratic-order/volcano description is undefined at Δ=0.
+    // ell_local also requires a nonzero discriminant for its valuation loop.
+    if delta.is_zero() {
+        return Vec::new();
+    }
     SMALL_PRIMES
         .iter()
         .map(|&ell| {
@@ -1523,6 +1550,7 @@ fn keys(t: &CurveTraits) -> BTreeMap<String, String> {
     put(
         "cm",
         match &t.frobenius.cm_disc {
+            None if t.frobenius.status == Status::NotApplicable => "n/a".into(),
             Some(d)
                 if d.parse::<i64>()
                     .is_ok_and(|v| v.unsigned_abs() <= SMALL_CM_DISC) =>
@@ -1581,7 +1609,9 @@ fn keys(t: &CurveTraits) -> BTreeMap<String, String> {
     let f = &t.frobenius;
     put(
         "conductor",
-        if f.status == Status::Bounded {
+        if f.status == Status::NotApplicable {
+            "n/a".into()
+        } else if f.status == Status::Bounded {
             "unknown".into()
         } else if f.conductor == "1" {
             "1".into()
@@ -1835,6 +1865,30 @@ mod tests {
             .filter(|c| !c.representations.is_empty())
             .count();
         assert!(with_gen >= 80, "only {with_gen} representations parsed");
+    }
+
+    #[test]
+    fn scalar_frobenius_has_no_quadratic_cm_or_volcano_conductor() {
+        // The registered supersingular F43² pairing-control model has t=-86.
+        let c = curve("icv1-fp6k2-tm86-70f2251b");
+        let t = compute(&c, &fx()).unwrap();
+        assert!(!t.ordinary);
+        assert_eq!(t.frobenius.disc, "0");
+        assert_eq!(t.frobenius.status, Status::NotApplicable);
+        assert_eq!(t.frobenius.disc_status, Status::NotApplicable);
+        assert_eq!(t.frobenius.cm_disc, None);
+        assert_eq!(t.frobenius.class_number, None);
+        assert_eq!(t.frobenius.conductor_fraction, None);
+        assert_eq!(t.endomorphism.status, Status::NotApplicable);
+        assert!(t.small_primes.is_empty());
+        assert_eq!(t.keys["cm"], "n/a");
+        assert_eq!(t.keys["conductor"], "n/a");
+        // The discriminant calculation must handle both scalar eigenvalue signs.
+        let mut opposite_trace = c;
+        opposite_trace.trace = -opposite_trace.trace;
+        let (frob, delta) = frobenius(&opposite_trace, &fx()).unwrap();
+        assert!(delta.is_zero());
+        assert_eq!(frob.status, Status::NotApplicable);
     }
 
     #[test]
