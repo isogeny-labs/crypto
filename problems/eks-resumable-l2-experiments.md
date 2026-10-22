@@ -5,7 +5,7 @@
 - **Affected work:** [shared Iso Lab skill](../.agents/skills/isolab-eks/SKILL.md),
   [EKS harness](../taskq/deploy/eks-karpenter/HARNESS.md)
 - **Next action owner:** Iso Lab implementation task T-70
-- **Last updated:** 2026-10-21
+- **Last updated:** 2026-10-22
 
 ## Problem
 
@@ -120,3 +120,23 @@ retry policy are unchanged. Twenty controller tests and 4,474 library tests pass
 the [failed run and exact evidence](../taskq/deploy/eks-karpenter/resume/validation/20261022-periodic/attempt-a/REPORT.md)
 remain recorded. Live multi-generation qualification and the main-only GitHub
 Action still keep this integration record open.
+
+2026-10-22 periodic attempt B verified the current runtime's two successive
+committed encrypted generations, controller restart and worker-loss recovery
+from generation 2. Its 2,486-record prefix was byte-identical after completion;
+all 3,606 computational records verified and all 3,600 measured replays matched.
+Both restored processes had the required stopped state and credentials. The
+zombie recapture branch was not forced in this live run; native tests cover it.
+
+**The frozen B qualification failed overall:** its distinct fresh epoch had
+3,603 L2 and 3 L1 observations, all with matching native replay. The L2 gate
+exited 42 before A/A; 18 emitted S3 payloads passed full readback hashes. The
+controller failed the logical run without a measurement retry. No failed sample
+was discarded. The three L1 records report three excess busy ticks each, zero
+steal and no SMT siblings; the retained data cannot attribute those ticks to a
+specific task or establish an accounting defect. No isolation threshold was
+changed. The [B report](../taskq/deploy/eks-karpenter/resume/validation/20261022-periodic/attempt-b/REPORT.md)
+retains its failed acceptance criteria and all public evidence. The runtime pin
+now matches the deployed checkpoint repair with that limited qualification.
+The original, separately frozen main-only Action acceptance criteria remain
+unchanged and unverified. An identical B rerun is not scheduled to seek a pass.

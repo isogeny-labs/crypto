@@ -1,10 +1,10 @@
 {
   "schema": "isolab.recovery.runtime/v1",
   "bucket": "isolab-results-104186811093-us-east-2",
-  "key": "inputs/recovery-runtime/156139a4e580db9af731136bea7d84e579f42d4580fc8cf90557770fadf7d323.tar.gz",
-  "version": "yjLed3ZZ5nKhEgpEJKbJCQ9llBi.v9.D",
-  "sha256": "156139a4e580db9af731136bea7d84e579f42d4580fc8cf90557770fadf7d323",
-  "source_archive_sha256": "d9d0dee052fa44b060636e421813f15e66c5e16d82e1af2e58aca4dfc7e4a9b7",
-  "source_revision": "93bdeb723f4ede560662ad730f7ba8caf1def7a2",
-  "qualification": "Passed automatic worker-loss and controller-restart test F: c8a.2xlarge, native replay as UID 1000, separate 1806 L2 / 1800 replay / 600 A-A / 19 S3-hash epoch; validation/20261021-controller/REPORT.md"
+  "key": "inputs/recovery-runtime/3ab3cf238340dfdeebec721ae52066aea7b1fe998d0360d2d96f4929e25dc03c.tar.gz",
+  "version": "bYbVePk2FoY4YW.amrLf.ifXlXsm0VOY",
+  "sha256": "3ab3cf238340dfdeebec721ae52066aea7b1fe998d0360d2d96f4929e25dc03c",
+  "source_archive_sha256": "ea578888e0cb6c829387579d416561025d9b25b3d9ebabe6835d7d0f4cda7f73",
+  "source_revision": "5499eeb9d72e6e777cb0d28b0ade41afbfff90b7",
+  "qualification": "B on c8a.2xlarge verified two committed generations, worker-loss/controller-restart restore and 3606 computation records / 3600 native replays. Overall qualification FAILED: the separate fresh epoch had 3603 L2 / 3 L1, A/A not evaluated, 18 S3 hashes verified, no measurement retry. See validation/20261022-periodic/attempt-b/REPORT.md. Zombie recapture has native tests, not forced live coverage."
 }

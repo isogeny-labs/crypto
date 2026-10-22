@@ -30,8 +30,9 @@ policy; ordinary v1 jobs are fresh, non-resumable jobs. Read
   CodeBuild launcher supplies the private EKS network route.
 - **Resumable native CPU computation:** use the native AWS-only recovery client
   with `isolab.eks.resumable/v1`, a digest-pinned recovery image and an original
-  absolute deadline. The deployed controller has passed worker-loss recovery
-  followed by a separate L2/S3 epoch on c8a.2xlarge. Follow the recovery reference;
+  absolute deadline. Worker-loss recovery and a separate L2/S3 epoch have prior
+  c8a.2xlarge evidence; the latest periodic test recovered computation but failed
+  its fresh L2 epoch. Read the exact runtime qualification and recovery reference;
   this does not qualify arbitrary commands or cross-family restoration.
 - **An installed EKS MCP connection:** start with `isolab_k8s_overview`, then
   `isolab_k8s_benchmark` for ecbench measurements or `isolab_k8s_run` for an

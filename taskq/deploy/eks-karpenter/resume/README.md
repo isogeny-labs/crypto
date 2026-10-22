@@ -10,6 +10,13 @@ Action verification remains blocked on the PR merge/checks; the
 [integration record](../../../../problems/eks-resumable-l2-experiments.md) tracks
 that and the remaining qualification limits.
 
+The current runtime pin adds the periodic-generation and exited-child capture
+fixes. Its [latest qualification](validation/20261022-periodic/attempt-b/REPORT.md)
+verified two committed generations and resumed computation after worker loss,
+but **failed overall** because three fresh observations earned L1. The gate
+rejected the epoch without retry and retained its S3 output. The earlier all-L2
+qualification above is separate evidence, not a pass for this later run.
+
 The selected policy is to resume computation, retain the interrupted epoch as
 invalid for timing, and start a fresh benchmark epoch with new warmup, L2
 observations and A/A controls. Snapshotting or restoring RAM does not preserve

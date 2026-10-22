@@ -43,6 +43,12 @@ L2, native replay, A/A and complete downloaded S3 manifest checks pass. Preserve
 `result.json`, the request hash, build ID, both epoch identities and S3 locations.
 Computation records are always L0/timing-invalid, even when no restore occurred.
 
+Read the qualification named in `resume/runtime.json` for the exact pinned
+runtime. The latest periodic test restored generation 2 and passed computation
+replay, but its fresh epoch failed L2 (3,603 L2 / 3 L1; A/A not evaluated).
+All 18 emitted S3 payload hashes matched. This remains a failed run, with no
+measurement retry; earlier successful epochs do not turn it into a pass.
+
 The maintained MCP binary also exposes `isolab_k8s_resumable_submit` and
 `isolab_k8s_recovery_status` when this native client is installed on its PATH.
 Inspect the live schema: older installed servers do not have these tools.

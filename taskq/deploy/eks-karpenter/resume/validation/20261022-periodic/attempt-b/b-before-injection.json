@@ -1,0 +1,123 @@
+{
+  "schema": "isolab.eks.recovery-state/v1",
+  "request": {
+    "schema": "isolab.eks.resumable/v1",
+    "run_name": "ecbench-periodic-20261022-b",
+    "deadline_unix_seconds": 1792650847,
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+      "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+      "ecbench_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9"
+    },
+    "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0ecb5bf15e2f22b8d12242c3cb306735b1e44e696c698f2dade470b517869dd9",
+    "spec": {
+      "arms": [
+        {
+          "method": {
+            "id": "rho.negation"
+          },
+          "name": "rho-neg",
+          "role": "reference"
+        },
+        {
+          "method": {
+            "id": "rho.plain"
+          },
+          "name": "rho-plain",
+          "role": "baseline"
+        },
+        {
+          "method": {
+            "id": "rho.negation"
+          },
+          "name": "rho-neg-aa",
+          "role": "control"
+        }
+      ],
+      "description": "Isolation and correctness validation after a computation-only restore; independent fresh warmup and A/A. No algorithm speed claim.",
+      "label": "Periodic CRIU checkpoint rotation and distinct fresh L2 epoch qualification",
+      "measurement": {
+        "isolation_required": "L2",
+        "order": "alternate",
+        "rounds": 600,
+        "seed": 1,
+        "timeout_seconds": 120,
+        "warmup": 1
+      },
+      "schema": "ecbench.spec/v1",
+      "workloads": {
+        "curves": [
+          {
+            "bits": 32,
+            "kind": "prime_search",
+            "seed": 59297
+          }
+        ],
+        "target_seed": 20261002,
+        "targets_per_curve": 2
+      }
+    },
+    "instance_type": "c8a.2xlarge",
+    "checkpoint_interval_seconds": 30,
+    "max_restores": 2
+  },
+  "request_sha256": "ed92a0e90d771b6780055281e5d4fe5175314d990ab914bf52202b75e1fa8d55",
+  "owner_build": "isolab-recovery-controller:bfca5a3c-2db2-4b1a-816c-f04df08283b5",
+  "phase": "checkpointing",
+  "attempt": 0,
+  "restores": 0,
+  "next_generation": 3,
+  "checkpoint_generation": 2,
+  "current_pod_uid": "9a4a8f68-600d-4ccb-9b3b-7fe25202f142",
+  "current_instance": "i-0ae9215e018bebc9a",
+  "original_node_runtime": {
+    "architecture": "amd64",
+    "containerRuntimeVersion": "containerd://2.3.5+unknown",
+    "kernelVersion": "6.18.54-121.166.amzn2023.x86_64",
+    "osImage": "Amazon Linux 2023.12.20261012"
+  },
+  "terminated_instances": [],
+  "generations": [
+    {
+      "number": 1,
+      "request_sha256": "ed92a0e90d771b6780055281e5d4fe5175314d990ab914bf52202b75e1fa8d55",
+      "snapshot_name": "ecbench-periodic-20261022-b-g1",
+      "snapshot_id": "snap-0d025b1c76948a8a5",
+      "archive_key": "recovery/runs/ecbench-periodic-20261022-b/generations/g1/checkpoint.tar",
+      "archive_version": "LTgiSBzssaKXOfrfjXjz9qEjGZLQTN_V",
+      "archive_sha256": "57c2dad45da251957022231e35eb225ddddeed9ea72ce40614d140a80b6f1fc2",
+      "manifest_sha256": "71748d2323684e1294aa499b1741c3a127ef79cecf68c067f35c8f876f0e5042",
+      "archive_bytes": 46489600,
+      "source_instance": "i-0ae9215e018bebc9a",
+      "source_pod_uid": "9a4a8f68-600d-4ccb-9b3b-7fe25202f142",
+      "committed_unix_seconds": 1792647506,
+      "snapshot_ready": true,
+      "encrypted": true,
+      "readback_verified": true
+    },
+    {
+      "number": 2,
+      "request_sha256": "ed92a0e90d771b6780055281e5d4fe5175314d990ab914bf52202b75e1fa8d55",
+      "snapshot_name": "ecbench-periodic-20261022-b-g2",
+      "snapshot_id": "snap-042f5c51ec9f5df38",
+      "archive_key": "recovery/runs/ecbench-periodic-20261022-b/generations/g2/checkpoint.tar",
+      "archive_version": "GH1tHPzJEH7UzY4pNT.7ntm8fSEKTA.W",
+      "archive_sha256": "266176d0d9a9b0ab00f6b16dc670cb55e206c17ef3102fe5d63086394aa620f9",
+      "manifest_sha256": "f3890745754a7f06f961ef43922a186b8a552a06dd22f27bc1d27cffa1491d9c",
+      "archive_bytes": 36321280,
+      "source_instance": "i-0ae9215e018bebc9a",
+      "source_pod_uid": "9a4a8f68-600d-4ccb-9b3b-7fe25202f142",
+      "committed_unix_seconds": 1792647640,
+      "snapshot_ready": true,
+      "encrypted": true,
+      "readback_verified": true
+    }
+  ],
+  "last_checkpoint_at": 1792647640,
+  "selected_generation": null,
+  "failure": null,
+  "benchmark_job": null,
+  "benchmark_uid": null,
+  "benchmark_manifest": null,
+  "benchmark_create_attempted": false
+}

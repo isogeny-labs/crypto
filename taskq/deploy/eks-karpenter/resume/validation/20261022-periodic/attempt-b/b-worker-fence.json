@@ -1,0 +1,137 @@
+{
+    "Reservations": [
+        {
+            "ReservationId": "r-012046fd32fef3675",
+            "OwnerId": "104186811093",
+            "RequesterId": "044972866608",
+            "Groups": [],
+            "Instances": [
+                {
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [],
+                    "ClientToken": "fleet-378c6a26-239f-c1b6-2692-8e08ad71878d-0",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "InstanceLifecycle": "spot",
+                    "NetworkInterfaces": [],
+                    "RootDeviceName": "/dev/xvda",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [],
+                    "SpotInstanceRequestId": "sir-1g1fpybh",
+                    "StateReason": {
+                        "Code": "Client.UserInitiatedShutdown",
+                        "Message": "Client.UserInitiatedShutdown: User initiated shutdown"
+                    },
+                    "Tags": [
+                        {
+                            "Key": "aws:ec2:fleet-id",
+                            "Value": "fleet-378c6a26-239f-c1b6-2692-8e08ad71878d"
+                        },
+                        {
+                            "Key": "kubernetes.io/cluster/isolab",
+                            "Value": "owned"
+                        },
+                        {
+                            "Key": "project",
+                            "Value": "isolab"
+                        },
+                        {
+                            "Key": "Name",
+                            "Value": "ip-10-84-176-154.us-east-2.compute.internal"
+                        },
+                        {
+                            "Key": "eks:eks-cluster-name",
+                            "Value": "isolab"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:id",
+                            "Value": "lt-08ae863d88fea5153"
+                        },
+                        {
+                            "Key": "managed-by",
+                            "Value": "karpenter"
+                        },
+                        {
+                            "Key": "karpenter.sh/nodepool",
+                            "Value": "cpu-spot"
+                        },
+                        {
+                            "Key": "karpenter.k8s.aws/ec2nodeclass",
+                            "Value": "cpu"
+                        },
+                        {
+                            "Key": "karpenter.sh/nodeclaim",
+                            "Value": "cpu-spot-5zslm"
+                        },
+                        {
+                            "Key": "aws:ec2launchtemplate:version",
+                            "Value": "1"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 8,
+                        "ThreadsPerCore": 1
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "none"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "pending",
+                        "HttpTokens": "required",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled",
+                        "InstanceMetadataTags": "disabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    },
+                    "BootMode": "uefi-preferred",
+                    "PlatformDetails": "Linux/UNIX",
+                    "UsageOperation": "RunInstances",
+                    "UsageOperationUpdateTime": "2026-10-22T05:35:02+00:00",
+                    "MaintenanceOptions": {
+                        "AutoRecovery": "default",
+                        "RebootMigration": "default"
+                    },
+                    "CurrentInstanceBootMode": "uefi",
+                    "NetworkPerformanceOptions": {
+                        "BandwidthWeighting": "default"
+                    },
+                    "Operator": {
+                        "Managed": false,
+                        "HiddenByDefault": false
+                    },
+                    "SecondaryInterfaces": [],
+                    "InstanceId": "i-0ae9215e018bebc9a",
+                    "ImageId": "ami-082b570a48503ea93",
+                    "State": {
+                        "Code": 48,
+                        "Name": "terminated"
+                    },
+                    "PrivateDnsName": "",
+                    "PublicDnsName": "",
+                    "StateTransitionReason": "User initiated (2026-10-22 05:40:49 GMT)",
+                    "AmiLaunchIndex": 0,
+                    "ProductCodes": [],
+                    "InstanceType": "c8a.2xlarge",
+                    "LaunchTime": "2026-10-22T05:35:02+00:00",
+                    "Placement": {
+                        "AvailabilityZoneId": "use2-az3",
+                        "GroupName": "",
+                        "Tenancy": "default",
+                        "AvailabilityZone": "us-east-2c"
+                    },
+                    "Monitoring": {
+                        "State": "disabled"
+                    }
+                }
+            ]
+        }
+    ]
+}
