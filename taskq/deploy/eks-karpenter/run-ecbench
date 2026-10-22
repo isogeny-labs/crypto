@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Runs inside the pinned task image. argv[1] is literal spec JSON, not code.
+set -euo pipefail
+mkdir -p "$ISOLAB_OUTPUT_DIR"
+finish() {
+  run_exit=$?
+  trap - EXIT TERM INT
+  set +e
+  printf '{"exit_code":%s,"job_name":"%s","pod_uid":"%s","node_name":"%s"}\n' "$run_exit" "$ISOLAB_JOB_ID" "$POD_UID" "$NODE_NAME" > "$ISOLAB_OUTPUT_DIR/job-exit.json"
+  (
+    set -e
+    cd "$ISOLAB_OUTPUT_DIR"
+    shopt -s globstar nullglob
+    for artifact in **/*; do
+      if [[ -f "$artifact" && "$artifact" != SHA256SUMS ]]; then sha256sum "$artifact"; fi
+    done
+  ) > "$ISOLAB_OUTPUT_DIR/SHA256SUMS"
+  hash_exit=$?
+  if [[ "$hash_exit" != 0 ]]; then exit 90; fi
+  if aws s3 cp "$ISOLAB_OUTPUT_DIR/" "$ISOLAB_RESULTS_URI" --recursive --only-show-errors; then
+    printf 'Artifacts saved: %s\n' "$ISOLAB_RESULTS_URI"
+  else
+    exit 91
+  fi
+  exit "$run_exit"
+}
+trap finish EXIT
+trap 'exit 143' TERM
+trap 'exit 130' INT
+cp /opt/isolab/build-info.json "$ISOLAB_OUTPUT_DIR/build-info.json"
+printf '%s\n' "$1" > "$ISOLAB_OUTPUT_DIR/input-spec.json"
+spec="$ISOLAB_OUTPUT_DIR/input-spec.json"
+jq -e '.schema == "ecbench.spec/v1" and .measurement.isolation_required == "L2"
+  and .measurement.rounds >= 5 and .measurement.warmup >= 1
+  and ([.arms[] | select(.role == "reference")] | length > 0)
+  and ([.arms[] | select(.role == "control")] | length > 0)' "$spec" >/dev/null
+sha256sum /usr/local/bin/ecbench > "$ISOLAB_OUTPUT_DIR/binary.sha256"
+aws sts get-caller-identity > "$ISOLAB_OUTPUT_DIR/runner-identity.json"
+cat /proc/self/status > "$ISOLAB_OUTPUT_DIR/process-status.txt"
+cat /sys/fs/cgroup/cpuset.cpus.effective > "$ISOLAB_OUTPUT_DIR/pod-cpuset.txt"
+# A separate whole core remains for the parent shell and harness. No busy
+# override, threshold override, automatic retry, or selective record removal.
+sleep 60
+ecbench run --spec "$spec" --out "$ISOLAB_OUTPUT_DIR/session" --cpus auto > "$ISOLAB_OUTPUT_DIR/run-summary.json" 2> "$ISOLAB_OUTPUT_DIR/run.stderr"
+ecbench verify --dir "$ISOLAB_OUTPUT_DIR/session" --replay-all --exit-code --out "$ISOLAB_OUTPUT_DIR/audit.json" > "$ISOLAB_OUTPUT_DIR/audit.stdout" 2> "$ISOLAB_OUTPUT_DIR/audit.stderr"
+cat "$ISOLAB_OUTPUT_DIR/audit.stderr"
+jq -e '.ok and .regraded and .records_bound and .records>0
+  and .verified_records==.records and (.replays|length)>0
+  and all(.replays[]; .reproduced==true)' "$ISOLAB_OUTPUT_DIR/audit.json" >/dev/null || exit 41
+# The audit authenticates and regrades the records; this additional gate
+# rejects a correct computation whose measurement did not achieve L2.
+jq -s '{required:"L2",executions:length,
+  invalid_outcomes:[.[] | select(.outcome.status != "verified" or .outcome.matches_target != true) | {seq,arm,outcome}],
+  below_l2:[.[] | select(.isolation.level != "L2" and .isolation.level != "L3") | {seq,arm,isolation}],
+  grades:(group_by(.isolation.level)|map({level:.[0].isolation.level,count:length}))}
+  | .accepted=(.executions > 0 and (.below_l2|length)==0 and (.invalid_outcomes|length)==0)' \
+  "$ISOLAB_OUTPUT_DIR/session/records.jsonl" > "$ISOLAB_OUTPUT_DIR/l2-gate.json"
+jq -e '.accepted' "$ISOLAB_OUTPUT_DIR/l2-gate.json" >/dev/null || exit 42
+reference=$(jq -r '.arms[] | select(.role=="reference") | .name' "$spec" | head -1)
+control=$(jq -r '.arms[] | select(.role=="control") | .name' "$spec" | head -1)
+ecbench compare --dir "$ISOLAB_OUTPUT_DIR/session" --a "$reference" --b "$control" --json \
+  > "$ISOLAB_OUTPUT_DIR/control-comparison.json"
+jq -e '.wall.status=="admitted" and .wall.pairs_below_level==0 and .wall.aa_pairs>=5
+  and .wall.aa_ci95!=null' "$ISOLAB_OUTPUT_DIR/control-comparison.json" >/dev/null || exit 43
