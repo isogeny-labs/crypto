@@ -33,7 +33,10 @@ use std::time::{Duration, Instant};
 
 #[path = "isogeny_walk/state.rs"]
 mod state;
+#[path = "isogeny_walk/traits_state.rs"]
+mod traits_state;
 use state::WalkState;
+use traits_state::TraitsState;
 
 use clap::{Args, Parser, Subcommand};
 use crypto_lib::cryptanalysis::isogeny_walk::queue::{self, PlanStore, PlanWalk};
@@ -178,6 +181,24 @@ enum Cmd {
         store: Option<String>,
         #[arg(long)]
         run: Option<String>,
+        /// Save a checksummed checkpoint after each completed curve in --out.
+        #[arg(long)]
+        checkpoint: bool,
+        /// Resume completed curves from --out or from S3 into a fresh --out.
+        #[arg(long)]
+        resume: bool,
+        /// Mirror checkpoint and final shard artifacts to this S3 prefix.
+        #[arg(long)]
+        state_s3_uri: Option<String>,
+        /// Seconds between S3 copies; the final copy is always required.
+        #[arg(long, value_parser = clap::value_parser!(u64).range(1..))]
+        sync_every: Option<u64>,
+        /// Print completed-curve progress and S3 transfers on stderr.
+        #[arg(long)]
+        verbose: bool,
+        /// Seconds between heartbeat lines (implies --verbose).
+        #[arg(long, value_parser = clap::value_parser!(u64).range(1..))]
+        progress_every: Option<u64>,
     },
     /// Merge trait shard directories, refusing gaps, duplicates and mixed walks.
     Collect {
@@ -437,10 +458,17 @@ impl Heartbeat {
                 .is_err_and(|e| e == mpsc::RecvTimeoutError::Timeout)
             {
                 let (name, curves, edges) = *shared.lock().expect("walk heartbeat lock");
-                eprintln!(
-                    "isogeny_walk: {name}: {curves} curves, {edges} edges; elapsed {:.1}s",
-                    started.elapsed().as_secs_f64()
-                );
+                if name == "traits" {
+                    eprintln!(
+                        "isogeny_walk: traits: {curves}/{edges} curves complete; elapsed {:.1}s",
+                        started.elapsed().as_secs_f64()
+                    );
+                } else {
+                    eprintln!(
+                        "isogeny_walk: {name}: {curves} curves, {edges} edges; elapsed {:.1}s",
+                        started.elapsed().as_secs_f64()
+                    );
+                }
             }
         });
         Self {
@@ -737,7 +765,19 @@ fn run(cli: Cli) -> Result<(), String> {
             out,
             store: store_uri,
             run,
+            checkpoint,
+            resume,
+            state_s3_uri,
+            sync_every,
+            verbose,
+            progress_every,
         } => {
+            if of == 0 || shard >= of {
+                return Err(format!("shard {shard} of {of}: need 0 <= shard < of"));
+            }
+            if sync_every.is_some() && state_s3_uri.is_none() {
+                return Err("--sync-every requires --state-s3-uri".into());
+            }
             let start = curve.start()?;
             let out = out
                 .or_else(|| std::env::var_os("TASKQ_OUTPUT_DIR").map(PathBuf::from))
@@ -745,7 +785,74 @@ fn run(cli: Cli) -> Result<(), String> {
             let path = dir.join("isogeny_routes.json");
             let text =
                 std::fs::read_to_string(&path).map_err(|e| format!("{}: {e}", path.display()))?;
-            let shard_out = queue::run_shard(&text, &start, shard, of, class_audit_sample)?;
+            let managed = checkpoint || resume || state_s3_uri.is_some();
+            let show_progress = verbose || progress_every.is_some();
+            let mut trait_state = if managed {
+                let binary = std::fs::read(std::env::current_exe().map_err(|e| e.to_string())?)
+                    .map_err(|e| format!("reading current executable: {e}"))?;
+                let manifest = serde_json::json!({
+                    "schema_version": 1,
+                    "method": "isogeny-traits",
+                    "isogeny_routes_sha256": sha256_hex(&text),
+                    "curve": {"name": start.name, "p": start.p.to_string(),
+                        "a": start.a.to_string(), "b": start.b.to_string(),
+                        "order": start.order.to_string(),
+                        "subgroup_order": start.subgroup_order.to_string(),
+                        "gx": start.gx.to_string(), "gy": start.gy.to_string()},
+                    "shard": shard, "of": of, "class_audit_sample": class_audit_sample,
+                    "binary_blake3": blake3::hash(&binary).to_hex().to_string(),
+                });
+                Some(TraitsState::prepare(
+                    out.clone(),
+                    resume,
+                    state_s3_uri,
+                    sync_every.unwrap_or(60),
+                    show_progress,
+                    manifest,
+                )?)
+            } else {
+                None
+            };
+            let saved = trait_state
+                .as_ref()
+                .map(|state| state.lines().to_vec())
+                .unwrap_or_default();
+            let heartbeat = show_progress.then(|| Heartbeat::start(progress_every.unwrap_or(5)));
+            if let Some(heartbeat) = &heartbeat {
+                let nodes_total = serde_json::from_str::<serde_json::Value>(&text)
+                    .map_err(|e| format!("invalid routes: {e}"))?["curve_nodes"]
+                    .as_array()
+                    .ok_or("curve_nodes")?
+                    .len();
+                let shard_total = (shard..nodes_total).step_by(of).count();
+                heartbeat.update("traits", saved.len(), shard_total);
+            }
+            let shard_out = if managed || show_progress {
+                let mut on_curve = |done: usize, total: usize, line: &str| -> Result<(), String> {
+                    if let Some(state) = trait_state.as_mut() {
+                        state.record(line)?;
+                    }
+                    if let Some(heartbeat) = &heartbeat {
+                        heartbeat.update("traits", done, total);
+                    }
+                    if show_progress {
+                        eprintln!("isogeny_walk: trait shard {shard}/{of}: {done}/{total} curves complete");
+                    }
+                    Ok(())
+                };
+                queue::run_shard_resume(
+                    &text,
+                    &start,
+                    shard,
+                    of,
+                    class_audit_sample,
+                    &saved,
+                    &mut on_curve,
+                )?
+            } else {
+                queue::run_shard(&text, &start, shard, of, class_audit_sample)?
+            };
+            drop(heartbeat);
             queue::write_shard(&out, &shard_out)?;
             if let Some(uri) = &store_uri {
                 let run = run.as_deref().ok_or("--store needs --run")?;
@@ -761,6 +868,9 @@ fn run(cli: Cli) -> Result<(), String> {
                         ("of", V::int(of)),
                     ]),
                 )?;
+            }
+            if let Some(state) = trait_state.as_mut() {
+                state.finish()?;
             }
             eprintln!(
                 "isogeny_walk: trait shard {shard}/{of} of {} written to {}",

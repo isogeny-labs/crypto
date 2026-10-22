@@ -59,6 +59,31 @@ dedicated prefix per run.
 Only one host should write a given state prefix at a time; the directory lock
 does not coordinate separate hosts.
 
+`isogeny_walk traits` can also report each completed curve with `--verbose`
+and a heartbeat with `--progress-every SECONDS`. Add `--checkpoint` to save a
+checksummed `traits.ckpt` in `--out` after every completed curve, or add
+`--state-s3-uri` to save locally and mirror it to S3. Resume with the same
+walk, root curve, shard, and detector settings; a stopped detector repeats
+its curve. A fresh `--out` can restore directly from S3:
+
+```sh
+isogeny_walk traits --curve p224 --dir ./walks/p224-12 --shard 0 --of 4 \
+  --out ./traits/p224-shard-0 --checkpoint --verbose \
+  --state-s3-uri s3://my-bucket/trait-state/p224-shard-0 --sync-every 60
+isogeny_walk traits --curve p224 --dir ./walks/p224-12 --shard 0 --of 4 \
+  --out ./traits/restored-shard-0 --resume --verbose \
+  --state-s3-uri s3://my-bucket/trait-state/p224-shard-0
+```
+
+The manifest binds the routes file, root curve, shard parameters, and
+executable digest. `progress.json` records the committed curve count.
+`traits.jsonl`, `class_audits.json`, `metrics.json`, and `result.json` are
+uploaded after the checkpoint, with the result last. Class audits repeat on
+restart. Ordinary runs without these progress or state options keep the
+parallel detector path. Use one writer per state prefix; the local lock does
+not coordinate hosts. The existing `--store` prefix separately publishes
+completed shard artifacts.
+
 `crypto isogeny class build` and `resume` keep the class graph in SQLite and
 now stream committed vertex counts with `--verbose` (or
 `--progress-every SECONDS`). They can publish transaction-consistent SQLite
