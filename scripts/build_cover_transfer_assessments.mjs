@@ -9,7 +9,7 @@ const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
 const ASSESSMENT_DATE = "2026-10-22";
-const CATALOG_COMMIT = "a11984a573441d5bf0d60ab1d26cfc34e71badf5";
+const CATALOG_COMMIT = "228cdc0d50f2e4a2058f6fb93d6cc7f535e2692d";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
@@ -1073,15 +1073,39 @@ async function buildSourceArtifacts() {
       "historical PDF coverage-marker utility source; not executed by this refresh",
     ),
     integrityArtifact(
-      "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/README.md",
+      "research/quadratic_twist_evidence_20261021/native/metadata/main.rs",
+      "native identity importer including canonical appended-row layout",
+    ),
+    integrityArtifact(
+      "scripts/update_curve_standards.py",
+      "metadata-only standards join and display freshness adapter; no curve arithmetic",
+    ),
+    integrityArtifact(
+      "scripts/build_ic_leaderboard.py",
+      "existing display renderer; only its metadata roster path was invoked",
+    ),
+    integrityArtifact(
+      "scripts/build_lab_browser.py",
+      "metadata browser renderer; integer coefficient vectors are displayed without changing identities",
+    ),
+    integrityArtifact(
+      "research/quadratic_twist_evidence_20261021/validation/metadata-ci-20261022T0500Z/preservation.json",
+      "lossless layout, identity, geometry and frozen-measurement preservation receipt",
+    ),
+    integrityArtifact(
+      "research/quadratic_twist_evidence_20261021/validation/metadata-ci-20261022T0500Z/verify-preservation.mjs",
+      "metadata comparison source including exact predecessor and inherited Lean object checks",
+    ),
+    integrityArtifact(
+      "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/README.md",
       "source-linked catalog-wide assessment report",
     ),
     integrityArtifact(
-      "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/report.tex",
+      "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/report.tex",
       "current PDF source and embedded exact coverage marker",
     ),
     integrityArtifact(
-      "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/build.sh",
+      "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/build.sh",
       "Graphviz and LaTeX report build command",
     ),
     integrityArtifact(
@@ -1089,31 +1113,31 @@ async function buildSourceArtifacts() {
       "published-artifact replay receipt and source/package boundary",
     ),
     integrityArtifact(
-      "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_correspondence.dot",
+      "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_correspondence.dot",
       "assessment diagram source",
     ),
     integrityArtifact(
-      "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_correspondence.svg",
+      "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_correspondence.svg",
       "rendered assessment diagram in SVG format",
     ),
     integrityArtifact(
-      "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_correspondence.png",
+      "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_correspondence.png",
       "rendered assessment diagram in PNG format",
     ),
     integrityArtifact(
-      "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_transfer_context.dot",
+      "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_transfer_context.dot",
       "typed transfer-context diagram source",
     ),
     integrityArtifact(
-      "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_transfer_context.svg",
+      "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_transfer_context.svg",
       "rendered typed transfer-context diagram in SVG format",
     ),
     integrityArtifact(
-      "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_transfer_context.png",
+      "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_transfer_context.png",
       "rendered typed transfer-context diagram in PNG format",
     ),
     integrityArtifact(
-      "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/report.pdf",
+      "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/report.pdf",
       "rendered catalog-wide assessment PDF",
     ),
   ]);
@@ -1639,21 +1663,21 @@ async function buildLedger() {
     ],
     open_obligations: obligations,
     report: {
-      markdown: "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/README.md",
+      markdown: "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/README.md",
       pdf:
-        "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/report.pdf",
+        "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/report.pdf",
       graph_source:
-        "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_correspondence.dot",
+        "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_correspondence.dot",
       graph_svg:
-        "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_correspondence.svg",
+        "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_correspondence.svg",
       graph_png:
-        "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_correspondence.png",
+        "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_correspondence.png",
       context_graph_source:
-        "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_transfer_context.dot",
+        "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_transfer_context.dot",
       context_graph_svg:
-        "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_transfer_context.svg",
+        "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_transfer_context.svg",
       context_graph_png:
-        "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_transfer_context.png",
+        "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_transfer_context.png",
       release_receipt:
         "research/cover_transfer_assessment_20261013/release_replay.txt",
     },

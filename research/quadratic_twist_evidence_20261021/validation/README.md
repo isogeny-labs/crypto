@@ -22,6 +22,7 @@ unavailable checks. Earlier missing-tool statements describe the earlier environ
 | Legacy registry metadata adapter | syntax compiled; no Python arithmetic path executed | metadata-only `harvest_native_quadratic_twists`; native Rust generated the records |
 | New PDF | compiled and every page visually inspected | `../reports/native-20261021T150125Z/`, `continuation/pdf-build.log` |
 | Expanded cover catalog integration | 4,493 native geometry checks; all prior records retained; independent assessment and missing-membership control pass; 26 affected binary tests pass | `catalog-ci-20261022/README.md`, `../reports/catalog-20261022/` |
+| Standards/browser metadata follow-up | all 4,493 rows reproduce; 40 native, 4,474 library and 26 binary tests pass; six metadata tests pass; frozen registry/board/browser values preserved; independent assessment has zero findings | `metadata-ci-20261022T0500Z/README.md`, `../reports/metadata-20261022T0500Z/` |
 
 The full-library run requires permission for its existing localhost socket tests.
 A sandbox-restricted invocation failed nine networking tests with `PermissionDenied`.
@@ -69,3 +70,19 @@ validation. The old benchmark/gate files remain outside this change.
 CI must still complete successfully for the resulting head before any merge.
 Shared Conductor access and the exact remaining geometric proof obligations stay
 open in the problem record.
+
+At head `3e442fd3310d`, the full native audit and quadratic-twist Lean target
+passed CI. The next standards metadata join found compact imported rows; the
+fresh-import reproduction and layout correction are retained in
+`metadata-ci-20261022T0500Z/`. Native generation now matches the canonical registry
+byte for byte. Model, geometry, identity, alias and measured-board values are
+unchanged. The current assessment retains the three original Git blobs at
+`a11984a57344` and pins corrected inputs at descendant `228cdc0d50f2`.
+
+The same exact-head Lean run failed in the unrelated SEA target after a
+successful build because Lean 4.19 rejected `--trusted` before axiom auditing.
+Its source directory, gate and workflow are identical at the declared PR base,
+CI base, PR head and tested merge. That inherited failure is recorded without
+modifying its sources or the gate. Cursor's approval agent could not start due
+to its usage limit; a neutral result supplies no approval. Full exact-head check
+runs, failed receipts and source comparisons are retained in the new record.

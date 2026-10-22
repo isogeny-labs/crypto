@@ -1,0 +1,421 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h07a9b2e6b0a3a9d3",
+  "statement": {
+    "name": "symmetric-s3",
+    "source": "research/quadratic_twist_evidence_20261021/lean/TwistProof.lean:TwistProof.symmetric_s3; exact Z coefficient cancellation also checked by native/full.cpp",
+    "variables": [
+      "x",
+      "y",
+      "z",
+      "a",
+      "b"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "var",
+                        "args": "y"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "neg",
+                      "args": {
+                        "op": "var",
+                        "args": "y"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "z"
+                },
+                {
+                  "op": "var",
+                  "args": "z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "const",
+                "args": 2
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "x"
+                          },
+                          {
+                            "op": "var",
+                            "args": "y"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "add",
+                        "args": [
+                          {
+                            "op": "mul",
+                            "args": [
+                              {
+                                "op": "var",
+                                "args": "x"
+                              },
+                              {
+                                "op": "var",
+                                "args": "y"
+                              }
+                            ]
+                          },
+                          {
+                            "op": "var",
+                            "args": "a"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "const",
+                        "args": 2
+                      },
+                      {
+                        "op": "var",
+                        "args": "b"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "var",
+                "args": "z"
+              }
+            ]
+          }
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "y"
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "a"
+                  }
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "y"
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "a"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "const",
+                "args": 4
+              },
+              {
+                "op": "var",
+                "args": "b"
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "x"
+                  },
+                  {
+                    "op": "var",
+                    "args": "y"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "x"
+                        },
+                        {
+                          "op": "var",
+                          "args": "y"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "x"
+                        },
+                        {
+                          "op": "var",
+                          "args": "z"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "y"
+                        },
+                        {
+                          "op": "var",
+                          "args": "z"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "a"
+                  }
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "x"
+                        },
+                        {
+                          "op": "var",
+                          "args": "y"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "x"
+                        },
+                        {
+                          "op": "var",
+                          "args": "z"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "y"
+                        },
+                        {
+                          "op": "var",
+                          "args": "z"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "a"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "const",
+                "args": 4
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "x"
+                  },
+                  {
+                    "op": "var",
+                    "args": "y"
+                  },
+                  {
+                    "op": "var",
+                    "args": "z"
+                  }
+                ]
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "x"
+                      },
+                      {
+                        "op": "var",
+                        "args": "y"
+                      },
+                      {
+                        "op": "var",
+                        "args": "z"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "var",
+                    "args": "b"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261021,
+  "value_digest": "64d21600176041d66f8fba8ea6a8b17a0ae759529ae657446938098583eb5309",
+  "independence": "Issued and checked with the repository native backend; extra checker seed 2381, 16 points. Same-host checks, not an independent-host claim.",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/quadratic_twist_evidence_20261021/lean/TwistProof.lean",
+    "sha256": "3e9a6ed8e870265b362352cfec51ef743ca4a191efc896849158f8c9486f7939"
+  }
+}

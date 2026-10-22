@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 829, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 804, in main
+    fresh = build()
+            ^^^^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 718, in build
+    curves = curve_rows(registry, leaderboard)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 361, in curve_rows
+    a, b = ("[" + ", ".join(v) + "]" if isinstance(v, list) else v for v in (a, b))
+    ^^^^
+  File "/workspace/crypto-next/scripts/build_lab_browser.py", line 361, in <genexpr>
+    a, b = ("[" + ", ".join(v) + "]" if isinstance(v, list) else v for v in (a, b))
+                  ^^^^^^^^^^^^
+TypeError: sequence item 0: expected str instance, int found

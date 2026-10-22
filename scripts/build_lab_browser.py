@@ -358,7 +358,7 @@ def curve_rows(registry: dict, leaderboard: dict) -> list[dict]:
         a = params.get("a") if params.get("a") is not None else model.get("a")
         b = params.get("b") if params.get("b") is not None else model.get("b")
         # An extension coefficient is its list over 1, t, ..., t^(k-1).
-        a, b = ("[" + ", ".join(v) + "]" if isinstance(v, list) else v for v in (a, b))
+        a, b = ("[" + ", ".join(map(str, v)) + "]" if isinstance(v, list) else v for v in (a, b))
         rep = (c.get("representations") or [None])[0]
         subgroup = rep["curve"] if rep else {}
         r = subgroup.get("subgroup_order")

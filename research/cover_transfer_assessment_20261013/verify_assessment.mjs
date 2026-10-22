@@ -795,7 +795,16 @@ check(
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "a11984a573441d5bf0d60ab1d26cfc34e71badf5";
+const expectedCatalogCommit = "228cdc0d50f2e4a2058f6fb93d6cc7f535e2692d";
+// Retain the exact original catalog dependency when a byte-layout correction
+// requires a descendant input snapshot. Neither historical blob checks nor
+// the current catalog's byte checks may be replaced by semantic equivalence.
+const predecessorCatalogCommit = "a11984a573441d5bf0d60ab1d26cfc34e71badf5";
+const predecessorCatalogHashes = {
+  "docs/curves/registry.json": "8bd5ceabd6c18d65193e10a243219f088dc94513afbe47a967ab43bfa76b04fe",
+  "docs/curves/covers.json": "3694c9f99462c6a508ea14f8402c2e90946ccaea729793ab7aee7950295de9cf",
+  "docs/curves/cover-links.yaml": "35113c345323549d708a5b89cac8dabf7cdf3489727b7d8a6119180e2f41a369",
+};
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -1045,8 +1054,14 @@ const expectedCostStatuses = {
   jacobian_relations_linear_algebra_target_decomposition: "not_applicable",
 };
 const requiredSourceArtifactPaths = [
-  "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/report.tex",
-  "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/build.sh",
+  "research/quadratic_twist_evidence_20261021/native/metadata/main.rs",
+  "scripts/update_curve_standards.py",
+  "scripts/build_ic_leaderboard.py",
+  "scripts/build_lab_browser.py",
+  "research/quadratic_twist_evidence_20261021/validation/metadata-ci-20261022T0500Z/preservation.json",
+  "research/quadratic_twist_evidence_20261021/validation/metadata-ci-20261022T0500Z/verify-preservation.mjs",
+  "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/report.tex",
+  "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/build.sh",
   "Cargo.toml",
   "Cargo.lock",
   ".github/workflows/curve-covers.yml",
@@ -1081,9 +1096,9 @@ const requiredSourceArtifactPaths = [
   "src/utils/mod.rs",
   "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
   "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
-  "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_transfer_context.dot",
-  "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_transfer_context.svg",
-  "research/quadratic_twist_evidence_20261021/reports/catalog-20261022/typed_transfer_context.png",
+  "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_transfer_context.dot",
+  "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_transfer_context.svg",
+  "research/quadratic_twist_evidence_20261021/reports/metadata-20261022T0500Z/typed_transfer_context.png",
 ];
 const closedMapPredicates = [
   "binary_cubic_same_field",
@@ -1110,6 +1125,19 @@ check(
   assessment.catalog_commit === expectedCatalogCommit,
   "assessment catalog commit changed",
 );
+try {
+  execFileSync("git", ["merge-base", "--is-ancestor", predecessorCatalogCommit,
+    expectedCatalogCommit], { cwd: root });
+  for (const [relativePath, expectedHash] of Object.entries(predecessorCatalogHashes)) {
+    const predecessorBytes = execFileSync("git",
+      ["show", `${predecessorCatalogCommit}:${relativePath}`],
+      { cwd: root, maxBuffer: 32 * 1024 * 1024 });
+    check(sha256(predecessorBytes) === expectedHash,
+      `predecessor catalog blob changed: ${relativePath}`);
+  }
+} catch (error) {
+  check(false, `cannot replay exact predecessor catalog: ${error.message}`);
+}
 for (const relativePath of [
   "docs/curves/registry.json",
   "docs/curves/covers.json",
