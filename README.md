@@ -750,6 +750,9 @@ crypto hash blake3 "hello world"
 # Hash exact bytes, including NUL and non-UTF-8 values
 crypto hash sha256 --hex 00ff0180
 crypto hash sha3-256 --file ./message.bin
+crypto hash sha-3-512 --file ./message.bin
+crypto hash shake-256 --output-bytes 64 --file ./message.bin
+crypto cryptanalysis hash-auto --hash sha-3-256
 
 # ECC / ECDSA / ECDH
 crypto ecc keygen

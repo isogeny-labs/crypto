@@ -583,7 +583,10 @@ pub fn auto_hash_attack_with_output_bytes(
     hash_name: &str,
     output_bytes: Option<usize>,
 ) -> Result<String, String> {
-    let is_xof = matches!(hash_name, "shake128" | "shake256");
+    let is_xof = matches!(
+        hash_name,
+        "shake128" | "shake-128" | "shake256" | "shake-256"
+    );
     let xof_len = if is_xof {
         match output_bytes {
             Some(length @ 1..=64) => length,
@@ -642,12 +645,12 @@ pub fn auto_hash_attack_with_output_bytes(
         "sha512-224" | "sha-512-224" => md.push_str(&run_fixed_without_extension(&Sha512_224)),
         "sha512-256" | "sha-512-256" => md.push_str(&run_fixed_without_extension(&Sha512_256)),
         "blake3" => md.push_str(&run_fixed_without_extension(&Blake3)),
-        "sha3-224" => md.push_str(&run_sponge(&Sha3_224)),
-        "sha3" | "sha3-256" => md.push_str(&run_sponge(&Sha3_256)),
-        "sha3-384" => md.push_str(&run_sponge(&Sha3_384)),
-        "sha3-512" => md.push_str(&run_sponge(&Sha3_512)),
-        "shake128" => md.push_str(&run_sponge(&Shake128(xof_len))),
-        "shake256" => md.push_str(&run_sponge(&Shake256(xof_len))),
+        "sha3-224" | "sha-3-224" => md.push_str(&run_sponge(&Sha3_224)),
+        "sha3" | "sha-3" | "sha3-256" | "sha-3-256" => md.push_str(&run_sponge(&Sha3_256)),
+        "sha3-384" | "sha-3-384" => md.push_str(&run_sponge(&Sha3_384)),
+        "sha3-512" | "sha-3-512" => md.push_str(&run_sponge(&Sha3_512)),
+        "shake128" | "shake-128" => md.push_str(&run_sponge(&Shake128(xof_len))),
+        "shake256" | "shake-256" => md.push_str(&run_sponge(&Shake256(xof_len))),
         _ => {
             return Err(format!(
                 "unknown hash '{}'; try one of: md4, md5, sha1, sha224, sha256, sha384, sha512, sha512-224, sha512-256, sha3-224, sha3-256, sha3-384, sha3-512, shake128, shake256, blake3",
@@ -929,9 +932,13 @@ mod tests {
     #[test]
     fn shake_auto_requires_bounded_explicit_length() {
         assert!(auto_hash_attack("shake128").is_err());
+        assert!(auto_hash_attack("shake-128").is_err());
         assert!(auto_hash_attack_with_output_bytes("shake256", Some(0)).is_err());
         assert!(auto_hash_attack_with_output_bytes("shake256", Some(65)).is_err());
         assert!(auto_hash_attack_with_output_bytes("sha3-256", Some(32)).is_err());
+        assert!(auto_hash_attack_with_output_bytes("sha-3-256", Some(32)).is_err());
+        assert!(auto_hash_attack("sha-3-256").is_ok());
+        assert!(auto_hash_attack_with_output_bytes("shake-256", Some(1)).is_ok());
     }
 
     /// Birthday-attack on 24-bit-truncated MD5 finds a collision in

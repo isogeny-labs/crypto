@@ -2646,7 +2646,7 @@ fn load_hash_input(
 
 fn cmd_hash(alg: &str, bytes: &[u8], output_bytes: Option<usize>) -> Result<String, String> {
     let length = match alg {
-        "shake128" | "shake256" => match output_bytes {
+        "shake128" | "shake-128" | "shake256" | "shake-256" => match output_bytes {
             Some(length @ 1..=1_048_576) => length,
             _ => return Err("SHAKE requires --output-bytes in 1..=1048576".into()),
         },
@@ -2686,12 +2686,12 @@ fn cmd_hash(alg: &str, bytes: &[u8], output_bytes: Option<usize>) -> Result<Stri
         "sha512" | "sha-512" => to_hex(&sha512(bytes)),
         "sha512-224" | "sha-512-224" => to_hex(&sha512_224(bytes)),
         "sha512-256" | "sha-512-256" => to_hex(&sha512_256(bytes)),
-        "sha3-224" => to_hex(&sha3_224(bytes)),
-        "sha3" | "sha3-256" => to_hex(&sha3_256(bytes)),
-        "sha3-384" => to_hex(&sha3_384(bytes)),
-        "sha3-512" => to_hex(&sha3_512(bytes)),
-        "shake128" => to_hex(&shake128(bytes, length)),
-        "shake256" => to_hex(&shake256(bytes, length)),
+        "sha3-224" | "sha-3-224" => to_hex(&sha3_224(bytes)),
+        "sha3" | "sha-3" | "sha3-256" | "sha-3-256" => to_hex(&sha3_256(bytes)),
+        "sha3-384" | "sha-3-384" => to_hex(&sha3_384(bytes)),
+        "sha3-512" | "sha-3-512" => to_hex(&sha3_512(bytes)),
+        "shake128" | "shake-128" => to_hex(&shake128(bytes, length)),
+        "shake256" | "shake-256" => to_hex(&shake256(bytes, length)),
         "blake2b" => to_hex(&blake2b(bytes, length)),
         "blake2s" => to_hex(&blake2s(bytes, length)),
         "blake3" => to_hex(&blake3_hash(bytes)),
@@ -3246,9 +3246,14 @@ mod hash_cli_tests {
             ("sha512-224", "4634270f707b6a54daae7530460842e20e37ed265ceee9a43e8924aa"),
             ("sha512-256", "53048e2681941ef99b2e29b76b4c7dabe4c2d0c634fc6d46e0e2f13107e7af23"),
             ("sha3-224", "e642824c3f8cf24ad09234ee7d3c766fc9a3a5168d0c94ad73b46fdf"),
+            ("sha-3-224", "e642824c3f8cf24ad09234ee7d3c766fc9a3a5168d0c94ad73b46fdf"),
             ("sha3", "3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532"),
+            ("sha-3", "3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532"),
+            ("sha-3-256", "3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532"),
             ("sha3-384", "ec01498288516fc926459f58e2c6ad8df9b473cb0fc08c2596da7cf0e49be4b298d88cea927ac7f539f1edf228376d25"),
+            ("sha-3-384", "ec01498288516fc926459f58e2c6ad8df9b473cb0fc08c2596da7cf0e49be4b298d88cea927ac7f539f1edf228376d25"),
             ("sha3-512", "b751850b1a57168a5693cd924b6b096e08f621827444f70d884f5d0240d2712e10e116e9192af3c91a7ec57647e3934057340b4cf408d5a56592f8274eec53f0"),
+            ("sha-3-512", "b751850b1a57168a5693cd924b6b096e08f621827444f70d884f5d0240d2712e10e116e9192af3c91a7ec57647e3934057340b4cf408d5a56592f8274eec53f0"),
         ];
         for (name, expected) in vectors {
             assert_eq!(cmd_hash(name, b"abc", None).unwrap(), expected, "{name}");
@@ -3258,7 +3263,15 @@ mod hash_cli_tests {
             "5881092dd818bf5cf8a3ddb793fbcba7"
         );
         assert_eq!(
+            cmd_hash("shake-128", b"abc", Some(16)).unwrap(),
+            "5881092dd818bf5cf8a3ddb793fbcba7"
+        );
+        assert_eq!(
             cmd_hash("shake256", b"abc", Some(16)).unwrap(),
+            "483366601360a8771c6863080cc4114d"
+        );
+        assert_eq!(
+            cmd_hash("shake-256", b"abc", Some(16)).unwrap(),
             "483366601360a8771c6863080cc4114d"
         );
     }
