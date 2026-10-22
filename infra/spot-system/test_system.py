@@ -279,6 +279,11 @@ class DeploymentTests(unittest.TestCase):
         for name in ['spot-legacy-recovery','spot-diem-recovery']:
             self.assertIn('After=network-online.target spot-codex-recovery.service',services[name])
             self.assertIn('Requires=spot-codex-recovery.service',services[name])
+        # A completed dependency must not remove the status files that Codex
+        # and other live recovery services still use in this shared directory.
+        for name in ['spot-codex-recovery', 'spot-legacy-recovery', 'spot-diem-recovery']:
+            self.assertIn('RuntimeDirectory=spot-legacy\n', services[name])
+            self.assertIn('RuntimeDirectoryPreserve=yes\n', services[name])
 
     def test_compute_lifecycle_is_independent_of_ip_cutover(self):
         template = build()
@@ -338,6 +343,56 @@ class LeaseTests(unittest.TestCase):
         self.asg.describe_auto_scaling_groups.return_value = {
             'AutoScalingGroups': [{'Instances': []}]}
         self.env = {'ENABLED': 'true', 'LOCK_TABLE': 'locks', 'GROUP': 'group', 'ALLOCATION': 'eip'}
+
+    def capacity_failure_fixture(self, complete=True, codex_ready=True):
+        self.env.update(PROTECTED_SOURCE='source', LEGACY_OWNER_KEYS='legacy-owner,legacy-owner-diem')
+        released = {'Origin': {'S': 'source'}, 'OriginReleased': {'BOOL': True},
+                    'ReleaseReceipt': {'S': 'a' * 64}, 'Owner': {'S': 'i-new'}}
+        def record(**kwargs):
+            key = kwargs['Key']['Id']['S']
+            return {'Item': {**released, **(
+                {'Ready': {'BOOL': codex_ready}} if key == 'legacy-owner-codex'
+                else {'Complete': {'BOOL': complete}})}}
+        self.db.get_item.side_effect = record
+        self.asg.describe_auto_scaling_groups.return_value = {'AutoScalingGroups': [{
+            'Instances': [{'InstanceId': 'i-new', 'LifecycleState': 'InService', 'HealthStatus': 'Healthy'}],
+            'MixedInstancesPolicy': {'LaunchTemplate': {
+                'LaunchTemplateSpecification': {'LaunchTemplateId': 'template', 'Version': '31'},
+                'Overrides': [{'InstanceRequirements': {'AllowedInstanceTypes': ['m8i-flex.*']}}]}}}]}
+        self.asg.update_auto_scaling_group.side_effect = RuntimeError('AccessDenied: launch template')
+        self.ec2.describe_instances.return_value = {'Reservations': [{'Instances': [{
+            'InstanceId': 'i-new', 'State': {'Name': 'running'}, 'LaunchTime': 1,
+            'Tags': [{'Key': 'SpotReady', 'Value': 'true'}, {'Key': 'LegacyReady', 'Value': 'true'}]}]}]}
+        self.ec2.describe_instance_status.return_value = {'InstanceStatuses': [{
+            'InstanceId': 'i-new', 'SystemStatus': {'Status': 'ok'}, 'InstanceStatus': {'Status': 'ok'}}]}
+        self.ec2.describe_addresses.return_value = {'Addresses': [{}]}
+
+    def test_optional_capacity_denial_does_not_block_ready_owner_ip(self):
+        self.capacity_failure_fixture()
+        with patch.dict(sys.modules, {'boto3': self.sdk}), patch.dict(os.environ, self.env), \
+                self.assertLogs('controller', level='ERROR'):
+            result = handler({}, SimpleNamespace(aws_request_id='request'))
+        self.assertEqual(result, {'state': 'moved', 'instance': 'i-new'})
+        self.ec2.associate_address.assert_called_once_with(
+            AllocationId='eip', InstanceId='i-new', AllowReassociation=True)
+        self.db.delete_item.assert_called_once()
+
+    def test_optional_capacity_denial_preserves_codex_readiness_fence(self):
+        self.capacity_failure_fixture(codex_ready=False)
+        with patch.dict(sys.modules, {'boto3': self.sdk}), patch.dict(os.environ, self.env), \
+                self.assertLogs('controller', level='ERROR'):
+            result = handler({}, SimpleNamespace(aws_request_id='request'))
+        self.assertEqual(result['state'], 'waiting-for-bootstrap')
+        self.ec2.associate_address.assert_not_called()
+        self.db.delete_item.assert_called_once()
+
+    def test_required_cpu_restriction_denial_still_fails_closed(self):
+        self.capacity_failure_fixture(complete=False)
+        with patch.dict(sys.modules, {'boto3': self.sdk}), patch.dict(os.environ, self.env):
+            with self.assertRaisesRegex(RuntimeError, 'AccessDenied'):
+                handler({}, SimpleNamespace(aws_request_id='request'))
+        self.ec2.associate_address.assert_not_called()
+        self.db.delete_item.assert_called_once()
 
     def test_busy_lease_prevents_ip_reconciliation(self):
         self.db.put_item.side_effect = self.db.exceptions.ConditionalCheckFailedException()

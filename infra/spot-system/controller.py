@@ -168,7 +168,17 @@ def handler(event, context):
         ownership = [records[name] for name in owner_keys] if records else []
         autoscaling = boto3.client('autoscaling')
         if os.environ.get('PROTECTED_SOURCE'):
-            release_legacy_cpu_restriction(autoscaling, os.environ['GROUP'], all(o.get('Complete',{}).get('BOOL') is True for o in ownership))
+            legacy_complete = all(o.get('Complete',{}).get('BOOL') is True for o in ownership)
+            try:
+                release_legacy_cpu_restriction(autoscaling, os.environ['GROUP'], legacy_complete)
+            except Exception:
+                # Widening the pool after recovery is optional. A denied launch
+                # template update must not prevent a ready owner's IP cutover.
+                # Keep failures to enforce an unfinished workload's CPU fence
+                # fatal, and leave all ownership/readiness checks below intact.
+                if not legacy_complete:
+                    raise
+                log.exception('CPU pool expansion deferred; retaining current instance restrictions')
         if 'legacy-owner-codex' in records:
             ownership.append(records['legacy-owner-codex'])
         return reconcile(ec2, autoscaling,
