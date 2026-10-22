@@ -12,8 +12,7 @@ for spec in "$ROOT"/docs/ecbench/specs/claim-koblitz-generator-orbit-*.json; do
   "$ECBENCH" run --wait --spec "$spec" --out "$out" --cpus none --allow-busy > "$HERE/logs/run-$name.log" 2>&1
   "$ECBENCH" verify --dir "$out" --replay-all --out "$HERE/audits/audit-$name.json" > "$HERE/logs/verify-$name.log" 2>&1
   "$ECBENCH" table --dir "$out" > "$HERE/tables/table-$name.md"
-  "$ECBENCH" band --dir "$out" > "$HERE/tables/band-$name.md"
-  "$ECBENCH" band --dir "$out" --json > "$HERE/tables/band-$name.json"
+  "$ECBENCH" band --dir "$out" --json "$HERE/tables/band-$name.json" > "$HERE/tables/band-$name.md"
   lazy=$(jq -r '.arms[] | select(.name|test("^ic-lazy-c")) | .name' "$spec")
   layout=$(jq -r '.arms[] | select(.name|test("^ic-layout-c")) | .name' "$spec")
   gen=$(jq -r '.arms[] | select(.name|test("^ic-gen-layout-c")) | .name' "$spec")

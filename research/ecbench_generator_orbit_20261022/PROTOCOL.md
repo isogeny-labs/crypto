@@ -129,3 +129,13 @@ or `benchmarks/README.md` only through the validation gate
 (`docs/VALIDATION_GATE.md`: replay certificate, validator report, matched-rho
 band, named by `VALIDATION.json`). Until then the study is reported as not
 validated.
+
+## Amendment 1 (2026-10-22, before any claim data was read)
+
+Card attempt 1 (`cards/attempt-1/`: card, receipt and logs) stopped at the
+first curve. `run.sh` called `ecbench band --json` without the output path
+that option takes, so the script exited 2 after the n = 13 session and its
+replay audit. `run.sh` now passes the path in a single `band` call. Nothing
+else changed. The attempt's partial outputs were set aside unread. The
+re-run uses the same frozen specs and seeds, and its n = 13 session replaces
+them. Hypotheses, arms, seeds and decision rules are unchanged.
