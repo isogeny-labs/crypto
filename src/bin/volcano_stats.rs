@@ -362,6 +362,167 @@ fn analyse(
     })
 }
 
+/// `--gap A:B`: class B over class A on raw (not class-normalised) S, for
+/// two classes of one isogeny class and one group order, e.g. the two sides
+/// of a prime conductor gap (`volcano-gap`).  The statistic is the ratio of
+/// pooled means over the levels both classes have; it needs the same level
+/// composition on both sides, which the caller checks.  Primary bootstrap
+/// (`ci90`, `ci95`): curves resampled within each (class, level), each with
+/// all its runs; the curve is the unit, and runs on different curves are
+/// independent walks.  Secondary (`crossed`): one draw of target indices
+/// shared by both classes (paired `planted_shared` k), then curves; for an
+/// arm with no target effect it counts the run noise twice, so it is
+/// conservative.  Permutation: side labels shuffled among the curves of
+/// each level.
+#[allow(clippy::too_many_arguments)]
+fn gap(
+    raw: &[Run],
+    a: u64,
+    b: u64,
+    margin: f64,
+    boot: usize,
+    perms: usize,
+    rng: &mut SmallRng,
+) -> Value {
+    let levels_a: std::collections::BTreeSet<u64> = raw
+        .iter()
+        .filter(|r| r.class == a)
+        .map(|r| r.level)
+        .collect();
+    let levels_b: std::collections::BTreeSet<u64> = raw
+        .iter()
+        .filter(|r| r.class == b)
+        .map(|r| r.level)
+        .collect();
+    let both: Vec<u64> = levels_a.intersection(&levels_b).copied().collect();
+    let runs: Vec<Run> = raw
+        .iter()
+        .filter(|r| (r.class == a || r.class == b) && both.contains(&r.level))
+        .cloned()
+        .collect();
+    if runs.is_empty() {
+        return json!(null);
+    }
+    let stat = |rs: &[Run], level: Option<u64>| -> Option<f64> {
+        let pick = |c: u64| -> Vec<&Run> {
+            rs.iter()
+                .filter(|r| r.class == c && level.is_none_or(|l| r.level == l))
+                .collect()
+        };
+        let (ra, rb) = (pick(a), pick(b));
+        (!ra.is_empty() && !rb.is_empty()).then(|| ratio(&rb) / ratio(&ra))
+    };
+    let obs = stat(&runs, None).unwrap();
+    let obs_level: Vec<(u64, f64)> = both
+        .iter()
+        .map(|&l| (l, stat(&runs, Some(l)).unwrap()))
+        .collect();
+
+    let cells = group(&runs, |r| (r.class, r.level, r.vertex));
+    let mut by_stratum: BTreeMap<(u64, u64), Vec<Vec<Run>>> = BTreeMap::new();
+    for ((c, l, _), rs) in &cells {
+        by_stratum
+            .entry((*c, *l))
+            .or_default()
+            .push(rs.iter().map(|r| (*r).clone()).collect());
+    }
+    let mut targets: Vec<u64> = runs.iter().map(|r| r.target).collect();
+    targets.sort();
+    targets.dedup();
+    let bootstrap = |crossed: bool, rng: &mut SmallRng| {
+        let mut bs = Vec::with_capacity(boot);
+        let mut bs_level: BTreeMap<u64, Vec<f64>> = BTreeMap::new();
+        for _ in 0..boot {
+            let draw: Vec<u64> = if crossed {
+                (0..targets.len())
+                    .map(|_| targets[rng.gen_range(0..targets.len())])
+                    .collect()
+            } else {
+                targets.clone()
+            };
+            let mut sample = Vec::new();
+            for curves in by_stratum.values() {
+                for _ in 0..curves.len() {
+                    let c = &curves[rng.gen_range(0..curves.len())];
+                    let by_t = group(c, |r| r.target);
+                    for t in &draw {
+                        if let Some(rs) = by_t.get(t) {
+                            sample.extend(rs.iter().map(|r| (*r).clone()));
+                        }
+                    }
+                }
+            }
+            if let Some(g) = stat(&sample, None) {
+                bs.push(g);
+            }
+            for &l in &both {
+                if let Some(g) = stat(&sample, Some(l)) {
+                    bs_level.entry(l).or_default().push(g);
+                }
+            }
+        }
+        (bs, bs_level)
+    };
+    let (bs, bs_level) = bootstrap(false, rng);
+    let (bs_crossed, _) = bootstrap(true, rng);
+    let by_level = group(&runs, |r| r.level);
+    let mut ge = 0usize;
+    for _ in 0..perms {
+        let mut shuffled = Vec::with_capacity(runs.len());
+        for rs in by_level.values() {
+            let owned: Vec<Run> = rs.iter().map(|r| (*r).clone()).collect();
+            let curves: Vec<(u64, u64)> = group(&owned, |r| (r.class, r.vertex))
+                .keys()
+                .copied()
+                .collect();
+            let mut labels: Vec<u64> = curves.iter().map(|c| c.0).collect();
+            labels.shuffle(rng);
+            let relabel: HashMap<(u64, u64), u64> = curves.iter().copied().zip(labels).collect();
+            for r in rs {
+                shuffled.push(Run {
+                    class: relabel[&(r.class, r.vertex)],
+                    ..(*r).clone()
+                });
+            }
+        }
+        if let Some(g) = stat(&shuffled, None) {
+            if g.ln().abs() >= obs.ln().abs() - 1e-12 {
+                ge += 1;
+            }
+        }
+    }
+    let ci = |v: &[f64], lo: f64, hi: f64| {
+        let (mut x, mut y) = (v.to_vec(), v.to_vec());
+        [quantile(&mut x, lo), quantile(&mut y, hi)]
+    };
+    let (ci90, ci95) = (ci(&bs, 0.05, 0.95), ci(&bs, 0.025, 0.975));
+    let per_level: Vec<Value> = obs_level
+        .iter()
+        .map(|(l, g)| {
+            let v = &bs_level[l];
+            let curves = |c: u64| {
+                cells
+                    .keys()
+                    .filter(|(cc, ll, _)| *cc == c && ll == l)
+                    .count()
+            };
+            json!({"level": l, "b_over_a": g, "ci90": ci(v, 0.05, 0.95), "ci95": ci(v, 0.025, 0.975),
+                   "curves_a": curves(a), "curves_b": curves(b)})
+        })
+        .collect();
+    json!({
+        "a": a, "b": b, "levels": both, "runs": runs.len(), "b_over_a": obs,
+        "ci90": ci90, "ci95": ci95, "boot": bs.len(),
+        "bootstrap": "curves within (class, level), all runs of each",
+        "crossed": {"ci90": ci(&bs_crossed, 0.05, 0.95), "ci95": ci(&bs_crossed, 0.025, 0.975),
+                    "bootstrap": "one shared target draw, then curves (conservative)"},
+        "perm_p": (ge + 1) as f64 / (perms + 1) as f64, "perms": perms,
+        "equivalent_within_margin": ci90[0] >= 1.0 - margin && ci90[1] <= 1.0 + margin, "margin": margin,
+        "excludes_1_at_95": ci95[0] > 1.0 || ci95[1] < 1.0,
+        "per_level": per_level,
+    })
+}
+
 fn main() {
     let argv: Vec<String> = std::env::args().skip(1).collect();
     let get = |k: &str| {
@@ -371,7 +532,7 @@ fn main() {
             .cloned()
     };
     if argv.iter().any(|a| a == "-h" || a == "--help") || get("--records").is_none() {
-        println!("usage: volcano-stats --records R1.jsonl[,R2...] --curves C1.jsonl[,C2...] [--margin 0.05] [--boot 2000] [--perm 10000] [--pair A:B]... [--out analysis.json]");
+        println!("usage: volcano-stats --records R1.jsonl[,R2...] --curves C1.jsonl[,C2...] [--margin 0.05] [--boot 2000] [--perm 10000] [--pair A:B]... [--gap CLASS_A:CLASS_B [--plant-class C:FACTOR]] [--out analysis.json]");
         return;
     }
     let margin: f64 = get("--margin").map_or(0.05, |v| v.parse().unwrap());
@@ -394,6 +555,13 @@ fn main() {
         })
     };
     let (plant_level, plant_curve) = (plant("--plant-level"), plant("--plant-curve"));
+    let plant_class = plant("--plant-class");
+    let gap_classes = get("--gap").map(|v| {
+        let (a, b) = v
+            .split_once(':')
+            .unwrap_or_else(|| die("--gap takes CLASS_A:CLASS_B"));
+        (a.parse::<u64>().unwrap(), b.parse::<u64>().unwrap())
+    });
 
     // Sidecars: (p, a, b, gx, gy) → (class, vertex, model, level). Each
     // sidecar file is one class (two classes may share p).
@@ -468,6 +636,9 @@ fn main() {
             if plant_curve.is_some_and(|(v, _)| v == vertex) {
                 base.num *= plant_curve.unwrap().1;
             }
+            if plant_class.is_some_and(|(c, _)| c == class) {
+                base.num *= plant_class.unwrap().1;
+            }
             if r["method"]["family"] == "bsgs" {
                 bsgs.entry(arm.clone())
                     .or_default()
@@ -499,6 +670,9 @@ fn main() {
         eprintln!("{arm}: S over {} runs", runs.len());
         let mut v = analyse(arm, runs, &floor, margin, boot, perms, &mut rng);
         v["metric"] = json!("S");
+        if let Some((a, b)) = gap_classes {
+            v["gap"] = gap(runs, a, b, margin, boot, perms, &mut rng);
+        }
         metrics.push(v);
     }
     for (arm, runs) in &ic_yield {
@@ -607,6 +781,18 @@ fn main() {
             m["model"]["tau_rel"].as_f64().unwrap_or(f64::NAN), m["model"]["tau_null_p95"].as_f64().unwrap_or(f64::NAN), m["model"]["perm_p"].as_f64().unwrap_or(f64::NAN),
             m["model"]["max_z_perm_p"].as_f64().unwrap_or(f64::NAN),
         );
+    }
+    for m in out["metrics"].as_array().unwrap() {
+        let g = &m["gap"];
+        if g.is_object() {
+            eprintln!(
+                "{:>16} gap class {}/{}: {:.4} 90% [{:.4}, {:.4}] 95% [{:.4}, {:.4}] p={:.4} equiv={}",
+                m["arm"].as_str().unwrap(), g["b"], g["a"],
+                g["b_over_a"].as_f64().unwrap(), g["ci90"][0].as_f64().unwrap(), g["ci90"][1].as_f64().unwrap(),
+                g["ci95"][0].as_f64().unwrap(), g["ci95"][1].as_f64().unwrap(),
+                g["perm_p"].as_f64().unwrap(), g["equivalent_within_margin"],
+            );
+        }
     }
     for e in &exact {
         eprintln!("bsgs exactness: {e}");
