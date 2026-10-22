@@ -5,6 +5,8 @@ This packet joins the priced results available from the frozen 21-model,
 divided by matched rho at the representative declared price. The
 [paired pencil graph](pencil-ratios.svg) shows the 36-cell peel/online range
 and the native-price point on each measured curve. The
+[pencil coverage graph](pencil-coverage.svg) shows the indexed outcome on
+each of the 1,260 frozen targets by order size. The
 [standardized price grid](results/standard-cost-grid.csv) retains all 36 price
 cells for each measured arm and size; the [schema](DATA_DICTIONARY.md) defines
 empty fields and the source grid for every row. The [PDF](REPORT.pdf) presents
@@ -17,6 +19,12 @@ representative costs, source verification, DLP verification, and Kummer's
 seven label outcomes and signed-Recover method per target. Its builder checks
 that all included arms agree on the 1,260 workload IDs;
 blank DLP fields apply only to Kummer's separate coordinate-only gate.
+The [pencil coverage matrix](results/pencil-coverage.csv) has one row for
+every frozen workload key. It records 543 keys with a verified candidate,
+one capped key without a verified candidate, and 716 keys with no pencil
+record in the integrated studies. The last category is an absence of indexed
+evidence, not a measured candidate failure. The 543 verified keys comprise
+180 each at 16, 20, and 24 bits and three at 28 bits.
 
 | Lead and arm | Source-verified candidate / rho solves | All-size candidate/rho | All-size candidate/external | Current scope |
 | --- | ---: | ---: | ---: | --- |

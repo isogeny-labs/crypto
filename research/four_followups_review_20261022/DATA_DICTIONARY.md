@@ -73,3 +73,16 @@ come from `research/pencil_markowitz_20261022/results/targets.jsonl`; its
 independent native validator, replay certificate and validation gate are in
 that source study. A missing pencil row for any other
 target means that variant was not run; it is not a zero-cost result.
+
+`results/pencil-coverage.csv` has exactly one row for each of the 1,260
+frozen `(bits,p,target_index,workload_id)` keys. `coverage_status` is
+`verified_candidate_present`, `cap_without_verified_candidate`, or
+`no_indexed_pencil_record`. The last value means the integrated pencil
+studies have no target row for that key; it does not assert anything about
+experiments outside this packet. `verified_candidate_rows` and `cap_rows`
+count the indexed arm observations on the key. Semicolon-separated
+`verified_candidate_arms`, `capped_arms`, and `source_records` enumerate
+their distinct provenance; they are empty for a key with no indexed row.
+The native converter verifies 543 verified keys, one capped key, and 716
+keys with no indexed pencil row. `pencil-coverage.svg` visualizes those
+counts by order bits, with 180 public targets at each size.

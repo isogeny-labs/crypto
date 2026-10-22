@@ -7,6 +7,7 @@ Run from the repository root:
 cd research/four_followups_review_20261022 && cargo run --release --locked --offline && cd ../..
 uvx --from cairosvg==2.8.2 cairosvg -d 150 -s 1.5625 research/four_followups_review_20261022/cost-ratios.svg -o research/four_followups_review_20261022/cost-ratios.png
 uvx --from cairosvg==2.8.2 cairosvg -d 150 -s 1.5625 research/four_followups_review_20261022/pencil-ratios.svg -o research/four_followups_review_20261022/pencil-ratios.png
+rsvg-convert -d 150 -p 150 research/four_followups_review_20261022/pencil-coverage.svg -o research/four_followups_review_20261022/pencil-coverage.png
 tectonic research/four_followups_review_20261022/REPORT.tex --outdir research/four_followups_review_20261022
 sha256sum -c research/four_followups_review_20261022/SHA256SUMS
 python3 scripts/validation_gate.py evidence research/pencil_sparse_20261022
@@ -41,6 +42,10 @@ keys, all source checks, seven Kummer zero outputs, zero coordinate failures,
 and 1,260 matching source-checked signed Recover rows. It additionally checks
 1,506 source-verified pencil arm-target solves and four null-candidate-cost
 cap records with measured rho costs.
+The separate pencil coverage matrix has one row for each of the 1,260
+frozen workload keys. The converter checks 543 keys with verified
+candidate rows, one with capped rows but no verified candidate, and
+716 with no indexed pencil row; the graph groups those statuses by bits.
 The two pencil study validators check their source scalars, replays, paired
 grids, and matched rho controls independently. The Kummer study validator checks its raw candidate
 and same-process rho source scalars, unmodified candidate trajectory, per-target

@@ -55,6 +55,18 @@ const TARGET_FIELDS: &[&str] = &[
     "solver_mode",
     "order",
 ];
+const PENCIL_COVERAGE_FIELDS: &[&str] = &[
+    "bits",
+    "p",
+    "target_index",
+    "workload_id",
+    "coverage_status",
+    "verified_candidate_rows",
+    "cap_rows",
+    "verified_candidate_arms",
+    "capped_arms",
+    "source_records",
+];
 const PENCIL: &[(u64, u32)] = &[
     (739, 16),
     (1151, 16),
@@ -745,6 +757,81 @@ fn target_rows(repo: &Path) -> Vec<Row> {
     out
 }
 
+fn pencil_coverage_rows(
+    keys: &BTreeMap<(String, String, String), BTreeSet<String>>,
+    targets: &[Row],
+) -> Vec<Row> {
+    let mut indexed: BTreeMap<(String, String, String), Vec<&Row>> = BTreeMap::new();
+    for target in targets
+        .iter()
+        .filter(|r| val(r, "lead") == "pencil_collector")
+    {
+        let key = (
+            val(target, "bits").to_string(),
+            val(target, "p").to_string(),
+            val(target, "target_index").to_string(),
+        );
+        assert!(keys.contains_key(&key));
+        indexed.entry(key).or_default().push(target);
+    }
+    let mut counts = BTreeMap::new();
+    let mut out = Vec::new();
+    for (key, ids) in keys {
+        assert_eq!(ids.len(), 1);
+        let observations = indexed.get(key).map(Vec::as_slice).unwrap_or(&[]);
+        let verified = observations
+            .iter()
+            .filter(|r| val(r, "candidate_dlp_verified") == "True")
+            .count();
+        let capped = observations
+            .iter()
+            .filter(|r| val(r, "status") == "incomplete_cap_unpriced")
+            .count();
+        assert_eq!(observations.len(), verified + capped);
+        let status = if verified > 0 {
+            "verified_candidate_present"
+        } else if capped > 0 {
+            "cap_without_verified_candidate"
+        } else {
+            "no_indexed_pencil_record"
+        };
+        *counts.entry(status).or_insert(0usize) += 1;
+        let distinct = |field: &str, predicate: &dyn Fn(&Row) -> bool| {
+            observations
+                .iter()
+                .filter(|r| predicate(r))
+                .map(|r| val(r, field).to_string())
+                .collect::<BTreeSet<_>>()
+                .into_iter()
+                .collect::<Vec<_>>()
+                .join(";")
+        };
+        out.push(row(&[
+            ("bits", key.0.clone()),
+            ("p", key.1.clone()),
+            ("target_index", key.2.clone()),
+            ("workload_id", ids.iter().next().unwrap().clone()),
+            ("coverage_status", status.into()),
+            ("verified_candidate_rows", verified.to_string()),
+            ("cap_rows", capped.to_string()),
+            (
+                "verified_candidate_arms",
+                distinct("arm", &|r| val(r, "candidate_dlp_verified") == "True"),
+            ),
+            (
+                "capped_arms",
+                distinct("arm", &|r| val(r, "status") == "incomplete_cap_unpriced"),
+            ),
+            ("source_records", distinct("source_record", &|_| true)),
+        ]));
+    }
+    assert_eq!(out.len(), 1260);
+    assert_eq!(counts.get("verified_candidate_present"), Some(&543));
+    assert_eq!(counts.get("cap_without_verified_candidate"), Some(&1));
+    assert_eq!(counts.get("no_indexed_pencil_record"), Some(&716));
+    out
+}
+
 fn main() {
     let repo = root();
     let here = Path::new(env!("CARGO_MANIFEST_DIR"));
@@ -868,8 +955,14 @@ fn main() {
     );
     assert_eq!((pencil_complete_rows, pencil_cap_rows), (1506, 4));
     assert_eq!((zero, coordinate_fail), (7, 0));
+    let pencil_coverage = pencil_coverage_rows(&keys, &targets);
     write_csv(&out.join("standard-cost-grid.csv"), GRID_FIELDS, &grids);
     write_csv(&out.join("standard-targets.csv"), TARGET_FIELDS, &targets);
+    write_csv(
+        &out.join("pencil-coverage.csv"),
+        PENCIL_COVERAGE_FIELDS,
+        &pencil_coverage,
+    );
     let mut representative = Vec::new();
     for r in &grids {
         if val(r, "status") != "priced_source_verified"
@@ -900,6 +993,7 @@ fn main() {
         "scope": "Frozen 21-model, 1,260-public-target cohort; 60 targets/model; seven order sizes.",
         "rows": grids.len(), "representative_rows": representative,
         "target_rows": targets.len(), "distinct_target_keys": keys.len(),
+        "pencil_coverage": {"rows": pencil_coverage.len(), "verified_candidate_targets": 543, "cap_without_verified_candidate_targets": 1, "no_indexed_pencil_record_targets": 716, "source": "research/four_followups_review_20261022/results/pencil-coverage.csv"},
         "requirements": [
             {"lead":"factor_base","status":"verified_complete_for_five_frozen_arms","candidate_targets_per_arm":1260,"rho_targets_per_arm":1260,"source":"research/four_followups_20261021/REPORT.md"},
             {"lead":"projective_law","status":"verified_complete_for_two_frozen_arms","candidate_targets_per_arm":1260,"rho_targets_per_arm":1260,"proof_scope":"exact_integer_polynomial_certificates_plus_written_divisor_arguments_for_reachable_1plus1_1plus2_2plus2_branches_on_smooth_odd_characteristic_curves_with_valid_reduced_inputs_and_nonzero_weights;faithful_mechanized_theorem_and_independent_mathematical_review_not_recorded","proof_source":"research/projective_law_followup_20261022/PROOF_AUDIT.md","source":"research/projective_law_followup_20261022/REPORT.md"},
@@ -913,11 +1007,56 @@ fn main() {
     )
     .unwrap();
     draw_graphs(here, &grids);
+    draw_pencil_coverage(here, &pencil_coverage);
     println!(
         "wrote {} normalized price rows and {} target rows",
         grids.len(),
         targets.len()
     );
+}
+
+fn draw_pencil_coverage(here: &Path, rows: &[Row]) {
+    let mut by_bits: BTreeMap<u32, [usize; 3]> = BTreeMap::new();
+    for row in rows {
+        let slot = match val(row, "coverage_status") {
+            "verified_candidate_present" => 0,
+            "cap_without_verified_candidate" => 1,
+            "no_indexed_pencil_record" => 2,
+            other => panic!("unknown pencil coverage status: {other}"),
+        };
+        by_bits.entry(num(val(row, "bits")) as u32).or_default()[slot] += 1;
+    }
+    assert_eq!(by_bits.len(), 7);
+    assert!(by_bits
+        .values()
+        .all(|counts| counts.iter().sum::<usize>() == 180));
+    let mut svg = vec![
+        r#"<svg xmlns="http://www.w3.org/2000/svg" width="920" height="390" viewBox="0 0 920 390">"#.to_string(),
+        r#"<rect width="100%" height="100%" fill="white"/>"#.into(),
+        r#"<text x="85" y="29" font-family="sans-serif" font-size="17">Indexed pencil outcomes on the frozen 1,260 targets</text>"#.into(),
+    ];
+    for (i, (bits, counts)) in by_bits.iter().enumerate() {
+        let yy = 63 + i * 39;
+        svg.push(format!(r#"<text x="72" y="{}" text-anchor="end" font-family="sans-serif" font-size="13">{bits} bits</text>"#, yy + 16));
+        let mut xx = 85.0;
+        for (count, color) in counts.iter().zip(["#1764aa", "#c5761b", "#d9dfe4"]) {
+            let width = *count as f64 * 3.4;
+            if *count > 0 {
+                svg.push(format!(
+                    r#"<rect x="{xx:.1}" y="{yy}" width="{width:.1}" height="23" fill="{color}"/>"#
+                ));
+            }
+            xx += width;
+        }
+        svg.push(format!(r#"<text x="710" y="{}" font-family="sans-serif" font-size="12">{} verified · {} cap · {} no record</text>"#, yy + 16, counts[0], counts[1], counts[2]));
+    }
+    svg.push(r#"<text x="85" y="355" font-family="sans-serif" font-size="11">Each bar is 180 public targets. “No record” means absent from the integrated pencil studies.</text>"#.into());
+    svg.push("</svg>".into());
+    fs::write(
+        here.join("pencil-coverage.svg"),
+        format!("{}\n", svg.join("\n")),
+    )
+    .unwrap();
 }
 
 fn draw_graphs(here: &Path, grids: &[Row]) {

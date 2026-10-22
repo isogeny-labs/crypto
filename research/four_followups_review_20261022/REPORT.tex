@@ -47,4 +47,9 @@ $p$ & Targets & Peel/online & Peel/rho & Cells peel$<$online\\\hline
 \includegraphics[width=0.90\linewidth]{cost-ratios.png}
 \includegraphics[width=0.90\linewidth]{pencil-ratios.png}
 \end{center}
+\clearpage
+\noindent\textbf{Pencil cohort coverage.} The chart has one bar per order size, with 180 public targets each. A blue segment means at least one source-verified candidate solve was indexed for that workload key; orange denotes an indexed cap without a verified candidate; gray means the integrated pencil studies have no row for that key. Gray is an evidence gap, not a measured failure or zero cost. The accompanying \path{results/pencil-coverage.csv} retains every workload ID, source record, and arm status. Across all sizes the counts are 543 verified, one capped, and 716 without an indexed pencil record.
+\begin{center}
+\includegraphics[width=0.94\linewidth]{pencil-coverage.png}
+\end{center}
 \end{document}
