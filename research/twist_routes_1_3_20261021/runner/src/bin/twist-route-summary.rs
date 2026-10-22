@@ -279,6 +279,113 @@ fn main() -> Result<()> {
     if args.get(3).is_some_and(|s| s == "metadata") {
         return add_metadata(study, out);
     }
+    if args.get(3).is_some_and(|s| s == "public3") {
+        let run = "public3-20261022T0132Z";
+        let raw = fs::read_to_string(
+            study
+                .join("execution-v1/runs")
+                .join(run)
+                .join("pari.stdout"),
+        )?;
+        let values: Vec<Value> = raw
+            .lines()
+            .map(serde_json::from_str)
+            .collect::<std::result::Result<_, _>>()?;
+        let toy = load(study.join("execution-v1/runs/geometry-20261021T2256Z/E11-gluing.json"))?;
+        assert_eq!(values.len(), 15);
+        let mut cross_checks = 0;
+        for v in &values {
+            if num(v, "trace_mod_3") != 0 {
+                assert_eq!(num(v, "det_minus_one_anti_intertwiners"), 0);
+            }
+            if let Some(old) = rows(&toy).iter().find(|old| old["fixture"] == v["fixture"]) {
+                assert_eq!(
+                    num(v, "det_minus_one_anti_intertwiners"),
+                    num(old, "three_torsion_companion_Frobenius_anti_intertwiners")
+                );
+                cross_checks += 1;
+            }
+        }
+        assert_eq!(cross_checks, 10);
+        let nist: Vec<_> = values
+            .iter()
+            .filter(|v| text(v, "fixture").starts_with("P-"))
+            .collect();
+        let positive: Vec<_> = nist
+            .iter()
+            .filter(|v| num(v, "det_minus_one_anti_intertwiners") > 0)
+            .map(|v| text(v, "fixture"))
+            .collect();
+        assert_eq!(positive, vec!["P-521"]);
+        let m = json!({"parameter_cases":15,"toy_cross_checks":cross_checks,
+            "toy_cross_check_mismatches":0,"NIST_cases":nist.len(),
+            "NIST_positive_module_filters":positive.len(),"NIST_positive_names":positive,
+            "geometric_constructions_certified":0,"rows":values});
+        report(out,run,"36563882e86dacbbcea0d2e473aca236a116ec97",
+            "Public 3-torsion companion-module filter",&m,
+            "PARI enumerates det(M)=-1 matrices over F3 with MA=-AM for the Frobenius companion matrix. All ten toy counts equal the earlier E11 counts. Among five public NIST P-curve order pairs, only P-521 passes this necessary module filter, with four matrices; the other four have none. This is a public-parameter calculation, not a NIST DLP. The actual torsion/Weil-pairing bridge, principally polarized quotient, genus-two model and divisor maps are not constructed or certified. A positive count is a candidate for further construction, not a speedup or novelty result.",
+            nist.iter().map(|v| text(v,"fixture")).collect(),
+            vec![("det −1 anti-intertwiners",nist.iter().map(|v|num(v,"det_minus_one_anti_intertwiners")).collect())])?;
+        fs::write(
+            out.join("PUBLIC_3_MODULE_ANALYSIS.json"),
+            serde_json::to_vec_pretty(&m)?,
+        )?;
+        return Ok(());
+    }
+    if args.get(3).is_some_and(|s| s == "isogeny-v2") {
+        let run = "isogeny-20261022T0054Z-v2";
+        let v = load(
+            study
+                .join("execution-v1/runs")
+                .join(run)
+                .join("E14-isogenies.json"),
+        )?;
+        let m = json!({"degree_fixture_cells":rows(&v).len(),"explicit_maps":count(&v,|x|x["status"]=="verified-explicit-Velu-and-rational-subgroup"),"algebraic_dual_maps":count(&v,|x|!x["algebraic_dual_return_map"].is_null()),"scalar_recovery_controls":rows(&v).iter().map(|x|num(x,"scalar_recovery_controls")).sum::<u64>(),"dual_kernel_searches":rows(&v).iter().map(|x|num(x,"dual_kernel_searches")).sum::<u64>()});
+        assert_eq!(num(&m, "algebraic_dual_maps"), 3);
+        report(out,run,"1284090fd4db2f55e023afcb275d94f3ce691b10","Repeated-eigenvalue dual-map completion",&m,
+            "The repeated-eigenvalue case samples another order-ell torsion point and requires its forward image to be nonzero; an eigenvalue alone is not accepted as an independent line. All three eligible degree-seven maps now have explicit algebraic duals, composition [7] checked on every rational source point, and eight scalar-recovery controls each. The original 30 rows, including its missing dual, remain intact. These exact toy maps supply no IC or NIST speed comparison; full cost and formal map bridges remain open.",vec!["eligible forward maps".into(),"verified algebraic duals".into(),"scalar return controls".into()],vec![("verified counts",vec![3,3,24])])?;
+        fs::write(
+            out.join("ISOGENY_V2_ANALYSIS.json"),
+            serde_json::to_vec_pretty(&m)?,
+        )?;
+        return Ok(());
+    }
+    if args.get(3).is_some_and(|s| s == "boundary") {
+        let a = load(out.join("ANALYSIS.json"))?;
+        let curves = a["ecbench-20261022T0012Z"]["by_curve_and_arm"]
+            .as_object()
+            .ok_or("curve/arm totals")?;
+        let floor = (std::f64::consts::PI / 4.0).sqrt();
+        let fields = ["sum_s_lower_bound", "sum_s_at_0_1_gae", "sum_s_at_1_gae"];
+        let mut csv="curve,arm,attempts,verified,S_floor,S_at_0,S_at_0.1,S_at_1,S_over_floor_at_0,S_over_floor_at_0.1,S_over_floor_at_1,S_over_matched_rho_at_0,S_over_matched_rho_at_0.1,S_over_matched_rho_at_1,full_cost_ranking_admitted\n".to_string();
+        for (key, v) in curves {
+            let n = num(v, "verified");
+            let (curve, _) = key.split_once(',').ok_or("curve key")?;
+            let reference = &curves[&format!("{curve},rho-neg")];
+            let nr = num(reference, "verified") as f64;
+            let means: Vec<_> = fields
+                .iter()
+                .map(|f| v[*f].as_f64().unwrap() / n.max(1) as f64)
+                .collect();
+            let rho: Vec<_> = fields
+                .iter()
+                .map(|f| reference[*f].as_f64().unwrap() / nr)
+                .collect();
+            csv += &format!("{key},{},{},{floor:.12}", num(v, "attempts"), n);
+            for x in &means {
+                csv += &format!(",{x:.12}");
+            }
+            for x in &means {
+                csv += &format!(",{:.12}", x / floor);
+            }
+            for (x, r) in means.iter().zip(rho) {
+                csv += &format!(",{:.12}", x / r);
+            }
+            csv += ",false\n";
+        }
+        fs::write(out.join("ecbench-20261022T0012Z/BOUNDARY_PRICING.csv"), csv)?;
+        return Ok(());
+    }
     if out.exists() {
         return Err("report root must be fresh".into());
     }
