@@ -27,6 +27,13 @@
 
 use std::path::PathBuf;
 use std::process::ExitCode;
+use std::sync::{mpsc, Arc, Mutex};
+use std::thread::JoinHandle;
+use std::time::{Duration, Instant};
+
+#[path = "isogeny_walk/state.rs"]
+mod state;
+use state::WalkState;
 
 use clap::{Args, Parser, Subcommand};
 use crypto_lib::cryptanalysis::isogeny_walk::queue::{self, PlanStore, PlanWalk};
@@ -91,6 +98,24 @@ enum Cmd {
         /// hash-checked, under runs/<curve>-<walk key>/.
         #[arg(long)]
         store: Option<String>,
+        /// Print live breadth-first expansion progress on stderr.
+        #[arg(long)]
+        verbose: bool,
+        /// Seconds between heartbeats during a long expansion batch.
+        #[arg(long, value_parser = clap::value_parser!(u64).range(1..))]
+        progress_every: Option<u64>,
+        /// Continue from walk.ckpt in --out, or restore it from S3.
+        #[arg(long)]
+        resume: bool,
+        /// Seconds between local checkpoint writes (0 saves every batch).
+        #[arg(long)]
+        checkpoint_every: Option<u64>,
+        /// Mirror in-progress state and final artifacts to this S3 prefix.
+        #[arg(long)]
+        state_s3_uri: Option<String>,
+        /// Seconds between S3 checkpoint uploads; final upload is required.
+        #[arg(long)]
+        sync_every: Option<u64>,
         /// After a successful publish, delete the local curves.yaml and
         /// isogeny_routes.json (walk.json and STORE.json stay).
         #[arg(long)]
@@ -394,6 +419,51 @@ fn write(path: &PathBuf, text: &str) -> Result<String, String> {
     Ok(sha256_hex(text))
 }
 
+struct Heartbeat {
+    stage: Arc<Mutex<(&'static str, usize, usize)>>,
+    stop: mpsc::Sender<()>,
+    worker: Option<JoinHandle<()>>,
+}
+
+impl Heartbeat {
+    fn start(seconds: u64) -> Self {
+        let stage = Arc::new(Mutex::new(("modular-polynomial setup", 0, 0)));
+        let shared = Arc::clone(&stage);
+        let (stop, receiver) = mpsc::channel();
+        let worker = std::thread::spawn(move || {
+            let started = Instant::now();
+            while receiver
+                .recv_timeout(Duration::from_secs(seconds))
+                .is_err_and(|e| e == mpsc::RecvTimeoutError::Timeout)
+            {
+                let (name, curves, edges) = *shared.lock().expect("walk heartbeat lock");
+                eprintln!(
+                    "isogeny_walk: {name}: {curves} curves, {edges} edges; elapsed {:.1}s",
+                    started.elapsed().as_secs_f64()
+                );
+            }
+        });
+        Self {
+            stage,
+            stop,
+            worker: Some(worker),
+        }
+    }
+
+    fn update(&self, name: &'static str, curves: usize, edges: usize) {
+        *self.stage.lock().expect("walk heartbeat lock") = (name, curves, edges);
+    }
+}
+
+impl Drop for Heartbeat {
+    fn drop(&mut self) {
+        let _ = self.stop.send(());
+        if let Some(worker) = self.worker.take() {
+            let _ = worker.join();
+        }
+    }
+}
+
 fn run(cli: Cli) -> Result<(), String> {
     match cli.cmd {
         Cmd::Class { curve, primes } => {
@@ -414,9 +484,18 @@ fn run(cli: Cli) -> Result<(), String> {
             class_audit_sample,
             no_class_audits,
             store: store_uri,
+            verbose,
+            progress_every,
+            resume,
+            checkpoint_every,
+            state_s3_uri,
+            sync_every,
             prune_local,
             out,
         } => {
+            if sync_every.is_some() && state_s3_uri.is_none() {
+                return Err("--sync-every requires --state-s3-uri".into());
+            }
             let key_args = walk_args(&primes, max_curves, max_depth, include_atkin);
             let plan_walk = PlanWalk {
                 curve_args: curve.argv(),
@@ -454,7 +533,42 @@ fn run(cli: Cli) -> Result<(), String> {
                 audit_points,
                 skipped,
             };
+            let show_progress = verbose || progress_every.is_some();
+            let heartbeat = show_progress.then(|| Heartbeat::start(progress_every.unwrap_or(5)));
             let mut w = Walk::new(start, config)?;
+            if let Some(heartbeat) = &heartbeat {
+                heartbeat.update("walk", w.nodes.len(), w.edges.len());
+            }
+            let manifest = serde_json::json!({
+                "schema_version": 1,
+                "method": "isogeny-walk",
+                "curve_args": plan_walk.curve_args,
+                "requested_primes": requested,
+                "max_curves": max_curves,
+                "max_depth": max_depth,
+                "seed": seed,
+                "audit_points": audit_points,
+                "include_atkin": include_atkin,
+                "class_audit_sample": class_audit_sample,
+                "no_class_audits": no_class_audits,
+            });
+            let managed = resume || checkpoint_every.is_some() || state_s3_uri.is_some();
+            let mut state = if managed {
+                Some(WalkState::prepare(
+                    out.clone(),
+                    resume,
+                    state_s3_uri,
+                    checkpoint_every.unwrap_or(60),
+                    sync_every.unwrap_or(60),
+                    verbose || progress_every.is_some(),
+                    manifest,
+                )?)
+            } else {
+                None
+            };
+            if resume {
+                state.as_ref().expect("managed resume").restore(&mut w)?;
+            }
             eprintln!(
                 "isogeny_walk: {} from {}; ℓ ∈ {:?}; Φ_ℓ built in {:?} ms",
                 w.start.name,
@@ -462,18 +576,41 @@ fn run(cli: Cli) -> Result<(), String> {
                 w.config.primes,
                 w.stats.phi_ms.iter().map(|x| x.1).collect::<Vec<_>>()
             );
-            w.run();
+            let mut on_batch = |walk: &Walk, final_batch: bool| -> Result<(), String> {
+                if let Some(heartbeat) = &heartbeat {
+                    heartbeat.update("walk", walk.nodes.len(), walk.edges.len());
+                }
+                if let Some(state) = state.as_mut() {
+                    state.progress(walk, final_batch)?;
+                } else if show_progress {
+                    eprintln!("isogeny_walk: {} curves, {} expanded, {} verified edges, {} failures; {} ms",
+                        walk.nodes.len(), walk.nodes.iter().filter(|n| n.expanded).count(),
+                        walk.edges.len(), walk.failures.len(), walk.stats.walk_ms);
+                }
+                Ok(())
+            };
+            w.run_with_progress((managed || show_progress).then_some(&mut on_batch))?;
+            drop(on_batch);
+            if let Some(heartbeat) = &heartbeat {
+                heartbeat.update("class audits", w.nodes.len(), w.edges.len());
+            }
             if !no_class_audits {
                 w.run_class_audits(class_audit_sample);
             }
             let ids: Vec<_> = (0..w.nodes.len()).map(|i| w.node_ids(i)).collect();
             let routes = RouteIndex::build(&w, &ids);
+            let routes_text = w.routes_json(&ids, &routes).json();
+            if resume {
+                let parsed: serde_json::Value = serde_json::from_str(&routes_text)
+                    .map_err(|e| format!("invalid resumed walk routes: {e}"))?;
+                let counts = walk::verify_routes(&parsed, &w.start, audit_points)?;
+                if counts != (w.nodes.len(), w.edges.len()) {
+                    return Err("resumed walk route counts differ from the graph".into());
+                }
+            }
             std::fs::create_dir_all(&out).map_err(|e| e.to_string())?;
             let yaml_sha = write(&out.join("curves.yaml"), &w.curves_yaml(&ids, &routes))?;
-            let routes_sha = write(
-                &out.join("isogeny_routes.json"),
-                &w.routes_json(&ids, &routes).json(),
-            )?;
+            let routes_sha = write(&out.join("isogeny_routes.json"), &routes_text)?;
             let mut summary = match w.summary(&ids) {
                 V::Map(m) => m,
                 _ => unreachable!(),
@@ -522,8 +659,12 @@ fn run(cli: Cli) -> Result<(), String> {
                 w.stats.walk_ms,
                 out.display()
             );
+            let mut prune_files = false;
             if let Some(uri) = &store_uri {
                 if !w.failures.is_empty() {
+                    if let Some(state) = state.as_mut() {
+                        state.finish()?;
+                    }
                     return Err("not publishing a walk with failures".into());
                 }
                 let run_id = plan_walk.run_id();
@@ -568,10 +709,14 @@ fn run(cli: Cli) -> Result<(), String> {
                     ("complete", r.marker),
                 ]);
                 write(&out.join("STORE.json"), &receipt.json())?;
-                if prune_local && r.won {
-                    for f in ["curves.yaml", "isogeny_routes.json"] {
-                        let _ = std::fs::remove_file(out.join(f));
-                    }
+                prune_files = prune_local && r.won;
+            }
+            if let Some(state) = state.as_mut() {
+                state.finish()?;
+            }
+            if prune_files {
+                for f in ["curves.yaml", "isogeny_routes.json"] {
+                    let _ = std::fs::remove_file(out.join(f));
                 }
             }
             if w.failures.is_empty() {
