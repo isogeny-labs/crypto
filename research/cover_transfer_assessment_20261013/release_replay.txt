@@ -83,27 +83,29 @@ Current-catalog compatibility boundary
 ======================================
 
 The successful 592-row catalog-export above concerns the registry bundled in
-v0.1.0-main.1371. It must not be extrapolated to the current 2,572-row
-registry.
+v0.1.0-main.1371. It must not be extrapolated to the then-current 2,100-row
+registry, or to the current 2,572-row registry.
 
-The current catalog is partitioned into these exact standalone-constructor
-input profiles:
+The 2,100-row catalog of that snapshot was partitioned into these exact
+standalone-constructor input profiles:
 
-  165 binary ordinary models
-  1,053 direct short-Weierstrass prime-field models
+  160 binary ordinary models
+  586 direct short-Weierstrass prime-field models
   30 normalized prime-field Montgomery/Edwards models
   1,324 short-Weierstrass odd extension-field models
-  2,572 total
+  2,100 total
 
 Comparison of the pinned v0.1.0-main.1371 source allowlist with those current
-input forms classifies the first two profiles, 1,218 models total, inside its
+input forms classifies the first two profiles, 746 models total, inside its
 syntactic constructor domain and the other two, 1,354 models total, outside
 it. The outside population is exactly 30 normalized models plus 1,324
-extension-field models. This 1,218/1,354 result is a static
+extension-field models. This 746/1,354 result is a static
 source/applicability inference; no exact batch harness or receipt in this
-record ran every current input against the archived executable. It does
-not invalidate the artifact's direct replay against its own bundled data, and
-it is not evidence that any outside-domain cover fails to exist.
+record ran all 2,100 inputs of that snapshot against the archived
+executable. It does not invalidate the artifact's direct replay against its
+own bundled data, and it is not evidence that any outside-domain cover fails
+to exist. This historical static comparison has not been rerun against the
+2,572-row catalog.
 
 The current source repairs the strict model allowlist for the normalized and
 extension-field forms. The catalog-wide source test is:
