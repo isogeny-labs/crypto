@@ -515,3 +515,18 @@ auditor. Run A/A and compare complete counted cold paths, retaining setup
 and rho on every arm rather than subtracting them. These are adaptive
 follow-ups to a measured zero-yield `k=3` prefix, not preregistered
 confirmatory evidence for other curves or targets.
+
+## Registered S5 degree-closure diagnostic after the initial failure
+
+Frozen after the first `k=0` and `k=4` pilot runs both returned “border
+unreachable at this degree” on frozen residual index 2 at Macaulay
+degree 29; the `k=0` failure missed one independently verified signed
+relation. Preserve those runs. Re-solve **only residual index 2** with the
+same precomputed symmetrised `S5` and line scales, first at degree 30,
+then at degree 31 only if degree 30 still fails. Report interpolation and
+every attempted solve's field operations, matrix shape, outcome, root
+filtering, signed-set agreement and L0 wall time. A successful higher
+degree is a diagnostic repair of the native solver, not evidence that
+the initial degree-29 run succeeded or that `S5` is competitive with
+the mixed-pattern pipeline. Cap each arm at 1,200 seconds and 8 GiB;
+retain timeouts and failures.
