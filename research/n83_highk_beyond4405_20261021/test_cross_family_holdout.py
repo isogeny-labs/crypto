@@ -24,6 +24,13 @@ def rows(highk_times, k1107_times):
                 "workload_id": f"sealed-point-{index}",
                 "status": "PASS_VERIFIED_ONE_TARGET_TIER1",
                 "ic_online_ms": online_ms,
+                "ic_cold_process_ms": online_ms * 1000,
+                "ic_cold_phases_ms": {
+                    "setup": online_ms * 500,
+                    "rank_stage": online_ms * 250,
+                    "targets_total": online_ms * 250,
+                    "unattributed": 0.0,
+                },
             })
     return result
 
@@ -112,6 +119,32 @@ class CrossFamilyHoldoutTests(unittest.TestCase):
         selected = verify_holdout.cross_family_select(data, HIGHK_ID)
         self.assertEqual(selected["status"], "SELECTED")
         self.assertEqual(selected["selected_candidate_id"], HIGHK_ID)
+
+    def test_cold_ranking_can_differ_from_online_ranking(self):
+        data = rows([100.0] * 16, [200.0] * 16)
+        for index in range(16):
+            data[2 * index]["ic_cold_process_ms"] = 400_000.0
+            data[2 * index]["ic_cold_phases_ms"] = {
+                "setup": 200_000.0, "rank_stage": 100_000.0,
+                "targets_total": 100_000.0, "unattributed": 0.0}
+            data[2 * index + 1]["ic_cold_process_ms"] = 100_000.0
+            data[2 * index + 1]["ic_cold_phases_ms"] = {
+                "setup": 50_000.0, "rank_stage": 25_000.0,
+                "targets_total": 25_000.0, "unattributed": 0.0}
+        online = verify_holdout.cross_family_select(data, HIGHK_ID)
+        cold = verify_holdout.cross_family_cold_select(data, HIGHK_ID)
+        self.assertEqual(online["selected_candidate_id"], HIGHK_ID)
+        self.assertEqual(cold["selected_candidate_id"],
+                         holdout.K1107_CANDIDATE_ID)
+        self.assertEqual(cold["paired_ic_cold_process_ms"][0],
+                         [400_000.0, 100_000.0])
+        data[1]["status"] = "PRODUCER_TIMEOUT"
+        self.assertEqual(verify_holdout.cross_family_cold_select(data, HIGHK_ID)
+                         ["status"], "BOUNDED_UNKNOWN")
+        data[1]["status"] = "PASS_VERIFIED_ONE_TARGET_TIER1"
+        del data[1]["ic_cold_phases_ms"]["rank_stage"]
+        self.assertEqual(verify_holdout.cross_family_cold_select(data, HIGHK_ID)
+                         ["status"], "BOUNDED_UNKNOWN")
 
 
 if __name__ == "__main__":

@@ -126,7 +126,10 @@ when any receipt is missing or inconsistent. The Pod-side scientific selector
 and this post-termination custody gate must both pass before a Tier 1 result
 is promoted. Its `final_primary_status` is read from the immutable archive and
 remains `BOUNDED_UNKNOWN` unless the archived screen and point-0 cross-family
-replay both passed. The custody check can be rerun independently:
+replay both passed. `final_cold_cost_status` separately requires the archived
+16-pair setup-inclusive selector, which the controller recomputes from the
+archived one-target rows before promotion. The custody check can be rerun
+independently:
 
 ```sh
 python3 -m research.n83_highk_beyond4405_20261021.verify_provider_custody \
@@ -148,7 +151,9 @@ the point-0 cross-family online wall-time ratio only when both Tier 1,
 resource, noise and correctness gates pass. Its 16-point paired selector
 retains `BOUNDED_UNKNOWN` for incomplete or conflicting evidence. The
 [cross-family addendum](K1107_CROSS_FAMILY_ADDENDUM.md) freezes its event
-order and selection rule. The Pod launcher runs this phase only after the
+order and selection rule. A separate 16-pair cold-process selector ranks
+setup-inclusive one-target IC cost, retaining setup, rank, target and residual
+phase accounting. The Pod launcher runs this phase only after the
 screen selector admits a unique fixed31 base and time remains before the
 provider deadline.
 `select.py` admits a fixed31 winner only from a complete independently replayed
@@ -186,8 +191,12 @@ The sparse profile now includes
 `research/cryptopro_b_chain_sweep_20261006/frozen_inputs`; all five tests
 passed through Cargo in `rust-lib-tests-cryptopro-fixture-focused.log.gz`.
 The touched release example suite passed 24/24 again in
-`rust-example-tests-current-head.log.gz`. The stable-profile full Cargo rerun
-is recorded in `rust-lib-tests-cargo-serial-stable.log`.
+`rust-example-tests-current-head.log.gz`. The stable-profile exact
+`cargo test --release --lib -- --test-threads=1` rerun passed **4,162 tests,
+zero failures, 117 ignored** in 3,970.39 seconds on the contended local
+host. Its raw output is retained in `rust-lib-tests-cargo-serial-stable.log.gz`
+(raw SHA-256
+`b94c87a2ac20e3e2862f3849b7f6a73e78e9abe08a9c0a0991a6b85e88e8f360`).
 The previous RunPod campaign's conservative upper charge was $5.710216
 against its $5 ceiling, so this preparation launches no paid instance. A new
 bounded allocation needs its own reviewed budget and protocol.

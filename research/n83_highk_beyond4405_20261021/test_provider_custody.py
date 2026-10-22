@@ -9,7 +9,8 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from research.n83_highk_beyond4405_20261021 import verify_provider_custody
+from research.n83_highk_beyond4405_20261021 import (
+    holdout, verify_holdout, verify_provider_custody)
 
 
 RECEIPT = {"pod_id": "pod123", "created_utc": "2030-01-01T00:00:00Z",
@@ -21,7 +22,7 @@ def write(path: Path, data: dict):
     path.write_text(json.dumps(data, sort_keys=True) + "\n")
 
 
-def fixture(root: Path) -> tuple[Path, Path]:
+def fixture(root: Path, corrupt_cold: bool = False) -> tuple[Path, Path]:
     allocation = root / "allocation.json"
     archive = root / "archive"
     archive.mkdir()
@@ -47,6 +48,36 @@ def fixture(root: Path) -> tuple[Path, Path]:
                        ("provider_post_terminate", absent)):
         write(archive / f"{name}.json", data)
     write(archive / "results" / "runpod_allocation.json", RECEIPT)
+    candidate = "selected-highk-control"
+    rows = []
+    for index in range(16):
+        for role, candidate_id, online_ms in (
+            ("highk", candidate, 100.0),
+            ("k1107", holdout.K1107_CANDIDATE_ID, 200.0),
+        ):
+            rows.append({
+                "point_index": index, "role": role,
+                "candidate_id": candidate_id,
+                "workload_id": f"sealed-point-{index}",
+                "status": "PASS_VERIFIED_ONE_TARGET_TIER1",
+                "ic_online_ms": online_ms,
+                "ic_cold_process_ms": online_ms * 1000,
+                "ic_cold_phases_ms": {
+                    "setup": online_ms * 500,
+                    "rank_stage": online_ms * 250,
+                    "targets_total": online_ms * 250,
+                    "unattributed": 0.0,
+                },
+            })
+    cold = verify_holdout.cross_family_cold_select(rows, candidate)
+    if corrupt_cold:
+        cold["selected_candidate_id"] = holdout.K1107_CANDIDATE_ID
+    analysis = {
+        "candidate_id": candidate, "rows": rows,
+        "primary_status": "PASS_VERIFIED_CROSS_FAMILY_TIER1",
+        "cross_family_selector": {"status": "SELECTED"},
+        "cold_cost_selector": cold,
+    }
     files = {
         "watchdog_ready.json": (archive / "watchdog_ready.json").read_bytes(),
         "results/runpod_allocation.json":
@@ -56,8 +87,7 @@ def fixture(root: Path) -> tuple[Path, Path]:
         "results/screen_analysis.json":
             b'{"status":"SCREEN_ADMITTED"}\n',
         "results/holdout/analysis.json":
-            b'{"primary_status":"PASS_VERIFIED_CROSS_FAMILY_TIER1",'
-            b'"cross_family_selector":{"status":"SELECTED"}}\n',
+            (json.dumps(analysis, sort_keys=True) + "\n").encode(),
     }
     tar_path = archive / "raw_results.tar.gz"
     with tarfile.open(tar_path, "w:gz") as tar:
@@ -82,6 +112,21 @@ class ProviderCustodyTests(unittest.TestCase):
         self.assertTrue(all(result["checks"].values()))
         self.assertEqual(result["final_primary_status"],
                          "PASS_VERIFIED_CROSS_FAMILY_TIER1")
+        self.assertEqual(result["final_cold_cost_status"],
+                         "SELECTED_TWO_FAMILIES_TIER1")
+        self.assertTrue(result["scientific_checks"]["cold_selector_replay"])
+
+    def test_inconsistent_archived_cold_selection_is_not_promoted(self):
+        with tempfile.TemporaryDirectory() as temp:
+            allocation, archive = fixture(Path(temp), corrupt_cold=True)
+            with mock.patch.object(verify_provider_custody.runpod_runner,
+                                   "read_allocation", return_value=RECEIPT):
+                result = verify_provider_custody.validate(allocation, archive)
+        self.assertEqual(result["status"], "PASS_PROVIDER_CUSTODY")
+        self.assertEqual(result["final_primary_status"],
+                         "PASS_VERIFIED_CROSS_FAMILY_TIER1")
+        self.assertFalse(result["scientific_checks"]["cold_selector_replay"])
+        self.assertEqual(result["final_cold_cost_status"], "BOUNDED_UNKNOWN")
 
     def test_missing_absence_or_modified_archive_is_unknown(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -92,6 +137,8 @@ class ProviderCustodyTests(unittest.TestCase):
                 missing = verify_provider_custody.validate(allocation, archive)
             self.assertEqual(missing["status"], "BOUNDED_UNKNOWN")
             self.assertEqual(missing["final_primary_status"],
+                             "BOUNDED_UNKNOWN")
+            self.assertEqual(missing["final_cold_cost_status"],
                              "BOUNDED_UNKNOWN")
             write(archive / "provider_post_terminate.json", {
                 "pod_id": "pod123", "recorded_utc": "2030-01-01T02:01:00Z",
