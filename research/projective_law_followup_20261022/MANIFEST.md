@@ -52,6 +52,14 @@ existing arithmetic-gate output was regenerated and byte-compared with
 the frozen `results/arithmetic-branches.jsonl`; the implementation's
 behavior and collector records were not changed by this audit.
 
+The subsequent symbolic certificate for the generic affine-input 1+2
+branch is built with `--bin projective-symbolic-12` and run from the
+repository root with stdout redirected to
+`results/symbolic-1plus2.json`. It checks exact sparse integer-polynomial
+coefficients; the algebra and the still-open branches are in
+`PROOF_AUDIT.md`. This certificate does not alter the measured collector
+or its frozen outputs.
+
 `SHA256SUMS` gives hashes for all tracked study inputs, code, records,
 summaries, graphs, PDF, and run package. Verify it from the study directory
 with `sha256sum -c SHA256SUMS`.

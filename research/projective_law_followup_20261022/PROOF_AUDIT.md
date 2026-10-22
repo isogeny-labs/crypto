@@ -72,11 +72,69 @@ certify the modified implementation.
 
 ## Remaining proof obligation
 
+### Exact generic 1+2 identity, added after the finite audit
+
+The new native `projective-symbolic-12` checker proves seven equalities as
+canonical polynomials over
+`Z[x,y,q,r,s,t,a0,a1,a2,a3]`. The output is
+`results/symbolic-1plus2.json`. This is an exact coefficient proof for
+the **affine-input, K ≠ 0** branch, not another finite-field sample.
+
+Write `u(X)=X²+qX+r`, `v(X)=sX+t`, `F(X)=X⁵+a3X³+a2X²+a1X+a0`,
+and `F-v²=uH+C`, where `deg C<2`. A valid Mumford input has `C=0`.
+For a point `P=(x,y)`, put `K=u(x)`, `A=y-v(x)`,
+`B=sK+Aq`, and `D=tK+Ar`. The branch condition is `K≠0`.
+Let `h1` be the coefficient of `X` in `H`; exact division gives
+`h1=a3+q²-r`. Define
+
+```text
+Q = K²(x-q)-A²
+R = K² h1 - A(B+sK) + xQ
+S = AQ-BK²
+T = ARK²-DK⁴
+U = K²X²+QX+R
+N = Kv+Au
+G = K²H-2KAv-A²u.
+```
+
+The checker verifies, without reducing modulo a prime or substituting
+random values,
+
+```text
+K²F-N² = uG + K²C
+G = (X-x)U + G(x)
+G(x) = K(F(x)-y²-C(x))
+K²(K²N-AU)+K²SX+T = 0.
+```
+
+Hence, if `C=0` and `y²=F(x)`, then with `L=N/K`,
+`F-L²=u(X-x)(U/K²)`, and
+`L≡-[(S/K³)X+(T/K⁵)] mod U/K²`. These are exactly the generic
+affine-input coordinates returned by `add12_weighted_generic` after
+normalization: its `q3=Q`, `r3=RK²`, `s3=S`, `t3=T`, and
+`z3=K,w3=1`. The standard divisor-of-`y-L` argument identifies this
+reduced Mumford pair with `P+D₂`. This proves the branch's output
+identity for valid affine inputs and `K≠0`. The native checker proves
+the stated polynomial equalities; the displayed divisor argument is
+written mathematics, not a Lean theorem.
+
+Proof map: the exact coefficient identities are discharged by
+`src/bin/projective_symbolic_12.rs` and its committed result. The
+divisor-class bridge and the weighted-coordinate generalization have no
+Lean declaration yet. A core-only Lean 4.34.1 probe found neither
+`Field` nor `Polynomial` in `Std`; completing a faithful Lean version
+needs a pinned algebra library or local definitions and a verified
+divisor-class representation. No weakened conditional Lean theorem is
+claimed as the full group-law proof.
+
+### Open cases
+
 A machine-checkable symbolic reduction is still needed for every output
-branch: show its nonzero weighted coordinates normalize to the Cantor sum,
-including degree drops and shared-support positive composition. The
-finite audit and the five branch-selection lemmas above do not supply
-these polynomial identities. In particular, no exhaustive all-divisor
+branch other than the affine-input generic 1+2 case: show its nonzero
+weighted coordinates normalize to the Cantor sum, including degree drops
+and shared-support positive composition. The finite audit and five
+branch-selection lemmas above do not supply these remaining identities.
+In particular, no exhaustive all-divisor
 pair enumeration was run on any of the 42 curves. No counterexample to
 the *implemented* weighted law was found in the stated finite audit;
 absence of a counterexample is not a universal proof.

@@ -33,6 +33,12 @@ is complete for arbitrary curves or divisors cannot be made from those runs.
   observed. The audit also records five algebraic branch-selection lemmas;
   output-formula identities remain unproved.
 - **Derived or proved:** For a quintic with leading coefficient L and x^4 coefficient a4, `x=L*u-a4/(5L)` and `y=L^3*v` give a monic quintic without u^4 when L and 5 are invertible. All 42 finite fields meet these conditions in the executed gate.
+- **Derived or proved, 2026-10-22 symbolic follow-up:** The
+  [proof audit](../research/projective_law_followup_20261022/PROOF_AUDIT.md)
+  now gives an exact integer-polynomial certificate and written divisor
+  argument for the affine-input generic 1+2 branch with `K≠0`. This
+  establishes that branch's formula identity over the stated family,
+  but not the remaining exceptional or weighted-coordinate branches.
 - **Suspected explanation:** None needed for the measured cost. Branch behavior
   outside the tested finite cases remains a proof obligation.
 - **Missing capability:** A checked universal case proof for the implemented
@@ -91,3 +97,8 @@ Five branch-selection conditions were discharged
 algebraically for valid reduced inputs in the linked proof audit. No
 counterexample to the implemented law was found. The universal
 output-formula proof remains open.
+
+2026-10-22: The generic affine-input 1+2 output received an exact
+symbolic polynomial certificate and written divisor-class proof.
+Weighted-input homogeneity and every other output branch remain open;
+the universal-completeness status is unchanged.
