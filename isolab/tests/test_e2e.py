@@ -97,7 +97,18 @@ async def test_success_with_repeats_metrics_and_artifacts(fabric, lab, tmp_path)
     assert len(runs) == 4 and runs[0]["warmup"] and not runs[1]["warmup"]
     assert all(r["exit_code"] == 0 and r["wall_s"] > 0 for r in runs)
     assert runs[1]["metrics"]["answer"] == sum(i * i for i in range(300000)) and runs[1]["metrics"]["repeat"] == "1"
-    assert res["summary"]["n"] == 3 and res["summary"]["wall_s"]["min"] > 0
+    # A best-effort host may report contention in any measured repeat. All
+    # three must complete, but the summary uses clean repeats when available.
+    measured = runs[1:]
+    clean = [r for r in measured if not r.get("contended")]
+    used = clean or measured
+    summary = res["summary"]
+    assert summary["n_timed"] == 3
+    assert summary["n_contended"] == 3 - len(clean)
+    assert summary["n"] == len(used)
+    assert summary["used_indices"] == [r["index"] for r in used]
+    assert summary["uses_contended"] is (not clean)
+    assert summary["wall_s"]["min"] == min(r["wall_s"] for r in used) > 0
     assert res["fidelity"]["grade"] in ("A", "B", "C", "D") and res["fidelity"]["policy"] == "best_effort"
     names = {a["path"] for a in res["artifacts"]}
     assert {"run-1/metrics.json", "run-1/table.csv", "_isolab_logs/stdout.log", "run-1/_isolab/launch.json"} <= names
