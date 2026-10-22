@@ -46,8 +46,11 @@ checked another 1,224,000 finite weighted additions against Cantor with zero
 mismatches. An exact integer-polynomial certificate and written divisor
 argument establish the generic weighted 1+2 output identity for valid
 inputs with `u(x) != 0`. A separate exact certificate covers exceptional
-1+2 cancellation and the coincident-positive branch when `x4 != x`.
-Tripling (`x4 = x`) and all 2+2 output identities remain open.
+1+2 cancellation, the coincident-positive branch when `x4 != x`, and
+tripling (`x4 = x`). Another exact certificate covers the coprime 2+2
+branch with `B != 0` and `C != 0`. Exceptional 2+2 output identities
+for degree drops, same-`u` doubling or mixed composition, and shared
+support remain open.
 
 The [Kummer coordinate evidence](../kummer_coordinates_20261022/REPORT.md)
 reports 8,813 matching nonzero xADD outputs and seven zero outputs on the
