@@ -1,11 +1,10 @@
 # Review-packet validation
 
-This is a deterministic conversion of frozen study grids, not a new solver.
+This is a deterministic native Rust conversion of frozen study grids, not a new solver.
 Run from the repository root:
 
 ```
-python3 research/four_followups_review_20261022/build.py
-python3 -m py_compile research/four_followups_review_20261022/build.py
+cd research/four_followups_review_20261022 && cargo run --release --locked --offline && cd ../..
 uvx --from cairosvg==2.8.2 cairosvg -d 150 -s 1.5625 research/four_followups_review_20261022/cost-ratios.svg -o research/four_followups_review_20261022/cost-ratios.png
 uvx --from cairosvg==2.8.2 cairosvg -d 150 -s 1.5625 research/four_followups_review_20261022/pencil-ratios.svg -o research/four_followups_review_20261022/pencil-ratios.png
 tectonic research/four_followups_review_20261022/REPORT.tex --outdir research/four_followups_review_20261022
@@ -13,7 +12,7 @@ sha256sum -c research/four_followups_review_20261022/SHA256SUMS
 python3 scripts/validation_gate.py evidence research/pencil_sparse_20261022
 ```
 
-The builder checks each copied priced ratio against its copied candidate and
+The native Rust converter checks each copied priced ratio against its copied candidate and
 comparator cost at relative tolerance `1e-9`. The source studies separately
 check recovered public scalars, matched rho, raw counter repricing, and
 archive-input replay. For this packet the factor-base and law studies contribute
@@ -22,8 +21,15 @@ contribute 720 rows (two arms, 36 cells each). Seven unpriced Kummer
 size rows contain empty cost fields. An unpriced row is not a failed DLP
 trial and cannot support a cost comparison.
 
+The converter replaces an earlier Python reporting script to comply with
+`AGENTS.md`'s native implementation rule. It regenerates both standardized
+CSVs, the summary JSON, and both SVGs from unchanged source evidence. Its
+checks include 240/360 pencil cells below online, 120/360 above, zero below
+rho, 1,446 verified pencil arm-target rows, two cap failures, and exact joins
+across all 1,260 workload keys.
+
 The companion target index has 11,528 rows: 6,300 factor-base, 2,520
-projective-law, 1,448 pencil, and 1,260 Kummer coordinate records. The builder verifies
+projective-law, 1,448 pencil, and 1,260 Kummer coordinate records. The converter verifies
 one shared workload ID for each of the 1,260 exact `(bits,p,target_index)`
 keys, all source checks, seven Kummer zero outputs, zero coordinate failures,
 and 1,260 matching source-checked signed Recover rows. It additionally checks

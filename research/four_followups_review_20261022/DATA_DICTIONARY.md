@@ -3,7 +3,7 @@
 `results/standard-cost-grid.csv` is a column mapping of the cited
 factor-base, projective-law, and paired pencil price grids. Each priced row is one arm, one
 size slice (or `all`), and one of 36 declared price cells. It copies the
-source cost and ratio strings; `build.py` independently checks both quotient
+source cost and ratio strings; the native Rust converter independently checks both quotient
 identities to relative tolerance `1e-9`. It does not recompute raw operation
 counts or source scalar products. The source study validators perform those
 checks. `source_grid` is the repository-relative source for each row.

@@ -62,7 +62,7 @@ arm-target rows, including two unpriced cap failures and all 1,446 verified
 solves. Its original 1,260-distinct-target requirement remains open.
 
 This review packet maps source results without modifying their frozen raw
-records. `build.py` checks imported arithmetic ratios and generates the graph
+records. The native Rust converter checks imported arithmetic ratios and generates the graph
 and standardized files. Consult each source study's independent validator,
 manifest, and hash list for source-scalar and replay evidence. The unresolved
 fields are explicit rather than inferred from a phase or coordinate gate.
