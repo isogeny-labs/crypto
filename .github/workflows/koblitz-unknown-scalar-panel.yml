@@ -45,13 +45,14 @@ concurrency:
 
 jobs:
   smoke-and-custody:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-unknown-scalar-panel.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-unknown-scalar-panel.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Install frozen dependency lock
-        run: cp research/weil_factor_composition_20260914/validation/dependencies.lock.txt Cargo.lock
+      # Current-code validation uses the PR checkout's own Cargo.lock. The
+      # Stage-23 historical producer is checked independently from its sealed
+      # source closure and the archived Stage-20 lock below.
       - name: Test Python control plane
         run: python3 scripts/test_koblitz_unknown_scalar_panel.py
       - name: Test compact terminal-evidence verifier
@@ -97,6 +98,20 @@ jobs:
           bundle_root = destination / expected_root
           assert hashlib.sha256((bundle_root / "bundle-seal.json").read_bytes()).hexdigest() == bundle_seal_sha256
           assert hashlib.sha256((bundle_root / "bundle-manifest.json").read_bytes()).hexdigest() == bundle_manifest_sha256
+          manifest = json.loads((bundle_root / "bundle-manifest.json").read_text())
+          closure = manifest["source_closure"]
+          assert closure["commit"] == "54c582009762603a3311c218e4f67f0c4cf32825"
+          assert closure["committed_tree_sha256"] == "aa7f8bb466bd19a0f41d92a6bb6204865e160fa68c425aa5091f65b67a3c76a8"
+          source_root = bundle_root / "source-tree"
+          source_hashes = {
+              "Cargo.toml": "43611c79a8692d99fc3146caf339ec72b4b93bf0ee1e2a8d50656558fa8beaa5",
+              "examples/koblitz_unknown_scalar_panel.rs": "9719ef7b1c457abf0563686881209cf5484d419a67dcdec47827b00293884ba3",
+              "src/cryptanalysis/koblitz_index_calculus.rs": "4dc220b31eb92a6895fc9c8f162b3b088ed1e49b4da23174e254dae2c4c7b2c0",
+          }
+          for relative, expected in source_hashes.items():
+              assert hashlib.sha256((source_root / relative).read_bytes()).hexdigest() == expected, relative
+          archived_lock = source_root / "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock"
+          assert hashlib.sha256(archived_lock.read_bytes()).hexdigest() == "712af6d0d82e4bb7fe5a36e2c419b2a7dabcbbfd71ba2e1af18e6a547436ab21"
           result = subprocess.run(
               [
                   "python3",
@@ -122,6 +137,19 @@ jobs:
           PY
       - name: Test arbitrary-target Rust producer
         run: cargo test --locked --example koblitz_unknown_scalar_panel
+      - name: Build and test producer from sealed historical source closure
+        run: |
+          bundle="$RUNNER_TEMP/stage23-terminal-evidence/koblitz-stage23-unknown-scalar-production-successor-03-terminal-evidence-20260910"
+          source_root="$bundle/source-tree"
+          historical_lock="$source_root/research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock"
+          printf '%s  %s\n' \
+            '43611c79a8692d99fc3146caf339ec72b4b93bf0ee1e2a8d50656558fa8beaa5' "$source_root/Cargo.toml" \
+            '9719ef7b1c457abf0563686881209cf5484d419a67dcdec47827b00293884ba3' "$source_root/examples/koblitz_unknown_scalar_panel.rs" \
+            '4dc220b31eb92a6895fc9c8f162b3b088ed1e49b4da23174e254dae2c4c7b2c0' "$source_root/src/cryptanalysis/koblitz_index_calculus.rs" \
+            '712af6d0d82e4bb7fe5a36e2c419b2a7dabcbbfd71ba2e1af18e6a547436ab21' "$historical_lock" \
+            | sha256sum --check
+          cp "$historical_lock" "$source_root/Cargo.lock"
+          CARGO_TARGET_DIR="$RUNNER_TEMP/stage23-historical-target" cargo test --locked --manifest-path "$source_root/Cargo.toml" --example koblitz_unknown_scalar_panel
       - name: Replay retained production mathematics independently
         run: |
           if python3 -O -B scripts/koblitz_stage24_math_replay.py --help; then

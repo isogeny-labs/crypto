@@ -24,6 +24,34 @@
   and host, with the outputs checked equal. A result that has not been
   compared is not yet a claim of being the fastest, and a loss is reported
   as a loss.
+- **Every big improvement updates the leaderboard** (owner, 2026-10-15).
+  A PR that lands a large measured gain, whether a whole pipeline, a phase
+  or a component (an engine, filter, oracle, solver or kernel), regenerates
+  `docs/ic-leaderboard.html` and its twins in the same PR (§7b), even when
+  no row of tables A–C moves; it is not a follow-up.
+- **Validation gate** (owner, 2026-10-19; schema and mechanics in
+  [`docs/VALIDATION_GATE.md`](docs/VALIDATION_GATE.md)). No row reaches the
+  IC leaderboard (`docs/ic/LEADERBOARD.md`, `docs/ic/leaderboard.json`,
+  `docs/ic-leaderboard.html`) or `benchmarks/README.md` unless its evidence
+  directory carries a `VALIDATION.json` pointing to three artifacts: (1) a
+  **replay certificate**, an independent replay of the recorded runs with the
+  scalars verified; (2) a **validator report**, an independent recompute of the
+  headline numbers from raw data that is in the repository; (3) a **rho
+  reference matched to the protocol**, the reference the protocol names and
+  the strongest available for that curve (negation, Frobenius or the
+  automorphism fold), priced in the same unit and the same binary or process,
+  with the §5a band at 0, 0.1 and 1 GAE. `scripts/build_ic_leaderboard.py`
+  refuses a row without them, and `scripts/validation_gate.py check` (workflow
+  `validation-gate`) fails a PR that adds or changes such a row. Existing
+  rows are not deleted: those frozen in `docs/ic/validation/PRE_GATE.json` and
+  `benchmarks/PRE_GATE.json` render as "unvalidated (pre-gate)" until a
+  validation sweep verdict
+  (`research/validation_sweep_20261019/{A-leaderboard,B-benchmarks}/verdicts.jsonl`)
+  or a `VALIDATION.json` validates them; the freeze files may only shrink. The
+  `audit-runs` skill re-audits finished runbook and ecbench sessions daily
+  (`.github/workflows/audit-runs-daily.yml`). Like the success criterion, the
+  gate decides what may be shown as a result, never whether an honest null or
+  negative result may be recorded: those stay in their research directories.
 - **Conductor:** run `conductor check --summary "…" --scope path:…` before
   editing; report scope expansion before editing outside reserved paths. Do
   not publish chat transcripts or secrets as task metadata.
@@ -399,6 +427,35 @@ verifiers, replay tools, and research result generation.
 - Older instructions that name Python scripts describe legacy tooling; they
   do not grant an exception. Preserve their mathematical contracts, fixtures,
   and accounting requirements in the native replacement.
+
+## Model tiers
+
+Owner rule, 2026-10-17: one model-tier topology across the owner's
+repositories. The reference design is
+[`docs/model-tiers.md`](https://github.com/aburan28/crypto-autoresearcher/blob/main/docs/model-tiers.md)
+in aburan28/crypto-autoresearcher.
+
+| tier | does here | Anthropic |
+| --- | --- | --- |
+| frontier | design, interpretation, claims, breakthrough review | Mythos (`claude-mythos-5`), Fable 5.1 (`claude-fable-5-1`) |
+| core | the same when frontier is not needed; coordination and review | Opus 5.5 (`claude-opus-5-5`); OpenAI, GLM 5.3 and Qwen equivalents |
+| director | compiles a decided experiment into a task card (`tools/task_card.py`: one format in every repository, copied byte-identical from crypto-autoresearcher, never edited here), then assesses the run | Sonnet 5.5 (`claude-sonnet-5-5`), [`experiment-director`](.claude/agents/experiment-director.md) |
+| mechanical | runs the card through `tools/task_card.py run`, relays its output verbatim, computes nothing, refuses anything underspecified | Haiku 5.5 (`claude-haiku-5-5`, effort low), [`executor-mechanical`](.claude/agents/executor-mechanical.md) |
+
+- **Frontier and core keep the reasoning**: the spec and preregistration,
+  analysis (`ecbench compare` and `table` read-outs), the §5a pricing band and
+  every cross-method ranking, success-criterion classification, claims, and
+  every PR decision (open, fix, merge).
+- **The relay.** Subagents do not nest in Claude Code, so the main session
+  does every dispatch: it dispatches `experiment-director` in compile mode,
+  relays the card it returns to `executor-mechanical` verbatim (adding
+  nothing), then dispatches `experiment-director` again in assess mode with
+  the executor's returned text. A card with a `specification_error` is not
+  relayed; the reasoning tier fixes the spec.
+- **The mechanical tier's output is an observation, never a result claim.**
+  The director's assessment says only whether the run executed as specified
+  and the relay was verbatim. What the numbers mean is decided by the
+  frontier or core tier under the measurement rules below.
 
 ## Default workflow: open the PR, check in, and land it
 
@@ -813,7 +870,13 @@ until the leaderboard shows it**, in the same pull request.
   - a reference re-matched;
   - a rule change that redefines the primary comparison, as the
     one-target rule did;
-  - a change to `docs/curves/registry.json`, which the page's roster reads.
+  - a change to `docs/curves/registry.json`, which the page's roster reads;
+  - a big improvement in a phase or component (an engine, filter, oracle,
+    solver or kernel) that moves no whole-pipeline row (owner, 2026-10-15):
+    it gets its own section outside tables A–C, generated from the study's
+    frozen summary with the before figure kept and its class (usually
+    engineering) named, as the linear-algebra engine section was added for
+    `research/la_engines_20261014`.
 - **How.** The page is generated, never edited by hand.
   - Point `SOURCES` in `scripts/build_ic_leaderboard.py` at the round's
     frozen files.
@@ -1013,6 +1076,37 @@ existing EC2 key-pair name **`meow34`** when launching the instance.
   key is unavailable in their environment. If `meow34.pem` is not mounted or
   accessible, report that access blocker and continue with non-SSH work where
   possible.
+
+### 9a. Experiments that do not run locally go through `ephemeral`
+
+When an experiment, benchmark or build is to run in the cloud rather than on
+the local machine, run it with the ephemeral runner
+([`taskq/deploy/ephemeral/`](taskq/deploy/ephemeral/README.md)). Do not
+launch EC2 instances by hand for it. `conductor/deploy/aws/launch.py`, in the
+Conductor repository, starts the Conductor control plane, not experiments.
+
+```sh
+cargo build --release --manifest-path taskq/deploy/ephemeral/cli/Cargo.toml   # once
+E=taskq/deploy/ephemeral/cli/target/release/ephemeral   # or the bash CLI: taskq/deploy/ephemeral/ephemeral
+$E run --detach --type c7i.4xlarge --ttl 4h -- 'cargo run --release -- ... --out "$EPHEMERAL_OUT"'
+$E status last; $E logs -f last; $E fetch last
+```
+
+- The two CLIs are interchangeable: same flags, S3 layout and runner, and
+  either one can follow, fetch or kill the other's jobs.
+- Agents use `--detach` and check back with `status` or `logs -f` at the
+  check-in cadence of the default workflow, rather than holding a foreground
+  session open on a long job.
+- Each job is a paid instance. Start the jobs the request asks for and no
+  more. Pick the smallest instance type and `--ttl` that fit, and `kill` any
+  `--keep` instance once you are done with it. The runner, the deadline timer
+  and the reaper terminate everything else.
+- Runners use Session Manager (`ephemeral shell`), not SSH. Section 9 applies
+  to hosts launched by hand.
+- A result that lands in the repository still follows section 10, the
+  `benchmarks/` rule and the research-visuals rule. Its provenance is the
+  fetched `job.json`, `host.txt` and `rusage.txt` in
+  `~/.cache/ephemeral/runs/<id>/`.
 
 ### 10. Performance work starts from a clean, recorded baseline
 
