@@ -10,7 +10,7 @@
 //!
 //! Writes `results.json` and `convergence.svg` into `--out`.
 
-use crypto::cryptanalysis::class_number_estimate::*;
+use crypto_lib::cryptanalysis::class_number_estimate::*;
 use num_bigint::{BigInt, BigUint};
 use num_traits::Num;
 use serde_json::json;
