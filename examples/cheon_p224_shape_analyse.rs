@@ -289,8 +289,12 @@ fn main() {
     // ── Table 1: observations ────────────────────────────────────────────
     writeln!(md, "### Table 1. Measured operation counts, every run\n").unwrap();
     writeln!(md, "Unit: group operations (one affine addition or doubling = 1), every phase charged. `S = median ops / sqrt(n)`. `F(n,d)` is the formula `sqrt(n/d)+sqrt(d)` (minus) or `sqrt(n/d)+d` (plus). `ratio to rho` is the median over targets of the paired ratio (same curve, same target). `correct` counts recovered logarithms equal to the planted one.\n").unwrap();
-    writeln!(md, "| family | bits | n | d | arm | leaked powers | correct | median ops | min | max | S | ops/F | ratio to rho |").unwrap();
-    writeln!(md, "|:--|--:|--:|--:|:--|--:|:--|--:|--:|--:|--:|--:|--:|").unwrap();
+    writeln!(md, "| family | bits | n | d | arm | leaked powers | correct | median ops | min | max | S | ops/F | ratio to rho (median of pairs) | ratio of sums |").unwrap();
+    writeln!(
+        md,
+        "|:--|--:|--:|--:|:--|--:|:--|--:|--:|--:|--:|--:|--:|--:|"
+    )
+    .unwrap();
     let mut rows_js = vec![];
     for c in &cells {
         let rho = ver(&c.fam, c.bits, "rho.negation");
@@ -318,11 +322,21 @@ fn main() {
                 ((c.n as f64) / c.d as f64).sqrt() + c.d as f64
             };
             let mut ratios = vec![];
+            let (mut sum_c, mut sum_r) = (0.0, 0.0);
             for o in &v {
                 if let Some(r) = rho.iter().find(|r| r.t == o.t) {
                     ratios.push(o.ops / r.ops);
+                    sum_c += o.ops;
+                    sum_r += r.ops;
                 }
             }
+            let rs = if arm == "rho.negation" {
+                "1".to_string()
+            } else if sum_r > 0.0 {
+                format!("{:.2}", sum_c / sum_r)
+            } else {
+                "n/a".into()
+            };
             let rr = if arm == "rho.negation" {
                 "1 (reference)".to_string()
             } else if ratios.is_empty() {
@@ -333,7 +347,7 @@ fn main() {
             ops.sort_by(|a, b| a.partial_cmp(b).unwrap());
             writeln!(
                 md,
-                "| {} | {} | {} | {} | `{}` | {} | {}/{} | {} | {} | {} | {:.3} | {:.1} | {} |",
+                "| {} | {} | {} | {} | `{}` | {} | {}/{} | {} | {} | {} | {:.3} | {:.1} | {} | {} |",
                 c.fam,
                 c.bits,
                 c.n,
@@ -347,7 +361,8 @@ fn main() {
                 ops.last().map_or("-".into(), |x| fmt_n(*x)),
                 med / (c.n as f64).sqrt(),
                 med / fnd,
-                rr
+                rr,
+                rs
             )
             .unwrap();
             rows_js.push(json!({"family": c.fam, "bits": c.bits, "n": c.n, "d": c.d, "arm": arm,
@@ -926,9 +941,32 @@ impl Plot {
 }
 
 fn svg_wrap(w: f64, h: f64, body: &str, caption: &str) -> String {
+    // wrap the caption to the figure width
+    let maxc = (w / 5.6) as usize;
+    let mut lines: Vec<String> = vec![];
+    let mut cur = String::new();
+    for word in caption.split_whitespace() {
+        if !cur.is_empty() && cur.len() + 1 + word.len() > maxc {
+            lines.push(std::mem::take(&mut cur));
+        }
+        if !cur.is_empty() {
+            cur.push(' ');
+        }
+        cur.push_str(word);
+    }
+    lines.push(cur);
+    let hh = h + 8.0 + 14.0 * lines.len() as f64;
+    let mut cap = String::new();
+    for (i, l) in lines.iter().enumerate() {
+        write!(
+            cap,
+            "<text x='10' y='{:.1}' class='c'>{l}</text>",
+            h + 12.0 + 14.0 * i as f64
+        )
+        .unwrap();
+    }
     format!(
-        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 {w} {h}' width='{w}' height='{h}' font-family='system-ui, sans-serif'>\n<style>:root{{--bg:#ffffff;--fg:#111827;--grid:#e5e7eb;--axis:#6b7280}}@media (prefers-color-scheme: dark){{:root{{--bg:#111827;--fg:#e5e7eb;--grid:#374151;--axis:#9ca3af}}}}.t{{font-size:11px;fill:var(--fg)}}.l{{font-size:12px;fill:var(--fg)}}.h{{font-size:13px;font-weight:600;fill:var(--fg)}}.c{{font-size:11px;fill:var(--fg)}}</style>\n<rect width='100%' height='100%' fill='var(--bg)'/>\n{body}\n<text x='10' y='{:.1}' class='c'>{caption}</text>\n</svg>\n",
-        h - 6.0
+        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 {w} {hh}' width='{w}' height='{hh}' font-family='system-ui, sans-serif'>\n<style>:root{{--bg:#ffffff;--fg:#111827;--grid:#e5e7eb;--axis:#6b7280}}@media (prefers-color-scheme: dark){{:root{{--bg:#111827;--fg:#e5e7eb;--grid:#374151;--axis:#9ca3af}}}}.t{{font-size:11px;fill:var(--fg)}}.l{{font-size:12px;fill:var(--fg)}}.h{{font-size:13px;font-weight:600;fill:var(--fg)}}.c{{font-size:11px;fill:var(--fg)}}</style>\n<rect width='100%' height='100%' fill='var(--bg)'/>\n{body}\n{cap}\n</svg>\n"
     )
 }
 
@@ -940,79 +978,59 @@ fn figures(
     ver: &dyn Fn(&str, u64, &str) -> Vec<Obs>,
     formula: &dyn Fn(&str, &str) -> f64,
 ) {
-    // Fig 1: scaling and extrapolation, two panels
-    let (pw, ph) = (560.0, 400.0);
-    let mut body = String::new();
-    for (i, fam) in ["minus", "plus"].iter().enumerate() {
-        let mut p = Plot::new(pw, ph, (28.0, 232.0), (10.0, 120.0));
-        let title = if *fam == "minus" {
-            "n-1 shape (d = n^0.129), Cheon vs rho"
-        } else {
-            "n+1 shape (d = n^0.211), Cheon vs rho"
-        };
-        p.axes(40.0, 20.0, "log2 n", "log2 group operations", title);
-        let arms: Vec<(&str, &str, &str)> = if *fam == "minus" {
-            vec![
-                ("rho.negation", COL_RHO, "rho.negation"),
-                ("cheon.pminus1_comb", COL_A, "Cheon comb"),
-                ("cheon.pminus1_naive", COL_B, "Cheon naive"),
-            ]
-        } else {
-            vec![
-                ("rho.negation", COL_RHO, "rho.negation"),
-                ("cheon.pplus1_comb", COL_A, "Cheon comb (2d powers)"),
-            ]
-        };
-        let mut legend = vec![];
-        for (arm, col, label) in &arms {
-            for c in cells.iter().filter(|c| c.fam == *fam) {
-                let v = ver(fam, c.bits, arm);
-                if v.is_empty() {
-                    continue;
+    // Fig 1 (measured range) and Fig 4 (extrapolation to 224): two panels each
+    for (name, xr, yr, xt, yt, extend, cap) in [
+        ("fig1_scaling_measured", (30.0, 58.0), (14.0, 33.0), 4.0, 2.0, false,
+         "Fig. 1. MEASURED log2 operations per size (dots = mean over verified targets, bars = min..max) with fit A over the measured range. Source: results.json."),
+        ("fig4_extrapolation_224", (28.0, 232.0), (10.0, 120.0), 40.0, 20.0, true,
+         "Fig. 4. EXTRAPOLATION. Fit A extended from the measured sizes to 224 bits (dashed); diamonds are the formula values at the P-224 shape. Nothing right of 58 bits is measured."),
+    ] {
+        let (pw, ph) = (560.0, 400.0);
+        let mut body = String::new();
+        for (i, fam) in ["minus", "plus"].iter().enumerate() {
+            let mut p = Plot::new(pw, ph, xr, yr);
+            let title = if *fam == "minus" { "n-1 shape (d = n^0.129): Cheon vs rho" } else { "n+1 shape (d = n^0.211): Cheon vs rho" };
+            p.axes(xt, yt, "log2 n", "log2 group operations", title);
+            let arms: Vec<(&str, &str, &str)> = if *fam == "minus" {
+                vec![("rho.negation", COL_RHO, "rho.negation"), ("cheon.pminus1_comb", COL_A, "Cheon comb"), ("cheon.pminus1_naive", COL_B, "Cheon naive")]
+            } else {
+                vec![("rho.negation", COL_RHO, "rho.negation"), ("cheon.pplus1_comb", COL_A, "Cheon comb (2d powers)")]
+            };
+            let mut legend = vec![];
+            for (arm, col, label) in &arms {
+                for c in cells.iter().filter(|c| c.fam == *fam) {
+                    let v = ver(fam, c.bits, arm);
+                    if v.is_empty() {
+                        continue;
+                    }
+                    let ys: Vec<f64> = v.iter().map(|o| o.ops.log2()).collect();
+                    let x = (c.n as f64).log2();
+                    p.vbar(x, ys.iter().cloned().fold(f64::MAX, f64::min), ys.iter().cloned().fold(f64::MIN, f64::max), col);
+                    p.dot(x, ys.iter().sum::<f64>() / ys.len() as f64, col, 3.5);
                 }
-                let ys: Vec<f64> = v.iter().map(|o| o.ops.log2()).collect();
-                let x = (c.n as f64).log2();
-                p.vbar(
-                    x,
-                    ys.iter().cloned().fold(f64::MAX, f64::min),
-                    ys.iter().cloned().fold(f64::MIN, f64::max),
-                    col,
-                );
-                p.dot(x, ys.iter().sum::<f64>() / ys.len() as f64, col, 3.5);
+                if let Some((ft, _)) = fits.get(&(fam.to_string(), arm.to_string())) {
+                    if extend {
+                        p.line(&[(30.0, ft.at(30.0)), (224.0, ft.at(224.0))], col, true, 1.5);
+                        if *arm != "cheon.pminus1_naive" {
+                            p.diamond(224.0, formula(fam, arm), col);
+                        }
+                    } else {
+                        p.line(&[(31.0, ft.at(31.0)), (56.0, ft.at(56.0))], col, false, 1.2);
+                    }
+                }
+                legend.push((*col, *label, false));
             }
-            if let Some((ft, _)) = fits.get(&(fam.to_string(), arm.to_string())) {
-                p.line(
-                    &[(30.0, ft.at(30.0)), (224.0, ft.at(224.0))],
-                    col,
-                    true,
-                    1.5,
-                );
-                p.diamond(224.0, formula(fam, arm), col);
+            if extend {
+                legend.push(("var(--fg)", "dashed: fit A, EXTRAPOLATED to 224", true));
             }
-            legend.push((*col, *label, false));
+            p.legend(&legend);
+            if extend {
+                p.text(p.px(224.0) - 175.0, p.py(10.0) - 6.0, "diamonds: formula at the P-224 shape", "var(--fg)");
+            }
+            write!(body, "<g transform='translate({},0)'>{}</g>", i as f64 * pw, p.s).unwrap();
         }
-        legend.push(("var(--fg)", "dashed: fit A, EXTRAPOLATED to 224", true));
-        p.legend(&legend);
-        p.text(
-            p.px(224.0) - 150.0,
-            p.py(10.0) - 6.0,
-            "diamonds: formula at the P-224 shape",
-            "var(--fg)",
-        );
-        write!(
-            body,
-            "<g transform='translate({},0)'>{}</g>",
-            i as f64 * pw,
-            p.s
-        )
-        .unwrap();
+        std::fs::write(format!("{out}/{name}.svg"), svg_wrap(pw * 2.0, ph, &body, cap)).unwrap();
     }
-    let cap = "Fig. 1. Measured log2 operations (dots = mean over verified targets, bars = min..max) and fit A extended to 224 bits (dashed, extrapolation). Source: results.json.";
-    std::fs::write(
-        format!("{out}/fig1_scaling.svg"),
-        svg_wrap(pw * 2.0, ph, &body, cap),
-    )
-    .unwrap();
 
     // Fig 2: ratio to rho by size
     let mut p = Plot::new(620.0, 360.0, (30.0, 58.0), (-4.0, 12.0));

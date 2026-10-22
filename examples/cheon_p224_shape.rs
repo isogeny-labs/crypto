@@ -20,6 +20,7 @@ use crypto_lib::cryptanalysis::cheon_counted::{
     cheon_pminus1, cheon_pplus1, distinct_prime_factors, find_shaped_curve, leaked_powers,
     next_prime, scalar_mul_plain, shape_divisor, Side,
 };
+use crypto_lib::cryptanalysis::ecbench::methods::{resolve, solve, MethodSpec};
 use crypto_lib::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
 use crypto_lib::cryptanalysis::ic_boundary::{GroupOps, PrimeCurve, PrimePoint};
 use serde_json::{json, Value};
@@ -365,11 +366,31 @@ fn run(args: &[String]) {
 
 /// Independent re-execution of recorded runs in a fresh process: every
 /// count must reproduce exactly and the planted logarithm must come back.
+/// With `--rho-records`, the matched `rho.negation` arm is re-executed in the
+/// same process (through `ecbench::methods::solve`, with the session's
+/// algorithm seed) for the same workloads and compared with the sealed
+/// session's record, so reference and candidate share one binary and one unit.
 fn replay(args: &[String]) {
     let curves = load_curves(&arg(args, "--curves").expect("--curves"));
     let runs = std::fs::read_to_string(arg(args, "--runs").expect("--runs")).unwrap();
     let out = arg(args, "--out").expect("--out");
     let max_bits: u64 = arg(args, "--full-up-to").map_or(48, |s| s.parse().unwrap());
+    let rho_records: Vec<Value> = arg(args, "--rho-records")
+        .map(|p| {
+            std::fs::read_to_string(p)
+                .unwrap()
+                .lines()
+                .filter(|l| !l.trim().is_empty())
+                .map(|l| serde_json::from_str(l).unwrap())
+                .collect()
+        })
+        .unwrap_or_default();
+    let rho_method = resolve(&MethodSpec {
+        id: "rho.negation".into(),
+        params: Default::default(),
+    })
+    .expect("rho.negation");
+    let mut rho_done = std::collections::HashSet::new();
     let mut results = vec![];
     let mut all_ok = true;
     for line in runs.lines().filter(|l| !l.trim().is_empty()) {
@@ -406,18 +427,100 @@ fn replay(args: &[String]) {
             "workload_id": wid, "ops_recorded": r["ops"], "ops_replayed": o.ops, "identical": same,
             "scalar_verified": o.alpha == Some(alpha)}),
         );
+        // the matched rho on the same workload, in this process
+        if !rho_records.is_empty() && rho_done.insert(wid.clone()) {
+            let rec = rho_records
+                .iter()
+                .find(|x| x["workload"]["workload_id"] == wid.as_str())
+                .expect("rho record for workload");
+            let cspec = explicit_spec(c);
+            let inst = cspec.build().unwrap();
+            let w = Workload::on(&cspec, &inst, TARGET_SEED, t, TargetKind::Planted).unwrap();
+            let seed: u64 = rec["algorithm_seed"].as_str().unwrap().parse().unwrap();
+            let rep = solve(&rho_method, &inst, &w.curve, &w.target, seed).expect("rho solve");
+            let recorded = rec["cost"]["total_gae"].as_f64().unwrap();
+            let verified = rep.recovered == w.planted;
+            let same_rho = rep.total_gae == recorded && verified;
+            all_ok &= same_rho;
+            eprintln!(
+                "replay {fam} {bits}b t{t} rho.negation (in process): {}",
+                if same_rho { "identical" } else { "DIFFERENT" }
+            );
+            results.push(
+                json!({"family": fam, "bits": bits, "target": t, "arm": "rho.negation",
+                "workload_id": wid, "ops_recorded": recorded, "ops_replayed": rep.total_gae,
+                "identical": same_rho, "scalar_verified": verified}),
+            );
+        }
     }
     let doc = json!({
         "schema": "cheon-p224-shape.replay/v1",
         "status": if all_ok && !results.is_empty() { "verified" } else { "failed" },
         "independent": true,
-        "independence": "fresh process re-executing the recorded (curve, target, arm) from curves.json and the ecbench target law; counts compared to the recorded run",
+        "independence": "fresh process re-executing the recorded (curve, target, arm) from curves.json and the ecbench target law; counts compared to the recorded run; rho.negation re-executed in the same process and binary with the session's algorithm seed",
         "scalars_verified": all_ok,
-        "scope": format!("every recorded run up to {max_bits} bits, target 0 above"),
+        "scope": format!("every recorded run up to {max_bits} bits, target 0 above; the ecbench session itself was replayed in full by `ecbench verify --replay-all` (sessions/rho-20261022.audit.json)"),
         "runs": results,
     });
     std::fs::write(&out, serde_json::to_string_pretty(&doc).unwrap() + "\n").unwrap();
     if !all_ok {
+        std::process::exit(1);
+    }
+}
+
+/// Link to the existing code: run `cryptanalysis::cheon_attack` (BigUint
+/// points, exponentiation counts) on the minus curves and require the same
+/// recovered logarithm and the same exponentiation count as the counted
+/// `cheon.pminus1_naive` arm.
+fn xcheck(args: &[String]) {
+    use crypto_lib::cryptanalysis::cheon_attack::cheon_attack;
+    use crypto_lib::ecc::curve::CurveParams;
+    use num_bigint::BigUint;
+    let curves = load_curves(&arg(args, "--curves").expect("--curves"));
+    let max_bits: u64 = arg(args, "--max-bits").map_or(40, |s| s.parse().unwrap());
+    let targets: u64 = arg(args, "--targets").map_or(3, |s| s.parse().unwrap());
+    let mut all = true;
+    for c in curves
+        .iter()
+        .filter(|c| c["family"] == "minus" && c["bits"].as_u64().unwrap() <= max_bits)
+    {
+        let (p, a, b, n, d) = (u(c, "p"), u(c, "a"), u(c, "b"), u(c, "n"), u(c, "d"));
+        let cp = CurveParams {
+            name: "cheon-p224-shape",
+            p: BigUint::from(p),
+            a: BigUint::from(a),
+            b: BigUint::from(b),
+            gx: BigUint::from(u(c, "gx")),
+            gy: BigUint::from(u(c, "gy")),
+            n: BigUint::from(n),
+            h: 1,
+        };
+        for t in 0..targets {
+            let (mine, _, alpha, _) = execute(c, t, "cheon.pminus1_naive", None);
+            let g = cp.generator();
+            let a_fe = cp.a_fe();
+            let ab = BigUint::from(alpha);
+            let adb = ab.modpow(&BigUint::from(d), &BigUint::from(n));
+            let ag = g.scalar_mul(&ab, &a_fe);
+            let adg = g.scalar_mul(&adb, &a_fe);
+            let rep = cheon_attack(&cp, &g, &ag, &adg, &BigUint::from(n), &BigUint::from(d));
+            let theirs = rep.step1_exps + rep.step2_exps;
+            let ok = rep.recovered_alpha == Some(BigUint::from(alpha))
+                && mine.alpha == Some(alpha)
+                && theirs == mine.exponentiations;
+            all &= ok;
+            println!(
+                "minus {} bits t{t}: cheon_attack.rs alpha {} exps {theirs}; counted naive alpha {} exps {} ops {}  {}",
+                c["bits"],
+                rep.recovered_alpha.is_some(),
+                mine.alpha.is_some(),
+                mine.exponentiations,
+                mine.ops,
+                if ok { "MATCH" } else { "MISMATCH" }
+            );
+        }
+    }
+    if !all {
         std::process::exit(1);
     }
 }
@@ -430,6 +533,7 @@ fn main() {
         Some("spec") => spec(&args),
         Some("run") => run(&args),
         Some("replay") => replay(&args),
+        Some("xcheck") => xcheck(&args),
         _ => {
             eprintln!("usage: cheon_p224_shape gen|check|spec|run|xcheck|analyse ...");
             std::process::exit(2);

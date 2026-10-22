@@ -1,0 +1,37 @@
+{
+  "schema": "validation-gate/v1",
+  "note": "Replay certificate: 160 re-executions in one fresh process (Cheon runs to 48 bits and target 0 above, plus the matched rho.negation on the same workloads); the rho session was also replayed in full by ecbench verify --replay-all (research/cheon_p224_shape_20261022/sessions/rho-20261022.audit.json, 84 of 84). Gae band: n-1 comb versus rho.negation at 55.6 bits, medians of per-target priced costs over six paired targets.",
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "sha256": "077f2a1186053058687412339d2e7c2e9ff2cc9b3c656970245ba37c01638518"
+  },
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "a8bb8bc00fdde7258a93998d70f6cbd8b4973022fdf2f1b139d5820c5b53571f"
+  },
+  "rho_reference": {
+    "kind": "negation",
+    "protocol": "ecbench rho.negation (negation-map r-adding walk, distinguished points), the strongest rho available on a prime-order curve with automorphism group {+-1}; same frozen curves and planted targets as the Cheon arms (research/cheon_p224_shape_20261022/PROTOCOL.md)",
+    "unit": "counted group operations (ecbench.gae: one affine addition or doubling)",
+    "binary_or_process": "cheon_p224_shape replay: the Cheon arms and rho.negation (ecbench::methods::solve, session algorithm seeds) re-executed in one process and one binary; sealed rho session ECBS1he8d120f81db5",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 100364872.0,
+        "rho": 158861495.0
+      },
+      "0.1": {
+        "ic": 105388784.1,
+        "rho": 174747597.25
+      },
+      "1": {
+        "ic": 150603993.0,
+        "rho": 317722517.5
+      }
+    },
+    "order_holds_across_band": true
+  }
+}
