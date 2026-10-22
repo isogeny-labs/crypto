@@ -1,0 +1,1892 @@
+{
+  "schema": "validation-gate/v1 validator-report",
+  "id": "VAL-20261022-0549c2",
+  "status": "pass",
+  "independent": true,
+  "independence": "Validator subagent; did not write the rho-neg instrument, addendum, card or runs, and took no number from a producer summary (none exists at the snapshot). Every value is recomputed by validator_recompute_rhoneg.py (stdlib Python) from committed raw rows; the rho walks were re-run by the validator's own Python port of the instrument (written after reading the instrument source, so not a blind re-derivation). The producing commits carry the same Claude-Session trailer as this validator's parent session: independence is a separate subagent context with no producer messages, not a separate model or session. The replay lane's outputs (raw/rho-neg-replay/, replay-certificate-v2.json, commits d63dea4372 and 043f1eb98c) were not read.",
+  "subject": {
+    "item": "research/blindspots_20261018/14-prime-m4-cells",
+    "evidence_directory": "benchmarks/20261018-blindspots-prime-m4-cells",
+    "snapshot_validated": "41155e55547b49baa2f1d8b077724a0c49d9da76",
+    "card": "CARD-BLINDSPOT-14-RHONEG-01",
+    "run_commit": "84e5b2c8592a97fffe0245602d18139fc140c45b",
+    "addendum_commit": "9b2f5e1b36467d7b93c72c09072f68dff6f83d2e",
+    "instrument_sha256": "1a7d51c3adcd7108de335cd7ac3b2d83a11f5ef1246b8b959271ced1f5e8710e",
+    "files_read_equal_snapshot_blobs": true,
+    "commit_times": {
+      "9b2f5e1b36": "2026-10-22T06:22:27+00:00",
+      "84e5b2c859": "2026-10-22T06:24:52+00:00",
+      "41155e5554": "2026-10-22T06:25:51+00:00"
+    }
+  },
+  "script": {
+    "path": "validator_recompute_rhoneg.py",
+    "run": "python3 -I benchmarks/20261018-blindspots-prime-m4-cells/validator_recompute_rhoneg.py --write",
+    "python": "3.13.16"
+  },
+  "tolerance_policy": "claimed = the instrument-emitted per-row totals (gae, native; arm (a) gae_total, native_total), aggregated exactly; recomputed = the per-counter fields, natives summed by the validator, aggregated exactly (Fractions, one float conversion). Both sides are exact integer means, so rel_tol is 1e-12 (float representation only); observed maximum relative difference 0.0. rho-neg entries also carry 'reimplemented': the same mean from the validator's Python port, which reproduced every row.",
+  "raw_data": [
+    {
+      "path": "../../benchmarks/20261018-blindspots-prime-m4-cells/rho-reference.json",
+      "sha256": "2ea7f468ac780097109a263bcdeb1a38bd284e4ecf682cf2f021eb12b6870690",
+      "role": "earlier rho reference (plain rho; strongest_available false)"
+    },
+    {
+      "path": "../../benchmarks/20261018-blindspots-prime-m4-cells/validator-report.json",
+      "sha256": "a495b649f7c792fda1f55a7b05f958e073fff783cd53872bf4c2482f1397a2d1",
+      "role": "earlier validator report (plain-rho numbers cross-checked)"
+    },
+    {
+      "path": "../../benchmarks/20261018-blindspots-prime-m4-cells/validator_recompute.py",
+      "sha256": "28d1b3da1a84ea24cc6dc18850e630791a7240381f6711505bfd69bacac2e360",
+      "role": "earlier validator script (grepped for the cost definition only)"
+    },
+    {
+      "path": "../../docs/VALIDATION_GATE.md",
+      "sha256": "1a2eff2fb1f62e5b113bc641278bf9d9678181791a25c3f23ca30dd835ebea4e",
+      "role": "gate schema (policy, read for the schema)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/PROTOCOL-ADDENDUM-rho-neg.md",
+      "sha256": "3734909a842985b9d968b85f4f7561a544bad7f86830bf398451951ed80d99a4",
+      "role": "protocol addendum B (committed before the run)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16.jsonl",
+      "sha256": "017b0d28297507bf45607468939b5cb76ccb81a50a82d8be0e2f81a11e82920e",
+      "role": "recorded fullic-a rows (card-01)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b20.jsonl",
+      "sha256": "61b5ac18a77940e2c54f808f35573e79c043dc52412f3ce5b81ee1a7a8c4df8e",
+      "role": "recorded fullic-a rows (card-01)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b24.jsonl",
+      "sha256": "49d179b1a73c7c59f6575abcebef84b27df55a0f70ad862883bffc2078cbbcf7",
+      "role": "recorded fullic-a rows (card-01)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b28.jsonl",
+      "sha256": "6e6d1181f844079e1baa9ee7c6ff9a6155606f8a2a36fa8224a30271ffd07afd",
+      "role": "recorded fullic-a rows (card-01)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b16.jsonl",
+      "sha256": "82a53bc6a5bdd95f24995996f2c86470dfcca5d898c687ff57aef86f9d514d46",
+      "role": "recorded rho rows (card-01)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b20.jsonl",
+      "sha256": "acb4957e2e5e3714cbd8079e27e6104bf752a0ed8c298d4064b8e45f3419ba78",
+      "role": "recorded rho rows (card-01)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b24.jsonl",
+      "sha256": "126cfd524da872a9d562d69544d8821f1352b96f277bf1a5fc9a8d8cef4f4bef",
+      "role": "recorded rho rows (card-01)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b28.jsonl",
+      "sha256": "9ee54d450af8a7d7c339a66827d8bc4c46cad121e977a0de47cbee8ae1be9ecc",
+      "role": "recorded rho rows (card-01)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/build.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/build.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stdout log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.jsonl",
+      "sha256": "9087848d11467d60af31556cd70fa3ea6982e33668316b864683a5fc50c8222a",
+      "role": "continuity control output (fullic-a)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.stdout.log",
+      "sha256": "9087848d11467d60af31556cd70fa3ea6982e33668316b864683a5fc50c8222a",
+      "role": "stdout log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.jsonl",
+      "sha256": "590ab471ab1c537bff31cf8d7b8d7c226f095628ca06209b31b1fb0de2573872",
+      "role": "continuity control output (fullic-a)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.stdout.log",
+      "sha256": "590ab471ab1c537bff31cf8d7b8d7c226f095628ca06209b31b1fb0de2573872",
+      "role": "stdout log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.jsonl",
+      "sha256": "2e53686e0e3becb0145cac0348ff91a7f4f284faf6b418a2b10a8ebed9ff44a9",
+      "role": "continuity control output (fullic-a)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.stdout.log",
+      "sha256": "2e53686e0e3becb0145cac0348ff91a7f4f284faf6b418a2b10a8ebed9ff44a9",
+      "role": "stdout log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.jsonl",
+      "sha256": "5328687969cc3b604db4871938524d9f81ac78da2bb8376cf8cc08f002eebba7",
+      "role": "continuity control output (fullic-a)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.stdout.log",
+      "sha256": "5328687969cc3b604db4871938524d9f81ac78da2bb8376cf8cc08f002eebba7",
+      "role": "stdout log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.jsonl",
+      "sha256": "4500d4d2d7ef12d7a954df42ab6a3bbb7567ef08570aef6514b535b9120fd308",
+      "role": "continuity control output (rho)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.stdout.log",
+      "sha256": "4500d4d2d7ef12d7a954df42ab6a3bbb7567ef08570aef6514b535b9120fd308",
+      "role": "stdout log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.jsonl",
+      "sha256": "877a14741a0d2e787a878a47fa1c4f017106262e3d585c6f144097633581c5d7",
+      "role": "continuity control output (rho)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.stdout.log",
+      "sha256": "877a14741a0d2e787a878a47fa1c4f017106262e3d585c6f144097633581c5d7",
+      "role": "stdout log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.jsonl",
+      "sha256": "6084f24df5b96bd614699d9f3e5323ea3f6552004e4413dc58cdd29771371046",
+      "role": "continuity control output (rho)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.stdout.log",
+      "sha256": "6084f24df5b96bd614699d9f3e5323ea3f6552004e4413dc58cdd29771371046",
+      "role": "stdout log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.jsonl",
+      "sha256": "a95c928779cf9f2899011c79bd9698de882fd924888a69ad5da5370808b31272",
+      "role": "continuity control output (rho)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.stdout.log",
+      "sha256": "a95c928779cf9f2899011c79bd9698de882fd924888a69ad5da5370808b31272",
+      "role": "stdout log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/receipt-n01.json",
+      "sha256": "3e966efdc2c444926f914c9ec3b4c98acb639fd36dab25890addff5d6905e6ae",
+      "role": "execution receipt of card n01"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.jsonl",
+      "sha256": "4b4886dfcc80c28890d85368b0e59aefdaecde5e28d017cc233a55bd9f798ba3",
+      "role": "rho-neg rows (measured reference)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.stdout.log",
+      "sha256": "4b4886dfcc80c28890d85368b0e59aefdaecde5e28d017cc233a55bd9f798ba3",
+      "role": "stdout log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.jsonl",
+      "sha256": "8e0e60e4084a831f673bbdf4cd7d3e2da1f43599ab3762d1902ee94ec6f8fd2a",
+      "role": "rho-neg rows (measured reference)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.stdout.log",
+      "sha256": "8e0e60e4084a831f673bbdf4cd7d3e2da1f43599ab3762d1902ee94ec6f8fd2a",
+      "role": "stdout log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.jsonl",
+      "sha256": "54707f92c51a527ff5627f33aa993d086ca86de63a67fe457ff3bf740b837dc6",
+      "role": "rho-neg rows (measured reference)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.stdout.log",
+      "sha256": "54707f92c51a527ff5627f33aa993d086ca86de63a67fe457ff3bf740b837dc6",
+      "role": "stdout log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.jsonl",
+      "sha256": "7389e1343687b1ca2ba3b0a9245f625a26aa5d59a2c714ea370b9efc80578a65",
+      "role": "rho-neg rows (measured reference)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.stdout.log",
+      "sha256": "7389e1343687b1ca2ba3b0a9245f625a26aa5d59a2c714ea370b9efc80578a65",
+      "role": "stdout log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/selftest.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "stderr log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/selftest.stdout.log",
+      "sha256": "0c02c1cd537dc2c62fd30bfb5653b4bf0da5ba95b04a39eaa70c579e435b7972",
+      "role": "selftest stdout"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/rho-neg-cards/card-n01.yaml",
+      "sha256": "a8aa5e6871bbb65578910a7661d05ccdc23c282420373cf63e39b93eaccba596",
+      "role": "frozen command card (CARD-BLINDSPOT-14-RHONEG-01)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/instruments/blindspots_14_prime_m4.rs",
+      "sha256": "f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376",
+      "role": "original instrument (diffed against the copy)"
+    },
+    {
+      "path": "../../research/blindspots_20261018/instruments/blindspots_14_prime_m4_neg.rs",
+      "sha256": "1a7d51c3adcd7108de335cd7ac3b2d83a11f5ef1246b8b959271ced1f5e8710e",
+      "role": "instrument source (rho-neg)"
+    },
+    {
+      "path": "../../scripts/validation_gate.py",
+      "sha256": "fa2c3c61dfee57b5106387bc805b87d9cb42136f455908bd42ec09b7a15651ee",
+      "role": "gate module (check_rho_reference, check_validator_report)"
+    }
+  ],
+  "headline": [
+    {
+      "name": "16 bits: rho-neg(w=0) (mean per run of gae + w*native, setup included)",
+      "claimed": 417.375,
+      "recomputed": 417.375,
+      "rel_tol": 1e-12,
+      "reimplemented": 417.375
+    },
+    {
+      "name": "16 bits: plain rho(w=0) (mean per run of gae + w*native, setup included)",
+      "claimed": 566.5,
+      "recomputed": 566.5,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "16 bits: arm (a) full IC S(w=0) (mean per run of gae + w*native, setup included)",
+      "claimed": 3651.1875,
+      "recomputed": 3651.1875,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "16 bits: gap S/rho-neg at w=0",
+      "claimed": 8.747978436657682,
+      "recomputed": 8.747978436657682,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "16 bits: gap S/plain-rho at w=0",
+      "claimed": 6.445167696381288,
+      "recomputed": 6.445167696381288,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "16 bits: rho-neg(w=0.1) (mean per run of gae + w*native, setup included)",
+      "claimed": 485.03125,
+      "recomputed": 485.03125,
+      "rel_tol": 1e-12,
+      "reimplemented": 485.03125
+    },
+    {
+      "name": "16 bits: plain rho(w=0.1) (mean per run of gae + w*native, setup included)",
+      "claimed": 602.63125,
+      "recomputed": 602.63125,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "16 bits: arm (a) full IC S(w=0.1) (mean per run of gae + w*native, setup included)",
+      "claimed": 3996.8375,
+      "recomputed": 3996.8375,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "16 bits: gap S/rho-neg at w=0.1",
+      "claimed": 8.240371110108885,
+      "recomputed": 8.240371110108885,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "16 bits: gap S/plain-rho at w=0.1",
+      "claimed": 6.632310388815714,
+      "recomputed": 6.632310388815714,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "16 bits: rho-neg(w=1) (mean per run of gae + w*native, setup included)",
+      "claimed": 1093.9375,
+      "recomputed": 1093.9375,
+      "rel_tol": 1e-12,
+      "reimplemented": 1093.9375
+    },
+    {
+      "name": "16 bits: plain rho(w=1) (mean per run of gae + w*native, setup included)",
+      "claimed": 927.8125,
+      "recomputed": 927.8125,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "16 bits: arm (a) full IC S(w=1) (mean per run of gae + w*native, setup included)",
+      "claimed": 7107.6875,
+      "recomputed": 7107.6875,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "16 bits: gap S/rho-neg at w=1",
+      "claimed": 6.497343312574987,
+      "recomputed": 6.497343312574987,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "16 bits: gap S/plain-rho at w=1",
+      "claimed": 7.660693836308521,
+      "recomputed": 7.660693836308521,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "20 bits: rho-neg(w=0) (mean per run of gae + w*native, setup included)",
+      "claimed": 969.6875,
+      "recomputed": 969.6875,
+      "rel_tol": 1e-12,
+      "reimplemented": 969.6875
+    },
+    {
+      "name": "20 bits: plain rho(w=0) (mean per run of gae + w*native, setup included)",
+      "claimed": 1119.1875,
+      "recomputed": 1119.1875,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "20 bits: arm (a) full IC S(w=0) (mean per run of gae + w*native, setup included)",
+      "claimed": 16480.875,
+      "recomputed": 16480.875,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "20 bits: gap S/rho-neg at w=0",
+      "claimed": 16.996068320979695,
+      "recomputed": 16.996068320979695,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "20 bits: gap S/plain-rho at w=0",
+      "claimed": 14.725749706818563,
+      "recomputed": 14.725749706818563,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "20 bits: rho-neg(w=0.1) (mean per run of gae + w*native, setup included)",
+      "claimed": 1214.04375,
+      "recomputed": 1214.04375,
+      "rel_tol": 1e-12,
+      "reimplemented": 1214.04375
+    },
+    {
+      "name": "20 bits: plain rho(w=0.1) (mean per run of gae + w*native, setup included)",
+      "claimed": 1207.8625,
+      "recomputed": 1207.8625,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "20 bits: arm (a) full IC S(w=0.1) (mean per run of gae + w*native, setup included)",
+      "claimed": 18138.45625,
+      "recomputed": 18138.45625,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "20 bits: gap S/rho-neg at w=0.1",
+      "claimed": 14.940529326064238,
+      "recomputed": 14.940529326064238,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "20 bits: gap S/plain-rho at w=0.1",
+      "claimed": 15.016987653809933,
+      "recomputed": 15.016987653809933,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "20 bits: rho-neg(w=1) (mean per run of gae + w*native, setup included)",
+      "claimed": 3413.25,
+      "recomputed": 3413.25,
+      "rel_tol": 1e-12,
+      "reimplemented": 3413.25
+    },
+    {
+      "name": "20 bits: plain rho(w=1) (mean per run of gae + w*native, setup included)",
+      "claimed": 2005.9375,
+      "recomputed": 2005.9375,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "20 bits: arm (a) full IC S(w=1) (mean per run of gae + w*native, setup included)",
+      "claimed": 33056.6875,
+      "recomputed": 33056.6875,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "20 bits: gap S/rho-neg at w=1",
+      "claimed": 9.68481286164213,
+      "recomputed": 9.68481286164213,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "20 bits: gap S/plain-rho at w=1",
+      "claimed": 16.479420470478267,
+      "recomputed": 16.479420470478267,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "24 bits: rho-neg(w=0) (mean per run of gae + w*native, setup included)",
+      "claimed": 3365.125,
+      "recomputed": 3365.125,
+      "rel_tol": 1e-12,
+      "reimplemented": 3365.125
+    },
+    {
+      "name": "24 bits: plain rho(w=0) (mean per run of gae + w*native, setup included)",
+      "claimed": 3707.75,
+      "recomputed": 3707.75,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "24 bits: arm (a) full IC S(w=0) (mean per run of gae + w*native, setup included)",
+      "claimed": 76401.4375,
+      "recomputed": 76401.4375,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "24 bits: gap S/rho-neg at w=0",
+      "claimed": 22.70389287173582,
+      "recomputed": 22.70389287173582,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "24 bits: gap S/plain-rho at w=0",
+      "claimed": 20.605876205245767,
+      "recomputed": 20.605876205245767,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "24 bits: rho-neg(w=0.1) (mean per run of gae + w*native, setup included)",
+      "claimed": 4410.65,
+      "recomputed": 4410.65,
+      "rel_tol": 1e-12,
+      "reimplemented": 4410.65
+    },
+    {
+      "name": "24 bits: plain rho(w=0.1) (mean per run of gae + w*native, setup included)",
+      "claimed": 4052.6625,
+      "recomputed": 4052.6625,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "24 bits: arm (a) full IC S(w=0.1) (mean per run of gae + w*native, setup included)",
+      "claimed": 84242.08125,
+      "recomputed": 84242.08125,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "24 bits: gap S/rho-neg at w=0.1",
+      "claimed": 19.099697606928682,
+      "recomputed": 19.099697606928682,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "24 bits: gap S/plain-rho at w=0.1",
+      "claimed": 20.78684846073415,
+      "recomputed": 20.78684846073415,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "24 bits: rho-neg(w=1) (mean per run of gae + w*native, setup included)",
+      "claimed": 13820.375,
+      "recomputed": 13820.375,
+      "rel_tol": 1e-12,
+      "reimplemented": 13820.375
+    },
+    {
+      "name": "24 bits: plain rho(w=1) (mean per run of gae + w*native, setup included)",
+      "claimed": 7156.875,
+      "recomputed": 7156.875,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "24 bits: arm (a) full IC S(w=1) (mean per run of gae + w*native, setup included)",
+      "claimed": 154807.875,
+      "recomputed": 154807.875,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "24 bits: gap S/rho-neg at w=1",
+      "claimed": 11.201423622730932,
+      "recomputed": 11.201423622730932,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "24 bits: gap S/plain-rho at w=1",
+      "claimed": 21.63065234477338,
+      "recomputed": 21.63065234477338,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "28 bits: rho-neg(w=0) (mean per run of gae + w*native, setup included)",
+      "claimed": 15953.375,
+      "recomputed": 15953.375,
+      "rel_tol": 1e-12,
+      "reimplemented": 15953.375
+    },
+    {
+      "name": "28 bits: plain rho(w=0) (mean per run of gae + w*native, setup included)",
+      "claimed": 18912.8125,
+      "recomputed": 18912.8125,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "28 bits: arm (a) full IC S(w=0) (mean per run of gae + w*native, setup included)",
+      "claimed": 568572.875,
+      "recomputed": 568572.875,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "28 bits: gap S/rho-neg at w=0",
+      "claimed": 35.63966088680295,
+      "recomputed": 35.63966088680295,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "28 bits: gap S/plain-rho at w=0",
+      "claimed": 30.062840997339766,
+      "recomputed": 30.062840997339766,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "28 bits: rho-neg(w=0.1) (mean per run of gae + w*native, setup included)",
+      "claimed": 21276.66875,
+      "recomputed": 21276.66875,
+      "rel_tol": 1e-12,
+      "reimplemented": 21276.66875
+    },
+    {
+      "name": "28 bits: plain rho(w=0.1) (mean per run of gae + w*native, setup included)",
+      "claimed": 20775.33125,
+      "recomputed": 20775.33125,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "28 bits: arm (a) full IC S(w=0.1) (mean per run of gae + w*native, setup included)",
+      "claimed": 627636.11875,
+      "recomputed": 627636.11875,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "28 bits: gap S/rho-neg at w=0.1",
+      "claimed": 29.49879636350498,
+      "recomputed": 29.49879636350498,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "28 bits: gap S/plain-rho at w=0.1",
+      "claimed": 30.210643151598365,
+      "recomputed": 30.210643151598365,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "28 bits: rho-neg(w=1) (mean per run of gae + w*native, setup included)",
+      "claimed": 69186.3125,
+      "recomputed": 69186.3125,
+      "rel_tol": 1e-12,
+      "reimplemented": 69186.3125
+    },
+    {
+      "name": "28 bits: plain rho(w=1) (mean per run of gae + w*native, setup included)",
+      "claimed": 37538.0,
+      "recomputed": 37538.0,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "28 bits: arm (a) full IC S(w=1) (mean per run of gae + w*native, setup included)",
+      "claimed": 1159205.3125,
+      "recomputed": 1159205.3125,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "28 bits: gap S/rho-neg at w=1",
+      "claimed": 16.754835900525844,
+      "recomputed": 16.754835900525844,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "28 bits: gap S/plain-rho at w=1",
+      "claimed": 30.880849072939423,
+      "recomputed": 30.880849072939423,
+      "rel_tol": 1e-12
+    }
+  ],
+  "headline_failures": [],
+  "per_cell": {
+    "16": {
+      "bits": 16,
+      "n": 48383,
+      "bx_arm_a": 8,
+      "runs": 16,
+      "ok": {
+        "rho_neg": 16,
+        "rho": 16,
+        "ic_a": 16
+      },
+      "band": {
+        "0": {
+          "S_a": 3651.1875,
+          "rho_neg": 417.375,
+          "rho_plain": 566.5,
+          "gap_S_over_rho_neg": 8.747978436657682,
+          "gap_S_over_rho_plain": 6.445167696381288,
+          "rho_plain_over_rho_neg": 1.3572926025756213,
+          "gap_S_over_cheaper_rho": 8.747978436657682,
+          "cheaper_rho": "rho_neg",
+          "ci95": {
+            "S_a": [
+              3145.0732001741685,
+              4157.301799825832
+            ],
+            "rho_neg": [
+              365.6645100666199,
+              469.0854899333801
+            ],
+            "rho_plain": [
+              449.804191755409,
+              683.195808244591
+            ],
+            "gap_S_over_rho_neg_conservative": [
+              6.704690866948015,
+              11.369169512973569
+            ],
+            "gap_S_over_rho_plain_conservative": [
+              4.6034726241297435,
+              9.24247011483267
+            ]
+          }
+        },
+        "0.1": {
+          "S_a": 3996.8375,
+          "rho_neg": 485.03125,
+          "rho_plain": 602.63125,
+          "gap_S_over_rho_neg": 8.240371110108885,
+          "gap_S_over_rho_plain": 6.632310388815714,
+          "rho_plain_over_rho_neg": 1.2424586044713615,
+          "gap_S_over_cheaper_rho": 8.240371110108885,
+          "cheaper_rho": "rho_neg",
+          "ci95": {
+            "S_a": [
+              3443.0418159330507,
+              4550.633184066949
+            ],
+            "rho_neg": [
+              417.00718419016493,
+              553.0553158098351
+            ],
+            "rho_plain": [
+              474.22457317388967,
+              731.0379268261104
+            ],
+            "gap_S_over_rho_neg_conservative": [
+              6.225492672268104,
+              10.91260140494787
+            ],
+            "gap_S_over_rho_plain_conservative": [
+              4.709799163063171,
+              9.595945552990806
+            ]
+          }
+        },
+        "1": {
+          "S_a": 7107.6875,
+          "rho_neg": 1093.9375,
+          "rho_plain": 927.8125,
+          "gap_S_over_rho_neg": 6.497343312574987,
+          "gap_S_over_rho_plain": 7.660693836308521,
+          "rho_plain_over_rho_neg": 0.848140318802491,
+          "gap_S_over_cheaper_rho": 7.660693836308521,
+          "cheaper_rho": "rho_plain",
+          "ci95": {
+            "S_a": [
+              6124.57098775653,
+              8090.80401224347
+            ],
+            "rho_neg": [
+              878.9118922980044,
+              1308.9631077019956
+            ],
+            "rho_plain": [
+              693.9833838862342,
+              1161.6416161137658
+            ],
+            "gap_S_over_rho_neg_conservative": [
+              4.678948514071396,
+              9.205477913251624
+            ],
+            "gap_S_over_rho_plain_conservative": [
+              5.272341230547578,
+              11.658498171722522
+            ]
+          }
+        }
+      },
+      "order_rho_neg_cheaper_than_arm_a_all_w": true,
+      "order_rho_plain_cheaper_than_arm_a_all_w": true,
+      "order_holds_against_both": true,
+      "ci95_separated_at_all_w": true,
+      "rho_neg_vs_rho_plain": "unresolved at the boundary (order flips inside the band)",
+      "diagnostics": {
+        "neg_mean_steps": 184.8125,
+        "neg_steps_over_sqrt_pi_n_4": 0.9480691271792129,
+        "rho_mean_steps": 329.375,
+        "rho_steps_over_sqrt_pi_n_2": 1.1947699674341943,
+        "online_gae_plain_over_neg": 1.641362660944206,
+        "neg_native_per_step": 3.6608048698004736,
+        "neg_totals": {
+          "walks": 168,
+          "steps": 2957,
+          "la_rejects": 110,
+          "la_exhausted": 0,
+          "fruitless_cycles": 3,
+          "fruitless_2cycles": 1,
+          "cycle_len_sum": 10,
+          "escape_gadd": 11,
+          "abandoned_walks": 0,
+          "gadd": 6678
+        },
+        "neg_mean_setup_gadd": 184.375,
+        "rho_mean_setup_gadd": 184.0625,
+        "ic_mean_setup_gadd": 1074.25
+      }
+    },
+    "20": {
+      "bits": 20,
+      "n": 660917,
+      "bx_arm_a": 15,
+      "runs": 16,
+      "ok": {
+        "rho_neg": 16,
+        "rho": 16,
+        "ic_a": 16
+      },
+      "band": {
+        "0": {
+          "S_a": 16480.875,
+          "rho_neg": 969.6875,
+          "rho_plain": 1119.1875,
+          "gap_S_over_rho_neg": 16.996068320979695,
+          "gap_S_over_rho_plain": 14.725749706818563,
+          "rho_plain_over_rho_neg": 1.1541733805994199,
+          "gap_S_over_cheaper_rho": 16.996068320979695,
+          "cheaper_rho": "rho_neg",
+          "ci95": {
+            "S_a": [
+              13815.416084423203,
+              19146.333915576797
+            ],
+            "rho_neg": [
+              789.8932011227228,
+              1149.4817988772772
+            ],
+            "rho_plain": [
+              788.657397618908,
+              1449.717602381092
+            ],
+            "gap_S_over_rho_neg_conservative": [
+              12.018821087830192,
+              24.239142568087637
+            ],
+            "gap_S_over_rho_plain_conservative": [
+              9.529729142925518,
+              24.27712460871205
+            ]
+          }
+        },
+        "0.1": {
+          "S_a": 18138.45625,
+          "rho_neg": 1214.04375,
+          "rho_plain": 1207.8625,
+          "gap_S_over_rho_neg": 14.940529326064238,
+          "gap_S_over_rho_plain": 15.016987653809933,
+          "rho_plain_over_rho_neg": 0.9949085442761021,
+          "gap_S_over_cheaper_rho": 15.016987653809933,
+          "cheaper_rho": "rho_plain",
+          "ci95": {
+            "S_a": [
+              15200.397284749593,
+              21076.515215250405
+            ],
+            "rho_neg": [
+              974.7456958050515,
+              1453.3418041949485
+            ],
+            "rho_plain": [
+              844.3399147162247,
+              1571.3850852837752
+            ],
+            "gap_S_over_rho_neg_conservative": [
+              10.45892799675543,
+              21.622578387322978
+            ],
+            "gap_S_over_rho_plain_conservative": [
+              9.673247778092895,
+              24.962121117220946
+            ]
+          }
+        },
+        "1": {
+          "S_a": 33056.6875,
+          "rho_neg": 3413.25,
+          "rho_plain": 2005.9375,
+          "gap_S_over_rho_neg": 9.68481286164213,
+          "gap_S_over_rho_plain": 16.479420470478267,
+          "rho_plain_over_rho_neg": 0.5876913498864719,
+          "gap_S_over_cheaper_rho": 16.479420470478267,
+          "cheaper_rho": "rho_plain",
+          "ci95": {
+            "S_a": [
+              27664.775488417647,
+              38448.59951158235
+            ],
+            "rho_neg": [
+              2638.349909299065,
+              4188.150090700935
+            ],
+            "rho_plain": [
+              1345.4758784900246,
+              2666.3991215099754
+            ],
+            "gap_S_over_rho_neg_conservative": [
+              6.605488076905962,
+              14.572972059569254
+            ],
+            "gap_S_over_rho_plain_conservative": [
+              10.375331759317094,
+              28.576208705229057
+            ]
+          }
+        }
+      },
+      "order_rho_neg_cheaper_than_arm_a_all_w": true,
+      "order_rho_plain_cheaper_than_arm_a_all_w": true,
+      "order_holds_against_both": true,
+      "ci95_separated_at_all_w": true,
+      "rho_neg_vs_rho_plain": "unresolved at the boundary (order flips inside the band)",
+      "diagnostics": {
+        "neg_mean_steps": 674.0625,
+        "neg_steps_over_sqrt_pi_n_4": 0.9355817996481799,
+        "rho_mean_steps": 839.0625,
+        "rho_steps_over_sqrt_pi_n_2": 0.8234948959984951,
+        "online_gae_plain_over_neg": 1.1958299264104661,
+        "neg_native_per_step": 3.62512749188688,
+        "neg_totals": {
+          "walks": 301,
+          "steps": 10785,
+          "la_rejects": 384,
+          "la_exhausted": 0,
+          "fruitless_cycles": 13,
+          "fruitless_2cycles": 0,
+          "cycle_len_sum": 52,
+          "escape_gadd": 53,
+          "abandoned_walks": 0,
+          "gadd": 15515
+        },
+        "neg_mean_setup_gadd": 205.3125,
+        "rho_mean_setup_gadd": 205.125,
+        "ic_mean_setup_gadd": 5403.9375
+      }
+    },
+    "24": {
+      "bits": 24,
+      "n": 10542893,
+      "bx_arm_a": 29,
+      "runs": 16,
+      "ok": {
+        "rho_neg": 16,
+        "rho": 16,
+        "ic_a": 16
+      },
+      "band": {
+        "0": {
+          "S_a": 76401.4375,
+          "rho_neg": 3365.125,
+          "rho_plain": 3707.75,
+          "gap_S_over_rho_neg": 22.70389287173582,
+          "gap_S_over_rho_plain": 20.605876205245767,
+          "rho_plain_over_rho_neg": 1.1018164258385648,
+          "gap_S_over_cheaper_rho": 22.70389287173582,
+          "cheaper_rho": "rho_neg",
+          "ci95": {
+            "S_a": [
+              71411.38907697766,
+              81391.48592302234
+            ],
+            "rho_neg": [
+              2510.5055402038115,
+              4219.7444597961885
+            ],
+            "rho_plain": [
+              2758.273705747718,
+              4657.226294252282
+            ],
+            "gap_S_over_rho_neg_conservative": [
+              16.923154887067923,
+              32.42035702355578
+            ],
+            "gap_S_over_rho_plain_conservative": [
+              15.333459137493504,
+              29.50812522826069
+            ]
+          }
+        },
+        "0.1": {
+          "S_a": 84242.08125,
+          "rho_neg": 4410.65,
+          "rho_plain": 4052.6625,
+          "gap_S_over_rho_neg": 19.099697606928682,
+          "gap_S_over_rho_plain": 20.78684846073415,
+          "rho_plain_over_rho_neg": 0.9188356591432102,
+          "gap_S_over_cheaper_rho": 20.78684846073415,
+          "cheaper_rho": "rho_plain",
+          "ci95": {
+            "S_a": [
+              78760.11427203781,
+              89724.0482279622
+            ],
+            "rho_neg": [
+              3268.580358688633,
+              5552.719641311366
+            ],
+            "rho_plain": [
+              3008.3078836517516,
+              5097.017116348248
+            ],
+            "gap_S_over_rho_neg_conservative": [
+              14.184061029495325,
+              27.45046423272268
+            ],
+            "gap_S_over_rho_plain_conservative": [
+              15.452197329183269,
+              29.82542070097133
+            ]
+          }
+        },
+        "1": {
+          "S_a": 154807.875,
+          "rho_neg": 13820.375,
+          "rho_plain": 7156.875,
+          "gap_S_over_rho_neg": 11.201423622730932,
+          "gap_S_over_rho_plain": 21.63065234477338,
+          "rho_plain_over_rho_neg": 0.5178495518392229,
+          "gap_S_over_cheaper_rho": 21.63065234477338,
+          "cheaper_rho": "rho_plain",
+          "ci95": {
+            "S_a": [
+              144893.22830963787,
+              164722.52169036213
+            ],
+            "rho_neg": [
+              10091.207917044703,
+              17549.542082955297
+            ],
+            "rho_plain": [
+              5258.614234945848,
+              9055.135765054152
+            ],
+            "gap_S_over_rho_neg_conservative": [
+              8.256239828067253,
+              16.323370110344783
+            ],
+            "gap_S_over_rho_plain_conservative": [
+              16.001220972170742,
+              31.324321262378817
+            ]
+          }
+        }
+      },
+      "order_rho_neg_cheaper_than_arm_a_all_w": true,
+      "order_rho_plain_cheaper_than_arm_a_all_w": true,
+      "order_holds_against_both": true,
+      "ci95_separated_at_all_w": true,
+      "rho_neg_vs_rho_plain": "unresolved at the boundary (order flips inside the band)",
+      "diagnostics": {
+        "neg_mean_steps": 2912.3125,
+        "neg_steps_over_sqrt_pi_n_4": 1.012076018316481,
+        "rho_mean_steps": 3348.9375,
+        "rho_steps_over_sqrt_pi_n_2": 0.822938166379549,
+        "online_gae_plain_over_neg": 1.108802929003502,
+        "neg_native_per_step": 3.59001652466897,
+        "neg_totals": {
+          "walks": 715,
+          "steps": 46597,
+          "la_rejects": 1494,
+          "la_exhausted": 0,
+          "fruitless_cycles": 53,
+          "fruitless_2cycles": 0,
+          "cycle_len_sum": 220,
+          "escape_gadd": 222,
+          "abandoned_walks": 0,
+          "gadd": 53842
+        },
+        "neg_mean_setup_gadd": 224.125,
+        "rho_mean_setup_gadd": 225,
+        "ic_mean_setup_gadd": 35315
+      }
+    },
+    "28": {
+      "bits": 28,
+      "n": 248685841,
+      "bx_arm_a": 63,
+      "runs": 16,
+      "ok": {
+        "rho_neg": 16,
+        "rho": 16,
+        "ic_a": 16
+      },
+      "band": {
+        "0": {
+          "S_a": 568572.875,
+          "rho_neg": 15953.375,
+          "rho_plain": 18912.8125,
+          "gap_S_over_rho_neg": 35.63966088680295,
+          "gap_S_over_rho_plain": 30.062840997339766,
+          "rho_plain_over_rho_neg": 1.1855054181325269,
+          "gap_S_over_cheaper_rho": 35.63966088680295,
+          "cheaper_rho": "rho_neg",
+          "ci95": {
+            "S_a": [
+              541176.1044448446,
+              595969.6455551554
+            ],
+            "rho_neg": [
+              10641.505668300002,
+              21265.2443317
+            ],
+            "rho_plain": [
+              13674.664604105794,
+              24150.960395894206
+            ],
+            "gap_S_over_rho_neg_conservative": [
+              25.448854290289812,
+              56.004259559856294
+            ],
+            "gap_S_over_rho_plain_conservative": [
+              22.408057301805997,
+              43.582030185677574
+            ]
+          }
+        },
+        "0.1": {
+          "S_a": 627636.11875,
+          "rho_neg": 21276.66875,
+          "rho_plain": 20775.33125,
+          "gap_S_over_rho_neg": 29.49879636350498,
+          "gap_S_over_rho_plain": 30.210643151598365,
+          "rho_plain_over_rho_neg": 0.9764372183497946,
+          "gap_S_over_cheaper_rho": 30.210643151598365,
+          "cheaper_rho": "rho_plain",
+          "ci95": {
+            "S_a": [
+              597083.8870116882,
+              658188.3504883118
+            ],
+            "rho_neg": [
+              14161.162827209246,
+              28392.174672790756
+            ],
+            "rho_plain": [
+              15013.453047336494,
+              26537.209452663505
+            ],
+            "gap_S_over_rho_neg_conservative": [
+              21.02987509385448,
+              46.47841130840395
+            ],
+            "gap_S_over_rho_plain_conservative": [
+              22.499874678863783,
+              43.8399046783631
+            ]
+          }
+        },
+        "1": {
+          "S_a": 1159205.3125,
+          "rho_neg": 69186.3125,
+          "rho_plain": 37538.0,
+          "gap_S_over_rho_neg": 16.754835900525844,
+          "gap_S_over_rho_plain": 30.880849072939423,
+          "rho_plain_over_rho_neg": 0.5425639645124893,
+          "gap_S_over_cheaper_rho": 30.880849072939423,
+          "cheaper_rho": "rho_plain",
+          "ci95": {
+            "S_a": [
+              1100222.5369526935,
+              1218188.0880473065
+            ],
+            "rho_neg": [
+              45838.02118614494,
+              92534.60381385506
+            ],
+            "rho_plain": [
+              27062.54881017177,
+              48013.45118982823
+            ],
+            "gap_S_over_rho_neg_conservative": [
+              11.889849760052238,
+              26.575930996242864
+            ],
+            "gap_S_over_rho_plain_conservative": [
+              22.914881344454955,
+              45.01379735486838
+            ]
+          }
+        }
+      },
+      "order_rho_neg_cheaper_than_arm_a_all_w": true,
+      "order_rho_plain_cheaper_than_arm_a_all_w": true,
+      "order_holds_against_both": true,
+      "ci95_separated_at_all_w": true,
+      "rho_neg_vs_rho_plain": "unresolved at the boundary (order flips inside the band)",
+      "diagnostics": {
+        "neg_mean_steps": 14867.3125,
+        "neg_steps_over_sqrt_pi_n_4": 1.0638049326994161,
+        "rho_mean_steps": 18339.5625,
+        "rho_steps_over_sqrt_pi_n_2": 0.9279049744752272,
+        "online_gae_plain_over_neg": 1.188467904948352,
+        "neg_native_per_step": 3.5805353186730957,
+        "neg_totals": {
+          "walks": 1794,
+          "steps": 237877,
+          "la_rejects": 8094,
+          "la_exhausted": 0,
+          "fruitless_cycles": 269,
+          "fruitless_2cycles": 6,
+          "cycle_len_sum": 1134,
+          "escape_gadd": 1167,
+          "abandoned_walks": 0,
+          "gadd": 255254
+        },
+        "neg_mean_setup_gadd": 246.125,
+        "rho_mean_setup_gadd": 245.25,
+        "ic_mean_setup_gadd": 345652.5
+      }
+    }
+  },
+  "artifact_and_control_checks": [
+    {
+      "check": "original instrument untouched",
+      "ok": true,
+      "detail": "sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376"
+    },
+    {
+      "check": "cells unchanged in the copy",
+      "ok": true,
+      "detail": "CELLS block parses identically from both instrument files"
+    },
+    {
+      "check": "receipt card binding",
+      "ok": true,
+      "detail": "card_id CARD-BLINDSPOT-14-RHONEG-01, card_sha256 a8aa5e6871bbb65578910a7661d05ccdc23c282420373cf63e39b93eaccba596 == sha256(card-n01.yaml) True"
+    },
+    {
+      "check": "receipt status",
+      "ok": true,
+      "detail": "status completed, 17 commands, card lists 17"
+    },
+    {
+      "check": "receipt commands vs card",
+      "ok": true,
+      "detail": "17/17 commands: id, argv and order equal the card; exit 0 in success_exit_codes, one attempt, no timeout; 12 output digests and 34 stdout/stderr digests equal sha256 of the committed files"
+    },
+    {
+      "check": "receipt commit and instrument",
+      "ok": true,
+      "detail": "commit 84e5b2c8592a97fffe0245602d18139fc140c45b, dirty_before [], instrument sha256 at that commit 1a7d51c3adcd7108de335cd7ac3b2d83a11f5ef1246b8b959271ced1f5e8710e; working tree and snapshot identical"
+    },
+    {
+      "check": "card binds",
+      "ok": true,
+      "detail": "9 bound files (instrument + 8 recorded raw files) hash to the card's sha256 at the run commit and now"
+    },
+    {
+      "check": "dirty_after and write scope",
+      "ok": true,
+      "detail": "dirty_after lists 40 files, all under research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/; with the receipt they are exactly the 41 files of raw/rho-neg at the snapshot; raw/rho-neg absent at the run commit; no must_not_exist path existed there; bin/b14neg removed"
+    },
+    {
+      "check": "selftest",
+      "ok": true,
+      "detail": "47 lines, last 'SELFTEST OK (19.7s)', stderr empty, receipt stdout_tail equals the last 20 lines"
+    },
+    {
+      "check": "addendum precedes the run",
+      "ok": true,
+      "detail": "addendum and instrument committed in 9b2f5e1b36 (2026-10-22T06:22:27+00:00), an ancestor of the card commit 84e5b2c859 (2026-10-22T06:24:52+00:00) at which the receipt says the card ran with a clean tree; outputs committed in 41155e5554 (2026-10-22T06:25:51+00:00), child of the card commit; the addendum blob is the same in all three"
+    },
+    {
+      "check": "continuity rho b16",
+      "ok": true,
+      "detail": "16 rows, 176 top-level fields (nested counters compared whole) equal to research/blindspots_20261018/14-prime-m4-cells/raw/rho-b16.jsonl in value and order except ms; byte-identical after removing ms; ms differs in 4 rows"
+    },
+    {
+      "check": "continuity rho b20",
+      "ok": true,
+      "detail": "16 rows, 176 top-level fields (nested counters compared whole) equal to research/blindspots_20261018/14-prime-m4-cells/raw/rho-b20.jsonl in value and order except ms; byte-identical after removing ms; ms differs in 2 rows"
+    },
+    {
+      "check": "continuity rho b24",
+      "ok": true,
+      "detail": "16 rows, 176 top-level fields (nested counters compared whole) equal to research/blindspots_20261018/14-prime-m4-cells/raw/rho-b24.jsonl in value and order except ms; byte-identical after removing ms; ms differs in 7 rows"
+    },
+    {
+      "check": "continuity rho b28",
+      "ok": true,
+      "detail": "16 rows, 176 top-level fields (nested counters compared whole) equal to research/blindspots_20261018/14-prime-m4-cells/raw/rho-b28.jsonl in value and order except ms; byte-identical after removing ms; ms differs in 15 rows"
+    },
+    {
+      "check": "continuity fullic-a b16",
+      "ok": true,
+      "detail": "16 rows, 304 top-level fields (nested counters compared whole) equal to research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16.jsonl in value and order except ms; byte-identical after removing ms; ms differs in 2 rows"
+    },
+    {
+      "check": "continuity fullic-a b20",
+      "ok": true,
+      "detail": "16 rows, 304 top-level fields (nested counters compared whole) equal to research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b20.jsonl in value and order except ms; byte-identical after removing ms; ms differs in 9 rows"
+    },
+    {
+      "check": "continuity fullic-a b24",
+      "ok": true,
+      "detail": "16 rows, 304 top-level fields (nested counters compared whole) equal to research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b24.jsonl in value and order except ms; byte-identical after removing ms; ms differs in 15 rows"
+    },
+    {
+      "check": "continuity fullic-a b28",
+      "ok": true,
+      "detail": "16 rows, 304 top-level fields (nested counters compared whole) equal to research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b28.jsonl in value and order except ms; byte-identical after removing ms; ms differs in 16 rows"
+    },
+    {
+      "check": "curve 16 bits",
+      "ok": true,
+      "detail": "p=48479 prime (3 mod 4), a, b != 0, disc != 0, j=916 (not 0, not 1728); G on curve, nG = O, n=48383 prime in the Hasse interval and > 4 sqrt p, so #E(F_p) = n (odd: no 2-torsion, classes {P,-P} have size 2); Aut(E) = {+-1}; Frobenius is the identity on E(F_p); n != p"
+    },
+    {
+      "check": "curve 20 bits",
+      "ok": true,
+      "detail": "p=661603 prime (3 mod 4), a, b != 0, disc != 0, j=522260 (not 0, not 1728); G on curve, nG = O, n=660917 prime in the Hasse interval and > 4 sqrt p, so #E(F_p) = n (odd: no 2-torsion, classes {P,-P} have size 2); Aut(E) = {+-1}; Frobenius is the identity on E(F_p); n != p"
+    },
+    {
+      "check": "curve 24 bits",
+      "ok": true,
+      "detail": "p=10539323 prime (3 mod 4), a, b != 0, disc != 0, j=5438329 (not 0, not 1728); G on curve, nG = O, n=10542893 prime in the Hasse interval and > 4 sqrt p, so #E(F_p) = n (odd: no 2-torsion, classes {P,-P} have size 2); Aut(E) = {+-1}; Frobenius is the identity on E(F_p); n != p"
+    },
+    {
+      "check": "curve 28 bits",
+      "ok": true,
+      "detail": "p=248685287 prime (3 mod 4), a, b != 0, disc != 0, j=163044807 (not 0, not 1728); G on curve, nG = O, n=248685841 prime in the Hasse interval and > 4 sqrt p, so #E(F_p) = n (odd: no 2-torsion, classes {P,-P} have size 2); Aut(E) = {+-1}; Frobenius is the identity on E(F_p); n != p"
+    },
+    {
+      "check": "rho-neg b16: Python port reproduces every row",
+      "ok": true,
+      "detail": "16/16 rows equal in every field except ms (targets d and walk seeds from the addendum's formulas)"
+    },
+    {
+      "check": "rho-neg b16: counter closure identities",
+      "ok": true,
+      "detail": "per row: gae == gadd; native == lookup+insert+dptest+canon+lookahead+cyctest; legendre, sqrt, rowop, madd, build zero; dptest == steps + fruitless_cycles; canon == walks + steps + cycle_len_sum + la_rejects; gadd - setup_gadd - 2 walks - steps - cycle_len_sum - la_rejects == the counted cost of one verification mul(d, G) for the addendum's target d; cyctest within its closure bounds; ok"
+    },
+    {
+      "check": "plain rho b16: Python port reproduces every continuity row",
+      "ok": true,
+      "detail": "16/16 rows equal except ms (rho seeds: tag 0x4410, walk seed + 3)"
+    },
+    {
+      "check": "rho-neg b20: Python port reproduces every row",
+      "ok": true,
+      "detail": "16/16 rows equal in every field except ms (targets d and walk seeds from the addendum's formulas)"
+    },
+    {
+      "check": "rho-neg b20: counter closure identities",
+      "ok": true,
+      "detail": "per row: gae == gadd; native == lookup+insert+dptest+canon+lookahead+cyctest; legendre, sqrt, rowop, madd, build zero; dptest == steps + fruitless_cycles; canon == walks + steps + cycle_len_sum + la_rejects; gadd - setup_gadd - 2 walks - steps - cycle_len_sum - la_rejects == the counted cost of one verification mul(d, G) for the addendum's target d; cyctest within its closure bounds; ok"
+    },
+    {
+      "check": "plain rho b20: Python port reproduces every continuity row",
+      "ok": true,
+      "detail": "16/16 rows equal except ms (rho seeds: tag 0x4410, walk seed + 3)"
+    },
+    {
+      "check": "rho-neg b24: Python port reproduces every row",
+      "ok": true,
+      "detail": "16/16 rows equal in every field except ms (targets d and walk seeds from the addendum's formulas)"
+    },
+    {
+      "check": "rho-neg b24: counter closure identities",
+      "ok": true,
+      "detail": "per row: gae == gadd; native == lookup+insert+dptest+canon+lookahead+cyctest; legendre, sqrt, rowop, madd, build zero; dptest == steps + fruitless_cycles; canon == walks + steps + cycle_len_sum + la_rejects; gadd - setup_gadd - 2 walks - steps - cycle_len_sum - la_rejects == the counted cost of one verification mul(d, G) for the addendum's target d; cyctest within its closure bounds; ok"
+    },
+    {
+      "check": "plain rho b24: Python port reproduces every continuity row",
+      "ok": true,
+      "detail": "16/16 rows equal except ms (rho seeds: tag 0x4410, walk seed + 3)"
+    },
+    {
+      "check": "rho-neg b28: Python port reproduces every row",
+      "ok": true,
+      "detail": "16/16 rows equal in every field except ms (targets d and walk seeds from the addendum's formulas)"
+    },
+    {
+      "check": "rho-neg b28: counter closure identities",
+      "ok": true,
+      "detail": "per row: gae == gadd; native == lookup+insert+dptest+canon+lookahead+cyctest; legendre, sqrt, rowop, madd, build zero; dptest == steps + fruitless_cycles; canon == walks + steps + cycle_len_sum + la_rejects; gadd - setup_gadd - 2 walks - steps - cycle_len_sum - la_rejects == the counted cost of one verification mul(d, G) for the addendum's target d; cyctest within its closure bounds; ok"
+    },
+    {
+      "check": "plain rho b28: Python port reproduces every continuity row",
+      "ok": true,
+      "detail": "16/16 rows equal except ms (rho seeds: tag 0x4410, walk seed + 3)"
+    },
+    {
+      "check": "rho-neg walk semantics (port, all 64 measured runs)",
+      "ok": true,
+      "detail": "298554 transitions: every walk point canonical (y <= p - y) and on the curve; coefficient invariant wa G + wb Q == w checked 17053 times (every transition at 16 and 20 bits, every DP and escape at 24 and 28 bits), 0 failures; detected cycles with equal coefficients (fruitless) 338, lengths {2: 7, 4: 298, 6: 28, 8: 4, 10: 1}; useful self-collisions (solved inside a walk) 5"
+    },
+    {
+      "check": "cost fields b16",
+      "ok": true,
+      "detail": "arm (a): gae_total == total.gadd, native_total == lookup+insert+legendre+sqrt+rowop+madd+dptest+build of total, total == setup + online + verify per counter; plain rho: native == lookup+insert+dptest, setup_gadd <= gae"
+    },
+    {
+      "check": "cost fields b20",
+      "ok": true,
+      "detail": "arm (a): gae_total == total.gadd, native_total == lookup+insert+legendre+sqrt+rowop+madd+dptest+build of total, total == setup + online + verify per counter; plain rho: native == lookup+insert+dptest, setup_gadd <= gae"
+    },
+    {
+      "check": "cost fields b24",
+      "ok": true,
+      "detail": "arm (a): gae_total == total.gadd, native_total == lookup+insert+legendre+sqrt+rowop+madd+dptest+build of total, total == setup + online + verify per counter; plain rho: native == lookup+insert+dptest, setup_gadd <= gae"
+    },
+    {
+      "check": "cost fields b28",
+      "ok": true,
+      "detail": "arm (a): gae_total == total.gadd, native_total == lookup+insert+legendre+sqrt+rowop+madd+dptest+build of total, total == setup + online + verify per counter; plain rho: native == lookup+insert+dptest, setup_gadd <= gae"
+    },
+    {
+      "check": "addendum expectations reproduce in the measured build's selftest",
+      "ok": true,
+      "detail": "addendum table [('16', '400', '1.062'), ('20', '200', '1.010'), ('24', '40', '1.042')], selftest {'16': '1.062', '20': '1.010', '24': '1.042'}; plain/neg online GAE addendum ('1.401', '1.483', '1.331'), selftest {'16': '1.401', '20': '1.483', '24': '1.331'}; 140 cycles (4 of length 2), 574 escape GAE, 289 2-cycles 50/50: present in both"
+    },
+    {
+      "check": "agreement with the earlier validator (plain rho(w), S(w))",
+      "ok": true,
+      "detail": "24 values equal to VAL-20261022-e873ba's recomputed numbers"
+    }
+  ],
+  "continuity": {
+    "rho-b16": {
+      "rows": 16,
+      "fields_equal_except_ms": true,
+      "bytes_equal_after_removing_ms": true,
+      "rows_with_different_ms": 4,
+      "fields_compared": 176
+    },
+    "rho-b20": {
+      "rows": 16,
+      "fields_equal_except_ms": true,
+      "bytes_equal_after_removing_ms": true,
+      "rows_with_different_ms": 2,
+      "fields_compared": 176
+    },
+    "rho-b24": {
+      "rows": 16,
+      "fields_equal_except_ms": true,
+      "bytes_equal_after_removing_ms": true,
+      "rows_with_different_ms": 7,
+      "fields_compared": 176
+    },
+    "rho-b28": {
+      "rows": 16,
+      "fields_equal_except_ms": true,
+      "bytes_equal_after_removing_ms": true,
+      "rows_with_different_ms": 15,
+      "fields_compared": 176
+    },
+    "fullic-a-b16": {
+      "rows": 16,
+      "fields_equal_except_ms": true,
+      "bytes_equal_after_removing_ms": true,
+      "rows_with_different_ms": 2,
+      "fields_compared": 304
+    },
+    "fullic-a-b20": {
+      "rows": 16,
+      "fields_equal_except_ms": true,
+      "bytes_equal_after_removing_ms": true,
+      "rows_with_different_ms": 9,
+      "fields_compared": 304
+    },
+    "fullic-a-b24": {
+      "rows": 16,
+      "fields_equal_except_ms": true,
+      "bytes_equal_after_removing_ms": true,
+      "rows_with_different_ms": 15,
+      "fields_compared": 304
+    },
+    "fullic-a-b28": {
+      "rows": 16,
+      "fields_equal_except_ms": true,
+      "bytes_equal_after_removing_ms": true,
+      "rows_with_different_ms": 16,
+      "fields_compared": 304
+    }
+  },
+  "curves": [
+    {
+      "bits": 16,
+      "p": 48479,
+      "a": 25392,
+      "b": 20877,
+      "n": 48383,
+      "p_prime": true,
+      "p_mod_4": 3,
+      "a_nonzero": true,
+      "b_nonzero": true,
+      "discriminant_nonzero": true,
+      "j": 916,
+      "j_not_0": true,
+      "j_not_1728": true,
+      "G_on_curve": true,
+      "nG_is_identity": true,
+      "n_prime": true,
+      "n_in_hasse_interval": true,
+      "order_equals_n": true,
+      "anomalous": false,
+      "negation_is_strongest": true
+    },
+    {
+      "bits": 20,
+      "p": 661603,
+      "a": 422772,
+      "b": 346249,
+      "n": 660917,
+      "p_prime": true,
+      "p_mod_4": 3,
+      "a_nonzero": true,
+      "b_nonzero": true,
+      "discriminant_nonzero": true,
+      "j": 522260,
+      "j_not_0": true,
+      "j_not_1728": true,
+      "G_on_curve": true,
+      "nG_is_identity": true,
+      "n_prime": true,
+      "n_in_hasse_interval": true,
+      "order_equals_n": true,
+      "anomalous": false,
+      "negation_is_strongest": true
+    },
+    {
+      "bits": 24,
+      "p": 10539323,
+      "a": 7836717,
+      "b": 8828358,
+      "n": 10542893,
+      "p_prime": true,
+      "p_mod_4": 3,
+      "a_nonzero": true,
+      "b_nonzero": true,
+      "discriminant_nonzero": true,
+      "j": 5438329,
+      "j_not_0": true,
+      "j_not_1728": true,
+      "G_on_curve": true,
+      "nG_is_identity": true,
+      "n_prime": true,
+      "n_in_hasse_interval": true,
+      "order_equals_n": true,
+      "anomalous": false,
+      "negation_is_strongest": true
+    },
+    {
+      "bits": 28,
+      "p": 248685287,
+      "a": 49054657,
+      "b": 177851102,
+      "n": 248685841,
+      "p_prime": true,
+      "p_mod_4": 3,
+      "a_nonzero": true,
+      "b_nonzero": true,
+      "discriminant_nonzero": true,
+      "j": 163044807,
+      "j_not_0": true,
+      "j_not_1728": true,
+      "G_on_curve": true,
+      "nG_is_identity": true,
+      "n_prime": true,
+      "n_in_hasse_interval": true,
+      "order_equals_n": true,
+      "anomalous": false,
+      "negation_is_strongest": true
+    }
+  ],
+  "reimplementation": {
+    "rho-neg": {
+      "16": {
+        "rows": 16,
+        "mismatched_rows": [],
+        "closure_failures": [],
+        "invariant_level": 2
+      },
+      "20": {
+        "rows": 16,
+        "mismatched_rows": [],
+        "closure_failures": [],
+        "invariant_level": 2
+      },
+      "24": {
+        "rows": 16,
+        "mismatched_rows": [],
+        "closure_failures": [],
+        "invariant_level": 1
+      },
+      "28": {
+        "rows": 16,
+        "mismatched_rows": [],
+        "closure_failures": [],
+        "invariant_level": 1
+      }
+    },
+    "cont-rho": {
+      "16": {
+        "rows": 16,
+        "mismatched_rows": []
+      },
+      "20": {
+        "rows": 16,
+        "mismatched_rows": []
+      },
+      "24": {
+        "rows": 16,
+        "mismatched_rows": []
+      },
+      "28": {
+        "rows": 16,
+        "mismatched_rows": []
+      }
+    },
+    "walk_audit": {
+      "transitions": 298554,
+      "noncanonical": 0,
+      "off_curve": 0,
+      "invariant_checked": 17053,
+      "invariant_failed": 0,
+      "useful_self_collisions": 5,
+      "fruitless_same_coefficients": 338,
+      "cycle_lengths": {
+        "2": 7,
+        "4": 298,
+        "6": 28,
+        "8": 4,
+        "10": 1
+      }
+    }
+  },
+  "null_control": {
+    "what": "validator-side: the same port with the class map off (canon returns its input), paired targets and seeds; accepted steps should rise by about sqrt 2",
+    "cells": {
+      "16": {
+        "runs": 400,
+        "seeds": "validator seeds (target tag 0x56414C, walk seed 777001 + 13 run)",
+        "steps_on_over_sqrt_pi_n_4": 1.0418308233416373,
+        "steps_off_over_sqrt_pi_n_4": 1.4334728254491627,
+        "off_over_on": 1.3759170810970505
+      },
+      "20": {
+        "runs": 200,
+        "seeds": "validator seeds (target tag 0x56414C, walk seed 777001 + 13 run)",
+        "steps_on_over_sqrt_pi_n_4": 1.0546526923878268,
+        "steps_off_over_sqrt_pi_n_4": 1.3964761994192303,
+        "off_over_on": 1.324110021714812
+      },
+      "24": {
+        "runs": 16,
+        "seeds": "measured rho-neg targets and walk seeds",
+        "steps_on_over_sqrt_pi_n_4": 1.012076018316481,
+        "steps_off_over_sqrt_pi_n_4": 1.1716077125142739,
+        "off_over_on": 1.1576281734875635
+      },
+      "28": {
+        "runs": 16,
+        "seeds": "measured rho-neg targets and walk seeds",
+        "steps_on_over_sqrt_pi_n_4": 1.0638049326994161,
+        "steps_off_over_sqrt_pi_n_4": 1.4249700994234158,
+        "off_over_on": 1.3395031886226916
+      }
+    }
+  },
+  "receipt": {
+    "exit_codes": {
+      "make-dirs": 0,
+      "build": 0,
+      "selftest": 0,
+      "cont-rho-b16": 0,
+      "cont-rho-b20": 0,
+      "cont-rho-b24": 0,
+      "cont-rho-b28": 0,
+      "cont-fullic-a-b16": 0,
+      "cont-fullic-a-b20": 0,
+      "cont-fullic-a-b24": 0,
+      "cont-fullic-a-b28": 0,
+      "rho-neg-b16": 0,
+      "rho-neg-b20": 0,
+      "rho-neg-b24": 0,
+      "rho-neg-b28": 0,
+      "remove-bin": 0,
+      "remove-bin-dir": 0
+    },
+    "seconds": {
+      "make-dirs": 0.003,
+      "build": 6.324,
+      "selftest": 19.732,
+      "cont-rho-b16": 0.004,
+      "cont-rho-b20": 0.005,
+      "cont-rho-b24": 0.01,
+      "cont-rho-b28": 0.042,
+      "cont-fullic-a-b16": 0.008,
+      "cont-fullic-a-b20": 0.029,
+      "cont-fullic-a-b24": 0.127,
+      "cont-fullic-a-b28": 1.418,
+      "rho-neg-b16": 0.004,
+      "rho-neg-b20": 0.005,
+      "rho-neg-b24": 0.011,
+      "rho-neg-b28": 0.038,
+      "remove-bin": 0.002,
+      "remove-bin-dir": 0.003
+    },
+    "binary_sha256_recorded": false
+  },
+  "discrepancies": [
+    {
+      "what": "binary sha256 not recorded",
+      "detail": "PROTOCOL-ADDENDUM-rho-neg.md says 'The card records the source and binary sha256 in its receipt.' The card has no hashing command and receipt-n01.json has no binary digest (the binary was removed by remove-bin). The source is bound (card binds, clean tree at the run commit); binary identity rests on the command sequence of one card (build once, every run command invokes that path) and on the continuity controls, which reproduce the recorded rows. Same limitation as card-01.",
+      "material": false
+    },
+    {
+      "what": "plain rho is cheaper than rho-neg inside the band",
+      "detail": "rho-neg cheaper at ['16 bits w=0', '16 bits w=0.1', '20 bits w=0', '24 bits w=0', '28 bits w=0']; plain rho cheaper at ['16 bits w=1', '20 bits w=0.1', '20 bits w=1', '24 bits w=0.1', '24 bits w=1', '28 bits w=0.1', '28 bits w=1']. rho-neg emits {16: 3.66, 20: 3.63, 24: 3.59, 28: 3.58} native operations per accepted step (dptest, canon, lookahead on negated candidates, cyctest) against about 1.1 for plain rho, each charged w GAE. The rho order therefore flips inside the band at every cell (unresolved at that boundary). The addendum foresaw this and fixed the rule (an order statement must hold against both rhos); arm (a)'s order holds against both. Not a defect; but S/rho-neg understates the distance to the cheapest measured rho wherever plain rho is cheaper (per_cell gap_S_over_cheaper_rho).",
+      "material": false
+    },
+    {
+      "what": "addendum expectation 'the gap is expected to shrink by about sqrt 2 at w = 0' is inverted",
+      "detail": "a rho that is sqrt 2 cheaper makes S/rho grow by sqrt 2, not shrink. Measured at w = 0, S/rho-neg = (S/plain rho) x {16: 1.357, 20: 1.154, 24: 1.102, 28: 1.186} (plain/neg). The ratio is below sqrt 2 at 20-28 bits partly because the recorded plain-rho sample ran short (mean steps / sqrt(pi n/2) = {16: 1.195, 20: 0.823, 24: 0.823, 28: 0.928}) while rho-neg ran near expectation (mean steps / sqrt(pi n/4) = {16: 0.948, 20: 0.936, 24: 1.012, 28: 1.064}); independent 16-run samples, within sampling error. The other half of the expectation, gap above 1 at every cell and weight, holds (smallest S/rho-neg 6.497).",
+      "material": false
+    }
+  ],
+  "limitations": [
+    "One curve per size and 16 logarithms per cell. The 95% t half-width of a cell mean reaches 34% for rho-neg and 33% for plain rho (largest over cells and w), 16% for arm (a). The order is robust to it: arm (a)'s lower 95% bound exceeds both rhos' upper 95% bounds at every cell and weight (per_cell ci95_separated_at_all_w).",
+    "The rho-neg vs plain rho comparison is between independent samples (distinct targets and walk seeds by design), not paired runs; per-cell plain/neg ratios carry about 11% (16 bits) to 20% (28 bits) relative standard error, from the per-run coefficients of variation.",
+    "Partition hashes (part(x) per step), coefficient updates mod n and Brent's saved-class copies are not counted on either rho, as in the original protocol; listed per AGENTS.md 5a.",
+    "theta = floor(bits/4) uses the cell label, as PROTOCOL.md does; the new walk inherits it unchanged.",
+    "rho-neg can solve inside a walk when a detected cycle closes with different coefficients (5 of the 64 measured runs ended that way, per the validator's port); plain rho has no cycle check. This is part of the addendum's specified fruitless-cycle handling and is counted, not an uncounted shortcut.",
+    "The receipt records no environment (rustc version, CPU for target-cpu=native) and no timestamps; counts do not depend on either, and wall time (ms) is not used.",
+    "The Python port was written after reading the instrument; it shows the rows follow from the code and the addendum's seed formulas, not that an independent reading of the addendum alone yields the same walk.",
+    "Validated content is snapshot 41155e5554; HEAD has since gained the replay lane's commits d63dea4372 and 043f1eb98c, which change none of the files read (each read file equals its snapshot blob).",
+    "This report makes no ECDLP claim and authorizes no promotion; it admits the rho-neg rows as the gate's matched rho reference for arm (a) at the four design cells."
+  ],
+  "validation_report": {
+    "id": "VAL-20261022-0549c2",
+    "task_id": "validation-gate item 14 (blind-spot 20261018) negation-map matched rho; no Conductor task card supplied",
+    "run_ids": [
+      "CARD-BLINDSPOT-14-RHONEG-01"
+    ],
+    "heuristic_validation_checks": [
+      {
+        "check": "pre-registered prediction",
+        "ok": true,
+        "detail": "addendum committed in 9b2f5e1b36 before the card commit at which the run executed: steps near sqrt(pi n / 4) instead of sqrt(pi n / 2), gap above 1 at every cell and weight (the 'shrink by sqrt 2' wording is inverted; see discrepancies). Its numeric expectations came from selftest seeds (target tag 0x5E1F, walk seeds 900001 + 7 run), disjoint from the measured streams (0x4E47, + 0x4E4547), and reproduce in the measured build's selftest log."
+      },
+      {
+        "check": "sample integrity",
+        "ok": true,
+        "detail": "16 runs per cell, targets and walk seeds from the addendum's formulas, every row reproduced by the validator's port; mean steps / sqrt(pi n/4) and online-GAE plain/neg recomputed from rows (per_cell.diagnostics)."
+      },
+      {
+        "check": "null control (class map off)",
+        "ok": true,
+        "detail": "validator's port with canon returning its input, paired targets and seeds: accepted steps off/on = {16: 1.376, 20: 1.324, 24: 1.158, 28: 1.34} (runs {16: 400, 20: 200, 24: 16, 28: 16}); expected about sqrt 2 = 1.414 less DP overhead. The step reduction is caused by the class map."
+      },
+      {
+        "check": "scale binding",
+        "ok": true,
+        "detail": "p of 16, 20, 24, 28 bits only; no transfer to larger p is claimed or validated."
+      }
+    ],
+    "cost_model_checks": [
+      {
+        "check": "unit declared",
+        "ok": true,
+        "detail": "GAE plus w x native, w in {0, 0.1, 1}, natives listed per arm; no memory figure is emitted by either rho or arm (a) in these rows (rho table size = insert count is the only proxy)."
+      },
+      {
+        "check": "optimistic assumptions flagged",
+        "ok": true,
+        "detail": "canon, lookahead and cyctest priced like dptest (pessimistic for rho-neg at w = 1); setup included on every arm; per-run cost includes the counted verification."
+      },
+      {
+        "check": "expected-cost bookkeeping",
+        "ok": true,
+        "detail": "costs are means over runs that each ran to a verified logarithm (16/16 ok on both rhos and arm (a)), not per-attempt costs scaled by a success probability."
+      }
+    ],
+    "proof_architecture_checks": [],
+    "verdict": "passed",
+    "artifact_paths": [
+      "validator-report-rhoneg.json",
+      "rho-reference-neg.json",
+      "validator_recompute_rhoneg.py"
+    ]
+  },
+  "review_attestation": {
+    "joints_owned": [
+      "receipt and commit-order binding of card n01",
+      "continuity controls (rho, fullic --arm a) at 16-28 bits",
+      "rho-neg algorithm vs addendum B and vs plain rho (code and port)",
+      "strongest-available symmetry on the four cells",
+      "rho-neg(w), plain rho(w), S(w) and both gaps at w = 0, 0.1, 1"
+    ],
+    "sources_read": [
+      "../../benchmarks/20261018-blindspots-prime-m4-cells/rho-reference.json",
+      "../../benchmarks/20261018-blindspots-prime-m4-cells/validator-report.json",
+      "../../benchmarks/20261018-blindspots-prime-m4-cells/validator_recompute.py",
+      "../../docs/VALIDATION_GATE.md",
+      "../../research/blindspots_20261018/14-prime-m4-cells/PROTOCOL-ADDENDUM-rho-neg.md",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b20.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b24.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b28.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b16.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b20.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b24.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b28.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/build.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/build.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b16.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b20.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b24.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-fullic-a-b28.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b16.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b20.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b24.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/cont-rho-b28.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/receipt-n01.json",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b16.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b20.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b24.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/rho-neg-b28.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/selftest.stderr.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/selftest.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/rho-neg-cards/card-n01.yaml",
+      "../../research/blindspots_20261018/instruments/blindspots_14_prime_m4.rs",
+      "../../research/blindspots_20261018/instruments/blindspots_14_prime_m4_neg.rs",
+      "../../scripts/validation_gate.py",
+      "research/blindspots_20261018/14-prime-m4-cells/rho-neg-cards/PLAN.md at 84e5b2c859 (git show; the working-tree file was appended later by d63dea4372 and that part was not read)",
+      "AGENTS.md (crypto) sections 'Standing workflow rules' pointer and 5a (pricing band)",
+      "/home/user/crypto-autoresearcher/agents/validator.md, docs/agent-runtime-core.md, AGENTS.md 'Review architecture' and 'Curve identity and measured bounds' (role contract; outside this repository)"
+    ],
+    "read_sibling_reports": false,
+    "sibling_note": "the earlier validator report and rho-reference.json for this item were read (context named by the task, and the plain-rho cross-check); the concurrent replay certificate v2 and the replay outputs were not read",
+    "verdict": "holds"
+  }
+}

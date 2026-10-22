@@ -1,0 +1,47 @@
+{
+ "note": "Blind-spot item 14. Matched rho is the negation-map rho added under PROTOCOL-ADDENDUM-rho-neg.md (instrument blindspots_14_prime_m4_neg.rs); arm (a) recorded rows reproduce exactly in that binary at 16-28 bits. Arm (a) is dearer than both the negation-map rho and the plain rho at every cell and every w (the two rhos swap order inside the band). The first validator report (validator-report.json, 84 headlines of the original run) and the earlier plain-rho descriptor (rho-reference.json, refused: no negation map) are kept for the record; arm (b) rows are not covered by this rho reference.",
+ "replay_certificate": {
+  "path": "replay-certificate-v2.json",
+  "sha256": "bbaa88ceb2aa4829aea55ff034c6827568f60c7890730e1d512f4a1c3ec84607"
+ },
+ "rho_reference": {
+  "binary_or_process": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/bin/b14neg: one rustc build (prlimit --as=4294967296 rustc --edition 2021 -C opt-level=3 -C codegen-units=1 -C target-cpu=native) of research/blindspots_20261018/instruments/blindspots_14_prime_m4_neg.rs (sha256 1a7d51c3adcd7108de335cd7ac3b2d83a11f5ef1246b8b959271ced1f5e8710e, committed in 9b2f5e1b36), command 'build' (index 2) of card CARD-BLINDSPOT-14-RHONEG-01 (research/blindspots_20261018/14-prime-m4-cells/rho-neg-cards/card-n01.yaml, sha256 a8aa5e6871bbb65578910a7661d05ccdc23c282420373cf63e39b93eaccba596), run at commit 84e5b2c8592a97fffe0245602d18139fc140c45b with dirty_before empty; receipt research/blindspots_20261018/14-prime-m4-cells/raw/rho-neg/receipt-n01.json (sha256 3e966efdc2c444926f914c9ec3b4c98acb639fd36dab25890addff5d6905e6ae), outputs committed in 41155e5554. From that one binary, as separate processes: selftest --deep (3), continuity controls cont-rho-b16..b28 (4-7) and cont-fullic-a-b16..b28 (8-11), rho-neg-b16..b28 (12-15); remove-bin (16). Continuity: cont-rho-bB.jsonl equals raw/rho-bB.jsonl and cont-fullic-a-bB.jsonl equals raw/fullic-a-bB.jsonl in every field except ms at B = 16, 20, 24, 28 (validator-checked), so arm (a)'s recorded rows (card-01 binary, built from research/blindspots_20261018/instruments/blindspots_14_prime_m4.rs, sha256 f6696fc0caff...) are what this binary computes, and the gap uses them. The binary's own sha256 is not recorded (deleted by remove-bin; the receipt has no binary digest).",
+  "descriptor": {
+   "path": "rho-reference-neg.json",
+   "sha256": "5874604f7d41daa8ea329a69b44dd08577c1afd01ad59706a7e21c0d5f79c6d5"
+  },
+  "gae_band": {
+   "0": {
+    "ic": 568572.875,
+    "rho": 15953.375
+   },
+   "0.1": {
+    "ic": 627636.11875,
+    "rho": 21276.66875
+   },
+   "1": {
+    "ic": 1159205.3125,
+    "rho": 69186.3125
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": true,
+  "protocol": "research/blindspots_20261018/14-prime-m4-cells/PROTOCOL-ADDENDUM-rho-neg.md (addendum B to PROTOCOL.md, committed in 9b2f5e1b36 before the run): 'The matched reference for the gate is rho-neg (kind: negation). Plain rho is still reported beside it, priced at the same three weights.' Everything not changed by the addendum is PROTOCOL.md's matched rho: same make_jumps (16 jumps, four random bits per scalar, counted doubling chains), same partition, theta = max(bits/4, 2), DP rule x mod 2^theta = 0, cap 20*2^theta + 64, x-keyed table, counted verification mul(cand, G) == Q, 16 logarithms per cell, one thread, setup counted in gae.",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "GAE: one counted affine group addition (doubling and P + (-P) included) = 1, plus w x native operations, w in {0, 0.1, 1}. Native set (same counters on every arm): lookup, insert, legendre, sqrt, rowop, madd, dptest, build, and for rho-neg canon, lookahead, cyctest (zero on every other arm). Recomputed natives: rho-neg = lookup + insert + dptest + canon + lookahead + cyctest; plain rho = lookup + insert + dptest; arm (a) = lookup + insert + legendre + sqrt + rowop. Cost(w) = mean over 16 runs of (gae + w * native), setup included."
+ },
+ "schema": "validation-gate/v1",
+ "supporting": {
+  "validator_report_original_run": {
+   "path": "validator-report.json",
+   "sha256": "a495b649f7c792fda1f55a7b05f958e073fff783cd53872bf4c2482f1397a2d1"
+  }
+ },
+ "validator_report": {
+  "path": "validator-report-rhoneg.json",
+  "sha256": "09d7b0682d6b48d0d86c39fcbc7dbaed9ec94ae6dde6ab2f1e4ed147ca79c34c"
+ }
+}

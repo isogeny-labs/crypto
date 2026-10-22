@@ -132,14 +132,43 @@ unedited because the validator report pins its sha256: the prime-order
 unpriced native work per instance (`native_total`); the filter counter alone
 falls from 14.0 M to 348. Neither is a headline or changes a verdict.
 
-Item 14 has a verified replay (281 rows, 0 mismatches) and a passing validator
-report, but its matched rho is a plain r-adding walk without the negation map,
-so it is not the strongest available rho and the gate refuses it. A
-negation-map rho in the same binary as arm (a) would close it; rho could only
-get cheaper, so the order (rho cheaper at every weight) cannot change. Four of
-the twelve have no measured matched-rho row: 05, 07 and 16 report none, and
-02's gap is derived, not measured. Item 15 borrows its rho from another study's
-runs. Those cannot pass the gate as they stand.
+Item 14 is validated too
+(`benchmarks/20261018-blindspots-prime-m4-cells/VALIDATION.json`). Its original
+matched rho was a plain r-adding walk without the negation map, which the gate
+refuses as not the strongest available rho. A negation-map rho was added in a
+new instrument copy (`instruments/blindspots_14_prime_m4_neg.rs`) under
+`14-prime-m4-cells/PROTOCOL-ADDENDUM-rho-neg.md`, committed before the run; in
+that binary the recorded plain-rho and arm (a) rows reproduce exactly at 16 to
+28 bits, and an independent replay of the new run matches it. Arm (a) is dearer
+than both rhos at every cell and every w (8.2x to 29.5x the negation-map rho at
+w = 0.1). The two rhos swap order inside the band, because the negation map's
+bookkeeping is priced as native work. The commit subject's "6.5x" was not any
+measured ratio.
+
+Item 15 is getting a matched negation-map rho in its own binary
+(`instruments/blindspots_15b_genus3_la_rho.rs`,
+`15-genus3-la-exponent/PROTOCOL-ADDENDUM-matched-rho.md`); its row stays
+withheld until that run, a replay and a validator report land. Priced on the
+section 5a band its "IC below rho at every price" table is not expected to hold.
+
+The other nine stay withheld because a matched Pollard rho is not the right
+reference for what they claim, so a rho run cannot make the row valid:
+
+| item | claim | reason withheld |
+|:--|:--|:--|
+| 02 | closed-form crossover model | model, no solve; its rho already uses the strongest symmetry in closed form |
+| 03 | solver bit-operation counts, INCONCLUSIVE | no group operations; its "rho_A" columns are ratios against FES, not Pollard rho |
+| 05 | F4 touch ratio, wdeg vs grevlex | component on synthetic targets, no curve DLP |
+| 06 | signature Groebner basis, REGRESSES | stage diagnostic |
+| 07 | closure degree, BLOCKED | incomplete (cards 1 and 7 never finished) |
+| 10 | kernel replica, relation phase only | component; a matched row needs a new full-solve study |
+| 13 | negation walk vs plain walk, ECC2K-130 plan | rho-internal study with no IC arm; the reference would be the weaker walk by construction |
+| 16 | barrel-oracle CPU, n = 5 to 13 | component, production cells BLOCKED |
+| 17 | factor base and pair table at n = 83, TRADES | the IC whole solve is a model (0 relations found) |
+
+None of the nine had a row in the base `benchmarks/README.md`, so no archive
+disposition applies; the gate has no route for component, phase or
+rho-internal rows.
 
 ## Instruments
 
