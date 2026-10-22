@@ -275,6 +275,44 @@ fn price_rows(repo: &Path) -> Vec<Row> {
             out.push(r);
         }
     }
+    let kummer_source =
+        "research/kummer_differential_collector_20261022/results/paired/analysis/price-grid.csv";
+    let mut kummer_rows = 0;
+    for old in read_csv(&repo.join(kummer_source)) {
+        assert_eq!(val(&old, "arm"), "uncached");
+        let candidate = num(val(&old, "candidate_cold_GAE"));
+        let rho = num(val(&old, "rho_GAE"));
+        close(candidate / rho, num(val(&old, "candidate_cold_over_rho")));
+        let slice = val(&old, "slice");
+        let slice = slice.strip_prefix("bits").unwrap_or(slice);
+        let mut r = Row::new();
+        for key in [
+            "targets",
+            "S_per_M",
+            "I_per_M",
+            "native_GAE_per_logical",
+            "rho_GAE",
+        ] {
+            put(&mut r, key, val(&old, key));
+        }
+        put(&mut r, "lead", "kummer_walk");
+        put(&mut r, "arm", "differential_uncached");
+        put(&mut r, "slice", slice);
+        put(&mut r, "verified", val(&old, "targets"));
+        put(&mut r, "candidate_failures", "0");
+        put(&mut r, "rho_failures", "0");
+        put(&mut r, "candidate_GAE", val(&old, "candidate_cold_GAE"));
+        put(
+            &mut r,
+            "candidate_over_rho",
+            val(&old, "candidate_cold_over_rho"),
+        );
+        put(&mut r, "status", "priced_source_verified_same_process");
+        put(&mut r, "source_grid", kummer_source);
+        out.push(r);
+        kummer_rows += 1;
+    }
+    assert_eq!(kummer_rows, 288);
     for (p, _bits) in PENCIL {
         let source = format!("research/pencil_sparse_20261022/results/p{p}-peel-vs-online.csv");
         for old in read_csv(&repo.join(&source)) {
@@ -345,7 +383,7 @@ fn price_rows(repo: &Path) -> Vec<Row> {
             ),
         ]));
     }
-    assert_eq!(out.len(), 2743);
+    assert_eq!(out.len(), 3031);
     out
 }
 
@@ -466,6 +504,55 @@ fn target_rows(repo: &Path) -> Vec<Row> {
         }
         out.push(std::mem::take(&mut r));
     }
+    let kummer_price =
+        "research/kummer_differential_collector_20261022/results/paired/analysis/target-price.csv";
+    let kummer_prices = read_csv(&repo.join(kummer_price));
+    assert_eq!(kummer_prices.len(), 45360);
+    let mut kummer_target_keys = BTreeSet::new();
+    for old in kummer_prices {
+        if (
+            val(&old, "S_per_M"),
+            val(&old, "I_per_M"),
+            val(&old, "native_GAE_per_logical"),
+        ) != ("0.5", "10", "0.1")
+        {
+            continue;
+        }
+        assert_eq!(val(&old, "arm"), "uncached");
+        assert_eq!(val(&old, "candidate_verified"), "true");
+        assert_eq!(val(&old, "rho_verified"), "true");
+        close(
+            num(val(&old, "candidate_cold_GAE")) / num(val(&old, "rho_GAE")),
+            num(val(&old, "candidate_cold_over_rho")),
+        );
+        let key = (
+            val(&old, "bits").to_string(),
+            val(&old, "p").to_string(),
+            val(&old, "target_index").to_string(),
+            val(&old, "workload_id").to_string(),
+        );
+        assert!(kummer_target_keys.insert(key));
+        out.push(row(&[
+            ("lead", "kummer_walk".into()),
+            ("arm", "differential_uncached".into()),
+            ("bits", val(&old, "bits").into()),
+            ("p", val(&old, "p").into()),
+            ("target_index", val(&old, "target_index").into()),
+            ("workload_id", val(&old, "workload_id").into()),
+            ("source_verified", "True".into()),
+            ("candidate_dlp_verified", "True".into()),
+            ("rho_verified", "True".into()),
+            ("candidate_GAE", val(&old, "candidate_cold_GAE").into()),
+            ("rho_GAE", val(&old, "rho_GAE").into()),
+            (
+                "candidate_over_rho",
+                val(&old, "candidate_cold_over_rho").into(),
+            ),
+            ("status", "priced_source_verified_same_process".into()),
+            ("source_record", kummer_price.into()),
+        ]));
+    }
+    assert_eq!(kummer_target_keys.len(), 1260);
     for bits in [16, 20, 24, 28, 32, 36, 40] {
         let path = format!("research/kummer_coordinates_20261022/results/target-gate-{bits}.jsonl");
         let recover_path =
@@ -530,7 +617,7 @@ fn target_rows(repo: &Path) -> Vec<Row> {
             ]));
         }
     }
-    assert_eq!(out.len(), 11528);
+    assert_eq!(out.len(), 12789);
     out
 }
 
@@ -539,6 +626,16 @@ fn main() {
     let here = Path::new(env!("CARGO_MANIFEST_DIR"));
     let out = here.join("results");
     fs::create_dir_all(&out).unwrap();
+    let kummer_gate_path =
+        repo.join("research/kummer_differential_collector_20261022/VALIDATION.json");
+    let kummer_gate: Value = serde_json::from_str(
+        &fs::read_to_string(&kummer_gate_path)
+            .unwrap_or_else(|e| panic!("{}: {e}", kummer_gate_path.display())),
+    )
+    .unwrap();
+    assert_eq!(kummer_gate["schema"], "validation-gate/v1");
+    assert_eq!(kummer_gate["rho_reference"]["same_binary_or_process"], true);
+    assert_eq!(kummer_gate["rho_reference"]["matches_protocol"], true);
     let grids = price_rows(&repo);
     let targets = target_rows(&repo);
     let peel: Vec<_> = grids
@@ -593,7 +690,7 @@ fn main() {
                 pencil_cap_rows += 1;
             }
         }
-        if val(r, "lead") == "kummer_walk" {
+        if val(r, "arm") == "coordinate_identity_gate" {
             zero += num(val(r, "coordinate_zero_outputs")) as usize;
             coordinate_fail += num(val(r, "coordinate_failures")) as usize;
             assert_eq!(val(r, "signed_recover_verified").to_lowercase(), "true");
@@ -609,15 +706,17 @@ fn main() {
     assert!(keys.values().all(|v| v.len() == 1));
     assert_eq!(
         (pencil_rows, pencil_present.len(), pencil_verified.len()),
-        (1448, 544, 543)
+        (1449, 544, 543)
     );
-    assert_eq!((pencil_complete_rows, pencil_cap_rows), (1446, 2));
+    assert_eq!((pencil_complete_rows, pencil_cap_rows), (1446, 3));
     assert_eq!((zero, coordinate_fail), (7, 0));
     write_csv(&out.join("standard-cost-grid.csv"), GRID_FIELDS, &grids);
     write_csv(&out.join("standard-targets.csv"), TARGET_FIELDS, &targets);
     let mut representative = Vec::new();
     for r in &grids {
-        if val(r, "status") != "priced_source_verified" {
+        if val(r, "status") != "priced_source_verified"
+            && val(r, "status") != "priced_source_verified_same_process"
+        {
             continue;
         }
         if (
@@ -646,8 +745,8 @@ fn main() {
         "requirements": [
             {"lead":"factor_base","status":"verified_complete_for_five_frozen_arms","candidate_targets_per_arm":1260,"rho_targets_per_arm":1260,"source":"research/four_followups_20261021/REPORT.md"},
             {"lead":"projective_law","status":"verified_complete_for_two_frozen_arms","candidate_targets_per_arm":1260,"rho_targets_per_arm":1260,"source":"research/projective_law_followup_20261022/REPORT.md"},
-            {"lead":"pencil_collector","status":"partial","candidate_distinct_targets":543,"rho_distinct_targets":544,"failed_distinct_targets":1,"open_distinct_targets":717,"remaining":"717 original target workloads have no completed candidate solve; one p=186379 target has two cap failures and source-verified rho.","source":"research/pencil_sparse_20261022/REPORT.md"},
-            {"lead":"kummer_walk","status":"partial","coordinate_label_cases":8820,"nonzero_matches":8813,"zero_outputs":7,"wrong_nonzero_outputs":0,"candidate_dlp_targets":0,"candidate_over_rho":null,"signed_recoveries_verified":1260,"zero_coordinate_repairs_verified":175,"remaining":"A closed labeled DLP collector with complete cost.","source":"research/kummer_recover_20261022/REPORT.md"},
+            {"lead":"pencil_collector","status":"partial","candidate_distinct_targets":543,"rho_distinct_targets":544,"failed_distinct_targets":1,"open_distinct_targets":717,"remaining":"717 original target workloads have no completed candidate solve; one p=186379 target has three replayed cap failures, including a 25-million-coefficient run, and source-verified rho.","source":"research/pencil_sparse_20261022/REPORT.md"},
+            {"lead":"kummer_walk","status":"verified_complete_for_uncached_differential_collector","coordinate_label_cases":8820,"nonzero_matches":8813,"zero_outputs":7,"wrong_nonzero_outputs":0,"candidate_dlp_targets":1260,"rho_targets":1260,"signed_recoveries_verified":1260,"zero_coordinate_repairs_verified":175,"source":"research/kummer_differential_collector_20261022/MATCHED_REPORT.md"},
         ],
     });
     fs::write(
@@ -672,6 +771,7 @@ fn draw_graphs(here: &Path, grids: &[Row]) {
         ("quarter_16", "#a03543"),
         ("wrapper", "#75832a"),
         ("retained_state", "#8647a3"),
+        ("differential_uncached", "#202020"),
     ];
     let x = |bits: f64| 90.0 + (bits - 16.0) / 24.0 * 600.0;
     let y = |ratio: f64| 465.0 - ratio.log10() / 2.0 * 425.0;
@@ -731,13 +831,18 @@ fn draw_graphs(here: &Path, grids: &[Row]) {
             75 + i * 27,
             75 + i * 27
         ));
+        let label = if *arm == "differential_uncached" {
+            "Kummer uncached"
+        } else {
+            arm
+        };
         svg.push(format!(
-            r#"<text x="753" y="{}" font-size="13" font-family="sans-serif">{arm}</text>"#,
+            r#"<text x="753" y="{}" font-size="13" font-family="sans-serif">{label}</text>"#,
             79 + i * 27
         ));
     }
     svg.push(r#"<text x="390" y="518" text-anchor="middle" font-size="13" font-family="sans-serif">Order bits</text>"#.into());
-    svg.push(r#"<text x="90" y="544" font-size="11" font-family="sans-serif">Kummer DLP has no priced collector and is intentionally absent. Source: standard-cost-grid.csv.</text>"#.into());
+    svg.push(r#"<text x="90" y="544" font-size="11" font-family="sans-serif">Full cold operation prices; all answers source checked. Source: standard-cost-grid.csv.</text>"#.into());
     svg.push("</svg>".into());
     fs::write(
         here.join("cost-ratios.svg"),

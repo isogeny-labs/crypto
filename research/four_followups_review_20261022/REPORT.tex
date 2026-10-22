@@ -6,8 +6,8 @@
 \begin{document}
 \begin{center}\Large Four follow-ups: cross-lead review packet\\[2pt]
 \normalsize Frozen public 21-model, 1,260-target cohort; 22 October 2026\end{center}
-\noindent\textbf{Accounting.} Full cold candidate cost divided by same-process matched negation-rho cost at $M+0.5S+10I$ and 0.1 source-addition equivalents per native logical operation. The external column uses the archived wrapped graph collector. Values are ratios of summed costs across the stated targets; the accompanying SVG shows per-size ratios. All 36 price cells and exact source grid paths are in \texttt{results/standard-cost-grid.csv}.
-\medskip
+\noindent\textbf{Accounting.} Full cold candidate cost divided by same-process matched negation-rho cost at $M+0.5S+10I$ and 0.1 source-addition equivalents per native logical operation. The external column uses the archived wrapped graph collector where measured. Values are ratios of summed costs across the stated targets; the accompanying SVG shows per-size ratios. All 36 price cells and exact source grid paths are in \texttt{results/standard-cost-grid.csv}.
+\par\medskip
 \begin{center}\small\begin{tabular}{l|r r|r r}
 Arm & Candidate & Rho & Candidate/rho & Candidate/external\\\hline
 Full base, 16 jumps & 1,260 & 1,260 & 2.448830 & 1.000000\\
@@ -17,11 +17,12 @@ Half base, 16 jumps & 1,260 & 1,260 & 3.017732 & 1.232316\\
 Quarter base, 16 jumps & 1,260 & 1,260 & 3.919193 & 1.600435\\
 Projective wrapper & 1,260 & 1,260 & 3.793783 & 1.549223\\
 Retained weighted state & 1,260 & 1,260 & 4.179297 & 1.706651\\
+Kummer differential, uncached & 1,260 & 1,260 & 14.356662 & ---\\
 \end{tabular}\end{center}
-\noindent\textbf{Validation.} Factor-base arms have 6,300 candidate and 6,300 rho source-scalar checks. Each projective-law arm has 1,260 candidate and 1,260 rho source-scalar checks. Its independent Rust validator recomputed 576 price cells. The weighted-law arithmetic gate includes targeted exceptional cases, but finite checks do not prove universal formula completeness. Study-specific raw JSONL, validators, manifests, and hashes remain in their source directories.
-\medskip
-\noindent\textbf{Point-driven pencil.} The validated sparse-rank continuation has 543 distinct candidate solves and 544 source-verified rho solves. One 32-bit target reached caps under both online and peel; both candidate costs and ratios are null. Another 717 original targets have no completed candidate solve. Nine 60-target curves and one 28-bit single target have all 36 paired online/peel/rho prices. The next table retains the representative prices and the number of cells where peel costs less than online; the companion pencil SVG shows all-cell ranges.
-\medskip
+\noindent\textbf{Validation.} Factor-base arms have 6,300 candidate and 6,300 rho source-scalar checks. Each projective-law arm has 1,260 candidate and 1,260 rho source-scalar checks. Its independent Rust validator recomputed 576 price cells. A separate 42-model audit checked 1,224,000 finite weighted additions against Cantor; universal formula completeness remains unproved. Kummer's paired uncached collector and fresh rho each passed 1,260 source-scalar checks. Study-specific raw JSONL, validators, manifests, and hashes remain in their source directories.
+\par\medskip
+\noindent\textbf{Point-driven pencil.} The validated sparse-rank continuation has 543 distinct candidate solves and 544 source-verified rho solves. One 32-bit target reached three coefficient caps under online and peel variants; all three candidate costs and ratios are null. Another 717 original targets have no completed candidate solve. Nine 60-target curves and one 28-bit single target have all 36 paired online/peel/rho prices. The next table retains representative prices and cells where peel costs less than online; the companion pencil SVG shows all-cell ranges.
+\par\medskip
 \begin{center}\small\begin{tabular}{r|r|r r|r}
 $p$ & Targets & Peel/online & Peel/rho & Cells peel$<$online\\\hline
 739 & 60 & 0.898244 & 11.615357 & 24/36\\
@@ -35,13 +36,13 @@ $p$ & Targets & Peel/online & Peel/rho & Cells peel$<$online\\\hline
 12,143 & 60 & 0.269806 & 1,146.700226 & 24/36\\
 48,383 & 1 & 0.233555 & 22,644.843832 & 24/36\\
 \end{tabular}\end{center}
-\noindent Every paired curve also has 12/36 cells where peel costs more than online and 0/36 where peel costs less than rho. The 28-bit row is one target, not a cohort mean. Its 36-cell range and source paths are in the price grid; all 1,448 pencil arm-target rows, including two unpriced failures, are in the target index.
-\medskip
-\noindent\textbf{Kummer open requirement.} The coordinate gate checked 8,820 labeled cases on all 1,260 public targets: 8,813 matching nonzero xADD outputs, seven recorded zero outputs, and no wrong nonzero outputs. Its separate signed-Recover gate repaired 175 quotient zero cases and recovered all 1,260 signed targets (1,257 generic, three bounded exceptional). The priced labeled DLP collector remains open, so its candidate cost, rho cost, and ratio are null here.
-\medskip
-\noindent\textbf{Review files.} \path{REPORT.md} links each source study and its raw data. \path{DATA_DICTIONARY.md} defines both normalized CSV files, empty fields, and exact source references. The target index has 11,528 rows sharing 1,260 checked workload keys and retains all seven Kummer label outcomes per target. The two SVGs show factor-base/law and paired pencil prices. The CSVs and summary JSON support independent regrouping without using this report's wording.
+\noindent Every paired curve also has 12/36 cells where peel costs more than online and 0/36 where peel costs less than rho. The 28-bit row is one target, not a cohort mean. Its 36-cell range and source paths are in the price grid; all 1,449 pencil arm-target rows, including three unpriced failures, are in the target index.
+\par\medskip
+\noindent\textbf{Kummer collector.} The coordinate gate checked 8,820 labeled cases on all 1,260 targets: 8,813 matching nonzero xADD outputs, seven recorded zero outputs, and no wrong nonzero outputs. Signed Recover repaired 175 quotient zero cases and recovered all 1,260 signed targets (1,257 generic, three bounded exceptional). The differential collector solved 1,260 DLPs with fresh same-process rho controls. Its full-cold candidate/rho range is 8.959687--55.935424 over 36 cells, with zero cells below rho. A cached-inverse arm also solved 1,260 targets; its 12.945664 representative ratio uses archived same-source rho from a separate process and is retained only in its source study.
+\par\medskip
+\noindent\textbf{Review files.} \path{REPORT.md} links each source study and its raw data. \path{DATA_DICTIONARY.md} defines both normalized CSV files, empty fields, and exact source references. The target index has 12,789 rows sharing 1,260 checked workload keys and retains all seven Kummer label outcomes per target. The two SVGs show factor-base/law/Kummer and paired pencil prices. The CSVs and summary JSON support independent regrouping without using this report's wording.
 \clearpage
-\noindent\textbf{Measured price ratios.} The first graph shows candidate divided by matched rho at the representative price for the complete factor-base and law arms. The second shows the degree-peeling collector divided by its matched online control: each line is the full 36-cell range and each dot is the representative price. Its last curve has one target; the others have 60. Kummer collector prices are absent pending full validation. Source: the standardized price grid.
+\noindent\textbf{Measured price ratios.} The first graph shows candidate divided by matched rho at the representative price for complete factor-base, law, and Kummer arms. The second shows the degree-peeling collector divided by its matched online control: each line is the full 36-cell range and each dot is the representative price. Its last curve has one target; the others have 60. Source: the standardized price grid.
 \begin{center}
 \includegraphics[width=0.90\linewidth]{cost-ratios.png}
 \includegraphics[width=0.90\linewidth]{pencil-ratios.png}
