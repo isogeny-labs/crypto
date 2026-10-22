@@ -10,7 +10,7 @@
 
 == Result
 
-- *Every published figure recomputes.* 2,162 figures from the raw `*.price.json` and `*.isolation.jsonl` records. The rounds' A/A, suite and holdout intervals and rule v6/v7's S figures agree to 1e-9. The explorations' paired cold times agree exactly, and their summaries agree at the three decimals they print.
+- *Every published figure recomputes.* 2,192 figures (30 of them the leaderboard's rule-v7 figures) from the raw `*.price.json` and `*.isolation.jsonl` records. The rounds' A/A, suite and holdout intervals and rule v6/v7's S figures agree to 1e-9. The explorations' paired cold times agree exactly, and their summaries agree at the three decimals they print.
 - *Every recorded scalar verifies.* 6,809 records and 13,618 certificates (both arms of every process) pass $[s]G = T$ and $[n]G = O$. The negative control $[s+1]G != T$ is rejected each time. The fields are GF($2^19$) to GF($2^61$).
 - *56 of 56 native replays are identical.* The committed seed drew 4 records per directory. Each was rerun with its own recorded binary, hash-checked, and reproduced the same certificates, counts and flags.
 - *The gate passes.* `scripts/validation_gate.py check` reports every row validated or frozen.
@@ -26,7 +26,7 @@ Each `ic price --single-target` process records rho as built and rho priced at t
   [R12 (v8)], [$2^47.2$], [9.86], [18.86],
 )
 
-The order holds across the §5a band: rho is faster at 0, 0.1 and 1 GAE for each of rho's uncharged canonicalisations. The index calculus is timed by the clock, so it carries no unpriced native work. The speed-ups between IC versions are unaffected, because both arms of each round meet the same rho. The leaderboard still quotes the as-built ratio. Whether to switch its quoted reference is for the owner to decide.
+The order holds across the §5a band: rho is faster at 0, 0.1 and 1 GAE for each of rho's uncharged canonicalisations. The index calculus is timed by the clock, so it carries no unpriced native work. The speed-ups between IC versions are unaffected, because both arms of each round meet the same rho. *The leaderboard now uses the canonical-step reference* (owner's decision, 2026-10-22): Table A's rule-v7 rows show the canonical-step ratio, with the as-built ratio and its interval beneath, and §23's "was" marks are recomputed the same way. At $2^47.2$ the row reads 22.4× (was 58.2×, §23), where it read 11.5× (was 31.6×).
 
 == Rows withdrawn from `benchmarks/README.md`
 

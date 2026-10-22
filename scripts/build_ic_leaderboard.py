@@ -138,8 +138,11 @@ FAMILIES = {
                     "and divides by this unit, measured around each repetition (§20, §23). Each process measures its own "
                     "unit, so S here is not "
                     "compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).",
-        "reference": "One-target rho on the same point, measured as built (its set-up plus its walk), "
-                     "in the same unit and the same process; its answer replayed and verified (§23; rule v7 at baseline v7).",
+        "reference": "One-target rho on the same point, in the same unit and the same process: its set-up plus its "
+                     "walk, the walk priced at the canonical batched step the process measures (`s_rho_model`), the "
+                     "stronger of the two rho figures each process records and the validation gate's reference; its "
+                     "answer replayed and verified (§23; rule v7 at baseline v7). Rho as built pays about twice the "
+                     "canonical step a walk step; its ratio, with its interval, is shown beneath each row's.",
         "floor": "√(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed "
                  "Frobenius and negation, n the extension degree. Stated in steps and not rescaled to "
                  "units, so × floor here divides units by steps.",
@@ -454,6 +457,14 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
         sh = d["online_phase_shares"]
         online, setup = x["s_ic_online_mean"], x["s_setup"]
         s = setup + online
+        # The reference is rho priced at the canonical batched step the same
+        # process measures (`s_rho_model_mean`): the stronger of the two rho
+        # figures each process records, as the validation gate requires
+        # (research/ic_tool_program/validation/README.md).  Rho as built,
+        # which pays about twice that step a walk step, is kept beside it.
+        rho_canonical = x["s_rho_setup"] + x["s_rho_model_mean"]
+        before_canonical = ((before["s_setup"] + before["s_ic_online_mean"])
+                            / (before["s_rho_setup"] + before["s_rho_model_mean"]))
         floor_s = math.sqrt(math.pi / (4 * n))
         artefact = d["s_curve_construction"] > x["s_rho_online_mean"]
         recipe = {
@@ -467,9 +478,11 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
                          "descent": online * (sh["target_query"] + sh["target_pdp"]
                                               + sh["target_descent"] + sh["target_relation_check"]),
                          "verify": online * sh["recovery_check"]},
-            "ratio_rho": x["cold_ratio_ic_over_rho"]["value"],
-            "ratio_rho_ci": list(x["cold_ratio_ic_over_rho"]["ci95"]),
-            "ratio_rho_section23": before["cold_ratio_ic_over_rho"]["value"],
+            "ratio_rho": s / rho_canonical,
+            "ratio_rho_as_built": x["cold_ratio_ic_over_rho"]["value"],
+            "ratio_rho_as_built_ci": list(x["cold_ratio_ic_over_rho"]["ci95"]),
+            "ratio_rho_section23": before_canonical,
+            "ratio_rho_section23_as_built": before["cold_ratio_ic_over_rho"]["value"],
             "online_speedup_section23": before["online_speedup"]["mean_ratio"],
             "online_speedup": x["online_speedup"]["mean_ratio"],
             "online_speedup_ci": list(x["online_speedup"]["ci95"]),
@@ -486,8 +499,10 @@ def koblitz_one_target_rows(names: Names) -> list[dict]:
         rows.append({
             "regime": "koblitz", "slug": c["slug"], "ec1": x.get("curve_id") or ec1_of(c),
             "legacy": before["curve"], "log2_r": x["log2_r"], "cofactor": None,
-            "reference": "one-target rho on the same point, its set-up plus its walk (§23's rule, at baseline v7)",
-            "reference_s": x["s_rho_online_mean"] + x["s_rho_setup"], "floor_s": floor_s,
+            "reference": ("one-target rho on the same point, its set-up plus its walk priced at the canonical "
+                          "step (§23's rule, at baseline v7)"),
+            "reference_s": rho_canonical, "reference_s_as_built": x["s_rho_online_mean"] + x["s_rho_setup"],
+            "floor_s": floor_s,
             "targets": 1, "recipes": [recipe], "best": recipe, "source": SOURCES["koblitz_rule_v7"],
             "before_source": SOURCES["koblitz_s23"],
             "round": "rule v7: §23's comparison at baseline v7 (2026-10-16); before marks §23 (2026-09-30)",
@@ -1302,7 +1317,8 @@ def markdown(doc: dict) -> str:
             cells = ([REGIME_NAME[r["regime"]]] if multi else []) + [
                 f"`{r['slug']}`", f"{r['log2_r']:.1f}", b["label"], g3(b["s"]), g3(r["reference_s"]),
                 f"**{times(b['ratio_rho'])}**" + (f" (was {times(b['ratio_rho_section23'])}, §23)"
-                                                   if "ratio_rho_section23" in b else ""),
+                                                   if "ratio_rho_section23" in b else "")
+                + (f"; as built {times(b['ratio_rho_as_built'])}" if "ratio_rho_as_built" in b else ""),
                 g3(r["floor_s"]), times(b["ratio_floor"]),
                 "✓" if b["verified"] else "✗", r["validation"]["status"]]
             L.append("| " + " | ".join(cells) + " |")
@@ -2097,6 +2113,9 @@ def page(doc: dict, standalone: bool) -> str:
             b = r["best"]
             ci = (f'<br><span class="muted">[{g3(b["ratio_rho_ci"][0])}, {g3(b["ratio_rho_ci"][1])}]</span>'
                   if "ratio_rho_ci" in b else "")
+            if "ratio_rho_as_built" in b:
+                ci += (f'<br><span class="muted">against rho as built {times(b["ratio_rho_as_built"])} '
+                       f'[{g3(b["ratio_rho_as_built_ci"][0])}, {g3(b["ratio_rho_as_built_ci"][1])}]</span>')
             if "online_speedup" in b:
                 ci += (f'<br><span class="muted">online {g3(b["online_speedup"])}× faster '
                        f'[{g3(b["online_speedup_ci"][0])}, {g3(b["online_speedup_ci"][1])}]; '

@@ -21,7 +21,7 @@ This performance handoff is published beside the curve-by-curve tables. The stan
 ## Table A: Koblitz, one target (§23, re-run at baseline v7)
 
 - **Unit:** one batched affine addition (`add_many` over 1,024 subgroup points), per √r.  A clock reading, not a count: `ic price` times each phase exclusively, on one thread, and divides by this unit, measured around each repetition (§20, §23). Each process measures its own unit, so S here is not compared with §23's; the ratios carry no unit (research/ic_tool_program/rule/v7/README.md).
-- **Reference:** One-target rho on the same point, measured as built (its set-up plus its walk), in the same unit and the same process; its answer replayed and verified (§23; rule v7 at baseline v7).
+- **Reference:** One-target rho on the same point, in the same unit and the same process: its set-up plus its walk, the walk priced at the canonical batched step the process measures (`s_rho_model`), the stronger of the two rho figures each process records and the validation gate's reference; its answer replayed and verified (§23; rule v7 at baseline v7). Rho as built pays about twice the canonical step a walk step; its ratio, with its interval, is shown beneath each row's.
 - **Floor:** √(π/4n) rho steps per √r: generic, one target, no precomputation, A = 2n by signed Frobenius and negation, n the extension degree. Stated in steps and not rescaled to units, so × floor here divides units by steps.
 - **Targets:** one unseen public point per process, 64 per size; §23's figures on the same curve are the before marks
 - **Status:** primary comparison: one target, as AGENTS.md's one-target rule requires
@@ -29,12 +29,12 @@ This performance handoff is published beside the curve-by-curve tables. The stan
 
 | curve | log₂ r | recipe | S, IC | S, reference | × reference | S, floor | × floor | ok | validation |
 |:--|--:|:--|--:|--:|--:|--:|--:|:--|:--|
-| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 6.03 | 1.76 | **3.43×** (was 4.95×, §23) | 0.129 | 46.6× | ✓ | validated |
-| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 6.37 | 1.6 | **3.97×** (was 1.98×, §23) | 0.117 | 54.2× | ✓ | validated |
-| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 6.63 | 1.4 | **4.74×** (was 8.04×, §23) | 0.138 | 47.9× | ✓ | validated |
-| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 8.15 | 1.16 | **7.03×** (was 14.7×, §23) | 0.122 | 66.9× | ✓ | validated |
-| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 7.82 | 1.23 | **6.37×** (was 15.7×, §23) | 0.115 | 67.8× | ✓ | validated |
-| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 12.4 | 1.08 | **11.5×** (was 31.6×, §23) | 0.113 | 109× | ✓ | validated |
+| `icv1-f2m47-t22705043-f4e44623` | 36.6 | aimed m = 3 collection, m = 3 descent; one target | 6.03 | 0.983 | **6.14×** (was 8.58×, §23); as built 3.43× | 0.129 | 46.6× | ✓ | validated |
+| `icv1-f2m57-tm747311035-c1f545af` | 38.0 | aimed m = 3 collection, m = 2 descent; one target | 6.37 | 0.961 | **6.63×** (was 2.15×, §23); as built 3.97× | 0.117 | 54.2× | ✓ | validated |
+| `icv1-f2m41-tm2308219-7f48b14a` | 39.0 | aimed m = 3 collection, m = 2 descent; one target | 6.63 | 0.696 | **9.52×** (was 14.9×, §23); as built 4.74× | 0.138 | 47.9× | ✓ | validated |
+| `icv1-f2m53-tm56619371-dac20a85` | 44.3 | aimed m = 3 collection, m = 2 descent; one target | 8.15 | 0.596 | **13.7×** (was 26.6×, §23); as built 7.03× | 0.122 | 66.9× | ✓ | validated |
+| `icv1-f2m59-tm943548413-98844ecc` | 44.5 | aimed m = 3 collection, m = 2 descent; one target | 7.82 | 0.652 | **12×** (was 27.3×, §23); as built 6.37× | 0.115 | 67.8× | ✓ | validated |
+| `icv1-f2m61-t158598901-ab42b6c5` | 47.2 | aimed m = 3 collection, m = 2 descent; one target | 12.4 | 0.554 | **22.4×** (was 58.2×, §23); as built 11.5× | 0.113 | 109× | ✓ | validated |
 
 ## Table B: Prime and random-binary ladder (§18)
 

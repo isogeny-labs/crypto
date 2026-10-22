@@ -18,7 +18,7 @@ PDF: [`report/report.pdf`](report/report.pdf).
   carries the leaderboard's six rule-v7 rows.
   `python3 scripts/validation_gate.py check --base origin/main` reports every
   row validated or frozen.
-- **Every published figure recomputes.** 2,162 figures from the raw records:
+- **Every published figure recomputes.** 2,192 figures from the raw records, including the 30 the leaderboard shows for rule v7:
   - the five rounds' A/A, suite and holdout intervals and rule v6/v7's S figures
     agree to 1e-9;
   - the explorations' paired cold times agree exactly, and their summaries
@@ -56,9 +56,15 @@ then 1.84 to 2.05 times the published one:
 Every row's values are in its `VALIDATION.json` (`rho_reference`). The order
 holds across the §5a band: rho is faster at 0, 0.1 and 1 GAE for each of rho's
 uncharged canonicalisations. The speed-ups between IC versions are unaffected,
-because both arms of each round meet the same rho. The leaderboard still quotes
-the as-built ratio. Whether to switch its quoted reference is for the owner to
-decide, and this PR does not change it.
+because both arms of each round meet the same rho.
+
+**The leaderboard now uses the canonical-step reference** (owner's decision,
+2026-10-22). Table A's six rule-v7 rows show `S, reference` and `× reference`
+at the canonical step, and the as-built ratio with its interval beneath. §23's
+"was" marks are recomputed the same way from §23's own `s_rho_model_mean`.
+At 2^47.2 the row reads **22.4×** (was 58.2×, §23), where it read 11.5×
+(was 31.6×). The rule-v7 validator report also recomputes these 30 displayed
+figures from the raw records, which brings its total to 78.
 
 ## Rows withdrawn from `benchmarks/README.md`
 

@@ -777,6 +777,66 @@ fn mode_rule(d: &Path) -> Report {
             "rho_canonicalisations_uncharged_median": canon}),
         );
     }
+    // The leaderboard's rows from this analysis show the reference at the canonical step
+    // (scripts/build_ic_leaderboard.py): recompute what they display.
+    let board_path = repo.join("docs/ic/leaderboard.json");
+    let source = rel_to(&d.join("analysis.json"), &repo);
+    if let Ok(raw) = fs::read(&board_path) {
+        let board: Value = serde_json::from_slice(&raw).unwrap();
+        let mut shown = 0;
+        for row in board["board"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter(|r| r["source"] == source.as_str())
+        {
+            let Some(sz) = sizes.iter().find(|x| x["curve"] == row["slug"]) else {
+                continue;
+            };
+            let slug = row["slug"].as_str().unwrap();
+            let (ic, canon, built) = (
+                f(&sz["s_ic_cold"]),
+                f(&sz["s_rho_canonical"]),
+                f(&sz["s_rho_as_built"]),
+            );
+            rep.check(
+                format!("leaderboard {slug} S, IC"),
+                opt(&row["best"]["s"]),
+                Some(ic),
+                1e-9,
+            );
+            rep.check(
+                format!("leaderboard {slug} S, reference (canonical step)"),
+                opt(&row["reference_s"]),
+                Some(canon),
+                1e-9,
+            );
+            rep.check(
+                format!("leaderboard {slug} x reference (canonical step)"),
+                opt(&row["best"]["ratio_rho"]),
+                Some(ic / canon),
+                1e-9,
+            );
+            rep.check(
+                format!("leaderboard {slug} S, reference as built"),
+                opt(&row["reference_s_as_built"]),
+                Some(built),
+                1e-9,
+            );
+            rep.check(
+                format!("leaderboard {slug} x reference as built"),
+                opt(&row["best"]["ratio_rho_as_built"]),
+                Some(ic / built),
+                1e-9,
+            );
+            shown += 1;
+        }
+        if shown > 0 {
+            // cited, not pinned: the file changes whenever any other row does
+            rep.raw
+                .push(json!({"path": rel_to(&board_path, &repo), "sha256": null}));
+        }
+    }
     rep.extra.insert("sizes".into(), Value::Array(sizes));
     rep.extra.insert("records".into(), json!(recs.price.len()));
     rep
