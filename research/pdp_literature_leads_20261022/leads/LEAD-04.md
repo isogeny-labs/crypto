@@ -17,7 +17,8 @@ none (`S ∝ r^{1/6}` for the pair-table family is unchanged).
 
 ## 1. Mechanism (precise)
 
-**Setting.** `#E = h·r`, `r` prime, `gcd(h, r) = 1` (every leaderboard row).
+**Setting.** `#E = h·r`, `r` prime, `gcd(h, r) = 1` (every ranked row of Tables A–C; the
+withheld Table D curves have full 2-torsion and are never prime order).
 Then `E(F_q) ≅ Z/r × H` with `|H| = h`, and `P ↦ [r]P` identifies `E/⟨G⟩` with `H`.
 Any homomorphism `χ: E(F_q) → A` with `gcd(|A|, r) = 1` (every ℓ-descent, Tate or
 Kosters–Yeo class, since `ℓ ≠ r`) kills `⟨G⟩` and factors through `H`: it is a
@@ -178,7 +179,8 @@ It does not lower either. Step by step, with the assumption each rests on:
   at most 2× for every class group, and 1× for `Z/3`, `Z/3²` (brute force on 8 groups
   agrees). The card's "`|A|` for `m = 3`" is false. A toy `m = 3` restricted scheme
   (probe class 0, equal-class pairs) found exactly the same decomposable targets
-  (72/152/226 of 246), table `0.53–0.54`, probes `0.44–0.8` (unverified desk check).
+  (72/152/226 of 246), table `0.52–0.71` of the full table, probes `0.44–0.80` of the base
+  (class imbalance at small `F`; unverified desk check).
 - **O4, the metric.** "Candidate tuples examined" in a hash oracle is an uncharged counter
   (`rootfind.rs`); the hit probability per probe is unchanged (`(F/A)/r` vs `F/(h r)`). A
   fall in that counter is relabelling. Only charged additions count.
