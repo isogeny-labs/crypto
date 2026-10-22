@@ -43,6 +43,12 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 # Named jobs whose routine PR budget is longer than 25 minutes, each with the
 # reason. Exact on workflow path, job name and timeout; nothing else matches.
 NAMED_BUDGET_EXCEPTIONS = {
+    (".github/workflows/release.yml", "isogeny"): {
+        "timeout": 45,
+        # Run 39652680641, job 119434898023 exhausted 25 minutes during
+        # the second Windows build after native compilation/tests passed.
+        "reason": "Windows native and software-hash builds plus installed CLI checks",
+    },
     (".github/workflows/curve-covers.yml", "certificates"): {
         "timeout": 45,
         # Job 118198334025 exhausted 25 minutes while replaying the expanded
@@ -120,7 +126,7 @@ def frozen_proof_budget_exception(label, job_name, budget, event, root=REPO_ROOT
         return False
 
 
-def expression(value, event, action=None):
+def expression(value, event, action=None, matrix=None):
     if not isinstance(value, str):
         return value
     source = value.strip()
@@ -151,6 +157,9 @@ def expression(value, event, action=None):
                 return event
             if identity == "github.event.action" and action is not None:
                 return action
+            if len(parts) == 2 and parts[0] == "matrix" and isinstance(matrix, dict):
+                item = matrix.get(parts[1], UNKNOWN)
+                return item if isinstance(item, (str, int, float, bool)) else UNKNOWN
             return UNKNOWN
         if isinstance(node, ast.Call):
             return True if isinstance(node.func, ast.Name) and node.func.id == "always" and not node.args and not node.keywords else UNKNOWN
@@ -236,13 +245,23 @@ def job_problems(jobs, event, action, label):
     for name, job in jobs.items():
         if not may_run(name):
             continue
-        budget = expression(job.get("timeout-minutes", UNKNOWN), event, action)
-        if isinstance(budget, bool) or not isinstance(budget, (int, float)) or not 0 < budget <= 25:
-            if frozen_proof_budget_exception(label, name, budget, event):
-                continue
-            if named_budget_exception(label, name, budget):
-                continue
-            found.append(f"{label}: {name} can run on {event}/{action} without a proven 1–25 minute timeout")
+        # Include-only static matrices enumerate every possible row. Other
+        # matrix shapes remain unknown rather than guessing expansion rules.
+        matrix = job.get("strategy", {}).get("matrix")
+        rows = [None]
+        if (isinstance(matrix, dict) and set(matrix) == {"include"}
+                and isinstance(matrix["include"], list) and matrix["include"]
+                and all(isinstance(row, dict) for row in matrix["include"])):
+            rows = matrix["include"]
+        for row in rows:
+            budget = expression(job.get("timeout-minutes", UNKNOWN), event, action, row)
+            if isinstance(budget, bool) or not isinstance(budget, (int, float)) or not 0 < budget <= 25:
+                if frozen_proof_budget_exception(label, name, budget, event):
+                    continue
+                if named_budget_exception(label, name, budget):
+                    continue
+                found.append(f"{label}: {name} can run on {event}/{action} without a proven 1–25 minute timeout")
+                break
     return found
 
 def main():
