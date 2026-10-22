@@ -279,9 +279,11 @@ def generator_of(o: dict) -> tuple[int, int] | None:
 
 
 def subgroup_of(o: dict, order: int) -> tuple[int, int] | None:
-    r = _int(o.get("subgroup_order"))
+    r = _int(o.get("subgroup_order", o.get("r")))
     h = _int(o.get("cofactor"))
-    if r is None:
+    if "subgroup_order" in o and "r" in o and _int(o["r"]) != r:
+        raise ValueError("conflicting subgroup_order and r")
+    if r is None or r <= 0:
         return None
     if h is None:
         h = order // r

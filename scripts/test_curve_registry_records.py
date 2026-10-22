@@ -45,6 +45,35 @@ class CurveRecordTests(unittest.TestCase):
         self.assertFalse(fatal)
         self.assertTrue(any(record["curve_uid"] in reps for reps in reg.reps.values()))
 
+    def test_prime_r_alias_preserves_frozen_representation(self):
+        source = builder.REPO / "research/conductor_gap_cm_orbits_20261015/prepared/curve_ids.json"
+        record = json.loads(source.read_text())[0]
+        explicit = dict(record, subgroup_order=record["r"])
+        self.assertEqual(builder.subgroup_of(record, record["order"]),
+                         builder.subgroup_of(explicit, record["order"]))
+        self.assertEqual(builder.subgroup_of(record, record["order"]), (record["r"], 1))
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fixture = root / "curve_ids.json"
+            fixture.write_text(json.dumps([record]))
+            registry = builder.Registry()
+            problems, fatal = [], []
+            with patch.object(builder, "REPO", root), patch.object(builder, "tracked", return_value=[fixture]):
+                builder.harvest_json(registry, problems, fatal)
+        self.assertFalse(problems)
+        self.assertFalse(fatal)
+        self.assertEqual(sum(map(len, registry.reps.values())), 1)
+        expected = builder.ec1.curve_identity(*builder.prime_record(
+            record["p"], record["a"], record["b"], record["order"], record["r"], 1,
+            builder.generator_of(record)), "x")["curve_uid"]
+        self.assertTrue(any(expected in reps for reps in registry.reps.values()))
+
+    def test_invalid_subgroup_alias_does_not_enter_registry(self):
+        self.assertIsNone(builder.subgroup_of({"r": 0}, 13))
+        self.assertIsNone(builder.subgroup_of({"r": 5}, 13))
+        with self.assertRaisesRegex(ValueError, "conflicting"):
+            builder.subgroup_of({"r": 13, "subgroup_order": 7}, 13)
+
     def test_declared_uid_mismatch_fails_closed(self):
         record = self.record()
         record["curve_uid"] = "urn:ec-record:1:sha256:" + "0" * 64
