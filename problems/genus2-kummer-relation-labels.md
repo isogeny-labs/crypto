@@ -27,6 +27,11 @@ collector priced against matched rho, not merely fast scalar multiplication.
   Every test had one quotient output and one signed lift, with source labels
   checked; the implementation uses Jacobian addition to enumerate possible
   quotient lifts, not fast Kummer coordinates.
+- **Observed:** [The separate Rosenhain setup gate](../research/kummer_walk_20261022/ROSENHAIN_GATE.md)
+  found and exactly checked an `Fp` Rosenhain normalization on all 21
+  models. Each had 10 square-scale choices among 20 ordered root pairs.
+  This establishes the normalized equation, not theta constants or Kummer
+  projection coordinates.
 - **Derived or proved:** Unsigned Kummer classes alone cannot define the
   binary ordinary addition used by this arbitrary-jump walk; the witness is
   exact for each transferred subgroup of order greater than four.
@@ -71,11 +76,11 @@ second measures it. The full rational two-torsion gate alone is insufficient.
   `K(T+G)` and each `K(T-J_i)` under the two prospective arbitrary jumps of
   the frozen collector, or substitute a fully specified differential walk
   whose candidate and relation distribution is measured against the control.
-- **Coordinate prerequisite:** Normalize the p=739 quintic to Rosenhain
-  form, derive theta constants and projection coordinates, then check
+- **Coordinate prerequisite:** Starting from the checked p=739 Rosenhain
+  normalization, derive theta constants and projection coordinates, then check
   Gaudry's xDBL/xADD and the signed recovery of Chung--Costello--Smith
   against the Jacobian, including all vanishing-denominator branches. The
-  prior rational-root gate alone does not establish this projection.
+  rational-root and Rosenhain gates do not establish this projection.
 - **Inputs and controls:** All 21 exact models; the signed Jacobian and
   source-curve oracles; the frozen 16-jump collector and its 1,260 target
   workload. Verify the sidecar after every jump, restart and cycle closure.
@@ -98,3 +103,7 @@ Differential walk, signed relation labels and the full cohort unresolved.
 passed 1,260 target and 630 exceptional cases. Fast coordinates, a closed
 arbitrary-jump state recurrence, and all full-collector cost ratios remain
 unresolved.
+
+2026-10-22 addendum: Exact `Fp` Rosenhain normalization passed on 21/21
+models. Theta coordinates, fast Kummer operations, signed jump recurrence,
+and full-collector costs remain unresolved.
