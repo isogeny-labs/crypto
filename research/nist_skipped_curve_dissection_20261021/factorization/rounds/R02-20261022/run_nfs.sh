@@ -34,7 +34,7 @@ git rev-parse HEAD > "$log/code-commit.txt"
 sha256sum "${BASH_SOURCE[0]}" "$out/state/yafu" > "$log/source-binary-sha256.txt"
 find "$siever" -maxdepth 1 -type f -name 'gnfs-*' -exec sha256sum {} + > "$log/siever-sha256.txt"
 if [[ $mode == resume ]]; then
-  tar -C "$out" -cf - state | xz -6 -T1 > "$log/state-before.tar.xz"
+  tar -C "$out" -cf - state | xz -1 -T1 > "$log/state-before.tar.xz"
 fi
 printf 'nfs(%s)\n' "$number" > "$log/expression.txt"
 argv=(./yafu -threads 2 -lathreads 2 -seed 20261022 -gnfs -xover 81
