@@ -9,7 +9,10 @@ mkdir -p "$out"
 out=$(cd -- "$out" && pwd)
 if [[ ! -f $out/input.txt ]]; then
   [[ -z $(find "$out" -mindepth 1 -maxdepth 1 -print -quit) ]] || exit 1
-  if [[ -n ${NIST_FACTOR_RAW_ARCHIVE:-} ]]; then
+  if [[ -n ${NIST_FACTOR_CHECKPOINT:-} ]]; then
+    archive=$NIST_FACTOR_CHECKPOINT
+    sums="$archive.sha256"
+  elif [[ -n ${NIST_FACTOR_RAW_ARCHIVE:-} ]]; then
     archive=$NIST_FACTOR_RAW_ARCHIVE
     sums="$here/runs.tar.xz.sha256"
   elif [[ -f $here/checkpoint-$id.tar.xz ]]; then
@@ -38,6 +41,10 @@ fi
 if jq -e '.status=="complete"' "$out/result.json" >/dev/null; then
   echo 'The recorded target is already complete; no further search started.'
   exit 0
+fi
+if [[ ! -s $out/state/nfs.job && ! -s $out/state/nfs.dat.p ]]; then
+  echo 'No native-recognized master polynomial/job checkpoint. Per-thread .p files require validated recovery; refusing to restart from scratch.' >&2
+  exit 1
 fi
 bash "$here/run_nfs_target.sh" "$id" "$out.parent.json" "$out" "$seconds" resume
 jq -n --arg id "$id" --arg n "$expected" \

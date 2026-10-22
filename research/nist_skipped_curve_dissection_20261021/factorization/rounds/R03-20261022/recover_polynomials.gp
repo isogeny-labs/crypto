@@ -1,10 +1,12 @@
 \\ Native exact validation and layout of saved YAFU polynomial candidates.
 integer(s) = {
-  my(v=Vecsmall(s), x=0, sign=1, start=1);
+  my(v=Vecsmall(s), x=0, sign=1, start=1, stop=#v);
   if(!#v,error("empty integer"));
-  if(v[1]==45,sign=-1;start=2);
-  if(start>#v,error("missing digits"));
-  for(i=start,#v,if(v[i]<48||v[i]>57,error("nondecimal integer"));x=10*x+v[i]-48);
+  while(start<=stop && (v[start]==32||v[start]==9),start++);
+  while(stop>=start && (v[stop]==32||v[stop]==9||v[stop]==13),stop--);
+  if(start<=stop && v[start]==45,sign=-1;start++);
+  if(start>stop,error("missing digits"));
+  for(i=start,stop,if(v[i]<48||v[i]>57,error("nondecimal integer"));x=10*x+v[i]-48);
   sign*x;
 };
 {
@@ -13,13 +15,14 @@ integer(s) = {
   my(lines=readstr(path), block=List(), a=vector(6), seen=vector(6), y0=0, hasy0=0, count=0);
   write(out,"n: ",N);
   foreach(lines,line,
-    my(tokens=strsplit(line,": "));
-    if(!#tokens,next);
-    if(tokens[1]=="#",
+    my(chars=Vecsmall(line));
+    if(!#chars,next);
+    my(header=chars[1]==35, tokens=strsplit(line,":"));
+    if(header,
       if(#block,error("incomplete candidate before next header"));
       block=List();a=vector(6);seen=vector(6);hasy0=0;
     );
-    if(!#block && tokens[1]!="#",error("candidate must begin with native score header"));
+    if(!#block && !header,error("candidate must begin with native score header"));
     listput(block,line);
     my(name=Vecsmall(tokens[1]));
     if(#name==2 && name[1]==99 && name[2]>=48 && name[2]<=53,

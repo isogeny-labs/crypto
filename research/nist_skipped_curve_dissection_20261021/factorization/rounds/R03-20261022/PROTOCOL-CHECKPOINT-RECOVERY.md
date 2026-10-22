@@ -23,6 +23,10 @@ an optimal polynomial or satisfactory sieve performance.
 
 Use a correct-target positive validation and a different-input rejection
 control. The next execution must demonstrate YAFU actually recognizes the
-master file before it is called a polynomial resume. There is no second
+master file before it is called a polynomial resume. A separate diagnostic
+copy may run for at most three seconds, with one second kill grace, solely
+to capture native input matching and the last-leading-coefficient message;
+any incidental work is setup cost, never new production search coverage.
+There is no second
 production search in R03; the later backlog job must use the corrected
 checkpoint and retain a failed restore as an execution failure.
