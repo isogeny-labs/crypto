@@ -19,6 +19,14 @@
 use super::field::{inv_mod_u64, single_word, FieldElement};
 use num_bigint::BigUint;
 
+#[cfg(test)]
+thread_local! {
+    /// Iterations of [`Point::scalar_mul_ct`]'s ladder that began with the
+    /// identity in either register; tests read it to check that the
+    /// ladder's work does not depend on the scalar's length.
+    static LADDER_IDENTITY_STEPS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
 /// A point on a Weierstrass curve, either the identity (point at infinity)
 /// or an affine coordinate pair.
 #[derive(Clone, Debug, PartialEq)]
@@ -318,13 +326,26 @@ impl Point {
         }
     }
 
-    /// Scalar multiplication kP using the Montgomery ladder, processing
-    /// `scalar_bits` bits MSB-first.  Every iteration performs exactly
-    /// one point addition and one point doubling, regardless of the bit
-    /// value, so the *operation count* no longer depends on the
-    /// scalar's bit pattern.  Iteration count is fixed at `scalar_bits`,
-    /// so the runtime no longer scales with the position of the
-    /// most-significant set bit.
+    /// Scalar multiplication `[k mod 2^scalar_bits]·P` by a Montgomery
+    /// ladder whose work depends on neither the bit pattern nor the bit
+    /// length of `k`.
+    ///
+    /// Every iteration performs one point addition and two doublings,
+    /// whatever the bit.  A ladder on `k` itself would start at `r0 = O`
+    /// and stay there through every leading zero bit, where `O + P` and
+    /// `2·O` are shortcuts in [`Point::add`] and [`Point::double`], so its
+    /// time would reveal the scalar's bit length — the nonce length that
+    /// lattice attacks use.  This one runs on `k + 2^scalar_bits`, whose
+    /// top bit is always set: it starts from `(P, 2P)`, the state after
+    /// that bit, so the registers hold `[j]P` and `[j + 1]P` with
+    /// `1 ≤ j < 2^(scalar_bits + 1)` and meet the identity only where
+    /// `j` or `j + 1` is a multiple of the point's order — for a point of
+    /// prime order `n` with `scalar_bits = bits(n)`, a few scalars per
+    /// bit position out of `n`.  It returns
+    /// `[k + 2^scalar_bits]P − [2^scalar_bits]P`, where the subtrahend is
+    /// `scalar_bits` doublings of the public `P`.  That is exact for every
+    /// point, including points outside the curve's prime-order subgroup,
+    /// for about a third more group operations than the plain ladder.
     ///
     /// Security caveats (read carefully):
     ///
@@ -345,11 +366,15 @@ impl Point {
     /// but it does not make ECC operations side-channel safe.  See
     /// `SECURITY.md` for the full picture.
     pub fn scalar_mul_ct(&self, k: &BigUint, a: &FieldElement, scalar_bits: usize) -> Point {
-        let mut r0 = Point::Infinity;
-        let mut r1 = self.clone();
+        let mut r0 = self.clone();
+        let mut r1 = self.double(a);
 
         for i in (0..scalar_bits).rev() {
             let bit = k.bit(i as u64);
+            #[cfg(test)]
+            if matches!(r0, Point::Infinity) || matches!(r1, Point::Infinity) {
+                LADDER_IDENTITY_STEPS.with(|c| c.set(c.get() + 1));
+            }
 
             // Always compute all three potential next states so the
             // operation count is independent of `bit`.
@@ -367,7 +392,11 @@ impl Point {
                 r1 = sum;
             }
         }
-        r0
+        let mut top = self.clone();
+        for _ in 0..scalar_bits {
+            top = top.double(a);
+        }
+        r0.add(&top.neg(), a)
     }
 
     /// Negate a point: -P = (x, -y mod p).
@@ -1011,6 +1040,57 @@ mod tests {
             let v = g.scalar_mul(&k_bu, &a);
             let ct = g.scalar_mul_ct(&k_bu, &a, 4);
             assert_eq!(v, ct, "mismatch at k={}", k);
+        }
+    }
+
+    /// The fixed-length ladder returns exactly `[k mod 2^scalar_bits]P` for
+    /// every point of a small curve (identity, 2-torsion and other
+    /// small-order points included), as the plain ladder did.  On a small
+    /// order point the registers do meet the identity, which shows that the
+    /// counter read by `ladder_work_does_not_depend_on_scalar_length` sees it.
+    #[test]
+    fn ladder_is_exact_for_every_point_of_a_small_curve() {
+        let (points, a) = f97_points();
+        LADDER_IDENTITY_STEPS.with(|c| c.set(0));
+        for pt in &points {
+            for k in 0..160u32 {
+                let k = BigUint::from(k);
+                for bits in [0usize, 5, 8] {
+                    let low = &k % (BigUint::one() << bits);
+                    assert_eq!(
+                        pt.scalar_mul_ct(&k, &a, bits),
+                        scalar_mul_affine(pt, &low, &a),
+                        "{pt:?} k={k} bits={bits}"
+                    );
+                }
+            }
+        }
+        assert!(LADDER_IDENTITY_STEPS.with(|c| c.get()) > 0);
+    }
+
+    /// Audit finding 7: the plain ladder started at `r0 = O` and took the
+    /// `O + P` and `2·O` shortcuts through every leading zero bit, so its
+    /// time revealed the scalar's bit length.  On SM2's generator the
+    /// fixed-length ladder never holds the identity, for scalars of every
+    /// length from 1 to 256 bits, and still returns `[k]G`.
+    #[test]
+    fn ladder_work_does_not_depend_on_scalar_length() {
+        let curve = super::super::curve::CurveParams::sm2();
+        let g = curve.generator();
+        let a = curve.a_fe();
+        let bits = curve.order_bits();
+        let mut scalars = vec![BigUint::zero(), BigUint::one(), &curve.n - 1u32];
+        let mut x = BigUint::from(0x9e37_79b9_7f4a_7c15u64);
+        for leading_zeros in [0usize, 1, 8, 64, 128, 250] {
+            x = (&x * &x + 0x1234u32) % &curve.n;
+            let len = bits - leading_zeros;
+            scalars.push((&x % (BigUint::one() << len)) | (BigUint::one() << (len - 1)));
+        }
+        for k in &scalars {
+            LADDER_IDENTITY_STEPS.with(|c| c.set(0));
+            let ct = g.scalar_mul_ct(k, &a, bits);
+            assert_eq!(LADDER_IDENTITY_STEPS.with(|c| c.get()), 0, "k = {k:x}");
+            assert_eq!(ct, g.scalar_mul(k, &a), "k = {k:x}");
         }
     }
 
