@@ -109,6 +109,21 @@ fn verify_relations(f: &Fixture, v: &mut Value) -> Result<()> {
     Ok(())
 }
 pub fn run(fixtures: &[Fixture], selected: &[Selected], out: &Path) -> Result<Vec<Value>> {
+    run_height(fixtures, selected, out, false)
+}
+pub fn run_original_height(
+    fixtures: &[Fixture],
+    selected: &[Selected],
+    out: &Path,
+) -> Result<Vec<Value>> {
+    run_height(fixtures, selected, out, true)
+}
+fn run_height(
+    fixtures: &[Fixture],
+    selected: &[Selected],
+    out: &Path,
+    original_height: bool,
+) -> Result<Vec<Value>> {
     fs::create_dir_all(out.join("raw"))?;
     let mut geometry = vec![];
     for s in selected {
@@ -152,24 +167,27 @@ quit;
                 continue;
             }
             let mut script = format!(
-                "A={};B={};p={};d={};identifier={};\n",
+                "A={};B={};p={};d={};identifier={};height_original={};\n",
                 f.a,
                 f.b,
                 f.p,
                 d,
-                serde_json::to_string(&f.id)?
+                serde_json::to_string(&f.id)?,
+                u8::from(original_height)
             );
             script.push_str(r#"default(parisize,64000000);
 E=ellinit([A*d^2,B*d^3]);
 R=ellrank(E,0);
-P=ellratpoints(E,16);
+Hcap=16;if(height_original,Hcap=16*abs(d));
+P=ellratpoints(E,Hcap);
+if(height_original,P=select(z->max(abs(numerator(z[1]/d)),denominator(z[1]/d))<=16,P));
 P=Set(concat(P,apply(z->ellneg(E,z),P)));
 rels=List();
 for(i=1,#P,for(j=i,#P,S=ellneg(E,elladd(E,P[i],P[j]));k=setsearch(P,S);if(k>=j,listput(rels,[i,j,k]))));
 images=[];
 if(kronecker(d,p)==1,sd=lift(sqrt(Mod(d,p)));images=apply(z->[lift(Mod(z[1]/d,p)),lift(Mod(z[2]*sd/d^2,p))],P));
 jstr(z)=Str(Strchr(34),z,Strchr(34));
-print("{",jstr("fixture"),":",jstr(identifier),",",jstr("d"),":",d,",",jstr("rank_lower"),":",R[1],",",jstr("rank_upper"),":",R[2],",",jstr("rank_witnesses"),":",jstr(R[4]),",",jstr("standard_model_x_height_cap"),":16,",jstr("rational_points"),":",jstr(P),",",jstr("point_count"),":",#P,",",jstr("images"),":",images,",",jstr("relations"),":",Vec(rels),"}");
+print("{",jstr("fixture"),":",jstr(identifier),",",jstr("d"),":",d,",",jstr("rank_lower"),":",R[1],",",jstr("rank_upper"),":",R[2],",",jstr("rank_witnesses"),":",jstr(R[4]),",",jstr("standard_model_x_search_height_cap"),":",Hcap,",",jstr("original_model_x_height_cap"),":",if(height_original,16,"null"),",",jstr("rational_points"),":",jstr(P),",",jstr("point_count"),":",#P,",",jstr("images"),":",images,",",jstr("relations"),":",Vec(rels),"}");
 quit;
 "#);
             let stem = out.join("raw").join(format!("{}-d{d}", f.id));
