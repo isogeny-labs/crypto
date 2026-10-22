@@ -396,3 +396,34 @@ a second elimination method and all-group-log enumeration. The oracle's
 complete first-query hit count must agree with the earlier p=13/p=37
 records. This tests dense extraction plus a public known-log anchor; it
 does not price polynomial S5, hash/allocator work or matched rho.
+
+## Registered combined tagged-index and dense-row p=37 exact-oracle solve
+
+Frozen on 22 October 2026 after the separate full-2D dense solve and
+direct-posting tagged 53-residual replay, before constructing the combined
+producer. Reuse the canonical p=37, b0=2, order-1,873,633 twist, exact
+624-point signed base and public `[271]G` target. Charge model creation,
+axis re-lifts, interior base lifts, input checks, both eigenvalue checks,
+all 52 orbit-map columns, the action-tagged direct-posting table, the first
+seed-zero residual, dense anchored row selection, matrix solve and all
+factor/target checks in **one producer run**. Enumerate the complete signed
+four-distinct-factor decomposition set of the first residual in the same
+lexicographic order as the full-table oracle. Keep every rank-increasing
+row after fixing the generator factor log to 1; retain full selected terms,
+rank progression, candidate count and answer. The target scalar must not
+enter row construction. Stop at anchored rank 52 or, if absent, continue
+the frozen stream with a 64-residual cap; retain a cap failure. For the
+registered first residual, independently compute the full-table signed
+decomposition set in a separately counted reference arm and require exact
+set equality. Do not charge the reference arm to the tagged cold path.
+Count model/base/input/eigen/map/table/stream/check `Fp` multiplications,
+group operations, matrix operations, hash lookups/candidate postings,
+retained and peak allocator-requested bytes, and shared-host L0 phase times.
+Track reference-arm setup/query counts separately. Record a non-timing A/A
+diff and reuse the independent dense point-keyed four-sign auditor to
+reconstruct the entire first-query count, selected rows, rank and target.
+Use a 300-second watchdog and 8 GiB memory cap per run. Compare the
+result only with the earlier **same-target counted exact-oracle** baseline;
+do not combine costs from separate runs or claim an isolated timing,
+polynomial-S5, calibrated whole-method or rho improvement. Publish a
+source-linked run report, graph and PDF, and retain negative outcomes.
