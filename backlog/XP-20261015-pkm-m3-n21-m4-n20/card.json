@@ -5,17 +5,16 @@
   "created": "2026-10-15",
   "authors": ["backlog lane", "coordinator"],
   "status": "blocked",
-  "status_note": "Rescoped 2026-10-16 (claim audit): the m = 4, N = 20 cell is already answered, NEGATIVE: msolve 0.6.5 completed three productive degree-8 F4 rounds on both targets before its 5 GB cap, so D >= 8 at m = 4, N = 20 (research/ic_next10_20261014/03-pkm-degree/README.md; caveat: msolve on the raw presentation, f4_fp_tower not run there). The card's own rule reads that as strong evidence against boundedness at m = 4. Only the m = 3, N = 21 cell remains (inconclusive there: D >= 7, stopped by the wall before any degree-8 round). Blocked on hardware: the projection needs 133-146 GB (m = 3) of RAM against about 14 GB here, or a disk-backed B' reducer that is not built. The engine is pinned at the head of the open PR #1893. The engine has no checkpoint, so a run cannot resume; that must change, or the protocol must accept unresumable runs, before the card is ready.",
+  "status_note": "Rescoped 2026-10-16 (claim audit): the m = 4, N = 20 cell is already answered, NEGATIVE: msolve 0.6.5 completed three productive degree-8 F4 rounds on both targets before its 5 GB cap, so D >= 8 at m = 4, N = 20 (research/ic_next10_20261014/03-pkm-degree/README.md; caveat: msolve on the raw presentation, f4_fp_tower not run there). The card's own rule reads that as strong evidence against boundedness at m = 4. Only the m = 3, N = 21 cell remains (inconclusive there: D >= 7, stopped by the wall before any degree-8 round). Blocked on hardware: the projection needs 133-146 GB (m = 3) of RAM against about 14 GB here, or a disk-backed B' reducer that is not built. The engine is pinned at the merge commit of PR #1893 (3074507842, merged 2026-10-15). The engine has no checkpoint, so a run cannot resume; that must change, or the protocol must accept unresumable runs, before the card is ready.",
   "blocked_on": [
     "hw:a host with 192-256 GB RAM for m = 3, N = 21 (research/pkm_dickson_torus_20261015/README.md §5)",
-    "note:or a disk-backed B' (echelon) in the F4 tower engine, streamed from NVMe; not built, and its I/O cost is not measured",
-    "pr:1893 the projection and the pinned engine (claude/leads-dickson-torus, open, unmerged)"
+    "note:or a disk-backed B' (echelon) in the F4 tower engine, streamed from NVMe; not built, and its I/O cost is not measured"
   ],
   "links": {
     "lead": "docs/ic/factor-base-encyclopedia/README.md §8 item 1 (is the tower's F4 solving degree bounded?)",
     "notes": [
       "research/ic_next10_20261014/03-pkm-degree/README.md (m = 4, N = 20: D >= 8, NEGATIVE; m = 3, N = 18/21/24: D >= 7, inconclusive)",
-      "research/pkm_dickson_torus_20261015/README.md §5 on branch claude/leads-dickson-torus (Task C: derived, not run)",
+      "research/pkm_dickson_torus_20261015/README.md §5 (Task C: derived, not run; merged in PR #1893)",
       "research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md §11.7, §12.7, §16.8-16.9"
     ],
     "prs": [1893]
@@ -25,8 +24,8 @@
   "protocol": {"path": null, "blob": null},
   "code": {
     "repo": "crypto",
-    "commit": "17c5663382bc052a99dc6c4c6d0368b02acc5039",
-    "branch": "claude/leads-dickson-torus",
+    "commit": "3074507842f88ef3e6880f08fbcc3eb19d5b7038",
+    "branch": "main",
     "build": [["cargo", "build", "--release", "--example", "pkm_tower_pilot"]]
   },
   "resources": {
