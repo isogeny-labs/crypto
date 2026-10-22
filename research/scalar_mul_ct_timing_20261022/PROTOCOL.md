@@ -94,3 +94,20 @@ Analysis is native, in `examples/scalar_mul_timing_analyze.rs`, which writes
   take shortcuts inside the ladder whenever a partial multiple reaches the
   identity. Rejecting such points is the job of point validation, not of
   this fix.
+
+## Amendment 1 (2026-10-22, after run 1, before run 2)
+
+Run 1 (`raw/`, `summary.json`) measured the fix with `[2^L]P` computed by `L`
+affine doublings, at 1.29–1.55× the old cost on full-length scalars.
+
+- **What changes.** The user asked that `[2^L]P` come from the Jacobian
+  `Point::scalar_mul` instead. That routine is variable-time, but its inputs
+  are `P` and `L`, which are public, so `k` never enters it.
+- **Arm B is redefined** as the commit with that change.
+- **Run 2** repeats the frozen procedure unchanged, writing to `raw-run2/`
+  and `summary-run2.json`: 5 rotated rounds of A, A′ and B, 3 repetitions,
+  `isolated_bench.py` on one CPU.
+- **Rules and inputs.** Inputs, measures and verdict rules are unchanged.
+  Run 1 stays as recorded and is reported beside run 2.
+- **Cost expectation** for run 2: close to 1×, since the ladder's `L`
+  iterations dominate and the Jacobian chain costs one inversion.

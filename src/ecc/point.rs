@@ -342,10 +342,13 @@ impl Point {
     /// `j` or `j + 1` is a multiple of the point's order — for a point of
     /// prime order `n` with `scalar_bits = bits(n)`, a few scalars per
     /// bit position out of `n`.  It returns
-    /// `[k + 2^scalar_bits]P − [2^scalar_bits]P`, where the subtrahend is
-    /// `scalar_bits` doublings of the public `P`.  That is exact for every
-    /// point, including points outside the curve's prime-order subgroup,
-    /// for about a third more group operations than the plain ladder.
+    /// `[k + 2^scalar_bits]P − [2^scalar_bits]P`, which is exact for every
+    /// point, including points outside the curve's prime-order subgroup.
+    /// The subtrahend depends only on `P` and `scalar_bits`, never on `k`,
+    /// so it comes from the variable-time Jacobian [`Point::scalar_mul`]
+    /// (one inversion in all) rather than `scalar_bits` affine doublings.
+    /// `P` must be public, as it is for every caller (generators, public
+    /// keys, ciphertext points).
     ///
     /// Security caveats (read carefully):
     ///
@@ -392,10 +395,7 @@ impl Point {
                 r1 = sum;
             }
         }
-        let mut top = self.clone();
-        for _ in 0..scalar_bits {
-            top = top.double(a);
-        }
+        let top = self.scalar_mul(&(BigUint::from(1u32) << scalar_bits), a);
         r0.add(&top.neg(), a)
     }
 
