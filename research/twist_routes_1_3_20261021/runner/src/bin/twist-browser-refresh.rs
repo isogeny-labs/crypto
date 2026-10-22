@@ -323,8 +323,8 @@ fn main() -> Result<()> {
                 continue;
             }
             let mut v = json!({"session_id":sid,"arm":arm,"method":a.method,"method_id":a.id,"runs":a.n,"verified":a.verified,
-                "mean_s":if a.verified>0&&a.zero==0{json!((a.s/a.verified as f64*1e4).round_ties_even()/1e4)}else{Value::Null},
-                "mean_ratio_to_floor":if a.floor>0.&&a.zero==0{json!((a.s/a.floor*1e3).round_ties_even()/1e3)}else{Value::Null}});
+                "mean_s":if a.verified>0&&a.zero==0{json!(format!("{:.4}",a.s/a.verified as f64).parse::<f64>()?)}else{Value::Null},
+                "mean_ratio_to_floor":if a.floor>0.&&a.zero==0{json!(format!("{:.3}",a.s/a.floor).parse::<f64>()?)}else{Value::Null}});
             if a.zero > 0 {
                 v["unpriced_zero_runs"] = json!(a.zero);
                 v["score_status"] = json!("unknown complete price; zero charged lower bound");
