@@ -115,6 +115,9 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
     {
         return Err("--setup-candidates and --target-candidates currently require eccp-131".into());
     }
+    if args.relation_arity == 3 && args.setup_candidates == 0 && args.target_candidates == 0 {
+        return Err("--relation-arity 3 requires setup or target candidates".into());
+    }
     let report = if matches!(name.as_str(), "eccp-131" | "eccp131") {
         let params = CurveParams::eccp131();
         let record = SecgCurve {
