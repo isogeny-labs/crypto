@@ -9,8 +9,11 @@ operation, peel/online is 0.269806–0.898244 and peel/rho is
 is below matched rho. A separately replayed p=48,383 first target costs
 0.233555× online and 22,644.843832× rho; it is one target, not a curve
 average. The original 1,260-target requirement remains open: 543 distinct
-source targets solved and 717 still open. A 32-bit target reached two
-recorded coefficient caps and has no candidate/rho price. These are complete
+source targets solved and 717 still open. Three degree-peeling 32-bit
+coefficient-cap attempts have no candidate/rho price. A separately frozen
+[Markowitz-priority study](../../research/pencil_markowitz_20261022/REPORT.md)
+reached a fourth 32-bit coefficient cap; it also has a null candidate/rho
+ratio and does not add a distinct solved target. These are complete
 cold logical-cost-model prices for completed targets; isolated wall time and
 a fastest-external-tool runtime comparison were not measured.
 
