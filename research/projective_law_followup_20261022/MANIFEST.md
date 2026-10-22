@@ -43,6 +43,15 @@ direct arm grid and cold-phase breakdown. The plotting/layout-only command
 graphs and three-page PDF. A packaged PDF and graphs appear under
 `reports/run-20261022T0547Z/` for independent review.
 
+The later proof audit is described separately in `PROOF_AUDIT.md`. From
+the repository root, build `--bin projective-proof-audit` with the same
+manifest and run the binary with stdout redirected to
+`results/proof-audit-20261022.jsonl`. It reads the 42 committed model
+receipts and uses deterministic seeds recorded per output row. The
+existing arithmetic-gate output was regenerated and byte-compared with
+the frozen `results/arithmetic-branches.jsonl`; the implementation's
+behavior and collector records were not changed by this audit.
+
 `SHA256SUMS` gives hashes for all tracked study inputs, code, records,
 summaries, graphs, PDF, and run package. Verify it from the study directory
 with `sha256sum -c SHA256SUMS`.

@@ -27,6 +27,11 @@ is complete for arbitrary curves or divisors cannot be made from those runs.
   exceptional 2+2 cases, 1,680 doubles, and 21,504 consecutive additions
   against independent Cantor arithmetic. The [native validator](../research/projective_law_followup_20261022/results/independent-validation.json)
   recomputed 576 arm/size/price cells and cold-phase sums.
+- **Observed, 2026-10-22 proof audit:** A deterministic [42-model finite audit](../research/projective_law_followup_20261022/PROOF_AUDIT.md)
+  compared 1,020,000 sampled 2+2 and 204,000 sampled 1+2 weighted
+  additions with Cantor arithmetic. No mismatch or unresolved return was
+  observed. The audit also records five algebraic branch-selection lemmas;
+  output-formula identities remain unproved.
 - **Derived or proved:** For a quintic with leading coefficient L and x^4 coefficient a4, `x=L*u-a4/(5L)` and `y=L^3*v` give a monic quintic without u^4 when L and 5 are invertible. All 42 finite fields meet these conditions in the executed gate.
 - **Suspected explanation:** None needed for the measured cost. Branch behavior
   outside the tested finite cases remains a proof obligation.
@@ -80,3 +85,9 @@ source-verified all 1,260 original targets, with independent 36-cell pricing.
 The measured-cohort and integration gaps are closed. Universal completeness
 of the implemented law remains unproved, as stated in the
 [follow-up report](../research/projective_law_followup_20261022/REPORT.md).
+
+2026-10-22: All 42 mapped models received the additional finite audit.
+Five branch-selection conditions were discharged
+algebraically for valid reduced inputs in the linked proof audit. No
+counterexample to the implemented law was found. The universal
+output-formula proof remains open.

@@ -30,10 +30,10 @@ const PRIMES: [u64; 21] = [
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub(crate) struct D1 {
-    x: u64,
-    y: u64,
-    z: u64,
-    w: u64,
+    pub(crate) x: u64,
+    pub(crate) y: u64,
+    pub(crate) z: u64,
+    pub(crate) w: u64,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub(crate) enum ResultPoint {
@@ -460,7 +460,7 @@ fn transform(poly: &[u64], alpha: u64, beta: u64, scale: u64, f: &Field) -> Vec<
     }
     out
 }
-fn normal_curve(p: u64) -> Jacobian {
+pub(crate) fn normal_curve(p: u64) -> Jacobian {
     let s = Scholten::new(p);
     let old = &s.j.polynomial;
     let lead = old[5];
@@ -705,7 +705,7 @@ fn add22_weighted_common(a: [u64; 6], b: [u64; 6], f: &Field) -> Option<ResultPo
     ]))
 }
 
-fn weight_degree_two(d: Divisor, z: u64, w: u64, f: &Field) -> [u64; 6] {
+pub(crate) fn weight_degree_two(d: Divisor, z: u64, w: u64, f: &Field) -> [u64; 6] {
     assert_eq!(d.degree, 2);
     let z2 = f.sq(z);
     let z3 = f.mul(z2, z);
@@ -825,7 +825,7 @@ fn double22_weighted(a: [u64; 6], curve: &[u64], f: &Field) -> (ResultPoint, &'s
     double22_weighted_variant(a, curve, f, true)
 }
 
-fn add12_weighted_complete(
+pub(crate) fn add12_weighted_complete(
     a: D1,
     b: [u64; 6],
     curve: &[u64],
@@ -893,7 +893,7 @@ fn add_point_to_result(
 // All direct 2+2 branches in weighted coordinates. A shared-support positive
 // branch composes the already checked 1+2 generic formula; if its secondary
 // support also coincides, None records that unresolved exception explicitly.
-fn add22_weighted(
+pub(crate) fn add22_weighted(
     a: [u64; 6],
     b: [u64; 6],
     curve: &[u64],
