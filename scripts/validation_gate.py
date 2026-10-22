@@ -367,7 +367,14 @@ def benchmark_groups(text: str) -> dict[str, str]:
     """Row text by directory; a directory listed on several rows is judged as one unit."""
     out: dict[str, str] = {}
     for d, line in benchmark_rows(text):
-        out[d] = (out[d] + "\n" if d in out else "") + line.strip()
+        normalized = line.strip()
+        # Exact duplicate rows occasionally occur in the historical table. They
+        # represent one archived statement and should not require the archive to
+        # encode the same text twice (which the one-record-per-directory schema
+        # cannot express).
+        existing = out.get(d, "").split("\n") if d in out else []
+        if normalized not in existing:
+            out[d] = (out[d] + "\n" if d in out else "") + normalized
     return out
 
 

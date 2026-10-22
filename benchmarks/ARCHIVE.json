@@ -2,26 +2,25 @@
   "schema": "validation-gate-archive/v1",
   "rows": [
     {
-      "directory": "20261020-ic-oracle-setup-blocked",
-      "row": "| 2026-10-20 | [`20261020-ic-oracle-setup-blocked`](20261020-ic-oracle-setup-blocked/) | ecbench `ic.pipeline` oracle set-up (the negation-folded \\|F\\|² pair table), three builders of the same table: `mitm:negation_folded=1` (scalar), `mitm-prime-batch` (batched inversion) and the new `mitm-prime-blocked` (batched, packed cache-sized regions); `prime-abscissa:size=N`, N = 1,024 to 16,384, `incremental-gauss`, on registered `icv1-fp32-t7319-90da43e9` against `rho.negation`; 592 measured runs + 128 warmups (all 720 records verified), audits OK (30 exact replays); an interrupted first session B (27 records) kept | 456/456 executions identical across the builders, so S unchanged and tied across the §5a band; set-up wall blocked/batched 0.47 (N = 1,024) to 0.24 (16,384), blocked/scalar 0.25 to 0.12–0.13 (224 s → 28.2 s at 16,384), at about half the peak RSS (descriptive, L1); gap to rho unchanged, 33.0× at best (N = 1,024); engineering, a component speed-up | 4 vCPU Xeon 2.80 GHz VM, `ecbench run --cpus auto`, IC runs mostly L1 (hypervisor steal), rho L2 | [`research/ic_oracle_setup_blocked_20261020`](../research/ic_oracle_setup_blocked_20261020/README.md) ([PDF](20261020-ic-oracle-setup-blocked/REPORT.pdf)) |",
-      "sha256": "1b0ee0074ad7e9b1fd001974f50a71fba61474ee0398c7eff1d981c5c44b3017",
-      "disposition": "incomplete",
-      "reason": "The run has session audit receipts and sampled exact replays, but no gate-format independent replay certificate, independent headline recomputation, or matched-rho GAE-band validation. Keep the engineering observation in the research archive; it is not an admitted benchmark result.",
+      "directory": "20261014-ic-program-paper",
+      "row": "| 2026-10-14 | [`20261014-ic-program-paper`](20261014-ic-program-paper/) | figures of the index-calculus programme paper (no new measurement): commit activity, root-finding vs Gröbner, Koblitz n=13 loop progression, cold IC/rho gaps, Koblitz online ladder, D4 at k=4 and PKM tower, engine ratios | root finding 383–1,535× (binary vs matrix F4) and 3,021–5,802× (NIST vs Buchberger) per decomposition, 50–105× end to end vs msolve; best complete Koblitz n=13 IC S 38.82 → 22.97, 1.55× strong rho; D4 cuts C4 47.5–48.4×; admitted n=61 online 13.94× [9.81, 19.13] vs rho without a table, retired (preprocessing rho with equal advice 53–317× faster); genus-3 after cubic GHS about q^1.4 vs rho q^1.5, 1.15× a measured negation-map rho at q = 2^20 after round 2, a further 0.44× in rounds 3–4 not yet matched against rho; k=4 over F_(2^m)^4 6.1× rho at n ≈ 2^56, closing as n^(−1/4), crossover extrapolated near 2^68; n=83 online points retired (precomputed rho wins every matched pair); every cold IC arm above matched rho (updated 2026-10-20) | values as recorded in the cited studies | [`papers/ecdlp-index-calculus-program`](../papers/ecdlp-index-calculus-program/) ([paper PDF](20261014-ic-program-paper/paper.pdf)) |",
+      "sha256": "6d9b7d5d5dacbed4fa0e20823fd9ab34004c0dd0d473c8da252c7b3f34f8be17",
+      "disposition": "documentary",
+      "reason": "This is a synthesis of previously committed studies and explicitly reports no new measurement. It is retained as a documentary archive entry, not as an admitted benchmark measurement.",
       "provenance": [
-        "research/ic_oracle_setup_blocked_20261020/README.md",
-        "research/ic_oracle_setup_blocked_20261020/RESULT.json"
+        "papers/ecdlp-index-calculus-program/README.md",
+        "papers/ecdlp-index-calculus-program/figures/data.json"
       ]
     },
     {
-      "directory": "20261019-ic-matched-rho-v8",
-      "row": "| 2026-10-19 | [`20261019-ic-matched-rho-v8`](20261019-ic-matched-rho-v8/) | Rule's single-target comparison at v8, six Table A Koblitz curves (log2 r 36.6 to 47.2), 64 targets a size, 408 rows a run; two runs of one binary: rho with batched GFNI signed-Frobenius canonicalisation (matched) vs rho as at rule v7 (control); cold and online wall time | cold IC/rho with matched rho 4.67 [4.34, 5.07], 5.70, 7.07, 11.75, 10.65, 18.07 [15.98, 20.58] (control 3.59 to 11.56); matched/control 1.30 to 1.58; rho online 1.42 to 1.62× faster; same walks on 64/64 targets; IC online v8/v8c 0.976 to 1.033; slope of ln cold ratio on ln r 0.168 [0.128, 0.208] matched, 0.141 control (v3 0.176); no curve of log2 r ≥ 50 runnable (largest 47.21); class: engineering (rho kernel), accounting (larger distance), no advance | Emerald Rapids container (family 6 model 207), isolated_bench --cpus 2 | [`research/ic_tool_program/rule/v8`](../research/ic_tool_program/rule/v8/) · [report](20261019-ic-matched-rho-v8/report.pdf) |",
-      "sha256": "4e697af126d31b8eff8aa8b8912b1a89fbfc24854fe907ede5aff1b75f0733b1",
+      "directory": "20261016-isogeny-round5",
+      "row": "| 2026-10-16 | [`20261016-isogeny-round5`](20261016-isogeny-round5/) | isogeny_algos optimisation round 5: multi-prime NTT for long products over multi-limb prime fields (1/2/4/8 limbs), shared q-series for Φ_ℓ, lazy squarings, sliding-window polynomial powers, table reducer to 160 coefficients, BMSS linear-algebra loop fix; SEA over 2^127 − 1 profiled per phase; full benchmark suite main vs branch, min of two runs per arm | NTT 10–11× Karatsuba at n = 8192 (2/4 limbs), bit-identical output; Φ_ℓ for ℓ ≤ 89 over 2^127 − 1 9.4–9.6 s → 2.3 s (4.1×); SEA point count 2^127 − 1 1.14× geomean (0.82–1.42); BMSS linear algebra ℓ = 101 40/64/52× (40/256/511-bit); Kohel ℓ = 1009 2.0–2.4×; CSIDH-512, √élu, kernel/find groups unchanged; 148/148 tests | 4 vCPU shared VM, one run per profile, min of two per suite arm, L0 wall | [`isogeny_algos/docs/round5-20261016`](../isogeny_algos/docs/round5-20261016/REPORT.md) ([PDF](20261016-isogeny-round5/REPORT.pdf)) |",
+      "sha256": "269663361049d7e14a52b5a8f3dd81b317b563e27bb1558e0d14a384843963cf",
       "disposition": "incomplete",
-      "reason": "The study contains run and replay artifacts, but the gate-format independent headline recomputation and protocol-matched rho reference band have not been recorded. Its inadmissible control remains explicitly qualified.",
+      "reason": "The row has no gate-format independent replay certificate, independent headline recomputation, or matched-rho GAE-band validation, and its digest differs from the pre-gate freeze. Preserve its historical wording and study artifacts outside the admitted results table.",
       "provenance": [
-        "research/ic_tool_program/rule/v8/README.md",
-        "research/ic_tool_program/rule/v8/PROTOCOL.md",
-        "research/ic_tool_program/rule/v8/matched.json"
+        "isogeny_algos/docs/round5-20261016/REPORT.md",
+        "benchmarks/20261016-isogeny-round5/REPORT.pdf"
       ]
     },
     {
@@ -37,14 +36,15 @@
       ]
     },
     {
-      "directory": "20261014-ic-program-paper",
-      "row": "| 2026-10-14 | [`20261014-ic-program-paper`](20261014-ic-program-paper/) | figures of the index-calculus programme paper (no new measurement): commit activity, root-finding vs Gröbner, Koblitz n=13 loop progression, cold IC/rho gaps, Koblitz online ladder, D4 at k=4 and PKM tower, engine ratios | root finding 383–1,535× (binary vs matrix F4) and 3,021–5,802× (NIST vs Buchberger) per decomposition, 50–105× end to end vs msolve; best complete Koblitz n=13 IC S 38.82 → 22.97, 1.55× strong rho; D4 cuts C4 47.5–48.4×; admitted n=61 online 13.94× [9.81, 19.13] vs rho without a table, retired (preprocessing rho with equal advice 53–317× faster); genus-3 after cubic GHS about q^1.4 vs rho q^1.5, 1.15× a measured negation-map rho at q = 2^20 after round 2, a further 0.44× in rounds 3–4 not yet matched against rho; k=4 over F_(2^m)^4 6.1× rho at n ≈ 2^56, closing as n^(−1/4), crossover extrapolated near 2^68; n=83 online points retired (precomputed rho wins every matched pair); every cold IC arm above matched rho (updated 2026-10-20) | values as recorded in the cited studies | [`papers/ecdlp-index-calculus-program`](../papers/ecdlp-index-calculus-program/) ([paper PDF](20261014-ic-program-paper/paper.pdf)) |",
-      "sha256": "6d9b7d5d5dacbed4fa0e20823fd9ab34004c0dd0d473c8da252c7b3f34f8be17",
-      "disposition": "documentary",
-      "reason": "This is a synthesis of previously committed studies and explicitly reports no new measurement. It is retained as a documentary archive entry, not as an admitted benchmark measurement.",
+      "directory": "20261019-ic-matched-rho-v8",
+      "row": "| 2026-10-19 | [`20261019-ic-matched-rho-v8`](20261019-ic-matched-rho-v8/) | Rule's single-target comparison at v8, six Table A Koblitz curves (log2 r 36.6 to 47.2), 64 targets a size, 408 rows a run; two runs of one binary: rho with batched GFNI signed-Frobenius canonicalisation (matched) vs rho as at rule v7 (control); cold and online wall time | cold IC/rho with matched rho 4.67 [4.34, 5.07], 5.70, 7.07, 11.75, 10.65, 18.07 [15.98, 20.58] (control 3.59 to 11.56); matched/control 1.30 to 1.58; rho online 1.42 to 1.62× faster; same walks on 64/64 targets; IC online v8/v8c 0.976 to 1.033; slope of ln cold ratio on ln r 0.168 [0.128, 0.208] matched, 0.141 control (v3 0.176); no curve of log2 r ≥ 50 runnable (largest 47.21); class: engineering (rho kernel), accounting (larger distance), no advance | Emerald Rapids container (family 6 model 207), isolated_bench --cpus 2 | [`research/ic_tool_program/rule/v8`](../research/ic_tool_program/rule/v8/) · [report](20261019-ic-matched-rho-v8/report.pdf) |",
+      "sha256": "4e697af126d31b8eff8aa8b8912b1a89fbfc24854fe907ede5aff1b75f0733b1",
+      "disposition": "incomplete",
+      "reason": "The study contains run and replay artifacts, but the gate-format independent headline recomputation and protocol-matched rho reference band have not been recorded. Its inadmissible control remains explicitly qualified.",
       "provenance": [
-        "papers/ecdlp-index-calculus-program/README.md",
-        "papers/ecdlp-index-calculus-program/figures/data.json"
+        "research/ic_tool_program/rule/v8/README.md",
+        "research/ic_tool_program/rule/v8/PROTOCOL.md",
+        "research/ic_tool_program/rule/v8/matched.json"
       ]
     },
     {
@@ -57,6 +57,17 @@
         "research/pdp_split_slots_20261012/README.md",
         "research/pdp_split_slots_20261012/ANALYSIS.json",
         "research/pdp_split_slots_20261012/PROTOCOL.md"
+      ]
+    },
+    {
+      "directory": "20261020-ic-oracle-setup-blocked",
+      "row": "| 2026-10-20 | [`20261020-ic-oracle-setup-blocked`](20261020-ic-oracle-setup-blocked/) | ecbench `ic.pipeline` oracle set-up (the negation-folded \\|F\\|² pair table), three builders of the same table: `mitm:negation_folded=1` (scalar), `mitm-prime-batch` (batched inversion) and the new `mitm-prime-blocked` (batched, packed cache-sized regions); `prime-abscissa:size=N`, N = 1,024 to 16,384, `incremental-gauss`, on registered `icv1-fp32-t7319-90da43e9` against `rho.negation`; 592 measured runs + 128 warmups (all 720 records verified), audits OK (30 exact replays); an interrupted first session B (27 records) kept | 456/456 executions identical across the builders, so S unchanged and tied across the §5a band; set-up wall blocked/batched 0.47 (N = 1,024) to 0.24 (16,384), blocked/scalar 0.25 to 0.12–0.13 (224 s → 28.2 s at 16,384), at about half the peak RSS (descriptive, L1); gap to rho unchanged, 33.0× at best (N = 1,024); engineering, a component speed-up | 4 vCPU Xeon 2.80 GHz VM, `ecbench run --cpus auto`, IC runs mostly L1 (hypervisor steal), rho L2 | [`research/ic_oracle_setup_blocked_20261020`](../research/ic_oracle_setup_blocked_20261020/README.md) ([PDF](20261020-ic-oracle-setup-blocked/REPORT.pdf)) |",
+      "sha256": "1b0ee0074ad7e9b1fd001974f50a71fba61474ee0398c7eff1d981c5c44b3017",
+      "disposition": "incomplete",
+      "reason": "The run has session audit receipts and sampled exact replays, but no gate-format independent replay certificate, independent headline recomputation, or matched-rho GAE-band validation. Keep the engineering observation in the research archive; it is not an admitted benchmark result.",
+      "provenance": [
+        "research/ic_oracle_setup_blocked_20261020/README.md",
+        "research/ic_oracle_setup_blocked_20261020/RESULT.json"
       ]
     }
   ]
