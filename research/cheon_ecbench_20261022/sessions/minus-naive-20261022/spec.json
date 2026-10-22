@@ -1,0 +1,98 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "cheon-ecbench minus, naive: matched rho and Cheon n-1 with a full double-and-add per step (the algorithm of cheon_attack.rs), 32 to 52 bits",
+  "description": "research/cheon_ecbench_20261022/PROTOCOL.md section 3. The 56-bit curve is left out of this session (1.9e9 operations a target, about 8 minutes each; a timing probe, section 3). Queries are counters.oracle_queries, outside the unit.",
+  "workloads": {
+    "curves": [
+      {
+        "a": 1276370223,
+        "b": 3125933284,
+        "group_order": 3221255537,
+        "gx": 2,
+        "gy": 433123184,
+        "kind": "prime_explicit",
+        "p": 3221225473,
+        "r": 3221255537
+      },
+      {
+        "a": 42839962887,
+        "b": 20874427050,
+        "group_order": 51539573731,
+        "gx": 1,
+        "gy": 6673236750,
+        "kind": "prime_explicit",
+        "p": 51539607599,
+        "r": 51539573731
+      },
+      {
+        "a": 631256874754,
+        "b": 396321534139,
+        "group_order": 824632004309,
+        "gx": 1,
+        "gy": 358987552726,
+        "kind": "prime_explicit",
+        "p": 824633720837,
+        "r": 824632004309
+      },
+      {
+        "a": 4446846082295,
+        "b": 8537060969387,
+        "group_order": 13194139832747,
+        "gx": 1,
+        "gy": 2639664229832,
+        "kind": "prime_explicit",
+        "p": 13194139533349,
+        "r": 13194139832747
+      },
+      {
+        "a": 39641408782314,
+        "b": 41864005889039,
+        "group_order": 211106219695673,
+        "gx": 6,
+        "gy": 47249795888303,
+        "kind": "prime_explicit",
+        "p": 211106232533047,
+        "r": 211106219695673
+      },
+      {
+        "a": 1295299755018450,
+        "b": 2616635297825668,
+        "group_order": 3377699780661797,
+        "gx": 1,
+        "gy": 36869105830282,
+        "kind": "prime_explicit",
+        "p": 3377699720527897,
+        "r": 3377699780661797
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261022
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "cheon-naive",
+      "role": "baseline",
+      "method": {
+        "id": "cheon.pminus1_naive",
+        "params": {
+          "d": "shape:0.12943:0.015"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 1,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  }
+}

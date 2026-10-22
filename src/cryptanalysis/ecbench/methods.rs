@@ -1258,7 +1258,7 @@ fn solve_cheon(
     let plus = m.id == "cheon.pplus1_comb";
     let side = if plus { Side::Plus } else { Side::Minus };
     let d = cheon_d(m, n, side)?;
-    if d < 1 || d > (1 << 24) {
+    if !(1..=(1 << 24)).contains(&d) {
         return Err(format!(
             "d = {d} is outside 1..2^24 (the leaked powers are held in memory)"
         ));

@@ -14,42 +14,60 @@
     "ECBND1h242c8c9495a1",
     "ECBND1h25ac58612850",
     "ECBND1h2eb0cf5648a1",
+    "ECBND1h2fdaa885bf06",
     "ECBND1h3271f30a876a",
     "ECBND1h36247411dca1",
+    "ECBND1h3b205a6d0540",
     "ECBND1h412ef80d6c1a",
     "ECBND1h435dff125a94",
     "ECBND1h46fbc9140ac3",
     "ECBND1h4bf964dff427",
+    "ECBND1h5c49604db60e",
     "ECBND1h63df4ec3d936",
     "ECBND1h65b55d17b35c",
     "ECBND1h7a905c0d78e4",
     "ECBND1h7b69b9787056",
+    "ECBND1h7ccf77f32c59",
     "ECBND1h7ec91aa7b4a8",
     "ECBND1h7edffa0407e6",
     "ECBND1h7f1d4d59799f",
     "ECBND1h83091af19aee",
     "ECBND1h8406f3255acf",
     "ECBND1h8a535b61cad3",
+    "ECBND1h952774e21c83",
     "ECBND1h9834244fe7f6",
+    "ECBND1h99cf9dff484c",
     "ECBND1h9d3beb6852c6",
     "ECBND1h9db4ac1ad04e",
     "ECBND1ha2a17b22c9c0",
     "ECBND1ha6fbf0c678d0",
+    "ECBND1ha7a3cdc54301",
+    "ECBND1hb4ad379d43d8",
     "ECBND1hb4b4be548e88",
+    "ECBND1hba196f5d2859",
+    "ECBND1hbab44fbc5232",
     "ECBND1hbab6d6dc37fc",
     "ECBND1hbc8602528f48",
     "ECBND1hc0f4d1ce156a",
+    "ECBND1hc107cc81f0b3",
     "ECBND1hc2936a598d20",
+    "ECBND1hc2cfee03ebf6",
     "ECBND1hc58599b47139",
+    "ECBND1hc7f1fc29171b",
+    "ECBND1hcc568213272c",
     "ECBND1hce4cbf18c091",
+    "ECBND1hce4f9adaff6b",
     "ECBND1hcf67af806cc5",
     "ECBND1hd392c8f42bb0",
+    "ECBND1hd4cfe6663583",
     "ECBND1hd53ee4aa6eb3",
     "ECBND1hdb2a8a16cc26",
+    "ECBND1he00f1952b198",
     "ECBND1he0aea8671f10",
     "ECBND1he508a84e4e20",
     "ECBND1he8163c29cc39",
-    "ECBND1he836821517fb"
+    "ECBND1he836821517fb",
+    "ECBND1heb8f0d5c8a05"
   ],
   "domains": [
     {
@@ -1709,6 +1727,982 @@
     {
       "axes": [
         "ops",
+        "memory",
+        "oracle_queries"
+      ],
+      "domain": {
+        "envelope": {
+          "oracle": "static_dh:n-1:d=shape(0.12943,0.015)",
+          "precomputation": "none",
+          "targets": 1,
+          "threads": 1
+        },
+        "family": "prime",
+        "problem": "ecdlp.single_target",
+        "target_kind": "planted",
+        "tier": "medium",
+        "unit": "ecbench.gae+band(w=0.1)"
+      },
+      "domain_id": "ECDOM1h8817bf314e4f",
+      "entries": [
+        {
+          "alpha": 0.448137903804062,
+          "alpha_ci95": [
+            0.40459296287304086,
+            0.47060017129064974
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.4474883804018849,
+                0.7178353375198633
+              ],
+              "known": true,
+              "value": 0.5739107759707482
+            },
+            "field_muls": {
+              "ci95": [
+                0.909698094749568,
+                1.424855788512494
+              ],
+              "known": true,
+              "value": 1.148481805359404
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.4533527994836197,
+                0.7157112016968724
+              ],
+              "known": true,
+              "value": 0.574130860443384
+            },
+            "memory": {
+              "ci95": [
+                0.09353875788214748,
+                0.21453110414750456
+              ],
+              "known": true,
+              "value": 0.14900807299667293
+            },
+            "ops": {
+              "ci95": [
+                0.5434366722957658,
+                0.8733766046170917
+              ],
+              "known": true,
+              "value": 0.6902058713402898
+            },
+            "oracle_queries": {
+              "ci95": [
+                5.214966630638831e-6,
+                0.0000710365559707057
+              ],
+              "known": true,
+              "value": 0.00003084316314662998
+            },
+            "uncharged": {
+              "ci95": [
+                0.26220526454588594,
+                0.5032613874441815
+              ],
+              "known": true,
+              "value": 0.37768251316598533
+            }
+          },
+          "bound_id": "ECBND1h99cf9dff484c",
+          "bounded": true,
+          "declared_alpha": null,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "cheon.pminus1_comb on the n-1 shaped curves-w0.1",
+          "level": "exponent",
+          "log2_r": [
+            35.5849615540045,
+            39.584959497664485,
+            43.584962533462466,
+            47.58496241299122,
+            51.58496252640577,
+            55.58496249668622
+          ],
+          "method": "cheon.pminus1_comb",
+          "method_id": "ECM1he9fc05bb2b2b",
+          "params": {
+            "d": "shape:0.12943:0.015"
+          },
+          "runs": 48,
+          "scaling_claim": true
+        },
+        {
+          "alpha": 0.49632372416093506,
+          "alpha_ci95": [
+            0.4307982150596263,
+            0.6107256966417473
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.7448693084462872,
+                1.2484679037011237
+              ],
+              "known": true,
+              "value": 0.9871650926626284
+            },
+            "field_muls": {
+              "ci95": [
+                1.5144811514396894,
+                2.4931092482656667
+              ],
+              "known": true,
+              "value": 1.978306122843411
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.74174427005558,
+                1.2476079364558856
+              ],
+              "known": true,
+              "value": 0.9884904051686796
+            },
+            "memory": {
+              "ci95": [
+                0.00017538370937544747,
+                0.0013919303288053603
+              ],
+              "known": true,
+              "value": 0.0006476327428920106
+            },
+            "ops": {
+              "ci95": [
+                0.9310480384652092,
+                1.5491557734807626
+              ],
+              "known": true,
+              "value": 1.2252405477965782
+            },
+            "oracle_queries": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            },
+            "uncharged": {
+              "ci95": [
+                0.7460332218577888,
+                1.2337901503687227
+              ],
+              "known": true,
+              "value": 0.98676070951186
+            }
+          },
+          "bound_id": "ECBND1hd4cfe6663583",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.negation on the n-1 shaped curves (reference, queries nothing)-w0.1",
+          "level": "exponent",
+          "log2_r": [
+            35.5849615540045,
+            39.584959497664485,
+            43.584962533462466,
+            47.58496241299122,
+            51.58496252640577,
+            55.58496249668622
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 48,
+          "scaling_claim": true
+        },
+        {
+          "alpha": 0.523623334690647,
+          "alpha_ci95": [
+            0.4169522734837078,
+            0.6847487237958542
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.7827725492237623,
+                1.3194485776250895
+              ],
+              "known": true,
+              "value": 1.054802031519697
+            },
+            "field_muls": {
+              "ci95": [
+                1.595314152628315,
+                2.6596786877971863
+              ],
+              "known": true,
+              "value": 2.113968956424959
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.8049085889141714,
+                1.313921097850553
+              ],
+              "known": true,
+              "value": 1.056256995981552
+            },
+            "memory": {
+              "ci95": [
+                0.00024006336578664028,
+                0.001632524826493407
+              ],
+              "known": true,
+              "value": 0.0007702240453842723
+            },
+            "ops": {
+              "ci95": [
+                0.9947508380647044,
+                1.6459477335760135
+              ],
+              "known": true,
+              "value": 1.309183592169465
+            },
+            "oracle_queries": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            },
+            "uncharged": {
+              "ci95": [
+                0.7895933817541289,
+                1.316515837403722
+              ],
+              "known": true,
+              "value": 1.0543171822184514
+            }
+          },
+          "bound_id": "ECBND1h5c49604db60e",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.negation beside cheon.pminus1_naive (36 to 52 bits)-w0.1",
+          "level": "exponent",
+          "log2_r": [
+            35.5849615540045,
+            39.584959497664485,
+            43.584962533462466,
+            47.58496241299122,
+            51.58496252640577
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 40,
+          "scaling_claim": true
+        },
+        {
+          "alpha": 0.4413556989550312,
+          "alpha_ci95": [
+            0.38731534668594114,
+            0.49619794175581033
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                9.613618784552669,
+                15.010457794838908
+              ],
+              "known": true,
+              "value": 12.242619090615316
+            },
+            "field_muls": {
+              "ci95": [
+                37.46959479320088,
+                59.43128772626561
+              ],
+              "known": true,
+              "value": 49.03772675028126
+            },
+            "field_sqrs": {
+              "ci95": [
+                15.670673458590338,
+                24.959750445133217
+              ],
+              "known": true,
+              "value": 20.426781946965537
+            },
+            "memory": {
+              "ci95": [
+                0.104461144235177,
+                0.17408560038001822
+              ],
+              "known": true,
+              "value": 0.13991208676895686
+            },
+            "ops": {
+              "ci95": [
+                10.650715308758755,
+                16.98733416469388
+              ],
+              "known": true,
+              "value": 13.860730514060217
+            },
+            "oracle_queries": {
+              "ci95": [
+                6.655427330787235e-6,
+                0.00008334773052350353
+              ],
+              "known": true,
+              "value": 0.00003683198911669057
+            },
+            "uncharged": {
+              "ci95": [
+                0.28819983554762046,
+                0.5388711351026736
+              ],
+              "known": true,
+              "value": 0.41133497389486734
+            }
+          },
+          "bound_id": "ECBND1h3b205a6d0540",
+          "bounded": true,
+          "declared_alpha": null,
+          "dominance_notes": [
+            "ECBND1h5c49604db60e (rho.negation) is clearly better on ops, memory, oracle_queries",
+            "ECBND1hd4cfe6663583 (rho.negation) is clearly better on ops, memory, oracle_queries"
+          ],
+          "dominated_by": [
+            "ECBND1h5c49604db60e",
+            "ECBND1hd4cfe6663583"
+          ],
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "cheon.pminus1_naive on the n-1 shaped curves-w0.1",
+          "level": "exponent",
+          "log2_r": [
+            35.5849615540045,
+            39.584959497664485,
+            43.584962533462466,
+            47.58496241299122,
+            51.58496252640577
+          ],
+          "method": "cheon.pminus1_naive",
+          "method_id": "ECM1he0fc20dbd5e9",
+          "params": {
+            "d": "shape:0.12943:0.015"
+          },
+          "runs": 40,
+          "scaling_claim": true
+        }
+      ],
+      "floor_model": "S_floor = sqrt(pi / 2A), A the usable automorphisms; ops = S / S_floor",
+      "memory_leader": "ECBND1hd4cfe6663583",
+      "ops_leader": "ECBND1h99cf9dff484c"
+    },
+    {
+      "axes": [
+        "ops",
+        "memory",
+        "oracle_queries"
+      ],
+      "domain": {
+        "envelope": {
+          "oracle": "static_dh:n-1:d=shape(0.12943,0.015)",
+          "precomputation": "none",
+          "targets": 1,
+          "threads": 1
+        },
+        "family": "prime",
+        "problem": "ecdlp.single_target",
+        "target_kind": "planted",
+        "tier": "medium",
+        "unit": "ecbench.gae"
+      },
+      "domain_id": "ECDOM1h8d05bac67097",
+      "entries": [
+        {
+          "alpha": 0.4502072720909292,
+          "alpha_ci95": [
+            0.4058768520256826,
+            0.47276604110298226
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.4474883804018849,
+                0.7178353375198633
+              ],
+              "known": true,
+              "value": 0.5739107759707482
+            },
+            "field_muls": {
+              "ci95": [
+                0.909698094749568,
+                1.424855788512494
+              ],
+              "known": true,
+              "value": 1.148481805359404
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.4533527994836197,
+                0.7157112016968724
+              ],
+              "known": true,
+              "value": 0.574130860443384
+            },
+            "memory": {
+              "ci95": [
+                0.09353875788214748,
+                0.21453110414750456
+              ],
+              "known": true,
+              "value": 0.14900807299667293
+            },
+            "ops": {
+              "ci95": [
+                0.5137358587760718,
+                0.8183420333021671
+              ],
+              "known": true,
+              "value": 0.6475889633770121
+            },
+            "oracle_queries": {
+              "ci95": [
+                5.214966630638831e-6,
+                0.0000710365559707057
+              ],
+              "known": true,
+              "value": 0.00003084316314662998
+            },
+            "uncharged": {
+              "ci95": [
+                0.26220526454588594,
+                0.5032613874441815
+              ],
+              "known": true,
+              "value": 0.37768251316598533
+            }
+          },
+          "bound_id": "ECBND1hc7f1fc29171b",
+          "bounded": true,
+          "declared_alpha": null,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "cheon.pminus1_comb on the n-1 shaped curves",
+          "level": "exponent",
+          "log2_r": [
+            35.5849615540045,
+            39.584959497664485,
+            43.584962533462466,
+            47.58496241299122,
+            51.58496252640577,
+            55.58496249668622
+          ],
+          "method": "cheon.pminus1_comb",
+          "method_id": "ECM1he9fc05bb2b2b",
+          "params": {
+            "d": "shape:0.12943:0.015"
+          },
+          "runs": 48,
+          "scaling_claim": true
+        },
+        {
+          "alpha": 0.49630892131306575,
+          "alpha_ci95": [
+            0.43078882464483753,
+            0.610697691604282
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.7448693084462872,
+                1.2484679037011237
+              ],
+              "known": true,
+              "value": 0.9871650926626284
+            },
+            "field_muls": {
+              "ci95": [
+                1.5144811514396894,
+                2.4931092482656667
+              ],
+              "known": true,
+              "value": 1.978306122843411
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.74174427005558,
+                1.2476079364558856
+              ],
+              "known": true,
+              "value": 0.9884904051686796
+            },
+            "memory": {
+              "ci95": [
+                0.00017538370937544747,
+                0.0013919303288053603
+              ],
+              "known": true,
+              "value": 0.0006476327428920106
+            },
+            "ops": {
+              "ci95": [
+                0.846445871690073,
+                1.4083851132375056
+              ],
+              "known": true,
+              "value": 1.1138965250444213
+            },
+            "oracle_queries": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            },
+            "uncharged": {
+              "ci95": [
+                0.7460332218577888,
+                1.2337901503687227
+              ],
+              "known": true,
+              "value": 0.98676070951186
+            }
+          },
+          "bound_id": "ECBND1hc107cc81f0b3",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.negation on the n-1 shaped curves (reference, queries nothing)",
+          "level": "exponent",
+          "log2_r": [
+            35.5849615540045,
+            39.584959497664485,
+            43.584962533462466,
+            47.58496241299122,
+            51.58496252640577,
+            55.58496249668622
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 48,
+          "scaling_claim": true
+        },
+        {
+          "alpha": 0.5236039718688534,
+          "alpha_ci95": [
+            0.4169309109071906,
+            0.6847184519697255
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.7827725492237623,
+                1.3194485776250895
+              ],
+              "known": true,
+              "value": 1.054802031519697
+            },
+            "field_muls": {
+              "ci95": [
+                1.595314152628315,
+                2.6596786877971863
+              ],
+              "known": true,
+              "value": 2.113968956424959
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.8049085889141714,
+                1.313921097850553
+              ],
+              "known": true,
+              "value": 1.056256995981552
+            },
+            "memory": {
+              "ci95": [
+                0.00024006336578664028,
+                0.001632524826493407
+              ],
+              "known": true,
+              "value": 0.0007702240453842723
+            },
+            "ops": {
+              "ci95": [
+                0.904377355056543,
+                1.4963993902657051
+              ],
+              "known": true,
+              "value": 1.1902166377768508
+            },
+            "oracle_queries": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            },
+            "uncharged": {
+              "ci95": [
+                0.7895933817541289,
+                1.316515837403722
+              ],
+              "known": true,
+              "value": 1.0543171822184514
+            }
+          },
+          "bound_id": "ECBND1h7ccf77f32c59",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.negation beside cheon.pminus1_naive (36 to 52 bits)",
+          "level": "exponent",
+          "log2_r": [
+            35.5849615540045,
+            39.584959497664485,
+            43.584962533462466,
+            47.58496241299122,
+            51.58496252640577
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 40,
+          "scaling_claim": true
+        },
+        {
+          "alpha": 0.4414703359059018,
+          "alpha_ci95": [
+            0.3877850779005761,
+            0.4970740428241485
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                9.613618784552669,
+                15.010457794838908
+              ],
+              "known": true,
+              "value": 12.242619090615316
+            },
+            "field_muls": {
+              "ci95": [
+                37.46959479320088,
+                59.43128772626561
+              ],
+              "known": true,
+              "value": 49.03772675028126
+            },
+            "field_sqrs": {
+              "ci95": [
+                15.670673458590338,
+                24.959750445133217
+              ],
+              "known": true,
+              "value": 20.426781946965537
+            },
+            "memory": {
+              "ci95": [
+                0.104461144235177,
+                0.17408560038001822
+              ],
+              "known": true,
+              "value": 0.13991208676895686
+            },
+            "ops": {
+              "ci95": [
+                10.618567120281089,
+                16.929369878613386
+              ],
+              "known": true,
+              "value": 13.814316332536135
+            },
+            "oracle_queries": {
+              "ci95": [
+                6.655427330787235e-6,
+                0.00008334773052350353
+              ],
+              "known": true,
+              "value": 0.00003683198911669057
+            },
+            "uncharged": {
+              "ci95": [
+                0.28819983554762046,
+                0.5388711351026736
+              ],
+              "known": true,
+              "value": 0.41133497389486734
+            }
+          },
+          "bound_id": "ECBND1hce4f9adaff6b",
+          "bounded": true,
+          "declared_alpha": null,
+          "dominance_notes": [
+            "ECBND1h7ccf77f32c59 (rho.negation) is clearly better on ops, memory, oracle_queries",
+            "ECBND1hc107cc81f0b3 (rho.negation) is clearly better on ops, memory, oracle_queries"
+          ],
+          "dominated_by": [
+            "ECBND1h7ccf77f32c59",
+            "ECBND1hc107cc81f0b3"
+          ],
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "cheon.pminus1_naive on the n-1 shaped curves",
+          "level": "exponent",
+          "log2_r": [
+            35.5849615540045,
+            39.584959497664485,
+            43.584962533462466,
+            47.58496241299122,
+            51.58496252640577
+          ],
+          "method": "cheon.pminus1_naive",
+          "method_id": "ECM1he0fc20dbd5e9",
+          "params": {
+            "d": "shape:0.12943:0.015"
+          },
+          "runs": 40,
+          "scaling_claim": true
+        }
+      ],
+      "floor_model": "S_floor = sqrt(pi / 2A), A the usable automorphisms; ops = S / S_floor",
+      "memory_leader": "ECBND1hc107cc81f0b3",
+      "ops_leader": "ECBND1hc7f1fc29171b"
+    },
+    {
+      "axes": [
+        "ops",
+        "memory",
+        "oracle_queries"
+      ],
+      "domain": {
+        "envelope": {
+          "oracle": "static_dh:n+1:d=shape(0.21106,0.015)",
+          "precomputation": "none",
+          "targets": 1,
+          "threads": 1
+        },
+        "family": "prime",
+        "problem": "ecdlp.single_target",
+        "target_kind": "planted",
+        "tier": "medium",
+        "unit": "ecbench.gae+band(w=1)"
+      },
+      "domain_id": "ECDOM1h8fd940f495eb",
+      "entries": [
+        {
+          "alpha": 0.42493177456509496,
+          "alpha_ci95": [
+            0.3897789168680288,
+            0.4552962878265193
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.42537734296596225,
+                0.7498275017441387
+              ],
+              "known": true,
+              "value": 0.5818646643060811
+            },
+            "field_muls": {
+              "ci95": [
+                0.8826712020479184,
+                1.6921565228796558
+              ],
+              "known": true,
+              "value": 1.2607508072840228
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.4370248950552321,
+                0.8119405678160173
+              ],
+              "known": true,
+              "value": 0.6142051571967012
+            },
+            "memory": {
+              "ci95": [
+                0.029449945426109236,
+                0.13646438345586165
+              ],
+              "known": true,
+              "value": 0.07053050229804453
+            },
+            "ops": {
+              "ci95": [
+                0.5803316576879861,
+                1.0309394388941486
+              ],
+              "known": true,
+              "value": 0.7948143744040136
+            },
+            "oracle_queries": {
+              "ci95": [
+                0.00010670034360430964,
+                0.0012340946876226644
+              ],
+              "known": true,
+              "value": 0.0005863091059254773
+            },
+            "uncharged": {
+              "ci95": [
+                0.08491408043603714,
+                0.16669795264283038
+              ],
+              "known": true,
+              "value": 0.12252121208580458
+            }
+          },
+          "bound_id": "ECBND1h952774e21c83",
+          "bounded": true,
+          "declared_alpha": null,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "cheon.pplus1_comb on the n+1 shaped curves-w1",
+          "level": "exponent",
+          "log2_r": [
+            35.58496611635515,
+            39.584961867649426,
+            43.584962227314065,
+            47.58496258554062,
+            51.58496249501846,
+            55.58496249329696
+          ],
+          "method": "cheon.pplus1_comb",
+          "method_id": "ECM1hc0c1a4267a18",
+          "params": {
+            "d": "shape:0.21106:0.015"
+          },
+          "runs": 48,
+          "scaling_claim": true
+        },
+        {
+          "alpha": 0.5132697592045361,
+          "alpha_ci95": [
+            0.3859909287791897,
+            0.6364584283824105
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.7472750946904114,
+                1.291060116064351
+              ],
+              "known": true,
+              "value": 1.0127298580918396
+            },
+            "field_muls": {
+              "ci95": [
+                1.535130468732703,
+                2.5760607523507497
+              ],
+              "known": true,
+              "value": 2.0295135459935048
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.7622509186718933,
+                1.2876128023403868
+              ],
+              "known": true,
+              "value": 1.0140811346951146
+            },
+            "memory": {
+              "ci95": [
+                0.00014363811092543314,
+                0.001160999541817291
+              ],
+              "known": true,
+              "value": 0.0005991067833134659
+            },
+            "ops": {
+              "ci95": [
+                1.6793607579686438,
+                2.912791652764477
+              ],
+              "known": true,
+              "value": 2.2850318304340655
+            },
+            "oracle_queries": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            },
+            "uncharged": {
+              "ci95": [
+                0.7568334556259911,
+                1.2990792321278442
+              ],
+              "known": true,
+              "value": 1.0123268755554302
+            }
+          },
+          "bound_id": "ECBND1hcc568213272c",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.negation on the n+1 shaped curves (reference, queries nothing)-w1",
+          "level": "exponent",
+          "log2_r": [
+            35.58496611635515,
+            39.584961867649426,
+            43.584962227314065,
+            47.58496258554062,
+            51.58496249501846,
+            55.58496249329696
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 48,
+          "scaling_claim": true
+        }
+      ],
+      "floor_model": "S_floor = sqrt(pi / 2A), A the usable automorphisms; ops = S / S_floor",
+      "memory_leader": "ECBND1hcc568213272c",
+      "ops_leader": "ECBND1h952774e21c83"
+    },
+    {
+      "axes": [
+        "ops",
         "memory"
       ],
       "domain": {
@@ -2808,9 +3802,803 @@
       "floor_model": "S_floor = sqrt(pi / 2A), A the usable automorphisms; ops = S / S_floor",
       "memory_leader": "ECBND1h412ef80d6c1a",
       "ops_leader": "ECBND1he8163c29cc39"
+    },
+    {
+      "axes": [
+        "ops",
+        "memory",
+        "oracle_queries"
+      ],
+      "domain": {
+        "envelope": {
+          "oracle": "static_dh:n+1:d=shape(0.21106,0.015)",
+          "precomputation": "none",
+          "targets": 1,
+          "threads": 1
+        },
+        "family": "prime",
+        "problem": "ecdlp.single_target",
+        "target_kind": "planted",
+        "tier": "medium",
+        "unit": "ecbench.gae"
+      },
+      "domain_id": "ECDOM1hda52cee5db35",
+      "entries": [
+        {
+          "alpha": 0.4276232260494994,
+          "alpha_ci95": [
+            0.3885456855360758,
+            0.46015491783676327
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.42537734296596225,
+                0.7498275017441387
+              ],
+              "known": true,
+              "value": 0.5818646643060811
+            },
+            "field_muls": {
+              "ci95": [
+                0.8826712020479184,
+                1.6921565228796558
+              ],
+              "known": true,
+              "value": 1.2607508072840228
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.4370248950552321,
+                0.8119405678160173
+              ],
+              "known": true,
+              "value": 0.6142051571967012
+            },
+            "memory": {
+              "ci95": [
+                0.029449945426109236,
+                0.13646438345586165
+              ],
+              "known": true,
+              "value": 0.07053050229804453
+            },
+            "ops": {
+              "ci95": [
+                0.4834228658293667,
+                0.8454028589463813
+              ],
+              "known": true,
+              "value": 0.656563991159101
+            },
+            "oracle_queries": {
+              "ci95": [
+                0.00010670034360430964,
+                0.0012340946876226644
+              ],
+              "known": true,
+              "value": 0.0005863091059254773
+            },
+            "uncharged": {
+              "ci95": [
+                0.08491408043603714,
+                0.16669795264283038
+              ],
+              "known": true,
+              "value": 0.12252121208580458
+            }
+          },
+          "bound_id": "ECBND1hbab44fbc5232",
+          "bounded": true,
+          "declared_alpha": null,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "cheon.pplus1_comb on the n+1 shaped curves",
+          "level": "exponent",
+          "log2_r": [
+            35.58496611635515,
+            39.584961867649426,
+            43.584962227314065,
+            47.58496258554062,
+            51.58496249501846,
+            55.58496249329696
+          ],
+          "method": "cheon.pplus1_comb",
+          "method_id": "ECM1hc0c1a4267a18",
+          "params": {
+            "d": "shape:0.21106:0.015"
+          },
+          "runs": 48,
+          "scaling_claim": true
+        },
+        {
+          "alpha": 0.5132022246777962,
+          "alpha_ci95": [
+            0.3858764988463148,
+            0.6364447766812121
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.7472750946904114,
+                1.291060116064351
+              ],
+              "known": true,
+              "value": 1.0127298580918396
+            },
+            "field_muls": {
+              "ci95": [
+                1.535130468732703,
+                2.5760607523507497
+              ],
+              "known": true,
+              "value": 2.0295135459935048
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.7622509186718933,
+                1.2876128023403868
+              ],
+              "known": true,
+              "value": 1.0140811346951146
+            },
+            "memory": {
+              "ci95": [
+                0.00014363811092543314,
+                0.001160999541817291
+              ],
+              "known": true,
+              "value": 0.0005991067833134659
+            },
+            "ops": {
+              "ci95": [
+                0.8397381744808142,
+                1.456767229652389
+              ],
+              "known": true,
+              "value": 1.142743273766427
+            },
+            "oracle_queries": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            },
+            "uncharged": {
+              "ci95": [
+                0.7568334556259911,
+                1.2990792321278442
+              ],
+              "known": true,
+              "value": 1.0123268755554302
+            }
+          },
+          "bound_id": "ECBND1he00f1952b198",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.negation on the n+1 shaped curves (reference, queries nothing)",
+          "level": "exponent",
+          "log2_r": [
+            35.58496611635515,
+            39.584961867649426,
+            43.584962227314065,
+            47.58496258554062,
+            51.58496249501846,
+            55.58496249329696
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 48,
+          "scaling_claim": true
+        }
+      ],
+      "floor_model": "S_floor = sqrt(pi / 2A), A the usable automorphisms; ops = S / S_floor",
+      "memory_leader": "ECBND1he00f1952b198",
+      "ops_leader": "ECBND1hbab44fbc5232"
+    },
+    {
+      "axes": [
+        "ops",
+        "memory",
+        "oracle_queries"
+      ],
+      "domain": {
+        "envelope": {
+          "oracle": "static_dh:n+1:d=shape(0.21106,0.015)",
+          "precomputation": "none",
+          "targets": 1,
+          "threads": 1
+        },
+        "family": "prime",
+        "problem": "ecdlp.single_target",
+        "target_kind": "planted",
+        "tier": "medium",
+        "unit": "ecbench.gae+band(w=0.1)"
+      },
+      "domain_id": "ECDOM1hef860bc4dfb7",
+      "entries": [
+        {
+          "alpha": 0.427307279321282,
+          "alpha_ci95": [
+            0.3886496387680157,
+            0.4594180358445642
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.42537734296596225,
+                0.7498275017441387
+              ],
+              "known": true,
+              "value": 0.5818646643060811
+            },
+            "field_muls": {
+              "ci95": [
+                0.8826712020479184,
+                1.6921565228796558
+              ],
+              "known": true,
+              "value": 1.2607508072840228
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.4370248950552321,
+                0.8119405678160173
+              ],
+              "known": true,
+              "value": 0.6142051571967012
+            },
+            "memory": {
+              "ci95": [
+                0.029449945426109236,
+                0.13646438345586165
+              ],
+              "known": true,
+              "value": 0.07053050229804453
+            },
+            "ops": {
+              "ci95": [
+                0.4933118787089256,
+                0.863904677213661
+              ],
+              "known": true,
+              "value": 0.6703890294835922
+            },
+            "oracle_queries": {
+              "ci95": [
+                0.00010670034360430964,
+                0.0012340946876226644
+              ],
+              "known": true,
+              "value": 0.0005863091059254773
+            },
+            "uncharged": {
+              "ci95": [
+                0.08491408043603714,
+                0.16669795264283038
+              ],
+              "known": true,
+              "value": 0.12252121208580458
+            }
+          },
+          "bound_id": "ECBND1hc2cfee03ebf6",
+          "bounded": true,
+          "declared_alpha": null,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "cheon.pplus1_comb on the n+1 shaped curves-w0.1",
+          "level": "exponent",
+          "log2_r": [
+            35.58496611635515,
+            39.584961867649426,
+            43.584962227314065,
+            47.58496258554062,
+            51.58496249501846,
+            55.58496249329696
+          ],
+          "method": "cheon.pplus1_comb",
+          "method_id": "ECM1hc0c1a4267a18",
+          "params": {
+            "d": "shape:0.21106:0.015"
+          },
+          "runs": 48,
+          "scaling_claim": true
+        },
+        {
+          "alpha": 0.5132144979030332,
+          "alpha_ci95": [
+            0.3858972930859249,
+            0.6364472586117521
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.7472750946904114,
+                1.291060116064351
+              ],
+              "known": true,
+              "value": 1.0127298580918396
+            },
+            "field_muls": {
+              "ci95": [
+                1.535130468732703,
+                2.5760607523507497
+              ],
+              "known": true,
+              "value": 2.0295135459935048
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.7622509186718933,
+                1.2876128023403868
+              ],
+              "known": true,
+              "value": 1.0140811346951146
+            },
+            "memory": {
+              "ci95": [
+                0.00014363811092543314,
+                0.001160999541817291
+              ],
+              "known": true,
+              "value": 0.0005991067833134659
+            },
+            "ops": {
+              "ci95": [
+                0.9237004328295968,
+                1.6023696719635978
+              ],
+              "known": true,
+              "value": 1.2569721294331908
+            },
+            "oracle_queries": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            },
+            "uncharged": {
+              "ci95": [
+                0.7568334556259911,
+                1.2990792321278442
+              ],
+              "known": true,
+              "value": 1.0123268755554302
+            }
+          },
+          "bound_id": "ECBND1heb8f0d5c8a05",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.negation on the n+1 shaped curves (reference, queries nothing)-w0.1",
+          "level": "exponent",
+          "log2_r": [
+            35.58496611635515,
+            39.584961867649426,
+            43.584962227314065,
+            47.58496258554062,
+            51.58496249501846,
+            55.58496249329696
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 48,
+          "scaling_claim": true
+        }
+      ],
+      "floor_model": "S_floor = sqrt(pi / 2A), A the usable automorphisms; ops = S / S_floor",
+      "memory_leader": "ECBND1heb8f0d5c8a05",
+      "ops_leader": "ECBND1hc2cfee03ebf6"
+    },
+    {
+      "axes": [
+        "ops",
+        "memory",
+        "oracle_queries"
+      ],
+      "domain": {
+        "envelope": {
+          "oracle": "static_dh:n-1:d=shape(0.12943,0.015)",
+          "precomputation": "none",
+          "targets": 1,
+          "threads": 1
+        },
+        "family": "prime",
+        "problem": "ecdlp.single_target",
+        "target_kind": "planted",
+        "tier": "medium",
+        "unit": "ecbench.gae+band(w=1)"
+      },
+      "domain_id": "ECDOM1hf55d42d12e08",
+      "entries": [
+        {
+          "alpha": 0.4367945311488421,
+          "alpha_ci95": [
+            0.3959525324090633,
+            0.4597152697851225
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.4474883804018849,
+                0.7178353375198633
+              ],
+              "known": true,
+              "value": 0.5739107759707482
+            },
+            "field_muls": {
+              "ci95": [
+                0.909698094749568,
+                1.424855788512494
+              ],
+              "known": true,
+              "value": 1.148481805359404
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.4533527994836197,
+                0.7157112016968724
+              ],
+              "known": true,
+              "value": 0.574130860443384
+            },
+            "memory": {
+              "ci95": [
+                0.09353875788214748,
+                0.21453110414750456
+              ],
+              "known": true,
+              "value": 0.14900807299667293
+            },
+            "ops": {
+              "ci95": [
+                0.808987589092983,
+                1.376206636383019
+              ],
+              "known": true,
+              "value": 1.0737580430097868
+            },
+            "oracle_queries": {
+              "ci95": [
+                5.214966630638831e-6,
+                0.0000710365559707057
+              ],
+              "known": true,
+              "value": 0.00003084316314662998
+            },
+            "uncharged": {
+              "ci95": [
+                0.26220526454588594,
+                0.5032613874441815
+              ],
+              "known": true,
+              "value": 0.37768251316598533
+            }
+          },
+          "bound_id": "ECBND1h2fdaa885bf06",
+          "bounded": true,
+          "declared_alpha": null,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "cheon.pminus1_comb on the n-1 shaped curves-w1",
+          "level": "exponent",
+          "log2_r": [
+            35.5849615540045,
+            39.584959497664485,
+            43.584962533462466,
+            47.58496241299122,
+            51.58496252640577,
+            55.58496249668622
+          ],
+          "method": "cheon.pminus1_comb",
+          "method_id": "ECM1he9fc05bb2b2b",
+          "params": {
+            "d": "shape:0.12943:0.015"
+          },
+          "runs": 48,
+          "scaling_claim": true
+        },
+        {
+          "alpha": 0.4963903935623747,
+          "alpha_ci95": [
+            0.4308404883294345,
+            0.6108518351361036
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.7448693084462872,
+                1.2484679037011237
+              ],
+              "known": true,
+              "value": 0.9871650926626284
+            },
+            "field_muls": {
+              "ci95": [
+                1.5144811514396894,
+                2.4931092482656667
+              ],
+              "known": true,
+              "value": 1.978306122843411
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.74174427005558,
+                1.2476079364558856
+              ],
+              "known": true,
+              "value": 0.9884904051686796
+            },
+            "memory": {
+              "ci95": [
+                0.00017538370937544747,
+                0.0013919303288053603
+              ],
+              "known": true,
+              "value": 0.0006476327428920106
+            },
+            "ops": {
+              "ci95": [
+                1.6925739397280062,
+                2.816090934478084
+              ],
+              "known": true,
+              "value": 2.2273367525659906
+            },
+            "oracle_queries": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            },
+            "uncharged": {
+              "ci95": [
+                0.7460332218577888,
+                1.2337901503687227
+              ],
+              "known": true,
+              "value": 0.98676070951186
+            }
+          },
+          "bound_id": "ECBND1ha7a3cdc54301",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.negation on the n-1 shaped curves (reference, queries nothing)-w1",
+          "level": "exponent",
+          "log2_r": [
+            35.5849615540045,
+            39.584959497664485,
+            43.584962533462466,
+            47.58496241299122,
+            51.58496252640577,
+            55.58496249668622
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 48,
+          "scaling_claim": true
+        },
+        {
+          "alpha": 0.5237105422609998,
+          "alpha_ci95": [
+            0.41714946529506297,
+            0.6848851004806195
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                0.7827725492237623,
+                1.3194485776250895
+              ],
+              "known": true,
+              "value": 1.054802031519697
+            },
+            "field_muls": {
+              "ci95": [
+                1.595314152628315,
+                2.6596786877971863
+              ],
+              "known": true,
+              "value": 2.113968956424959
+            },
+            "field_sqrs": {
+              "ci95": [
+                0.8049085889141714,
+                1.313921097850553
+              ],
+              "known": true,
+              "value": 1.056256995981552
+            },
+            "memory": {
+              "ci95": [
+                0.00024006336578664028,
+                0.001632524826493407
+              ],
+              "known": true,
+              "value": 0.0007702240453842723
+            },
+            "ops": {
+              "ci95": [
+                1.8081121851381516,
+                2.991882823368791
+              ],
+              "known": true,
+              "value": 2.3798861817029944
+            },
+            "oracle_queries": {
+              "ci95": [
+                0.0,
+                0.0
+              ],
+              "known": true,
+              "value": 0.0
+            },
+            "uncharged": {
+              "ci95": [
+                0.7895933817541289,
+                1.316515837403722
+              ],
+              "known": true,
+              "value": 1.0543171822184514
+            }
+          },
+          "bound_id": "ECBND1hba196f5d2859",
+          "bounded": true,
+          "declared_alpha": 0.5,
+          "dominance_notes": [],
+          "dominated_by": [],
+          "improves_on": [],
+          "is_frontier": true,
+          "label": "rho.negation beside cheon.pminus1_naive (36 to 52 bits)-w1",
+          "level": "exponent",
+          "log2_r": [
+            35.5849615540045,
+            39.584959497664485,
+            43.584962533462466,
+            47.58496241299122,
+            51.58496252640577
+          ],
+          "method": "rho.negation",
+          "method_id": "ECM1hefea4e0ebe79",
+          "params": {
+            "cap_multiple": "64"
+          },
+          "runs": 40,
+          "scaling_claim": true
+        },
+        {
+          "alpha": 0.4403570458434174,
+          "alpha_ci95": [
+            0.3868062181758837,
+            0.4958503161823544
+          ],
+          "axes": {
+            "field_invs": {
+              "ci95": [
+                9.613618784552669,
+                15.010457794838908
+              ],
+              "known": true,
+              "value": 12.242619090615316
+            },
+            "field_muls": {
+              "ci95": [
+                37.46959479320088,
+                59.43128772626561
+              ],
+              "known": true,
+              "value": 49.03772675028126
+            },
+            "field_sqrs": {
+              "ci95": [
+                15.670673458590338,
+                24.959750445133217
+              ],
+              "known": true,
+              "value": 20.426781946965537
+            },
+            "memory": {
+              "ci95": [
+                0.104461144235177,
+                0.17408560038001822
+              ],
+              "known": true,
+              "value": 0.13991208676895686
+            },
+            "ops": {
+              "ci95": [
+                10.952677884695142,
+                17.521629551670088
+              ],
+              "known": true,
+              "value": 14.278458147776885
+            },
+            "oracle_queries": {
+              "ci95": [
+                6.655427330787235e-6,
+                0.00008334773052350353
+              ],
+              "known": true,
+              "value": 0.00003683198911669057
+            },
+            "uncharged": {
+              "ci95": [
+                0.28819983554762046,
+                0.5388711351026736
+              ],
+              "known": true,
+              "value": 0.41133497389486734
+            }
+          },
+          "bound_id": "ECBND1hb4ad379d43d8",
+          "bounded": true,
+          "declared_alpha": null,
+          "dominance_notes": [
+            "ECBND1hba196f5d2859 (rho.negation) is clearly better on ops, memory, oracle_queries",
+            "ECBND1ha7a3cdc54301 (rho.negation) is clearly better on ops, memory, oracle_queries"
+          ],
+          "dominated_by": [
+            "ECBND1hba196f5d2859",
+            "ECBND1ha7a3cdc54301"
+          ],
+          "improves_on": [],
+          "is_frontier": false,
+          "label": "cheon.pminus1_naive on the n-1 shaped curves-w1",
+          "level": "exponent",
+          "log2_r": [
+            35.5849615540045,
+            39.584959497664485,
+            43.584962533462466,
+            47.58496241299122,
+            51.58496252640577
+          ],
+          "method": "cheon.pminus1_naive",
+          "method_id": "ECM1he0fc20dbd5e9",
+          "params": {
+            "d": "shape:0.12943:0.015"
+          },
+          "runs": 40,
+          "scaling_claim": true
+        }
+      ],
+      "floor_model": "S_floor = sqrt(pi / 2A), A the usable automorphisms; ops = S / S_floor",
+      "memory_leader": "ECBND1ha7a3cdc54301",
+      "ops_leader": "ECBND1h2fdaa885bf06"
     }
   ],
-  "frontier_id": "ECFR1h8b45b672c283",
+  "frontier_id": "ECFR1hbc8728ad0497",
   "inadmissible": [
     {
       "bound_id": "ECBND1h11f6a579f4ae",
