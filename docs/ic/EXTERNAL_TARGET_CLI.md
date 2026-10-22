@@ -325,7 +325,11 @@ byte recovery routine enumerates S-box input-byte candidates and checks a
 constant output XOR across observations; its output is not a LAT-derived
 multi-round linear attack. It reports `candidate` without holdout data and
 `verified` only when the recovered input key reproduces every distinct
-verification pair with the reduced-round cipher. A mismatch reports
+verification pair with the reduced-round cipher. Before either status, it
+replays every training pair with the complete reduced-AES key schedule;
+per-byte consistency alone can also fit independent output whitening bytes.
+An inconsistent training corpus reports `training_model_mismatch` with a null
+candidate key and exits unsuccessfully. A holdout mismatch reports
 `verification_failed` and exits unsuccessfully. Both observed-data commands
 accept local files or checked store references.
 

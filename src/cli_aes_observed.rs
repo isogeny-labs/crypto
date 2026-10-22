@@ -363,14 +363,22 @@ pub fn linear(input: &Path) -> Result<(), String> {
             key[4 * ((c + r) % 4) + r] = recovered;
         }
     }
-    // The recovered bytes are the input whitening key. Independently replay
-    // supplied holdout pairs before claiming a complete candidate.
+    // Per-byte consistency admits arbitrary independent output whitening
+    // bytes. Enforce the AES key schedule by replaying the complete training
+    // corpus before reporting an input-key candidate.
     let cipher = ReducedAes128::new(&key, 1, false);
+    let training_matches = pairs
+        .iter()
+        .filter(|(p, c)| cipher.encrypt(p) == *c)
+        .count();
     let match_count = verify
         .iter()
         .filter(|(p, c)| cipher.encrypt(p) == *c)
         .count();
-    let status = if verify.is_empty() {
+    let training_ok = training_matches == pairs.len();
+    let status = if !training_ok {
+        "training_model_mismatch"
+    } else if verify.is_empty() {
         "candidate"
     } else if match_count == verify.len() {
         "verified"
@@ -384,13 +392,17 @@ pub fn linear(input: &Path) -> Result<(), String> {
             "model":"aes-128-reduced-one-round-no-final-mixcolumns",
             "method":"per-byte-exhaustive-consistency",
             "status":status,
-            "candidate_key_hex":hex::encode(key),
+            "candidate_key_hex":if training_ok {Some(hex::encode(key))} else {None},
             "training_pairs":pairs.len(),
+            "training_matches":training_matches,
             "verification_pairs":verify.len(),
             "verification_matches":match_count
         }))
         .map_err(|e| e.to_string())?
     );
+    if !training_ok {
+        return Err("candidate failed complete training model replay".into());
+    }
     if status == "verification_failed" {
         return Err("candidate failed independent verification".into());
     }
@@ -610,6 +622,19 @@ mod tests {
             "verification_pairs":[as_json(&corpus[128])]});
         fs::write(&path, payload.to_string()).unwrap();
         assert!(linear(&path).is_ok());
+        // A fixed output-byte offset leaves each S-box input-byte search
+        // consistent, but no longer matches the AES round-key schedule.
+        let mut shifted = payload.clone();
+        shifted["verification_pairs"] = json!([]);
+        for pair in shifted["pairs"].as_array_mut().unwrap() {
+            let mut ciphertext = hex::decode(pair["ciphertext_hex"].as_str().unwrap()).unwrap();
+            ciphertext[0] ^= 1;
+            pair["ciphertext_hex"] = json!(hex::encode(ciphertext));
+        }
+        fs::write(&path, shifted.to_string()).unwrap();
+        assert!(linear(&path)
+            .unwrap_err()
+            .contains("complete training model replay"));
         let mut repeated = payload.clone();
         repeated["pairs"][1] = repeated["pairs"][0].clone();
         fs::write(&path, repeated.to_string()).unwrap();
