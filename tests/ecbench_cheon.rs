@@ -10,7 +10,7 @@ use crypto_lib::cryptanalysis::cheon_counted::{find_shaped_curve, next_prime, Sh
 use crypto_lib::cryptanalysis::ecbench::methods::{
     needs_static_dh_oracle, resolve, solve, solve_with_oracle, MethodSpec,
 };
-use crypto_lib::cryptanalysis::ecbench::oracle::PlantedStaticDh;
+use crypto_lib::cryptanalysis::ecbench::oracle::{PlantedStaticDh, StaticDhOracle};
 use crypto_lib::cryptanalysis::ecbench::workload::{CurveSpec, Instance, TargetKind, Workload};
 use serde_json::Value;
 
