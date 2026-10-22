@@ -11,7 +11,7 @@ use rand::rngs::StdRng;
 use rand::SeedableRng;
 use serde_json::{json, Value};
 
-type Terms = [(usize, i8); 4];
+pub(crate) type Terms = [(usize, i8); 4];
 
 fn u(v: &Value) -> u64 {
     v.as_u64().expect("u64")
@@ -130,10 +130,10 @@ fn vinv5(p: u64) -> [[u64; 5]; 5] {
     std::array::from_fn(|i| std::array::from_fn(|j| rows[i][5 + j]))
 }
 
-struct SymS4 {
+pub(crate) struct SymS4 {
     monos: Vec<[u8; 3]>,
     coef: Vec<[E4; 5]>,
-    precompute_muls: u64,
+    pub(crate) precompute_muls: u64,
 }
 impl SymS4 {
     fn coeffs_last(c: &Curve4, x: &[E4; 3], vinv: &[[u64; 5]; 5]) -> [E4; 5] {
@@ -147,7 +147,7 @@ impl SymS4 {
             })
         })
     }
-    fn precompute(c: &Curve4, rng: &mut StdRng) -> Self {
+    pub(crate) fn precompute(c: &Curve4, rng: &mut StdRng) -> Self {
         let f = &c.f;
         let start = f.muls();
         let mons = exponents3(4);
@@ -424,6 +424,129 @@ fn candidate_ids(
         ids.push(*by_x.get(&f.mul(&s, &f.from_fp(x)))?);
     }
     ids.try_into().ok()
+}
+
+pub(crate) struct MixedCollect {
+    pub relations: BTreeSet<Terms>,
+    pub systems: u64,
+    pub system_failures: u64,
+    pub field_solutions: u64,
+    pub split_failures: u64,
+    pub foreign_or_repeat: u64,
+    pub external_fp_muls: u64,
+    pub internal_fp_muls: u64,
+    pub group_ops: u64,
+    pub wall_ms_l0: f64,
+}
+
+/// Complete polynomial relation collection for one mixed component pattern.
+/// Only k=1,2,3 are accepted; neither same-line S5 arm is called.
+pub(crate) fn collect_mixed_pattern(
+    c: &Curve4,
+    base: &[Pt4],
+    by_x: &HashMap<E4, usize>,
+    residual: &Pt4,
+    k: usize,
+    s4: &SymS4,
+    rng: &mut StdRng,
+) -> MixedCollect {
+    assert!((1..=3).contains(&k));
+    c.f.reset_muls();
+    c.reset_ops();
+    let start = Instant::now();
+    let mut got = BTreeSet::new();
+    let mut systems = 0;
+    let mut failures = 0;
+    let mut field_solutions = 0;
+    let mut split_failures = 0;
+    let mut foreign_or_repeat = 0;
+    let mut internal_muls = 0;
+    let mut process = |line0: Vec<u64>, line2: Vec<u64>| {
+        field_solutions += 1;
+        let Some(ids) = candidate_ids(&c.f, by_x, &line0, &line2) else {
+            foreign_or_repeat += 1;
+            return;
+        };
+        if ids.iter().copied().collect::<BTreeSet<_>>().len() != 4 {
+            foreign_or_repeat += 1;
+            return;
+        }
+        got.extend(signed_relations(c, base, residual, &ids));
+    };
+    if k == 1 || k == 3 {
+        let peel = if k == 1 { 36..48 } else { 0..36 };
+        let scale = if k == 1 { E4::ONE } else { E4([0, 0, 1, 0]) };
+        for id in peel {
+            for sign in [-1, 1] {
+                let pt = if sign == 1 { base[id] } else { c.neg(&base[id]) };
+                let remain = c.sub(residual, &pt);
+                if remain.inf {
+                    continue;
+                }
+                let mut st = QuarticSolve::default();
+                let before = c.f.muls();
+                let comps = s4.weil_line(&c.f, &remain.x, &scale);
+                st.weil_muls = c.f.muls() - before;
+                systems += 1;
+                if let Some(solutions) = solve_system_n::<3>(&comps, 4, 10, 37, rng, &mut st) {
+                    for sol in solutions {
+                        if let Some(xs) = split(&sol, 37) {
+                            let peeled_x = if k == 1 { base[id].x.0[2] } else { base[id].x.0[0] };
+                            if k == 1 {
+                                process(xs.to_vec(), vec![peeled_x]);
+                            } else {
+                                process(vec![peeled_x], xs.to_vec());
+                            }
+                        } else {
+                            split_failures += 1;
+                        }
+                    }
+                } else {
+                    failures += 1;
+                }
+                st.close_public();
+                internal_muls += st.total_muls - st.weil_muls;
+            }
+        }
+    } else {
+        for i in 36..48 {
+            for j in i + 1..48 {
+                for si in [-1, 1] {
+                    for sj in [-1, 1] {
+                        let pi = if si == 1 { base[i] } else { c.neg(&base[i]) };
+                        let pj = if sj == 1 { base[j] } else { c.neg(&base[j]) };
+                        let remain = c.sub(&c.sub(residual, &pi), &pj);
+                        if remain.inf {
+                            continue;
+                        }
+                        let comps = s3_weil(c, &remain.x);
+                        systems += 1;
+                        let (solutions, muls) = solve_s3_fp_scan(&comps, 37);
+                        internal_muls += muls;
+                        for sol in solutions {
+                            if let Some(xs) = split(&sol, 37) {
+                                process(xs.to_vec(), vec![base[i].x.0[2], base[j].x.0[2]]);
+                            } else {
+                                split_failures += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    MixedCollect {
+        relations: got,
+        systems,
+        system_failures: failures,
+        field_solutions,
+        split_failures,
+        foreign_or_repeat,
+        external_fp_muls: c.f.muls(),
+        internal_fp_muls: internal_muls,
+        group_ops: c.ops(),
+        wall_ms_l0: start.elapsed().as_secs_f64() * 1e3,
+    }
 }
 
 fn run(k: usize, raw: &str) -> Value {
