@@ -1,0 +1,98 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261022-twist-complete-cost-accounting",
+  "title": "Twist E27: Complete primitive accounting and a cold one-target replay",
+  "created": "2026-10-22",
+  "authors": [
+    "twist follow-up design lane"
+  ],
+  "status": "blocked",
+  "status_note": "Proposed E27; not started. Complete counters, admitted calibration/isolation, independent aggregation and a runnable frozen protocol are missing. A separate runnable protocol and source/checker pins are required.",
+  "blocked_on": [
+    "problem:problems/twist-trace-constraint-and-solver-gap.md",
+    "note:Complete counters, admitted calibration/isolation, independent aggregation and a runnable frozen protocol are missing."
+  ],
+  "links": {
+    "lead": "research/twist_routes_1_3_20261021/proposals-20261022/README.md#e27",
+    "notes": [
+      "research/twist_routes_1_3_20261021/proposals-20261022/experiments.json",
+      "research/twist_routes_1_3_20261021/proposals-20261022/README.md",
+      "backlog/XP-20261021-twist-symmetry-solver/README.md",
+      "research/twist_routes_1_3_20261021/E15_SPEC_V1.json",
+      "research/twist_routes_1_3_20261021/PIPELINE_PROTOCOL_V1.md",
+      "research/twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.md"
+    ],
+    "prs": [
+      2380
+    ]
+  },
+  "question": "Do any apparent IC stage or pipeline savings survive complete symmetric pricing of construction, solver, projection, verification and linear algebra?",
+  "decision_value": "A lower verified cost than the frozen best IC baseline is an IC improvement within this workload. Beating rho is a separate test. An unexplained sensitivity reversal or missing material cost blocks a complete-cost claim.",
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "aburan28/crypto",
+    "commit": null,
+    "branch": "codex/twist-ic-routes-1-3-20261021",
+    "build": []
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 4,
+    "disk_gb": 1,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Proposed pilot: one CPU and 4 GiB per arm, 120 seconds per one-target cell, checkpoint after each arm/target. Full-grid runtime remains unestimated; pilot measurements are required before scheduling it. Full resources remain unestimated. The nominal disk field is not an estimate; calibrate and freeze it before readiness."
+  },
+  "run": {
+    "argv": [
+      "false"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 1
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "Not frozen; required evidence fields are in the linked design. No result exists.",
+    "verify": [],
+    "land": "research/twist_routes_1_3_20261021/followup-runs/e27"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261022-twist-complete-cost-accounting"
+    ],
+    "ttl_s": 3600,
+    "env": {
+      "name": "unassigned-native-rust",
+      "recipe": "Design only; implement native driver, independent checker, checkpoints and source/protocol pins before readiness."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 4096,
+      "timeout_s": 1,
+      "sandbox": "auto",
+      "sandbox_reason": "",
+      "publish": "runs/XP-20261022-twist-complete-cost-accounting"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Blocked proposal with no run estimate, below the existing funded seed cards. Adding it changes no runnable-work priority or funding."
+    },
+    "notes": "No lab publication, lease, run, resource allocation or funding transaction has been performed. The failing sentinel is intentional."
+  },
+  "owner_hint": "unassigned"
+}

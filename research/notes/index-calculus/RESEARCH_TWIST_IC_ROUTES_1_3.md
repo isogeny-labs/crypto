@@ -184,3 +184,23 @@ The [E00 arithmetic result](../../twist_routes_1_3_20261021/reports/RESULTS.md) 
 ## 2026-10-22 bounded execution
 
 The [result report](../../twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.md) records 1,920 native IC/rho executions (1,704 verified and exactly replayed, 216 empty-base cells), ten class transfers, three explicit isogenies and all three algebraic duals, rational-height controls, and the retained invalid/resource-limited attempts. Three positive three-gluing module cases still lack quotient/polarization/maps. Full-cost accounting/calibration, broader solver grids and independent-host replay remain open. The original route acceptance criteria are retained.
+
+## 2026-10-22 follow-up proposals
+
+The request to keep proposing experiments is tracked in
+[E18–E29](../../twist_routes_1_3_20261021/proposals-20261022/README.md), its
+[machine matrix](../../twist_routes_1_3_20261021/proposals-20261022/experiments.json)
+and [diagram/PDF](../../twist_routes_1_3_20261021/proposals-20261022/REPORT.pdf).
+All twelve are proposed, blocked and unfunded, with separate backlog cards;
+none has run or been scheduled. Original E00–E17 requirements remain open
+where the bounded results did not satisfy them.
+
+The new scientific tests are actual torsion/pairing and indecomposable
+3-gluing certificates for the three positive toys and public P-521 (E18/E19),
+other small gluing primes (E20), predicates coupling the Frobenius components
+(E21), projected additive structure (E22), and general-helper partial-relation
+elimination (E23). E24/E29 close independent class-map and concrete proof
+bridges. E25/E27 close applicable signature-reference and complete-cost gaps;
+E26/E28 test block elimination and a frozen heldout selector. Every design
+states finite inputs, controls, outputs, resource caps and a decision rule.
+No novelty, new group relation or calibrated speedup is asserted.

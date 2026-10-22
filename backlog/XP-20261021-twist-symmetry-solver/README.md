@@ -43,3 +43,14 @@ A null result closes only the frozen candidate/question. A stage gain does not e
 ## Bounded execution update, 2026-10-22
 
 Equivalent native systems and three preserved 1930-cell solver attempts executed; 240 distinct projection cells match. Combined IC has 1704 verified identical replays and 216 empty-base cells. Broader grids, applicable signature baseline, full solver pricing and independent-host replay remain open. See the [result and requirement table](../../research/twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.md), exact receipts and source/protocol freezes. All original acceptance items above remain requirements; local correctness evidence is not a complete-cost improvement. No funded or remote full campaign is running.
+
+## Follow-up proposals, 2026-10-22
+
+[E18–E29 designs](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md)
+add separate blocked cards for route-3 and shared measurement panels:
+[E25 applicable signature control](../XP-20261022-twist-homogeneous-solver-control/README.md),
+[E26 block/hybrid elimination](../XP-20261022-twist-block-elimination/README.md),
+[E27 complete cost accounting](../XP-20261022-twist-complete-cost-accounting/README.md)
+and [E28 heldout selection](../XP-20261022-twist-heldout-selection/README.md).
+They are proposed, unfunded and not started. This card's original frozen
+protocol and acceptance criteria are unchanged.

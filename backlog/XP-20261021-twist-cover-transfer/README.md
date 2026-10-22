@@ -43,3 +43,14 @@ A null result closes only the frozen candidate/question. A stage gain does not e
 ## Bounded execution update, 2026-10-22
 
 Ten selected covers have executable class pullback/norm checks, independent PARI orders and bounded image controls. Three explicit isogenies now have algebraic duals. Positive three-gluing quotient/polarization construction, Jacobian decomposition, formal/independent-host map replay and complete costs remain open. See the [result and requirement table](../../research/twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.md), exact receipts and source/protocol freezes. All original acceptance items above remain requirements; local correctness evidence is not a complete-cost improvement. No funded or remote full campaign is running.
+
+## Follow-up proposals, 2026-10-22
+
+[E18–E29 designs](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md)
+add separate blocked cards for route-2 panels:
+[E18 actual 3-torsion](../XP-20261022-twist-actual-three-torsion/README.md),
+[E19 explicit gluing geometry](../XP-20261022-twist-three-gluing-geometry/README.md),
+[E20 other gluing primes](../XP-20261022-twist-higher-gluing-filters/README.md)
+and [E24 independent base-field divisor replay](../XP-20261022-twist-base-field-jacobian/README.md).
+They are proposed, unfunded and not started. This card's original frozen
+protocol and acceptance criteria are unchanged.

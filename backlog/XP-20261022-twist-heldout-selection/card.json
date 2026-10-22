@@ -1,0 +1,101 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261022-twist-heldout-selection",
+  "title": "Twist E28: Heldout family selection and an honest solver portfolio",
+  "created": "2026-10-22",
+  "authors": [
+    "twist follow-up design lane"
+  ],
+  "status": "blocked",
+  "status_note": "Proposed E28; not started. Verified candidates, complete counters, a frozen selector and unopened final target set are required. A separate runnable protocol and source/checker pins are required.",
+  "blocked_on": [
+    "problem:problems/twist-trace-constraint-and-solver-gap.md",
+    "xp:XP-20261022-twist-coupled-component-bases",
+    "xp:XP-20261022-twist-projected-energy",
+    "xp:XP-20261022-twist-block-elimination",
+    "xp:XP-20261022-twist-complete-cost-accounting",
+    "note:Verified candidates, complete counters, a frozen selector and unopened final target set are required."
+  ],
+  "links": {
+    "lead": "research/twist_routes_1_3_20261021/proposals-20261022/README.md#e28",
+    "notes": [
+      "research/twist_routes_1_3_20261021/proposals-20261022/experiments.json",
+      "research/twist_routes_1_3_20261021/proposals-20261022/README.md",
+      "backlog/XP-20261021-twist-symmetry-solver/README.md",
+      "research/twist_routes_1_3_20261021/execution-v1/fixtures.json",
+      "research/twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.md"
+    ],
+    "prs": [
+      2380
+    ]
+  },
+  "question": "Can a selector using only public instance features improve cold one-target IC after all search and selection costs are included?",
+  "decision_value": "A complete-cost reduction on the sealed final population supports an adaptive engineering improvement and justifies independent replication of this frozen selector. A training-only gain, oracle result or failed heldout transfer does not support that conclusion.",
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "aburan28/crypto",
+    "commit": null,
+    "branch": "codex/twist-ic-routes-1-3-20261021",
+    "build": []
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 4,
+    "disk_gb": 1,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Proposed pilot: one CPU, 4 GiB, at most four configurations and two budgeted pilot probes per target; 120 seconds total per selector cell, including probes. Final resource estimates await E27. Full resources remain unestimated. The nominal disk field is not an estimate; calibrate and freeze it before readiness."
+  },
+  "run": {
+    "argv": [
+      "false"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 1
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "Not frozen; required evidence fields are in the linked design. No result exists.",
+    "verify": [],
+    "land": "research/twist_routes_1_3_20261021/followup-runs/e28"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261022-twist-heldout-selection"
+    ],
+    "ttl_s": 3600,
+    "env": {
+      "name": "unassigned-native-rust",
+      "recipe": "Design only; implement native driver, independent checker, checkpoints and source/protocol pins before readiness."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 4096,
+      "timeout_s": 1,
+      "sandbox": "auto",
+      "sandbox_reason": "",
+      "publish": "runs/XP-20261022-twist-heldout-selection"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Blocked proposal with no run estimate, below the existing funded seed cards. Adding it changes no runnable-work priority or funding."
+    },
+    "notes": "No lab publication, lease, run, resource allocation or funding transaction has been performed. The failing sentinel is intentional."
+  },
+  "owner_hint": "unassigned"
+}

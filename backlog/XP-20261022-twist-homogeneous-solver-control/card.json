@@ -1,0 +1,97 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261022-twist-homogeneous-solver-control",
+  "title": "Twist E25: Applicable homogeneous signature baseline with complete output certificates",
+  "created": "2026-10-22",
+  "authors": [
+    "twist follow-up design lane"
+  ],
+  "status": "blocked",
+  "status_note": "Proposed E25; not started. Applicable signature backend, homogenization/saturation adapter and complete-basis checker are not yet pinned. A separate runnable protocol and source/checker pins are required.",
+  "blocked_on": [
+    "problem:problems/twist-trace-constraint-and-solver-gap.md",
+    "note:Applicable signature backend, homogenization/saturation adapter and complete-basis checker are not yet pinned."
+  ],
+  "links": {
+    "lead": "research/twist_routes_1_3_20261021/proposals-20261022/README.md#e25",
+    "notes": [
+      "research/twist_routes_1_3_20261021/proposals-20261022/experiments.json",
+      "research/twist_routes_1_3_20261021/proposals-20261022/README.md",
+      "backlog/XP-20261021-twist-symmetry-solver/README.md",
+      "research/twist_routes_1_3_20261021/SOLVER_PROTOCOL_V3.md",
+      "research/twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.md"
+    ],
+    "prs": [
+      2380
+    ]
+  },
+  "question": "Can a same-characteristic signature solver be compared fairly after homogenization, saturation and dehomogenization are fully verified and priced?",
+  "decision_value": "Only verified equal tasks admit a stage comparison. If no applicable signature implementation is available, that baseline remains missing rather than being replaced by a wrong-characteristic run.",
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "aburan28/crypto",
+    "commit": null,
+    "branch": "codex/twist-ic-routes-1-3-20261021",
+    "build": []
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 4,
+    "disk_gb": 1,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Proposed pilot: one CPU, 4 GiB, 30 seconds per engine/system with the same hard envelope for each compared engine. Freeze timeout semantics and record extraction/checking separately before extending the grid. Full resources remain unestimated. The nominal disk field is not an estimate; calibrate and freeze it before readiness."
+  },
+  "run": {
+    "argv": [
+      "false"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 1
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "Not frozen; required evidence fields are in the linked design. No result exists.",
+    "verify": [],
+    "land": "research/twist_routes_1_3_20261021/followup-runs/e25"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261022-twist-homogeneous-solver-control"
+    ],
+    "ttl_s": 3600,
+    "env": {
+      "name": "unassigned-native-rust",
+      "recipe": "Design only; implement native driver, independent checker, checkpoints and source/protocol pins before readiness."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 4096,
+      "timeout_s": 1,
+      "sandbox": "auto",
+      "sandbox_reason": "",
+      "publish": "runs/XP-20261022-twist-homogeneous-solver-control"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Blocked proposal with no run estimate, below the existing funded seed cards. Adding it changes no runnable-work priority or funding."
+    },
+    "notes": "No lab publication, lease, run, resource allocation or funding transaction has been performed. The failing sentinel is intentional."
+  },
+  "owner_hint": "unassigned"
+}

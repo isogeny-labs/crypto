@@ -4,6 +4,15 @@
 [Original experiment designs](EXPERIMENTS.md), [machine-readable status](experiments.json),
 [dependency diagram](PROGRAM.svg), [Lean proof map](lean/README.md).
 
+[Follow-up proposals E18–E29](proposals-20261022/README.md),
+[proposal PDF](proposals-20261022/REPORT.pdf) and
+[machine-readable designs](proposals-20261022/experiments.json) add twelve
+blocked, unfunded experiments. They cover actual 3-gluing, coupled restrictions,
+partial-relation elimination, independent divisor replay and solver/cost gaps.
+These are designs only; no follow-up experiment has started.
+[Proposal validation and check logs](proposals-20261022/CHECKS.md) retain the
+sandbox-blocked test attempt and its passing socket-enabled replay.
+
 The 2026-10-21–22 native panels recorded 1,920 combined IC/rho executions:
 1,704 verified logarithms, all identically replayed, and 216 empty-base cells.
 Trace/cover/class-map controls, three bounded solver attempts, rational-height
