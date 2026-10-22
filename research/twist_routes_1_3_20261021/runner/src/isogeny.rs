@@ -202,54 +202,65 @@ pub fn run(fixtures: &[Fixture], out: &Path) -> Result<Vec<Value>> {
             }
             let mut dual = None;
             let mut dual_scale = None;
-            if roots.len() == 2 {
-                if let Some((other, _)) = point(k, e, f.order, ell, Some(roots[1]), &mut seed) {
-                    let dg = map.ext(k, other);
-                    assert!(dg.is_some());
-                    let dm = from_kernel(k, map.a, map.b, dg, ell);
-                    let composite = dm.fp(dest, image_g);
-                    let ell_g = e.pm(f.group(), ell as u128);
-                    let u = (1..e.p)
-                        .find(|u| {
-                            e.a * pow(*u, 4, e.p) % e.p == dm.a
-                                && e.b * pow(*u, 6, e.p) % e.p == dm.b
-                                && ell_g.map(|(x, y)| {
-                                    (
-                                        Q(x.0 * pow(*u, 2, e.p) % e.p, 0),
-                                        Q(y.0 * pow(*u, 3, e.p) % e.p, 0),
-                                    )
-                                }) == composite
-                        })
-                        .expect("dual model scale");
-                    for p in e.rational() {
-                        let lhs = dm.fp(dest, map.fp(e, p));
-                        let rhs = e.pm(p, ell as u128).map(|(x, y)| {
-                            (
-                                Q(x.0 * pow(u, 2, e.p) % e.p, 0),
-                                Q(y.0 * pow(u, 3, e.p) % e.p, 0),
-                            )
-                        });
-                        assert_eq!(lhs, rhs);
+            // A repeated eigenvalue may have a two-dimensional eigenspace.
+            // Only a torsion point outside this kernel supplies a dual kernel.
+            let mut dg = None;
+            let mut dual_searches = 0;
+            for _ in 0..16 {
+                dual_searches += 1;
+                let lambda = *roots.get(1).unwrap_or(&roots[0]);
+                if let Some((other, _)) = point(k, e, f.order, ell, Some(lambda), &mut seed) {
+                    let image = map.ext(k, other);
+                    if image.is_some() {
+                        dg = image;
+                        break;
                     }
-                    for s in 0..8 {
-                        let q = e.pm(
-                            f.group(),
-                            (1 + (20261021 + s * 7919) % (f.order - 1)) as u128,
-                        );
-                        let mapped = dm.fp(dest, map.fp(e, q));
-                        let unscaled = mapped.map(|(x, y)| {
-                            (
-                                Q(x.0 * inv(pow(u, 2, e.p), e.p) % e.p, 0),
-                                Q(y.0 * inv(pow(u, 3, e.p), e.p) % e.p, 0),
-                            )
-                        });
-                        assert_eq!(e.pm(unscaled, inv(ell, f.order) as u128), q);
-                    }
-                    dual_scale = Some(u);
-                    dual = Some(
-                        json!({"kernel_polynomial":dm.h,"x_numerator":dm.n,"y_multiplier_numerator":dm.m,"normalized_target_coefficients":[dm.a,dm.b]}),
-                    );
                 }
+            }
+            if dg.is_some() {
+                let dm = from_kernel(k, map.a, map.b, dg, ell);
+                let composite = dm.fp(dest, image_g);
+                let ell_g = e.pm(f.group(), ell as u128);
+                let u = (1..e.p)
+                    .find(|u| {
+                        e.a * pow(*u, 4, e.p) % e.p == dm.a
+                            && e.b * pow(*u, 6, e.p) % e.p == dm.b
+                            && ell_g.map(|(x, y)| {
+                                (
+                                    Q(x.0 * pow(*u, 2, e.p) % e.p, 0),
+                                    Q(y.0 * pow(*u, 3, e.p) % e.p, 0),
+                                )
+                            }) == composite
+                    })
+                    .expect("dual model scale");
+                for p in e.rational() {
+                    let lhs = dm.fp(dest, map.fp(e, p));
+                    let rhs = e.pm(p, ell as u128).map(|(x, y)| {
+                        (
+                            Q(x.0 * pow(u, 2, e.p) % e.p, 0),
+                            Q(y.0 * pow(u, 3, e.p) % e.p, 0),
+                        )
+                    });
+                    assert_eq!(lhs, rhs);
+                }
+                for s in 0..8 {
+                    let q = e.pm(
+                        f.group(),
+                        (1 + (20261021 + s * 7919) % (f.order - 1)) as u128,
+                    );
+                    let mapped = dm.fp(dest, map.fp(e, q));
+                    let unscaled = mapped.map(|(x, y)| {
+                        (
+                            Q(x.0 * inv(pow(u, 2, e.p), e.p) % e.p, 0),
+                            Q(y.0 * inv(pow(u, 3, e.p), e.p) % e.p, 0),
+                        )
+                    });
+                    assert_eq!(e.pm(unscaled, inv(ell, f.order) as u128), q);
+                }
+                dual_scale = Some(u);
+                dual = Some(
+                    json!({"kernel_polynomial":dm.h,"x_numerator":dm.n,"y_multiplier_numerator":dm.m,"normalized_target_coefficients":[dm.a,dm.b]}),
+                );
             }
             let mut representations = vec![];
             for u in [1, 2, 3] {
@@ -278,7 +289,7 @@ pub fn run(fixtures: &[Fixture], out: &Path) -> Result<Vec<Value>> {
                 }
                 representations.push(name);
             }
-            rows.push(json!({"fixture":f.id,"destination":id,"ell":ell,"status":"verified-explicit-Velu-and-rational-subgroup","kernel_generator_tower_coordinates":g,"kernel_trials":trials,"frobenius_eigenvalues":roots,"kernel_polynomial":map.h,"x_numerator":map.n,"y_multiplier_numerator":map.m,"source_and_destination_points_checked":f.order,"generator_addition_homomorphism_checks":f.order,"finite_lookup_return_map_entries":inverse.len(),"algebraic_dual_return_map":dual,"dual_model_scale":dual_scale,"scalar_recovery_controls":if dual_scale.is_some(){8}else{0},"representation_isomorphism_controls":representations,"field_and_model_conversion_charged_in_pipeline":false,"IC_or_DLP_speedup":null}));
+            rows.push(json!({"fixture":f.id,"destination":id,"ell":ell,"status":"verified-explicit-Velu-and-rational-subgroup","kernel_generator_tower_coordinates":g,"kernel_trials":trials,"frobenius_eigenvalues":roots,"kernel_polynomial":map.h,"x_numerator":map.n,"y_multiplier_numerator":map.m,"source_and_destination_points_checked":f.order,"generator_addition_homomorphism_checks":f.order,"finite_lookup_return_map_entries":inverse.len(),"algebraic_dual_return_map":dual,"dual_model_scale":dual_scale,"dual_kernel_searches":dual_searches,"scalar_recovery_controls":if dual_scale.is_some(){8}else{0},"representation_isomorphism_controls":representations,"field_and_model_conversion_charged_in_pipeline":false,"IC_or_DLP_speedup":null}));
         }
         println!("{}", json!({"stage":"isogeny","fixture":f.id}));
     }
