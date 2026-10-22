@@ -1,0 +1,664 @@
+{
+  "card_id": "CARD-BLINDSPOT-14-R01",
+  "card_path": "research/blindspots_20261018/14-prime-m4-cells/replay/card-r01.yaml",
+  "card_sha256": "8694e98fe44b2b4c12b556ceb84298fae7b1b1a4429f704336fa6f8f3a7c51a1",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-dirs",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14",
+        "research/blindspots_20261018/instruments/blindspots_14_prime_m4.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 5.516,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 5.516,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14",
+        "selftest",
+        "--deep"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 19.425,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "selftest",
+      "index": 3,
+      "outputs": {},
+      "seconds": 19.425,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "4ed3c1e88b5c5b8b85fbb115eb804b8df3e999e28b7e119cae6c4e790db381de",
+      "stdout_tail": [
+        "selftest: arm b bx=5 planted=true: dim Some(24) = brute 24 (madds 155233177, steps 16, 226 ms)",
+        "selftest: arm b bx=5 planted=false: dim Some(0) = brute 0 (madds 155743427, steps 16, 209 ms)",
+        "selftest: arm b bx=5 planted=true: dim Some(12) = brute 12 (madds 155714688, steps 16, 246 ms)",
+        "selftest: arm b bx=5 planted=true: dim Some(24) = brute 24 (madds 155237892, steps 16, 245 ms)",
+        "selftest: arm b bx=5 planted=false: dim Some(0) = brute 0 (madds 155745124, steps 16, 234 ms)",
+        "selftest: arm b bx=5 planted=true: dim Some(12) = brute 12 (madds 155714299, steps 16, 241 ms)",
+        "selftest: arm b bx=6 planted=true: dim Some(24) = brute 24 (madds 1158363890, steps 20, 2001 ms)",
+        "selftest: arm b bx=6 planted=false: dim Some(0) = brute 0 (madds 1158902994, steps 20, 1980 ms)",
+        "selftest: arm b bx=6 planted=true: dim Some(12) = brute 12 (madds 1158867132, steps 20, 1986 ms)",
+        "selftest: arm b bx=6 planted=true: dim Some(24) = brute 24 (madds 1158373513, steps 20, 2038 ms)",
+        "selftest: arm b bx=6 planted=false: dim Some(0) = brute 0 (madds 1158904240, steps 20, 1953 ms)",
+        "selftest: arm b bx=6 planted=true: dim Some(12) = brute 12 (madds 1158866532, steps 20, 1990 ms)",
+        "selftest: full IC arm a, 16 bits, run 0: ok, 148 attempts, 9 hits, rank 9",
+        "selftest: full IC arm a, 16 bits, run 1: ok, 189 attempts, 12 hits, rank 9",
+        "selftest: full IC arm a, 16 bits, run 2: ok, 158 attempts, 9 hits, rank 9",
+        "selftest: rho 16 bits run 0: ok, 508 adds, 20 walks",
+        "selftest: rho 16 bits run 1: ok, 310 adds, 6 walks",
+        "selftest: rho 16 bits run 2: ok, 524 adds, 10 walks",
+        "selftest: reach control ok (0.05556, 0.10000, 0.11905)",
+        "SELFTEST OK (19.4s)"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14",
+        "rho",
+        "--bits",
+        "16",
+        "--runs",
+        "16",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b16.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "rho-b16",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b16.jsonl": "0ccb27d777c4c2c49ffb2bd0a6229b64a3963c73c99596f7c9112ff08d762f71"
+      },
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "0ccb27d777c4c2c49ffb2bd0a6229b64a3963c73c99596f7c9112ff08d762f71",
+      "stdout_tail": [
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":0,\"ok\":true,\"setup_gadd\":182,\"walks\":17,\"counts\":{\"gadd\":442,\"lookup\":17,\"insert\":16,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":204,\"fmul\":884,\"fsqr\":513,\"finv\":442,\"build\":0},\"gae\":442,\"native\":237,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.0}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":1,\"ok\":true,\"setup_gadd\":193,\"walks\":27,\"counts\":{\"gadd\":595,\"lookup\":27,\"insert\":26,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":325,\"fmul\":1190,\"fsqr\":672,\"finv\":595,\"build\":0},\"gae\":595,\"native\":378,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.1}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":2,\"ok\":true,\"setup_gadd\":185,\"walks\":14,\"counts\":{\"gadd\":484,\"lookup\":14,\"insert\":13,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":252,\"fmul\":968,\"fsqr\":556,\"finv\":484,\"build\":0},\"gae\":484,\"native\":279,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.1}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":3,\"ok\":true,\"setup_gadd\":180,\"walks\":7,\"counts\":{\"gadd\":501,\"lookup\":7,\"insert\":6,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":289,\"fmul\":1002,\"fsqr\":571,\"finv\":501,\"build\":0},\"gae\":501,\"native\":302,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.0}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":4,\"ok\":true,\"setup_gadd\":181,\"walks\":27,\"counts\":{\"gadd\":732,\"lookup\":27,\"insert\":26,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":474,\"fmul\":1464,\"fsqr\":803,\"finv\":732,\"build\":0},\"gae\":732,\"native\":527,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.1}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":5,\"ok\":true,\"setup_gadd\":184,\"walks\":26,\"counts\":{\"gadd\":764,\"lookup\":26,\"insert\":25,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":505,\"fmul\":1528,\"fsqr\":837,\"finv\":764,\"build\":0},\"gae\":764,\"native\":556,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.1}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":6,\"ok\":true,\"setup_gadd\":173,\"walks\":23,\"counts\":{\"gadd\":530,\"lookup\":23,\"insert\":22,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":301,\"fmul\":1060,\"fsqr\":588,\"finv\":530,\"build\":0},\"gae\":530,\"native\":346,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.0}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":7,\"ok\":true,\"setup_gadd\":187,\"walks\":14,\"counts\":{\"gadd\":410,\"lookup\":14,\"insert\":13,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":170,\"fmul\":820,\"fsqr\":485,\"finv\":410,\"build\":0},\"gae\":410,\"native\":197,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.0}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":8,\"ok\":true,\"setup_gadd\":184,\"walks\":21,\"counts\":{\"gadd\":485,\"lookup\":21,\"insert\":20,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":240,\"fmul\":970,\"fsqr\":557,\"finv\":485,\"build\":0},\"gae\":485,\"native\":281,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.1}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":9,\"ok\":true,\"setup_gadd\":188,\"walks\":16,\"counts\":{\"gadd\":598,\"lookup\":16,\"insert\":15,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":360,\"fmul\":1196,\"fsqr\":674,\"finv\":598,\"build\":0},\"gae\":598,\"native\":391,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.1}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":10,\"ok\":true,\"setup_gadd\":183,\"walks\":21,\"counts\":{\"gadd\":532,\"lookup\":21,\"insert\":20,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":288,\"fmul\":1064,\"fsqr\":607,\"finv\":532,\"build\":0},\"gae\":532,\"native\":329,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.0}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":11,\"ok\":true,\"setup_gadd\":183,\"walks\":7,\"counts\":{\"gadd\":1239,\"lookup\":5,\"insert\":4,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":1027,\"fmul\":2478,\"fsqr\":1309,\"finv\":1239,\"build\":0},\"gae\":1239,\"native\":1036,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.1}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":12,\"ok\":true,\"setup_gadd\":183,\"walks\":9,\"counts\":{\"gadd\":354,\"lookup\":9,\"insert\":8,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":130,\"fmul\":708,\"fsqr\":425,\"finv\":354,\"build\":0},\"gae\":354,\"native\":147,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.0}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":13,\"ok\":true,\"setup_gadd\":189,\"walks\":7,\"counts\":{\"gadd\":307,\"lookup\":7,\"insert\":6,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":85,\"fmul\":614,\"fsqr\":380,\"finv\":307,\"build\":0},\"gae\":307,\"native\":98,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.0}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":14,\"ok\":true,\"setup_gadd\":187,\"walks\":8,\"counts\":{\"gadd\":433,\"lookup\":8,\"insert\":7,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":208,\"fmul\":866,\"fsqr\":510,\"finv\":433,\"build\":0},\"gae\":433,\"native\":223,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.0}",
+        "{\"kind\":\"rho\",\"bits\":16,\"run\":15,\"ok\":true,\"setup_gadd\":183,\"walks\":22,\"counts\":{\"gadd\":658,\"lookup\":22,\"insert\":20,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":412,\"fmul\":1316,\"fsqr\":734,\"finv\":658,\"build\":0},\"gae\":658,\"native\":454,\"n\":48383,\"sqrt_pi_n_over_2\":275.7,\"ms\":0.1}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14",
+        "rho",
+        "--bits",
+        "28",
+        "--runs",
+        "16",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b28.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.04,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "rho-b28",
+      "index": 5,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b28.jsonl": "75486f28f1b9c08b4249675ed2d53019271d16e4f701a27ba2cda65108f27e17"
+      },
+      "seconds": 0.04,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "75486f28f1b9c08b4249675ed2d53019271d16e4f701a27ba2cda65108f27e17",
+      "stdout_tail": [
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":0,\"ok\":true,\"setup_gadd\":249,\"walks\":205,\"counts\":{\"gadd\":26291,\"lookup\":205,\"insert\":201,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":25590,\"fmul\":52582,\"fsqr\":26425,\"finv\":26291,\"build\":0},\"gae\":26291,\"native\":25996,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":3.2}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":1,\"ok\":true,\"setup_gadd\":246,\"walks\":271,\"counts\":{\"gadd\":34074,\"lookup\":271,\"insert\":266,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":33248,\"fmul\":68148,\"fsqr\":34211,\"finv\":34074,\"build\":0},\"gae\":34074,\"native\":33785,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":4.1}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":2,\"ok\":true,\"setup_gadd\":243,\"walks\":287,\"counts\":{\"gadd\":38364,\"lookup\":287,\"insert\":282,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":37506,\"fmul\":76728,\"fsqr\":38498,\"finv\":38364,\"build\":0},\"gae\":38364,\"native\":38075,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":4.7}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":3,\"ok\":true,\"setup_gadd\":243,\"walks\":38,\"counts\":{\"gadd\":4815,\"lookup\":38,\"insert\":37,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":4451,\"fmul\":9630,\"fsqr\":4950,\"finv\":4815,\"build\":0},\"gae\":4815,\"native\":4526,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":0.8}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":4,\"ok\":true,\"setup_gadd\":243,\"walks\":137,\"counts\":{\"gadd\":16104,\"lookup\":137,\"insert\":134,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":15544,\"fmul\":32208,\"fsqr\":16238,\"finv\":16104,\"build\":0},\"gae\":16104,\"native\":15815,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":1.9}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":5,\"ok\":true,\"setup_gadd\":250,\"walks\":175,\"counts\":{\"gadd\":24106,\"lookup\":175,\"insert\":171,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":23468,\"fmul\":48212,\"fsqr\":24241,\"finv\":24106,\"build\":0},\"gae\":24106,\"native\":23814,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":2.9}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":6,\"ok\":true,\"setup_gadd\":252,\"walks\":158,\"counts\":{\"gadd\":18806,\"lookup\":158,\"insert\":155,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":18202,\"fmul\":37612,\"fsqr\":18939,\"finv\":18806,\"build\":0},\"gae\":18806,\"native\":18515,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":2.3}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":7,\"ok\":true,\"setup_gadd\":242,\"walks\":76,\"counts\":{\"gadd\":10972,\"lookup\":76,\"insert\":75,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":10542,\"fmul\":21944,\"fsqr\":11103,\"finv\":10972,\"build\":0},\"gae\":10972,\"native\":10693,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":1.3}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":8,\"ok\":true,\"setup_gadd\":251,\"walks\":181,\"counts\":{\"gadd\":26627,\"lookup\":181,\"insert\":180,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":25975,\"fmul\":53254,\"fsqr\":26763,\"finv\":26627,\"build\":0},\"gae\":26627,\"native\":26336,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":3.3}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":9,\"ok\":true,\"setup_gadd\":246,\"walks\":89,\"counts\":{\"gadd\":11420,\"lookup\":89,\"insert\":88,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":10955,\"fmul\":22840,\"fsqr\":11554,\"finv\":11420,\"build\":0},\"gae\":11420,\"native\":11132,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":1.4}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":10,\"ok\":true,\"setup_gadd\":241,\"walks\":59,\"counts\":{\"gadd\":8382,\"lookup\":59,\"insert\":57,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":7982,\"fmul\":16764,\"fsqr\":8514,\"finv\":8382,\"build\":0},\"gae\":8382,\"native\":8098,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":1.0}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":11,\"ok\":true,\"setup_gadd\":246,\"walks\":135,\"counts\":{\"gadd\":18401,\"lookup\":135,\"insert\":131,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":17846,\"fmul\":36802,\"fsqr\":18536,\"finv\":18401,\"build\":0},\"gae\":18401,\"native\":18112,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":2.2}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":12,\"ok\":true,\"setup_gadd\":246,\"walks\":206,\"counts\":{\"gadd\":28347,\"lookup\":206,\"insert\":203,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":27653,\"fmul\":56694,\"fsqr\":28481,\"finv\":28347,\"build\":0},\"gae\":28347,\"native\":28062,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":3.4}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":13,\"ok\":true,\"setup_gadd\":236,\"walks\":139,\"counts\":{\"gadd\":16246,\"lookup\":139,\"insert\":137,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":15694,\"fmul\":32492,\"fsqr\":16377,\"finv\":16246,\"build\":0},\"gae\":16246,\"native\":15970,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":1.9}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":14,\"ok\":true,\"setup_gadd\":247,\"walks\":87,\"counts\":{\"gadd\":10842,\"lookup\":87,\"insert\":86,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":10379,\"fmul\":21684,\"fsqr\":10979,\"finv\":10842,\"build\":0},\"gae\":10842,\"native\":10552,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":1.3}",
+        "{\"kind\":\"rho\",\"bits\":28,\"run\":15,\"ok\":true,\"setup_gadd\":243,\"walks\":63,\"counts\":{\"gadd\":8808,\"lookup\":63,\"insert\":61,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":8398,\"fmul\":17616,\"fsqr\":8944,\"finv\":8808,\"build\":0},\"gae\":8808,\"native\":8522,\"n\":248685841,\"sqrt_pi_n_over_2\":19764.5,\"ms\":1.1}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14",
+        "tdec",
+        "--bits",
+        "16",
+        "--arms",
+        "a",
+        "--targets",
+        "16",
+        "--planted",
+        "4",
+        "--check",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tdec-a-b16",
+      "index": 6,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16.jsonl": "657f50cd5ce16426cf5771189143ad45173aa15f467cabb828fc601554d7a586"
+      },
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "657f50cd5ce16426cf5771189143ad45173aa15f467cabb828fc601554d7a586",
+      "stdout_tail": [
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":0,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0015}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":1,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0014}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":2,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0016}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":3,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0011}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":4,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0014}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":5,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0018}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":6,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0014}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":7,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0014}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":8,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0012}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":9,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0014}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":10,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0011}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":11,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0013}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":12,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0013}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":13,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0014}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":14,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0018}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":15,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":16,\"lookup\":16,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":16,\"finv\":16,\"build\":0},\"native\":16,\"ms\":0.0012}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":16,\"tkind\":\"planted\",\"hit\":true,\"valid\":true,\"crosscheck_decomposable\":true,\"planted\":true,\"counts\":{\"gadd\":1,\"lookup\":1,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2,\"fsqr\":1,\"finv\":1,\"build\":0},\"native\":1,\"ms\":0.0002}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":17,\"tkind\":\"planted\",\"hit\":true,\"valid\":true,\"crosscheck_decomposable\":true,\"planted\":true,\"counts\":{\"gadd\":3,\"lookup\":3,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":6,\"fsqr\":3,\"finv\":3,\"build\":0},\"native\":3,\"ms\":0.0003}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":18,\"tkind\":\"planted\",\"hit\":true,\"valid\":true,\"crosscheck_decomposable\":true,\"planted\":true,\"counts\":{\"gadd\":4,\"lookup\":4,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":8,\"fsqr\":4,\"finv\":4,\"build\":0},\"native\":4,\"ms\":0.0006}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":17,\"bx\":8,\"target\":19,\"tkind\":\"planted\",\"hit\":true,\"valid\":true,\"crosscheck_decomposable\":true,\"planted\":true,\"counts\":{\"gadd\":5,\"lookup\":5,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":10,\"fsqr\":5,\"finv\":5,\"build\":0},\"native\":5,\"ms\":0.0006}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14",
+        "tdec",
+        "--bits",
+        "28",
+        "--arms",
+        "a",
+        "--targets",
+        "16",
+        "--planted",
+        "4",
+        "--check",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b28.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.084,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tdec-a-b28",
+      "index": 7,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b28.jsonl": "ac0b26532f2a84302cbdb420e7928d3e99354c2c9f11d61852817261602e3468"
+      },
+      "seconds": 0.084,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ac0b26532f2a84302cbdb420e7928d3e99354c2c9f11d61852817261602e3468",
+      "stdout_tail": [
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":0,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0148}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":1,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0154}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":2,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0151}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":3,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0122}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":4,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0173}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":5,\"tkind\":\"random\",\"hit\":true,\"valid\":true,\"crosscheck_decomposable\":true,\"planted\":false,\"counts\":{\"gadd\":18,\"lookup\":18,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":36,\"fsqr\":18,\"finv\":18,\"build\":0},\"native\":18,\"ms\":0.0024}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":6,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0147}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":7,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0152}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":8,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0166}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":9,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0178}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":10,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0169}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":11,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0170}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":12,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0219}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":13,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0169}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":14,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0203}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":15,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":126,\"lookup\":126,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":252,\"fsqr\":126,\"finv\":126,\"build\":0},\"native\":126,\"ms\":0.0180}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":16,\"tkind\":\"planted\",\"hit\":true,\"valid\":true,\"crosscheck_decomposable\":true,\"planted\":true,\"counts\":{\"gadd\":13,\"lookup\":13,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":26,\"fsqr\":13,\"finv\":13,\"build\":0},\"native\":13,\"ms\":0.0025}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":17,\"tkind\":\"planted\",\"hit\":true,\"valid\":true,\"crosscheck_decomposable\":true,\"planted\":true,\"counts\":{\"gadd\":5,\"lookup\":5,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":10,\"fsqr\":5,\"finv\":5,\"build\":0},\"native\":5,\"ms\":0.0010}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":18,\"tkind\":\"planted\",\"hit\":true,\"valid\":true,\"crosscheck_decomposable\":true,\"planted\":true,\"counts\":{\"gadd\":2,\"lookup\":2,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":4,\"fsqr\":2,\"finv\":2,\"build\":0},\"native\":2,\"ms\":0.0009}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":28,\"B\":122,\"bx\":63,\"target\":19,\"tkind\":\"planted\",\"hit\":true,\"valid\":true,\"crosscheck_decomposable\":true,\"planted\":true,\"counts\":{\"gadd\":26,\"lookup\":26,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":52,\"fsqr\":26,\"finv\":26,\"build\":0},\"native\":26,\"ms\":0.0034}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14",
+        "tdec",
+        "--bits",
+        "16",
+        "--arms",
+        "a",
+        "--bx",
+        "3",
+        "--targets",
+        "16",
+        "--planted",
+        "4",
+        "--check",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16-bx3.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "tdec-a-b16-bx3",
+      "index": 8,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16-bx3.jsonl": "2787237b02d28bc2bf7faf73c5b8ff2c764ca8cfd8bd3a7321c1bd625a6f08da"
+      },
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2787237b02d28bc2bf7faf73c5b8ff2c764ca8cfd8bd3a7321c1bd625a6f08da",
+      "stdout_tail": [
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":0,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0007}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":1,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0006}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":2,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0006}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":3,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0007}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":4,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0006}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":5,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0005}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":6,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0005}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":7,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0005}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":8,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0005}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":9,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0006}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":10,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0006}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":11,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0006}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":12,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0005}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":13,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0007}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":14,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0005}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":15,\"tkind\":\"random\",\"hit\":false,\"valid\":null,\"crosscheck_decomposable\":false,\"planted\":false,\"counts\":{\"gadd\":6,\"lookup\":6,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":12,\"fsqr\":6,\"finv\":6,\"build\":0},\"native\":6,\"ms\":0.0005}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":16,\"tkind\":\"planted\",\"hit\":true,\"valid\":true,\"crosscheck_decomposable\":true,\"planted\":true,\"counts\":{\"gadd\":1,\"lookup\":1,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2,\"fsqr\":1,\"finv\":1,\"build\":0},\"native\":1,\"ms\":0.0002}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":17,\"tkind\":\"planted\",\"hit\":true,\"valid\":true,\"crosscheck_decomposable\":true,\"planted\":true,\"counts\":{\"gadd\":2,\"lookup\":2,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":4,\"fsqr\":2,\"finv\":2,\"build\":0},\"native\":2,\"ms\":0.0002}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":18,\"tkind\":\"planted\",\"hit\":true,\"valid\":true,\"crosscheck_decomposable\":true,\"planted\":true,\"counts\":{\"gadd\":2,\"lookup\":2,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":4,\"fsqr\":2,\"finv\":2,\"build\":0},\"native\":2,\"ms\":0.0002}",
+        "{\"kind\":\"tdec\",\"arm\":\"a\",\"bits\":16,\"B\":5,\"bx\":3,\"target\":19,\"tkind\":\"planted\",\"hit\":true,\"valid\":true,\"crosscheck_decomposable\":true,\"planted\":true,\"counts\":{\"gadd\":2,\"lookup\":2,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":4,\"fsqr\":2,\"finv\":2,\"build\":0},\"native\":2,\"ms\":0.0002}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14",
+        "fullic",
+        "--bits",
+        "16",
+        "--arm",
+        "a",
+        "--runs",
+        "16",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.008,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fullic-a-b16",
+      "index": 9,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16.jsonl": "fbfdfedb785ba777f3e66296cd5a4dd4c5cdd7f1922425e99e1f333bc7419693"
+      },
+      "seconds": 0.008,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "fbfdfedb785ba777f3e66296cd5a4dd4c5cdd7f1922425e99e1f333bc7419693",
+      "stdout_tail": [
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":0,\"ok\":true,\"attempts\":179,\"hits\":9,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1079,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2142,\"fsqr\":1149,\"finv\":1071,\"build\":0},\"online\":{\"gadd\":2967,\"lookup\":2761,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":138,\"madd\":0,\"dptest\":0,\"fmul\":5934,\"fsqr\":2970,\"finv\":2967,\"build\":0},\"verify\":{\"gadd\":23,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":46,\"fsqr\":38,\"finv\":23,\"build\":0},\"total\":{\"gadd\":4069,\"lookup\":2761,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":183,\"madd\":0,\"dptest\":0,\"fmul\":8122,\"fsqr\":4157,\"finv\":4061,\"build\":0},\"gae_total\":4069,\"native_total\":3785,\"n\":48383,\"ms\":0.4,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":1,\"ok\":true,\"attempts\":70,\"hits\":10,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1071,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2126,\"fsqr\":1138,\"finv\":1063,\"build\":0},\"online\":{\"gadd\":1110,\"lookup\":1010,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":211,\"madd\":0,\"dptest\":0,\"fmul\":2220,\"fsqr\":1114,\"finv\":1110,\"build\":0},\"verify\":{\"gadd\":16,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":27,\"finv\":16,\"build\":0},\"total\":{\"gadd\":2197,\"lookup\":1010,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":256,\"madd\":0,\"dptest\":0,\"fmul\":4378,\"fsqr\":2279,\"finv\":2189,\"build\":0},\"gae_total\":2197,\"native_total\":2107,\"n\":48383,\"ms\":0.2,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":2,\"ok\":true,\"attempts\":177,\"hits\":9,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1070,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2124,\"fsqr\":1134,\"finv\":1062,\"build\":0},\"online\":{\"gadd\":2937,\"lookup\":2734,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":154,\"madd\":0,\"dptest\":0,\"fmul\":5872,\"fsqr\":2940,\"finv\":2936,\"build\":0},\"verify\":{\"gadd\":21,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":42,\"fsqr\":35,\"finv\":21,\"build\":0},\"total\":{\"gadd\":4028,\"lookup\":2734,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":199,\"madd\":0,\"dptest\":0,\"fmul\":8038,\"fsqr\":4109,\"finv\":4019,\"build\":0},\"gae_total\":4028,\"native_total\":3774,\"n\":48383,\"ms\":0.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":3,\"ok\":true,\"attempts\":238,\"hits\":9,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1074,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2132,\"fsqr\":1142,\"finv\":1066,\"build\":0},\"online\":{\"gadd\":3957,\"lookup\":3692,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":199,\"madd\":0,\"dptest\":0,\"fmul\":7914,\"fsqr\":3958,\"finv\":3957,\"build\":0},\"verify\":{\"gadd\":20,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":40,\"fsqr\":35,\"finv\":20,\"build\":0},\"total\":{\"gadd\":5051,\"lookup\":3692,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":244,\"madd\":0,\"dptest\":0,\"fmul\":10086,\"fsqr\":5135,\"finv\":5043,\"build\":0},\"gae_total\":5051,\"native_total\":4777,\"n\":48383,\"ms\":0.4,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":4,\"ok\":true,\"attempts\":211,\"hits\":9,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1071,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2126,\"fsqr\":1141,\"finv\":1063,\"build\":0},\"online\":{\"gadd\":3517,\"lookup\":3279,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":161,\"madd\":0,\"dptest\":0,\"fmul\":7034,\"fsqr\":3519,\"finv\":3517,\"build\":0},\"verify\":{\"gadd\":16,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":28,\"finv\":16,\"build\":0},\"total\":{\"gadd\":4604,\"lookup\":3279,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":206,\"madd\":0,\"dptest\":0,\"fmul\":9192,\"fsqr\":4688,\"finv\":4596,\"build\":0},\"gae_total\":4604,\"native_total\":4326,\"n\":48383,\"ms\":0.4,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":5,\"ok\":true,\"attempts\":104,\"hits\":9,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1077,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2138,\"fsqr\":1147,\"finv\":1069,\"build\":0},\"online\":{\"gadd\":1672,\"lookup\":1543,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":178,\"madd\":0,\"dptest\":0,\"fmul\":3340,\"fsqr\":1672,\"finv\":1670,\"build\":0},\"verify\":{\"gadd\":21,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":42,\"fsqr\":36,\"finv\":21,\"build\":0},\"total\":{\"gadd\":2770,\"lookup\":1543,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":223,\"madd\":0,\"dptest\":0,\"fmul\":5520,\"fsqr\":2855,\"finv\":2760,\"build\":0},\"gae_total\":2770,\"native_total\":2607,\"n\":48383,\"ms\":0.2,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":6,\"ok\":true,\"attempts\":120,\"hits\":9,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1077,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2138,\"fsqr\":1145,\"finv\":1069,\"build\":0},\"online\":{\"gadd\":1962,\"lookup\":1815,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":158,\"madd\":0,\"dptest\":0,\"fmul\":3924,\"fsqr\":1964,\"finv\":1962,\"build\":0},\"verify\":{\"gadd\":22,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":44,\"fsqr\":37,\"finv\":22,\"build\":0},\"total\":{\"gadd\":3061,\"lookup\":1815,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":203,\"madd\":0,\"dptest\":0,\"fmul\":6106,\"fsqr\":3146,\"finv\":3053,\"build\":0},\"gae_total\":3061,\"native_total\":2859,\"n\":48383,\"ms\":0.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":7,\"ok\":true,\"attempts\":151,\"hits\":9,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1074,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2132,\"fsqr\":1142,\"finv\":1066,\"build\":0},\"online\":{\"gadd\":2475,\"lookup\":2297,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":228,\"madd\":0,\"dptest\":0,\"fmul\":4950,\"fsqr\":2476,\"finv\":2475,\"build\":0},\"verify\":{\"gadd\":19,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":38,\"fsqr\":32,\"finv\":19,\"build\":0},\"total\":{\"gadd\":3568,\"lookup\":2297,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":273,\"madd\":0,\"dptest\":0,\"fmul\":7120,\"fsqr\":3650,\"finv\":3560,\"build\":0},\"gae_total\":3568,\"native_total\":3411,\"n\":48383,\"ms\":0.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":8,\"ok\":true,\"attempts\":140,\"hits\":12,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1073,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2130,\"fsqr\":1142,\"finv\":1065,\"build\":0},\"online\":{\"gadd\":2255,\"lookup\":2080,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":296,\"madd\":0,\"dptest\":0,\"fmul\":4508,\"fsqr\":2258,\"finv\":2254,\"build\":0},\"verify\":{\"gadd\":15,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":30,\"fsqr\":28,\"finv\":15,\"build\":0},\"total\":{\"gadd\":3343,\"lookup\":2080,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":341,\"madd\":0,\"dptest\":0,\"fmul\":6668,\"fsqr\":3428,\"finv\":3334,\"build\":0},\"gae_total\":3343,\"native_total\":3262,\"n\":48383,\"ms\":0.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":9,\"ok\":true,\"attempts\":140,\"hits\":9,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1072,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2128,\"fsqr\":1139,\"finv\":1064,\"build\":0},\"online\":{\"gadd\":2289,\"lookup\":2122,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":172,\"madd\":0,\"dptest\":0,\"fmul\":4578,\"fsqr\":2292,\"finv\":2289,\"build\":0},\"verify\":{\"gadd\":21,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":42,\"fsqr\":34,\"finv\":21,\"build\":0},\"total\":{\"gadd\":3382,\"lookup\":2122,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":217,\"madd\":0,\"dptest\":0,\"fmul\":6748,\"fsqr\":3465,\"finv\":3374,\"build\":0},\"gae_total\":3382,\"native_total\":3180,\"n\":48383,\"ms\":0.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":10,\"ok\":true,\"attempts\":227,\"hits\":12,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1073,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2130,\"fsqr\":1140,\"finv\":1065,\"build\":0},\"online\":{\"gadd\":3737,\"lookup\":3476,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":244,\"madd\":0,\"dptest\":0,\"fmul\":7470,\"fsqr\":3739,\"finv\":3735,\"build\":0},\"verify\":{\"gadd\":17,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":34,\"fsqr\":30,\"finv\":17,\"build\":0},\"total\":{\"gadd\":4827,\"lookup\":3476,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":289,\"madd\":0,\"dptest\":0,\"fmul\":9634,\"fsqr\":4909,\"finv\":4817,\"build\":0},\"gae_total\":4827,\"native_total\":4606,\"n\":48383,\"ms\":0.4,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":11,\"ok\":true,\"attempts\":77,\"hits\":9,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1079,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2142,\"fsqr\":1149,\"finv\":1071,\"build\":0},\"online\":{\"gadd\":1224,\"lookup\":1120,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":183,\"madd\":0,\"dptest\":0,\"fmul\":2448,\"fsqr\":1226,\"finv\":1224,\"build\":0},\"verify\":{\"gadd\":22,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":44,\"fsqr\":37,\"finv\":22,\"build\":0},\"total\":{\"gadd\":2325,\"lookup\":1120,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":228,\"madd\":0,\"dptest\":0,\"fmul\":4634,\"fsqr\":2412,\"finv\":2317,\"build\":0},\"gae_total\":2325,\"native_total\":2189,\"n\":48383,\"ms\":0.2,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":12,\"ok\":true,\"attempts\":79,\"hits\":9,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1068,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2120,\"fsqr\":1132,\"finv\":1060,\"build\":0},\"online\":{\"gadd\":1260,\"lookup\":1154,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":210,\"madd\":0,\"dptest\":0,\"fmul\":2520,\"fsqr\":1263,\"finv\":1260,\"build\":0},\"verify\":{\"gadd\":22,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":44,\"fsqr\":35,\"finv\":22,\"build\":0},\"total\":{\"gadd\":2350,\"lookup\":1154,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":255,\"madd\":0,\"dptest\":0,\"fmul\":4684,\"fsqr\":2430,\"finv\":2342,\"build\":0},\"gae_total\":2350,\"native_total\":2250,\"n\":48383,\"ms\":0.2,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":13,\"ok\":true,\"attempts\":149,\"hits\":9,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1077,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2138,\"fsqr\":1147,\"finv\":1069,\"build\":0},\"online\":{\"gadd\":2437,\"lookup\":2262,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":192,\"madd\":0,\"dptest\":0,\"fmul\":4872,\"fsqr\":2437,\"finv\":2436,\"build\":0},\"verify\":{\"gadd\":15,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":30,\"fsqr\":27,\"finv\":15,\"build\":0},\"total\":{\"gadd\":3529,\"lookup\":2262,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":237,\"madd\":0,\"dptest\":0,\"fmul\":7040,\"fsqr\":3611,\"finv\":3520,\"build\":0},\"gae_total\":3529,\"native_total\":3340,\"n\":48383,\"ms\":0.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":14,\"ok\":true,\"attempts\":225,\"hits\":9,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1074,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2132,\"fsqr\":1142,\"finv\":1066,\"build\":0},\"online\":{\"gadd\":3731,\"lookup\":3479,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":239,\"madd\":0,\"dptest\":0,\"fmul\":7462,\"fsqr\":3732,\"finv\":3731,\"build\":0},\"verify\":{\"gadd\":25,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":50,\"fsqr\":40,\"finv\":25,\"build\":0},\"total\":{\"gadd\":4830,\"lookup\":3479,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":284,\"madd\":0,\"dptest\":0,\"fmul\":9644,\"fsqr\":4914,\"finv\":4822,\"build\":0},\"gae_total\":4830,\"native_total\":4604,\"n\":48383,\"ms\":0.4,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":8,\"run\":15,\"ok\":true,\"attempts\":204,\"hits\":9,\"relations\":9,\"rank\":9,\"cols\":9,\"setup\":{\"gadd\":1079,\"lookup\":0,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":2142,\"fsqr\":1147,\"finv\":1071,\"build\":0},\"online\":{\"gadd\":3388,\"lookup\":3157,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":184,\"madd\":0,\"dptest\":0,\"fmul\":6776,\"fsqr\":3390,\"finv\":3388,\"build\":0},\"verify\":{\"gadd\":18,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":36,\"fsqr\":33,\"finv\":18,\"build\":0},\"total\":{\"gadd\":4485,\"lookup\":3157,\"insert\":816,\"legendre\":17,\"sqrt\":8,\"rowop\":229,\"madd\":0,\"dptest\":0,\"fmul\":8954,\"fsqr\":4570,\"finv\":4477,\"build\":0},\"gae_total\":4485,\"native_total\":4227,\"n\":48383,\"ms\":0.3,\"note\":\"\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14",
+        "fullic",
+        "--bits",
+        "28",
+        "--arm",
+        "a",
+        "--runs",
+        "16",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b28.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.108,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fullic-a-b28",
+      "index": 10,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b28.jsonl": "eae6b1c4ad1f354225db6771b1b2122388d0f9864fa4042852422ebec67f20d3"
+      },
+      "seconds": 1.108,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "eae6b1c4ad1f354225db6771b1b2122388d0f9864fa4042852422ebec67f20d3",
+      "stdout_tail": [
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":0,\"ok\":true,\"attempts\":1700,\"hits\":65,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345646,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691166,\"fsqr\":345815,\"finv\":345583,\"build\":0},\"online\":{\"gadd\":209511,\"lookup\":207616,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":16181,\"madd\":0,\"dptest\":0,\"fmul\":419022,\"fsqr\":209512,\"finv\":209511,\"build\":0},\"verify\":{\"gadd\":43,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":86,\"fsqr\":70,\"finv\":43,\"build\":0},\"total\":{\"gadd\":555200,\"lookup\":207616,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":18261,\"madd\":0,\"dptest\":0,\"fmul\":1110274,\"fsqr\":555397,\"finv\":555137,\"build\":0},\"gae_total\":555200,\"native_total\":567438,\"n\":248685841,\"ms\":72.6,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":1,\"ok\":true,\"attempts\":1493,\"hits\":67,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345651,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691176,\"fsqr\":345823,\"finv\":345588,\"build\":0},\"online\":{\"gadd\":183267,\"lookup\":181573,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":18259,\"madd\":0,\"dptest\":0,\"fmul\":366534,\"fsqr\":183268,\"finv\":183267,\"build\":0},\"verify\":{\"gadd\":40,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":80,\"fsqr\":66,\"finv\":40,\"build\":0},\"total\":{\"gadd\":528958,\"lookup\":181573,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":20339,\"madd\":0,\"dptest\":0,\"fmul\":1057790,\"fsqr\":529157,\"finv\":528895,\"build\":0},\"gae_total\":528958,\"native_total\":543473,\"n\":248685841,\"ms\":63.8,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":2,\"ok\":true,\"attempts\":1554,\"hits\":64,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345652,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691178,\"fsqr\":345823,\"finv\":345589,\"build\":0},\"online\":{\"gadd\":191089,\"lookup\":189343,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":15438,\"madd\":0,\"dptest\":0,\"fmul\":382178,\"fsqr\":191094,\"finv\":191089,\"build\":0},\"verify\":{\"gadd\":38,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":76,\"fsqr\":65,\"finv\":38,\"build\":0},\"total\":{\"gadd\":536779,\"lookup\":189343,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":17518,\"madd\":0,\"dptest\":0,\"fmul\":1073432,\"fsqr\":536982,\"finv\":536716,\"build\":0},\"gae_total\":536779,\"native_total\":548422,\"n\":248685841,\"ms\":59.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":3,\"ok\":true,\"attempts\":1527,\"hits\":78,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345650,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691174,\"fsqr\":345819,\"finv\":345587,\"build\":0},\"online\":{\"gadd\":185931,\"lookup\":184170,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":26009,\"madd\":0,\"dptest\":0,\"fmul\":371862,\"fsqr\":185933,\"finv\":185931,\"build\":0},\"verify\":{\"gadd\":40,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":80,\"fsqr\":66,\"finv\":40,\"build\":0},\"total\":{\"gadd\":531621,\"lookup\":184170,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":28089,\"madd\":0,\"dptest\":0,\"fmul\":1063116,\"fsqr\":531818,\"finv\":531558,\"build\":0},\"gae_total\":531621,\"native_total\":553820,\"n\":248685841,\"ms\":58.0,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":4,\"ok\":true,\"attempts\":2777,\"hits\":111,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345653,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691180,\"fsqr\":345824,\"finv\":345590,\"build\":0},\"online\":{\"gadd\":341994,\"lookup\":338884,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":47116,\"madd\":0,\"dptest\":0,\"fmul\":683988,\"fsqr\":341996,\"finv\":341994,\"build\":0},\"verify\":{\"gadd\":35,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":70,\"fsqr\":59,\"finv\":35,\"build\":0},\"total\":{\"gadd\":687682,\"lookup\":338884,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":49196,\"madd\":0,\"dptest\":0,\"fmul\":1375238,\"fsqr\":687879,\"finv\":687619,\"build\":0},\"gae_total\":687682,\"native_total\":729641,\"n\":248685841,\"ms\":72.5,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":5,\"ok\":true,\"attempts\":1244,\"hits\":64,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345656,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691186,\"fsqr\":345825,\"finv\":345593,\"build\":0},\"online\":{\"gadd\":151619,\"lookup\":150184,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":17844,\"madd\":0,\"dptest\":0,\"fmul\":303236,\"fsqr\":151619,\"finv\":151618,\"build\":0},\"verify\":{\"gadd\":40,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":80,\"fsqr\":66,\"finv\":40,\"build\":0},\"total\":{\"gadd\":497315,\"lookup\":150184,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":19924,\"madd\":0,\"dptest\":0,\"fmul\":994502,\"fsqr\":497510,\"finv\":497251,\"build\":0},\"gae_total\":497315,\"native_total\":511669,\"n\":248685841,\"ms\":56.8,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":6,\"ok\":true,\"attempts\":2023,\"hits\":93,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345659,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691192,\"fsqr\":345830,\"finv\":345596,\"build\":0},\"online\":{\"gadd\":247756,\"lookup\":245454,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":30391,\"madd\":0,\"dptest\":0,\"fmul\":495512,\"fsqr\":247758,\"finv\":247756,\"build\":0},\"verify\":{\"gadd\":32,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":64,\"fsqr\":57,\"finv\":32,\"build\":0},\"total\":{\"gadd\":593447,\"lookup\":245454,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":32471,\"madd\":0,\"dptest\":0,\"fmul\":1186768,\"fsqr\":593645,\"finv\":593384,\"build\":0},\"gae_total\":593447,\"native_total\":619486,\"n\":248685841,\"ms\":61.6,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":7,\"ok\":true,\"attempts\":1656,\"hits\":72,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345653,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691180,\"fsqr\":345823,\"finv\":345590,\"build\":0},\"online\":{\"gadd\":203204,\"lookup\":201332,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":21736,\"madd\":0,\"dptest\":0,\"fmul\":406408,\"fsqr\":203205,\"finv\":203204,\"build\":0},\"verify\":{\"gadd\":37,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":74,\"fsqr\":63,\"finv\":37,\"build\":0},\"total\":{\"gadd\":548894,\"lookup\":201332,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":23816,\"madd\":0,\"dptest\":0,\"fmul\":1097662,\"fsqr\":549091,\"finv\":548831,\"build\":0},\"gae_total\":548894,\"native_total\":566709,\"n\":248685841,\"ms\":57.4,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":8,\"ok\":true,\"attempts\":1384,\"hits\":64,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345649,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691172,\"fsqr\":345818,\"finv\":345586,\"build\":0},\"online\":{\"gadd\":169562,\"lookup\":167986,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":19049,\"madd\":0,\"dptest\":0,\"fmul\":339124,\"fsqr\":169565,\"finv\":169562,\"build\":0},\"verify\":{\"gadd\":39,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":78,\"fsqr\":66,\"finv\":39,\"build\":0},\"total\":{\"gadd\":515250,\"lookup\":167986,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":21129,\"madd\":0,\"dptest\":0,\"fmul\":1030374,\"fsqr\":515449,\"finv\":515187,\"build\":0},\"gae_total\":515250,\"native_total\":530676,\"n\":248685841,\"ms\":57.1,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":9,\"ok\":true,\"attempts\":1507,\"hits\":77,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345656,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691186,\"fsqr\":345829,\"finv\":345593,\"build\":0},\"online\":{\"gadd\":183775,\"lookup\":182037,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":22033,\"madd\":0,\"dptest\":0,\"fmul\":367550,\"fsqr\":183777,\"finv\":183775,\"build\":0},\"verify\":{\"gadd\":41,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":82,\"fsqr\":67,\"finv\":41,\"build\":0},\"total\":{\"gadd\":529472,\"lookup\":182037,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":24113,\"madd\":0,\"dptest\":0,\"fmul\":1058818,\"fsqr\":529673,\"finv\":529409,\"build\":0},\"gae_total\":529472,\"native_total\":547711,\"n\":248685841,\"ms\":72.6,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":10,\"ok\":true,\"attempts\":1729,\"hits\":79,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345656,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691186,\"fsqr\":345829,\"finv\":345593,\"build\":0},\"online\":{\"gadd\":211582,\"lookup\":209616,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":26547,\"madd\":0,\"dptest\":0,\"fmul\":423164,\"fsqr\":211585,\"finv\":211582,\"build\":0},\"verify\":{\"gadd\":40,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":80,\"fsqr\":66,\"finv\":40,\"build\":0},\"total\":{\"gadd\":557278,\"lookup\":209616,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":28627,\"madd\":0,\"dptest\":0,\"fmul\":1114430,\"fsqr\":557480,\"finv\":557215,\"build\":0},\"gae_total\":557278,\"native_total\":579804,\"n\":248685841,\"ms\":74.7,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":11,\"ok\":true,\"attempts\":2040,\"hits\":90,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345651,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691176,\"fsqr\":345820,\"finv\":345588,\"build\":0},\"online\":{\"gadd\":250306,\"lookup\":247996,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":31306,\"madd\":0,\"dptest\":0,\"fmul\":500612,\"fsqr\":250310,\"finv\":250306,\"build\":0},\"verify\":{\"gadd\":41,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":82,\"fsqr\":68,\"finv\":41,\"build\":0},\"total\":{\"gadd\":595998,\"lookup\":247996,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":33386,\"madd\":0,\"dptest\":0,\"fmul\":1191870,\"fsqr\":596198,\"finv\":595935,\"build\":0},\"gae_total\":595998,\"native_total\":622943,\"n\":248685841,\"ms\":86.0,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":12,\"ok\":true,\"attempts\":2517,\"hits\":102,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345649,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691172,\"fsqr\":345818,\"finv\":345586,\"build\":0},\"online\":{\"gadd\":309586,\"lookup\":306763,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":37495,\"madd\":0,\"dptest\":0,\"fmul\":619172,\"fsqr\":309593,\"finv\":309586,\"build\":0},\"verify\":{\"gadd\":39,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":78,\"fsqr\":65,\"finv\":39,\"build\":0},\"total\":{\"gadd\":655274,\"lookup\":306763,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":39575,\"madd\":0,\"dptest\":0,\"fmul\":1310422,\"fsqr\":655476,\"finv\":655211,\"build\":0},\"gae_total\":655274,\"native_total\":687899,\"n\":248685841,\"ms\":85.4,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":13,\"ok\":true,\"attempts\":2093,\"hits\":89,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345657,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691188,\"fsqr\":345830,\"finv\":345594,\"build\":0},\"online\":{\"gadd\":256918,\"lookup\":254558,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":39399,\"madd\":0,\"dptest\":0,\"fmul\":513836,\"fsqr\":256920,\"finv\":256918,\"build\":0},\"verify\":{\"gadd\":33,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":66,\"fsqr\":56,\"finv\":33,\"build\":0},\"total\":{\"gadd\":602608,\"lookup\":254558,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":41479,\"madd\":0,\"dptest\":0,\"fmul\":1205090,\"fsqr\":602806,\"finv\":602545,\"build\":0},\"gae_total\":602608,\"native_total\":637598,\"n\":248685841,\"ms\":75.6,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":14,\"ok\":true,\"attempts\":1725,\"hits\":71,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345650,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691174,\"fsqr\":345822,\"finv\":345587,\"build\":0},\"online\":{\"gadd\":212254,\"lookup\":210316,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":20460,\"madd\":0,\"dptest\":0,\"fmul\":424508,\"fsqr\":212259,\"finv\":212254,\"build\":0},\"verify\":{\"gadd\":41,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":82,\"fsqr\":67,\"finv\":41,\"build\":0},\"total\":{\"gadd\":557945,\"lookup\":210316,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":22540,\"madd\":0,\"dptest\":0,\"fmul\":1115764,\"fsqr\":558148,\"finv\":557882,\"build\":0},\"gae_total\":557945,\"native_total\":574417,\"n\":248685841,\"ms\":72.8,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":28,\"bx\":63,\"run\":15,\"ok\":true,\"attempts\":2096,\"hits\":88,\"relations\":64,\"rank\":64,\"cols\":64,\"setup\":{\"gadd\":345652,\"lookup\":0,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":691178,\"fsqr\":345824,\"finv\":345589,\"build\":0},\"online\":{\"gadd\":257758,\"lookup\":255398,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":29374,\"madd\":0,\"dptest\":0,\"fmul\":515516,\"fsqr\":257759,\"finv\":257758,\"build\":0},\"verify\":{\"gadd\":35,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":2080,\"madd\":0,\"dptest\":0,\"fmul\":70,\"fsqr\":60,\"finv\":35,\"build\":0},\"total\":{\"gadd\":603445,\"lookup\":255398,\"insert\":341376,\"legendre\":122,\"sqrt\":63,\"rowop\":31454,\"madd\":0,\"dptest\":0,\"fmul\":1206764,\"fsqr\":603643,\"finv\":603382,\"build\":0},\"gae_total\":603445,\"native_total\":628413,\"n\":248685841,\"ms\":76.2,\"note\":\"\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14",
+        "fullic",
+        "--bits",
+        "16",
+        "--arm",
+        "a",
+        "--bx",
+        "3",
+        "--runs",
+        "16",
+        "--out",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16-bx3.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.024,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "fullic-a-b16-bx3",
+      "index": 11,
+      "outputs": {
+        "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16-bx3.jsonl": "be3bde1384918f4606473f436794f6cccaf9b1c71628c78245212956f0016b5f"
+      },
+      "seconds": 0.024,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "be3bde1384918f4606473f436794f6cccaf9b1c71628c78245212956f0016b5f",
+      "stdout_tail": [
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":0,\"ok\":true,\"attempts\":2299,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":259,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":512,\"fsqr\":324,\"finv\":256,\"build\":0},\"online\":{\"gadd\":16091,\"lookup\":13780,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":28,\"madd\":0,\"dptest\":0,\"fmul\":32182,\"fsqr\":16095,\"finv\":16091,\"build\":0},\"verify\":{\"gadd\":23,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":46,\"fsqr\":38,\"finv\":23,\"build\":0},\"total\":{\"gadd\":16373,\"lookup\":13780,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":38,\"madd\":0,\"dptest\":0,\"fmul\":32740,\"fsqr\":16457,\"finv\":16370,\"build\":0},\"gae_total\":16373,\"native_total\":13882,\"n\":48383,\"ms\":1.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":1,\"ok\":true,\"attempts\":2346,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":251,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":496,\"fsqr\":313,\"finv\":248,\"build\":0},\"online\":{\"gadd\":16420,\"lookup\":14062,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":30,\"madd\":0,\"dptest\":0,\"fmul\":32840,\"fsqr\":16423,\"finv\":16420,\"build\":0},\"verify\":{\"gadd\":16,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":27,\"finv\":16,\"build\":0},\"total\":{\"gadd\":16687,\"lookup\":14062,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":40,\"madd\":0,\"dptest\":0,\"fmul\":33368,\"fsqr\":16763,\"finv\":16684,\"build\":0},\"gae_total\":16687,\"native_total\":14166,\"n\":48383,\"ms\":1.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":2,\"ok\":true,\"attempts\":2413,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":250,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":494,\"fsqr\":309,\"finv\":247,\"build\":0},\"online\":{\"gadd\":16890,\"lookup\":14465,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":30,\"madd\":0,\"dptest\":0,\"fmul\":33780,\"fsqr\":16892,\"finv\":16890,\"build\":0},\"verify\":{\"gadd\":21,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":42,\"fsqr\":35,\"finv\":21,\"build\":0},\"total\":{\"gadd\":17161,\"lookup\":14465,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":40,\"madd\":0,\"dptest\":0,\"fmul\":34316,\"fsqr\":17236,\"finv\":17158,\"build\":0},\"gae_total\":17161,\"native_total\":14569,\"n\":48383,\"ms\":1.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":3,\"ok\":true,\"attempts\":3121,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":254,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":502,\"fsqr\":317,\"finv\":251,\"build\":0},\"online\":{\"gadd\":21842,\"lookup\":18710,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":32,\"madd\":0,\"dptest\":0,\"fmul\":43682,\"fsqr\":21843,\"finv\":21841,\"build\":0},\"verify\":{\"gadd\":20,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":40,\"fsqr\":35,\"finv\":20,\"build\":0},\"total\":{\"gadd\":22116,\"lookup\":18710,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":42,\"madd\":0,\"dptest\":0,\"fmul\":44224,\"fsqr\":22195,\"finv\":22112,\"build\":0},\"gae_total\":22116,\"native_total\":18816,\"n\":48383,\"ms\":1.7,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":4,\"ok\":true,\"attempts\":3388,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":251,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":496,\"fsqr\":316,\"finv\":248,\"build\":0},\"online\":{\"gadd\":23711,\"lookup\":20313,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":18,\"madd\":0,\"dptest\":0,\"fmul\":47418,\"fsqr\":23712,\"finv\":23709,\"build\":0},\"verify\":{\"gadd\":16,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":32,\"fsqr\":28,\"finv\":16,\"build\":0},\"total\":{\"gadd\":23978,\"lookup\":20313,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":28,\"madd\":0,\"dptest\":0,\"fmul\":47946,\"fsqr\":24056,\"finv\":23973,\"build\":0},\"gae_total\":23978,\"native_total\":20405,\"n\":48383,\"ms\":1.9,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":5,\"ok\":true,\"attempts\":1308,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":257,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":508,\"fsqr\":322,\"finv\":254,\"build\":0},\"online\":{\"gadd\":9148,\"lookup\":7830,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":33,\"madd\":0,\"dptest\":0,\"fmul\":18290,\"fsqr\":9148,\"finv\":9145,\"build\":0},\"verify\":{\"gadd\":21,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":42,\"fsqr\":36,\"finv\":21,\"build\":0},\"total\":{\"gadd\":9426,\"lookup\":7830,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":43,\"madd\":0,\"dptest\":0,\"fmul\":18840,\"fsqr\":9506,\"finv\":9420,\"build\":0},\"gae_total\":9426,\"native_total\":7937,\"n\":48383,\"ms\":0.7,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":6,\"ok\":true,\"attempts\":2291,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":257,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":508,\"fsqr\":320,\"finv\":254,\"build\":0},\"online\":{\"gadd\":16033,\"lookup\":13730,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":31,\"madd\":0,\"dptest\":0,\"fmul\":32066,\"fsqr\":16034,\"finv\":16033,\"build\":0},\"verify\":{\"gadd\":22,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":44,\"fsqr\":37,\"finv\":22,\"build\":0},\"total\":{\"gadd\":16312,\"lookup\":13730,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":41,\"madd\":0,\"dptest\":0,\"fmul\":32618,\"fsqr\":16391,\"finv\":16309,\"build\":0},\"gae_total\":16312,\"native_total\":13835,\"n\":48383,\"ms\":1.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":7,\"ok\":true,\"attempts\":1810,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":254,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":502,\"fsqr\":317,\"finv\":251,\"build\":0},\"online\":{\"gadd\":12662,\"lookup\":10841,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":28,\"madd\":0,\"dptest\":0,\"fmul\":25322,\"fsqr\":12664,\"finv\":12661,\"build\":0},\"verify\":{\"gadd\":19,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":38,\"fsqr\":32,\"finv\":19,\"build\":0},\"total\":{\"gadd\":12935,\"lookup\":10841,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":38,\"madd\":0,\"dptest\":0,\"fmul\":25862,\"fsqr\":13013,\"finv\":12931,\"build\":0},\"gae_total\":12935,\"native_total\":10943,\"n\":48383,\"ms\":1.1,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":8,\"ok\":true,\"attempts\":1729,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":253,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":500,\"fsqr\":317,\"finv\":250,\"build\":0},\"online\":{\"gadd\":12102,\"lookup\":10361,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":26,\"madd\":0,\"dptest\":0,\"fmul\":24204,\"fsqr\":12105,\"finv\":12102,\"build\":0},\"verify\":{\"gadd\":15,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":30,\"fsqr\":28,\"finv\":15,\"build\":0},\"total\":{\"gadd\":12370,\"lookup\":10361,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":36,\"madd\":0,\"dptest\":0,\"fmul\":24734,\"fsqr\":12450,\"finv\":12367,\"build\":0},\"gae_total\":12370,\"native_total\":10461,\"n\":48383,\"ms\":1.0,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":9,\"ok\":true,\"attempts\":3256,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":252,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":498,\"fsqr\":314,\"finv\":249,\"build\":0},\"online\":{\"gadd\":22783,\"lookup\":19517,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":29,\"madd\":0,\"dptest\":0,\"fmul\":45562,\"fsqr\":22781,\"finv\":22781,\"build\":0},\"verify\":{\"gadd\":21,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":42,\"fsqr\":34,\"finv\":21,\"build\":0},\"total\":{\"gadd\":23056,\"lookup\":19517,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":39,\"madd\":0,\"dptest\":0,\"fmul\":46102,\"fsqr\":23129,\"finv\":23051,\"build\":0},\"gae_total\":23056,\"native_total\":19620,\"n\":48383,\"ms\":1.9,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":10,\"ok\":true,\"attempts\":1354,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":253,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":500,\"fsqr\":315,\"finv\":250,\"build\":0},\"online\":{\"gadd\":9474,\"lookup\":8108,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":35,\"madd\":0,\"dptest\":0,\"fmul\":18948,\"fsqr\":9476,\"finv\":9474,\"build\":0},\"verify\":{\"gadd\":17,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":34,\"fsqr\":30,\"finv\":17,\"build\":0},\"total\":{\"gadd\":9744,\"lookup\":8108,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":45,\"madd\":0,\"dptest\":0,\"fmul\":19482,\"fsqr\":9821,\"finv\":9741,\"build\":0},\"gae_total\":9744,\"native_total\":8217,\"n\":48383,\"ms\":0.7,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":11,\"ok\":true,\"attempts\":1949,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":259,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":512,\"fsqr\":324,\"finv\":256,\"build\":0},\"online\":{\"gadd\":13644,\"lookup\":11683,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":25,\"madd\":0,\"dptest\":0,\"fmul\":27288,\"fsqr\":13645,\"finv\":13644,\"build\":0},\"verify\":{\"gadd\":22,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":44,\"fsqr\":37,\"finv\":22,\"build\":0},\"total\":{\"gadd\":13925,\"lookup\":11683,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":35,\"madd\":0,\"dptest\":0,\"fmul\":27844,\"fsqr\":14006,\"finv\":13922,\"build\":0},\"gae_total\":13925,\"native_total\":11782,\"n\":48383,\"ms\":1.1,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":12,\"ok\":true,\"attempts\":2439,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":248,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":490,\"fsqr\":307,\"finv\":245,\"build\":0},\"online\":{\"gadd\":17071,\"lookup\":14620,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":31,\"madd\":0,\"dptest\":0,\"fmul\":34142,\"fsqr\":17075,\"finv\":17071,\"build\":0},\"verify\":{\"gadd\":22,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":44,\"fsqr\":35,\"finv\":22,\"build\":0},\"total\":{\"gadd\":17341,\"lookup\":14620,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":41,\"madd\":0,\"dptest\":0,\"fmul\":34676,\"fsqr\":17417,\"finv\":17338,\"build\":0},\"gae_total\":17341,\"native_total\":14725,\"n\":48383,\"ms\":1.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":13,\"ok\":true,\"attempts\":463,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":257,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":508,\"fsqr\":322,\"finv\":254,\"build\":0},\"online\":{\"gadd\":3234,\"lookup\":2760,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":31,\"madd\":0,\"dptest\":0,\"fmul\":6466,\"fsqr\":3233,\"finv\":3233,\"build\":0},\"verify\":{\"gadd\":15,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":30,\"fsqr\":27,\"finv\":15,\"build\":0},\"total\":{\"gadd\":3506,\"lookup\":2760,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":41,\"madd\":0,\"dptest\":0,\"fmul\":7004,\"fsqr\":3582,\"finv\":3502,\"build\":0},\"gae_total\":3506,\"native_total\":2865,\"n\":48383,\"ms\":0.3,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":14,\"ok\":true,\"attempts\":1479,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":254,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":502,\"fsqr\":317,\"finv\":251,\"build\":0},\"online\":{\"gadd\":10348,\"lookup\":8857,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":36,\"madd\":0,\"dptest\":0,\"fmul\":20696,\"fsqr\":10350,\"finv\":10348,\"build\":0},\"verify\":{\"gadd\":25,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":50,\"fsqr\":40,\"finv\":25,\"build\":0},\"total\":{\"gadd\":10627,\"lookup\":8857,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":46,\"madd\":0,\"dptest\":0,\"fmul\":21248,\"fsqr\":10707,\"finv\":10624,\"build\":0},\"gae_total\":10627,\"native_total\":8967,\"n\":48383,\"ms\":0.8,\"note\":\"\"}",
+        "{\"kind\":\"fullic\",\"arm\":\"a\",\"bits\":16,\"bx\":3,\"run\":15,\"ok\":true,\"attempts\":3142,\"hits\":4,\"relations\":4,\"rank\":4,\"cols\":4,\"setup\":{\"gadd\":259,\"lookup\":0,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":0,\"madd\":0,\"dptest\":0,\"fmul\":512,\"fsqr\":322,\"finv\":256,\"build\":0},\"online\":{\"gadd\":21987,\"lookup\":18833,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":36,\"madd\":0,\"dptest\":0,\"fmul\":43972,\"fsqr\":21990,\"finv\":21986,\"build\":0},\"verify\":{\"gadd\":18,\"lookup\":0,\"insert\":0,\"legendre\":0,\"sqrt\":0,\"rowop\":10,\"madd\":0,\"dptest\":0,\"fmul\":36,\"fsqr\":33,\"finv\":18,\"build\":0},\"total\":{\"gadd\":22264,\"lookup\":18833,\"insert\":56,\"legendre\":5,\"sqrt\":3,\"rowop\":46,\"madd\":0,\"dptest\":0,\"fmul\":44520,\"fsqr\":22345,\"finv\":22260,\"build\":0},\"gae_total\":22264,\"native_total\":18943,\"n\":48383,\"ms\":1.8,\"note\":\"\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01/b14"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 12,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "research/blindspots_20261018/14-prime-m4-cells/replay/bin-r01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 13,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 13,
+  "commit": "e59a91a29ca9321d6efa976b7813ac36735ddf6c",
+  "dirty_after": [
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-build.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-build.stdout.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-fullic-a-b16-bx3.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-fullic-a-b16.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-fullic-a-b28.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-rho-b16.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-rho-b28.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-selftest.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-selftest.stdout.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-tdec-a-b16-bx3.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-tdec-a-b16.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-tdec-a-b28.stderr.log",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16-bx3.jsonl",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16.jsonl",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b28.jsonl",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b16.jsonl",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b28.jsonl",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16-bx3.jsonl",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16.jsonl",
+    "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b28.jsonl"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
