@@ -1,0 +1,254 @@
+{
+  "card_id": "CARD-BLINDSPOT-15-R01",
+  "card_path": "research/blindspots_20261018/15-genus3-la-exponent/matched-rho-cards/card-r01.yaml",
+  "card_sha256": "3d08aebf706f10f9bfa7b0c4fec23bf49b285bf4ac03dbe20011b7da81084eab",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-dirs",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin/b15b",
+        "research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 16.694,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 16.694,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin/b15b",
+        "--bits",
+        "20",
+        "--curve",
+        "0",
+        "--kappa",
+        "1.3059",
+        "--cx",
+        "8",
+        "--streams",
+        "r2",
+        "--las",
+        "lpsgebw2@8,lpsgebw2*,lpsgebw4x4@8,lpsgebl4@8",
+        "--orders",
+        "research/blindspots_20261018/15-genus3-la-exponent/orders.csv",
+        "--no-c1",
+        "--no-gp-check",
+        "--arms",
+        "rho",
+        "--rho-targets",
+        "4",
+        "--rho-r",
+        "64",
+        "--out",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/b20_c0_rho_replay.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 358.488,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-b20-c0-rho-replay",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/b20_c0_rho_replay.jsonl": "c25b5902267e51951d77c41bbbf73e445abd9c05ec8ecc0e5f5348d98164c213"
+      },
+      "seconds": 358.488,
+      "stderr_sha256": "70ec1f4ae089f36c6e4349d649b5a7cca947eafb69e66a8f59c3f787e9f7617d",
+      "stderr_tail": [
+        "{\"bits\":20,\"curve\":0,\"arm\":\"rho\",\"target\":0,\"correct\":true,\"cost\":18866263020,\"steps\":232712993,\"steps_over_model\":1.198,\"wall\":95.5}",
+        "{\"bits\":20,\"curve\":0,\"arm\":\"rho\",\"target\":1,\"correct\":true,\"cost\":36018367900,\"steps\":444291395,\"steps_over_model\":2.287,\"wall\":181.6}",
+        "{\"bits\":20,\"curve\":0,\"arm\":\"rho\",\"target\":2,\"correct\":true,\"cost\":10406739575,\"steps\":128360662,\"steps_over_model\":0.661,\"wall\":52.4}",
+        "{\"bits\":20,\"curve\":0,\"arm\":\"rho\",\"target\":3,\"correct\":true,\"cost\":5728952453,\"steps\":70657559,\"steps_over_model\":0.364,\"wall\":28.8}"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin/b15b",
+        "--bits",
+        "20",
+        "--curve",
+        "2",
+        "--kappa",
+        "1.3059",
+        "--cx",
+        "8",
+        "--streams",
+        "r2",
+        "--las",
+        "lpsgebw2@8,lpsgebw2*,lpsgebw4x4@8,lpsgebl4@8",
+        "--orders",
+        "research/blindspots_20261018/15-genus3-la-exponent/orders.csv",
+        "--no-c1",
+        "--no-gp-check",
+        "--arms",
+        "rho",
+        "--rho-targets",
+        "3",
+        "--rho-r",
+        "64",
+        "--out",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/b20_c2_rho_replay.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 233.079,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run-b20-c2-rho-replay",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/b20_c2_rho_replay.jsonl": "cd7f189e36c11b917fb59bad6eb1a2c5e672e56c376f3f3c8d49b28d42feb550"
+      },
+      "seconds": 233.079,
+      "stderr_sha256": "a81b27f0ecc893c2514408849b9843a11ecce532a21676f1abf34f0214d3d609",
+      "stderr_tail": [
+        "{\"bits\":20,\"curve\":2,\"arm\":\"rho\",\"target\":0,\"correct\":true,\"cost\":17781900829,\"steps\":219336676,\"steps_over_model\":1.458,\"wall\":92.8}",
+        "{\"bits\":20,\"curve\":2,\"arm\":\"rho\",\"target\":1,\"correct\":true,\"cost\":17821056140,\"steps\":219819746,\"steps_over_model\":1.461,\"wall\":92.4}",
+        "{\"bits\":20,\"curve\":2,\"arm\":\"rho\",\"target\":2,\"correct\":true,\"cost\":9056151217,\"steps\":111700251,\"steps_over_model\":0.742,\"wall\":47.3}"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin/b15b"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.008,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.008,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/bin"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "6febe56232e9283bc17ed54c121560eae39b790c",
+  "dirty_after": [
+    "benchmarks/20261018-blindspots-genus3-la-exponent/validate_item15_matched_rho.py",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/b20_c0_rho_replay.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/b20_c2_rho_replay.jsonl",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/build.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/build.stdout.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/run-c0.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/run-c0.stdout.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/run-c2.stderr.log",
+    "research/blindspots_20261018/15-genus3-la-exponent/raw/matched-replay/run-c2.stdout.log"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
