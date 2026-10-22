@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   validate:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-disjoint-cold-v2.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-disjoint-cold-v2.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 35 }}
     steps:
       - uses: actions/checkout@v4
@@ -109,7 +109,7 @@ jobs:
   measure:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     needs: validate
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-disjoint-cold-v2.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-disjoint-cold-v2.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 90
     strategy:
       fail-fast: false
