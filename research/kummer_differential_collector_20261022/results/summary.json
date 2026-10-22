@@ -1,12 +1,23 @@
 {
   "arms": [
-    "uncached"
+    "uncached",
+    "cached"
   ],
   "candidate_cost_boundary": "cold per target: fresh model root/theta/torsion setup, source transfer, anchor, collector, and verification",
   "cold_model_charges": 1260,
   "cold_setup_models": 21,
   "cold_setup_targets": 1260,
   "per_arm": {
+    "cached": {
+      "cold_loss_cells": 36,
+      "cold_ratio_max": 54.09364409904294,
+      "cold_ratio_min": 8.617640054144095,
+      "cold_win_cells": 0,
+      "online_loss_cells": 36,
+      "online_ratio_max": 51.61020370862604,
+      "online_ratio_min": 8.149963582878545,
+      "online_win_cells": 0
+    },
     "uncached": {
       "cold_loss_cells": 36,
       "cold_ratio_max": 55.93542363449571,
@@ -18,21 +29,28 @@
       "online_win_cells": 0
     }
   },
-  "price_cells": 288,
+  "price_cells": 576,
   "processed_divisors": {
+    "cached": 230430039,
     "uncached": 230430039
   },
   "recover_fail": {
+    "cached": 739,
     "uncached": 739
   },
   "schema": "kummer-differential-collector-summary/v1",
   "source_verified": {
+    "cached": 1260,
     "uncached": 1260
   },
   "split_relations": {
+    "cached": 109480302,
     "uncached": 109480302
   },
   "status": {
+    "cached": {
+      "verified": 1260
+    },
     "uncached": {
       "verified": 1260
     }
@@ -40,9 +58,11 @@
   "study_id": "KUMMER-DIFFERENTIAL-COLLECTOR-20261022",
   "targets_per_arm": 1260,
   "walk_restarts": {
+    "cached": 1080,
     "uncached": 1080
   },
   "xadd_repairs": {
+    "cached": 0,
     "uncached": 0
   }
 }

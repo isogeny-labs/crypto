@@ -266,8 +266,16 @@ fn main() {
     let here = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let root = here.parent().unwrap().parent().unwrap().to_path_buf();
     let results = here.join("results");
-    let prior: Value =
-        serde_json::from_str(&fs::read_to_string(results.join("summary.json")).unwrap()).unwrap();
+    let paired = std::env::var("KUMMER_RHO_SOURCE").ok().as_deref() == Some("paired");
+    let output = if paired {
+        results.join("paired/analysis")
+    } else {
+        results.clone()
+    };
+    fs::create_dir_all(&output).unwrap();
+    let prior: Option<Value> = fs::read_to_string(output.join("summary.json"))
+        .ok()
+        .map(|s| serde_json::from_str(&s).unwrap());
     let arms: Vec<String> = std::env::var("KUMMER_ARMS")
         .unwrap_or_else(|_| "uncached,cached".to_string())
         .split(',')
@@ -300,6 +308,7 @@ fn main() {
         let mut recover_fail = 0u64;
         let mut repairs = 0u64;
         let mut restarts = 0u64;
+        let mut rho_archive_matches = 0u64;
         for bits in BITS {
             let source = rows(&root.join(format!(
                 "research/kummer_coordinates_20261022/results/target-gate-{bits}.jsonl"
@@ -309,11 +318,61 @@ fn main() {
                 .into_iter()
                 .map(|v| (s(&v, "workload_id").to_string(), v))
                 .collect();
-            let candidates = rows(&results.join(format!("{arm}/collector-{bits}.jsonl")));
+            let candidate_path = if paired {
+                results.join(format!("paired/{arm}/collector-{bits}.jsonl"))
+            } else {
+                results.join(format!("{arm}/collector-{bits}.jsonl"))
+            };
+            let candidates = rows(&candidate_path);
             assert_eq!(candidates.len(), 180);
+            let frozen_uncached: HashMap<String, Value> = if paired || arm == "cached" {
+                rows(&results.join(format!("uncached/collector-{bits}.jsonl")))
+                    .into_iter()
+                    .map(|v| (s(&v, "workload_id").to_string(), v))
+                    .collect()
+            } else {
+                HashMap::new()
+            };
             let rho = rho_rows(&root, bits);
+            let paired_rho: HashMap<String, Value> = if paired {
+                let matched = rows(&results.join(format!("paired/rho/rho-{bits}.jsonl")));
+                assert_eq!(matched.len(), 180);
+                matched
+                    .into_iter()
+                    .map(|v| (s(&v, "workload_id").to_string(), v))
+                    .collect()
+            } else {
+                HashMap::new()
+            };
             for c in candidates {
                 let id = s(&c, "workload_id");
+                if paired {
+                    assert_eq!(c, frozen_uncached[id], "paired candidate changed {id}");
+                } else if arm == "cached" {
+                    let base = &frozen_uncached[id];
+                    for key in [
+                        "recovered",
+                        "status",
+                        "attempts",
+                        "split_relations",
+                        "recover_success",
+                        "recover_fail",
+                        "graph_operations",
+                        "walk_restarts",
+                        "xadd_repairs",
+                    ] {
+                        assert_eq!(c[key], base[key], "cached trajectory differs {id} {key}");
+                    }
+                    for phase in ["walk_ops", "recover_ops"] {
+                        for key in ["m", "a"] {
+                            assert_eq!(
+                                c[phase][key], base[phase][key],
+                                "cached arithmetic differs {id} {phase}.{key}"
+                            );
+                        }
+                        assert!(n(&c[phase], "i") <= n(&base[phase], "i"));
+                    }
+                }
                 let rr = &rho[id];
                 let w = &rr["workload"];
                 let src = &source_map[id];
@@ -335,6 +394,16 @@ fn main() {
                     s(&rr["outcome"], "recovered").parse::<u64>().unwrap(),
                     n(&c, "recovered")
                 );
+                let priced_rho = if paired { &paired_rho[id] } else { rr };
+                if paired {
+                    assert_eq!(n(&w["curve"], "automorphisms_available"), 2);
+                    assert_eq!(priced_rho["status"], "verified");
+                    assert_eq!(priced_rho["same_process_as_candidate"], true);
+                    assert_eq!(n(priced_rho, "recovered"), n(&c, "recovered"));
+                    assert_eq!(n(priced_rho, "target_index"), n(&c, "target_index"));
+                    rho_archive_matches +=
+                        u64::from(priced_rho["archived_arithmetic_match"] == true);
+                }
                 assert_eq!(t["source_scalar_verified"], true);
                 assert_eq!(m["torsion_actions_match"], true);
                 assert_eq!(n(src, "target_index"), n(&c, "target_index"));
@@ -359,11 +428,12 @@ fn main() {
                 );
                 replay_runs.push(json!({"arm":arm,"bits":bits,"workload_id":id,
                     "recovered":n(&c,"recovered"),"source_scalar_verified":true,
-                    "rho_recovered":s(&rr["outcome"],"recovered").parse::<u64>().unwrap()}));
+                    "rho_recovered":if paired {n(priced_rho,"recovered")} else {s(&rr["outcome"],"recovered").parse::<u64>().unwrap()},
+                    "rho_same_process":paired}));
                 let online = candidate_count(&c);
                 let mut cold = online;
                 cold.add(setup_count(m, t));
-                let (rc, unit) = rho_count(rr);
+                let (rc, unit) = rho_count(priced_rho);
                 records.push(Record {
                     arm: arm.clone(),
                     bits,
@@ -385,7 +455,7 @@ fn main() {
         }
         assert_eq!(verified, 1260);
         status.insert(arm.clone(), json!({"verified":verified}));
-        totals.insert(arm.clone(),json!({"source_verified":verified,"processed_divisors":steps,"split_relations":splits,"recover_fail":recover_fail,"xadd_repairs":repairs,"walk_restarts":restarts}));
+        totals.insert(arm.clone(),json!({"source_verified":verified,"processed_divisors":steps,"split_relations":splits,"recover_fail":recover_fail,"xadd_repairs":repairs,"walk_restarts":restarts,"rho_archive_matches":rho_archive_matches}));
     }
     let cells: Vec<(f64, f64, f64)> = [0., 0.5, 1.]
         .into_iter()
@@ -409,7 +479,7 @@ fn main() {
             target_csv.push_str(&format!("{},{},{},{},{},{sq},{inv},{native},{o:.12},{c:.12},{r:.12},{:.12},{:.12},true,true\n",rec.arm,rec.bits,rec.p,rec.index,rec.id,o/r,c/r));
         }
     }
-    fs::write(results.join("target-price.csv"), target_csv).unwrap();
+    fs::write(output.join("target-price.csv"), target_csv).unwrap();
     let mut grid_csv = String::from(
         "arm,slice,targets,S_per_M,I_per_M,native_GAE_per_logical,candidate_online_GAE,candidate_cold_GAE,rho_GAE,candidate_online_over_rho,candidate_cold_over_rho,candidate_wins,candidate_losses\n",
     );
@@ -469,7 +539,7 @@ fn main() {
         }
         per_arm.insert(arm.clone(),json!({"cold_ratio_min":min_c,"cold_ratio_max":max_c,"cold_win_cells":wc,"cold_loss_cells":lc,"online_ratio_min":min_o,"online_ratio_max":max_o,"online_win_cells":wo,"online_loss_cells":lo}));
     }
-    fs::write(results.join("price-grid.csv"), grid_csv).unwrap();
+    fs::write(output.join("price-grid.csv"), grid_csv).unwrap();
     let get = |key: &str| -> Value {
         Value::Object(
             totals
@@ -481,10 +551,19 @@ fn main() {
     let summary = json!({"schema":"kummer-differential-collector-summary/v1","study_id":"KUMMER-DIFFERENTIAL-COLLECTOR-20261022",
       "targets_per_arm":1260,"arms":arms,"status":status,"source_verified":get("source_verified"),"processed_divisors":get("processed_divisors"),"split_relations":get("split_relations"),"recover_fail":get("recover_fail"),"xadd_repairs":get("xadd_repairs"),"walk_restarts":get("walk_restarts"),
       "price_cells":36*8*per_arm.len(),"candidate_cost_boundary":"cold per target: fresh model root/theta/torsion setup, source transfer, anchor, collector, and verification","cold_setup_models":21,"cold_setup_targets":1260,"cold_model_charges":1260,"per_arm":per_arm});
-    assert_eq!(
-        prior["arms"], summary["arms"],
-        "first produce a native summary for newly completed arms, then rerun for independent headline validation"
-    );
+    let mut summary = summary;
+    if paired {
+        summary["paired_rho_arithmetic_matches_archive"] = get("rho_archive_matches");
+    }
+    let Some(prior) = prior.filter(|v| v["arms"] == summary["arms"]) else {
+        fs::write(
+            output.join("summary.json"),
+            format!("{}\n", serde_json::to_string_pretty(&summary).unwrap()),
+        )
+        .unwrap();
+        println!("{}", serde_json::to_string(&summary).unwrap());
+        return;
+    };
     let mut raw_paths = vec![
         "research/kummer_differential_collector_20261022/results/cold-model-setup.jsonl"
             .to_string(),
@@ -494,7 +573,18 @@ fn main() {
     ];
     for arm in &arms {
         for bits in BITS {
-            raw_paths.push(format!("research/kummer_differential_collector_20261022/results/{arm}/collector-{bits}.jsonl"));
+            raw_paths.push(if paired {format!("research/kummer_differential_collector_20261022/results/paired/{arm}/collector-{bits}.jsonl")}
+              else {format!("research/kummer_differential_collector_20261022/results/{arm}/collector-{bits}.jsonl")});
+        }
+    }
+    if paired {
+        for bits in BITS {
+            raw_paths.push(format!("research/kummer_differential_collector_20261022/results/paired/rho/rho-{bits}.jsonl"));
+        }
+    }
+    if paired {
+        for bits in BITS {
+            raw_paths.push(format!("research/kummer_differential_collector_20261022/results/uncached/collector-{bits}.jsonl"));
         }
     }
     for bits in BITS {
@@ -509,9 +599,15 @@ fn main() {
     let cert = json!({"schema":"kummer-native-replay-certificate/v1","status":"verified","independent":true,
       "scalars_verified":true,"runs":replay_runs,"raw_data":raw_data,
       "analyzer_source_sha256":digest(&here.join("src/bin/analyze.rs")),
+      "paired_runner_source_sha256":if paired {Some(digest(&here.join("src/bin/paired_uncached.rs")))} else {None},
+      "candidate_source_sha256":if paired {Some(digest(&here.join("src/main_uncached.rs")))} else {None},
       "method":"independent Rust Fp² affine scalar multiplication and exact setup/collector joins"});
     fs::write(
-        here.join("replay-certificate.json"),
+        if paired {
+            output.join("replay-certificate.json")
+        } else {
+            here.join("replay-certificate.json")
+        },
         format!("{}\n", serde_json::to_string_pretty(&cert).unwrap()),
     )
     .unwrap();
@@ -539,16 +635,57 @@ fn main() {
     );
     let report = json!({"schema":"kummer-native-validator-report/v1","status":"pass","independent":true,
       "raw_data":raw_data,"headline":headlines,"analyzer_source_sha256":digest(&here.join("src/bin/analyze.rs")),
-      "rho_process_match":false,"rho_note":"archived same-source rho ran in a separate process; no leaderboard gate claim"});
+      "rho_process_match":paired,"rho_note":if paired {"collector and native negation rho ran in paired_uncached process"} else {"archived same-source rho ran in a separate process; no leaderboard gate claim"}});
     fs::write(
-        here.join("validator-report.json"),
+        if paired {
+            output.join("validator-report.json")
+        } else {
+            here.join("validator-report.json")
+        },
         format!("{}\n", serde_json::to_string_pretty(&report).unwrap()),
     )
     .unwrap();
     fs::write(
-        results.join("summary.json"),
+        output.join("summary.json"),
         format!("{}\n", serde_json::to_string_pretty(&summary).unwrap()),
     )
     .unwrap();
+    if paired {
+        assert_eq!(
+            arms,
+            vec!["uncached".to_string()],
+            "paired manifest currently covers uncached arm"
+        );
+        let mut band = serde_json::Map::new();
+        let mut ranks = Vec::new();
+        for native in [0., 0.1, 1.] {
+            let sq = 0.5;
+            let inv = 10.;
+            let mut ic = 0.;
+            let mut rho = 0.;
+            for rec in &records {
+                ic += gae(rec.cold, sq, inv, native, rec.unit);
+                rho += gae(rec.rho, sq, inv, native, rec.unit);
+            }
+            ranks.push(ic < rho);
+            band.insert(format!("{native}"), json!({"ic":ic,"rho":rho}));
+        }
+        assert!(ranks.iter().all(|x| *x == ranks[0]));
+        let manifest = json!({"schema":"validation-gate/v1",
+          "replay_certificate":{"path":"results/paired/analysis/replay-certificate.json",
+            "sha256":digest(&output.join("replay-certificate.json"))},
+          "validator_report":{"path":"results/paired/analysis/validator-report.json",
+            "sha256":digest(&output.join("validator-report.json"))},
+          "rho_reference":{"kind":"negation","protocol":"native memoized r-adding rho with negation, source E(Fp²), exact 1260 workloads",
+            "unit":"GAE at S/M=0.5, I/M=10 with native band",
+            "binary_or_process":"paired_uncached",
+            "matches_protocol":true,"strongest_available":true,"same_unit":true,
+            "same_binary_or_process":true,"gae_band":band,"order_holds_across_band":true}});
+        fs::write(
+            here.join("VALIDATION.json"),
+            format!("{}\n", serde_json::to_string_pretty(&manifest).unwrap()),
+        )
+        .unwrap();
+    }
     println!("{}", serde_json::to_string(&summary).unwrap());
 }

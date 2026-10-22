@@ -112,7 +112,7 @@ mod signed {
     }
 }
 
-fn main() {
+pub fn run(output_dir: &str) {
     let theta_rows =
         fs::read_to_string("research/kummer_theta_20261022/results/theta-models.jsonl").unwrap();
     let mut theta = BTreeMap::new();
@@ -326,18 +326,14 @@ fn main() {
             completed += 1;
             out.push_str(&format!("{}\n",json!({"schema":"kummer-differential-collector/v1","bits":bits,"p":p,"r":r,"target_index":v["target_index"],"workload_id":v["workload_id"],"planted":v["planted"],"source_scalar_verified":v["source_scalar_verified"],"status":status,"recovered":recovered,"source_verified":status=="verified","attempts":attempts,"split_relations":splits,"recover_success":recovery_ok,"recover_fail":recovery_fail,"general_conversion_skips":general_skips,"xadd_repairs":repairs,"walk_restarts":restarts,"graph_cycles":graph.cycles,"graph_operations":graph.operations,"walk_ops":walk::read_ops(),"recover_ops":signed::read_ops(),"field_counts":j.f.counts()})));
         }
-        fs::create_dir_all("research/kummer_differential_collector_20261022/results/uncached")
-            .unwrap();
-        fs::write(
-            format!(
-                "research/kummer_differential_collector_20261022/results/uncached/collector-{bits}.jsonl"
-            ),
-            out,
-        )
-        .unwrap();
+        fs::create_dir_all(output_dir).unwrap();
+        fs::write(format!("{output_dir}/collector-{bits}.jsonl"), out).unwrap();
         if completed == max_targets {
             break;
         }
     }
     println!("completed={completed} solved={solved}");
+}
+fn main() {
+    run("research/kummer_differential_collector_20261022/results/uncached");
 }

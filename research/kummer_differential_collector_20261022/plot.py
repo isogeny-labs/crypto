@@ -1,12 +1,15 @@
 """Render full source-paired cold costs and all 36 pricing cells."""
 import csv
 import json
+import os
 from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
 B = Path(__file__).resolve().parent
-R = B / "results"
+paired = os.environ.get("KUMMER_PLOT_SOURCE") == "paired"
+R = B / ("results/paired/analysis" if paired else "results")
+rho_label = "same-process rho" if paired else "same-source archived rho"
 s = json.loads((R / "summary.json").read_text())
 grid = list(csv.DictReader((R / "price-grid.csv").open()))
 arms = s["arms"]
@@ -24,7 +27,7 @@ for arm in arms:
                         native_GAE_per_logical=0.1)["candidate_cold_over_rho"]) for b in bits]
     ax1.plot(bits, y, marker=marker, color=color, linestyle="--" if arm == "uncached" else "-", label=f"{arm}, I/M={inv}")
 ax1.set_xlabel("Frozen target size (bits)")
-ax1.set_ylabel("Complete cold candidate / same-source archived rho")
+ax1.set_ylabel(f"Complete cold candidate / {rho_label}")
 ax1.set_title("Cold ratio by bit size; S/M=0.5, native=0.1 GAE")
 ax1.grid(alpha=0.2)
 ax1.legend(fontsize=7)
@@ -42,13 +45,13 @@ ax2.set_yticks(range(3), ("0", "0.5", "1"))
 ax2.set_xlabel("Inversion price I/M")
 ax2.set_ylabel("Square price S/M")
 ax2.set_title(f"{heat_arm.title()} arm; 1,260 targets; native=0.1 GAE")
-fig.colorbar(img, ax=ax2, shrink=0.75, label="Cold candidate / archived rho")
-svg = B / "collector-cost.svg"
+fig.colorbar(img, ax=ax2, shrink=0.75, label=f"Cold candidate / {rho_label}")
+svg = B / ("collector-cost-paired.svg" if paired else "collector-cost.svg")
 fig.savefig(svg, bbox_inches="tight")
 svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
-fig.savefig(B / "collector-cost.png", dpi=160, bbox_inches="tight")
+fig.savefig(B / ("collector-cost-paired.png" if paired else "collector-cost.png"), dpi=160, bbox_inches="tight")
 
-with PdfPages(B / "KUMMER_COLLECTOR.pdf") as pdf:
+with PdfPages(B / ("KUMMER_PAIRED.pdf" if paired else "KUMMER_COLLECTOR.pdf")) as pdf:
     page = plt.figure(figsize=(8.27, 11.69))
     page.text(0.07, 0.95, "Fixed-difference Kummer collector", fontsize=17, weight="bold")
     page.text(0.07, 0.92, "KUMMER-DIFFERENTIAL-COLLECTOR-20261022", fontsize=10)
@@ -65,12 +68,12 @@ with PdfPages(B / "KUMMER_COLLECTOR.pdf") as pdf:
         f"Source transfers and source verifications: {s['cold_setup_targets']} each.",
         "Every candidate and rho answer was independently checked as k·P=Q",
         "on the original elliptic curve over Fp².",
-        "Rho is a same-source archived control from a separate process.",
-        "A matched-process rho gate is pending; these ratios use archived counts.",
+        "Rho ran in the same paired_uncached process." if paired else "Rho is a same-source archived control from a separate process.",
+        "These ratios use fresh paired rho counts." if paired else "These ratios use archived rho counts; see KUMMER_PAIRED.pdf for matched counts.",
         "Model setup includes root search, theta search and torsion matrices.",
         "Each cold target includes source transfer, initialization, the",
         "quotient walk, signed Recover, graph elimination and verification.",
-        "Raw: results/<arm>/collector-*.jsonl, cold-*-setup.jsonl,",
+        "Raw: results/paired/<arm>/collector-*.jsonl, paired/rho/*.jsonl," if paired else "Raw: results/<arm>/collector-*.jsonl, cold-*-setup.jsonl,",
         "results/target-price.csv and results/price-grid.csv.",
         "All 36 cells use S/M in {0,0.5,1}, I/M in {1,10,100,1000},",
         "and native cost in {0,0.1,1} GAE per declared logical operation.",
@@ -88,7 +91,7 @@ with PdfPages(B / "KUMMER_COLLECTOR.pdf") as pdf:
      for native in (0., .1, 1.):
         page = plt.figure(figsize=(8.27, 11.69))
         page.text(0.07, 0.95, f"{arm}: native={native:g} GAE/logical", fontsize=14, weight="bold")
-        page.text(0.07, 0.91, "S/M    I/M      candidate GAE     archived rho GAE   ratio     wins/losses", fontsize=9)
+        page.text(0.07, 0.91, "S/M    I/M      candidate GAE        rho GAE        ratio     wins/losses", fontsize=9)
         y = 0.88
         for row in rows:
             if row["arm"] != arm or float(row["native_GAE_per_logical"]) != native:

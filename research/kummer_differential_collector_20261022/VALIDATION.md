@@ -8,17 +8,18 @@ TMPDIR=/var/tmp cargo build --release --locked --offline --bins
 cd ../..
 research/kummer_differential_collector_20261022/target/release/setup
 research/kummer_differential_collector_20261022/target/release/uncached
-KUMMER_ARMS=uncached research/kummer_differential_collector_20261022/target/release/analyze
+research/kummer_differential_collector_20261022/target/release/cached
+KUMMER_ARMS=uncached,cached research/kummer_differential_collector_20261022/target/release/analyze
 MPLCONFIGDIR=/var/tmp/kummer-mpl uv run --with matplotlib python3 research/kummer_differential_collector_20261022/plot.py
 ```
 
-When the optional cached arm finishes, run its binary and then repeat the
-native analyzer without `KUMMER_ARMS` to include both complete arms. Python
-is used only to lay out the PDF and graph from the native result files.
+The two collector arms use the same 1,260 target IDs. Python is used only to
+lay out the PDF and graph from the native result files.
 The analyzer also emits `replay-certificate.json` and `validator-report.json`
 with SHA-256 pins for all raw inputs. The archived rho was collected in a
-separate process, so these artifacts document the result but do not yet
-satisfy the leaderboard's same-process rho gate.
+separate process, so these artifacts document the historical comparison.
+The same-process rho arm is replayed and priced separately under
+`results/paired/`; see `PAIRED_PROCESS_PROTOCOL.md`.
 
 The setup binary reconstructs and matches each frozen root set, theta tuple
 and torsion matrix before emitting counts. It also recomputes each source
