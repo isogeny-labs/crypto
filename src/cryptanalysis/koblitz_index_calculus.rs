@@ -6692,9 +6692,9 @@ impl PairSumTable {
                     self.curve
                         .add_many_lazy_soa(target, gather_x, gather_y, x3s, lambdas, batch)
                 }
-                Scan::Gathered { xs, ys, .. } => {
-                    self.curve.add_many_lazy_soa(target, xs, ys, x3s, lambdas, batch)
-                }
+                Scan::Gathered { xs, ys, .. } => self
+                    .curve
+                    .add_many_lazy_soa(target, xs, ys, x3s, lambdas, batch),
             };
             if !done {
                 x3s.clear();
@@ -12681,8 +12681,14 @@ impl<'a> RelationCollector<'a> {
         doubled.extend_from_slice(&idxs[..window]);
         let (doubled_x, doubled_y) = match self.pair_table() {
             Some(pair) if !pair.negated_x.is_empty() => (
-                doubled.iter().map(|&i| pair.negated_x[i as usize]).collect(),
-                doubled.iter().map(|&i| pair.negated_y[i as usize]).collect(),
+                doubled
+                    .iter()
+                    .map(|&i| pair.negated_x[i as usize])
+                    .collect(),
+                doubled
+                    .iter()
+                    .map(|&i| pair.negated_y[i as usize])
+                    .collect(),
             ),
             _ => (Vec::new(), Vec::new()),
         };
