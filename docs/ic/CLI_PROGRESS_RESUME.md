@@ -58,3 +58,27 @@ publishes `walk.json` last; success requires the final upload to finish. Use a
 dedicated prefix per run.
 Only one host should write a given state prefix at a time; the directory lock
 does not coordinate separate hosts.
+
+`crypto isogeny class build` and `resume` keep the class graph in SQLite and
+now stream committed vertex counts with `--verbose` (or
+`--progress-every SECONDS`). They can publish transaction-consistent SQLite
+snapshots to a dedicated S3 prefix:
+
+```sh
+crypto isogeny class build --curve ./curve.json --out ./class/graph.sqlite \
+  --steps 100 --verbose --state-s3-uri s3://my-bucket/classes/run-1 \
+  --sync-every 60
+crypto isogeny class resume --input ./class/graph.sqlite --steps all \
+  --verbose --state-s3-uri s3://my-bucket/classes/run-1
+```
+
+The second command also works with a fresh local path: it downloads the
+snapshot named by S3 `LATEST.json`, checks its SHA-256 and size, and validates
+the stored plan before expanding. Each S3 upload writes an immutable SQLite
+snapshot first and moves `LATEST.json` last. `graph.sqlite.progress.json` and
+`graph.sqlite.result.json` remain local; the final result is uploaded after
+the final snapshot. A stopped vertex expansion repeats from its last SQLite
+transaction. Snapshot cadence may lag local transactions by `--sync-every`
+seconds. The local lock does not coordinate separate hosts, so use one writer
+per prefix. The original graph replay and completeness checks still decide
+whether a class is complete.
