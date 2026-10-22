@@ -36,7 +36,7 @@ use crypto_lib::cryptanalysis::ecdlp_nist::{
     name = "ecdlp-nist",
     version,
     about = "ECDLP solvers and structural audit across NIST and Certicom curves",
-    long_about = "Solve Q = [k]G on the NIST P, K and B curves and nine Certicom binary \
+    long_about = "Solve Q = [k]G on the NIST P, K and B curves and Certicom prime/binary \
                   challenges by the \
                   branch the curve calls for (Smart on anomalous prime curves, \
                   Pohlig–Hellman on composite orders, BSGS/kangaroo on an interval, \
@@ -394,9 +394,20 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
         Option<BigUint>,
         Option<serde_json::Value>,
     ) = if args.challenge {
-        let (_, target) = BinaryCurve::certicom_challenge(&curve.name)
-            .ok_or_else(|| format!("{} is not a Certicom binary challenge", curve.name))?;
-        (nist::AnyPoint::Binary(target), None, None)
+        if curve.name.eq_ignore_ascii_case("ECCp-131") {
+            (
+                curve.parse_point(
+                    "03AA6F004FC62E2DA1ED0BFB62C3FFB568",
+                    "009C21C284BA8A445BB2701BF55E3A67ED",
+                )?,
+                None,
+                None,
+            )
+        } else {
+            let (_, target) = BinaryCurve::certicom_challenge(&curve.name)
+                .ok_or_else(|| format!("{} is not a supported Certicom challenge", curve.name))?;
+            (nist::AnyPoint::Binary(target), None, None)
+        }
     } else if let Some(path) = &args.point_file {
         let (point, receipt) = load_target_artifact(&curve, path)?;
         (point, None, Some(receipt))
@@ -428,7 +439,10 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
                 &lo + rng.gen_biguint_below(&span)
             }
             (None, None) => {
-                return Err("give --secret K, --random-bits B, --point X,Y, or --challenge".into());
+                return Err(
+                    "give --secret K, --random-bits B, --point X,Y, --point-file PATH, or --challenge"
+                        .into(),
+                );
             }
         };
         (curve.plant(&k), Some(k), None)

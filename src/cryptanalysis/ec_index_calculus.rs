@@ -1608,8 +1608,6 @@ pub fn ec_index_calculus_dlp_s4_staged(
         let (rel, trials) = found?;
         trials_total += failed_trials + trials;
         trials_per_relation.push(failed_trials + trials);
-        trials_total += trials;
-        trials_per_relation.push(trials);
         relations.push(rel);
     }
     let relations_ms = relations_started.elapsed().as_secs_f64() * 1e3;
