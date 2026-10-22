@@ -1146,7 +1146,11 @@ impl Walk {
                 rec.insert(3, ("target_curve_ref".into(), V::s(self.curve_ref(e.target))));
                 rec.push((
                     "kernel_certificate".into(),
-                    V::s("kernel::verify_kernel: squarefree, divides psi_ell, closed under [g], Velu codomain F_p-isomorphic to the target"),
+                    V::s(if e.ell == 2 {
+                        "kernel::verify_kernel: rational 2-torsion root, Velu codomain F_p-isomorphic to the target"
+                    } else {
+                        "kernel::verify_kernel: squarefree, divides psi_ell, closed under [g], Velu codomain F_p-isomorphic to the target"
+                    }),
                 ));
                 V::Map(rec)
             })

@@ -5,10 +5,12 @@ use clap::Args;
 use crypto_lib::cryptanalysis::isogeny_walk::walk::{
     self, RouteIndex, StartCurve, Walk, WalkConfig,
 };
+use crypto_lib::cryptanalysis::isogeny_walk::{kernel as walk_kernel, walk::Edge, walk::Node};
 use crypto_lib::ecc::{curve::CurveParams, field::FieldElement, point::Point};
 use crypto_lib::hash::sha256::sha256;
 use isogeny_algos::curve::{self, Curve, Isogeny, Pt};
 use isogeny_algos::field::{Field as _, Zp};
+use isogeny_algos::kernel::kohel::kohel;
 use num_bigint::BigUint;
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -41,7 +43,7 @@ pub struct GenerateArgs {
     qx: u64,
     #[arg(long)]
     qy: u64,
-    /// Odd prime isogeny degree in 3..=31.
+    /// Prime isogeny degree in 2..=31; degree 2 needs rational 2-torsion.
     #[arg(long)]
     degree: u64,
     /// Maximum curve models in the bounded walk (2..=64).
@@ -63,14 +65,17 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
     if !(3..=4_000_000).contains(&args.n) || !super::prime(args.n) {
         return Err("n must be prime and in 3..=4000000".into());
     }
-    if !(3..=31).contains(&args.degree)
+    if !(2..=31).contains(&args.degree)
         || !super::prime(args.degree)
         || args.degree == args.n
         || args.p <= args.degree + 1
         || !(2..=64).contains(&args.max_curves)
         || !(1..=64).contains(&args.max_depth)
     {
-        return Err("degree must be an odd prime in 3..=31 below p-1 and distinct from n; max-curves must be in 2..=64 and max-depth in 1..=64".into());
+        return Err("degree must be prime in 2..=31 below p-1 and distinct from n; max-curves must be in 2..=64 and max-depth in 1..=64".into());
+    }
+    if args.degree == 2 && args.max_depth != 1 {
+        return Err("degree-2 route generation currently requires max-depth 1".into());
     }
     if [args.a, args.b, args.gx, args.gy, args.qx, args.qy]
         .iter()
@@ -142,7 +147,11 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
         gy: BigUint::from(args.gy),
     };
     let config = WalkConfig {
-        primes: vec![args.degree],
+        primes: if args.degree == 2 {
+            vec![]
+        } else {
+            vec![args.degree]
+        },
         max_curves: args.max_curves,
         max_depth: args.max_depth,
         seed: args.seed,
@@ -150,7 +159,61 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
         skipped: Vec::new(),
     };
     let mut walk = Walk::new(start.clone(), config)?;
-    walk.run();
+    if args.degree == 2 {
+        let field = walk.field.clone();
+        let source = Curve::new(args.a, args.b);
+        let zp = Zp::new(args.p);
+        let root = walk.nodes[0].model;
+        for x in 0..args.p {
+            let xx = u128::from(x);
+            if (xx * xx * xx + u128::from(args.a) * xx + u128::from(args.b)) % u128::from(args.p)
+                != 0
+            {
+                continue;
+            }
+            let kernel = vec![field.neg(&field.from_u64(x)), field.one()];
+            let codomain = walk_kernel::verify_kernel(&field, &root, 2, &kernel)
+                .map_err(|e| format!("degree-2 kernel certificate failed: {e:?}"))?;
+            let j = codomain.j(&field).ok_or("degree-2 codomain is singular")?;
+            if walk.nodes.iter().any(|node| node.j == j) {
+                continue;
+            }
+            let iso = kohel(&zp, &source, &vec![zp.neg(x), 1], 2);
+            let Pt::Aff(gx, gy) = iso.eval(&zp, &Pt::Aff(args.gx, args.gy)) else {
+                return Err("degree-2 kernel killed the DLP generator".into());
+            };
+            if field.from_u64(iso.cod.a) != codomain.a || field.from_u64(iso.cod.b) != codomain.b {
+                return Err("degree-2 Kohel and kernel certificates disagree".into());
+            }
+            let edge_index = walk.edges.len();
+            let target_index = walk.nodes.len();
+            walk.edges.push(Edge {
+                ell: 2,
+                dir: 'x',
+                source: 0,
+                target: target_index,
+                kernel,
+                velu: codomain,
+                u2: field.one(),
+            });
+            walk.nodes.push(Node {
+                j,
+                model: codomain,
+                depth: 1,
+                parent_edge: Some(edge_index),
+                expanded: false,
+                generator: (field.from_u64(gx), field.from_u64(gy)),
+                audit: None,
+                roots: Vec::new(),
+                levels: Vec::new(),
+            });
+            if walk.nodes.len() == args.max_curves {
+                break;
+            }
+        }
+    } else {
+        walk.run();
+    }
     let ids: Vec<_> = (0..walk.nodes.len()).map(|i| walk.node_ids(i)).collect();
     let routes = RouteIndex::build(&walk, &ids);
     if routes.records.is_empty() {
@@ -242,8 +305,8 @@ pub(super) fn transport(
     }
     for edge in edges {
         let ell = integer(&edge["degree"], "degree")?;
-        if !(3..=31).contains(&ell) || !super::prime(ell) {
-            return Err("route degrees must be odd primes in 3..=31".into());
+        if !(2..=31).contains(&ell) || !super::prime(ell) {
+            return Err("route degrees must be primes in 2..=31".into());
         }
     }
     let root = &nodes[0];
@@ -549,5 +612,73 @@ mod tests {
                 .scalar_mul(&BigUint::from(190u32), &mapped.curve.a_fe()),
             mapped.target
         );
+    }
+
+    #[test]
+    fn generated_degree_two_route_replays_and_rejects_wrong_kernel() {
+        let field =
+            crypto_lib::cryptanalysis::isogeny_walk::field::Field::new(&BigUint::from(101u32))
+                .unwrap();
+        let model = crypto_lib::cryptanalysis::isogeny_walk::curve::Model {
+            a: field.from_u64(2),
+            b: field.from_u64(7),
+        };
+        assert_eq!(
+            walk_kernel::verify_kernel(&field, &model, 2, &vec![field.zero(), field.one()]),
+            Err(walk_kernel::EdgeError::NotTorsion)
+        );
+        let input = GenerateArgs {
+            p: 101,
+            a: 2,
+            b: 7,
+            n: 53,
+            gx: 73,
+            gy: 57,
+            qx: 20,
+            qy: 88,
+            degree: 2,
+            max_curves: 3,
+            max_depth: 1,
+            seed: 1,
+        };
+        let graph = generate(&input).unwrap();
+        assert_eq!(graph["edges"].as_array().unwrap().len(), 1);
+        let route_id = graph["routes"][0]["id"].as_str().unwrap().to_owned();
+        let path = std::env::temp_dir().join(format!(
+            "prime-degree-two-route-{}-{}.json",
+            std::process::id(),
+            line!()
+        ));
+        std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
+        let target = PrimeArgs {
+            p: input.p,
+            a: input.a,
+            b: input.b,
+            n: input.n,
+            gx: input.gx,
+            gy: input.gy,
+            qx: input.qx,
+            qy: input.qy,
+            fb_size: 8,
+            extra_relations: 64,
+            max_trials_per_relation: 5000,
+            max_relation_attempts: 64,
+            rho_steps: 0,
+            route_file: None,
+            route_id: None,
+        };
+        let mapped = transport(&target, &path, &route_id).unwrap();
+        assert_eq!(mapped.receipt["hops"], 1);
+        assert_eq!(
+            mapped
+                .generator
+                .scalar_mul(&BigUint::from(5u32), &mapped.curve.a_fe()),
+            mapped.target
+        );
+        let mut damaged = graph;
+        damaged["edges"][0]["kernel_polynomial"][0] = json!(0);
+        std::fs::write(&path, serde_json::to_vec(&damaged).unwrap()).unwrap();
+        assert!(transport(&target, &path, &route_id).is_err());
+        std::fs::remove_file(path).unwrap();
     }
 }

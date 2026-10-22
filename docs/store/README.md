@@ -211,6 +211,10 @@ The generated two-edge prime route passed the same path from an empty cache,
 including scalar replay after transport across both edges and exact-object
 cleanup. Its receipt is
 [`GENERATED_PRIME_MULTIHOP_S3_ACCEPTANCE_20261022.json`](GENERATED_PRIME_MULTIHOP_S3_ACCEPTANCE_20261022.json).
+The generated degree-2 prime route passed push, HEAD, remote verification,
+fresh-cache pull, `solve-prime` scalar replay, and exact-object cleanup in its
+own acceptance prefix. Its receipt is
+[`GENERATED_PRIME_DEGREE2_S3_ACCEPTANCE_20261022.json`](GENERATED_PRIME_DEGREE2_S3_ACCEPTANCE_20261022.json).
 The public cubic-field cofactor-12 target input also passed a live upload,
 HEAD checksum, fresh-cache `icx solve-cubic --input store:...` fetch, scalar
 replay, remote verify, exact-object cleanup, and final HEAD 404. The first

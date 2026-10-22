@@ -24,13 +24,16 @@
 //!
 //! # Verification
 //!
-//! [`verify_kernel`] never looks at `Φ_ℓ` or at how `h` was found.  It
-//! accepts `h` only if `h` is squarefree of degree `(ℓ − 1)/2`, divides the
+//! [`verify_kernel`] never looks at `Φ_ℓ` or at how `h` was found. For odd
+//! prime degree it accepts `h` only if `h` is squarefree of degree `(ℓ − 1)/2`, divides the
 //! `ℓ`-division polynomial, and its roots are closed under `P ↦ [g]P` for a
 //! generator `g` of `(Z/ℓ)^*/±1` — which makes them exactly the `x`-
 //! coordinates of one cyclic subgroup of order `ℓ`, stable under Galois
 //! because `h ∈ F_p[x]`.  Vélu's formulas then give the codomain, which
 //! must match the recorded target up to an `F_p`-isomorphism.
+//! For degree 2, a monic linear kernel is accepted only when its root is a
+//! rational point with `y = 0`; the separate 2-torsion Vélu sums certify its
+//! codomain.
 
 use super::curve::{self, Model};
 use super::field::{Fe, Field};
@@ -172,6 +175,23 @@ pub fn velu_codomain(f: &Field, e: &Model, h: &Poly) -> Model {
 /// Certify that `h` is the kernel polynomial of an `F_p`-rational
 /// `ℓ`-isogeny from `e`, and return Vélu's codomain.  Independent of `Φ_ℓ`.
 pub fn verify_kernel(f: &Field, e: &Model, ell: u64, h: &Poly) -> Result<Model, EdgeError> {
+    if ell == 2 {
+        if poly::degree(h) != Some(1) || h[1] != f.one() {
+            return Err(EdgeError::WrongDegree);
+        }
+        let x = f.neg(&h[0]);
+        if !f.is_zero(&e.rhs(f, &x)) {
+            return Err(EdgeError::NotTorsion);
+        }
+        let x2 = f.sqr(&x);
+        let x3 = f.mul(&x2, &x);
+        let t = f.add(&f.mul(&f.from_u64(3), &x2), &e.a);
+        let w = f.add(&f.mul(&f.from_u64(3), &x3), &f.mul(&e.a, &x));
+        return Ok(Model {
+            a: f.sub(&e.a, &f.mul(&f.from_u64(5), &t)),
+            b: f.sub(&e.b, &f.mul(&f.from_u64(7), &w)),
+        });
+    }
     let d = ((ell - 1) / 2) as usize;
     if ell < 3 || ell.is_multiple_of(2) || poly::degree(h) != Some(d) || h[d] != f.one() {
         return Err(EdgeError::WrongDegree);
@@ -350,5 +370,8 @@ fn kernel_from_sums(f: &Field, e: &Model, e2: &Model, s1: Fe, d: usize) -> Resul
 /// The `F_p`-isomorphism from Vélu's codomain to the recorded target, as
 /// `u²`, or [`EdgeError::NotIsomorphic`].
 pub fn link_to_target(f: &Field, codomain: &Model, target: &Model) -> Result<Fe, EdgeError> {
+    if codomain == target {
+        return Ok(f.one());
+    }
     curve::isomorphism(f, codomain, target).ok_or(EdgeError::NotIsomorphic)
 }

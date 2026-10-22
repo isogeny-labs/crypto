@@ -51,13 +51,37 @@ ic solve-prime --p 271 --a 1 --b 19 --n 281 \
 the same public curve, generator, and target coordinates as `solve-prime`,
 counts and validates the group, runs a bounded certified walk, and
 independently verifies the generated `IW1` graph before emitting its route
-file. The degree must be an odd prime in 3–31 below `p-1` and distinct from
-the DLP subgroup order; `--max-curves` is 2–64 and `--max-depth` is 1–64
-(default 1). Routes may contain several checked edges. A walk with no certified
+file. The degree must be prime in 2–31 below `p-1` and distinct from the
+DLP subgroup order; `--max-curves` is 2–64 and `--max-depth` is 1–64
+(default 1). Degree 2 uses rational 2-torsion and currently requires
+`--max-depth 1`. Other degrees use the modular-polynomial walk. Routes may
+contain several checked edges. A walk with no certified
 rational route exits unsuccessfully. The command may return several route
 IDs; select one from the emitted `routes` array. The p=271 command above
 returns two verified edges and two routes, including the shown route ID.
-For a two-edge route on the same target, set `--max-depth 2 --max-curves 16`
+For a rational degree-2 route, use the public `p=101`, `#E=106`, `n=53`
+target:
+
+```sh
+ic prime-route-generate --p 101 --a 2 --b 7 --n 53 \
+  --gx 73 --gy 57 --qx 20 --qy 88 --degree 2 --json \
+  > /tmp/prime-route-2.json
+ic solve-prime --p 101 --a 2 --b 7 --n 53 \
+  --gx 73 --gy 57 --qx 20 --qy 88 \
+  --route-file /tmp/prime-route-2.json \
+  --route-id IW1E2x1h3844094bf86c --rho-steps 0 --json
+```
+
+The degree-2 constructor enumerates rational roots of the cubic defining
+2-torsion, checks each linear kernel polynomial and Vélu codomain, and emits
+root-origin routes. The verifier independently checks the recorded kernel,
+codomain, curve identities, and point map. The command above generated one
+checked edge; `solve-prime` verified the route and scalar 5 on both curves.
+The generated route passed a live Setec store push, HEAD, remote verification,
+fresh-cache pull, `solve-prime` replay through `store:`, and exact-object
+cleanup. Its isolated object key and checks are in
+[`GENERATED_PRIME_DEGREE2_S3_ACCEPTANCE_20261022.json`](../store/GENERATED_PRIME_DEGREE2_S3_ACCEPTANCE_20261022.json).
+For a two-edge route on the p=271 target, set `--max-depth 2 --max-curves 16`
 and select `IW1E11h2hd708dae2b716` from the resulting route file. Both edges
 are reverified during `solve-prime`; the public scalar replays on the second
 destination curve. The generator emits only root-origin route IDs that
