@@ -668,6 +668,7 @@ pub fn rho4_folded(inst: &FoldInstance4, fold: RhoFold, seed: u64) -> RhoRun4F {
         b = mulm((b + mults[j].1) % n, m, n);
         l = next;
     }
+    let correct = found == Some(inst.d) && found.is_some_and(|d| curve.mul(&inst.g, d) == inst.q);
     RhoRun4F {
         fold,
         seed,
@@ -675,7 +676,7 @@ pub fn rho4_folded(inst: &FoldInstance4, fold: RhoFold, seed: u64) -> RhoRun4F {
         group_ops: curve.ops(),
         fp_muls: f.muls(),
         cycle_escapes,
-        correct: found == Some(inst.d),
+        correct,
         recovered: found,
     }
 }
@@ -860,6 +861,14 @@ pub struct Twist24Instance {
     pub h3_degree: usize,
     pub h3_coeff: u64,
     pub lambda_frob: u64,
+    pub model_fp_muls: u64,
+    pub twist_geometry_fp_muls: u64,
+    pub input_fp_muls: u64,
+    pub input_group_ops: u64,
+    pub cubic_eigen_fp_muls: u64,
+    pub cubic_eigen_group_ops: u64,
+    pub frob_eigen_fp_muls: u64,
+    pub frob_eigen_group_ops: u64,
 }
 
 impl Twist24Instance {
@@ -919,8 +928,10 @@ pub fn construct_twist24(p: u64, b0: u64, seed: u64) -> Result<Twist24Instance, 
         return Err("Frobenius y multiplier is not a monomial".into());
     }
     let (h3_degree, &h3_coeff) = monomials[0];
+    let twist_geometry_fp_muls = f.muls();
     let t3 = f.mul(&f.sq(&t), &t);
     let curve = Curve4::with_params(p, E4::ZERO, f.scale(&t3, b0));
+    let model_fp_muls = f.muls() - twist_geometry_fp_muls;
     let mut count = 1u64;
     for x in 0..p {
         let v = (pow_mod(x, 3, p) + b0) % p;
@@ -955,6 +966,9 @@ pub fn construct_twist24(p: u64, b0: u64, seed: u64) -> Result<Twist24Instance, 
         return Err("prime-order certificate failed".into());
     }
     let d = 271u64;
+    let q = curve.mul(&g, d);
+    let input_fp_muls = curve.f.muls();
+    let input_group_ops = curve.ops();
     let mut inst = Twist24Instance {
         core: FoldInstance4 {
             family: Family4::Psi,
@@ -966,7 +980,7 @@ pub fn construct_twist24(p: u64, b0: u64, seed: u64) -> Result<Twist24Instance, 
             cofactor: 1,
             g,
             d,
-            q: curve.mul(&g, d),
+            q,
             omega,
             lambda: 0,
             x0: E4::ZERO,
@@ -978,11 +992,23 @@ pub fn construct_twist24(p: u64, b0: u64, seed: u64) -> Result<Twist24Instance, 
         h3_degree,
         h3_coeff,
         lambda_frob: 0,
+        model_fp_muls,
+        twist_geometry_fp_muls,
+        input_fp_muls,
+        input_group_ops,
+        cubic_eigen_fp_muls: 0,
+        cubic_eigen_group_ops: 0,
+        frob_eigen_fp_muls: 0,
+        frob_eigen_group_ops: 0,
     };
     let cubic_g = inst.core.psi(&curve, &g, 1);
     inst.core.lambda = root_of_order(&curve, &g, &cubic_g, n, 3);
+    inst.cubic_eigen_fp_muls = curve.f.muls() - input_fp_muls;
+    inst.cubic_eigen_group_ops = curve.ops() - input_group_ops;
     let frob_g = inst.frob(&curve, &g);
     inst.lambda_frob = root_of_order(&curve, &g, &frob_g, n, 8);
+    inst.frob_eigen_fp_muls = curve.f.muls() - input_fp_muls - inst.cubic_eigen_fp_muls;
+    inst.frob_eigen_group_ops = curve.ops() - input_group_ops - inst.cubic_eigen_group_ops;
     if pow_mod(inst.lambda_frob, 4, n) != n - 1 || pow_mod(inst.core.lambda, 3, n) != 1 {
         return Err("endomorphism eigenvalues have wrong orders".into());
     }
@@ -1031,6 +1057,11 @@ fn twist24_columns(
                     fj,
                     pow_mod(inst.core.lambda, k as u64, inst.core.n),
                     inst.core.n,
+                );
+                assert_eq!(
+                    curve.mul(&rep, multiplier),
+                    transformed,
+                    "endomorphism coefficient failed independent scalar replay"
                 );
                 assert!(transformed.x.in_fp());
                 let &idx = index.get(&transformed.x.0[0]).expect("orbit left the base");
@@ -1188,6 +1219,16 @@ pub struct K4Twist24Report {
     pub target_x: [u64; 4],
     pub target_y: [u64; 4],
     pub known_scalar: u64,
+    pub negative_control_rejected: bool,
+    pub all_coefficients_checked: bool,
+    pub model_fp_muls: u64,
+    pub twist_geometry_fp_muls: u64,
+    pub input_fp_muls: u64,
+    pub input_group_ops: u64,
+    pub cubic_eigen_fp_muls: u64,
+    pub cubic_eigen_group_ops: u64,
+    pub frob_eigen_fp_muls: u64,
+    pub frob_eigen_group_ops: u64,
     pub base_points: usize,
     pub base_coordinates: Vec<([u64; 4], [u64; 4])>,
     pub selected_relations: Vec<TwistRelationRecord>,
@@ -1250,6 +1291,11 @@ pub fn run_k4_twist24(
     let core = &inst.core;
     let n = core.n;
     let curve = core.curve();
+    let mut corrupted = inst;
+    corrupted.lambda_frob = (inst.lambda_frob + 1) % n;
+    let negative_control_rejected =
+        curve.mul(&core.g, corrupted.lambda_frob) != corrupted.frob(&curve, &core.g);
+    assert!(negative_control_rejected);
     let mut rng = StdRng::seed_from_u64(seed ^ 0x1A4F_01D5);
     curve.f.reset_muls();
     let base = twist24_points(&inst, &curve, seed);
@@ -1386,6 +1432,16 @@ pub fn run_k4_twist24(
         target_x: core.q.x.0,
         target_y: core.q.y.0,
         known_scalar: core.d,
+        negative_control_rejected,
+        all_coefficients_checked: true,
+        model_fp_muls: inst.model_fp_muls,
+        twist_geometry_fp_muls: inst.twist_geometry_fp_muls,
+        input_fp_muls: inst.input_fp_muls,
+        input_group_ops: inst.input_group_ops,
+        cubic_eigen_fp_muls: inst.cubic_eigen_fp_muls,
+        cubic_eigen_group_ops: inst.cubic_eigen_group_ops,
+        frob_eigen_fp_muls: inst.frob_eigen_fp_muls,
+        frob_eigen_group_ops: inst.frob_eigen_group_ops,
         base_points: base.len(),
         base_coordinates: base.iter().map(|pt| (pt.x.0, pt.y.0)).collect(),
         selected_relations,
@@ -1525,6 +1581,12 @@ mod rho_tests {
     fn quartic_twist_action_and_line_columns_replay() {
         let inst = construct_twist24(37, 2, 0).unwrap();
         let curve = inst.core.curve();
+        let mut bad = inst;
+        bad.lambda_frob = (bad.lambda_frob + 1) % bad.core.n;
+        assert_ne!(
+            curve.mul(&bad.core.g, bad.lambda_frob),
+            bad.frob(&curve, &bad.core.g)
+        );
         let cubic = twist24_base(&inst, 0, false);
         let combined = twist24_base(&inst, 0, true);
         assert_eq!(cubic.points, combined.points);

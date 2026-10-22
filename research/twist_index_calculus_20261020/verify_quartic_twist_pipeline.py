@@ -129,6 +129,13 @@ def verify_one(rec):
     assert rec['known_scalar']==271 and c.scale(g,271)==q
     assert c.scale(g,rec['lambda_frob'])==psi(g)
     assert c.scale(g,rec['lambda_cubic'])==cubic(g)
+    if 'negative_control_rejected' in rec:
+        assert rec['negative_control_rejected'] and rec['all_coefficients_checked']
+        assert c.scale(g,(rec['lambda_frob']+1)%r)!=psi(g)
+        for key in ('model_fp_muls','twist_geometry_fp_muls','input_fp_muls',
+                    'input_group_ops','cubic_eigen_fp_muls','cubic_eigen_group_ops',
+                    'frob_eigen_fp_muls','frob_eigen_group_ops'):
+            assert isinstance(rec[key],int) and rec[key]>=0
     pts = [point(x,y) for x,y in rec['base_coordinates']]
     assert len(pts)==rec['base_points'] and len(set(pts))==len(pts)
     line = [x for x in range(1,p) if (rhs:=c.rhs((x,0,0,0)))!=Z

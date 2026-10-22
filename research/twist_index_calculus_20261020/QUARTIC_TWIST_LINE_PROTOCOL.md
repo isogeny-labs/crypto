@@ -97,3 +97,60 @@ Use the same quadratic-character test for all lines and retain zero
 lines. The maximum-size line per curve is a post hoc candidate; its
 relation yield and complete cost require a separately frozen paired
 run. Do not substitute it into the already registered `x∈Fp` panel.
+
+## Post-run v2 accounting and mutation-control amendment
+
+The 21-run v1 panel was committed at `ddd469ee74`; all three IC arms
+and all 1,008 rho walks recovered their public known-answer targets,
+with 1,821 selected relations independently replayed. The first cost
+report correctly counts base construction, orbit maps, pair table,
+stream, linear algebra and target verification, but it excludes the
+construction of the canonical public model, generator and eigenvalues.
+It must not be called a complete cold cost.
+
+Before changing the producer, freeze v2 on the **same** seven curves,
+three seeds, one target per run, 16 rho walks per fold, 64-wide batches,
+same jump rules, relation oracle, row selection and stopping cap. Add
+exclusive counters for common model construction, input/generator
+preparation, cubic eigenvalue identification, and twist-Frobenius
+geometry/eigenvalue identification. Charge the relevant eigenvalue
+work to each IC and rho arm, report common input work separately,
+and preserve the earlier post-input count for direct v1 comparison.
+Check every factor's asserted scalar coefficient during orbit-map
+construction, and inject one incorrect Frobenius eigenvalue per run:
+the validator must reject it before the timed relation stream. Retain
+the check and outcome in each raw record. Re-run the full 21-instance
+panel once as an A/A control; compare all non-timing fields exactly.
+Any divergence is an instrument failure. Derive summary CSV and plots
+from raw records, and independently replay the v2 relations, ranks,
+scalars and controls. Public model and known-answer target creation
+remain outside the one-target online interval, but their counted cost
+is explicit. No sealed or isolated whole-method speed claim follows
+from this L0 experiment.
+
+## Separately registered mixed-line relation-yield experiment
+
+Frozen after the four-line character sweep, before implementing the mixed
+producer. For the seven positive `(p,b0)` pairs and seeds `0,1,2`, compare
+two bases on the *same* canonical twist, generator and target `[271]G`:
+`L0={x∈Fp}` and `L02={x∈Fp}∪{x∈t²Fp}`. Both use exactly one signed lift per
+nonzero abscissa, with identical L0 lifts and their fixed signs across arms.
+The four-factor signed meet-in-the-middle oracle, 64-wide target batches,
+50,000,000 residual cap, flat/cubic/twist24 row encodings, square-core rank
+and scalar verification are held fixed. The target `(a,b)` stream comes
+from a dedicated RNG seeded by `(p,seed)` and is identical for L0 and L02;
+any decomposition choice uses a separate RNG. Charge model, eigenvalue,
+base, map, pair-table, stream, row/rank, and verification costs. Record
+every target attempted, every decomposition, unique selected trace,
+matrix ranks, per-arm stop, and full post-input arithmetic. Reuse the v2
+same-target 24-fold rho reference, which is independent of factor base;
+do not make a wall-time speed claim from these L0 host runs.
+
+For each base, independently replay liftability, closure, the 24 action,
+all emitted relations, encoded rows, rank and recovered scalar. Require
+the L0 target stream to be an exact prefix of L02's stream or vice versa,
+and require every L0 success at a shared target to be present as a valid
+L02 decomposition. Report yield per *same attempted target*, together
+with incremental table size and work; raw yield by itself is not the
+decision criterion. Preserve failures and censored rows. A full rerun
+must match every non-timing field exactly.
