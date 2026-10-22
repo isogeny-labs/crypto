@@ -53,8 +53,8 @@ counts and validates the group, runs a bounded certified walk, and
 independently verifies the generated `IW1` graph before emitting its route
 file. The degree must be prime in 2–31 below `p-1` and distinct from the
 DLP subgroup order; `--max-curves` is 2–64 and `--max-depth` is 1–64
-(default 1). Degree 2 uses rational 2-torsion and currently requires
-`--max-depth 1`. Other degrees use the modular-polynomial walk. Routes may
+(default 1). Degree 2 follows rational 2-torsion through the requested depth.
+Other degrees use the modular-polynomial walk. Routes may
 contain several checked edges. A walk with no certified
 rational route exits unsuccessfully. The command may return several route
 IDs; select one from the emitted `routes` array. The p=271 command above
@@ -81,6 +81,26 @@ The generated route passed a live Setec store push, HEAD, remote verification,
 fresh-cache pull, `solve-prime` replay through `store:`, and exact-object
 cleanup. Its isolated object key and checks are in
 [`GENERATED_PRIME_DEGREE2_S3_ACCEPTANCE_20261022.json`](../store/GENERATED_PRIME_DEGREE2_S3_ACCEPTANCE_20261022.json).
+For a two-edge degree-2 route, use the public p=107 curve with counted order
+124, subgroup order 31, generator `(11,37)`, and target `(16,61)`:
+
+```sh
+ic prime-route-generate --p 107 --a 3 --b 5 --n 31 \
+  --gx 11 --gy 37 --qx 16 --qy 61 --degree 2 \
+  --max-curves 8 --max-depth 2 --json > /tmp/prime-route-2-depth2.json
+ic solve-prime --p 107 --a 3 --b 5 --n 31 \
+  --gx 11 --gy 37 --qx 16 --qy 61 \
+  --route-file /tmp/prime-route-2-depth2.json \
+  --route-id IW1E2x2h0d74657d90d7 --rho-steps 0 --json
+```
+
+The generator verifies every rational 2-torsion kernel it selects and
+transports the public generator to each new model before expanding it. The
+solver rechecks the two-edge path and scalar 5 on its source and destination.
+The generated two-edge degree-2 route passed a live Setec S3 upload, HEAD,
+remote verification, fresh-cache pull, `solve-prime` replay through `store:`,
+and exact-object cleanup. The isolated key and checks are in
+[`GENERATED_PRIME_DEGREE2_MULTIHOP_S3_ACCEPTANCE_20261022.json`](../store/GENERATED_PRIME_DEGREE2_MULTIHOP_S3_ACCEPTANCE_20261022.json).
 For a two-edge route on the p=271 target, set `--max-depth 2 --max-curves 16`
 and select `IW1E11h2hd708dae2b716` from the resulting route file. Both edges
 are reverified during `solve-prime`; the public scalar replays on the second

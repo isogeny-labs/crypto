@@ -74,9 +74,6 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
     {
         return Err("degree must be prime in 2..=31 below p-1 and distinct from n; max-curves must be in 2..=64 and max-depth in 1..=64".into());
     }
-    if args.degree == 2 && args.max_depth != 1 {
-        return Err("degree-2 route generation currently requires max-depth 1".into());
-    }
     if [args.a, args.b, args.gx, args.gy, args.qx, args.qy]
         .iter()
         .any(|&v| v >= args.p)
@@ -161,55 +158,76 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
     let mut walk = Walk::new(start.clone(), config)?;
     if args.degree == 2 {
         let field = walk.field.clone();
-        let source = Curve::new(args.a, args.b);
         let zp = Zp::new(args.p);
-        let root = walk.nodes[0].model;
-        for x in 0..args.p {
-            let xx = u128::from(x);
-            if (xx * xx * xx + u128::from(args.a) * xx + u128::from(args.b)) % u128::from(args.p)
-                != 0
-            {
-                continue;
+        let coordinate = |v| {
+            field
+                .to_big(&v)
+                .to_u64_digits()
+                .first()
+                .copied()
+                .unwrap_or(0)
+        };
+        let mut source_index = 0;
+        while source_index < walk.nodes.len() && walk.nodes.len() < args.max_curves {
+            let node = walk.nodes[source_index].clone();
+            if node.depth < args.max_depth {
+                let a = coordinate(node.model.a);
+                let b = coordinate(node.model.b);
+                let source = Curve::new(a, b);
+                let generator = Pt::Aff(coordinate(node.generator.0), coordinate(node.generator.1));
+                for x in 0..args.p {
+                    let xx = u128::from(x);
+                    if (xx * xx * xx + u128::from(a) * xx + u128::from(b)) % u128::from(args.p) != 0
+                    {
+                        continue;
+                    }
+                    let kernel = vec![field.neg(&field.from_u64(x)), field.one()];
+                    let codomain = walk_kernel::verify_kernel(&field, &node.model, 2, &kernel)
+                        .map_err(|e| format!("degree-2 kernel certificate failed: {e:?}"))?;
+                    let j = codomain.j(&field).ok_or("degree-2 codomain is singular")?;
+                    if walk.nodes.iter().any(|known| known.j == j) {
+                        continue;
+                    }
+                    let iso = kohel(&zp, &source, &vec![zp.neg(x), 1], 2);
+                    let Pt::Aff(gx, gy) = iso.eval(&zp, &generator) else {
+                        return Err("degree-2 kernel killed the DLP generator".into());
+                    };
+                    if field.from_u64(iso.cod.a) != codomain.a
+                        || field.from_u64(iso.cod.b) != codomain.b
+                    {
+                        return Err("degree-2 Kohel and kernel certificates disagree".into());
+                    }
+                    let edge_index = walk.edges.len();
+                    let target_index = walk.nodes.len();
+                    walk.edges.push(Edge {
+                        ell: 2,
+                        dir: 'x',
+                        source: source_index,
+                        target: target_index,
+                        kernel,
+                        velu: codomain,
+                        u2: field.one(),
+                    });
+                    walk.nodes.push(Node {
+                        j,
+                        model: codomain,
+                        depth: node.depth + 1,
+                        parent_edge: Some(edge_index),
+                        expanded: false,
+                        generator: (field.from_u64(gx), field.from_u64(gy)),
+                        audit: None,
+                        roots: Vec::new(),
+                        levels: Vec::new(),
+                    });
+                    if walk.nodes.len() == args.max_curves {
+                        break;
+                    }
+                }
+                if walk.nodes.len() < args.max_curves {
+                    walk.nodes[source_index].expanded = true;
+                }
             }
-            let kernel = vec![field.neg(&field.from_u64(x)), field.one()];
-            let codomain = walk_kernel::verify_kernel(&field, &root, 2, &kernel)
-                .map_err(|e| format!("degree-2 kernel certificate failed: {e:?}"))?;
-            let j = codomain.j(&field).ok_or("degree-2 codomain is singular")?;
-            if walk.nodes.iter().any(|node| node.j == j) {
-                continue;
-            }
-            let iso = kohel(&zp, &source, &vec![zp.neg(x), 1], 2);
-            let Pt::Aff(gx, gy) = iso.eval(&zp, &Pt::Aff(args.gx, args.gy)) else {
-                return Err("degree-2 kernel killed the DLP generator".into());
-            };
-            if field.from_u64(iso.cod.a) != codomain.a || field.from_u64(iso.cod.b) != codomain.b {
-                return Err("degree-2 Kohel and kernel certificates disagree".into());
-            }
-            let edge_index = walk.edges.len();
-            let target_index = walk.nodes.len();
-            walk.edges.push(Edge {
-                ell: 2,
-                dir: 'x',
-                source: 0,
-                target: target_index,
-                kernel,
-                velu: codomain,
-                u2: field.one(),
-            });
-            walk.nodes.push(Node {
-                j,
-                model: codomain,
-                depth: 1,
-                parent_edge: Some(edge_index),
-                expanded: false,
-                generator: (field.from_u64(gx), field.from_u64(gy)),
-                audit: None,
-                roots: Vec::new(),
-                levels: Vec::new(),
-            });
-            if walk.nodes.len() == args.max_curves {
-                break;
-            }
+            source_index += 1;
         }
     } else {
         walk.run();
@@ -680,5 +698,70 @@ mod tests {
         std::fs::write(&path, serde_json::to_vec(&damaged).unwrap()).unwrap();
         assert!(transport(&target, &path, &route_id).is_err());
         std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn generated_degree_two_two_hop_route_replays_public_target() {
+        let input = GenerateArgs {
+            p: 107,
+            a: 3,
+            b: 5,
+            n: 31,
+            gx: 11,
+            gy: 37,
+            qx: 16,
+            qy: 61,
+            degree: 2,
+            max_curves: 8,
+            max_depth: 2,
+            seed: 1,
+        };
+        let graph = generate(&input).unwrap();
+        let route_id = graph["routes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|route| {
+                route["edge_ids"]
+                    .as_array()
+                    .is_some_and(|ids| ids.len() == 2)
+            })
+            .unwrap()["id"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        let path = std::env::temp_dir().join(format!(
+            "prime-degree-two-two-hop-{}-{}.json",
+            std::process::id(),
+            line!()
+        ));
+        std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
+        let target = PrimeArgs {
+            p: input.p,
+            a: input.a,
+            b: input.b,
+            n: input.n,
+            gx: input.gx,
+            gy: input.gy,
+            qx: input.qx,
+            qy: input.qy,
+            fb_size: 8,
+            extra_relations: 64,
+            max_trials_per_relation: 5000,
+            max_relation_attempts: 64,
+            rho_steps: 0,
+            route_file: None,
+            route_id: None,
+        };
+        let mapped = transport(&target, &path, &route_id).unwrap();
+        std::fs::remove_file(path).unwrap();
+        assert_eq!(mapped.receipt["hops"], 2);
+        assert_eq!(mapped.receipt["edges_verified"], 3);
+        assert_eq!(
+            mapped
+                .generator
+                .scalar_mul(&BigUint::from(5u32), &mapped.curve.a_fe()),
+            mapped.target
+        );
     }
 }
