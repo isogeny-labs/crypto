@@ -68,5 +68,7 @@ These conditions would establish runnable, validated implementations and qualifi
   but its device run was rejected before launch by a zero AWS GPU vCPU quota;
   no device or performance result is recorded.
 
+- 2026-10-22: Single-core CPU baseline for the three 131-bit targets ([study](../research/certicom131_rho_ic_bench_20261022/README.md)): batched-inversion walks on the exact ECC2-131 and ECCp-131 groups with checked arithmetic (8.50 M and 1.23 M steps/s). No CUDA result; the device replay above remains open.
+
 Partially resolved.  Completing the two-curve host arithmetic does not
 complete the requested GPU and durable campaign integration.
