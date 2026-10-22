@@ -39,6 +39,11 @@ is complete for arbitrary curves or divisors cannot be made from those runs.
   argument for the generic weighted-input 1+2 branch with `K≠0`. This
   establishes that branch's formula identity over the stated family,
   but not the remaining exceptional or 2+2 branches.
+- **Derived or proved, 2026-10-22 exceptional follow-up:** The same
+  [proof audit](../research/projective_law_followup_20261022/PROOF_AUDIT.md)
+  now has exact integer-polynomial certificates and written divisor
+  arguments for the `K=0` cancellation and coincident-positive
+  nontripling 1+2 branches. Tripling and the 2+2 outputs remain open.
 - **Suspected explanation:** None needed for the measured cost. Branch behavior
   outside the tested finite cases remains a proof obligation.
 - **Missing capability:** A checked universal case proof for the implemented
@@ -102,3 +107,8 @@ output-formula proof remains open.
 symbolic polynomial and homogeneity certificates plus a written
 divisor-class proof. Every other output branch remains open;
 the universal-completeness status is unchanged.
+
+2026-10-22: The `K=0` 1+2 cancellation and coincident-positive
+nontripling paths received exact symbolic certificates and written
+divisor-class arguments. Tripling and every 2+2 output identity remain
+unproved, so universal completeness is still open.

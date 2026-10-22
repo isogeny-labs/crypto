@@ -8,21 +8,21 @@ const N: usize = 14;
 type Monomial = [u8; N];
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-struct P(BTreeMap<Monomial, i128>);
+pub(crate) struct P(BTreeMap<Monomial, i128>);
 impl P {
-    fn c(n: i128) -> Self {
+    pub(crate) fn c(n: i128) -> Self {
         if n == 0 {
             Self(BTreeMap::new())
         } else {
             Self(BTreeMap::from([([0; N], n)]))
         }
     }
-    fn var(i: usize) -> Self {
+    pub(crate) fn var(i: usize) -> Self {
         let mut m = [0; N];
         m[i] = 1;
         Self(BTreeMap::from([(m, 1)]))
     }
-    fn add(&self, rhs: &Self) -> Self {
+    pub(crate) fn add(&self, rhs: &Self) -> Self {
         let mut out = self.0.clone();
         for (m, c) in &rhs.0 {
             let slot = out.entry(*m).or_default();
@@ -31,7 +31,7 @@ impl P {
         out.retain(|_, c| *c != 0);
         Self(out)
     }
-    fn neg(&self) -> Self {
+    pub(crate) fn neg(&self) -> Self {
         Self(
             self.0
                 .iter()
@@ -39,10 +39,10 @@ impl P {
                 .collect(),
         )
     }
-    fn sub(&self, rhs: &Self) -> Self {
+    pub(crate) fn sub(&self, rhs: &Self) -> Self {
         self.add(&rhs.neg())
     }
-    fn mul(&self, rhs: &Self) -> Self {
+    pub(crate) fn mul(&self, rhs: &Self) -> Self {
         let mut out = BTreeMap::new();
         for (a, ca) in &self.0 {
             for (b, cb) in &rhs.0 {
@@ -59,57 +59,57 @@ impl P {
         out.retain(|_, c| *c != 0);
         Self(out)
     }
-    fn sq(&self) -> Self {
+    pub(crate) fn sq(&self) -> Self {
         self.mul(self)
     }
-    fn pow(&self, n: u32) -> Self {
+    pub(crate) fn pow(&self, n: u32) -> Self {
         let mut out = Self::c(1);
         for _ in 0..n {
             out = out.mul(self);
         }
         out
     }
-    fn terms(&self) -> usize {
+    pub(crate) fn terms(&self) -> usize {
         self.0.len()
     }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-struct U(Vec<P>);
+pub(crate) struct U(Vec<P>);
 impl U {
-    fn new(mut v: Vec<P>) -> Self {
+    pub(crate) fn new(mut v: Vec<P>) -> Self {
         while v.last().is_some_and(|p| p.0.is_empty()) {
             v.pop();
         }
         Self(v)
     }
-    fn c(p: P) -> Self {
+    pub(crate) fn c(p: P) -> Self {
         Self::new(vec![p])
     }
-    fn x() -> Self {
+    pub(crate) fn x() -> Self {
         Self::new(vec![P::c(0), P::c(1)])
     }
-    fn coeff(&self, i: usize) -> P {
+    pub(crate) fn coeff(&self, i: usize) -> P {
         self.0.get(i).cloned().unwrap_or_else(|| P::c(0))
     }
-    fn add(&self, rhs: &Self) -> Self {
+    pub(crate) fn add(&self, rhs: &Self) -> Self {
         Self::new(
             (0..self.0.len().max(rhs.0.len()))
                 .map(|i| self.coeff(i).add(&rhs.coeff(i)))
                 .collect(),
         )
     }
-    fn sub(&self, rhs: &Self) -> Self {
+    pub(crate) fn sub(&self, rhs: &Self) -> Self {
         Self::new(
             (0..self.0.len().max(rhs.0.len()))
                 .map(|i| self.coeff(i).sub(&rhs.coeff(i)))
                 .collect(),
         )
     }
-    fn scale(&self, p: &P) -> Self {
+    pub(crate) fn scale(&self, p: &P) -> Self {
         Self::new(self.0.iter().map(|c| c.mul(p)).collect())
     }
-    fn mul(&self, rhs: &Self) -> Self {
+    pub(crate) fn mul(&self, rhs: &Self) -> Self {
         if self.0.is_empty() || rhs.0.is_empty() {
             return Self::new(vec![]);
         }
@@ -121,10 +121,10 @@ impl U {
         }
         Self::new(out)
     }
-    fn eval(&self, x: &P) -> P {
+    pub(crate) fn eval(&self, x: &P) -> P {
         self.0.iter().rev().fold(P::c(0), |a, c| a.mul(x).add(c))
     }
-    fn terms(&self) -> usize {
+    pub(crate) fn terms(&self) -> usize {
         self.0.iter().map(P::terms).sum()
     }
 }

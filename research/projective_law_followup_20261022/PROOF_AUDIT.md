@@ -130,8 +130,42 @@ normalizes to the affine pair above. The nine scale equalities are checked
 over the integer polynomial ring, so they hold for every field
 specialization where the input weights and `K` are nonzero.
 
-Proof map: the exact coefficient identities are discharged by
-`src/bin/projective_symbolic_12.rs` and its committed result. The
+### Exceptional 1+2 cancellation and nontripling positive branch
+
+`projective-symbolic-12-exception` is a separate, versioned native
+certificate in `results/symbolic-1plus2-exception.json`. It checks 12
+additional equalities over the same integer polynomial ring.
+
+When `K=u(x)=0`, put `x₄=-q-x`. Exact polynomial division gives
+`u(X)=(X-x)(X-x₄)`. The literal weighted code computes
+`x₄,w=alpha² zeta² x₄` and
+`y₄,w=alpha⁵ zeta⁵ omega v(x₄)`, with
+`z₄=alpha zeta,w₄=omega`. Its cancellation predicate is
+`alpha⁵ zeta⁵ mu omega (y+v(x))=0`. With nonzero input weights, this
+is precisely `y=-v(x)`. The normalized output is `(x₄,v(x₄))`.
+The relation `P+ι(P)∼2∞` on the smooth odd-characteristic
+hyperelliptic curve proves that this is the sum of `P` and the
+degree-two input. This also covers repeated-root support when the
+input is a valid reduced divisor.
+
+For the remaining `K=0`, `y=v(x)≠0` branch, the certificate expands
+the literal weighted `dbl(P)` output. After normalization it has
+`u₂(X)=(X-x)²` and
+`v₂(X)=y+[F'(x)/(2y)](X-x)`; the identity
+`2F(x)-xF'(x)=2y²-xF'(x)` uses the point equation.
+The tangent construction therefore represents `2P`. If
+`x₄≠x`, then `u₂(x₄)=(x₄-x)²≠0`, so the already proved generic
+weighted 1+2 formula applies to `P₄+2P`. This is exactly the
+implemented `coincident_double_plus_other` path and equals the
+desired `P+D₂`. If `y=0`, the code selects cancellation first;
+the positive branch does not run. The `x₄=x` tripling formula is
+still an open output identity.
+
+Proof map: the generic coefficient identities are discharged by
+`src/bin/projective_symbolic_12.rs` and its committed result; the
+exceptional cancellation and point-doubling identities are discharged
+by `src/bin/projective_symbolic_12_exception.rs` and its separate
+result. The
 divisor-class bridge and weighted identities have no Lean declaration yet.
 A core-only Lean 4.34.1 probe found neither
 `Field` nor `Polynomial` in `Std`; completing a faithful Lean version
@@ -142,9 +176,10 @@ claimed as the full group-law proof.
 ### Open cases
 
 A machine-checkable symbolic reduction is still needed for every output
-branch other than the generic weighted-input 1+2 case: show its nonzero
-weighted coordinates normalize to the Cantor sum, including degree drops
-and shared-support positive composition. The finite audit and five
+branch other than the generic weighted-input 1+2 and the two exceptional
+1+2 cases just proved: show its nonzero weighted coordinates normalize
+to the Cantor sum, including tripling, 2+2 degree drops, and shared-support
+positive composition. The finite audit and five
 branch-selection lemmas above do not supply these remaining identities.
 In particular, no exhaustive all-divisor
 pair enumeration was run on any of the 42 curves. No counterexample to
