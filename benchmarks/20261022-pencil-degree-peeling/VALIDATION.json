@@ -1,0 +1,176 @@
+{
+  "benchmark_copy": {
+    "raw_data_symlink": "results",
+    "study_validation": "../../research/pencil_sparse_20261022/VALIDATION.json",
+    "visual_manifest": "COPY_MANIFEST.json"
+  },
+  "replay_certificate": {
+    "path": "../../research/pencil_sparse_20261022/results/replay-certificate.json",
+    "sha256": "237feb17ba1367860dd2648234f75d44632dc4dee40e32115f12aee894074d8d"
+  },
+  "rho_reference": {
+    "binary_or_process": "pencil-sparse process runs candidate and source rho per target",
+    "gae_band": {
+      "0": {
+        "ic": 724655.6428571428,
+        "rho": 62284.38095238093
+      },
+      "0.1": {
+        "ic": 3881713.9428571416,
+        "rho": 334188.08095238096
+      },
+      "1": {
+        "ic": 32295238.642857153,
+        "rho": 2781321.38095238
+      }
+    },
+    "gae_band_by_curve": {
+      "1151": {
+        "0": {
+          "ic": 1039665.095238095,
+          "rho": 61828.428571428594
+        },
+        "0.1": {
+          "ic": 7568005.2952381,
+          "rho": 331406.22857142874
+        },
+        "1": {
+          "ic": 66323067.09523808,
+          "rho": 2757606.4285714286
+        }
+      },
+      "11731": {
+        "0": {
+          "ic": 8145381.000000005,
+          "rho": 201483.8095238095
+        },
+        "0.1": {
+          "ic": 1444745955.4000003,
+          "rho": 1199303.0095238094
+        },
+        "1": {
+          "ic": 14374151124.999998,
+          "rho": 10179675.809523808
+        }
+      },
+      "1187": {
+        "0": {
+          "ic": 1066816.785714286,
+          "rho": 62709.80952380952
+        },
+        "0.1": {
+          "ic": 7699673.385714286,
+          "rho": 336565.30952380947
+        },
+        "1": {
+          "ic": 67395382.7857143,
+          "rho": 2801264.8095238092
+        }
+      },
+      "11887": {
+        "0": {
+          "ic": 8271931.595238095,
+          "rho": 230337.42857142855
+        },
+        "0.1": {
+          "ic": 1504878277.7952383,
+          "rho": 1379792.5285714283
+        },
+        "1": {
+          "ic": 14974335393.595238,
+          "rho": 11724888.428571422
+        }
+      },
+      "12143": {
+        "0": {
+          "ic": 8439419.904761905,
+          "rho": 226419.23809523814
+        },
+        "0.1": {
+          "ic": 1553718190.104762,
+          "rho": 1354947.138095238
+        },
+        "1": {
+          "ic": 15461227121.90476,
+          "rho": 11511698.238095239
+        }
+      },
+      "3371": {
+        "0": {
+          "ic": 2540638.7380952383,
+          "rho": 100846.80952380951
+        },
+        "0.1": {
+          "ic": 53551624.93809526,
+          "rho": 572863.7095238094
+        },
+        "1": {
+          "ic": 512650500.73809516,
+          "rho": 4821015.809523808
+        }
+      },
+      "3527": {
+        "0": {
+          "ic": 2669429.0,
+          "rho": 104098.42857142855
+        },
+        "0.1": {
+          "ic": 62364422.299999975,
+          "rho": 593057.7285714288
+        },
+        "1": {
+          "ic": 599619362.0000001,
+          "rho": 4993691.42857143
+        }
+      },
+      "3931": {
+        "0": {
+          "ic": 2925570.3333333326,
+          "rho": 113510.52380952382
+        },
+        "0.1": {
+          "ic": 79094912.43333335,
+          "rho": 651700.1238095238
+        },
+        "1": {
+          "ic": 764618991.3333331,
+          "rho": 5495406.523809524
+        }
+      },
+      "739": {
+        "0": {
+          "ic": 724655.6428571428,
+          "rho": 62284.38095238093
+        },
+        "0.1": {
+          "ic": 3881713.9428571416,
+          "rho": 334188.08095238096
+        },
+        "1": {
+          "ic": 32295238.642857153,
+          "rho": 2781321.38095238
+        }
+      }
+    },
+    "gae_band_scope": "p=739, 60 targets, S/M=0.5, I/M=10; native paired CSV",
+    "kind": "negation",
+    "matches_protocol": true,
+    "order_holds_across_band": true,
+    "ordering": "candidate GAE > matched rho GAE on each of the nine curves at all three native prices",
+    "protocol": "same-process source-negation-rho on each frozen target; PROTOCOL.md",
+    "same_binary_or_process": true,
+    "same_unit": true,
+    "strongest_available": true,
+    "symmetry_check": {
+      "path": "results/rho-symmetry-check.json",
+      "sha256": "0da306b43fc98f30fb1b03c1b1d3c6f5dd109f4819af0b4c840f1b3307457b80"
+    },
+    "unit": "GAE"
+  },
+  "schema": "validation-gate/v1",
+  "scope": "degree-peeling point-driven pencil, nine 60-target frozen pilot curves",
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "3b6a9ba5808a0024b754c1347e8f63feef256e6a6247c69e11e6a301f78de681"
+  }
+}
