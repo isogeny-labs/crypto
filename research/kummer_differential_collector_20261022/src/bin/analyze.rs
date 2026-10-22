@@ -633,8 +633,12 @@ fn main() {
         }),
         "headline mismatch"
     );
+    let gate_raw_data: Vec<Value> = raw_data
+        .iter()
+        .map(|row| json!({"path":format!("../../{}",s(row,"path")),"sha256":s(row,"sha256")}))
+        .collect();
     let report = json!({"schema":"kummer-native-validator-report/v1","status":"pass","independent":true,
-      "raw_data":raw_data,"headline":headlines,"analyzer_source_sha256":digest(&here.join("src/bin/analyze.rs")),
+      "raw_data":gate_raw_data,"headline":headlines,"analyzer_source_sha256":digest(&here.join("src/bin/analyze.rs")),
       "rho_process_match":paired,"rho_note":if paired {"collector and native negation rho ran in paired_uncached process"} else {"archived same-source rho ran in a separate process; no leaderboard gate claim"}});
     fs::write(
         if paired {

@@ -16,6 +16,11 @@ the model and target setup joins, independently replays source-field
 | `results/target-price.csv` | one arm, target and pricing cell | cold/online candidate GAE, rho GAE, both ratios and verification flags |
 | `results/price-grid.csv` | one arm, bit slice or full cohort and pricing cell | summed cold/online candidate and rho GAE, ratios, target-level wins/losses |
 | `results/summary.json` | whole run | target and relation totals, ratio ranges, applicable cell counts and cost boundary |
+| `results/paired/uncached/collector-{bits}.jsonl` | one same-process candidate solve per public target | exact independent replay of the frozen uncached collector row; target ID, scalar, source checks, phase counters |
+| `results/paired/rho/rho-{bits}.jsonl` | one rho solve in the paired process per public target | negation-rho seed and cap, scalar and source checks, fresh arithmetic/native counters, source-addition unit |
+| `results/paired/analysis/target-price.csv` | one paired target and pricing cell | fresh same-process candidate and rho prices, including cold and online ratios |
+| `results/paired/analysis/price-grid.csv` | one paired bit slice or full cohort and pricing cell | summed fresh same-process prices, ratios, target-level wins and losses |
+| `results/paired/analysis/{summary.json,replay-certificate.json,validator-report.json}` | paired run | native recomputation and SHA-pinned source/price evidence |
 
 `walk_ops` and `recover_ops` count each executed base-field multiplication,
 addition and inversion in their independent code paths. The native
@@ -35,3 +40,9 @@ coefficient updates per quotient step, signed-relation dedup probes, and
 walk restarts. Rho logical work uses the archive's `_uncharged` categories,
 as in the native matched analyzer. The matrix/root setup is charged cold to
 *each* target, not amortized across the 60 targets sharing that model.
+
+The root `results/` price tables join the archived same-source rho records
+collected in a separate process. The `results/paired/analysis/` tables use
+new rho records generated in the same `paired_uncached` process as the
+candidate. They have the same CSV headers but must be interpreted as distinct
+comparisons. Neither table silently substitutes one rho source for the other.

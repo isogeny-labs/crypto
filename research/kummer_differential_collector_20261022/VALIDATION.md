@@ -21,6 +21,18 @@ separate process, so these artifacts document the historical comparison.
 The same-process rho arm is replayed and priced separately under
 `results/paired/`; see `PAIRED_PROCESS_PROTOCOL.md`.
 
+For the complete paired uncached/rho measurement, run the release binary
+from the repository root, then run the native analyzer twice. The first pass
+writes the claimed summary and the second pass recomputes it from raw records
+and emits the SHA-pinned certificate, validator report, and `VALIDATION.json`:
+
+```sh
+research/kummer_differential_collector_20261022/target/release/paired_uncached
+KUMMER_RHO_SOURCE=paired KUMMER_ARMS=uncached research/kummer_differential_collector_20261022/target/release/analyze
+KUMMER_RHO_SOURCE=paired KUMMER_ARMS=uncached research/kummer_differential_collector_20261022/target/release/analyze
+KUMMER_PLOT_SOURCE=paired MPLCONFIGDIR=/var/tmp/kummer-mpl uv run --with matplotlib python3 research/kummer_differential_collector_20261022/plot.py
+```
+
 The setup binary reconstructs and matches each frozen root set, theta tuple
 and torsion matrix before emitting counts. It also recomputes each source
 target's transfer and `k·P=Q`. The collector recomputes every candidate

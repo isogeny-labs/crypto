@@ -74,7 +74,7 @@ with PdfPages(B / ("KUMMER_PAIRED.pdf" if paired else "KUMMER_COLLECTOR.pdf")) a
         "Each cold target includes source transfer, initialization, the",
         "quotient walk, signed Recover, graph elimination and verification.",
         "Raw: results/paired/<arm>/collector-*.jsonl, paired/rho/*.jsonl," if paired else "Raw: results/<arm>/collector-*.jsonl, cold-*-setup.jsonl,",
-        "results/target-price.csv and results/price-grid.csv.",
+        "results/paired/analysis/{target-price,price-grid}.csv." if paired else "results/target-price.csv and results/price-grid.csv.",
         "All 36 cells use S/M in {0,0.5,1}, I/M in {1,10,100,1000},",
         "and native cost in {0,0.1,1} GAE per declared logical operation.",
         "Ratios describe this measured implementation and frozen cohort.",
