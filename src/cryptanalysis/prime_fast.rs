@@ -262,31 +262,42 @@ impl Fp64 {
     }
 }
 
-/// `a⁻¹ mod p` for odd `p < 2^63` and `0 < a < p`, by the extended
-/// Euclidean algorithm on words.
-///
-/// One hardware division per step measured 2.3–2.7× faster than the
-/// division-free binary algorithm (HAC 14.61) this replaced, at 16 to 62
-/// bits on the study host (`research/inversion_review_20261022`). The
-/// inverse is unique, so results are unchanged.  Bézout coefficients are
-/// kept as magnitudes: they alternate in sign, `t0 + q·t1` never exceeds
-/// `p`, and the parity of the step count gives the sign.
+/// `a⁻¹ mod p` for odd `p < 2^63` and `0 < a < p`, by the binary
+/// extended Euclidean algorithm (HAC 14.61): no divisions.
 pub fn inv_mod_u64(a: u64, p: u64) -> u64 {
     debug_assert!(a != 0 && a < p && p & 1 == 1);
-    let (mut r0, mut r1) = (p, a);
-    let (mut t0, mut t1) = (0u64, 1u64);
-    let mut odd = false;
-    while r1 != 0 {
-        let q = r0 / r1;
-        (r0, r1) = (r1, r0 - q * r1);
-        (t0, t1) = (t1, t0 + q * t1);
-        odd = !odd;
+    let (mut u, mut v) = (a, p);
+    // Invariants: x1·a ≡ u, x2·a ≡ v (mod p).
+    let (mut x1, mut x2) = (1u64, 0u64);
+    #[inline(always)]
+    fn halve(x: u64, p: u64) -> u64 {
+        if x & 1 == 0 {
+            x >> 1
+        } else {
+            ((x as u128 + p as u128) >> 1) as u64
+        }
     }
-    debug_assert_eq!(r0, 1, "{a} is not invertible mod {p}");
-    if odd {
-        t0
+    while u != 1 && v != 1 {
+        while u & 1 == 0 {
+            u >>= 1;
+            x1 = halve(x1, p);
+        }
+        while v & 1 == 0 {
+            v >>= 1;
+            x2 = halve(x2, p);
+        }
+        if u >= v {
+            u -= v;
+            x1 = if x1 >= x2 { x1 - x2 } else { x1 + p - x2 };
+        } else {
+            v -= u;
+            x2 = if x2 >= x1 { x2 - x1 } else { x2 + p - x1 };
+        }
+    }
+    if u == 1 {
+        x1
     } else {
-        p - t0
+        x2
     }
 }
 
