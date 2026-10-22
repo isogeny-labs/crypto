@@ -163,6 +163,8 @@ The previous pilot retained one relation per residual. The new registered extrac
 
 The p=37 counted one-target field and group paths fall 33.807-fold and 34.627-fold. This combines dense row retention with a public known-log anchor on the twist-folded 2D base; the reduction is not attributable to twist symmetry alone. The exact group oracle remains far from matched 24-fold rho and does not price polynomial relation finding, hash CPU, allocator work, isolated native time or a GAE band. The derivation, certified signed-count polynomial (`IDC1hf0237ddd316cd9d8`), raw records, independent audits, and limitations are in `QUARTIC_TWIST24_REPORT.md`.
 
+For $B$ signed physical factors, a uniform residual has $16 binom(B,4) / r approx (2/3) B^4 / r$ expected decompositions. With $m=B/12$ folded columns, the expected count reaches $m$ near $B^3 approx r/8$; this is an occupancy heuristic, not a rank guarantee. The explicit pair oracle then builds $Theta(B^2)=Theta(r^(2/3))$ entries with one group addition each, exceeding constant-automorphism rho's $Theta(r^(1/2))$ exponent. A 12-fold orbit quotient changes only the constant. Polynomial and implicit-table relation finders are outside this projection.
+
 #pagebreak()
 == Full-stream tagged-table boundary
 On the *old* 53-residual p=37 full-2D trace, direct-posting and full signed-pair tables returned identical complete sets for all 2,833,126 decompositions. Every tagged posting was checked by a separate group addition; A/A non-timing records matched. Query arithmetic was identical: 4,003,562,862 $F_p$ multiplications and 41,273,856 group operations in each arm.
