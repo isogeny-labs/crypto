@@ -1,0 +1,19 @@
+digraph cover_assessment_20261022 {
+  // cover-transfer-assessments/v2; catalog_maps=2771; unique_cover_models=2769; geometry_verified_maps=2771; ec1_representations=977; assessed_maps=2771; unassessed_maps=0; assessed_subgroups=977; unassessed_subgroups=0
+  graph [rankdir=LR, bgcolor="#ffffff", pad="0.25", nodesep="0.30", ranksep="0.55", fontname="DejaVu Sans", fontsize=18, label="Expanded cover catalog: geometry verified, transfer bounded", labelloc=t];
+  node [shape=box, style="rounded,filled", color="#244467", fillcolor="#eaf2fb", fontname="DejaVu Sans", fontsize=11, margin="0.16,0.10"];
+  edge [color="#5d7794", penwidth=1.5, arrowsize=0.7];
+  catalog [label="2,771 catalog maps\n2,769 cover objects", fillcolor="#dcecff"];
+  binary [label="186 binary cubic\nbounded typed point classes", fillcolor="#d6eee4"];
+  prime [label="1,184 odd-prime direct\ngeometry only", fillcolor="#fce8cf"];
+  normalized [label="30 odd-prime normalized\ngeometry + target map", fillcolor="#fce8cf"];
+  extension [label="1,371 odd-extension direct\ngeometry only", fillcolor="#fce8cf"];
+  verified [label="2,771 / 2,771 geometry replay\n0 unassessed maps", fillcolor="#d6eee4"];
+  boundary [label="No complete catalog transfer pipeline\nNo performance or attack claim", fillcolor="#f5e0e0"];
+  catalog -> {binary prime normalized extension};
+  binary -> verified;
+  prime -> verified;
+  normalized -> verified;
+  extension -> verified;
+  verified -> boundary;
+}

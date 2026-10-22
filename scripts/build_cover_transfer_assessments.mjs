@@ -8,8 +8,8 @@ import { dirname, resolve } from "node:path";
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
-const ASSESSMENT_DATE = "2026-10-19";
-const CATALOG_COMMIT = "8e4c99759fd8d9594ed207d793b07b59ebaf19f7";
+const ASSESSMENT_DATE = "2026-10-22";
+const CATALOG_COMMIT = "525a4404bd0cb3fb1e74ce6983fc0e992079692c";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
@@ -164,7 +164,7 @@ const obligations = [
   {
     id: "catalog_wide_packaged_binary",
     description:
-      "Build and publish a standalone artifact that accepts every currently supported catalog input form, including odd-characteristic extension fields and normalized target models, then replay all 2,572 direct commands against that exact artifact.",
+      "Build and publish a standalone artifact that accepts every currently supported catalog input form, including odd-characteristic extension fields and normalized target models, then replay all 2,771 direct commands against that exact artifact.",
     status: "unknown",
   },
   {
@@ -210,7 +210,7 @@ const resultTemplates = {
   "map.binary-construction.supported": {
     status: "supported",
     scope:
-      "Ordinary binary Weierstrass targets in the 165-row cubic-pullback profile, with exact Rabin-validated polynomial-basis fields and nonzero b.",
+      "Ordinary binary Weierstrass targets in the 186-row cubic-pullback profile, with exact Rabin-validated polynomial-basis fields and nonzero b.",
     rationale:
       "The uniform constructor emits H: v^2+u^2v=u^7+a*u^4+sqrt(b)*u and phi(u,v)=(u^3,u*v+sqrt(b)); all profile members match those coefficients, and the current source-level standalone constructor accepts every member of this profile.",
     evidence_refs: [
@@ -270,7 +270,7 @@ const resultTemplates = {
   "map.binary-arbitrary-pushforward.refuted": {
     status: "refuted",
     scope:
-      "Claim that the current implementation accepts and norms an arbitrary reduced class in Jac(H) for any of the 165 catalog binary covers.",
+      "Claim that the current implementation accepts and norms an arbitrary reduced class in Jac(H) for any of the 186 catalog binary covers.",
     rationale:
       "The public entry point supports one exact fixed-GF(8) fixture, which is not a catalog row, and returns Unsupported(ArbitraryJacobianPushforward) for the catalog profiles. This refutes a catalog implementation claim, not mathematical existence of a norm.",
     evidence_refs: [
@@ -851,7 +851,7 @@ async function buildSourceArtifacts() {
       "exact ICV1/EC1 input registry",
       freshness(
         "supported",
-        "the exact input registry for all 2,572 assessed map rows",
+        "the exact input registry for all 2,771 assessed map rows",
         "The digest is computed from the current file and every membership is joined through its model hash.",
         ["docs/curves/registry.json"],
       ),
@@ -861,7 +861,7 @@ async function buildSourceArtifacts() {
       "generated curve-level geometry catalog",
       freshness(
         "supported",
-        "all 2,572 current verified-over-declared-field geometry rows",
+        "all 2,771 current verified-over-declared-field geometry rows",
         "The ledger derives every map profile predicate from this exact file.",
         ["docs/curves/covers.json"],
       ),
@@ -871,7 +871,7 @@ async function buildSourceArtifacts() {
       "content-addressed ICV1/EC1/HC1/CV1 graph",
       freshness(
         "supported",
-        "2,572 exact map links, 2,570 unique cover objects, and 977 EC1 triples",
+        "2,771 exact map links, 2,769 unique cover objects, and 977 EC1 triples",
         "The ledger records exact sorted UID memberships rather than count-only coverage.",
         ["docs/curves/cover-links.yaml"],
       ),
@@ -1019,7 +1019,7 @@ async function buildSourceArtifacts() {
       "legacy formula-screen inventory; not a transfer certificate",
       freshness(
         "refuted",
-        "claim that this inventory is current for the 2,572-row registry",
+        "claim that this inventory is current for the 2,771-row registry",
         "It pins an older registry, omits current slugs, and contains modeled routes without exact HC1/CV1 subgroup certificates.",
         [
           "docs/curves/jacobian-transfers.json",
@@ -1106,7 +1106,24 @@ async function buildSourceArtifacts() {
     ),
     integrityArtifact(
       "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
-      "rendered catalog-wide assessment PDF",
+      "frozen 2,572-map historical assessment PDF",
+    ),
+    ...[
+      ["REPORT.md", "dated 2,771-map assessment addendum"],
+      ["assessment.dot", "dated profile graph source"],
+      ["assessment.svg", "dated profile graph SVG"],
+      ["assessment.png", "dated profile graph PNG"],
+      ["typed-context.dot", "dated typed-context graph source"],
+      ["typed-context.svg", "dated typed-context graph SVG"],
+      ["typed-context.png", "dated typed-context graph PNG"],
+      ["report.tex", "dated assessment PDF source"],
+      ["set_pdf_metadata.py", "dated PDF metadata source"],
+      ["report.pdf", "dated assessment PDF"],
+    ].map(([file, description]) =>
+      integrityArtifact(
+        `research/cover_transfer_assessment_20261013/reports/run-20261022T1607Z/${file}`,
+        description,
+      ),
     ),
   ]);
 }
@@ -1491,7 +1508,7 @@ async function buildLedger() {
         control: "identity",
         assessment: freshness(
           "supported",
-          "all 2,572 map UIDs and 977 exact EC1/curve/map triples",
+          "all 2,771 map UIDs and 977 exact EC1/curve/map triples",
           "The generator resolves exact content-addressed joins and rejects duplicates or missing rows.",
           [
             "scripts/build_cover_transfer_assessments.mjs",
@@ -1504,7 +1521,7 @@ async function buildLedger() {
         control: "geometry",
         assessment: freshness(
           "supported",
-          "all 2,572 fixed-family cover rows",
+          "all 2,771 fixed-family cover rows",
           "Native certificates cover defining identities, smoothness, genus, degree, separability, and infinity behavior.",
           ["src/bin/curve_cover_check/checker.rs", "docs/curves/covers.json"],
         ),
@@ -1553,7 +1570,7 @@ async function buildLedger() {
         control: "odd_degree2_transfer",
         assessment: freshness(
           "refuted",
-          "claim that the current one-infinity odd-prime implementation supports the 2,407 even-sextic source models",
+          "claim that the current one-infinity odd-prime implementation supports the 2,585 even-sextic source models",
           "The current model contract and the catalog infinity configuration are structurally incompatible.",
           ["src/prime_hyperelliptic/curve.rs", "docs/curves/covers.json"],
         ),
@@ -1563,8 +1580,8 @@ async function buildLedger() {
         control: "published_artifact",
         assessment: freshness(
           "refuted",
-          "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 2,572 current catalog models",
-          "Direct artifact replay covered only its bundled 592-row registry. The historical static comparison classified 746 of the earlier 2,100 forms as inside the pinned source allowlist (160 binary and 586 direct prime-field) and 1,354 as outside it. That comparison has not been rerun against the expanded catalog and is not a 2,572-command artifact receipt. Current source accepts the new forms, but this artifact does not contain it.",
+          "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 2,771 current catalog models",
+          "Direct artifact replay covered only its bundled 592-row registry. The historical static comparison classified 746 of the earlier 2,100 forms as inside the pinned source allowlist (160 binary and 586 direct prime-field) and 1,354 as outside it. That comparison has not been rerun against the expanded catalog and is not a 2,771-command artifact receipt. Current source accepts the new forms, but this artifact does not contain it.",
           [
             "research/cover_transfer_assessment_20261013/release_replay.txt",
             "src/bin/hyperelliptic_cover.rs#every_current_catalog_model_reaches_the_standalone_constructor",
@@ -1622,30 +1639,30 @@ async function buildLedger() {
     ],
     exploration_boundary: [
       "No search for production targets, private keys, or discrete logarithms was performed.",
-      "All 2,572 map rows and all 977 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
-      "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
-      "The 2,407 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
+      "All 2,771 map rows and all 977 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
+      "The 186 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
+      "The 2,585 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
       "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",
       "Formula-screen outputs in jacobian-transfers.json were not promoted to executable or measured claims.",
       "A full cover-integrated Jacobian index-calculus solver, relation collection, linear algebra, and target decomposition remain a separate deliverable. The bounded odd-prime one-infinity solver library is outside these catalog-cover paths.",
     ],
     open_obligations: obligations,
     report: {
-      markdown: "research/cover_transfer_assessment_20261013/README.md",
+      markdown: "research/cover_transfer_assessment_20261013/reports/run-20261022T1607Z/REPORT.md",
       pdf:
-        "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
+        "research/cover_transfer_assessment_20261013/reports/run-20261022T1607Z/report.pdf",
       graph_source:
-        "research/cover_transfer_assessment_20261013/typed_correspondence.dot",
+        "research/cover_transfer_assessment_20261013/reports/run-20261022T1607Z/assessment.dot",
       graph_svg:
-        "research/cover_transfer_assessment_20261013/typed_correspondence.svg",
+        "research/cover_transfer_assessment_20261013/reports/run-20261022T1607Z/assessment.svg",
       graph_png:
-        "research/cover_transfer_assessment_20261013/typed_correspondence.png",
+        "research/cover_transfer_assessment_20261013/reports/run-20261022T1607Z/assessment.png",
       context_graph_source:
-        "research/cover_transfer_assessment_20261013/typed_transfer_context.dot",
+        "research/cover_transfer_assessment_20261013/reports/run-20261022T1607Z/typed-context.dot",
       context_graph_svg:
-        "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
+        "research/cover_transfer_assessment_20261013/reports/run-20261022T1607Z/typed-context.svg",
       context_graph_png:
-        "research/cover_transfer_assessment_20261013/typed_transfer_context.png",
+        "research/cover_transfer_assessment_20261013/reports/run-20261022T1607Z/typed-context.png",
       release_receipt:
         "research/cover_transfer_assessment_20261013/release_replay.txt",
     },

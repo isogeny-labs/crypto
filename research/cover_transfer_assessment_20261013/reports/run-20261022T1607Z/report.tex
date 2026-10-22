@@ -1,0 +1,33 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[T1]{fontenc}
+\title{Expanded curve-cover catalog assessment}
+\author{Validation addendum, 22 October 2026}
+\date{}
+\begin{document}
+\maketitle
+\noindent\textbf{Source catalog.} Commit \texttt{525a4404bd0cb3fb1e74ce6983fc0e992079692c} fixes the three catalog files. The current inventory has 2,771 map rows, 2,769 unique cover objects, 687 declared fields, 2,769 Jacobian contexts, and 977 linked EC1 subgroup triples. The independent assessment records 2,771 geometry-verified maps, zero unassessed maps, and zero unassessed subgroup triples. This dated addendum preserves the earlier 2,572-map report.
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Map profile & Rows & Full transfer pipeline \\
+\midrule
+Binary cubic, same field & 186 & unavailable \\
+Odd prime, direct quadratic & 1,184 & unavailable \\
+Odd prime, normalized quadratic & 30 & unavailable \\
+Odd extension, direct quadratic & 1,371 & unavailable \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{center}
+\includegraphics[width=0.95\textwidth]{assessment.png}
+\end{center}
+
+\noindent\textbf{Verification.} The generated assessment is byte-exact under \texttt{build\_cover\_transfer\_assessments.mjs --check}. The independent \texttt{verify\_assessment.mjs} reconstructs exact model, map, cover, field, and Jacobian joins and replays the cover equations over declared fields. It also SHA-binds this report and its figures. The release library suite passed 4,494 tests with 119 ignored in a serial run; the standalone cover binary passed 13/13, including the 2,771-model constructor test.
+
+\noindent\textbf{Boundary.} The 186 binary maps have bounded typed point-class operations. The 2,585 odd-characteristic maps have cover geometry but no compatible balanced two-infinity Jacobian transfer implementation. There is no end-to-end speed, discrete-log, or full-Jacobian transfer claim. The earlier published executable covered a smaller bundled catalog and is not a replay of all 2,771 current inputs. The conditional Lean group lemma does not import this catalog.
+\end{document}
