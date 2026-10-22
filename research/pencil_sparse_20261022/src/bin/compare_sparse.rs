@@ -18,6 +18,7 @@ fn target_ids(path: &str) -> BTreeSet<String> {
         .collect()
 }
 fn main() {
+    let root = std::env::var("PENCIL_PRICE_OUT").unwrap_or_else(|_| ROOT.to_owned());
     let args: Vec<String> = std::env::args().skip(1).collect();
     assert_eq!(
         args.len(),
@@ -33,7 +34,7 @@ fn main() {
         target_ids(candidate),
         "workloads must match exactly"
     );
-    let grid = fs::read_to_string(format!("{ROOT}/price-grid.csv")).unwrap();
+    let grid = fs::read_to_string(format!("{root}/price-grid.csv")).unwrap();
     type Key = (String, String, String, String);
     let mut control: BTreeMap<Key, (f64, f64)> = BTreeMap::new();
     let mut trial: BTreeMap<Key, (f64, f64)> = BTreeMap::new();
@@ -68,7 +69,7 @@ fn main() {
     assert_eq!(control.len(), targets.len() * 36);
     assert_eq!(control.len(), trial.len());
     assert!(control.keys().eq(trial.keys()));
-    let mut file = File::create(format!("{ROOT}/{stem}.csv")).unwrap();
+    let mut file = File::create(format!("{root}/{stem}.csv")).unwrap();
     writeln!(file,"p,targets,S_per_M,I_per_M,native_GAE_per_logical,baseline_GAE,candidate_GAE,rho_GAE,candidate_over_baseline,baseline_over_rho,candidate_over_rho").unwrap();
     let mut representative = Value::Null;
     let mut cells_lower = 0u64;
@@ -114,9 +115,9 @@ fn main() {
         "p":p.unwrap(),"targets":targets.len(),"baseline_raw":baseline,"candidate_raw":candidate,
         "representative":representative,"pricing_cells":36,"cells_candidate_below_baseline":cells_lower,
         "cells_candidate_below_rho":cells_below_rho,"min_candidate_over_baseline":min_ratio,
-        "max_candidate_over_baseline":max_ratio,"grid":format!("{ROOT}/{stem}.csv")});
+        "max_candidate_over_baseline":max_ratio,"grid":format!("{root}/{stem}.csv")});
     fs::write(
-        format!("{ROOT}/{stem}.json"),
+        format!("{root}/{stem}.json"),
         serde_json::to_vec_pretty(&summary).unwrap(),
     )
     .unwrap();

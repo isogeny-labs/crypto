@@ -484,10 +484,11 @@ struct PeelSolver {
     max_rank: usize,
     max_stored_nonzero_coefficients: usize,
     coefficient_cap: usize,
+    markowitz: bool,
     failure: Option<&'static str>,
 }
 impl PeelSolver {
-    fn new(map: &LinearSolver, coefficient_cap: usize) -> Self {
+    fn new(map: &LinearSolver, coefficient_cap: usize, markowitz: bool) -> Self {
         Self {
             nodes: map.nodes.clone(),
             field_prime: map.field_prime,
@@ -500,8 +501,33 @@ impl PeelSolver {
             max_rank: 0,
             max_stored_nonzero_coefficients: 0,
             coefficient_cap,
+            markowitz,
             failure: None,
         }
+    }
+    fn priority(
+        &mut self,
+        column: usize,
+        incidence: &[BTreeSet<usize>],
+        rows: &[Option<BTreeMap<usize, u64>>],
+    ) -> Option<(u64, usize, usize, usize)> {
+        let degree = incidence[column].len();
+        if degree == 0 {
+            return None;
+        }
+        if !self.markowitz {
+            return Some((degree as u64, 0, 0, column));
+        }
+        let shortest = incidence[column]
+            .iter()
+            .map(|&row_id| {
+                self.index_ops += 1;
+                rows[row_id].as_ref().expect("live incident row").len()
+            })
+            .min()
+            .unwrap();
+        let score = (degree as u64 - 1) * (shortest as u64 - 1);
+        Some((score, degree, shortest, column))
     }
     fn relation(&mut self, points: &[[u64; 2]], a: u64, b: u64) {
         let n = self.nodes.iter().flatten().count();
@@ -570,19 +596,21 @@ impl PeelSolver {
                 return Some(k);
             }
         }
-        let mut heap = BinaryHeap::<Reverse<(usize, usize)>>::new();
-        for (column, incident) in incidence.iter().enumerate() {
-            if !incident.is_empty() {
-                heap.push(Reverse((incident.len(), column)));
+        let mut heap = BinaryHeap::<Reverse<(u64, usize, usize, usize)>>::new();
+        for column in 0..incidence.len() {
+            if let Some(priority) = self.priority(column, &incidence, &rows) {
+                heap.push(Reverse(priority));
                 self.index_ops += 1;
             }
         }
         let mut rank = 0usize;
-        while let Some(Reverse((degree, column))) = heap.pop() {
+        while let Some(Reverse(priority)) = heap.pop() {
             self.index_ops += 1;
-            if incidence[column].len() != degree || degree == 0 {
+            let column = priority.3;
+            if self.priority(column, &incidence, &rows) != Some(priority) {
                 continue;
             }
+            let degree = incidence[column].len();
             let incident: Vec<usize> = incidence[column].iter().copied().collect();
             let pivot_id = if degree == 1 {
                 incident[0]
@@ -653,8 +681,8 @@ impl PeelSolver {
                 }
             }
             for col in touched {
-                if !incidence[col].is_empty() {
-                    heap.push(Reverse((incidence[col].len(), col)));
+                if let Some(priority) = self.priority(col, &incidence, &rows) {
+                    heap.push(Reverse(priority));
                     self.index_ops += 1;
                 }
             }
@@ -1146,8 +1174,8 @@ fn cohort_main(bits: u64, selected_p: u64) {
         .unwrap_or(0);
     assert!(target_start + target_limit <= 60);
     let solver_mode = std::env::var("PENCIL_SOLVER").unwrap_or_else(|_| "online".into());
-    assert!(["online", "peel"].contains(&solver_mode.as_str()));
-    let use_peel = solver_mode == "peel";
+    assert!(["online", "peel", "markowitz"].contains(&solver_mode.as_str()));
+    let use_peel = solver_mode != "online";
     for row in rows.into_iter().skip(target_start).take(target_limit) {
         let workload = &row["workload"];
         let scalar = workload["planted"].as_u64().unwrap();
@@ -1167,7 +1195,7 @@ fn cohort_main(bits: u64, selected_p: u64) {
         reset_arithmetic_counts();
         let mut phases = BTreeMap::new();
         let mut solver = LinearSolver::new(p, r, &rational_y);
-        let mut peel = PeelSolver::new(&solver, matrix_coefficient_cap);
+        let mut peel = PeelSolver::new(&solver, matrix_coefficient_cap, solver_mode == "markowitz");
         let mut recovered = None;
         let mut failure = None;
         let mut walks = 0;

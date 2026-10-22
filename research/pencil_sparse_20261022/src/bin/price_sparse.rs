@@ -102,8 +102,10 @@ fn verified(row: &Value) -> bool {
 fn main() {
     let inputs: Vec<String> = std::env::args().skip(1).collect();
     assert!(!inputs.is_empty(), "usage: price-sparse RAW.jsonl ...");
-    let mut grid = File::create(format!("{OUT}/price-grid.csv")).unwrap();
-    let mut targets = File::create(format!("{OUT}/targets.jsonl")).unwrap();
+    let out = std::env::var("PENCIL_PRICE_OUT").unwrap_or_else(|_| OUT.to_owned());
+    fs::create_dir_all(&out).unwrap();
+    let mut grid = File::create(format!("{out}/price-grid.csv")).unwrap();
+    let mut targets = File::create(format!("{out}/targets.jsonl")).unwrap();
     writeln!(grid, "raw_path,bits,p,order,target_index,workload_id,status,S_per_M,I_per_M,native_GAE_per_logical,pencil_GAE,rho_GAE,pencil_over_rho").unwrap();
     let mut summaries = Vec::new();
     let mut total_targets = 0;
@@ -214,7 +216,7 @@ fn main() {
         "pricing_cells":total_cells,"price_cells_below_rho":total_below_rho,"slices":summaries,
         "pricing":"cold setup included in each raw target; variable-order logical work added; wall time excluded"});
     fs::write(
-        format!("{OUT}/summary.json"),
+        format!("{out}/summary.json"),
         serde_json::to_vec_pretty(&summary).unwrap(),
     )
     .unwrap();

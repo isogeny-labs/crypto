@@ -136,6 +136,7 @@ fn archive(bits: u64) -> BTreeMap<String, Value> {
         .collect()
 }
 fn main() {
+    let root = std::env::var("PENCIL_PRICE_OUT").unwrap_or_else(|_| ROOT.to_owned());
     let paths: Vec<String> = std::env::args().skip(1).collect();
     assert!(!paths.is_empty(), "usage: validate-sparse RAW.jsonl ...");
     let mut raw_by_key = BTreeMap::new();
@@ -294,7 +295,7 @@ fn main() {
             }else if replay_ready {json!("nonwall_equal")}else{Value::Null}
         }));
     }
-    let grid = fs::read_to_string(format!("{ROOT}/price-grid.csv")).unwrap();
+    let grid = fs::read_to_string(format!("{root}/price-grid.csv")).unwrap();
     let mut cells = 0u64;
     let mut valid_cells = 0u64;
     let mut missing_cells = 0u64;
@@ -361,7 +362,7 @@ fn main() {
     }
     assert_eq!(cells, raw_by_key.len() as u64 * 36);
     let summary: Value =
-        serde_json::from_slice(&fs::read(format!("{ROOT}/summary.json")).unwrap()).unwrap();
+        serde_json::from_slice(&fs::read(format!("{root}/summary.json")).unwrap()).unwrap();
     assert_eq!(
         summary["price_cells_below_rho"].as_u64().unwrap(),
         below_rho
@@ -384,7 +385,7 @@ fn main() {
     }
     let mut paired_cells_checked = 0u64;
     let mut headline = Vec::new();
-    for entry in fs::read_dir(ROOT).unwrap() {
+    for entry in fs::read_dir(&root).unwrap() {
         let path = entry.unwrap().path();
         let name = path.file_name().unwrap().to_string_lossy();
         if !name.contains("-vs-") || !name.ends_with(".json") {
@@ -506,7 +507,7 @@ fn main() {
     let evidence_paths: Vec<String> = paths
         .iter()
         .map(|path| {
-            path.strip_prefix(&format!("{ROOT}/"))
+            path.strip_prefix(&format!("{root}/"))
                 .map(|relative| format!("results/{relative}"))
                 .unwrap_or_else(|| format!("../{}", path.strip_prefix("research/").unwrap()))
         })
@@ -520,7 +521,7 @@ fn main() {
         "paired_comparison_cells_checked":paired_cells_checked,
         "method":"independent native source multiplication, raw/replay equality after wall removal and pre-peel online zero/default metadata normalization, all-cell arithmetic recomputation"});
     fs::write(
-        format!("{ROOT}/validation.json"),
+        format!("{root}/validation.json"),
         serde_json::to_vec_pretty(&validation).unwrap(),
     )
     .unwrap();
@@ -531,7 +532,7 @@ fn main() {
         "missing_replays":missing_replays,
         "normalization":"wall fields removed; pre-peel online rows gain solver_mode=online, solver_attempts=0, solver_index_ops=0"});
     fs::write(
-        format!("{ROOT}/replay-certificate.json"),
+        format!("{root}/replay-certificate.json"),
         serde_json::to_vec_pretty(&replay_certificate).unwrap(),
     )
     .unwrap();

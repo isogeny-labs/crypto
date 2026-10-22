@@ -39,9 +39,22 @@ same-process source-negation rho and the two-point control.
   matched non-wall fields; rho's source scalar verified. All three cap records
   retain null candidate scalar and ratio. The 8 GiB and 3,600-second guards
   did not trigger in the 25-million run.
+- **Observed, Markowitz-priority continuation:** The [separate study](../research/pencil_markowitz_20261022/REPORT.md)
+  held that source workload, relation collector, and 25m cap fixed. Its
+  primary record stopped at 25,000,069 peak coefficients, rank 85,463,
+  95,648,928 modular row updates and 36,545,252,445 logical index
+  operations. Its candidate scalar and ratio are null; the same-process
+  rho scalar verified. Its [independent replay](../research/pencil_markowitz_20261022/results/replay/p186379-markowitz-t0.jsonl)
+  matched all non-wall fields, and the [native validator](../research/pencil_markowitz_20261022/results/validation.json)
+  checked the source scalar, the null candidate price in 36 cells, and
+  the matched rho prices.
 - **Derived or proved:** No asymptotic lower bound for the pencil method or
   elimination is established. The 28-bit single target is not a 60-target
-  size estimate.
+  size estimate. On the observed p=186,379 relation prefix, there are
+  93,307 rows and 93,187 factor-base columns, so the left nullspace of
+  the uneliminated factor-base matrix has dimension at least 120 over the
+  recorded prime subgroup field. This count alone does not prove that a
+  dependency has a nonzero target label.
 - **Suspected explanation:** Dense fill and repeated modular updates may
   dominate as the pencil factor base grows; the raw nonzero counts and
   update counters distinguish this from candidate-verification work.
@@ -67,28 +80,47 @@ external-tool checks.
 
 ## Next discriminating step
 
-- **Action or proof obligation:** Compare a new exact sparse-elimination
-  implementation on the same fixed p=186,379 target and relation stream,
-  including its 25-million-coefficient cap record as the control.
+- **Action or proof obligation:** Export the already verified, uneliminated
+  p=186,379 target-0 relation matrix in native code, preserving the ordered
+  relation labels and an input digest. Test an exact black-box left-nullspace
+  computation over the archived prime subgroup field, for example a
+  preconditioned Wiedemann/Krylov pass on `A D A^T`. For every proposed
+  vector `w`, check `A^T w = 0` exactly, require a nonzero combined target
+  label, derive the scalar, and verify it by source-curve multiplication.
+  A nullspace vector without that target label is not a target solve.
 - **Inputs and controls:** Frozen workload hash, seed, relation stream,
   source rho and source-scalar checks from the [protocol](../research/four_followups_20261021/PROTOCOL.md).
-- **Execution limits and stop condition:** Freeze and record the alternative's
-  coefficient, memory and time guards before execution; retain partial records
-  on each guard or explicit resource failure. Do not silently reduce the cohort.
-- **Outcomes and next actions:** A validated faster elimination can be
-  replayed on the remaining targets; an equal or slower result is recorded,
-  and the unchanged collector still requires the full run. A replay mismatch
-  invalidates the single-target price until resolved.
+- **Execution limits and stop condition:** The observed 93,307 rows contain
+  at most three factor-base terms each, so the original matrix has at most
+  279,921 nonzeros before label columns. A CSR encoding with 32-bit columns
+  and coefficients plus row offsets and two label vectors needs under 4 MiB
+  for those arrays; transpose and workspaces need separate measurement.
+  One `A D A^T` application visits at most 559,842 original coefficients.
+  A single-seed scalar Wiedemann pilot with at most `3 × 93,307` such
+  applications has an upper accounting bound of about 1.6 × 10^11 sparse
+  coefficient visits, excluding polynomial arithmetic. Preregister one
+  8 GiB-address, 7,200-second attempt and a 2 × 10^11-visit counter cap;
+  retain a stopped or unusable-kernel result with a null candidate/rho
+  ratio. These are proposed guards, not measured execution costs.
+- **Outcomes and next actions:** A source-verified scalar with exact
+  residual and independent non-wall replay would justify an unchanged
+  full-cohort arm with all 36 operation prices against same-process rho.
+  A failed residual, zero target label, resource cap, or replay mismatch
+  remains a failed or inconclusive one-target attempt. Record its counters
+  without extrapolating to the remaining curves.
 - **Recheck trigger:** A new exact elimination arm or more complete upper-size targets.
 
 ## Resolution and history
 
 2026-10-21: Nine smaller models complete; one 28-bit target independently
 replayed. The upper-size full cohort remains unresolved.
-
 2026-10-22: Degree peeling completed all nine 60-target pilot curves and two
 additional 28-bit first targets. The 25-million-coefficient p=186,379 attempt
 and independent replay both ended at the coefficient cap; 543/1,260 distinct
 targets are solved and 717 remain open. See the [three-cap report](../research/pencil_sparse_20261022/reports/run-20261022T0647Z/RUN_REPORT.pdf)
 and [study validation gate](../research/pencil_sparse_20261022/VALIDATION.json).
+
+2026-10-22: The Markowitz-priority p=186,379 primary also reached its 25m cap
+with no candidate scalar; its independent replay matched. The exact sparse
+nullspace gate above is proposed and unrun. Unresolved.
 This record does not close or replace the requested experiment.
