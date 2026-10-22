@@ -5,6 +5,9 @@ here=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 study=$(cd -- "$here/../.." && pwd)
 parent=$1 hints=$2 out=$3 cofactor=$4
 [[ $cofactor =~ ^[0-9]+$ ]]
+jq -e '(.id|test("^[a-zA-Z0-9_-]+$")) and (.value|test("^[0-9]+$")) and
+  all((.factors+.residuals)[]; (.[0]|test("^[0-9]+$")) and
+    (.[1]|type=="number" and .>0 and .==floor))' "$parent" >/dev/null
 mkdir -p "$out"
 [[ -z $(find "$out" -mindepth 1 -maxdepth 1 -print -quit) ]] || exit 1
 out=$(cd -- "$out" && pwd)
