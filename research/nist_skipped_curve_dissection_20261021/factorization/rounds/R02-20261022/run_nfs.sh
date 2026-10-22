@@ -37,7 +37,7 @@ if [[ $mode == resume ]]; then
   tar -C "$out" -cf - state | xz -6 -T1 > "$log/state-before.tar.xz"
 fi
 printf 'nfs(%s)\n' "$number" > "$log/expression.txt"
-argv=(./yafu -threads 2 -lathreads 2 -seed 20261022
+argv=(./yafu -threads 2 -lathreads 2 -seed 20261022 -gnfs -xover 81
   -ggnfsT "$seconds" -ggnfs_dir "$siever/" -job nfs.job -o nfs.dat
   -logfile factor.log -session session.log)
 [[ $mode == fresh ]] || argv+=(-R)
