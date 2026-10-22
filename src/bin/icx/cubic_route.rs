@@ -26,9 +26,12 @@ pub(super) struct GraphArgs {
     /// Three coefficients of the source curve's b parameter.
     #[arg(long, num_args = 3)]
     b: Vec<u64>,
-    /// Include odd-prime isogeny degrees through this value (3..=7).
+    /// Include supported isogeny degrees through this value (2..=7).
     #[arg(long, default_value_t = 5)]
     max_ell: usize,
+    /// Include degree-2 j-neighbours alongside the supported odd degrees.
+    #[arg(long)]
+    include_degree_two: bool,
     /// Maximum distinct j-invariants to retain (1..=64).
     #[arg(long, default_value_t = 32)]
     max_nodes: usize,
@@ -220,11 +223,11 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
 pub(super) fn enumerate_j(args: &GraphArgs) -> Result<Value, String> {
     if !(7..=101).contains(&args.p)
         || !prime(args.p)
-        || !(3..=7).contains(&args.max_ell)
+        || !(2..=7).contains(&args.max_ell)
         || !(1..=64).contains(&args.max_nodes)
     {
         return Err(
-            "cubic graph requires prime p in 7..=101, max-ell in 3..=7, max-nodes in 1..=64".into(),
+            "cubic graph requires prime p in 7..=101, max-ell in 2..=7, max-nodes in 1..=64".into(),
         );
     }
     if args.a.len() != 3
@@ -246,12 +249,16 @@ pub(super) fn enumerate_j(args: &GraphArgs) -> Result<Value, String> {
     if !curve::is_smooth(&f, &source) {
         return Err("cubic graph source curve is singular".into());
     }
-    let degrees: Vec<usize> = [3, 5, 7]
+    let degrees: Vec<usize> = [2, 3, 5, 7]
         .into_iter()
-        .filter(|&ell| ell <= args.max_ell && ell + 1 < args.p as usize)
+        .filter(|&ell| {
+            ell <= args.max_ell
+                && ell + 1 < args.p as usize
+                && (ell != 2 || args.include_degree_two)
+        })
         .collect();
     if degrees.is_empty() {
-        return Err("no supported degree below the field characteristic".into());
+        return Err("no selected degree below the field characteristic; use --include-degree-two for max-ell 2".into());
     }
     let prime_cache = PhiCache::new(&Zp::new(args.p), &degrees);
     let cache = prime_cache.lift(|v| E3([v, 0, 0]));
@@ -646,6 +653,7 @@ mod tests {
             a: vec![3, 6, 4],
             b: vec![4, 4, 6],
             max_ell: 5,
+            include_degree_two: false,
             max_nodes: 32,
             seed: 1,
         })
@@ -678,6 +686,7 @@ mod tests {
             a: vec![3, 6, 4],
             b: vec![4, 4, 6],
             max_ell: 5,
+            include_degree_two: false,
             max_nodes: 32,
             seed: 1,
         };
@@ -723,6 +732,63 @@ mod tests {
             }
         }
         assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn degree_two_j_graph_matches_exhaustive_field_roots() {
+        let args = GraphArgs {
+            p: 7,
+            c: 2,
+            a: vec![3, 6, 4],
+            b: vec![4, 4, 6],
+            max_ell: 2,
+            include_degree_two: true,
+            max_nodes: 64,
+            seed: 1,
+        };
+        let report = enumerate_j(&args).unwrap();
+        assert_eq!(report["degrees"], json!([2]));
+        let nodes: Vec<E3> = report["nodes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|node| E3(serde_json::from_value(node["j"].clone()).unwrap()))
+            .collect();
+        let retained: HashSet<_> = nodes.iter().copied().collect();
+        let actual: HashSet<_> = report["edges"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|edge| {
+                assert_eq!(edge["degree"], 2);
+                let source = edge["source"].as_u64().unwrap() as usize;
+                let target = edge["target"].as_u64().unwrap() as usize;
+                (source, nodes[target])
+            })
+            .collect();
+        let f = CubicField { p: 7, c: 2 };
+        let phi = PhiCache::new(&Zp::new(7), &[2]).lift(|v| E3([v, 0, 0]));
+        let mut expected = HashSet::new();
+        let mut omitted = false;
+        for (source, &j) in nodes.iter().enumerate() {
+            for x2 in 0..7 {
+                for x1 in 0..7 {
+                    for x0 in 0..7 {
+                        let candidate = E3([x0, x1, x2]);
+                        if phi.get(2).eval(&f, j, candidate) == Fp3::ZERO {
+                            if retained.contains(&candidate) {
+                                expected.insert((source, candidate));
+                            } else {
+                                omitted = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        assert!(!actual.is_empty());
+        assert_eq!(actual, expected);
+        assert_eq!(report["truncated"], omitted);
     }
 
     #[test]

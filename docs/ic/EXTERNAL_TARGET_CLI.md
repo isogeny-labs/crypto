@@ -155,11 +155,16 @@ ic cubic-graph --p 7 --c 2 --a 3 6 4 --b 4 4 6 \
   --max-ell 5 --max-nodes 32 --seed 1 --json
 icx cubic-graph --p 7 --c 2 --a 3 6 4 --b 4 4 6 \
   --max-ell 5 --max-nodes 32 --seed 1 --json
+ic cubic-graph --p 7 --c 2 --a 3 6 4 --b 4 4 6 \
+  --max-ell 2 --include-degree-two --max-nodes 64 --seed 1 --json
 ```
 
 The field must be exactly `F_p[t]/(t³-c)` with canonical coefficients,
-prime `p` in `7..=101` (necessarily `p ≡ 1 mod 3`), and noncube `c`. Supported odd prime degrees are
-3, 5, and 7 when `p > degree + 1`. `--max-nodes` is bounded to 1–64;
+prime `p` in `7..=101` (necessarily `p ≡ 1 mod 3`), and noncube `c`.
+Supported odd prime degrees are 3, 5, and 7 when `p > degree + 1`.
+`--include-degree-two` also includes degree 2 when `--max-ell >= 2`; the
+default remains the odd-degree graph. Both `ic` and `icx` accept the flag.
+`--max-nodes` is bounded to 1–64;
 `truncated` records when that limit omits a discovered neighbour. Nodes
 are distinct j-invariants in the exact cubic field. Edges record distinct
 target j-invariants per degree and pass a second modular-polynomial
@@ -174,6 +179,10 @@ target j over all 343 field elements for both degrees and found exactly the
 reported neighbours. The frozen CLI output is
 [`cubic_f7_j_graph_public_20261021.json`](fixtures/cubic_f7_j_graph_public_20261021.json),
 SHA-256 `4e07e7c2fc117ecf8deec4916ac9d0178325f5118464ae5881c980c0ab2069de`.
+A separate `--max-ell 2 --include-degree-two` run on the same source returned
+4 j nodes and 6 directed degree-2 edges without truncation. Both release
+CLIs returned identical JSON, and an exhaustive scan over all 343 field
+elements found exactly those degree-2 neighbours for every retained node.
 A p=97, c=2 run with degree 3 and a two-node cap completed in 1.144 seconds
 on the local host and correctly marked its output truncated; that check
 validates command execution at the upper prime range, not complete graph
