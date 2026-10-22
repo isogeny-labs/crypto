@@ -27,6 +27,9 @@ use num_traits::{One, Zero};
 use super::group::{mix64, EcdlpGroup};
 use super::rho::biguint_to_f64;
 
+/// Maximum number of baby steps admitted by the in-memory BSGS implementation.
+pub const MAX_BSGS_BABY_STEPS: u64 = 1 << 20;
+
 /// What an interval solve did.
 #[derive(Clone, Debug)]
 pub struct IntervalReport {
@@ -94,20 +97,32 @@ pub fn bsgs<G: EcdlpGroup>(
 
     // Baby steps: rep(±[j]G) for j = 0..=m, m = ⌈√(width/2)⌉.
     let m_big = isqrt_ceil(&(width >> 1u32)).max(BigUint::one());
+    if m_big >= BigUint::from(MAX_BSGS_BABY_STEPS) {
+        report.elapsed_ms = t0.elapsed().as_millis();
+        return report;
+    }
     let m: u64 = m_big
         .iter_u64_digits()
         .next()
-        .expect("non-zero")
-        .min(u64::MAX / 4);
+        .expect("non-zero and bounded by MAX_BSGS_BABY_STEPS");
+    // A 64-bit point key can collide. Keep the first baby-step index in the
+    // compact table and retain every additional index for that key separately.
+    // Candidate scalars are verified against the full target point.
     let mut table: HashMap<u64, u64> = HashMap::with_capacity(m as usize + 1);
+    let mut collisions: HashMap<u64, Vec<u64>> = HashMap::new();
     let mut baby = g.identity();
     for j in 0..=m {
         let (rep, _) = g.canonical_sign(&baby);
-        table.entry(g.key(&rep)).or_insert(j);
+        let key = g.key(&rep);
+        if let std::collections::hash_map::Entry::Vacant(slot) = table.entry(key) {
+            slot.insert(j);
+        } else {
+            collisions.entry(key).or_default().push(j);
+        }
         baby = g.add(&baby, &gen);
         report.group_ops += 1;
     }
-    report.table_size = table.len();
+    report.table_size = m as usize + 1;
 
     // Giant steps: T − [i]S, S = [2m+1]G.
     let stride = BigUint::from(2 * m + 1);
@@ -120,16 +135,20 @@ pub fn bsgs<G: EcdlpGroup>(
     let mut cur = t_pt;
     for i in 0..=giants {
         let (rep, _) = g.canonical_sign(&cur);
-        if let Some(&j) = table.get(&g.key(&rep)) {
+        let key = g.key(&rep);
+        if let Some(&first) = table.get(&key) {
             let base = &stride * BigUint::from(i);
-            for cand in [&base + BigUint::from(j), (&base + n - BigUint::from(j)) % n] {
-                if cand < *width {
-                    let k = (lo + &cand) % n;
-                    if verify(&k) {
+            let extra = collisions.get(&key).into_iter().flatten().copied();
+            for j in std::iter::once(first).chain(extra) {
+                for cand in [&base + BigUint::from(j), (&base + n - BigUint::from(j)) % n] {
+                    if cand < *width {
+                        let k = (lo + &cand) % n;
                         report.group_ops += 2 * k.bits();
-                        report.scalar = Some(k);
-                        report.elapsed_ms = t0.elapsed().as_millis();
-                        return report;
+                        if verify(&k) {
+                            report.scalar = Some(k);
+                            report.elapsed_ms = t0.elapsed().as_millis();
+                            return report;
+                        }
                     }
                 }
             }
@@ -388,6 +407,59 @@ pub fn kangaroo<G: EcdlpGroup>(
 mod tests {
     use super::*;
     use crate::cryptanalysis::ecdlp_nist::toy;
+
+    struct CollidingCyclicGroup;
+
+    impl EcdlpGroup for CollidingCyclicGroup {
+        type Elt = u32;
+
+        fn name(&self) -> &str {
+            "colliding-cyclic-101"
+        }
+        fn order(&self) -> &BigUint {
+            static ORDER: std::sync::OnceLock<BigUint> = std::sync::OnceLock::new();
+            ORDER.get_or_init(|| BigUint::from(101u32))
+        }
+        fn generator(&self) -> Self::Elt {
+            1
+        }
+        fn identity(&self) -> Self::Elt {
+            0
+        }
+        fn is_identity(&self, p: &Self::Elt) -> bool {
+            *p == 0
+        }
+        fn add(&self, p: &Self::Elt, q: &Self::Elt) -> Self::Elt {
+            (p + q) % 101
+        }
+        fn double(&self, p: &Self::Elt) -> Self::Elt {
+            (p * 2) % 101
+        }
+        fn neg(&self, p: &Self::Elt) -> Self::Elt {
+            (101 - p) % 101
+        }
+        fn key(&self, _p: &Self::Elt) -> u64 {
+            0
+        }
+        fn canonical_sign(&self, p: &Self::Elt) -> (Self::Elt, bool) {
+            if *p > 50 {
+                (self.neg(p), true)
+            } else {
+                (*p, false)
+            }
+        }
+        fn coords_hex(&self, p: &Self::Elt) -> Option<(String, String)> {
+            Some((format!("{p:x}"), "0".into()))
+        }
+    }
+
+    #[test]
+    fn bsgs_retains_all_indices_when_point_keys_collide() {
+        let group = CollidingCyclicGroup;
+        let target = group.mul(&group.generator(), &BigUint::from(37u32));
+        let report = bsgs(&group, &target, &BigUint::zero(), &BigUint::from(50u32));
+        assert_eq!(report.scalar, Some(BigUint::from(37u32)));
+    }
 
     #[test]
     fn bsgs_and_kangaroo_agree_on_toy_curves() {
