@@ -157,6 +157,9 @@ icx cubic-graph --p 7 --c 2 --a 3 6 4 --b 4 4 6 \
   --max-ell 5 --max-nodes 32 --seed 1 --json
 ic cubic-graph --p 7 --c 2 --a 3 6 4 --b 4 4 6 \
   --max-ell 2 --include-degree-two --max-nodes 64 --seed 1 --json
+ic cubic-graph --p 7 --c 2 --a 0 0 0 --b 1 0 0 \
+  --max-ell 2 --include-degree-two --include-multiplicity \
+  --max-nodes 8 --seed 1 --json
 ```
 
 The field must be exactly `F_p[t]/(t³-c)` with canonical coefficients,
@@ -168,9 +171,13 @@ default remains the odd-degree graph. Both `ic` and `icx` accept the flag.
 `truncated` records when that limit omits a discovered neighbour. Nodes
 are distinct j-invariants in the exact cubic field. Edges record distinct
 target j-invariants per degree and pass a second modular-polynomial
-evaluation. This numeration does not include edge multiplicities or kernel
-generators. To transport an IC target, supply a separately certified
-`--route-file` as described above.
+evaluation. `--include-multiplicity` adds the root multiplicity of each edge
+in Φ_degree(source j, Y), counting repeated roots at special j values. It
+does not identify a distinct kernel for each repeated root. The default JSON
+omits this field so existing consumers keep the same schema. This numeration
+does not include kernel generators. In the j=0 example, the degree-2 edge to
+j=2 has multiplicity 3. To transport an IC target, supply a separately
+certified `--route-file` as described above.
 
 The public p=7 command above completed without truncation: 6 j nodes and
 18 distinct degree-labelled directed edges. Both `ic` and `icx` returned

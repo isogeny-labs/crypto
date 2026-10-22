@@ -121,7 +121,7 @@ enum Action {
     SolveCubic(cubic_external::CubicArgs),
     /// Enumerate bounded rational j-neighbours over an exact cubic field.
     CubicGraph(cubic_route::GraphArgs),
-    /// Generate a checked one-hop cubic Vélu route for a rational odd-prime kernel.
+    /// Generate a checked one-hop cubic Vélu route for a rational prime-order kernel.
     CubicRouteGenerate(cubic_route::GenerateArgs),
 }
 #[derive(Args)]

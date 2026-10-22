@@ -7,6 +7,7 @@ use isogeny_algos::curve::{self, Curve, Isogeny, Pt};
 use isogeny_algos::field::{Field, Rng, Zp};
 use isogeny_algos::kernel::velu::{velu_cyclic, velu_from_point, VeluIso};
 use isogeny_algos::path::graph::{self, PhiCache};
+use isogeny_algos::poly;
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::collections::{HashMap, HashSet};
@@ -32,6 +33,9 @@ pub(super) struct GraphArgs {
     /// Include degree-2 j-neighbours alongside the supported odd degrees.
     #[arg(long)]
     include_degree_two: bool,
+    /// Include each j-neighbour's root multiplicity in the modular polynomial.
+    #[arg(long)]
+    include_multiplicity: bool,
     /// Maximum distinct j-invariants to retain (1..=64).
     #[arg(long, default_value_t = 32)]
     max_nodes: usize,
@@ -316,7 +320,25 @@ pub(super) fn enumerate_j(args: &GraphArgs) -> Result<Value, String> {
                 index.insert(next_j, id);
                 id
             };
-            edges.push(json!({"source":source_id,"target":target_id,"degree":ell}));
+            let mut edge = json!({"source":source_id,"target":target_id,"degree":ell});
+            if args.include_multiplicity {
+                let mut polynomial = cache.get(ell).y_poly(&f, j);
+                let linear = vec![f.neg(next_j), f.one()];
+                let mut multiplicity = 0;
+                while polynomial.len() > 1 {
+                    let (quotient, remainder) = poly::divrem(&f, &polynomial, &linear);
+                    if !remainder.is_empty() {
+                        break;
+                    }
+                    polynomial = quotient;
+                    multiplicity += 1;
+                }
+                if multiplicity == 0 || multiplicity > ell + 1 {
+                    return Err("modular-polynomial neighbour has invalid multiplicity".into());
+                }
+                edge["multiplicity"] = json!(multiplicity);
+            }
+            edges.push(edge);
         }
         expanded += 1;
     }
@@ -678,6 +700,7 @@ mod tests {
             b: vec![4, 4, 6],
             max_ell: 5,
             include_degree_two: false,
+            include_multiplicity: false,
             max_nodes: 32,
             seed: 1,
         })
@@ -711,6 +734,7 @@ mod tests {
             b: vec![4, 4, 6],
             max_ell: 5,
             include_degree_two: false,
+            include_multiplicity: false,
             max_nodes: 32,
             seed: 1,
         };
@@ -767,6 +791,7 @@ mod tests {
             b: vec![4, 4, 6],
             max_ell: 2,
             include_degree_two: true,
+            include_multiplicity: false,
             max_nodes: 64,
             seed: 1,
         };
@@ -813,6 +838,32 @@ mod tests {
         assert!(!actual.is_empty());
         assert_eq!(actual, expected);
         assert_eq!(report["truncated"], omitted);
+    }
+
+    #[test]
+    fn degree_two_j_graph_counts_repeated_root() {
+        let report = enumerate_j(&GraphArgs {
+            p: 7,
+            c: 2,
+            a: vec![0, 0, 0],
+            b: vec![1, 0, 0],
+            max_ell: 2,
+            include_degree_two: true,
+            include_multiplicity: true,
+            max_nodes: 8,
+            seed: 1,
+        })
+        .unwrap();
+        assert_eq!(report["nodes"][0]["j"], json!([0, 0, 0]));
+        let edge = report["edges"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|edge| edge["source"] == 0)
+            .unwrap();
+        let target = edge["target"].as_u64().unwrap() as usize;
+        assert_eq!(report["nodes"][target]["j"], json!([2, 0, 0]));
+        assert_eq!(edge["multiplicity"], 3);
     }
 
     #[test]
