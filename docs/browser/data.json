@@ -8,8 +8,8 @@
   "factor_bases": 672,
   "candidates": 271,
   "rounds": 30,
-  "sessions": 226,
-  "yields": 14648
+  "sessions": 238,
+  "yields": 14684
  },
  "sources": {
   "docs/curves/registry.json": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf",
@@ -58,6 +58,18 @@
   "research/ecbench_numa_vm_20261002/sessions/v2-auto/records.jsonl": "126d9bf61729d2043d9ef41f36ae599d0f8601dcd4c990688a6d9d39ad72ea79",
   "research/ecbench_numa_vm_20261002/sessions/v2-interrupted/records.jsonl": "a68ffa3bfef32b38c45113ae6a345d54e0493c890fc574b8b821e7f5a9bc499b",
   "research/ecbench_numa_vm_20261002/sessions/v2-node0/records.jsonl": "6a8cbb87f5a9354470a26d131c43b2d3573a29a99edbc7e4a55a04ebecf71f96",
+  "research/ecbench_overhead_review_20261022/sessions/generic-32-final-1/records.jsonl": "e5d42385e69cacafb57e0556c85a7a8dbdc161d6be2d7067273acd2616553d0f",
+  "research/ecbench_overhead_review_20261022/sessions/generic-32-final-2/records.jsonl": "db19b2b12b49093585df36382e393dabd8ded944521a31c30fb7c3ba8d54e61a",
+  "research/ecbench_overhead_review_20261022/sessions/generic-32-final-3/records.jsonl": "faa1ed2ac74a43116e99c449a5f4bfddf3b2f9e9fefbbbc9fb7efc349c1525c5",
+  "research/ecbench_overhead_review_20261022/sessions/generic-32-main-1/records.jsonl": "87647c03065f03e92e854ee6fbc0fe98b03392f094631991cdcacbeb0ceb10f9",
+  "research/ecbench_overhead_review_20261022/sessions/generic-32-main-2/records.jsonl": "b6b40c06c342040893633b0deb9da1b0b603221545148d7fac83b8f36e94fbf4",
+  "research/ecbench_overhead_review_20261022/sessions/generic-32-main-3/records.jsonl": "b2b236cc2ab8925166adb6ba4da82cdb4ca9e992791bcc13a5b6e49086674fd8",
+  "research/ecbench_overhead_review_20261022/sessions/smoke-prime-20-final-1/records.jsonl": "e5c0ac56a4017ee82fcc50a50533c1754324a1e88dfe9a001749dee7104581a0",
+  "research/ecbench_overhead_review_20261022/sessions/smoke-prime-20-final-2/records.jsonl": "1fb6e5431a675477341081a3878387a7b5fbf1cadb1cec3ba1f2ab3fbab4a251",
+  "research/ecbench_overhead_review_20261022/sessions/smoke-prime-20-final-3/records.jsonl": "51c62684e70f2266ff58cd8264f41a278c225bb858da472f1d541f13131f97e2",
+  "research/ecbench_overhead_review_20261022/sessions/smoke-prime-20-main-1/records.jsonl": "2440fd8899e04cfd4e8e01944af4834038dc868d41806ffa847fa3aef1ae0b6d",
+  "research/ecbench_overhead_review_20261022/sessions/smoke-prime-20-main-2/records.jsonl": "da2cea28ddbf740d671bd79049e6c72810a373ae8f41724a66f22d120e920abc",
+  "research/ecbench_overhead_review_20261022/sessions/smoke-prime-20-main-3/records.jsonl": "d14904e8974733f9d75bba02c995ebaf5871ea319ecafe5f3cf03235d55f73c9",
   "research/ecbench_pair_claw_20261003/sessions/koblitz/records.jsonl": "4a2ffb331ade66ca0c09d3f0a7617e64070f27824c7c27eca56fbe37ba90effc",
   "research/ecbench_rho_optimized_20261014/sessions/run-20261014T012000Z/records.jsonl": "cc6d9f2fe3d979522e21d7421da4ed581ce6d9130ed62844584c0ed228ec2378",
   "research/ecbench_rootfind_engine_20261012/sessions/claim-n13/records.jsonl": "1c1f08b3c0b761ddb06021393b687043431261a64fb622ba794f0e045d479f10",
@@ -36223,6 +36235,276 @@
      "mean_ratio_to_floor": 1.334
     },
     {
+     "session_id": "ECBS1h2299d9574150",
+     "arm": "bsgs",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.4348,
+     "mean_ratio_to_floor": 1.619
+    },
+    {
+     "session_id": "ECBS1h2299d9574150",
+     "arm": "bsgs-il",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 0.8521,
+     "mean_ratio_to_floor": 0.961
+    },
+    {
+     "session_id": "ECBS1h2299d9574150",
+     "arm": "bsgs-neg",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 0.9374,
+     "mean_ratio_to_floor": 1.058
+    },
+    {
+     "session_id": "ECBS1h2299d9574150",
+     "arm": "ic-mitm",
+     "method": "ic.pipeline",
+     "method_id": "ECM1he27eac0cec8f",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 10.4922,
+     "mean_ratio_to_floor": 11.839
+    },
+    {
+     "session_id": "ECBS1h2299d9574150",
+     "arm": "kangaroo",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.9475,
+     "mean_ratio_to_floor": 2.197
+    },
+    {
+     "session_id": "ECBS1h2299d9574150",
+     "arm": "rho-frozen",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 2.4933,
+     "mean_ratio_to_floor": 2.813
+    },
+    {
+     "session_id": "ECBS1h2299d9574150",
+     "arm": "rho-neg",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.3185,
+     "mean_ratio_to_floor": 1.488
+    },
+    {
+     "session_id": "ECBS1h2299d9574150",
+     "arm": "rho-neg-aa",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.3185,
+     "mean_ratio_to_floor": 1.488
+    },
+    {
+     "session_id": "ECBS1h2299d9574150",
+     "arm": "rho-plain",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.441,
+     "mean_ratio_to_floor": 1.626
+    },
+    {
+     "session_id": "ECBS1h2e01d195fc9d",
+     "arm": "bsgs",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.4348,
+     "mean_ratio_to_floor": 1.619
+    },
+    {
+     "session_id": "ECBS1h2e01d195fc9d",
+     "arm": "bsgs-il",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 0.8521,
+     "mean_ratio_to_floor": 0.961
+    },
+    {
+     "session_id": "ECBS1h2e01d195fc9d",
+     "arm": "bsgs-neg",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 0.9374,
+     "mean_ratio_to_floor": 1.058
+    },
+    {
+     "session_id": "ECBS1h2e01d195fc9d",
+     "arm": "ic-mitm",
+     "method": "ic.pipeline",
+     "method_id": "ECM1he27eac0cec8f",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 10.4922,
+     "mean_ratio_to_floor": 11.839
+    },
+    {
+     "session_id": "ECBS1h2e01d195fc9d",
+     "arm": "kangaroo",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.9475,
+     "mean_ratio_to_floor": 2.197
+    },
+    {
+     "session_id": "ECBS1h2e01d195fc9d",
+     "arm": "rho-frozen",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 2.4933,
+     "mean_ratio_to_floor": 2.813
+    },
+    {
+     "session_id": "ECBS1h2e01d195fc9d",
+     "arm": "rho-neg",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.3185,
+     "mean_ratio_to_floor": 1.488
+    },
+    {
+     "session_id": "ECBS1h2e01d195fc9d",
+     "arm": "rho-neg-aa",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.3185,
+     "mean_ratio_to_floor": 1.488
+    },
+    {
+     "session_id": "ECBS1h2e01d195fc9d",
+     "arm": "rho-plain",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.441,
+     "mean_ratio_to_floor": 1.626
+    },
+    {
+     "session_id": "ECBS1h3197a547fbda",
+     "arm": "bsgs",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.4348,
+     "mean_ratio_to_floor": 1.619
+    },
+    {
+     "session_id": "ECBS1h3197a547fbda",
+     "arm": "bsgs-il",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 0.8521,
+     "mean_ratio_to_floor": 0.961
+    },
+    {
+     "session_id": "ECBS1h3197a547fbda",
+     "arm": "bsgs-neg",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 0.9374,
+     "mean_ratio_to_floor": 1.058
+    },
+    {
+     "session_id": "ECBS1h3197a547fbda",
+     "arm": "ic-mitm",
+     "method": "ic.pipeline",
+     "method_id": "ECM1he27eac0cec8f",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 10.4922,
+     "mean_ratio_to_floor": 11.839
+    },
+    {
+     "session_id": "ECBS1h3197a547fbda",
+     "arm": "kangaroo",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.9475,
+     "mean_ratio_to_floor": 2.197
+    },
+    {
+     "session_id": "ECBS1h3197a547fbda",
+     "arm": "rho-frozen",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 2.4933,
+     "mean_ratio_to_floor": 2.813
+    },
+    {
+     "session_id": "ECBS1h3197a547fbda",
+     "arm": "rho-neg",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.3185,
+     "mean_ratio_to_floor": 1.488
+    },
+    {
+     "session_id": "ECBS1h3197a547fbda",
+     "arm": "rho-neg-aa",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.3185,
+     "mean_ratio_to_floor": 1.488
+    },
+    {
+     "session_id": "ECBS1h3197a547fbda",
+     "arm": "rho-plain",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.441,
+     "mean_ratio_to_floor": 1.626
+    },
+    {
      "session_id": "ECBS1h382073f2a6ad",
      "arm": "pair-b32",
      "method": "ic.pipeline",
@@ -36663,6 +36945,96 @@
      "mean_ratio_to_floor": 1.27
     },
     {
+     "session_id": "ECBS1h588d6791e88d",
+     "arm": "bsgs",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.4348,
+     "mean_ratio_to_floor": 1.619
+    },
+    {
+     "session_id": "ECBS1h588d6791e88d",
+     "arm": "bsgs-il",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 0.8521,
+     "mean_ratio_to_floor": 0.961
+    },
+    {
+     "session_id": "ECBS1h588d6791e88d",
+     "arm": "bsgs-neg",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 0.9374,
+     "mean_ratio_to_floor": 1.058
+    },
+    {
+     "session_id": "ECBS1h588d6791e88d",
+     "arm": "ic-mitm",
+     "method": "ic.pipeline",
+     "method_id": "ECM1he27eac0cec8f",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 10.4922,
+     "mean_ratio_to_floor": 11.839
+    },
+    {
+     "session_id": "ECBS1h588d6791e88d",
+     "arm": "kangaroo",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.9475,
+     "mean_ratio_to_floor": 2.197
+    },
+    {
+     "session_id": "ECBS1h588d6791e88d",
+     "arm": "rho-frozen",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 2.4933,
+     "mean_ratio_to_floor": 2.813
+    },
+    {
+     "session_id": "ECBS1h588d6791e88d",
+     "arm": "rho-neg",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.3185,
+     "mean_ratio_to_floor": 1.488
+    },
+    {
+     "session_id": "ECBS1h588d6791e88d",
+     "arm": "rho-neg-aa",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.3185,
+     "mean_ratio_to_floor": 1.488
+    },
+    {
+     "session_id": "ECBS1h588d6791e88d",
+     "arm": "rho-plain",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.441,
+     "mean_ratio_to_floor": 1.626
+    },
+    {
      "session_id": "ECBS1h79581b989883",
      "arm": "b48-batch-8",
      "method": "ic.pipeline",
@@ -36781,6 +37153,96 @@
      "verified": 6,
      "mean_s": 1.3185,
      "mean_ratio_to_floor": 1.488
+    },
+    {
+     "session_id": "ECBS1h9f28821cf7af",
+     "arm": "bsgs",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.4348,
+     "mean_ratio_to_floor": 1.619
+    },
+    {
+     "session_id": "ECBS1h9f28821cf7af",
+     "arm": "bsgs-il",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 0.8521,
+     "mean_ratio_to_floor": 0.961
+    },
+    {
+     "session_id": "ECBS1h9f28821cf7af",
+     "arm": "bsgs-neg",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 0.9374,
+     "mean_ratio_to_floor": 1.058
+    },
+    {
+     "session_id": "ECBS1h9f28821cf7af",
+     "arm": "ic-mitm",
+     "method": "ic.pipeline",
+     "method_id": "ECM1he27eac0cec8f",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 10.4922,
+     "mean_ratio_to_floor": 11.839
+    },
+    {
+     "session_id": "ECBS1h9f28821cf7af",
+     "arm": "kangaroo",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.9475,
+     "mean_ratio_to_floor": 2.197
+    },
+    {
+     "session_id": "ECBS1h9f28821cf7af",
+     "arm": "rho-frozen",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 2.4933,
+     "mean_ratio_to_floor": 2.813
+    },
+    {
+     "session_id": "ECBS1h9f28821cf7af",
+     "arm": "rho-neg",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.3185,
+     "mean_ratio_to_floor": 1.488
+    },
+    {
+     "session_id": "ECBS1h9f28821cf7af",
+     "arm": "rho-neg-aa",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.3185,
+     "mean_ratio_to_floor": 1.488
+    },
+    {
+     "session_id": "ECBS1h9f28821cf7af",
+     "arm": "rho-plain",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.441,
+     "mean_ratio_to_floor": 1.626
     },
     {
      "session_id": "ECBS1hadb0689b12a0",
@@ -37271,6 +37733,96 @@
      "verified": 24,
      "mean_s": 1.5425,
      "mean_ratio_to_floor": 1.741
+    },
+    {
+     "session_id": "ECBS1hd7dc67cf3417",
+     "arm": "bsgs",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.4348,
+     "mean_ratio_to_floor": 1.619
+    },
+    {
+     "session_id": "ECBS1hd7dc67cf3417",
+     "arm": "bsgs-il",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 0.8521,
+     "mean_ratio_to_floor": 0.961
+    },
+    {
+     "session_id": "ECBS1hd7dc67cf3417",
+     "arm": "bsgs-neg",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 0.9374,
+     "mean_ratio_to_floor": 1.058
+    },
+    {
+     "session_id": "ECBS1hd7dc67cf3417",
+     "arm": "ic-mitm",
+     "method": "ic.pipeline",
+     "method_id": "ECM1he27eac0cec8f",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 10.4922,
+     "mean_ratio_to_floor": 11.839
+    },
+    {
+     "session_id": "ECBS1hd7dc67cf3417",
+     "arm": "kangaroo",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.9475,
+     "mean_ratio_to_floor": 2.197
+    },
+    {
+     "session_id": "ECBS1hd7dc67cf3417",
+     "arm": "rho-frozen",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 2.4933,
+     "mean_ratio_to_floor": 2.813
+    },
+    {
+     "session_id": "ECBS1hd7dc67cf3417",
+     "arm": "rho-neg",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.3185,
+     "mean_ratio_to_floor": 1.488
+    },
+    {
+     "session_id": "ECBS1hd7dc67cf3417",
+     "arm": "rho-neg-aa",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.3185,
+     "mean_ratio_to_floor": 1.488
+    },
+    {
+     "session_id": "ECBS1hd7dc67cf3417",
+     "arm": "rho-plain",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c",
+     "runs": 6,
+     "verified": 6,
+     "mean_s": 1.441,
+     "mean_ratio_to_floor": 1.626
     },
     {
      "session_id": "ECBS1hdb2c745b39ed",
@@ -293682,9 +294234,21 @@
    "params": {},
    "sessions": [
     "ECBS1h162089ae4d82",
+    "ECBS1h2299d9574150",
+    "ECBS1h2e01d195fc9d",
+    "ECBS1h3197a547fbda",
+    "ECBS1h3b6e6e6f4f76",
+    "ECBS1h3d9b955ebe5b",
+    "ECBS1h43be7ede7fb2",
+    "ECBS1h4eef13d78753",
+    "ECBS1h588d6791e88d",
+    "ECBS1h5d58db8c9ed7",
     "ECBS1h73210d525d59",
+    "ECBS1h9f28821cf7af",
     "ECBS1haf997766feb9",
-    "ECBS1hf4c34c2455f9"
+    "ECBS1hd7dc67cf3417",
+    "ECBS1hf4c34c2455f9",
+    "ECBS1hff775c6ff8ad"
    ],
    "curves": [
     "icv1-f2m17-tm101-00378d4e",
@@ -293701,10 +294265,11 @@
     "icv1-fp20-t727-cd198a38",
     "icv1-fp22-tm1385-475dcb5f",
     "icv1-fp24-t1059-6df599df",
-    "icv1-fp26-tm1775-7e8fb6df"
+    "icv1-fp26-tm1775-7e8fb6df",
+    "icv1-fp32-t74357-b7396dac"
    ],
-   "runs": 544,
-   "verified": 544
+   "runs": 700,
+   "verified": 700
   },
   {
    "method_id": "ECM1h87f6341629c3",
@@ -293715,17 +294280,29 @@
    "sessions": [
     "ECBS1h14bbcca48793",
     "ECBS1h162089ae4d82",
+    "ECBS1h2299d9574150",
+    "ECBS1h2e01d195fc9d",
+    "ECBS1h3197a547fbda",
     "ECBS1h3a5708ad901b",
+    "ECBS1h3b6e6e6f4f76",
+    "ECBS1h3d9b955ebe5b",
+    "ECBS1h43be7ede7fb2",
     "ECBS1h445dba3005bc",
     "ECBS1h46ed5b65cdcf",
     "ECBS1h498fa819ba21",
+    "ECBS1h4eef13d78753",
+    "ECBS1h588d6791e88d",
+    "ECBS1h5d58db8c9ed7",
     "ECBS1h73210d525d59",
     "ECBS1h923e3eb44444",
+    "ECBS1h9f28821cf7af",
     "ECBS1ha960fa84a3c2",
     "ECBS1haf997766feb9",
     "ECBS1hafb48c7c6d26",
     "ECBS1hc6d15a12b9b6",
-    "ECBS1hf4c34c2455f9"
+    "ECBS1hd7dc67cf3417",
+    "ECBS1hf4c34c2455f9",
+    "ECBS1hff775c6ff8ad"
    ],
    "curves": [
     "icv1-f2m17-tm101-00378d4e",
@@ -293746,10 +294323,11 @@
     "icv1-fp20-t727-cd198a38",
     "icv1-fp22-tm1385-475dcb5f",
     "icv1-fp24-t1059-6df599df",
-    "icv1-fp26-tm1775-7e8fb6df"
+    "icv1-fp26-tm1775-7e8fb6df",
+    "icv1-fp32-t74357-b7396dac"
    ],
-   "runs": 969,
-   "verified": 969
+   "runs": 1125,
+   "verified": 1125
   },
   {
    "method_id": "ECM1h2ee5b13dfb35",
@@ -293774,13 +294352,16 @@
     "ECBS1h1b54ad37ab95",
     "ECBS1h1db636b08cb4",
     "ECBS1h1f14c02571cb",
+    "ECBS1h2299d9574150",
     "ECBS1h23d3f475cb89",
     "ECBS1h2523d101e44e",
     "ECBS1h25b2c3e60c4c",
     "ECBS1h26c39485206a",
     "ECBS1h2bc002a3daa1",
     "ECBS1h2d021ff8abdf",
+    "ECBS1h2e01d195fc9d",
     "ECBS1h3090cbcbb95a",
+    "ECBS1h3197a547fbda",
     "ECBS1h343a364bd71f",
     "ECBS1h346309094a99",
     "ECBS1h34f7e10ef715",
@@ -293789,16 +294370,20 @@
     "ECBS1h39dbd21d4694",
     "ECBS1h3a6a6851fc47",
     "ECBS1h3b49bc4ceba3",
+    "ECBS1h3b6e6e6f4f76",
     "ECBS1h3d1e3125303b",
+    "ECBS1h3d9b955ebe5b",
     "ECBS1h3de49977ea73",
     "ECBS1h3e230f1318fd",
     "ECBS1h423fa68a169b",
+    "ECBS1h43be7ede7fb2",
     "ECBS1h4617a91cd1cd",
     "ECBS1h46702a492e70",
     "ECBS1h46ca5439adb6",
     "ECBS1h4a716f544969",
     "ECBS1h4c84a929ea38",
     "ECBS1h4d953595ff1e",
+    "ECBS1h4eef13d78753",
     "ECBS1h4f520534c67b",
     "ECBS1h4f864a9dccdc",
     "ECBS1h52b62ca08cdf",
@@ -293806,7 +294391,9 @@
     "ECBS1h556a0918e195",
     "ECBS1h57075cbbcb93",
     "ECBS1h57a3895d1af3",
+    "ECBS1h588d6791e88d",
     "ECBS1h58c830865d4e",
+    "ECBS1h5d58db8c9ed7",
     "ECBS1h5d771495f9ff",
     "ECBS1h6073db2308c6",
     "ECBS1h61a4863dcf76",
@@ -293829,6 +294416,7 @@
     "ECBS1h98af579fe359",
     "ECBS1h9af38a52c31c",
     "ECBS1h9b3e37ed9df2",
+    "ECBS1h9f28821cf7af",
     "ECBS1h9f2abedadb4f",
     "ECBS1h9f513f451fa8",
     "ECBS1ha078f870b4a2",
@@ -293851,6 +294439,7 @@
     "ECBS1hd3bd452b0b8c",
     "ECBS1hd444a83024d8",
     "ECBS1hd63455604824",
+    "ECBS1hd7dc67cf3417",
     "ECBS1hd81e104729dc",
     "ECBS1hd9545b87ba96",
     "ECBS1hdb74a24d8f3d",
@@ -293871,7 +294460,8 @@
     "ECBS1hf9785598bd2c",
     "ECBS1hfcc421519476",
     "ECBS1hfcdcd31cad82",
-    "ECBS1hfdb0e621e56f"
+    "ECBS1hfdb0e621e56f",
+    "ECBS1hff775c6ff8ad"
    ],
    "curves": [
     "icv1-f2m17-tm101-00378d4e",
@@ -293884,6 +294474,7 @@
     "icv1-fp22-tm1385-475dcb5f",
     "icv1-fp24-t1059-6df599df",
     "icv1-fp26-tm1775-7e8fb6df",
+    "icv1-fp32-t74357-b7396dac",
     "icv1-fp57-t536870914-0c911b7f",
     "icv1-fp57-t536870914-134c8e5c",
     "icv1-fp57-t536870914-15dbcf0d",
@@ -293985,8 +294576,8 @@
     "icv1-fp59-t1073741954-ff4d579a",
     "icv1-fp7-t2-4910f2d0"
    ],
-   "runs": 622,
-   "verified": 566
+   "runs": 778,
+   "verified": 722
   },
   {
    "method_id": "ECM1h3f1995f505fa",
@@ -297750,11 +298341,17 @@
    },
    "sessions": [
     "ECBS1h045961daac5c",
+    "ECBS1h2299d9574150",
+    "ECBS1h2e01d195fc9d",
+    "ECBS1h3197a547fbda",
     "ECBS1h472473eb8a3c",
     "ECBS1h548d49a71881",
+    "ECBS1h588d6791e88d",
+    "ECBS1h9f28821cf7af",
     "ECBS1haef4de822259",
     "ECBS1haf997766feb9",
-    "ECBS1hb8f2623c82e2"
+    "ECBS1hb8f2623c82e2",
+    "ECBS1hd7dc67cf3417"
    ],
    "curves": [
     "icv1-fp16-t295-8d3c3165",
@@ -297788,8 +298385,8 @@
     "icv1-fp25-t9734-60775ec1",
     "icv1-fp25-t9734-bcfe9f51"
    ],
-   "runs": 606,
-   "verified": 602
+   "runs": 654,
+   "verified": 650
   },
   {
    "method_id": "ECM1he284629af806",
@@ -300259,16 +300856,28 @@
    "sessions": [
     "ECBS1h14bbcca48793",
     "ECBS1h162089ae4d82",
+    "ECBS1h2299d9574150",
+    "ECBS1h2e01d195fc9d",
+    "ECBS1h3197a547fbda",
+    "ECBS1h3b6e6e6f4f76",
+    "ECBS1h3d9b955ebe5b",
+    "ECBS1h43be7ede7fb2",
     "ECBS1h445dba3005bc",
     "ECBS1h46ed5b65cdcf",
     "ECBS1h498fa819ba21",
+    "ECBS1h4eef13d78753",
+    "ECBS1h588d6791e88d",
+    "ECBS1h5d58db8c9ed7",
     "ECBS1h73210d525d59",
     "ECBS1h923e3eb44444",
+    "ECBS1h9f28821cf7af",
     "ECBS1haf997766feb9",
     "ECBS1hafb48c7c6d26",
     "ECBS1hc6d15a12b9b6",
+    "ECBS1hd7dc67cf3417",
     "ECBS1he0789e5685e0",
-    "ECBS1hf4c34c2455f9"
+    "ECBS1hf4c34c2455f9",
+    "ECBS1hff775c6ff8ad"
    ],
    "curves": [
     "icv1-f2m17-tm101-00378d4e",
@@ -300285,10 +300894,11 @@
     "icv1-fp20-t727-cd198a38",
     "icv1-fp22-tm1385-475dcb5f",
     "icv1-fp24-t1059-6df599df",
-    "icv1-fp26-tm1775-7e8fb6df"
+    "icv1-fp26-tm1775-7e8fb6df",
+    "icv1-fp32-t74357-b7396dac"
    ],
-   "runs": 777,
-   "verified": 777
+   "runs": 933,
+   "verified": 933
   },
   {
    "method_id": "ECM1h9c08616a41bb",
@@ -300300,8 +300910,20 @@
    },
    "sessions": [
     "ECBS1h162089ae4d82",
+    "ECBS1h2299d9574150",
+    "ECBS1h2e01d195fc9d",
+    "ECBS1h3197a547fbda",
+    "ECBS1h3b6e6e6f4f76",
+    "ECBS1h3d9b955ebe5b",
+    "ECBS1h43be7ede7fb2",
+    "ECBS1h4eef13d78753",
+    "ECBS1h588d6791e88d",
+    "ECBS1h5d58db8c9ed7",
+    "ECBS1h9f28821cf7af",
     "ECBS1haf997766feb9",
-    "ECBS1hf4c34c2455f9"
+    "ECBS1hd7dc67cf3417",
+    "ECBS1hf4c34c2455f9",
+    "ECBS1hff775c6ff8ad"
    ],
    "curves": [
     "icv1-f2m17-tm101-00378d4e",
@@ -300313,10 +300935,11 @@
     "icv1-fp20-t727-cd198a38",
     "icv1-fp22-tm1385-475dcb5f",
     "icv1-fp24-t1059-6df599df",
-    "icv1-fp26-tm1775-7e8fb6df"
+    "icv1-fp26-tm1775-7e8fb6df",
+    "icv1-fp32-t74357-b7396dac"
    ],
-   "runs": 400,
-   "verified": 400
+   "runs": 556,
+   "verified": 556
   },
   {
    "method_id": "ECM1hefea4e0ebe79",
@@ -300349,6 +300972,7 @@
     "ECBS1h1db636b08cb4",
     "ECBS1h1df9dadd2590",
     "ECBS1h1f14c02571cb",
+    "ECBS1h2299d9574150",
     "ECBS1h23d3f475cb89",
     "ECBS1h2523d101e44e",
     "ECBS1h25b2c3e60c4c",
@@ -300356,8 +300980,10 @@
     "ECBS1h26c39485206a",
     "ECBS1h2bc002a3daa1",
     "ECBS1h2d021ff8abdf",
+    "ECBS1h2e01d195fc9d",
     "ECBS1h2e0ea18cdf87",
     "ECBS1h3090cbcbb95a",
+    "ECBS1h3197a547fbda",
     "ECBS1h343a364bd71f",
     "ECBS1h346309094a99",
     "ECBS1h34f7e10ef715",
@@ -300369,11 +300995,14 @@
     "ECBS1h3a6a6851fc47",
     "ECBS1h3b2f74e560f4",
     "ECBS1h3b49bc4ceba3",
+    "ECBS1h3b6e6e6f4f76",
     "ECBS1h3d1e3125303b",
+    "ECBS1h3d9b955ebe5b",
     "ECBS1h3de49977ea73",
     "ECBS1h3e230f1318fd",
     "ECBS1h40838be1a86e",
     "ECBS1h423fa68a169b",
+    "ECBS1h43be7ede7fb2",
     "ECBS1h445dba3005bc",
     "ECBS1h4617a91cd1cd",
     "ECBS1h46702a492e70",
@@ -300388,6 +301017,7 @@
     "ECBS1h4d0b9e4a02a7",
     "ECBS1h4d6111413151",
     "ECBS1h4d953595ff1e",
+    "ECBS1h4eef13d78753",
     "ECBS1h4f520534c67b",
     "ECBS1h4f864a9dccdc",
     "ECBS1h52b62ca08cdf",
@@ -300398,8 +301028,10 @@
     "ECBS1h556a0918e195",
     "ECBS1h57075cbbcb93",
     "ECBS1h57a3895d1af3",
+    "ECBS1h588d6791e88d",
     "ECBS1h58c830865d4e",
     "ECBS1h5b9b70bafd3c",
+    "ECBS1h5d58db8c9ed7",
     "ECBS1h5d771495f9ff",
     "ECBS1h5e7b97a5c459",
     "ECBS1h6073db2308c6",
@@ -300431,6 +301063,7 @@
     "ECBS1h9af38a52c31c",
     "ECBS1h9b3e37ed9df2",
     "ECBS1h9f04832d988b",
+    "ECBS1h9f28821cf7af",
     "ECBS1h9f2abedadb4f",
     "ECBS1h9f513f451fa8",
     "ECBS1ha078f870b4a2",
@@ -300469,6 +301102,7 @@
     "ECBS1hd3d1c462e777",
     "ECBS1hd444a83024d8",
     "ECBS1hd63455604824",
+    "ECBS1hd7dc67cf3417",
     "ECBS1hd81e104729dc",
     "ECBS1hd9545b87ba96",
     "ECBS1hdb2c745b39ed",
@@ -300496,7 +301130,8 @@
     "ECBS1hf9785598bd2c",
     "ECBS1hfcc421519476",
     "ECBS1hfcdcd31cad82",
-    "ECBS1hfdb0e621e56f"
+    "ECBS1hfdb0e621e56f",
+    "ECBS1hff775c6ff8ad"
    ],
    "curves": [
     "icv1-f2m17-t147-f0d8ca02",
@@ -300665,6 +301300,7 @@
     "icv1-fp30-tm29402-75bd2650",
     "icv1-fp30-tm45748-31aed113",
     "icv1-fp30-tm48354-87c391fd",
+    "icv1-fp32-t74357-b7396dac",
     "icv1-fp37-t277-090dc414",
     "icv1-fp37-t277-91fd6e29",
     "icv1-fp57-t536870914-0c911b7f",
@@ -300768,8 +301404,8 @@
     "icv1-fp59-t1073741954-ff4d579a",
     "icv1-fp7-t2-4910f2d0"
    ],
-   "runs": 9973,
-   "verified": 9917
+   "runs": 10285,
+   "verified": 10229
   },
   {
    "method_id": "ECM1hb367476fce6c",
@@ -300781,10 +301417,22 @@
    },
    "sessions": [
     "ECBS1h162089ae4d82",
+    "ECBS1h2299d9574150",
+    "ECBS1h2e01d195fc9d",
+    "ECBS1h3197a547fbda",
+    "ECBS1h3b6e6e6f4f76",
+    "ECBS1h3d9b955ebe5b",
+    "ECBS1h43be7ede7fb2",
+    "ECBS1h4eef13d78753",
+    "ECBS1h588d6791e88d",
+    "ECBS1h5d58db8c9ed7",
     "ECBS1h6f9ddee85cae",
     "ECBS1h73210d525d59",
+    "ECBS1h9f28821cf7af",
     "ECBS1haf997766feb9",
-    "ECBS1hf4c34c2455f9"
+    "ECBS1hd7dc67cf3417",
+    "ECBS1hf4c34c2455f9",
+    "ECBS1hff775c6ff8ad"
    ],
    "curves": [
     "icv1-f2m17-tm101-00378d4e",
@@ -300801,10 +301449,11 @@
     "icv1-fp20-t727-cd198a38",
     "icv1-fp22-tm1385-475dcb5f",
     "icv1-fp24-t1059-6df599df",
-    "icv1-fp26-tm1775-7e8fb6df"
+    "icv1-fp26-tm1775-7e8fb6df",
+    "icv1-fp32-t74357-b7396dac"
    ],
-   "runs": 672,
-   "verified": 672
+   "runs": 828,
+   "verified": 828
   },
   {
    "method_id": "ECM1h64b303e4183b",
@@ -305161,12 +305810,18 @@
    "curve": "icv1-fp20-t727-cd198a38",
    "sessions": [
     "ECBS1h045961daac5c",
+    "ECBS1h2299d9574150",
+    "ECBS1h2e01d195fc9d",
+    "ECBS1h3197a547fbda",
     "ECBS1h382073f2a6ad",
     "ECBS1h40838be1a86e",
     "ECBS1h472473eb8a3c",
     "ECBS1h548d49a71881",
+    "ECBS1h588d6791e88d",
+    "ECBS1h9f28821cf7af",
     "ECBS1haf997766feb9",
     "ECBS1hb8f2623c82e2",
+    "ECBS1hd7dc67cf3417",
     "ECBS1hdb581ed962a0"
    ],
    "methods": [
@@ -328168,6 +328823,858 @@
      "role": "control",
      "method": "rho.negation",
      "method_id": "ECM1hefea4e0ebe79"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1hff775c6ff8ad",
+   "dir": "research/ecbench_overhead_review_20261022/sessions/generic-32-final-1",
+   "label": "review 2026-10-22: generic methods on a 32-bit prime-order curve",
+   "status": "complete",
+   "spec_id": "ECS1h31d539cc90af",
+   "env_class_id": "ECBENV2h073d08183a09",
+   "binary_sha256": "65356a7943901ffabe75fe50678c68aaf86474f16467dd701fd15e6b8e53d6af",
+   "git_commit": null,
+   "records": 144,
+   "status_counts": {
+    "verified": 144
+   },
+   "started_unix_ms": 1792643887966,
+   "curves": [
+    "icv1-fp32-t74357-b7396dac"
+   ],
+   "arms": [
+    {
+     "arm": "bsgs",
+     "role": "candidate",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35"
+    },
+    {
+     "arm": "bsgs-il",
+     "role": "candidate",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8"
+    },
+    {
+     "arm": "bsgs-neg",
+     "role": "candidate",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3"
+    },
+    {
+     "arm": "kangaroo",
+     "role": "candidate",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164"
+    },
+    {
+     "arm": "rho-frozen",
+     "role": "baseline",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb"
+    },
+    {
+     "arm": "rho-neg",
+     "role": "reference",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-neg-aa",
+     "role": "control",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-plain",
+     "role": "baseline",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1h3d9b955ebe5b",
+   "dir": "research/ecbench_overhead_review_20261022/sessions/generic-32-final-2",
+   "label": "review 2026-10-22: generic methods on a 32-bit prime-order curve",
+   "status": "complete",
+   "spec_id": "ECS1h31d539cc90af",
+   "env_class_id": "ECBENV2h073d08183a09",
+   "binary_sha256": "65356a7943901ffabe75fe50678c68aaf86474f16467dd701fd15e6b8e53d6af",
+   "git_commit": null,
+   "records": 144,
+   "status_counts": {
+    "verified": 144
+   },
+   "started_unix_ms": 1792643908303,
+   "curves": [
+    "icv1-fp32-t74357-b7396dac"
+   ],
+   "arms": [
+    {
+     "arm": "bsgs",
+     "role": "candidate",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35"
+    },
+    {
+     "arm": "bsgs-il",
+     "role": "candidate",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8"
+    },
+    {
+     "arm": "bsgs-neg",
+     "role": "candidate",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3"
+    },
+    {
+     "arm": "kangaroo",
+     "role": "candidate",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164"
+    },
+    {
+     "arm": "rho-frozen",
+     "role": "baseline",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb"
+    },
+    {
+     "arm": "rho-neg",
+     "role": "reference",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-neg-aa",
+     "role": "control",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-plain",
+     "role": "baseline",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1h3b6e6e6f4f76",
+   "dir": "research/ecbench_overhead_review_20261022/sessions/generic-32-final-3",
+   "label": "review 2026-10-22: generic methods on a 32-bit prime-order curve",
+   "status": "complete",
+   "spec_id": "ECS1h31d539cc90af",
+   "env_class_id": "ECBENV2h073d08183a09",
+   "binary_sha256": "65356a7943901ffabe75fe50678c68aaf86474f16467dd701fd15e6b8e53d6af",
+   "git_commit": null,
+   "records": 144,
+   "status_counts": {
+    "verified": 144
+   },
+   "started_unix_ms": 1792643928253,
+   "curves": [
+    "icv1-fp32-t74357-b7396dac"
+   ],
+   "arms": [
+    {
+     "arm": "bsgs",
+     "role": "candidate",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35"
+    },
+    {
+     "arm": "bsgs-il",
+     "role": "candidate",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8"
+    },
+    {
+     "arm": "bsgs-neg",
+     "role": "candidate",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3"
+    },
+    {
+     "arm": "kangaroo",
+     "role": "candidate",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164"
+    },
+    {
+     "arm": "rho-frozen",
+     "role": "baseline",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb"
+    },
+    {
+     "arm": "rho-neg",
+     "role": "reference",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-neg-aa",
+     "role": "control",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-plain",
+     "role": "baseline",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1h5d58db8c9ed7",
+   "dir": "research/ecbench_overhead_review_20261022/sessions/generic-32-main-1",
+   "label": "review 2026-10-22: generic methods on a 32-bit prime-order curve",
+   "status": "complete",
+   "spec_id": "ECS1h31d539cc90af",
+   "env_class_id": "ECBENV2h073d08183a09",
+   "binary_sha256": "dc68e91bb61195008c98a56d03a1bc68c93010419f32012ed478a39b47ed4d71",
+   "git_commit": null,
+   "records": 144,
+   "status_counts": {
+    "verified": 144
+   },
+   "started_unix_ms": 1792643877861,
+   "curves": [
+    "icv1-fp32-t74357-b7396dac"
+   ],
+   "arms": [
+    {
+     "arm": "bsgs",
+     "role": "candidate",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35"
+    },
+    {
+     "arm": "bsgs-il",
+     "role": "candidate",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8"
+    },
+    {
+     "arm": "bsgs-neg",
+     "role": "candidate",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3"
+    },
+    {
+     "arm": "kangaroo",
+     "role": "candidate",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164"
+    },
+    {
+     "arm": "rho-frozen",
+     "role": "baseline",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb"
+    },
+    {
+     "arm": "rho-neg",
+     "role": "reference",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-neg-aa",
+     "role": "control",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-plain",
+     "role": "baseline",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1h43be7ede7fb2",
+   "dir": "research/ecbench_overhead_review_20261022/sessions/generic-32-main-2",
+   "label": "review 2026-10-22: generic methods on a 32-bit prime-order curve",
+   "status": "complete",
+   "spec_id": "ECS1h31d539cc90af",
+   "env_class_id": "ECBENV2h073d08183a09",
+   "binary_sha256": "dc68e91bb61195008c98a56d03a1bc68c93010419f32012ed478a39b47ed4d71",
+   "git_commit": null,
+   "records": 144,
+   "status_counts": {
+    "verified": 144
+   },
+   "started_unix_ms": 1792643897197,
+   "curves": [
+    "icv1-fp32-t74357-b7396dac"
+   ],
+   "arms": [
+    {
+     "arm": "bsgs",
+     "role": "candidate",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35"
+    },
+    {
+     "arm": "bsgs-il",
+     "role": "candidate",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8"
+    },
+    {
+     "arm": "bsgs-neg",
+     "role": "candidate",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3"
+    },
+    {
+     "arm": "kangaroo",
+     "role": "candidate",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164"
+    },
+    {
+     "arm": "rho-frozen",
+     "role": "baseline",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb"
+    },
+    {
+     "arm": "rho-neg",
+     "role": "reference",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-neg-aa",
+     "role": "control",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-plain",
+     "role": "baseline",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1h4eef13d78753",
+   "dir": "research/ecbench_overhead_review_20261022/sessions/generic-32-main-3",
+   "label": "review 2026-10-22: generic methods on a 32-bit prime-order curve",
+   "status": "complete",
+   "spec_id": "ECS1h31d539cc90af",
+   "env_class_id": "ECBENV2h073d08183a09",
+   "binary_sha256": "dc68e91bb61195008c98a56d03a1bc68c93010419f32012ed478a39b47ed4d71",
+   "git_commit": null,
+   "records": 144,
+   "status_counts": {
+    "verified": 144
+   },
+   "started_unix_ms": 1792643917582,
+   "curves": [
+    "icv1-fp32-t74357-b7396dac"
+   ],
+   "arms": [
+    {
+     "arm": "bsgs",
+     "role": "candidate",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35"
+    },
+    {
+     "arm": "bsgs-il",
+     "role": "candidate",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8"
+    },
+    {
+     "arm": "bsgs-neg",
+     "role": "candidate",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3"
+    },
+    {
+     "arm": "kangaroo",
+     "role": "candidate",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164"
+    },
+    {
+     "arm": "rho-frozen",
+     "role": "baseline",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb"
+    },
+    {
+     "arm": "rho-neg",
+     "role": "reference",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-neg-aa",
+     "role": "control",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-plain",
+     "role": "baseline",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1h588d6791e88d",
+   "dir": "research/ecbench_overhead_review_20261022/sessions/smoke-prime-20-final-1",
+   "label": "smoke: every method on a registered 20-bit prime-order curve",
+   "status": "complete",
+   "spec_id": "ECS1h94f54998e76f",
+   "env_class_id": "ECBENV2h073d08183a09",
+   "binary_sha256": "65356a7943901ffabe75fe50678c68aaf86474f16467dd701fd15e6b8e53d6af",
+   "git_commit": null,
+   "records": 72,
+   "status_counts": {
+    "verified": 72
+   },
+   "started_unix_ms": 1792643853734,
+   "curves": [
+    "icv1-fp20-t727-cd198a38"
+   ],
+   "arms": [
+    {
+     "arm": "bsgs",
+     "role": "candidate",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35"
+    },
+    {
+     "arm": "bsgs-il",
+     "role": "candidate",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8"
+    },
+    {
+     "arm": "bsgs-neg",
+     "role": "candidate",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3"
+    },
+    {
+     "arm": "ic-mitm",
+     "role": "candidate",
+     "method": "ic.pipeline",
+     "method_id": "ECM1he27eac0cec8f"
+    },
+    {
+     "arm": "kangaroo",
+     "role": "candidate",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164"
+    },
+    {
+     "arm": "rho-frozen",
+     "role": "baseline",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb"
+    },
+    {
+     "arm": "rho-neg",
+     "role": "reference",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-neg-aa",
+     "role": "control",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-plain",
+     "role": "baseline",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1h9f28821cf7af",
+   "dir": "research/ecbench_overhead_review_20261022/sessions/smoke-prime-20-final-2",
+   "label": "smoke: every method on a registered 20-bit prime-order curve",
+   "status": "complete",
+   "spec_id": "ECS1h94f54998e76f",
+   "env_class_id": "ECBENV2h073d08183a09",
+   "binary_sha256": "65356a7943901ffabe75fe50678c68aaf86474f16467dd701fd15e6b8e53d6af",
+   "git_commit": null,
+   "records": 72,
+   "status_counts": {
+    "verified": 72
+   },
+   "started_unix_ms": 1792643863425,
+   "curves": [
+    "icv1-fp20-t727-cd198a38"
+   ],
+   "arms": [
+    {
+     "arm": "bsgs",
+     "role": "candidate",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35"
+    },
+    {
+     "arm": "bsgs-il",
+     "role": "candidate",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8"
+    },
+    {
+     "arm": "bsgs-neg",
+     "role": "candidate",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3"
+    },
+    {
+     "arm": "ic-mitm",
+     "role": "candidate",
+     "method": "ic.pipeline",
+     "method_id": "ECM1he27eac0cec8f"
+    },
+    {
+     "arm": "kangaroo",
+     "role": "candidate",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164"
+    },
+    {
+     "arm": "rho-frozen",
+     "role": "baseline",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb"
+    },
+    {
+     "arm": "rho-neg",
+     "role": "reference",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-neg-aa",
+     "role": "control",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-plain",
+     "role": "baseline",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1hd7dc67cf3417",
+   "dir": "research/ecbench_overhead_review_20261022/sessions/smoke-prime-20-final-3",
+   "label": "smoke: every method on a registered 20-bit prime-order curve",
+   "status": "complete",
+   "spec_id": "ECS1h94f54998e76f",
+   "env_class_id": "ECBENV2h073d08183a09",
+   "binary_sha256": "65356a7943901ffabe75fe50678c68aaf86474f16467dd701fd15e6b8e53d6af",
+   "git_commit": null,
+   "records": 72,
+   "status_counts": {
+    "verified": 72
+   },
+   "started_unix_ms": 1792643872980,
+   "curves": [
+    "icv1-fp20-t727-cd198a38"
+   ],
+   "arms": [
+    {
+     "arm": "bsgs",
+     "role": "candidate",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35"
+    },
+    {
+     "arm": "bsgs-il",
+     "role": "candidate",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8"
+    },
+    {
+     "arm": "bsgs-neg",
+     "role": "candidate",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3"
+    },
+    {
+     "arm": "ic-mitm",
+     "role": "candidate",
+     "method": "ic.pipeline",
+     "method_id": "ECM1he27eac0cec8f"
+    },
+    {
+     "arm": "kangaroo",
+     "role": "candidate",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164"
+    },
+    {
+     "arm": "rho-frozen",
+     "role": "baseline",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb"
+    },
+    {
+     "arm": "rho-neg",
+     "role": "reference",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-neg-aa",
+     "role": "control",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-plain",
+     "role": "baseline",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1h2e01d195fc9d",
+   "dir": "research/ecbench_overhead_review_20261022/sessions/smoke-prime-20-main-1",
+   "label": "smoke: every method on a registered 20-bit prime-order curve",
+   "status": "complete",
+   "spec_id": "ECS1h94f54998e76f",
+   "env_class_id": "ECBENV2h073d08183a09",
+   "binary_sha256": "dc68e91bb61195008c98a56d03a1bc68c93010419f32012ed478a39b47ed4d71",
+   "git_commit": null,
+   "records": 72,
+   "status_counts": {
+    "verified": 72
+   },
+   "started_unix_ms": 1792643848578,
+   "curves": [
+    "icv1-fp20-t727-cd198a38"
+   ],
+   "arms": [
+    {
+     "arm": "bsgs",
+     "role": "candidate",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35"
+    },
+    {
+     "arm": "bsgs-il",
+     "role": "candidate",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8"
+    },
+    {
+     "arm": "bsgs-neg",
+     "role": "candidate",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3"
+    },
+    {
+     "arm": "ic-mitm",
+     "role": "candidate",
+     "method": "ic.pipeline",
+     "method_id": "ECM1he27eac0cec8f"
+    },
+    {
+     "arm": "kangaroo",
+     "role": "candidate",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164"
+    },
+    {
+     "arm": "rho-frozen",
+     "role": "baseline",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb"
+    },
+    {
+     "arm": "rho-neg",
+     "role": "reference",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-neg-aa",
+     "role": "control",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-plain",
+     "role": "baseline",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1h2299d9574150",
+   "dir": "research/ecbench_overhead_review_20261022/sessions/smoke-prime-20-main-2",
+   "label": "smoke: every method on a registered 20-bit prime-order curve",
+   "status": "complete",
+   "spec_id": "ECS1h94f54998e76f",
+   "env_class_id": "ECBENV2h073d08183a09",
+   "binary_sha256": "dc68e91bb61195008c98a56d03a1bc68c93010419f32012ed478a39b47ed4d71",
+   "git_commit": null,
+   "records": 72,
+   "status_counts": {
+    "verified": 72
+   },
+   "started_unix_ms": 1792643858188,
+   "curves": [
+    "icv1-fp20-t727-cd198a38"
+   ],
+   "arms": [
+    {
+     "arm": "bsgs",
+     "role": "candidate",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35"
+    },
+    {
+     "arm": "bsgs-il",
+     "role": "candidate",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8"
+    },
+    {
+     "arm": "bsgs-neg",
+     "role": "candidate",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3"
+    },
+    {
+     "arm": "ic-mitm",
+     "role": "candidate",
+     "method": "ic.pipeline",
+     "method_id": "ECM1he27eac0cec8f"
+    },
+    {
+     "arm": "kangaroo",
+     "role": "candidate",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164"
+    },
+    {
+     "arm": "rho-frozen",
+     "role": "baseline",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb"
+    },
+    {
+     "arm": "rho-neg",
+     "role": "reference",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-neg-aa",
+     "role": "control",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-plain",
+     "role": "baseline",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c"
+    }
+   ]
+  },
+  {
+   "session_id": "ECBS1h3197a547fbda",
+   "dir": "research/ecbench_overhead_review_20261022/sessions/smoke-prime-20-main-3",
+   "label": "smoke: every method on a registered 20-bit prime-order curve",
+   "status": "complete",
+   "spec_id": "ECS1h94f54998e76f",
+   "env_class_id": "ECBENV2h073d08183a09",
+   "binary_sha256": "dc68e91bb61195008c98a56d03a1bc68c93010419f32012ed478a39b47ed4d71",
+   "git_commit": null,
+   "records": 72,
+   "status_counts": {
+    "verified": 72
+   },
+   "started_unix_ms": 1792643867937,
+   "curves": [
+    "icv1-fp20-t727-cd198a38"
+   ],
+   "arms": [
+    {
+     "arm": "bsgs",
+     "role": "candidate",
+     "method": "bsgs.textbook",
+     "method_id": "ECM1h2ee5b13dfb35"
+    },
+    {
+     "arm": "bsgs-il",
+     "role": "candidate",
+     "method": "bsgs.interleaved",
+     "method_id": "ECM1h6153371050b8"
+    },
+    {
+     "arm": "bsgs-neg",
+     "role": "candidate",
+     "method": "bsgs.negation",
+     "method_id": "ECM1h87f6341629c3"
+    },
+    {
+     "arm": "ic-mitm",
+     "role": "candidate",
+     "method": "ic.pipeline",
+     "method_id": "ECM1he27eac0cec8f"
+    },
+    {
+     "arm": "kangaroo",
+     "role": "candidate",
+     "method": "kangaroo.vow",
+     "method_id": "ECM1h05c1dc19c164"
+    },
+    {
+     "arm": "rho-frozen",
+     "role": "baseline",
+     "method": "rho.frozen_reference",
+     "method_id": "ECM1h9c08616a41bb"
+    },
+    {
+     "arm": "rho-neg",
+     "role": "reference",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-neg-aa",
+     "role": "control",
+     "method": "rho.negation",
+     "method_id": "ECM1hefea4e0ebe79"
+    },
+    {
+     "arm": "rho-plain",
+     "role": "baseline",
+     "method": "rho.plain",
+     "method_id": "ECM1hb367476fce6c"
     }
    ]
   },
@@ -814578,6 +816085,924 @@
    "solver": null
   },
   {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR2",
+   "record_id": "ECR1h5448fb0d1ed5",
+   "session_id": "ECBS1h2299d9574150",
+   "arm": "ic-mitm",
+   "round": 1,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "5.801688e-3",
+   "trials": 3792,
+   "relations": 22,
+   "yield": 0.0058016877637130804,
+   "lookups": 3775,
+   "lookups_per_relation": 171.5909090909091,
+   "walk_steps": 3774,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 22,
+   "matrix_columns": 33,
+   "matrix_rank": 22,
+   "row_ops": 296,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 5545.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 6625.0,
+   "s": 8.833906574314577,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR3",
+   "record_id": "ECR1he0d6e6b90599",
+   "session_id": "ECBS1h2299d9574150",
+   "arm": "ic-mitm",
+   "round": 2,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "2.771523e-3",
+   "trials": 5773,
+   "relations": 16,
+   "yield": 0.002771522605231249,
+   "lookups": 5752,
+   "lookups_per_relation": 359.5,
+   "walk_steps": 5751,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 16,
+   "matrix_columns": 33,
+   "matrix_rank": 16,
+   "row_ops": 169,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7476.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 8556.0,
+   "s": 11.408740324503475,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR4",
+   "record_id": "ECR1ha3d75b4beacd",
+   "session_id": "ECBS1h2299d9574150",
+   "arm": "ic-mitm",
+   "round": 3,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "2.740227e-3",
+   "trials": 5474,
+   "relations": 15,
+   "yield": 0.002740226525392766,
+   "lookups": 5454,
+   "lookups_per_relation": 363.6,
+   "walk_steps": 5453,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 15,
+   "matrix_columns": 33,
+   "matrix_rank": 15,
+   "row_ops": 123,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7245.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 8325.0,
+   "s": 11.100720336780205,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR2",
+   "record_id": "ECR1h57e8d2fb8d18",
+   "session_id": "ECBS1h2299d9574150",
+   "arm": "ic-mitm",
+   "round": 1,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.924647e-3",
+   "trials": 2548,
+   "relations": 10,
+   "yield": 0.003924646781789639,
+   "lookups": 2545,
+   "lookups_per_relation": 254.5,
+   "walk_steps": 2544,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 10,
+   "matrix_columns": 33,
+   "matrix_rank": 10,
+   "row_ops": 79,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 3678.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 4760.0,
+   "s": 6.347078534903757,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR3",
+   "record_id": "ECR1he61ca257af07",
+   "session_id": "ECBS1h2299d9574150",
+   "arm": "ic-mitm",
+   "round": 2,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.775168e-3",
+   "trials": 7152,
+   "relations": 27,
+   "yield": 0.0037751677852348995,
+   "lookups": 7105,
+   "lookups_per_relation": 263.14814814814815,
+   "walk_steps": 7104,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 27,
+   "matrix_columns": 33,
+   "matrix_rank": 27,
+   "row_ops": 339,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 8898.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 9980.0,
+   "s": 13.307530205533507,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR4",
+   "record_id": "ECR1h832dbb8bc97f",
+   "session_id": "ECBS1h2299d9574150",
+   "arm": "ic-mitm",
+   "round": 3,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.907522e-3",
+   "trials": 6142,
+   "relations": 24,
+   "yield": 0.0039075219798111365,
+   "lookups": 6104,
+   "lookups_per_relation": 254.33333333333334,
+   "walk_steps": 6103,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 24,
+   "matrix_columns": 33,
+   "matrix_rank": 24,
+   "row_ops": 284,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7884.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 8966.0,
+   "s": 11.955442467215773,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR2",
+   "record_id": "ECR1h1ae69d1318a6",
+   "session_id": "ECBS1h2e01d195fc9d",
+   "arm": "ic-mitm",
+   "round": 1,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "5.801688e-3",
+   "trials": 3792,
+   "relations": 22,
+   "yield": 0.0058016877637130804,
+   "lookups": 3775,
+   "lookups_per_relation": 171.5909090909091,
+   "walk_steps": 3774,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 22,
+   "matrix_columns": 33,
+   "matrix_rank": 22,
+   "row_ops": 296,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 5545.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 6625.0,
+   "s": 8.833906574314577,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR3",
+   "record_id": "ECR1ha4b542680884",
+   "session_id": "ECBS1h2e01d195fc9d",
+   "arm": "ic-mitm",
+   "round": 2,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "2.771523e-3",
+   "trials": 5773,
+   "relations": 16,
+   "yield": 0.002771522605231249,
+   "lookups": 5752,
+   "lookups_per_relation": 359.5,
+   "walk_steps": 5751,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 16,
+   "matrix_columns": 33,
+   "matrix_rank": 16,
+   "row_ops": 169,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7476.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 8556.0,
+   "s": 11.408740324503475,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR4",
+   "record_id": "ECR1hc94d295daf76",
+   "session_id": "ECBS1h2e01d195fc9d",
+   "arm": "ic-mitm",
+   "round": 3,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "2.740227e-3",
+   "trials": 5474,
+   "relations": 15,
+   "yield": 0.002740226525392766,
+   "lookups": 5454,
+   "lookups_per_relation": 363.6,
+   "walk_steps": 5453,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 15,
+   "matrix_columns": 33,
+   "matrix_rank": 15,
+   "row_ops": 123,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7245.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 8325.0,
+   "s": 11.100720336780205,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR2",
+   "record_id": "ECR1h619b17594a75",
+   "session_id": "ECBS1h2e01d195fc9d",
+   "arm": "ic-mitm",
+   "round": 1,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.924647e-3",
+   "trials": 2548,
+   "relations": 10,
+   "yield": 0.003924646781789639,
+   "lookups": 2545,
+   "lookups_per_relation": 254.5,
+   "walk_steps": 2544,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 10,
+   "matrix_columns": 33,
+   "matrix_rank": 10,
+   "row_ops": 79,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 3678.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 4760.0,
+   "s": 6.347078534903757,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR3",
+   "record_id": "ECR1h56624889331f",
+   "session_id": "ECBS1h2e01d195fc9d",
+   "arm": "ic-mitm",
+   "round": 2,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.775168e-3",
+   "trials": 7152,
+   "relations": 27,
+   "yield": 0.0037751677852348995,
+   "lookups": 7105,
+   "lookups_per_relation": 263.14814814814815,
+   "walk_steps": 7104,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 27,
+   "matrix_columns": 33,
+   "matrix_rank": 27,
+   "row_ops": 339,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 8898.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 9980.0,
+   "s": 13.307530205533507,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR4",
+   "record_id": "ECR1hb4f65c71e625",
+   "session_id": "ECBS1h2e01d195fc9d",
+   "arm": "ic-mitm",
+   "round": 3,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.907522e-3",
+   "trials": 6142,
+   "relations": 24,
+   "yield": 0.0039075219798111365,
+   "lookups": 6104,
+   "lookups_per_relation": 254.33333333333334,
+   "walk_steps": 6103,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 24,
+   "matrix_columns": 33,
+   "matrix_rank": 24,
+   "row_ops": 284,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7884.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 8966.0,
+   "s": 11.955442467215773,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR2",
+   "record_id": "ECR1h7345edf6e629",
+   "session_id": "ECBS1h3197a547fbda",
+   "arm": "ic-mitm",
+   "round": 1,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "5.801688e-3",
+   "trials": 3792,
+   "relations": 22,
+   "yield": 0.0058016877637130804,
+   "lookups": 3775,
+   "lookups_per_relation": 171.5909090909091,
+   "walk_steps": 3774,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 22,
+   "matrix_columns": 33,
+   "matrix_rank": 22,
+   "row_ops": 296,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 5545.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 6625.0,
+   "s": 8.833906574314577,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR3",
+   "record_id": "ECR1h47c9d544db18",
+   "session_id": "ECBS1h3197a547fbda",
+   "arm": "ic-mitm",
+   "round": 2,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "2.771523e-3",
+   "trials": 5773,
+   "relations": 16,
+   "yield": 0.002771522605231249,
+   "lookups": 5752,
+   "lookups_per_relation": 359.5,
+   "walk_steps": 5751,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 16,
+   "matrix_columns": 33,
+   "matrix_rank": 16,
+   "row_ops": 169,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7476.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 8556.0,
+   "s": 11.408740324503475,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR4",
+   "record_id": "ECR1hc39272f6ac26",
+   "session_id": "ECBS1h3197a547fbda",
+   "arm": "ic-mitm",
+   "round": 3,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "2.740227e-3",
+   "trials": 5474,
+   "relations": 15,
+   "yield": 0.002740226525392766,
+   "lookups": 5454,
+   "lookups_per_relation": 363.6,
+   "walk_steps": 5453,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 15,
+   "matrix_columns": 33,
+   "matrix_rank": 15,
+   "row_ops": 123,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7245.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 8325.0,
+   "s": 11.100720336780205,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR2",
+   "record_id": "ECR1h12a9cc93d5f5",
+   "session_id": "ECBS1h3197a547fbda",
+   "arm": "ic-mitm",
+   "round": 1,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.924647e-3",
+   "trials": 2548,
+   "relations": 10,
+   "yield": 0.003924646781789639,
+   "lookups": 2545,
+   "lookups_per_relation": 254.5,
+   "walk_steps": 2544,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 10,
+   "matrix_columns": 33,
+   "matrix_rank": 10,
+   "row_ops": 79,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 3678.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 4760.0,
+   "s": 6.347078534903757,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR3",
+   "record_id": "ECR1h806951af6488",
+   "session_id": "ECBS1h3197a547fbda",
+   "arm": "ic-mitm",
+   "round": 2,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.775168e-3",
+   "trials": 7152,
+   "relations": 27,
+   "yield": 0.0037751677852348995,
+   "lookups": 7105,
+   "lookups_per_relation": 263.14814814814815,
+   "walk_steps": 7104,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 27,
+   "matrix_columns": 33,
+   "matrix_rank": 27,
+   "row_ops": 339,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 8898.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 9980.0,
+   "s": 13.307530205533507,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR4",
+   "record_id": "ECR1h08e10014ef6c",
+   "session_id": "ECBS1h3197a547fbda",
+   "arm": "ic-mitm",
+   "round": 3,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.907522e-3",
+   "trials": 6142,
+   "relations": 24,
+   "yield": 0.0039075219798111365,
+   "lookups": 6104,
+   "lookups_per_relation": 254.33333333333334,
+   "walk_steps": 6103,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 24,
+   "matrix_columns": 33,
+   "matrix_rank": 24,
+   "row_ops": 284,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7884.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 8966.0,
+   "s": 11.955442467215773,
+   "deterministic": true,
+   "solver": null
+  },
+  {
    "run_id": "ECM1he27eac0cec8fW2756ecb8ca9eR2",
    "record_id": "ECR1hef1b165fe17b",
    "session_id": "ECBS1h472473eb8a3c",
@@ -815390,6 +817815,618 @@
    },
    "total_gae": 8472.0,
    "s": 11.296733056240468,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR2",
+   "record_id": "ECR1h42ae6dc50c6d",
+   "session_id": "ECBS1h588d6791e88d",
+   "arm": "ic-mitm",
+   "round": 1,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "5.801688e-3",
+   "trials": 3792,
+   "relations": 22,
+   "yield": 0.0058016877637130804,
+   "lookups": 3775,
+   "lookups_per_relation": 171.5909090909091,
+   "walk_steps": 3774,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 22,
+   "matrix_columns": 33,
+   "matrix_rank": 22,
+   "row_ops": 296,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 5545.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 6625.0,
+   "s": 8.833906574314577,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR3",
+   "record_id": "ECR1h46742540cc18",
+   "session_id": "ECBS1h588d6791e88d",
+   "arm": "ic-mitm",
+   "round": 2,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "2.771523e-3",
+   "trials": 5773,
+   "relations": 16,
+   "yield": 0.002771522605231249,
+   "lookups": 5752,
+   "lookups_per_relation": 359.5,
+   "walk_steps": 5751,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 16,
+   "matrix_columns": 33,
+   "matrix_rank": 16,
+   "row_ops": 169,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7476.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 8556.0,
+   "s": 11.408740324503475,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR4",
+   "record_id": "ECR1h11596d4f21cb",
+   "session_id": "ECBS1h588d6791e88d",
+   "arm": "ic-mitm",
+   "round": 3,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "2.740227e-3",
+   "trials": 5474,
+   "relations": 15,
+   "yield": 0.002740226525392766,
+   "lookups": 5454,
+   "lookups_per_relation": 363.6,
+   "walk_steps": 5453,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 15,
+   "matrix_columns": 33,
+   "matrix_rank": 15,
+   "row_ops": 123,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7245.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 8325.0,
+   "s": 11.100720336780205,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR2",
+   "record_id": "ECR1h8c7855d52775",
+   "session_id": "ECBS1h588d6791e88d",
+   "arm": "ic-mitm",
+   "round": 1,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.924647e-3",
+   "trials": 2548,
+   "relations": 10,
+   "yield": 0.003924646781789639,
+   "lookups": 2545,
+   "lookups_per_relation": 254.5,
+   "walk_steps": 2544,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 10,
+   "matrix_columns": 33,
+   "matrix_rank": 10,
+   "row_ops": 79,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 3678.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 4760.0,
+   "s": 6.347078534903757,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR3",
+   "record_id": "ECR1hbcfaa8417ff9",
+   "session_id": "ECBS1h588d6791e88d",
+   "arm": "ic-mitm",
+   "round": 2,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.775168e-3",
+   "trials": 7152,
+   "relations": 27,
+   "yield": 0.0037751677852348995,
+   "lookups": 7105,
+   "lookups_per_relation": 263.14814814814815,
+   "walk_steps": 7104,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 27,
+   "matrix_columns": 33,
+   "matrix_rank": 27,
+   "row_ops": 339,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 8898.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 9980.0,
+   "s": 13.307530205533507,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR4",
+   "record_id": "ECR1h5cd982d18044",
+   "session_id": "ECBS1h588d6791e88d",
+   "arm": "ic-mitm",
+   "round": 3,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.907522e-3",
+   "trials": 6142,
+   "relations": 24,
+   "yield": 0.0039075219798111365,
+   "lookups": 6104,
+   "lookups_per_relation": 254.33333333333334,
+   "walk_steps": 6103,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 24,
+   "matrix_columns": 33,
+   "matrix_rank": 24,
+   "row_ops": 284,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7884.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 8966.0,
+   "s": 11.955442467215773,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR2",
+   "record_id": "ECR1h61cd0a72b215",
+   "session_id": "ECBS1h9f28821cf7af",
+   "arm": "ic-mitm",
+   "round": 1,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "5.801688e-3",
+   "trials": 3792,
+   "relations": 22,
+   "yield": 0.0058016877637130804,
+   "lookups": 3775,
+   "lookups_per_relation": 171.5909090909091,
+   "walk_steps": 3774,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 22,
+   "matrix_columns": 33,
+   "matrix_rank": 22,
+   "row_ops": 296,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 5545.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 6625.0,
+   "s": 8.833906574314577,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR3",
+   "record_id": "ECR1h21e8870485ce",
+   "session_id": "ECBS1h9f28821cf7af",
+   "arm": "ic-mitm",
+   "round": 2,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "2.771523e-3",
+   "trials": 5773,
+   "relations": 16,
+   "yield": 0.002771522605231249,
+   "lookups": 5752,
+   "lookups_per_relation": 359.5,
+   "walk_steps": 5751,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 16,
+   "matrix_columns": 33,
+   "matrix_rank": 16,
+   "row_ops": 169,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7476.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 8556.0,
+   "s": 11.408740324503475,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR4",
+   "record_id": "ECR1ha29ead290f0a",
+   "session_id": "ECBS1h9f28821cf7af",
+   "arm": "ic-mitm",
+   "round": 3,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "2.740227e-3",
+   "trials": 5474,
+   "relations": 15,
+   "yield": 0.002740226525392766,
+   "lookups": 5454,
+   "lookups_per_relation": 363.6,
+   "walk_steps": 5453,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 15,
+   "matrix_columns": 33,
+   "matrix_rank": 15,
+   "row_ops": 123,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7245.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 8325.0,
+   "s": 11.100720336780205,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR2",
+   "record_id": "ECR1h7ef17a64f2e4",
+   "session_id": "ECBS1h9f28821cf7af",
+   "arm": "ic-mitm",
+   "round": 1,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.924647e-3",
+   "trials": 2548,
+   "relations": 10,
+   "yield": 0.003924646781789639,
+   "lookups": 2545,
+   "lookups_per_relation": 254.5,
+   "walk_steps": 2544,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 10,
+   "matrix_columns": 33,
+   "matrix_rank": 10,
+   "row_ops": 79,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 3678.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 4760.0,
+   "s": 6.347078534903757,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR3",
+   "record_id": "ECR1h43633b9c2561",
+   "session_id": "ECBS1h9f28821cf7af",
+   "arm": "ic-mitm",
+   "round": 2,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.775168e-3",
+   "trials": 7152,
+   "relations": 27,
+   "yield": 0.0037751677852348995,
+   "lookups": 7105,
+   "lookups_per_relation": 263.14814814814815,
+   "walk_steps": 7104,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 27,
+   "matrix_columns": 33,
+   "matrix_rank": 27,
+   "row_ops": 339,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 8898.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 9980.0,
+   "s": 13.307530205533507,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR4",
+   "record_id": "ECR1h87b2ae01ad9e",
+   "session_id": "ECBS1h9f28821cf7af",
+   "arm": "ic-mitm",
+   "round": 3,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.907522e-3",
+   "trials": 6142,
+   "relations": 24,
+   "yield": 0.0039075219798111365,
+   "lookups": 6104,
+   "lookups_per_relation": 254.33333333333334,
+   "walk_steps": 6103,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 24,
+   "matrix_columns": 33,
+   "matrix_rank": 24,
+   "row_ops": 284,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7884.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 8966.0,
+   "s": 11.955442467215773,
    "deterministic": true,
    "solver": null
   },
@@ -816818,6 +819855,312 @@
    },
    "total_gae": 10127.0,
    "s": 13.50354292499377,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR2",
+   "record_id": "ECR1h43634ec3d0e4",
+   "session_id": "ECBS1hd7dc67cf3417",
+   "arm": "ic-mitm",
+   "round": 1,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "5.801688e-3",
+   "trials": 3792,
+   "relations": 22,
+   "yield": 0.0058016877637130804,
+   "lookups": 3775,
+   "lookups_per_relation": 171.5909090909091,
+   "walk_steps": 3774,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 22,
+   "matrix_columns": 33,
+   "matrix_rank": 22,
+   "row_ops": 296,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 5545.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 6625.0,
+   "s": 8.833906574314577,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR3",
+   "record_id": "ECR1h853f9af7b07a",
+   "session_id": "ECBS1hd7dc67cf3417",
+   "arm": "ic-mitm",
+   "round": 2,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "2.771523e-3",
+   "trials": 5773,
+   "relations": 16,
+   "yield": 0.002771522605231249,
+   "lookups": 5752,
+   "lookups_per_relation": 359.5,
+   "walk_steps": 5751,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 16,
+   "matrix_columns": 33,
+   "matrix_rank": 16,
+   "row_ops": 169,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7476.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 8556.0,
+   "s": 11.408740324503475,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW141767324d6eR4",
+   "record_id": "ECR1h20c6daac7405",
+   "session_id": "ECBS1hd7dc67cf3417",
+   "arm": "ic-mitm",
+   "round": 3,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 0,
+   "target": [
+    "0x6d8f7",
+    "0x1439a"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "2.740227e-3",
+   "trials": 5474,
+   "relations": 15,
+   "yield": 0.002740226525392766,
+   "lookups": 5454,
+   "lookups_per_relation": 363.6,
+   "walk_steps": 5453,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 15,
+   "matrix_columns": 33,
+   "matrix_rank": 15,
+   "row_ops": 123,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7245.0,
+    "linear_algebra": 0.0,
+    "verify": 24.0
+   },
+   "total_gae": 8325.0,
+   "s": 11.100720336780205,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR2",
+   "record_id": "ECR1hf95c96127e5f",
+   "session_id": "ECBS1hd7dc67cf3417",
+   "arm": "ic-mitm",
+   "round": 1,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.924647e-3",
+   "trials": 2548,
+   "relations": 10,
+   "yield": 0.003924646781789639,
+   "lookups": 2545,
+   "lookups_per_relation": 254.5,
+   "walk_steps": 2544,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 10,
+   "matrix_columns": 33,
+   "matrix_rank": 10,
+   "row_ops": 79,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 3678.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 4760.0,
+   "s": 6.347078534903757,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR3",
+   "record_id": "ECR1haa44844a0706",
+   "session_id": "ECBS1hd7dc67cf3417",
+   "arm": "ic-mitm",
+   "round": 2,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.775168e-3",
+   "trials": 7152,
+   "relations": 27,
+   "yield": 0.0037751677852348995,
+   "lookups": 7105,
+   "lookups_per_relation": 263.14814814814815,
+   "walk_steps": 7104,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 27,
+   "matrix_columns": 33,
+   "matrix_rank": 27,
+   "row_ops": 339,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 8898.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 9980.0,
+   "s": 13.307530205533507,
+   "deterministic": true,
+   "solver": null
+  },
+  {
+   "run_id": "ECM1he27eac0cec8fW8d7a772f8ccdR4",
+   "record_id": "ECR1h3552236c9664",
+   "session_id": "ECBS1hd7dc67cf3417",
+   "arm": "ic-mitm",
+   "round": 3,
+   "status": "verified",
+   "curve": "icv1-fp20-t727-cd198a38",
+   "log2_r": 19.073,
+   "target_index": 1,
+   "target": [
+    "0x85d4e",
+    "0x83dae"
+   ],
+   "method_id": "ECM1he27eac0cec8f",
+   "fb_id": "FB1h4b3725c0aa92",
+   "fb_family": "prime-abscissa",
+   "fb_params": {
+    "size": "32"
+   },
+   "fb_columns": 32,
+   "fb_signed_points": 64,
+   "oracle": "mitm:negation_folded=1",
+   "solver_name": null,
+   "summands": 2,
+   "hit_rate": "3.907522e-3",
+   "trials": 6142,
+   "relations": 24,
+   "yield": 0.0039075219798111365,
+   "lookups": 6104,
+   "lookups_per_relation": 254.33333333333334,
+   "walk_steps": 6103,
+   "lift_failures": 0,
+   "unliftable_systems": 0,
+   "frobfold_mismatches": 0,
+   "matrix_rows": 24,
+   "matrix_columns": 33,
+   "matrix_rank": 24,
+   "row_ops": 284,
+   "gae": {
+    "factor_base": 0.0,
+    "oracle_setup": 1056.0,
+    "relations": 7884.0,
+    "linear_algebra": 0.0,
+    "verify": 26.0
+   },
+   "total_gae": 8966.0,
+   "s": 11.955442467215773,
    "deterministic": true,
    "solver": null
   },
