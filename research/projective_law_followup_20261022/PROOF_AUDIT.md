@@ -443,3 +443,25 @@ has not yet been recorded. In particular, no exhaustive all-divisor
 pair enumeration was run on any of the 42 curves. The finite audit
 alone cannot establish universal completeness; no counterexample to
 the implemented weighted law was found in that audit.
+
+### Secondary read-only static audit
+
+A separate agent inspected the branch predicates and `None` exits in
+`src/bin/projective_law_gate.rs`, this written case split, and all eight
+`projective_symbolic_*` certificate programs. It found no concrete
+missing reachable branch or contradictory predicate under the stated
+smooth odd-characteristic, valid reduced-input, nonzero-weight assumptions.
+The eight committed certificate results report 145 exact
+integer-polynomial equalities in total: 16, 12, 16, 19, 18, 7, 30,
+and 27 respectively. This is a static review observation, not an
+additional algebraic certificate.
+
+The certificate programs transcribe the production formulas into their
+own polynomial expressions; they do not invoke or mechanically link to
+the runtime functions. Agreement of that transcription with the runtime
+code was inspected manually and sampled by the finite 42-model Cantor
+comparison, not proved by a source-to-certificate theorem. The
+divisor-class and exceptional-branch composition arguments above are
+also written mathematics rather than mechanized declarations. This
+secondary agent audit is not an independent mathematical peer review
+or an exhaustive all-divisor enumeration.

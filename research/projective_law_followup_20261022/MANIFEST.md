@@ -99,6 +99,10 @@ the already certified point-doubling and 1+2 branches is written in
 `PROOF_AUDIT.md`. A faithful Lean theorem and independent proof
 review remain outstanding.
 
+`PROOF_AUDIT.md` also records a separate read-only static agent audit
+of the branch partition and certificate-to-runtime transcription. It
+does not replace a mechanized theorem or independent mathematical review.
+
 `SHA256SUMS` gives hashes for all tracked study inputs, code, records,
 summaries, graphs, PDF, and run package. Verify it from the study directory
 with `sha256sum -c SHA256SUMS`.
