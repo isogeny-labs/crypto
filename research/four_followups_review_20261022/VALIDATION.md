@@ -6,6 +6,8 @@ Run from the repository root:
 ```
 python3 research/four_followups_review_20261022/build.py
 python3 -m py_compile research/four_followups_review_20261022/build.py
+uvx --from cairosvg==2.8.2 cairosvg -d 150 -s 1.5625 research/four_followups_review_20261022/cost-ratios.svg -o research/four_followups_review_20261022/cost-ratios.png
+uvx --from cairosvg==2.8.2 cairosvg -d 150 -s 1.5625 research/four_followups_review_20261022/pencil-ratios.svg -o research/four_followups_review_20261022/pencil-ratios.png
 tectonic research/four_followups_review_20261022/REPORT.tex --outdir research/four_followups_review_20261022
 sha256sum -c research/four_followups_review_20261022/SHA256SUMS
 python3 scripts/validation_gate.py evidence research/pencil_sparse_20261022
@@ -31,7 +33,9 @@ rho control independently. This packet does not replace
 the separate source studies' arithmetic and scalar validators.
 
 The factor-base/law graph is rendered from the JSON representative rows; the
-paired pencil graph uses all 36 price cells per measured curve. The PDF table is
+paired pencil graph uses all 36 price cells per measured curve. Their PNGs are
+rendered from the same SVGs at 150/96 pixel scale for the 150-dpi PDF embed.
+The two-page PDF includes both graphs. Its table is
 an editorial selection of the pooled representative rows; reviewers should
 use the CSV for per-size patterns and the linked raw JSONL for target-level
 analysis. The original pencil 1,260-distinct-target request remains open: 543

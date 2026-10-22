@@ -2,6 +2,7 @@
 \usepackage[margin=0.72in]{geometry}
 \usepackage{array}
 \usepackage{url}
+\usepackage{graphicx}
 \begin{document}
 \begin{center}\Large Four follow-ups: cross-lead review packet\\[2pt]
 \normalsize Frozen public 21-model, 1,260-target cohort; 22 October 2026\end{center}
@@ -39,4 +40,10 @@ $p$ & Targets & Peel/online & Peel/rho & Cells peel$<$online\\\hline
 \noindent\textbf{Kummer open requirement.} The coordinate gate checked 8,820 labeled cases on all 1,260 public targets: 8,813 matching nonzero xADD outputs, seven recorded zero outputs, and no wrong nonzero outputs. Its separate signed-Recover gate repaired 175 quotient zero cases and recovered all 1,260 signed targets (1,257 generic, three bounded exceptional). The priced labeled DLP collector remains open, so its candidate cost, rho cost, and ratio are null here.
 \medskip
 \noindent\textbf{Review files.} \path{REPORT.md} links each source study and its raw data. \path{DATA_DICTIONARY.md} defines both normalized CSV files, empty fields, and exact source references. The target index has 11,528 rows sharing 1,260 checked workload keys and retains all seven Kummer label outcomes per target. The two SVGs show factor-base/law and paired pencil prices. The CSVs and summary JSON support independent regrouping without using this report's wording.
+\clearpage
+\noindent\textbf{Measured price ratios.} The first graph shows candidate divided by matched rho at the representative price for the complete factor-base and law arms. The second shows the degree-peeling collector divided by its matched online control: each line is the full 36-cell range and each dot is the representative price. Its last curve has one target; the others have 60. Kummer collector prices are absent pending full validation. Source: the standardized price grid.
+\begin{center}
+\includegraphics[width=0.90\linewidth]{cost-ratios.png}
+\includegraphics[width=0.90\linewidth]{pencil-ratios.png}
+\end{center}
 \end{document}

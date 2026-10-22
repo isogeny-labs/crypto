@@ -8,7 +8,7 @@ and the native-price point on each measured curve. The
 [standardized price grid](results/standard-cost-grid.csv) retains all 36 price
 cells for each measured arm and size; the [schema](DATA_DICTIONARY.md) defines
 empty fields and the source grid for every row. The [PDF](REPORT.pdf) presents
-the same status and selected values. These are operation-count prices, not
+the same status, selected values, and both graphs. These are operation-count prices, not
 isolated wall-time claims.
 
 The [standardized target index](results/standard-targets.csv) joins 11,528
