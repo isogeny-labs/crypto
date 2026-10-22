@@ -1,0 +1,1699 @@
+{
+  "schema": "validation-gate/v1 validator-report",
+  "id": "VAL-20261022-e873ba",
+  "status": "pass",
+  "independent": true,
+  "independence": "Validator subagent; did not produce item 14. Recomputed every value with its own stdlib Python from the raw JSONL. The producer's instrument source was read only for field semantics and print formats; the instrument was not run and no number was taken from summary.md.",
+  "subject": {
+    "item": "research/blindspots_20261018/14-prime-m4-cells",
+    "evidence_directory": "benchmarks/20261018-blindspots-prime-m4-cells",
+    "snapshot_validated_from": "f543b5523357eb11490a30fcac84d17359ce98ad",
+    "repository_head": "44578da212c808280f071d2fb0c45bc47ed905e2",
+    "files_read_committed_and_clean_at_head": true,
+    "files_read_identical_at_snapshot_and_head": true,
+    "uncommitted_paths_in_item_tree_not_read": [
+      "research/blindspots_20261018/14-prime-m4-cells/replay/"
+    ],
+    "uncommitted_paths_note": "untracked or modified paths present in the item tree at validation time (another lane's replay output); none was read by this validation",
+    "instrument_sha256": "f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376",
+    "card_commits": {
+      "card-01": "397d5ade00dc143660ab068d2d12d3808e93510e",
+      "card-02": "c8dbbe74ac85b9a7af5648b431ffa2178030b6c0",
+      "card-03": "f5360dac05c93a73c2b72b61bbb6474c7e51fbd8",
+      "card-04": "98732f64aa2449c71182901d680db88110f7c6c6",
+      "card-05": "7d1ea060625db8a65b76b74aa12f974bfedcb091",
+      "card-06": "59db7115875db18fe41685dccf538fe139bb5eb6",
+      "card-07": "07a57960e77a91b1ade72d8e5d0a1cc7daef6ef6",
+      "card-08": "3d43c69d8bc7cde2c8f927b2bb17fd9adb6f1399",
+      "card-09": "5f57909690d2374cd0af8b18970e27872a6344be",
+      "card-10": "0425aa8b7bbc49f8a0ca86061049da76233cfd3f",
+      "card-11": "7241b25da5a3e1fea7a2dd9065249cd21370ec6e",
+      "card-12": "5ed037cfd1da6ec9511ec07b5dd6a72b3eb1acaa"
+    }
+  },
+  "script": {
+    "path": "validator_recompute.py",
+    "run": "python3 -I benchmarks/20261018-blindspots-prime-m4-cells/validator_recompute.py"
+  },
+  "tolerance_policy": "rel_tol = sum of half-units of each rounding stage between the exact value and the README's printed digits, divided by |claimed|. Stages are the summarize print format of that column (README: 'Numbers are those printed by summarize') followed by the README's own precision. Integer counts use rel_tol 0. Gate comparison: |claimed - recomputed| <= rel_tol * max(|claimed|, |recomputed|).",
+  "raw_data": [
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/PROTOCOL.md",
+      "sha256": "63a4aaa6a0d49bcfede585a26d9d72b949f01f22d844de25bef50e1d686420ef",
+      "role": "frozen definitions and cell table"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/README.md",
+      "sha256": "5a333ca46a54939fe333254924419c4273ab177e9395e703ce702ac6ae548ddd",
+      "role": "claims"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/card-01.yaml",
+      "sha256": "64adb85f6ef39ef8030e7f3289df6f86954c9881800a5d041abfac7c6aa20eaa",
+      "role": "frozen command card"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/card-02.yaml",
+      "sha256": "cb6b364c778e96f14758e4d005754af1a8e1ba09e1b626f9aa30f0aa9e7fdf79",
+      "role": "frozen command card"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/card-03.yaml",
+      "sha256": "592c289c9f61322483a3fa14639555d7a1e3b218f6d8c5b4d8e541de9fad3327",
+      "role": "frozen command card"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/card-04.yaml",
+      "sha256": "54b8a5082f77029fdb188dc9c02593d1806cb76bc9be92d1654861f2248cf814",
+      "role": "frozen command card"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/card-05.yaml",
+      "sha256": "c982b9afb28e5c56f2ce8b43bcb3985f0a2ebedd8ac5a85dcf00e8eed9f9a7cb",
+      "role": "frozen command card"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/card-06.yaml",
+      "sha256": "f8922fb8fff14e4af07d4101312550294b55a4f9bb13ba14ed9952a8c466b79a",
+      "role": "frozen command card"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/card-07.yaml",
+      "sha256": "0eed3cbcd8b299c59e7e8c056db188bc5a5095c54e6cb819928fbdd61b5b7e38",
+      "role": "frozen command card"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/card-08.yaml",
+      "sha256": "42e610797f0a35a6fc858c374ce94db634e2a03012bdf43671268ee67fa45cdb",
+      "role": "frozen command card"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/card-09.yaml",
+      "sha256": "ffc522c668d6a61f71fd7cc727c39697699d3a944ad75f547bc044f743326376",
+      "role": "frozen command card"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/card-10.yaml",
+      "sha256": "835e44547484a144f4f1875ffeca27b4248dd19f57c2540835985e20e986bfbb",
+      "role": "frozen command card"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/card-11.yaml",
+      "sha256": "64295330c3d09918eee34c3623f7b66d4d9dc3ec3820a849dc94fd3d1d0fdaa7",
+      "role": "frozen command card"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/card-12.yaml",
+      "sha256": "f48dcec5d76f409e7024210229d76aaa2443da3800d65fcb58709c4e38b6f127",
+      "role": "frozen command card"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/card-01-selftest.stdout.log",
+      "sha256": "26b2dee1c6dc4e98b62a26896aa7981f180045b1149e24934eef9a886d2a213b",
+      "role": "control log"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx3.jsonl",
+      "sha256": "d2ca21b8012e87398abd2ff49ae9c51fed8fd0fde138c3017d51cb4f0d40ac67",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx4.jsonl",
+      "sha256": "bcf8f3a4874ba3b847fba8f9c6aff43f4ef5b28ccd596fa8bfef87d3dff3c117",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx5.jsonl",
+      "sha256": "9d96e2061e87ecce52210cf506655f8d20ea99b78f24a354b0a15cb0acea268a",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx6.jsonl",
+      "sha256": "8f48668d425b4474e3083572e028b8377728d83e385545069c4aec1fb76bd4be",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx7.jsonl",
+      "sha256": "6e08e7423cf6a42ebff8867ccdc60c8987a3dc119314925767915014ec2662e2",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16.jsonl",
+      "sha256": "017b0d28297507bf45607468939b5cb76ccb81a50a82d8be0e2f81a11e82920e",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b20.jsonl",
+      "sha256": "61b5ac18a77940e2c54f808f35573e79c043dc52412f3ce5b81ee1a7a8c4df8e",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b24.jsonl",
+      "sha256": "49d179b1a73c7c59f6575abcebef84b27df55a0f70ad862883bffc2078cbbcf7",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b28.jsonl",
+      "sha256": "6e6d1181f844079e1baa9ee7c6ff9a6155606f8a2a36fa8224a30271ffd07afd",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx3.jsonl",
+      "sha256": "6169acdaa182e92ca4c576275d00a99b227a8404e59ba357ebb256f9257a0947",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx4-r00-06.jsonl",
+      "sha256": "f69a9ca2081a58d4cca531755715ee9feb210ab77761cd9912df9cf5b9d47596",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx4-r06-11.jsonl",
+      "sha256": "868ab7e9aff7458db54b109b3fa89f2ce3ea9338ae964235af3deb27e2558b01",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx4-r11-16.jsonl",
+      "sha256": "911670fc4819aa58a67ff2d8db6e7e725dd5cb51e21e1375161281e0653167bf",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-01.json",
+      "sha256": "10e7382158368b1a548227e4a823633f3a5ceb4aa46afc0a3b4e32b57a50e243",
+      "role": "execution receipt"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-02.json",
+      "sha256": "8f160a10853135c5078b85969841944a86ae84142eef692ea55346c24884f3e4",
+      "role": "execution receipt"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-03.json",
+      "sha256": "9c9c64b253fd5559f4a3448f513d3df83172e46d67892c46853a51022c2dcdb0",
+      "role": "execution receipt"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-04.json",
+      "sha256": "36ff5e0648a643987b807e73c71e4b102561b1f64a3b9f3ad80e250c447d715d",
+      "role": "execution receipt"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-05.json",
+      "sha256": "8183609397872ec652bcaaebe3bee78e85065a3055c748f449d92aa1fa310080",
+      "role": "execution receipt"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-06.json",
+      "sha256": "45113135565da93d665d78dd7bb5e529c3b7937461cfdde98aeebf09037c4bee",
+      "role": "execution receipt"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-07.json",
+      "sha256": "7bcee7ba050a0154610d426e0123ae6712aaadb3360820028807c2e7f992ebb4",
+      "role": "execution receipt"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-08.json",
+      "sha256": "0dcceb7b81401d2fd7c93439e885454d9b1f99a7ed0765625034ed3daef99e36",
+      "role": "execution receipt"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-09.json",
+      "sha256": "0d30665bdc2e3652e6c8a93684ed65d30907b7b76596565738f75c62057d120b",
+      "role": "execution receipt"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-10.json",
+      "sha256": "344931495c582312880311feb85dd6b9c23b6d3395dfe9e5762f36a67b062d05",
+      "role": "execution receipt"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-11.json",
+      "sha256": "bc32690b1a3e7355d36f47655e26ca097e5ce93a3cd89087867f1ec865ad9f11",
+      "role": "execution receipt"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-12.json",
+      "sha256": "89873d863e6364d360ef13cecf0efd041d37539d44b72feee7bac77d4057215a",
+      "role": "execution receipt"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b16.jsonl",
+      "sha256": "82a53bc6a5bdd95f24995996f2c86470dfcca5d898c687ff57aef86f9d514d46",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b20.jsonl",
+      "sha256": "acb4957e2e5e3714cbd8079e27e6104bf752a0ed8c298d4064b8e45f3419ba78",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b24.jsonl",
+      "sha256": "126cfd524da872a9d562d69544d8821f1352b96f277bf1a5fc9a8d8cef4f4bef",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b28.jsonl",
+      "sha256": "9ee54d450af8a7d7c339a66827d8bc4c46cad121e977a0de47cbee8ae1be9ecc",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/summary.md",
+      "sha256": "e11466d16695d8258a54d443e80775717e8bebefa4a42ed1f108ef53d7cc1ce8",
+      "role": "rounding-chain reference only (print precision of the values the README copied); no recomputed value is taken from it"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx3.jsonl",
+      "sha256": "65aa3cca6f0b90ede018f1c621cf22d6abd5f4aedd0639f6f81d1eb01ccaaf23",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx4.jsonl",
+      "sha256": "1b31e436f81055146f6160d756a319151d467b3452b6440f85647a75d1d74d2a",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx5.jsonl",
+      "sha256": "8992d23ada29b58cd25e4094c2837b13102b2e2e4ada0623c568ebd8d43ff36c",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx6.jsonl",
+      "sha256": "511163e3c04d1a6f2f00e5d5c261545cd2c77d1d51c2c5c436bcb2cbb0f4381b",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx7.jsonl",
+      "sha256": "a6aedfa3e2c1bf2de5ebf42b249526ce0f2b5db070748022487b3d293a4a39cd",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16.jsonl",
+      "sha256": "3f7a10de292c5c26a6a9e288b8c45d8082b1e51e9b839e3bb0af2a2c81488eb3",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b20.jsonl",
+      "sha256": "62ade1f39f636b1df1ec9bf3e623b9c3bc9da6ac94bb4099cf7b9502e5bef43d",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b24.jsonl",
+      "sha256": "f3ffe7c1377aa59369b23015dec5ec623c8af71426676fa01e931b919dc4885c",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b28.jsonl",
+      "sha256": "58017ad73cc398326542e78648c174e0f0a3637b251dd614cc6a46d61e3651b1",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx3.jsonl",
+      "sha256": "c29f8cacad14b7dcd203c36670e65a05e929189219f6e79b3234a1a66e0c3a17",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx4.jsonl",
+      "sha256": "23cc29cc019f7ce7e9ce1743a0daf524f0b49e17614490efa573cbbc452aada9",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx5.jsonl",
+      "sha256": "17ed214ab54cb403a76ad45b13aed036c027977811fd7cceb5ca0c7880901b7d",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx6.jsonl",
+      "sha256": "623db9a317d534c48423f09aa10f40f96f4e7fdc2fc260770d364025a31b1ec8",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx7-t00-09.jsonl",
+      "sha256": "6b35a0976f11e39897f9230d9c9ffd5febd23c92d33718c77de35c650bce8f4f",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx7-t09-18.jsonl",
+      "sha256": "6270210d02ea615c65b366f96a9b71911a54a00261bc16471d8bdebac63a6b7e",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t00-05.jsonl",
+      "sha256": "b4759c68e67cf5385be6ca21628a1f7f3d8cb9bf7c88c3f496cc144e2d01cbce",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t05-10.jsonl",
+      "sha256": "55ab2d50272629e76294a3f4159d9ac40631b549eefeb370a251a9c7d60b5306",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t10-15.jsonl",
+      "sha256": "3ca9155e349a50b28565aff2f9c3626d57d50a5d251e76873b1001fd35832d46",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t15-18.jsonl",
+      "sha256": "b22591b50645bcfa1107b3fb50ac6c2a873b4d8320ccc2b1c71c5ab01b431afa",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b20-bx15.jsonl",
+      "sha256": "ec2234c603b31d39f39106c82e5878b7b2d500c253ee9fd131d21640f2f7dca7",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b20-bx5.jsonl",
+      "sha256": "61f5e1b0ea535fa20bf4351dcdc5361ce77c268df2864dd1b56c0117064978c3",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b20-bx6.jsonl",
+      "sha256": "016cead329d843c69170b8c27a8e15601d9d11efa958a7da2ed02780934fdcc2",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b24-bx29.jsonl",
+      "sha256": "ea2f719a63ccc4fb7ab3cd35cd45bf98b92739542f0abad13f9f7cddd08a2caa",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b24-bx5.jsonl",
+      "sha256": "d7514c8b3a7a8d7423c4f73559b701ad8f62aa80b3ff94c9f3d38034c31f2851",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b24-bx6.jsonl",
+      "sha256": "35bce0cf7c42c223463e23ecbcb6086bd0182d61a7c7b35975b02090dc9a3297",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx5.jsonl",
+      "sha256": "c89368415b4ce76b8815fd52d2b739d0079e3a8eef99d5c23b0d4e6dc3b64189",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx6.jsonl",
+      "sha256": "977a48e836f96e2d365e198b42fdf1d4672a1bcf7276609906e189ff072f87ab",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx63.jsonl",
+      "sha256": "76c85ec21b16baba2d21aca6e68adfe1c857453818f33aefc1285ce51babc3d2",
+      "role": "raw"
+    },
+    {
+      "path": "../../research/blindspots_20261018/instruments/blindspots_14_prime_m4.rs",
+      "sha256": "f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376",
+      "role": "instrument source (relocated byte-identically); read for field semantics only"
+    }
+  ],
+  "headline": [
+    {
+      "name": "arm (b) |F|-exponent: OLS slope log2 madds on log2 |F|, 16-bit ladder bx=3..8, mean over the 18 targets (16 random + 2 planted) as the README states",
+      "claimed": 11.031,
+      "recomputed": 11.031108321201714,
+      "rel_tol": 4.5326806273229983e-05,
+      "rounding_chain": [
+        0.001
+      ]
+    },
+    {
+      "name": "arm (b) |F|-exponent 95% t lower bound (4 df), README definition",
+      "claimed": 11.009,
+      "recomputed": 11.009290916021826,
+      "rel_tol": 4.541738577527478e-05,
+      "rounding_chain": [
+        0.001
+      ]
+    },
+    {
+      "name": "arm (b) |F|-exponent 95% t upper bound (4 df), README definition",
+      "claimed": 11.053,
+      "recomputed": 11.052925726381602,
+      "rel_tol": 4.523658735185017e-05,
+      "rounding_chain": [
+        0.001
+      ]
+    },
+    {
+      "name": "arm (b) |F|-exponent at headline precision (commit subject 'slope 11.03'), frozen PROTOCOL definition (mean over the 16 random targets only)",
+      "claimed": 11.03,
+      "recomputed": 11.02647276838519,
+      "rel_tol": 0.0004533091568449683,
+      "rounding_chain": [
+        0.01
+      ],
+      "note": "at 3 decimals the protocol definition gives 11.026, not 11.031; see discrepancies"
+    },
+    {
+      "name": "arm (b) p-exponent = slope/4 (|F| = p^(1/4) assumed)",
+      "claimed": 2.76,
+      "recomputed": 2.7577770803004285,
+      "rel_tol": 0.001811594202898551,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (b) mean multiply-adds per attempt, 16 bits, bx=3 (18 targets, README definition)",
+      "claimed": 548000.0,
+      "recomputed": 548387.0555555555,
+      "rel_tol": 0.0009215328467153285,
+      "rounding_chain": [
+        10,
+        1000
+      ]
+    },
+    {
+      "name": "arm (b) mean multiply-adds per attempt, 16 bits, bx=4 (18 targets, README definition)",
+      "claimed": 13300000.0,
+      "recomputed": 13282791.611111112,
+      "rel_tol": 0.0037969924812030075,
+      "rounding_chain": [
+        1000,
+        100000
+      ]
+    },
+    {
+      "name": "arm (b) mean multiply-adds per attempt, 16 bits, bx=5 (18 targets, README definition)",
+      "claimed": 156000000.0,
+      "recomputed": 155687218.0,
+      "rel_tol": 0.003237179487179487,
+      "rounding_chain": [
+        10000,
+        1000000
+      ]
+    },
+    {
+      "name": "arm (b) mean multiply-adds per attempt, 16 bits, bx=6 (18 targets, README definition)",
+      "claimed": 1160000000.0,
+      "recomputed": 1158837640.5555556,
+      "rel_tol": 0.004353448275862069,
+      "rounding_chain": [
+        100000,
+        10000000
+      ]
+    },
+    {
+      "name": "arm (b) mean multiply-adds per attempt, 16 bits, bx=7 (18 targets, README definition)",
+      "claimed": 6320000000.0,
+      "recomputed": 6322294111.555555,
+      "rel_tol": 0.0007990506329113924,
+      "rounding_chain": [
+        100000,
+        10000000
+      ]
+    },
+    {
+      "name": "arm (b) mean multiply-adds per attempt, 16 bits, bx=8 (18 targets, README definition)",
+      "claimed": 27500000000.0,
+      "recomputed": 27487305362.11111,
+      "rel_tol": 0.0018363636363636364,
+      "rounding_chain": [
+        1000000,
+        100000000
+      ]
+    },
+    {
+      "name": "arm (a) full IC 16 bits bx=8: mean attempts",
+      "claimed": 155.7,
+      "recomputed": 155.6875,
+      "rel_tol": 0.0003211303789338472,
+      "rounding_chain": [
+        0.1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 16 bits: S(0)",
+      "claimed": 3651,
+      "recomputed": 3651.1875,
+      "rel_tol": 0.0001506436592714325,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 16 bits: S(0.1)",
+      "claimed": 3997,
+      "recomputed": 3996.8375,
+      "rel_tol": 0.00013760320240180135,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 16 bits: S(1)",
+      "claimed": 7108,
+      "recomputed": 7107.6875,
+      "rel_tol": 7.034327518289252e-05,
+      "rounding_chain": [
+        1
+      ]
+    },
+    {
+      "name": "matched rho 16 bits: rho(0)",
+      "claimed": 566.5,
+      "recomputed": 566.5,
+      "rel_tol": 8.826125330979701e-05,
+      "rounding_chain": [
+        0.1
+      ]
+    },
+    {
+      "name": "matched rho 16 bits: rho(0.1)",
+      "claimed": 602.6,
+      "recomputed": 602.63125,
+      "rel_tol": 8.297378028542981e-05,
+      "rounding_chain": [
+        0.1
+      ]
+    },
+    {
+      "name": "matched rho 16 bits: rho(1)",
+      "claimed": 927.8,
+      "recomputed": 927.8125,
+      "rel_tol": 5.389092476826903e-05,
+      "rounding_chain": [
+        0.1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 16 bits: S/rho at w=0",
+      "claimed": 6.45,
+      "recomputed": 6.445167696381288,
+      "rel_tol": 0.0007751937984496124,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (a) full IC 16 bits: S/rho at w=0.1 (headline 'about 6.5x')",
+      "claimed": 6.63,
+      "recomputed": 6.632310388815714,
+      "rel_tol": 0.0007541478129713424,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (a) full IC 16 bits: S/rho at w=1",
+      "claimed": 7.66,
+      "recomputed": 7.660693836308521,
+      "rel_tol": 0.0007180156657963446,
+      "rounding_chain": [
+        0.001,
+        0.01
+      ]
+    },
+    {
+      "name": "arm (a) full IC 20 bits bx=15: mean attempts",
+      "claimed": 368.4,
+      "recomputed": 368.4375,
+      "rel_tol": 0.00013572204125950055,
+      "rounding_chain": [
+        0.1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 20 bits: S(0)",
+      "claimed": 16481,
+      "recomputed": 16480.875,
+      "rel_tol": 3.33717614222438e-05,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 20 bits: S(0.1)",
+      "claimed": 18139,
+      "recomputed": 18138.45625,
+      "rel_tol": 3.032140691328078e-05,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 20 bits: S(1)",
+      "claimed": 33060,
+      "recomputed": 33056.6875,
+      "rel_tol": 0.00015124016938898973,
+      "rounding_chain": [
+        10
+      ]
+    },
+    {
+      "name": "matched rho 20 bits: rho(0)",
+      "claimed": 1119,
+      "recomputed": 1119.1875,
+      "rel_tol": 0.0004915102770330652,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "matched rho 20 bits: rho(0.1)",
+      "claimed": 1208,
+      "recomputed": 1207.8625,
+      "rel_tol": 0.00045529801324503314,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "matched rho 20 bits: rho(1)",
+      "claimed": 2006,
+      "recomputed": 2005.9375,
+      "rel_tol": 0.0002741774675972084,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 20 bits: S/rho at w=0",
+      "claimed": 14.73,
+      "recomputed": 14.725749706818563,
+      "rel_tol": 0.00033944331296673454,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (a) full IC 20 bits: S/rho at w=0.1",
+      "claimed": 15.02,
+      "recomputed": 15.016987653809933,
+      "rel_tol": 0.00033288948069241014,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (a) full IC 20 bits: S/rho at w=1",
+      "claimed": 16.48,
+      "recomputed": 16.479420470478267,
+      "rel_tol": 0.00030339805825242716,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (a) full IC 24 bits bx=29: mean attempts",
+      "claimed": 719.0,
+      "recomputed": 719.0,
+      "rel_tol": 6.954102920723227e-05,
+      "rounding_chain": [
+        0.1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 24 bits: S(0)",
+      "claimed": 76401,
+      "recomputed": 76401.4375,
+      "rel_tol": 7.198858653682544e-06,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 24 bits: S(0.1)",
+      "claimed": 84242,
+      "recomputed": 84242.08125,
+      "rel_tol": 6.528809857315829e-06,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 24 bits: S(1)",
+      "claimed": 154800,
+      "recomputed": 154807.875,
+      "rel_tol": 0.00032299741602067185,
+      "rounding_chain": [
+        100
+      ]
+    },
+    {
+      "name": "matched rho 24 bits: rho(0)",
+      "claimed": 3708,
+      "recomputed": 3707.75,
+      "rel_tol": 0.00014832793959007552,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "matched rho 24 bits: rho(0.1)",
+      "claimed": 4053,
+      "recomputed": 4052.6625,
+      "rel_tol": 0.00013570194917345178,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "matched rho 24 bits: rho(1)",
+      "claimed": 7157,
+      "recomputed": 7156.875,
+      "rel_tol": 7.684784127427694e-05,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 24 bits: S/rho at w=0",
+      "claimed": 20.61,
+      "recomputed": 20.605876205245767,
+      "rel_tol": 0.000242600679281902,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (a) full IC 24 bits: S/rho at w=0.1",
+      "claimed": 20.79,
+      "recomputed": 20.78684846073415,
+      "rel_tol": 0.0002405002405002405,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (a) full IC 24 bits: S/rho at w=1",
+      "claimed": 21.63,
+      "recomputed": 21.63065234477338,
+      "rel_tol": 0.00023116042533518263,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (a) full IC 28 bits bx=63: mean attempts",
+      "claimed": 1816.6,
+      "recomputed": 1816.5625,
+      "rel_tol": 2.7523945832874604e-05,
+      "rounding_chain": [
+        0.1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 28 bits: S(0)",
+      "claimed": 568573,
+      "recomputed": 568572.875,
+      "rel_tol": 9.673340098808773e-07,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 28 bits: S(0.1)",
+      "claimed": 627636,
+      "recomputed": 627636.11875,
+      "rel_tol": 8.763040998285631e-07,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 28 bits: S(1)",
+      "claimed": 1159000,
+      "recomputed": 1159205.3125,
+      "rel_tol": 0.0004314063848144953,
+      "rounding_chain": [
+        1000
+      ]
+    },
+    {
+      "name": "matched rho 28 bits: rho(0)",
+      "claimed": 18913,
+      "recomputed": 18912.8125,
+      "rel_tol": 2.9080526621900282e-05,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "matched rho 28 bits: rho(0.1)",
+      "claimed": 20775,
+      "recomputed": 20775.33125,
+      "rel_tol": 2.647412755716005e-05,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "matched rho 28 bits: rho(1)",
+      "claimed": 37538,
+      "recomputed": 37538.0,
+      "rel_tol": 1.465181948958389e-05,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (a) full IC 28 bits: S/rho at w=0",
+      "claimed": 30.06,
+      "recomputed": 30.062840997339766,
+      "rel_tol": 0.00016633399866932801,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (a) full IC 28 bits: S/rho at w=0.1 (headline 'about 30x')",
+      "claimed": 30.21,
+      "recomputed": 30.21064315159837,
+      "rel_tol": 0.00016550810989738498,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (a) full IC 28 bits: S/rho at w=1",
+      "claimed": 30.88,
+      "recomputed": 30.880849072939423,
+      "rel_tol": 0.00016191709844559586,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "fitted growth of log2(S/rho) on log2 p, arm (a), 4 design cells (x = cell label 16..28, w = 0)",
+      "claimed": 0.179,
+      "recomputed": 0.17874473452160008,
+      "rel_tol": 0.002793296089385475,
+      "rounding_chain": [
+        0.001
+      ],
+      "note": "reproduces only at w = 0 with x = cell label; see limitations"
+    },
+    {
+      "name": "arm (a) S scales like p^e (OLS, x = cell label, w = 0)",
+      "claimed": 0.6,
+      "recomputed": 0.6015328515208511,
+      "rel_tol": 0.008333333333333333,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "matched rho scales like p^e (OLS, x = cell label, w = 0)",
+      "claimed": 0.42,
+      "recomputed": 0.42278811699925106,
+      "rel_tol": 0.011904761904761906,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (a) T_dec exponent on log2 p (actual primes), design cells",
+      "claimed": 0.2359,
+      "recomputed": 0.23591563988684766,
+      "rel_tol": 0.000211954217888936,
+      "rounding_chain": [
+        0.0001
+      ]
+    },
+    {
+      "name": "arm (a) T_dec exponent 95% t lower bound (2 df)",
+      "claimed": 0.2223,
+      "recomputed": 0.22226111100434345,
+      "rel_tol": 0.0002249212775528565,
+      "rounding_chain": [
+        0.0001
+      ]
+    },
+    {
+      "name": "arm (a) T_dec exponent 95% t upper bound (2 df)",
+      "claimed": 0.2496,
+      "recomputed": 0.24957016876935187,
+      "rel_tol": 0.00020032051282051284,
+      "rounding_chain": [
+        0.0001
+      ]
+    },
+    {
+      "name": "arm (a) full IC 16-bit ladder bx=3: S(0)",
+      "claimed": 15489,
+      "recomputed": 15488.8125,
+      "rel_tol": 3.550907095357996e-05,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (b) full IC 16 bits bx=3: S(0)",
+      "claimed": 2431,
+      "recomputed": 2430.5625,
+      "rel_tol": 0.00022624434389140272,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (b) full IC 16 bits bx=3: S(0.1)",
+      "claimed": 136800000.0,
+      "recomputed": 136774037.5375,
+      "rel_tol": 0.00036549744152046787,
+      "rounding_chain": [
+        0.1,
+        100000
+      ]
+    },
+    {
+      "name": "arm (b) full IC 16 bits bx=3: S(1)",
+      "claimed": 1368000000.0,
+      "recomputed": 1367718500.3125,
+      "rel_tol": 0.0003654970760233918,
+      "rounding_chain": [
+        1000000
+      ]
+    },
+    {
+      "name": "arm (b) full IC 16 bits bx=3: S/rho at w=0",
+      "claimed": 4.29,
+      "recomputed": 4.290489849955869,
+      "rel_tol": 0.0011655011655011655,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (b) full IC 16 bits bx=3: S/rho at w=0.1",
+      "claimed": 227000.0,
+      "recomputed": 226961.40888395678,
+      "rel_tol": 0.0022026651982378852,
+      "rounding_chain": [
+        0.01,
+        1000
+      ]
+    },
+    {
+      "name": "arm (b) full IC 16 bits bx=3: S/rho at w=1",
+      "claimed": 1470000.0,
+      "recomputed": 1474132.4355001685,
+      "rel_tol": 0.0037414965986394557,
+      "rounding_chain": [
+        1000,
+        10000
+      ]
+    },
+    {
+      "name": "arm (b) full IC 16 bits bx=4: S(0)",
+      "claimed": 1353,
+      "recomputed": 1353.0625,
+      "rel_tol": 0.00040650406504065046,
+      "rounding_chain": [
+        0.1,
+        1
+      ]
+    },
+    {
+      "name": "arm (b) full IC 16 bits bx=4: S(0.1)",
+      "claimed": 1439000000.0,
+      "recomputed": 1438862395.9437501,
+      "rel_tol": 0.0003474635510771369,
+      "rounding_chain": [
+        0.1,
+        1000000
+      ]
+    },
+    {
+      "name": "arm (b) full IC 16 bits bx=4: S(1)",
+      "claimed": 14390000000.0,
+      "recomputed": 14388611781.875,
+      "rel_tol": 0.00034746351633078526,
+      "rounding_chain": [
+        10000000
+      ]
+    },
+    {
+      "name": "arm (b) full IC 16 bits bx=4: S/rho at w=0",
+      "claimed": 2.39,
+      "recomputed": 2.388459841129744,
+      "rel_tol": 0.0020920502092050207,
+      "rounding_chain": [
+        0.01
+      ]
+    },
+    {
+      "name": "arm (b) full IC 16 bits bx=4: S/rho at w=0.1",
+      "claimed": 2390000.0,
+      "recomputed": 2387633.2266933555,
+      "rel_tol": 0.00209205230125523,
+      "rounding_chain": [
+        0.01,
+        10000
+      ]
+    },
+    {
+      "name": "arm (b) full IC 16 bits bx=4: S/rho at w=1",
+      "claimed": 15500000.0,
+      "recomputed": 15508102.964634556,
+      "rel_tol": 0.0035483870967741938,
+      "rounding_chain": [
+        10000,
+        100000
+      ]
+    },
+    {
+      "name": "MODEL arm (b) oracle phase at bx=8, w=0.1 (attempts x madds x 0.1)",
+      "claimed": 428000000000.0,
+      "recomputed": 427942985356.3674,
+      "rel_tol": 0.0011799065420560748,
+      "rounding_chain": [
+        10000000.0,
+        1000000000.0
+      ]
+    },
+    {
+      "name": "MODEL arm (b) oracle phase at bx=8, w=1",
+      "claimed": 4280000000000.0,
+      "recomputed": 4279429853563.6733,
+      "rel_tol": 0.0011799065420560748,
+      "rounding_chain": [
+        100000000.0,
+        10000000000.0
+      ]
+    },
+    {
+      "name": "MODEL arm (b) / rho at w=0.1",
+      "claimed": 710000000.0,
+      "recomputed": 710124118.7813731,
+      "rel_tol": 0.007042253521126761,
+      "rounding_chain": [
+        10000000.0
+      ]
+    },
+    {
+      "name": "MODEL arm (b) / rho at w=1",
+      "claimed": 4600000000.0,
+      "recomputed": 4612386504.346162,
+      "rel_tol": 0.010869565217391304,
+      "rounding_chain": [
+        100000000.0
+      ]
+    },
+    {
+      "name": "arm (a) full IC solves at 16 bits (of 16)",
+      "claimed": 16,
+      "recomputed": 16,
+      "rel_tol": 0.0,
+      "rounding_chain": []
+    },
+    {
+      "name": "matched rho logarithms recovered at 16 bits (of 16)",
+      "claimed": 16,
+      "recomputed": 16,
+      "rel_tol": 0.0,
+      "rounding_chain": []
+    },
+    {
+      "name": "arm (a) full IC solves at 20 bits (of 16)",
+      "claimed": 16,
+      "recomputed": 16,
+      "rel_tol": 0.0,
+      "rounding_chain": []
+    },
+    {
+      "name": "matched rho logarithms recovered at 20 bits (of 16)",
+      "claimed": 16,
+      "recomputed": 16,
+      "rel_tol": 0.0,
+      "rounding_chain": []
+    },
+    {
+      "name": "arm (a) full IC solves at 24 bits (of 16)",
+      "claimed": 16,
+      "recomputed": 16,
+      "rel_tol": 0.0,
+      "rounding_chain": []
+    },
+    {
+      "name": "matched rho logarithms recovered at 24 bits (of 16)",
+      "claimed": 16,
+      "recomputed": 16,
+      "rel_tol": 0.0,
+      "rounding_chain": []
+    },
+    {
+      "name": "arm (a) full IC solves at 28 bits (of 16)",
+      "claimed": 16,
+      "recomputed": 16,
+      "rel_tol": 0.0,
+      "rounding_chain": []
+    },
+    {
+      "name": "matched rho logarithms recovered at 28 bits (of 16)",
+      "claimed": 16,
+      "recomputed": 16,
+      "rel_tol": 0.0,
+      "rounding_chain": []
+    },
+    {
+      "name": "arm (b) full IC solves at 16 bits bx=3 (of 16)",
+      "claimed": 16,
+      "recomputed": 16,
+      "rel_tol": 0.0,
+      "rounding_chain": []
+    },
+    {
+      "name": "arm (b) full IC solves at 16 bits bx=4 (of 16)",
+      "claimed": 16,
+      "recomputed": 16,
+      "rel_tol": 0.0,
+      "rounding_chain": []
+    }
+  ],
+  "headline_failures": [],
+  "artifact_and_control_checks": [
+    {
+      "check": "card-01 receipt",
+      "ok": true,
+      "detail": "card sha256 matches receipt; status completed; 29 commands, failed []; 24 output digests, mismatched []; commit 397d5ade00dc143660ab068d2d12d3808e93510e with instrument sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376; dirty_before 0 paths, instrument dirty: []"
+    },
+    {
+      "check": "card-02 receipt",
+      "ok": true,
+      "detail": "card sha256 matches receipt; status completed; 9 commands, failed []; 5 output digests, mismatched []; commit c8dbbe74ac85b9a7af5648b431ffa2178030b6c0 with instrument sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376; dirty_before 5 paths, instrument dirty: []"
+    },
+    {
+      "check": "card-03 receipt",
+      "ok": true,
+      "detail": "card sha256 matches receipt; status completed; 11 commands, failed []; 7 output digests, mismatched []; commit f5360dac05c93a73c2b72b61bbb6474c7e51fbd8 with instrument sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376; dirty_before 6 paths, instrument dirty: []"
+    },
+    {
+      "check": "card-04 receipt",
+      "ok": true,
+      "detail": "card sha256 matches receipt; status completed; 5 commands, failed []; 1 output digests, mismatched []; commit 98732f64aa2449c71182901d680db88110f7c6c6 with instrument sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376; dirty_before 6 paths, instrument dirty: []"
+    },
+    {
+      "check": "card-05 receipt",
+      "ok": true,
+      "detail": "card sha256 matches receipt; status completed; 5 commands, failed []; 1 output digests, mismatched []; commit 7d1ea060625db8a65b76b74aa12f974bfedcb091 with instrument sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376; dirty_before 1 paths, instrument dirty: []"
+    },
+    {
+      "check": "card-06 receipt",
+      "ok": true,
+      "detail": "card sha256 matches receipt; status completed; 5 commands, failed []; 1 output digests, mismatched []; commit 59db7115875db18fe41685dccf538fe139bb5eb6 with instrument sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376; dirty_before 3 paths, instrument dirty: []"
+    },
+    {
+      "check": "card-07 receipt",
+      "ok": true,
+      "detail": "card sha256 matches receipt; status completed; 5 commands, failed []; 1 output digests, mismatched []; commit 07a57960e77a91b1ade72d8e5d0a1cc7daef6ef6 with instrument sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376; dirty_before 3 paths, instrument dirty: []"
+    },
+    {
+      "check": "card-08 receipt",
+      "ok": true,
+      "detail": "card sha256 matches receipt; status completed; 6 commands, failed []; 2 output digests, mismatched []; commit 3d43c69d8bc7cde2c8f927b2bb17fd9adb6f1399 with instrument sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376; dirty_before 0 paths, instrument dirty: []"
+    },
+    {
+      "check": "card-09 receipt",
+      "ok": true,
+      "detail": "card sha256 matches receipt; status completed; 6 commands, failed []; 2 output digests, mismatched []; commit 5f57909690d2374cd0af8b18970e27872a6344be with instrument sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376; dirty_before 5 paths, instrument dirty: []"
+    },
+    {
+      "check": "card-10 receipt",
+      "ok": true,
+      "detail": "card sha256 matches receipt; status completed; 5 commands, failed []; 1 output digests, mismatched []; commit 0425aa8b7bbc49f8a0ca86061049da76233cfd3f with instrument sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376; dirty_before 0 paths, instrument dirty: []"
+    },
+    {
+      "check": "card-11 receipt",
+      "ok": true,
+      "detail": "card sha256 matches receipt; status completed; 5 commands, failed []; 1 output digests, mismatched []; commit 7241b25da5a3e1fea7a2dd9065249cd21370ec6e with instrument sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376; dirty_before 4 paths, instrument dirty: []"
+    },
+    {
+      "check": "card-12 receipt",
+      "ok": true,
+      "detail": "card sha256 matches receipt; status completed; 5 commands, failed []; 1 output digests, mismatched []; commit 5ed037cfd1da6ec9511ec07b5dd6a72b3eb1acaa with instrument sha256 f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376; dirty_before 3 paths, instrument dirty: []"
+    },
+    {
+      "check": "rho and arm (a) full IC invoke one binary built once in card 01",
+      "ok": true,
+      "detail": "build index 2 -> target/blindspots-14/card-01/b14; rho indices [6, 7, 8, 9]; arm (a) full-IC indices [19, 20, 21, 22]; remove-bin index 28"
+    },
+    {
+      "check": "selftest --deep passed",
+      "ok": true,
+      "detail": "card-01-selftest.stdout.log"
+    },
+    {
+      "check": "relocated instrument source is the bound source",
+      "ok": true,
+      "detail": "f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376"
+    },
+    {
+      "check": "cell 16 matches PROTOCOL table",
+      "ok": true,
+      "detail": "p=48479 a=25392 b=20877 n=48383 bx=8 (a, b nonzero: j not in {0, 1728}, Aut(E) = {+-1}, negation is the only symmetry)"
+    },
+    {
+      "check": "cell 20 matches PROTOCOL table",
+      "ok": true,
+      "detail": "p=661603 a=422772 b=346249 n=660917 bx=15 (a, b nonzero: j not in {0, 1728}, Aut(E) = {+-1}, negation is the only symmetry)"
+    },
+    {
+      "check": "cell 24 matches PROTOCOL table",
+      "ok": true,
+      "detail": "p=10539323 a=7836717 b=8828358 n=10542893 bx=29 (a, b nonzero: j not in {0, 1728}, Aut(E) = {+-1}, negation is the only symmetry)"
+    },
+    {
+      "check": "cell 28 matches PROTOCOL table",
+      "ok": true,
+      "detail": "p=248685287 a=49054657 b=177851102 n=248685841 bx=63 (a, b nonzero: j not in {0, 1728}, Aut(E) = {+-1}, negation is the only symmetry)"
+    },
+    {
+      "check": "arm (a) planted 4-sums found and pair-table cross-check agrees at every cell",
+      "ok": true,
+      "detail": "[{\"bits\": 16, \"bx\": 8, \"random\": 16, \"planted_found\": 4, \"planted\": 4, \"crosscheck_mismatches\": 0, \"miss_gadd\": [16]}, {\"bits\": 20, \"bx\": 15, \"random\": 16, \"planted_found\": 4, \"planted\": 4, \"crosscheck_mismatches\": 0, \"miss_gadd\": [30]}, {\"bits\": 24, \"bx\": 29, \"random\": 16, \"planted_found\": 4, \"planted\": 4, \"crosscheck_mismatches\": 0, \"miss_gadd\": [58]}, {\"bits\": 28, \"bx\": 63, \"random\": 16, \"planted_found\": 4, \"planted\": 4, \"crosscheck_mismatches\": 0, \"miss_gadd\": [126]}, {\"bits\": 16, \"bx\": 3, \"random\": 16, \"planted_found\": 4, \"planted\": 4, \"crosscheck_mismatches\": 0, \"miss_gadd\": [6]}, {\"bits\": 16, \"bx\": 4, \"random\": 16, \"planted_found\": 4, \"planted\": 4, \"crosscheck_mismatches\": 0, \"miss_gadd\": [8]}, {\"bits\": 16, \"bx\": 5, \"random\": 16, \"planted_found\": 4, \"planted\": 4, \"crosscheck_mismatches\": 0, \"miss_gadd\": [10]}, {\"bits\": 16, \"bx\": 6, \"random\": 16, \"planted_found\": 4, \"planted\": 4, \"crosscheck_mismatches\": 0, \"miss_gadd\": [12]}, {\"bits\": 16, \"bx\": 7, \"random\": 16, \"planted_found\": 4, \"planted\": 4, \"crosscheck_mismatches\": 0, \"miss_gadd\": [14]}]"
+    },
+    {
+      "check": "arm (b) quotient dimension equals brute-force root count at every finished cell; planted vanishes",
+      "ok": true,
+      "detail": "[{\"bits\": 16, \"bx\": 3, \"targets\": 18, \"random\": 16, \"planted\": 2, \"done\": 18, \"status\": [\"done\"], \"dim_eq_brute\": \"18/18\", \"planted_vanishes\": \"2/2\", \"random_dims\": [0]}, {\"bits\": 16, \"bx\": 4, \"targets\": 18, \"random\": 16, \"planted\": 2, \"done\": 18, \"status\": [\"done\"], \"dim_eq_brute\": \"18/18\", \"planted_vanishes\": \"2/2\", \"random_dims\": [0]}, {\"bits\": 16, \"bx\": 5, \"targets\": 18, \"random\": 16, \"planted\": 2, \"done\": 18, \"status\": [\"done\"], \"dim_eq_brute\": \"18/18\", \"planted_vanishes\": \"2/2\", \"random_dims\": [0]}, {\"bits\": 16, \"bx\": 6, \"targets\": 18, \"random\": 16, \"planted\": 2, \"done\": 18, \"status\": [\"done\"], \"dim_eq_brute\": \"18/18\", \"planted_vanishes\": \"2/2\", \"random_dims\": [0]}, {\"bits\": 16, \"bx\": 7, \"targets\": 18, \"random\": 16, \"planted\": 2, \"done\": 18, \"status\": [\"done\"], \"dim_eq_brute\": \"18/18\", \"planted_vanishes\": \"2/2\", \"random_dims\": [0]}, {\"bits\": 16, \"bx\": 8, \"targets\": 18, \"random\": 16, \"planted\": 2, \"done\": 18, \"status\": [\"done\"], \"dim_eq_brute\": \"18/18\", \"planted_vanishes\": \"2/2\", \"random_dims\": [0]}, {\"bits\": 20, \"bx\": 5, \"targets\": 18, \"random\": 16, \"planted\": 2, \"done\": 18, \"status\": [\"done\"], \"dim_eq_brute\": \"18/18\", \"planted_vanishes\": \"2/2\", \"random_dims\": [0]}, {\"bits\": 20, \"bx\": 6, \"targets\": 18, \"random\": 16, \"planted\": 2, \"done\": 18, \"status\": [\"done\"], \"dim_eq_brute\": \"18/18\", \"planted_vanishes\": \"2/2\", \"random_dims\": [0]}, {\"bits\": 24, \"bx\": 5, \"targets\": 18, \"random\": 16, \"planted\": 2, \"done\": 18, \"status\": [\"done\"], \"dim_eq_brute\": \"18/18\", \"planted_vanishes\": \"2/2\", \"random_dims\": [0]}, {\"bits\": 24, \"bx\": 6, \"targets\": 18, \"random\": 16, \"planted\": 2, \"done\": 18, \"status\": [\"done\"], \"dim_eq_brute\": \"18/18\", \"planted_vanishes\": \"2/2\", \"random_dims\": [0]}, {\"bits\": 28, \"bx\": 5, \"targets\": 18, \"random\": 16, \"planted\": 2, \"done\": 18, \"status\": [\"done\"], \"dim_eq_brute\": \"18/18\", \"planted_vanishes\": \"2/2\", \"random_dims\": [0]}, {\"bits\": 28, \"bx\": 6, \"targets\": 18, \"random\": 16, \"planted\": 2, \"done\": 18, \"status\": [\"done\"], \"dim_eq_brute\": \"18/18\", \"planted_vanishes\": \"2/2\", \"random_dims\": [0]}]"
+    },
+    {
+      "check": "arm (b) design cells 20/24/28 stopped by the count cap on all 16 targets (lower bounds only)",
+      "ok": true,
+      "detail": "[{\"bits\": 20, \"bx\": 15, \"targets\": 16, \"random\": 16, \"planted\": 0, \"done\": 0, \"status\": [\"budget-nnz\"], \"dim_eq_brute\": \"0/0\", \"planted_vanishes\": \"0/0\", \"random_dims\": [null]}, {\"bits\": 24, \"bx\": 29, \"targets\": 16, \"random\": 16, \"planted\": 0, \"done\": 0, \"status\": [\"budget-nnz\"], \"dim_eq_brute\": \"0/0\", \"planted_vanishes\": \"0/0\", \"random_dims\": [null]}, {\"bits\": 28, \"bx\": 63, \"targets\": 16, \"random\": 16, \"planted\": 0, \"done\": 0, \"status\": [\"budget-nnz\"], \"dim_eq_brute\": \"0/0\", \"planted_vanishes\": \"0/0\", \"random_dims\": [null]}]"
+    },
+    {
+      "check": "every file read is tracked and unmodified at HEAD",
+      "ok": true,
+      "detail": "74 files; not committed or modified: []"
+    }
+  ],
+  "arm_b_controls": [
+    {
+      "bits": 16,
+      "bx": 3,
+      "targets": 18,
+      "random": 16,
+      "planted": 2,
+      "done": 18,
+      "status": [
+        "done"
+      ],
+      "dim_eq_brute": "18/18",
+      "planted_vanishes": "2/2",
+      "random_dims": [
+        0
+      ]
+    },
+    {
+      "bits": 16,
+      "bx": 4,
+      "targets": 18,
+      "random": 16,
+      "planted": 2,
+      "done": 18,
+      "status": [
+        "done"
+      ],
+      "dim_eq_brute": "18/18",
+      "planted_vanishes": "2/2",
+      "random_dims": [
+        0
+      ]
+    },
+    {
+      "bits": 16,
+      "bx": 5,
+      "targets": 18,
+      "random": 16,
+      "planted": 2,
+      "done": 18,
+      "status": [
+        "done"
+      ],
+      "dim_eq_brute": "18/18",
+      "planted_vanishes": "2/2",
+      "random_dims": [
+        0
+      ]
+    },
+    {
+      "bits": 16,
+      "bx": 6,
+      "targets": 18,
+      "random": 16,
+      "planted": 2,
+      "done": 18,
+      "status": [
+        "done"
+      ],
+      "dim_eq_brute": "18/18",
+      "planted_vanishes": "2/2",
+      "random_dims": [
+        0
+      ]
+    },
+    {
+      "bits": 16,
+      "bx": 7,
+      "targets": 18,
+      "random": 16,
+      "planted": 2,
+      "done": 18,
+      "status": [
+        "done"
+      ],
+      "dim_eq_brute": "18/18",
+      "planted_vanishes": "2/2",
+      "random_dims": [
+        0
+      ]
+    },
+    {
+      "bits": 16,
+      "bx": 8,
+      "targets": 18,
+      "random": 16,
+      "planted": 2,
+      "done": 18,
+      "status": [
+        "done"
+      ],
+      "dim_eq_brute": "18/18",
+      "planted_vanishes": "2/2",
+      "random_dims": [
+        0
+      ]
+    },
+    {
+      "bits": 20,
+      "bx": 5,
+      "targets": 18,
+      "random": 16,
+      "planted": 2,
+      "done": 18,
+      "status": [
+        "done"
+      ],
+      "dim_eq_brute": "18/18",
+      "planted_vanishes": "2/2",
+      "random_dims": [
+        0
+      ]
+    },
+    {
+      "bits": 20,
+      "bx": 6,
+      "targets": 18,
+      "random": 16,
+      "planted": 2,
+      "done": 18,
+      "status": [
+        "done"
+      ],
+      "dim_eq_brute": "18/18",
+      "planted_vanishes": "2/2",
+      "random_dims": [
+        0
+      ]
+    },
+    {
+      "bits": 20,
+      "bx": 15,
+      "targets": 16,
+      "random": 16,
+      "planted": 0,
+      "done": 0,
+      "status": [
+        "budget-nnz"
+      ],
+      "dim_eq_brute": "0/0",
+      "planted_vanishes": "0/0",
+      "random_dims": [
+        null
+      ]
+    },
+    {
+      "bits": 24,
+      "bx": 5,
+      "targets": 18,
+      "random": 16,
+      "planted": 2,
+      "done": 18,
+      "status": [
+        "done"
+      ],
+      "dim_eq_brute": "18/18",
+      "planted_vanishes": "2/2",
+      "random_dims": [
+        0
+      ]
+    },
+    {
+      "bits": 24,
+      "bx": 6,
+      "targets": 18,
+      "random": 16,
+      "planted": 2,
+      "done": 18,
+      "status": [
+        "done"
+      ],
+      "dim_eq_brute": "18/18",
+      "planted_vanishes": "2/2",
+      "random_dims": [
+        0
+      ]
+    },
+    {
+      "bits": 24,
+      "bx": 29,
+      "targets": 16,
+      "random": 16,
+      "planted": 0,
+      "done": 0,
+      "status": [
+        "budget-nnz"
+      ],
+      "dim_eq_brute": "0/0",
+      "planted_vanishes": "0/0",
+      "random_dims": [
+        null
+      ]
+    },
+    {
+      "bits": 28,
+      "bx": 5,
+      "targets": 18,
+      "random": 16,
+      "planted": 2,
+      "done": 18,
+      "status": [
+        "done"
+      ],
+      "dim_eq_brute": "18/18",
+      "planted_vanishes": "2/2",
+      "random_dims": [
+        0
+      ]
+    },
+    {
+      "bits": 28,
+      "bx": 6,
+      "targets": 18,
+      "random": 16,
+      "planted": 2,
+      "done": 18,
+      "status": [
+        "done"
+      ],
+      "dim_eq_brute": "18/18",
+      "planted_vanishes": "2/2",
+      "random_dims": [
+        0
+      ]
+    },
+    {
+      "bits": 28,
+      "bx": 63,
+      "targets": 16,
+      "random": 16,
+      "planted": 0,
+      "done": 0,
+      "status": [
+        "budget-nnz"
+      ],
+      "dim_eq_brute": "0/0",
+      "planted_vanishes": "0/0",
+      "random_dims": [
+        null
+      ]
+    }
+  ],
+  "discrepancies": [
+    {
+      "what": "arm (b) |F|-exponent definition",
+      "detail": "README 11.031 [11.009, 11.053] averages each ladder cell over all 18 targets including the 2 planted controls (recomputed 11.0311 [11.0093, 11.0529]). PROTOCOL 'T_dec = mean over the cell's 16 random targets' gives 11.0265 [11.0060, 11.0469]. Same at 2 decimals (11.03); the bx=3 cell mean is 5.5067e+05 (random) vs 5.4839e+05 (README 5.48e5). No verdict changes (threshold slope 1).",
+      "material": false
+    },
+    {
+      "what": "S(0.1) at 20 bits is double-rounded",
+      "detail": "exact 18138.4562; summary.md prints 18138.5 and the README rounds that to 18139; a single rounding gives 18138. Within the README's documented rounding chain (0.05 + 0.5).",
+      "material": false
+    },
+    {
+      "what": "'about 6.5x' (commit subject '6.5x-30x', task paraphrase) at w = 0.1",
+      "detail": "measured 16-bit S/rho is 6.4452 (w=0), 6.6323 (w=0.1), 7.6607 (w=1). '6.5' is not a rounding of the w=0.1 value (6.6). The README table value 6.63 is used as the claim.",
+      "material": false
+    },
+    {
+      "what": "arm (b) full-IC S omits the S5 interpolation",
+      "detail": "in `fullic --arm b` S5 is built once per process outside every run's counted phases (setup.build = [0] in all 32 arm-(b) full-IC records), while the tdec-b setup records count [14467005] build operations for it, and PROTOCOL's S covers 'table or S5' cold. Priced at w, this understates arm (b) S(0.1) and S(1) by 1.06% at bx=3 and 0.10% at bx=4 (resultant evaluations are uncounted by design). Arm (a) and rho are unaffected; no ranking changes. Not disclosed in the README.",
+      "material": false
+    },
+    {
+      "what": "planted-target dimensions",
+      "detail": "README: 'dimension 0 for random targets, 24 or 12 for planted'. At 16 bits bx=8, planted target 16 has dimension 48 = brute-force root count 48 (a second decomposition). The control (dimension equals the brute-force count, planted point vanishes) holds; only the README wording is incomplete.",
+      "material": false
+    },
+    {
+      "what": "no benchmarks/README.md row",
+      "detail": "at HEAD 44578da212c808280f071d2fb0c45bc47ed905e2 benchmarks/README.md has no row for 20261018-blindspots-prime-m4-cells; the assess commit bde5b137c7 added only REPORT.pdf, graph.svg and graph.png (byte-identical to the research copies). The 'benchmarks row' claims checked are the commit subject's (slope 11.03; 6.5x-30x).",
+      "material": false
+    }
+  ],
+  "limitations": [
+    "Derived fits use mixed conventions: the README's 0.179 growth, p^0.60 and p^0.42 reproduce with x = the cell label (16, 20, 24, 28) at w = 0 only. log2(S/rho) growth on the cell label is 0.1787 / 0.1758 / 0.1606 at w = 0 / 0.1 / 1; on log2 of the actual primes it is 0.1728 / 0.1700 / 0.1553. S exponent on actual primes 0.588, rho 0.415 at w = 0. The summarizer's arm-(a) T_dec fit uses actual primes. 'The gap grows with p' holds under every convention.",
+    "The matched rho is a plain r-adding walk over points. The x-keyed DP table catches +-matches only at distinguished points; it is not a negation-map walk. The strongest reference for these curves (j != 0, 1728) is negation (expected about 1/sqrt(2) of the walk steps, heuristic). A stronger rho could only lower rho's cost and widen the measured gap, so the order 'rho is cheaper' is unaffected; the ratios are understated.",
+    "DP parameter theta = floor(bits/4) uses the cell label (4, 5, 6, 7 bits), as PROTOCOL's 'log2 p' convention does; with log2 of the actual prime it would be one bit smaller at every cell.",
+    "The rho binary has no recorded sha256 (deleted by the card's remove-bin step). Binary identity rests on the receipt: one build of target/blindspots-14/card-01/b14 from the bound source at a clean commit, then every rho and arm-(a) run invokes that path. Arm (b) full IC (cards 09-12) used separate rustc builds of the same source and flags, not the same binary file as the rho.",
+    "One curve per size, 16 runs per cell; rho means have about 13% standard error at 16 runs. Full-IC targets are a correlated walk (Deviation 11). Toy scale (16-28 bits); arm (b)'s p-exponent assumes |F| = p^(1/4) and extrapolates beyond |F| = 6..16.",
+    "Validation, not replay: no command was re-executed. This report is the gate's validator report, not its replay certificate. A passed report means the receipts are admissible evidence; it supports no ECDLP or speedup claim."
+  ],
+  "validation_report": {
+    "id": "VAL-20261022-e873ba",
+    "task_id": "validation-gate item 14 (blind-spot 20261018), no Conductor task card supplied",
+    "run_ids": [
+      "CARD-BLINDSPOT-14-01",
+      "CARD-BLINDSPOT-14-02",
+      "CARD-BLINDSPOT-14-03",
+      "CARD-BLINDSPOT-14-04",
+      "CARD-BLINDSPOT-14-05",
+      "CARD-BLINDSPOT-14-06",
+      "CARD-BLINDSPOT-14-07",
+      "CARD-BLINDSPOT-14-08",
+      "CARD-BLINDSPOT-14-09",
+      "CARD-BLINDSPOT-14-10",
+      "CARD-BLINDSPOT-14-11",
+      "CARD-BLINDSPOT-14-12"
+    ],
+    "verdict": "passed",
+    "artifact_paths": [
+      "validator-report.json",
+      "rho-reference.json",
+      "validator_recompute.py"
+    ]
+  },
+  "review_attestation": {
+    "joints_owned": [
+      "headline recompute from committed raw data (validator report)",
+      "matched rho reference descriptor (draft)"
+    ],
+    "sources_read": [
+      "../../docs/VALIDATION_GATE.md",
+      "../../research/blindspots_20261018/14-prime-m4-cells/PROTOCOL.md",
+      "../../research/blindspots_20261018/14-prime-m4-cells/README.md",
+      "../../research/blindspots_20261018/14-prime-m4-cells/card-01.yaml",
+      "../../research/blindspots_20261018/14-prime-m4-cells/card-02.yaml",
+      "../../research/blindspots_20261018/14-prime-m4-cells/card-03.yaml",
+      "../../research/blindspots_20261018/14-prime-m4-cells/card-04.yaml",
+      "../../research/blindspots_20261018/14-prime-m4-cells/card-05.yaml",
+      "../../research/blindspots_20261018/14-prime-m4-cells/card-06.yaml",
+      "../../research/blindspots_20261018/14-prime-m4-cells/card-07.yaml",
+      "../../research/blindspots_20261018/14-prime-m4-cells/card-08.yaml",
+      "../../research/blindspots_20261018/14-prime-m4-cells/card-09.yaml",
+      "../../research/blindspots_20261018/14-prime-m4-cells/card-10.yaml",
+      "../../research/blindspots_20261018/14-prime-m4-cells/card-11.yaml",
+      "../../research/blindspots_20261018/14-prime-m4-cells/card-12.yaml",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/card-01-selftest.stdout.log",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx3.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx4.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx5.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx6.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx7.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b20.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b24.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b28.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx3.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx4-r00-06.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx4-r06-11.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx4-r11-16.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-01.json",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-02.json",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-03.json",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-04.json",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-05.json",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-06.json",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-07.json",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-08.json",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-09.json",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-10.json",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-11.json",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-12.json",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b16.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b20.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b24.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/rho-b28.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/summary.md",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx3.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx4.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx5.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx6.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx7.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b20.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b24.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b28.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx3.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx4.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx5.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx6.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx7-t00-09.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx7-t09-18.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t00-05.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t05-10.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t10-15.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t15-18.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b20-bx15.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b20-bx5.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b20-bx6.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b24-bx29.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b24-bx5.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b24-bx6.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx5.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx6.jsonl",
+      "../../research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx63.jsonl",
+      "../../research/blindspots_20261018/instruments/blindspots_14_prime_m4.rs",
+      "../../scripts/validation_gate.py",
+      "/home/user/crypto-autoresearcher/agents/validator.md",
+      "/home/user/crypto-autoresearcher/docs/agent-runtime-core.md"
+    ],
+    "read_sibling_reports": false,
+    "sibling_note": "the replay lane's outputs under research/.../14-prime-m4-cells/replay/ appeared during this validation and were not read",
+    "verdict": "holds"
+  }
+}
