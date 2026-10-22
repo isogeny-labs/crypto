@@ -4,8 +4,8 @@
 
 = Validation gate evidence for PR \#1978's IC rows
 
-*What this is.* The validation gate (owner rule 2026-10-19, `docs/VALIDATION_GATE.md`) admits a row to `benchmarks/README.md` or the IC leaderboard only with a replay certificate, an independent validator report and a matched rho reference with the §5a band. This report covers 16 evidence directories:
-- 14 benchmark rows;
+*What this is.* The validation gate (owner rule 2026-10-19, `docs/VALIDATION_GATE.md`) admits a row to `benchmarks/README.md` or the IC leaderboard only with a replay certificate, an independent validator report and a matched rho reference with the §5a band. This report covers 17 evidence directories:
+- 14 benchmark rows, and the re-admitted rule v8 row (`20261022-ic-matched-rho-v8-validated`);
 - `research/ic_tool_program/rule/v8/`, which carries the leaderboard's six Table A rows;
 - `rule/v7/`, whose rows Table A cited before.
 
@@ -13,8 +13,8 @@
 
 == Result
 
-- *Every published figure recomputes.* 2,240 figures from the raw records.
-  - The rounds' intervals, rule v6/v7/v8's S figures and the 30 figures Table A shows for rule v8 agree to 1e-9.
+- *Every published figure recomputes.* 2,252 figures from the raw records.
+  - The rounds' intervals, rule v6/v7/v8's S figures the 30 figures Table A shows for rule v8 and the 12 cold ratios of its `matched.json` agree to 1e-9.
   - The explorations' paired cold times agree exactly, and their summaries agree at the decimals they print.
 - *Every recorded scalar verifies.* 7,650 records and 15,300 certificates pass $[s]G = T$ and $[n]G = O$, and the negative control $[s+1]G != T$ is rejected each time.
 - *64 of 64 native replays are identical,* 4 drawn per directory by the committed seed.

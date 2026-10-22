@@ -808,6 +808,36 @@ fn mode_rule(d: &Path) -> Report {
         .join("analysis.json")
         .exists()
         .then(|| rule_size_figures(&control_dir));
+    // rule v8's paired read-out (`matched.json`): its matched and control cold ratios
+    let matched = d.join("matched.json");
+    if let (true, Some(c)) = (matched.exists(), control.as_ref()) {
+        let m = read_json(&matched);
+        rep.raw
+            .push(json!({"path": rel_to(&matched, &repo), "sha256": sha256_file(&matched)}));
+        for x in m["sizes"].as_array().into_iter().flatten() {
+            let n = format!("icv1-f2m{}-", x["n"]);
+            let mine = sizes
+                .iter()
+                .find(|s| s["curve"].as_str().unwrap_or("").starts_with(&n));
+            let ctl = c
+                .iter()
+                .find(|s| s["curve"].as_str().unwrap_or("").starts_with(&n));
+            if let (Some(a), Some(b)) = (mine, ctl) {
+                rep.check(
+                    format!("matched.json n{} cold ratio, matched", x["n"]),
+                    opt(&x["cold_ratio_matched"]["value"]),
+                    Some(f(&a["s_ic_cold"]) / f(&a["s_rho_as_built"])),
+                    1e-9,
+                );
+                rep.check(
+                    format!("matched.json n{} cold ratio, control", x["n"]),
+                    opt(&x["cold_ratio_control"]["value"]),
+                    Some(f(&b["s_ic_cold"]) / f(&b["s_rho_as_built"])),
+                    1e-9,
+                );
+            }
+        }
+    }
     let board_path = repo.join("docs/ic/leaderboard.json");
     let source = rel_to(&d.join("analysis.json"), &repo);
     if let Ok(raw) = fs::read(&board_path) {
@@ -1562,7 +1592,10 @@ const ROWS: &[Row] = &[
         mode: "rule",
         arm: "",
         also: &[("v8c", "rule/v8c")],
-        evidence: &["research/ic_tool_program/rule/v8"],
+        evidence: &[
+            "research/ic_tool_program/rule/v8",
+            "benchmarks/20261022-ic-matched-rho-v8-validated",
+        ],
     },
     Row {
         key: "A14",

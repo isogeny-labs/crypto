@@ -14,17 +14,18 @@ PDF: [`report/report.pdf`](report/report.pdf).
 
 ## Result
 
-- **16 evidence directories validated:**
-  - 14 benchmark rows;
+- **17 evidence directories validated:**
+  - 14 benchmark rows, and the re-admitted rule v8 row
+    (`20261022-ic-matched-rho-v8-validated`);
   - `rule/v8/`, which carries the leaderboard's six Table A rows;
   - `rule/v7/`, whose rows Table A cited before.
 
   `python3 scripts/validation_gate.py check --base origin/main` reports every
   row validated or frozen.
-- **Every published figure recomputes.** 2,240 figures from the raw records:
+- **Every published figure recomputes.** 2,252 figures from the raw records:
   - the five rounds' A/A, suite and holdout intervals and rule v6/v7/v8's S
     figures agree to 1e-9, as do the 30 figures Table A shows for rule v8 and
-    its control;
+    its control, and the 12 cold ratios of rule v8's `matched.json`;
   - the explorations' paired cold times agree exactly, and their summaries
     agree at the three decimals they print.
 - **Every recorded scalar verifies.** 7,650 records and 15,300 certificates
@@ -87,6 +88,15 @@ figures:
 
 The measured v6 and v7 figures themselves are unchanged. The scoreboard already
 cited rule v8.
+
+## Rule v8's benchmark row, re-admitted
+
+Main archived `20261019-ic-matched-rho-v8` as `incomplete` because it lacked
+gate-format evidence. The gate forbids admitting an archived directory and
+forbids removing an archive record. The result is therefore re-admitted under a
+new directory, `benchmarks/20261022-ic-matched-rho-v8-validated/`, with its
+original graphs and PDF and the three gate files. The archive record stays as
+history.
 
 ## Rows withdrawn from `benchmarks/README.md`
 
