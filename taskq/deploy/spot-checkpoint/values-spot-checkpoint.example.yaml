@@ -1,0 +1,67 @@
+# Example taskq Helm values for the two pools the spot-checkpoint design
+# names (README.md). Install with
+#   helm upgrade --install rq taskq/deploy/helm/taskq -f values-spot-checkpoint.example.yaml
+# on a cluster whose node pools match the selectors below (the EKS isolab
+# cluster's Karpenter `cpu-spot` NodePool carries the `isolab.dev/pool` label
+# and the `isolab.dev/workload=cpu:NoSchedule` taint; see
+# taskq/deploy/eks-karpenter/nodepool.yaml).
+#
+# The `--checkpoint-*` worker arguments and TASKQ_CHECKPOINT_* variables are
+# the interface the design specifies; the worker in this tree does not read
+# them yet (problems/taskq-spot-checkpoint-restore-not-implemented.md). A
+# worker that does not know a spec field hands the task back, so a spec that
+# carries the checkpoint block fails safe on an old worker.
+
+pools:
+  # Measurement jobs: a clock or counter is read against an A/A interval.
+  # One task per pod, Guaranteed QoS, integer CPUs, static CPU manager on
+  # the node. Never resumed: an interrupted row is a new row.
+  - name: cpu-exclusive
+    queues: [cpu-exclusive]
+    replicas: 1
+    labels: {pool: cpu-exclusive, isolation: static-cpu-manager}
+    resources:
+      requests: {cpu: "4", memory: 8Gi}
+      limits: {cpu: "4", memory: 8Gi}
+    cacheSize: 50Gi
+    nodeSelector: {isolab.dev/pool: cpu-spot, isolab.dev/cpu-isolation: v4}
+    tolerations: [{key: isolab.dev/workload, operator: Equal, value: cpu, effect: NoSchedule}]
+    keda: {minReplicas: 0, maxReplicas: 4, lagCount: 1}
+
+  # Throughput, search and training jobs: finish cheaply, checkpoint, resume.
+  - name: cpu-spot-checkpoint
+    queues: [cpu-spot-checkpoint]
+    replicas: 0
+    labels: {pool: cpu-spot-checkpoint, checkpoint: application}
+    resources:
+      requests: {cpu: "8", memory: 30Gi}
+      limits: {cpu: "8", memory: 30Gi}
+    cacheSize: 50Gi
+    nodeSelector: {isolab.dev/pool: cpu-spot}
+    tolerations: [{key: isolab.dev/workload, operator: Equal, value: cpu, effect: NoSchedule}]
+    keda: {minReplicas: 0, maxReplicas: 8, lagCount: 1}
+
+worker:
+  leaseSeconds: 60
+  maxTrees: 8
+  # Must fit inside the provider's interruption notice (AWS: 120 s, best
+  # effort). The checkpoint grace the worker gives the child is this minus
+  # the upload and hand-back time; 110 s here leaves 90 s for the child.
+  terminationGracePeriodSeconds: 110
+  extraArgs:
+    - --checkpoint-dir
+    - /results/checkpoints
+    - --checkpoint-grace-seconds
+    - "90"
+    - --checkpoint-store
+    - s3://CHANGE-ME-results-bucket/taskq/ckpt
+  extraEnv:
+    - {name: TASKQ_CHECKPOINT_STORE, value: s3://CHANGE-ME-results-bucket/taskq/ckpt}
+    - {name: AWS_REGION, value: us-east-2}
+
+keda:
+  enabled: true
+  pollingInterval: 30
+  # A busy pod hands its task back on SIGTERM; a long cooldown keeps KEDA
+  # from scaling a checkpointing pod away mid-generation.
+  cooldownPeriod: 900

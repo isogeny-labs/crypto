@@ -173,6 +173,11 @@ Per AGENTS.md, open or update a PR in this task:
 - the spec, the session directory under `research/<topic>_<date>/sessions/`, the
   audit receipt, the saved comparisons, and a README with the hypothesis, the
   host (`ecbench host`), the levels earned, the table and the decision;
+- `protocol.json` frozen before the run (`experiment-protocol`: the spec is
+  the instrument, the protocol names its claims, controls, seeds and what
+  counts) and `export.json` built from the session with
+  `experiment_protocol.py from-ecbench` and checked with `check-export
+  --verify-files`, beside the session, never inside it;
 - the scoreboard and the thread's note in the same PR when the round measures an
   IC variant (§7). Mark extrapolations as such;
 - failures, timeouts and regressions included;

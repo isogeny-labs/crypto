@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "experiment-job/v1",
+  "title": "Experiment job envelope v1",
+  "description": "What a submitter asks a queue to run for one arm and instance (or shard) of a frozen experiment.protocol/v1. It is compiled into the backend's own spec (taskq.task-spec/v1, isolab.job/v1, spotlab.job/v1, a spot-system jobs.json entry) by the table in README.md; the backend measures, the envelope binds the measurement to the protocol and fixes what a checkpoint and a restore mean for the rows that come back.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "job_id", "protocol", "arm", "instance", "measurement_class", "source", "command", "placement", "limits", "checkpoint", "export", "labels"],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]{0,160}$"},
+    "argv": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+  },
+  "properties": {
+    "schema": {"const": "experiment-job/v1"},
+    "job_id": {"$ref": "#/$defs/id", "description": "<protocol_id>/<arm>/<instance>[/<shard>]; also the backend idempotency key, so a resubmission returns the first task."},
+    "protocol": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256", "protocol_id", "version"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256", "description": "freeze.protocol_sha256 of the frozen protocol; a draft protocol is refused."},
+        "protocol_id": {"type": "string", "minLength": 1},
+        "version": {"type": "integer", "minimum": 1}
+      }
+    },
+    "arm": {"type": "string", "minLength": 1},
+    "instance": {"type": "string", "minLength": 1},
+    "shard": {"type": ["object", "null"], "additionalProperties": false,
+              "properties": {"index": {"type": "integer", "minimum": 0}, "count": {"type": "integer", "minimum": 1},
+                             "seed_lo": {"type": "string"}, "seed_hi": {"type": "string"}}},
+    "measurement_class": {"enum": ["measurement", "throughput", "search", "training"],
+                          "description": "measurement: a clock or counter is read against an A/A interval, so the job needs an isolated host and is never resumed. The others finish cheaply, on spot capacity, and checkpoint."},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repo", "commit"],
+      "properties": {
+        "repo": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$", "description": "An alias in the worker's allowlist, never a URL."},
+        "commit": {"$ref": "#/$defs/commit", "description": "Pushed. A worker checks out exactly this commit."},
+        "sparse_paths": {"type": "array", "items": {"type": "string"}},
+        "image_digest": {"type": ["string", "null"], "description": "For image-based backends (isolab-k8s): the immutable digest that holds the binary; the source commit then records provenance only."}
+      }
+    },
+    "command": {
+      "type": "object", "additionalProperties": false,
+      "required": ["argv"],
+      "properties": {
+        "argv": {"$ref": "#/$defs/argv", "description": "No shell. Placeholders {out}, {checkpoint}, {seed}, {shard} are substituted by the compiler from the envelope and the protocol's seed table."},
+        "cwd": {"type": "string", "default": "."},
+        "env": {"type": "object", "additionalProperties": {"type": "string"}},
+        "setup": {"type": "array", "items": {"$ref": "#/$defs/argv"}},
+        "inputs": {"type": "array", "items": {"type": "object", "required": ["path", "sha256"], "properties": {"path": {"type": "string"}, "sha256": {"$ref": "#/$defs/sha256"}}}},
+        "verify": {"type": ["object", "null"], "description": "The backend's independent certificate check (taskq verify.builtin certificate, isolab verify.builtin taskq-certificate, or an argv exiting 0 verified / 1 refuted / 2 no claim)."}
+      }
+    },
+    "placement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["cpus", "memory_mb", "isolation_required", "spot_allowed"],
+      "properties": {
+        "cpus": {"type": "integer", "minimum": 1},
+        "memory_mb": {"type": "integer", "minimum": 1},
+        "gpu": {"type": ["string", "null"]},
+        "isolation_required": {"enum": ["none", "L0", "L1", "L2", "L3", "tierA", "tierB", "tierC", "tierD"]},
+        "spot_allowed": {"type": "boolean"},
+        "instance_families": {"type": "array", "items": {"type": "string"}, "description": "Pin families when a CRIU image must restore on the same CPU feature set."},
+        "require_labels": {"type": "object", "additionalProperties": {"type": "string"}},
+        "queue": {"type": ["string", "null"]}
+      }
+    },
+    "limits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["timeout_seconds", "max_attempts"],
+      "properties": {
+        "timeout_seconds": {"type": "number", "exclusiveMinimum": 0, "description": "Wall budget of useful work across all attempts; waiting for capacity and checkpoint grace are not charged to it."},
+        "setup_timeout_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "max_attempts": {"type": "integer", "minimum": 1, "maximum": 20, "description": "Infrastructure attempts only (worker lost, checkout failed, preemption). A non-zero exit or a timeout is an outcome."},
+        "max_cost_usd": {"type": ["number", "null"]}
+      }
+    },
+    "checkpoint": {
+      "type": "object", "additionalProperties": false,
+      "required": ["policy", "interval_seconds", "grace_seconds", "store", "restore_validation", "after_restore"],
+      "properties": {
+        "policy": {"enum": ["none", "application", "criu"]},
+        "interval_seconds": {"type": ["number", "null"], "minimum": 1},
+        "grace_seconds": {"type": ["number", "null"], "minimum": 1, "description": "The window the job gets after SIGTERM to commit a generation; must fit inside the pod's terminationGracePeriodSeconds, which must fit inside the provider's notice (AWS: 120 s, best effort)."},
+        "store": {"type": ["string", "null"], "description": "Durable prefix for generations: s3://bucket/taskq/ckpt/<job_id>/ or a ReadWriteMany PVC path. Never a node-local path alone."},
+        "restore_validation": {"enum": ["none", "manifest_sha256", "application_managed", "criu_selfcheck"]},
+        "keep_generations": {"type": "integer", "minimum": 1, "default": 2},
+        "criu": {"type": ["object", "null"], "additionalProperties": false,
+                 "properties": {"pre_dump": {"type": "boolean", "default": true}, "cpu_cap": {"type": "string", "default": "fpu"},
+                                "image_budget_mb": {"type": ["integer", "null"], "description": "Refuse to admit a job whose RSS would not dump inside grace_seconds at the measured dump rate."}}},
+        "after_restore": {"type": "object", "additionalProperties": false, "required": ["wall_time", "counted_units"],
+                          "properties": {"wall_time": {"const": "invalid"}, "counted_units": {"const": "valid"}}}
+      }
+    },
+    "export": {
+      "type": "object", "additionalProperties": false,
+      "required": ["out", "export_id"],
+      "properties": {
+        "out": {"type": "string", "minLength": 1, "description": "Where export.json (experiment.export/v1) is written, beside the raw records, never inside a sealed session."},
+        "export_id": {"type": "string", "minLength": 1},
+        "adapter": {"enum": ["from-taskq", "from-ecbench", "from-rows", "native"]}
+      }
+    },
+    "labels": {"type": "object", "additionalProperties": {"type": "string"},
+               "description": "Provenance the queue stores opaquely: protocol_id, protocol_sha256, arm, instance, experiment, goal, submitted_by."}
+  },
+  "allOf": [
+    {"if": {"properties": {"measurement_class": {"const": "measurement"}}},
+     "then": {"properties": {"checkpoint": {"properties": {"policy": {"const": "none"}}}}}},
+    {"if": {"properties": {"checkpoint": {"properties": {"policy": {"enum": ["application", "criu"]}}}}},
+     "then": {"properties": {"checkpoint": {"required": ["interval_seconds", "grace_seconds", "store"],
+                                            "properties": {"interval_seconds": {"type": "number"}, "grace_seconds": {"type": "number"}, "store": {"type": "string"},
+                                                           "restore_validation": {"enum": ["manifest_sha256", "application_managed", "criu_selfcheck"]}}}}}}
+  ]
+}

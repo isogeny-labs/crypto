@@ -24,6 +24,7 @@ description: Preserve user requirements and report experimental evidence without
 - Retain exact commands, code revisions, inputs, seeds, environment, budgets, raw outputs, exit status, and validation results. Preserve unsuccessful attempts, timeouts, OOMs, duplicates, regressions, and missing measurements.
 - Follow the requested accounting interval and comparison. Identify setup, online work, verification, and excluded costs; never silently change the denominator or replace a single-target result with a batch average.
 - Keep correctness checks. Flag invalid results and implementation defects without suppressing them or promoting them as successes. Do not report a planned or launched run as completed.
+- Leave the run's data as one `experiment.export/v1` beside the raw records (`experiment-protocol` skill), its `flow` block (planned, attempted, completed, excluded by rule) in the report, and cite any `review-run` record another runner filed; a row resumed after a Spot interruption keeps its counts and has no clock.
 
 ## Separate measurement from interpretation
 

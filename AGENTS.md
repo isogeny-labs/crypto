@@ -103,6 +103,9 @@ baseline. Every such improvement is a success and is reported as one.**
   `RESEARCH_ECC2K130_IC_FEASIBILITY.md`
 - Faster checkouts (blobless clone, sparse profiles, cloud-session
   settings): [docs/sparse-checkout.md](docs/sparse-checkout.md)
+- Experiment design and records: `controlled-experiment` (claims, controls,
+  confounders), `experiment-protocol` and `review-run` (pointers to the
+  canonical schemas in crypto-autoresearcher), `queue-experiment` (§9b)
 
 For small-prime or pinned GF(2^83) elliptic-curve surface searches, quartic
 subgroup transfers, genus-2+ Jacobian transfers, hyperelliptic covers, Mumford
@@ -1107,6 +1110,25 @@ $E status last; $E logs -f last; $E fetch last
   `benchmarks/` rule and the research-visuals rule. Its provenance is the
   fetched `job.json`, `host.txt` and `rusage.txt` in
   `~/.cache/ephemeral/runs/<id>/`.
+
+### 9b. Protocol-bound jobs on the queue, and what a restore means
+
+Owner request, 2026-10-22; design in
+[`taskq/deploy/spot-checkpoint/README.md`](taskq/deploy/spot-checkpoint/README.md),
+submission in the `queue-experiment` skill. Every job a queue runs binds a
+frozen `experiment.protocol/v1` (`experiment-protocol` skill; the schemas and
+checker are canonical in aburan28/crypto-autoresearcher) and lands as one
+`experiment.export/v1` beside its raw records, one row per execution with the
+isolation level it earned and its checkpoint history. The protocol's
+`measurement_class` picks the pool: a job whose clock or counter is read
+against an A/A interval goes to an isolated pool and is never resumed (an
+interrupted row is abandoned and a new row runs); a throughput, search or
+training job goes to Spot capacity and checkpoints under the application
+manifest contract or, where a program cannot save itself, a CRIU image. After
+a restore, counted units stay valid and wall and CPU time do not
+(`wall_valid: false`, `resumed > 0`); the export checker refuses a resumed row
+with a valid clock. A `review-run` record by another runner is the second
+reading of an export and an input to the validation gate, never a row.
 
 ### 10. Performance work starts from a clean, recorded baseline
 
