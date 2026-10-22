@@ -167,7 +167,7 @@ so a true `G` within ±3% should read as equivalent.
   ±5% at this size. It does not prove hardness equal for every algorithm.
   That part is the transfer theorem, with its additive cost.
 
-## Erratum (after the build, before any measurement)
+## Erratum (written after the build, as the sessions were starting; before any result was read)
 
 `1 + 3 + 6 + 12 + 24 + 48 + 96 = 190`, not 191. So each side has 190
 curves, and the run counts are 380 × 2 × 6 = 4560 (`spec.json`),

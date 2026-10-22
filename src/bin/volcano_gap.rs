@@ -80,7 +80,7 @@ impl Fp {
     fn inv(&self, a: u64) -> u64 {
         inv_mod(a, self.p)
     }
-    fn from_i128(&self, v: i128) -> u64 {
+    fn reduce_i128(&self, v: i128) -> u64 {
         v.rem_euclid(self.p as i128) as u64
     }
     fn is_square(&self, a: u64) -> bool {
@@ -619,7 +619,7 @@ fn construct(argv: &[String]) {
     );
 
     // The crater curve of S1: j = j(D₀), in the twist with trace t.
-    let j1 = f.from_i128(j_cm);
+    let j1 = f.reduce_i128(j_cm);
     let k = f.mul(j1, f.inv(f.sub(1728 % p, j1)));
     let base = Curve {
         a: f.sm(3, k),
@@ -1003,7 +1003,7 @@ mod tests {
         assert!(order_t.is_multiple_of(cand.big_n * cand.big_n));
         let mut rng = SmallRng::seed_from_u64(1);
         let c = f.non_residue();
-        let j1 = f.from_i128(-32768);
+        let j1 = f.reduce_i128(-32768);
         let k = f.mul(j1, f.inv(f.sub(1728, j1)));
         let base = Curve {
             a: f.sm(3, k),

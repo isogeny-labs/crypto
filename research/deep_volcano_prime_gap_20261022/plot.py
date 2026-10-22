@@ -66,7 +66,8 @@ for c, side in [(0, "s1"), (1, "s2")]:
         "subtitle": f"session {sessions['spec']} · gap prime N = {N}",
         "footnote": "curves per level " + ", ".join(
             f"L{lv}: {sum(1 for x in model0 if x['level'] == lv)}" for lv in range(depth + 1)
-        ) + " · every curve measured · root ringed",
+        ) + " · every curve measured · root ringed · band conductors are relative to this crater; absolute: "
+        + ("2^i" if c == 0 else f"{N}·2^i") + " · colour range is this figure's own",
         "metrics": [
             {"key": "s", "title": "mean S = GAE/√r", "label": "S per solve"},
             {"key": "ms", "title": "mean solve wall time (L0, descriptive)", "label": "ms per solve"},
@@ -96,7 +97,8 @@ for c in (0, 1):
     ax1.errorbar(xs, ys, yerr=es, fmt="o", color=COL[c], capsize=3, label=SIDE[c])
 ax1.axhline(1.0, color="#888", lw=0.8, ls=":")
 ax1.set_xticks(range(depth + 1))
-ax1.set_xticklabels([f"L{lv}\n{lm[(0, lv)]['curves']}+{lm[(1, lv)]['curves']} curves" for lv in range(depth + 1)], fontsize=8)
+ax1.set_xticklabels([f"L{lv}\n{lm[(0, lv)]['curves']}+{lm[(1, lv)]['curves']}" for lv in range(depth + 1)], fontsize=8)
+ax1.set_xlabel("2-level (curves on S1 + S2)", fontsize=8)
 ax1.set_ylabel("mean S = GAE/√r (95% CI, runs)")
 ax1.set_title("rho.negation, mean S per 2-level, each side", fontsize=10)
 ax1.legend(fontsize=8)
@@ -104,14 +106,18 @@ pl = g["per_level"]
 ax2.axhspan(1 - g["margin"], 1 + g["margin"], color="#cfe8cf", alpha=0.6, label="±5% equivalence margin")
 for row in pl:
     lv = row["level"]
-    ax2.plot([lv, lv], row["ci95"], color="#444", lw=1.2)
+    ax2.plot([lv - 0.08, lv - 0.08], row["ci95"], color="#444", lw=1.4,
+             label="95% curve bootstrap" if lv == 0 else None)
+    ax2.plot([lv + 0.08, lv + 0.08], row["ci95_runs"], color="#999", lw=1.4, ls="--",
+             label="95% run-level (delta method)" if lv == 0 else None)
     ax2.plot([lv], [row["b_over_a"]], "o", color="#b03a8c")
 ax2.axhline(1.0, color="#888", lw=0.8)
 ax2.errorbar([depth + 1.2], [g["b_over_a"]], yerr=[[g["b_over_a"] - g["ci90"][0]], [g["ci90"][1] - g["b_over_a"]]],
              fmt="D", color="#000", capsize=4, label=f"pooled G = {g['b_over_a']:.4f}, 90% CI")
 ax2.set_xticks(list(range(depth + 1)) + [depth + 1.2])
 ax2.set_xticklabels([f"L{lv}" for lv in range(depth + 1)] + ["all"])
-ax2.set_ylabel("S2 / S1 mean S (95% curve bootstrap)")
+ax2.set_ylabel("S2 / S1 mean S")
+ax2.set_ylim(0.55, 1.6)
 ax2.set_title(f"Across the gap N = {N}: ratio by level", fontsize=10)
 ax2.legend(fontsize=8, loc="upper right")
 fig.suptitle(f"Session {sessions['spec']} · {g['runs']} runs · p ≈ 2^52, n ≈ 2^40.8", fontsize=9)
@@ -137,7 +143,7 @@ ax.set_yticklabels([r[0] for r in reversed(rows)], fontsize=8)
 ax.set_xlim(0.88, 1.20)
 ax.set_xlabel("S2 / S1 mean S (thin: 90% CI, thick grey: 95% CI)")
 ax.set_title("Primary contrast and controls", fontsize=10)
-ax.legend(fontsize=8, loc="lower right")
+ax.legend(fontsize=8, loc="upper left")
 save(fig, "controls")
 
 # 4. Explanatory: the class, its two sides and the maps that join them.
@@ -145,8 +151,8 @@ fig, ax = plt.subplots(figsize=(10, 4.8))
 ax.set_xlim(0, 10)
 ax.set_ylim(-0.6, 7.4)
 ax.axis("off")
-for c, x0 in [(0, 2.2), (1, 7.8)]:
-    ax.add_patch(Polygon([[x0, 6.6], [x0 - 1.9, 0.4], [x0 + 1.9, 0.4]], closed=True, fc=COL[c], alpha=0.15, ec=COL[c]))
+for c, x0 in [(0, 1.7), (1, 8.3)]:
+    ax.add_patch(Polygon([[x0, 6.6], [x0 - 1.5, 0.4], [x0 + 1.5, 0.4]], closed=True, fc=COL[c], alpha=0.15, ec=COL[c]))
     for lv in range(depth + 1):
         y = 6.6 - lv * (6.2 / depth)
         cnt = 1 if lv == 0 else 3 * 2 ** (lv - 1)
@@ -155,14 +161,14 @@ for c, x0 in [(0, 2.2), (1, 7.8)]:
     ax.text(x0, 7.15, SIDE[c] + ("  (one volcano, j = −32768 on top)" if c == 0 else f"  ({N - 1} volcanoes like this one)"),
             ha="center", fontsize=8.5, color=COL[c], weight="bold")
 ax.add_patch(FancyArrowPatch((3.3, 6.4), (6.7, 6.4), arrowstyle="-|>", mutation_scale=14, color="#333"))
-ax.text(5, 6.65, f"φ: degree N = {N}, descending (Vélu, twist-rational kernel)", ha="center", fontsize=8)
+ax.text(5, 6.65, f"φ: degree N = {N}, descending (Vélu, twist-rational kernel)", ha="center", fontsize=7.5)
 ax.add_patch(FancyArrowPatch((6.7, 5.9), (3.3, 5.9), arrowstyle="-|>", mutation_scale=14, color="#777"))
 ax.text(5, 5.55, "ψ: the dual, ascending; ψ∘φ = ±[N] checked", ha="center", fontsize=8, color="#555")
 iso = pair["isogeny"]
 ax.text(5, 3.4, f"build φ: {iso['construct_field_mults']:.3g} F_p mults · evaluate: {iso['eval_field_mults_per_point']:.3g} per point",
-        ha="center", fontsize=8)
-ax.text(5, 2.9, "2-isogenies (Vélu) carry the instance to all 190 curves of each side", ha="center", fontsize=8)
-ax.text(5, 0.0, f"t² − 4p = −11·(2^6·N)², t ≡ −2 (mod N), #E = {cl['cofactor']}·n, n = {cl['n']}", ha="center", fontsize=8)
+        ha="center", fontsize=7.5)
+ax.text(5, 2.9, "2-isogenies (Vélu) carry the instance to all 190 curves of each side", ha="center", fontsize=7.5)
+ax.text(5, 0.0, f"t² − 4p = −11·(2^6·N)², t ≡ −2 (mod N), #E = {cl['cofactor']}·n, n = {cl['n']}", ha="center", fontsize=7.5)
 ax.set_title(f"One ECDLP instance, two deep 2-volcanoes across a prime conductor gap (p = {p})", fontsize=10)
 save(fig, "class-diagram")
 print("figures ->", figs)

@@ -21,7 +21,9 @@ builds on `TransferBound` from
 - `T_A(E)` is the cost of algorithm `A` on `E`, and `T*(E)` the least cost
   over all always-correct algorithms.
 
-## Theorem 1 — what every curve of the class shares (proved here)
+## Theorem 1 — what every curve of the class shares
+
+*Status: proved here.*
 
 For all `E, E' ∈ 𝓘_t`:
 
@@ -46,7 +48,9 @@ transcript on isomorphic groups. That model does **not** cover the hashed
 rho walks ecbench runs (sheriff case SHF-20261016-3caa6f). For those, equal
 cost is an empirical question, measured in [`README.md`](README.md).
 
-## Theorem 2 — transfer, for every algorithm (proved here; Lean: `TransferBound.transfer`, `DeepGap.transfer_comp_cost`, `DeepGap.chain_equivalence`)
+## Theorem 2 — transfer, for every algorithm
+
+*Status: proved here; Lean: `TransferBound.transfer`, `DeepGap.transfer_comp_cost`, `DeepGap.chain_equivalence`.*
 
 Let `φ = φ_m ∘ … ∘ φ_1 : E → E'` be a chain of `F_p`-isogenies with
 `gcd(deg φ_i, n) = 1`, where `φ_i` costs `C_i` to evaluate at one point.
@@ -76,7 +80,9 @@ has a partner on the other (`chain_equivalence`). ∎
 So **pairwise** hardness across a conductor gap is a question about the
 cost of the chain, nothing else.
 
-## Theorem 3 — the class measured here: explicit chains of cost `O(N + d)` (proved here; arithmetic in Lean)
+## Theorem 3 — the class measured here: explicit chains
+
+*Status: proved here; the arithmetic is in Lean. Chains cost `O(N + d)`.*
 
 Hypotheses:
 
@@ -175,11 +181,13 @@ small order `k` in `F_N^×/±1`.
 | build the descending `N`-isogeny | 0.15 s, about 4.4·10⁷ field multiplications |
 | evaluate it at one point | about 3.2·10⁶ field multiplications, 0.019 s |
 | transfer one instance (2 points) | about 6.3·10⁶ field multiplications, 0.04 s |
-| one `rho.negation` solve, for comparison | about 1.2·10⁶ group operations, ≈ 0.5 s ([`README.md`](README.md)) |
+| one `rho.negation` solve, for comparison | about 1.29·10⁶ group operations, 0.39 s mean wall time ([`README.md`](README.md)) |
 
 ∎
 
-## Theorem 4 — where "the same" fails: automorphisms (proved here, constant factor; measured in this repository)
+## Theorem 4 — where "the same" fails: automorphisms
+
+*Status: proved here (a constant factor); measured in this repository.*
 
 `Aut(E) = O_{c(E)}^×`, which is `{±1}` unless `O_c = Z[i]` (order 4) or
 `Z[ζ₃]` (order 6). Those are maximal orders, so `c = 1`.
@@ -211,7 +219,9 @@ It is not a difference in `T*`:
 The `√3` follows the instance once the map is built. In this study's class
 `D₀ = −11`, so `Aut = ±1` on every curve and there is no exception.
 
-## Theorem 5 — general classes (literature, as reported; not re-derived here)
+## Theorem 5 — general classes
+
+*Status: literature, as reported; not re-derived here.*
 
 Galbraith, *Climbing and descending tall isogeny volcanos*, ePrint
 2024/924 (summary: `crypto-autoresearcher/knowledge/literature/KN-LIT-ca35e0.md`):
@@ -254,14 +264,39 @@ measurement in [`README.md`](README.md) tests, within ±5%, at 52 bits.
 
 ## Proof map
 
-| statement | Lean declaration | hypotheses in Lean | status |
-|:--|:--|:--|:--|
-| Thm 2, one edge | `TransferBound.transfer`, `transfer_cost`, `transfer_answer` | `Hom` (injective, `one`/`mul`), always-correct `Solver` | proved (2026-10-10 study) |
-| Thm 2, chains | `DeepGap.Isogeny.comp`, `comp_cost`, `transfer_comp_cost`, `transfer_comp_answer`, `chain_equivalence` | the same | proved |
-| Thm 3(a), arithmetic | `DeepGap.twist_order_identity`, `twist_order_sq_dvd`, `order_mod` | integers `p, t, D, f, N` with `t² − 4p = Df²`, `N ∣ f`, `N ∣ t + 2` | proved |
-| Thm 3, the class | `class_discriminant`, `gap_prime_divides_t_plus_2`, `class_twist_order`, `gap_prime_mod_11` | the numbers of `run/pair.json` | proved (`decide`) |
-| Thm 3(d), counts | `volcanoSize_closed`, `depth6_size` | the level-count recursion `1, 3·2^{k−1}` | proved; the recursion itself (class-number formula for inert 2) is not formalized |
-| Thm 1, 3(a)–(c) curve parts, Thm 4 | none | needs elliptic curves over `F_p`, `End`, Vélu, Weil pairing | not formalizable against today's Mathlib; checked numerically by `volcano-gap` on every curve |
+Declarations are in namespace `DeepGap` unless marked.
+
+- **Thm 2, one edge.**
+  - Lean: `TransferBound.transfer`, `TransferBound.transfer_cost`,
+    `TransferBound.transfer_answer`.
+  - Hypotheses: a `Hom` (injective, preserves `one` and `mul`) and an
+    always-correct `Solver`.
+  - Status: proved in the 2026-10-10 study.
+- **Thm 2, chains.**
+  - Lean: `Isogeny.comp`, `comp_cost`, `transfer_comp_cost`,
+    `transfer_comp_answer`, `chain_equivalence`.
+  - Hypotheses: the same.
+  - Status: proved.
+- **Thm 3(a), the arithmetic.**
+  - Lean: `twist_order_identity`, `twist_order_sq_dvd`, `order_mod`.
+  - Hypotheses: integers `p, t, D, f, N` with `t² − 4p = Df²`, `N ∣ f`
+    and `N ∣ t + 2`.
+  - Status: proved.
+- **Thm 3, the class.**
+  - Lean: `class_discriminant`, `gap_prime_divides_t_plus_2`,
+    `class_twist_order`, `gap_prime_mod_11`.
+  - Hypotheses: the numbers of `run/pair.json`.
+  - Status: proved by `decide` in the kernel.
+- **Thm 3(d), the counts.**
+  - Lean: `volcanoSize_closed`, `depth6_size`.
+  - Hypotheses: the level-count recursion `1, 3·2^{k−1}`.
+  - Status: proved. The recursion itself (the class-number formula for
+    inert 2) is not formalized.
+- **Thm 1, the curve parts of Thm 3(a)–(c), and Thm 4.**
+  - Lean: none. They need elliptic curves over `F_p`, `End`, Vélu and the
+    Weil pairing.
+  - Status: not formalizable against today's Mathlib. `volcano-gap` checks
+    them numerically on every curve.
 
 Axiom audit: `lean/axiom-audit.log`. Every declaration uses at most
 `propext`, `Classical.choice` and `Quot.sound`. `tools/lean/proof-gate.sh`

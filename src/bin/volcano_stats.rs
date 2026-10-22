@@ -46,6 +46,9 @@ struct Run {
     den: f64,
     /// The solve's wall time (`time.solve_wall_ns`), descriptive only.
     wall_ns: f64,
+    /// Unpriced native operations per counted GAE (`cost.unpriced` counters
+    /// over `cost.total_gae`), for the §5a band: `S(w) = S·(1 + w·upf)`.
+    upf: f64,
 }
 
 fn die(msg: &str) -> ! {
@@ -508,7 +511,16 @@ fn gap(
                     .filter(|(cc, ll, _)| *cc == c && ll == l)
                     .count()
             };
+            // Run-level interval (delta method on the two ratio estimators):
+            // the curve bootstrap has no spread in a stratum of one curve.
+            let side = |c: u64| {
+                let rs: Vec<&Run> = runs.iter().filter(|r| r.class == c && r.level == *l).collect();
+                let (m, se2) = ratio_se2(&rs);
+                se2 / (m * m)
+            };
+            let se = (side(a) + side(b)).sqrt();
             json!({"level": l, "b_over_a": g, "ci90": ci(v, 0.05, 0.95), "ci95": ci(v, 0.025, 0.975),
+                   "ci95_runs": [g * (-1.96 * se).exp(), g * (1.96 * se).exp()],
                    "curves_a": curves(a), "curves_b": curves(b)})
         })
         .collect();
@@ -530,6 +542,24 @@ fn gap(
             json!({"class": c, "level": l, "runs": rs.len(), "curves": curves, "mean_s": m, "ci95_half": 1.96 * se2.sqrt()})
         })
         .collect();
+    // §5a: each side's mean S with its unpriced native work charged at w GAE
+    // per operation, the same weight on both sides; reported, never ranked.
+    let band: Value = [0.0f64, 0.1, 1.0]
+        .iter()
+        .map(|&w| {
+            let side = |c: u64| {
+                let rs: Vec<&Run> = runs.iter().filter(|r| r.class == c).collect();
+                rs.iter().map(|r| r.num * (1.0 + w * r.upf)).sum::<f64>()
+                    / rs.iter().map(|r| r.den).sum::<f64>()
+            };
+            let (sa, sb) = (side(a), side(b));
+            (
+                format!("{w}"),
+                json!({"a": sa, "b": sb, "b_over_a": sb / sa}),
+            )
+        })
+        .collect::<serde_json::Map<String, Value>>()
+        .into();
     let side_means: Vec<Value> = [a, b]
         .iter()
         .map(|&c| {
@@ -539,7 +569,7 @@ fn gap(
         })
         .collect();
     json!({
-        "curve_means": curve_means, "level_means": level_means, "side_means": side_means,
+        "curve_means": curve_means, "level_means": level_means, "side_means": side_means, "band": band,
         "a": a, "b": b, "levels": both, "runs": runs.len(), "b_over_a": obs,
         "ci90": ci90, "ci95": ci95, "boot": bs.len(),
         "bootstrap": "curves within (class, level), all runs of each",
@@ -657,6 +687,11 @@ fn main() {
                 num: s,
                 den: 1.0,
                 wall_ns: r["time"]["solve_wall_ns"].as_f64().unwrap_or(f64::NAN),
+                upf: r["cost"]["unpriced"].as_array().map_or(0.0, |ks| {
+                    ks.iter()
+                        .filter_map(|k| r["counters"][k.as_str().unwrap_or("")].as_f64())
+                        .sum::<f64>()
+                }) / r["cost"]["total_gae"].as_f64().unwrap_or(f64::NAN),
             };
             // Planted effects (--plant-level L:x, --plant-curve V:x): the
             // analysis's own positive control, applied to S and to yield.
