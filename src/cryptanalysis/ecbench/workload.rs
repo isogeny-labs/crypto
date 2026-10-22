@@ -13,6 +13,8 @@
 //! (`canonical::derive_u64`), never from an RNG stream, and no solver is
 //! handed it: the runner verifies the solver's answer afterwards.
 
+use std::sync::OnceLock;
+
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
@@ -448,8 +450,7 @@ pub struct WideInstance {
 
 /// The registry's modulus for `K_a` over `F_{2^n}`, if it lists one.
 pub fn registry_koblitz_modulus(a: u8, n: u32) -> Option<IrreduciblePoly> {
-    let doc: Value = serde_json::from_str(REGISTRY).ok()?;
-    let entry = doc.get("curves")?.as_array()?.iter().find(|c| {
+    let entry = registry()?.get("curves")?.as_array()?.iter().find(|c| {
         let p = c.get("params");
         c.get("family").and_then(Value::as_str) == Some("koblitz")
             && p.and_then(|p| p.get("a")).and_then(Value::as_u64) == Some(u64::from(a))
@@ -504,10 +505,18 @@ pub struct CurveFacts {
 
 const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
 
+/// The registry, parsed once per process: it is several megabytes of JSON
+/// and every `Workload::on` looks a slug up in it.
+fn registry() -> Option<&'static Value> {
+    static DOC: OnceLock<Option<Value>> = OnceLock::new();
+    DOC.get_or_init(|| serde_json::from_str(REGISTRY).ok())
+        .as_ref()
+}
+
 /// The registry entry of `slug`, if any.
 fn registry_entry(slug: &str) -> Option<Value> {
-    let doc: Value = serde_json::from_str(REGISTRY).ok()?;
-    doc.get("curves")?
+    registry()?
+        .get("curves")?
         .as_array()?
         .iter()
         .find(|c| c.get("slug").and_then(Value::as_str) == Some(slug))

@@ -31,8 +31,15 @@ pub struct GenericOutcome {
 }
 
 impl GenericOutcome {
+    /// Called several times per step, so the key is allocated only the
+    /// first time a counter is touched.
     fn count(&mut self, name: &str, by: u64) {
-        *self.counters.entry(name.to_string()).or_insert(0) += by;
+        match self.counters.get_mut(name) {
+            Some(v) => *v += by,
+            None => {
+                self.counters.insert(name.to_string(), by);
+            }
+        }
     }
 }
 
