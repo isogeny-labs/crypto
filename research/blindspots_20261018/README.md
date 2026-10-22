@@ -145,11 +145,20 @@ w = 0.1). The two rhos swap order inside the band, because the negation map's
 bookkeeping is priced as native work. The commit subject's "6.5x" was not any
 measured ratio.
 
-Item 15 is getting a matched negation-map rho in its own binary
-(`instruments/blindspots_15b_genus3_la_rho.rs`,
-`15-genus3-la-exponent/PROTOCOL-ADDENDUM-matched-rho.md`); its row stays
-withheld until that run, a replay and a validator report land. Priced on the
-section 5a band its "IC below rho at every price" table is not expected to hold.
+Item 15 is validated
+(`benchmarks/20261018-blindspots-genus3-la-exponent/VALIDATION.json`). Its rho
+had been borrowed from round 4; a matched negation-map rho now runs in the item
+binary (`instruments/blindspots_15b_genus3_la_rho.rs`,
+`15-genus3-la-exponent/PROTOCOL-ADDENDUM-matched-rho.md`, committed before the
+runs), where the four b = 20 IC arms reproduce their recorded rows exactly. With
+the frozen protocol's classification (mod-ell products are unpriced native work)
+on the section 5a band, every IC arm is below rho at w = 0 (0.38x) and above it
+at w = 0.1 and 1, so IC against rho is unresolved. The README's "IC below rho at
+every price" used c_ell pricing, a lower-bound comparison, and does not survive
+section 5a. If mod-ell products were instead charged as one F_q multiplication,
+arms a and d would be below rho at every w; that would need a protocol
+amendment. The linear-algebra headline (arm d 0.9862 of arm a at b = 20)
+recomputes exactly.
 
 The other nine stay withheld because a matched Pollard rho is not the right
 reference for what they claim, so a rho run cannot make the row valid:
