@@ -12,6 +12,26 @@ ic solve-prime --p 271 --a 1 --b 19 --n 281 \
   --gx 3 --gy 7 --qx 231 --qy 54 --json
 ```
 
+Both `ic` and `icx` can save any report with `--out PATH`. Add
+`--store-name NAME` to publish that new file to the configured artifact store
+in the same invocation. The name must be unused, the output path must not
+exist, and the remote must be configured before the solve starts. A successful
+publication prints the indexed SHA-256 and byte count to stderr. A bounded or
+error report can also be published so its limits remain available for review.
+For example:
+
+```sh
+CRYPTO_STORE_REMOTE=s3://setec-astronomy-artifacts/ic/v1/runs \
+ic solve-prime --p 271 --a 1 --b 19 --n 281 \
+  --gx 3 --gy 7 --qx 231 --qy 54 \
+  --out prime271-report.json --store-name ic-reports/prime271/run-001 --json
+crypto store verify ic-reports/prime271/run-001 --remote --download
+crypto store pull store:ic-reports/prime271/run-001
+```
+
+The remote prefix is an example schema; choose a project-owned prefix and
+configure the same store index for the solve, verify, and pull commands.
+
 The example target is `[190]G`. The command requires a prime `p` in
 `5..=1000000`, a nonsingular short-Weierstrass curve, a prime subgroup order
 `n` in `3..=4000000`, canonical coordinates, and `[n]G = [n]Q = O`.

@@ -16,7 +16,7 @@
 //! Every subcommand supports `--json`. Its provenance block records the package
 //! version, OS, architecture, and host field-backend capability label.
 
-use std::process::ExitCode;
+use std::{fs::OpenOptions, io::Write, path::PathBuf, process::ExitCode};
 
 use clap::{Args, Parser, Subcommand};
 use serde_json::{json, Value};
@@ -53,6 +53,12 @@ struct Cli {
     /// Emit a machine-readable JSON report.
     #[arg(long, global = true)]
     json: bool,
+    /// Write the JSON report to a new file; existing files are never overwritten.
+    #[arg(long, global = true)]
+    out: Option<PathBuf>,
+    /// Publish --out through the configured artifact store under a new logical name.
+    #[arg(long, global = true, requires = "out")]
+    store_name: Option<String>,
 }
 
 #[derive(Subcommand)]
@@ -638,6 +644,37 @@ fn execute(cli: &Cli) -> Result<Value, String> {
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
+    if let Some(path) = &cli.out {
+        if std::fs::symlink_metadata(path).is_ok() {
+            eprintln!("icx: output already exists: {}", path.display());
+            return ExitCode::FAILURE;
+        }
+    }
+    let mut publication_store = if let Some(name) = &cli.store_name {
+        if let Err(error) = crypto_lib::store::index::validate_name(name) {
+            eprintln!("icx: invalid store name: {error}");
+            return ExitCode::FAILURE;
+        }
+        match crypto_lib::store::Store::open_default() {
+            Ok(store) => {
+                if let Err(error) = store.remote() {
+                    eprintln!("icx: {error}");
+                    return ExitCode::FAILURE;
+                }
+                if store.index.get(name).is_some() {
+                    eprintln!("icx: store name already exists: {name}");
+                    return ExitCode::FAILURE;
+                }
+                Some(store)
+            }
+            Err(error) => {
+                eprintln!("icx: cannot open artifact store: {error}");
+                return ExitCode::FAILURE;
+            }
+        }
+    } else {
+        None
+    };
     let mut report = match execute(&cli) {
         Ok(v) => v,
         Err(message) => json!({
@@ -658,10 +695,54 @@ fn main() -> ExitCode {
             Some("complete" | "checks_passed")
         )
     };
+    let text = serde_json::to_string_pretty(&report).expect("JSON serializable");
+    if let Some(path) = &cli.out {
+        let result = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(path)
+            .and_then(|mut file| {
+                file.write_all(text.as_bytes())?;
+                file.write_all(b"\n")?;
+                file.sync_all()
+            });
+        if let Err(error) = result {
+            eprintln!("icx: could not create report {}: {error}", path.display());
+            return ExitCode::FAILURE;
+        }
+    }
+    if let (Some(name), Some(path), Some(store)) =
+        (&cli.store_name, &cli.out, &mut publication_store)
+    {
+        let meta = crypto_lib::store::PushMeta {
+            description: format!(
+                "icx {} report",
+                report["operation"].as_str().unwrap_or("run")
+            ),
+            provenance: format!(
+                "icx CLI, git commit {}",
+                crypto_lib::build_provenance::git_commit().unwrap_or("unknown")
+            ),
+            ..Default::default()
+        };
+        match store.push(name, path, meta) {
+            Ok(published) => eprintln!(
+                "icx: published store:{name} sha256:{} bytes={} uploaded={}",
+                published.sha256, published.bytes, published.uploaded
+            ),
+            Err(error) => {
+                eprintln!("icx: could not publish report {}: {error}", path.display());
+                return ExitCode::FAILURE;
+            }
+        }
+    }
     if cli.json {
-        println!("{}", serde_json::to_string_pretty(&report).unwrap());
+        println!("{text}");
     } else {
         display(&report);
+        if let Some(path) = &cli.out {
+            println!("Report saved: {}", path.display());
+        }
     }
     if ok {
         ExitCode::SUCCESS

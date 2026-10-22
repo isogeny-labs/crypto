@@ -14,6 +14,14 @@ each name means, so a checkout, a CI job, a worker pod and the
 `crypto-autoresearcher` repository all resolve the same name to the same
 bytes.
 
+`ic` and `icx` also publish their generated JSON reports directly: pass
+`--out NEW_PATH --store-name NEW_NAME` to a command. The store checks the
+remote object after upload and records the digest and provenance in its index.
+The local output remains available if publication fails; the command then
+exits unsuccessfully. Names and output paths are checked before computation.
+The prime-field `ic` and cubic-field `icx` live S3 acceptance receipt is
+[`IC_REPORT_DIRECT_S3_ACCEPTANCE_20261022.json`](IC_REPORT_DIRECT_S3_ACCEPTANCE_20261022.json).
+
 The store moves bytes and checks them. It prices nothing and makes no
 performance claim; the evidence rules in `AGENTS.md` apply to what is built
 on the bytes.

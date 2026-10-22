@@ -70,6 +70,9 @@ struct Cli {
     /// Write the JSON report to a new file; existing files are never overwritten.
     #[arg(long, global = true)]
     out: Option<PathBuf>,
+    /// Publish --out through the configured artifact store under a new logical name.
+    #[arg(long, global = true, requires = "out")]
+    store_name: Option<String>,
 }
 #[derive(Subcommand)]
 enum Action {
@@ -608,6 +611,31 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     }
+    let mut publication_store = if let Some(name) = &cli.store_name {
+        if let Err(error) = crypto_lib::store::index::validate_name(name) {
+            eprintln!("ic: invalid store name: {error}");
+            return ExitCode::FAILURE;
+        }
+        match crypto_lib::store::Store::open_default() {
+            Ok(store) => {
+                if let Err(error) = store.remote() {
+                    eprintln!("ic: {error}");
+                    return ExitCode::FAILURE;
+                }
+                if store.index.get(name).is_some() {
+                    eprintln!("ic: store name already exists: {name}");
+                    return ExitCode::FAILURE;
+                }
+                Some(store)
+            }
+            Err(error) => {
+                eprintln!("ic: cannot open artifact store: {error}");
+                return ExitCode::FAILURE;
+            }
+        }
+    } else {
+        None
+    };
     let mut report = match execute(&cli) {
         Ok(v) => v,
         Err(message) => {
@@ -640,6 +668,31 @@ fn main() -> ExitCode {
         if let Err(error) = result {
             eprintln!("ic: could not create report {}: {error}", path.display());
             return ExitCode::FAILURE;
+        }
+    }
+    if let (Some(name), Some(path), Some(store)) =
+        (&cli.store_name, &cli.out, &mut publication_store)
+    {
+        let meta = crypto_lib::store::PushMeta {
+            description: format!(
+                "ic {} report",
+                report["operation"].as_str().unwrap_or("run")
+            ),
+            provenance: format!(
+                "ic CLI, git commit {}",
+                git_commit().as_deref().unwrap_or("unknown")
+            ),
+            ..Default::default()
+        };
+        match store.push(name, path, meta) {
+            Ok(published) => eprintln!(
+                "ic: published store:{name} sha256:{} bytes={} uploaded={}",
+                published.sha256, published.bytes, published.uploaded
+            ),
+            Err(error) => {
+                eprintln!("ic: could not publish report {}: {error}", path.display());
+                return ExitCode::FAILURE;
+            }
         }
     }
     if cli.json || report.get("operation").is_none() {
