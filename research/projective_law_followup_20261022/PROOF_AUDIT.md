@@ -310,18 +310,78 @@ the two distinct linear factors would share root `x₀`, forcing
 Weierstrass support, which is impossible. Hence `dbl(P₀)` has a
 nonzero output weight and equals `2P₀` by the separately certified
 weighted point-doubling formula. This proves the mixed branch's
-output class. Equal-`v` same-`u` divisor doubling is a different,
-still-open branch.
+output class. Equal-`v` same-`u` divisor doubling is certified separately
+below.
+
+### Same-`u`, equal-`v` divisor doubling
+
+`projective-symbolic-22-double` checks 30 exact integer-polynomial
+equalities in `results/symbolic-2plus2-double.json`, including literal
+weighted intermediates and all three `B,C` paths of
+`double22_weighted`. The input is a valid reduced Mumford pair
+`u=X²+qX+r`, `v=sX+t` on the stated monic quintic. Divide
+`F-v²=uH+R` with `deg R<2`; validity means `R=0`. In affine
+coordinates, the code's values are
+
+```text
+n1=qs-t, n2=rs,
+B=2(n1*t-n2*s),
+n5=s²-q(4r-q²)+q*a3-a2,
+n6=2r-3q²-a3,
+A=n1*n5-n2*n6, C=s*n5-t*n6.
+```
+
+The checker verifies the exact Hermite identity
+`B H+2v(CX+A)=uJ` for a polynomial `J`. Put
+`N=Bv-(CX+A)u` and
+`U=C²X²+(2AC-B²)X+(A²-2sBC+2qB²)`.
+It checks `BJ-(CX+A)²=-U`, hence
+
+```text
+B²F-N² = -u²U+B²R.
+```
+
+When `B,C≠0` and `R=0`, `L=N/B` is cubic and
+`F-L²=-u²U/B²`. The function `y-L` has the doubled input
+zeros and two residual zeros; its pole order is six. The output
+has normalized `u₃=U/C²`, and the checker verifies the cleared
+congruence `C⁵N+S C²X+T≡0 (mod U)` for the literal `s3=S,t3=T`.
+With `z3=C,w3=B`, the returned `v₃=-L mod u₃`, so it is the
+divisor-class double. Thirteen scale identities check the literal
+weighted generic path, including the corrected `w²` factor in `n6`.
+
+When `B≠0,C=0`, the same exact identity gives
+`U=-B²X+Xnum` with `Xnum=2qB²+A²`, so
+`F-L²=u²(X-Xnum/B²)`. The code's degree-one branch returns
+`x=Xnum/B²`, and its checked `y` numerator equals
+`-B⁴N(Xnum/B²)`, giving `y=-L(x)`. Three further scale
+identities verify the literal weighted point output. This is the
+degree-one divisor-class double.
+
+Finally `B=-2 Res(u,v)` exactly. If `B=0,s=0`, odd
+characteristic forces `t=0`; both support points are
+Weierstrass, so the divisor is 2-torsion and the code's
+identity output is correct. If `B=0,s≠0`, the root
+`x₀=-t/s` of `v` is a Weierstrass support point. The other
+support point is `x₁=-q+t/s`; it is non-Weierstrass for a
+valid reduced divisor on a smooth curve. The certificate checks
+that the weighted code extracts `(x₁,v(x₁))` and calls the
+already certified point-doubling law. Since twice the
+Weierstrass point is the identity, this equals twice the
+original divisor. These are written divisor arguments backed
+by exact polynomial identities; no Lean divisor-class theorem
+is claimed.
 
 Proof map: the generic 1+2 coefficient identities are discharged by
 `src/bin/projective_symbolic_12.rs` and its committed result; the
 exceptional cancellation and point-doubling identities are discharged
 by `src/bin/projective_symbolic_12_exception.rs` and its separate
-result. Tripling, both coprime 2+2 branches, and same-`u` mixed extraction have independent certificates
+result. Tripling, both coprime 2+2 branches, and both same-`u` paths have independent certificates
 in `src/bin/projective_symbolic_triple.rs` and
 `src/bin/projective_symbolic_22_common.rs` and
 `src/bin/projective_symbolic_22_drop.rs` and
-`src/bin/projective_symbolic_22_mixed.rs`. The
+`src/bin/projective_symbolic_22_mixed.rs` and
+`src/bin/projective_symbolic_22_double.rs`. The
 divisor-class bridge and weighted identities have no Lean declaration yet.
 A core-only Lean 4.34.1 probe found neither
 `Field` nor `Polynomial` in `Std`; completing a faithful Lean version
@@ -331,11 +391,11 @@ claimed as the full group-law proof.
 
 ### Open cases
 
-A machine-checkable symbolic reduction is still needed for the exceptional
-2+2 output branches: same-`u` equal-`v` doubling, and
-`B=0` shared-support cancellation and positive composition, including
-any degree drops in their nested calls. The coprime certificates require
-`B≠0`; they do not discharge these cases. The finite audit and five
+A machine-checkable symbolic reduction is still needed for the
+`B=0` shared-support cancellation and positive composition branches,
+including any degree drops in their nested `add11` and `add12` calls.
+The coprime and same-`u` certificates do not discharge these paths.
+The finite audit and five
 branch-selection lemmas above do not supply these remaining identities.
 In particular, no exhaustive all-divisor
 pair enumeration was run on any of the 42 curves. No counterexample to

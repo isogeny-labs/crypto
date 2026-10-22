@@ -85,6 +85,13 @@ weighted point-extraction certificate. The valid-divisor cancellation
 argument and its use of the previously certified `dbl(P)` formula are
 in `PROOF_AUDIT.md`.
 
+Build `--bin projective-symbolic-22-double` and redirect stdout to
+`results/symbolic-2plus2-double.json` for the same-`u`, equal-`v`
+doubling certificate. It checks exact Hermite interpolation for the
+`B≠0` paths, the `C=0` degree-one specialization, and weighted
+extraction when `B=0`. The divisor-class argument and remaining
+shared-support gap are in `PROOF_AUDIT.md`.
+
 `SHA256SUMS` gives hashes for all tracked study inputs, code, records,
 summaries, graphs, PDF, and run package. Verify it from the study directory
 with `sha256sum -c SHA256SUMS`.

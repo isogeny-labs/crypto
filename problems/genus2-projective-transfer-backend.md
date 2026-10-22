@@ -59,6 +59,12 @@ is complete for arbitrary curves or divisors cannot be made from those runs.
   adds exact weighted point-extraction identities and a written
   valid-divisor cancellation argument for the mixed same-`u` branch.
   Equal-`v` same-`u` doubling and shared-support outputs remain open.
+- **Derived or proved, 2026-10-22 same-`u` doubling follow-up:**
+  The [proof audit](../research/projective_law_followup_20261022/PROOF_AUDIT.md)
+  adds exact Hermite-interpolation, output, and weighted-scale
+  certificates for same-`u`, equal-`v` doubling, including `C=0`
+  degree one and `B=0` point extraction or identity.
+  Shared-support outputs remain open.
 - **Suspected explanation:** None needed for the measured cost. Branch behavior
   outside the tested finite cases remains a proof obligation.
 - **Missing capability:** A checked universal case proof for the implemented
@@ -141,3 +147,8 @@ remain open. Universal completeness remains open.
 extraction certificate and written cancellation argument, composed
 with the previously certified non-Weierstrass point doubling.
 Equal-`v` same-`u` doubling and `B=0` shared-support paths remain open.
+
+2026-10-22: Equal-`v` same-`u` doubling received exact Hermite,
+output, and weighted-scale certificates for its generic, degree-one,
+and point-extraction or identity paths. Only `B=0` shared-support
+composition paths remain open in the implemented 2+2 case split.
