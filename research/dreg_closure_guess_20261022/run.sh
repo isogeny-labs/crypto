@@ -40,6 +40,13 @@ case $STEP in
 gen)
   (cd "$REPO" && "$LADDER" --cells 22:8:3 --m 3 --unsat 4 --ffd-max 3 --seed 20261022) \
     > "$DRAWS/$NAME.jsonl" 2> "$DRAWS/$NAME.log" ;;
+gen-shards) # Amendment 1: draws from 3 on, four shards in parallel
+  for i in 0 1 2 3; do
+    (cd "$REPO" && "$LADDER" --cells 22:8:3 --m 3 --ffd-max 3 --seed 20261022 \
+       --shard "$i/4" --first-draw 3 --max-draws 16) \
+      > "$DRAWS/shard-$i.jsonl" 2> "$DRAWS/shard-$i.log" &
+  done
+  wait ;;
 measure)
   draws=$(grep -v '"satisfiable"' "$REPO/$F" | grep -o '"draw":[0-9]*' | cut -d: -f2)
   for k in $draws; do one "$k" G6 6=0,7=0,14=0,15=0,22=0,23=0; done
