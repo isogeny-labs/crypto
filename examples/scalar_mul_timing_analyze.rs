@@ -141,13 +141,16 @@ fn main() {
                 .fold(0.0, f64::max);
             delta = delta.max(band);
             let cost = b[&0] / a[&0];
-            per_curve_rounds.entry(name.clone()).or_default().push(json!({
-                "round": r,
-                "R": {"A": ratio(a, 224), "A2": ratio(a2, 224), "B": ratio(b, 224)},
-                "F": {"A": flatness(a), "A2": flatness(a2), "B": flatness(b)},
-                "aa_band": band, "cost": cost,
-                "full_length_ms": {"A": a[&0] / 1e6, "B": b[&0] / 1e6},
-            }));
+            per_curve_rounds
+                .entry(name.clone())
+                .or_default()
+                .push(json!({
+                    "round": r,
+                    "R": {"A": ratio(a, 224), "A2": ratio(a2, 224), "B": ratio(b, 224)},
+                    "F": {"A": flatness(a), "A2": flatness(a2), "B": flatness(b)},
+                    "aa_band": band, "cost": cost,
+                    "full_length_ms": {"A": a[&0] / 1e6, "B": b[&0] / 1e6},
+                }));
         }
     }
     for (name, rows) in &per_curve_rounds {
