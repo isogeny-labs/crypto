@@ -231,6 +231,7 @@ crypto cryptanalysis aes-attack --technique differential
 crypto cryptanalysis aes-attack --technique linear
 crypto cryptanalysis aes-attack --technique square
 crypto cryptanalysis aes-differential-observed --input chosen-pairs.json
+crypto cryptanalysis aes-higher-order-observed --input plaintext-cube.json
 crypto cryptanalysis aes-linear-observed --input known-pairs.json
 crypto cryptanalysis aes-linear-parity --input known-pairs.json \
   --column 0 --row 0 --input-mask 1 --output-mask 1
@@ -287,6 +288,16 @@ the corpus. It reports the XOR sum of all 256 ciphertexts and the number of
 zero output bytes. A zero XOR sum is the Square integral balance expected
 after three full AES rounds with MixColumns in the last round; the command
 reports an observed balance, not proof of the underlying cipher or its key.
+
+`aes-higher-order-observed` accepts a complete affine plaintext cube and
+reports its observed XOR derivative. The JSON contains
+`base_plaintext_hex`, `directions_hex` (1–16 independent 16-byte differences),
+and `pairs` with `plaintext_hex` and `ciphertext_hex` for every combination of
+the directions. Pair order is arbitrary. The command checks independence,
+duplicate and missing plaintexts, and exact cube membership before computing
+the derivative. It reports the 16-byte XOR sum and zero-byte count; the input
+does not include a key or round count, so the report does not verify which
+AES construction produced the ciphertexts.
 
 `aes-differential-observed` accepts caller-supplied data for the reduced
 two-round cipher (the last round omits MixColumns):

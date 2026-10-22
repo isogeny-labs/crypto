@@ -41,6 +41,100 @@ struct MitmInput {
     pairs: Vec<Pair2>,
 }
 
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct HigherOrderInput {
+    base_plaintext_hex: String,
+    directions_hex: Vec<String>,
+    pairs: Vec<Pair2>,
+}
+
+/// XOR the observed outputs of a complete affine plaintext cube.
+pub fn higher_order(input: &Path) -> Result<(), String> {
+    let data: HigherOrderInput =
+        serde_json::from_slice(&read(input)?).map_err(|e| e.to_string())?;
+    let report = analyze_higher_order(data)?;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&report).map_err(|e| e.to_string())?
+    );
+    Ok(())
+}
+
+fn analyze_higher_order(data: HigherOrderInput) -> Result<serde_json::Value, String> {
+    let dimension = data.directions_hex.len();
+    if !(1..=16).contains(&dimension) {
+        return Err("cube dimension must be 1..=16".into());
+    }
+    let expected_count = 1usize << dimension;
+    if data.pairs.len() != expected_count {
+        return Err(format!(
+            "cube requires exactly {expected_count} plaintext/ciphertext pairs"
+        ));
+    }
+    let base = block(&data.base_plaintext_hex)?;
+    let directions: Vec<[u8; 16]> = data
+        .directions_hex
+        .iter()
+        .map(|encoded| block(encoded))
+        .collect::<Result<_, _>>()?;
+    let mut basis = [0u128; 128];
+    for direction in &directions {
+        let mut vector = u128::from_le_bytes(*direction);
+        for bit in (0..128).rev() {
+            if (vector >> bit) & 1 == 0 {
+                continue;
+            }
+            if basis[bit] != 0 {
+                vector ^= basis[bit];
+            } else {
+                basis[bit] = vector;
+                break;
+            }
+        }
+        if vector == 0 {
+            return Err("cube directions must be linearly independent".into());
+        }
+    }
+    let mut observations = HashMap::with_capacity(expected_count);
+    for pair in data.pairs {
+        let plaintext = block(&pair.plaintext_hex)?;
+        let ciphertext = block(&pair.ciphertext_hex)?;
+        if observations.insert(plaintext, ciphertext).is_some() {
+            return Err("duplicate plaintext in cube".into());
+        }
+    }
+    let mut derivative = [0u8; 16];
+    for mask in 0..expected_count {
+        let mut plaintext = base;
+        for (bit, direction) in directions.iter().enumerate() {
+            if mask & (1 << bit) != 0 {
+                for (byte, delta) in plaintext.iter_mut().zip(direction) {
+                    *byte ^= delta;
+                }
+            }
+        }
+        let ciphertext = observations
+            .remove(&plaintext)
+            .ok_or_else(|| format!("missing cube plaintext {}", hex::encode(plaintext)))?;
+        for (byte, observed) in derivative.iter_mut().zip(ciphertext) {
+            *byte ^= observed;
+        }
+    }
+    let balanced = derivative.iter().filter(|&&byte| byte == 0).count();
+    Ok(json!({
+        "schema_version":1,
+        "method":"observed-higher-order-xor-derivative",
+        "status":if balanced == 16 {"zero_derivative"} else {"nonzero_derivative"},
+        "cube_dimension":dimension,
+        "pairs_used":expected_count,
+        "base_plaintext_hex":hex::encode(base),
+        "directions_hex":directions.iter().map(hex::encode).collect::<Vec<_>>(),
+        "xor_derivative_hex":hex::encode(derivative),
+        "balanced_output_bytes":balanced
+    }))
+}
+
 /// Compute the Square integral balance over a caller-supplied λ-set.
 pub fn integral(input: &Path) -> Result<(), String> {
     let data: MitmInput = serde_json::from_slice(&read(input)?).map_err(|e| e.to_string())?;
@@ -343,6 +437,54 @@ pub fn linear_parity(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn higher_order_observed_checks_complete_independent_cube() {
+        let key = [0x51u8; 16];
+        let cipher = ReducedAes128::new(&key, 2, false);
+        let mut directions = [[0u8; 16]; 2];
+        directions[0][0] = 1;
+        directions[1][1] = 1;
+        let base = [0x42u8; 16];
+        let mut expected = [0u8; 16];
+        let mut pairs = Vec::new();
+        for mask in 0..4 {
+            let mut plaintext = base;
+            for (bit, direction) in directions.iter().enumerate() {
+                if mask & (1 << bit) != 0 {
+                    for (byte, delta) in plaintext.iter_mut().zip(direction) {
+                        *byte ^= delta;
+                    }
+                }
+            }
+            let ciphertext = cipher.encrypt(&plaintext);
+            for (byte, observed) in expected.iter_mut().zip(ciphertext) {
+                *byte ^= observed;
+            }
+            pairs.push(json!({"plaintext_hex":hex::encode(plaintext),
+                "ciphertext_hex":hex::encode(ciphertext)}));
+        }
+        pairs.reverse();
+        let mut payload = json!({
+            "base_plaintext_hex":hex::encode(base),
+            "directions_hex":directions.iter().map(hex::encode).collect::<Vec<_>>(),
+            "pairs":pairs
+        });
+        let parse = |value| serde_json::from_value::<HigherOrderInput>(value).unwrap();
+        let report = analyze_higher_order(parse(payload.clone())).unwrap();
+        assert_eq!(report["xor_derivative_hex"], hex::encode(expected));
+        assert_eq!(report["pairs_used"], 4);
+
+        payload["directions_hex"][1] = payload["directions_hex"][0].clone();
+        assert!(analyze_higher_order(parse(payload.clone()))
+            .unwrap_err()
+            .contains("linearly independent"));
+        payload["directions_hex"][1] = json!(hex::encode(directions[1]));
+        payload["pairs"][1]["plaintext_hex"] = payload["pairs"][0]["plaintext_hex"].clone();
+        assert!(analyze_higher_order(parse(payload.clone()))
+            .unwrap_err()
+            .contains("duplicate"));
+    }
 
     #[test]
     fn observed_integral_checks_lambda_set_and_balance() {

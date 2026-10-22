@@ -397,6 +397,12 @@ enum CryptanalysisOp {
         #[arg(long)]
         input: PathBuf,
     },
+    /// Measure an observed higher-order XOR derivative over a complete AES plaintext cube.
+    AesHigherOrderObserved {
+        /// JSON with a base plaintext, independent directions, and all plaintext/ciphertext pairs.
+        #[arg(long)]
+        input: PathBuf,
+    },
     /// Recover two round-key bytes from an observed 256-pair two-round AES delta set.
     AesMitmObserved {
         /// JSON with pairs of plaintext_hex and ciphertext_hex; plaintexts cover (i, 0, ..., 0).
@@ -2293,6 +2299,12 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
         }
         CryptanalysisOp::AesDifferentialObserved { input } => {
             if let Err(e) = cli_aes_observed::differential(&input) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesHigherOrderObserved { input } => {
+            if let Err(e) = cli_aes_observed::higher_order(&input) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }
