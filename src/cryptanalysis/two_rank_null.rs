@@ -124,7 +124,7 @@ pub fn plant_small_primes(n: &BigUint, k: usize) -> BigUint {
     let mut q = 5u32;
     while planted < k {
         let qb = BigUint::from(q);
-        if (0..q).all(|d| d < 2 || d == q || q % d != 0) && !(n % &qb).is_zero() {
+        if (2..q).all(|d| !q.is_multiple_of(d)) && !(n % &qb).is_zero() {
             out *= &qb;
             planted += 1;
         }

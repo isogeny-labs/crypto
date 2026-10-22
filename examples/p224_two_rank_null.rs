@@ -695,16 +695,17 @@ fn svg(rows: &[Value]) -> String {
         ),
     ];
     let (w, ph, left, bottom) = (900.0, 230.0, 70.0, 40.0);
-    let h = 70.0 + panels.len() as f64 * (ph + bottom);
+    let h = 84.0 + panels.len() as f64 * (ph + bottom);
     let mut s = String::new();
     write!(s, "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 {w} {h}' font-family='sans-serif' font-size='12'>").unwrap();
     write!(s, "<rect width='{w}' height='{h}' fill='white'/>").unwrap();
     write!(s, "<text x='{left}' y='24' font-size='16' font-weight='bold'>Distinct primes dividing the CM discriminant of prime-order curves, omega(D_K)</text>").unwrap();
-    write!(s, "<text x='{left}' y='44' fill='#444'>bars: omega_mid fraction of null; thin lines: omega_lo (blue) and omega_hi (red) fractions; dashed: target (2-rank = omega - 1). Trace uniform on the Hasse interval, p+1-t prime.</text>").unwrap();
+    write!(s, "<text x='{left}' y='44' fill='#444'>bars: omega_mid fraction of null; thin lines: omega_lo (blue) and omega_hi (red) fractions; dashed: target.</text>").unwrap();
+    write!(s, "<text x='{left}' y='60' fill='#444'>2-rank = omega - 1. Trace uniform on the Hasse interval, p+1-t prime. Run seed 20261022.</text>").unwrap();
     let kmax = 16usize;
     let bw = (w - left - 30.0) / (kmax + 1) as f64;
     for (pi, (arm, label, tg)) in panels.iter().enumerate() {
-        let y0 = 70.0 + pi as f64 * (ph + bottom);
+        let y0 = 84.0 + pi as f64 * (ph + bottom);
         let r: Vec<&Value> = rows
             .iter()
             .filter(|r| r["kind"] == "null" && r["arm"] == *arm)
