@@ -22,6 +22,18 @@ on:
         description: Kubernetes deadline including provisioning (1..3600)
         type: string
         default: '900'
+      resumable:
+        description: CRIU/EBS computation recovery, then one fresh L2 benchmark epoch
+        type: boolean
+        default: false
+      checkpoint_seconds:
+        description: Periodic computation checkpoint interval (30..900 seconds)
+        type: string
+        default: '120'
+      max_restores:
+        description: Maximum restored computation attempts (1..5)
+        type: string
+        default: '2'
 permissions:
   contents: read
 jobs:
@@ -43,6 +55,13 @@ jobs:
           taskq/deploy/eks-karpenter/remote/test-contract.sh
           taskq/deploy/eks-karpenter/remote/test-build-verification.sh
           taskq/deploy/eks-karpenter/remote/test-publish-image.sh
+          taskq/deploy/eks-karpenter/resume/test-publisher.sh
+          cargo +1.99.1 test --locked --release --manifest-path taskq/deploy/eks-karpenter/resume/fixture/Cargo.toml
+          cargo +1.99.1 test --locked --release --manifest-path taskq/deploy/eks-karpenter/resume/progress/Cargo.toml
+          cargo +1.99.1 test --locked --release --manifest-path taskq/deploy/eks-karpenter/resume/controller/Cargo.toml
+          cargo +1.99.1 run --locked --release --manifest-path taskq/deploy/eks-karpenter/resume/fixture/Cargo.toml -- \
+            verify taskq/deploy/eks-karpenter/resume/validation/20261021/progress-after.log \
+            1048576 taskq/deploy/eks-karpenter/resume/validation/20261021/progress-before.log
   build:
     needs: contracts
     if: github.event_name == 'workflow_dispatch'
@@ -146,13 +165,31 @@ jobs:
           mask-aws-account-id: true
       - name: Publish the commit image and resolve its immutable digest
         run: taskq/deploy/eks-karpenter/publish-image "$RUNNER_TEMP/isolab-build" "$SOURCE_REVISION" "$RUNNER_TEMP/isolab-image.json"
+      - name: Add the trusted recovery runtime
+        if: inputs.resumable
+        run: taskq/deploy/eks-karpenter/resume/publish-runtime "$RUNNER_TEMP/isolab-image.json" "$RUNNER_TEMP/isolab-recovery-image.json"
       - name: Prepare the versioned experiment request
         env:
           INSTANCE_TYPE: ${{ inputs.instance_type }}
           DEADLINE: ${{ inputs.seconds }}
+          RESUMABLE: ${{ inputs.resumable }}
+          CHECKPOINT_SECONDS: ${{ inputs.checkpoint_seconds }}
+          MAX_RESTORES: ${{ inputs.max_restores }}
         run: |
           set -euo pipefail
           [[ "$DEADLINE" =~ ^[1-9][0-9]{0,3}$ && "$DEADLINE" -le 3600 ]]
+          if [[ "$RESUMABLE" == true ]]; then
+            [[ "$DEADLINE" -ge 180 && "$INSTANCE_TYPE" == c8a.2xlarge ]]
+            [[ "$CHECKPOINT_SECONDS" =~ ^[0-9]{2,3}$ && "$CHECKPOINT_SECONDS" -ge 30 && "$CHECKPOINT_SECONDS" -le 900 ]]
+            [[ "$MAX_RESTORES" =~ ^[1-5]$ ]]
+            jq -n --slurpfile spec "$RUNNER_TEMP/isolab-spec.json" --slurpfile build "$RUNNER_TEMP/isolab-image.json" \
+              --slurpfile runtime "$RUNNER_TEMP/isolab-recovery-image.json" \
+              --arg name "gh-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" --arg instance "$INSTANCE_TYPE" \
+              --argjson deadline "$(($(date -u +%s)+DEADLINE))" --argjson interval "$CHECKPOINT_SECONDS" --argjson restores "$MAX_RESTORES" \
+              '{schema:"isolab.eks.resumable/v1",run_name:$name,deadline_unix_seconds:$deadline,build:$build[0],runtime_image_uri:$runtime[0].runtime_image_uri,
+                spec:$spec[0],instance_type:$instance,checkpoint_interval_seconds:$interval,max_restores:$restores}' > "$RUNNER_TEMP/isolab-request.json"
+            exit 0
+          fi
           jq -n --slurpfile spec "$RUNNER_TEMP/isolab-spec.json" --slurpfile build "$RUNNER_TEMP/isolab-image.json" \
             --arg name "gh-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" --arg instance "$INSTANCE_TYPE" \
             --argjson seconds "$DEADLINE" --arg rev "$SOURCE_REVISION" --arg workflow "$GITHUB_SHA" \
@@ -161,11 +198,24 @@ jobs:
               provenance:{harness:"github-actions",source_revision:$rev,workflow_revision:$workflow,run_url:$url}}' > "$RUNNER_TEMP/isolab-request.json"
           taskq/deploy/eks-karpenter/remote/validate-request "$RUNNER_TEMP/isolab-request.json" >/dev/null
       - name: Launch, await and verify the EKS experiment
+        if: '!inputs.resumable'
         run: taskq/deploy/eks-karpenter/remote/launch-remote "$RUNNER_TEMP/isolab-request.json"
+      - name: Submit resumable computation and verify its fresh L2 epoch
+        if: inputs.resumable
+        run: |
+          set -euo pipefail
+          taskq/deploy/eks-karpenter/resume/fetch-client "$RUNNER_TEMP/isolab-recovery-client"
+          client="$RUNNER_TEMP/isolab-recovery-client/isolab-eks-recovery"
+          "$client" submit "$RUNNER_TEMP/isolab-request.json" "$ISOLAB_CLIENT_OUTPUT"
+          "$client" wait "$RUNNER_TEMP/isolab-request.json" "$ISOLAB_CLIENT_OUTPUT"
       - name: Report the outcome
         if: always()
         run: |
           if [[ -f "$ISOLAB_CLIENT_OUTPUT/result.json" ]]; then
+            if jq -e '.schema=="isolab.eks.recovery-result/v1"' "$ISOLAB_CLIENT_OUTPUT/result.json" >/dev/null; then
+              jq -r '"Iso Lab resumable run: `\(.state.request.run_name)`\n\nOutcome: **\(.state.phase)**; restored attempts: \(.state.restores).\n\nTested commit: `\(.state.request.build.source_revision)`\n\nFresh L2 epoch: `\(.benchmark.job_name)`; S3 payload hashes verified: \(.benchmark.payload_hashes_verified).\n\nComputation timing is excluded. Private checkpoint, computation, and fresh epoch receipts remain in S3."' "$ISOLAB_CLIENT_OUTPUT/result.json" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
             jq -r '"Iso Lab job: `\(.job_name)`\n\nOutcome: **\(.state)**.\n\nTested commit: `\(.build.source_revision)`\n\nNative SHA-256: `\(.build.ecbench_sha256)`\n\nFull receipts and measurements are retained in the private lab S3 bucket."' \
               "$ISOLAB_CLIENT_OUTPUT/result.json" >> "$GITHUB_STEP_SUMMARY"
           else

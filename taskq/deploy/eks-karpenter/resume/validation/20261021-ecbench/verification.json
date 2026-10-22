@@ -1,0 +1,76 @@
+{
+  "schema": "isolab.recovery-qualification.verification/v1",
+  "computation": {
+    "records": 36,
+    "verified_records": 36,
+    "replays": 30,
+    "all_replays_verified": true,
+    "timing_admitted": false,
+    "isolation": "L0",
+    "initial_restore_supplementary_group_drift": true,
+    "clear_groups_restore_correctness_verified": true,
+    "clear_groups_replays": 30
+  },
+  "checkpoint": {
+    "generation": {
+      "schema": "isolab.recovery-qualification.generation/v1",
+      "phase": "committed",
+      "generation": 1,
+      "original_pod_uid": "87fe94bf-e5cb-4a1f-9bb2-d998e7d9e848",
+      "original_instance_id": "i-0ab01e249ab5475f7",
+      "snapshot_id": "snap-0ead1fd75c8add942",
+      "archive_s3_key": "recovery/probes/20261021/ecbench-qualification/private-computation-checkpoint.tar.gz",
+      "archive_version_id": "wrUFEkEn2iy5Pbqm8ajs_UpU41Qal.m3",
+      "archive_sha256": "d47323a9719c8f2a179ad7b6eb99d0d95e1591ba147529501a6b916bf4ff411b",
+      "archive_encryption": "AES256",
+      "archive_download_verified": true,
+      "computation_only": true,
+      "benchmark_timing_valid": false,
+      "deadline_utc": "2026-10-21T06:25:00Z"
+    },
+    "file_hashes_verified": 52
+  },
+  "fresh_epoch": {
+    "l2": {
+      "required": "L2",
+      "executions": 36,
+      "invalid_outcomes": [],
+      "below_l2": [],
+      "grades": [
+        {
+          "level": "L2",
+          "count": 36
+        }
+      ],
+      "accepted": true
+    },
+    "replays": 30,
+    "all_replays_verified": true,
+    "aa_pairs": 10,
+    "aa_ci95": [
+      0.9997380265281529,
+      1.0011447799716735
+    ],
+    "aa_status": "admitted",
+    "s3_payload_hashes_verified": 19,
+    "receipt": {
+      "schema": "isolab.eks.result/v1",
+      "state": "succeeded",
+      "job_name": "criu-ecbench-20261021-epoch-1",
+      "job_uid": "5dcb2f83-c991-46ca-aeea-1532d37bdb0f",
+      "pod_uid": "848af771-ccde-46ce-aef5-7e73e2de357e",
+      "results_uri": "s3://isolab-results-104186811093-us-east-2/runs/criu-ecbench-20261021-epoch-1/848af771-ccde-46ce-aef5-7e73e2de357e/",
+      "receipt_uri": "s3://isolab-results-104186811093-us-east-2/runs/criu-ecbench-20261021-epoch-1/launcher/b695246a-e391-444b-9e27-1a3e62644bf6/",
+      "request_sha256": "622bd09c15ee653f9b5c21eb6c006d08eefb6dd2c9995e0d49214151d0f417d6",
+      "launcher": "isolab-experiment-launcher:b695246a-e391-444b-9e27-1a3e62644bf6",
+      "exit_code": 0,
+      "build": {
+        "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+        "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+        "ecbench_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9"
+      }
+    }
+  },
+  "automatic_recovery_integrated": false,
+  "automatic_epoch_transition": false
+}

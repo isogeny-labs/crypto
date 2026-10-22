@@ -243,3 +243,30 @@ or workflow dispatch has succeeded.
 References: [GitHub OIDC with AWS](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws),
 [CodeBuild VPC access](https://docs.aws.amazon.com/codebuild/latest/userguide/vpc-support.html),
 [CodeBuild StartBuild](https://docs.aws.amazon.com/codebuild/latest/APIReference/API_StartBuild.html).
+
+## Resumable native computation (separate contract)
+
+`isolab.eks.resumable/v1` is implemented by the native recovery controller in
+[`resume/`](resume/README.md), with its strict [request schema](resume/request.schema.json).
+It has passed scoped automatic worker-loss qualification; ordinary
+`isolab.eks.request/v1` and custom command jobs remain non-resumable.
+
+The new request uses an absolute original deadline and binds both the tested
+image and the trusted CRIU runtime image. Initially it admits c8a.2xlarge only.
+It periodically checkpoints computation at L0 (all timing invalid), waits for
+verified EBS/S3 storage, fences the old EC2 writer before restoration, then
+submits one ordinary fresh L2 epoch with the original specification. A failed
+L2/A/A epoch is terminal, including after a controller retry.
+
+AWS callers can use the native client's `submit`, `remote-status` and `wait`
+commands from anywhere. MCP exposes `isolab_k8s_resumable_submit` and
+`isolab_k8s_recovery_status` when both maintained binaries are installed. The
+GitHub Action adds `resumable`, `checkpoint_seconds` and `max_restores` inputs;
+its trusted runtime is layered over the commit-built image without executing the
+tested binary in the publisher. The full Action still requires these changes on
+`main`; a feature-branch build or PR contract check is not an EKS run.
+
+The controller project currently admits one active build. A definitive
+concurrency-limit rejection means no controller was started; preserve the
+original request/deadline and retry after capacity is available. An ambiguous
+submission must be reconciled by the original run identity, never a new name.

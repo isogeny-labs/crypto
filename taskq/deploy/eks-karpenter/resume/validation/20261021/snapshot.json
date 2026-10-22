@@ -1,0 +1,21 @@
+{
+  "apiVersion": "snapshot.storage.k8s.io/v1",
+  "kind": "VolumeSnapshot",
+  "metadata": {
+    "name": "resume-process-probe-generation-1",
+    "namespace": "isolab-recovery-system",
+    "uid": "4c8bc29f-dac4-4ca1-ad68-de469a252967"
+  },
+  "spec": {
+    "source": {
+      "persistentVolumeClaimName": "resume-process-probe"
+    },
+    "volumeSnapshotClassName": "isolab-ebs-checkpoints"
+  },
+  "status": {
+    "boundVolumeSnapshotContentName": "snapcontent-4c8bc29f-dac4-4ca1-ad68-de469a252967",
+    "creationTime": "2026-10-21T05:13:55Z",
+    "readyToUse": true,
+    "restoreSize": "4Gi"
+  }
+}

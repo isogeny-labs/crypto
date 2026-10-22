@@ -1,0 +1,102 @@
+{
+  "schema": "isolab.recovery-probe.verification/v1",
+  "status": "passed",
+  "scope": "Manual process recovery; not automatic harness failover or an admitted timing interval",
+  "policy": "CRIU plus EBS snapshots; resume computation and start fresh benchmark epoch",
+  "original": {
+    "pod": "resume-process-probe",
+    "pod_uid": "fdfb8d6b-710a-471e-abc0-e2305b90043f",
+    "node": "ip-10-84-29-238.us-east-2.compute.internal",
+    "instance_id": "i-0fabdc1b9d167d430",
+    "zone": "us-east-2a",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581"
+  },
+  "restored": {
+    "pod": "resume-process-restored",
+    "pod_uid": "122f1ce9-405f-4cfc-98e4-11c5c8bb7ce9",
+    "node": "ip-10-84-186-89.us-east-2.compute.internal",
+    "instance_id": "i-0ff791a8db99aac86",
+    "zone": "us-east-2c",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+    "created_at": "2026-10-21T05:17:20Z"
+  },
+  "fence": {
+    "state": "terminated",
+    "instance_id": "i-0fabdc1b9d167d430",
+    "observed_at": "2026-10-21T05:17:19.212Z"
+  },
+  "compatibility": {
+    "instance_type": "c8a.2xlarge",
+    "kernel": "6.18.54-121.166.amzn2023.x86_64",
+    "containerd": "containerd://2.3.5+unknown",
+    "criu": "4.2.1",
+    "cpu_cap_check": "all",
+    "same_kernel": true
+  },
+  "generation": {
+    "schema": "isolab.recovery-probe.generation/v1",
+    "generation": 1,
+    "criu": "4.2.1",
+    "original_pod_uid": "fdfb8d6b-710a-471e-abc0-e2305b90043f",
+    "original_instance_id": "i-0fabdc1b9d167d430",
+    "snapshot_id": "snap-030a4d1ca8390aa4a",
+    "snapshot_ready": true,
+    "archive_s3_key": "recovery/probes/20261021/generation-1/private-generation-verified.tar.gz",
+    "archive_sha256": "3914d6956b0133d1a064fdd0a0c9040c8adef2908c2c32da2b931fc83c88c5e9",
+    "archive_version_id": "0D67rNlXaCQVBYFvTLfjeMrMAD3RdT0h",
+    "archive_encryption": "AES256",
+    "archive_download_verified": true,
+    "fixture_sha256": "b3cd5b6832a85967fddc5489984963939bd26e76798280a64f0e03b45b4352b8",
+    "last_sequence": 48128,
+    "deadline_utc": "2026-10-21T06:00:00Z",
+    "benchmark_validity": "not_measured"
+  },
+  "snapshot": {
+    "snapshot_id": "snap-030a4d1ca8390aa4a",
+    "state": "completed",
+    "encrypted": true
+  },
+  "checkpoint_file_hashes_verified": 22,
+  "checkpoint_sequence": 48128,
+  "executed_source_sha256": "42b3b70c1f281e1ffe507e653022bd170e9197b95c4e2cb75abd7a7df7193d75",
+  "replay": {
+    "ok": true,
+    "starts": 1,
+    "steps": 1024,
+    "sequence": 1048576,
+    "sha256": "fdde49b4c5a6b75e9974a8993090b4abb7bca85454a0466eece1357b792dae98"
+  },
+  "benchmark_epoch": {
+    "status": "passed",
+    "request": "fresh-epoch-request.json",
+    "receipt": {
+      "schema": "isolab.eks.result/v1",
+      "state": "succeeded",
+      "job_name": "criu-resume-20261021-epoch-1",
+      "job_uid": "4c90515a-1a82-482f-a28d-54d798dde3a1",
+      "pod_uid": "d5afd859-72e2-4288-a0ca-a85b493f58bf",
+      "results_uri": "s3://isolab-results-104186811093-us-east-2/runs/criu-resume-20261021-epoch-1/d5afd859-72e2-4288-a0ca-a85b493f58bf/",
+      "receipt_uri": "s3://isolab-results-104186811093-us-east-2/runs/criu-resume-20261021-epoch-1/launcher/d865902e-9493-4fd8-be7f-3d2eb3989d14/",
+      "request_sha256": "dce5b92a53c2bc70caf28f2087be153d78238663fd605b7aef340ba95a671c2d",
+      "launcher": "isolab-experiment-launcher:d865902e-9493-4fd8-be7f-3d2eb3989d14",
+      "exit_code": 0,
+      "build": {
+        "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+        "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+        "ecbench_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9"
+      }
+    },
+    "l2_executions": 108,
+    "reproduced_replays": 90,
+    "artifact_hashes_verified": 19,
+    "aa_pairs": 10,
+    "aa_ci95": [
+      0.9892440499496646,
+      1.012733566458267
+    ],
+    "no_smt": true,
+    "instance_type": "c8a.2xlarge",
+    "automatic_transition": false
+  },
+  "production_harness_resume_ready": false
+}

@@ -27,6 +27,8 @@ fn tools() -> Vec<Value> {
     let name = json!({"type":"string","pattern":"^[a-z0-9]([-a-z0-9]*[a-z0-9])?$","maxLength":55});
     vec![
         tool("isolab_k8s_overview", "List lab Jobs and their current Kubernetes state. Workers scale from zero when Jobs arrive.", json!({}), &[], true, false),
+        tool("isolab_k8s_resumable_submit", "Submit a trusted native ecbench computation through the AWS recovery controller. Uses CRIU plus EBS checkpoints on qualified c8a.2xlarge Spot workers; computation timing is L0/invalid. After native replay, one separate fresh epoch must pass L2, A/A and S3 checks. Requires the installed isolab-eks-recovery client and AWS identity; no direct EKS route is needed. On ambiguous submission, check the same immutable request before retrying.", json!({"request":serde_json::from_str::<Value>(include_str!("../../resume/request.schema.json")).unwrap()}), &["request"], false, false),
+        tool("isolab_k8s_recovery_status", "Read the durable S3 state of the original resumable request, binding its source, image, spec and deadline. A pending receipt is not success. Succeeded means the controller verified computation and a distinct fresh L2/replay/A-A/S3 epoch.",json!({"request":serde_json::from_str::<Value>(include_str!("../../resume/request.schema.json")).unwrap()}), &["request"], true, false),
         tool("isolab_k8s_benchmark", "Run a native ecbench specification with four exclusive vCPUs on a worker configured for CPU isolation. Requires L2, at least five rounds, a warmup, reference and matching A/A control. Audits and replays all measured executions, rejects ANY record below L2, and uploads all artifacts (including failures) to S3. No automatic retries. Job success is an isolation/correctness check, not a speed claim.",
             json!({"job_name":name,"spec":{"type":"object","description":"ecbench.spec/v1 specification; defaults to the supplied 20-bit validation fixture"},
                 "build":build_schema(),
@@ -161,7 +163,11 @@ fn validate(tool_name: &str, args: &Value) -> Result<()> {
             return Err(format!("missing argument {key}"));
         }
     }
-    if tool_name != "isolab_k8s_overview" {
+    if ["isolab_k8s_resumable_submit", "isolab_k8s_recovery_status"].contains(&tool_name) {
+        if !args["request"].is_object() {
+            return Err("request must be an isolab.eks.resumable/v1 object".into());
+        }
+    } else if tool_name != "isolab_k8s_overview" {
         job_name(args)?;
     }
     Ok(())
@@ -387,6 +393,44 @@ fn benchmark_args(args: &Value) -> Result<Vec<String>> {
 fn call(name: &str, args: &Value) -> Result<Value> {
     validate(name, args)?;
     match name {
+        "isolab_k8s_resumable_submit" | "isolab_k8s_recovery_status" => {
+            use std::os::unix::fs::DirBuilderExt;
+            let nonce = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map_err(|e| e.to_string())?
+                .as_nanos();
+            let dir = std::env::temp_dir()
+                .join(format!("isolab-recovery-{}-{nonce}", std::process::id()));
+            std::fs::DirBuilder::new()
+                .mode(0o700)
+                .create(&dir)
+                .map_err(|e| e.to_string())?;
+            let path = dir.join("request.json");
+            let result = (|| {
+                std::fs::write(
+                    &path,
+                    serde_json::to_vec(&args["request"]).map_err(|e| e.to_string())?,
+                )
+                .map_err(|e| e.to_string())?;
+                let command = if name == "isolab_k8s_resumable_submit" {
+                    "submit"
+                } else {
+                    "remote-status"
+                };
+                let out = execute(
+                    "isolab-eks-recovery",
+                    &[
+                        command.into(),
+                        path.to_str().ok_or("invalid temporary path")?.into(),
+                        dir.to_str().ok_or("invalid temporary path")?.into(),
+                    ],
+                    None,
+                )?;
+                serde_json::from_str(&out).map_err(|e| e.to_string())
+            })();
+            let _ = std::fs::remove_dir_all(&dir);
+            result
+        }
         "isolab_k8s_overview" => {
             let list = kube_json(
                 &["get", "jobs", "-l", "isolab.dev/job=true", "-o", "json"],
@@ -654,7 +698,7 @@ mod tests {
                 .as_array()
                 .unwrap()
                 .len(),
-            7
+            9
         );
         assert_eq!(
             s.dispatch(

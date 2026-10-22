@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="370" viewBox="0 0 1000 370">
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#526275"/></marker></defs>
+  <rect width="1000" height="370" fill="#f7f9fc"/>
+  <g font-family="sans-serif" text-anchor="middle">
+    <text x="500" y="35" font-size="24" fill="#152c44">Observed: CRIU + EBS recovery, then a separate L2 epoch</text>
+    <text x="500" y="60" font-size="15" fill="#526275">Iso Lab · 2026-10-21 · manual operator procedure · one replacement</text>
+    <g fill="#e5edf8" stroke="#8ba5c4" stroke-width="2">
+      <rect x="25" y="105" width="220" height="145" rx="12"/>
+      <rect x="270" y="105" width="220" height="145" rx="12"/>
+      <rect x="515" y="105" width="220" height="145" rx="12"/>
+      <rect x="760" y="105" width="215" height="145" rx="12"/>
+    </g>
+    <g fill="#152c44" font-size="17">
+      <text x="135" y="138">Original Spot worker</text><text x="135" y="169">RAM: step 48,128</text><text x="135" y="198">CRIU + frozen files</text><text x="135" y="227">us-east-2a</text>
+      <text x="380" y="138">Committed generation</text><text x="380" y="169">Encrypted EBS snapshot</text><text x="380" y="198">22 file hashes verified</text><text x="380" y="227">Old worker terminated</text>
+      <text x="625" y="138">Replacement Spot worker</text><text x="625" y="169">Restored RAM + files</text><text x="625" y="198">1,048,576 steps verified</text><text x="625" y="227">us-east-2c · one start</text>
+      <text x="868" y="138">Fresh benchmark job</text><text x="868" y="169">108 L2 · 90 replays</text><text x="868" y="198">10 A/A control pairs</text><text x="868" y="227">19 S3 hashes verified</text>
+    </g>
+    <g stroke="#526275" stroke-width="2.5" marker-end="url(#arrow)"><path d="M245 178H268"/><path d="M490 178H513"/><path d="M735 178H758" stroke-dasharray="5 4"/></g>
+    <text x="500" y="293" font-size="17" fill="#773c16">Interrupted computation has no admitted L2 timing interval.</text>
+    <text x="500" y="323" font-size="17" fill="#526275">Dashed arrow: separate operator submission. Automatic harness recovery remains open.</text>
+    <text x="500" y="351" font-size="14" fill="#526275">Source: verification.json, progress logs, native replay and fresh-epoch artifacts</text>
+  </g>
+</svg>
