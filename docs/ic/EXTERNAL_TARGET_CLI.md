@@ -310,12 +310,17 @@ Supply at least two and at most 100,000 pairs. Each pair must change only
 plaintext byte zero by `alpha`, and its ciphertext difference must have
 exactly active positions 0, 7, 10, and 13. The result contains four
 last-round key-byte candidates at those positions and reports
-`partial_candidate`; this does not identify a whole AES-128 key.
+`partial_candidate`; this does not identify a whole AES-128 key. The command
+requires distinct chosen-plaintext pairs with consistent ciphertexts. Each
+reported four-byte tuple must imply the same first-round S-box output
+difference across all four active positions for every supplied pair, including
+pairs after an individual byte has only one candidate.
 
 `aes-linear-observed` accepts `{"pairs":[{"plaintext_hex":"<32 hex
 digits>","ciphertext_hex":"<32 hex digits>"}],"verification_pairs":[...]}`.
 It requires 16–100,000 training pairs and permits up to 100,000 independent
-verification pairs. The one-round model omits final MixColumns. The current
+verification pairs. Training plaintexts and verification plaintexts must each
+be distinct. The one-round model omits final MixColumns. The current
 byte recovery routine enumerates S-box input-byte candidates and checks a
 constant output XOR across observations; its output is not a LAT-derived
 multi-round linear attack. It reports `candidate` without holdout data and

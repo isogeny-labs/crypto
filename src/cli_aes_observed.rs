@@ -2,7 +2,11 @@
 use crypto_lib::cryptanalysis::aes::{differential, linear, mitm, reduced::ReducedAes128};
 use serde::Deserialize;
 use serde_json::json;
-use std::{collections::HashMap, fs, path::Path};
+use std::{
+    collections::{HashMap, HashSet},
+    fs,
+    path::Path,
+};
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -253,6 +257,8 @@ pub fn differential(input: &Path) -> Result<(), String> {
         return Err("alpha must be nonzero and pair count must be 2..=100000".into());
     }
     let mut pairs = Vec::with_capacity(data.pairs.len());
+    let mut seen_points = HashMap::new();
+    let mut seen_pairs = HashSet::new();
     for (i, raw) in data.pairs.iter().enumerate() {
         let pair = differential::DiffPair {
             p0: block(&raw.p0_hex)?,
@@ -268,6 +274,22 @@ pub fn differential(input: &Path) -> Result<(), String> {
             return Err(format!(
                 "pair {i} violates the two-round chosen-difference model"
             ));
+        }
+        for (plaintext, ciphertext) in [(pair.p0, pair.c0), (pair.p1, pair.c1)] {
+            if seen_points
+                .insert(plaintext, ciphertext)
+                .is_some_and(|old| old != ciphertext)
+            {
+                return Err(format!("pair {i} contradicts an earlier ciphertext"));
+            }
+        }
+        let ordered = if pair.p0 < pair.p1 {
+            (pair.p0, pair.p1)
+        } else {
+            (pair.p1, pair.p0)
+        };
+        if !seen_pairs.insert(ordered) {
+            return Err(format!("pair {i} repeats a chosen-plaintext pair"));
         }
         pairs.push(pair);
     }
@@ -321,10 +343,16 @@ pub fn linear(input: &Path) -> Result<(), String> {
     }
     let mut seen = HashMap::new();
     let pairs = parsed_pairs(&data.pairs, &mut seen)?;
+    if seen.len() != pairs.len() {
+        return Err("training plaintexts must be distinct".into());
+    }
     let training = seen.clone();
     let verify = parsed_pairs(&data.verification_pairs, &mut seen)?;
     if verify.iter().any(|(p, _)| training.contains_key(p)) {
         return Err("verification plaintext must be distinct from training plaintexts".into());
+    }
+    if seen.len() != pairs.len() + verify.len() {
+        return Err("verification plaintexts must be distinct".into());
     }
     let lat = linear::aes_sbox_lat();
     let mut key = [0u8; 16];
@@ -568,6 +596,12 @@ mod tests {
         })).collect::<Vec<_>>()});
         fs::write(&path, payload.to_string()).unwrap();
         assert!(differential(&path).is_ok());
+        let mut repeated = payload.clone();
+        repeated["pairs"][1] = repeated["pairs"][0].clone();
+        fs::write(&path, repeated.to_string()).unwrap();
+        assert!(differential(&path)
+            .unwrap_err()
+            .contains("repeats a chosen-plaintext pair"));
 
         let one = ReducedAes128::new(&key, 1, false);
         let corpus = linear::known_plaintext_corpus(&one, 129, 7);
@@ -576,6 +610,12 @@ mod tests {
             "verification_pairs":[as_json(&corpus[128])]});
         fs::write(&path, payload.to_string()).unwrap();
         assert!(linear(&path).is_ok());
+        let mut repeated = payload.clone();
+        repeated["pairs"][1] = repeated["pairs"][0].clone();
+        fs::write(&path, repeated.to_string()).unwrap();
+        assert!(linear(&path)
+            .unwrap_err()
+            .contains("training plaintexts must be distinct"));
         let mut mismatch = payload.clone();
         mismatch["verification_pairs"][0]["ciphertext_hex"] =
             json!("00000000000000000000000000000000");

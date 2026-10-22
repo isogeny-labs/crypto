@@ -233,26 +233,34 @@ pub struct DifferentialAttackReport {
     /// Recovered last-round key bytes at the four active positions
     /// (column-major flat indices 0, 7, 10, 13).
     pub key_bytes: [(usize, u8); 4],
-    /// Number of `(k, pair)` test combinations evaluated.
+    /// Number of key-byte and joint-tuple checks evaluated.
     pub trial_count: usize,
 }
 
 /// 2-round differential key recovery on AES-128 with `nr = 2`,
 /// `final_mix_columns = false`. Recovers the four active bytes of the
-/// last round key independently.
+/// last round key by requiring all four bytes to imply the same first-round
+/// S-box output difference for every pair.
 ///
 /// `alpha` is the input difference value at byte 0. `pairs` are
 /// chosen-plaintext pairs of the form `(P, P ⊕ (α, 0, …, 0))` with
 /// the corresponding ciphertexts.
 ///
-/// Returns `Err(())` if at the end of `pairs` more than one candidate
-/// remains for any position — meaning the caller should supply more
-/// pairs.
+/// Returns an ambiguity error when more than one four-byte tuple survives.
+fn inferred_beta(pair: &DiffPair, pos: usize, coef_inv: u8, key: u8) -> u8 {
+    let v0 = INV_SBOX[(pair.c0[pos] ^ key) as usize];
+    let v1 = INV_SBOX[(pair.c1[pos] ^ key) as usize];
+    gmul(v0 ^ v1, coef_inv)
+}
+
 pub fn key_recovery_two_round(
     alpha: u8,
     pairs: &[DiffPair],
     ddt: &AesDdt,
 ) -> Result<DifferentialAttackReport, &'static str> {
+    let first = pairs
+        .first()
+        .ok_or("at least one chosen pair is required")?;
     // Active byte positions in the ciphertext difference, and the
     // MixColumns coefficient that scales β at the corresponding row
     // of column 0 before SR R2. Row 0 ⇒ 2β; row 1 ⇒ β; row 2 ⇒ β;
@@ -267,42 +275,73 @@ pub fn key_recovery_two_round(
     ];
 
     let mut trial_count = 0usize;
-    let mut recovered = [(0usize, 0u8); 4];
+    let inverse_coefficients = active.map(|(_, coef)| ginv(coef));
+    let mut candidates: [Vec<u8>; 4] =
+        std::array::from_fn(|_| (0u16..256).map(|v| v as u8).collect());
 
-    for (slot, &(pos, coef)) in active.iter().enumerate() {
-        let coef_inv = ginv(coef);
-        let mut candidates: Vec<u8> = (0u16..256).map(|v| v as u8).collect();
-
+    for (slot, &(pos, _)) in active.iter().enumerate() {
         for pair in pairs.iter() {
-            if candidates.len() == 1 {
-                break;
-            }
-            candidates.retain(|&k| {
+            candidates[slot].retain(|&k| {
                 trial_count += 1;
-                let v0 = INV_SBOX[(pair.c0[pos] ^ k) as usize];
-                let v1 = INV_SBOX[(pair.c1[pos] ^ k) as usize];
-                let delta = v0 ^ v1;
-                if delta == 0 {
+                let beta = inferred_beta(pair, pos, inverse_coefficients[slot], k);
+                if beta == 0 {
                     // Active byte must have nonzero difference for the
                     // right key.
                     return false;
                 }
-                // β is δ scaled by the inverse of the MC coefficient.
-                let beta = gmul(delta, coef_inv);
                 ddt[alpha as usize][beta as usize] > 0
             });
         }
-
-        match candidates.len() {
-            1 => recovered[slot] = (pos, candidates[0]),
-            0 => return Err("no candidate survived — α/pairs inconsistent"),
-            _ => return Err("ambiguous — supply more pairs"),
+        if candidates[slot].is_empty() {
+            return Err("no candidate survived — α/pairs inconsistent");
         }
     }
 
+    // The first pair partitions each byte's candidates by its inferred β.
+    // Only tuples in a common partition can be consistent. Later pairs then
+    // enforce that common β independently for every observation.
+    let mut by_beta: [Vec<Vec<u8>>; 4] = std::array::from_fn(|_| vec![Vec::new(); 256]);
+    for slot in 0..4 {
+        for &key in &candidates[slot] {
+            let beta = inferred_beta(first, active[slot].0, inverse_coefficients[slot], key);
+            by_beta[slot][beta as usize].push(key);
+        }
+    }
+    let mut recovered: Option<[u8; 4]> = None;
+    for beta in 1..=255usize {
+        for &k0 in &by_beta[0][beta] {
+            for &k1 in &by_beta[1][beta] {
+                for &k2 in &by_beta[2][beta] {
+                    for &k3 in &by_beta[3][beta] {
+                        let tuple = [k0, k1, k2, k3];
+                        let consistent = pairs.iter().skip(1).all(|pair| {
+                            trial_count += 1;
+                            let expected =
+                                inferred_beta(pair, active[0].0, inverse_coefficients[0], k0);
+                            (1..4).all(|slot| {
+                                inferred_beta(
+                                    pair,
+                                    active[slot].0,
+                                    inverse_coefficients[slot],
+                                    tuple[slot],
+                                ) == expected
+                            })
+                        });
+                        if consistent {
+                            if recovered.replace(tuple).is_some() {
+                                return Err("ambiguous — supply more pairs");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    let recovered = recovered.ok_or("no common first-round difference survived")?;
+
     Ok(DifferentialAttackReport {
         pairs_used: pairs.len(),
-        key_bytes: recovered,
+        key_bytes: std::array::from_fn(|slot| (active[slot].0, recovered[slot])),
         trial_count,
     })
 }
@@ -428,6 +467,32 @@ mod tests {
             let r = pos % 4;
             assert_eq!(k, true_k[c][r], "wrong byte at flat position {pos}");
         }
+    }
+
+    #[test]
+    fn late_pair_must_share_one_beta_across_all_active_bytes() {
+        let key = [0x51u8; 16];
+        let cipher = ReducedAes128::new(&key, 2, false);
+        let alpha = 0x73u8;
+        let ddt = aes_sbox_ddt();
+        let mut pairs = build_pairs(&cipher, alpha, 24, 0xdead_beef_cafe);
+        assert!(key_recovery_two_round(alpha, &pairs, &ddt).is_ok());
+
+        let mut late = build_pairs(&cipher, alpha, 1, 0x1234_5678)[0];
+        let key_byte = cipher.round_key(2)[0][0];
+        let input = INV_SBOX[(late.c0[0] ^ key_byte) as usize];
+        let original_beta = inferred_beta(&late, 0, ginv(2), key_byte);
+        let alternate_beta = (1u16..256)
+            .map(|v| v as u8)
+            .find(|&beta| beta != original_beta && ddt[alpha as usize][beta as usize] > 0)
+            .unwrap();
+        late.c1[0] = SBOX[(input ^ gmul(2, alternate_beta)) as usize] ^ key_byte;
+        assert_eq!(inferred_beta(&late, 0, ginv(2), key_byte), alternate_beta);
+        pairs.push(late);
+        assert_eq!(
+            key_recovery_two_round(alpha, &pairs, &ddt).unwrap_err(),
+            "no common first-round difference survived"
+        );
     }
 
     /// Sanity: the active byte positions predicted by the attack are
