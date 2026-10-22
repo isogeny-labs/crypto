@@ -237,10 +237,14 @@ fn run(args: &[String]) {
             .collect();
         stage(a.name, new, &mut rows);
     }
+    // A full run replaces `rows.jsonl`; an `--only` run adds its arms to it.
+    let partial = !only.is_empty();
     let mut f = std::io::BufWriter::new(
         std::fs::OpenOptions::new()
             .create(true)
-            .append(true)
+            .write(true)
+            .append(partial)
+            .truncate(!partial)
             .open(format!("{out}/rows.jsonl"))
             .unwrap(),
     );

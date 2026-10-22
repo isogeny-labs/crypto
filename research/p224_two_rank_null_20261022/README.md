@@ -22,3 +22,19 @@ limits are in [`report.pdf`](report.pdf) (source `report.typ`).
 Not an ECDLP cost measurement: no rho ratio, no scoreboard row, no `benchmarks/`
 entry owed. The null is a Hasse-interval trace model, not point-counted curves
 (`PROTOCOL.md`).
+
+## Correction, 2026-10-22: effective rho budget
+
+`PROTOCOL.md` (frozen, unchanged) states a Pollard–Brent budget of 2²¹
+iterations. `p224_hypotheses::pollard_brent` checks the budget only before each
+of Brent's doubling rounds, so a walk can overshoot: the largest recorded
+`rho_iterations` is 4,194,302 = 2²² − 2 (2,085 of 6,822 rows). The effective
+instrument is therefore "stop at the first doubling round at or after 2²¹",
+at most 2²² − 2 iterations per sample. It is deterministic and identical on
+every arm, target and control, so the comparisons and verdicts stand; only
+the stated budget was wrong. Re-running with `--rho 2097152` reproduces the
+committed rows exactly. (Reported by automated review on PR #2432.)
+
+A full `run` now replaces `run/rows.jsonl`; only an `--only` run appends to it.
+Before this fix every run appended, so re-running the reproduce command into
+the committed directory would have duplicated rows.
