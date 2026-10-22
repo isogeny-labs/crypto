@@ -1,5 +1,10 @@
 # Continue the DiSSECT factorizations
 
+**Latest: [R02, 2026-10-22](rounds/R02-20261022/README.md)** completely
+factors eight of nine integers and resolves thirteen of fourteen timeout
+fields. Only the 444-bit P-256 block-876 cofactor remains. The text and
+dated results below describe R01 and are preserved as historical evidence.
+
 Run `nist-factor-continuation-20261021T1424Z`, 2026-10-21.
 **Six of nine distinct target integers have complete proven-prime
 factorizations. Three retain composite cofactors.** This resolves eleven

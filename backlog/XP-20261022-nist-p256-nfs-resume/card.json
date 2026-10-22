@@ -1,0 +1,106 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261022-nist-p256-nfs-resume",
+  "title": "Resume native NFS on the remaining skipped P256 extension-twist cofactor",
+  "created": "2026-10-22",
+  "authors": [
+    "NIST seed provenance research"
+  ],
+  "status": "draft",
+  "status_note": "Draft later allocation; not queued. Ready promotion requires the completed R03 checkpoint, merged implementation pin and selected compatible lab host.",
+  "blocked_on": [],
+  "links": {
+    "lead": "backlog/XP-20261022-nist-p256-nfs-resume/README.md",
+    "notes": [
+      "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R02-20261022/README.md",
+      "problems/nist-extension-twist-composite-cofactors.md"
+    ],
+    "prs": [
+      2379
+    ]
+  },
+  "question": "Can a further bounded native NFS checkpoint allocation split the remaining 444-bit P256 cofactor?",
+  "decision_value": "A prime-certified split refines the only unresolved DiSSECT target. Native state progress without factors is reported separately; an incomplete or failed run leaves the mathematical requirement open and informs the next allocation.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "91e3293b4badd9f994d39fa116c387a15b4ebfaf"
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/nist-skipped-curve-jobs",
+    "build": []
+  },
+  "resources": {
+    "cpus": 2,
+    "ram_gb": 16,
+    "disk_gb": 32,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Configured native 1800s, outer 1860s plus 30s grace, task 2400s. These ceilings are not completion-time estimates. Requires AVX2/BMI2 and compatible libecm."
+  },
+  "run": {
+    "argv": [
+      "bash",
+      "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R02-20261022/resume_job.sh",
+      "skipped_256_876-twist2",
+      "{out}",
+      "1800",
+      "--resume"
+    ],
+    "env": {
+      "GP_BIN": "gp",
+      "GNFS_BIN_DIR": "/opt/yafu/factor/lasieve5_64/bin",
+      "NIST_FACTOR_CHECKPOINT": "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R03-20261022/checkpoint-skipped_256_876-twist2.tar.xz",
+      "NFS_POLY_BATCH": "120"
+    },
+    "timeout_per_shard_s": 2400
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": "checkpoint.json",
+    "resume_flag": "--resume"
+  },
+  "outputs": {
+    "result_schema": "nist-nfs-checkpoint/v1 plus independently verified exact target partition",
+    "verify": [
+      "bash",
+      "research/nist_skipped_curve_dissection_20261021/factorization/rounds/R02-20261022/verify_nfs_artifact.sh",
+      "{out}",
+      "skipped_256_876-twist2",
+      "33492266050798185653682380062483799213318454801653963493134064721059735936944520907295931496614455858076048437184499090478420204888353"
+    ],
+    "land": "research/nist_skipped_curve_dissection_20261021/factorization/rounds"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261022-nist-p256-nfs-resume"
+    ],
+    "ttl_s": 7200,
+    "env": {
+      "name": "nist-yafu-c7d902-pari217",
+      "recipe": "Build pinned YAFU c7d90283972820f99b3b4920bfc1eff05c1f6342 with AVX2/BMI2, GMP and matching libecm 7.0.6 headers; make bundled native lattice sievers executable. Install PARI/GP 2.17.2, Bash, jq, GNU coreutils, xz and util-linux. Verify archive checksum and executable hashes; use compatible AVX2/BMI2 hardware. Pin the selected environment before ready promotion."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 16384,
+      "timeout_s": 2400,
+      "sandbox": "auto",
+      "sandbox_reason": "",
+      "publish": "runs/XP-20261022-nist-p256-nfs-resume"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Unqueued draft follow-up with no priority against existing funded cards until merged pin, checkpoint and execution environment are selected."
+    },
+    "notes": "No task, lease, external message, funding or paid compute is created. A sound partial verifier verdict does not certify complete factorization."
+  }
+}

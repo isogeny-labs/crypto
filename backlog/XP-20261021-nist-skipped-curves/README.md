@@ -4,9 +4,11 @@ Status: runnable candidate-branch jobs, not queued. The card remains
 `draft` until its implementation is merged and pinned, a resumable runner
 is available, and an execution environment is selected. The manual workflow
 has not been dispatched. The linked [factorization continuation](../../research/nist_skipped_curve_dissection_20261021/factorization/README.md)
-imports the earlier external run as unchanged evidence and resolves eleven
-of its fourteen timeout-valued fields: six of nine distinct integers are
-completely factored, while three retain composite cofactors. This does not
+imports the earlier external run as unchanged evidence. Its
+[R02 supplement](../../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R02-20261022/README.md)
+resolves thirteen of its fourteen timeout-valued fields: eight of nine
+distinct integers are completely factored, while one retains a 444-bit
+composite cofactor. This does not
 complete a fresh 23-job run or establish a historical skip reason.
 
 The panel is the P-224 seed stream's candidates 777, 1485 and 5736, the
