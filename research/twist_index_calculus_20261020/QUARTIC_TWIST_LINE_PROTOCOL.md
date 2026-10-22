@@ -427,3 +427,40 @@ result only with the earlier **same-target counted exact-oracle** baseline;
 do not combine costs from separate runs or claim an isolated timing,
 polynomial-S5, calibrated whole-method or rho improvement. Publish a
 source-linked run report, graph and PDF, and retain negative outcomes.
+
+## Registered mixed-line polynomial peeling pilot
+
+Frozen on 22 October 2026 after the combined exact-oracle result and before
+implementing the polynomial peeling producer. Reuse the canonical `p=37,
+b0=2, r=1,873,633` curve, the seed-zero `L0 ∪ L2` 48-point signed base,
+public target `[271]G`, and the **first four residuals in their existing
+order** from `quartic_twist_mixed_v1.ndjson`. Do not select residuals by
+polynomial outcome. Partition a four-distinct-abscissa decomposition by its
+number `k=0,…,4` of factors on `L2`.
+
+For `k=0` and `k=4`, solve the symmetrised `S5` on the relevant single line,
+scaling the elementary symmetric coordinates by `s^j` for line scale
+`s=1` or `t²`. For `k=1`, enumerate each signed `L2` point, subtract it from
+the residual, and solve a symmetrised `S4` in the three remaining `L0`
+abscissae. For `k=3`, enumerate each signed `L0` point and solve the same
+`S4` on `L2`. For `k=2`, enumerate each unordered pair of distinct signed
+`L2` points and solve the explicit symmetric `S3` in the two remaining
+`L0` abscissae. The `S4` polynomial is the `S3`/`S3` resultant, independently
+interpolated in the elementary symmetric functions of its three factor
+variables and checked against fresh direct resultant evaluations. All
+systems must use the **same residuals** and the exact recorded curve model.
+
+Keep all returned field solutions, splitting failures, repeated/foreign
+abscissae and group-invalid candidates in separate counters; verify every
+accepted candidate by enumerating its physical signs and adding the four
+points. Reconstruct the complete signed relation set for each `k` and
+residual with an independently keyed group-pair oracle, and demand exact
+set equality before any cost interpretation. Record precomputation,
+per-system Weil restriction, elimination, splitting, peeling and group
+verification counts, plus L0 wall and peak memory. Retain `None`, timeouts
+and OOMs as censored failures. Run an identical A/A repetition; do not call
+this a complete IC or rho speedup. The pilot succeeds only for the `k`
+arms whose four-residual complete signed sets agree; a missing arm stays
+explicitly incomplete. Use an 8-GiB memory cap and 1,200-second watchdog
+per arm. A full polynomial relation stream, same-host msolve/Magma baseline
+and matched one-target rho are separate subsequent gates.
