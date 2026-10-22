@@ -30,6 +30,9 @@ remain outside this table pending validation admission.
 The [retained root11 integration wording](N83_ROOT11_UNADMITTED_20261021.md)
 remains outside this table; the parent’s pre-gate row groups are preserved exactly.
 
+The [retained late N83 stack wording](N83_LATE_STACK_UNADMITTED_20261022.md)
+remains outside this table pending validation admission.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-20 | [`20261020-jv-sieve-strong-rho`](20261020-jv-sieve-strong-rho/) | Retained weak-class IC/rho measurements, 444 rows; original summary replayed exactly | **Comparison withheld:** control acceptance unspecified, original hash charges incomplete, interrupted-attempt costs unavailable. Original PDF/figures preserved; [review qualification](../research/jv_sieve_strong_rho_20261019/review-20261020/README.md) | Original shared cloud host; review is replay only | [`research/jv_sieve_strong_rho_20261019`](../research/jv_sieve_strong_rho_20261019/) |
