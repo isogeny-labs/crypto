@@ -130,8 +130,8 @@ ic solve-cubic \
 The route file can also be an indexed `store:NAME` or `sha256:DIGEST`
 reference. Its schema fixes `field_characteristic` and `cubic_nonresidue`,
 lists bounded short-Weierstrass `curve_nodes` with canonical three-coefficient
-`a` and `b`, and records each edge's source, target, odd prime degree in
-`3..=31`, and affine `kernel_generator`. Each route is a root-origin sequence
+`a` and `b`, and records each edge's source, target, prime degree in
+`2..=31`, and affine `kernel_generator`. Each route is a root-origin sequence
 of edge IDs. The command verifies every node, edge, and route, checks each
 kernel's exact prime order, independently reconstructs the Vélu codomain,
 checks the transported point map against doubling and subgroup order, and
@@ -190,7 +190,7 @@ coverage there.
 
 ### From a cubic j neighbour to a checked IC route
 
-For a neighbour reached by a rational odd-prime kernel, either CLI can
+For a neighbour reached by a rational prime-order kernel, either CLI can
 construct the exact one-hop Vélu route file consumed by `solve-cubic`:
 
 ```sh
@@ -202,11 +202,20 @@ ic solve-cubic \
   --input docs/ic/fixtures/cubic_f7_cofactor12_public_target.json \
   --route-file /tmp/cubic-route.json --route-id root-to-velu3 \
   --seed 1 --max-residuals 1000 --skip-rho --json
+
+ic cubic-route-generate \
+  --input docs/ic/fixtures/cubic_f7_cofactor12_public_target.json \
+  --degree 2 --seed 1 --max-samples 256 --json \
+  > /tmp/cubic-route-2.json
+ic solve-cubic \
+  --input docs/ic/fixtures/cubic_f7_cofactor12_public_target.json \
+  --route-file /tmp/cubic-route-2.json --route-id root-to-velu2 \
+  --seed 1 --max-residuals 1000 --skip-rho --json
 ```
 
 The generator counts the source curve order, checks the supplied public
-points and subgroup, samples a rational kernel of the requested odd-prime
-degree in `3..=31`, and checks the Vélu codomain, point maps and subgroup
+points and subgroup, samples a rational kernel of the requested prime
+degree in `2..=31`, and checks the Vélu codomain, point maps and subgroup
 before returning a route. `--target-j` selects an exact j-invariant from
 `cubic-graph`; omit it to accept the first checked rational-kernel edge.
 The field and subgroup bounds match `solve-cubic`; `--max-samples` is
@@ -222,10 +231,18 @@ scalar 5 on the source and destination. The
 SHA-256 is `fe9e14bfe7e53afa681b1fdad0b41be5e96779930309eb06014f4b269e9ebe0f`.
 The same route generator is exposed through `icx`; both release CLIs
 produced semantically identical route JSON and exited successfully.
+For degree 2, both release generators returned the same kernel edge and
+codomain; `ic solve-cubic` accepted the generated route and verified scalar 5
+on the source and destination. The generator isolates the prime-power
+component of sampled points before selecting a kernel, so a group order
+divisible by the degree more than once does not silently defeat sampling.
 The generated route also passed a live Setec S3 push, HEAD, remote verify,
 fresh-cache `solve-cubic` fetch and scalar replay, exact-object cleanup, and
 final HEAD 404. The isolated prefix and checks are in
 [`GENERATED_CUBIC_ROUTE_S3_ACCEPTANCE_20261021.json`](../store/GENERATED_CUBIC_ROUTE_S3_ACCEPTANCE_20261021.json).
+The degree-2 route passed the same live store path under a separate acceptance
+prefix. Its object key, digest, fetch, replay, and cleanup checks are in
+[`GENERATED_CUBIC_DEGREE2_ROUTE_S3_ACCEPTANCE_20261022.json`](../store/GENERATED_CUBIC_DEGREE2_ROUTE_S3_ACCEPTANCE_20261022.json).
 
 The prime and cubic commands return `bounded_unknown` with a nonzero exit
 status if their configured IC budget ends without a verified scalar. These

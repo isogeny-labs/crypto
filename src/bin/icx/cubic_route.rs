@@ -1,11 +1,11 @@
-//! Checked odd-degree Vélu routes over the exact cubic field supplied to IC.
+//! Checked prime-degree Vélu routes over the exact cubic field supplied to IC.
 
 use clap::Args;
 use crypto_lib::cryptanalysis::gaudry_cubic::{Curve3, Fp3, Pt3, E3};
 use crypto_lib::hash::sha256::sha256;
 use isogeny_algos::curve::{self, Curve, Isogeny, Pt};
 use isogeny_algos::field::{Field, Rng, Zp};
-use isogeny_algos::kernel::velu::velu_from_point;
+use isogeny_algos::kernel::velu::{velu_cyclic, velu_from_point, VeluIso};
 use isogeny_algos::path::graph::{self, PhiCache};
 use serde::Deserialize;
 use serde_json::{json, Value};
@@ -45,7 +45,7 @@ pub(super) struct GenerateArgs {
     /// Public cubic target JSON, local or a checked store reference.
     #[arg(long)]
     input: std::path::PathBuf,
-    /// Odd prime degree for the rational Vélu kernel (3..=31).
+    /// Prime degree for the rational Vélu kernel (2..=31).
     #[arg(long)]
     degree: u64,
     /// Optional target j-invariant as three canonical cubic-field coefficients.
@@ -97,16 +97,28 @@ fn cubic_order(f: &CubicField, curve: &Curve<E3>) -> u64 {
     order
 }
 
+fn kernel_isogeny(
+    f: &CubicField,
+    curve: &Curve<E3>,
+    kernel: &Pt<E3>,
+    degree: u64,
+) -> VeluIso<CubicField> {
+    if degree == 2 {
+        velu_cyclic(f, curve, kernel, degree)
+    } else {
+        velu_from_point(f, curve, kernel, degree)
+    }
+}
+
 /// Construct a one-hop rational-kernel route in the exact schema accepted by
 /// `solve-cubic`. A j-neighbour without a rational kernel may be unreachable
 /// by this constructor; the bounded search reports that outcome explicitly.
 pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
-    if !(3..=31).contains(&args.degree)
-        || args.degree.is_multiple_of(2)
+    if !(2..=31).contains(&args.degree)
         || !prime(args.degree)
         || !(1..=10_000).contains(&args.max_samples)
     {
-        return Err("degree must be an odd prime in 3..=31 and max-samples in 1..=10000".into());
+        return Err("degree must be prime in 2..=31 and max-samples in 1..=10000".into());
     }
     let resolved = crypto_lib::store::resolve_path(&args.input)?;
     if std::fs::metadata(&resolved)
@@ -167,16 +179,29 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
             "route degree or DLP subgroup order does not divide counted curve order".into(),
         );
     }
-    let cofactor = order / args.degree;
+    let mut cofactor = order;
+    let mut valuation = 0;
+    while cofactor.is_multiple_of(args.degree) {
+        cofactor /= args.degree;
+        valuation += 1;
+    }
     let mut rng = Rng::new(args.seed);
     for _ in 0..args.max_samples {
         let sampled = curve::random_point_f(&f, &curve, &mut rng);
-        let kernel = curve::pmul(&f, &curve, &sampled, u128::from(cofactor));
+        let mut kernel = curve::pmul(&f, &curve, &sampled, u128::from(cofactor));
+        for _ in 1..valuation {
+            if kernel == Pt::Inf
+                || curve::pmul(&f, &curve, &kernel, u128::from(args.degree)) == Pt::Inf
+            {
+                break;
+            }
+            kernel = curve::pmul(&f, &curve, &kernel, u128::from(args.degree));
+        }
         if kernel == Pt::Inf || curve::pmul(&f, &curve, &kernel, u128::from(args.degree)) != Pt::Inf
         {
             continue;
         }
-        let iso = velu_from_point(&f, &curve, &kernel, args.degree);
+        let iso = kernel_isogeny(&f, &curve, &kernel, args.degree);
         if !curve::is_smooth(&f, &iso.cod) {
             continue;
         }
@@ -497,9 +522,8 @@ pub(super) fn transport(
         if edge.id.is_empty() || edge_by_id.insert(edge.id.as_str(), edge).is_some() {
             return Err("cubic route has an empty or duplicate edge id".into());
         }
-        if !(3..=31).contains(&edge.degree) || edge.degree.is_multiple_of(2) || !prime(edge.degree)
-        {
-            return Err("cubic route degree must be an odd prime in 3..=31".into());
+        if !(2..=31).contains(&edge.degree) || !prime(edge.degree) {
+            return Err("cubic route degree must be prime in 2..=31".into());
         }
         if edge.degree == source.n {
             return Err("cubic route degree equals the DLP subgroup order".into());
@@ -522,7 +546,7 @@ pub(super) fn transport(
                 edge.id
             ));
         }
-        let isogeny = velu_from_point(&f, domain, &kernel, edge.degree);
+        let isogeny = kernel_isogeny(&f, domain, &kernel, edge.degree);
         if &isogeny.cod != codomain {
             return Err(format!("cubic route edge {} has a wrong codomain", edge.id));
         }
@@ -564,7 +588,7 @@ pub(super) fn transport(
         let domain = nodes[&current_ref];
         let codomain = nodes[&edge.target_curve_ref.as_str()];
         let kernel = Pt::Aff(E3(edge.kernel_generator[0]), E3(edge.kernel_generator[1]));
-        let isogeny = velu_from_point(&f, &domain, &kernel, edge.degree);
+        let isogeny = kernel_isogeny(&f, &domain, &kernel, edge.degree);
         for point in [g, q] {
             let before = curve::padd(&f, &domain, &point, &point);
             let after = isogeny.eval(&f, &point);
@@ -789,6 +813,41 @@ mod tests {
         assert!(!actual.is_empty());
         assert_eq!(actual, expected);
         assert_eq!(report["truncated"], omitted);
+    }
+
+    #[test]
+    fn generated_degree_two_route_transports_public_scalar() {
+        let input = Path::new(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/docs/ic/fixtures/cubic_f7_cofactor12_public_target.json"
+        ));
+        let graph = generate(&GenerateArgs {
+            input: input.to_path_buf(),
+            degree: 2,
+            target_j: None,
+            seed: 1,
+            max_samples: 256,
+        })
+        .unwrap();
+        let path = std::env::temp_dir().join(format!(
+            "cubic-degree-two-route-{}-{}.json",
+            std::process::id(),
+            line!()
+        ));
+        std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
+        let field = Fp3::with_cube_nonresidue(7, 2).unwrap();
+        let generator = Pt3::affine(E3([1, 2, 3]), E3([1, 1, 6]));
+        let target = Pt3::affine(E3([3, 4, 6]), E3([1, 3, 5]));
+        let source = Curve3::new(field, E3([3, 6, 4]), E3([4, 4, 6]), 29, generator);
+        let mapped = transport(&source, target, &path, "root-to-velu2").unwrap();
+        std::fs::remove_file(path).unwrap();
+        assert_eq!(mapped.curve.mul(&mapped.curve.g, 5), mapped.target);
+        assert_eq!(mapped.receipt["edges_verified"], 1);
+        let f = CubicField { p: 7, c: 2 };
+        let source_j = curve::jinv(&f, &Curve::new(source.a, source.b));
+        let destination_j = curve::jinv(&f, &Curve::new(mapped.curve.a, mapped.curve.b));
+        let phi = PhiCache::new(&Zp::new(7), &[2]).lift(|v| E3([v, 0, 0]));
+        assert_eq!(phi.get(2).eval(&f, source_j, destination_j), Fp3::ZERO);
     }
 
     #[test]
