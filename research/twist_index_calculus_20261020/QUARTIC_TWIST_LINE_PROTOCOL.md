@@ -249,3 +249,150 @@ representatives, histogram and canonical hash-key count. Re-run once
 and require every non-timing field to agree. Hash probes, allocator
 bytes and whole-method performance are outside this bounded structural
 and oracle test; it makes no rho or polynomial-system speed claim.
+
+## Registered action-tagged pair index
+
+Frozen after the direct canonical quotient showed identical relation sets
+but high per-query canonicalization cost, before building the tagged index.
+Compare the repository's full signed-pair hash table with a new index that
+stores one pair tuple per orbit and indexes every transformed pair-sum
+abscissa by a compact `(orbit, action, y-sign)` posting. Use the same
+point action, deterministic factor signs and four-distinct-factor rule.
+The tagged lookup must not compute a canonical orbit key per query: it
+looks up the required sum's actual abscissa, checks its stored y sign,
+and reconstructs the pair terms from the action tag. Use the coordinate
+Frobenius with its scalar/monomial multipliers, not a generic `Fp⁴`
+multiplication. Audit the action maps and all reconstructed pair sums.
+
+Run two frozen workloads: (1) all seven residuals from the prior p=13
+two-dimensional seed-zero pilot, using its exact recorded base and target;
+(2) the **first three** seed-zero `p=37,b0=2` residuals from the
+single-line record in `quartic_twist_mixed_v1.ndjson`, on the full
+two-dimensional `Fp+t²Fp` base. For (2), retain the signed line-0 and
+line-2 points from the paired union record, then lift every interior
+`a+b t²` abscissa in lexical order using `StdRng` seed
+`0x5441_4747_0000_0037`. Verify the resulting base size against the
+registered census (624) and verify curve/order/action closure.
+
+For each workload, require exact equality of the **entire signed
+four-factor decomposition sets** from full and tagged oracles on every
+target. Preserve every failure, mismatch and timeout. Count each arm's
+table setup and target-query `Fp` multiplications and group operations,
+the number of retained pair tuples, postings and abscissa keys, and
+lookup comparisons. Instrument allocator-requested live and peak bytes
+for each table's retained structure, including tagged action maps, orbit
+tuples and index; report them as requested-byte counts, not RSS. Keep
+common base/model/target work separate. Run full and tagged arms in one
+process with identical inputs, then a complete A/A rerun; compare all
+non-timing fields including allocator-requested bytes. Use a 600-second
+watchdog and 8 GiB virtual-memory cap per workload. Shared-host L0
+times are diagnostic only; do not claim an isolated whole-method or
+external-tool speed result.
+
+## Registered hash-key variant of the tagged pair index
+
+Frozen after both ordered-index workloads and their A/A checks passed, and
+before editing the implementation. Repeat the identical p=13 and p=37
+workloads above with the same action map, pair-orbit representatives,
+postings, y-sign check, allocator instrument and full-table reference.
+Replace only binary search over sorted abscissa keys with a hash map from
+actual pair-sum abscissa to the same compact key index. Build the map in
+charged table setup, include its retained and peak requested bytes, and
+count hash lookups and candidate postings. Require exact equality of all
+four-factor decomposition sets, independent pair-posting audit, and a
+complete non-timing A/A check. Report setup plus all registered query
+operation counts and shared-host L0 times for both arms; distinguish a
+component setup win from a complete one-target IC or rho speedup.
+
+## Registered direct-posting query variant
+
+Frozen after the hash-key variant and its A/A checks, before code changes.
+Repeat the same two frozen workloads and full-table reference. Keep the
+orbit-representative setup: perform only one elliptic addition per 12-action
+pair orbit and obtain all other pair sums from the action. During setup,
+resolve each `(representative, action)` to a compact `(i,j,s,y-sign)`
+posting and discard the query-time action map. Look up by actual abscissa
+through the same hash-key index. Charge posting expansion in setup and
+include the full retained index, representatives and hash map in requested
+bytes. Require exact full signed decomposition-set equality, independent
+posting-sum audit and non-timing A/A. Report setup/query counts and L0
+times separately and in total. The purpose is to test whether the
+symmetry-derived setup saving survives a lower-overhead query path;
+there is no whole-method or rho speed claim from this oracle comparison.
+
+## Registered p=37 full two-dimensional exact-oracle IC pilot
+
+Frozen after the three pair-index variants completed and passed A/A, before
+the p=37 solver was built. On the canonical p=37, b0=2 twist with prime
+subgroup order 1,873,633, use the exact 624-point base and signs from the
+tagged-index p=37 protocol: 48 axis points from the seed-zero L0/L2 union
+record, then 576 interior points lifted lexically with `StdRng` seed
+`0x5441_4747_0000_0037`. Re-lift every axis abscissa with `StdRng`
+seed `0x5441_4747_4158_0037`, check its y-coordinate up to sign against
+the recorded axis point, retain the recorded sign, and charge this axis
+work to base construction. The generator and sole target `[271]G` are the
+same as the mixed-line panel. Compute both twist eigenvalues, check all
+52 folded factor columns by group multiplication, and use the same signed
+four-factor full pair-table oracle. Generate the residual stream with
+`StdRng(seed ^ p.rotate_left(17) ^ 0x7A12_0A02)`, seed zero; assert that
+its first three `(a,b)` pairs match the frozen seed-zero single-line
+record. Select one decomposition from each successful residual using
+`StdRng(0x1A4F_01D5)`, re-add it, and solve all 52 factor columns plus
+the target coefficient over the prime subgroup order. Stop at full rank
+or 256 processed residuals; preserve failure at the cap. Verify the target
+scalar and every solved factor log by group multiplication. Record all
+processed `(a,b,hit-count)` tuples, selected signed terms, row, rank,
+phase-by-phase `Fp` multiplications and group operations, modular row
+operations, shared-host L0 wall time and the common base/target identity.
+Run A/A and require exact equality of every non-timing field. This is an
+exact group-oracle pilot; it does not measure the polynomial `S5` solve,
+hash/allocator work, isolated wall time or matched rho band.
+
+## Registered p=37 full-stream tagged pair-index replay
+
+Frozen after the p=37 full-2D pilot reached rank 53 and its A/A matched,
+before implementation. Reuse exactly that pilot's 624 signed points and
+all 53 recorded residual `(a,b)` pairs. Compare the existing full signed
+pair table with the direct-posting tagged construction, using the same
+actual-abscissa hash lookup and one group addition per pair orbit as in
+the three-query registered experiment. Demand equality of the *entire*
+signed four-factor decomposition set for each of the 53 residuals and
+audit every posting by a separate group addition. Record setup and
+53-query field multiplications, group operations, live and peak requested
+bytes, hash lookups, candidate postings and shared-host L0 times. A/A
+must match every non-timing field. Use a 600-second watchdog and 8 GiB
+virtual-memory cap per run. Do not combine this table replacement with
+matrix, base or rho costs from another run into a claimed cold speedup;
+report any arithmetic projection explicitly as a derived partial cost.
+
+## Registered dense same-residual relation extraction
+
+Frozen after observing the p=37 full-2D 53-query run and its 53-residual
+pair-index replay, before the dense extractor is built. Reuse the exact
+public target `[271]G`, subgroup orders, signed bases, orbit maps and
+seed-zero residual stream from the p=13 and p=37 full-2D pilots. On each
+curve, enumerate **all** signed four-distinct-factor decompositions of the
+first residual with the existing full pair-table oracle. Process them in
+the oracle's deterministic lexicographic order. Turn every decomposition
+into the target/factor-log matrix equation. Audit the unanchored rank
+(all factor logs plus target) on the complete first-query decomposition
+set. Then use the public fact that the first base point is the generator:
+fix its folded factor log to 1, move that column's coefficient to the
+right side, and solve only the remaining factor logs plus target. This
+anchor must be checked by group multiplication and cannot use the known
+target scalar. Re-add each accepted relation as a group check; retain a
+row only when it raises anchored rank. If the first residual does not
+reach anchored full rank, continue the same frozen residual stream for at
+most 64 queries. The oracle enumerates the complete decomposition set for
+each queried residual even if rank is reached early. Stop at anchored
+rank 6 (p=13) or 52 (p=37), solve, and verify the target scalar and every
+factor log by group multiplication. Record complete per-query hit counts,
+unanchored first-query rank, total decompositions scanned before anchored
+full rank, accepted signed rows, rank trajectory, all phase-by-phase field
+multiplications and group operations, modular matrix operations, retained
+query count and L0 wall time. Re-run A/A and independently replay the
+accepted equations, rank and answer from the recorded signed base using
+a second elimination method and all-group-log enumeration. The oracle's
+complete first-query hit count must agree with the earlier p=13/p=37
+records. This tests dense extraction plus a public known-log anchor; it
+does not price polynomial S5, hash/allocator work or matched rho.

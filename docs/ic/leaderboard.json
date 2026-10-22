@@ -106,6 +106,54 @@
    "path": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
    "sha256": "e6f6f56f9db4c125e23e22009247e80e60386238108db8822f20efc2e1fdd8aa"
   },
+  "quartic_tagged_p13": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json",
+   "sha256": "02427944511bd86f99e291309e889c76276bc14becc38c695c3c775796de2c46"
+  },
+  "quartic_tagged_p37": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json",
+   "sha256": "706bc2efaf2c1a36ec7f98518cc2786ffbdb087d9fe7bdf46c83388edbe8c2a5"
+  },
+  "quartic_tagged_p13_aa": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json",
+   "sha256": "baddefec00f04f0be11f9a8b9f747ffcb7ebfc281c15c7010eaf816048590a92"
+  },
+  "quartic_tagged_p37_aa": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_aa_v1.json",
+   "sha256": "cc75cb1f1142b94eb3c620d40edc06550f46bab8ebe826b270b5bb5296f1a068"
+  },
+  "quartic_dense_p13": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p13_v1.json",
+   "sha256": "c0c3241972033c413c5c1ebee81cfb16355a95460cd7196e4affdf85e231063a"
+  },
+  "quartic_dense_p37": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_v1.json",
+   "sha256": "36f7ae42554bccfbf11a131c6cf08786968230e1a245d1b47a868f0041009685"
+  },
+  "quartic_dense_p13_aa": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p13_aa_v1.json",
+   "sha256": "09adc53846bc84a2684ced67c95a427842bc9235f1d79711eef387bd038be760"
+  },
+  "quartic_dense_p37_aa": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_aa_v1.json",
+   "sha256": "c57f5dd8935f064e4ba4bffdcbd27d881839a54e48fae8b99667fe7e9228936b"
+  },
+  "quartic_dense_p13_audit": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p13_native_audit_v1.json",
+   "sha256": "ce24ff067aab1408c8f86f78760bb0c3aec4f67934e219b41a80b5ea811b3309"
+  },
+  "quartic_dense_p37_audit": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_native_audit_v1.json",
+   "sha256": "4a2eda5132b9609a778935e1fd8b9009662ae14a1034448ba488297848d5ae67"
+  },
+  "quartic_dense_p13_prior": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_2d_p13_v1.json",
+   "sha256": "05521665d6596151e5ed5f7697aca30c999d47f10d873f31b1038e0d7126f6f3"
+  },
+  "quartic_dense_p37_prior": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_2d_p37_v1.json",
+   "sha256": "4f5903b1e127b14914e63f87f6598254b0dc0aa10427c736d6987b8fdf00dc6c"
+  },
   "planner_validation": {
    "path": "research/ic_planner_validation_20261020/analysis/summary.json",
    "sha256": "c8fb751cea39e55ebd1b322245c95a958ae8b47d393c6b6918abddcd2d4234fc"
@@ -128,7 +176,7 @@
   },
   "registry": {
    "path": "docs/curves/registry.json",
-   "sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf"
+   "sha256": "8f60ef230aea092ebcf5821531ac4e79c8200a941b08730b1b3977e692a9b110"
   },
   "curves_schema": {
    "path": "docs/curves/ic/curves.schema.json",
@@ -11780,6 +11828,24 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp7-tm5-7bc8be1d",
+   "family": "prime",
+   "field": "GF(p), p = 101",
+   "coefficients": "a = 3, b = 17",
+   "order_bits": 7,
+   "standard": [],
+   "ec1": [
+    "EC1P7Cfphf080843839af"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "mixed twist IC p101"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp7-t2-4910f2d0",
    "family": "prime",
    "field": "GF(p), p = 113",
@@ -11789,6 +11855,24 @@
    "ec1": [],
    "ec1_unresolved": "no tracked record carries this model's subgroup and generator",
    "legacy": [],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp8-tm11-e7c21318",
+   "family": "prime",
+   "field": "GF(p), p = 211",
+   "coefficients": "a = 1, b = 1",
+   "order_bits": 8,
+   "standard": [],
+   "ec1": [
+    "EC1P8Cfphe8fbff65cf23"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "mixed twist IC p211"
+   ],
    "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
@@ -11808,6 +11892,42 @@
    "factor_base_link_status": "no_curves_yaml_record"
   },
   {
+   "slug": "icv1-fp9-tm23-2397caf5",
+   "family": "prime",
+   "field": "GF(p), p = 307",
+   "coefficients": "a = 1, b = 6",
+   "order_bits": 9,
+   "standard": [],
+   "ec1": [
+    "EC1P9Cfph04557e27ffa9"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "mixed twist IC p307"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp9-t7-adc82bdc",
+   "family": "prime",
+   "field": "GF(p), p = 509",
+   "coefficients": "a = 1, b = 17",
+   "order_bits": 9,
+   "standard": [],
+   "ec1": [
+    "EC1P9Cfph02f4cf5d30d2"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "mixed twist IC p509"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
    "slug": "icv1-fp10-t5-192cb216",
    "family": "prime",
    "field": "GF(p), p = 827",
@@ -11822,6 +11942,42 @@
     "bench-10bit"
    ],
    "on_board": true,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp10-tm3-e1039cbb",
+   "family": "prime",
+   "field": "GF(p), p = 1009",
+   "coefficients": "a = 1, b = 14",
+   "order_bits": 10,
+   "standard": [],
+   "ec1": [
+    "EC1P10Cfphed757a4fa5e3"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "mixed twist IC p1009"
+   ],
+   "on_board": false,
+   "curves_yaml_key": null,
+   "factor_base_link_status": "no_curves_yaml_record"
+  },
+  {
+   "slug": "icv1-fp11-t71-7618c703",
+   "family": "prime",
+   "field": "GF(p), p = 2003",
+   "coefficients": "a = 2, b = 15",
+   "order_bits": 11,
+   "standard": [],
+   "ec1": [
+    "EC1P11Cfphf26bffe8399a"
+   ],
+   "ec1_unresolved": null,
+   "legacy": [
+    "mixed twist IC p2003"
+   ],
+   "on_board": false,
    "curves_yaml_key": null,
    "factor_base_link_status": "no_curves_yaml_record"
   },
@@ -49923,6 +50079,76 @@
   "study": "research/ic_oracle_setup_blocked_20261020/",
   "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
   "class": "engineering"
+ },
+ "quartic_twist_pair_component": {
+  "rows": [
+   {
+    "p": 13,
+    "base_points": 72,
+    "full_pair_entries": 5112,
+    "tagged_pair_representatives": 426,
+    "full_setup_fp_muls": 495864,
+    "tagged_setup_fp_muls": 154922,
+    "full_setup_group_ops": 5112,
+    "tagged_setup_group_ops": 426,
+    "full_query_fp_muls": 7029782,
+    "tagged_query_fp_muls": 7029782,
+    "full_table_live_requested_bytes": 1273360,
+    "tagged_table_live_requested_bytes": 681932,
+    "queries": 7
+   },
+   {
+    "p": 37,
+    "base_points": 624,
+    "full_pair_entries": 388752,
+    "tagged_pair_representatives": 32396,
+    "full_setup_fp_muls": 37708944,
+    "tagged_setup_fp_muls": 7796605,
+    "full_setup_group_ops": 388752,
+    "tagged_setup_group_ops": 32396,
+    "full_query_fp_muls": 226616754,
+    "tagged_query_fp_muls": 226616754,
+    "full_table_live_requested_bytes": 91007248,
+    "tagged_table_live_requested_bytes": 47721464,
+    "queries": 3
+   }
+  ],
+  "class": "counted component improvement; no priced IC/rho row",
+  "study": "research/twist_index_calculus_20261020/",
+  "report": "research/twist_index_calculus_20261020/QUARTIC_TWIST24_REPORT.pdf"
+ },
+ "quartic_dense_component": {
+  "rows": [
+   {
+    "p": 13,
+    "base_points": 72,
+    "folded_columns": 6,
+    "before_queries": 7,
+    "after_queries": 1,
+    "first_query_decompositions": 561,
+    "candidates_to_rank": 6,
+    "before_fp_muls": 8096696,
+    "after_fp_muls": 2045670,
+    "before_group_ops": 81076,
+    "after_group_ops": 18609
+   },
+   {
+    "p": 37,
+    "base_points": 624,
+    "folded_columns": 52,
+    "before_queries": 53,
+    "after_queries": 1,
+    "first_query_decompositions": 53551,
+    "candidates_to_rank": 115,
+    "before_fp_muls": 4048104018,
+    "after_fp_muls": 119740945,
+    "before_group_ops": 41702654,
+    "after_group_ops": 1204356
+   }
+  ],
+  "class": "counted exact-oracle one-target improvement; no priced IC/rho row",
+  "study": "research/twist_index_calculus_20261020/",
+  "report": "research/twist_index_calculus_20261020/QUARTIC_TWIST24_REPORT.pdf"
  },
  "planner_component": {
   "rows": [

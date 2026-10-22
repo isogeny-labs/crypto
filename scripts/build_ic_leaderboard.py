@@ -74,6 +74,18 @@ SOURCES = {
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
+    "quartic_tagged_p13": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json",
+    "quartic_tagged_p37": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json",
+    "quartic_tagged_p13_aa": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json",
+    "quartic_tagged_p37_aa": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_aa_v1.json",
+    "quartic_dense_p13": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p13_v1.json",
+    "quartic_dense_p37": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_v1.json",
+    "quartic_dense_p13_aa": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p13_aa_v1.json",
+    "quartic_dense_p37_aa": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_aa_v1.json",
+    "quartic_dense_p13_audit": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p13_native_audit_v1.json",
+    "quartic_dense_p37_audit": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_native_audit_v1.json",
+    "quartic_dense_p13_prior": "research/twist_index_calculus_20261020/quartic_twist_2d_p13_v1.json",
+    "quartic_dense_p37_prior": "research/twist_index_calculus_20261020/quartic_twist_2d_p37_v1.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
@@ -640,6 +652,75 @@ def pair_table_component() -> dict:
             "class": "engineering"}
 
 
+def quartic_twist_pair_component() -> dict:
+    """Copy the frozen exact-oracle component results, outside priced IC rows."""
+    rows = []
+    timing = {"full_setup_ms_l0", "full_query_ms_l0", "tagged_setup_ms_l0", "tagged_query_ms_l0"}
+    for prime in (13, 37):
+        record = load(SOURCES[f"quartic_tagged_p{prime}"])
+        replay = load(SOURCES[f"quartic_tagged_p{prime}_aa"])
+        if ({k: v for k, v in record.items() if k not in timing}
+                != {k: v for k, v in replay.items() if k not in timing}):
+            raise SystemExit(f"quartic tagged pair p={prime}: A/A mismatch")
+        if (record["status"] != "pass" or record["p"] != prime
+                or any(not query["sets_equal"] for query in record["queries"])
+                or record["full_pair_entries"] != record["tagged_postings"]
+                or record["full_pair_entries"] != 12 * record["tagged_pair_representatives"]
+                or record["full_query_fp_muls"] != record["tagged_query_fp_muls"]
+                or record["full_query_group_ops"] != record["tagged_query_group_ops"]):
+            raise SystemExit(f"quartic tagged pair p={prime}: incomplete/equality failure")
+        rows.append({k: record[k] for k in (
+            "p", "base_points", "full_pair_entries", "tagged_pair_representatives",
+            "full_setup_fp_muls", "tagged_setup_fp_muls", "full_setup_group_ops",
+            "tagged_setup_group_ops", "full_query_fp_muls", "tagged_query_fp_muls",
+            "full_table_live_requested_bytes", "tagged_table_live_requested_bytes")}
+                    | {"queries": len(record["queries"])})
+    return {"rows": rows, "class": "counted component improvement; no priced IC/rho row",
+            "study": "research/twist_index_calculus_20261020/",
+            "report": "research/twist_index_calculus_20261020/QUARTIC_TWIST24_REPORT.pdf"}
+
+
+def quartic_dense_component() -> dict:
+    """Copy the audited one-target exact-oracle before/after counts."""
+    rows = []
+    phases = ("model", "base", "input", "eigen", "map", "table", "stream", "verification")
+    for prime, order in ((13, 28_753), (37, 1_873_633)):
+        after = load(SOURCES[f"quartic_dense_p{prime}"])
+        repeat = load(SOURCES[f"quartic_dense_p{prime}_aa"])
+        before = load(SOURCES[f"quartic_dense_p{prime}_prior"])
+        audit = load(SOURCES[f"quartic_dense_p{prime}_audit"])
+        if ({k: v for k, v in after.items() if k != "wall_ms_l0"}
+                != {k: v for k, v in repeat.items() if k != "wall_ms_l0"}):
+            raise SystemExit(f"quartic dense p={prime}: A/A mismatch")
+        if (after["status"] != "pass" or after["p"] != prime or after["n"] != order
+                or after["residuals"] != 1 or after["recovered"] != 271
+                or before["recovered"] != 271
+                or after["query_trace"][0] != before["query_trace"][0]
+                or after["rank"] != after["folded_columns"]
+                or after["unanchored_rank_first_query"] != after["folded_columns"]
+                or len(after["selected_relations"]) != after["folded_columns"]
+                or after["known_log_column"] != 0 or after["known_log_value"] != 1
+                or audit["status"] != "pass" or audit["recovered"] != 271
+                or audit["anchored_rank"] != after["rank"]
+                or audit["decompositions_replayed"] != after["decompositions"]
+                or audit["point_logs_enumerated"] != order):
+            raise SystemExit(f"quartic dense p={prime}: audit/rank mismatch")
+        def count(data, unit):
+            return sum(data.get(f"{phase}_{unit}", 0) for phase in phases)
+        rows.append({"p": prime, "base_points": after["physical_base"],
+                     "folded_columns": after["folded_columns"],
+                     "before_queries": before["residuals"], "after_queries": after["residuals"],
+                     "first_query_decompositions": after["decompositions"],
+                     "candidates_to_rank": after["decompositions_examined_to_rank"],
+                     "before_fp_muls": count(before, "fp_muls"),
+                     "after_fp_muls": count(after, "fp_muls"),
+                     "before_group_ops": count(before, "group_ops"),
+                     "after_group_ops": count(after, "group_ops")})
+    return {"rows": rows, "class": "counted exact-oracle one-target improvement; no priced IC/rho row",
+            "study": "research/twist_index_calculus_20261020/",
+            "report": "research/twist_index_calculus_20261020/QUARTIC_TWIST24_REPORT.pdf"}
+
+
 PLANNER_ARMS = ["half-base", "double-base", "rootfind", "full-rank", "random-targets"]
 
 
@@ -1179,6 +1260,8 @@ def build(allow_unvalidated: bool = False) -> dict:
         "conductor_gap_count_diagnostic": load(SOURCES["conductor_gap_counts"]),
         "linear_algebra_component": la_component(),
         "pair_table_component": pair_table_component(),
+        "quartic_twist_pair_component": quartic_twist_pair_component(),
+        "quartic_dense_component": quartic_dense_component(),
         "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
@@ -1571,6 +1654,47 @@ def markdown(doc: dict) -> str:
         L.append(f"| {r['N']:,} | {pts(r['setup_ms']['scalar'])} | {pts(r['setup_ms']['batch'])} | "
                  f"{pts(r['setup_ms']['blocked'])} | {ptr(r['blocked_over_batch'])} | {ptr(r['blocked_over_scalar'])} | "
                  f"{r['run_blocked_over_scalar']:.2f} | {r['rss_gib']['batch']:.2f} → {r['rss_gib']['blocked']:.2f} GiB |")
+    L.append("")
+    qt = doc["quartic_twist_pair_component"]
+    L += ["## Quartic-twist pair index, outside tables A–C", "",
+          "Exact signed four-factor group oracle on the canonical quartic twist. A 12-action pair orbit "
+          "constructs all physical pair-sum keys from one elliptic addition; the direct-posting "
+          "candidate is compared with the existing full hash table on identical residuals "
+          "(class: counted component improvement). Every full signed decomposition set matches; "
+          "all postings passed a separate group-addition audit and the non-timing A/A records "
+          "are identical. The query counts below are the same in both arms. Setup and retained "
+          "allocator-requested bytes improve, but hash CPU, an isolated native-time comparison, "
+          "a complete polynomial IC pipeline and a matched rho band are absent. No priced row moves. "
+          f"Study: [{qt['study']}](../../{qt['study']}).", "",
+          "| p | base | residuals | full / tagged setup Fp M | full / tagged setup group ops | full / tagged query Fp M | full / tagged retained requested bytes |",
+          "|--:|--:|--:|:--|:--|:--|:--|"]
+    for r in qt["rows"]:
+        L.append(f"| {r['p']} | {r['base_points']:,} | {r['queries']} | "
+                 f"{r['full_setup_fp_muls']:,} / {r['tagged_setup_fp_muls']:,} | "
+                 f"{r['full_setup_group_ops']:,} / {r['tagged_setup_group_ops']:,} | "
+                 f"{r['full_query_fp_muls']:,} / {r['tagged_query_fp_muls']:,} | "
+                 f"{r['full_table_live_requested_bytes']:,} / {r['tagged_table_live_requested_bytes']:,} |")
+    L.append("")
+    qd = doc["quartic_dense_component"]
+    L += ["## Quartic-twist dense same-residual oracle, outside tables A–C", "",
+          "One public target `[271]G` per canonical quartic twist. The reference retains one "
+          "exact four-factor relation per residual and treats all factor logs as unknown; "
+          "the candidate retains rank-raising rows from the first residual and fixes the "
+          "public generator's factor log to 1 (class: counted exact-oracle improvement). "
+          "A separate point-keyed signed-pair oracle replayed complete first-query counts, "
+          "selected rows, rank and answer; all subgroup logs were enumerated, and A/A "
+          "non-timing records match. Counted path totals include model, base, input, "
+          "eigen/map, full pair table, relation stream and answer checks. These are not "
+          "polynomial S5, isolated native-time or matched rho results; no priced row moves. "
+          f"Study: [{qd['study']}](../../{qd['study']}).", "",
+          "| p | base / folded columns | residuals before → after | first-query decompositions / scanned to rank | total Fp M before → after | total group ops before → after |",
+          "|--:|:--|:--|:--|:--|:--|"]
+    for r in qd["rows"]:
+        L.append(f"| {r['p']} | {r['base_points']:,} / {r['folded_columns']} | "
+                 f"{r['before_queries']} → {r['after_queries']} | "
+                 f"{r['first_query_decompositions']:,} / {r['candidates_to_rank']} | "
+                 f"{r['before_fp_muls']:,} → {r['after_fp_muls']:,} | "
+                 f"{r['before_group_ops']:,} → {r['after_group_ops']:,} |")
     L.append("")
     pl = doc["planner_component"]
 
@@ -2056,6 +2180,52 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{pq(r["blocked_over_batch"])}</td><td>{pq(r["blocked_over_scalar"])}</td>'
                  f'<td class="n">{r["run_blocked_over_scalar"]:.2f}</td>'
                  f'<td>{r["rss_gib"]["batch"]:.2f} → {r["rss_gib"]["blocked"]:.2f} GiB</td></tr>')
+    P.append('</tbody></table></section>')
+
+    qt = doc["quartic_twist_pair_component"]
+    P.append('<section class="card" id="quartic-twist-pair-component"><h2>Quartic-twist pair index, outside the priced tables</h2>'
+             '<p>Exact signed four-factor group oracle on the canonical quartic twist. The 12-action '
+             'pair orbit constructs all physical pair-sum keys from one elliptic addition. The '
+             'direct-posting candidate and existing full hash table use identical residuals '
+             '(class: counted component improvement). Every complete signed decomposition set matches; '
+             'all postings passed a separate group-addition audit and non-timing A/A records are identical. '
+             'Setup and retained allocator-requested bytes improve. An isolated native-time result, full '
+             'polynomial IC pipeline and matched rho band are absent; no priced row moves. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(qt["study"])}">Study</a>.</p>')
+    P.append('<table><thead><tr><th class="n">p</th><th class="n">base</th><th class="n">residuals</th>'
+             '<th>full / tagged setup Fp M</th><th>full / tagged setup group ops</th>'
+             '<th>full / tagged query Fp M</th><th>full / tagged retained requested bytes</th>'
+             '</tr></thead><tbody>')
+    for r in qt["rows"]:
+        P.append(f'<tr><td class="n">{r["p"]}</td><td class="n">{r["base_points"]:,}</td>'
+                 f'<td class="n">{r["queries"]}</td>'
+                 f'<td>{r["full_setup_fp_muls"]:,} / {r["tagged_setup_fp_muls"]:,}</td>'
+                 f'<td>{r["full_setup_group_ops"]:,} / {r["tagged_setup_group_ops"]:,}</td>'
+                 f'<td>{r["full_query_fp_muls"]:,} / {r["tagged_query_fp_muls"]:,}</td>'
+                 f'<td>{r["full_table_live_requested_bytes"]:,} / {r["tagged_table_live_requested_bytes"]:,}</td></tr>')
+    P.append('</tbody></table></section>')
+
+    qd = doc["quartic_dense_component"]
+    P.append('<section class="card" id="quartic-dense-component"><h2>Quartic-twist dense same-residual oracle, outside the priced tables</h2>'
+             '<p>One public target <code>[271]G</code> per canonical quartic twist. The reference keeps one exact '
+             'four-factor relation per residual and treats all factor logs as unknown. The candidate retains '
+             'rank-raising rows from the first residual and fixes the public generator factor log to 1 '
+             '(class: counted exact-oracle improvement). A separate point-keyed signed-pair oracle replayed '
+             'complete first-query counts, selected rows, rank and answer; all subgroup logs were enumerated, '
+             'and A/A non-timing records match. Counted path totals include model, base, input, eigen/map, full '
+             'pair table, relation stream and answer checks. Polynomial S5, isolated native time and matched rho '
+             'remain unpriced; no priced row moves. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(qd["study"])}">Study</a>.</p>')
+    P.append('<table><thead><tr><th class="n">p</th><th>base / folded columns</th>'
+             '<th>residuals before → after</th><th>first-query decompositions / scanned to rank</th>'
+             '<th>total Fp M before → after</th><th>total group ops before → after</th></tr></thead><tbody>')
+    for r in qd["rows"]:
+        P.append(f'<tr><td class="n">{r["p"]}</td>'
+                 f'<td>{r["base_points"]:,} / {r["folded_columns"]}</td>'
+                 f'<td>{r["before_queries"]} → {r["after_queries"]}</td>'
+                 f'<td>{r["first_query_decompositions"]:,} / {r["candidates_to_rank"]}</td>'
+                 f'<td>{r["before_fp_muls"]:,} → {r["after_fp_muls"]:,}</td>'
+                 f'<td>{r["before_group_ops"]:,} → {r["after_group_ops"]:,}</td></tr>')
     P.append('</tbody></table></section>')
 
     pl = doc["planner_component"]

@@ -6,7 +6,7 @@
 22 October 2026. Full source-linked record: `QUARTIC_TWIST24_REPORT.md`.
 
 == Question and protocol
-We tested a transported Frobenius on a quadratic twist over $F_(p^4)$, combined it with the cubic $j=0$ automorphism, and measured both an unchanged physical factor base and the union of two invariant abscissa lines. Seven positive toy curves, three seeds, one public target $[271]G$ per run; the $p=13$ empty-base control is retained. The signed four-factor oracle, three matrix encodings, and full 24-fold rho reference are native Rust. The frozen protocol and raw records are in the same study directory.
+We tested a transported Frobenius on a quadratic twist over $F_(p^4)$, combined it with the cubic $j=0$ automorphism, and measured an unchanged physical base, the union of two invariant lines, the full invariant two-dimensional abscissa space, tagged pair indexes, and dense same-residual rank extraction. The line panel has seven positive toy curves and three seeds; the full 2D target solves use $p=13,37$. Each run has one public target $[271]G$. The signed four-factor oracle, matrix encodings, and 24-fold rho reference are native Rust. The frozen protocol and raw records are in the same study directory.
 
 The construction uses $F=F_p[t]/(t^4-d)$ with $d$ the least nonsquare, $E: y^2=x^3+b_0 t^3$, $h=t^((1-p)/2)$, $omega^3=1$, and
 $psi(x,y)=(h^2 x^p,h^3 y^p)$, $iota(x,y)=(omega x,y)$.
@@ -112,6 +112,67 @@ On the same p=13 two-dimensional base, the signed two-factor table has 5,112 ent
 
 #image("reports/run-20261022T0644Z-quartic-pair-quotient/pair_quotient.png", width: 100%)
 
-This exact symmetry quotient reduces stored pair *records* by 12 times and setup group additions by 12 times. It does not measure allocated bytes; action maps and hash buckets also consume memory. Its canonical lookup uses 13.66 times the query base-field multiplications of the full table, while query group-operation counts are equal. Therefore the tested direct quotient preserves relation yield and trades arithmetic for a smaller representative set. It is not a relation-lookup speed improvement on these targets. A tagged orbit index might alter the tradeoff but has not been tested.
+This exact symmetry quotient reduces stored pair *records* by 12 times and setup group additions by 12 times. It does not measure allocated bytes; action maps and hash buckets also consume memory. Its canonical lookup uses 13.66 times the query base-field multiplications of the full table, while query group-operation counts are equal. Therefore the tested direct quotient preserves relation yield and trades arithmetic for a smaller representative set. It is not a relation-lookup speed improvement on these targets.
 
 Raw records: `quartic_twist_pair_quotient_p13_v1.json` and its A/A copy. Source: `examples/quartic_twist_pair_quotient_p13.rs`; the frozen protocol, full run report and exact operation counts are linked in `QUARTIC_TWIST24_REPORT.md`.
+
+#pagebreak()
+== Action-tagged relation-finder index
+The ordered, hash-key and direct-posting variants store one pair tuple per 12-action orbit while indexing each actual transformed pair-sum abscissa. They avoid query-time canonicalization. On the same p=13 seven residuals and p=37 three residuals, every variant returned the *exact same complete signed four-factor decomposition sets* as the full table. A separate group addition audited all 5,112 and 388,752 postings. Six non-timing A/A diffs are empty.
+
+#table(columns: (.5fr,1fr,1fr,1.1fr,1.2fr), inset: 4pt,
+  [$p$], [full / tagged setup $F_p M$], [full / tagged setup group ops], [full / tagged query $F_p M$], [full / direct retained requested MB],
+  [13], [495,864 / 154,922], [5,112 / 426], [7,029,782 / 7,029,782], [1.273 / 0.682],
+  [37], [37,708,944 / 7,796,605], [388,752 / 32,396], [226,616,754 / 226,616,754], [91.007 / 47.721],
+)
+
+#image("reports/run-20261022T0707Z-quartic-tagged-direct-p37/tagged_pair_index.png", width: 100%)
+
+Setup group additions fall 12-fold; counted setup $F_p$ multiplications fall 3.20-fold at p=13 and 4.84-fold at p=37. Query $F_p$ multiplication and group-operation counts are exactly equal. For setup plus these registered queries, direct posting uses 1.047-fold and 1.128-fold fewer counted $F_p$ multiplications. The ordered index has the smallest retained requested payload but high binary-search overhead; the hash and direct variants use more bytes and less query CPU. Shared-host L0 timings do not establish a wall-time gain. Retained requested bytes are allocator payloads, not RSS. A complete one-target polynomial index calculus, rho comparison and isolated native-time result remain open.
+
+The twist action alone does not create new relations on a fixed physical base. Exact decomposition sets are identical pointwise; physical-base expansion, as in the mixed-line and 2D experiments, is what raises hit yield. The tagged index changes the *cost* of finding the same relations. Commands, source digests, all raw counters and write-once run PDFs are linked from `QUARTIC_TWIST24_REPORT.md`.
+
+#pagebreak()
+== Full p=37 two-dimensional rank pilot
+The registered full $F_p+t^2 F_p$ base has 624 signed physical points and 52 twist-folded factor-log columns. The first 53 seed-zero residuals on one public target $[271]G$ yielded 2,833,126 exact signed decompositions and 53 selected relations. The matrix reached rank 53 and recovered 271; every factor log was checked by group multiplication. A separate point-keyed four-sign pair oracle enumerated all 1,873,633 subgroup logs, recomputed every hit count, checked selected rows and rank, and recovered the same scalar. The non-timing A/A diff is empty.
+
+#table(columns: (1.6fr,1.3fr,1.3fr), inset: 5pt,
+  [phase], [$F_p$ multiplications], [group operations],
+  [model and base], [2,568,538], [0],
+  [input, eigenvalues, orbit map], [1,898,403], [17,726],
+  [full pair table], [37,708,944], [388,752],
+  [53-query stream], [4,003,923,826], [41,277,322],
+  [answer checks], [2,004,307], [18,854],
+)
+
+#image("reports/run-20261022T0717Z-quartic-2d-p37/p37_relations.png", width: 100%)
+
+The two-line shared prefix had 43 hits and 89 decompositions over these 53 residuals; the full 2D base had 53 hits and 2,833,126 decompositions. The larger base also raises the factor-log column count and per-query pair work. Total counted path: 4,048,104,018 $F_p$ multiplications, 41,702,654 group operations and 369,021 modular row operations. This is an exact group-oracle pilot, not an $S_5$ or calibrated rho result.
+
+#pagebreak()
+== Dense rows from one residual
+The previous pilot retained one relation per residual. The new registered extractor kept every rank-raising decomposition of the *first* residual and fixed the public generator's factor log to 1. For a fixed residual, all unanchored row differences annihilate the nonzero factor-log vector and have target coordinate zero, so their rank is at most $m$ for $m+1$ unknowns. That ceiling was attained: 6/7 at p=13 and 52/53 at p=37. After removing the known column, the first residual had full rank on both curves. The independent point-keyed oracle verified all first-query decompositions, selected terms, rank and answer; A/A non-timing diffs are empty.
+
+#table(columns: (.5fr, .9fr, 1.2fr, 1.4fr, 1.4fr), inset: 4pt,
+  [$p$], [queries old → dense], [accepted / candidates scanned], [old → dense counted $F_p M$], [old → dense group ops],
+  [13], [7 → 1], [6 / 6], [8,096,696 → 2,045,670], [81,076 → 18,609],
+  [37], [53 → 1], [52 / 115], [4,048,104,018 → 119,740,945], [41,702,654 → 1,204,356],
+)
+
+#image("reports/run-20261022T0729Z-quartic-2d-dense-p37/dense_cost.png", width: 100%)
+
+The p=37 counted one-target field and group paths fall 33.807-fold and 34.627-fold. This combines dense row retention with a public known-log anchor on the twist-folded 2D base; the reduction is not attributable to twist symmetry alone. The exact group oracle remains far from matched 24-fold rho and does not price polynomial relation finding, hash CPU, allocator work, isolated native time or a GAE band. The derivation, certified signed-count polynomial (`IDC1hf0237ddd316cd9d8`), raw records, independent audits, and limitations are in `QUARTIC_TWIST24_REPORT.md`.
+
+#pagebreak()
+== Full-stream tagged-table boundary
+On the *old* 53-residual p=37 full-2D trace, direct-posting and full signed-pair tables returned identical complete sets for all 2,833,126 decompositions. Every tagged posting was checked by a separate group addition; A/A non-timing records matched. Query arithmetic was identical: 4,003,562,862 $F_p$ multiplications and 41,273,856 group operations in each arm.
+
+#table(columns: (1.5fr,1.3fr,1.3fr,1.3fr), inset: 5pt,
+  [arm], [setup $F_p M$], [setup group ops], [retained requested bytes],
+  [full], [37,708,944], [388,752], [91,007,248],
+  [tagged direct], [7,796,605], [32,396], [47,721,464],
+)
+
+#image("reports/run-20261022T0720Z-quartic-tagged-direct_full-p37/tagged_pair_index.png", width: 100%)
+
+Setup plus 53 queries cost 4,041,271,806 versus 4,011,359,467 counted $F_p$ multiplications, a 1.00746-fold reduction. The 4.84-fold table-setup gain is diluted by the query stream. Its L0 wall time is not isolated; the tagged arm was slower in that shared-host observation. Dense extraction reduces the number of quadratic-size queries and gives the larger counted gain. Neither result establishes a polynomial or rho speedup.

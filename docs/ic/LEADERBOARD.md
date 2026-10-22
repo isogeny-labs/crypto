@@ -251,6 +251,24 @@ The `ic.pipeline` oracle set-up (the negation-folded |F|² pair table) on icv1-f
 | 8,192 | 43.6 s | 20.5 s | 5.29 s | 0.26 [0.24, 0.31] | 0.12 [0.11, 0.15] | 0.13 | 2.37 → 1.25 GiB |
 | 16,384 | 224 s | 117 s | 28.2 s | 0.24 [0.22, 0.26] | 0.13 [0.12, 0.14] | 0.13 | 9.15 → 4.65 GiB |
 
+## Quartic-twist pair index, outside tables A–C
+
+Exact signed four-factor group oracle on the canonical quartic twist. A 12-action pair orbit constructs all physical pair-sum keys from one elliptic addition; the direct-posting candidate is compared with the existing full hash table on identical residuals (class: counted component improvement). Every full signed decomposition set matches; all postings passed a separate group-addition audit and the non-timing A/A records are identical. The query counts below are the same in both arms. Setup and retained allocator-requested bytes improve, but hash CPU, an isolated native-time comparison, a complete polynomial IC pipeline and a matched rho band are absent. No priced row moves. Study: [research/twist_index_calculus_20261020/](../../research/twist_index_calculus_20261020/).
+
+| p | base | residuals | full / tagged setup Fp M | full / tagged setup group ops | full / tagged query Fp M | full / tagged retained requested bytes |
+|--:|--:|--:|:--|:--|:--|:--|
+| 13 | 72 | 7 | 495,864 / 154,922 | 5,112 / 426 | 7,029,782 / 7,029,782 | 1,273,360 / 681,932 |
+| 37 | 624 | 3 | 37,708,944 / 7,796,605 | 388,752 / 32,396 | 226,616,754 / 226,616,754 | 91,007,248 / 47,721,464 |
+
+## Quartic-twist dense same-residual oracle, outside tables A–C
+
+One public target `[271]G` per canonical quartic twist. The reference retains one exact four-factor relation per residual and treats all factor logs as unknown; the candidate retains rank-raising rows from the first residual and fixes the public generator's factor log to 1 (class: counted exact-oracle improvement). A separate point-keyed signed-pair oracle replayed complete first-query counts, selected rows, rank and answer; all subgroup logs were enumerated, and A/A non-timing records match. Counted path totals include model, base, input, eigen/map, full pair table, relation stream and answer checks. These are not polynomial S5, isolated native-time or matched rho results; no priced row moves. Study: [research/twist_index_calculus_20261020/](../../research/twist_index_calculus_20261020/).
+
+| p | base / folded columns | residuals before → after | first-query decompositions / scanned to rank | total Fp M before → after | total group ops before → after |
+|--:|:--|:--|:--|:--|:--|
+| 13 | 72 / 6 | 7 → 1 | 561 / 6 | 8,096,696 → 2,045,670 | 81,076 → 18,609 |
+| 37 | 624 / 52 | 53 → 1 | 53,551 / 115 | 4,048,104,018 → 119,740,945 | 41,702,654 → 1,204,356 |
+
 ## Planner validation, outside tables A–C
 
 `ic plan` / `ic bench --auto` (ic-planner/1) chooses every `ic.pipeline` stage of a prime-field run; here its plan runs against every alternative one change away from it on six prime curves outside its evidence (class: engineering). The plan is the existing best recipe, chosen automatically, so no row above moves. Cells are S(alternative) / S(plan), ecbench `compare`, paired, cluster 95% interval, at w = 0; the band column is the ratio at w = 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md §5a). Supplementary curves are `prime_search` curves outside the registry, named by tag. Study: [research/ic_planner_validation_20261020/](../../research/ic_planner_validation_20261020/).
@@ -315,11 +333,23 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
+- `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json` — sha256 `02427944511bd86f…`
+- `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json` — sha256 `706bc2efaf2c1a36…`
+- `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json` — sha256 `baddefec00f04f0b…`
+- `research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_aa_v1.json` — sha256 `cc75cb1f1142b94e…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_p13_v1.json` — sha256 `c0c3241972033c41…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_v1.json` — sha256 `36f7ae42554bccfb…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_p13_aa_v1.json` — sha256 `09adc53846bc84a2…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_aa_v1.json` — sha256 `c57f5dd8935f064e…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_p13_native_audit_v1.json` — sha256 `ce24ff067aab1408…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_dense_p37_native_audit_v1.json` — sha256 `4a2eda5132b9609a…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_p13_v1.json` — sha256 `05521665d6596151…`
+- `research/twist_index_calculus_20261020/quartic_twist_2d_p37_v1.json` — sha256 `4f5903b1e127b149…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
-- `docs/curves/registry.json` — sha256 `584d070fbec7e21f…`
+- `docs/curves/registry.json` — sha256 `8f60ef230aea092e…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
