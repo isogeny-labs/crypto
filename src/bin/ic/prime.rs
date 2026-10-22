@@ -13,8 +13,8 @@ use clap::{Args, ValueEnum};
 use crypto_lib::cryptanalysis::{
     binary_small_x,
     prime_small_x::{
-        self, exact_ic_probe, measure, toy_curve, toy_curve_with_cofactor, Curve, MontField,
-        Options, PrimeField, Pt,
+        self, exact_ic_probe_with_arity, measure, toy_curve, toy_curve_with_cofactor, Curve,
+        MontField, Options, PrimeField, Pt,
     },
     secg_small_x::{measure_secg, Extras},
     secg_standards::{secg, SecgCurve, SecgField},
@@ -77,6 +77,10 @@ pub struct PrimeArgs {
     /// Exact ECCp-131 descent candidates `Q+[a]G`, starting with the published Q.
     #[arg(long, default_value_t = 0, value_parser = clap::value_parser!(u64).range(0..=1_000_000))]
     pub target_candidates: u64,
+    /// Signed base points per exact ECCp-131 relation: 2 or 3. The three-point
+    /// path probes the pair table after subtracting one base point.
+    #[arg(long, default_value_t = 2, value_parser = clap::value_parser!(u8).range(2..=3))]
+    pub relation_arity: u8,
 }
 
 pub fn run(args: PrimeArgs) -> Result<Value, String> {
@@ -137,7 +141,7 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
                 x: c.field.embed_big(&params::number(&published.x)?)?,
                 y: c.field.embed_big(&params::number(&published.y)?)?,
             };
-            ic_probe = Some(exact_ic_probe(
+            ic_probe = Some(exact_ic_probe_with_arity(
                 &c,
                 &g,
                 &q,
@@ -145,6 +149,7 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
                 args.setup_candidates,
                 args.target_candidates,
                 args.seed,
+                args.relation_arity,
             )?);
         }
         r
@@ -216,7 +221,7 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
         "ic_probe": ic_probe,
         "elapsed_seconds": started.elapsed().as_secs_f64(),
         "limitations": [
-            "Two-point sums only: a relation is a signed sum of two base points of the small-x base.",
+            "The yield report measures two-point sums of the small-x base. --relation-arity 3 tests signed three-point relations separately; the two-point yield is not its success probability.",
             "The yield is exact for the base built. The Monte Carlo rate agrees with it only where the yield is large enough to produce hits; at P-192 it is a null result and bounds the rate from above.",
             "The cost of deciding a trial by a Semaev S₃ solve is measured only with --s3-trials. On ECCp-131, --setup-candidates and --target-candidates separately run and account for a bounded relation, rank, and descent probe; a yield alone is not a discrete logarithm.",
             "The base is capped at 8192 abscissae, and lower where the pair-sum keys would not fit in memory (wide fields).",

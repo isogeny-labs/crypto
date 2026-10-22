@@ -694,6 +694,8 @@ pub struct ExactIcRelation {
 #[derive(Clone, Debug, Serialize)]
 pub struct ExactIcProbe {
     pub curve: String,
+    /// Number of signed base points admitted in each relation (two or three).
+    pub relation_arity: u8,
     pub factor_base_abscissae: usize,
     /// SHA-256 of `ECC-IC-FB-v1`, curve name, field modulus,
     /// coefficient keys, subgroup order, cofactor, and each canonical
@@ -728,7 +730,26 @@ pub fn exact_ic_probe<F: PrimeField>(
     target_candidates: u64,
     seed: u64,
 ) -> Result<ExactIcProbe, String> {
+    exact_ic_probe_with_arity(c, g, q, size, setup_candidates, target_candidates, seed, 2)
+}
+
+/// As [`exact_ic_probe`], with an optional third signed base point. The
+/// three-point search subtracts each signed base point from a candidate and
+/// probes the existing pair-sum keys; it never materializes a cubic table.
+pub fn exact_ic_probe_with_arity<F: PrimeField>(
+    c: &Curve<F>,
+    g: &Pt<F::E>,
+    q: &Pt<F::E>,
+    size: usize,
+    setup_candidates: u64,
+    target_candidates: u64,
+    seed: u64,
+    relation_arity: u8,
+) -> Result<ExactIcProbe, String> {
     let started = Instant::now();
+    if ![2, 3].contains(&relation_arity) {
+        return Err("relation arity must be two or three".into());
+    }
     if !c.order_is_prime || c.order <= BigUint::from(2u8) {
         return Err("the relation solver requires a prime subgroup order".into());
     }
@@ -790,9 +811,8 @@ pub fn exact_ic_probe<F: PrimeField>(
         let Some(r) = c.mul_big(&mut f, g, &a) else {
             return Err("nonzero generator scalar produced infinity".into());
         };
-        if keys.binary_search(&f.key(r.x)).is_ok() {
-            let terms = checked_two_sum(c, &mut f, &base, &index, &r)
-                .ok_or("pair-sum key hit had no geometric decomposition")?;
+        if let Some(terms) = checked_relation(c, &mut f, &base, &index, &keys, &r, relation_arity)?
+        {
             relations.push(ExactIcRelation {
                 candidate,
                 coefficient: a.to_str_radix(16),
@@ -816,9 +836,8 @@ pub fn exact_ic_probe<F: PrimeField>(
                 .and_then(|ag| c.add_points(&mut f, q, &ag))
         };
         let Some(r) = r else { continue };
-        if keys.binary_search(&f.key(r.x)).is_ok() {
-            let terms = checked_two_sum(c, &mut f, &base, &index, &r)
-                .ok_or("target pair-sum key hit had no geometric decomposition")?;
+        if let Some(terms) = checked_relation(c, &mut f, &base, &index, &keys, &r, relation_arity)?
+        {
             relations.push(ExactIcRelation {
                 candidate,
                 coefficient: a.to_str_radix(16),
@@ -843,6 +862,7 @@ pub fn exact_ic_probe<F: PrimeField>(
     }
     Ok(ExactIcProbe {
         curve: c.name.clone(),
+        relation_arity,
         factor_base_abscissae: size,
         factor_base_sha256,
         distinct_pair_sum_abscissae: keys.len(),
@@ -858,6 +878,61 @@ pub fn exact_ic_probe<F: PrimeField>(
         relations,
         elapsed_ms: started.elapsed().as_secs_f64() * 1000.0,
     })
+}
+
+fn checked_relation<F: PrimeField>(
+    c: &Curve<F>,
+    f: &mut F,
+    base: &[Pt<F::E>],
+    index: &HashMap<F::K, usize>,
+    pair_keys: &[F::K],
+    target: &Pt<F::E>,
+    arity: u8,
+) -> Result<Option<Vec<(usize, i8)>>, String> {
+    if pair_keys.binary_search(&f.key(target.x)).is_ok() {
+        return checked_two_sum(c, f, base, index, target)
+            .map(Some)
+            .ok_or_else(|| "pair-sum key hit had no geometric decomposition".into());
+    }
+    if arity == 2 {
+        return Ok(None);
+    }
+    for (i, point) in base.iter().enumerate() {
+        for sign in [1i8, -1] {
+            let first = if sign == 1 {
+                *point
+            } else {
+                c.negate(f, point)
+            };
+            let minus_first = c.negate(f, &first);
+            let Some(rest) = c.add_points(f, target, &minus_first) else {
+                continue;
+            };
+            if pair_keys.binary_search(&f.key(rest.x)).is_err() {
+                continue;
+            }
+            let mut terms = checked_two_sum(c, f, base, index, &rest)
+                .ok_or("three-point pair key hit had no geometric decomposition")?;
+            terms.push((i, sign));
+            let mut sum: Option<Pt<F::E>> = None;
+            for &(j, s) in &terms {
+                let term = if s == 1 {
+                    base[j]
+                } else {
+                    c.negate(f, &base[j])
+                };
+                sum = match sum {
+                    Some(p) => c.add_points(f, &p, &term),
+                    None => Some(term),
+                };
+            }
+            if sum.as_ref() != Some(target) {
+                return Err("three-point relation failed group-law verification".into());
+            }
+            return Ok(Some(terms));
+        }
+    }
+    Ok(None)
 }
 
 fn checked_two_sum<F: PrimeField>(
@@ -1503,6 +1578,37 @@ pub fn p192_native_sum(a: &Pt<Fp>, b: &Pt<Fp>, ar: &mut P192Arithmetic) -> Optio
 mod tests {
     use super::*;
     use std::collections::HashSet;
+
+    #[test]
+    fn exact_eccp131_three_point_relation_is_checked() {
+        let p = crate::ecc::curve::CurveParams::eccp131();
+        let record = SecgCurve {
+            name: p.name.into(),
+            oid: String::new(),
+            field: SecgField::Prime { p: p.p.clone() },
+            a: p.a.clone(),
+            b: p.b.clone(),
+            gx: p.gx.clone(),
+            gy: p.gy.clone(),
+            order: p.n.clone(),
+            cofactor: p.h as u64,
+        };
+        let c = Curve::<MontField<3>>::from_secg(&record).expect("curve");
+        let g = c.secg_generator(&record).expect("generator");
+        let base = small_x_base(&c, 16).expect("base");
+        let mut f = c.field.clone();
+        let pair = c.add_points(&mut f, &base[0], &base[1]).expect("pair");
+        let target = c.add_points(&mut f, &pair, &base[2]).expect("triple");
+        let pair_keys = pair_sum_keys(&c, &base);
+        assert!(pair_keys.binary_search(&f.key(target.x)).is_err());
+        let report = exact_ic_probe_with_arity(&c, &g, &target, 16, 0, 1, 131, 3)
+            .expect("three-point probe");
+        assert_eq!(report.relation_arity, 3);
+        assert_eq!(report.target_relations, 1);
+        assert_eq!(report.relations[0].terms.len(), 3);
+        assert_eq!(report.setup_rank, 0);
+        assert!(!report.target_log_determined);
+    }
 
     #[test]
     fn exact_ic_probe_recovers_a_fresh_target_from_natural_rows() {
