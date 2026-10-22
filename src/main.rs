@@ -438,7 +438,7 @@ enum CryptanalysisOp {
     },
     /// Recover an AES-128 key candidate from measured first-round S-box power traces.
     AesCpa {
-        /// JSON with plaintexts and sixteen aligned trace arrays.
+        /// JSON with plaintexts and sixteen aligned trace arrays; accepts a checked store: reference.
         #[arg(long)]
         input: PathBuf,
         /// Ciphertext for the first plaintext, to verify the recovered key.
@@ -1794,8 +1794,19 @@ fn cmd_aes_cpa(input: &Path, known_ciphertext_hex: Option<&str>) -> Result<(), S
         traces_per_byte: [Vec<f64>; 16],
     }
 
+    let resolved = crypto_lib::store::resolve_path(input)?;
+    if std::fs::metadata(&resolved)
+        .map_err(|e| format!("cannot inspect {}: {e}", input.display()))?
+        .len()
+        > 64 * 1024 * 1024
+    {
+        return Err("AES CPA trace input exceeds 64 MiB".into());
+    }
     let bytes =
-        std::fs::read(input).map_err(|e| format!("cannot read {}: {e}", input.display()))?;
+        std::fs::read(&resolved).map_err(|e| format!("cannot read {}: {e}", input.display()))?;
+    if bytes.len() > 64 * 1024 * 1024 {
+        return Err("AES CPA trace input exceeds 64 MiB".into());
+    }
     let trace_input: TraceInput =
         serde_json::from_slice(&bytes).map_err(|e| format!("invalid AES CPA trace JSON: {e}"))?;
     let count = trace_input.plaintexts.len();

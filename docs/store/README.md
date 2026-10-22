@@ -194,6 +194,9 @@ object first. New Setec runs can use `CRYPTO_STORE_REMOTE` and a separate
 The bucket is in `us-east-2`; the configured `ecc-challenges-new` AWS profile
 passed a live push, HEAD, remote verify, fresh-cache pull, SHA-256 comparison,
 and cleanup on 2026-10-18.
+The AES CPA trace command also resolves `store:` inputs into a checked cache.
+Its live Setec acceptance receipt is
+[`AES_CPA_S3_ACCEPTANCE_20261022.json`](AES_CPA_S3_ACCEPTANCE_20261022.json).
 The exact key, checksums and cleanup outcome are recorded in
 [`S3_ACCEPTANCE_20261018.json`](S3_ACCEPTANCE_20261018.json).
 The separate isogeny-walk `publish`/`fetch` path was exercised on a public

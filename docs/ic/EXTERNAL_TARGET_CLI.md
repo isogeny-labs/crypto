@@ -525,6 +525,9 @@ The same input with masks 1 and 2 was rejected because that LAT entry is zero.
 
 `aes-cpa` accepts JSON with `plaintexts` as 16-byte hex strings and
 `traces_per_byte` as sixteen equal-length arrays of finite measured values.
+`--input` accepts a local path or an indexed `store:NAME` or
+`sha256:DIGEST` reference. The store downloads and checks the indexed digest
+before analysis; trace JSON is limited to 64 MiB.
 Each channel corresponds to first-round S-box leakage for the matching
 plaintext byte. It requires 16–100,000 aligned samples and reports the
 candidate AES-128 key, peak and runner-up absolute correlations, and the
@@ -543,6 +546,11 @@ plaintext byte `j` is `(37i + 19j) mod 256`. Each trace is the bit count
 of the AES S-box output at that plaintext byte XOR the matching key byte.
 The input JSON SHA-256 is
 `81b50a60c0361b33d7df6fe73cf5827942ce8dd10ff6284e931c97172a9ed2d8`.
+The same public trace values are preserved as compact JSON in
+[`aes_cpa_traces_public_20261022.json`](fixtures/aes_cpa_traces_public_20261022.json).
+That file's SHA-256 is
+`636eef3989b37b9db88b43996b5ef841c5fd62eb90870e4ec867b1920a84d0d1`;
+the live S3 CPA receipt records the checked upload and fresh-cache replay.
 The known-answer ciphertext is `69c4e0d86a7b0430d8cdb78070b4c55a`.
 
 `aes-cache-timing` accepts JSON with `plaintexts` as 16-byte hex strings
