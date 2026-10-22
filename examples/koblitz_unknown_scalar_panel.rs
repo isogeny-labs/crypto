@@ -9,7 +9,7 @@ use crypto_lib::cryptanalysis::koblitz_groebner::SolverEngine;
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_frobenius_factor_base_from_divisor,
     koblitz_index_calculus_dlp_with_factor_base_and_progress,
-    koblitz_signed_frobenius_rho_with_progress, DecompositionStrategy, KoblitzCurve,
+    koblitz_signed_frobenius_rho_with_progress, ChainS3Limits, DecompositionStrategy, KoblitzCurve,
     KoblitzIcEvent, KoblitzIcOptions, KoblitzRelation, KoblitzRelationAttemptDisposition,
     KoblitzRelationAttemptRecord, KoblitzSignedRhoEvent, KoblitzSignedRhoOptions, LinearAlgebra,
     SatDecompositionOptions,
@@ -308,6 +308,7 @@ fn ic_event_json(event: &KoblitzIcEvent) -> Value {
         KoblitzIcEvent::FactorBaseReady { points, orbits } => {
             json!({"event":"factor_base_ready","points":points,"orbits":orbits})
         }
+        KoblitzIcEvent::PairTableStarted => json!({"event":"pair_table_started"}),
         KoblitzIcEvent::PairTableReady { entries } => {
             json!({"event":"pair_table_ready","entries":entries})
         }
@@ -320,6 +321,12 @@ fn ic_event_json(event: &KoblitzIcEvent) -> Value {
             trials,
         } => json!({
             "event":"relation_progress","collected":collected,"wanted":wanted,"trials":trials
+        }),
+        KoblitzIcEvent::RelationBatchStarted {
+            first_trial,
+            trials,
+        } => json!({
+            "event":"relation_batch_started","first_trial":first_trial,"trials":trials
         }),
         KoblitzIcEvent::RelationAttemptFinished {
             trial,
@@ -531,13 +538,13 @@ fn run_ic(profile: Profile, target_id: &str, x: &str, y: &str, seed: u64) -> Res
         sat_macaulay_degree: None,
         sat_options: SatDecompositionOptions {
             encoding: XorEncoding::Native,
+            factored_s4: false,
             branch_on_summands: true,
             restrict_to_factor_base: true,
             trace_constraint: true,
             conflict_budget: profile.conflict_budget(),
             wall_budget: None,
             symmetry_breaking: false,
-            wall_budget: None,
         },
         collapse_negation: true,
         stop_on_verified_rank: true,
@@ -547,6 +554,12 @@ fn run_ic(profile: Profile, target_id: &str, x: &str, y: &str, seed: u64) -> Res
         crossbred: None,
         wdsat_binary: None,
         wdsat_timeout_ms: 5_000,
+        chain_s3_limits: ChainS3Limits {
+            max_variables: 0,
+            max_domain_clauses: 0,
+            max_models: 0,
+            conflict_budget: 0,
+        },
         linear_algebra: LinearAlgebra::Dense,
     };
     let solve_started = Instant::now();

@@ -5,8 +5,12 @@ directory per paper.
 
 | directory | title | status |
 |---|---|---|
+| [`ecdlp-six-month-portfolio/`](ecdlp-six-month-portfolio/) | A Six-Month ECDLP Research Programme: Implementations, Experiments, Structural Leads, and Evidence | research draft, anonymized, not submitted; 19-repository retrospective with pinned evidence and explicit coverage limits |
 | [`structural-completeness/`](structural-completeness/) | Structural Completeness of Prime-Field Elliptic Curves Against Isogeny-Graph Cryptanalysis | research draft, anonymized, not submitted; Markdown twin in `research/notes/cm-isogeny/PAPER_STRUCTURAL_COMPLETENESS.md` |
-| [`lll-degeneracy-note/`](lll-degeneracy-note/) | An Empirical Note on LLL Degeneracy of the Boneh–Venkatesan Lattice for secp256k1 | research note, anonymized, not submitted |
+| [`lll-degeneracy-note/`](lll-degeneracy-note/) | LLL Failures on the Boneh–Venkatesan Lattice Were Floating-Point Artifacts: A Corrected Note | corrected 2026-10-16 and 2026-10-17 (earlier curve-specificity claim and P-521 mechanism withdrawn); anonymized, not submitted |
+| [`eigen-seta/`](eigen-seta/) | Eigen-Séta: an isogeny KEM whose trapdoor is a hidden-degree endomorphism | revision 2 (2026-10-17): assessment added, unqualified NIST-category conjecture withdrawn (two claim tiers); research draft, anonymized, not peer reviewed, not submitted; maintained code in sibling repo `eigenx`, historical code in `eigen_seta/` |
+| [`rootfinding-decomposition/`](rootfinding-decomposition/) | Point Decomposition by Root Finding: Replacing Gröbner-Basis Solvers in Elliptic-Curve Index Calculus, with Measurements on Prime and Binary Curves up to NIST P-521 | research draft, anonymized, not submitted, not cleared; engineering-class stage result, no security claim; Markdown twin in `RESEARCH_SEMAEV_ROOTFIND_VS_GROEBNER.md`; Prop. 1 machine-checked in `rootfinding-decomposition/lean/` |
+| [`ecdlp-index-calculus-program/`](ecdlp-index-calculus-program/) | Index Calculus for the Elliptic-Curve Discrete Logarithm, Measured: a fourteen-week programme record (July–October 2026) | research draft, anonymized, not submitted; synthesis of committed evidence, no new measurement; proposes a split into five papers (README) |
 
 Markdown drafts that are not yet typeset stay with their notes and are listed
 here so they are not lost: `research/ecdlp_autolab/PAPER_DRAFT.md` (An Empirical
@@ -22,7 +26,8 @@ Conventions shared by every paper here and by the sibling repositories
   what it says, what it does not say, how to build, reproduction pointers, the
   checklist owed before submission), an `abstract.txt` and the built PDF;
 - the build is `paper.mk` in this directory: a paper's `Makefile` sets `TEX`,
-  `SECTIONS` and `BIB` and includes it (`make`, `make check`, `make arxiv`,
+  `SECTIONS`, `BIB` and, for figures or other files the build reads, `ASSETS`,
+  and includes it (`make`, `make check`, `make arxiv`,
   `make eprint`, `make deanonymize`, `make clean`);
 - every number cites a committed artefact in this repository or a sibling
   (`crypto:`, `cryptanalysis:` or `crypto-autoresearcher:` prefix); a stage
