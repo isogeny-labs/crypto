@@ -27,6 +27,13 @@ its own section outside tables A–C (AGENTS.md "Standing workflow rules" and
 §7b).
 
 <!-- conductor:begin -->
+Validation gate (owner, 2026-10-19): no row reaches the IC leaderboard or
+`benchmarks/README.md` without a replay certificate, a validator report and a
+matched rho reference (with the §5a band), named by the evidence directory's
+`VALIDATION.json`; pre-gate rows render as "unvalidated (pre-gate)". Rule:
+[`AGENTS.md`](AGENTS.md), "Standing workflow rules"; schema:
+[`docs/VALIDATION_GATE.md`](docs/VALIDATION_GATE.md).
+
 Before making code changes, obtain or attach to a Conductor task. Run
 `conductor check --summary "…" --scope path:…` first — if someone already holds
 those files, it will tell you who and what to do about it. Read `.conductor/WORKFLOW.md`
