@@ -368,5 +368,6 @@ entries and reports the stop step and what F4 knew at it. A stopped run gives
 note §16.1); otherwise it gives no bound. Read under A1 exactly as §3 Q2 says
 for a stopped cell: `D >= 6` or `D >= 7` from a productive step leaves the
 `m = 2` line inconclusive; nothing from R18b can read H0 or H1a. R18b is run
-after the main batch (R19 included) finishes or 09:30 UTC, whichever is first;
-it is not run if free memory then is under 6 GB.
+now, concurrently with the rest of the main batch (single thread each, 2 for
+R18b), if free memory at its start is at least 6 GB; otherwise after the
+batch. *(Edited before R18b started: the first draft said "after the batch".)*
