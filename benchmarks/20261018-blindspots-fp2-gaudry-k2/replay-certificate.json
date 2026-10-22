@@ -1,0 +1,414 @@
+{
+ "schema": "replay-certificate/v1",
+ "item": "BLINDSPOT-01",
+ "evidence_directory": "benchmarks/20261018-blindspots-fp2-gaudry-k2",
+ "status": "verified",
+ "independent": true,
+ "independence_basis": "Fresh build (rustc from source, per card) and fresh run on 2026-10-22 by an executor session other than the one that produced the recorded 2026-10-18 rows; cards written and compared by the experiment-director lane. Same instrument source file (sha256 pinned below); same host class is not claimed to be a different machine.",
+ "scalars_verified": true,
+ "scalars_scope": "All 282 compared rows (the sample in replay/PLAN.md: all 189 rows at nominal 24 bits, 93 rows at 40 bits idx 0 and idx 2, and the 40-bit control-shuffled-rate row) plus instances.txt byte-identical. Not replayed: sizes 28, 32, 36 bits and 40-bit idx 1, 3, 4, 5 (recorded 945 rows in total); see replay/PLAN.md 'Dropped, and why'. Wall-time fields detail.wall_seconds, detail.wall_seconds_filter, detail.wall_seconds_wiedemann are descriptive and excluded.",
+ "comparison_rule": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/PLAN.md, 'Comparison rule': join on (family,bits,idx,target,arm); equal row counts; all fields equal after JSON parse except the three wall-time fields; floats compared for equality.",
+ "compare_script": {
+  "path": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/compare_replay.py",
+  "sha256": "f8b3ab159d2736d1ad8094ad590b04c3d9dac1aae698cd8af2e48b3e0a7320d8"
+ },
+ "instrument": {
+  "path": "research/blindspots_20261018/instruments/blindspots_01_fp2_gaudry.rs",
+  "sha256": "0629a73c7ff443e70c6ce16c0872b98a5aebc5a71d25f7bff60156c8693ff559"
+ },
+ "final_file_note": "gls-b40-i2.jsonl compared as the final on-disk file; sha256 da3b43629bee7d2c99d4b1acb7b914aa9e031d7b101d65a38c2fb1e4d67d339a equals the digest in receipt-card-r05.json. The partial copy tracked in commit 7dbb2397f2 was not used.",
+ "total_rows_compared": 282,
+ "total_mismatches": 0,
+ "mismatches": [],
+ "runs": [
+  {
+   "card_id": "CARD-BLINDSPOT-01-REPLAY-R01",
+   "card": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/card-r01.yaml",
+   "card_sha256": "bcfd71a280670c2e85ed47c962cc35884780ccd9a2e1c75dcde02b8868c719ea",
+   "receipt": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/receipt-card-r01.json",
+   "receipt_sha256": "2cd38fca07b4fbd9ba071945be62ba44a49b7a789cc4ceb3a5910a46cadd9a3d",
+   "commit": "f543b5523357eb11490a30fcac84d17359ce98ad",
+   "status": "completed",
+   "commands": [
+    {
+     "id": "make-bin-dir",
+     "exit_code": 0
+    },
+    {
+     "id": "build",
+     "exit_code": 0
+    },
+    {
+     "id": "list-instances",
+     "exit_code": 0
+    },
+    {
+     "id": "torsion-b24",
+     "exit_code": 0
+    },
+    {
+     "id": "gls-b24",
+     "exit_code": 0
+    },
+    {
+     "id": "prime-b24",
+     "exit_code": 0
+    },
+    {
+     "id": "control-b24",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin-dir",
+     "exit_code": 0
+    }
+   ],
+   "files": [
+    {
+     "replay_file": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/instances.txt",
+     "replay_sha256": "21d288f71ffdd49e17dc30221205fad4a17202520c4cd73d4411d85483b0438a",
+     "reproduces_recorded_file": "research/blindspots_20261018/01-fp2-gaudry-k2/raw/instances.txt",
+     "recorded_sha256": "21d288f71ffdd49e17dc30221205fad4a17202520c4cd73d4411d85483b0438a",
+     "comparison": "byte-identical",
+     "byte_identical": true,
+     "rows_compared": 0,
+     "mismatches": []
+    },
+    {
+     "replay_file": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b24.jsonl",
+     "replay_sha256": "afd7969dc49485dc1b8b59cc70c511ad6185fe6e2e309e04a993a01b9d26e0f6",
+     "reproduces_recorded_file": "research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b24.jsonl",
+     "recorded_sha256": "748fe4f19148154b9b39264b08e89831e384174b6cff4698532c3cda844ea63b",
+     "rows_recorded": 96,
+     "rows_replayed": 96,
+     "rows_compared": 96,
+     "rows_equal": 96,
+     "mismatches": [],
+     "descriptive_wall_seconds_sum": {
+      "recorded": 16.823346513,
+      "replayed": 16.210701755,
+      "note": "descriptive only, not compared"
+     }
+    },
+    {
+     "replay_file": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/gls-b24.jsonl",
+     "replay_sha256": "2951b0f1bfdf939e5a29e1e1b309befafc16fb7861641492660decbfd8b0fb9d",
+     "reproduces_recorded_file": "research/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b24.jsonl",
+     "recorded_sha256": "fcf4ebc931b6c4d39da4659609861f38997669a8253bf9705ab61337a2ec170c",
+     "rows_recorded": 60,
+     "rows_replayed": 60,
+     "rows_compared": 60,
+     "rows_equal": 60,
+     "mismatches": [],
+     "descriptive_wall_seconds_sum": {
+      "recorded": 9.884248003,
+      "replayed": 9.33972906,
+      "note": "descriptive only, not compared"
+     }
+    },
+    {
+     "replay_file": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b24.jsonl",
+     "replay_sha256": "ff635038a18a06220333cadd475f9a8f6876c7491c138f0aa3105f21de2518eb",
+     "reproduces_recorded_file": "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b24.jsonl",
+     "recorded_sha256": "87e519cf0c11e7d98a33913665bfe2e3bdf2c26140a0f217c5a7b80af3eafa99",
+     "rows_recorded": 30,
+     "rows_replayed": 30,
+     "rows_compared": 30,
+     "rows_equal": 30,
+     "mismatches": [],
+     "descriptive_wall_seconds_sum": {
+      "recorded": 6.043857388,
+      "replayed": 5.817619013,
+      "note": "descriptive only, not compared"
+     }
+    },
+    {
+     "replay_file": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/control-b24.jsonl",
+     "replay_sha256": "ea439b8b6407476e8d26c20a71f75b43e53917e5da6b5dd264e07e53740766d1",
+     "reproduces_recorded_file": "research/blindspots_20261018/01-fp2-gaudry-k2/raw/control-b24.jsonl",
+     "recorded_sha256": "8e2579e9c217a9ca4d4d374e6b25efab2e858ea1e433486eba2801d3b0027e3c",
+     "rows_recorded": 3,
+     "rows_replayed": 3,
+     "rows_compared": 3,
+     "rows_equal": 3,
+     "mismatches": [],
+     "descriptive_wall_seconds_sum": {
+      "recorded": 2.84454544,
+      "replayed": 2.792483889,
+      "note": "descriptive only, not compared"
+     }
+    }
+   ],
+   "rows_compared": 189,
+   "mismatches": []
+  },
+  {
+   "card_id": "CARD-BLINDSPOT-01-REPLAY-R02",
+   "card": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/card-r02.yaml",
+   "card_sha256": "47ab0a6ad648e6dbb129e6474a4749389bc04075872469fb69109f9e46f6a172",
+   "receipt": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/receipt-card-r02.json",
+   "receipt_sha256": "4ab8a076a617896942c0fa7a2c405eaf32278afce809edbe239a5d9b1cb05934",
+   "commit": "f543b5523357eb11490a30fcac84d17359ce98ad",
+   "status": "completed",
+   "commands": [
+    {
+     "id": "make-bin-dir",
+     "exit_code": 0
+    },
+    {
+     "id": "build",
+     "exit_code": 0
+    },
+    {
+     "id": "torsion-b40-i0",
+     "exit_code": 0
+    },
+    {
+     "id": "prime-b40-i0",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin-dir",
+     "exit_code": 0
+    }
+   ],
+   "files": [
+    {
+     "replay_file": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i0.jsonl",
+     "replay_sha256": "89843d4b7e0ac9c585fb44068867c3e95f80e52d4d7060deb5ecd5425fa38660",
+     "reproduces_recorded_file": "research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i0.jsonl",
+     "recorded_sha256": "a291f39bf40b43c9f23a1b7b364a827701766f3b2d5253b5a62131fb8ca7871b",
+     "rows_recorded": 16,
+     "rows_replayed": 16,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": [],
+     "descriptive_wall_seconds_sum": {
+      "recorded": 89.486502862,
+      "replayed": 86.711862608,
+      "note": "descriptive only, not compared"
+     }
+    },
+    {
+     "replay_file": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b40-i0.jsonl",
+     "replay_sha256": "0fcbc1f29e37b98a3114aa39b5e8cfef5ea329a6a56343d13dad75cc2e748f07",
+     "reproduces_recorded_file": "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i0.jsonl",
+     "recorded_sha256": "b8468f3a60bc77a2889ed870de92b990c619f003196aebf4c6bf120d5dd58b5e",
+     "rows_recorded": 10,
+     "rows_replayed": 10,
+     "rows_compared": 10,
+     "rows_equal": 10,
+     "mismatches": [],
+     "descriptive_wall_seconds_sum": {
+      "recorded": 52.116926379,
+      "replayed": 49.133357409,
+      "note": "descriptive only, not compared"
+     }
+    }
+   ],
+   "rows_compared": 26,
+   "mismatches": []
+  },
+  {
+   "card_id": "CARD-BLINDSPOT-01-REPLAY-R03",
+   "card": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/card-r03.yaml",
+   "card_sha256": "56735536f25023ab06677af2f7ccebdf89c952eed6e328892a535d969d0c2891",
+   "receipt": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/receipt-card-r03.json",
+   "receipt_sha256": "0b3aeb03456429fd4c38f9dbf4e38217e01cf4dd7375901d1525b06252bfd5d2",
+   "commit": "f543b5523357eb11490a30fcac84d17359ce98ad",
+   "status": "completed",
+   "commands": [
+    {
+     "id": "make-bin-dir",
+     "exit_code": 0
+    },
+    {
+     "id": "build",
+     "exit_code": 0
+    },
+    {
+     "id": "gls-b40-i0",
+     "exit_code": 0
+    },
+    {
+     "id": "rate-b40-i0",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin-dir",
+     "exit_code": 0
+    }
+   ],
+   "files": [
+    {
+     "replay_file": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/gls-b40-i0.jsonl",
+     "replay_sha256": "5eb1053201fde1e7cbf80bcafb6e5c61897a236438e3948d99ba7dc4c1b95424",
+     "reproduces_recorded_file": "research/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b40-i0.jsonl",
+     "recorded_sha256": "91dc4afeeca382c2a2ab38d84bc945bd796154aaf6a1e7d2e5673916e94ed227",
+     "rows_recorded": 20,
+     "rows_replayed": 20,
+     "rows_compared": 20,
+     "rows_equal": 20,
+     "mismatches": [],
+     "descriptive_wall_seconds_sum": {
+      "recorded": 88.96800806899999,
+      "replayed": 81.73192954800001,
+      "note": "descriptive only, not compared"
+     }
+    },
+    {
+     "replay_file": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/rate-b40-i0.jsonl",
+     "replay_sha256": "bff2faa3c99a84ab2620170a42791f8746b167cb6c5dfeedca21d3c3019f4c85",
+     "reproduces_recorded_file": "research/blindspots_20261018/01-fp2-gaudry-k2/raw/rate-b40-i0.jsonl",
+     "recorded_sha256": "7a592045b89f9377c16490a7155f16aace1d95bc8edea4459590b30fca531dd1",
+     "rows_recorded": 1,
+     "rows_replayed": 1,
+     "rows_compared": 1,
+     "rows_equal": 1,
+     "mismatches": [],
+     "descriptive_wall_seconds_sum": {
+      "recorded": 44.873776326,
+      "replayed": 38.521395165,
+      "note": "descriptive only, not compared"
+     }
+    }
+   ],
+   "rows_compared": 21,
+   "mismatches": []
+  },
+  {
+   "card_id": "CARD-BLINDSPOT-01-REPLAY-R04",
+   "card": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/card-r04.yaml",
+   "card_sha256": "42152a33a0e3ec7b2967502eaddb398d2fd9ce6816772e9c0f9606adcb738933",
+   "receipt": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/receipt-card-r04.json",
+   "receipt_sha256": "c7f65ad3474359b492a870913a95af34969f772f27159a3ab9f37eec6cb4f18d",
+   "commit": "ed96923f0414a0ed6a45fe48a2b9683060d5ebf3",
+   "status": "completed",
+   "commands": [
+    {
+     "id": "make-bin-dir",
+     "exit_code": 0
+    },
+    {
+     "id": "build",
+     "exit_code": 0
+    },
+    {
+     "id": "torsion-b40-i2",
+     "exit_code": 0
+    },
+    {
+     "id": "prime-b40-i2",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin-dir",
+     "exit_code": 0
+    }
+   ],
+   "files": [
+    {
+     "replay_file": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/torsion-b40-i2.jsonl",
+     "replay_sha256": "406cefa6cfe261510a6680de08b36f725dcead484a5888563d0aae8506f14fbd",
+     "reproduces_recorded_file": "research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i2.jsonl",
+     "recorded_sha256": "b6f8eff130981bdcbd8400eec15478f9afe504dad3cfe8903ece01d8d5c3020d",
+     "rows_recorded": 16,
+     "rows_replayed": 16,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": [],
+     "descriptive_wall_seconds_sum": {
+      "recorded": 103.325879774,
+      "replayed": 91.023126605,
+      "note": "descriptive only, not compared"
+     }
+    },
+    {
+     "replay_file": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/prime-b40-i2.jsonl",
+     "replay_sha256": "7cd4d7539ad079b9824d4628ac8f22fb11b48358a8ab7741c1841ccdfa0cb89e",
+     "reproduces_recorded_file": "research/blindspots_20261018/01-fp2-gaudry-k2/raw/prime-b40-i2.jsonl",
+     "recorded_sha256": "dab5c21a3ebb62dd6410dcdfc1fce5bb4ea3b49c0188a449fd5f8d6ff89b22ab",
+     "rows_recorded": 10,
+     "rows_replayed": 10,
+     "rows_compared": 10,
+     "rows_equal": 10,
+     "mismatches": [],
+     "descriptive_wall_seconds_sum": {
+      "recorded": 60.98706706,
+      "replayed": 57.839423729,
+      "note": "descriptive only, not compared"
+     }
+    }
+   ],
+   "rows_compared": 26,
+   "mismatches": []
+  },
+  {
+   "card_id": "CARD-BLINDSPOT-01-REPLAY-R05",
+   "card": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/card-r05.yaml",
+   "card_sha256": "7afa62d69a266dc71c3bf6dc22fe64a9bf428f0aab54c7d85f666d3e6f6fbe1f",
+   "receipt": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/receipt-card-r05.json",
+   "receipt_sha256": "fb58212b673ade7c41c483b5632d92c81a4921e40e6e00f1c794bded3d795f6f",
+   "commit": "0677940b8204d4cb60109550035c0a9c3b1a1070",
+   "status": "completed",
+   "commands": [
+    {
+     "id": "make-bin-dir",
+     "exit_code": 0
+    },
+    {
+     "id": "build",
+     "exit_code": 0
+    },
+    {
+     "id": "gls-b40-i2",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin-dir",
+     "exit_code": 0
+    }
+   ],
+   "files": [
+    {
+     "replay_file": "research/blindspots_20261018/01-fp2-gaudry-k2/replay/raw/gls-b40-i2.jsonl",
+     "replay_sha256": "da3b43629bee7d2c99d4b1acb7b914aa9e031d7b101d65a38c2fb1e4d67d339a",
+     "reproduces_recorded_file": "research/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b40-i2.jsonl",
+     "recorded_sha256": "d6dac2aec31bb293019d87b1064cdcfea363b4d58f34a113c72c8daa7657c445",
+     "rows_recorded": 20,
+     "rows_replayed": 20,
+     "rows_compared": 20,
+     "rows_equal": 20,
+     "mismatches": [],
+     "descriptive_wall_seconds_sum": {
+      "recorded": 86.900972415,
+      "replayed": 81.390626635,
+      "note": "descriptive only, not compared"
+     }
+    }
+   ],
+   "rows_compared": 20,
+   "mismatches": []
+  }
+ ]
+}
