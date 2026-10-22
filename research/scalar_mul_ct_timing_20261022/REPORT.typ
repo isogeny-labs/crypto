@@ -51,7 +51,7 @@
 #figure(image("fig_timing.svg", width: 100%), caption: [Time of `scalar_mul_secret` per leading-zero class, as a fraction of the full-length class: median over rounds, with bars for the range over rounds. Dashed line: no dependence on length.])
 
 #table(
-  columns: 7, stroke: 0.3pt, inset: 3pt,
+  columns: (3.6cm, 1fr, 1fr, 0.8fr, 1.3fr, 1fr, 1fr), stroke: 0.3pt, inset: 3pt,
   [curve], [`R` = t(224 zeros)/t(full), before, worst round], [flatness `F` after, worst round], [A/A band `δ`], [full-length ms, before → after (round 1)], [cost after/before, median], [range over rounds],
   ..s.curves.map(c => (c.curve, f3(c.R_A_max), f3(c.F_B_max), f3(s.delta),
     f2(c.per_round.at(0).full_length_ms.A) + " → " + f2(c.per_round.at(0).full_length_ms.B),
@@ -88,5 +88,9 @@
 - *Small-order points.* On such points, for example attacker-chosen
   off-curve points, the registers can still meet the identity mid-ladder.
   Rejecting those points is the job of point validation.
-- *Cost.* About a third more group operations, paid only on curves without a
-  dedicated projective stack.
+- *Cost.* The fix adds `L` doublings to a ladder of `L` additions and `2L`
+  doublings, about a third more group operations. Measured wall time on
+  full-length scalars is
+  #s.curves.map(c => c.curve + " " + f2(c.cost_min) + "–" + f2(c.cost_max) + "×").join("; ").
+  The cost falls only on curves without a dedicated projective stack.
+  secp256k1 and P-256 are unaffected.

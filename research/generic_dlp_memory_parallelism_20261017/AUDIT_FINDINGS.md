@@ -22,8 +22,8 @@ Each finding says how it is known:
   here. A reported cost figure is an estimate, not a measurement. Some came
   from scratch models outside the repository and are not evidence.
 
-Status is one of: *fixed in #2048*, *fixed in the correctness PR* (pending,
-see below), or *open*. Open findings are not claims. They are leads, each
+Status is one of: *fixed in #2048*, *fixed in #2063* (the correctness PR),
+*fixed in the `scalar_mul_ct` timing PR*, or *open*. Open findings are not claims. They are leads, each
 with the change that would settle it.
 
 ## Fixed in #2048 (this study, engineering, outputs pinned)
@@ -33,7 +33,7 @@ with the change that would settle it.
 | 1 | `bsgs_fast.rs` kernels and `BabyTable` | BSGS on tables past L2 waited on probe misses. At load ≈ ½ the probe's "empty?" branch depends on the missing load, so misses serialised. | measured | 1.30–1.98× lower one-target wall time at 44–52 bits ([README](README.md)) |
 | 2 | `prime_fast.rs:540` `mul`, `:554` `combine` | Affine double-and-add paid one binary-GCD inversion per group operation. `rho_parallel` calls `combine` for its 1024-entry table and every walk start, all outside `total_steps`. | measured | start-up 6.8–16.1× cheaper; whole solve 1.8–5.8× faster at 32–40 bits (1 thread) |
 
-## Fixed in the correctness PR (branch `claude/generic-dlp-correctness-fixes`, pending)
+## Fixed in #2063 (the correctness PR)
 
 These change counted outputs by design: walk transcripts, step counts. They
 are therefore re-pinned deliberately in `tests/ec_vartime_walks_pinned.rs`,
@@ -46,13 +46,18 @@ with before/after counts, in their own PR.
 | 5 | `pohlig_hellman.rs:85` via `j0_twists::factorise_small` | The whole order is trial-divided in `BigUint` up to √(cofactor), before the smoothness bound is consulted. For an order with a large prime factor (a cryptographic `curve.n`) that does not finish. | verified | trial division bounded by `smoothness_bound` |
 | 6 | `pohlig_hellman.rs:110` | The CRT result is never checked against `Q`, and order 1 returns `None`. | verified | `[d]G = Q` checked; order 1 gives `d = 0` |
 
+## Fixed in the `scalar_mul_ct` timing PR
+
+| # | where | finding | how known | effect |
+|:--|:--|:--|:--|:--|
+| 7 | `ecc/point.rs` `scalar_mul_ct`, reached from `ecc/ct.rs` `scalar_mul_secret` and the SM2, GOST, EC-KCDSA and EC-ElGamal routines | **Coarse timing leak in protocol code.** The affine `BigUint` ladder (every curve but secp256k1 and P-256) started at `r0 = O`, where `O + P` and `2·O` are shortcuts, so each leading zero bit was cheaper and wall time revealed the scalar's bit length, which lattice attacks on nonces use. | measured ([study](../scalar_mul_ct_timing_20261022/README.md)): before the fix a 32-bit scalar took 0.38–0.48 of a full-length one's time on SM2 and GOST-256 | the ladder runs on `k + 2^L` from `(P, 2P)` and subtracts `[2^L]P` (public doublings): exact `[k mod 2^L]P` for every point, no identity step (unit test), time flat within the A/A band; 1.29–1.55× on full-length scalars |
+
 ## Open
 
 ### Correctness and claim fidelity
 
 | # | where | finding | how known | what would settle it |
 |:--|:--|:--|:--|:--|
-| 7 | `ecc/ct.rs:39` `scalar_mul_secret`; `ecc/point.rs:347` `scalar_mul_ct` | **Coarse timing leak in protocol code.** Curves other than secp256k1 and P-256 fall back, unblinded, to the affine `BigUint` ladder. It starts at `r0 = O`, where `O + P` and `2·O` are shortcuts, so each iteration above the scalar's top set bit costs less and wall time reveals the scalar's bit length. The nonce bit length is what lattice attacks use. The doc says the coarse operation-count leak is closed. Callers: `sm2.rs`, `gost_3410_2012.rs`, `ec_kcdsa.rs`, `asymmetric/ec_elgamal.rs`. (`SECURITY.md` already disclaims limb-level timing.) | verified by reading; leak size not measured | Blind as `scalar_mul_secret_blinded` does, or fix the bit length (`k + n` or `k + 2n`), plus a test that times leading-zero scalars against full-length ones. Better: run the RCB general-`a` formulas over `ct_bignum`'s runtime Montgomery context. |
 | 8 | `ecdlp_variants/gaudry_schost.rs:118` `branch` | The branch is `x`'s low byte mod `r`, and the DP test (`:131`) zeroes the low `dp_bits`. With `r = 32` and `dp_bits = 4`, branches 0 and 16 are never taken from a non-DP point: a 30-way walk. | verified by reading | Take the branch from bits above the DP bits, then re-pin the GS transcripts. Impact on the iteration count is expected to be small, but it is not measured. |
 | 9 | `pollard_collab/walk.rs:79` `branch_index` | The same overlap: `x mod r` against a low-bits DP test. Branch 0 is never taken from a non-DP point once `dp_bits ≥ 5`. | reported | as #8 |
 | 10 | `ecdlp_variants/bsgs.rs:326` (#8), `:390` (#9) | The negation-map interleaved and grumpy variants use stride `m`, not `2m − 1`, so the x-folded tables do not widen the giant stride. They pay for folding and do not get its coverage. | verified by reading | Stride `2m − 1` with tables of `m` entries, the counts compared against #3 and #4 over a target panel |
