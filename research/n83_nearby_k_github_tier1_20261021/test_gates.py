@@ -10,6 +10,18 @@ from research.n83_nearby_k_github_tier1_20261021 import protocol, run, verify
 
 
 class GateTests(unittest.TestCase):
+    def test_rho_noise_controls_repeat_work_with_independent_rounds(self):
+        events = protocol.events()
+        seeds = []
+        for index in range(protocol.ROUNDS):
+            block = events[6 * index:6 * index + 6]
+            before, after = block[0], block[-1]
+            self.assertEqual(before["kind"], "rho")
+            self.assertEqual(after["kind"], "rho")
+            self.assertEqual(before["seed"], after["seed"])
+            seeds.append(before["seed"])
+        self.assertEqual(len(set(seeds)), protocol.ROUNDS)
+
     def test_independent_point_is_outside_fixed31_holdout(self):
         _line, point, _scalar = run.fixture()
         reserved = {tuple(int(x) for x in json.loads(line)) for line in

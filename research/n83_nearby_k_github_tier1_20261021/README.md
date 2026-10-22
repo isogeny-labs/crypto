@@ -56,3 +56,10 @@ The workflow builds and tests the exact producers on Linux, runs the sealed
 schedule, independently replays it, and uploads all raw receipts even if a
 child or gate fails. The producer and verifier run in a GitHub Actions job;
 the present macOS host is not used for a new timed comparison.
+
+
+## Rho A/A control correction
+
+Run [39695853504](https://github.com/aburan28/crypto/actions/runs/39695853504) remains `BOUNDED_UNKNOWN`. Its original source receipt and independent replay are retained in `prior_runs/39695853504/`, with the artifact digest and exact source commit. All 30 children replayed, but the 20% noise gate failed. The rho before/after pair used different seeds in each round, so its spread mixed stochastic search work with host noise. The K1107 pair also exceeded the gate in round 0 (21.316%); correcting rho does not validate that run.
+
+The corrected schedule repeats the same rho seed within each round and keeps distinct seeds across the five rounds. Its protocol digest changes, and the verifier continues to require the exact schedule and protocol digest. The candidates, point, caps, five rounds and 20% gate stay fixed. Any new run is separate evidence; it must independently pass every existing gate. No historical timing is promoted, and the earlier failed run is never reclassified.

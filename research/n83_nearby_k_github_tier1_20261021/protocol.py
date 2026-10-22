@@ -47,7 +47,11 @@ RHO_SEED_BASE = 2026122100
 
 
 def events():
-    """Two same-point rho controls and two K1107 A/A controls per round."""
+    """Same-point, same-seed rho A/A pairs and K1107 A/A pairs per round.
+
+    Distinct seeds between rounds retain independent walks. Within a pair,
+    changing the seed would mix search-work variance into the host-noise gate.
+    """
     rows = []
     for round_index in range(ROUNDS):
         prefix = f"r{round_index:02d}"
@@ -60,5 +64,5 @@ def events():
                          "round": round_index, "k": k,
                          "candidate_id": CANDIDATES[k][0]})
         rows.append({"name": f"{prefix}_rho_after", "kind": "rho",
-                     "round": round_index, "seed": RHO_SEED_BASE + 2 * round_index + 1})
+                     "round": round_index, "seed": RHO_SEED_BASE + 2 * round_index})
     return rows
