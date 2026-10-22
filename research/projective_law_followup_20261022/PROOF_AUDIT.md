@@ -74,11 +74,11 @@ certify the modified implementation.
 
 ### Exact generic 1+2 identity, added after the finite audit
 
-The new native `projective-symbolic-12` checker proves seven equalities as
-canonical polynomials over
-`Z[x,y,q,r,s,t,a0,a1,a2,a3]`. The output is
+The new native `projective-symbolic-12` checker proves seven affine
+equalities and nine weighted-scale equalities as canonical polynomials over
+`Z[x,y,q,r,s,t,a0,a1,a2,a3,alpha,mu,zeta,omega]`. The output is
 `results/symbolic-1plus2.json`. This is an exact coefficient proof for
-the **affine-input, K ≠ 0** branch, not another finite-field sample.
+the **generic weighted-input, K ≠ 0** branch, not another finite-field sample.
 
 Write `u(X)=X²+qX+r`, `v(X)=sX+t`, `F(X)=X⁵+a3X³+a2X²+a1X+a0`,
 and `F-v²=uH+C`, where `deg C<2`. A valid Mumford input has `C=0`.
@@ -118,10 +118,22 @@ identity for valid affine inputs and `K≠0`. The native checker proves
 the stated polynomial equalities; the displayed divisor argument is
 written mathematics, not a Lean theorem.
 
+For arbitrary nonzero point weights `(alpha,mu)` and degree-two weights
+`(zeta,omega)`, substitute the prescribed projective input coordinates
+into the literal implementation. Put `M=alpha⁵ zeta⁵ mu omega`. The
+checker verifies its intermediates scale as
+`K_w=alpha⁴ zeta⁴ mu K`, `A_w=MA`, `B_w=M zeta² B`, and
+`D_w=M zeta⁴ D`. Its outputs satisfy
+`(q3,r3,s3,t3,z3)=(M²Q,M⁴K²R,M³S,M⁵T,MK)`. These are precisely the
+coordinate weights used by `normalize`; the weighted output therefore
+normalizes to the affine pair above. The nine scale equalities are checked
+over the integer polynomial ring, so they hold for every field
+specialization where the input weights and `K` are nonzero.
+
 Proof map: the exact coefficient identities are discharged by
 `src/bin/projective_symbolic_12.rs` and its committed result. The
-divisor-class bridge and the weighted-coordinate generalization have no
-Lean declaration yet. A core-only Lean 4.34.1 probe found neither
+divisor-class bridge and weighted identities have no Lean declaration yet.
+A core-only Lean 4.34.1 probe found neither
 `Field` nor `Polynomial` in `Std`; completing a faithful Lean version
 needs a pinned algebra library or local definitions and a verified
 divisor-class representation. No weakened conditional Lean theorem is
@@ -130,7 +142,7 @@ claimed as the full group-law proof.
 ### Open cases
 
 A machine-checkable symbolic reduction is still needed for every output
-branch other than the affine-input generic 1+2 case: show its nonzero
+branch other than the generic weighted-input 1+2 case: show its nonzero
 weighted coordinates normalize to the Cantor sum, including degree drops
 and shared-support positive composition. The finite audit and five
 branch-selection lemmas above do not supply these remaining identities.

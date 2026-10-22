@@ -4,7 +4,7 @@
 use serde_json::json;
 use std::collections::BTreeMap;
 
-const N: usize = 10;
+const N: usize = 14;
 type Monomial = [u8; N];
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -61,6 +61,13 @@ impl P {
     }
     fn sq(&self) -> Self {
         self.mul(self)
+    }
+    fn pow(&self, n: u32) -> Self {
+        let mut out = Self::c(1);
+        for _ in 0..n {
+            out = out.mul(self);
+        }
+        out
     }
     fn terms(&self) -> usize {
         self.0.len()
@@ -123,7 +130,7 @@ impl U {
 }
 
 fn main() {
-    // Formal independent variables x,y,q,r,s,t,a0,a1,a2,a3.
+    // Formal independent variables x,y,q,r,s,t,a0,a1,a2,a3,alpha,mu,zeta,omega.
     let v: Vec<P> = (0..N).map(P::var).collect();
     let (x, y, q, r, s, t) = (&v[0], &v[1], &v[2], &v[3], &v[4], &v[5]);
     let f = U::new(vec![
@@ -197,14 +204,59 @@ fn main() {
             .sub(&a.mul(&b.add(&s.mul(&k))).mul(&k2))
             .add(&qnum.mul(x).mul(&k2))
     );
+
+    // Independently substitute arbitrary nonzero input weights into the
+    // literal weighted implementation and compare every intermediate/output
+    // with the affine branch's predicted homogeneous scale.
+    let (alpha, mu, zeta, omega) = (&v[10], &v[11], &v[12], &v[13]);
+    let (az2, az3, az4, az5) = (alpha.sq(), alpha.pow(3), alpha.pow(4), alpha.pow(5));
+    let (zz2, zz3, zz4, zz5) = (zeta.sq(), zeta.pow(3), zeta.pow(4), zeta.pow(5));
+    let (px, py) = (x.mul(&az2), y.mul(&az5).mul(mu));
+    let (qw, rw) = (q.mul(&zz2), r.mul(&zz4));
+    let (sw, tw) = (s.mul(&zz3).mul(omega), t.mul(&zz5).mul(omega));
+    let kw = qw
+        .mul(&zz2)
+        .mul(&px)
+        .mul(&az2)
+        .add(&px.sq().mul(&zz4))
+        .add(&rw.mul(&az4))
+        .mul(mu);
+    let aw = py
+        .mul(&zz5)
+        .mul(omega)
+        .sub(&sw.mul(&az3).mul(&px).mul(&zz2).add(&tw.mul(&az5)).mul(mu));
+    let bw = sw.mul(&kw).mul(alpha).add(&aw.mul(&qw));
+    let cw = tw.mul(&kw).mul(alpha).add(&aw.mul(&rw));
+    let ll = kw.mul(alpha).mul(omega);
+    let mm = kw.mul(zeta).mul(omega);
+    let q3w = px.mul(&mm.sq()).sub(&qw.mul(&ll.sq())).sub(&aw.sq());
+    let h1w = v[9].mul(&zz4).sub(&rw).add(&qw.sq());
+    let r3w = h1w
+        .mul(&ll.pow(4))
+        .sub(&aw.mul(&bw.add(&sw.mul(&kw).mul(alpha))).mul(&ll.sq()))
+        .add(&q3w.mul(&px).mul(&mm.sq()));
+    let s3w = aw.mul(&q3w).sub(&bw.mul(&ll.sq()));
+    let t3w = aw.mul(&r3w).sub(&cw.mul(&ll.pow(4)));
+    let zw = kw.mul(zeta).mul(alpha).mul(omega);
+    let m = az5.mul(&zz5).mul(mu).mul(omega);
+    assert_eq!(kw, az4.mul(&zz4).mul(mu).mul(&k));
+    assert_eq!(aw, m.mul(&a));
+    assert_eq!(bw, m.mul(&zz2).mul(&b));
+    assert_eq!(cw, m.mul(&zz4).mul(&ccoef));
+    assert_eq!(q3w, m.sq().mul(&qnum));
+    assert_eq!(r3w, m.pow(4).mul(&k2).mul(&rscaled));
+    assert_eq!(s3w, m.pow(3).mul(&s3));
+    assert_eq!(t3w, m.pow(5).mul(&t3));
+    assert_eq!(zw, m.mul(&k));
     println!(
         "{}",
         json!({"schema":"projective-symbolic-1plus2/v1","status":"pass",
-            "coefficient_ring":"Z[x,y,q,r,s,t,a0,a1,a2,a3]",
-            "exact_integer_polynomial_equalities":7,
+            "coefficient_ring":"Z[x,y,q,r,s,t,a0,a1,a2,a3,alpha,mu,zeta,omega]",
+            "affine_exact_equalities":7,"weighted_scale_equalities":9,
+            "exact_integer_polynomial_equalities":16,
             "input_f_minus_v_squared_terms":f.sub(&vv.mul(&vv)).terms(),
             "body_terms":body.terms(),
             "output_u_scaled_terms":uscaled.terms(),
-            "scope":"generic affine-input 1+2 branch with K != 0; divisor-class bridge in PROOF_AUDIT.md"})
+            "scope":"generic weighted-input 1+2 branch with K != 0 and nonzero input weights; divisor-class bridge in PROOF_AUDIT.md"})
     );
 }

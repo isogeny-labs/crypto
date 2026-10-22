@@ -52,7 +52,7 @@ existing arithmetic-gate output was regenerated and byte-compared with
 the frozen `results/arithmetic-branches.jsonl`; the implementation's
 behavior and collector records were not changed by this audit.
 
-The subsequent symbolic certificate for the generic affine-input 1+2
+The subsequent symbolic certificate for the generic weighted-input 1+2
 branch is built with `--bin projective-symbolic-12` and run from the
 repository root with stdout redirected to
 `results/symbolic-1plus2.json`. It checks exact sparse integer-polynomial
