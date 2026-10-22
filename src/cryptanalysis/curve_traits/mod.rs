@@ -1045,10 +1045,12 @@ fn twist(q: &BigUint, trace: &BigInt, fx: &Factoring) -> Twist {
 
 /// The orders `End(E)` can still be, given the levels so far, cut down by
 /// the walks (walk.rs): a closed cycle of `r` `l`-isogenies puts the
-/// conductor `f` among the divisors of its `y` and makes `r` the order of
-/// a prime above `l` in the class group of `End(E)`, so `r | h(O_f)`; a
-/// walk of `n` steps that has not closed rules out every order with
-/// `h(O_f) ≤ n`.  A level all surviving orders share is decided; the
+/// conductor `f` among the divisors of its `y` and makes `r` exactly the
+/// order of a prime above `l` in the class group of `End(E)`; a walk of
+/// `n` steps that has not closed makes that order exceed `n`.  The order
+/// comes from composing binary quadratic forms of discriminant `d_K f²`,
+/// or, past word size, is bounded through `h(O_f)` (`r | h(O_f)`, and
+/// `h(O_f) > n`).  A level all surviving orders share is decided; the
 /// others keep the largest surviving level as their bound.  Open walks are
 /// lengthened (within [`WALK_EXTENSION`] times the budget) to the class
 /// number they must outlast.  `Err` when no order survives.
@@ -1125,13 +1127,21 @@ fn settle_by_walks(
             .zip(cand)
             .fold(BigUint::one(), |acc, (p, &e)| acc * p.pow(e));
         let h = class(cand);
+        // The first return is exactly the order of the class of a prime
+        // above l in the class group of End(E): computed by composing
+        // forms where Δ fits a word, else bounded through h(O_f).
         walks.closed.iter().all(|cy| {
             (cy.multiples.is_empty() || cy.multiples.iter().any(|y| (y % &f).is_zero()))
-                && h.as_ref().is_none_or(|h| (h % cy.steps).is_zero())
-        }) && walks
-            .open
-            .iter()
-            .all(|(_, n)| h.as_ref().is_none_or(|h| h > &BigUint::from(*n)))
+                && match walk::class_order(dk, &f, cy.degree, u64::from(cy.steps)) {
+                    Ok(order) => order == Some(u64::from(cy.steps)),
+                    Err(()) => h.as_ref().is_none_or(|h| (h % cy.steps).is_zero()),
+                }
+        }) && walks.open.iter().all(|(l, n)| {
+            match walk::class_order(dk, &f, *l, u64::from(*n)) {
+                Ok(order) => order.is_none(),
+                Err(()) => h.as_ref().is_none_or(|h| h > &BigUint::from(*n)),
+            }
+        })
     };
     let survivors: Vec<&Vec<u32>> = candidates.iter().filter(|c| fits(c)).collect();
     if survivors.is_empty() {

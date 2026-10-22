@@ -677,16 +677,16 @@ type Form = (i128, i128, i128);
 /// The reduced form equivalent to `f` (`|b| ≤ a ≤ c`, `b ≥ 0` when
 /// `|b| = a` or `a = c`).
 fn reduce(f: Form, delta: i128) -> Form {
-    let (mut a, mut b, mut c) = f;
+    let (mut a, mut b, _) = f;
     loop {
         let mut t = b.rem_euclid(2 * a);
         if t > a {
             t -= 2 * a;
         }
         b = t;
-        c = (b * b - delta) / (4 * a);
+        let c = (b * b - delta) / (4 * a);
         if a > c {
-            (a, b, c) = (c, -b, a);
+            (a, b) = (c, -b);
             continue;
         }
         if a == c && b < 0 {
