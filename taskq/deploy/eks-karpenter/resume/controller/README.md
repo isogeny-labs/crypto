@@ -23,6 +23,15 @@ next checkpoint; an older state already in `Checkpointing` without an intent
 fails explicitly instead of guessing whether SIGCONT or a new checkpoint was
 pending.
 
+CRIU can capture an exited ecbench child while its stopped parent has not yet
+reaped it. Such a zombie is not admitted as a stopped process. The supervisor
+retains that uncommitted capture, resumes the same computational process to reap
+the child, and captures again, at most eight times within the original deadline.
+Every admitted process and thread must be stopped and retain the original
+credential checks. A completed root proceeds to native verification. This does
+not retry an L2 epoch or reset a checkpoint's logical generation; no EBS/S3
+generation is committed until an admissible capture exists.
+
 The supervisor has no service-account token or AWS credentials. It drops the
 payload's UID/GID, groups and capabilities before exec; the separate native
 progress launcher forces L0 and denies perf descriptors. CRIU restores with

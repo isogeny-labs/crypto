@@ -328,34 +328,73 @@ fn checkpoint(req: &Request, s: &mut Status, n: u64) -> Result<(), String> {
     )
     .map_err(error)?;
     let dump = dir.join("dump");
-    fs::create_dir(&dump).map_err(error)?;
     s.phase = "checkpointing".into();
     s.generation = Some(n);
     save(&status_path(s.attempt), s)?;
-    let mut cmd = criu();
-    cmd.args(["dump", "--tree", &pid.to_string()]);
-    common_criu(&mut cmd, &dump);
-    cmd.args(["--log-file", "dump.log"]);
-    let result = cmd.output().map_err(error)?;
-    save(
-        &dir.join("dump-result.json"),
-        &json!({"exit_code":result.status.code(),"stderr":String::from_utf8_lossy(&result.stderr)}),
-    )?;
-    if !result.status.success() {
-        return Err("CRIU dump failed; retained log, no generation committed".into());
-    }
-    let pids = tree(pid)?;
-    for p in &pids {
-        credentials(*p)?;
-        let st = payload_status(*p)?;
-        if !st
-            .lines()
-            .any(|l| l.starts_with("State:") && l.contains("T (stopped)"))
-        {
-            return Err("dump did not leave complete tree stopped".into());
+    // ecbench reaps short-lived workers. CRIU can catch an already exited
+    // child, whose zombie state is quiescent but cannot satisfy our strict
+    // stopped/credential restore contract. Never commit such a capture.
+    // Let this SAME computation reap it, then capture again. No measurement
+    // epoch, deadline, or logical checkpoint identity is retried/reset.
+    let mut captured = None;
+    for capture in 1..=8 {
+        if now() >= req.deadline_unix_seconds {
+            return Err("original UTC deadline expired during checkpoint".into());
         }
-        fs::write(dir.join(format!("process-{p}-status.txt")), st).map_err(error)?;
+        if checkpoint_completion(s, pid)? {
+            return Ok(());
+        }
+        let candidate = dir.join(format!("capture-{capture}"));
+        fs::create_dir(&candidate).map_err(error)?;
+        let mut cmd = criu();
+        cmd.args(["dump", "--tree", &pid.to_string()]);
+        common_criu(&mut cmd, &candidate);
+        cmd.args(["--log-file", "dump.log"]);
+        let result = cmd.output().map_err(error)?;
+        let receipt = json!({"exit_code":result.status.code(),"stderr":String::from_utf8_lossy(&result.stderr)});
+        save(&candidate.join("dump-result.json"), &receipt)?;
+        if !result.status.success() {
+            return Err("CRIU dump failed; retained log, no generation committed".into());
+        }
+        let pids = tree(pid)?;
+        let mut has_zombie = false;
+        for p in &pids {
+            let st = payload_status(*p)?;
+            fs::write(candidate.join(format!("process-{p}-status.txt")), &st).map_err(error)?;
+            credentials(*p)?;
+            has_zombie |= !stopped_or_zombie(&st)?;
+            // Every thread must be quiescent, not merely its process leader.
+            for task in fs::read_dir(format!("/proc/{p}/task")).map_err(error)? {
+                let path = task.map_err(error)?.path().join("status");
+                has_zombie |= !stopped_or_zombie(&fs::read_to_string(path).map_err(error)?)?;
+            }
+        }
+        if !has_zombie {
+            fs::rename(&candidate, &dump).map_err(error)?;
+            save(&dir.join("dump-result.json"), &receipt)?;
+            captured = Some(pids);
+            break;
+        }
+        save(
+            &candidate.join("not-committed.json"),
+            &json!({"reason":"captured zombie; resume same computation to reap before recapturing","capture":capture}),
+        )?;
+        if !stopped_or_zombie(&payload_status(pid)?)? {
+            if !checkpoint_completion(s, pid)? {
+                return Err("captured zombie root was not waitable".into());
+            }
+            return Ok(());
+        }
+        if capture == 8 {
+            return Err(
+                "checkpoint exhausted eight captures containing zombies; no generation committed"
+                    .into(),
+            );
+        }
+        continue_tree(s)?;
+        thread::sleep(Duration::from_millis(10));
     }
+    let pids = captured.ok_or("checkpoint has no admitted stopped capture")?;
     sync_work()?;
     let mut entries = BTreeMap::new();
     files(Path::new("/work/compute"), &mut entries)?;
@@ -373,6 +412,33 @@ fn checkpoint(req: &Request, s: &mut Status, n: u64) -> Result<(), String> {
     sync_work()?;
     s.phase = "stopped".into();
     Ok(())
+}
+fn checkpoint_completion(s: &mut Status, pid: i32) -> Result<bool, String> {
+    let mut status = 0;
+    let got = unsafe { libc::waitpid(pid, &mut status, libc::WNOHANG) };
+    if got == 0 {
+        return Ok(false);
+    }
+    if got != pid || !libc::WIFEXITED(status) || libc::WEXITSTATUS(status) != 0 {
+        return Err("computation failed during checkpoint".into());
+    }
+    s.exit_code = Some(0);
+    s.phase = "completed".into();
+    Ok(true)
+}
+// Only a stopped task is eligible for a committed generation. Zombies are
+// distinguished solely to request an uncommitted recapture; all other states
+// remain errors. In particular a ptrace stop is not our SIGSTOP contract.
+fn stopped_or_zombie(s: &str) -> Result<bool, String> {
+    match s
+        .lines()
+        .find_map(|line| line.strip_prefix("State:"))
+        .map(str::trim)
+    {
+        Some("T (stopped)") => Ok(true),
+        Some("Z (zombie)") => Ok(false),
+        state => Err(format!("checkpoint task is not stopped: {state:?}")),
+    }
 }
 fn restore(req: &Request, s: &mut Status, n: u64, expected: Option<&str>) -> Result<(), String> {
     if s.phase != "waiting" || s.attempt == 0 {
@@ -679,5 +745,45 @@ mod tests {
         checkpoint(&req, &mut s, 1).unwrap();
         assert_eq!(s.phase, "completed");
         assert!(s.generation.is_none());
+    }
+    #[test]
+    fn running_and_traced_tasks_cannot_be_recapture_candidates() {
+        assert_eq!(stopped_or_zombie("State:\tT (stopped)\n"), Ok(true));
+        assert_eq!(stopped_or_zombie("State:\tZ (zombie)\n"), Ok(false));
+        for state in [
+            "R (running)",
+            "S (sleeping)",
+            "D (disk sleep)",
+            "t (tracing stop)",
+            "",
+        ] {
+            assert!(stopped_or_zombie(&format!("State:\t{state}\n")).is_err());
+        }
+    }
+    #[test]
+    fn real_exited_child_requires_recapture_without_reaping_it() {
+        // Exercise the actual /proc state from the live qualification failure.
+        // Child executes only async-signal-safe _exit after a test-runner fork.
+        let child = unsafe { libc::fork() };
+        assert!(child >= 0);
+        if child == 0 {
+            unsafe { libc::_exit(17) }
+        }
+        let mut info = unsafe { std::mem::zeroed::<libc::siginfo_t>() };
+        let waited = unsafe {
+            libc::waitid(
+                libc::P_PID,
+                child as u32,
+                &mut info,
+                libc::WEXITED | libc::WNOWAIT,
+            )
+        };
+        let observed = payload_status(child).and_then(|s| stopped_or_zombie(&s));
+        let mut status = 0;
+        let reaped = unsafe { libc::waitpid(child, &mut status, 0) };
+        assert_eq!(waited, 0);
+        assert_eq!(observed, Ok(false));
+        assert_eq!(reaped, child);
+        assert_eq!(libc::WEXITSTATUS(status), 17);
     }
 }

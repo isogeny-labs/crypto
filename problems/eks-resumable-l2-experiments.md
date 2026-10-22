@@ -109,3 +109,14 @@ refreshed against it. Pending exact-head CI/review and full main-only Action
 execution keep this record open. The lab host MCP/client are upgraded; a fresh
 connection exposed all nine tools and read F as succeeded. Existing connections
 must reconnect to discover the recovery tools; other processes were left running.
+
+2026-10-22 periodic-checkpoint follow-up: the generation-intent fix was merged
+into #2342 and deployed after 18 native controller tests. Its new live attempt
+failed before committing a generation: CRIU captured an exited child and the
+supervisor correctly refused to call it a stopped process. The repair now retains
+that uncommitted capture, lets the same computation reap the child, and recaptures
+at most eight times within the original deadline. Credential checks and L2 epoch
+retry policy are unchanged. Twenty controller tests and 4,474 library tests pass;
+the [failed run and exact evidence](../taskq/deploy/eks-karpenter/resume/validation/20261022-periodic/attempt-a/REPORT.md)
+remain recorded. Live multi-generation qualification and the main-only GitHub
+Action still keep this integration record open.
