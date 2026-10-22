@@ -431,6 +431,25 @@ class MeasurementSchemaTests(unittest.TestCase):
             self.assertEqual(result["status"], "FAIL", f"variant {index}: {result}")
             self.assertTrue(result["validation_errors"] or result["pairing_errors"])
 
+    def test_parse_paired_oracle_stdout_current_format(self) -> None:
+        sample = """=== Paired oracle benchmark: x-system vs symmetrised system ===
+targets = 8, seed = 24269, node budget = 50000, SAT conflict budget = 2000000, targets in <G> = true
+
+== K_0/F_2^31  m = 2  dim V = 16  |F_x| = 68327  |F_u| = 69441  targets = 8
+   arm            vars  eqs deg found refuted inconc via T     found ms   refuted ms    effort  built  ffd  gate
+   x-chained F4     32   31   2     5       3      0     0        20850        75871      7056      -    3    ok
+   sym F4           31   31   2     4       4      0     0         7011        38153      4095      -    4    ok
+   divisor indices [0, 1, 2, 3]  (612.0 s)
+"""
+        parsed = lab.parse_paired_oracle_stdout(sample)
+        self.assertEqual(parsed["header"]["n"], 31)
+        self.assertEqual(parsed["header"]["dim"], 16)
+        self.assertEqual(parsed["disagreements"], 0)
+        self.assertEqual(parsed["median_ms_per_target"], 75871.0)
+        self.assertEqual(parsed["arms"]["x_chained_f4"]["ffd"], 3)
+        self.assertEqual(parsed["arms"]["sym_f4"]["ffd"], 4)
+        self.assertEqual(parsed["wall_s"], 612.0)
+
     def test_decomposition_requires_ffd(self) -> None:
         report = {
             "n": 31,
@@ -452,6 +471,34 @@ class MeasurementSchemaTests(unittest.TestCase):
         result = lab.validate_claim(report, stage="decomposition", ledger=self.ledger)
         self.assertEqual(result["status"], "FAIL")
         self.assertIn("ffd_or_degree_of_regularity", result["missing_stage_fields"])
+
+    def test_parse_semaev_decomp_bench_stdout(self) -> None:
+        sample = """
+  ── deciding one target that does NOT decompose ──────────────────
+    l    n        triples  triples/gen  triples/1wd  pairs+solve   speedup
+    5   15           5984       0.025s       0.001s       0.001s      1.6x
+    8   24        2829056      14.299s       0.607s       0.068s      8.9x
+"""
+        parsed = lab.parse_semaev_decomp_bench_stdout(sample)
+        self.assertEqual(len(parsed["ladder"]), 2)
+        self.assertEqual(parsed["ladder"][-1]["l"], 8)
+        self.assertEqual(parsed["ladder"][-1]["pairs_s"], 0.068)
+        self.assertEqual(parsed["ladder"][-1]["speedup_vs_triples"], 8.9)
+
+    def test_parse_j0_known_answer_stdout(self) -> None:
+        sample = (
+            "curve=j0-bench-16bit p_bits≈16 n=65521 orbits=40\n"
+            '{"bits":16,"curve":"j0-bench-16bit","ic_ms":12.5,"ic_ok":true,'
+            '"ic_matches_truth":true,"rho_ms":1.25,"rho_ok":true,'
+            '"ic_agrees_rho":true,"target_orbits":40,"max_trials":200000,'
+            '"rho_steps":65536,"claim_boundary":"synthetic known-answer j=0 IC vs rho"}\n'
+        )
+        parsed = lab.parse_j0_known_answer_stdout(sample)
+        self.assertEqual(parsed["bits"], 16)
+        self.assertTrue(parsed["ic_ok"])
+        self.assertTrue(parsed["rho_ok"])
+        self.assertTrue(parsed["ic_agrees_rho"])
+        self.assertEqual(parsed["ic_ms"], 12.5)
 
 
 class HelperTests(unittest.TestCase):
@@ -1107,6 +1154,131 @@ class SingleTargetPanelTests(unittest.TestCase):
                   "online_start_ns": 5, "online_stop_event": "e", "relation_checks": 1}
         self.assertEqual(self.stp.untimed(record, ("relation_checks",)), {"kind": "k", "probes": 3})
 
+    def test_point_comparisons_survive_string_coordinates(self) -> None:
+        # Regression: producers emit u128 coordinates as decimal strings while the
+        # panel stores Python ints; rho_ok and the IC relation replay must
+        # normalize both sides instead of comparing raw values.
+        target = list(self.curve.mul(self.curve.g, 12345))
+        self.assertTrue(self.stp.same_point([str(v) for v in target], target))
+        self.assertTrue(self.stp.same_point(target, [str(v) for v in target]))
+        self.assertFalse(self.stp.same_point([str(v) for v in target], [v + 1 for v in target]))
+        points = [self.curve.mul(self.curve.g, s) for s in (11, 22, 33)]
+        last = self.curve.add(self.curve.neg(self.curve.add(self.curve.add(points[0], points[1]), points[2])),
+                              tuple(target))
+        base = points + [last]
+        fixture = dict(self.beat["curve_fixture"], targets=[[str(v) for v in target]])
+        ic = {"arm": "ic", "curve_id": "c", "generator": [int(v) for v in fixture["generator"]],
+              "target": [str(v) for v in target], "scalar": 12345,
+              "relation": {"base_hash": "b", "point_indices": [0, 1, 2, 3],
+                          "x_codes": [str(p[0]) for p in base]}}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "cert.json"
+            path.write_bytes(self.stp.identity.canonical(ic) + b"\n")
+            replay = self.stp.replay_certificate(path, self.stp.identity.sha256(ic), fixture, base)
+        self.assertTrue(replay["statement_holds"], replay)
+
+
+
+
+
+class EqualAdviceBlTests(unittest.TestCase):
+    BEAT = "koblitz.compact_orbit.n61_bl_reference"
+
+    def setUp(self) -> None:
+        self.protocol = lab.load_protocol()
+        self.ledger = lab.load_ledger(self.protocol)
+        self.beat = self.protocol["beats"][self.BEAT]
+
+    def test_bl_reference_beat_is_diagnostic_only(self) -> None:
+        self.assertEqual(self.beat["launch_mode"], "equal_advice_bl")
+        self.assertEqual(self.beat["stage"], "vs_rho")
+        self.assertTrue(self.beat["diagnostic_only"])
+        self.assertFalse(self.beat["primary_speedup_eligible"])
+        self.assertGreaterEqual(self.beat["targets_minimum"], 1024)
+        self.assertEqual(self.beat["panel_producers"]["bl"]["example"], "ic_next10_09_equal_advice")
+        rows = {row["beat_id"]: row for row in lab.plan(self.protocol, self.ledger)["beats"]}
+        self.assertFalse(rows[self.BEAT]["primary_speedup_eligible"])
+        self.assertIn("n61_bl_reference", lab.plan(self.protocol, self.ledger)["commands"])
+
+    def test_launch_and_panel_reject_equal_advice_beat(self) -> None:
+        args = lab.parser().parse_args(["launch", "--beat", self.BEAT])
+        with self.assertRaisesRegex(lab.AutolabError, "launch-equal-advice"):
+            lab.launch(args)
+        args = lab.parser().parse_args(["launch-panel", "--beat", self.BEAT])
+        with self.assertRaisesRegex(lab.AutolabError, "not a batch panel"):
+            lab.launch_panel(args)
+
+    def test_prepare_only_scaffolds_fail_closed_claim(self) -> None:
+        run_id = f"test-bl-ref-prepare-{lab.now().replace(':', '').replace('+', '')}"
+        args = lab.parser().parse_args([
+            "launch-equal-advice",
+            "--beat", self.BEAT,
+            "--run-id", run_id,
+            "--prepare-only",
+        ])
+        state = lab.launch_equal_advice(args)
+        self.assertEqual(state["status"], "PREPARE_ONLY")
+        run = lab.RUNS_DIR / run_id
+        draft = lab.read_json(run / "artifacts/claim_draft.json")
+        check = lab.read_json(run / "artifacts/claim_check.json")
+        self.assertEqual(draft["status"], "SCHEMA_INCOMPLETE")
+        self.assertEqual(check["status"], "FAIL")
+        self.assertTrue((run / "artifacts/commands.json").is_file())
+
+    def test_prepare_only_pair_ic_reuses_archive_pin(self) -> None:
+        archive = (
+            lab.HERE
+            / "evidence"
+            / "20261016-n61-bl-reference-l1024"
+            / "20261016T063525Z-842e1c174e"
+        )
+        self.assertTrue((archive / "logs" / "bl.jsonl").is_file())
+        run_id = f"test-bl-pair-prepare-{lab.now().replace(':', '').replace('+', '')}"
+        args = lab.parser().parse_args([
+            "launch-equal-advice",
+            "--beat", self.BEAT,
+            "--run-id", run_id,
+            "--prepare-only",
+            "--pair-ic",
+            "--reuse-bl-archive", str(archive),
+            "--ic-k", "256",
+            "--ic-target-count", "1",
+        ])
+        state = lab.launch_equal_advice(args)
+        self.assertEqual(state["status"], "PREPARE_ONLY")
+        self.assertTrue(state["pair_ic"])
+        commands = lab.read_json(lab.RUNS_DIR / run_id / "artifacts/commands.json")
+        self.assertIn("ic", commands)
+        self.assertEqual(self.beat.get("ic_k_default"), 256)
+
+    def test_equal_advice_pair_helpers_pin_archive(self) -> None:
+        import equal_advice_pair
+
+        archive = (
+            lab.HERE
+            / "evidence"
+            / "20261016-n61-bl-reference-l1024"
+            / "20261016T063525Z-842e1c174e"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            run = Path(tmp) / "run"
+            pin = equal_advice_pair.materialize_bl_archive(
+                archive=archive,
+                run=run,
+                lab=lab,
+                targets=1024,
+                table_bytes=5711008,
+            )
+            self.assertEqual(pin["targets"], 1024)
+            self.assertFalse(pin["remeasured"])
+            self.assertEqual(
+                pin["points_sha256"],
+                lab.sha256(archive / "inputs" / "points.txt"),
+            )
+            self.assertEqual(
+                pin["bl_jsonl_sha256"],
+                lab.sha256(archive / "logs" / "bl.jsonl"),
+            )
 
 
 if __name__ == "__main__":
