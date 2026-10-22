@@ -1098,30 +1098,7 @@ fn settle_by_walks(
             })
             .collect();
     }
-    // Lengthen each open walk past the largest class number it can afford
-    // to outlast, so it rules those orders out.
-    let classes: Vec<BigUint> = candidates.iter().filter_map(|cand| class(cand)).collect();
-    for (l, steps) in walks.open.iter_mut() {
-        let Some(reach) = walk::affordable(model, *l, WALK_EXTENSION) else {
-            continue;
-        };
-        let Some(need) = classes
-            .iter()
-            .filter_map(|h| h.to_u32())
-            .filter(|&h| h >= *steps && h < reach)
-            .max()
-        else {
-            continue;
-        };
-        match walk::walk_degree(model, dk, *l, need + 1) {
-            Some(walk::Walked::Closed(cy)) => walks.closed.push(cy),
-            Some(walk::Walked::Open { steps: n, .. }) => *steps = n,
-            None => {}
-        }
-    }
-    let closed: Vec<u64> = walks.closed.iter().map(|c| c.degree).collect();
-    walks.open.retain(|(l, _)| !closed.contains(l));
-    let fits = |cand: &Vec<u32>| {
+    let fits = |walks: &walk::Walks, cand: &Vec<u32>| {
         let f = primes
             .iter()
             .zip(cand)
@@ -1143,7 +1120,53 @@ fn settle_by_walks(
             }
         })
     };
-    let survivors: Vec<&Vec<u32>> = candidates.iter().filter(|c| fits(c)).collect();
+    let pinned = |survivors: &[&Vec<u32>]| {
+        (0..levels.len()).all(|i| survivors.iter().all(|c| c[i] == survivors[0][i]))
+    };
+    // Lengthen open walks only as far as the next class number among the
+    // orders still standing, and only while some level is still open.
+    let survivors: Vec<Vec<u32>> = loop {
+        let survivors: Vec<&Vec<u32>> = candidates.iter().filter(|c| fits(walks, c)).collect();
+        if survivors.is_empty() || pinned(&survivors) {
+            break survivors.into_iter().cloned().collect();
+        }
+        let classes: Vec<u32> = survivors
+            .iter()
+            .filter_map(|c| class(c))
+            .filter_map(|h| h.to_u32())
+            .collect();
+        let mut lengthened = false;
+        for i in 0..walks.open.len() {
+            let (l, steps) = walks.open[i];
+            let Some(reach) = walk::affordable(model, l, WALK_EXTENSION) else {
+                continue;
+            };
+            let Some(next) = classes
+                .iter()
+                .copied()
+                .filter(|&h| h >= steps && h < reach)
+                .min()
+            else {
+                continue;
+            };
+            match walk::walk_degree(model, dk, l, next + 1) {
+                Some(walk::Walked::Closed(cy)) => {
+                    walks.closed.push(cy);
+                    walks.open.remove(i);
+                }
+                Some(walk::Walked::Open { steps: n, .. }) => walks.open[i].1 = n,
+                None => {
+                    walks.open.remove(i);
+                }
+            }
+            lengthened = true;
+            break;
+        }
+        if !lengthened {
+            break survivors.into_iter().cloned().collect();
+        }
+    };
+    let survivors: Vec<&Vec<u32>> = survivors.iter().collect();
     if survivors.is_empty() {
         return Err(format!(
             "no order between Z[π] and O_K fits the isogeny walks ({} closed, {} open)",
@@ -1202,7 +1225,7 @@ fn settle_by_walks(
 const MAX_CANDIDATE_ORDERS: usize = 4096;
 
 /// How far past its budget [`settle_by_walks`] may lengthen an open walk.
-const WALK_EXTENSION: u64 = 4;
+const WALK_EXTENSION: u64 = 8;
 
 /// Stage timing for profiling (TRAITS_TIMING).
 fn timed<T>(what: &str, slug: &str, f: impl FnOnce() -> T) -> T {

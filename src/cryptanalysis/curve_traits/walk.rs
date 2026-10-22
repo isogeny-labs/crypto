@@ -120,6 +120,9 @@ pub fn walks(model: &Model, dk: &BigInt, v: &BigUint) -> Walks {
         let Some(steps) = affordable(model, l, 1) else {
             break;
         };
+        // Short first: the class numbers the levels need decide later how
+        // far an open walk must go (mod.rs, settle_by_walks).
+        let steps = steps.min(FIRST_STEPS);
         match walk_degree(model, dk, l, steps) {
             Some(Walked::Closed(c)) => out.closed.push(c),
             Some(Walked::Open { degree, steps }) => out.open.push((degree, steps)),
@@ -168,6 +171,9 @@ pub const CORNACCHIA_BITS: f64 = 4096.0;
 /// The largest `|d_K|`, in bits, for which [`walks`]
 /// walks.
 pub const MAX_DISC_BITS: u64 = 48;
+
+/// The length of [`walks`]'s first walk of each degree.
+pub const FIRST_STEPS: u32 = 512;
 
 /// Degrees `l` that [`walks`] walks.
 pub const DEGREES_TRIED: usize = 3;
