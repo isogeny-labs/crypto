@@ -44,9 +44,10 @@ cells, and branch records. Those finite checks do not prove universal
 completeness of the formula on every curve. A later [42-model proof audit](../projective_law_followup_20261022/PROOF_AUDIT.md)
 checked another 1,224,000 finite weighted additions against Cantor with zero
 mismatches. An exact integer-polynomial certificate and written divisor
-argument now establish the generic weighted 1+2 output identity for valid
-inputs with `u(x) != 0`; exceptional 1+2 and all 2+2 output identities
-remain open.
+argument establish the generic weighted 1+2 output identity for valid
+inputs with `u(x) != 0`. A separate exact certificate covers exceptional
+1+2 cancellation and the coincident-positive branch when `x4 != x`.
+Tripling (`x4 = x`) and all 2+2 output identities remain open.
 
 The [Kummer coordinate evidence](../kummer_coordinates_20261022/REPORT.md)
 reports 8,813 matching nonzero xADD outputs and seven zero outputs on the
