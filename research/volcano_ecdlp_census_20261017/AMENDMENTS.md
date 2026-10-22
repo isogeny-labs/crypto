@@ -78,3 +78,50 @@ estimand, margin, family, test or threshold in `ANALYSIS_PLAN.md`.
    removed under A1.6, each with a `cleanup` line in `runs/progress.jsonl`,
    after the same checks as Phase B; each archive was unpacked once more for
    the uncharged extract.
+3. **Interpretations the plan leaves open (post hoc, fixed in code before the
+   final run).** A 100-replicate smoke run was inspected before the final run,
+   to test the code. No choice below was changed after seeing its output.
+   - *Curve = census vertex.* §1 keys curves by `curve_slug` and maps each slug
+     to its vertex. The five isogenous families give five slugs (five
+     generators) per vertex, so the bootstrap resamples **vertices**, then rows
+     of each chosen vertex (all five families together), stratified by level.
+     Resampling slugs would count one curve five times.
+   - *Level analysis uses `S` and carries `ops_gae` and `solve_wall_ns` on the
+     same resamples.* The wall column is descriptive unless §8 admits it.
+   - *p-values.* A bootstrap two-sided p = 2·min(P(R* ≤ 1), P(R* ≥ 1)) with
+     +1 smoothing, used only for Holm. A test is "different" when the 95% CI
+     excludes 1 and the Holm-adjusted p is below 0.05. A result that meets both
+     TOST and "different" is labelled "equivalent" (the plan's order).
+   - *§4 per-curve p.* Within-vertex label shuffles have 3 outcomes per vertex,
+     so a per-curve p cannot reach 0.01 from them. p_v is the share of the
+     pooled |z*| (all vertices, all 10,000 shuffles) at least |z_v|, Holm over the
+     curves of that (V, arm). A degenerate (V, arm) with zero within-vertex
+     variance (BSGS: S depends only on r and k) reports no F and no flags.
+   - *§5 paired source ratio.* The unit is the (vertex, target_index, round)
+     triple, resampled jointly across the two families; pooled over all levels,
+     strata = level. N does not share k_i with D, so its pairing is nominal.
+     Holm family (c) = V × {rho-neg, rho-plain, ic} × {Ua, Ub, S, N}. bsgs and
+     bsgs-neg get the identity check only.
+   - *§5 transport then solve.* Per (V, source family, arm, destination level):
+     [mean ops_gae at the destination + p × Vélu point maps of the path] ÷
+     mean ops_gae of the same family's rows at the source vertex, for p = 0,
+     0.1, 1. Cost of both point maps (G and Q) is charged to every instance, with
+     no amortisation. The plan gives no definition of "exceeds the control
+     spread"; the control is the same ratio computed with the native (N) rows at
+     the same destinations and the same source vertex, no Vélu cost. A signal
+     needs the CI to exclude 1 on the lower side at all three prices and to be
+     disjoint from the control CI. The source mean comes from one vertex, so
+     it is noisy and shared by all destination levels.
+   - *§6.* The V3 crater is one curve, so the primary bootstrap resamples
+     (workload, target, round) pairs of `rho-cubic` and `rho-neg`. A
+     slug-cluster resample is reported as a sensitivity.
+   - *§8.* "A/A" ratio = pooled mean of `solve_wall_ns` of `rho-neg-aa` over
+     `rho-neg` on the same triples, level-stratified vertex bootstrap.
+   - *§9.* Pairs are (ic, rho-neg) runs of the same (workload, target, round);
+     priced S = S · (total_gae + p · uncharged) / total_gae. Only counters that
+     ecbench names in `cost.unpriced` are priced; any other native work is not
+     counted, so both arms stay lower bounds.
+   - *Reps.* All statistics use the plan's 10,000 replicates; no reduction.
+4. **Python.** AGENTS.md bars Python from computing results; the plan names
+   `analysis/analyze.py`, so it is Python. It reads only committed records and
+   is a candidate for a native re-implementation by the validator.
