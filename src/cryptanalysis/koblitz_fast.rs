@@ -1285,8 +1285,16 @@ impl FrobeniusCanon {
                 };
                 chunk.copy_from_slice(&mins);
             }
-            for x in chunks.into_remainder() {
-                *x = self.canon(*x);
+            // The tail runs as one padded block: the scalar key costs
+            // several times a vector lane inside a scan, and a window is
+            // rarely a multiple of sixteen. Padding repeats a real key, so
+            // the extra lanes compute a canonical name that is dropped.
+            let rest = chunks.into_remainder();
+            if let Some(&last) = rest.last() {
+                let mut block = [last; 16];
+                block[..rest.len()].copy_from_slice(rest);
+                self.canon_in_place(&mut block);
+                rest.copy_from_slice(&block[..rest.len()]);
             }
             return;
         }

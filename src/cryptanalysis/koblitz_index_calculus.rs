@@ -4170,6 +4170,10 @@ pub struct ScanScratch {
     /// for the folding kernel.
     gather_x: Vec<u64>,
     gather_y: Vec<u64>,
+    /// One block's filter hashes and the offsets the filter admits:
+    /// reused across scans, so a trial allocates nothing.
+    hashes: Vec<u64>,
+    admitted_offsets: Vec<usize>,
 }
 
 /// [`PairSumTable`]'s `negated_x` and `negated_y` of `points`: both empty
@@ -6602,6 +6606,8 @@ impl PairSumTable {
             x3s,
             gather_x,
             gather_y,
+            hashes,
+            admitted_offsets,
         } = scratch;
         rests.clear();
         lambdas.clear();
@@ -6699,8 +6705,6 @@ impl PairSumTable {
         // stopping at its first witness has not paid for the rest.
         const BLOCK: usize = 1024;
         const LOOKAHEAD: usize = 32;
-        let mut admitted_offsets = Vec::with_capacity(BLOCK / 8);
-        let mut hashes = Vec::with_capacity(BLOCK);
         let count = if fused { x3s.len() } else { rests.len() };
         for lo in (0..count).step_by(BLOCK) {
             let hi = (lo + BLOCK).min(count);
@@ -12397,6 +12401,24 @@ fn wide_probe_scalar(rng: &mut StdRng, order: &BigUint, nonzero: bool) -> BigUin
 /// worth parallelising.
 const PROBE_RUN: u64 = 64;
 
+/// `(a + b) mod m` for the walked probe sequence. When `a, b < m`, as
+/// every walked scalar and stride is, one compare replaces the 128-bit
+/// division; anything else takes the exact remainder, so the sequence is
+/// the one `(a + b) % m` always gave.
+#[inline]
+fn add_mod_u64(a: u64, b: u64, m: u64) -> u64 {
+    if a < m && b < m {
+        let d = m - b;
+        if a >= d {
+            a - d
+        } else {
+            a + b
+        }
+    } else {
+        ((a as u128 + b as u128) % m as u128) as u64
+    }
+}
+
 /// The step a walked run takes between consecutive trials, fixed by the
 /// seed so the sequence is reproducible.
 fn probe_run_stride(seed: u64, r_u64: u64) -> u64 {
@@ -12433,8 +12455,10 @@ pub struct RelationCollector<'a> {
     kc: &'a KoblitzCurve,
     fb: &'a FrobeniusFactorBase,
     opts: &'a KoblitzIcOptions,
-    index_of: Arc<HashMap<(BigUint, BigUint), usize>>,
-    field: FieldStructure,
+    /// The point index and the field structure the generic decomposition
+    /// reads; built on first use, since the walked pair-table path never does.
+    index_of: OnceLock<Arc<HashMap<(BigUint, BigUint), usize>>>,
+    field: OnceLock<FieldStructure>,
     pair: PairSource<'a>,
     /// Single-word curve and lifted generator when the field fits.
     fast: Option<(FastCurve, FastPoint)>,
@@ -12457,6 +12481,17 @@ pub struct CollectorDispatch {
 pub const PRECOMPUTE_BATCH_TRIALS: usize = 64;
 
 impl<'a> RelationCollector<'a> {
+    /// The base's point index, built on first use.
+    fn index_of(&self) -> &HashMap<(BigUint, BigUint), usize> {
+        self.index_of.get_or_init(|| self.fb.shared_index_map())
+    }
+
+    /// The field's multiplication structure, built on first use.
+    fn field(&self) -> &FieldStructure {
+        self.field
+            .get_or_init(|| FieldStructure::new(self.kc.n, &self.kc.curve.irreducible))
+    }
+
     /// `None` when the base cannot decompose with `opts.m` summands or
     /// the field is too wide for the pair table.
     pub fn new(
@@ -12518,8 +12553,8 @@ impl<'a> RelationCollector<'a> {
             kc,
             fb,
             opts,
-            index_of: fb.shared_index_map(),
-            field: FieldStructure::new(kc.n, &kc.curve.irreducible),
+            index_of: OnceLock::new(),
+            field: OnceLock::new(),
             pair,
             fast,
             r_u64,
@@ -12737,8 +12772,8 @@ impl<'a> RelationCollector<'a> {
                         decompose_once(
                             self.kc,
                             self.fb,
-                            &self.index_of,
-                            &self.field,
+                            self.index_of(),
+                            self.field(),
                             self.pair_table(),
                             self.opts,
                             &target,
@@ -12858,7 +12893,7 @@ impl<'a> RelationCollector<'a> {
                 // The next trial of the run is one stride further
                 // along, matching [`walked_probe_scalar`] without
                 // re-deriving the run's anchor.
-                a = ((a as u128 + stride as u128) % self.r_u64.max(2) as u128) as u64;
+                a = add_mod_u64(a, stride, self.r_u64.max(2));
                 point = fc.add(point, stride_point);
             }
             found
@@ -13881,8 +13916,10 @@ pub struct IndividualLogSolver<'a> {
     pair: Option<&'a PairSumTable>,
     projected: Arc<ProjectedSignedOrbitMap>,
     column_log: Vec<BigUint>,
-    index_of: Arc<HashMap<(BigUint, BigUint), usize>>,
-    field: FieldStructure,
+    /// The point index and the field structure the generic decomposition
+    /// reads; built on first use, since the walked pair-table path never does.
+    index_of: OnceLock<Arc<HashMap<(BigUint, BigUint), usize>>>,
+    field: OnceLock<FieldStructure>,
     /// Single-word curve and lifted generator when the field fits.
     fast: Option<(FastCurve, FastPoint)>,
     h: BigUint,
@@ -13998,6 +14035,17 @@ pub struct DescentDispatch {
 }
 
 impl<'a> IndividualLogSolver<'a> {
+    /// The base's point index, built on first use.
+    fn index_of(&self) -> &HashMap<(BigUint, BigUint), usize> {
+        self.index_of.get_or_init(|| self.fb.shared_index_map())
+    }
+
+    /// The field's multiplication structure, built on first use.
+    fn field(&self) -> &FieldStructure {
+        self.field
+            .get_or_init(|| FieldStructure::new(self.kc.n, &self.kc.curve.irreducible))
+    }
+
     pub fn admission_dispatch(&self) -> DescentDispatch {
         DescentDispatch {
             strategy: format!("{:?}", self.opts.strategy),
@@ -14086,8 +14134,8 @@ impl<'a> IndividualLogSolver<'a> {
             pair,
             projected: projected.clone(),
             column_log,
-            index_of: fb.shared_index_map(),
-            field: FieldStructure::new(kc.n, &kc.curve.irreducible),
+            index_of: OnceLock::new(),
+            field: OnceLock::new(),
             fast,
             h: &kc.cofactor % r,
             r_u64,
@@ -14175,8 +14223,8 @@ impl<'a> IndividualLogSolver<'a> {
                 _ => decompose_once(
                     self.kc,
                     self.fb,
-                    &self.index_of,
-                    &self.field,
+                    self.index_of(),
+                    self.field(),
                     self.pair,
                     self.opts,
                     &fc.lower(target),
@@ -14194,8 +14242,8 @@ impl<'a> IndividualLogSolver<'a> {
         decompose_once(
             self.kc,
             self.fb,
-            &self.index_of,
-            &self.field,
+            self.index_of(),
+            self.field(),
             self.pair,
             self.opts,
             &target,
