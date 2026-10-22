@@ -7,7 +7,8 @@ precisely stated computation with:
 - an independent checker.
 
 Measurements come from frozen specifications and are sealed, replayable records. A **bound**
-records what a method costs as cost = C · size^α, with bootstrap intervals. The **frontier**
+records what a method costs as cost = C · size^α (or C · 2^(α · size) for the exponential
+problems), with bootstrap intervals. The **frontier**
 lists, per problem, the bounds no other bound dominates. A **challenge** is a frozen paired spec;
 its **verdict** says whether a candidate advances on the incumbent, trades, matches or
 regresses, and at which level (exponent or constant).
@@ -117,18 +118,24 @@ The spec id `ISS1h…` is the hash of the spec. `plan` expands it deterministica
   - **Points:** one arm's verified records. Each instance is averaged over its rounds.
   - **Per size:** the mean, with a bootstrap interval in which instances are resampled within
     each size.
-  - **Fit:** cost = C · size^α by least squares in log–log space, with bootstrap intervals for
-    α and C (2000 resamples, fixed seed). The same fit is made for wall time.
+  - **Fit:** by least squares in log space, with bootstrap intervals for α and C (2000
+    resamples, fixed seed), under the problem's model. The same fit is made for wall time.
+    - `power`: cost = C · size^α (log–log). The algebraic problems use it.
+    - `exp2`: cost = C · 2^(α · size). With size = log₂ p this is C · p^α. The path problems
+      use it; their costs grow exponentially in log₂ p, and a power law in log₂ p would give an
+      exponent with no meaning. The declared α is 1/4 for both: Galbraith and GHS on ordinary
+      classes (√(class number)), and Delfs–Galbraith on supersingular graphs.
   - **Scaling:** the exponent is a scaling claim only with at least four sizes.
   - **Re-checking:** `bound check` re-derives a committed bound from its sessions, which must
     give the identical document.
   - **Exact counts:** counted costs that depend only on the size (Vélu at a given ℓ, a chain of
     a given n) have zero-width intervals.
 - **Frontier** (`frontier build`). Bounds are grouped by problem and parameters. A bound A
-  dominates B when:
-  - both make scaling claims and A's α interval lies entirely below B's; or
-  - their α intervals overlap (or either has fewer than four sizes) and A's mean-cost interval
-    at the largest common size lies entirely below B's.
+  dominates B when A's mean-cost interval at the largest size both measured lies entirely below
+  B's, unless A's α interval lies entirely above B's. A cheaper method that scales worse is a
+  crossover: dominance would be an extrapolation past the measured sizes, so both stay on the
+  frontier. A method name that appears in two sessions of one group is labelled with its
+  session.
 
   Ties stand. `--check` fails when `FRONTIER.md` or `frontier.json` is stale.
 - **Challenge** (`challenge seal`, `ISCH1h…`). A frozen paired spec with three arms:
@@ -171,6 +178,10 @@ The spec id `ISS1h…` is the hash of the spec. `plan` expands it deterministica
     Ramanujan 2-graph.
 
   The fitted α describes these instance distributions.
+- **SEA sizes stop at 160 bits.** A `count.sea` answer is accepted only with a point-order
+  certificate for #E or its twist, which needs the order factored by trial division and Pollard
+  rho. At 192 bits two of three random instances leave cofactors (72 × 93 and 46 × 135 bits)
+  beyond that effort for both orders. An uncertified count is not accepted as verified.
 - **Not compared here:** external tools such as PARI/GP cannot be operation-counted. The
   wall-time comparisons against them stay in `results/p16-external/`, `results/p17-sea/` and
   `results/p18-families/`.

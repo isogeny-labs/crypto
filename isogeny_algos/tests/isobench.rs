@@ -182,7 +182,7 @@ fn bound_fit_recovers_a_planted_exponent() {
             vec![base * 0.98, base * 1.02, base * (1.0 + 0.001 * k as f64)],
         );
     }
-    let fit = bounds::fit_points(&pts).unwrap();
+    let fit = bounds::fit_points(&pts, problems::Model::Power).unwrap();
     assert!((fit.alpha - 1.5).abs() < 0.02, "alpha {}", fit.alpha);
     assert!(fit.alpha_ci.0 <= 1.5 && 1.5 <= fit.alpha_ci.1 + 0.01);
     assert!((fit.c / 3.0 - 1.0).abs() < 0.1, "C {}", fit.c);
@@ -264,9 +264,10 @@ fn full_cycle_through_the_binary() {
     let mut check = fargs.to_vec();
     check.push("--check");
     run(&check);
-    assert!(std::fs::read_to_string(&md)
-        .unwrap()
-        .contains("| sqrtvelu | frontier"));
+    // two sizes make no scaling claim: the cheaper method at the largest size dominates
+    let page = std::fs::read_to_string(&md).unwrap();
+    assert!(page.contains("| xonly | frontier"), "{page}");
+    assert!(page.contains("| sqrtvelu | dominated by xonly"), "{page}");
     // tampering is caught
     let rec = s1.join("records.jsonl");
     let t = std::fs::read_to_string(&rec).unwrap();

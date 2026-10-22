@@ -18,7 +18,7 @@
 //!   (dominance is conservative: alpha intervals disjoint, or overlapping alphas and the mean
 //!   cost at the largest common size with disjoint intervals; ties stand).
 use super::harness::{read_records, seal, sealed, Spec};
-use super::problems;
+use super::problems::{self, Model};
 use crate::field::Rng;
 use crate::json::Json;
 use std::collections::BTreeMap;
@@ -59,18 +59,22 @@ fn mean(v: &[f64]) -> f64 {
     v.iter().sum::<f64>() / v.len() as f64
 }
 
-/// OLS of log y on log x: (alpha, log C).
-fn fit(pts: &[(f64, f64)]) -> (f64, f64) {
-    let n = pts.len() as f64;
+/// OLS of ln y on ln x (power model) or on x ln 2 (exp2 model): (alpha, ln C).
+fn fit(pts: &[(f64, f64)], model: Model) -> (f64, f64) {
     let (lx, ly): (Vec<f64>, Vec<f64>) = pts
         .iter()
-        .map(|&(x, y)| (x.ln(), y.max(1e-12).ln()))
+        .map(|&(x, y)| {
+            let x = match model {
+                Model::Power => x.ln(),
+                Model::Exp2 => x * std::f64::consts::LN_2,
+            };
+            (x, y.max(1e-12).ln())
+        })
         .unzip();
     let (mx, my) = (mean(&lx), mean(&ly));
     let sxx: f64 = lx.iter().map(|x| (x - mx).powi(2)).sum();
     let sxy: f64 = lx.iter().zip(&ly).map(|(x, y)| (x - mx) * (y - my)).sum();
     let a = if sxx > 0.0 { sxy / sxx } else { 0.0 };
-    let _ = n;
     (a, my - a * mx)
 }
 
@@ -95,14 +99,14 @@ pub struct Fit {
     pub per_size: Vec<(u64, usize, f64, (f64, f64))>,
 }
 
-pub fn fit_points(pts: &BTreeMap<u64, Vec<f64>>) -> Option<Fit> {
+pub fn fit_points(pts: &BTreeMap<u64, Vec<f64>>, model: Model) -> Option<Fit> {
     if pts.is_empty() || pts.values().any(|v| v.is_empty()) {
         return None;
     }
     let mut rng = Rng::new(BOOT_SEED);
     let base: Vec<(f64, f64)> = pts.iter().map(|(&s, v)| (s as f64, mean(v))).collect();
     let (alpha, lc) = if base.len() >= 2 {
-        fit(&base)
+        fit(&base, model)
     } else {
         (0.0, base[0].1.ln())
     };
@@ -119,7 +123,7 @@ pub fn fit_points(pts: &BTreeMap<u64, Vec<f64>>) -> Option<Fit> {
             })
             .collect();
         if b.len() >= 2 {
-            let (a, l) = fit(&b);
+            let (a, l) = fit(&b, model);
             alphas.push(a);
             cs.push(l.exp());
         }
@@ -214,8 +218,8 @@ pub fn bound(sessions: &[&Path], arm: &str) -> Result<Json, String> {
     let decl = problems::problem(&spec.problem)?;
     let (pts, unverified) = arm_points(&records, arm, "cost");
     let (wall, _) = arm_points(&records, arm, "wall_ms");
-    let cost = fit_points(&pts).ok_or("no verified records for this arm")?;
-    let wallfit = fit_points(&wall);
+    let cost = fit_points(&pts, decl.model).ok_or("no verified records for this arm")?;
+    let wallfit = fit_points(&wall, decl.model);
     let sizes = pts.len();
     let doc = Json::obj(vec![
         ("schema", Json::str("isobench.bound/v1")),
@@ -249,6 +253,7 @@ pub fn bound(sessions: &[&Path], arm: &str) -> Result<Json, String> {
                 })
                 .unwrap_or(Json::Null),
         ),
+        ("model", Json::str(decl.model.name())),
         ("declared_alpha", f(decl.declared_alpha)),
         ("sizes", Json::Num(sizes as i64)),
         ("scaling_claim", Json::Bool(sizes >= MIN_SIZES_FOR_SCALING)),
@@ -540,7 +545,8 @@ pub fn verdict(challenge_text: &str, session: &Path) -> Result<Json, String> {
     // the level: per-arm alpha intervals within this session
     let (pi, _) = arm_points(&records, "incumbent", "cost");
     let (pc, _) = arm_points(&records, "candidate", "cost");
-    let (fi, fc) = (fit_points(&pi), fit_points(&pc));
+    let model = problems::problem(&spec.problem)?.model;
+    let (fi, fc) = (fit_points(&pi, model), fit_points(&pc, model));
     let level = match (&fi, &fc) {
         (Some(a), Some(b))
             if sizes >= MIN_SIZES_FOR_SCALING
@@ -608,6 +614,7 @@ struct B {
     largest: (u64, f64, (f64, f64)),
     per: BTreeMap<u64, (f64, (f64, f64))>,
     declared: f64,
+    model: Model,
 }
 
 fn tri(j: &Json, k: &str, kci: &str) -> (f64, f64, f64) {
@@ -665,6 +672,11 @@ fn load_bound(path: &Path) -> Result<B, String> {
         scaling: matches!(j.get("scaling_claim"), Some(Json::Bool(true))),
         largest: (ls, lm, lci),
         per,
+        model: j
+            .get("model")
+            .and_then(|m| m.as_str())
+            .and_then(Model::parse)
+            .unwrap_or(Model::Power),
         declared: j
             .get("declared_alpha")
             .and_then(|s| s.as_f64())
@@ -672,13 +684,12 @@ fn load_bound(path: &Path) -> Result<B, String> {
     })
 }
 
-/// Does a dominate b (conservatively)?
+/// Does a dominate b (conservatively)? a must cost less at the largest size both measured
+/// (disjoint intervals) and must not scale worse: a bound that is cheaper over the measured
+/// range but has a disjoint, higher exponent is not dominated, since that would extrapolate.
 fn dominates(a: &B, b: &B) -> bool {
-    if a.scaling && b.scaling && a.alpha.2 < b.alpha.1 {
-        return true;
-    }
-    let overlap = a.alpha.1 <= b.alpha.2 && b.alpha.1 <= a.alpha.2;
-    if !(overlap || !(a.scaling && b.scaling)) {
+    let worse_exponent = a.scaling && b.scaling && a.alpha.1 > b.alpha.2;
+    if worse_exponent {
         return false;
     }
     // the largest size both measured
@@ -687,6 +698,25 @@ fn dominates(a: &B, b: &B) -> bool {
         Some(s) => a.per[s].1 .1 < b.per[s].1 .0,
         None => false,
     }
+}
+
+/// The method's name, qualified by its session when another bound in the group shares it.
+fn label(bounds: &[B], idx: &[usize], i: usize) -> String {
+    let b = &bounds[i];
+    if idx
+        .iter()
+        .filter(|&&k| bounds[k].method == b.method)
+        .count()
+        < 2
+    {
+        return b.method.clone();
+    }
+    let session = b
+        .file
+        .strip_suffix(".json")
+        .and_then(|f| f.strip_suffix(&format!("-{}", b.method)))
+        .unwrap_or(&b.file);
+    format!("{} ({session})", b.method)
 }
 
 /// Build the frontier page (markdown) and its JSON from every bound record in `dir`.
@@ -712,14 +742,24 @@ pub fn frontier(dir: &Path) -> Result<(String, Json), String> {
     let mut md = String::from(
         "# Isogeny frontier\n\nGenerated by `isobench frontier build` from `docs/isobench/bounds/records/`; \
          do not edit. A method is on the frontier when no other bound for the same problem and parameters \
-         dominates it (alpha intervals disjoint, or overlapping alphas and disjoint mean-cost intervals at \
-         the largest common size). Exponents are scaling claims only with at least four sizes. Units: \
+         dominates it: a bound dominates another when its mean-cost interval at the largest common size \
+         lies entirely below the other's and its alpha interval does not lie entirely above (a cheaper \
+         bound with a worse exponent is a crossover, and both stand). Exponents are scaling claims only with at least four sizes. Units: \
          `isobench.fme` field-multiplication equivalents (pinned calibration), `isobench.oracle_calls` \
          neighbour-oracle root findings, `isobench.norm_bits` log2 of the output norm.\n",
     );
     let mut jgroups = vec![];
     for ((problem, params), idx) in &groups {
-        md.push_str(&format!("\n## {problem} ({params})\n\n"));
+        let model = bounds[idx[0]].model;
+        let head = if params.is_empty() {
+            problem.clone()
+        } else {
+            format!("{problem} ({params})")
+        };
+        md.push_str(&format!(
+            "\n## {head}\n\nModel: cost = {}.\n\n",
+            model.formula()
+        ));
         md.push_str("| method | status | unit | alpha (95% CI) | declared | sizes | mean cost at largest size (95% CI) | bound |\n");
         md.push_str("|:--|:--|:--|:--|--:|--:|:--|:--|\n");
         let mut rows = vec![];
@@ -733,10 +773,10 @@ pub fn frontier(dir: &Path) -> Result<(String, Json), String> {
         });
         for &i in &order {
             let b = &bounds[i];
-            let by: Vec<&str> = idx
+            let by: Vec<String> = idx
                 .iter()
                 .filter(|&&k| k != i && dominates(&bounds[k], b))
-                .map(|&k| bounds[k].method.as_str())
+                .map(|&k| label(&bounds, idx, k))
                 .collect();
             let status = if by.is_empty() {
                 "frontier".to_string()
@@ -746,7 +786,7 @@ pub fn frontier(dir: &Path) -> Result<(String, Json), String> {
             let (l, lm, lci) = b.largest;
             md.push_str(&format!(
                 "| {} | {} | {} | {:.3} [{:.3}, {:.3}]{} | {} | {} | {} @ {} [{}, {}] | `{}` |\n",
-                b.method,
+                label(&bounds, idx, i),
                 status,
                 b.unit.trim_start_matches("isobench."),
                 b.alpha.0,
@@ -763,6 +803,7 @@ pub fn frontier(dir: &Path) -> Result<(String, Json), String> {
             ));
             rows.push(Json::obj(vec![
                 ("method", Json::str(&b.method)),
+                ("label", Json::str(label(&bounds, idx, i))),
                 ("bound", Json::str(&b.id)),
                 ("status", Json::str(&status)),
             ]));
@@ -770,6 +811,7 @@ pub fn frontier(dir: &Path) -> Result<(String, Json), String> {
         jgroups.push(Json::obj(vec![
             ("problem", Json::str(problem)),
             ("params", Json::str(params)),
+            ("model", Json::str(model.name())),
             ("methods", Json::Arr(rows)),
         ]));
     }

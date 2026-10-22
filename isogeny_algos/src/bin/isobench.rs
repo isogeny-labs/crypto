@@ -132,6 +132,7 @@ fn cli(args: &[String]) -> Result<(), String> {
                         ("summary", Json::str(p.summary)),
                         ("size", Json::str(p.size)),
                         ("unit", Json::str(p.unit)),
+                        ("model", Json::str(p.model.name())),
                         ("declared_alpha", Json::Float(p.declared_alpha)),
                         (
                             "methods",

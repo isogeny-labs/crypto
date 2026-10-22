@@ -23,14 +23,48 @@ pub const UNIT_ORACLE: &str = "isobench.oracle_calls";
 pub const UNIT_NORM: &str = "isobench.norm_bits";
 
 /// One problem of the registry.
+/// The scaling model a bound is fitted under.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Model {
+    /// cost = C size^alpha
+    Power,
+    /// cost = C 2^(alpha size): for size = log2 p, cost = C p^alpha
+    Exp2,
+}
+
+impl Model {
+    pub fn name(self) -> &'static str {
+        match self {
+            Model::Power => "power",
+            Model::Exp2 => "exp2",
+        }
+    }
+    /// the cost formula, for documents and pages
+    pub fn formula(self) -> &'static str {
+        match self {
+            Model::Power => "C * size^alpha",
+            Model::Exp2 => "C * 2^(alpha * size)",
+        }
+    }
+    pub fn parse(s: &str) -> Option<Model> {
+        match s {
+            "power" => Some(Model::Power),
+            "exp2" => Some(Model::Exp2),
+            _ => None,
+        }
+    }
+}
+
 pub struct ProblemDecl {
     pub id: &'static str,
     pub summary: &'static str,
     /// what the size parameter is
     pub size: &'static str,
     pub unit: &'static str,
-    /// the exponent alpha in cost = C size^alpha that the best known method is expected to show
+    /// the exponent alpha that the best known method is expected to show, under `model`
     pub declared_alpha: f64,
+    /// how cost scales with size: C size^alpha, or C 2^(alpha size) (C p^alpha for size log2 p)
+    pub model: Model,
     /// method ids, the first is the reference
     pub methods: &'static [&'static str],
     /// (name, default)
@@ -45,6 +79,7 @@ pub fn registry() -> &'static [ProblemDecl] {
             size: "l (odd prime)",
             unit: UNIT,
             declared_alpha: 0.5,
+            model: Model::Power,
             methods: &["xonly", "velu", "kohel", "sqrtvelu"],
             params: &[("bits", "127")],
         },
@@ -54,6 +89,7 @@ pub fn registry() -> &'static [ProblemDecl] {
             size: "n (chain length)",
             unit: UNIT,
             declared_alpha: 1.0,
+            model: Model::Power,
             methods: &["naive", "balanced", "optimal"],
             params: &[("bits", "255"), ("ell", "2")],
         },
@@ -63,6 +99,7 @@ pub fn registry() -> &'static [ProblemDecl] {
             size: "l (odd prime >= 5)",
             unit: UNIT,
             declared_alpha: 1.0,
+            model: Model::Power,
             methods: &[
                 "fast_elkies_prime",
                 "linear_algebra",
@@ -81,6 +118,7 @@ pub fn registry() -> &'static [ProblemDecl] {
             size: "l (prime)",
             unit: UNIT,
             declared_alpha: 2.0,
+            model: Model::Power,
             methods: &["hecke", "linear_algebra"],
             params: &[("bits", "127")],
         },
@@ -90,6 +128,7 @@ pub fn registry() -> &'static [ProblemDecl] {
             size: "log2 p",
             unit: UNIT,
             declared_alpha: 4.0,
+            model: Model::Power,
             methods: &["sea", "sea_no_cycles"],
             params: &[],
         },
@@ -98,7 +137,8 @@ pub fn registry() -> &'static [ProblemDecl] {
             summary: "a path of l-isogenies between two ordinary j-invariants in one isogeny class (the second is the end of a random walk from the first long enough to mix: 4 log2 p + 8 * 2^(log2 p / 4) steps)",
             size: "log2 p",
             unit: UNIT_ORACLE,
-            declared_alpha: 0.0,
+            declared_alpha: 0.25,
+            model: Model::Exp2,
             methods: &["galbraith", "ghs", "galbraith_stolbunov"],
             params: &[("ells", "2,3,5,7"), ("budget", "2000000")],
         },
@@ -107,7 +147,8 @@ pub fn registry() -> &'static [ProblemDecl] {
             summary: "a path of 2- and 3-isogenies between two random supersingular j-invariants over F_p^2",
             size: "log2 p",
             unit: UNIT_ORACLE,
-            declared_alpha: 0.0,
+            declared_alpha: 0.25,
+            model: Model::Exp2,
             methods: &["delfs_galbraith", "bfs", "ghs"],
             params: &[("budget", "4000000")],
         },
@@ -117,6 +158,7 @@ pub fn registry() -> &'static [ProblemDecl] {
             size: "B (exponent bound)",
             unit: UNIT,
             declared_alpha: 1.0,
+            model: Model::Power,
             methods: &["tree", "batched", "one_at_a_time"],
             params: &[("preset", "csidh512")],
         },
@@ -126,6 +168,7 @@ pub fn registry() -> &'static [ProblemDecl] {
             size: "log2 p",
             unit: UNIT_NORM,
             declared_alpha: 1.0,
+            model: Model::Power,
             methods: &["klpt"],
             params: &[],
         },
@@ -144,7 +187,7 @@ pub type Params = BTreeMap<String, String>;
 /// Fill defaults and reject unknown parameters.
 pub fn resolve_params(p: &ProblemDecl, given: &Params) -> Result<Params, String> {
     let mut out = Params::new();
-    for (k, _) in given {
+    for k in given.keys() {
         if !p.params.iter().any(|(n, _)| n == k) {
             return Err(format!("{}: unknown parameter {k}", p.id));
         }
@@ -884,7 +927,7 @@ fn csidh_action(
             let fr = &f;
             let (a, fme, tally, ms) = measure!(fr, counted, cal, |g| {
                 let c = Csidh {
-                    fp: g.clone(),
+                    fp: *g,
                     primes: cs.primes.clone(),
                     p1: cs.p1.clone(),
                     sqrt_velu_min: cs.sqrt_velu_min,

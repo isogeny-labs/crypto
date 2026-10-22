@@ -68,6 +68,13 @@ fn bump(f: impl FnOnce(&mut Tally)) {
     TALLY.with(|t| f(&mut t.borrow_mut()));
 }
 
+/// The transform length of a prepared operand (what the `prepare` and `conv_prep` tables are
+/// calibrated by), or `fallback` for a preparation this module does not know.
+fn points(p: &crate::field::Prepared, fallback: usize) -> usize {
+    p.downcast_ref::<crate::ntt::Prepared>()
+        .map_or(fallback, |q| q.points())
+}
+
 fn bulk(kind: &str, n: usize, calls: u64) {
     bump(|t| *t.bulk.entry((kind.to_string(), n)).or_insert(0) += calls);
 }
@@ -96,7 +103,7 @@ impl<const N: usize> CalKey for FpM<N> {
 }
 
 /// A field whose work is tallied (see the module documentation).
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Counted<F>(pub F);
 
 impl<F: Field + CalKey> CalKey for Counted<F> {
@@ -179,15 +186,17 @@ impl<F: Field> Field for Counted<F> {
     }
     fn prepare(&self, b: &[F::E], max_len: usize, cyc: usize) -> Option<Prepared> {
         let r = self.0.prepare(b, max_len, cyc);
-        if r.is_some() {
-            bulk("prepare", max_len.max(cyc).max(b.len()), 1);
+        if let Some(p) = &r {
+            // priced by transform length, as calibrated (max_len and cyc may be usize::MAX)
+            let full = max_len.saturating_add(b.len() - 1).min(cyc);
+            bulk("prepare", points(p, full), 1);
         }
         r
     }
     fn conv_prepared(&self, a: &[F::E], b: &Prepared) -> Option<Vec<F::E>> {
         let r = self.0.conv_prepared(a, b);
         if r.is_some() {
-            bulk("conv_prep", a.len(), 1);
+            bulk("conv_prep", points(b, a.len()), 1);
         }
         r
     }
