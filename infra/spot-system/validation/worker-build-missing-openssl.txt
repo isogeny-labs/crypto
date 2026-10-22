@@ -1,0 +1,18 @@
+Full original bytes: raw-evidence.tar.gz → worker-build-missing-openssl.txt (SHA-256 in raw-evidence.json).
+
+  trouble finding it,  you can set the `OPENSSL_DIR` environment variable for the
+  compilation process.
+
+  Make sure you also have the development packages of openssl installed.
+  For example, `libssl-dev` on Ubuntu or `openssl-devel` on Fedora.
+
+  If you're in a situation where you think the directory *should* be found
+  automatically, please open a bug at https://github.com/rust-openssl/rust-openssl
+  and include information about your system as well as this message.
+
+  $HOST = x86_64-unknown-linux-gnu
+  $TARGET = x86_64-unknown-linux-gnu
+  openssl-sys = 0.9.117
+
+
+warning: build failed, waiting for other jobs to finish...

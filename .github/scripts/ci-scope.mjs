@@ -47,7 +47,6 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
     const root = /\.rs$/.test(file) && maintained.test(file) || frozenExamples.test(file) || cargoSources.has(file) || rustConfig.test(file) || embedded.has(file)
       || (volcanoCliRust.test(file) && !prose.test(file)) || isogenyAlgosInputs.test(file);
     const releaseAttributes = file === '.gitattributes';
-    const root = /\.rs$/.test(file) && maintained.test(file) || frozenExamples.test(file) || cargoSources.has(file) || rustConfig.test(file) || embedded.has(file);
     result.rust_root ||= root || sharedAnalysis.test(file) || file === 'scripts/clippy-maintained.sh';
     result.rust_cd ||= /^cd_attack\/(src|tests|examples|benches)\//.test(file) && !prose.test(file)
       || /^cd_attack\/(Cargo\.(toml|lock)|build\.rs|rust-toolchain(\.toml)?|\.cargo\/.*)$/.test(file)

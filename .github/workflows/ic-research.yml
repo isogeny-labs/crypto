@@ -19,8 +19,11 @@ concurrency:
 
 jobs:
   validate-cli:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-research.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-research.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    # A cold release build of `ic` alone takes about 6 minutes; whole runs
+    # took 7-10 minutes in October 2026 and a 10-minute limit cancelled
+    # passing runs mid-test.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
