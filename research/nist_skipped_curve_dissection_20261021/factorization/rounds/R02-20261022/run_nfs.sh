@@ -36,15 +36,17 @@ find "$siever" -maxdepth 1 -type f -name 'gnfs-*' -exec sha256sum {} + > "$log/s
 if [[ $mode == resume ]]; then
   tar -C "$out" -cf - state | xz -6 -T1 > "$log/state-before.tar.xz"
 fi
-argv=(./yafu "nfs($number)" -threads 2 -lathreads 2 -seed 20261022,362436069
+printf 'nfs(%s)\n' "$number" > "$log/expression.txt"
+argv=(./yafu -threads 2 -lathreads 2 -seed 20261022
   -ggnfsT "$seconds" -ggnfs_dir "$siever/" -job nfs.job -o nfs.dat
   -logfile factor.log -session session.log)
 [[ $mode == fresh ]] || argv+=(-R)
 outer=$((seconds+60))
 printf '%q ' timeout --signal=INT --kill-after=30s "$outer" "${argv[@]}" > "$log/command.txt"
-printf '\n' >> "$log/command.txt"
+printf '< %q\n' "$log/expression.txt" >> "$log/command.txt"
+printf '%s\n' "$out/state" > "$log/working-directory.txt"
 set +e
-(cd "$out/state" && ulimit -v 4194304 && timeout --signal=INT --kill-after=30s "$outer" "${argv[@]}") \
+(cd "$out/state" && ulimit -v 4194304 && timeout --signal=INT --kill-after=30s "$outer" "${argv[@]}" < "$log/expression.txt") \
   > "$log/stdout.txt" 2> "$log/stderr.txt"
 status=$?
 set -e
@@ -57,7 +59,7 @@ jq -n --arg n "$number" --arg mode "$mode" --argjson seconds "$seconds" \
   --argjson outer "$outer" --argjson status "$status" \
   '{schema:"nist-native-nfs-attempt/v1",input:$n,mode:$mode,native_limit_seconds:$seconds,
     outer_limit_seconds:$outer,threads:2,linear_algebra_threads:2,
-    seed:"20261022,362436069",address_space_limit_kib_per_process:4194304,
+    seed:"20261022",address_space_limit_kib_per_process:4194304,
     exit_status:$status,timed_out:($status==124),factor_labels:"unverified",
     checkpoint_directory:"state"}' > "$log/receipt.json"
 cp "$log/candidate-factors.txt" "$out/candidate-factors.txt"
