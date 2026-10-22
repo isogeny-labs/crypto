@@ -334,12 +334,29 @@ impl Curve {
     /// Machine-readable parameters.
     pub fn describe(&self) -> serde_json::Value {
         let (gx, gy) = self.point_hex(&self.generator()).unwrap_or_default();
+        let field_and_equation = match &self.group {
+            Group::Prime(group) => serde_json::json!({
+                "model": "short-weierstrass-prime",
+                "p_hex": format!("{:x}", group.curve.p),
+                "a_hex": format!("{:x}", group.curve.a),
+                "b_hex": format!("{:x}", group.curve.b),
+            }),
+            Group::Binary(group) => serde_json::json!({
+                "model": "binary-weierstrass",
+                "m": group.curve.m,
+                "irreducible_low_terms": group.curve.irreducible.low_terms,
+                "a_hex": format!("{:x}", group.curve.a.to_biguint()),
+                "b_hex": format!("{:x}", group.curve.b.to_biguint()),
+            }),
+        };
         serde_json::json!({
             "name": self.name,
             "catalog_name": self.catalog_name,
             "family": self.family.tag(),
             "standard": self.standard,
             "field_bits": self.field_bits,
+            "field_size": self.field_size.to_string(),
+            "field_and_equation": field_and_equation,
             "order": self.order().to_string(),
             "order_bits": self.order().bits(),
             "cofactor": self.cofactor.to_string(),
@@ -1107,6 +1124,29 @@ mod tests {
         let rep = solve(&full, &full.plant(&k), &SolveOptions::default());
         assert_eq!(rep.method, Method::PohligHellman);
         assert_eq!(rep.scalar_value, Some(k));
+    }
+
+    #[test]
+    fn machine_description_includes_exact_field_and_equation() {
+        let prime = curve_by_name("P-256").unwrap().describe();
+        assert_eq!(
+            prime["field_and_equation"]["model"],
+            "short-weierstrass-prime"
+        );
+        assert_eq!(
+            prime["field_and_equation"]["p_hex"],
+            "ffffffff00000001000000000000000000000000ffffffffffffffffffffffff"
+        );
+        assert!(prime["field_and_equation"]["a_hex"].as_str().unwrap().len() > 1);
+        assert!(prime["field_and_equation"]["b_hex"].as_str().unwrap().len() > 1);
+        let binary = curve_by_name("K-163").unwrap().describe();
+        assert_eq!(binary["field_and_equation"]["model"], "binary-weierstrass");
+        assert_eq!(binary["field_and_equation"]["m"], 163);
+        assert_eq!(
+            binary["field_and_equation"]["irreducible_low_terms"],
+            serde_json::json!([0, 3, 6, 7])
+        );
+        assert_eq!(binary["field_and_equation"]["b_hex"], "1");
     }
 
     #[test]

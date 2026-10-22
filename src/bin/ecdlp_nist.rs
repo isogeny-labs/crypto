@@ -150,6 +150,64 @@ fn parse_uint(s: &str) -> Result<BigUint, String> {
     .ok_or_else(|| format!("not a number: {s:?}"))
 }
 
+fn random_span(bits: u32, available: &BigUint) -> Result<BigUint, String> {
+    if bits == 0 {
+        return Err("--random-bits must be positive".into());
+    }
+    if u64::from(bits) >= available.bits() {
+        Ok(available.clone())
+    } else {
+        Ok((BigUint::from(1u8) << bits).min(available.clone()))
+    }
+}
+
+fn solve_bounds(
+    args: &SolveArgs,
+    order: &BigUint,
+    method: Method,
+) -> Result<(BigUint, Option<BigUint>), String> {
+    let lo = match &args.interval_lo {
+        Some(s) => parse_uint(s)?,
+        None => BigUint::from(0u8),
+    };
+    if &lo >= order {
+        return Err("interval lower bound must be below the subgroup order".into());
+    }
+    let available = order - &lo;
+    let infer_from_random = args.random_bits.is_some()
+        && (args.interval_lo.is_some()
+            || matches!(method, Method::Bsgs | Method::Kangaroo)
+            || (method == Method::Auto && order.bits() > 40));
+    let width = match (&args.interval_bits, &args.interval_width) {
+        (Some(bits), _) => {
+            if u64::from(*bits) > order.bits() {
+                return Err("interval bit width exceeds the subgroup order".into());
+            }
+            Some(BigUint::from(1u8) << *bits)
+        }
+        (None, Some(value)) => Some(parse_uint(value)?),
+        (None, None) if infer_from_random => Some(random_span(
+            args.random_bits.expect("inferred from random bits"),
+            &available,
+        )?),
+        (None, None) => None,
+    };
+    if args.interval_lo.is_some() && width.is_none() {
+        return Err("--interval-lo requires an interval width or --random-bits".into());
+    }
+    if let Some(width) = &width {
+        if width == &BigUint::from(0u8) || width > &available {
+            return Err(
+                "interval width must be positive and stay within the subgroup order".into(),
+            );
+        }
+    }
+    if let Some(bits) = args.random_bits {
+        random_span(bits, &available)?;
+    }
+    Ok((lo, width))
+}
+
 fn audit_row(a: &Audit) -> String {
     format!(
         "{:<6} {:<8} {:>5} {:>5} {:>3}  {:<5} {:<5} {:<5}  {:>6}  {:>7.1}  {:>7.1}  {}",
@@ -279,15 +337,7 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
     let curve = curve_by_name(&args.curve)?;
     let method: Method = args.method.parse()?;
     let mut rng = StdRng::seed_from_u64(args.seed ^ 0xC0FFEE);
-    let lo = match &args.interval_lo {
-        Some(s) => parse_uint(s)?,
-        None => BigUint::from(0u32),
-    };
-    let width = match (&args.interval_bits, &args.interval_width) {
-        (Some(b), _) => Some(BigUint::from(1u32) << *b),
-        (None, Some(w)) => Some(parse_uint(w)?),
-        (None, None) => None,
-    };
+    let (lo, width) = solve_bounds(args, curve.order(), method)?;
     // Target: planted or supplied.
     let (target, planted): (nist::AnyPoint, Option<BigUint>) = if args.challenge {
         let (_, target) = BinaryCurve::certicom_challenge(&curve.name)
@@ -300,12 +350,25 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
         (curve.parse_point(x, y)?, None)
     } else {
         let k = match (&args.secret, args.random_bits) {
-            (Some(s), _) => parse_uint(s)? % curve.order(),
+            (Some(s), _) => {
+                let k = parse_uint(s)?;
+                if &k >= curve.order() {
+                    return Err("planted scalar must be below the subgroup order".into());
+                }
+                if width.as_ref().is_some_and(|w| k < lo || k >= &lo + w) {
+                    return Err("planted scalar is outside the declared interval".into());
+                }
+                k
+            }
             (None, Some(bits)) => {
-                let w = width.clone().unwrap_or_else(|| BigUint::from(1u32) << bits);
-                // Random k in [lo, lo + min(w, 2^bits)) ∩ [0, n).
-                let span = w.min(BigUint::from(1u32) << bits);
-                (&lo + rng.gen_biguint_below(&span)) % curve.order()
+                // Keep the sampled scalar in both the declared interval and
+                // the subgroup's canonical [0, n) range, without wraparound.
+                let available = curve.order() - &lo;
+                let mut span = random_span(bits, &available)?;
+                if let Some(w) = &width {
+                    span = span.min(w.clone());
+                }
+                &lo + rng.gen_biguint_below(&span)
             }
             (None, None) => {
                 return Err("give --secret K, --random-bits B, --point X,Y, or --challenge".into());
@@ -335,6 +398,7 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
             "{}",
             serde_json::to_string_pretty(&json!({
                 "operation": "solve",
+                "curve": curve.describe(),
                 "target": {"x": tx, "y": ty},
                 "planted_scalar": planted.as_ref().map(|k| k.to_string()),
                 "planted_recovered": planted_ok,
@@ -482,6 +546,63 @@ fn cmd_bench(args: &BenchArgs, json: bool) -> Result<(), String> {
         );
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn args() -> SolveArgs {
+        SolveArgs {
+            curve: "P-256".into(),
+            secret: None,
+            random_bits: None,
+            point: None,
+            challenge: false,
+            interval_lo: None,
+            interval_bits: None,
+            interval_width: None,
+            method: "auto".into(),
+            threads: 1,
+            seed: 1,
+            max_iterations: None,
+            dp_bits: None,
+            no_fold: false,
+            force: false,
+        }
+    }
+
+    #[test]
+    fn random_bits_infer_large_curve_interval_and_reject_invalid_bounds() {
+        let order = curve_by_name("P-256").unwrap().order().clone();
+        let mut input = args();
+        input.random_bits = Some(8);
+        assert_eq!(
+            solve_bounds(&input, &order, Method::Auto).unwrap().1,
+            Some(BigUint::from(256u32))
+        );
+        let small_order = (BigUint::from(1u32) << 23) - BigUint::from(1u32);
+        assert!(solve_bounds(&input, &small_order, Method::Auto)
+            .unwrap()
+            .1
+            .is_none());
+        input.interval_width = Some("0".into());
+        assert!(solve_bounds(&input, &order, Method::Auto)
+            .unwrap_err()
+            .contains("positive"));
+        input.interval_width = None;
+        input.interval_lo = Some((&order - BigUint::from(1u32)).to_string());
+        input.interval_bits = Some(1);
+        assert!(solve_bounds(&input, &order, Method::Auto)
+            .unwrap_err()
+            .contains("within"));
+        input.interval_lo = None;
+        input.interval_bits = None;
+        input.random_bits = Some(0);
+        assert!(solve_bounds(&input, &order, Method::Auto)
+            .unwrap_err()
+            .contains("positive"));
+    }
 }
 
 fn main() -> ExitCode {
