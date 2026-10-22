@@ -12,7 +12,7 @@ integer(s) = {
 {
   my(N=integer(getenv("NFS_INPUT")), path=getenv("POLY_INPUT"), out=getenv("POLY_OUTPUT"));
   if(N<=1,error("invalid input"));
-  my(lines=readstr(path), block=List(), a=vector(6), seen=vector(6), y0=0, hasy0=0, count=0, hasn=0);
+  my(lines=readstr(path), block=List(), a=vector(6), seen=vector(6), y0=0, hasy0=0, count=0, hasn=0, highest=0);
   write(out,"n: ",N);
   foreach(lines,line,
     my(chars=Vecsmall(line));
@@ -21,6 +21,10 @@ integer(s) = {
     if(tokens[1]=="n",
       if(hasn||count||#block||#tokens!=2||integer(tokens[2])!=N,error("wrong or misplaced input header"));
       hasn=1;next;
+    );
+    if(tokens[1]=="time",
+      if(!hasn||#block||#tokens!=2||integer(tokens[2])<0,error("invalid native time record"));
+      write(out,line);next;
     );
     if(header,
       if(#block,error("incomplete candidate before next header"));
@@ -45,6 +49,7 @@ integer(s) = {
       if(g!=1,error("noninvertible Y1: gcd=",g));
       my(m=-Mod(y0,N)/Mod(y1,N));
       if(subst(Polrev(a),'x,m)!=0,error("wrong input or invalid common root"));
+      highest=max(highest,a[6]);
       write(out,strjoin(Vec(block),"\n"));
       count++;block=List();
     );
@@ -52,6 +57,7 @@ integer(s) = {
   if(#block,error("trailing incomplete candidate"));
   if(!count,error("no complete candidates"));
   print("{\"verified\":true,\"input\":\"",N,"\",\"candidate_count\":",count,
+    ",\"highest_leading_coefficient\":",highest,
     ",\"common_root_verified\":true,\"elapsed_time_record_added\":false}");
 }
 quit;
