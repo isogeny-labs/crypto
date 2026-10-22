@@ -232,6 +232,11 @@ replay, including source and destination scalar checks and same-target rho.
 Its live upload, HEAD, remote download verification, pull, and exact-object
 cleanup are in
 [`GENERATED_CUBIC_MULTIHOP_S3_ACCEPTANCE_20261022.json`](GENERATED_CUBIC_MULTIHOP_S3_ACCEPTANCE_20261022.json).
+An exact P-256 ECDLP target artifact passed live upload, HEAD, remote
+download verification, fresh-cache `ecdlp-nist solve --point-file store:...`
+replay of scalar 38, byte comparison, pull, and exact-object cleanup. Its
+receipt is
+[`ECDLP_TARGET_S3_ACCEPTANCE_20261022.json`](ECDLP_TARGET_S3_ACCEPTANCE_20261022.json).
 The public cubic-field cofactor-12 target input also passed a live upload,
 HEAD checksum, fresh-cache `icx solve-cubic --input store:...` fetch, scalar
 replay, remote verify, exact-object cleanup, and final HEAD 404. The first

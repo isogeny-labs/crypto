@@ -14,6 +14,7 @@
 //! Every subcommand takes `--json` for a machine-readable report.  See
 //! `docs/ECDLP_NIST.md`.
 
+use std::path::Path;
 use std::process::ExitCode;
 use std::time::Instant;
 
@@ -77,15 +78,18 @@ struct SolveArgs {
     /// Curve name (see `list`).
     curve: String,
     /// Plant Q = [k]G with this scalar (decimal or 0x-hex).
-    #[arg(long, conflicts_with_all = ["random_bits", "point", "challenge"])]
+    #[arg(long, conflicts_with_all = ["random_bits", "point", "point_file", "challenge"])]
     secret: Option<String>,
     /// Plant Q = [k]G with a random k of this many bits (seeded).
-    #[arg(long, conflicts_with_all = ["point", "challenge"])]
+    #[arg(long, conflicts_with_all = ["point", "point_file", "challenge"])]
     random_bits: Option<u32>,
     /// Solve an externally supplied point `x,y` (hex).  Needs an interval
     /// unless the curve is a toy.
-    #[arg(long, value_name = "X,Y", conflicts_with = "challenge")]
+    #[arg(long, value_name = "X,Y", conflicts_with_all = ["point_file", "challenge"])]
     point: Option<String>,
+    /// Checked JSON target artifact, local or store:NAME/sha256:DIGEST.
+    #[arg(long, conflicts_with_all = ["secret", "random_bits", "point", "challenge"])]
+    point_file: Option<std::path::PathBuf>,
     /// Use the published Certicom challenge point Q for this curve.
     #[arg(long)]
     challenge: bool,
@@ -206,6 +210,52 @@ fn solve_bounds(
         random_span(bits, &available)?;
     }
     Ok((lo, width))
+}
+
+fn load_target_artifact(
+    curve: &Curve,
+    input: &Path,
+) -> Result<(nist::AnyPoint, serde_json::Value), String> {
+    let resolved = crypto_lib::store::resolve_path(input)?;
+    if std::fs::metadata(&resolved)
+        .map_err(|e| e.to_string())?
+        .len()
+        > 1024 * 1024
+    {
+        return Err("ECDLP target artifact exceeds 1 MiB".into());
+    }
+    let bytes = std::fs::read(&resolved).map_err(|e| e.to_string())?;
+    if bytes.len() > 1024 * 1024 {
+        return Err("ECDLP target artifact exceeds 1 MiB".into());
+    }
+    let value: serde_json::Value = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+    let accepted_envelope = (value["schema_version"] == 1
+        && value.get("operation").is_none()
+        && value.as_object().is_some_and(|obj| {
+            obj.keys()
+                .all(|key| matches!(key.as_str(), "schema_version" | "curve" | "target"))
+        }))
+        || (value["operation"] == "solve" && value.get("schema_version").is_none());
+    if !accepted_envelope {
+        return Err("ECDLP target artifact must be a v1 target envelope or solve report".into());
+    }
+    if value.get("curve") != Some(&curve.describe()) {
+        return Err("ECDLP target artifact curve identity differs from the selected curve".into());
+    }
+    let x = value["target"]["x"]
+        .as_str()
+        .ok_or("ECDLP target artifact lacks hex x coordinate")?;
+    let y = value["target"]["y"]
+        .as_str()
+        .ok_or("ECDLP target artifact lacks hex y coordinate")?;
+    let point = curve.parse_point(x, y)?;
+    Ok((
+        point,
+        json!({
+            "source": input.display().to_string(),
+            "sha256": hex::encode(crypto_lib::hash::sha256(&bytes)),
+        }),
+    ))
 }
 
 fn audit_row(a: &Audit) -> String {
@@ -339,15 +389,22 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
     let mut rng = StdRng::seed_from_u64(args.seed ^ 0xC0FFEE);
     let (lo, width) = solve_bounds(args, curve.order(), method)?;
     // Target: planted or supplied.
-    let (target, planted): (nist::AnyPoint, Option<BigUint>) = if args.challenge {
+    let (target, planted, target_artifact): (
+        nist::AnyPoint,
+        Option<BigUint>,
+        Option<serde_json::Value>,
+    ) = if args.challenge {
         let (_, target) = BinaryCurve::certicom_challenge(&curve.name)
             .ok_or_else(|| format!("{} is not a Certicom binary challenge", curve.name))?;
-        (nist::AnyPoint::Binary(target), None)
+        (nist::AnyPoint::Binary(target), None, None)
+    } else if let Some(path) = &args.point_file {
+        let (point, receipt) = load_target_artifact(&curve, path)?;
+        (point, None, Some(receipt))
     } else if let Some(pt) = &args.point {
         let (x, y) = pt
             .split_once(',')
             .ok_or_else(|| "--point wants X,Y in hex".to_string())?;
-        (curve.parse_point(x, y)?, None)
+        (curve.parse_point(x, y)?, None, None)
     } else {
         let k = match (&args.secret, args.random_bits) {
             (Some(s), _) => {
@@ -374,7 +431,7 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
                 return Err("give --secret K, --random-bits B, --point X,Y, or --challenge".into());
             }
         };
-        (curve.plant(&k), Some(k))
+        (curve.plant(&k), Some(k), None)
     };
     let interval = width.map(|w| (lo.clone(), w));
     let opts = SolveOptions {
@@ -400,6 +457,7 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
                 "operation": "solve",
                 "curve": curve.describe(),
                 "target": {"x": tx, "y": ty},
+                "target_artifact": target_artifact,
                 "planted_scalar": planted.as_ref().map(|k| k.to_string()),
                 "planted_recovered": planted_ok,
                 "report": report,
@@ -409,6 +467,13 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
     } else {
         println!("curve:     {} ({})", report.curve, report.family.tag());
         println!("target:    ({tx}, {ty})");
+        if let Some(artifact) = &target_artifact {
+            println!(
+                "artifact:  {} (SHA-256 {})",
+                artifact["source"].as_str().unwrap_or("?"),
+                artifact["sha256"].as_str().unwrap_or("?")
+            );
+        }
         println!("method:    {}", report.method);
         match &report.scalar {
             Some(k) => println!(
@@ -558,6 +623,7 @@ mod tests {
             secret: None,
             random_bits: None,
             point: None,
+            point_file: None,
             challenge: false,
             interval_lo: None,
             interval_bits: None,
@@ -602,6 +668,44 @@ mod tests {
         assert!(solve_bounds(&input, &order, Method::Auto)
             .unwrap_err()
             .contains("positive"));
+    }
+
+    #[test]
+    fn target_artifact_requires_exact_curve_and_valid_point() {
+        let curve = curve_by_name("P-256").unwrap();
+        let fixture = Path::new(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/docs/ic/fixtures/ecdlp_nist_p256_target_20261022.json"
+        ));
+        let (point, receipt) = load_target_artifact(&curve, fixture).unwrap();
+        assert_eq!(point, curve.plant(&BigUint::from(38u32)));
+        assert_eq!(
+            receipt["sha256"],
+            hex::encode(crypto_lib::hash::sha256(&std::fs::read(fixture).unwrap()))
+        );
+        let path = std::env::temp_dir().join(format!(
+            "ecdlp-target-{}-{}.json",
+            std::process::id(),
+            line!()
+        ));
+        let mut value: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(fixture).unwrap()).unwrap();
+        value["curve"]["field_and_equation"]["p_hex"] = json!("dead");
+        std::fs::write(&path, serde_json::to_vec(&value).unwrap()).unwrap();
+        assert!(load_target_artifact(&curve, &path)
+            .err()
+            .unwrap()
+            .contains("curve identity"));
+        value["curve"] = curve.describe();
+        value["target"]["y"] = json!("0");
+        std::fs::write(&path, serde_json::to_vec(&value).unwrap()).unwrap();
+        assert!(load_target_artifact(&curve, &path).is_err());
+        value["target"]["y"] = json!(curve.point_hex(&point).unwrap().1);
+        value.as_object_mut().unwrap().remove("schema_version");
+        value["operation"] = json!("solve");
+        std::fs::write(&path, serde_json::to_vec(&value).unwrap()).unwrap();
+        assert_eq!(load_target_artifact(&curve, &path).unwrap().0, point);
+        std::fs::remove_file(path).unwrap();
     }
 }
 
