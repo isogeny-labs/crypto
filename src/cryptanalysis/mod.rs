@@ -99,6 +99,7 @@ pub mod aut_folded_rho;
 pub mod auto_attack;
 pub mod avalanche;
 pub mod b_seed_profile;
+pub mod b_weak_class_battery;
 pub mod bielliptic_quartic;
 pub mod biext_k2;
 pub mod binary_field_basis;
