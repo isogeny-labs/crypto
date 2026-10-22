@@ -5,6 +5,7 @@ import argparse
 import datetime as dt
 import hashlib
 import json
+import os
 import platform
 import subprocess
 import time
@@ -48,6 +49,7 @@ def main():
         "rustc": command_output("rustc", "--version"),
         "cargo": command_output("cargo", "--version"),
         "arms": [],
+        "environment_overrides": {"RAYON_NUM_THREADS": "1"},
     }
     for seed in (131, 137):
         for arity in (2, 3):
@@ -61,7 +63,10 @@ def main():
             row = {"name": stem, "command": cmd, "started_utc": utc_now()}
             start = time.monotonic()
             try:
-                child = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+                child = subprocess.run(
+                    cmd, capture_output=True, text=True, timeout=300,
+                    env={**os.environ, "RAYON_NUM_THREADS": "1"},
+                )
                 row["exit_code"] = child.returncode
                 stdout, stderr = child.stdout, child.stderr
             except subprocess.TimeoutExpired as exc:
