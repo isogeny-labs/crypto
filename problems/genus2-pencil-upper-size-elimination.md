@@ -2,9 +2,9 @@
 
 - **Status:** `investigating`
 - **Kind:** empirical bottleneck and resource limit
-- **Affected work:** [four-follow-up protocol](../research/four_followups_20261021/PROTOCOL.md), point-driven pencil collector
+- **Affected work:** [four-follow-up protocol](../research/four_followups_20261021/PROTOCOL.md), [point-driven pencil collector](../research/pencil_sparse_20261022/REPORT.md)
 - **Next action owner:** PR #2304 follow-up
-- **Last updated:** 2026-10-21
+- **Last updated:** 2026-10-22
 
 ## Problem
 
@@ -26,6 +26,19 @@ same-process source-negation rho and the two-point control.
   candidate/rho source scalars and three headline prices. See the
   [single-target record](../research/four_followups_20261021/results/pencil-pilot/f48383-one-target.jsonl)
   and [certificate](../research/four_followups_20261021/results/pencil-pilot/f48383-one-target-replay-certificate.json).
+- **Observed, 2026-10-22:** The [native cohort status](../research/pencil_sparse_20261022/results/status.json)
+  records 543 of the original 1,260 distinct targets solved and source verified;
+  717 remain open. The [validator](../research/pencil_sparse_20261022/results/validation.json)
+  checked 2,895 source scalars, 1,482 independent replay rows, 52,056 priced
+  cells and 108 deliberately unpriced cap cells. At the first p=186,379 target,
+  online elimination and degree peeling both reached the 10-million-coefficient
+  cap. A separately frozen [25-million-coefficient extension](../research/pencil_sparse_20261022/results/p186379-peel-cap25m-t0.jsonl)
+  also returned `sparse_matrix_cap`, at rank 85,168, peak 25,000,079 stored
+  coefficients, 79,696,712 modular row updates and 4,778,336,117 index
+  operations. Its [independent replay](../research/pencil_sparse_20261022/results/replay/p186379-peel-cap25m-t0.jsonl)
+  matched non-wall fields; rho's source scalar verified. All three cap records
+  retain null candidate scalar and ratio. The 8 GiB and 3,600-second guards
+  did not trigger in the 25-million run.
 - **Derived or proved:** No asymptotic lower bound for the pencil method or
   elimination is established. The 28-bit single target is not a 60-target
   size estimate.
@@ -36,11 +49,13 @@ same-process source-negation rho and the two-point control.
   execution resources for the unchanged upper-size workloads and their
   independent replay.
 - **What this evidence does not establish:** No full 1,260-target result or
-  growing-size cost conclusion for the pencil path.
+  growing-size cost conclusion for the pencil path. Raising the coefficient
+  cap from 10 million to 25 million on one target did not yield a solve; it
+  does not prove that exact elimination cannot solve that target.
 
 ## What would unblock it
 
-- [ ] Run the remaining 719 frozen targets, retaining per-target failures and
+- [ ] Run the remaining 717 frozen targets, retaining per-target failures and
   complete phase, field, native, setup, elimination and source-rho counts.
 - [ ] Independently replay all records, verify both recovered scalars on the
   source curve, recompute all 36 prices per model and compare with the frozen
@@ -52,14 +67,14 @@ external-tool checks.
 
 ## Next discriminating step
 
-- **Action or proof obligation:** Profile row-update and stored-nonzero growth
-  under the unchanged collector and compare an exact alternative sparse
-  elimination on the same first 28-bit target.
+- **Action or proof obligation:** Compare a new exact sparse-elimination
+  implementation on the same fixed p=186,379 target and relation stream,
+  including its 25-million-coefficient cap record as the control.
 - **Inputs and controls:** Frozen workload hash, seed, relation stream,
   source rho and source-scalar checks from the [protocol](../research/four_followups_20261021/PROTOCOL.md).
-- **Execution limits and stop condition:** Record actual wall and memory use;
-  terminate only on the frozen collector cap or an explicit resource failure,
-  retaining partial records. Do not silently reduce the cohort.
+- **Execution limits and stop condition:** Freeze and record the alternative's
+  coefficient, memory and time guards before execution; retain partial records
+  on each guard or explicit resource failure. Do not silently reduce the cohort.
 - **Outcomes and next actions:** A validated faster elimination can be
   replayed on the remaining targets; an equal or slower result is recorded,
   and the unchanged collector still requires the full run. A replay mismatch
@@ -70,4 +85,10 @@ external-tool checks.
 
 2026-10-21: Nine smaller models complete; one 28-bit target independently
 replayed. The upper-size full cohort remains unresolved.
+
+2026-10-22: Degree peeling completed all nine 60-target pilot curves and two
+additional 28-bit first targets. The 25-million-coefficient p=186,379 attempt
+and independent replay both ended at the coefficient cap; 543/1,260 distinct
+targets are solved and 717 remain open. See the [three-cap report](../research/pencil_sparse_20261022/reports/run-20261022T0647Z/RUN_REPORT.pdf)
+and [study validation gate](../research/pencil_sparse_20261022/VALIDATION.json).
 This record does not close or replace the requested experiment.
