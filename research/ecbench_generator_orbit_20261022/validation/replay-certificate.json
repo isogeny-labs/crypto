@@ -1,0 +1,308 @@
+{
+  "schema": "replay-certificate/v1",
+  "study": "research/ecbench_generator_orbit_20261022",
+  "snapshot": {
+    "branch": "claude/ic-generator-orbit",
+    "head": "45a11de2eb7aa01220e07c3ec513662bf8c193fa",
+    "tree_clean": true
+  },
+  "status": "verified",
+  "independent": true,
+  "independence": "Replayed by the validator, a separate agent from the measuring session, from the committed snapshot; scalars re-checked a second time with validator-written code (validation/verify_scalars.py, Python GF(2^n) arithmetic, no repository code). Same binary and same host class as the sessions: not a cross-host or cross-implementation replay.",
+  "scalars_verified": true,
+  "scalars_verified_count": 5760,
+  "records": 5760,
+  "replays": 4320,
+  "reproduced": 4320,
+  "warmups_not_replayed": 1440,
+  "warmup_note": "ecbench verify --replay-all re-executes measured (non-warm-up) deterministic runs; warm-up records are covered by the audit integrity checks and both scalar checks, not by replay.",
+  "binary": {
+    "path": "target/release/ecbench",
+    "sha256": "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191",
+    "matches_every_record_and_session": true,
+    "session_git_commit": "de57ca373f79560121b266dfc75a1ebb62864870",
+    "session_git_dirty": false,
+    "rebuilt": false,
+    "note": "No mismatch, so nothing was rebuilt. The binary embeds no git commit; its binding to source rests on session.json (git_commit de57ca373f, git_dirty false at run time) and on timing: built 2026-10-22T08:42:40Z, after d2b3a56c32 (08:37:49Z, the last commit touching src/), and de57ca373f changed only PROTOCOL.md, run.sh and cards/attempt-1."
+  },
+  "host": {
+    "env_class_id": "ECBENV2hebd6c1d47154",
+    "auditor_hardware_class_id": [
+      "ECBHW1h71df94523395"
+    ],
+    "session_env_class_ids": [
+      "ECBENV2hebd6c1d47154"
+    ],
+    "same_host_class_as_sessions": true,
+    "note": "Same host class as the sessions (env class ECBENV2hebd6c1d47154, the env_class_id of every session and record). The cross-host replay the gate asks for was not available in this container."
+  },
+  "command": "./target/release/ecbench verify --dir research/ecbench_generator_orbit_20261022/sessions/<session> --replay-all --exit-code --out research/ecbench_generator_orbit_20261022/validation/replay-<session>.json (exit 0 for all seven)",
+  "runs": [
+    {
+      "session": "a0-n13",
+      "session_id": "ECBS1h40b3312cf235",
+      "session_id_matches": true,
+      "records": 768,
+      "records_sha256": "f9e57293681219256b47145ecfd0c4ffad1a46e8638d412f011dec9f1a41cf44",
+      "records_sha256_matches_session_json": true,
+      "warmups_not_replayed": 192,
+      "replays": 576,
+      "reproduced": 576,
+      "replay_details": [
+        "identical"
+      ],
+      "audit_ok": true,
+      "audit_problems": [],
+      "audit_checks_all_true": true,
+      "ecbench_verified_records": 768,
+      "auditor_env_class_id": "ECBENV2hebd6c1d47154",
+      "auditor_hardware_class_id": "ECBHW1h71df94523395",
+      "session_env_class_id": "ECBENV2hebd6c1d47154",
+      "independent_scalar_check": {
+        "scalars_verified": 768,
+        "scalars_failed": 0,
+        "modulus_hex": "0x201b",
+        "targets_on_curve": true,
+        "targets_in_subgroup": true
+      },
+      "scalar_ok": true,
+      "record_binary_sha256": [
+        "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191"
+      ],
+      "session_binary_sha256": "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191",
+      "session_git_commit": "de57ca373f79560121b266dfc75a1ebb62864870",
+      "session_git_dirty": false,
+      "receipt": "validation/replay-a0-n13.json",
+      "receipt_sha256": "8a7d427eb8a4ded96f0c21449f4f600612cf654f3965af91c7cc825295965797",
+      "log": "validation/replay-a0-n13.log"
+    },
+    {
+      "session": "a0-n19",
+      "session_id": "ECBS1hba7a75763c85",
+      "session_id_matches": true,
+      "records": 768,
+      "records_sha256": "f42fad5f8d94b37a2669543db5bb4d5546a7554ee11ea956adaaad9b9c62e0d9",
+      "records_sha256_matches_session_json": true,
+      "warmups_not_replayed": 192,
+      "replays": 576,
+      "reproduced": 576,
+      "replay_details": [
+        "identical"
+      ],
+      "audit_ok": true,
+      "audit_problems": [],
+      "audit_checks_all_true": true,
+      "ecbench_verified_records": 768,
+      "auditor_env_class_id": "ECBENV2hebd6c1d47154",
+      "auditor_hardware_class_id": "ECBHW1h71df94523395",
+      "session_env_class_id": "ECBENV2hebd6c1d47154",
+      "independent_scalar_check": {
+        "scalars_verified": 768,
+        "scalars_failed": 0,
+        "modulus_hex": "0x80027",
+        "targets_on_curve": true,
+        "targets_in_subgroup": true
+      },
+      "scalar_ok": true,
+      "record_binary_sha256": [
+        "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191"
+      ],
+      "session_binary_sha256": "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191",
+      "session_git_commit": "de57ca373f79560121b266dfc75a1ebb62864870",
+      "session_git_dirty": false,
+      "receipt": "validation/replay-a0-n19.json",
+      "receipt_sha256": "ad3bb769a77008f2ee98c5652a386720c180d220a145b0e2a4dddad2bf67f6b8",
+      "log": "validation/replay-a0-n19.log"
+    },
+    {
+      "session": "a0-n23",
+      "session_id": "ECBS1h4f7cdc1ab404",
+      "session_id_matches": true,
+      "records": 768,
+      "records_sha256": "6b3c22cddb8fad0831d959ef58640004d6d6e8b653f5d4bc8e0dc57cd63feef5",
+      "records_sha256_matches_session_json": true,
+      "warmups_not_replayed": 192,
+      "replays": 576,
+      "reproduced": 576,
+      "replay_details": [
+        "identical"
+      ],
+      "audit_ok": true,
+      "audit_problems": [],
+      "audit_checks_all_true": true,
+      "ecbench_verified_records": 768,
+      "auditor_env_class_id": "ECBENV2hebd6c1d47154",
+      "auditor_hardware_class_id": "ECBHW1h71df94523395",
+      "session_env_class_id": "ECBENV2hebd6c1d47154",
+      "independent_scalar_check": {
+        "scalars_verified": 768,
+        "scalars_failed": 0,
+        "modulus_hex": "0x800021",
+        "targets_on_curve": true,
+        "targets_in_subgroup": true
+      },
+      "scalar_ok": true,
+      "record_binary_sha256": [
+        "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191"
+      ],
+      "session_binary_sha256": "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191",
+      "session_git_commit": "de57ca373f79560121b266dfc75a1ebb62864870",
+      "session_git_dirty": false,
+      "receipt": "validation/replay-a0-n23.json",
+      "receipt_sha256": "2c6be4e45e4fd38c8766720a61249855065ade0a760887bd18777b6ca2220f69",
+      "log": "validation/replay-a0-n23.log"
+    },
+    {
+      "session": "a0-n31",
+      "session_id": "ECBS1h573443176608",
+      "session_id_matches": true,
+      "records": 768,
+      "records_sha256": "246f698a44dfd5978947a7c70fdc56a8dcbd1fbd5723c1afbd6f98076ba726b2",
+      "records_sha256_matches_session_json": true,
+      "warmups_not_replayed": 192,
+      "replays": 576,
+      "reproduced": 576,
+      "replay_details": [
+        "identical"
+      ],
+      "audit_ok": true,
+      "audit_problems": [],
+      "audit_checks_all_true": true,
+      "ecbench_verified_records": 768,
+      "auditor_env_class_id": "ECBENV2hebd6c1d47154",
+      "auditor_hardware_class_id": "ECBHW1h71df94523395",
+      "session_env_class_id": "ECBENV2hebd6c1d47154",
+      "independent_scalar_check": {
+        "scalars_verified": 768,
+        "scalars_failed": 0,
+        "modulus_hex": "0x80000009",
+        "targets_on_curve": true,
+        "targets_in_subgroup": true
+      },
+      "scalar_ok": true,
+      "record_binary_sha256": [
+        "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191"
+      ],
+      "session_binary_sha256": "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191",
+      "session_git_commit": "de57ca373f79560121b266dfc75a1ebb62864870",
+      "session_git_dirty": false,
+      "receipt": "validation/replay-a0-n31.json",
+      "receipt_sha256": "27e9cbb291fe514dd640023c2ff42c6b13e1491a3799284094273d1b728295c4",
+      "log": "validation/replay-a0-n31.log"
+    },
+    {
+      "session": "a0-n37",
+      "session_id": "ECBS1h28d6e10492db",
+      "session_id_matches": true,
+      "records": 384,
+      "records_sha256": "483235b43c46f7d728b3543d7dd65ed9e39b4b5ea7e7d289c026302f29dd5423",
+      "records_sha256_matches_session_json": true,
+      "warmups_not_replayed": 96,
+      "replays": 288,
+      "reproduced": 288,
+      "replay_details": [
+        "identical"
+      ],
+      "audit_ok": true,
+      "audit_problems": [],
+      "audit_checks_all_true": true,
+      "ecbench_verified_records": 384,
+      "auditor_env_class_id": "ECBENV2hebd6c1d47154",
+      "auditor_hardware_class_id": "ECBHW1h71df94523395",
+      "session_env_class_id": "ECBENV2hebd6c1d47154",
+      "independent_scalar_check": {
+        "scalars_verified": 384,
+        "scalars_failed": 0,
+        "modulus_hex": "0x2000000053",
+        "targets_on_curve": true,
+        "targets_in_subgroup": true
+      },
+      "scalar_ok": true,
+      "record_binary_sha256": [
+        "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191"
+      ],
+      "session_binary_sha256": "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191",
+      "session_git_commit": "de57ca373f79560121b266dfc75a1ebb62864870",
+      "session_git_dirty": false,
+      "receipt": "validation/replay-a0-n37.json",
+      "receipt_sha256": "a9eab0fe9a6a63590f1da3037ebd8b6156e14b1aacc379f25366fc9066ddc36d",
+      "log": "validation/replay-a0-n37.log"
+    },
+    {
+      "session": "a1-n17",
+      "session_id": "ECBS1hecda0d013d4e",
+      "session_id_matches": true,
+      "records": 768,
+      "records_sha256": "fad4a09edcbc3cd937e618f0a69c975b2ff0df56a01cbb1041ea7a96298d88d5",
+      "records_sha256_matches_session_json": true,
+      "warmups_not_replayed": 192,
+      "replays": 576,
+      "reproduced": 576,
+      "replay_details": [
+        "identical"
+      ],
+      "audit_ok": true,
+      "audit_problems": [],
+      "audit_checks_all_true": true,
+      "ecbench_verified_records": 768,
+      "auditor_env_class_id": "ECBENV2hebd6c1d47154",
+      "auditor_hardware_class_id": "ECBHW1h71df94523395",
+      "session_env_class_id": "ECBENV2hebd6c1d47154",
+      "independent_scalar_check": {
+        "scalars_verified": 768,
+        "scalars_failed": 0,
+        "modulus_hex": "0x20009",
+        "targets_on_curve": true,
+        "targets_in_subgroup": true
+      },
+      "scalar_ok": true,
+      "record_binary_sha256": [
+        "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191"
+      ],
+      "session_binary_sha256": "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191",
+      "session_git_commit": "de57ca373f79560121b266dfc75a1ebb62864870",
+      "session_git_dirty": false,
+      "receipt": "validation/replay-a1-n17.json",
+      "receipt_sha256": "9fe8f3c456e0c20987e1a66e8d8af329532cdbce465da7a031e7163ac4d58e35",
+      "log": "validation/replay-a1-n17.log"
+    },
+    {
+      "session": "a1-n29",
+      "session_id": "ECBS1h4217c35be5b6",
+      "session_id_matches": true,
+      "records": 1536,
+      "records_sha256": "105209a001539c9d66c1a07f962be025153faacebd372dc8b3e06763770030e5",
+      "records_sha256_matches_session_json": true,
+      "warmups_not_replayed": 384,
+      "replays": 1152,
+      "reproduced": 1152,
+      "replay_details": [
+        "identical"
+      ],
+      "audit_ok": true,
+      "audit_problems": [],
+      "audit_checks_all_true": true,
+      "ecbench_verified_records": 1536,
+      "auditor_env_class_id": "ECBENV2hebd6c1d47154",
+      "auditor_hardware_class_id": "ECBHW1h71df94523395",
+      "session_env_class_id": "ECBENV2hebd6c1d47154",
+      "independent_scalar_check": {
+        "scalars_verified": 1536,
+        "scalars_failed": 0,
+        "modulus_hex": "0x20000005",
+        "targets_on_curve": true,
+        "targets_in_subgroup": true
+      },
+      "scalar_ok": true,
+      "record_binary_sha256": [
+        "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191"
+      ],
+      "session_binary_sha256": "f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191",
+      "session_git_commit": "de57ca373f79560121b266dfc75a1ebb62864870",
+      "session_git_dirty": false,
+      "receipt": "validation/replay-a1-n29.json",
+      "receipt_sha256": "a0306b0977a611f11fe8a5270d9eafffa460e50130eead35c2df138d607f3331",
+      "log": "validation/replay-a1-n29.log"
+    }
+  ]
+}

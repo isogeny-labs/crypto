@@ -1,0 +1,82 @@
+{
+  "schema": "validation-gate/v1",
+  "replay_certificate": {
+    "path": "../../research/ecbench_generator_orbit_20261022/validation/replay-certificate.json",
+    "sha256": "27e7803c31955ab6b8fc92228335a8512f50cf91ea9141d9741e1bdfe4279902"
+  },
+  "validator_report": {
+    "path": "../../research/ecbench_generator_orbit_20261022/validation/validator-report-benchmarks.json",
+    "sha256": "3105a36e3e5dd4c56917a48b99344507b8db328e970d6458a309dcaac64a3431"
+  },
+  "rho_reference": {
+    "kind": "negation_frobenius",
+    "protocol": "PROTOCOL.md §5 H5: rho-frob (rho.signed_frobenius_full, the signed-Frobenius fold), same session, paired by target; rho-strong also measured",
+    "unit": "ecbench.gae (S = GAE / sqrt r)",
+    "binary_or_process": "ecbench f7ac8fb01b45613f5ce1d63a7da7c97bd410aa0912cf7b2b15fc203b2bb0e191, one session per curve, both arms interleaved",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "gae_band": {
+      "0": {
+        "ic": 0.5455578097990991,
+        "rho": 1.5685264230740932
+      },
+      "0.1": {
+        "ic": 0.6105599321040679,
+        "rho": 1.5685264230740932
+      },
+      "1": {
+        "ic": 1.1955790328487834,
+        "rho": 1.5685264230740932
+      }
+    },
+    "order_holds_across_band": true,
+    "scope": "The band numbers are mean S on icv1-f2m29-tm40309-30c52b96 (n29, c = 1), the one curve on which the protocol ranks the IC arm ahead of rho-frob (`ecbench band --ranks`). n13 is unresolved inside the band; at n17, n23, n31 and n37 rho-frob is ahead at every weight; at n19 the band does not re-price the IC natives (no pinned calibration row). At c = 1 the IC arm is a Frobenius-folded baby-step giant-step and the crossing rests on rho-frob set-up at log2 r = 15.4 (REPORT.pdf).",
+    "bands_considered": {
+      "ecbench_band": {
+        "what": "the protocol-named instrument (band.rs): IC calibration-priced and unpriced natives at w; rho_full natives stay at full_prices.json",
+        "ic": [
+          0.5455578097990991,
+          0.6105599321040679,
+          1.1955790328487834
+        ],
+        "rho": [
+          1.5685264230740932,
+          1.5685264230740932,
+          1.5685264230740932
+        ],
+        "order": "ic < rho at every weight"
+      },
+      "like_for_like": {
+        "what": "analysis/core_band.jq: the same native operation types on both arms (canonicalisations, lookups and guard probes, Frobenius maps, row ops, inversions, solves; rho canonicalisations and distinguished points) at w; group work at 1 GAE",
+        "ic": [
+          0.41335343990245305,
+          0.47835556220742204,
+          1.0633746629521388
+        ],
+        "rho": [
+          1.5033952513348148,
+          1.5818472217026522,
+          2.2879149550131888
+        ],
+        "order": "ic < rho at every weight"
+      },
+      "every_unit_operation": {
+        "what": "validator diagnostic validation/alike_band.jq: every native unit operation of the full-price rules at w, including field squarings, hash probes, point negations and the factor-base byte floor, which only the IC records count at that granularity",
+        "ic": [
+          0.41335343990245305,
+          0.8865070123873826,
+          5.144889164751745
+        ],
+        "rho": [
+          1.5033952513348148,
+          1.5818472217026522,
+          2.2879149550131888
+        ],
+        "order": "unresolved (ic < rho at w = 0 and 0.1, rho < ic at w = 1)"
+      }
+    },
+    "validator_findings": "../../research/ecbench_generator_orbit_20261022/validation/findings.json: F2 (band.rs subtracts C at calibration prices from a full-price G), F3 (band not applied alike: rho natives never swept), F4 (n19 unpinned), F5 (A/A identical by construction)"
+  }
+}

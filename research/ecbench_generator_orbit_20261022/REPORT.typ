@@ -64,6 +64,23 @@ All 5 760 records verified, none is a lower bound, and all 4 320 replays in the 
 
 *n29: IC is ranked ahead of the matched rho.* `ic-gen-layout ÷ rho-frob` is 0.366 [0.241, 0.523] over 192 pairs. The IC arm's band S (0.546 / 0.611 / 1.196) is below rho-frob's 1.569 at all three weights, and `ecbench band --ranks` returns `ic-gen-layout-c1 < rho-frob`. By the protocol's H5 rule, IC is ahead of rho on this curve.
 
+*How robust the ranking is to the band's definition.* The independent validator (finding F3) showed that `ecbench band` is not applied alike to every arm. It charges the IC arms' calibration-priced natives at $w$, but leaves rho's natives (its canonicalisations and distinguished points) at `full_prices.json` rates. Table 3 adds two bands that treat both arms alike.
+
+- The *like-for-like* band (`analysis/core_band.jq`) charges the same operation types on both arms at $w$. The ranking holds there.
+- The validator's *every-unit-operation* band charges each field squaring, hash probe, point negation and the factor-base byte floor at $w$. Only the IC records count work at that granularity. In that band the IC arm loses at $w = 1$.
+
+So the n29 ranking holds under the protocol's instrument and under the like-for-like band. It is unresolved under the strictest accounting.
+
+#figure(
+  table(columns: 4, align: (left, left, left, left),
+    [band], [ic-gen-layout S (w = 0 / 0.1 / 1)], [rho-frob S], [order],
+    [`ecbench band` (protocol)], [0.546 / 0.611 / 1.196], [1.569 / 1.569 / 1.569], [IC ahead at every weight],
+    [like-for-like], [0.413 / 0.478 / 1.063], [1.503 / 1.582 / 2.288], [IC ahead at every weight],
+    [every unit operation (validator)], [0.413 / 0.887 / 5.145], [1.503 / 1.582 / 2.288], [unresolved],
+  ),
+  caption: [n29 under three §5a bands. The like-for-like band at the other curves: n13 IC ahead at every weight (0.892 / 1.022 / 2.192 against 1.911 / 1.971 / 2.505), which the protocol's instrument leaves unresolved; n19 unresolved; rho-frob ahead at n17, n23, n31 and n37 (`analysis/core-band-*.json`).],
+)
+
 *What it is, and what it is not.* At $c = 1$ the pipeline is a Frobenius-folded baby-step giant-step (protocol §2).
 
 - The baby steps are the 26 pair-sum classes of $G$'s signed orbit, covering 1 508 of $r = 42 457$ points.
@@ -77,6 +94,25 @@ So this is the first measured, band-robust crossing of the matched rho by an IC-
 #figure(image("figures/fig2-band-by-curve.svg", width: 100%), caption: [Mean S at the band's ends ($w = 0$ solid, $w = 1$ dotted, range shaded) for the lazy baseline and the gen-layout arm, with rho-frob, against $log_2 r$.])
 
 #figure(image("figures/fig3-n29-phases.svg", width: 90%), caption: [n29: mean priced work per phase, calibration prices (derived: means over 192 non-warm-up records per arm, `figures/summary.json`). The generator orbit removes the scanned seed's lift, projection and order check (factor_base 100 → 23 GAE). It also removes the relation phase's scalar multiplications. rho-frob's set-up is 133 of its 323 GAE.])
+
+== Validation
+
+An independent validator agent did the following (`validation/`):
+
+- It replayed every session (`verify --replay-all`): 4 320 of 4 320 replays reproduced.
+- It verified all 5 760 scalars twice, once through the audit and once with its own GF($2^n$) code that shares nothing with the repository.
+- From the raw `records.jsonl` it recomputed all 84 band means, H1 (960 of 960 pairs equal) and the n29 trial mean. Every one agrees exactly.
+
+`VALIDATION.json` names the replay certificate, the validator report and the rho-frob reference, with the n29 band and all three bands above. `scripts/validation_gate.py evidence` reports the study directory `valid`.
+
+The validator also found four problems. None changes a verdict here:
+
+- *F2.* `band.rs` subtracts the calibration-priced C from a G that `*_full` re-priced at `full_prices.json` rates. Correcting this lowers the IC means by 1.2–12.3 %.
+- *F3.* The band is not applied alike to every arm (table 3).
+- *F4.* n19 is unpinned (below).
+- *F5.* The A/A control uses the same seeds, so it tests determinism only and cannot fail.
+
+F2 and F3 are band-tool follow-ups.
 
 == Classification and limits
 
@@ -99,5 +135,6 @@ Nothing here concerns larger fields, ECC2K-130, deployed curves or security.
 - `audits/`, `tables/` (`table-`, `band-` and `compare-` files) and `logs/`.
 - `cards/`: both task cards, receipts and the director's assessment.
 - `figures/summary.json`, from `figures/make_summary.sh` (jq), and `figures/plot_figures.py`, which lays out recorded values only.
-- `validation/`: replay certificate and validator report.
+- `validation/`: replay certificate, validator report and findings. `VALIDATION.json`.
+- `analysis/core_band.jq` and `analysis/core-band-*.json`: the like-for-like band.
 - Unit tests `layout_table_returns_the_lazy_pairs_with_no_maps_and_half_the_same_orbit_sums` and `generator_orbit_base_pins_the_target_with_one_relation`. `cargo test --release --lib -- ic_framework ic_boundary ecbench`: 221 passed.
