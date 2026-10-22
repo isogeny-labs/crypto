@@ -1,0 +1,24 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.72in]{geometry}
+\usepackage{array}
+\begin{document}
+\begin{center}\Large Four follow-ups: cross-lead review packet\\[2pt]
+\normalsize Frozen public 21-model, 1,260-target cohort; 22 October 2026\end{center}
+\noindent\textbf{Accounting.} Full cold candidate cost divided by same-process matched negation-rho cost at $M+0.5S+10I$ and 0.1 source-addition equivalents per native logical operation. The external column uses the archived wrapped graph collector. Values are ratios of summed costs across the stated targets; the accompanying SVG shows per-size ratios. All 36 price cells and exact source grid paths are in \texttt{results/standard-cost-grid.csv}.
+\medskip
+\begin{center}\small\begin{tabular}{l|r r|r r}
+Arm & Candidate & Rho & Candidate/rho & Candidate/external\\\hline
+Full base, 16 jumps & 1,260 & 1,260 & 2.448830 & 1.000000\\
+Full base, 8 jumps & 1,260 & 1,260 & 2.447173 & 0.999323\\
+Full base, 32 jumps & 1,260 & 1,260 & 2.453278 & 1.001816\\
+Half base, 16 jumps & 1,260 & 1,260 & 3.017732 & 1.232316\\
+Quarter base, 16 jumps & 1,260 & 1,260 & 3.919193 & 1.600435\\
+Projective wrapper & 1,260 & 1,260 & 3.793783 & 1.549223\\
+Retained weighted state & 1,260 & 1,260 & 4.179297 & 1.706651\\
+\end{tabular}\end{center}
+\noindent\textbf{Validation.} Factor-base arms have 6,300 candidate and 6,300 rho source-scalar checks. Each projective-law arm has 1,260 candidate and 1,260 rho source-scalar checks. Its independent Rust validator recomputed 576 price cells. The weighted-law arithmetic gate includes targeted exceptional cases, but finite checks do not prove universal formula completeness. Study-specific raw JSONL, validators, manifests, and hashes remain in their source directories.
+\medskip
+\noindent\textbf{Open requirements.} The integrated point-driven pencil pilot covers 541 distinct public targets; 719 original targets remain. The sparse-rank continuation is recorded separately. The Kummer coordinate gate checked 8,820 labeled cases on all 1,260 public targets: 8,813 matching nonzero xADD outputs, seven recorded zero outputs, and no wrong nonzero outputs. It has no complete labeled DLP collector, so candidate cost, rho cost, and cost ratio are null. Neither a stage count nor a coordinate identity is substituted for a full solve.
+\medskip
+\noindent\textbf{Review files.} \texttt{REPORT.md} links each source study and its raw data. \texttt{DATA\_DICTIONARY.md} defines the normalized CSV, empty fields, and exact source references. \texttt{cost-ratios.svg} plots per-size measured ratios and omits unpriced Kummer rows. The CSV and \texttt{results/summary.json} support independent regrouping without using this report's wording.
+\end{document}
