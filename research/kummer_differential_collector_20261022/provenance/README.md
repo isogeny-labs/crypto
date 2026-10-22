@@ -29,6 +29,11 @@ Those latter read-only checks supplement the checked-in Rust analyzer; this
 receipt's durable source-to-executable claim rests on its explicit hashes and
 the byte-identical rebuild.
 
+The [retrospective original run report](../reports/run-20261022T0710Z/RUN.md)
+and its [PDF](../reports/run-20261022T0710Z/run-report.pdf) put the recovered
+command, observations, missing capture, and price graph beside the archived
+records without representing the report as contemporaneous evidence.
+
 A later [isolated full replay](../reports/run-20261022T1354Z/RUN.md) ran the
 retained executable on copied inputs with separate stdout, stderr,
 environment, and resource capture. It exited 0 after 1,260 candidate and
