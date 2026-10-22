@@ -11,7 +11,7 @@ empty fields and the source grid for every row. The [PDF](REPORT.pdf) presents
 the same status, selected values, and both graphs. These are operation-count prices, not
 isolated wall-time claims.
 
-The [standardized target index](results/standard-targets.csv) joins 12,789
+The [standardized target index](results/standard-targets.csv) joins 12,850
 target-arm rows on the exact public workload key. It retains per-target
 representative costs, source verification, DLP verification, and Kummer's
 seven label outcomes and signed-Recover method per target. Its builder checks
@@ -27,7 +27,7 @@ blank DLP fields apply only to Kummer's separate coordinate-only gate.
 | Factor base, quarter base 16 jumps | 1,260 / 1,260 | 3.919193 | 1.600435 | Same targets and price |
 | Projective law, normalized wrapper | 1,260 / 1,260 | 3.793783 | 1.549223 | Full cold collector and rho |
 | Projective law, retained weighted state | 1,260 / 1,260 | 4.179297 | 1.706651 | Full cold collector and rho |
-| Point-driven pencil | 543 distinct candidate solves; 544 rho solves | See paired grid and graph | null | 717 original targets have no candidate solve; one p=186,379 target reached three caps |
+| Point-driven pencil | 543 distinct candidate solves; 544 rho solves | See paired grid and graph | null | 717 original targets have no candidate solve; one p=186,379 target reached four caps across three solver methods |
 | Kummer differential collector, uncached | 1,260 / 1,260 | 14.356662 | null | Same-process matched rho; 36-cell cold ratio 8.959687–55.935424 |
 | Kummer coordinate/recovery gate | 0 / 0 DLP solves; 1,260 signed recoveries and 8,820 labels checked | null | null | Separate arithmetic gate with no collector cost |
 
@@ -43,7 +43,10 @@ includes two 1,260-target arms, 576 independently recomputed arm/size/price
 cells, and branch records. Those finite checks do not prove universal
 completeness of the formula on every curve. A later [42-model proof audit](../projective_law_followup_20261022/PROOF_AUDIT.md)
 checked another 1,224,000 finite weighted additions against Cantor with zero
-mismatches; its symbolic output-identity proof remains open.
+mismatches. An exact integer-polynomial certificate and written divisor
+argument now establish the generic weighted 1+2 output identity for valid
+inputs with `u(x) != 0`; exceptional 1+2 and all 2+2 output identities
+remain open.
 
 The [Kummer coordinate evidence](../kummer_coordinates_20261022/REPORT.md)
 reports 8,813 matching nonzero xADD outputs and seven zero outputs on the
@@ -68,8 +71,14 @@ were above one. At the representative price, peel/online spans 0.233555 to
 0.898244 and peel/rho spans 11.615357 to 22,644.843832 across these slices.
 The 28-bit endpoint is one target; it is not a 60-target average. The
 [target index](results/standard-targets.csv) retains all 1,449 pencil
-arm-target rows, including three unpriced cap failures and all 1,446 verified
-solves. Its original 1,260-distinct-target requirement remains open.
+arm-target rows in that study, including three unpriced cap failures and all
+1,446 verified solves. The separate [Markowitz-priority continuation](../pencil_markowitz_20261022/REPORT.md)
+has 60 source-verified p=739 solves and one replayed p=186,379 cap with null
+candidate ratio. Its representative Markowitz/peel ratio is 1.204855 and
+Markowitz/rho is 13.994822; zero of 36 cells cost less than peel or rho.
+The combined target index has 1,510 pencil arm-target rows, including four
+unpriced cap attempts across methods. The original 1,260-distinct-target
+requirement remains open.
 
 This review packet maps source results without modifying their frozen raw
 records. The native Rust converter checks imported arithmetic ratios and generates the graph

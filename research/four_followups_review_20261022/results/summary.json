@@ -930,6 +930,17 @@
       "slice": "p48383",
       "source_grid": "research/pencil_sparse_20261022/results/p48383-peel-vs-online.csv",
       "targets": 1
+    },
+    {
+      "arm": "markowitz_priority",
+      "candidate_GAE": 4676902.742857141,
+      "candidate_over_external": null,
+      "candidate_over_rho": 13.994822105949,
+      "lead": "pencil_collector",
+      "rho_GAE": 334188.08095238096,
+      "slice": "p739",
+      "source_grid": "research/pencil_markowitz_20261022/results/p739-markowitz-vs-peel.csv",
+      "targets": 60
     }
   ],
   "requirements": [
@@ -952,9 +963,9 @@
       "failed_distinct_targets": 1,
       "lead": "pencil_collector",
       "open_distinct_targets": 717,
-      "remaining": "717 original target workloads have no completed candidate solve; one p=186379 target has three replayed cap failures, including a 25-million-coefficient run, and source-verified rho.",
+      "remaining": "717 original target workloads have no completed candidate solve; one p=186379 target has four replayed cap attempts across online, peel, and Markowitz methods, each with null candidate cost and source-verified rho.",
       "rho_distinct_targets": 544,
-      "source": "research/pencil_sparse_20261022/REPORT.md",
+      "source": "research/pencil_markowitz_20261022/REPORT.md",
       "status": "partial"
     },
     {
@@ -971,8 +982,8 @@
       "zero_outputs": 7
     }
   ],
-  "rows": 3031,
+  "rows": 3067,
   "schema": "four-followups-review/v1",
   "scope": "Frozen 21-model, 1,260-public-target cohort; 60 targets/model; seven order sizes.",
-  "target_rows": 12789
+  "target_rows": 12850
 }

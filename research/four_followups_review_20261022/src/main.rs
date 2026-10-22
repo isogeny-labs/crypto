@@ -365,6 +365,42 @@ fn price_rows(repo: &Path) -> Vec<Row> {
             }
         }
     }
+    let markowitz_source = "research/pencil_markowitz_20261022/results/p739-markowitz-vs-peel.csv";
+    let mut markowitz_rows = 0;
+    for old in read_csv(&repo.join(markowitz_source)) {
+        assert_eq!(val(&old, "p"), "739");
+        assert_eq!(val(&old, "targets"), "60");
+        let base = num(val(&old, "baseline_GAE"));
+        let cand = num(val(&old, "candidate_GAE"));
+        let rho = num(val(&old, "rho_GAE"));
+        close(cand / base, num(val(&old, "candidate_over_baseline")));
+        close(cand / rho, num(val(&old, "candidate_over_rho")));
+        let mut r = Row::new();
+        for key in [
+            "targets",
+            "S_per_M",
+            "I_per_M",
+            "native_GAE_per_logical",
+            "candidate_GAE",
+            "rho_GAE",
+            "baseline_GAE",
+            "candidate_over_baseline",
+            "candidate_over_rho",
+        ] {
+            put(&mut r, key, val(&old, key));
+        }
+        put(&mut r, "lead", "pencil_collector");
+        put(&mut r, "arm", "markowitz_priority");
+        put(&mut r, "slice", "p739");
+        put(&mut r, "verified", "60");
+        put(&mut r, "candidate_failures", "0");
+        put(&mut r, "rho_failures", "0");
+        put(&mut r, "status", "priced_source_verified");
+        put(&mut r, "source_grid", markowitz_source);
+        out.push(r);
+        markowitz_rows += 1;
+    }
+    assert_eq!(markowitz_rows, 36);
     for bits in [16, 20, 24, 28, 32, 36, 40] {
         out.push(row(&[
             ("lead", "kummer_walk".into()),
@@ -383,7 +419,7 @@ fn price_rows(repo: &Path) -> Vec<Row> {
             ),
         ]));
     }
-    assert_eq!(out.len(), 3031);
+    assert_eq!(out.len(), 3067);
     out
 }
 
@@ -459,6 +495,30 @@ fn target_rows(repo: &Path) -> Vec<Row> {
             out.push(priced_target(&source, "projective_law", arm, "p", path));
         }
     }
+    let mut pencil_cap_rho = BTreeMap::new();
+    for path in [
+        "research/pencil_sparse_20261022/results/price-grid.csv",
+        "research/pencil_markowitz_20261022/results/price-grid.csv",
+    ] {
+        for old in read_csv(&repo.join(path)) {
+            if val(&old, "status") != "incomplete"
+                || (
+                    val(&old, "S_per_M"),
+                    val(&old, "I_per_M"),
+                    val(&old, "native_GAE_per_logical"),
+                ) != ("0.5", "10", "0.1")
+            {
+                continue;
+            }
+            assert!(val(&old, "pencil_GAE").is_empty());
+            let rho = val(&old, "rho_GAE");
+            assert!(num(rho) > 0.0);
+            assert!(pencil_cap_rho
+                .insert(val(&old, "raw_path").to_string(), rho.to_string())
+                .is_none());
+        }
+    }
+    assert_eq!(pencil_cap_rho.len(), 4);
     let pencil = "research/pencil_sparse_20261022/results/targets.jsonl";
     for source in read_jsonl(&repo.join(pencil)) {
         let verified = js(&source, "candidate_verified").as_bool().unwrap();
@@ -484,7 +544,17 @@ fn target_rows(repo: &Path) -> Vec<Row> {
             ),
             ("rho_verified", s(js(&source, "rho_verified"))),
             ("candidate_GAE", s(js(priced, "pencil_GAE"))),
-            ("rho_GAE", s(js(priced, "rho_GAE"))),
+            (
+                "rho_GAE",
+                if verified {
+                    s(js(priced, "rho_GAE"))
+                } else {
+                    pencil_cap_rho
+                        .get(&s(js(&source, "raw_path")))
+                        .unwrap()
+                        .clone()
+                },
+            ),
             ("candidate_over_rho", s(js(priced, "pencil_over_rho"))),
             (
                 "status",
@@ -504,6 +574,60 @@ fn target_rows(repo: &Path) -> Vec<Row> {
         }
         out.push(std::mem::take(&mut r));
     }
+    let markowitz = "research/pencil_markowitz_20261022/results/targets.jsonl";
+    let mut markowitz_target_rows = 0;
+    for source in read_jsonl(&repo.join(markowitz)) {
+        if js(&source, "solver_mode").as_str() != Some("markowitz") {
+            continue;
+        }
+        let verified = js(&source, "candidate_verified").as_bool().unwrap();
+        let priced = js(&source, "representative");
+        let r = row(&[
+            ("lead", "pencil_collector".into()),
+            ("arm", "markowitz_priority".into()),
+            ("bits", s(js(&source, "bits"))),
+            ("p", s(js(&source, "curve_p"))),
+            ("target_index", s(js(&source, "target_index"))),
+            ("workload_id", s(js(&source, "workload_id"))),
+            ("source_verified", s(js(&source, "rho_verified"))),
+            (
+                "candidate_dlp_verified",
+                s(js(&source, "candidate_verified")),
+            ),
+            ("rho_verified", s(js(&source, "rho_verified"))),
+            ("candidate_GAE", s(js(priced, "pencil_GAE"))),
+            (
+                "rho_GAE",
+                if verified {
+                    s(js(priced, "rho_GAE"))
+                } else {
+                    pencil_cap_rho
+                        .get(&s(js(&source, "raw_path")))
+                        .unwrap()
+                        .clone()
+                },
+            ),
+            ("candidate_over_rho", s(js(priced, "pencil_over_rho"))),
+            (
+                "status",
+                if verified {
+                    "priced_source_verified".into()
+                } else {
+                    "incomplete_cap_unpriced".into()
+                },
+            ),
+            ("source_record", s(js(&source, "raw_path"))),
+            ("failure", s(js(&source, "failure"))),
+            ("solver_mode", s(js(&source, "solver_mode"))),
+            ("order", s(js(&source, "order"))),
+        ]);
+        if !verified {
+            assert!(val(&r, "candidate_GAE").is_empty());
+        }
+        out.push(r);
+        markowitz_target_rows += 1;
+    }
+    assert_eq!(markowitz_target_rows, 61);
     let kummer_price =
         "research/kummer_differential_collector_20261022/results/paired/analysis/target-price.csv";
     let kummer_prices = read_csv(&repo.join(kummer_price));
@@ -617,7 +741,7 @@ fn target_rows(repo: &Path) -> Vec<Row> {
             ]));
         }
     }
-    assert_eq!(out.len(), 12789);
+    assert_eq!(out.len(), 12850);
     out
 }
 
@@ -636,6 +760,18 @@ fn main() {
     assert_eq!(kummer_gate["schema"], "validation-gate/v1");
     assert_eq!(kummer_gate["rho_reference"]["same_binary_or_process"], true);
     assert_eq!(kummer_gate["rho_reference"]["matches_protocol"], true);
+    let markowitz_gate_path = repo.join("research/pencil_markowitz_20261022/VALIDATION.json");
+    let markowitz_gate: Value = serde_json::from_str(
+        &fs::read_to_string(&markowitz_gate_path)
+            .unwrap_or_else(|e| panic!("{}: {e}", markowitz_gate_path.display())),
+    )
+    .unwrap();
+    assert_eq!(markowitz_gate["schema"], "validation-gate/v1");
+    assert_eq!(
+        markowitz_gate["rho_reference"]["same_binary_or_process"],
+        true
+    );
+    assert_eq!(markowitz_gate["rho_reference"]["matches_protocol"], true);
     let grids = price_rows(&repo);
     let targets = target_rows(&repo);
     let peel: Vec<_> = grids
@@ -657,6 +793,25 @@ fn main() {
     );
     assert_eq!(
         peel.iter()
+            .filter(|r| num(val(r, "candidate_over_rho")) < 1.0)
+            .count(),
+        0
+    );
+    let markowitz: Vec<_> = grids
+        .iter()
+        .filter(|r| val(r, "lead") == "pencil_collector" && val(r, "arm") == "markowitz_priority")
+        .collect();
+    assert_eq!(markowitz.len(), 36);
+    assert_eq!(
+        markowitz
+            .iter()
+            .filter(|r| num(val(r, "candidate_over_baseline")) < 1.0)
+            .count(),
+        0
+    );
+    assert_eq!(
+        markowitz
+            .iter()
             .filter(|r| num(val(r, "candidate_over_rho")) < 1.0)
             .count(),
         0
@@ -687,6 +842,9 @@ fn main() {
                 pencil_complete_rows += 1;
             } else {
                 assert_eq!(val(r, "status"), "incomplete_cap_unpriced");
+                assert!(val(r, "candidate_GAE").is_empty());
+                assert!(val(r, "candidate_over_rho").is_empty());
+                assert!(num(val(r, "rho_GAE")) > 0.0);
                 pencil_cap_rows += 1;
             }
         }
@@ -706,9 +864,9 @@ fn main() {
     assert!(keys.values().all(|v| v.len() == 1));
     assert_eq!(
         (pencil_rows, pencil_present.len(), pencil_verified.len()),
-        (1449, 544, 543)
+        (1510, 544, 543)
     );
-    assert_eq!((pencil_complete_rows, pencil_cap_rows), (1446, 3));
+    assert_eq!((pencil_complete_rows, pencil_cap_rows), (1506, 4));
     assert_eq!((zero, coordinate_fail), (7, 0));
     write_csv(&out.join("standard-cost-grid.csv"), GRID_FIELDS, &grids);
     write_csv(&out.join("standard-targets.csv"), TARGET_FIELDS, &targets);
@@ -745,7 +903,7 @@ fn main() {
         "requirements": [
             {"lead":"factor_base","status":"verified_complete_for_five_frozen_arms","candidate_targets_per_arm":1260,"rho_targets_per_arm":1260,"source":"research/four_followups_20261021/REPORT.md"},
             {"lead":"projective_law","status":"verified_complete_for_two_frozen_arms","candidate_targets_per_arm":1260,"rho_targets_per_arm":1260,"source":"research/projective_law_followup_20261022/REPORT.md"},
-            {"lead":"pencil_collector","status":"partial","candidate_distinct_targets":543,"rho_distinct_targets":544,"failed_distinct_targets":1,"open_distinct_targets":717,"remaining":"717 original target workloads have no completed candidate solve; one p=186379 target has three replayed cap failures, including a 25-million-coefficient run, and source-verified rho.","source":"research/pencil_sparse_20261022/REPORT.md"},
+            {"lead":"pencil_collector","status":"partial","candidate_distinct_targets":543,"rho_distinct_targets":544,"failed_distinct_targets":1,"open_distinct_targets":717,"remaining":"717 original target workloads have no completed candidate solve; one p=186379 target has four replayed cap attempts across online, peel, and Markowitz methods, each with null candidate cost and source-verified rho.","source":"research/pencil_markowitz_20261022/REPORT.md"},
             {"lead":"kummer_walk","status":"verified_complete_for_uncached_differential_collector","coordinate_label_cases":8820,"nonzero_matches":8813,"zero_outputs":7,"wrong_nonzero_outputs":0,"candidate_dlp_targets":1260,"rho_targets":1260,"signed_recoveries_verified":1260,"zero_coordinate_repairs_verified":175,"source":"research/kummer_differential_collector_20261022/MATCHED_REPORT.md"},
         ],
     });
