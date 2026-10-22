@@ -18,7 +18,7 @@ only binds continuation state; it does not itself establish completion.
 
 Use pinned YAFU c7d90283972820f99b3b4920bfc1eff05c1f6342 and native sievers,
 seed 20261022, two threads and two linear-algebra threads in their separate
-phase, `-gnfs -xover 81`, native 1800-second limit, outer 1860 seconds with
+phase, `-gnfs -xover 81 -pbatch 120`, native 1800-second limit, outer 1860 seconds with
 30-second kill grace, per-process virtual memory limit 4 GiB. Preserve a
 pre-resume snapshot, every native output and all failure statuses. The task
 envelope is 2400 seconds, including restoration and verification; this is
@@ -28,6 +28,10 @@ a separate recorded decision.
 
 Require the existing genuine-GNFS known-answer and checkpoint-resume
 controls, plus checkpoint checksum verification and fixed-input comparison.
+Per-thread-only polynomial state is insufficient: require the R03
+native-recognized master checkpoint or a later validated checkpoint. Refuse
+a silent restart. Use the latest completed round's checkpoint at execution;
+R03 is the compact fallback and does not contain any subsequent R04 progress.
 Treat every native factor label as a hint. The independent verifier is
 pinned to both the fixture-derived whole target and this literal residual;
 it checks exact products and retained PARI prime certificates. Partial

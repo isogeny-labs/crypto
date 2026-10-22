@@ -12,12 +12,16 @@ integer(s) = {
 {
   my(N=integer(getenv("NFS_INPUT")), path=getenv("POLY_INPUT"), out=getenv("POLY_OUTPUT"));
   if(N<=1,error("invalid input"));
-  my(lines=readstr(path), block=List(), a=vector(6), seen=vector(6), y0=0, hasy0=0, count=0);
+  my(lines=readstr(path), block=List(), a=vector(6), seen=vector(6), y0=0, hasy0=0, count=0, hasn=0);
   write(out,"n: ",N);
   foreach(lines,line,
     my(chars=Vecsmall(line));
     if(!#chars,next);
     my(header=chars[1]==35, tokens=strsplit(line,":"));
+    if(tokens[1]=="n",
+      if(hasn||count||#block||#tokens!=2||integer(tokens[2])!=N,error("wrong or misplaced input header"));
+      hasn=1;next;
+    );
     if(header,
       if(#block,error("incomplete candidate before next header"));
       block=List();a=vector(6);seen=vector(6);hasy0=0;
