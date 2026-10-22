@@ -185,6 +185,14 @@ fn main() {
                     .filter(|p| !p.terms.is_empty())
                     .collect();
             }
+            // The engine's columns run over the variables that occur, so the
+            // cap is read against those: every variable occurs unspecialised.
+            let occurring = sys
+                .equations
+                .iter()
+                .flat_map(|p| p.terms.iter())
+                .fold(0u64, |acc, t| acc | t.mask)
+                .count_ones() as u64;
             let fixed_json = format!(
                 "[{}]",
                 fixes
@@ -220,7 +228,7 @@ fn main() {
             if satisfiable {
                 let mut scan = Vec::new();
                 for d in (3..=to.unwrap_or(5))
-                    .take_while(|&d| monomials_up_to(sys.n_vars as u64, d) <= max_cols)
+                    .take_while(|&d| monomials_up_to(occurring, d) <= max_cols)
                 {
                     scan.extend(closure_refutation_scan(&sys.equations, sys.n_vars, d, d));
                 }
@@ -242,7 +250,7 @@ fn main() {
             let xl_known = v["outcome"]["kind"] == "resolved";
             let ceiling = to.unwrap_or(if xl_known { committed } else { committed - 1 });
             let top = (3..=ceiling)
-                .take_while(|&d| monomials_up_to(sys.n_vars as u64, d) <= max_cols)
+                .take_while(|&d| monomials_up_to(occurring, d) <= max_cols)
                 .last()
                 .unwrap_or(2);
             let mut scan = Vec::new();

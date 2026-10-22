@@ -115,3 +115,25 @@ Per draw: four guesses **suffice** if all 16 G4 branches refute at 4;
   sequential run would produce at that index. The frozen draw set is
   unchanged: the first 4 unsatisfiable draws in draw order, merged into
   `draws/m3-22-8.jsonl`.
+
+## Amendment 2 (2026-10-22, before any degree-4 measurement)
+
+The first launch of `measure` recorded no degree-4 reading, because of two
+instrument bugs. Its 8 outputs (G6 and G4b0 on each draw, all `measured_to`
+3) are kept unscored in `runs/invalid-cap-bug/`. No outcome at degree 4 was
+seen before this amendment.
+
+- **`dreg_closure` cap.** The column cap was read against the system's
+  declared 46 variables. The engine builds its columns over the variables
+  that occur (`RootMatrix`, occurring-variable multipliers), which after
+  `--fix` are 46 − k. So degree 4 (179,447 estimated columns) was skipped on
+  every run. The cap is now read against the occurring variables, which
+  equals the declared count on every unspecialised system.
+  - **Identity check:** the committed `fresh-m3-16-6.d0` record (scale study)
+    is reproduced exactly with the new binary: closure degree 4, ranks 1451
+    and 1, columns 4,861 and 52,956.
+  - The new binary's hash is in `runs/binary.sha256`.
+- **`run.sh` early stop.** `failed()` treated `"closure_degree":null` as
+  a failing branch, which also matches a run that never reached degree 4.
+  It now requires a degree-4 scan entry that is saturated without
+  refuting, which is the registered "does not".

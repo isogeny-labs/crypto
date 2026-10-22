@@ -33,7 +33,8 @@ one() { # draw arm fix
 }
 
 failed() { # draw: has a G4 branch that saturated degree 4 without refuting
-  grep -l '"closure_degree":null' "$RUNS/$NAME.d$1".G4b*.jsonl >/dev/null 2>&1
+  grep -l '"degree":4,"xl_refuted":false,"closure_refuted":false,"saturated":true' \
+    "$RUNS/$NAME.d$1".G4b*.jsonl >/dev/null 2>&1
 }
 
 case $STEP in
