@@ -2,6 +2,11 @@ name: Optimized IC producer admission
 on:
   pull_request:
     paths:
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'build.rs'
+      - '.cargo/**'
+      - 'rust-toolchain*'
       - 'research/ic_candidate_tournament_20260915/producer/**'
       - 'research/ic_candidate_tournament_20260915/identity.py'
       - 'research/ic_candidate_tournament_20260915/measurement.py'
@@ -36,11 +41,11 @@ permissions:
   contents: read
 concurrency:
   group: ic-producer-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   archived-producer:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-producer.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-producer.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 45 || 90 }}
     strategy:
       fail-fast: false
       matrix:
@@ -114,6 +119,7 @@ jobs:
         if: matrix.reference == 'scaled'
         run: |
           cp research/ic_candidate_tournament_20260915/ci/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
           cargo fetch --locked
           python research/ic_candidate_tournament_20260915/generic_build.py \
             --out "$RUNNER_TEMP/ic-generic-driver-build"
@@ -153,7 +159,7 @@ jobs:
   generic-reference-qualification:
     if: github.event_name == 'workflow_dispatch' && inputs.qualify_generic
     needs: archived-producer
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-producer.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-producer.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
@@ -178,6 +184,7 @@ jobs:
       - name: Build the source-bound generic worker
         run: |
           cp research/ic_candidate_tournament_20260915/ci/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
           cargo fetch --locked
           python research/ic_candidate_tournament_20260915/generic_build.py \
             --out "$RUNNER_TEMP/ic-generic-qualification-build"
@@ -204,7 +211,7 @@ jobs:
   reference-qualification:
     if: github.event_name == 'workflow_dispatch' && inputs.qualify_references
     needs: archived-producer
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-producer.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-producer.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4

@@ -10,8 +10,14 @@ name: ic measurement standard
 # refuses wall time by design.  The smoke job checks the machinery, never the
 # numbers.
 on:
+  merge_group:
   pull_request:
     paths:
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'build.rs'
+      - '.cargo/**'
+      - 'rust-toolchain*'
       - "tools/icms/**"
       - "tools/isolated_bench.py"
       - "docs/ic/measurement/**"
@@ -32,7 +38,7 @@ defaults:
     shell: bash
 jobs:
   standard:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-measurement.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-measurement.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -62,8 +68,8 @@ jobs:
         run: python scripts/build_ic_measurement.py --check
 
   smoke:
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-measurement.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-measurement.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 40 }}
     needs: standard
     steps:
       - uses: actions/checkout@v4
@@ -123,7 +129,7 @@ jobs:
       - name: The smoke session audits like a committed one
         run: python tools/icms audit-sessions /tmp/icms-smoke
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ !cancelled() }}
         with:
           name: icms-smoke-session
           path: /tmp/icms-smoke
