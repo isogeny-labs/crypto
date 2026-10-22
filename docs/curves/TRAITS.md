@@ -254,18 +254,19 @@ certify its coordinates or group order.
 
 In the current file (2112 registry curves and 176 from the sources: 175
 walked curves of the P-256 and P-224 isogeny classes and the ECC2K-130
-degree-263 descendant), `End(E)` is established for 1989 curves (879
-maximal, 1110 non-maximal) and unresolved for 264; 35 have a `Δ` that did
+degree-263 descendant), `End(E)` is established for 2241 curves (953
+maximal, 1288 non-maximal) and unresolved for 33; 14 have a `Δ` that did
 not factor. Of the 1324 curves over `GF(p^k)`, `k > 1`, 1319 have a
 certified order (9 by generator, 1310 by point orders: 484 proved, 826
-probable). The levels behind it: 1246 decided by the scalar test on `E[ℓ]`
-(730 floors, 516 craters at depth 1), 982 by the prime-power test (459 one
-above the floor, 319 craters, 204 in between), 70 by the point test (57
-floors, 13 craters; 6 of them on binary curves), 13 walker certificates (each agreeing with the test),
-111 from a certified `End(E)`, 228 where `f₀` is already prime to `ℓ`.
-What stays open: 202 levels the tests only bound (beyond the cost limit or
-`ℓ^j > 64`), 38 depth-1 primes beyond both tests' budgets (`k > 64` or the cost
-limit), and 72 primes of `v`
+probable). The levels behind it: 1255 decided by the scalar test on `E[ℓ]`
+(739 floors, 516 craters at depth 1), 1137 by the prime-power tests (473 one
+above the floor, 347 craters, 317 in between), 65 by the depth-1 point test
+(57 floors, 8 craters; 5 of them on binary curves), 130 by isogeny walks
+(95 craters, 20 floors, 15 in between), 13 walker certificates (each
+agreeing with the test), 111 from a certified `End(E)`, 228 where `f₀` is
+already prime to `ℓ`. What stays open: 13 levels the tests only bound and
+19 depth-1 primes beyond the point test's budget, all on `GF(p^k)` curves
+whose `|d_K|` is far too large for a walk, and 2 primes of `v`
 above the test's range. P-256's `Δ` factors with
 the committed hints as `−3·5·456597257999·p81·p136` (squarefree), so
 `v = 1`, `d_K = Δ` and `End(E) = O_K`, probable through its 136-bit prime

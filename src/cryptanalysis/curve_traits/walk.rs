@@ -10,7 +10,9 @@
 //! `End(E)`.  The walk follows it on `j`-invariants, the next one being
 //! the root of `Φ_l(j_i, Y)` in `GF(q)` other than `j_{i−1}`, each root
 //! required simple (so it is one isogeny, the previous one's dual when it
-//! is `j_{i−1}`).
+//! is `j_{i−1}`).  A single root in `GF(q)` means both rational
+//! isogenies end there: a cycle of length 1 or 2, closed by the second,
+//! non-dual isogeny.
 //!
 //! When it is back at `j(E)` after `r` steps the composition is an
 //! endomorphism `α` of degree `l^r`, defined over `GF(q)` (an isogenous
@@ -249,6 +251,24 @@ fn walk<F: Field>(
         // Its distinct roots in GF(q): gcd(Y^q − Y, Φ_l(cur, Y)).
         let y_q = ppow(f, &y, q, &phi_y);
         let g = pgcd(f, &phi_y, &psub(f, &y_q, &y));
+        if g.len() == 2 {
+            // One root r in GF(q): both rational l-isogenies end at r, so
+            // a prime above l and its conjugate have the same class, of
+            // order 1 or 2.  Going on from r is the other isogeny, not the
+            // dual; from a non-start vertex only a return to the start fits.
+            let r = f.neg(&monic(f, &g)[0]);
+            let next = match &prev {
+                None => r,
+                Some(back) if *back == r && back == j0 => return Some(Ok(step)),
+                Some(_) => return None,
+            };
+            if next == *j0 {
+                return Some(Ok(step));
+            }
+            prev = Some(cur);
+            cur = next;
+            continue;
+        }
         if g.len() != 3 {
             return None;
         }
@@ -386,6 +406,21 @@ fn walk_word(p: u64, j0: u64, l: u64, max_steps: u32) -> Option<Result<u32, u32>
         d.resize(d.len().max(2), 0);
         d[1] = sub(d[1], 1);
         let g = gcd(&f, &strip(d));
+        if g.len() == 2 {
+            // As in [`walk`]: one root, both rational isogenies end there.
+            let r = sub(0, g[0]);
+            let next = match prev {
+                None => r,
+                Some(back) if back == r && back == j0 => return Some(Ok(step)),
+                Some(_) => return None,
+            };
+            if next == j0 {
+                return Some(Ok(step));
+            }
+            prev = Some(cur);
+            cur = next;
+            continue;
+        }
         if g.len() != 3 {
             return None;
         }

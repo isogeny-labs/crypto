@@ -1214,12 +1214,29 @@ fn timed<T>(what: &str, slug: &str, f: impl FnOnce() -> T) -> T {
     r
 }
 
+/// `j(O_K)` for the nine imaginary quadratic fields of class number 1.
+fn class_one_j(dk: &BigInt) -> Option<BigInt> {
+    let j: i128 = match dk.to_i64()? {
+        -3 => 0,
+        -4 => 1728,
+        -7 => -3375,
+        -8 => 8000,
+        -11 => -32768,
+        -19 => -884736,
+        -43 => -884736000,
+        -67 => -147197952000,
+        -163 => -262537412640768000,
+        _ => return None,
+    };
+    Some(BigInt::from(j))
+}
+
 /// Bound the conductor of `End(E)` by every order known to lie in it.
 /// `Z[π] ⊂ End(E)` gives `f | v`.  A field of definition `GF(2^k)` puts
 /// its Frobenius `π_k` in `End(E)` (`π = π_k^{n/k}`, and `Q(π_k) = Q(π)`),
 /// so `f | v_k` with `t_k² − 4·2^k = v_k²·d_K`.  `j = 0` and `j = 1728`
 /// on a prime-field model put `Z[ζ₃]` and `Z[i]`, both maximal, in
-/// `End(E)`.  A registry certificate fixes `End(E)` outright.  `Err` when
+/// `End(E)`; for the other class-number-1 fields, `j(E) = j(O_K)` does.  A registry certificate fixes `End(E)` outright.  `Err` when
 /// one of these contradicts `d_K`.
 fn endomorphism(
     c: &RegistryCurve,
@@ -1270,6 +1287,25 @@ fn endomorphism(
                 }
                 f0 = BigUint::one();
                 contains.push(ring.to_string());
+            }
+        }
+    }
+    // Class number 1: the curves with End(E) = O_K are the reductions of
+    // the one CM j-invariant j(O_K) (Deuring), so j(E) = j(O_K) mod p puts
+    // O_K in End(E).
+    if let (Model::Prime { p, a, b }, Some(j_k)) = (&c.model, class_one_j(&dk)) {
+        if f0 > BigUint::one() && !a.is_zero() && !b.is_zero() {
+            let pi = BigInt::from(p.clone());
+            let (a, b) = (BigInt::from(a.clone()), BigInt::from(b.clone()));
+            let a3 = BigInt::from(4) * &a * &a * &a;
+            let den = (&a3 + BigInt::from(27) * &b * &b).mod_floor(&pi);
+            if !den.is_zero() {
+                let inv = den.modpow(&(&pi - 2u8), &pi);
+                let j = (BigInt::from(1728) * a3 * inv).mod_floor(&pi);
+                if j == j_k.mod_floor(&pi) {
+                    f0 = BigUint::one();
+                    contains.push(format!("O_K (j = {j_k}, the class-number-1 CM j-invariant)"));
+                }
             }
         }
     }
@@ -2195,6 +2231,11 @@ mod tests {
         assert_eq!(t.endomorphism.conductor.as_deref(), Some("1"));
         assert_eq!(t.endomorphism.maximal, Some(true));
         assert_eq!(t.keys["end_order"], "maximal");
+        // d_K = −163 has class number 1 and no split prime below 41, so no
+        // walk; j(E) = −640320³ mod p puts O_K in End(E) all the same.
+        let t = get("icv1-fp240-t3-5d0c27a2");
+        assert_eq!(t.endomorphism.maximal, Some(true));
+        assert!(t.endomorphism.contains.iter().any(|o| o.starts_with("O_K (j = ")));
         // v = 271 is beyond the scalar test, d_K = −7 has class number 1:
         // O_K would close every walk of l-isogenies in one step, and the
         // walk does not, so End(E) = Z[π], of conductor 271.
