@@ -1,0 +1,28 @@
+[package]
+name = "projective-law-followup"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+five-leads-study = { path = "../five_leads_e2e_20261019/native" }
+serde_json = "1"
+
+[[bin]]
+name = "projective-law-gate"
+path = "src/bin/projective_law_gate.rs"
+
+[[bin]]
+name = "projective-collector"
+path = "src/bin/projective_collector.rs"
+
+[[bin]]
+name = "analyze-projective"
+path = "src/bin/analyze.rs"
+
+[[bin]]
+name = "projective-state-collector"
+path = "src/bin/projective_state_collector.rs"
+
+[[bin]]
+name = "validate-projective"
+path = "src/bin/validate.rs"
