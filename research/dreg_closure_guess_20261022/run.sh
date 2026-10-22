@@ -20,11 +20,17 @@ export F4_F2_MAX_ROWS=50000000 F4_F2_MAX_COLS=50000000
 export RAYON_NUM_THREADS=${RAYON_NUM_THREADS:-4}
 NAME=m3-22-8
 F=research/dreg_closure_guess_20261022/draws/$NAME.jsonl
+STARTED=0
 log() { echo "$(date -u +%FT%TZ) $*" | tee -a "$RUNS/queue.log"; }
 
 one() { # draw arm fix
   local k=$1 a=$2 fix=$3 out=$RUNS/$NAME.d$1.$2.jsonl
-  if [ -s "$out" ]; then log "$NAME d$k $a: done already, skipped"; return; fi
+  if [ -s "$out" ]; then return; fi
+  # MAX_RUNS=N: start at most N runs this invocation, then exit (resume later).
+  if [ -n "${MAX_RUNS:-}" ]; then
+    [ "$STARTED" -ge "$MAX_RUNS" ] && exit 0
+    STARTED=$((STARTED + 1))
+  fi
   log "$NAME d$k $a: start fix=$fix"
   local start; start=$(date +%s)
   (cd "$REPO" && prlimit --as=15000000000 timeout 7200 "$CLOSURE" --to 4 --max-cols 130000 \
@@ -53,7 +59,7 @@ measure)
   for k in $draws; do one "$k" G6 6=0,7=0,14=0,15=0,22=0,23=0; done
   for b in $(seq 0 15); do
     for k in $draws; do
-      if failed "$k"; then log "$NAME d$k G4b$b: draw already fails, skipped"; continue; fi
+      if failed "$k"; then continue; fi
       one "$k" "G4b$b" "7=$((b & 1)),15=$((b >> 1 & 1)),23=$((b >> 2 & 1)),24=$((b >> 3 & 1))"
     done
   done ;;
