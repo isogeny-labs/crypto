@@ -44,9 +44,12 @@ pub struct GenerateArgs {
     /// Odd prime isogeny degree in 3..=31.
     #[arg(long)]
     degree: u64,
-    /// Maximum curve models in the one-hop walk (2..=64).
+    /// Maximum curve models in the bounded walk (2..=64).
     #[arg(long, default_value_t = 3)]
     max_curves: usize,
+    /// Maximum route depth in edges (1..=64).
+    #[arg(long, default_value_t = 1)]
+    max_depth: usize,
     /// Deterministic polynomial-root search seed.
     #[arg(long, default_value_t = 1)]
     seed: u64,
@@ -65,8 +68,9 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
         || args.degree == args.n
         || args.p <= args.degree + 1
         || !(2..=64).contains(&args.max_curves)
+        || !(1..=64).contains(&args.max_depth)
     {
-        return Err("degree must be an odd prime in 3..=31 below p-1 and distinct from n; max-curves must be in 2..=64".into());
+        return Err("degree must be an odd prime in 3..=31 below p-1 and distinct from n; max-curves must be in 2..=64 and max-depth in 1..=64".into());
     }
     if [args.a, args.b, args.gx, args.gy, args.qx, args.qy]
         .iter()
@@ -140,7 +144,7 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
     let config = WalkConfig {
         primes: vec![args.degree],
         max_curves: args.max_curves,
-        max_depth: 1,
+        max_depth: args.max_depth,
         seed: args.seed,
         audit_points: 1,
         skipped: Vec::new(),
@@ -155,8 +159,16 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
             args.degree
         ));
     }
-    let document: Value = serde_json::from_str(&walk.routes_json(&ids, &routes).json())
+    let mut document: Value = serde_json::from_str(&walk.routes_json(&ids, &routes).json())
         .map_err(|e| format!("generated route is invalid JSON: {e}"))?;
+    let root_ref = document["curve_nodes"][0]["ref"]
+        .as_str()
+        .ok_or("generated route root lacks ref")?
+        .to_owned();
+    document["routes"]
+        .as_array_mut()
+        .ok_or("generated route lacks routes")?
+        .retain(|route| route["source_curve_ref"].as_str() == Some(root_ref.as_str()));
     walk::verify_routes(&document, &start, 2)?;
     Ok(document)
 }
@@ -430,6 +442,7 @@ mod tests {
             qy: 54,
             degree: 11,
             max_curves: 3,
+            max_depth: 1,
             seed: 1,
         };
         let graph = generate(&input).unwrap();
@@ -468,5 +481,73 @@ mod tests {
             mapped.target
         );
         assert_eq!(mapped.receipt["edges_verified"], 2);
+    }
+
+    #[test]
+    fn generated_two_hop_route_transports_public_target() {
+        let input = GenerateArgs {
+            p: 271,
+            a: 1,
+            b: 19,
+            n: 281,
+            gx: 3,
+            gy: 7,
+            qx: 231,
+            qy: 54,
+            degree: 11,
+            max_curves: 16,
+            max_depth: 2,
+            seed: 1,
+        };
+        let graph = generate(&input).unwrap();
+        let root_ref = graph["curve_nodes"][0]["ref"].as_str().unwrap();
+        assert!(graph["routes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|route| route["source_curve_ref"] == root_ref));
+        let two_hop = graph["routes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|route| {
+                route["edge_ids"]
+                    .as_array()
+                    .is_some_and(|ids| ids.len() == 2)
+            })
+            .unwrap();
+        let path = std::env::temp_dir().join(format!(
+            "prime-generated-two-hop-{}-{}.json",
+            std::process::id(),
+            line!()
+        ));
+        std::fs::write(&path, serde_json::to_vec(&graph).unwrap()).unwrap();
+        let target = PrimeArgs {
+            p: input.p,
+            a: input.a,
+            b: input.b,
+            n: input.n,
+            gx: input.gx,
+            gy: input.gy,
+            qx: input.qx,
+            qy: input.qy,
+            fb_size: 8,
+            extra_relations: 64,
+            max_trials_per_relation: 5000,
+            max_relation_attempts: 64,
+            rho_steps: 0,
+            route_file: None,
+            route_id: None,
+        };
+        let mapped = transport(&target, &path, two_hop["id"].as_str().unwrap()).unwrap();
+        std::fs::remove_file(path).unwrap();
+        assert_eq!(mapped.receipt["hops"], 2);
+        assert_eq!(mapped.receipt["edges_verified"], 6);
+        assert_eq!(
+            mapped
+                .generator
+                .scalar_mul(&BigUint::from(190u32), &mapped.curve.a_fe()),
+            mapped.target
+        );
     }
 }

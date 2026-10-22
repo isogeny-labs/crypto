@@ -69,7 +69,7 @@ enum Action {
     Run(RunArgs),
     /// Solve a specified public target on a bounded prime-field curve.
     SolvePrime(prime_external::PrimeArgs),
-    /// Generate certified prime-field IW1 isogeny routes for a public target.
+    /// Generate bounded certified prime-field IW1 isogeny routes for a public target.
     PrimeRouteGenerate(prime_external::PrimeRouteGenerateArgs),
     /// Solve a specified public target over a bounded cubic extension field.
     SolveCubic(cubic_external::CubicArgs),

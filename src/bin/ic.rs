@@ -117,7 +117,7 @@ enum Action {
     Prime(prime::PrimeArgs),
     /// Run bounded EC index calculus on an explicit prime-field public target.
     SolvePrime(prime_external::PrimeArgs),
-    /// Generate certified prime-field IW1 isogeny routes for a public target.
+    /// Generate bounded certified prime-field IW1 isogeny routes for a public target.
     PrimeRouteGenerate(prime_external::PrimeRouteGenerateArgs),
     /// Run bounded EC index calculus on an explicit cubic-field public target.
     SolveCubic(cubic_external::CubicArgs),
