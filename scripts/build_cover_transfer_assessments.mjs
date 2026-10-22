@@ -1125,15 +1125,15 @@ async function buildLedger() {
     readJson("docs/curves/covers.json"),
     readJson("docs/curves/cover-links.yaml"),
   ]);
-  assert(covers.curves.length === 2572, "unexpected covers row count");
-  assert(Object.keys(graph.maps).length === 2572, "unexpected graph map count");
-  assert(Object.keys(graph.covers).length === 2570, "unexpected graph cover count");
-  assert(graph.curves.length === 2572, "unexpected graph curve count");
+  assert(covers.curves.length === 2771, "unexpected covers row count");
+  assert(Object.keys(graph.maps).length === 2771, "unexpected graph map count");
+  assert(Object.keys(graph.covers).length === 2769, "unexpected graph cover count");
+  assert(graph.curves.length === 2771, "unexpected graph curve count");
 
   const coverRowsByModel = new Map(
     covers.curves.map((row) => [row.model_sha256, row]),
   );
-  assert(coverRowsByModel.size === 2572, "cover rows must have unique model hashes");
+  assert(coverRowsByModel.size === 2771, "cover rows must have unique model hashes");
 
   const mapMembers = new Map(
     Object.entries(profiles)
@@ -1250,16 +1250,16 @@ async function buildLedger() {
   );
   const mapCount = mapBase.reduce((sum, group) => sum + group.count, 0);
   const subgroupCount = subgroupBase.reduce((sum, group) => sum + group.count, 0);
-  assert(mapCount === 2572, `map membership count is ${mapCount}`);
+  assert(mapCount === 2771, `map membership count is ${mapCount}`);
   assert(subgroupCount === 977, `subgroup membership count is ${subgroupCount}`);
-  assert(fieldBindings.size === 509, `declared-field binding count is ${fieldBindings.size}`);
-  assert(jacobianBindings.size === 2570, `Jacobian binding count is ${jacobianBindings.size}`);
-  assert(typedMapBindings.size === 2572, `typed map binding count is ${typedMapBindings.size}`);
+  assert(fieldBindings.size === 687, `declared-field binding count is ${fieldBindings.size}`);
+  assert(jacobianBindings.size === 2769, `Jacobian binding count is ${jacobianBindings.size}`);
+  assert(typedMapBindings.size === 2771, `typed map binding count is ${typedMapBindings.size}`);
   const expectedMapCounts = new Map([
-    ["map.binary-cubic.same-field", 165],
-    ["map.odd-prime-quadratic.direct", 1053],
+    ["map.binary-cubic.same-field", 186],
+    ["map.odd-prime-quadratic.direct", 1184],
     ["map.odd-prime-quadratic.normalized", 30],
-    ["map.odd-extension-quadratic.direct", 1324],
+    ["map.odd-extension-quadratic.direct", 1371],
   ]);
   for (const group of mapBase) {
     assert(
@@ -1440,11 +1440,11 @@ async function buildLedger() {
       },
     ],
     coverage: {
-      catalog_maps: 2572,
-      unique_cover_models: 2570,
-      geometry_verified_maps: 2572,
+      catalog_maps: 2771,
+      unique_cover_models: 2769,
+      geometry_verified_maps: 2771,
       ec1_representations: 977,
-      assessed_maps: 2572,
+      assessed_maps: 2771,
       unassessed_maps: 0,
       assessed_subgroups: 977,
       unassessed_subgroups: 0,
