@@ -158,7 +158,8 @@ fn pairing(fixture: &Path, out: &Path) -> Result<()> {
 g=elltatepairing(E,P,Q,r)^168;if(g==1 || g^r!=1,error("degenerate pairing"));
 targets={};logs=List();
 for(j=1,#targets,T=[targets[j][1]*w^0,targets[j][2]*w^0];v=elltatepairing(E,T,Q,r)^168;k=fflog(v,g,r);if(ellmul(E,P,k)!=T,error("wrong source logarithm"));listput(logs,k));
-jstr(z)=Str(Strchr(34),z,Strchr(34));print("{{",jstr("recovered_logs"),":",Vec(logs),",",jstr("nondegenerate_order"),":11,",jstr("source_logarithms_checked"),":10}}");quit;
+jstr(z)=Str(Strchr(34),z,Strchr(34));
+print("{{",jstr("recovered_logs"),":",Vec(logs),",",jstr("nondegenerate_order"),":11,",jstr("source_logarithms_checked"),":10}}");quit;
 "#,
         px.0,
         py.0,
