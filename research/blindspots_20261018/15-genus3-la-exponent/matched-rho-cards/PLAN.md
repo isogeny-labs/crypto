@@ -93,3 +93,52 @@ receipts; the 4-vCPU host fits three single-thread jobs).
   of the first three ends.
 * The Bash background timeout of 7200000 ms covers the whole card; a run that used its full 7200 s would
   leave no margin for the build, and would already be a stop.
+
+## Replay card r01 (validation gate: independent replay of a sample of the matched rho walks)
+
+Card `card-r01.yaml` (CARD-BLINDSPOT-15-R01), receipt `raw/matched-replay/receipt-card-r01.json`, all outputs and
+the binary under `raw/matched-replay/` (paths relative to `research/blindspots_20261018/15-genus3-la-exponent/`).
+The IC arms of the m cards are replayed and gated elsewhere; this card replays only the rho arm.
+
+### Why a prefix, and why it is exact
+
+In the 15b source (`main`, "15b: round 4's rho dispatch") the rho loop clones the stream `base` once (the state
+after the shared k was drawn) and then threads one generator `r2` through every walk: target 0 is the shared k,
+target i >= 1 is `r2.randrange(1, ell)`, and each `rho_neg` call consumes `r2` for its multipliers and restarts.
+So the targets and per-walk randomness do not depend on `--rho-targets`: `--rho-targets K` reproduces exactly the
+first K walks of the 16-walk run. They do depend on the earlier walks, so a sample cannot skip walks: it is a
+prefix. Everything before `base` (instance build, G, the phi checks, k, `measure_c_add`, `symmetry_check`)
+uses only the seed (20261014 * 1000 + 10 b + curve) and not `--arms`; the IC streams run on clones of `base` and
+do not advance it. Counters are `reset()` and the native counters `nrestore`d before every walk.
+
+### Sample (recorded wall and steps from `raw/matched/b20_c<c>_matched.jsonl`, `results[]`, `arm == "rho"`)
+
+| curve | `--rho-targets` | walks replayed | recorded steps | recorded wall (s) | cumulative (s) |
+|---|---|---|---|---|---|
+| 0 | 4 | targets 0, 1, 2, 3 | 232712993, 444291395, 128360662, 70657559 | 99.4, 188.2, 53.0, 29.1 | 369.6 |
+| 2 | 3 | targets 0, 1, 2 | 219336676, 219819746, 111700251 | 92, 95, 48 (cumulative 92, 187, 235) | 235 |
+
+Seven walks on two curves, target 0 (the shared IC k) on both. Estimated about 605 s of rho plus the build
+(about 15 s) and two instance builds (under 1 s each): about 10.5 minutes, one thread, hence `background: true`.
+
+### What each replay record must equal
+
+Compare `raw/matched-replay/b20_c<c>_rho_replay.jsonl` (one line per curve) to `raw/matched/b20_c<c>_matched.jsonl`
+(one line per curve), the `results[]` entries with `arm == "rho"` and `target` in the replayed range, matched by
+`target`. Every field below must be equal (integers exactly; floats equal as parsed, they come from the same
+integer counters and the same code):
+
+* per rho record: `arm`, `target`, `k`, `k_true`, `correct`, `steps`, `counters` (5 values), `setup_counters`
+  (5), `restarts`, `escapes`, `r`, `cost`, `cost_cl9`, `cost_per_step`, `rho_model_neg`, `steps_over_sqrt_ell`,
+  `steps_over_model`, `native` (all native counters), and `gae` (`counted_fq`, `counted_gae`, `native_ops`, and
+  `S` at every w);
+* per curve line, the instance and the unit it is priced in: `bits`, `q`, `curve`, `seed`, `mode`, `build_tries`,
+  `N`, `ell`, `c`, `h`, `a`, `b`, `r0`, `Kmod`, `checks`, `relprim`, `walks`, `instrument`, `symmetry` (including
+  `strongest_rho_symmetry == "negation"`), `c_add` (`mean`, `min`, `max`, `additions`, `c_dbl_mean`, `unit`),
+  `native_names`, `native_note`.
+
+Exempt (wall or descriptive, or differ by construction): `wall_total` of every rho record; `build_wall`;
+`vmhwm_kb`; `arms_run` (`["rho"]` against `["ic2lp","rho"]`); `matched_rho` (null in the replay, because it has
+no IC arm); and the IC `results[]` entries, which the replay does not produce. The 16 - K recorded walks beyond
+the prefix are not replayed and stay unreplayed. A difference in any listed field is a replay failure to report,
+never to explain away.
