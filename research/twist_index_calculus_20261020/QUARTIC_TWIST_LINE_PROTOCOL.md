@@ -498,3 +498,20 @@ the selected signed relations, orbit coefficients, rank and answer by a
 scalar-keyed subgroup-log oracle. Use an 8-GiB cap and 1,200-second
 watchdog. Treat isolated ABAB timings and same-input external Gröbner
 comparison as separate gates before a ranked whole-method speed claim.
+
+## Registered mixed-pattern pruning controls
+
+Frozen after the first `k=1,2,3` one-target polynomial run recovered 271
+at anchored rank four on residual seven, before running either control.
+On the identical p=37 target, 48-point base and 61-residual cap, run two
+new one-target arms: `k={1,2}` and `k={1}`. For each arm, invoke only its
+listed polynomial peeling systems; keep the same complete-set,
+rank-raising-row, public-anchor, scalar/factor-log verification and
+same-process 24-fold rho rules as the `k={1,2,3}` producer. No known
+target scalar may enter collection or matrix construction. Record every
+attempt, zero-yield residual and cap failure. Reconstruct each processed
+pattern's signed set and final matrix with the independent scalar-keyed
+auditor. Run A/A and compare complete counted cold paths, retaining setup
+and rho on every arm rather than subtracting them. These are adaptive
+follow-ups to a measured zero-yield `k=3` prefix, not preregistered
+confirmatory evidence for other curves or targets.
