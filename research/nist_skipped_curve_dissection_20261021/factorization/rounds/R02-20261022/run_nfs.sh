@@ -45,11 +45,11 @@ argv=(./yafu -threads 2 -lathreads 2 -seed 20261022 -gnfs -xover 81
 [[ $mode == fresh ]] || argv+=(-R)
 [[ -z $poly_batch ]] || argv+=(-pbatch "$poly_batch")
 outer=$((seconds+60))
-printf '%q ' timeout --signal=INT --kill-after=30s "$outer" "${argv[@]}" > "$log/command.txt"
+printf '%q ' env LC_ALL=C timeout --verbose --signal=INT --kill-after=30s "$outer" "${argv[@]}" > "$log/command.txt"
 printf '< %q\n' "$log/expression.txt" >> "$log/command.txt"
 printf '%s\n' "$out/state" > "$log/working-directory.txt"
 set +e
-(cd "$out/state" && ulimit -v 4194304 && timeout --signal=INT --kill-after=30s "$outer" "${argv[@]}" < "$log/expression.txt") \
+(cd "$out/state" && ulimit -v 4194304 && LC_ALL=C timeout --verbose --signal=INT --kill-after=30s "$outer" "${argv[@]}" < "$log/expression.txt") \
   > "$log/stdout.txt" 2> "$log/stderr.txt"
 status=$?
 set -e
@@ -58,12 +58,18 @@ awk '($1 ~ /^(P|PRP|C)[0-9]+$/ && $2=="=" && $3 ~ /^[0-9]+$/) {print $3}
      ($1 ~ /^(p|prp|c)[0-9]+:$/ && $NF ~ /^[0-9]+$/) {print $NF}' \
   "$log/stdout.txt" | sort -u > "$log/reported-factors.txt"
 awk -v n="$number" '"x" $0!="x" n && "x" $0!="x1"' "$log/reported-factors.txt" > "$log/candidate-factors.txt"
+timeout_logged=false
+kill_logged=false
+if rg -q '^timeout: sending signal ' "$log/stderr.txt"; then timeout_logged=true; fi
+if rg -q '^timeout: sending signal KILL' "$log/stderr.txt"; then kill_logged=true; fi
 jq -n --arg n "$number" --arg mode "$mode" --argjson seconds "$seconds" \
   --argjson outer "$outer" --argjson status "$status" --arg batch "$poly_batch" \
-  '{schema:"nist-native-nfs-attempt/v1",input:$n,mode:$mode,native_limit_seconds:$seconds,
+  --argjson timeout_logged "$timeout_logged" --argjson kill_logged "$kill_logged" \
+  '{schema:"nist-native-nfs-attempt/v2",input:$n,mode:$mode,native_limit_seconds:$seconds,
     outer_limit_seconds:$outer,threads:2,linear_algebra_threads:2,
     seed:"20261022",polynomial_batch:(if $batch=="" then null else ($batch|tonumber) end),address_space_limit_kib_per_process:4194304,
-    exit_status:$status,timed_out:($status==124),factor_labels:"unverified",
+    exit_status:$status,timed_out:(if $timeout_logged or $status==124 then true elif $status==137 then null else false end),
+    timed_out_scope:"outer_process_limit",timeout_signal_logged:$timeout_logged,kill_signal_logged:$kill_logged,factor_labels:"unverified",
     checkpoint_directory:"state"}' > "$log/receipt.json"
 cp "$log/candidate-factors.txt" "$out/candidate-factors.txt"
 cp "$log/receipt.json" "$out/receipt.json"
