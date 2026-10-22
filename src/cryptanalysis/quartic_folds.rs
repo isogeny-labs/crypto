@@ -1027,17 +1027,21 @@ fn twist24_points(inst: &Twist24Instance, curve: &Curve4, seed: u64) -> Vec<Pt4>
     points
 }
 
+fn twist24_points_mixed(inst: &Twist24Instance, curve: &Curve4, seed: u64) -> Vec<Pt4> {
+    let mut points = twist24_points(inst, curve, seed);
+    let mut rng = StdRng::seed_from_u64(seed ^ 0x1A4F_01D5 ^ 0x2);
+    let t2 = E4([0, 0, 1, 0]);
+    points.extend((1..inst.core.p).filter_map(|x| curve.lift_x(&curve.f.scale(&t2, x), &mut rng)));
+    points
+}
+
 fn twist24_columns(
     inst: &Twist24Instance,
     curve: &Curve4,
     points: Vec<Pt4>,
     combined: bool,
 ) -> FoldedBase4 {
-    let index: HashMap<u64, usize> = points
-        .iter()
-        .enumerate()
-        .map(|(i, pt)| (pt.x.0[0], i))
-        .collect();
+    let index: HashMap<E4, usize> = points.iter().enumerate().map(|(i, pt)| (pt.x, i)).collect();
     let mut col = vec![usize::MAX; points.len()];
     let mut coef = vec![0u64; points.len()];
     let mut columns = 0;
@@ -1063,8 +1067,7 @@ fn twist24_columns(
                     transformed,
                     "endomorphism coefficient failed independent scalar replay"
                 );
-                assert!(transformed.x.in_fp());
-                let &idx = index.get(&transformed.x.0[0]).expect("orbit left the base");
+                let &idx = index.get(&transformed.x).expect("orbit left the base");
                 let v = if points[idx].y == transformed.y {
                     multiplier
                 } else if points[idx].y == curve.f.neg(&transformed.y) {
@@ -1219,6 +1222,11 @@ pub struct K4Twist24Report {
     pub target_x: [u64; 4],
     pub target_y: [u64; 4],
     pub known_scalar: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub line_powers: Option<Vec<u8>>,
+    /// Processed targets only; each entry is `(a,b,verified decomposition count)`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub query_trace: Option<Vec<(u64, u64, u16)>>,
     pub negative_control_rejected: bool,
     pub all_coefficients_checked: bool,
     pub model_fp_muls: u64,
@@ -1286,6 +1294,27 @@ pub fn run_k4_twist24(
     seed: u64,
     rho_runs: usize,
 ) -> Result<K4Twist24Report, String> {
+    run_k4_twist24_inner(p, b0, seed, rho_runs, false, false)
+}
+
+/// Paired single-line or union-line run with an independent target RNG.
+pub fn run_k4_twist24_line(
+    p: u64,
+    b0: u64,
+    seed: u64,
+    mixed: bool,
+) -> Result<K4Twist24Report, String> {
+    run_k4_twist24_inner(p, b0, seed, 0, mixed, true)
+}
+
+fn run_k4_twist24_inner(
+    p: u64,
+    b0: u64,
+    seed: u64,
+    rho_runs: usize,
+    mixed: bool,
+    paired_stream: bool,
+) -> Result<K4Twist24Report, String> {
     let started = Instant::now();
     let inst = construct_twist24(p, b0, seed)?;
     let core = &inst.core;
@@ -1297,8 +1326,13 @@ pub fn run_k4_twist24(
         curve.mul(&core.g, corrupted.lambda_frob) != corrupted.frob(&curve, &core.g);
     assert!(negative_control_rejected);
     let mut rng = StdRng::seed_from_u64(seed ^ 0x1A4F_01D5);
+    let mut query_rng = StdRng::seed_from_u64(seed ^ p.rotate_left(17) ^ 0x7A12_0A02);
     curve.f.reset_muls();
-    let base = twist24_points(&inst, &curve, seed);
+    let base = if mixed {
+        twist24_points_mixed(&inst, &curve, seed)
+    } else {
+        twist24_points(&inst, &curve, seed)
+    };
     let base_fp_muls = curve.f.muls();
     let cubic_fb = twist24_columns(&inst, &curve, base.clone(), false);
     let cubic_map_fp_muls = curve.f.muls() - base_fp_muls;
@@ -1318,13 +1352,20 @@ pub fn run_k4_twist24(
     let mut targets_computed = 0u64;
     let mut per_target = [0u64; 10];
     let mut selected_relations = Vec::new();
+    let mut query_trace = Vec::new();
     let mut verification_fp_muls = [0u64; 3];
     let mut worker_fp_muls = 0u64;
     let mut targets_computed_at_solve = [0u64; 3];
     let mut stream_fp_muls_at_solve = [0u64; 3];
     while residuals < 50_000_000 && !arms.iter().all(|a| a.rep.solved) {
         let batch: Vec<(u64, u64)> = (0..64)
-            .map(|_| (rng.gen_range(0..n), rng.gen_range(1..n)))
+            .map(|_| {
+                if paired_stream {
+                    (query_rng.gen_range(0..n), query_rng.gen_range(1..n))
+                } else {
+                    (rng.gen_range(0..n), rng.gen_range(1..n))
+                }
+            })
             .collect();
         let found: Vec<(u64, u64, Pt4, Vec<Vec<(usize, i64)>>, u64)> = batch
             .par_iter()
@@ -1355,6 +1396,9 @@ pub fn run_k4_twist24(
                 }
             }
             per_target[good.len().min(9)] += 1;
+            if paired_stream {
+                query_trace.push((a, b, good.len().try_into().expect("decomposition count")));
+            }
             if !good.is_empty() {
                 targets_decomposed += 1;
                 let terms = good.swap_remove(rng.gen_range(0..good.len()));
@@ -1432,6 +1476,8 @@ pub fn run_k4_twist24(
         target_x: core.q.x.0,
         target_y: core.q.y.0,
         known_scalar: core.d,
+        line_powers: paired_stream.then(|| if mixed { vec![0, 2] } else { vec![0] }),
+        query_trace: paired_stream.then_some(query_trace),
         negative_control_rejected,
         all_coefficients_checked: true,
         model_fp_muls: inst.model_fp_muls,

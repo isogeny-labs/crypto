@@ -11,7 +11,11 @@ points on a curve over an extension field. The earlier
 original curve; this study attacks DLP targets **already on the GLS twist**.
 It executes an exact signed width-three relation oracle, complete relation
 censuses, one-target matrix solves and descents, and matched negation-rho
-controls. It does **not** execute a Semaev polynomial-system solver.
+controls. This **particular panel** does not execute a Semaev polynomial-system
+solver. The repository's earlier [E2b line oracle](../../src/cryptanalysis/line_oracle.rs)
+does execute a Weil-descent `S3` resultant; the later
+[quartic twist24 study](QUARTIC_TWIST24_REPORT.md) executes a four-factor
+meet-in-the-middle oracle and tests an order-24 combined fold.
 
 | Requested aspect | Evidence and status |
 | --- | --- |

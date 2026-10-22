@@ -154,3 +154,98 @@ L02 decomposition. Report yield per *same attempted target*, together
 with incremental table size and work; raw yield by itself is not the
 decision criterion. Preserve failures and censored rows. A full rerun
 must match every non-timing field exactly.
+
+## Registered native S5 polynomial-oracle pilot
+
+Frozen after the exact 42-run mixed-line experiment and before building
+the pilot. The existing native `gaudry_quartic::SymmetrisedS5` and
+`solve_s5_subspace` implement the Weil-restricted degree-five summation
+polynomial for four `x∈Fp` factors. On the canonical quartic twist, test
+exactly `p=37,73,97`, `seed=0`, using the *first successful* and *first
+unsuccessful* target `(a,b)` in each recorded L0 query trace from
+`quartic_twist_mixed_v1.ndjson`. Construct the same curve, generator,
+target and signed base as the recorded run. Count S5 symmetrisation
+precomputation once per curve and each solver phase separately. Compare
+all resulting abscissa quadruples to an exact group meet-in-the-middle
+oracle on the identical target, and verify each candidate by group
+addition. Retain extraneous, missing, censored and timeout outcomes.
+Use a 1,800-second process watchdog per curve; a smaller pilot is not a
+substitute for the already completed exact relation-yield panel. This
+pilot tests whether the repository's existing algebraic oracle executes
+correctly on the canonical twist and measures its initial cost. It does
+not test the line-0/line-2 union polynomial system, run a full IC solve
+with S5, compare with msolve/Magma, or justify a large-size speed claim.
+
+## Registered two-dimensional invariant-space census
+
+Frozen before implementing this separate census. For all eight registered
+`(p,b0)` curves, enumerate every `x=a+b t²` with `a,b∈Fp`, except `x=0`,
+on the same canonical twist. Test exact liftability using the native field
+quadratic-character routine. Retain the separate counts with `b=0`, `a=0`,
+and `ab≠0`, including zeros. Check that the two axis counts reproduce the
+earlier line sweep. On every lifted abscissa, apply the exact transported
+Frobenius and cubic abscissa maps, assert that the images remain lifted,
+and compute the full generated abscissa-orbit histogram. Check its sum and
+the expected 12-orbit claim rather than assuming it. Report the physical
+base size, folded columns, and the number `B(B−1)` of signed pair-table
+entries the existing exact four-factor oracle would generate, before hash
+collisions. These are structural and work-size data, **not** a relation
+yield experiment or a measured memory footprint. Preserve the `p=13`
+one-dimensional empty-base control and state whether the larger space
+revives it. Any target-query experiment using this base requires a
+separately frozen budget and complete work accounting.
+
+Audit the census with the independent quadratic-subfield norm criterion:
+for each nonzero `x=a+b t²`, `x³+b₀t³` is a square in `Fp⁴` exactly when
+its norm to `Fp²` is a square in `Fp²`. Recompute every count. For one
+point per abscissa orbit, obtain a native square root, verify the curve
+equation, `ψ⁴(P)=−P`, commutation with `ι`, and the generated signed
+point-orbit size 24. Retain a separate machine-readable audit record.
+
+## Registered p=13 two-dimensional relation-and-rank pilot
+
+Frozen after the two-dimensional census and its norm/point audit, before
+building the pilot. On the previously empty-line `p=13,b0=4` curve only,
+use all 72 liftable nonzero abscissae in `Fp+t²Fp`, one deterministic
+signed lift per abscissa, and the first liftable abscissa in lexical
+`(a,b)` order as generator. Verify the published prime group order
+`r=28,753`, set the sole target to `[271]G`, and use seed zero. Construct
+the 24-fold orbit coefficient map and assert every point-to-scalar map.
+Use the same fully signed four-factor pair-table oracle and independent
+target RNG formula as the mixed-line panel, one selected relation per
+successful target, in 64-target batches. Stop at full rank for the six
+factor logs plus target log, or after 10,000 processed targets. Re-add
+every selected relation, retain every attempted target and decomposition
+count, and verify the recovered target scalar and all solved factor logs
+by group multiplication. Record setup, base, orbit-map, pair-table,
+relation-stream base-field multiplication and group-operation counts;
+record modular row operations separately. Preserve a full A/A rerun and
+compare all non-timing fields. This is a bounded, exact group-oracle IC
+pilot for an additional invariant base, not an S5 polynomial experiment
+or an isolated whole-method/rho speed comparison.
+Independently replay all attempted target hit counts with a fully signed
+pair-sum hash whose ordering differs from the producer, reconstruct each
+selected row and its rank, and verify the recovered target by group
+multiplication. The audit must pass before interpreting the pilot.
+
+## Registered p=13 twist-quotient pair-table oracle
+
+Frozen after the p=13 2D pilot and independent signed-pair audit, before
+building the quotient. Use its exact base signs and seven recorded residual
+targets, with no new target sampling. On the same `p=13,b0=4` curve, let
+the 24 point actions act on signed two-factor entries modulo global sign;
+the induced abscissa action has 12 elements. Enumerate all `B(B−1)`
+standard pair entries, classify their exact action orbits, retain one
+representative per orbit, and key it by the canonical abscissa of its
+pair sum. Preserve all stabilizers and hash-key collisions. For each
+recorded residual, run both the existing full signed-pair oracle and a
+quotient lookup that reconstructs pair entries from representative and
+action tag on demand. Require exact equality of the **entire signed
+four-factor decomposition set** on every target, not just the hit count;
+require all seven previously selected relations to occur in both.
+Record full and quotient setup and seven-query `Fp` multiplication and
+group-operation counts separately, plus full entries, quotient orbit
+representatives, histogram and canonical hash-key count. Re-run once
+and require every non-timing field to agree. Hash probes, allocator
+bytes and whole-method performance are outside this bounded structural
+and oracle test; it makes no rho or polynomial-system speed claim.

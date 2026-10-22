@@ -1,0 +1,5 @@
+# Quartic twist index-calculus visual record
+
+This directory copies the [source study's results PDF](../../research/twist_index_calculus_20261020/QUARTIC_TWIST24_REPORT.pdf), twelve run-report PDFs and their graphs as SVG and 150-dpi PNG. The source [report](../../research/twist_index_calculus_20261020/QUARTIC_TWIST24_REPORT.md), raw records, native audits and frozen protocol remain in `research/twist_index_calculus_20261020/`. The added runs cover three two-query native S5 pilots, an exhaustive two-dimensional invariant-space census, a p=13 exact-oracle IC solve, and a twist-quotient pair-table oracle, each with the registered controls.
+
+The studies compare counted field multiplications, group operations and modular row operations on a shared-host L0 panel. The S5 results have no same-input external-tool comparison (msolve and Magma were unavailable), and the study has no admitted whole-method `S` or 0/0.1/1 GAE band. This visual record is **not** a validated benchmark row under [`docs/VALIDATION_GATE.md`](../../docs/VALIDATION_GATE.md). It is intentionally absent from `benchmarks/README.md` and the IC leaderboard until that gate is met.

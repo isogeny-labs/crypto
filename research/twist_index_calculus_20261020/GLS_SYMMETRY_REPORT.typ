@@ -6,7 +6,7 @@
 21 October 2026 · Full research record: `GLS_SYMMETRY_REPORT.md`
 
 == Question and scope
-We tested whether a quadratic twist supplies a Frobenius symmetry that can reduce relation-matrix work for a discrete logarithm already on the twist subgroup. The exact signed width-three oracle and physical factor base were identical in the flat and folded arms. Three curves, three base sizes, and three one-target DLPs per cell gave 54 index-calculus solves and 27 matched rho controls. The experiment did not implement a Semaev polynomial-system solver.
+We tested whether a quadratic twist supplies a Frobenius symmetry that can reduce relation-matrix work for a discrete logarithm already on the twist subgroup. The exact signed width-three oracle and physical factor base were identical in the flat and folded arms. Three curves, three base sizes, and three one-target DLPs per cell gave 54 index-calculus solves and 27 matched rho controls. This panel did not implement a Semaev polynomial-system solver; the repository's earlier E2b line oracle did implement a Weil-descent $S_3$ resultant. The subsequent quartic twist24 study tests an order-24 combined fold and a two-line relation-yield comparison.
 
 == Algebraic result
 For the GLS twist over $F_(p^2)$, let $alpha = c^((1-p)/2)$ and $psi(x,y) = (alpha^2 x^p, alpha^3 y^p)$. Since $alpha^(p+1)=-1$, $psi^2(x,y)=(x,-y)$. On the selected cyclic subgroup, $psi(G)=[lambda]G$ and $lambda^2=-1 mod r$. The independent verifier checked all subgroup points.
@@ -38,7 +38,6 @@ All raw relation sets are identical across arms. Every witness has a four-elemen
 
 The chart shows flat/folded recorded $F_(p^2)$ multiplication-count ratios for the cold one-target v2 solves. There are three target scalars per cell; setup and collection follow one deterministic trajectory per cell. Ratios on $p=211$ are 1.638, 1.317, and 1.117 for $B=12,24,36$. At $p=101$ and $p=307$, base and table construction dominate and the ratio is approximately one. Rho uses fewer recorded $F_(p^2)$ multiplications in every cell.
 
-#pagebreak()
 == Equal-column post hoc comparison
 Flat $B=12$ and folded $B=24$ each have 12 log unknowns and use the same three targets per curve. A new orbit-distinct flat control takes one representative from each of the same 12 orbits used by the folded 24-point base. It charges the same orbit scan and geometry checks; folding additionally charges eigenvalue identification. Separate native arithmetic replay verifies the complete signed-triple census, collection stop, descent query counts, and all nine control scalars.
 
