@@ -12,9 +12,9 @@ isolated wall-time claims.
 The [standardized target index](results/standard-targets.csv) joins 10,080
 target-arm rows on the exact public workload key. It retains per-target
 representative costs, source verification, DLP verification, and Kummer's
-seven label outcomes per target. Its builder checks that all eight currently
-integrated arms agree on the 1,260 workload IDs; blank DLP fields mean that
-the coordinate gate did not run a collector.
+seven label outcomes and signed-Recover method per target. Its builder checks
+that all eight currently integrated arms agree on the 1,260 workload IDs;
+blank DLP fields mean that the Kummer gates did not run a collector.
 
 | Lead and arm | Source-verified candidate / rho solves | All-size candidate/rho | All-size candidate/external | Current scope |
 | --- | ---: | ---: | ---: | --- |
@@ -26,7 +26,7 @@ the coordinate gate did not run a collector.
 | Projective law, normalized wrapper | 1,260 / 1,260 | 3.793783 | 1.549223 | Full cold collector and rho |
 | Projective law, retained weighted state | 1,260 / 1,260 | 4.179297 | 1.706651 | Full cold collector and rho |
 | Point-driven pencil | 541 / 541 distinct in integrated online pilot | See separate nine-curve and one-target prices | null | 719 original targets remain; sparse-rank continuation in progress |
-| Kummer coordinate walk | 0 / 0 DLP solves; 1,260 source targets and 8,820 labels checked | null | null | Fast recovery and priced collector remain open |
+| Kummer coordinate walk | 0 / 0 DLP solves; 1,260 signed recoveries and 8,820 labels checked | null | null | Priced labeled collector remains open |
 
 The representative cell is `M + 0.5S + 10I` with 0.1 source-addition
 equivalent (GAE) for each declared native logical operation. All-size ratios
@@ -43,8 +43,11 @@ completeness of the formula on every curve.
 The [Kummer coordinate evidence](../kummer_coordinates_20261022/REPORT.md)
 reports 8,813 matching nonzero xADD outputs and seven zero outputs on the
 8,820 checked target labels, with no wrong nonzero output. Its source labels
-and scalar identities passed. No full Kummer DLP target was solved by a
-coordinate-only collector, so its operation price and ratio are null.
+and scalar identities passed. The [signed-Recover gate](../kummer_recover_20261022/REPORT.md)
+repaired 175/175 recorded quotient zero cases and recovered all 1,260 signed
+targets: 1,257 generic and three bounded exceptional lifts. It retains literal
+printed-equation failures and an exact witness. No full Kummer DLP target was
+solved by a labeled collector, so its operation price and ratio are null.
 The [pencil pilot](../four_followups_20261021/REPORT.md) prices nine complete
 60-target small-curve slices and a separately replayed 28-bit target. Its
 original 1,260-target requirement remains open; additional sparse-rank

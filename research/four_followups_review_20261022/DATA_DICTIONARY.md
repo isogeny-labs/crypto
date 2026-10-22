@@ -16,7 +16,7 @@ checks. `source_grid` is the repository-relative source for each row.
 source addition equivalents. The two `candidate_over_*` columns divide
 candidate by the named comparator for that same row.
 
-Seven Kummer coordinate rows use `status=identity_only_no_dlp_collector` and
+Seven Kummer coordinate/recovery rows use `status=coordinate_and_recover_gate_no_dlp_collector` and
 empty price and cost fields. They are one per 180-target size slice, rather
 than 36 fabricated price cells. Their `verified` field counts source labels
 at the *target* level; the coordinate case counts are in the source JSONL.
@@ -38,6 +38,8 @@ empty for Kummer's coordinate-only row. Target-level costs use the same
 representative price as the report and are empty when no complete collector
 was run. `coordinate_nonzero_matches`, `coordinate_zero_outputs`, and
 `coordinate_failures` are the seven Kummer labels on that target, empty for
-other leads. `source_record` links the underlying raw file. This index keeps
-zero-coordinate cases visible and permits target-level joins without treating
-them as failed DLP solves.
+other leads. `signed_recover_verified` and `recover_method` join the separate
+source-checked signed-Recover gate; `recover_record` links its raw file.
+`source_record` links the coordinate raw file. This index keeps zero-coordinate
+cases and the three exceptional Recover methods visible without treating them
+as failed DLP solves.

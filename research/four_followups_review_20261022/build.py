@@ -63,7 +63,7 @@ for bits in (16, 20, 24, 28, 32, 36, 40):
         "targets": "180", "verified": "180", "candidate_failures": "0", "rho_failures": "",
         "S_per_M": "", "I_per_M": "", "native_GAE_per_logical": "", "candidate_GAE": "",
         "external_GAE": "", "rho_GAE": "", "candidate_over_external": "",
-        "candidate_over_rho": "", "status": "identity_only_no_dlp_collector",
+        "candidate_over_rho": "", "status": "coordinate_and_recover_gate_no_dlp_collector",
         "source_grid": f"research/kummer_coordinates_20261022/results/target-gate-{bits}.jsonl",
     })
 
@@ -101,8 +101,9 @@ summary = {
         {"lead": "kummer_walk", "status": "partial", "coordinate_label_cases": 8820,
          "nonzero_matches": 8813, "zero_outputs": 7, "wrong_nonzero_outputs": 0,
          "candidate_dlp_targets": 0, "candidate_over_rho": None,
-         "remaining": "Published fast Recover and a labeled DLP collector with complete cost.",
-         "source": "research/kummer_coordinates_20261022/REPORT.md"},
+         "signed_recoveries_verified": 1260, "zero_coordinate_repairs_verified": 175,
+         "remaining": "A closed labeled DLP collector with complete cost.",
+         "source": "research/kummer_recover_20261022/REPORT.md"},
     ],
 }
 (OUT / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
@@ -111,7 +112,8 @@ target_fields = [
     "lead", "arm", "bits", "p", "target_index", "workload_id", "source_verified",
     "candidate_dlp_verified", "rho_verified", "candidate_GAE", "rho_GAE",
     "candidate_over_rho", "coordinate_nonzero_matches", "coordinate_zero_outputs",
-    "coordinate_failures", "status", "source_record",
+    "coordinate_failures", "signed_recover_verified", "recover_method", "recover_record",
+    "status", "source_record",
 ]
 targets = []
 
@@ -128,7 +130,8 @@ def append_source_targets(path, lead, arm, p_key):
                 "candidate_GAE": source["candidate_GAE"], "rho_GAE": source["rho_GAE"],
                 "candidate_over_rho": source["candidate_over_rho"],
                 "coordinate_nonzero_matches": "", "coordinate_zero_outputs": "",
-                "coordinate_failures": "", "status": "priced_source_verified",
+                "coordinate_failures": "", "signed_recover_verified": "", "recover_method": "",
+                "recover_record": "", "status": "priced_source_verified",
                 "source_record": source.get("raw_record", path),
             })
 
@@ -148,16 +151,22 @@ with (ROOT / factor_path).open() as handle:
             "candidate_GAE": source["candidate_GAE"], "rho_GAE": source["rho_GAE"],
             "candidate_over_rho": source["candidate_over_rho"],
             "coordinate_nonzero_matches": "", "coordinate_zero_outputs": "",
-            "coordinate_failures": "", "status": "priced_source_verified",
+            "coordinate_failures": "", "signed_recover_verified": "", "recover_method": "",
+            "recover_record": "", "status": "priced_source_verified",
             "source_record": source["raw_record"],
         })
 append_source_targets("research/projective_law_followup_20261022/results/targets-projective.jsonl", "projective_law", "wrapper", "p")
 append_source_targets("research/projective_law_followup_20261022/results/targets-state.jsonl", "projective_law", "retained_state", "p")
 for bits in (16, 20, 24, 28, 32, 36, 40):
     path = f"research/kummer_coordinates_20261022/results/target-gate-{bits}.jsonl"
+    recover_path = f"research/kummer_recover_20261022/results/recover-target-{bits}.jsonl"
+    with (ROOT / recover_path).open() as handle:
+        recover = {(item["p"], item["target_index"]): item for item in map(json.loads, handle)}
     with (ROOT / path).open() as handle:
         for line in handle:
             source = json.loads(line)
+            signed = recover[(source["p"], source["target_index"])]
+            assert signed["workload_id"] == source["workload_id"]
             statuses = [case["coordinate_status"] for case in source["cases"]]
             passed = statuses.count("pass")
             zero = statuses.count("zero_output")
@@ -170,12 +179,15 @@ for bits in (16, 20, 24, 28, 32, 36, 40):
                 "candidate_dlp_verified": "", "rho_verified": "", "candidate_GAE": "", "rho_GAE": "",
                 "candidate_over_rho": "", "coordinate_nonzero_matches": passed,
                 "coordinate_zero_outputs": zero, "coordinate_failures": failures,
-                "status": "identity_only_no_dlp_collector", "source_record": path,
+                "signed_recover_verified": bool(signed["correct"] and signed["source_scalar_verified"]),
+                "recover_method": signed["status"], "recover_record": recover_path,
+                "status": "coordinate_and_recover_gate_no_dlp_collector", "source_record": path,
             })
 
 assert len(targets) == 10080, len(targets)
 assert sum(int(row["coordinate_zero_outputs"]) for row in targets if row["lead"] == "kummer_walk") == 7
 assert sum(int(row["coordinate_failures"]) for row in targets if row["lead"] == "kummer_walk") == 0
+assert all(row["signed_recover_verified"] for row in targets if row["lead"] == "kummer_walk")
 by_input = {}
 for row in targets:
     key = (row["bits"], row["p"], row["target_index"])

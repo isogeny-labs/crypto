@@ -21,9 +21,9 @@ trial and cannot support a cost comparison.
 The companion target index has 10,080 rows: 6,300 factor-base, 2,520
 projective-law, and 1,260 Kummer coordinate records. The builder verifies
 one shared workload ID for each of the 1,260 exact `(bits,p,target_index)`
-keys, all source checks, seven Kummer zero outputs, and zero coordinate
-failures. It does not replace the separate source studies' arithmetic and
-scalar validators.
+keys, all source checks, seven Kummer zero outputs, zero coordinate failures,
+and 1,260 matching source-checked signed Recover rows. It does not replace
+the separate source studies' arithmetic and scalar validators.
 
 The graph is rendered from the JSON representative rows. The PDF table is
 an editorial selection of the pooled representative rows; reviewers should
