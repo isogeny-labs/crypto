@@ -47,3 +47,28 @@ alters an estimand's meaning, a margin, a family, a test or a threshold.
      - permutation p = (1 + #{F* ≥ F}) / (1 + 10,000).
    - (d) "Pooled" means a ratio of means. Only the overall pooled H-T value
      carries the verdict; per-level values are descriptive.
+
+## A2 (2026-10-23, during Phase B; operational, no data inspected)
+
+1. **Busy-host refusals are retried, not recorded as failures.** Between
+   05:41Z and 05:43Z, ecbench refused to start 9 short `Tcr` sessions with
+   "host is not quiet (PSI cpu some avg10 > 5.00)". It exited 2 and no session
+   was started. The previous session's archive, verify and prune work was
+   still loading the CPU. Three refusals in a row tripped the
+   3-failures guard (`GUARD_AUDIT`) at 87/147 sessions. No measurement was
+   affected.
+   - `scripts/run_phase_b.sh` now waits 15 s and retries a refusal up to 40
+     times, as ecbench's message asks.
+   - The failure streak skips the refusal signature (`rc_run` 2 with
+     `session_status` "missing").
+   - The 9 refused specs are not done, so they run again. Their `failed`
+     lines stay in `runs/progress.jsonl` as records.
+2. **Measurement orchestration.** In workflow run `wf_ff44b5a4-872`, the
+   mechanical-tier restart cards were refused as underspecified or ran the
+   wrong command, so the driver was never restarted. The main session now
+   starts the driver directly with `scripts/start_phase_b.sh`. The workflow
+   resumes at Gate B once every session is done.
+3. **Base merge.** `origin/main` was merged into the branch (`1b746e53b0`).
+   The `validation-gate` check had failed because a `benchmarks/README.md`
+   row added on `main` was missing from the branch. The frozen ecbench binary
+   was not rebuilt, and the driver checks its sha256 before every session.

@@ -38,7 +38,7 @@ bin_sha() { sha256sum "$ECB" 2>/dev/null | cut -d' ' -f1; }
 done_p() { prog | jq -e --arg s "$1" 'select(.spec==$s and .status=="done")' >/dev/null 2>&1; }
 free_kb() { df -Pk "$STUDY" | awk 'NR==2{print $4}'; }
 # trailing run of non-ok session lines (failed, audit_failed, archive_failed, ...)
-audit_streak() { prog | jq -r 'select(.spec!=null and .status!=null)|(.audit_ok|tostring)' | tac | awk 'BEGIN{n=0}{if($1=="true")exit; n++}END{print n}'; }
+audit_streak() { prog | jq -r 'select(.spec!=null and .status!=null)|select((.rc_run==2 and .session_status=="missing")|not)|(.audit_ok|tostring)' | tac | awk 'BEGIN{n=0}{if($1=="true")exit; n++}END{print n}'; }
 num() { case "${1:-}" in ''|*[!0-9]*) echo 0;; *) echo "$1";; esac; }
 
 check_bin() { [ "$(bin_sha)" = "$ECB_SHA" ]; }
@@ -125,7 +125,13 @@ for name in $(jq -r '.sessions[].name' runs/manifest.json); do
   t0=$(date +%s)
   rc_run=-1; rc_ver=-1; audit_ok=false; sstat=missing; runs=0; fails=0; raw=0; xzb=0; sha=""; xz_ok=false
   if [ -f specs/$name.json ]; then
-    $ECB run --wait --cpus auto --spec specs/$name.json --out $out > $out.log 2>&1; rc_run=$?
+    # ecbench refuses (exit 2, no session started) when the host is not quiet; wait and retry,
+    # as its message asks, instead of recording a failure (AMENDMENTS A2)
+    for try in $(seq 1 40); do
+      $ECB run --wait --cpus auto --spec specs/$name.json --out $out > $out.log 2>&1; rc_run=$?
+      if [ $rc_run -eq 2 ] && [ ! -e $out ] && grep -q "host is not quiet" $out.log; then sleep 15; continue; fi
+      break
+    done
   else
     echo "spec file specs/$name.json missing" > $out.log
   fi
