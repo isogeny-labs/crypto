@@ -83,7 +83,7 @@ fn rendered(c: &alg::Case, polys: &[f4::Poly]) -> String {
 }
 const COMPLETE: &str = r#"
 proc twist_complete(ideal B,ideal I,ideal G){
- int i,j,k,ok=1;intvec a,b;poly L,S;
+ int i,j,k;int ok=1;intvec a,b;poly L,S;
  for(i=1;i<=size(B);i++){if(B[i]!=0){for(j=i+1;j<=size(B);j++){if(B[j]!=0){
   a=leadexp(B[i]);b=leadexp(B[j]);L=1;
   for(k=1;k<=nvars(basering);k++){if(a[k]>b[k]){L=L*var(k)^a[k];}else{L=L*var(k)^b[k];}}
@@ -446,6 +446,106 @@ pub fn run(fixtures: &[Fixture], bases: &Path, out: &Path) -> Result<Vec<Value>>
         )
     });
     rows.push(control);
+    Ok(rows)
+}
+pub fn recheck(input: &Path, out: &Path) -> Result<Vec<Value>> {
+    fs::create_dir(out.join("cases"))?;
+    let mut rows = vec![];
+    let mut originals = fs::read_dir(input.join("cases"))?
+        .filter_map(|e| e.ok().map(|e| e.path()))
+        .filter(|p| {
+            p.file_name()
+                .unwrap()
+                .to_string_lossy()
+                .ends_with(".original.json")
+        })
+        .collect::<Vec<_>>();
+    originals.sort();
+    for original in originals {
+        let name = original
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .strip_suffix(".original.json")
+            .unwrap()
+            .to_string();
+        let oldstem = input.join("cases").join(&name);
+        let stem = out.join("cases").join(&name);
+        let c: alg::Case = serde_json::from_slice(&fs::read(&original)?)?;
+        let h = homogenize(&c);
+        let old: Value = serde_json::from_slice(&fs::read(append(&oldstem, "RESULT.json"))?)?;
+        assert_eq!(
+            serde_json::to_value(&h)?,
+            serde_json::from_slice::<Value>(&fs::read(append(&oldstem, "homogeneous.json"))?)?
+        );
+        let mut assignments = vec![];
+        tuples(&c.xs, c.arity, |xs| {
+            for path in trajectories(crate::toy_field::Quad::new(c.p, c.a, c.b), xs, c.target_x) {
+                if let Some(v) = expand_values(&c, xs, &path) {
+                    assignments.push(v);
+                }
+            }
+        });
+        let row = if old["order"] == "lex" {
+            let checked = certify(
+                &c,
+                &[],
+                "lex",
+                &append(&stem, "lex-control"),
+                Some(assignments.len() as u64),
+            )?;
+            json!({"experiment":"E25","fixture":old["fixture"],"p":c.p,"arity":c.arity,"encoding":c.encoding,"order":"lex","status":"signature-backend-does-not-provide-lex-order","independent_lex_affine_reference":checked,"original_result_sha256":digest(&fs::read(append(&oldstem,"RESULT.json"))?),"performance_claim":false})
+        } else {
+            let mut hb = vec![];
+            let mut ab = vec![];
+            for e in old["engines"].as_array().unwrap() {
+                if e["exit_code"] != 0 || e["basis_parsed"] != true {
+                    continue;
+                }
+                let label = e["engine"].as_str().unwrap();
+                let homogeneous = e["homogeneous"] == true;
+                let cc = if homogeneous { &h } else { &c };
+                let basis = parse_basis(
+                    &fs::read_to_string(append(&oldstem, &format!("{label}.gb")))?,
+                    cc,
+                )?;
+                let stored: Vec<f4::Poly> = serde_json::from_slice(&fs::read(append(
+                    &oldstem,
+                    &format!("{label}.basis.json"),
+                ))?)?;
+                assert_eq!(
+                    basis, stored,
+                    "saved parsed basis differs from raw solver output"
+                );
+                for v in &assignments {
+                    let mut v = v.clone();
+                    if homogeneous {
+                        v.push(1);
+                    }
+                    assert!(basis.iter().all(|f| f4::eval(f, &v, c.p) == 0));
+                }
+                if homogeneous {
+                    hb.push((label.into(), basis.clone()));
+                    ab.push((label.into(), dehomogenize(&basis, c.p)));
+                } else {
+                    ab.push((label.into(), basis));
+                }
+            }
+            let hc = certify(&h, &hb, "grevlex", &append(&stem, "hom-check"), None)?;
+            let ac = certify(
+                &c,
+                &ab,
+                "grevlex",
+                &append(&stem, "aff-check"),
+                Some(assignments.len() as u64),
+            )?;
+            json!({"experiment":"E25","fixture":old["fixture"],"p":c.p,"B":c.xs.len(),"arity":c.arity,"encoding":c.encoding,"order":"grevlex","engines":old["engines"],"homogeneous_complete_basis_gate":hc,"dehomogenized_affine_complete_basis_gate":ac,"infinity_and_saturation":old["infinity_and_saturation"],"actual_affine_assignments_replayed":assignments.len(),"raw_solver_outputs_reparsed_and_identical":true,"original_result_sha256":digest(&fs::read(append(&oldstem,"RESULT.json"))?),"engine_measurements_repeated":false,"status":"corrected-independent-basis-recheck","full_E25_complete":false,"performance_claim":false})
+        };
+        write_json(append(&stem, "RESULT.json"), &row)?;
+        rows.push(row);
+        println!("{}", json!({"experiment":"E25","recheck":name}));
+    }
+    rows.push(control(out)?);
     Ok(rows)
 }
 

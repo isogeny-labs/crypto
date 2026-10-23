@@ -7,7 +7,7 @@ cd -- "$repo_dir"
 panel="${1:?filters or torsion}"
 output="${2:?fresh output directory}"
 source_name="${3:-}"
-case "$panel" in filters) cap=1400 ;; torsion) cap=1800 ;; geometry-input|geometry-verify|adjudicate-cas|coupled-census|coupled-relations|coupled-energy|projection-replay|partial-replay|jacobian-replay|three-transfer|homogeneous-pilot) cap=3600 ;; *) exit 2 ;; esac
+case "$panel" in filters) cap=1400 ;; torsion|higher-torsion-input|higher-torsion-verify) cap=1800 ;; geometry-input|geometry-verify|adjudicate-cas|coupled-census|coupled-relations|coupled-energy|projection-replay|partial-replay|jacobian-replay|three-transfer|homogeneous-pilot|homogeneous-recheck) cap=3600 ;; *) exit 2 ;; esac
 test ! -e "$output"
 revision="$(git rev-parse HEAD)"
 pinned_dir="/tmp/twist-v2-pinned/$revision"
@@ -34,11 +34,12 @@ const fs=require('fs');const crypto=require('crypto');
 const [receipt,revision,binary_sha,started,status,cap,...argv]=process.argv.slice(2);
 const hash=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
 const study='research/twist_routes_1_3_20261021';
-const homogeneous=argv[2]==='homogeneous-pilot';
-const protocol=study+'/execution-v2/'+(homogeneous?'HOMOGENEOUS_PROTOCOL_V1.md':argv[2].startsWith('coupled-')?'COUPLED_PROTOCOL_V1.md':argv[2].startsWith('projection-')||argv[2].startsWith('partial-')?'PROJECTION_PARTIAL_PROTOCOL_V1.md':['jacobian-replay','three-transfer'].includes(argv[2])?'DIVISOR_PROTOCOL_V1.md':'GLUING_PROTOCOL_V2.md');
+const homogeneous=argv[2].startsWith('homogeneous-');
+const workers=argv[2]==='homogeneous-pilot'?3:1;
+const protocol=study+'/execution-v2/'+(homogeneous?'HOMOGENEOUS_PROTOCOL_V1.md':argv[2].startsWith('higher-torsion-')?'HIGHER_TORSION_PROTOCOL_V1.md':argv[2].startsWith('coupled-')?'COUPLED_PROTOCOL_V1.md':argv[2].startsWith('projection-')||argv[2].startsWith('partial-')?'PROJECTION_PARTIAL_PROTOCOL_V1.md':['jacobian-replay','three-transfer'].includes(argv[2])?'DIVISOR_PROTOCOL_V1.md':'GLUING_PROTOCOL_V2.md');
 fs.writeFileSync(receipt+'.json',JSON.stringify({schema:'twist.run-receipt/v2',source_commit:revision,
  binary_sha256:binary_sha,argv,started_utc:started,finished_utc:new Date().toISOString(),exit_code:Number(status),
- timeout_s:Number(cap),address_space_kib:4194304,threads:homogeneous?3:1,per_engine_threads:1,concurrent_cells:homogeneous?3:1,isolation:'L0',wall_time_admitted:false,
+ timeout_s:Number(cap),address_space_kib:4194304,threads:workers,per_engine_threads:1,concurrent_cells:workers,isolation:'L0',wall_time_admitted:false,
  protocol_path:protocol,protocol_sha256:hash(protocol),
  base_protocol_path:study+'/execution-v2/GLUING_PROTOCOL_V1.md',base_protocol_sha256:hash(study+'/execution-v2/GLUING_PROTOCOL_V1.md'),
  fixture_sha256:hash(study+'/execution-v1/fixtures.json'),registry_sha256:hash('docs/curves/registry.json'),

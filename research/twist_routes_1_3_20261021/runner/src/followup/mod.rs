@@ -2,8 +2,10 @@
 mod bigfield;
 mod coupled;
 mod divisors;
+mod finite;
 mod geometry;
 mod gluing;
+mod higher;
 mod homogeneous;
 mod partial;
 mod projection;
@@ -118,9 +120,19 @@ pub fn main(args: &[String]) -> Result<()> {
         }
         "coupled-census" => coupled::census(&fixtures, out)?,
         "projection-replay" => projection::replay(&fixtures, out)?,
+        "higher-torsion-input" => higher::input(&src, out)?,
+        "higher-torsion-verify" => higher::verify(
+            &src,
+            Path::new(args.get(3).ok_or("missing constructor stdout")?),
+            out,
+        )?,
         "homogeneous-pilot" => homogeneous::run(
             &fixtures,
             Path::new(args.get(3).ok_or("missing frozen bases")?),
+            out,
+        )?,
+        "homogeneous-recheck" => homogeneous::recheck(
+            Path::new(args.get(3).ok_or("missing previous solver panel")?),
             out,
         )?,
         "jacobian-replay" => divisors::independent(
@@ -199,6 +211,7 @@ fn adjudicate(prefix: &Path, out: &Path) -> Result<Vec<Value>> {
         || text.contains("ALL_COUPLED_REPLAY_OK")
         || text.contains("ALL_PROJECTION_REPLAY_OK")
         || text.contains("ALL_DIVISOR_REPLAY_OK");
+    let marker = marker || text.contains("ALL_HIGHER_TORSION_CONSTRUCTION_DONE");
     let hashes_match =
         meta["stdout_sha256"] == digest(&stdout) && meta["stderr_sha256"] == digest(&stderr);
     let script = meta["argv"]
