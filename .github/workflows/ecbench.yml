@@ -209,6 +209,10 @@ jobs:
       # the records give (docs/bounds/README.md §8).
       - name: Bound records re-derive, challenges check, the frontier is current
         run: |
+          # A record may cite evidence outside research/ecbench_*/ (an audit
+          # receipt beside its sessions): check out every path the records name.
+          jq -r '[.. | objects | select(has("path")) | .path | strings] | .[]' \
+            docs/bounds/records/*.json | sort -u | sed 's#^#/#' | git sparse-checkout add --stdin
           ./target/release/ecbench bound check --root . --record docs/bounds/records/*.json
           ./target/release/ecbench challenge check --file docs/bounds/challenges/*.json
           ./target/release/ecbench frontier build --bounds docs/bounds/records \
