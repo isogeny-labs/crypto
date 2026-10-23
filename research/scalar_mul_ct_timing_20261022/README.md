@@ -146,9 +146,10 @@ class, so it need not equal the ratio of the two ms columns.
 - **secp256k1 and P-256** take the projective ladders with complete
   formulas, which never had this shortcut. They are unchanged.
 
-**Possible follow-up, not done here:** EC-KCDSA and EC-ElGamal on P-256
-and secp256k1 could call `scalar_mul_secret` instead of the affine ladder,
-and so get the limb-level constant-time projective stack.
+**Follow-up, done in a separate PR (#2436):** EC-KCDSA and EC-ElGamal now
+call `scalar_mul_secret` instead of the affine ladder, so on P-256 and
+secp256k1 they get the limb-level constant-time projective stack. On the
+other curves they still reach the ladder fixed here, through the dispatcher.
 
 ## Why there is no `benchmarks/` row
 
