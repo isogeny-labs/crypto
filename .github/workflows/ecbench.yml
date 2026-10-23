@@ -471,7 +471,10 @@ jobs:
           name: ecbench-pr-audit-bin
           path: target/release
       - name: Validate committed evidence integrity on pull requests
-        timeout-minutes: 12
+        # The job keeps its 25-minute PR budget (check-pr-budgets.py). The 113
+        # gzipped isogeny-volcano-cost-v2 sessions alone take about 8 minutes
+        # to audit on 4 cores (decompress + verify --replay 0), so 12 is too short.
+        timeout-minutes: 22
         run: |
           chmod +x target/release/ecbench
           bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
