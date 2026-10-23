@@ -11,7 +11,7 @@ const started=new Date().toISOString();
 const native=args[0]==='--native';
 const program=native?args[1]:'/tmp/twist-lean/bin/lean';
 const argv=['-c','0',program,...(native?args.slice(2):['-j1','-M3072',...args])];
-const child=spawn('/usr/bin/taskset',argv,{cwd,env:{...process.env,LEAN_PATH:leanPath,MIMALLOC_ARENA_RESERVE:'65536'},stdio:['ignore',fs.openSync(prefix+'.stdout','wx'),fs.openSync(prefix+'.stderr','wx')]});
+const child=spawn('/usr/bin/taskset',argv,{cwd,env:{...process.env,PATH:'/tmp/twist-lean/bin:'+process.env.PATH,LEAN_PATH:leanPath,MIMALLOC_ARENA_RESERVE:'65536'},stdio:['ignore',fs.openSync(prefix+'.stdout','wx'),fs.openSync(prefix+'.stderr','wx')]});
 let peak=0,limit=null;
 const poll=setInterval(()=>{
  try{const s=fs.readFileSync('/proc/'+child.pid+'/status','utf8');const m=s.match(/^VmRSS:\s+(\d+)/m);if(m){peak=Math.max(peak,Number(m[1]));if(peak>4194304){limit='sampled-resident-memory';child.kill('SIGKILL');}}}catch{}
