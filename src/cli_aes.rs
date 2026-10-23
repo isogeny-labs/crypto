@@ -6,7 +6,10 @@ use crypto_lib::symmetric::{
     },
     aes_cbc::{aes_cbc_decrypt, aes_cbc_encrypt},
 };
-use std::{fs, path::PathBuf};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 #[derive(Subcommand)]
 pub enum AesOp {
@@ -34,10 +37,10 @@ pub struct IoArgs {
     /// Hex-encoded input bytes.
     #[arg(long, conflicts_with = "file")]
     hex: Option<String>,
-    /// Read raw input bytes from a file.
+    /// Read raw input bytes from a file or checked store: reference.
     #[arg(long)]
     file: Option<PathBuf>,
-    /// Read 16, 24, or 32 raw AES key bytes from a file.
+    /// Read 16, 24, or 32 raw AES key bytes from a file or checked store: reference.
     #[arg(long, conflicts_with = "key_hex")]
     key_file: Option<PathBuf>,
     /// Hex-encoded 16, 24, or 32 byte key, useful for public test vectors.
@@ -71,10 +74,10 @@ pub struct GcmArgs {
     /// Hex-encoded plaintext or ciphertext followed by its tag.
     #[arg(long, conflicts_with = "file")]
     hex: Option<String>,
-    /// Read plaintext or ciphertext followed by its tag from a file.
+    /// Read plaintext or ciphertext followed by its tag from a file or checked store: reference.
     #[arg(long)]
     file: Option<PathBuf>,
-    /// Read 16, 24, or 32 raw AES key bytes from a file.
+    /// Read 16, 24, or 32 raw AES key bytes from a file or checked store: reference.
     #[arg(long, conflicts_with = "key_hex")]
     key_file: Option<PathBuf>,
     /// Hex-encoded 16, 24, or 32 byte key, useful for public test vectors.
@@ -106,15 +109,11 @@ fn load_io(args: &IoArgs) -> Result<(Vec<u8>, AesKey), String> {
     let data = match (&args.message, &args.hex, &args.file) {
         (Some(message), None, None) => message.as_bytes().to_vec(),
         (None, Some(encoded), None) => decode("input", encoded)?,
-        (None, None, Some(path)) => {
-            fs::read(path).map_err(|e| format!("cannot read input file {}: {e}", path.display()))?
-        }
+        (None, None, Some(path)) => read_checked_file(path, "input")?,
         _ => return Err("provide exactly one of message, --hex, or --file".into()),
     };
     let key_bytes = match (&args.key_file, &args.key_hex) {
-        (Some(path), None) => {
-            fs::read(path).map_err(|e| format!("cannot read key file {}: {e}", path.display()))?
-        }
+        (Some(path), None) => read_checked_file(path, "key")?,
         (None, Some(encoded)) => decode("key", encoded)?,
         _ => return Err("provide exactly one of --key-file or --key-hex".into()),
     };
@@ -158,15 +157,11 @@ fn transform(args: &GcmArgs, decrypt: bool) -> Result<Vec<u8>, String> {
     let data = match (&args.message, &args.hex, &args.file) {
         (Some(message), None, None) => message.as_bytes().to_vec(),
         (None, Some(encoded), None) => decode("input", encoded)?,
-        (None, None, Some(path)) => {
-            fs::read(path).map_err(|e| format!("cannot read input file {}: {e}", path.display()))?
-        }
+        (None, None, Some(path)) => read_checked_file(path, "input")?,
         _ => return Err("provide exactly one of message, --hex, or --file".into()),
     };
     let key_bytes = match (&args.key_file, &args.key_hex) {
-        (Some(path), None) => {
-            fs::read(path).map_err(|e| format!("cannot read key file {}: {e}", path.display()))?
-        }
+        (Some(path), None) => read_checked_file(path, "key")?,
         (None, Some(encoded)) => decode("key", encoded)?,
         _ => return Err("provide exactly one of --key-file or --key-hex".into()),
     };
@@ -202,6 +197,11 @@ fn transform(args: &GcmArgs, decrypt: bool) -> Result<Vec<u8>, String> {
 
 fn decode(label: &str, encoded: &str) -> Result<Vec<u8>, String> {
     hex::decode(encoded).map_err(|e| format!("invalid {label} hex: {e}"))
+}
+
+fn read_checked_file(path: &Path, label: &str) -> Result<Vec<u8>, String> {
+    let resolved = crypto_lib::store::resolve_path(path)?;
+    fs::read(&resolved).map_err(|e| format!("cannot read {label} file {}: {e}", path.display()))
 }
 
 #[cfg(test)]

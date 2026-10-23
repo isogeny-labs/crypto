@@ -393,6 +393,14 @@ not a claim against the repository's full IC-versus-rho measurement gates.
 
 ## AES analysis adapters
 
+The direct `crypto aes` block, CTR, CBC, and GCM commands accept local files
+or checked `store:NAME` and `sha256:DIGEST` references for both `--file` and
+`--key-file`. For example, `crypto aes block-encrypt --file
+store:public/plain.bin --key-file store:public/key.bin` reads verified bytes
+from the content store. A [live Setec receipt](../store/AES_FILE_S3_ACCEPTANCE_20261022.json)
+covers all seven direct AES operations with public inputs, including
+authenticated GCM decryption. Use a private store for private keys.
+
 ```sh
 crypto cryptanalysis aes-attack --technique differential
 crypto cryptanalysis aes-attack --technique linear

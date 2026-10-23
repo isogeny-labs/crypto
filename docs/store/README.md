@@ -197,6 +197,14 @@ and cleanup on 2026-10-18.
 The AES CPA trace command also resolves `store:` inputs into a checked cache.
 Its live Setec acceptance receipt is
 [`AES_CPA_S3_ACCEPTANCE_20261022.json`](AES_CPA_S3_ACCEPTANCE_20261022.json).
+All seven direct `crypto aes` operations also accept checked `store:NAME` or
+`sha256:DIGEST` references in `--file` and `--key-file`. A live run exercised
+block, CTR, CBC, and GCM encryption and decryption from an empty cache with
+public vectors. Its S3 upload, HEAD, remote downloaded-byte verification,
+pull, and exact-object cleanup are recorded in
+[`AES_FILE_S3_ACCEPTANCE_20261022.json`](AES_FILE_S3_ACCEPTANCE_20261022.json).
+Use a private store for private AES keys; the acceptance objects contain only
+public test bytes.
 The observed AES DPA command uses the same checked trace input format; its
 separate live acceptance receipt is
 [`AES_DPA_S3_ACCEPTANCE_20261022.json`](AES_DPA_S3_ACCEPTANCE_20261022.json).
