@@ -1037,6 +1037,112 @@
       }
     }
   },
+  "claim-noprobe": {
+    "sessions": [
+      "fix-noprobe-claim"
+    ],
+    "arms": {
+      "ic": {
+        "records": 20,
+        "verified": 20,
+        "solve_wall_ns": {
+          "n": 20,
+          "min": 1295199,
+          "q1": 1382251.75,
+          "median": 1456180,
+          "q3": 1624824.75,
+          "max": 2602010
+        },
+        "online_wall_ns": {
+          "n": 20,
+          "min": 108425,
+          "q1": 115124.25,
+          "median": 125169.5,
+          "q3": 150332.25,
+          "max": 366240
+        },
+        "ns_per_gae": {
+          "n": 20,
+          "min": 298.1119233627196,
+          "q1": 317.68833210676246,
+          "median": 333.8007967361172,
+          "q3": 370.7384482969864,
+          "max": 593.3722721467095
+        },
+        "isolation_levels": {
+          "L0": 20
+        },
+        "pre_solve_trim_true": 20,
+        "pre_solve_trim_absent": 0
+      },
+      "rho": {
+        "records": 20,
+        "verified": 20,
+        "solve_wall_ns": {
+          "n": 20,
+          "min": 229435,
+          "q1": 272795.75,
+          "median": 296430,
+          "q3": 331610.25,
+          "max": 624075
+        },
+        "online_wall_ns": {
+          "n": 20,
+          "min": 226192,
+          "q1": 269082,
+          "median": 292009.5,
+          "q3": 326725.75,
+          "max": 617786
+        },
+        "ns_per_gae": {
+          "n": 20,
+          "min": 261.9519492293744,
+          "q1": 980.6413144665797,
+          "median": 1135.6464430894307,
+          "q3": 1403.4023823704586,
+          "max": 1683.5192307692307
+        },
+        "isolation_levels": {
+          "L0": 20
+        },
+        "pre_solve_trim_true": 20,
+        "pre_solve_trim_absent": 0
+      },
+      "rho-strong": {
+        "records": 20,
+        "verified": 20,
+        "solve_wall_ns": {
+          "n": 20,
+          "min": 141214,
+          "q1": 153037.75,
+          "median": 169956.5,
+          "q3": 201566.5,
+          "max": 248576
+        },
+        "online_wall_ns": {
+          "n": 20,
+          "min": 27532,
+          "q1": 35657.25,
+          "median": 42572,
+          "q3": 52182.25,
+          "max": 90993
+        },
+        "ns_per_gae": {
+          "n": 20,
+          "min": 131.59208172621598,
+          "q1": 151.73623856629342,
+          "median": 170.0250358885256,
+          "q3": 192.97899832896772,
+          "max": 248.31305659343855
+        },
+        "isolation_levels": {
+          "L0": 20
+        },
+        "pre_solve_trim_true": 20,
+        "pre_solve_trim_absent": 0
+      }
+    }
+  },
   "claim-notrim": {
     "sessions": [
       "fix-notrim-claim"
@@ -2685,6 +2791,310 @@
           "L1": 12
         },
         "pre_solve_trim_true": 12,
+        "pre_solve_trim_absent": 0
+      }
+    }
+  },
+  "smoke-noprobe": {
+    "sessions": [
+      "fix-noprobe-smoke"
+    ],
+    "arms": {
+      "bsgs": {
+        "records": 6,
+        "verified": 6,
+        "solve_wall_ns": {
+          "n": 6,
+          "min": 163909,
+          "q1": 180866.5,
+          "median": 211930,
+          "q3": 261655,
+          "max": 335040
+        },
+        "online_wall_ns": {
+          "n": 6,
+          "min": 163191,
+          "q1": 180282.25,
+          "median": 210840.5,
+          "q3": 260823.75,
+          "max": 335037
+        },
+        "ns_per_gae": {
+          "n": 6,
+          "min": 172.89978902953587,
+          "q1": 174.46926910299004,
+          "median": 180.15278537084544,
+          "q3": 253.99915016050576,
+          "max": 292.17721518987344
+        },
+        "isolation_levels": {
+          "L0": 6
+        },
+        "pre_solve_trim_true": 6,
+        "pre_solve_trim_absent": 0
+      },
+      "bsgs-il": {
+        "records": 6,
+        "verified": 6,
+        "solve_wall_ns": {
+          "n": 6,
+          "min": 101457,
+          "q1": 134420.75,
+          "median": 181712,
+          "q3": 220233.5,
+          "max": 241429
+        },
+        "online_wall_ns": {
+          "n": 6,
+          "min": 100338,
+          "q1": 133151.5,
+          "median": 180635.5,
+          "q3": 218287,
+          "max": 240245
+        },
+        "ns_per_gae": {
+          "n": 6,
+          "min": 239.1977653631285,
+          "q1": 252.49670420234258,
+          "median": 267.3269279577578,
+          "q3": 320.924560584623,
+          "max": 389.9268929503916
+        },
+        "isolation_levels": {
+          "L0": 6
+        },
+        "pre_solve_trim_true": 6,
+        "pre_solve_trim_absent": 0
+      },
+      "bsgs-neg": {
+        "records": 6,
+        "verified": 6,
+        "solve_wall_ns": {
+          "n": 6,
+          "min": 111634,
+          "q1": 121446.5,
+          "median": 140386.5,
+          "q3": 158538.25,
+          "max": 229653
+        },
+        "online_wall_ns": {
+          "n": 6,
+          "min": 111088,
+          "q1": 120190.75,
+          "median": 139784,
+          "q3": 158245.5,
+          "max": 229363
+        },
+        "ns_per_gae": {
+          "n": 6,
+          "min": 185.47412755716005,
+          "q1": 192.94807408570085,
+          "median": 201.17217391304348,
+          "q3": 217.23739130434782,
+          "max": 276.3574007220217
+        },
+        "isolation_levels": {
+          "L0": 6
+        },
+        "pre_solve_trim_true": 6,
+        "pre_solve_trim_absent": 0
+      },
+      "ic-mitm": {
+        "records": 6,
+        "verified": 6,
+        "solve_wall_ns": {
+          "n": 6,
+          "min": 1173844,
+          "q1": 1699416.5,
+          "median": 1880455,
+          "q3": 1949919,
+          "max": 2182509
+        },
+        "online_wall_ns": {
+          "n": 6,
+          "min": 772077,
+          "q1": 1257974.5,
+          "median": 1370239,
+          "q3": 1529088.25,
+          "max": 1848554
+        },
+        "ns_per_gae": {
+          "n": 6,
+          "min": 183.40430515279945,
+          "q1": 220.9667479553702,
+          "median": 228.8929581264294,
+          "q3": 242.45035028738002,
+          "max": 281.4274716981132
+        },
+        "isolation_levels": {
+          "L0": 6
+        },
+        "pre_solve_trim_true": 6,
+        "pre_solve_trim_absent": 0
+      },
+      "kangaroo": {
+        "records": 6,
+        "verified": 6,
+        "solve_wall_ns": {
+          "n": 6,
+          "min": 176007,
+          "q1": 198190.75,
+          "median": 214879.5,
+          "q3": 227160.5,
+          "max": 260967
+        },
+        "online_wall_ns": {
+          "n": 6,
+          "min": 175133,
+          "q1": 197298.5,
+          "median": 213178,
+          "q3": 225429.75,
+          "max": 259973
+        },
+        "ns_per_gae": {
+          "n": 6,
+          "min": 125.19472502805836,
+          "q1": 132.7878787878788,
+          "median": 150.48689189229137,
+          "q3": 167.2756804214223,
+          "max": 181.441615452151
+        },
+        "isolation_levels": {
+          "L0": 6
+        },
+        "pre_solve_trim_true": 6,
+        "pre_solve_trim_absent": 0
+      },
+      "rho-frozen": {
+        "records": 6,
+        "verified": 6,
+        "solve_wall_ns": {
+          "n": 6,
+          "min": 203729,
+          "q1": 260833.75,
+          "median": 271240.5,
+          "q3": 387312.5,
+          "max": 426543
+        },
+        "online_wall_ns": {
+          "n": 6,
+          "min": 208164,
+          "q1": 270353.25,
+          "median": 277846.5,
+          "q3": 394074.75,
+          "max": 477895
+        },
+        "ns_per_gae": {
+          "n": 6,
+          "min": 144.25374659400546,
+          "q1": 158.70085181852787,
+          "median": 162.52214252682916,
+          "q3": 178.74526892785315,
+          "max": 236.89418604651163
+        },
+        "isolation_levels": {
+          "L0": 6
+        },
+        "pre_solve_trim_true": 6,
+        "pre_solve_trim_absent": 0
+      },
+      "rho-neg": {
+        "records": 6,
+        "verified": 6,
+        "solve_wall_ns": {
+          "n": 6,
+          "min": 199793,
+          "q1": 244063.75,
+          "median": 276796.5,
+          "q3": 309060.5,
+          "max": 329120
+        },
+        "online_wall_ns": {
+          "n": 6,
+          "min": 207339,
+          "q1": 252912.5,
+          "median": 286930.5,
+          "q3": 315973,
+          "max": 337061
+        },
+        "ns_per_gae": {
+          "n": 6,
+          "min": 216.24178712220763,
+          "q1": 244.10974409448818,
+          "median": 296.4401977599335,
+          "q3": 347.7439301872091,
+          "max": 364.63734567901236
+        },
+        "isolation_levels": {
+          "L0": 6
+        },
+        "pre_solve_trim_true": 6,
+        "pre_solve_trim_absent": 0
+      },
+      "rho-neg-aa": {
+        "records": 6,
+        "verified": 6,
+        "solve_wall_ns": {
+          "n": 6,
+          "min": 209386,
+          "q1": 238374.5,
+          "median": 278314,
+          "q3": 315509.25,
+          "max": 398261
+        },
+        "online_wall_ns": {
+          "n": 6,
+          "min": 217262,
+          "q1": 245830,
+          "median": 284608,
+          "q3": 325153.75,
+          "max": 409284
+        },
+        "ns_per_gae": {
+          "n": 6,
+          "min": 242.71396396396398,
+          "q1": 260.65064616594407,
+          "median": 292.39802850375565,
+          "q3": 351.62712405957666,
+          "max": 379
+        },
+        "isolation_levels": {
+          "L0": 6
+        },
+        "pre_solve_trim_true": 6,
+        "pre_solve_trim_absent": 0
+      },
+      "rho-plain": {
+        "records": 6,
+        "verified": 6,
+        "solve_wall_ns": {
+          "n": 6,
+          "min": 184666,
+          "q1": 206526.75,
+          "median": 274798,
+          "q3": 299495,
+          "max": 333576
+        },
+        "online_wall_ns": {
+          "n": 6,
+          "min": 192843,
+          "q1": 219564.25,
+          "median": 280885.5,
+          "q3": 305382.5,
+          "max": 344960
+        },
+        "ns_per_gae": {
+          "n": 6,
+          "min": 205.78408389882787,
+          "q1": 218.96020556598268,
+          "median": 231.88192288494028,
+          "q3": 299.4220573803151,
+          "max": 366.73929961089493
+        },
+        "isolation_levels": {
+          "L0": 6
+        },
+        "pre_solve_trim_true": 6,
         "pre_solve_trim_absent": 0
       }
     }

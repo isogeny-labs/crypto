@@ -13,12 +13,13 @@ study, outbase = sys.argv[1], sys.argv[2]
 S = json.load(open(f"{study}/analysis/summary.json"))
 GROUPS = {  # group -> session dirs (same names as run_all.sh)
     "smoke": {"base": ["base-smoke", "base-smoke-rev"], "fix": ["fix-smoke", "fix-smoke-rev"],
-              "fix-notrim": ["fix-notrim-smoke"]},
+              "fix-notrim": ["fix-notrim-smoke"], "fix-notrim2": ["fix-notrim2-smoke"], "fix-noprobe": ["fix-noprobe-smoke"]},
     "claim": {"base": ["base-claim", "base-claim-rev"], "fix": ["fix-claim", "fix-claim-rev"],
-              "fix-notrim": ["fix-notrim-claim"]},
+              "fix-notrim": ["fix-notrim-claim"], "fix-notrim2": ["fix-notrim2-claim"], "fix-noprobe": ["fix-noprobe-claim"]},
 }
-COL = {"base": "#c0504d", "fix": "#2f6db0", "fix-notrim": "#8a8a8a"}
-OFF = {"base": -0.27, "fix": 0.0, "fix-notrim": 0.27}
+ORDER = ("base", "fix", "fix-notrim", "fix-noprobe", "fix-notrim2")
+COL = {"base": "#c0504d", "fix": "#2f6db0", "fix-notrim": "#5aa5a0", "fix-noprobe": "#d19a2a", "fix-notrim2": "#7b5ea7"}
+OFF = {"base": -0.32, "fix": -0.16, "fix-notrim": 0.0, "fix-noprobe": 0.16, "fix-notrim2": 0.32}
 
 def values(sessions, arm, metric):
     out = []
@@ -39,14 +40,15 @@ def values(sessions, arm, metric):
 panels = [("smoke", "solve_wall_ns", "smoke-prime (20-bit prime, 2 targets x 3 rounds x 2 sessions)"),
           ("claim", "solve_wall_ns", "claim-koblitz-r10 (Koblitz a=1 n=17), whole solve"),
           ("claim", "online_wall_ns", "claim-koblitz-r10, online window")]
-fig, axes = plt.subplots(len(panels), 1, figsize=(10, 11.5))
+fig, axes = plt.subplots(len(panels), 1, figsize=(10.5, 12))
 for ax, (key, metric, title) in zip(axes, panels):
-    gname = {"base": f"{key}-base", "fix": f"{key}-fix", "fix-notrim": f"{key}-notrim"}
+    gname = {"base": f"{key}-base", "fix": f"{key}-fix", "fix-notrim": f"{key}-notrim",
+             "fix-noprobe": f"{key}-noprobe", "fix-notrim2": f"{key}-notrim2"}
     gsum = {g: S.get(gname[g]) for g in gname}
     arms = [a for a in (gsum["base"] or gsum["fix"])["arms"].keys()]
     arms = [a for a in arms if (gsum["base"] or gsum["fix"])["arms"][a][metric]]
     for i, arm in enumerate(arms):
-        for g in ("base", "fix", "fix-notrim"):
+        for g in ORDER:
             if gsum[g] is None or arm not in gsum[g]["arms"] or not gsum[g]["arms"][arm][metric]:
                 continue
             st = gsum[g]["arms"][arm][metric]
@@ -55,7 +57,7 @@ for ax, (key, metric, title) in zip(axes, panels):
             ax.scatter([x + (j % 7 - 3) * 0.018 for j in range(len(ys))], ys, s=7, color=COL[g], alpha=0.55, linewidths=0)
             ax.plot([x, x], [st["q1"], st["q3"]], color=COL[g], lw=2.2)
             ax.plot([x - 0.1, x + 0.1], [st["median"]] * 2, color="black", lw=1.6)
-            ax.text(x, st["max"] * 1.25, f"n={st['n']}", ha="center", fontsize=6, color=COL[g], rotation=90)
+            ax.text(x, st["max"] * 1.2, f"{st['n']}", ha="center", fontsize=5.5, color=COL[g])
     ax.set_yscale("log")
     ax.set_xticks(range(len(arms)))
     ax.set_xticklabels(arms, rotation=25, ha="right", fontsize=8)
@@ -65,11 +67,11 @@ for ax, (key, metric, title) in zip(axes, panels):
     ax.axhline(1e6, color="#999", lw=0.6, ls=":")
     if key == "smoke":
         ax.text(len(arms) - 0.5, 1.05e6, "1 ms (grading v3 admits no wall below)", fontsize=6.5, ha="right", color="#666")
-h = [plt.Line2D([], [], marker="o", ls="", color=COL[g], label=f"{g}") for g in ("base", "fix", "fix-notrim")]
+h = [plt.Line2D([], [], marker="o", ls="", color=COL[g], label=f"{g}") for g in ORDER]
 h.append(plt.Line2D([], [], color="black", lw=1.6, label="median (bar: quartiles)"))
-axes[0].legend(handles=h, fontsize=7.5, loc="upper right", ncol=4)
-fig.suptitle("Solve wall time per arm, merge-base binary vs PR #2455 binary (descriptive; shared 4-vCPU VM, below L3)\n"
+fig.legend(handles=h, fontsize=8, loc="lower center", ncol=6)
+fig.suptitle("Solve wall time per arm: merge-base binary (base), PR #2455 binary (fix) and three scratch ablations of it\n(descriptive; shared 4-vCPU VM, isolation L1 or L2, never L3; number above each bar = n)\n"
              "dots = recorded verified measured runs; sessions: research/ecbench_allocator_confound_20261023/sessions/*", fontsize=9.5)
-fig.tight_layout(rect=(0, 0, 1, 0.965))
+fig.tight_layout(rect=(0, 0.03, 1, 0.95))
 fig.savefig(outbase + ".svg")
 fig.savefig(outbase + ".png", dpi=150)

@@ -2,3 +2,4 @@ base  sha256 a59c4014ff52100ed10c06b5d27a0572f9474d24c137fd18b24798237024f81f  m
 fix   sha256 26f25d9fa47a004af88ad7c4cd76104ca1ddef19393cc3c06aa2296a297da09c  ecbench/fix-runner 63fede816dcacc012580ce37fd40b4ad850ad867 (no src/Cargo file newer than the binary; later branch commits touch only study files and benchmarks/*/SHA256SUMS)
 fix-notrim  sha256 6fbdb7c8f3523ff4eb72d5e42c4e5026991c5e148a6ea3b7d42b30bee7dc15bc  fix source 63fede816 + analysis/notrim.patch (scratch build, not in the PR)
 fix-notrim2 sha256 4e9927811f4da5e9f4854e62c1f33956559bb47bb082d7f3a6c592dc36ac3f41  fix source 63fede816 + analysis/notrim2.patch (cumulative: no trim, SolveProbe::read reads nothing; scratch build, AMENDMENT_1)
+fix-noprobe sha256 591b9a402a4d101c7ad929b96dbe9889c9185209b69ed71f90cba13b26e6cb88  fix source 63fede816 + analysis/noprobe.patch (trim kept, SolveProbe::read reads nothing; scratch build, AMENDMENT_1 addendum)
