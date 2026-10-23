@@ -188,6 +188,9 @@ enum Conflict {
 /// which engine is actually costing the time.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct SolverStats {
+    /// Completed in-place arena compactions and words removed, cumulative.
+    pub arena_reclamations: u64,
+    pub arena_reclaimed_words: u64,
     pub decisions: u64,
     pub conflicts: u64,
     pub restarts: u64,
@@ -414,8 +417,8 @@ pub struct Solver {
     /// [`Solver::next_cref`] panics past that, where per-clause vectors
     /// had no cap.  And growing it by doubling briefly holds the old and
     /// the new buffer together, about three times the arena at once.
-    /// Forgotten clauses are never freed, which was already so with a
-    /// vector per clause.
+    /// At reductions, detached clauses are compacted to small tautology
+    /// tombstones and excess capacity is returned to the allocator.
     arena: Vec<Lit>,
     /// `clause_at[i]` is clause `i`'s arena offset, in the order clauses
     /// were added; learnt clauses start at `n_orig_clauses`.  Offsets
@@ -548,10 +551,12 @@ pub struct Solver {
     /// comparison key, refreshed wherever either input changes.
     heap_key: Vec<u64>,
     /// Learnt clauses that have been detached from the watch lists and
-    /// are no longer propagated, by clause index.  They stay in the
-    /// arena so that every offset — in `reason`, in `watches` — remains
-    /// valid.
+    /// are no longer propagated, by clause index. Compaction preserves
+    /// their indices so database-reduction scheduling is unchanged.
     detached: Vec<bool>,
+    /// Reclaim detached clause storage at database reductions. Disabling
+    /// this retains the append-only layout for matched diagnostic controls.
+    pub reclaim_detached_clauses: bool,
     /// Learnt-clause budget before the next reduction.  Set it before
     /// `solve()` to force more aggressive forgetting; left at 0 it is
     /// chosen from the problem size.
@@ -660,6 +665,7 @@ impl Solver {
             branch_priority: vec![false; n],
             heap_key: vec![order_key(0.0, false); n],
             detached: Vec::new(),
+            reclaim_detached_clauses: true,
             max_learnts: 0,
             stats: SolverStats::default(),
         }
@@ -1804,8 +1810,7 @@ impl Solver {
     /// stopped earning their keep.  Clauses are ranked by length, the
     /// cheap stand-in for LBD: a short clause prunes more.
     ///
-    /// Detached clauses stay in the arena and are only unhooked from
-    /// the watch lists, so every stored offset stays valid; they are
+    /// Detached clauses are unhooked from the watch lists; they are
     /// learnt, hence implied by the original problem, so dropping them
     /// can cost propagation power but never soundness.  A clause that
     /// is currently some variable's reason is kept, or conflict
@@ -1841,13 +1846,77 @@ impl Solver {
             self.detached[i] = true;
         }
 
+        if self.reclaim_detached_clauses {
+            self.reclaim_clause_arena();
+        }
+        self.rebuild_clause_watches();
+    }
+
+    /// Compact in place, preserving every clause ordinal and live clause's
+    /// literal order. Three-word tautologies keep detached slots harmless
+    /// if incremental clause addition later promotes the learnt prefix to
+    /// originals (including DIMACS export); empty tombstones would be UNSAT.
+    /// No live reason may be detached. Stale reasons of unassigned variables
+    /// are cleared, and every surviving reason offset is relocated.
+    ///
+    /// Only compact when at least a quarter of used words can be recovered.
+    /// Retain 50% headroom to avoid an immediate doubling on the next learnt
+    /// clause. Copying in place avoids holding a second full-sized arena;
+    /// the allocator's subsequent shrink may still move its allocation.
+    fn reclaim_clause_arena(&mut self) {
+        debug_assert!(self.trail_lim.is_empty());
+        let reclaimable: usize = self
+            .clause_at
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| self.detached.get(*i).copied().unwrap_or(false))
+            .map(|(_, &cref)| clause_in(&self.arena, cref).len().saturating_sub(2))
+            .sum();
+        if reclaimable == 0 || reclaimable < self.arena.len() / 4 {
+            return;
+        }
+        let old_offsets = self.clause_at.clone();
+        let mut end = 0usize;
+        for (i, &offset) in old_offsets.iter().enumerate() {
+            let start = offset as usize;
+            let words = self.arena[start] as usize + 1;
+            self.clause_at[i] = u32::try_from(end).expect("compacted arena offset");
+            if self.detached.get(i).copied().unwrap_or(false) && words > 3 {
+                self.arena[end..end + 3].copy_from_slice(&[2, 1, -1]);
+                end += 3;
+            } else {
+                self.arena.copy_within(start..start + words, end);
+                end += words;
+            }
+        }
+        for v in 0..self.reason.len() {
+            if let Reason::Propagated(offset) = self.reason[v] {
+                let i = old_offsets
+                    .binary_search(&offset)
+                    .expect("stored reason offset");
+                self.reason[v] = if self.detached.get(i).copied().unwrap_or(false) {
+                    assert!(self.var_value(v).is_none(), "detached live reason");
+                    Reason::Decision
+                } else {
+                    Reason::Propagated(self.clause_at[i])
+                };
+            }
+        }
+        self.stats.arena_reclamations += 1;
+        self.stats.arena_reclaimed_words += (self.arena.len() - end) as u64;
+        self.arena.truncate(end);
+        self.arena
+            .shrink_to(end.saturating_add((end / 2).max(4096)));
+    }
+
+    fn rebuild_clause_watches(&mut self) {
         // Rebuild the watch lists from what survives.  Cheaper and much
         // less error-prone than unhooking clauses one at a time.
         for w in self.watches.iter_mut() {
             w.clear();
         }
         let n = self.lit_base as i32;
-        for idx in 0..n_clauses {
+        for idx in 0..self.clause_at.len() {
             let cref = self.clause_at[idx];
             let c = clause_in(&self.arena, cref);
             if c.len() < 2 || self.detached.get(idx).copied().unwrap_or(false) {
@@ -2009,6 +2078,8 @@ impl Solver {
             "components_capacity_bytes":components,
             "owned_capacity_bytes":components.values().sum::<u64>(),
             "arena_used_words":self.arena.len(),"arena_capacity_words":self.arena.capacity(),
+            "arena_reclamations":self.stats.arena_reclamations,
+            "arena_reclaimed_words":self.stats.arena_reclaimed_words,
             "literal_word_bytes":std::mem::size_of::<Lit>(),
             "original_clause_words":original_words,"active_learnt_clause_words":active_learnt_words,
             "detached_learnt_clause_words":detached_learnt_words,
@@ -3548,6 +3619,70 @@ mod tests {
             0x0623_2f40_9d26_5579,
         ];
         assert_eq!(digests, want, "search trace moved: {digests:#018x?}");
+    }
+
+    #[test]
+    fn arena_reclamation_relocates_reasons_and_preserves_incremental_exports() {
+        fn fixture() -> Solver {
+            let mut s = Solver::new(6);
+            s.add_clause(vec![-1, 2, 5]);
+            s.add_clause(vec![-1, 2, -5]);
+            s.add_clause(vec![-2, 3]);
+            s.add_clause(vec![1]);
+            s.add_xor(&[3, 4], false);
+            // Implied by the original root unit, deliberately large enough
+            // to exercise both physical compaction and capacity shrinking.
+            s.push_clause(&vec![1; 20_000]);
+            let live = s.push_clause(&[2]);
+            s.detached.resize(s.clause_at.len(), false);
+            s.detached[s.n_orig_clauses] = true;
+            s.enqueue(2, Reason::Propagated(live)).unwrap();
+            s.reason[5] = Reason::Propagated(s.clause_at[s.n_orig_clauses]);
+            assert!(s.propagate().is_none());
+            s
+        }
+        let mut compact = fixture();
+        let mut retained = fixture();
+        let before = compact.arena.len();
+        let capacity = compact.arena.capacity();
+        compact.reclaim_clause_arena();
+        compact.rebuild_clause_watches();
+        assert!(compact.arena.len() < before / 4);
+        assert!(compact.arena.capacity() < capacity);
+        assert_eq!(compact.clause_at.len(), retained.clause_at.len());
+        assert!(compact.clause_at.windows(2).all(|w| w[0] < w[1]));
+        assert!(matches!(compact.reason[5], Reason::Decision));
+        match compact.reason[1] {
+            Reason::Propagated(c) => assert_eq!(clause_in(&compact.arena, c), &[2]),
+            _ => panic!("live reason lost"),
+        }
+        for s in [&mut compact, &mut retained] {
+            s.add_clause(vec![5, 6]);
+        }
+        fn exported_truth(s: &Solver) -> Vec<bool> {
+            (0..64)
+                .map(|bits| {
+                    s.clause_at.iter().take(s.n_orig_clauses).all(|&c| {
+                        clause_in(&s.arena, c)
+                            .iter()
+                            .any(|&l| ((bits >> var_of(l)) & 1 == 1) == (l > 0))
+                    })
+                })
+                .collect()
+        }
+        assert_eq!(exported_truth(&compact), exported_truth(&retained));
+        assert_eq!(compact.solve(), retained.solve());
+        assert_eq!(compact.model(), retained.model());
+        let mut replay = parse_dimacs(&to_dimacs(&compact)).unwrap();
+        assert_eq!(replay.solve(), SolveResult::Sat);
+        let mut replay_xor = parse_dimacs_xor(&to_dimacs_xor(&compact)).unwrap();
+        assert_eq!(replay_xor.solve(), SolveResult::Sat);
+        assert_eq!(compact.stats.arena_reclamations, 1);
+        // A second pass is harmless, including tombstones now in originals.
+        let after = compact.arena.clone();
+        compact.reset_search();
+        compact.reclaim_clause_arena();
+        assert_eq!(compact.arena, after);
     }
 
     /// **The search trace is pinned across bitset word boundaries.**

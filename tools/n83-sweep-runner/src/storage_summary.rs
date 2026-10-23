@@ -53,6 +53,19 @@ fn status_bytes(v: &Value, prefix: &str) -> R<Option<u64>> {
     Ok(None)
 }
 fn validate_storage(v: &Value) -> R<Value> {
+    let reclamation = match (v.get("arena_reclamations"), v.get("arena_reclaimed_words")) {
+        (None, None) => None,
+        (Some(calls), Some(words)) => {
+            let calls = calls.as_u64().ok_or("reclamation count integer")?;
+            let words = words.as_u64().ok_or("reclaimed words integer")?;
+            require(
+                (calls == 0) == (words == 0),
+                "reclamation counters disagree",
+            )?;
+            Some((calls, words))
+        }
+        _ => return Err("incomplete reclamation counters".into()),
+    };
     require(v["schema"] == "n83.sat-storage/v1", "storage schema")?;
     let parts = v["components_capacity_bytes"]
         .as_object()
@@ -117,6 +130,8 @@ fn validate_storage(v: &Value) -> R<Value> {
         json!({"owned_capacity_bytes":owned,"components_capacity_bytes":parts,
         "arena_used_bytes":used.checked_mul(word).ok_or("arena overflow")?,
         "arena_capacity_bytes":cap.checked_mul(word).ok_or("arena overflow")?,
+        "arena_reclamations":reclamation.map(|v|v.0),
+        "arena_reclaimed_words":reclamation.map(|v|v.1),
         "original_clause_bytes":original*word,"active_learnt_clause_bytes":active*word,
         "detached_learnt_clause_bytes":dead*word,"detached_learnt_clauses":n_dead,
         "arena_capacity_fraction_of_owned":cap as f64*word as f64/owned as f64,
@@ -188,7 +203,36 @@ fn storage_rows(events: &[Value]) -> R<Vec<Value>> {
     }
     Ok(rows)
 }
+fn compare_complete_1m_prefix(events: &[Value], old: &[Value]) -> R<usize> {
+    let mut previous = None;
+    let mut prefix = Vec::new();
+    for event in events.iter().filter(|v| v["phase"] == "conflict_snapshot") {
+        let count = number(event, "conflicts")?;
+        require(
+            previous.is_none_or(|n| count > n),
+            "duplicate or regressed snapshot",
+        )?;
+        signature(event)?;
+        if count <= 1_000_000 {
+            prefix.push(event.clone());
+        }
+        previous = Some(count);
+    }
+    let matched = compare_snapshots(&prefix, old)?;
+    require(matched == 1001, "full 1M prefix coverage required")?;
+    Ok(matched)
+}
 pub fn summarize(dir: &Path, reference: &Path, out: &Path) -> R<()> {
+    summarize_impl(dir, reference, out, false)
+}
+
+/// The candidate must show actual reclamation and match every reference
+/// snapshot through the complete retained 1M prefix. Later storage samples
+/// remain validated, but later search signatures are explicitly unpaired.
+pub fn summarize_reclamation(dir: &Path, reference: &Path, out: &Path) -> R<()> {
+    summarize_impl(dir, reference, out, true)
+}
+fn summarize_impl(dir: &Path, reference: &Path, out: &Path, reclamation: bool) -> R<()> {
     let audit = super::audit(dir)?;
     let reference_audit = super::audit(reference)?;
     require(
@@ -212,8 +256,40 @@ pub fn summarize(dir: &Path, reference: &Path, out: &Path) -> R<()> {
     )?;
     let events = trace["events"].as_array().ok_or("events")?;
     let old = retained["events"].as_array().ok_or("reference events")?;
-    let matched = compare_snapshots(events, old)?;
+    let reference_limit = number(&ref_cfg, "conflicts")?;
+    let matched = if reclamation {
+        require(
+            reference_limit == 1_000_000,
+            "complete retained 1M reference required",
+        )?;
+        let matched = compare_complete_1m_prefix(events, old)?;
+        require(
+            matched == 1001 && number(&cfg, "conflicts")? >= reference_limit,
+            "full 1M prefix coverage required",
+        )?;
+        matched
+    } else {
+        compare_snapshots(events, old)?
+    };
     let snapshots = storage_rows(events)?;
+    if reclamation {
+        let mut previous = (0, 0);
+        for row in &snapshots {
+            let current = (
+                number(row, "arena_reclamations")?,
+                number(row, "arena_reclaimed_words")?,
+            );
+            require(
+                current.0 >= previous.0 && current.1 >= previous.1,
+                "reclamation counters regressed",
+            )?;
+            previous = current;
+        }
+        require(
+            previous.0 > 0 && previous.1 > 0,
+            "no arena reclamation observed",
+        )?;
+    }
     require(
         matched > 0 && snapshots.len() >= 2,
         "missing storage profile/snapshot comparison",
@@ -234,6 +310,9 @@ pub fn summarize(dir: &Path, reference: &Path, out: &Path) -> R<()> {
         "dir":dir,"reference_dir":reference,"columns":cfg["columns"],
         "source_commit":cfg["source_commit"],"worker_blake3":cfg["worker_blake3"],
         "terminal_counters":audit["terminal_counters"],"matched_conflict_snapshots":matched,
+        "reclamation_required":reclamation,
+        "signature_comparison_limit_conflicts":if reclamation {Some(reference_limit)}else{None},
+        "later_search_signatures_compared":false,
         "n_storage_snapshots":snapshots.len(),"snapshots":snapshots,
         "terminal_components_descending":terminal_components,
         "timing_admission":"diagnostic instrumented worker; no matched clock or speed claim",
@@ -257,6 +336,42 @@ mod tests {
         assert_eq!(v["worker_rss_bytes"], 12288);
         assert_eq!(v["arena_used_bytes"], 40);
         assert_eq!(v["detached_learnt_clause_bytes"], 12);
+    }
+    #[test]
+    fn reclamation_counters_fail_closed() {
+        let mut v = fixture();
+        v["arena_reclamations"] = json!(1);
+        assert!(validate_storage(&v).is_err());
+        v["arena_reclaimed_words"] = json!(0);
+        assert!(validate_storage(&v).is_err());
+        v["arena_reclaimed_words"] = json!(30);
+        assert_eq!(validate_storage(&v).unwrap()["arena_reclaimed_words"], 30);
+        v["arena_reclamations"] = json!(-1);
+        assert!(validate_storage(&v).is_err());
+    }
+    #[test]
+    fn continuation_requires_the_entire_reference_prefix() {
+        let old: Vec<_> = (0..=1000)
+            .map(|i| {
+                json!({"phase":"conflict_snapshot",
+            "conflicts":i*1000,"decisions":i,"propagations":i,
+            "xor_passes":i,"xor_propagations":i})
+            })
+            .collect();
+        let mut candidate = old.clone();
+        let mut later = old[1000].clone();
+        later["conflicts"] = json!(1_001_000);
+        candidate.push(later.clone());
+        assert_eq!(compare_complete_1m_prefix(&candidate, &old).unwrap(), 1001);
+        candidate.push(later);
+        assert!(compare_complete_1m_prefix(&candidate, &old).is_err());
+        candidate.pop();
+        candidate.remove(10);
+        assert!(compare_complete_1m_prefix(&candidate, &old).is_err());
+        let mut changed = old.clone();
+        changed[500]["decisions"] = json!(9);
+        assert!(compare_complete_1m_prefix(&changed, &old).is_err());
+        assert!(compare_complete_1m_prefix(&old[..1000], &old).is_err());
     }
     #[test]
     fn forged_capacity_and_partition_are_refused() {

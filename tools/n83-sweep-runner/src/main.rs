@@ -1401,6 +1401,11 @@ fn main() -> R<()> {
         Some("summarize-storage") if a.len() == 5 => {
             storage_summary::summarize(Path::new(&a[2]), Path::new(&a[3]), Path::new(&a[4]))
         }
+        Some("summarize-reclamation") if a.len() == 5 => storage_summary::summarize_reclamation(
+            Path::new(&a[2]),
+            Path::new(&a[3]),
+            Path::new(&a[4]),
+        ),
         Some("summarize-xor") if a.len() == 4 => {
             xor_summary::summarize(Path::new(&a[2]), Path::new(&a[3]))
         }
