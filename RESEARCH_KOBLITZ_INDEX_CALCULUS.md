@@ -12,22 +12,26 @@ pre-registered hypotheses)
 (ePrint 2020/1315).
 
 **Modular and low-genus carrier follow-up (2026-10-22):**
-[Round16](research/koblitz_modular_ic_20261018/rounds/16/REPORT.md)
-constructs explicit F2 affine level77 incidence circuits and their diamond
-twist. Exact independent torsion enumeration through F32 agrees with both;
-the smooth compact genus61 interpretation remains a written modular bridge.
-Proper normalization and the integral Koblitz-factor correspondence remain
-open. The actual sign-factor Bezout denominator704 is divisible by11,
-blocking the simple integral Frobenius coprimality projector.
+[Round17](research/koblitz_modular_ic_20261018/rounds/17/REPORT.md)
+checks eight simple mod11 roots for each actual n=5 source factor. A
+written integral Tate/local-lattice argument supplies a prime-to11 map
+existence result under the compact modular/Jacobian bridge. Actual source
+matrices and split/glued lattice controls exhibit a forward fixed11
+injection even when the natural reverse cancels. An evaluated integral
+level77 correspondence and its divisor map remain open.
 
-Four determinant19 polarizations have explicit diagonal F32 finite covers
-and factor section bases. Graphs0/2 admit the selected separable odd cover
-of degree99225; graphs1/3 have an inseparable cover of degree50176.
-Theta kernel actions,243 descended target sections and proper equations
-remain open. A source-bound quartic with h-membership depth6 excludes all
-four old Q17 boundary models for arbitrary ramification. Four new checked
-Q22 survivors keep full saturation and proper quotient embeddings open.
-Sixty-three new named Lean results cover residuals and finite certificates.
+The odd diagonal cover has certified Smith kernel E[3]×E[105] of order99225,
+actual full torsion bases and four normalized factored theta lifts.
+Three period probes,18 commutator probes and48 independent square checks
+per graph pass. Canonical mixed-divisor character matching, F32/F2 descent
+compatibility,243 explicit target sections and proper equations remain open.
+All four previous Q22 boundary points are excluded by source-bound quartics
+of h-membership depth6. Four new Q24 survivors, in the supersingular
+companion subcircuit, retain the whole-saturation obligation. Sixty-nine
+new named Lean results prove structural implications, universal identities
+and actual finite certificates; global modular/Tate geometry stays written.
+[Round16](research/koblitz_modular_ic_20261018/rounds/16/REPORT.md)'s
+explicit level77 incidence and diamond twist remain frozen inputs.
 
 [Round15](research/koblitz_modular_ic_20261018/rounds/15/REPORT.md)'s
 level7p CM carriers include genus45589 for n=131 after a diamond twist.

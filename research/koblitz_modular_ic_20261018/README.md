@@ -1,25 +1,30 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [16](rounds/16/README.md), with its
-[report](rounds/16/REPORT.md), [PDF](rounds/16/report.pdf),
-[CM equations](rounds/16/CM.md), [cover sections](rounds/16/THETA.md),
-[saturation](rounds/16/SATURATION.md), [proof map](rounds/16/PROOF_MAP.md),
-[ledger](rounds/16/ledger.json) and exact replay.
+The current round is [17](rounds/17/README.md), with its
+[report](rounds/17/REPORT.md), [PDF](rounds/17/report.pdf),
+[integral map](rounds/17/CM.md), [theta descent](rounds/17/THETA.md),
+[saturation](rounds/17/SATURATION.md), [proof map](rounds/17/PROOF_MAP.md),
+[ledger](rounds/17/ledger.json) and exact replay.
 
-The level77 genus61 carrier has explicit F2 affine incidence equations and
-a derived diamond twist, with nonvacuous independent torsion checks through
-F32. Proper normalization and Koblitz-factor maps are open; the simple
-Frobenius sign-projector denominator704 fails integrality at11. Four
-polarized diagonal F32 covers now have explicit factor section bases,
-but243 target sections and proper equations still need kernel descent.
+The actual n=5 source factors each have eight simple roots modulo11.
+A written Tate/local-lattice argument gives prime-to11 map existence
+under the compact modular/Jacobian bridge. Integral controls preserve the
+fixed11 line forward while the natural reverse kills it; the evaluated
+level77 correspondence remains open.
 
-A depth6 quartic separator excludes all four old Q17 boundary points for
-any ramification; four new checked Q22 survivors keep full saturation open.
-Sixty-three new named Lean results cover identities and actual finite data.
-Round15's new norm fibers/images and Round14's ranks remain unchanged.
-No IC efficiency verdict is supplied.
+The odd cover has Smith kernel E[3]×E[105] and four normalized factored
+theta lifts, with actual torsion, pairing, period and square controls.
+Canonical mixed-divisor character matching, F32/F2 compatibility and243
+explicit target sections remain open. All four Q22 points are excluded
+by source-bound depth6 quartics; four new Q24 survivors keep full saturation
+open. Sixty-nine new named Lean results cover structural implications,
+universal identities and finite data. Earlier ranks/divisors remain frozen;
+no IC cost or efficiency assessment is supplied.
 
 Earlier evidence stays frozen:
+
+- [Round 16](rounds/16/README.md): explicit level77 incidence and twist,
+  diagonal cover section bases and source-bound quartic separators.
 
 - [Round 15](rounds/15/README.md): direct level7p CM carriers, rational
   theta descent, new coupled norms and first-jet obstructions.

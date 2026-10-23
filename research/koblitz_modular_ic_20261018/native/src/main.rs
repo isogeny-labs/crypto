@@ -55,16 +55,19 @@ mod forward07;
 mod gluing;
 #[path = "../../../../src/cryptanalysis/identity_certificate.rs"]
 mod identity_certificate;
+mod integral17;
 mod jets15;
 mod klein_transfer;
 mod kummer08;
 mod large_field;
+mod liftproof17;
 #[path = "../../../../src/cryptanalysis/curve_construction/lpoly.rs"]
 mod lpoly;
 mod modular_geometry;
 mod modular_screen;
 mod n5_relations;
 mod odd07;
+mod oddtheta17;
 mod ordinary13;
 mod polarized;
 mod proofs15;
@@ -98,6 +101,7 @@ mod saturation11;
 mod sections16;
 mod separator16;
 mod ss10;
+mod survivors17;
 mod valuation16;
 
 fn pow(mut a: u64, mut k: u64, p: u64) -> u64 {
@@ -383,6 +387,30 @@ fn main() {
         kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::repair16::run(std::path::Path::new(&args10[2]));
         return;
     }
+    if args10.get(1).map(String::as_str) == Some("--round17-repair") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::survivor_repair17::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round17-lift-proof") {
+        liftproof17::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round17-lifts") {
+        oddtheta17::lifts::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round17-theta") {
+        oddtheta17::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round17-integral") {
+        integral17::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round17-survivors") {
+        survivors17::run(std::path::Path::new(&args10[2]));
+        return;
+    }
     if args10.get(1).map(String::as_str) == Some("--round16-separators") {
         separator16::run(std::path::Path::new(&args10[2]));
         return;
@@ -402,6 +430,17 @@ fn main() {
     if args10.get(1).map(String::as_str) == Some("--round16-cm") {
         cm16::run(std::path::Path::new(&args10[2]));
         return;
+    }
+    match args10.get(1).map(String::as_str) {
+        Some("--record-round17") => {
+            round13_record::round17::record(std::path::Path::new(&args10[2]));
+            return;
+        }
+        Some("--round17-check-identities") => {
+            round13_record::round17::identities(std::path::Path::new(&args10[2]), false);
+            return;
+        }
+        _ => {}
     }
     match args10.get(1).map(String::as_str) {
         Some("--record-round16") => {

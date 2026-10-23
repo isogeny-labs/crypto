@@ -699,3 +699,39 @@ an explicit11-primary kernel; sparse theta-kernel descent on the odd cover;
 another actual separator or genuine arc for Q22; source fibers/images for
 Round15's ordinary pushed460/367 supports. Earlier signed divisors/ranks
 stay frozen. No IC cost assessment or rank promotion occurs in Round16.
+
+## Round17: integral existence, factored theta lifts and four exclusions
+
+[Round17](../research/koblitz_modular_ic_20261018/rounds/17/REPORT.md)
+checks that each actual degree8 source polynomial has eight simple roots
+modulo11. Under the compact modular/Jacobian bridge, the written integral
+Tate/local-lattice argument gives an F2 map injective on geometric11-torsion.
+This refines the existence status; it does not supply the actual integral
+correspondence, proper model or divisor evaluator. Explicit split/glued
+lattice controls show why a reverse cancellation does not refute a forward
+injection. The old denominator704 obstruction to the simple projector stays.
+
+The odd cover's exact Smith kernel is E[3]×E[105], order99225. Actual torsion
+and pairing checks, two-sided Smith inverses, normalized factored theta
+lifts and48 independent Pic2 square controls per graph pass. The normalized
+character is not yet matched to the canonical mixed-divisor character;
+F32/F2 descent compatibility, invariant section extraction and243 target
+sections remain required. This is an implementation/geometry gap, not an
+obstruction to descent. The theoretical two-stage section dimensions are
+8704314675→87723→243, not measured matrix ranks.
+
+Source-bound depth6 quartics exclude all four Q22 survivors. Retaining all
+prior repairs and four ordinary-cube radical boundary consequences finds
+four new complete Q24 models in nine visits per graph. Their unit nodes
+are59,61,64,65,66 on graphs0/1 and58,60,63,64,65 on graphs2/3.
+They inhabit the supersingular companion subcircuit; no arc or exclusion
+is established. The Lean statements check these finite bindings and expose
+their structural hypotheses. Global modular/abelian geometry remains written.
+
+Next discriminating obligations: construct an integral correspondence and
+verify its primitive11-primary image on public fixtures; compare the four
+normalized lift characters with the original mixed divisor and solve the
+Frobenius compatibility equations before section extraction; derive an actual
+companion separator or full ramified arc for Q24, then prove full saturated
+ideal equality. These acceptance tests remain open. Round14 ranks/divisors
+and Round15 source-fiber/image gaps stay frozen. No IC assessment is supplied.

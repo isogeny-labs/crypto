@@ -188,3 +188,6 @@ pub fn record(round: &Path) {
 
 #[path = "round16_record.rs"]
 pub(crate) mod round16;
+
+#[path = "round17_record.rs"]
+pub(crate) mod round17;

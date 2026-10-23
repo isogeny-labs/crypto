@@ -1,0 +1,243 @@
+{
+  "id": "IDC1h9e3d3e3bc4edfd8a",
+  "independence": "native issuer;128 extra parsed checks plus source-bound kernel theorem",
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "proof": {
+    "kind": "lean4",
+    "path": "research/koblitz_modular_ic_20261018/lean/KoblitzRound17.lean",
+    "sha256": "effac32393c4f0a690c319a010b2e7e1c814fb01aa39960a619288a559a0fabd"
+  },
+  "schema": "identity.certificate/v1",
+  "seed": 202610230102,
+  "statement": {
+    "degree_bound": 3,
+    "lhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "y",
+                          "op": "var"
+                        },
+                        {
+                          "args": 1,
+                          "op": "const"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "y",
+                          "op": "var"
+                        },
+                        {
+                          "args": 1,
+                          "op": "const"
+                        }
+                      ],
+                      "op": "add"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "y",
+                          "op": "var"
+                        },
+                        {
+                          "args": 1,
+                          "op": "const"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "a",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": -1,
+              "op": "const"
+            },
+            {
+              "args": "x",
+              "op": "var"
+            }
+          ],
+          "op": "mul"
+        }
+      ],
+      "op": "add"
+    },
+    "name": "T-translation-x",
+    "rhs": {
+      "args": [
+        {
+          "args": [
+            {
+              "args": [
+                {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": "y",
+                          "op": "var"
+                        },
+                        {
+                          "args": "y",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": "x",
+                          "op": "var"
+                        },
+                        {
+                          "args": "y",
+                          "op": "var"
+                        }
+                      ],
+                      "op": "mul"
+                    }
+                  ],
+                  "op": "add"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "add"
+            },
+            {
+              "args": [
+                {
+                  "args": "a",
+                  "op": "var"
+                },
+                {
+                  "args": [
+                    {
+                      "args": "x",
+                      "op": "var"
+                    },
+                    {
+                      "args": "x",
+                      "op": "var"
+                    }
+                  ],
+                  "op": "mul"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        },
+        {
+          "args": [
+            {
+              "args": 1,
+              "op": "const"
+            },
+            {
+              "args": [
+                {
+                  "args": 2,
+                  "op": "const"
+                },
+                {
+                  "args": "y",
+                  "op": "var"
+                }
+              ],
+              "op": "mul"
+            }
+          ],
+          "op": "add"
+        }
+      ],
+      "op": "add"
+    },
+    "source": "KoblitzRound17.T_translation_x_residual",
+    "variables": [
+      "x",
+      "y",
+      "a"
+    ]
+  },
+  "value_digest": "641a78cb483bd600b701b43e00ef064529aea5e8d0a50931bc8002f51d9e4a89"
+}
