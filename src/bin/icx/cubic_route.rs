@@ -715,6 +715,7 @@ pub(super) fn transport(
     target: Pt3,
     path: &Path,
     route_id: &str,
+    input_sha256: Option<&str>,
 ) -> Result<Transport, String> {
     let resolved = crypto_lib::store::resolve_path(path)?;
     let size = std::fs::metadata(&resolved)
@@ -829,6 +830,7 @@ pub(super) fn transport(
             || selection.target_node == 0
             || !canonical_hash(&selection.sha256)
             || !canonical_hash(&selection.target_input_sha256)
+            || input_sha256.is_some_and(|digest| digest != selection.target_input_sha256)
             || route.edge_ids.len() != 1
             || first_edge.source_curve_ref != root.reference
             || first_edge.degree != selection.degree
@@ -931,7 +933,7 @@ mod tests {
         let generator = Pt3::affine(E3([1, 2, 3]), E3([1, 1, 6]));
         let target = Pt3::affine(E3([3, 4, 6]), E3([1, 3, 5]));
         let source = Curve3::new(field, E3([3, 6, 4]), E3([4, 4, 6]), 29, generator);
-        let result = transport(&source, target, &path, "root-to-velu3").unwrap();
+        let result = transport(&source, target, &path, "root-to-velu3", None).unwrap();
         std::fs::remove_file(path).unwrap();
         assert_eq!(result.curve.mul(&result.curve.g, 5), result.target);
         let f = CubicField { p: 7, c: 2 };
@@ -1142,7 +1144,7 @@ mod tests {
         let generator = Pt3::affine(E3([1, 2, 3]), E3([1, 1, 6]));
         let target = Pt3::affine(E3([3, 4, 6]), E3([1, 3, 5]));
         let source = Curve3::new(field, E3([3, 6, 4]), E3([4, 4, 6]), 29, generator);
-        let mapped = transport(&source, target, &path, "root-to-velu2").unwrap();
+        let mapped = transport(&source, target, &path, "root-to-velu2", None).unwrap();
         std::fs::remove_file(path).unwrap();
         assert_eq!(mapped.curve.mul(&mapped.curve.g, 5), mapped.target);
         assert_eq!(mapped.receipt["edges_verified"], 1);
@@ -1182,12 +1184,12 @@ mod tests {
         let generator = Pt3::affine(E3([1, 2, 3]), E3([1, 1, 6]));
         let target = Pt3::affine(E3([3, 4, 6]), E3([1, 3, 5]));
         let source = Curve3::new(field, E3([3, 6, 4]), E3([4, 4, 6]), 29, generator);
-        let mapped = transport(&source, target, &path, "root-to-velu2-depth2").unwrap();
+        let mapped = transport(&source, target, &path, "root-to-velu2-depth2", None).unwrap();
         let mut tampered = graph;
         tampered["edges"][1]["kernel_generator"][0] = json!([0, 0, 0]);
         std::fs::write(&path, serde_json::to_vec(&tampered).unwrap()).unwrap();
         assert!(
-            transport(&source, target, &path, "root-to-velu2-depth2")
+            transport(&source, target, &path, "root-to-velu2-depth2", None)
                 .err()
                 .expect("tampered second edge must fail")
                 .contains("invalid kernel")
@@ -1208,7 +1210,7 @@ mod tests {
             env!("CARGO_MANIFEST_DIR"),
             "/docs/ic/fixtures/cubic_f7_cofactor12_isogeny_route.json"
         ));
-        let result = transport(&source, target, path, "root-to-velu3").unwrap();
+        let result = transport(&source, target, path, "root-to-velu3", None).unwrap();
         assert_eq!(result.curve.a, E3([3, 5, 6]));
         assert_eq!(result.curve.b, E3([4, 4, 6]));
         assert_eq!(result.curve.g, Pt3::affine(E3([0, 5, 2]), E3([2, 6, 4])));

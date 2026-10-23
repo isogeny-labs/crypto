@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "cubic-graph-node-route-cli-acceptance",
-  "checked_at_utc": "2026-10-23T04:10:15Z",
+  "checked_at_utc": "2026-10-23T04:25:21Z",
   "input": "docs/ic/fixtures/cubic_f7_cofactor12_public_target.json",
   "input_sha256": "8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967",
   "graph": {
@@ -20,7 +20,8 @@
     "sha256": "4c53ee7018daf03edd5d997d6e9ad6d9465a3bafa899bab86cefefb50e59dcdd",
     "both_binaries_identical": true,
     "route_id": "root-to-velu3",
-    "edges": 1
+    "edges": 1,
+    "solve_checks_target_input_sha256": true
   },
   "solve": {
     "ic": {
@@ -80,6 +81,11 @@
       "case": "root_node",
       "exit": 1,
       "error": "--target-node must select a non-root graph node"
+    },
+    {
+      "case": "route_input_sha_mismatch",
+      "exit": 1,
+      "error": "cubic route graph selection disagrees with the checked route"
     }
   ],
   "s3": {
@@ -97,10 +103,10 @@
   },
   "binaries": {
     "ic": {
-      "sha256": "472954da2bf393363c791f0941bbdb385523650a4f2bb26a8f054b8ffdf5fea8"
+      "sha256": "77b17ccf5d1e5b532a97fb73409fa007b81a348ccfb580cb04b9cb8c5e5f496a"
     },
     "icx": {
-      "sha256": "6053c5ce89c502709ef832d86b541d12700e5fd6d107a25d5df885ac7aaeeae3"
+      "sha256": "ddb3bf3b60eb447640af5ff50ef4fb65eedd7149e767e2073f866504727e8d18"
     }
   },
   "scope": "Bounded F7 cubic public target, one degree-3 graph edge and checked rational-kernel route; this does not establish arbitrary-field graph-route availability or an unbounded ECDLP capability.",

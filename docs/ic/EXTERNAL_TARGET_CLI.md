@@ -394,6 +394,9 @@ target. A graph generated from `--input` must carry the target artifact's
 SHA-256. The modular-polynomial edge is checked again before a rational
 kernel search. A j-neighbour without a suitable rational kernel can still
 exhaust the stated search budget; the graph alone is not a point map.
+`solve-cubic` checks that a graph-selected route records the SHA-256 of the
+exact target artifact it reads, along with the selected destination j and
+degree.
 The [graph-node route acceptance receipt](fixtures/CUBIC_GRAPH_NODE_ROUTE_ACCEPTANCE_20261023.json)
 records both CLI outputs, verified scalar 5, rejection cases, and an isolated
 S3 upload, remote check, fresh-cache retrieval, solve, and exact-object cleanup.

@@ -2,11 +2,11 @@
 
 use clap::Args;
 use crypto_lib::cryptanalysis::gaudry_cubic::{
-    run_gaudry_opts, run_rho3, Curve3, Fp3, GaudryOptions, Instance3, Pt3, SubspaceBase, E3,
+    Curve3, E3, Fp3, GaudryOptions, Instance3, Pt3, SubspaceBase, run_gaudry_opts, run_rho3,
 };
-use rand::{rngs::StdRng, SeedableRng};
+use rand::{SeedableRng, rngs::StdRng};
 use serde::Deserialize;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::path::PathBuf;
 
 #[derive(Args)]
@@ -142,7 +142,9 @@ pub fn solve(args: &CubicArgs) -> Result<Value, String> {
     // verified by replay of the recovered scalar, without a planted answer.
     let source = Instance3 { curve, q, d: 0 };
     let (inst, route) = if let (Some(path), Some(id)) = (&args.route_file, &args.route_id) {
-        let transport = super::cubic_route::transport(&source.curve, q, path, id)?;
+        let input_sha256 = hex::encode(crypto_lib::hash::sha256::sha256(&bytes));
+        let transport =
+            super::cubic_route::transport(&source.curve, q, path, id, Some(&input_sha256))?;
         let destination_order = count_curve_order3(
             &transport.curve.field,
             &transport.curve.a,
