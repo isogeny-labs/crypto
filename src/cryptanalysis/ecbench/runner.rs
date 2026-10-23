@@ -864,6 +864,7 @@ pub fn read_record_lines_exact(dir: &Path) -> Result<Vec<(String, Record)>, Stri
 }
 
 fn from_str_exact_floats<T: serde::de::DeserializeOwned>(line: &str) -> Result<T, String> {
+    crate::cryptanalysis::ecbench::canonical::reject_duplicate_keys(line)?;
     // Validate the complete typed shape first. In particular, serde's derived
     // record visitors reject duplicate fields; Value alone would keep only the
     // last occurrence. Discard the legacy f64 values from this pass.

@@ -452,6 +452,13 @@ fn normalize_legacy_json_floats(value: &mut Value) -> Result<(), String> {
                 normalize_legacy_json_floats(value)?;
             }
         }
+        Value::Number(number)
+            if crate::cryptanalysis::ecbench::canonical::is_nonfinite_lexeme(number) =>
+        {
+            // `1e400`: neither an integer nor (to serde_json) a float, so
+            // it would otherwise pass through to be read as infinity.
+            return Err(format!("record number {number} is not a finite f64"));
+        }
         Value::Number(number) if number.is_f64() => {
             let current = number
                 .as_f64()
@@ -471,6 +478,9 @@ fn normalize_legacy_json_floats(value: &mut Value) -> Result<(), String> {
 /// Deserialize a sealed `ecbench.record/v1` JSON value with the decimal
 /// semantics under which the schema and its derived bounds were frozen.
 pub(crate) fn from_str_legacy_floats<T: DeserializeOwned>(text: &str) -> Result<T, String> {
+    // `Value` keeps the last of two equal keys; refuse them like the exact
+    // reader does, so a line cannot carry a figure the typed record hides.
+    crate::cryptanalysis::ecbench::canonical::reject_duplicate_keys(text)?;
     let mut value: Value = serde_json::from_str(text).map_err(|error| error.to_string())?;
     normalize_legacy_json_floats(&mut value)?;
     serde_json::from_value(value).map_err(|error| error.to_string())

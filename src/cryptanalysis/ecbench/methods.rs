@@ -625,7 +625,60 @@ pub fn decl(id: &str) -> Option<&'static MethodDecl> {
     registry().iter().find(|m| m.id == id)
 }
 
-/// Fill defaults, refuse unknown and missing parameters, hash.
+/// Required parameters that hold an integer (a parameter with a default is
+/// integer-valued when its default is a canonical integer).  `summands`
+/// also takes `n-1`, which the lexeme rule below leaves alone.
+const INTEGER_PARAMS_WITHOUT_DEFAULT: &[&str] = &[
+    "large_primes",
+    "max_trials",
+    "target_max_attempts",
+    "small_dimension",
+    "envelope_dimension",
+    "summands",
+    "rank_seed",
+    "rank_max_trials",
+    "max_states",
+];
+
+/// Whether `s` is a canonical decimal integer: `0`, or an optional minus
+/// and digits with no leading zero.
+fn is_canonical_integer(s: &str) -> bool {
+    let digits = s.strip_prefix('-').unwrap_or(s);
+    !digits.is_empty()
+        && digits.bytes().all(|b| b.is_ascii_digit())
+        && (digits == "0" || (!digits.starts_with('0') && s != "-0"))
+}
+
+/// The canonical text of an integer-valued parameter.  `64`, `064` and
+/// `+64` are one method and so one id; a value that is not an integer
+/// lexeme (`n-1`, `1e3`, `6.0`) is left as written for the method to read
+/// or refuse.  Done on the text, so no width limit applies.
+fn normalise_param(name: &str, default: Option<&str>, value: &str) -> String {
+    let integer_valued = default.map_or_else(
+        || INTEGER_PARAMS_WITHOUT_DEFAULT.contains(&name),
+        is_canonical_integer,
+    );
+    if !integer_valued {
+        return value.to_string();
+    }
+    let (negative, unsigned) = match value.as_bytes().first() {
+        Some(b'-') => (true, &value[1..]),
+        Some(b'+') => (false, &value[1..]),
+        _ => (false, value),
+    };
+    if unsigned.is_empty() || !unsigned.bytes().all(|b| b.is_ascii_digit()) {
+        return value.to_string();
+    }
+    let trimmed = unsigned.trim_start_matches('0');
+    match (trimmed.is_empty(), negative) {
+        (true, _) => "0".to_string(),
+        (false, true) => format!("-{trimmed}"),
+        (false, false) => trimmed.to_string(),
+    }
+}
+
+/// Fill defaults, normalise integer-valued parameters to canonical
+/// decimal, refuse unknown and missing parameters, hash.
 pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
     let d = decl(&spec.id).ok_or_else(|| {
         let ids: Vec<&str> = registry().iter().map(|m| m.id).collect();
@@ -639,8 +692,8 @@ pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
     let mut params = BTreeMap::new();
     for p in d.params {
         match (spec.params.get(p.name), p.default) {
-            (Some(v), _) => {
-                params.insert(p.name.to_string(), v.clone());
+            (Some(v), def) => {
+                params.insert(p.name.to_string(), normalise_param(p.name, def, v));
             }
             (None, Some(def)) => {
                 params.insert(p.name.to_string(), def.to_string());
@@ -3281,5 +3334,58 @@ mod tests {
             params: BTreeMap::new()
         })
         .is_err());
+    }
+    fn spelled(id: &str, name: &str, value: &str) -> ResolvedMethod {
+        let mut params = BTreeMap::new();
+        params.insert(name.to_string(), value.to_string());
+        resolve(&MethodSpec {
+            id: id.into(),
+            params,
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn integer_parameters_have_one_spelling_and_so_one_method_id() {
+        // `64` is the default of `cap_multiple`: written out, zero-padded
+        // or signed it is the same method.
+        let default = resolve(&MethodSpec {
+            id: "rho.negation".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        for spelling in ["64", "064", "+64", "0064", "+0064"] {
+            let m = spelled("rho.negation", "cap_multiple", spelling);
+            assert_eq!(m.params["cap_multiple"], "64", "{spelling}");
+            assert_eq!(m.method_id, default.method_id, "{spelling}");
+            assert_eq!(m.method_sha256, default.method_sha256, "{spelling}");
+        }
+        // A different value is a different method; zero stays zero.
+        assert_ne!(
+            spelled("rho.negation", "cap_multiple", "65").method_id,
+            default.method_id
+        );
+        assert_eq!(
+            spelled("rho.negation", "cap_multiple", "+000").params["cap_multiple"],
+            "0"
+        );
+        // A value that is not an integer lexeme is left as written (the
+        // method refuses it when it reads it), and a string parameter is
+        // never rewritten.
+        assert_eq!(
+            spelled("rho.negation", "cap_multiple", "6.0").params["cap_multiple"],
+            "6.0"
+        );
+        assert_eq!(
+            spelled("rho.negation", "cap_multiple", "1e3").params["cap_multiple"],
+            "1e3"
+        );
+        assert_eq!(normalise_param("backend_sha256", None, "0123"), "0123");
+        assert_eq!(normalise_param("summands", None, "n-1"), "n-1");
+        assert_eq!(normalise_param("summands", None, "+007"), "7");
+        assert_eq!(
+            normalise_param("lp_exponent", Some("0.75"), "0.750"),
+            "0.750"
+        );
     }
 }

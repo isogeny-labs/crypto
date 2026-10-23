@@ -30,12 +30,7 @@ fn write(v: &Value, out: &mut String) -> Result<(), String> {
     match v {
         Value::Null => out.push_str("null"),
         Value::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
-        Value::Number(n) => {
-            if n.is_f64() {
-                return Err(format!("float {n} in an identity; write it as a string"));
-            }
-            out.push_str(&n.to_string());
-        }
+        Value::Number(n) => out.push_str(&canonical_integer(n)?),
         Value::String(s) => write_str(s, out),
         Value::Array(items) => {
             out.push('[');
@@ -65,6 +60,103 @@ fn write(v: &Value, out: &mut String) -> Result<(), String> {
     Ok(())
 }
 
+/// The canonical text of a JSON number in an identity: a plain integer
+/// lexeme, written the way Python's `json.dumps` writes the integer it
+/// parses to (`-0` is `0`).  Anything else is refused: a float, whatever
+/// its value, and in particular a lexeme `serde_json` (with
+/// `arbitrary_precision`) keeps verbatim without calling it a float
+/// because it is not finite, such as `1e400`.
+fn canonical_integer(n: &serde_json::Number) -> Result<String, String> {
+    let lexeme = n.to_string();
+    let digits = lexeme.strip_prefix('-').unwrap_or(&lexeme);
+    let plain = !digits.is_empty()
+        && digits.bytes().all(|b| b.is_ascii_digit())
+        && (digits == "0" || !digits.starts_with('0'));
+    if !plain {
+        return Err(format!(
+            "number {lexeme} in an identity is not a plain integer; write it as a string"
+        ));
+    }
+    Ok(if lexeme == "-0" { "0".into() } else { lexeme })
+}
+
+/// Whether `n` is a float lexeme (it has a fraction or an exponent) that
+/// is not a finite `f64`: `1e400`.  `serde_json` with `arbitrary_precision`
+/// reports such a number as neither integer nor float and keeps its text,
+/// so a reader that only looks at `is_f64()` would pass it through.
+pub fn is_nonfinite_lexeme(n: &serde_json::Number) -> bool {
+    let lexeme = n.to_string();
+    lexeme.contains(['.', 'e', 'E']) && !lexeme.parse::<f64>().is_ok_and(f64::is_finite)
+}
+
+/// Fail on the first object that repeats a key, anywhere in `text`.
+///
+/// `serde_json::Value` silently keeps the last of two equal keys, so a
+/// reader that parses to a `Value` first would accept
+/// `{"total_gae":5,"total_gae":1}` and see only one of the figures; the
+/// seal hashes the bytes, which carry both.
+pub fn reject_duplicate_keys(text: &str) -> Result<(), String> {
+    use serde::de::{DeserializeSeed, Deserializer, Error as _, MapAccess, SeqAccess, Visitor};
+    struct Seed;
+    impl<'de> DeserializeSeed<'de> for Seed {
+        type Value = ();
+        fn deserialize<D: Deserializer<'de>>(self, d: D) -> Result<(), D::Error> {
+            d.deserialize_any(Walk)
+        }
+    }
+    struct Walk;
+    impl<'de> Visitor<'de> for Walk {
+        type Value = ();
+        fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+            f.write_str("any JSON value")
+        }
+        fn visit_bool<E>(self, _: bool) -> Result<(), E> {
+            Ok(())
+        }
+        fn visit_i64<E>(self, _: i64) -> Result<(), E> {
+            Ok(())
+        }
+        fn visit_u64<E>(self, _: u64) -> Result<(), E> {
+            Ok(())
+        }
+        fn visit_i128<E>(self, _: i128) -> Result<(), E> {
+            Ok(())
+        }
+        fn visit_u128<E>(self, _: u128) -> Result<(), E> {
+            Ok(())
+        }
+        fn visit_f64<E>(self, _: f64) -> Result<(), E> {
+            Ok(())
+        }
+        fn visit_str<E>(self, _: &str) -> Result<(), E> {
+            Ok(())
+        }
+        fn visit_unit<E>(self) -> Result<(), E> {
+            Ok(())
+        }
+        fn visit_none<E>(self) -> Result<(), E> {
+            Ok(())
+        }
+        fn visit_seq<A: SeqAccess<'de>>(self, mut seq: A) -> Result<(), A::Error> {
+            while seq.next_element_seed(Seed)?.is_some() {}
+            Ok(())
+        }
+        fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> Result<(), A::Error> {
+            let mut seen = std::collections::BTreeSet::new();
+            while let Some(key) = map.next_key::<String>()? {
+                if !seen.insert(key.clone()) {
+                    return Err(A::Error::custom(format!("duplicate key `{key}`")));
+                }
+                map.next_value_seed(Seed)?;
+            }
+            Ok(())
+        }
+    }
+    let mut de = serde_json::Deserializer::from_str(text);
+    Seed.deserialize(&mut de).map_err(|e| e.to_string())?;
+    de.end().map_err(|e| e.to_string())
+}
+
 /// JSON string escaping as Python's `json.dumps(..., ensure_ascii=True)`
 /// writes it, so a Python reader hashing the same object agrees.
 fn write_str(s: &str, out: &mut String) {
@@ -78,8 +170,10 @@ fn write_str(s: &str, out: &mut String) {
             '\t' => out.push_str("\\t"),
             '\u{08}' => out.push_str("\\b"),
             '\u{0c}' => out.push_str("\\f"),
-            c if (c as u32) < 0x20 => out.push_str(&format!("\\u{:04x}", c as u32)),
-            c if (c as u32) < 0x80 => out.push(c),
+            // Printable ASCII only: Python's ensure_ascii pattern is
+            // `[^ -~]`, so DEL (0x7f) is escaped with the control codes.
+            c if (' '..='~').contains(&c) => out.push(c),
+            c if (c as u32) < 0x80 => out.push_str(&format!("\\u{:04x}", c as u32)),
             c => {
                 let mut buf = [0u16; 2];
                 for unit in c.encode_utf16(&mut buf) {
@@ -239,6 +333,52 @@ mod tests {
     #[test]
     fn floats_are_refused() {
         assert!(canonical(&json!({"x": 1.5})).is_err());
+    }
+
+    fn parsed(text: &str) -> Value {
+        serde_json::from_str(text).unwrap()
+    }
+
+    #[test]
+    fn non_finite_and_non_integer_lexemes_are_refused() {
+        // `1e400` is not an `f64`, so `is_f64()` is false for it and a
+        // check on that alone would write the lexeme into the identity.
+        for lexeme in ["1e400", "-1e400", "1E400", "1e2", "1.0", "0.5e-3"] {
+            let v = parsed(&format!("{{\"x\":{lexeme}}}"));
+            assert!(canonical(&v).is_err(), "{lexeme} must be refused");
+        }
+        assert!(is_nonfinite_lexeme(match &parsed("1e400") {
+            Value::Number(n) => n,
+            _ => unreachable!(),
+        }));
+        assert!(!is_nonfinite_lexeme(match &parsed("1e300") {
+            Value::Number(n) => n,
+            _ => unreachable!(),
+        }));
+        // Integers keep their digits, however wide, and `-0` is Python's 0.
+        assert_eq!(
+            canonical(&parsed("[0,-7,18446744073709551616]")).unwrap(),
+            "[0,-7,18446744073709551616]"
+        );
+        assert_eq!(canonical(&parsed("[-0]")).unwrap(), "[0]");
+    }
+
+    #[test]
+    fn del_is_escaped_like_python_ensure_ascii() {
+        // json.dumps("\x7f", ensure_ascii=True) == '"\\u007f"'
+        assert_eq!(canonical(&json!("a\u{7f}b")).unwrap(), "\"a\\u007fb\"");
+        assert_eq!(canonical(&json!("~ \u{1f}")).unwrap(), "\"~ \\u001f\"");
+    }
+
+    #[test]
+    fn duplicate_keys_are_found_at_any_depth() {
+        assert!(reject_duplicate_keys(r#"{"a":1,"b":[{"c":2},{"c":3}],"d":{"e":null}}"#).is_ok());
+        assert!(reject_duplicate_keys(r#"{"a":1,"a":2}"#).is_err());
+        assert!(reject_duplicate_keys(r#"{"a":{"b":1,"b":1}}"#).is_err());
+        assert!(reject_duplicate_keys(r#"[{"x":1},{"y":{"z":1,"z":2}}]"#).is_err());
+        assert!(reject_duplicate_keys(r#"{"a":1} trailing"#).is_err());
+        // Numbers (kept as text by `arbitrary_precision`) are not maps to it.
+        assert!(reject_duplicate_keys(r#"{"a":1.5e3,"b":-2,"c":12345678901234567890123}"#).is_ok());
     }
 
     #[test]
