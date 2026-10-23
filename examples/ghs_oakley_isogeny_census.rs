@@ -7,7 +7,7 @@
 //! visited, and curves whose cover does not descend (MMT condition 8) are
 //! counted separately.
 use crypto_lib::binary_ecc::{F2mElement, IrreduciblePoly};
-use crypto_lib::cryptanalysis::binary_isogeny::{j_invariant, l_isogenous_neighbours};
+use crypto_lib::cryptanalysis::binary_isogeny::{curve_from_j, j_invariant, l_isogenous_neighbours};
 use crypto_lib::cryptanalysis::ec_trapdoor::{magic_number_full, mmt_condition_8, FieldTower};
 use crypto_lib::cryptanalysis::ghs_descent::ECurve;
 use std::collections::{BTreeMap, HashSet, VecDeque};
@@ -42,16 +42,23 @@ fn census(name: &str, n_deg: u32, mid: u32, a: &str, b: &str, towers: &[u32], ma
         q.push_back((start.clone(), 0u32));
         let mut best: Option<(u32, u32)> = None;
         let mut visited = 0usize;
+        let mut reps = 0usize;
         let mut depth_max = 0;
         while let Some((cur, d)) = q.pop_front() {
             if visited >= max_visited { break; }
             visited += 1;
             depth_max = depth_max.max(d);
-            let m = magic_number_full(&tower, &cur.a, &cur.b);
-            let ok = mmt_condition_8(&tower, &cur.a, &cur.b);
-            let e = hist.entry(m).or_insert((0, 0));
-            if ok { e.0 += 1 } else { e.1 += 1 }
-            if ok && best.map_or(true, |(bm, _)| m < bm) { best = Some((m, d)); }
+            // Both twist representatives (a = 0 and a = 1) of the orbit's j.
+            let jc = j_invariant(&cur);
+            for a_choice in [0u8, 1u8] {
+                let Some(rep) = curve_from_j(&jc, n_deg, &irr, a_choice) else { continue };
+                let m = magic_number_full(&tower, &rep.a, &rep.b);
+                let ok = mmt_condition_8(&tower, &rep.a, &rep.b);
+                let e = hist.entry(m).or_insert((0, 0));
+                if ok { e.0 += 1 } else { e.1 += 1 }
+                reps += 1;
+                if ok && best.map_or(true, |(bm, _)| m < bm) { best = Some((m, d)); }
+            }
             for &ell in &[3u32, 5, 7, 11, 13] {
                 for nb in l_isogenous_neighbours(&cur, ell) {
                     if seen.insert(canon(&nb)) {
@@ -60,7 +67,7 @@ fn census(name: &str, n_deg: u32, mid: u32, a: &str, b: &str, towers: &[u32], ma
                 }
             }
         }
-        println!("{name} N={n_deg} tower n={n} l={l}: orbits_visited={visited} max_depth={depth_max} best(descending)={best:?}");
+        println!("{name} N={n_deg} tower n={n} l={l}: orbits_visited={visited} representatives={reps} (both twists) max_depth={depth_max} best(descending)={best:?}");
         for (m, (ok, bad)) in &hist { println!("  magic={m:>4}  descends={ok:>5}  no-descent={bad:>5}"); }
     }
 }
