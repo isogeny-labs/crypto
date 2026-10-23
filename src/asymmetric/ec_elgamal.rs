@@ -48,6 +48,7 @@
 //!   each participant contributes an encrypted increment.
 //! - **Small-balance private ledgers** where balances fit in 32 bits.
 
+use crate::ecc::ct::scalar_mul_secret;
 use crate::ecc::curve::CurveParams;
 use crate::ecc::point::Point;
 use num_bigint::{BigUint, RandBigInt};
@@ -94,9 +95,7 @@ pub fn ec_elgamal_keygen(curve: CurveParams) -> EcElGamalPrivateKey {
             break candidate;
         }
     };
-    let g = curve.generator();
-    let bits = curve.order_bits();
-    let q = g.scalar_mul_ct(&d, &curve.a_fe(), bits);
+    let q = scalar_mul_secret(&curve.generator(), &d, &curve);
     EcElGamalPrivateKey {
         public: EcElGamalPublicKey { curve, q },
         d,
@@ -132,12 +131,12 @@ pub fn ec_elgamal_encrypt_checked(
         }
     };
     let g = pk.curve.generator();
-    let bits = pk.curve.order_bits();
     let a = pk.curve.a_fe();
-    // C1 = k·G, C2 = m·G + k·Q
-    let c1 = g.scalar_mul_ct(&k, &a, bits);
-    let m_g = g.scalar_mul(m, &a);
-    let k_q = pk.q.scalar_mul_ct(&k, &a, bits);
+    // C1 = k·G, C2 = m·G + k·Q.  The plaintext is secret too, so `m·G`
+    // takes the same path as the nonce products.
+    let c1 = scalar_mul_secret(&g, &k, &pk.curve);
+    let m_g = scalar_mul_secret(&g, m, &pk.curve);
+    let k_q = scalar_mul_secret(&pk.q, &k, &pk.curve);
     let c2 = m_g.add(&k_q, &a);
     Ok(EcElGamalCiphertext { c1, c2 })
 }
@@ -159,8 +158,7 @@ pub fn ec_elgamal_decrypt_point_checked(
     validate_public_key(&sk.public)?;
     validate_ciphertext(&sk.public.curve, c)?;
     let a = sk.public.curve.a_fe();
-    let bits = sk.public.curve.order_bits();
-    let d_c1 = c.c1.scalar_mul_ct(&sk.d, &a, bits);
+    let d_c1 = scalar_mul_secret(&c.c1, &sk.d, &sk.public.curve);
     // M = C2 − d·C1 = C2 + (−(d·C1))
     Ok(c.c2.add(&d_c1.neg(), &a))
 }
@@ -365,11 +363,9 @@ pub fn ec_elgamal_mul_scalar_checked(
 ) -> Result<EcElGamalCiphertext, &'static str> {
     validate_public_key(pk)?;
     validate_ciphertext(&pk.curve, c)?;
-    let a = pk.curve.a_fe();
-    let bits = pk.curve.order_bits();
     Ok(EcElGamalCiphertext {
-        c1: c.c1.scalar_mul_ct(k, &a, bits),
-        c2: c.c2.scalar_mul_ct(k, &a, bits),
+        c1: scalar_mul_secret(&c.c1, k, &pk.curve),
+        c2: scalar_mul_secret(&c.c2, k, &pk.curve),
     })
 }
 
