@@ -176,8 +176,10 @@ unseen target**, cold, with every phase charged, verified.
   The runner checks `[k]G = Q` and `k = planted` in its own process, and
   `ecbench verify` checks it again from the files. A run that does not
   verify is a row with status `wrong_answer`, `exhausted`, `error`,
-  `timeout` or `crashed`. It is kept, never dropped, and it makes any
-  comparison involving it `incomplete`.
+  `timeout`, `crashed`, `interrupted` (the session's own interruption
+  killed the child) or `spawn_error` (the child could not be started or
+  pinned; the session stops there). It is kept, never dropped, and it makes
+  any comparison involving it `incomplete`.
 - **Planted or public targets.** By default a target is `Q = [k]G` for a
   derived `k` (`uniform_scalar_sha256_v1`), kept for the check above. With
   `"target_kind": "public"` a target is hashed to the subgroup

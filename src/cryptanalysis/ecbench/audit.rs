@@ -196,22 +196,23 @@ pub fn audit(dir: &Path, replay: usize) -> Result<AuditReport, String> {
 /// finalised.
 pub const NEVER_FINALISED: &str = "never_finalised";
 
-/// A session whose `session.json` is still exactly in the state the runner
-/// writes before its first execution: status `running`, no finish time, no
-/// record count, no records hash, no status counts.  The runner rewrites
-/// `session.json` only when the session ends (`complete`, or `interrupted`
-/// on a signal or an error), so a session left in this state was killed
-/// outright (SIGKILL, host loss) or is still being written by a live
-/// runner; the files cannot tell those apart, and a committed session has
-/// no live runner.  Its records are still sealed line by line as they are
-/// written, so every per-record check applies; only the whole-file hash,
-/// which the runner never got to write, does not.
+/// A session whose `session.json` is still in a state the runner writes
+/// before the session ends: status `running`, no finish time, no records
+/// hash.  The runner writes the final `session.json` (`complete`, or
+/// `interrupted` on a signal or an error) only when the session ends, so a
+/// session left in this state was killed outright (SIGKILL, host loss) or
+/// is still being written by a live runner; the files cannot tell those
+/// apart, and a committed session has no live runner.  Since the runner
+/// rewrites `session.json` atomically after every record, a killed session
+/// may carry progress counters (`records_written`, `last_seq`,
+/// `status_counts`); sessions killed before that was done carry zeros.
+/// Records are sealed line by line as they are written, so every
+/// per-record check applies; only the whole-file hash, which the runner
+/// never got to write, does not.
 pub fn never_finalised(session: &crate::cryptanalysis::ecbench::runner::Session) -> bool {
     session.status == "running"
         && session.finished_unix_ms.is_none()
-        && session.records_written == 0
         && session.records_sha256.is_none()
-        && session.status_counts.is_empty()
 }
 
 /// [`audit`], optionally accepting an `interrupted` session: it is held
@@ -346,7 +347,9 @@ pub fn audit_with(
         if complete {
             records.len() as u64 == session.records_written && records.len() == p.executions.len()
         } else if killed {
-            records.len() <= p.executions.len()
+            // The progress counter was written after the record it counts,
+            // so no fewer records than it says may be on disk.
+            records.len() <= p.executions.len() && records.len() as u64 >= session.records_written
         } else {
             records.len() as u64 == session.records_written && records.len() <= p.executions.len()
         },
@@ -758,6 +761,39 @@ mod tests {
         assert!(text.contains("\"records_bound\":false"), "{text}");
         assert_eq!(lenient.records, 4);
         assert_eq!(lenient.checks.get("records"), Some(&true));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// The runner now rewrites `session.json` after every record, so a
+    /// runner killed outright leaves `running` with progress counters.
+    #[test]
+    fn a_killed_session_with_progress_counters_is_still_never_finalised() {
+        let dir = killed_copy("progress");
+        let text = std::fs::read_to_string(dir.join("session.json")).unwrap();
+        let mut v: serde_json::Value = serde_json::from_str(&text).unwrap();
+        v["records_written"] = json!(4);
+        v["last_seq"] = json!(3);
+        v["status_counts"] = json!({"verified": 2, "error": 2});
+        std::fs::write(dir.join("session.json"), v.to_string()).unwrap();
+        assert!(never_finalised(&read_session(&dir).unwrap()));
+        let strict = audit_with(&dir, 0, false).unwrap();
+        assert!(!strict.ok);
+        let lenient = audit_with(&dir, 0, true).unwrap();
+        assert!(lenient.ok, "{:?}", lenient.problems);
+        assert_eq!(lenient.interruption.as_deref(), Some(NEVER_FINALISED));
+        assert_eq!(lenient.records_bound, Some(false));
+        // A record count above what is on disk is truncation, caught even
+        // though no whole-file hash exists.
+        v["records_written"] = json!(5);
+        std::fs::write(dir.join("session.json"), v.to_string()).unwrap();
+        let rep = audit_with(&dir, 0, true).unwrap();
+        assert!(!rep.ok);
+        assert_eq!(rep.checks.get("record_count"), Some(&false));
+        // A finish time still takes it out of the relaxation.
+        v["records_written"] = json!(4);
+        v["finished_unix_ms"] = json!(1791170600000u64);
+        std::fs::write(dir.join("session.json"), v.to_string()).unwrap();
+        assert!(!never_finalised(&read_session(&dir).unwrap()));
         let _ = std::fs::remove_dir_all(&dir);
     }
 
