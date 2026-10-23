@@ -48,12 +48,12 @@ boundaries.
 | Generated artifact | SHA-256 | Scope |
 | --- | --- | --- |
 | `registry.json` | `e39687f5d46346faa2b65ca0fa7d635afec6b01b5025951192d3fa4d1829c3cb` | 15,791 models |
-| `traits.json` | `a9ca14c3e4588d3e1815defaa8596047afb2763f30f2e302b70f631c7faf1edc` | 15,967 trait rows, budget 262,144; 73,577,404 bytes |
-| `covers.json` | `65c2d68bf4886fad9805e7507487f851a7cef8fdd6a8d69ec936211a35b04648` | 15,791 verified models, zero invalid |
-| `cover-links.yaml` | `966619ae9aa07f5cb5beb787d2718abf935c6764a8189d6ef3eafa16afaa73f3` | 15,791 exact maps, 979 EC1 records |
-| `jacobian-transfers.json` | `7d5d4954b1b38372ab25599936e3e29d318675bb787c435029e1c0bfadb259f1` | 15,791 models, 46,222 modeled routes |
-| `docs/ic/leaderboard.json` | `a23f00f42a6043e1720f559ca2e16843a944562faf5bcdd18c11d24001f9d39f` | current curve roster; no new performance result |
-| `docs/browser/data.json` | `f359249f304f0d4101326e8397c3e91bd5b10af0b2e32d7cf448b4218177bd8a` | current searchable catalog |
+| `traits.json` | `27fcf4646f142411bb95949a4e91b2a35dbcda6f2c23221f3f3ccf39f4583c91` | 15,967 trait rows, budget 262,144; 73,577,404 bytes |
+| `covers.json` | `af2b530b5f5022c4f331e35508a366691e1b720e9326f6e6e8a3999c5408ed0a` | 15,791 verified models, zero invalid |
+| `cover-links.yaml` | `8707d3e522ba56a7500fd0fd3808aff3f5e598113979e2c6a2986144909eb32b` | 15,791 exact maps, 979 EC1 records |
+| `jacobian-transfers.json` | `92c3a75954717c7f4248f6b19385a1d99af759fc44a2752c2d14b5d80022b5b1` | 15,791 models, 46,222 modeled routes |
+| `docs/ic/leaderboard.json` | `5d4dd2350405b03eee362687914f8b1dd07e357af7c7518cea8b5a3cb9363f91` | current curve roster; no new performance result |
+| `docs/browser/data.json` | `2fdf9bd635e7ac6b9abaa0f52aea3b87933915747fc48e2539361a5b1bae8103` | current searchable catalog |
 
 The cover geometry and Jacobian inventory are regenerated on the expanded
 catalog. The 2026-10-19 cover-transfer assessment, PDF, and figures remain a
@@ -61,7 +61,9 @@ catalog. The 2026-10-19 cover-transfer assessment, PDF, and figures remain a
 models. `scripts/check_historical_cover_transfer_assessment.mjs` replays that
 assessment on its exact `a53a7e2...` inputs and compares it with the published
 artifact. The current browser shows the new cover geometry, not an inferred
-transfer speedup. No new benchmark or performance claim is made here.
+transfer speedup. Its curve rows changed only in source lists, and its methods,
+factor bases, candidates, rounds, sessions, yields, and counts are byte-equivalent
+after parsing. No new benchmark or performance claim is made here.
 
 Local replay:
 
