@@ -72,16 +72,18 @@ happens in a follow-on PR with a replay certificate and a validator report.
 
 **Method.** This is direct-subtraction IC-2 (the `prime_fast::collect_relations`
 sweep). Factor base: the `B` points of smallest `x` with `y ≤ (p−1)/2`.
-Target `R = aG + bQ`, one Straus–Shamir combine, then `R ← R + G` per target.
-For each `F_i`, both candidates `T = R ∓ F_i` are formed with one shared
-batched inversion:
+Targets `R = aG + bQ` come from an r-adding walk: `R ← R + M_{h(R)}`, with
+32 table points `M_j = u_jG + v_jQ`, restarted from a fresh random combine
+every 1024 steps. For each `F_i`, both candidates `T = R ∓ F_i` are formed
+with one shared batched inversion:
 
-- `x(T) ∈ FB` gives a full relation;
+- `x(T) ∈ FB` gives a full relation, re-added in the group at once;
 - otherwise, if `x(T) ∈ (max_x(FB), X_L]` with `X_L = p >> s`, it gives a
-  partial relation `R = ±F_i ± T_c`, an edge to vertex `x(T)`.
+  partial relation `R = ±F_i ± T_c`, an edge to vertex `x(T)`. A partial is
+  re-added in the group only if it reaches the 2-core: lazy, fail-closed
+  verification, one addition each.
 
-Every accepted relation is re-added in the group. Collection stops when
-`fulls + Σ_v (deg v − 1) ≥ B + 1 + 8`. Degree-one vertices are peeled, the
+Collection stops when `fulls + Σ_v (deg v − 1) ≥ B + 1 + 8`. Degree-one vertices are peeled, the
 2-core goes through `large_prime_filter::filter_large_primes`, and every
 complete row is replayed from its sources. The dense Gauss–Jordan solve mod
 `n` runs over unknowns `(y_0…y_{B−1}, x)`. If `x` is not pinned, 8 more
@@ -90,16 +92,17 @@ checked against the planted `k` and by `[x]G = Q`.
 
 **Grid.** `bits ∈ {20, 24, 28, 32}`, `B ∈ {16, 64, 256}`,
 `s ∈ {none (baseline), 12, 8, 4, 0}`, 3 targets per cell. A cell is skipped,
-and recorded as skipped, when its predicted cost exceeds `6·10⁹` GAE. The
+and recorded as skipped, when its predicted cost exceeds `2.5·10⁹` GAE. The
 prediction is `p` for the baseline and `p·√(B/(2·(p>>s))) + √p` otherwise,
-fixed before any run.
+fixed before any run. At 32 bits this skips the three baselines; the
+large-prime cells there get no G1 verdict.
 
 **Counted unit.** Group-addition equivalents (GAE):
 
 - sweep: 1 per `(target, F_i)`, covering both candidates;
-- step: 1 per `R ← R + G`;
-- setup: `⌈1.75·bits⌉` per combine;
-- verify: 1 per accepted relation, plus `⌈1.5·bits⌉` for the final `[x]G`.
+- step: 1 per walk addition;
+- setup: `⌈1.75·bits⌉` per combine (the 32 table points and every restart);
+- verify: 1 per verified relation, plus `⌈1.5·bits⌉` for the final `[x]G`.
 
 `S = GAE / √n`.
 
@@ -192,7 +195,7 @@ single-step differences are expected noise, and the rule ignores them.
 
 ### 3.3 Arm F: fake subfields under F4
 
-**Method.** On the arm F curve, for `B ∈ {8, 16, 32, 64, 128}` and each family
+**Method.** On the arm F curve, for `B ∈ {8, 16, …, 1024}` (powers of two) and each family
 build the x-set of size exactly `B`:
 
 - interval `{1..B}`;
@@ -243,9 +246,48 @@ The following are not permitted:
 The dry run (`--quick`, scratch output, not committed) and the per-cell
 estimates are in §5.1, added before the freeze.
 
-### 5.1 Dry-run timings
+### 5.1 Dry-run findings and timings (2026-10-23, before freezing)
 
-(filled before freezing)
+The host has 2 threads and 7 GB of memory. The dry run used `--quick`
+(arm G at 20 and 24 bits with B ∈ {16, 64} and 2 targets; arm L at level 1
+with 4 trials; arm F at B ≤ 128 with 1 seed). Its output was written to
+scratch and is not committed. It changed the harness in two ways before the
+freeze; both are recorded here.
+
+1. **Arithmetic walk made the graph degenerate.** With `R ← R + G` and a
+   fixed `b`, every large-prime cell failed "x not pinned after 4 attempts".
+   The cycle relations were the same row repeated: two targets `R_s, R_t`
+   meeting at one vertex give `R_s + R_t = F_i + F_j`, which depends only on
+   `s + t`. That is a property of the walk, not of the graph method. The fix
+   is the r-adding walk in §3.1. After it, every dry-run cell solved and was
+   checked.
+2. **Eager partial verification dominated at `s = 0`.** Re-adding every
+   partial costs one GAE per partial. At `s = 0` almost every candidate is a
+   partial, so this was more than half of `S` (24 bits, B = 16: `S_w0` 9.2
+   eager against 3.4 lazy). Only the 2-core rows enter the solve, so only
+   they are verified now. The check stays fail-closed.
+
+Measured dry-run rates: the arm G sweep costs about 55 ns per GAE (24-bit
+baseline, B = 16: 8.7·10⁶ GAE in 0.48 s). An arm L level-1 trial takes under
+1 ms. Arm F at B = 128 takes about 80 ms per F4 run and `2.4·10⁶`
+multiplications, growing about 4× per doubling of B. The arm F grid was
+therefore extended from B ≤ 128 to B ≤ 1024 before the freeze.
+
+The dry run did not show the target arms' outcome in any way that changed a
+rule. Its level-1 arm L numbers (4 trials) had the fraction lattice
+succeeding at one grid step beyond the interval lattice at 40 bits. That is
+inside the one-step band the decision rule treats as noise, and the rule is
+unchanged.
+
+**Estimates for the full run** (single-threaded except rho):
+
+- Arm G: 28-bit baselines `≈ p·55 ns ≈ 15 s` each. All other cells are below
+  that, except 32-bit `s = 12` at B = 256 (`≈ 5·10⁷` GAE). Total about 10–20
+  min.
+- Arm L: level 3 at 40 bits costs 1–8 s per LLL (probe B's timing), so
+  16 cells × 16 trials ≈ 20–35 min. Levels 1–2 take a few minutes.
+- Arm F: B = 1024 is extrapolated at `≈ 1.5·10⁸` multiplications and
+  `≈ 10` s per run, within the 600 s budget. Total a few minutes.
 
 ## 6. Outputs
 

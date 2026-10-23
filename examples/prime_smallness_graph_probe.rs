@@ -49,8 +49,7 @@ use crypto_lib::cryptanalysis::large_prime_filter::{
 };
 use crypto_lib::cryptanalysis::lattice::lll_reduce;
 use crypto_lib::cryptanalysis::prime_fast::{
-    find_a3_curve, point_order_hasse, rho_parallel, FastCurve, FastFactorBase, Fp64, Pt,
-    RhoConfig,
+    find_a3_curve, point_order_hasse, rho_parallel, FastCurve, FastFactorBase, Fp64, Pt, RhoConfig,
 };
 use crypto_lib::cryptanalysis::residual_walk::is_prime_u64;
 use num_bigint::{BigInt, BigUint};
@@ -223,6 +222,7 @@ struct GraphRun {
     replay_failures: u64,
     relations_used: u64,
     la_attempts: u64,
+    partials_rejected: u64,
     lp_set_size: u64,
     fb_max_x: u64,
     wall_ms: f64,
@@ -234,7 +234,12 @@ struct GraphRun {
 
 /// Dense Gauss–Jordan mod prime `n` on rows over columns `0..=cols-1`
 /// (`cols − 1` is `x`); returns `x` when pinned.  Counts multiplications.
-fn solve_dense(rows: &[(Vec<(u32, u64)>, u64)], cols: usize, n: u64, mults: &mut u64) -> Option<u64> {
+fn solve_dense(
+    rows: &[(Vec<(u32, u64)>, u64)],
+    cols: usize,
+    n: u64,
+    mults: &mut u64,
+) -> Option<u64> {
     let mut m: Vec<Vec<u64>> = Vec::with_capacity(rows.len());
     let mut rhs: Vec<u64> = Vec::with_capacity(rows.len());
     for (entries, r) in rows {
@@ -334,208 +339,284 @@ fn graph_ic2(
     let lp_on = x_l_max > fb.max_x;
     let mut needed = b_len + 1 + extra;
 
+    // Targets come from an r-adding walk R ← R + M_{h(R)}, M_j = u_j G + v_j Q,
+    // restarted from a fresh combine every `RESTART` steps.  (An arithmetic
+    // walk R ← R + G makes the large-prime collisions structural: every pair
+    // of targets with the same index sum closes the same cycle — found in the
+    // dry run, protocol §5.1.)
+    const TABLE: usize = 32;
+    const RESTART: u64 = 1024;
+    let combine_gae = (bits as f64 * 1.75).ceil() as u64; // ~bits doublings + ~0.75·bits adds
     let mut rng = StdRng::seed_from_u64(seed);
-    let a0 = rng.gen_range(1..n);
-    let b0 = rng.gen_range(1..n);
-    let mut a = a0;
-    let b = b0;
-    let Some(mut r) = curve.combine(g, q, a, b) else {
-        run.stop_reason = "degenerate start".into();
-        return run;
+    let mut table: Vec<(u64, u64, Pt)> = Vec::with_capacity(TABLE);
+    while table.len() < TABLE {
+        let (u, v) = (rng.gen_range(1..n), rng.gen_range(1..n));
+        if let Some(m) = curve.combine(g, q, u, v) {
+            table.push((u, v, m));
+            run.gae_setup += combine_gae;
+        }
+    }
+    let fresh = |rng: &mut StdRng, run: &mut GraphRun| -> (u64, u64, Pt) {
+        loop {
+            let (a, b) = (rng.gen_range(1..n), rng.gen_range(1..n));
+            run.gae_setup += combine_gae;
+            if let Some(r) = curve.combine(g, q, a, b) {
+                return (a, b, r);
+            }
+        }
     };
-    // Straus–Shamir over ~bits doublings and ~0.75·bits additions.
-    run.gae_setup += (bits as f64 * 1.75).ceil() as u64;
+    let (mut a, mut b, mut r) = fresh(&mut rng, &mut run);
+    let mut since_restart = 0u64;
 
     let mut fulls: Vec<(Vec<(u32, u64)>, u64)> = Vec::new();
     let mut partials: Vec<PartialRelation> = Vec::new();
+    let mut witness: Vec<(Pt, u32, i64, i64, Pt)> = Vec::new();
+    let mut verified: std::collections::HashSet<u64> = std::collections::HashSet::new();
+    let mut rejected: std::collections::HashSet<u64> = std::collections::HashSet::new();
     let mut deg: HashMap<u64, u32> = HashMap::new();
     let mut d = vec![0u64; b_len];
     let mut degenerate = vec![false; b_len];
     let mut scratch = Vec::with_capacity(b_len);
-    let neg_b = (n - b % n) % n;
     let col_x = b_len as u32;
     let available = |fulls: usize, cyc: u64| fulls as u64 + cyc;
 
     'attempt: loop {
-    let t_collect = Instant::now();
-    while available(fulls.len(), run.cycles_available) < needed as u64 {
-        if run.gae_sweep + run.gae_step + run.gae_verify >= max_gae {
-            run.stop_reason = "gae budget".into();
-            break;
-        }
-        run.targets += 1;
-        for i in 0..b_len {
-            let dd = f.sub(r.x, fb.pts[i].x);
-            degenerate[i] = dd == 0;
-            d[i] = if dd == 0 { f.one } else { dd };
-        }
-        f.batch_inv(&mut d, &mut scratch);
-        run.gae_sweep += b_len as u64;
-        for i in 0..b_len {
-            let fi = fb.pts[i];
-            if degenerate[i] {
-                let s: i64 = if r.y == fi.y { 1 } else { -1 };
-                fulls.push((vec![(i as u32, signed_mod(s, n)), (col_x, neg_b)], a));
-                continue;
+        let t_collect = Instant::now();
+        while available(fulls.len(), run.cycles_available) < needed as u64 {
+            if run.gae_sweep + run.gae_step + run.gae_verify >= max_gae {
+                run.stop_reason = "gae budget".into();
+                break;
             }
-            let inv = d[i];
-            let lam_minus = f.mul(f.add(r.y, fi.y), inv);
-            let lam_plus = f.mul(f.sub(r.y, fi.y), inv);
-            for (eps, lam) in [(1i64, lam_minus), (-1i64, lam_plus)] {
-                let x3 = f.sub(f.sub(f.sqr(lam), r.x), fi.x);
-                let xc = f.from_mont(x3);
-                if let Some(j) = fb.lookup(xc) {
-                    if j >= i {
+            run.targets += 1;
+            let neg_b = (n - b % n) % n;
+            for i in 0..b_len {
+                let dd = f.sub(r.x, fb.pts[i].x);
+                degenerate[i] = dd == 0;
+                d[i] = if dd == 0 { f.one } else { dd };
+            }
+            f.batch_inv(&mut d, &mut scratch);
+            run.gae_sweep += b_len as u64;
+            for i in 0..b_len {
+                let fi = fb.pts[i];
+                if degenerate[i] {
+                    let s: i64 = if r.y == fi.y { 1 } else { -1 };
+                    fulls.push((vec![(i as u32, signed_mod(s, n)), (col_x, neg_b)], a));
+                    continue;
+                }
+                let inv = d[i];
+                let lam_minus = f.mul(f.add(r.y, fi.y), inv);
+                let lam_plus = f.mul(f.sub(r.y, fi.y), inv);
+                for (eps, lam) in [(1i64, lam_minus), (-1i64, lam_plus)] {
+                    let x3 = f.sub(f.sub(f.sqr(lam), r.x), fi.x);
+                    let xc = f.from_mont(x3);
+                    if let Some(j) = fb.lookup(xc) {
+                        if j >= i {
+                            let y = f.sub(f.mul(lam, f.sub(r.x, x3)), r.y);
+                            let tau: i64 = if y == fb.pts[j].y { 1 } else { -1 };
+                            // verify R = eps·F_i + tau·F_j in the group
+                            let fi_s = if eps < 0 { curve.neg(fi) } else { fi };
+                            let fj_s = if tau < 0 {
+                                curve.neg(fb.pts[j])
+                            } else {
+                                fb.pts[j]
+                            };
+                            run.gae_verify += 1;
+                            if curve.add(Some(fi_s), Some(fj_s)) != Some(r) {
+                                continue;
+                            }
+                            let mut e: Vec<(u32, u64)> = Vec::new();
+                            if i == j {
+                                e.push((i as u32, signed_mod(eps + tau, n)));
+                            } else {
+                                e.push((i as u32, signed_mod(eps, n)));
+                                e.push((j as u32, signed_mod(tau, n)));
+                            }
+                            e.retain(|t| t.1 != 0);
+                            e.push((col_x, neg_b));
+                            fulls.push((e, a));
+                            run.full_relations += 1;
+                        }
+                    } else if lp_on && xc > fb.max_x && xc <= x_l_max {
                         let y = f.sub(f.mul(lam, f.sub(r.x, x3)), r.y);
-                        let tau: i64 = if y == fb.pts[j].y { 1 } else { -1 };
-                        // verify R = eps·F_i + tau·F_j in the group
-                        let fi_s = if eps < 0 { curve.neg(fi) } else { fi };
-                        let fj_s = if tau < 0 { curve.neg(fb.pts[j]) } else { fb.pts[j] };
-                        run.gae_verify += 1;
-                        if curve.add(Some(fi_s), Some(fj_s)) != Some(r) {
-                            continue;
+                        let t = Pt { x: x3, y };
+                        let (tc, flipped) = curve.canonical_sign(t);
+                        let tau: i64 = if flipped { -1 } else { 1 };
+                        // R = eps·F_i + tau·T_c is verified lazily, only for
+                        // partials that reach the 2-core (one addition each).
+                        witness.push((r, i as u32, eps, tau, tc));
+                        run.partials += 1;
+                        run.hash_ops += 1;
+                        let c = deg.entry(xc).or_insert(0);
+                        *c += 1;
+                        if *c >= 2 {
+                            run.cycles_available += 1;
                         }
-                        let mut e: Vec<(u32, u64)> = Vec::new();
-                        if i == j {
-                            e.push((i as u32, signed_mod(eps + tau, n)));
-                        } else {
-                            e.push((i as u32, signed_mod(eps, n)));
-                            e.push((j as u32, signed_mod(tau, n)));
-                        }
-                        e.retain(|t| t.1 != 0);
-                        e.push((col_x, neg_b));
-                        fulls.push((e, a));
-                        run.full_relations += 1;
+                        partials.push(PartialRelation {
+                            id: partials.len() as u64,
+                            small: vec![(i as u32, signed_mod(eps, n)), (col_x, neg_b)],
+                            large: vec![(xc, signed_mod(tau, n))],
+                            rhs: a,
+                        });
                     }
-                } else if lp_on && xc > fb.max_x && xc <= x_l_max {
-                    let y = f.sub(f.mul(lam, f.sub(r.x, x3)), r.y);
-                    let t = Pt { x: x3, y };
-                    let (tc, flipped) = curve.canonical_sign(t);
-                    let tau: i64 = if flipped { -1 } else { 1 };
-                    // verify R = eps·F_i + tau·T_c
-                    let fi_s = if eps < 0 { curve.neg(fi) } else { fi };
-                    let t_s = if tau < 0 { curve.neg(tc) } else { tc };
-                    run.gae_verify += 1;
-                    if curve.add(Some(fi_s), Some(t_s)) != Some(r) {
-                        continue;
-                    }
-                    run.partials += 1;
-                    run.hash_ops += 1;
-                    let c = deg.entry(xc).or_insert(0);
-                    *c += 1;
-                    if *c >= 2 {
-                        run.cycles_available += 1;
-                    }
-                    partials.push(PartialRelation {
-                        id: partials.len() as u64,
-                        small: vec![(i as u32, signed_mod(eps, n)), (col_x, neg_b)],
-                        large: vec![(xc, signed_mod(tau, n))],
-                        rhs: a,
-                    });
+                }
+            }
+            // next target: r-adding step (one addition), or a restart
+            since_restart += 1;
+            let next = if since_restart >= RESTART {
+                None
+            } else {
+                let j =
+                    (f.from_mont(r.x).wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 59) as usize % TABLE;
+                let (u, v, m) = table[j];
+                run.gae_step += 1;
+                curve
+                    .add(Some(r), Some(m))
+                    .map(|nr| (addmod(a, u, n), addmod(b, v, n), nr))
+            };
+            match next {
+                Some((na, nb, nr)) => {
+                    a = na;
+                    b = nb;
+                    r = nr;
+                }
+                None => {
+                    let (na, nb, nr) = fresh(&mut rng, &mut run);
+                    a = na;
+                    b = nb;
+                    r = nr;
+                    since_restart = 0;
                 }
             }
         }
-        // next target R ← R + G (one addition), a ← a + 1
-        match curve.add(Some(r), Some(g)) {
-            Some(nr) => {
-                r = nr;
-                a = addmod(a, 1, n);
-                run.gae_step += 1;
+        run.collect_ms += t_collect.elapsed().as_secs_f64() * 1e3;
+        run.vertices = deg.len() as u64;
+        run.vertices_deg2 = deg.values().filter(|&&c| c >= 2).count() as u64;
+        if available(fulls.len(), run.cycles_available) < needed as u64 {
+            if run.stop_reason.is_empty() {
+                run.stop_reason = "insufficient relations".into();
             }
-            None => {
-                run.stop_reason = "walk hit O".into();
-                break;
-            }
+            run.wall_ms = t_all.elapsed().as_secs_f64() * 1e3;
+            return run;
         }
-    }
-    run.collect_ms += t_collect.elapsed().as_secs_f64() * 1e3;
-    run.vertices = deg.len() as u64;
-    run.vertices_deg2 = deg.values().filter(|&&c| c >= 2).count() as u64;
-    if available(fulls.len(), run.cycles_available) < needed as u64 {
-        if run.stop_reason.is_empty() {
-            run.stop_reason = "insufficient relations".into();
-        }
-        run.wall_ms = t_all.elapsed().as_secs_f64() * 1e3;
-        return run;
-    }
 
-    // Peel degree-one vertices ourselves (one hash lookup per partial), then
-    // eliminate the 2-core with the shared filter.  Every attempt is priced.
-    let t_filter = Instant::now();
-    let core: Vec<PartialRelation> = partials
-        .iter()
-        .filter(|pr| deg.get(&pr.large[0].0).copied().unwrap_or(0) >= 2)
-        .cloned()
-        .collect();
-    run.hash_ops += partials.len() as u64;
-    run.partials_into_filter = core.len() as u64;
-    let mut complete: Vec<CompleteRelation> = Vec::new();
-    if !core.is_empty() {
-        let opts = LargePrimeFilterOptions {
-            modulus: n,
-            ..Default::default()
-        };
-        match filter_large_primes(core.clone(), &opts) {
-            Ok((c, rep)) => {
-                run.filter_complete = c.len() as u64;
-                run.filter_cycles_closed = rep.cycles_closed as u64;
-                run.filter_row_ops += (rep.merges + rep.pivots + rep.peeled_relations) as u64;
-                complete = c;
+        // Peel degree-one vertices ourselves (one hash lookup per partial), then
+        // eliminate the 2-core with the shared filter.  Every attempt is priced.
+        let t_filter = Instant::now();
+        let mut core: Vec<PartialRelation> = Vec::new();
+        for pr in &partials {
+            if deg.get(&pr.large[0].0).copied().unwrap_or(0) < 2 {
+                continue;
             }
-            Err(e) => {
-                run.stop_reason = format!("filter error {e:?}");
-                run.wall_ms = t_all.elapsed().as_secs_f64() * 1e3;
-                return run;
+            let (rw, i, eps, tau, tc) = witness[pr.id as usize];
+            if verified.insert(pr.id) {
+                let fi = fb.pts[i as usize];
+                let fi_s = if eps < 0 { curve.neg(fi) } else { fi };
+                let t_s = if tau < 0 { curve.neg(tc) } else { tc };
+                run.gae_verify += 1;
+                if curve.add(Some(fi_s), Some(t_s)) != Some(rw) {
+                    rejected.insert(pr.id);
+                }
             }
+            if rejected.contains(&pr.id) {
+                run.partials_rejected += 1;
+                continue;
+            }
+            core.push(pr.clone());
         }
-        // Replay every complete row against its sources (algebraic witness).
-        for c in &complete {
-            let ok = replay_complete_relation(c, &core, n).is_some_and(|rc| {
-                let mut a = rc.small.clone();
-                let mut b = c.small.clone();
-                a.sort_unstable();
-                b.sort_unstable();
-                a == b && rc.rhs == c.rhs
-            });
-            if !ok {
-                run.replay_failures += 1;
-            }
-        }
-    }
-    run.filter_ms += t_filter.elapsed().as_secs_f64() * 1e3;
-
-    let mut rows: Vec<(Vec<(u32, u64)>, u64)> = fulls.clone();
-    for c in &complete {
-        rows.push((c.small.clone(), c.rhs));
-    }
-    run.relations_used = rows.len() as u64;
-    let t_la = Instant::now();
-    let mut mults = 0u64;
-    let x = solve_dense(&rows, b_len + 1, n, &mut mults);
-    run.la_mults += mults;
-    run.la_ms += t_la.elapsed().as_secs_f64() * 1e3;
-    match x {
-        Some(x) => {
-            run.solved = true;
-            run.gae_verify += (bits as f64 * 1.5).ceil() as u64; // [x]G == Q
-            run.log_correct = x == k_planted && curve.mul(Some(g), x) == Some(q);
-            run.stop_reason = if run.log_correct {
-                "solved".into()
-            } else {
-                "wrong log".into()
+        run.hash_ops += partials.len() as u64;
+        run.partials_into_filter = core.len() as u64;
+        let mut complete: Vec<CompleteRelation> = Vec::new();
+        if !core.is_empty() {
+            let opts = LargePrimeFilterOptions {
+                modulus: n,
+                ..Default::default()
             };
-            break 'attempt;
+            match filter_large_primes(core.clone(), &opts) {
+                Ok((c, rep)) => {
+                    run.filter_complete = c.len() as u64;
+                    run.filter_cycles_closed = rep.cycles_closed as u64;
+                    run.filter_row_ops += (rep.merges + rep.pivots + rep.peeled_relations) as u64;
+                    complete = c;
+                }
+                Err(e) => {
+                    run.stop_reason = format!("filter error {e:?}");
+                    run.wall_ms = t_all.elapsed().as_secs_f64() * 1e3;
+                    return run;
+                }
+            }
+            // Replay every complete row against its sources (algebraic witness).
+            for c in &complete {
+                let ok = replay_complete_relation(c, &core, n).is_some_and(|rc| {
+                    let mut a = rc.small.clone();
+                    let mut b = c.small.clone();
+                    a.sort_unstable();
+                    b.sort_unstable();
+                    a == b && rc.rhs == c.rhs
+                });
+                if !ok {
+                    run.replay_failures += 1;
+                }
+            }
         }
-        None => {
-            run.la_attempts += 1;
-            if run.la_attempts >= 4 {
-                run.stop_reason = "x not pinned after 4 attempts".into();
+        run.filter_ms += t_filter.elapsed().as_secs_f64() * 1e3;
+
+        let mut rows: Vec<(Vec<(u32, u64)>, u64)> = fulls.clone();
+        for c in &complete {
+            rows.push((c.small.clone(), c.rhs));
+        }
+        run.relations_used = rows.len() as u64;
+        let t_la = Instant::now();
+        let mut mults = 0u64;
+        let x = solve_dense(&rows, b_len + 1, n, &mut mults);
+        run.la_mults += mults;
+        run.la_ms += t_la.elapsed().as_secs_f64() * 1e3;
+        match x {
+            Some(x) => {
+                run.solved = true;
+                run.gae_verify += (bits as f64 * 1.5).ceil() as u64; // [x]G == Q
+                run.log_correct = x == k_planted && curve.mul(Some(g), x) == Some(q);
+                run.stop_reason = if run.log_correct {
+                    "solved".into()
+                } else {
+                    "wrong log".into()
+                };
                 break 'attempt;
             }
-            // rank deficiency: collect `extra` more relations and retry
-            needed += extra.max(8);
+            None => {
+                if std::env::var("GRAPH_DEBUG").is_ok() {
+                    let with_x = rows
+                        .iter()
+                        .filter(|r| r.0.iter().any(|t| t.0 == col_x && t.1 != 0))
+                        .count();
+                    let mut cover = vec![0u32; b_len + 1];
+                    for r in &rows {
+                        for t in &r.0 {
+                            if t.1 != 0 {
+                                cover[t.0 as usize] += 1;
+                            }
+                        }
+                    }
+                    eprintln!(
+                        "DEBUG rows {} with_x {} fulls {} complete {} cover {:?}",
+                        rows.len(),
+                        with_x,
+                        fulls.len(),
+                        complete.len(),
+                        cover
+                    );
+                    for c in complete.iter().take(6) {
+                        eprintln!("  complete {:?} rhs {} src {:?}", c.small, c.rhs, c.sources);
+                    }
+                }
+                run.la_attempts += 1;
+                if run.la_attempts >= 4 {
+                    run.stop_reason = "x not pinned after 4 attempts".into();
+                    break 'attempt;
+                }
+                // rank deficiency: collect `extra` more relations and retry
+                needed += extra.max(8);
+            }
         }
-    }
     }
     run.wall_ms = t_all.elapsed().as_secs_f64() * 1e3;
     run
@@ -566,7 +647,8 @@ fn graph_row(curve: &FastCurve, bits: u32, seed: u64, cell: GraphCell, run: &Gra
                   "filter_cycles_closed": run.filter_cycles_closed,
                   "replay_failures": run.replay_failures,
                   "relations_used": run.relations_used,
-                  "failed_la_attempts": run.la_attempts},
+                  "failed_la_attempts": run.la_attempts,
+                  "partials_rejected_in_verification": run.partials_rejected},
         "wall_ms": {"total": run.wall_ms, "collect": run.collect_ms,
                     "filter": run.filter_ms, "la": run.la_ms},
     })
@@ -601,7 +683,13 @@ fn rho_row(curve: &FastCurve, bits: u32, g: Pt, q: Pt, k: u64, seed: u64) -> Val
     }
 }
 
-fn arm_g(bits_list: &[u32], seeds: u64, quick: bool, out: &mut Vec<Value>, curves: &mut Vec<Value>) {
+fn arm_g(
+    bits_list: &[u32],
+    seeds: u64,
+    quick: bool,
+    out: &mut Vec<Value>,
+    curves: &mut Vec<Value>,
+) {
     let fb_sizes: &[usize] = if quick { &[16, 64] } else { &[16, 64, 256] };
     let shifts: &[Option<u32>] = &[None, Some(12), Some(8), Some(4), Some(0)];
     for &bits in bits_list {
@@ -609,7 +697,11 @@ fn arm_g(bits_list: &[u32], seeds: u64, quick: bool, out: &mut Vec<Value>, curve
             eprintln!("no curve at {bits} bits");
             continue;
         };
-        curves.push(curve_record(&curve, g, &format!("find_a3_curve({bits}, 3)")));
+        curves.push(curve_record(
+            &curve,
+            g,
+            &format!("find_a3_curve({bits}, 3)"),
+        ));
         eprintln!("[G] {bits} bits, n = {}, slug {}", curve.n, slug_of(&curve));
         // planted targets, shared by every arm at this size
         let targets: Vec<(u64, u64, Pt)> = (0..seeds)
@@ -622,29 +714,49 @@ fn arm_g(bits_list: &[u32], seeds: u64, quick: bool, out: &mut Vec<Value>, curve
             .collect();
         for &(seed, k, q) in &targets {
             let row = rho_row(&curve, bits, g, q, k, seed);
-            eprintln!("  rho seed {seed:x}: S_steps {:.3}", row["S_steps"].as_f64().unwrap_or(f64::NAN));
+            eprintln!(
+                "  rho seed {seed:x}: S_steps {:.3}",
+                row["S_steps"].as_f64().unwrap_or(f64::NAN)
+            );
             out.push(row);
         }
         for &fb_size in fb_sizes {
             for &shift in shifts {
-                let cell = GraphCell { fb_size, lp_shift: shift };
+                let cell = GraphCell {
+                    fb_size,
+                    lp_shift: shift,
+                };
                 // Preregistered skip: the baseline's predicted cost ~p GAE.
                 let predicted = match shift {
                     None => curve.f.p as f64,
                     Some(s) => {
                         let ell = ((curve.f.p >> s) as f64).max(1.0);
-                        (curve.f.p as f64) * (fb_size as f64 / (2.0 * ell)).sqrt() + (curve.f.p as f64).sqrt()
+                        (curve.f.p as f64) * (fb_size as f64 / (2.0 * ell)).sqrt()
+                            + (curve.f.p as f64).sqrt()
                     }
                 };
-                let budget = if quick { 4.0e8 } else { 6.0e9 };
+                let budget = if quick { 4.0e8 } else { 2.5e9 };
                 if predicted > budget {
-                    out.push(json!({"arm": "G", "bits": bits, "fb_size": fb_size, "lp_shift": shift,
-                        "skipped": true, "predicted_gae": predicted, "budget_gae": budget}));
-                    eprintln!("  G B={fb_size} shift={shift:?}: skipped (predicted {predicted:.2e} GAE)");
+                    out.push(
+                        json!({"arm": "G", "bits": bits, "fb_size": fb_size, "lp_shift": shift,
+                        "skipped": true, "predicted_gae": predicted, "budget_gae": budget}),
+                    );
+                    eprintln!(
+                        "  G B={fb_size} shift={shift:?}: skipped (predicted {predicted:.2e} GAE)"
+                    );
                     continue;
                 }
                 for &(seed, k, q) in &targets {
-                    let run = graph_ic2(&curve, g, q, k, cell, 8, (budget * 2.0) as u64, seed ^ 0x5EED);
+                    let run = graph_ic2(
+                        &curve,
+                        g,
+                        q,
+                        k,
+                        cell,
+                        8,
+                        (budget * 2.0) as u64,
+                        seed ^ 0x5EED,
+                    );
                     let row = graph_row(&curve, bits, seed, cell, &run);
                     eprintln!(
                         "  G B={fb_size} shift={shift:?} seed {seed:x}: {} S_w0 {:.2} targets {} partials {} wall {:.0} ms",
@@ -825,7 +937,12 @@ fn lattice_trial(
     if dim != row_polys.len() {
         return None; // non-square: shape error
     }
-    let index: HashMap<Vec<u32>, usize> = monos.iter().cloned().enumerate().map(|(i, e)| (e, i)).collect();
+    let index: HashMap<Vec<u32>, usize> = monos
+        .iter()
+        .cloned()
+        .enumerate()
+        .map(|(i, e)| (e, i))
+        .collect();
     let bnd = BigInt::from(bound);
     let scale = |e: &[u32]| -> BigInt {
         let deg: u32 = e.iter().sum();
@@ -893,13 +1010,23 @@ fn fraction_bound_for(target: u64) -> u64 {
     x
 }
 
-fn arm_l(bits_list: &[u32], trials: usize, levels: &[usize], out: &mut Vec<Value>, curves: &mut Vec<Value>) {
+fn arm_l(
+    bits_list: &[u32],
+    trials: usize,
+    levels: &[usize],
+    out: &mut Vec<Value>,
+    curves: &mut Vec<Value>,
+) {
     let deltas = [0.06, 0.08, 0.10, 0.12, 0.14, 0.16, 0.18, 0.20];
     for &bits in bits_list {
         let Some((curve, g)) = find_a3_curve(bits, 3) else {
             continue;
         };
-        curves.push(curve_record(&curve, g, &format!("find_a3_curve({bits}, 3)")));
+        curves.push(curve_record(
+            &curve,
+            g,
+            &format!("find_a3_curve({bits}, 3)"),
+        ));
         let p = curve.f.p as f64;
         for &m in levels {
             if m == 3 && bits > 40 {
@@ -916,9 +1043,13 @@ fn arm_l(bits_list: &[u32], trials: usize, levels: &[usize], out: &mut Vec<Value
                         }
                     };
                     // same seed for both kinds at a cell: same R-sign coin flips
-                    let seed = 0x1A77 + bits as u64 * 1000 + m as u64 * 100 + (delta * 100.0).round() as u64;
+                    let seed = 0x1A77
+                        + bits as u64 * 1000
+                        + m as u64 * 100
+                        + (delta * 100.0).round() as u64;
                     let mut rng = StdRng::seed_from_u64(seed);
-                    let (mut succ, mut hgc, mut vsum, mut done, mut dim, mut failed) = (0, 0, 0, 0, 0, 0);
+                    let (mut succ, mut hgc, mut vsum, mut done, mut dim, mut failed) =
+                        (0, 0, 0, 0, 0, 0);
                     let t0 = Instant::now();
                     for _ in 0..trials {
                         match lattice_trial(&curve, kind, m, bound, &mut rng) {
@@ -941,12 +1072,14 @@ fn arm_l(bits_list: &[u32], trials: usize, levels: &[usize], out: &mut Vec<Value
                     eprintln!(
                         "[L] {bits}b m={m} {kind:?} δ={delta:.2} δ_eff={d_eff:.3} bound={bound} |set|={set_size}: {succ}/{done} HG {hgc}/{done} ({ms:.0} ms)"
                     );
-                    out.push(json!({"arm": "L", "bits": bits, "curve_slug": slug_of(&curve),
+                    out.push(
+                        json!({"arm": "L", "bits": bits, "curve_slug": slug_of(&curve),
                         "kind": format!("{kind:?}"), "level": m, "dim": dim, "delta": delta,
                         "delta_eff": d_eff, "bound": bound, "set_size": set_size, "seed": seed,
                         "trials": done, "trial_failures": failed, "successes": succ,
                         "hg_first_two": hgc, "mean_vanishing": vsum as f64 / done.max(1) as f64,
-                        "ms_per_trial": ms}));
+                        "ms_per_trial": ms}),
+                    );
                 }
             }
         }
@@ -1023,7 +1156,10 @@ fn membership_poly(p: u64, roots: &[u64]) -> Vec<u64> {
 }
 
 fn standard_monomials_2var(basis: &[Poly]) -> Option<u64> {
-    let lms: Vec<&Vec<u32>> = basis.iter().filter_map(|f| f.first().map(|t| &t.0)).collect();
+    let lms: Vec<&Vec<u32>> = basis
+        .iter()
+        .filter_map(|f| f.first().map(|t| &t.0))
+        .collect();
     let a = lms.iter().filter(|e| e[1] == 0).map(|e| e[0]).min()?;
     let b = lms.iter().filter(|e| e[0] == 0).map(|e| e[1]).min()?;
     let mut cnt = 0u64;
@@ -1037,20 +1173,33 @@ fn standard_monomials_2var(basis: &[Poly]) -> Option<u64> {
     Some(cnt)
 }
 
-fn arm_f(bsizes: &[usize], seeds: u64, budget_s: u64, out: &mut Vec<Value>, curves: &mut Vec<Value>) {
+fn arm_f(
+    bsizes: &[usize],
+    seeds: u64,
+    budget_s: u64,
+    out: &mut Vec<Value>,
+    curves: &mut Vec<Value>,
+) {
     let bits = 24u32;
     let Some((curve, g)) = find_a3_curve_2adic(bits, 10) else {
         eprintln!("no 2-adic curve");
         return;
     };
-    curves.push(curve_record(&curve, g, &format!("find_a3_curve_2adic({bits}, 10)")));
+    curves.push(curve_record(
+        &curve,
+        g,
+        &format!("find_a3_curve_2adic({bits}, 10)"),
+    ));
     let p = curve.f.p;
     eprintln!("[F] p = {p}, slug {}", slug_of(&curve));
     let ord = MonoOrder::Grevlex;
     for &bsize in bsizes {
         for family in [FbFamily::Interval, FbFamily::Subgroup, FbFamily::Fraction] {
             let xs = fb_xset(p, family, bsize);
-            let on_curve: Vec<(u64, Pt)> = xs.iter().filter_map(|&x| curve.lift_x(x).map(|pt| (x, pt))).collect();
+            let on_curve: Vec<(u64, Pt)> = xs
+                .iter()
+                .filter_map(|&x| curve.lift_x(x).map(|pt| (x, pt)))
+                .collect();
             let lpoly = membership_poly(p, &xs);
             for s in 0..seeds {
                 let seed = 0xF4F4_0000 + bsize as u64 * 100 + s;
@@ -1071,18 +1220,31 @@ fn arm_f(bsizes: &[usize], seeds: u64, budget_s: u64, out: &mut Vec<Value>, curv
                         s3.push((vec![i, j], c[i as usize][j as usize]));
                     }
                 }
-                let l1: Vec<(Vec<u32>, u64)> = lpoly.iter().enumerate().map(|(k, &cf)| (vec![k as u32, 0], cf)).collect();
-                let l2: Vec<(Vec<u32>, u64)> = lpoly.iter().enumerate().map(|(k, &cf)| (vec![0, k as u32], cf)).collect();
+                let l1: Vec<(Vec<u32>, u64)> = lpoly
+                    .iter()
+                    .enumerate()
+                    .map(|(k, &cf)| (vec![k as u32, 0], cf))
+                    .collect();
+                let l2: Vec<(Vec<u32>, u64)> = lpoly
+                    .iter()
+                    .enumerate()
+                    .map(|(k, &cf)| (vec![0, k as u32], cf))
+                    .collect();
                 let input: Vec<Poly> = vec![
                     f4_fp::normalise(&s3, p, ord),
                     f4_fp::normalise(&l1, p, ord),
                     f4_fp::normalise(&l2, p, ord),
                 ];
                 let planted_ok = input.iter().all(|f| f4_fp::eval(f, &[u, v], p) == 0);
-                let opts = F4Options::new(ord, 2 * bsize as u32 + 8).with_budget(Duration::from_secs(budget_s));
+                let opts = F4Options::new(ord, 2 * bsize as u32 + 8)
+                    .with_budget(Duration::from_secs(budget_s));
                 let rep = f4_fp::f4(&input, 2, p, &opts);
                 let root_in_variety = rep.basis.iter().all(|f| f4_fp::eval(f, &[u, v], p) == 0);
-                let sols = if rep.timed_out { None } else { standard_monomials_2var(&rep.basis) };
+                let sols = if rep.timed_out {
+                    None
+                } else {
+                    standard_monomials_2var(&rep.basis)
+                };
                 // direct subtraction: 7 multiplications per factor-base point
                 // (3 in the shared inversion, 2 slopes, 2 squarings), on the
                 // on-curve part of the set; the inversion itself ~2·log₂p.
@@ -1091,7 +1253,8 @@ fn arm_f(bsizes: &[usize], seeds: u64, budget_s: u64, out: &mut Vec<Value>, curv
                     "[F] B={bsize} {family:?} seed {s}: ops {} deg {} cols {} {:.0} ms sols {:?} root {} timed_out {}",
                     rep.field_ops, rep.solving_degree_max, rep.max_cols, rep.ms, sols, root_in_variety, rep.timed_out
                 );
-                out.push(json!({"arm": "F", "p_bits": bits, "curve_slug": slug_of(&curve),
+                out.push(
+                    json!({"arm": "F", "p_bits": bits, "curve_slug": slug_of(&curve),
                     "family": format!("{family:?}"), "B": bsize, "on_curve": on_curve.len(),
                     "seed": seed, "planted_ok": planted_ok, "root_in_variety": root_in_variety,
                     "inconsistent": rep.inconsistent, "timed_out": rep.timed_out,
@@ -1100,7 +1263,8 @@ fn arm_f(bsizes: &[usize], seeds: u64, budget_s: u64, out: &mut Vec<Value>, curv
                     "max_rows": rep.max_rows, "max_cols": rep.max_cols, "steps": rep.steps,
                     "ms": rep.ms, "solutions_with_multiplicity": sols,
                     "direct_subtraction_mults": ds,
-                    "ratio_f4_over_direct": rep.field_ops as f64 / ds as f64}));
+                    "ratio_f4_over_direct": rep.field_ops as f64 / ds as f64}),
+                );
             }
         }
     }
@@ -1175,7 +1339,10 @@ fn summarize_g(rows: &[Value]) -> Value {
             m.insert("all_correct".into(), json!(ok));
             m.insert("runs".into(), json!(rs.len()));
             for k in WS.iter().chain(["S_steps"].iter()) {
-                m.insert(k.to_string(), json!(median(rs.iter().filter_map(|r| r[*k].as_f64()).collect())));
+                m.insert(
+                    k.to_string(),
+                    json!(median(rs.iter().filter_map(|r| r[*k].as_f64()).collect())),
+                );
             }
             (bits, Value::Object(m))
         })
@@ -1192,7 +1359,10 @@ fn summarize_g(rows: &[Value]) -> Value {
         if valid {
             med.insert((bits, b, s), [m[0], m[1], m[2]]);
         }
-        let rho_w0 = rho_med.get(&bits).and_then(|v| v["S_w0"].as_f64()).unwrap_or(f64::NAN);
+        let rho_w0 = rho_med
+            .get(&bits)
+            .and_then(|v| v["S_w0"].as_f64())
+            .unwrap_or(f64::NAN);
         cell_out.push(json!({"bits": bits, "fb_size": b, "lp_shift": if s < 0 { Value::Null } else { json!(s) },
             "lp_set_size": ell, "runs": rs.len(), "valid": valid,
             "median_targets": median(rs.iter().filter_map(|r| r["targets"].as_f64()).collect()),
@@ -1221,8 +1391,10 @@ fn summarize_g(rows: &[Value]) -> Value {
             }
             None => "no baseline (skipped): extrapolated-only",
         };
-        g1.push(json!({"bits": bits, "fb_size": b, "lp_shift": s, "verdict": verdict,
-            "ratio_to_baseline_w0": med.get(&(bits, b, -1)).map(|base| m[0] / base[0])}));
+        g1.push(
+            json!({"bits": bits, "fb_size": b, "lp_shift": s, "verdict": verdict,
+            "ratio_to_baseline_w0": med.get(&(bits, b, -1)).map(|base| m[0] / base[0])}),
+        );
     }
     // G2
     let mut g2 = Vec::new();
@@ -1239,7 +1411,11 @@ fn summarize_g(rows: &[Value]) -> Value {
             continue;
         }
         let slope = loglog_slope(&pts).unwrap_or(f64::NAN);
-        let verdict = if (-0.65..=-0.35).contains(&slope) { "model holds" } else { "model fails" };
+        let verdict = if (-0.65..=-0.35).contains(&slope) {
+            "model holds"
+        } else {
+            "model fails"
+        };
         g2.push(json!({"bits": bits, "fb_size": b, "points": pts.len(), "slope": slope, "verdict": verdict}));
     }
     // G3
@@ -1322,7 +1498,12 @@ fn summarize_l(rows: &[Value]) -> Value {
     }
     let levels: std::collections::BTreeSet<u64> = diffs.keys().map(|k| k.1).collect();
     let sizes: std::collections::BTreeSet<u64> = diffs.keys().map(|k| k.0).collect();
-    let both = |l: u64, pred: &dyn Fn(f64) -> bool| sizes.len() >= 2 && sizes.iter().all(|b| diffs.get(&(*b, l)).is_some_and(|d| pred(*d)));
+    let both = |l: u64, pred: &dyn Fn(f64) -> bool| {
+        sizes.len() >= 2
+            && sizes
+                .iter()
+                .all(|b| diffs.get(&(*b, l)).is_some_and(|d| pred(*d)))
+    };
     let extends = levels.iter().any(|&l| both(l, &|d| d >= 0.04 - 1e-9));
     let loses = levels.iter().any(|&l| both(l, &|d| d <= -0.04 + 1e-9));
     let same = diffs.values().all(|d| d.abs() <= 0.02 + 1e-9);
@@ -1338,11 +1519,14 @@ fn summarize_l(rows: &[Value]) -> Value {
         "inconclusive"
     };
     let milestone = rows.iter().any(|r| {
-        r["arm"] == "L" && r["kind"] == "Fraction" && r["delta"].as_f64().unwrap_or(0.0) >= 0.20 - 1e-9 && {
-            let s = r["successes"].as_u64().unwrap_or(0);
-            let t = r["trials"].as_u64().unwrap_or(0);
-            t > 0 && 2 * s >= t
-        }
+        r["arm"] == "L"
+            && r["kind"] == "Fraction"
+            && r["delta"].as_f64().unwrap_or(0.0) >= 0.20 - 1e-9
+            && {
+                let s = r["successes"].as_u64().unwrap_or(0);
+                let t = r["trials"].as_u64().unwrap_or(0);
+                t > 0 && 2 * s >= t
+            }
     });
     json!({"series": series, "positive_control_ok": pos_ok,
         "delta_star_diff_fraction_minus_interval": diffs.iter().map(|(k, d)| json!({"bits": k.0, "level": k.1, "diff": d})).collect::<Vec<_>>(),
@@ -1353,18 +1537,26 @@ fn summarize_f(rows: &[Value]) -> Value {
     use std::collections::BTreeMap;
     let mut by: BTreeMap<(String, u64), Vec<&Value>> = BTreeMap::new();
     for r in rows.iter().filter(|r| r["arm"] == "F") {
-        by.entry((r["family"].as_str().unwrap_or("").to_string(), r["B"].as_u64().unwrap_or(0)))
-            .or_default()
-            .push(r);
+        by.entry((
+            r["family"].as_str().unwrap_or("").to_string(),
+            r["B"].as_u64().unwrap_or(0),
+        ))
+        .or_default()
+        .push(r);
     }
     let mut pos_ok = true;
     let mut max_sol_ratio = 0.0f64;
     let mut fam: BTreeMap<String, Vec<Value>> = BTreeMap::new();
     let mut pts: BTreeMap<String, Vec<(f64, f64, f64)>> = BTreeMap::new();
     for ((family, b), rs) in &by {
-        let done: Vec<&&Value> = rs.iter().filter(|r| r["timed_out"].as_bool() == Some(false)).collect();
+        let done: Vec<&&Value> = rs
+            .iter()
+            .filter(|r| r["timed_out"].as_bool() == Some(false))
+            .collect();
         for r in &done {
-            if r["root_in_variety"].as_bool() != Some(true) || r["planted_ok"].as_bool() != Some(true) {
+            if r["root_in_variety"].as_bool() != Some(true)
+                || r["planted_ok"].as_bool() != Some(true)
+            {
                 pos_ok = false;
             }
             if let Some(s) = r["solutions_with_multiplicity"].as_f64() {
@@ -1372,10 +1564,20 @@ fn summarize_f(rows: &[Value]) -> Value {
             }
         }
         let complete = done.len() == rs.len() && !rs.is_empty();
-        let ops = median(done.iter().filter_map(|r| r["field_ops"].as_f64()).collect());
-        let ratio = median(done.iter().filter_map(|r| r["ratio_f4_over_direct"].as_f64()).collect());
+        let ops = median(
+            done.iter()
+                .filter_map(|r| r["field_ops"].as_f64())
+                .collect(),
+        );
+        let ratio = median(
+            done.iter()
+                .filter_map(|r| r["ratio_f4_over_direct"].as_f64())
+                .collect(),
+        );
         if complete {
-            pts.entry(family.clone()).or_default().push((*b as f64, ops, ratio));
+            pts.entry(family.clone())
+                .or_default()
+                .push((*b as f64, ops, ratio));
         }
         fam.entry(family.clone()).or_default().push(json!({"B": b, "runs": rs.len(), "completed": done.len(),
             "median_field_ops": ops, "median_ratio_to_direct": ratio,
@@ -1472,7 +1674,12 @@ fn main() {
     let write = |name: &str, rows: &[Value], meta: &Value| {
         let path = format!("{out_dir}/{name}");
         let mut f = std::fs::File::create(&path).expect("create");
-        writeln!(f, "{}", serde_json::to_string(&json!({"meta": meta})).unwrap()).unwrap();
+        writeln!(
+            f,
+            "{}",
+            serde_json::to_string(&json!({"meta": meta})).unwrap()
+        )
+        .unwrap();
         for r in rows {
             writeln!(f, "{}", serde_json::to_string(r).unwrap()).unwrap();
         }
@@ -1480,7 +1687,13 @@ fn main() {
     };
     if arm.contains('g') {
         let mut rows = Vec::new();
-        let b = bits.clone().unwrap_or_else(|| if quick { vec![20, 24] } else { vec![20, 24, 28, 32] });
+        let b = bits.clone().unwrap_or_else(|| {
+            if quick {
+                vec![20, 24]
+            } else {
+                vec![20, 24, 28, 32]
+            }
+        });
         arm_g(&b, seeds.unwrap_or(3), quick, &mut rows, &mut curves);
         write("arm_g.jsonl", &rows, &meta);
     }
@@ -1488,20 +1701,44 @@ fn main() {
         let mut rows = Vec::new();
         let b = bits.clone().unwrap_or_else(|| vec![40, 56]);
         let levels: &[usize] = if quick { &[1] } else { &[1, 2, 3] };
-        arm_l(&b, if quick { 4 } else { seeds.map(|s| s as usize).unwrap_or(16) }, levels, &mut rows, &mut curves);
+        arm_l(
+            &b,
+            if quick {
+                4
+            } else {
+                seeds.map(|s| s as usize).unwrap_or(16)
+            },
+            levels,
+            &mut rows,
+            &mut curves,
+        );
         write("arm_l.jsonl", &rows, &meta);
     }
     if arm.contains('f') {
         let mut rows = Vec::new();
-        let bs: &[usize] = if quick { &[8, 16] } else { &[8, 16, 32, 64, 128] };
-        arm_f(bs, seeds.unwrap_or(3), if quick { 30 } else { 600 }, &mut rows, &mut curves);
+        let bs: &[usize] = if quick {
+            &[8, 16]
+        } else {
+            &[8, 16, 32, 64, 128, 256, 512, 1024]
+        };
+        arm_f(
+            bs,
+            seeds.unwrap_or(3),
+            if quick { 30 } else { 600 },
+            &mut rows,
+            &mut curves,
+        );
         write("arm_f.jsonl", &rows, &meta);
     }
     curves.sort_by_key(|c| c["slug"].to_string());
     curves.dedup_by_key(|c| c["slug"].to_string());
     if !curves.is_empty() {
         let path = format!("{out_dir}/curves.json");
-        std::fs::write(&path, serde_json::to_string_pretty(&json!({"curves": curves})).unwrap()).unwrap();
+        std::fs::write(
+            &path,
+            serde_json::to_string_pretty(&json!({"curves": curves})).unwrap(),
+        )
+        .unwrap();
     }
     eprintln!("done in {:.1} s", started.elapsed().as_secs_f64());
 }
@@ -1516,7 +1753,19 @@ mod tests {
         let k = 12_345 % curve.n;
         let q = curve.mul(Some(g), k).unwrap();
         for shift in [None, Some(4), Some(0)] {
-            let run = graph_ic2(&curve, g, q, k, GraphCell { fb_size: 16, lp_shift: shift }, 8, 1 << 30, 7);
+            let run = graph_ic2(
+                &curve,
+                g,
+                q,
+                k,
+                GraphCell {
+                    fb_size: 16,
+                    lp_shift: shift,
+                },
+                8,
+                1 << 30,
+                7,
+            );
             assert!(run.log_correct, "{shift:?}: {}", run.stop_reason);
             assert_eq!(run.replay_failures, 0);
         }
@@ -1566,20 +1815,40 @@ mod tests {
         for family in [FbFamily::Interval, FbFamily::Subgroup, FbFamily::Fraction] {
             let xs = fb_xset(p, family, 8);
             assert_eq!(xs.len(), 8);
-            let on: Vec<(u64, Pt)> = xs.iter().filter_map(|&x| curve.lift_x(x).map(|pt| (x, pt))).collect();
+            let on: Vec<(u64, Pt)> = xs
+                .iter()
+                .filter_map(|&x| curve.lift_x(x).map(|pt| (x, pt)))
+                .collect();
             let (u, pu) = on[0];
             let (v, pv) = on[on.len() - 1];
             let r = curve.add(Some(pu), Some(pv)).unwrap();
             let c = s3_coeffs(&curve, r.x);
-            let s3: Vec<(Vec<u32>, u64)> = (0..9).map(|t| (vec![t / 3, t % 3], c[(t / 3) as usize][(t % 3) as usize])).collect();
+            let s3: Vec<(Vec<u32>, u64)> = (0..9)
+                .map(|t| (vec![t / 3, t % 3], c[(t / 3) as usize][(t % 3) as usize]))
+                .collect();
             let l = membership_poly(p, &xs);
-            let l1: Vec<_> = l.iter().enumerate().map(|(k, &cf)| (vec![k as u32, 0], cf)).collect();
-            let l2: Vec<_> = l.iter().enumerate().map(|(k, &cf)| (vec![0, k as u32], cf)).collect();
-            let input = vec![f4_fp::normalise(&s3, p, ord), f4_fp::normalise(&l1, p, ord), f4_fp::normalise(&l2, p, ord)];
+            let l1: Vec<_> = l
+                .iter()
+                .enumerate()
+                .map(|(k, &cf)| (vec![k as u32, 0], cf))
+                .collect();
+            let l2: Vec<_> = l
+                .iter()
+                .enumerate()
+                .map(|(k, &cf)| (vec![0, k as u32], cf))
+                .collect();
+            let input = vec![
+                f4_fp::normalise(&s3, p, ord),
+                f4_fp::normalise(&l1, p, ord),
+                f4_fp::normalise(&l2, p, ord),
+            ];
             assert!(input.iter().all(|f| f4_fp::eval(f, &[u, v], p) == 0));
             let rep = f4_fp::f4(&input, 2, p, &F4Options::new(ord, 24));
             assert!(!rep.inconsistent);
-            assert!(rep.basis.iter().all(|f| f4_fp::eval(f, &[u, v], p) == 0), "{family:?}");
+            assert!(
+                rep.basis.iter().all(|f| f4_fp::eval(f, &[u, v], p) == 0),
+                "{family:?}"
+            );
             assert!(standard_monomials_2var(&rep.basis).unwrap() >= 1);
         }
     }
