@@ -656,3 +656,43 @@ This is an **ideal exact group-oracle rank and system-count survey**.
 It does not price S4, heal the p=73 failure, or claim a polynomial IC
 gain. A later native polynomial thinning experiment requires its own
 frozen choice, source version, complete cost and independent replay.
+
+## Registered native polynomial validation of every thinning choice
+
+Frozen 23 October 2026 after the 21-case ideal oracle survey and its
+byte-identical A/A, before implementing a native thinning producer.
+Run the **entire** same 21-case grid: p=73 with j=1,2,3,4 and p=97
+with j=1,2,3, each at seeds 0,1,2. Retain all L0 points and the first
+j L2 orbits under the survey's physical-index ordering. Keep the same
+canonical curve, generator, public target `[271]G`, original full-base
+signs and frozen residual trace. Stop only after anchored full rank or
+the recorded stream end. The source and auditor are separate new files;
+the previous scaling source and raw records remain frozen. Construct
+the **full** physical base and its verified twist map before extracting
+the subset, and charge that work; for a proper subset, also charge its
+own verified orbit map. This deliberately conservative setup accounting
+isolates the S4 system-count tradeoff. Use the same interpolation RNG,
+signed L2 peel, native S4 solver, sign reconstruction, row selection,
+scalar checks and strongest same-target twist24 rho as the earlier
+scaling producer. The full-j control must reproduce the older run's
+non-timing relation stream, selected rows, answer and operation counts
+after excluding newly explicit subset metadata. Do not tune the solver
+by j or hide failed systems.
+
+For every case, a separate point-keyed signed-pair auditor must derive
+the orbit-complete subset from the frozen full base, independently BSGS
+verify each physical factor and target log, compare **every processed
+signed k=1 set**, reconstruct the folded coefficients and anchored
+matrix, and check the recovered scalar by group multiplication. Mark
+any missing relation as partial even if the target is recovered; retain
+all censored, failed and timed-out cases. Run a full A/A for each case,
+compare all non-timing fields and audit outputs exactly. Bound each
+producer and auditor by 8 GiB address space and 1,200 seconds. Report
+individual one-target rows, not a pooled multi-target cost. The
+predeclared arithmetic endpoint is counted cold `Fp M` against the
+same-seed full-j polynomial run, with group and matrix operations
+separate; the matched same-target rho gap must appear on every row.
+Native hash/allocator CPU and peak bytes, calibrated GAE, isolated
+ABAB timing and same-input msolve/Magma remain gates before any priced
+whole-method speed or fastest-solver claim. The ideal-oracle survey is
+a hypothesis screen, not part of the candidate's relation work.
