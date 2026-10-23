@@ -101,6 +101,10 @@ model output is `descent_degree_cost-output-20261016-scale.txt`.
    - At the priced m = 4, ℓ = 33 cell the hybrid beats degree 5 only if
      k ≤ 6. Linear growth in ℓ gives about 105; a bounded k is not
      excluded. Its best case is the `2^68.43` degree-4 row. No row moves.
+10. **Three guesses at ℓ = 8 do not suffice for variables 7, 15, 23 (§11).**
+    - Three of four draws have a branch that saturates degree 4; four guesses
+      (§10) did suffice. This says nothing yet about other sets or a growth
+      law. No row moves.
 
 ## 1. What is measured
 
@@ -504,6 +508,24 @@ draws (N = 46), all 16 branches each.
 - **What would move a row:** k measured to stay bounded as ℓ grows (k = 3
   at ℓ = 8, then ℓ = 9). Even then its best case is the degree-4 row
   `2^68.43`, `2^+7.62` over rho. The free-oracle floor binds every row.
+
+## 11. Three guesses at ℓ = 8 (2026-10-23)
+
+`research/dreg_closure_guess3_20261023/` guessed variables 7, 15 and 23 (the
+top coordinate of each summand) on the same 4 unsatisfiable m = 3, ℓ = 8
+draws (N = 43, 136,698 columns), 8 branches per draw.
+
+- **Three do not suffice for this set.** Draws 0, 3 and 5 each have a branch
+  that saturates degree 4 without refuting; draw 6 refutes on 8 of 8. The
+  controls are valid (the ℓ = 7 identity control matches its committed
+  record; the dimension-6 control refutes on 4 of 4).
+- **Four did (§10).** So the set matters or the count does, and this study
+  does not separate them. One cell does not by itself kill the
+  guess-then-degree-4 route or fix a growth law.
+- **The price is unchanged.** At the m = 4, ℓ = 33 cell (N = 394) the ratio
+  `C(N, ≤5) / (2^k · C(N−k, ≤4))` is 78.2, 39.5, 19.95, 10.08, 5.09 for
+  k = 0..4, and the hybrid beats degree 5 only if k ≤ 6.
+- **No row moves** and none beats rho.
 
 ## Scope and disclosures
 

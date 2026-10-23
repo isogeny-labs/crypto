@@ -895,6 +895,25 @@ branches each, and runs the degree-4 closure on every branch.
   variables that occur after `--fix`. The engine's columns already ran over
   those, and unspecialised systems are unchanged.
 
+## Result 16: three guessed variables do not suffice at ℓ = 8 for this set
+
+`research/dreg_closure_guess3_20261023/` was pre-registered. At m = 3,
+(n, ℓ) = (22, 8) on the same 4 unsatisfiable draws, it guesses variables 7,
+15 and 23 (the top coordinate of each summand, no intermediate coordinate),
+8 branches per draw, N = 43, 136,698 degree-4 columns.
+
+- **Registered verdict: three guesses do not suffice at ℓ = 8 (for this
+  guess set).** 1 draw suffices (draw 6, 8 of 8 branches refute) and 3 do not
+  (draws 0, 3, 5: the first branch saturates degree 4 without the constant
+  `1`; the other 7 branches were not run, by the registered stop rule).
+- **Controls valid.** The unspecialised ℓ = 7 draw matches the committed
+  scale-study record on every non-timing field; the dimension-6 control
+  refutes on 4 of 4.
+- **What it says.** Three do not suffice for variables 7, 15, 23; four
+  (7, 15, 23, 24) did in Result 15. One cell does not fix a growth law, and
+  another three-variable set is unmeasured.
+- **Memory.** Peak 7.04 GB under the 15 GB limit.
+
 ## Reproducing
 
 ```sh
