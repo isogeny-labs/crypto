@@ -87,6 +87,11 @@ used.
 Gaudry-type HCDLP: 27 to 30 bits above rho. Diem-type exponent: 18 to 22
 bits below rho before constants. Neither is a measured end-to-end cost.
 
+## Verification run
+`cargo test --release --lib` on this branch (with `phi_exact` and the l = 5..13
+lookup): 4488 passed, 0 failed, 119 ignored (the repo's own `#[ignore]` markers),
+419 s. The new `phi_exact_matches_tables_and_kronecker` test is among the passes.
+
 ## Not done
 - Hess generalized covers (direction 1 proper): needs function-field
   arithmetic; Magma, Sage and pdflatex are not installed here, and the
