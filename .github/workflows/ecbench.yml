@@ -478,7 +478,9 @@ jobs:
           name: ecbench-pr-audit-bin
           path: target/release
       - name: Validate committed evidence integrity on pull requests
-        timeout-minutes: 12
+        # One audit per CPU over ~500 sessions: about 7 min on 4 vCPUs, about
+        # 14 min on the 2-vCPU hosted runners.
+        timeout-minutes: 20
         run: |
           chmod +x target/release/ecbench
           bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
