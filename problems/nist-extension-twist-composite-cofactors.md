@@ -136,3 +136,11 @@ returns no additional factors for the nine original integers or the exact
 products and that their pieces only group whole local pieces. Seven
 original targets are more completely factored locally and two partitions
 agree. This does not establish novelty or explain the historical skip.
+
+R06: a separate local 1800-second continuation uses the validated patched
+binary and R05's main relation checkpoint. Checksums and arithmetic replay
+pass before compute; the inherited worker output is retained outside the
+active state. The [dated observation](../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R06-20261023/OBSERVATION.json)
+records two running native workers at 2026-10-23 01:43:40 UTC. Final status,
+archive and post-run replay remain pending until termination; no new
+factor or completed factorization is claimed.
