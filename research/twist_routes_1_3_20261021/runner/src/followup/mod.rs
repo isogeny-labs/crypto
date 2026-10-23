@@ -1,5 +1,6 @@
 //! Native follow-up experiments. Every command requires a fresh output tree.
 mod bigfield;
+mod geometry;
 mod gluing;
 
 use crate::{digest, write_json, Fixture, Result};
@@ -101,6 +102,15 @@ pub fn main(args: &[String]) -> Result<()> {
     let rows = match command.as_str() {
         "filters" => gluing::filters(&src, out)?,
         "torsion" => gluing::torsion(&src, out)?,
+        "geometry-input" => geometry::input(&src, out)?,
+        "geometry-verify" => geometry::verify(
+            &src,
+            Path::new(args.get(3).ok_or("missing GP stdout")?),
+            out,
+        )?,
+        "adjudicate-cas" => {
+            adjudicate(Path::new(args.get(3).ok_or("missing CAS log prefix")?), out)?
+        }
         _ => return Err("followup: expected filters or torsion".into()),
     };
     write_json(
@@ -114,4 +124,85 @@ pub fn main(args: &[String]) -> Result<()> {
         json!({"status":"finished","command":command,"rows":rows.len(),"out":out})
     );
     Ok(())
+}
+
+fn adjudicate(prefix: &Path, out: &Path) -> Result<Vec<Value>> {
+    let suffix = |s: &str| std::path::PathBuf::from(format!("{}.{s}", prefix.display()));
+    let meta: Value = serde_json::from_slice(&fs::read(suffix("json"))?)?;
+    let stdout = fs::read(suffix("stdout"))?;
+    let stderr = fs::read(suffix("stderr"))?;
+    let text = std::str::from_utf8(&stdout)?;
+    let errors = std::str::from_utf8(&stderr)?;
+    let allowed_warning =
+        |line: &str| line.trim().is_empty() || line.contains("Warning: new maximum stack size =");
+    let error_lines = errors
+        .lines()
+        .filter(|l| !allowed_warning(l))
+        .collect::<Vec<_>>();
+    let marker = text.contains("INDEPENDENT_MODULE_REPLAY_OK")
+        || text.contains("ALL_TORSION_REPLAY_OK")
+        || text.contains("ALL_GEOMETRY_SEARCH_DONE");
+    let hashes_match =
+        meta["stdout_sha256"] == digest(&stdout) && meta["stderr_sha256"] == digest(&stderr);
+    let script = meta["argv"]
+        .as_array()
+        .and_then(|xs| xs.last())
+        .and_then(Value::as_str)
+        .ok_or("missing CAS input path")?;
+    let script_hash_matches = meta["script_sha256"] == digest(&fs::read(script)?);
+    let accepted = meta["exit_code"] == 0
+        && marker
+        && hashes_match
+        && script_hash_matches
+        && error_lines.is_empty();
+    let row = json!({"schema":"twist.native-cas-adjudication/v1","log_prefix":prefix,"transport_metadata":meta,
+      "completion_marker_present":marker,"raw_hashes_match":hashes_match,"script_hash_matches":script_hash_matches,"allowed_stack_warning_present":errors.contains("Warning: new maximum stack size ="),
+      "unaccepted_error_lines":error_lines,"accepted":accepted,"status":if accepted{"accepted-native-checked-CAS-replay"}else{"invalid-or-incomplete-CAS-replay"},
+      "scope":"The GP script performs independent group/pairing/polynomial checks. This Rust gate rejects errors even when GP exits zero and prints a marker."});
+    write_json(out.join("ADJUDICATION.json"), &row)?;
+    if !accepted {
+        return Err("CAS replay contains errors, missing output or hash mismatches".into());
+    }
+    Ok(vec![row])
+}
+
+#[cfg(test)]
+mod cas_tests {
+    use super::*;
+    #[test]
+    fn gp_zero_exit_and_marker_cannot_hide_errors_or_input_mutation() {
+        let dir = std::env::temp_dir().join(format!("twist-cas-gate-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        let script = dir.join("input.gp");
+        fs::write(&script, "print(1);\n").unwrap();
+        for (index, stderr, input_hash, expected) in [
+            (
+                0,
+                "  *** Warning: new maximum stack size = 4000002048\n",
+                digest(&fs::read(&script).unwrap()),
+                true,
+            ),
+            (
+                1,
+                "  *** user error: bad Weil pairing\n",
+                digest(&fs::read(&script).unwrap()),
+                false,
+            ),
+            (2, "", String::from("wrong-input-hash"), false),
+        ] {
+            let prefix = dir.join(format!("case-{index}"));
+            let stdout = "ALL_TORSION_REPLAY_OK\n";
+            fs::write(format!("{}.stdout", prefix.display()), stdout).unwrap();
+            fs::write(format!("{}.stderr", prefix.display()), stderr).unwrap();
+            write_json(format!("{}.json",prefix.display()),&json!({"exit_code":0,"argv":["gp","-f","-q",script],
+              "script_sha256":input_hash,"stdout_sha256":digest(stdout.as_bytes()),"stderr_sha256":digest(stderr.as_bytes())})).unwrap();
+            let out = dir.join(format!("out-{index}"));
+            fs::create_dir_all(&out).unwrap();
+            assert_eq!(adjudicate(&prefix, &out).is_ok(), expected);
+            let row: Value =
+                serde_json::from_slice(&fs::read(out.join("ADJUDICATION.json")).unwrap()).unwrap();
+            assert_eq!(row["accepted"], expected);
+        }
+        fs::remove_dir_all(dir).unwrap();
+    }
 }

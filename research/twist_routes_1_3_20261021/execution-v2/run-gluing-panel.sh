@@ -7,7 +7,7 @@ cd -- "$repo_dir"
 panel="${1:?filters or torsion}"
 output="${2:?fresh output directory}"
 source_name="${3:-}"
-case "$panel" in filters) cap=1400 ;; torsion) cap=1800 ;; *) exit 2 ;; esac
+case "$panel" in filters) cap=1400 ;; torsion) cap=1800 ;; geometry-input|geometry-verify|adjudicate-cas) cap=3600 ;; *) exit 2 ;; esac
 test ! -e "$output"
 revision="$(git rev-parse HEAD)"
 pinned_dir="/tmp/twist-v2-pinned/$revision"
@@ -37,7 +37,8 @@ const study='research/twist_routes_1_3_20261021';
 fs.writeFileSync(receipt+'.json',JSON.stringify({schema:'twist.run-receipt/v2',source_commit:revision,
  binary_sha256:binary_sha,argv,started_utc:started,finished_utc:new Date().toISOString(),exit_code:Number(status),
  timeout_s:Number(cap),address_space_kib:4194304,threads:1,isolation:'L0',wall_time_admitted:false,
- protocol_path:study+'/execution-v2/GLUING_PROTOCOL_V1.md',protocol_sha256:hash(study+'/execution-v2/GLUING_PROTOCOL_V1.md'),
+ protocol_path:study+'/execution-v2/GLUING_PROTOCOL_V2.md',protocol_sha256:hash(study+'/execution-v2/GLUING_PROTOCOL_V2.md'),
+ base_protocol_path:study+'/execution-v2/GLUING_PROTOCOL_V1.md',base_protocol_sha256:hash(study+'/execution-v2/GLUING_PROTOCOL_V1.md'),
  fixture_sha256:hash(study+'/execution-v1/fixtures.json'),registry_sha256:hash('docs/curves/registry.json'),
  stdout_sha256:hash(receipt+'.stdout'),stderr_sha256:hash(receipt+'.stderr'),
  performance_claim:false,geometric_quotient_claim:false},null,2)+'\n');

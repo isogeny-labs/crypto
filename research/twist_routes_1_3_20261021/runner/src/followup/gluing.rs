@@ -199,11 +199,12 @@ fn certificate(s: &Source) -> Value {
     let mut gp=format!("p={};d={};a={};b={};M=Mod(1,p)*({}-{}*x^2+x^4);if(!polisirreducible(M),error(\"reducible field\"));z=ffgen(M,'z);E=ellinit([a,b],z);P={};Q={};Z={};\n",s.p,s.d,s.a,s.b,modulus[0],k.eta.clone()*2u32,gp_p(&k,&p),gp_p(&k,&q),gp_f(&k,&zeta));
     gp.push_str("if(!ellisoncurve(E,P)||!ellisoncurve(E,Q)||ellmul(E,P,3)!=[0]||ellmul(E,Q,3)!=[0]||P==Q||P==ellneg(E,Q),error(\"bad basis\"));if(ellweilpairing(E,P,Q,3)!=Z||Z^3!=1||Z==1,error(\"pairing mismatch\"));\n");
     gp.push_str(&format!("A=Mod([{},{};{},{}],3);ET=ellinit([d^2*a,d^3*b],z);TP={};TQ={};if(ellweilpairing(ET,TP,TQ,3)!=Z,error(\"twist pairing mismatch\"));\n",a[0],a[1],a[2],a[3],gp_p(&k,&tp),gp_p(&k,&tq)));
-    gp.push_str("frob(P)=if(P==[0],P,[P[1]^p,P[2]^p]);image(E,P,Q,u,v)=elladd(E,ellmul(E,P,u),ellmul(E,Q,v));\n");
-    gp.push_str("if(frob(P)!=image(E,P,Q,lift(A[1,1]),lift(A[2,1]))||frob(Q)!=image(E,P,Q,lift(A[1,2]),lift(A[2,2])),error(\"Frobenius mismatch\"));if(frob(TP)!=image(ET,TP,TQ,lift(-A[1,1]),lift(-A[2,1]))||frob(TQ)!=image(ET,TP,TQ,lift(-A[1,2]),lift(-A[2,2])),error(\"twist Frobenius mismatch\"));\n");
+    gp.push_str("twist_frob(P)={if(P==[0],P,[P[1]^p,P[2]^p])};\n");
+    gp.push_str("twist_linear(E,P,Q,u,v)={elladd(E,ellmul(E,P,u),ellmul(E,Q,v))};\n");
+    gp.push_str("if(twist_frob(P)!=twist_linear(E,P,Q,lift(A[1,1]),lift(A[2,1]))||twist_frob(Q)!=twist_linear(E,P,Q,lift(A[1,2]),lift(A[2,2])),error(\"Frobenius mismatch\"));if(twist_frob(TP)!=twist_linear(ET,TP,TQ,lift(-A[1,1]),lift(-A[2,1]))||twist_frob(TQ)!=twist_linear(ET,TP,TQ,lift(-A[1,2]),lift(-A[2,2])),error(\"twist Frobenius mismatch\"));\n");
     for map in &maps {
         let m: Vec<u64> = serde_json::from_value(map["matrix"].clone()).unwrap();
-        gp.push_str(&format!("MP=image(ET,TP,TQ,{},{});MQ=image(ET,TP,TQ,{},{});if(ellweilpairing(ET,MP,MQ,3)!=Z^2,error(\"anti pairing\"));for(i=0,2,for(j=0,2,my(C=lift(A*Mod([i,j]~,3)));if(frob(image(ET,MP,MQ,i,j))!=image(ET,MP,MQ,C[1],C[2]),error(\"graph Frobenius\"))));\n",m[0],m[2],m[1],m[3]));
+        gp.push_str(&format!("MP=twist_linear(ET,TP,TQ,{},{});MQ=twist_linear(ET,TP,TQ,{},{});if(ellweilpairing(ET,MP,MQ,3)!=Z^2,error(\"anti pairing\"));for(i=0,2,for(j=0,2,my(C=lift(A*Mod([i,j]~,3)));if(twist_frob(twist_linear(ET,MP,MQ,i,j))!=twist_linear(ET,MP,MQ,C[1],C[2]),error(\"graph Frobenius\"))));\n",m[0],m[2],m[1],m[3]));
     }
     gp.push_str(&format!("print(\"TORSION_REPLAY_OK {}\");\n", s.name));
     json!({"experiment":"E18","status":"actual-3-torsion-and-anti-isometries-constructed-native-verifier-pending-independent-GP",
