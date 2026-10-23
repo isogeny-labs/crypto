@@ -5,6 +5,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/**'
+      - '.github/actionlint.yaml'
       - '.github/scripts/run-actionlint.sh'
 # A newer push to the same pull request cancels this workflow's run for the older commit.
 # Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
@@ -25,6 +26,7 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /.github/workflows/
+            /.github/actionlint.yaml
             /.github/scripts/run-actionlint.sh
       - uses: actions/setup-python@v5
         with:
