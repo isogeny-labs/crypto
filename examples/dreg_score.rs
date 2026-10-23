@@ -689,15 +689,32 @@ fn fix_outcome(path: &str) -> &'static str {
 
 /// Score `research/dreg_closure_guess_20261022` (its PREREGISTRATION.md): one
 /// `dreg_closure --fix` output per `<cell>.d<K>.<arm>.jsonl`, arm `G6` (the
-/// positive control) or `G4b<B>` (branch B, 0..16, of the four guessed
-/// variables).  Per draw, four guesses suffice when all 16 branches refute at
-/// ≤ 4 and fail once one branch does not; the run stops a draw's branches at
-/// its first failure.  Controls are valid when G6 refutes on ≥ 3 of the 4
-/// draws; then ≥ 3 draws sufficing reads "four guesses suffice at ℓ = 8",
-/// ≥ 3 failing reads "four guesses do not suffice", anything else is mixed.
-fn guess(paths: &[String]) {
+/// positive control) or `G<K>b<B>` (branch B, 0..2^K, of the K guessed
+/// variables; K is `--k K`, default 4).  Per draw, K guesses suffice when all
+/// 2^K branches refute at ≤ 4 and fail once one branch does not; the run stops
+/// a draw's branches at its first failure.  Controls are valid when G6 refutes
+/// on ≥ 3 of the 4 draws; then ≥ 3 draws sufficing reads "K guesses suffice at
+/// ℓ = 8", ≥ 3 failing reads "K guesses do not suffice", anything else is mixed.
+fn guess(args: &[String]) {
+    let mut k: u32 = 4;
+    let mut paths: Vec<String> = Vec::new();
+    let mut it = args.iter();
+    while let Some(a) = it.next() {
+        if a == "--k" {
+            k = it.next().expect("--k K").parse().expect("K");
+        } else {
+            paths.push(a.clone());
+        }
+    }
+    let nb = 1u32 << k;
+    let words = [
+        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+    ];
+    let kw = words
+        .get(k as usize)
+        .map_or_else(|| k.to_string(), |w| w.to_string());
     let mut grid: BTreeMap<(String, u64), BTreeMap<String, &'static str>> = BTreeMap::new();
-    for path in paths {
+    for path in &paths {
         let name = std::path::Path::new(path)
             .file_name()
             .and_then(|f| f.to_str())
@@ -711,7 +728,7 @@ fn guess(paths: &[String]) {
             .or_default()
             .insert(parts[2].to_string(), fix_outcome(path));
     }
-    println!("| cell | draw | G6 (6,6,6) | G4 branches refuting | G4 branches not refuting | G4 unmeasured | four guesses |");
+    println!("| cell | draw | G6 (6,6,6) | G{k} branches refuting | G{k} branches not refuting | G{k} unmeasured | {kw} guesses |");
     println!("|---|--:|---|--:|--:|--:|---|");
     let (mut g6_ref, mut suffice, mut fail, mut draws) = (0, 0, 0, 0);
     for ((cell, draw), row) in &grid {
@@ -721,8 +738,8 @@ fn guess(paths: &[String]) {
             g6_ref += 1;
         }
         let (mut r, mut n, mut u) = (0, 0, 0);
-        for b in 0..16 {
-            match row.get(&format!("G4b{b}")).copied() {
+        for b in 0..nb {
+            match row.get(&format!("G{k}b{b}")).copied() {
                 Some("refutes") => r += 1,
                 Some("does not") => n += 1,
                 _ => u += 1,
@@ -731,7 +748,7 @@ fn guess(paths: &[String]) {
         let verdict = if n > 0 {
             fail += 1;
             "do not suffice"
-        } else if r == 16 {
+        } else if r == nb {
             suffice += 1;
             "suffice"
         } else {
@@ -746,13 +763,13 @@ fn guess(paths: &[String]) {
         if valid { "valid" } else { "NOT valid" }
     );
     let v = if !valid {
-        "uninformative (control not valid)"
+        "uninformative (control not valid)".to_string()
     } else if suffice >= 3 {
-        "four guesses suffice at ℓ = 8"
+        format!("{kw} guesses suffice at ℓ = 8")
     } else if fail >= 3 {
-        "four guesses do not suffice at ℓ = 8"
+        format!("{kw} guesses do not suffice at ℓ = 8")
     } else {
-        "mixed"
+        "mixed".to_string()
     };
     println!("Draws: {suffice} suffice, {fail} do not → {v}");
 }
@@ -770,7 +787,7 @@ fn main() {
         Some("guess") => guess(&args[1..]),
         _ => {
             eprintln!(
-                "usage: dreg_score score FILES… | compare REF RERUN | semireg M n:ℓ… | shape M n:ℓ:D… | closure FILES… | scale FILES… | specialise FILES… | guess FILES…"
+                "usage: dreg_score score FILES… | compare REF RERUN | semireg M n:ℓ… | shape M n:ℓ:D… | closure FILES… | scale FILES… | specialise FILES… | guess [--k K] FILES…"
             );
             std::process::exit(2);
         }
