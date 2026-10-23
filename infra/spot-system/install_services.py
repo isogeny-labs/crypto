@@ -195,4 +195,8 @@ if __name__ == '__main__':
             Path('/etc/systemd/system/'+name).write_text(text)
         names.append('spot-checkpoint-discovery.timer')
     subprocess.run(['systemctl', 'daemon-reload'], check=True)
-    subprocess.run(['systemctl', 'enable', '--now', *names], check=True)
+    # Recovery may retry a slow provider snapshot. Do not make bootstrap's
+    # readiness publication depend on the first activation attempt succeeding.
+    # Endpoint reconciliation still requires the separate workload-owner fence.
+    subprocess.run(['systemctl', 'enable', *names], check=True)
+    subprocess.run(['systemctl', 'start', '--no-block', *names], check=True)
