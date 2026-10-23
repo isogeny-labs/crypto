@@ -2346,6 +2346,10 @@ pub fn rho_walk_negation_lanes(
     let setup = ops;
 
     let lane_count = lanes.max(1);
+    let jump_mask = jumps
+        .len()
+        .is_power_of_two()
+        .then(|| jumps.len() as u64 - 1);
     let ctx = NegLaneWalk {
         g,
         classes: &classes,
@@ -2356,6 +2360,7 @@ pub fn rho_walk_negation_lanes(
         look_ahead: walk.look_ahead,
         window: walk.cycle_window,
         budget: max_steps,
+        jump_mask,
     };
     let mut table: FastMap<(u64, u64)> = fast_map(1024);
     let automorphisms = 2;
@@ -2492,6 +2497,79 @@ struct NegLaneWalk<'a> {
     look_ahead: bool,
     window: usize,
     budget: u64,
+    /// `jumps.len() − 1` when that is a power of two, so the jump index is
+    /// a mask rather than a division; the value is the same.
+    jump_mask: Option<u64>,
+}
+
+/// The last `window` points of a walk, oldest first, as
+/// [`TunedWalker::walk`]'s `recent` deque holds them, with the keys in an
+/// array of their own so that the per-step search scans one small array.
+/// A slot's key is `0` while empty: no point the walk keeps has key `0`.
+struct RecentRing {
+    keys: Vec<u64>,
+    entries: Vec<(PrimePoint, u64, u64)>,
+    /// The oldest entry's slot, and how many entries there are.
+    head: usize,
+    len: usize,
+}
+
+impl RecentRing {
+    fn new(window: usize) -> Self {
+        Self {
+            keys: vec![0; window],
+            entries: vec![(PrimePoint::INFINITY, 0, 0); window],
+            head: 0,
+            len: 0,
+        }
+    }
+
+    fn clear(&mut self) {
+        self.keys.fill(0);
+        self.head = 0;
+        self.len = 0;
+    }
+
+    fn slot(&self, age: usize) -> usize {
+        let s = self.head + age;
+        if s >= self.keys.len() {
+            s - self.keys.len()
+        } else {
+            s
+        }
+    }
+
+    /// The age (0 = oldest) of the entry with this key.
+    fn position(&self, key: u64) -> Option<usize> {
+        let s = self.keys.iter().position(|&k| k == key)?;
+        let w = self.keys.len();
+        Some(if s >= self.head {
+            s - self.head
+        } else {
+            s + w - self.head
+        })
+    }
+
+    fn get(&self, age: usize) -> (u64, PrimePoint, u64, u64) {
+        let s = self.slot(age);
+        let (p, a, b) = self.entries[s];
+        (self.keys[s], p, a, b)
+    }
+
+    /// Append, dropping the oldest entry when the window is full.
+    fn push(&mut self, key: u64, p: PrimePoint, a: u64, b: u64) {
+        let w = self.keys.len();
+        let s = if self.len == w {
+            let s = self.head;
+            self.head = self.slot(1);
+            s
+        } else {
+            self.len += 1;
+            self.slot(self.len - 1)
+        };
+        self.keys[s] = key;
+        self.entries[s] = (p, a, b);
+    }
 }
 
 /// One walk in flight: the [`TunedWalker::walk`] locals.
@@ -2499,7 +2577,7 @@ struct NegLane {
     x: PrimePoint,
     a: u64,
     b: u64,
-    recent: VecDeque<(u64, PrimePoint, u64, u64)>,
+    recent: RecentRing,
     last_escape: Option<u64>,
     len: u64,
     /// The step's first jump and how many it has tried (the look-ahead).
@@ -2509,13 +2587,22 @@ struct NegLane {
 
 impl NegLane {
     fn jump(&self, ctx: &NegLaneWalk) -> usize {
-        (self.j0 + self.tried) % ctx.jumps.len()
+        // `j0 < n` and `tried < n`, so one subtraction reduces it.
+        let (j, n) = (self.j0 + self.tried, ctx.jumps.len());
+        if j >= n {
+            j - n
+        } else {
+            j
+        }
     }
 }
 
 impl NegLaneWalk<'_> {
     fn first_jump(&self, hash: u64) -> usize {
-        ((hash >> 24) % self.jumps.len() as u64) as usize
+        match self.jump_mask {
+            Some(mask) => ((hash >> 24) & mask) as usize,
+            None => ((hash >> 24) % self.jumps.len() as u64) as usize,
+        }
     }
 
     fn start(
@@ -2540,7 +2627,7 @@ impl NegLaneWalk<'_> {
             x,
             a,
             b,
-            recent: VecDeque::with_capacity(self.window + 1),
+            recent: RecentRing::new(self.window),
             last_escape: None,
             len: 0,
             j0: self.first_jump(mix(self.g.key(&x))),
@@ -2591,18 +2678,15 @@ impl NegLaneWalk<'_> {
         }
         let mut key = g.key(&lane.x);
         if self.window > 0 {
-            if let Some(pos) = lane.recent.iter().position(|e| e.0 == key) {
-                let c = lane.recent.len() - pos;
+            if let Some(pos) = lane.recent.position(key) {
+                let c = lane.recent.len - pos;
                 match c {
                     2 => tally.cycles_2 += 1,
                     4 => tally.cycles_4 += 1,
                     _ => tally.cycles_other += 1,
                 }
-                let (min_key, mp, ma, mb) = lane
-                    .recent
-                    .iter()
-                    .skip(pos)
-                    .copied()
+                let (min_key, mp, ma, mb) = (pos..lane.recent.len)
+                    .map(|age| lane.recent.get(age))
                     .min_by_key(|e| e.0)
                     .expect("a cycle has members");
                 if lane.last_escape == Some(min_key) {
@@ -2631,10 +2715,7 @@ impl NegLaneWalk<'_> {
                 }
                 key = g.key(&lane.x);
             }
-            lane.recent.push_back((key, lane.x, lane.a, lane.b));
-            if lane.recent.len() > self.window {
-                lane.recent.pop_front();
-            }
+            lane.recent.push(key, lane.x, lane.a, lane.b);
         }
         let hash = mix(key);
         if hash & self.dp_mask == 0 {
