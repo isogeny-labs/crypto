@@ -454,7 +454,12 @@ pub fn s_ode_both<F: Field>(
 }
 
 /// U(w) = 1/T(w)^2 where S(x) = x T(x^2); N/D = x U(1/x) so h_i = U[i+1]; length m.
-fn u_from_ode<F: Field>(f: &F, e: &Curve<F::E>, et: &Curve<F::E>, m: usize) -> Vec<F::E> {
+pub(crate) fn u_from_ode<F: Field>(
+    f: &F,
+    e: &Curve<F::E>,
+    et: &Curve<F::E>,
+    m: usize,
+) -> Vec<F::E> {
     let s = s_ode(f, e, et, 2 * m + 2);
     let t: Vec<F::E> = (0..m).map(|i| s[2 * i + 1]).collect();
     let t2 = series::mul(f, &t, &t, m);
@@ -646,10 +651,29 @@ pub fn isogeny<F: Field>(
     ell: usize,
     sigma: Option<F::E>,
 ) -> Option<RatIsogeny<F>> {
+    let g = kernel(f, m, e, et, ell, sigma)?;
+    let iso = kohel(f, e, &g, ell as u64);
+    if iso.cod != *et {
+        return None;
+    }
+    Some(iso)
+}
+
+/// The kernel polynomial an algorithm of the family returns, without the exact check that its
+/// Kohel codomain is `et` (over an inexact field such as `padic::PadicField` the two agree only
+/// to the working precision; callers verify after reduction).
+pub fn kernel<F: Field>(
+    f: &F,
+    m: Method,
+    e: &Curve<F::E>,
+    et: &Curve<F::E>,
+    ell: usize,
+    sigma: Option<F::E>,
+) -> Option<Poly<F>> {
     if ell < 3 || ell.is_multiple_of(2) {
         return None;
     }
-    let g = match m {
+    match m {
         Method::LinearAlgebra => linear_algebra(f, e, et, ell),
         Method::Stark1972 => stark(f, e, et, ell),
         Method::Atkin1992 => atkin1992(f, e, et, ell, sigma?),
@@ -658,12 +682,7 @@ pub fn isogeny<F: Field>(
         Method::Elkies1998 => elkies1998(f, e, et, ell, sigma?),
         Method::FastElkies => fast_elkies(f, e, et, ell, sigma?),
         Method::FastElkiesPrime => fast_elkies_prime(f, e, et, ell),
-    }?;
-    let iso = kohel(f, e, &g, ell as u64);
-    if iso.cod != *et {
-        return None;
     }
-    Some(iso)
 }
 
 /// sigma = sum of the abscissas of the non-zero kernel points, from the second-order relation of
