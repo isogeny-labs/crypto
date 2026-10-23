@@ -13,11 +13,12 @@
 //! capsules captured before versions 3 and 2, which still recompute under
 //! their own definitions), not ICMS's `ENV1h…`: the two hash different
 //! fact sets, and a shared prefix would invite a join that means nothing.
-//! Version 3 leaves the compiler out of the class: it used to be the
-//! output of `rustc -Vv` on `PATH` and in the current directory, which
-//! moves with the shell (`sudo` runs landed in another class).  The
-//! compiler that built the binary is a build-time fact, embedded by
-//! `build.rs` and recorded beside the class, as the binary's hash is.
+//! Version 3 leaves the compiler out of the class: it is the output of
+//! `rustc -Vv` on `PATH` and in the current directory, which moves with
+//! the shell (`sudo` runs landed in another class).  It is still recorded
+//! as a diagnostic beside the class; the binary's hash is the fact that
+//! names the code.  (No build script embeds it: the tournament admits no
+//! root build script, docs/ecbench/README.md §7.)
 
 use std::collections::BTreeMap;
 use std::process::Command;
@@ -68,11 +69,10 @@ pub struct StableFacts {
     pub transparent_hugepages: Option<String>,
     /// `hypervisor` CPU flag, DMI product, or `kern.hv_vmm_present`.
     pub virtualization: BTreeMap<String, String>,
-    /// `rustc -Vv` of the compiler that built this binary, embedded at
-    /// build time (never asked of `PATH`).  Capsules before class
-    /// version 3 hold the toolchain on `PATH` at run time here and hash
-    /// it; from version 3 on it is recorded and not hashed.  The binary's
-    /// own hash is the stronger fact and sits in [`BuildFacts`].
+    /// `rustc -Vv` of the toolchain on `PATH` at capture time.  Capsules
+    /// before class version 3 hash it into the class; from version 3 on it
+    /// is a diagnostic, recorded and not hashed.  The binary's own hash is
+    /// the stronger fact and sits in [`BuildFacts`].
     pub rustc_vv: Option<String>,
 }
 
@@ -261,7 +261,7 @@ fn stable_facts() -> StableFacts {
         cpu_settings: BTreeMap::new(),
         transparent_hugepages: None,
         virtualization: BTreeMap::new(),
-        rustc_vv: embedded_rustc_vv(),
+        rustc_vv: run("rustc", &["-Vv"]),
     };
     #[cfg(target_os = "linux")]
     {
@@ -381,12 +381,6 @@ fn select_git_facts(
 // materializes historical crate roots together with the current host capsule,
 // so adding a new crate-root module as a dependency would make old evidence
 // stop compiling.
-/// `rustc -Vv` of the compiler that built this binary, from `build.rs`.
-/// `None` for a build without the build script (a frozen historical tree).
-fn embedded_rustc_vv() -> Option<String> {
-    option_env!("ECBENCH_BUILD_RUSTC_VV").map(|v| v.replace("\\n", "\n"))
-}
-
 /// The allocator behind `malloc` in this process, named for the record.
 pub fn allocator_name() -> String {
     #[cfg(all(target_os = "linux", target_env = "gnu"))]
@@ -722,8 +716,6 @@ mod tests {
         // The facts of the host still move it.
         b.stable.kernel_release = Some("another kernel".into());
         assert_ne!(recompute_class(&a).unwrap(), recompute_class(&b).unwrap());
-        // Capture never asks PATH: the compiler fact is the embedded one.
-        assert_eq!(a.stable.rustc_vv, embedded_rustc_vv());
     }
 
     #[test]
