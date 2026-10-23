@@ -142,7 +142,7 @@ history.
     ("Implementation language: no Python"). Its log is
     [`raw/native-replay-attempt1-python-driver.log`](raw/native-replay-attempt1-python-driver.log).
     It stopped at A18, whose parameter files were renamed after the run
-    (`k0n61-…` became the curve slug). The tool now maps the recorded name to
+    (the retired size prefix became the curve slug). The tool now maps the recorded name to
     the renamed file and records the mapping in each run's `params_renamed`.
     The replays reproduced identical outputs, which shows the contents are the
     same.
