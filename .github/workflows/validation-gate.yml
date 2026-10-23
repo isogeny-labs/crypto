@@ -33,6 +33,13 @@ jobs:
         with:
           # Keep the complete current tree, without every historical archive.
           fetch-depth: 1
+          # Clone partially from the start. The base fetch below is filtered;
+          # adding a filtered ref to a repository that is not yet partial makes
+          # git repack every local object to record promisor links, which
+          # rewrites the whole current-tree pack and exhausted the runner disk.
+          # An already-partial clone skips that conversion, and the gate's two
+          # `git show <base>:…` reads fetch their blobs on demand.
+          filter: blob:none
       - name: Fetch the PR base for immutable-history comparisons
         if: github.event_name == 'pull_request'
         env:
