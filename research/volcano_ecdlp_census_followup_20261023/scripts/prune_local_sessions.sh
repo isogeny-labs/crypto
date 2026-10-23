@@ -9,6 +9,7 @@ ECB=${ECB:-/home/user/crypto/target/release/ecbench}
 SC=${SC:-/tmp/claude-0/-home-user/a7557d77-b66e-59ae-b32e-04991c48472e/scratchpad/ex}
 REPO=$(git rev-parse --show-toplevel); REL=$(realpath --relative-to="$REPO" "$STUDY")
 PROG=runs/progress.jsonl
+prog() { jq -R -c 'try fromjson catch empty' $PROG; } # valid JSON lines only
 prune_one() {
   local name=$1 a=sessions/$1.tar.xz want ok c
   [ -d sessions/$name ] || return 0
@@ -17,7 +18,7 @@ prune_one() {
   c=$(git -C "$REPO" log -1 --format=%H -- $REL/$a)
   git -C "$REPO" branch -r --contains "$c" 2>/dev/null | grep -q origin || { echo "skip $name: not pushed"; return 1; }
   xz -t $a || { echo "skip $name: xz -t"; return 1; }
-  want=$(jq -r --arg s "$name" 'select(.out==("sessions/"+$s) and .status=="done")|.sha256_tar_xz' $PROG | head -1)
+  want=$(prog | jq -r --arg s "$name" 'select(.out==("sessions/"+$s) and .status=="done")|.sha256_tar_xz' | head -1)
   [ -n "$want" ] && [ "$(sha256sum $a | cut -d' ' -f1)" = "$want" ] || { echo "skip $name: sha mismatch"; return 1; }
   rm -rf $SC; mkdir -p $SC; tar -C $SC -xf $a || { echo "skip $name: extract"; rm -rf $SC; return 1; }
   $ECB verify --dir $SC/$name --replay 3 --out $SC/a.json > $SC/v.log 2>&1; ok=$(jq -r .ok $SC/a.json 2>/dev/null)
@@ -29,7 +30,7 @@ prune_one() {
 }
 if [ "${1:-}" = "--session" ]; then prune_one "$2"; rc=$?; df -h . | tail -1; exit $rc; fi
 target=$1
-for name in $(jq -r 'select(.spec)|select(.status=="done")|.out|sub("^sessions/";"")' $PROG); do
+for name in $(prog | jq -r 'select(.spec)|select(.status=="done")|.out|sub("^sessions/";"")'); do
   [ "$(df -Pk . | awk 'NR==2{print $4}')" -ge "$target" ] && break
   prune_one "$name"
 done
