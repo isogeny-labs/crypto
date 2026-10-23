@@ -108,3 +108,16 @@ The evidence directory gets a `VALIDATION.json` only after an independent
 replay of sampled jobs (IC and rho answers and counts reproduced
 bit-for-bit) and an independent recompute of the headline ratios from
 `raw/`, by validator agents that did not write the analysis.
+
+---
+
+## Deviations log (appended 2026-10-23; the text above is unchanged and was committed before any data)
+
+1. **Execution only.** The first run (card `CARD-ghs3-vs-rho-20261023-1`) was killed by the agent
+   harness's 30-minute background limit, not by the tool or the card's timeout; every child
+   process died with it. Two jobs had completed (`raw/b20_c1.jsonl`, `raw/b20_c2.jsonl`); killed
+   jobs left no record (a job writes its line only when it finishes). `run.sh` skips a job whose
+   record exists, and every job is deterministic in `(b, curve)`, so the run is resumed with the
+   **same bound binary** (sha256 `7847d102…`, not rebuilt) and no count changes. The resume is a
+   new card launched detached from the agent harness. The two completed records are kept as
+   written; the validator's replay covers them like every other job.
