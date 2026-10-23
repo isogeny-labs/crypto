@@ -86,3 +86,19 @@ Controls:
 
 This run is a correctness and accounting correction. It does not measure an
 ECDLP method comparison or change any end-to-end hardness conclusion.
+
+## Recorded outcome
+
+The frozen protocol passed on 2026-10-23. Successor source commit
+`3b66e5cae94ab709f2ba2169e181eb0d3ac1c9e2` produced and replayed the exact
+terminal range, emitted 65,376 node records and 18 closure certificates, and
+advanced the checkpoint to `next_x=19894128`. The admitted segment has SHA-256
+`1b576b189b7354bb9c025f17a14409cb1a4118c8c84c7bfbfb7229f5505fee32`.
+The terminal-specific structural follower connected it to the immutable
+ordinary-prefix audit chain and passed. See the
+[run report](reports/run-20261023T200212Z/REPORT.md) and its machine-readable
+[evidence manifest](reports/run-20261023T200212Z/evidence.json).
+
+The downstream pipeline subsequently reported all 358,094,304 census vertices
+admitted with no row gaps. Global uniqueness and complete adjacency remain
+separate active gates.
