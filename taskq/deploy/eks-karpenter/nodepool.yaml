@@ -87,7 +87,11 @@ spec:
       > /etc/systemd/system/irqbalance.service.d/50-isolab.conf
     # Keep scheduler load balancing within each pod's exclusive cpuset;
     # isolcpus=domain would serialize unpinned multithreaded jobs.
-    kernel_args="isolcpus=managed_irq,$worker_list nohz_full=$worker_list rcu_nocbs=$worker_list irqaffinity=$housekeeping"
+    # Keep the periodic tick on running CPUs. On this AL2023 kernel, the
+    # full-dynticks probe reported 50ms of busy time in a 25ms wall window;
+    # removing nohz_full eliminated that anomaly without changing L2 gates.
+    # IRQ, RCU and workqueue housekeeping remain isolated as before.
+    kernel_args="isolcpus=managed_irq,$worker_list rcu_nocbs=$worker_list irqaffinity=$housekeeping"
     printf 'housekeeping=%q\nhouse_hex=%q\nkernel_args=%q\n' "$housekeeping" "$house_hex" "$kernel_args" \
       > /etc/isolab/cpus.env
     cat > /usr/local/sbin/isolab-cpu-isolation <<'SCRIPT'
@@ -100,6 +104,13 @@ spec:
     for arg in $kernel_args; do
       [[ "$cmdline" == *" $arg "* ]] || exit 1
     done
+    # Reject workers with full dynticks still active, including an AMI default
+    # that would not be detected by checking our requested arguments alone.
+    if [[ -e /sys/devices/system/cpu/nohz_full ]]; then
+      nohz_full=$(cat /sys/devices/system/cpu/nohz_full)
+      nohz_full=${nohz_full//[[:space:]]/}
+      [[ -z "$nohz_full" || "$nohz_full" == '(null)' ]] || exit 1
+    fi
     # kubepods.slice is a sibling, not a descendant. Cgroup restrictions do
     # not leak an inherited task affinity into workload processes.
     systemctl set-property system.slice AllowedCPUs="$housekeeping"
@@ -134,7 +145,7 @@ spec:
     systemctl daemon-reload
     # A newly launched worker reboots once before kubelet can admit a pod.
     # Persistent service reapplies IRQ/workqueue placement on every reboot.
-    grubby --update-kernel=ALL --args="$kernel_args"
+    grubby --update-kernel=ALL --remove-args=nohz_full --args="$kernel_args"
     systemctl --no-block reboot
   tags:
     project: isolab
@@ -150,7 +161,7 @@ spec:
       labels:
         isolab.dev/role: worker
         isolab.dev/pool: cpu-spot
-        isolab.dev/cpu-isolation: v4
+        isolab.dev/cpu-isolation: v5
     spec:
       nodeClassRef:
         group: karpenter.k8s.aws

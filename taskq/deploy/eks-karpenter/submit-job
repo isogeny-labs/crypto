@@ -60,7 +60,7 @@ jq -n --arg name "$name" --arg image "$image" --arg cpu "$cpu" --arg profile "$i
       spec:{restartPolicy:"Never",serviceAccountName:"runner",automountServiceAccountToken:false,
         terminationGracePeriodSeconds:60,
         nodeSelector:({"isolab.dev/pool":"cpu-spot"}
-          + (if $profile == "l2" then {"isolab.dev/cpu-isolation":"v4"} else {} end)
+          + (if $profile == "l2" then {"isolab.dev/cpu-isolation":"v5"} else {} end)
           + (if $instance_type != "" then {"node.kubernetes.io/instance-type":$instance_type} else {} end)),
         tolerations:[{key:"isolab.dev/workload",value:"cpu",operator:"Equal",effect:"NoSchedule"}],
         affinity:{podAntiAffinity:{requiredDuringSchedulingIgnoredDuringExecution:[{

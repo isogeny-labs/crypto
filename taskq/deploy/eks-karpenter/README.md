@@ -269,7 +269,7 @@ The optional `build` object binds the image, source revision and executable
 SHA-256; both the pod and the launcher verify that identity. Callers that omit
 `build` retain the deployed default image.
 
-The tool requests four exclusive vCPUs, selects bootstrap profile `v4`, and runs
+The tool requests four exclusive vCPUs, selects bootstrap profile `v5`, and runs
 `run-ecbench` with `--cpus auto`. One whole physical core measures the child;
 the remaining allocated CPUs accommodate the parent shell and harness. `--cpus inherit` would
 reserve the entire pod allocation and leave those processes nowhere to go.
@@ -279,8 +279,11 @@ Worker bootstrap confines OS services to CPU 0's physical core, reserves it with
 Kubernetes' static/full-core/strict CPU manager, and routes movable IRQs and
 unbound workqueues to housekeeping. This includes AL2023's separate
 `runtime.slice` for kubelet/containerd. It discovers sibling topology at boot.
-The kernel also boots with managed-IRQ isolation, full tickless
-CPUs and offloaded RCU callbacks on workload CPUs. Fresh workers reboot once
+The kernel also boots with managed-IRQ isolation and offloaded RCU callbacks on
+workload CPUs. Running CPUs retain the periodic tick: full-dynticks accounting
+on the pinned AL2023 kernel produced excess busy ticks in the native diagnostic.
+The bootstrap removes `nohz_full` and refuses to admit a worker if full dynticks
+remain active. Fresh workers reboot once
 before joining; a persistent service checks the kernel arguments and reapplies
 runtime affinity before every kubelet start. Kubelet refuses to start if this
 service fails. The AL2023 reserved-cgroup defaults
@@ -290,8 +293,12 @@ unallocated CPUs. No measurement thresholds or native grader rules change.
 Scheduler-domain load balancing remains enabled so ordinary multithreaded
 jobs can use their allocated CPUs. Each measured ecbench child is separately
 pinned by the native harness. Live validation and retained private failure
-artifacts include 108/108 L2 records on the final v4 profile, complete S3 replay, and
+artifacts include 108/108 L2 records on the earlier v4 profile, complete S3 replay, and
 4,405 passing library tests on a separate multithreaded job.
+The longer periodic-recovery qualification later rejected three v4 observations;
+that failed result remains retained. The [CPU-accounting diagnostic](diagnostics/cpu-accounting/README.md)
+documents the probe used to investigate the v5 change. Node labels never replace
+per-execution L2, replay, A/A and S3 verification.
 
 After a 60-second startup settle, the native quiet preflight must pass. Every
 record, including warmups, must earn L2 or L3, and all measured executions must
