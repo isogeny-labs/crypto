@@ -487,6 +487,7 @@ authenticated GCM decryption. Use a private store for private keys.
 crypto cryptanalysis aes-attack --technique differential
 crypto cryptanalysis aes-attack --technique linear
 crypto cryptanalysis aes-attack --technique square
+crypto cryptanalysis aes-trail-check --pattern 0001 --pattern 000f
 crypto cryptanalysis aes-sbox-table --kind bct --row 1
 crypto cryptanalysis aes-sbox-table --kind dlct --row 1
 crypto cryptanalysis aes-differential-observed --input chosen-pairs.json
@@ -512,6 +513,11 @@ These commands expose the existing AES-128 two-round differential,
 one-round linear, and four-round integral recoveries. `--key-hex` supplies
 the analysis instance; `--samples` and `--seed` configure the differential
 and linear corpora. Each recovered result is checked against that instance.
+`aes-trail-check` accepts one to ten four-digit hexadecimal active-byte masks
+(bit `4*column+row`) and reports each ShiftRows/MixColumns column transition.
+It enforces a nonzero starting pattern and the zero-column and branch-number
+necessary conditions. Passing those conditions does not establish a realizable
+exact difference trail or a differential probability.
 The rest of the AES modules have separate input models and remain outside
 this adapter; `crypto cryptanalysis sbox`, `auto`, `boomerang`, `rectangle`,
 `aes-related-key`, and `aes-visual-demo` provide other entry points.

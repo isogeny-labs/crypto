@@ -397,6 +397,12 @@ enum CryptanalysisOp {
         #[arg(long)]
         row: Option<u8>,
     },
+    /// Check a supplied sequence of AES active-byte patterns against MixColumns branch constraints.
+    AesTrailCheck {
+        /// One four-digit hex mask per round, bit 4*column+row marking an active byte; repeat --pattern.
+        #[arg(long, required = true)]
+        pattern: Vec<String>,
+    },
     /// Run a bounded AES-128 differential, linear, or integral recovery.
     AesAttack {
         /// `differential` (2 rounds), `linear` (1 round), or `square` (4 rounds).
@@ -2102,6 +2108,72 @@ fn cmd_aes_attack(
     Ok(())
 }
 
+fn aes_trail_check_report(patterns: &[String]) -> Result<serde_json::Value, String> {
+    use crypto_lib::cryptanalysis::aes::milp::{
+        active_sboxes_for_trail, apply_shiftrows, column_weights, mc_branch_number_ok, weight,
+    };
+    use serde_json::json;
+
+    if patterns.is_empty() || patterns.len() > 10 {
+        return Err("supply one to ten --pattern masks".into());
+    }
+    let mut trail = Vec::with_capacity(patterns.len());
+    let mut canonical = Vec::with_capacity(patterns.len());
+    for pattern in patterns {
+        if pattern.len() != 4 || !pattern.bytes().all(|byte| byte.is_ascii_hexdigit()) {
+            return Err(format!(
+                "invalid AES activity mask '{pattern}': use four hex digits"
+            ));
+        }
+        let mask = u16::from_str_radix(pattern, 16).map_err(|e| e.to_string())?;
+        trail.push(std::array::from_fn(|i| mask & (1 << i) != 0));
+        canonical.push(format!("{mask:04x}"));
+    }
+    let mut violations = Vec::new();
+    if !trail[0].iter().any(|&active| active) {
+        violations.push(json!({"kind":"zero_initial_difference"}));
+    }
+    let mut transitions = Vec::new();
+    for round in 0..trail.len() - 1 {
+        let after_shiftrows = apply_shiftrows(&trail[round]);
+        let input_columns = column_weights(&after_shiftrows);
+        let output_columns = column_weights(&trail[round + 1]);
+        for column in 0..4 {
+            if !mc_branch_number_ok(input_columns[column], output_columns[column]) {
+                violations.push(json!({
+                    "kind":"mixcolumns_branch_constraint",
+                    "round":round + 1,
+                    "column":column,
+                    "input_active":input_columns[column],
+                    "output_active":output_columns[column]
+                }));
+            }
+        }
+        transitions.push(json!({
+            "round":round + 1,
+            "after_shiftrows":format!("{:04x}", after_shiftrows.iter().enumerate().fold(0u16, |mask, (i, active)| mask | (u16::from(*active) << i))),
+            "mixcolumns_input_active_per_column":input_columns,
+            "next_round_active_per_column":output_columns
+        }));
+    }
+    let validated_count = active_sboxes_for_trail(&trail);
+    debug_assert_eq!(validated_count.is_some(), violations.is_empty());
+    Ok(json!({
+        "schema_version":1,
+        "operation":"aes-trail-check",
+        "model":"active-byte MixColumns branch-number necessary conditions",
+        "patterns":canonical,
+        "rounds":trail.len(),
+        "active_sboxes_per_round":trail.iter().map(weight).collect::<Vec<_>>(),
+        "supplied_active_sboxes_total":trail.iter().map(weight).sum::<u32>(),
+        "necessary_conditions_passed":validated_count.is_some(),
+        "violations":violations,
+        "transitions":transitions,
+        "exact_difference_trail_certified":false,
+        "differential_probability":serde_json::Value::Null
+    }))
+}
+
 fn aes_sbox_table_report(kind: &str, row: Option<u8>) -> Result<serde_json::Value, String> {
     use crypto_lib::cryptanalysis::aes::{
         boomerang::aes_sbox_bct,
@@ -2527,6 +2599,13 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             }
         }
         CryptanalysisOp::AesSboxTable { kind, row } => match aes_sbox_table_report(&kind, row) {
+            Ok(report) => println!("{}", serde_json::to_string_pretty(&report).unwrap()),
+            Err(e) => {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        },
+        CryptanalysisOp::AesTrailCheck { pattern } => match aes_trail_check_report(&pattern) {
             Ok(report) => println!("{}", serde_json::to_string_pretty(&report).unwrap()),
             Err(e) => {
                 eprintln!("error: {e}");
