@@ -10,6 +10,15 @@ This is the **DLP with auxiliary inputs**, not the plain ECDLP. The Cheon arms
 are handed `[alpha^i]G` that rho cannot use. No row here is an ECDLP advance,
 and no index-calculus baseline is changed.
 
+> **Review qualification (2026-10-23).** The pre-registered H3 gate failed: 5 of
+> the 84 sealed rho runs have `S` outside `[0.3, 4]`, so under PROTOCOL.md
+> section 6 the rho reference is unreliable and nothing may be ranked against it.
+> Every Cheon/rho ratio, crossing and "advance" reading below (Tables 2 and 5,
+> the calibration paragraph, section 6) is withdrawn as a result. The Cheon-only
+> scaling (Table 3's Cheon exponents, `ops / F`, Table 4's Cheon extrapolations)
+> stands. The text below is the original report, unchanged; see
+> [section 11](#11-review-qualification-2026-10-23).
+
 ## 1. Question and method in one paragraph
 
 NIST P-224 has `n - 1 = 2^2 3^6 5 17 2153 q195` (smooth part `d- = 2^28.99`)
@@ -353,3 +362,30 @@ $E/cheon_p224_shape_validate --curves curves.json --runs runs/cheon-all.jsonl --
 `reports/run-20261022T0538Z/` (run report), `REPORT.md`/`REPORT.pdf` (this
 report), `render.sh`, `report.css`. A copy of the PDFs and graphs, and the validation-gate
 manifest `VALIDATION.json`, are in `benchmarks/20261022-cheon-p224-shape/`.
+
+## 11. Review qualification (2026-10-23)
+
+A review of PR #2422 recomputed `S = total_gae / sqrt(r)` for all 84 sealed
+`rho.negation` records and confirmed 5 outside `[0.3, 4]`. PROTOCOL.md section 6
+attaches a consequence to that, written before the data: *"if ... any rho `S` is
+outside `[0.3, 4]`, the rho arm is declared unreliable and nothing is ranked
+against it"*. Section 7, item 1 of this report read the gate as applying to
+per-size medians and reported the rankings anyway. That reading was chosen after
+the results were seen, so it does not satisfy the protocol.
+
+Consequences, applied in the same PR:
+
+- **Withdrawn:** the paired Cheon/rho ratios (0.59 for `n - 1` comb and 0.21 for
+  `n + 1` comb at 56 bits, 11.9 naive), the extrapolated crossings, the
+  overshoot-corrected gaps in the calibration paragraph, and the "advance"
+  classification. They are no longer shown on the IC scoreboard. The
+  `benchmarks/README.md` row is removed, and
+  `benchmarks/20261022-cheon-p224-shape/VALIDATION.json` now records
+  `matches_protocol: false`.
+- **Standing:** the Cheon arms' own measurements. These are the verified
+  answers, operation counts, `S`, `ops / F(n, d)`, the fitted Cheon exponents
+  (0.447 ± 0.012, 0.453 ± 0.011 and 0.413 ± 0.013) and their labelled
+  extrapolations. The protocol, raw records and the original text above are
+  unchanged.
+- **Follow-up:** admitting a Cheon-versus-rho comparison needs a fresh
+  pre-registered study, with a rho gate stated unambiguously before any data.
