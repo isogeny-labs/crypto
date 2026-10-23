@@ -70,6 +70,12 @@ class AddressTests(unittest.TestCase):
         retain_confirmed_termination(db,ec2,'table','source',{'legacy-owner':record})
         ec2.describe_instances.assert_not_called()
         db.update_item.assert_not_called()
+        receipt = db.put_item.call_args.kwargs
+        self.assertEqual(receipt['Item']['Id']['S'], 'terminated-owner-previous')
+        self.assertEqual(receipt['Item']['Owner']['S'], 'previous')
+        self.assertEqual(receipt['Item']['Origin']['S'], 'source')
+        self.assertTrue(receipt['Item']['OwnerTerminated']['BOOL'])
+        self.assertIn('#owner = :owner', receipt['ConditionExpression'])
 
     def setUp(self):
         self.ec2, self.asg = Mock(), Mock()

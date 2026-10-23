@@ -62,6 +62,16 @@ def retain_confirmed_termination(db, ec2, table, source, records):
             if owner not in states:
                 states[owner] = source_state(ec2, owner, {})
             dead = states[owner] == 'terminated'
+        # Keep death evidence under the retired instance ID before ownership
+        # records are replaced. Retained disks can outlive EC2's instance record.
+        if dead:
+            db.put_item(TableName=table, Item={
+                'Id': {'S': 'terminated-owner-' + owner},
+                'Owner': {'S': owner}, 'Origin': {'S': source},
+                'OwnerTerminated': {'BOOL': True}},
+                ConditionExpression='attribute_not_exists(Id) OR (#owner = :owner AND #origin = :origin)',
+                ExpressionAttributeNames={'#owner': 'Owner', '#origin': 'Origin'},
+                ExpressionAttributeValues={':owner': {'S': owner}, ':origin': {'S': source}})
         changes = {}
         if original_state == 'terminated' and record.get('OriginTerminated', {}).get('BOOL') is not True:
             changes['OriginTerminated'] = {'BOOL': True}
