@@ -365,6 +365,18 @@ ic solve-cubic \
   --route-file /tmp/cubic-route.json --route-id root-to-velu3 \
   --seed 1 --max-residuals 1000 --skip-rho --json
 
+icx cubic-graph \
+  --input docs/ic/fixtures/cubic_f7_cofactor12_public_target.json \
+  --max-ell 5 --max-nodes 32 --seed 1 --out /tmp/cubic-j-graph.json --json
+icx cubic-route-generate \
+  --input docs/ic/fixtures/cubic_f7_cofactor12_public_target.json \
+  --degree 3 --graph-file /tmp/cubic-j-graph.json --target-node 1 \
+  --seed 1 --max-samples 256 --json > /tmp/cubic-route-from-node.json
+icx solve-cubic \
+  --input docs/ic/fixtures/cubic_f7_cofactor12_public_target.json \
+  --route-file /tmp/cubic-route-from-node.json --route-id root-to-velu3 \
+  --seed 1 --max-residuals 1000 --skip-rho --json
+
 ic cubic-route-generate \
   --input docs/ic/fixtures/cubic_f7_cofactor12_public_target.json \
   --degree 2 --seed 1 --max-samples 256 --json \
@@ -374,6 +386,17 @@ ic solve-cubic \
   --route-file /tmp/cubic-route-2.json --route-id root-to-velu2 \
   --seed 1 --max-residuals 1000 --skip-rho --json
 ```
+
+`--graph-file` also accepts a checked `store:` or `sha256:` reference. With
+`--target-node`, it requires a direct edge from graph root to the selected
+node at `--degree`, one route hop, and the same field and source curve as the
+target. A graph generated from `--input` must carry the target artifact's
+SHA-256. The modular-polynomial edge is checked again before a rational
+kernel search. A j-neighbour without a suitable rational kernel can still
+exhaust the stated search budget; the graph alone is not a point map.
+The [graph-node route acceptance receipt](fixtures/CUBIC_GRAPH_NODE_ROUTE_ACCEPTANCE_20261023.json)
+records both CLI outputs, verified scalar 5, rejection cases, and an isolated
+S3 upload, remote check, fresh-cache retrieval, solve, and exact-object cleanup.
 
 The generator counts the source curve order, checks the supplied public
 points and subgroup, samples a rational kernel of the requested prime

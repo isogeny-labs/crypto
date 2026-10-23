@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "kind": "cubic-graph-node-route-cli-acceptance",
+  "checked_at_utc": "2026-10-23T04:10:15Z",
+  "input": "docs/ic/fixtures/cubic_f7_cofactor12_public_target.json",
+  "input_sha256": "8b13570347c9712d219cc6a7e18b77dc13b020b73d1fc5503fe4d5063f3ff967",
+  "graph": {
+    "sha256": "0edce4f483c7c29c461823172985f94c66397375b33c1880416895753ec11967",
+    "node_count": 6,
+    "edge_count": 18,
+    "selected_node": 1,
+    "selected_j": [
+      3,
+      5,
+      0
+    ],
+    "degree": 3
+  },
+  "route": {
+    "sha256": "4c53ee7018daf03edd5d997d6e9ad6d9465a3bafa899bab86cefefb50e59dcdd",
+    "both_binaries_identical": true,
+    "route_id": "root-to-velu3",
+    "edges": 1
+  },
+  "solve": {
+    "ic": {
+      "status": "complete",
+      "verified": true,
+      "recovered_scalar": 5,
+      "route_file_sha256": "4c53ee7018daf03edd5d997d6e9ad6d9465a3bafa899bab86cefefb50e59dcdd"
+    },
+    "icx": {
+      "status": "complete",
+      "verified": true,
+      "recovered_scalar": 5
+    }
+  },
+  "negative_cases": [
+    {
+      "case": "wrong_input_sha",
+      "exit": 1,
+      "error": "cubic graph was made from a different target artifact"
+    },
+    {
+      "case": "wrong_curve",
+      "exit": 1,
+      "error": "cubic graph does not match the target field and source curve"
+    },
+    {
+      "case": "missing_edge",
+      "exit": 1,
+      "error": "selected graph node has no root edge of the requested degree"
+    },
+    {
+      "case": "noncanonical_j",
+      "exit": 1,
+      "error": "cubic graph target j is not canonical"
+    },
+    {
+      "case": "missing_node",
+      "exit": 1,
+      "error": "--graph-file and --target-node must be supplied together"
+    },
+    {
+      "case": "conflicting_j",
+      "exit": 1,
+      "error": "--graph-file --target-node requires one hop and cannot use --target-j"
+    },
+    {
+      "case": "wrong_degree",
+      "exit": 1,
+      "error": "selected graph node has no root edge of the requested degree"
+    },
+    {
+      "case": "false_modpoly",
+      "exit": 1,
+      "error": "selected graph edge failed independent modular-polynomial evaluation"
+    },
+    {
+      "case": "root_node",
+      "exit": 1,
+      "error": "--target-node must select a non-root graph node"
+    }
+  ],
+  "s3": {
+    "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/cubic-graph-node-route-20261023-1792728534",
+    "name": "cubic-graphs/f7-cofactor12-node1.json",
+    "uploaded": true,
+    "head_verified": true,
+    "fresh_cache_pull_sha256": "0edce4f483c7c29c461823172985f94c66397375b33c1880416895753ec11967",
+    "checked_route_sha256": "737c922461cdc2c49c02707f5fdd0dd965e0f8dd9d69d629c843c60c3ccc711a",
+    "solve_verified": true,
+    "solve_recovered_scalar": 5,
+    "acceptance_object_deleted": true,
+    "post_delete_head_http_status": 404,
+    "object_key": "ic/v1/acceptance/cubic-graph-node-route-20261023-1792728534/sha256/0e/0edce4f483c7c29c461823172985f94c66397375b33c1880416895753ec11967"
+  },
+  "binaries": {
+    "ic": {
+      "sha256": "472954da2bf393363c791f0941bbdb385523650a4f2bb26a8f054b8ffdf5fea8"
+    },
+    "icx": {
+      "sha256": "6053c5ce89c502709ef832d86b541d12700e5fd6d107a25d5df885ac7aaeeae3"
+    }
+  },
+  "scope": "Bounded F7 cubic public target, one degree-3 graph edge and checked rational-kernel route; this does not establish arbitrary-field graph-route availability or an unbounded ECDLP capability.",
+  "tests": {
+    "release_bin_ic": 34,
+    "release_bin_icx": 21,
+    "release_library": {
+      "passed": 4488,
+      "failed": 0,
+      "ignored": 119
+    }
+  }
+}

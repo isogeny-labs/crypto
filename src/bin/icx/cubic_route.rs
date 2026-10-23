@@ -1,15 +1,15 @@
 //! Checked prime-degree Vélu routes over the exact cubic field supplied to IC.
 
 use clap::Args;
-use crypto_lib::cryptanalysis::gaudry_cubic::{Curve3, Fp3, Pt3, E3};
+use crypto_lib::cryptanalysis::gaudry_cubic::{Curve3, E3, Fp3, Pt3};
 use crypto_lib::hash::sha256::sha256;
 use isogeny_algos::curve::{self, Curve, Isogeny, Pt};
 use isogeny_algos::field::{Field, Rng, Zp};
-use isogeny_algos::kernel::velu::{velu_cyclic, velu_from_point, VeluIso};
+use isogeny_algos::kernel::velu::{VeluIso, velu_cyclic, velu_from_point};
 use isogeny_algos::path::graph::{self, PhiCache};
 use isogeny_algos::poly;
 use serde::Deserialize;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
@@ -58,6 +58,12 @@ pub(super) struct GenerateArgs {
     /// Optional target j-invariant as three canonical cubic-field coefficients.
     #[arg(long, num_args = 3)]
     target_j: Option<Vec<u64>>,
+    /// Checked cubic j-graph JSON, local or a checked store reference; use with --target-node.
+    #[arg(long)]
+    graph_file: Option<std::path::PathBuf>,
+    /// Numbered destination j-node connected directly to graph root by --degree.
+    #[arg(long)]
+    target_node: Option<usize>,
     /// Deterministic point-sampling seed.
     #[arg(long, default_value_t = 1)]
     seed: u64,
@@ -165,6 +171,108 @@ fn kernel_isogeny(
     }
 }
 
+fn selected_graph_node(
+    args: &GenerateArgs,
+    input: &PublicTarget,
+    input_bytes: &[u8],
+    field: &CubicField,
+    source: &Curve<E3>,
+) -> Result<(E3, Value), String> {
+    let path = args.graph_file.as_ref().ok_or("--graph-file is required")?;
+    let node_id = args.target_node.ok_or("--target-node is required")?;
+    if node_id == 0 {
+        return Err("--target-node must select a non-root graph node".into());
+    }
+    if args.target_j.is_some() || args.max_depth != 1 {
+        return Err("--graph-file --target-node requires one hop and cannot use --target-j".into());
+    }
+    let resolved = crypto_lib::store::resolve_path(path)?;
+    if std::fs::metadata(&resolved)
+        .map_err(|e| e.to_string())?
+        .len()
+        > 1024 * 1024
+    {
+        return Err("cubic graph file exceeds 1 MiB".into());
+    }
+    let bytes = std::fs::read(&resolved).map_err(|e| e.to_string())?;
+    if bytes.len() > 1024 * 1024 {
+        return Err("cubic graph file exceeds 1 MiB".into());
+    }
+    let graph: Value = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+    if graph["schema_version"].as_u64() != Some(1)
+        || graph["graph_kind"].as_str() != Some("cubic-rational-j-neighbours")
+        || graph["field_characteristic"].as_u64() != Some(input.p)
+        || graph["cubic_nonresidue"].as_u64() != Some(input.c)
+        || graph["source_curve"]["a"] != json!(input.a)
+        || graph["source_curve"]["b"] != json!(input.b)
+    {
+        return Err("cubic graph does not match the target field and source curve".into());
+    }
+    let target_sha = hex::encode(sha256(input_bytes));
+    if !graph["input_artifact"].is_null()
+        && graph["input_artifact"]["sha256"].as_str() != Some(target_sha.as_str())
+    {
+        return Err("cubic graph was made from a different target artifact".into());
+    }
+    let nodes = graph["nodes"]
+        .as_array()
+        .ok_or("cubic graph has no nodes")?;
+    let roots: Vec<&Value> = nodes
+        .iter()
+        .filter(|node| node["id"].as_u64() == Some(0))
+        .collect();
+    if roots.len() != 1 {
+        return Err("cubic graph must have exactly one root node".into());
+    }
+    let root = roots[0];
+    if root["j"] != json!(curve::jinv(field, source).0) {
+        return Err("cubic graph root j does not match the target curve".into());
+    }
+    let selected: Vec<&Value> = nodes
+        .iter()
+        .filter(|node| node["id"].as_u64() == Some(node_id as u64))
+        .collect();
+    if selected.len() != 1 {
+        return Err("cubic graph target node is missing or duplicated".into());
+    }
+    let coords: [u64; 3] = serde_json::from_value(selected[0]["j"].clone())
+        .map_err(|_| "cubic graph target j is not a coefficient triple")?;
+    if coords.iter().any(|&v| v >= input.p) {
+        return Err("cubic graph target j is not canonical".into());
+    }
+    let edges = graph["edges"]
+        .as_array()
+        .ok_or("cubic graph has no edges")?;
+    if !edges.iter().any(|edge| {
+        edge["source"].as_u64() == Some(0)
+            && edge["target"].as_u64() == Some(node_id as u64)
+            && edge["degree"].as_u64() == Some(args.degree)
+    }) {
+        return Err("selected graph node has no root edge of the requested degree".into());
+    }
+    let degree = args.degree as usize;
+    if ![2, 3, 5, 7].contains(&degree) || degree + 1 >= input.p as usize {
+        return Err("graph-selected route degree is outside the supported graph range".into());
+    }
+    let cache = PhiCache::new(&Zp::new(input.p), &[degree]).lift(|v| E3([v, 0, 0]));
+    let j = E3(coords);
+    if cache.get(degree).eval(field, curve::jinv(field, source), j) != field.zero() {
+        return Err("selected graph edge failed independent modular-polynomial evaluation".into());
+    }
+    Ok((
+        j,
+        json!({
+            "reference":path.to_string_lossy(),
+            "sha256":hex::encode(sha256(&bytes)),
+            "bytes":bytes.len(),
+            "target_node":node_id,
+            "target_j":coords,
+            "degree":args.degree,
+            "target_input_sha256":target_sha,
+        }),
+    ))
+}
+
 /// Construct a bounded rational-kernel route in the exact schema accepted by
 /// `solve-cubic`. A j-neighbour without a rational kernel may be unreachable
 /// by this constructor; the bounded search reports that outcome explicitly.
@@ -178,6 +286,9 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
             "degree must be prime in 2..=31, max-samples in 1..=10000, and max-depth in 1..=4"
                 .into(),
         );
+    }
+    if args.graph_file.is_some() != args.target_node.is_some() {
+        return Err("--graph-file and --target-node must be supplied together".into());
     }
     let resolved = crypto_lib::store::resolve_path(&args.input)?;
     if std::fs::metadata(&resolved)
@@ -225,12 +336,18 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
     {
         return Err("cubic target points fail source subgroup checks".into());
     }
-    let requested_j = match &args.target_j {
-        None => None,
-        Some(values) if values.len() == 3 && values.iter().all(|&v| v < input.p) => {
-            Some(E3([values[0], values[1], values[2]]))
-        }
-        _ => return Err("target-j must be three canonical field coefficients".into()),
+    let (requested_j, graph_selection) = if args.graph_file.is_some() {
+        let (j, selection) = selected_graph_node(args, &input, &bytes, &f, &curve)?;
+        (Some(j), Some(selection))
+    } else {
+        let j = match &args.target_j {
+            None => None,
+            Some(values) if values.len() == 3 && values.iter().all(|&v| v < input.p) => {
+                Some(E3([values[0], values[1], values[2]]))
+            }
+            _ => return Err("target-j must be three canonical field coefficients".into()),
+        };
+        (j, None)
     };
     let order = cubic_order(&f, &curve);
     if !order.is_multiple_of(args.degree) || !order.is_multiple_of(input.n) {
@@ -329,14 +446,18 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
     } else {
         format!("root-to-velu{}-depth{}", args.degree, args.max_depth)
     };
-    Ok(json!({
+    let mut report = json!({
         "schema_version":1,
         "field_characteristic":input.p,
         "cubic_nonresidue":input.c,
         "curve_nodes":nodes,
         "edges":edges,
         "routes":[{"id":route_id,"edge_ids":edge_ids}]
-    }))
+    });
+    if let Some(selection) = graph_selection {
+        report["graph_selection"] = selection;
+    }
+    Ok(report)
 }
 
 /// Enumerate distinct F_{p^3}-rational j-neighbours by modular polynomial.
@@ -507,6 +628,20 @@ struct Graph {
     curve_nodes: Vec<Node>,
     edges: Vec<Edge>,
     routes: Vec<Route>,
+    #[serde(default)]
+    graph_selection: Option<GraphSelection>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct GraphSelection {
+    reference: String,
+    sha256: String,
+    bytes: usize,
+    target_node: usize,
+    target_j: [u64; 3],
+    degree: u64,
+    target_input_sha256: String,
 }
 
 #[derive(Deserialize)]
@@ -683,6 +818,25 @@ pub(super) fn transport(
         .iter()
         .find(|route| route.id == route_id)
         .ok_or_else(|| format!("cubic route id {route_id} is absent"))?;
+    if let Some(selection) = &graph.graph_selection {
+        let first_edge = edge_by_id[route.edge_ids[0].as_str()];
+        let last_edge = edge_by_id[route.edge_ids.last().unwrap().as_str()];
+        let destination = nodes[&last_edge.target_curve_ref.as_str()];
+        let canonical_hash =
+            |value: &str| value.len() == 64 && value.bytes().all(|byte| byte.is_ascii_hexdigit());
+        if selection.reference.is_empty()
+            || selection.bytes == 0
+            || selection.target_node == 0
+            || !canonical_hash(&selection.sha256)
+            || !canonical_hash(&selection.target_input_sha256)
+            || route.edge_ids.len() != 1
+            || first_edge.source_curve_ref != root.reference
+            || first_edge.degree != selection.degree
+            || curve::jinv(&f, &destination).0 != selection.target_j
+        {
+            return Err("cubic route graph selection disagrees with the checked route".into());
+        }
+    }
     let mut current_ref = root.reference.as_str();
     let mut g = Pt::Aff(source.g.x, source.g.y);
     let mut q = Pt::Aff(target.x, target.y);
@@ -760,6 +914,8 @@ mod tests {
             input: input.to_path_buf(),
             degree: 3,
             target_j: None,
+            graph_file: None,
+            target_node: None,
             seed: 1,
             max_samples: 256,
             max_depth: 1,
@@ -800,11 +956,13 @@ mod tests {
             .find(|node| node["j"] == json!(destination_j.0))
             .unwrap();
         let id = node["id"].as_u64().unwrap();
-        assert!(j_graph["edges"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .any(|edge| edge["source"] == 0 && edge["target"] == id && edge["degree"] == 3));
+        assert!(
+            j_graph["edges"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|edge| edge["source"] == 0 && edge["target"] == id && edge["degree"] == 3)
+        );
         let mut requested = args;
         requested.target_j = Some(destination_j.0.to_vec());
         assert_eq!(
@@ -967,6 +1125,8 @@ mod tests {
             input: input.to_path_buf(),
             degree: 2,
             target_j: None,
+            graph_file: None,
+            target_node: None,
             seed: 1,
             max_samples: 256,
             max_depth: 1,
@@ -1003,6 +1163,8 @@ mod tests {
             input: input.to_path_buf(),
             degree: 2,
             target_j: None,
+            graph_file: None,
+            target_node: None,
             seed: 1,
             max_samples: 256,
             max_depth: 2,
@@ -1024,10 +1186,12 @@ mod tests {
         let mut tampered = graph;
         tampered["edges"][1]["kernel_generator"][0] = json!([0, 0, 0]);
         std::fs::write(&path, serde_json::to_vec(&tampered).unwrap()).unwrap();
-        assert!(transport(&source, target, &path, "root-to-velu2-depth2")
-            .err()
-            .expect("tampered second edge must fail")
-            .contains("invalid kernel"));
+        assert!(
+            transport(&source, target, &path, "root-to-velu2-depth2")
+                .err()
+                .expect("tampered second edge must fail")
+                .contains("invalid kernel")
+        );
         std::fs::remove_file(path).unwrap();
         assert_eq!(mapped.receipt["hops"], 2);
         assert_eq!(mapped.receipt["edges_verified"], 2);
