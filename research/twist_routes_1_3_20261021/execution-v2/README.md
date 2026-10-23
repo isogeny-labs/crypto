@@ -55,6 +55,22 @@ upload must be followed by a verified pull and a committed `store/index.json`
 entry before this publication blocker can close. Do not split the blob or
 add a local-only store entry to evade the limit.
 
+## Existing oversized-file merge hold
+
+The full PR check against main `a53a7e2b` fails on twelve already committed
+execution-v1 evidence files: one 11,663,186-byte ecbench `records.jsonl` and
+eleven historical split solver archive parts. The exact paths and sizes are
+in [large-files.stdout](checks/final-20261023/large-files.stdout).
+The scoped follow-up check against preceding PR head `386dd5df` passes:
+[large-files-followup.stdout](checks/final-20261023/large-files-followup.stdout).
+No new follow-up Git blob exceeds the limit.
+
+AGENTS.md §13 requires an owner/reviewer-added `large-file-ok` exception for
+an oversized Git blob. Section 13a forbids repacking, compressing or moving
+committed evidence. Preserve those historical files and the failed full-PR
+check; no exception is self-applied and no history is rewritten. This is a
+separate merge hold from uploading the new raw bundle to the store.
+
 ## Source and protocol freezes
 
 Raw stdout/stderr remain byte-preserved, including tool-emitted trailing

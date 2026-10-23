@@ -1,7 +1,7 @@
 # Publishing the complete twist follow-up raw evidence
 
 - **Status:** open
-- **Kind:** access/tool limit, separate from the mathematical and cost gaps
+- **Kind:** access/tool limit and repository owner/reviewer exception requirement, separate from the mathematical and cost gaps
 - **Affected work:** [follow-up execution](../research/twist_routes_1_3_20261021/execution-v2/README.md), [PR #2380](https://github.com/aburan28/crypto/pull/2380)
 - **Next action owner:** environment/store identity owner; native upload and replay lane after credentials exist
 - **Last updated:** 2026-10-23
@@ -11,6 +11,12 @@
 The complete 2026-10-23 twist raw run bundle exceeds Git's 10 MiB limit and
 cannot be uploaded to the configured `s3://crypto-autoresearcher/store`
 because this managed environment has no AWS credentials.
+
+The full PR also contains twelve older execution-v1 evidence blobs above
+the newly merged size limit. Those files were already committed before
+this follow-up. AGENTS.md §13a prohibits repacking/moving committed evidence;
+§13 requires an owner/reviewer-added `large-file-ok` exception if retained.
+No such exception is self-applied here.
 
 This blocks durable remote publication of the full replay input. Small
 summaries, receipts, source freezes, reports and proof logs are reviewable;
@@ -42,6 +48,9 @@ remote reproducibility are distinct statuses.
   `store/index.json` entry and extraction instructions in the PR.
 - [ ] Replay the archived-member hashes and original native/CAS checker
   inputs after extraction. Keep loose live metadata paths intact.
+- [ ] Resolve the twelve historical oversized-file entries through the
+  owner/reviewer policy exception or an explicitly authorized compliant
+  resolution; preserve the failed [full-PR check](../research/twist_routes_1_3_20261021/execution-v2/checks/final-20261023/large-files.stdout).
 
 These conditions close evidence publication only. They do not construct the
 missing higher-prime quotients, supply full costs or prove a speedup.
@@ -63,4 +72,6 @@ missing higher-prime quotients, supply full costs or prove a speedup.
 
 2026-10-23: preserved complete local outputs, prepared the deterministic
 bundle and installed the AWS CLI; credential discovery fails. Unresolved.
-No existing committed raw tree was repacked or deleted.
+No existing committed raw tree was repacked or deleted. The scoped new-wave
+size check passes; the full-PR check fails on the twelve older blobs. Both
+outputs remain in the PR and merge stays on hold.
