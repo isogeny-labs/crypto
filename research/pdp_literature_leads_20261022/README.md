@@ -439,7 +439,7 @@ Table D. Ranking inputs and verification totals, round 2.
 | 16 | high (symmetry and degree derived and desk-checked at `p = 13`); medium (cost transferred from published timings) | none; the card's C₄ of `2.54·10¹⁰` is also stale (now `6.9·10⁷`), so Nagao is predicted 450–14,000× worse than the current baseline | 1–1.5 person-days of Rust (no Nagao exporter exists), < 3 CPU-h, < 12 GB; not recommended | 2 / 1 / 7; 18 / 0 |
 | 17 | medium (degree ≤ 3 formulas); low (any `D` law) | none as an improvement, a pricing input only; the `m = 4` degree-4 row stays at +7.62 bits to rho | replaying the formulas on the committed records: < 1 CPU-minute; the new `m = 4`, `n = 10`, `ℓ = 6` cells about 40 CPU-minutes at 8–10 GB; degree 5 needs a 70–128 GB host | pending |
 | 18 | medium (dimension and phase shares measured; msolve cost unmeasured, msolve not on PATH) | 1.0–1.4× on the current C₄ of `8.2·10⁷` at `p = 1009`, 1.9× at best (about 3.6 bits on the crossover); distance to rho unchanged (`1.39·10⁶×` rho-negation at `p = 29`) | 0.5–1 person-day, about 40 CPU-minutes, no new Rust (msolve `-g 1`, `-g 2`, `-P 1`, one thread, on four plain D₄ instances against the repository's four solver arms) | 7 / 0 / 5; 17 / 0 |
-| 19 | medium (mechanism checked exactly on the three curves; effect on `S` is a desk model over 3-seed means with heavy tails) | lever only: about 1.4–1.5× on `f2m15` and `f2m21`, about 3× on `f2m27`; against the published rows about 2.8×, 2.1×, 3.4×; distance to matched rho from 13.1×, 18×, 38.2× to about 4.7×, 8.7×, 11×, still above rho on every row | about 1 person-day of Rust (150–200 lines with tests, a `--base-arms` flag on `ic boundary`), < 5 CPU-minutes, < 0.5 GiB; landing a row adds the validation gate | pending |
+| 19 | medium (mechanism checked exactly on the three curves; effect on `S` is a desk model over 3-seed means with heavy tails) | lever only: about 1.4–1.5× on `f2m15` and `f2m21`, about 3× on `f2m27`; against the published rows about 2.8×, 2.1×, 3.4×; distance to matched rho from 13.1×, 18×, 38.2× to about 4.7×, 8.7×, 11×, still above rho on every row | about 1 person-day of Rust (150–200 lines with tests, a `--base-arms` flag on `ic boundary`), < 5 CPU-minutes, < 0.5 GiB; landing a row adds the validation gate | 3 / 0 / 3 (+3 unverified); 18 / 2 |
 
 ### 10.1 What the round-2 dossiers change in the ranking
 
@@ -480,7 +480,9 @@ Table D. Ranking inputs and verification totals, round 2.
   not fetched". Six unfound numbers are rounded forms.
 - **LEAD-18.** Twenty unfound numbers are rounded scientific notation
   (`2.54·10¹⁰` for the files' `2.535–2.552·10¹⁰` and full-digit JSON values).
-- **LEAD-19.** Its card lands with the final build.
+- **LEAD-19.** No mismatches; three citations the card could not route
+  (no identifier) are listed as unverified; the two missing paths are the
+  `--base-arms` flag and its arms, which the test proposes to add.
 
 ## 9. Files
 
