@@ -1,0 +1,86 @@
+# Pre-registration for H3_canonical_lift/PROTOCOL.md (the prose protocol is the authority).
+# Executed by a Sonnet runner through the isolab harness wrapper; expspec validates
+# this file as the machine-readable record. Not approved: no coordinator decision
+# is committed, so `expspec card` refuses it and runs are recorded in the state notes.
+schema: crypto.experiment/v1
+id: EXP-EXOTIC-H3-001
+version: 1
+title: "Canonical-lift p-adic digits: additive defect, MI with log, closure (C3)"
+status: draft
+owner: adam
+created: 2026-10-22
+tags: [exotic, prime-field, falsifier, h3]
+links:
+  protocol: research/exotic_ecdlp_20261021/H3_canonical_lift/PROTOCOL.md
+  results: research/exotic_ecdlp_20261021/H3_canonical_lift/RESULTS.md
+  predecessors: [research/exotic_ecdlp_20261021/PROOFS.md]
+
+question:
+  summary: "Is any F_p-linear functional of the lift digits approximately additive or closed?"
+  questions:
+    - {id: Q1, text: "Is any F_p-linear functional of the lift digits approximately additive or closed?"}
+  predictions:
+    - {id: P1, about: [Q1], text: "Kill: min Delta(L) >= 1-c/sqrt(p), MI within permutation null, closure at base rate.", confidence: 0.9}
+
+source:
+  repo: aburan28/crypto
+  ref: claude/exotic-ecdlp-hypotheses-20261021
+  commit: 02b37807a9bec066b5508be22a9f0a62bc1a2369
+  allow_drift: true
+  frozen: []
+
+paths:
+  root: research/exotic_ecdlp_20261021/H3_canonical_lift
+  out: research/exotic_ecdlp_20261021/H3_canonical_lift/out
+
+matrix:
+  axes:
+    bits: [12, 16, 20]
+  id_template: "bits{{bits}}"
+
+steps:
+  - id: run
+    title: submit the Sage program to isolab, poll, download results
+    scope: once
+    runs_on: host
+    argv: [bash, -c, "bash ~/ops/eks-isolab/submit-and-wait.sh exotic-h3-canonical-lift 4 8Gi 3600 < ~/ops/eks-isolab/tmp/exotic-h3-canonical-lift.py"]
+    timeout_s: 5400
+    outputs: ["research/exotic_ecdlp_20261021/H3_canonical_lift/out/result.json"]
+    evidence: true
+    on_failure: stop
+
+hosts:
+  selection: ordered
+  candidates:
+    - id: isolab-harness
+      backend: ssh
+      config: {host: awsspot, workdir: /home/ec2-user/ops/eks-isolab}
+      provides: {vcpus: 4, memory_gb: 8, arch: x86_64}
+      timing_valid: false
+      preemptible: true
+      paid: true
+      est_hourly_usd: 0.5
+      note: "isolab EKS Spot pod via submit-and-wait.sh; image isolab/tasks@sha256:9ba9edac1c5e...; VM pod, no timing claim"
+
+budget: {max_cost_usd: 5, max_wall_hours: 1}
+
+metrics:
+  - {id: min_delta, kind: derived, description: "primary observable, see PROTOCOL.md", source: {file: "research/exotic_ecdlp_20261021/H3_canonical_lift/out/result.json", path: min_delta}, primary: true}
+
+outcome:
+  decision_rules:
+    - {id: KILL, about: [Q1], when: "min Delta(L) >= 1-c/sqrt(p), MI within permutation null, closure at base rate", verdict: "C3 survives; route reduced to a measured wall"}
+    - {id: WIN, about: [Q1], when: "the PROTOCOL.md Win criterion holds and strengthens with scale", verdict: "candidate counterexample; run the validation gate before any claim"}
+  invalidation: ["the planted/count control fails", "the instance-validation flags in result.json are false"]
+  censoring: ["isolab Spot interruption", "per-cell time or memory cap exceeded (reported per cell, never as evidence)"]
+
+reporting:
+  results_file: research/exotic_ecdlp_20261021/H3_canonical_lift/RESULTS.md
+  required_artifacts: ["research/exotic_ecdlp_20261021/H3_canonical_lift/out/result.json", "research/exotic_ecdlp_20261021/H3_canonical_lift/run.py"]
+  visuals: true
+
+agent:
+  executor_model: claude-sonnet-5-5
+  director_model: claude-opus-5-5
+  autonomy: {launch_paid_host: allowed, terminate_own_hosts: allowed, git_commit: never, git_push: never, open_pr: never}
+  escalate_on: [step_failed, any_error]
