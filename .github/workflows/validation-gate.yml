@@ -31,7 +31,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          # The full research tree exceeds 7 GiB and exhausted a hosted runner
+          # before this job reached its tests. Keep the complete evidence paths
+          # used by the current leaderboard and benchmark rows. A new validated
+          # row that cites another directory must add that directory here.
+          fetch-depth: 2
+          sparse-checkout: |
+            benchmarks
+            docs/ic
+            papers
+            research/validation_sweep_20261019
+            research/ic_oracle_setup_blocked_20261020
+            research/ic_tool_program
+            research/isogeny-volcano-cost-v2_20261017
+            research/pdp_split_slots_20261012
+            research/two_sylow_fp64_20261017
+            research/volcano_ecdlp_census_20261017
+            scripts
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -41,6 +57,9 @@ jobs:
         run: |
           base=""
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            base="--base origin/${{ github.base_ref }}"
+            # Checkout's synthetic PR merge commit has the exact base as its
+            # first parent and the submitted head as its second parent.
+            test "$(git rev-parse HEAD^2)" = "${{ github.event.pull_request.head.sha }}"
+            base="--base HEAD^1"
           fi
           python3 scripts/validation_gate.py check $base
