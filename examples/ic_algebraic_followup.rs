@@ -21,6 +21,8 @@ use num_traits::ToPrimitive;
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
+#[path = "ic_algebraic_followup/exact.rs"]
+mod exact;
 
 fn digest(bytes: &[u8]) -> String {
     hex::encode(Sha256::digest(bytes))
@@ -497,20 +499,11 @@ fn guess(args: &BTreeMap<String, String>) {
     let get = |k: &str| args.get(k).unwrap_or_else(|| panic!("missing {k}"));
     let source = std::fs::read(get("--input")).expect("input");
     let draw: u64 = get("--draw").parse().unwrap();
-    let vars: Vec<usize> = if get("--vars") == "none" {
-        vec![]
-    } else {
-        get("--vars")
-            .split(',')
-            .map(|x| x.parse().unwrap())
-            .collect()
-    };
-    assert!(vars.len() <= 16 && vars.iter().copied().collect::<BTreeSet<_>>().len() == vars.len());
     let degree: u32 = get("--degree").parse().unwrap();
     let cap: u128 = get("--max-cols").parse().unwrap();
     let first: u64 = get("--first-branch").parse().unwrap();
     let end: u64 = get("--end-branch").parse().unwrap();
-    assert!(first < end && end <= 1u64 << vars.len());
+    assert!(first < end);
     let input: Value = std::str::from_utf8(&source)
         .unwrap()
         .lines()
@@ -538,18 +531,81 @@ fn guess(args: &BTreeMap<String, String>) {
         &F2mElement::one(n),
         m,
         &st,
-    )
-    .unwrap();
+    );
+    let Some(sys) = sys else {
+        emit(
+            &json!({"schema":"ic-algebraic-guess/v1","input_sha256":digest(&source),
+            "draw":draw,"m":m,"n":n,"ell":bs.len(),"variables":input["n_vars"],
+            "guess_spec":get("--vars"),"first_branch":first,"end_branch":end,
+            "complete_dlp_cost":null,"rho_ratio":null,"status":"unsupported_over_64_variables"}),
+        );
+        return;
+    };
+    let vars: Vec<usize> = if let Some((ordering, k)) = get("--vars").split_once(':') {
+        let k: usize = k.parse().unwrap();
+        let mut frequency = vec![0usize; sys.n_vars];
+        for p in &sys.equations {
+            for term in &p.terms {
+                for (v, f) in frequency.iter_mut().enumerate() {
+                    if term.mask >> v & 1 != 0 {
+                        *f += 1;
+                    }
+                }
+            }
+        }
+        let mut candidates: Vec<_> = (0..sys.n_vars).filter(|&v| frequency[v] > 0).collect();
+        match ordering {
+            "lowest" => {}
+            "frequent" => candidates.sort_by_key(|&v| (std::cmp::Reverse(frequency[v]), v)),
+            _ => panic!("ordering must be lowest or frequent"),
+        }
+        assert!(k <= candidates.len());
+        candidates.truncate(k);
+        candidates
+    } else if get("--vars") == "none" {
+        vec![]
+    } else {
+        get("--vars")
+            .split(',')
+            .map(|x| x.parse().unwrap())
+            .collect()
+    };
+    assert!(vars.len() <= 16 && vars.iter().copied().collect::<BTreeSet<_>>().len() == vars.len());
+    assert!(end <= 1u64 << vars.len());
     assert!(vars.iter().all(|&v| v < sys.n_vars));
     assert_eq!(sys.n_vars as u64, input["n_vars"].as_u64().unwrap());
     for branch in first..end {
         let eqs = specialise(&sys.equations, &vars, branch);
         let cols = columns(occurring(&eqs), degree);
-        let mut row = json!({"schema":"ic-algebraic-guess/v1","input_sha256":digest(&source),
+        let engine = args.get("--engine").map(String::as_str).unwrap_or("dense");
+        assert!(engine == "dense" || engine == "sparse");
+        let mut row = json!({"schema":"ic-algebraic-guess/v1","input_sha256":digest(&source),"engine":engine,
             "draw":draw,"m":m,"n":n,"ell":bs.len(),"variables":sys.n_vars,"guessed_variables":vars,
             "branch":branch,"degree":degree,"estimated_columns":cols.to_string(),"column_cap":cap.to_string(),
             "complete_dlp_cost":null,"rho_ratio":null,"status":"column_cap"});
-        if cols <= cap {
+        if engine == "sparse" {
+            let limit: usize = get("--max-entries").parse().unwrap();
+            let start = std::time::Instant::now();
+            let result = crypto_lib::cryptanalysis::koblitz_bench::sparse_closure_refutes(
+                &eqs, sys.n_vars, degree, limit,
+            );
+            row["max_entries"] = json!(limit);
+            if let Some(r) = result {
+                row["status"] = json!(if r.refuted {
+                    "refuted"
+                } else if r.saturated {
+                    "saturated_not_refuted"
+                } else {
+                    "not_saturated"
+                });
+                row["sparse_rank"] = json!(r.rank);
+                row["sparse_products"] = json!(r.products);
+                row["sparse_max_weight"] = json!(r.max_weight);
+            } else {
+                row["status"] = json!("sparse_entry_cap");
+            }
+            row["diagnostic_seconds"] = json!(start.elapsed().as_secs_f64());
+        } else if cols <= cap {
             let start = std::time::Instant::now();
             if let Some((closed, cost)) =
                 ReducedBasis::from_system_closed_full(&eqs, sys.n_vars, degree, 1_000_000)
@@ -660,6 +716,107 @@ fn selftest() {
         "symmetric_identity":true,"repeated_root_split":true,"sat_soundness":true}),
     );
 }
+fn fixtures(args: &BTreeMap<String, String>) {
+    let get = |k: &str| args.get(k).unwrap_or_else(|| panic!("missing {k}"));
+    let n: u32 = get("--n").parse().unwrap();
+    let ell: usize = get("--ell").parse().unwrap();
+    let m: usize = get("--m").parse().unwrap();
+    let seed: u64 = get("--seed").parse().unwrap();
+    let draws: u64 = get("--draws").parse().unwrap();
+    let family = get("--family");
+    let irr = find_irreducible_sparse(n).unwrap();
+    let gf = Gf2::new(&irr);
+    let mut rng =
+        StdRng::seed_from_u64(seed ^ ((m as u64) << 48) ^ ((n as u64) << 24) ^ ell as u64);
+    for draw in 0..draws {
+        let bs = make_basis(&gf, ell, family, rng.gen());
+        let xr = rng.gen_range(0..1u64 << n);
+        let start = std::time::Instant::now();
+        let solutions = exact::count(&gf, &bs, xr, m);
+        emit(
+            &json!({"schema":"ic-algebraic-fixture/v1","m":m,"n":n,"ell":ell,"family":family,
+            "seed":seed,"draw":draw,"field_modulus":gf.irr,"n_vars":m*ell+(m-2)*n as usize,
+            "v_basis":bs,"x_r":xr,"solutions":solutions,"outcome":{"kind":"unmeasured"},
+            "oracle":"quadratic-chain-mitm-v1","oracle_diagnostic_seconds":start.elapsed().as_secs_f64()}),
+        );
+    }
+}
+
+fn verify_fixtures(args: &BTreeMap<String, String>) {
+    let path = args.get("--input").expect("--input");
+    let source = std::fs::read(path).unwrap();
+    for line in std::str::from_utf8(&source).unwrap().lines() {
+        let input: Value = serde_json::from_str(line).unwrap();
+        let n = input["n"].as_u64().unwrap() as u32;
+        let m = input["m"].as_u64().unwrap_or(3) as usize;
+        let bs: Vec<_> = input["v_basis"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v.as_u64().unwrap())
+            .collect();
+        let xr = input["x_r"].as_u64().unwrap();
+        let irr = find_irreducible_sparse(n).unwrap();
+        let gf = Gf2::new(&irr);
+        let count = exact::count(&gf, &bs, xr, m);
+        assert_eq!(
+            count,
+            input["solutions"].as_u64().unwrap(),
+            "fixture exact count mismatch"
+        );
+        let witness = exact::witness(&gf, &bs, xr, m);
+        assert_eq!(witness.is_some(), count > 0);
+        let mut row = json!({"schema":"ic-algebraic-fixture-replay/v1","input_sha256":digest(&source),
+            "draw":input["draw"],"m":m,"n":n,"ell":bs.len(),"solutions":count,"count_matches":true,
+            "witness_checked":false,"status":"verified"});
+        if let Some((xs, us)) = witness {
+            let base: Vec<_> = bs.iter().map(|&x| element(x, n)).collect();
+            let st = FieldStructure::new(n, &irr);
+            let sys = build_decomposition_system(&base, &element(xr, n), &element(1, n), m, &st);
+            row["witness_x"] = json!(xs);
+            row["witness_intermediates"] = json!(us);
+            if let Some(sys) = sys {
+                let mut assignment = 0u64;
+                for (i, &x) in xs.iter().enumerate() {
+                    let bits = (0..1u64 << bs.len())
+                        .find(|&bits| {
+                            bs.iter()
+                                .enumerate()
+                                .filter(|(j, _)| bits >> j & 1 != 0)
+                                .fold(0, |a, (_, b)| a ^ b)
+                                == x
+                        })
+                        .unwrap();
+                    assignment |= bits << (i * bs.len());
+                }
+                for (i, &u) in us.iter().enumerate() {
+                    assignment |= u << (m * bs.len() + i * n as usize);
+                }
+                assert!(sys.equations.iter().all(|p| p.eval(assignment) == 0));
+                // A SAT control at the affordable degree must not refute.
+                if columns(sys.n_vars, 3) <= 30000 {
+                    let (closed, _) = ReducedBasis::from_system_closed_full(
+                        &sys.equations,
+                        sys.n_vars,
+                        3,
+                        1_000_000,
+                    )
+                    .unwrap();
+                    assert!(!closed.is_refuted());
+                    row["sat_degree3_not_refuted"] = json!(true);
+                } else {
+                    row["sat_degree3_status"] = json!("column_cap_30000");
+                }
+                row["witness_assignment"] = json!(assignment);
+                row["witness_checked"] = json!(true);
+            } else {
+                row["boolean_layout_status"] = json!("unsupported_over_64_variables");
+            }
+        }
+        emit(&row);
+    }
+}
+
 fn main() {
     let mut it = std::env::args().skip(1);
     let mode = it.next().expect("mode: selftest/profile/guess");
@@ -673,6 +830,8 @@ fn main() {
         "selftest" => selftest(),
         "profile" => profile(&args),
         "guess" => guess(&args),
+        "fixtures" => fixtures(&args),
+        "verify-fixtures" => verify_fixtures(&args),
         _ => panic!("unknown mode"),
     }
 }

@@ -131,3 +131,35 @@ Conductor is not installed in this workspace; no task reservation is claimed.
 Review `docs/index-calculus-scoreboard.html`, the leaderboard, progress data
 and browser when results land. Add a study panel for new structural findings;
 retain end-to-end fields as null until their obligations are met.
+
+## Amendment 1: fixture oracle and bounded sparse follow-up, 2026-10-23
+
+Frozen before generating fresh fixtures or running any guessing branch. The
+initial structural panel remains governed by the original protocol and binary.
+The native follow-up adds a separate exact fixture oracle: invert the binary
+linear map y -> y^2+y, solve each S3 quadratic including linear/degenerate
+cases, and join the two ends of a three- or four-summand chain. Full-field
+quadratic enumeration at n=5,6,7 and the legacy exhaustive chain counter at
+n=5 are its correctness controls. This oracle is enumeration for validation;
+no IC improvement or end-to-end speedup is inferred from its runtime.
+
+Replay all seven original fixtures independently, including explicit SAT
+witnesses evaluated in the Boolean chain. SAT closure controls use degree
+three with a 30,000-column cap; refusals remain recorded.
+
+Fresh cells (m,n,ell): (3,25,9), (4,17,6), (4,18,6), (3,34,8), (3,36,8),
+(4,38,6). The last has 100 variables and currently exceeds the Boolean
+engine's 64-variable layout; fixture counting is supported independently.
+For every cell generate 32 draws in each of prefix, geometric, geomtraceu,
+random, seed 20261023. Prefix base duplication is retained and identified.
+Record every draw; select the first four UNSAT and first three SAT per arm,
+without replacing missing classes, for the closure/guessing follow-up.
+Commit exact fixture bytes and hashes before closure measurement.
+
+The declared alternative guess orderings are ascending occurring variable
+index (`lowest:k`) and decreasing monomial frequency, ties by variable index
+(`frequent:k`). Original balanced ordering is unchanged. Optional sparse
+closure is a separate instrument arm capped at 25,000,000 stored nonzeros,
+the same 12 GiB address-space and 900 s command limits. A sparse cap or timeout
+does not settle a degree or guessing minimum. Begin it on the first UNSAT
+draw at each larger cell. Do not retry a capped branch to change its outcome.
