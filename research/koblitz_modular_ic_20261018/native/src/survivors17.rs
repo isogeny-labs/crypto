@@ -211,3 +211,9 @@ pub fn run(dir: &Path) {
         &json!({"schema":"koblitz.round17/q23-v1","records":records,"scope":"actual source-bound h6 membership via Round16 universal residual;four Q22 exclusions,not full saturation"}),
     );
 }
+
+#[path = "companion18.rs"]
+pub(crate) mod companion18;
+
+#[path = "squares18.rs"]
+pub(crate) mod squares18;

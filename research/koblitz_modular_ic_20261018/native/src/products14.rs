@@ -521,3 +521,9 @@ mod tests {
 
 #[path = "survivor_repair17.rs"]
 pub(crate) mod survivor_repair17;
+
+#[path = "boundary18.rs"]
+pub(crate) mod boundary18;
+
+#[path = "boundary18_square.rs"]
+pub(crate) mod boundary18_square;

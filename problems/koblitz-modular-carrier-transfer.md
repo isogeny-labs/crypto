@@ -735,3 +735,44 @@ Frobenius compatibility equations before section extraction; derive an actual
 companion separator or full ramified arc for Q24, then prove full saturated
 ideal equality. These acceptance tests remain open. Round14 ranks/divisors
 and Round15 source-fiber/image gaps stay frozen. No IC assessment is supplied.
+
+## Round18: actual deck action, canonical characters and a precise descent obstruction
+
+[Round18](../research/koblitz_modular_ic_20261018/rounds/18/REPORT.md)
+evaluates the actual diamond-2 curve correspondence. It preserves the ten
+positive F32 incidence points, its fifth iterate is the old involution and
+its tenth is identity. This gives an integral deck correspondence under the
+written normalization bridge, not an evaluated factor inclusion. The actual
+CM source root sets have two shared Frobenius/diamond systems modulo11;
+(F,D)=(1,6) is the rational11 system. The shared unramified Hecke congruence
+persists through23 prime controls. Arbitrary integral maps are not excluded.
+
+An exhaustive affine-linear F32 search in span(1,b,c,lambda,nu) yields90/12
+nonconstant finite fits. Eight independent F1024 incidence constructions
+refute all102 with exact residues, recomputed by a Lean bit-polynomial
+checker. Higher-degree and rational maps with controlled poles remain open;
+the written prime-to11 existence proof is unaffected. Exit criteria still
+require a proper model/correspondence, a function-field identity, an actual
+11-primary image and a divisor evaluator. The next ansatz should permit
+poles rather than repeat the excluded affine-linear family.
+
+Symmetric normalization determines the canonical theta character under the
+actual written symmetric pullback-class bridge, with exponents35,0,50,23
+modulo105. Standard split Frobenius controls pass. The selected diagonal
+cover, however, has no integral lift of the target rotation: B^-1 R B has
+denominator105, with a proved modulo81 obstruction. This is a proved
+obstruction for that cover, not nonexistence of F2 quotient/bundle descent.
+C=105B^-1 is an integral CM refinement and B C=105I commutes with R.
+Its mixed theta action, coherent F2 invariant basis, second19² action and
+243 target sections remain required. The scalar cover's algebraic degree
+is recorded without an IC cost claim.
+
+All four Q24 points are excluded by depth6 companion quartics. Their four
+Q26 successors are excluded by depth5 square/cube residuals. Retaining every
+prior constraint gives four checked Q28 models with support95,97,123 in51
+visits per graph. They remain unclassified; the next discriminating test is
+an actual source separator or a full ramified arc. Whole saturated ideals
+and proper polarized embeddings remain open. Ninety-four new named Lean
+results distinguish universal/finite proofs from native searches and written
+geometry. Earlier ranks, divisors and Round15 norm-source-fiber gaps remain
+frozen; no IC efficiency assessment is supplied.

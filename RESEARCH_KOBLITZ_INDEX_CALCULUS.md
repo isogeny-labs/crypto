@@ -12,24 +12,26 @@ pre-registered hypotheses)
 (ePrint 2020/1315).
 
 **Modular and low-genus carrier follow-up (2026-10-22):**
-[Round17](research/koblitz_modular_ic_20261018/rounds/17/REPORT.md)
-checks eight simple mod11 roots for each actual n=5 source factor. A
-written integral Tate/local-lattice argument supplies a prime-to11 map
-existence result under the compact modular/Jacobian bridge. Actual source
-matrices and split/glued lattice controls exhibit a forward fixed11
-injection even when the natural reverse cancels. An evaluated integral
-level77 correspondence and its divisor map remain open.
+[Round18](research/koblitz_modular_ic_20261018/rounds/18/REPORT.md)
+evaluates the diamond-2 correspondence and verifies a common unramified
+residual Hecke system on the rational 11-torsion lines. Exhausting33,554,432
+affine-linear x-functions per sign gives102 nonconstant finite fits; eight
+independent F1024 incidences reject all102. The actual integral factor
+inclusion and its divisor evaluator remain open. [Round17](research/koblitz_modular_ic_20261018/rounds/17/CM.md)'s
+conditional written prime-to11 existence argument is unchanged.
 
-The odd diagonal cover has certified Smith kernel E[3]×E[105] of order99225,
-actual full torsion bases and four normalized factored theta lifts.
-Three period probes,18 commutator probes and48 independent square checks
-per graph pass. Canonical mixed-divisor character matching, F32/F2 descent
-compatibility,243 explicit target sections and proper equations remain open.
-All four previous Q22 boundary points are excluded by source-bound quartics
-of h-membership depth6. Four new Q24 survivors, in the supersingular
-companion subcircuit, retain the whole-saturation obligation. Sixty-nine
-new named Lean results prove structural implications, universal identities
-and actual finite certificates; global modular/Tate geometry stays written.
+Canonical theta characters are determined by symmetry under the actual
+written pullback-class identification. The selected diagonal cover has
+B^-1 R B denominator105 and an exact modulo81 no-lift certificate.
+C=105B^-1 is an explicit integral refinement with B C=105I, compatible
+with R; its mixed theta action, F2 invariant basis and243 target sections
+remain open. Source-bound depth6 quartics exclude all four Q24 models;
+depth5 square/cube residuals also exclude the four Q26 models. Four new Q28
+models on nodes95,97,123 keep full saturation and proper embeddings open.
+Ninety-four new named Lean results prove structural implications, universal
+identities, finite matrix/source bindings and102 counterexample residues.
+Global modular/abelian geometry and native search exhaustion remain written
+or native, with exact scope in the proof map.
 [Round16](research/koblitz_modular_ic_20261018/rounds/16/REPORT.md)'s
 explicit level77 incidence and diamond twist remain frozen inputs.
 

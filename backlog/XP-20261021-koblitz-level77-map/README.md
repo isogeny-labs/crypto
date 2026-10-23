@@ -12,6 +12,10 @@ with independent nonvacuous F32 torsion controls. Round17 gives a written
 prime-to11 map existence argument under the compact modular/Jacobian bridge,
 using the eight simple mod11 roots of each actual source factor. Integral
 controls distinguish forward injection from natural reverse cancellation.
+Round18 evaluates the diamond-2 correspondence and exhausts an affine-linear
+F32 ansatz;independent F1024 incidences refute all102 nonconstant finite fits.
+Shared residual Hecke systems remain inseparable by scalar projectors. See
+[Round18 CM](../../research/koblitz_modular_ic_20261018/rounds/18/CM.md).
 The card remains blocked on proper normalization, the evaluated integral
 correspondence and its divisor checker. The simple projector denominator704
 is still divisible by11. See [Round17 CM](../../research/koblitz_modular_ic_20261018/rounds/17/CM.md).
@@ -33,6 +37,6 @@ not establish this F2 modular map. A positive result establishes only
 its actual map/subgroup/divisor obligations. Runtime, relation usefulness
 and IC assessment remain separate.
 
-The related3Theta section construction, new Q24 companion arc/separator identification and460/367
+The related3Theta section construction, new Q28 arc/separator identification and460/367
 ordinary-support source fibers remain explicit acceptance tests in the
 [recurring problem](../../problems/koblitz-modular-carrier-transfer.md).

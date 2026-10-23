@@ -191,3 +191,6 @@ pub(crate) mod round16;
 
 #[path = "round17_record.rs"]
 pub(crate) mod round17;
+
+#[path = "round18_record.rs"]
+pub(crate) mod round18;

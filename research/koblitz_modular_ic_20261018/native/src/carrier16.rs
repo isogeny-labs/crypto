@@ -490,3 +490,11 @@ pub fn run(dir: &Path) {
         &json!({"schema":"koblitz.round16/cm17-v1","level":77,"candidate_compact_genus_under_moduli_bridge":61,"primary_variables":["b","c","lambda","nu"],"Tate_curve":"y2+(1+c)xy+by=x3+bx2","P11":[0,0],"untwisted":{"nodes":p.nodes,"residuals":p.res,"units":p.units},"diamond_quadratic_twist":{"nodes":t.nodes,"residuals":t.res,"units":t.units},"diamond_involution":"lambda -> lambda+1+c;nu -> nu+b","finite_field_records":records,"conservative_field_multiplication_budget_charge":OPS.load(Ordering::Relaxed),"budget_accounting":"128 field multiplications charged per algebra visit;all fields degree<=15;this is a conservative cap,not a measured operation count","proper_normalization_constructed":false,"Koblitz_factor_correspondence_constructed":false,"subgroup_injection_evaluated":false,"scope":"explicit inverse-witness affine Tate incidence and its diamond twist;global compact moduli identification written;factor map open"}),
     );
 }
+
+#[path = "diamond18.rs"]
+pub(crate) mod diamond18;
+#[path = "maps18.rs"]
+pub(crate) mod maps18;
+
+#[path = "holdout18.rs"]
+pub(crate) mod holdout18;

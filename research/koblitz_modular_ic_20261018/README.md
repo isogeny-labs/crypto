@@ -1,27 +1,29 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [17](rounds/17/README.md), with its
-[report](rounds/17/REPORT.md), [PDF](rounds/17/report.pdf),
-[integral map](rounds/17/CM.md), [theta descent](rounds/17/THETA.md),
-[saturation](rounds/17/SATURATION.md), [proof map](rounds/17/PROOF_MAP.md),
-[ledger](rounds/17/ledger.json) and exact replay.
+The current round is [18](rounds/18/README.md), with its
+[report](rounds/18/REPORT.md), [PDF](rounds/18/report.pdf),
+[integral maps](rounds/18/CM.md), [theta descent](rounds/18/THETA.md),
+[saturation](rounds/18/SATURATION.md), [proof map](rounds/18/PROOF_MAP.md),
+[ledger](rounds/18/ledger.json) and exact replay.
 
-The actual n=5 source factors each have eight simple roots modulo11.
-A written Tate/local-lattice argument gives prime-to11 map existence
-under the compact modular/Jacobian bridge. Integral controls preserve the
-fixed11 line forward while the natural reverse kills it; the evaluated
-level77 correspondence remains open.
+The diamond-2 correspondence is evaluated on the actual level-77 chart.
+The rational 11-torsion lines still share an unramified residual Hecke
+system. A complete affine-linear F32 ansatz gives102 nonconstant finite
+fits; independent F1024 incidences reject all of them. The integral factor
+inclusion remains open, consistent with Round17's conditional existence proof.
 
-The odd cover has Smith kernel E[3]×E[105] and four normalized factored
-theta lifts, with actual torsion, pairing, period and square controls.
-Canonical mixed-divisor character matching, F32/F2 compatibility and243
-explicit target sections remain open. All four Q22 points are excluded
-by source-bound depth6 quartics; four new Q24 survivors keep full saturation
-open. Sixty-nine new named Lean results cover structural implications,
-universal identities and finite data. Earlier ranks/divisors remain frozen;
-no IC cost or efficiency assessment is supplied.
+Symmetry determines the old-to-canonical theta characters under the written
+pullback-class bridge. The selected diagonal cover has a certified integral
+rotation obstruction. An explicit scalar105 refinement commutes with the
+rotation; its polarization is mixed and invariant sections remain open.
+All four Q24 and four Q26 points are excluded; four Q28 models remain
+unclassified. There are94 new named Lean results. Earlier ranks and divisors
+stay frozen; no IC cost or efficiency assessment is supplied.
 
 Earlier evidence stays frozen:
+
+- [Round 17](rounds/17/README.md): written prime-to11 map existence,
+  odd kernel and factored lifts, source-bound Q22 exclusions.
 
 - [Round 16](rounds/16/README.md): explicit level77 incidence and twist,
   diagonal cover section bases and source-bound quartic separators.

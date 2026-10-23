@@ -361,3 +361,9 @@ pub fn run(dir: &Path) {
         &json!({"schema":"koblitz.round17/cm18-v1","records":records,"common_roots_mod11":common,"cyclic_glued_Frobenius":matv(&n),"split_fixed11_dimension":2,"cyclic_fixed11_dimension":1,"same_Frobenius_polynomial":polyv(&pq),"same_determinant_F_minus_one":121,"split_cokernel11_primary":[11,11],"cyclic_cokernel11_primary":[121],"cokernel_bridge":"for a companion polynomial P,coker(F-1)=Z/(P(1));split controls are direct sums","actual_level77_integral_lattice_known":false,"existence_bridge":"squarefree mod11 source Frobenius gives unique local lattice;Tate integral Hom approximation supplies prime-to11 isogeny to its isotypic subvariety,under written global hypotheses","actual_factor_correspondence_constructed":false}),
     );
 }
+
+#[path = "frobenius18.rs"]
+pub(crate) mod frobenius18;
+
+#[path = "refinement18.rs"]
+pub(crate) mod refinement18;

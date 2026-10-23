@@ -53,6 +53,7 @@ mod divisors10;
 mod exact16;
 mod forward07;
 mod gluing;
+mod hecke18;
 #[path = "../../../../src/cryptanalysis/identity_certificate.rs"]
 mod identity_certificate;
 mod integral17;
@@ -397,6 +398,62 @@ fn main() {
     }
     if args10.get(1).map(String::as_str) == Some("--round17-lifts") {
         oddtheta17::lifts::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round18-squares") {
+        survivors17::squares18::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round18-square-repair") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::boundary18_square::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--record-round18") {
+        round13_record::round18::record(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round18-check-identities") {
+        round13_record::round18::identities(std::path::Path::new(&args10[2]), false);
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round18-map-proof") {
+        carrier16::holdout18::proof(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round18-refinement") {
+        integral17::refinement18::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round18-holdouts") {
+        carrier16::holdout18::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round18-diamond") {
+        carrier16::diamond18::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round18-hecke") {
+        hecke18::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round18-maps") {
+        carrier16::maps18::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round18-frobenius") {
+        integral17::frobenius18::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round18-symmetric") {
+        oddtheta17::lifts::symmetric18::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round18-repair") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::boundary18::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round18-companion") {
+        survivors17::companion18::run(std::path::Path::new(&args10[2]));
         return;
     }
     if args10.get(1).map(String::as_str) == Some("--round17-theta") {

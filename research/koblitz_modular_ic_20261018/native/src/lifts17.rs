@@ -235,3 +235,6 @@ pub fn run(dir: &Path) {
         &json!({"schema":"koblitz.round17/g18-v1","records":records,"field_degree":168,"modulus":f.modulus().to_str_radix(16),"cover_kernel_order":99225,"two_stage_section_dimensions":[8704314675u64,87723,243],"scope":"factored rational-function theta lifts with normalized generator orders and sampled native evaluation controls;global divisor bridge written;canonical character and invariant-section extraction open"}),
     );
 }
+
+#[path = "symmetric18.rs"]
+pub(crate) mod symmetric18;
