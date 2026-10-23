@@ -505,8 +505,8 @@ the four levels are kept apart.
 
 ## 9. Reading the seed frontier
 
-`records/` holds 54 bounds fitted from five committed sessions and two
-challenge sessions: `research/ecbench_all_candidates_20261003/sessions/{prime,koblitz}`
+`records/` holds 94 bounds from five committed sessions and two challenge
+sessions: `research/ecbench_all_candidates_20261003/sessions/{prime,koblitz}`
 (four sizes each, eight targets, three rounds, audited with 12 replays);
 `research/ecbench_calibration_20261002/sessions/{prime,koblitz}` (six sizes
 each, same targets and rounds; the Koblitz session spans tiers — degrees 17,
@@ -514,15 +514,16 @@ each, same targets and rounds; the Koblitz session spans tiers — degrees 17,
 sizes each, and those are listed, not ranked: three sizes and a tier subset);
 `research/ecbench_pair_claw_20261003/sessions/koblitz` (six Koblitz degrees
 41 to 61, all medium); and the two epoch-1 sessions of
-`research/ecbench_bounds_challenges_20261006/`, whose `incumbent` and
-`candidate` arms are fitted as ordinary bounds (`session-*`). Forty-eight are fit
-version 2. Six are fit version 1 and unchanged: the four incumbents the
-standing challenges name by id (`prime-rho-neg`, `prime-bsgs-neg`,
-`koblitz-rho-strong`, `koblitz-bsgs-neg`; a committed challenge is never
-rewritten, and each has a `-v2` twin beside it) and the two bounds the
-epoch-1 verdicts wrote (`challenge-*`). `bound check` re-derives all of them,
-each under the version it records; the version-1 bounds appear on the page as
-*listed, not ranked*. The page has three domains. What changed from the first
+`research/ecbench_bounds_challenges_20261006/`. **No published record was
+replaced.** The 46 records published before fit version 2 (44 seed fits and
+the two bounds the epoch-1 verdicts wrote) stay byte for byte as they were:
+their ids are cited by the standing challenges, the IC leaderboard and
+research notes, and `bound check` re-derives each under fit version 1. Each
+seed fit has a fit-version-2 twin `<name>-v2.json`, and the `incumbent` and
+`candidate` arms of the two challenge sessions are fitted as
+`session-*-v2.json`: 48 version-2 bounds, which are the ones the frontier
+ranks. The version-1 records appear under each table as historical, listed and
+not ranked. The page has three domains. What changed from the first
 page, and what they say, read honestly:
 
 - **Prime, toy.** `bsgs.negation` is `1.100 ×` the floor `[0.978, 1.225]` over
@@ -627,8 +628,9 @@ ecbench challenge verdict --challenge C.json --dir SESSION --bounds DIR [--repla
 `--axes` and a challenge's `acceptance.axes` may name `ops`, `memory`,
 `uncharged`, `field_muls`, `field_sqrs` and `field_invs`.
 
-`refit.sh` regenerates every seed record (fit version 2) and the frontier
-(procedure 2) from the committed sessions, and runs the two committed
+`refit.sh` regenerates every seed record (fit version 1 as published, and its
+fit-version-2 `-v2` twin) and the frontier (procedure 2) from the committed
+sessions, and runs the two committed
 verdicts again under procedure 1 so the version-1 records they wrote
 re-derive byte for byte; CI runs `bound check` on every record, `challenge check` on every
 challenge and `frontier build --check` on the page.
@@ -640,8 +642,10 @@ docs/bounds/
   README.md          this protocol
   FRONTIER.md        generated page, checked in CI
   frontier.json      its machine-readable twin
-  records/*.json     bound records, write-once: <session>-<arm>.json from a fit,
-                     challenge-<name>-e<N>-<candidate>.json written by a verdict
+  records/*.json     bound records, write-once: <session>-<arm>.json from a fit
+                     (fit version 1, as published), <session>-<arm>-v2.json its
+                     fit-version-2 twin, challenge-<name>-e<N>-<candidate>.json
+                     written by a verdict
   challenges/*.json  standing challenges, one per domain and axis leader
   refit.sh           regenerate records and frontier from committed sessions
 

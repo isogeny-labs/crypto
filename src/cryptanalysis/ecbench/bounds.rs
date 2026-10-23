@@ -527,7 +527,7 @@ impl Bound {
         let mut why = Vec::new();
         if self.fit_version() < FIT_VERSION {
             why.push(format!(
-                "fit version {} (legacy): re-derivable, but fitted before the version-2 refusals",
+                "historical: fit version {}, kept as published and re-derivable; ranking uses fit-version-2 bounds (its -v2 twin where one was fitted)",
                 self.fit_version()
             ));
         }

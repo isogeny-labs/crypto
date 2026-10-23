@@ -15,7 +15,7 @@
       "target_guard_probes_uncharged"
     ]
   },
-  "bound_id": "ECBND1h0b4e1d5006f9",
+  "bound_id": "ECBND1h242c8c9495a1",
   "constant": {
     "declared_ratio_to_floor": null,
     "ratio_to_floor": {
@@ -81,22 +81,24 @@
   },
   "domain_id": "ECDOM1h080dd3dc639e",
   "fit": {
-    "alpha": 0.9585575736916673,
+    "alpha": 0.9585575736915988,
     "alpha_agrees_with_declared": null,
-    "alpha_ci95": null,
-    "ci_method": "none",
+    "alpha_ci95": [
+      -0.25,
+      1.0082900395096166
+    ],
+    "ci_method": "cluster",
     "declared_alpha": null,
-    "log2_c": -2.9078239301691227,
+    "log2_c": -2.9078239301678543,
     "model": "gae = C * r^alpha",
     "points": 48,
-    "r_squared": 0.9562881988719372,
+    "r_squared": 0.9562881988719388,
     "scaling_claim": false,
     "size_parameter": "r",
     "sizes": 2
   },
   "fit_options": {
     "curves": [],
-    "fit_version": 2,
     "resamples": 2000,
     "seed": 20261005,
     "tier": null
@@ -156,23 +158,6 @@
   "sizes": [
     {
       "automorphisms_available": 58,
-      "band": [
-        {
-          "ci95": null,
-          "s": null,
-          "weight": 0.0
-        },
-        {
-          "ci95": null,
-          "s": null,
-          "weight": 0.1
-        },
-        {
-          "ci95": null,
-          "s": null,
-          "weight": 1.0
-        }
-      ],
       "declared_ratio_to_floor": null,
       "declared_s": null,
       "field_bits": 29,
@@ -195,41 +180,6 @@
     },
     {
       "automorphisms_available": 34,
-      "axes": {
-        "uncharged": {
-          "ci95": [
-            0.0,
-            0.0
-          ],
-          "value": 0.0
-        }
-      },
-      "band": [
-        {
-          "ci95": [
-            17.812788831887456,
-            27.886177176491895
-          ],
-          "s": 22.822339022819364,
-          "weight": 0.0
-        },
-        {
-          "ci95": [
-            20.06872925201308,
-            30.653981864595572
-          ],
-          "s": 25.21852599051982,
-          "weight": 0.1
-        },
-        {
-          "ci95": [
-            37.30420930466898,
-            56.42311030823934
-          ],
-          "s": 46.78420869982393,
-          "weight": 1.0
-        }
-      ],
       "declared_ratio_to_floor": null,
       "declared_s": null,
       "field_bits": 17,
@@ -256,23 +206,6 @@
     },
     {
       "automorphisms_available": 38,
-      "band": [
-        {
-          "ci95": null,
-          "s": null,
-          "weight": 0.0
-        },
-        {
-          "ci95": null,
-          "s": null,
-          "weight": 0.1
-        },
-        {
-          "ci95": null,
-          "s": null,
-          "weight": 1.0
-        }
-      ],
       "declared_ratio_to_floor": null,
       "declared_s": null,
       "field_bits": 19,
@@ -295,41 +228,6 @@
     },
     {
       "automorphisms_available": 46,
-      "axes": {
-        "uncharged": {
-          "ci95": [
-            0.0,
-            0.0
-          ],
-          "value": 0.0
-        }
-      },
-      "band": [
-        {
-          "ci95": [
-            96.84080809091637,
-            120.6054062869945
-          ],
-          "s": 109.59878632517155,
-          "weight": 0.0
-        },
-        {
-          "ci95": [
-            106.88134476312909,
-            134.09686175602914
-          ],
-          "s": 121.09764405323433,
-          "weight": 0.1
-        },
-        {
-          "ci95": [
-            199.2781292843038,
-            247.19747665521345
-          ],
-          "s": 224.58736360579954,
-          "weight": 1.0
-        }
-      ],
       "declared_ratio_to_floor": null,
       "declared_s": null,
       "field_bits": 23,
@@ -397,14 +295,5 @@
       "sizes_with_work": 2
     }
   ],
-  "tail": {
-    "large": false,
-    "max_over_median": 3.4885601175649383,
-    "max_ratio": 821.4129071428401,
-    "median_ratio": 235.45900872025027,
-    "runs": 48,
-    "top_run": "ECR1h739c3cfd8151",
-    "top_run_share": 0.04880552441853303
-  },
   "verdict_id": null
 }

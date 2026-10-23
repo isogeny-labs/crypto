@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
-# Regenerate every seed bound record (fit version 2) and the frontier page
+# Regenerate every seed bound record (fit version 1 as published, and its
+# fit-version-2 twin) and the frontier page
 # (procedure 2) from the committed sessions.  Thin orchestration only
 # (AGENTS.md): every figure is computed by
 # `ecbench`.  Run from the repository root after `cargo build --release --bin
@@ -15,24 +16,16 @@ mkdir -p "$R"
 # into $R/OUT.json, citing the receipt research/TOPIC/RECEIPT.  TIER keeps one
 # tier of a session whose sizes span two; a mixed fit is refused.
 #
-# Fit version 2 is the procedure (README §3a).  Four seed records are the
-# incumbents the standing challenges in docs/bounds/challenges/ name by id; a
-# committed challenge is never rewritten, so those four stay as they were
-# fitted (fit version 1, re-derived here byte for byte) and their version-2
-# twins are written beside them as OUT-v2.json.
+# Every published record stays byte for byte what it was: OUT.json is the
+# fit-version-1 record (re-derived here and by `bound check`, cited by its id
+# in challenges, leaderboards and research notes), and its version-2 twin,
+# the one the frontier ranks, is written beside it as OUT-v2.json
+# (README §3a).
 fit() {
-  case "$5" in
-    prime-rho-neg | prime-bsgs-neg | koblitz-rho-strong | koblitz-bsgs-neg)
-      "$E" bound fit --dir "research/$1/sessions/$2" --arm "$3" --audit "research/$1/$4" \
-        --fit-version 1 ${6:+--tier "$6"} --root . --out "$R/$5.json" 2>&1 | grep -v '^wrote' || true
-      "$E" bound fit --dir "research/$1/sessions/$2" --arm "$3" --audit "research/$1/$4" \
-        ${6:+--tier "$6"} --root . --out "$R/$5-v2.json" 2>&1 | grep -v '^wrote' || true
-      ;;
-    *)
-      "$E" bound fit --dir "research/$1/sessions/$2" --arm "$3" --audit "research/$1/$4" \
-        ${6:+--tier "$6"} --root . --out "$R/$5.json" 2>&1 | grep -v '^wrote' || true
-      ;;
-  esac
+  "$E" bound fit --dir "research/$1/sessions/$2" --arm "$3" --audit "research/$1/$4" \
+    --fit-version 1 ${6:+--tier "$6"} --root . --out "$R/$5.json" 2>&1 | grep -v '^wrote' || true
+  "$E" bound fit --dir "research/$1/sessions/$2" --arm "$3" --audit "research/$1/$4" \
+    ${6:+--tier "$6"} --root . --out "$R/$5-v2.json" 2>&1 | grep -v '^wrote' || true
 }
 
 # Every candidate (research/ecbench_all_candidates_20261003): four sizes per
@@ -74,10 +67,10 @@ K=ecbench_bounds_challenges_20261006
 for arm in incumbent candidate; do
   "$E" bound fit --dir "research/$K/sessions/prime-toy-reference-e1" --arm "$arm" \
     --audit "research/$K/audit-prime-toy-reference-e1.json" --root . \
-    --out "$R/session-prime-toy-reference-e1-$arm.json" 2>&1 | grep -v '^wrote' || true
+    --out "$R/session-prime-toy-reference-e1-$arm-v2.json" 2>&1 | grep -v '^wrote' || true
   "$E" bound fit --dir "research/$K/sessions/koblitz-toy-reference-e1" --arm "$arm" \
     --audit "research/$K/audit-koblitz-toy-reference-e1.json" --root . \
-    --out "$R/session-koblitz-toy-reference-e1-$arm.json" 2>&1 | grep -v '^wrote' || true
+    --out "$R/session-koblitz-toy-reference-e1-$arm-v2.json" 2>&1 | grep -v '^wrote' || true
 done
 
 # Challenge verdicts (research/ecbench_bounds_challenges_20261006): the two
