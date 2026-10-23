@@ -15,7 +15,14 @@
 --     group orders) are TEXT in decimal; counts that cannot are INTEGER.
 --   * S = total group-addition equivalents / sqrt(r), over the whole method,
 --     cold, one target.  A row whose `lower_bound` is 1 left work unpriced.
---   * Only runs with status = 'verified' and warmup = 0 are results.
+--   * Only runs with status = 'verified' and warmup = 0 are results, and
+--     only runs of a `complete` session: the views below read nothing from
+--     an `interrupted` or `running` one (a prefix of its plan, however
+--     favourable), which stays in the tables with its status.
+--   * `ecbench db sql` audits a session directory before it emits a row of
+--     it, so a tampered or unsealed record never reaches this index; the
+--     identity guards below turn a row that disagrees with the one already
+--     loaded into an error.
 
 PRAGMA foreign_keys = ON;
 
@@ -190,7 +197,7 @@ CREATE TABLE IF NOT EXISTS runs (
   fb_id                TEXT REFERENCES factor_bases(fb_id),
   fbm_id               TEXT REFERENCES factor_base_measurements(fbm_id),
   algorithm_seed       TEXT NOT NULL,
-  status               TEXT NOT NULL CHECK (status IN ('verified', 'wrong_answer', 'exhausted', 'error', 'timeout', 'crashed')),
+  status               TEXT NOT NULL CHECK (status IN ('verified', 'wrong_answer', 'exhausted', 'error', 'timeout', 'crashed', 'interrupted', 'spawn_error')),
   recovered            TEXT,
   total_gae            REAL,
   s                    REAL,
@@ -363,9 +370,40 @@ CREATE TRIGGER IF NOT EXISTS hosts_identity BEFORE INSERT ON hosts
 WHEN EXISTS (SELECT 1 FROM hosts WHERE env_class_id = NEW.env_class_id AND env_class_sha256 <> NEW.env_class_sha256)
 BEGIN SELECT RAISE(ABORT, 'host class id already loaded with a different class hash'); END;
 
-CREATE TRIGGER IF NOT EXISTS runs_identity BEFORE INSERT ON runs
-WHEN EXISTS (SELECT 1 FROM runs WHERE record_id = NEW.record_id AND (session_id <> NEW.session_id OR seq <> NEW.seq))
-BEGIN SELECT RAISE(ABORT, 'record id already loaded for a different session or sequence number'); END;
+-- A run loaded again must be the same run: the same session and sequence
+-- number, and the same figures.  (Dropped first so a database built under
+-- an older schema gets the stricter guard.)
+DROP TRIGGER IF EXISTS runs_identity;
+CREATE TRIGGER runs_identity BEFORE INSERT ON runs
+WHEN EXISTS (SELECT 1 FROM runs WHERE record_id = NEW.record_id
+             AND (session_id <> NEW.session_id OR seq <> NEW.seq OR run_id <> NEW.run_id
+                  OR method_id <> NEW.method_id OR workload_id <> NEW.workload_id
+                  OR status <> NEW.status OR total_gae IS NOT NEW.total_gae OR s IS NOT NEW.s))
+BEGIN SELECT RAISE(ABORT, 'record id already loaded as a different run'); END;
+
+-- A session loaded again must be the same session, and a complete one
+-- never reverts or changes its records.
+DROP TRIGGER IF EXISTS sessions_identity;
+CREATE TRIGGER sessions_identity BEFORE INSERT ON sessions
+WHEN EXISTS (SELECT 1 FROM sessions WHERE session_id = NEW.session_id
+             AND (spec_sha256 <> NEW.spec_sha256 OR env_class_id <> NEW.env_class_id
+                  OR label <> NEW.label OR started_unix_ms <> NEW.started_unix_ms
+                  OR binary_sha256 IS NOT NEW.binary_sha256
+                  OR (status = 'complete'
+                      AND (NEW.status <> 'complete' OR records_sha256 IS NOT NEW.records_sha256))))
+BEGIN SELECT RAISE(ABORT, 'session id already loaded as a different session, or as complete with other records'); END;
+
+-- An arm name keeps its role and method for the whole session.
+CREATE TRIGGER IF NOT EXISTS arms_identity BEFORE INSERT ON arms
+WHEN EXISTS (SELECT 1 FROM arms WHERE session_id = NEW.session_id AND arm = NEW.arm
+             AND (role <> NEW.role OR method_id <> NEW.method_id))
+BEGIN SELECT RAISE(ABORT, 'arm already loaded with a different role or method'); END;
+
+-- A comparison id keeps its content: a differing row is an error, never a
+-- replacement.
+CREATE TRIGGER IF NOT EXISTS comparisons_identity BEFORE INSERT ON comparisons
+WHEN EXISTS (SELECT 1 FROM comparisons WHERE comparison_id = NEW.comparison_id AND json <> NEW.json)
+BEGIN SELECT RAISE(ABORT, 'comparison id already loaded with different content'); END;
 
 CREATE TRIGGER IF NOT EXISTS claims_identity BEFORE INSERT ON claims
 WHEN EXISTS (SELECT 1 FROM claims WHERE run_id = NEW.run_id
@@ -376,8 +414,16 @@ BEGIN SELECT RAISE(ABORT, 'claim run id already loaded for a different candidate
 
 -- ── Views ────────────────────────────────────────────────────────────
 
+-- The views read complete sessions only.  (Dropped and recreated on every
+-- load, so a database built under an older schema picks up the filter.)
+DROP VIEW IF EXISTS arm_workload_summary;
+DROP VIEW IF EXISTS method_by_curve;
+DROP VIEW IF EXISTS ic_phase_split;
+DROP VIEW IF EXISTS ic_yield;
+DROP VIEW IF EXISTS fb_measurement_ledger;
+
 -- Every arm on every workload: the table AGENTS.md §2 asks for, one unit.
-CREATE VIEW IF NOT EXISTS arm_workload_summary AS
+CREATE VIEW arm_workload_summary AS
 SELECT r.session_id, r.arm, a.method, a.family, r.method_id,
        w.curve_slug, c.log2_r, r.workload_id,
        COUNT(*)                                          AS measured,
@@ -390,6 +436,7 @@ SELECT r.session_id, r.arm, a.method, a.family, r.method_id,
        MAX(r.lower_bound)                                AS any_lower_bound,
        MIN(r.isolation_level)                            AS worst_level
 FROM runs r
+JOIN sessions ss ON ss.session_id = r.session_id AND ss.status = 'complete'
 JOIN algorithms a ON a.method_id = r.method_id
 JOIN workloads w ON w.workload_id = r.workload_id
 JOIN curves c ON c.slug = w.curve_slug
@@ -397,13 +444,14 @@ WHERE r.warmup = 0
 GROUP BY r.session_id, r.arm, r.workload_id;
 
 -- Each method's mean S per curve across sessions, against the curve's floor.
-CREATE VIEW IF NOT EXISTS method_by_curve AS
+CREATE VIEW method_by_curve AS
 SELECT a.method, a.family, r.method_id, w.curve_slug, c.log2_r, c.floor_s,
        COUNT(*)                     AS verified_runs,
        AVG(r.s)                     AS mean_s,
        AVG(r.s) / c.floor_s         AS mean_ratio_to_floor,
        MAX(r.lower_bound)           AS any_lower_bound
 FROM runs r
+JOIN sessions ss ON ss.session_id = r.session_id AND ss.status = 'complete'
 JOIN algorithms a ON a.method_id = r.method_id
 JOIN workloads w ON w.workload_id = r.workload_id
 JOIN curves c ON c.slug = w.curve_slug
@@ -411,11 +459,12 @@ WHERE r.warmup = 0 AND r.status = 'verified'
 GROUP BY r.method_id, w.curve_slug;
 
 -- Index-calculus runs with their factor base and phase split.
-CREATE VIEW IF NOT EXISTS ic_phase_split AS
+CREATE VIEW ic_phase_split AS
 SELECT r.record_id, r.session_id, r.arm, w.curve_slug, f.fb_id, f.family AS fb_family,
        f.signed_points, f.columns, p.phase, p.gae, r.total_gae,
        p.gae / r.total_gae AS share
 FROM runs r
+JOIN sessions ss ON ss.session_id = r.session_id AND ss.status = 'complete'
 JOIN phases p ON p.record_id = r.record_id
 JOIN workloads w ON w.workload_id = r.workload_id
 LEFT JOIN factor_bases f ON f.fb_id = r.fb_id
@@ -425,7 +474,7 @@ WHERE r.fb_id IS NOT NULL;
 -- with its base, oracle, matrix rank and solver statistics.  `yield` is
 -- relations per trial.  ic.pipeline writes `relations`, ic.shared_rank
 -- writes `hits`; the view reads either.
-CREATE VIEW IF NOT EXISTS ic_yield AS
+CREATE VIEW ic_yield AS
 SELECT r.record_id, r.session_id, r.arm, r.round, r.status, r.run_id,
        w.curve_slug, w.target_index, r.fb_id, r.fbm_id, f.family AS fb_family, f.columns AS fb_columns,
        f.signed_points AS fb_signed_points, a.method AS method,
@@ -445,6 +494,7 @@ SELECT r.record_id, r.session_id, r.arm, r.round, r.status, r.run_id,
        s.macaulay_rows, s.macaulay_columns, s.macaulay_degree, s.macaulay_rank,
        s.sat_variables, s.sat_clauses, s.sat_conflicts, s.sat_decisions, s.sat_propagations
 FROM runs r
+JOIN sessions ss ON ss.session_id = r.session_id AND ss.status = 'complete'
 JOIN algorithms a ON a.method_id = r.method_id
 JOIN workloads w ON w.workload_id = r.workload_id
 LEFT JOIN factor_bases f ON f.fb_id = r.fb_id
@@ -455,7 +505,7 @@ WHERE a.family = 'ic' AND r.warmup = 0;
 
 -- The FBM1 ledger: every measurement cell with its identity and DoR/yield fields.
 -- Cite yield or DoR only with both fb_id and fbm_id present.
-CREATE VIEW IF NOT EXISTS fb_measurement_ledger AS
+CREATE VIEW fb_measurement_ledger AS
 SELECT m.fbm_id, m.fbm_sha256, m.curve_slug, m.fb_id, m.family AS fb_family,
        m.oracle, m.solver, m.linalg, m.instrument,
        c.cell_id, c.record_id, c.session_id, c.s, c.total_gae,
@@ -463,7 +513,9 @@ SELECT m.fbm_id, m.fbm_sha256, m.curve_slug, m.fb_id, m.family AS fb_family,
        c.solving_degree_mean, c.solving_degree_max, c.semi_regular_degree,
        c.macaulay_rows, c.macaulay_columns, c.status, c.extra_json
 FROM factor_base_measurements m
-LEFT JOIN factor_base_measurement_cells c ON c.fbm_id = m.fbm_id;
+LEFT JOIN factor_base_measurement_cells c ON c.fbm_id = m.fbm_id
+  AND (c.session_id IS NULL
+       OR c.session_id IN (SELECT session_id FROM sessions WHERE status = 'complete'));
 
 CREATE TRIGGER IF NOT EXISTS factor_base_measurements_identity
 BEFORE INSERT ON factor_base_measurements
@@ -475,4 +527,8 @@ BEGIN
   SELECT RAISE(ABORT, 'fbm_id collision: same short id, different sha256');
 END;
 
-INSERT OR REPLACE INTO schema_info (key, value) VALUES ('ecbench_schema_version', '3');
+-- Version 4: identity guards for arms, sessions, runs and comparisons; views
+-- over complete sessions only; run statuses `interrupted` and `spawn_error`
+-- (a database created under version 3 keeps its older CHECK and must be
+-- rebuilt to load sessions that have them).
+INSERT OR REPLACE INTO schema_info (key, value) VALUES ('ecbench_schema_version', '4');

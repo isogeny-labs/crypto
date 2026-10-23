@@ -1921,7 +1921,14 @@ mod tests {
     fn compiler_change_on_one_machine_cannot_supply_independence() {
         let original = host::capture().unwrap();
         let mut alternate = original.clone();
+        // From class version 3 the compiler is recorded, not hashed: a
+        // changed kernel moves the class, a changed toolchain does not.
         alternate.stable.rustc_vv = Some("other toolchain".into());
+        assert_eq!(
+            host::recompute_class(&original).unwrap(),
+            host::recompute_class(&alternate).unwrap()
+        );
+        alternate.stable.kernel_release = Some("other kernel".into());
         assert_ne!(
             host::recompute_class(&original).unwrap(),
             host::recompute_class(&alternate).unwrap()

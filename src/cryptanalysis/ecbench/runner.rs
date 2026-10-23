@@ -39,8 +39,9 @@ use crate::cryptanalysis::ecbench::canonical::{sha256_hex, short_id};
 use crate::cryptanalysis::ecbench::fbm::{self, INSTRUMENT_IC_PIPELINE};
 use crate::cryptanalysis::ecbench::host::{capture, HostCapsule};
 use crate::cryptanalysis::ecbench::isolation::{
-    allowed_cpus, conditions, evict, leave_reserved, plan_cpus, preflight, ticks_per_second,
-    topology, BenchLock, CpuPlan, CpuRequest, Eviction, EvictionSummary, Preflight, Thresholds,
+    allowed_cpus, conditions, conditions_scanned, evict, leave_reserved, plan_cpus, preflight,
+    ticks_per_second, topology, BenchLock, CpuPlan, CpuRequest, Eviction, EvictionSummary,
+    Preflight, Thresholds,
 };
 use crate::cryptanalysis::ecbench::methods::MethodSpec;
 use crate::cryptanalysis::ecbench::record::{
@@ -119,6 +120,28 @@ pub struct Session {
     pub records_written: u64,
     pub records_sha256: Option<String>,
     pub status_counts: BTreeMap<String, u64>,
+    /// The sequence number of the last record written (rewritten after
+    /// every record, so a session killed outright still says how far it got).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_seq: Option<u64>,
+    /// Why and where the session stopped, when it did not run to the end.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stop: Option<SessionStop>,
+}
+
+/// Why a session ended early.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SessionStop {
+    /// `interrupt` (a signal to the runner), `spawn_error` (a child could
+    /// not be started or pinned) or `error`.
+    pub kind: String,
+    /// The execution the session was at: for an interruption or a spawn
+    /// error, the one that did not complete; otherwise the last written.
+    pub seq: Option<u64>,
+    /// The signal, for an interruption.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub signal: Option<i32>,
+    pub message: String,
 }
 
 /// The plan as written to `plan.json`.
@@ -161,8 +184,33 @@ fn child_env() -> BTreeMap<String, String> {
 
 fn write_json(path: &Path, v: &impl Serialize) -> Result<String, String> {
     let text = serde_json::to_string_pretty(v).map_err(|e| e.to_string())? + "\n";
-    std::fs::write(path, &text).map_err(|e| format!("{}: {e}", path.display()))?;
+    write_atomic(path, text.as_bytes())?;
     Ok(sha256_hex(text.as_bytes()))
+}
+
+/// Write `bytes` to `path` so that a reader (or a crash) sees the old
+/// file or the new one, never a torn mix: write a sibling temporary
+/// file, fsync it, rename it over `path`, fsync the directory.
+pub fn write_atomic(path: &Path, bytes: &[u8]) -> Result<(), String> {
+    let name = path
+        .file_name()
+        .map(|n| n.to_string_lossy().into_owned())
+        .unwrap_or_default();
+    let tmp = path.with_file_name(format!(".{name}.tmp"));
+    let fail = |e: std::io::Error| format!("{}: {e}", path.display());
+    {
+        let mut f = std::fs::File::create(&tmp).map_err(fail)?;
+        f.write_all(bytes).map_err(fail)?;
+        f.sync_all().map_err(fail)?;
+    }
+    std::fs::rename(&tmp, path).map_err(fail)?;
+    // Best effort: make the rename itself durable.
+    if let Some(dir) = path.parent().filter(|d| !d.as_os_str().is_empty()) {
+        if let Ok(d) = std::fs::File::open(dir) {
+            let _ = d.sync_all();
+        }
+    }
+    Ok(())
 }
 
 /// What the runner observed of one finished child.
@@ -172,7 +220,49 @@ struct Reaped {
     stderr: Vec<u8>,
     timing: Timing,
     exit: Option<String>,
+    /// The watchdog's SIGKILL ended the child at the deadline.
     timed_out: bool,
+    /// The session's interruption (a signal to the runner) killed the child.
+    interrupted: bool,
+    /// The child could not be started: spawn, pinning or feeding failed.
+    spawn_error: Option<String>,
+}
+
+impl Reaped {
+    fn spawn_failed(message: String) -> Self {
+        Reaped {
+            output: None,
+            parse_error: None,
+            stderr: Vec::new(),
+            timing: Timing::default(),
+            exit: None,
+            timed_out: false,
+            interrupted: false,
+            spawn_error: Some(message),
+        }
+    }
+}
+
+/// Why a child that died of SIGKILL died: `(timed_out, interrupted)`.
+///
+/// Only a SIGKILL ends a child on the runner's behalf, and only the
+/// watchdog (the deadline) or the interruption handler sends it.  A child
+/// that exited by itself, even in the instant the watchdog fired, was not
+/// killed and is not a timeout: its answer stands.  An interruption takes
+/// precedence, since it ends the session whatever the deadline said.
+fn classify_stop(
+    watchdog_fired: bool,
+    interruption: bool,
+    killed_by_sigkill: bool,
+) -> (bool, bool) {
+    if !killed_by_sigkill {
+        return (false, false);
+    }
+    if interruption {
+        (false, true)
+    } else {
+        (watchdog_fired, false)
+    }
 }
 
 /// Spawn, pin, feed, wait, reap.
@@ -266,8 +356,39 @@ fn run_child(
     };
     let mut timing = Timing::default();
     let mut exit = None;
+    let mut killed_by_sigkill = false;
     #[cfg(unix)]
     {
+        // Wait until the child has ended without reaping it: while it is
+        // a zombie its pid cannot be recycled, so a watchdog signal that
+        // lands now is harmless, and it cannot land on a stranger's group
+        // after the reap.
+        #[cfg(target_os = "linux")]
+        // SAFETY: waiting for our own child; `info` is filled.
+        unsafe {
+            loop {
+                let mut info: libc::siginfo_t = std::mem::zeroed();
+                let rc = libc::waitid(
+                    libc::P_PID,
+                    pid as libc::id_t,
+                    &mut info,
+                    libc::WEXITED | libc::WNOWAIT,
+                );
+                if rc == -1
+                    && std::io::Error::last_os_error().kind() == std::io::ErrorKind::Interrupted
+                {
+                    continue;
+                }
+                break;
+            }
+        }
+        #[cfg(target_os = "linux")]
+        {
+            signals::clear_child();
+            let (lock, cv) = &*done;
+            *lock.lock().unwrap_or_else(|e| e.into_inner()) = true;
+            cv.notify_all();
+        }
         // SAFETY: waiting for our own child; status and rusage are filled.
         unsafe {
             let mut status: libc::c_int = 0;
@@ -297,6 +418,8 @@ fn run_child(
                 timing.major_faults = ru.ru_majflt as u64;
                 timing.voluntary_switches = ru.ru_nvcsw as u64;
                 timing.involuntary_switches = ru.ru_nivcsw as u64;
+                killed_by_sigkill =
+                    libc::WIFSIGNALED(status) && libc::WTERMSIG(status) == libc::SIGKILL;
                 exit = Some(if libc::WIFEXITED(status) {
                     format!("exit {}", libc::WEXITSTATUS(status))
                 } else if libc::WIFSIGNALED(status) {
@@ -324,15 +447,21 @@ fn run_child(
     std::mem::forget(child);
     let out = out_reader.join().unwrap_or_default();
     let err = err_reader.join().unwrap_or_default();
-    let timed_out = *fired.lock().unwrap_or_else(|e| e.into_inner());
+    let watchdog_fired = *fired.lock().unwrap_or_else(|e| e.into_inner());
+    let (timed_out, interrupted) = classify_stop(
+        watchdog_fired,
+        signals::interrupted().is_some(),
+        killed_by_sigkill,
+    );
     let (output, parse_error) = match serde_json::from_slice::<ChildOutput>(&out) {
         Ok(o) => (Some(o), None),
-        Err(e) if !timed_out => (None, Some(format!("child output: {e}"))),
+        Err(e) if !timed_out && !interrupted => (None, Some(format!("child output: {e}"))),
         Err(_) => (None, None),
     };
-    if let Some(o) = output.as_ref().filter(|_| !timed_out) {
+    if let Some(o) = output.as_ref().filter(|_| !timed_out && !interrupted) {
         timing.schedstat_solve = o.schedstat_solve;
         timing.hw_solve = o.hw_solve.clone();
+        timing.solve = o.solve_obs.clone();
         timing.solve_wall_ns = o.report.as_ref().map(|r| r.solve_wall_ns);
     }
     Ok(Reaped {
@@ -342,6 +471,8 @@ fn run_child(
         timing,
         exit,
         timed_out,
+        interrupted,
+        spawn_error: None,
     })
 }
 
@@ -372,15 +503,23 @@ pub fn run_session(
             out.display()
         ));
     }
+    // A spec that does not parse is refused before waiting for anything.
     let spec = Spec::from_json(spec_text)?;
+    // The lock comes first.  Planning (a prime search can burn minutes of
+    // CPU), the host capture and the choice of CPUs all disturb whatever
+    // timed session holds the lock, and a CPU choice made while queued
+    // would be made from a mask that session had narrowed.
+    let lock = BenchLock::acquire(&opts.lock_path, opts.wait_for_lock)?;
     let plan_: Plan = plan(spec)?;
+    for w in &plan_.warnings {
+        progress(&format!("warning: {w}"));
+    }
     let capsule: HostCapsule = capture()?;
     let topo = capsule.stable.topology.clone();
     let allowed = allowed_cpus();
     let cpu_plan = plan_cpus(&opts.cpus, &topo, allowed.as_deref())?;
 
-    // Lock, check and preflight before anything is written.
-    let lock = BenchLock::acquire(&opts.lock_path, opts.wait_for_lock)?;
+    // Check and preflight before anything is written.
     let mut runner_on_run_cpu = false;
     let mut runner_cpus = None;
     // Restores on drop: a failure or panic from here on puts the host back.
@@ -530,6 +669,8 @@ fn execute_session(
         records_written: 0,
         records_sha256: None,
         status_counts: BTreeMap::new(),
+        last_seq: None,
+        stop: None,
     };
     write_json(&out.join("session.json"), &session)?;
 
@@ -545,16 +686,44 @@ fn execute_session(
         .map(|c| c.observed_cpus())
         .unwrap_or_default();
     let exe_at_start = exe_fingerprint(&opts.exe);
+    let reserved: Vec<u32> = cpu_plan
+        .as_ref()
+        .map(|c| c.reserved.clone())
+        .unwrap_or_default();
+    // Conditions around a run, with a scan of the reservation for threads
+    // that could run on it when there is one.
+    let snapshot = || {
+        if cpu_plan.is_some() {
+            conditions_scanned(&observed, &reserved)
+        } else {
+            conditions(&observed)
+        }
+    };
+    let mut stop: Option<SessionStop> = None;
     let result = (|| -> Result<(), String> {
         for ex in &p.executions {
-            if let Some(e) = interrupted_error() {
-                return Err(e);
+            if let Some(sig) = signals::interrupted() {
+                let message = format!("interrupted by signal {sig}");
+                stop = Some(SessionStop {
+                    kind: "interrupt".into(),
+                    seq: Some(ex.seq),
+                    signal: Some(sig),
+                    message: message.clone(),
+                });
+                return Err(message);
             }
             if !opts.exe.starts_with("/proc") && exe_fingerprint(&opts.exe) != exe_at_start {
-                return Err(format!(
+                let message = format!(
                     "{} changed during the session; its records would not match the recorded binary hash",
                     opts.exe.display()
-                ));
+                );
+                stop = Some(SessionStop {
+                    kind: "error".into(),
+                    seq: Some(ex.seq),
+                    signal: None,
+                    message: message.clone(),
+                });
+                return Err(message);
             }
             let arm = &p.arms[ex.arm];
             let w = &p.workloads[ex.workload];
@@ -573,9 +742,12 @@ fn execute_session(
                 expected_method_id: arm.method.method_id.clone(),
                 algorithm_seed: ex.algorithm_seed,
             };
-            let before = conditions(&observed);
-            let reaped = run_child(&opts, cpu_plan.as_ref(), &env, &input, timeout)?;
-            let after = conditions(&observed);
+            let before = snapshot();
+            // A child that cannot be started (spawn, pinning) is a record
+            // of its own, not a silent end of the session.
+            let reaped = run_child(&opts, cpu_plan.as_ref(), &env, &input, timeout)
+                .unwrap_or_else(Reaped::spawn_failed);
+            let after = snapshot();
             // n counts every execution of this (method, workload) in the
             // session, warm-ups and A/A arms included, so a run id is
             // unique in its session and n ≥ 1 as the convention requires.
@@ -607,7 +779,7 @@ fn execute_session(
                 },
             );
             let interrupted = interrupted_error();
-            if let Some(e) = &interrupted {
+            if let (Some(e), true) = (&interrupted, reaped.interrupted) {
                 // The child was killed by the interruption: say so.
                 rec.outcome.error = Some(match rec.outcome.error.take() {
                     Some(prev) => format!("{prev}; session {e}"),
@@ -631,6 +803,10 @@ fn execute_session(
                 .entry(rec.outcome.status.clone())
                 .or_insert(0) += 1;
             session.records_written += 1;
+            session.last_seq = Some(ex.seq);
+            // Atomic, after every record: a session killed outright still
+            // says how many records it wrote and how far it got.
+            write_json(&out.join("session.json"), &session)?;
             progress(&format!(
                 "{:>4}/{} {:<14} {} {} {:>9} S={} {}",
                 ex.seq + 1,
@@ -645,13 +821,39 @@ fn execute_session(
                     .unwrap_or_else(|| "-".into()),
                 rec.isolation.level.name(),
             ));
+            if let Some(message) = reaped.spawn_error.clone() {
+                stop = Some(SessionStop {
+                    kind: "spawn_error".into(),
+                    seq: Some(ex.seq),
+                    signal: None,
+                    message: message.clone(),
+                });
+                return Err(message);
+            }
             if let Some(e) = interrupted {
+                stop = Some(SessionStop {
+                    kind: "interrupt".into(),
+                    seq: Some(ex.seq),
+                    signal: signals::interrupted(),
+                    message: e.clone(),
+                });
                 return Err(e);
             }
         }
         Ok(())
     })();
     drop(records);
+    if stop.is_none() {
+        if let Err(e) = &result {
+            stop = Some(SessionStop {
+                kind: "error".into(),
+                seq: session.last_seq,
+                signal: None,
+                message: e.clone(),
+            });
+        }
+    }
+    session.stop = stop;
     // The counts and the hash so far, whatever happened: an interrupted
     // session keeps what it measured.
     if let Ok(body) = std::fs::read(out.join("records.jsonl")) {
@@ -695,9 +897,11 @@ fn assemble(
     let report = reaped
         .output
         .as_ref()
-        .filter(|_| !reaped.timed_out)
+        .filter(|_| !reaped.timed_out && !reaped.interrupted)
         .and_then(|o| o.report.clone());
-    let child_error = if reaped.timed_out {
+    let child_error = if let Some(message) = &reaped.spawn_error {
+        Some(format!("spawn_error: {message}"))
+    } else if reaped.timed_out {
         Some(match &reaped.output {
             Some(output) => format!(
                 "watchdog expired; unaccepted parsed child output: {}",
@@ -718,7 +922,11 @@ fn assemble(
     let matches_target = recovered.map(|k| inst.mul_generator_hex(k).as_ref() == Some(&w.target));
     // A public target has no planted answer: [k]G = Q decides alone.
     let matches_planted = w.planted.and_then(|p| recovered.map(|k| k == p));
-    let status = if reaped.timed_out {
+    let status = if reaped.spawn_error.is_some() {
+        "spawn_error"
+    } else if reaped.interrupted {
+        "interrupted"
+    } else if reaped.timed_out {
         "timeout"
     } else if !exited_cleanly && report.is_none() {
         "crashed"
@@ -824,6 +1032,11 @@ fn assemble(
             .unwrap_or(serde_json::Value::Null),
         online: report.as_ref().and_then(|r| r.online.clone()),
         solver: report.as_ref().and_then(|r| r.solver.clone()),
+        allocator: reaped
+            .output
+            .as_ref()
+            .filter(|_| !reaped.timed_out && !reaped.interrupted)
+            .and_then(|o| o.allocator.clone()),
         field_ops: report.as_ref().and_then(|r| r.field_ops),
         time: reaped.timing.clone(),
         isolation: IsolationRecord {
@@ -865,6 +1078,7 @@ pub fn read_record_lines_exact(dir: &Path) -> Result<Vec<(String, Record)>, Stri
 }
 
 fn from_str_exact_floats<T: serde::de::DeserializeOwned>(line: &str) -> Result<T, String> {
+    crate::cryptanalysis::ecbench::canonical::reject_duplicate_keys(line)?;
     // Validate the complete typed shape first. In particular, serde's derived
     // record visitors reject duplicate fields; Value alone would keep only the
     // last occurrence. Discard the legacy f64 values from this pass.
@@ -980,6 +1194,8 @@ mod watchdog_record_tests {
             timing: Timing::default(),
             exit: Some("exit 0".into()),
             timed_out: false,
+            interrupted: false,
+            spawn_error: None,
         };
         let make = |r: &Reaped| {
             assemble(
@@ -1029,5 +1245,265 @@ mod watchdog_record_tests {
         let exhausted_late = make(&reaped);
         assert_eq!(exhausted_late.outcome.status, "timeout");
         assert!(exhausted_late.cost.total_gae.is_none());
+    }
+}
+
+#[cfg(test)]
+mod robustness_tests {
+    use super::*;
+
+    const SPEC: &str = r#"{
+      "schema":"ecbench.spec/v1","label":"robustness",
+      "workloads":{"curves":[{"kind":"prime_explicit","p":113,"a":19,"b":2,"group_order":112,"r":7,"gx":52,"gy":110}],"targets_per_curve":1,"target_seed":20261017,"target_kind":"public"},
+      "arms":[{"name":"bsgs","role":"reference","method":{"id":"bsgs.textbook"}}],
+      "measurement":{"rounds":2,"warmup":0,"seed":1,"isolation_required":"L0"}
+    }"#;
+
+    fn tmp(name: &str) -> PathBuf {
+        let d = std::env::temp_dir().join(format!(
+            "ecbench-runner-{name}-{}-{}",
+            std::process::id(),
+            now_ms()
+        ));
+        std::fs::create_dir_all(&d).unwrap();
+        d
+    }
+
+    fn options(lock: &Path, exe: &str, wait: bool) -> RunOptions {
+        RunOptions {
+            cpus: CpuRequest::None,
+            lock_path: lock.display().to_string(),
+            wait_for_lock: wait,
+            allow_busy: true,
+            thresholds: Thresholds::default(),
+            exe: PathBuf::from(exe),
+        }
+    }
+
+    #[test]
+    fn only_a_sigkill_that_the_watchdog_or_the_interruption_sent_is_a_stop() {
+        // (watchdog fired, interruption, killed by SIGKILL) -> (timed out, interrupted)
+        assert_eq!(classify_stop(true, false, true), (true, false));
+        assert_eq!(classify_stop(false, true, true), (false, true));
+        // The interruption wins when both are pending.
+        assert_eq!(classify_stop(true, true, true), (false, true));
+        // The child finished by itself in the instant the watchdog fired:
+        // it was not killed, its answer stands.
+        assert_eq!(classify_stop(true, false, false), (false, false));
+        assert_eq!(classify_stop(false, true, false), (false, false));
+        // Killed by something else (the OOM killer): a crash.
+        assert_eq!(classify_stop(false, false, true), (false, false));
+    }
+
+    fn script(dir: &Path, name: &str, body: &str) -> PathBuf {
+        use std::os::unix::fs::PermissionsExt;
+        let path = dir.join(name);
+        std::fs::write(&path, format!("#!/bin/sh\n{body}\n")).unwrap();
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
+        path
+    }
+
+    fn input() -> ChildInput {
+        ChildInput {
+            schema: CHILD_INPUT_SCHEMA.into(),
+            curve: serde_json::from_str(
+                r#"{"kind":"prime_explicit","p":113,"a":19,"b":2,"group_order":112,"r":7,"gx":52,"gy":110}"#,
+            )
+            .unwrap(),
+            target_seed: 1,
+            target_index: 0,
+            target_kind: Default::default(),
+            expected_workload_id: String::new(),
+            method: MethodSpec {
+                id: "bsgs.textbook".into(),
+                params: Default::default(),
+            },
+            expected_method_id: String::new(),
+            algorithm_seed: 1,
+        }
+    }
+
+    /// `run_child` on a script, retrying the `ETXTBSY` another test thread's
+    /// fork can cause while the script file was still open for writing.
+    fn run_script(exe: &Path, timeout: Duration) -> Reaped {
+        let opts = options(
+            &exe.with_extension("lock"),
+            &exe.display().to_string(),
+            false,
+        );
+        for _ in 0..50 {
+            let r = run_child(&opts, None, &child_env(), &input(), timeout);
+            match r {
+                Err(e) if e.contains("Text file busy") => {
+                    std::thread::sleep(Duration::from_millis(50))
+                }
+                other => return other.unwrap(),
+            }
+        }
+        panic!("script stayed busy");
+    }
+
+    #[test]
+    fn a_child_that_finishes_is_not_a_timeout_and_a_killed_one_is() {
+        let d = tmp("deadline");
+        // Finishes at once: exit 0, nothing censored.
+        let fast = script(&d, "fast.sh", "exit 0");
+        let r = run_script(&fast, Duration::from_secs(30));
+        assert_eq!(r.exit.as_deref(), Some("exit 0"));
+        assert!(!r.timed_out && !r.interrupted && r.spawn_error.is_none());
+        // Still running at the deadline: killed by the watchdog's SIGKILL.
+        let slow = script(&d, "slow.sh", "sleep 30");
+        let t = Instant::now();
+        let r = run_script(&slow, Duration::from_secs(1));
+        assert!(t.elapsed() < Duration::from_secs(20));
+        assert_eq!(r.exit.as_deref(), Some("signal 9"));
+        assert!(r.timed_out && !r.interrupted);
+        // Killed by something else (not the watchdog): a crash, not a timeout.
+        let killed = script(&d, "killed.sh", "kill -9 $$");
+        let r = run_script(&killed, Duration::from_secs(30));
+        assert_eq!(r.exit.as_deref(), Some("signal 9"));
+        assert!(!r.timed_out && !r.interrupted);
+    }
+
+    #[test]
+    fn session_json_is_replaced_atomically() {
+        let d = tmp("atomic");
+        let path = d.join("session.json");
+        write_atomic(&path, b"{\"a\":1}\n").unwrap();
+        write_atomic(&path, b"{\"a\":2}\n").unwrap();
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), "{\"a\":2}\n");
+        // No temporary file is left behind to be mistaken for the session.
+        let names: Vec<String> = std::fs::read_dir(&d)
+            .unwrap()
+            .map(|e| e.unwrap().file_name().to_string_lossy().into_owned())
+            .collect();
+        assert_eq!(names, vec!["session.json".to_string()], "{names:?}");
+    }
+
+    #[test]
+    fn a_session_written_before_the_stop_fields_still_reads() {
+        let dir = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/ecbench_numa_vm_20261002/sessions/v2-auto");
+        if !dir.join("session.json").exists() {
+            return;
+        }
+        let s = read_session(&dir).unwrap();
+        assert!(s.last_seq.is_none() && s.stop.is_none());
+        // And a new field never appears in an old session's serialisation.
+        let text = serde_json::to_string(&s).unwrap();
+        assert!(!text.contains("last_seq") && !text.contains("\"stop\""));
+    }
+
+    #[test]
+    fn a_spawn_failure_is_a_record_and_a_stopped_session_not_a_silent_end() {
+        let d = tmp("spawn");
+        let out = d.join("session");
+        let opts = options(&d.join("lock"), "/nonexistent/ecbench", false);
+        let err = run_session(SPEC, &out, opts, |_| {}).err().expect("stops");
+        assert!(err.contains("cannot exec"), "{err}");
+        let session = read_session(&out).unwrap();
+        assert_eq!(session.status, "interrupted");
+        assert_eq!(session.records_written, 1);
+        assert_eq!(session.last_seq, Some(0));
+        let stop = session.stop.expect("the stop is recorded");
+        assert_eq!(stop.kind, "spawn_error");
+        assert_eq!(stop.seq, Some(0));
+        assert!(session.records_sha256.is_some());
+        let records = read_records(&out).unwrap();
+        assert_eq!(records.len(), 1);
+        assert_eq!(records[0].outcome.status, "spawn_error");
+        assert!(!records[0].counts());
+        assert!(records[0]
+            .outcome
+            .error
+            .as_deref()
+            .unwrap()
+            .starts_with("spawn_error: "));
+        assert!(!out.join(".session.json.tmp").exists());
+    }
+
+    #[test]
+    fn the_lock_is_taken_before_the_spec_is_planned() {
+        let d = tmp("lock");
+        let lock_path = d.join("lock");
+        let held = BenchLock::acquire(&lock_path.display().to_string(), false).unwrap();
+        // A spec that parses but cannot be planned (an unknown method).
+        let bad = SPEC.replace("bsgs.textbook", "no.such.method");
+        let opts = options(&lock_path, "/bin/true", false);
+        let err = run_session(&bad, &d.join("never"), opts, |_| {})
+            .err()
+            .unwrap();
+        // Before the change this was the planning error, produced without
+        // waiting for the lock; now planning happens inside it.
+        assert!(err.contains("another benchmark holds"), "{err}");
+        assert!(!d.join("never").exists());
+        drop(held);
+        let opts = options(&lock_path, "/bin/true", false);
+        let err = run_session(&bad, &d.join("never"), opts, |_| {})
+            .err()
+            .unwrap();
+        assert!(!err.contains("another benchmark holds"), "{err}");
+    }
+
+    #[test]
+    fn an_interrupted_child_is_not_a_crash_and_carries_no_result() {
+        let spec = Spec::from_json(SPEC).unwrap();
+        let p = plan(spec).unwrap();
+        let ex = &p.executions[0];
+        let arm = &p.arms[ex.arm];
+        let w = &p.workloads[ex.workload];
+        let capsule = capture().unwrap();
+        let thresholds = Thresholds::default();
+        let ctx = GradeContext {
+            plan: None,
+            preflight: None,
+            eviction: None,
+            runner_on_run_cpu: false,
+            thresholds: &thresholds,
+            hz: 100.0,
+        };
+        let reaped = Reaped {
+            output: None,
+            parse_error: None,
+            stderr: vec![],
+            timing: Timing::default(),
+            exit: Some("signal 9".into()),
+            timed_out: false,
+            interrupted: true,
+            spawn_error: None,
+        };
+        let rec = assemble(
+            "t",
+            ex,
+            1,
+            arm,
+            w,
+            p.instance(ex.workload),
+            &capsule,
+            &reaped,
+            conditions(&[]),
+            conditions(&[]),
+            &ctx,
+        );
+        assert_eq!(rec.outcome.status, "interrupted");
+        assert!(!rec.counts());
+        let crashed = Reaped {
+            interrupted: false,
+            ..reaped
+        };
+        let rec = assemble(
+            "t",
+            ex,
+            1,
+            arm,
+            w,
+            p.instance(ex.workload),
+            &capsule,
+            &crashed,
+            conditions(&[]),
+            conditions(&[]),
+            &ctx,
+        );
+        assert_eq!(rec.outcome.status, "crashed");
     }
 }

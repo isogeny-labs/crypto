@@ -76,6 +76,12 @@ enum Cmd {
         /// Watchdog limit for each command, including the device self-test.
         #[arg(long, default_value_t = 600)]
         timeout_seconds: u64,
+        /// The shared benchmark lock; a GPU stage is timed work.
+        #[arg(long, default_value = isolation::DEFAULT_LOCK)]
+        lock: String,
+        /// Queue behind another benchmark holding the lock.
+        #[arg(long)]
+        wait: bool,
         /// Options forwarded to the CUDA binary after `--`.
         #[arg(last = true)]
         gpu_args: Vec<String>,
@@ -94,6 +100,12 @@ enum Cmd {
         timeout_seconds: u64,
         #[arg(long, default_value = "nvidia-smi")]
         telemetry_binary: PathBuf,
+        /// The shared benchmark lock; a GPU solve is timed work.
+        #[arg(long, default_value = isolation::DEFAULT_LOCK)]
+        lock: String,
+        /// Queue behind another benchmark holding the lock.
+        #[arg(long)]
+        wait: bool,
         /// Optional verified CPU record for an exact workload identity link.
         #[arg(long)]
         cpu_record: Option<PathBuf>,
@@ -203,16 +215,28 @@ enum Cmd {
         #[arg(long)]
         prefix: PathBuf,
     },
-    /// Audit a session from its own files.
+    /// Audit a session from its own files.  Exits 1 when the audit finds a
+    /// problem (and 2 when it cannot be run at all), so a failed audit
+    /// fails whatever calls it; a receipt is printed either way.
     Verify {
         #[arg(long)]
         dir: String,
-        /// Re-execute this many measured runs and require identical counts.
+        /// Re-execute this many measured runs, drawn at random from the
+        /// deterministic ones, and require identical counts.
         #[arg(long, default_value_t = 0)]
         replay: usize,
         /// Re-execute every measured deterministic run.
         #[arg(long)]
         replay_all: bool,
+        /// The auditor's randomness for the `--replay N` draw (default: a
+        /// seed from the operating system's entropy).  Recorded in the
+        /// receipt; the same seed on the same session draws the same runs.
+        #[arg(long)]
+        replay_seed: Option<u64>,
+        /// Also re-execute the run with this sequence number (repeatable),
+        /// beside any sample.
+        #[arg(long = "replay-seq")]
+        replay_seq: Vec<u64>,
         /// Accept a session marked `interrupted`: every integrity check
         /// still applies, but not "every planned execution recorded".
         #[arg(long)]
@@ -220,8 +244,9 @@ enum Cmd {
         /// Write the receipt here (it is also printed).
         #[arg(long)]
         out: Option<PathBuf>,
-        /// Exit 1 when the audit finds a problem (isolab's verify contract).
-        #[arg(long)]
+        /// Accepted for compatibility and ignored: a failed audit always
+        /// exits 1.
+        #[arg(long, hide = true)]
         exit_code: bool,
     },
     /// Compare arm B against arm A.
@@ -761,6 +786,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             }))?;
         }
         Cmd::Host { json } => {
+            host::pin_binary_hash();
             let c = host::capture()?;
             if json {
                 print_json(&c)?;
@@ -815,6 +841,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
         Cmd::Plan { spec: path, json } => {
             let text = read(&path)?;
             let p = spec::plan(spec::Spec::from_json(&text)?)?;
+            for w in &p.warnings {
+                eprintln!("ecbench: warning: {w}");
+            }
             if json {
                 print_json(&serde_json::json!({
                     "spec_id": p.spec_id, "spec_sha256": p.spec_sha256,
@@ -871,6 +900,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             max_psi,
             quiet,
         } => {
+            // Hash the running binary before anything slow (planning can
+            // take minutes): a rebuild meanwhile cannot null or swap it.
+            host::pin_binary_hash();
             let text = read(&path)?;
             let out = PathBuf::from(isolab::expand_env(&out)?);
             let mut req = isolation::CpuRequest::parse(&cpus)?;
@@ -969,19 +1001,25 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             dir,
             replay,
             replay_all,
+            replay_seed,
+            replay_seq,
             allow_interrupted,
             out,
-            exit_code,
+            exit_code: _,
         } => {
             let dir = PathBuf::from(isolab::expand_env(&dir)?);
-            let rep = audit::audit_with(
+            let rep = audit::audit_opts(
                 &dir,
-                if replay_all {
-                    audit::REPLAY_ALL
-                } else {
-                    replay
+                &audit::AuditOptions {
+                    replay: if replay_all {
+                        audit::REPLAY_ALL
+                    } else {
+                        replay
+                    },
+                    replay_seed,
+                    replay_seqs: replay_seq,
+                    allow_interrupted,
                 },
-                allow_interrupted,
             )?;
             let text = serde_json::to_string_pretty(&rep).map_err(|e| e.to_string())? + "\n";
             if let Some(o) = out {
@@ -989,6 +1027,15 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 eprintln!("receipt sha256 {}", canonical::sha256_hex(text.as_bytes()));
             }
             print!("{text}");
+            for w in &rep.warnings {
+                eprintln!("warning: {w}");
+            }
+            if let Some(seed) = rep.replay_seed {
+                eprintln!(
+                    "replay seed {seed} ({} eligible runs)",
+                    rep.replay_candidates.unwrap_or(0)
+                );
+            }
             eprintln!(
                 "audit {}: {} records, {} verified, {} replays reproduced, {} problems",
                 if rep.ok { "OK" } else { "FAILED" },
@@ -997,6 +1044,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 rep.replays.iter().filter(|r| r.reproduced).count(),
                 rep.problems.len()
             );
+            for problem in rep.problems.iter().take(20) {
+                eprintln!("problem: {problem}");
+            }
             if rep.records_bound == Some(false) && rep.interruption.is_some() {
                 eprintln!(
                     "warning: interruption {}: records_bound false (no records hash binds \
@@ -1004,8 +1054,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     rep.interruption.as_deref().unwrap_or("")
                 );
             }
-            if exit_code && !rep.ok {
-                return Ok(ExitCode::from(1));
+            if rep.exit_status() != 0 {
+                return Ok(ExitCode::from(rep.exit_status()));
             }
         }
         Cmd::GpuStage {
@@ -1013,6 +1063,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             out,
             mode,
             timeout_seconds,
+            lock,
+            wait,
             gpu_args,
         } => {
             let receipt = gpu::run(&gpu::GpuOptions {
@@ -1021,6 +1073,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 mode,
                 args: gpu_args,
                 timeout_seconds,
+                lock_path: lock,
+                wait_for_lock: wait,
             })?;
             print_json(&receipt)?;
             if receipt.status != "stage_completed" {
@@ -1034,6 +1088,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             out,
             timeout_seconds,
             telemetry_binary,
+            lock,
+            wait,
             cpu_record,
             gpu_args,
         } => {
@@ -1045,6 +1101,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 telemetry_binary,
                 cpu_record,
                 args: gpu_args,
+                lock_path: lock,
+                wait_for_lock: wait,
             })?;
             print_json(&receipt)?;
             if receipt.status != "verified" {
@@ -1293,7 +1351,22 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             DbCmd::Schema => print!("{}", db::SCHEMA_SQL),
             DbCmd::Sql { paths } => {
                 let refs: Vec<&Path> = paths.iter().map(|p| p.as_path()).collect();
-                print!("{}", db::sql(&refs)?);
+                let batch = db::sql_batch(&refs);
+                print!("{}", batch.sql);
+                // A refused path (tampered, unreadable, not ecbench) loads
+                // nothing and does not stop the rest; the exit status says
+                // the load was not complete.
+                for (path, why) in &batch.refused {
+                    eprintln!("db sql: skipped {}: {why}", path.display());
+                }
+                if !batch.refused.is_empty() {
+                    eprintln!(
+                        "db sql: {} of {} paths were skipped; the SQL above omits them",
+                        batch.refused.len(),
+                        refs.len()
+                    );
+                    return Ok(ExitCode::from(1));
+                }
             }
         },
         Cmd::IsolabJob {
