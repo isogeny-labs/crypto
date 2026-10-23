@@ -448,8 +448,7 @@ pub struct WideInstance {
 
 /// The registry's modulus for `K_a` over `F_{2^n}`, if it lists one.
 pub fn registry_koblitz_modulus(a: u8, n: u32) -> Option<IrreduciblePoly> {
-    let doc: Value = serde_json::from_str(REGISTRY).ok()?;
-    let entry = doc.get("curves")?.as_array()?.iter().find(|c| {
+    let entry = registry_curves()?.iter().find(|c| {
         let p = c.get("params");
         c.get("family").and_then(Value::as_str) == Some("koblitz")
             && p.and_then(|p| p.get("a")).and_then(Value::as_u64) == Some(u64::from(a))
@@ -505,13 +504,36 @@ pub struct CurveFacts {
 const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
 
 /// The registry entry of `slug`, if any.
+/// The registry, parsed once per process: it is several megabytes, and
+/// planning a spec looked every workload's curve up in it, which parsed it
+/// again each time (most of a large spec's planning time).
+static REGISTRY_DOC: std::sync::LazyLock<Option<Value>> =
+    std::sync::LazyLock::new(|| serde_json::from_str(REGISTRY).ok());
+
+/// Registry entries by slug, built from [`REGISTRY_DOC`] once.
+static REGISTRY_BY_SLUG: std::sync::LazyLock<std::collections::HashMap<String, usize>> =
+    std::sync::LazyLock::new(|| {
+        registry_curves()
+            .map(|cs| {
+                let mut m = std::collections::HashMap::new();
+                for (i, c) in cs.iter().enumerate() {
+                    if let Some(slug) = c.get("slug").and_then(Value::as_str) {
+                        // The first entry with a slug wins, as the linear search did.
+                        m.entry(slug.to_string()).or_insert(i);
+                    }
+                }
+                m
+            })
+            .unwrap_or_default()
+    });
+
+fn registry_curves() -> Option<&'static Vec<Value>> {
+    REGISTRY_DOC.as_ref()?.get("curves")?.as_array()
+}
+
 fn registry_entry(slug: &str) -> Option<Value> {
-    let doc: Value = serde_json::from_str(REGISTRY).ok()?;
-    doc.get("curves")?
-        .as_array()?
-        .iter()
-        .find(|c| c.get("slug").and_then(Value::as_str) == Some(slug))
-        .cloned()
+    let i = *REGISTRY_BY_SLUG.get(slug)?;
+    registry_curves()?.get(i).cloned()
 }
 
 fn parse_hex(s: &str) -> Option<u128> {

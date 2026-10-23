@@ -1122,6 +1122,11 @@ fn spec(argv: &[String]) {
     let aa_targets: u64 = num(argv, "--aa-targets", Some(targets));
     let bsgs_targets: u64 = num(argv, "--bsgs-targets", Some(2));
     let seed: u64 = num(argv, "--seed", Some(20261022));
+    // `--shards K` writes the main spec as K specs over every K-th curve:
+    // ecbench seeds each run from (measurement seed, workload id, round),
+    // so the shards' runs are exactly the unsharded spec's, and K sessions
+    // can run side by side.
+    let shards: usize = num(argv, "--shards", Some(1usize)).max(1);
     let cl = &pair["class"];
     let (order, n) = (cl["order"].as_u64().unwrap(), cl["n"].as_u64().unwrap());
     let side_lists = sides(argv);
@@ -1180,6 +1185,27 @@ fn spec(argv: &[String]) {
         ("spec-bsgs.json", &bsgs),
     ] {
         fs::write(out.join(name), serde_json::to_string_pretty(v).unwrap()).unwrap();
+    }
+    if shards > 1 {
+        for k in 0..shards {
+            let mut part = main.clone();
+            part["label"] = json!(format!(
+                "{} (shard {}/{shards})",
+                main["label"].as_str().unwrap(),
+                k + 1
+            ));
+            part["workloads"]["curves"] = json!(all
+                .iter()
+                .skip(k)
+                .step_by(shards)
+                .cloned()
+                .collect::<Vec<_>>());
+            fs::write(
+                out.join(format!("spec-shard{k}.json")),
+                serde_json::to_string_pretty(&part).unwrap(),
+            )
+            .unwrap();
+        }
     }
     eprintln!(
         "spec: {} workload curves x {targets} targets (A/A {} x {aa_targets}, BSGS {} x {bsgs_targets}) -> {}",
