@@ -213,3 +213,23 @@ The later registered p=37 tagged-line experiment uses the same 36 line-0 and 12 
 #image("mixed_polynomial_cost.png", width: 100%)
 
 The matched same-process twist24 rho used 348,941 counted $F_p M$ and 2,745 group operations. In their separate units, the restricted k=1 path uses 332.6 and 1.434 times those counts. No calibrated $S$ or isolated wall-speed ratio is available: hash/tree and allocator CPU, requested peak bytes, rho hash/table CPU, external same-input Gröbner comparison and ABAB isolation are missing. The all-one-line k=0 S5 arm missed one verified relation; k=4 had a failed system, and degree-30/31 retries failed to repair the native Macaulay border. This result is a complete *restricted-pattern* polynomial IC solve on one toy instance, not a complete union S5 or rho crossover. The full algebra, raw evidence, A/A controls, failure records and graphs are in `MIXED_POLYNOMIAL_REPORT.md` and its own PDF.
+
+#pagebreak()
+== Larger-curve mixed-pattern scaling and complete-stream occupancy
+The next preregistered panel uses the identical mixed-line physical base and frozen residual streams at $p=73$ and $p=97$, with three independent one-target seeds each. The 24-action folds their 96 and 72 physical factors to eight and six log columns respectively. All six polynomial paths reach anchored full rank and recover $[271]G$. Five processed signed-relation sets exactly match an independent point-keyed group oracle. One $p=73$ seed-one $S_4$ system fails and misses two verified relations, although the target is still recovered. That run is explicitly partial.
+
+#table(columns: (.7fr, .8fr, 1fr, 1fr, 1.4fr), inset: 4pt,
+  [$p$/seed], [IC residuals], [exact/poly signed sets], [anchored rank], [IC/rho counted $F_p M$],
+  [73/0], [15], [8/8], [8/8], [1,788],
+  [73/1], [20], [11/9], [8/8], [3,225],
+  [73/2], [43], [15/15], [8/8], [5,283],
+  [97/0], [310], [16/16], [6/6], [17,249],
+  [97/1], [75], [6/6], [6/6], [6,695],
+  [97/2], [150], [6/6], [6/6], [8,461],
+)
+
+#image("k1_scaling_overview.png", width: 95%)
+
+The separately registered *entire-stream* census counted 167 signed k=1 relations in 359 p=73 residuals and 79 in 1,497 p=97 residuals. In the p=97 streams, 1,423 residuals have no k=1 relation. The point-keyed group oracle and independent BSGS-derived scalar-keyed oracle agree on all 1,856 per-query signed-set digests, including after the polynomial arm stops. Its mutation control rejects one changed count at query zero. This identifies low physical k=1 occupancy as the source of the long p=97 collection paths, rather than a hidden polynomial miss on processed p=97 queries.
+
+For each of the 42 selected polynomial relations, all 24 twist/cubic transforms of its folded matrix row are scalar multiples of that row: 1,008 exact row and right-hand-side checks and 12,096 factor-image closure checks pass. Thus the 24 action reduces unknown columns and supports component tagging but does not create 24 independent equations. The counted IC/rho field ratios above omit hash/tree and allocator CPU, peak bytes, calibrated group-arithmetic bands, isolated timing and same-input msolve/Magma. No priced whole-method speed or asymptotic conclusion follows. The source-linked full report and all run-level PDFs are in `K1_SCALING_REPORT.md`, `K1_SCALE_RUNS.md`, and `K1_CENSUS_RUNS.md`.

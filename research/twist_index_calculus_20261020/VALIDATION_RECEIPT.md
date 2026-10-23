@@ -30,3 +30,28 @@
 An earlier parallel `cargo test --offline --release --lib` attempt passed 4,474 tests and failed one unrelated filesystem cleanup test, `cryptanalysis::ecc2k130_merge::tests::torn_and_shrunk_inputs_fail_closed`, at `remove_dir_all` with `DirectoryNotEmpty`; 119 tests were ignored. The exact test passed on a serialized rerun, and the complete serial suite above passed without a code change to that module. This is retained as a failed-attempt observation, not reported as a cryptanalysis failure.
 
 The registered `p=37,73,97` S5 pilot completed all six success/failure queries with exact group-oracle agreement; [p=37](quartic_twist_s5_p37.json), [p=73](quartic_twist_s5_p73.json), [p=97](quartic_twist_s5_p97.json). Its shared-host L0 times and field-operation counts are diagnostic. The repo validation gate does not admit a whole-method speed row because the main panel lacks IC-stream group-operation and hash/allocation accounting, a 0/0.1/1 GAE band and an isolated matched rho timing comparison. The S5 pilot also lacks a full relation stream and same-input msolve/Magma comparison.
+
+## 23 October 2026 larger-curve polynomial and occupancy extension
+
+The [registered scaling protocol](QUARTIC_TWIST_LINE_PROTOCOL.md),
+[source-linked scaling report](K1_SCALING_REPORT.md), [polynomial run index](K1_SCALE_RUNS.md),
+and [complete-stream census index](K1_CENSUS_RUNS.md) are additive to the
+22 October receipt above. [K1_PANEL_VALIDATION.json](K1_PANEL_VALIDATION.json)
+is the machine-readable aggregate; its [executable validator](verify_k1_panel.py)
+passed on six one-target workloads.
+
+| Check | Evidence | Result |
+| --- | --- | --- |
+| Generalized p=37 control | [Full non-timing diff](quartic_twist_k1_scale_p37_seed0_parity.diff), [independent audit](quartic_twist_k1_scale_p37_seed0_audit_v1.json) | Empty diff against frozen p=37 `k=1`; independent target/factor checks pass. |
+| p=73/p=97 polynomial solves | [Six first/A/A pairs](K1_SCALE_RUNS.md), six separate native point-keyed/BSGS audits | All six recover 271 at anchored full rank; five processed-prefix signed sets exact. p=73 seed one is retained as `partial`: 11 exact, nine polynomial, two missed at one failed S4 system. All six A/A non-timing diffs are empty and their independent audit outputs are byte-identical. |
+| Complete-stream signed occupancy | [Twelve first/A/A census reports](K1_CENSUS_RUNS.md), [scalar-keyed auditor](../../examples/quartic_twist_k1_census_audit.rs) | Six first/A/A census raw pairs and six audit-output pairs are byte-identical; all 1,856 exact per-query signed-set digests, counts and cumulative totals match independent BSGS-derived scalar sums, including post-IC-stop queries. |
+| Auditor sensitivity | [Mutation control](quartic_twist_k1_census_mutation_control_v1.json) | One p=73 query-zero count changed from 0 to 1; auditor exited 101 with the expected count assertion, before accepting a corrupted census. |
+| Twist-row redundancy | [Orbit-row record](quartic_twist_k1_orbit_row_audit_v1.json), [verifier](verify_k1_orbit_rows.py) | All 12,096 factor-action closure checks and 1,008 exact row/RHS scalar-multiple checks pass across 42 selected relations. |
+| Missing-relation localization | [Post-run difference record](quartic_twist_k1_missing_diagnostic_v1.json), [executable diagnosis](diagnose_k1_missing.py) | Exactly one differing query across six processed streams; both missing relations use signed `L2` peel `(54,+1)`, with no false polynomial relation. This is a post-run diagnosis, not an input to collection. |
+| Reports and visual copies | [25 run reports](K1_SCALE_RUNS.md), [one-page scaling PDF](K1_SCALING_REPORT.pdf), [canonical study PDF](QUARTIC_TWIST24_REPORT.pdf), [copy manifest](../../benchmarks/20261022-quartic-twist-index-calculus/K1_VISUALS.json) | All 25 run PDFs open as one page; the scaling PDF opens as one page and the updated canonical PDF as 13. Visual inspection found readable figures; SHA-256 equality holds for 79 source/copy files. A local-link check over 33 affected Markdown files found zero missing targets. |
+| Repository validation gate | `python3 scripts/validation_gate.py check --base 2f7f8538258fd81c1972c142fc6465a8086b61f0` | Pass against this branch's merge base; no priced row was added. The same check against current `origin/main` reports two removed unrelated volcano benchmark rows because this branch predates 219 upstream commits and its old `benchmarks/README.md` lacks those additions. The PR merge check remains the decisive current-base gate. |
+
+The current host has neither `msolve` nor Magma on `PATH`. No same-input
+external solver comparison, complete native hash/allocator and memory
+pricing, calibrated GAE band, or isolated ABAB timing was performed, so
+the extension does not promote a whole-method IC/rho speed result.
