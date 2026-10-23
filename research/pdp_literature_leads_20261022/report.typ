@@ -45,10 +45,22 @@ degree law is plausible for two-point `S₃` but does not transfer to the
 chain routes (LEAD-05). The gate dossier (LEAD-12) finds no lead that
 the generic bounds exclude outright and three that could move the
 exponent in principle, which means "not excluded", not "indicated". The
-remaining five dossiers (02, 03, 07, 09, 13) are listed below with their
-status. The cheapest next measurement that decides several cards at once
-is LEAD-05’s `S₃` boundary replication (about 1 person-day, 10–15
-CPU-hours), which LEAD-12 routes first.
+five remaining dossiers close their cards at the desk as well: the
+parametric eliminant needs about `D^{k+1}` terms against a `D^{3.1}`
+solve and costs more to evaluate than the solve it replaces (LEAD-02);
+`ℓ`-torsion beyond 2 multiplies the solution count by more than the
+symmetry group can divide it, and the 3-torsion frame was already
+measured not to pay (LEAD-03); every admissible Crossbred choice on the
+deciding `(m, ℓ) = (4, 6)` cell enumerates more variables than the
+summands have (LEAD-07); the Ore resultant is dense of degree `2^{ℓ+1}`
+and its roots are the list rf-mitm already enumerates (LEAD-09); and the
+summation-ideal solution-count drop needs characteristic 2 while both
+repository cover paths are odd-characteristic (LEAD-13). The cheapest
+next measurement that decides several cards at once is LEAD-05’s `S₃`
+boundary replication (about 1 person-day, 10–15 CPU-hours), which
+LEAD-12 routes first; the only candidate for a measured improvement over
+a leaderboard row is LEAD-04’s cofactor-projected base on the
+random-binary ladder (desk estimate 1.4–1.6× at fixed base size).
 
 Figures: #link("figures/pdp_landscape.svg")[`figures/pdp_landscape.svg`]
 (source #link("figures/diagram.py")[`figures/diagram.py`]) and
@@ -99,7 +111,11 @@ Dossiers and verification cards: #link("leads/")[`leads/`].
   citation re-fetched, every path tested with `test -e`, every quoted
   number grepped; computes nothing). The container restarted once during
   the round; the five dossiers that were lost (02, 03, 07, 09, 13) were
-  re-dispatched on 2026-10-23 with a time budget.
+  re-dispatched on 2026-10-23 with a time budget. The second LEAD-07
+  agent stalled for three hours and was stopped; a third, with a
+  25-minute budget, wrote the dossier from the repository files, the
+  published version of ePrint 2024/992 (read at source) and the two
+  other ePrint abstracts.
 
 == 2. What the literature says (summary of `papers.csv`)
 <what-the-literature-says-summary-of-papers.csv>
@@ -192,11 +208,28 @@ is a wrong citation.
   [02],
   [Parametric eliminant: generic-fibre Gröbner basis in the target’s
   coordinates (solver, amortisation)],
-  [#emph[pending (re-dispatched 2026-10-23)]],
+  [#strong[closed-by-measurement], provisional (desk): over `F̄_q` the
+  descended `k = 3` system splits into one equation per conjugate target
+  coordinate; the solution count is 384 before and 64 after
+  `S₃`-symmetrisation, so the eliminant has degree 64 in `e₁` and up to
+  64 in each of the three target coordinates, up to `65⁴ ≈ 1.8·10⁷`
+  terms and at least 274,625 specialisations; evaluating it per target
+  costs 4–60× the measured `C₃` at `k = 3` and about `9·10⁴×` `C₄(D₄)`
+  at `k = 4`, because an eliminant in `k` target coordinates needs about
+  `D^{k+1}` terms against a `D^{3.1}` Macaulay solve],
   [03],
   [ℓ-torsion (3, 4) symmetrisation and Kummer-model coordinates
   (formulation)],
-  [#emph[pending (re-dispatched 2026-10-23)]],
+  [#strong[closed-by-measurement] for `ℓ = 3` (the 3-torsion frame was
+  measured at `m = 3` in `RESEARCH_EXOTIC_COORDINATES.md` §14.3, "does
+  not pay"), #strong[closed-by-theorem] for `ℓ = 4` and for elliptic
+  Kummer/theta-line coordinates (FHJRV Prop. 3 needs `ℓ | deg ϕ`; Prop.
+  5 makes every Kummer-line coordinate a Möbius image of `x`):
+  `ℓ`-torsion forces `deg ϕ ≥ ℓ`, breaks the `[−1]` halving and raises
+  the solution count from `2^{(m−1)²}` to `ℓ^{m²−m+1}`, which the group
+  order `ℓ^{m−1} m!` cannot recover; the Hessian `S′₃` has degree 9 per
+  variable against 2 (exact check), so the card’s kill fires at
+  `m = 2`],
   [04],
   [Homomorphic class pre-partition: Tate pairing, ℓ-descent, trace
   parity (filter)],
@@ -224,7 +257,17 @@ is a wrong citation.
   `k = 4` ladder’s 4 equations of degree ≤ 8],
   [07],
   [Crossbred on the Weil-descent degree cells (solver)],
-  [#emph[pending (re-dispatched 2026-10-23)]],
+  [#strong[constant-factor candidate], lowest rung, with the card’s own
+  kill (`k > ℓ`) expected to fire at `(m, ℓ) = (4, 6)`: only `mℓ = 24`
+  of the `N` Boolean variables are free, and every admissible Crossbred
+  choice in the dossier’s desk model (a semi-regular count extended from
+  the paper’s quadratic theorem to mixed quadratic and cubic equations)
+  enumerates `k ≥ N − 8`, i.e. 38–64 variables against 24; with `k ≤ ℓ`
+  the specialised system is under-determined at `n = 10` and `15` and no
+  `D ≤ 14` is admissible at `n = 24`; preprocessing over all `N`
+  variables is about 9× wider than guess-then-F4 on the `m = 3`
+  residual; the card’s "70 GB at degree 5" is the `N = 40` figure, and
+  `(4, 6)` at `n = 10` is 191 GB dense],
   [08],
   [Learned orderings and branching for F4 and WDSat (solver, ML)],
   [#strong[constant-factor candidate], stage level only: a variable
@@ -235,7 +278,15 @@ is a wrong citation.
   2–4.91× at stage level with `S` unchanged],
   [09],
   [Ore / linearized-polynomial quotient-algebra elimination (solver)],
-  [#emph[pending (re-dispatched 2026-10-23)]],
+  [#strong[closed-by-measurement] (desk, exact over `F_{2^n}` at
+  `ℓ = 3…8`) for the card as written: `Res_{x₂}(S₃, L_V)` has degree
+  exactly `2^{ℓ+1}` in `x₁` (proved) and is dense (at most one zero
+  coefficient in 16 instances, full ANF support), so the fast
+  skew-polynomial costs, which are in the 2-degree `ℓ`, apply to `L_V`
+  and its compositions (already used in `semaev_decomp.rs`) but not to
+  the resultant; its roots are the candidate list `x(R ± P_v)` that
+  rf-mitm already enumerates at 5 multiplications each, a
+  membership-test oracle in disguise],
   [10],
   [Chord-parametrised small-root family over `F_p` (formulation)],
   [#strong[closed-by-theorem] for the small-unknown family: the chord
@@ -265,7 +316,18 @@ is a wrong citation.
   [13],
   [Summation ideals (Faugère–Wallet) and Nagao on Joux–Vitse covers
   (formulation on the cover)],
-  [#emph[pending (re-dispatched 2026-10-23)]],
+  [#strong[closed-by-theorem] for the repository’s cover paths: the
+  `2^{(n−1)(g+1)}` drop needs characteristic 2 and a monomial `h₁`
+  (2-rank at most 1), and Wallet’s 2016 slides say "no reduction in
+  characteristic `p > 2`"; both repository cover paths are
+  odd-characteristic, the cubic-GHS `q^{1.30}` route has no Gröbner step
+  at all (smoothness tests with large primes), and in the Joux–Vitse
+  route the Nagao test survives only in the descent (53–56 % of `S` at
+  `p = 1511`); the frozen `experiments/30_jv_cover_ccov.json` shows
+  ideal degree 64 in all 10 rows, so the card’s kill (an 8× fall) fires;
+  the Jacobian’s rational 2-torsion gives no quotient for `g ≥ 2`
+  because translation by a 2-torsion class is an automorphism of `J`,
+  not of the cover curve],
   [14],
   [Prime-field digit and Kummer-tower systems as multi-homogeneous
   blocks (formulation)],
@@ -294,15 +356,26 @@ Table B. Ranking inputs and verification totals per lead.
   [1–1.5 person-days, \< 4 CPU-h, ≤ 1.5 GB (msolve)],
   [12 / 2 / 0; 25 / 1],
   [02],
-  [],
-  [],
-  [],
-  [],
+  [medium (degree counts desk-checked at `k = 3`; density measured only
+  at `k = 2`, 67 of 125 terms)],
+  [none; if evaluation were free the ceiling would be 5–9× at `k = 3`
+  and about `10³×` at `k = 4` (arithmetic, not a result); setup
+  amortises at `k = 3` (about 9 % of the relation phase at `q = 2^20`)
+  but not at `k = 4` before the extrapolated `D₄` handover],
+  [2–3 person-days of Rust (a `k = 3` slice-fill measurement), \< 1
+  CPU-h, \< 1 GB],
+  [2 / 2 / 6; 8 / 0],
   [03],
-  [],
-  [],
-  [],
-  [],
+  [high (counting argument, exact degree check and the repository’s
+  measured row agree)],
+  [none: at `m = 3` the descended Hessian system has 2,187 `F̄_q`
+  solutions against 16 (2-torsion frame) and 64 (plain symmetrised
+  Semaev); the measured F4 proxy is 5–8× slower than Gaudry’s `x`-line;
+  a monic Hessian with `ω ∈ F_q` has `9 \| #E`, so the matched rho gets
+  3× cheaper (brute-force counts at `p = 7, 13, 19, 31`)],
+  [1 person-day for a Hessian chart in the quotient engine, \< 5
+  CPU-min; recommended skipped],
+  [4 / 1 / 7; 11 / 0],
   [04],
   [medium (bounds); low (effect on `S`)],
   [about 1.1–1.2× on `S` for the cofactor-2/6 random-binary rows (desk
@@ -323,10 +396,15 @@ Table B. Ranking inputs and verification totals per lead.
   [2–3 person-days (new `T₃` harness), ≤ 2 CPU-h],
   [1 / 4 / 4; 16 / 0],
   [07],
-  [],
-  [],
-  [],
-  [],
+  [low that it gains; medium that the kill fires (the desk model
+  predicts degree 7–8 where the repository’s F4 reads 4, so only the
+  test can close it)],
+  [unknown, probably none: at most a constant on peak memory at `(4, 6)`
+  and nothing on end-to-end `S`, because the `m = 4` free-oracle floor
+  of `2^56.46` binds; the gap to rho stays at the committed +7.62 bits],
+  [3–5 person-days, 40–60 CPU-h at 16 GB; an optional degree-5 item adds
+  about 15 CPU-h at 7–25 GB],
+  [pending],
   [08],
   [medium],
   [0 degree levels; WDSat ≤ 1.04×; F4 XORs 1.0–2× beyond the hand rules
@@ -334,10 +412,15 @@ Table B. Ranking inputs and verification totals per lead.
   [2 person-days core, 10 CPU-h mechanical, ≤ 16 GB],
   [7 / 0 / 5; 21 / 3],
   [09],
-  [],
-  [],
-  [],
-  [],
+  [medium (degree proved; density at `ℓ = 14–16` extrapolated)],
+  [none: at `n = 47` writing out the resultant costs `2^{ℓ+1}+1`
+  coefficients, about 0.80× rf-mitm’s counted multiplications, at least
+  2.4× above the card’s kill line; the `m = 3` pairs residual floor is
+  3.2–3.9× above rf-pairs; `S_IC/S_rho` unchanged (3,053 at `n = 31`,
+  25,116 at `n = 37`)],
+  [0.25 person-day, \< 1 CPU-h, \< 1 GB (a term-count example on
+  `semaev_decomp::{Gf2, Poly}`)],
+  [6 / 2 / 1; 24 / 0],
   [10],
   [medium],
   [none in the exponent; 5–11 % higher `δ` at equal multiplicity (2–3×
@@ -357,10 +440,18 @@ Table B. Ranking inputs and verification totals per lead.
   [0.5 person-day to close the reading gap],
   [8 / 1 / 3; 10 / 0],
   [13],
-  [],
-  [],
-  [],
-  [],
+  [high (repository path); medium (even-characteristic numbers:
+  Faugère–Wallet’s HAL and Springer pages were unreachable, so the
+  abstract and Wallet’s slides were used)],
+  [none on any row: 1.0× at `q ≈ 2^11` in odd characteristic; a
+  hypothetical even-characteristic Joux–Vitse cover would have `L = g`,
+  giving at best degree 64 → 32 (a symbolic recount of the norm
+  polynomial finds 64 → 64), about 1–6× per test (desk estimate);
+  ECC2K-130 has no low-genus cover],
+  [T0 is a read-only `jq` over the frozen JSON (0.1 person-day, already
+  run: `delta.max = 64` in every row); the even-characteristic control
+  T1 (3–5 person-days, external CAS) is not recommended],
+  [5 / 0 / 1; 19 / 0],
   [14],
   [medium],
   [none on the exponent, and the sign is wrong; constant unknown, likely
@@ -382,6 +473,18 @@ Table B. Ranking inputs and verification totals per lead.
   left is whether the closed-form carry seeds (bit components of
   `x₁f₁, x₂f₁, yf₁`) lie in the degree-4 Macaulay span and let F4 finish
   at 3; the dossier replaces the card’s test with that probe (R1).
+- #strong[LEAD-02.] Break-even at `k = 3` needs an eliminant fill of
+  1.6–2.5 %, which is the one unmeasured quantity (the test).
+  Joux–Vitse’s F4 traces were read at source from saved PDFs;
+  Weispfenning 1992 is recalled, Montes–Wibmer and Faugère–Mou
+  abstract-only.
+- #strong[LEAD-03.] The Hessian invariant ring is polynomial: `G(3,3,3)`
+  has order 54 with primary invariants `Σuᵢ³`, `Σ_{i<j} uᵢ³uⱼ³` and
+  `u₁u₂u₃` and no secondary invariants, so the obstruction is the
+  solution count, not the invariant theory. FHJRV stop at 2-torsion
+  because degree-2 maps are automatically 2-torsion-equivariant. The
+  Barbulescu–Robert–Sarkis PDF returned 503, so only its abstract was
+  read.
 - #strong[LEAD-04.] Why KN-FIND-14706d does not cover this: that finding
   tests the product character `χ₁χ₂χ₃`, which is trivial on `E(F_p)` by
   the curve equation; the 2-descent class `(χ₁, χ₂)` lives in its kernel
@@ -410,6 +513,17 @@ Table B. Ranking inputs and verification totals per lead.
   transfer to generic curves. The card’s pointer "ePrint 2014/158" is
   the point-compression paper; the optimal-representation paper is arXiv
   1405.2733 / ePrint 2014/333.
+- #strong[LEAD-07.] The card’s "(ℓ, m) \= (4, 6)" is read as `m = 4`,
+  `ℓ = 6`, the cell the repository names as blocked and unmeasured; the
+  literal `ℓ = 4`, `m = 6` reading has no repository measurement and its
+  arithmetic is in the dossier. `crossbred_20260920/README.md` and the
+  MutantXL README do not exist; `oracle_ladder.txt`, `e2e_panel.txt` and
+  the MutantXL RESULTS were used instead. The published version of
+  ePrint 2024/992 was read at source (introduction, §2, Algorithm 1,
+  Definition 7, Theorem 10 and the examples; not the proofs or
+  experiments); 2017/372 and 2026/360 are abstract-only. Not read: the
+  exporter’s variable order, so whether the repository’s `k` enumerates
+  `x`-bits or `y`-bits is unknown.
 - #strong[LEAD-08.] HATSolver predicts the lex Gröbner basis directly
   rather than learning an ordering; the relevant learned-order paper is
   Bunch et al., arXiv 2602.02972. The instance-level degree is a
@@ -417,6 +531,12 @@ Table B. Ranking inputs and verification totals per lead.
   so there is nothing per-instance to learn; the test is replaced by a
   held-out-cell split with a permutation null, runnable from
   ml-cryptanalysis.
+- #strong[LEAD-09.] Implicit variants (never writing the resultant out)
+  are not excluded, but they are not new either: they reduce to the
+  bilinear descended system that LEAD-01, 05 and 07 already study. For
+  `m = 3` the method sits at `Θ̃(2^n)`, the enumeration line. Euler–Petit
+  is cited only through the repository’s knowledge notes, which the
+  dossier says.
 - #strong[LEAD-10.] Two side findings:
   `RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md` §4.6 puts the
   `(e₁, e₂)` reach at 1/9, which W10’s own e-encoding rows already
@@ -438,6 +558,13 @@ Table B. Ranking inputs and verification totals per lead.
   of `D(n)` would move the exponent (desk check: cost exponent per bit
   of `n` 0.81 at slope 1/20 and 0.48 at 1/40, against rho’s 0.5), which
   is why LEAD-05’s fit of `D(n)` is the first test.
+- #strong[LEAD-13.] Faugère–Wallet is not cited in the repository’s
+  SAT/SMT/Nagao survey. Open items: the paper’s statement for `L = g`,
+  where its `g − L + 1` formula and the dossier’s recount differ by at
+  most 2× in degree, and whether the HCDLP step of `ghs_descent.rs` (the
+  only repository code that builds a characteristic-2 cover) uses Nagao.
+  Constant-factor levers named instead: a sieved or batched descent and
+  cheaper line enumeration.
 - #strong[LEAD-14.] The card’s premise is wrong at source:
   Petit–Kosters–Messeng use a composition tower, not binary digits, and
   their experiments are `m = 2` only. Their Tables 4–5 (Magma, `m = 2`)
@@ -451,8 +578,10 @@ Table B. Ranking inputs and verification totals per lead.
 
 == 4. Ranking and what to do next
 <ranking-and-what-to-do-next>
-#emph[(Provisional until the five re-dispatched dossiers land; the
-ranking below uses the nine completed ones and LEAD-12’s gate.)]
+All 14 dossiers are in; the ranking uses their verdicts and LEAD-12’s
+gate. No card produced a measured improvement, and none was expected to:
+this was a search round. The order below is by what a measurement would
+decide per unit of cost.
 
 + #strong[Run LEAD-05’s cheap test first] (about 1 person-day, 10–15
   CPU-hours, ≤ 12 GB): replicate the `S₃` closure boundaries at
@@ -470,9 +599,12 @@ ranking below uses the nine completed ones and LEAD-12’s gate.)]
   with the prime-order negative control that must read 1.000×. A
   measured improvement over a leaderboard row would count under the
   success criterion even at that size.
-+ #strong[Do not spend on] LEAD-06, 10, 14 (closed at the desk, with the
-  reasoning in the dossiers) or LEAD-08 beyond a cheap null test (the
-  theorem leaves only matrix cost, where hand rules already exist).
++ #strong[Do not spend on] LEAD-02, 03, 06, 09, 10, 13, 14 (closed at
+  the desk, with the reasoning in the dossiers) or LEAD-08 beyond a
+  cheap null test (the theorem leaves only matrix cost, where hand rules
+  already exist). LEAD-07 is worth its 3–5 person-days only if the
+  `(4, 6)` cell is wanted for LEAD-05’s degree question and no 128 GB
+  host is available; its own kill is expected to fire.
 + #strong[Reading debt] (0.5 person-day each, needs a host outside the
   Cloudflare block): ePrint 2017/1262 (LEAD-11) and the elliptic-curve
   section of ePrint 2026/384 (LEAD-12). Until then both verdicts stay
@@ -487,13 +619,16 @@ Each `leads/LEAD-NN.verify.md` re-fetched every citation, tested every
 path and grepped every quoted number, recording outcomes verbatim. The
 non-clean rows, read by hand:
 
-- #strong[Citation mismatches.] All are year-of-version or wording
-  differences: arXiv submission year against journal year (LEAD-06 ×3,
-  LEAD-12 ×1 where a search ranked a different paper first and the right
-  one second), title capitalisation or an abbreviated title in the
-  dossier (LEAD-01 ×2, LEAD-11 ×2), and a thesis whose host
-  (`edoc-vmtest.ub.unibas.ch`) did not resolve (LEAD-06). No row shows a
-  different paper or different authors.
+- #strong[Citation mismatches.] All are year-of-version, wording or
+  search artefacts: arXiv submission year against journal year (LEAD-06
+  ×3, LEAD-03 ×1), a search that ranked a different paper first and the
+  right one second (LEAD-12 ×1, LEAD-09 ×1 for Ore 1933), title
+  capitalisation, a paraphrased or abbreviated title in the dossier
+  (LEAD-01 ×2, LEAD-09 ×1, LEAD-11 ×2), two author-page PDFs that the
+  fetch tool returns as binary (LEAD-02 ×2; the dossier read them by
+  text extraction), and a thesis whose host (`edoc-vmtest.ub.unibas.ch`)
+  did not resolve (LEAD-06). No row shows a different paper or different
+  authors.
 - #strong[Unreachable citations.] ePrint PDFs and some abstract pages
   (403 or a Cloudflare challenge), one Springer chapter behind a login,
   the Caen 2018 server (504), Semantic Scholar’s rate limit. The
@@ -506,8 +641,9 @@ non-clean rows, read by hand:
   artefact (`README` for `README.md`). No cited existing path is
   missing.
 - #strong[Numbers not found by literal grep.] Formatting differences ("0
-  of 345" for "0/345", "8 of 8", "N \= 40 and 42"; confirmed by hand in
-  the named files), and in LEAD-14 three numbers that live in
+  of 345" for "0/345", "8 of 8", "N \= 40 and 42", superscripts such as
+  `2¹⁵⁰` for `2^150` in LEAD-03; confirmed by hand in the named files),
+  and in LEAD-14 three numbers that live in
   `research/pkm_m3_n21_msolve_20261018/RESULTS.md` while the dossier
   names the sibling `README.md` (an attribution slip, not a wrong
   number). One LEAD-05 number ("37 of 38" in
@@ -547,9 +683,17 @@ them.
   read at source).
 - The Caen 2018 talk and paper by Mueller (nitaj.users.lmno.cnrs.fr)
   returned 504; Mueller’s UCD thesis was not found online.
-- The five re-dispatched dossiers (02, 03, 07, 09, 13) are listed as
-  pending in §3 until their agents report; this README and the PDF are
-  regenerated when they do.
+- Two LEAD-07 agents produced nothing (one lost to the container
+  restart, one stalled and stopped after three hours); the third wrote
+  the dossier under a 25-minute budget, so its reading of the Crossbred
+  literature is shallower than the other dossiers’ and it says so. Its
+  verification card is the last to land and its totals are filled in §3
+  when it does.
+- The published version of ePrint 2024/992 and the two Joux–Vitse PDFs
+  were read from saved copies by text extraction (the fetch tool returns
+  binary for them); Faugère–Wallet’s HAL and Springer pages were
+  unreachable, so LEAD-13 rests on the abstract and Wallet’s 2016
+  slides.
 
 == 8. Graphs checked and left unchanged
 <graphs-checked-and-left-unchanged>
@@ -581,7 +725,7 @@ result, so no `benchmarks/` entry is owed.
   [Figure 1 and its source],
   [`figures/dreg_records.svg`, `.png`, `.csv`, `plot_dreg.py`],
   [Figure 2, its data and its source],
-  [`report.typ`, `report.pdf`],
-  [This report rendered (pandoc → Typst)],
+  [`report.typ`, `report.pdf`, `build.sh`],
+  [This report rendered (pandoc → Typst), and the build script],
 )
 ]
