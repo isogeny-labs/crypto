@@ -1,5 +1,12 @@
 # Heldout family selection and an honest solver portfolio
 
+**Current status, 2026-10-23: partial / blocked / unfunded.** Final labels 32–63 remain unopened; no final heldout run. E21 diagnostic selection is not a substitute for a frozen complete-cost selector.
+
+[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/RESULTS.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). No local run of this experiment has executed.
+
+The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
+
+
 **E28: proposed, blocked, not started.** Route 3; priority P2.
 
 [Full finite design and controls](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md#e28).

@@ -1,5 +1,12 @@
 # Applicable homogeneous signature baseline with complete output certificates
 
+**Current status, 2026-10-23: partial / blocked / unfunded.** 24 affine F4 workloads have complete independent certificates in each applicable arm; full homogeneous checks pass 21 and leave three incomplete. Signature backend fails every cell and its positive control. No timing or signature improvement admitted.
+
+[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/E25.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). Local phase receipts do not complete the original experiment.
+
+The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
+
+
 **E25: proposed, blocked, not started.** Route 3; priority P0.
 
 [Full finite design and controls](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md#e25).

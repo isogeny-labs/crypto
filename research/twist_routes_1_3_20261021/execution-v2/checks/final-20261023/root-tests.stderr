@@ -1,0 +1,113 @@
+ Downloading crates ...
+  Downloaded anstyle-query v1.1.5
+  Downloaded clap v4.6.7
+  Downloaded arcstr v1.2.0
+  Downloaded block-buffer v0.10.4
+  Downloaded arrayvec v0.7.8
+  Downloaded anstyle v1.0.14
+  Downloaded anstream v1.0.0
+  Downloaded anstyle-parse v1.0.0
+  Downloaded adler2 v2.0.1
+  Downloaded blake3 v1.8.7
+  Downloaded combine v4.6.8
+  Downloaded ahash v0.8.12
+  Downloaded clap_lex v1.1.1
+  Downloaded cc v1.6.0
+  Downloaded colorchoice v1.0.5
+  Downloaded clap_derive v4.6.7
+  Downloaded constant_time_eq v0.4.2
+  Downloaded bytes v1.12.1
+  Downloaded cpufeatures v0.3.1
+  Downloaded cpufeatures v0.2.17
+  Downloaded foreign-types v0.3.2
+  Downloaded fallible-iterator v0.3.0
+  Downloaded crc32fast v1.5.2
+  Downloaded crypto-common v0.1.7
+  Downloaded flate2 v1.1.10
+  Downloaded find-msvc-tools v0.1.14
+  Downloaded foreign-types-shared v0.1.1
+  Downloaded digest v0.10.7
+  Downloaded base64 v0.21.7
+  Downloaded fallible-streaming-iterator v0.1.9
+  Downloaded clap_builder v4.6.7
+  Downloaded displaydoc v0.2.7
+  Downloaded generic-array v0.14.7
+  Downloaded form_urlencoded v1.2.2
+  Downloaded bitflags v2.13.2
+  Downloaded heck v0.5.0
+  Downloaded hashlink v0.9.1
+  Downloaded hashbrown v0.14.5
+  Downloaded icu_normalizer_data v2.3.0
+  Downloaded icu_collections v2.3.0
+  Downloaded icu_provider v2.3.1
+  Downloaded icu_locale_core v2.3.0
+  Downloaded icu_properties v2.3.0
+  Downloaded icu_properties_data v2.3.0
+  Downloaded is_terminal_polyfill v1.70.2
+  Downloaded idna_adapter v1.2.2
+  Downloaded icu_normalizer v2.3.0
+  Downloaded idna v1.1.0
+  Downloaded log v0.4.34
+  Downloaded miniz_oxide v0.9.1
+  Downloaded native-tls v0.2.18
+  Downloaded num-bigint v0.5.1
+  Downloaded once_cell v1.21.4
+  Downloaded litemap v0.8.3
+  Downloaded openssl-probe v0.2.1
+  Downloaded openssl-macros v0.1.1
+  Downloaded openssl v0.10.81
+  Downloaded openssl-sys v0.9.117
+  Downloaded percent-encoding v2.3.2
+  Downloaded potential_utf v0.1.6
+  Downloaded pkg-config v0.3.34
+  Downloaded redis v1.7.1
+  Downloaded libsqlite3-sys v0.30.1
+  Downloaded sha2 v0.10.9
+  Downloaded smallvec v1.16.2
+  Downloaded simd-adler32 v0.3.10
+  Downloaded sha1_smol v1.0.1
+  Downloaded ryu v1.0.23
+  Downloaded shlex v2.0.1
+  Downloaded socket2 v0.6.5
+  Downloaded rusqlite v0.32.1
+  Downloaded subtle v2.6.1
+  Downloaded stable_deref_trait v1.2.1
+  Downloaded strsim v0.11.1
+  Downloaded synstructure v0.14.0
+  Downloaded tinystr v0.8.4
+  Downloaded syn v2.0.119
+  Downloaded typenum v1.20.1
+  Downloaded unicode-ident v1.0.26
+  Downloaded url v2.5.8
+  Downloaded utf8_iter v1.0.4
+  Downloaded version_check v0.9.5
+  Downloaded utf8parse v0.2.2
+  Downloaded xxhash-rust v0.8.19
+  Downloaded writeable v0.6.4
+  Downloaded vcpkg v0.2.15
+  Downloaded zerofrom v0.1.8
+  Downloaded yoke-derive v0.8.4
+  Downloaded yoke v0.8.3
+  Downloaded zeroize v1.9.0
+  Downloaded zerofrom-derive v0.1.8
+  Downloaded zeroize_derive v1.5.0
+  Downloaded zerotrie v0.2.5
+  Downloaded zerovec-derive v0.11.6
+  Downloaded zerovec v0.11.8
+  Downloaded zlib-rs v0.6.8
+   Compiling isogeny_algos v0.1.0 (/workspace/crypto-twist-runs/isogeny_algos)
+warning: value assigned to `cands` is never read
+   --> isogeny_algos/src/quat/deuring.rs:320:17
+    |
+320 |         let mut cands: Vec<([Int; 4], Int)> = vec![];
+    |                 ^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+    = note: `#[warn(unused_assignments)]` on by default
+
+   Compiling volcano-cli v0.1.0 (/workspace/crypto-twist-runs/tools/volcano-cli)
+warning: `isogeny_algos` (lib) generated 1 warning
+   Compiling crypto v0.1.0 (/workspace/crypto-twist-runs)
+    Finished `release` profile [optimized] target(s) in 12m 05s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-6a16cd246fedb10f)
+Restoring native checkpoint: degree=2, next_column=1

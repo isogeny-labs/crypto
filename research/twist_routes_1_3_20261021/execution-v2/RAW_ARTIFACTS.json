@@ -1,0 +1,24 @@
+{
+  "schema": "twist.raw-publication/v1",
+  "archive": {
+    "local_path": "/workspace/shared/twist-artifacts-20261023/runs.tar.xz",
+    "sha256": "6fb0de2cf9ad5c2b9acd1703372560550433da7c095f5f42202100aba31ef167",
+    "bytes": 38156064,
+    "format": "GNU tar with single-threaded xz -6",
+    "repack_cwd": "research/twist_routes_1_3_20261021/execution-v2",
+    "repack_command": "tar --sort=name --mtime='2026-10-23 00:00:00Z' --owner=0 --group=0 --numeric-owner --mode='u+rwX,go+rX,go-w' --format=gnu --exclude='*/SUMMARY.json' --exclude='*/ADJUDICATION.json' --exclude='*/INVENTORY.json' -cf - runs | xz -6 -T1 > runs.tar.xz",
+    "extracted_tree_repack_sha256": "6fb0de2cf9ad5c2b9acd1703372560550433da7c095f5f42202100aba31ef167",
+    "deterministic_repack_verified": true
+  },
+  "status": "local-ready-remote-upload-blocked",
+  "remote_uploaded": false,
+  "store_index_entry_committed": false,
+  "expected_store_name": "evidence/twist_routes_1_3_20261021/execution-v2-20261023/runs.tar.xz",
+  "store_name_resolvable": false,
+  "reason": "AWS CLI installed; configured S3 store status reports NoCredentials.",
+  "loose_metadata_manifest": "LOOSE_METADATA.json",
+  "full_member_manifest": "RAW_MEMBERS_FINAL.json",
+  "historical_member_inventories_retained": true,
+  "original_committed_trees_repacked": false,
+  "performance_claim": false
+}

@@ -1,5 +1,12 @@
 # Restrictions coupling the two Frobenius components
 
+**Current status, 2026-10-23: partial / blocked / unfunded.** 120 coupled census cells and 456 evaluated relation cells; all evaluated projected row sets match the same-base rational control. Full polynomial collector and complete costs remain missing.
+
+[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/E21.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). Local phase receipts do not complete the original experiment.
+
+The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
+
+
 **E21: proposed, blocked, not started.** Route 1; priority P1.
 
 [Full finite design and controls](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md#e21).

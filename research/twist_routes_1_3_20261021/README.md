@@ -1,6 +1,9 @@
 # Twist routes 1–3: designs and bounded execution
 
-[Execution results and remaining requirements](reports/EXECUTION_RESULTS.md).
+[Current follow-up results and remaining requirements](reports/followup-20261023/RESULTS.md),
+[PDF](reports/followup-20261023/RESULTS.pdf), and
+[execution/raw publication status](execution-v2/README.md).
+[Original execution report](reports/EXECUTION_RESULTS.md).
 [Original experiment designs](EXPERIMENTS.md), [machine-readable status](experiments.json),
 [dependency diagram](PROGRAM.svg), [Lean proof map](lean/README.md).
 
@@ -9,7 +12,9 @@
 [machine-readable designs](proposals-20261022/experiments.json) add twelve
 blocked, unfunded experiments. They cover actual 3-gluing, coupled restrictions,
 partial-relation elimination, independent divisor replay and solver/cost gaps.
-These are designs only; no follow-up experiment has started.
+That directory is the frozen design snapshot. Bounded local follow-up phases
+have now run under separately committed protocols; the full twelve-experiment
+campaign remains partial. A separate E30 incidence pilot is also recorded.
 [Proposal validation and check logs](proposals-20261022/CHECKS.md) retain the
 sandbox-blocked test attempt and its passing socket-enabled replay.
 
@@ -20,15 +25,25 @@ searches and known positive pairing/isogeny controls are preserved. All three
 eligible isogenies now have checked explicit duals. No calibrated IC speedup,
 novel algorithm or NIST-size benefit is established.
 
-P-521 alone passes the bounded public 3-torsion companion-module filter among
-the five NIST P-curves; the required gluing quotient and divisor maps remain
-unconstructed. This is an applicability candidate, not a speed result.
+Actual 3-torsion and explicit BHLS degree-three cover maps now pass native
+and PARI checks on the three positive toy sources and public P-521. The toy
+divisor transfers verify 24 distinct destination-subgroup recoveries back on
+their sources; no NIST DLP is attempted. Polarized identification with the
+certified torsion graphs and full costs remain open.
+
+Five actual higher-prime toy torsion cases also replay. Coupled and helper
+experiments retain identical projected rows to their matched rational
+controls. E30's 270 finite-incidence cells produce no maximum-degree
+reduction in the fixed grid. The 17-theorem Lean follow-up is a partial
+concrete bridge. None of these results establishes a calibrated speedup.
 
 The eighteen-experiment campaign remains partial: the result table retains
-positive three-gluing construction, higher-degree factorization, broader solver
+polarized gluing identification, higher-degree factorization, broader solver
 grids, full accounting/calibration, formal map bridges and independent-host
 replay as open requirements. The backlog cards remain blocked and unfunded.
-No follow-on computation is running.
+E26–E28 have not run. The full raw bundle is prepared locally but its remote
+store publication is blocked by missing AWS credentials. No continuing
+background computation is implied by these records.
 
 ## Reproduction
 

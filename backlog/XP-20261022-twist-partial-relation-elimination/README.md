@@ -1,5 +1,12 @@
 # Mixed extension helpers and partial-relation elimination
 
+**Current status, 2026-10-23: partial / blocked / unfunded.** Corrected v2 panel has 336 evaluated profiles and 20,976 unique arm witnesses freshly replayed. Paired row/recovery controls match. V1 cross-arity witness overwrite is preserved as incomplete evidence. Complete helper/construction costs remain missing.
+
+[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/E23.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). Local phase receipts do not complete the original experiment.
+
+The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
+
+
 **E23: proposed, blocked, not started.** Route 1; priority P1.
 
 [Full finite design and controls](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md#e23).

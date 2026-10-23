@@ -1,5 +1,12 @@
 # Projected additive energy and relation-yield diagnostics
 
+**Current status, 2026-10-23: partial / blocked / unfunded.** All pair/triple histograms and energies recomputed, with 960 random controls. Independent rank/yield controls and complete collector cost remain partial.
+
+[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/E22.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). Local phase receipts do not complete the original experiment.
+
+The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
+
+
 **E22: proposed, blocked, not started.** Route 1; priority P2.
 
 [Full finite design and controls](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md#e22).

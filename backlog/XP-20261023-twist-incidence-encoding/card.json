@@ -1,0 +1,95 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261023-twist-incidence-encoding",
+  "title": "Twist E30: Two-box incidence encoding and a matched ordinary control",
+  "created": "2026-10-23",
+  "authors": [
+    "twist local follow-up"
+  ],
+  "status": "blocked",
+  "status_note": "Partial local pilot: all 270 finite-grid cells and independent PARI replay pass; zero degree reductions versus direct membership. Full solver/cost comparison and raw publication remain open. Blocked and unfunded.",
+  "blocked_on": [
+    "problem:problems/twist-trace-constraint-and-solver-gap.md",
+    "xp:XP-20261022-twist-complete-cost-accounting",
+    "note:Complete solver/lifting and cold construction costs for the exact same projected bases are missing."
+  ],
+  "links": {
+    "lead": "research/twist_routes_1_3_20261021/execution-v2/INCIDENCE_PROTOCOL_V1.md",
+    "notes": [
+      "research/twist_routes_1_3_20261021/reports/followup-20261023/E30.md",
+      "research/twist_routes_1_3_20261021/execution-v2/README.md"
+    ],
+    "prs": [
+      2380
+    ]
+  },
+  "question": "Can a two-box twist incidence encoding lower complete decomposition cost against direct membership and a generic ordinary encoding of the same projected base?",
+  "decision_value": "A verified same-base complete-cost gain supports an encoding improvement. A lower displayed degree alone does not, and an ordinary-mask match must be priced before attributing any benefit to the twist.",
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "aburan28/crypto",
+    "commit": null,
+    "branch": "codex/twist-ic-routes-1-3-20261021",
+    "build": []
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 4,
+    "disk_gb": 1,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Bounded local correctness pilot: one worker, 4 GiB, native 3600-second and PARI 600-second caps. Full solver/cost and disk estimates remain uncalibrated; no scheduled job or funding."
+  },
+  "run": {
+    "argv": [
+      "false"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 1
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "Partial local twist.followup-run/v1 finite-incidence certificates; full comparison not complete.",
+    "verify": [],
+    "land": "research/twist_routes_1_3_20261021/execution-v2"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261023-twist-incidence-encoding"
+    ],
+    "ttl_s": 3600,
+    "env": {
+      "name": "unassigned-native-rust",
+      "recipe": "Design only; implement native driver, independent checker, checkpoints and source/protocol pins before readiness."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 4096,
+      "timeout_s": 1,
+      "sandbox": "auto",
+      "sandbox_reason": "",
+      "publish": "runs/XP-20261023-twist-incidence-encoding"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Blocked proposal with no run estimate, below the existing funded seed cards. Adding it changes no runnable-work priority or funding."
+    },
+    "notes": "No lab publication, allocation, lease or funding transaction. Separate local pilot receipts do not make this full card runnable."
+  },
+  "owner_hint": "unassigned"
+}

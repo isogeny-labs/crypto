@@ -54,3 +54,7 @@ add separate blocked cards for route-3 and shared measurement panels:
 and [E28 heldout selection](../XP-20261022-twist-heldout-selection/README.md).
 They are proposed, unfunded and not started. This card's original frozen
 protocol and acceptance criteria are unchanged.
+
+## 2026-10-23 bounded follow-up
+
+[Current results and remaining requirements](../../research/twist_routes_1_3_20261021/reports/followup-20261023/RESULTS.md) and [raw publication status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). Explicit geometry, independent arithmetic and matched projected-row controls are locally checked. No calibrated speedup, novelty or NIST DLP is established. E26–E28 and full costs remain open; this full-campaign card stays blocked and unfunded.

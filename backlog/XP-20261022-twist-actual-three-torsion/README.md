@@ -1,5 +1,12 @@
 # Actual 3-torsion and pairing certificates
 
+**Current status, 2026-10-23: partial / blocked / unfunded.** Four actual 3-torsion/pairing/Frobenius certificate replays pass, including public P-521. Canonical extension registration, quotient/polarization identification and full formal bridge remain open.
+
+[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/E18.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). Local phase receipts do not complete the original experiment.
+
+The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
+
+
 **E18: proposed, blocked, not started.** Route 2; priority P1.
 
 [Full finite design and controls](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md#e18).

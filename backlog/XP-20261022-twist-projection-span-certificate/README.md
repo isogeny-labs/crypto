@@ -1,5 +1,12 @@
 # Concrete separation and projected target-span certificates
 
+**Current status, 2026-10-23: partial / blocked / unfunded.** Finite coordinate/Frobenius/projector replay passes; 17 Lean theorems have a clean durable axiom audit. Exact twist-group embedding, odd-subgroup/projector, row-module and serialization bridges remain open.
+
+[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/E29.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). Local phase receipts do not complete the original experiment.
+
+The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
+
+
 **E29: proposed, blocked, not started.** Route 1; priority P1.
 
 [Full finite design and controls](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md#e29).

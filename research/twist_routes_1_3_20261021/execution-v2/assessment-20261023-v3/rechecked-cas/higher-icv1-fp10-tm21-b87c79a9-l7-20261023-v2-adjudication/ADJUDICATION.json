@@ -1,0 +1,34 @@
+{
+  "schema": "twist.native-cas-adjudication/v1",
+  "log_prefix": "research/twist_routes_1_3_20261021/execution-v2/receipts/higher-icv1-fp10-tm21-b87c79a9-l7-20261023-v2-gp",
+  "transport_metadata": {
+    "schema": "twist.CAS-transport/v2",
+    "source_commit": "cc313c23e9b1a3f51978c013b57c4a705ea6e3c4",
+    "tool": "PARI/GP 2.17.2",
+    "tool_binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+    "argv": [
+      "/tmp/twist-cas/root/usr/bin/gp",
+      "-f",
+      "-q",
+      "research/twist_routes_1_3_20261021/execution-v2/runs/higher-torsion-input-20261023-v2/icv1-fp10-tm21-b87c79a9-l7.gp"
+    ],
+    "script_sha256": "44f7b646e37a4a712deb883e1545a8ba8b58bedad0b0f083246b657180c3aff8",
+    "started_utc": "2026-10-23T16:40:54Z",
+    "finished_utc": "2026-10-23T16:40:54.306Z",
+    "exit_code": 0,
+    "timeout_s": 1800,
+    "address_space_kib": 4194304,
+    "threads": 1,
+    "stdout_sha256": "56eb27cd7bd047a21f89b597b2d8a58efcb394ea02f10b3d78b3575c5ac22fff",
+    "stderr_sha256": "8971d27eaec8de44fdae5dedb6bf4e0c3b40c12527d074dfbb390b381dd7a040",
+    "scientific_acceptance": "requires-native-adjudication"
+  },
+  "completion_marker_present": true,
+  "raw_hashes_match": true,
+  "script_hash_matches": true,
+  "allowed_stack_warning_present": true,
+  "unaccepted_error_lines": [],
+  "accepted": true,
+  "status": "accepted-native-checked-CAS-replay",
+  "scope": "The GP script performs independent group/pairing/polynomial checks. This Rust gate rejects errors even when GP exits zero and prints a marker."
+}

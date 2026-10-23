@@ -1,9 +1,9 @@
 # Twist-assisted index calculus: routes 1–3
 
-- **Updated:** 2026-10-22
+- **Updated:** 2026-10-23
 - **Status:** bounded native execution recorded; all three routes remain open for calibrated complete-cost improvement.
 - **Target family:** NIST prime-field P-curves, including P-256, P-384 and P-521; initial implementation checks must use registered public synthetic ordinary prime-field fixtures.
-- **Deliverable:** preserve the three routes, their prerequisites, controls and completion criteria. Bounded implementations, proofs and receipts are linked in the [execution report](../../twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.md). No novel algorithm, calibrated speedup or NIST security result is established.
+- **Deliverable:** preserve the three routes, their prerequisites, controls and completion criteria. See the [current follow-up report](../../twist_routes_1_3_20261021/reports/followup-20261023/RESULTS.md), [raw publication status](../../twist_routes_1_3_20261021/execution-v2/README.md), and [original execution report](../../twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.md). No novel algorithm, calibrated speedup or NIST security result is established.
 - **Shared blocker:** [missing constraint and solver comparison](../../../problems/twist-trace-constraint-and-solver-gap.md).
 - **Prior work:** [PR #2368](https://github.com/aburan28/crypto/pull/2368), the mixed-component twist experiment, was open when this tracker was prepared. Its findings and receipts are prior unmerged work, not a newly replayed or accepted baseline for these routes.
 
@@ -11,17 +11,18 @@
 
 | Route | Question | Actual status | Next deliverable | Execution card |
 | --- | --- | --- | --- | --- |
-| 1. Traces of extension points | Can a structured set in E(F_(p²)) make decomposition of its small trace image cheaper? | Bounded trace/norm/divisor/census panels and same-base controls executed | Full larger-field restrictions, full costing and independent host | [trace factor base](../../../backlog/XP-20261021-twist-trace-factor-base/README.md) |
-| 2. Covers and Jacobians | Can a cover involving E and its twist produce cheaper projected divisor relations? | Ten executable selected-cover transfers and independent orders checked | Positive three-gluing quotients, Jacobian decomposition and formal/independent map replay | [cover transfer](../../../backlog/XP-20261021-twist-cover-transfer/README.md) |
-| 3. Symmetry and elimination | Can keeping extension variables and exploiting Frobenius reduce actual solving cost? | Equivalent systems, three bounded solver attempts and native IC/replay panel executed | Broader grid, applicable signature reference and calibrated solver/pipeline costs | [symmetry solver](../../../backlog/XP-20261021-twist-symmetry-solver/README.md) |
+| 1. Traces of extension points | Can a structured set in E(F_(p²)) make decomposition of its small trace image cheaper? | Coupled census, energy/random controls and matched helper rows checked; paired extension/rational rows agree | Full polynomial collector, complete costing and independent host | [trace factor base](../../../backlog/XP-20261021-twist-trace-factor-base/README.md) |
+| 2. Covers and Jacobians | Can a cover involving E and its twist produce cheaper projected divisor relations? | Actual torsion, explicit degree-three maps, three toy divisor transfers and all 5,855 old class replays checked | Polarized graph identification, higher-prime quotients, destination decomposition and full costs | [cover transfer](../../../backlog/XP-20261021-twist-cover-transfer/README.md) |
+| 3. Symmetry and elimination | Can keeping extension variables and exploiting Frobenius reduce actual solving cost? | Affine F4 completeness replay passes; signature backend fails; 270 incidence cells give no degree reduction | Four E26 block candidates, applicable signature reference and complete solver/pipeline costs | [symmetry solver](../../../backlog/XP-20261021-twist-symmetry-solver/README.md) |
 
 The cards are deliberately **blocked**, with zero proposed funding and a failing execution sentinel. They are not runnable future full-campaign jobs. Completed bounded local runs have separate receipts; no follow-on job is running.
 
 The separate public 3-torsion companion-module filter passes only P-521 among
 the five NIST P-curves (four det-minus-one anti-intertwiners); ten toy counts
-match E11. The actual torsion/Weil-pairing bridge, polarized quotient, curve
-and divisor maps remain open. This identifies a construction candidate, not
-a NIST DLP speedup.
+match E11. Actual torsion/Weil pairings and explicit degree-three curve maps
+now replay for P-521 and the three positive toys. Toy divisor transfer is
+verified; polarized graph identification, public-curve divisor/solver work
+and all costs remain open. This is not a NIST DLP speedup.
 
 ## Mathematical setup and proof obligations
 

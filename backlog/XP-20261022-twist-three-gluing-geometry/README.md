@@ -1,5 +1,12 @@
 # Indecomposable gluing, a genus-2 curve and explicit maps
 
+**Current status, 2026-10-23: partial / blocked / unfunded.** Four parameter presentations per source and explicit degree-three maps pass native/PARI checks. Toy divisor transfer and 24 distinct source-verified destination recoveries pass. Polarized graph identification, second-map transfer, formal bridges and full costs remain open.
+
+[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/E19.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). Local phase receipts do not complete the original experiment.
+
+The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
+
+
 **E19: proposed, blocked, not started.** Route 2; priority P1.
 
 [Full finite design and controls](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md#e19).

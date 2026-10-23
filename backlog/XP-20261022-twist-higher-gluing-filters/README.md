@@ -1,5 +1,12 @@
 # Other small gluing primes and actual torsion modules
 
+**Current status, 2026-10-23: partial / blocked / unfunded.** 75 main module-filter rows plus 15 regression rows replay; five actual toy higher-prime pairing/Frobenius/graph cases pass. Higher-prime quotient/model/maps remain unconstructed.
+
+[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/E20.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). Local phase receipts do not complete the original experiment.
+
+The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
+
+
 **E20: proposed, blocked, not started.** Route 2; priority P2.
 
 [Full finite design and controls](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md#e20).

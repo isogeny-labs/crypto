@@ -1,5 +1,12 @@
 # Complete primitive accounting and a cold one-target replay
 
+**Current status, 2026-10-23: partial / blocked / unfunded.** Full primitive accounting, symmetric calibration and complete cold one-target replay remain unimplemented and unrun. High-level proxy counts are not a calibrated cost.
+
+[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/RESULTS.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). No local run of this experiment has executed.
+
+The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
+
+
 **E27: proposed, blocked, not started.** Route 3; priority P0.
 
 [Full finite design and controls](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md#e27).

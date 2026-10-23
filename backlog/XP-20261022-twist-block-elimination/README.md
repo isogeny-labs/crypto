@@ -1,5 +1,12 @@
 # Frobenius blocks, hybrid elimination and bounded invariant encodings
 
+**Current status, 2026-10-23: partial / blocked / unfunded.** Four requested block-elimination candidates remain unimplemented and unrun. E30 incidence pilot is a separate encoding experiment and does not replace this requirement.
+
+[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/RESULTS.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). No local run of this experiment has executed.
+
+The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
+
+
 **E26: proposed, blocked, not started.** Route 3; priority P2.
 
 [Full finite design and controls](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md#e26).

@@ -4,11 +4,11 @@
 - **Kind:** construction gap, proof-verification gap, implementation gap and missing measurements; these are not a universal impossibility theorem.
 - **Affected work:** [routes 1–3 tracker](../research/notes/index-calculus/RESEARCH_TWIST_IC_ROUTES_1_3.md), [trace card](../backlog/XP-20261021-twist-trace-factor-base/README.md), [cover card](../backlog/XP-20261021-twist-cover-transfer/README.md), [solver card](../backlog/XP-20261021-twist-symmetry-solver/README.md).
 - **Next action owner:** unassigned research/implementation lane.
-- **Last updated:** 2026-10-22
+- **Last updated:** 2026-10-23
 
 ## Problem
 
-A calibrated twist-assisted IC improvement for the NIST prime-field P-curve setting is not established. Bounded native trace restrictions, selected-cover class transfers and equivalent solver encodings now have execution evidence and matched same-base controls. Complete costs, broader grids, positive three-gluing constructions and independent-host/formal map bridges remain open.
+A calibrated twist-assisted IC improvement for the NIST prime-field P-curve setting is not established. Bounded native restrictions, explicit degree-three cover maps, toy divisor transfers and equivalent solver encodings have local execution evidence and matched same-base controls. Polarized graph identification, higher-prime quotients, full costs, broader grids and independent-host/formal map bridges remain open. The complete new raw bundle also has a separate [publication access blocker](twist-followup-evidence-publication.md).
 
 The source setting is E/F_p in characteristic p > 3 with the stated odd prime-order rational group. Exact toy fixtures and representations were registered and frozen. The [execution report](../research/twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.md) separates verified finite checks, partial comparisons and the original outstanding requirements. No NIST DLP was executed.
 
@@ -18,7 +18,7 @@ The source setting is E/F_p in characteristic p > 3 with the stated odd prime-or
 - **Derived or checked:** E00 checks five trace/cover polynomial preconditions by exact coefficient expansion and evaluated identity certificates, including false controls. Native group/exceptional-branch replay and nine explicit Lean theorems now pass; faithful concrete Frobenius/twist, odd-subgroup and chart/map bridges remain open.
 - **Suspected explanation:** an apparent gain from additional extension solutions may consist only of multiple lifts of the same projected relation. Whether a carefully restricted family reduces actual decomposition cost is unknown.
 - **Implemented and checked:** native restrictions/censuses, equivalent finite-base systems, ten selected-cover class transfers, independent PARI characteristic polynomials, three explicit isogenies with algebraic duals, and 1,920 combined IC/rho records. All 1,704 verified records replay identically; 216 empty-base errors are retained.
-- **Remaining capability:** three positive toy three-gluing module cases need quotient/polarization/maps. The public NIST companion-module filter passes P-521 alone, with four matrices, and still needs an actual torsion/Weil-pairing bridge and geometric construction. Larger-field families, higher-degree divisor factorization and broader solver grids remain partial. Applicable signature/F5 references, complete primitive/peak-memory accounting, calibration, general target lifting and independent-host class/pipeline replay remain open.
+- **Remaining capability:** actual 3-torsion/pairings and BHLS degree-three curve maps now replay on the three positive toys and P-521. Toy divisor transfer is checked, but polarized identification with the torsion graphs and full second-map transfer remain open. Five actual higher-prime toy torsion cases do not yet have quotient/model/maps. Larger-field families, higher-degree divisor factorization and broader solver grids remain partial. A successful applicable signature/F5 reference, complete accounting/calibration, target lifting and independent-host replay remain missing.
 - **What this evidence does not establish:** it neither proves that all auxiliary twist geometry is useless nor supplies an efficient NIST algorithm, a novel construction, a scaling result or a security conclusion.
 
 ## What would unblock it
@@ -33,7 +33,7 @@ These conditions would resolve a particular candidate's comparison gap. A null o
 
 ## Next discriminating step
 
-- **Action:** implement the three positive three-gluing quotients/maps or complete the existing useful-row/full-cost comparison, retaining the already frozen same-base controls and original acceptance conditions.
+- **Action:** identify the polarized gluing graphs for the explicit covers and complete the useful-row/full-cost comparison, retaining the frozen same-base controls and original acceptance conditions.
 - **Inputs and controls:** registered public synthetic ordinary prime-field fixtures, exact curve/twist representations, identity and exceptional branches, same projected factor base, duplicate-lift and rational-only controls.
 - **Execution limits:** bounded local runs have finished with exact source/input freezes and process limits. No follow-on full campaign is running. The blocked cards still require a complete future resource/checkpoint/cost protocol and validation before readiness.
 - **Outcomes:** equal projected rows without cheaper computation close the tested restriction as null; a verified stage reduction advances to full-pipeline costing; a mismatch blocks performance interpretation until fixed; unsupported maps remain construction gaps.
@@ -60,3 +60,28 @@ and complexity bridges remain open. The apparent group-cost reductions change
 ordering in the equal 0/0.1/1 GAE native-work sensitivity band. No calibrated IC
 gain or claim promotion follows. Historical planning/preflight statements above
 describe their dates; current status is this update and the execution report.
+
+### 2026-10-23: explicit geometry, independent replay and null controls
+
+The [new follow-up report](../research/twist_routes_1_3_20261021/reports/followup-20261023/RESULTS.md)
+records actual three-torsion and BHLS degree-three covers on the three toy
+positives and public P-521; 24 distinct toy destination recoveries; five
+actual higher-prime toy torsion inputs; and independent replay of all 5,855
+original arbitrary divisor classes. These are local structural/correctness
+results. Public NIST logarithms were not attempted.
+
+Coupled projection and helper controls retain exactly the same useful rows
+as their matched rational controls. The corrected helper panel has a clean
+source-group replay of 20,976 unique arm witnesses. Its first panel omitted
+arity from witness filenames and is preserved as incomplete evidence; the
+corrected full panel and a streaming assessment pass. The finite two-box
+incidence pilot checks 270 cells and finds zero maximum-generator-degree
+reductions. Applicable affine F4 outputs have completeness certificates;
+the signature backend fails its positive control and every attempted cell.
+
+Seventeen concrete-field/conditional group theorems now pass the durable
+Lean build and clean axiom audit. Full twist-group, odd-subgroup/projector,
+row-module and field/chart bridges remain open. E26, E27 and E28 remain
+unimplemented/unrun; final heldout labels 32–63 stay unopened. The raw bundle
+is prepared locally but [awaits artifact-store credentials](twist-followup-evidence-publication.md).
+No calibrated cost, novelty or IC improvement is promoted.

@@ -1,5 +1,12 @@
 # Base-field Jacobian arithmetic and independent arbitrary-class replay
 
+**Current status, 2026-10-23: partial / blocked / unfunded.** Independent PARI replay passes all 5,855 original divisor classes and both norms. Balanced base-field arithmetic, formal chart bridge and independent-host replay remain open.
+
+[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/E24.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). Local phase receipts do not complete the original experiment.
+
+The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
+
+
 **E24: proposed, blocked, not started.** Route 2; priority P1.
 
 [Full finite design and controls](../../research/twist_routes_1_3_20261021/proposals-20261022/README.md#e24).
