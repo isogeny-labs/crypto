@@ -40,6 +40,15 @@ class ArchivedLabelTests(unittest.TestCase):
         self.assertEqual(len(problems), 1)
         self.assertIn("K_1 / 2^19", problems[0])
 
+    def test_diff_preserves_frozen_source_and_still_lints_live_source(self):
+        diff = ("+++ b/research/study/evidence/source/sat.rs\n"
+                "@@ -0,0 +1 @@\n+K_1 / 2^19\n"
+                "+++ b/src/live.rs\n@@ -0,0 +1 @@\n+K_1 / 2^19\n")
+        with patch.object(names, "git", side_effect=["", diff]):
+            problems = names.lint_diff("base", self.resolver)
+        self.assertEqual(len(problems), 1)
+        self.assertTrue(problems[0].startswith("src/live.rs:"))
+
 
 if __name__ == "__main__":
     unittest.main()
