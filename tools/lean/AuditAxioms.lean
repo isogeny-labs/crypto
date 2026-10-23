@@ -1,7 +1,7 @@
 /-
 Axiom audit for the repository's Lean proof gate (tools/lean/proof-gate.sh).
 
-Usage: lake env lean --run tools/lean/AuditAxioms.lean [--trusted FILE] <Module> [<Module> ...]
+Usage: lake env lean --run tools/lean/AuditAxioms.lean -- [--trusted FILE] <Module> [<Module> ...]
 
 Imports the named modules, then, for every theorem declared in them (including
 submodules sharing the prefix), collects the axioms it depends on transitively.
@@ -46,10 +46,12 @@ def isNativeAxiom (a : Name) : Bool :=
 def readTrusted (path : String) : IO (List Name) := do
   let lines ← IO.FS.lines path
   return lines.toList.filterMap fun l =>
-    let n := String.ofList (((l.splitOn "#").head!).toList.filter (fun c => !c.isWhitespace))
+    let n := String.mk (((l.splitOn "#").head!).toList.filter (fun c => !c.isWhitespace))
     if n.isEmpty then none else some n.toName
 
 def main (args : List String) : IO UInt32 := do
+  -- Lean versions differ on whether --run consumes the argument separator.
+  let args := if args.head? == some "--" then args.drop 1 else args
   let (trusted, args) ← match args with
     | "--trusted" :: f :: rest => do pure ((← readTrusted f), rest)
     | _ => pure ([], args)
