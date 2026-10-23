@@ -36,6 +36,7 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
+use crate::cryptanalysis::ecbench::band::priced_s;
 use crate::cryptanalysis::ecbench::canonical::short_id;
 use crate::cryptanalysis::ecbench::record::Record;
 use crate::cryptanalysis::ecbench::runner::{read_records, read_session};
@@ -227,36 +228,45 @@ struct Matched {
     same_seeds: bool,
 }
 
-fn match_pairs(ma: &[&Record], mb: &[&Record]) -> Matched {
-    let key = |r: &Record| (r.workload.workload_id.clone(), r.round);
-    let a: BTreeMap<(String, u32), &Record> = ma
-        .iter()
-        .filter(|r| r.counts() && r.cost.s.is_some())
-        .map(|r| (key(r), *r))
-        .collect();
-    let b: BTreeMap<(String, u32), &Record> = mb
-        .iter()
-        .filter(|r| r.counts() && r.cost.s.is_some())
-        .map(|r| (key(r), *r))
-        .collect();
+/// A run's `S`: the recorded one, or `priced_S(w)` of AGENTS.md §5a when a
+/// weight is given (`None` when that weight cannot price the run).
+fn run_s(r: &Record, weight: Option<f64>) -> Result<Option<f64>, String> {
+    match weight {
+        None => Ok(r.cost.s),
+        Some(w) => priced_s(r, w),
+    }
+}
+
+fn match_pairs(ma: &[&Record], mb: &[&Record], weight: Option<f64>) -> Result<Matched, String> {
+    fn priced<'a>(
+        ms: &[&'a Record],
+        weight: Option<f64>,
+    ) -> Result<BTreeMap<(String, u32), (&'a Record, f64)>, String> {
+        let mut out = BTreeMap::new();
+        for r in ms.iter().filter(|r| r.counts()) {
+            if let Some(s) = run_s(r, weight)? {
+                out.insert((r.workload.workload_id.clone(), r.round), (*r, s));
+            }
+        }
+        Ok(out)
+    }
+    let a = priced(ma, weight)?;
+    let b = priced(mb, weight)?;
     let mut by_workload: BTreeMap<String, Vec<(f64, f64)>> = BTreeMap::new();
     let mut same_seeds = true;
-    for (k, ra) in &a {
-        if let Some(rb) = b.get(k) {
+    for (k, (ra, sa)) in &a {
+        if let Some((rb, sb)) = b.get(k) {
             same_seeds &= ra.algorithm_seed == rb.algorithm_seed;
-            by_workload
-                .entry(k.0.clone())
-                .or_default()
-                .push((ra.cost.s.unwrap_or(0.0), rb.cost.s.unwrap_or(0.0)));
+            by_workload.entry(k.0.clone()).or_default().push((*sa, *sb));
         }
     }
     let paired: usize = by_workload.values().map(|v| v.len()).sum();
     let unpaired = (a.len() - paired) as u64 + (b.len() - paired) as u64;
-    Matched {
+    Ok(Matched {
         by_workload,
         unpaired,
         same_seeds,
-    }
+    })
 }
 
 /// The ratio of sums over `strata` with its interval: two-stage when
@@ -293,6 +303,21 @@ pub fn compare(
     resamples: usize,
     seed: u64,
 ) -> Result<Comparison, String> {
+    compare_weighted(a_dir, a_arm, b_dir, b_arm, resamples, seed, None)
+}
+
+/// [`compare`] with every run priced at `priced_S(weight)` (GAE per native
+/// operation, AGENTS.md §5a) instead of its recorded `S`.  A run that the
+/// weight cannot price is unpaired, never zero.
+pub fn compare_weighted(
+    a_dir: &Path,
+    a_arm: &str,
+    b_dir: Option<&Path>,
+    b_arm: &str,
+    resamples: usize,
+    seed: u64,
+    weight: Option<f64>,
+) -> Result<Comparison, String> {
     let sa = read_session(a_dir)?;
     let ra = read_records(a_dir)?;
     let (sb, rb) = match b_dir {
@@ -326,7 +351,7 @@ pub fn compare(
         return Err("the arms report different units".into());
     }
 
-    let matched = match_pairs(&ma, &mb);
+    let matched = match_pairs(&ma, &mb, weight)?;
     let workload_of: BTreeMap<&str, &Record> = ma
         .iter()
         .map(|r| (r.workload.workload_id.as_str(), *r))

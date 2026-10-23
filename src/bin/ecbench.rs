@@ -239,6 +239,10 @@ enum Cmd {
         resamples: usize,
         #[arg(long, default_value_t = 20261002)]
         seed: u64,
+        /// Price each run at this many GAE per unpriced native operation
+        /// (AGENTS.md §5a) before pairing; default is the recorded `S`.
+        #[arg(long)]
+        weight: Option<f64>,
         /// Save to <dir>/comparisons/<a>__<b>.json.
         #[arg(long)]
         save: bool,
@@ -1079,10 +1083,19 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             b_dir,
             resamples,
             seed,
+            weight,
             save,
             json,
         } => {
-            let c = compare::compare(&dir, &a, b_dir.as_deref(), &b, resamples, seed)?;
+            let c = compare::compare_weighted(
+                &dir,
+                &a,
+                b_dir.as_deref(),
+                &b,
+                resamples,
+                seed,
+                weight,
+            )?;
             if save {
                 let d = dir.join("comparisons");
                 std::fs::create_dir_all(&d).map_err(|e| e.to_string())?;
