@@ -596,3 +596,23 @@ is a group-oracle reference, not a polynomial IC cost. Use the same
 A/A copy. If a solver run later stops before the end of its frozen
 stream, keep the census's post-stop portion explicitly separate from the
 counted one-target path.
+
+## Registered independent scalar-keyed census audit
+
+Frozen 23 October 2026 after all six point-keyed census records and their
+byte-identical A/A copies were generated, before implementing this audit.
+Independently recover the logarithm of every physical base point and the
+public target with a reusable baby-step/giant-step table on the same exact
+subgroup. Verify every recovered scalar by group multiplication. Build a
+signed `L0` pair table keyed by **scalar sums modulo `r`**, then enumerate
+the `L2` plus one `L0` complement for each residual `(a,b)` in the entire
+frozen stream. Compare the sorted complete signed `k=1` set's SHA-256 and
+cardinality against every point-keyed census row, including the portion
+after the polynomial IC stops. Check the cumulative count, first hit,
+zero-query count, occupancy numerator/denominator, and all record metadata.
+The scalar oracle may use the independently recovered target log for this
+reference audit only; the polynomial collector never sees it. Audit all
+six first and A/A census records with the same 8 GiB/1,200 s bound and
+retain every failure. Prove the audit is sensitive to corrupted evidence
+by mutating one recorded count and requiring rejection. An A/A agreement
+alone is not independent correctness evidence.
