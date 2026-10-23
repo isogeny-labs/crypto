@@ -201,10 +201,21 @@ fn field_setup(f: &Fixture) -> String {
             .collect::<Vec<_>>()
             .join("+")
     };
-    let modulus = f
-        .sextic_modulus
-        .as_ref()
-        .unwrap()
+    let mut coefficients = f.sextic_modulus.clone().unwrap();
+    assert_eq!(
+        coefficients.len(),
+        6,
+        "registered modulus stores the six lower coefficients"
+    );
+    coefficients.push(1);
+    let evaluation = coefficients.iter().enumerate().fold(Z, |v, (i, c)| {
+        k.add(v, k.mul(k.c(*c), k.pow(beta, i as u128)))
+    });
+    assert_eq!(
+        evaluation, Z,
+        "registered monic modulus does not annihilate the declared flat generator"
+    );
+    let modulus = coefficients
         .iter()
         .enumerate()
         .map(|(i, c)| format!("{c}*t^{i}"))
@@ -416,20 +427,16 @@ impl Three {
         );
         let mut d = h.reduce(u, v);
         if eq.len() < 4 {
-            assert_eq!(
-                eq.len(),
-                3,
-                "unsupported higher ramification at old infinity"
-            );
+            let multiplicity = 4 - eq.len();
             let fy = k
                 .sqrt(*self.old.last().unwrap())
                 .expect("fiber at infinity requires its actual square root");
             let mut found = 0;
             for s in [fy, k.neg(fy)] {
-                let image_x = k.div(*self.xn.last().unwrap(), *self.xd.last().unwrap());
+                let image_x = k.div(*self.xn.get(3).unwrap_or(&Z), self.xd[3]);
                 let image_y = k.div(
-                    k.mul(s, *self.yn.last().unwrap()),
-                    k.pow(*self.xd.last().unwrap(), 2),
+                    k.mul(s, *self.yn.get(3).unwrap_or(&Z)),
+                    k.pow(self.xd[3], 2),
                 );
                 if (image_x, image_y) == (k.c(x.0), k.c(y.0)) {
                     let inf = Div {
@@ -437,7 +444,7 @@ impl Three {
                         v: vec![k.mul(k.pow(h.lambda, 2), s)],
                     };
                     h.valid(&inf);
-                    d = h.add(&d, &inf);
+                    d = h.add(&d, &h.scalar(&inf, multiplicity as u128));
                     found += 1;
                 }
             }
