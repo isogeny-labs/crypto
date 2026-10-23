@@ -51,3 +51,14 @@ The initial verified readiness archive remains immutable at SHA256
 3,390,892bytes, in setec-astronomy-artifacts. Additional integration evidence,
 source history and receipts are published separately. CI readiness still needs
 fresh exact-head outcomes after the reconciled branch is pushed.
+
+The reconciled push restored27queued workflows and PR mergeability. Its final
+naming lint also exposed3unregistered model IDs used as literal results.json
+metric keys in incoming main's independent validator report. The report is
+preserved byte-for-byte(SHA25696b965a9772e868b8dd71ffdc6b1daf5447a19b6df1080b18c67100bf2577daf).
+Existing archived-label handling now retains only those3keys at that exact
+path/hash; it neither registers models nor allows their use in new prose.
+Changed report bytes, another path or another unknown label are rejected.
+All5naming regression tests and the full naming lint pass; the initial3-error
+output remains recorded separately. The validator report, its gate certificate
+and scientific results were not changed.
