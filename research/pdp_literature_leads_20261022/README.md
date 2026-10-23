@@ -338,8 +338,10 @@ read by hand:
   artefacts: arXiv submission year against journal year (LEAD-06 ×3, LEAD-03
   ×1), a search that ranked a different paper first and the right one second
   (LEAD-12 ×1, LEAD-09 ×1 for Ore 1933), title capitalisation, a paraphrased
-  or abbreviated title in the dossier (LEAD-01 ×2, LEAD-09 ×1, LEAD-11 ×2),
-  two author-page PDFs that the fetch tool returns as binary (LEAD-02 ×2;
+  or abbreviated title in the dossier (LEAD-01 ×2, LEAD-07 ×1, LEAD-09 ×1,
+  LEAD-11 ×2), a documentation page that carries no author or year
+  (LEAD-07 ×1), two author-page PDFs that the fetch tool returns as binary
+  (LEAD-02 ×2;
   the dossier read them by text extraction), and a thesis whose host
   (`edoc-vmtest.ub.unibas.ch`) did not resolve (LEAD-06). No row shows a
   different paper or different authors.
