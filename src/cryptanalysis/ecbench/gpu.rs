@@ -65,6 +65,38 @@ fn unix_ms() -> u128 {
         .unwrap_or(0)
 }
 
+// A parallel fork can briefly inherit a writer for a just-copied executable,
+// even with CLOEXEC, until that other child execs. ETXTBSY means our executable
+// never ran: only that launch error may wait, within the original budget.
+fn spawn_snapshot(
+    cmd: &mut Command,
+    started: Instant,
+    budget: Duration,
+) -> std::io::Result<std::process::Child> {
+    loop {
+        if started.elapsed() >= budget {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::TimedOut,
+                "GPU executable launch deadline expired",
+            ));
+        }
+        match cmd.spawn() {
+            #[cfg(unix)]
+            Err(error) if error.raw_os_error() == Some(libc::ETXTBSY) => {
+                let remaining = budget.saturating_sub(started.elapsed());
+                if remaining.is_zero() {
+                    return Err(error);
+                }
+                std::thread::sleep(remaining.min(Duration::from_millis(10)));
+                if started.elapsed() >= budget {
+                    return Err(error);
+                }
+            }
+            result => return result,
+        }
+    }
+}
+
 fn run_one(
     binary: &Path,
     args: &[String],
@@ -93,7 +125,8 @@ fn run_one(
     }
     let started_unix_ms = unix_ms();
     let start = Instant::now();
-    let child = match cmd.spawn() {
+    let budget = Duration::from_secs(timeout);
+    let child = match spawn_snapshot(&mut cmd, start, budget) {
         Ok(child) => child,
         Err(e) => {
             let message = format!("{}: {e}", binary.display());
@@ -110,7 +143,7 @@ fn run_one(
                     elapsed_ns: start.elapsed().as_nanos(),
                     child_pid: 0,
                     exit_code: None,
-                    timed_out: false,
+                    timed_out: start.elapsed() >= budget,
                     stdout_sha256: sha256_hex(b""),
                     stderr_sha256: sha256_hex(message.as_bytes()),
                 },
@@ -128,7 +161,9 @@ fn run_one(
             let (lock, cv) = &*done;
             let guard = lock.lock().unwrap_or_else(|e| e.into_inner());
             let (guard, _) = cv
-                .wait_timeout_while(guard, Duration::from_secs(timeout), |finished| !*finished)
+                .wait_timeout_while(guard, budget.saturating_sub(start.elapsed()), |finished| {
+                    !*finished
+                })
                 .unwrap_or_else(|e| e.into_inner());
             if !*guard {
                 *timed_out.lock().unwrap_or_else(|e| e.into_inner()) = true;
@@ -1045,6 +1080,76 @@ mod tests {
         assert_eq!(r.status, "selftest_failed");
         assert!(r.benchmark.is_none());
         assert!(!bad.join("benchmark.stdout").exists());
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn executable_writer_release_allows_one_launch_within_original_budget() {
+        let root = std::env::temp_dir().join(format!(
+            "ecbench-gpu-busy-release-{}-{}",
+            std::process::id(),
+            unix_ms()
+        ));
+        std::fs::create_dir(&root).unwrap();
+        let driver = root.join("driver.sh");
+        std::fs::write(&driver, "#!/bin/sh\necho launched\n").unwrap();
+        std::fs::set_permissions(&driver, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let writer = std::fs::OpenOptions::new()
+            .write(true)
+            .open(&driver)
+            .unwrap();
+        assert_eq!(
+            Command::new(&driver).spawn().unwrap_err().raw_os_error(),
+            Some(libc::ETXTBSY)
+        );
+        let release = std::thread::spawn(move || {
+            std::thread::sleep(Duration::from_millis(50));
+            drop(writer);
+        });
+        let (receipt, output) = run_one(&driver, &[], &root, "released", 3).unwrap();
+        release.join().unwrap();
+        assert_eq!(receipt.exit_code, Some(0));
+        assert!(receipt.child_pid > 0);
+        assert!(!receipt.timed_out);
+        assert_eq!(output, "launched\n");
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn busy_launch_deadline_and_other_spawn_errors_do_not_start_children() {
+        let root = std::env::temp_dir().join(format!(
+            "ecbench-gpu-busy-deadline-{}-{}",
+            std::process::id(),
+            unix_ms()
+        ));
+        std::fs::create_dir(&root).unwrap();
+        let driver = root.join("driver.sh");
+        std::fs::write(&driver, "#!/bin/sh\necho must-not-run\n").unwrap();
+        std::fs::set_permissions(&driver, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let writer = std::fs::OpenOptions::new()
+            .write(true)
+            .open(&driver)
+            .unwrap();
+        let start = Instant::now();
+        let error = spawn_snapshot(&mut Command::new(&driver), start, Duration::from_millis(30))
+            .unwrap_err();
+        // A descheduled test can exhaust its budget before the first attempt.
+        assert!(
+            error.raw_os_error() == Some(libc::ETXTBSY)
+                || error.kind() == std::io::ErrorKind::TimedOut
+        );
+        assert!(start.elapsed() >= Duration::from_millis(30));
+        drop(writer);
+        let error = spawn_snapshot(
+            &mut Command::new(root.join("absent")),
+            Instant::now(),
+            Duration::from_secs(3),
+        )
+        .unwrap_err();
+        assert_eq!(error.kind(), std::io::ErrorKind::NotFound);
+        let expired =
+            spawn_snapshot(&mut Command::new(&driver), Instant::now(), Duration::ZERO).unwrap_err();
+        assert_eq!(expired.kind(), std::io::ErrorKind::TimedOut);
         std::fs::remove_dir_all(root).unwrap();
     }
 
