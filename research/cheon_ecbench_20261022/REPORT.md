@@ -164,3 +164,27 @@ hard-assert 2,572, so refreshing them is held for a separate decision.
 - **Precision.** With 8 targets per size the intervals are wide, so exponent
   claims would need more targets.
 - **No challenge.** No challenge or verdict was sealed in an oracle domain.
+
+## Rho gate: per-run reading (disclosure, 2026-10-23)
+
+PROTOCOL.md section 6 states this study's rho gate per size: *"if the rho `S` is
+outside `[0.3, 4]` on any size ... nothing is ranked against rho"*. It was frozen
+before any data. Every per-size rho `S` lies between 0.60 and 1.50, so the gate
+as written is met, and the rankings above follow the protocol.
+
+The protocol also calls the gate "PR #2422's". The review of PR #2422 held that
+gate to apply to every individual run. Read that way, it fails here too:
+
+| session | rho runs | outside `[0.3, 4]` | lowest `S` |
+|:--|--:|--:|--:|
+| minus | 56 | 7 | 0.078 |
+| minus-naive | 48 | 6 | 0.078 |
+| plus | 56 | 6 | 0.035 |
+
+The minus-naive session shares six of its rho targets with the minus session.
+Rho's per-run cost has a heavy lower tail, as in PR #2422. The pooled ratios
+above are ratios of sums over 8 paired targets per size. They are therefore less
+sensitive to single low rho runs than per-size medians, but they are not immune.
+Whether these rankings are admitted under the per-run reading is a review
+decision. This section records the counts so that the decision can be made.
+
