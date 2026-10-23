@@ -4453,7 +4453,6 @@ fn rho_neg(inst: &Instance, g: EP, t: EP, rng: &mut PyRng, r: usize, max_steps: 
     }
 }
 
-
 // ------------------------------------------------- rho on E0 through the library walk
 use crypto_lib::cryptanalysis::ic_boundary::{
     rho_walk_with, CountedGroup, GroupOps, NegationClasses, RhoWalk,
@@ -4523,13 +4522,7 @@ fn ksqr5(k: &KField, a: KE) -> KE {
     let s2 = t * t % p;
     let s3 = 2 * a[1] % p * a[2] % p;
     let s4 = a[2] * a[2] % p;
-    let d = [
-        s0,
-        s1,
-        (s1 + s2 + s3 + 2 * p - s0 - s4) % p,
-        s3,
-        s4,
-    ];
+    let d = [s0, s1, (s1 + s2 + s3 + 2 * p - s0 - s4) % p, s3, s4];
     cnt(0, 5 + 2 + if k.c1 == 1 { 0 } else { 2 });
     kred(k, d)
 }

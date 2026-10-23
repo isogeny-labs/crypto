@@ -211,7 +211,14 @@ mod tests {
                 }
             }
             assert!(inst.id().slug.starts_with("icv1-"));
-            let t = inst.hash_to_subgroup_hex(0xdead_beef_1234_5678).unwrap();
+            // About half the draws lift to a point; the law takes the first that does.
+            let t = (0..64u64)
+                .find_map(|c| {
+                    inst.hash_to_subgroup_hex(
+                        0xdead_beef_1234_5678 ^ c.wrapping_mul(0x9e37_79b9_7f4a_7c15),
+                    )
+                })
+                .expect("one of 64 draws lifts");
             assert_ne!(t, inst.generator_hex());
         }
     }
