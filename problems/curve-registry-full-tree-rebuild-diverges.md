@@ -73,13 +73,36 @@ or independently count each curve's full group order.
   are retained. This resolves the n73 UID mismatch in the experimental
   output; it does not justify promoting the 13,219 additional entries or
   establish arithmetic validity of every recorded generator.
+- **Observed:** Independent [source bindings](../docs/curves/audit-20261023/candidate-source-bindings.jsonl.gz)
+  match all 13,219 new model/order tuples to unique JSON rows in 152 tracked
+  files. Independent [order certificates](../docs/curves/audit-20261023/candidate-order-certificates.jsonl.gz)
+  validate all 13,219 prime-curve group orders: 13,216 by point order plus
+  Hasse-interval uniqueness and three by exhaustive small-field counting.
+  The [checker](../docs/curves/audit-20261023/check_candidate_orders.py)
+  passed small-field controls and rejected a wrong-order mutation. The
+  [Lean theorem](../research/sea_point_count_20261016/lean/RegistryOrderUniqueness.lean)
+  proves the interval-uniqueness step from explicit bounds and divisibility
+  premises; it does not verify the Python arithmetic or source ingestion.
+  The [receipt](../docs/curves/audit-20261023/candidate-validation.json)
+  records hashes and the full scope.
+- **Observed:** The scratch rebuild also changes 527 existing entries:
+  representation-status fields in 478, representations in 288, source lists
+  in 182, parameters in 132, and trace fields in 131. These counts overlap.
+  None of the 2,771 existing model identities disappeared. Of the changed
+  representations, 278 prime-curve EC1 UIDs disappear entirely; their source
+  records are four conductor-gap `prepared/*curve_ids.json` lists with
+  `p,a,b,order,r,generator`. The generic harvester recognizes the models but
+  requires `subgroup_order` before adding a representation, and the special
+  `*curve_ids.json` candidate handles only binary records. The changed
+  attributes have not been reviewed for promotion.
 - **Suspected explanation:** Sparse-worktree generation may have omitted
   tracked volcano source files, and the broad JSON harvester may admit
   unrelated fixtures into the 15,990-entry output. The path inventory supports
   the omission hypothesis but does not establish each record's validity.
 - **Missing capability:** An agreed authoritative input scope for the
-  generator, a source-backed resolution of the n73 representation, and a
-  full-checkout generated artefact that passes its own freshness check.
+  generator, reviewed existing-entry attribute changes and n73 subgroup
+  representation, and a promoted full-checkout generated artifact that passes
+  its own freshness check.
 - **What this evidence does not establish:** It does not show that the 2,771
   registered models are false, that all 13,219 additional generated models
   are valid, or that a performance result is wrong. The finite subgroup check
@@ -87,12 +110,15 @@ or independently count each curve's full group order.
 
 ## What would unblock it
 
-- [ ] Review and pin the registry builder's accepted source classes; classify
-  the 13,219-entry delta against original curve records and fixtures without
-  silently admitting or discarding a class.
+- [ ] Review and pin the registry builder's accepted source classes across
+  the 152 bound JSON files; decide which are authoritative records rather than
+  fixtures. Review the 527 existing-entry changes before promotion.
 - [ ] Resolve `EC1N73Ce0h243f847bccdd` from a matching source record or a
   truthful source correction, preserving the original claim. Then regenerate
   registry and aliases in a full clean checkout with exit code 0.
+- [ ] Reconstruct and validate the 278 prime EC1 representations from their
+  four original `r`/generator lists before accepting a regenerated registry;
+  compare exact UID sets against the committed file and explain every delta.
 - [ ] Require `build_curve_registry.py --check`, `check_curve_names.py`, and
   the curve-traits freshness check to pass on the same exact head; verify the
   three volcano models are present with source links and reviewed subgroup
@@ -128,3 +154,7 @@ They would not independently replay every experiment or prove its performance.
   exact-record n73 candidate in scratch. The experimental freshness check
   passed, but source and arithmetic review remain open. No candidate code or
   generated registry was promoted. Open.
+- 2026-10-23: Bound all 13,219 new models to source rows and checked their
+  group orders with independent finite arithmetic; rebuilt a conditional
+  Lean uniqueness theorem and the SEA formal gate. Source-class and 527
+  existing-entry reviews remain. Open.
