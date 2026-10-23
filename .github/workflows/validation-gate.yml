@@ -31,16 +31,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          # Keep the complete current tree, without every historical archive.
+          fetch-depth: 1
+      - name: Fetch the PR base for immutable-history comparisons
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: git fetch --no-tags --depth=1 --filter=blob:none origin "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
       - name: Every leaderboard and benchmarks row is validated or frozen pre-gate
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
-          base=""
+          base=()
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            base="--base origin/${{ github.base_ref }}"
+            base=(--base "origin/$BASE_REF")
           fi
-          python3 scripts/validation_gate.py check $base
+          python3 scripts/validation_gate.py check "${base[@]}"
