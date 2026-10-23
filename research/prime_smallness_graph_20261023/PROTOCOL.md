@@ -297,3 +297,56 @@ meta line, then one row per run, failures included), `results/curves.json`,
 raw files), and the run report with graph and PDF under
 `reports/run-<UTC start>/`. The study README carries the results table,
 verdicts and scope.
+
+## 7. Amendment v1.1 (2026-10-23, after the v1 run of arms G and F, before any v1.1 run)
+
+This amendment was written after seeing v1 data. v1 stays the frozen
+record: its rows, summary and verdicts are committed under `results/v1/` and
+reported beside v1.1, never replaced.
+
+**A1. Arm G: deduplicate rows before the solve.** In v1, 4 of 171 arm G runs
+ended "x not pinned after 4 attempts": all at `s = 0` with `B = 256`, one at
+24 bits and all three at 28 bits. The cause is in the implementation, not the
+method. A cycle `R − F_i = R' − F_j` is the same equation as
+`R + F_j = R' + F_i`, so when `ℓ` covers almost every x-value it closes at
+two vertices. The stopping rule then counts it twice, and the LA receives
+about half as many distinct rows as the count suggests. The four retries
+(8 rows each) cannot cover a shortfall of about 130 rows.
+
+v1.1 normalises every row to leading coefficient 1 (one inversion, priced
+as LA multiplications plus one hash operation) and drops duplicates. If
+fewer than `B + 1 + 8` distinct rows remain, it collects twice the shortfall
+and filters again; this does not count as a failed solve. Everything else in
+§3.1 is unchanged: grid, seeds, budget, unit, band and decision rules. The
+full arm G grid is rerun under v1.1 as `results/v1_1/g/`. v1.1 decides
+G1–G3; v1's verdicts are reported beside it.
+
+**A2. Arm L: recoverability audit (secondary, post hoc).** In v1's arm L,
+the fraction lattice at level 2 on the 40-bit curve met the primary
+criterion (≥ 2 reduced rows vanishing at the root, in ≥ 8/16 trials) up to
+`δ = 0.18`; the interval lattice did so up to `0.14`. That is a two-step gap,
+which is what the rule calls "extends reach" if it repeats at 56 bits. The
+primary criterion is necessary but not sufficient for recovering the root.
+Two vanishing rows that share a factor through the root cut out a curve,
+not a point. The bihomogeneous lattice has more room for such rows than the
+interval lattice.
+
+The audit reruns arm L's grid with the identical seeds and trial code
+(`lattice_trial_keep` is `lattice_trial` with the vanishing rows returned).
+It must reproduce v1's primary counts exactly; any mismatch voids the audit.
+For each trial it also records **recoverable**: whether some pair of
+vanishing rows has a zero-dimensional intersection. To decide this, the
+rows are dehomogenised (fraction: `b₁ = b₂ = 1`), and the resultants with
+respect to each variable are checked to be not identically zero at 24
+random specialisations modulo `q = 2^61 − 1`.
+
+**Use.** The primary arm L verdict is reported exactly as §3.2 defines it.
+It is qualified as follows. The same decision rule (thresholds, sizes and
+levels unchanged) is applied to the recoverable counts. If the primary
+verdict is "Fraction extends reach" and the recoverable verdict is not, the
+report states that the extension is an artifact of the vanishing criterion
+and is not evidence of more reach. Only a "Fraction extends reach" verdict
+under both criteria may be described as more reach. Because this criterion
+was added after the data, any such description is labelled post hoc and
+needs a fresh preregistered run (a new curve family and seeds) before it is
+cited.

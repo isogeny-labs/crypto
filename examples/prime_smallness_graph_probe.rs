@@ -223,6 +223,7 @@ struct GraphRun {
     relations_used: u64,
     la_attempts: u64,
     partials_rejected: u64,
+    duplicate_rows: u64,
     lp_set_size: u64,
     fb_max_x: u64,
     wall_ms: f64,
@@ -560,11 +561,41 @@ fn graph_ic2(
         }
         run.filter_ms += t_filter.elapsed().as_secs_f64() * 1e3;
 
-        let mut rows: Vec<(Vec<(u32, u64)>, u64)> = fulls.clone();
-        for c in &complete {
-            rows.push((c.small.clone(), c.rhs));
+        // v1.1: deduplicate rows up to scaling.  A cycle R − F_i = R' − F_j
+        // is also found at the vertex R + F_j = R' + F_i, so at large ℓ the
+        // cycle count overstates the independent rows about twofold (the v1
+        // full run's "x not pinned" failures).  Normalise each row to a
+        // leading coefficient 1 (one inversion, priced as LA work) and hash.
+        let mut rows: Vec<(Vec<(u32, u64)>, u64)> = Vec::new();
+        let mut seen_rows: std::collections::HashSet<(Vec<(u32, u64)>, u64)> =
+            std::collections::HashSet::new();
+        for (small, rhs) in fulls
+            .iter()
+            .cloned()
+            .chain(complete.iter().map(|c| (c.small.clone(), c.rhs)))
+        {
+            let mut sm = small.clone();
+            sm.sort_unstable();
+            sm.retain(|t| t.1 % n != 0);
+            if sm.is_empty() {
+                continue;
+            }
+            let inv = invmod(sm[0].1 % n, n);
+            run.la_mults += 2 * 62 + sm.len() as u64 + 1;
+            run.hash_ops += 1;
+            let key: Vec<(u32, u64)> = sm.iter().map(|&(c, v)| (c, mulmod(v, inv, n))).collect();
+            let krhs = mulmod(rhs % n, inv, n);
+            if seen_rows.insert((key, krhs)) {
+                rows.push((small, rhs));
+            }
         }
+        run.duplicate_rows += (fulls.len() + complete.len() - rows.len()) as u64;
         run.relations_used = rows.len() as u64;
+        if rows.len() < b_len + 1 + extra {
+            // not a failed solve: too few distinct rows; collect the shortfall
+            needed += 2 * (b_len + 1 + extra - rows.len());
+            continue 'attempt;
+        }
         let t_la = Instant::now();
         let mut mults = 0u64;
         let x = solve_dense(&rows, b_len + 1, n, &mut mults);
@@ -648,7 +679,8 @@ fn graph_row(curve: &FastCurve, bits: u32, seed: u64, cell: GraphCell, run: &Gra
                   "replay_failures": run.replay_failures,
                   "relations_used": run.relations_used,
                   "failed_la_attempts": run.la_attempts,
-                  "partials_rejected_in_verification": run.partials_rejected},
+                  "partials_rejected_in_verification": run.partials_rejected,
+                  "duplicate_rows_dropped": run.duplicate_rows},
         "wall_ms": {"total": run.wall_ms, "collect": run.collect_ms,
                     "filter": run.filter_ms, "la": run.la_ms},
     })
@@ -846,6 +878,21 @@ fn lattice_trial(
     bound: u64,
     rng: &mut StdRng,
 ) -> Option<(usize, bool, usize)> {
+    lattice_trial_keep(curve, kind, m, bound, rng, None, None)
+}
+
+/// [`lattice_trial`], optionally returning the reduced rows that vanish at
+/// the root and the root itself (for the recoverability audit, protocol
+/// v1.1 amendment).  The trial itself is unchanged.
+fn lattice_trial_keep(
+    curve: &FastCurve,
+    kind: LatKind,
+    m: usize,
+    bound: u64,
+    rng: &mut StdRng,
+    mut keep_vanishing: Option<&mut Vec<MPoly>>,
+    root_out: Option<&mut Vec<BigInt>>,
+) -> Option<(usize, bool, usize)> {
     let p = curve.f.p;
     let pb = BigInt::from(p);
     // plant two factor-base points; keep the integer representation
@@ -900,6 +947,9 @@ fn lattice_trial(
         LatKind::Interval => vec![ri[0].clone(), rj[0].clone()],
         LatKind::Fraction => vec![ri[0].clone(), ri[1].clone(), rj[0].clone(), rj[1].clone()],
     };
+    if let Some(out) = root_out {
+        *out = root.clone();
+    }
     {
         let v = mpoly_eval(&f, &root);
         if !(((v % &pb) + &pb) % &pb).is_zero() {
@@ -979,6 +1029,9 @@ fn lattice_trial(
         }
         if mpoly_eval(&poly, &root).is_zero() {
             vanishing += 1;
+            if let Some(keep) = keep_vanishing.as_deref_mut() {
+                keep.push(poly.clone());
+            }
         }
         if ri < 2 {
             let norm = norm2.to_f64().unwrap_or(f64::INFINITY).sqrt();
@@ -986,6 +1039,182 @@ fn lattice_trial(
         }
     }
     Some((vanishing, hg, dim))
+}
+
+// ── Arm L recoverability audit (protocol v1.1 amendment) ───────────────
+//
+// "≥ 2 reduced rows vanish at the root" is probe B's criterion.  It is
+// necessary for the resultant step but not sufficient: two vanishing rows
+// that share a factor through the root cut out a curve, not a point.  The
+// audit asks, for each trial, whether some pair of vanishing rows meets in
+// a zero-dimensional set: after dehomogenising (fraction: b₁ = b₂ = 1), the
+// resultants in each variable are checked to be not identically zero, at 24
+// random specialisations modulo the prime q = 2^61 − 1.
+
+const AUDIT_Q: u64 = (1u64 << 61) - 1;
+
+fn big_mod_q(c: &BigInt) -> u64 {
+    let q = BigInt::from(AUDIT_Q);
+    let r = ((c % &q) + &q) % &q;
+    r.to_u64().unwrap_or(0)
+}
+
+/// Dehomogenised bivariate coefficients mod q: `(deg x₁, deg x₂) → c`.
+fn dehom_q(poly: &MPoly, kind: LatKind) -> Vec<((u32, u32), u64)> {
+    poly.iter()
+        .map(|(e, c)| {
+            let k = match kind {
+                LatKind::Interval => (e[0], e[1]),
+                LatKind::Fraction => (e[0], e[2]),
+            };
+            (k, big_mod_q(c))
+        })
+        .collect()
+}
+
+/// Univariate coefficients (low first) in the free variable after fixing
+/// the other one (`fix_first`: x₁ = t, else x₂ = t), mod q.
+fn specialise_q(terms: &[((u32, u32), u64)], fix_first: bool, t: u64) -> Vec<u64> {
+    let mut out: Vec<u64> = Vec::new();
+    for &((d1, d2), c) in terms {
+        let (fixed, free) = if fix_first { (d1, d2) } else { (d2, d1) };
+        let v = mulmod(c, powmod(t, fixed as u64, AUDIT_Q), AUDIT_Q);
+        if out.len() <= free as usize {
+            out.resize(free as usize + 1, 0);
+        }
+        out[free as usize] = addmod(out[free as usize], v, AUDIT_Q);
+    }
+    while out.last() == Some(&0) {
+        out.pop();
+    }
+    out
+}
+
+/// Resultant of two univariate polynomials mod q (Sylvester determinant).
+fn resultant_q(f: &[u64], g: &[u64]) -> u64 {
+    if f.is_empty() || g.is_empty() {
+        return 0;
+    }
+    let (df, dg) = (f.len() - 1, g.len() - 1);
+    if df == 0 && dg == 0 {
+        return 1;
+    }
+    let nn = df + dg;
+    let mut m = vec![vec![0u64; nn]; nn];
+    for i in 0..dg {
+        for (k, &c) in f.iter().enumerate() {
+            m[i][i + df - k] = c;
+        }
+    }
+    for i in 0..df {
+        for (k, &c) in g.iter().enumerate() {
+            m[dg + i][i + dg - k] = c;
+        }
+    }
+    let q = AUDIT_Q;
+    let mut det = 1u64;
+    for col in 0..nn {
+        let Some(pr) = (col..nn).find(|&r| m[r][col] != 0) else {
+            return 0;
+        };
+        if pr != col {
+            m.swap(pr, col);
+            det = (q - det) % q;
+        }
+        det = mulmod(det, m[col][col], q);
+        let inv = invmod(m[col][col], q);
+        for r in col + 1..nn {
+            if m[r][col] == 0 {
+                continue;
+            }
+            let fct = mulmod(m[r][col], inv, q);
+            for c in col..nn {
+                m[r][c] = submod(m[r][c], mulmod(fct, m[col][c], q), q);
+            }
+        }
+    }
+    det
+}
+
+/// Whether some pair of the vanishing rows meets in finitely many points
+/// (both resultants not identically zero at 24 random specialisations).
+fn recoverable(polys: &[MPoly], kind: LatKind, seed: u64) -> bool {
+    let terms: Vec<Vec<((u32, u32), u64)>> = polys.iter().map(|p| dehom_q(p, kind)).collect();
+    let mut rng = StdRng::seed_from_u64(seed);
+    let ts: Vec<u64> = (0..24).map(|_| rng.gen_range(2..AUDIT_Q)).collect();
+    let nonzero_in = |a: &[((u32, u32), u64)], b: &[((u32, u32), u64)], fix_first: bool| {
+        ts.iter().any(|&t| {
+            resultant_q(
+                &specialise_q(a, fix_first, t),
+                &specialise_q(b, fix_first, t),
+            ) != 0
+        })
+    };
+    for i in 0..terms.len() {
+        for j in i + 1..terms.len() {
+            if nonzero_in(&terms[i], &terms[j], true) && nonzero_in(&terms[i], &terms[j], false) {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+/// Re-run arm L's grid with the same seeds, recording the primary criterion
+/// (must reproduce `arm_l.jsonl` exactly) and the recoverability audit.
+fn arm_l_audit(bits_list: &[u32], trials: usize, levels: &[usize], out: &mut Vec<Value>) {
+    let deltas = [0.06, 0.08, 0.10, 0.12, 0.14, 0.16, 0.18, 0.20];
+    for &bits in bits_list {
+        let Some((curve, _g)) = find_a3_curve(bits, 3) else {
+            continue;
+        };
+        let p = curve.f.p as f64;
+        for &m in levels {
+            if m == 3 && bits > 40 {
+                continue;
+            }
+            for kind in [LatKind::Interval, LatKind::Fraction] {
+                for &delta in &deltas {
+                    let target = p.powf(delta).floor().max(2.0) as u64;
+                    let bound = match kind {
+                        LatKind::Interval => target,
+                        LatKind::Fraction => fraction_bound_for(target),
+                    };
+                    let seed = 0x1A77
+                        + bits as u64 * 1000
+                        + m as u64 * 100
+                        + (delta * 100.0).round() as u64;
+                    let mut rng = StdRng::seed_from_u64(seed);
+                    let (mut succ, mut rec, mut done) = (0usize, 0usize, 0usize);
+                    for t in 0..trials {
+                        let mut keep: Vec<MPoly> = Vec::new();
+                        let mut root: Vec<BigInt> = Vec::new();
+                        if let Some((v, _h, _d)) = lattice_trial_keep(
+                            &curve,
+                            kind,
+                            m,
+                            bound,
+                            &mut rng,
+                            Some(&mut keep),
+                            Some(&mut root),
+                        ) {
+                            done += 1;
+                            if v >= 2 {
+                                succ += 1;
+                                if recoverable(&keep, kind, seed ^ (t as u64) << 32) {
+                                    rec += 1;
+                                }
+                            }
+                        }
+                    }
+                    eprintln!("[L-audit] {bits}b m={m} {kind:?} δ={delta:.2}: ≥2 vanishing {succ}/{done}, recoverable {rec}/{done}");
+                    out.push(json!({"arm": "L-audit", "bits": bits, "kind": format!("{kind:?}"), "level": m,
+                        "delta": delta, "bound": bound, "seed": seed, "trials": done,
+                        "successes": succ, "recoverable": rec}));
+                }
+            }
+        }
+    }
 }
 
 /// Number of distinct `a/b` with `|a| ≤ X`, `1 ≤ b ≤ X`, `gcd(a, b) = 1`.
@@ -1714,6 +1943,13 @@ fn main() {
         );
         write("arm_l.jsonl", &rows, &meta);
     }
+    if arm.contains('r') {
+        let mut rows = Vec::new();
+        let b = bits.clone().unwrap_or_else(|| vec![40, 56]);
+        let levels: &[usize] = if quick { &[1] } else { &[1, 2, 3] };
+        arm_l_audit(&b, if quick { 4 } else { 16 }, levels, &mut rows);
+        write("arm_l_audit.jsonl", &rows, &meta);
+    }
     if arm.contains('f') {
         let mut rows = Vec::new();
         let bs: &[usize] = if quick {
@@ -1791,6 +2027,23 @@ mod tests {
             let (v, _, _) = lattice_trial(&curve, kind, 1, 3, &mut rng).unwrap();
             assert!(v >= 2, "{kind:?}");
         }
+    }
+
+    #[test]
+    fn audit_resultant_separates_points_from_curves() {
+        let q = AUDIT_Q;
+        assert_ne!(resultant_q(&[q - 2, 1], &[q - 5, 1]), 0);
+        assert_eq!(resultant_q(&[q - 2, 1], &[q - 2, 1]), 0);
+        let mk = |t: &[((u32, u32), i64)]| -> MPoly {
+            t.iter()
+                .map(|&((a, b), c)| (vec![a, b], BigInt::from(c)))
+                .collect()
+        };
+        let g1 = mk(&[((1, 0), 1), ((0, 0), -3)]); // x1 − 3
+        let g2 = mk(&[((0, 1), 1), ((0, 0), -4)]); // x2 − 4
+        let g3 = mk(&[((1, 1), 1), ((0, 1), -3)]); // (x1 − 3)·x2
+        assert!(recoverable(&[g1.clone(), g2], LatKind::Interval, 1));
+        assert!(!recoverable(&[g1, g3], LatKind::Interval, 1));
     }
 
     #[test]
