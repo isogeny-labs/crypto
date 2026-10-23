@@ -13,6 +13,11 @@ ECB=${ECB:-/home/user/crypto/target/release/ecbench}
 ECB_SHA=${ECB_SHA:-ac4bc5b26f858a4d8a374208297157840af25fb1dc25ea1c19dd41360735fb35}
 MAXWALL=${MAXWALL_S:-$((20*3600))}; MINFREE_KB=$(( ${MINFREE_MIB:-1024} * 1024 )); MAXFAIL=3
 COMMIT_TRAILER=${COMMIT_TRAILER:-}
+# test overrides (a different binary or sha) are for a scratch STUDY only: never against the real campaign directory
+if [ "$STUDY" = /home/user/crypto/research/volcano_ecdlp_census_followup_20261023 ] && \
+   { [ "$ECB" != /home/user/crypto/target/release/ecbench ] || [ "$ECB_SHA" != ac4bc5b26f858a4d8a374208297157840af25fb1dc25ea1c19dd41360735fb35 ]; }; then
+  echo "REFUSED: ECB or ECB_SHA overridden while STUDY is the real campaign directory"; exit 2
+fi
 cd "$STUDY" || exit 2
 PROG=runs/progress.jsonl
 mkdir -p sessions runs/extract runs/tables
