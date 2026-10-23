@@ -89,6 +89,7 @@ SOURCES = {
     "n41_n53_counted": "research/ecbench_n41_n53_shared_rank_20261005/DECISION.json",
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
+    "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -1342,6 +1343,9 @@ def build(allow_unvalidated: bool = False) -> dict:
         "three_leads_study": load(SOURCES["three_leads"]),
         "three_leads_instructions": load(SOURCES["three_leads_instructions"]),
         "linear_algebra_component": la_component(),
+        # A component speed-up (the linear stage after F4 in jv_cover) copied
+        # from its study's frozen summary; it moves no row of tables A-C.
+        "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
         "pair_table_component": pair_table_component(),
         "projective_law_component": projective_law_component(),
         "pencil_peel_component": pencil_peel_component(),
@@ -1841,6 +1845,18 @@ def markdown(doc: dict) -> str:
         observed = session["arms"]["ic-mitm"]["cross_curve"]
         L.append(f"| {session['ell']} | {observed['ratio_floor_over_crater']:.6f} | "
                  f"{observed['ci99'][0]:.6f} to {observed['ci99'][1]:.6f} |")
+    ls = doc["jv_cover_linear_stage_component"]
+    L += ["", "## Linear stage after F4 (sparse FGLM) in the Jacobian-cover IC", "",
+          f"Component speed-up, class {ls['class']}: the dense linear stage against sparse FGLM "
+          f"(Wiedemann / Berlekamp–Massey on M_xn, shift-chain eigenvectors) in {ls['pipeline']}, "
+          f"same binary and seeds, the same relations, every DLP solved and verified by both arms "
+          f"(`{ls['study']}`, {ls['run']}). It moves no row of tables A–C. "
+          "S/rho is a lower-bound comparison (unpriced native work is not emitted).", "",
+          "| p | seed | relations | S dense | S sparse | dense ÷ sparse | S/rho dense | S/rho sparse (distance to rho) |",
+          "|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    for r in ls["dlp"]:
+        L.append(f"| {r['p']} | {r['seed']} | {r['relations']} | {r['s_before']:.4g} | {r['s_after']:.4g} | "
+                 f"{r['s_ratio']:.2f} | {r['s_over_rho_before']:.0f} | {r['s_over_rho_after']:.0f} |")
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -2718,6 +2734,21 @@ def page(doc: dict, standalone: bool) -> str:
         P.append(f'<tr><td>{session["ell"]}</td><td>{observed["ratio_floor_over_crater"]:.6f}</td>'
                  f'<td>{observed["ci99"][0]:.6f} to {observed["ci99"][1]:.6f}</td></tr>')
     P.append('</tbody></table>' + gh(SOURCES["conductor_gap_counts"], 'Native analysis and source records') + '</section>')
+
+    ls = doc["jv_cover_linear_stage_component"]
+    P.append('<section id="jv-cover-linear-stage-component"><h2>Linear stage after F4 (sparse FGLM) in the Jacobian-cover IC</h2>'
+             f'<p>Component speed-up, class {esc(ls["class"])}: the dense linear stage against sparse FGLM '
+             f'(Wiedemann / Berlekamp–Massey on M<sub>x<sub>n</sub></sub>, shift-chain eigenvectors) in {esc(ls["pipeline"])}, '
+             'same binary and seeds, the same relations, every DLP solved and verified by both arms. It moves no row '
+             'of tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted); the sparse '
+             'column is the distance remaining to rho.</p>'
+             '<table><thead><tr><th>p</th><th>seed</th><th>relations</th><th>S dense</th><th>S sparse</th>'
+             '<th>dense ÷ sparse</th><th>S/rho dense</th><th>S/rho sparse</th></tr></thead><tbody>')
+    for r in ls["dlp"]:
+        P.append(f'<tr><td>{r["p"]}</td><td>{r["seed"]}</td><td>{r["relations"]}</td><td>{r["s_before"]:.4g}</td>'
+                 f'<td>{r["s_after"]:.4g}</td><td>{r["s_ratio"]:.2f}</td><td>{r["s_over_rho_before"]:.0f}</td>'
+                 f'<td>{r["s_over_rho_after"]:.0f}</td></tr>')
+    P.append('</tbody></table>' + gh(ls["study"], 'Study, run report and raw records') + '</section>')
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]
