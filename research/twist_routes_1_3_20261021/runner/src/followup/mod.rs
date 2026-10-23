@@ -8,6 +8,7 @@ mod geometry;
 mod gluing;
 mod higher;
 mod homogeneous;
+mod incidence;
 mod partial;
 mod projection;
 
@@ -108,6 +109,7 @@ pub fn main(args: &[String]) -> Result<()> {
         }
     }
     let rows = match command.as_str() {
+        "incidence-pilot" => incidence::run(&fixtures, out)?,
         "assessment" => assessment::run(
             &fixtures,
             Path::new(args.get(3).ok_or("missing execution evidence directory")?),
@@ -223,7 +225,9 @@ fn adjudicate(prefix: &Path, out: &Path) -> Result<Vec<Value>> {
         || text.contains("ALL_COUPLED_REPLAY_OK")
         || text.contains("ALL_PROJECTION_REPLAY_OK")
         || text.contains("ALL_DIVISOR_REPLAY_OK");
-    let marker = marker || text.contains("ALL_HIGHER_TORSION_CONSTRUCTION_DONE");
+    let marker = marker
+        || text.contains("ALL_HIGHER_TORSION_CONSTRUCTION_DONE")
+        || text.contains("ALL_INCIDENCE_REPLAY_OK");
     let hashes_match =
         meta["stdout_sha256"] == digest(&stdout) && meta["stderr_sha256"] == digest(&stderr);
     let script = meta["argv"]
