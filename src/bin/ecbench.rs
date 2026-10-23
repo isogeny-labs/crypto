@@ -76,6 +76,12 @@ enum Cmd {
         /// Watchdog limit for each command, including the device self-test.
         #[arg(long, default_value_t = 600)]
         timeout_seconds: u64,
+        /// The shared benchmark lock; a GPU stage is timed work.
+        #[arg(long, default_value = isolation::DEFAULT_LOCK)]
+        lock: String,
+        /// Queue behind another benchmark holding the lock.
+        #[arg(long)]
+        wait: bool,
         /// Options forwarded to the CUDA binary after `--`.
         #[arg(last = true)]
         gpu_args: Vec<String>,
@@ -94,6 +100,12 @@ enum Cmd {
         timeout_seconds: u64,
         #[arg(long, default_value = "nvidia-smi")]
         telemetry_binary: PathBuf,
+        /// The shared benchmark lock; a GPU solve is timed work.
+        #[arg(long, default_value = isolation::DEFAULT_LOCK)]
+        lock: String,
+        /// Queue behind another benchmark holding the lock.
+        #[arg(long)]
+        wait: bool,
         /// Optional verified CPU record for an exact workload identity link.
         #[arg(long)]
         cpu_record: Option<PathBuf>,
@@ -774,6 +786,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             }))?;
         }
         Cmd::Host { json } => {
+            host::pin_binary_hash();
             let c = host::capture()?;
             if json {
                 print_json(&c)?;
@@ -828,6 +841,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
         Cmd::Plan { spec: path, json } => {
             let text = read(&path)?;
             let p = spec::plan(spec::Spec::from_json(&text)?)?;
+            for w in &p.warnings {
+                eprintln!("ecbench: warning: {w}");
+            }
             if json {
                 print_json(&serde_json::json!({
                     "spec_id": p.spec_id, "spec_sha256": p.spec_sha256,
@@ -884,6 +900,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             max_psi,
             quiet,
         } => {
+            // Hash the running binary before anything slow (planning can
+            // take minutes): a rebuild meanwhile cannot null or swap it.
+            host::pin_binary_hash();
             let text = read(&path)?;
             let out = PathBuf::from(isolab::expand_env(&out)?);
             let mut req = isolation::CpuRequest::parse(&cpus)?;
@@ -1044,6 +1063,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             out,
             mode,
             timeout_seconds,
+            lock,
+            wait,
             gpu_args,
         } => {
             let receipt = gpu::run(&gpu::GpuOptions {
@@ -1052,6 +1073,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 mode,
                 args: gpu_args,
                 timeout_seconds,
+                lock_path: lock,
+                wait_for_lock: wait,
             })?;
             print_json(&receipt)?;
             if receipt.status != "stage_completed" {
@@ -1065,6 +1088,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             out,
             timeout_seconds,
             telemetry_binary,
+            lock,
+            wait,
             cpu_record,
             gpu_args,
         } => {
@@ -1076,6 +1101,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 telemetry_binary,
                 cpu_record,
                 args: gpu_args,
+                lock_path: lock,
+                wait_for_lock: wait,
             })?;
             print_json(&receipt)?;
             if receipt.status != "verified" {

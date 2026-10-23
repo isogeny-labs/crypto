@@ -197,7 +197,7 @@ CREATE TABLE IF NOT EXISTS runs (
   fb_id                TEXT REFERENCES factor_bases(fb_id),
   fbm_id               TEXT REFERENCES factor_base_measurements(fbm_id),
   algorithm_seed       TEXT NOT NULL,
-  status               TEXT NOT NULL CHECK (status IN ('verified', 'wrong_answer', 'exhausted', 'error', 'timeout', 'crashed')),
+  status               TEXT NOT NULL CHECK (status IN ('verified', 'wrong_answer', 'exhausted', 'error', 'timeout', 'crashed', 'interrupted', 'spawn_error')),
   recovered            TEXT,
   total_gae            REAL,
   s                    REAL,
@@ -527,4 +527,8 @@ BEGIN
   SELECT RAISE(ABORT, 'fbm_id collision: same short id, different sha256');
 END;
 
+-- Version 4: identity guards for arms, sessions, runs and comparisons; views
+-- over complete sessions only; run statuses `interrupted` and `spawn_error`
+-- (a database created under version 3 keeps its older CHECK and must be
+-- rebuilt to load sessions that have them).
 INSERT OR REPLACE INTO schema_info (key, value) VALUES ('ecbench_schema_version', '4');

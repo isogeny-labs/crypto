@@ -54,8 +54,8 @@ use crate::cryptanalysis::ecbench::canonical::{sha256_hex, short_id, splitmix64}
 use crate::cryptanalysis::ecbench::host::{self, recompute_class, HostCapsule};
 use crate::cryptanalysis::ecbench::methods::{MethodSpec, PhaseRecord, ResolvedMethod};
 use crate::cryptanalysis::ecbench::record::{
-    check_line_seal, child_main, floor_s, from_str_legacy_floats, grade, json_roundtrip,
-    ChildInput, Grade, GradeInput, Record, CHILD_INPUT_SCHEMA, GRADING_VERSION,
+    check_line_seal, child_main, floor_s, from_str_legacy_floats, grade_for_version,
+    json_roundtrip, ChildInput, Grade, GradeInput, Record, CHILD_INPUT_SCHEMA,
 };
 use crate::cryptanalysis::ecbench::runner::{read_session, PlanDoc, Session};
 use crate::cryptanalysis::ecbench::spec::{plan, Arm, Execution, Level, Plan, Spec};
@@ -135,16 +135,43 @@ pub fn method_determinism(m: &ResolvedMethod) -> Determinism {
     }
 }
 
+/// Committed sessions whose failed outcomes (`exhausted`, `wrong_answer`,
+/// `error`) were recorded by code whose failure paths have since changed,
+/// and which were never held to replay before failed outcomes were: their
+/// failed runs are checked statically and their verified runs replay as
+/// every other session's do.  Session id, and why.
+pub const FAILED_OUTCOME_REPLAY_EXEMPT: &[(&str, &str)] = &[
+    (
+        "ECBS1hedc734e1870d",
+        "factor_bases_20261013/koblitz17-algebraic: the two exhausted runs' solver work is pinned now, wall-priced then",
+    ),
+    (
+        "ECBS1h4c7b9db8a389",
+        "rootfinding_arity_20261013/prime20-b64-m2-vs-m3: `rootfind-subtract` refused prime curves then and runs on them now",
+    ),
+    (
+        "ECBS1h302934ff99ed",
+        "f6_ic_ecbench_ladder_20261005/n7: 48 of the 72 exhausted runs count other phase work under the current code",
+    ),
+];
+
 /// Whether the audit can re-execute this record's run and expect the same
 /// outcome: a measured (not warm-up) run of a method the registry calls
-/// deterministic, whose outcome is one a replay can reproduce.  `timeout`
-/// and `crashed` are the host's doing and are checked statically instead.
+/// deterministic, whose outcome is one a replay can reproduce.  `timeout`,
+/// `crashed`, `interrupted` and `spawn_error` are the host's or the
+/// runner's doing and are checked statically instead, as are the failed
+/// outcomes of the sessions in [`FAILED_OUTCOME_REPLAY_EXEMPT`].
 fn replayable(r: &Record) -> bool {
+    let failed_outcome = matches!(
+        r.outcome.status.as_str(),
+        "wrong_answer" | "exhausted" | "error"
+    );
     !r.warmup
-        && matches!(
-            r.outcome.status.as_str(),
-            "verified" | "wrong_answer" | "exhausted" | "error"
-        )
+        && (r.outcome.status == "verified"
+            || (failed_outcome
+                && !FAILED_OUTCOME_REPLAY_EXEMPT
+                    .iter()
+                    .any(|(s, _)| *s == r.session_id)))
         && match method_determinism(&r.method) {
             Determinism::Always => true,
             Determinism::Budgeted => r.cost.total_gae.is_some() && r.cost.deterministic,
@@ -321,25 +348,28 @@ pub fn legacy_rounding_bounded(
 /// grades any honest recording under that version can carry (more than one
 /// only where a version's rules changed without the version being bumped).
 ///
-/// The current version is [`grade`].  Version 1 predates three checks
-/// that version 2 added (the run CPU's unreserved SMT siblings, the
-/// busy time on the reserved idle siblings, and the policy-and-pages NUMA
-/// read-back); it is reproduced from version 2 by dropping the blockers only
-/// version 2 raises.  The committed sessions recorded without a version
-/// differ on NUMA placement: the first ones read the cpuset's `Mems_allowed`
+/// Versions 2 and later are the record module's frozen graders
+/// ([`grade_for_version`]).  Version 1 predates three checks that version 2
+/// added (the run CPU's unreserved SMT siblings, the busy time on the
+/// reserved idle siblings, and the policy-and-pages NUMA read-back); it is
+/// reproduced from version 2 by dropping the blockers only version 2
+/// raises.  The committed sessions recorded without a version differ on
+/// NUMA placement: the first ones read the cpuset's `Mems_allowed`
 /// (`memory allowed on Some("0-1"), not bound to node 1`), the later ones
 /// the memory policy and where the pages are, and both are `1`; a version-1
 /// record must match one of them.  Any other version is refused: an audit
 /// does not grade by rules it does not have.
 pub fn grades_under_version(version: u32, g: &GradeInput) -> Result<Vec<Grade>, String> {
-    match version {
-        GRADING_VERSION => Ok(vec![grade(g)]),
-        1 if GRADING_VERSION == 2 => Ok(grade_v1_candidates(g)),
-        v => Err(format!(
-            "grading version {v} is not supported by this binary (it grades under version {GRADING_VERSION}{})",
-            if GRADING_VERSION == 2 { " and reproduces version 1" } else { "" }
-        )),
+    if version == 1 {
+        return grade_v1_candidates(g)
+            .ok_or_else(|| "grading version 1 needs the frozen version-2 grader".to_string());
     }
+    grade_for_version(version, g).map(|x| vec![x]).ok_or_else(|| {
+        format!(
+            "grading version {version} is not supported by this binary (it regrades versions 1 to {})",
+            crate::cryptanalysis::ecbench::record::GRADING_VERSION
+        )
+    })
 }
 
 fn level_of(blockers: &[String]) -> Level {
@@ -354,8 +384,8 @@ fn level_of(blockers: &[String]) -> Level {
     }
 }
 
-fn grade_v1_candidates(g: &GradeInput) -> Vec<Grade> {
-    let v2 = grade(g);
+fn grade_v1_candidates(g: &GradeInput) -> Option<Vec<Grade>> {
+    let v2 = grade_for_version(2, g)?;
     // The blockers only version 2 raises.
     let v2_only = |b: &str| {
         b.starts_with("L1: the run CPU's SMT siblings")
@@ -401,7 +431,7 @@ fn grade_v1_candidates(g: &GradeInput) -> Vec<Grade> {
             }
         }
     }
-    out
+    Some(out)
 }
 
 // ── The receipt ────────────────────────────────────────────────────
@@ -539,22 +569,23 @@ pub fn audit(dir: &Path, replay: usize) -> Result<AuditReport, String> {
 /// finalised.
 pub const NEVER_FINALISED: &str = "never_finalised";
 
-/// A session whose `session.json` is still exactly in the state the runner
-/// writes before its first execution: status `running`, no finish time, no
-/// record count, no records hash, no status counts.  The runner rewrites
-/// `session.json` only when the session ends (`complete`, or `interrupted`
-/// on a signal or an error), so a session left in this state was killed
-/// outright (SIGKILL, host loss) or is still being written by a live
-/// runner; the files cannot tell those apart, and a committed session has
-/// no live runner.  Its records are still sealed line by line as they are
-/// written, so every per-record check applies; only the whole-file hash,
-/// which the runner never got to write, does not.
+/// A session whose `session.json` is still in a state the runner writes
+/// before the session ends: status `running`, no finish time, no records
+/// hash.  The runner writes the final `session.json` (`complete`, or
+/// `interrupted` on a signal or an error) only when the session ends, so a
+/// session left in this state was killed outright (SIGKILL, host loss) or
+/// is still being written by a live runner; the files cannot tell those
+/// apart, and a committed session has no live runner.  Since the runner
+/// rewrites `session.json` atomically after every record, a killed session
+/// may carry progress counters (`records_written`, `last_seq`,
+/// `status_counts`); sessions killed before that was done carry zeros.
+/// Records are sealed line by line as they are written, so every
+/// per-record check applies; only the whole-file hash, which the runner
+/// never got to write, does not.
 pub fn never_finalised(session: &Session) -> bool {
     session.status == "running"
         && session.finished_unix_ms.is_none()
-        && session.records_written == 0
         && session.records_sha256.is_none()
-        && session.status_counts.is_empty()
 }
 
 /// [`audit`], optionally accepting an `interrupted` session: it is held
@@ -1005,12 +1036,6 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
     let mut files = BTreeMap::new();
     let mut warnings: Vec<String> = Vec::new();
     let session = read_session(dir)?;
-    // Fields of session.json beyond the typed ones: the runner's optional
-    // record of where and why it stopped.
-    let session_raw: serde_json::Value = std::fs::read_to_string(dir.join("session.json"))
-        .ok()
-        .and_then(|t| serde_json::from_str(&t).ok())
-        .unwrap_or(serde_json::Value::Null);
     file_sha(dir, "session.json", &mut files);
     file_sha(dir, "spec.json", &mut files);
 
@@ -1168,7 +1193,9 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         if complete {
             records.len() as u64 == session.records_written && records.len() == p.executions.len()
         } else if killed {
-            records.len() <= p.executions.len()
+            // The progress counter was written after the record it counts,
+            // so no fewer records than it says may be on disk.
+            records.len() <= p.executions.len() && records.len() as u64 >= session.records_written
         } else {
             records.len() as u64 == session.records_written && records.len() <= p.executions.len()
         },
@@ -1352,18 +1379,23 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
     led.problems.extend(record_problems);
 
     // The session's own counts follow from its records.
-    if !killed {
-        led.check(
-            "status_counts",
-            session.status_counts == status_counts,
-            || {
-                format!(
-                    "session.json counts {:?}, the records have {:?}",
-                    session.status_counts, status_counts
-                )
-            },
-        );
-    }
+    // A killed runner's counts cover the records it had finished writing
+    // when it last rewrote session.json (one more may be on disk).
+    let counted: BTreeMap<String, u64> = if killed {
+        let mut c = BTreeMap::new();
+        for r in records.iter().take(session.records_written as usize) {
+            *c.entry(r.outcome.status.clone()).or_insert(0) += 1;
+        }
+        c
+    } else {
+        status_counts
+    };
+    led.check("status_counts", session.status_counts == counted, || {
+        format!(
+            "session.json counts {:?}, the records have {:?}",
+            session.status_counts, counted
+        )
+    });
 
     // An interrupted session is an incomplete one, and says so.
     let mut interruption_point = None;
@@ -1384,18 +1416,42 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
                 }
             ),
         );
-        // The runner may record where it stopped; if it does, the records
-        // end exactly there.
-        if let Some(at) = session_raw
-            .pointer("/interruption/at_seq")
-            .and_then(|v| v.as_u64())
-        {
-            led.check("interruption_point", at == records.len() as u64, || {
+    }
+    // Where the runner says it got to.  `last_seq` is rewritten after every
+    // record, so a finalised session's records end exactly there and a
+    // killed one's at most one further (the record written before the
+    // runner could rewrite session.json).  `stop.seq` is the execution the
+    // session stopped at: the last one recorded, or the next one when the
+    // stop came before it ran.  Sessions written before these fields carry
+    // neither.
+    if let Some(last) = session.last_seq {
+        let n = records.len() as u64;
+        let ok = if killed {
+            n == last + 1 || n == last + 2
+        } else {
+            n == last + 1
+        };
+        led.check("last_seq", ok, || {
+            format!("session.json says the last record is seq {last}, the records end at {n}")
+        });
+    }
+    if let Some(stop) = &session.stop {
+        let n = records.len() as u64;
+        led.check(
+            "stop",
+            !complete && stop.seq.is_none_or(|s| n == s || n == s + 1),
+            || {
                 format!(
-                    "session.json says it was interrupted at seq {at}, the records end at {}",
-                    records.len()
+                    "session.json says it stopped ({}) at seq {:?}, the records end at {n}",
+                    stop.kind, stop.seq
                 )
-            });
+            },
+        );
+        if !complete {
+            warnings.push(format!(
+                "stopped: {} at seq {:?}: {}",
+                stop.kind, stop.seq, stop.message
+            ));
         }
     }
 
@@ -1604,6 +1660,39 @@ pub(crate) mod tests {
         assert!(text.contains("\"records_bound\":false"), "{text}");
         assert_eq!(lenient.records, 4);
         assert_eq!(lenient.checks.get("records"), Some(&true));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// The runner now rewrites `session.json` after every record, so a
+    /// runner killed outright leaves `running` with progress counters.
+    #[test]
+    fn a_killed_session_with_progress_counters_is_still_never_finalised() {
+        let dir = killed_copy("progress");
+        let text = std::fs::read_to_string(dir.join("session.json")).unwrap();
+        let mut v: serde_json::Value = serde_json::from_str(&text).unwrap();
+        v["records_written"] = json!(4);
+        v["last_seq"] = json!(3);
+        v["status_counts"] = json!({"verified": 2, "timeout": 2});
+        std::fs::write(dir.join("session.json"), v.to_string()).unwrap();
+        assert!(never_finalised(&read_session(&dir).unwrap()));
+        let strict = audit_with(&dir, 0, false).unwrap();
+        assert!(!strict.ok);
+        let lenient = audit_with(&dir, 0, true).unwrap();
+        assert!(lenient.ok, "{:?}", lenient.problems);
+        assert_eq!(lenient.interruption.as_deref(), Some(NEVER_FINALISED));
+        assert_eq!(lenient.records_bound, Some(false));
+        // A record count above what is on disk is truncation, caught even
+        // though no whole-file hash exists.
+        v["records_written"] = json!(5);
+        std::fs::write(dir.join("session.json"), v.to_string()).unwrap();
+        let rep = audit_with(&dir, 0, true).unwrap();
+        assert!(!rep.ok);
+        assert_eq!(rep.checks.get("record_count"), Some(&false));
+        // A finish time still takes it out of the relaxation.
+        v["records_written"] = json!(4);
+        v["finished_unix_ms"] = json!(1791170600000u64);
+        std::fs::write(dir.join("session.json"), v.to_string()).unwrap();
+        assert!(!never_finalised(&read_session(&dir).unwrap()));
         let _ = std::fs::remove_dir_all(&dir);
     }
 
@@ -2455,14 +2544,15 @@ pub(crate) mod tests {
     }
 
     #[test]
-    fn an_interruption_the_runner_dated_must_end_the_records_there() {
+    fn an_interruption_the_runner_recorded_must_end_the_records_there() {
         let dir = fresh("dated");
         tamper(&dir, |recs, s| {
             recs.truncate(10);
             s["status"] = json!("interrupted");
             s["records_written"] = json!(10);
             s["status_counts"] = json!({"verified": 10});
-            s["interruption"] = json!({"at_seq": 10, "reason": "signal 15"});
+            s["last_seq"] = json!(9);
+            s["stop"] = json!({"kind": "interrupt", "seq": 10, "signal": 15, "message": "interrupted by signal 15"});
         });
         let allow = AuditOptions {
             allow_interrupted: true,
@@ -2470,13 +2560,36 @@ pub(crate) mod tests {
         };
         let rep = audit_opts(&dir, &allow).unwrap();
         assert!(rep.ok, "{:?}", rep.problems);
-        assert_eq!(rep.checks.get("interruption_point"), Some(&true));
+        assert_eq!(rep.checks.get("last_seq"), Some(&true));
+        assert_eq!(rep.checks.get("stop"), Some(&true));
+        assert!(
+            rep.warnings
+                .iter()
+                .any(|w| w.starts_with("stopped: interrupt at seq Some(10)")),
+            "{:?}",
+            rep.warnings
+        );
         // The same records with a later point recorded: some were removed.
-        tamper(&dir, |_, s| s["interruption"]["at_seq"] = json!(14));
+        tamper(&dir, |_, s| {
+            s["last_seq"] = json!(13);
+            s["stop"]["seq"] = json!(14);
+        });
         let rep = audit_opts(&dir, &allow).unwrap();
         assert!(!rep.ok);
-        assert_eq!(rep.checks.get("interruption_point"), Some(&false));
-        let _ = std::fs::remove_dir_all(&dir);
+        assert_eq!(rep.checks.get("last_seq"), Some(&false));
+        assert_eq!(rep.checks.get("stop"), Some(&false));
+        // A complete session has no stop.
+        let dir2 = fresh("dated2");
+        tamper(&dir2, |_, s| {
+            s["stop"] = json!({"kind": "error", "seq": 17, "message": "x"});
+        });
+        assert_eq!(
+            audit_opts(&dir2, &allow).unwrap().checks.get("stop"),
+            Some(&false)
+        );
+        for d in [dir, dir2] {
+            let _ = std::fs::remove_dir_all(&d);
+        }
     }
 
     /// t18/t19: a torn final line gives a receipt, not an error.
