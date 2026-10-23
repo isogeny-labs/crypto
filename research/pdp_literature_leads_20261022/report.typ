@@ -14,6 +14,8 @@
 
 #strong[Round 2 (2026-10-23).] Five further cards (LEAD-15 to LEAD-19) follow the dossiers’ own pointers; their verdicts are in §10. One is an exponent-candidate (LEAD-15, Diem’s plane-quartic branch of the cubic-GHS transfer), one is a constant-factor candidate with a desk estimate of 1.4–3× on three leaderboard rows (LEAD-19), and the rest close at the desk.
 
+#strong[Follow-up (2026-10-23, same PR).] LEAD-19’s discriminating test was run under a frozen protocol: #link("../lead19_projected_base/README.md")[`../lead19_projected_base/`]. The measured lever S(A′)/S(B) at the published rung is 1.29 (95 % interval 1.12–1.52), 1.58 (1.35–1.82) and 3.36 (2.80–4.02) on the three rows (desk estimates 1.4–1.5, 1.4–1.5, about 3), classified engineering; the desk text of this study, including §10, is left as written.
+
 Figures: #link("figures/pdp_landscape.svg")[`figures/pdp_landscape.svg`] (source #link("figures/diagram.py")[`figures/diagram.py`]) and #link("figures/dreg_records.svg")[`figures/dreg_records.svg`] (source #link("figures/plot_dreg.py")[`figures/plot_dreg.py`], data #link("figures/dreg_records.csv")[`figures/dreg_records.csv`]). PDF: #link("report.pdf")[`report.pdf`] (source #link("report.typ")[`report.typ`]). Literature map: #link("papers.csv")[`papers.csv`]. Cards: #link("LEADS.md")[`LEADS.md`]. Dossiers and verification cards: #link("leads/")[`leads/`].
 
 == 1. Scope and method

@@ -56,6 +56,13 @@ exponent-candidate (LEAD-15, Diem's plane-quartic branch of the cubic-GHS
 transfer), one is a constant-factor candidate with a desk estimate of 1.4–3×
 on three leaderboard rows (LEAD-19), and the rest close at the desk.
 
+**Follow-up (2026-10-23, same PR).** LEAD-19's discriminating test was run
+under a frozen protocol: [`../lead19_projected_base/`](../lead19_projected_base/README.md).
+The measured lever S(A′)/S(B) at the published rung is 1.29 (95 % interval
+1.12–1.52), 1.58 (1.35–1.82) and 3.36 (2.80–4.02) on the three rows (desk
+estimates 1.4–1.5, 1.4–1.5, about 3), classified engineering; the desk text
+of this study, including §10, is left as written.
+
 Figures: [`figures/pdp_landscape.svg`](figures/pdp_landscape.svg) (source
 [`figures/diagram.py`](figures/diagram.py)) and
 [`figures/dreg_records.svg`](figures/dreg_records.svg) (source
