@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Full Certicom 131-bit rho and IC benchmark](certicom-131-full-rho-ic-benchmark.md) | open | complete matched ECC2K-130, ECC2-131 and ECCp-131 solver rates beyond CPU state-step and S3 diagnostics | permitted GPU run, validated GPU clients for the other two curves, and complete exact-target IC/rho receipts |
 | [ECCp-131 full-parameter index-calculus relation pipeline](eccp131-full-parameter-index-calculus.md) | open | checked two- and three-point small-x probes have zero natural rank in bounded exact-curve runs; three-point support is at most `8B³` points | exact relation oracle beyond the fixed small-x support bound, independently replayed rank and target-descent chain |
 | [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | implemented; client activation remains | enrolled legacy process recovery | private recurring backups, fenced two-hop recovery and Diem copy restore passed; laptop installation/trust needs client access |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |
