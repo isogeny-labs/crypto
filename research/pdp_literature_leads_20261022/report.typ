@@ -137,7 +137,7 @@ Table B. Ranking inputs and verification totals per lead.
   [low that it gains; medium that the kill fires (the desk model predicts degree 7–8 where the repository’s F4 reads 4, so only the test can close it)],
   [unknown, probably none: at most a constant on peak memory at `(4, 6)` and nothing on end-to-end `S`, because the `m = 4` free-oracle floor of `2^56.46` binds; the gap to rho stays at the committed +7.62 bits],
   [3–5 person-days, 40–60 CPU-h at 16 GB; an optional degree-5 item adds about 15 CPU-h at 7–25 GB],
-  [pending],
+  [3 / 2 / 1; 14 / 0],
   [08],
   [medium],
   [0 degree levels; WDSat ≤ 1.04×; F4 XORs 1.0–2× beyond the hand rules (guess); `S` 1.00×],
@@ -232,7 +232,7 @@ Recorded here for the owners of those files; this PR changes none of them.
 <unresolved-checks-and-access-failures>
 - IACR ePrint PDFs are blocked from this container by a Cloudflare challenge; WebFetch on the same URLs returns 403. The texts that matter most and were not read: ePrint 2017/1262 (LEAD-11), the elliptic-curve section of ePrint 2026/384 (LEAD-12), ePrint 2015/573 (LEAD-05), ePrint 2019/313 (LEAD-08; covered by Trimoska’s thesis, read at source).
 - The Caen 2018 talk and paper by Mueller (nitaj.users.lmno.cnrs.fr) returned 504; Mueller’s UCD thesis was not found online.
-- Two LEAD-07 agents produced nothing (one lost to the container restart, one stalled and stopped after three hours); the third wrote the dossier under a 25-minute budget, so its reading of the Crossbred literature is shallower than the other dossiers’ and it says so. Its verification card is the last to land and its totals are filled in §3 when it does.
+- Two LEAD-07 agents produced nothing (one lost to the container restart, one stalled and stopped after three hours); the third wrote the dossier under a 25-minute budget, so its reading of the Crossbred literature is shallower than the other dossiers’ and it says so.
 - The published version of ePrint 2024/992 and the two Joux–Vitse PDFs were read from saved copies by text extraction (the fetch tool returns binary for them); Faugère–Wallet’s HAL and Springer pages were unreachable, so LEAD-13 rests on the abstract and Wallet’s 2016 slides.
 
 == 8. Graphs checked and left unchanged

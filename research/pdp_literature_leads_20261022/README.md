@@ -184,7 +184,7 @@ Table B. Ranking inputs and verification totals per lead.
 | 04 | medium (bounds); low (effect on `S`) | about 1.1–1.2× on `S` for the cofactor-2/6 random-binary rows (desk estimate); exponent unchanged | 1 person-day, < 1 CPU-h | 2 / 0 / 0; 30 / 0 |
 | 05 | medium (`S₃` import); low (transfer) | none as an improvement; if the slope transferred, the `m = 3, 4` rows at `n = 131` would move *up*, to 2^114.7–2^129.1 and 2^132.1–2^155.6 column touches | 1 person-day, 10–15 CPU-h, ≤ 12 GB | 8 / 0 / 0; 24 / 1 |
 | 06 | high (no improvement); medium (`n = 5` asymptotics) | none against any baseline row; a `T_n` row would be a new baseline, not an improvement | 2–3 person-days (new `T₃` harness), ≤ 2 CPU-h | 1 / 4 / 4; 16 / 0 |
-| 07 | low that it gains; medium that the kill fires (the desk model predicts degree 7–8 where the repository's F4 reads 4, so only the test can close it) | unknown, probably none: at most a constant on peak memory at `(4, 6)` and nothing on end-to-end `S`, because the `m = 4` free-oracle floor of `2^56.46` binds; the gap to rho stays at the committed +7.62 bits | 3–5 person-days, 40–60 CPU-h at 16 GB; an optional degree-5 item adds about 15 CPU-h at 7–25 GB | pending |
+| 07 | low that it gains; medium that the kill fires (the desk model predicts degree 7–8 where the repository's F4 reads 4, so only the test can close it) | unknown, probably none: at most a constant on peak memory at `(4, 6)` and nothing on end-to-end `S`, because the `m = 4` free-oracle floor of `2^56.46` binds; the gap to rho stays at the committed +7.62 bits | 3–5 person-days, 40–60 CPU-h at 16 GB; an optional degree-5 item adds about 15 CPU-h at 7–25 GB | 3 / 2 / 1; 14 / 0 |
 | 08 | medium | 0 degree levels; WDSat ≤ 1.04×; F4 XORs 1.0–2× beyond the hand rules (guess); `S` 1.00× | 2 person-days core, 10 CPU-h mechanical, ≤ 16 GB | 7 / 0 / 5; 21 / 3 |
 | 09 | medium (degree proved; density at `ℓ = 14–16` extrapolated) | none: at `n = 47` writing out the resultant costs `2^{ℓ+1}+1` coefficients, about 0.80× rf-mitm's counted multiplications, at least 2.4× above the card's kill line; the `m = 3` pairs residual floor is 3.2–3.9× above rf-pairs; `S_IC/S_rho` unchanged (3,053 at `n = 31`, 25,116 at `n = 37`) | 0.25 person-day, < 1 CPU-h, < 1 GB (a term-count example on `semaev_decomp::{Gf2, Poly}`) | 6 / 2 / 1; 24 / 0 |
 | 10 | medium | none in the exponent; 5–11 % higher `δ` at equal multiplicity (2–3× smaller lattices) on oracles that cannot beat rho | zero-compute test done in the dossier; 0.5 person-day to confirm in the `05` MILP harness | 6 / 0 / 1; 12 / 0 |
@@ -394,8 +394,7 @@ Recorded here for the owners of those files; this PR changes none of them.
 - Two LEAD-07 agents produced nothing (one lost to the container restart,
   one stalled and stopped after three hours); the third wrote the dossier
   under a 25-minute budget, so its reading of the Crossbred literature is
-  shallower than the other dossiers' and it says so. Its verification card
-  is the last to land and its totals are filled in §3 when it does.
+  shallower than the other dossiers' and it says so.
 - The published version of ePrint 2024/992 and the two Joux–Vitse PDFs were
   read from saved copies by text extraction (the fetch tool returns binary
   for them); Faugère–Wallet's HAL and Springer pages were unreachable, so
