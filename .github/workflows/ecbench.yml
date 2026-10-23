@@ -380,9 +380,27 @@ jobs:
           ./target/release/ecbench table --dir "$RUNNER_TEMP/prime" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Database loads, twice, strictly
         run: |
-          command -v sqlite3 >/dev/null || sudo apt-get install -y -qq sqlite3
-          for _ in 1 2; do ./target/release/ecbench db sql "$RUNNER_TEMP/prime" | sqlite3 -bail "$RUNNER_TEMP/ecbench.db"; done
-          test "$(sqlite3 "$RUNNER_TEMP/ecbench.db" 'select count(*) from runs')" = 72
+          python3 - "$RUNNER_TEMP/ecbench.db" "$RUNNER_TEMP/prime" <<'PY'
+          import sqlite3
+          import subprocess
+          import sys
+
+          database, session = sys.argv[1:]
+          connection = sqlite3.connect(database)
+          try:
+              for _ in range(2):
+                  sql = subprocess.run(
+                      ["./target/release/ecbench", "db", "sql", session],
+                      check=True,
+                      capture_output=True,
+                      text=True,
+                  ).stdout
+                  connection.executescript(sql)
+              if connection.execute("select count(*) from runs").fetchone()[0] != 72:
+                  raise SystemExit("expected 72 runs after two strict database loads")
+          finally:
+              connection.close()
+          PY
       - name: A vs_rho claim builds, loads, and fails closed at L0
         run: |
           ./target/release/ecbench run --spec docs/ecbench/specs/claim-koblitz.json \
@@ -403,8 +421,30 @@ jobs:
             "isolation_levels.ic L0 is below required L2",
             "isolation_levels.rho L0 is below required L2",
             "record_class must be verified_answer_controlled_wall for a primary wall claim"]' "$RUNNER_TEMP/check-native.json" > /dev/null
-          for _ in 1 2; do ./target/release/ecbench db sql "$RUNNER_TEMP/claim" "$RUNNER_TEMP/claim.json" | sqlite3 -bail "$RUNNER_TEMP/ecbench.db"; done
-          test "$(sqlite3 "$RUNNER_TEMP/ecbench.db" 'select count(*), min(check_status) from claims')" = "1|FAIL"
+          python3 - "$RUNNER_TEMP/ecbench.db" "$RUNNER_TEMP/claim" "$RUNNER_TEMP/claim.json" <<'PY'
+          import sqlite3
+          import subprocess
+          import sys
+
+          database, session, claim = sys.argv[1:]
+          connection = sqlite3.connect(database)
+          try:
+              for _ in range(2):
+                  sql = subprocess.run(
+                      ["./target/release/ecbench", "db", "sql", session, claim],
+                      check=True,
+                      capture_output=True,
+                      text=True,
+                  ).stdout
+                  connection.executescript(sql)
+              result = connection.execute(
+                  "select count(*), min(check_status) from claims"
+              ).fetchone()
+              if result != (1, "FAIL"):
+                  raise SystemExit(f"expected one failed claim after two strict loads, got {result}")
+          finally:
+              connection.close()
+          PY
           jq -r '.verdict' "$RUNNER_TEMP/claim.json" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Audit complete and interrupted sessions; pin incomplete scratch evidence
         if: (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
