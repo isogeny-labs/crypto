@@ -1,0 +1,71 @@
+name: isobench
+
+# The isogeny benchmark harness (isogeny_algos/src/isobench, docs/isobench): unit and cycle tests,
+# a live smoke session that must replay exactly on this code, a structural audit of every
+# committed session (seals, plan, every answer re-verified), every committed bound re-derived
+# from its sessions, and the frontier page checked for staleness. Committed sessions are not
+# re-executed here: their counts are exact functions of the code at the commit in host.json, and
+# later optimisations of the algorithms change them (that is what a new session and a challenge
+# are for). See docs/isobench/README.md.
+on:
+  pull_request:
+    paths:
+      - 'isogeny_algos/**'
+      - '.github/workflows/isobench.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'isogeny_algos/**'
+      - '.github/workflows/isobench.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: isobench-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  isobench:
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /isogeny_algos/
+            /research/p192_p224_large_degree_isogenies_20261008/PROTOCOL.md
+      - uses: dtolnay/rust-toolchain@1.98
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: isogeny_algos
+      - name: Build
+        run: cargo build --manifest-path isogeny_algos/Cargo.toml --locked --release --bin isobench
+      - name: Tests
+        run: cargo test --manifest-path isogeny_algos/Cargo.toml --locked --release --test isobench
+      - name: Live smoke session, replayed exactly
+        shell: bash
+        working-directory: isogeny_algos
+        run: |
+          set -euo pipefail
+          B=target/release/isobench
+          CAL=docs/isobench/calibration.json
+          $B run docs/isobench/specs/smoke-codomain.json --out "$RUNNER_TEMP/smoke" --cal $CAL > /dev/null
+          $B verify "$RUNNER_TEMP/smoke" --cal $CAL --replay-all
+      - name: Audit committed sessions, bounds and the frontier
+        shell: bash
+        working-directory: isogeny_algos
+        run: |
+          set -euo pipefail
+          B=target/release/isobench
+          CAL=docs/isobench/calibration.json
+          for s in docs/isobench/sessions/*/; do
+            $B verify "$s" --cal $CAL --replay 0
+          done
+          $B bound check docs/isobench/bounds/records/*.json --sessions docs/isobench/sessions
+          $B frontier build --bounds docs/isobench/bounds/records --out docs/isobench/FRONTIER.md \
+            --json docs/isobench/frontier.json --check
