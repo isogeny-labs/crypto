@@ -1132,18 +1132,29 @@ fn settle_by_walks(
         if survivors.is_empty() || pinned(&survivors) {
             break survivors.into_iter().cloned().collect();
         }
-        let classes: Vec<u32> = survivors
-            .iter()
-            .filter_map(|c| class(c))
-            .filter_map(|h| h.to_u32())
-            .collect();
         let mut lengthened = false;
         for i in 0..walks.open.len() {
             let (l, steps) = walks.open[i];
             let Some(reach) = walk::affordable(model, l, WALK_EXTENSION) else {
                 continue;
             };
-            let Some(next) = classes
+            // Where each surviving order would close the walk: the exact
+            // order of a prime above l in its class group, or, past word
+            // size, its class number (a multiple of that order).
+            let targets: Vec<u32> = survivors
+                .iter()
+                .filter_map(|cand| {
+                    let f = primes
+                        .iter()
+                        .zip(cand.iter())
+                        .fold(BigUint::one(), |acc, (p, &e)| acc * p.pow(e));
+                    match walk::class_order(dk, &f, l, u64::from(reach)) {
+                        Ok(order) => order.and_then(|o| u32::try_from(o).ok()),
+                        Err(()) => class(cand).and_then(|h| h.to_u32()),
+                    }
+                })
+                .collect();
+            let Some(next) = targets
                 .iter()
                 .copied()
                 .filter(|&h| h >= steps && h < reach)
@@ -2365,6 +2376,20 @@ mod tests {
             .iter()
             .any(|o| o.starts_with("O_K (j = ")));
         assert!(t.endomorphism.levels.iter().all(|l| l.level == Some(0)));
+        // GF(2^47), v = 31² at depth 2, h(d_K) = 11468: no 5- or 17-isogeny
+        // walk returns, but in Cl(O_31) the primes above 5 and 17 have
+        // orders 22936 and 91744 (O_K: 5734), so only the floor fits.
+        let t = get("icv1-f2m47-t4276051-826c5755");
+        let l31 = &t.endomorphism.levels[0];
+        assert_eq!((l31.ell.as_str(), l31.level), ("31", Some(2)));
+        // GF(2^61), ℓ = 31543 at depth 1: a cycle of 17934 13-isogenies
+        // fits Cl(O_{7³}) and not Cl(O_{7³·31543}) (orders exact past 2^60).
+        let t = get("icv1-f2m61-tm1864788689-c4a45971");
+        assert!(t
+            .endomorphism
+            .levels
+            .iter()
+            .any(|l| l.ell == "31543" && l.level == Some(0)));
         // v = 271 is beyond the scalar test, d_K = −7 has class number 1:
         // O_K would close every walk of l-isogenies in one step, and the
         // walk does not, so End(E) = Z[π], of conductor 271.
