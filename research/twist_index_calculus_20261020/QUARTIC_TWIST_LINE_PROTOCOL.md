@@ -630,3 +630,29 @@ transformed residual `(λa,λb)`; require exact componentwise equality to
 Record the number of checked relations/actions and every failure. This is
 a deterministic redundancy test of the proposed symmetry mechanism, not
 a new independent relation or a runtime speed comparison.
+
+## Registered orbit-complete L2 thinning oracle survey
+
+Frozen 23 October 2026 after the six-run polynomial and full-stream
+point/scalar-keyed censuses, before implementing this survey. Keep every
+physical `L0` factor and its sign. Order the `L2` 12-abscissa orbits by
+their smallest physical factor index in the frozen full base, and retain
+the first `j=1,2,3,4` orbits for p=73 and `j=1,2,3` for p=97. Run every
+`j` on all three original seed streams, including the full-base control;
+do not choose a subset from its observed hits. For each residual, take
+the complete signed `k=1` set from the independently BSGS-verified
+scalar-keyed oracle and retain precisely those decompositions whose
+single `L2` factor is in the chosen orbits. Check the full-base set
+against the committed complete-stream census on every query. Rebuild
+the compact twist-folded row map, fix the public generator factor log
+as anchor, retain every rank-increasing relation in sorted order, and
+stop at full anchored rank or the frozen stream end. Independently
+verify all solved representative logs and the public target by subgroup
+multiplication when rank completes. Record per-query unique set size,
+rank, chosen orbit IDs, zero queries, first hit, attempted signed `L2`
+S4 peels (excluding infinity residuals), and full-stream versus
+pre-stop values. Rerun the whole survey A/A and compare all output bytes.
+This is an **ideal exact group-oracle rank and system-count survey**.
+It does not price S4, heal the p=73 failure, or claim a polynomial IC
+gain. A later native polynomial thinning experiment requires its own
+frozen choice, source version, complete cost and independent replay.
