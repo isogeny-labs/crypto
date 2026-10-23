@@ -3,7 +3,7 @@ set -euo pipefail
 input="${1:?GP script}"
 receipt="${2:?fresh log prefix}"
 cap="${3:-1800}"
-case "$cap" in 1400|1800|3600) ;; *) exit 2 ;; esac
+case "$cap" in 600|1400|1800|3600) ;; *) exit 2 ;; esac
 test ! -e "$receipt.json"
 gp_bin="${TWIST_GP_BIN:-/tmp/twist-cas/root/usr/bin/gp}"
 revision="$(git rev-parse HEAD)"
