@@ -46,20 +46,23 @@ jobs:
       - name: Fetch authoritative cryptanalysis registry for byte comparison
         shell: bash
         env:
-          GH_TOKEN: ${{ secrets.CRYPTANALYSIS_READ_TOKEN }}
+          PEER_TOKEN: ${{ secrets.CRYPTANALYSIS_READ_TOKEN }}
         run: |
           set -euo pipefail
-          if [ -z "$GH_TOKEN" ]; then
+          if [ -z "$PEER_TOKEN" ]; then
             echo "::error::Configure CRYPTANALYSIS_READ_TOKEN with contents:read access to the private cryptanalysis repository. The upstream mirror gate cannot run anonymously."
             exit 1
           fi
+          # curl, not gh: the crypto-eks-linux runners do not ship the gh CLI.
           base=cryptanalysis-peer/experiments/ic-candidate-catalog
           mkdir -p "$base/curve-links"
           for file in curves.yaml curves.schema.json curve-links/link.schema.json \
                       validate_semantics.py test_validate_semantics.py; do
-            gh api -H 'Accept: application/vnd.github.raw+json' \
-              "repos/aburan28/cryptanalysis/contents/experiments/ic-candidate-catalog/$file?ref=main" \
-              > "$base/$file"
+            curl --fail --location --show-error --silent --retry 3 \
+              -H "Authorization: Bearer $PEER_TOKEN" \
+              -H "Accept: application/vnd.github.raw" \
+              "https://api.github.com/repos/aburan28/cryptanalysis/contents/experiments/ic-candidate-catalog/$file?ref=main" \
+              --output "$base/$file"
           done
       - name: Validate committed metadata and upstream mirror
         run: python docs/curves/ic/validate_semantics.py --peer cryptanalysis-peer
