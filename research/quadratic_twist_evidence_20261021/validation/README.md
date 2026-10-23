@@ -86,3 +86,16 @@ CI base, PR head and tested merge. That inherited failure is recorded without
 modifying its sources or the gate. Cursor's approval agent could not start due
 to its usage limit; a neutral result supplies no approval. Full exact-head check
 runs, failed receipts and source comparisons are retained in the new record.
+
+The [2026-10-23 group-map/eigenspace continuation](group-map-20261023/README.md)
+passes the unmodified proof gate with 49 named theorems / 57 audited declarations,
+zero failing/extra trusted, and a fresh 4,479-pass library suite (119 existing
+ignores). Actual addition/scalars, source annihilators, the full explicit
+short-model minus-group isomorphism and rational fixed eigenspace are checked.
+Four new source-bound polynomial certificates, exact bytes, corruption controls
+and 22 isolated native backend tests pass. The PR-caused stale Jacobian catalog
+is repaired natively, preserving all 2,572 prior objects; the strict cover
+assessment's source bindings are refreshed without changing any non-source
+semantic section or existing transfer status. Raw failures and all earlier
+reports remain unchanged. General normalization, exceptional lifting, pairing,
+trace-zero and shared-Conductor gates stay open.

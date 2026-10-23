@@ -1,0 +1,17 @@
+icv1-f2m131-tm22283658519494248867-115e0dc5  [ECC2K-130]
+  ICV1:f2m-131-5cc3e086:-22283658519494248867:2722258935367507707729280517973639940516:0x1:-7:unk:r:115e0dc5d9eb
+  family koblitz  field binary (degree 131, 131.0 bits)  trace -22283658519494248867
+  subgroup r: 129.0 bits [largest_prime_of_order]  rho reference: 2^78.8
+  verdict boundary
+  #    route                    genus     dest log2     total     ratio transport         class             evidence
+   0   ghs_weil_descent         1               3.3      14.5     +64.3 degenerate        not_carried       exact_invariant
+        GHS descent to Jac(C)/GF(2^1), N = 131 * 1
+        audit_curve_magic_number=1  base_degree=1  cover_degree_log2=1  magic_number=1  mmt_condition_8=true  relative_degree=131  relative_trace_b_zero=false  trace_a=0  type_i=false
+        solver EngeGaudry (leading term 2^0.0, exponent ratio +64.5); search none, transfer 2^14.5
+        - GHS Weil descent: magic number dim Span{(1, σ^i(√b))} and genus as in research/cover_route_prime_binary_20261008/ghs_magic.rs (Hess); the cover C/GF(2^l) is not constructed here
+        - sqrt(b) lies in the subfield: E is defined over GF(2^l) and the descent is the trace map onto E(GF(2^l)), which cannot carry the subgroup
+  *1   same_field_cover         3              83.9      83.9      -5.1 carried_if_coprime_to_degree boundary          construction
+        same-field genus-3 cover H -> E of degree 3 over GF(2^131) (ordinary_binary_cubic_pullback)
+        construction="docs/curves/COVERS.md ordinary binary"  map_degree=3
+        solver RhoOnJacobian (leading term 2^64.5, exponent ratio +0.0); search none, transfer 2^16.1
+        - the Jacobian over the same field is larger than E: index calculus there is q^(4/3) against rho's q^(1/2)

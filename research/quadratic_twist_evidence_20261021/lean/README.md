@@ -3,8 +3,8 @@
 Lean 4.34.1 and Mathlib commit `d13f23b723b8a846827a245b89c10fc7d3f11612`
 are pinned in the toolchain, Lake file, and dependency manifest. The repository
 proof gate builds the module and audits all transitive theorem axioms. The current
-latest receipt reports **28 named research theorems, zero trusted native declarations**;
-the expanded audit checks 36 declarations including eight generated helper lemmas. Only standard
+latest receipt reports **49 named research theorems, zero trusted native declarations**;
+the expanded audit checks 57 declarations including eight generated helper lemmas. Only standard
 `propext`, `Classical.choice`, and `Quot.sound` occur, and some proofs need fewer.
 No theorem source contains a placeholder or a custom research axiom.
 
@@ -64,24 +64,76 @@ explicit assumptions. No assumption that Frobenius negates the image remains.
 | `rational_twist_sum_odd` | an odd-annihilated sum of twist images in a rational relation is zero |
 | `cleared_monic_twist_identity` | universal cleared-map polynomial identity; source-bound IDC1h9dc35b198cc2fa02 |
 
-The map is not yet declared an additive isomorphism. The odd-annihilator hypotheses
-are on the actual image or sum, not silently transported from the source group.
-The sum theorem concludes the aggregate is zero; it does not make each summand
-zero. The independent native experiment checks actual subgroup tables and all
-signed words in its finite population. It does not replace a general group-map
-or full eigenspace-surjectivity proof.
+Those original statements keep the odd-annihilator hypotheses on the image or
+sum. Their source and source-bound certificate are unchanged. The two new modules
+below prove addition compatibility, transport source annihilators, and identify
+the whole short-model minus eigenspace. The sum conclusions kill the aggregate;
+they do not make each summand zero.
+
+## Group law and full short-model eigenspaces (2026-10-23)
+
+`TwistGroupMap.lean` proves the existing map preserves addition in every case,
+including O, inverse pairs, tangents and two-torsion. For the group-map statements,
+the hypotheses are fields k,K, an algebra k→K, d≠0, u²=d, and ellipticity of
+`short a b`; finiteness, nonsquareness and odd characteristic are not needed
+until the Frobenius obstruction. `liftHom` is the actual `AddMonoidHom`, and
+`liftEquivRange` is its injective isomorphism onto its image.
+
+| Declaration in `TwistGroupMap` | Exact statement |
+| --- | --- |
+| `slope_scale` | secant/tangent/vertical slope scales by 1/u, with d≠0 and u²=d; all zero-denominator cases retained |
+| `addX_scale`, `addY_scale` | actual addition-coordinate formulas scale by 1/d and 1/(du) |
+| `cleared_tangent_identity`, `cleared_addX_identity`, `cleared_addY_identity` | universal commutative-ring identities for the polynomial parts, with IDC1 records |
+| `mapped_slope_scale` | the slope statement commutes with the actual base-field embedding |
+| `lift_add` | psi(P+Q)=psi(P)+psi(Q) for actual nonsingular points |
+| `lift_nsmul`, `lift_zsmul` | natural and integer scalar compatibility |
+| `source_annihilator` | rP=O implies r psi(P)=O |
+| `lift_sum` | every finite sum commutes with psi |
+| `lift_annihilator_iff` | r psi(P)=O iff rP=O, using the proved injection |
+| `rational_relation_source_odd` | rational A+psi(P)=R and odd r with rP=O imply P=O and equal rational lifts |
+| `rational_sum_source_odd` | an odd annihilator on the source aggregate suffices for the same aggregate conclusion |
+| `rational_sum_common_source_odd` | a common odd source annihilator on every summand suffices; individual summands need not vanish |
+
+`TwistEigenspace.lean` derives the fixed field rather than assuming it. It uses
+the complete root set of X^q−X, and injectivity of k→K, to show z^q=z iff z
+comes from k. No finite-extension or degree-two assumption on K is hidden:
+K can be any field algebra containing the specified square root. The minus
+theorem uses finite odd k, nonsquare d, u²=d and the explicit elliptic short model.
+
+| Declaration/construction in `TwistEigenspace` | Exact statement |
+| --- | --- |
+| `frobenius_fixed_iff` | q-power fixed field in K is exactly the image of the finite base field |
+| `twist_delta` | the actual discriminant scales by d^6; source-bound IDC1 record |
+| `twist_elliptic` | d≠0 and ellipticity of E imply ellipticity of the monic twist |
+| `lift_range_iff_neg` | Q is an explicit rational twist image iff actual Frobenius sends Q to −Q |
+| `rational_range_iff_fixed` | for any elliptic Weierstrass model, Q comes from a rational base-change point iff Frobenius fixes Q |
+| `minus`, `liftEquivMinus` | actual additive minus subgroup and group isomorphism from the rational monic twist onto all of it |
+
+The inverse existence proof descends X=d·x and Y=d·u·y from a minus point,
+checks the actual twist equation and nonsingularity, and reconstructs Q.
+`liftEquivMinus` is not merely an isomorphism onto an unspecified image.
+It is also not a claim that every point of E(K) is in the minus subgroup, or
+that E(K) is a direct sum at two-torsion. The retained nonzero two-torsion
+controls explain why oddness cannot be dropped from the relation obstruction.
+
+Four [new native IDC1 records](../validation/group-map-20261023/certificates/receipt.json)
+bind the exact new Lean sources, replay 32+16 points each, reject false plus-one
+identities arithmetically, and reject false source hashes. They certify only the
+polynomial identities; the checked Lean proofs establish division, actual-point
+addition and Frobenius consequences. The 57-declaration axiom receipt covers
+every reported theorem and the generated helpers; all five modules build.
 
 **Remaining bridges.** The explicit short-model image's Frobenius-negation
-property is checked. Formal additive-isomorphism and general-model normalization
-proofs remain open, as does identifying the full eigenspaces with the required
-rational point sets, formalize
-S3/S4 lifting including exceptional cases, or prove Weil-pairing nondegeneracy
+property, additive isomorphism onto the entire minus subgroup, and rational
+fixed-point identification are checked under the hypotheses above. General-model
+normalization with compatible group maps remains open, as do
+S3/S4 lifting including exceptional cases, Weil-pairing nondegeneracy
 and the complete DLP reduction. Its abstract implications are fully proved;
 the complete historical geometric theorems are only partially formalized.
 Finite enumerations check the original fixtures, not those universal bridges.
 The trace-zero counting theorem and general GHS construction likewise remain open.
-The [latest build and axiom receipts](../validation/mixed-20261022T0718Z/)
-include all three modules. The earlier 14- and 18-theorem gate receipts and
+The [latest build and axiom receipts](../validation/group-map-20261023/)
+include all five modules. The earlier 14-, 18- and 28-theorem gate receipts and
 their exact Lake configurations are retained unchanged.
 
 Reproduce from the repository root:

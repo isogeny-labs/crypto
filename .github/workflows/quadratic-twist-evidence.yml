@@ -52,6 +52,8 @@ jobs:
         run: bash research/quadratic_twist_evidence_20261021/run-mixed.sh "$RUNNER_TEMP/twist-mixed"
       - name: Check mixed-audit native identity backend tests
         run: cargo test --release --locked --manifest-path research/quadratic_twist_evidence_20261021/native/mixed-audit/Cargo.toml
+      - name: Replay source-bound group-map polynomial identities and controls
+        run: bash research/quadratic_twist_evidence_20261021/run-group-map.sh "$RUNNER_TEMP/twist-group-map"
       - name: Upload native audit receipts
         if: always()
         uses: actions/upload-artifact@v4
@@ -63,4 +65,5 @@ jobs:
             ${{ runner.temp }}/twist-controls/
             ${{ runner.temp }}/twist-metadata/
             ${{ runner.temp }}/twist-mixed/
+            ${{ runner.temp }}/twist-group-map/
           if-no-files-found: error

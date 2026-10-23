@@ -1016,21 +1016,26 @@ async function buildSourceArtifacts() {
     ),
     sourceArtifact(
       "docs/curves/jacobian-transfers.json",
-      "legacy formula-screen inventory; not a transfer certificate",
+      "native formula-screen inventory with verified registry membership; not a transfer certificate",
       freshness(
         "refuted",
-        "claim that this inventory is current for the 4,493-row registry",
-        "It pins an older registry, omits current slugs, and contains modeled routes without exact HC1/CV1 subgroup certificates.",
+        "claim that this formula inventory itself supplies verified executable HC1/CV1 subgroup transfers",
+        "The 2026-10-23 native refresh now checks exact current 4,493-row registry membership and preserves all 2,572 prior per-model objects and the cost model. This corrects the former stale-membership finding, but the modeled routes still do not supply exact HC1/CV1 subgroup transfer certificates or measured advantage. The applicability status stays refuted for that stronger claim; the pinned historical open-obligation ledger is retained unchanged.",
         [
           "docs/curves/jacobian-transfers.json",
           "docs/curves/JACOBIAN_TRANSFERS.md",
+          "research/quadratic_twist_evidence_20261021/validation/group-map-20261023/jacobian/summary.json",
         ],
         "refresh_formula_inventory",
       ),
     ),
     integrityArtifact(
       "docs/curves/JACOBIAN_TRANSFERS.md",
-      "legacy formula-screen documentation pinned for the stale-inventory finding",
+      "formula-screen documentation; regenerated summary table is byte-identical after the native inventory refresh",
+    ),
+    integrityArtifact(
+      "research/quadratic_twist_evidence_20261021/validation/group-map-20261023/jacobian/summary.json",
+      "native formula-inventory exact membership and unchanged prior-object/cost-model receipt",
     ),
     sourceArtifact(
       "docs/curves/COVERS.md",

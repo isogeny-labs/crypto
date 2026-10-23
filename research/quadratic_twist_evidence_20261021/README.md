@@ -13,8 +13,8 @@ No mixed-component counterexample or relation-rank gain appears. Nonzero
 two-torsion exceptions remain visible. Ten new Lean statements construct the
 explicit short-model twist image, prove its Frobenius negation without an
 assumed hB, and derive the single-point and finite-sum odd-order obstructions.
-There are now 28 named research theorems; full geometric formalization remains
-partial. [New raw records](native/mixed-20261022T0718Z/),
+That round had 28 named research theorems; full geometric formalization remains
+partial. [Raw records](native/mixed-20261022T0718Z/),
 [protocol](MIXED_RELATIONS_20261022_PROTOCOL.md),
 [proof map](lean/README.md), and [validation](validation/mixed-20261022T0718Z/README.md).
 
@@ -22,6 +22,21 @@ Reproduce the new bounded experiment and independent controls with
 `bash research/quadratic_twist_evidence_20261021/run-mixed.sh /tmp/twist-mixed-fresh`.
 The directory must be fresh. The workflow runs this replay, and the existing
 proof gate includes the new Lean module. No general hardness or speedup follows.
+
+The [2026-10-23 group-map continuation](reports/group-map-20261023/README.md)
+now proves addition and scalar compatibility of that same actual point map,
+transports source annihilators, and constructs an isomorphism onto the **entire
+Frobenius-minus eigenspace** of the explicit short model. Rational base-change
+points are exactly the fixed eigenspace. The proof gate passes **49 named
+research theorems / 57 audited declarations, zero extra trusted axioms**.
+The source-order obstruction now assumes rP=O on the twist, not separately on
+the image. Four new native polynomial certificates and their corruption controls
+replay byte for byte; the old point-map source and all frozen evidence remain
+unchanged. This round also repairs the PR-caused stale Jacobian metadata:
+all 4,493 models are covered and all 2,572 prior per-model objects are unchanged.
+[Proof protocol](GROUP_MAP_20261023_PROTOCOL.md),
+[metadata protocol](JACOBIAN_REFRESH_20261023_PROTOCOL.md),
+[receipts](validation/group-map-20261023/README.md).
 
 - [Full native replay receipt](native/runs/run-20261021T150125Z/parity.json),
   [raw output](native/runs/run-20261021T150125Z/results.json), and
@@ -51,7 +66,8 @@ proof gate includes the new Lean module. No general hardness or speedup follows.
 
 The Lean proofs establish the stated group/ring implications, with explicit
 hypotheses. The actual Frobenius point map and rational-point lifts are now
-formalized. The twist-to-minus-eigenspace identification, summation-polynomial
+formalized, including the explicit short-model twist-to-minus-eigenspace group
+isomorphism. General-model normalization, exceptional summation-polynomial
 lifting and Weil-pairing bridges remain open.
 This study establishes finite correctness and specific obstructions; it supplies
 neither a general ECDLP hardness proof nor a general GHS attack or speedup result.

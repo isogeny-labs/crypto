@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "bfc760f3cfb9ab3dfdca20d7dc3c79543d98b22d40f82c7c57b55c8352aeca57",
+      "sha256": "2cbdd0bbe067fdb357a76c221a7d954de0c5e6aebfc9e038d5db8d1ad26901f9",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -443,15 +443,16 @@
     },
     {
       "path": "docs/curves/jacobian-transfers.json",
-      "sha256": "616c2fa7a51bb3402f8f7305ee17cdc71046fda8209d8046184611133bb6a345",
-      "role": "legacy formula-screen inventory; not a transfer certificate",
+      "sha256": "e03922ea296923bfb2ba2a43f03758e05d336e8abed501b41f69fda6a318b507",
+      "role": "native formula-screen inventory with verified registry membership; not a transfer certificate",
       "freshness": {
         "status": "refuted",
-        "scope": "claim that this inventory is current for the 4,493-row registry",
-        "rationale": "It pins an older registry, omits current slugs, and contains modeled routes without exact HC1/CV1 subgroup certificates.",
+        "scope": "claim that this formula inventory itself supplies verified executable HC1/CV1 subgroup transfers",
+        "rationale": "The 2026-10-23 native refresh now checks exact current 4,493-row registry membership and preserves all 2,572 prior per-model objects and the cost model. This corrects the former stale-membership finding, but the modeled routes still do not supply exact HC1/CV1 subgroup transfer certificates or measured advantage. The applicability status stays refuted for that stronger claim; the pinned historical open-obligation ledger is retained unchanged.",
         "evidence_refs": [
           "docs/curves/jacobian-transfers.json",
-          "docs/curves/JACOBIAN_TRANSFERS.md"
+          "docs/curves/JACOBIAN_TRANSFERS.md",
+          "research/quadratic_twist_evidence_20261021/validation/group-map-20261023/jacobian/summary.json"
         ],
         "obligation_id": "refresh_formula_inventory"
       }
@@ -459,13 +460,26 @@
     {
       "path": "docs/curves/JACOBIAN_TRANSFERS.md",
       "sha256": "47b619f17e9fe913170edb3b8bf8ab2ed806be5d330514d8303e91edc07eeb36",
-      "role": "legacy formula-screen documentation pinned for the stale-inventory finding",
+      "role": "formula-screen documentation; regenerated summary table is byte-identical after the native inventory refresh",
       "freshness": {
         "status": "supported",
         "scope": "byte identity of this assessment artifact at the generated-ledger revision",
         "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
         "evidence_refs": [
           "docs/curves/JACOBIAN_TRANSFERS.md"
+        ]
+      }
+    },
+    {
+      "path": "research/quadratic_twist_evidence_20261021/validation/group-map-20261023/jacobian/summary.json",
+      "sha256": "23dec9218920f6cc18e89d695bbbb594a7642b9d838340bba4fadc66bdc3848f",
+      "role": "native formula-inventory exact membership and unchanged prior-object/cost-model receipt",
+      "freshness": {
+        "status": "supported",
+        "scope": "byte identity of this assessment artifact at the generated-ledger revision",
+        "rationale": "The SHA-256 digest binds references to the exact repository bytes; it does not by itself promote any mathematical or performance claim.",
+        "evidence_refs": [
+          "research/quadratic_twist_evidence_20261021/validation/group-map-20261023/jacobian/summary.json"
         ]
       }
     },
