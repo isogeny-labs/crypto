@@ -39,6 +39,10 @@ jobs:
         run: python -m pip install pyyaml==6.0.2 jsonschema==4.23.0
       - name: Negative controls
         run: python -m unittest discover -s docs/curves/ic -p 'test_validate_semantics.py' -v
+      # aburan28/cryptanalysis is private: an unauthenticated fetch returns 404.
+      # CRYPTANALYSIS_READ_TOKEN (a fine-grained token with contents: read on
+      # that repository) enables the byte comparison. The gate is fail-closed:
+      # without the token the job errors instead of skipping the mirror check.
       - name: Fetch authoritative cryptanalysis registry for byte comparison
         shell: bash
         env:
