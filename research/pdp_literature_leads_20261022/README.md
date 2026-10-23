@@ -144,7 +144,7 @@ row was read by hand and is classified in §5; none is a wrong citation.
 | Lead | Card (class) | Dossier verdict |
 |---|---|---|
 | 01 | MinRank / Kipnis–Shamir / support-minors modelling of the summation chain (formulation) | **closed-by-theorem**: the Minors, KS and SM modellings are the repository's `S₄`-direct system, the chain, and the chain's ideal; none can read a lower degree than the chain. One residual probe (carry seeds) keeps about a 10 % prior of one degree |
-| 02 | Parametric eliminant: generic-fibre Gröbner basis in the target's coordinates (solver, amortisation) | *pending (re-dispatched 2026-10-23)* |
+| 02 | Parametric eliminant: generic-fibre Gröbner basis in the target's coordinates (solver, amortisation) | **closed-by-measurement**, provisional (desk): over `F̄_q` the descended `k = 3` system splits into one equation per conjugate target coordinate; the solution count is 384 before and 64 after `S₃`-symmetrisation, so the eliminant has degree 64 in `e₁` and up to 64 in each of the three target coordinates, up to `65⁴ ≈ 1.8·10⁷` terms and at least 274,625 specialisations; evaluating it per target costs 4–60× the measured `C₃` at `k = 3` and about `9·10⁴×` `C₄(D₄)` at `k = 4`, because an eliminant in `k` target coordinates needs about `D^{k+1}` terms against a `D^{3.1}` Macaulay solve |
 | 03 | ℓ-torsion (3, 4) symmetrisation and Kummer-model coordinates (formulation) | *pending (re-dispatched 2026-10-23)* |
 | 04 | Homomorphic class pre-partition: Tate pairing, ℓ-descent, trace parity (filter) | **constant-factor candidate**, cofactor curves only: `Z/r` has no proper quotient, so every prime-order row (all eight Table B prime rows) gets exactly 1.000×; pigeonhole caps the `m = 3` probe saving at 2× for any class group, so the card's "`\|A\|` in every oracle" is wrong |
 | 05 | Degree-of-regularity growth law for descended `S₃`/`S₄` (measurement) | **unverifiable-from-here**: the `S₃` thresholds 3 → 4 → 5 at square `N = 16, 36` agree with Kosters–Yeo, Kousidis–Wiemers and the repository's own `lfd.sage` boundary, with one conflicting cell (Magma reads 4 at `n = 35` where the preprint reads 5); the law is for the quadratic two-point `S₃`, not the cubic-plus-quadratic chain, and the preprint's own `S₄` data are flat at 7 |
@@ -163,7 +163,7 @@ Table B. Ranking inputs and verification totals per lead.
 | Lead | Confidence | Expected gain if it works | Test cost | Verification (citations v/m/u; paths e/m) |
 |---|---|---|---|---|
 | 01 | medium | at most one degree (4 → 3): `m = 4` at `n = 131` moves +7.62 → +5.34 bits over rho (`w = 1`), still above | 1–1.5 person-days, < 4 CPU-h, ≤ 1.5 GB (msolve) | 12 / 2 / 0; 25 / 1 |
-| 02 |  |  |  |  |
+| 02 | medium (degree counts desk-checked at `k = 3`; density measured only at `k = 2`, 67 of 125 terms) | none; if evaluation were free the ceiling would be 5–9× at `k = 3` and about `10³×` at `k = 4` (arithmetic, not a result); setup amortises at `k = 3` (about 9 % of the relation phase at `q = 2^20`) but not at `k = 4` before the extrapolated `D₄` handover | 2–3 person-days of Rust (a `k = 3` slice-fill measurement), < 1 CPU-h, < 1 GB | pending |
 | 03 |  |  |  |  |
 | 04 | medium (bounds); low (effect on `S`) | about 1.1–1.2× on `S` for the cofactor-2/6 random-binary rows (desk estimate); exponent unchanged | 1 person-day, < 1 CPU-h | 2 / 0 / 0; 30 / 0 |
 | 05 | medium (`S₃` import); low (transfer) | none as an improvement; if the slope transferred, the `m = 3, 4` rows at `n = 131` would move *up*, to 2^114.7–2^129.1 and 2^132.1–2^155.6 column touches | 1 person-day, 10–15 CPU-h, ≤ 12 GB | 8 / 0 / 0; 24 / 1 |
@@ -189,6 +189,10 @@ Table B. Ranking inputs and verification totals per lead.
   seeds (bit components of `x₁f₁, x₂f₁, yf₁`) lie in the degree-4 Macaulay
   span and let F4 finish at 3; the dossier replaces the card's test with that
   probe (R1).
+- **LEAD-02.** Break-even at `k = 3` needs an eliminant fill of 1.6–2.5 %,
+  which is the one unmeasured quantity (the test). Joux–Vitse's F4 traces
+  were read at source from saved PDFs; Weispfenning 1992 is recalled,
+  Montes–Wibmer and Faugère–Mou abstract-only.
 - **LEAD-04.** Why KN-FIND-14706d does not cover this: that finding tests
   the product character `χ₁χ₂χ₃`, which is trivial on `E(F_p)` by the curve
   equation; the 2-descent class `(χ₁, χ₂)` lives in its kernel and takes all
