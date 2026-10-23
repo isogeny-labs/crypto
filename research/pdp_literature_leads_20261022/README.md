@@ -1,4 +1,4 @@
-# Point decomposition beyond summation polynomials: literature review and 14 leads
+# Point decomposition beyond summation polynomials: literature review and 19 leads (two rounds)
 
 **Date.** 2026-10-22 (dossiers completed 2026-10-23). **Type.** Literature
 search round with lead dossiers (research-visuals skill, "Deliverables for each
@@ -49,6 +49,12 @@ person-day, 10–15 CPU-hours), which LEAD-12 routes first; the only candidate
 for a measured improvement over a leaderboard row is LEAD-04's
 cofactor-projected base on the random-binary ladder (desk estimate 1.4–1.6×
 at fixed base size).
+
+**Round 2 (2026-10-23).** Five further cards (LEAD-15 to LEAD-19) follow the
+dossiers' own pointers; their verdicts are in §10. One is an
+exponent-candidate (LEAD-15, Diem's plane-quartic branch of the cubic-GHS
+transfer), one is a constant-factor candidate with a desk estimate of 1.4–3×
+on three leaderboard rows (LEAD-19), and the rest close at the desk.
 
 Figures: [`figures/pdp_landscape.svg`](figures/pdp_landscape.svg) (source
 [`figures/diagram.py`](figures/diagram.py)) and
@@ -409,6 +415,67 @@ No measured result was produced, so no canonical graph changes:
 `docs/ic-leaderboard.html` / `docs/ic/LEADERBOARD.md` / `docs/ic/leaderboard.json`,
 `docs/performance-gains/`, and `benchmarks/README.md` are untouched. Nothing
 here is a performance result, so no `benchmarks/` entry is owed.
+
+## 10. Round 2 (2026-10-23): five leads from the dossiers' own pointers
+
+Cards in `LEADS.md`, "Round 2 cards"; dossiers and verification cards in
+`leads/`. Same briefs and rules as round 1. Verification totals are the
+mechanical card's (citations verified / mismatch / unreachable; paths exist /
+missing); every non-clean row was read by hand and is classified in §10.2.
+
+| Lead | Card (class) | Dossier verdict |
+|---|---|---|
+| 15 | Plane-quartic Jacobian arithmetic for Diem's Õ(q) branch of the cubic-GHS transfer (transfer, exponent) | **exponent-candidate**, with the card mis-aimed: Diem–Thomé's practical algorithm uses about 12 class-group additions and needs no unique class forms (Riemann–Roch gives Diem's divisor "reduced along `P₀`" where one is needed), and the line harvest uses no Jacobian arithmetic at all, so the missing arithmetic is a small cost term, not the blocker; Diem's JTNB 2012 paper proves Õ(q) for plane quartics (the census README calls it heuristic), but that proved version needs about `48q` additions and is not competitive while the practical one is; the Flon–Oyono–Ritzenthaler group law costs 148M + 15S + 2I per addition (about 181 multiplication-equivalents at `q = 257`), inside the card's `10³` kill line; the untested links are the line yield on the bielliptic GHS quartics and whether `C(F_q)` reaches the `ℓ`-part at `q ≥ 257` |
+| 16 | Nagao's quadratic system against the D₄-symmetrised S₅ at `k = 4` (formulation) | **closed-by-theorem**: Nagao's 12 quadrics in 12 unknowns define the same 4096-point variety as Gaudry's `S₄` form in other coordinates; only the central 2-torsion translation acts on it, so its best quotient is 2048 against 512 for the D₄ system, and the card's second kill fires; the predicted cost is `3·10¹⁰–10¹²` multiplication-equivalents per decomposition against the committed D₄ solve; the card's "about 85 solutions" is `4096/48`, a cost ratio read as a count (the repository's quotient is 512); the better-shaped Nagao system at `k = 4` is on the genus-2 cover of Joux–Vitse §5 (4 quadrics in 4 unknowns, degree 16, read at source), which has no card and no repository route |
+| 17 | Closed-form closure dimensions for the descended `S₃` chain (theory) | *pending (agent running at the time of this build)* |
+| 18 | Structured elimination for C₄: sparse FGLM or resultants on the D₄ quotient (solver) | **closed-by-measurement**: the card's premise is stale; the ideal degree is 512, not 85, and the repository's `chains` step (landed 2026-10-14) already does what the card proposes (only the dense columns of the multiplication matrix, as in Faugère–Mou and msolve §4.4), taking C₄ from `2.54·10¹⁰` to `6.9–8.2·10⁷`; the remaining paths are at parity (the `det A(λ)` step costs `2.5·10⁷` against `2.3·10⁷` for the Krylov step), a resultant chain costs about `3·10¹⁰` (dense desk bound, roughly 370× the current C₄), root finding is 0–4 % of C₄, and msolve has no weighted order and cannot replay its F4 trace across targets |
+| 19 | Cofactor-projected factor base on the random-binary ladder (filter) | **constant-factor candidate** on the generic line: the raw subspace base is never projected on the random-binary ladder (`run_char2_instance`), while the lever already exists for Koblitz bases (`build_subgroup_orbit_factor_base`); about 50 % of the folded pair table lies in the subgroup on `f2m15` and `f2m21` and 16.7 % on `f2m27`, walked targets always stay in the subgroup; the published rows also carry a class-test charge (about 12 of 26.3 units on `f2m15`) that the projected arm never pays, which is accounting, not an improvement, so the protocol measures against the raw base with that charge removed and reports both ratios |
+
+Table D. Ranking inputs and verification totals, round 2.
+
+| Lead | Confidence | Expected gain if it works | Test cost | Verification (citations v/m/u; paths e/m) |
+|---|---|---|---|---|
+| 15 | medium (Diem–Thomé ran the same harvest up to `q = 2^31`; the toy quartic IC passes 90/90; yield on GHS quartics and the `ℓ`-part reach are untested) | desk estimate: cost ratio to the Item-7 rho model about 1.1 at `q = 257`, 0.25 at `2^11`, 0.085 at `2^15` (3.3 / 1.1 / 0.40 with linear-algebra multiplications mod `ℓ` priced at 9 field multiplications); fitted exponent about 1.0 against 1.30 for the hyperelliptic branch and 1.5 for rho; would move the `m = 3` double-large-prime row at `q = 2^15` from `2.60·10⁸` to about `1.4·10⁷`, but only on instances with a plane-quartic cover (a new row) | 6–10 person-days, < 1 CPU-h; the harvest alone about 3 days, mostly an `F_{q³}` quartic builder at `q ≥ 257` (none exists above `q = 11`) | 6 / 5 / 4; 13 / 0 |
+| 16 | high (symmetry and degree derived and desk-checked at `p = 13`); medium (cost transferred from published timings) | none; the card's C₄ of `2.54·10¹⁰` is also stale (now `6.9·10⁷`), so Nagao is predicted 450–14,000× worse than the current baseline | 1–1.5 person-days of Rust (no Nagao exporter exists), < 3 CPU-h, < 12 GB; not recommended | 2 / 1 / 7; 18 / 0 |
+| 17 | *pending* | | | pending |
+| 18 | medium (dimension and phase shares measured; msolve cost unmeasured, msolve not on PATH) | 1.0–1.4× on the current C₄ of `8.2·10⁷` at `p = 1009`, 1.9× at best (about 3.6 bits on the crossover); distance to rho unchanged (`1.39·10⁶×` rho-negation at `p = 29`) | 0.5–1 person-day, about 40 CPU-minutes, no new Rust (msolve `-g 1`, `-g 2`, `-P 1`, one thread, on four plain D₄ instances against the repository's four solver arms) | 7 / 0 / 5; 17 / 0 |
+| 19 | medium (mechanism checked exactly on the three curves; effect on `S` is a desk model over 3-seed means with heavy tails) | lever only: about 1.4–1.5× on `f2m15` and `f2m21`, about 3× on `f2m27`; against the published rows about 2.8×, 2.1×, 3.4×; distance to matched rho from 13.1×, 18×, 38.2× to about 4.7×, 8.7×, 11×, still above rho on every row | about 1 person-day of Rust (150–200 lines with tests, a `--base-arms` flag on `ic boundary`), < 5 CPU-minutes, < 0.5 GiB; landing a row adds the validation gate | pending |
+
+### 10.1 What the round-2 dossiers change in the ranking
+
+1. **LEAD-19 moves to the top of the measurable list.** It is the only item
+   with a desk estimate of an improvement over existing leaderboard rows
+   (random-binary `f2m15`, `f2m21`, `f2m27`), it needs about a person-day of
+   Rust and minutes of CPU, and its protocol carries the prime-order negative
+   control (`fp24`, must read 1.000×) and the accounting separation (the
+   class-test charge) that the success criterion demands. Expected result if
+   it works: three rows improved by 1.4–3×, still above rho.
+2. **LEAD-15 is the only exponent lead left on the board**, and it is a
+   transfer: Diem's practical line-intersection index calculus on the
+   plane-quartic branch of the cubic-GHS cover, with a desk cost ratio to rho
+   that falls from about 1.1 at `q = 257` to 0.085 at `q = 2^15`. The work is
+   an `F_{q³}` instance builder for plane-quartic covers at `q ≥ 257` and the
+   line harvest (about 3 person-days before any Jacobian arithmetic is
+   needed), on the weak class only.
+3. **LEAD-18 and LEAD-16 retire the C₄ engineering angle**: the sparse-FGLM
+   idea is already in the tree, and Nagao's coordinates cannot take the D₄
+   quotient. The pointer worth a card is Nagao on the genus-2 cover at
+   `k = 4` (Joux–Vitse §5).
+4. **LEAD-17** decides whether the degree law can be derived rather than
+   measured; its status is recorded when its dossier lands.
+
+### 10.2 Verification notes, round 2
+
+- **LEAD-15.** Five "mismatch" rows are PDFs the fetch tool returns as binary
+  (the HAL copy of Diem–Thomé, the JTNB paper, the Flon–Oyono–Ritzenthaler
+  report), a 502 from the ECC 2005 slides mirror, and a Springer page behind
+  a login; none shows a different paper. The dossier read Diem–Thomé and the
+  JTNB paper by text extraction.
+- **LEAD-16.** The one mismatch is a title the dossier itself marks "seen,
+  not fetched". Six unfound numbers are rounded forms.
+- **LEAD-18.** Twenty unfound numbers are rounded scientific notation
+  (`2.54·10¹⁰` for the files' `2.535–2.552·10¹⁰` and full-digit JSON values).
+- **LEAD-19.** Its card lands with the final build.
 
 ## 9. Files
 
