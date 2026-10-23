@@ -100,7 +100,7 @@ the symmetrized `S_4`. **Falsifier (H1):** measure the actual recovered root-siz
 generic Coppersmith bound at `p ∈ {2^16…2^28}` on a 4-torsion curve.
 
 ### C2 (Hermitian relation matrix is generic).
-The degree-`p+1` Hermitian surface `H(3,p^2)/F_{p^2}` carries `(p^3+1)(p^2+1)` lines forming
+The degree-`p+1` Hermitian surface `H(3,p^2)/F_{p^2}` carries `(p+1)(p^3+1)` lines (the count `(p^3+1)(p^2+1)` is the number of points) forming
 a rank-`O(p^3)` Néron–Severi sublattice with `PGU(4,p)` acting. Restricting lines to a
 Legendre fiber `E_λ(F_{p^2})` gives relations not implied by the `F_p` group law.
 Conjecture: the resulting relation matrix has generic rank (full minus the tautological
@@ -163,3 +163,6 @@ validation gate (`docs/VALIDATION_GATE.md`: replay certificate, validator report
 band) before any claim leaves this directory. The expected outcome is a measured Kill on each,
 which is still a result: it turns a hand-waved "dead" into a quantified wall with a scale
 trend.
+
+
+> Erratum (2026-10-23, found by the H2 runner): lines of H(3,p^2) number (p+1)(p^3+1); (p^3+1)(p^2+1) counts points. N N^T has spectrum {(p+1)(p^2+1), p^2+p, 0}. No faithful map from H to a Legendre fibre exists, so H2 tests a norm-circle surrogate.

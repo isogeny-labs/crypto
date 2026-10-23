@@ -12,11 +12,11 @@ the full validation gate (`docs/VALIDATION_GATE.md`) before any claim; none has.
 | H0 | linear-size monoid on E(F_p) (C0) | **KILL** (on cost) | cost per decomposition scales as p^0.50 (median-walk fit); decompositions are O(1) length (median 3) but each step scans all of F (≈√p adds) | at the √p wall, no sub-birthday recursion |
 | H1 | symmetrized Semaev small-roots (C1) | **KILL** | β_sym = 0.1125 at p=2^28 vs β_generic = 0.25; never beats the raw system; no growth with p | implied 2^89.4 per relation at 131-bit, vs 2^65 rho and 2^43.7 enumeration null |
 | H3 | canonical-lift p-adic digits (C3) | **KILL** (on scale) | min additive-defect 0.99996 (≈1−1/p, no character); MI within null; small-p closure "signal" is a miscalibrated null (z spans −2.9…+5.0 across sibling curves) | no size function; nothing survives to cryptographic scale |
-| H2 | Hermitian Néron–Severi spectrum (C2) | in progress | — | — |
-| H4 | FPPR descent to F_2, first-fall trend (C4) | in progress | — | — |
+| H2 | Hermitian Néron–Severi spectrum (C2) | **KILL on a surrogate only** | non-tautological corank 0 at p=7, 11, 13 (rank equals the random baseline; p=31 censored). The matrix has 26 to 82 columns against 2,752 to 30,772 rows, so full column rank was near-certain and the test had little power. The true restriction to a Legendre fibre does not exist (genus and Kodaira mismatch), so a norm-circle model was used | not a rho comparison; the real C2 object is untested |
+| H4 | FPPR descent to F_2, first-fall trend (C4) | **INCONCLUSIVE on the trend; Win excluded by a cost bound** | first-fall degree is exactly 7 at all nine prime n from 11 to 41 (62 systems). The metric is uninformative: the equations have degree 6, so the first fall is 6+1 by construction. Solving degree resolved only at n=11, where it equals the 12 variables (no gain over exhaustive search) | any Macaulay solve needs degree at least 7 over 132 variables at n=131: at least 2^87.4 bit-ops per relation, 66 bits over the 2^21 gate and 22 bits over the 2^65 rho floor (recomputed independently; guessing variables first does not lower it at fixed degree) |
 | H5 | Ulmer Legendre d=p^2+1 kernel (C5) | in progress | — | — |
 
-Three of six resolved, all Kills, each decided on the correct gate — cost or scale, not a
+Five of six have a verdict, but only H0, H1 and H3 are clean Kills: H2 is surrogate-only and weak, and H4 is inconclusive on its pre-registered trend, each decided on the correct gate — cost or scale, not a
 confounded proxy. In every case the script's strict per-cell rule and the directed final verdict
 are both recorded in `H*/out/result.json` (`verdict` vs `verdict_script_output` /
 `verdict_literal_3pt_amortized_fit`), so the override trail is auditable.
@@ -49,15 +49,8 @@ empirically.
 
 ## In progress
 
-- **H2 (Hermitian spectrum):** first two jobs hit the 132-minute deadline — the line enumeration at
-  `p ∈ {7,11,13,31}` is too slow as written. Needs orbit-based enumeration (unitary group action)
-  or to accept `p=31` censored and finish `{7,11,13}` within budget. Runner paused on a session rate
-  limit (resets 7:50pm PT); resumes with that guidance.
-- **H4 (FPPR first-fall trend — the headline):** methodology is correct (in-house Boolean
-  Macaulay-matrix profiling, M4RI rank, degree-fall detection, exhaustive `d_solv` check). The debug
-  run used a 100-second per-cell budget and hit a worker-pool `KeyError`, so `n=11` censored. Needs
-  the pool bug fixed and realistic budgets, then the prime-`n` sweep `{11..41}` and the
-  extrapolation to 131. Runner paused on the rate limit; resumes with that guidance.
+- **H2:** finished as `-r4` (4 CPU, 8Gi) after the earlier jobs never scheduled, failed on JSON serialisation, or were OOM-killed at p=31. See the verdict table for why this Kill is weak. Two protocol errors were found and are corrected in PROOFS.md and the H2 protocol: the line count of H(3,p^2) is (p+1)(p^3+1), not (p^3+1)(p^2+1), which is the point count; and the incidence spectrum of N N^T is {(p+1)(p^2+1), p^2+p, 0}, not the list originally stated.
+- **H4:** finished as `-r3` on 4 CPU and 8Gi (the 16 and 8 CPU pods never scheduled on Spot). The pre-registered trend test failed to discriminate, because the first-fall degree is pinned to the equation degree plus one. The informative quantity is the solving degree, which is censored for n of 13 and above. The 130.6-bit figure in the fit block comes from the single n=11 point and should be ignored. The bound that stands is the 2^87.4 lower bound. It is not a measured solving cost. It does not cover algorithms that lower the degree by guessing variables or by other structure, and the FGHR 4-torsion symmetrization was not applied. A real C4 test needs the solving degree measured at n of 13 to 23 with an exact solver, which is a follow-up.
 - **H5 (Ulmer f=2 kernel):** the 8-vCPU pods could not schedule on Spot; resubmitted single-threaded
   at 4 vCPU (`-r3`, running). Deviation from the pre-registered 16 GiB noted; the code is
   single-threaded so the kernel numbers are unaffected.
