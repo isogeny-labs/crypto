@@ -1182,7 +1182,8 @@ fn rho_report(res: RhoResult, wall: u64, field_ops: Option<FieldOps>) -> SolveRe
 /// the phases a rho or kangaroo pays before its first step whatever `r` is
 /// (`setup`, `automorphism_setup`).  `None` for a method whose set-up scales
 /// with `√r` (BSGS's table, the claw's base and table) or that has none.
-/// `ecbench table` flags a row whose share exceeds [`SETUP_SHARE_FLAG`].
+/// [`row_flags`] flags a share above [`SETUP_SHARE_FLAG`]; `ecbench table`
+/// does not print that flag yet (README §12).
 pub fn setup_share(family: &str, phases: &[PhaseRecord], total: f64) -> Option<f64> {
     if !matches!(family, "rho" | "kangaroo")
         || total.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
