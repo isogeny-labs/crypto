@@ -82,3 +82,29 @@ left independent. Require exact reconstruction over the integers and a
 faithful commutative-ring Lean theorem. This checks for a smaller formula
 whose specializations could expose an elimination pattern. It makes no
 novelty or relation-finder performance claim by itself.
+
+## Same-system completeness discriminator
+
+Frozen after the 46,200-system profile passed exact coefficient equality
+and showed degree profile `[4,4,4,4]` before and after linear reduction
+on every system. Test every one of the eight retained representative
+systems: the first finite peel of each of seven p=37/73/97 workloads,
+plus p=73 seed-one query 18, physical peel 54, sign +1. Preserve their
+four exact component polynomials unchanged.
+
+Enumerate all `Fp^3` symmetric assignments with a native Horner scan to
+obtain the complete rational root set. Independently call the existing
+native `f4_fp::solve` on the same equations with its standard quartic
+settings: grevlex, degree bound 12, no staircase stop, one Rayon thread,
+1,200 s cooperative deadline and 8 GiB process address-space cap. Compare
+the complete sets, not only the two known missing decompositions. Split
+every returned cubic, resolve all signs in the original curve group and
+retain every valid relation. A coefficient mutation must be detected
+against the immutable fixture before solving. Any F4 timeout,
+undetermined verdict, root mismatch or false relation is retained.
+
+This is a solver-completeness pilot and records row-reduction
+multiplications with their limited boundary. It supplies no priced
+whole-method or fastest-external-solver result. A successful pilot must
+be integrated and compared on the full frozen relation stream before a
+pipeline improvement can be claimed.
