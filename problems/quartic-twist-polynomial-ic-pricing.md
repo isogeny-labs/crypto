@@ -19,10 +19,17 @@ external solver comparisons remain absent.
 The original broader request asks whether twist symmetry speeds relation
 finding and index calculus across relevant regimes. The p=73/p=97
 three-seed `k=1` panel is now independently audited. Its p=73 seed-one
-S4 collector misses two verified relations at one failed system; the
+historical S4 collector misses two verified relations at one failed system; the
 p=97 paths are complete on their processed prefixes but sparse in exact
 physical relation yield. Three small primes and incomplete cost fields
 still prevent scaling or robust crossover claims.
+
+The [exact S4/F4 follow-up](../research/twist_index_calculus_20261020/s4_twist_elimination/REPORT.md)
+now repairs that S4 miss and matches every query's complete signed set on
+all seven original processed prefixes in two byte-identical runs. The
+remaining gaps include S5, the 21 thinned-base replays, complete cold
+cost, external solvers and broader scaling; the historical misses and
+their original costs remain preserved.
 
 ## Evidence and uncertainty
 
@@ -33,7 +40,8 @@ still prevent scaling or robust crossover claims.
 - **Exact peeled-target orbit diagnostic:** The [full-stream six-run test and subgroup ablation](../research/twist_index_calculus_20261020/K1_PEELED_ORBIT_REUSE.md) check 142,248 finite signed L2 peels. Identity, cubic-only, transported-Frobenius-only and combined-action caches find 20, 107, 243 and 790 duplicate targets respectively. Only two combined-action collisions occur within one residual; 788 more occur across residuals within their separate streams. Even an ideal unlimited combined cache yields only a 1.005585× aggregate S4 call-count ratio here, before cache overhead. This is no native speed measurement or general obstruction.
 - **Native base-shape panel:** The [complete 21-case report](../research/twist_index_calculus_20261020/K1_THIN_NATIVE_REPORT.md) and [machine validator](../research/twist_index_calculus_20261020/K1_THIN_NATIVE_VALIDATION.json) show full anchored rank and independently verified scalar 271 on every preregistered prefix choice. Seventeen processed signed relation sets are exact; four p=73 seed-one choices remain partial from the same one failed S4 system. All 21 first/A/A non-timing records and independent audit outputs match, and six full-base controls reproduce the older scaling source. The largest observed proper-subset same-seed full/candidate counted-field ratios are 3.653× at p=73 and 3.575× at p=97; p=97 seed-one one-orbit regresses to 0.745×. This comparison charges full-base and subset-map construction but omits native hash/allocator CPU and a calibrated whole-method unit.
 - **Suspected explanation:** The S5 closure failure may be a low-degree Macaulay border or specialization defect in the native solver; neither was established by the retries. A different order, degree, Gröbner engine or exact root algorithm could change the outcome.
-- **Missing capability:** A solver that returns complete signed sets for all five patterns on the frozen p=37 stream and repairs the p=73 seed-one S4 miss; native hash/tree/allocator and rho hash CPU accounting; peak memory; isolated ABAB wall intervals; a same-input msolve comparison (Magma if available); and tests on larger curves beyond p=97.
+- **Exact S4 repair:** [Seven complete first/A/A collectors](../research/twist_index_calculus_20261020/s4_twist_elimination/results/prefixes.json) execute 46,200 finite systems per run with no undetermined cases. Every signed set matches a post-run group-pair oracle; all seven anchored matrices and target/factor logarithms verify. The old p73/seed1 prefix's nine relations become the exact eleven and full rank first occurs at query 18 rather than 19. Eight separately frozen systems also match complete `Fp^3` root enumeration. The 49-term and 18-term resultant identities have zero exact integer remainders, separate IDC records and two checked Lean theorems. All 46,200 component-coefficient matches pass; simple linear equation reduction retains degree profile `[4,4,4,4]`. F4's counter covers row reduction only, so this is a completeness result, not a cold-cost improvement.
+- **Missing capability:** A solver that returns complete signed sets for all five patterns on the frozen p=37 stream; F4 replay on the 21 thinned bases; complete F4 and cold-pipeline accounting including native hash/tree/allocator and rho hash CPU; peak memory; isolated ABAB wall intervals; a same-input msolve comparison (Magma if available); and tests on larger curves beyond p=97.
 - **Not established:** Impossibility of complete S5 solving, polynomial IC superiority to rho, fastest solver status, large-size asymptotics, or an effect on deployed curves.
 
 ## What would unblock it
@@ -43,7 +51,8 @@ still prevent scaling or robust crossover claims.
 - [ ] Emit native hash/tree/allocator and rho-partition CPU/work counters, requested and observed peak bytes, exclusive setup and online phases; run at least five interleaved ABAB repetitions under the repository's isolation tool, A/A controls, same target and resource envelope, and price `w=0,0.1,1` GAE.
 - [x] Run a preregistered p=73/p=97 one-target panel with independent signed-set/rank/scalar audits and a cap that records censored outcomes. Five processed-prefix relation sets pass; one is retained as partial.
 - [x] Run every preregistered orbit-complete L2 prefix choice with native polynomial collection, full-base construction, independent exact signed-set and rank replay, full-base source parity and A/A. All 21 recover the target; four retain the known relation miss.
-- [ ] Repair and independently audit the two missing p=73 seed-one S4 relations, keeping the initial failure and its complete counted cost; extend the polynomial panel beyond p=97 where feasible.
+- [x] Repair and independently audit both missing p=73 seed-one S4 relations, retaining the historical failure and cost record; complete on all seven original processed prefixes in first/A/A.
+- [ ] Extend the repaired collector to all 21 thinned bases and the unused frozen-stream suffixes; extend the polynomial panel beyond p=97 where feasible.
 - [ ] For any priced leaderboard result, provide the replay certificate, validator report and strongest matched rho receipt in `VALIDATION.json` under `docs/VALIDATION_GATE.md`.
 
 The first item would establish a complete tagged-line-union polynomial
@@ -72,3 +81,12 @@ identity/cubic/Frobenius/full peeled-target cache ablation were added.
 The restricted S4 path has counted base-shape improvements on selected
 frozen cases and a regression on another; the p=73 algebraic miss,
 full pricing and external comparison remain unresolved.
+
+2026-10-23: Exact coefficient derivation and two Lean identities, an
+eight-system exhaustive field-root comparison, and complete seven-prefix
+F4 first/A/A collectors repair the S4 miss. Full cold costing and external
+comparisons are still open. The proposed endomorphism-sum image base is
+recorded as draft card
+[`XP-20261023-quartic-twist-image-base`](../backlog/XP-20261023-quartic-twist-image-base/README.md),
+with an unimplemented harness and explicit prerequisites; no image-base
+result or launch is implied.

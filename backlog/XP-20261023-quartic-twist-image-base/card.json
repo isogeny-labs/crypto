@@ -1,0 +1,49 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261023-quartic-twist-image-base",
+  "title": "Quartic twist index calculus with endomorphism-sum image factors and unchanged log columns",
+  "created": "2026-10-23",
+  "authors": ["quartic twist IC research"],
+  "status": "draft",
+  "status_note": "Design only. The image-base collector, independent verifier, complete counters and checkpoint format are not implemented. No result, run or scheduled execution is implied by this card.",
+  "blocked_on": [],
+  "links": {
+    "lead": "research/twist_index_calculus_20261020/s4_twist_elimination/REPORT.md",
+    "notes": ["problems/quartic-twist-polynomial-ic-pricing.md"],
+    "prs": [2368]
+  },
+  "question": "Can adding (1-psi)(B) as physical factors increase independent index-calculus relations per completely counted unit without adding logarithm columns?",
+  "decision_value": "An exact set and rank census distinguishes additional physical relation supply from duplicated automorphism images or dependent rows. A complete same-target collector comparison then decides whether the additional images and peel work improve cold index calculus. A loss retains the same controls and prevents promoting a larger base or an isolated relation count into a performance claim.",
+  "protocol": {"path": null, "blob": null},
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "codex/twist-ic-20261020",
+    "build": [["cargo", "build", "--locked", "--release", "--manifest-path", "research/twist_index_calculus_20261020/s4_twist_elimination/native/Cargo.toml"]]
+  },
+  "resources": {
+    "cpus": 2, "ram_gb": 8, "disk_gb": 8, "gpu": null,
+    "est_core_hours": null, "est_wall_hours": null,
+    "notes": "Provisional bounded toy correctness envelope only. The earlier F4 collector's watchdog is 1200 seconds per original prefix panel. Extra image peels and oracle work have not been profiled, so no runtime estimate or cost projection is supplied. Freeze a pilot-based estimate before ready."
+  },
+  "run": {
+    "argv": ["research/twist_index_calculus_20261020/s4_twist_elimination/native/target/release/twist-s4-structure-probe", "--endomorphism-images", "{out}"],
+    "env": {"RAYON_NUM_THREADS": "1"},
+    "timeout_per_shard_s": 1200
+  },
+  "shards": {"count": 1, "scheme": "single", "params": {}, "stop": "all"},
+  "checkpoint": {"file": null, "resume_flag": null},
+  "outputs": {
+    "result_schema": "quartic-twist-image-base/v1 (proposed; not implemented)",
+    "verify": [],
+    "land": "research/twist_index_calculus_20261020/endomorphism_image_base"
+  },
+  "cairn": {
+    "mode": "lab-task", "space": "TBD",
+    "tasks": ["XP-20261023-quartic-twist-image-base"], "ttl_s": 1800,
+    "env": {"name": "quartic-twist-image-base", "recipe": "Pin native toolchain, completed collector and independent verifier before ready."},
+    "exec": {"cpus": 2, "memory_mb": 8192, "timeout_s": 1200, "sandbox": "auto", "sandbox_reason": "", "publish": "runs/XP-20261023-quartic-twist-image-base"},
+    "funding": {"units": 0, "rationale": "Unscheduled draft with no measured image-base cost or completed checker. No execution priority is proposed against the funded runnable cards until its bounded pilot and protocol are frozen."},
+    "notes": "Not posted or leased. The --endomorphism-images mode in run.argv does not exist yet."
+  }
+}
