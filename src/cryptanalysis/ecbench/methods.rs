@@ -1131,7 +1131,9 @@ fn rho_report(res: RhoResult, wall: u64, field_ops: Option<FieldOps>) -> SolveRe
 /// with `√r` (BSGS's table, the claw's base and table) or that has none.
 /// `ecbench table` flags a row whose share exceeds [`SETUP_SHARE_FLAG`].
 pub fn setup_share(family: &str, phases: &[PhaseRecord], total: f64) -> Option<f64> {
-    if !matches!(family, "rho" | "kangaroo") || !(total > 0.0) {
+    if !matches!(family, "rho" | "kangaroo")
+        || total.partial_cmp(&0.0) != Some(std::cmp::Ordering::Greater)
+    {
         return None;
     }
     let fixed: f64 = phases
