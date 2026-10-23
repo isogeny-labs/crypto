@@ -258,7 +258,7 @@ Cards in `LEADS.md`, "Round 2 cards"; dossiers and verification cards in `leads/
   [#strong[closed-by-theorem]: Nagao’s 12 quadrics in 12 unknowns define the same 4096-point variety as Gaudry’s `S₄` form in other coordinates; only the central 2-torsion translation acts on it, so its best quotient is 2048 against 512 for the D₄ system, and the card’s second kill fires; the predicted cost is `3·10¹⁰–10¹²` multiplication-equivalents per decomposition against the committed D₄ solve; the card’s "about 85 solutions" is `4096/48`, a cost ratio read as a count (the repository’s quotient is 512); the better-shaped Nagao system at `k = 4` is on the genus-2 cover of Joux–Vitse §5 (4 quadrics in 4 unknowns, degree 16, read at source), which has no card and no repository route],
   [17],
   [Closed-form closure dimensions for the descended `S₃` chain (theory)],
-  [#emph[pending (agent running at the time of this build)]],
+  [#strong[unverifiable-from-here] for the degree law, with the count closing exactly where it can be checked: closed forms for the degree-2 and degree-3 closure dimensions and for the plain degree-4 Macaulay rank, for `m = 3, 4` and `ℓ ≥ 4`, reproduce the committed `(m, n, ℓ) = (3, 11, 5)` cell exactly (`XL₃ = 307`, `V₃ = 772`, `XL₄ = 4071`), are exact for `XL₃` and `XL₄` in 16 of 17 committed cells with `ℓ ≥ 4` and within ±2 for `V₃` in 16, and predicted the `m = 4`, `ℓ = 6` cells at `n = 9, 10` exactly in desk runs; the obstruction is that the quadric-fall space is not stable from `D = 3` to `D = 4` (it grows to about 1.5–2.2× the degree-3 value `3n + 2ℓ` on the unsaturated `m = 3` cells), so the degree-3 count does not fix the saturation degree and no prediction is made at `(4, 6)`; the `4ℓ` lag term and the `(m − 1)(n + ℓ)` degree-4 term are fitted, not derived],
   [18],
   [Structured elimination for C₄: sparse FGLM or resultants on the D₄ quotient (solver)],
   [#strong[closed-by-measurement]: the card’s premise is stale; the ideal degree is 512, not 85, and the repository’s `chains` step (landed 2026-10-14) already does what the card proposes (only the dense columns of the multiplication matrix, as in Faugère–Mou and msolve §4.4), taking C₄ from `2.54·10¹⁰` to `6.9–8.2·10⁷`; the remaining paths are at parity (the `det A(λ)` step costs `2.5·10⁷` against `2.3·10⁷` for the Krylov step), a resultant chain costs about `3·10¹⁰` (dense desk bound, roughly 370× the current C₄), root finding is 0–4 % of C₄, and msolve has no weighted order and cannot replay its F4 trace across targets],
@@ -286,10 +286,10 @@ Table D. Ranking inputs and verification totals, round 2.
   [1–1.5 person-days of Rust (no Nagao exporter exists), \< 3 CPU-h, \< 12 GB; not recommended],
   [2 / 1 / 7; 18 / 0],
   [17],
-  [#emph[pending]],
-  [],
-  [],
-  [pending],
+  [medium (degree ≤ 3 formulas); low (any `D` law)],
+  [none as an improvement, a pricing input only; the `m = 4` degree-4 row stays at +7.62 bits to rho],
+  [replaying the formulas on the committed records: \< 1 CPU-minute; the new `m = 4`, `n = 10`, `ℓ = 6` cells about 40 CPU-minutes at 8–10 GB; degree 5 needs a 70–128 GB host],
+  [4 / 1 / 0; 18 / 0],
   [18],
   [medium (dimension and phase shares measured; msolve cost unmeasured, msolve not on PATH)],
   [1.0–1.4× on the current C₄ of `8.2·10⁷` at `p = 1009`, 1.9× at best (about 3.6 bits on the crossover); distance to rho unchanged (`1.39·10⁶×` rho-negation at `p = 29`)],
@@ -299,7 +299,7 @@ Table D. Ranking inputs and verification totals, round 2.
   [medium (mechanism checked exactly on the three curves; effect on `S` is a desk model over 3-seed means with heavy tails)],
   [lever only: about 1.4–1.5× on `f2m15` and `f2m21`, about 3× on `f2m27`; against the published rows about 2.8×, 2.1×, 3.4×; distance to matched rho from 13.1×, 18×, 38.2× to about 4.7×, 8.7×, 11×, still above rho on every row],
   [about 1 person-day of Rust (150–200 lines with tests, a `--base-arms` flag on `ic boundary`), \< 5 CPU-minutes, \< 0.5 GiB; landing a row adds the validation gate],
-  [pending],
+  [3 / 0 / 3 (+3 unverified); 18 / 2],
 )
 ]
 
@@ -308,14 +308,15 @@ Table D. Ranking inputs and verification totals, round 2.
 + #strong[LEAD-19 moves to the top of the measurable list.] It is the only item with a desk estimate of an improvement over existing leaderboard rows (random-binary `f2m15`, `f2m21`, `f2m27`), it needs about a person-day of Rust and minutes of CPU, and its protocol carries the prime-order negative control (`fp24`, must read 1.000×) and the accounting separation (the class-test charge) that the success criterion demands. Expected result if it works: three rows improved by 1.4–3×, still above rho.
 + #strong[LEAD-15 is the only exponent lead left on the board], and it is a transfer: Diem’s practical line-intersection index calculus on the plane-quartic branch of the cubic-GHS cover, with a desk cost ratio to rho that falls from about 1.1 at `q = 257` to 0.085 at `q = 2^15`. The work is an `F_{q³}` instance builder for plane-quartic covers at `q ≥ 257` and the line harvest (about 3 person-days before any Jacobian arithmetic is needed), on the weak class only.
 + #strong[LEAD-18 and LEAD-16 retire the C₄ engineering angle]: the sparse-FGLM idea is already in the tree, and Nagao’s coordinates cannot take the D₄ quotient. The pointer worth a card is Nagao on the genus-2 cover at `k = 4` (Joux–Vitse §5).
-+ #strong[LEAD-17] decides whether the degree law can be derived rather than measured; its status is recorded when its dossier lands.
++ #strong[LEAD-17 does not replace the measurement.] The combinatorial count is exact through degree 3 and for the plain degree-4 rank, which is a useful zero-compute check on every committed cell, but the quadric-fall space grows between degrees 3 and 4 by a factor the count does not predict, so the saturation degree at `(4, 6)` still needs the run (about 40 CPU-minutes at 8–10 GB for degree 4; a 70–128 GB host for degree 5). The dossier reads the card’s "(ℓ, m) \= (4, 6)" as `m = 4`, `ℓ = 6`.
 
 === 10.2 Verification notes, round 2
 <verification-notes-round-2>
 - #strong[LEAD-15.] Five "mismatch" rows are PDFs the fetch tool returns as binary (the HAL copy of Diem–Thomé, the JTNB paper, the Flon–Oyono–Ritzenthaler report), a 502 from the ECC 2005 slides mirror, and a Springer page behind a login; none shows a different paper. The dossier read Diem–Thomé and the JTNB paper by text extraction.
 - #strong[LEAD-16.] The one mismatch is a title the dossier itself marks "seen, not fetched". Six unfound numbers are rounded forms.
 - #strong[LEAD-18.] Twenty unfound numbers are rounded scientific notation (`2.54·10¹⁰` for the files’ `2.535–2.552·10¹⁰` and full-digit JSON values).
-- #strong[LEAD-19.] Its card lands with the final build.
+- #strong[LEAD-17.] One mismatch (a search-ranked page), one unfound number; all 18 paths exist.
+- #strong[LEAD-19.] No mismatches; three citations the card could not route (no identifier) are listed as unverified; the two missing paths are the output files the proposed test would write (`research/lead19_projected_base/{char2,prime24}.json`).
 
 == 9. Files
 <files>
