@@ -420,6 +420,15 @@ enum CryptanalysisOp {
         /// Input difference at plaintext byte zero (differential only).
         #[arg(long, default_value_t = 0x73)]
         alpha: u8,
+        /// For square, write generated four-round pairs to a new versioned corpus file.
+        #[arg(long)]
+        export_pairs_file: Option<PathBuf>,
+        /// For square, write a separate held-out lambda set to a new corpus file.
+        #[arg(long, requires = "export_pairs_file")]
+        export_verification_file: Option<PathBuf>,
+        /// Complete training lambda sets to export for square (1..=6).
+        #[arg(long, default_value_t = 3)]
+        square_sets: usize,
     },
     /// Measure a bounded AES impossible, yoyo, mixture, boomerang, or S-box zero-correlation distinguisher.
     AesDistinguisher {
@@ -512,6 +521,15 @@ enum CryptanalysisOp {
         /// JSON pairs with plaintext byte 0 covering 0..=255 and all other bytes fixed.
         #[arg(long)]
         input: PathBuf,
+    },
+    /// Recover a four-round AES-128 key from complete captured Square lambda sets.
+    AesSquareObserved {
+        /// Legacy pairs JSON or a versioned four-round Square corpus; accepts checked store references.
+        #[arg(long)]
+        input: PathBuf,
+        /// Separate held-out pairs for independent replay of the recovered key.
+        #[arg(long)]
+        verification_input: Option<PathBuf>,
     },
     /// Analyze caller-supplied known pairs for the one-round AES linear model.
     AesLinearObserved {
@@ -2038,12 +2056,60 @@ fn cmd_aes_cache_timing(input: &Path, min_samples_per_bucket: usize) -> Result<(
     Ok(())
 }
 
+fn write_square_corpus(
+    path: &Path,
+    cipher: &crypto_lib::cryptanalysis::aes::ReducedAes128,
+    seed: u64,
+    sets: usize,
+    first_set: usize,
+) -> Result<(), String> {
+    use crypto_lib::cryptanalysis::aes::square;
+    use std::io::Write;
+    if path.to_string_lossy().starts_with("store:") || path.to_string_lossy().starts_with("sha256:")
+    {
+        return Err("export to a local file, then publish with crypto store push".into());
+    }
+    let pairs: Vec<_> = (first_set..first_set + sets)
+        .flat_map(|set_index| {
+            let base = [seed.wrapping_add(set_index as u64) as u8; 16];
+            square::lambda_set(&base, 0).into_iter().map(|plaintext| {
+                serde_json::json!({
+                    "plaintext":hex::encode(plaintext),
+                    "ciphertext":hex::encode(cipher.encrypt(&plaintext))
+                })
+            })
+        })
+        .collect();
+    let bytes = serde_json::to_vec_pretty(&serde_json::json!({
+        "schema_version":1,
+        "cipher_model":"aes128-reduced-final-no-mixcolumns/v1",
+        "technique":"square",
+        "rounds":4,
+        "pairs":pairs
+    }))
+    .map_err(|e| e.to_string())?;
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(path)
+        .map_err(|e| format!("cannot create {}: {e}", path.display()))?;
+    if let Err(error) = file.write_all(&bytes).and_then(|()| file.sync_all()) {
+        drop(file);
+        let _ = std::fs::remove_file(path);
+        return Err(format!("cannot write {}: {error}", path.display()));
+    }
+    Ok(())
+}
+
 fn cmd_aes_attack(
     technique: &str,
     key_hex: &str,
     samples: usize,
     seed: u64,
     alpha: u8,
+    export_pairs_file: Option<&Path>,
+    export_verification_file: Option<&Path>,
+    square_sets: usize,
 ) -> Result<(), String> {
     use crypto_lib::cryptanalysis::aes::{differential, linear, square, ReducedAes128};
 
@@ -2053,6 +2119,13 @@ fn cmd_aes_attack(
         .map_err(|_| "AES-128 key must be exactly 16 bytes".to_string())?;
     if !(1..=1_000_000).contains(&samples) {
         return Err("samples must be in 1..=1000000".into());
+    }
+    if technique != "square" && (export_pairs_file.is_some() || export_verification_file.is_some())
+    {
+        return Err("pair export is currently available for square only".into());
+    }
+    if export_pairs_file.is_some() && export_pairs_file == export_verification_file {
+        return Err("training and verification export paths must differ".into());
     }
     match technique {
         "differential" => {
@@ -2104,7 +2177,16 @@ fn cmd_aes_attack(
             }
         }
         "square" => {
+            if !(1..=6).contains(&square_sets) {
+                return Err("square-sets must be in 1..=6".into());
+            }
             let cipher = ReducedAes128::new(&key, 4, false);
+            if let Some(path) = export_pairs_file {
+                write_square_corpus(path, &cipher, seed, square_sets, 0)?;
+            }
+            if let Some(path) = export_verification_file {
+                write_square_corpus(path, &cipher, seed, 1, square_sets)?;
+            }
             let report = square::key_recovery_four_round(|p| cipher.encrypt(p));
             let verified = report.master_key == key;
             println!("# AES-128 four-round integral recovery");
@@ -2637,8 +2719,20 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             samples,
             seed,
             alpha,
+            export_pairs_file,
+            export_verification_file,
+            square_sets,
         } => {
-            if let Err(e) = cmd_aes_attack(&technique, &key_hex, samples, seed, alpha) {
+            if let Err(e) = cmd_aes_attack(
+                &technique,
+                &key_hex,
+                samples,
+                seed,
+                alpha,
+                export_pairs_file.as_deref(),
+                export_verification_file.as_deref(),
+                square_sets,
+            ) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }
@@ -2735,6 +2829,16 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
         }
         CryptanalysisOp::AesIntegralObserved { input } => {
             if let Err(e) = cli_aes_observed::integral(&input) {
+                eprintln!("error: {e}");
+                std::process::exit(1);
+            }
+        }
+        CryptanalysisOp::AesSquareObserved {
+            input,
+            verification_input,
+        } => {
+            if let Err(e) = cli_aes_observed::square_recover(&input, verification_input.as_deref())
+            {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }

@@ -2,6 +2,28 @@
 
 Source reviewed: `crypto` upstream main at `c6d64436a33359320ad9d5b42c4acebee2968b9a` and C `cryptanalysis` upstream main at `5a52a13877271144d88e62a82031826759696fc3`. This inventory covers runnable commands rather than inferring CLI support from library modules. A status of **verified** below applies only to the named local check, not arbitrary curves, algorithms, devices, or a live S3 account.
 
+## Current-head captured Square recovery — 2026-10-23
+
+`crypto cryptanalysis aes-square-observed --input FILE` accepts 1–6 complete
+four-round Square lambda sets, groups observations by their 15 fixed
+plaintext bytes, and requires byte zero to cover every value exactly once
+per set. It intersects last-round key-byte candidates from the captured
+ciphertexts, inverts the four-round AES-128 schedule, and replays every
+training pair. `--verification-input FILE` supplies held-out pairs; the
+result is `verified` only when every held-out pair matches and all
+plaintexts are distinct. Both files accept checked `store:NAME` and
+`sha256:DIGEST` references. The versioned format uses
+`aes128-reduced-final-no-mixcolumns/v1`, `technique: square`, `rounds: 4`,
+and `pairs` containing `plaintext` and `ciphertext` hex blocks. Legacy
+`plaintext_hex`/`ciphertext_hex` pairs remain accepted.
+
+`crypto cryptanalysis aes-attack --technique square` can export a versioned
+training corpus and a separate held-out corpus with `--export-pairs-file`
+and `--export-verification-file`. The [captured Square acceptance receipt](../store/AES_SQUARE_CORPUS_ACCEPTANCE_20261023.json)
+records the release CLI, corruption controls, and artifact storage checks.
+This path has a four-round reduced-AES scope; the three-round
+`aes-integral-observed` distinguisher remains a separate command.
+
 ## Current-head AES corpus interoperability — 2026-10-23
 
 `crypto cryptanalysis aes-differential-observed` accepts the versioned CRAx

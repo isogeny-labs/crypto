@@ -1,9 +1,9 @@
 //! Observed AES corpora for reduced-round recovery and general block statistics.
-use crypto_lib::cryptanalysis::aes::{differential, linear, mitm, reduced::ReducedAes128};
+use crypto_lib::cryptanalysis::aes::{differential, linear, mitm, reduced::ReducedAes128, square};
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{BTreeMap, HashMap, HashSet},
     fs,
     path::Path,
 };
@@ -148,6 +148,31 @@ fn parse_linear_input(bytes: &[u8]) -> Result<(LinearInput, &'static str), Strin
             verification_pairs: Vec::new(),
         },
         "crax-aes-corpus/v1",
+    ))
+}
+
+fn parse_square_input(bytes: &[u8]) -> Result<(LinearInput, &'static str), String> {
+    if !versioned_corpus(bytes)? {
+        return serde_json::from_slice(bytes)
+            .map(|input| (input, "crypto-observed/v1"))
+            .map_err(|e| e.to_string());
+    }
+    let corpus: CraxCorpus<CraxLinearPair> =
+        serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
+    check_crax_corpus(&corpus, "square", 4)?;
+    Ok((
+        LinearInput {
+            pairs: corpus
+                .pairs
+                .into_iter()
+                .map(|pair| Pair2 {
+                    plaintext_hex: pair.plaintext,
+                    ciphertext_hex: pair.ciphertext,
+                })
+                .collect(),
+            verification_pairs: Vec::new(),
+        },
+        "aes-square-corpus/v1",
     ))
 }
 
@@ -309,6 +334,114 @@ pub fn integral(input: &Path) -> Result<(), String> {
         }))
         .map_err(|e| e.to_string())?
     );
+    Ok(())
+}
+
+/// Recover a four-round AES-128 key from complete observed Square sets.
+pub fn square_recover(input: &Path, verification_input: Option<&Path>) -> Result<(), String> {
+    let bytes = read(input)?;
+    let (mut data, input_format) = parse_square_input(&bytes)?;
+    let mut verification_artifact = None;
+    let mut verification_format = None;
+    if let Some(path) = verification_input {
+        if !data.verification_pairs.is_empty() {
+            return Err("use either inline verification_pairs or --verification-input".into());
+        }
+        let held_out_bytes = read(path)?;
+        let (held_out, format) = parse_square_input(&held_out_bytes)?;
+        if !held_out.verification_pairs.is_empty() {
+            return Err("--verification-input must contain only pairs".into());
+        }
+        data.verification_pairs = held_out.pairs;
+        verification_artifact = Some(input_artifact(path, &held_out_bytes));
+        verification_format = Some(format);
+    }
+    if !(256..=1536).contains(&data.pairs.len())
+        || data.pairs.len() % 256 != 0
+        || data.verification_pairs.len() > 100_000
+    {
+        return Err(
+            "Square recovery needs 1..=6 complete lambda sets and <=100000 verification pairs"
+                .into(),
+        );
+    }
+    let mut seen = HashMap::new();
+    let training = parsed_pairs(&data.pairs, &mut seen)?;
+    if seen.len() != training.len() {
+        return Err("Square training plaintexts must be distinct".into());
+    }
+    let mut grouped: BTreeMap<[u8; 15], Vec<Option<[u8; 16]>>> = BTreeMap::new();
+    for (plaintext, ciphertext) in &training {
+        let fixed: [u8; 15] = plaintext[1..].try_into().expect("AES block length");
+        let slots = grouped.entry(fixed).or_insert_with(|| vec![None; 256]);
+        if slots[plaintext[0] as usize].replace(*ciphertext).is_some() {
+            return Err("duplicate plaintext in Square lambda set".into());
+        }
+    }
+    if grouped.len() != data.pairs.len() / 256
+        || grouped.values().any(|set| set.iter().any(Option::is_none))
+    {
+        return Err("each Square lambda set must cover all 256 values of plaintext byte 0".into());
+    }
+    let sets: Vec<Vec<[u8; 16]>> = grouped
+        .into_values()
+        .map(|slots| slots.into_iter().map(Option::unwrap).collect())
+        .collect();
+    let report = square::key_recovery_four_round_from_captured(&sets)?;
+    let cipher = ReducedAes128::new(&report.master_key, 4, false);
+    let training_matches = training
+        .iter()
+        .filter(|(p, c)| cipher.encrypt(p) == *c)
+        .count();
+    let training_ok = training_matches == training.len();
+    let training_plaintexts: HashSet<_> = training.iter().map(|(p, _)| *p).collect();
+    let mut verify_seen = seen;
+    let verification = parsed_pairs(&data.verification_pairs, &mut verify_seen)?;
+    if verification
+        .iter()
+        .any(|(plaintext, _)| training_plaintexts.contains(plaintext))
+        || verify_seen.len() != training.len() + verification.len()
+    {
+        return Err("verification plaintexts must be distinct from training and each other".into());
+    }
+    let verification_matches = verification
+        .iter()
+        .filter(|(p, c)| cipher.encrypt(p) == *c)
+        .count();
+    let status = if !training_ok {
+        "training_model_mismatch"
+    } else if verification.is_empty() {
+        "candidate"
+    } else if verification_matches == verification.len() {
+        "verified"
+    } else {
+        "verification_failed"
+    };
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&json!({
+            "schema_version":1,
+            "model":"aes-128-reduced-four-round-no-final-mixcolumns",
+            "method":"square-integral-last-round-key-recovery",
+            "status":status,
+            "input_format":input_format,
+            "input_artifact":input_artifact(input, &bytes),
+            "verification_format":verification_format,
+            "verification_artifact":verification_artifact,
+            "lambda_sets_used":report.lambda_sets_used,
+            "sbox_lookups":report.sbox_lookups,
+            "last_round_key_hex":hex::encode(report.last_round_key.concat()),
+            "candidate_key_hex":if training_ok {Some(hex::encode(report.master_key))} else {None},
+            "training_pairs":training.len(),
+            "training_matches":training_matches,
+            "verification_pairs":verification.len(),
+            "verification_matches":verification_matches
+        }))
+        .map_err(|e| e.to_string())?
+    );
+    if !training_ok || status == "verification_failed" {
+        return Err("Square candidate failed complete model replay".into());
+    }
     Ok(())
 }
 
@@ -746,6 +879,48 @@ pub fn linear_parity(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn square_capture_recovers_and_replays_a_separate_corpus() {
+        let key = [0x5bu8; 16];
+        let cipher = ReducedAes128::new(&key, 4, false);
+        let corpus = |bases: &[u8]| {
+            let pairs: Vec<_> = bases
+                .iter()
+                .flat_map(|&base_byte| {
+                    let mut base = [base_byte; 16];
+                    base[0] = 0;
+                    square::lambda_set(&base, 0).into_iter().map(|plaintext| {
+                        json!({"plaintext":hex::encode(plaintext),
+                               "ciphertext":hex::encode(cipher.encrypt(&plaintext))})
+                    })
+                })
+                .collect();
+            json!({"schema_version":1,"cipher_model":CRAX_CIPHER_MODEL,
+                   "technique":"square","rounds":4,"pairs":pairs})
+        };
+        let root = std::env::temp_dir().join(format!(
+            "aes-square-capture-{}-{}",
+            std::process::id(),
+            line!()
+        ));
+        fs::create_dir(&root).unwrap();
+        let training = root.join("training.json");
+        let held_out = root.join("held-out.json");
+        fs::write(&training, corpus(&[0x11, 0x22, 0x33]).to_string()).unwrap();
+        fs::write(&held_out, corpus(&[0x44]).to_string()).unwrap();
+        assert!(square_recover(&training, Some(&held_out)).is_ok());
+        assert!(square_recover(&training, Some(&training))
+            .unwrap_err()
+            .contains("distinct"));
+        let mut wrong_round = corpus(&[0x11, 0x22, 0x33]);
+        wrong_round["rounds"] = json!(3);
+        fs::write(&training, wrong_round.to_string()).unwrap();
+        assert!(square_recover(&training, Some(&held_out))
+            .unwrap_err()
+            .contains("round count"));
+        fs::remove_dir_all(root).unwrap();
+    }
 
     #[test]
     fn versioned_aes_corpora_require_the_exact_reduced_model() {
