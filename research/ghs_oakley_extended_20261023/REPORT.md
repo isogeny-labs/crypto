@@ -19,6 +19,7 @@ cargo run --release --bin ghs_screen -- --degree 155 --modulus 0x800000000000000
 cargo run --release --bin ghs_screen -- --degree 185 --modulus 0x20000000000000000000000000000200000000000000001 --a 0 --b 0x1ee9
 cargo run --release --example ghs_magic_spectrum
 cargo run --release --example ghs_oakley_isogeny_census -- 300
+cargo run --release --example ghs_relation_constants
 ```
 Outputs in `data/`. `data/census-single-representative-l3-SUPERSEDED.txt` is
 the first run (l = 3, one twist representative per orbit); it is kept, not
@@ -86,6 +87,29 @@ used.
    section 5a band at 0, 0.1 and 1 GAE is not applied, so **no ordering of
    arms is claimed**.
 
+## Measured relation-phase constants (Gaudry route, genus 16)
+`ghs_relation_constants` measures two inner loops in the same generic
+`F2mElement` arithmetic (unoptimized on both sides); output in
+`data/relation-constants.txt`.
+- **Smoothness probability.** A random monic degree-g polynomial over
+  F_(2^8) splits into distinct linear factors with probability within 0.4% to
+  10% of 1/g! for g = 2..6 (ratio measured/1/g!: 0.996, 0.988, 0.980, 0.973,
+  0.904). The ratio falls with g because q = 256 is small next to g; at
+  q = 2^31 the 1/g! value is the expected one but was not measured there
+  (2^-44 is out of reach). The `x^q = x (mod u)` splitting test agrees with
+  root finding on 5000 random degree-4 polynomials (0 disagreements).
+- **Cost per trial.** Degree-16 splitting test over F_(2^31): about 0.63 ms.
+  Affine EC addition proxy (1 inversion, 2 mul, 1 square) over F_(2^155):
+  about 7.4 microseconds.
+- **Result.** At genus 16 the relation phase alone needs about q/(1/16!) =
+  2^75.3 trials, 2^94.5 ns in total, against rho at 2^76.5 steps = 2^89.3 ns:
+  **5.2 bits slower**, before the factor-base build, divisor arithmetic and
+  linear algebra, so this is a lower bound for the plain Gaudry route.
+  Optimized code would shift both sides by unmeasured, different factors, so
+  the sign is a measurement of these two loops only, not of the best
+  implementations. It says nothing about the Diem/Nagao route, which needs far
+  fewer smoothness trials; that route is still unmeasured.
+
 ## Distance remaining
 Gaudry-type HCDLP: 27 to 30 bits above rho. Diem-type exponent: 18 to 22
 bits below rho before constants. Neither is a measured end-to-end cost.
@@ -97,11 +121,14 @@ lookup): 4488 passed, 0 failed, 119 ignored (the repo's own `#[ignore]` markers)
 
 ## Not done
 - Hess generalized covers (direction 1 proper): needs function-field
-  arithmetic; Magma, Sage and pdflatex are not installed here, and the
-  Menezes-Teske text could not be fetched (HTTP 403 on the PDF).
+  arithmetic. Magma and Sage are not installed; `pip install
+  passagemath-standard` was tried and failed with "No space left on device"
+  (about 3.3 GiB free; Sage needs several GiB more). The Menezes-Teske text
+  could not be fetched (HTTP 403 on the PDF).
 - Velu point-map transport at l >= 5 (the codomain is tested at l = 5, 7;
-  the point map is tested at l = 3 only); relation collection and linear
-  algebra with real constants.
+  the point map is tested at l = 3 only); the Diem/Nagao relation search,
+  factor-base build and linear algebra (only the Gaudry smoothness loop is
+  measured above).
 - Conductor: the release download returned HTTP 403 through the sandbox
   proxy; `go install` through the module proxy worked, but `conductor up`
   needs Postgres or a Docker daemon, neither of which runs here, so
