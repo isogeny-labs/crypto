@@ -155,7 +155,7 @@ row was read by hand and is classified in §5; none is a wrong citation.
 | 10 | Chord-parametrised small-root family over `F_p` (formulation) | **closed-by-theorem** for the small-unknown family: the chord system at `m = 2` is Semaev's `S₃` in the symmetric `(e₁, e₂)` encoding after a free linear elimination of the slope (symbolic and numeric desk check); every encoding has the same limit reach `2/(m(m+1)d)` = 1/6, 1/24, 1/80 and ceiling `1/(md)` = 1/4, 1/12, 1/32, so the `m = 4` kill fires (1/80 < 1/32 < 1/5) |
 | 11 | McGuire–Mueller Gröbner-free algorithms, ePrint 2017/1262 (literature verification) | **unverifiable-from-here**: the PDF is Cloudflare-blocked (`cf-mitigated: challenge`), the Caen server times out, no mirror found; provisional classification from second-hand evidence: Algorithm 2 (sum `m−1` base points, test membership) coincides with the repository's `rf-pairs`/`rf-mitm` oracles, Algorithm 1 is the same oracle with an algebraic evaluation step; both on the CGK line |
 | 12 | Theory gate: structured GGM and non-adaptive bounds (theory) | **unverifiable-from-here** for the one statement it most wants (the elliptic-curve theorem of ePrint 2026/384 could not be read); the 14-row classification is delivered: 3 leads can move the exponent in principle (01, 06, 10 conditional), 9 constant only, 0 excluded outright, 2 are not oracles; none of CGK, Shoup, DKM or SGGM constrains an oracle that reads coordinates, so "in principle" means "not excluded" |
-| 13 | Summation ideals (Faugère–Wallet) and Nagao on Joux–Vitse covers (formulation on the cover) | *pending (re-dispatched 2026-10-23)* |
+| 13 | Summation ideals (Faugère–Wallet) and Nagao on Joux–Vitse covers (formulation on the cover) | **closed-by-theorem** for the repository's cover paths: the `2^{(n−1)(g+1)}` drop needs characteristic 2 and a monomial `h₁` (2-rank at most 1), and Wallet's 2016 slides say "no reduction in characteristic `p > 2`"; both repository cover paths are odd-characteristic, the cubic-GHS `q^{1.30}` route has no Gröbner step at all (smoothness tests with large primes), and in the Joux–Vitse route the Nagao test survives only in the descent (53–56 % of `S` at `p = 1511`); the frozen `experiments/30_jv_cover_ccov.json` shows ideal degree 64 in all 10 rows, so the card's kill (an 8× fall) fires; the Jacobian's rational 2-torsion gives no quotient for `g ≥ 2` because translation by a 2-torsion class is an automorphism of `J`, not of the cover curve |
 | 14 | Prime-field digit and Kummer-tower systems as multi-homogeneous blocks (formulation) | **closed-by-theorem**: the bilinear and unmixed multilinear bounds do not apply (two structural hypotheses fail: the tower quadrics have block degree 2 and the system is over-determined); their formal values 7, 9, 11, 13 at `m = 3`, `N = 9–18` exceed the measured 6, 6, 7, 7 with a slope 3–7× too steep; any valid block bound has slope `(m−1)/m` in `N`, which the PKM note's §3.6 turns into at least `√r` per target |
 
 Table B. Ranking inputs and verification totals per lead.
@@ -174,7 +174,7 @@ Table B. Ranking inputs and verification totals per lead.
 | 10 | medium | none in the exponent; 5–11 % higher `δ` at equal multiplicity (2–3× smaller lattices) on oracles that cannot beat rho | zero-compute test done in the dossier; 0.5 person-day to confirm in the `05` MILP harness | 6 / 0 / 1; 12 / 0 |
 | 11 | low (text); medium (classification) | none; the relayed `O(p)` cost is a worse exponent than Table B's `m = 2` row (`r^{2/3}`) | 0.5 person-day once a host can download the CC BY PDF | 9 / 2 / 3; 13 / 0 |
 | 12 | medium (generic rows); low (algebraic rows) | none (a gate); routes the first test to LEAD-05 | 0.5 person-day to close the reading gap | 8 / 1 / 3; 10 / 0 |
-| 13 |  |  |  |  |
+| 13 | high (repository path); medium (even-characteristic numbers: Faugère–Wallet's HAL and Springer pages were unreachable, so the abstract and Wallet's slides were used) | none on any row: 1.0× at `q ≈ 2^11` in odd characteristic; a hypothetical even-characteristic Joux–Vitse cover would have `L = g`, giving at best degree 64 → 32 (a symbolic recount of the norm polynomial finds 64 → 64), about 1–6× per test (desk estimate); ECC2K-130 has no low-genus cover | T0 is a read-only `jq` over the frozen JSON (0.1 person-day, already run: `delta.max = 64` in every row); the even-characteristic control T1 (3–5 person-days, external CAS) is not recommended | pending |
 | 14 | medium | none on the exponent, and the sign is wrong; constant unknown, likely ≤ 1.5× | 0.5 person-day, < 1 CPU-minute | 10 / 0 / 0; 12 / 1 |
 
 ### 3.1 What the completed dossiers add beyond their verdicts
@@ -254,6 +254,12 @@ Table B. Ranking inputs and verification totals per lead.
   exponent (desk check: cost exponent per bit of `n` 0.81 at slope 1/20 and
   0.48 at 1/40, against rho's 0.5), which is why LEAD-05's fit of `D(n)` is the
   first test.
+- **LEAD-13.** Faugère–Wallet is not cited in the repository's SAT/SMT/Nagao
+  survey. Open items: the paper's statement for `L = g`, where its `g − L + 1`
+  formula and the dossier's recount differ by at most 2× in degree, and
+  whether the HCDLP step of `ghs_descent.rs` (the only repository code that
+  builds a characteristic-2 cover) uses Nagao. Constant-factor levers named
+  instead: a sieved or batched descent and cheaper line enumeration.
 - **LEAD-14.** The card's premise is wrong at source: Petit–Kosters–Messeng
   use a composition tower, not binary digits, and their experiments are
   `m = 2` only. Their Tables 4–5 (Magma, `m = 2`) independently reproduce the
