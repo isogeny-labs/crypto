@@ -11,29 +11,33 @@ pre-registered hypotheses)
 *On index calculus algorithms for subfield curves*, SAC 2020
 (ePrint 2020/1315).
 
-**Modular and low-genus carrier follow-up (2026-10-22):**
-[Round18](research/koblitz_modular_ic_20261018/rounds/18/REPORT.md)
-evaluates the diamond-2 correspondence and verifies a common unramified
-residual Hecke system on the rational 11-torsion lines. Exhausting33,554,432
-affine-linear x-functions per sign gives102 nonconstant finite fits; eight
-independent F1024 incidences reject all102. The actual integral factor
-inclusion and its divisor evaluator remain open. [Round17](research/koblitz_modular_ic_20261018/rounds/17/CM.md)'s
-conditional written prime-to11 existence argument is unchanged.
+**Modular and low-genus carrier follow-up (2026-10-23):**
+[Round19](research/koblitz_modular_ic_20261018/rounds/19/REPORT.md)
+exhausts335544320 controlled-pole x numerators across five denominator
+families, with quadratic y numerators and18 actual incidence constraints.
+Only64 constant maps survive; the evaluated integral factor inclusion,
+proper pole divisors and divisor evaluator remain open. Round17's
+conditional prime-to11 existence argument is unchanged.
 
-Canonical theta characters are determined by symmetry under the actual
-written pullback-class identification. The selected diagonal cover has
-B^-1 R B denominator105 and an exact modulo81 no-lift certificate.
-C=105B^-1 is an explicit integral refinement with B C=105I, compatible
-with R; its mixed theta action, F2 invariant basis and243 target sections
-remain open. Source-bound depth6 quartics exclude all four Q24 models;
-depth5 square/cube residuals also exclude the four Q26 models. Four new Q28
-models on nodes95,97,123 keep full saturation and proper embeddings open.
-Ninety-four new named Lean results prove structural implications, universal
-identities, finite matrix/source bindings and102 counterexample residues.
-Global modular/abelian geometry and native search exhaustion remain written
-or native, with exact scope in the proof map.
-[Round16](research/koblitz_modular_ic_20261018/rounds/16/REPORT.md)'s
-explicit level77 incidence and diamond twist remain frozen inputs.
+G25 constructs an explicit F2 orbit divisor of polarization3*105² H on
+the stable scalar cover for graphs0/2, with41 evaluated mixed sections.
+The primitive modulo5 transfer obstruction is cleared by this cover.
+All48 scalar-kernel probes show noninvariance, and the sections have
+forced fixed components. Canonical Pic2 matching, full weighted section
+spaces, kernel actions and243 target sections remain open.
+Coupled elliptic resultants exclude all four Q28 models;266 further
+pure-source resultants also exclude Q30. Four checked Q32 models on
+[123,124,126,127] remain unclassified. Whole saturation and proper
+polarized embeddings remain open. Seventy-nine new named Lean results
+cover the universal implications, actual source/leading-term/model
+bindings and constant-map controls; geometric bridges and native search
+exhaustion retain their explicit proof-map limits.
+
+[Round18](research/koblitz_modular_ic_20261018/rounds/18/REPORT.md)'s
+canonical symmetric characters, selected-cover rotation obstruction and
+scalar105 refinement remain frozen inputs. Its actual diamond-2 action
+and shared residual Hecke system remain valid; the new search extends
+its failed affine-linear ansatz. Earlier ranks and divisors stay unchanged.
 
 [Round15](research/koblitz_modular_ic_20261018/rounds/15/REPORT.md)'s
 level7p CM carriers include genus45589 for n=131 after a diamond twist.

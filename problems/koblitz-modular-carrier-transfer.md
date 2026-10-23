@@ -776,3 +776,64 @@ and proper polarized embeddings remain open. Ninety-four new named Lean
 results distinguish universal/finite proofs from native searches and written
 geometry. Earlier ranks, divisors and Round15 norm-source-fiber gaps remain
 frozen; no IC efficiency assessment is supplied.
+
+
+## Round19: controlled pole spaces, auxiliary invariants and coupled elimination
+
+[Round19](../research/koblitz_modular_ic_20261018/rounds/19/REPORT.md)
+examines335544320 x numerators across q=1,b,c,1+c,b+(1+c)c, with
+x=N/q² and y=M/q³, N affine and M quadratic over F32. Eighteen actual
+incidences leave only64 constant maps. The pole bounds are relative to
+coordinate pole divisors; their proper supports/multiplicities and a
+complete prescribed Riemann--Roch basis remain uncomputed. This is a
+bounded ansatz exclusion, not nonexistence of the integral map.
+
+Six explicit elementary-symmetric orbit sections now have a common mixed
+pole divisor on the scalar105 cover and pass768 actual torsion translates,
+rotation and twisted Frobenius controls. Their auxiliary polarization is
+2(I+J), of determinant80. Its failure to descend through the final degree361
+kernel is a specific degree obstruction. The requested canonical3L bundle
+is different and remains open; changing a character cannot fix the
+auxiliary polarization. Acceptance still requires its actual mixed
+trivializations, both kernel actions,243 sections and proper equations.
+
+The proposed higher-degree univariate separator fails for Q28, whose
+supported polynomial already has degree9. The coupled y*S norm produces
+four191-term degree19 resultants with sole boundary term U^19, excluding
+all four Q28 models under the actual source bridge. Q30 models on120,122
+are also excluded by266 exact pure-source resultants covering282 aliases.
+Q32 retains all previous constraints and has four checked uncapped models
+on123,124,126,127. These are unclassified: a complete simultaneous source
+arc must include every inverse witness, Kummer root and coefficient
+Frobenius component; otherwise a source-bound separator is needed.
+Whole saturated-ideal equality and proper boundary gluing remain open.
+
+The79 new named Lean results cover universal identities, determinant,
+monic-boundary and orbit implications, actual finite source/leading-term
+certificates, model checks and64 constant-map controls. Full native search,
+F360 semantics and modular/divisor/descent geometry remain outside the
+formalization. The existing norm460/367 source fibers/images and final
+integral subgroup/divisor evaluator acceptance criteria remain in force.
+No IC efficiency conclusion or rank promotion is made.
+
+
+G24 strengthens the bounded orbit-Gram null: every integral matrix transfer
+for the actual augmentation cycle kills its fixed vector modulo5, whereas
+both actual H and3H do not. This excludes every finite sum of integral
+elliptic-pullback orbit Grams in this basis, without a coefficient cap.
+It leaves invariant mixed bundles and general sections open. The next
+specific obligation is a rational trivialization of R*D-D for the corrected
+mixed3L divisor, with its fivefold cocycle and both kernel actions checked.
+The79-result proof map includes this structural transfer obstruction.
+
+
+G25 clears the primitive transfer obstruction on the actual scalar105
+cover for graphs0/2. Rows(C0/5,C1/5,C2,C3), their five rotations and
+weights(45,315,63,171) have exact Gram3*105² H. This gives a literal
+F2 effective mixed divisor and41 evaluated sections of the correct
+polarization. Their forced fixed weights(42,312,60,168) prevent a
+basepoint-free system, and all48 scalar-kernel probes show noninvariance.
+Acceptance now requires canonical symmetric Pic2 matching, complete
+weighted factor-section spaces and verified theta actions on both
+kernels. The other graphs and243 quotient sections remain open. The
+79-result proof map includes all four actual G25 matrix/source bindings.

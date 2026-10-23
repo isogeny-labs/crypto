@@ -527,3 +527,9 @@ pub(crate) mod boundary18;
 
 #[path = "boundary18_square.rs"]
 pub(crate) mod boundary18_square;
+
+#[path = "boundary19.rs"]
+pub(crate) mod boundary19;
+
+#[path = "boundary19_final.rs"]
+pub(crate) mod boundary19_final;

@@ -64,6 +64,7 @@ mod large_field;
 mod liftproof17;
 #[path = "../../../../src/cryptanalysis/curve_construction/lpoly.rs"]
 mod lpoly;
+mod mixed19;
 mod modular_geometry;
 mod modular_screen;
 mod n5_relations;
@@ -71,6 +72,7 @@ mod odd07;
 mod oddtheta17;
 mod ordinary13;
 mod polarized;
+mod poles19;
 mod proofs15;
 mod quotient_geometry;
 mod quotients06;
@@ -398,6 +400,58 @@ fn main() {
     }
     if args10.get(1).map(String::as_str) == Some("--round17-lifts") {
         oddtheta17::lifts::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round19-profile") {
+        survivors17::source19::profile(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--record-round19") {
+        round13_record::round19::record(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round19-check-identities") {
+        round13_record::round19::identities(std::path::Path::new(&args10[2]), false);
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round19-poles") {
+        poles19::run(std::path::Path::new(&args10[2]), args10[3].parse().unwrap());
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round19-resultant") {
+        survivors17::source19::resultant(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round19-repair") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::boundary19::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round19-final-repair") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::boundary19_final::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round19-mixed") {
+        mixed19::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round19-polarization") {
+        mixed19::polarization(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round19-orbit-obstruction") {
+        mixed19::obstruction(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round19-orbit-cover") {
+        mixed19::cover(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round19-family") {
+        survivors17::source19::family(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round19-map-proof") {
+        poles19::proof(std::path::Path::new(&args10[2]));
         return;
     }
     if args10.get(1).map(String::as_str) == Some("--round18-squares") {

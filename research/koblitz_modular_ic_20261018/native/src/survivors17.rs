@@ -217,3 +217,6 @@ pub(crate) mod companion18;
 
 #[path = "squares18.rs"]
 pub(crate) mod squares18;
+
+#[path = "source19.rs"]
+pub(crate) mod source19;

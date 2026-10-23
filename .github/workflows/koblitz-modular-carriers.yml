@@ -176,6 +176,16 @@ jobs:
           (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
           (cd "$round" && sha256sum -c validation-runs.tar.xz.sha256 && tar -xJf validation-runs.tar.xz && sha256sum -c validation-runs.sha256)
           "$round/REPLAY.sh"
+          git fetch --no-tags origin a2b8f27be5fb3faac9362430ef43245b3bce819d
+          research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-history "$round" a2b8f27be5fb3faac9362430ef43245b3bce819d
+      - name: Replay round 19 controlled poles, mixed sections and coupled elimination
+        shell: bash
+        run: |
+          set -euo pipefail
+          round=research/koblitz_modular_ic_20261018/rounds/19
+          (cd "$round" && sha256sum -c runs.tar.xz.sha256 && tar -xJf runs.tar.xz && sha256sum -c runs.sha256)
+          (cd "$round" && sha256sum -c validation-runs.tar.xz.sha256 && tar -xJf validation-runs.tar.xz && sha256sum -c validation-runs.sha256)
+          "$round/REPLAY.sh"
           research/koblitz_modular_ic_20261018/native/target/release/koblitz-modular-carriers --round16-verify-sources "$round"
       - name: Install pinned Lean
         run: |
