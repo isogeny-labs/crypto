@@ -5,7 +5,7 @@ use std::fs;
 use std::time::Instant;
 
 use crypto_lib::cryptanalysis::gaudry_quartic::{
-    solve_system4, solve_system_n, Curve4, E4, Fp4, Pt4, QuarticSolve, SymmetrisedS5,
+    solve_system4, solve_system_n, Curve4, Fp4, Pt4, QuarticSolve, SymmetrisedS5, E4,
 };
 use rand::rngs::StdRng;
 use rand::SeedableRng;
@@ -138,9 +138,8 @@ pub(crate) struct SymS4 {
 impl SymS4 {
     fn coeffs_last(c: &Curve4, x: &[E4; 3], vinv: &[[u64; 5]; 5]) -> [E4; 5] {
         let f = &c.f;
-        let vals: [E4; 5] = std::array::from_fn(|i| {
-            s4_direct(c, &[x[0], x[1], x[2], f.from_fp(i as u64)])
-        });
+        let vals: [E4; 5] =
+            std::array::from_fn(|i| s4_direct(c, &[x[0], x[1], x[2], f.from_fp(i as u64)]));
         std::array::from_fn(|j| {
             (0..5).fold(E4::ZERO, |acc, k| {
                 f.add(&acc, &f.scale(&vals[k], vinv[j][k]))
@@ -200,9 +199,10 @@ impl SymS4 {
                 let mut xp = E4::ONE;
                 let mut got = E4::ZERO;
                 for j in 0..5 {
-                    let cj = mv.iter().zip(&pre.coef).fold(E4::ZERO, |sum, (m, c)| {
-                        f.add(&sum, &f.mul(m, &c[j]))
-                    });
+                    let cj = mv
+                        .iter()
+                        .zip(&pre.coef)
+                        .fold(E4::ZERO, |sum, (m, c)| f.add(&sum, &f.mul(m, &c[j])));
                     got = f.add(&got, &f.mul(&cj, &xp));
                     xp = f.mul(&xp, &xr);
                 }
@@ -363,7 +363,14 @@ fn signed_relations(c: &Curve4, base: &[Pt4], target: &Pt4, ids: &[usize; 4]) ->
         for (j, &id) in ids.iter().enumerate() {
             let sign = if mask & (1 << j) == 0 { 1 } else { -1 };
             terms[j] = (id, sign);
-            sum = c.add(&sum, &if sign == 1 { base[id] } else { c.neg(&base[id]) });
+            sum = c.add(
+                &sum,
+                &if sign == 1 {
+                    base[id]
+                } else {
+                    c.neg(&base[id])
+                },
+            );
         }
         if sum == *target {
             terms.sort_unstable();
@@ -426,6 +433,7 @@ fn candidate_ids(
     ids.try_into().ok()
 }
 
+#[allow(dead_code)] // Imported by the one-target producer; unused in this standalone pilot.
 pub(crate) struct MixedCollect {
     pub relations: BTreeSet<Terms>,
     pub systems: u64,
@@ -441,6 +449,7 @@ pub(crate) struct MixedCollect {
 
 /// Complete polynomial relation collection for one mixed component pattern.
 /// Only k=1,2,3 are accepted; neither same-line S5 arm is called.
+#[allow(dead_code)] // Imported by the one-target producer; unused in this standalone pilot.
 pub(crate) fn collect_mixed_pattern(
     c: &Curve4,
     base: &[Pt4],
@@ -478,7 +487,11 @@ pub(crate) fn collect_mixed_pattern(
         let scale = if k == 1 { E4::ONE } else { E4([0, 0, 1, 0]) };
         for id in peel {
             for sign in [-1, 1] {
-                let pt = if sign == 1 { base[id] } else { c.neg(&base[id]) };
+                let pt = if sign == 1 {
+                    base[id]
+                } else {
+                    c.neg(&base[id])
+                };
                 let remain = c.sub(residual, &pt);
                 if remain.inf {
                     continue;
@@ -491,7 +504,11 @@ pub(crate) fn collect_mixed_pattern(
                 if let Some(solutions) = solve_system_n::<3>(&comps, 4, 10, 37, rng, &mut st) {
                     for sol in solutions {
                         if let Some(xs) = split(&sol, 37) {
-                            let peeled_x = if k == 1 { base[id].x.0[2] } else { base[id].x.0[0] };
+                            let peeled_x = if k == 1 {
+                                base[id].x.0[2]
+                            } else {
+                                base[id].x.0[0]
+                            };
                             if k == 1 {
                                 process(xs.to_vec(), vec![peeled_x]);
                             } else {
@@ -549,8 +566,12 @@ pub(crate) fn collect_mixed_pattern(
     }
 }
 
-fn run(k: usize, raw: &str) -> Value {
+fn run(k: usize, raw: &str, query_filter: Option<usize>, s5_degree: u8) -> Value {
     assert!(k <= 4);
+    assert!((29..=31).contains(&s5_degree));
+    if query_filter.is_some() || s5_degree != 29 {
+        assert!((k == 0 || k == 4) && query_filter == Some(2));
+    }
     let records: Vec<Value> = fs::read_to_string(raw)
         .expect("frozen mixed trace")
         .lines()
@@ -565,22 +586,40 @@ fn run(k: usize, raw: &str) -> Value {
     let g = point(&json!([rec["generator_x"], rec["generator_y"]]));
     let q = point(&json!([rec["target_x"], rec["target_y"]]));
     assert_eq!(c.mul(&g, 271), q);
-    let base: Vec<Pt4> = rec["base_coordinates"].as_array().unwrap().iter().map(point).collect();
+    let base: Vec<Pt4> = rec["base_coordinates"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(point)
+        .collect();
     assert_eq!(base.len(), 48);
     assert!(base[..36].iter().all(|pt| pt.x.0[1..] == [0, 0, 0]));
-    assert!(base[36..].iter().all(|pt| pt.x.0[0] == 0 && pt.x.0[1] == 0 && pt.x.0[3] == 0));
+    assert!(base[36..]
+        .iter()
+        .all(|pt| pt.x.0[0] == 0 && pt.x.0[1] == 0 && pt.x.0[3] == 0));
     let by_x: HashMap<E4, usize> = base.iter().enumerate().map(|(i, pt)| (pt.x, i)).collect();
     let mut rng = StdRng::seed_from_u64(0x5441_4747_4544_5335 ^ k as u64);
     c.f.reset_muls();
     c.reset_ops();
     let started = Instant::now();
-    let s4 = if k == 1 || k == 3 { Some(SymS4::precompute(&c, &mut rng)) } else { None };
-    let s5 = if k == 0 || k == 4 { Some(SymmetrisedS5::precompute(&c, &mut rng)) } else { None };
+    let s4 = if k == 1 || k == 3 {
+        Some(SymS4::precompute(&c, &mut rng))
+    } else {
+        None
+    };
+    let s5 = if k == 0 || k == 4 {
+        Some(SymmetrisedS5::precompute(&c, &mut rng))
+    } else {
+        None
+    };
     let precompute_muls = c.f.muls();
     let precompute_ms_l0 = started.elapsed().as_secs_f64() * 1e3;
     let trace = rec["query_trace"].as_array().unwrap();
     let mut rows = Vec::new();
     for (query_index, z) in trace.iter().take(4).enumerate() {
+        if query_filter.is_some_and(|wanted| wanted != query_index) {
+            continue;
+        }
         c.f.reset_muls();
         c.reset_ops();
         let (a, b) = (u(&z[0]), u(&z[1]));
@@ -618,11 +657,16 @@ fn run(k: usize, raw: &str) -> Value {
             let comps = s5_weil_line(pre, &c.f, &residual.x, &scale);
             st.weil_muls = c.f.muls() - before;
             systems += 1;
-            if let Some(solutions) = solve_system4(&comps, 8, 29, 37, &mut rng, &mut st, false) {
+            if let Some(solutions) =
+                solve_system4(&comps, 8, s5_degree, 37, &mut rng, &mut st, false)
+            {
                 for sol in solutions {
                     if let Some(xs) = split(&sol, 37) {
-                        if k == 0 { process(xs.to_vec(), Vec::new()) }
-                        else { process(Vec::new(), xs.to_vec()) }
+                        if k == 0 {
+                            process(xs.to_vec(), Vec::new())
+                        } else {
+                            process(Vec::new(), xs.to_vec())
+                        }
                     } else {
                         split_failures += 1;
                     }
@@ -638,20 +682,35 @@ fn run(k: usize, raw: &str) -> Value {
             let pre = s4.as_ref().unwrap();
             for id in peel {
                 for sign in [-1, 1] {
-                    let pt = if sign == 1 { base[id] } else { c.neg(&base[id]) };
+                    let pt = if sign == 1 {
+                        base[id]
+                    } else {
+                        c.neg(&base[id])
+                    };
                     let remain = c.sub(&residual, &pt);
-                    if remain.inf { continue; }
+                    if remain.inf {
+                        continue;
+                    }
                     let mut st = QuarticSolve::default();
                     let before = c.f.muls();
                     let comps = pre.weil_line(&c.f, &remain.x, &scale);
                     st.weil_muls = c.f.muls() - before;
                     systems += 1;
-                    if let Some(solutions) = solve_system_n::<3>(&comps, 4, 10, 37, &mut rng, &mut st) {
+                    if let Some(solutions) =
+                        solve_system_n::<3>(&comps, 4, 10, 37, &mut rng, &mut st)
+                    {
                         for sol in solutions {
                             if let Some(xs) = split(&sol, 37) {
-                                let peeled_x = if k == 1 { base[id].x.0[2] } else { base[id].x.0[0] };
-                                if k == 1 { process(xs.to_vec(), vec![peeled_x]) }
-                                else { process(vec![peeled_x], xs.to_vec()) }
+                                let peeled_x = if k == 1 {
+                                    base[id].x.0[2]
+                                } else {
+                                    base[id].x.0[0]
+                                };
+                                if k == 1 {
+                                    process(xs.to_vec(), vec![peeled_x])
+                                } else {
+                                    process(vec![peeled_x], xs.to_vec())
+                                }
                             } else {
                                 split_failures += 1;
                             }
@@ -671,7 +730,9 @@ fn run(k: usize, raw: &str) -> Value {
                             let pi = if si == 1 { base[i] } else { c.neg(&base[i]) };
                             let pj = if sj == 1 { base[j] } else { c.neg(&base[j]) };
                             let remain = c.sub(&c.sub(&residual, &pi), &pj);
-                            if remain.inf { continue; }
+                            if remain.inf {
+                                continue;
+                            }
                             let mut st = QuarticSolve::default();
                             let before = c.f.muls();
                             let comps = s3_weil(&c, &remain.x);
@@ -699,10 +760,19 @@ fn run(k: usize, raw: &str) -> Value {
         }
         let external_fp_muls = c.f.muls();
         let group_ops = c.ops();
-        let internal_fp_muls: u64 = system_stats.iter().map(|s| s.total_muls - s.weil_muls).sum();
+        let internal_fp_muls: u64 = system_stats
+            .iter()
+            .map(|s| s.total_muls - s.weil_muls)
+            .sum();
         let agree = got == reference;
-        eprintln!("k={k} residual {query_index}: {} systems, {} / {} signed relations, agree={agree}", systems, got.len(), reference.len());
-        rows.push(json!({"query_index":query_index,"a":a,"b":b,"recorded_total_hits":u(&z[2]),
+        eprintln!(
+            "k={k} residual {query_index}: {} systems, {} / {} signed relations, agree={agree}",
+            systems,
+            got.len(),
+            reference.len()
+        );
+        rows.push(
+            json!({"query_index":query_index,"a":a,"b":b,"recorded_total_hits":u(&z[2]),
             "reference_signed_relations":reference,"polynomial_signed_relations":got,
             "reference_fp_muls_excluded":reference_fp_muls_excluded,
             "reference_group_ops_excluded":reference_group_ops_excluded,
@@ -710,10 +780,12 @@ fn run(k: usize, raw: &str) -> Value {
             "splitting_failures":split_failures,"foreign_or_repeat":foreign_or_repeat,
             "external_fp_muls":external_fp_muls,"internal_fp_muls":internal_fp_muls,
             "group_ops":group_ops,"system_stats":system_stats,"agree":agree,
-            "wall_ms_l0":query_started.elapsed().as_secs_f64()*1e3}));
+            "wall_ms_l0":query_started.elapsed().as_secs_f64()*1e3}),
+        );
     }
-    json!({"status":if rows.iter().all(|r|r["agree"]==true){"pass"}else{"mismatch"},
+    json!({"status":if rows.iter().all(|r|r["agree"]==true && r["system_failures"]==0){"pass"}else{"partial"},
         "p":37,"b0":u(&rec["b0"]),"n":u(&rec["n"]),"seed":0,"target_scalar":271,
+        "query_index_filter":query_filter,"s5_macaulay_degree":s5_degree,
         "line_powers":[0,2],"base_size":base.len(),"line2_size":12,"k":k,
         "precompute_muls":precompute_muls,"precompute_ms_l0":precompute_ms_l0,
         "s4_interpolation_muls":s4.as_ref().map(|v|v.precompute_muls),
@@ -723,8 +795,22 @@ fn run(k: usize, raw: &str) -> Value {
 
 fn main() {
     let args: Vec<_> = env::args().collect();
-    assert_eq!(args.len(), 4, "usage: quartic_twist_tagged_s5 --k K MIXED_NDJSON");
+    assert!(
+        (4..=6).contains(&args.len()),
+        "usage: quartic_twist_tagged_s5 --k K MIXED_NDJSON [--query-index=2] [--s5-degree=30|31]"
+    );
     assert_eq!(args[1], "--k");
     let k: usize = args[2].parse().expect("k");
-    println!("{}", run(k, &args[3]));
+    let mut query_filter = None;
+    let mut s5_degree = 29;
+    for option in &args[4..] {
+        if let Some(value) = option.strip_prefix("--query-index=") {
+            query_filter = Some(value.parse().unwrap());
+        } else if let Some(value) = option.strip_prefix("--s5-degree=") {
+            s5_degree = value.parse().unwrap();
+        } else {
+            panic!("unrecognized option: {option}");
+        }
+    }
+    println!("{}", run(k, &args[3], query_filter, s5_degree));
 }

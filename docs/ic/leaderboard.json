@@ -170,6 +170,38 @@
    "path": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_v1.json",
    "sha256": "7623e510ffc219c144d734a169702f5f68dda244c71ecdf0e0a74c5d6a98fd48"
   },
+  "quartic_poly_k123": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_p37_v3.json",
+   "sha256": "04ca27dc67d3f7817541e592c7e11decfc7dd5b4ec3811642959a1380fe33d49"
+  },
+  "quartic_poly_k123_audit": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_audit_p37_v3.json",
+   "sha256": "7d443fc185426a47bbcd2b3a893f772dc12f7722b520327a473606053c6a36e5"
+  },
+  "quartic_poly_k12": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k12_p37_v1.json",
+   "sha256": "e5d8f52ba26180fdf8bbf4103f573f8b53391bb99aceee97375ae041160f7507"
+  },
+  "quartic_poly_k12_aa": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k12_p37_aa_v1.json",
+   "sha256": "c100b1d1e32e41dd0a34e0a9f40322d4290aa0dbbddc5b8fa5c6aefe4afe264d"
+  },
+  "quartic_poly_k12_audit": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k12_audit_p37_v1.json",
+   "sha256": "46f6fd0779b0e18f5e83a92a8e9a876b9b24feabc6b78140cffa491d332978fe"
+  },
+  "quartic_poly_k1": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_p37_v1.json",
+   "sha256": "9e7299c74b69844a575297d43dd3cf3cb6060749664ab36267d4d5c3eb271c4e"
+  },
+  "quartic_poly_k1_aa": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_p37_aa_v1.json",
+   "sha256": "a3bf3faa565f4ebff30ad64ed6ff973188e104c1f0c315dea542497a44e61a85"
+  },
+  "quartic_poly_k1_audit": {
+   "path": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_audit_p37_v1.json",
+   "sha256": "bf5877366f80a65b015bcfa8c0560846c164a5658133406c813ac3912c16e6b1"
+  },
   "planner_validation": {
    "path": "research/ic_planner_validation_20261020/analysis/summary.json",
    "sha256": "c8fb751cea39e55ebd1b322245c95a958ae8b47d393c6b6918abddcd2d4234fc"
@@ -50179,6 +50211,51 @@
   "class": "counted exact-oracle one-target improvement; no priced IC/rho row",
   "study": "research/twist_index_calculus_20261020/",
   "report": "research/twist_index_calculus_20261020/QUARTIC_TWIST24_REPORT.pdf"
+ },
+ "quartic_polynomial_component": {
+  "rows": [
+   {
+    "patterns": [
+     1,
+     2,
+     3
+    ],
+    "queries": 7,
+    "rank": 4,
+    "relations": 5,
+    "ic_fp_muls": 455838426,
+    "ic_group_ops": 8123,
+    "rho_fp_muls": 348941,
+    "rho_group_ops": 2745
+   },
+   {
+    "patterns": [
+     1,
+     2
+    ],
+    "queries": 7,
+    "rank": 4,
+    "relations": 5,
+    "ic_fp_muls": 154272224,
+    "ic_group_ops": 7619,
+    "rho_fp_muls": 348941,
+    "rho_group_ops": 2745
+   },
+   {
+    "patterns": [
+     1
+    ],
+    "queries": 8,
+    "rank": 4,
+    "relations": 4,
+    "ic_fp_muls": 116050118,
+    "ic_group_ops": 3936,
+    "rho_fp_muls": 348941,
+    "rho_group_ops": 2745
+   }
+  ],
+  "class": "counted native polynomial path; no priced IC/rho row",
+  "report": "research/twist_index_calculus_20261020/MIXED_POLYNOMIAL_REPORT.pdf"
  },
  "planner_component": {
   "rows": [

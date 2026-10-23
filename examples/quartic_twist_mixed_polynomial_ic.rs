@@ -9,7 +9,7 @@ use std::env;
 use std::fs;
 use std::time::Instant;
 
-use crypto_lib::cryptanalysis::gaudry_quartic::{Curve4, E4, Pt4};
+use crypto_lib::cryptanalysis::gaudry_quartic::{Curve4, Pt4, E4};
 use crypto_lib::cryptanalysis::quartic_folds::{construct_twist24, rho_twist24, Twist24Instance};
 use crypto_lib::cryptanalysis::residual_walk::{inv_mod, pow_mod};
 use rand::rngs::StdRng;
@@ -152,13 +152,18 @@ impl Matrix {
 fn relation_row(terms: &Terms, map: &OrbitMap, a: u64, b: u64, n: u64) -> ([u64; 4], u64) {
     let mut sum = [0u64; 4];
     for &(id, sign) in terms {
-        let coef = if sign == 1 { map.coef[id] } else { sub(0, map.coef[id], n) };
+        let coef = if sign == 1 {
+            map.coef[id]
+        } else {
+            sub(0, map.coef[id], n)
+        };
         sum[map.col[id]] = (sum[map.col[id]] + coef) % n;
     }
     ([sum[1], sum[2], sum[3], sub(0, b, n)], sub(a, sum[0], n))
 }
 
-fn run(raw: &str) -> Value {
+fn run(raw: &str, enabled_patterns: &[usize]) -> Value {
+    assert!(matches!(enabled_patterns, [1] | [1, 2] | [1, 2, 3]));
     let frozen: Vec<Value> = fs::read_to_string(raw)
         .expect("frozen trace")
         .lines()
@@ -188,7 +193,12 @@ fn run(raw: &str) -> Value {
         .collect();
     let mut rng_line2 = StdRng::seed_from_u64(0x1A4F_01D5 ^ 2);
     base.extend((1..37).filter_map(|x| c.lift_x(&c.f.scale(&t2, x), &mut rng_line2)));
-    let prior_base: Vec<Pt4> = rec["base_coordinates"].as_array().unwrap().iter().map(point).collect();
+    let prior_base: Vec<Pt4> = rec["base_coordinates"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(point)
+        .collect();
     assert_eq!(base, prior_base);
     assert_eq!(base.len(), 48);
     assert_eq!(base[0], inst.core.g);
@@ -219,7 +229,13 @@ fn run(raw: &str) -> Value {
     let mut stream_internal_muls = 0u64;
     let mut stream_group_ops = 0u64;
     let mut failed_systems = 0u64;
-    for (query_index, z) in rec["query_trace"].as_array().unwrap().iter().take(61).enumerate() {
+    for (query_index, z) in rec["query_trace"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .take(61)
+        .enumerate()
+    {
         let (a, b) = (u(&z[0]), u(&z[1]));
         c.f.reset_muls();
         c.reset_ops();
@@ -231,8 +247,9 @@ fn run(raw: &str) -> Value {
         stream_external_muls += residual_fp_muls;
         stream_group_ops += residual_group_ops;
         let mut patterns = Vec::new();
-        for k in 1..=3 {
-            let result = collect_mixed_pattern(&c, &base, &by_x, &residual, k, &s4, &mut rng_solver);
+        for &k in enabled_patterns {
+            let result =
+                collect_mixed_pattern(&c, &base, &by_x, &residual, k, &s4, &mut rng_solver);
             stream_external_muls += result.external_fp_muls;
             stream_internal_muls += result.internal_fp_muls;
             stream_group_ops += result.group_ops;
@@ -255,7 +272,11 @@ fn run(raw: &str) -> Value {
                 "internal_fp_muls":result.internal_fp_muls,"group_ops":result.group_ops,
                 "wall_ms_l0":result.wall_ms_l0}));
         }
-        eprintln!("query {query_index}: anchored rank {}, selected {}", matrix.rank, selected.len());
+        eprintln!(
+            "query {query_index}: anchored rank {}, selected {}",
+            matrix.rank,
+            selected.len()
+        );
         traces.push(json!({"query_index":query_index,"a":a,"b":b,
             "recorded_all_pattern_hits":u(&z[2]),"patterns":patterns,
             "residual_fp_muls":residual_fp_muls,"residual_group_ops":residual_group_ops,
@@ -270,14 +291,22 @@ fn run(raw: &str) -> Value {
     let verify_started = Instant::now();
     let mut factor_logs_verified = false;
     let mut recovered = None;
+    let mut physical_factor_logs = Vec::new();
     if let Some(logs) = solution {
         let target_log = logs[3];
         let reps_logs = [1, logs[0], logs[1], logs[2]];
-        let reps_ok = map.reps.iter().enumerate().all(|(j, &id)| c.mul(&inst.core.g, reps_logs[j]) == base[id]);
+        let reps_ok = map
+            .reps
+            .iter()
+            .enumerate()
+            .all(|(j, &id)| c.mul(&inst.core.g, reps_logs[j]) == base[id]);
         let points_ok = base.iter().enumerate().all(|(id, pt)| {
             c.mul(&inst.core.g, mm(reps_logs[map.col[id]], map.coef[id], n)) == *pt
         });
         factor_logs_verified = reps_ok && points_ok;
+        physical_factor_logs = (0..base.len())
+            .map(|id| mm(reps_logs[map.col[id]], map.coef[id], n))
+            .collect();
         if factor_logs_verified && c.mul(&inst.core.g, target_log) == inst.core.q {
             recovered = Some(target_log);
         }
@@ -290,9 +319,31 @@ fn run(raw: &str) -> Value {
     let rho = rho_twist24(&inst, 0);
     let rho_wall_ms_l0 = rho_started.elapsed().as_secs_f64() * 1e3;
     assert!(rho.correct && rho.recovered == Some(271));
-    let status = if recovered == Some(271) && failed_systems == 0 { "pass" } else { "partial" };
+    let status = if recovered == Some(271) && failed_systems == 0 {
+        "pass"
+    } else {
+        "partial"
+    };
+    let counted_ic_fp_muls = inst.model_fp_muls
+        + inst.twist_geometry_fp_muls
+        + inst.cubic_eigen_fp_muls
+        + inst.frob_eigen_fp_muls
+        + base_fp_muls
+        + map_fp_muls
+        + precompute_fp_muls
+        + stream_external_muls
+        + stream_internal_muls
+        + verify_fp_muls;
+    let counted_ic_group_ops = inst.cubic_eigen_group_ops
+        + inst.frob_eigen_group_ops
+        + base_group_ops
+        + map_group_ops
+        + stream_group_ops
+        + verify_group_ops;
     json!({"status":status,"p":37,"b0":2,"n":n,"seed":0,
+        "enabled_patterns":enabled_patterns,
         "public_target_scalar_for_postcheck":271,"recovered":recovered,
+        "solved_factor_and_target_logs":solution,"physical_factor_logs":physical_factor_logs,
         "base_size":base.len(),"folded_columns":map.reps.len(),
         "base_coordinates":base.iter().map(|pt|json!([pt.x.0,pt.y.0])).collect::<Vec<_>>(),
         "generator_x":inst.core.g.x.0,"generator_y":inst.core.g.y.0,
@@ -313,12 +364,26 @@ fn run(raw: &str) -> Value {
         "anchored_rank":matrix.rank,"selected_relations":selected,"trace":traces,
         "factor_logs_verified":factor_logs_verified,
         "verify_fp_muls":verify_fp_muls,"verify_group_ops":verify_group_ops,"verify_ms_l0":verify_ms_l0,
+        "counted_ic_fp_muls":counted_ic_fp_muls,"counted_ic_group_ops":counted_ic_group_ops,
         "ic_wall_ms_l0":ic_wall_ms_l0,"rho":rho,"rho_wall_ms_l0":rho_wall_ms_l0,
-        "hash_allocator_cpu_unpriced":true,"rho_native_hash_cpu_unpriced":true})
+        "hash_allocator_cpu_unpriced":true,"rho_native_hash_cpu_unpriced":true,
+        "missing_native_counters":["polynomial-solver hash probes and inserts",
+            "relation-set tree operations","allocator CPU and requested peak bytes",
+            "rho partition hashes, table lookups and inserts"]})
 }
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    assert_eq!(args.len(), 2, "usage: quartic_twist_mixed_polynomial_ic MIXED_NDJSON");
-    println!("{}", run(&args[1]));
+    assert!((2..=3).contains(&args.len()), "usage: quartic_twist_mixed_polynomial_ic MIXED_NDJSON [--patterns=1|--patterns=1,2|--patterns=1,2,3]");
+    let patterns = if args.len() == 3 {
+        args[2]
+            .strip_prefix("--patterns=")
+            .unwrap()
+            .split(',')
+            .map(|s| s.parse::<usize>().unwrap())
+            .collect::<Vec<_>>()
+    } else {
+        vec![1, 2, 3]
+    };
+    println!("{}", run(&args[1], &patterns));
 }

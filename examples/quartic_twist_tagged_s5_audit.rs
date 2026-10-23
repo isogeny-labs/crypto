@@ -2,7 +2,7 @@
 use std::collections::{BTreeSet, HashMap};
 use std::{env, fs};
 
-use crypto_lib::cryptanalysis::gaudry_quartic::{Curve4, E4, Pt4};
+use crypto_lib::cryptanalysis::gaudry_quartic::{Curve4, Pt4, E4};
 use serde_json::{json, Value};
 
 type Terms = [(usize, i8); 4];
@@ -30,14 +30,22 @@ fn parse_set(v: &Value) -> BTreeSet<Terms> {
         .collect()
 }
 fn signed_scalar(log: u64, sign: i8, n: u64) -> u64 {
-    if sign == 1 { log } else { (n - log) % n }
+    if sign == 1 {
+        log
+    } else {
+        (n - log) % n
+    }
 }
 fn replay_add(c: &Curve4, base: &[Pt4], target: &Pt4, terms: &Terms) {
     assert!(terms.windows(2).all(|w| w[0].0 < w[1].0));
     let mut sum = Pt4::INF;
     for &(id, sign) in terms {
         assert!(id < base.len() && (sign == 1 || sign == -1));
-        let pt = if sign == 1 { base[id] } else { c.neg(&base[id]) };
+        let pt = if sign == 1 {
+            base[id]
+        } else {
+            c.neg(&base[id])
+        };
         sum = c.add(&sum, &pt);
     }
     assert_eq!(&sum, target);
@@ -73,7 +81,12 @@ fn main() {
         y: e(&prior["target_y"]),
         inf: false,
     };
-    let base: Vec<Pt4> = prior["base_coordinates"].as_array().unwrap().iter().map(point).collect();
+    let base: Vec<Pt4> = prior["base_coordinates"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(point)
+        .collect();
     assert_eq!(base.len(), 48);
     assert_eq!(c.mul(&g, 271), q);
     let mut logs = HashMap::with_capacity(n as usize);
@@ -95,10 +108,9 @@ fn main() {
         for j in i + 1..base.len() {
             for si in [-1, 1] {
                 for sj in [-1, 1] {
-                    let key = (
-                        signed_scalar(base_logs[i], si, n)
-                            + signed_scalar(base_logs[j], sj, n)
-                    ) % n;
+                    let key = (signed_scalar(base_logs[i], si, n)
+                        + signed_scalar(base_logs[j], sj, n))
+                        % n;
                     let terms = [(i, si), (j, sj)];
                     pair_hash.entry(key).or_default().push(terms);
                     pairs.push((key, terms));
@@ -141,9 +153,15 @@ fn main() {
             }
             let raw_reference = parse_set(&row["reference_signed_relations"]);
             let polynomial = parse_set(&row["polynomial_signed_relations"]);
-            assert_eq!(expected, raw_reference, "producer oracle mismatch, k={k}, q={index}");
+            assert_eq!(
+                expected, raw_reference,
+                "producer oracle mismatch, k={k}, q={index}"
+            );
             assert_eq!(row["agree"], expected == polynomial);
-            assert!(polynomial.is_subset(&expected), "foreign polynomial relation, k={k}, q={index}");
+            assert!(
+                polynomial.is_subset(&expected),
+                "foreign polynomial relation, k={k}, q={index}"
+            );
             for relation in &polynomial {
                 replay_add(&c, &base, &target, relation);
             }
@@ -153,17 +171,34 @@ fn main() {
             missing_relations += expected.difference(&polynomial).count();
         }
         let complete = failed_systems == 0 && missing_relations == 0;
-        assert_eq!(rec["status"], if missing_relations == 0 { "pass" } else { "mismatch" });
-        reports.push(json!({"k":k,"queries":4,"oracle_signed_relations":total_relations,
+        assert_eq!(
+            rec["status"],
+            if failed_systems > 0 {
+                "partial"
+            } else if missing_relations > 0 {
+                "mismatch"
+            } else {
+                "pass"
+            }
+        );
+        reports.push(
+            json!({"k":k,"queries":4,"oracle_signed_relations":total_relations,
             "polynomial_signed_relations":polynomial_relations,"failed_systems":failed_systems,
-            "missing_signed_relations":missing_relations,"complete":complete}));
+            "missing_signed_relations":missing_relations,"complete":complete}),
+        );
     }
-    let total: usize = reports.iter().map(|v| u(&v["oracle_signed_relations"]) as usize).sum();
+    let total: usize = reports
+        .iter()
+        .map(|v| u(&v["oracle_signed_relations"]) as usize)
+        .sum();
     let recorded_total: usize = frozen_trace.iter().take(4).map(|z| u(&z[2]) as usize).sum();
     assert_eq!(total, recorded_total);
     let all_complete = reports.iter().all(|r| r["complete"] == true);
-    println!("{}", json!({"status":if all_complete {"pass"} else {"partial"},
+    println!(
+        "{}",
+        json!({"status":if all_complete {"pass"} else {"partial"},
         "p":37,"n":n,"enumerated_subgroup_logs":n,
         "base_size":48,"pair_postings":pairs.len(),"first_four_recorded_hits":recorded_total,
-        "first_four_replayed_hits":total,"arms":reports}));
+        "first_four_replayed_hits":total,"arms":reports})
+    );
 }

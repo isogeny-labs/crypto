@@ -275,6 +275,16 @@ One public target `[271]G` per canonical quartic twist. The reference retains on
 |--:|:--|:--|--:|--:|
 | 37 | 119,740,945 → 89,828,606 | 1,204,356 → 848,000 | 47,721,464 | 777,503 |
 
+## Quartic-twist mixed-pattern polynomial IC, outside tables A–C
+
+Native S4/S3 polynomial relation finding on the canonical p=37 twist, one public target `[271]G`, 48 signed physical factors and four twist-folded log columns. A scalar-keyed independent audit enumerated all 1,873,633 subgroup logs, replayed complete processed signed sets, rank, factor logs, target and same-process twist24 rho. The k=1 and k=1,2 arms have identical non-timing A/A records. Single-line S5 remained incomplete and is excluded from these restricted-pattern arms. Hash/tree and allocator CPU, peak bytes, calibrated GAE, isolated wall time and same-input external Gröbner controls are missing; no priced IC/rho row moves. [Report](../../research/twist_index_calculus_20261020/MIXED_POLYNOMIAL_REPORT.pdf).
+
+| Enabled patterns | Residuals | Signed relations / rank | Counted IC Fp M / group ops | Same-target twist24 rho Fp M / group ops |
+|:--|--:|:--|:--|:--|
+| 1,2,3 | 7 | 5 / 4 | 455,838,426 / 8,123 | 348,941 / 2,745 |
+| 1,2 | 7 | 5 / 4 | 154,272,224 / 7,619 | 348,941 / 2,745 |
+| 1 | 8 | 4 / 4 | 116,050,118 / 3,936 | 348,941 / 2,745 |
+
 ## Planner validation, outside tables A–C
 
 `ic plan` / `ic bench --auto` (ic-planner/1) chooses every `ic.pipeline` stage of a prime-field run; here its plan runs against every alternative one change away from it on six prime curves outside its evidence (class: engineering). The plan is the existing best recipe, chosen automatically, so no row above moves. Cells are S(alternative) / S(plan), ecbench `compare`, paired, cluster 95% interval, at w = 0; the band column is the ratio at w = 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md §5a). Supplementary curves are `prime_search` curves outside the registry, named by tag. Study: [research/ic_planner_validation_20261020/](../../research/ic_planner_validation_20261020/).
@@ -355,6 +365,14 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_aa_v2.json` — sha256 `c7176b30a8fe8764…`
 - `research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_native_audit_v2.json` — sha256 `4a2eda5132b9609a…`
 - `research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_v1.json` — sha256 `7623e510ffc219c1…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_p37_v3.json` — sha256 `04ca27dc67d3f781…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_audit_p37_v3.json` — sha256 `7d443fc185426a47…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k12_p37_v1.json` — sha256 `e5d8f52ba26180fd…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k12_p37_aa_v1.json` — sha256 `c100b1d1e32e41dd…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k12_audit_p37_v1.json` — sha256 `46f6fd0779b0e18f…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_p37_v1.json` — sha256 `9e7299c74b69844a…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_p37_aa_v1.json` — sha256 `a3bf3faa565f4ebf…`
+- `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_audit_p37_v1.json` — sha256 `bf5877366f80a65b…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`

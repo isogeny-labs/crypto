@@ -100,6 +100,8 @@ On the $p=13$ two-dimensional base, a separately frozen one-target exact-oracle 
 
 The complete measurements, per-curve S5 records, two-dimensional census, native audits, p=13 run, figures and write-once run reports are linked from `QUARTIC_TWIST24_REPORT.md`.
 
+The later registered mixed-component polynomial experiment is summarized in the final section of this PDF and in `MIXED_POLYNOMIAL_REPORT.pdf`; the six-query S5 pilot above remains its historical single-line baseline.
+
 #pagebreak()
 == Twist symmetry in the relation-finder pair table
 On the same p=13 two-dimensional base, the signed two-factor table has 5,112 entries modulo global sign. The 12 abscissa actions partition it into 426 orbits, each of size 12. The direct quotient stores one pair representative per orbit under 350 canonical sum-abscissa keys. It reconstructs transformed pairs when queried. On every one of the seven previously recorded residuals, its *complete signed four-factor decomposition set* equals that of the full pair table; all 4,041 decompositions and seven selected IC relations remain available. A full A/A rerun matched every non-timing field.
@@ -196,3 +198,18 @@ The registered p=37 combined producer charged model/base/input/eigen/map, a dire
 The total deltas of 29,912,339 $F_p M$ and 356,356 group operations equal the table-setup deltas exactly; all other counted phases match. The tagged table retained 47,721,464 requested bytes and the producer peaked 78,834,528 requested bytes above pre-table allocation. Its first-residual stream recorded 777,503 hash lookups and 324,839 candidate postings. The anchored matrix needed 32,453 modular operations; 17,251,447 additional operations checked an unanchored-rank diagnostic, so the shared-host L0 wall observation of 639.113 ms is not an isolated anchored-path time. Relative to the older 53-query full-table pilot, the combined counted ratios are 45.065-fold $F_p M$ and 49.178-fold group operations. This larger difference also includes generic dense-row extraction and a public known-log anchor, not only twist symmetry.
 
 The exact-oracle path still costs about 257 times the earlier same-target 24-fold rho $F_p M$ count and 309 times its group-operation count, as separate cross-run diagnostics. Polynomial $S_5$ decomposition enumeration, hash/allocator CPU, isolated timing and a matched in-process 0/0.1/1 GAE band remain unmeasured. The full source-linked report, raw records, run/A-A PDFs, audit and protocol are in the study directory.
+
+#pagebreak()
+== Mixed-component polynomial relation finding
+The later registered p=37 tagged-line experiment uses the same 36 line-0 and 12 line-2 physical factors. The twist and cubic action fold them into four factor-log columns. One signed line-2 factor can be peeled, leaving an $S_4$ polynomial in three symmetric line-0 abscissae. On the frozen seed-zero public target $[271]G$, four distinct k=1 signed relations in eight residuals reach anchored rank four and recover the target. An independent scalar-keyed auditor enumerated all 1,873,633 subgroup logs, replayed every processed signed set and checked the factor logs, target and rho.
+
+#table(columns: (1fr, .7fr, 1fr, 1fr), inset: 5pt,
+  [polynomial patterns], [residuals], [counted IC $F_p M$], [IC group operations],
+  [k=1,2,3], [7], [455,838,426], [8,123],
+  [k=1,2], [7], [154,272,224], [7,619],
+  [k=1], [8], [116,050,118], [3,936],
+)
+
+#image("mixed_polynomial_cost.png", width: 100%)
+
+The matched same-process twist24 rho used 348,941 counted $F_p M$ and 2,745 group operations. In their separate units, the restricted k=1 path uses 332.6 and 1.434 times those counts. No calibrated $S$ or isolated wall-speed ratio is available: hash/tree and allocator CPU, requested peak bytes, rho hash/table CPU, external same-input Gröbner comparison and ABAB isolation are missing. The all-one-line k=0 S5 arm missed one verified relation; k=4 had a failed system, and degree-30/31 retries failed to repair the native Macaulay border. This result is a complete *restricted-pattern* polynomial IC solve on one toy instance, not a complete union S5 or rho crossover. The full algebra, raw evidence, A/A controls, failure records and graphs are in `MIXED_POLYNOMIAL_REPORT.md` and its own PDF.

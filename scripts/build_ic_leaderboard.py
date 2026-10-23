@@ -90,6 +90,14 @@ SOURCES = {
     "quartic_dense_tagged_p37_aa": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_aa_v2.json",
     "quartic_dense_tagged_p37_audit": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_native_audit_v2.json",
     "quartic_dense_tagged_p37_previous": "research/twist_index_calculus_20261020/quartic_twist_2d_dense_tagged_p37_v1.json",
+    "quartic_poly_k123": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_p37_v3.json",
+    "quartic_poly_k123_audit": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_audit_p37_v3.json",
+    "quartic_poly_k12": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k12_p37_v1.json",
+    "quartic_poly_k12_aa": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k12_p37_aa_v1.json",
+    "quartic_poly_k12_audit": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k12_audit_p37_v1.json",
+    "quartic_poly_k1": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_p37_v1.json",
+    "quartic_poly_k1_aa": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_p37_aa_v1.json",
+    "quartic_poly_k1_audit": "research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_audit_p37_v1.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
     "n83_tier1_cold_holdout": "research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json",
@@ -766,6 +774,46 @@ def quartic_dense_component() -> dict:
             "report": "research/twist_index_calculus_20261020/QUARTIC_TWIST24_REPORT.pdf"}
 
 
+def quartic_polynomial_component() -> dict:
+    """Copy native one-target polynomial observations outside priced rows."""
+    def without_l0(value):
+        if isinstance(value, dict):
+            return {k: without_l0(v) for k, v in value.items() if not k.endswith("_ms_l0")}
+        if isinstance(value, list):
+            return [without_l0(v) for v in value]
+        return value
+
+    rows = []
+    for arm in ("k123", "k12", "k1"):
+        record = load(SOURCES[f"quartic_poly_{arm}"])
+        audit = load(SOURCES[f"quartic_poly_{arm}_audit"])
+        if arm != "k123":
+            repeat = load(SOURCES[f"quartic_poly_{arm}_aa"])
+            if without_l0(record) != without_l0(repeat):
+                raise SystemExit(f"quartic polynomial {arm}: A/A mismatch")
+        if (record["status"] != "pass" or audit["status"] != "pass"
+                or record["p"] != audit["p"] != 37
+                or record["n"] != audit["n"] != 1_873_633
+                or record["recovered"] != audit["recovered"] != 271
+                or record["anchored_rank"] != audit["anchored_rank"] != 4
+                or record["counted_ic_fp_muls"] != audit["ic_counted_fp_muls"]
+                or record["counted_ic_group_ops"] != audit["ic_counted_group_ops"]
+                or record["rho"]["fp_muls"] != audit["rho_counted_fp_muls"]
+                or record["rho"]["group_ops"] != audit["rho_counted_group_ops"]
+                or len(record["trace"]) != audit["queries"]
+                or len(record["selected_relations"]) != audit["selected_rows"]):
+            raise SystemExit(f"quartic polynomial {arm}: incomplete replay")
+        rows.append({"patterns": record["enabled_patterns"],
+                     "queries": audit["queries"], "rank": audit["anchored_rank"],
+                     "relations": audit["audited_signed_relations"],
+                     "ic_fp_muls": audit["ic_counted_fp_muls"],
+                     "ic_group_ops": audit["ic_counted_group_ops"],
+                     "rho_fp_muls": audit["rho_counted_fp_muls"],
+                     "rho_group_ops": audit["rho_counted_group_ops"]})
+    return {"rows": rows, "class": "counted native polynomial path; no priced IC/rho row",
+            "report": "research/twist_index_calculus_20261020/MIXED_POLYNOMIAL_REPORT.pdf"}
+
+
 PLANNER_ARMS = ["half-base", "double-base", "rootfind", "full-rank", "random-targets"]
 
 
@@ -1307,6 +1355,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "pair_table_component": pair_table_component(),
         "quartic_twist_pair_component": quartic_twist_pair_component(),
         "quartic_dense_component": quartic_dense_component(),
+        "quartic_polynomial_component": quartic_polynomial_component(),
         "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
     }
@@ -1757,6 +1806,24 @@ def markdown(doc: dict) -> str:
           f"| {follow['p']} | {follow['full_fp_muls']:,} → {follow['tagged_fp_muls']:,} | "
           f"{follow['full_group_ops']:,} → {follow['tagged_group_ops']:,} | "
           f"{follow['table_live_requested_bytes']:,} | {follow['tagged_lookup_calls']:,} |", ""]
+    qp = doc["quartic_polynomial_component"]
+    L += ["## Quartic-twist mixed-pattern polynomial IC, outside tables A–C", "",
+          "Native S4/S3 polynomial relation finding on the canonical p=37 twist, one public "
+          "target `[271]G`, 48 signed physical factors and four twist-folded log columns. "
+          "A scalar-keyed independent audit enumerated all 1,873,633 subgroup logs, replayed "
+          "complete processed signed sets, rank, factor logs, target and same-process twist24 rho. "
+          "The k=1 and k=1,2 arms have identical non-timing A/A records. Single-line S5 "
+          "remained incomplete and is excluded from these restricted-pattern arms. Hash/tree "
+          "and allocator CPU, peak bytes, calibrated GAE, isolated wall time and same-input "
+          "external Gröbner controls are missing; no priced IC/rho row moves. "
+          f"[Report](../../{qp['report']}).", "",
+          "| Enabled patterns | Residuals | Signed relations / rank | Counted IC Fp M / group ops | Same-target twist24 rho Fp M / group ops |",
+          "|:--|--:|:--|:--|:--|"]
+    for r in qp["rows"]:
+        L.append(f"| {','.join(map(str, r['patterns']))} | {r['queries']} | "
+                 f"{r['relations']} / {r['rank']} | {r['ic_fp_muls']:,} / {r['ic_group_ops']:,} | "
+                 f"{r['rho_fp_muls']:,} / {r['rho_group_ops']:,} |")
+    L.append("")
     pl = doc["planner_component"]
 
     def plq(a):
@@ -2303,6 +2370,27 @@ def page(doc: dict, standalone: bool) -> str:
              f'<td>{follow["full_group_ops"]:,} → {follow["tagged_group_ops"]:,}</td>'
              f'<td>{follow["table_live_requested_bytes"]:,}</td>'
              f'<td>{follow["tagged_lookup_calls"]:,}</td></tr>')
+    P.append('</tbody></table></section>')
+
+    qp = doc["quartic_polynomial_component"]
+    P.append('<section class="card" id="quartic-polynomial-component"><h2>Quartic-twist mixed-pattern polynomial IC, outside the priced tables</h2>'
+             '<p>Native S4/S3 polynomial relation finding on the canonical p=37 twist, one public '
+             'target <code>[271]G</code>, 48 signed physical factors and four twist-folded log '
+             'columns. A scalar-keyed audit enumerated all subgroup logs and replayed complete '
+             'processed signed sets, rank, factor logs, target and same-process twist24 rho. '
+             'The k=1 and k=1,2 arms have identical non-timing A/A records. Single-line S5 '
+             'remained incomplete and is excluded from these restricted-pattern arms. Hash/tree '
+             'and allocator CPU, peak bytes, calibrated GAE, isolated wall time and same-input '
+             'external Gröbner controls are missing; no priced row moves. '
+             f'<a href="{GITHUB}{esc(qp["report"])}">Report PDF</a>.</p>')
+    P.append('<table><thead><tr><th>Patterns</th><th>Residuals</th><th>Signed relations / rank</th>'
+             '<th>Counted IC Fp M / group ops</th><th>Same-target rho Fp M / group ops</th>'
+             '</tr></thead><tbody>')
+    for r in qp["rows"]:
+        P.append(f'<tr><td>{",".join(map(str, r["patterns"]))}</td><td>{r["queries"]}</td>'
+                 f'<td>{r["relations"]} / {r["rank"]}</td>'
+                 f'<td>{r["ic_fp_muls"]:,} / {r["ic_group_ops"]:,}</td>'
+                 f'<td>{r["rho_fp_muls"]:,} / {r["rho_group_ops"]:,}</td></tr>')
     P.append('</tbody></table></section>')
 
     pl = doc["planner_component"]
