@@ -29,33 +29,41 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
+      # The full-history checkout no longer fits a hosted runner: from
+      # 2026-10-23 04:20 UTC every run died with "No space left on device".
+      # The gate reads the head's working tree and, through `git show`, two
+      # files on the base tip, so it needs no history. Free the preinstalled
+      # SDKs it does not use, check out only the head, and fetch only the
+      # base tip; its blobs arrive on demand.
+      - name: Free runner disk
+        run: |
+          df -h /
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
       - uses: actions/checkout@v4
         with:
-          # Keep the complete current tree, without every historical archive.
           fetch-depth: 1
-          # Clone partially from the start. The base fetch below is filtered;
-          # adding a filtered ref to a repository that is not yet partial makes
-          # git repack every local object to record promisor links, which
-          # rewrites the whole current-tree pack and exhausted the runner disk.
-          # An already-partial clone skips that conversion, and the gate's two
-          # `git show <base>:…` reads fetch their blobs on demand.
           filter: blob:none
-      - name: Fetch the PR base for immutable-history comparisons
+      - name: Fetch the base tip
         if: github.event_name == 'pull_request'
         env:
           BASE_REF: ${{ github.base_ref }}
-        run: git fetch --no-tags --depth=1 --filter=blob:none origin "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+        run: |
+          git fetch --no-tags --depth=1 --filter=blob:none origin \
+            "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+          # validation_gate.py treats an unreadable base file as absent, so
+          # fail here rather than let the freeze comparison pass silently.
+          git rev-parse --verify "origin/$BASE_REF^{commit}"
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - name: The gate's own tests, with a positive and a negative fixture
         run: python3 scripts/test_validation_gate.py
       - name: Every leaderboard and benchmarks row is validated or frozen pre-gate
-        env:
-          BASE_REF: ${{ github.base_ref }}
         run: |
-          base=()
+          base=""
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            base=(--base "origin/$BASE_REF")
+            base="--base origin/${{ github.base_ref }}"
           fi
-          python3 scripts/validation_gate.py check "${base[@]}"
+          python3 scripts/validation_gate.py check $base
