@@ -1,72 +1,97 @@
 # Generalized GHS / Weil descent on the IPsec Oakley EC groups 3 and 4
 
-Date 2026-10-23. Status: structural screen, isogeny-neighbourhood census and
-an exponent-level cost model. **No attack, no speedup, no vulnerability claim.**
-Nothing here is a leaderboard or benchmark row, so no `VALIDATION.json`.
+Date 2026-10-23. Status: structural screen, exact magic-number spectrum,
+isogeny-neighbourhood census (both twists), exponent-level cost model.
+**No attack, no speedup, no vulnerability claim.** Nothing here is a
+leaderboard or benchmark row, so no `VALIDATION.json`.
 
-Curves (RFC 2409, bit i = z^i, a = 0): Group 3 `F_2[z]/(z^155+z^62+1)`,
-b = 0x07338f; Group 4 `F_2[z]/(z^185+z^69+1)`, b = 0x1ee9. The hex encodings
-are my reading of the RFC and should be checked against it before citing.
+Curves, checked against RFC 2409 sections 6.3 and 6.4 on 2026-10-23
+(a = 0 for both):
+
+| group | field | b | RFC group order |
+|---|---|---|---|
+| 3 | `u^155 + u^62 + 1` | 0x07338f | 0x0800000000000000000057db5698537193aef944 |
+| 4 | `u^185 + u^69 + 1` | 0x1ee9 | 0x01ffffffffffffffffffffffdbf2f889b73e484175f94ebc |
 
 ## Reproduce
 ```
 cargo run --release --bin ghs_screen -- --degree 155 --modulus 0x800000000000000000000004000000000000001 --a 0 --b 0x07338f
 cargo run --release --bin ghs_screen -- --degree 185 --modulus 0x20000000000000000000000000000200000000000000001 --a 0 --b 0x1ee9
-cargo run --release --example ghs_oakley_isogeny_census -- 2000
+cargo run --release --example ghs_magic_spectrum
+cargo run --release --example ghs_oakley_isogeny_census -- 300
 ```
-Outputs: `data/oakley3-screen.json`, `data/oakley4-screen.json`, `data/census-output.txt`.
+Outputs in `data/`. `data/census-single-representative-l3-SUPERSEDED.txt` is
+the first run (l = 3, one twist representative per orbit); it is kept, not
+used.
+
+## Corrections to the first version of this report
+1. The first cost model rows for m = 2, 3, 4 described magic numbers that
+   cannot occur for n = 5 (finding 2); they and the "0.8 bits above rho"
+   statement are withdrawn.
+2. The census recorded one twist per j-orbit while saying it covered both
+   (found in review of 85bcdcf0b); it now evaluates both and reports orbit
+   and representative counts separately.
+3. "Explicit characteristic-2 Velu isogeny not implemented" was wrong:
+   `src/cryptanalysis/binary_velu.rs` has it, checked against Phi_3 only.
 
 ## Findings
-1. **Classical GHS (direction 1 baseline).** Both curves have best magic
-   number m = 5 (n = 5; l = 31 / 37), genus 2^(m-1) = 16. Other towers are
-   far worse (genus 2^25 and up). MMT condition (8) holds; neither curve is in
-   the genus <= 4 range.
-2. **Isogenies (direction 2).** Phi_2 mod 2 = (X^2 - Y)(X - Y^2), so 2-isogenies
-   are Frobenius/Verschiebung and only identify conjugates; my first census
-   counted them as 155 distinct curves and was wrong. Counting Frobenius orbits
-   and moving with l = 3 only (the only odd l tabled):
-   - Group 3: a chain of 2000 distinct orbits (BFS depth 1000, so two
-     directions of one crater). Every one has m = 5 for n = 5. A hit at m = 4
-     is expected with probability about q^-1 = 2^-31 per orbit (heuristic), so
-     2000 orbits is no evidence either way.
-   - Group 4: **no rational 3-isogeny**; the orbit is isolated. Reaching other
-     orbits needs l = 5, 7, ... (Phi_l not tabled in `binary_isogeny.rs`).
-   - The walk is j-invariant level only; no explicit isogeny or kernel is built.
-3. **Practicality (direction 3).** Exponent-level model (`cost_model` in the
-   example; walk step cost 0.7 ms measured, converted at an UNMEASURED 100 ns
-   per rho step; hit probability q^(m-n)):
+1. **Classical GHS.** Best magic number m = 5 (n = 5; l = 31 / 37), genus
+   2^(m-1) = 16 (type II). Other towers are far worse. MMT condition (8)
+   holds. Neither curve is in the genus <= 4 range.
+2. **The magic-number spectrum (new, exact).** m(b) = deg Ord_b + c (MMT
+   Thm 5), where Ord_b divides x^n - 1 over **F_2** and c = 1 iff (x+1) does
+   not divide Ord_b. By the normal basis theorem every divisor other than 1
+   occurs. For odd n the irreducible factors are the cyclotomic cosets of 2
+   mod n. `ghs_magic_spectrum` computes the spectrum and confirms it by
+   enumerating every b != 0 in four small fields (N = 9, 10, 14, 15):
+   observed = predicted in all four.
+   - n = 5: spectrum {1, 5}. **Every curve not defined over the subfield has
+     m = 5**; no isogeny can lower it. m = 1 is the subfield case, which the
+     Oakley orders exclude by a size argument (not checked by computation here).
+   - n = 37: {1, 37}. n = 31: seven values, smallest above 1 is 6. n = 155:
+     62 values. n = 185: 12 values.
+   - So extended GHS by isogeny cannot reduce genus below 16 on the n = 5
+     tower. The question moves to Hess's generalized covers (different
+     Artin-Schreier functions), which this repository does not implement, and
+     to the cost of HCDLP at genus 16.
+3. **Isogeny census (both twists).** Phi_2 mod 2 = (X^2 - Y)(X - Y^2), so
+   2-isogenies are Frobenius/Verschiebung and identify conjugates. Moving by
+   l in {3, 5, 7} over Frobenius orbits, 300 orbits per curve, 600 twist
+   representatives:
+   - Group 3: n = 5: all 600 have m = 5 (as finding 2 requires). n = 31:
+     m in {26, 31}. n = 155: m in {126, 145, 146, 150, 151, 155}. Every
+     observed value lies in the tower's spectrum.
+   - Group 4: see `data/census-both-twists-l3-5-7.txt` (the earlier result
+     "no rational 3-isogeny" still holds for l = 3 only; l = 5, 7 open it up).
+   - Walk is j-invariant level; no isogeny or kernel is built by the census.
+4. **Cost model (exponent level, NOT a measurement).** Only m = 5 exists, so
+   there is no walk cost:
 
-   | curve | m | genus | walk | Gaudry g!q^2 | rho |
-   |---|---|---|---|---|---|
-   | Oakley 3 | 5 | 16 | 2^13 | 2^106.3 | 2^76.5 |
-   | Oakley 3 | 4 | 8 | 2^44 | 2^77.3 | 2^76.5 |
-   | Oakley 3 | 3 | 4 | 2^75 | 2^66.6 | 2^76.5 |
-   | Oakley 4 | 5 | 16 | 2^13 | 2^118.3 | 2^91.5 |
-   | Oakley 4 | 4 | 8 | 2^50 | 2^89.3 | 2^91.5 |
-   | Oakley 4 | 3 | 4 | 2^87 | 2^78.6 | 2^91.5 |
+   | curve | genus | Gaudry g!q^2 (constant 1) | Diem/Nagao q^(2-2/g), exponent only | rho |
+   |---|---|---|---|---|
+   | Group 3 | 16 | 2^106.3 (+29.8 bits vs rho) | 2^58.1 (-18.4 bits, constant unknown) | 2^76.5 |
+   | Group 4 | 16 | 2^118.3 (+26.8 bits) | 2^69.4 (-22.1 bits, constant unknown) | 2^91.5 |
 
-   Oakley 3 at m = 4 sits 0.8 bits above rho at constant 1, so the hidden
-   constants decide it, and that is the precise open item (Menezes-Teske
-   section 10). Oakley 4 at m = 4 is 2.2 bits below rho in the same model, but
-   only if an m = 4 orbit were reachable, and it has no 3-isogeny. Nagao-type
-   q^(2-2/g) is shown as exponent only; its constant is unknown, so it is not
-   a bound. Units differ between walk, HCDLP and rho (field operations vs
-   group operations); the section 5a band at 0, 0.1 and 1 GAE is not applied,
-   so **no ordering of arms is claimed**.
+   The two columns disagree in sign, so the exponent analysis does not decide
+   it: the hidden constant of a genus-16 Diem-type relation search and its
+   sparse linear algebra is the open cost question (Menezes-Teske, section
+   10). Menezes-Teske (ePrint 2004/235) record GF(q^5) as weak under plain
+   GHS, so these curves sit in the regime the literature already flags.
+   Units differ between columns and rho (field vs group operations); the
+   section 5a band at 0, 0.1 and 1 GAE is not applied, so **no ordering of
+   arms is claimed**.
 
-## Distance remaining (success-criterion framing)
-Unmodified GHS is far from rho on both curves (Gaudry model 2^106 vs 2^76.5
-and 2^118 vs 2^91.5). The one configuration within error of rho is an
-undiscovered m = 4 isogenous curve for Group 3.
+## Distance remaining
+Gaudry-type HCDLP: 27 to 30 bits above rho. Diem-type exponent: 18 to 22
+bits below rho before constants. Neither is a measured end-to-end cost.
 
-## Not done (and why)
+## Not done
 - Hess generalized covers (direction 1 proper): needs function-field
-  arithmetic (Magma/Sage; neither is installed here). Nothing in this change
-  searches for smaller genus than classical GHS.
-- Explicit char-2 Velu isogeny, Phi_l for l >= 5, genus-4..8 relation
-  collection and linear algebra with real constants.
-- No replay certificate, validator report or matched rho in the section 5a
-  band, so this is not eligible for the leaderboard or `benchmarks/`.
-- Conductor is not installed in this session; no `conductor check` was run.
-- PDF: pdflatex is absent; the graph is `ghs-oakley.svg` (hand-laid from the
-  table above).
+  arithmetic; Magma, Sage and pdflatex are not installed here, and the
+  Menezes-Teske text could not be fetched (HTTP 403 on the PDF).
+- Velu transport at l >= 5 (only l = 3 has a test); relation collection and
+  linear algebra with real constants.
+- Conductor: the release download returned HTTP 403 through the sandbox
+  proxy, so `conductor check` was not run.
+- No replay certificate, validator report or section 5a matched rho, so
+  this is not eligible for the leaderboard or `benchmarks/`.

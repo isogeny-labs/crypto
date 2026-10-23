@@ -59,7 +59,7 @@ fn census(name: &str, n_deg: u32, mid: u32, a: &str, b: &str, towers: &[u32], ma
                 reps += 1;
                 if ok && best.map_or(true, |(bm, _)| m < bm) { best = Some((m, d)); }
             }
-            for &ell in &[3u32, 5, 7, 11, 13] {
+            for &ell in &[3u32, 5, 7] {
                 for nb in l_isogenous_neighbours(&cur, ell) {
                     if seen.insert(canon(&nb)) {
                         q.push_back((nb, d + 1));
@@ -72,34 +72,31 @@ fn census(name: &str, n_deg: u32, mid: u32, a: &str, b: &str, towers: &[u32], ma
     }
 }
 
-/// Exponent-level log2 cost model for the extended GHS attack on
-/// `E/F_(q^n)`, q = 2^l, target magic m. NOT a measured result.
-/// - P(hit) per isogeny-class orbit ~ q^(m-n) (GHS fraction heuristic).
-/// - walk: (n-m)*l + WALK_STEP_LOG2, where one l=3 orbit step measured
-///   ~0.7 ms here, taken as 2^13 rho-step-equivalents (assumes 100 ns per
-///   rho step: an UNMEASURED assumption, see the report).
-/// - HCDLP, genus g = 2^(m-1): Gaudry g!*q^2 (constant 1, concrete) and
-///   Nagao q^(2-2/g) (exponent only, hidden constant unknown: not a bound).
-const WALK_STEP_LOG2: f64 = 13.0;
-
-fn cost_model(name: &str, big_n: u32, n: u32, rho_log2: f64) {
+/// Exponent-level log2 cost model for GHS on `E/F_(q^n)`, q = 2^l, at the
+/// admissible magic numbers of the tower. NOT a measured result.
+/// - Only m in the tower's spectrum exist (`ghs_magic_spectrum`). For n = 5
+///   that is {1, 5}: every curve not defined over the subfield has m = 5, so
+///   an isogeny walk cannot lower the genus and there is no walk cost.
+/// - HCDLP in genus g = 2^(m-1): Gaudry g!*q^2 (constant 1, concrete) and
+///   Nagao/Diem-type q^(2-2/g) (exponent only, hidden constant unknown: this
+///   is the open cost question of Menezes-Teske section 10, not a bound).
+fn cost_model(name: &str, big_n: u32, n: u32, rho_log2: f64, admissible: &[u32]) {
     let l = (big_n / n) as f64;
     let lg = |g: f64| (1..=(g as u64)).map(|k| (k as f64).log2()).sum::<f64>();
     println!("cost model {name}: N={big_n} n={n} q=2^{l} rho~2^{rho_log2}");
-    for m in 2..=n {
+    for &m in admissible {
         let g = (1u64 << (m - 1)) as f64;
-        let walk = (n - m) as f64 * l + WALK_STEP_LOG2;
         let gaudry = lg(g) + 2.0 * l;
         let nagao = (2.0 - 2.0 / g) * l;
-        let total_g = walk.max(gaudry);
-        println!("  m={m} g={g:>2} walk=2^{walk:>6.1} gaudry=2^{gaudry:>6.1} nagao(exp only)=2^{nagao:>5.1} total(gaudry)=2^{total_g:>6.1} {}",
-            if total_g < rho_log2 { "below rho (constant-1 model)" } else { "above rho" });
+        println!("  m={m} g={g:>2} gaudry=2^{gaudry:>6.1} ({:+.1} bits vs rho)  nagao(exp only)=2^{nagao:>5.1} ({:+.1} bits vs rho, constant unknown)",
+            gaudry - rho_log2, nagao - rho_log2);
     }
 }
 
 fn main() {
-    cost_model("oakley3", 155, 5, 76.5);
-    cost_model("oakley4", 185, 5, 91.5);
+    // n = 5: x^5-1 = (x+1)(x^4+..+1) over F_2, so m is 1 or 5 (see ghs_magic_spectrum).
+    cost_model("oakley3", 155, 5, 76.5, &[5]);
+    cost_model("oakley4", 185, 5, 91.5, &[5]);
     let cap: usize = std::env::args().nth(1).and_then(|s| s.parse().ok()).unwrap_or(300);
     census("oakley3", 155, 62, "0", "7338f", &[5, 31, 155], cap);
     census("oakley4", 185, 69, "0", "1ee9", &[5, 37, 185], cap);
