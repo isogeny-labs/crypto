@@ -1,9 +1,9 @@
 {
   "schema": "ecbench.spec/v1",
   "label": "audit (accounting v2): j = 0 curve floor",
-  "description": "The deep-dive review's j = 0 reproduction (y^2 = x^3 + 2 over F_4194397, prime order 1048627). The order-3 automorphism acts on the subgroup, so the floor is sqrt(pi / 12) (A = 6, boundaries.floor_rule automorphisms/v2), where the first rule read A = 2 and rho.cubic 0.91x its floor. rho.cubic_v2 charges the set-up [kappa]G ledger the frozen id leaves out of its total. Expect rho.cubic_v2 above 1x the floor and rho.negation_v2 near sqrt(3) x rho.cubic_v2.",
+  "description": "A registered j = 0 prime curve (y^2 = x^3 + 1 over F_23736841, p = 1 mod 3, #E = 23727108 = 12 * 1977259, prime subgroup order 1977259 = 1 mod 3). The order-3 automorphism acts on the subgroup, so the floor is sqrt(pi / 12) (A = 6, boundaries.floor_rule automorphisms/v2), where the first rule read A = 2 and rho.cubic about 0.91x its floor. rho.cubic_v2 charges the set-up [kappa]G ledger the frozen id leaves out of its total. Expect rho.cubic_v2 above 1x the floor and rho.negation_v2 near sqrt(3) x rho.cubic_v2.",
   "workloads": {
-    "curves": [{"kind": "prime_explicit", "p": 4194397, "a": 0, "b": 2, "group_order": 4194508, "r": 1048627, "gx": 2359468, "gy": 1145958}],
+    "curves": [{"kind": "prime_explicit", "p": 23736841, "a": 0, "b": 1, "group_order": 23727108, "r": 1977259, "gx": 19157303, "gy": 13563414}],
     "targets_per_curve": 6,
     "target_seed": 7
   },

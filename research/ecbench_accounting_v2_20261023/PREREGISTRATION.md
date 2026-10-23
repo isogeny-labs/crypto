@@ -240,3 +240,21 @@ branch's audit checks `automorphisms_used <= automorphisms_available`. The
 session is therefore kept as a verbatim archive (`archive/`), not as a session
 directory the CI audit would pick up, and its audit receipts (the branch
 binary's failing one and the main binary's passing one) are committed.
+
+**A4 (2026-10-23, after the first j = 0 sessions and their audits; before the
+second j = 0 sessions).** The j = 0 curve of Q1 (y^2 = x^3 + 2 over F_4194397)
+is not in `docs/curves/registry.json`, which CI's `names` check
+(`scripts/check_curve_names.py`, AGENTS.md section 11) requires of every slug
+written in tracked files. Q1 and the `frozen-j0` cross-binary check are
+therefore re-run on the registered j = 0 curve `icv1-fp25-t9734-bcfe9f51`
+(y^2 = x^3 + 1 over F_23736841, p = 1 mod 3, #E = 23727108 = 12 x 1977259,
+r = 1977259 = 1 mod 3, generator from the registry, `ecbench plan` reports
+`registered=true`, A = 6). The PR's spec `docs/ecbench/specs/check-prime-j0-floor-v2.json`
+(added by the unmerged PR) now names this curve; `specs/frozen-j0.json` names
+it too. Outcome O1, its falsifier, the secondary figures and the prior for the
+old-floor reading are unchanged, and the floor values are the same (A = 6:
+0.5117; A = 2: 0.8862). The first run (r = 1 048 627, 24 runs per arm: `rho.cubic_v2`
+S / floor 1.514, frozen `rho.cubic` 0.911 on the old floor) is kept, unedited,
+under `archives/fp23-first-run/` and reported beside the second as a replication
+on a second curve; the choice of the new curve was made before its data and
+the first run's numbers were known when it was made.
