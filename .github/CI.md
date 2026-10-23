@@ -186,3 +186,36 @@ The classifier tests exercise real git history, dependencies, unrelated prose,
 workflow changes, embedded data, renames/deletions, newline-containing paths,
 more than 300 changed files, and fail-closed comparisons. No cryptographic
 algorithm, scientific result, or frozen session is modified by this change.
+
+## Runner capacity and stalled PRs (2026-10-22)
+
+Measured from the public Actions API on 2026-10-22 at about 17:00 UTC:
+
+- 807 workflow runs were queued, 790 of them for PRs. Sampled queued jobs had
+  waited a median of about 8 hours (maximum 9.7 hours). The waits were on the
+  self-hosted ARC pools, not on GitHub-hosted runners: 46 sampled jobs waited
+  for `crypto-eks-linux` (6 of its 11 runners busy) and 41 for
+  `crypto-eks-highmem`, which has `maxRunners: 1`.
+- `CRYPTO_EKS_HIGHMEM_WORKFLOWS` sends the always-on PR gates to that single
+  runner: `codeql.yml`, `rust-all-targets.yml`, `rust-lint.yml`,
+  `curve-names.yml`, `ecbench.yml`, `workflows-parse.yml` and
+  `workflow-lint.yml`. Every PR push queues those gates behind every other
+  PR's gates, one job at a time, including YAML parsing and the
+  scope classifier.
+- Each PR push starts a median of 16 workflow runs (up to 39). Of the latest
+  1,000 runs (8.5 hours), 549 were cancelled by a newer push to the same PR,
+  148 succeeded and 11 failed.
+- Of 187 open PRs, none had a complete green head. 40 waited on queued
+  checks, 41 had failing checks, 2 had conflicts, about 80 carried
+  `needs-human` and about 24 were based on another PR's branch.
+
+Rolling back the high-memory routing of the PR gates removes the one-runner
+bottleneck without a workflow change. Each workflow then falls back to
+`crypto-eks-linux` if it is listed in `CRYPTO_EKS_WORKFLOWS`, or otherwise to
+its original GitHub-hosted label. Queued jobs keep the label they were created
+with, so they must be cancelled and re-run (see
+[the ARC README](../taskq/deploy/eks-karpenter/arc/README.md)).
+
+`merge-sweeper.yml` applies the AGENTS.md merge gate to every open PR every
+30 minutes, so a green PR lands after its authoring session has ended. It
+reports only until `MERGE_SWEEPER_APPLY` is `true`.
