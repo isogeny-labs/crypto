@@ -1,0 +1,50 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m17-tm101-00378d4e | 16.00 | bsgs-neg | 32/32 | 0.917 | 1.006 | 1.803 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | bsgs-neg-v2 | 32/32 | 0.998 | 1.086 | 1.884 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | claw | 32/32 | 1.163 | 1.290 | 2.434 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | claw-v2 | 32/32 | 1.243 | 1.370 | 2.515 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rho-frob | 32/32 | 1.141 | 1.195 | 1.684 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rho-frob-v2 | 32/32 | 1.122 | 1.177 | 1.680 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rho-frob-v2-aa | 32/32 | 1.122 | 1.177 | 1.680 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rho-strong | 32/32 | 3.941 | 4.064 | 5.170 | — |
+| icv1-f2m17-tm101-00378d4e | 16.00 | rho-strong-v2 | 32/32 | 0.901 | 0.970 | 1.597 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m17-tm101-00378d4e | bsgs-neg vs bsgs-neg-v2 | bsgs-neg < bsgs-neg-v2 |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg vs claw | bsgs-neg < claw |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg vs claw-v2 | bsgs-neg < claw-v2 |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg vs rho-frob | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg vs rho-frob-v2 | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg vs rho-frob-v2-aa | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg vs rho-strong | bsgs-neg < rho-strong |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg vs rho-strong-v2 | rho-strong-v2 < bsgs-neg |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg-v2 vs claw | bsgs-neg-v2 < claw |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg-v2 vs claw-v2 | bsgs-neg-v2 < claw-v2 |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg-v2 vs rho-frob | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg-v2 vs rho-frob-v2 | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg-v2 vs rho-frob-v2-aa | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg-v2 vs rho-strong | bsgs-neg-v2 < rho-strong |
+| icv1-f2m17-tm101-00378d4e | bsgs-neg-v2 vs rho-strong-v2 | rho-strong-v2 < bsgs-neg-v2 |
+| icv1-f2m17-tm101-00378d4e | claw vs claw-v2 | claw < claw-v2 |
+| icv1-f2m17-tm101-00378d4e | claw vs rho-frob | rho-frob < claw |
+| icv1-f2m17-tm101-00378d4e | claw vs rho-frob-v2 | rho-frob-v2 < claw |
+| icv1-f2m17-tm101-00378d4e | claw vs rho-frob-v2-aa | rho-frob-v2-aa < claw |
+| icv1-f2m17-tm101-00378d4e | claw vs rho-strong | claw < rho-strong |
+| icv1-f2m17-tm101-00378d4e | claw vs rho-strong-v2 | rho-strong-v2 < claw |
+| icv1-f2m17-tm101-00378d4e | claw-v2 vs rho-frob | rho-frob < claw-v2 |
+| icv1-f2m17-tm101-00378d4e | claw-v2 vs rho-frob-v2 | rho-frob-v2 < claw-v2 |
+| icv1-f2m17-tm101-00378d4e | claw-v2 vs rho-frob-v2-aa | rho-frob-v2-aa < claw-v2 |
+| icv1-f2m17-tm101-00378d4e | claw-v2 vs rho-strong | claw-v2 < rho-strong |
+| icv1-f2m17-tm101-00378d4e | claw-v2 vs rho-strong-v2 | rho-strong-v2 < claw-v2 |
+| icv1-f2m17-tm101-00378d4e | rho-frob vs rho-frob-v2 | rho-frob-v2 < rho-frob |
+| icv1-f2m17-tm101-00378d4e | rho-frob vs rho-frob-v2-aa | rho-frob-v2-aa < rho-frob |
+| icv1-f2m17-tm101-00378d4e | rho-frob vs rho-strong | rho-frob < rho-strong |
+| icv1-f2m17-tm101-00378d4e | rho-frob vs rho-strong-v2 | rho-strong-v2 < rho-frob |
+| icv1-f2m17-tm101-00378d4e | rho-frob-v2 vs rho-frob-v2-aa | unresolved inside the band |
+| icv1-f2m17-tm101-00378d4e | rho-frob-v2 vs rho-strong | rho-frob-v2 < rho-strong |
+| icv1-f2m17-tm101-00378d4e | rho-frob-v2 vs rho-strong-v2 | rho-strong-v2 < rho-frob-v2 |
+| icv1-f2m17-tm101-00378d4e | rho-frob-v2-aa vs rho-strong | rho-frob-v2-aa < rho-strong |
+| icv1-f2m17-tm101-00378d4e | rho-frob-v2-aa vs rho-strong-v2 | rho-strong-v2 < rho-frob-v2-aa |
+| icv1-f2m17-tm101-00378d4e | rho-strong vs rho-strong-v2 | rho-strong-v2 < rho-strong |
