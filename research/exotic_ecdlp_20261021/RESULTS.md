@@ -14,9 +14,9 @@ the full validation gate (`docs/VALIDATION_GATE.md`) before any claim; none has.
 | H3 | canonical-lift p-adic digits (C3) | **KILL** (on scale) | min additive-defect 0.99996 (≈1−1/p, no character); MI within null; small-p closure "signal" is a miscalibrated null (z spans −2.9…+5.0 across sibling curves) | no size function; nothing survives to cryptographic scale |
 | H2 | Hermitian Néron–Severi spectrum (C2) | **KILL on a surrogate only** | non-tautological corank 0 at p=7, 11, 13 (rank equals the random baseline; p=31 censored). The matrix has 26 to 82 columns against 2,752 to 30,772 rows, so full column rank was near-certain and the test had little power. The true restriction to a Legendre fibre does not exist (genus and Kodaira mismatch), so a norm-circle model was used | not a rho comparison; the real C2 object is untested |
 | H4 | FPPR descent to F_2, first-fall trend (C4) | **INCONCLUSIVE on the trend; Win excluded by a cost bound** | first-fall degree is exactly 7 at all nine prime n from 11 to 41 (62 systems). The metric is uninformative: the equations have degree 6, so the first fall is 6+1 by construction. Solving degree resolved only at n=11, where it equals the 12 variables (no gain over exhaustive search) | any Macaulay solve needs degree at least 7 over 132 variables at n=131: at least 2^87.4 bit-ops per relation, 66 bits over the 2^21 gate and 22 bits over the 2^65 rho floor (recomputed independently; guessing variables first does not lower it at fixed degree) |
-| H5 | Ulmer Legendre d=p^2+1 kernel (C5) | in progress | — | — |
+| H5 | Ulmer Legendre d=p^2+1 kernel (C5) | **KILL, weak** | corank 48 of 50 at p=7 and 120 of 122 at p=11; only two geometric relations (twice the all-ones and signed sums, both 2-torsion). The corank metric is close to automatic, because the kernel of a map into a finite group always has full rank r. The Néron–Severi height pairing was not computed, so geometric relations beyond Ulmer's two were not searched for | not a rho comparison |
 
-Five of six have a verdict, but only H0, H1 and H3 are clean Kills: H2 is surrogate-only and weak, and H4 is inconclusive on its pre-registered trend, each decided on the correct gate — cost or scale, not a
+All six have run. Only H0, H1 and H3 are clean Kills. H2 and H5 are weak Kills whose metrics had little power, and H4 is inconclusive on its pre-registered trend, each decided on the correct gate — cost or scale, not a
 confounded proxy. In every case the script's strict per-cell rule and the directed final verdict
 are both recorded in `H*/out/result.json` (`verdict` vs `verdict_script_output` /
 `verdict_literal_3pt_amortized_fit`), so the override trail is auditable.
@@ -51,9 +51,7 @@ empirically.
 
 - **H2:** finished as `-r4` (4 CPU, 8Gi) after the earlier jobs never scheduled, failed on JSON serialisation, or were OOM-killed at p=31. See the verdict table for why this Kill is weak. Two protocol errors were found and are corrected in PROOFS.md and the H2 protocol: the line count of H(3,p^2) is (p+1)(p^3+1), not (p^3+1)(p^2+1), which is the point count; and the incidence spectrum of N N^T is {(p+1)(p^2+1), p^2+p, 0}, not the list originally stated.
 - **H4:** finished as `-r3` on 4 CPU and 8Gi (the 16 and 8 CPU pods never scheduled on Spot). The pre-registered trend test failed to discriminate, because the first-fall degree is pinned to the equation degree plus one. The informative quantity is the solving degree, which is censored for n of 13 and above. The 130.6-bit figure in the fit block comes from the single n=11 point and should be ignored. The bound that stands is the 2^87.4 lower bound. It is not a measured solving cost. It does not cover algorithms that lower the degree by guessing variables or by other structure, and the FGHR 4-torsion symmetrization was not applied. A real C4 test needs the solving degree measured at n of 13 to 23 with an exact solver, which is a follow-up.
-- **H5 (Ulmer f=2 kernel):** the 8-vCPU pods could not schedule on Spot; resubmitted single-threaded
-  at 4 vCPU (`-r3`, running). Deviation from the pre-registered 16 GiB noted; the code is
-  single-threaded so the kernel numbers are unaffected.
+- **H5:** finished as `-r6` on 4 CPU and 8Gi after three infrastructure failures and three bugs in the runner's own code. The recalled Ulmer rank formula predicts one geometric relation and the data show two. That does not change the verdict and was not re-derived. At p=11 the fibre loop stopped at 53 of 70 fibres and the exact function-field check was not run.
 
 ## Infrastructure notes (for reproducibility)
 
@@ -63,3 +61,9 @@ the runners piped from, truncating programs to empty; (2) the MCP command-argume
 rejected large scripts, fixed by staging each program through S3 and having the pod pull it. After
 the fixes a 17.7 KB script ran clean end to end. AWS Spot returned `MaxSpotInstanceCountExceeded`
 under load, which delayed and failed some larger-pod jobs; this is censoring, not evidence.
+
+## What the program established, and what it did not
+
+Three conjectures survive as measured walls on their probes: the interval-base monoid (C0), symmetrized small roots (C1) and the canonical-lift digits (C3). Two more survive only because their tests were weak (C2, C5). C4, the one route that exists on ECC2-131, is not settled: the pre-registered metric was uninformative, and a lower bound of 2^87 for plain Macaulay solving excludes a win but is not a measured cost.
+
+Nothing here threatens rho on either Certicom curve, and nothing triggers the validation gate. The follow-ups that would turn weak results into real ones are: solving degree at n of 13 to 23 with an exact solver (C4), the Néron–Severi Gram matrix for the Hermitian family (C2 and C5), and a faithful restriction of the surface to a fibre if one exists.
