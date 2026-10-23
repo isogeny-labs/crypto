@@ -530,3 +530,49 @@ degree is a diagnostic repair of the native solver, not evidence that
 the initial degree-29 run succeeded or that `S5` is competitive with
 the mixed-pattern pipeline. Cap each arm at 1,200 seconds and 8 GiB;
 retain timeouts and failures.
+
+## Registered larger-curve k=1 polynomial scaling panel
+
+Frozen 23 October 2026 after the audited p=37 restricted-pattern solve,
+before generalizing the k=1 collector or implementing the scaling driver.
+Use the already registered canonical quartic twists `(p,b0,r) =
+(73,5,28,408,033)` and `(97,5,88,538,353)`, the exact signed `L0∪L2`
+bases, generators, public `[271]G` targets and seed-`0,1,2` residual
+streams recorded in `quartic_twist_mixed_v1.ndjson`. The six workloads
+are separate one-target runs, never a shared multi-target precomputation.
+For each, process the recorded stream in order through its full recorded
+length (117/120/122 queries at p=73 and 558/458/481 at p=97), stopping
+only when the public-generator-anchored matrix reaches all folded-column
+unknowns or the stream is exhausted. Use only the `k=1` polynomial path:
+peel every signed `L2` point, solve the symmetrised S4 in three `L0`
+abscissae, split all field roots, reconstruct all physical signs and
+re-add every accepted four-factor relation. Do not sample favorable
+residuals or read 271 during relation or matrix construction.
+
+Generalize the p=37 collector only by replacing fixed line boundaries,
+field size and orbit-column count with the reconstructed base and curve
+parameters. Re-run p=37 seed zero from the generalized collector and
+require exact equality of all non-timing relation sets, selected rows,
+matrix solution and counters with the frozen k=1 record before using any
+larger result. Reconstruct the 24-action map and all factor logs in each
+producer. Charge model, eigenvalues, base, map, S4 interpolation, every
+attempted S4 system (including zero-root and failed systems), root
+filtering, group sign verification, matrix work and final checks. Run
+the strongest same-target 24-fold rho in the same process and record its
+field and group counts, failures and exact scalar. Retain null and
+censored one-target results, not only successes.
+
+An independent auditor must build complete signed `k=1` sets for every
+processed residual with a separately keyed signed-pair group oracle,
+compare the entire set, replay the twist orbit coefficients and matrix
+using distinct elimination code, and verify each solved factor log and
+target by scalar multiplication. For p=73/p=97, a baby-step/giant-step
+subgroup-log table or equivalent exact certificate may replace exhaustive
+`r`-element enumeration, provided every base point's log is independently
+verified. Run A/A for each workload and compare all non-timing fields.
+Use an 8 GiB address-space cap and 1,200-second watchdog **per producer
+and auditor**; a timeout or OOM is a censored result. Keep per-run visual
+reports and PDFs, matched controls, and raw failures. The same-input
+msolve/Magma comparison, native hash/allocator CPU, calibrated GAE and
+isolated ABAB timing remain separate gates; counted-unit scaling is not
+a priced IC/rho claim.
