@@ -735,12 +735,10 @@ fn check(air: &AirV2, config: &StarkConfig, proof: &StarkProofV2) -> Result<(), 
     let depth = lde_size.trailing_zeros() as usize;
     let h_lde = coset(lde_size, &coset_shift());
     let h_trace = subgroup(n);
-    let omega = &h_trace[1];
 
     let (alpha1, alpha2) = absorb_trace_draw_alphas(&mut transcript, &proof.trace_commit);
     // z is the verifier's own draw: outside H_trace and the coset.
     let z = absorb_composition_draw_z(&mut transcript, &proof.composition_commit, n, lde_size);
-    let wz = fr_mul(omega, &z);
     let ood = &proof.ood;
     let coeffs = absorb_ood_draw_deep(&mut transcript, ood).ok_or(Reject::OodValue)?;
     // The AIR holds at z: Comp(z) is the composition of f(z), f(ωz).
