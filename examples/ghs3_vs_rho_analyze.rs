@@ -238,7 +238,55 @@ fn main() {
     writeln!(md, "\n## Crossover against R_ideal\n").unwrap();
     writeln!(md, "OLS of log2(IC / R_ideal) on log2 q over {} instances: slope {:.4} [{:.4}, {:.4}] per bit; root log2 q = **{:.2}** [{:.2}, {:.2}] (95% bootstrap over curves within size, 10,000 resamples).",
         pts.len(), slope, q(&slopes, 0.025), q(&slopes, 0.975), root, q(&roots, 0.025), q(&roots, 0.975)).unwrap();
+    // POST HOC (not in PROTOCOL.md): IC cost depends on q only, rho on ell = N / c, so the
+    // ratio carries the cofactor c. Group by c and regress log2 ratio on (log2 q, log2 c).
+    writeln!(md, "\n## Post hoc (not preregistered): the ratio by cofactor\n").unwrap();
+    writeln!(md, "IC cost depends on `q` alone; rho on `ell = #E0 / c`. So `IC / R_ideal` carries `sqrt(c)`. Labelled post hoc; it moves no preregistered decision.\n").unwrap();
+    writeln!(md, "| cofactor c | log2 q | curve | IC/R_ideal |").unwrap();
+    writeln!(md, "|---:|---:|---:|---:|").unwrap();
+    let mut by_c: Vec<(u64, u32, u32, f64, f64)> = insts
+        .iter()
+        .map(|i| {
+            let n = i.ell * (2f64.powi(3 * i.b as i32) / i.ell).round();
+            let c = (n / i.ell).round() as u64;
+            (c, i.b, i.curve, i.ic / (i.r_ideal_ops * i.gae), i.ell)
+        })
+        .collect();
+    by_c.sort_by(|a, b| (a.0, a.1, a.2).cmp(&(b.0, b.1, b.2)));
+    for (c, b, cu, r, _) in &by_c {
+        writeln!(md, "| {c} | {b} | {cu} | {r:.3} |").unwrap();
+    }
+    // OLS of log2 ratio on (b, log2 c) by normal equations
+    let rows3: Vec<(f64, f64, f64)> = insts
+        .iter()
+        .map(|i| {
+            let c = 2f64.powi(3 * i.b as i32) / i.ell;
+            (i.b as f64, c.log2(), (i.ic / (i.r_ideal_ops * i.gae)).log2())
+        })
+        .collect();
+    let n = rows3.len() as f64;
+    let (mx, mc, my) = (
+        rows3.iter().map(|r| r.0).sum::<f64>() / n,
+        rows3.iter().map(|r| r.1).sum::<f64>() / n,
+        rows3.iter().map(|r| r.2).sum::<f64>() / n,
+    );
+    let (mut sxx, mut scc, mut sxc, mut sxy, mut scy) = (0.0, 0.0, 0.0, 0.0, 0.0);
+    for r in &rows3 {
+        let (dx, dc, dy) = (r.0 - mx, r.1 - mc, r.2 - my);
+        sxx += dx * dx;
+        scc += dc * dc;
+        sxc += dx * dc;
+        sxy += dx * dy;
+        scy += dc * dy;
+    }
+    let det = sxx * scc - sxc * sxc;
+    let bq = (scc * sxy - sxc * scy) / det;
+    let bc = (sxx * scy - sxc * sxy) / det;
+    let a0 = my - bq * mx - bc * mc;
+    let root_c4 = -(a0 + bc * 2.0) / bq;
+    writeln!(md, "\nOLS `log2(IC/R_ideal) = a + b_q log2 q + b_c log2 c`: b_q = **{bq:.4}** per bit (theory 4/3 - 3/2 = -0.1667 per bit of `q` at fixed `c`), b_c = **{bc:.3}** (theory 0.5); a = {a0:.3}. At c = 4 the fitted ratio is 1 at log2 q = {root_c4:.2}. Point estimates only (21 instances).").unwrap();
     let summary = json!({
+        "post_hoc_cofactor_fit": {"b_q": bq, "b_c": bc, "a": a0, "root_log2_q_at_c4": root_c4, "label": "post hoc, not preregistered"},
         "schema": "ghs3-vs-rho-summary/v1", "protocol": "research/ghs3_vs_rho_20261023/PROTOCOL.md",
         "candidate_arm": format!("w:lpsgebw2@cx{CAND}"),
         "gate0_identical_to_round4": gate0, "all_correct": correct,
