@@ -75,6 +75,8 @@ enum Action {
     Run(RunArgs),
     /// Solve a specified public target on a bounded prime-field curve.
     SolvePrime(prime_external::PrimeArgs),
+    /// Solve a bounded prime-field public target from a checked JSON artifact.
+    SolvePrimeFile(prime_external::PrimeFileArgs),
     /// Generate bounded certified prime-field IW1 isogeny routes for a public target.
     PrimeRouteGenerate(prime_external::PrimeRouteGenerateArgs),
     /// Solve a specified public target over a bounded cubic extension field.
@@ -627,6 +629,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Estimate(a)) => estimate(a),
         Some(Action::Run(a)) => run_cmd(a, cli.json),
         Some(Action::SolvePrime(a)) => prime_external::solve(a),
+        Some(Action::SolvePrimeFile(a)) => prime_external::solve_file(a),
         Some(Action::PrimeRouteGenerate(a)) => prime_external::generate_route(a),
         Some(Action::SolveCubic(a)) => cubic_external::solve(a),
         Some(Action::CubicGraph(a)) => cubic_route::enumerate_j(a),

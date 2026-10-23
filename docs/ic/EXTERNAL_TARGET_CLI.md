@@ -10,7 +10,22 @@ an independent multiplication of the supplied generator.
 ```sh
 ic solve-prime --p 271 --a 1 --b 19 --n 281 \
   --gx 3 --gy 7 --qx 231 --qy 54 --seed 42 --json
+ic solve-prime-file --input docs/ic/fixtures/prime271_target_input_20261023.json \
+  --seed 42 --rho-steps 0 --json
 ```
+
+`solve-prime-file` is available through both `ic` and `icx`. It accepts a
+local JSON path or indexed `store:NAME` and `sha256:DIGEST` reference with the
+eight integer fields `p`, `a`, `b`, `n`, `gx`, `gy`, `qx`, and `qy`; unknown or
+missing fields are rejected. The file is capped at 64 KiB and the report
+records its SHA-256 and byte count in `input_artifact`. The command calls the
+same field, subgroup, relation, isogeny-route, and scalar-verification code
+as the flag-based `solve-prime`. Relation budgets, `--seed`, `--rho-steps`,
+`--route-file`, and `--route-id` remain CLI options. The public target file
+passed live Setec S3 upload, HEAD, downloaded-byte verification, fresh-cache
+solves in both binaries, pull, and exact-object cleanup; see the
+[`PRIME_TARGET_FILE_S3_ACCEPTANCE_20261023.json`](../store/PRIME_TARGET_FILE_S3_ACCEPTANCE_20261023.json)
+receipt.
 
 Both `ic` and `icx` can save any report with `--out PATH`. Add
 `--store-name NAME` to publish that new file to the configured artifact store

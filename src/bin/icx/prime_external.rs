@@ -6,9 +6,10 @@ use crypto_lib::cryptanalysis::ec_index_calculus::{
 };
 use crypto_lib::ecc::{curve::CurveParams, field::FieldElement, point::Point};
 use num_bigint::BigUint;
+use serde::Deserialize;
 use serde_json::{json, Value};
-use std::path::PathBuf;
 use std::time::Instant;
+use std::{fs, path::PathBuf};
 
 #[path = "prime_route.rs"]
 mod route;
@@ -60,6 +61,90 @@ pub struct PrimeArgs {
     /// IW1 route originating at the supplied curve's root node.
     #[arg(long, requires = "route_file")]
     route_id: Option<String>,
+}
+
+#[derive(Args)]
+pub struct PrimeFileArgs {
+    /// JSON target file or checked store:NAME/sha256:DIGEST reference.
+    #[arg(long)]
+    input: PathBuf,
+    #[arg(long, default_value_t = 8)]
+    fb_size: usize,
+    #[arg(long, default_value_t = 64)]
+    extra_relations: usize,
+    #[arg(long, default_value_t = 5000)]
+    max_trials_per_relation: usize,
+    #[arg(long, default_value_t = 64)]
+    max_relation_attempts: usize,
+    /// Reproduce the IC relation sampler; omitted uses OS randomness.
+    #[arg(long)]
+    seed: Option<u64>,
+    /// Maximum same-target Pollard-rho steps; zero skips the reference.
+    #[arg(long, default_value_t = 1_000_000)]
+    rho_steps: usize,
+    /// Certified isogeny route file or checked store reference.
+    #[arg(long, requires = "route_id")]
+    route_file: Option<PathBuf>,
+    /// Root-origin IW1 route identifier.
+    #[arg(long, requires = "route_file")]
+    route_id: Option<String>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PrimeTargetInput {
+    p: u64,
+    a: u64,
+    b: u64,
+    n: u64,
+    gx: u64,
+    gy: u64,
+    qx: u64,
+    qy: u64,
+}
+
+pub fn solve_file(args: &PrimeFileArgs) -> Result<Value, String> {
+    let resolved = crypto_lib::store::resolve_path(&args.input)?;
+    if fs::metadata(&resolved)
+        .map_err(|e| format!("{}: {e}", args.input.display()))?
+        .len()
+        > 64 * 1024
+    {
+        return Err("prime target input exceeds 64 KiB".into());
+    }
+    let bytes =
+        fs::read(&resolved).map_err(|e| format!("cannot read {}: {e}", args.input.display()))?;
+    if bytes.len() > 64 * 1024 {
+        return Err("prime target input exceeds 64 KiB".into());
+    }
+    let target: PrimeTargetInput =
+        serde_json::from_slice(&bytes).map_err(|e| format!("invalid prime target JSON: {e}"))?;
+    let solve_args = PrimeArgs {
+        p: target.p,
+        a: target.a,
+        b: target.b,
+        n: target.n,
+        gx: target.gx,
+        gy: target.gy,
+        qx: target.qx,
+        qy: target.qy,
+        fb_size: args.fb_size,
+        extra_relations: args.extra_relations,
+        max_trials_per_relation: args.max_trials_per_relation,
+        max_relation_attempts: args.max_relation_attempts,
+        seed: args.seed,
+        rho_steps: args.rho_steps,
+        route_file: args.route_file.clone(),
+        route_id: args.route_id.clone(),
+    };
+    let mut report = solve(&solve_args)?;
+    report["operation"] = json!("solve-prime-file");
+    report["input_artifact"] = json!({
+        "reference": args.input.display().to_string(),
+        "sha256": hex::encode(crypto_lib::hash::sha256::sha256(&bytes)),
+        "bytes": bytes.len(),
+    });
+    Ok(report)
 }
 
 pub(super) fn prime(n: u64) -> bool {
@@ -391,5 +476,43 @@ mod tests {
         ] {
             assert_eq!(first["ic"]["stages"][field], second["ic"]["stages"][field]);
         }
+    }
+
+    #[test]
+    fn prime_target_file_reuses_checked_solver_and_route() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+        let input = root.join("docs/ic/fixtures/prime271_target_input_20261023.json");
+        let mut args = PrimeFileArgs {
+            input: input.clone(),
+            fb_size: 8,
+            extra_relations: 16,
+            max_trials_per_relation: 5000,
+            max_relation_attempts: 64,
+            seed: Some(42),
+            rho_steps: 0,
+            route_file: None,
+            route_id: None,
+        };
+        let report = solve_file(&args).unwrap();
+        assert_eq!(report["status"], "complete");
+        assert_eq!(report["ic"]["scalar"], "190");
+        assert_eq!(report["operation"], "solve-prime-file");
+        assert_eq!(
+            report["input_artifact"]["bytes"],
+            fs::metadata(&input).unwrap().len()
+        );
+        assert_eq!(
+            report["input_artifact"]["sha256"],
+            hex::encode(crypto_lib::hash::sha256::sha256(&fs::read(&input).unwrap()))
+        );
+        args.route_file = Some(root.join("docs/ic/fixtures/prime271_isogeny_routes.json"));
+        args.route_id = Some("IW1E11h1h1a619f4ab250".into());
+        let routed = solve_file(&args).unwrap();
+        assert_eq!(routed["ic"]["scalar"], "190");
+        assert_eq!(routed["isogeny_route"]["hops"], 1);
+        assert!(serde_json::from_str::<PrimeTargetInput>(
+            r#"{"p":271,"a":1,"b":19,"n":281,"gx":3,"gy":7,"qx":231,"qy":54,"unexpected":1}"#
+        )
+        .is_err());
     }
 }
