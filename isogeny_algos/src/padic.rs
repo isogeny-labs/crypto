@@ -178,6 +178,7 @@ pub struct PadicField {
 
 /// Largest N with p^N < 2^127.
 pub fn max_precision(p: u64) -> u32 {
+    assert!(p >= 2, "p-adic characteristic must be at least 2");
     let mut n = 0u32;
     let mut x: u128 = 1;
     while let Some(y) = x.checked_mul(p as u128) {
@@ -190,13 +191,187 @@ pub fn max_precision(p: u64) -> u32 {
     n
 }
 
+fn sub_mod(a: u64, b: u64, p: u64) -> u64 {
+    if a >= b {
+        a - b
+    } else {
+        p - (b - a)
+    }
+}
+
+fn mul_mod(a: u64, b: u64, p: u64) -> u64 {
+    ((a as u128 * b as u128) % p as u128) as u64
+}
+
+fn pow_mod(mut a: u64, mut e: u64, p: u64) -> u64 {
+    let mut out = 1;
+    while e > 0 {
+        if e & 1 == 1 {
+            out = mul_mod(out, a, p);
+        }
+        a = mul_mod(a, a, p);
+        e >>= 1;
+    }
+    out
+}
+
+fn trim_poly(poly: &mut Vec<u64>) {
+    while poly.len() > 1 && poly.last() == Some(&0) {
+        poly.pop();
+    }
+}
+
+fn poly_rem(mut a: Vec<u64>, b: &[u64], p: u64) -> Vec<u64> {
+    let mut divisor = b.to_vec();
+    trim_poly(&mut a);
+    trim_poly(&mut divisor);
+    assert!(divisor.last().is_some_and(|&c| c != 0));
+    let inv_lead = pow_mod(*divisor.last().unwrap(), p - 2, p);
+    while !(a.len() == 1 && a[0] == 0) && a.len() >= divisor.len() {
+        let shift = a.len() - divisor.len();
+        let factor = mul_mod(*a.last().unwrap(), inv_lead, p);
+        for (i, &coefficient) in divisor.iter().enumerate() {
+            let product = mul_mod(factor, coefficient, p);
+            a[shift + i] = sub_mod(a[shift + i], product, p);
+        }
+        trim_poly(&mut a);
+    }
+    a
+}
+
+fn poly_mul_mod(a: &[u64], b: &[u64], modulus: &[u64], p: u64) -> Vec<u64> {
+    let n = modulus.len() - 1;
+    let mut product = vec![0u64; 2 * n - 1];
+    for (i, &x) in a.iter().enumerate().take(n) {
+        for (j, &y) in b.iter().enumerate().take(n) {
+            let index = i + j;
+            let term = mul_mod(x, y, p);
+            product[index] = ((product[index] as u128 + term as u128) % p as u128) as u64;
+        }
+    }
+    for degree in (n..product.len()).rev() {
+        let leading = product[degree];
+        if leading == 0 {
+            continue;
+        }
+        for (i, &coefficient) in modulus[..n].iter().enumerate() {
+            let index = degree - n + i;
+            product[index] = sub_mod(product[index], mul_mod(leading, coefficient, p), p);
+        }
+    }
+    product.truncate(n);
+    trim_poly(&mut product);
+    product
+}
+
+fn poly_pow_mod(mut base: Vec<u64>, mut exponent: u64, modulus: &[u64], p: u64) -> Vec<u64> {
+    let mut out = vec![1];
+    while exponent > 0 {
+        if exponent & 1 == 1 {
+            out = poly_mul_mod(&out, &base, modulus, p);
+        }
+        base = poly_mul_mod(&base, &base, modulus, p);
+        exponent >>= 1;
+    }
+    out
+}
+
+/// Rabin's test for a monic polynomial over the prime field F_p.
+fn residue_modulus_is_irreducible(modulus: &[u64], p: u64) -> bool {
+    let n = modulus.len() - 1;
+    if n == 1 {
+        return true;
+    }
+    let x = vec![0, 1];
+    let mut frobenius = x.clone();
+    for _ in 0..n {
+        frobenius = poly_pow_mod(frobenius, p, modulus, p);
+    }
+    if frobenius != x {
+        return false;
+    }
+
+    let mut remaining = n;
+    let mut q = 2usize;
+    while q * q <= remaining {
+        if remaining.is_multiple_of(q) {
+            let mut power = x.clone();
+            for _ in 0..(n / q) {
+                power = poly_pow_mod(power, p, modulus, p);
+            }
+            let mut difference = power;
+            if difference.len() < x.len() {
+                difference.resize(x.len(), 0);
+            }
+            for i in 0..x.len() {
+                difference[i] = sub_mod(difference[i], x[i], p);
+            }
+            trim_poly(&mut difference);
+            let mut a = modulus.to_vec();
+            let mut b = difference;
+            while !(b.len() == 1 && b[0] == 0) {
+                let remainder = poly_rem(a, &b, p);
+                a = b;
+                b = remainder;
+            }
+            trim_poly(&mut a);
+            if a.len() != 1 {
+                return false;
+            }
+            while remaining.is_multiple_of(q) {
+                remaining /= q;
+            }
+        }
+        q += 1;
+    }
+    if remaining > 1 {
+        let mut power = x.clone();
+        for _ in 0..(n / remaining) {
+            power = poly_pow_mod(power, p, modulus, p);
+        }
+        let mut difference = power;
+        if difference.len() < x.len() {
+            difference.resize(x.len(), 0);
+        }
+        for i in 0..x.len() {
+            difference[i] = sub_mod(difference[i], x[i], p);
+        }
+        trim_poly(&mut difference);
+        let mut a = modulus.to_vec();
+        let mut b = difference;
+        while !(b.len() == 1 && b[0] == 0) {
+            let remainder = poly_rem(a, &b, p);
+            a = b;
+            b = remainder;
+        }
+        trim_poly(&mut a);
+        if a.len() != 1 {
+            return false;
+        }
+    }
+    true
+}
+
 impl PadicField {
     /// Q_q with residue field F_p[t]/(m̄); `residue_modulus` is m̄ monic of degree n (coefficients
     /// in [0, p), lowest first), lifted to Z_p with the same small coefficients.
     pub fn new(p: u64, residue_modulus: &[u64], prec: u32) -> PadicField {
+        assert!(crate::field::is_prime(p), "p must be prime");
+        assert!(
+            residue_modulus.len() >= 2,
+            "residue modulus must have positive degree"
+        );
         let n = residue_modulus.len() - 1;
         assert!((1..=NMAX).contains(&n), "extension degree {n} out of range");
+        assert!(
+            residue_modulus.iter().all(|&c| c < p),
+            "residue modulus coefficients must be in [0, p)"
+        );
         assert_eq!(residue_modulus[n], 1, "residue modulus must be monic");
+        assert!(
+            residue_modulus_is_irreducible(residue_modulus, p),
+            "residue modulus must be irreducible over F_p"
+        );
         assert!(
             prec >= 1 && prec <= max_precision(p),
             "precision {prec} out of range for p = {p}"
@@ -599,5 +774,36 @@ mod tests {
         let r = f.from_residue(&[1, 0, 1]);
         assert_eq!(f.to_residue(r), Some(vec![1, 0, 1]));
         assert_eq!(f.to_residue(f.inv(f.from_u64(2))), None);
+    }
+
+    #[test]
+    fn constructor_rejects_invalid_residue_fields() {
+        for (p, modulus) in [
+            (4, &[1, 1][..]),       // composite characteristic
+            (2, &[][..]),           // no modulus
+            (2, &[1][..]),          // degree zero
+            (2, &[0, 0, 1][..]),    // reducible: t^2
+            (2, &[1, 0, 0, 1][..]), // reducible: (t + 1)(t^2 + t + 1)
+            (2, &[2, 1][..]),       // noncanonical coefficient
+            (3, &[1, 2][..]),       // not monic
+        ] {
+            assert!(std::panic::catch_unwind(|| PadicField::new(p, modulus, 8)).is_err());
+        }
+
+        // These are irreducible over their respective prime fields.
+        PadicField::new(2, &[1, 1, 0, 1], 8);
+        PadicField::new(3, &[1, 0, 1], 8);
+    }
+
+    #[test]
+    #[should_panic(expected = "p-adic characteristic must be at least 2")]
+    fn max_precision_rejects_zero_characteristic() {
+        max_precision(0);
+    }
+
+    #[test]
+    #[should_panic(expected = "p-adic characteristic must be at least 2")]
+    fn max_precision_rejects_unit_characteristic() {
+        max_precision(1);
     }
 }
