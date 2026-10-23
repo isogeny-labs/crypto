@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Routing regressions for the CI metadata policy, using small YAML fixtures."""
 import importlib.util
+import hashlib
 from pathlib import Path
-import shutil
 import tempfile
 import unittest
+from unittest import mock
 
 spec = importlib.util.spec_from_file_location("budget_policy", Path(__file__).with_name("check-pr-budgets.py"))
 policy = importlib.util.module_from_spec(spec)
@@ -84,14 +85,10 @@ class BudgetPolicyTests(unittest.TestCase):
         for workflow_path, exception in policy.FROZEN_BUDGET_EXCEPTIONS.items():
             job = exception["job"]
             timeout = exception["timeout"]
+            # The current files still match their pinned seals, so the exact
+            # proof-job exception remains valid. It must not cover other jobs.
             self.assertTrue(policy.frozen_proof_budget_exception(
                 workflow_path, job, timeout, "pull_request"))
-            self.assertFalse(policy.frozen_proof_budget_exception(
-                workflow_path, "other", timeout, "pull_request"))
-            self.assertFalse(policy.frozen_proof_budget_exception(
-                workflow_path, job, timeout, "merge_group"))
-            self.assertFalse(policy.frozen_proof_budget_exception(
-                workflow_path, job, timeout + 1, "pull_request"))
             self.assertTrue(policy.problems(
                 workflow({"timeout-minutes": 60}), workflow_path))
 
@@ -101,18 +98,29 @@ class BudgetPolicyTests(unittest.TestCase):
                 workflow_file = root / workflow_path
                 seal.parent.mkdir(parents=True)
                 workflow_file.parent.mkdir(parents=True)
-                shutil.copy2(policy.REPO_ROOT / exception["seal"], seal)
-                shutil.copy2(policy.REPO_ROOT / workflow_path, workflow_file)
-                self.assertTrue(policy.frozen_proof_budget_exception(
-                    workflow_path, job, timeout, "pull_request", root=root))
-                pinned_seal = seal.read_bytes()
-                seal.write_bytes(pinned_seal + b"\n")
-                self.assertFalse(policy.frozen_proof_budget_exception(
-                    workflow_path, job, timeout, "pull_request", root=root))
+                workflow_bytes = (policy.REPO_ROOT / workflow_path).read_bytes()
+                workflow_file.write_bytes(workflow_bytes)
+                pinned_seal = (hashlib.sha256(workflow_bytes).hexdigest()
+                               + "  " + exception["pin_path"] + "\n").encode()
                 seal.write_bytes(pinned_seal)
-                workflow_file.write_bytes(workflow_file.read_bytes() + b"\n# modified\n")
-                self.assertFalse(policy.frozen_proof_budget_exception(
-                    workflow_path, job, timeout, "pull_request", root=root))
+                synthetic = dict(exception, seal_sha256=hashlib.sha256(pinned_seal).hexdigest())
+                with mock.patch.dict(policy.FROZEN_BUDGET_EXCEPTIONS,
+                                     {workflow_path: synthetic}):
+                    self.assertTrue(policy.frozen_proof_budget_exception(
+                        workflow_path, job, timeout, "pull_request", root=root))
+                    self.assertFalse(policy.frozen_proof_budget_exception(
+                        workflow_path, "other", timeout, "pull_request", root=root))
+                    self.assertFalse(policy.frozen_proof_budget_exception(
+                        workflow_path, job, timeout, "merge_group", root=root))
+                    self.assertFalse(policy.frozen_proof_budget_exception(
+                        workflow_path, job, timeout + 1, "pull_request", root=root))
+                    seal.write_bytes(pinned_seal + b"\n")
+                    self.assertFalse(policy.frozen_proof_budget_exception(
+                        workflow_path, job, timeout, "pull_request", root=root))
+                    seal.write_bytes(pinned_seal)
+                    workflow_file.write_bytes(workflow_bytes + b"\n# modified\n")
+                    self.assertFalse(policy.frozen_proof_budget_exception(
+                        workflow_path, job, timeout, "pull_request", root=root))
 
     def test_named_exceptions_are_exact(self):
         for (workflow_path, job), exception in policy.NAMED_BUDGET_EXCEPTIONS.items():

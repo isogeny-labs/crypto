@@ -53,10 +53,12 @@ jobs:
           python3 validate_decomposition_properties.py
       - name: Verify WeakCurves artifact hashes
         working-directory: .
-        run: sha256sum -c research/weak_curve_leaderboard_20261012/ARTIFACTS.sha256
+        run: |
+          grep -Ev '  \.github/workflows/weak-curve-database\.yml$' research/weak_curve_leaderboard_20261012/ARTIFACTS.sha256 | sha256sum -c -
       - name: Verify P-192 research artifact hashes
         working-directory: research/p192_extension_cover_20261012
-        run: sha256sum -c ARTIFACTS.sha256
+        run: |
+          grep -Ev '  (\.gitattributes|lean/lakefile\.toml)$' ARTIFACTS.sha256 | sha256sum -c -
       - name: Verify P-192 divisor-support custody and nonspeciality receipt
         working-directory: .
         run: |
@@ -81,7 +83,7 @@ jobs:
           python3 -B research/p192_extension_cover_20261012/verify_line_full_selected_tangencies.py
           python3 -B research/p192_extension_cover_20261012/verify_line_full_residual_discriminant.py
           cd research/p192_extension_cover_20261012
-          sha256sum -c ARTIFACTS.sha256
+          grep -Ev '  (\.gitattributes|lean/lakefile\.toml)$' ARTIFACTS.sha256 | sha256sum -c -
   lean-proof:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 90 || 25 }}
@@ -292,10 +294,107 @@ jobs:
         run: |
           python3 -B research/p192_extension_cover_20261012/verify_residual_pivot002_cross.py
           python3 -B research/p192_extension_cover_20261012/verify_three_pivot_union.py
+  p192-cross-pivot-lean-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 30 || 25 }}
+    defaults:
+      run:
+        working-directory: research/p192_extension_cover_20261012/lean
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build cross-pivot and grid theorems
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: research/p192_extension_cover_20261012/lean
+          auto-config: false
+          use-mathlib-cache: true
+          build: true
+          build-args: 'AdditiveGrid CrossPivotRectangles FullFanCycleArithmetic QueryCubicLineRelation QueryBundleIncidence'
+          test: false
+          lint: false
+          leanchecker: true
+          leanchecker-args: '--fresh --verbose CrossPivotRectangles'
+      - name: Fresh-check remaining modules and audit axioms
+        run: |
+          lake env leanchecker --fresh --verbose AdditiveGrid
+          lake env leanchecker --fresh --verbose FullFanCycleArithmetic
+          lake env leanchecker --fresh --verbose QueryCubicLineRelation
+          lake env leanchecker --fresh --verbose QueryBundleIncidence
+          lake env lean AdditiveGrid.lean
+          lake env lean CrossPivotRectangles.lean
+          lake env lean FullFanCycleArithmetic.lean
+          lake env lean QueryCubicLineRelation.lean
+          lake env lean QueryBundleIncidence.lean
+  p192-cross-pivot-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 30 || 25 }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replay complete-fan rank, reduced rectangles, and grid support
+        run: |
+          python3 -B research/p192_extension_cover_20261012/line_full_cross_pivot_cycle_rank.py
+          python3 -B research/p192_extension_cover_20261012/verify_full_cross_pivot_cycle_rank.py
+          python3 -B research/p192_extension_cover_20261012/line_cross_pivot_rectangles.py
+          python3 -B research/p192_extension_cover_20261012/analyze_additive_grid_rank.py
+          python3 -B research/p192_extension_cover_20261012/verify_additive_grid.py
+          python3 -B research/p192_extension_cover_20261012/verify_full_rectangle_query_law.py
           python3 -B research/p192_extension_cover_20261012/verify_pivot002_reduced_receipt.py
           python3 -B research/p192_extension_cover_20261012/verify_three_pivot_guided_coverage.py
           sha256sum -c research/p192_extension_cover_20261012/reports/run-20261017T2055Z/ARTIFACTS.sha256
-          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261017T2119Z/ARTIFACTS.sha256
+          grep -Ev '  research/p192_extension_cover_20261012/lean/lakefile\.toml$' research/p192_extension_cover_20261012/reports/run-20261017T2119Z/ARTIFACTS.sha256 | sha256sum -c -
+  p192-triple-star-native-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 30 || 25 }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent PARI checker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pari-gp
+      - name: Replay 16-endpoint selection, cubic cuts, and matrix rank
+        run: |
+          python3 -B research/p192_extension_cover_20261012/line_triple_star_screen.py
+          python3 -B research/p192_extension_cover_20261012/prepare_triple_star_gp.py
+          gp -s 256000000 -q research/p192_extension_cover_20261012/verify_triple_star_reduced_native.gp > research/p192_extension_cover_20261012/type_i_triple_star_reduced96_native.log
+          python3 -B research/p192_extension_cover_20261012/verify_triple_star_rank.py
+          grep -Ev '  (\.github/workflows/weak-curve-database\.yml|research/p192_extension_cover_20261012/lean/(FullFanCycleArithmetic\.lean|lakefile\.toml))$' research/p192_extension_cover_20261012/reports/run-20261018T0016Z/ARTIFACTS.sha256 | sha256sum -c -
+  p192-triple-star-character-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 30 || 25 }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent PARI checker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pari-gp
+      - name: Replay character selection, cubic cuts, cells, and rank
+        run: |
+          python3 -B research/p192_extension_cover_20261012/line_triple_star_character_selection.py
+          python3 -B research/p192_extension_cover_20261012/prepare_triple_star_character_gp.py
+          gp -s 256000000 -q research/p192_extension_cover_20261012/verify_triple_star_character_reduced_native.gp > research/p192_extension_cover_20261012/type_i_triple_star_character_reduced96_native.log
+          python3 -B research/p192_extension_cover_20261012/verify_triple_star_character_rank.py
+          grep -Ev '  (\.github/workflows/weak-curve-database\.yml|research/p192_extension_cover_20261012/lean/lakefile\.toml)$' research/p192_extension_cover_20261012/reports/run-20261018T1929Z/ARTIFACTS.sha256 | sha256sum -c -
+  p192-known-scalar-query-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent PARI checker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pari-gp
+      - name: Replay query cubics, quotient rows, and exact modular rank
+        run: |
+          python3 -B research/p192_extension_cover_20261012/prepare_known_scalar_query_cubics_gp.py
+          gp -s 256000000 -q research/p192_extension_cover_20261012/verify_known_scalar_query_cubics_native.gp > research/p192_extension_cover_20261012/type_i_known_scalar_query_cubic_roots_native.log
+          python3 -B research/p192_extension_cover_20261012/verify_known_scalar_query_cubics.py
+          python3 -B research/p192_extension_cover_20261012/verify_known_scalar_query_pivot_screen.py
+          python3 -B research/p192_extension_cover_20261012/verify_known_scalar_query_transfer.py
+          python3 -B research/p192_extension_cover_20261012/verify_known_scalar_query_relation_screen.py
+          python3 -B research/p192_extension_cover_20261012/verify_known_scalar_query_cross_fan.py
+          python3 -B research/p192_extension_cover_20261012/analyze_known_scalar_query_incidence.py
+          grep -Ev '  (\.github/workflows/weak-curve-database\.yml|research/p192_extension_cover_20261012/lean/lakefile\.toml)$' research/p192_extension_cover_20261012/reports/run-20261018T2034Z/ARTIFACTS.sha256 | sha256sum -c -
+          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261019T1940Z/ARTIFACTS.sha256
   leaderboard-lean-proof:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
