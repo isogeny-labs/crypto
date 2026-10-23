@@ -43,7 +43,7 @@ Observations only (research-visuals skill, "Every experiment run"). The interpre
 - Arms per instance and rung: `mitm_m2_negfold_walk` (A, the raw base), the same minus its class test (A′, derived: `total_gae` minus `admissibility_adds + admissibility_doubles`), `…_projected` (B), `…_subgroup` (C); each at the std rung and, where the ladder has one, the balanced rung (`…_balanced`). The ladder’s other rows (`mitm_m3*`, `mitm_m2_negfold`) ran as always and are in the record but are not arms.
 - Instances: `icv1-f2m15-t131-ed7256f0` (h \= 2), `icv1-f2m18-t393-d2c04152` (h \= 8), `icv1-f2m21-t2591-de54d72e` (h \= 2), `icv1-f2m24-tm3047-2d0c0e8c` (h \= 8), `icv1-f2m27-t12543-569dca8b` (h \= 6); control `icv1-fp24-t1577-77336155` (h \= 1).
 - Seeds: curves fixed by `--seed 123212651130`; five targets per instance (repeats 0 to 2 are the frozen round-5 targets); eight matched-rho negation walks per target.
-- Requested and completed: 5 instances × 5 repeats × 4 arms × 2 rungs \= 200 arm rows on the char2 ladder, 1 × 5 × 3 × 2 \= 30 on the control; all completed, none failed, none timed out.
+- Requested and completed: 5 instances × 5 repeats × 3 recorded arms (A, B, C; A′ is derived from A) × 2 rungs \= 150 arm rows on the char2 ladder, 1 × 5 × 3 × 2 \= 30 on the control; all completed, none failed, none timed out.
 
 == Stop checks (PROTOCOL.md §6)
 <stop-checks-protocol.md-6>
