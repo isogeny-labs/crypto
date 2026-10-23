@@ -10,7 +10,7 @@ twist_higher_construct(p,a,b,n,d,l,k,source)={
   attempts++;my(xx=sum(i=0,k-1,random(p)*z^i),ys=ellordinate(E,xx),R);
   if(#ys==0,next);R=ellmul(E,[xx,ys[1]],c);
   while(R!=[0]&&ellmul(E,R,l)!=[0],R=ellmul(E,R,l));if(R==[0],next);
-  if(P==[0],P=R,next);if(ellweilpairing(E,P,R,l)!=1,Q=R;break);
+  if(P==[0],P=R;next);if(ellweilpairing(E,P,R,l)!=1,Q=R;break);
  );
  if(Q==[0],error("bounded torsion basis search exhausted"));
  print("CERTIFICATE {\"source\":",twist_higher_quote(source),",\"ell\":",l,",\"degree\":",k,",\"p\":",p,",\"modulus\":",Vecrev(lift(m)),",\"w\":",twist_higher_quote(w),",\"basis\":[",twist_higher_point(P),",",twist_higher_point(Q),"],\"pairing\":",twist_higher_quote(ellweilpairing(E,P,Q,l)),",\"extension_order\":",twist_higher_quote(N),",\"cofactor\":",twist_higher_quote(c),",\"ell_valuation\":",valuation,",\"point_trials\":",attempts,"}");

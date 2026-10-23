@@ -134,6 +134,12 @@ pub fn main(args: &[String]) -> Result<()> {
         "homogeneous-recheck" => homogeneous::recheck(
             Path::new(args.get(3).ok_or("missing previous solver panel")?),
             out,
+            false,
+        )?,
+        "homogeneous-fast-recheck" => homogeneous::recheck(
+            Path::new(args.get(3).ok_or("missing previous solver panel")?),
+            out,
+            true,
         )?,
         "jacobian-replay" => divisors::independent(
             &fixtures,

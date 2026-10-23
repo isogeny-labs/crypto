@@ -93,12 +93,32 @@ proc twist_complete(ideal B,ideal I,ideal G){
  return(ok);
 }
 "#;
+const COMPLETE_LEADING: &str = r#"
+proc twist_complete(ideal B,ideal I,ideal G){
+ ideal LB=lead(B);ideal LG=lead(G);
+ if(size(reduce(B,G))!=0){return(0);}
+ if(size(reduce(I,B))!=0){return(0);}
+ if(size(reduce(LG,LB))!=0){return(0);}
+ if(size(reduce(LB,LG))!=0){return(0);}
+ return(1);
+}
+"#;
 fn certify(
     c: &alg::Case,
     bases: &[(String, Vec<f4::Poly>)],
     order: &str,
     stem: &Path,
     expected: Option<u64>,
+) -> Result<Value> {
+    certify_with(c, bases, order, stem, expected, false)
+}
+fn certify_with(
+    c: &alg::Case,
+    bases: &[(String, Vec<f4::Poly>)],
+    order: &str,
+    stem: &Path,
+    expected: Option<u64>,
+    leading: bool,
 ) -> Result<Value> {
     let mut text = format!(
         "ring rr={},({}),{};\nideal I={};\nideal G=std(I);\nprint(\"DIM=\"+string(vdim(G)));\n",
@@ -107,7 +127,7 @@ fn certify(
         if order == "lex" { "lp" } else { "dp" },
         rendered(c, &c.equations)
     );
-    text.push_str(COMPLETE);
+    text.push_str(if leading { COMPLETE_LEADING } else { COMPLETE });
     for (name, polys) in bases {
         text.push_str(&format!(
             "ideal {name}={};\nprint(\"COMPLETE_{name}=\"+string(twist_complete({name},I,G)));\n",
@@ -139,9 +159,9 @@ fn certify(
             );
         }
     }
-    let results=bases.iter().map(|(name,_)|json!({"basis":name,"all_S_pairs_and_both_inclusions_verified":clean&&stdout.lines().any(|s|s==format!("COMPLETE_{name}=1"))})).collect::<Vec<_>>();
+    let results=bases.iter().map(|(name,_)|{let complete=clean&&stdout.lines().any(|s|s==format!("COMPLETE_{name}=1"));json!({"basis":name,"complete":complete,"all_S_pairs_and_both_inclusions_verified":if leading{None}else{Some(complete)},"independent_leading_ideal_and_both_inclusions_verified":if leading{Some(complete)}else{None}})}).collect::<Vec<_>>();
     Ok(
-        json!({"exit_code":code,"completion_and_clean_output":clean,"dimension":dim,"expected_affine_assignments":expected,"bases":results,"script_sha256":digest(&fs::read(&script)?),"stdout_sha256":digest(stdout.as_bytes()),"stderr_sha256":digest(stderr.as_bytes())}),
+        json!({"exit_code":code,"completion_and_clean_output":clean,"certificate_method":if leading{"independent-complete-reference-leading-ideal-equality-and-both-inclusions"}else{"all-required-S-pairs-and-both-inclusions"},"dimension":dim,"expected_affine_assignments":expected,"bases":results,"script_sha256":digest(&fs::read(&script)?),"stdout_sha256":digest(stdout.as_bytes()),"stderr_sha256":digest(stderr.as_bytes())}),
     )
 }
 fn infinity(c: &alg::Case, stem: &Path) -> Result<Value> {
@@ -296,7 +316,7 @@ fn execute(j: &Job) -> Result<Value> {
         json!({"experiment":"E25","fixture":j.fixture,"p":c.p,"B":c.xs.len(),"arity":c.arity,"encoding":c.encoding,"order":"grevlex","engines":engines,"homogeneous_complete_basis_gate":hc,"dehomogenized_affine_complete_basis_gate":ac,"infinity_and_saturation":inf,"actual_affine_assignments_replayed":assignments.len(),"omitted_nonaffine_or_first_pair_branches_retained_as_count":omitted_chart_or_first_pair_branches,"status":"bounded-correct-field-homogeneous-signature-pilot","full_E25_complete":false,"performance_claim":false}),
     )
 }
-fn control(out: &Path) -> Result<Value> {
+fn control(out: &Path, leading: bool) -> Result<Value> {
     let c = alg::Case {
         p: 59,
         a: 1,
@@ -373,8 +393,22 @@ fn control(out: &Path) -> Result<Value> {
             c.equations[1].clone(),
         ],
     ));
-    let hom = certify(&h, &hb, "grevlex", &append(&stem, "hom-check"), None)?;
-    let aff = certify(&c, &ab, "grevlex", &append(&stem, "aff-check"), Some(1))?;
+    let hom = certify_with(
+        &h,
+        &hb,
+        "grevlex",
+        &append(&stem, "hom-check"),
+        None,
+        leading,
+    )?;
+    let aff = certify_with(
+        &c,
+        &ab,
+        "grevlex",
+        &append(&stem, "aff-check"),
+        Some(1),
+        leading,
+    )?;
     if aff["completion_and_clean_output"] == true {
         for name in ["TRUNCATED", "WRONGFIELD"] {
             let row = aff["bases"]
@@ -383,7 +417,7 @@ fn control(out: &Path) -> Result<Value> {
                 .iter()
                 .find(|r| r["basis"] == name)
                 .unwrap();
-            assert_eq!(row["all_S_pairs_and_both_inclusions_verified"], false);
+            assert_eq!(row["complete"], false);
         }
     }
     let record = json!({"experiment":"E25-control","p":59,"engines":engines,"homogeneous":hom,"affine":aff,"positive_control_affine_solution":[1,2],"wrong_characteristic_metadata_rejected":61!=c.p,"status":"positive-and-incomplete-basis-controls-recorded"});
@@ -395,7 +429,7 @@ pub fn run(fixtures: &[Fixture], bases: &Path, out: &Path) -> Result<Vec<Value>>
         return Err("pinned signature-output adapter binary is not built".into());
     }
     let bs: Vec<Base> = serde_json::from_slice(&fs::read(bases)?)?;
-    let control = control(out)?;
+    let control = control(out, false)?;
     fs::create_dir(out.join("cases"))?;
     let mut jobs = vec![];
     for f in fixtures.iter().filter(|f| [59, 211, 251].contains(&f.p)) {
@@ -448,7 +482,7 @@ pub fn run(fixtures: &[Fixture], bases: &Path, out: &Path) -> Result<Vec<Value>>
     rows.push(control);
     Ok(rows)
 }
-pub fn recheck(input: &Path, out: &Path) -> Result<Vec<Value>> {
+pub fn recheck(input: &Path, out: &Path, leading: bool) -> Result<Vec<Value>> {
     fs::create_dir(out.join("cases"))?;
     let mut rows = vec![];
     let mut originals = fs::read_dir(input.join("cases"))?
@@ -531,13 +565,21 @@ pub fn recheck(input: &Path, out: &Path) -> Result<Vec<Value>> {
                     ab.push((label.into(), basis));
                 }
             }
-            let hc = certify(&h, &hb, "grevlex", &append(&stem, "hom-check"), None)?;
-            let ac = certify(
+            let hc = certify_with(
+                &h,
+                &hb,
+                "grevlex",
+                &append(&stem, "hom-check"),
+                None,
+                leading,
+            )?;
+            let ac = certify_with(
                 &c,
                 &ab,
                 "grevlex",
                 &append(&stem, "aff-check"),
                 Some(assignments.len() as u64),
+                leading,
             )?;
             json!({"experiment":"E25","fixture":old["fixture"],"p":c.p,"B":c.xs.len(),"arity":c.arity,"encoding":c.encoding,"order":"grevlex","engines":old["engines"],"homogeneous_complete_basis_gate":hc,"dehomogenized_affine_complete_basis_gate":ac,"infinity_and_saturation":old["infinity_and_saturation"],"actual_affine_assignments_replayed":assignments.len(),"raw_solver_outputs_reparsed_and_identical":true,"original_result_sha256":digest(&fs::read(append(&oldstem,"RESULT.json"))?),"engine_measurements_repeated":false,"status":"corrected-independent-basis-recheck","full_E25_complete":false,"performance_claim":false})
         };
@@ -545,7 +587,7 @@ pub fn recheck(input: &Path, out: &Path) -> Result<Vec<Value>> {
         rows.push(row);
         println!("{}", json!({"experiment":"E25","recheck":name}));
     }
-    rows.push(control(out)?);
+    rows.push(control(out, leading)?);
     Ok(rows)
 }
 

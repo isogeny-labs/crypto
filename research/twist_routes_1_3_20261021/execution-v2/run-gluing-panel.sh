@@ -7,7 +7,7 @@ cd -- "$repo_dir"
 panel="${1:?filters or torsion}"
 output="${2:?fresh output directory}"
 source_name="${3:-}"
-case "$panel" in filters) cap=1400 ;; torsion|higher-torsion-input|higher-torsion-verify) cap=1800 ;; geometry-input|geometry-verify|adjudicate-cas|coupled-census|coupled-relations|coupled-energy|projection-replay|partial-replay|jacobian-replay|three-transfer|homogeneous-pilot|homogeneous-recheck) cap=3600 ;; *) exit 2 ;; esac
+case "$panel" in filters) cap=1400 ;; torsion|higher-torsion-input|higher-torsion-verify) cap=1800 ;; geometry-input|geometry-verify|adjudicate-cas|coupled-census|coupled-relations|coupled-energy|projection-replay|partial-replay|jacobian-replay|three-transfer|homogeneous-pilot|homogeneous-recheck|homogeneous-fast-recheck) cap=3600 ;; *) exit 2 ;; esac
 test ! -e "$output"
 revision="$(git rev-parse HEAD)"
 pinned_dir="/tmp/twist-v2-pinned/$revision"
