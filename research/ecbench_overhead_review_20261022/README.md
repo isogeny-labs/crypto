@@ -15,7 +15,7 @@ Neither changes a counted result. 2,376 records from the A/B and attribution
 sessions are identical to the old binary's outside timing (`summarize.py`);
 every headline session re-verifies under the *other* binary with all measured
 runs replayed (`verify/`, 1,044 replays, all reproduced); the §5a band is the
-same from both binaries (`band/`).
+same from both binaries (`band/`; the printed tables are in `band/raw/`).
 
 ## Headline (old binary vs this change)
 
