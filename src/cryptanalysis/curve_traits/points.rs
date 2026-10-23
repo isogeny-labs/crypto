@@ -155,28 +155,36 @@ pub(crate) fn pgcd<F: Field>(f: &F, a: &Poly<F::E>, b: &Poly<F::E>) -> Poly<F::E
 /// has a factor of degree `i ≤ k/2`, which divides `x^{q^i} − x`.  The
 /// powers `x^{q^i}` come from the matrix of the `q`-power map.
 pub fn irreducible<F: Field>(f: &F, q: &BigUint, k: usize, seed: u64) -> Option<Poly<F::E>> {
-    let x = vec![f.zero(), f.one()];
     for attempt in 0..(64 * k as u64) {
         let mut m: Poly<F::E> = (0..k as u64)
             .map(|j| f.sample(seed.wrapping_add(attempt * (k as u64 + 1) + j)))
             .collect();
         m.push(f.one());
         let m = trim(f, m);
-        let table = frobenius_table(f, q, &m);
-        let mut power = prem(f, &x, &m);
-        let mut coprime = true;
-        for _ in 0..k / 2 {
-            power = apply_frobenius(f, &table, &power);
-            if pgcd(f, &m, &psub(f, &power, &x)).len() != 1 {
-                coprime = false;
-                break;
-            }
-        }
-        if coprime {
+        if is_irreducible(f, q, &m) {
             return Some(m);
         }
     }
     None
+}
+
+/// Ben-Or's test for a monic `m` of degree `k ≥ 1` over `F` (`|F| = q`):
+/// `gcd(x^{q^i} − x, m) = 1` for every `i ≤ k/2`.
+pub fn is_irreducible<F: Field>(f: &F, q: &BigUint, m: &Poly<F::E>) -> bool {
+    let k = m.len().saturating_sub(1);
+    if k == 0 || m.last() != Some(&f.one()) {
+        return false;
+    }
+    let x = vec![f.zero(), f.one()];
+    let table = frobenius_table(f, q, m);
+    let mut power = prem(f, &x, m);
+    for _ in 0..k / 2 {
+        power = apply_frobenius(f, &table, &power);
+        if pgcd(f, m, &psub(f, &power, &x)).len() != 1 {
+            return false;
+        }
+    }
+    true
 }
 
 /// A square root of `a` in a field of odd order `order` (Tonelli–Shanks),
@@ -1221,6 +1229,211 @@ pub fn scalar_on_power_by_points(model: &Model, trace: &BigInt, ell: u64, j: u32
     verdict
 }
 
+/// A stored proof of a depth-1 volcano level (`docs/curves/level-certificates.json`):
+/// points of the group the depth-1 point test searches, found offline
+/// (`research/curve_traits_level_certificates_20261023/search.gp`) and only
+/// checked here.  Field elements are coefficient vectors: of `GF(q)` in the
+/// registry basis, and of `GF(q^m) = GF(q)[w]/(g)` as `m` of those.
+#[derive(Clone, Debug, serde::Deserialize)]
+pub struct LevelCertificate {
+    pub slug: String,
+    pub ell: u64,
+    /// "floor": one point whose `ℓ`-part has order `ℓ^v`; "crater": two
+    /// independent points of order `ℓ`.
+    pub kind: String,
+    /// `m`: `k = ord(λ)`, or `k/2` on the quadratic twist when `k` is even.
+    pub degree: u32,
+    pub twist: bool,
+    /// `v_ℓ` of the group order, as the search computed it.
+    pub v: u32,
+    /// The `m` low coefficients of the monic modulus `g`.
+    pub modulus: Vec<Vec<u64>>,
+    /// The twisting element, a non-square of `GF(q^m)`.
+    pub d: Option<Vec<Vec<u64>>>,
+    pub points: Vec<[Vec<Vec<u64>>; 2]>,
+}
+
+/// The committed certificates by `(slug, ℓ)`.
+pub type Certificates = std::collections::HashMap<(String, u64), LevelCertificate>;
+
+/// Parse the certificate file: `{"certificates": [...]}`.
+pub fn read_certificates(text: &str) -> Result<Certificates, String> {
+    #[derive(serde::Deserialize)]
+    struct File {
+        certificates: Vec<LevelCertificate>,
+    }
+    let file: File =
+        serde_json::from_str(text).map_err(|e| format!("level certificates: {e}"))?;
+    let mut out = Certificates::new();
+    for c in file.certificates {
+        let key = (c.slug.clone(), c.ell);
+        if out.insert(key, c).is_some() {
+            return Err("level certificates: a level appears twice".into());
+        }
+    }
+    Ok(out)
+}
+
+/// Check a [`LevelCertificate`] for the curve of `model`, independently of
+/// how it was found: `Ok(true)` when Frobenius is a scalar on `E[ℓ]` (two
+/// independent points of order `ℓ`: the `ℓ`-part has rank 2, the crater),
+/// `Ok(false)` when it is not (a point of order `ℓ^v`, `ℓ^v ∥ N`: the
+/// `ℓ`-part is cyclic, the floor); `Err` naming what fails otherwise.  The
+/// group is `E(GF(q^k))`, `k = ord(λ)`, or for even `k` the quadratic twist
+/// over `GF(q^{k/2})`, as in [`scalar_by_points`], whose module docs give
+/// the equivalences.  Checked here: `g` is irreducible (Ben-Or), the twist
+/// element is a non-square (its norm to `GF(q)` is, by Euler's criterion),
+/// the group order `N` from the trace, each point on the curve, and its
+/// order.
+pub fn verify_level_certificate(
+    model: &Model,
+    trace: &BigInt,
+    cert: &LevelCertificate,
+) -> Result<bool, String> {
+    let ell = cert.ell;
+    if ell < 3 || !(2..ell).take_while(|d| d * d <= ell).all(|d| ell % d != 0) {
+        return Err(format!("ℓ = {ell} is not an odd prime"));
+    }
+    let (f, a, b) = match model {
+        Model::Extension {
+            p, modulus, a, b, ..
+        } => {
+            let f = FpK::new(p, modulus).ok_or("no word arithmetic for this field")?;
+            let (a, b) = (
+                f.element(a).ok_or("bad a")?,
+                f.element(b).ok_or("bad b")?,
+            );
+            (f, a, b)
+        }
+        Model::Prime { p, a, b } => {
+            let f = FpK::new(p, &[BigUint::zero()]).ok_or("no word arithmetic for this field")?;
+            let el = |c: &BigUint| f.int((c % p).to_u64().expect("below p"));
+            let (a, b) = (el(a), el(b));
+            (f, a, b)
+        }
+        _ => return Err("certificates cover GF(p) and GF(p^k) models".into()),
+    };
+    if (BigUint::from(ell) % f.p).is_zero() {
+        return Err("ℓ is the characteristic".into());
+    }
+    let q = model.q();
+    let k = eigen_order(ell, trace);
+    let (m, twist) = if k % 2 == 0 { (k / 2, true) } else { (k, false) };
+    if k == 0 || (m, twist) != (cert.degree, cert.twist) {
+        return Err(format!(
+            "the certificate is over degree {} (twist {}), but ord(λ) = {k}",
+            cert.degree, cert.twist
+        ));
+    }
+    let element = |v: &Vec<u64>| -> Result<Vec<u64>, String> {
+        (v.len() == f.k() && v.iter().all(|&c| c < f.p))
+            .then(|| v.clone())
+            .ok_or_else(|| "a coefficient outside GF(q)".to_string())
+    };
+    let tower = |v: &Vec<Vec<u64>>| -> Result<Poly<Vec<u64>>, String> {
+        if v.len() != m as usize {
+            return Err(format!("an element with {} coefficients, not {m}", v.len()));
+        }
+        Ok(trim(&f, v.iter().map(element).collect::<Result<_, _>>()?))
+    };
+    let mut g: Poly<Vec<u64>> = cert
+        .modulus
+        .iter()
+        .map(element)
+        .collect::<Result<_, _>>()?;
+    if g.len() != m as usize {
+        return Err(format!("a modulus of degree {}, not {m}", g.len()));
+    }
+    g.push(f.one());
+    if !is_irreducible(&f, &q, &g) {
+        return Err("the modulus is reducible".into());
+    }
+    let e = Ext::new(&f, g, &q);
+    let one = e.one();
+    let d = match (&cert.d, twist) {
+        (Some(d), true) => {
+            let d = tower(d)?;
+            // d is a square in GF(q^m) iff its norm to GF(q) is a square.
+            let (mut cur, mut norm) = (d.clone(), d.clone());
+            for _ in 1..m {
+                cur = e.frobenius(&cur);
+                norm = e.mul(&norm, &cur);
+            }
+            let c = match norm.len() {
+                1 => norm[0].clone(),
+                _ => return Err("the norm of d is not in GF(q)".into()),
+            };
+            if f.pow(&c, &((&q - 1u8) >> 1)) != f.neg(&f.one()) {
+                return Err("d is a square".into());
+            }
+            d
+        }
+        (None, false) => one.clone(),
+        _ => return Err("a twist element where none belongs, or none where one does".into()),
+    };
+    let d2 = e.mul(&d, &d);
+    let (a, b) = (
+        e.mul(&e.constant(&a), &d2),
+        e.mul(&e.constant(&b), &e.mul(&d2, &d)),
+    );
+    let qi = BigInt::from(q.clone());
+    let v_m = lucas_v(trace, &qi, m);
+    let n = if twist {
+        qi.pow(m) + 1u8 + v_m
+    } else {
+        qi.pow(m) + 1u8 - v_m
+    }
+    .to_biguint()
+    .filter(|n| !n.is_zero())
+    .ok_or("a non-positive group order")?;
+    let (v, _) = split_power(&n, ell);
+    if v == 0 || v != cert.v {
+        return Err(format!("v_ℓ(N) = {v}, the certificate says {}", cert.v));
+    }
+    let g = ShortW {
+        f: &e,
+        a: a.clone(),
+        b: b.clone(),
+        order: q.pow(m),
+        nonresidue: None,
+    };
+    let l = BigUint::from(ell);
+    let mut pts = Vec::new();
+    for [x, y] in &cert.points {
+        let (x, y) = (tower(x)?, tower(y)?);
+        if !super::torsion::on_curve(&e, &a, &b, &x, &y) {
+            return Err("a point off the curve".into());
+        }
+        pts.push(Jac { x, y, z: one.clone() });
+    }
+    match (cert.kind.as_str(), pts.as_slice()) {
+        ("floor", [t]) => {
+            // Order exactly ℓ^v: [ℓ^{v−1}]T ≠ O = [ℓ^v]T.
+            let below = g.mul(t, &l.pow(v - 1));
+            if g.is_zero(&below) || !g.is_zero(&g.mul(&below, &l)) {
+                return Err("the point's order is not ℓ^v".into());
+            }
+            Ok(false)
+        }
+        ("crater", [t1, t2]) => {
+            for t in [t1, t2] {
+                if g.is_zero(t) || !g.is_zero(&g.mul(t, &l)) {
+                    return Err("a point not of order ℓ".into());
+                }
+            }
+            let mut multiple = t1.clone();
+            for _ in 1..ell {
+                if g.same(&multiple, t2) {
+                    return Err("the two points are dependent".into());
+                }
+                multiple = g.add(&multiple, t1);
+            }
+            Ok(true)
+        }
+        _ => Err(format!("a certificate of kind {} with {} points", cert.kind, pts.len())),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1431,6 +1644,187 @@ mod tests {
             }
         }
         assert!(seen[0] > 0 && seen[1] > 0, "{seen:?}");
+    }
+
+    /// A certificate as `search.gp` would produce it, found here by a plain
+    /// search over the same tower, for small curves over GF(p²).
+    fn find_certificate(
+        f: &FpK,
+        a: &[u64],
+        b: &[u64],
+        t: &BigInt,
+        ell: u64,
+    ) -> Option<LevelCertificate> {
+        let q = BigUint::from(f.p).pow(f.k() as u32);
+        let k = eigen_order(ell, t);
+        let (m, twist) = if k % 2 == 0 { (k / 2, true) } else { (k, false) };
+        let g = irreducible(f, &q, m as usize, 7)?;
+        let e = Ext::new(f, g.clone(), &q);
+        let order = q.pow(m);
+        let d = if twist {
+            (1u64..)
+                .map(|i| e.sample(i))
+                .find(|d| !e.is_zero(d) && sqrt(&e, d, &order).is_none())?
+        } else {
+            e.one()
+        };
+        let d2 = e.mul(&d, &d);
+        let (ta, tb) = (
+            e.mul(&e.constant(&a.to_vec()), &d2),
+            e.mul(&e.constant(&b.to_vec()), &e.mul(&d2, &d)),
+        );
+        let grp = ShortW {
+            f: &e,
+            a: ta,
+            b: tb,
+            order: order.clone(),
+            nonresidue: None,
+        };
+        let qi = BigInt::from(q.clone());
+        let vm = lucas_v(t, &qi, m);
+        let n = (if twist { qi.pow(m) + 1u8 + vm } else { qi.pow(m) + 1u8 - vm }).to_biguint()?;
+        let (v, cof) = split_power(&n, ell);
+        if v == 0 {
+            return None;
+        }
+        let l = BigUint::from(ell);
+        let coords = |x: &Poly<Vec<u64>>| -> Vec<Vec<u64>> {
+            (0..m as usize).map(|i| x.get(i).cloned().unwrap_or_else(|| f.zero())).collect()
+        };
+        let affine_pt = |p: &Jac<Poly<Vec<u64>>>| {
+            let (x, y) = grp.affine(p).expect("not O");
+            [coords(&x), coords(&y)]
+        };
+        let mut low: Vec<Jac<Poly<Vec<u64>>>> = Vec::new();
+        let (kind, pts) = 'search: {
+            for i in 0..400 {
+                let Some(p) = grp.sample_point(i) else { continue };
+                let s = grp.mul(&p, &cof);
+                let (mut ex, mut r) = (0u32, s.clone());
+                while !grp.is_zero(&r) {
+                    r = grp.mul(&r, &l);
+                    ex += 1;
+                }
+                if ex == v {
+                    break 'search ("floor", vec![affine_pt(&s)]);
+                }
+                if ex >= 1 {
+                    let tp = grp.mul(&s, &l.pow(ex - 1));
+                    for t1 in &low {
+                        let mut mult = t1.clone();
+                        let mut inside = false;
+                        for _ in 1..ell {
+                            inside |= grp.same(&mult, &tp);
+                            mult = grp.add(&mult, t1);
+                        }
+                        if !inside {
+                            break 'search ("crater", vec![affine_pt(t1), affine_pt(&tp)]);
+                        }
+                    }
+                    low.push(tp);
+                }
+            }
+            return None;
+        };
+        Some(LevelCertificate {
+            slug: String::new(),
+            ell,
+            kind: kind.into(),
+            degree: m,
+            twist,
+            v,
+            modulus: coords(&g[..m as usize].to_vec()),
+            d: twist.then(|| coords(&d)),
+            points: pts,
+        })
+    }
+
+    /// Certificates verify, agree with the division-polynomial test (floor
+    /// and crater, twisted and not), and every tampered one is refused.
+    #[test]
+    fn level_certificates_verify_and_tampering_fails() {
+        let mut seen = [0usize; 2];
+        let mut refused = 0usize;
+        for p in [103u64, 107, 127, 131] {
+            // GF(p²) = GF(p)[z]/(z² + 1), p ≡ 3 mod 4.
+            let f = FpK { p, modulus: vec![1, 0] };
+            let q = p * p;
+            let chi_exp = BigUint::from((q - 1) / 2);
+            for (a0, a1, b0) in [(1u64, 0u64, 3u64), (2, 1, 5), (3, 2, 1), (1, 1, 7), (5, 0, 2), (4, 3, 6)] {
+                let (a, b) = (vec![a0, a1], vec![b0, 0]);
+                // #E(GF(p²)) by counting, so the trace is exact.
+                let mut n = 1u64;
+                for i in 0..q {
+                    let x = vec![i % p, i / p];
+                    let rhs = f.add(&f.mul(&f.add(&f.mul(&x, &x), &a), &x), &b);
+                    n += if f.is_zero(&rhs) { 1 } else if f.pow(&rhs, &chi_exp) == f.one() { 2 } else { 0 };
+                }
+                let t = BigInt::from(q as i64 + 1 - n as i64);
+                let delta = &t * &t - BigInt::from(4 * q);
+                let model = Model::Extension {
+                    p: BigUint::from(p),
+                    k: 2,
+                    q: BigUint::from(q),
+                    field_id: String::new(),
+                    modulus: vec![BigUint::from(1u8), BigUint::zero()],
+                    a: a.iter().map(|&c| BigUint::from(c)).collect(),
+                    b: b.iter().map(|&c| BigUint::from(c)).collect(),
+                };
+                for ell in [3u64, 5, 7, 11] {
+                    let l2 = BigInt::from(ell * ell);
+                    // Depth 1 at ℓ: v_ℓ(Δ) is 2 or 3.
+                    if delta.is_zero() || !(&delta % &l2).is_zero() || (&delta % (&l2 * &l2)).is_zero() {
+                        continue;
+                    }
+                    let Some(truth) = super::super::torsion::frobenius_is_scalar(&model, &t, ell) else {
+                        continue;
+                    };
+                    let Some(cert) = find_certificate(&f, &a, &b, &t, ell) else {
+                        continue;
+                    };
+                    assert_eq!(
+                        verify_level_certificate(&model, &t, &cert),
+                        Ok(truth),
+                        "p={p} a={a:?} b={b:?} ℓ={ell}"
+                    );
+                    seen[usize::from(truth)] += 1;
+                    // Tampering: a moved coordinate, a reducible modulus, a
+                    // square twist element, the wrong kind, the wrong ℓ.
+                    let mut bad = Vec::new();
+                    let mut c1 = cert.clone();
+                    c1.points[0][0][0][0] = (c1.points[0][0][0][0] + 1) % p;
+                    bad.push(c1);
+                    if cert.degree >= 2 {
+                        let mut c2 = cert.clone();
+                        c2.modulus = vec![vec![0, 0]; cert.degree as usize];
+                        bad.push(c2);
+                    }
+                    if let Some(d) = &cert.d {
+                        let e = Ext::new(&f, {
+                            let mut g: Poly<Vec<u64>> = cert.modulus.clone();
+                            g.push(f.one());
+                            g
+                        }, &BigUint::from(q));
+                        let dd = e.mul(&trim(&f, d.clone()), &trim(&f, d.clone()));
+                        let mut c3 = cert.clone();
+                        c3.d = Some((0..cert.degree as usize).map(|i| dd.get(i).cloned().unwrap_or_else(|| f.zero())).collect());
+                        bad.push(c3);
+                    }
+                    let mut c4 = cert.clone();
+                    c4.kind = if cert.kind == "floor" { "crater".into() } else { "floor".into() };
+                    bad.push(c4);
+                    let mut c5 = cert.clone();
+                    c5.ell = 13;
+                    bad.push(c5);
+                    for c in &bad {
+                        assert!(verify_level_certificate(&model, &t, c).is_err(), "accepted a tampered certificate");
+                        refused += 1;
+                    }
+                }
+            }
+        }
+        assert!(seen[0] > 0 && seen[1] > 0, "{seen:?}");
+        assert!(refused > 10, "{refused}");
     }
 
     #[test]

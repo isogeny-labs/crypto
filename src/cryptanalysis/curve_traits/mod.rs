@@ -213,6 +213,8 @@ impl Source {
 pub struct Factoring {
     pub budget: u64,
     pub hints: Vec<BigUint>,
+    /// Stored depth-1 level certificates (`docs/curves/level-certificates.json`).
+    pub certificates: points::Certificates,
     memo: Mutex<HashMap<BigUint, Factored>>,
 }
 
@@ -221,6 +223,7 @@ impl Factoring {
         Factoring {
             budget,
             hints,
+            certificates: points::Certificates::new(),
             memo: Mutex::new(HashMap::new()),
         }
     }
@@ -1285,6 +1288,7 @@ fn endomorphism(
     frob: &Frobenius,
     sub: &SubfieldRecord,
     ordinary: bool,
+    certificates: &points::Certificates,
 ) -> Result<EndomorphismRecord, String> {
     let record = |f0: Option<String>, maximal, status, contains: Vec<String>| EndomorphismRecord {
         conductor_divides: f0,
@@ -1507,7 +1511,27 @@ fn endomorphism(
                             })
                         })
                     };
-                    let mut by_points = depth1(false);
+                    // A stored certificate first: it is only checked, so
+                    // it costs a few multiplications where the search
+                    // costs many; a certificate that fails stops the build.
+                    let certificate = (*depth == 1)
+                        .then(|| certificates.get(&(c.slug.clone(), small.unwrap_or(0))))
+                        .flatten();
+                    let by_certificate = match certificate {
+                        Some(cert) => Some(
+                            timed(&format!("certificate {ell}"), &c.slug, || {
+                                points::verify_level_certificate(&c.model, &c.trace, cert)
+                            })
+                            .map_err(|why| {
+                                format!("the level certificate at ℓ = {ell} fails: {why}")
+                            })?,
+                        ),
+                        None => None,
+                    };
+                    let mut by_points = by_certificate;
+                    if by_points.is_none() {
+                        by_points = depth1(false);
+                    }
                     let mut by_cycle = false;
                     if by_points.is_none() {
                         let cycles = cycles.get_or_insert_with(|| {
@@ -1527,6 +1551,16 @@ fn endomorphism(
                                 walk::describe(&cycles.as_ref().expect("walked").closed)
                             ),
                         ),
+                        Some(true) if by_certificate.is_some() => (
+                            Some(0),
+                            0,
+                            format!(
+                                "a stored certificate: two independent points of order ℓ over \
+                                 GF(q^{}){}, the crater",
+                                certificate.expect("checked").degree,
+                                if certificate.expect("checked").twist { " on the twist" } else { "" }
+                            ),
+                        ),
                         Some(true) => (
                             Some(0),
                             0,
@@ -1539,11 +1573,20 @@ fn endomorphism(
                                      is on the floor, but ℓ ∤ f₀"
                                 ));
                             }
-                            (
-                                Some(1),
-                                1,
-                                "the ℓ-part of E(GF(q^k)) is cyclic, k = ord(λ): the floor".into(),
-                            )
+                            let method = match certificate {
+                                Some(cert) => format!(
+                                    "a stored certificate: a point of order ℓ^{} over GF(q^{}){}, \
+                                     the ℓ-part cyclic, the floor",
+                                    cert.v,
+                                    cert.degree,
+                                    if cert.twist { " on the twist" } else { "" }
+                                ),
+                                None => {
+                                    "the ℓ-part of E(GF(q^k)) is cyclic, k = ord(λ): the floor"
+                                        .into()
+                                }
+                            };
+                            (Some(1), 1, method)
                         }
                         None => {
                             let why = match (&c.model, small) {
@@ -1688,7 +1731,7 @@ pub fn compute(c: &RegistryCurve, fx: &Factoring) -> Result<CurveTraits, String>
     };
     let (subgroup, r) = subgroup(c, fx).map_err(ctx)?;
     let sub = subfield_record(c).map_err(ctx)?;
-    let endo = endomorphism(c, &frob, &sub, ordinary).map_err(ctx)?;
+    let endo = endomorphism(c, &frob, &sub, ordinary, &fx.certificates).map_err(ctx)?;
     let small = small_primes(&delta, &characteristic);
     let dissect = match &c.model {
         Model::Prime { .. } | Model::Binary { .. } | Model::Extension { .. } if ordinary => {
@@ -2031,7 +2074,7 @@ impl TraitFile {
             path: "docs/curves/registry.json".into(),
             text: registry_text.to_string(),
         };
-        Ok(Self::build_from(&registry, None, None, &[], budget)?.0)
+        Ok(Self::build_from(&registry, None, None, None, &[], budget)?.0)
     }
 
     /// The registry, the factor hints, and the curves of every source the
@@ -2040,6 +2083,7 @@ impl TraitFile {
     pub fn build_from(
         registry: &Input,
         hints: Option<&Input>,
+        certificates: Option<&Input>,
         manifest: Option<&Input>,
         sources: &[Input],
         budget: u64,
@@ -2073,7 +2117,11 @@ impl TraitFile {
                 curves.extend(read.into_iter().filter(|c| seen.insert(c.slug.clone())));
             }
         }
-        let fx = Factoring::new(budget, hint_primes);
+        let mut fx = Factoring::new(budget, hint_primes);
+        if let Some(c) = certificates {
+            inputs.push(c.digest());
+            fx.certificates = points::read_certificates(&c.text)?;
+        }
         let records: Result<Vec<_>, String> = curves
             .par_iter()
             .map(|c| {

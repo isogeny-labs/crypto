@@ -26,6 +26,7 @@ const REGISTRY: &str = "docs/curves/registry.json";
 const TRAITS: &str = "docs/curves/traits.json";
 const HINTS: &str = "docs/curves/factor-hints.txt";
 const SOURCES: &str = "docs/curves/trait-sources.json";
+const CERTIFICATES: &str = "docs/curves/level-certificates.json";
 
 fn read(path: &str) -> Result<Input, String> {
     Ok(Input {
@@ -45,6 +46,7 @@ fn build(registry: &str, budget: u64) -> Result<(TraitFile, Factoring), String> 
     TraitFile::build_from(
         &read(registry)?,
         Some(&read(HINTS)?),
+        Some(&read(CERTIFICATES)?),
         Some(&manifest),
         &files,
         budget,
