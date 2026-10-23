@@ -114,8 +114,19 @@ secp256k1.
   `2λ ≡ t (mod n)` (one candidate for odd `ℓ`, two for `ℓ = 2`), and the
   test is `x^q ≡ x([λ]P) (mod f_n)`: it says `πP = ±λP` for every `P` of
   `E[n]` outside `E[2]`, which on a basis and its sum forces `π = ±λ`.
-  It runs for `ℓ^j ≤ 64` within the same cost budget; where it stops
-  early the level keeps the bound it reached.
+  It runs for `ℓ^j ≤ 64` within the same cost budget. Beyond that the
+  **prime-power point test** (`scalar_on_power_by_points`) decides the
+  same question from points: a scalar `λ` on `E[ℓ^j]` has `π^m = 1`
+  there, `m = ord(λ mod ℓ^j)`, so `E[ℓ^j] ⊆ E(GF(q^m))`. With
+  `#E(GF(q^m)) = ℓ^v·c` exact from the trace, a candidate `λ` is refuted
+  by `v < 2j`, by a point whose `ℓ`-part has order above `ℓ^{v−j}`, or by
+  a point `T` of order `ℓ^j` with `πT ≠ [λ]T` (`π` applied to its
+  coordinates through the matrix of the `q`-power map), and confirmed by
+  two eigenvectors of order `ℓ^j` whose order-`ℓ` multiples are
+  independent (the second split off the cyclic factor by a
+  Pohlig–Hellman logarithm). Extensions of prime fields below `2^63` are
+  built directly as `GF(p^m)` in word arithmetic. Where both stop early
+  the level keeps the bound it reached.
 - at depth 1 with `ψ_ℓ` too large, the **point test**
   ([`points.rs`](../../src/cryptanalysis/curve_traits/points.rs)): the
   scalar case is exactly `E[ℓ] ⊆ E(GF(q^k))`, `k = ord(λ)`, i.e. an
@@ -124,7 +135,11 @@ secp256k1.
   as `F[w]/(m)` with `m` certified irreducible by Rabin's test) find a
   certificate either way: a point whose `ℓ`-part has order `ℓ^{v_ℓ(N)}`
   (cyclic, the floor) or two independent points of order `ℓ` (rank 2,
-  the crater). Binary curves use the char-2 group law in affine
+  the crater). For even `k` the test runs instead on the quadratic twist
+  over `GF(q^{k/2})`: there `λ^{k/2} = −1`, so a scalar puts all of
+  `E[ℓ]` in the twist's group (order `q^{k/2} + 1 + V_{k/2}(t, q)`) and a
+  Jordan block only a line. It is tried after `E(GF(q^k))` itself, so
+  every level the earlier test decided is decided the same way. Binary curves use the char-2 group law in affine
   coordinates, with points sampled by solving `z² + z = x + a + b/x²`
   (`y = xz`; the half-trace in odd degree, a trace-1 element otherwise). The search is bounded by `POINT_TEST_COST` scalar-
   multiplication work, `ℓ ≤ 1000` and `k ≤ 64`; a test agrees with the
@@ -133,6 +148,24 @@ secp256k1.
   within a fixed cost budget (`SCALAR_TEST_COST`), and is compared with a
   brute-force count of rational `ℓ`-torsion over small prime, binary and
   `GF(p^k)` fields in the tests.
+
+- where those tests stop and `|d_K| < 2^48`, **walks of horizontal
+  isogenies** ([`walk.rs`](../../src/cryptanalysis/curve_traits/walk.rs)):
+  for a small prime `l` split in `K` and prime to `v`, `E` has exactly two
+  rational `l`-isogenies and the `l`-isogeny graph through it is a cycle,
+  walked on `j`-invariants as the roots of `Φ_l(j, Y)` in `GF(q)`
+  (`Φ_l` for `l ≤ 19` from PARI/GP, checked against Vélu's formulas in
+  the tests; every step a simple root). A cycle that closes after `r`
+  steps is a cyclic endomorphism `α` of degree `l^r`, so `(α) = 𝔩^r` and
+  Cornacchia's `x² − d_K y² = 4l^r` gives `|y|`, the conductor of
+  `Z[α] ⊆ End(E)`: `f | y`. The cycle length is also the order of a
+  class in the class group of `End(E)`, so it divides `h(O_f)`; a walk of
+  `n` steps that has not closed rules out every order with
+  `h(O_f) ≤ n` (class numbers from counting reduced forms and the
+  conductor formula). Of the orders between `Z[π]` and `O_K` the levels
+  allow, the walks keep those consistent with all of this: a level they
+  all share is decided (a floor this way needs no point over an extension
+  at all), and a resolved level outside them stops the build.
 
 When every prime is resolved, `conductor` is exact and `end_order` is
 `maximal` or `non-maximal`; otherwise `End(E)` stays `bounded` between
@@ -219,21 +252,23 @@ coordinate/order adapter is unavailable explicitly report `not_evaluated`;
 Curve25519 is one such record. A complete catalogue entry does not by itself
 certify its coordinates or group order.
 
-In the current file (2112 registry curves and 176 from the sources: 175
+In the current file (2572 registry curves and 176 from the sources: 175
 walked curves of the P-256 and P-224 isogeny classes and the ECC2K-130
-degree-263 descendant), `End(E)` is established for 1989 curves (879
-maximal, 1110 non-maximal) and unresolved for 264; 35 have a `Δ` that did
+degree-263 descendant), `End(E)` is established for 2700 curves (1150
+maximal, 1550 non-maximal) and unresolved for 34; 14 have a `Δ` that did
 not factor. Of the 1324 curves over `GF(p^k)`, `k > 1`, 1319 have a
 certified order (9 by generator, 1310 by point orders: 484 proved, 826
-probable). The levels behind it: 1246 decided by the scalar test on `E[ℓ]`
-(730 floors, 516 craters at depth 1), 982 by the prime-power test (459 one
-above the floor, 319 craters, 204 in between), 70 by the point test (57
-floors, 13 craters; 6 of them on binary curves), 13 walker certificates (each agreeing with the test),
-111 from a certified `End(E)`, 228 where `f₀` is already prime to `ℓ`.
-What stays open: 202 levels the tests only bound (beyond the cost limit or
-`ℓ^j > 64`), 38 depth-1 primes beyond both tests' budgets (`k > 64` or the cost
-limit), and 72 primes of `v`
-above the test's range. P-256's `Δ` factors with
+probable). The levels behind it: 1306 decided by the scalar test on `E[ℓ]`
+(787 floors, 519 craters at depth 1), 1265 by the prime-power tests (486 one
+above the floor, 370 craters, 409 in between), 74 by the depth-1 point test
+(58 floors, 16 craters; 6 of them on binary curves), 388 by isogeny walks
+(204 craters, 166 floors, 18 in between), 19 by `j(E) = j(O_K)` in a field
+of class number 1, 13 walker certificates (each agreeing with the test), 111
+from a certified `End(E)`, 243 where `f₀` is already prime to `ℓ`. What
+stays open: 34 levels, all but two on `GF(p^k)` curves whose `|d_K|` is far
+too large for a walk (13 the tests only bound, 19 at depth 1 beyond the
+point test's budget), and two on binary curves (`ℓ = 31` at depth 1 over
+`GF(2^47)`, `ℓ = 31543` over `GF(2^61)`). P-256's `Δ` factors with
 the committed hints as `−3·5·456597257999·p81·p136` (squarefree), so
 `v = 1`, `d_K = Δ` and `End(E) = O_K`, probable through its 136-bit prime
 (the 81-bit one is below the Miller–Rabin proof bound); every walked curve
