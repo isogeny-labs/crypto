@@ -89,7 +89,7 @@
         "restore_validation": {"enum": ["none", "manifest_sha256", "application_managed", "criu_selfcheck"]},
         "keep_generations": {"type": "integer", "minimum": 1, "default": 2},
         "criu": {"type": ["object", "null"], "additionalProperties": false,
-                 "properties": {"pre_dump": {"type": "boolean", "default": true}, "cpu_cap": {"type": "string", "default": "fpu"},
+                 "properties": {"pre_dump": {"type": "boolean", "default": true}, "cpu_cap": {"type": "string", "default": "all", "description": "Check CPU capabilities on both dump and restore; fpu alone does not check instruction compatibility."},
                                 "image_budget_mb": {"type": ["integer", "null"], "description": "Refuse to admit a job whose RSS would not dump inside grace_seconds at the measured dump rate."}}},
         "after_restore": {"type": "object", "additionalProperties": false, "required": ["wall_time", "counted_units"],
                           "properties": {"wall_time": {"const": "invalid"}, "counted_units": {"const": "valid"}}}

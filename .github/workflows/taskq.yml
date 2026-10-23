@@ -37,6 +37,10 @@ jobs:
         env:
           TASKQ_TEST_REDIS_URL: redis://127.0.0.1:6379/0
         run: python -m pytest -q taskq/tests
+      - name: Checkpoint supervisor regression checks
+        run: |
+          bash -n taskq/deploy/spot-checkpoint/checkpoint-hook.sh
+          bash taskq/deploy/spot-checkpoint/test-checkpoint-hook.sh
       - uses: azure/setup-helm@v4
       - name: Helm chart renders and lints
         run: |

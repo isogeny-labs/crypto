@@ -62,6 +62,6 @@ worker:
 keda:
   enabled: true
   pollingInterval: 30
-  # A busy pod hands its task back on SIGTERM; a long cooldown keeps KEDA
-  # from scaling a checkpointing pod away mid-generation.
+  # A busy pod hands its task back on SIGTERM. A long cooldown reduces
+  # scale-in churn; it cannot prevent eviction during a checkpoint.
   cooldownPeriod: 900

@@ -56,16 +56,19 @@ a `taskq submit --job envelope.json` that the problem record names):
 
 ## 3. Route A: application checkpoints (the contract that exists)
 
-The contract is spot-system's `manifest-sha256-v1` and spotlab's job-side
-rules, restated once for every backend. A job that resumes must:
+The integrity requirements follow spot-system's `manifest-sha256-v1` and
+spotlab's job-side rules. The hook uses `manifest.json` with schema
+`experiment.checkpoint/v1`; this is not a drop-in replacement for
+spot-system's `checkpoint-manifest.json` and its supervisor state layout.
+A backend adapter must preserve the identity binding. A job that resumes must:
 
 1. keep every file it needs to continue under `$CHECKPOINT_DIR/gen-<n>/`,
    each generation complete on its own (never incremental across
    generations);
 2. write every file, fsync it, then write `manifest.json` **last** (temp
-   file, fsync, rename, directory fsync) listing `job_id`, the protocol or
-   spec sha256, `generation`, `committed: true` and every file's relative
-   path, sha256 and size; keep the previous valid generation;
+   file, fsync, rename, directory fsync) listing `schema`, `job_id`,
+   `spec_sha256`, `generation`, `committed: true` and every file's relative
+   `path`, `sha256` and `bytes`; keep the previous valid generation;
 3. on start with `CHECKPOINT_RESUMED=1`, restore exactly the generation named
    by `CHECKPOINT_MANIFEST`; never pick another and never start from zero
    when restore fails (exit non-zero and say so);
@@ -80,7 +83,36 @@ ones), starts the command in its own process group, syncs committed
 generations to S3 on a timer and on SIGTERM, forwards SIGTERM and waits
 `grace_seconds`, and exits 75 when the run was interrupted so the queue
 resumes it. The same contract is what spot-system's `checkpoint-discovery`
-validates natively; the hook is the portable shell form for pods.
+validates natively; the hook supplies these integrity checks for pods.
+
+Invoke it with the expected job and immutable envelope hash:
+
+```sh
+checkpoint-hook.sh --checkpoint-dir /results/checkpoints --store s3://BUCKET/JOB \
+  --job-id JOB --spec-sha256 ENVELOPE_SHA256 --grace 90 --sync-timeout 15 \
+  --interval 300 --keep 2 -- COMMAND ARGS
+```
+
+The Linux image needs Bash, `jq`, `sha256sum`, GNU `timeout`, `setsid` and
+the AWS CLI. Manifest paths use letters, digits, `.`, `_`, `-` and `/`,
+with no empty, `.` or `..` components; symlinks and unlisted files are
+rejected. `generation` must match the `gen-<n>` directory. Data uploads
+precede the manifest upload, and every download/upload batch has a total
+deadline. A failed download refuses admission; a failed upload retains all
+local generations. Pruning happens only after a successful upload batch.
+Normal completion with a failed final upload exits 74; interruption exits
+75, including when the child exits immediately after SIGTERM. A successful
+manifest check establishes file integrity, not application-level restore
+correctness; the command still checks its invariants.
+
+The hook assumes one writer per job prefix and immutable committed
+generations. It does not implement the queue's fencing, durable attempt
+marker, or an S3 conditional-write protocol. The worker integration must
+add those before deployment, including refusal to restart a previous
+attempt when both the local and remote checkpoint sets are empty.
+Local supervisor checks run with
+`bash taskq/deploy/spot-checkpoint/test-checkpoint-hook.sh`; they use a
+local object-store stand-in and do not establish cluster recovery.
 
 **Proposed additive `checkpoint` block in `taskq.task-spec/v1`** (a worker
 that does not know it hands the task back, which is the documented safe
@@ -111,11 +143,13 @@ Worker semantics to implement (`taskq/taskq/worker.py`, `execute.py`):
   measurement.
 
 Pod settings ([`values-spot-checkpoint.example.yaml`](values-spot-checkpoint.example.yaml)):
-`terminationGracePeriodSeconds: 110` so the child's 90 s grace and the
-upload fit inside AWS's 120 s notice; the Karpenter NodePool keeps its
+`terminationGracePeriodSeconds: 110` budgets 90 s for the child and 15 s
+for the upload batch (plus up to 2 s to kill a stuck uploader), leaving
+only a small scheduling margin. AWS's 120 s notice is best effort, so
+periodic durable checkpoints remain necessary; the Karpenter NodePool keeps its
 long `terminationGracePeriod` because the node waits for the pod; KEDA
-`cooldownPeriod` long enough that scale-in never evicts a pod
-mid-generation.
+`cooldownPeriod` reduces scale-in churn; it does not prevent eviction or
+guarantee completion of an in-progress checkpoint.
 
 ## 4. Route B: CRIU process images (designed, untested in a pod)
 
@@ -135,17 +169,18 @@ so the pieces are known; what is new is doing it inside a pod on a queue.
 - **Dump schedule.** `criu pre-dump --track-mem` every `interval_seconds`
   into `gen-<n>` with `--prev-images-dir gen-<n-1>`, so memory is
   transferred incrementally; on SIGTERM a final `criu dump --tree <pid>
-  --shell-job --leave-running=false --cpu-cap=<cap>` whose size is the
+  --shell-job --cpu-cap=all` whose size is the
   dirty pages since the last pre-dump. The first run measures the dump
   rate; the worker refuses a job whose resident set would not dump inside
   `grace_seconds` (`checkpoint.criu.image_budget_mb`).
 - **Restore.** The next pod on the same pool runs `criu restore
-  --images-dir gen-<n> --restore-detached` and then the self-check
+  --images-dir gen-<n> --restore-detached --cpu-cap=all` and then the self-check
   (`restore_validation: criu_selfcheck`): the restored process must report
   a progress marker that the manifest recorded, and the worker compares;
   a failed self-check is an `infra_error`, never a fresh start.
 - **Constraints the envelope must pin.** The same CPU feature set
-  (`placement.instance_families` or `--cpu-cap=fpu`; spot-system pinned
+  (`placement.instance_families` plus `--cpu-cap=all` on dump and restore;
+  `fpu` alone does not check every required instruction; spot-system pinned
   m8i for its live images), the same kernel major and CRIU version in the
   image, no network sockets (`network: none`; `--tcp-close` otherwise),
   no GPU (the CUDA plugin through `cuda-checkpoint` exists in CRIU's GPU
@@ -235,3 +270,12 @@ criu.org's Kubernetes page returned HTTP 503 and is cited through the
 requests above. Internal: `infra/spot-system/` (CRIU 4.2.1 on AL2023,
 kernel 6.18; `rseq` failure of 3.17.1; dump freeze intervals),
 `spotlab/README.md`, `taskq/README.md`.
+
+Review source checks (2026-10-22):
+[Kubelet checkpoint API](https://kubernetes.io/docs/reference/node/kubelet-checkpoint-api/),
+[EC2 interruption notices](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-instance-termination-notices.html),
+[Karpenter interruption handling](https://karpenter.sh/docs/concepts/disruption/#interruption),
+and [CRIU 4.2.1 command reference](https://github.com/checkpoint-restore/criu/blob/v4.2.1/Documentation/criu.txt).
+CRIU's `--leave-running` is a flag, so the final dump omits it to use the
+normal stop-after-dump behavior. CPU compatibility checks are requested
+explicitly on restore; matching an instance family alone is insufficient.

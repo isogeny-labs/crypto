@@ -33,9 +33,13 @@ tree has run a checkpoint-and-restore cycle inside a Kubernetes pod.
   disposable host with the pool pinned to one family);
   `research/eks_crypto_validation_20261019` (the EKS Spot pool runs real
   ecbench work and persists to S3; no checkpointing).
-- **Derived or proved:** not established. The hook script
-  `checkpoint-hook.sh` passes `bash -n` and a local validation check of its
-  manifest logic; it has not run on the cluster.
+- **Locally checked:** the hook passes shell syntax and lint checks and
+  `test-checkpoint-hook.sh` exercises identity/hash admission, corrupt
+  generation fallback, failed download/upload handling, pruning, child
+  exit propagation and interruption with a local object-store stand-in.
+  It has not run on the cluster. The worker still needs a durable attempt
+  marker and single-writer fencing; the hook alone does not prevent two
+  attempts from sharing a prefix or a previous empty attempt from restarting.
 - **Suspected explanation:** none needed; the pieces are known and
   unassembled.
 - **Missing capability:** worker support for the `checkpoint` spec block

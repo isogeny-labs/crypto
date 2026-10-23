@@ -126,18 +126,20 @@ protocol states:
    (an amendment that says whether it preceded the data it affects), and
    both versions are reported.
 
-**Power check before freezing (do the arithmetic).** An empirical rank test
-cannot reject below its resolution. With the add-one estimate the smallest
-attainable two-sided p is `2/(N + 1)`, so `N` must satisfy
-`2/(N + 1) < α/m` for `m` corrected tests, with margin: `N + 1 ≥ 4m/α`
-lets a target beyond every control reach `p = α/(2m)`. Check this for every
-test family in the protocol and write the numbers into it
-(`experiment_protocol.py power --n N --alpha α --m m`; `validate` refuses a
-`passes` that disagrees). A protocol that fails this check can only ever
-report "within the control distribution", so its nulls are vacuous. (The
-first protocol written with this skill,
-`research/nist_cyclotomic_controls_20261011/PROTOCOL.md`, failed it in all
-three comparative families. The fix was a dated amendment, not an edit.)
+**P-value resolution and power before freezing.** With `N` null resamples,
+an add-one empirical estimate using a doubled smaller tail has minimum
+`2/(N + 1)`. Under that convention, require `2/(N + 1) < α/m` for `m`
+corrected tests; `N + 1 ≥ 4m/α` leaves resolution margin. The legacy
+`experiment_protocol.py power --n N --alpha α --m m` checks only that
+arithmetic. It does not establish statistical power for the intended effect;
+justify that separately for the named test and effect size. Exact rank tests
+and other tail conventions have different attainable p-values. See the
+canonical protocol documentation and
+[SciPy's permutation-test convention](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html).
+A failed resolution check prevents rejection at the declared threshold; it
+does not establish equivalence to the null. Preserve earlier protocols and
+file a dated amendment when changing sample size or the decision rule.
+
 **Pre-flight runtime estimate (write it into the protocol).** Before
 freezing, time one instrument call per arm and per size class, and
 separate the *per-sample* cost (scales with `N`) from the *fixed* cost
@@ -176,8 +178,8 @@ revealed about the target.
   reasoning tier.
 - Write `export.json` (`experiment.export/v1`) beside the rows:
   `experiment_protocol.py from-rows rows.jsonl --protocol protocol.json
-  --out export.json` (or `from-ecbench` for a session), then
-  `check-export --verify-files` until clean. Its `flow` block (planned,
+  --out export.json --export-id <study>` (or `from-ecbench` for a session), then
+  `check-export export.json --protocol protocol.json --verify-files` until clean. Its `flow` block (planned,
   attempted, completed, excluded by rule) goes in the report.
 
 ## 5. Report
@@ -210,7 +212,7 @@ Lead with the table. For each target × metric:
 - [ ] one instrument, identical budgets across arms; `same_instrument_as` checked
 - [ ] variable ledger lists every confounder; no decisive comparison is confounded
 - [ ] arm order interleaved; seeds derived before data; arm labels masked during analysis
-- [ ] power check passes: `2/(N + 1) < α/m` for every test family (§3)
+- [ ] applicable p-value resolution check passes; test-specific power justified (§3)
 - [ ] pre-flight runtime estimate (fixed and per-sample) in the protocol (§3)
 - [ ] `PROTOCOL.md` and `protocol.json` frozen (hash recorded) before results; dry run on scratch output
 - [ ] raw rows committed; `export.json` passes `check-export --verify-files`; summary recomputable
