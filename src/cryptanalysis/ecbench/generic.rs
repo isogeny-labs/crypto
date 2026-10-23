@@ -23,6 +23,12 @@ pub struct GenericOutcome {
     pub recovered: Option<u64>,
     pub setup: GroupOps,
     pub search: GroupOps,
+    /// Kangaroo restarts, when [`kangaroo_with`] keeps them apart from
+    /// `setup` (the `_v2` accounting); zero otherwise.
+    pub restarts: GroupOps,
+    /// The final `[d]G = Q` check of [`verify_candidate`]; zero for the
+    /// ids that do not run it.
+    pub verification: GroupOps,
     /// Native work the group-operation unit does not charge, and the
     /// shape of the run (`baby_steps`, `giant_steps`, `restarts`, …).
     pub counters: BTreeMap<String, u64>,
@@ -33,6 +39,26 @@ pub struct GenericOutcome {
 impl GenericOutcome {
     fn count(&mut self, name: &str, by: u64) {
         *self.counters.entry(name.to_string()).or_insert(0) += by;
+    }
+}
+
+/// Charge the check `[d]G = Q` of the candidate a solve returned to
+/// `out.verification`, one scalar multiplication (`≈ 1.5·log₂ r` additions,
+/// counted exactly), and book it in `verification_checks`; a candidate that
+/// fails is booked in `failed_candidates` and kept for the runner to
+/// grade.  A solve with no candidate (exhausted) pays nothing.  This is the
+/// rule of every `_v2` method: rho and index calculus have always paid it
+/// for the answer they return, BSGS, the kangaroo and the claw had not.
+pub fn verify_candidate<G: CountedGroup>(
+    g: &G,
+    gen: G::Elt,
+    target: G::Elt,
+    out: &mut GenericOutcome,
+) {
+    let Some(d) = out.recovered else { return };
+    out.count("verification_checks", 1);
+    if g.mul(&mut out.verification, gen, d) != target {
+        out.count("failed_candidates", 1);
     }
 }
 
@@ -233,6 +259,22 @@ pub fn kangaroo<G: CountedGroup>(
     seed: u64,
     max_steps: u64,
 ) -> GenericOutcome {
+    kangaroo_with(g, gen, target, r, seed, max_steps, false)
+}
+
+/// [`kangaroo`], with the scalar multiplications of a restart charged to
+/// `out.restarts` instead of `out.setup` when `restarts_apart` (the `_v2`
+/// phase attribution: a restart is search work, not jump-table set-up).
+/// The walk is the same either way.
+pub fn kangaroo_with<G: CountedGroup>(
+    g: &G,
+    gen: G::Elt,
+    target: G::Elt,
+    r: u64,
+    seed: u64,
+    max_steps: u64,
+    restarts_apart: bool,
+) -> GenericOutcome {
     let mut out = GenericOutcome::default();
     let shape = KangarooShape::of(r);
     out.count("jump_count", shape.jumps as u64);
@@ -257,17 +299,24 @@ pub fn kangaroo<G: CountedGroup>(
         rng = mix(rng);
         rng
     };
-    let start = |kind: u8, out: &mut GenericOutcome, off: u64| -> (G::Elt, u64) {
+    let start = |kind: u8, out: &mut GenericOutcome, off: u64, restart: bool| -> (G::Elt, u64) {
         out.count("starts", 1);
-        if kind == 0 {
+        let mut ops = GroupOps::default();
+        let point = if kind == 0 {
             let d = addmod(r / 2, off, r);
-            (g.mul(&mut out.setup, gen, d), d)
+            (g.mul(&mut ops, gen, d), d)
         } else {
-            let z = g.mul(&mut out.setup, gen, off);
-            (g.add(&mut out.setup, target, z), off)
+            let z = g.mul(&mut ops, gen, off);
+            (g.add(&mut ops, target, z), off)
+        };
+        if restart && restarts_apart {
+            out.restarts.merge(ops);
+        } else {
+            out.setup.merge(ops);
         }
+        point
     };
-    let mut roo = [start(0, &mut out, 0), start(1, &mut out, 0)];
+    let mut roo = [start(0, &mut out, 0, false), start(1, &mut out, 0, false)];
     let mut steps = 0u64;
     while steps < max_steps {
         for kind in 0..2u8 {
@@ -294,7 +343,7 @@ pub fn kangaroo<G: CountedGroup>(
                 Some(_) => {
                     out.count("same_kind_collisions", 1);
                     let off = next() % r.max(2);
-                    roo[kind as usize] = start(kind, &mut out, off);
+                    roo[kind as usize] = start(kind, &mut out, off, true);
                 }
                 None => {
                     table.insert(g.key(&np), (kind, nd));

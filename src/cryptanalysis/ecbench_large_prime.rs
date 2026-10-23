@@ -441,6 +441,20 @@ pub struct SolveCounters {
     pub lp_merge_ops_uncharged: u64,
     pub row_ops_uncharged: u64,
     pub lp_pivots: u64,
+    /// Scalar multiplications the `_v2` accounting charges to the
+    /// verification phase beyond the relation witness checks: the target's
+    /// `[r]Q` membership check and the final `[d]G = Q`.  Zero (and absent
+    /// from the report) for the first rule.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub membership_checks: u64,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub final_checks: u64,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub final_checks_failed: u64,
+}
+
+fn is_zero(v: &u64) -> bool {
+    *v == 0
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -759,7 +773,7 @@ pub fn solve(
     target: FastPoint,
     config: SolveConfig,
 ) -> Result<LargePrimeReport, String> {
-    solve_with_verification(instance, target, config, true)
+    solve_with_verification(instance, target, config, true, false)
 }
 
 /// Return the algebraic candidate without checking it against the target.
@@ -769,7 +783,20 @@ pub fn solve_candidate(
     target: FastPoint,
     config: SolveConfig,
 ) -> Result<LargePrimeReport, String> {
-    solve_with_verification(instance, target, config, false)
+    solve_with_verification(instance, target, config, false, false)
+}
+
+/// [`solve_candidate`] under the `_v2` accounting (`ic.large_prime_v2`):
+/// the target's `[r]Q` subgroup-membership check, which the first rule runs
+/// on a ledger nobody reads, and the final `[d]G = Q` check, which it
+/// leaves to the runner, are counted scalar multiplications in the
+/// verification phase.  The search is the same.
+pub fn solve_candidate_v2(
+    instance: &BinaryInstance,
+    target: FastPoint,
+    config: SolveConfig,
+) -> Result<LargePrimeReport, String> {
+    solve_with_verification(instance, target, config, false, true)
 }
 
 fn solve_with_verification(
@@ -777,15 +804,24 @@ fn solve_with_verification(
     target: FastPoint,
     config: SolveConfig,
     verify_candidate: bool,
+    charge_checks: bool,
 ) -> Result<LargePrimeReport, String> {
     if config.max_large_primes > 2 {
         return Err("max_large_primes must be 0, 1, or 2".into());
     }
-    if !instance.fast.is_on_curve(target) || !instance.fast.mul_u64(target, instance.r).infinity {
+    let group = BinaryGroup(&instance.fast);
+    let mut verify_ops = GroupOps::default();
+    let mut membership_checks = 0u64;
+    let in_subgroup = if charge_checks {
+        membership_checks = 1;
+        instance.fast.is_on_curve(target) && group.mul(&mut verify_ops, target, instance.r).infinity
+    } else {
+        instance.fast.is_on_curve(target) && instance.fast.mul_u64(target, instance.r).infinity
+    };
+    if !in_subgroup {
         return Err("target is not a point in the configured prime-order subgroup".into());
     }
     let start = Instant::now();
-    let group = BinaryGroup(&instance.fast);
     let mut phase_group_ops = BTreeMap::new();
 
     let mut fb_ops = GroupOps::default();
@@ -815,10 +851,10 @@ fn solve_with_verification(
     let mut eliminator = LargePrimeEliminator::new(base.small_columns + 1, instance.r);
     let mut rng = SplitMix64(config.seed ^ 0x4a6f_7578_4c50_7631);
     let mut rel_ops = GroupOps::default();
-    let mut verify_ops = GroupOps::default();
     let mut counters = SolveCounters {
         combination_states_uncharged: decomposer.report.left_states
             + decomposer.report.right_states,
+        membership_checks,
         ..Default::default()
     };
     let mut samples = Vec::new();
@@ -924,6 +960,14 @@ fn solve_with_verification(
     counters.matrix_rank = matrix.rank() as u64;
     counters.row_ops_uncharged = matrix.row_ops;
     counters.lp_pivots = eliminator.pivot_count() as u64;
+    if charge_checks {
+        if let Some(d) = recovered {
+            counters.final_checks = 1;
+            if group.mul(&mut verify_ops, instance.generator, d) != target {
+                counters.final_checks_failed = 1;
+            }
+        }
+    }
     phase_group_ops.insert("relations".into(), rel_ops);
     phase_group_ops.insert("verification".into(), verify_ops);
     let verified_fast = verify_candidate

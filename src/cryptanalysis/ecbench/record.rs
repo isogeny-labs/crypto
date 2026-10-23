@@ -23,7 +23,9 @@ use crate::cryptanalysis::ecbench::methods::{
     SolverStats,
 };
 use crate::cryptanalysis::ecbench::spec::Level;
-use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
+use crate::cryptanalysis::ecbench::workload::{
+    legacy_automorphisms, CurveFacts, CurveSpec, TargetKind, Workload, FLOOR_RULE_V2,
+};
 use crate::cryptanalysis::ic_boundary::FieldOps;
 use crate::cryptanalysis::ic_measurement;
 
@@ -166,7 +168,7 @@ pub fn child_main(input: &str) -> ChildOutput {
         if profile_solve {
             ic_measurement::callgrind_dump(b"ecbench_before_solve\0");
         }
-        let report = crate::cryptanalysis::ecbench::methods::solve(
+        let report = crate::cryptanalysis::ecbench::methods::solve_measured(
             &m,
             &inst,
             &w.curve,
@@ -176,9 +178,18 @@ pub fn child_main(input: &str) -> ChildOutput {
         if profile_solve {
             ic_measurement::callgrind_dump(b"ecbench_solve\0");
         }
-        let report = report?;
+        let mut report = report?;
         let hw = counters.stop();
         let after = schedstat();
+        // The factor-base inventory names the base in the record and changes
+        // no count; it is rebuilt here, after every window has closed.
+        crate::cryptanalysis::ecbench::methods::complete(
+            &m,
+            &inst,
+            &w.curve,
+            &w.target,
+            &mut report,
+        )?;
         let delta = match (before, after) {
             (Some(a), Some(b)) => Some(SchedStat {
                 cpu_ns: b.cpu_ns.saturating_sub(a.cpu_ns),
@@ -248,6 +259,12 @@ pub struct Boundaries {
     /// for this curve, which no generic method beats on average.
     pub floor_s: f64,
     pub ratio_to_floor: Option<f64>,
+    /// The rule that gave `automorphisms_available` and `floor_s`
+    /// ([`FLOOR_RULE_V2`]).  Absent in a record written before the rule was
+    /// named: the audit recomputes it under the first rule, `A = 2` on every
+    /// prime curve, so a committed record keeps the floor it was written with.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub floor_rule: Option<String>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
@@ -479,6 +496,18 @@ pub(crate) fn from_str_legacy_floats<T: DeserializeOwned>(text: &str) -> Result<
 /// `√(π / 2A)`.
 pub fn floor_s(automorphisms: u32) -> f64 {
     (std::f64::consts::PI / (2.0 * automorphisms.max(1) as f64)).sqrt()
+}
+
+/// The `A` a record's floor must have been computed from, given the curve
+/// facts the audit rebuilds from the spec: the first rule for a record with no
+/// `floor_rule`, the facts' own count under [`FLOOR_RULE_V2`], and `None`
+/// (unknown, so a failure) for any other rule name.
+pub fn expected_automorphisms(floor_rule: Option<&str>, curve: &CurveFacts) -> Option<u32> {
+    match floor_rule {
+        None => Some(legacy_automorphisms(curve)),
+        Some(FLOOR_RULE_V2) => Some(curve.automorphisms_available),
+        Some(_) => None,
+    }
 }
 
 // ── Grading ────────────────────────────────────────────────────────

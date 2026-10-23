@@ -31,8 +31,8 @@ use crate::cryptanalysis::ecbench::canonical::sha256_hex;
 use crate::cryptanalysis::ecbench::host::{self, recompute_class, HostCapsule};
 use crate::cryptanalysis::ecbench::methods::MethodSpec;
 use crate::cryptanalysis::ecbench::record::{
-    check_line_seal, child_main, floor_s, grade, json_roundtrip, ChildInput, GradeInput, Record,
-    CHILD_INPUT_SCHEMA, GRADING_VERSION,
+    check_line_seal, child_main, expected_automorphisms, floor_s, grade, json_roundtrip,
+    ChildInput, GradeInput, Record, CHILD_INPUT_SCHEMA, GRADING_VERSION,
 };
 use crate::cryptanalysis::ecbench::runner::{read_record_lines, read_session, PlanDoc};
 use crate::cryptanalysis::ecbench::spec::{plan, Arm, Spec};
@@ -401,7 +401,11 @@ pub fn audit_with(
         // a hand-edited S, ratio or flag fails here even if resealed.
         let floor = floor_s(r.boundaries.automorphisms_available);
         let sqrt_r = (w.curve.r as f64).sqrt();
-        let derived_ok = r.boundaries.automorphisms_available == w.curve.automorphisms_available
+        // The floor's `A` follows the rule the record names (none: the first
+        // rule), so a record written before `j = 0` and `j = 1728` curves got
+        // their own count still recomputes to the floor it was written with.
+        let derived_ok = Some(r.boundaries.automorphisms_available)
+            == expected_automorphisms(r.boundaries.floor_rule.as_deref(), &w.curve)
             && close(r.boundaries.floor_s, floor)
             && match (r.cost.total_gae, r.cost.s, r.boundaries.ratio_to_floor) {
                 (Some(t), Some(sv), Some(q)) => close(sv, t / sqrt_r) && close(q, sv / floor),

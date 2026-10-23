@@ -191,9 +191,26 @@ unseen target**, cold, with every phase charged, verified.
 
 Every record carries the curve's generic floor in `S`,
 `floor_s = √(π / 2A)`, with `A` the automorphisms a generic algorithm may
-use: 2 (negation) on any curve, `2m` on a Koblitz curve over `GF(2^m)`
-(signed Frobenius). The ratio `S / floor_s` is in every record and every
-table. The *reference* is an arm of the session, normally the matched
+use, computed from the curve (`workload::Instance::facts`): 2 (negation)
+on any curve; `2m` on a Koblitz curve over `GF(2^m)` (signed Frobenius),
+whether constructed or given as an explicit binary curve with `a ∈ {0,1}`,
+`b = 1`; 6 on a `j = 0` prime curve (`a = 0`, `p ≡ 1 (mod 3)`) and 4 on a
+`j = 1728` one (`b = 0`, `p ≡ 1 (mod 4)`), when the rational order-3
+(order-4) automorphism acts on the order-`r` subgroup as a scalar (the
+structure `rho.cubic` and `rho.quartic` need, checked with their own
+constructors). The ratio `S / floor_s` is in every record and every table.
+
+The count is versioned: a record carries `boundaries.floor_rule`
+(`automorphisms/v2`). A record without the field was written under the first
+rule, `A = 2` on every prime curve, and the audit recomputes it under that rule
+(`workload::legacy_automorphisms`), so a committed record keeps the floor it
+was written with. Under the first rule a `j = 0` curve's `rho.cubic` read
+0.91× a floor it was entitled to beat (`A = 6` makes that floor
+`√(π/12) = 0.51`, and the same run about 1.6× it). No committed session uses
+a `j = 0` or `j = 1728` prime curve; the explicit Koblitz curves in
+`research/ghs_curve_comparison_20261009` already carry `A = 2m`, because
+`binary_explicit_instance` certifies them as Koblitz. A test checks that no
+method's `automorphisms_used` exceeds the `A` available. The *reference* is an arm of the session, normally the matched
 rho: `rho.negation` on a prime curve, `rho.signed_frobenius` on a Koblitz
 curve. `ecbench table` divides every arm by it.
 
@@ -334,11 +351,11 @@ rho's expectation `√(π/2)`; the curve's floor is `√(π/2A)` (§3).
 
 | family | charged | counted, not charged (`*_uncharged`) |
 |---|---|---|
-| `rho.*` | jump-table set-up, walk starts, every step, cycle escapes, look-ahead additions, internal verification | canonicalisations (negation, signed Frobenius), Frobenius maps |
+| `rho.*` | jump-table set-up, walk starts, every step, cycle escapes, look-ahead additions, internal verification (`rho.cubic` and `rho.quartic` leave out their set-up `[κ]G` ledger; the `_v2` ids charge it) | canonicalisations (negation, signed Frobenius), Frobenius maps, distinguished-point table queries and inserts (counted in the `_v2` ids) |
 | `rho.signed_frobenius_strong` | group additions exactly; each scalar multiplication (jump table, walk start stride, candidate checks) at `1.5·log₂ r` additions, `ic_boundary::signed_frobenius_rho`'s convention | canonicalisations, partition hashes, distinguished-point table queries and inserts |
 | `rho.signed_frobenius_strong_legacy` | identical to `rho.signed_frobenius_strong`; comparison-only implementation control | identical to `rho.signed_frobenius_strong` |
-| `bsgs.*` | baby steps, the giant stride, giant steps | table inserts and lookups |
-| `kangaroo.vow` | jump-table set-up, starts and restarts, every jump | table inserts and lookups |
+| `bsgs.*` | baby steps, the giant stride, giant steps (the `_v2` ids add the final check) | table inserts and lookups |
+| `kangaroo.vow` | jump-table set-up, starts and restarts (all in `setup`; `kangaroo.vow_v2` keeps restarts apart and adds the final check), every jump | table inserts and lookups |
 | `claw.pair_table` | the known-log base's seed scalar multiplications, every table addition `P_i + F_b`, both query additions `Q − (F_k + F_l)`, the addition that rebuilds a hit's table sum; phases `base`, `table`, `search`, `recover` | Frobenius maps, canonicalisations, table inserts and probes |
 | `ic.pipeline` | factor base, oracle set-up (pair tables), relation trials, linear algebra, verification, each a phase; native work (lookups, row operations, square roots, Artin–Schreier solves, …) at the pinned ratio where the repository has one | native work with no pinned ratio for this curve; algebraic-solver operations |
 | `ic.pipeline_counted` | the same pipeline with the relation phase charge rebuilt from counted work and pinned conversions for deterministic SAT/PDP replays | algebraic-solver operations without a pinned conversion, including SAT conflicts; these runs remain lower bounds |
@@ -549,6 +566,59 @@ sense of AGENTS.md §3: the same work in a faster constant. `ecbench` has no
 prime-curve Gröbner oracle (the note's Buchberger baseline terminates only
 at `|F| = 6`, too small for a DLP), so the prime side is compared with the
 existing `subtract` and `mitm` oracles.
+
+**Accounting v2.** Some rules above had gaps that a registered method's id
+freezes: counts are compared on replay, so a fix is a new id, and the old id
+keeps its records and says what it leaves out. The `_v2` ids below are the ones
+to read new work against; every phase sum equals the total for them
+(`accounting_tests::every_registered_methods_phases_sum_to_its_total`).
+
+| old id (frozen) | new id | what changes |
+|---|---|---|
+| `rho.cubic`, `rho.quartic` | `rho.cubic_v2`, `rho.quartic_v2` | the `[κ]G` verification ledger of `CubicClasses::new` / `QuarticClasses::new` is in `total_gae` (phase `automorphism_setup`); the frozen ids put it in `search` after reading `gae`, so their phases sum to 26 GAE (3 % of `S` at 2^20) more than their total. **Known-undercharged**; no committed session uses them |
+| `rho.negation`, `rho.signed_frobenius`, + the two above | `rho.negation_v2`, `rho.signed_frobenius_v2` + the two above | Brent cycle detection (one stored checkpoint at powers of two, the cycle left from its least-key member) beside the 16-point window, so a cycle longer than the window is escaped and not run to the walk cap (`20·2^dp + 64`); `lost_walk_steps` (and by cause: `steps_in_walks_capped`, `…_abandoned_in_a_cycle`, `…_ending_at_the_identity`, `…_out_of_budget`) are charged counters (the work is in `walk_operations`), `cycles_longer_than_window` counts the detections, and the distinguished-point table's `…_table_queries_uncharged` and `…_inserts_uncharged` are counted. On the review's n = 37 runs 4 of 80 hit capped walks and the mean rose 14 % |
+| `rho.signed_frobenius_strong` | `rho.signed_frobenius_strong_v2` | lanes, distinguished-point bits and the jump table scale with `r` (`auto`, see below); the jump table is `[s]G` for distinct scalars from one table of `[2^i]G`, every doubling and addition counted (`1.5·log₂ r` a jump in the frozen id); the `lanes − 1` start multiples are charged (not in the frozen id); candidate checks are a `verification` phase; an exhausted solve records the work it spent (the frozen id records total 0 and no phases) |
+| `bsgs.textbook`, `bsgs.interleaved`, `bsgs.negation` | `…_v2` | one charged final `[d]G = Q` (phase `verification`, about `1.5·log₂ r` GAE, 2.7 % of `S` at 2^20), which rho and index calculus already paid for their answer |
+| `kangaroo.vow` | `kangaroo.vow_v2` | the final check, and restarts in their own phase `restarts` (the frozen id charges them to `setup`) |
+| `claw.pair_table` | `claw.pair_table_v2` | the final check; the `max_adds` budget counts the `recover` phase too (the frozen id lets a run spend past it by its recover additions) |
+| `ic.large_prime` | `ic.large_prime_v2` | the target's `[r]Q` subgroup-membership check, which the frozen id ran on a ledger nobody read, and the final `[d]G = Q` are counted scalar multiplications in the `verification` phase |
+
+*One rule for verification.* A method that returns an answer charges one final
+`[d]G = Q` scalar multiplication, and every failed candidate check, in a phase
+named `verification` (rho: `internal_verification`). It is a property of the
+method id and not a harness phase added to every arm: rho and index calculus
+already pay it inside their frozen ids, so a harness phase would charge them
+twice unless it knew which methods verify (a per-method flag again), and it
+would have to be versioned through the plan, the record and the audit's
+`S = total / √r` recomputation, each owned elsewhere and each a new way for a
+historical record to stop recomputing. A `_v2` id carries the rule in the
+identity the audit, the replay and the run ids already hash, and one
+registry-wide test pins it.
+
+*The strong reference's `auto` shape.* With `ideal = √(πr/2A)` expected steps:
+`dp_bits = round(log₂(ideal)/2)` (1 to 20), `lanes` the power of two at most
+`ideal / 2^(dp_bits+3)` (1 to 32), and `jumps` the largest of 32, 16, 8 whose
+fixed set-up (`jump table + 3·log₂ r + 1.5·log₂ r`, the two start
+multiplications and the final check) is at most a tenth of `ideal`, never
+fewer than 8; the table repeats its distinct jumps to the reference's 32
+entries. Where `r` is too small for that (below about 2^31) the set-up share is
+not hidden by a worse walk: it is in `detail.setup_share`, and a row is
+flagged when fixed set-up exceeds 10 % of `S` or `log₂ r` is below the
+calibrated range (prime `r < 2^25`, Koblitz `r < 2^39`;
+`methods::row_flags`, `setup_share`, `calibrated_log2_r`, for `ecbench
+table`). At the review's sizes the frozen reference was 58× (n = 13) and 15.5×
+(n = 19) theory, almost all of it 32 full-size jump scalars; at n = 13, with
+about eleven expected steps, even eight jumps cost more than the search.
+
+*The factor-base inventory is outside the measured span.* An index-calculus
+run names its factor base in the record (`factor_base`: the `FB1h…` id, size and
+description), which needs the base rebuilt after `run_pipeline`. The measured
+child used to rebuild it before closing its scheduler, hardware-counter and
+Callgrind windows, so those, and `max_rss_kib`, included work that is neither
+the solve nor counted in `S`. `methods::solve_measured` now returns without it
+and the child calls `methods::complete` after every window has closed
+(`methods::solve` calls both for any other caller). No count changes: a replay
+of the committed `ic.pipeline` and `ic.shared_rank` sessions is identical.
 
 **Calibration.** The unit has been checked against theory in
 [`research/ecbench_calibration_20261002`](../../research/ecbench_calibration_20261002/README.md).
@@ -929,9 +999,17 @@ Stated so that nothing here is read as more than it is:
   not an isolated online wall claim; the
   [preregistered n37 gate](../../research/ecbench_n37_online_ir_20261004/PROTOCOL.md)
   defines its first comparison.
-- **Rho's distinguished-point table is not counted.** Its stores happen
-  once per distinguished point, a vanishing fraction of steps. BSGS and
-  the kangaroo count their table operations.
+- **Rho's distinguished-point table is not charged.** Its probes and stores
+  happen once per distinguished point, which is not a vanishing fraction of
+  steps at the walk lengths the references use: 1 in 16 at `dp_bits = 4`, so
+  6.5 % of the steps at n = 37 and 16 % at n = 13 for
+  `rho.signed_frobenius_strong`, which counts them as
+  `table_queries_uncharged` and `table_inserts_uncharged` (the tuned rho's
+  `_v2` ids as `distinguished_point_table_queries_uncharged` and
+  `…_inserts_uncharged`; the frozen tuned ids do not count them). The strong
+  `_v2` reference's `dp_bits` scales with `r`, which brings the fraction down
+  to about `1/√ideal`; §5a's pricing sees the counts either way. BSGS and the
+  kangaroo count their table operations.
 - **One thread.** Parallel collision search is out of scope until a
   multi-thread run can be graded (a parallel change must be measured at
   one thread and at many, AGENTS.md §10).
