@@ -124,6 +124,8 @@ fn every_problem_runs_verifies_and_rejects_wrong_answers() {
         ("path.supersingular", 12, vec![]),
         ("csidh.action", 1, vec![("preset", "n=6")]),
         ("klpt", 30, vec![]),
+        ("radical.chain", 6, vec![("ell", "7"), ("bits", "61")]),
+        ("radical.chain", 6, vec![("ell", "5"), ("bits", "61")]),
     ];
     for (problem, size, ps) in cases {
         let decl = problems::problem(problem).unwrap();

@@ -214,3 +214,49 @@ The main crate already contains related code, which this crate neither imports n
 (Elkies kernel polynomial from Φ_ℓ with its own derivation of the E2 relation; **not**
 cross-tested against `find/bmss.rs::sigma_from_phi`), `src/cryptanalysis/binary_velu.rs`
 (characteristic-2 Vélu; not cross-tested against `binary.rs`).
+
+## Measured in isobench (the counted frontier)
+
+`isobench` (`docs/isobench/`) measures families in a counted unit (field-multiplication
+equivalents, fme, through `Counted<F>`) with independent checkers, sealed replayable records and
+a frontier. A family is *measurable there* only when its whole computation runs through the
+`Field` trait over a single prime field GF(p): the counter sees every operation. The measured
+problems are `kernel.codomain`, `kernel.chain`, `find.kernel`, `modpoly.phi`, `count.sea`,
+`path.ordinary`, `path.supersingular`, `csidh.action`, `klpt`, and **`radical.chain`** (radical
+ℓ-isogeny chains, ℓ ∈ {5, 7}; one ℓ-th root per step, so cost ≈ linear in the chain length — the
+fitted exponent is 0.97 in n over a 61-bit prime, session `docs/isobench/sessions/radical-7`).
+
+Implemented families that are **not** in the counted frontier, and why (the same reason external
+tools such as PARI are not counted — their work is not all in the `Field` interface over one
+GF(p)):
+- **Higher-dimensional (theta (2,2), Kani chains, Richelot, genus 2):** these run over F_{p²}
+  (and products of surfaces), not a single prime field; their wall-time behaviour is in the
+  `tests/theta*.rs`, `tests/genus2.rs` suites and the p434 benchmark, not in fme.
+- **Deuring correspondence and KLPT→isogeny:** quaternion and lattice arithmetic over the
+  integers, outside the `Field` interface (KLPT's *output norm* is measured by `klpt`, but the
+  ideal→isogeny translation is not).
+- **Fixed-degree isogenies (V4):** Cornacchia/Coppersmith lattice steps are integer work, not
+  field operations.
+- **Characteristic 2 and 3 (`binary.rs`, `gf3n.rs`):** these are `Field`s, but `isobench`'s
+  field dispatch is GF(p) only; a GF(2ⁿ)/GF(3ⁿ) counted unit would need its own calibration.
+
+## Known gaps (as of this coverage pass)
+
+Honestly recorded so the map above is not mistaken for completeness:
+- **(E, Ẽ) → isogeny in small characteristic** (p-adic lift, Couveignes' 2-torsion): implemented
+  on a separate branch/PR (small-char), not yet merged here. Lercier 1996 (char 2) and
+  Caruso–Eid–Lercier 2020 remain unimplemented.
+- **Full SIDH key recovery** (Castryck–Decru digit guessing / Robert evaluation): prototyped; the
+  dimension-2 split *decision* at a known full secret (the endomorphism Kani diamond) verifies,
+  but a correct end-to-end digit-guessing recovery did not converge and is not shipped.
+- **Ideal → isogeny at cryptographic size** (Clapoti(s)/KLaPoTi/SQIsign2D) and **PEGASIS**-style
+  group-action evaluation via dimension-2/4 isogenies: not implemented (the Deuring here is
+  limited to u64 p).
+- **Enge's quasi-linear Φ_ℓ** (floating-point evaluation/interpolation): not implemented; the
+  modular polynomial is built by q-expansions, Hecke/Newton, or CM volcano CRT.
+- **Odd (ℓ, ℓ)-isogenies in dimension 2** (Bruin–Flynn–Testa (3,3), Cosset–Robert): not
+  implemented (only (2, 2) is).
+- **Path/group-action refinements:** faster Delfs–Galbraith (subfield-root detection),
+  multi-ℓ volcano paths, the rest of Galbraith–Stolbunov, CTIDH/dCTIDH: not implemented.
+- **Radical isogenies of other degrees** (N = 2, 4, 9, 11, 13) and **Jacobi-quartic models:**
+  N = 3, 5, 7 are implemented; N = 11, 13 need the genus-1/2 modular curves X₁(11), X₁(13).
