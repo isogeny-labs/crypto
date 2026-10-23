@@ -515,3 +515,194 @@ generic system with the block structure and read the predicted degree;
 compare with the measured `D = 6, 6, 7, 7, ≥ 8` at `N = 9–20`. **Kill** if the
 predicted bound is ≥ the measured degree at every `N` (then the block
 structure explains nothing and offers nothing).
+
+## Round 2 cards (2026-10-23)
+
+Added after the 14 dossiers above closed most reformulations at the desk.
+These five follow the dossiers' own pointers: the one regime where an index
+calculus without summation polynomials is measured below rho's exponent, the
+degree-law question that decides the binary route, and constant-factor levers
+that would count as measured improvements under the owner's success
+criterion. Same rules, same briefs (`BRIEF_SONNET.md`, `BRIEF_HAIKU.md`).
+
+### LEAD-15 — Plane-quartic Jacobian arithmetic to unblock Diem's Õ(q) branch of the cubic-GHS transfer
+
+**Class.** Transfer / arithmetic (the live sub-rho regime). **Tier.**
+Exponent: Diem's plane-curve index calculus on a non-hyperelliptic genus-3
+curve costs Õ(q) against rho's q^{1.5} on E(F_{q^3}), with relations from
+line intersections and no Gröbner step.
+
+**Mechanism.** For E/F_{q^3} with #E ≡ 0 mod 4 the minimal GHS genus is 3
+(`research/ghs_cubic_cover_census_20261012/`). The hyperelliptic branch is
+measured at q^{1.30} with double large primes
+(`research/ic_next10_20261014/07-cubic-ghs-genus3/README.md`); the
+non-hyperelliptic branch (smooth plane quartic) is Diem's Õ(q) algorithm and
+ran 90/90 correct on toys at q ∈ {5, 7, 11} but is blocked because
+degree-3 Picard-class canonical forms are not unique in the repository's code
+(`problems/plane-quartic-jacobian-class-arithmetic-missing.md`;
+`research/ghs_cubic_quartic_ic_20261012/README.md`). The missing piece is
+Jacobian arithmetic on a smooth plane quartic C/F_q: a canonical reduced
+representative of each class in Pic⁰(C) (Riemann–Roch, effective divisors of
+degree 3 up to linear equivalence), addition and negation, and the map that
+carries the ℓ-part of E(F_{q^3}) through the cover.
+
+**Prior art.** Diem, "An index calculus algorithm for plane curves of small
+degree" (ANTS VII, 2006) and his thesis; Flon–Oyono–Ritzenthaler, "Fast
+addition on non-hyperelliptic genus 3 curves" (Algebraic Geometry and its
+Applications, 2008): group law by geometric constructions (conics through
+points) with a quoted operation count; Khuri-Makdisi, "Asymptotically fast
+group operations on Jacobians of general curves" (Math. Comp. 2007) and "Linear
+algebra algorithms for divisors on an algebraic curve" (Math. Comp. 2004);
+Oyono's thesis; the Smith cover construction
+(`ml-cryptanalysis/csd/smith_codomain.py`, `experiments/smith-codomain/report.md`:
+line-relation yield f²/2, 10–30× the hyperelliptic yield); repository
+`hyperelliptic_index_calculus.rs`, `research/ghs_cubic_hyperelliptic_genus3_20261013/`
+(4,800/4,800 homomorphism checks), `problems/ghs-to-smith-pipeline-characteristic-mismatch.md`
+(characteristic 2 and 3 blocked), the `ecdlp-surfaces` tooling.
+
+**Discriminating test.** Specify the arithmetic precisely enough for the
+mechanical tier: representation of a class (which basis of L(3P∞) or of the
+canonical embedding), the addition algorithm with its operation count in F_q
+multiplications per group operation, the test vectors (toys q ∈ {5, 7, 11},
+random classes, associativity and order checks against the point count), then
+the ℓ-part transfer and a line-relation harvest at q = 2^8. **Kill** if the
+per-operation cost exceeds 10³ F_q multiplications at q = 2^8 (then the
+relation and descent phases cannot stay below the hyperelliptic branch), or if
+canonical forms cannot be made unique without a Gröbner computation per
+class.
+
+### LEAD-16 — Nagao's quadratic system against the D₄-symmetrised S₅ at k = 4
+
+**Class.** Formulation (extension field k = 4, the regime with rho's
+exponent). **Tier.** Constant on C₄, the crossover lever.
+
+**Mechanism.** On E/F_{p^4} with the factor base x ∈ F_p, the repository
+decomposes with S₅ descended and symmetrised under
+D₄ = (Z/2)³ ⋊ S₄, at C₄ ≈ 2.54·10¹⁰ F_p multiplications per solve
+(`research/gaudry_quartic_d4_20261013/README.md`, 48× below the plain S₅).
+Nagao's alternative for g = 1, n = 4 writes the decomposition as "the
+function f with divisor Q + P₁ + … + P₄ − 5∞ has coefficients whose
+F_p-rationality conditions are n(n−1) = 12 quadrics in 12 unknowns"
+(`RESEARCH_PDP_SAT_SMT_NAGAO_SURVEY.md` §4.2). Its unknowns are coefficients of
+f, so the S₄ permutation symmetry is already quotiented; the 2-torsion
+translations may still act. Ideal degree before symmetry is 2^{12} = 4096,
+the same as S₅'s; after D₄ the S₅ system has about 85 solutions. The question
+is which system msolve solves faster per decomposition, and whether Nagao's
+admits the (Z/2)³ quotient.
+
+**Prior art.** Nagao ePrint 2007/112 (ANTS 2010); Joux–Vitse Eurocrypt 2012
+(Nagao's "n − 1 decomposition" on the cover, `jv_cover.rs`); Faugère–Wallet
+2018 (summation ideals against Nagao on Jacobians); repository
+`RESEARCH_PDP_SAT_SMT_NAGAO_SURVEY.md` §5 (prime n only: "S′₄ with the linear
+part hidden"), `leads/LEAD-13.md`, `research/ic_next10_20261014/01-fp4-ladder/`,
+`gaudry_quartic_d4.rs`, `research/gaudry_quartic_d4_cost_20261014/README.md`.
+
+**Discriminating test.** Write both systems for one curve at p ≈ 2^{10}
+(three random targets), count variables, equations, degrees and the ideal
+degree with msolve, time one solve each, and record whether the Nagao system
+is invariant under translation by the rational 2-torsion and by what
+quotient. **Kill** if Nagao's per-decomposition cost is not below the D₄ S₅
+solve by ≥ 2× at equal ideal degree, or if its solution count is not below
+4096/8.
+
+### LEAD-17 — Closed-form closure dimensions for the descended S₃ chain (the degree law without a 128 GB host)
+
+**Class.** Theory (binary, prime n; the m = 3, 4 routes). **Tier.**
+Exponent-deciding: it answers LEAD-05's question for every n at once.
+
+**Mechanism.** Solovyev's preprint gives exact closure dimensions for the
+descended S₃ (dim V₃ = (3N − 2)n − C(N, 2), formulas for dim V₄ and the
+degree-5 part, "exactly 3n quadrics"), and the repository proved the exact
+b(b+1)/2 symmetry defect of the bilinear S₃ core
+(`research/linearization_reach_20260930/README.md`) and measured trace-parity
+confinement. Together they say the truncated ideal's Hilbert function is
+combinatorial: monomial counts minus the identities that the Frobenius
+structure (x² linear in the bits), the field equations, the S₃ symmetry and
+the trace morphism force. If the same count can be carried out for the chain
+S₃(x₁, x₂, y) = S₃(y, x₃, x_R) = 0 with x_i ∈ V (dimension ℓ) and y free, the
+degree D(n, ℓ) at which the closure saturates (= the solving degree the
+repository measures with MutantXL and msolve) follows without computing the
+(4, 6) cell.
+
+**Prior art.** `leads/LEAD-05.md` (what Solovyev's degree is and how it
+matches the repository's instruments); `research/dreg_closure_scale_20261016/RESULTS.md`,
+`dreg_closure_driver_20261016/RESULTS.md`, `dreg_closure_mutantxl_20261016/RESULTS.md`
+(measured closure ranks per cell, the data to fit against);
+`research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md` and
+`RESEARCH_CHAIN_SPLIT_ORDER.md`; Huang–Kosters–Yang–Yeo (arXiv 1505.02532,
+last fall degree); Kousidis–Wiemers (first fall m² − m + 1); Caminata–Gorla
+(solving degree versus degree of regularity).
+
+**Discriminating test.** Derive the degree-2 and degree-3 closure dimensions
+of the chain as functions of (n, ℓ), compare with three measured cells from
+the closure RESULTS files (exact match required), then state the predicted
+saturation degree at (ℓ, m) = (4, 6) and the slope in n. **Kill** (for the
+theory route) if the degree-3 count misses a measured cell by more than the
+trace-parity term, which means an identity is missing that the count cannot
+see.
+
+### LEAD-18 — Structured elimination for C₄: a resultant or FGLM path on the D₄ quotient instead of the dense Macaulay solve
+
+**Class.** Solver engineering (k = 4). **Tier.** Constant; every 10× off C₄
+moves the k = 4 handover by about 2^{13}
+(`research/ic_speed_and_rho_scope_20261013/README.md`).
+
+**Mechanism.** The D₄-symmetrised S₅ system has 4 invariant unknowns and
+about 85 solutions over F̄_p; the repository solves it by a dense Macaulay
+elimination (`gaudry_quartic_d4.rs`;
+`research/gaudry_quartic_d4_cost_20261014/README.md`, record-and-replay
+capped at 2–7 %). A zero-dimensional system of degree 85 in 4 unknowns can
+also be solved by (i) a grevlex Gröbner basis followed by sparse FGLM
+(Faugère–Mou) to a lex basis in shape position and a degree-85 univariate
+root-finding (gcd with x^p − x), or (ii) iterated resultants exploiting that
+each invariant appears with low degree, as E13 did at k = 3 with a degree-16
+resultant (`RESEARCH_GLV_INVARIANT_FACTOR_BASES.md`). The cost model is
+known: FGLM in Õ(D^ω) or sparse O(D²·nnz), root-finding in Õ(D log p).
+
+**Prior art.** Faugère–Mou, "Sparse FGLM algorithms" (JSC 2017);
+Faugère–Gianni–Lazard–Mora (FGLM); E13 and §11.17–11.19 of
+`RESEARCH_RESIDUAL_WALKS.md`; `leads/LEAD-02.md` (why precomputing the
+eliminant in the target coordinates fails: this card keeps the per-target
+solve and changes only its algorithm); `research/gaudry_quartic_replay_20261013/README.md`.
+
+**Discriminating test.** On the committed D₄ instances at p ≈ 2^{10}, read
+the Macaulay matrix size and degree the solver reaches, then estimate (desk)
+the FGLM + root-finding cost and the resultant-chain cost in F_p
+multiplications, and prescribe a msolve run (which already does F4 + FGLM)
+on the same instances to read its cost against C₄. **Kill** if neither path
+is below the measured C₄ by ≥ 3× in the desk model, or if msolve's measured
+cost on the instances is not below the repository solver's.
+
+### LEAD-19 — Cofactor-projected factor base on the random-binary ladder (LEAD-04, arm C)
+
+**Class.** Factor base / filter (binary rows with cofactor). **Tier.**
+Constant; the one card with a desk estimate of a measured improvement over a
+leaderboard row.
+
+**Mechanism.** The random-binary rows of Table B (`icv1-f2m15`, `f2m21`,
+`f2m27`, cofactors 2 or 6, `docs/ic/LEADERBOARD.md`) build their factor base
+from raw points of E(F_{2^n}) with no projection into the prime-order
+subgroup, so a fraction of base points and of candidate pairs can never
+appear in a relation inside the subgroup. `leads/LEAD-04.md` estimates a
+class-0 or cofactor-projected base at 1.4–1.6× on S at fixed base size on
+`f2m21` and found no record of it being tried. Two constructions: multiply
+each base point by the cofactor h (keeps |F| but moves every point into the
+subgroup; relations then hold in the subgroup directly), or keep only points
+already in the subgroup (shrinks |F| by h, so compare at equal |F| by
+drawing more candidates).
+
+**Prior art.** `leads/LEAD-04.md` §4 and §6 (arm C, the prime-order negative
+control that must read 1.000×, the cofactor-4 positive control);
+`research/ic_tool_program/rule/v3/README.md` and
+`research/notes/index-calculus/RESEARCH_IC_BOUNDARY_LEDGER.md` §10 (how the
+rows were built: folded pair table, walked targets, m = 2);
+`src/cryptanalysis/ic_framework/plugins.rs` (the `binary-subspace` base),
+`docs/ic/boundary_targets.json` (trace-zero ceiling caveat: bases in 2E).
+
+**Discriminating test.** A frozen protocol the mechanical tier can run with
+the existing `ic boundary` tooling: arms A (current base), B (h-projected
+base, same |F|), C (subgroup-only base at equal |F|), on `f2m15`, `f2m21`,
+`f2m27`, 5 seeds each, recording S, relations per candidate, and verified
+answers; prime-order row `fp24` as the negative control. Prediction 1.4–1.6×
+on S for B and C; **kill** if B and C are within 1.1× of A on all three rows
+or the negative control moves.
