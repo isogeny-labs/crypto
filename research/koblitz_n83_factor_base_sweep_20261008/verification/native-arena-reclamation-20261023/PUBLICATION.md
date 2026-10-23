@@ -52,3 +52,29 @@ SHA25698c4396b189493eba773c7d3d5e10f05f974d77cf9b811af8437c1150417c5ea;
 restore the frozen absolute input paths or use the byte-identical archived
 bind copies. These are zero-relation diagnostic replays, not scalar-recovery
 certificates or performance admission.
+
+## Continuation preparation and pre-search refusal correction
+
+Two additional immutable names are registered in store/index.json:
+
+- `evidence/n83/arena-reclamation-20261023/continuation-preparation.tar.xz`,
+  2984808bytes, SHA256
+  `c103fb3250fe66466fffe6f90fff5ebe4bcddef49dce117c912b8ae3340c6bdc`.
+  Source througha591, prerequisite37631; final report inspection, v2/v3 guards,
+  metadata/format/render failures and their corrections. No higher-cap worker
+  at that archive freeze. PUT/HEAD/freshGET/payload/source/repack pass.
+- `evidence/n83/arena-reclamation-20261023/admission-correction.tar.xz`,
+  37079684bytes, SHA256
+  `d44f b92c a0bd fdec 4c96 6c0c 030d 29bf 0c1e ab3d b0e7 da52 89b5 ad29 0773 9d6f`
+  (concatenate groups). Source throughb877, prerequisitea591. Includes the
+  actual K2048-c1 refusal, complete raw/card/spec/binds/relay/receipt/source,
+  director assessment, pressure/lock refusals, first failed packaging collision,
+  corrected staging, new binaries and21/43+7 native checks, native13/8987
+  accounting, and separate inspected failure report. PUT/HEAD/freshGET/all
+  payload SHA/source/native accounting/byte-identical repack pass.
+
+Receipts and manifests are under publication/continuation-preparation-publication
+and publication/admission-correction-publication-v2. Prior entries were checked
+structurally unchanged; objects were neither overwritten nor deleted. Copies
+were made readable only in the new staging directory. No corrected continuation
+has run at this publication freeze; see RESPEC-C2.md for the exact bounded plan.
