@@ -12,9 +12,22 @@ polynomial records and a native-selected job for the next P-256 sieving
 allocation. Its bounded search returned no new factor; the arithmetic
 counts above remain unchanged.
 
-[R05 interim status](factorization/rounds/R05-20261022/README.md) records
-the subsequent bounded local sieving allocation. Its dated observation is
-an active-run status; final raw archive and outcome remain pending.
+[R05](factorization/rounds/R05-20261022/README.md) ended with exit 139 after
+3,164,757 main-file raw relations, plus a separate 32,684-line worker
+output. Its failed native status, full checkpoint and fresh independent
+arithmetic replay are recorded; no new factor was found and no worker is
+currently running. The earlier interim observation remains unchanged.
+
+The [2026-10-23 FactorDB check](factorization/factordb-20261023/README.md)
+queries all nine original targets and the exact remaining cofactor. It
+supplies no additional factors. Seven targets are more completely factored
+locally; the other two partitions agree. All returned products and their
+grouping into local pieces pass native PARI checks.
+
+The [native timeout diagnostic](factorization/native-timeout-diagnostic-20261023/README.md)
+reproduces the unpatched tool's exit 139 and validates its two-line printf
+fix in bounded full-tool controls. The later resume card now requires the
+checked executable and the R05 relation checkpoint; it remains unqueued.
 
 The [23-job runner](../../backlog/XP-20261021-nist-skipped-curves/README.md)
 and manual workflow remain available for a fresh upstream run. This study

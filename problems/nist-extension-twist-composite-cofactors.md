@@ -4,7 +4,7 @@
 - **Kind:** empirical bottleneck; bounded native factorization search
 - **Affected work:** [factorization continuation](../research/nist_skipped_curve_dissection_20261021/factorization/README.md), [original jobs](../backlog/XP-20261021-nist-skipped-curves/README.md)
 - **Next action owner:** native factorization continuation
-- **Last updated:** 2026-10-22
+- **Last updated:** 2026-10-23
 
 ## Problem
 
@@ -112,9 +112,27 @@ exact input and common-root checks. The native configured relation target
 is 46,000,000, with no runtime or sufficiency guarantee. The next bounded
 job can start sieving from the [R04 checkpoint](../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R04-20261022/README.md).
 
-R05: a local sieving allocation starts from that selected job, with a
-3600-second native limit and 1 GiB per-file cap. The
-[dated interim observation](../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R05-20261022/OBSERVATION.json)
-records actual native workers and raw relation progress. Final status,
-archive and replay are pending; no new factor is claimed. This does not
-close the original prime-factorization requirement.
+R05: the local 3600-second native allocation ends at 2026-10-22 11:28:15 UTC
+with exit 139 and a segmentation-fault diagnostic. The exact failing native
+component and cause are unknown; no outer-timeout signal was logged. The
+main file has 3,164,757 raw-relation lines; a separate worker output has
+32,684 lines. Both are retained without claiming deduplication or usable
+rank. Post-failure refinement and independent prime/product replay pass,
+with no new factor. No factorization worker is running at finalization.
+The [completion report](../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R05-20261022/reports/completion-20261023T0100Z/REPORT.md)
+and archive manifest identify the final evidence; the original interim
+observation remains unchanged. A subsequent
+[separate native timeout diagnostic](../research/nist_skipped_curve_dissection_20261021/factorization/native-timeout-diagnostic-20261023/README.md)
+reproduces original exit 139 versus patched exit 0 on the same input and
+small Q range, validating a two-line printf correction. Its original
+executable matches R05; no original production backtrace was retained.
+Use the binary-bound checked wrapper for the next bounded resume after
+actual checkpoint publication, preserving the separate worker file until
+safe merge semantics are verified.
+
+2026-10-23: [FactorDB](../research/nist_skipped_curve_dissection_20261021/factorization/factordb-20261023/README.md)
+returns no additional factors for the nine original integers or the exact
+444-bit residual, which remains `C`. Native checks verify all ten returned
+products and that their pieces only group whole local pieces. Seven
+original targets are more completely factored locally and two partitions
+agree. This does not establish novelty or explain the historical skip.

@@ -5,9 +5,12 @@ bounded native resume and independent certificate verifier. R02 completed
 eight of nine targets; its [P-256 checkpoint](../../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R02-20261022/README.md)
 is the remaining 444-bit composite lineage. R03 corrected a native restore
 failure; its validated compact master checkpoint is the fallback input.
-R04 preserves 329 validated saved records and a native-selected job for
-sieving. Its [checkpoint](../../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R04-20261022/README.md)
-is now selected by the card. Using the R03 fallback repeats R04 progress.
+R04 preserves a selected sieving job. The card now selects the newer
+[R05 relation checkpoint](../../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R05-20261022/README.md),
+which requires actual artifact-store publication before ready promotion.
+R03/R04 fallback archives omit R05's relations and are not equivalent resumes.
+The [native timeout correction](../../research/nist_skipped_curve_dissection_20261021/factorization/native-timeout-diagnostic-20261023/README.md)
+and a binary-bound passing native control are required by the checked wrapper.
 This card is a later allocation, never a claim that
 another worker or cloud task is running.
 
@@ -16,9 +19,14 @@ the retained polynomial/sieving state? A certified split changes the known
 factor partition; no split leaves the complete factorization unresolved.
 Progress in native state is recorded separately from the arithmetic result.
 
-Before ready promotion, pin the merged implementation, completed R03
-checkpoint and its checksum, select a compatible AVX2/BMI2 host and lab,
-and verify the fixed input. `NIST_FACTOR_CHECKPOINT` selects the explicit
+Before ready promotion, pin the merged implementation, publish and bind
+the R05 checkpoint and checksum, select a compatible AVX2/BMI2 host and lab,
+and verify the fixed input. Build the recorded two-line native patch and
+run the bounded original-versus-patched controls on that host. Set
+`YAFU_PATCHED_BIN` and `YAFU_TIMEOUT_CONTROL_DIR` to the actual validated
+binary and its control record. The checked wrapper retains the old
+checkpoint executable and installs only the exact tested binary under both
+existing locks; its prepare-only replay passes. `NIST_FACTOR_CHECKPOINT` selects the explicit
 archive and its sibling `.sha256`; continuation of an existing output
 directory uses that directory's state. Exact command and verifier are in
 [card.json](card.json), with bounds in [PROTOCOL.md](PROTOCOL.md).

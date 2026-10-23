@@ -16,7 +16,8 @@ It belongs to `skipped_256_876-twist2`, the exact degree-2 extension-twist
 order reconstructed from the original hexadecimal fixture. A checkpoint
 only binds continuation state; it does not itself establish completion.
 
-Use pinned YAFU c7d90283972820f99b3b4920bfc1eff05c1f6342 and native sievers,
+Use pinned YAFU c7d90283972820f99b3b4920bfc1eff05c1f6342 with the recorded
+two-line timeout printf patch, plus the unchanged native sievers,
 seed 20261022, two threads and two linear-algebra threads in their separate
 phase, `-gnfs -xover 81 -pbatch 120`, native 1800-second limit, outer 1860 seconds with
 30-second kill grace, per-process virtual memory limit 4 GiB. Preserve a
@@ -30,8 +31,18 @@ Require the existing genuine-GNFS known-answer and checkpoint-resume
 controls, plus checkpoint checksum verification and fixed-input comparison.
 Per-thread-only polynomial state is insufficient: require the R03
 native-recognized master checkpoint or a later validated checkpoint. Refuse
-a silent restart. Use the latest completed round's checkpoint at execution;
-R03 is the compact fallback and does not contain any subsequent R04 progress.
+a silent restart. Bind the R05 relation checkpoint and its checksum at
+execution; it currently awaits required artifact-store publication. Older
+R03/R04 checkpoints omit the subsequently collected relations and are not
+equivalent resumptions. Before ready promotion, run the separate bounded
+native timeout controls on the selected host. Require a passing summary
+bound to the exact patched binary hash. The checked resume wrapper installs
+that binary under both existing locks, retains the previous executable and
+control provenance, and preserves polynomial and relation files. An old
+unpatched executable stored in a restored checkpoint must not silently win
+over the validated binary. A prepare-only control must replay successfully
+before the actual allocation. No ready promotion or later run is claimed
+by this prerequisite update.
 Treat every native factor label as a hint. The independent verifier is
 pinned to both the fixture-derived whole target and this literal residual;
 it checks exact products and retained PARI prime certificates. Partial

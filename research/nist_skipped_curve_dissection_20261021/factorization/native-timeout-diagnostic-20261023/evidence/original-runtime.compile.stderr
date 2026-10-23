@@ -1,0 +1,7 @@
+/workspace/crypto/research/nist_skipped_curve_dissection_20261021/factorization/native-timeout-diagnostic-20261023/timeout_print.c: In function ‘main’:
+/workspace/crypto/research/nist_skipped_curve_dissection_20261021/factorization/native-timeout-diagnostic-20261023/timeout_print.c:13:56: warning: format ‘%s’ expects argument of type ‘char *’, but argument 3 has type ‘uint32_t’ {aka ‘unsigned int’} [-Wformat=]
+   13 |     printf("nfs: thread %d halting, nfs timeout of %1.4sec exceeded\n", tid, timeout);
+      |                                                    ~~~~^                     ~~~~~~~
+      |                                                        |                     |
+      |                                                        char *                uint32_t {aka unsigned int}
+      |                                                    %1.4d
