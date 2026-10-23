@@ -9,6 +9,8 @@ test ! -e "$run"
 mkdir -p "$run"
 bin=target/release/examples/ic_algebraic_followup
 test -x "$bin"
+timer=${IC_TIMER:-/workspace/.tools/usr/bin/time}
+test -x "$timer"
 git rev-parse HEAD > "$run/source-commit.txt"
 sha256sum "$bin" examples/ic_algebraic_followup.rs "$study/PROTOCOL.md" \
   "$study/inputs/guess-ell8.jsonl" "$study/run-local.sh" > "$run/hashes.txt"
@@ -22,10 +24,10 @@ run_one() {
   seqno=$((seqno + 1))
   mkdir "$cell"
   jq -n --args '{argv:$ARGS.positional,timeout_seconds:900,address_space_bytes:12884901888,isolation:"L0"}' \
-    "$bin" "$@" > "$cell/command.json"
+    -- "$bin" "$@" > "$cell/command.json"
   date -u +%FT%TZ > "$cell/started.txt"
   set +e
-  /usr/bin/time -v -o "$cell/rusage.txt" \
+  "$timer" -v -o "$cell/rusage.txt" \
     timeout --kill-after=15s 900s prlimit --as=12884901888 -- "$bin" "$@" \
     > "$cell/rows.jsonl" 2> "$cell/stderr.txt"
   rc=$?
