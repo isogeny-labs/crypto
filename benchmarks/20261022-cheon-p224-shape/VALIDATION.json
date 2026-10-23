@@ -14,7 +14,7 @@
     "protocol": "ecbench rho.negation (negation-map r-adding walk, distinguished points), the strongest rho available on a prime-order curve with automorphism group {+-1}; same frozen curves and planted targets as the Cheon arms (research/cheon_p224_shape_20261022/PROTOCOL.md)",
     "unit": "counted group operations (ecbench.gae: one affine addition or doubling)",
     "binary_or_process": "cheon_p224_shape replay: the Cheon arms and rho.negation (ecbench::methods::solve, session algorithm seeds) re-executed in one process and one binary; sealed rho session ECBS1he8d120f81db5",
-    "matches_protocol": true,
+    "matches_protocol": false,
     "strongest_available": true,
     "same_unit": true,
     "same_binary_or_process": true,
@@ -33,5 +33,6 @@
       }
     },
     "order_holds_across_band": true
-  }
+  },
+  "review_qualification": "2026-10-23 review: the pre-registered H3 gate (research/cheon_p224_shape_20261022/PROTOCOL.md section 6) declares the rho reference unreliable if any individual rho S lies outside [0.3, 4]; 5 of the 84 sealed rho.negation runs do. The rho reference therefore does not match its protocol, nothing is ranked against it, and this directory backs no row of benchmarks/README.md. The gae_band numbers are kept as recorded, not as a ranking."
 }
