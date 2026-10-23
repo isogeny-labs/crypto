@@ -74,6 +74,35 @@ pub type Poly = Vec<(Vec<u32>, u64)>;
 /// loops.
 static FIELD_OPS: AtomicU64 = AtomicU64::new(0);
 
+/// Process-wide count of native (non-multiplication) operations the F4 driver
+/// does outside row reduction and that no field-multiplication counter prices:
+/// leading-monomial divisibility tests (symbolic preprocessing and the staircase
+/// checks of the stopping rules) and monomial-table probes of symbolic
+/// preprocessing.  A diagnostic for AGENTS.md section 5a; incomplete by design (pair
+/// selection, matrix assembly and sorting are not counted), so it is a lower bound.
+static NATIVE_OPS: AtomicU64 = AtomicU64::new(0);
+/// The share of [`native_ops_total`] spent on staircase / Hilbert-function checks.
+static NATIVE_STAIR: AtomicU64 = AtomicU64::new(0);
+
+pub fn native_ops_total() -> u64 {
+    NATIVE_OPS.load(AtomicOrdering::Relaxed) + NATIVE_STAIR.load(AtomicOrdering::Relaxed)
+}
+
+/// Staircase and Hilbert-function checks only (inside [`native_ops_total`]).
+pub fn native_stair_ops_total() -> u64 {
+    NATIVE_STAIR.load(AtomicOrdering::Relaxed)
+}
+
+#[inline]
+fn count_native(n: u64) {
+    NATIVE_OPS.fetch_add(n, AtomicOrdering::Relaxed);
+}
+
+#[inline]
+fn count_stair(n: u64) {
+    NATIVE_STAIR.fetch_add(n, AtomicOrdering::Relaxed);
+}
+
 /// Per-step diagnostics of the most recent F4 run on this thread (taken with
 /// [`take_run_log`]): they cost nothing in the counted multiplications.
 #[derive(Clone, Debug, Default)]
@@ -101,23 +130,142 @@ pub fn take_run_log() -> RunLog {
 }
 /// Degree-`d` monomials in `n` variables divisible by no leading monomial.
 fn uncovered_in_degree(lms: &[&[u32]], n: usize, d: u32) -> usize {
-    fn rec(k: usize, left: u32, mono: &mut Vec<u32>, lms: &[&[u32]], cnt: &mut usize) {
+    fn rec(
+        k: usize,
+        left: u32,
+        mono: &mut Vec<u32>,
+        lms: &[&[u32]],
+        cnt: &mut usize,
+        tests: &mut u64,
+    ) {
         if k + 1 == mono.len() {
             mono[k] = left;
-            if !lms.iter().any(|l| divides(l, mono)) {
-                *cnt += 1;
+            match lms.iter().position(|l| divides(l, mono)) {
+                Some(i) => *tests += i as u64 + 1,
+                None => {
+                    *tests += lms.len() as u64;
+                    *cnt += 1;
+                }
             }
             return;
         }
         for e in 0..=left {
             mono[k] = e;
-            rec(k + 1, left - e, mono, lms, cnt);
+            rec(k + 1, left - e, mono, lms, cnt, tests);
         }
     }
     let mut cnt = 0;
+    let mut tests = 0u64;
     let mut mono = vec![0u32; n];
-    rec(0, d, &mut mono, lms, &mut cnt);
+    rec(0, d, &mut mono, lms, &mut cnt, &mut tests);
+    count_stair(tests);
     cnt
+}
+
+/// The uncovered monomials of each degree (those divisible by no leading monomial
+/// of the basis so far), kept up to date as basis elements are appended, for the
+/// Hilbert stopping rule.  Coverage only grows: an element is killed (`alive`
+/// false) only when a newer leading monomial divides its own, so the union over
+/// all basis elements is the union over the alive ones.  The counts equal
+/// [`uncovered_in_degree`] on the alive leading monomials (asserted in tests).
+/// Work is charged to the native staircase counter: one unit per divisibility
+/// test and per monomial generated.
+struct StairTracker {
+    n: usize,
+    done: usize,
+    /// Leading monomials by total degree: only those of degree `<= k` can divide a
+    /// monomial of degree `k`.
+    lms_by_deg: Vec<Vec<Vec<u32>>>,
+    /// `u[k]`: uncovered monomials of degree `k`, for `k <= u.len() - 1`.
+    u: Vec<Vec<Vec<u32>>>,
+}
+
+impl StairTracker {
+    fn new(n: usize) -> Self {
+        Self {
+            n,
+            done: 0,
+            lms_by_deg: Vec::new(),
+            u: vec![vec![vec![0u32; n]]],
+        }
+    }
+
+    /// Take in the basis elements appended since the last call.
+    fn absorb(&mut self, basis: &[Poly]) {
+        let mut work = 0u64;
+        while self.done < basis.len() {
+            let l = basis[self.done][0].0.clone();
+            let dl = total_degree(&l) as usize;
+            for level in self.u.iter_mut().skip(dl) {
+                work += level.len() as u64;
+                level.retain(|m| !divides(&l, m));
+            }
+            if self.lms_by_deg.len() <= dl {
+                self.lms_by_deg.resize(dl + 1, Vec::new());
+            }
+            self.lms_by_deg[dl].push(l);
+            self.done += 1;
+        }
+        count_stair(work);
+    }
+
+    /// Build the levels up to degree `k`.
+    fn ensure(&mut self, k: u32) {
+        let mut work = 0u64;
+        while self.u.len() <= k as usize {
+            let prev = self.u.last().unwrap();
+            let mut next: Vec<Vec<u32>> = Vec::new();
+            for m in prev {
+                let mx = m.iter().rposition(|&e| e > 0).unwrap_or(0);
+                for i in mx..self.n {
+                    let mut c = m.clone();
+                    c[i] += 1;
+                    work += 1;
+                    let mut covered = false;
+                    for bucket in self.lms_by_deg.iter().take(self.u.len() + 1) {
+                        for l in bucket {
+                            work += 1;
+                            if divides(l, &c) {
+                                covered = true;
+                                break;
+                            }
+                        }
+                        if covered {
+                            break;
+                        }
+                    }
+                    if !covered {
+                        next.push(c);
+                    }
+                }
+            }
+            self.u.push(next);
+        }
+        count_stair(work);
+    }
+
+    #[allow(unused_variables)]
+    fn count(&mut self, basis: &[Poly], alive: &[bool], k: u32) -> usize {
+        self.absorb(basis);
+        self.ensure(k);
+        let c = self.u[k as usize].len();
+        #[cfg(test)]
+        {
+            let lms: Vec<&[u32]> = basis
+                .iter()
+                .zip(alive)
+                .filter(|(_, &a)| a)
+                .map(|(f, _)| f[0].0.as_slice())
+                .collect();
+            assert_eq!(c, uncovered_in_degree(&lms, self.n, k), "tracker vs scan");
+        }
+        c
+    }
+}
+
+fn stair_scan() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_STAIR").as_deref() == Ok("scan"))
 }
 
 fn field_ops_now() -> u64 {
@@ -608,12 +756,21 @@ fn staircase_at_most(lms: &[&[u32]], n_vars: usize, bound: usize) -> Option<usiz
         k: usize,
         mono: &mut Vec<u32>,
         cap: &[u32],
-        lms: &[&[u32]],
+        lms: &[(u32, &[u32])],
         count: &mut usize,
         bound: usize,
+        tests: &mut u64,
     ) -> bool {
-        if lms.iter().any(|l| divides(l, mono)) {
-            return true;
+        // only a leading monomial of degree <= deg(mono) can divide it
+        let dm: u32 = mono.iter().sum();
+        for (dl, l) in lms {
+            if *dl > dm {
+                break;
+            }
+            *tests += 1;
+            if divides(l, mono) {
+                return true;
+            }
         }
         if k == cap.len() {
             *count += 1;
@@ -621,7 +778,7 @@ fn staircase_at_most(lms: &[&[u32]], n_vars: usize, bound: usize) -> Option<usiz
         }
         for e in 0..cap[k] {
             mono[k] = e;
-            if !walk(k + 1, mono, cap, lms, count, bound) {
+            if !walk(k + 1, mono, cap, lms, count, bound, tests) {
                 mono[k] = 0;
                 return false;
             }
@@ -629,9 +786,14 @@ fn staircase_at_most(lms: &[&[u32]], n_vars: usize, bound: usize) -> Option<usiz
         mono[k] = 0;
         true
     }
+    let mut sorted: Vec<(u32, &[u32])> = lms.iter().map(|l| (total_degree(l), *l)).collect();
+    sorted.sort_by_key(|x| x.0);
     let mut count = 0usize;
+    let mut tests = 0u64;
     let mut mono = vec![0u32; n_vars];
-    walk(0, &mut mono, &cap, lms, &mut count, bound).then_some(count)
+    let ok = walk(0, &mut mono, &cap, &sorted, &mut count, bound, &mut tests);
+    count_stair(tests);
+    ok.then_some(count)
 }
 
 #[derive(Clone, Debug)]
@@ -901,6 +1063,7 @@ impl Packed {
         let mut frontier: Vec<(usize, u128)> = seeds.iter().map(|(i, m)| (*i, pack(m))).collect();
         while !frontier.is_empty() {
             // the frontier rows' terms against the monomials known so far
+            count_native(frontier.iter().map(|&(i, _)| self.terms[i].len() as u64).sum());
             let known = &ids;
             let mut frows: Vec<Vec<u32>> = frontier
                 .par_iter()
@@ -965,10 +1128,11 @@ impl Packed {
                 .filter(|&id| !lead[id])
                 .filter_map(|id| {
                     let mono = monos[id];
-                    alive_idx
+                    let k = alive_idx
                         .iter()
-                        .find(|&&i| self.divides(self.lms[i], mono))
-                        .map(|&i| (i, mono - self.lms[i]))
+                        .position(|&i| self.divides(self.lms[i], mono));
+                    count_native(k.map_or(alive_idx.len(), |k| k + 1) as u64);
+                    k.map(|k| (alive_idx[k], mono - self.lms[alive_idx[k]]))
                 })
                 .collect();
             extra.extend(next.iter().copied());
@@ -1041,6 +1205,7 @@ impl Packed {
         for &(idx, m) in &seeds {
             let row: Vec<u32> = self.terms[idx].iter().map(|&e| t.id(e + m)).collect();
             t.done[row[0] as usize] = true;
+            count_native(row.len() as u64);
             rows.push(row);
         }
         let alive_idx: Vec<usize> = (0..self.lms.len()).filter(|&i| alive[i]).collect();
@@ -1051,10 +1216,13 @@ impl Packed {
             }
             t.done[id as usize] = true;
             let mono = t.monos[id as usize];
-            if let Some(&idx) = alive_idx.iter().find(|&&i| self.divides(self.lms[i], mono)) {
+            let found = alive_idx.iter().position(|&i| self.divides(self.lms[i], mono));
+            count_native(found.map_or(alive_idx.len(), |k| k + 1) as u64);
+            if let Some(idx) = found.map(|k| alive_idx[k]) {
                 let m = mono - self.lms[idx];
                 if seen.insert((idx, m)) {
                     let row: Vec<u32> = self.terms[idx].iter().map(|&e| t.id(e + m)).collect();
+                    count_native(row.len() as u64);
                     rows.push(row);
                     extra.push((idx, m));
                 }
@@ -2208,21 +2376,30 @@ fn f4_with_arithmetic(
     let mut learned = (0u32, 0usize, 0usize);
     let mut staircase_at_stop: Option<usize> = None;
     let mut hilbert_violated = false;
+    let mut stair = StairTracker::new(n_vars);
     RUN_LOG.with(|l| *l.borrow_mut() = RunLog::default());
 
     loop {
         if let (Some(h), false) = (&opts.hilbert_expect, hilbert_violated) {
             while let Some(d) = pairs.iter().map(|pr| pr.degree).min() {
-                let lms: Vec<&[u32]> = basis
-                    .iter()
-                    .zip(&alive)
-                    .filter(|(_, &a)| a)
-                    .map(|(f, _)| f[0].0.as_slice())
-                    .collect();
+                let lms: Vec<&[u32]> = if stair_scan() {
+                    basis
+                        .iter()
+                        .zip(&alive)
+                        .filter(|(_, &a)| a)
+                        .map(|(f, _)| f[0].0.as_slice())
+                        .collect()
+                } else {
+                    Vec::new()
+                };
                 let want = |k: u32| h.get(k as usize).copied().unwrap_or(0);
                 let mut met = true;
                 for k in 0..=d {
-                    let unc = uncovered_in_degree(&lms, n_vars, k);
+                    let unc = if stair_scan() {
+                        uncovered_in_degree(&lms, n_vars, k)
+                    } else {
+                        stair.count(&basis, &alive, k)
+                    };
                     if unc < want(k) {
                         // fewer standard monomials than the complete
                         // intersection allows: the certificate was wrong

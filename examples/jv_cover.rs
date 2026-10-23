@@ -14,7 +14,7 @@ use std::env;
 use std::fs;
 
 use crypto_lib::cryptanalysis::jv_cover::{
-    run_cover_ccov_mode, run_cover_dlp, run_rho_dp, CcovReport, CoverDlpReport, RhoDpReport,
+    run_cover_ccov_mode, run_cover_dlp_mode, run_rho_dp, CcovReport, CoverDlpReport, RhoDpReport,
     StopMode,
 };
 use crypto_lib::cryptanalysis::jv_rho_strong::{run_strong_rho, StrongOpts, StrongRun};
@@ -174,15 +174,12 @@ fn main() {
                     rows.push(Row::Ccov(r));
                 }
                 "dlp" => {
-                    let r = run_cover_dlp(
-                        p,
-                        seed,
-                        rho_runs,
-                        check_every,
-                        rho_ref,
-                        (stop > 0).then_some(stop),
-                        trace,
-                    );
+                    let dlp_mode = match (hilbert, stop) {
+                        (Some(c), _) => StopMode::Hilbert(c),
+                        (None, 0) => StopMode::Full,
+                        (None, k) => StopMode::Staircase(k),
+                    };
+                    let r = run_cover_dlp_mode(p, seed, rho_runs, check_every, rho_ref, dlp_mode, trace);
                     println!(
                         "p={:>5} seed={} l=2^{:.1} |F|={:>4} c_add E {:.0} J {:.0} stop {:?} ({} stopped) trace {} ({} replayed, {} mismatches) | residuals {} decomposable {} ({:.5} vs 1/720 {:.5}) relations {} (floor {:.0}, ratio {:.2}) | incomplete {} timed out {} cross-checked {} mismatches {} | C_cov {:.3e} | unknowns {} (filtered {}) phi {:.2} row {:.1} LA attempts {} ops {} ({:.1}·u²) | solved {} correct {} | S {:.3e} | rho S {:.3} ± {:.3} ({} runs) | S/rho {:.3} = relation {:.3} + la {:.4} (last {:.4}) | predicted {:.3} | {:.0} s",
                         r.p, r.seed, r.bits, r.base, r.c_add_e, r.c_add_j, r.stop_staircase, r.stopped, r.trace, r.replayed, r.trace_mismatches, r.residuals, r.decompositions,
