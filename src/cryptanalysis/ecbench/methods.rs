@@ -22,6 +22,7 @@ use serde_json::{json, Value};
 
 use crate::cryptanalysis::ecbench::canonical::{derive_u64, sha256_hex, short_id};
 use crate::cryptanalysis::ecbench::claw::{pair_claw, pair_claw_wide, ClawOutcome, ClawShape};
+use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::{self as fp4, Fp4Group, Fp4Instance, K4Base, K4Params};
 use crate::cryptanalysis::ecbench::full_price;
 use crate::cryptanalysis::ecbench::generic::{
@@ -31,6 +32,7 @@ use crate::cryptanalysis::ecbench::workload::{CurveFacts, Instance, WideInstance
 use crate::cryptanalysis::ecbench_large_prime::{
     self as large_prime, SolveConfig as LargePrimeConfig,
 };
+use crate::cryptanalysis::endo_rho::EndomorphismClasses;
 use crate::cryptanalysis::gaudry_quartic::Pt4;
 use crate::cryptanalysis::gaudry_quartic_bin::{
     fq_muls_per_add, BinCurve, BinD4Oracle, BinOptions, PtB, TLineBase,
@@ -38,6 +40,7 @@ use crate::cryptanalysis::gaudry_quartic_bin::{
 use crate::cryptanalysis::gaudry_quartic_d4::{
     fp_muls_per_add, unpack_e4, D4Curve, D4Options, D4Oracle, YLineBase,
 };
+use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::ic_boundary::{
     price_phase, rho_cap, rho_reference, rho_walk_with, signed_frobenius_rho_tuned, BinaryGroup,
     BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses,
@@ -281,6 +284,22 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "rho",
             summary: "tuned walk on {±ι^i(P)} (A = 4), the rational order-4 automorphism of a j = 1728 curve with p ≡ 1 (mod 4) and 4 | r − 1; Wiener–Zuccherato look-ahead and cycle escape; refuses any curve without the structure",
             entry: "ic_boundary::QuarticClasses with RhoWalk::negation()",
+            applies: Applies::Any,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.frobenius_orbit",
+            family: "rho",
+            summary: "tuned walk on {±π^i(P)} (A = 2k), the p-power Frobenius of a curve defined over F_p acting on its subgroup over F_{p^k} (subfield_fp3: k = 3, A = 6); Wiener–Zuccherato look-ahead and cycle escape; each canonicalisation applies π k − 1 times, counted as endomorphism_applications_uncharged; refuses any other curve",
+            entry: "endo_rho::EndomorphismClasses(FrobeniusType) with RhoWalk::negation()",
+            applies: Applies::Any,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.gls",
+            family: "rho",
+            summary: "tuned walk on {ψ^i(P)} (A = 4), the GLS endomorphism ψ = τ∘π∘τ⁻¹ with ψ² = −1 on the twist over F_{p²} of a curve over F_p (gls_fp2); Wiener–Zuccherato look-ahead and cycle escape; each canonicalisation applies ψ three times, counted as endomorphism_applications_uncharged; refuses any other curve",
+            entry: "endo_rho::EndomorphismClasses(GlsEndomorphism) with RhoWalk::negation()",
             applies: Applies::Any,
             params: RHO_PARAMS,
         },
@@ -583,7 +602,8 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
         "rho.frozen_reference" | "rho.plain" => Some((PI / 2.0).sqrt()),
         "rho.negation" => Some((PI / 4.0).sqrt()),
         "rho.cubic" => Some((PI / 12.0).sqrt()),
-        "rho.quartic" => Some((PI / 8.0).sqrt()),
+        "rho.quartic" | "rho.gls" => Some((PI / 8.0).sqrt()),
+        "rho.frobenius_orbit" => Some((PI / 12.0).sqrt()),
         "rho.signed_frobenius"
         | "rho.signed_frobenius_full"
         | "rho.signed_frobenius_strong"
@@ -1170,6 +1190,15 @@ fn solve_inner(
     if let Instance::Fp4(i) = inst {
         return solve_fp4(m, i, tx, ty, seed);
     }
+    if let Instance::Ext(i) = inst {
+        return solve_ext(m, i, tx, ty, seed);
+    }
+    if m.id == "rho.frobenius_orbit" || m.id == "rho.gls" {
+        return Err(format!(
+            "`{}` runs on subfield_fp3 / gls_fp2 curves only; {} is {}",
+            m.id, curve.slug, curve.family
+        ));
+    }
     if m.id == "ic.k4_gaudry" {
         return Err(format!(
             "`ic.k4_gaudry` runs on fp4_translation curves only; {} is {}",
@@ -1323,8 +1352,91 @@ fn solve_inner(
             };
             solve_generic(m, &i.curve, i.generator, target, i.r, seed)
         }
-        (Instance::Wide(_), _) | (Instance::Fp4(_), _) => unreachable!("returned above"),
+        (Instance::Wide(_), _) | (Instance::Fp4(_), _) | (Instance::Ext(_), _) => {
+            unreachable!("returned above")
+        }
     }
+}
+
+/// A GLS or subfield curve (`ecbench::ext`): the endomorphism-orbit rho
+/// its family carries, or a generic method on the curve itself.
+fn solve_ext(
+    m: &ResolvedMethod,
+    inst: &ExtInstance,
+    tx: u64,
+    ty: u64,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    let generic = m.id.starts_with("rho.plain")
+        || m.id == "rho.negation"
+        || m.id == "rho.frozen_reference"
+        || m.id.starts_with("bsgs.")
+        || m.id == "kangaroo.vow";
+    let folded = match (inst, m.id.as_str()) {
+        (ExtInstance::Gls(_), "rho.gls") | (ExtInstance::Subfield(_), "rho.frobenius_orbit") => {
+            true
+        }
+        _ if generic => false,
+        (ExtInstance::Gls(_), _) => {
+            return Err(format!("`{}` has no gls_fp2 implementation", m.id))
+        }
+        (ExtInstance::Subfield(_), _) => {
+            return Err(format!("`{}` has no subfield_fp3 implementation", m.id))
+        }
+    };
+    match inst {
+        ExtInstance::Gls(i) => {
+            let target = ExtInstance::decode_gls(i, tx, ty)?;
+            if !folded {
+                return solve_generic(m, &i.curve, i.generator, target, i.r, seed);
+            }
+            solve_endo_orbit(m, &i.curve, i.psi, i.generator, target, i.r, seed, "gls-psi orbit walk on {ψ^i(P)}: look-ahead, short-cycle escape by doubling, distinguished points, stride starts")
+        }
+        ExtInstance::Subfield(i) => {
+            let target = ExtInstance::decode_subfield(i, tx, ty)?;
+            if !folded {
+                return solve_generic(m, &i.curve, i.generator, target, i.r, seed);
+            }
+            solve_endo_orbit(m, &i.curve, i.frobenius, i.generator, target, i.r, seed, "frobenius-orbit walk on {±π^i(P)}: look-ahead, short-cycle escape by doubling, distinguished points, stride starts")
+        }
+    }
+}
+
+/// Rho on the classes of an endomorphism, the verification of its
+/// eigenvalue on `G` charged as set-up.
+#[allow(clippy::too_many_arguments)]
+fn solve_endo_orbit<G: CountedGroup, E: Endomorphism<G>>(
+    m: &ResolvedMethod,
+    g: &G,
+    endo: E,
+    gen: G::Elt,
+    target: G::Elt,
+    r: u64,
+    seed: u64,
+    name: &'static str,
+) -> Result<SolveReport, String> {
+    let t = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let mut setup = GroupOps::default();
+    let classes = EndomorphismClasses::new(g, endo, gen, r, &mut setup, name)?;
+    let mut res = rho_walk_with(
+        g,
+        &classes,
+        gen,
+        target,
+        r,
+        seed,
+        rho_cap(r, param_u64(m, "cap_multiple")? as f64),
+        RhoWalk::negation(),
+    );
+    res.group_ops.merge(setup);
+    res.counters.insert(
+        "endomorphism_applications_uncharged".into(),
+        classes.applications(),
+    );
+    measurement::end_online();
+    let f = field_ops_of(g, &[res.group_ops]);
+    Ok(rho_report(res, t.elapsed().as_nanos() as u64, f))
 }
 
 /// `E(F_{p⁴})`: `ic.k4_gaudry`, or a generic method on [`Fp4Group`].
@@ -2847,6 +2959,9 @@ pub fn dump_factor_base(
     if let Instance::Fp4(_) = &inst {
         return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
     }
+    if let Instance::Ext(_) = &inst {
+        return Err("no factor-base plug-in runs on a gls_fp2 or subfield_fp3 curve".into());
+    }
     if let Instance::Fp4Torsion(_) | Instance::F2m4(_) = &inst {
         return Err("factor-base dumps cover prime and binary curves".into());
     }
@@ -2946,9 +3061,11 @@ pub fn dump_factor_base(
                 build_doubles: total.doubles,
             })
         }
-        Instance::Wide(_) | Instance::Fp4(_) | Instance::Fp4Torsion(_) | Instance::F2m4(_) => {
-            unreachable!("returned above")
-        }
+        Instance::Wide(_)
+        | Instance::Fp4(_)
+        | Instance::Fp4Torsion(_)
+        | Instance::F2m4(_)
+        | Instance::Ext(_) => unreachable!("returned above"),
     }
 }
 

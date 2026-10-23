@@ -19,6 +19,7 @@ use serde_json::{json, Value};
 use crate::binary_ecc::IrreduciblePoly;
 use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128, derive_u64};
 use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
+use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::Fp4Instance;
 use crate::cryptanalysis::ecbench_large_prime::binary_explicit_instance;
 use crate::cryptanalysis::gaudry_quartic::Pt4;
@@ -133,6 +134,26 @@ pub enum CurveSpec {
     /// `p ≡ 1 (mod 4)`, `p < 2^15`.  Unregistered: ICV1 has no
     /// extension-field form.
     Fp4Translation { p: u64, seed: u64 },
+    /// `gls_fp2::generate_gls_instance(p_bits, seed, max_cofactor)`: the
+    /// GLS twist over `F_{p²} = F_p[s]/(s² − ν)` of a curve over `F_p`,
+    /// `p` of `p_bits ≤ 24` bits, with the verified `ψ` (`ψ² = −1` on the
+    /// subgroup, `A = 4`).  A point is two packed words `c₀ + c₁ p`.
+    GlsFp2 {
+        p_bits: u32,
+        seed: u64,
+        max_cofactor: u64,
+    },
+    /// `subfield_fp3::generate_subfield_instance(p_bits, seed, false,
+    /// max_cofactor_ratio)`: a curve over `F_p` (`j ≠ 0`) on its group
+    /// over `F_{p³} = F_p[s]/(s³ − ν)`, `p ≡ 1 (mod 3)` of `p_bits ≤ 20`
+    /// bits, the prime subgroup outside `E(F_p)`, with the verified
+    /// Frobenius of order 3 on it (`A = 6`).  A point is two packed words
+    /// `c₀ + c₁ p + c₂ p²`.
+    SubfieldFp3 {
+        p_bits: u32,
+        seed: u64,
+        max_cofactor_ratio: u64,
+    },
 }
 
 impl CurveSpec {
@@ -330,6 +351,18 @@ impl CurveSpec {
             CurveSpec::Fp4Translation { p, seed } => {
                 Fp4Instance::build(p, seed).map(|i| Instance::Fp4(Box::new(i)))
             }
+            CurveSpec::GlsFp2 {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => ExtInstance::build_gls(p_bits, seed, max_cofactor)
+                .map(|i| Instance::Ext(Box::new(i))),
+            CurveSpec::SubfieldFp3 {
+                p_bits,
+                seed,
+                max_cofactor_ratio,
+            } => ExtInstance::build_subfield(p_bits, seed, max_cofactor_ratio)
+                .map(|i| Instance::Ext(Box::new(i))),
         }
     }
 
@@ -371,7 +404,8 @@ impl CurveSpec {
             | Instance::Wide(_)
             | Instance::Fp4(_)
             | Instance::Fp4Torsion(_)
-            | Instance::F2m4(_) => None,
+            | Instance::F2m4(_)
+            | Instance::Ext(_) => None,
         }
     }
 
@@ -420,6 +454,18 @@ impl CurveSpec {
             CurveSpec::Fp4Translation { p, seed } => {
                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
             }
+            CurveSpec::GlsFp2 {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => format!("gls_fp2::generate_gls_instance({p_bits}, {seed}, {max_cofactor})"),
+            CurveSpec::SubfieldFp3 {
+                p_bits,
+                seed,
+                max_cofactor_ratio,
+            } => format!(
+                "subfield_fp3::generate_subfield_instance({p_bits}, {seed}, false, {max_cofactor_ratio})"
+            ),
         }
     }
 }
@@ -437,6 +483,9 @@ pub enum Instance {
     /// A curve over `F_{p⁴}` (`ecbench::fp4`); a point is one 64-bit word
     /// per coordinate, four 16-bit limbs.
     Fp4(Box<Fp4Instance>),
+    /// A GLS curve over `F_{p²}` or a subfield curve on `E(F_{p³})`
+    /// (`ecbench::ext`); a coordinate is one packed word.
+    Ext(Box<ExtInstance>),
 }
 
 /// A wide Koblitz curve and the strong reference's arithmetic on it, which
@@ -550,10 +599,30 @@ impl Instance {
             Instance::Fp4(i) => u128::from(i.r),
             Instance::Fp4Torsion(i) => u128::from(i.r),
             Instance::F2m4(i) => u128::from(i.r),
+            Instance::Ext(i) => u128::from(i.r()),
         }
     }
 
     pub fn facts(&self, spec: &CurveSpec) -> CurveFacts {
+        if let Instance::Ext(i) = self {
+            let id = i.id();
+            return CurveFacts {
+                slug: id.slug,
+                icv1: id.icv1,
+                family: "extension".into(),
+                construction: spec.call(),
+                field_degree: None,
+                field_bits: Some(64 - i.p().leading_zeros()),
+                group_order: u128::from(i.group_order()),
+                r: u128::from(i.r()),
+                cofactor: u128::from(i.cofactor()),
+                generator: i.generator_hex(),
+                automorphisms_available: i.automorphisms_available(),
+                registered: false,
+                ec1: None,
+                curve_uid: None,
+            };
+        }
         if let Instance::Fp4(i) = self {
             let (icv1, slug) = i.names();
             let g = Fp4Instance::encode(&i.g).unwrap_or_default();
@@ -603,7 +672,7 @@ impl Instance {
                 u128::from(i.generator.y),
                 if i.koblitz.is_some() { 2 * i.n } else { 2 },
             ),
-            Instance::Fp4(_) => unreachable!("returned above"),
+            Instance::Fp4(_) | Instance::Ext(_) => unreachable!("returned above"),
             Instance::Wide(i) => (
                 i.kc.curve_id(),
                 "koblitz",
@@ -709,6 +778,9 @@ impl Instance {
         if let Instance::Fp4(i) = self {
             return i.mul_generator_hex(k);
         }
+        if let Instance::Ext(i) = self {
+            return i.mul_generator_hex(k);
+        }
         match self {
             Instance::Prime(i) => {
                 let p = i.curve.mul(&mut scratch, i.generator_point(), k);
@@ -740,7 +812,9 @@ impl Instance {
                     ]
                 })
             }
-            Instance::Wide(_) | Instance::Fp4(_) => unreachable!("returned above"),
+            Instance::Wide(_) | Instance::Fp4(_) | Instance::Ext(_) => {
+                unreachable!("returned above")
+            }
         }
     }
 }
@@ -810,6 +884,11 @@ impl Instance {
                     }
                 }
                 Instance::Wide(_) | Instance::Fp4(_) => unreachable!("handled above"),
+                Instance::Ext(i) => {
+                    if let Some(t) = i.hash_to_subgroup_hex(h) {
+                        return Some((t, counter));
+                    }
+                }
                 Instance::Fp4Torsion(i) => {
                     let c = &i.inst.curve;
                     let p = c.f.p;
