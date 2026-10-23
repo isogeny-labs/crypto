@@ -1,4 +1,5 @@
 //! Native follow-up experiments. Every command requires a fresh output tree.
+mod assessment;
 mod bigfield;
 mod coupled;
 mod divisors;
@@ -107,6 +108,11 @@ pub fn main(args: &[String]) -> Result<()> {
         }
     }
     let rows = match command.as_str() {
+        "assessment" => assessment::run(
+            &fixtures,
+            Path::new(args.get(3).ok_or("missing execution evidence directory")?),
+            out,
+        )?,
         "filters" => gluing::filters(&src, out)?,
         "torsion" => gluing::torsion(&src, out)?,
         "geometry-input" => geometry::input(&src, out)?,

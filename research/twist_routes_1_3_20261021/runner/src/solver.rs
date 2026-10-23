@@ -91,7 +91,11 @@ pub(crate) fn trajectories(e: Quad, xs: &[u64], r: u64) -> Vec<Vec<Option<u64>>>
         .filter(|x| x.last() == Some(&Some(r)))
         .collect()
 }
-pub(crate) fn expand_values(case: &alg::Case, xs: &[u64], path: &[Option<u64>]) -> Option<Vec<u64>> {
+pub(crate) fn expand_values(
+    case: &alg::Case,
+    xs: &[u64],
+    path: &[Option<u64>],
+) -> Option<Vec<u64>> {
     if path[1..path.len() - 1].iter().any(Option::is_none) {
         return None;
     }
