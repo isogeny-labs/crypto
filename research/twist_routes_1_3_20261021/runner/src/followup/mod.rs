@@ -164,8 +164,11 @@ fn adjudicate(prefix: &Path, out: &Path) -> Result<Vec<Value>> {
     let stderr = fs::read(suffix("stderr"))?;
     let text = std::str::from_utf8(&stdout)?;
     let errors = std::str::from_utf8(&stderr)?;
-    let allowed_warning =
-        |line: &str| line.trim().is_empty() || line.contains("Warning: new maximum stack size =");
+    let allowed_warning = |line: &str| {
+        let growth=line.trim().strip_prefix("***").and_then(|s|s.trim().split_once(": Warning: increasing stack size to "));
+        let known_growth=growth.is_some_and(|(op,size)| ["_+_","_-_","_/_","_*_"].contains(&op) && size.strip_suffix('.').is_some_and(|n| n.parse::<u64>().is_ok_and(|n|n<=4_000_002_048)));
+        line.trim().is_empty() || line.contains("Warning: new maximum stack size =") || known_growth
+    };
     let error_lines = errors
         .lines()
         .filter(|l| !allowed_warning(l))
@@ -224,6 +227,9 @@ mod cas_tests {
                 false,
             ),
             (2, "", String::from("wrong-input-hash"), false),
+            (3, "  *** _+_: Warning: increasing stack size to 128000000.\n", digest(&fs::read(&script).unwrap()), true),
+            (4, "  *** _+_: Warning: increasing stack size to 9999999999.\n", digest(&fs::read(&script).unwrap()), false),
+            (5, "  *** _+_: Warning: increasing stack size to 128000000.\n  *** user error: failed divisor replay\n", digest(&fs::read(&script).unwrap()), false),
         ] {
             let prefix = dir.join(format!("case-{index}"));
             let stdout = "ALL_TORSION_REPLAY_OK\n";
