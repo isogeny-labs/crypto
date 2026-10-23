@@ -1434,6 +1434,10 @@ fn solve_endo_orbit<G: CountedGroup, E: Endomorphism<G>>(
         "endomorphism_applications_uncharged".into(),
         classes.applications(),
     );
+    res.counters.insert(
+        "endomorphism_field_muls_uncharged".into(),
+        classes.field_muls(),
+    );
     measurement::end_online();
     let f = field_ops_of(g, &[res.group_ops]);
     Ok(rho_report(res, t.elapsed().as_nanos() as u64, f))

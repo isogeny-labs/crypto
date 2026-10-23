@@ -69,3 +69,35 @@ weights.
 - its ratio lies outside the windows above (a walk that is too good is a
   bug in the accounting, a walk that is too slow is a bug in the classes);
 - any unverified solve.
+
+---
+
+## Amendment A1 (2026-10-23, after the first sessions; the text above is unchanged)
+
+The first sessions (`sessions/subfield-fp3`, `sessions/gls-fp2`, card
+`CARD-ext-endo-rho-20261023-2`) are kept as recorded. Reading them showed
+two accounting gaps and one control-design flaw, and the study is re-run
+in `sessions-a1/` with them fixed:
+
+1. **GLS canonicalisation applied `ψ` three times per step.** Since
+   `ψ² = −1`, the class `{P, ψP, −P, −ψP}` needs one application; the other
+   members are negations. `EndomorphismClasses` now applies `φ` only up to
+   the first power with `λ^h = −1`. The representatives, multipliers and
+   therefore the walk and every group-operation count are unchanged; only
+   `endomorphism_applications_uncharged` changes (3 → 1 per step on GLS,
+   2 per step on the subfield family, unchanged).
+2. **No field-level price.** `ExtCurve` now tallies every `F_p`
+   multiplication and inversion of its group law into the ledger
+   (`counts_field_ops`), and the classes report the multiplications of
+   their endomorphism applications as `endomorphism_field_muls_uncharged`.
+   This adds a calibrated point (total `F_p` multiplications, inversions
+   counted beside them) next to the §5a band; it does not replace the band.
+3. **The A/A arm was degenerate.** `rho-neg-aa` is the same method with the
+   same algorithm seed, so it reproduced `rho-neg` exactly (ratio 1.0000):
+   a determinism check, not a sampling-noise control. Its acceptance rule
+   is met as written, but it is reported as a determinism check only. The
+   sampling noise of the ratios is carried by their paired bootstrap
+   intervals over 72 workloads.
+
+Specs, curves, targets, seeds and decision rules are unchanged. A1 is
+committed before the `sessions-a1/` data exist.

@@ -24,19 +24,23 @@
 //! quartic automorphism classes do, so every rho arm on one curve is
 //! the same walk in the same counted unit.
 //!
-//! **What a canonicalisation costs.**  `m − 1` applications of `φ` per
-//! step (two Frobenius maps on `F_{p³}` are 8 `F_p` multiplications; one
-//! `ψ` on `F_{p²}` is 8), plus `A − 1` key comparisons.  None of it is a
-//! group operation, so the walk reports it as
-//! `canonicalisations_uncharged` (one per step, as for negation), and
-//! [`EndomorphismClasses::applications`] counts the maps applied so a
-//! comparison can price them (AGENTS.md §5a).
+//! **What a canonicalisation costs.**  `h − 1` applications of `φ` per
+//! step, `h` the first power with `λ^h = −1` (the members past it are
+//! negations, which are free), or `m − 1` when `−1` is not a power of
+//! `λ`: two Frobenius maps on `F_{p³}` (8 `F_p` multiplications), one `ψ`
+//! on `F_{p²}` (8).  Plus `A − 1` key comparisons.  None of it is a group
+//! operation, so the walk reports it as `canonicalisations_uncharged`
+//! (one per step, as for negation), and
+//! [`EndomorphismClasses::applications`] and
+//! [`EndomorphismClasses::field_muls`] count the maps applied and their
+//! `F_p` multiplications so a comparison can price them (AGENTS.md §5a).
 //!
 //! [`rho_walk_with`]: crate::cryptanalysis::ic_boundary::rho_walk_with
 
 use std::cell::Cell;
 use std::marker::PhantomData;
 
+use crate::cryptanalysis::ext_curve::peek_field_counters;
 use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::ic_boundary::{mulmod, CountedGroup, GroupOps, RhoClasses};
 
@@ -48,8 +52,11 @@ pub struct EndomorphismClasses<G: CountedGroup, E: Endomorphism<G>> {
     powers: Vec<u64>,
     /// `−1` is not a power of `λ`, so negations are added to the class.
     negate: bool,
+    /// The first `h` with `λ^h = −1`, or `m` when there is none.
+    half: usize,
     method: &'static str,
     applications: Cell<u64>,
+    field_muls: Cell<u64>,
     _group: PhantomData<G>,
 }
 
@@ -88,14 +95,20 @@ impl<G: CountedGroup, E: Endomorphism<G>> EndomorphismClasses<G, E> {
             powers.push(x);
             x = mulmod(x, lambda, r);
         }
-        let negate = !powers.contains(&(r - 1));
+        let half = powers
+            .iter()
+            .position(|&x| x == r - 1)
+            .unwrap_or(powers.len());
+        let negate = half == powers.len();
         Ok(Self {
             endo,
             r,
             powers,
             negate,
+            half,
             method,
             applications: Cell::new(0),
+            field_muls: Cell::new(0),
             _group: PhantomData,
         })
     }
@@ -108,6 +121,12 @@ impl<G: CountedGroup, E: Endomorphism<G>> EndomorphismClasses<G, E> {
     /// Endomorphism applications performed by canonicalisations so far.
     pub fn applications(&self) -> u64 {
         self.applications.get()
+    }
+
+    /// `F_p` multiplications those applications performed (on a curve
+    /// over an `ExtField`; zero on a group whose field is not counted).
+    pub fn field_muls(&self) -> u64 {
+        self.field_muls.get()
     }
 }
 
@@ -131,18 +150,23 @@ impl<G: CountedGroup, E: Endomorphism<G>> RhoClasses<G> for EndomorphismClasses<
                 best_mu = mu;
             }
         };
+        // Members φ^i(P) for i < half by application; the rest are
+        // negations: −φ^i(P) = φ^{i+half}(P) when λ^half = −1, and the
+        // explicit negations otherwise.
+        let before = peek_field_counters();
         let mut cur = p;
-        for (i, &mu) in self.powers.iter().enumerate() {
+        for i in 0..self.half {
             if i > 0 {
                 cur = self.endo.apply(g, cur);
-                consider(cur, mu);
+                consider(cur, self.powers[i]);
             }
-            if self.negate {
-                consider(g.neg(cur), (self.r - mu) % self.r);
-            }
+            consider(g.neg(cur), (self.r - self.powers[i]) % self.r);
         }
+        let after = peek_field_counters();
         self.applications
-            .set(self.applications.get() + self.powers.len() as u64 - 1);
+            .set(self.applications.get() + self.half as u64 - 1);
+        self.field_muls
+            .set(self.field_muls.get() + (after.0 - before.0));
         (best, best_mu)
     }
 
