@@ -36,7 +36,7 @@ public:
     F neg(F x) const {return make(-x.u,-x.v);}
     F sub(F x,F y) const {return add(x,neg(y));}
     F mul(F x,F y) const {return make(x.u*y.u+delta*x.v*y.v,x.u*y.v+x.v*y.u);}
-    F pow(F x,Int n) const {F y{1,0}; for (;n;n>>=1,x=mul(x,x)) if(n&1)y=mul(y,x); return y;}
+    F pow(F x,Int n) const {require(n>=0,"negative exponent"); F y{1,0}; for (;n;n>>=1,x=mul(x,x)) if(n&1)y=mul(y,x); return y;}
     F inv(F x) const {require(!(x==F{}),"division by zero");return pow(x,p*p-2);}
     F div(F x,F y) const {return mul(x,inv(y));}
 };
