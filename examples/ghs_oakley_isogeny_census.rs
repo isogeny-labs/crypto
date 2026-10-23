@@ -27,7 +27,7 @@ fn census(name: &str, n_deg: u32, mid: u32, a: &str, b: &str, towers: &[u32], ma
         let mut seen: HashSet<Vec<u64>> = HashSet::new();
         let mut q = VecDeque::new();
         // Phi_2 = (X^2-Y)(X-Y^2) mod 2: 2-isogenies are Frobenius/Verschiebung,
-        // so orbits are identified and only l = 3 moves between orbits.
+        // so orbits are identified and only odd l moves between orbits.
         let canon = |e: &ECurve| -> Vec<u64> {
             let j = j_invariant(e);
             let mut best = j.raw_bits().to_vec();
@@ -52,7 +52,7 @@ fn census(name: &str, n_deg: u32, mid: u32, a: &str, b: &str, towers: &[u32], ma
             let e = hist.entry(m).or_insert((0, 0));
             if ok { e.0 += 1 } else { e.1 += 1 }
             if ok && best.map_or(true, |(bm, _)| m < bm) { best = Some((m, d)); }
-            for &ell in &[3u32] {
+            for &ell in &[3u32, 5, 7, 11, 13] {
                 for nb in l_isogenous_neighbours(&cur, ell) {
                     if seen.insert(canon(&nb)) {
                         q.push_back((nb, d + 1));
