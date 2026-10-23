@@ -14,7 +14,7 @@ struct Q {
 impl Q {
     fn constant(p: u64, c: u64) -> Self {
         let mut terms = BTreeMap::new();
-        if c % p != 0 {
+        if !c.is_multiple_of(p) {
             terms.insert([0; 3], c % p);
         }
         Self { p, terms }

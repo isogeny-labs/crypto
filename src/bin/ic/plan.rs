@@ -91,9 +91,7 @@ pub fn profile_of(inst: &Instance) -> CurveProfile {
         Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
         | Instance::Fp4(_)
-        | Instance::ThreeLeads(_) => {
-            CurveProfile::other(0.0, 0.0, 0)
-        }
+        | Instance::ThreeLeads(_) => CurveProfile::other(0.0, 0.0, 0),
     }
 }
 
