@@ -237,3 +237,36 @@ library rule. Preserve every branch, nonsplitting root and incomplete query.
 Audit each panel against independent point enumeration. These ablations test
 whether cheaper closure can finish the same queries; all end-to-end costs
 remain unset until the full pipeline and calibration obligations are met.
+
+## Amendment 4: intermediate guesses and complete-pipeline smoke
+
+Frozen before these arms' data. Add three-variable sets [7,15,24] and
+[7,23,24] at the original ell=8 fixtures, every assignment on each of
+draws 0,3,5,6. They separate guessing an intermediate from merely reducing
+each summand's dimension. [15,23,24] is the image of [7,23,24] under exchange
+of the first two summands; certify that exchange on the actual equations
+before deriving a degree-verdict equivalence. Never infer equal costs under
+a variable permutation.
+
+Integrate the geometric-base and symmetric solver into the ecbench binary
+as new versioned plug-ins, retaining every existing method. Complete-DLP
+smoke: K_0 over n=7,13,17,23, respectively ell=2,3,3,4; base family geometric,
+base seed 17. Two public known-answer targets per field, target seed
+202610230101 and interleaving seed 202610230102. Arms: strongest signed-
+Frobenius rho, direct S4 hybrid without preclosure, symmetric S4 hybrid with
+degree-two preclosure, complete negation-folded pair-table IC on the same
+base, repeated strongest rho. Hybrid degree=2 with the explicit input-degree
+floor, node_budget=20000, max_solutions=4096, max_cols=30000. Every search
+parameter is required by the plug-in. max_trials=100000; 900 s per child;
+one round, no warmup, L0 counted evidence. Each field has its own spec.
+
+The complete runner charges setup, actual queries, failed attempts, relation
+verification, filtering, relation LA and scalar recovery as the existing
+framework does. Signed lifts use CountedGroup, and all solver word operations
+are retained in SolverTotals. Symbolic construction and cubic splitting are
+not completely counted in native units: S is a lower bound, not a full-price
+cost. Keep elapsed phases diagnostic at L0, retain every incompletion, replay
+every successful run, and report the common native-work sensitivity band
+0,0.1,1 GAE. This smoke does not establish a scaling win, fastest-oracle
+claim, or net gain over the best verified IC pipeline. Full calibrated and
+external-tool comparisons remain C3/D1 obligations.

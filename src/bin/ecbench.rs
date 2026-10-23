@@ -34,6 +34,8 @@
 mod pdp3_koblitz;
 #[path = "ecbench/pdp_split_oracle.rs"]
 mod pdp_split_oracle;
+#[path = "ecbench/structured_s4.rs"]
+mod structured_s4;
 
 use std::io::Write as _;
 use std::path::{Path, PathBuf};
@@ -600,10 +602,12 @@ fn binary_plugins() -> crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugin
         base: |name, instance| {
             (pdp3_koblitz::plugins().base)(name, instance)
                 .or_else(|| pdp_split_oracle::base(name, instance))
+                .or_else(|| structured_s4::base(name, instance))
         },
         oracle: |name, summands, instance| {
             (pdp3_koblitz::plugins().oracle)(name, summands, instance)
                 .or_else(|| pdp_split_oracle::oracle(name, summands, instance))
+                .or_else(|| structured_s4::oracle(name, summands, instance))
         },
     }
 }
