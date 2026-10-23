@@ -80,6 +80,7 @@ fn collect(
     index: &BTreeMap<P, Rows>,
     target: P,
     mode: &str,
+    profile: &str,
     out: &Path,
 ) -> Result<Value> {
     let e = f.curve();
@@ -201,7 +202,7 @@ fn collect(
         }
     }
     let file = format!(
-        "{}-{}.json",
+        "{profile}-{}-{}.json",
         digest(&serde_json::to_vec(&(f.id.clone(), base, helpers, target))?),
         mode
     );
@@ -300,7 +301,7 @@ pub fn replay(fixtures: &[Fixture], input: &Path, out: &Path) -> Result<Vec<Valu
                             "general-extension",
                             "direct-rational",
                         ] {
-                            arms.push(collect(f, &base, helpers, u, &index, q, mode, out)?);
+                            arms.push(collect(f, &base, helpers, u, &index, q, mode, &key, out)?);
                         }
                         assert_eq!(
                             arms[0]["row_sha256"], arms[1]["row_sha256"],
@@ -357,8 +358,45 @@ mod tests {
         let q = e.pm(f.group(), 13);
         let dir = std::env::temp_dir().join(format!("twist-helper-support-{}", std::process::id()));
         fs::create_dir_all(&dir).unwrap();
-        let a = collect(f, base, helpers, u, &index, q, "general-extension", &dir).unwrap();
-        let b = collect(f, base, helpers, u, &index, q, "direct-rational", &dir).unwrap();
+        let a = collect(
+            f,
+            base,
+            helpers,
+            u,
+            &index,
+            q,
+            "general-extension",
+            "arity2",
+            &dir,
+        )
+        .unwrap();
+        let b = collect(
+            f,
+            base,
+            helpers,
+            u,
+            &index,
+            q,
+            "direct-rational",
+            "arity2",
+            &dir,
+        )
+        .unwrap();
+        let c = collect(
+            f,
+            base,
+            helpers,
+            u,
+            &index,
+            q,
+            "general-extension",
+            "arity3",
+            &dir,
+        )
+        .unwrap();
+        assert_ne!(a["file"], c["file"]);
+        assert!(dir.join(a["file"].as_str().unwrap()).exists());
+        assert!(dir.join(c["file"].as_str().unwrap()).exists());
         assert_eq!(a["row_sha256"], b["row_sha256"]);
         assert_eq!(a["scalar_verified"], true);
         assert_eq!(a["rank"], b["rank"]);

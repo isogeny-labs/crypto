@@ -327,12 +327,12 @@ pub fn run(fixtures: &[Fixture], execution: &Path, out: &Path) -> Result<Vec<Val
         "matched_random_controls":random.values().map(|v|v.len()).sum::<usize>(),"matched_random_groups":random_summary,
         "all_pair_triple_histograms_recomputed":true,"fiber_energy_is_derived_not_measured_span":true,"status":"partial"}));
 
-    let partial = rows(&root, "partial-20261023-v1")?;
+    let partial = rows(&root, "partial-20261023-v2")?;
     let mut profiles = 0;
     let mut attempts = 0;
     let mut distinct_targets = BTreeSet::new();
     let mut verified = [0u64; 4];
-    let partial_root = root.join("partial-20261023-v1");
+    let partial_root = root.join("partial-20261023-v2");
     let mut witness_cache = BTreeMap::new();
     for p in files(&partial_root)? {
         if !p
