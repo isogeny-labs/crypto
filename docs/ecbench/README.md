@@ -215,8 +215,11 @@ rule, `A = 2` on every prime curve, and the audit recomputes it under that rule
 (`workload::legacy_automorphisms`), so a committed record keeps the floor it
 was written with. Under the first rule a `j = 0` curve's `rho.cubic` read
 0.91× a floor it was entitled to beat (`A = 6` makes that floor
-`√(π/12) = 0.51`, and the same run about 1.6× it). No committed session uses
-a `j = 0` or `j = 1728` prime curve; the explicit Koblitz curves in
+`√(π/12) = 0.51`, and the same run about 1.6× it). Apart from
+[`research/ecbench_accounting_v2_20261023`](../../research/ecbench_accounting_v2_20261023/REPORT.pdf),
+which measures this change on the registered `j = 0` curve
+`icv1-fp25-t9734-bcfe9f51`, no committed session uses a `j = 0` or
+`j = 1728` prime curve; the explicit Koblitz curves in
 `research/ghs_curve_comparison_20261009` already carry `A = 2m`, because
 `binary_explicit_instance` certifies them as Koblitz. A test checks that no
 method's `automorphisms_used` exceeds the `A` available. The *reference* is an arm of the session, normally the matched
@@ -627,11 +630,13 @@ fixed set-up (`jump table + 3·log₂ r + 1.5·log₂ r`, the two start
 multiplications and the final check) is at most a tenth of `ideal`, never
 fewer than 8; the table repeats its distinct jumps to the reference's 32
 entries. Where `r` is too small for that (below about 2^31) the set-up share is
-not hidden by a worse walk: it is in `detail.setup_share`, and a row is
-flagged when fixed set-up exceeds 10 % of `S` or `log₂ r` is below the
-calibrated range (prime `r < 2^25`, Koblitz `r < 2^39`;
-`methods::row_flags`, `setup_share`, `calibrated_log2_r`, for `ecbench
-table`). At the review's sizes the frozen reference was 58× (n = 13) and 15.5×
+not hidden by a worse walk: it is in each record's `detail.setup_share`.
+`methods::setup_share`, `row_flags` and `calibrated_log2_r` compute the
+flag a table row should carry (fixed set-up above 10 % of `S`, or `log₂ r`
+below the calibrated range: prime `r < 2^25`, Koblitz `r < 2^39`), but
+`ecbench table` does not print it yet: the table column is a follow-up, and
+until it lands the share is read from the records' `detail.setup_share` or
+from their `setup` and `automorphism_setup` phases. At the review's sizes the frozen reference was 58× (n = 13) and 15.5×
 (n = 19) theory, almost all of it 32 full-size jump scalars; at n = 13, with
 about eleven expected steps, even eight jumps cost more than the search.
 

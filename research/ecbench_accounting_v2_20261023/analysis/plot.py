@@ -42,33 +42,51 @@ def save(fig, name, data):
     (FIG / f"{name}.data.json").write_text(json.dumps(data, indent=1))
     plt.close(fig)
 
-# ---- Figure 1: j = 0, S / floor -------------------------------------------------------------
-t = table("j0-v2"); tm = table("j0-frozen-main"); sj = summ("j0-v2")
-floor_v2 = sj["rho-cubic-v2"]["floor_s"]            # recorded boundaries.floor_s, A = 6
-floor_old = summ("j0-frozen-main")["rho-cubic"]["floor_s"]   # recorded by the main binary, A = 2
-smm = summ("j0-frozen-main")
-items = [  # label, table row, floor used, exact mean S/floor from the records, colour
-    ("rho.plain (A=1 walk)", t["rho-plain"], floor_v2, sj["rho-plain"]["mean_ratio_to_floor"], FROZEN),
-    ("rho.negation_v2", t["rho-neg-v2"], floor_v2, sj["rho-neg-v2"]["mean_ratio_to_floor"], V2),
-    ("rho.cubic, old floor (A=2), main binary", tm["rho-cubic"], floor_old, smm["rho-cubic"]["mean_ratio_to_floor"], OLD),
-    ("rho.cubic, floor v2 (A=6)", t["rho-cubic"], floor_v2, sj["rho-cubic"]["mean_ratio_to_floor"], FROZEN),
-    ("rho.cubic_v2, floor v2 (A=6)", t["rho-cubic-v2"], floor_v2, sj["rho-cubic-v2"]["mean_ratio_to_floor"], V2),
-]
-fig, ax = plt.subplots(figsize=(7.2, 3.1))
+# ---- Figure 1: j = 0, S / floor (registered curve, and the archived first run) --------------------
+ARCH = D.parent / "archives" / "fp23-first-run" / "analysis"
+
+def table_at(path):
+    rows = {}
+    for line in path.read_text().splitlines()[2:]:
+        c = [x.strip() for x in line.strip().strip("|").split("|")]
+        if len(c) < 15:
+            continue
+        lo, hi = [float(x) for x in re.findall(r"[-\d.]+", c[7])]
+        rows[c[1]] = dict(session=c[0], method=c[2], curve=c[3], log2r=float(c[4]), verified=c[5],
+                          mean_s=float(c[6]), lo=lo, hi=hi, s_over_floor=float(c[10]))
+    return rows
+
+def summ_at(path):
+    return {r["arm"]: r for r in json.load(open(path))}
+
+panels = [("Registered curve: p = 23 736 841, r = 1 977 259 (primary)", D / "table", D / "summary"),
+          ("First run: p = 4 194 397, r = 1 048 627 (archived)", ARCH / "table", ARCH / "summary")]
+fig, axs = plt.subplots(1, 2, figsize=(10.4, 3.2), sharey=True)
 data = []
-for i, (lab, r, fl, ratio, col) in enumerate(items):
-    y = len(items) - 1 - i
-    m, lo, hi = ratio, r["lo"] / fl, r["hi"] / fl
-    ax.errorbar(m, y, xerr=[[m - lo], [hi - m]], fmt="o", color=col, capsize=3)
-    ax.text(hi + 0.05, y, f"{m:.3f}", va="center", fontsize=8)
-    data.append(dict(label=lab, mean_s=r["mean_s"], s_lo=r["lo"], s_hi=r["hi"], floor_s=fl,
-                     s_over_floor=m, lo=lo, hi=hi, session=r["session"]))
-ax.axvline(1.0, color="black", lw=0.8, ls="--")
-ax.set_yticks(range(len(items))); ax.set_yticklabels([x[0] for x in items][::-1])
-ax.set_xlabel("mean S / floor")
-ax.set_xlim(0, 4.4)
-ax.set_title("j = 0, r = 1 048 627: below the floor only under the old A = 2", loc="left")
-fig.text(0.01, -0.12, f"24 runs per arm (6 targets x 4 rounds). Point: mean of the records' ratio_to_floor; whiskers: ecbench table 95% interval of S\ndivided by the recorded floor_s (derived). Sessions: j0-v2 {t['rho-cubic']['session']}, j0-frozen-main {tm['rho-cubic']['session']}.\nfloor_s = {floor_v2:.4f} (A=6, floor_rule automorphisms/v2), {floor_old:.4f} (A=2, first rule).", fontsize=7, va="top")
+for ax, (ttl, tdir, sdir) in zip(axs, panels):
+    t = table_at(tdir / "j0-v2.md"); tm = table_at(tdir / "j0-frozen-main.md")
+    sj = summ_at(sdir / "j0-v2.json"); smm = summ_at(sdir / "j0-frozen-main.json")
+    floor_v2 = sj["rho-cubic-v2"]["floor_s"]; floor_old = smm["rho-cubic"]["floor_s"]
+    items = [
+        ("rho.plain (A=1 walk)", t["rho-plain"], floor_v2, sj["rho-plain"]["mean_ratio_to_floor"], FROZEN),
+        ("rho.negation_v2", t["rho-neg-v2"], floor_v2, sj["rho-neg-v2"]["mean_ratio_to_floor"], V2),
+        ("rho.cubic, old floor (A=2), main binary", tm["rho-cubic"], floor_old, smm["rho-cubic"]["mean_ratio_to_floor"], OLD),
+        ("rho.cubic, floor v2 (A=6)", t["rho-cubic"], floor_v2, sj["rho-cubic"]["mean_ratio_to_floor"], FROZEN),
+        ("rho.cubic_v2, floor v2 (A=6)", t["rho-cubic-v2"], floor_v2, sj["rho-cubic-v2"]["mean_ratio_to_floor"], V2),
+    ]
+    for i, (lab, r, fl, ratio, col) in enumerate(items):
+        y = len(items) - 1 - i
+        m, lo, hi = ratio, r["lo"] / fl, r["hi"] / fl
+        ax.errorbar(m, y, xerr=[[m - lo], [hi - m]], fmt="o", color=col, capsize=3)
+        ax.text(hi + 0.05, y, f"{m:.3f}", va="center", fontsize=8)
+        data.append(dict(panel=ttl, label=lab, mean_s=r["mean_s"], s_lo=r["lo"], s_hi=r["hi"], floor_s=fl,
+                         s_over_floor=m, lo=lo, hi=hi, session=r["session"], runs=r["verified"]))
+    ax.axvline(1.0, color="black", lw=0.8, ls="--")
+    ax.set_yticks(range(len(items))); ax.set_yticklabels([x[0] for x in items][::-1])
+    ax.set_xlabel("mean S / floor"); ax.set_xlim(0, 4.4)
+    ax.set_title(ttl, loc="left", fontsize=8.5)
+fig.text(0.01, -0.08, "24 runs per arm (6 targets x 4 rounds) in every panel. Point: mean of the records' ratio_to_floor; whiskers: ecbench table 95% interval of S divided by the recorded floor_s (derived). "
+         "Dashed line: floor = 1.\nfloor_s = 0.5117 (A=6, floor_rule automorphisms/v2) or 0.8862 (A=2, first rule, main binary). Left sessions: j0-v2, j0-frozen-main (analysis/table); right: archives/fp23-first-run.", fontsize=7, va="top")
 save(fig, "fig1_j0_floor", data)
 
 # ---- Figure 2: strong reference, frozen vs v2, three sizes ---------------------------------------

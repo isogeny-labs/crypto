@@ -20,14 +20,14 @@
   Binary built at head `7ed39a752` (sha256 `e265bbc0...54d50b1`)
 ]
 
-*What this is.* An accounting and instrument correction check. It is not an algorithmic improvement and not a speed result: AGENTS.md's success criterion says relabelling and accounting changes are not improvements, and nothing here is reported as one. Counts are the result; wall time is descriptive only. Every figure is measured (recorded by `ecbench` in a session) or derived (the text says how). Preregistered in `PREREGISTRATION.md` before any data; amendments A1 to A3 are dated in the same file. Run report: `reports/run-20261023T0815Z/`.
+*What this is.* An accounting and instrument correction check. It is not an algorithmic improvement and not a speed result: AGENTS.md's success criterion says relabelling and accounting changes are not improvements, and nothing here is reported as one. Counts are the result; wall time is descriptive only. Every figure is measured (recorded by `ecbench` in a session) or derived (the text says how). Preregistered in `PREREGISTRATION.md` before any data; amendments A1 to A4 are dated in the same file. Run report: `reports/run-20261023T0815Z/`.
 
 = Preregistered outcomes
 
 #table(columns: (auto, 1.6fr, 2.4fr, 1fr),
   [*id*], [*outcome (preregistered)*], [*result*], [*verdict*],
   [O1], [`rho.cubic_v2` at or above 1.0 of its floor on j = 0, interval excluding values below 1.0],
-  [S / floor = *1.514*, 95% interval *[1.257, 1.800]* (n = 24; the `ecbench table` interval of S divided by the recorded `floor_s` 0.5117, derived)], [met],
+  [S / floor = *1.419*, 95% interval *[1.132, 1.761]* on the registered j = 0 curve (n = 24; the `ecbench table` interval of S divided by the recorded `floor_s` 0.5117, derived). The first run on another j = 0 curve (archived, amendment A4): 1.514 [1.257, 1.800]], [met on both curves],
   [O2], [strong v2 lowers mean S and set-up share against the frozen id at n = 13, 19, 37; ratio interval excluding 1],
   [S ratio v2 / frozen 0.182 [0.171, 0.196], 0.223 [0.201, 0.248], 0.678 [0.499, 0.891]; set-up share 83.3% to 39.9%, 71.3% to 29.3%, 30.2% to 4.3%], [met at all three sizes],
   [O3 (a)-(c)], [v2 minus frozen is exactly the verification phase; other phases equal; same recovered scalar],
@@ -38,7 +38,7 @@
   [504 of 504 matched records equal on every compared count field; on j = 0 only the floor figures differ, by design], [met],
 )
 
-Quoted figures against measured (all within the preregistered 15% band, so none is reported as differing). j = 0: 1.514 quoted, 1.514 measured; `rho.cubic` on the old floor 0.91 quoted, 0.911 measured. Strong reference frozen to v2, mean S and set-up share, quoted then measured: n = 13, 14.0 to 2.55 and 84% to 38% against 14.12 to 2.57 and 83% to 40%; n = 19, 2.95 to 0.68 and 77% to 31% against 3.16 to 0.705 and 71% to 29%; n = 37, 0.293 to 0.209 and 31% to 4.5% against 0.291 to 0.197 and 30% to 4.3%. The scratch runs used other seeds and targets; the largest differences are n = 19 frozen S (+7%), its share (-8%) and n = 37 v2 S (-6%).
+Quoted figures against measured (all within the preregistered 15% band, so none is reported as differing). j = 0, the review's curve (first run, archived): 1.514 quoted, 1.514 measured; `rho.cubic` on the old floor 0.91 quoted, 0.911 measured. On the registered curve used for the primary run (a different curve, so the review's figures are not a prediction for it): 1.419 and 0.720. Strong reference frozen to v2, mean S and set-up share, quoted then measured: n = 13, 14.0 to 2.55 and 84% to 38% against 14.12 to 2.57 and 83% to 40%; n = 19, 2.95 to 0.68 and 77% to 31% against 3.16 to 0.705 and 71% to 29%; n = 37, 0.293 to 0.209 and 31% to 4.5% against 0.291 to 0.197 and 30% to 4.3%. The scratch runs used other seeds and targets; the largest differences are n = 19 frozen S (+7%), its share (-8%) and n = 37 v2 S (-6%).
 
 = Old id to new id
 
@@ -57,21 +57,22 @@ Quoted figures against measured (all within the preregistered 15% band, so none 
 
 = Q1: the j = 0 floor
 
-Curve `icv1-fp23-tm110-8df20cbc` ($y^2 = x^3 + 2$ over $F_4194397$, r = 1 048 627; not in `docs/curves/registry.json`). Session `j0-v2` (committed spec `check-prime-j0-floor-v2.json`; 6 targets, 4 rounds, 24 runs per arm, all verified) and `j0-frozen-main` (same curve and seeds, frozen ids, recorded by the main binary).
+Primary run, on the registered j = 0 curve `icv1-fp25-t9734-bcfe9f51` ($y^2 = x^3 + 1$ over $F_(23736841)$, group order 23 727 108 = 12 times 1 977 259, r = 1 977 259, `registered=true`, A = 6). Session `j0-v2` (the PR's spec `check-prime-j0-floor-v2.json`, which names this curve; 6 targets, 4 rounds, 24 runs per arm, all verified) and `j0-frozen-main` (same curve and seeds, frozen ids, recorded by the main binary). The first run used another j = 0 curve ($y^2 = x^3 + 2$ over $F_4194397$, r = 1 048 627) that is not in `docs/curves/registry.json`, which CI's curve-name check requires; the curve was switched (amendment A4) and the first run kept, unedited, in `archives/fp23-first-run/` as a replication (right panel of figure 1, table below).
 
-#figure(image("figures/fig1_j0_floor.svg", width: 82%), caption: [Mean S / floor on the j = 0 curve (dashed line: floor = 1). Sessions `j0-v2` ECBS1h70fa091addfe and `j0-frozen-main` ECBS1h1c109f746e68; 24 runs per arm.])
+#figure(image("figures/fig1_j0_floor.svg", width: 100%), caption: [Mean S / floor on the j = 0 curves (dashed line: floor = 1). Left: sessions `j0-v2` ECBS1h0c64bbd17533 and `j0-frozen-main` ECBS1h7b9bf9250cf7. Right: the archived first run, ECBS1h70fa091addfe and ECBS1h1c109f746e68. 24 runs per arm.])
 
-#table(columns: (2.2fr, 1.1fr, 1fr, 1.4fr, 1fr),
-  [*arm (binary)*], [*floor_s (A)*], [*mean S (n = 24)*], [*95% interval of S*], [*S / floor*],
-  [`rho.cubic_v2` (branch)], [0.5117 (6)], [0.7746], [[0.643, 0.921]], [*1.514*],
-  [`rho.cubic` (branch)], [0.5117 (6)], [0.8074], [[0.665, 0.958]], [1.578],
-  [`rho.cubic` (main binary, first rule)], [0.8862 (2)], [0.8074], [[0.665, 0.958]], [*0.911*],
-  [`rho.negation_v2` (reference)], [0.5117 (6)], [1.1067], [[0.827, 1.420]], [2.163],
-  [`rho.plain`], [0.5117 (6)], [1.4909], [[1.100, 1.947]], [2.914],
+#table(columns: (2.2fr, 1fr, 0.8fr, 1.2fr, 0.8fr, 0.8fr, 1.2fr, 0.8fr),
+  [*arm (binary)*], [*floor_s (A)*], [*mean S*], [*95% interval of S*], [*S / floor*], [*S / floor interval (derived)*], [*first run (archived): mean S, S / floor*], [*n*],
+  [`rho.cubic_v2` (branch)], [0.5117 (6)], [0.7262], [[0.579, 0.901]], [*1.419*], [[1.132, 1.761]], [0.7746, 1.514 [1.257, 1.800]], [24],
+  [`rho.cubic` (branch)], [0.5117 (6)], [0.6381], [[0.524, 0.768]], [1.247], [[1.024, 1.501]], [0.8074, 1.578], [24],
+  [`rho.cubic` (main binary, first rule)], [0.8862 (2)], [0.6381], [[0.524, 0.768]], [*0.720*], [[0.591, 0.867]], [0.8074, 0.911 [0.750, 1.081]], [24],
+  [`rho.negation_v2` (reference)], [0.5117 (6)], [1.1349], [[0.877, 1.399]], [2.218], [[1.714, 2.734]], [1.1067, 2.163], [24],
+  [`rho.plain`], [0.5117 (6)], [1.2632], [[0.942, 1.597]], [2.469], [[1.841, 3.121]], [1.4909, 2.914], [24],
 )
-- The frozen `rho.cubic` counts are identical on the two binaries (72 of 72 records); only the floor differs. Under the first rule it reads 0.911 (S / floor interval [0.750, 1.081], which includes 1: the review's "below its floor" was not distinguishable from 1 either); under `automorphisms/v2` it reads 1.578.
-- Paired ratio `rho.cubic_v2` over `rho.cubic` of total S: *0.960 [0.826, 1.042]* (24 pairs). Charging the set-up ledger (about 26 GAE, 3% of S at this size, per the README) does not raise S here; the total falls, which is consistent with Brent cycle detection removing more than the ledger adds (inferred: the two effects are not separated in this study). "v2 charges more" is true of the ledger, not of the total.
-- Paired `rho.cubic_v2` over `rho.negation_v2` is 0.700 [0.505, 1.043], so negation over cubic is 1.43 [0.96, 1.98] (inverted, derived); the prior $sqrt(3) = 1.73$ is inside the interval.
+- *O1 is met on both curves:* `rho.cubic_v2` reads 1.419 of its floor with the interval above 1 (1.132 to 1.761), and 1.514 (1.257 to 1.800) on the first curve. The review's 1.514 was this first curve; on the registered curve the same method reads lower, which is a property of the curve and targets, not of the floor rule.
+- The frozen `rho.cubic` counts are identical on the two binaries (72 of 72 records, both curves); only the floor differs. Under the first rule it reads 0.720 on the registered curve (interval [0.591, 0.867], excluding 1: a method that uses six automorphisms read below a floor computed with two) and 0.911 on the first curve (interval [0.750, 1.081], including 1); under `automorphisms/v2` it reads 1.247 and 1.578.
+- Paired ratio `rho.cubic_v2` over `rho.cubic` of total S: *1.138 [0.899, 1.442]* (24 pairs) on the registered curve and 0.960 [0.826, 1.042] on the first. Both intervals include 1: this study cannot say whether charging the set-up ledger (about 26 GAE, 3% of S at these sizes, per the README) raises the total, since the v2 walk also differs (Brent cycle detection) and the two effects are not separated here.
+- Paired `rho.cubic_v2` over `rho.negation_v2` is 0.640 [0.480, 0.853], so negation over cubic is 1.56 [1.17, 2.08] (inverted, derived) on the registered curve and 1.43 [0.96, 1.98] on the first; the prior $sqrt(3) = 1.73$ is inside both intervals.
 
 = Q2: the strong reference, frozen and v2
 
@@ -135,22 +136,22 @@ Two committed sessions fail a replay on the branch binary and fail it identicall
 
 = Exploratory results and the pricing band
 
-- *Brent cycle detection changes totals.* `rho.negation_v2` over `rho.negation`: 0.914 [0.809, 1.040] (2^20 prime, 32 pairs). `rho.signed_frobenius_v2` over `rho.signed_frobenius`: 0.983 [0.653, 1.389] (n = 17) and *0.893 [0.804, 0.983]* (n = 37). Runs with a recorded cycle longer than the window: 30 of 32 (`rho-neg-v2`, prime), 12 of 24 (`rho.cubic_v2`), 10 of 32 and 5 of 32 (`signed_frobenius_v2`, n = 17 and 37). The README's "mean rose 14%" at n = 37 is the opposite direction to these paired totals (v2 lower); the README cites the review's runs (n = 80, with capped walks), and this study does not resolve the difference. Not a preregistered test.
+- *Brent cycle detection changes totals.* `rho.negation_v2` over `rho.negation`: 0.914 [0.809, 1.040] (2^20 prime, 32 pairs). `rho.signed_frobenius_v2` over `rho.signed_frobenius`: 0.983 [0.653, 1.389] (n = 17) and *0.893 [0.804, 0.983]* (n = 37). Runs with a recorded cycle longer than the window: 30 of 32 (`rho-neg-v2`, prime), 13 of 24 (`rho.cubic_v2`, registered j = 0 curve; 12 of 24 on the first curve), 10 of 32 and 5 of 32 (`signed_frobenius_v2`, n = 17 and 37). The README's "mean rose 14%" at n = 37 is the opposite direction to these paired totals (v2 lower); the README cites the review's runs (n = 80, with capped walks), and this study does not resolve the difference. Not a preregistered test.
 - *Pricing band (AGENTS.md 5a)*, `analysis/band/`: every v2 arm emits its uncharged counters (the `uncounted` column is empty for every arm), so all arms are ranked across 0, 0.1 and 1 GAE per native operation. At n = 37 strong v2 is below the frozen strong across the band (S 0.197, 0.234, 0.560 against 0.291, 0.331, 0.691); strong v2 and `rho.signed_frobenius` are unresolved there.
 - *Distance to the matched rho (success criterion).* The index-calculus arms of the committed claim specs are unchanged by this PR; the reference they are read against is what changed (`analysis/gap_to_rho.tsv`, band weights 0, 0.1, 1). The best IC arm across the band, `ic-rootfind-m2`, is 10.6 to 11.0 times strong v2 at n = 13 (2.0 to 2.3 times the frozen strong) and 34 to 49 times at n = 19 (10 to 11 times the frozen strong). The corrected references make the measured gap larger, not smaller. These are distances remaining, not a gate.
 
 = Deviations, limits, not done
 
-- Amendments (dated in `PREREGISTRATION.md`): A1 added the frozen `ic.large_prime` cross-binary spec; A2 records that outcome (d) was too strict and adds the post hoc (d'); A3 records that the main-binary j = 0 session fails the branch audit by design.
-- `j0-frozen-main` is a verbatim archive (`archive/j0-frozen-main.tar.gz`, sha256 beside it), not a session directory: the branch binary's audit rejects it ("used 6 automorphisms, the curve has 2", 25 problems), which is the gap the floor rule closes; the main binary accepts it. Committed as a session it would fail CI's re-audit of every `ecbench.session/v1`.
-- Sessions record the worktree's `git_commit` at run time (`c5ca4380e` and `2833cfc7a`, above the binary's source head `7ed39a752`; the commits between add only this study). The binary sha256 is the same in every branch session.
+- Amendments (dated in `PREREGISTRATION.md`): A1 added the frozen `ic.large_prime` cross-binary spec; A2 records that outcome (d) was too strict and adds the post hoc (d'); A3 records that the main-binary j = 0 session fails the branch audit by design; A4 records the switch of the j = 0 curve to a registered one, with the first run kept as a replication.
+- `j0-frozen-main` (registered curve) is a verbatim archive (`archive/j0-frozen-main.tar.gz`, sha256 beside it; the first curve's is `archives/fp23-first-run/j0-frozen-main.tar.gz`), not a session directory: the branch binary's audit rejects it ("used 6 automorphisms, the curve has 2", 25 problems in both runs), which is the gap the floor rule closes; the main binary accepts it. Committed as a session it would fail CI's re-audit of every `ecbench.session/v1`.
+- Sessions record the worktree's `git_commit` at run time (`c5ca4380e`, `2833cfc7a` and, for the registered-curve j = 0 sessions, `3d310548d`, above the binary's source head `7ed39a752`; the commits between add only this study). The binary sha256 is the same in every branch session.
 - Isolation: L1 or better only, not the L2 the specs request on most records (a shared 4-vCPU virtual machine with other agents building). Counts are unaffected; no wall-time statement is made, and median solves (0.1 to 1.5 ms) are below the harness's 1 ms admission minimum.
-- The README says `ecbench table` flags rows above 10% set-up or below the calibrated range; on this head the table prints no flags column (`methods::row_flags` and `setup_share` are referenced only by unit tests). The flags above are computed by hand from the same thresholds.
+- `ecbench table` prints no flag column on this head (`methods::row_flags` and `setup_share` are referenced only by unit tests); the README of this PR now says the column is a follow-up (the share is in `detail.setup_share`). The flags above are computed by hand from the same thresholds.
 - Not run: `rho.quartic_v2` and the j = 1728 floor; sizes between or beyond n = 13, 19, 37 for the strong reference (no scaling claim); a replay of the branch's sessions on the main binary.
-- The j = 0 curve slug is not in `docs/curves/registry.json`; it is cited by slug and parameters.
+- Curve names: the first j = 0 curve is not registered, so its sessions, tables and the PR's original spec text live only under `archives/` (exempt from `scripts/check_curve_names.py`); a run of that script in this sparse checkout (files absent from it read as empty) reports 0 problems, both plain and with `--diff origin/main`.
 - Sessions are 16 directories of about 16 MB (the per-record isolation capsule dominates; the whole study directory is 20 MB), more than the few MB asked for; git compresses `records.jsonl` roughly tenfold.
 - No `benchmarks/` entry: nothing here measures how fast an algorithm runs or reports a speedup, and no validation-gate row is created. No leaderboard change: no row of `docs/ic/leaderboard.json` is added or moved (accounting changes are not improvements). Canonical graphs checked and left unchanged: `docs/ic-leaderboard.html`, `docs/ic/LEADERBOARD.md`, `docs/ic/leaderboard.json`, `docs/index-calculus-scoreboard.html`, `docs/bounds/*`; they cite frozen ids, whose counts Q4 shows unchanged. A follow-up may add v2-reference columns.
 
 = Files and reproduction
 
-`PREREGISTRATION.md`, `SPEC_SHA256.txt`, `specs/`; `sessions/` (never edited), `archive/`, `audits/` (replay-all receipts beside the sessions, never inside), `logs/`, `host.txt`; `analysis/` (commands `run.sh`, `run_a1.sh`, `audit.sh`, `replay_committed.sh`; jq and shell scripts that produce every number; `compare/`, `table/`, `band/`, `summary/`, `pair_check.json`, `cross_binary.json`, `gap_to_rho.tsv`, `inventory.tsv`; `plot.py`, which plots recorded values only); `figures/` (SVG, 150 dpi PNG and `*.data.json` with the numbers drawn); `REPORT.typ`, `REPORT.pdf`; `reports/run-20261023T0815Z/`.
+`PREREGISTRATION.md`, `SPEC_SHA256.txt`, `specs/`; `sessions/` (never edited), `archive/`, `archives/fp23-first-run/` (the first j = 0 run: sessions, archive, specs, audits, analysis), `audits/` (replay-all receipts beside the sessions, never inside), `logs/`, `host.txt`; `analysis/` (commands `run.sh`, `run_a1.sh`, `audit.sh`, `replay_committed.sh`; jq and shell scripts that produce every number; `compare/`, `table/`, `band/`, `summary/`, `pair_check.json`, `cross_binary.json`, `gap_to_rho.tsv`, `inventory.tsv`; `plot.py`, which plots recorded values only); `figures/` (SVG, 150 dpi PNG and `*.data.json` with the numbers drawn); `REPORT.typ`, `REPORT.pdf`; `reports/run-20261023T0815Z/`.

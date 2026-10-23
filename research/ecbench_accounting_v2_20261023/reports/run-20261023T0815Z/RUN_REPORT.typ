@@ -11,14 +11,14 @@
 
 #align(center)[
   #text(size: 15pt, weight: "bold")[Run report: accounting v2 study sessions] \
-  Study `research/ecbench_accounting_v2_20261023` \ Runs started 2026-10-23 08:15 UTC (batch 1: 08:15 to 08:22; amendment A1 batch after the audits)
+  Study `research/ecbench_accounting_v2_20261023` \ Runs started 2026-10-23 08:15 UTC (batch 1: 08:15 to 08:22; amendment A1 and A4 batches after the audits)
 ]
 
 Descriptive only: what ran, on what, with what result recorded. Interpretation is in the study's `REPORT.pdf`. Observations only: no speedup or significance statement is made here.
 
 = What ran
 
-- Command for each session: `ecbench run --wait --allow-busy --cpus auto --quiet --spec SPEC --out sessions/NAME` (scripts `analysis/run.sh` and `analysis/run_a1.sh`). Audit: `ecbench verify --dir D --replay-all --exit-code` (`analysis/audit.sh`), receipts in `audits/`.
+- Command for each session: `ecbench run --wait --allow-busy --cpus auto --quiet --spec SPEC --out sessions/NAME` (scripts `analysis/run.sh`, `run_a1.sh`, `run_a4.sh`). Audit: `ecbench verify --dir D --replay-all --exit-code` (`analysis/audit.sh`), receipts in `audits/`.
 - Binary: branch `./target/release/ecbench`, built at head `7ed39a752`, sha256 `e265bbc00a91...`; the main binary `ecbench-base`, sha256 `a59c4014ff52...`, only for the `*-main` sessions. Host capsule: `host.txt` (env class ECBENV3had995aa2df0f, Intel Xeon 2.10 GHz, 4 logical CPUs, 1 NUMA node, virtual machine, Linux 6.18.44).
 - Specs and sha256: `SPEC_SHA256.txt`. Committed specs (unchanged): `check-prime-j0-floor-v2`, `smoke-prime-v2`, `smoke-koblitz-v2`, `claim-koblitz-strong-v2-n13`, `-n19`. New specs: `specs/*.json`.
 - Workloads and seeds: one algorithm seed per (workload, round) shared by every arm (spec.rs); target seeds are in each spec (`20261023`, `7`, `202610121301`, `202610121901`, `202610123701`).
@@ -26,7 +26,7 @@ Descriptive only: what ran, on what, with what result recorded. Interpretation i
 
 = Runs requested and completed
 
-Every session completed; every record verified; no failure, timeout or interruption. Audit column: SHA-256 of the receipt of the `--replay-all` audit (`audits/NAME.verify.txt`). `j0-frozen-main` is archived (`archive/`) because the branch binary's audit rejects it by design (25 problems: "used 6 automorphisms, the curve has 2"); the main binary's audit of it passes. Every other session: audit OK, 0 problems.
+Every session completed; every record verified; no failure, timeout or interruption. Audit column: SHA-256 of the receipt of the `--replay-all` audit (`audits/NAME.verify.txt`). `j0-frozen-main` is archived (`archive/`; the sessions of the first j = 0 curve, replaced under amendment A4 because that curve is not registered, are under `archives/fp23-first-run/`) because the branch binary's audit rejects it by design (25 problems: "used 6 automorphisms, the curve has 2"); the main binary's audit of it passes. Every other session: audit OK, 0 problems.
 
 #table(columns: (2.2fr, 1.7fr, 0.9fr, 1fr, 1.2fr, 1.7fr, 1.5fr),
   [*session*], [*session id*], [*status*], [*verified of records*], [*binary sha256*], [*isolation level counts*], [*audit receipt*],
@@ -38,9 +38,9 @@ Every session completed; every record verified; no failure, timeout or interrupt
   [`frozen-large-prime-main`], [ECBS1he690ca5be93], [complete], [32 of 32], [a59c4014ff52], [L1x4 L2x28], [da9bc0fdce2d],
   [`frozen-prime-branch`], [ECBS1h349b75d5e73], [complete], [240 of 240], [e265bbc00a91], [L1x240], [64609a593829],
   [`frozen-prime-main`], [ECBS1hc0d0d5b26f8], [complete], [240 of 240], [a59c4014ff52], [L1x240], [7d4f536c6773],
-  [`j0-frozen-branch`], [ECBS1h26edfacea04], [complete], [72 of 72], [e265bbc00a91], [L1x72], [34b1a7f77011],
-  [`j0-frozen-main`], [ECBS1h1c109f746e6], [complete], [72 of 72], [a59c4014ff52], [L1x72], [8f7c547b28e6],
-  [`j0-v2`], [ECBS1h70fa091addf], [complete], [144 of 144], [e265bbc00a91], [L1x144], [9d56b9ffa662],
+  [`j0-frozen-branch`], [ECBS1h1c5b6e1e11a], [complete], [72 of 72], [e265bbc00a91], [L1x72], [b90a3b7d7dd4],
+  [`j0-frozen-main`], [ECBS1h7b9bf9250cf], [complete], [72 of 72], [a59c4014ff52], [L1x72], [9bfa168c88fd],
+  [`j0-v2`], [ECBS1h0c64bbd1753], [complete], [144 of 144], [e265bbc00a91], [L1x144], [458ea2607ed8],
   [`pairs-koblitz`], [ECBS1h001cebd5ff1], [complete], [360 of 360], [e265bbc00a91], [L1x360], [7bd0076d541b],
   [`pairs-large-prime`], [ECBS1h8ce582cbde1], [complete], [48 of 48], [e265bbc00a91], [L1x16 L2x32], [85ad837c7ac5],
   [`pairs-prime`], [ECBS1h5c19d0d7e48], [complete], [480 of 480], [e265bbc00a91], [L1x480], [e97bb70352ca],
