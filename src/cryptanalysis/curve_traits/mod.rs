@@ -1569,7 +1569,11 @@ fn endomorphism(
                                 "a stored certificate: two independent points of order ℓ over \
                                  GF(q^{}){}, the crater",
                                 certificate.expect("checked").degree,
-                                if certificate.expect("checked").twist { " on the twist" } else { "" }
+                                if certificate.expect("checked").twist {
+                                    " on the twist"
+                                } else {
+                                    ""
+                                }
                             ),
                         ),
                         Some(true) => (
@@ -1592,10 +1596,8 @@ fn endomorphism(
                                     cert.degree,
                                     if cert.twist { " on the twist" } else { "" }
                                 ),
-                                None => {
-                                    "the ℓ-part of E(GF(q^k)) is cyclic, k = ord(λ): the floor"
-                                        .into()
-                                }
+                                None => "the ℓ-part of E(GF(q^k)) is cyclic, k = ord(λ): the floor"
+                                    .into(),
                             };
                             (Some(1), 1, method)
                         }

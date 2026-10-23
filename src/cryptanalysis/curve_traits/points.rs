@@ -1262,8 +1262,7 @@ pub fn read_certificates(text: &str) -> Result<Certificates, String> {
     struct File {
         certificates: Vec<LevelCertificate>,
     }
-    let file: File =
-        serde_json::from_str(text).map_err(|e| format!("level certificates: {e}"))?;
+    let file: File = serde_json::from_str(text).map_err(|e| format!("level certificates: {e}"))?;
     let mut out = Certificates::new();
     for c in file.certificates {
         let key = (c.slug.clone(), c.ell);
@@ -1291,7 +1290,11 @@ pub fn verify_level_certificate(
     cert: &LevelCertificate,
 ) -> Result<bool, String> {
     let ell = cert.ell;
-    if ell < 3 || !(2..ell).take_while(|d| d * d <= ell).all(|d| ell % d != 0) {
+    if ell < 3
+        || !(2..ell)
+            .take_while(|d| d * d <= ell)
+            .all(|d| !ell.is_multiple_of(d))
+    {
         return Err(format!("ℓ = {ell} is not an odd prime"));
     }
     let (f, a, b) = match model {
@@ -1299,10 +1302,7 @@ pub fn verify_level_certificate(
             p, modulus, a, b, ..
         } => {
             let f = FpK::new(p, modulus).ok_or("no word arithmetic for this field")?;
-            let (a, b) = (
-                f.element(a).ok_or("bad a")?,
-                f.element(b).ok_or("bad b")?,
-            );
+            let (a, b) = (f.element(a).ok_or("bad a")?, f.element(b).ok_or("bad b")?);
             (f, a, b)
         }
         Model::Prime { p, a, b } => {
@@ -1318,7 +1318,11 @@ pub fn verify_level_certificate(
     }
     let q = model.q();
     let k = eigen_order(ell, trace);
-    let (m, twist) = if k % 2 == 0 { (k / 2, true) } else { (k, false) };
+    let (m, twist) = if k.is_multiple_of(2) {
+        (k / 2, true)
+    } else {
+        (k, false)
+    };
     if k == 0 || (m, twist) != (cert.degree, cert.twist) {
         return Err(format!(
             "the certificate is over degree {} (twist {}), but ord(λ) = {k}",
@@ -1336,11 +1340,7 @@ pub fn verify_level_certificate(
         }
         Ok(trim(&f, v.iter().map(element).collect::<Result<_, _>>()?))
     };
-    let mut g: Poly<Vec<u64>> = cert
-        .modulus
-        .iter()
-        .map(element)
-        .collect::<Result<_, _>>()?;
+    let mut g: Poly<Vec<u64>> = cert.modulus.iter().map(element).collect::<Result<_, _>>()?;
     if g.len() != m as usize {
         return Err(format!("a modulus of degree {}, not {m}", g.len()));
     }
@@ -1404,7 +1404,11 @@ pub fn verify_level_certificate(
         if !super::torsion::on_curve(&e, &a, &b, &x, &y) {
             return Err("a point off the curve".into());
         }
-        pts.push(Jac { x, y, z: one.clone() });
+        pts.push(Jac {
+            x,
+            y,
+            z: one.clone(),
+        });
     }
     match (cert.kind.as_str(), pts.as_slice()) {
         ("floor", [t]) => {
@@ -1430,7 +1434,11 @@ pub fn verify_level_certificate(
             }
             Ok(true)
         }
-        _ => Err(format!("a certificate of kind {} with {} points", cert.kind, pts.len())),
+        _ => Err(format!(
+            "a certificate of kind {} with {} points",
+            cert.kind,
+            pts.len()
+        )),
     }
 }
 
@@ -1657,7 +1665,11 @@ mod tests {
     ) -> Option<LevelCertificate> {
         let q = BigUint::from(f.p).pow(f.k() as u32);
         let k = eigen_order(ell, t);
-        let (m, twist) = if k % 2 == 0 { (k / 2, true) } else { (k, false) };
+        let (m, twist) = if k % 2 == 0 {
+            (k / 2, true)
+        } else {
+            (k, false)
+        };
         let g = irreducible(f, &q, m as usize, 7)?;
         let e = Ext::new(f, g.clone(), &q);
         let order = q.pow(m);
@@ -1682,14 +1694,21 @@ mod tests {
         };
         let qi = BigInt::from(q.clone());
         let vm = lucas_v(t, &qi, m);
-        let n = (if twist { qi.pow(m) + 1u8 + vm } else { qi.pow(m) + 1u8 - vm }).to_biguint()?;
+        let n = (if twist {
+            qi.pow(m) + 1u8 + vm
+        } else {
+            qi.pow(m) + 1u8 - vm
+        })
+        .to_biguint()?;
         let (v, cof) = split_power(&n, ell);
         if v == 0 {
             return None;
         }
         let l = BigUint::from(ell);
         let coords = |x: &Poly<Vec<u64>>| -> Vec<Vec<u64>> {
-            (0..m as usize).map(|i| x.get(i).cloned().unwrap_or_else(|| f.zero())).collect()
+            (0..m as usize)
+                .map(|i| x.get(i).cloned().unwrap_or_else(|| f.zero()))
+                .collect()
         };
         let affine_pt = |p: &Jac<Poly<Vec<u64>>>| {
             let (x, y) = grp.affine(p).expect("not O");
@@ -1698,7 +1717,9 @@ mod tests {
         let mut low: Vec<Jac<Poly<Vec<u64>>>> = Vec::new();
         let (kind, pts) = 'search: {
             for i in 0..400 {
-                let Some(p) = grp.sample_point(i) else { continue };
+                let Some(p) = grp.sample_point(i) else {
+                    continue;
+                };
                 let s = grp.mul(&p, &cof);
                 let (mut ex, mut r) = (0u32, s.clone());
                 while !grp.is_zero(&r) {
@@ -1747,17 +1768,33 @@ mod tests {
         let mut refused = 0usize;
         for p in [103u64, 107, 127, 131] {
             // GF(p²) = GF(p)[z]/(z² + 1), p ≡ 3 mod 4.
-            let f = FpK { p, modulus: vec![1, 0] };
+            let f = FpK {
+                p,
+                modulus: vec![1, 0],
+            };
             let q = p * p;
             let chi_exp = BigUint::from((q - 1) / 2);
-            for (a0, a1, b0) in [(1u64, 0u64, 3u64), (2, 1, 5), (3, 2, 1), (1, 1, 7), (5, 0, 2), (4, 3, 6)] {
+            for (a0, a1, b0) in [
+                (1u64, 0u64, 3u64),
+                (2, 1, 5),
+                (3, 2, 1),
+                (1, 1, 7),
+                (5, 0, 2),
+                (4, 3, 6),
+            ] {
                 let (a, b) = (vec![a0, a1], vec![b0, 0]);
                 // #E(GF(p²)) by counting, so the trace is exact.
                 let mut n = 1u64;
                 for i in 0..q {
                     let x = vec![i % p, i / p];
                     let rhs = f.add(&f.mul(&f.add(&f.mul(&x, &x), &a), &x), &b);
-                    n += if f.is_zero(&rhs) { 1 } else if f.pow(&rhs, &chi_exp) == f.one() { 2 } else { 0 };
+                    n += if f.is_zero(&rhs) {
+                        1
+                    } else if f.pow(&rhs, &chi_exp) == f.one() {
+                        2
+                    } else {
+                        0
+                    };
                 }
                 let t = BigInt::from(q as i64 + 1 - n as i64);
                 let delta = &t * &t - BigInt::from(4 * q);
@@ -1773,10 +1810,14 @@ mod tests {
                 for ell in [3u64, 5, 7, 11] {
                     let l2 = BigInt::from(ell * ell);
                     // Depth 1 at ℓ: v_ℓ(Δ) is 2 or 3.
-                    if delta.is_zero() || !(&delta % &l2).is_zero() || (&delta % (&l2 * &l2)).is_zero() {
+                    if delta.is_zero()
+                        || !(&delta % &l2).is_zero()
+                        || (&delta % (&l2 * &l2)).is_zero()
+                    {
                         continue;
                     }
-                    let Some(truth) = super::super::torsion::frobenius_is_scalar(&model, &t, ell) else {
+                    let Some(truth) = super::super::torsion::frobenius_is_scalar(&model, &t, ell)
+                    else {
                         continue;
                     };
                     let Some(cert) = find_certificate(&f, &a, &b, &t, ell) else {
@@ -1800,24 +1841,39 @@ mod tests {
                         bad.push(c2);
                     }
                     if let Some(d) = &cert.d {
-                        let e = Ext::new(&f, {
-                            let mut g: Poly<Vec<u64>> = cert.modulus.clone();
-                            g.push(f.one());
-                            g
-                        }, &BigUint::from(q));
+                        let e = Ext::new(
+                            &f,
+                            {
+                                let mut g: Poly<Vec<u64>> = cert.modulus.clone();
+                                g.push(f.one());
+                                g
+                            },
+                            &BigUint::from(q),
+                        );
                         let dd = e.mul(&trim(&f, d.clone()), &trim(&f, d.clone()));
                         let mut c3 = cert.clone();
-                        c3.d = Some((0..cert.degree as usize).map(|i| dd.get(i).cloned().unwrap_or_else(|| f.zero())).collect());
+                        c3.d = Some(
+                            (0..cert.degree as usize)
+                                .map(|i| dd.get(i).cloned().unwrap_or_else(|| f.zero()))
+                                .collect(),
+                        );
                         bad.push(c3);
                     }
                     let mut c4 = cert.clone();
-                    c4.kind = if cert.kind == "floor" { "crater".into() } else { "floor".into() };
+                    c4.kind = if cert.kind == "floor" {
+                        "crater".into()
+                    } else {
+                        "floor".into()
+                    };
                     bad.push(c4);
                     let mut c5 = cert.clone();
                     c5.ell = 13;
                     bad.push(c5);
                     for c in &bad {
-                        assert!(verify_level_certificate(&model, &t, c).is_err(), "accepted a tampered certificate");
+                        assert!(
+                            verify_level_certificate(&model, &t, c).is_err(),
+                            "accepted a tampered certificate"
+                        );
                         refused += 1;
                     }
                 }

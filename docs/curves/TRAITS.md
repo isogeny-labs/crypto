@@ -164,8 +164,25 @@ secp256k1.
   `h(O_f) ≤ n` (class numbers from counting reduced forms and the
   conductor formula). Of the orders between `Z[π]` and `O_K` the levels
   allow, the walks keep those consistent with all of this: a level they
-  all share is decided (a floor this way needs no point over an extension
+  all share is decided (class-group orders exactly, by composing forms, up to
+  `|Δ| < 2^80`; an open walk is lengthened to the next such order) (a floor this way needs no point over an extension
   at all), and a resolved level outside them stops the build.
+
+- a **stored level certificate**
+  ([`level-certificates.json`](level-certificates.json)), where one exists,
+  before any search: the points the depth-1 point test would look for,
+  found offline by
+  [`search.gp`](../../research/curve_traits_level_certificates_20261023/search.gp)
+  (PARI/GP) and only checked by `curve_traits`
+  (`points.rs`, `verify_level_certificate`). A certificate gives a monic
+  `g` of degree `m` over `GF(q)` (`m = k`, or `k/2` on the quadratic twist
+  for even `k`), the twisting element `d`, and the points, all in the
+  tower basis `GF(q)[w]/(g)`; the build checks that `g` is irreducible
+  (Ben-Or), that `d` is a non-square (its norm to `GF(q)` is, by Euler's
+  criterion), the group order from the trace, that each point is on the
+  curve, and its order: a point of order `ℓ^v`, `ℓ^v ∥ N`, makes the
+  `ℓ`-part cyclic (the floor); two independent points of order `ℓ` make it
+  rank 2 (the crater). A certificate that fails stops the build.
 
 When every prime is resolved, `conductor` is exact and `end_order` is
 `maximal` or `non-maximal`; otherwise `End(E)` stays `bounded` between
@@ -254,21 +271,20 @@ certify its coordinates or group order.
 
 In the current file (2572 registry curves and 176 from the sources: 175
 walked curves of the P-256 and P-224 isogeny classes and the ECC2K-130
-degree-263 descendant), `End(E)` is established for 2700 curves (1150
-maximal, 1550 non-maximal) and unresolved for 34; 14 have a `Δ` that did
+degree-263 descendant), `End(E)` is established for 2721 curves (1150
+maximal, 1571 non-maximal) and unresolved for 13; 14 have a `Δ` that did
 not factor. Of the 1324 curves over `GF(p^k)`, `k > 1`, 1319 have a
 certified order (9 by generator, 1310 by point orders: 484 proved, 826
 probable). The levels behind it: 1306 decided by the scalar test on `E[ℓ]`
 (787 floors, 519 craters at depth 1), 1265 by the prime-power tests (486 one
 above the floor, 370 craters, 409 in between), 74 by the depth-1 point test
-(58 floors, 16 craters; 6 of them on binary curves), 388 by isogeny walks
-(204 craters, 166 floors, 18 in between), 19 by `j(E) = j(O_K)` in a field
-of class number 1, 13 walker certificates (each agreeing with the test), 111
-from a certified `End(E)`, 243 where `f₀` is already prime to `ℓ`. What
-stays open: 34 levels, all but two on `GF(p^k)` curves whose `|d_K|` is far
-too large for a walk (13 the tests only bound, 19 at depth 1 beyond the
-point test's budget), and two on binary curves (`ℓ = 31` at depth 1 over
-`GF(2^47)`, `ℓ = 31543` over `GF(2^61)`). P-256's `Δ` factors with
+(58 floors, 16 craters; 6 of them on binary curves), 19 by stored level
+certificates (all floors), 390 by isogeny walks (205 craters, 167 floors,
+18 in between), 19 by `j(E) = j(O_K)` in a field of class number 1, 13
+walker certificates (each agreeing with the test), 111 from a certified
+`End(E)`, 243 where `f₀` is already prime to `ℓ`. What stays open: 13
+prime-power levels at `ℓ = 2, 3` on `GF(p^k)` curves that the tests only
+bound. P-256's `Δ` factors with
 the committed hints as `−3·5·456597257999·p81·p136` (squarefree), so
 `v = 1`, `d_K = Δ` and `End(E) = O_K`, probable through its 136-bit prime
 (the 81-bit one is below the Miller–Rabin proof bound); every walked curve

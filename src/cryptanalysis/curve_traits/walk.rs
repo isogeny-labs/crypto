@@ -1279,5 +1279,3 @@ mod tests {
         assert!(closed > 100 && sharp > 50, "closed {closed}, sharp {sharp}");
     }
 }
-
-
