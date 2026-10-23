@@ -1,0 +1,85 @@
+name: N83 fresh K1103 K1107 cold base confirmation
+
+on:
+  push:
+    branches: [codex/n83-cold-base-confirm-20261021]
+    paths:
+      - .github/workflows/n83-cold-base-confirm.yml
+      - research/n83_cold_base_confirm_20261021/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n83-cold-base-confirm-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sixteen-point-cold-base-confirm:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-cold-base-confirm-20261021'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Replay sealed fixture and frozen schedule
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PYTHONDONTWRITEBYTECODE=1
+          mkdir -p "$RUNNER_TEMP/n83-cold-base-confirm"
+          python3 research/n83_cold_base_confirm_20261021/generate.py --verify-sealed > \
+            "$RUNNER_TEMP/n83-cold-base-confirm/fixture-check.json"
+          python3 research/n83_cold_base_confirm_20261021/run.py --preflight > \
+            "$RUNNER_TEMP/n83-cold-base-confirm/preflight.json"
+          python3 -c 'import json,sys; x=json.load(open(sys.argv[1])); assert len(x["schedule"]) == 16 and sum(len(r["ic_order"]) for r in x["schedule"]) == 64' \
+            "$RUNNER_TEMP/n83-cold-base-confirm/preflight.json"
+          rustc --version > "$RUNNER_TEMP/n83-cold-base-confirm/rustc-version.txt"
+          cargo --version > "$RUNNER_TEMP/n83-cold-base-confirm/cargo-version.txt"
+
+      - name: Build and check exact IC and same-point rho producers
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-cold-base-confirm-target"
+          export CARGO_BUILD_JOBS=2
+          cargo test --release --locked --example koblitz_orbit_dlp_fast > \
+            "$RUNNER_TEMP/n83-cold-base-confirm/ic-tests.log" 2>&1
+          cargo test --release --locked --example n83_rho_optimization_eval > \
+            "$RUNNER_TEMP/n83-cold-base-confirm/rho-tests.log" 2>&1
+          cargo build --release --locked --example koblitz_orbit_dlp_fast > \
+            "$RUNNER_TEMP/n83-cold-base-confirm/ic-build.log" 2>&1
+          cargo build --release --locked --example n83_rho_optimization_eval > \
+            "$RUNNER_TEMP/n83-cold-base-confirm/rho-build.log" 2>&1
+
+      - name: Run sixteen sealed matched one-point panels
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-cold-base-confirm-target"
+          python3 research/n83_cold_base_confirm_20261021/run.py \
+            --binary "$CARGO_TARGET_DIR/release/examples/koblitz_orbit_dlp_fast" \
+            --rho-binary "$CARGO_TARGET_DIR/release/examples/n83_rho_optimization_eval" \
+            --output "$RUNNER_TEMP/n83-cold-base-confirm/results" \
+            2>&1 | tee "$RUNNER_TEMP/n83-cold-base-confirm/run.log"
+
+      - name: Independently replay all bases relations scalars and resources
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -d "$RUNNER_TEMP/n83-cold-base-confirm/results" ]; then
+            python3 research/n83_cold_base_confirm_20261021/verify.py \
+              "$RUNNER_TEMP/n83-cold-base-confirm/results" \
+              2>&1 | tee "$RUNNER_TEMP/n83-cold-base-confirm/verify.log"
+          fi
+
+      - name: Preserve raw receipts and every failed arm
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-cold-base-confirm-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/n83-cold-base-confirm/
+          if-no-files-found: error
+          retention-days: 14
