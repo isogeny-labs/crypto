@@ -71,3 +71,14 @@ five interleaved rounds on the same inputs. msolve/Magma comparisons,
 complete native memory/CPU accounting, matched strongest rho and the
 0/0.1/1 GAE band remain necessary before a priced whole-method claim.
 Keep source-linked reports, figures and inspected PDFs for all outcomes.
+
+## Structural supplement after the first exact derivation
+
+The first standard-library native job produced 49 terms in the three
+elementary variables and a zero integer coefficient remainder. Before
+running a further derivation, also freeze the full four-abscissa symmetric
+reduction: elementary variables `s1,s2,s3,s4` of `x1,x2,x3,X`, with `B`
+left independent. Require exact reconstruction over the integers and a
+faithful commutative-ring Lean theorem. This checks for a smaller formula
+whose specializations could expose an elimination pattern. It makes no
+novelty or relation-finder performance claim by itself.
