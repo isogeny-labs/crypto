@@ -176,6 +176,14 @@ hash, both transported points, and validation counts. Any scalar found on
 the destination is checked on both the destination and the original public
 curve. The Pollard-rho reference stays on the original `G,Q` pair.
 
+A second live acceptance enumerated this public custom curve with the
+release `isogeny_walk` binary, published the three-curve walk under a unique
+Setec S3 prefix, confirmed the completion marker with HEAD, fetched all three
+files with hash verification, and independently verified both fetched edges.
+`ic solve-prime-file` consumed the fetched route and verified scalar 190 on
+the original curve. The four test objects were then removed; see
+[`ISOGENY_WALK_CUSTOM_S3_ACCEPTANCE_20261023.json`](../store/ISOGENY_WALK_CUSTOM_S3_ACCEPTANCE_20261023.json).
+
 ## Cubic extension field
 
 ```sh
