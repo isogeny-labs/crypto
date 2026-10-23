@@ -162,8 +162,8 @@ findings:
   severity: major
   title: 'a0-n19: no pinned calibration, so the band collapses to one host-microbenchmark point'
   text: 'At a0-n19 the IC records carry detail.calibration_pinned_units = [] because docs/ic/calibration.json
-    has no koblitz/K_0 / GF(2^19) row: it has K_0 at n = 13, 15, 23, 31, 37, 39, 41 and K_1 at n = 11,
-    17, 19, 23, 29, and K_1 / GF(2^19) is another curve. The base ic.pipeline therefore priced no native
+    has no koblitz/icv1-f2m19-t797-b6cf2467 row: it has K_0 at n = 13, 15, 23, 31, 37, 39, 41 and K_1 at n = 11,
+    17, 19, 23, 29, and icv1-f2m19-tm797-9c54981b is another curve. The base ic.pipeline therefore priced no native
     work: detail.framework_total_gae_before_solver_removal equals sum(adds + doubles), e.g. 281 GAE. The
     *_full repricing then charged every native counter (lookups, canonicalisations, Frobenius maps, row
     ops, inversions, hash probes, field squarings and the rest) at the icv1-f2m19-t797-b6cf2467 row of
