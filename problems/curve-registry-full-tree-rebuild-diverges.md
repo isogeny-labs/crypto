@@ -58,10 +58,25 @@ or independently count each curve's full group order.
 - **Derived:** The full-tree builder recognizes those three models, while the
   committed registry lacks them. The resulting `names` failure on #2304,
   #2357 and #2391 is reproducible from the current base report and registry.
+- **Observed:** The [source-scope receipt](../docs/curves/audit-20261023/source-scope-summary.json)
+  classifies the 13,219 new entries: all are prime models, 7,760 first sourced
+  from `isogeny-volcano-cost-v2_20261017`, 4,583 from the volcano census,
+  870 from the earlier volcano-cost study, and six from two other studies.
+  None has an EC1 representation. This classifies input paths only; it does
+  not independently check the claimed group orders.
+- **Observed in scratch only:** A [one-line candidate](../docs/curves/audit-20261023/curve-ids-candidate.patch)
+  makes the builder harvest the seven tracked `*curve_ids.json` files as exact
+  representations alongside `*curve_records.json`. A full rebuild then exits
+  0 with 15,990 curves, and `--check` passes against that scratch output;
+  [build](../docs/curves/audit-20261023/curve-ids-candidate-build.log) and
+  [check](../docs/curves/audit-20261023/curve-ids-candidate-check.log) logs
+  are retained. This resolves the n73 UID mismatch in the experimental
+  output; it does not justify promoting the 13,219 additional entries or
+  establish arithmetic validity of every recorded generator.
 - **Suspected explanation:** Sparse-worktree generation may have omitted
-  tracked source files, and the broad JSON harvester may admit unrelated
-  fixtures into the 15,990-entry output. Both need record-level review;
-  neither explanation is established by the count alone.
+  tracked volcano source files, and the broad JSON harvester may admit
+  unrelated fixtures into the 15,990-entry output. The path inventory supports
+  the omission hypothesis but does not establish each record's validity.
 - **Missing capability:** An agreed authoritative input scope for the
   generator, a source-backed resolution of the n73 representation, and a
   full-checkout generated artefact that passes its own freshness check.
@@ -109,3 +124,7 @@ They would not independently replay every experiment or prove its performance.
 
 - 2026-10-23: Full-tree replay and source-bound volcano-slug check completed
   as above. No generated 15,990-curve replacement was committed. Open.
+- 2026-10-23: Classified the full-tree delta by first source and tested an
+  exact-record n73 candidate in scratch. The experimental freshness check
+  passed, but source and arithmetic review remain open. No candidate code or
+  generated registry was promoted. Open.
