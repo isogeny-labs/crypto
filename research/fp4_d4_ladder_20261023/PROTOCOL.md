@@ -67,3 +67,9 @@ planted targets per curve.
   reported as distance remaining, not as pass or fail.
 - **Handover:** least-squares fit of `log S(ic-d4-new)` against `log r` over
   the four sizes, extrapolated to `S = S(rho-neg)`; descriptive.
+
+---
+
+## Deviations log (appended; the text above is unchanged and was committed before any data)
+
+1. **Execution only.** The container was reclaimed at about 07:35-08:18 UTC while the agent session was idle; every process died (uptime reset), the disk survived. Card `CARD-fp4-d4-ladder-20261023-a2` left session `sessions/A` unfinished (never finalised); card `-b2` had not created `sessions/B`. ecbench sessions cannot be resumed, so `sessions/A` is kept as an interrupted, uncited session and both specs are re-run into `sessions/A3` and `sessions/B3`, unchanged.

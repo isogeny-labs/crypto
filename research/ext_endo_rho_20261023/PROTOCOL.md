@@ -101,3 +101,7 @@ in `sessions-a1/` with them fixed:
 
 Specs, curves, targets, seeds and decision rules are unchanged. A1 is
 committed before the `sessions-a1/` data exist.
+
+### A1 execution note (appended after the A1 runs started)
+
+The container was reclaimed at about 07:35-08:18 UTC while the agent session was idle; every process died (uptime reset), the disk survived. Card `CARD-ext-endo-rho-20261023-4` completed `sessions-a1/subfield-fp3` (session, audit, compares, table, band) before the interruption and never started `gls-fp2`; it wrote no receipt. A new card runs `sessions-a1/gls-fp2` alone with the same spec and binary. The completed subfield session is kept; its audit is in `sessions-a1/subfield-fp3.audit.json`.

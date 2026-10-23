@@ -121,3 +121,4 @@ bit-for-bit) and an independent recompute of the headline ratios from
    **same bound binary** (sha256 `7847d102…`, not rebuilt) and no count changes. The resume is a
    new card launched detached from the agent harness. The two completed records are kept as
    written; the validator's replay covers them like every other job.
+2. **Execution only (second interruption).** The container was reclaimed at about 07:35-08:18 UTC while the agent session was idle; every process died (uptime reset), the disk survived. The resume card `CARD-ghs3-vs-rho-20261023-2` wrote no receipt. Completed records are still only `b20_c1` and `b20_c2` (killed jobs write nothing). A third card resumes with the same binary; the session is kept active by a harness-tracked waiter until the run ends.

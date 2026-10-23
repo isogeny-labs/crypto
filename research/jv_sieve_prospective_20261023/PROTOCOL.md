@@ -102,3 +102,9 @@ sampled IC and rho jobs reproduces answers and counts, (2) an independent
 recompute of the headline ratios from `raw/` agrees, and (3) the rho
 reference descriptor records R3 as the strongest available
 (`strongest_available` is true only if the symmetry check passes).
+
+---
+
+## Deviations log (appended; the text above is unchanged and was committed before any data)
+
+1. **Execution only.** The container was reclaimed at about 07:35-08:18 UTC while the agent session was idle; every process died (uptime reset), the disk survived. Card `CARD-jv-sieve-prospective-20261023-2` had completed the symmetry check (`raw/endo_check.jsonl`) and no IC or rho job. `run.sh` skips completed outputs and every job is deterministic in its arguments, so a new card resumes it; no count changes.
