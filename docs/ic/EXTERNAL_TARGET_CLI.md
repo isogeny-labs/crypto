@@ -188,6 +188,13 @@ For an on-demand S3 existence check, use
 authoritative `complete.json` marker and returns JSON with `exists`, byte
 count, and S3-reported SHA-256. Use `--shard I --of N` or `--collected --of N`
 to check trait outputs; a missing marker reports `exists: false`.
+Add `--check-objects` to read the marker and HEAD every referenced object.
+Its `object_check` reports `pass`, `incomplete`, or `no_marker`, with missing
+and mismatched keys. This compares S3 byte counts and stored SHA-256 values;
+`fetch` checks downloaded and decoded bytes before publishing local files.
+The [live object-check receipt](../store/ISOGENY_WALK_OBJECT_CHECK_S3_ACCEPTANCE_20261023.json)
+records all three statuses, including a missing object and a replacement with
+different stored bytes under a unique Setec prefix.
 The [live S3 receipt](../store/ISOGENY_WALK_EXISTS_S3_ACCEPTANCE_20261023.json)
 records false, true, and false across publish and exact-prefix cleanup.
 `isogeny_walk fetch` writes to a new output directory only after every

@@ -201,6 +201,69 @@ pub fn head(loc: &S3Loc, key: &str) -> Result<Option<Head>, String> {
     }))
 }
 
+/// HEAD every object named by a completed run's marker. This checks stored
+/// byte counts and S3-reported hashes; [`fetch`] additionally checks the
+/// downloaded and decoded bytes.
+pub struct ObjectCheck {
+    pub checked: usize,
+    pub missing: Vec<String>,
+    pub mismatched: Vec<String>,
+}
+
+pub fn check_objects(
+    loc: &S3Loc,
+    run_rel: &str,
+    marker_head: &Head,
+    scratch: &Path,
+) -> Result<ObjectCheck, String> {
+    let marker_key = loc.key(&format!("{run_rel}/{COMPLETE_FILE}"));
+    let bytes = get(loc, &marker_key, scratch)?
+        .ok_or_else(|| format!("{marker_key}: marker vanished after HEAD"))?;
+    if bytes.len() as u64 != marker_head.bytes || sha256_hex_bytes(&bytes) != marker_head.sha256 {
+        return Err(format!("{marker_key}: marker differs from S3 HEAD"));
+    }
+    let marker: serde_json::Value = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+    if marker["schema"].as_str() != Some(COMPLETE_SCHEMA)
+        || marker["run"].as_str() != Some(loc.uri(run_rel).as_str())
+    {
+        return Err(format!("{marker_key}: wrong schema or run identity"));
+    }
+    let objects = marker["objects"]
+        .as_array()
+        .ok_or("marker has no objects array")?;
+    let mut names = BTreeSet::new();
+    let mut missing = Vec::new();
+    let mut mismatched = Vec::new();
+    let object_prefix = loc.key(&format!("{run_rel}/attempts/"));
+    for object in objects {
+        let name = segment(object["name"].as_str().ok_or("object has no name")?)?;
+        if !names.insert(name) {
+            return Err(format!("{marker_key}: duplicate object name {name}"));
+        }
+        let key = object["key"].as_str().ok_or("object has no key")?;
+        if !key.starts_with(&object_prefix) {
+            return Err(format!("{key}: outside this run"));
+        }
+        let expected_bytes = object["bytes"].as_u64().ok_or("object has no bytes")?;
+        let expected_sha = object["sha256"].as_str().ok_or("object has no SHA-256")?;
+        if expected_sha.len() != 64 || !expected_sha.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return Err(format!("{key}: invalid SHA-256 in marker"));
+        }
+        match head(loc, key)? {
+            None => missing.push(key.to_string()),
+            Some(found) if found.bytes != expected_bytes || found.sha256 != expected_sha => {
+                mismatched.push(key.to_string());
+            }
+            Some(_) => {}
+        }
+    }
+    Ok(ObjectCheck {
+        checked: objects.len(),
+        missing,
+        mismatched,
+    })
+}
+
 /// Upload an existing file without buffering it, conditional on the key not
 /// existing. An existing content-addressed object is accepted only when its
 /// byte count and S3-reported SHA-256 match the caller's descriptor.
