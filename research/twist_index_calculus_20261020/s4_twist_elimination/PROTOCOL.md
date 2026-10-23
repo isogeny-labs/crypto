@@ -108,3 +108,33 @@ multiplications with their limited boundary. It supplies no priced
 whole-method or fastest-external-solver result. A successful pilot must
 be integrated and compared on the full frozen relation stream before a
 pipeline improvement can be claimed.
+
+## Frozen-prefix collector integration
+
+The eight-system pilot returned exactly the exhaustive field-root sets,
+including both previously missed p=73 seed-one relations. Freeze the next
+step before execution: replace the polynomial solver by F4 on **every**
+finite signed line-2 peel in all seven original processed prefixes (46,200
+systems). Use the exact coefficient derivation already checked against
+interpolation on all 46,200 inputs. Pin the profile fixture hash and check
+each original input's hash against that profile before solving.
+
+Produce relations without access to reference hits or factor logarithms.
+After each run, compare every query's entire signed relation set against
+an independently constructed group-pair oracle. Record missing and extra
+relations, undetermined systems, infinity peels, cubic split failures and
+foreign factors. Rebuild the anchored matrix in the original sorted
+relation order using only the verified public endomorphism orbit map;
+verify recovered target and all physical factor logarithms in the group.
+Report rank progress, first complete-rank query and the old baseline's
+relation counts. Continue through the entire original processed prefix
+even if the new collector reaches full rank earlier.
+
+Use one Rayon thread, the original F4 settings from the eight-system
+pilot, 8 GiB process address-space limit and a 1,200 s process watchdog.
+Retain a record after every query so a timeout cannot erase completed
+work. Repeat the complete deterministic collector (A/A) and require equal
+relation, rank and arithmetic records. This step measures F4's row-reduction
+multiplications only; it does not price complete F4 arithmetic or cold
+index calculus. No elapsed-time speed claim or full-stream result is
+inferred from a processed-prefix comparison.
