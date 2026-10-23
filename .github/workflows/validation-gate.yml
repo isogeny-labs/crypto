@@ -32,6 +32,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # Fetch historical blobs only when read; the full evidence tree and
+          # base-history checks remain available without downloading all archives.
+          filter: blob:none
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'

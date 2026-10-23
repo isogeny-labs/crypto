@@ -261,3 +261,11 @@ retains that distinct failure, charges its entire29.838953191-second command
 upward as30seconds, and records8957seconds remaining in the same slot. The
 validated launch wait is60seconds within the existing command envelope, with
 no automatic mutation retry. Both CPU and I/O pressure must pass before dispatch.
+
+K2048-c3 now completes1500000conflicts in one attempt, exit0/no timeout,
+boundedUnknown and zero relations. Native audit, all1001 original signatures
+through1M,152storage snapshots, memory custody and independent director
+receipt/relay/bind/cleanup checks pass. Four reclamations remove1581835327words.
+[Completed run report and native data](reports/run-20261023T0533Z/REPORT.md).
+K4096's1.5M arm remains open; total allowance is unchanged. Later search
+signatures are unpaired; no selected base, speed or rho claim follows.

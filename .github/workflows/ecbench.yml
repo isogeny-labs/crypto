@@ -352,8 +352,10 @@ jobs:
       - name: Pinned session as root
         run: |
           sudo git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          # Container runners may inherit only part of an SMT core. Still pin
+          # every child; the grader records missing siblings and earned levels.
           sudo ./target/release/ecbench run --spec docs/ecbench/specs/smoke-prime.json \
-            --out "$RUNNER_TEMP/prime" --allow-busy --settle 1 --quiet
+            --out "$RUNNER_TEMP/prime" --cpus inherit --allow-busy --settle 1 --quiet
           sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/prime"
       - name: Pinning took effect in every measured child
         run: |

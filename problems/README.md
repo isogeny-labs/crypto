@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [PR2036 CodeQL configuration and runners](pr2036-codeql-configuration.md) | open | current-head CI acceptance | enabled repository code scanning and complete current-head query/handoff checks on healthy runners |
 | [N83 resume evidence and historical accounting](n83-resume-evidence-and-execution-access.md) | open | missing historical charged intervals and interrupted-run custody; S3 restored | reconcile prior intervals; retain fresh native1M replay/profile and storage evidence |
 | [Native N83 800K memory limit](n83-native-800k-memory-limit.md) | investigating | both arena candidates pass1M with complete retained counters/storage/memory and observed reclamation; historical4GiB attribution/minimum memory open | exact1.5M/9000 continuation after validated guard; retain old OOMs, refusals and rejected/interrupted custody |
 | [Native N83 K4096 terminal observability](n83-native-k4096-terminal-observability.md) | resolved (bounded diagnostic) | matched 1,000-conflict terminal observability only | native phase/query controls and independently replayed K2048/K4096 terminals pass; full cold selection remains open |
