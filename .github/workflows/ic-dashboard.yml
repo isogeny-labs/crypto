@@ -36,6 +36,16 @@ jobs:
           node-version: '22'
       - name: Check frozen evidence pins and generated overview
         run: node tools/render_ic_dashboard.mjs --check
+
+  browser:
+    needs: overview
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
         with:
