@@ -63,10 +63,19 @@ pub struct WorkloadPlan {
 #[serde(rename_all = "snake_case")]
 pub enum Order {
     /// Spec order on even rounds, reversed on odd ones: a linear drift
-    /// (thermal, a slowly filling page cache) cancels over a pair.
+    /// (thermal, a slowly filling page cache) cancels over a pair.  The
+    /// parity counts the warm-up rounds, so the measured rounds start
+    /// reversed after an odd number of warm-ups.  Kept exactly as it was,
+    /// because it fixes the plan of every existing spec.
     Alternate,
     /// A seeded permutation per round.
     Shuffle,
+    /// Like `alternate`, but the parity counts the measured rounds only:
+    /// the first measured round is always in spec order, whatever the
+    /// warm-up.  (Warm-up rounds alternate among themselves.)  With an
+    /// even number of measured rounds each arm leads and trails equally
+    /// often.
+    AlternateMeasured,
 }
 
 /// The isolation level a wall-clock figure needs (`docs/ecbench/README.md`).
@@ -170,6 +179,10 @@ pub struct Plan {
     pub spec_sha256: String,
     pub arms: Vec<Arm>,
     pub workloads: Vec<Workload>,
+    /// Things a reader should know about the spec that do not make it
+    /// invalid (e.g. an order that cannot be balanced).  Not hashed, not
+    /// recorded in the plan.
+    pub warnings: Vec<String>,
     /// One built curve per spec curve, in spec order.
     pub instances: Vec<Instance>,
     /// The index into `instances` of each workload's curve.
@@ -204,6 +217,34 @@ impl Spec {
             "measurement": serde_json::to_value(&self.measurement).unwrap_or(Value::Null),
         })
     }
+}
+
+/// Why a spec's arm order cannot be balanced over its measured rounds, if
+/// it cannot.  A warning, never a refusal: existing specs (and the plans
+/// and hashes derived from them) must keep expanding as they did.
+fn order_warnings(m: &Measurement) -> Vec<String> {
+    let mut out = Vec::new();
+    if m.rounds % 2 == 1 {
+        match m.order {
+            Order::Alternate => {
+                let first = if m.warmup % 2 == 1 {
+                    "reversed"
+                } else {
+                    "in spec order"
+                };
+                out.push(format!(
+                    "order `alternate` with {} measured round(s) cannot be balanced: one arm order is used once more than the other, and the parity counts the {} warm-up round(s), so the measured rounds start {first}; use an even number of rounds, or order `alternate_measured` (which starts the measured rounds in spec order)",
+                    m.rounds, m.warmup
+                ));
+            }
+            Order::AlternateMeasured => out.push(format!(
+                "order `alternate_measured` with {} measured round(s) cannot be balanced: spec order is used once more than the reverse; use an even number of rounds",
+                m.rounds
+            )),
+            Order::Shuffle => {}
+        }
+    }
+    out
 }
 
 /// Validate and expand.  Every refusal happens here, before anything runs.
@@ -304,6 +345,12 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
                         order.reverse();
                     }
                 }
+                Order::AlternateMeasured => {
+                    let k = if warmup { round } else { round - m.warmup };
+                    if k % 2 == 1 {
+                        order.reverse();
+                    }
+                }
                 Order::Shuffle => {
                     let mut s = derive_u64("ecbench.order", &[m.seed, wid, round as u64]);
                     for i in (1..order.len()).rev() {
@@ -326,12 +373,14 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
         }
     }
     let (spec_id, spec_sha256) = short_id("ECS1", &spec.identity_view())?;
+    let warnings = order_warnings(&spec.measurement);
     Ok(Plan {
         spec,
         spec_id,
         spec_sha256,
         arms,
         workloads,
+        warnings,
         instances,
         curve_of,
         executions,
@@ -370,6 +419,124 @@ mod tests {
         assert_eq!(r1[0].algorithm_seed, r1[1].algorithm_seed);
         assert_eq!((r1[0].arm, r1[1].arm), (1, 0));
         assert!(p.spec_id.starts_with("ECS1h"));
+    }
+
+    fn first_arm_per_round(p: &Plan, workload: usize) -> Vec<(u32, bool, usize)> {
+        let mut seen = std::collections::BTreeSet::new();
+        p.executions
+            .iter()
+            .filter(|e| e.workload == workload)
+            .filter(|e| seen.insert(e.round))
+            .map(|e| (e.round, e.warmup, e.arm))
+            .collect()
+    }
+
+    #[test]
+    fn alternate_measured_counts_measured_rounds_only() {
+        let mut s = spec(&[("a", "rho.negation"), ("b", "bsgs.textbook")]);
+        s.measurement.warmup = 1;
+        s.measurement.rounds = 4;
+        let alt = plan(s.clone()).unwrap();
+        // `alternate` parity counts the warm-up: measured rounds 1..=4 run
+        // reversed, forward, reversed, forward.
+        let a: Vec<usize> = first_arm_per_round(&alt, 0)
+            .into_iter()
+            .filter(|r| !r.1)
+            .map(|r| r.2)
+            .collect();
+        assert_eq!(a, vec![1, 0, 1, 0]);
+        s.measurement.order = Order::AlternateMeasured;
+        let alt_m = plan(s.clone()).unwrap();
+        // The first measured round is in spec order whatever the warm-up.
+        let m: Vec<usize> = first_arm_per_round(&alt_m, 0)
+            .into_iter()
+            .filter(|r| !r.1)
+            .map(|r| r.2)
+            .collect();
+        assert_eq!(m, vec![0, 1, 0, 1]);
+        // The same warm-up count, any parity: the measured pattern is fixed.
+        for warmup in [0u32, 1, 2, 3] {
+            s.measurement.warmup = warmup;
+            let p = plan(s.clone()).unwrap();
+            let m: Vec<usize> = first_arm_per_round(&p, 0)
+                .into_iter()
+                .filter(|r| !r.1)
+                .map(|r| r.2)
+                .collect();
+            assert_eq!(m, vec![0, 1, 0, 1], "warmup {warmup}");
+        }
+        // Seeds and workloads do not depend on the order mode.
+        let seeds = |p: &Plan| -> Vec<(u32, u64)> {
+            let mut v: Vec<_> = p
+                .executions
+                .iter()
+                .map(|e| (e.round, e.algorithm_seed))
+                .collect();
+            v.sort();
+            v.dedup();
+            v
+        };
+        s.measurement.warmup = 1;
+        s.measurement.order = Order::Alternate;
+        let a = plan(s.clone()).unwrap();
+        s.measurement.order = Order::AlternateMeasured;
+        let b = plan(s).unwrap();
+        assert_eq!(seeds(&a), seeds(&b));
+        assert_ne!(a.spec_id, b.spec_id);
+    }
+
+    #[test]
+    fn existing_alternate_expansion_is_unchanged_and_odd_rounds_only_warn() {
+        // The default spec: 1 warm-up, 3 measured rounds, `alternate`.
+        let p = plan(spec(&[("a", "rho.negation"), ("b", "bsgs.textbook")])).unwrap();
+        let firsts: Vec<usize> = first_arm_per_round(&p, 0)
+            .into_iter()
+            .map(|r| r.2)
+            .collect();
+        // warm-up (round 0) forward, then reversed, forward, reversed.
+        assert_eq!(firsts, vec![0, 1, 0, 1]);
+        assert_eq!(p.warnings.len(), 1, "{:?}", p.warnings);
+        assert!(p.warnings[0].contains("alternate_measured"));
+        // Even rounds: no warning.
+        let mut s = spec(&[("a", "rho.negation"), ("b", "bsgs.textbook")]);
+        s.measurement.rounds = 4;
+        assert!(plan(s).unwrap().warnings.is_empty());
+        // The enum names are part of the spec language.
+        assert_eq!(
+            serde_json::to_string(&Order::Alternate).unwrap(),
+            "\"alternate\""
+        );
+        assert_eq!(
+            serde_json::to_string(&Order::AlternateMeasured).unwrap(),
+            "\"alternate_measured\""
+        );
+    }
+
+    /// A session recorded before `alternate_measured` expands today exactly
+    /// as it was planned then: same executions, same seeds, same order.
+    #[test]
+    fn a_committed_sessions_plan_still_expands_identically() {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/ecbench_numa_vm_20261002/sessions/v2-auto");
+        let Ok(spec_text) = std::fs::read_to_string(dir.join("spec.json")) else {
+            return; // a sparse checkout without the evidence
+        };
+        let recorded: Value =
+            serde_json::from_str(&std::fs::read_to_string(dir.join("plan.json")).unwrap()).unwrap();
+        let p = plan(Spec::from_json(&spec_text).unwrap()).unwrap();
+        assert_eq!(recorded["spec_id"], json!(p.spec_id));
+        assert_eq!(
+            recorded["executions"],
+            serde_json::to_value(&p.executions).unwrap()
+        );
+        assert_eq!(recorded["arms"], serde_json::to_value(&p.arms).unwrap());
+        assert_eq!(
+            recorded["workloads"],
+            serde_json::to_value(&p.workloads).unwrap()
+        );
+        // It is `alternate` with 3 measured rounds: warned, never refused.
+        assert_eq!(p.spec.measurement.order, Order::Alternate);
+        assert_eq!(p.warnings.len(), 1);
     }
 
     #[test]

@@ -9,10 +9,15 @@
 //! is recorded beside the class but not in it: a baseline and a
 //! candidate are different binaries on the same host class.
 //!
-//! The class id here is `ECBENV2h…` (`ECBENV1h…` for capsules captured
-//! before version 2, which still recompute under their own definition),
-//! not ICMS's `ENV1h…`: the two hash different fact sets, and a shared
-//! prefix would invite a join that means nothing.
+//! The class id here is `ECBENV3h…` (`ECBENV2h…` and `ECBENV1h…` for
+//! capsules captured before versions 3 and 2, which still recompute under
+//! their own definitions), not ICMS's `ENV1h…`: the two hash different
+//! fact sets, and a shared prefix would invite a join that means nothing.
+//! Version 3 leaves the compiler out of the class: it used to be the
+//! output of `rustc -Vv` on `PATH` and in the current directory, which
+//! moves with the shell (`sudo` runs landed in another class).  The
+//! compiler that built the binary is a build-time fact, embedded by
+//! `build.rs` and recorded beside the class, as the binary's hash is.
 
 use std::collections::BTreeMap;
 use std::process::Command;
@@ -63,8 +68,11 @@ pub struct StableFacts {
     pub transparent_hugepages: Option<String>,
     /// `hypervisor` CPU flag, DMI product, or `kern.hv_vmm_present`.
     pub virtualization: BTreeMap<String, String>,
-    /// `rustc -Vv` of the toolchain on PATH.  The binary's own hash is
-    /// the stronger fact and sits in [`BuildFacts`].
+    /// `rustc -Vv` of the compiler that built this binary, embedded at
+    /// build time (never asked of `PATH`).  Capsules before class
+    /// version 3 hold the toolchain on `PATH` at run time here and hash
+    /// it; from version 3 on it is recorded and not hashed.  The binary's
+    /// own hash is the stronger fact and sits in [`BuildFacts`].
     pub rustc_vv: Option<String>,
 }
 
@@ -87,6 +95,12 @@ pub struct BuildFacts {
     pub runtime_git_commit: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub runtime_git_dirty: Option<bool>,
+    /// The allocator the measured children run on (`glibc 2.39`): its
+    /// behaviour (fastbins, consolidation) moves wall time at small
+    /// sizes.  What a child did to it before a solve is in each record's
+    /// `allocator`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub allocator: Option<String>,
     /// Built with debug assertions: an unoptimised build times nothing.
     pub debug_assertions: bool,
     pub target_os: String,
@@ -247,7 +261,7 @@ fn stable_facts() -> StableFacts {
         cpu_settings: BTreeMap::new(),
         transparent_hugepages: None,
         virtualization: BTreeMap::new(),
-        rustc_vv: run("rustc", &["-Vv"]),
+        rustc_vv: embedded_rustc_vv(),
     };
     #[cfg(target_os = "linux")]
     {
@@ -367,6 +381,59 @@ fn select_git_facts(
 // materializes historical crate roots together with the current host capsule,
 // so adding a new crate-root module as a dependency would make old evidence
 // stop compiling.
+/// `rustc -Vv` of the compiler that built this binary, from `build.rs`.
+/// `None` for a build without the build script (a frozen historical tree).
+fn embedded_rustc_vv() -> Option<String> {
+    option_env!("ECBENCH_BUILD_RUSTC_VV").map(|v| v.replace("\\n", "\n"))
+}
+
+/// The allocator behind `malloc` in this process, named for the record.
+pub fn allocator_name() -> String {
+    #[cfg(all(target_os = "linux", target_env = "gnu"))]
+    {
+        // SAFETY: returns a static NUL-terminated string.
+        let v = unsafe { std::ffi::CStr::from_ptr(libc::gnu_get_libc_version()) };
+        format!("glibc {}", v.to_string_lossy())
+    }
+    #[cfg(all(target_os = "linux", not(target_env = "gnu")))]
+    {
+        "musl".to_string()
+    }
+    #[cfg(target_os = "macos")]
+    {
+        "libsystem_malloc".to_string()
+    }
+    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
+    {
+        "system".to_string()
+    }
+}
+
+static BINARY_SHA256: std::sync::OnceLock<Option<String>> = std::sync::OnceLock::new();
+
+/// SHA-256 of the executable this process is running.  On Linux it reads
+/// `/proc/self/exe`, which names the inode that was exec'd even after a
+/// rebuild replaced the file at its path (the path then reads
+/// `… (deleted)` or names a different binary).
+fn hash_running_exe() -> Option<String> {
+    #[cfg(target_os = "linux")]
+    if let Ok(bytes) = std::fs::read("/proc/self/exe") {
+        return Some(sha256_hex(&bytes));
+    }
+    std::env::current_exe()
+        .ok()
+        .and_then(|p| std::fs::read(p).ok())
+        .map(|b| sha256_hex(&b))
+}
+
+/// Hash the running executable now and remember it.  `ecbench run` calls
+/// this first thing, before any planning that may take minutes, so the
+/// hash it records is of the code that started, whatever is rebuilt
+/// meanwhile.
+pub fn pin_binary_hash() {
+    BINARY_SHA256.get_or_init(hash_running_exe);
+}
+
 fn embedded_git_commit() -> Option<&'static str> {
     option_env!("CRYPTO_BUILD_GIT_COMMIT").or(option_env!("GITHUB_SHA"))
 }
@@ -391,10 +458,7 @@ fn embedded_git_source() -> Option<&'static str> {
 
 fn build_facts() -> BuildFacts {
     let exe = std::env::current_exe().ok();
-    let binary_sha256 = exe
-        .as_ref()
-        .and_then(|p| std::fs::read(p).ok())
-        .map(|b| sha256_hex(&b));
+    let binary_sha256 = BINARY_SHA256.get_or_init(hash_running_exe).clone();
     // The commit of the worktree the binary sits in (target/release/…),
     // not of whatever directory the session was started from.
     let repo = exe
@@ -441,6 +505,7 @@ fn build_facts() -> BuildFacts {
         git_commit_source,
         runtime_git_commit,
         runtime_git_dirty,
+        allocator: Some(allocator_name()),
         debug_assertions: cfg!(debug_assertions),
         target_os: std::env::consts::OS.into(),
         target_arch: std::env::consts::ARCH.into(),
@@ -528,6 +593,20 @@ fn class_view_v2(s: &StableFacts) -> Value {
     })
 }
 
+/// The class, version 3: version 2 without the compiler.  `rustc_vv` was
+/// the output of the `rustc` on `PATH` (and in the current directory,
+/// where a toolchain file selects another), a fact of the shell and not
+/// of the host.  The compiler that built the binary is recorded in the
+/// capsule and the binary's hash is the stronger fact.
+fn class_view_v3(s: &StableFacts) -> Value {
+    let mut v = class_view_v2(s);
+    if let Value::Object(m) = &mut v {
+        m.remove("rustc_vv");
+        m.insert("schema".into(), json!("ecbench.env_class/v3"));
+    }
+    v
+}
+
 /// A conservative hardware class for cross-machine replay admission.
 /// Unlike the measurement environment class, this excludes the compiler on
 /// PATH, kernel release, CPU governor and other settings that can change on
@@ -573,7 +652,7 @@ pub fn hardware_class_id(c: &HostCapsule) -> Result<String, String> {
 /// Capture the capsule now.
 pub fn capture() -> Result<HostCapsule, String> {
     let stable = stable_facts();
-    let (env_class_id, env_class_sha256) = short_id("ECBENV2", &class_view_v2(&stable))?;
+    let (env_class_id, env_class_sha256) = short_id("ECBENV3", &class_view_v3(&stable))?;
     Ok(HostCapsule {
         schema: "ecbench.host/v1".into(),
         env_class_id,
@@ -594,6 +673,8 @@ pub fn recompute_class(c: &HostCapsule) -> Result<String, String> {
     // Each id recomputes under the definition it was made with.
     if c.env_class_id.starts_with("ECBENV1h") {
         Ok(short_id("ECBENV1", &class_view_v1(&c.stable))?.0)
+    } else if c.env_class_id.starts_with("ECBENV3h") {
+        Ok(short_id("ECBENV3", &class_view_v3(&c.stable))?.0)
     } else {
         Ok(short_id("ECBENV2", &class_view_v2(&c.stable))?.0)
     }
@@ -610,22 +691,70 @@ mod tests {
         let mut b = a.clone();
         b.stable.mem_total_kib = Some(16 * 1024 * 1024 - 260_000);
         assert_eq!(
+            short_id("ECBENV3", &class_view_v3(&a.stable)).unwrap(),
+            short_id("ECBENV3", &class_view_v3(&b.stable)).unwrap()
+        );
+        assert_eq!(
             short_id("ECBENV2", &class_view_v2(&a.stable)).unwrap(),
             short_id("ECBENV2", &class_view_v2(&b.stable)).unwrap()
         );
         b.stable.mem_total_kib = Some(32 * 1024 * 1024);
         assert_ne!(
-            short_id("ECBENV2", &class_view_v2(&a.stable)).unwrap(),
-            short_id("ECBENV2", &class_view_v2(&b.stable)).unwrap()
+            short_id("ECBENV3", &class_view_v3(&a.stable)).unwrap(),
+            short_id("ECBENV3", &class_view_v3(&b.stable)).unwrap()
         );
     }
 
     #[test]
     fn capsule_class_is_stable_and_recomputable() {
         let a = capture().unwrap();
-        assert!(a.env_class_id.starts_with("ECBENV2h"));
+        assert!(a.env_class_id.starts_with("ECBENV3h"));
         assert_eq!(recompute_class(&a).unwrap(), a.env_class_id);
         assert!(!a.stable.os.is_empty());
+    }
+
+    #[test]
+    fn class_v3_does_not_depend_on_the_compiler_on_path() {
+        let a = capture().unwrap();
+        let mut b = a.clone();
+        b.stable.rustc_vv = Some("another compiler on PATH".into());
+        assert_eq!(recompute_class(&a).unwrap(), recompute_class(&b).unwrap());
+        // The facts of the host still move it.
+        b.stable.kernel_release = Some("another kernel".into());
+        assert_ne!(recompute_class(&a).unwrap(), recompute_class(&b).unwrap());
+        // Capture never asks PATH: the compiler fact is the embedded one.
+        assert_eq!(a.stable.rustc_vv, embedded_rustc_vv());
+    }
+
+    #[test]
+    fn earlier_class_versions_still_recompute_under_their_own_definition() {
+        let a = capture().unwrap();
+        let (v2, _) = short_id("ECBENV2", &class_view_v2(&a.stable)).unwrap();
+        let (v1, _) = short_id("ECBENV1", &class_view_v1(&a.stable)).unwrap();
+        let mut old = a.clone();
+        old.env_class_id = v2.clone();
+        assert_eq!(recompute_class(&old).unwrap(), v2);
+        // A version-2 capsule hashed the compiler: changing it changes the id.
+        old.stable.rustc_vv = Some("another compiler".into());
+        assert_ne!(recompute_class(&old).unwrap(), v2);
+        old.env_class_id = v1.clone();
+        old.stable.rustc_vv = a.stable.rustc_vv.clone();
+        assert_eq!(recompute_class(&old).unwrap(), v1);
+    }
+
+    #[test]
+    fn binary_hash_is_of_the_running_executable_and_pinned() {
+        pin_binary_hash();
+        let a = capture().unwrap();
+        let b = capture().unwrap();
+        assert!(a.build.binary_sha256.is_some());
+        assert_eq!(a.build.binary_sha256, b.build.binary_sha256);
+        #[cfg(target_os = "linux")]
+        assert_eq!(
+            a.build.binary_sha256,
+            Some(sha256_hex(&std::fs::read("/proc/self/exe").unwrap()))
+        );
+        assert!(a.build.allocator.is_some());
     }
 
     #[test]

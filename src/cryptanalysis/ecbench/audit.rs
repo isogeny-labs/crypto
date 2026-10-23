@@ -31,8 +31,8 @@ use crate::cryptanalysis::ecbench::canonical::sha256_hex;
 use crate::cryptanalysis::ecbench::host::{self, recompute_class, HostCapsule};
 use crate::cryptanalysis::ecbench::methods::MethodSpec;
 use crate::cryptanalysis::ecbench::record::{
-    check_line_seal, child_main, floor_s, grade, json_roundtrip, ChildInput, GradeInput, Record,
-    CHILD_INPUT_SCHEMA, GRADING_VERSION,
+    check_line_seal, child_main, floor_s, grade_for_version, grading_version_supported,
+    json_roundtrip, ChildInput, GradeInput, Record, CHILD_INPUT_SCHEMA,
 };
 use crate::cryptanalysis::ecbench::runner::{read_record_lines, read_session, PlanDoc};
 use crate::cryptanalysis::ecbench::spec::{plan, Arm, Spec};
@@ -443,24 +443,30 @@ pub fn audit_with(
             }
         }
     }
-    // Regrade every run from its own observations, when the session was
-    // graded under the rules this binary applies.
-    let regraded = session.grading_version == GRADING_VERSION;
+    // Regrade every run from its own observations under the rules the
+    // session was graded with (`grade_for_version`), when this binary
+    // implements that version.
+    let regraded = grading_version_supported(session.grading_version);
     if regraded {
         for r in &records {
-            let g = grade(&GradeInput {
-                plan: session.cpu_plan.as_ref(),
-                preflight: session.preflight.as_ref(),
-                eviction: session.eviction.as_ref(),
-                runner_on_run_cpu: session.runner_on_run_cpu,
-                capsule: &host,
-                thresholds: &session.options.thresholds,
-                placement: &r.isolation.placement,
-                before: &r.isolation.before,
-                after: &r.isolation.after,
-                timing: &r.time,
-                hz: session.ticks_per_second as f64,
-            });
+            let Some(g) = grade_for_version(
+                session.grading_version,
+                &GradeInput {
+                    plan: session.cpu_plan.as_ref(),
+                    preflight: session.preflight.as_ref(),
+                    eviction: session.eviction.as_ref(),
+                    runner_on_run_cpu: session.runner_on_run_cpu,
+                    capsule: &host,
+                    thresholds: &session.options.thresholds,
+                    placement: &r.isolation.placement,
+                    before: &r.isolation.before,
+                    after: &r.isolation.after,
+                    timing: &r.time,
+                    hz: session.ticks_per_second as f64,
+                },
+            ) else {
+                continue;
+            };
             if g.level != r.isolation.level || g.blockers != r.isolation.blockers {
                 record_problems.push(format!(
                     "record seq {}: graded {} with {} blockers, its observations give {} with {}",
