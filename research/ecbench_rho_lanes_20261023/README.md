@@ -73,16 +73,64 @@ Things tried and dropped:
 - A key ring for the cycle window (in the commit) left all 144 probe records
   identical and moved wall time by under 2%.
 
+## Also in this round: prime index calculus at 32 bits
+
+I profiled `ic.pipeline` on the 32-bit curve to see what dominates once
+curves outgrow the 28-bit sessions:
+
+- With a 512-point base, relation collection is about 95% of the solve.
+- With a 2048-point base, the pair-table set-up dominates instead.
+- Linear algebra is 1–4% in both, so restructuring the Gauss elimination
+  isn't worth it.
+- The cache-blocked table (`mitm-prime-blocked`) already halves set-up at
+  2048 (430 → 200 ms).
+- The batched relation walk (`targets=walk-prime-batch-16`) cuts the
+  per-trial cost by about 100 ns.
+
+What remains per trial is cache misses in the guard set and the pair table.
+The lane target sources prepare a round of query points ahead, so the
+collector now reads, uncounted, the guard's and the m = 2 pair table's slots
+for the whole round first (`DecompositionOracle::touch`). That way their
+misses overlap.
+
+Old and new binary, three sessions each, `ic-touch/`:
+
+| arm | relation ns/trial old → new | ratio | solve ms old → new |
+|:--|--:|--:|--:|
+| 2048-point base, `mitm-prime-blocked`, batch-16 | 464 → 377 | **0.812** | 413 → 401 |
+| 512-point base, `mitm-prime-batch`, batch-16 | 330 → 309 | 0.935 | 632 → 588 |
+
+All 108 records are identical outside timing, and every session replays
+under the other binary. The default `targets=walk` takes one target at a
+time, so it has nothing to prefetch and is unchanged.
+
+## Koblitz relation collection: reviewed, no change
+
+The Koblitz scan (`witnesses_fast_scan`) is already pipelined end to end:
+
+- AVX-512 batched lazy additions over pre-gathered coordinates;
+- keys computed in blocks of 1,024;
+- prefetching of the filter words 32 ahead, of the admitted keys' buckets,
+  and of their runs;
+- a least-rotation canonicaliser that finds the Frobenius canonical form in
+  about log₂ n steps instead of n.
+
+I didn't find a further change worth making from reading the code. A
+measured split would need hardware counters, but `perf` isn't available in
+this container, and valgrind can't run the AVX-512 path. So I made no change
+there this round.
+
 ## Validation
 
-- Every run verified: 2,200 measured runs, and every recovered scalar
-  matches its target.
+- Every run verified: 2,200 measured runs (lanes study) plus the IC A/B,
+  and every recovered scalar matches its target.
 - `ecbench verify --replay-all` re-executes every measured run of all 12
-  sessions in a fresh process, with identical counts (2,200 replays,
+  sessions in a fresh process, with identical counts (2,200 replays; the
+  six IC sessions add 108, each replayed by the other binary;
   [`replay-certificate.json`](replay-certificate.json), receipts in
   `verify/`). The method is new, so no earlier binary can replay it.
-- [`validator.py`](validator.py) recomputes all 24 headline ratios from the
-  raw records, with no code shared with `summarize.py`
+- [`validator.py`](validator.py) recomputes every headline ratio from the
+  raw records (26 with the IC rows), with no code shared with `summarize.py`
   ([`validator-report.json`](validator-report.json): pass).
 - The §5a band for each curve is in `band/`, with the printed tables in
   `band/raw/`. No arm has unpriced native work, so the order holds across

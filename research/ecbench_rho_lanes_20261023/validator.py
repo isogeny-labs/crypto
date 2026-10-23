@@ -43,6 +43,21 @@ def main():
                             ("s_ratio", (sum(s[(bits, arm)]) / len(s[(bits, arm)])) / (sum(ref_s) / len(ref_s)))):
             name = f"{bits}/{arm}/{kind}"
             headline.append({"name": name, "claimed": claimed.get(name), "recomputed": value, "rel_tol": 1e-9})
+    rel = {}
+    for path in sorted((HERE / "ic-touch" / "sessions").glob("*/records.jsonl")):
+        variant = path.parent.name.split("-")[0]
+        raw.append({"path": os.path.relpath(path, EVIDENCE), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+        for line in path.read_text().splitlines():
+            r = json.loads(line)
+            if r["warmup"] or r["arm"] == "rho-neg":
+                continue
+            phase = [p for p in r["phases"] if p["name"] == "relations"][0]
+            rel.setdefault((r["arm"], variant), []).append(phase["wall_ns"] / r["counters"]["targets_tried"])
+    for (arm, variant), xs in sorted(rel.items()):
+        if variant == "new":
+            name = f"ic-touch/{arm}/relation_ratio"
+            headline.append({"name": name, "claimed": claimed.get(name),
+                             "recomputed": med(xs) / med(rel[(arm, "old")]), "rel_tol": 1e-9})
     ok = len(headline) == len(claimed) and all(
         h["claimed"] is not None and abs(h["claimed"] - h["recomputed"]) <= 1e-9 * abs(h["recomputed"]) for h in headline)
     report = {"schema": "validation-gate/v1 validator report", "status": "pass" if ok else "fail", "independent": True,

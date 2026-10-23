@@ -71,6 +71,7 @@ The A/A control (<code>rho-neg-aa</code>) is a second copy of the reference arm.
 (<code>ecbench verify --replay-all</code>, 2200 replays). At 32 bits a rho step's single field inversion (word extended Euclid, about
 110 ns) was most of its wall time; shared over a round it costs a few nanoseconds, and the step becomes instruction-bound (about
 680 instructions per group operation in Callgrind, for both methods).</p>
+<h2>Prime index calculus: prefetch for lane walks</h2><p>The prime lane target sources prepare a round of query points before taking the first; the collector now reads the guard set's and the m = 2 pair table's slots for the whole round first, uncounted, so their cache misses overlap. Old and new binary, three sessions each on the 32-bit curve (<code>targets=walk-prime-batch-16</code>); 108 of 108 records identical outside timing, every session replays under the other binary.</p><table><tr><th>arm</th><th>ns/trial old</th><th>new</th><th>ratio</th><th>solve ms old</th><th>new</th><th>ratio</th></tr><tr><td>b2048-blocked-b16</td><td>464</td><td>377</td><td>0.812</td><td>413</td><td>401</td><td>0.971</td></tr><tr><td>b512-batch16</td><td>330</td><td>309</td><td>0.935</td><td>632</td><td>588</td><td>0.930</td></tr></table>
 <p>This is a wall-time result. In the counted unit (<code>S</code>, GAE/√r) the lanes method costs 4–30% more than
 <code>rho.negation</code>, so it is not a stronger matched rho reference for index-calculus comparisons, which are made in that unit.</p>
 </body></html>

@@ -95,8 +95,58 @@
   {
    "claimed": 1.1241195135171347,
    "name": "32/lanes-32/s_ratio"
+  },
+  {
+   "claimed": 0.8124555808511421,
+   "name": "ic-touch/b2048-blocked-b16/relation_ratio"
+  },
+  {
+   "claimed": 0.9347938317418778,
+   "name": "ic-touch/b512-batch16/relation_ratio"
   }
  ],
+ "ic_touch": {
+  "identical_records": 108,
+  "records": 108,
+  "rows": [
+   {
+    "arm": "b2048-blocked-b16",
+    "new_ns_per_trial": 377.1221628516927,
+    "new_solve_ms": 401.4451995,
+    "old_ns_per_trial": 464.17573063700684,
+    "old_solve_ms": 413.2637625,
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "linalg": "incremental-gauss",
+     "max_trials": "100000000",
+     "oracle": "mitm-prime-blocked:m=2",
+     "solver": "",
+     "solver_budget_seconds": "0",
+     "targets": "walk-prime-batch-16"
+    },
+    "relation_ratio": 0.8124555808511421,
+    "solve_ratio": 0.9714018888844628
+   },
+   {
+    "arm": "b512-batch16",
+    "new_ns_per_trial": 308.70363339715385,
+    "new_solve_ms": 587.6904665,
+    "old_ns_per_trial": 330.2371313489747,
+    "old_solve_ms": 631.6653934999999,
+    "params": {
+     "factor_base": "prime-abscissa:size=512",
+     "linalg": "incremental-gauss",
+     "max_trials": "100000000",
+     "oracle": "mitm-prime-batch:m=2",
+     "solver": "",
+     "solver_budget_seconds": "0",
+     "targets": "walk-prime-batch-16"
+    },
+    "relation_ratio": 0.9347938317418778,
+    "solve_ratio": 0.9303825610006289
+   }
+  ]
+ },
  "replays": 2200,
  "rows": [
   {

@@ -1,0 +1,57 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "round 3 probe: prime IC options at 32 bits",
+ "description": "probe",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 32,
+    "seed": 59297
+   }
+  ],
+  "targets_per_curve": 2,
+  "target_seed": 20261002
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "b512-batch16",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=512",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk-prime-batch-16"
+    }
+   }
+  },
+  {
+   "name": "b2048-blocked-b16",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "walk-prime-batch-16"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 1,
+  "isolation_required": "L2",
+  "timeout_seconds": 1200
+ }
+}

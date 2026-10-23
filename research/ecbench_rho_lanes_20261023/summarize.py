@@ -54,6 +54,40 @@ def rows():
     return out
 
 
+def ic_touch():
+    """The prefetch for prime IC lane walks: old and new binary, three sessions each."""
+    VOL = {"time", "isolation", "env_class_id", "binary_sha256", "record_id", "session_id", "run_id"}
+
+    def counted(r):
+        r = {k: v for k, v in r.items() if k not in VOL}
+        r["phases"] = [{k: v for k, v in p.items() if k != "wall_ns"} for p in r["phases"]]
+        if isinstance(r.get("online"), dict):
+            r["online"] = {k: v for k, v in r["online"].items() if k != "wall_ns"}
+            r["online"]["phases_ns"] = sorted(r["online"].get("phases_ns") or {})
+        return json.dumps(r, sort_keys=True)
+
+    def load(v):
+        return [[json.loads(l) for l in (d / "records.jsonl").read_text().splitlines() if l.strip()]
+                for d in sorted(HERE.glob(f"ic-touch/sessions/{v}-*"))]
+
+    old, new = load("old"), load("new")
+    ref = [counted(r) for r in old[0]]
+    same = sum(counted(r) == c for sess in old + new for r, c in zip(sess, ref))
+    total = sum(len(sess) for sess in old + new)
+    out = []
+    for arm in sorted({r["arm"] for r in old[0] if r["arm"] != "rho-neg"}):
+        def per(sessions, f):
+            return statistics.median(f(r) for s in sessions for r in s if r["arm"] == arm and not r["warmup"])
+        rel = lambda r: next(p for p in r["phases"] if p["name"] == "relations")["wall_ns"] / r["counters"]["targets_tried"]
+        solve = lambda r: r["time"]["solve_wall_ns"] / 1e6
+        out.append({"arm": arm, "params": next(r["method"]["params"] for r in old[0] if r["arm"] == arm),
+                    "old_ns_per_trial": per(old, rel), "new_ns_per_trial": per(new, rel),
+                    "relation_ratio": per(new, rel) / per(old, rel),
+                    "old_solve_ms": per(old, solve), "new_solve_ms": per(new, solve),
+                    "solve_ratio": per(new, solve) / per(old, solve)})
+    return out, same, total
+
+
 def figure(rs):
     W, H, L, T, B = 760, 420, 70, 60, 50
     x0, x1, y0, y1 = L, W - 190, T, H - B
@@ -85,11 +119,21 @@ def figure(rs):
     (HERE / "solve-time.svg").write_text("\n".join(out) + "\n")
 
 
-def report(rs, replays):
+def report(rs, replays, touch=None):
     tr = "\n".join(
         f"<tr><td>{r['bits']}</td><td>{r['arm']}</td><td>{r['verified']}/{r['runs']}</td><td>{r['mean_s']:.3f}</td>"
         f"<td>{r['median_wall_ms']:.2f}</td><td>{r['paired_wall_geomean']:.3f}</td><td>{r['paired_s_geomean']:.3f}</td>"
         f"<td>{r['muls_per_gae']:.2f} / {r['sqrs_per_gae']:.2f} / {r['invs_per_gae']:.3f}</td></tr>" for r in rs)
+    t_rows, same, total = touch
+    touch_html = (f"<h2>Prime index calculus: prefetch for lane walks</h2><p>The prime lane target sources prepare a round of query "
+                  "points before taking the first; the collector now reads the guard set's and the m = 2 pair table's slots for the whole "
+                  "round first, uncounted, so their cache misses overlap. Old and new binary, three sessions each on the 32-bit curve "
+                  f"(<code>targets=walk-prime-batch-16</code>); {same} of {total} records identical outside timing, every session replays "
+                  "under the other binary.</p><table><tr><th>arm</th><th>ns/trial old</th><th>new</th><th>ratio</th><th>solve ms old</th>"
+                  "<th>new</th><th>ratio</th></tr>" + "".join(
+                      f"<tr><td>{t['arm']}</td><td>{t['old_ns_per_trial']:.0f}</td><td>{t['new_ns_per_trial']:.0f}</td>"
+                      f"<td>{t['relation_ratio']:.3f}</td><td>{t['old_solve_ms']:.0f}</td><td>{t['new_solve_ms']:.0f}</td>"
+                      f"<td>{t['solve_ratio']:.3f}</td></tr>" for t in t_rows) + "</table>")
     html = f"""<!doctype html><html><head><meta charset="utf-8"><title>Rho with batched inversions</title>
 <style>body{{font-family:Helvetica,Arial,sans-serif;max-width:900px;margin:24px auto;color:#222;font-size:13px}}
 table{{border-collapse:collapse;margin:8px 0}}td,th{{border:1px solid #ccc;padding:3px 6px;text-align:right}}td:nth-child(2),th:nth-child(2){{text-align:left}}</style></head><body>
@@ -108,6 +152,7 @@ The A/A control (<code>rho-neg-aa</code>) is a second copy of the reference arm.
 (<code>ecbench verify --replay-all</code>, {replays} replays). At 32 bits a rho step's single field inversion (word extended Euclid, about
 110 ns) was most of its wall time; shared over a round it costs a few nanoseconds, and the step becomes instruction-bound (about
 680 instructions per group operation in Callgrind, for both methods).</p>
+{touch_html}
 <p>This is a wall-time result. In the counted unit (<code>S</code>, GAE/√r) the lanes method costs 4–30% more than
 <code>rho.negation</code>, so it is not a stronger matched rho reference for index-calculus comparisons, which are made in that unit.</p>
 </body></html>
@@ -118,11 +163,19 @@ The A/A control (<code>rho-neg-aa</code>) is a second copy of the reference arm.
 def main():
     rs = rows()
     replays = sum(len(json.loads(p.read_text())["replays"]) for p in sorted((HERE / "verify").glob("*.json")))
+    touch = ic_touch()
     figure(rs)
-    report(rs, replays)
+    report(rs, replays, touch)
     headline = [{"name": f"{r['bits']}/{r['arm']}/wall_ratio", "claimed": r["wall_ratio"]} for r in rs if r["arm"] != "rho-neg"]
     headline += [{"name": f"{r['bits']}/{r['arm']}/s_ratio", "claimed": r["s_ratio"]} for r in rs if r["arm"] != "rho-neg"]
-    (HERE / "results.json").write_text(json.dumps({"rows": rs, "replays": replays, "headline": headline}, indent=1, sort_keys=True) + "\n")
+    headline += [{"name": f"ic-touch/{t['arm']}/relation_ratio", "claimed": t["relation_ratio"]} for t in touch[0]]
+    (HERE / "results.json").write_text(json.dumps({"rows": rs, "replays": replays, "headline": headline,
+                                                   "ic_touch": {"rows": touch[0], "identical_records": touch[1],
+                                                                "records": touch[2]}},
+                                                  indent=1, sort_keys=True) + "\n")
+    for t in touch[0]:
+        print("ic-touch", t["arm"], f"{t['old_ns_per_trial']:.0f} -> {t['new_ns_per_trial']:.0f} ns/trial ({t['relation_ratio']:.3f}); "
+              f"solve {t['solve_ratio']:.3f}; identical {touch[1]}/{touch[2]}")
     for r in rs:
         print(f"{r['bits']} {r['arm']:10s} {r['verified']}/{r['runs']} S={r['mean_s']:.3f} wall={r['median_wall_ms']:.2f}ms "
               f"wall/rho={r['paired_wall_geomean']:.3f} S/rho={r['paired_s_geomean']:.3f} M/S/I per GAE {r['muls_per_gae']:.2f}/{r['sqrs_per_gae']:.2f}/{r['invs_per_gae']:.3f}")
