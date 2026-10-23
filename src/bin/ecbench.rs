@@ -1099,7 +1099,11 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             if save {
                 let d = dir.join("comparisons");
                 std::fs::create_dir_all(&d).map_err(|e| e.to_string())?;
-                let f = d.join(format!("{a}__{b}.json"));
+                let suffix = c
+                    .pricing_weight
+                    .map(|_| format!("__{}", c.comparison_id))
+                    .unwrap_or_default();
+                let f = d.join(format!("{a}__{b}{suffix}.json"));
                 std::fs::write(
                     &f,
                     serde_json::to_string_pretty(&c).map_err(|e| e.to_string())? + "\n",

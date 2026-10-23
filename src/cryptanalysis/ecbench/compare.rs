@@ -160,6 +160,10 @@ pub struct MeasurementQuality {
 pub struct Comparison {
     pub schema: String,
     pub comparison_id: String,
+    /// GAE per native operation used to price this comparison. `None` keeps
+    /// recorded unpriced S values; it is part of the saved identity.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pricing_weight: Option<f64>,
     /// The deterministic bootstrap seed. Historical v1 files did not store
     /// it and remain readable; calibration requires a recorded seed.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -494,11 +498,13 @@ pub fn compare_weighted(
             "b": [b.session_id, b.arm, b.method_id],
             "resamples": resamples,
             "seed": seed.to_string(),
+            "pricing_weight": weight.map(|w| w.to_string()),
         }),
     )?;
     Ok(Comparison {
         schema: COMPARISON_SCHEMA.into(),
         comparison_id,
+        pricing_weight: weight,
         resample_seed: Some(seed),
         a,
         b,
@@ -756,5 +762,25 @@ mod tests {
         assert_eq!(r, Some(1.0));
         assert_eq!(ci, Some((1.0, 1.0)));
         assert_eq!(method, "cluster");
+    }
+
+    #[test]
+    fn pricing_weight_is_part_of_saved_comparison_identity() {
+        let base = |weight: Option<f64>| {
+            short_id(
+                "ECC1",
+                &json!({
+                    "a": ["session", "a", "method-a"],
+                    "b": ["session", "b", "method-b"],
+                    "resamples": 500,
+                    "seed": "1",
+                    "pricing_weight": weight.map(|w| w.to_string()),
+                }),
+            )
+            .unwrap()
+            .0
+        };
+        assert_ne!(base(None), base(Some(0.0)));
+        assert_ne!(base(Some(0.0)), base(Some(1.0)));
     }
 }
