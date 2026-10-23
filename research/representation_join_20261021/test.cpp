@@ -29,6 +29,7 @@ int main() {try {
     for(Int p:{5,7,11}) {
         Int d=2;for(;;++d){bool square=false;for(Int x=0;x<p;++x)square|=x*x%p==d;if(!square)break;}
         Curve e(p,d,{1,1},{p==5?2:1,0});const auto& f=e.field;
+        rejects([&]{f.pow({2,0},-1);});
         for(Int u=0;u<p;++u)for(Int v=0;v<p;++v) {
             F x{u,v};if(x==F{})rejects([&]{f.inv(x);});else check(f.mul(x,f.inv(x))==F{1,0});
         }
