@@ -35,6 +35,8 @@ def read(path: Path):
 
 def save(fig, dest: Path, name="graph"):
     fig.savefig(dest / f"{name}.svg")
+    svg = dest / f"{name}.svg"
+    svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines())+"\n")
     fig.savefig(dest / f"{name}.png", dpi=150)
     plt.close(fig)
 
@@ -147,7 +149,7 @@ def typst(md: str, image_base: Path) -> str:
             out.append("#text("+json.dumps(plain(" ".join(para)),ensure_ascii=False)+")\n")
             continue
         i+=1
-    return "\n".join(out)+"\n"
+    return "\n".join(out).rstrip()+"\n"
 
 
 def compile_pdf(dest: Path, md: str):

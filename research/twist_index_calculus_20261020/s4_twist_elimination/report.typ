@@ -111,4 +111,3 @@
 
 
 #text("Canonical graph check: the existing scaling, thinning and peeled-orbit reuse graphs retain their historical measurements. This new result has its own overview and report links. No leaderboard A–C value or priced benchmark changes, because this round did not measure the required cost interval. PDF (report.pdf).")
-
