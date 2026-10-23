@@ -101,7 +101,7 @@ class, so it need not equal the ratio of the two ms columns.
 
 **Verdicts** (frozen in `PROTOCOL.md`):
 - **Leak present before.** The ratio `R` of the 224-leading-zero class to
-  the full-length class was 0.34–0.47 in every round, on both curves, against
+  the full-length class was 0.33–0.47 in every round, on both curves, against
   the threshold 0.9.
 - **Coarse leak closed after.** The largest deviation of any class from
   the full-length class, `F`, was at most 0.138 (SM2) and 0.165 (GOST).
@@ -150,15 +150,19 @@ class, so it need not equal the ratio of the two ms columns.
 and secp256k1 could call `scalar_mul_secret` instead of the affine ladder,
 and so get the limb-level constant-time projective stack.
 
-## Why there is no `benchmarks/` row
+## `benchmarks/` entry, outside the results table
 
-The validation gate (`docs/VALIDATION_GATE.md`, owner rule of 2026-10-19)
-admits a `benchmarks/README.md` row only with a replay certificate, a
-validator report and a rho reference matched to the protocol, priced in GAE
-at 0, 0.1 and 1. This study times a scalar multiplication. It ranks no ECDLP
-method, so there is no rho reference to match, and inventing one would
-misstate the result. The result therefore stays in this research directory,
-which the gate permits.
+The figures and report are copied to
+[`benchmarks/20261022-scalar-mul-ct-timing/`](../../benchmarks/20261022-scalar-mul-ct-timing/README.md)
+(AGENTS.md, "Performance results also land in `benchmarks/`") and listed in
+`benchmarks/README.md` under "Security timing (outside the results table)",
+not as a row of the admitted table. The validation gate
+(`docs/VALIDATION_GATE.md`, owner rule of 2026-10-19) admits a row only with a
+replay certificate, a validator report and a rho reference matched to the
+protocol, priced in GAE at 0, 0.1 and 1. This study times a scalar
+multiplication: it ranks no ECDLP method, so there is no rho reference to
+match, and inventing one would misstate the result. It is timing-leakage
+evidence, not a solver-performance improvement.
 
 ## Files
 

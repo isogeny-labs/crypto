@@ -146,3 +146,18 @@ admitted by this table and cannot satisfy the validation gate.
 ## Studies awaiting benchmark admission
 
 The [Jacobian-cover cost breakdown and proposed leads](20261018-jv-cover-cost-breakdown-leads/README.md) retain component-count evidence and a corrected report. This study is not admitted to the results table: its component census has no matched end-to-end rho reference or complete validation-gate record.
+
+## Security timing (outside the results table)
+
+Timing studies of constant-time fixes keep their visual record here, but they
+measure side-channel leakage, not solver performance: they compare no ECDLP
+method, have no matched rho reference, and are never rows of the admitted table
+above.
+
+- 2026-10-22, [`20261022-scalar-mul-ct-timing`](20261022-scalar-mul-ct-timing/README.md):
+  the affine ladder behind `scalar_mul_secret` (every curve but secp256k1 and
+  P-256) leaked the scalar's bit length. Before the fix, a scalar with 224
+  leading zero bits took 0.33–0.47 of a full-length one's time (SM2 and the
+  GOST-256 test curve). After it, every class is within 0.165 of full length,
+  inside the A/A band 0.296, at a full-length cost of 0.86–1.09×. Study:
+  [`research/scalar_mul_ct_timing_20261022`](../research/scalar_mul_ct_timing_20261022/README.md).
