@@ -11,7 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [EKS resumable L2 experiments](eks-resumable-l2-experiments.md) | partially resolved | main-only GitHub recovery execution and broader runtime coverage | automatic AWS harness worker-loss/L2/S3 proof passed; finish exact-head CI/review/merges, main Action and additional workload qualification |
+| [EKS resumable L2 experiments](eks-resumable-l2-experiments.md) | partially resolved | full crypto qualification of the CPU-accounting fix, final review/CI and main Action | CRIU recovery verified; counter diagnostic passed; full L2 qualification could not start within the Spot quota |
 | [ECCp-131 full-parameter index-calculus relation pipeline](eccp131-full-parameter-index-calculus.md) | open | checked two- and three-point small-x probes have zero natural rank in bounded exact-curve runs; three-point support is at most `8B³` points | exact relation oracle beyond the fixed small-x support bound, independently replayed rank and target-descent chain |
 | [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | implemented; client activation remains | enrolled legacy process recovery | private recurring backups, fenced two-hop recovery and Diem copy restore passed; laptop installation/trust needs client access |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |

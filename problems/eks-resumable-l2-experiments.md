@@ -159,3 +159,13 @@ grader and thresholds are unchanged. The separate 600-round c8a qualification
 must still establish all L2/replay/A/A/S3 criteria before promotion; the counter
 probe alone does not meet them or identify a precise upstream kernel defect.
 The source merge conflict is resolved while retaining both problem-index rows.
+
+Qualification D then exhausted its 1,800-second provisioning deadline without
+starting a container. AWS rejected nominated c8a workers with
+`MaxSpotInstanceCountExceeded`; other lab work occupied the available slot under
+the unchanged 96-vCPU quota. It produced zero measurement payloads and no L2,
+replay or A/A result. The [separate failure report](../taskq/deploy/eks-karpenter/diagnostics/validation/20261023-l2-qualification-d/REPORT.md)
+retains the frozen workload, receipts, events and zero-object S3 listing. The v5
+source and launcher packages are prepared but not promoted. A free 8-vCPU Spot
+slot and a new, explicitly frozen provisioning attempt are needed to execute
+the original full qualification; no measurement result has been retried.
