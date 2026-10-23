@@ -217,7 +217,12 @@ coordinate/order adapter is unavailable explicitly report `not_evaluated`;
 Curve25519 is one such record. A complete catalogue entry does not by itself
 certify its coordinates or group order.
 
-In the current file (2112 registry curves and 176 from the sources: 175
+The current generated file contains 8211 records: 8035 registered models
+and 176 source records. Its per-record statuses are authoritative for this
+expanded catalogue.
+
+The following aggregate classification counts describe the earlier
+2288-record snapshot (2112 registry curves and 176 from the sources: 175
 walked curves of the P-256 and P-224 isogeny classes and the ECC2K-130
 degree-263 descendant), `End(E)` is established for 1983 curves (878
 maximal, 1105 non-maximal) and unresolved for 270; 35 have a `Δ` that did

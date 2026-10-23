@@ -135,11 +135,11 @@ existence alone does not establish cheaper computation there.
 
 The separate generated
 [`cover-transfer-assessments.json`](cover-transfer-assessments.json) v2 ledger
-classifies transfer obligations for all 2,100 map rows (2,098 distinct cover
-models) and 664 linked EC1 representations. The population comprises 160
-binary maps and 1,940 odd-characteristic maps: 586 direct prime-field, 30
-normalized-target prime-field, and 1,324 extension-field maps. The EC1 links
-comprise 134 binary and 530 odd-characteristic representations. That
+classifies transfer obligations for every current map and linked EC1
+representation. Its coverage counts are derived from exact registry and graph
+membership. The immutable October 13 report covers its dated 2,100-map,
+664-representation snapshot; it does not establish replay coverage for later
+catalog additions. The generated current-catalog
 classification does not alter this geometry catalog: it records bounded binary
 typed-transfer support,
 refutes capabilities absent from the current implementation, and leaves the

@@ -401,12 +401,11 @@ structural contract
 [`cover-transfer-assessment.schema.json`](cover-transfer-assessment.schema.json)
 and a dated
 [transfer report](../../research/cover_transfer_assessment_20261013/README.md).
-It classifies all 2,100 map rows, representing 2,098 distinct cover models, and
-all 664 exact EC1 representations. Its map profiles contain 160 binary cubic
-covers, 586 direct prime-field quadratic covers, 30 normalized-target
-prime-field covers, and 1,324 odd-characteristic extension-field covers. Its
-subgroup profiles contain 134 binary and 530 odd-characteristic
-representations. “Assessed” means that every declared claim has an explicit
+The generated ledger classifies every current map and exact EC1 representation
+and derives coverage from the registry and graph membership. The dated report
+retains its October 13 snapshot of 2,100 maps, 2,098 cover models, and 664 EC1
+representations; its historical replay does not cover later catalog additions.
+“Assessed” means that every declared claim has an explicit
 status; it does not mean that every capability is supported.
 
 The binary profile has checked one-infinity Jacobian arithmetic and a bounded
@@ -417,7 +416,7 @@ open catalog-wide except for the order-29 overlay and the
 implementation-separated cardinality-486 certificate for the separate fixed
 F8 source fixture. The
 latter is not an EC1 subgroup-order certificate. All computational-advantage
-and end-to-end solver costs for these 2,100 assessed cover paths remain
+and end-to-end solver costs for the assessed cover paths remain
 unknown. The retained cryptanalysis parity receipt predates the fixed-F8 norm,
 so current mirror/integration evidence is also open. The assessment does not change
 the geometry semantics or browser status fields in `covers.json` and
@@ -467,7 +466,7 @@ The exported catalog identifies its wrapper with
 `producer_source_sha256` is SHA-256 of the exact UTF-8 checker source, model
 normalization source, and `hyperelliptic-cover` wrapper source concatenated in
 that order. For the current source it is
-`1f0c9492189415448ba854f717dd599fd8f96cbb33b342b9845f85001b89d9eb`.
+`6f5c3e05f6fe0c2949c876868a4b795189c32a26993bffe8054a5a4d8cbf6cc8`.
 Thus changing any of the three producer inputs changes the provenance digest.
 Both
 `hyperelliptic-cover catalog-export` and `curve_cover_check` require callers

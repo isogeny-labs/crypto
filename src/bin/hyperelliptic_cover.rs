@@ -982,7 +982,7 @@ mod tests {
     fn every_current_catalog_model_reaches_the_standalone_constructor() {
         let registry: Value = serde_json::from_str(CURRENT_REGISTRY).expect("current registry");
         let rows = registry["curves"].as_array().expect("registry curve array");
-        assert_eq!(rows.len(), 2572);
+        assert_eq!(rows.len(), 8035);
         for row in rows {
             let slug = row["slug"].as_str().expect("catalog slug");
             let model: Value = serde_json::from_str(
@@ -1033,10 +1033,20 @@ mod tests {
                     .as_array()
                     .filter(|coordinates| coordinates.len() == 2)
                     .expect("binary generator pair");
-                let generator_x = parse_number(generator[0].as_str().expect("binary generator x"))
-                    .expect("parsed x");
-                let generator_y = parse_number(generator[1].as_str().expect("binary generator y"))
-                    .expect("parsed y");
+                assert_eq!(
+                    representation["field"]["element_encoding"],
+                    "hex polynomial coefficient bitset, least significant bit is constant",
+                    "{ec1}: unsupported binary coordinate encoding"
+                );
+                // EC1 binary coordinates are hexadecimal bitsets, with an
+                // optional prefix. Digit-only strings are hexadecimal too.
+                let decode = |value: &Value| {
+                    let text = value.as_str().expect("binary generator coordinate");
+                    BigUint::parse_bytes(text.strip_prefix("0x").unwrap_or(text).as_bytes(), 16)
+                        .expect("hexadecimal binary generator coordinate")
+                };
+                let generator_x = decode(&generator[0]);
+                let generator_y = decode(&generator[1]);
                 assert!(
                     generator_x.bits() <= irreducible.degree as u64,
                     "{ec1}: generator x is not canonical for the declared field"
@@ -1120,7 +1130,7 @@ mod tests {
                 checked += 1;
             }
         }
-        assert_eq!(checked, 140);
+        assert_eq!(checked, 142);
     }
 
     #[test]

@@ -363,11 +363,11 @@ function check(condition, message) {
   }
 }
 
-check(registry.curves.length === 2572, "unexpected registry row count");
-check(report.curves.length === 2572, "unexpected cover-report row count");
-check(graph.curves.length === 2572, "unexpected graph curve-node count");
-check(Object.keys(graph.maps).length === 2572, "unexpected CV1 map count");
-check(Object.keys(graph.covers).length === 2570, "unexpected HC1 cover count");
+check(registry.curves.length === 8035, "unexpected registry row count");
+check(report.curves.length === 8035, "unexpected cover-report row count");
+check(graph.curves.length === 8035, "unexpected graph curve-node count");
+check(Object.keys(graph.maps).length === 8035, "unexpected CV1 map count");
+check(Object.keys(graph.covers).length === 8033, "unexpected HC1 cover count");
 
 const registryBytes = fs.readFileSync(registryPath);
 check(report.registry_sha256 === sha256(registryBytes), "covers.json registry digest mismatch");
@@ -482,15 +482,15 @@ check(
   "graph model hashes are not a unique exact copy of the registry model hashes",
 );
 
-check(representationCount === 977, "unexpected EC1 representation count");
-check(ec1Aliases.size === 977, "unexpected unique EC1 count");
-check(curveUids.size === 977, "unexpected unique curve-UID count");
+check(representationCount === 983, "unexpected EC1 representation count");
+check(ec1Aliases.size === 983, "unexpected unique EC1 count");
+check(curveUids.size === 983, "unexpected unique curve-UID count");
 check(
-  mapReferenceCounts.size === 2572 && [...mapReferenceCounts.values()].every((count) => count === 1),
+  mapReferenceCounts.size === 8035 && [...mapReferenceCounts.values()].every((count) => count === 1),
   "CV1 references are not bijective with curve nodes",
 );
 check(
-  coverReferenceCounts.size === 2570 &&
+  coverReferenceCounts.size === 8033 &&
     [...coverReferenceCounts.values()].every((count) => count === 1 || count === 2) &&
     [...coverReferenceCounts.values()].filter((count) => count === 2).length === 2,
   "unexpected HC1 sharing pattern",
@@ -785,9 +785,9 @@ for (const coverResult of report.curves) {
 }
 
 check(constructionCounts.binary_cubic_pullback_v1 === 165, "unexpected binary-construction count");
-check(constructionCounts.prime_quadratic_pullback_v1 === 2407, "unexpected odd-construction count");
+check(constructionCounts.prime_quadratic_pullback_v1 === 7870, "unexpected odd-construction count");
 check(arithmeticChecks.binary === 165, "unexpected binary arithmetic-replay count");
-check(arithmeticChecks.prime === 1083, "unexpected prime-field arithmetic-replay count");
+check(arithmeticChecks.prime === 6546, "unexpected prime-field arithmetic-replay count");
 check(arithmeticChecks.extension === 1324, "unexpected extension-field arithmetic-replay count");
 check(
   arithmeticChecks.normalized_target === 30,
@@ -795,7 +795,7 @@ check(
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "8e4c99759fd8d9594ed207d793b07b59ebaf19f7";
+const expectedCatalogCommit = "427712a80b58ca8d5de15aacf20b3a937500f869";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -1020,12 +1020,20 @@ const expectedControlStatuses = {
   coordinate_controls: ["unknown", "coordinate_controls"],
   paired_performance: ["not_applicable", null],
 };
+// Independently check inventory identity; freshness never certifies a transfer.
+const formulaInventory = readJson(path.join(curvesDir, "jacobian-transfers.json"));
+const formulaIdentityRows = rows => rows.map(row => JSON.stringify([row.slug, row.icv1])).sort();
+const formulaInventoryCurrent = formulaInventory.registry_sha256 === sha256(registryBytes) &&
+  canonicalJson(formulaIdentityRows(formulaInventory.curves)) ===
+    canonicalJson(formulaIdentityRows(registry.curves));
 const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
-  result_templates: "1a4955b6d4dd016e0cad661afde21257ae6845904904917568414f2ae601f05e",
+  result_templates: "6060a31ac400dcf48fb4da54093794ea3858081b8cb67c1d7df9ae17904c2d4e",
   profiles: "807800e78066e8c3b0caa6634072a585cf4ae924a40b13817d9ca7a3c0aa3710",
-  controls: "f5e73ff82f722d7f3f435e3c4d238b856d2b613111a28012dffa5b8ef5e7d3c6",
-  open_obligations: "ba227bbd94320d317ccfbf71b1e0dd3f05854e7aa4e62693472dfdf34c8f2373",
+  controls: "f669214fbb19879a74c4e9c3bb231fb39b08b43eb0e8dbbca446d6bd720de7f4",
+  open_obligations: formulaInventoryCurrent
+    ? "8914c54ee9c965d73b7f3b57cf30124ca7242d7e520e55b0fc991f46b0c1cb1c"
+    : "3012575af69627a9f1ede9eae0dd51f918bda107909eea4de1e90e11bd35c2b4",
   global_cost_accounting:
     "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",
 };
@@ -1146,6 +1154,12 @@ const sourceArtifacts = Array.isArray(assessment.source_artifacts)
   ? assessment.source_artifacts
   : [];
 check(Array.isArray(assessment.source_artifacts), "source_artifacts is not an array");
+const formulaArtifact = sourceArtifacts.find(item => item.path === "docs/curves/jacobian-transfers.json");
+check(formulaArtifact?.freshness?.status === (formulaInventoryCurrent ? "supported" : "refuted"),
+  "formula inventory freshness does not match its registry digest and exact membership");
+check((formulaArtifact?.freshness?.obligation_id ?? null) ===
+    (formulaInventoryCurrent ? null : "refresh_formula_inventory"),
+  "formula inventory refresh obligation does not match freshness");
 const sourceArtifactPaths = new Set();
 for (const artifact of sourceArtifacts) {
   if (!isPlainObject(artifact)) {
@@ -1661,10 +1675,10 @@ for (const [mapUid, context] of mapContexts) {
   });
 }
 
-check(expectedFieldBindings.size === 509, "unexpected declared-field context count");
-check(fieldUidByLabel.size === 509, "declared-field labels are not bijective with field contexts");
-check(expectedJacobianBindings.size === 2570, "unexpected Jacobian-context count");
-check(expectedTypedMapBindings.size === 2572, "unexpected typed-map binding count");
+check(expectedFieldBindings.size === 531, "unexpected declared-field context count");
+check(fieldUidByLabel.size === 531, "declared-field labels are not bijective with field contexts");
+check(expectedJacobianBindings.size === 8033, "unexpected Jacobian-context count");
+check(expectedTypedMapBindings.size === 8035, "unexpected typed-map binding count");
 check(
   canonicalJson(actualFieldBindings) === canonicalJson(sortedRecord(expectedFieldBindings)),
   "typed declared-field bindings are not the exact independently derived set",
@@ -1830,11 +1844,11 @@ check(
 
 const expectedPredicateCounts = {
   binary_cubic_same_field: 165,
-  odd_prime_quadratic_direct_same_field: 1053,
+  odd_prime_quadratic_direct_same_field: 6516,
   odd_prime_quadratic_normalized_same_field: 30,
   odd_extension_quadratic_direct_same_field: 1324,
-  linked_subgroup_degree3: 140,
-  linked_subgroup_degree2: 837,
+  linked_subgroup_degree3: 142,
+  linked_subgroup_degree2: 841,
 };
 const actualPredicateCounts = {};
 for (const context of mapContexts.values()) {
@@ -2175,9 +2189,9 @@ check(
   typeof coverage.scope_note === "string" && coverage.scope_note.trim().length > 0,
   "coverage scope_note is empty",
 );
-check(coverage.assessed_maps === 2572 && coverage.unassessed_maps === 0, "map coverage is incomplete");
+check(coverage.assessed_maps === 8035 && coverage.unassessed_maps === 0, "map coverage is incomplete");
 check(
-  coverage.assessed_subgroups === 977 && coverage.unassessed_subgroups === 0,
+  coverage.assessed_subgroups === 983 && coverage.unassessed_subgroups === 0,
   "subgroup coverage is incomplete",
 );
 
@@ -2406,8 +2420,8 @@ for (const [kind, relativePath] of Object.entries(reportArtifacts)) {
   if (kind === "context_graph_source") {
     const contents = bytes.toString("utf8");
     for (const marker of [
-      "509 fields / 2,570 Jacobian contexts / 2,572 maps",
-      "current-source test: 2,572 / 2,572",
+      "531 fields / 8,033 Jacobian contexts / 8,035 maps",
+      "current-source test: 8,035 / 8,035",
       "746 inside / 1,354 outside old allowlist",
     ]) {
       check(contents.includes(marker), `context graph lacks current marker: ${marker}`);
