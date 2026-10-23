@@ -8,7 +8,7 @@
     "status": "admissible",
     "unpriced": []
   },
-  "bound_id": "ECBND1h63df4ec3d936",
+  "bound_id": "ECBND1hc8fa6c1da954",
   "constant": {
     "declared_ratio_to_floor": null,
     "ratio_to_floor": {
@@ -77,24 +77,22 @@
   },
   "domain_id": "ECDOM1h080dd3dc639e",
   "fit": {
-    "alpha": 0.40493256273986555,
-    "alpha_agrees_with_declared": true,
-    "alpha_ci95": [
-      0.0,
-      0.5254816087738171
-    ],
-    "ci_method": "cluster",
+    "alpha": 0.4049325627398584,
+    "alpha_agrees_with_declared": null,
+    "alpha_ci95": null,
+    "ci_method": "none",
     "declared_alpha": 0.5,
-    "log2_c": 2.5079626944735236,
+    "log2_c": 2.507962694473657,
     "model": "gae = C * r^alpha",
     "points": 72,
-    "r_squared": 0.71396498567543,
+    "r_squared": 0.7139649856754295,
     "scaling_claim": false,
     "size_parameter": "r",
     "sizes": 3
   },
   "fit_options": {
     "curves": [],
+    "fit_version": 2,
     "resamples": 2000,
     "seed": 20261005,
     "tier": "toy"
@@ -147,6 +145,48 @@
   "sizes": [
     {
       "automorphisms_available": 34,
+      "axes": {
+        "memory": {
+          "ci95": [
+            0.06426536384967851,
+            0.09908661574316568
+          ],
+          "value": 0.0818366532060463
+        },
+        "uncharged": {
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "value": 0.0
+        }
+      },
+      "band": [
+        {
+          "ci95": [
+            1.7790849124760553,
+            2.3820689247939844
+          ],
+          "s": 2.0740629325460795,
+          "weight": 0.0
+        },
+        {
+          "ci95": [
+            1.792922302844195,
+            2.3773588430637367
+          ],
+          "s": 2.0740629325460795,
+          "weight": 0.1
+        },
+        {
+          "ci95": [
+            1.776119757397168,
+            2.3757278043989434
+          ],
+          "s": 2.0740629325460795,
+          "weight": 1.0
+        }
+      ],
       "declared_ratio_to_floor": 5.8309518948453,
       "declared_s": 1.2533141373155001,
       "field_bits": 17,
@@ -172,6 +212,48 @@
     },
     {
       "automorphisms_available": 38,
+      "axes": {
+        "memory": {
+          "ci95": [
+            0.07204602159027346,
+            0.11775303091373399
+          ],
+          "value": 0.0934347795448226
+        },
+        "uncharged": {
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "value": 0.0
+        }
+      },
+      "band": [
+        {
+          "ci95": [
+            1.577283166199475,
+            2.2848869516008725
+          ],
+          "s": 1.9191129654114996,
+          "weight": 0.0
+        },
+        {
+          "ci95": [
+            1.5821094100341009,
+            2.282333555536723
+          ],
+          "s": 1.9191129654114996,
+          "weight": 0.1
+        },
+        {
+          "ci95": [
+            1.5780516245690996,
+            2.2959462466557863
+          ],
+          "s": 1.9191129654114996,
+          "weight": 1.0
+        }
+      ],
       "declared_ratio_to_floor": 6.164414002968976,
       "declared_s": 1.2533141373155001,
       "field_bits": 19,
@@ -197,6 +279,48 @@
     },
     {
       "automorphisms_available": 46,
+      "axes": {
+        "memory": {
+          "ci95": [
+            0.03030473989388817,
+            0.05318583545135405
+          ],
+          "value": 0.040738519468092614
+        },
+        "uncharged": {
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "value": 0.0
+        }
+      },
+      "band": [
+        {
+          "ci95": [
+            1.1768723705281827,
+            1.880595209992961
+          ],
+          "s": 1.51383362083355,
+          "weight": 0.0
+        },
+        {
+          "ci95": [
+            1.1942803080283027,
+            1.8937503145321335
+          ],
+          "s": 1.51383362083355,
+          "weight": 0.1
+        },
+        {
+          "ci95": [
+            1.1850368538918765,
+            1.8907417047007213
+          ],
+          "s": 1.51383362083355,
+          "weight": 1.0
+        }
+      ],
       "declared_ratio_to_floor": 6.782329983125268,
       "declared_s": 1.2533141373155001,
       "field_bits": 23,
@@ -247,5 +371,14 @@
       "sizes_with_work": 3
     }
   ],
+  "tail": {
+    "large": false,
+    "max_over_median": 2.223222045537868,
+    "max_ratio": 20.03067421056984,
+    "median_ratio": 9.009749723727566,
+    "runs": 72,
+    "top_run": "ECR1he4aaf996a366",
+    "top_run_share": 0.030593475266575715
+  },
   "verdict_id": null
 }
