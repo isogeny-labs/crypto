@@ -482,7 +482,8 @@ Table D. Ranking inputs and verification totals, round 2.
   (`2.54·10¹⁰` for the files' `2.535–2.552·10¹⁰` and full-digit JSON values).
 - **LEAD-19.** No mismatches; three citations the card could not route
   (no identifier) are listed as unverified; the two missing paths are the
-  `--base-arms` flag and its arms, which the test proposes to add.
+  output files the proposed test would write
+  (`research/lead19_projected_base/{char2,prime24}.json`).
 
 ## 9. Files
 
