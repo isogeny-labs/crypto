@@ -210,3 +210,33 @@ Counts on these curves and seeds, on the PR's head. Not shown: any
 index-calculus improvement, any claim about sizes between or beyond those
 run, any claim about the main binary other than the frozen ids' recorded
 counts on these workloads.
+
+## Amendments
+
+**A1 (2026-10-23, after the first batch of sessions had run and before any
+analysis of `frozen-large-prime`).** The first batch covered the frozen
+`rho.*`, `bsgs.*`, `kangaroo.vow`, `claw.pair_table` and `rho.cubic` ids on
+both binaries (Q4) but not the frozen `ic.large_prime`. Added
+`specs/frozen-large-prime.json` (same curve, parameters, seeds and arm names as
+`pairs-large-prime.json`, frozen ids only) to be run on the branch binary and on
+the main binary and compared by the Q4 rule, unchanged. No outcome, falsifier
+or earlier spec changes.
+
+**A2 (2026-10-23, after the pair check had run).** Q3 (d) said the verification
+phase of the generic v2 ids has `gae = 1.5 log2 r`. The README's wording is
+"about `1.5 log2 r`", and the recorded phase is the exact double-and-add count
+of the scalar `d` (a whole number of GAE). Outcome (d) as written is therefore
+reported as **not met** (it fails for every record), and a replacement (d')
+is reported beside it, labelled post hoc: the `verification` phase has
+`scalar_mults = 1`, `doubles = bitlength(d) - 1` and `adds = popcount(d) - 1`
+for the planted scalar `d` of the workload, and the mean over workloads of
+`gae / (1.5 log2 r)` is reported. (d') is not a preregistered test.
+
+**A3 (2026-10-23, after the audits).** `j0-frozen-main` (the frozen ids on the
+j = 0 curve, recorded by the main binary under the first floor rule) fails the
+branch binary's integrity audit by design: the main binary records
+`rho.cubic` as using 6 automorphisms on a curve it records as having 2, and the
+branch's audit checks `automorphisms_used <= automorphisms_available`. The
+session is therefore kept as a verbatim archive (`archive/`), not as a session
+directory the CI audit would pick up, and its audit receipts (the branch
+binary's failing one and the main binary's passing one) are committed.
