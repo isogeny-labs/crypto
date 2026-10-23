@@ -3,6 +3,7 @@
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 study=research/ic_algebraic_crossover_20261023
+export F4_F2_MAX_ROWS=50000000 F4_F2_MAX_COLS=1000000
 mode=${1:?selftest, structural, or guess}
 run=${2:?fresh output directory}
 test ! -e "$run"
@@ -24,6 +25,7 @@ uname -a > "$run/host.txt"
 lscpu >> "$run/host.txt"
 cat /sys/fs/cgroup/memory.max > "$run/cgroup-memory-max.txt"
 date -u +%FT%TZ > "$run/started.txt"
+jq -n '{F4_F2_MAX_ROWS:50000000,F4_F2_MAX_COLS:1000000}' > "$run/library-caps.json"
 seqno=0
 run_one() {
   local cell="$run/cell-$(printf '%04d' "$seqno")" rc
@@ -60,7 +62,7 @@ case "$mode" in
         for family in prefix geometric geomtraceu random; do
           for rep in 0 1; do
             run_one profile --n "$n" --ell "$ell" --family "$family" --rep "$rep" \
-              --seed 20261023 --targets 4 --degree 4 --max-cols 30000
+              --seed 20261023 --targets 4 --degree "${IC_DEGREE:-4}" --max-cols 30000
           done
         done
       done

@@ -218,3 +218,22 @@ parallel runs. The first UNSAT random draw in each B3 cell is the local
 preflight; complete four-draw large-host panels remain required if these
 preflights cannot finish. Dense preflight permits 600,000 columns for
 N=58,60; N=100 uses sparse closure. Retain degree-start receipts on failure.
+
+## Amendment 3: internal-cap correction and degree-two/three ablations
+
+Before any scored guessing result, the first eight k=3 calls returned
+`engine_cap` immediately. The library's default 40,000-column ceiling was
+still active beneath the frozen 140,000-column instrument limit. Preserve
+these as unmeasured cap refusals, not degree observations. For subsequent
+calls explicitly set F4_F2_MAX_ROWS=50000000 and F4_F2_MAX_COLS=1000000;
+the instrument's stricter column, address-space and timeout caps remain.
+
+The initial panel's degree-four preprocessing is more work than necessary
+on small inputs. Before any lower-degree ablation data, register the identical
+96-command structural panel at closure degrees two and three as separate
+arms. Seeds, exact targets, families, replicates and all other limits are
+unchanged. Extraction uses the now-explicit max(closure degree,input degree)
+library rule. Preserve every branch, nonsplitting root and incomplete query.
+Audit each panel against independent point enumeration. These ablations test
+whether cheaper closure can finish the same queries; all end-to-end costs
+remain unset until the full pipeline and calibration obligations are met.
