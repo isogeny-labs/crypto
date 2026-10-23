@@ -31,6 +31,7 @@ on:
       - 'scripts/update_curve_standards.py'
       - 'scripts/build_curve_registry.py'
       - 'scripts/build_cover_transfer_assessments.mjs'
+      - 'scripts/check_historical_cover_transfer_assessment.mjs'
       - 'research/cover_transfer_assessment_20261013/**'
       - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md'
       - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.pdf'
@@ -71,6 +72,7 @@ on:
       - 'scripts/update_curve_standards.py'
       - 'scripts/build_curve_registry.py'
       - 'scripts/build_cover_transfer_assessments.mjs'
+      - 'scripts/check_historical_cover_transfer_assessment.mjs'
       - 'research/cover_transfer_assessment_20261013/**'
       - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md'
       - 'research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.pdf'
@@ -118,6 +120,8 @@ jobs:
             --repo-root .
       - run: cargo run --bin curve_standards -- --check
       - run: python3 scripts/update_curve_standards.py --check
+      - name: Replay source-bound registry order certificates
+        run: python3 -O docs/curves/registry-rebuild-20261023/check_registry_transfer.py
       - run: cargo run --bin curve_cover_check -- --check
       - run: python3 scripts/test_cover_catalog.py
       - name: Check sparse-safe lab-browser generation
@@ -141,12 +145,10 @@ jobs:
           python-version: '3.11'
       - name: Install the pinned Draft 2020-12 validator
         run: python -m pip install jsonschema==4.23.0
-      - name: Check deterministic catalog-wide assessment generation
-        run: node scripts/build_cover_transfer_assessments.mjs --check
+      - name: Replay the historical assessment on its exact catalog snapshot
+        run: node scripts/check_historical_cover_transfer_assessment.mjs
       - name: Validate the assessment schema
         run: python -m jsonschema -i docs/curves/cover-transfer-assessments.json docs/curves/cover-transfer-assessment.schema.json
-      - name: Verify typed map, subgroup, and evidence bindings
-        run: node research/cover_transfer_assessment_20261013/verify_assessment.mjs
 
   transfer-lemma:
     name: Cover transfer Lean lemma

@@ -489,7 +489,7 @@ def harvest_curve_records(reg: Registry) -> None:
     """EC1 records the threads keep (curve_records.json, written by
     examples/koblitz_curve_records.rs): each is one exact representation,
     taken verbatim so its UID is the thread's."""
-    for path in tracked("*curve_records.json"):
+    for path in tracked("*curve_records.json", "*curve_ids.json"):
         rel = str(path.relative_to(REPO))
         try:
             doc = json.loads(path.read_text())
@@ -513,6 +513,40 @@ def harvest_curve_records(reg: Registry) -> None:
             reg.represent(ident, f, {k: v for k, v in c.items() if k != "curve_id"}, rel)
 
 
+def harvest_conductor_prime_ids(reg: Registry, fatal: list[str]) -> None:
+    """Exact prime subgroup records in the conductor-gap prepared ID lists.
+
+    These lists use `r` for subgroup order; the general JSON harvester requires
+    `subgroup_order`, so it recognizes the models but loses their EC1 records.
+    """
+    for path in tracked("research/conductor_gap_cm_orbits_20261015/prepared/*curve_ids.json"):
+        rel = str(path.relative_to(REPO))
+        try:
+            doc = json.loads(path.read_text())
+        except (OSError, ValueError) as err:
+            fatal.append(f"{rel}: cannot read curve IDs ({err})")
+            continue
+        if not isinstance(doc, list):
+            continue
+        for index, row in enumerate(doc):
+            if not isinstance(row, dict):
+                fatal.append(f"{rel}/{index}: expected a prime-curve record")
+                continue
+            p, a, b, order, r = (_int(row.get(k)) for k in ("p", "a", "b", "order", "r"))
+            g = generator_of(row)
+            if (p is None or a is None or b is None or order is None or
+                    r is None or r <= 0 or order % r or g is None):
+                fatal.append(f"{rel}/{index}: incomplete prime-curve subgroup record")
+                continue
+            try:
+                ident = cid.prime_id(p, a, b, order)
+            except ValueError as err:
+                fatal.append(f"{rel}/{index}: invalid prime-curve identity ({err})")
+                continue
+            reg.add(ident, "prime", {"p": str(p), "a": str(a % p), "b": str(b % p)}, rel)
+            reg.represent(ident, *prime_record(p, a, b, order, r, order // r, g), rel)
+
+
 def harvest_bench(reg: Registry) -> None:
     src = (REPO / "src/cryptanalysis/research_bench.rs").read_text()
     pat = re.compile(r'name: "(bench-\d+bit)",\s*p: BigUint::from\((\d+)u32\),\s*'
@@ -527,6 +561,9 @@ def harvest_bench(reg: Registry) -> None:
 def harvest_text_koblitz(reg: Registry) -> None:
     seen = set()
     for path in tracked("*.md", "*.html", "*.rs", "*.py", "*.json", "*.yml", "*.toml", "*.txt"):
+        if path in {OUT, REPO / "src/cryptanalysis/curve_aliases.json"}:
+            # Generated indexes cannot be their own source of curve names.
+            continue
         try:
             if path.stat().st_size > MAX_JSON_BYTES:
                 continue
@@ -719,6 +756,7 @@ def build() -> tuple[dict, list[str], list[str]]:
     harvest_standards(reg)
     harvest_bench(reg)
     harvest_json(reg, problems, fatal)
+    harvest_conductor_prime_ids(reg, fatal)
     harvest_curve_records(reg)
     harvest_text_koblitz(reg)
     harvest_native_standards(reg)

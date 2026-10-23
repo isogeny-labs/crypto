@@ -68,22 +68,44 @@ the logs. They are not an unbounded theorem about elliptic curves.
 
 Lean 4.19.0, commit `6caaee842e94`, with no package dependencies beyond its
 standard library. `lake-manifest.json` records an empty dependency list.
-The final proof suite contains ten theorem declarations. Axiom inspection
+The historical proof suite contains ten theorem declarations. Axiom inspection
 reports only standard Lean `propext` and `Quot.sound` where used; no reported
 theorem depends on `sorryAx`, admitted proofs, or a custom research axiom.
 The initial unsuccessful induction proof and its failed build log are retained
 separately; they are superseded by the successful proof, not reported as checked.
 An independent `lean4checker --fresh` executable is not installed here.
 
-TLC comes from the v1.8.0 release URL with SHA-256
+The historical TLC run used the v1.8.0 release URL with SHA-256
 `15d103b7e5617780bcc904c0af12f1ad242e2b345c0301136c5be4588f17edac`.
-Its reported build is 2026.10.15.145915, revision `932d35e`. CI verifies that
-exact artifact hash, reruns positive configurations, and requires both negative
+Its reported build is 2026.10.15.145915, revision `932d35e`. That run verified
+the exact artifact hash, reran positive configurations, and required both negative
 controls to fail with the expected invariant and exit status.
 
 The proofs concern group search, set refinement, and interval uniqueness. No
 new polynomial identity is asserted, so the polynomial-evaluation
 `identity.certificate/v1` format is not substituted for these Lean proofs.
+
+### Current gate and curve-registry application, 2026-10-23
+
+The upstream `v1.8.0` URL is a rolling prerelease: the current asset has
+different bytes from the historical pinned build. The formal gate now uses
+the stable [v1.7.1 release](https://github.com/tlaplus/tlaplus/releases/tag/v1.7.1)
+jar, checking its published SHA-1
+`9416f74257aa50f250776db34964db7ec99e9883` and SHA-256
+`d532ba31aafe17afba1130f92410d9257454ff7393d1eb2fe032f0c07f352da5`.
+All three positive and two expected-failure TLA configurations passed locally
+with Java 21; the original v1.8 evidence and hashes remain frozen.
+
+Lean 4.19 also rebuilt
+[`RegistryOrderUniqueness.point_order_forces_group_order`](lean/RegistryOrderUniqueness.lean).
+It derives uniqueness from explicit Hasse interval and divisibility premises
+when the witnessed divisor exceeds the interval width. The theorem's axiom
+audit reports only `propext` and `Quot.sound`. The
+[full-tree registry rebuild](../../docs/curves/registry-rebuild-20261023/README.md) uses this
+lemma for 13,216 computational point-order certificates and counts three
+small fields exhaustively. The Lean theorem does not verify the Python
+point arithmetic, source JSON extraction, Hasse's theorem, or Lagrange's
+theorem; those remain explicit trust boundaries.
 
 ## Open implementation obligations
 

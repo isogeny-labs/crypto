@@ -24,6 +24,9 @@ cargo build --release --bin curve_traits
 
 Every query reads the committed `traits.json`; nothing is recomputed.
 `--json` gives machine-readable output.
+The generated JSON keeps one compact curve record per line so the expanded
+catalog fits GitHub's single-file limit while retaining per-curve text diffs.
+`curve_traits check` still compares the committed bytes with a fresh build.
 
 ## What each record holds
 
