@@ -15,10 +15,13 @@ of the existing `taskq/deploy/aws` Redis/managed-worker stack.
 - Two On-Demand `t3.medium` system nodes for DNS, CSI and Karpenter.
 - Karpenter 1.15.0, two replicas on system nodes, scoped controller IAM,
   node access entry, SQS interruption queue and EventBridge interruption rules.
-- `cpu-spot` NodePool: x86-64 Linux, Spot only, C/M/R generation 6+, instances
-  with 8/16/32 vCPUs, excluding Flex families, aggregate limits of 64 vCPUs
-  and 256 GiB RAM. CPU 0's whole physical core is reserved for housekeeping.
-  No GPU or automatic On-Demand fallback is enabled.
+- `cpu-spot` for ordinary commands and `cpu-l2-spot` for native benchmarks:
+  x86-64 Linux, Spot only, C/M/R generation 6+, 8/16/32-vCPU instance types,
+  excluding Flex families. Each pool has a 32-vCPU / 128-GiB limit, preserving
+  the combined 64-vCPU / 256-GiB envelope. A single node must fit its pool
+  (for example, a 256-GiB memory-optimized type cannot fit either pool).
+  CPU 0's whole physical core is reserved for housekeeping. No GPU or automatic
+  On-Demand fallback is enabled. Unused capacity is not borrowed across pools.
 - VPC CNI with network-policy support, CoreDNS, kube-proxy, metrics-server,
   EBS CSI, an encrypted `gp3` StorageClass and seven-day control-plane logs.
 - Versioned, encrypted S3 results bucket and immutable ECR repository
@@ -269,7 +272,7 @@ The optional `build` object binds the image, source revision and executable
 SHA-256; both the pod and the launcher verify that identity. Callers that omit
 `build` retain the deployed default image.
 
-The tool requests four exclusive vCPUs, selects bootstrap profile `v5`, and runs
+The tool requests four exclusive vCPUs, selects `cpu-l2-spot` with bootstrap profile `v6`, and runs
 `run-ecbench` with `--cpus auto`. One whole physical core measures the child;
 the remaining allocated CPUs accommodate the parent shell and harness. `--cpus inherit` would
 reserve the entire pod allocation and leave those processes nowhere to go.
@@ -290,15 +293,25 @@ service fails. The AL2023 reserved-cgroup defaults
 are cleared because they conflict with `reservedSystemCPUs`; pod resource
 accounting and reservations remain enforced. DaemonSets share the remaining
 unallocated CPUs. No measurement thresholds or native grader rules change.
-Scheduler-domain load balancing remains enabled so ordinary multithreaded
-jobs can use their allocated CPUs. Each measured ecbench child is separately
-pinned by the native harness. Live validation and retained private failure
+The benchmark pool also isolates scheduler domains, confines the watchdog and
+RCU kernel threads to housekeeping, and disables per-cgroup PSI work. System-wide
+`/proc/pressure/cpu` and `/proc/pressure/memory` remain enabled and mandatory in the
+native preflight. Per-container PSI metrics are therefore unavailable on these
+workers. Each measured ecbench child is explicitly pinned by the native harness.
+The separate ordinary `cpu-spot` pool retains its v4 bootstrap and scheduler load
+balancing so general multithreaded commands can use their allocation. Ordinary
+jobs neither select nor tolerate the benchmark pool. Live validation and retained private failure
 artifacts include 108/108 L2 records on the earlier v4 profile, complete S3 replay, and
 4,405 passing library tests on a separate multithreaded job.
 The longer periodic-recovery qualification later rejected three v4 observations;
 that failed result remains retained. The [CPU-accounting diagnostic](diagnostics/cpu-accounting/README.md)
-documents the probe used to investigate the v5 change. Node labels never replace
-per-execution L2, replay, A/A and S3 verification.
+documents the v5 accounting investigation. The complete periodic-tick-only
+qualification E then failed 48 preemption checks and remains retained. The
+[dedicated-worker qualification](diagnostics/validation/20261023-l2-domain/REPORT.md)
+passed all 3,606 L2 records, 3,600 native replays, 1,200 A/A pairs and 19 S3 payload
+hashes after scheduler tracing identified the remaining kernel work. No native
+threshold changed. Node labels never replace per-execution L2, replay, A/A and
+S3 verification; the post-merge GitHub Action is a separate integration proof.
 
 After a 60-second startup settle, the native quiet preflight must pass. Every
 record, including warmups, must earn L2 or L3, and all measured executions must
@@ -354,7 +367,7 @@ kubectl -n isolab get events --sort-by=.lastTimestamp
 ```
 
 For deliberate teardown, first stop new submissions and preserve outputs. Delete
-the lab Jobs, then delete `nodepool/cpu-spot` and wait for **all** NodeClaims and
+the lab Jobs, then delete `nodepool/cpu-spot` and `nodepool/cpu-l2-spot` and wait for **all** NodeClaims and
 their EC2 instances to terminate while Karpenter still runs. Only then uninstall
 Karpenter, delete the cluster with eksctl, and delete `Karpenter-isolab`.
 Do not remove the controller first: its finalizers clean up launched instances.

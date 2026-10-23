@@ -4,7 +4,7 @@ This installs the GitHub-supported Actions Runner Controller (ARC) chart version
 `0.15.0` for `aburan28/crypto`. ARC listens for Actions jobs, starts one ephemeral
 runner pod per job, and Karpenter supplies a Spot EC2 node when a pod cannot
 fit. Empty runner nodes are consolidated after five minutes. The runner NodePools are
-separate from the `cpu-spot` Iso Lab measurement pool.
+separate from the `cpu-spot` and `cpu-l2-spot` Iso Lab pools.
 
 | Scale set / `runs-on` | Pod request | Pod memory limit | Maximum runners |
 | --- | --- | --- | --- |
@@ -169,7 +169,7 @@ The Iso Lab workflow uses these queues for manual runs and same-repository PRs;
 fork PRs retain the hosted runner. Delete the variables to restore hosted
 routing. Existing queued jobs retain their original routing. The builder has
 no AWS OIDC permission; only the main-branch publishing job obtains AWS
-credentials. Benchmark pods still use the dedicated `cpu-spot` nodes and
+credentials. Benchmark pods use the dedicated `cpu-l2-spot` nodes and
 the same L2, replay, A/A and S3 verification gates.
 
 A regional Spot quota can block both general CI and benchmark nodes even when

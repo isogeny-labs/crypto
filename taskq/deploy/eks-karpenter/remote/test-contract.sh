@@ -64,3 +64,55 @@ for change in "${cases[@]}"; do
   fi
 done
 printf 'Commit-build request and %s rejection cases passed\n' "${#cases[@]}"
+
+# Ordinary commands must never land on the scheduler-isolated benchmark pool.
+"$here/../submit-job" --image "$image" --dry-run -- true > "$tmp/standard.json"
+jq -e '.spec.template.spec | .nodeSelector["isolab.dev/pool"]=="cpu-spot"
+  and (.nodeSelector["isolab.dev/cpu-isolation"]==null)
+  and all(.tolerations[]; .key!="isolab.dev/measurement")' "$tmp/standard.json" >/dev/null
+"$here/../submit-job" --image "$image" --cpu 4 --isolation-profile l2 \
+  --instance-type c8a.2xlarge --dry-run -- true > "$tmp/l2.json"
+jq -e '.spec.backoffLimit==0 and (.spec.template.spec |
+  .nodeSelector["isolab.dev/pool"]=="cpu-l2-spot"
+  and .nodeSelector["isolab.dev/cpu-isolation"]=="v6"
+  and .nodeSelector["node.kubernetes.io/instance-type"]=="c8a.2xlarge"
+  and any(.tolerations[]; .key=="isolab.dev/measurement" and .value=="l2")
+  and .containers[0].resources.requests==.containers[0].resources.limits)' "$tmp/l2.json" >/dev/null
+
+# Readiness must check the new pool/class and reject stale Ready conditions.
+mkdir "$tmp/bin"
+cat > "$tmp/bin/aws" <<'STUB'
+#!/usr/bin/env bash
+case "$*" in
+  'eks describe-cluster '*) echo ACTIVE ;;
+  's3api list-objects-v2 '*) echo '{}' ;;
+  *) exit 90 ;;
+esac
+STUB
+cat > "$tmp/bin/kubectl" <<'STUB'
+#!/usr/bin/env bash
+case "$*" in
+  *' auth can-i '*) echo yes ;;
+  *' get deployment karpenter '*) echo '{"status":{"readyReplicas":1}}' ;;
+  *' get nodepool/'*|*' get ec2nodeclass/'*)
+    ready=True; generation=2
+    if [[ -n ${UNREADY_RESOURCE:-} && "$*" == *" get $UNREADY_RESOURCE "* ]]; then ready=False; fi
+    if [[ -n ${STALE_RESOURCE:-} && "$*" == *" get $STALE_RESOURCE "* ]]; then generation=1; fi
+    printf '{"metadata":{"generation":2},"status":{"conditions":[{"type":"Ready","status":"%s","observedGeneration":%s}]}}\n' "$ready" "$generation"
+    ;;
+  *) exit 91 ;;
+esac
+STUB
+chmod +x "$tmp/bin/"*
+ready() {
+  PATH="$tmp/bin:$PATH" KUBECONFIG=unused ISOLAB_KUBE_CONTEXT=unused \
+    ISOLAB_CLUSTER=isolab ISOLAB_BUCKET=unused AWS_REGION=us-east-2 "$here/check-ready"
+}
+ready | jq -e '.ready and (.capacity_guaranteed==false)' >/dev/null
+if UNREADY_RESOURCE=nodepool/cpu-l2-spot ready >/dev/null 2>&1; then
+  echo 'Readiness accepted an unready benchmark pool' >&2; exit 1
+fi
+if STALE_RESOURCE=ec2nodeclass/cpu-l2 ready >/dev/null 2>&1; then
+  echo 'Readiness accepted a stale benchmark class' >&2; exit 1
+fi
+printf 'Pool routing, resource guarantees and readiness rejection cases passed\n'

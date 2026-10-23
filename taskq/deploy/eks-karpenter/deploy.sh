@@ -48,7 +48,7 @@ eksctl create iamserviceaccount --cluster isolab --region us-east-2 \
 helm upgrade --install karpenter oci://public.ecr.aws/karpenter/karpenter \
   --version 1.15.0 --namespace kube-system --values karpenter-values.yaml --wait --timeout 10m
 kubectl apply -f nodepool.yaml
-kubectl wait --for=condition=Ready ec2nodeclass/cpu --timeout=180s
-kubectl wait --for=condition=Ready nodepool/cpu-spot --timeout=180s
+kubectl wait --for=condition=Ready ec2nodeclass/cpu ec2nodeclass/cpu-l2 --timeout=180s
+kubectl wait --for=condition=Ready nodepool/cpu-spot nodepool/cpu-l2-spot --timeout=180s
 kubectl -n kube-system rollout status deployment/karpenter --timeout=180s
 kubectl get nodes,nodepools

@@ -140,3 +140,21 @@ is privileged and is not a sandbox for untrusted code. Private CRIU archives may
 contain process memory; never copy them into Git or GitHub artifacts. Two recent
 generations are eligible for automatic restore; older EBS snapshots and S3
 versions are retained until explicitly cleaned up by the operator.
+
+The longer periodic B test later recovered 3,606 computations / 3,600 replays
+but failed its fresh epoch with three L1 records. That failure remains retained.
+The subsequent dedicated-worker bootstrap J passed a separate, unchanged fresh
+workload: 3,606 L2 records, 3,600 replays, 1,200 A/A pairs and all 19 S3 hashes.
+See the [bootstrap report](../../../../taskq/deploy/eks-karpenter/diagnostics/validation/20261023-l2-domain/REPORT.md).
+J did not perform another CRIU restore. The recovery controller now routes its
+fresh epoch through the same `cpu-l2-spot` submission helper; computation restore
+continues on ordinary `cpu-spot` workers. Keep these evidence scopes distinct.
+
+The longer periodic B test later recovered 3,606 computations / 3,600 replays
+but failed its fresh epoch with three L1 records. That failure remains retained.
+The subsequent dedicated-worker bootstrap J passed a separate, unchanged fresh
+workload: 3,606 L2 records, 3,600 replays, 1,200 A/A pairs and all 19 S3 hashes.
+See the [bootstrap report](../../../../taskq/deploy/eks-karpenter/diagnostics/validation/20261023-l2-domain/REPORT.md).
+J did not perform another CRIU restore. The recovery controller now routes its
+fresh epoch through the same `cpu-l2-spot` submission helper; computation restore
+continues on ordinary `cpu-spot` workers. Keep these evidence scopes distinct.

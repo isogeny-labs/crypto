@@ -53,9 +53,11 @@ workflow SHA, binary SHA-256 and OCI digest distinct.
    job name. Capture the request hash, GitHub/CodeBuild run ID, Job UID and Pod
    UID. A timeout after submission is ambiguous: look up the original request,
    not a newly named duplicate. A GitHub rerun is a new experiment, not resume.
-3. Verify live capacity. The deployed x86 CPU pool spans compute, general-purpose
-   and memory families; instance availability and CPU compatibility still
-   matter. The worker cap is 64 vCPUs and the account's Standard Spot quota is
+3. Verify live capacity. Ordinary jobs use `cpu-spot`; native L2 jobs select
+   `cpu-l2-spot` and its benchmark taint automatically. Both span x86 compute,
+   general-purpose and memory families. Each pool is capped at 32 vCPUs and
+   128 GiB; nodes must fit their individual pool, with no cross-pool borrowing.
+   The combined worker cap is 64 vCPUs and the account's Standard Spot quota is
    currently 96 in `us-east-2`; other consumers share it. Do not request a quota
    increase or raise pool caps implicitly. Count default instance vCPUs even
    when SMT is disabled. `m8a.2xlarge` and the contract default `c8a.2xlarge`
@@ -70,7 +72,10 @@ workflow SHA, binary SHA-256 and OCI digest distinct.
 
 The ecbench path requires L2, at least five measured rounds, a warmup, a reference
 and matching A/A control. It uses four CPUs, Guaranteed requests/limits,
-whole-core NUMA placement and zero automatic measurement retries. Keep these
+whole-core NUMA placement and zero automatic measurement retries. Profile v6
+uses scheduler-domain isolation on benchmark workers; ordinary multithreaded
+workers retain load balancing. Benchmark workers retain mandatory host PSI but
+disable per-cgroup pressure accounting, so per-container PSI is unavailable. Keep these
 checks intact; do not lower isolation thresholds or selectively discard failed
 records to make a run pass.
 

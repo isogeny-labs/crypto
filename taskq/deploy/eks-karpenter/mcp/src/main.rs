@@ -443,7 +443,7 @@ fn call(name: &str, args: &Value) -> Result<Value> {
                 .map(summary)
                 .collect();
             Ok(
-                json!({"namespace":"isolab","node_pool":"cpu-spot","configured_vcpu_limit":64,"jobs":jobs,"guidance":GUIDANCE}),
+                json!({"namespace":"isolab","node_pool":"cpu-spot","benchmark_node_pool":"cpu-l2-spot","configured_vcpu_limit":64,"pool_limits":{"cpu-spot":{"cpu":32,"memory":"128Gi"},"cpu-l2-spot":{"cpu":32,"memory":"128Gi"}},"jobs":jobs,"guidance":GUIDANCE}),
             )
         }
         "isolab_k8s_run" | "isolab_k8s_benchmark" => {

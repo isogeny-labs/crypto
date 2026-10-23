@@ -59,10 +59,12 @@ jq -n --arg name "$name" --arg image "$image" --arg cpu "$cpu" --arg profile "$i
     template:{metadata:{labels:{"isolab.dev/job":"true"},annotations:{"karpenter.sh/do-not-disrupt":"true"}},
       spec:{restartPolicy:"Never",serviceAccountName:"runner",automountServiceAccountToken:false,
         terminationGracePeriodSeconds:60,
-        nodeSelector:({"isolab.dev/pool":"cpu-spot"}
-          + (if $profile == "l2" then {"isolab.dev/cpu-isolation":"v5"} else {} end)
+        nodeSelector:((if $profile == "l2" then
+            {"isolab.dev/pool":"cpu-l2-spot","isolab.dev/cpu-isolation":"v6"}
+          else {"isolab.dev/pool":"cpu-spot"} end)
           + (if $instance_type != "" then {"node.kubernetes.io/instance-type":$instance_type} else {} end)),
-        tolerations:[{key:"isolab.dev/workload",value:"cpu",operator:"Equal",effect:"NoSchedule"}],
+        tolerations:([{key:"isolab.dev/workload",value:"cpu",operator:"Equal",effect:"NoSchedule"}]
+          + (if $profile == "l2" then [{key:"isolab.dev/measurement",value:"l2",operator:"Equal",effect:"NoSchedule"}] else [] end)),
         affinity:{podAntiAffinity:{requiredDuringSchedulingIgnoredDuringExecution:[{
           labelSelector:{matchLabels:{"isolab.dev/job":"true"}},topologyKey:"kubernetes.io/hostname"}]}},
         securityContext:{runAsNonRoot:true,runAsUser:1000,runAsGroup:1000,fsGroup:1000,seccompProfile:{type:"RuntimeDefault"}},

@@ -206,7 +206,7 @@ can lose artifacts that were not uploaded yet.
 
 CodeBuild allows two concurrent launchers, with a ten-minute queue timeout and
 70-minute build timeout. The EKS Spot pool retains its separate aggregate
-64-vCPU limit. Native Job objects expire after a day; empty workers and their pod
+combined 64-vCPU limit (32 per ordinary/benchmark pool). Native Job objects expire after a day; empty workers and their pod
 logs can disappear after two minutes. S3 is the durable experiment record.
 
 ## Deploy and update the portable launcher

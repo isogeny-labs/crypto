@@ -214,6 +214,14 @@ and failed measurements are retained and cannot replace a good measurement.
 Deploy `namespace.yaml`, `rbac.yaml`, and `bridge.yaml` with `deploy-controller`
 from an authorized administrator identity. It packages native binaries and binds
 the CodeBuild source to an S3 version. The role has no EC2 termination permission.
-The project admits one controller at a time; the pool cap stays 64 vCPUs and the
+The project admits one controller at a time; the combined pool cap stays 64 vCPUs and the
 account quota 96. The controller can restore only after a complete generation;
 loss before the first committed checkpoint fails visibly instead of starting over.
+
+Fresh benchmark epochs select the dedicated `cpu-l2-spot` v6 pool. The ordinary
+`cpu-spot` pool continues computation and restore with normal scheduler balancing.
+Each pool is limited to 32 vCPUs / 128 GiB (combined 64 vCPUs / 256 GiB).
+The [bootstrap qualification](../diagnostics/validation/20261023-l2-domain/REPORT.md)
+passed 3,606 L2 observations, 3,600 replays, 1,200 A/A pairs and all 19 S3 hashes.
+It does not replace or regrade periodic B's failed fresh epoch, and did not repeat
+CRIU restoration. Runtime image/controller pins remain unchanged.

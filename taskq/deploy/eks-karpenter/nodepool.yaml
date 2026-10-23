@@ -1,3 +1,5 @@
+# Ordinary and L2 pools share a fixed aggregate cap: 64 vCPUs / 256Gi.
+# Each gets 32 vCPUs / 128Gi; no cross-pool borrowing or implicit cap increase.
 apiVersion: karpenter.k8s.aws/v1
 kind: EC2NodeClass
 metadata:
@@ -87,11 +89,210 @@ spec:
       > /etc/systemd/system/irqbalance.service.d/50-isolab.conf
     # Keep scheduler load balancing within each pod's exclusive cpuset;
     # isolcpus=domain would serialize unpinned multithreaded jobs.
+    kernel_args="isolcpus=managed_irq,$worker_list nohz_full=$worker_list rcu_nocbs=$worker_list irqaffinity=$housekeeping"
+    printf 'housekeeping=%q\nhouse_hex=%q\nkernel_args=%q\n' "$housekeeping" "$house_hex" "$kernel_args" \
+      > /etc/isolab/cpus.env
+    cat > /usr/local/sbin/isolab-cpu-isolation <<'SCRIPT'
+    #!/bin/bash
+    set -euo pipefail
+    source /etc/isolab/cpus.env
+    : "${kernel_args:?}" "${housekeeping:?}" "${house_hex:?}"
+    # Fail before admitting pods if the kernel was not booted as configured.
+    cmdline=" $(cat /proc/cmdline) "
+    for arg in $kernel_args; do
+      [[ "$cmdline" == *" $arg "* ]] || exit 1
+    done
+    # kubepods.slice is a sibling, not a descendant. Cgroup restrictions do
+    # not leak an inherited task affinity into workload processes.
+    systemctl set-property system.slice AllowedCPUs="$housekeeping"
+    # AL2023 puts kubelet and containerd in runtime.slice, outside system.slice.
+    systemctl set-property runtime.slice AllowedCPUs="$housekeeping"
+    systemctl set-property user.slice AllowedCPUs="$housekeeping"
+    systemctl set-property init.scope AllowedCPUs="$housekeeping"
+    printf '%s\n' "$house_hex" > /proc/irq/default_smp_affinity
+    for irq in /proc/irq/*/smp_affinity_list; do
+      # Managed/per-CPU IRQs can refuse affinity changes. Record them;
+      # ecbench must still pass its per-execution noise audit.
+      if ! printf '%s\n' "$housekeeping" > "$irq" 2>/dev/null; then
+        printf 'Immutable IRQ affinity: %s\n' "$irq"
+      fi
+    done
+    printf '%s\n' "$house_hex" > /sys/devices/virtual/workqueue/cpumask
+    printf '%s\n' "$housekeeping" > /etc/isolab/housekeeping-cpus
+    touch /run/isolab-cpu-isolation-ready
+    SCRIPT
+    chmod 755 /usr/local/sbin/isolab-cpu-isolation
+    cat > /etc/systemd/system/isolab-cpu-isolation.service <<'UNIT'
+    [Unit]
+    Description=Iso Lab kernel and CPU housekeeping isolation
+    Before=kubelet.service
+    After=irqbalance.service
+    Wants=irqbalance.service
+    [Service]
+    Type=oneshot
+    ExecStart=/usr/local/sbin/isolab-cpu-isolation
+    RemainAfterExit=yes
+    UNIT
+    systemctl daemon-reload
+    # A newly launched worker reboots once before kubelet can admit a pod.
+    # Persistent service reapplies IRQ/workqueue placement on every reboot.
+    grubby --update-kernel=ALL --args="$kernel_args"
+    systemctl --no-block reboot
+  tags:
+    project: isolab
+    managed-by: karpenter
+---
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: cpu-spot
+spec:
+  template:
+    metadata:
+      labels:
+        isolab.dev/role: worker
+        isolab.dev/pool: cpu-spot
+        isolab.dev/cpu-isolation: v4
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: cpu
+      taints:
+        - key: isolab.dev/workload
+          value: cpu
+          effect: NoSchedule
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: [amd64]
+        - key: kubernetes.io/os
+          operator: In
+          values: [linux]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: [spot]
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: [c, m, r]
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: ["5"]
+        - key: karpenter.k8s.aws/instance-cpu
+          operator: In
+          values: ["8", "16", "32"]
+        - key: karpenter.k8s.aws/instance-family
+          operator: NotIn
+          values: [c7i-flex, m7i-flex, c8i-flex, m8i-flex]
+      expireAfter: Never
+      terminationGracePeriod: 1h
+  limits:
+    cpu: "32"
+    memory: 128Gi
+  disruption:
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 2m
+    budgets:
+      - nodes: "0"
+        reasons: [Drifted]
+      - nodes: "100%"
+        reasons: [Empty]
+---
+# Dedicated L2 workers: explicit harness affinity, periodic ticks and kernel housekeeping.
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: cpu-l2
+spec:
+  amiFamily: AL2023
+  amiSelectorTerms:
+  - id: ami-082b570a48503ea93
+  role: KarpenterNodeRole-isolab
+  subnetSelectorTerms:
+  - tags:
+      karpenter.sh/discovery: isolab
+  securityGroupSelectorTerms:
+  - tags:
+      karpenter.sh/discovery: isolab
+  metadataOptions:
+    httpEndpoint: enabled
+    httpProtocolIPv6: disabled
+    httpPutResponseHopLimit: 1
+    httpTokens: required
+  blockDeviceMappings:
+  - deviceName: /dev/xvda
+    ebs:
+      volumeSize: 80Gi
+      volumeType: gp3
+      encrypted: true
+      deleteOnTermination: true
+  kubelet:
+    kubeReserved:
+      cpu: '1'
+      memory: 512Mi
+      ephemeral-storage: 1Gi
+    systemReserved:
+      cpu: '1'
+      memory: 512Mi
+      ephemeral-storage: 1Gi
+  userData: |
+    #!/bin/bash
+    # Karpenter wraps this in AL2023 multipart user data. nodeadm-run reads
+    # the dynamic drop-in after cloud-init; never invoke nodeadm init here.
+    set -euo pipefail
+    mkdir -p /etc/isolab /etc/eks/nodeadm.d /etc/systemd/system/kubelet.service.d
+    cat > /etc/systemd/system/kubelet.service.d/50-isolab.conf <<'UNIT'
+    [Unit]
+    Requires=isolab-cpu-isolation.service
+    After=isolab-cpu-isolation.service
+    [Service]
+    ExecStartPre=/usr/bin/test -f /run/isolab-cpu-isolation-ready
+    UNIT
+    # Reserve CPU 0's entire physical core, discovered rather than assuming
+    # that adjacent logical CPU numbers are SMT siblings.
+    housekeeping=$(cat /sys/devices/system/cpu/cpu0/topology/thread_siblings_list)
+    [[ "$housekeeping" =~ ^[0-9,-]+$ ]]
+    cat > /etc/eks/nodeadm.d/50-isolab.yaml <<EOF
+    apiVersion: node.eks.aws/v1alpha1
+    kind: NodeConfig
+    spec:
+      kubelet:
+        config:
+          reservedSystemCPUs: "$housekeeping"
+          # AL2023 sets a kubeReservedCgroup by default; Kubernetes forbids
+          # combining either reserved cgroup path with reservedSystemCPUs.
+          kubeReservedCgroup: ""
+          systemReservedCgroup: ""
+          enforceNodeAllocatable: [pods]
+          cpuManagerPolicy: static
+          cpuManagerPolicyOptions:
+            full-pcpus-only: "true"
+            strict-cpu-reservation: "true"
+          topologyManagerPolicy: single-numa-node
+    EOF
+    house_mask=0
+    worker_list=''
+    for path in /sys/devices/system/cpu/cpu[0-9]*; do
+      cpu=${path##*cpu}
+      siblings=$(cat "$path/topology/thread_siblings_list")
+      if [[ "$siblings" == "$housekeeping" ]]; then
+        house_mask=$((house_mask | (1 << cpu)))
+      else
+        worker_list+="${worker_list:+,}$cpu"
+      fi
+    done
+    # Pool members have at most 32 vCPUs; one hexadecimal mask suffices.
+    printf -v house_hex '%x' "$house_mask"
+    mkdir -p /etc/systemd/system/irqbalance.service.d
+    printf '[Service]\nEnvironment="IRQBALANCE_BANNED_CPULIST=%s"\n' "$worker_list" \
+      > /etc/systemd/system/irqbalance.service.d/50-isolab.conf
+    # Dedicated benchmark workers use explicit native per-child affinity.
+    # General multithreaded jobs continue to use the separate ordinary pool.
     # Keep the periodic tick on running CPUs. On this AL2023 kernel, the
     # full-dynticks probe reported 50ms of busy time in a 25ms wall window;
     # removing nohz_full eliminated that anomaly without changing L2 gates.
     # IRQ, RCU and workqueue housekeeping remain isolated as before.
-    kernel_args="isolcpus=managed_irq,$worker_list rcu_nocbs=$worker_list irqaffinity=$housekeeping"
+    kernel_args="isolcpus=domain,managed_irq,$worker_list rcu_nocbs=$worker_list irqaffinity=$housekeeping cgroup_disable=pressure"
     printf 'housekeeping=%q\nhouse_hex=%q\nkernel_args=%q\n' "$housekeeping" "$house_hex" "$kernel_args" \
       > /etc/isolab/cpus.env
     cat > /usr/local/sbin/isolab-cpu-isolation <<'SCRIPT'
@@ -128,6 +329,24 @@ spec:
     done
     printf '%s\n' "$house_hex" > /sys/devices/virtual/workqueue/cpumask
     printf '%s\n' "$housekeeping" > /etc/isolab/housekeeping-cpus
+    # Full dynticks normally excludes worker CPUs from soft-lockup watchdogs.
+    # With periodic ticks, explicitly keep that monitoring on housekeeping.
+    printf '%s\n' "$housekeeping" > /proc/sys/kernel/watchdog_cpumask
+    # rcu_nocbs offloads callbacks but does not bind their kernel threads.
+    for comm_path in /proc/[0-9]*/comm; do
+      read -r thread_name < "$comm_path" || continue
+      case "$thread_name" in
+        rcu*)
+          thread_pid=${comm_path%/comm}; thread_pid=${thread_pid##*/}
+          taskset -pc "$housekeeping" "$thread_pid"
+          ;;
+      esac
+    done
+    # The native preflight still requires actual host CPU and memory pressure.
+    for resource in cpu memory; do
+      test -r "/proc/pressure/$resource"
+      grep -q '^some ' "/proc/pressure/$resource"
+    done
     touch /run/isolab-cpu-isolation-ready
     SCRIPT
     chmod 755 /usr/local/sbin/isolab-cpu-isolation
@@ -154,55 +373,74 @@ spec:
 apiVersion: karpenter.sh/v1
 kind: NodePool
 metadata:
-  name: cpu-spot
+  name: cpu-l2-spot
 spec:
   template:
     metadata:
       labels:
         isolab.dev/role: worker
-        isolab.dev/pool: cpu-spot
-        isolab.dev/cpu-isolation: v5
+        isolab.dev/pool: cpu-l2-spot
+        isolab.dev/cpu-isolation: v6
     spec:
       nodeClassRef:
         group: karpenter.k8s.aws
         kind: EC2NodeClass
-        name: cpu
+        name: cpu-l2
       taints:
-        - key: isolab.dev/workload
-          value: cpu
-          effect: NoSchedule
+      - key: isolab.dev/workload
+        value: cpu
+        effect: NoSchedule
+      - key: isolab.dev/measurement
+        value: l2
+        effect: NoSchedule
       requirements:
-        - key: kubernetes.io/arch
-          operator: In
-          values: [amd64]
-        - key: kubernetes.io/os
-          operator: In
-          values: [linux]
-        - key: karpenter.sh/capacity-type
-          operator: In
-          values: [spot]
-        - key: karpenter.k8s.aws/instance-category
-          operator: In
-          values: [c, m, r]
-        - key: karpenter.k8s.aws/instance-generation
-          operator: Gt
-          values: ["5"]
-        - key: karpenter.k8s.aws/instance-cpu
-          operator: In
-          values: ["8", "16", "32"]
-        - key: karpenter.k8s.aws/instance-family
-          operator: NotIn
-          values: [c7i-flex, m7i-flex, c8i-flex, m8i-flex]
+      - key: kubernetes.io/arch
+        operator: In
+        values:
+        - amd64
+      - key: kubernetes.io/os
+        operator: In
+        values:
+        - linux
+      - key: karpenter.sh/capacity-type
+        operator: In
+        values:
+        - spot
+      - key: karpenter.k8s.aws/instance-category
+        operator: In
+        values:
+        - c
+        - m
+        - r
+      - key: karpenter.k8s.aws/instance-generation
+        operator: Gt
+        values:
+        - '5'
+      - key: karpenter.k8s.aws/instance-cpu
+        operator: In
+        values:
+        - '8'
+        - '16'
+        - '32'
+      - key: karpenter.k8s.aws/instance-family
+        operator: NotIn
+        values:
+        - c7i-flex
+        - m7i-flex
+        - c8i-flex
+        - m8i-flex
       expireAfter: Never
       terminationGracePeriod: 1h
   limits:
-    cpu: "64"
-    memory: 256Gi
+    cpu: '32'
+    memory: 128Gi
   disruption:
     consolidationPolicy: WhenEmpty
     consolidateAfter: 2m
     budgets:
-      - nodes: "0"
-        reasons: [Drifted]
-      - nodes: "100%"
-        reasons: [Empty]
+    - nodes: '0'
+      reasons:
+      - Drifted
+    - nodes: 100%
+      reasons:
+      - Empty
