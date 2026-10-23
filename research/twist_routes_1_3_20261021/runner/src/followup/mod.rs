@@ -1,6 +1,7 @@
 //! Native follow-up experiments. Every command requires a fresh output tree.
 mod bigfield;
 mod coupled;
+mod divisors;
 mod geometry;
 mod gluing;
 mod partial;
@@ -116,6 +117,16 @@ pub fn main(args: &[String]) -> Result<()> {
         }
         "coupled-census" => coupled::census(&fixtures, out)?,
         "projection-replay" => projection::replay(&fixtures, out)?,
+        "jacobian-replay" => divisors::independent(
+            &fixtures,
+            Path::new(args.get(3).ok_or("missing selected covers")?),
+            out,
+        )?,
+        "three-transfer" => divisors::transfer(
+            &fixtures,
+            Path::new(args.get(3).ok_or("missing verified geometry index")?),
+            out,
+        )?,
         "partial-replay" => partial::replay(
             &fixtures,
             Path::new(args.get(3).ok_or("missing census directory")?),
@@ -164,7 +175,8 @@ fn adjudicate(prefix: &Path, out: &Path) -> Result<Vec<Value>> {
         || text.contains("ALL_GEOMETRY_SEARCH_DONE");
     let marker = marker
         || text.contains("ALL_COUPLED_REPLAY_OK")
-        || text.contains("ALL_PROJECTION_REPLAY_OK");
+        || text.contains("ALL_PROJECTION_REPLAY_OK")
+        || text.contains("ALL_DIVISOR_REPLAY_OK");
     let hashes_match =
         meta["stdout_sha256"] == digest(&stdout) && meta["stderr_sha256"] == digest(&stderr);
     let script = meta["argv"]

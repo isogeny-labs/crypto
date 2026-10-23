@@ -188,7 +188,7 @@ impl Chart {
         assert!(d.v.len() < d.u.len());
         assert!(r.rem(&r.sub(&r.mul(&d.v, &d.v), &self.f), &d.u).is_empty());
     }
-    fn reduce(&self, mut u: Poly, mut v: Poly) -> Div {
+    pub(crate) fn reduce(&self, mut u: Poly, mut v: Poly) -> Div {
         let r = Ring(self.k);
         u = r.monic(&u);
         v = r.rem(&v, &u);
