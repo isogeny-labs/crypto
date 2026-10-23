@@ -696,3 +696,27 @@ Native hash/allocator CPU and peak bytes, calibrated GAE, isolated
 ABAB timing and same-input msolve/Magma remain gates before any priced
 whole-method speed or fastest-solver claim. The ideal-oracle survey is
 a hypothesis screen, not part of the candidate's relation work.
+
+## Registered peeled-residual orbit-reuse test
+
+Frozen 23 October 2026 before calculating peeled-residual orbit collisions.
+Use every residual, including those after one-target stopping, from the six
+original p=73/97 three-seed mixed-line streams. On each stream reconstruct
+the same full signed L2 point set and independently BSGS-verified physical
+logs already used by the point/scalar-keyed census. For each finite residual
+`R=[a]G+[b]Q` and signed L2 factor `T`, compute the scalar of `R-T` modulo
+the recorded prime order. Canonicalize that scalar under all 24 products of
+the verified Frobenius and cubic eigenvalues, then count (a) distinct
+canonical peeled targets within each residual and (b) distinct canonical
+peeled targets across the whole stream. Report original attempted peels,
+intra-residual duplicates, cross-residual duplicates, and the maximum
+possible exact-orbit cache reduction in each scope, per seed and overall.
+Infinity peels are excluded from polynomial systems and reported separately.
+
+Check the eigenvalue group has exactly 24 members and every signed L2
+factor orbit is closed. As a positive control, all 24 images of each
+nonzero peeled target must share its canonical representative; as a
+negative control, perturb one eigenvalue and require the closure check to
+fail. This is an exact scalar/group diagnostic of potential reuse, not a
+polynomial implementation or measured cache speedup. A later native cache
+would have to preserve complete relation sets, signs, rank and total cost.
