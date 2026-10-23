@@ -117,53 +117,9 @@ jobs:
         - language: rust
           scope: rust
           build-mode: none
-          check_name: rust
-          category: /language:rust-core
-          rust_paths: |
-            /Cargo.toml
-            /Cargo.lock
-            /build.rs
-            /src/
-            /tests/
-            /benches/
-        - language: rust
-          scope: rust
-          build-mode: none
-          check_name: rust-boolean
-          category: /language:rust-boolean
-          rust_paths: |
-            /Cargo.toml
-            /Cargo.lock
-            /research/boolean_*/
-        - language: rust
-          scope: rust
-          build-mode: none
-          check_name: rust-research
-          category: /language:rust-research
-          rust_paths: |
-            /Cargo.toml
-            /Cargo.lock
-            /research/
-            !/research/boolean_*/
-            /examples/
-            /experiments/
-            /docs/
-        - language: rust
-          scope: rust
-          build-mode: none
-          check_name: rust-aux
-          category: /language:rust-aux
-          rust_paths: |
-            /Cargo.toml
-            /Cargo.lock
-            /isogeny_algos/
-            /tools/
-            /eigen_seta/
-            /cd_attack/
-            /ecc2k130/
-            /spotlab/
-            /gpu/
-            /quantum_circuit_secp256k1/
+          # One complete-source database retains cross-directory dataflow.
+          # Do not combine the former path shards with this shared handoff:
+          # each would analyze the same database and upload the same category.
         # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'rust', 'swift'
         # Use `c-cpp` to analyze code written in C, C++ or both
         # Use 'java-kotlin' to analyze code written in Java, Kotlin or both
@@ -186,9 +142,6 @@ jobs:
     - name: Checkout repository
       if: needs.scope.outputs[matrix.scope] != 'false' && matrix.language != 'rust'
       uses: actions/checkout@v7
-      with:
-        sparse-checkout: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && matrix.rust_paths || '' }}
-        sparse-checkout-cone-mode: false
 
     # The repository contains many research receipts that CodeQL does not
     # parse as Rust. Keep every tracked Rust source and Cargo manifest while
@@ -264,7 +217,7 @@ jobs:
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
     - name: Run manual build steps
-      if: needs.scope.outputs[matrix.scope] != 'false' && matrix.build-mode == 'manual' && (matrix.language != 'rust' || matrix.check_name == 'rust' || github.event_name == 'pull_request' || github.event_name == 'merge_group')
+      if: needs.scope.outputs[matrix.scope] != 'false' && matrix.build-mode == 'manual'
       shell: bash
       run: |
         echo 'If you are using a "manual" build mode for one or more of the' \
@@ -278,7 +231,7 @@ jobs:
       if: needs.scope.outputs[matrix.scope] != 'false' && !(matrix.language == 'rust' && (github.event_name == 'pull_request' || github.event_name == 'merge_group'))
       uses: github/codeql-action/analyze@v4
       with:
-        category: ${{ matrix.category || format('/language:{0}', matrix.language) }}
+        category: "/language:${{matrix.language}}"
 
     - name: Set up CodeQL for the finalized Rust database
       id: rust-tools
