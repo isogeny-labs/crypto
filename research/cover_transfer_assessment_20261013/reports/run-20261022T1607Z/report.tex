@@ -4,11 +4,20 @@
 \usepackage{booktabs}
 \usepackage[T1]{fontenc}
 \title{Expanded curve-cover catalog assessment}
-\author{Validation addendum, 22 October 2026}
+\author{Validation addendum, 23 October 2026}
 \date{}
 \begin{document}
 \maketitle
-\noindent\textbf{Source catalog.} Commit \texttt{525a4404bd0cb3fb1e74ce6983fc0e992079692c} fixes the three catalog files. The current inventory has 2,771 map rows, 2,769 unique cover objects, 687 declared fields, 2,769 Jacobian contexts, and 977 linked EC1 subgroup triples. The independent assessment records 2,771 geometry-verified maps, zero unassessed maps, and zero unassessed subgroup triples. This dated addendum preserves the earlier 2,572-map report.
+
+\noindent\textbf{Source catalog.} Commit
+\texttt{cf3fad47b02159e018c2a6329fadd5213f9aa40e} fixes the three catalog
+files. The current inventory contains 15,990 map rows, 15,988 unique cover
+objects, 735 declared fields, 15,988 Jacobian contexts, and 700 linked EC1
+representations. The catalog checker records 15,990 verified maps, zero
+invalid inputs, and zero unsupported inputs. The assessment assigns a base
+profile to all 15,990 maps and a subgroup profile to all 700 linked triples;
+``assessed'' means each claim has an explicit status, not that all capabilities
+are supported.
 
 \begin{center}
 \begin{tabular}{lrr}
@@ -16,9 +25,11 @@
 Map profile & Rows & Full transfer pipeline \\
 \midrule
 Binary cubic, same field & 186 & unavailable \\
-Odd prime, direct quadratic & 1,184 & unavailable \\
+Odd prime, direct quadratic & 14,403 & unavailable \\
 Odd prime, normalized quadratic & 30 & unavailable \\
 Odd extension, direct quadratic & 1,371 & unavailable \\
+\midrule
+Total & 15,990 & unavailable \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -27,7 +38,30 @@ Odd extension, direct quadratic & 1,371 & unavailable \\
 \includegraphics[width=0.95\textwidth]{assessment.png}
 \end{center}
 
-\noindent\textbf{Verification.} The generated assessment is byte-exact under \texttt{build\_cover\_transfer\_assessments.mjs --check}. The independent \texttt{verify\_assessment.mjs} reconstructs exact model, map, cover, field, and Jacobian joins and replays the cover equations over declared fields. It also SHA-binds this report and its figures. The release library suite passed 4,494 tests with 119 ignored in a serial run; the standalone cover binary passed 13/13, including the 2,771-model constructor test.
+\noindent\textbf{Linked subgroup inventory.} The 700 linked EC1
+representations comprise 141 binary degree-three triples and 559
+odd-characteristic degree-two triples. The binary profile records bounded
+generator-level typed identities; the odd-characteristic profile does not
+supply compatible induced maps.
 
-\noindent\textbf{Boundary.} The 186 binary maps have bounded typed point-class operations. The 2,585 odd-characteristic maps have cover geometry but no compatible balanced two-infinity Jacobian transfer implementation. There is no end-to-end speed, discrete-log, or full-Jacobian transfer claim. The earlier published executable covered a smaller bundled catalog and is not a replay of all 2,771 current inputs. The conditional Lean group lemma does not import this catalog.
+\noindent\textbf{Provenance and verification.} The catalog adds 13,219
+prime-field models relative to the previous 2,771-row inventory. The dated
+registry audit records source bindings, order certificates, and their stated
+limits. At the catalog commit,
+\texttt{curve\_cover\_check --check} returned
+\texttt{verified=15990}, \texttt{invalid\_input=0}, and
+\texttt{unsupported=0}. The generated assessment is byte-exact under
+\texttt{build\_cover\_transfer\_assessments.mjs --check}; the independent
+\texttt{verify\_assessment.mjs} reconstructs the model, map, cover, field,
+and Jacobian joins, replays the declared cover equations, and SHA-binds this
+report and its figures.
+
+\noindent\textbf{Boundary.} The 186 binary maps have bounded typed
+point-class operations. The 15,804 odd-characteristic maps have cover geometry
+without a compatible balanced two-infinity Jacobian transfer. No complete
+catalog transfer pipeline, discrete-log cost improvement, or wall-speed result
+is established. The conditional Lean group lemma does not import this catalog.
+The older packaged release replay covers a smaller bundled registry and is not
+a replay of all 15,990 current inputs.
+
 \end{document}

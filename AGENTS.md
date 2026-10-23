@@ -1269,7 +1269,7 @@ See [docs/store/README.md](docs/store/README.md).
 stays in every future clone. The `large-files` workflow
 (`scripts/check-large-files.sh`) fails a PR that adds or modifies such a file,
 except generated text that git delta-compresses well (`docs/browser/data.json`,
-`docs/curves/*.json`). A PR that must commit one anyway carries the
+`docs/curves/*.json`, `docs/curves/cover-links.yaml`). A PR that must commit one anyway carries the
 `large-file-ok` label, added by the owner or a reviewer. Do not pre-compress
 text files to get under the limit: compressed blobs do not delta, so each
 revision costs its full size again.

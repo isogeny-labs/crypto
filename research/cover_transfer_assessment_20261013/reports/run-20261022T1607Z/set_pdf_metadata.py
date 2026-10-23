@@ -23,8 +23,8 @@ writer.add_metadata(
         "/Title": "Expanded curve-cover catalog assessment",
         "/Subject": subject,
         "/Creator": "Tectonic and pypdf 6.0.0",
-        "/CreationDate": "D:20261022000000Z",
-        "/ModDate": "D:20261022000000Z",
+        "/CreationDate": "D:20261023000000Z",
+        "/ModDate": "D:20261023000000Z",
     }
 )
 temp = PDF.with_suffix(".pdf.tmp")

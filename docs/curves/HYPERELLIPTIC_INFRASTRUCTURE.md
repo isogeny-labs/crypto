@@ -467,7 +467,7 @@ The exported catalog identifies its wrapper with
 `producer_source_sha256` is SHA-256 of the exact UTF-8 checker source, model
 normalization source, and `hyperelliptic-cover` wrapper source concatenated in
 that order. For the current source it is
-`537591926ca6a014fa8752b3025648ddb7fe7cd8143bdfe3e2df0e05353ab88c`.
+`9d32ee65742c205ed621cccb4a9bc4bb9042b7bce4982b58cbac5b8c0fbd0a26`.
 Thus changing any of the three producer inputs changes the provenance digest.
 Both
 `hyperelliptic-cover catalog-export` and `curve_cover_check` require callers
