@@ -27,7 +27,9 @@ concurrency:
 
 jobs:
   overview:
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-dashboard.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-dashboard.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    # Not routed to crypto-eks: the browser check needs Chrome and its system
+    # libraries, and that runner image has no browser and no apt-get install.
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -36,15 +38,8 @@ jobs:
           node-version: '22'
       - name: Check frozen evidence pins and generated overview
         run: node tools/render_ic_dashboard.mjs --check
-      # The crypto-eks runner image has no browser; ubuntu-latest does. Install
-      # one either way so the check runs the same on both.
-      - uses: browser-actions/setup-chrome@v1
-        id: chrome
-        with:
-          install-dependencies: true
       - name: Check actual desktop and mobile rendering
         env:
-          IC_DASHBOARD_CHROME: ${{ steps.chrome.outputs.chrome-path }}
           IC_DASHBOARD_SCREENSHOTS: /tmp/ic-dashboard-screenshots
         run: node tools/check_ic_dashboard_browser.mjs
       - uses: actions/upload-artifact@v4
