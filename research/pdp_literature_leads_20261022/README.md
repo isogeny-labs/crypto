@@ -480,8 +480,10 @@ Table D. Ranking inputs and verification totals, round 2.
   not fetched". Six unfound numbers are rounded forms.
 - **LEAD-18.** Twenty unfound numbers are rounded scientific notation
   (`2.54·10¹⁰` for the files' `2.535–2.552·10¹⁰` and full-digit JSON values).
-- **LEAD-17.** One mismatch (a search-ranked page), one unfound number; all
-  18 paths exist.
+- **LEAD-17.** One genuine defect: the arXiv identifier the dossier guesses
+  for Caminata–Gorla (solving degree versus degree of regularity) resolves
+  to an unrelated paper, so that citation stands as recalled, not verified;
+  one unfound number; all 18 paths exist.
 - **LEAD-19.** No mismatches; three citations the card could not route
   (no identifier) are listed as unverified; the two missing paths are the
   output files the proposed test would write

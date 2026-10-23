@@ -315,7 +315,7 @@ Table D. Ranking inputs and verification totals, round 2.
 - #strong[LEAD-15.] Five "mismatch" rows are PDFs the fetch tool returns as binary (the HAL copy of Diem–Thomé, the JTNB paper, the Flon–Oyono–Ritzenthaler report), a 502 from the ECC 2005 slides mirror, and a Springer page behind a login; none shows a different paper. The dossier read Diem–Thomé and the JTNB paper by text extraction.
 - #strong[LEAD-16.] The one mismatch is a title the dossier itself marks "seen, not fetched". Six unfound numbers are rounded forms.
 - #strong[LEAD-18.] Twenty unfound numbers are rounded scientific notation (`2.54·10¹⁰` for the files’ `2.535–2.552·10¹⁰` and full-digit JSON values).
-- #strong[LEAD-17.] One mismatch (a search-ranked page), one unfound number; all 18 paths exist.
+- #strong[LEAD-17.] One genuine defect: the arXiv identifier the dossier guesses for Caminata–Gorla (solving degree versus degree of regularity) resolves to an unrelated paper, so that citation stands as recalled, not verified; one unfound number; all 18 paths exist.
 - #strong[LEAD-19.] No mismatches; three citations the card could not route (no identifier) are listed as unverified; the two missing paths are the output files the proposed test would write (`research/lead19_projected_base/{char2,prime24}.json`).
 
 == 9. Files
