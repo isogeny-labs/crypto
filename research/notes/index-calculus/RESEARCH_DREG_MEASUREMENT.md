@@ -857,6 +857,10 @@ closure measurement on its cells. It has 16 unsatisfiable draws at degree 4.
 - **For ECC2K-130.** `RESEARCH_ECC2K130_DESCENT_DEGREE.md` §8: both
   survivors put the m = 4 rise at ℓ ≤ 7, so the m = 4 degree-4 row is
   contradicted.
+- **Update 2026-10-23.** The separating cell was measured by another
+  session on a large host (`research/dreg_closure_m4l6_20261018/RESULTS.md`): m = 4, ℓ = 6
+  (N = 54) refutes at degree 4 on 2 of 2 unsatisfiable draws. So
+  **m·ℓ ≥ 21 is refuted and ℓ = 7 survives.**
 
 ## Result 14: one fixed variable usually brings the ℓ = 7 draws back to degree 4
 
@@ -910,9 +914,15 @@ branches each, and runs the degree-4 closure on every branch.
   scale-study record on every non-timing field; the dimension-6 control
   refutes on 4 of 4.
 - **What it says.** Three do not suffice for variables 7, 15, 23; four
-  (7, 15, 23, 24) did in Result 15. One cell does not fix a growth law, and
-  another three-variable set is unmeasured.
-- **Memory.** Peak 7.04 GB under the 15 GB limit.
+  (7, 15, 23, 24) did in Result 15. Another three-variable set is unmeasured.
+- **Reading (not registered).** The 3-set leaves every summand in dimension 7
+  with N = 43, structurally the ℓ = 7 systems that did not refute at degree 4
+  on 8 of 8 draws (Results 12 and 13), so its failure is what that result
+  predicts. The pattern fits `m·(ℓ−7)+1` guesses (4 at ℓ = 8), which would be
+  105 at the priced m = 4, ℓ = 33 cell against a break-even of 6. That is an
+  extrapolation from two values of ℓ, not a result.
+- **Memory.** Peak 7.04 GB under the 15 GB limit; the earlier 10.6 GB was one
+  outlier (median 7.0 GB over 68 runs).
 
 ## Reproducing
 

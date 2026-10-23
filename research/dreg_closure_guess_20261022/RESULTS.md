@@ -92,3 +92,6 @@ before any degree-4 reading).
 - **k at ℓ = 9** (m = 3, N ≥ 49) to see whether k grows at all. That needs
   a larger host too.
 - Still open from earlier studies: m = 4, ℓ = 6, and degree 5 past ℓ = 7.
+  *Update 2026-10-23: m = 4, ℓ = 6 was measured by another session
+  (`research/dreg_closure_m4l6_20261018/RESULTS.md`) and refutes at degree 4 on 2 of 2
+  unsatisfiable draws; it is not open.*

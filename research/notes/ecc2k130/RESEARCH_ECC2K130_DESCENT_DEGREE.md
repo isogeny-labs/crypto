@@ -95,6 +95,11 @@ model output is `descent_degree_cost-output-20261016-scale.txt`.
    - Both surviving explanations put m = 4's rise at ℓ ≤ 7. So the m = 4
      degree-4 row (`2^68.43`) is contradicted.
    - The degree-5 rows are now the optimistic case: m = 4 at `2^71.13`.
+   - **Update 2026-10-23.** Another session measured m = 4, ℓ = 6 (N = 54)
+     on a large host (`research/dreg_closure_m4l6_20261018/RESULTS.md`): the degree-4 closure
+     refutes on 2 of 2 unsatisfiable draws. So **m·ℓ ≥ 21 is refuted and
+     ℓ = 7 is what survives.** The m = 4 degree-4 row stays contradicted,
+     because the rise at ℓ = 7 is still far below the priced ℓ = 33.
 9. **Guess-then-degree-4 survives to ℓ = 8, with k ≤ 4 (§9, §10).**
    - At m = 3, ℓ = 8, four guessed variables make degree 4 refute on all 64
      branches of 4 draws. The linear rule `m·(ℓ−6)` (6 guesses) fails.
@@ -103,8 +108,9 @@ model output is `descent_degree_cost-output-20261016-scale.txt`.
      excluded. Its best case is the `2^68.43` degree-4 row. No row moves.
 10. **Three guesses at ℓ = 8 do not suffice for variables 7, 15, 23 (§11).**
     - Three of four draws have a branch that saturates degree 4; four guesses
-      (§10) did suffice. This says nothing yet about other sets or a growth
-      law. No row moves.
+      (§10) did suffice. The 3-set is structurally an ℓ = 7 system, and the
+      pattern fits `m·(ℓ−7)+1` guesses (105 at ℓ = 33, m = 4): a reading, not
+      a result. No row moves.
 
 ## 1. What is measured
 
@@ -520,8 +526,15 @@ draws (N = 43, 136,698 columns), 8 branches per draw.
   controls are valid (the ℓ = 7 identity control matches its committed
   record; the dimension-6 control refutes on 4 of 4).
 - **Four did (§10).** So the set matters or the count does, and this study
-  does not separate them. One cell does not by itself kill the
-  guess-then-degree-4 route or fix a growth law.
+  does not separate them.
+- **Reading (not registered).** The 3-set leaves each summand in dimension 7
+  at N = 43: structurally the ℓ = 7 systems that did not refute at degree 4
+  on 8 of 8 draws (§7, §8). The result fits `m·(ℓ−7)+1` guesses, 4 at ℓ = 8.
+  Extended linearly that is 105 at the priced m = 4, ℓ = 33 cell, against
+  the break-even of 6 with degree 5. It rests on two values of ℓ and is the
+  first evidence leaning toward a count that grows with ℓ. The matched null
+  (unspecialised (22, 7), same matrix size) and a 3-set that leaves one
+  summand at dimension 8 would test it.
 - **The price is unchanged.** At the m = 4, ℓ = 33 cell (N = 394) the ratio
   `C(N, ≤5) / (2^k · C(N−k, ≤4))` is 78.2, 39.5, 19.95, 10.08, 5.09 for
   k = 0..4, and the hybrid beats degree 5 only if k ≤ 6.

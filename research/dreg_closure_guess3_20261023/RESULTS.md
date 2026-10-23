@@ -19,9 +19,10 @@ amendments).
   m = 3, (n, ℓ) = (22, 8), N = 46, unsatisfiable draws 0, 3, 5, 6. No new draw
   was generated.
 - **Memory.** Peak VmHWM 7,044,568 kB (7.04 GB, draw 5 G3b0) across all 16
-  logs, under the 15 GB `prlimit` and the previous run's 10.6 GB. G3 runs
-  peaked at 6.74–7.04 GB. The pilot G3b0 on draw 0 ran 252 s at 6.93 GB. The
-  cap was not changed.
+  logs, under the 15 GB `prlimit`. G3 runs peaked at 6.74–7.04 GB. The
+  previous study's 10.6 GB was a single outlier (draw 5, branch 5) among 68
+  runs whose median was 7.0 GB, so 136,698 columns fit comfortably. The cap
+  was not changed.
 - **Degree-4 columns:** 136,698 per G3 branch (N = 43), 102,091 per G6 run and
   for N7. Degree-4 scan time: 193–252 s per G3 branch.
 - **Run report** with graph and PDF: `reports/run-20261023T0516Z/`.
@@ -86,11 +87,34 @@ Recomputed, not copied (`C(N, ≤d)` is the sum of binomials up to d):
   `C(394, ≤5) / (2^k · C(394−k, ≤4))` is 78.2, 39.5, 19.95, 10.08, 5.09 for
   k = 0..4, 2.57 at k = 5, 1.30 at k = 6 and 0.66 at k = 7. **The hybrid beats
   degree 5 there only if k ≤ 6.**
-- **What this study changes: very little.** It does not lower the measured
-  upper bound (k ≤ 4 at ℓ = 8, previous study) and shows this particular
-  3-set is not an upper bound. The cost model's inputs are unchanged, so no
-  row moves. The guess-then-degree-4 route stays open, with its k at ℓ = 8
-  between 4 (suffices, measured) and a lower value not yet reached.
+- **What the registered result changes.** It does not lower the measured upper
+  bound (k ≤ 4 at ℓ = 8, previous study), and it shows this 3-set is not an
+  upper bound. No row moves.
+- **Interpretation (not registered; derived from committed records).**
+  - **G3 is structurally an ℓ = 7 system.** Fixing the top coordinate of each
+    summand leaves every summand in a 7-dimensional subspace or coset, with
+    N = 43 unknowns. The unspecialised ℓ = 7 draws of the closure-at-scale and
+    closure-driver studies (N = 40 and 42) did not refute at degree 4 on 8 of
+    8 draws. G3 not refuting on draws 0, 3 and 5 is therefore what the
+    "ℓ = 7 stops refuting" result predicts, not a separate surprise.
+  - **The pattern fits the rule `m·(ℓ−7)+1`.** It is the pre-registered
+    "K_marginal" rule of the previous study: `m·(ℓ−7)` guesses bring every
+    summand down to ℓ = 7, plus about one more (the single-fix result at
+    ℓ = 7). At ℓ = 8, m = 3 it gives 4. Four suffice (64 of 64 branches) and
+    the 3-set fails on 3 of 4 draws. The rule `m·(ℓ−6)` (6) was already
+    rejected by the previous study.
+  - **Draw 6 is an exception:** all 8 branches of the 3-set refute, so the
+    count varies by draw.
+  - **What it would mean at the priced cell.** Extended linearly, the rule
+    gives 4·(33−7)+1 = 105 guesses at m = 4, ℓ = 33, against the break-even
+    k ≤ 6 with degree 5. That is an extrapolation from two values of ℓ
+    (ℓ = 7: about 1 guess on 5 of 8 draws; ℓ = 8: 4 suffice, 3 do not for this
+    set on 3 of 4 draws), not a result. It is the first evidence leaning
+    toward a guess count that grows with ℓ.
+  - **What would test it.** The matched null: unspecialised (22, 7) draws
+    (N = 43, 136,698 columns, the same matrix size as G3) should not refute on
+    most draws if G3 is "just ℓ = 7", and a 3-set that leaves one summand at
+    dimension 8 (for example 7, 15, 24) should fail on most draws.
 - **Against the success criterion.** This is a measurement that narrows what
   is known, not an improvement over the index-calculus baseline and not a row
   beating rho. No S, no speed claim.
@@ -103,5 +127,13 @@ Recomputed, not copied (`C(N, ≤d)` is the sum of binomials up to d):
   columns (136,698), same memory (about 7 GB).
 - **Draws 0, 3, 5 under other branches of G3** are unnecessary for the
   verdict, but would say how many branches fail.
-- **Measurements that fit in 16 GB are now used up for guess counts.** ℓ = 9,
-  m = 4 at ℓ = 6, and degree 5 past ℓ = 7 need a larger machine.
+- **The matched null and the shape arms** described above. They fit in this
+  container: 136,698 columns at about 7 GB. The unspecialised ℓ = 8 system
+  (179,447 columns) and k = 1, 2 (164,221 and 149,986 columns) may fit too,
+  since peak memory was 7 GB at 136,698; that is untested.
+- **ℓ = 9 and degree 5 past ℓ = 7** still need a larger machine. m = 4 at
+  ℓ = 6 is no longer open: another session measured it on a large host
+  (`research/dreg_closure_m4l6_20261018/RESULTS.md`, refutes at degree 4 on 2 of 2
+  unsatisfiable draws), which refutes the "m·ℓ ≥ 21" explanation and leaves
+  "ℓ = 7". That makes the structural reading above (G3 is an ℓ = 7 system)
+  the one the data support.
