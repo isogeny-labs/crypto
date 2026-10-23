@@ -5,7 +5,7 @@
 - **Affected work:** [shared Iso Lab skill](../.agents/skills/isolab-eks/SKILL.md),
   [EKS harness](../taskq/deploy/eks-karpenter/HARNESS.md)
 - **Next action owner:** Iso Lab implementation task T-70
-- **Last updated:** 2026-10-22
+- **Last updated:** 2026-10-23
 
 ## Problem
 
@@ -65,8 +65,9 @@ Existing v1 jobs instead use `emptyDir` and zero automatic measurement retries.
 
 ## Next discriminating step
 
-Finish merging the parent commit-image PR and this recovery PR after exact-head
-CI/review, then dispatch the main-only GitHub Action. Require its built image,
+Qualify the periodic-tick bootstrap against the unchanged 600-round crypto
+workload, then finish PR #2342 after exact-head CI/review and dispatch the
+main-only GitHub Action. Require its built image,
 source/binary hashes, actual EKS identity and complete L2/S3 receipts to agree.
 Keep the existing 96-vCPU account quota and 64-vCPU worker cap. Interrupted
 generation and corrupt-archive cases have offline tests; a live multi-generation
@@ -140,3 +141,21 @@ retains its failed acceptance criteria and all public evidence. The runtime pin
 now matches the deployed checkpoint repair with that limited qualification.
 The original, separately frozen main-only Action acceptance criteria remain
 unchanged and unverified. An identical B rerun is not scheduled to seek a pass.
+
+2026-10-23 accounting diagnosis: a separately frozen native probe recorded every
+one of 2,000 child executions on a c7i worker. Seven faulting children produced
+50 ms of reported busy ticks inside approximately 25 ms wall windows, without
+IRQ/softirq/steal increments. A control on the same instance type, kernel, image
+and placement, with only `nohz_full` removed from bootstrap, completed all 2,000
+samples with no excess above two ticks. All six emitted S3 payload hashes matched
+for each probe. Both probes shared SMT siblings and claim no L2 grade. The c8a
+probe A never started before its provisioning deadline; its failure is retained.
+The [diagnostic report and inspected PDF](../taskq/deploy/eks-karpenter/diagnostics/validation/20261023-cpu-accounting/REPORT.md)
+retain protocols, raw counters, identities and the original timestamp erratum.
+
+Profile v5 keeps the periodic tick, rejects active full-dynticks CPUs before
+kubelet admission, and retains CPU/IRQ/workqueue/RCU isolation. The native L2
+grader and thresholds are unchanged. The separate 600-round c8a qualification
+must still establish all L2/replay/A/A/S3 criteria before promotion; the counter
+probe alone does not meet them or identify a precise upstream kernel defect.
+The source merge conflict is resolved while retaining both problem-index rows.
