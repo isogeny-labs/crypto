@@ -1,5 +1,6 @@
 //! Native follow-up experiments. Every command requires a fresh output tree.
 mod bigfield;
+mod coupled;
 mod geometry;
 mod gluing;
 
@@ -111,6 +112,17 @@ pub fn main(args: &[String]) -> Result<()> {
         "adjudicate-cas" => {
             adjudicate(Path::new(args.get(3).ok_or("missing CAS log prefix")?), out)?
         }
+        "coupled-census" => coupled::census(&fixtures, out)?,
+        "coupled-relations" => coupled::relations(
+            &fixtures,
+            Path::new(args.get(3).ok_or("missing census directory")?),
+            out,
+        )?,
+        "coupled-energy" => coupled::energies(
+            &fixtures,
+            Path::new(args.get(3).ok_or("missing census directory")?),
+            out,
+        )?,
         _ => return Err("followup: expected filters or torsion".into()),
     };
     write_json(
@@ -142,6 +154,7 @@ fn adjudicate(prefix: &Path, out: &Path) -> Result<Vec<Value>> {
     let marker = text.contains("INDEPENDENT_MODULE_REPLAY_OK")
         || text.contains("ALL_TORSION_REPLAY_OK")
         || text.contains("ALL_GEOMETRY_SEARCH_DONE");
+    let marker = marker || text.contains("ALL_COUPLED_REPLAY_OK");
     let hashes_match =
         meta["stdout_sha256"] == digest(&stdout) && meta["stderr_sha256"] == digest(&stderr);
     let script = meta["argv"]
