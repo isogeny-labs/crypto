@@ -2,6 +2,7 @@ name: Factor-base factory
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'tools/factor-base/**'
       - 'docs/ic/FACTOR_BASE_FACTORY.md'
@@ -23,6 +24,7 @@ concurrency:
 
 jobs:
   verify:
+    if: ${{ !github.event.pull_request.draft }}
     name: Factory (${{ matrix.os }})
     strategy:
       fail-fast: false

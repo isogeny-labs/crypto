@@ -1,6 +1,7 @@
 name: IC generic backend qualification v3
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/ic-generic-backend-qualification-v3.yml'
       - 'research/ic_candidate_tournament_20260915/run_generic_backend_qualification_v3.py'
@@ -20,6 +21,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   preflight:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-generic-backend-qualification-v3.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-generic-backend-qualification-v3.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 25
     steps:
@@ -48,6 +50,7 @@ jobs:
             --out "$RUNNER_TEMP/v3-layout.json" \
             --require-pass
   artifact-smoke:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-generic-backend-qualification-v3.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-generic-backend-qualification-v3.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     steps:
@@ -80,7 +83,9 @@ jobs:
   campaign:
     # Seed 2026093001 already ran once: Actions 37399021219. Do not run it again.
     # Never redispatch 2026092901 or 2026092902.
-    if: ${{ false && github.event_name == 'workflow_dispatch' }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (false && github.event_name == 'workflow_dispatch')
     needs: [preflight, artifact-smoke]
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-generic-backend-qualification-v3.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-generic-backend-qualification-v3.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 240

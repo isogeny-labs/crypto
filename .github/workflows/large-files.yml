@@ -8,7 +8,7 @@ name: large-files
 on:
   workflow_dispatch:
   pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
+    types: [opened, synchronize, reopened, labeled, unlabeled, ready_for_review]
 # A newer push to the same pull request cancels this workflow's run for the older commit.
 # Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
 concurrency:
@@ -17,7 +17,9 @@ concurrency:
 
 jobs:
   size:
-    if: github.event_name == 'pull_request'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'pull_request')
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

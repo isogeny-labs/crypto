@@ -39,6 +39,7 @@ name: ecbench
 # fails here.
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   merge_group:
   workflow_dispatch:
   schedule:
@@ -53,6 +54,7 @@ defaults:
     shell: bash
 jobs:
   scope:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
     permissions:
@@ -94,7 +96,9 @@ jobs:
         run: node .github/scripts/ci-scope.mjs
 
   harness:
-    if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false'))
     needs: scope
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     # Keep the exhaustive scientific audit's existing 300-minute budget in
@@ -434,7 +438,9 @@ jobs:
           if-no-files-found: ignore
 
   evidence_audit_pr:
-    if: (github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false'
+    if: >-
+      !github.event.pull_request.draft &&
+      ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false')
     needs: [scope, harness]
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 25

@@ -1,6 +1,7 @@
 name: Compact shared-log archive replay
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/notes/ecc2k130/compact_shared_log_20260925/**'
       - '.github/workflows/compact-shared-log-replay.yml'
@@ -13,6 +14,7 @@ concurrency:
 
 jobs:
   replay:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|compact-shared-log-replay.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|compact-shared-log-replay.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     steps:

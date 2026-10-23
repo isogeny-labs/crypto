@@ -1,7 +1,7 @@
 name: ECC2K-130 n19 sparse S3 linear semantic replay
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/notes/ecc2k130/rotated_s3_sparse_n19_linear_20260929/**'
       - '.github/workflows/ecc2k130-s3-sparse-n19-linear-replay.yml'
@@ -10,6 +10,7 @@ permissions:
   contents: read
 jobs:
   immutable-archive-replay:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-s3-sparse-n19-linear-replay.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-s3-sparse-n19-linear-replay.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     steps:

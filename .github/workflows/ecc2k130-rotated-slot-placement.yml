@@ -2,6 +2,7 @@ name: ECC2K130 rotated slot placement
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/notes/ecc2k130/rotated_slot_placement_20260925/**'
       - 'research/notes/ecc2k130/rotated_pdp_corpus_20260925/**'
@@ -17,6 +18,7 @@ on:
 
 jobs:
   replay:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-rotated-slot-placement.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-rotated-slot-placement.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 20
     steps:

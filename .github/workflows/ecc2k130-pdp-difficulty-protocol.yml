@@ -2,6 +2,7 @@ name: ECC2K-130 PDP difficulty input freeze
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - "research/notes/ecc2k130/pdp_difficulty_features_20261001/**"
       - ".github/workflows/ecc2k130-pdp-difficulty-protocol.yml"
@@ -16,6 +17,7 @@ permissions:
 
 jobs:
   preflight:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-pdp-difficulty-protocol.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-pdp-difficulty-protocol.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 5
     steps:
@@ -30,6 +32,7 @@ jobs:
           cmp /tmp/ecc2k130-pdp-difficulty-input-check.json \
             research/notes/ecc2k130/pdp_difficulty_features_20261001/INPUT_CHECK.json
   outcome:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-pdp-difficulty-protocol.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-pdp-difficulty-protocol.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 5
     steps:

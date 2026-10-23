@@ -2,6 +2,7 @@ name: ECC2K130 n13 O-aware UNSAT proofs
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/notes/ecc2k130/n13_oaware_unsat_proof_20260925/**'
       - 'research/notes/ecc2k130/n13_oaware_sat_benchmark_20260925/**'
@@ -19,6 +20,7 @@ concurrency:
 
 jobs:
   replay:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-n13-oaware-unsat-proof.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-n13-oaware-unsat-proof.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     steps:

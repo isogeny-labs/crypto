@@ -15,6 +15,7 @@ on:
         type: boolean
         default: false
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - ".github/workflows/ecc2k130-status.yml"
       - "scripts/rho_status/**"
@@ -82,7 +83,9 @@ concurrency:
 
 jobs:
   source-connection-check:
-    if: github.event_name == 'workflow_dispatch' && inputs.source_connection_check && github.ref == 'refs/heads/main'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'workflow_dispatch' && inputs.source_connection_check && github.ref == 'refs/heads/main')
     runs-on: ubuntu-22.04
     timeout-minutes: 5
     permissions:
@@ -111,7 +114,9 @@ jobs:
   # every scheduled run behind it was superseded unrun. test_rho_status.py
   # pins the two step lists to each other.
   test:
-    if: github.event_name == 'pull_request'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'pull_request')
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
     steps:
@@ -135,7 +140,9 @@ jobs:
         run: node scripts/site/test_algorithm_lab.js
 
   publish:
-    if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && !inputs.source_connection_check
+    if: >-
+      !github.event.pull_request.draft &&
+      ((github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && !inputs.source_connection_check)
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-status.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     # 35 min so the index-only fallback plus a stretch of hour-chunk
     # backfill (300 s each, resumed next run) plus history merge and Pages

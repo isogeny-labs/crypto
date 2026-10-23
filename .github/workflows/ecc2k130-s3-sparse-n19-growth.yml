@@ -1,7 +1,7 @@
 name: ECC2K-130 n19 sparse S3 growth gate
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled]
+    types: [opened, synchronize, reopened, labeled, ready_for_review]
     paths:
       - 'research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/**'
       - '.github/workflows/ecc2k130-s3-sparse-n19-growth.yml'
@@ -12,6 +12,7 @@ permissions:
   issues: read
 jobs:
   frozen-and-archive:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-s3-sparse-n19-growth.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-s3-sparse-n19-growth.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     steps:
@@ -31,7 +32,9 @@ jobs:
               --evidence research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final
           fi
   measured-first-attempt:
-    if: ${{ github.event.action == 'labeled' && github.event.label.name == 'ecc2k130-n19-sparse-measure-once' && github.run_attempt == 1 && github.event.pull_request.number == 795 }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event.action == 'labeled' && github.event.label.name == 'ecc2k130-n19-sparse-measure-once' && github.run_attempt == 1 && github.event.pull_request.number == 795)
     needs: frozen-and-archive
     concurrency:
       group: ecc2k130-n19-sparse-first-release-795

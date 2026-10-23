@@ -7,6 +7,7 @@ name: Conductor-gap Lean proofs
 # with leanchecker. Sheriff case SHF-20261016-3caa6f, finding L6.
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.github/workflows/conductor-gap-lean.yml'
       - 'research/conductor_gap_cm_pairs_20261010/lean/**'
@@ -25,6 +26,7 @@ concurrency:
 
 jobs:
   lean:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|conductor-gap-lean.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|conductor-gap-lean.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 60 }}
     defaults:

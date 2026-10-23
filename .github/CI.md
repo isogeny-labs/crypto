@@ -219,3 +219,44 @@ with, so they must be cancelled and re-run (see
 `merge-sweeper.yml` applies the AGENTS.md merge gate to every open PR every
 30 minutes, so a green PR lands after its authoring session has ended. It
 reports only until `MERGE_SWEEPER_APPLY` is `true`.
+
+## CI tiers (2026-10-23)
+
+The three repositories opened about 1,125 PRs from 2026-10-15 to 2026-10-23
+(up to about 240 a day), and on 2026-10-23 about 1,000 runs were queued
+behind 11 EKS runners. The fix is to run less, not to wait longer:
+
+| PR state | What runs on each push |
+| --- | --- |
+| Draft | Fast tier only: `workflows-parse.yml`, `workflow-lint.yml`, `validation-gate.yml`, `ci-tier.yml` (its `full-tier` job skips), and the four byte-pinned workflows below |
+| Ready for review | Full tier: every applicable workflow, as before |
+
+- Every other workflow with a `pull_request` trigger gates each job on
+  `!github.event.pull_request.draft` and lists `ready_for_review` in its PR
+  types (label-only triggers are left alone), so marking a PR ready starts the
+  full tier on its head. `.github/scripts/draft_tier_gate.py` checks this in
+  `workflows-parse` and `--apply` adds it to a new workflow; other events
+  (push, schedule, dispatch) carry no PR payload and are unaffected.
+- `weak-curve-lean.yml`, `weak-curve-conjectures.yml`, `release.yml` and
+  `curve-covers.yml` are excluded: their bytes are pinned by sealed evidence
+  or an exact implementation-version dependency.
+- A gated job on a draft reports `skipped`, so the merge sweeper also requires
+  a successful `full-tier` check on the head. Heads whose checks all started
+  before `ci-tier.yml` reached `main` predate the tiers and need no marker.
+- **Check budget:** the sweeper holds a PR whose head ran more than 30 checks
+  (`MERGE_SWEEPER_MAX_CHECKS`; skipped and neutral checks do not count) and
+  labels it `ci:over-budget`. On 2026-10-23, 9 of the 30 most recently
+  updated PRs were over.
+- **Capacity:** with `MERGE_SWEEPER_APPLY=true` the sweeper moves red,
+  conflicted, over-budget and `needs-human` PRs back to draft (`ci:parked`)
+  and keeps at most `MERGE_SWEEPER_MAX_READY` (default 40) PRs ready, the
+  newest beyond that going to draft with `ci:waiting`. Given
+  `MERGE_SWEEPER_TOKEN` it marks waiting drafts, then `lane/*` drafts idle for
+  six hours, ready as slots free; events made with `GITHUB_TOKEN` start no
+  workflows, so without that token nothing is promoted.
+- **Lanes:** sessions working one study push to `lane/<lane>` with
+  `scripts/lane-push.sh <lane>` instead of opening a PR each; the lane has one
+  draft PR.
+
+Queued runs keep the workflow revision they were created with; only new events
+use the tiers.

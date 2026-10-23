@@ -11,6 +11,7 @@ name: Rust all targets compile
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   merge_group:
 # A newer push to the same pull request cancels this workflow's run for the older commit.
 # Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
@@ -20,6 +21,7 @@ concurrency:
 
 jobs:
   scope:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-all-targets.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-all-targets.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 5
     permissions:
@@ -62,7 +64,9 @@ jobs:
 
   check:
     needs: scope
-    if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.rust_root != 'false')
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.rust_root != 'false'))
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-all-targets.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-all-targets.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 25
     permissions:

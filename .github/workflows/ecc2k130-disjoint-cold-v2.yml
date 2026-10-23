@@ -2,6 +2,7 @@ name: ECC2K130 orbit-disjoint v2 compact cold CPU panel
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'tools/isolated_bench.py'
       - .github/workflows/ecc2k130-disjoint-cold-v2.yml
@@ -18,6 +19,7 @@ concurrency:
 
 jobs:
   validate:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-disjoint-cold-v2.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-disjoint-cold-v2.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 35 }}
     steps:
@@ -107,7 +109,9 @@ jobs:
           retention-days: 90
 
   measure:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     needs: validate
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-disjoint-cold-v2.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-disjoint-cold-v2.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 90

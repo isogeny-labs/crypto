@@ -1,7 +1,11 @@
-Open pull requests ready for review, never as drafts, whatever the runtime
-defaults to, and mark an existing draft ready; only a user request in the task
-makes a draft. This and the repository's other rules are in
-[`AGENTS.md`](AGENTS.md) ("Default workflow").
+Open pull requests as drafts and mark them ready for review only when the
+work is finished: drafts run only the fast CI tier, ready PRs the full tier
+(owner, 2026-10-23; replaces the 2026-10-17 ready-for-review rule). Push work
+for an existing research lane to its `lane/<lane>` branch with
+`scripts/lane-push.sh` instead of opening another PR, and keep a PR's head
+within 30 CI checks. This and the repository's other rules are in
+[`AGENTS.md`](AGENTS.md) ("Default workflow") and
+[`.github/CI.md`](.github/CI.md) ("CI tiers").
 
 **Success criterion** (owner, 2026-10-15): every verified, measured
 improvement over the current index-calculus baseline is a success. Beating

@@ -9,6 +9,7 @@ on:
       - 'src/cryptanalysis/gf2_elim.rs'
       - '.github/workflows/boolean-f5-support-aware.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'tools/isolated_bench.py'
       - 'Cargo.toml'
@@ -54,6 +55,7 @@ env:
 
 jobs:
   correctness:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|boolean-f5-support-aware.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|boolean-f5-support-aware.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 360 }}
     steps:
@@ -77,7 +79,9 @@ jobs:
           jq -e 'select(.kind == "sample" and .arm == "support_unpack_layout") | any(.calls[]; .support_projected == true)' "$RUNNER_TEMP/f5-support-dev-n24.jsonl"
 
   qualified-discovery:
-    if: github.event_name == 'workflow_dispatch' && inputs.phase == 'discovery'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'workflow_dispatch' && inputs.phase == 'discovery')
     needs: correctness
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|boolean-f5-support-aware.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|boolean-f5-support-aware.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 75
@@ -95,7 +99,9 @@ jobs:
           if-no-files-found: error
 
   qualified-holdout:
-    if: github.event_name == 'workflow_dispatch' && inputs.phase == 'holdout'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'workflow_dispatch' && inputs.phase == 'holdout')
     needs: correctness
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|boolean-f5-support-aware.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|boolean-f5-support-aware.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 75

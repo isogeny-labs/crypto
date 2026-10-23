@@ -82,8 +82,8 @@ env:
 jobs:
   triage:
     if: >-
-      vars.AUTOFIX_PAUSED != 'true' &&
-      (github.event_name != 'pull_request' || github.event.label.name == 'autofix')
+      !github.event.pull_request.draft &&
+      (vars.AUTOFIX_PAUSED != 'true' && (github.event_name != 'pull_request' || github.event.label.name == 'autofix'))
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     permissions:
@@ -138,7 +138,9 @@ jobs:
 
   fix:
     needs: triage
-    if: needs.triage.outputs.count != '' && needs.triage.outputs.count != '0'
+    if: >-
+      !github.event.pull_request.draft &&
+      (needs.triage.outputs.count != '' && needs.triage.outputs.count != '0')
     name: "#${{ matrix.pr.number }} (${{ matrix.pr.tier }})"
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 75

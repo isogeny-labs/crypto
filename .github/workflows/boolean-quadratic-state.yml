@@ -1,6 +1,7 @@
 name: Standalone Boolean quadratic state
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/boolean_quadratic_state_20260923/**'
       - '.github/workflows/boolean-quadratic-state.yml'
@@ -15,6 +16,7 @@ concurrency:
 
 jobs:
   correctness-and-evidence:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|boolean-quadratic-state.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|boolean-quadratic-state.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 10
     steps:

@@ -5,7 +5,7 @@ env:
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled]
+    types: [opened, synchronize, reopened, labeled, ready_for_review]
     paths:
       - 'research/sat_factor_base_review_20260908/autolab_n53_native_cyclic_l384_20260929/**'
       - '.github/scripts/frozen_source_selector.py'
@@ -28,6 +28,7 @@ concurrency:
 
 jobs:
   hash-only:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n53-native-cyclic-l384.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n53-native-cyclic-l384.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 360 }}
     steps:
@@ -75,7 +76,9 @@ jobs:
           fi
 
   outcome:
-    if: github.event.action == 'labeled' && github.event.label.name == 'run-n53-native-cyclic-l384-once' && github.event.pull_request.head.repo.full_name == github.repository
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event.action == 'labeled' && github.event.label.name == 'run-n53-native-cyclic-l384-once' && github.event.pull_request.head.repo.full_name == github.repository)
     needs: hash-only
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n53-native-cyclic-l384.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n53-native-cyclic-l384.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 130

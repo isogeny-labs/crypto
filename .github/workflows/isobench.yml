@@ -9,6 +9,7 @@ name: isobench
 # are for). See docs/isobench/README.md.
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'isogeny_algos/**'
       - '.github/workflows/isobench.yml'
@@ -28,6 +29,7 @@ concurrency:
 
 jobs:
   isobench:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     env:

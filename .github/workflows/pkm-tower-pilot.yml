@@ -1,6 +1,7 @@
 name: PKM tower pilot
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/pkm_tower_pilot_20260924/**'
       - 'research/pkm_tower_round2_20260925/**'
@@ -29,6 +30,7 @@ concurrency:
 
 jobs:
   cross-check:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|pkm-tower-pilot.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|pkm-tower-pilot.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
     steps:
@@ -101,6 +103,7 @@ jobs:
       - name: The full-rank exit reproduces rounds 2 and 3 (round 6, note section 15.2)
         run: python3 research/pkm_tower_round6_20260930/compare_exit.py
   engine-tests:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|pkm-tower-pilot.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|pkm-tower-pilot.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 45 }}
     steps:

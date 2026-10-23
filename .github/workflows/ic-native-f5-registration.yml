@@ -3,6 +3,7 @@ name: Native F5 registration custody
 # Data only: never dispatch the registered worker or execute archived binaries.
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'Cargo.toml'
       - 'Cargo.lock'
@@ -33,6 +34,7 @@ concurrency:
 
 jobs:
   custody:
+    if: ${{ !github.event.pull_request.draft }}
     strategy:
       fail-fast: false
       matrix:

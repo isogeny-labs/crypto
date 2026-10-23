@@ -16,9 +16,8 @@ concurrency:
 jobs:
   preflight:
     if: >-
-      github.event.label.name == 'run-ecc2k130-m10-capacity-once' &&
-      github.event.pull_request.head.ref == 'codex/n131-m10-capacity-attempt-20260929' &&
-      github.event.pull_request.head.repo.full_name == github.repository
+      !github.event.pull_request.draft &&
+      (github.event.label.name == 'run-ecc2k130-m10-capacity-once' && github.event.pull_request.head.ref == 'codex/n131-m10-capacity-attempt-20260929' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-m10-capacity-once.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-m10-capacity-once.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 5
     steps:
@@ -39,6 +38,7 @@ jobs:
           python3 -m unittest discover -s research/notes/ecc2k130/m10_export_capacity_20260925 -p 'test_dispatch_gate.py' -v
 
   admission:
+    if: ${{ !github.event.pull_request.draft }}
     needs: preflight
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-m10-capacity-once.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-m10-capacity-once.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 5
@@ -65,6 +65,7 @@ jobs:
           retention-days: 30
 
   capacity:
+    if: ${{ !github.event.pull_request.draft }}
     needs: admission
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-m10-capacity-once.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-m10-capacity-once.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 50

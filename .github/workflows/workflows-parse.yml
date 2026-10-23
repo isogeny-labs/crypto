@@ -17,6 +17,8 @@ on:
       - '.github/scripts/n53-historical-cargo-lock-view-v1.json'
       - '.github/scripts/check-pr-budgets.py'
       - '.github/scripts/test-pr-budgets.py'
+      - '.github/scripts/draft_tier_gate.py'
+      - '.github/scripts/*merge_sweeper.py'
       - 'research/weak_curve_properties_lean_20261011/EVIDENCE_SHA256.tsv'
       - 'research/weak_curve_conjectures_20261012/EVIDENCE_SHA256SUMS'
 # A newer push to the same pull request cancels this workflow's run for the older commit.
@@ -51,3 +53,5 @@ jobs:
       - run: node --test .github/scripts/test-frozen-workflow-check.mjs
       - run: python3 -B .github/scripts/test-pr-budgets.py -v
       - run: python3 -B .github/scripts/check-pr-budgets.py
+      - run: python3 -B .github/scripts/draft_tier_gate.py
+      - run: python3 -B .github/scripts/test_merge_sweeper.py -v

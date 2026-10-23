@@ -471,10 +471,21 @@ separate small-model automation did the CI work and the merge.
 commits, pushes, and opens the PR (or updates the existing one). It then
 follows the PR until it lands, under the check-in and merge rules below.
 
-- **Open every PR ready for review, never as a draft**, whatever a tool or
-  runtime defaults to, and mark an existing draft ready when you update it,
-  so reviews and checks that skip drafts (`llm-review`) run from the first
-  push. Open a draft only when the user asks for one in that task.
+- **Open every PR as a draft; mark it ready when the work is done** (owner,
+  2026-10-23). Every push to a draft runs only the fast CI tier, and marking
+  the PR ready runs the full tier once on the current head (`.github/CI.md`,
+  "CI tiers"). Mark it ready after the final local validation, not to see
+  what CI says; a later push to a ready PR re-runs the full tier. The merge
+  sweeper requires the `full-tier` check and moves red PRs back to draft
+  (`ci:parked`). This replaces the 2026-10-17 rule that opened every PR ready.
+- **One PR per research lane, not per session.** Before opening a PR, look for
+  an open PR from `lane/<lane>` for the same study (IC autolab, volcano,
+  conductor gap, N83, ...). If there is one, push to it with
+  `scripts/lane-push.sh <lane>` (merge commits, retried, never a force-push)
+  and stop there: the lane PR carries your commits. Open a new PR only for
+  work no lane covers; name new lanes after the study.
+- **Keep a PR's head within 30 CI checks.** The sweeper holds a PR whose head
+  ran more (`ci:over-budget`); split it by touched area instead.
 - Review the final diff and confirm that the requested scope, relevant tests,
   evidence, and documentation are complete before opening the PR. Passing CI
   does not substitute for checking that the work is finished.

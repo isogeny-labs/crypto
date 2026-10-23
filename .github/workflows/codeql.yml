@@ -15,6 +15,7 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [ "main" ]
   merge_group:
   workflow_dispatch:
@@ -27,6 +28,7 @@ concurrency:
 
 jobs:
   scope:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
     permissions:
@@ -68,7 +70,9 @@ jobs:
         run: node .github/scripts/ci-scope.mjs
 
   analyze:
-    if: always() && !cancelled() && github.event_name != 'workflow_dispatch'
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && github.event_name != 'workflow_dispatch')
     needs: [scope, build-rust-database, warm-rust-cache]
     # Routine Rust scans consume the database finalized by the first job and
     # the evaluation cache the second job warmed; queries retain this existing
@@ -323,7 +327,9 @@ jobs:
 
   build-rust-database:
     name: Build database (rust)
-    if: needs.scope.outputs.rust != 'false' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
+    if: >-
+      !github.event.pull_request.draft &&
+      (needs.scope.outputs.rust != 'false' && (github.event_name == 'pull_request' || github.event_name == 'merge_group'))
     needs: scope
     timeout-minutes: 25
     runs-on: ubuntu-24.04-arm
@@ -421,7 +427,9 @@ jobs:
   # no reusable cache, so the phase must finish within its own budget.
   warm-rust-cache:
     name: Warm cache (rust)
-    if: needs.scope.outputs.rust != 'false' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
+    if: >-
+      !github.event.pull_request.draft &&
+      (needs.scope.outputs.rust != 'false' && (github.event_name == 'pull_request' || github.event_name == 'merge_group'))
     needs: [scope, build-rust-database]
     # Type inference over the merged tree passed 25 minutes on 2026-10-19
     # (run 39226121956 was cancelled mid-evaluation); 45 leaves headroom.
@@ -483,7 +491,9 @@ jobs:
           retention-days: 1
 
   analyze-rust-long:
-    if: github.event_name == 'workflow_dispatch'
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'workflow_dispatch')
     needs: scope
     timeout-minutes: 60
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|codeql.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}

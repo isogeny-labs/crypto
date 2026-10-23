@@ -1,6 +1,7 @@
 name: Private workspace startup
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - '.claude/hooks/session-start.sh'
       - 'scripts/private-workspace.sh'
@@ -29,6 +30,7 @@ concurrency:
 
 jobs:
   private-startup:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|private-workspace.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|private-workspace.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     # Syntax check and offline contract tests; about one second locally.
     timeout-minutes: 10

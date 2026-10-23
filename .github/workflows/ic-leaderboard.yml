@@ -15,6 +15,7 @@ name: ic-leaderboard
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'scripts/build_ic_leaderboard.py'
       - 'scripts/check_ic_leaderboard_paths.py'
@@ -148,6 +149,7 @@ concurrency:
 
 jobs:
   current:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-leaderboard.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-leaderboard.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 10
     steps:

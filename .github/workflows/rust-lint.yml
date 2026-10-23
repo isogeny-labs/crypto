@@ -13,6 +13,7 @@ name: Rust lint
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   merge_group:
   push:
     branches: [main]
@@ -33,6 +34,7 @@ env:
 
 jobs:
   scope:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 5
     permissions:
@@ -84,7 +86,9 @@ jobs:
   fmt:
     needs: scope
     name: rustfmt (changed files)
-    if: always() && !cancelled() && github.event_name == 'pull_request' && (needs.scope.result != 'success' || needs.scope.outputs.rust_fmt != 'false')
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && github.event_name == 'pull_request' && (needs.scope.result != 'success' || needs.scope.outputs.rust_fmt != 'false'))
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 5
     steps:
@@ -153,7 +157,9 @@ jobs:
           exit $bad
 
   clippy:
-    if: always() && !cancelled()
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled())
     needs: scope
     name: clippy (${{ matrix.crate }})
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}

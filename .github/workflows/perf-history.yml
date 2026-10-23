@@ -40,6 +40,7 @@ on:
       - 'scripts/perf/groebner-render-requirements.txt'
       - '.github/workflows/perf-history.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'build.rs'
       - '.cargo/**'
@@ -89,7 +90,9 @@ env:
 jobs:
   record:
     # Append one snapshot for the pushed (or dispatched) revision.
-    if: github.event_name != 'pull_request' && github.event_name != 'merge_group' && !inputs.check_only
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name != 'pull_request' && github.event_name != 'merge_group' && !inputs.check_only)
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|perf-history.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|perf-history.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 120
     permissions:
@@ -239,7 +242,9 @@ jobs:
 
   check:
     # PRs validate the history machinery; check_only dispatches retain the full comparison.
-    if: github.event_name == 'pull_request' || github.event_name == 'merge_group' || inputs.check_only
+    if: >-
+      !github.event.pull_request.draft &&
+      (github.event_name == 'pull_request' || github.event_name == 'merge_group' || inputs.check_only)
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|perf-history.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|perf-history.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 90 }}
     steps:

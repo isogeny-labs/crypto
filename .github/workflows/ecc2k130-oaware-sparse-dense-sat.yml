@@ -1,6 +1,7 @@
 name: ECC2K-130 n13 O-aware sparse-dense SAT freeze
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/notes/ecc2k130/n13_oaware_sparse_dense_sat_20260925/**'
       - 'research/notes/ecc2k130/n13_oaware_sat_benchmark_20260925/**'
@@ -14,6 +15,7 @@ permissions:
   contents: read
 jobs:
   frozen-hash-only:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-oaware-sparse-dense-sat.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-oaware-sparse-dense-sat.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 10
     steps:

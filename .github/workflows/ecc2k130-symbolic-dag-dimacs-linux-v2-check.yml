@@ -1,6 +1,7 @@
 name: ECC2K-130 symbolic DAG DIMACS Linux v2 held replay
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/**'
       - '.github/workflows/ecc2k130-symbolic-dag-dimacs-linux-v2-check.yml'
@@ -11,6 +12,7 @@ permissions:
   pull-requests: read
 jobs:
   exact-head-hash-and-archive-replay:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-symbolic-dag-dimacs-linux-v2-check.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-symbolic-dag-dimacs-linux-v2-check.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 20
     env:
