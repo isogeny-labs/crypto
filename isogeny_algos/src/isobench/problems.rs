@@ -1042,6 +1042,22 @@ fn radical_prime(bits: u64, ell: u64) -> Result<Int, String> {
     }
 }
 
+/// Validate the radical.chain parameters, shared by the runner and the verifier so the two can
+/// never disagree on the input domain: the degree must be a supported one (so prime generation
+/// is never reached with an unsupported or zero modulus) and the chain length at least two (so a
+/// non-backtracking step exists to check). Returns (ell, n).
+fn radical_params(params: &Params, size: u64) -> Result<(u64, usize), String> {
+    let ell = param_u64(params, "ell")?;
+    if ell != 5 && ell != 7 {
+        return Err("radical.chain: ell must be 5 or 7".into());
+    }
+    let n = usize::try_from(size).map_err(|_| "radical.chain: n too large".to_string())?;
+    if n < 2 {
+        return Err("radical.chain: n >= 2".into());
+    }
+    Ok((ell, n))
+}
+
 /// The Tate-normal-form coefficients of the X_1(l) member with parameter `param`
 /// (l = 7: family7; l = 5: c = b = param).
 fn radical_model<F: Field>(f: &F, ell: u64, param: F::E) -> [F::E; 5] {
@@ -1085,14 +1101,7 @@ fn radical_chain(
     counted: bool,
     cal: &Calibration,
 ) -> Result<Outcome, String> {
-    let ell = param_u64(params, "ell")?;
-    if ell != 5 && ell != 7 {
-        return Err("radical.chain: ell must be 5 or 7".into());
-    }
-    let n = size as usize;
-    if n < 2 {
-        return Err("radical.chain: n >= 2".into());
-    }
+    let (ell, n) = radical_params(params, size)?;
     let p = radical_prime(param_u64(params, "bits")?, ell)?;
     struct T<'a>(u64, usize, u64, bool, &'a Calibration);
     impl Task for T<'_> {
@@ -1314,7 +1323,7 @@ pub fn verify(
             ))
         }
         "radical.chain" => {
-            let ell = param_u64(params, "ell")?;
+            let (ell, n) = radical_params(params, size)?;
             let p = radical_prime(param_u64(params, "bits")?, ell)?;
             struct V<'a>(u64, usize, u64, &'a str);
             impl Task for V<'_> {
@@ -1322,11 +1331,11 @@ pub fn verify(
                 fn run<F: PrimeFieldInt + CalKey>(self, f: &F) -> Self::Out {
                     let (ell, n, index, answer) = (self.0, self.1, self.2, self.3);
                     let js: Vec<F::E> = answer.split(',').map(|s| f.elem(&dec(s))).collect();
-                    if js.len() != n + 1 {
+                    let expected = n.checked_add(1).ok_or("radical.chain: n too large")?;
+                    if js.len() != expected {
                         return Err(format!(
-                            "radical.chain: path has {} nodes, expected {}",
-                            js.len(),
-                            n + 1
+                            "radical.chain: path has {} nodes, expected {expected}",
+                            js.len()
                         ));
                     }
                     // j_0 is the start curve's j (ties the path to the instance)
@@ -1357,7 +1366,7 @@ pub fn verify(
                     ))
                 }
             }
-            with_field(&p, V(ell, size as usize, index, answer))
+            with_field(&p, V(ell, n, index, answer))
         }
         _ => Err(format!("unknown problem {problem}")),
     }
