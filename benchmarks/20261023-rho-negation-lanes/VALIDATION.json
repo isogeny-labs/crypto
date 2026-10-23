@@ -1,0 +1,38 @@
+{
+ "note": "A new rho method (rho.negation_lanes) measured against rho.negation in the same binary, sessions and targets. This is a wall-time result: in the counted unit the candidate costs 4-30% more. The schema's `ic` band slot carries the candidate arm (rho.negation_lanes, lanes=16, 32-bit); the study has no index-calculus arm.",
+ "replay_certificate": {
+  "path": "../../research/ecbench_rho_lanes_20261023/replay-certificate.json",
+  "sha256": "f14c264660140f6d6be8c583e4c5e40da93b10858544bc5d2cf2d4dab9db364a"
+ },
+ "rho_reference": {
+  "band_source": "../../research/ecbench_rho_lanes_20261023/band/lanes-32.json (rho.negation_lanes lanes=16 vs rho.negation, 32-bit prime-order curve, 4 sessions)",
+  "binary_or_process": "ecbench b94301af7; every arm of a session runs in that session's binary",
+  "gae_band": {
+   "0": {
+    "ic": 0.988683279531705,
+    "rho": 0.9295995642105751
+   },
+   "0.1": {
+    "ic": 1.0868682740455724,
+    "rho": 1.0218886989313576
+   },
+   "1": {
+    "ic": 1.9705332246703753,
+    "rho": 1.8524909114184074
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": true,
+  "protocol": "each spec's rho.negation reference arm (role reference) and an A/A copy, run in every session on the same curve, targets and rounds as the candidate arms; prime-order curves (A = 2), so negation is the strongest symmetry available",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "ecbench.gae (counted group operations, S = GAE/sqrt(r))"
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "../../research/ecbench_rho_lanes_20261023/validator-report.json",
+  "sha256": "73ce36a75affc1166e1f51b3de12c83362a783de81845fcbb0ab00c87ea66a21"
+ }
+}

@@ -1,0 +1,76 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Rho with batched inversions</title>
+<style>body{font-family:Helvetica,Arial,sans-serif;max-width:900px;margin:24px auto;color:#222;font-size:13px}
+table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid #ccc;padding:3px 6px;text-align:right}td:nth-child(2),th:nth-child(2){text-align:left}</style></head><body>
+<h1>rho.negation_lanes: Pollard rho with batched inversions (2026-10-23)</h1>
+<p>A new ecbench method beside <code>rho.negation</code>, whose code and counts are unchanged. It runs <code>rho.negation</code>'s step rule
+(negation classes, look-ahead, cycle escape, distinguished points) as <code>lanes</code> walks in lockstep on a prime curve; each round's
+additions share one field inversion (Montgomery's trick). Every addition any lane performs is charged, including the walks still in flight
+when another lane's collision recovers the logarithm, so <code>S</code> is a few percent above <code>rho.negation</code>'s. The
+<code>field_ops</code> block records the work actually done: 3(n − 1) multiplications and one inversion per round of n additions, then
+2M + 1S per addition, against rho.negation's 2M + 1S + 1I.</p>
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" viewBox="0 0 760 420" font-family="Helvetica,Arial,sans-serif" font-size="12">
+<rect width="760" height="420" fill="#fff"/>
+<text x="16" y="22" font-size="14" fill="#222">rho.negation_lanes against rho.negation, same binary and targets</text>
+<text x="16" y="40" fill="#555">solid: solve wall time ratio (paired geometric mean); dashed: S ratio (counted GAE / √r)</text>
+<line x1="70" y1="341.8" x2="570" y2="341.8" stroke="#e3e3e3"/>
+<text x="62" y="345.8" text-anchor="end" fill="#555">0.4</text>
+<line x1="70" y1="285.5" x2="570" y2="285.5" stroke="#e3e3e3"/>
+<text x="62" y="289.5" text-anchor="end" fill="#555">0.6</text>
+<line x1="70" y1="229.1" x2="570" y2="229.1" stroke="#e3e3e3"/>
+<text x="62" y="233.1" text-anchor="end" fill="#555">0.8</text>
+<line x1="70" y1="172.7" x2="570" y2="172.7" stroke="#333"/>
+<text x="62" y="176.7" text-anchor="end" fill="#555">1.0</text>
+<line x1="70" y1="116.4" x2="570" y2="116.4" stroke="#e3e3e3"/>
+<text x="62" y="120.4" text-anchor="end" fill="#555">1.2</text>
+<line x1="70" y1="60.0" x2="570" y2="60.0" stroke="#e3e3e3"/>
+<text x="62" y="64.0" text-anchor="end" fill="#555">1.4</text>
+<text x="120.0" y="388" text-anchor="middle" fill="#555">24-bit</text>
+<text x="320.0" y="388" text-anchor="middle" fill="#555">28-bit</text>
+<text x="520.0" y="388" text-anchor="middle" fill="#555">32-bit</text>
+<polyline points="120.0,264.1 320.0,301.1 520.0,316.7" fill="none" stroke="#2a6fdb" stroke-width="2.5"/>
+<polyline points="120.0,151.9 320.0,155.9 520.0,161.8" fill="none" stroke="#2a6fdb" stroke-width="1.5" stroke-dasharray="5,4"/>
+<circle cx="120.0" cy="264.1" r="3.5" fill="#2a6fdb"/>
+<circle cx="320.0" cy="301.1" r="3.5" fill="#2a6fdb"/>
+<circle cx="520.0" cy="316.7" r="3.5" fill="#2a6fdb"/>
+<line x1="590" y1="80" x2="615" y2="80" stroke="#2a6fdb" stroke-width="2.5"/>
+<text x="622" y="84" fill="#222">lanes-8</text>
+<polyline points="120.0,255.2 320.0,300.9 520.0,321.5" fill="none" stroke="#d9822b" stroke-width="2.5"/>
+<polyline points="120.0,127.9 320.0,143.3 520.0,150.8" fill="none" stroke="#d9822b" stroke-width="1.5" stroke-dasharray="5,4"/>
+<circle cx="120.0" cy="255.2" r="3.5" fill="#d9822b"/>
+<circle cx="320.0" cy="300.9" r="3.5" fill="#d9822b"/>
+<circle cx="520.0" cy="321.5" r="3.5" fill="#d9822b"/>
+<line x1="590" y1="102" x2="615" y2="102" stroke="#d9822b" stroke-width="2.5"/>
+<text x="622" y="106" fill="#222">lanes-16</text>
+<polyline points="120.0,237.8 320.0,296.0 520.0,320.3" fill="none" stroke="#7a4fc9" stroke-width="2.5"/>
+<polyline points="120.0,87.7 320.0,118.8 520.0,131.2" fill="none" stroke="#7a4fc9" stroke-width="1.5" stroke-dasharray="5,4"/>
+<circle cx="120.0" cy="237.8" r="3.5" fill="#7a4fc9"/>
+<circle cx="320.0" cy="296.0" r="3.5" fill="#7a4fc9"/>
+<circle cx="520.0" cy="320.3" r="3.5" fill="#7a4fc9"/>
+<line x1="590" y1="124" x2="615" y2="124" stroke="#7a4fc9" stroke-width="2.5"/>
+<text x="622" y="128" fill="#222">lanes-32</text>
+</svg>
+
+<table><tr><th>bits</th><th>arm</th><th>verified</th><th>mean S</th><th>median wall ms</th><th>wall / rho (paired)</th><th>S / rho (paired)</th><th>M / S / I per GAE</th></tr>
+<tr><td>24</td><td>rho-neg</td><td>160/160</td><td>1.083</td><td>0.72</td><td>1.000</td><td>1.000</td><td>2.15 / 1.05 / 1.000</td></tr>
+<tr><td>24</td><td>rho-neg-aa</td><td>160/160</td><td>1.083</td><td>0.73</td><td>1.001</td><td>1.000</td><td>2.15 / 1.05 / 1.000</td></tr>
+<tr><td>24</td><td>lanes-8</td><td>160/160</td><td>1.158</td><td>0.50</td><td>0.676</td><td>1.074</td><td>4.52 / 1.05 / 0.209</td></tr>
+<tr><td>24</td><td>lanes-16</td><td>160/160</td><td>1.228</td><td>0.53</td><td>0.707</td><td>1.159</td><td>4.68 / 1.04 / 0.149</td></tr>
+<tr><td>24</td><td>lanes-32</td><td>160/160</td><td>1.349</td><td>0.59</td><td>0.769</td><td>1.302</td><td>4.77 / 1.04 / 0.117</td></tr>
+<tr><td>28</td><td>rho-neg</td><td>160/160</td><td>1.002</td><td>2.67</td><td>1.000</td><td>1.000</td><td>2.04 / 1.01 / 1.000</td></tr>
+<tr><td>28</td><td>rho-neg-aa</td><td>160/160</td><td>1.002</td><td>2.64</td><td>1.019</td><td>1.000</td><td>2.04 / 1.01 / 1.000</td></tr>
+<tr><td>28</td><td>lanes-8</td><td>160/160</td><td>1.045</td><td>1.44</td><td>0.544</td><td>1.060</td><td>4.58 / 1.01 / 0.153</td></tr>
+<tr><td>28</td><td>lanes-16</td><td>160/160</td><td>1.080</td><td>1.44</td><td>0.545</td><td>1.105</td><td>4.77 / 1.01 / 0.092</td></tr>
+<tr><td>28</td><td>lanes-32</td><td>160/160</td><td>1.156</td><td>1.43</td><td>0.563</td><td>1.191</td><td>4.86 / 1.01 / 0.061</td></tr>
+<tr><td>32</td><td>rho-neg</td><td>120/120</td><td>0.930</td><td>9.24</td><td>1.000</td><td>1.000</td><td>2.02 / 1.01 / 1.000</td></tr>
+<tr><td>32</td><td>rho-neg-aa</td><td>120/120</td><td>0.930</td><td>9.23</td><td>0.987</td><td>1.000</td><td>2.02 / 1.01 / 1.000</td></tr>
+<tr><td>32</td><td>lanes-8</td><td>120/120</td><td>0.959</td><td>4.57</td><td>0.489</td><td>1.039</td><td>4.61 / 1.01 / 0.135</td></tr>
+<tr><td>32</td><td>lanes-16</td><td>120/120</td><td>0.989</td><td>4.44</td><td>0.472</td><td>1.078</td><td>4.79 / 1.01 / 0.074</td></tr>
+<tr><td>32</td><td>lanes-32</td><td>120/120</td><td>1.045</td><td>4.45</td><td>0.476</td><td>1.147</td><td>4.89 / 1.00 / 0.043</td></tr></table>
+<p>Four sessions per curve on one binary, every arm alternated within each session over the same targets and rounds; warm-up excluded.
+The A/A control (<code>rho-neg-aa</code>) is a second copy of the reference arm. Every session replays exactly
+(<code>ecbench verify --replay-all</code>, 2200 replays). At 32 bits a rho step's single field inversion (word extended Euclid, about
+110 ns) was most of its wall time; shared over a round it costs a few nanoseconds, and the step becomes instruction-bound (about
+680 instructions per group operation in Callgrind, for both methods).</p>
+<p>This is a wall-time result. In the counted unit (<code>S</code>, GAE/√r) the lanes method costs 4–30% more than
+<code>rho.negation</code>, so it is not a stronger matched rho reference for index-calculus comparisons, which are made in that unit.</p>
+</body></html>
