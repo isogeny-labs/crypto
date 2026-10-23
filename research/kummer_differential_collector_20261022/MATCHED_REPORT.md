@@ -3,16 +3,18 @@
 Study `KUMMER-DIFFERENTIAL-COLLECTOR-20261022`, completed 2026-10-22 UTC.
 The matched native `paired_uncached` executable ran the frozen uncached
 candidate over all 1,260 public targets, then ran negation rho over the same
-1,260 workload IDs in that process. It source-verified every recovered scalar
-as `kP=Q` on the original elliptic curve over `Fp²`. The independent Rust
-analyzer repeated that check, compared all 1,260 candidate rows exactly to
+1,260 workload IDs in that process. The candidate path checked each recovered
+scalar against the planted value and the transferred Jacobian equation. The
+paired rho path source-checked each workload's planted scalar. The independent
+Rust analyzer directly verified every recovered candidate scalar as `kP=Q`
+on the original elliptic curve over `Fp²`, compared all 1,260 candidate rows exactly to
 the previously frozen uncached rows, and recomputed all prices from fresh
 operation counts. The 1,260 fresh rho M/S/I arithmetic records also matched
 the archived same-source M/S/I counts.
 
 The candidate processed 230,430,039 quotient states and inserted 109,480,302
-signed split relations. It recorded 739 Recover failures and 1,080 walk
-restarts. All 1,260 solves were verified. These counts and the complete
+signed split relations. It recorded 739 failed intermediate Recover calls and
+1,080 walk restarts. All 1,260 final solves were verified. These counts and the complete
 cold-cost price grid equal the separate-process archived comparison; the
 newly calculated 288 price rows were compared exactly to its uncached rows.
 The fresh paired measurement
