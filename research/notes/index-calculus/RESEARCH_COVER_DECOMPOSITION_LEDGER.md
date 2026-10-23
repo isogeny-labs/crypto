@@ -1369,6 +1369,26 @@ from a trace sample alone, without the `2q² + 2q` enumeration, and §18.2's
 characterization stays open.  **Class: exploratory → candidate**; nothing
 here is a claim until V1–V3 are read.
 
+### 18.7 The registered held-out readout at p = 19 (2026-10-22; `experiments/43_jv_cover_r_v2_holdout_19.{json,log}`)
+
+§18.6 registered a sampled held-out test of R-v2 at `p = 19`.  Its readout
+(`--characterize` on the frozen census: `2,998` weak classes, reach `0.5915` of
+full-2-torsion curves and `0.2152` of uniformly random curves):
+
+| `v₂(D)` of the sampled class | 5 | 6 | ≥ 7 |
+|:--|--:|--:|--:|
+| sampled classes | 1,163 | 836 | 807 |
+| weak share | 0.00 | 0.99 | 0.90 |
+
+V1 (necessity) holds; V2 (sufficiency) is falsified at `v₂(D) ≥ 7`
+(`0.90` against the registered `0.95`); V3 holds (`0.586` against `0.592`).
+This agrees with §19, which settles R-v2 on exhaustive data at
+`p = 5 … 19`: necessity exactly, sufficiency at `86–95 %`, and §18.6's
+halvability heuristic refuted as the mechanism.  §19 is the authoritative
+reading; this section records only that the preregistered sampled test came
+out the same way.  The `--characterize` readout line added here prints V1–V3
+from any frozen census file.
+
 ## 19. The depth-1 refusal, wired into the §17 walk, and what the exhaustive census says about §18.6's R-v2 (2026-10-08; `experiments/41_jv_refuse_depth1/`)
 
 **R-v2 against exhaustive data.**  Independently of §18.6, an exhaustive
