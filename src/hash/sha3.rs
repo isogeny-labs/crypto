@@ -87,6 +87,81 @@ pub fn keccak_f(state: &mut [u64; 25]) {
     }
 }
 
+/// Incremental Keccak sponge for SHA-3 and SHAKE. The retained input is at
+/// most one rate-sized block, regardless of message length.
+pub struct KeccakSponge {
+    state: [u64; 25],
+    pending: [u8; 168],
+    pending_len: usize,
+    rate: usize,
+    suffix: u8,
+}
+
+impl KeccakSponge {
+    pub fn new(rate: usize, suffix: u8) -> Self {
+        assert!(rate > 0 && rate <= 168 && rate.is_multiple_of(8));
+        assert!(suffix & 0x80 == 0);
+        Self {
+            state: [0; 25],
+            pending: [0; 168],
+            pending_len: 0,
+            rate,
+            suffix,
+        }
+    }
+
+    fn absorb(&mut self, block: &[u8]) {
+        for (index, lane) in block.chunks_exact(8).enumerate() {
+            self.state[index] ^= u64::from_le_bytes(lane.try_into().unwrap());
+        }
+        keccak_f(&mut self.state);
+    }
+
+    pub fn update(&mut self, mut data: &[u8]) {
+        if self.pending_len != 0 {
+            let take = (self.rate - self.pending_len).min(data.len());
+            self.pending[self.pending_len..self.pending_len + take].copy_from_slice(&data[..take]);
+            self.pending_len += take;
+            data = &data[take..];
+            if self.pending_len < self.rate {
+                return;
+            }
+            let block = self.pending;
+            self.absorb(&block[..self.rate]);
+            self.pending_len = 0;
+        }
+        let mut blocks = data.chunks_exact(self.rate);
+        for block in &mut blocks {
+            self.absorb(block);
+        }
+        let remainder = blocks.remainder();
+        self.pending[..remainder.len()].copy_from_slice(remainder);
+        self.pending_len = remainder.len();
+    }
+
+    pub fn finalize(mut self, output_len: usize) -> Vec<u8> {
+        let mut last = [0u8; 168];
+        last[..self.pending_len].copy_from_slice(&self.pending[..self.pending_len]);
+        last[self.pending_len] ^= self.suffix;
+        last[self.rate - 1] ^= 0x80;
+        self.absorb(&last[..self.rate]);
+        let mut output = Vec::with_capacity(output_len);
+        while output.len() < output_len {
+            for lane in &self.state[..self.rate / 8] {
+                output.extend_from_slice(&lane.to_le_bytes());
+                if output.len() >= output_len {
+                    break;
+                }
+            }
+            if output.len() < output_len {
+                keccak_f(&mut self.state);
+            }
+        }
+        output.truncate(output_len);
+        output
+    }
+}
+
 /// Generic Keccak sponge. `rate` is in bytes; `capacity = 200 - rate`.
 /// `suffix` is the domain-separation byte (0x06 for SHA-3, 0x1f for SHAKE).
 fn keccak_sponge(msg: &[u8], rate: usize, output_len: usize, suffix: u8) -> Vec<u8> {
@@ -165,6 +240,31 @@ pub fn shake256(data: &[u8], output_len: usize) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn incremental_sponge_matches_one_shot_at_rate_boundaries() {
+        for size in [
+            0, 1, 71, 72, 103, 104, 135, 136, 143, 144, 167, 168, 169, 4097,
+        ] {
+            let data: Vec<u8> = (0..size).map(|i| (i * 37) as u8).collect();
+            for chunk in [1, 17, 136, 257] {
+                for (rate, suffix, expected) in [
+                    (144, 0x06, sha3_224(&data).to_vec()),
+                    (136, 0x06, sha3_256(&data).to_vec()),
+                    (104, 0x06, sha3_384(&data).to_vec()),
+                    (72, 0x06, sha3_512(&data).to_vec()),
+                    (168, 0x1f, shake128(&data, 35)),
+                    (136, 0x1f, shake256(&data, 35)),
+                ] {
+                    let mut state = KeccakSponge::new(rate, suffix);
+                    for part in data.chunks(chunk) {
+                        state.update(part);
+                    }
+                    assert_eq!(state.finalize(expected.len()), expected);
+                }
+            }
+        }
+    }
 
     fn h(s: &str) -> Vec<u8> {
         hex::decode(s).unwrap()

@@ -2,6 +2,19 @@
 
 Source reviewed: `crypto` upstream main at `c6d64436a33359320ad9d5b42c4acebee2968b9a` and C `cryptanalysis` upstream main at `5a52a13877271144d88e62a82031826759696fc3`. This inventory covers runnable commands rather than inferring CLI support from library modules. A status of **verified** below applies only to the named local check, not arbitrary curves, algorithms, devices, or a live S3 account.
 
+## Current-head hash-file addition — 2026-10-23
+
+`crypto hash --file` now processes SHA-256, SHA-3-224/256/384/512,
+SHAKE128/256, and BLAKE3 incrementally using a 64 KiB read buffer. SHA-3
+and SHAKE retain one rate-sized pending block. Checked `store:NAME` and
+`sha256:DIGEST` references use the same file path after retrieval. Other
+hash algorithms in this command still read their complete file input into
+memory. The [streaming acceptance receipt](../store/CRYPTO_STREAM_HASH_ACCEPTANCE_20261023.json)
+records independent boundary and large-file digest comparisons, option
+rejections, and a live Setec S3 upload, fresh-cache reads, and cleanup.
+The inventory below is the frozen 2026-10-17 starting point; its historical
+statuses should not be read as current-head claims.
+
 ## Requirement-to-evidence inventory
 
 | Requested surface | Executable path and evidence | Status and remaining gap |

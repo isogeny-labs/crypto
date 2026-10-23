@@ -53,6 +53,7 @@ use crypto_lib::{
     utils::encoding::{bigint_to_bytes_be, from_hex, to_hex},
 };
 use num_bigint::BigUint;
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use subtle::ConstantTimeEq;
 
@@ -812,8 +813,8 @@ fn main() {
             output_bytes,
             custom_hex,
             function_name_hex,
-        } => match load_hash_input(message.as_deref(), hex.as_deref(), file.as_deref()).and_then(
-            |bytes| {
+        } => {
+            let result = (|| {
                 let custom = custom_hex
                     .as_deref()
                     .map(|hex| from_hex(hex).map_err(|e| format!("invalid customization hex: {e}")))
@@ -822,6 +823,20 @@ fn main() {
                     .as_deref()
                     .map(|hex| from_hex(hex).map_err(|e| format!("invalid function-name hex: {e}")))
                     .transpose()?;
+                if message.is_none() && hex.is_none() {
+                    if let Some(path) = file.as_deref() {
+                        if let Some(digest) = cmd_hash_file_streamed(
+                            &algorithm,
+                            path,
+                            output_bytes,
+                            custom.as_deref(),
+                            function_name.as_deref(),
+                        )? {
+                            return Ok(digest);
+                        }
+                    }
+                }
+                let bytes = load_hash_input(message.as_deref(), hex.as_deref(), file.as_deref())?;
                 cmd_hash_custom(
                     &algorithm,
                     &bytes,
@@ -829,14 +844,15 @@ fn main() {
                     custom.as_deref(),
                     function_name.as_deref(),
                 )
-            },
-        ) {
-            Ok(digest) => println!("{digest}"),
-            Err(error) => {
-                eprintln!("hash: {error}");
-                std::process::exit(2);
+            })();
+            match result {
+                Ok(digest) => println!("{digest}"),
+                Err(error) => {
+                    eprintln!("hash: {error}");
+                    std::process::exit(2);
+                }
             }
-        },
+        }
         Cmd::Mac {
             algorithm,
             message,
@@ -3054,6 +3070,74 @@ fn load_hash_input(
         (None, None, None) => Err("provide a message, --hex, or --file".into()),
         _ => Err("provide exactly one of message, --hex, or --file".into()),
     }
+}
+
+enum StreamingHash {
+    Sha256(crypto_lib::hash::sha256::Sha256),
+    Keccak(crypto_lib::hash::sha3::KeccakSponge, usize),
+    Blake3(blake3::Hasher),
+}
+
+fn cmd_hash_file_streamed(
+    algorithm: &str,
+    file: &Path,
+    output_bytes: Option<usize>,
+    custom: Option<&[u8]>,
+    function_name: Option<&[u8]>,
+) -> Result<Option<String>, String> {
+    let mut engine = match algorithm {
+        "sha256" | "sha-256" => StreamingHash::Sha256(crypto_lib::hash::sha256::Sha256::new()),
+        "sha3-224" | "sha-3-224" => {
+            StreamingHash::Keccak(crypto_lib::hash::sha3::KeccakSponge::new(144, 0x06), 28)
+        }
+        "sha3" | "sha-3" | "sha3-256" | "sha-3-256" => {
+            StreamingHash::Keccak(crypto_lib::hash::sha3::KeccakSponge::new(136, 0x06), 32)
+        }
+        "sha3-384" | "sha-3-384" => {
+            StreamingHash::Keccak(crypto_lib::hash::sha3::KeccakSponge::new(104, 0x06), 48)
+        }
+        "sha3-512" | "sha-3-512" => {
+            StreamingHash::Keccak(crypto_lib::hash::sha3::KeccakSponge::new(72, 0x06), 64)
+        }
+        "shake128" | "shake-128" => StreamingHash::Keccak(
+            crypto_lib::hash::sha3::KeccakSponge::new(168, 0x1f),
+            output_bytes.unwrap_or(0),
+        ),
+        "shake256" | "shake-256" => StreamingHash::Keccak(
+            crypto_lib::hash::sha3::KeccakSponge::new(136, 0x1f),
+            output_bytes.unwrap_or(0),
+        ),
+        "blake3" => StreamingHash::Blake3(blake3::Hasher::new()),
+        _ => return Ok(None),
+    };
+    // Reuse the text-input parameter checks, including SHAKE's output bound
+    // and rejection of customization flags on these algorithms.
+    cmd_hash_custom(algorithm, b"", output_bytes, custom, function_name)?;
+    let resolved = crypto_lib::store::resolve_path(file)?;
+    let mut input = std::fs::File::open(&resolved)
+        .map_err(|e| format!("cannot read input file {}: {e}", file.display()))?;
+    let mut buffer = [0u8; 64 * 1024];
+    loop {
+        let count = input
+            .read(&mut buffer)
+            .map_err(|e| format!("cannot read input file {}: {e}", file.display()))?;
+        if count == 0 {
+            break;
+        }
+        match &mut engine {
+            StreamingHash::Sha256(state) => state.update(&buffer[..count]),
+            StreamingHash::Keccak(state, _) => state.update(&buffer[..count]),
+            StreamingHash::Blake3(state) => {
+                state.update(&buffer[..count]);
+            }
+        }
+    }
+    let digest = match engine {
+        StreamingHash::Sha256(state) => state.finalize().to_vec(),
+        StreamingHash::Keccak(state, length) => state.finalize(length),
+        StreamingHash::Blake3(state) => state.finalize().as_bytes().to_vec(),
+    };
+    Ok(Some(to_hex(&digest)))
 }
 
 fn cmd_hash(alg: &str, bytes: &[u8], output_bytes: Option<usize>) -> Result<String, String> {
