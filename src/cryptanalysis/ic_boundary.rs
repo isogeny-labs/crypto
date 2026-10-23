@@ -5840,6 +5840,12 @@ impl PairTable {
 
     /// Indices `(i, j)` with `P_i + P_j = target`, if the table holds a
     /// pair summing to `±target`; one probe, at most one addition.
+    /// Read the slot [`Self::probe`] would read for `target`, uncounted:
+    /// a prefetch for a caller that knows its next targets.
+    pub fn touch<G: CountedGroup>(&self, g: &G, target: &G::Elt) {
+        std::hint::black_box(self.get(g.key(target) >> 1));
+    }
+
     pub fn probe<G: CountedGroup>(
         &self,
         g: &G,
@@ -6757,7 +6763,46 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
     pool_mode: RestartPool,
     matrix: &mut L,
     completion: CompletionRule,
+    oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+) -> PipelineOutcome {
+    collect_and_solve_relations_touching(
+        g,
+        generator,
+        target,
+        r,
+        h,
+        fb,
+        seed,
+        max_trials,
+        targets,
+        pool_mode,
+        matrix,
+        completion,
+        oracle,
+        |_| {},
+    )
+}
+
+/// [`collect_and_solve_relations`] with a `touch` that reads, uncounted,
+/// what the oracle will read for a target: the lane walks call it for a
+/// whole round of prepared targets before taking the first, so the
+/// round's cache misses overlap.  It decides and counts nothing.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver + ?Sized>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    targets: TargetSource,
+    pool_mode: RestartPool,
+    matrix: &mut L,
+    completion: CompletionRule,
     mut oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+    touch: impl Fn(&G::Elt),
 ) -> PipelineOutcome {
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_4C41_5449_4F4E);
     let mut rel = PhaseCost::default();
@@ -6986,6 +7031,16 @@ pub fn collect_and_solve_relations<G: CountedGroup, L: RelationSolver + ?Sized>(
                 }
             }
             lane_rounds += 1;
+            // Touch the guard's and the oracle's slots for the whole round
+            // before taking its first target: the reads are independent,
+            // so their cache misses overlap instead of falling one per
+            // trial.  Uncounted reads; everything below decides as before.
+            for &(_, point, _, _) in &lane_queue {
+                if guarded {
+                    std::hint::black_box(seen.contains_key(&g.key(&point)));
+                }
+                touch(&point);
+            }
         }
         // Exclusive phase marks (no-ops without an `ic_measurement`
         // session): drawing the target-dependent query point.
