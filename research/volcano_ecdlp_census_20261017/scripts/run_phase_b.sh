@@ -10,12 +10,15 @@ START=$(jq -r 'select(.type=="header").start_unix' $PROG | head -1)
 now() { date -u +%Y-%m-%dT%H:%M:%SZ; }
 done_p() { jq -e --arg s "$1" 'select(.spec==$s and .status=="done")' $PROG >/dev/null 2>&1 && return 0; return 1; }
 free_kb() { df -Pk "$STUDY" | awk 'NR==2{print $4}'; }
-audit_streak() { jq -r 'select(.spec!=null)|.audit_ok' $PROG | tac | awk 'BEGIN{n=0}{if($1=="true")exit; n++}END{print n}'; }
+audit_streak() { jq -r 'select(.spec!=null and .status!=null)|.audit_ok' $PROG | tac | awk 'BEGIN{n=0}{if($1=="true")exit; n++}END{print n}'; }
 log() { jq -nc --arg t "$(now)" --arg m "$1" '{type:"note",time:$t,msg:$m}' >> $PROG; }
 
 for name in $(jq -r '.sessions[].name' runs/manifest.json); do
   done_p "$name" && continue
-  el=$(( $(date +%s) - START ))
+  # campaign wall = now - start - recorded pauses (driver not running)
+  gap=$(jq -s '[.[]|select(.type=="pause")|((.resume|fromdate)-(.from|fromdate))]|add // 0' $PROG)
+  el=$(( $(date +%s) - START - gap ))
+  if [ "$(free_kb)" -lt $((2560*1024)) ]; then scripts/prune_local_sessions.sh $((2560*1024)) >> runs/prune.log 2>&1; fi
   if [ $el -ge $MAXWALL ]; then log "guard: 16h wall reached before $name"; echo GUARD_WALL; exit 3; fi
   if [ "$(free_kb)" -lt $MINFREE_KB ]; then log "guard: free disk < 1.5 GiB before $name"; echo GUARD_DISK; exit 3; fi
   if [ "$(audit_streak)" -ge $MAXFAIL ]; then log "guard: 3 failed audits in a row before $name"; echo GUARD_AUDIT; exit 3; fi
@@ -44,9 +47,11 @@ for name in $(jq -r '.sessions[].name' runs/manifest.json); do
   sstat=$(jq -r '.status' $out/session.json)
   raw=$(du -sb $out | cut -f1)
   tar -C sessions -cf - $base | xz -9e -T1 > sessions/$base.tar.xz
+  xz -t sessions/$base.tar.xz 2>/dev/null || { mv sessions/$base.tar.xz sessions/$base.tar.xz.partial; tar -C sessions -cf - $base | xz -9e -T1 > sessions/$base.tar.xz; }
+  xz -t sessions/$base.tar.xz 2>/dev/null && xz_ok=true || xz_ok=false
   xzb=$(stat -c %s sessions/$base.tar.xz); sha=$(sha256sum sessions/$base.tar.xz | cut -d' ' -f1)
   wall=$(( $(date +%s) - t0 ))
-  st=done; [ "$sstat" != "complete" ] && st=$sstat; [ "$audit_ok" != "true" ] && st=audit_failed
+  st=done; [ "$sstat" != "complete" ] && st=$sstat; [ "$audit_ok" != "true" ] && st=audit_failed; [ "$xz_ok" != true ] && st=archive_failed
   [ "$sstat" != "complete" ] && audit_ok=false
   jq -nc --arg spec "$name" --arg out "$out" --arg st "$st" --arg ss "$sstat" --argjson ok "$audit_ok" --argjson runs $runs --argjson fails $fails \
     --argjson raw $raw --argjson xz $xzb --arg sha "$sha" --argjson wall $wall --arg t "$(now)" --argjson rr $rc_run --argjson rv $rc_ver \
