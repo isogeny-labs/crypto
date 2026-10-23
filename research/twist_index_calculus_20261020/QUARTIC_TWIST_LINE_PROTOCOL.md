@@ -576,3 +576,23 @@ reports and PDFs, matched controls, and raw failures. The same-input
 msolve/Magma comparison, native hash/allocator CPU, calibrated GAE and
 isolated ABAB timing remain separate gates; counted-unit scaling is not
 a priced IC/rho claim.
+
+## Registered complete frozen-stream k=1 occupancy census
+
+Frozen 23 October 2026 after the p=73 producer and independent audit
+reported one missed system on seed one, while the p=97 producer was still
+running. On all six p=73/p=97 seed-0/1/2 `L0∪L2` traces named above,
+run an **independent point-keyed group-pair oracle** over the entire
+recorded residual stream, including residuals after an IC arm would stop.
+Count the complete signed `k=1` set per residual, first hit, cumulative
+hits, zero-yield runs and observed/`16 C(B0,3) B2/r` uniform-occupancy
+ratio. Preserve per-residual counts and a digest of each exact signed set
+with an executable native replay path. The point-keyed oracle must not
+use the polynomial producer's reported relation set to determine
+occupancy. This census tests whether the p=97 collection burden arises
+from the physical factor-base distribution or the algebraic solver; it
+is a group-oracle reference, not a polynomial IC cost. Use the same
+8 GiB/1,200 s bound per curve/seed, retain failures and make a native
+A/A copy. If a solver run later stops before the end of its frozen
+stream, keep the census's post-stop portion explicitly separate from the
+counted one-target path.
