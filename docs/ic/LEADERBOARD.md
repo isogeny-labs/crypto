@@ -273,6 +273,17 @@ Copied from native analysis: eight independent one-target workloads per fixed cu
 | 8209 | 0.975242 | 0.603463 to 1.450934 |
 | 131101 | 1.127134 | 0.922471 to 1.341694 |
 
+## Linear stage after F4 (sparse FGLM) in the Jacobian-cover IC
+
+Component speed-up, class engineering: the dense linear stage against sparse FGLM (Wiedemann / Berlekamp–Massey on M_xn, shift-chain eigenvectors) in examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve), same binary and seeds, the same relations, every DLP solved and verified by both arms (`research/jv_cover_sparse_fglm_20261018`, run-20261018T2138Z). It moves no row of tables A–C. S/rho is a lower-bound comparison (unpriced native work is not emitted).
+
+| p | seed | relations | S dense | S sparse | dense ÷ sparse | S/rho dense | S/rho sparse (distance to rho) |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 53 | 1 | 31 | 937.2 | 731.6 | 1.28 | 851 | 664 |
+| 53 | 2 | 33 | 424.5 | 328.8 | 1.29 | 369 | 286 |
+| 101 | 1 | 53 | 287.8 | 224.4 | 1.28 | 194 | 151 |
+| 101 | 2 | 50 | 466.3 | 365.5 | 1.28 | 373 | 293 |
+
 ## N83 Tier 1 one-target cold factor-base holdout
 
 Five sealed public points, one fresh process per IC arm, and a same-point rho solve per point completed on one GitHub-hosted cloud instance. Each of the 25 IC arms and five rho arms passed independent replay. K1152 ran twice per point as the local A/A control. The selected candidate is `null`; the frozen decision is `BOUNDED_UNKNOWN`.
@@ -316,6 +327,7 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/glv_k4_pipeline_d4_20261017/summary.json` — sha256 `369769457fdf5657…`
 - `research/glv_gls_v4_20261018/summary.json` — sha256 `c8de6d58008176d6…`
+- `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
