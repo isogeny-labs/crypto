@@ -29,6 +29,7 @@ pub mod gf3n;
 pub mod gls_loop;
 pub mod icv1;
 pub mod int;
+pub mod isobench;
 pub mod json;
 pub mod kernel;
 /// Exact integer LLL in any dimension.
