@@ -2,6 +2,26 @@
 
 Source reviewed: `crypto` upstream main at `c6d64436a33359320ad9d5b42c4acebee2968b9a` and C `cryptanalysis` upstream main at `5a52a13877271144d88e62a82031826759696fc3`. This inventory covers runnable commands rather than inferring CLI support from library modules. A status of **verified** below applies only to the named local check, not arbitrary curves, algorithms, devices, or a live S3 account.
 
+## Current-head AES corpus interoperability — 2026-10-23
+
+`crypto cryptanalysis aes-differential-observed` accepts the versioned CRAx
+two-round differential corpus. `crypto cryptanalysis aes-linear-observed`
+accepts the versioned CRAx one-round linear corpus. Both commands check the
+schema version, technique, round count, and
+`aes128-reduced-final-no-mixcolumns/v1` model before analysis. The linear
+command also accepts `--verification-input` for a separate corpus of held-out
+pairs. It rejects plaintext overlap and reports `verified` only after a full
+replay against both corpora. Both inputs can be checked `store:NAME` or
+`sha256:DIGEST` references. Results include the input formats and SHA-256
+artifact identities.
+
+The [cross-CLI acceptance receipt](../store/AES_CROSS_CLI_CORPUS_ACCEPTANCE_20261023.json)
+records CRAx generation, local comparison, S3 publication and HEAD checks,
+fresh-cache retrieval, digest checks, held-out replay, negative cases, and
+cleanup. The differential command returns four last-round key bytes for its
+two-round model. These commands do not claim coverage of general full-round
+AES key recovery.
+
 ## Current-head hash-file addition — 2026-10-23
 
 `crypto hash --file` now processes SHA-256, SHA-3-224/256/384/512,

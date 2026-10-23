@@ -1,7 +1,7 @@
 //! Observed AES corpora for reduced-round recovery and general block statistics.
 use crypto_lib::cryptanalysis::aes::{differential, linear, mitm, reduced::ReducedAes128};
 use serde::Deserialize;
-use serde_json::json;
+use serde_json::{json, Value};
 use std::{
     collections::{HashMap, HashSet},
     fs,
@@ -44,6 +44,119 @@ struct LinearInput {
     pairs: Vec<Pair2>,
     #[serde(default)]
     verification_pairs: Vec<Pair2>,
+}
+
+const CRAX_CIPHER_MODEL: &str = "aes128-reduced-final-no-mixcolumns/v1";
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CraxCorpus<T> {
+    schema_version: u32,
+    cipher_model: String,
+    technique: String,
+    rounds: usize,
+    pairs: Vec<T>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CraxDifferentialPair {
+    p0: String,
+    p1: String,
+    c0: String,
+    c1: String,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CraxLinearPair {
+    plaintext: String,
+    ciphertext: String,
+}
+
+fn versioned_corpus(bytes: &[u8]) -> Result<bool, String> {
+    let value: Value = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
+    Ok(value.get("schema_version").is_some())
+}
+
+fn check_crax_corpus<T>(
+    corpus: &CraxCorpus<T>,
+    technique: &str,
+    rounds: usize,
+) -> Result<(), String> {
+    if corpus.schema_version != 1
+        || corpus.cipher_model != CRAX_CIPHER_MODEL
+        || corpus.technique != technique
+        || corpus.rounds != rounds
+    {
+        return Err("AES corpus schema, model, technique, or round count differs".into());
+    }
+    Ok(())
+}
+
+fn parse_differential_input(bytes: &[u8]) -> Result<(DifferentialInput, &'static str), String> {
+    if !versioned_corpus(bytes)? {
+        return serde_json::from_slice(bytes)
+            .map(|input| (input, "crypto-observed/v1"))
+            .map_err(|e| e.to_string());
+    }
+    let corpus: CraxCorpus<CraxDifferentialPair> =
+        serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
+    check_crax_corpus(&corpus, "differential", 2)?;
+    let first = corpus
+        .pairs
+        .first()
+        .ok_or("AES differential corpus has no pairs")?;
+    let alpha = block(&first.p0)?[0] ^ block(&first.p1)?[0];
+    Ok((
+        DifferentialInput {
+            alpha,
+            pairs: corpus
+                .pairs
+                .into_iter()
+                .map(|pair| Pair4 {
+                    p0_hex: pair.p0,
+                    p1_hex: pair.p1,
+                    c0_hex: pair.c0,
+                    c1_hex: pair.c1,
+                })
+                .collect(),
+        },
+        "crax-aes-corpus/v1",
+    ))
+}
+
+fn parse_linear_input(bytes: &[u8]) -> Result<(LinearInput, &'static str), String> {
+    if !versioned_corpus(bytes)? {
+        return serde_json::from_slice(bytes)
+            .map(|input| (input, "crypto-observed/v1"))
+            .map_err(|e| e.to_string());
+    }
+    let corpus: CraxCorpus<CraxLinearPair> =
+        serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
+    check_crax_corpus(&corpus, "linear", 1)?;
+    Ok((
+        LinearInput {
+            pairs: corpus
+                .pairs
+                .into_iter()
+                .map(|pair| Pair2 {
+                    plaintext_hex: pair.plaintext,
+                    ciphertext_hex: pair.ciphertext,
+                })
+                .collect(),
+            verification_pairs: Vec::new(),
+        },
+        "crax-aes-corpus/v1",
+    ))
+}
+
+fn input_artifact(input: &Path, bytes: &[u8]) -> Value {
+    json!({
+        "reference":input.to_string_lossy(),
+        "sha256":hex::encode(crypto_lib::hash::sha256::sha256(bytes)),
+        "bytes":bytes.len(),
+    })
 }
 
 #[derive(Deserialize)]
@@ -385,8 +498,8 @@ pub fn linear_statistics(input: &Path) -> Result<(), String> {
 }
 
 pub fn differential(input: &Path) -> Result<(), String> {
-    let data: DifferentialInput =
-        serde_json::from_slice(&read(input)?).map_err(|e| e.to_string())?;
+    let bytes = read(input)?;
+    let (data, input_format) = parse_differential_input(&bytes)?;
     if data.alpha == 0 || !(2..=100_000).contains(&data.pairs.len()) {
         return Err("alpha must be nonzero and pair count must be 2..=100000".into());
     }
@@ -430,7 +543,7 @@ pub fn differential(input: &Path) -> Result<(), String> {
     let ddt = differential::aes_sbox_ddt();
     let report =
         differential::key_recovery_two_round(data.alpha, &pairs, &ddt).map_err(str::to_owned)?;
-    let bytes: Vec<_> = report
+    let key_bytes: Vec<_> = report
         .key_bytes
         .iter()
         .map(|(position, value)| json!({"position":position,"value_hex":format!("{value:02x}")}))
@@ -440,10 +553,12 @@ pub fn differential(input: &Path) -> Result<(), String> {
         serde_json::to_string_pretty(&json!({
             "schema_version":1,
             "model":"aes-128-reduced-two-round-no-final-mixcolumns",
+            "input_format":input_format,
+            "input_artifact":input_artifact(input, &bytes),
             "status":"partial_candidate",
             "pairs_used":report.pairs_used,
             "trial_count":report.trial_count,
-            "last_round_key_bytes":bytes
+            "last_round_key_bytes":key_bytes
         }))
         .map_err(|e| e.to_string())?
     );
@@ -468,8 +583,24 @@ fn parsed_pairs(
     Ok(out)
 }
 
-pub fn linear(input: &Path) -> Result<(), String> {
-    let data: LinearInput = serde_json::from_slice(&read(input)?).map_err(|e| e.to_string())?;
+pub fn linear(input: &Path, verification_input: Option<&Path>) -> Result<(), String> {
+    let bytes = read(input)?;
+    let (mut data, input_format) = parse_linear_input(&bytes)?;
+    let mut verification_artifact = None;
+    let mut verification_format = None;
+    if let Some(path) = verification_input {
+        if !data.verification_pairs.is_empty() {
+            return Err("use either inline verification_pairs or --verification-input".into());
+        }
+        let held_out_bytes = read(path)?;
+        let (held_out, format) = parse_linear_input(&held_out_bytes)?;
+        if !held_out.verification_pairs.is_empty() {
+            return Err("--verification-input must contain only training pairs".into());
+        }
+        data.verification_pairs = held_out.pairs;
+        verification_artifact = Some(input_artifact(path, &held_out_bytes));
+        verification_format = Some(format);
+    }
     if !(16..=100_000).contains(&data.pairs.len()) || data.verification_pairs.len() > 100_000 {
         return Err(
             "training pair count must be 16..=100000; verification pair count <=100000".into(),
@@ -524,6 +655,10 @@ pub fn linear(input: &Path) -> Result<(), String> {
         serde_json::to_string_pretty(&json!({
             "schema_version":1,
             "model":"aes-128-reduced-one-round-no-final-mixcolumns",
+            "input_format":input_format,
+            "input_artifact":input_artifact(input, &bytes),
+            "verification_format":verification_format,
+            "verification_artifact":verification_artifact,
             "method":"per-byte-exhaustive-consistency",
             "status":status,
             "candidate_key_hex":if training_ok {Some(hex::encode(key))} else {None},
@@ -611,6 +746,54 @@ pub fn linear_parity(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn versioned_aes_corpora_require_the_exact_reduced_model() {
+        let p0 = "00".repeat(16);
+        let p1 = format!("73{}", "00".repeat(15));
+        let mut differential = json!({
+            "schema_version":1,
+            "cipher_model":CRAX_CIPHER_MODEL,
+            "technique":"differential",
+            "rounds":2,
+            "pairs":[{"p0":p0,"p1":p1,"c0":"00".repeat(16),"c1":"01".repeat(16)}]
+        });
+        let bytes = serde_json::to_vec(&differential).unwrap();
+        let (parsed, format) = parse_differential_input(&bytes).unwrap();
+        assert_eq!(format, "crax-aes-corpus/v1");
+        assert_eq!(parsed.alpha, 0x73);
+        differential["rounds"] = json!(1);
+        assert!(
+            parse_differential_input(&serde_json::to_vec(&differential).unwrap())
+                .err()
+                .unwrap()
+                .contains("round count differs")
+        );
+        differential["rounds"] = json!(2);
+        differential["pairs"][0]["unexpected"] = json!(1);
+        assert!(
+            parse_differential_input(&serde_json::to_vec(&differential).unwrap())
+                .err()
+                .unwrap()
+                .contains("unknown field")
+        );
+
+        let mut linear = json!({
+            "schema_version":1,
+            "cipher_model":CRAX_CIPHER_MODEL,
+            "technique":"linear",
+            "rounds":1,
+            "pairs":[{"plaintext":"00".repeat(16),"ciphertext":"01".repeat(16)}]
+        });
+        let (parsed, format) = parse_linear_input(&serde_json::to_vec(&linear).unwrap()).unwrap();
+        assert_eq!(format, "crax-aes-corpus/v1");
+        assert_eq!(parsed.pairs.len(), 1);
+        linear["cipher_model"] = json!("aes128-full/v1");
+        assert!(parse_linear_input(&serde_json::to_vec(&linear).unwrap())
+            .err()
+            .unwrap()
+            .contains("model"));
+    }
 
     #[test]
     fn observed_block_statistics_measure_pairs_and_reject_bad_corpora() {
@@ -822,7 +1005,7 @@ mod tests {
         let payload = json!({"pairs":corpus[..128].iter().map(as_json).collect::<Vec<_>>(),
             "verification_pairs":[as_json(&corpus[128])]});
         fs::write(&path, payload.to_string()).unwrap();
-        assert!(linear(&path).is_ok());
+        assert!(linear(&path, None).is_ok());
         // A fixed output-byte offset leaves each S-box input-byte search
         // consistent, but no longer matches the AES round-key schedule.
         let mut shifted = payload.clone();
@@ -833,20 +1016,20 @@ mod tests {
             pair["ciphertext_hex"] = json!(hex::encode(ciphertext));
         }
         fs::write(&path, shifted.to_string()).unwrap();
-        assert!(linear(&path)
+        assert!(linear(&path, None)
             .unwrap_err()
             .contains("complete training model replay"));
         let mut repeated = payload.clone();
         repeated["pairs"][1] = repeated["pairs"][0].clone();
         fs::write(&path, repeated.to_string()).unwrap();
-        assert!(linear(&path)
+        assert!(linear(&path, None)
             .unwrap_err()
             .contains("training plaintexts must be distinct"));
         let mut mismatch = payload.clone();
         mismatch["verification_pairs"][0]["ciphertext_hex"] =
             json!("00000000000000000000000000000000");
         fs::write(&path, mismatch.to_string()).unwrap();
-        assert!(linear(&path)
+        assert!(linear(&path, None)
             .unwrap_err()
             .contains("failed independent verification"));
         let mut invalid = payload;
@@ -855,7 +1038,7 @@ mod tests {
         invalid["verification_pairs"][0]["ciphertext_hex"] =
             invalid["pairs"][0]["ciphertext_hex"].clone();
         fs::write(&path, invalid.to_string()).unwrap();
-        assert!(linear(&path).unwrap_err().contains("distinct"));
+        assert!(linear(&path, None).unwrap_err().contains("distinct"));
 
         let samples = linear::known_plaintext_corpus(&one, 4096, 19);
         let lat = linear::aes_sbox_lat();

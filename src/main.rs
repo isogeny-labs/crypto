@@ -479,7 +479,7 @@ enum CryptanalysisOp {
     },
     /// Analyze caller-supplied chosen pairs for the two-round AES differential model.
     AesDifferentialObserved {
-        /// JSON with alpha and chosen plaintext/ciphertext pairs.
+        /// Legacy JSON or a versioned crax two-round differential pairs file; accepts checked store references.
         #[arg(long)]
         input: PathBuf,
     },
@@ -515,9 +515,12 @@ enum CryptanalysisOp {
     },
     /// Analyze caller-supplied known pairs for the one-round AES linear model.
     AesLinearObserved {
-        /// JSON with known pairs and optional independent verification pairs.
+        /// Legacy JSON or a versioned crax one-round linear pairs file; accepts checked store references.
         #[arg(long)]
         input: PathBuf,
+        /// Separate linear corpus of held-out pairs for independent candidate verification.
+        #[arg(long)]
+        verification_input: Option<PathBuf>,
     },
     /// Infer one effective-key parity bit from an AES S-box linear approximation.
     AesLinearParity {
@@ -2736,8 +2739,11 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
                 std::process::exit(1);
             }
         }
-        CryptanalysisOp::AesLinearObserved { input } => {
-            if let Err(e) = cli_aes_observed::linear(&input) {
+        CryptanalysisOp::AesLinearObserved {
+            input,
+            verification_input,
+        } => {
+            if let Err(e) = cli_aes_observed::linear(&input, verification_input.as_deref()) {
                 eprintln!("error: {e}");
                 std::process::exit(1);
             }
