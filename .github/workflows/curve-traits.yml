@@ -119,8 +119,21 @@ jobs:
       - name: Reject an altered file
         if: matrix.task == 'altered'
         run: |
-          cp docs/curves/traits.json /tmp/altered.json
-          sed -i '0,/"conductor": "7"/s//"conductor": "11"/' /tmp/altered.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          import re
+
+          original = Path('docs/curves/traits.json').read_text()
+          altered, count = re.subn(r'("conductor"\s*:\s*)"7"',
+                                   r'\g<1>"11"', original, count=1)
+          assert count == 1, 'expected a conductor value of 7'
+          before = json.loads(original)
+          after = json.loads(altered)
+          assert before['curves'][0]['frobenius']['conductor'] == '7'
+          assert after['curves'][0]['frobenius']['conductor'] == '11'
+          Path('/tmp/altered.json').write_text(altered)
+          PY
           if cmp -s docs/curves/traits.json /tmp/altered.json; then
             echo 'the edit did not apply'; exit 1
           fi
