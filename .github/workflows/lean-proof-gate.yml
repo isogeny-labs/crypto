@@ -43,6 +43,9 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: /tools/lean/**
       - name: Install elan
         run: |
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain "$(cat tools/lean/lean-toolchain)"
@@ -73,6 +76,23 @@ jobs:
     name: ${{ matrix.target }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: /tools/lean/**
+      - name: Materialize only this proof target
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          if [[ "$TARGET" == *.lean ]]; then
+            target_dir=$(dirname "$TARGET")
+          else
+            target_dir=$TARGET
+          fi
+          if [[ "$target_dir" == . ]]; then
+            git sparse-checkout add '/*.lean' '/lean-toolchain'
+          else
+            git sparse-checkout add "/$target_dir/**"
+          fi
       - name: Install elan
         run: |
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
