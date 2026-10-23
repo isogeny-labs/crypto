@@ -1,0 +1,61 @@
+{
+  "schema": "isolab.l2-bootstrap-verification/v1",
+  "verified_at": "2026-10-23T02:59:07.390363+00:00",
+  "run": "ecbench-domain-periodic-20261023-j",
+  "result": "passed",
+  "job_uid": "c97aa0ac-d3f6-431d-915d-189d21cd3c36",
+  "pod_uid": "76931218-b9ab-446c-a4b9-05dc068aa557",
+  "node": "ip-10-84-74-123.us-east-2.compute.internal",
+  "instance": {
+    "id": "i-08df3df7752a77c99",
+    "type": "c8a.2xlarge",
+    "state": "running",
+    "launch": "2026-10-23T02:47:02+00:00",
+    "cpu": {
+      "CoreCount": 8,
+      "ThreadsPerCore": 1
+    },
+    "image": "ami-082b570a48503ea93",
+    "zone": "us-east-2c"
+  },
+  "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+  "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+  "binary_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9",
+  "grades": [
+    {
+      "level": "L2",
+      "count": 3606
+    }
+  ],
+  "records": 3606,
+  "matching_native_replays": 3600,
+  "aa": {
+    "status": "admitted",
+    "reasons": [],
+    "required_level": "L2",
+    "pairs": 1200,
+    "pairs_below_level": 0,
+    "median_ratio": 1.0000835088461724,
+    "ci95": [
+      0.9998369790409941,
+      1.0002442221670806
+    ],
+    "aa_arms": [
+      "rho-neg",
+      "rho-neg-aa"
+    ],
+    "aa_pairs": 1200,
+    "aa_median_ratio": 1.0000835088461724,
+    "aa_ci95": [
+      0.9998485970859599,
+      1.0002419602383978
+    ],
+    "outside_noise": false
+  },
+  "s3_payload_hashes_verified": 19,
+  "results_uri": "s3://isolab-results-104186811093-us-east-2/runs/ecbench-domain-periodic-20261023-j/76931218-b9ab-446c-a4b9-05dc068aa557/",
+  "bootstrap": "periodic tick, scheduler-domain isolation, host PSI retained, watchdog/RCU housekeeping",
+  "measurement_retries": 0,
+  "protocol_erratum": "protocol-pair-count-erratum.json (two targets times 600 rounds gives 1200 A/A pairs)",
+  "scope": "Fresh measurement qualification; separate from CRIU restore and from the still-pending post-merge main GitHub Action"
+}

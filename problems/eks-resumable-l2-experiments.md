@@ -65,8 +65,8 @@ Existing v1 jobs instead use `emptyDir` and zero automatic measurement retries.
 
 ## Next discriminating step
 
-Qualify the periodic-tick bootstrap against the unchanged 600-round crypto
-workload, then finish PR #2342 after exact-head CI/review and dispatch the
+The dedicated benchmark bootstrap has passed the unchanged full crypto workload
+and is deployed. Finish PR #2342 after current-head CI/review and dispatch the
 main-only GitHub Action. Require its built image,
 source/binary hashes, actual EKS identity and complete L2/S3 receipts to agree.
 Keep the existing 96-vCPU account quota and 64-vCPU worker cap. Interrupted
@@ -169,3 +169,38 @@ retains the frozen workload, receipts, events and zero-object S3 listing. The v5
 source and launcher packages are prepared but not promoted. A free 8-vCPU Spot
 slot and a new, explicitly frozen provisioning attempt are needed to execute
 the original full qualification; no measurement result has been retried.
+
+Qualification E subsequently ran when capacity freed. All 3,606 computations and
+3,600 native measured replays verified, but the unchanged L2 gate rejected 48
+records for involuntary preemptions: 3,558 L2 / 48 L1. None failed the excess-tick
+or steal gate. A/A was not evaluated after exit 42; all 18 emitted S3 payload
+hashes matched complete readback. The [frozen failure report and inspected PDF](../taskq/deploy/eks-karpenter/diagnostics/validation/20261023-l2-qualification-e/REPORT.md)
+retain every record, identity, receipt and the explicit correction to the observer's
+paginated-S3-listing assumption. The periodic-tick-only candidate is not promoted.
+
+Separate native scheduler diagnostics G and H identified bound kernel workers,
+including `psi_avgs_work` and `vmstat_update`, and periodic migration-thread work.
+The initial RCU-only hypothesis did not explain the dominant trace. Candidate I
+tested a dedicated benchmark bootstrap: scheduler-domain isolation, per-cgroup
+pressure accounting off while mandatory host pressure metrics remain on, and
+explicit housekeeping affinity for RCU threads and the watchdog. All 2,000 native
+diagnostic records were retained; no probe preemptions were traced on CPU4 and
+no record exceeded two excess busy ticks. This probe alone claims no L2 grade.
+No measured failed epoch is selectively retried, regraded or dropped.
+
+Full qualification J then passed with tracing disabled: 3,606 verified L2
+executions, 3,600 matching native measured replays, 1,200 admitted A/A pairs and
+all 19 S3 payload hashes verified. The original protocol's 600-pair expectation
+was an arithmetic error: two targets times 600 rounds produce 1,200 pairs. The
+unchanged workload, original protocol and explicit correction are retained in
+the [report and inspected PDF](../taskq/deploy/eks-karpenter/diagnostics/validation/20261023-l2-domain/REPORT.md).
+No threshold, sample or timing result was changed to obtain the pass.
+
+The qualified profile v6 is deployed on dedicated `cpu-l2-spot` workers; ordinary
+`cpu-spot` retains its v4 bootstrap. Each pool is capped at 32 vCPUs / 128 GiB,
+preserving combined limits of 64 vCPUs / 256 GiB and the regional 96-vCPU quota.
+Both immutable launchers and submitter readiness were deployed and read back.
+Temporary diagnostic workers and this task's temporary cluster-admin association
+were removed. Other tasks' workers were not interrupted. The main-only GitHub
+Action remains pending PR review/CI and merge. J proves a fresh epoch, not a new
+CRIU restore on v6 or qualification of every allowed instance family.
