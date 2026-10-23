@@ -720,3 +720,18 @@ negative control, perturb one eigenvalue and require the closure check to
 fail. This is an exact scalar/group diagnostic of potential reuse, not a
 polynomial implementation or measured cache speedup. A later native cache
 would have to preserve complete relation sets, signs, rank and total cost.
+
+## Registered subgroup ablation of peeled-target reuse
+
+Frozen 23 October 2026 after the full-24 diagnostic, before calculating
+subgroup collision counts. Reuse the exact same six complete p=73/97
+mixed-line streams, signed L2 logs, non-infinity peels and per-stream cache
+boundary from the preceding test. Canonicalize under four fixed groups:
+identity (order 1), cubic alone (order 3), transported Frobenius alone
+(order 8), and their product (order 24). For each group and stream report
+within-residual duplicates, additional across-residual duplicates,
+unique canonical targets and the ideal solver-call ratio. Verify the
+expected orders, subgroup containment, factor-set closure and monotone
+unique counts. Treat all ratios only as call-count upper bounds; cache
+lookup, canonicalization and polynomial transport remain unmeasured.
+Preserve the initial full-24 record unchanged and link both diagnostics.
