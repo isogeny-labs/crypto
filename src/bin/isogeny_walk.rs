@@ -112,6 +112,23 @@ enum Cmd {
         #[arg(long)]
         run: Option<String>,
     },
+    /// Check whether a walk, trait shard, or collected trait run has a completed S3 marker.
+    Exists {
+        /// s3://bucket/prefix the run was published under.
+        #[arg(long)]
+        from: String,
+        /// Run id (printed by `walk --store`, in STORE.json).
+        #[arg(long)]
+        run: String,
+        /// Check trait shard SHARD of OF instead of the walk.
+        #[arg(long)]
+        shard: Option<usize>,
+        #[arg(long)]
+        of: Option<usize>,
+        /// Check the collected traits of OF shards instead of the walk.
+        #[arg(long)]
+        collected: bool,
+    },
     /// Download a stored walk, trait shard or collected traits, checking every hash.
     Fetch {
         /// s3://bucket/prefix the run was published under.
@@ -785,6 +802,34 @@ fn run(cli: Cli) -> Result<(), String> {
                     ]),
                 )?;
             }
+            Ok(())
+        }
+        Cmd::Exists {
+            from,
+            run,
+            shard,
+            of,
+            collected,
+        } => {
+            let loc = S3Loc::parse(&from)?;
+            let rel = match (shard, of, collected) {
+                (Some(i), Some(n), false) => store::shard_rel(&run, i, n)?,
+                (None, Some(n), true) => store::collected_rel(&run, n)?,
+                (None, None, false) => store::walk_rel(&run)?,
+                _ => return Err("use --shard I --of N, or --collected --of N, or neither".into()),
+            };
+            let marker = loc.key(&format!("{rel}/{}", store::COMPLETE_FILE));
+            let result = store::head(&loc, &marker)?;
+            println!(
+                "{}",
+                serde_json::json!({
+                    "schema": "isogeny-walk-exists/v1",
+                    "marker": loc.uri(&format!("{rel}/{}", store::COMPLETE_FILE)),
+                    "exists": result.is_some(),
+                    "bytes": result.as_ref().map(|h| h.bytes),
+                    "sha256": result.as_ref().map(|h| h.sha256.as_str()),
+                })
+            );
             Ok(())
         }
         Cmd::Fetch {

@@ -183,6 +183,13 @@ files with hash verification, and independently verified both fetched edges.
 `ic solve-prime-file` consumed the fetched route and verified scalar 190 on
 the original curve. The four test objects were then removed; see
 [`ISOGENY_WALK_CUSTOM_S3_ACCEPTANCE_20261023.json`](../store/ISOGENY_WALK_CUSTOM_S3_ACCEPTANCE_20261023.json).
+For an on-demand S3 existence check, use
+`isogeny_walk exists --from s3://BUCKET/PREFIX --run RUN_ID`. It HEADs the
+authoritative `complete.json` marker and returns JSON with `exists`, byte
+count, and S3-reported SHA-256. Use `--shard I --of N` or `--collected --of N`
+to check trait outputs; a missing marker reports `exists: false`.
+The [live S3 receipt](../store/ISOGENY_WALK_EXISTS_S3_ACCEPTANCE_20261023.json)
+records false, true, and false across publish and exact-prefix cleanup.
 
 ## Cubic extension field
 
