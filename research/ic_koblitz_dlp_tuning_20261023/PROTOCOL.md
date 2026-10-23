@@ -208,3 +208,24 @@ dry targets was 5.7 (n = 37), 13.5 (n = 47), in line with Phase 1.
 SHA-256 of the train and positive-control specs at freeze (`sha256sum specs/*.json`) are recorded
 in `SPEC_HASHES.txt`, committed together with this file. This file's own hash is recorded in each
 result file's header by `REPORT.md`.
+
+## Amendment 1 (2026-10-23, before any train or holdout data)
+
+**Finding.** The first positive-control session (`sessions/poscontrol-n41`, binary
+`eaba5eb0…`, kept as evidence) verified 24 of 24 runs and gave the expected effect, but
+`ecbench verify --replay-all` FAILED: every `dlp-k10-c10` record "differs in phase counts"
+(8 of 8; `audits/poscontrol-n41.audit.json`). The cause is a wall-clock counter,
+`lp_filter_wall_ns`, which `ic_framework::large_prime::relation_counters` wrote into the relations
+phase's replayed `native` map. It is not priced (no `_uncharged` suffix, not in `total_gae`), so no
+`S` changes; but a double-LP record cannot replay identically while it is there, and this protocol
+requires `--replay-all` OK.
+
+**Change.** One instrument edit, `src/cryptanalysis/ic_framework/large_prime.rs`: the collector no
+longer emits `lp_filter_wall_ns` (the field stays on the collector). The binary is rebuilt from this
+branch (`origin/main` a53a7e2bf + this edit + the `ic_paired_band` example) and its SHA-256 is
+recorded in every session. All sessions are run with that one binary; the positive control is
+re-run as `sessions/poscontrol-n41-r2`. The pre-fix session is not used for any inference except to
+check that the fix changed no count: its per-record `total_gae` and every native counter other than
+`lp_filter_wall_ns` must equal the r2 session's, record for record (same spec, seeds), reported in
+`REPORT.md`. Nothing else in the protocol changes. `run_session.sh` (run, audit, band) is added to
+the frozen commands.

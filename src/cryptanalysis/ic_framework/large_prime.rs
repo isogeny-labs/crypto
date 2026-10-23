@@ -455,7 +455,10 @@ impl<'i> LargePrimeCollector<'i> {
             c.verification_scalar_mults,
         );
         out.insert("lp_verification_failures".into(), c.verification_failures);
-        out.insert("lp_filter_wall_ns".into(), c.filter_wall_ns);
+        // `filter_wall_ns` is a wall-clock reading; recording it in the replayed
+        // `native` map made every double-LP record differ from its own replay
+        // (`ecbench verify` "differs in phase counts"), so it is kept on the
+        // collector only and is not emitted (counts are unaffected: it was never priced).
         out
     }
 
