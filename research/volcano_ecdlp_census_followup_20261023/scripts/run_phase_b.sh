@@ -47,10 +47,15 @@ git_publish() { # $1 = commit subject, then the repo-relative paths just added. 
   local subj=$1; shift
   # commit only the listed paths (anything else staged in the index by someone else is left alone);
   # a commit that fails (for example a stale index.lock) is not hidden: the caller checks HEAD
-  git -C "$REPO" commit -q -m "$subj${COMMIT_TRAILER:+
-
-$COMMIT_TRAILER}" -- "$@" >/dev/null 2>&1 || true
+  # a transient failure (index.lock held by a concurrent git command) is retried up to 4 times;
+  # a commit that still fails is not hidden: the caller checks HEAD
   local i
+  for i in 1 2 3 4; do
+    git -C "$REPO" commit -q -m "$subj${COMMIT_TRAILER:+
+
+$COMMIT_TRAILER}" -- "$@" >/dev/null 2>&1 && break
+    sleep $((i*2))
+  done
   for i in 1 2 3 4 5; do
     if git -C "$REPO" push -q -u origin "$BRANCH" >/dev/null 2>&1; then return 0; fi
     git -C "$REPO" pull -q --no-rebase origin "$BRANCH" >/dev/null 2>&1 || true
