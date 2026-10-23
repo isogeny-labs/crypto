@@ -333,7 +333,8 @@ pub fn run(fixtures: &[Fixture], execution: &Path, out: &Path) -> Result<Vec<Val
     let mut distinct_targets = BTreeSet::new();
     let mut verified = [0u64; 4];
     let partial_root = root.join("partial-20261023-v2");
-    let mut witness_cache = BTreeMap::new();
+    // Keep only the replay result, not thousands of expanded JSON matrices.
+    let mut witness_cache = BTreeMap::<String, (P, Option<u64>)>::new();
     for p in files(&partial_root)? {
         if !p
             .file_name()
@@ -357,8 +358,8 @@ pub fn run(fixtures: &[Fixture], execution: &Path, out: &Path) -> Result<Vec<Val
             for (i, a) in arms.iter().enumerate() {
                 verified[i] += u64::from(a["scalar_verified"] == true);
                 let file = text(&a["file"]);
-                let witness = if let Some(v) = witness_cache.get(file) {
-                    v
+                let (q, scalar) = if let Some(v) = witness_cache.get(file) {
+                    *v
                 } else {
                     let w = read(partial_root.join(file))?;
                     assert_eq!(
@@ -390,10 +391,11 @@ pub fn run(fixtures: &[Fixture], execution: &Path, out: &Path) -> Result<Vec<Val
                         assert_eq!(row_value(f.curve(), &columns, array(row)), None);
                     }
                     verify_scalar(f, q, &w["scalar"]);
-                    witness_cache.entry(file.to_owned()).or_insert(w)
+                    let replay = (q, w["scalar"].as_u64());
+                    witness_cache.insert(file.to_owned(), replay);
+                    replay
                 };
-                let q: P = serde_json::from_value(witness["target"].clone())?;
-                assert_eq!(a["scalar_verified"], !witness["scalar"].is_null());
+                assert_eq!(a["scalar_verified"], scalar.is_some());
                 distinct_targets.insert((f.id.clone(), q));
             }
             attempts += 1;
