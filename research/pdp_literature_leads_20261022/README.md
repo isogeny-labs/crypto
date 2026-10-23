@@ -151,7 +151,7 @@ row was read by hand and is classified in §5; none is a wrong citation.
 | 06 | Trace-zero variety representation for `E(F_{q^n})`, `n = 3, 5` (representation) | **closed-by-theorem**: `T_n` exists only for a curve defined over `F_q`, so it is not a coordinate system for the baseline's random prime-order `E/F_{p^k}`; at `n = 3` it ties rho at `q¹`; at `n = 5` the `T₅` system is 9 equations of degree 32 in 8 unknowns against the `k = 4` ladder's 4 equations of degree ≤ 8 |
 | 07 | Crossbred on the Weil-descent degree cells (solver) | *pending (re-dispatched 2026-10-23)* |
 | 08 | Learned orderings and branching for F4 and WDSat (solver, ML) | **constant-factor candidate**, stage level only: a variable order cannot change F4's solving degree on refuted or unique-solution targets (Caminata–Gorla Thm 3.1, Cor 3.3, read at source) and cannot lower WDSat's node count (thesis tables within +0.8 % of `2^{3ℓ}/3!`); only the F4 word-XOR cost is in play, where hand rules already give 2–4.91× at stage level with `S` unchanged |
-| 09 | Ore / linearized-polynomial quotient-algebra elimination (solver) | *pending (re-dispatched 2026-10-23)* |
+| 09 | Ore / linearized-polynomial quotient-algebra elimination (solver) | **closed-by-measurement** (desk, exact over `F_{2^n}` at `ℓ = 3…8`) for the card as written: `Res_{x₂}(S₃, L_V)` has degree exactly `2^{ℓ+1}` in `x₁` (proved) and is dense (at most one zero coefficient in 16 instances, full ANF support), so the fast skew-polynomial costs, which are in the 2-degree `ℓ`, apply to `L_V` and its compositions (already used in `semaev_decomp.rs`) but not to the resultant; its roots are the candidate list `x(R ± P_v)` that rf-mitm already enumerates at 5 multiplications each, a membership-test oracle in disguise |
 | 10 | Chord-parametrised small-root family over `F_p` (formulation) | **closed-by-theorem** for the small-unknown family: the chord system at `m = 2` is Semaev's `S₃` in the symmetric `(e₁, e₂)` encoding after a free linear elimination of the slope (symbolic and numeric desk check); every encoding has the same limit reach `2/(m(m+1)d)` = 1/6, 1/24, 1/80 and ceiling `1/(md)` = 1/4, 1/12, 1/32, so the `m = 4` kill fires (1/80 < 1/32 < 1/5) |
 | 11 | McGuire–Mueller Gröbner-free algorithms, ePrint 2017/1262 (literature verification) | **unverifiable-from-here**: the PDF is Cloudflare-blocked (`cf-mitigated: challenge`), the Caen server times out, no mirror found; provisional classification from second-hand evidence: Algorithm 2 (sum `m−1` base points, test membership) coincides with the repository's `rf-pairs`/`rf-mitm` oracles, Algorithm 1 is the same oracle with an algebraic evaluation step; both on the CGK line |
 | 12 | Theory gate: structured GGM and non-adaptive bounds (theory) | **unverifiable-from-here** for the one statement it most wants (the elliptic-curve theorem of ePrint 2026/384 could not be read); the 14-row classification is delivered: 3 leads can move the exponent in principle (01, 06, 10 conditional), 9 constant only, 0 excluded outright, 2 are not oracles; none of CGK, Shoup, DKM or SGGM constrains an oracle that reads coordinates, so "in principle" means "not excluded" |
@@ -170,7 +170,7 @@ Table B. Ranking inputs and verification totals per lead.
 | 06 | high (no improvement); medium (`n = 5` asymptotics) | none against any baseline row; a `T_n` row would be a new baseline, not an improvement | 2–3 person-days (new `T₃` harness), ≤ 2 CPU-h | 1 / 4 / 4; 16 / 0 |
 | 07 |  |  |  |  |
 | 08 | medium | 0 degree levels; WDSat ≤ 1.04×; F4 XORs 1.0–2× beyond the hand rules (guess); `S` 1.00× | 2 person-days core, 10 CPU-h mechanical, ≤ 16 GB | 7 / 0 / 5; 21 / 3 |
-| 09 |  |  |  |  |
+| 09 | medium (degree proved; density at `ℓ = 14–16` extrapolated) | none: at `n = 47` writing out the resultant costs `2^{ℓ+1}+1` coefficients, about 0.80× rf-mitm's counted multiplications, at least 2.4× above the card's kill line; the `m = 3` pairs residual floor is 3.2–3.9× above rf-pairs; `S_IC/S_rho` unchanged (3,053 at `n = 31`, 25,116 at `n = 37`) | 0.25 person-day, < 1 CPU-h, < 1 GB (a term-count example on `semaev_decomp::{Gf2, Poly}`) | pending |
 | 10 | medium | none in the exponent; 5–11 % higher `δ` at equal multiplicity (2–3× smaller lattices) on oracles that cannot beat rho | zero-compute test done in the dossier; 0.5 person-day to confirm in the `05` MILP harness | 6 / 0 / 1; 12 / 0 |
 | 11 | low (text); medium (classification) | none; the relayed `O(p)` cost is a worse exponent than Table B's `m = 2` row (`r^{2/3}`) | 0.5 person-day once a host can download the CC BY PDF | 9 / 2 / 3; 13 / 0 |
 | 12 | medium (generic rows); low (algebraic rows) | none (a gate); routes the first test to LEAD-05 | 0.5 person-day to close the reading gap | 8 / 1 / 3; 10 / 0 |
@@ -220,6 +220,11 @@ Table B. Ranking inputs and verification totals per lead.
   identical across targets in the committed data, so there is nothing
   per-instance to learn; the test is replaced by a held-out-cell split with a
   permutation null, runnable from ml-cryptanalysis.
+- **LEAD-09.** Implicit variants (never writing the resultant out) are not
+  excluded, but they are not new either: they reduce to the bilinear
+  descended system that LEAD-01, 05 and 07 already study. For `m = 3` the
+  method sits at `Θ̃(2^n)`, the enumeration line. Euler–Petit is cited only
+  through the repository's knowledge notes, which the dossier says.
 - **LEAD-10.** Two side findings: `RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md`
   §4.6 puts the `(e₁, e₂)` reach at 1/9, which W10's own e-encoding rows
   already exceed (the family value is 1/6); W10's `m = 3` e-encoding rows were
