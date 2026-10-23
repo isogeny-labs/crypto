@@ -65,7 +65,16 @@ CERT_OK = {"verified", "pass", "passed", "pass_independent_replay"}
 # What a sweep verdict must carry to validate a row (the three artifacts).
 VERDICT_ARTIFACTS = ("replay_certificate", "validator_report", "rho_reference")
 VERDICT_PASS = {"validated", "pass", "passed", "ok"}
-VERDICT_FAIL = {"failed", "fail", "invalid", "refuted", "rejected"}
+# `contradicted` is the validation sweep's word for a recompute that disagrees with the row.
+VERDICT_FAIL = {"failed", "fail", "invalid", "refuted", "rejected", "contradicted"}
+# Recognized, never passing: the sweep looked and did not clear the row (caveats, or
+# no verdict).  The row keeps whatever standing it had (pre-gate), with the verdict shown.
+VERDICT_NONPASS = {"validated_with_caveats", "unvalidated"}
+# Caveat fields a sweep line may carry; a passing verdict is refused if any is not clean.
+CAVEAT_FIELDS = ("pricing_ok", "rho_reference_ok", "replay_ok", "recomputed_ok", "protocol_frozen_ok")
+CAVEAT_CLEAN = (True, "not_applicable")
+# A sweep `row_id` is "<table>:<key>"; for the board tables the key is the ICV1 slug.
+BOARD_TABLE_PREFIXES = ("A", "B", "C")
 
 
 # ---------------------------------------------------------------------------
@@ -242,13 +251,32 @@ def load_pre_gate(rel: str, repo: Path = REPO) -> dict[str, str]:
     return dict(d.get("rows", {}))
 
 
+def verdict_keys(v: dict) -> list[str]:
+    """The keys a verdict line is filed under.  `row` is used as written.  `row_id` is
+    used as written and, for a board table prefix (`A:`, `B:`, `C:`), also without it,
+    because the gate names a board row by `board:<slug>:<source>`, `<slug>@<source>` or `<slug>`."""
+    keys = []
+    for field in ("row", "row_id"):
+        k = v.get(field)
+        if isinstance(k, str) and k:
+            keys.append(k)
+            head, sep, rest = k.partition(":")
+            if field == "row_id" and sep and head in BOARD_TABLE_PREFIXES and rest:
+                keys.append(rest)
+    return keys
+
+
 def load_verdicts(kind: str, repo: Path = REPO) -> dict[str, dict]:
-    """Sweep verdicts by row key.  One JSON object per line; `row` names the row
-    (a board key, a slug, a source path or a benchmarks directory); later lines win."""
+    """Sweep verdicts by row key.  One JSON object per line, naming its row by `row` or
+    `row_id` (see verdict_keys) and carrying a `verdict` word the gate knows.  A line that
+    names no row, or whose verdict word is not recognized, stops the gate: silently skipping
+    it would leave the row looking un-swept.  Later lines win, except that nothing
+    overrides a failing verdict."""
     p = repo / SWEEPS[kind]
     out: dict[str, dict] = {}
     if not p.is_file():
         return out
+    known = VERDICT_PASS | VERDICT_FAIL | VERDICT_NONPASS
     for n, line in enumerate(p.read_text().splitlines(), 1):
         if not line.strip():
             continue
@@ -256,26 +284,61 @@ def load_verdicts(kind: str, repo: Path = REPO) -> dict[str, dict]:
             v = json.loads(line)
         except ValueError:
             raise SystemExit(f"{SWEEPS[kind]}:{n} is not JSON")
-        if isinstance(v, dict) and isinstance(v.get("row"), str):
-            out[v["row"]] = v
+        if not isinstance(v, dict) or not verdict_keys(v):
+            raise SystemExit(f"{SWEEPS[kind]}:{n} names no row (needs `row` or `row_id`)")
+        word = str(v.get("verdict", "")).lower()
+        if word not in known:
+            raise SystemExit(f"{SWEEPS[kind]}:{n}: unrecognized verdict {v.get('verdict')!r} for "
+                             f"{verdict_keys(v)[0]}; known: {', '.join(sorted(known))} "
+                             "(add the word to scripts/validation_gate.py deliberately)")
+        for k in verdict_keys(v):
+            old = out.get(k)
+            if old is not None and str(old.get("verdict", "")).lower() in VERDICT_FAIL:
+                continue
+            out[k] = v
     return out
 
 
-def verdict_status(v: dict | None, digest: str) -> tuple[str, str] | None:
-    """(status, why) a verdict decides, or None when it decides nothing."""
+def sweep_note(v: dict) -> dict:
+    """The sweep verdict and its caveat fields, as shown beside the row's standing."""
+    note = {"verdict": str(v.get("verdict", "")).lower()}
+    for f in CAVEAT_FIELDS:
+        if f in v:
+            note[f] = v[f]
+    return note
+
+
+def sweep_text(note: dict) -> str:
+    return note["verdict"] + "".join(f", {k}={note[k]}" for k in CAVEAT_FIELDS if k in note)
+
+
+def verdict_status(v: dict | None, digest: str) -> tuple[str, str, dict] | None:
+    """(status, why, sweep note) a verdict decides, or None when it decides nothing.
+
+    A passing word validates only when the line names the three artifacts
+    (docs/VALIDATION_GATE.md, "Row standing") and carries no unclean caveat
+    (pricing_ok false, rho_reference_ok partial, ...); otherwise it is UNVALIDATED,
+    which cannot outrank the freeze.  Non-passing words never validate."""
     if v is None:
         return None
     word = str(v.get("verdict", "")).lower()
     if v.get("row_digest") not in (None, digest):
         return None  # the row changed after the sweep looked at it
+    note = sweep_note(v)
     if word in VERDICT_FAIL:
-        return FAILED, f"sweep verdict {word}"
+        return FAILED, f"sweep verdict {word}", note
     if word in VERDICT_PASS:
         missing = [k for k in VERDICT_ARTIFACTS if not v.get(k)]
-        if missing:
-            return UNVALIDATED, "sweep verdict lacks " + ", ".join(missing)
-        return VALIDATED, "sweep verdict"
-    return None
+        caveats = [f"{k}={v[k]}" for k in CAVEAT_FIELDS if k in v and v[k] not in CAVEAT_CLEAN]
+        if missing or caveats:
+            why = ("sweep verdict " + word + " does not validate: "
+                   + "; ".join(([("lacks " + ", ".join(missing))] if missing else [])
+                               + ([("caveats " + ", ".join(caveats))] if caveats else [])))
+            return UNVALIDATED, why, note
+        return VALIDATED, "sweep verdict", note
+    if word in VERDICT_NONPASS:
+        return UNVALIDATED, "sweep verdict " + sweep_text(note) + " (recognized, not passing)", note
+    raise SystemExit(f"unrecognized sweep verdict {v.get('verdict')!r}")
 
 
 def judge(keys: list[str], digest: str, evidence: Path | None, slug: str | None,
@@ -288,7 +351,7 @@ def judge(keys: list[str], digest: str, evidence: Path | None, slug: str | None,
     """
     decided = [verdict_status(verdicts.get(k), digest) for k in keys]
     decided = [d for d in decided if d]
-    for st, why in decided:
+    for st, why, _ in decided:
         if st == FAILED:
             return FAILED, [why]
     errs: list[str] = []
@@ -296,12 +359,12 @@ def judge(keys: list[str], digest: str, evidence: Path | None, slug: str | None,
         errs = check_evidence_dir(evidence, repo, slug)
         if not errs:
             return VALIDATED, []
-    for st, why in decided:
+    for st, why, _ in decided:
         if st == VALIDATED:
             return VALIDATED, [why]
     frozen = [pre_gate[k] for k in keys if k in pre_gate]
     if frozen and frozen[0] == digest:
-        return PRE_GATE, errs
+        return PRE_GATE, errs + [d[1] for d in decided]
     reasons = errs + [d[1] for d in decided]
     if frozen:
         reasons.append("row changed since the pre-gate freeze")
@@ -319,7 +382,11 @@ def judge_board_row(row: dict, digest: str, verdicts: dict, pre_gate: dict,
     keys = [board_key(row), row["slug"] + "@" + row["source"], row["slug"]]
     st, why = judge(keys, digest, repo / board_evidence_dir(row), row["slug"],
                     verdicts, pre_gate, repo)
-    return {"status": st, "evidence_dir": board_evidence_dir(row), "reasons": why}
+    out = {"status": st, "evidence_dir": board_evidence_dir(row), "reasons": why}
+    seen = [d for d in (verdict_status(verdicts.get(k), digest) for k in keys) if d]
+    if seen:  # the sweep verdict that bears on this row, caveats included; a failing one first
+        out["sweep"] = sorted(seen, key=lambda d: d[0] != FAILED)[0][2]
+    return out
 
 
 def annotate_board(board: list[dict], digest_of, repo: Path = REPO,

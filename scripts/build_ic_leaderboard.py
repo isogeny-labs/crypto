@@ -265,6 +265,11 @@ def curve_records() -> dict:
     return {r["slug"]: r for r in recs if r["slug"]}, len(recs)
 
 
+def validation_cell(v: dict) -> str:
+    """Standing, plus the validation sweep's verdict and caveat fields when it has one."""
+    return v["status"] + (f" (sweep: {gate.sweep_text(v['sweep'])})" if "sweep" in v else "")
+
+
 def curve_record(records: dict, slug: str) -> dict:
     """Where a curve's identity and factor base are recorded."""
     rec = records.get(slug)
@@ -1308,7 +1313,7 @@ def markdown(doc: dict) -> str:
                 f"**{times(b['ratio_rho'])}**" + (f" (was {times(b['ratio_rho_section23'])}, §23)"
                                                    if "ratio_rho_section23" in b else ""),
                 g3(r["floor_s"]), times(b["ratio_floor"]),
-                "✓" if b["verified"] else "✗", r["validation"]["status"]]
+                "✓" if b["verified"] else "✗", validation_cell(r["validation"])]
             L.append("| " + " | ".join(cells) + " |")
         L.append("")
     D = doc["jv_sieve_weak_class"]
@@ -2137,7 +2142,9 @@ def page(doc: dict, standalone: bool) -> str:
                      f'<td class="n">{g3(r["reference_s"])}</td><td class="n"><span class="ratio">{times(b["ratio_rho"])}</span>{ci}</td>'
                      f'<td class="n">{g3(r["floor_s"])}</td><td class="n">{times(b["ratio_floor"])}</td><td>{phase_bar(b["phases_s"], b["s"])}</td>'
                      f'<td>{"✓" if b["verified"] else "✗"}</td>'
-                     f'<td class="muted">{esc(r["validation"]["status"])}</td></tr>')
+                     f'<td class="muted">{esc(r["validation"]["status"])}'
+                     + (f'<br>sweep: {esc(gate.sweep_text(r["validation"]["sweep"]))}'
+                        if "sweep" in r["validation"] else "") + '</td></tr>')
 
 
     def family_defs(code: str) -> str:
