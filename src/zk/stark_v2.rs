@@ -40,7 +40,8 @@
 //!    drawn after the OOD values,
 //!
 //!    ```text
-//!    D(x) = (λ₀ + λ₁·x) · [ γ₁·(f(x) − f(z))/(x − z) + γ₂·(f(x) − f(ω·z))/(x − ω·z)
+//!    D(x) = (λ₀ + λ₁·x) · [ γ₁·(f(x) − f(z))/(x − z)
+//!                          + γ₂·(f(ω·x) − f(ω·z))/(x − z)
 //!                          + γ₃·(Comp(x) − Comp(z))/(x − z) ]
 //!    ```
 //!
@@ -445,27 +446,27 @@ fn absorb_ood_draw_deep(t: &mut Vec<u8>, ood: &OodValues) -> Option<DeepCoeffs> 
 }
 
 /// The DEEP quotient combination at `x` (module docs, item 4), from
-/// `f(x)` and `Comp(x)`:
+/// `f(x)`, `f(ω·x)` and `Comp(x)`.
 ///
 /// ```text
-/// D(x) = (λ₀ + λ₁·x) · [ γ₁·(f(x) − f(z))/(x − z) + γ₂·(f(x) − f(ωz))/(x − ωz)
+/// D(x) = (λ₀ + λ₁·x) · [ γ₁·(f(x) − f(z))/(x − z)
+///                       + γ₂·(f(ωx) − f(ωz))/(x − z)
 ///                       + γ₃·(Comp(x) − Comp(z))/(x − z) ]
 /// ```
 ///
-/// `None` if `x = z` or `x = ω·z`.
+/// `None` if `x = z`.
 fn deep_at(
     x: &BigUint,
     fx: &BigUint,
+    f_wx: &BigUint,
     comp_x: &BigUint,
     z: &BigUint,
-    wz: &BigUint,
     ood: &OodValues,
     c: &DeepCoeffs,
 ) -> Option<BigUint> {
     let inv_xz = fr_inv(&fr_sub(x, z))?;
-    let inv_xwz = fr_inv(&fr_sub(x, wz))?;
     let q_f = fr_mul(&fr_sub(fx, &ood.f_z), &inv_xz);
-    let q_fw = fr_mul(&fr_sub(fx, &ood.f_wz), &inv_xwz);
+    let q_fw = fr_mul(&fr_sub(f_wx, &ood.f_wz), &inv_xz);
     let q_c = fr_mul(&fr_sub(comp_x, &ood.comp_z), &inv_xz);
     let sum = fr_add(
         &fr_add(&fr_mul(&c.gamma[0], &q_f), &fr_mul(&c.gamma[1], &q_fw)),
@@ -633,9 +634,9 @@ fn prove_with(air: &AirV2, config: &StarkConfig, knobs: &ProverKnobs) -> Option<
         let d = deep_at(
             &h_lde[i],
             &f_lde[i],
+            &f_lde[(i + beta) % lde_size],
             &composition_lde[i],
             &z,
-            &wz,
             &ood,
             &coeffs,
         );
@@ -773,7 +774,7 @@ fn check(air: &AirV2, config: &StarkConfig, proof: &StarkProofV2) -> Result<(), 
         }
         // ... and FRI's first layer is the DEEP combination of the
         // opened f(x) and Comp(x) with the OOD claims.
-        let deep = deep_at(x, &fx.1, &comp.1, &z, &wz, ood, &coeffs);
+        let deep = deep_at(x, &fx.1, &f_wx.1, &comp.1, &z, ood, &coeffs);
         let (fri_pos, fri_open) = &proof.fri_openings[i];
         if *fri_pos != p
             || deep.is_none()
@@ -1331,6 +1332,31 @@ mod tests {
             assert_eq!(proof.ood.comp_z, Poly::interpolate(&pts).evaluate(&z));
             assert!(fri_input_low_degree(&proof));
         }
+    }
+
+    /// The second DEEP term is the divided difference of the transformed
+    /// trace polynomial `f(ω·X)`, so it must use the opened `f(ω·x)` at the
+    /// same `x`.  A nonconstant trace makes this distinguishable from using
+    /// the opened `f(x)` with the unrelated point `ω·z`.
+    #[test]
+    fn deep_uses_transformed_trace_at_same_x() {
+        let x = big(11);
+        let z = big(13);
+        let fx = big(17);
+        let f_wx = big(19);
+        let ood = OodValues {
+            f_z: big(23),
+            f_wz: big(29),
+            comp_z: big(31),
+        };
+        let coeffs = DeepCoeffs {
+            gamma: [big(0), big(1), big(0)],
+            lambda: [big(1), big(0)],
+        };
+        let got = deep_at(&x, &fx, &f_wx, &big(37), &z, &ood, &coeffs).unwrap();
+        let expected = fr_mul(&fr_sub(&f_wx, &ood.f_wz), &fr_inv(&fr_sub(&x, &z)).unwrap());
+        assert_eq!(got, expected);
+        assert_ne!(fx, f_wx);
     }
 
     /// Wrong f(z): tampered after proving (the transcript moves), or
