@@ -350,3 +350,61 @@ under both criteria may be described as more reach. Because this criterion
 was added after the data, any such description is labelled post hoc and
 needs a fresh preregistered run (a new curve family and seeds) before it is
 cited.
+
+## 8. Protocol v2: arm L2, size scaling and a centred-interval control (2026-10-23, before any L2 run)
+
+**Why.** v1's primary arm L verdict is "Fraction extends reach": `δ*`
+differs by 0.04 at level 2 at both 40 and 56 bits, and by 0.04 at every
+level at 40 bits. The v1.1 audit's early rows show the recoverable counts
+equal to the vanishing counts. Two explanations fit and predict different
+things:
+
+- **Constant factor.** The v1 interval arm uses `x ∈ [1, B]`, a one-sided
+  set whose bound equals its size. The fraction set uses signed `a` and has
+  `|set| ≈ 1.216 X²`. Both differ from the best interval set by constant
+  factors in the bound. A constant factor `c` moves the reach by
+  `log_p c`, which shrinks like `1/bits`. Prediction: the gap measured in
+  bits of `B` (`Δδ · bits`) stays roughly constant as `p` grows, and a
+  centred interval `|x| ≤ h` (`|set| = 2h + 1`, bound `≈ |set|/2`) matches
+  or beats the fraction lattice.
+- **Exponent.** The bihomogeneous lattice reaches further in `δ` itself.
+  Prediction: `Δδ` does not shrink with `p`.
+
+The determinant derivation in §3.2 predicts the constant-factor case.
+
+**Method.** Same trial routine as arm L (`lattice_trial_keep`) with a third
+kind, `Centered`: plant `x` uniform in `[−h, h]` and use bound `h`, with
+`h = ⌊(⌊p^δ⌋ − 1)/2⌋`. Interval and fraction are sized as in §3.2.
+
+- Curves: `find_a3_curve(bits, 3)` for bits ∈ {40, 50, 60}.
+- Levels: 1 and 2.
+- `δ ∈ {0.08, 0.09, …, 0.24}`.
+- 24 trials per cell. Seed `0x2A770000 + 1000·bits + 100·level + round(100·δ)`,
+  shared by the three kinds at a cell.
+- Per trial: success (≥ 2 vanishing rows), recoverable (§7 A2), and
+  Howgrave-Graham on the first two rows.
+
+**Metric.** `δ50` for (bits, level, kind): the `δ_eff` at which the
+**recoverable** fraction first falls below 0.5, linearly interpolated
+between the last cell at or above 0.5 and the next cell. The vanishing-
+criterion `δ50` is also reported. All of this is computed in Rust
+(`--arm s`, `summarize_l2`).
+
+**Decision rules** (per level; `Δ = δ50_frac − δ50_interval`):
+
+- **"Gap persists in δ (exponent-like)"** if `Δ(60) ≥ 0.75 · Δ(40)`.
+- **"Gap constant in bits of B (constant factor)"** if `Δ(60) < 0.75 · Δ(40)`
+  and `Δ(60)·60 / (Δ(40)·40) ∈ [0.65, 1.35]`.
+- Otherwise **"inconclusive"**.
+- **"The centred interval explains the gap"** if
+  `δ50_frac − δ50_centred ≤ 0.005` at every size.
+
+Only "gap persists in δ" together with a centred interval that does *not*
+explain it would justify the §3.2 milestone follow-up (an `S₄`
+fraction-lattice run). Any other outcome closes the lever, with the reason
+stated.
+
+**Pre-flight.** The `--quick` dry run (40 bits, level 1, 4 trials,
+scratch) ran end to end. Level 2 costs about 50–150 ms per trial at
+40–56 bits (v1). The estimate is about 7,300 trials, 15–30 min,
+single-threaded.

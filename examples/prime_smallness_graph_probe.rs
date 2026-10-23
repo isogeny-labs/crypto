@@ -722,8 +722,17 @@ fn arm_g(
     out: &mut Vec<Value>,
     curves: &mut Vec<Value>,
 ) {
-    let fb_sizes: &[usize] = if quick { &[16, 64] } else { &[16, 64, 256] };
-    let shifts: &[Option<u32>] = &[None, Some(12), Some(8), Some(4), Some(0)];
+    // Debug overrides (not used by the recorded runs): GRAPH_FB=256 GRAPH_SHIFTS=0,4
+    let fb_env: Option<Vec<usize>> = std::env::var("GRAPH_FB")
+        .ok()
+        .map(|s| s.split(',').filter_map(|x| x.parse().ok()).collect());
+    let sh_env: Option<Vec<Option<u32>>> = std::env::var("GRAPH_SHIFTS")
+        .ok()
+        .map(|s| s.split(',').map(|x| x.parse().ok()).collect());
+    let fb_default: &[usize] = if quick { &[16, 64] } else { &[16, 64, 256] };
+    let fb_sizes: &[usize] = fb_env.as_deref().unwrap_or(fb_default);
+    let sh_default: &[Option<u32>] = &[None, Some(12), Some(8), Some(4), Some(0)];
+    let shifts: &[Option<u32>] = sh_env.as_deref().unwrap_or(sh_default);
     for &bits in bits_list {
         let Some((curve, g)) = find_a3_curve(bits, 3) else {
             eprintln!("no curve at {bits} bits");
@@ -867,6 +876,9 @@ enum LatKind {
     Interval,
     /// Fraction factor base `x ≡ a/b`, unknowns `(a₁, b₁, a₂, b₂)`, bound `X`.
     Fraction,
+    /// Centred interval `|x| ≤ h` (x or p − x small), unknowns `(x₁, x₂)`,
+    /// bounds `(h, h)`; protocol v2 control.
+    Centered,
 }
 
 /// One planted trial: returns (vanishing rows, HG on first two, dim).
@@ -905,6 +917,12 @@ fn lattice_trial_keep(
                         return Some((pt, vec![BigInt::from(x)]));
                     }
                 }
+                LatKind::Centered => {
+                    let x: i64 = rng.gen_range(-(bound as i64)..=(bound as i64));
+                    if let Some(pt) = curve.lift_x(signed_mod(x, p)) {
+                        return Some((pt, vec![BigInt::from(x)]));
+                    }
+                }
                 LatKind::Fraction => {
                     let a: i64 = rng.gen_range(-(bound as i64)..=(bound as i64));
                     let b: u64 = rng.gen_range(1..=bound);
@@ -926,7 +944,7 @@ fn lattice_trial_keep(
     let r = curve.add(Some(fi), Some(fj_signed))?;
     let c = s3_coeffs(curve, r.x);
     let nv = match kind {
-        LatKind::Interval => 2,
+        LatKind::Interval | LatKind::Centered => 2,
         LatKind::Fraction => 4,
     };
     // the polynomial f (monic in its leading monomial u²v² / a₁²a₂²)
@@ -937,14 +955,14 @@ fn lattice_trial_keep(
                 continue;
             }
             let e = match kind {
-                LatKind::Interval => vec![i, j],
+                LatKind::Interval | LatKind::Centered => vec![i, j],
                 LatKind::Fraction => vec![i, 2 - i, j, 2 - j],
             };
             f.insert(e, BigInt::from(c[i as usize][j as usize]));
         }
     }
     let root: Vec<BigInt> = match kind {
-        LatKind::Interval => vec![ri[0].clone(), rj[0].clone()],
+        LatKind::Interval | LatKind::Centered => vec![ri[0].clone(), rj[0].clone()],
         LatKind::Fraction => vec![ri[0].clone(), ri[1].clone(), rj[0].clone(), rj[1].clone()],
     };
     if let Some(out) = root_out {
@@ -968,7 +986,7 @@ fn lattice_trial_keep(
         for beta in 0..=mm {
             let k = (alpha / 2).min(beta / 2).min(m as u32);
             let shift: Vec<u32> = match kind {
-                LatKind::Interval => vec![alpha - 2 * k, beta - 2 * k],
+                LatKind::Interval | LatKind::Centered => vec![alpha - 2 * k, beta - 2 * k],
                 LatKind::Fraction => vec![alpha - 2 * k, mm - alpha, beta - 2 * k, mm - beta],
             };
             let pk = pb.pow(m as u32 - k);
@@ -1064,7 +1082,7 @@ fn dehom_q(poly: &MPoly, kind: LatKind) -> Vec<((u32, u32), u64)> {
     poly.iter()
         .map(|(e, c)| {
             let k = match kind {
-                LatKind::Interval => (e[0], e[1]),
+                LatKind::Interval | LatKind::Centered => (e[0], e[1]),
                 LatKind::Fraction => (e[0], e[2]),
             };
             (k, big_mod_q(c))
@@ -1177,7 +1195,7 @@ fn arm_l_audit(bits_list: &[u32], trials: usize, levels: &[usize], out: &mut Vec
                 for &delta in &deltas {
                     let target = p.powf(delta).floor().max(2.0) as u64;
                     let bound = match kind {
-                        LatKind::Interval => target,
+                        LatKind::Interval | LatKind::Centered => target,
                         LatKind::Fraction => fraction_bound_for(target),
                     };
                     let seed = 0x1A77
@@ -1215,6 +1233,178 @@ fn arm_l_audit(bits_list: &[u32], trials: usize, levels: &[usize], out: &mut Vec
             }
         }
     }
+}
+
+// ── Arm L v2: centred-interval control and size scaling (protocol §8) ──
+
+fn arm_l_v2(
+    bits_list: &[u32],
+    trials: usize,
+    levels: &[usize],
+    out: &mut Vec<Value>,
+    curves: &mut Vec<Value>,
+) {
+    let deltas: Vec<f64> = (8..=24).map(|k| k as f64 / 100.0).collect();
+    for &bits in bits_list {
+        let Some((curve, g)) = find_a3_curve(bits, 3) else {
+            continue;
+        };
+        curves.push(curve_record(
+            &curve,
+            g,
+            &format!("find_a3_curve({bits}, 3)"),
+        ));
+        let p = curve.f.p as f64;
+        for &m in levels {
+            for kind in [LatKind::Interval, LatKind::Centered, LatKind::Fraction] {
+                for &delta in &deltas {
+                    let target = p.powf(delta).floor().max(3.0) as u64;
+                    let (bound, set_size) = match kind {
+                        LatKind::Interval => (target, target),
+                        LatKind::Centered => ((target - 1) / 2, 2 * ((target - 1) / 2) + 1),
+                        LatKind::Fraction => {
+                            let x = fraction_bound_for(target);
+                            (x, fraction_count(x))
+                        }
+                    };
+                    let seed = 0x2A77_0000
+                        + bits as u64 * 1000
+                        + m as u64 * 100
+                        + (delta * 100.0).round() as u64;
+                    let mut rng = StdRng::seed_from_u64(seed);
+                    let (mut succ, mut rec, mut hgc, mut done, mut dim) =
+                        (0usize, 0usize, 0usize, 0usize, 0usize);
+                    let t0 = Instant::now();
+                    for t in 0..trials {
+                        let mut keep: Vec<MPoly> = Vec::new();
+                        if let Some((v, h, d)) = lattice_trial_keep(
+                            &curve,
+                            kind,
+                            m,
+                            bound,
+                            &mut rng,
+                            Some(&mut keep),
+                            None,
+                        ) {
+                            done += 1;
+                            dim = d;
+                            if h {
+                                hgc += 1;
+                            }
+                            if v >= 2 {
+                                succ += 1;
+                                if recoverable(&keep, kind, seed ^ ((t as u64) << 32)) {
+                                    rec += 1;
+                                }
+                            }
+                        }
+                    }
+                    let ms = t0.elapsed().as_secs_f64() * 1e3 / done.max(1) as f64;
+                    let d_eff = (set_size as f64).ln() / p.ln();
+                    eprintln!("[L2] {bits}b m={m} {kind:?} δ={delta:.2} δ_eff={d_eff:.3} |set|={set_size}: {succ}/{done} rec {rec} HG {hgc} ({ms:.0} ms)");
+                    out.push(
+                        json!({"arm": "L2", "bits": bits, "curve_slug": slug_of(&curve),
+                        "kind": format!("{kind:?}"), "level": m, "dim": dim, "delta": delta,
+                        "delta_eff": d_eff, "bound": bound, "set_size": set_size, "seed": seed,
+                        "trials": done, "successes": succ, "recoverable": rec, "hg_first_two": hgc,
+                        "ms_per_trial": ms}),
+                    );
+                }
+            }
+        }
+    }
+}
+
+/// δ at which the success fraction first falls through 0.5, by linear
+/// interpolation in δ_eff between the last cell ≥ 0.5 and the next cell.
+fn delta50(cells: &[(f64, f64)]) -> Option<f64> {
+    let mut c = cells.to_vec();
+    c.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+    let last_hi = c.iter().rposition(|x| x.1 >= 0.5)?;
+    if last_hi + 1 >= c.len() {
+        return None; // never fell below 0.5 in the grid
+    }
+    let (d0, f0) = c[last_hi];
+    let (d1, f1) = c[last_hi + 1];
+    Some(d0 + (f0 - 0.5) / (f0 - f1) * (d1 - d0))
+}
+
+fn summarize_l2(rows: &[Value]) -> Value {
+    use std::collections::BTreeMap;
+    let mut by: BTreeMap<(u64, u64, String), Vec<(f64, f64, f64)>> = BTreeMap::new();
+    for r in rows.iter().filter(|r| r["arm"] == "L2") {
+        let t = r["trials"].as_f64().unwrap_or(0.0).max(1.0);
+        by.entry((
+            r["bits"].as_u64().unwrap_or(0),
+            r["level"].as_u64().unwrap_or(0),
+            r["kind"].as_str().unwrap_or("").into(),
+        ))
+        .or_default()
+        .push((
+            r["delta_eff"].as_f64().unwrap_or(0.0),
+            r["successes"].as_f64().unwrap_or(0.0) / t,
+            r["recoverable"].as_f64().unwrap_or(0.0) / t,
+        ));
+    }
+    let mut d50: BTreeMap<(u64, u64, String), (Option<f64>, Option<f64>)> = BTreeMap::new();
+    for (k, v) in &by {
+        let s: Vec<(f64, f64)> = v.iter().map(|x| (x.0, x.1)).collect();
+        let r: Vec<(f64, f64)> = v.iter().map(|x| (x.0, x.2)).collect();
+        d50.insert(k.clone(), (delta50(&s), delta50(&r)));
+    }
+    let mut gaps = Vec::new();
+    let levels: std::collections::BTreeSet<u64> = d50.keys().map(|k| k.1).collect();
+    let sizes: Vec<u64> = d50
+        .keys()
+        .map(|k| k.0)
+        .collect::<std::collections::BTreeSet<_>>()
+        .into_iter()
+        .collect();
+    let mut verdicts = Vec::new();
+    for &l in &levels {
+        let mut gap_int = Vec::new();
+        let mut gap_cen = Vec::new();
+        for &b in &sizes {
+            let get = |k: &str| d50.get(&(b, l, k.to_string())).and_then(|x| x.1);
+            let (fi, ii, ci) = (get("Fraction"), get("Interval"), get("Centered"));
+            let gi = match (fi, ii) {
+                (Some(a), Some(c)) => Some(a - c),
+                _ => None,
+            };
+            let gc = match (fi, ci) {
+                (Some(a), Some(c)) => Some(a - c),
+                _ => None,
+            };
+            gaps.push(json!({"bits": b, "level": l, "d50_rec_fraction": fi, "d50_rec_interval": ii,
+                "d50_rec_centered": ci, "gap_fraction_minus_interval": gi, "gap_fraction_minus_centered": gc,
+                "gap_fraction_minus_interval_in_bits_of_B": gi.map(|g| g * b as f64)}));
+            gap_int.push((b, gi));
+            gap_cen.push((b, gc));
+        }
+        // scaling rule (§8): compare smallest and largest size
+        let first = gap_int.first().and_then(|x| x.1.map(|g| (x.0, g)));
+        let last = gap_int.last().and_then(|x| x.1.map(|g| (x.0, g)));
+        let scaling = match (first, last) {
+            (Some((b0, g0)), Some((b1, g1))) if g0 > 0.0 => {
+                let bits_ratio = (g1 * b1 as f64) / (g0 * b0 as f64);
+                if g1 >= 0.75 * g0 {
+                    "gap persists in δ (exponent-like)"
+                } else if (0.65..=1.35).contains(&bits_ratio) {
+                    "gap constant in bits of B (constant factor)"
+                } else {
+                    "inconclusive"
+                }
+            }
+            (Some((_, g0)), Some(_)) if g0 <= 0.0 => "no gap at the smallest size",
+            _ => "inconclusive (missing δ50)",
+        };
+        let centered_explains = gap_cen.iter().all(|x| x.1.is_some_and(|g| g <= 0.005));
+        verdicts.push(json!({"level": l, "scaling_verdict": scaling,
+            "centered_interval_matches_or_beats_fraction_at_every_size": centered_explains}));
+    }
+    json!({"delta50": d50.iter().map(|(k, v)| json!({"bits": k.0, "level": k.1, "kind": k.2,
+        "d50_vanishing": v.0, "d50_recoverable": v.1})).collect::<Vec<_>>(),
+        "gaps": gaps, "verdicts": verdicts})
 }
 
 /// Number of distinct `a/b` with `|a| ≤ X`, `1 ≤ b ≤ X`, `gcd(a, b) = 1`.
@@ -1265,7 +1455,7 @@ fn arm_l(
                 for &delta in &deltas {
                     let target = p.powf(delta).floor().max(2.0) as u64;
                     let (bound, set_size) = match kind {
-                        LatKind::Interval => (target, target),
+                        LatKind::Interval | LatKind::Centered => (target, target),
                         LatKind::Fraction => {
                             let x = fraction_bound_for(target);
                             (x, fraction_count(x))
@@ -1839,10 +2029,11 @@ fn summarize(dir: &str) {
     let g = read_rows(&format!("{dir}/arm_g.jsonl"));
     let l = read_rows(&format!("{dir}/arm_l.jsonl"));
     let f = read_rows(&format!("{dir}/arm_f.jsonl"));
+    let l2 = read_rows(&format!("{dir}/arm_l2.jsonl"));
     let out = json!({
         "protocol": "research/prime_smallness_graph_20261023/PROTOCOL.md",
         "computed_by": "prime_smallness_graph_probe --arm s",
-        "G": summarize_g(&g), "L": summarize_l(&l), "F": summarize_f(&f),
+        "G": summarize_g(&g), "L": summarize_l(&l), "F": summarize_f(&f), "L2": summarize_l2(&l2),
     });
     let path = format!("{dir}/summary.json");
     std::fs::write(&path, serde_json::to_string_pretty(&out).unwrap()).unwrap();
@@ -1942,6 +2133,19 @@ fn main() {
             &mut curves,
         );
         write("arm_l.jsonl", &rows, &meta);
+    }
+    if arm.contains('v') {
+        let mut rows = Vec::new();
+        let b = bits.clone().unwrap_or_else(|| vec![40, 50, 60]);
+        let levels: &[usize] = if quick { &[1] } else { &[1, 2] };
+        arm_l_v2(
+            &b,
+            if quick { 4 } else { 24 },
+            levels,
+            &mut rows,
+            &mut curves,
+        );
+        write("arm_l2.jsonl", &rows, &meta);
     }
     if arm.contains('r') {
         let mut rows = Vec::new();
