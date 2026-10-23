@@ -1,0 +1,3 @@
+From a fresh extraction of the pinned archive, apply msolve-signature-output.patch with patch -p1. Run from that source directory:
+
+gcc -O2 -fopenmp -DVERSION='"0.7.5+twist-signature-output"' -I/tmp/twist-cas/root/usr/include -I/tmp/twist-cas/root/usr/include/x86_64-linux-gnu src/msolve/main.c src/neogb/gb.c src/fglm/fglm_core.c src/usolve/usolve.c -L/tmp/twist-cas/root/usr/lib/x86_64-linux-gnu -Wl,-rpath,/tmp/twist-cas/root/usr/lib/x86_64-linux-gnu -lflint -lmpfr -lgmp -lm -o /tmp/twist-cas/msolve-signature-output

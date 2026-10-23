@@ -4,6 +4,7 @@ mod coupled;
 mod divisors;
 mod geometry;
 mod gluing;
+mod homogeneous;
 mod partial;
 mod projection;
 
@@ -117,6 +118,11 @@ pub fn main(args: &[String]) -> Result<()> {
         }
         "coupled-census" => coupled::census(&fixtures, out)?,
         "projection-replay" => projection::replay(&fixtures, out)?,
+        "homogeneous-pilot" => homogeneous::run(
+            &fixtures,
+            Path::new(args.get(3).ok_or("missing frozen bases")?),
+            out,
+        )?,
         "jacobian-replay" => divisors::independent(
             &fixtures,
             Path::new(args.get(3).ok_or("missing selected covers")?),
@@ -165,10 +171,12 @@ fn adjudicate(prefix: &Path, out: &Path) -> Result<Vec<Value>> {
     let text = std::str::from_utf8(&stdout)?;
     let errors = std::str::from_utf8(&stderr)?;
     let allowed_warning = |line: &str| {
-        let growth = line
-            .trim()
-            .strip_prefix("***")
-            .and_then(|s| s.trim().split_once(": Warning: increasing stack size to "));
+        let growth = line.trim().strip_prefix("***").and_then(|s| {
+            let s = s.trim();
+            s.strip_prefix("Warning: increasing stack size to ")
+                .map(|size| ("anonymous", size))
+                .or_else(|| s.split_once(": Warning: increasing stack size to "))
+        });
         let known_growth = growth.is_some_and(|(op, size)| {
             !op.is_empty()
                 && op
@@ -242,6 +250,7 @@ mod cas_tests {
             (4, "  *** _+_: Warning: increasing stack size to 9999999999.\n", digest(&fs::read(&script).unwrap()), false),
             (5, "  *** _+_: Warning: increasing stack size to 128000000.\n  *** user error: failed divisor replay\n", digest(&fs::read(&script).unwrap()), false),
             (6, "  *** Mod: Warning: increasing stack size to 16000000.\n", digest(&fs::read(&script).unwrap()), true),
+            (7, "  ***   Warning: increasing stack size to 32000000.\n", digest(&fs::read(&script).unwrap()), true),
         ] {
             let prefix = dir.join(format!("case-{index}"));
             let stdout = "ALL_TORSION_REPLAY_OK\n";

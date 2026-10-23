@@ -13,7 +13,7 @@ use std::{
         Mutex,
     },
 };
-fn cas_render(poly: &f4::Poly, names: &[String], p: u64) -> String {
+pub(crate) fn cas_render(poly: &f4::Poly, names: &[String], p: u64) -> String {
     if poly.is_empty() {
         return "0".into();
     }
@@ -58,7 +58,7 @@ fn add_x(e: Quad, a: Option<u64>, b: u64) -> Vec<Option<u64>> {
     out.dedup();
     out
 }
-fn target(f: &Fixture, seed: u64) -> P {
+pub(crate) fn target(f: &Fixture, seed: u64) -> P {
     let mut s = 202610210000 + seed + f.p * 65537;
     loop {
         let x = crate::next(&mut s) % f.p;
@@ -74,7 +74,7 @@ fn target(f: &Fixture, seed: u64) -> P {
         }
     }
 }
-fn trajectories(e: Quad, xs: &[u64], r: u64) -> Vec<Vec<Option<u64>>> {
+pub(crate) fn trajectories(e: Quad, xs: &[u64], r: u64) -> Vec<Vec<Option<u64>>> {
     let mut v = vec![vec![Some(xs[0])]];
     for &i in &xs[1..] {
         let mut next = vec![];
@@ -91,7 +91,7 @@ fn trajectories(e: Quad, xs: &[u64], r: u64) -> Vec<Vec<Option<u64>>> {
         .filter(|x| x.last() == Some(&Some(r)))
         .collect()
 }
-fn expand_values(case: &alg::Case, xs: &[u64], path: &[Option<u64>]) -> Option<Vec<u64>> {
+pub(crate) fn expand_values(case: &alg::Case, xs: &[u64], path: &[Option<u64>]) -> Option<Vec<u64>> {
     if path[1..path.len() - 1].iter().any(Option::is_none) {
         return None;
     }
@@ -131,7 +131,7 @@ fn expand_values(case: &alg::Case, xs: &[u64], path: &[Option<u64>]) -> Option<V
     assert!(case.equations.iter().all(|f| f4::eval(f, &v, case.p) == 0));
     Some(v)
 }
-fn tuples(xs: &[u64], m: usize, mut f: impl FnMut(&[u64])) {
+pub(crate) fn tuples(xs: &[u64], m: usize, mut f: impl FnMut(&[u64])) {
     fn rec(xs: &[u64], m: usize, v: &mut Vec<u64>, f: &mut impl FnMut(&[u64])) {
         if m == 0 {
             f(v);
@@ -247,7 +247,7 @@ fn parse_poly(text: &str, names: &[String], p: u64) -> Result<f4::Poly> {
     }
     Ok(f4::normalise(&terms, p, f4::Ordering::Grevlex))
 }
-fn parse_basis(text: &str, c: &alg::Case) -> Result<Vec<f4::Poly>> {
+pub(crate) fn parse_basis(text: &str, c: &alg::Case) -> Result<Vec<f4::Poly>> {
     let start = text.find('[').ok_or("missing msolve basis")?;
     let end = text.rfind(']').ok_or("missing closing basis")?;
     text[start + 1..end]
