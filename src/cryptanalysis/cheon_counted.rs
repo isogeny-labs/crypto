@@ -618,6 +618,10 @@ pub fn cheon_pplus1(
     if d == 0 || !(n + 1).is_multiple_of(d) || (pows.len() as u64) < 2 * d + 1 {
         return outcome(ctx, None, 0, Some("bad d or too few powers".into()));
     }
+    // The coefficients below invert (2d)! modulo n, which is zero once 2d >= n.
+    if 2 * d >= n {
+        return outcome(ctx, None, 0, Some("2d must be below n".into()));
+    }
     let Some(fac) = distinct_prime_factors(n + 1) else {
         return outcome(ctx, None, 0, Some("n + 1 not factored".into()));
     };
