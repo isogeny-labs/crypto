@@ -1516,15 +1516,91 @@ fn pdiv(g: &GfTab, a: &[u16], h: &[u16], muls: &mut u64) -> Vec<u16> {
 /// `X^q − X` (by `m` squarings modulo the polynomial), then splitting by
 /// `Tr(δX)`; every multiplication counted.
 pub fn roots(f: &Gf2q, poly: &[u16], muls: &mut u64) -> Vec<u16> {
+    roots_with(f, poly, muls, false)
+}
+
+/// Squaring modulo a monic `h` of degree `d`, as the `F_q`-semilinear map
+/// it is in characteristic 2: `(Σ aᵢXⁱ)² = Σ aᵢ²X²ⁱ`.  The terms with
+/// `2i < d` need no reduction and the others use the table
+/// `X^{d+j} mod h` (`j < d − 1`), built once per modulus by `d − 1`
+/// shift-and-reduce steps.  The result equals `pmod(pmul(r, r), h)`
+/// coefficient for coefficient; only the multiplications executed (and
+/// counted, one per nonzero product) differ.
+struct SqMod {
+    d: usize,
+    tbl: Vec<Vec<u16>>,
+}
+
+impl SqMod {
+    fn new(g: &GfTab, h: &[u16], muls: &mut u64) -> SqMod {
+        let d = h.len() - 1;
+        let mut tbl: Vec<Vec<u16>> = Vec::with_capacity(d.saturating_sub(1));
+        if d >= 2 {
+            // X^d ≡ h[0..d] (characteristic 2).
+            tbl.push(h[..d].to_vec());
+            for j in 1..d - 1 {
+                let prev = &tbl[j - 1];
+                let top = prev[d - 1];
+                let mut next = vec![0u16; d];
+                next[1..d].copy_from_slice(&prev[..d - 1]);
+                if top != 0 {
+                    for (k, &hk) in h[..d].iter().enumerate() {
+                        if hk != 0 {
+                            next[k] ^= g.mul(top, hk);
+                            *muls += 1;
+                        }
+                    }
+                }
+                tbl.push(next);
+            }
+        }
+        SqMod { d, tbl }
+    }
+    /// `r² mod h` for `deg r < d`.
+    fn sq(&self, g: &GfTab, r: &[u16], muls: &mut u64) -> Vec<u16> {
+        let d = self.d;
+        let mut out = vec![0u16; d];
+        for (i, &a) in r.iter().enumerate() {
+            if a == 0 {
+                continue;
+            }
+            let a2 = g.mul(a, a);
+            *muls += 1;
+            if 2 * i < d {
+                out[2 * i] ^= a2;
+            } else {
+                for (k, &t) in self.tbl[2 * i - d].iter().enumerate() {
+                    if t != 0 {
+                        out[k] ^= g.mul(a2, t);
+                        *muls += 1;
+                    }
+                }
+            }
+        }
+        ptrim(&mut out);
+        out
+    }
+}
+
+/// [`roots`], with the `m` squarings of the `X^q − X` and splitting loops
+/// done by [`SqMod`] when `frob` is set (identical output).
+pub fn roots_with(f: &Gf2q, poly: &[u16], muls: &mut u64, frob: bool) -> Vec<u16> {
     let g = &f.tab;
     let p = pmonic(g, poly.to_vec(), muls);
     if p.len() <= 1 {
         return Vec::new();
     }
     let mut r = pmod(g, &[0, 1], &p, muls);
-    for _ in 0..f.m {
-        let sq = pmul(g, &r, &r, muls);
-        r = pmod(g, &sq, &p, muls);
+    if frob && p.len() >= 3 {
+        let sm = SqMod::new(g, &p, muls);
+        for _ in 0..f.m {
+            r = sm.sq(g, &r, muls);
+        }
+    } else {
+        for _ in 0..f.m {
+            let sq = pmul(g, &r, &r, muls);
+            r = pmod(g, &sq, &p, muls);
+        }
     }
     if r.len() < 2 {
         r.resize(2, 0);
@@ -1537,42 +1613,57 @@ pub fn roots(f: &Gf2q, poly: &[u16], muls: &mut u64) -> Vec<u16> {
         pgcd(g, &p, &r, muls)
     };
     let mut out = Vec::new();
-    split_roots(f, h, &mut out, 1, muls);
+    split_roots(f, h, &mut out, 1, muls, frob);
     out.sort_unstable();
     out
 }
 
-fn split_roots(f: &Gf2q, h: Vec<u16>, out: &mut Vec<u16>, mut seed: u32, muls: &mut u64) {
+fn split_roots(
+    f: &Gf2q,
+    h: Vec<u16>,
+    out: &mut Vec<u16>,
+    mut seed: u32,
+    muls: &mut u64,
+    frob: bool,
+) {
     let g = &f.tab;
     match h.len() {
         0 | 1 => {}
         2 => out.push(h[0]),
-        _ => loop {
-            let delta = g.exp[(seed % (f.q - 1)) as usize];
-            seed += 1;
-            let mut x = pmod(g, &[0, delta], &h, muls);
-            let mut acc = x.clone();
-            for _ in 1..f.m {
-                let sq = pmul(g, &x, &x, muls);
-                x = pmod(g, &sq, &h, muls);
-                let len = acc.len().max(x.len());
-                acc.resize(len, 0);
-                for (i, &c) in x.iter().enumerate() {
-                    acc[i] ^= c;
+        _ => {
+            let sm = (frob && h.len() >= 3).then(|| SqMod::new(g, &h, muls));
+            loop {
+                let delta = g.exp[(seed % (f.q - 1)) as usize];
+                seed += 1;
+                let mut x = pmod(g, &[0, delta], &h, muls);
+                let mut acc = x.clone();
+                for _ in 1..f.m {
+                    x = match &sm {
+                        Some(sm) => sm.sq(g, &x, muls),
+                        None => {
+                            let sq = pmul(g, &x, &x, muls);
+                            pmod(g, &sq, &h, muls)
+                        }
+                    };
+                    let len = acc.len().max(x.len());
+                    acc.resize(len, 0);
+                    for (i, &c) in x.iter().enumerate() {
+                        acc[i] ^= c;
+                    }
+                    ptrim(&mut acc);
                 }
-                ptrim(&mut acc);
+                if acc.is_empty() {
+                    continue;
+                }
+                let d = pgcd(g, &h, &acc, muls);
+                if d.len() > 1 && d.len() < h.len() {
+                    let e = pdiv(g, &h, &d, muls);
+                    split_roots(f, d, out, seed, muls, frob);
+                    split_roots(f, e, out, seed + 7, muls, frob);
+                    return;
+                }
             }
-            if acc.is_empty() {
-                continue;
-            }
-            let d = pgcd(g, &h, &acc, muls);
-            if d.len() > 1 && d.len() < h.len() {
-                let e = pdiv(g, &h, &d, muls);
-                split_roots(f, d, out, seed, muls);
-                split_roots(f, e, out, seed + 7, muls);
-                return;
-            }
-        },
+        }
     }
 }
 
@@ -1605,6 +1696,9 @@ pub struct BinSolve {
     pub replay: String,
     pub outcome: String,
     pub total_ms: f64,
+    /// Input, not output: root finding by [`SqMod`] (see [`BinOptions`]).
+    #[serde(skip)]
+    pub frob_roots: bool,
 }
 
 impl BinSolve {
@@ -1649,6 +1743,12 @@ pub struct BinOptions {
     pub frobenius: bool,
     pub sparsest: bool,
     pub replay: bool,
+    /// Root finding over `F_q` (the `X^q − X` and splitting squarings) by the
+    /// characteristic-2 semilinear squaring [`SqMod`] instead of a generic
+    /// polynomial product and reduction.  Same roots, same solutions, same
+    /// relations; fewer field multiplications executed.
+    #[serde(default)]
+    pub frob_roots: bool,
 }
 
 struct Chains {
@@ -1752,6 +1852,7 @@ fn split_partial(
     w: &[Vec<u16>],
     known: &[(usize, usize)],
     muls: &mut u64,
+    frob: bool,
 ) -> Vec<Vec<u16>> {
     let g = &f.tab;
     let k = w.len();
@@ -1775,7 +1876,7 @@ fn split_partial(
     }
     let at: Vec<Vec<u16>> = (0..k).map(|j| (0..k).map(|i| a[i][j]).collect()).collect();
     let cp = small_charpoly(f, &a, muls);
-    let mus = roots(f, &cp, muls);
+    let mus = roots_with(f, &cp, muls, frob);
     let dim = w[0].len();
     let mut out = Vec::new();
     for mu in mus {
@@ -2053,7 +2154,7 @@ fn solve_once<const N: usize>(
             return Ok(None);
         }
         let mut rm = 0;
-        let r = roots(f, &poly, &mut rm);
+        let r = roots_with(f, &poly, &mut rm, st.frob_roots);
         st.roots_muls += rm;
         r
     };
@@ -2081,7 +2182,7 @@ fn solve_once<const N: usize>(
                 if ker.len() <= 1 {
                     break;
                 }
-                ker = split_partial(f, &ker, kn, &mut ev);
+                ker = split_partial(f, &ker, kn, &mut ev, st.frob_roots);
             }
         }
         st.eigenvector_muls += ev;
@@ -2193,6 +2294,7 @@ pub fn solve_d4_bin(
     let f = &curve.f;
     let g = &f.f.tab;
     let mut out = BinD4Solve::default();
+    out.solve.frob_roots = opts.frob_roots;
     let before = f.f.muls();
     let t_r = curve.t_of_x(&r.x);
     let sols: Option<Vec<[u16; 5]>> = if opts.frobenius {
@@ -2265,7 +2367,7 @@ pub fn solve_d4_bin(
         // s = (s₁, s₂, s₃, s₄, π).
         let mut sm = 0;
         let quartic = [s[3], s[2], s[1], s[0], 1];
-        let rts = roots(&f.f, &quartic, &mut sm);
+        let rts = roots_with(&f.f, &quartic, &mut sm, opts.frob_roots);
         out.solve.split_muls += sm;
         // The multisets of roots with these symmetric functions.
         let mut multisets = Vec::new();
@@ -2946,18 +3048,21 @@ mod tests {
                     frobenius: false,
                     sparsest: true,
                     replay: true,
+                    frob_roots: false,
                 },
                 BinOptions {
                     weighted: false,
                     frobenius: false,
                     sparsest: true,
                     replay: false,
+                    frob_roots: false,
                 },
                 BinOptions {
                     weighted: true,
                     frobenius: true,
                     sparsest: true,
                     replay: false,
+                    frob_roots: false,
                 },
             ] {
                 let mut s = StdRng::seed_from_u64(k);
@@ -3030,5 +3135,89 @@ mod ecbench_tests {
                 mulmod(tb.coords(f, &a), tb.coords(f, &b))
             );
         }
+    }
+
+    #[test]
+    fn semilinear_squaring_roots_equal_the_generic_roots() {
+        for m in [3u32, 5, 8, 12] {
+            let f = Gf2q::new(m);
+            let mut rng = StdRng::seed_from_u64(100 + u64::from(m));
+            for deg in [2usize, 3, 4, 9, 17, 40, 64] {
+                for _ in 0..4 {
+                    // A polynomial with known rational roots times a random one.
+                    let mut poly = vec![1u16];
+                    let mut sink = 0;
+                    for _ in 0..deg / 2 {
+                        let r = rng.gen_range(0..f.q) as u16;
+                        poly = pmul(&f.tab, &poly, &[r, 1], &mut sink);
+                    }
+                    while poly.len() < deg + 1 {
+                        let mut tail = vec![0u16; 2];
+                        tail[0] = rng.gen_range(1..f.q) as u16;
+                        tail[1] = 1;
+                        poly = pmul(&f.tab, &poly, &tail, &mut sink);
+                        if poly.len() > deg + 1 {
+                            break;
+                        }
+                    }
+                    let (mut a, mut b) = (0u64, 0u64);
+                    let base = roots_with(&f, &poly, &mut a, false);
+                    let fast = roots_with(&f, &poly, &mut b, true);
+                    assert_eq!(base, fast, "m {m} degree {}", poly.len() - 1);
+                    for r in &base {
+                        let mut ev = 0u16;
+                        for &c in poly.iter().rev() {
+                            ev = f.tab.mul(ev, *r) ^ c;
+                        }
+                        assert_eq!(ev, 0);
+                    }
+                    if poly.len() > 40 && m >= 8 {
+                        assert!(b < a, "dense degree {}: {b} !< {a}", poly.len() - 1);
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn frob_roots_changes_nothing_but_the_multiplications() {
+        let c = generate_instance(5, 7);
+        let mut rng = StdRng::seed_from_u64(7);
+        let pre = SymmetrisedBin::precompute(&c, &mut rng, 6).expect("invariant");
+        let (mut slow, mut fast) = (0u64, 0u64);
+        let (mut t0, mut t1) = (BinTrace::default(), BinTrace::default());
+        for k in 0..12u64 {
+            let r = loop {
+                let x = c.f.random(&mut rng);
+                if let Some(p) = c.lift_x(&x, &mut rng) {
+                    break p;
+                }
+            };
+            let run = |frob_roots: bool, trace: &mut BinTrace| {
+                let opts = BinOptions {
+                    weighted: true,
+                    frobenius: true,
+                    sparsest: true,
+                    replay: true,
+                    frob_roots,
+                };
+                let mut s = StdRng::seed_from_u64(k);
+                solve_d4_bin(&c, &pre, &r, opts, 11, &mut s, Some(trace))
+            };
+            match (run(false, &mut t0), run(true, &mut t1)) {
+                (Ok(a), Ok(b)) => {
+                    assert_eq!(a.decompositions, b.decompositions);
+                    assert_eq!(a.rational_solutions, b.rational_solutions);
+                    assert_eq!(a.witness.is_some(), b.witness.is_some());
+                    assert_eq!(a.solve.echelon_muls, b.solve.echelon_muls);
+                    assert_eq!(a.solve.charpoly_muls, b.solve.charpoly_muls);
+                    slow += a.solve.total_muls;
+                    fast += b.solve.total_muls;
+                }
+                (Err(a), Err(b)) => assert_eq!(a.outcome, b.outcome),
+                _ => panic!("the two roots paths disagree on closing"),
+            }
+        }
+        assert!(fast <= slow, "{fast} > {slow}");
     }
 }

@@ -2318,6 +2318,7 @@ fn solve_ic_f2m4(
         frobenius,
         sparsest: flag("sparsest")?,
         replay: flag("replay")?,
+        frob_roots: flag("frob_roots")?,
     };
     let mut oracle = BinD4Oracle::new(inst, macaulay, seed, opts);
     oracle.charge_unsolved = flag("charge_unsolved")?;
