@@ -759,12 +759,22 @@ def wide_producer_component() -> dict:
 def t20_e2e_component() -> dict:
     """The landed n = 73, K = 600 row re-run cold end to end with the wide
     producer's landed gains: frozen summary of
-    benchmarks/20261019-t20-n73-k600-e2e. Engineering: counted S is
-    unchanged, the wall time of every phase is measured; no rho win."""
+    benchmarks/20261019-t20-n73-k600-e2e. Engineering: recorded probes are
+    unchanged; complete charged-cost equality is unmeasured; no rho win."""
     sm = load(SOURCES["t20_e2e"])
     if sm.get("schema") != "crypto.t20_n73_k600_e2e/v1" or sm.get("class") != "engineering":
         raise SystemExit("review the T20 end-to-end summary before updating the leaderboard")
-    return sm
+    # Preserve the archived summary; qualify its public interpretation separately.
+    return {
+        **sm,
+        "claim": "recorded cold end-to-end wall on the fixed n=73, K=600 row; identical recorded probes and relations; complete charged-cost equality is unmeasured; no rho win",
+        "recorded_probe_proxy_old_over_new": sm["counted_S_old_over_new"],
+        "counted_S_old_over_new": None,
+        "review_qualification": "docs/ic/T20_REVIEW_20261020.md",
+        "caveats": [c.replace("rho draws 2-12", "rho draws 1-12") for c in sm["caveats"]]
+            + ["all retained rho timings follow the IC runs; draw 1 was also replaced",
+               "the column bootstrap is conditional on the retained runs; two A/A measurements do not bound run-to-run noise"],
+    }
 
 
 def f4_gf2_port_component() -> dict:
@@ -1850,12 +1860,12 @@ def markdown(doc: dict) -> str:
         L.append(f"| {a} | {t['arms_wall_s'][a]:.1f} | {t['arms_cpu_s'][a]:.0f} | "
                  f"{t['phases_s'][a]['index_build']:.1f} | {t['phases_s'][a]['rank_stage']:.1f} |")
     L += ["", f"Old / landed end-to-end wall **{r['point']:.3f}** (95% {r['lo']:.3f}-{r['hi']:.3f}); A/A "
-          f"{t['old_over_new']['A_A_N1_over_N2_end_to_end_wall']['point']:.3f}; counted S old/new "
-          f"{t['counted_S_old_over_new']:.3f}. IC/rho (20 matched draws): landed wall {ir['landed_wall']['point']:.1f} "
+          f"{t['old_over_new']['A_A_N1_over_N2_end_to_end_wall']['point']:.3f}; recorded probe proxy old/new "
+          f"{t['recorded_probe_proxy_old_over_new']:.3f}; complete charged-cost equality unmeasured. IC/rho (20 matched draws): landed wall {ir['landed_wall']['point']:.1f} "
           f"({ir['landed_wall']['lo']:.1f}-{ir['landed_wall']['hi']:.1f}), cpu {ir['landed_cpu']['point']:.1f}; old wall "
           f"{ir['old_wall']['point']:.1f}, cpu {ir['old_cpu']['point']:.1f}. Section 5a band: {t['band_5a']['verdict']}. "
           f"Controls: {t['controls']}. Caveats: " + "; ".join(t["caveats"]) + ".",
-          "", f"[Frozen summary](../../{SOURCES['t20_e2e']}), [report](../../{t['report']}).", ""]
+          "", f"[Frozen summary](../../{SOURCES['t20_e2e']}), [report](../../{t['report']}), [review qualification](../../{t['review_qualification']}).", ""]
     g = doc["f4_gf2_port_component"]
     ag = g["agreement"]
     L += ["", "## Component: ported rank-indexed Boolean F4 kernel (engineering)", "",
@@ -2716,12 +2726,12 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{t["phases_s"][a]["index_build"]:.1f}</td><td>{t["phases_s"][a]["rank_stage"]:.1f}</td></tr>')
     P.append('</tbody></table></div>'
              f'<p>Old / landed end-to-end wall <strong>{r["point"]:.3f}</strong> (95% {r["lo"]:.3f}-{r["hi"]:.3f}); '
-             f'A/A {t["old_over_new"]["A_A_N1_over_N2_end_to_end_wall"]["point"]:.3f}; counted S old/new '
-             f'{t["counted_S_old_over_new"]:.3f}. IC/rho (20 matched draws): landed wall {ir["landed_wall"]["point"]:.1f} '
+             f'A/A {t["old_over_new"]["A_A_N1_over_N2_end_to_end_wall"]["point"]:.3f}; recorded probe proxy old/new '
+             f'{t["recorded_probe_proxy_old_over_new"]:.3f}; complete charged-cost equality unmeasured. IC/rho (20 matched draws): landed wall {ir["landed_wall"]["point"]:.1f} '
              f'({ir["landed_wall"]["lo"]:.1f}-{ir["landed_wall"]["hi"]:.1f}), cpu {ir["landed_cpu"]["point"]:.1f}; old wall '
              f'{ir["old_wall"]["point"]:.1f}, cpu {ir["old_cpu"]["point"]:.1f}. Section 5a band: {esc(t["band_5a"]["verdict"])}. '
              f'Controls: {esc(t["controls"])}. Caveats: ' + esc("; ".join(t["caveats"])) + '.</p>'
-             + gh(SOURCES["t20_e2e"], 'Frozen summary') + '</section>')
+             + gh(SOURCES["t20_e2e"], 'Frozen summary') + gh(t['review_qualification'], 'Review qualification') + '</section>')
 
     g = doc["f4_gf2_port_component"]
     ag = g["agreement"]
