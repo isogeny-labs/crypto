@@ -616,3 +616,17 @@ six first and A/A census records with the same 8 GiB/1,200 s bound and
 retain every failure. Prove the audit is sensitive to corrupted evidence
 by mutating one recorded count and requiring rejection. An A/A agreement
 alone is not independent correctness evidence.
+
+## Registered twist-orbit row-span check
+
+Frozen 23 October 2026 before writing this derived symmetry check. For
+all selected k=1 relations in the six p=73/p=97 polynomial records, use
+the independently BSGS-verified physical factor logs to map every signed
+factor under each of the 24 distinct `ψ`/`ι` scalar actions. Require the
+mapped factor to occur in the same physical base up to sign. Reconstruct
+its folded row and anchored right-hand side from the mapped factors and
+transformed residual `(λa,λb)`; require exact componentwise equality to
+`λ` times the original row and right-hand side modulo the subgroup order.
+Record the number of checked relations/actions and every failure. This is
+a deterministic redundancy test of the proposed symmetry mechanism, not
+a new independent relation or a runtime speed comparison.
