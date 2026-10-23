@@ -31,6 +31,22 @@ remaining gaps include S5, the 21 thinned-base replays, complete cold
 cost, external solvers and broader scaling; the historical misses and
 their original costs remain preserved.
 
+The [endomorphism-image study](../research/twist_index_calculus_20261020/endomorphism_image_base/PROTOCOL.md)
+has now completed the resumed 189-case nine-arm polynomial panel and 21
+generic-doubling controls, all on the 21 frozen p=37…337 instances.
+All 210 independent processed-prefix signed-set and rank audits pass;
+189 full-rank scalar/factor recoveries verify, and 21 inactive-column
+controls remain censored as prescribed. The original arm matches all
+621 earlier S4 prefix queries. Full-stream relation counts come from the
+separate complete scalar/group oracle, not from unexecuted polynomial
+suffixes. Its cold elapsed comparison now admits all 105 complete
+eleven-execution rounds and 630 non-timing replays. Its msolve comparison
+checks all 3,024 complete reduced-basis pairs for 378 fixed inputs. The
+[final image-base report](../research/twist_index_calculus_20261020/endomorphism_image_base/README.md)
+gives every paired per-target cost and its actual supplied-encoding clock
+boundary. Complete GAE pricing, matched strongest rho and full external
+DLP cost remain open; these image-base controls do not discharge them.
+
 ## Evidence and uncertainty
 
 - **Observed:** The [pilot audit](../research/twist_index_calculus_20261020/quartic_twist_tagged_s5_audit_p37_v1.json) enumerated all `r` subgroup logs and found five complete signed relations among the first four residuals. `k=1,2,3` reproduce their entire pattern-specific sets; `k=0` misses one and `k=4` has one system failure. The [one-target k=1 audit](../research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_audit_p37_v1.json) independently reconstructs all eight processed sets, rank four, all physical factor logs, scalar 271, and the same-target twist24 rho replay. The native producer counts 116,050,118 `Fp M` and 3,936 group operations against rho's 348,941 `Fp M` and 2,745 group operations, in separate units.
@@ -43,6 +59,7 @@ their original costs remain preserved.
 - **Exact S4 repair:** [Seven complete first/A/A collectors](../research/twist_index_calculus_20261020/s4_twist_elimination/results/prefixes.json) execute 46,200 finite systems per run with no undetermined cases. Every signed set matches a post-run group-pair oracle; all seven anchored matrices and target/factor logarithms verify. The old p73/seed1 prefix's nine relations become the exact eleven and full rank first occurs at query 18 rather than 19. Eight separately frozen systems also match complete `Fp^3` root enumeration. The 49-term and 18-term resultant identities have zero exact integer remainders, separate IDC records and two checked Lean theorems. All 46,200 component-coefficient matches pass; simple linear equation reduction retains degree profile `[4,4,4,4]`. F4's counter covers row reduction only, so this is a completeness result, not a cold-cost improvement.
 - **Missing capability:** A solver that returns complete signed sets for all five patterns on the frozen p=37 stream; F4 replay on the 21 thinned bases; complete F4 and cold-pipeline accounting including native hash/tree/allocator and rho hash CPU; peak memory; isolated ABAB wall intervals; a same-input msolve comparison (Magma if available); and tests on larger curves beyond p=97.
 - **Not established:** Impossibility of complete S5 solving, polynomial IC superiority to rho, fastest solver status, large-size asymptotics, or an effect on deployed curves.
+- **Image-base attribution control:** On the same 9,658-query full reference streams, phi(L0) supplies 1,865 unique signed tuples and 1,698 distinct projective augmented rows; [2]L0 supplies 1,804 and 1,705 respectively. Both active-column variants attain full rank on all 21 cases. These distinct rows are not all linearly independent. The psi control reproduces the original's exact sets; phi(L2) gives 1,472 tuples against the original's 1,473 with equal peel counts. All 210 candidate-prefix audits pass, both A/A trees match, and hash/omission negative controls reject. All 105 whole cold rounds and 630 non-timing records are admitted; original deadlines, isolation refusals and Spot reclaims are retained. Through first full rank, phi consumes 5.868804% more systems than doubling. Per-record paired doubling/phi median elapsed ratios span 0.405438–5.524357, with both gains and losses. The exact fixture boundary includes encoded public points for alignment while recomputing and charging every lift. The same-input GB control completes 378 fixed systems in eight passes, with 3,024 matching native/msolve bases and generally slower native timers. Complete operation pricing, strongest rho, S5 and full external DLP comparisons remain open.
 
 ## What would unblock it
 
@@ -53,6 +70,9 @@ their original costs remain preserved.
 - [x] Run every preregistered orbit-complete L2 prefix choice with native polynomial collection, full-base construction, independent exact signed-set and rank replay, full-base source parity and A/A. All 21 recover the target; four retain the known relation miss.
 - [x] Repair and independently audit both missing p=73 seed-one S4 relations, retaining the historical failure and cost record; complete on all seven original processed prefixes in first/A/A.
 - [ ] Extend the repaired collector to all 21 thinned bases and the unused frozen-stream suffixes; extend the polynomial panel beyond p=97 where feasible.
+- [x] Execute all 189 image-base cases plus 21 doubling controls through rank or their frozen cap on all seven primes, with complete independently checked processed sets, rank progress, source parity and A/A.
+- [x] Reconcile and admit all 105 complete same-origin cold rounds and 630 non-timing replays for the ten image-base arms; check complete elapsed phase sums and retain every censored, interrupted and refused record. Complete GAE prices are still missing.
+- [x] Compare complete native and msolve reduced bases on all 378 preselected image-study systems in eight passes, preserving losing rows and internal timer ranges. This is a GB component comparison, not all S5 roots or external DLP cost.
 - [ ] For any priced leaderboard result, provide the replay certificate, validator report and strongest matched rho receipt in `VALIDATION.json` under `docs/VALIDATION_GATE.md`.
 
 The first item would establish a complete tagged-line-union polynomial

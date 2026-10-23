@@ -1,0 +1,14 @@
+diff --git a/src/neogb/meta_data.c b/src/neogb/meta_data.c
+--- a/src/neogb/meta_data.c
++++ b/src/neogb/meta_data.c
+@@ -284,8 +284,8 @@ static void print_final_statistics(
+ 
+     if (st->info_level > 0) {
+         fprintf(file, "\n---------------- TIMINGS ----------------\n");
+-        fprintf(file, "overall(elapsed) %11.2f sec\n", st->f4_rtime);
+-        fprintf(file, "overall(cpu) %15.2f sec\n", st->f4_ctime);
++        fprintf(file, "overall(elapsed) %18.9f sec\n", st->f4_rtime);
++        fprintf(file, "overall(cpu) %22.9f sec\n", st->f4_ctime);
+         if(st->trace_level == APPLY_TRACER) {
+             fprintf(file, "tracer       %15.2f sec %5.1f%%\n",
+                     st->tracer_rtime,

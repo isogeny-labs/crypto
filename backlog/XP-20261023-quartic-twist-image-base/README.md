@@ -1,7 +1,39 @@
 # Endomorphism-sum image factors for quartic-twist index calculus
 
-Draft experiment design, 23 October 2026. No image-base experiment was
-run or scheduled. The command in `card.json` names an unimplemented mode.
+Draft scheduler card, updated 23 October 2026. The research study has run
+manually under the user's authorization through repository ephemeral
+runners; this card has not been posted or leased in cairn. Its scheduler
+command and checkpoint fields remain draft metadata, rather than a runnable
+job specification.
+
+## Executed study status
+
+The [frozen image-base protocol](../../research/twist_index_calculus_20261020/endomorphism_image_base/PROTOCOL.md)
+and supplements expand the original design to all 21 frozen instances,
+nine original arms and a generic doubling control. The resumed 189-case
+polynomial run and all 21 doubling controls completed first/A/A; all 210
+separate complete-set, rank and recovery audits passed: 189 full-rank
+recoveries verify in the group, and the 21 deliberately inactive-column
+controls are retained as censored. The original arm
+matches all 621 queries in the seven earlier S4 prefixes, and deliberate
+input-hash and omitted-reference-relation mutations are rejected.
+
+Across the 9,658-query full reference streams, phi(L0) gives 1,865 unique
+signed tuples and 1,698 distinct projective augmented rows. Doubling gives
+1,804 tuples and 1,705 such rows. Both active-column arms reach full rank
+on every instance. These are exact finite reference counts, not 1,698 or
+1,705 independent equations and not a complete-cost gain. Cold setup and
+five-round isolated timings are complete: 105 resource-admitted whole
+rounds and 630 non-timing replays. The 21 paired doubling/phi median cold
+ratios range from 0.405438 to 5.524357; above one favors phi, with no
+consistent advantage across this fixed panel. Phi consumes 275,784 finite
+systems through rank versus doubling's 260,496. These are fixture-level
+instrumented elapsed intervals, not complete GAE prices or a rho comparison.
+The [final report](../../research/twist_index_calculus_20261020/endomorphism_image_base/README.md)
+preserves every per-target row. Deadline, resource-refusal
+and Spot-interruption records remain part of the evidence. The prior
+statements that this harness and independent verifier did not exist are
+superseded by this executed status.
 
 ## Question and discriminating outcome
 
@@ -18,7 +50,7 @@ Any improvement in completely counted cold cost must survive all
 generation, deduplication, solving, matrix, memory and verification costs.
 A null result or loss is retained on the same frozen panel.
 
-## Proposed stages, to freeze before execution
+## Original proposed stages (retained design history)
 
 1. Use the same seven p37/p73/p97 public synthetic generator/target
    instances, signs, orbit maps and original processed residual prefixes.
@@ -45,16 +77,24 @@ A null result or loss is retained on the same frozen panel.
 
 ## Prerequisites and cost derivation
 
-The new native mode, independent checker, checkpoint/resume schema and
-complete F4/cold-pipeline counters do not exist. The frozen protocol and
-implementation commit must be supplied before this card becomes ready.
+The native image modes and independent checker are implemented. Interrupted
+case shards have been resumed from preserved checkpoints. Separate cold
+reconstruction and all 210 rows' elapsed intervals are independently
+checked. The same-input msolve control
+has 378 fixed systems and 3,024 checked equal complete reduced bases;
+native is generally slower on that GB component. Complete operation
+pricing, matched strongest rho and scheduler-ready checkpoint metadata
+remain open. The manual study's artifacts and reproduction are linked in
+the final report. This separate, unfunded scheduler specification remains
+draft; it is not a queued repeat of completed work.
 The original panel contains 46,200 finite signed L2 systems; adding image
 factors changes the number of peels and can change residuals to rank, so
 that old count is not an estimate for the proposed computation. The
 8 GiB/1,200 s envelope is a proposed initial cap, not a predicted runtime.
-Core-hour and wall-hour estimates stay null until a bounded pilot supplies
-the inputs for an explicit derivation. Funding is zero while this remains
-an unscheduled draft; no cairn objective or lease has been posted.
+Core-hour and wall-hour estimates stay null until an explicit derivation
+is attached. Funding is zero for this unscheduled scheduler card; no cairn
+objective or lease has been posted. This does not negate the manually
+executed research runs recorded above.
 
 ## What done means
 

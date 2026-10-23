@@ -3,47 +3,102 @@
   "id": "XP-20261023-quartic-twist-image-base",
   "title": "Quartic twist index calculus with endomorphism-sum image factors and unchanged log columns",
   "created": "2026-10-23",
-  "authors": ["quartic twist IC research"],
+  "authors": [
+    "quartic twist IC research"
+  ],
   "status": "draft",
-  "status_note": "Design only. The image-base collector, independent verifier, complete counters and checkpoint format are not implemented. No result, run or scheduled execution is implied by this card.",
+  "status_note": "The 189-case panel, 21 doubling controls, 210 independent set/rank/recovery audits, 105 admitted complete cold rounds and 630 non-timing replays are complete. The same-input GB comparison has 3024 checked equal native/msolve bases on 378 systems. Per-target doubling/phi median elapsed ratios span 0.405438 to 5.524357, with no uniform advantage. Complete GAE prices and matched strongest rho remain open. This separate unscheduled scheduler specification remains draft; it is not a queued repeat.",
   "blocked_on": [],
   "links": {
     "lead": "research/twist_index_calculus_20261020/s4_twist_elimination/REPORT.md",
-    "notes": ["problems/quartic-twist-polynomial-ic-pricing.md"],
-    "prs": [2368]
+    "notes": [
+      "problems/quartic-twist-polynomial-ic-pricing.md",
+      "research/twist_index_calculus_20261020/endomorphism_image_base/PROTOCOL.md",
+      "research/twist_index_calculus_20261020/endomorphism_image_base/README.md"
+    ],
+    "prs": [
+      2368
+    ]
   },
   "question": "Can adding (1-psi)(B) as physical factors increase independent index-calculus relations per completely counted unit without adding logarithm columns?",
   "decision_value": "An exact set and rank census distinguishes additional physical relation supply from duplicated automorphism images or dependent rows. A complete same-target collector comparison then decides whether the additional images and peel work improve cold index calculus. A loss retains the same controls and prevents promoting a larger base or an isolated relation count into a performance claim.",
-  "protocol": {"path": null, "blob": null},
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
   "code": {
     "repo": "crypto",
     "commit": null,
     "branch": "codex/twist-ic-20261020",
-    "build": [["cargo", "build", "--locked", "--release", "--manifest-path", "research/twist_index_calculus_20261020/s4_twist_elimination/native/Cargo.toml"]]
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "research/twist_index_calculus_20261020/s4_twist_elimination/native/Cargo.toml"
+      ]
+    ]
   },
   "resources": {
-    "cpus": 2, "ram_gb": 8, "disk_gb": 8, "gpu": null,
-    "est_core_hours": null, "est_wall_hours": null,
-    "notes": "Provisional bounded toy correctness envelope only. The earlier F4 collector's watchdog is 1200 seconds per original prefix panel. Extra image peels and oracle work have not been profiled, so no runtime estimate or cost projection is supplied. Freeze a pilot-based estimate before ready."
+    "cpus": 2,
+    "ram_gb": 8,
+    "disk_gb": 8,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Executed manually through repository ephemeral runners with an 8 GiB address-space/1200-second per-case watchdog, one Rayon thread. Exact relation/rank counts have been audited on all 210 cases; cold timing has separate isolated five-round and A/A gates. Estimates remain null rather than infer cloud duration from arithmetic counts."
   },
   "run": {
-    "argv": ["research/twist_index_calculus_20261020/s4_twist_elimination/native/target/release/twist-s4-structure-probe", "--endomorphism-images", "{out}"],
-    "env": {"RAYON_NUM_THREADS": "1"},
+    "argv": [
+      "research/twist_index_calculus_20261020/s4_twist_elimination/native/target/release/twist-s4-structure-probe",
+      "--endomorphism-images",
+      "{out}"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
     "timeout_per_shard_s": 1200
   },
-  "shards": {"count": 1, "scheme": "single", "params": {}, "stop": "all"},
-  "checkpoint": {"file": null, "resume_flag": null},
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
   "outputs": {
     "result_schema": "quartic-twist-image-base/v1 (proposed; not implemented)",
     "verify": [],
     "land": "research/twist_index_calculus_20261020/endomorphism_image_base"
   },
   "cairn": {
-    "mode": "lab-task", "space": "TBD",
-    "tasks": ["XP-20261023-quartic-twist-image-base"], "ttl_s": 1800,
-    "env": {"name": "quartic-twist-image-base", "recipe": "Pin native toolchain, completed collector and independent verifier before ready."},
-    "exec": {"cpus": 2, "memory_mb": 8192, "timeout_s": 1200, "sandbox": "auto", "sandbox_reason": "", "publish": "runs/XP-20261023-quartic-twist-image-base"},
-    "funding": {"units": 0, "rationale": "Unscheduled draft with no measured image-base cost or completed checker. No execution priority is proposed against the funded runnable cards until its bounded pilot and protocol are frozen."},
-    "notes": "Not posted or leased. The --endomorphism-images mode in run.argv does not exist yet."
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261023-quartic-twist-image-base"
+    ],
+    "ttl_s": 1800,
+    "env": {
+      "name": "quartic-twist-image-base",
+      "recipe": "Pin native toolchain, completed collector and independent verifier before ready."
+    },
+    "exec": {
+      "cpus": 2,
+      "memory_mb": 8192,
+      "timeout_s": 1200,
+      "sandbox": "auto",
+      "sandbox_reason": "",
+      "publish": "runs/XP-20261023-quartic-twist-image-base"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Unscheduled draft scheduler specification. The manual image-base relation/rank and instrumented elapsed study is complete; operation pricing, strongest rho and runnable scheduler metadata remain open. No repeat execution is queued or funded."
+    },
+    "notes": "Not posted or leased. Manual authorized experiments use the implemented endomorphism_image_base native crate and its committed frozen protocols; this draft's scheduler argv/commit/checkpoint fields are not yet a runnable lease specification."
   }
 }
