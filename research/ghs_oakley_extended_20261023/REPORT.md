@@ -61,8 +61,10 @@ used.
    - Group 3: n = 5: all 600 have m = 5 (as finding 2 requires). n = 31:
      m in {26, 31}. n = 155: m in {126, 145, 146, 150, 151, 155}. Every
      observed value lies in the tower's spectrum.
-   - Group 4: see `data/census-both-twists-l3-5-7.txt` (the earlier result
-     "no rational 3-isogeny" still holds for l = 3 only; l = 5, 7 open it up).
+   - Group 4: l = 5, 7 leave the 3-isogeny-isolated orbit (the first run's
+     "no rational 3-isogeny" holds for l = 3 only). n = 5: all 600 have
+     m = 5; n = 37: all 600 have m = 37; n = 185: m = 181 (48) or 185 (552).
+     All lie in the tower spectra.
    - Walk is j-invariant level; no isogeny or kernel is built by the census.
 4. **Cost model (exponent level, NOT a measurement).** Only m = 5 exists, so
    there is no walk cost:
