@@ -298,12 +298,24 @@ ic cubic-graph --p 7 --c 2 --a 3 6 4 --b 4 4 6 \
   --max-ell 5 --max-nodes 32 --seed 1 --json
 icx cubic-graph --p 7 --c 2 --a 3 6 4 --b 4 4 6 \
   --max-ell 5 --max-nodes 32 --seed 1 --json
+icx cubic-graph --input docs/ic/fixtures/cubic_f7_cofactor12_public_target.json \
+  --max-ell 5 --max-nodes 32 --seed 1 --json
 ic cubic-graph --p 7 --c 2 --a 3 6 4 --b 4 4 6 \
   --max-ell 2 --include-degree-two --max-nodes 64 --seed 1 --json
 ic cubic-graph --p 7 --c 2 --a 0 0 0 --b 1 0 0 \
   --max-ell 2 --include-degree-two --include-multiplicity \
   --max-nodes 8 --seed 1 --json
 ```
+
+`--input` accepts the same strict public cubic target JSON used by
+`solve-cubic`, including a checked `store:NAME` or `sha256:DIGEST` reference.
+It supplies `p`, `c`, `a`, and `b` and cannot be combined with those explicit
+flags. The graph report records the input reference, SHA-256, and byte count;
+point and subgroup checks remain the responsibility of `solve-cubic`.
+The [target-file acceptance receipt](fixtures/CUBIC_GRAPH_TARGET_FILE_ACCEPTANCE_20261023.json)
+compares both release CLIs with explicit coefficients, records five rejected
+inputs, and checks fresh-cache `store:` and digest references against one live
+Setec object before exact-prefix cleanup.
 
 The field must be exactly `F_p[t]/(t³-c)` with canonical coefficients,
 prime `p` in `7..=101` (necessarily `p ≡ 1 mod 3`), and noncube `c`.

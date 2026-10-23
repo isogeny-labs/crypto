@@ -15,12 +15,15 @@ use std::path::Path;
 
 #[derive(Args, Clone)]
 pub(super) struct GraphArgs {
-    /// Prime characteristic in 7..=101 with p congruent to 1 modulo 3.
+    /// Public cubic target JSON, local or a checked store reference; supplies p, c, a, and b.
     #[arg(long)]
-    p: u64,
+    input: Option<std::path::PathBuf>,
+    /// Prime characteristic in 7..=101 with p congruent to 1 modulo 3; use with --c, --a, --b.
+    #[arg(long)]
+    p: Option<u64>,
     /// A non-cube in F_p defining t^3 = c.
     #[arg(long)]
-    c: u64,
+    c: Option<u64>,
     /// Three coefficients of the source curve's a parameter.
     #[arg(long, num_args = 3)]
     a: Vec<u64>,
@@ -78,6 +81,51 @@ struct PublicTarget {
     gy: [u64; 3],
     qx: [u64; 3],
     qy: [u64; 3],
+}
+
+fn graph_source(args: &GraphArgs) -> Result<(u64, u64, [u64; 3], [u64; 3], Option<Value>), String> {
+    if let Some(path) = &args.input {
+        if args.p.is_some() || args.c.is_some() || !args.a.is_empty() || !args.b.is_empty() {
+            return Err("--input cannot be combined with --p, --c, --a, or --b".into());
+        }
+        let resolved = crypto_lib::store::resolve_path(path)?;
+        if std::fs::metadata(&resolved)
+            .map_err(|e| e.to_string())?
+            .len()
+            > 64 * 1024
+        {
+            return Err("cubic graph input exceeds 64 KiB".into());
+        }
+        let bytes = std::fs::read(&resolved).map_err(|e| e.to_string())?;
+        if bytes.len() > 64 * 1024 {
+            return Err("cubic graph input exceeds 64 KiB".into());
+        }
+        let target: PublicTarget = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+        let artifact = json!({
+            "reference": path.to_string_lossy(),
+            "sha256": hex::encode(sha256(&bytes)),
+            "bytes": bytes.len(),
+        });
+        Ok((target.p, target.c, target.a, target.b, Some(artifact)))
+    } else {
+        let p = args
+            .p
+            .ok_or("cubic graph needs --input or --p --c --a --b")?;
+        let c = args
+            .c
+            .ok_or("cubic graph needs --input or --p --c --a --b")?;
+        let a = args
+            .a
+            .clone()
+            .try_into()
+            .map_err(|_| "cubic graph needs three --a coefficients")?;
+        let b = args
+            .b
+            .clone()
+            .try_into()
+            .map_err(|_| "cubic graph needs three --b coefficients")?;
+        Ok((p, c, a, b, None))
+    }
 }
 
 fn cubic_order(f: &CubicField, curve: &Curve<E3>) -> u64 {
@@ -295,8 +343,9 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
 /// This is a graph of j-invariants; explicit point transport requires a
 /// separately certified route of curve models and kernel generators.
 pub(super) fn enumerate_j(args: &GraphArgs) -> Result<Value, String> {
-    if !(7..=101).contains(&args.p)
-        || !prime(args.p)
+    let (p, c, a, b, input_artifact) = graph_source(args)?;
+    if !(7..=101).contains(&p)
+        || !prime(p)
         || !(2..=7).contains(&args.max_ell)
         || !(1..=64).contains(&args.max_nodes)
     {
@@ -304,37 +353,25 @@ pub(super) fn enumerate_j(args: &GraphArgs) -> Result<Value, String> {
             "cubic graph requires prime p in 7..=101, max-ell in 2..=7, max-nodes in 1..=64".into(),
         );
     }
-    if args.a.len() != 3
-        || args.b.len() != 3
-        || args.c >= args.p
-        || args.a.iter().chain(&args.b).any(|&v| v >= args.p)
-    {
+    if c >= p || a.iter().chain(&b).any(|&v| v >= p) {
         return Err("cubic graph field coefficients must be canonical triples".into());
     }
-    let _checked_field = Fp3::with_cube_nonresidue(args.p, args.c)?;
-    let f = CubicField {
-        p: args.p,
-        c: args.c,
-    };
-    let source = Curve::new(
-        E3([args.a[0], args.a[1], args.a[2]]),
-        E3([args.b[0], args.b[1], args.b[2]]),
-    );
+    let _checked_field = Fp3::with_cube_nonresidue(p, c)?;
+    let f = CubicField { p, c };
+    let source = Curve::new(E3(a), E3(b));
     if !curve::is_smooth(&f, &source) {
         return Err("cubic graph source curve is singular".into());
     }
     let degrees: Vec<usize> = [2, 3, 5, 7]
         .into_iter()
         .filter(|&ell| {
-            ell <= args.max_ell
-                && ell + 1 < args.p as usize
-                && (ell != 2 || args.include_degree_two)
+            ell <= args.max_ell && ell + 1 < p as usize && (ell != 2 || args.include_degree_two)
         })
         .collect();
     if degrees.is_empty() {
         return Err("no selected degree below the field characteristic; use --include-degree-two for max-ell 2".into());
     }
-    let prime_cache = PhiCache::new(&Zp::new(args.p), &degrees);
+    let prime_cache = PhiCache::new(&Zp::new(p), &degrees);
     let cache = prime_cache.lift(|v| E3([v, 0, 0]));
     let mut nodes = vec![curve::jinv(&f, &source)];
     let mut index = HashMap::new();
@@ -387,19 +424,23 @@ pub(super) fn enumerate_j(args: &GraphArgs) -> Result<Value, String> {
         }
         expanded += 1;
     }
-    Ok(json!({
+    let mut report = json!({
         "schema_version":1,
         "graph_kind":"cubic-rational-j-neighbours",
-        "field_characteristic":args.p,
-        "cubic_nonresidue":args.c,
-        "source_curve":{"a":args.a,"b":args.b},
+        "field_characteristic":p,
+        "cubic_nonresidue":c,
+        "source_curve":{"a":a,"b":b},
         "degrees":degrees,
         "nodes":nodes.iter().enumerate().map(|(id,j)| json!({"id":id,"j":j.0})).collect::<Vec<_>>(),
         "edges":edges,
         "nodes_expanded":expanded,
         "truncated":truncated,
         "seed":args.seed
-    }))
+    });
+    if let Some(artifact) = input_artifact {
+        report["input_artifact"] = artifact;
+    }
+    Ok(report)
 }
 
 /// A counter-free field adapter. `Fp3` uses `Cell` to charge IC arithmetic;
@@ -740,8 +781,9 @@ mod tests {
         let f = CubicField { p: 7, c: 2 };
         let destination_j = curve::jinv(&f, &Curve::new(result.curve.a, result.curve.b));
         let j_graph = enumerate_j(&GraphArgs {
-            p: 7,
-            c: 2,
+            input: None,
+            p: Some(7),
+            c: Some(2),
             a: vec![3, 6, 4],
             b: vec![4, 4, 6],
             max_ell: 5,
@@ -774,8 +816,9 @@ mod tests {
     #[test]
     fn public_f7_j_graph_matches_exhaustive_field_roots() {
         let args = GraphArgs {
-            p: 7,
-            c: 2,
+            input: None,
+            p: Some(7),
+            c: Some(2),
             a: vec![3, 6, 4],
             b: vec![4, 4, 6],
             max_ell: 5,
@@ -831,8 +874,9 @@ mod tests {
     #[test]
     fn degree_two_j_graph_matches_exhaustive_field_roots() {
         let args = GraphArgs {
-            p: 7,
-            c: 2,
+            input: None,
+            p: Some(7),
+            c: Some(2),
             a: vec![3, 6, 4],
             b: vec![4, 4, 6],
             max_ell: 2,
@@ -889,8 +933,9 @@ mod tests {
     #[test]
     fn degree_two_j_graph_counts_repeated_root() {
         let report = enumerate_j(&GraphArgs {
-            p: 7,
-            c: 2,
+            input: None,
+            p: Some(7),
+            c: Some(2),
             a: vec![0, 0, 0],
             b: vec![1, 0, 0],
             max_ell: 2,
