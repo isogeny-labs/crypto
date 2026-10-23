@@ -80,9 +80,40 @@ impl<'a> Quadratic<'a> {
 /// Meet in the middle on the chain, not on group points. For m=3 and m=4
 /// this uses O(|V|^2) quadratic solves, and exactly counts intermediate roots.
 pub fn count(gf: &Gf2, bs: &[u64], xr: u64, m: usize) -> u64 {
-    assert!(m == 3 || m == 4);
+    assert!((3..=12).contains(&m));
     let domain = span(bs);
     let quad = Quadratic::new(gf);
+    if m > 4 {
+        let mut states = BTreeMap::<u64, u64>::new();
+        for &x in &domain {
+            for &y in &domain {
+                for u in quad.link(x, y) {
+                    *states.entry(u).or_default() += 1;
+                }
+            }
+        }
+        for _ in 2..m - 1 {
+            let mut next = BTreeMap::<u64, u64>::new();
+            for (u, weight) in states {
+                for &x in &domain {
+                    for v in quad.link(u, x) {
+                        let dst = next.entry(v).or_default();
+                        *dst = dst.checked_add(weight).expect("count overflow");
+                    }
+                }
+            }
+            states = next;
+        }
+        let mut total = 0u64;
+        for &x in &domain {
+            for u in quad.link(x, xr) {
+                total = total
+                    .checked_add(*states.get(&u).unwrap_or(&0))
+                    .expect("count overflow");
+            }
+        }
+        return total;
+    }
     let mut right = BTreeMap::<u64, u64>::new();
     for &last in &domain {
         for u in quad.link(last, xr) {
@@ -112,9 +143,46 @@ pub fn count(gf: &Gf2, bs: &[u64], xr: u64, m: usize) -> u64 {
 
 /// One exact chain witness, returned as (summand x values, intermediates).
 pub fn witness(gf: &Gf2, bs: &[u64], xr: u64, m: usize) -> Option<(Vec<u64>, Vec<u64>)> {
-    assert!(m == 3 || m == 4);
+    assert!((3..=12).contains(&m));
     let domain = span(bs);
     let quad = Quadratic::new(gf);
+    if m > 4 {
+        let mut states = BTreeMap::new();
+        for &x in &domain {
+            for &y in &domain {
+                for u in quad.link(x, y) {
+                    states.entry(u).or_insert((vec![x, y], vec![u]));
+                }
+            }
+        }
+        for _ in 2..m - 1 {
+            let mut next = BTreeMap::new();
+            for (u, (xs, us)) in states {
+                for &x in &domain {
+                    for v in quad.link(u, x) {
+                        next.entry(v).or_insert_with(|| {
+                            let mut xs = xs.clone();
+                            xs.push(x);
+                            let mut us = us.clone();
+                            us.push(v);
+                            (xs, us)
+                        });
+                    }
+                }
+            }
+            states = next;
+        }
+        for &x in &domain {
+            for u in quad.link(x, xr) {
+                if let Some((xs, us)) = states.get(&u) {
+                    let mut xs = xs.clone();
+                    xs.push(x);
+                    return Some((xs, us.clone()));
+                }
+            }
+        }
+        return None;
+    }
     let mut right = BTreeMap::new();
     for &last in &domain {
         for u in quad.link(last, xr) {
@@ -174,7 +242,7 @@ mod tests {
         let gf = Gf2::new(&irr);
         let bs = [1, 2];
         let base: Vec<_> = bs.iter().map(|&x| element(x, 5)).collect();
-        for m in [3, 4] {
+        for m in [3, 4, 5, 6] {
             for xr in 0..32 {
                 assert_eq!(
                     count(&gf, &bs, xr, m),

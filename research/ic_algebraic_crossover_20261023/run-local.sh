@@ -12,11 +12,13 @@ test -x "$bin"
 timer=${IC_TIMER:-/usr/bin/time}
 if test ! -x "$timer"; then timer=/workspace/.tools/usr/bin/time; fi
 test -x "$timer"
+"$timer" --version > "$run/timer-version.txt"
 git rev-parse HEAD > "$run/source-commit.txt"
 sha256sum "$bin" examples/ic_algebraic_followup.rs "$study/PROTOCOL.md" \
   "$study/inputs/guess-ell8.jsonl" "$study/run-local.sh" > "$run/hashes.txt"
+sha256sum "$timer" >> "$run/hashes.txt"
 if test -f examples/ic_algebraic_followup/exact.rs; then
-  sha256sum examples/ic_algebraic_followup/exact.rs >> "$run/hashes.txt"
+  sha256sum examples/ic_algebraic_followup/*.rs >> "$run/hashes.txt"
 fi
 uname -a > "$run/host.txt"
 lscpu >> "$run/host.txt"
@@ -46,7 +48,7 @@ case "$mode" in
   single) run_one "${@:3}" ;;
   verify) run_one verify-fixtures --input "${3:?input file}" ;;
   fixtures)
-    for cell in 3:25:9 4:17:6 4:18:6 3:34:8 3:36:8 4:38:6; do
+    for cell in 3:25:9 4:17:6 4:18:6 3:34:8 3:36:8 4:38:6 6:10:3 5:15:3 10:10:2; do
       IFS=: read -r m n ell <<< "$cell"
       for family in prefix geometric geomtraceu random; do
         run_one fixtures --m "$m" --n "$n" --ell "$ell" --family "$family" --seed 20261023 --draws 32

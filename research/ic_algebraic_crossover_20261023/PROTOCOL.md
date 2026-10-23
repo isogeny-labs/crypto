@@ -156,6 +156,14 @@ Record every draw; select the first four UNSAT and first three SAT per arm,
 without replacing missing classes, for the closure/guessing follow-up.
 Commit exact fixture bytes and hashes before closure measurement.
 
+The exact B3 continuations from the HKY study are additionally (6,10,3),
+N=58, and (5,15,3), N=60, not replacements by m=3 cells of equal N. Add
+(10,10,2), N=100, to increase m at fixed field size. For m>4 the fixture
+oracle propagates exact multiplicities along the quadratic chain rather
+than enumerating every intermediate tuple. Cross-check it against the
+legacy exhaustive oracle at m=5,6 as well before use. Generate the same
+32 draws per family. A Boolean layout refusal does not discharge B3.
+
 The declared alternative guess orderings are ascending occurring variable
 index (`lowest:k`) and decreasing monomial frequency, ties by variable index
 (`frequent:k`). Original balanced ordering is unchanged. Optional sparse
@@ -163,3 +171,50 @@ closure is a separate instrument arm capped at 25,000,000 stored nonzeros,
 the same 12 GiB address-space and 900 s command limits. A sparse cap or timeout
 does not settle a degree or guessing minimum. Begin it on the first UNSAT
 draw at each larger cell. Do not retry a capped branch to change its outcome.
+
+## Source update and extraction disclosure, 2026-10-23
+
+Before this campaign's guessing data, the current PR #2429 source was
+rechecked. Its `dreg_closure_guess3_20261023/RESULTS.md` already reports
+balanced k=3 failing on draws 0,3,5 at branch 0 and passing all eight branches
+on draw 6. This independent campaign does not claim priority for that result.
+The protocol's full 32-branch panel additionally measures the 21 branches
+that source early-stopped; the alternative orderings remain separate arms.
+
+The initial structural panel's closure matrix cap is degree four. Inspection
+of extraction telemetry while that panel was running found that the library
+solver sets its effective degree to max(requested degree,input degree),
+including direct S4 inputs of degree six. Thus its extraction is not a
+strict-degree-four comparison. Preserve those records, report this protocol
+deviation, and use them for exact correctness and explicitly scoped solver
+work only. Do not claim a same-degree or full-query speedup from that panel.
+Future rows record input and effective extraction degrees explicitly.
+
+Quartic smoke spec `specs/quartic-smoke.json` uses target seed 202610230001,
+order seed 202610230002, 3,600 s per measured child and L0 counted evidence.
+The full rungs `specs/quartic-m14.json` through `quartic-m18.json` retain
+eight targets and the original 86,400 s child cap; they are pending, not
+automatically launched by the local runner. Local smoke runs are serial,
+with no other measurement process active.
+
+## Amendment 2: 128-variable masks and the HKY continuation
+
+Frozen before any new fixture or HKY measurement. Add a Rust coefficient-
+based S3 chain builder with u128 Boolean masks (at most 127 variables),
+verified equation by equation against the library builder for m=3..6.
+Carry the source-pinned PR #2214 parallel HKY engine into the instrument,
+widening monomial masks to u128 while retaining u64 matrix words. Verify
+small fixed points against the library's independent dense closure.
+Source: `examples/hky_par.rs` at f0196738eeb033b23719fb79f76d266e3a8d0c16,
+SHA-256 4bc7e43aa56fa446a2785c30602d2823f3aed7182a772b7120cfdeae5c30d8b2.
+
+Add a separate bounded u128 sparse engine. Its 25,000,000-entry cap counts
+stored pivot and queued-fall monomials; its counter unit is mask comparisons,
+not the dense engine's u64 word operations. Compare small sparse fixed points
+against the dense engine and include a contradiction using variable 99.
+No cross-engine speed ratio is licensed. The limits remain 12 GiB address
+space and 900 s per command; use RAYON_NUM_THREADS=4 and HKY_CHUNK=256 for
+parallel runs. The first UNSAT random draw in each B3 cell is the local
+preflight; complete four-draw large-host panels remain required if these
+preflights cannot finish. Dense preflight permits 600,000 columns for
+N=58,60; N=100 uses sparse closure. Retain degree-start receipts on failure.

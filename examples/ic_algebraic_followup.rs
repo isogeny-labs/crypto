@@ -23,6 +23,10 @@ use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 #[path = "ic_algebraic_followup/exact.rs"]
 mod exact;
+#[path = "ic_algebraic_followup/hky.rs"]
+mod hky;
+#[path = "ic_algebraic_followup/wide.rs"]
+mod wide;
 
 fn digest(bytes: &[u8]) -> String {
     hex::encode(Sha256::digest(bytes))
@@ -412,6 +416,14 @@ fn profile(args: &BTreeMap<String, String>) {
                 "equations_sha256":digest(&serde_json::to_vec(&eqs).unwrap()),"degree":degree,
                 "candidate_id":null,"complete_dlp_cost":null,"rho_ratio":null,
                 "isolation":"L0","status":"unmeasured"});
+            let input_degree = eqs
+                .iter()
+                .flat_map(|p| &p.terms)
+                .map(|m| m.mask.count_ones())
+                .max()
+                .unwrap_or(0);
+            row["input_max_degree"] = json!(input_degree);
+            row["extraction_effective_degree"] = json!(degree.max(input_degree).max(2));
             let count = columns(occurring(&eqs), degree);
             row["estimated_columns"] = json!(count.to_string());
             if count > max_cols {
@@ -775,24 +787,33 @@ fn verify_fixtures(args: &BTreeMap<String, String>) {
             let sys = build_decomposition_system(&base, &element(xr, n), &element(1, n), m, &st);
             row["witness_x"] = json!(xs);
             row["witness_intermediates"] = json!(us);
+            let mut assignment = 0u128;
+            for (i, &x) in xs.iter().enumerate() {
+                let bits = (0..1u64 << bs.len())
+                    .find(|&bits| {
+                        bs.iter()
+                            .enumerate()
+                            .filter(|(j, _)| bits >> j & 1 != 0)
+                            .fold(0, |a, (_, b)| a ^ b)
+                            == x
+                    })
+                    .unwrap();
+                assignment |= (bits as u128) << (i * bs.len());
+            }
+            for (i, &u) in us.iter().enumerate() {
+                assignment |= (u as u128) << (m * bs.len() + i * n as usize);
+            }
+            let (wide_eqs, _) = wide::chain(&gf, &bs, xr, m);
+            assert!(wide_eqs
+                .iter()
+                .all(|p| p.iter().filter(|&&m| assignment & m == m).count() % 2 == 0));
+            row["witness_assignment_hex"] = json!(format!("{assignment:x}"));
+            row["witness_checked"] = json!(true);
             if let Some(sys) = sys {
-                let mut assignment = 0u64;
-                for (i, &x) in xs.iter().enumerate() {
-                    let bits = (0..1u64 << bs.len())
-                        .find(|&bits| {
-                            bs.iter()
-                                .enumerate()
-                                .filter(|(j, _)| bits >> j & 1 != 0)
-                                .fold(0, |a, (_, b)| a ^ b)
-                                == x
-                        })
-                        .unwrap();
-                    assignment |= bits << (i * bs.len());
-                }
-                for (i, &u) in us.iter().enumerate() {
-                    assignment |= u << (m * bs.len() + i * n as usize);
-                }
-                assert!(sys.equations.iter().all(|p| p.eval(assignment) == 0));
+                assert!(sys
+                    .equations
+                    .iter()
+                    .all(|p| p.eval(assignment.try_into().unwrap()) == 0));
                 // A SAT control at the affordable degree must not refute.
                 if columns(sys.n_vars, 3) <= 30000 {
                     let (closed, _) = ReducedBasis::from_system_closed_full(
@@ -807,14 +828,191 @@ fn verify_fixtures(args: &BTreeMap<String, String>) {
                 } else {
                     row["sat_degree3_status"] = json!("column_cap_30000");
                 }
-                row["witness_assignment"] = json!(assignment);
-                row["witness_checked"] = json!(true);
             } else {
                 row["boolean_layout_status"] = json!("unsupported_over_64_variables");
             }
         }
         emit(&row);
     }
+}
+
+fn hky_run(args: &BTreeMap<String, String>) {
+    let get = |k: &str| args.get(k).unwrap_or_else(|| panic!("missing {k}"));
+    let source = std::fs::read(get("--input")).unwrap();
+    let draw: u64 = get("--draw").parse().unwrap();
+    let input: Value = std::str::from_utf8(&source)
+        .unwrap()
+        .lines()
+        .map(|l| serde_json::from_str::<Value>(l).unwrap())
+        .find(|v| v["draw"] == draw)
+        .unwrap();
+    assert_eq!(input["solutions"], 0);
+    let n = input["n"].as_u64().unwrap() as u32;
+    let m = input["m"].as_u64().unwrap_or(3) as usize;
+    let bs: Vec<_> = input["v_basis"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v.as_u64().unwrap())
+        .collect();
+    let irr = find_irreducible_sparse(n).unwrap();
+    let (eqs, nv) = wide::chain(&Gf2::new(&irr), &bs, input["x_r"].as_u64().unwrap(), m);
+    let mut row = json!({"schema":"ic-algebraic-hky/v1","input_sha256":digest(&source),"draw":draw,"m":m,"n":n,
+        "ell":bs.len(),"complete_dlp_cost":null,"rho_ratio":null});
+    row["variables"] = json!(nv);
+    let engine = args.get("--engine").map(String::as_str).unwrap_or("dense");
+    assert!(engine == "dense" || engine == "sparse");
+    row["engine"] = json!(engine);
+    let cmax: u32 = get("--degree").parse().unwrap();
+    let cap: u128 = get("--max-cols").parse().unwrap();
+    for degree in 2..=cmax {
+        let cols = columns(nv, degree);
+        row["degree"] = json!(degree);
+        row["columns"] = json!(cols.to_string());
+        if cols > cap && engine == "dense" {
+            row["status"] = json!("column_cap");
+            emit(&row);
+            return;
+        }
+        row["status"] = json!("started");
+        emit(&row);
+        let start = std::time::Instant::now();
+        if engine == "sparse" {
+            let limit: usize = get("--max-entries").parse().unwrap();
+            let result = wide::closure(&eqs, nv, degree, limit);
+            row["status"] = json!(result.status);
+            row["sparse"] = serde_json::to_value(&result).unwrap();
+            row["diagnostic_seconds"] = json!(start.elapsed().as_secs_f64());
+            emit(&row);
+            if result.status != "saturated_not_refuted" {
+                return;
+            }
+            row.as_object_mut().unwrap().remove("sparse");
+            row.as_object_mut().unwrap().remove("diagnostic_seconds");
+            continue;
+        }
+        let (plain, closed, rounds) = hky::closure_par(&eqs, nv as u32, degree, cols as usize);
+        row["status"] = json!(if closed == cols as usize {
+            "refuted"
+        } else {
+            "saturated_not_refuted"
+        });
+        row["plain_dimension"] = json!(plain);
+        row["closure_dimension"] = json!(closed);
+        row["rounds"] = json!(rounds);
+        row["threads"] = json!(rayon::current_num_threads());
+        row["diagnostic_seconds"] = json!(start.elapsed().as_secs_f64());
+        emit(&row);
+        if closed == cols as usize {
+            return;
+        }
+        for key in [
+            "plain_dimension",
+            "closure_dimension",
+            "rounds",
+            "threads",
+            "diagnostic_seconds",
+        ] {
+            row.as_object_mut().unwrap().remove(key);
+        }
+    }
+}
+
+fn audit(args: &BTreeMap<String, String>) {
+    let directory = std::path::Path::new(args.get("--run").expect("--run"));
+    let mut cells: Vec<_> = std::fs::read_dir(directory)
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .filter(|p| p.is_dir())
+        .collect();
+    cells.sort();
+    let mut total = 0u64;
+    let mut complete = 0u64;
+    let mut failures = 0u64;
+    for cell in cells {
+        let path = cell.join("rows.jsonl");
+        if !path.exists() {
+            continue;
+        }
+        let mut oracle_cache = BTreeMap::new();
+        for line in std::fs::read_to_string(&path).unwrap().lines() {
+            let row: Value = serde_json::from_str(line).unwrap();
+            if row["schema"] != "ic-algebraic-profile/v1" {
+                continue;
+            }
+            let n = row["field_degree"].as_u64().unwrap() as u32;
+            let target_id = row["target_index"].as_u64().unwrap();
+            let kc = KoblitzCurve::new(0, n).unwrap();
+            let target = BinaryPoint::Affine {
+                x: element(row["target"]["x"].as_u64().unwrap(), n),
+                y: element(row["target"]["y"].as_u64().unwrap(), n),
+            };
+            assert_eq!(point_json(&kc.curve.generator), row["generator"]);
+            let bs: Vec<_> = row["basis"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|x| x.as_u64().unwrap())
+                .collect();
+            let expected = oracle_cache.entry(target_id).or_insert_with(|| {
+                let domain = span(&bs);
+                let lifts: Vec<_> = domain
+                    .iter()
+                    .map(|&x| points_with_x(&kc.curve, &element(x, n)))
+                    .collect();
+                let mut found = BTreeSet::new();
+                // Independent loop shape: enumerate unordered x multisets,
+                // cache lifts, and sum the last two points first.
+                for i in 0..domain.len() {
+                    for j in i..domain.len() {
+                        for k in j..domain.len() {
+                            let mut yes = false;
+                            for q in &lifts[j] {
+                                for r in &lifts[k] {
+                                    let qr = point_add(&kc.curve, q, r);
+                                    for p in &lifts[i] {
+                                        if point_add(&kc.curve, p, &qr) == target {
+                                            yes = true;
+                                        }
+                                    }
+                                }
+                            }
+                            if yes {
+                                found.insert([domain[i], domain[j], domain[k]]);
+                            }
+                        }
+                    }
+                }
+                found
+            });
+            let measured: BTreeSet<[u64; 3]> = row
+                .get("accepted_x_multisets")
+                .map(|x| serde_json::from_value(x.clone()).unwrap())
+                .unwrap_or_default();
+            let extracted = row["extraction_complete"] == true;
+            let subset = measured.is_subset(expected);
+            let matches = extracted && measured == *expected;
+            let mandatory = row["formulation"] != "chain";
+            let valid = subset && (!extracted || matches || !mandatory);
+            total += 1;
+            complete += u64::from(extracted);
+            failures += u64::from(!valid);
+            emit(
+                &json!({"schema":"ic-algebraic-query-audit/v1","cell":cell.file_name().unwrap().to_str().unwrap(),
+                "n":n,"ell":row["ell"],"family":row["family"],"rep":row["base_rep"],"target_index":target_id,
+                "formulation":row["formulation"],"measured_status":row["status"],"exact_truth":expected,
+                "measured_accepted":measured,"extraction_complete":extracted,"subset_valid":subset,
+                "complete_matches":if extracted{json!(matches)}else{Value::Null},
+                "status":if valid{"verified"}else{"mismatch"},
+                "chain_degenerate_mismatch":extracted && !matches && !mandatory}),
+            );
+        }
+    }
+    emit(
+        &json!({"schema":"ic-algebraic-query-audit-summary/v1","rows":total,
+        "complete_extractions":complete,"failures":failures,"status":if failures==0{"passed"}else{"failed"}}),
+    );
+    assert_eq!(failures, 0, "independent exact-query audit failed");
 }
 
 fn main() {
@@ -832,6 +1030,8 @@ fn main() {
         "guess" => guess(&args),
         "fixtures" => fixtures(&args),
         "verify-fixtures" => verify_fixtures(&args),
+        "audit" => audit(&args),
+        "hky" => hky_run(&args),
         _ => panic!("unknown mode"),
     }
 }
@@ -854,5 +1054,38 @@ mod tests {
         let gf = Gf2::new(&find_irreducible_sparse(5).unwrap());
         let mut tests = 0;
         assert_eq!(split(&gf, &[0], [1, 1, 1], &mut tests), None);
+    }
+    #[test]
+    fn parallel_hky_agrees_with_dense_fixed_point() {
+        let n = 5;
+        let irr = find_irreducible_sparse(n).unwrap();
+        let st = FieldStructure::new(n, &irr);
+        let bs = vec![element(1, n), element(2, n)];
+        for m in [3, 4] {
+            for xr in 0..8 {
+                let sys = build_decomposition_system(&bs, &element(xr, n), &element(1, n), m, &st)
+                    .unwrap();
+                let eqs: Vec<Vec<u128>> = sys
+                    .equations
+                    .iter()
+                    .map(|p| p.terms.iter().map(|m| m.mask as u128).collect())
+                    .collect();
+                for d in [2, 3] {
+                    let total = columns(sys.n_vars, d) as usize;
+                    let (_, dim, _) = hky::closure_par(&eqs, sys.n_vars as u32, d, total);
+                    let (closed, _) = ReducedBasis::from_system_closed_full(
+                        &sys.equations,
+                        sys.n_vars,
+                        d,
+                        1_000_000,
+                    )
+                    .unwrap();
+                    assert_eq!(dim == total, closed.is_refuted());
+                    if !closed.is_refuted() {
+                        assert_eq!(dim, closed.rank());
+                    }
+                }
+            }
+        }
     }
 }
