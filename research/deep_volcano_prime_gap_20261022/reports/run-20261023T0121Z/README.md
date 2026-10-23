@@ -13,7 +13,7 @@ A descriptive record of the run. The results report is
 | run | `ecbench run --cpus auto --allow-busy`; session `ECBS1h45f937d2f95a`, 01:21:26–01:29:02 UTC, 2026-10-23 |
 | host | Intel Xeon Processor @ 2.10 GHz, 4 vCPU shared cloud VM, Linux; isolation earned L1 / L2 per run |
 | ecbench binary | sha256 `d9a6ca939982404c…`; sessions' git `bec9df9e8`, dirty (the lanes walk, committed as `d81da47d5`) |
-| external | `rho-lanes/external_ca.sh`: `ca solve --alg rho --threads 1` (`aburan28/cryptanalysis` 1aa48b5, `ca` 0.1.0), `taskset -c 2`, seeds 1–3, on the session's 192 workload targets; run after the session, alone on the host |
+| external | `rho-lanes/external_ca.sh`: `ca solve --alg rho --threads 1` (`aburan28/cryptanalysis` 1aa48b5, `ca` 0.1.0), `taskset -c 2`, seeds 1–3, on the session's 192 workload targets; run after the session (binary sha256 in `rho-lanes/external_ca.binary.sha256`, recorded afterwards) |
 
 ## Runs
 
@@ -35,7 +35,7 @@ The audit is `ecbench verify --replay 24`: `audit OK: 1536 records, 1536 verifie
 
 The run is paired by `ecbench compare`:
 - counted operations, lanes over serial: 1.0252 [1.0213, 1.0295], cluster interval over 576 pairs;
-- median wall ratio: 0.4193 [0.4173, 0.4214], over 306 admitted pairs;
+- median wall ratio: 0.4193 [0.4173, 0.4214], over all 576 pairs (306 of them at L2 on both sides);
 - measurement quality: 58/100.
 
 The §5a band is in `rho-lanes/band.json`.

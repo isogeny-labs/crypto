@@ -2289,7 +2289,8 @@ struct LaneWalk<E> {
 /// expected count, do not.  The budget bounds all lanes together.  The
 /// additions are charged one each as before; the field tally is the lane
 /// adder's (one inversion a round, three multiplications a batched lane,
-/// and the conversions to and from Montgomery form).  Without a native
+/// and the conversions into Montgomery form; the reductions back out are
+/// counted apart, in `GroupOps::montgomery_reductions`).  Without a native
 /// lane adder, with more jumps than its 16 slots, or with no lanes, this
 /// is [`rho_walk_with`].  One lane is [`rho_walk_with`]'s walk exactly
 /// (the same steps, collision and counters), with the lane adder's field

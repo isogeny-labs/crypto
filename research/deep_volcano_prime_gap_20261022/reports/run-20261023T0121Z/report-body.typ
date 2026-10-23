@@ -28,7 +28,8 @@ A descriptive record of the run. The results report is
     [external], [`rho-lanes/external_ca.sh`:
     `ca solve --alg rho --threads 1` (`aburan28/cryptanalysis` 1aa48b5,
     `ca` 0.1.0), `taskset -c 2`, seeds 1--3, on the session\'s 192
-    workload targets; run after the session, alone on the host],
+    workload targets; run after the session (binary sha256 in
+    `rho-lanes/external_ca.binary.sha256`, recorded afterwards)],
   )]
   , kind: table
   )
@@ -76,7 +77,8 @@ The run is paired by `ecbench compare`:
 
 - counted operations, lanes over serial: 1.0252 \[1.0213, 1.0295\],
   cluster interval over 576 pairs;
-- median wall ratio: 0.4193 \[0.4173, 0.4214\], over 306 admitted pairs;
+- median wall ratio: 0.4193 \[0.4173, 0.4214\], over all 576 pairs (306
+  of them at L2 on both sides);
 - measurement quality: 58/100.
 
 The §5a band is in `rho-lanes/band.json`.

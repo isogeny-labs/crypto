@@ -47,8 +47,10 @@ All numbers below are #strong[measured], except where marked
 
 The first five rows come from `timing.sh`. Its runs are interleaved
 before/after and pinned (`taskset`). They report the median of 3 rounds
-(plan) or 7 rounds (construct). The before binaries are built from the
-parent commits.
+(plan) or 7 rounds (construct). The before binaries are `volcano-gap`
+built at `54178db75` and `ecbench` built at this commit with
+`src/cryptanalysis/ecbench/workload.rs` reverted to `bec9df9e8`\'s
+(sha256s in each row).
 
 The sessions row is the recorded span from the first session start to
 the last session end:
@@ -151,11 +153,16 @@ seeds (`lane_rho_recovers_replays_and_batches_its_inversions`).
   more operations, mostly the walks still in flight when the collision
   is found (32 walks of about 2^10 steps each).
 - #strong[Wall time.] The median wall ratio is #strong[0.4193 \[0.4173,
-  0.4214\]], over 306 admitted pairs.
+  0.4214\]] over all 576 pairs. Of those, 306 pairs ran at L2 on both
+  sides; their median is 0.4179 (validator). The lanes run was faster in
+  all 576 pairs.
 - #strong[Audit.] The session passes `ecbench verify --replay 24`
   (`rho-lanes/session.audit.json`). The §5a band is in
-  `rho-lanes/band.json`. Both arms run the same walk, so the band does
-  not rank them.
+  `rho-lanes/band.json`. At 0, 0.1 and 1 GAE per unpriced
+  canonicalisation the mean S is 0.9303 / 1.0233 / 1.8604 (serial) and
+  0.9538 / 1.0492 / 1.9073 (lanes). The band ranks serial as cheaper in
+  counted cost on 48/48 curves at every weight: the lanes arm buys wall
+  time with 2.5% more operations.
 
 === Against the fastest external rho at hand (AGENTS.md §15)
 <against-the-fastest-external-rho-at-hand-agentsmd-15>
@@ -201,12 +208,48 @@ and 4.34 passes it through to the script. The
 change, is the check: its result on this PR\'s CI is the evidence, and
 the self-test passed locally on 4.34.1.
 
+== Caveats (from the independent validation)
+<caveats-from-the-independent-validation>
+- #strong[Sessions.] The 2.89× session span comes from running the main
+  spec as three parallel shards, plus removing the old planning delay.
+  The total solve CPU time across the sessions rose, from 2738 s to 2988
+  s, because the shards contend for 4 vCPUs. It is a turnaround gain,
+  not less work.
+- #strong[`construct` on one CPU.] On 1 CPU the whole
+  `volcano-gap construct` is only about 1.25× faster. The 3.13× in the
+  summary is on 4 CPUs.
+- #strong[Per-operation gap to `ca`.] `ca` counts one operation per
+  addition or doubling, like GAE, but about 7% of its count
+  (validator\'s estimate from its source) are scalar multiplications
+  priced at double-and-add counts while computed with fixed-base tables.
+  Its walk also differs (256 walks, 512 multipliers, 7
+  distinguished-point bits). So the 2.63× per operation is approximate;
+  the 2.65× per solve is not affected.
+- #strong[Provenance.] The `ca` binary\'s sha256 was recorded after the
+  run (`rho-lanes/external_ca.binary.sha256`\; the binary was not
+  rebuilt in between). The run report\'s \"alone on the host\" is not
+  established by the evidence. The ecbench binaries of the two sessions
+  were built from dirty trees and not kept; the validator\'s replays tie
+  their counted results to the committed code (`d81da47d5`, and the
+  merged `b67532210`), not their wall times.
+- #strong[Batching alone.] The 2.46× per operation mixes Montgomery
+  arithmetic with batch inversion. No arm isolates the batching.
+- #strong[Missing test.] No test compares a multi-lane walk with the
+  serial walks from the same starts, walk by walk. The one-lane equality
+  and the per-record invariant (steps + look-ahead = 32 × rounds on
+  768/768 lanes records) are the checks that exist.
+
 == What is not claimed
 <what-is-not-claimed>
 - No change to the study\'s result or its counted measurements. The rho
   method the study used (`rho.negation`) is unchanged. The re-run
   sessions, whose records equal the committed ones, replay exactly with
   the new binary.
+- No improvement in counted cost (GAE), and no index-calculus
+  improvement or leaderboard progress: this speeds up the rho
+  comparator, not the IC baseline. An IC distance measured against
+  ecbench\'s rho in wall-clock time would now flatter IC, because `ca`
+  is 2.6× faster than `rho.negation_lanes` on this host.
 - `rho.negation_lanes` is not a new reference rho for the IC
   leaderboard. It costs 2.5% more counted operations than `rho.negation`
   and runs 2.4× faster in wall time on this host. An IC row priced in
