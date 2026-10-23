@@ -2,6 +2,7 @@
 #![allow(dead_code)]
 mod conditional;
 mod covers;
+mod followup;
 mod isogeny;
 mod jacobian;
 mod pari;
@@ -272,6 +273,7 @@ fn prepare(out: &Path) -> Result<()> {
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().collect();
     match args.get(1).map(String::as_str) {
+        Some("followup") => followup::main(&args[2..]),
         Some("prepare") => prepare(Path::new(args.get(2).ok_or("missing output directory")?)),
         Some("solver" | "f4-worker") => solver::main(&args[1..]),
         Some("run" | "trace" | "geometry" | "conditional" | "isogeny") => {
