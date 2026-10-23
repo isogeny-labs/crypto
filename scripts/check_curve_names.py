@@ -270,7 +270,8 @@ def lint_diff(base: str, res: Resolver) -> list[str]:
             rel = raw[6:] if raw.startswith("+++ b/") else None
         elif raw.startswith("@@"):
             line = int(re.search(r"\+(\d+)", raw).group(1))
-        elif raw.startswith("+") and rel and rel not in SELF:
+        elif (raw.startswith("+") and rel and rel not in SELF
+              and not any(part in FROZEN_DIRS for part in Path(rel).parts[:-1])):
             for _, _, found, repl in find_retired(raw[1:], "added.txt", res):
                 if archived_label(rel, archived_text.get(rel, ""), found, repl):
                     continue
