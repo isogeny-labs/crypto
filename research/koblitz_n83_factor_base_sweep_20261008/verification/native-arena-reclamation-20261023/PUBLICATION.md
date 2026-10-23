@@ -99,3 +99,24 @@ accounting and byte-identical repack pass from a fresh S3 GET after PUT/HEAD.
 Receipts/manifests: publication/launch-correction-publication. Prior store
 entries are structurally unchanged. No object was overwritten or deleted.
 No c3/K4096 continuation has run at this publication freeze. See RESPEC-C3.md.
+
+## Completed K2048-c3 native 1.5M continuation
+
+`evidence/n83/arena-reclamation-20261023/continuation-k2048-c3.tar.xz`,
+37639824bytes, SHA256
+`8930bb0a93a608148f8f4e271a34628a0d2e20ce3e4fd57e1791ed14e7e2b143`.
+One completed attempt, exit0/no timeout,1500000conflicts/boundedUnknown,
+zero models/relations/rank. All1001 reference signatures through1M and152storage
+snapshots validate; later signatures unpaired. Four reclamations remove
+1581835327words. All89 memory samples and explicit unsampled tail pass; native
+cleanup and director custody pass. Complete raw/card/spec/binds/source/streams,
+receipt/relay, all readiness refusals/final clearance, independent assessments,
+CI failure logs/annotations/repairs and inspected one-page report are included.
+Source bundle prerequisite99516 is in the prior launch-correction archive.
+
+PUT/HEAD/freshGET/allpayload hashes/source bundle/fresh native audit/memory/
+reference-prefix reclamation/byte-identical repack all PASS. Receipts and store
+manifest: publication/k2048-c3-publication. Previous entries remain unchanged;
+no objects were overwritten or deleted. Original private artifact permissions
+are unchanged; only staging copies were normalized. K4096-c1 remains open at
+this publication freeze. No speed, base winner, UNSAT, minimum-memory or rho claim.
