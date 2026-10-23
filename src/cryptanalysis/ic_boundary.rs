@@ -2291,6 +2291,368 @@ pub fn rho_walk_with<G: CountedGroup, C: RhoClasses<G>>(
     }
 }
 
+/// A [`rho_walk_with`] walk on the negation classes, run by `lanes` walks
+/// in lockstep on a prime curve so that each round's additions share one
+/// field inversion ([`PrimeCurve::add_many_counted`], Montgomery's trick).
+///
+/// Every lane follows exactly the step rule of [`TunedWalker::walk`]
+/// (look-ahead, cycle escape, distinguished points, the cap), and walk `k`
+/// starts at `[k]T` as in the serial walk; the set-up draws the same jumps
+/// and stride from the seed.  What differs is the order in which the
+/// walks are interleaved and so which collision is found first, and the
+/// field work: a round of `n` additions performs `3(n − 1)` products and
+/// one inversion for the shared inverse, then `2M + 1S` per addition, and
+/// that is what the ledger's `field_ops` records.  Every addition any lane
+/// performs is charged, including the work of walks still in flight when
+/// another lane's collision recovers the logarithm.
+#[allow(clippy::too_many_arguments)]
+pub fn rho_walk_negation_lanes(
+    g: &PrimeCurve,
+    generator: PrimePoint,
+    target: PrimePoint,
+    r: u64,
+    seed: u64,
+    max_steps: u64,
+    walk: RhoWalk,
+    lanes: usize,
+) -> RhoResult {
+    let start = Instant::now();
+    let classes = NegationClasses { r };
+    let mut ops = GroupOps::default();
+    let mut rng = StdRng::seed_from_u64(seed);
+    let shape = WalkShape::of(r, walk);
+    let short = r.min(1u64 << shape.coefficient_bits).max(2);
+
+    // Set-up: exactly `rho_walk_with`'s draws.
+    let gq = g.add(&mut ops, generator, target);
+    let jumps: Vec<(PrimePoint, u64, u64)> = (0..shape.jumps)
+        .map(|_| {
+            let a = rng.gen_range(1..short);
+            let b = rng.gen_range(1..short);
+            (
+                joint_mul(g, &mut ops, generator, target, gq, a, b),
+                a % r,
+                b % r,
+            )
+        })
+        .collect();
+    let (mut ta, mut tb) = (rng.gen_range(1..r.max(2)), rng.gen_range(1..r.max(2)));
+    let mut stride = joint_mul(g, &mut ops, generator, target, gq, ta, tb);
+    while g.is_identity(&stride) {
+        ta = rng.gen_range(1..r.max(2));
+        tb = rng.gen_range(1..r.max(2));
+        stride = joint_mul(g, &mut ops, generator, target, gq, ta, tb);
+    }
+    let setup = ops;
+
+    let lane_count = lanes.max(1);
+    let ctx = NegLaneWalk {
+        g,
+        classes: &classes,
+        r,
+        jumps,
+        dp_mask: shape.dp_mask,
+        walk_cap: shape.walk_cap,
+        look_ahead: walk.look_ahead,
+        window: walk.cycle_window,
+        budget: max_steps,
+    };
+    let mut table: FastMap<(u64, u64)> = fast_map(1024);
+    let automorphisms = 2;
+    let expected = generic_floor_ops(r as f64, automorphisms as f64);
+    let mut tally = WalkTally::default();
+    let (mut walks, mut dps, mut start_adds) = (0u64, 0u64, 0u64);
+    let (mut useless, mut verification_ops) = (0u64, 0u64);
+    let (mut rounds, mut batched) = (0u64, 0u64);
+    let mut recovered = None;
+    let (mut sx, mut sa, mut sb) = (stride, ta % r, tb % r);
+
+    // The next walk's start, `[k]T`, while the serial loop's guard holds.
+    let mut next_start =
+        |ops: &mut GroupOps, tally: &WalkTally| -> Option<(PrimePoint, u64, u64)> {
+            while tally.walk_ops() < max_steps && walks < max_steps {
+                walks += 1;
+                if walks > 1 {
+                    sx = g.add(ops, sx, stride);
+                    sa = addmod(sa, ta, r);
+                    sb = addmod(sb, tb, r);
+                    start_adds += 1;
+                }
+                if !g.is_identity(&sx) {
+                    return Some((sx, sa, sb));
+                }
+            }
+            None
+        };
+    let mut lane_state: Vec<Option<NegLane>> = Vec::with_capacity(lane_count);
+    for _ in 0..lane_count {
+        let lane =
+            next_start(&mut ops, &tally).map(|(p, a, b)| ctx.start(&mut ops, &mut tally, p, a, b));
+        lane_state.push(lane);
+    }
+    let mut pairs: Vec<(PrimePoint, PrimePoint)> = Vec::with_capacity(lane_count);
+    let mut sums: Vec<PrimePoint> = Vec::with_capacity(lane_count);
+    let mut scratch: Vec<u64> = Vec::with_capacity(lane_count);
+    let mut generic_pairs: Vec<usize> = Vec::with_capacity(lane_count);
+    'rounds: loop {
+        pairs.clear();
+        for lane in lane_state.iter().flatten() {
+            pairs.push((lane.x, ctx.jumps[lane.jump(&ctx)].0));
+        }
+        if pairs.is_empty() {
+            break;
+        }
+        g.add_many_counted(
+            &mut ops,
+            &pairs,
+            &mut sums,
+            &mut scratch,
+            &mut generic_pairs,
+        );
+        rounds += 1;
+        batched += pairs.len() as u64;
+        let mut k = 0;
+        for slot in lane_state.iter_mut() {
+            let Some(lane) = slot.as_mut() else {
+                continue;
+            };
+            let sum = sums[k];
+            k += 1;
+            let Some(end) = ctx.resume(lane, &mut ops, &mut tally, sum) else {
+                continue;
+            };
+            if let WalkEnd::Distinguished(x, a, b) = end {
+                dps += 1;
+                let key = g.key(&x);
+                match table.get(&key) {
+                    Some(&(a2, b2)) => {
+                        if b2 != b {
+                            let num = submod(a, a2, r);
+                            let den = submod(b2, b, r);
+                            if let Some(inv) = invmod(den, r) {
+                                let d = mulmod(num, inv, r);
+                                let before = ops.gae();
+                                let check = g.mul(&mut ops, generator, d);
+                                verification_ops += (ops.gae() - before) as u64;
+                                if check == target {
+                                    recovered = Some(d);
+                                    break 'rounds;
+                                }
+                            }
+                        }
+                        useless += 1;
+                    }
+                    None => {
+                        table.insert(key, (a, b));
+                    }
+                }
+            }
+            *slot = next_start(&mut ops, &tally)
+                .map(|(p, a, b)| ctx.start(&mut ops, &mut tally, p, a, b));
+        }
+    }
+    let wall_ns = start.elapsed().as_nanos() as u64;
+    let gae = ops.gae();
+    let walked = tally.walk_ops();
+    let mut counters = tuned_counters(&shape, setup, start_adds, &tally, verification_ops, useless);
+    counters.insert("lanes".into(), lane_count as u64);
+    counters.insert("lane_rounds".into(), rounds);
+    counters.insert("lane_batched_additions".into(), batched);
+    RhoResult {
+        method: format!(
+            "{}; {lane_count} walks in lockstep, one batched inversion per round",
+            <NegationClasses as RhoClasses<PrimeCurve>>::method(&classes)
+        ),
+        automorphisms,
+        group_ops: ops,
+        steps: tally.steps,
+        walks,
+        distinguished_points: dps,
+        gae,
+        s: gae / (r as f64).sqrt(),
+        s_walk: walked as f64 / (r as f64).sqrt(),
+        expected_steps: expected,
+        steps_over_expected: walked as f64 / expected,
+        wall_ns,
+        verified: recovered.is_some(),
+        recovered,
+        counters,
+    }
+}
+
+/// The step rule of [`TunedWalker::walk`], split at its one addition so
+/// that many walks can share the inversion behind it.
+struct NegLaneWalk<'a> {
+    g: &'a PrimeCurve,
+    classes: &'a NegationClasses,
+    r: u64,
+    jumps: Vec<(PrimePoint, u64, u64)>,
+    dp_mask: u64,
+    walk_cap: u64,
+    look_ahead: bool,
+    window: usize,
+    budget: u64,
+}
+
+/// One walk in flight: the [`TunedWalker::walk`] locals.
+struct NegLane {
+    x: PrimePoint,
+    a: u64,
+    b: u64,
+    recent: VecDeque<(u64, PrimePoint, u64, u64)>,
+    last_escape: Option<u64>,
+    len: u64,
+    /// The step's first jump and how many it has tried (the look-ahead).
+    j0: usize,
+    tried: usize,
+}
+
+impl NegLane {
+    fn jump(&self, ctx: &NegLaneWalk) -> usize {
+        (self.j0 + self.tried) % ctx.jumps.len()
+    }
+}
+
+impl NegLaneWalk<'_> {
+    fn first_jump(&self, hash: u64) -> usize {
+        ((hash >> 24) % self.jumps.len() as u64) as usize
+    }
+
+    fn start(
+        &self,
+        ops: &mut GroupOps,
+        tally: &mut WalkTally,
+        p: PrimePoint,
+        a: u64,
+        b: u64,
+    ) -> NegLane {
+        let (x, a, b, _) = rho_canon(
+            self.g,
+            self.classes,
+            ops,
+            p,
+            a,
+            b,
+            self.r,
+            &mut tally.canonicalisations,
+        );
+        NegLane {
+            x,
+            a,
+            b,
+            recent: VecDeque::with_capacity(self.window + 1),
+            last_escape: None,
+            len: 0,
+            j0: self.first_jump(mix(self.g.key(&x))),
+            tried: 0,
+        }
+    }
+
+    /// Continue `lane` from `sum = x + M_j`; `None` while the walk goes on
+    /// (its next addition is `lane.jump`), the end otherwise.
+    fn resume(
+        &self,
+        lane: &mut NegLane,
+        ops: &mut GroupOps,
+        tally: &mut WalkTally,
+        sum: PrimePoint,
+    ) -> Option<WalkEnd<PrimePoint>> {
+        let (g, r) = (self.g, self.r);
+        let jump_count = self.jumps.len();
+        let j = lane.jump(self);
+        let (_, aj, bj) = self.jumps[j];
+        let (y, ya, yb, flipped) = rho_canon(
+            g,
+            self.classes,
+            ops,
+            sum,
+            addmod(lane.a, aj, r),
+            addmod(lane.b, bj, r),
+            r,
+            &mut tally.canonicalisations,
+        );
+        lane.tried += 1;
+        if self.look_ahead
+            && flipped
+            && lane.tried < jump_count
+            && !g.is_identity(&y)
+            && self.first_jump(mix(g.key(&y))) == j
+        {
+            tally.look_ahead_adds += 1;
+            return None;
+        }
+        lane.x = y;
+        lane.a = ya;
+        lane.b = yb;
+        tally.steps += 1;
+        lane.len += 1;
+        if g.is_identity(&lane.x) {
+            return Some(WalkEnd::Lost);
+        }
+        let mut key = g.key(&lane.x);
+        if self.window > 0 {
+            if let Some(pos) = lane.recent.iter().position(|e| e.0 == key) {
+                let c = lane.recent.len() - pos;
+                match c {
+                    2 => tally.cycles_2 += 1,
+                    4 => tally.cycles_4 += 1,
+                    _ => tally.cycles_other += 1,
+                }
+                let (min_key, mp, ma, mb) = lane
+                    .recent
+                    .iter()
+                    .skip(pos)
+                    .copied()
+                    .min_by_key(|e| e.0)
+                    .expect("a cycle has members");
+                if lane.last_escape == Some(min_key) {
+                    tally.abandoned += 1;
+                    return Some(WalkEnd::Lost);
+                }
+                lane.last_escape = Some(min_key);
+                let d2 = g.double(ops, mp);
+                tally.escapes += 1;
+                let (e, ea, eb, _) = rho_canon(
+                    g,
+                    self.classes,
+                    ops,
+                    d2,
+                    addmod(ma, ma, r),
+                    addmod(mb, mb, r),
+                    r,
+                    &mut tally.canonicalisations,
+                );
+                lane.x = e;
+                lane.a = ea;
+                lane.b = eb;
+                lane.recent.clear();
+                if g.is_identity(&lane.x) {
+                    return Some(WalkEnd::Lost);
+                }
+                key = g.key(&lane.x);
+            }
+            lane.recent.push_back((key, lane.x, lane.a, lane.b));
+            if lane.recent.len() > self.window {
+                lane.recent.pop_front();
+            }
+        }
+        let hash = mix(key);
+        if hash & self.dp_mask == 0 {
+            return Some(WalkEnd::Distinguished(lane.x, lane.a, lane.b));
+        }
+        if lane.len > self.walk_cap {
+            tally.capped += 1;
+            return Some(WalkEnd::Lost);
+        }
+        if tally.walk_ops() >= self.budget {
+            return Some(WalkEnd::Lost);
+        }
+        lane.j0 = self.first_jump(hash);
+        lane.tried = 0;
+        None
+    }
+}
+
 /// One target's share of a [`rho_batch_with`] run.
 #[derive(Clone, Debug, Serialize)]
 pub struct RhoBatchTarget {
@@ -3656,6 +4018,77 @@ fn jacobi(mut a: u64, mut n: u64) -> i32 {
         result
     } else {
         0
+    }
+}
+
+impl PrimeCurve {
+    /// `out[i] = pairs[i].0 + pairs[i].1`, one [`CountedGroup::add`] each,
+    /// with the inversions of every generic addition shared (Montgomery's
+    /// trick).  Each sum is the one [`Self::add_raw`] returns, since
+    /// inverses mod `p` are unique.  The ledger records what is performed:
+    /// `adds += 1` per pair; for the `n` generic pairs `3(n − 1)`
+    /// multiplications and one inversion for their inverses, then `2M + 1S`
+    /// each; a pair with an identity or a shared abscissa goes through
+    /// [`CountedGroup::add`] and tallies as it does.
+    pub fn add_many_counted(
+        &self,
+        ops: &mut GroupOps,
+        pairs: &[(PrimePoint, PrimePoint)],
+        out: &mut Vec<PrimePoint>,
+        scratch: &mut Vec<u64>,
+        idx: &mut Vec<usize>,
+    ) {
+        out.clear();
+        out.resize(pairs.len(), PrimePoint::INFINITY);
+        // `scratch[k]`: the running product of the first `k + 1` generic
+        // pairs' `x_b − x_a`; `idx[k]`: that pair's position.
+        scratch.clear();
+        idx.clear();
+        let p = self.p;
+        let mulmod_p = |x: u64, y: u64| mulmod(x, y, p);
+        let t = &mut ops.field_ops;
+        let mut acc = 1u64;
+        for (i, &(a, b)) in pairs.iter().enumerate() {
+            if a.infinity || b.infinity || a.x == b.x {
+                continue;
+            }
+            let dx = submod(b.x, a.x, p);
+            acc = if idx.is_empty() {
+                dx
+            } else {
+                t.muls += 1;
+                mulmod_p(acc, dx)
+            };
+            scratch.push(acc);
+            idx.push(i);
+        }
+        if !idx.is_empty() {
+            t.invs += 1;
+            let mut inv = invmod(acc, p).expect("prime field");
+            for k in (0..idx.len()).rev() {
+                let (a, b) = pairs[idx[k]];
+                let inv_k = if k == 0 {
+                    inv
+                } else {
+                    t.muls += 2;
+                    let inv_k = mulmod_p(inv, scratch[k - 1]);
+                    inv = mulmod_p(inv, submod(b.x, a.x, p));
+                    inv_k
+                };
+                t.muls += 2;
+                t.sqrs += 1;
+                let lambda = mulmod_p(submod(b.y, a.y, p), inv_k);
+                let x3 = submod(submod(mulmod_p(lambda, lambda), a.x, p), b.x, p);
+                let y3 = submod(mulmod_p(lambda, submod(a.x, x3, p)), a.y, p);
+                out[idx[k]] = PrimePoint::affine(x3, y3);
+            }
+        }
+        ops.adds += idx.len() as u64;
+        for (i, &(a, b)) in pairs.iter().enumerate() {
+            if a.infinity || b.infinity || a.x == b.x {
+                out[i] = self.add(ops, a, b);
+            }
+        }
     }
 }
 
@@ -9147,6 +9580,105 @@ mod tests {
             );
             assert_eq!(res.recovered, Some(k));
             assert_eq!(res.automorphisms, 6);
+        }
+    }
+
+    /// The batched prime addition gives `add_raw`'s sums, tallies one
+    /// addition per pair, and records the field work it performs:
+    /// `3(n − 1) + 2n` multiplications, `n` squarings and one inversion
+    /// for `n` generic pairs, the scalar law's tally for the rest.
+    #[test]
+    fn prime_add_many_counted_matches_the_scalar_law() {
+        let curve = PrimeCurve {
+            p: 10037,
+            a: 8,
+            b: 0,
+        };
+        let mut ops = GroupOps::default();
+        let g = curve.double(&mut ops, PrimePoint::affine(1, 10034));
+        let mut rng = StdRng::seed_from_u64(7);
+        for n in [0usize, 1, 2, 3, 17, 64] {
+            let mut pairs: Vec<(PrimePoint, PrimePoint)> = (0..n)
+                .map(|_| {
+                    (
+                        curve.mul(&mut ops, g, rng.gen_range(1..4973)),
+                        curve.mul(&mut ops, g, rng.gen_range(1..4973)),
+                    )
+                })
+                .collect();
+            // The special cases: a doubling, an inverse pair, the identity.
+            let p = curve.mul(&mut ops, g, 77);
+            pairs.extend([(p, p), (p, curve.neg(p)), (PrimePoint::INFINITY, p)]);
+            let mut scalar = GroupOps::default();
+            let expect: Vec<PrimePoint> = pairs
+                .iter()
+                .map(|&(a, b)| curve.add(&mut scalar, a, b))
+                .collect();
+            let mut special = GroupOps::default();
+            let mut generic = 0u64;
+            for &(a, b) in &pairs {
+                if a.infinity || b.infinity || a.x == b.x {
+                    curve.add(&mut special, a, b);
+                } else {
+                    generic += 1;
+                }
+            }
+            let (mut batched, mut out, mut scratch, mut idx) =
+                (GroupOps::default(), Vec::new(), Vec::new(), Vec::new());
+            curve.add_many_counted(&mut batched, &pairs, &mut out, &mut scratch, &mut idx);
+            assert_eq!(out, expect, "n = {n}");
+            assert_eq!(batched.adds, scalar.adds);
+            assert_eq!(batched.doubles, scalar.doubles);
+            let shared = generic.saturating_sub(1);
+            assert_eq!(
+                batched.field_ops.muls,
+                special.field_ops.muls + 3 * shared + 2 * generic
+            );
+            assert_eq!(batched.field_ops.sqrs, special.field_ops.sqrs + generic);
+            assert_eq!(
+                batched.field_ops.invs,
+                special.field_ops.invs + u64::from(generic > 0)
+            );
+        }
+    }
+
+    /// The lanes walk recovers planted logarithms for any lane count, and
+    /// replays exactly from its seed.
+    #[test]
+    fn negation_lanes_solve_and_replay() {
+        let curve = PrimeCurve {
+            p: 10037,
+            a: 8,
+            b: 0,
+        };
+        let r = 4973u64;
+        let mut ops = GroupOps::default();
+        let g = curve.double(&mut ops, PrimePoint::affine(1, 10034));
+        let mut rng = StdRng::seed_from_u64(2027);
+        for lanes in [1usize, 4, 16] {
+            for _ in 0..8 {
+                let k = rng.gen_range(1..r);
+                let target = curve.mul(&mut ops, g, k);
+                let run = || {
+                    rho_walk_negation_lanes(
+                        &curve,
+                        g,
+                        target,
+                        r,
+                        k,
+                        1 << 26,
+                        RhoWalk::negation(),
+                        lanes,
+                    )
+                };
+                let res = run();
+                assert_eq!(res.recovered, Some(k), "lanes = {lanes}");
+                assert_eq!(res.automorphisms, 2);
+                let again = run();
+                assert_eq!(again.group_ops.adds, res.group_ops.adds);
+                assert_eq!(again.group_ops.field_ops.muls, res.group_ops.field_ops.muls);
+                assert_eq!(again.counters, res.counters);
+            }
         }
     }
 
