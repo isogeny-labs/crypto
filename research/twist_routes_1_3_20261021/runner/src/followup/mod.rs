@@ -3,6 +3,8 @@ mod bigfield;
 mod coupled;
 mod geometry;
 mod gluing;
+mod partial;
+mod projection;
 
 use crate::{digest, write_json, Fixture, Result};
 use num_bigint::BigUint;
@@ -113,6 +115,12 @@ pub fn main(args: &[String]) -> Result<()> {
             adjudicate(Path::new(args.get(3).ok_or("missing CAS log prefix")?), out)?
         }
         "coupled-census" => coupled::census(&fixtures, out)?,
+        "projection-replay" => projection::replay(&fixtures, out)?,
+        "partial-replay" => partial::replay(
+            &fixtures,
+            Path::new(args.get(3).ok_or("missing census directory")?),
+            out,
+        )?,
         "coupled-relations" => coupled::relations(
             &fixtures,
             Path::new(args.get(3).ok_or("missing census directory")?),
@@ -154,7 +162,9 @@ fn adjudicate(prefix: &Path, out: &Path) -> Result<Vec<Value>> {
     let marker = text.contains("INDEPENDENT_MODULE_REPLAY_OK")
         || text.contains("ALL_TORSION_REPLAY_OK")
         || text.contains("ALL_GEOMETRY_SEARCH_DONE");
-    let marker = marker || text.contains("ALL_COUPLED_REPLAY_OK");
+    let marker = marker
+        || text.contains("ALL_COUPLED_REPLAY_OK")
+        || text.contains("ALL_PROJECTION_REPLAY_OK");
     let hashes_match =
         meta["stdout_sha256"] == digest(&stdout) && meta["stderr_sha256"] == digest(&stderr);
     let script = meta["argv"]
