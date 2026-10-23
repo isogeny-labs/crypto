@@ -10,7 +10,7 @@
 set -eu
 cd "$(dirname "$0")"
 PY="${1:-python3}"
-pandoc README.md -t typst -o body.typ.tmp
+pandoc --wrap=none README.md -t typst -o body.typ.tmp
 {
   printf '#set page(margin: 1.8cm)\n'
   printf '#set text(size: 9.5pt)\n'
