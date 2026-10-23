@@ -82,6 +82,13 @@ ic --json large-prime --manifest corpus/manifest.json --family koblitz-n11-l4 \
 ./target/release/ecbench verify --dir /tmp/ecbench/smoke-1 --replay 8
 ```
 
+`verify` prints a receipt and exits 1 when the audit finds a problem (2
+when it cannot run at all); `--exit-code` is still accepted and ignored.
+`--replay 8` replays eight runs chosen at random from the deterministic
+ones, with a seed drawn from the operating system and recorded in the
+receipt (`--replay-seed N` repeats a draw, `--replay-seq N` replays one run
+by sequence number, `--replay-all` replays every one).
+
 ```bash
 ./target/release/ecbench compare --dir /tmp/ecbench/smoke-1 --a rho-neg --b bsgs-neg
 ```
@@ -206,7 +213,7 @@ identity, and two objects that hash alike are the same object.
 |---|---|---|
 | curve | ICV1 slug `icv1-…` ([ICV1](../curves/ICV1.md)), EC1 alias when the registry holds this generator | the curve model (AGENTS.md §11) |
 | workload | `W` + 12 hex | ICV1 string, subgroup order, cofactor, generator, **target point**, target law, seed, index, `target_count: 1`, `cache_policy: cold` |
-| method | `ECM1h` + 12 hex | registry id and every parameter, defaults written out |
+| method | `ECM1h` + 12 hex | registry id and every parameter, defaults written out; an integer-valued parameter is written in canonical decimal (`64`, `064` and `+64` are one method) |
 | factor base | `FB1h` + 12 hex | curve slug, family, parameters, column count, point count, SHA-256 of the sorted point keys |
 | spec | `ECS1h` + 12 hex | the spec without its label and description |
 | host class | `ECBENV2h` + 12 hex (`ECBENV1h` before version 2) | the stable host facts (§5): topology shape, memory in whole GiB, so a reboot keeps the class |
@@ -270,7 +277,7 @@ a run that fails the check loses its isolation level), or **recorded**
 | Pricing drift | per-run measured ratios repriced identical runs by up to 8 % | IC native work is priced only at the repository's pinned ratios (`docs/ic/calibration.json`); a unit without one stays unpriced, never host-measured; an algebraic solver's wall-priced work is taken back out | controlled |
 | Selective reporting | dropping a failure, rerunning until it looks good | every execution writes a sealed record before the next starts; the output directory is claimed with an atomic `mkdir` under the lock, so a session queued for a used directory fails instead of writing over it; an interrupted session is marked, never deleted | controlled |
 | Interruption | a killed runner leaves narrowed masks behind and a child solving on an unprotected core | SIGINT, SIGTERM, SIGHUP and SIGQUIT are taken by one thread, which kills the child's process group; the session is marked `interrupted`, the eviction restored, and the runner exits `128 + signal`; the child dies with the runner (`PR_SET_PDEATHSIG`). A runner killed outright (SIGKILL, host loss) cannot mark the session, which keeps reading `running` as first written; `ecbench verify --allow-interrupted` audits such a session as interrupted (`interruption: never_finalised`, `records_bound: false`), with every per-record check (seal, sequence, plan, answer, grading) still applied. No whole-file records hash was ever written, so the file is explicitly unbound: truncation or appended records are seen only through the unkeyed per-record seals, and such a session must not be cited as complete | controlled |
-| Tampering and transcription | a figure edited by hand, or copied wrong | every file is hashed into `session.json`; `verify` re-derives identities, the plan, the answers and the seals, and replays runs | controlled |
+| Tampering and transcription | a figure edited by hand, or copied wrong | every file is hashed into `session.json`; `verify` re-derives identities (the session id from its preimage), the plan, the answers, the seals, every derived figure and each record's internal consistency (§9), and replays randomly chosen runs; a failed audit exits non-zero | controlled |
 
 ## 6. Isolation levels
 
@@ -657,22 +664,68 @@ stays with the author.
 
 **Exact replay.** Operation counts depend only on the code, the workload
 and the seed, never on the host. `ecbench verify --replay N` re-executes
-N measured runs (`--replay-all`, every deterministic one) and requires
-the same answer, total, phase counts, counters, unpriced work and factor
-base, bit for bit. Run on another machine, it is an independent check of
-the figure. Records written before 2026-10-05 by an `ic.pipeline` arm
-whose solver work was wall-priced (the descent-algebraic arms of
-`research/ecbench_yield_sweep_20261004/sessions/koblitz`) carry gae
+N measured runs and requires the same answer, total, phase counts,
+counters, unpriced work and factor base, bit for bit (`--replay-all`
+replays every one). Run on another machine, it is an independent check of
+the figure. Which runs are replayed is the auditor's choice, never the
+record's:
+
+- Whether a run is deterministic is taken from the method registry (the
+  method's id and parameters), not from the `cost.deterministic` the record
+  declares; a record that declares itself nondeterministic under a
+  deterministic method fails the audit. Every measured run of a
+  deterministic method is a candidate, whatever its outcome: a `verified`,
+  `wrong_answer` or `exhausted` run must reproduce as such (an exhausted
+  run must replay to exhausted), and an `error` run must replay to the same
+  error. A `timeout` is checked without a replay: it has no total, was
+  killed by SIGKILL (`signal 9`) and ran at least the spec's
+  `timeout_seconds`; a `crashed` run has no total and a signal or nonzero
+  exit.
+- `--replay N` draws the N runs uniformly at random, from a seed that
+  defaults to the operating system's entropy; the seed, the number of
+  candidates and `replay_selection` are in the receipt, and
+  `--replay-seed` repeats a draw. A session's author cannot know which runs
+  will be replayed. (Receipts written before this read
+  `candidates[j·len/n]` and have none of these fields.)
+
+Records written before 2026-10-05 by an `ic.pipeline` arm whose solver work
+was wall-priced (the descent-algebraic arms of
+`research/ecbench_yield_sweep_20261004/sessions/koblitz` and the other
+committed sessions listed in `audit::LEGACY_ROUNDING_RECORDS`) carry gae
 figures rounded to the binade of that wall term, because the term was
-removed by subtraction; the audit reproduces that rounding from the
-solver term and pre-removal total the record itself carries, reports the
-replay as `identical (legacy gae rounding, …)`, and new records carry the
-exact figure. The audit also recomputes every derived figure from the
-record's own counts (`S = total/√r`, the floor, the ratio, the
-lower-bound flag) and, for a session graded under the current rules,
-regrades every run from its recorded observations. A figure edited by
-hand and resealed is caught. The receipt names every file by SHA-256,
-and its own SHA-256 is the replay certificate a claim cites. CI
+removed by subtraction. The audit reproduces that rounding from the solver
+term and pre-removal total the record carries, and reports the replay as
+`identical (legacy gae rounding, …)`, only for those exact sealed
+`(session id, record id)` pairs, and only when the difference is within a
+few ulps of the pre-removal total (and a millionth of the exact total).
+A record that is not on the list must replay exactly. New records carry
+the exact figure.
+
+The audit also recomputes every derived figure from the record's own
+counts (`S = total/√r`, the floor, the ratio, the lower-bound flag) and
+checks each record against what needs no replay: phases sum to the total
+(except the frozen `rho.cubic` and `rho.quartic` accounting,
+`audit::PHASE_SUM_EXEMPT_METHODS`), `automorphisms_used` does not exceed
+`automorphisms_available`, `role` is the spec arm's, `env_class_id` and
+`binary_sha256` are the host capsule's, `field_ops` is present where the
+method counts field operations on a prime curve, and `status_counts`,
+`executions_planned` and the `session_id` (recomputed from the spec, host
+and plan hashes and the start time) are what the records and plan give.
+Every run is regraded from its recorded observations under the grading
+version the session records (`regraded` is a check: an unsupported version
+fails the audit; version 1 is reproduced from the current rules). A figure
+edited by hand and resealed is caught.
+
+An `interrupted` session accepted with `--allow-interrupted` is reported
+in the receipt (`warnings`, `interruption_point`, `planned_executions`) and
+on stderr as a prefix of its plan that must not be cited as complete; a
+runner that records `interruption.at_seq` in `session.json` has the audit
+check that the records end exactly there. A torn final line of
+`records.jsonl` is a problem in the receipt (under `--allow-interrupted`,
+for an interrupted or killed session, a warning, with the intact prefix
+audited). A record line with a duplicate key, or a number such as `1e400`
+that is not a finite float, is refused. The receipt names every file by
+SHA-256, and its own SHA-256 is the replay certificate a claim cites. CI
 re-audits every committed session under `research/ecbench_*/sessions`
 on a Linux x86-64 runner with every run replayed.
 
@@ -802,12 +855,21 @@ agree on it.
 
 The database is an **index**, rebuilt from session directories,
 comparison files, factor-base dumps and claim files; it is never the
-record of a measurement. Loading is idempotent in one way only:
+record of a measurement. `db sql` audits each session directory
+(`verify --replay 0 --allow-interrupted`) before it emits any of its rows:
+a tampered or unsealed record, a records file that does not hash to the
+session's, or a session that fails any other integrity check is skipped
+with the reason on stderr, the other paths still load, and the exit status
+is 1. Loading is idempotent in one way only:
 an insert tolerates a conflict on its table's primary key when it is the
 same row again, and nothing else. A second row claiming an existing run
 id is a UNIQUE error. A key arriving with a different identity (a curve
 slug on another ICV1 string, a workload, method, factor-base or host id
-on another hash) is stopped by the schema's identity triggers.
+on another hash, an arm on another role or method, a run with other
+figures, a comparison id with other content, a complete session reloaded
+as running or with other records) is stopped by the schema's identity
+triggers. The views read `complete` sessions only; an `interrupted` or
+`running` session is in the tables with its status.
 
 | table | holds |
 |---|---|
