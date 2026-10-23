@@ -847,7 +847,7 @@ fn run(cli: Cli) -> Result<(), String> {
                 (None, None, false) => store::walk_rel(&run)?,
                 _ => return Err("use --shard I --of N, or --collected --of N, or neither".into()),
             };
-            let sc = scratch(&out);
+            let sc = out.with_extension(format!("s3-scratch-{}", store::attempt_id()));
             let marker = store::fetch(&loc, &rel, &out, &sc);
             let _ = std::fs::remove_dir_all(&sc);
             let marker = marker?;

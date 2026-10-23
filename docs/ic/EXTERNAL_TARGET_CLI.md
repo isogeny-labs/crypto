@@ -190,6 +190,13 @@ count, and S3-reported SHA-256. Use `--shard I --of N` or `--collected --of N`
 to check trait outputs; a missing marker reports `exists: false`.
 The [live S3 receipt](../store/ISOGENY_WALK_EXISTS_S3_ACCEPTANCE_20261023.json)
 records false, true, and false across publish and exact-prefix cleanup.
+`isogeny_walk fetch` writes to a new output directory only after every
+downloaded object passes its stored and decoded SHA-256 checks. A missing or
+corrupt object leaves no output directory, and an existing output path is
+rejected rather than overwritten.
+The [live acceptance receipt](../store/ISOGENY_WALK_ATOMIC_FETCH_S3_ACCEPTANCE_20261023.json)
+records a complete three-file fetch, existing-directory rejection, and a
+missing second object that leaves neither an output directory nor staging files.
 
 ## Cubic extension field
 
