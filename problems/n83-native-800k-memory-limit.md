@@ -1,18 +1,29 @@
 # Native N83 800K-conflict runs exceed 4 GiB
 
 - **Status:** investigating
-- **Kind:** observed 4GiB resource limit; bounded 8GiB execution resolved, allocation cause open
+- **Kind:** observed 4GiB resource limit; bounded 8GiB execution and arena reclamation validated; minimum memory and historical OOM attribution open
 - **Affected work:** [800K protocol](../research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-800k-20261020/PROTOCOL.md)
 - **Next action owner:** N83 sweep maintainer
-- **Last updated:** 2026-10-21 UTC
+- **Last updated:** 2026-10-23 UTC
 
-Current outcome: both new1M-conflict/8GiB arms complete with native replay,
+Current outcome: the [arena candidate](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261023T0150Z/REPORT.md)
+completes 1M conflicts for each base. All 1,001 original counter signatures and
+102 storage snapshots per base match/validate; 59/61 memory samples and exact
+custody pass. K2048 reclaims 988,381,364 words in three calls; K4096 reclaims
+776,774,054 in one. Both remain bounded Unknown with zero models/relations/rank.
+All raw evidence passes fresh S3 native replay and repack. This demonstrates
+reclamation and preserved observed search behavior at 8GiB; minimum safe memory,
+exact per-buffer resident pages and historical 4GiB OOM attribution remain open.
+The preregistered exact 1.5M/9,000-second continuation guard passes 41+7 tests;
+those higher-cap workers have not run at this update.
+
+Prior accepted append-only reference: both new1M-conflict/8GiB arms complete with native replay,
 continuous sampled-limit validation and verified cleanup. See the
 [1M report](../research/koblitz_n83_factor_base_sweep_20261008/reports/run-20261020T1546Z/REPORT.md).
 K2048-v20 has59samples/max sampled charge5304934400bytes; K4096-v20 has61/
 5876035584bytes. All samples retain8GiB and zero extra swap. Earlier4GiB OOMs,
-rejected swap profiles and interrupted custody remain unadmitted. The exact
-SAT allocation cause and minimum memory remain unknown; no 4GiB fix is claimed.
+rejected swap profiles and interrupted custody remain unadmitted. No 4GiB fix
+was established by that reference; later ownership/reclamation evidence follows.
 
 ## Original problem (historical)
 

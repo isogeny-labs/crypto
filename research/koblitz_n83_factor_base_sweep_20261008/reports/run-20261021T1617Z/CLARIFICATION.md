@@ -31,3 +31,10 @@ S3 supplement SHA99aeb0c37f3d585368be87a66787102ccc154aa1b2e818e573ebe8600bb65c5
 retains actual logs/source history with freshGET/payload/bundle/repack PASS.
 See the proof's PUBLICATION.md. The frozen PDF's4471/119 remains the earlier
 experimental-source validation, not a claim about the combined main tree.
+
+2026-10-23 counter-schedule clarification: the retained K2048-p22 trace starts
+its conflict snapshots at conflict1, followed by every1000 through450K. Conflict0
+is separately recorded at solve entry. Thus the frozen report's phrase
+"including zero" is a prose error; the reported451 matched snapshot count and
+all frozen raw/native summary bytes are unchanged. The new1M arena validation
+reports the schedule explicitly and matches all1001 retained snapshots.

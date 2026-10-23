@@ -1,12 +1,15 @@
 # Factor-base sweep for degree-83 Koblitz index calculus
 
-Latest diagnostic: [native SAT storage ownership, 21 October](reports/run-20261021T1617Z/REPORT.md).
-K2048/K4096 each complete a separately declared 450K-conflict profile after the
-[original 1M arms](reports/run-20261020T1546Z/REPORT.md). Native storage and retained
-search-prefix checks pass. Clause arenas account for 93.14%/91.90% of requested
-solver buffer capacities; K2048 retains 1.788 GB of detached learned clauses.
-Reclamation is the next untested change; no higher-cap or speedup claim follows.
-Raw evidence and fresh S3 replay are linked in the diagnostic publication.
+Latest diagnostic: [native arena reclamation, 23 October](reports/run-20261023T0150Z/REPORT.md).
+K2048/K4096 each complete a candidate 1M-conflict validation: all 1,001 retained
+counter snapshots, 102 storage snapshots per base and 59/61 memory samples pass.
+Three/one reclamations remove 988,381,364/776,774,054 arena words. Both return
+bounded Unknown with zero models/relations/rank. The prior
+[450K ownership profiles](reports/run-20261021T1617Z/REPORT.md) and
+[original 1M arms](reports/run-20261020T1546Z/REPORT.md) remain immutable.
+[All raw evidence is verified in S3](verification/native-arena-reclamation-20261023/PUBLICATION.md).
+The [exact 1.5M continuation](verification/native-arena-reclamation-20261023/CONTINUATION.md)
+is separately planned; no higher-cap worker or speed gain is claimed here.
 
 Latest control: [native free-selector witness verified](verification/native-selector-export-20261019/RESULT.md),
 787 conflicts / 167.34 s worker wall, actual model selectors and original
@@ -240,7 +243,7 @@ aws s3 sync s3://crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_
 target/release/examples/koblitz_n83_factor_base_export replay "$n83_replay_dir"
 ```
 
-Latest native continuation: [1M-conflict report](reports/run-20261020T1546Z/REPORT.md)
+Original append-only native continuation: [1M-conflict report](reports/run-20261020T1546Z/REPORT.md)
 and [publication](verification/native-natural-1m-20261020/PUBLICATION.md).
 Both final K2048/K4096 runs reach1Mconflicts with zero models/relations/rank;
 59/61memory samples pass at8GiB/zero extra swap. Earlier refusals, interruption

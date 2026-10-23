@@ -309,7 +309,8 @@ fn memory_limit(v: &Value) -> R<u64> {
     let extended = [2048, 4096].iter().any(|&k| v["columns"] == k)
         && ((v["conflicts"] == 450000u64 && v["wall_seconds"] == 2400u64)
             || (v["conflicts"] == 800000u64 && v["wall_seconds"] == 4800u64)
-            || (v["conflicts"] == 1000000u64 && v["wall_seconds"] == 6000u64))
+            || (v["conflicts"] == 1000000u64 && v["wall_seconds"] == 6000u64)
+            || (v["conflicts"] == 1500000u64 && v["wall_seconds"] == 9000u64))
         && !v["external_solver"].is_string()
         && !v["external_solver_blake3"].is_string();
     require(
@@ -329,6 +330,8 @@ fn explicit_memory_extension_keeps_legacy_and_control_limits() {
         (4096, 800000, 4800),
         (2048, 1000000, 6000),
         (4096, 1000000, 6000),
+        (2048, 1500000, 9000),
+        (4096, 1500000, 9000),
     ] {
         let base = json!({"columns":k,"conflicts":conflicts,"wall_seconds":wall,"memory_limit_bytes":8u64<<30});
         assert_eq!(memory_limit(&base).unwrap(), 8u64 << 30);
@@ -1024,6 +1027,12 @@ fn external_replay(dir: &Path) -> R<Vec<bool>> {
 }
 
 fn validate_run_budget(columns: u64, external: bool, conflicts: u64, wall: u64) -> R<()> {
+    // This preregistered continuation is one exact budget pair for two
+    // natural panels. All other natural, witness and external limits stay
+    // at their existing ceilings.
+    if matches!(columns, 2048 | 4096) && !external && conflicts == 1_500_000 && wall == 9000 {
+        return Ok(());
+    }
     let natural = columns != 0 && !external;
     let wall_ceiling = if natural { 6000 } else { 900 };
     let conflict_ceiling = if external {
@@ -1602,6 +1611,35 @@ fn natural_budget_admits_1m_but_stays_bounded() {
         assert!(validate_run_budget(columns, false, 1_000_000, 6001).is_err());
         assert!(validate_run_budget(columns, false, 0, 2400).is_err());
         assert!(validate_run_budget(columns, false, 800_000, 0).is_err());
+    }
+}
+
+#[test]
+fn continuation_budget_is_an_exact_natural_panel_pair() {
+    for columns in [2048, 4096] {
+        assert!(validate_run_budget(columns, false, 1_500_000, 9000).is_ok());
+        for (conflicts, wall) in [
+            (1_500_001, 9000),
+            (1_499_999, 9000),
+            (1_500_000, 9001),
+            (1_500_000, 8999),
+            (1_000_000, 9000),
+            (1_500_000, 6000),
+            (0, 9000),
+            (1_500_000, 0),
+        ] {
+            assert!(validate_run_budget(columns, false, conflicts, wall).is_err());
+            let spec = json!({"columns":columns,"conflicts":conflicts,"wall_seconds":wall,
+                "memory_limit_bytes":8u64<<30});
+            assert!(memory_limit(&spec).is_err());
+        }
+        assert!(validate_run_budget(columns, true, 1_500_000, 9000).is_err());
+    }
+    for columns in [0, 1, 1024, 8192] {
+        assert!(validate_run_budget(columns, false, 1_500_000, 9000).is_err());
+        assert!(memory_limit(&json!({"columns":columns,"conflicts":1500000,
+            "wall_seconds":9000,"memory_limit_bytes":8u64<<30}))
+        .is_err());
     }
 }
 

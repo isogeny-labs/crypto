@@ -282,6 +282,30 @@
       "bytes": 608144,
       "description": "Combined PR2036 main integration source and full native release validation, preserving documentary N83 ownership evidence",
       "provenance": "Source d5aac8e9; prerequisite remote05ec85b5; no new SAT worker/cap; raw03754a1f and sidecarfdf07b85 unchanged"
+    },
+    "evidence/n83/arena-reclamation-20261023/readiness.tar.xz": {
+      "sha256": "585d71ad1ce557a3354062a732834c5a2f61cc135a2b5038e7f65ba7fe971e16",
+      "bytes": 3390892,
+      "description": "N83 arena reclamation readiness, original CI failures and complete native validation",
+      "provenance": "Local freeze90dc5a262f; prerequisite05ec85b5; no new timed SAT arm; retains failed test source and full native gate logs"
+    },
+    "evidence/n83/arena-reclamation-20261023/integration-readiness.tar.xz": {
+      "sha256": "3f798c707ffc2d8640746b15422a97671cc089ce2478ff115b4f516f2e0d1fe1",
+      "bytes": 197506204,
+      "description": "PR2036 main integration, retained failed GPU receipt and corrected full native validation",
+      "provenance": "Freeze37631c5c; native build9d858211; prerequisite05ec85b5; no new timed N83 arm; old readiness585d71ad immutable"
+    },
+    "evidence/n83/arena-reclamation-20261023/validation-k2048-r1.tar.xz": {
+      "sha256": "4176a287c6d4cbcb18f27dd1df67a8a069788d434fcc4a9d90993f99a68a52c9",
+      "bytes": 34144472,
+      "description": "Accepted K2048 1M arena reclamation validation and all raw custody",
+      "provenance": "HEAD37631c5c; worker4fcda42f; all1001 retained counter signatures match;102 storage snapshots;59 memory samples;3 reclamations; zero relations at capUnknown; source bundle in integration-readiness3f798c70; no speed claim"
+    },
+    "evidence/n83/arena-reclamation-20261023/validation-k4096-r1.tar.xz": {
+      "sha256": "97eba74aaabf9ea5c6e3edc31a91bf985b8b2d840bb80f7f219cfd036044ae93",
+      "bytes": 34143964,
+      "description": "Accepted K4096 1M arena reclamation validation and all raw custody",
+      "provenance": "HEAD37631c5c; worker4fcda42f; all1001 retained counter signatures match;102 storage snapshots;61 memory samples;1 reclamation; zero relations at capUnknown; source bundle in integration-readiness3f798c70; no speed claim"
     }
   }
 }
