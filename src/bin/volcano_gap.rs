@@ -125,16 +125,114 @@ impl Fp {
     }
 }
 
+/// `a⁻¹ mod m` by word-sized extended Euclid: coefficient magnitudes with
+/// alternating signs, one hardware division per step (as `ic_boundary::invmod`).
 fn inv_mod(a: u64, m: u64) -> u64 {
-    let (mut r0, mut r1) = (m as i128, a as i128);
-    let (mut s0, mut s1) = (0i128, 1i128);
+    let (mut r0, mut r1) = (m, a % m);
+    let (mut t0, mut t1) = (0u64, 1u64);
+    let mut neg0 = true;
     while r1 != 0 {
         let q = r0 / r1;
         (r0, r1) = (r1, r0 - q * r1);
-        (s0, s1) = (s1, s0 - q * s1);
+        (t0, t1) = (t1, t0 + q * t1);
+        neg0 = !neg0;
     }
     assert_eq!(r0, 1, "not invertible");
-    s0.rem_euclid(m as i128) as u64
+    if neg0 {
+        m - t0
+    } else {
+        t0
+    }
+}
+
+/// Montgomery arithmetic modulo an odd `p < 2^62`, `R = 2^64`: REDC needs
+/// two word products and no division, against the 128-bit remainder (a
+/// library call) of `Fp::mul`.  Used for the degree-`N` isogeny's inner
+/// loops; values cross in and out with `to`/`from`.
+#[derive(Clone, Copy)]
+struct Mont {
+    p: u64,
+    /// `−p⁻¹ mod 2^64`.
+    pinv: u64,
+    /// `R² mod p`.
+    r2: u64,
+}
+
+impl Mont {
+    fn new(p: u64) -> Mont {
+        let mut inv = 1u64;
+        for _ in 0..6 {
+            inv = inv.wrapping_mul(2u64.wrapping_sub(p.wrapping_mul(inv)));
+        }
+        let r = ((1u128 << 64) % p as u128) as u64;
+        Mont {
+            p,
+            pinv: inv.wrapping_neg(),
+            r2: ((r as u128 * r as u128) % p as u128) as u64,
+        }
+    }
+    #[inline]
+    fn redc(&self, t: u128) -> u64 {
+        let m = (t as u64).wrapping_mul(self.pinv);
+        let u = ((t + m as u128 * self.p as u128) >> 64) as u64;
+        if u >= self.p {
+            u - self.p
+        } else {
+            u
+        }
+    }
+    #[inline]
+    fn mul(&self, a: u64, b: u64) -> u64 {
+        self.redc(a as u128 * b as u128)
+    }
+    #[inline]
+    fn add(&self, a: u64, b: u64) -> u64 {
+        let s = a + b;
+        if s >= self.p {
+            s - self.p
+        } else {
+            s
+        }
+    }
+    #[inline]
+    fn sub(&self, a: u64, b: u64) -> u64 {
+        if a >= b {
+            a - b
+        } else {
+            a + self.p - b
+        }
+    }
+    fn to(&self, a: u64) -> u64 {
+        self.mul(a % self.p, self.r2)
+    }
+    fn from(&self, a: u64) -> u64 {
+        self.redc(a as u128)
+    }
+    /// The inverse of a Montgomery-form value, in Montgomery form.
+    fn inv(&self, a: u64) -> u64 {
+        self.to(inv_mod(self.from(a), self.p))
+    }
+    /// Replaces each value by its inverse with one inversion
+    /// (Montgomery's trick); every value must be nonzero.
+    fn batch_inv(&self, v: &mut [u64]) {
+        let mut pre = Vec::with_capacity(v.len());
+        let mut acc = self.to(1);
+        for &x in v.iter() {
+            pre.push(acc);
+            acc = self.mul(acc, x);
+        }
+        let mut inv = self.inv(acc);
+        for i in (0..v.len()).rev() {
+            let x = v[i];
+            v[i] = self.mul(inv, pre[i]);
+            inv = self.mul(inv, x);
+        }
+    }
+}
+
+/// Worker threads for the isogeny's inner loops.
+fn threads() -> usize {
+    std::thread::available_parallelism().map_or(1, |n| n.get())
 }
 
 fn mulmod(a: u64, b: u64, m: u64) -> u64 {
@@ -385,8 +483,16 @@ fn point_of_order(f: &Fp, e: &Curve, order: u64, big_n: u64, rng: &mut SmallRng)
 struct Velu {
     ell: u64,
     xs: Vec<u64>,
+    /// Plain forms of `tq`, `uq`: read by `map_reference` in the tests.
+    #[cfg_attr(not(test), allow(dead_code))]
     tq: Vec<u64>,
+    #[cfg_attr(not(test), allow(dead_code))]
     uq: Vec<u64>,
+    /// `xs`, `tq`, `uq` in Montgomery form, for [`Velu::map`].
+    mont: Mont,
+    xs_m: Vec<u64>,
+    tq_m: Vec<u64>,
+    uq_m: Vec<u64>,
     codomain: Curve,
 }
 
@@ -413,11 +519,19 @@ impl Velu {
             uq.push(u);
         }
         cost.mults += 7 * xs.len() as u64;
+        let mont = Mont::new(f.p);
+        let conv = |v: &[u64]| v.iter().map(|&a| mont.to(a)).collect::<Vec<u64>>();
+        let (xs_m, tq_m, uq_m) = (conv(&xs), conv(&tq), conv(&uq));
+        cost.mults += 3 * xs.len() as u64;
         Velu {
             ell,
             xs,
             tq,
             uq,
+            mont,
+            xs_m,
+            tq_m,
+            uq_m,
             codomain: Curve {
                 a: f.sub(e.a, f.sm(5, v)),
                 b: f.sub(e.b, f.sm(7, w)),
@@ -425,8 +539,58 @@ impl Velu {
         }
     }
     /// `φ(x, y) = (x + Σ t/(x−x_Q) + u/(x−x_Q)², y·(1 − Σ t/(x−x_Q)² + 2u/(x−x_Q)³))`,
-    /// with one batch inversion of the `x − x_Q`.
+    /// in Montgomery form, the kernel split into one chunk per thread, each
+    /// with one batch inversion of its `x − x_Q`.
     fn map(&self, f: &Fp, p: Pt, cost: &mut Cost) -> Pt {
+        let (x, y) = p?;
+        if self.xs.contains(&x) {
+            return None;
+        }
+        let m = &self.mont;
+        let xm = m.to(x);
+        let n = self.xs_m.len();
+        let chunks = threads().min(n.div_ceil(4096)).max(1);
+        let step = n.div_ceil(chunks);
+        let partial = |lo: usize, hi: usize| -> (u64, u64) {
+            let mut d: Vec<u64> = self.xs_m[lo..hi].iter().map(|&xq| m.sub(xm, xq)).collect();
+            m.batch_inv(&mut d);
+            let (mut sx, mut sy) = (0u64, 0u64);
+            for (k, &i1) in d.iter().enumerate() {
+                let (t, u) = (self.tq_m[lo + k], self.uq_m[lo + k]);
+                let i2 = m.mul(i1, i1);
+                let i3 = m.mul(i2, i1);
+                let u2 = m.mul(u, i2);
+                sx = m.add(sx, m.add(m.mul(t, i1), u2));
+                let u3 = m.mul(u, i3);
+                sy = m.add(sy, m.add(m.mul(t, i2), m.add(u3, u3)));
+            }
+            (sx, sy)
+        };
+        let parts: Vec<(u64, u64)> = if chunks == 1 {
+            vec![partial(0, n)]
+        } else {
+            std::thread::scope(|sc| {
+                let hs: Vec<_> = (0..chunks)
+                    .map(|c| {
+                        let (lo, hi) = (c * step, ((c + 1) * step).min(n));
+                        sc.spawn(move || partial(lo, hi))
+                    })
+                    .collect();
+                hs.into_iter().map(|h| h.join().unwrap()).collect()
+            })
+        };
+        let (sx, sy) = parts
+            .iter()
+            .fold((0, 0), |(a, b), &(c, d)| (m.add(a, c), m.add(b, d)));
+        cost.mults += 3 * n as u64 + 128 * chunks as u64 + 6 * n as u64 + 4;
+        let (sx, sy) = (m.from(sx), m.from(sy));
+        Some((f.add(x, sx), f.sub(y, f.mul(y, sy))))
+    }
+
+    /// The map as first written (plain `Fp`, one batch inversion), kept as
+    /// the reference the Montgomery form is tested against.
+    #[cfg(test)]
+    fn map_reference(&self, f: &Fp, p: Pt) -> Pt {
         let (x, y) = p?;
         let d: Vec<u64> = self.xs.iter().map(|&xq| f.sub(x, xq)).collect();
         if d.contains(&0) {
@@ -455,13 +619,15 @@ impl Velu {
                 f.add(f.mul(self.tq[i], i2), f.sm(2, f.mul(self.uq[i], i3))),
             );
         }
-        cost.mults += 3 * d.len() as u64 + 2 * 64 + 7 * d.len() as u64;
         Some((f.add(x, sx), f.sub(y, f.mul(y, sy))))
     }
 }
 
 /// The kernel abscissae on `E` of `⟨K⟩`, `K` a point of order `N` on the
-/// twist `E^c`: `x(iK)/c` for `i = 1 … (N − 1)/2`.
+/// twist `E^c`: `x(iK)/c` for `i = 1 … (N − 1)/2`.  The multiples are
+/// accumulated in Jacobian coordinates by mixed additions of `K` (no
+/// inversion per step: `jK ≠ ±K` for `2 ≤ j < N − 1`), then normalised
+/// with one batch inversion of the `Z²`, all in Montgomery form.
 fn kernel_xs(
     f: &Fp,
     twist: &Curve,
@@ -470,6 +636,61 @@ fn kernel_xs(
     big_n: u64,
     cost: &mut Cost,
 ) -> Vec<u64> {
+    let m = Mont::new(f.p);
+    let count = ((big_n - 1) / 2) as usize;
+    let mut xs = Vec::with_capacity(count);
+    if count == 0 {
+        return xs;
+    }
+    let (kx, ky) = (m.to(k.0), m.to(k.1));
+    let one = m.to(1);
+    let mut jx = Vec::with_capacity(count);
+    let mut jz2 = Vec::with_capacity(count);
+    jx.push(kx);
+    jz2.push(one);
+    if count >= 2 {
+        let (x2, y2) = twist
+            .add(f, Some(k), Some(k))
+            .expect("2K vanished: N would be 2");
+        let (mut x1, mut y1, mut z1) = (m.to(x2), m.to(y2), one);
+        jx.push(x1);
+        jz2.push(one);
+        for _ in 3..=count {
+            // madd-2007-bl: (X1:Y1:Z1) + (kx, ky).
+            let z1z1 = m.mul(z1, z1);
+            let u2 = m.mul(kx, z1z1);
+            let s2 = m.mul(m.mul(ky, z1), z1z1);
+            let h = m.sub(u2, x1);
+            let hh = m.mul(h, h);
+            let i4 = m.add(m.add(hh, hh), m.add(hh, hh));
+            let j = m.mul(h, i4);
+            let r = m.add(m.sub(s2, y1), m.sub(s2, y1));
+            let v = m.mul(x1, i4);
+            let x3 = m.sub(m.sub(m.mul(r, r), j), m.add(v, v));
+            let y1j = m.mul(y1, j);
+            let y3 = m.sub(m.mul(r, m.sub(v, x3)), m.add(y1j, y1j));
+            let zh = m.add(z1, h);
+            let z3 = m.sub(m.sub(m.mul(zh, zh), z1z1), hh);
+            (x1, y1, z1) = (x3, y3, z3);
+            jx.push(x1);
+            jz2.push(m.mul(z1, z1));
+        }
+    }
+    m.batch_inv(&mut jz2);
+    let cinv = m.to(f.inv(c));
+    for (&x, &iz2) in jx.iter().zip(&jz2) {
+        xs.push(m.from(m.mul(m.mul(x, iz2), cinv)));
+    }
+    // A mixed addition is 7M + 4S; then Z², the batch inversion's three
+    // and the two products of the normalisation.
+    cost.mults += count as u64 * (11 + 1 + 3 + 2) + 128 * 2;
+    xs
+}
+
+/// The affine enumeration first written, kept as the reference the
+/// Jacobian form is tested against.
+#[cfg(test)]
+fn kernel_xs_reference(f: &Fp, twist: &Curve, k: (u64, u64), c: u64, big_n: u64) -> Vec<u64> {
     let cinv = f.inv(c);
     let mut xs = Vec::with_capacity(((big_n - 1) / 2) as usize);
     let mut cur = Some(k);
@@ -480,8 +701,6 @@ fn kernel_xs(
             cur = twist.add(f, cur, Some(k));
         }
     }
-    // One affine addition: an inversion and three multiplications.
-    cost.mults += xs.len() as u64 * (3 + 2 * 64 + 1);
     xs
 }
 
@@ -1051,5 +1270,38 @@ mod tests {
             f.mul(q.0, f.inv(u2)),
             e1.mul(&f, Some(p1), cand.big_n).unwrap().0
         );
+    }
+
+    /// The Montgomery/Jacobian kernel and the threaded map give exactly the
+    /// values of the affine reference, on the study's own 52-bit class.
+    #[test]
+    fn fast_isogeny_matches_reference() {
+        let cand = search(52, 6, 11, 16384);
+        assert_eq!(cand.big_n, 631409);
+        let f = Fp { p: cand.p };
+        let mut rng = SmallRng::seed_from_u64(3);
+        let c = f.non_residue();
+        let j1 = f.reduce_i128(-32768);
+        let k = f.mul(j1, f.inv(f.sub(1728, j1)));
+        let base = Curve {
+            a: f.sm(3, k),
+            b: f.sm(2, k),
+        };
+        let e1 = if prove_order(&f, &base, cand.h, cand.n, &mut rng).is_some() {
+            base
+        } else {
+            base.twist(&f, c)
+        };
+        let order_t = 2 * cand.p + 2 - cand.order;
+        let e1t = e1.twist(&f, c);
+        let kt = point_of_order(&f, &e1t, order_t, cand.big_n, &mut rng);
+        let mut cost = Cost::default();
+        let fast = kernel_xs(&f, &e1t, kt, c, cand.big_n, &mut cost);
+        assert_eq!(fast, kernel_xs_reference(&f, &e1t, kt, c, cand.big_n));
+        let phi = Velu::new(&f, &e1, cand.big_n, fast, &mut cost);
+        for _ in 0..3 {
+            let r = Some(e1.random_point(&f, &mut rng));
+            assert_eq!(phi.map(&f, r, &mut cost), phi.map_reference(&f, r));
+        }
     }
 }
