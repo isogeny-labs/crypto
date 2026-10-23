@@ -141,6 +141,11 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: /research/conductor_gap_cm_orbits_20261015/lean/
+      - name: Install zstd for the Lean archive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y zstd
+
       - name: Install hash-pinned Lean 4.34.1
         shell: bash
         run: |

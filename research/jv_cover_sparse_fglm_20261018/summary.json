@@ -1,0 +1,242 @@
+{
+  "study": "research/jv_cover_sparse_fglm_20261018",
+  "run": "run-20261018T2138Z",
+  "pipeline": "examples/jv_cover.rs (Nagao decompositions on a genus-2 cover of E(F_{p^6}); every decomposition one f4_fp solve)",
+  "change": "linear stage after F4: dense (JV_LIN=dense, as on main) against sparse FGLM (default: Wiedemann/Berlekamp-Massey minimal polynomial of M_xn + shift-chain eigenvector recovery); same binary, env-switched",
+  "class": "engineering",
+  "unit": "S counted by jv_cover (field multiplications priced in group additions); unpriced native work is not emitted by either arm, so S/rho is a lower-bound comparison",
+  "ccov": [
+    {
+      "p": 53,
+      "tests": 120,
+      "planted_found": [
+        20,
+        20
+      ],
+      "constructed": 20,
+      "mismatches": [
+        0,
+        0
+      ],
+      "unverified": [
+        0,
+        0
+      ],
+      "incomplete": [
+        0,
+        0
+      ],
+      "nonseparating": [
+        3,
+        0
+      ],
+      "lin_fallback": [
+        0,
+        4
+      ],
+      "c_cov_before": 1229631.475,
+      "c_cov_after": 971798.0166666667,
+      "c_cov_l1a": 991187.425,
+      "f4_muls_before": 737959.6666666666,
+      "f4_muls_after": 737959.6666666666,
+      "lin_muls": [
+        487480.3333333333,
+        229646.875
+      ],
+      "lin_muls_l1a": 249036.28333333333,
+      "c_cov_ratio": 1.26531589271783,
+      "c_cov_ratio_l1a": 1.240564038632754,
+      "lin_ratio": 2.122738806410204
+    },
+    {
+      "p": 101,
+      "tests": 120,
+      "planted_found": [
+        20,
+        20
+      ],
+      "constructed": 20,
+      "mismatches": [
+        0,
+        0
+      ],
+      "unverified": [
+        0,
+        0
+      ],
+      "incomplete": [
+        0,
+        0
+      ],
+      "nonseparating": [
+        2,
+        0
+      ],
+      "lin_fallback": [
+        0,
+        0
+      ],
+      "c_cov_before": 1227378.2916666667,
+      "c_cov_after": 940257.5583333333,
+      "c_cov_l1a": 981991.6,
+      "f4_muls_before": 736926.5583333333,
+      "f4_muls_after": 736926.5583333333,
+      "lin_muls": [
+        486265.31666666665,
+        199144.58333333334
+      ],
+      "lin_muls_l1a": 240878.625,
+      "c_cov_ratio": 1.3053639194799702,
+      "c_cov_ratio_l1a": 1.2498867522559935,
+      "lin_ratio": 2.4417702381226367
+    },
+    {
+      "p": 251,
+      "tests": 120,
+      "planted_found": [
+        20,
+        20
+      ],
+      "constructed": 20,
+      "mismatches": [
+        0,
+        0
+      ],
+      "unverified": [
+        0,
+        0
+      ],
+      "incomplete": [
+        0,
+        0
+      ],
+      "nonseparating": [
+        0,
+        0
+      ],
+      "lin_fallback": [
+        0,
+        1
+      ],
+      "c_cov_before": 1284368.8583333334,
+      "c_cov_after": 979997.9416666667,
+      "c_cov_l1a": 1018592.7,
+      "f4_muls_before": 744661.6166666667,
+      "f4_muls_after": 744661.6166666667,
+      "lin_muls": [
+        534731.0666666667,
+        230360.15
+      ],
+      "lin_muls_l1a": 268954.9083333333,
+      "c_cov_ratio": 1.3105832203576142,
+      "c_cov_ratio_l1a": 1.2609248606762384,
+      "lin_ratio": 2.3212828549845392
+    }
+  ],
+  "dlp": [
+    {
+      "p": 53,
+      "seed": 1,
+      "bits": 32.367524181961606,
+      "residuals": 19020,
+      "relations": 31,
+      "solved": [
+        true,
+        true
+      ],
+      "correct": [
+        true,
+        true
+      ],
+      "same_relations": true,
+      "s_before": 937.1959684803884,
+      "s_after": 731.5903153798725,
+      "s_l1a": 752.8409818668663,
+      "s_ratio": 1.2810393314101713,
+      "rho_s_mean": 1.1018183957660987,
+      "rho_s_sd": 0.20388657741417576,
+      "rho_runs": 4,
+      "s_over_rho_before": 850.5902352708064,
+      "s_over_rho_after": 663.9844807375855,
+      "s_over_rho_l1a": 683.2713855203089
+    },
+    {
+      "p": 53,
+      "seed": 2,
+      "bits": 32.36751642104743,
+      "residuals": 8486,
+      "relations": 33,
+      "solved": [
+        true,
+        true
+      ],
+      "correct": [
+        true,
+        true
+      ],
+      "same_relations": true,
+      "s_before": 424.49381621597604,
+      "s_after": 328.7944678377016,
+      "s_l1a": 337.23673348010334,
+      "s_ratio": 1.2910613095397738,
+      "rho_s_mean": 1.1507108178272323,
+      "rho_s_sd": 0.6885399420204872,
+      "rho_runs": 4,
+      "s_over_rho_before": 368.8970414108938,
+      "s_over_rho_after": 285.73162148464894,
+      "s_over_rho_l1a": 293.0681872938958
+    },
+    {
+      "p": 101,
+      "seed": 1,
+      "bits": 37.94926814244049,
+      "residuals": 40100,
+      "relations": 53,
+      "solved": [
+        true,
+        true
+      ],
+      "correct": [
+        true,
+        true
+      ],
+      "same_relations": true,
+      "s_before": 287.76424037175946,
+      "s_after": 224.4073373973037,
+      "s_l1a": 232.89161684151736,
+      "s_ratio": 1.2823299082341726,
+      "rho_s_mean": 1.482643809155018,
+      "rho_s_sd": 0.5214613787591336,
+      "rho_runs": 4,
+      "s_over_rho_before": 194.0885859401125,
+      "s_over_rho_after": 151.3562030284246,
+      "s_over_rho_l1a": 157.07860202393854
+    },
+    {
+      "p": 101,
+      "seed": 2,
+      "bits": 37.949271097566,
+      "residuals": 65422,
+      "relations": 50,
+      "solved": [
+        true,
+        true
+      ],
+      "correct": [
+        true,
+        true
+      ],
+      "same_relations": true,
+      "s_before": 466.32381627652813,
+      "s_after": 365.46270063554863,
+      "s_l1a": 379.51324011138513,
+      "s_ratio": 1.2759819687907399,
+      "rho_s_mean": 1.249439259025052,
+      "rho_s_sd": 0.5771822177479129,
+      "rho_runs": 4,
+      "s_over_rho_before": 373.22647972531655,
+      "s_over_rho_after": 292.5013745131734,
+      "s_over_rho_l1a": 303.7468507332821
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+== ubuntu-24.04-arm
+inherited: targets 80; decisions differing across arms/rounds: 0; arm word counts varying across rounds: 0
+  K1_17    f4   CPU on     455.1 ms  noeager/on 1.12  nogate/on 1.00
+  K1_17    f6p  CPU on     165.2 ms  noeager/on 1.11  nogate/on 1.85
+  K1_23    f4   CPU on     867.8 ms  noeager/on 1.28  nogate/on 1.00
+  K1_23    f6p  CPU on     357.6 ms  noeager/on 1.21  nogate/on 2.10
+  K0_23    f4   CPU on    2516.8 ms  noeager/on 1.30  nogate/on 1.00
+  K0_23    f6p  CPU on     819.3 ms  noeager/on 1.36  nogate/on 2.01
+  K0_31    f4   CPU on    2593.1 ms  noeager/on 1.62  nogate/on 1.00
+  K0_31    f6p  CPU on    1188.7 ms  noeager/on 1.57  nogate/on 2.01
+  K0_19    f4   CPU on     334.5 ms  noeager/on 1.13  nogate/on 1.00
+  K0_19    f6p  CPU on     119.6 ms  noeager/on 1.12  nogate/on 1.69
+  K1_19    f4   CPU on     581.2 ms  noeager/on 1.20  nogate/on 1.00
+  K1_19    f6p  CPU on     236.2 ms  noeager/on 1.15  nogate/on 1.92
+  K1_17d7  f4   CPU on     528.0 ms  noeager/on 1.08  nogate/on 1.00
+  K1_17d7  f6p  CPU on     157.5 ms  noeager/on 1.09  nogate/on 1.82
+  K1_29    f4   CPU on    1862.8 ms  noeager/on 1.52  nogate/on 1.00
+  K1_29    f6p  CPU on     870.0 ms  noeager/on 1.45  nogate/on 1.96
+  K0_37    f4   CPU on    4579.1 ms  noeager/on 1.69  nogate/on 1.00
+  K0_37    f6p  CPU on    2138.3 ms  noeager/on 1.62  nogate/on 2.02
+  f4: noeager/on >= 1 on 9/9 cells (rule: >= 6); nogate/on >= 1 on 4/9 (rule for f6p: >= 7)
+  f6p: noeager/on >= 1 on 9/9 cells (rule: >= 6); nogate/on >= 1 on 9/9 (rule for f6p: >= 7)
+gf2: exactness keys 21; differing across arms/rounds: 0
+  f4 t1 reuse arm/t4 geomean 1.004 (speedup 0.996), min 0.996, max 1.008, cases 7
+  f4 t1 t2    arm/t4 geomean 0.999 (speedup 1.001), min 0.995, max 1.004, cases 7
+  f4 t1 t3    arm/t4 geomean 1.001 (speedup 0.999), min 0.998, max 1.008, cases 7
+  f5 t1 reuse arm/t4 geomean 1.001 (speedup 0.999), min 0.988, max 1.025, cases 7
+  f5 t1 t2    arm/t4 geomean 1.067 (speedup 0.937), min 0.986, max 1.229, cases 7
+  f5 t1 t3    arm/t4 geomean 1.031 (speedup 0.970), min 0.989, max 1.091, cases 7
+  f5 t4 reuse arm/t4 geomean 1.014 (speedup 0.986), min 0.984, max 1.081, cases 7
+  f5 t4 t2    arm/t4 geomean 1.076 (speedup 0.930), min 1.001, max 1.217, cases 7
+  f5 t4 t3    arm/t4 geomean 1.033 (speedup 0.968), min 1.000, max 1.085, cases 7
+== macos-latest
+inherited: targets 80; decisions differing across arms/rounds: 0; arm word counts varying across rounds: 0
+  K1_17    f4   CPU on     604.8 ms  noeager/on 1.18  nogate/on 1.04
+  K1_17    f6p  CPU on     222.6 ms  noeager/on 1.11  nogate/on 1.71
+  K1_23    f4   CPU on    1161.5 ms  noeager/on 1.33  nogate/on 0.98
+  K1_23    f6p  CPU on     492.4 ms  noeager/on 1.27  nogate/on 2.05
+  K0_23    f4   CPU on    3348.0 ms  noeager/on 1.33  nogate/on 1.01
+  K0_23    f6p  CPU on    1020.6 ms  noeager/on 1.61  nogate/on 2.14
+  K0_31    f4   CPU on    3841.7 ms  noeager/on 1.42  nogate/on 0.93
+  K0_31    f6p  CPU on    1751.9 ms  noeager/on 1.53  nogate/on 1.90
+  K0_19    f4   CPU on     502.7 ms  noeager/on 1.17  nogate/on 0.98
+  K0_19    f6p  CPU on     173.2 ms  noeager/on 1.19  nogate/on 1.76
+  K1_19    f4   CPU on     883.8 ms  noeager/on 1.15  nogate/on 1.06
+  K1_19    f6p  CPU on     401.5 ms  noeager/on 0.97  nogate/on 1.75
+  K1_17d7  f4   CPU on     821.4 ms  noeager/on 1.09  nogate/on 0.99
+  K1_17d7  f6p  CPU on     246.0 ms  noeager/on 1.07  nogate/on 1.62
+  K1_29    f4   CPU on    2565.2 ms  noeager/on 1.44  nogate/on 0.96
+  K1_29    f6p  CPU on    1091.7 ms  noeager/on 1.52  nogate/on 2.13
+  K0_37    f4   CPU on    5871.8 ms  noeager/on 1.87  nogate/on 1.01
+  K0_37    f6p  CPU on    2648.5 ms  noeager/on 1.78  nogate/on 2.10
+  f4: noeager/on >= 1 on 9/9 cells (rule: >= 6); nogate/on >= 1 on 4/9 (rule for f6p: >= 7)
+  f6p: noeager/on >= 1 on 8/9 cells (rule: >= 6); nogate/on >= 1 on 9/9 (rule for f6p: >= 7)
+gf2: exactness keys 21; differing across arms/rounds: 0
+  f4 t1 reuse arm/t4 geomean 0.993 (speedup 1.007), min 0.921, max 1.027, cases 7
+  f4 t1 t2    arm/t4 geomean 0.998 (speedup 1.002), min 0.914, max 1.133, cases 7
+  f4 t1 t3    arm/t4 geomean 0.997 (speedup 1.003), min 0.911, max 1.062, cases 7
+  f5 t1 reuse arm/t4 geomean 0.975 (speedup 1.026), min 0.816, max 1.160, cases 7
+  f5 t1 t2    arm/t4 geomean 0.907 (speedup 1.103), min 0.747, max 1.017, cases 7
+  f5 t1 t3    arm/t4 geomean 0.918 (speedup 1.090), min 0.847, max 1.010, cases 7
+  f5 t3 reuse arm/t4 geomean 0.990 (speedup 1.010), min 0.922, max 1.045, cases 7
+  f5 t3 t2    arm/t4 geomean 1.065 (speedup 0.939), min 0.962, max 1.260, cases 7
+  f5 t3 t3    arm/t4 geomean 1.013 (speedup 0.987), min 0.887, max 1.109, cases 7

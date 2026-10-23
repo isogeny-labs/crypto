@@ -124,8 +124,9 @@ commands, and interpretation limits.
   `*.jsonl`, logs and CSVs by key or range (`jq`, `rg`), never whole; a
   session is read through its audit, replay or claim JSON.
 - **Paths, not contents,** in handoffs and subagent prompts.
-- **Off disk is not absent.** In a sparse checkout (`docs/sparse-checkout.md`)
-  a path `git ls-files` lists is materialized with
+- **Off disk is not absent.** Cloud sessions start in the sparse `harness`
+  profile, without the 18 largest `research/` archives. In a sparse checkout
+  (`docs/sparse-checkout.md`) a path `git ls-files` lists is materialized with
   `scripts/sparse-checkout.sh add --path`, never reported missing.
 
 # AGENTS.md
@@ -1272,6 +1273,15 @@ entry in the PR that lands the result. Objects are immutable and keyed by
 SHA-256; a name is not repointed without `--replace`, which keeps the old
 digest as superseded. Never delete remote objects from an agent session.
 See [docs/store/README.md](docs/store/README.md).
+
+"Too big for Git" means over 10 MiB (owner, 2026-10-22): every blob committed
+stays in every future clone. The `large-files` workflow
+(`scripts/check-large-files.sh`) fails a PR that adds or modifies such a file,
+except generated text that git delta-compresses well (`docs/browser/data.json`,
+`docs/curves/*.json`). A PR that must commit one anyway carries the
+`large-file-ok` label, added by the owner or a reviewer. Do not pre-compress
+text files to get under the limit: compressed blobs do not delta, so each
+revision costs its full size again.
 
 ### 13a. Raw run trees land as one archive
 
