@@ -32,7 +32,10 @@ used.
    (found in review of 85bcdcf0b); it now evaluates both and reports orbit
    and representative counts separately.
 3. "Explicit characteristic-2 Velu isogeny not implemented" was wrong:
-   `src/cryptanalysis/binary_velu.rs` has it, checked against Phi_3 only.
+   `src/cryptanalysis/binary_velu.rs` has it. It was checked against Phi_3;
+   a new test now also checks the codomain against the exact Phi_5 and Phi_7
+   (a rational order-l kernel gives j' a root of Phi_l(X, j), and the group
+   order is unchanged).
 
 ## Findings
 1. **Classical GHS.** Best magic number m = 5 (n = 5; l = 31 / 37), genus
@@ -96,9 +99,12 @@ lookup): 4488 passed, 0 failed, 119 ignored (the repo's own `#[ignore]` markers)
 - Hess generalized covers (direction 1 proper): needs function-field
   arithmetic; Magma, Sage and pdflatex are not installed here, and the
   Menezes-Teske text could not be fetched (HTTP 403 on the PDF).
-- Velu transport at l >= 5 (only l = 3 has a test); relation collection and
-  linear algebra with real constants.
+- Velu point-map transport at l >= 5 (the codomain is tested at l = 5, 7;
+  the point map is tested at l = 3 only); relation collection and linear
+  algebra with real constants.
 - Conductor: the release download returned HTTP 403 through the sandbox
-  proxy, so `conductor check` was not run.
+  proxy; `go install` through the module proxy worked, but `conductor up`
+  needs Postgres or a Docker daemon, neither of which runs here, so
+  `conductor check` was not run.
 - No replay certificate, validator report or section 5a matched rho, so
   this is not eligible for the leaderboard or `benchmarks/`.
