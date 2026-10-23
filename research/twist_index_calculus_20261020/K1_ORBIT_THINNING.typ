@@ -66,3 +66,22 @@ field work or runtime. No native polynomial run has yet tested the
 thinned bases. A prospective all-j native grid with independent replay,
 full accounting and matched rho is the next measurement; selecting a
 best j after this survey cannot justify a speed claim.
+
+== Later native validation (23 October)
+
+The complete 21-case native polynomial grid has since been run on these
+same frozen streams. Every candidate reaches full anchored rank and
+recovers 271 under independent point-keyed/BSGS replay; first/A/A and
+six full-base source-parity checks pass. Seventeen processed relation
+sets are exact. All four p=73 seed-one subsets retain two missing
+relations from the same failed S4 system. The source-linked
+`K1_THIN_NATIVE_REPORT.md` and its PDF contain the counted-field
+comparison and every negative or partial outcome. The exact-oracle
+survey above remains its original hypothesis screen, not candidate
+polynomial work.
+
+#image("k1_thin_native_overview.svg", width: 88%)
+
+Native field-work and attempted-system paths vary by seed and orbit
+count; p=97 seed-one with one orbit is a recorded regression. The
+native report supplies every per-case counted cost and rho gap.

@@ -82,3 +82,27 @@ leaderboard result. The p=37 control had a counted ratio of 332.6 on a
 different base. This finite three-prime panel does not establish an
 asymptotic trend or a deployed-curve claim. The complete Markdown report
 names the next failure repair, base-shape comparison, and pricing gates.
+
+== Follow-up (23 October): native base shape and symmetry reuse
+
+The separately registered 21-case native orbit-complete thinning grid
+ran every frozen prefix choice at p=73/97. Every case reaches full
+anchored rank and independently recovers 271; 17 relation sets are
+exact, while four p=73 seed-one choices retain the same two missing
+relations from one failed S4 system. The largest observed proper-subset
+same-seed full/candidate counted field ratios are 3.653 at p=73 seed
+two, one orbit, and 3.575 at p=97 seed zero, two orbits. The p=97
+seed-one one-orbit choice regresses to 0.745. These are arithmetic-path
+observations, not a priced S or selected recipe.
+
+The separate exact peeled-target orbit test finds two same-residual
+collisions among 142,248 finite signed L2 peels. Identity, cubic,
+transported Frobenius and combined caches find 20, 107, 243 and 790
+total duplicates across six separate streams. The subgroup ablation
+isolates the small incremental twist cache opportunity on these
+instances. Source-linked full tables, figures and independent checks
+are in `K1_THIN_NATIVE_REPORT.md` and `K1_PEELED_ORBIT_REUSE.md`.
+
+#image("k1_thin_native_overview.svg", width: 90%)
+
+#image("k1_peeled_subgroup_reuse.svg", width: 69%)

@@ -89,3 +89,17 @@ solves, hash/allocator CPU, matrix work, memory, matched rho and isolated
 time must be charged afresh in a native one-target experiment. This
 survey supplies an exact rank/system-count discriminator, not a priced
 index-calculus improvement or a new ECDLP complexity claim.
+
+## Later native validation
+
+The complete, separately frozen 21-case [native polynomial grid](K1_THIN_NATIVE_REPORT.md)
+has now run on the same six streams. All 21 candidate paths reached full
+anchored rank and recovered 271; independent point-keyed/BSGS replay,
+first/A/A non-timing controls, six full-base source parities and a
+mutation rejection passed. Seventeen processed-prefix signed sets are
+exact. The four p=73 seed-one subsets remain partial because the same
+S4 system failure misses two real relations. The per-case native table
+and 42 source-linked run PDFs are in the [native report](K1_THIN_NATIVE_REPORT.md)
+and [run index](K1_THIN_NATIVE_RUNS.md). The ideal survey above remains
+its original group-oracle prediction; it was not rewritten with the
+native outcomes.

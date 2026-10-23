@@ -233,3 +233,21 @@ The next preregistered panel uses the identical mixed-line physical base and fro
 The separately registered *entire-stream* census counted 167 signed k=1 relations in 359 p=73 residuals and 79 in 1,497 p=97 residuals. In the p=97 streams, 1,423 residuals have no k=1 relation. The point-keyed group oracle and independent BSGS-derived scalar-keyed oracle agree on all 1,856 per-query signed-set digests, including after the polynomial arm stops. Its mutation control rejects one changed count at query zero. This identifies low physical k=1 occupancy as the source of the long p=97 collection paths, rather than a hidden polynomial miss on processed p=97 queries.
 
 For each of the 42 selected polynomial relations, all 24 twist/cubic transforms of its folded matrix row are scalar multiples of that row: 1,008 exact row and right-hand-side checks and 12,096 factor-image closure checks pass. Thus the 24 action reduces unknown columns and supports component tagging but does not create 24 independent equations. The counted IC/rho field ratios above omit hash/tree and allocator CPU, peak bytes, calibrated group-arithmetic bands, isolated timing and same-input msolve/Magma. No priced whole-method speed or asymptotic conclusion follows. The source-linked full report and all run-level PDFs are in `K1_SCALING_REPORT.md`, `K1_SCALE_RUNS.md`, and `K1_CENSUS_RUNS.md`.
+
+#pagebreak()
+== Native orbit-complete base thinning
+The later preregistered 21-case grid retains every line-0 factor and the first j complete line-2 orbits by frozen physical index. It charges construction of the full base and verified map, plus a subset map for proper subsets. The same target, residual order, signed factors, S4 solver and row selection feed all arms. Every first/A/A pair matches on non-timing fields; independent point-keyed/BSGS audits match byte-for-byte. All 21 paths reach full anchored rank and recover 271. Seventeen processed relation sets are exact; all four p=73 seed-one choices retain one failed S4 system and two missed signed relations.
+
+#image("k1_thin_native_overview.svg", width: 94%)
+
+The figure includes all six frozen streams and all 21 prefix choices. Counted field-work full/candidate ratios on proper subsets reach 3.653 at p=73 seed two with one orbit and 3.575 at p=97 seed zero with two; p=97 seed one with one orbit regresses to 0.745 because it needs 302 residuals rather than 75 for the full base. These are observed same-seed arithmetic-path ratios, not a post hoc recipe or priced S speed claim. Each per-run group-operation count, rho gap, exact/poly relation set, rank and failed-system count is in `K1_THIN_NATIVE_REPORT.md`; 42 individual run PDFs and a machine validator accompany it.
+
+The earlier full-base producer agrees exactly on six final-source full-j controls. The validator also checks phase sums and rejects a mutated subset index. Native hash/allocator CPU, peak bytes, calibrated GAE, isolated ABAB wall intervals and same-input msolve/Magma remain missing, so no whole-method IC/rho row moves.
+
+#pagebreak()
+== Can the 24-action share peeled S4 systems?
+On a fixed nonzero residual R, corresponding factors T and λT in one line-2 orbit cannot give λ-equivalent peeled targets: R−λT=λ(R−T) would force (1−λ)R=0. The six complete streams contain 1,856 nonzero residuals. The separately preregistered exact diagnostic canonicalized all 142,248 finite signed peels under the action. It found only two within-residual orbit collisions and 788 additional within-stream collisions across residuals. A free unbounded cache therefore has at most a 1.005585 call-count ratio on these streams, before lookup, transport and memory costs.
+
+#image("k1_peeled_subgroup_reuse.svg", width: 88%)
+
+The follow-up identity/cubic/Frobenius/combined ablation identifies 20, 107, 243 and 790 duplicate targets respectively. Combined twist symmetry adds 770 hypothetical cache eliminations beyond ordinary exact equality, still below 0.6 percent of all peels. The source-linked `K1_PEELED_ORBIT_REUSE.md` report, machine records, figures and PDF preserve both the finite finding and its controls. Other bases, target streams and larger groups remain untested. This cache result is distinct from the measured base-thinning tradeoff above.

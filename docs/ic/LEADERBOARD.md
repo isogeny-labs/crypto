@@ -285,6 +285,36 @@ Native S4/S3 polynomial relation finding on the canonical p=37 twist, one public
 | 1,2 | 7 | 5 / 4 | 154,272,224 / 7,619 | 348,941 / 2,745 |
 | 1 | 8 | 4 / 4 | 116,050,118 / 3,936 | 348,941 / 2,745 |
 
+## Quartic-twist native polynomial orbit-thinning grid, outside tables A–C
+
+All 21 preregistered orbit-complete L2 prefix choices on the six frozen p=73/97 one-target streams are shown, including the partial p=73 seed-one cases. The native S4 collector and independent point-keyed/BSGS auditor recover 271 at full anchored rank in each case; first/A/A non-timing records, six full-base source parities, and a mutation rejection were checked. The full/candidate ratio is counted one-target IC Fp multiplications against the same-seed full-base path, with full-base construction and orbit-map work charged. Hash/allocator CPU, calibrated GAE and isolated timing are missing, so these are not priced S or IC/rho speed ratios. [Report](../../research/twist_index_calculus_20261020/K1_THIN_NATIVE_REPORT.pdf).
+
+| p/seed | L2 orbits | Base / folded columns | Residuals | Exact/poly relations | Rank | S4 failures | IC Fp M / group ops | Full/candidate Fp M | Same-target rho Fp M | Audit |
+|:--|--:|:--|--:|:--|--:|--:|:--|--:|--:|:--|
+| 73/0 | 1 | 60 / 5 | 30 | 6/6 | 5 | 0 | 445,445,605 / 10,701 | 1.994× | 496,841 | pass |
+| 73/0 | 2 | 72 / 6 | 20 | 6/6 | 6 | 0 | 593,181,104 / 11,095 | 1.497× | 496,841 | pass |
+| 73/0 | 3 | 84 / 7 | 15 | 7/7 | 7 | 0 | 666,998,170 / 11,760 | 1.332× | 496,841 | pass |
+| 73/0 | 4 | 96 / 8 | 15 | 8/8 | 8 | 0 | 888,203,272 / 9,988 | 1.000× | 496,841 | pass |
+| 73/1 | 1 | 60 / 5 | 45 | 8/6 | 5 | 1 | 667,133,505 / 12,209 | 1.774× | 366,965 | partial |
+| 73/1 | 2 | 72 / 6 | 28 | 9/7 | 6 | 1 | 829,490,482 / 12,141 | 1.427× | 366,965 | partial |
+| 73/1 | 3 | 84 / 7 | 20 | 10/8 | 7 | 1 | 888,451,433 / 12,564 | 1.332× | 366,965 | partial |
+| 73/1 | 4 | 96 / 8 | 20 | 11/9 | 8 | 1 | 1,183,617,228 / 10,891 | 1.000× | 366,965 | partial |
+| 73/2 | 1 | 60 / 5 | 47 | 5/5 | 5 | 0 | 696,092,141 / 12,281 | 3.653× | 481,339 | pass |
+| 73/2 | 2 | 72 / 6 | 45 | 6/6 | 6 | 0 | 1,331,570,891 / 14,074 | 1.910× | 481,339 | pass |
+| 73/2 | 3 | 84 / 7 | 43 | 11/11 | 7 | 0 | 1,907,506,701 / 16,014 | 1.333× | 481,339 | pass |
+| 73/2 | 4 | 96 / 8 | 43 | 15/15 | 8 | 0 | 2,542,727,892 / 15,084 | 1.000× | 481,339 | pass |
+| 97/0 | 1 | 48 / 4 | 310 | 4/4 | 4 | 0 | 4,616,280,829 / 38,187 | 2.998× | 802,322 | pass |
+| 97/0 | 2 | 60 / 5 | 130 | 8/8 | 5 | 0 | 3,870,889,536 / 24,149 | 3.575× | 802,322 | pass |
+| 97/0 | 3 | 72 / 6 | 310 | 16/16 | 6 | 0 | 13,839,508,536 / 53,111 | 1.000× | 802,322 | pass |
+| 97/1 | 1 | 48 / 4 | 302 | 4/4 | 4 | 0 | 4,496,535,068 / 37,541 | 0.745× | 500,318 | pass |
+| 97/1 | 2 | 60 / 5 | 75 | 5/5 | 5 | 0 | 2,233,996,578 / 17,273 | 1.499× | 500,318 | pass |
+| 97/1 | 3 | 72 / 6 | 75 | 6/6 | 6 | 0 | 3,349,559,070 / 17,475 | 1.000× | 500,318 | pass |
+| 97/2 | 1 | 48 / 4 | 182 | 4/4 | 4 | 0 | 2,710,417,878 / 25,189 | 2.471× | 791,504 | pass |
+| 97/2 | 2 | 60 / 5 | 150 | 5/5 | 5 | 0 | 4,465,588,225 / 26,573 | 1.500× | 791,504 | pass |
+| 97/2 | 3 | 72 / 6 | 150 | 6/6 | 6 | 0 | 6,696,848,851 / 28,588 | 1.000× | 791,504 | pass |
+
+A separate exact 24-action cache diagnostic found only 2 same-residual orbit collisions among 142,248 finite signed L2 peels, plus 788 across residuals within the six separate streams. This bounds ideal orbit-cache solver-call reduction on these streams before cache overhead. [Report](../../research/twist_index_calculus_20261020/K1_PEELED_ORBIT_REUSE.pdf).
+
 ## Planner validation, outside tables A–C
 
 `ic plan` / `ic bench --auto` (ic-planner/1) chooses every `ic.pipeline` stage of a prime-field run; here its plan runs against every alternative one change away from it on six prime curves outside its evidence (class: engineering). The plan is the existing best recipe, chosen automatically, so no row above moves. Cells are S(alternative) / S(plan), ecbench `compare`, paired, cluster 95% interval, at w = 0; the band column is the ratio at w = 0, 0.1 and 1 GAE per unpriced native operation (AGENTS.md §5a). Supplementary curves are `prime_search` curves outside the registry, named by tag. Study: [research/ic_planner_validation_20261020/](../../research/ic_planner_validation_20261020/).
@@ -373,6 +403,8 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_p37_v1.json` — sha256 `9e7299c74b69844a…`
 - `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_p37_aa_v1.json` — sha256 `a3bf3faa565f4ebf…`
 - `research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_audit_p37_v1.json` — sha256 `bf5877366f80a65b…`
+- `research/twist_index_calculus_20261020/K1_THIN_NATIVE_VALIDATION.json` — sha256 `469dbe385da11a4d…`
+- `research/twist_index_calculus_20261020/K1_PEELED_ORBIT_REUSE_v1.json` — sha256 `0bb72ba5f0cc6862…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
@@ -381,3 +413,87 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `docs/curves/registry.json` — sha256 `8f60ef230aea092e…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_v1.json` — sha256 `af8cfaf233c6b992…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_aa_v1.json` — sha256 `7469d776730297e9…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_audit_v1.json` — sha256 `ed0816775b6c9ae0…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j1_audit_aa_v1.json` — sha256 `ed0816775b6c9ae0…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j2_v1.json` — sha256 `17156e62b2724a80…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j2_aa_v1.json` — sha256 `1c4a590dd86f9165…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j2_audit_v1.json` — sha256 `e3b5b89ab638767b…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j2_audit_aa_v1.json` — sha256 `e3b5b89ab638767b…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j3_v1.json` — sha256 `a070aa4ebda00cc1…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j3_aa_v1.json` — sha256 `a2f2a2820e26c5ee…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j3_audit_v1.json` — sha256 `3b4619a119976b58…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j3_audit_aa_v1.json` — sha256 `3b4619a119976b58…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j4_v1.json` — sha256 `330e153cbd95c1cf…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j4_aa_v1.json` — sha256 `247b3940b87ee67d…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j4_audit_v1.json` — sha256 `a4dbd337db05130a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed0_j4_audit_aa_v1.json` — sha256 `a4dbd337db05130a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j1_v1.json` — sha256 `ca53eddee71e2835…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j1_aa_v1.json` — sha256 `4ee2db71f6aaaaca…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j1_audit_v1.json` — sha256 `71c39bf3a5fe912c…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j1_audit_aa_v1.json` — sha256 `71c39bf3a5fe912c…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j2_v1.json` — sha256 `a43b1734effe09e0…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j2_aa_v1.json` — sha256 `f524b681975f689a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j2_audit_v1.json` — sha256 `8c7d21edf94f16f1…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j2_audit_aa_v1.json` — sha256 `8c7d21edf94f16f1…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j3_v1.json` — sha256 `e672d4f5872ba6a2…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j3_aa_v1.json` — sha256 `8254b88566d0cf9a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j3_audit_v1.json` — sha256 `9bb81b224a9fe8f7…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j3_audit_aa_v1.json` — sha256 `9bb81b224a9fe8f7…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j4_v1.json` — sha256 `38d0dccd5e286e4a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j4_aa_v1.json` — sha256 `5fde1747a9106bc7…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j4_audit_v1.json` — sha256 `0c91510bf1449e47…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed1_j4_audit_aa_v1.json` — sha256 `0c91510bf1449e47…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j1_v1.json` — sha256 `0b6b4e09f9f7a766…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j1_aa_v1.json` — sha256 `6c254529d4ddf65f…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j1_audit_v1.json` — sha256 `bd9ec176e3725829…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j1_audit_aa_v1.json` — sha256 `bd9ec176e3725829…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j2_v1.json` — sha256 `042c2521c08d60fb…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j2_aa_v1.json` — sha256 `94a6b5242526a1d8…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j2_audit_v1.json` — sha256 `941cbee09aa054d4…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j2_audit_aa_v1.json` — sha256 `941cbee09aa054d4…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j3_v1.json` — sha256 `5f1872813478a1f4…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j3_aa_v1.json` — sha256 `6bb3c406535b795e…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j3_audit_v1.json` — sha256 `1718ce5f95708d7f…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j3_audit_aa_v1.json` — sha256 `1718ce5f95708d7f…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j4_v1.json` — sha256 `04d94cce5f755241…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j4_aa_v1.json` — sha256 `28ea03f8b74337aa…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j4_audit_v1.json` — sha256 `54b8ca3088cd0b35…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p73_seed2_j4_audit_aa_v1.json` — sha256 `54b8ca3088cd0b35…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j1_v1.json` — sha256 `9f3ad268a04cf5fc…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j1_aa_v1.json` — sha256 `29063dfceb88714a…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j1_audit_v1.json` — sha256 `9711d15221f9f171…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j1_audit_aa_v1.json` — sha256 `9711d15221f9f171…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j2_v1.json` — sha256 `6018dae4ef428b8c…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j2_aa_v1.json` — sha256 `dabac33fd726de17…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j2_audit_v1.json` — sha256 `ddbc153b9507bd27…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j2_audit_aa_v1.json` — sha256 `ddbc153b9507bd27…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j3_v1.json` — sha256 `18460bd93a7a3723…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j3_aa_v1.json` — sha256 `5161404d6d6582c7…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j3_audit_v1.json` — sha256 `36fb81da79ee8630…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed0_j3_audit_aa_v1.json` — sha256 `36fb81da79ee8630…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j1_v1.json` — sha256 `966cfb925b7a41e0…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j1_aa_v1.json` — sha256 `2b00ee85b3fe2129…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j1_audit_v1.json` — sha256 `ab7923b5dfc32544…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j1_audit_aa_v1.json` — sha256 `ab7923b5dfc32544…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j2_v1.json` — sha256 `145810f5c6fab4bd…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j2_aa_v1.json` — sha256 `f30c2d3e8ba4a367…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j2_audit_v1.json` — sha256 `ec659486e159c0fb…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j2_audit_aa_v1.json` — sha256 `ec659486e159c0fb…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j3_v1.json` — sha256 `26dcfa1e961c0c7c…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j3_aa_v1.json` — sha256 `4725bd4127d937ee…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j3_audit_v1.json` — sha256 `2d1275313d2ba021…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed1_j3_audit_aa_v1.json` — sha256 `2d1275313d2ba021…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j1_v1.json` — sha256 `fb0204667176e838…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j1_aa_v1.json` — sha256 `258dc92c9f18a67b…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j1_audit_v1.json` — sha256 `9a20002ef596d598…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j1_audit_aa_v1.json` — sha256 `9a20002ef596d598…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j2_v1.json` — sha256 `47fcde51f1b3e9ce…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j2_aa_v1.json` — sha256 `cd80e740c39d6181…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j2_audit_v1.json` — sha256 `ce37312105445544…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j2_audit_aa_v1.json` — sha256 `ce37312105445544…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_v1.json` — sha256 `6d9f255fe5580695…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_aa_v1.json` — sha256 `8f306ff8388bddaf…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_audit_v1.json` — sha256 `0e21b267b9612dcc…`
+- `research/twist_index_calculus_20261020/quartic_twist_k1_thin_p97_seed2_j3_audit_aa_v1.json` — sha256 `0e21b267b9612dcc…`

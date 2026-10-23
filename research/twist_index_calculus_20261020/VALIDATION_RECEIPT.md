@@ -48,10 +48,39 @@ passed on six one-target workloads.
 | Auditor sensitivity | [Mutation control](quartic_twist_k1_census_mutation_control_v1.json) | One p=73 query-zero count changed from 0 to 1; auditor exited 101 with the expected count assertion, before accepting a corrupted census. |
 | Twist-row redundancy | [Orbit-row record](quartic_twist_k1_orbit_row_audit_v1.json), [verifier](verify_k1_orbit_rows.py) | All 12,096 factor-action closure checks and 1,008 exact row/RHS scalar-multiple checks pass across 42 selected relations. |
 | Missing-relation localization | [Post-run difference record](quartic_twist_k1_missing_diagnostic_v1.json), [executable diagnosis](diagnose_k1_missing.py) | Exactly one differing query across six processed streams; both missing relations use signed `L2` peel `(54,+1)`, with no false polynomial relation. This is a post-run diagnosis, not an input to collection. |
-| Reports and visual copies | [25 run reports](K1_SCALE_RUNS.md), [one-page scaling PDF](K1_SCALING_REPORT.pdf), [canonical study PDF](QUARTIC_TWIST24_REPORT.pdf), [copy manifest](../../benchmarks/20261022-quartic-twist-index-calculus/K1_VISUALS.json) | All 25 run PDFs open as one page; the scaling PDF opens as one page and the updated canonical PDF as 13. Visual inspection found readable figures; SHA-256 equality holds for 79 source/copy files. A local-link check over 33 affected Markdown files found zero missing targets. |
+| Reports and visual copies | [25 earlier run reports](K1_SCALE_RUNS.md), [scaling PDF](K1_SCALING_REPORT.pdf), [canonical study PDF](QUARTIC_TWIST24_REPORT.pdf), [copy manifest](../../benchmarks/20261022-quartic-twist-index-calculus/K1_VISUALS.json) | All 25 earlier run PDFs remain one page. After the native follow-up, the scaling PDF is two pages and the canonical PDF 15; both were rebuilt and inspected. The current manifest has 216 source-matching visual copies. The earlier scaling commit had 79 copies and a 13-page canonical PDF; those historical counts are superseded by the follow-up receipt below. |
 | Repository validation gate | `python3 scripts/validation_gate.py check --base 2f7f8538258fd81c1972c142fc6465a8086b61f0` | Pass against this branch's merge base; no priced row was added. The same check against current `origin/main` reports two removed unrelated volcano benchmark rows because this branch predates 219 upstream commits and its old `benchmarks/README.md` lacks those additions. The PR merge check remains the decisive current-base gate. |
 
 The current host has neither `msolve` nor Magma on `PATH`. No same-input
 external solver comparison, complete native hash/allocator and memory
 pricing, calibrated GAE band, or isolated ABAB timing was performed, so
 the extension does not promote a whole-method IC/rho speed result.
+
+## Native orbit-thinning and peeled-target symmetry follow-up, 23 October
+
+The native grid was frozen in protocol commit `cadd7b9001`; the
+peeled-residual orbit-reuse test in `8801c22aaa`, and its subgroup
+ablation in `433df0f52d`, each before its corresponding calculation.
+The [native grid validator](K1_THIN_NATIVE_VALIDATION.json) and
+[exact reuse records](K1_PEELED_ORBIT_REUSE_v1.json) and
+[subgroup ablation](K1_PEELED_SUBGROUP_REUSE_v1.json) are separate
+machine outputs. The source-linked [native report](K1_THIN_NATIVE_REPORT.md)
+and [reuse report](K1_PEELED_ORBIT_REUSE.md) include all cases, including
+the four partial native relation sets and one native regression.
+
+| Check | Evidence | Result |
+| --- | --- | --- |
+| Full native grid | [21-case validator](K1_THIN_NATIVE_VALIDATION.json), [run index](K1_THIN_NATIVE_RUNS.md), [source](../../examples/quartic_twist_k1_thin.rs) | All 21 first/A/A native producers and 42 independent audit executions exited zero under 8 GiB/1,200 s bounds. All 21 recover 271 at full anchored rank. Seventeen processed-prefix signed sets are exact; p=73 seed-one j=1…4 each miss two relations from one failed S4 system and remain `partial`. |
+| Reproducibility and full-base control | 21 empty `*_aa_v1.diff` files, six empty `*_full_parity.diff` files; [validator](verify_k1_thin_native.py) | First/A/A non-timing and separate audit outputs match exactly for every choice; full-j controls match the previous scaling source after removing only newly explicit subset metadata and timing fields. The validator recomputes phase-sum `Fp M` and group counts, exact-oracle prefix counts and S4 peel attempts. |
+| Independent relation and scalar check | [Native auditor](../../examples/quartic_twist_k1_thin_audit.rs), 42 audited JSON records, [mutation control](quartic_twist_k1_thin_mutation_control_v1.json) | Each subset is reconstructed from the frozen full physical base; all retained factor logs are independently BSGS-verified, all processed signed sets and folded rows checked, and `[271]G=Q` verified. A corrupted selected-full-index record is rejected. |
+| Exact symmetry reuse | [Full-24 source](analyze_k1_peeled_orbits.py), [subgroup source](analyze_k1_peeled_subgroups.py), both machine records and [PDF](K1_PEELED_ORBIT_REUSE.pdf) | Across six complete streams, 142,248 finite peels have 2 same-residual and 788 additional within-stream full-action duplicates. Identity/cubic/Frobenius/full duplicates are 20/107/243/790. Order, closure, containment, image-canonicalization and perturbed-eigenvalue controls pass. |
+| Source-linked visuals | [42 native run reports](K1_THIN_NATIVE_RUNS.md), [native summary PDF](K1_THIN_NATIVE_REPORT.pdf), [reuse PDF](K1_PEELED_ORBIT_REUSE.pdf), [benchmark copy manifest](../../benchmarks/20261022-quartic-twist-index-calculus/K1_VISUALS.json) | All 42 native run PDFs have one page; the native summary has two landscape pages, the reuse report two A4 pages, and the canonical study 15 pages. The 216 new benchmark visual copies have source-matching SHA-256 hashes. The native figure and both reuse figures were visually inspected. |
+| Release library and touched examples | [Full release test log](validation_logs/k1_scaling_lib_tests.log), [seven-example harness log](validation_logs/k1_touched_examples_tests.log), [pinned Clippy log](validation_logs/k1_touched_clippy.log) | 4,475 library tests passed, 119 ignored, zero failed; all seven touched release example harnesses pass; pinned Rust 1.98 Clippy has no warnings. The native experiment executables and independent audits were run separately from the zero-test example harnesses. |
+| Generated board and validation gate | `python3 scripts/build_ic_leaderboard.py --check`; `python3 scripts/validation_gate.py check --base 2f7f8538258fd81c1972c142fc6465a8086b61f0` | Both pass. The 21-row counted component and exact symmetry-reuse diagnostic are outside priced tables A–C; no admitted row or `benchmarks/README.md` price changed. The validation gate passes against this branch's merge base. |
+| Source and document checks | Python `py_compile` on eight new/changed scripts; Markdown local-link scan over 56 study, run, benchmark, problem and generated-board files | Python syntax pass; zero missing local links. All 42 native run PDFs open as one-page files, the native summary and reuse PDFs as two-page files, and the canonical study PDF as 15 pages. |
+
+The grid's ratios are counted field-operation comparisons, with group
+and modular work separate. No calibrated `S`, isolated timing, complete
+native hash/allocator CPU or same-input external Gröbner comparison is
+claimed. The source-linked full report states the remaining execution
+and pricing gaps.

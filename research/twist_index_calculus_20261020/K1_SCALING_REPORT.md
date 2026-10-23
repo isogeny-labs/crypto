@@ -167,3 +167,27 @@ attack or a security statement about deployed curves.
 
 [PDF summary](K1_SCALING_REPORT.pdf) · [Run-level PDFs](K1_SCALE_RUNS.md) ·
 [Census PDFs](K1_CENSUS_RUNS.md)
+
+## Follow-up: native base thinning and symmetry-reuse ablation
+
+The separately preregistered [21-case native orbit-complete thinning grid](K1_THIN_NATIVE_REPORT.md)
+now addresses the base-shape part of discriminator (2) above on these
+same frozen streams. Every path reaches full anchored rank and recovers
+271; 17 of 21 processed-prefix relation sets are exact, with the same
+two missing p=73 seed-one relations in all four subset choices. The
+best *observed* proper-subset counted `Fp M` ratios against same-seed
+full bases are 3.653× at p=73 seed two with one L2 orbit and 3.575×
+at p=97 seed zero with two. The p=97 seed-one one-orbit choice regresses
+to 0.745× because it needs 302 residuals rather than 75. These are
+counted-field observations across the **entire** frozen grid, not
+post hoc recipe selection or priced whole-method `S`.
+
+The [peeled-target orbit-reuse test](K1_PEELED_ORBIT_REUSE.md) finds
+only two same-residual 24-action collisions among 142,248 finite signed
+L2 peels on the complete streams. Its identity/cubic/Frobenius/full
+ablation finds 20/107/243/790 total within-stream cache duplicates.
+The twist-specific extra cache opportunities are small on these
+streams; the native base-shape tradeoff remains the measured path for
+reducing the number of attempted S4 systems. Full native CPU/memory,
+isolated timing, solver completeness and external comparison are still
+open in the [named problem](../../problems/quartic-twist-polynomial-ic-pricing.md).
