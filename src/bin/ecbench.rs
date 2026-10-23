@@ -244,6 +244,10 @@ enum Cmd {
         save: bool,
         #[arg(long)]
         json: bool,
+        /// Compare a session whose status is not `complete` (recorded in
+        /// the comparison, which is then not admissible).
+        #[arg(long)]
+        allow_interrupted: bool,
     },
     /// The one-unit table: every arm on every curve, mean S, ratio to the
     /// floor and to the reference arm.
@@ -1081,8 +1085,19 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             seed,
             save,
             json,
+            allow_interrupted,
         } => {
-            let c = compare::compare(&dir, &a, b_dir.as_deref(), &b, resamples, seed)?;
+            let c = compare::compare_with(
+                &dir,
+                &a,
+                b_dir.as_deref(),
+                &b,
+                &compare::CompareOptions {
+                    resamples,
+                    seed,
+                    allow_interrupted,
+                },
+            )?;
             if save {
                 let d = dir.join("comparisons");
                 std::fs::create_dir_all(&d).map_err(|e| e.to_string())?;
@@ -1112,6 +1127,45 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     if !q.notes.is_empty() {
                         println!("quality notes: {}", q.notes.join("; "));
                     }
+                }
+                for arm in [&c.a, &c.b] {
+                    let tail = arm
+                        .tail
+                        .as_ref()
+                        .map(|t| {
+                            format!(
+                                "max/median S {}, top run {:.0}% of total{}",
+                                t.max_over_median
+                                    .map(|x| format!("{x:.2}"))
+                                    .unwrap_or_else(|| "n/a".into()),
+                                100.0 * t.top_run_share,
+                                if t.heavy_tail {
+                                    " (heavy tail; more runs needed)"
+                                } else {
+                                    ""
+                                }
+                            )
+                        })
+                        .unwrap_or_else(|| "no verified runs".into());
+                    let unpriced = if arm.unpriced_counts.is_empty() {
+                        "none".to_string()
+                    } else {
+                        arm.unpriced_counts
+                            .iter()
+                            .map(|(k, v)| {
+                                format!(
+                                    "{k}={}",
+                                    v.map(|n| n.to_string())
+                                        .unwrap_or_else(|| "uncounted".into())
+                                )
+                            })
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    };
+                    println!(
+                        "arm {}: verified {}/{} ({} censored); {}; unpriced: {}",
+                        arm.arm, arm.verified, arm.measured, arm.censored, tail, unpriced
+                    );
                 }
                 let o = |v: Option<f64>| v.map(|x| format!("{x:.4}")).unwrap_or_else(|| "–".into());
                 let ci = |v: Option<(f64, f64)>| {
@@ -1713,13 +1767,22 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                             .push(v);
                     }
                 }
+                // The mean S is a ratio of totals (Σ S / n) over workload
+                // clusters: the linearised t(K-1) interval, as `compare`
+                // forms the ratio's.  One workload: runs are the clusters.
+                // Fewer than five workloads is indicative.
                 let strata: Vec<Vec<f64>> = by_w.into_values().collect();
-                let ci = stats::cluster_bootstrap_ci(&strata, 4000, 20261002, |s| {
-                    stats::mean(&s.concat())
-                })
-                .or_else(|| {
-                    stats::bootstrap_ci(&strata, 4000, 20261002, |s| stats::mean(&s.concat()))
-                });
+                let clusters: Vec<(f64, f64)> = if strata.len() >= 2 {
+                    strata
+                        .iter()
+                        .map(|s| (s.len() as f64, s.iter().sum()))
+                        .collect()
+                } else {
+                    strata.iter().flatten().map(|v| (1.0, *v)).collect()
+                };
+                let indicative = strata.len() < compare::INDICATIVE_BELOW_WORKLOADS;
+                let ci = stats::linearised_ratio(&clusters)
+                    .and_then(|l| l.ci95_log().or_else(|| l.ci95()));
                 let any = mine.first();
                 let floor = any.map(|r| r.boundaries.floor_s).unwrap_or(f64::NAN);
                 let theory = any.and_then(|r| {
@@ -1764,6 +1827,25 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                 } else {
                     Some(walls_ms[walls_ms.len() / 2])
                 };
+                let mean_cell = format!(
+                    "{}{}{}",
+                    o(mean),
+                    if ok.len() < mine.len() {
+                        " (survivors only: unverified runs left out)"
+                    } else {
+                        ""
+                    },
+                    match compare::tail_diagnostics(
+                        &mine
+                            .iter()
+                            .filter(|r| r.counts())
+                            .filter_map(|r| Some((r.run_id.clone(), r.cost.s?)))
+                            .collect::<Vec<_>>()
+                    ) {
+                        Some(t) if t.heavy_tail => " (heavy tail; more runs needed)",
+                        _ => "",
+                    }
+                );
                 println!(
                     "| {} | {} | {} | {} | {:.2} | {}/{} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
                     s.session_id,
@@ -1774,9 +1856,12 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                         .unwrap_or(f64::NAN),
                     ok.len(),
                     mine.len(),
-                    o(mean),
-                    ci.map(|(l, h)| format!("[{l:.3}, {h:.3}]"))
-                        .unwrap_or_else(|| "–".into()),
+                    mean_cell,
+                    ci.map(|(l, h)| format!(
+                        "[{l:.3}, {h:.3}]{}",
+                        if indicative { " indicative" } else { "" }
+                    ))
+                    .unwrap_or_else(|| "–".into()),
                     o(theory),
                     o(match (mean, theory) {
                         (Some(m), Some(t)) => Some(m / t),
