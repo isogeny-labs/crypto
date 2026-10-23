@@ -229,3 +229,31 @@ check that the fix changed no count: its per-record `total_gae` and every native
 `lp_filter_wall_ns` must equal the r2 session's, record for record (same spec, seeds), reported in
 `REPORT.md`. Nothing else in the protocol changes. `run_session.sh` (run, audit, band) is added to
 the frozen commands.
+
+## Amendment 2 (2026-10-23, before any train result was read): two-stage train
+
+**Finding.** The pre-flight estimate of section 10 was low by about 5x: `sessions/train-n37` (all 65
+cells on 48 targets) was started and, after 263 of 3168 records, cost about 53 CPU-seconds per target
+(the K·c ≥ 320 cells cost 8 to 32 s per target each). Extrapolated over four curves the train panel
+would pass the 6 core-hour stop of section 2. That session was interrupted
+(`status: interrupted`, kept unedited as evidence; no result was read from it, and it is not used).
+
+**Change (design only; arms, grid, objective, weights, holdout unchanged).** Train becomes two stages
+with disjoint targets, which also removes the winner's-curse bias of choosing among 60 cells on the
+data that picks the winner:
+
+1. **Stage 1 (prune).** All 65 cells (`specs/stage1-n{N}.json`, the train grid of section 4) on 8
+   targets (target seed 20261023001, algorithm seed 20261023002). `prune.sh` keeps, per curve, the 10
+   double-LP cells with the smallest `minimax_vs_base` among cells whose runs all verified (ties: lowest
+   K, then lowest c) in `survivors.json`, hashed in `SURVIVORS.sha256`.
+2. **Stage 2 (select).** The 10 survivors, the five baseline cells and `rho-frob` on 48 fresh targets per
+   curve (target seed 20261023011, algorithm seed 20261023012; `specs/stage2-n{N}.json` from
+   `make_specs.sh stage2 survivors.json`, committed before they run). Section 5's objective and edge
+   rule apply to stage 2 only; `select.sh` reads `stage2/paired-n{N}.json`. The edge rule is
+   evaluated against stage 1's grid: if the stage-2 winner is a survivor on the grid boundary of section 5,
+   the boundary is extended and stages 1 and 2 are redone for that curve by amendment.
+
+The new seeds are disjoint from the train seeds above and from the holdout seeds. Section 10's estimate
+is replaced by: stage 1 about 53 s x 8 per curve (about 7 min at n = 37; the larger curves are
+measured, not assumed); stage 2 about 11 cells x 48 targets; holdout unchanged. `run_session.sh`,
+`prune.sh` and the stage generators are part of the frozen commands.

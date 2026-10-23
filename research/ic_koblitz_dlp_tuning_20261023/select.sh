@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# PROTOCOL.md section 5: the frozen selection. Reads train/paired-n{N}.json (the output of
-#   ic_paired_band --objective-base base-k{Kb} --out train/paired-n{N}.json sessions/train-n{N}...)
+# PROTOCOL.md section 5 and Amendment 2: the frozen selection. Reads stage2/paired-n{N}.json (the output of
+#   ic_paired_band --objective-base base-k{Kb} --out stage2/paired-n{N}.json sessions/stage2-n{N})
 # and writes selection.json: per curve the dlp cell and the baseline cell with the smallest
 # minimax_vs_base (ties: lowest K, then lowest c). Cells with an unverified run have a null
 # objective and are skipped.
@@ -9,7 +9,7 @@ cd "$(dirname "$0")"
 declare -A KB=([37]=8 [41]=128 [43]=16 [47]=64)
 out='{}'
 for n in 37 41 43 47; do
-  f=train/paired-n$n.json
+  f=stage2/paired-n$n.json
   [ -f "$f" ] || continue
   sel=$(jq -c --argjson kb ${KB[$n]} '
     [.arms[] | select(.minimax_vs_base != null)] as $a

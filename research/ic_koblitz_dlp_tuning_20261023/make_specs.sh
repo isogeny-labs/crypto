@@ -35,7 +35,21 @@ spec() { # label a n targets tseed aseed arms-json out
      arms:$arms,
      measurement:{rounds:1,warmup:0,order:"alternate",seed:$as,isolation_required:"L0",timeout_seconds:3600}}' > "$8"; }
 
+STAGE1_T=8; S2_T=48
+S2_TARGET_SEED=20261023011; S2_ALG_SEED=20261023012
 case "${1:-}" in
+stage1)
+  # Amendment 2: the full grid on 8 targets, to prune to the 10 best cells per curve.
+  for n in 37 41 43 47; do
+    jq --argjson t $STAGE1_T '.workloads.targets_per_curve=$t | .label=(.label|sub("TRAIN";"STAGE 1"))' specs/train-n$n.json > specs/stage1-n$n.json
+  done ;;
+stage2)
+  # Amendment 2: survivors of stage 1, the baseline grid and rho-frob on fresh targets.
+  sv=${2:?survivors json}
+  for n in 37 41 43 47; do
+    arms=$(jq -c --argjson s "$(jq -c --arg n $n '.[$n]' "$sv")" '[.arms[] | select(.name=="rho-frob" or (.name|startswith("base-k")) or ([.name]|inside($s)))]' specs/train-n$n.json)
+    spec "DLP tuning STAGE 2 Koblitz n=$n" ${A[$n]} $n $S2_T $S2_TARGET_SEED $S2_ALG_SEED "$arms" specs/stage2-n$n.json
+  done ;;
 train)
   for n in 37 41 43 47; do
     kb=${KB[$n]}; arms='[]'
