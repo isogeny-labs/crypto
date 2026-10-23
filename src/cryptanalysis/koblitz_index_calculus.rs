@@ -4350,9 +4350,15 @@ enum Targets {
     ///
     /// `doubled` is the subset concatenated with itself, so a window of
     /// any length up to the subset's is one contiguous slice and the
-    /// rotation needs no scratch of its own.
+    /// rotation needs no scratch of its own.  `doubled_x` and
+    /// `doubled_y` are the same summands' negated coordinates in the
+    /// same order, gathered once for the unit (empty when the table has
+    /// none), so a trial hands the folding kernel two slices instead of
+    /// gathering its window again.
     Subset {
         doubled: Vec<u32>,
+        doubled_x: Vec<u64>,
+        doubled_y: Vec<u64>,
         len: usize,
         window: usize,
     },
@@ -4388,8 +4394,23 @@ impl Targets {
                 len: *len,
             },
             Targets::Subset {
-                doubled, window, ..
-            } => Scan::Indices(&doubled[offset..offset + *window]),
+                doubled,
+                doubled_x,
+                doubled_y,
+                window,
+                ..
+            } => {
+                let idxs = &doubled[offset..offset + *window];
+                if doubled_x.is_empty() {
+                    Scan::Indices(idxs)
+                } else {
+                    Scan::Gathered {
+                        idxs,
+                        xs: &doubled_x[offset..offset + *window],
+                        ys: &doubled_y[offset..offset + *window],
+                    }
+                }
+            }
         }
     }
 }
@@ -4420,6 +4441,14 @@ pub enum Scan<'a> {
     Cyclic { start: usize, len: usize },
     /// Exactly these base indices, in this order.
     Indices(&'a [u32]),
+    /// [`Scan::Indices`] with the summands' negated coordinates already
+    /// gathered, in the same order: `xs[i]` and `ys[i]` are those of
+    /// `idxs[i]`.  The same scan, without its per-trial gather.
+    Gathered {
+        idxs: &'a [u32],
+        xs: &'a [u64],
+        ys: &'a [u64],
+    },
 }
 
 impl Scan<'_> {
@@ -4427,7 +4456,7 @@ impl Scan<'_> {
     pub fn len(&self) -> usize {
         match self {
             Scan::Cyclic { len, .. } => *len,
-            Scan::Indices(idxs) => idxs.len(),
+            Scan::Indices(idxs) | Scan::Gathered { idxs, .. } => idxs.len(),
         }
     }
 
@@ -6613,7 +6642,7 @@ impl PairSumTable {
                 let start = start % base;
                 (start, len.min(base - start))
             }
-            Scan::Indices(_) => (0, len),
+            Scan::Indices(_) | Scan::Gathered { .. } => (0, len),
         };
         // On a folded table with a basis change, the folding kernel takes
         // the summands as coordinate slices and leaves each rest as its
@@ -6654,6 +6683,9 @@ impl PairSumTable {
                     self.curve
                         .add_many_lazy_soa(target, gather_x, gather_y, x3s, lambdas, batch)
                 }
+                Scan::Gathered { xs, ys, .. } => self
+                    .curve
+                    .add_many_lazy_soa(target, xs, ys, x3s, lambdas, batch),
             };
             if !done {
                 x3s.clear();
@@ -6680,7 +6712,7 @@ impl PairSumTable {
                         add(&self.negated[..len - tail], rests);
                     }
                 }
-                Scan::Indices(idxs) => {
+                Scan::Indices(idxs) | Scan::Gathered { idxs, .. } => {
                     gather.clear();
                     gather.reserve(idxs.len());
                     for &i in idxs {
@@ -6741,7 +6773,7 @@ impl PairSumTable {
                             offset - tail
                         }
                     }
-                    Scan::Indices(idxs) => idxs[offset] as usize,
+                    Scan::Indices(idxs) | Scan::Gathered { idxs, .. } => idxs[offset] as usize,
                 };
                 let rest = if fused {
                     FastPoint::affine(x3s[offset], 0)
@@ -12609,8 +12641,26 @@ impl<'a> RelationCollector<'a> {
         let mut doubled = Vec::with_capacity(len + window);
         doubled.extend_from_slice(&idxs);
         doubled.extend_from_slice(&idxs[..window]);
+        // The summands' coordinates, gathered once here rather than by
+        // every trial's scan (`Scan::Gathered`); empty when the table
+        // keeps none, and then the scan gathers as before.
+        let (doubled_x, doubled_y) = match self.pair_table() {
+            Some(pair) if !pair.negated_x.is_empty() => (
+                doubled
+                    .iter()
+                    .map(|&i| pair.negated_x[i as usize])
+                    .collect(),
+                doubled
+                    .iter()
+                    .map(|&i| pair.negated_y[i as usize])
+                    .collect(),
+            ),
+            _ => (Vec::new(), Vec::new()),
+        };
         Some(Targets::Subset {
             doubled,
+            doubled_x,
+            doubled_y,
             len,
             window,
         })
@@ -18929,6 +18979,70 @@ mod tests {
                     assert_eq!(a, b, "degree {degree}, t = {t}: the scans disagree");
                     found += a.len();
                 }
+            }
+            assert!(
+                found > 0,
+                "degree {degree}: the scans found nothing to compare"
+            );
+        }
+    }
+
+    /// A [`Scan::Gathered`] scan is a [`Scan::Indices`] scan whose
+    /// coordinates were gathered beforehand: on a folded table, where the
+    /// folding kernel reads them, it must hand the sink exactly what the
+    /// index list hands it, in the same order.
+    #[test]
+    fn a_pre_gathered_scan_hands_the_sink_what_the_index_list_does() {
+        for (degree, points) in [(19u32, 300usize), (31, 400)] {
+            let kc = KoblitzCurve::new(0, degree).unwrap();
+            let fb = build_subgroup_orbit_factor_base(&kc, 3, points).unwrap();
+            let folded = PairSumTable::build_within(
+                &kc,
+                &fb,
+                PairSumTable::folded_byte_size(fb.signed_orbits.len(), fb.points.len(), kc.n),
+            )
+            .unwrap();
+            assert!(
+                folded.is_folded(),
+                "degree {degree}: expected the fold tier"
+            );
+            assert!(
+                !folded.negated_x.is_empty(),
+                "degree {degree}: the table kept no coordinates"
+            );
+            let fc = FastCurve::new(&kc.curve).unwrap();
+            let g = fc.lift(kc.generator());
+            let base = fb.points.len() as u32;
+            let idxs: Vec<u32> = (0..base).filter(|i| i % 3 != 1).rev().collect();
+            let xs: Vec<u64> = idxs.iter().map(|&i| folded.negated_x[i as usize]).collect();
+            let ys: Vec<u64> = idxs.iter().map(|&i| folded.negated_y[i as usize]).collect();
+            let (mut scratch_a, mut scratch_b) = (ScanScratch::default(), ScanScratch::default());
+            let mut found = 0usize;
+            for t in 1u64..300 {
+                let target = fc.mul_u64(g, t);
+                let mut a = Vec::new();
+                folded.witnesses_fast_scan(
+                    target,
+                    3,
+                    Scan::Indices(&idxs),
+                    &mut scratch_a,
+                    &mut |w| {
+                        a.push(w.to_vec());
+                        true
+                    },
+                );
+                let mut b = Vec::new();
+                let gathered = Scan::Gathered {
+                    idxs: &idxs,
+                    xs: &xs,
+                    ys: &ys,
+                };
+                folded.witnesses_fast_scan(target, 3, gathered, &mut scratch_b, &mut |w| {
+                    b.push(w.to_vec());
+                    true
+                });
+                assert_eq!(a, b, "degree {degree}, t = {t}: the scans disagree");
+                found += a.len();
             }
             assert!(
                 found > 0,
