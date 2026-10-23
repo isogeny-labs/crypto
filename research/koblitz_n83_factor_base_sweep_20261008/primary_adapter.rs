@@ -1011,7 +1011,7 @@ fn supported_chain_wall_budget(
             && !order_first_pair
             && matches!(
                 (columns, conflicts, seconds),
-                (2048, 1_500_000, 8987) | (4096, 1_500_000, 9000)
+                (2048, 1_500_000, 8957) | (4096, 1_500_000, 9000)
             ))
 }
 
@@ -1412,7 +1412,7 @@ mod tests {
 
     #[test]
     fn continuation_wall_admission_preserves_legacy_and_rejects_nearby_requests() {
-        for (columns, seconds) in [(2048, 8987), (4096, 9000)] {
+        for (columns, seconds) in [(2048, 8957), (4096, 9000)] {
             assert!(supported_chain_wall_budget(columns, 5, 1_500_000, seconds, true, false));
             for (k, m, conflicts, wall, orbits, ordered) in [
                 (columns, 5, 1_500_000, seconds - 1, true, false),
@@ -1431,7 +1431,8 @@ mod tests {
         }
         assert!(!supported_chain_wall_budget(2048, 5, 1_500_000, 0, true, false));
         assert!(!supported_chain_wall_budget(2048, 5, 1_500_000, 9000, true, false));
-        assert!(!supported_chain_wall_budget(4096, 5, 1_500_000, 8987, true, false));
+        assert!(!supported_chain_wall_budget(2048, 5, 1_500_000, 8987, true, false));
+        assert!(!supported_chain_wall_budget(4096, 5, 1_500_000, 8957, true, false));
     }
 
     #[test]
@@ -1443,7 +1444,7 @@ mod tests {
         fs::create_dir_all(&fixtures).unwrap();
         fs::write(fixtures.join("probe-corpus.json"), b"{}").unwrap();
         fs::write(fixtures.join("probe-validation.json"), b"{}").unwrap();
-        for (columns, seconds) in [(2048, 8987), (4096, 9000)] {
+        for (columns, seconds) in [(2048, 8957), (4096, 9000)] {
             // The deliberately absent panel prevents any SAT execution even
             // if the test happens to run inside a matching hard-memory cgroup.
             let err = run_chain_cli(

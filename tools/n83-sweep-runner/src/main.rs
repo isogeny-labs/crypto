@@ -161,8 +161,9 @@ fn retained_panel(manifest: &Value, columns: u64) -> R<()> {
 }
 fn docker_rpc_timeout(args: &[&str]) -> &'static str {
     // A slow daemon inspection must not discard a completed worker's evidence.
-    // Mutating operations retain their original deadline and are never retried.
-    if args.first() == Some(&"inspect") {
+    // Container launch may wait up to 60s inside the existing command envelope.
+    // No mutating request is retried; other mutations retain their 15s deadline.
+    if matches!(args.first(), Some(&"inspect") | Some(&"run")) {
         "60s"
     } else {
         "15s"
@@ -186,9 +187,10 @@ fn docker(args: &[&str]) -> R<Output> {
 }
 
 #[test]
-fn longer_inspection_wait_does_not_extend_or_retry_mutations() {
+fn bounded_launch_and_inspection_wait_keep_other_mutation_deadlines() {
     assert_eq!(docker_rpc_timeout(&["inspect", "container"]), "60s");
-    for operation in ["run", "kill", "rm", "logs", "ps", "image", ""] {
+    assert_eq!(docker_rpc_timeout(&["run", "--detach"]), "60s");
+    for operation in ["kill", "rm", "logs", "ps", "image", ""] {
         assert_eq!(docker_rpc_timeout(&[operation]), "15s");
     }
     assert_eq!(docker_rpc_timeout(&[]), "15s");
@@ -305,7 +307,7 @@ fn memory_profile_refuses_escaping_or_nonunified_cgroups() {
 fn continuation_budget(columns: u64, conflicts: u64, wall: u64) -> bool {
     matches!(
         (columns, conflicts, wall),
-        (2048, 1_500_000, 8987) | (4096, 1_500_000, 9000)
+        (2048, 1_500_000, 8957) | (4096, 1_500_000, 9000)
     )
 }
 fn memory_limit(v: &Value) -> R<u64> {
@@ -341,7 +343,7 @@ fn explicit_memory_extension_keeps_legacy_and_control_limits() {
         (4096, 800000, 4800),
         (2048, 1000000, 6000),
         (4096, 1000000, 6000),
-        (2048, 1500000, 8987),
+        (2048, 1500000, 8957),
         (4096, 1500000, 9000),
     ] {
         let base = json!({"columns":k,"conflicts":conflicts,"wall_seconds":wall,"memory_limit_bytes":8u64<<30});
@@ -1039,7 +1041,7 @@ fn external_replay(dir: &Path) -> R<Vec<bool>> {
 
 fn validate_run_budget(columns: u64, external: bool, conflicts: u64, wall: u64) -> R<()> {
     // Exact preregistered natural-panel budgets: K2048 charges the refused
-    // command inside its original slot, leaving 8987 seconds; K4096 keeps 9000.
+    // command inside its original slot, leaving 8957 seconds; K4096 keeps 9000.
     // All other natural, witness and external limits retain their ceilings.
     if !external && continuation_budget(columns, conflicts, wall) {
         return Ok(());
@@ -1394,6 +1396,12 @@ fn main() -> R<()> {
         Some("account-admission-refusal") if a.len() == 5 => {
             admission_refusal::account(Path::new(&a[2]), Path::new(&a[3]), Path::new(&a[4]))
         }
+        Some("account-launch-refusal") if a.len() == 6 => admission_refusal::account_launch(
+            Path::new(&a[2]),
+            Path::new(&a[3]),
+            Path::new(&a[4]),
+            Path::new(&a[5]),
+        ),
         Some("systemd-barrier-smoke") if a.len() == 3 => systemd_scope::smoke(Path::new(&a[2])),
         Some("prepare-systemd-swap") if a.len() == 4 => {
             let live = read(&a[2])?;
@@ -1631,8 +1639,9 @@ fn natural_budget_admits_1m_but_stays_bounded() {
 #[test]
 fn continuation_budget_is_an_exact_natural_panel_pair() {
     assert!(validate_run_budget(2048, false, 1_500_000, 9000).is_err());
-    assert!(validate_run_budget(4096, false, 1_500_000, 8987).is_err());
-    for (columns, wall) in [(2048, 8987), (4096, 9000)] {
+    assert!(validate_run_budget(2048, false, 1_500_000, 8987).is_err());
+    assert!(validate_run_budget(4096, false, 1_500_000, 8957).is_err());
+    for (columns, wall) in [(2048, 8957), (4096, 9000)] {
         assert!(validate_run_budget(columns, false, 1_500_000, wall).is_ok());
         for (conflicts, wall) in [
             (1_500_001, wall),

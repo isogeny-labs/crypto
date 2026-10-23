@@ -254,3 +254,10 @@ by the worker's old 7200-second admission gate. [RESPEC-C2.md](verification/nati
 records the retained failure, validated narrow gate correction and conservative
 13-second charge inside the original slot. The corrective ceiling is8987 seconds;
 K4096 retains9000. The total allowance remains30000, with no automatic retries.
+
+The corrected K2048-c2 card then stopped before worker release at Docker's
+15-second launch-RPC limit; cleanup and custody pass. [RESPEC-C3.md](verification/native-arena-reclamation-20261023/RESPEC-C3.md)
+retains that distinct failure, charges its entire29.838953191-second command
+upward as30seconds, and records8957seconds remaining in the same slot. The
+validated launch wait is60seconds within the existing command envelope, with
+no automatic mutation retry. Both CPU and I/O pressure must pass before dispatch.
