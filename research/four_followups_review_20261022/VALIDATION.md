@@ -8,7 +8,7 @@ cd research/four_followups_review_20261022 && cargo run --release --locked --off
 uvx --from cairosvg==2.8.2 cairosvg -d 150 -s 1.5625 research/four_followups_review_20261022/cost-ratios.svg -o research/four_followups_review_20261022/cost-ratios.png
 uvx --from cairosvg==2.8.2 cairosvg -d 150 -s 1.5625 research/four_followups_review_20261022/pencil-ratios.svg -o research/four_followups_review_20261022/pencil-ratios.png
 rsvg-convert -d 150 -p 150 research/four_followups_review_20261022/pencil-coverage.svg -o research/four_followups_review_20261022/pencil-coverage.png
-tectonic research/four_followups_review_20261022/REPORT.tex --outdir research/four_followups_review_20261022
+SOURCE_DATE_EPOCH=1792627200 tectonic research/four_followups_review_20261022/REPORT.tex --outdir research/four_followups_review_20261022
 sha256sum -c research/four_followups_review_20261022/SHA256SUMS
 python3 scripts/validation_gate.py evidence research/pencil_sparse_20261022
 python3 scripts/validation_gate.py evidence research/pencil_markowitz_20261022
@@ -28,7 +28,7 @@ and separately run cached arm are retained only in the source study.
 
 The converter replaces an earlier Python reporting script to comply with
 `AGENTS.md`'s native implementation rule. It regenerates both standardized
-CSVs, the summary JSON, and both SVGs from unchanged source evidence. Its
+CSVs, the pencil coverage CSV, the summary JSON, and all three SVGs from unchanged source evidence. Its
 checks include 240/360 peel cells below online, 120/360 above, zero below
 rho, 0/36 Markowitz cells below peel or rho, 1,506 verified pencil arm-target
 rows, four cap failures, and exact joins
@@ -53,9 +53,9 @@ cold costs, and native price band. This packet does not replace
 the separate source studies' arithmetic and scalar validators.
 
 The factor-base/law/Kummer graph is rendered from the same representative grid rows as the JSON summary; the
-paired pencil graph uses all 36 price cells per measured curve. Their PNGs are
+paired pencil graph uses all 36 price cells per measured curve. The coverage graph groups all 1,260 pencil workload keys by status. Their PNGs are
 rendered from the same SVGs at 150/96 pixel scale for the 150-dpi PDF embed.
-The two-page PDF includes both graphs. Its table is
+The three-page PDF includes all three graphs. Its table is
 an editorial selection of the pooled representative rows; reviewers should
 use the CSV for per-size patterns and the linked raw JSONL for target-level
 analysis. The original pencil 1,260-distinct-target request remains open: 543

@@ -24,7 +24,8 @@ has an SVG and a PNG here; the principal views are
 [nine-curve cost](peel-nine-curves.svg),
 [native-price cost](peel-nine-native.svg),
 [p=28 price band](p28-price-band.svg), and
-[cross-lead paired prices](review-pencil-ratios.svg).
+[cross-lead paired prices](review-pencil-ratios.svg), and
+[cross-lead pencil coverage](review-pencil-coverage.svg).
 Each PNG was rendered from its copied SVG with
 `rsvg-convert -d 150 -p 150`; [COPY_MANIFEST.json](COPY_MANIFEST.json) pins
 the exact source and copy hashes.

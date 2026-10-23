@@ -17,8 +17,8 @@ and [cross-lead review PDF](cross-lead-report.pdf) retain their source reports.
 Every graph in those PDFs has an SVG copy here, including
 [cost ratios](cost-ratios.svg), [direct price grid](direct-price-grid.svg),
 [branch coverage](branch-coverage.svg), and the review packet's
-[cross-lead](review-cost-ratios.svg) and [pencil](review-pencil-ratios.svg)
-views. Each SVG has a PNG rendered from that copied SVG with
+[cross-lead](review-cost-ratios.svg), [pencil prices](review-pencil-ratios.svg),
+and [pencil coverage](review-pencil-coverage.svg) views. Each SVG has a PNG rendered from that copied SVG with
 `rsvg-convert -d 150 -p 150`; [COPY_MANIFEST.json](COPY_MANIFEST.json) pins
 source and copy hashes. The source studies retain their own original PNGs.
 
