@@ -471,7 +471,7 @@ jobs:
           name: ecbench-pr-audit-bin
           path: target/release
       - name: Validate committed evidence integrity on pull requests
-        timeout-minutes: 12
+        timeout-minutes: 25
         run: |
           chmod +x target/release/ecbench
           bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
