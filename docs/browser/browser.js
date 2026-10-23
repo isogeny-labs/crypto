@@ -151,7 +151,7 @@
   function curvesView(q) {
     var head = el("div", null, [
       el("h1", { text: "Curves" }),
-      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. Search by name or identity, filter by family, field, trace, order, subgroup and what has been measured on it. Click a slug for its full record and everything that cites it. A conductor is not an invariant of a curve over a finite field; the endomorphism discriminant (−7 for every Koblitz curve) is the nearest thing recorded." })
+      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. Search by name or identity, filter by family, field, trace, order, subgroup and what has been measured on it. Click a slug for its full record and everything that cites it. This catalog filters the recorded endomorphism discriminant. Volcano conductors require a certified endomorphism order; missing order data is not a conductor assignment." })
     ]);
     var f = el("form", { class: "filters" });
     function input(name, label, type, extra) {
@@ -308,13 +308,19 @@
     ]);
     view.appendChild(facts);
 
+    view.appendChild(el("p", { class: "note" }, [repoLink("docs/curves/standards/coverage.json", "Standards inventory and unresolved records"), "; worldwide historical completeness has not been established."]));
     view.appendChild(el("h2", { text: "Hyperelliptic cover" }));
     var cover = c.hyperelliptic_cover;
+    var linkage = (c.cover_links || [])[0];
     if (cover) {
       var cert = cover.certificate;
       view.appendChild(el("dl", { class: "facts" }, [
         fact("Existence", cover.exists === true ? "Verified over the declared field" : (cover.status === "invalid_input" ? "Invalid input model" : "Unresolved")),
         fact("Cover direction", "H → E"),
+        fact("Cover identity", linkage ? linkage.cover_id : null, true),
+        fact("Map identity", linkage ? linkage.map_id : null, true),
+        fact("Cover UID", linkage ? linkage.cover_uid : null, true),
+        fact("Map UID", linkage ? linkage.map_uid : null, true),
         fact("Cover genus", cert ? cert.genus : null),
         fact("Map degree", cert ? cert.degree : null),
         fact("Field", cert ? "Same field as E" : "Not established"),
@@ -323,10 +329,10 @@
         fact("Subfield descent / subgroup transfer", "Not tested"),
         fact("DLP advantage", "Not measured")
       ]));
-      view.appendChild(el("p", { class: "note" }, [cert ? "An explicit geometric cover is recorded. Computational advantage requires separate evidence. " : "This result establishes neither existence nor nonexistence. ", repoLink("docs/curves/COVERS.md", "Proof and scope"), "; ", repoLink("docs/curves/covers.json", "replayable catalog findings"), "."]));
+      view.appendChild(el("p", { class: "note" }, [cert ? "An explicit geometric cover is recorded. Computational advantage requires separate evidence. " : "This result establishes neither existence nor nonexistence. ", repoLink("docs/curves/COVERS.md", "Proof and scope"), "; ", repoLink("docs/curves/covers.json", "replayable catalog findings"), "; ", repoLink("docs/curves/cover-links.yaml", "YAML identity graph"), "."]));
       if (cert) {
         var details = el("details", null, [el("summary", { text: "Cover equation and map certificate" })]);
-        details.appendChild(el("p", { text: "Ascending powers of u; H: v² + h(u)v = f(u). Map: x = x(u), y = y_v(u)v + y_0(u). Coefficients use the curve's field representation." }));
+        details.appendChild(el("p", { text: "Ascending powers of u; H: v² + h(u)v = f(u). Map to the short model: x = x(u), y = y_v(u)v + y_0(u); compose with target_model_map when present. Coefficients use the curve's field representation." }));
         details.appendChild(el("pre", { text: JSON.stringify(cert, null, 2) }));
         view.appendChild(details);
       }
@@ -440,12 +446,16 @@
   }
 
   /* ---------- factor bases ---------- */
+  function recordedCurveCell(slug) {
+    if (!slug) return tdText("–");
+    return byId.curve[slug] ? tdLink("#curve/" + slug, slug) : tdText(slug + " (registration pending)");
+  }
   function fbColumns() {
     return [
       { key: "fb_id", label: "Factor base", cell: function (f) { return tdLink("#fb/" + f.fb_id, f.fb_id); } },
       { key: "family", label: "Family" },
       { key: "params", label: "Parameters", cell: function (f) { return tdText(paramsText(f.params), "mono"); } },
-      { key: "curve", label: "Curve", cell: function (f) { return f.curve ? tdLink("#curve/" + f.curve, f.curve) : tdText("–"); } },
+      { key: "curve", label: "Curve", cell: function (f) { return recordedCurveCell(f.curve || f.recorded_curve); } },
       { key: "signed_points", label: "Signed points", numeric: true },
       { key: "abscissae", label: "Abscissae", numeric: true },
       { key: "columns", label: "Columns", numeric: true },
@@ -466,7 +476,7 @@
     view.appendChild(el("h1", { text: f.fb_id }));
     view.appendChild(el("dl", { class: "facts" }, [
       fact("Family", f.family), fact("Parameters", paramsText(f.params), true), fact("Description", f.description),
-      fact("Curve", f.curve ? link("#curve/" + f.curve, f.curve) : null, true),
+      fact("Curve", f.curve ? link("#curve/" + f.curve, f.curve) : (f.recorded_curve ? f.recorded_curve + " (registration pending)" : null), true),
       fact("Signed points", f.signed_points), fact("Abscissae", f.abscissae), fact("Columns", f.columns), fact("Dimension", f.dimension),
       fact("Points SHA-256", f.points_sha256, true), fact("Record SHA-256", f.fb_sha256, true)
     ]));
@@ -603,7 +613,7 @@
       return { slug: slug, r_bits: c ? c.r_bits : null, arms: ref.length, best: best === Infinity ? null : best };
     });
     view.appendChild(table([
-      { key: "slug", label: "Curve", cell: function (r) { return tdLink("#curve/" + r.slug, r.slug); } },
+      { key: "slug", label: "Curve", cell: function (r) { return recordedCurveCell(r.slug); } },
       { key: "r_bits", label: "log₂ r", numeric: true, digits: 2 },
       { key: "arms", label: "Arms measured", numeric: true },
       { key: "best", label: "Lowest mean S", numeric: true, digits: 3 }
@@ -658,7 +668,7 @@
       count.textContent = rows.length + " of " + DATA.yields.length + " runs" + (meanYield === null ? "" : " · mean yield over " + verified.length + " verified: " + (100 * meanYield).toFixed(3) + " %");
       while (holder.firstChild) holder.removeChild(holder.firstChild);
       holder.appendChild(table([
-        { key: "curve", label: "Curve", cell: function (y) { return tdLink("#curve/" + y.curve, y.curve); } },
+        { key: "curve", label: "Curve", cell: function (y) { return recordedCurveCell(y.curve); } },
         { key: "target_index", label: "Target", numeric: true, cell: function (y) { return tdText(y.target_index === null ? "–" : "#" + y.target_index, "n"); } },
         { key: "fb_id", label: "Factor base", cell: function (y) { return y.fb_id ? el("td", null, [link("#fb/" + y.fb_id, y.fb_id, "mono"), " ", chip(y.fb_family || "")]) : tdText("–"); } },
         { key: "fb_columns", label: "Cols", numeric: true },

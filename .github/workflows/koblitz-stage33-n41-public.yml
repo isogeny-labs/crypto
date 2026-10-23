@@ -1,32 +1,21 @@
 name: Koblitz Stage 33 n41 public unknown scalar
 
 on:
-  pull_request:
-    paths:
-      - "src/bin/ic/workflow.rs"
-      - "tests/ic_framework.rs"
-      - "scripts/run_koblitz_stage33_n41_unknown_scalar.py"
-      - "scripts/verify_koblitz_stage33_result.py"
-      - "scripts/compose_koblitz_stage34_gate_audit.py"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-33-n41-public-unknown-params.json"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/STAGE33_N41_PUBLIC_UNKNOWN_SCALAR.md"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/STAGE33_N41_PUBLIC_UNKNOWN_SCALAR_RESULTS.md"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/GATE_STATUS.md"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage33-n41-public-evidence-34653116265.tar.gz"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage33-n41-public-evidence-34653116265.tar.gz.sha256"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-33-n41-public-workflow-34653116265.json"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-33-n41-public-artifacts-34653116265.json"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-33-n41-public-result-20260911/**"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-34-current-gate-audit-20260911/**"
-      - ".github/workflows/koblitz-stage33-n41-public.yml"
+  # Historical stage control. Manual only: shared fixture path
+  # filters used to enqueue dozens of these on one PR and starve
+  # GitHub-hosted runners account-wide.
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   validate-control:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage33-n41-public.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage33-n41-public.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -36,9 +25,10 @@ jobs:
           python3 -m py_compile scripts/run_koblitz_stage33_n41_unknown_scalar.py
           python3 scripts/run_koblitz_stage33_n41_unknown_scalar.py self-test
           cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
           RUSTFLAGS=-Awarnings cargo test --locked --test ic_framework \
             workflow_runs_in_stages_and_resumes_without_redoing_work -- --exact
-          rm Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh --restore
           if test -f research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-33-n41-public-result-20260911/verification.json; then
             python3 scripts/verify_koblitz_stage33_result.py verify \
               > "$RUNNER_TEMP/stage33-retained-verification.json"
@@ -52,7 +42,7 @@ jobs:
 
   replay-retained-result:
     if: ${{ github.event_name == 'pull_request' }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage33-n41-public.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage33-n41-public.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -64,6 +54,7 @@ jobs:
           tar -xzf research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage33-n41-public-evidence-34653116265.tar.gz \
             -C "$RUNNER_TEMP/stage33-archive"
           cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
           RUSTFLAGS=-Awarnings cargo build --release --locked --bin ic
           cp -R "$RUNNER_TEMP/stage33-archive/koblitz-stage33-n41-public-34653116265/stage33-run/workflow" \
             "$RUNNER_TEMP/stage33-replay"
@@ -85,14 +76,14 @@ jobs:
           assert baseline["claim_boundary"] == "public_hash_unknown_scalar"
           assert baseline["ic"]["verified"] == baseline["rho"]["verified"] == 5
           PY
-          rm Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh --restore
           python3 scripts/verify_koblitz_stage33_result.py verify \
             > "$RUNNER_TEMP/stage33-static-verification.json"
 
   n41-public-unknown-scalar:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     needs: validate-control
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage33-n41-public.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage33-n41-public.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4

@@ -5,6 +5,7 @@
 //! ic bench --bits 16 --factor-base prime-abscissa:size=24 \
 //!          --oracle mitm:negation_folded=1 --targets walk
 //! ic bench --sweep sweep.json --out docs/ic/runs/sweep-YYYY-MM-DD.json
+//! ic bench --bits 24 --auto             the stages `ic plan` picks for the curve
 //! ```
 //!
 //! A configuration is a choice at each stage.  The table it prints
@@ -20,15 +21,18 @@ use serde_json::{json, Value};
 use crypto_lib::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
 use crypto_lib::cryptanalysis::ic_boundary::{
     calibrate_binary_instance, calibrate_group, calibrate_row_ops, calibrate_word_xor,
-    generic_floor_ops, koblitz_instance, random_binary_instance, rho_reference,
-    rho_reference_negation, roster_prime_instance, signed_frobenius_rho, BinaryGroup,
-    BinaryInstance, Calibration, CountedGroup, GroupOps, PinOutcome, PrimeInstance, RhoResult,
+    generic_floor_ops, koblitz_floor_instance, koblitz_instance, random_binary_instance,
+    rho_reference, rho_reference_negation, roster_prime_instance, signed_frobenius_rho,
+    BinaryGroup, BinaryInstance, Calibration, CountedGroup, GroupOps, PinOutcome, PrimeInstance,
+    RhoResult,
 };
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
+use crypto_lib::cryptanalysis::ic_framework::planner::{self, CurveProfile, PlanOptions};
 use crypto_lib::cryptanalysis::ic_framework::plugins::{
-    BinarySubspaceBase, DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase,
-    KoblitzOrbitBase, KoblitzSymmetrisedBase, KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase,
-    SubtractOracle, SymmetrisedOracle,
+    BinarySubspaceBase, CompactOrbitScanBase, DescentAlgebraicOracle, FrobeniusMitmOracle,
+    GlvOrbitBase, KoblitzClosureBase, KoblitzOrbitBase, KoblitzSymmetrisedBase,
+    KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase, PrimeBatchMitmOracle,
+    RootfindSubtractOracle, SubtractOracle, SymmetrisedOracle,
 };
 use crypto_lib::cryptanalysis::ic_framework::solvers::{
     solver_by_name, solver_registry, validate_solver_params,
@@ -46,6 +50,17 @@ pub struct BenchArgs {
     /// each plug-in reads, and exit.
     #[arg(long)]
     pub list: bool,
+    /// Let the planner (`ic plan`) choose every stage this command line
+    /// leaves at its default: factor base and size, oracle, relation
+    /// matrix and target source, from the measured evidence for this
+    /// curve.  A stage given explicitly (a non-default `--targets` or
+    /// `--linalg`, any `--factor-base` or `--oracle`) wins.  Not with
+    /// `--sweep`.
+    #[arg(long)]
+    pub auto: bool,
+    /// With `--auto`: memory the planned pair table may take, in GiB.
+    #[arg(long, default_value_t = 8.0)]
+    pub max_table_gib: f64,
     /// Prime-field instance of this subgroup bit length.
     #[arg(long)]
     pub bits: Option<u32>,
@@ -67,6 +82,13 @@ pub struct BenchArgs {
     /// `K_0`, so a ladder over both curves at one degree needs this.
     #[arg(long)]
     pub koblitz_a: Option<u8>,
+    /// With `--koblitz-degree` and `--koblitz-a`: run on the curve
+    /// `y² + xy = x³ + a x² + b` of the same isogeny class instead of the
+    /// Koblitz model (`b` a bitmask in the sparse modulus; built by
+    /// `research/ic_leads_20261010/e2_floor_curves_polclass.sage`).  No
+    /// Frobenius endomorphism: the floor-curve control of the lead ladder.
+    #[arg(long)]
+    pub model_b: Option<u64>,
     /// Largest cofactor a random binary curve may have.  The boundary
     /// ladders use 8, so `S = ops / sqrt(r)` is taken over a subgroup
     /// close to the whole group, as on every ledger row; a larger bound
@@ -86,7 +108,8 @@ pub struct BenchArgs {
     /// `random` or `walk`.
     #[arg(long, default_value = "walk")]
     pub targets: String,
-    /// The relation matrix: `incremental-gauss` or `structured-gauss`.
+    /// The relation matrix: `incremental-gauss`, `structured-gauss`,
+    /// `sparse-cado`, … (`ic bench --list` prints them all).
     #[arg(long, default_value = "incremental-gauss")]
     pub linalg: String,
     #[arg(long, default_value_t = 2_000_000)]
@@ -113,6 +136,17 @@ pub struct BenchArgs {
     /// the report.  Binary and Koblitz instances only.
     #[arg(long)]
     pub factor_base_out: Option<std::path::PathBuf>,
+    /// Large primes a `mitm-frobenius:m=3` partial relation may carry:
+    /// 0 (the classic oracle), 1 or 2.  Injected as the oracle's
+    /// `large_primes` parameter into every configuration that does not
+    /// set it; see `ic_framework::large_prime`.
+    #[arg(long)]
+    pub large_primes: Option<u32>,
+    /// Size of the large-prime domain `D` as a multiple of `|F|` in signed
+    /// points; injected as `lp_domain_factor` where the configuration
+    /// does not set it (the oracle's default is 10).
+    #[arg(long)]
+    pub lp_domain_factor: Option<f64>,
 }
 
 /// The factor base a configuration builds, frozen point by point: the
@@ -227,6 +261,13 @@ fn listing() -> Value {
                      "parameters": [
                         {"name": "divisor", "means": "`;`-separated factor indices, e.g. divisor=0;1; must include 0 (x + 1) so that 1 ∈ V; the base is F_u = {P : 1/(x+1) ∈ V}, T = (0,1) included"},
                         {"name": "no_fold", "means": "1 for one column per abscissa"}]},
+                    {"name": "koblitz-closure", "regimes": ["koblitz"],
+                     "parameters": [
+                        {"name": "dimension", "means": "the Frobenius closure of the prefix subspace of this dimension: the ordered tau-slot relation space, one column per signed orbit, subspace basis kept for descent-algebraic:slots=all"}]},
+                    {"name": "compact-orbit-scan", "regimes": ["koblitz"],
+                     "parameters": [
+                        {"name": "columns", "means": "number of distinct signed Frobenius orbits (the orbit-union base, the shape that exists where no invariant subspace does)"},
+                        {"name": "raw_x_cap", "means": "inclusive maximum raw abscissa scanned; exhaustion is an error"}]},
                 ],
             },
             {
@@ -249,7 +290,10 @@ fn listing() -> Value {
                      "parameters": [{"name": "negation_folded", "means": "1 to halve the table's additions"},
                                     {"name": "m", "means": "summands, 2 or 3"}]},
                     {"name": "mitm-frobenius", "summands": "2 or 3", "regimes": ["koblitz"],
-                     "parameters": [{"name": "m", "means": "summands, 2 or 3"}]},
+                     "parameters": [{"name": "m", "means": "summands, 2 or 3"},
+                                    {"name": "large_primes", "means": "0, 1 or 2 residuals outside the base a partial relation may carry (m=3 only); --large-primes sets it for every configuration"},
+                                    {"name": "lp_domain_factor", "means": "the large-prime domain as a multiple of |F| in signed points (default 10); --lp-domain-factor sets it"},
+                                    {"name": "lp_raw_x_cap", "means": "raw-abscissa cap of the scan that materialises the domain"}]},
                     {"name": "descent-algebraic", "summands": "2 or 3", "regimes": ["char2", "koblitz"],
                      "parameters": [{"name": "m", "means": "summands, 2 (descends S3) or 3 (descends S4)"}],
                      "needs": "a subspace factor base (binary-subspace or koblitz-orbit) and --solver"},
@@ -531,12 +575,19 @@ fn run_prime(
         let m = spec.oracle_params.u64_or("m", 2)? as u32;
         let mut subtract = SubtractOracle;
         let mut mitm = MitmOracle::new(m);
+        let mut batch = PrimeBatchMitmOracle::new();
+        let mut blocked = PrimeBatchMitmOracle::blocked();
+        let mut rootfind = RootfindSubtractOracle::new(m, inst);
         let oracle: &mut dyn DecompositionOracle<_> = match or_name {
             "subtract" => &mut subtract,
             "mitm" => &mut mitm,
+            "mitm-prime-batch" => &mut batch,
+            "mitm-prime-blocked" => &mut blocked,
+            "rootfind-subtract" => &mut rootfind,
             other => {
                 return Err(format!(
-                    "oracle `{other}` is not available on a prime-field curve; try subtract or mitm"
+                    "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
+                     mitm-prime-batch, mitm-prime-blocked or rootfind-subtract"
                 ))
             }
         };
@@ -563,14 +614,18 @@ fn run_binary(
     let orbit = KoblitzOrbitBase { instance: inst };
     let trace_zero = KoblitzTraceZeroBase { instance: inst };
     let symmetrised_base = KoblitzSymmetrisedBase { instance: inst };
+    let compact_orbit = CompactOrbitScanBase { instance: inst };
+    let closure = KoblitzClosureBase { instance: inst };
     let base: &dyn FactorBaseBuilder<BinaryGroup> = match fb_name {
+        "koblitz-closure" => &closure,
         "binary-subspace" => &subspace,
         "koblitz-orbit" => &orbit,
         "koblitz-trace-zero" => &trace_zero,
         "koblitz-symmetrised" => &symmetrised_base,
+        "compact-orbit-scan" => &compact_orbit,
         other => {
             return Err(format!(
-                "factor base `{other}` is not available on a binary curve; try binary-subspace, koblitz-orbit, koblitz-trace-zero or koblitz-symmetrised"
+                "factor base `{other}` is not available on a binary curve; try binary-subspace, koblitz-orbit, koblitz-trace-zero, koblitz-symmetrised or compact-orbit-scan"
             ))
         }
     };
@@ -610,6 +665,7 @@ fn run_binary(
         let mut subtract = SubtractOracle;
         let mut mitm = MitmOracle::new(m);
         let mut frob = FrobeniusMitmOracle::new(m, inst);
+        let mut frob_counted = FrobeniusMitmOracle::new_counted(m, inst);
         let mut symmetrised = match or_name {
             "symmetrised" => Some(SymmetrisedOracle::new(m, inst)),
             _ => None,
@@ -636,6 +692,7 @@ fn run_binary(
             "subtract" => &mut subtract,
             "mitm" => &mut mitm,
             "mitm-frobenius" => &mut frob,
+            "mitm-frobenius-counted" => &mut frob_counted,
             "descent-algebraic" => algebraic.as_mut().expect("built above"),
             "symmetrised" => symmetrised.as_mut().expect("built above"),
             other => return Err(format!("oracle `{other}` is not available here")),
@@ -737,7 +794,21 @@ fn spec_from(
         .cloned()
         .unwrap_or_else(|| defaults.targets.clone());
     let (fb_name, fb_params) = parse_plugin(&fb)?;
-    let (or_name, or_params) = parse_plugin(&or)?;
+    let (or_name, mut or_params) = parse_plugin(&or)?;
+    // The large-prime flags are defaults for the Frobenius table oracle;
+    // a configuration that names them itself wins.
+    if or_name == "mitm-frobenius" {
+        if let Some(lp) = defaults.large_primes {
+            if or_params.get("large_primes").is_none() {
+                or_params.set("large_primes", lp.to_string());
+            }
+        }
+        if let Some(c) = defaults.lp_domain_factor {
+            if or_params.get("lp_domain_factor").is_none() {
+                or_params.set("lp_domain_factor", c.to_string());
+            }
+        }
+    }
     Ok(PipelineSpec {
         factor_base: fb_name,
         factor_base_params: fb_params,
@@ -756,6 +827,43 @@ fn spec_from(
         max_trials: defaults.max_trials,
         seed: defaults.seed,
         solver_budget_seconds: defaults.solver_budget_seconds,
+    })
+}
+
+/// The instance `--bits`, `--char2-degree` or `--koblitz-degree` names.
+fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instance, String> {
+    Ok(match regime {
+        "prime" => Instance::Prime(match CmFamily::parse(&args.family)? {
+            CmFamily::Generic => roster_prime_instance(degree)
+                .ok_or_else(|| format!("no prime instance at {degree} bits"))?,
+            family => generate_cm_instance(family, degree, args.seed, args.max_cofactor)?,
+        }),
+        "char2" => Instance::Binary(
+            random_binary_instance(degree, args.seed, args.max_cofactor).ok_or_else(|| {
+                format!(
+                    "no random binary instance at degree {degree} with cofactor at most {}",
+                    args.max_cofactor
+                )
+            })?,
+        ),
+        "koblitz" => Instance::Binary(match (args.koblitz_a, args.model_b) {
+            (Some(a), Some(b)) => koblitz_floor_instance(a, degree, b).ok_or_else(|| {
+                format!(
+                    "no curve y^2 + xy = x^3 + {a}x^2 + b with b = {b:#x} of the K_{a} class at degree {degree} (b is a bitmask in the sparse modulus)"
+                )
+            })?,
+            (None, Some(_)) => return Err("--model-b needs --koblitz-a".into()),
+            (Some(a), None) => koblitz_instance(a, degree)
+                .ok_or_else(|| format!("no Koblitz instance K_{a} at degree {degree}"))?,
+            (None, None) => koblitz_instance(1, degree)
+                .or_else(|| koblitz_instance(0, degree))
+                .ok_or_else(|| format!("no Koblitz instance at degree {degree}"))?,
+        }),
+        other => {
+            return Err(format!(
+                "unknown regime `{other}`; try prime, char2 or koblitz"
+            ))
+        }
     })
 }
 
@@ -837,6 +945,72 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         }
     };
 
+    // `--auto`: the instance first, then the planner's stages for it.
+    let mut early_instance = None;
+    let mut plan_report = Value::Null;
+    let (configs, args) = if args.auto {
+        if args.sweep.is_some() {
+            return Err(
+                "--auto plans one configuration for one curve; it does not combine with --sweep"
+                    .into(),
+            );
+        }
+        let (regime, degree) = &instance_spec;
+        let inst = build_instance(regime, *degree, &args)?;
+        let profile = match &inst {
+            Instance::Prime(i) => CurveProfile::of_prime(i),
+            Instance::Binary(i) => CurveProfile::of_binary(i),
+        };
+        let plan = planner::plan(
+            &profile,
+            &PlanOptions {
+                max_table_bytes: args.max_table_gib * (1u64 << 30) as f64,
+                ..PlanOptions::default()
+            },
+        );
+        let mut a = args.clone();
+        let chosen = |stage: &str| plan.get(stage).map(str::to_string);
+        if a.factor_base.is_none() {
+            a.factor_base = chosen("factor_base");
+        }
+        if a.oracle.is_none() {
+            a.oracle = chosen("oracle");
+        }
+        if a.targets == "walk" {
+            a.targets = chosen("targets").unwrap_or(a.targets);
+        }
+        if a.linalg == "incremental-gauss" {
+            a.linalg = chosen("linalg").unwrap_or(a.linalg);
+        }
+        if !json_only {
+            eprintln!("  plan ({}): {}", planner::PLANNER_VERSION, plan.verdict);
+            for c in &plan.choices {
+                eprintln!(
+                    "    {:<12} {}  [{} · {:?}]",
+                    c.stage, c.value, c.rule, c.support
+                );
+            }
+            for w in &plan.warnings {
+                eprintln!("    warning: {w}");
+            }
+        }
+        if a.factor_base.is_none() || a.oracle.is_none() {
+            return Err(format!(
+                "no index-calculus recipe for this curve: {}",
+                plan.verdict
+            ));
+        }
+        let mut one = std::collections::BTreeMap::new();
+        one.insert("factor_base".to_string(), a.factor_base.clone().unwrap());
+        one.insert("oracle".to_string(), a.oracle.clone().unwrap());
+        one.insert("targets".to_string(), a.targets.clone());
+        plan_report = serde_json::to_value(&plan).unwrap_or(Value::Null);
+        early_instance = Some(inst);
+        (vec![one], a)
+    } else {
+        (configs, args)
+    };
+
     // A sweep may override the CLI default solver per configuration.
     // Reject malformed SAT encoding before calibrations, rho or a target.
     for cfg in &configs {
@@ -847,33 +1021,18 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         }
     }
 
+    // Parse every configuration's plug-in specs now too: a malformed one
+    // (a `,` list, a missing `=`) fails before the instance, calibration
+    // or rho reference rather than after them.
+    let specs = configs
+        .iter()
+        .map(|cfg| spec_from(cfg, &args))
+        .collect::<Result<Vec<_>, _>>()?;
+
     let (regime, degree) = instance_spec;
-    let instance = match regime.as_str() {
-        "prime" => Instance::Prime(match CmFamily::parse(&args.family)? {
-            CmFamily::Generic => roster_prime_instance(degree)
-                .ok_or_else(|| format!("no prime instance at {degree} bits"))?,
-            family => generate_cm_instance(family, degree, args.seed, args.max_cofactor)?,
-        }),
-        "char2" => Instance::Binary(
-            random_binary_instance(degree, args.seed, args.max_cofactor).ok_or_else(|| {
-                format!(
-                    "no random binary instance at degree {degree} with cofactor at most {}",
-                    args.max_cofactor
-                )
-            })?,
-        ),
-        "koblitz" => Instance::Binary(match args.koblitz_a {
-            Some(a) => koblitz_instance(a, degree)
-                .ok_or_else(|| format!("no Koblitz instance K_{a} at degree {degree}"))?,
-            None => koblitz_instance(1, degree)
-                .or_else(|| koblitz_instance(0, degree))
-                .ok_or_else(|| format!("no Koblitz instance at degree {degree}"))?,
-        }),
-        other => {
-            return Err(format!(
-                "unknown regime `{other}`; try prime, char2 or koblitz"
-            ))
-        }
+    let instance = match early_instance {
+        Some(i) => i,
+        None => build_instance(&regime, degree, &args)?,
     };
 
     let (calib, pins) = match &instance {
@@ -918,8 +1077,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
     let mut rows: Vec<RunReport> = Vec::new();
     let mut failures: Vec<Value> = Vec::new();
     let mut frozen: Vec<Value> = Vec::new();
-    for cfg in &configs {
-        let spec = spec_from(cfg, &args)?;
+    for spec in &specs {
         if !json_only {
             eprintln!("  {} …", spec.label());
         }
@@ -928,8 +1086,8 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         // combinations that do not exist, and the useful output is the
         // ones that do plus a note on the ones that do not.
         let outcome = match &instance {
-            Instance::Prime(i) => run_prime(i, &spec, &args, &calib, rho_s),
-            Instance::Binary(i) => run_binary(i, &spec, &args, &calib, rho_s, &mut frozen),
+            Instance::Prime(i) => run_prime(i, spec, &args, &calib, rho_s),
+            Instance::Binary(i) => run_binary(i, spec, &args, &calib, rho_s, &mut frozen),
         };
         match outcome {
             Ok(mut got) => rows.append(&mut got),
@@ -988,5 +1146,99 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         "elapsed_seconds": started.elapsed().as_secs_f64(),
         "markdown": markdown,
         "rows": rows,
+        "plan": plan_report,
     }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use clap::Parser;
+
+    #[derive(Parser)]
+    struct Cli {
+        #[command(flatten)]
+        bench: BenchArgs,
+    }
+
+    fn bench_args(flags: &[&str]) -> BenchArgs {
+        Cli::parse_from(std::iter::once("ic-bench").chain(flags.iter().copied())).bench
+    }
+
+    /// `--model-b` without `--koblitz-a` is refused when the instance is
+    /// chosen, before anything is built: a stand-in for "the long part of
+    /// the run starts here".
+    const INSTANCE_STAGE: [&str; 4] = ["--koblitz-degree", "17", "--model-b", "1"];
+
+    /// The control: with every spec well formed, the run reaches the
+    /// instance stage and stops there, so the test below is telling the
+    /// two stages apart.
+    #[test]
+    fn a_well_formed_spec_reaches_the_instance_stage() {
+        let mut flags = INSTANCE_STAGE.to_vec();
+        flags.extend(["--factor-base", "koblitz-orbit:divisor=1;2"]);
+        flags.extend(["--oracle", "mitm-frobenius:m=2"]);
+        let err = run(bench_args(&flags), true).unwrap_err();
+        assert_eq!(err, "--model-b needs --koblitz-a");
+    }
+
+    /// A comma list in a plug-in spec is refused before the instance, the
+    /// calibration or the rho reference, so a typo costs nothing.
+    #[test]
+    fn a_malformed_spec_fails_before_the_instance_stage() {
+        let mut flags = INSTANCE_STAGE.to_vec();
+        flags.extend(["--factor-base", "koblitz-orbit:divisor=1,2"]);
+        flags.extend(["--oracle", "mitm-frobenius:m=2"]);
+        let err = run(bench_args(&flags), true).unwrap_err();
+        assert!(err.contains("stray token `2`"), "{err}");
+    }
+
+    /// `--auto` fills every stage from the planner and runs it.
+    #[test]
+    fn auto_runs_the_planned_configuration() {
+        let report = run(
+            bench_args(&["--bits", "14", "--auto", "--repeats", "1"]),
+            true,
+        )
+        .unwrap();
+        assert_eq!(report["plan"]["planner"], planner::PLANNER_VERSION);
+        let row = &report["rows"][0];
+        let label = row["label"].as_str().unwrap_or_default().to_string();
+        assert!(label.contains("mitm-prime-blocked"), "{label}");
+        assert!(label.contains("prime-abscissa"), "{label}");
+        assert_eq!(row["verified"], true);
+    }
+
+    /// A stage named on the command line wins over the plan.
+    #[test]
+    fn auto_keeps_an_explicit_stage() {
+        let flags = [
+            "--bits",
+            "14",
+            "--auto",
+            "--repeats",
+            "1",
+            "--oracle",
+            "mitm:m=2,negation_folded=1",
+        ];
+        let report = run(bench_args(&flags), true).unwrap();
+        let label = report["rows"][0]["label"]
+            .as_str()
+            .unwrap_or_default()
+            .to_string();
+        assert!(
+            label.contains("mitm[") && !label.contains("blocked"),
+            "{label}"
+        );
+    }
+
+    #[test]
+    fn auto_refuses_a_sweep() {
+        let err = run(
+            bench_args(&["--auto", "--sweep", "/nonexistent.json"]),
+            true,
+        )
+        .unwrap_err();
+        assert!(err.contains("sweep"), "{err}");
+    }
 }

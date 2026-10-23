@@ -11,9 +11,15 @@ on:
 permissions:
   contents: read
 
+# A newer push to the same pull request cancels this workflow's run for the older commit.
+# Every other event (push, schedule, dispatch, merge queue) gets a group of its own and is never cancelled.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   rank-control:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|compact-orbit-rank-evidence.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|compact-orbit-rank-evidence.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -23,17 +29,27 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Check frozen source, input, and syntax
+      - name: Prepare immutable hosted-control source
+        run: |
+          # FROZEN.json describes the historical control, not the current PR.
+          git fetch origin 36592609af4367d589b320711552a2980371f159
+          git worktree add --detach "$RUNNER_TEMP/compact-orbit-rank-source" \
+            36592609af4367d589b320711552a2980371f159
+      - name: Check archived evidence and verifier syntax
         run: |
           python3 -m py_compile research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/{ci_replay,run_control,verify_rank,verify_archive,test_verify_rank}.py
-          python3 research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/ci_replay.py
           python3 research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/verify_archive.py
           python3 -m unittest discover -s research/notes/ecc2k130/compact_orbit_rank_evidence_20260929 -p 'test_verify_rank.py' -v
+      - name: Check frozen source and input
+        working-directory: ${{ runner.temp }}/compact-orbit-rank-source
+        run: python3 research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/ci_replay.py
       - name: Build exact compact producer
+        working-directory: ${{ runner.temp }}/compact-orbit-rank-source
         run: |
           cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock
           cargo build --release --locked --example koblitz_orbit_dlp_fast
       - name: Replay every n13 rank attempt and recovered scalar
+        working-directory: ${{ runner.temp }}/compact-orbit-rank-source
         run: |
           python3 research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/run_control.py \
             --binary target/release/examples/koblitz_orbit_dlp_fast \

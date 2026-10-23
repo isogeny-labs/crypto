@@ -1555,6 +1555,17 @@ pub fn run_walk2(
     }
 }
 
+/// Necessary trace condition for a Joux–Vitse weak curve over `F_(p^6)`.
+/// Its 2-isogenous Legendre neighbor has full rational 4-torsion, hence
+/// its trace is `±(p^6 + 1) (mod 16)` (ISO-1). Passing this filter does
+/// not imply that the isogeny class contains a weak curve.
+pub fn trace_may_hold_weak_curve(p: u64, trace: i128) -> bool {
+    let q_mod_16 = ((p % 16).pow(6) % 16) as i128;
+    let weak_residue = (q_mod_16 + 1) % 16;
+    let t = trace.rem_euclid(16);
+    t == weak_residue || t == (-weak_residue).rem_euclid(16)
+}
+
 /// §18.1 steps 1–2: a breadth-first walk to a weak curve from `start`, with
 /// each discovered curve's producing step recorded, so the path from `start`
 /// to the weak curve can be replayed on points.  Degrees whose Kronecker
@@ -1571,6 +1582,11 @@ pub fn walk_to_weak_record(
     rng: &mut StdRng,
 ) -> Option<(Curve2, Vec<Step>)> {
     let f = &ctx.f;
+    // The public trace identifies a class that cannot contain a weak curve.
+    // Reject it before any field arithmetic or graph enumeration.
+    if !trace_may_hold_weak_curve(f.f.p, trace) {
+        return None;
+    }
     let p3 = (f.f.p as i128).pow(6);
     let disc = trace * trace - 4 * p3;
     let degrees: Vec<u64> = jumps
@@ -1987,11 +2003,10 @@ pub fn trace_census(p: u64, seed: u64, n: u64) -> TraceCensus {
 /// weak curve is `y² = x(x − α)(x − σα)` with `α ∈ F_{q³} ∖ F_q` taken up
 /// to `F_q^{×2}`: the representatives have the first non-zero of
 /// `(α₁, α₂)` in `{1, w}`, `w` the non-residue of `F_q`, `2q² + 2q` of
-/// them.  Each gets its trace by [`curve_order`]; the set of traces is the
-/// set of isogeny classes that hold a weak curve.  Then `n` random
-/// full-2-torsion curves are drawn and the fraction whose trace is in that
-/// set is the exact chance that a random such curve's class holds a weak
-/// curve at this `p`.
+/// them.  Each gets a probabilistic trace assignment by [`curve_order`];
+/// the observed trace set labels the isogeny classes that hold a weak curve.
+/// Then `n` random full-2-torsion curves are drawn.  Their fraction in that
+/// set estimates, with sampling uncertainty, the chance for a random curve.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct ExactCensus {
     pub p: u64,
@@ -2050,9 +2065,7 @@ fn uniform_curve_order(f: &Fq3, rng: &mut StdRng) -> Option<u128> {
         }
         let cubic: P6 = vec![b, a, E6::ZERO, E6::ONE];
         let roots = roots_q3(f, &cubic, rng);
-        let Some(r) = roots.first().copied() else {
-            return None;
-        };
+        let r = roots.first().copied()?;
         // x = X + r:  y² = X³ + 3r X² + (3r² + a) X
         let a2 = f.mul(&c(3), &r);
         let a4 = f.add(&f.mul(&c(3), &f.sq(&r)), &a);
@@ -2071,8 +2084,10 @@ pub fn exact_census_full(p: u64, seed: u64, n: u64, n_uniform: u64) -> ExactCens
     let f = Fq3::new(p);
     let q = p * p;
     let q3 = (p as i128).pow(6);
-    let w = E2([f.f.w % p, 0]);
     let e2 = |k: u64| E2([k % p, k / p]);
+    // f.f.w is a nonsquare in F_p, hence a square in F_{p²}.  The two
+    // normal forms require representatives of both F_{p²} square classes.
+    let w = (1..q).map(e2).find(|x| !f.f.is_square(x)).unwrap();
     // Enumerate every weak representative in parallel over a0, each task with
     // its own field context (Fq3 holds a non-Sync counter).  `a1 ∈ {1, w}`
     // covers the generic representatives; `a1 = 0` with `a2 ∈ {1, w}` the
@@ -2393,6 +2408,46 @@ pub fn summarize_walk2(reports: &[Walk2Report]) -> String {
 mod tests {
     use super::*;
     use crate::cryptanalysis::jv_cover::generate_spec;
+
+    #[test]
+    fn iso1_trace_filter_preserves_weak_instances_and_rejects_before_walking() {
+        for p in [7_u64, 11, 13, 17] {
+            let spec = generate_spec(p, 1);
+            let trace = (p as i128).pow(6) + 1 - 4 * spec.l as i128;
+            assert!(trace_may_hold_weak_curve(p, trace), "p={p}");
+        }
+
+        let p = 11_u64;
+        let ctx = WalkCtx::new(p);
+        let mut rng = StdRng::seed_from_u64(0x1501);
+        let (curve, trace) = (0..40)
+            .find_map(|_| {
+                let curve = random_curve(&ctx.f, &mut rng);
+                let order = curve_order(&ctx.f, &curve, &mut rng);
+                let trace = (p as i128).pow(6) + 1 - order as i128;
+                (!trace_may_hold_weak_curve(p, trace)).then_some((curve, trace))
+            })
+            .expect("a depth-1 trace among deterministic random curves");
+        ctx.f.reset_muls();
+        assert!(walk_to_weak_record(&ctx, curve, &[3, 5, 7], 100, trace, &mut rng).is_none());
+        assert_eq!(ctx.f.muls(), 0, "trace refusal must precede field work");
+    }
+
+    #[test]
+    fn fp_nonsquare_is_not_an_fp2_square_class_representative() {
+        for p in [7_u64, 11, 13, 17, 37] {
+            let f = Fq3::new(p);
+            let old = E2([f.f.w, 0]);
+            assert!(
+                f.f.is_square(&old),
+                "p={p}: F_p element must square in F_p2"
+            );
+            let q = p * p;
+            let e2 = |k: u64| E2([k % p, k / p]);
+            let w = (1..q).map(e2).find(|x| !f.f.is_square(x)).unwrap();
+            assert!(!f.f.is_square(&w), "p={p}: missing second square class");
+        }
+    }
 
     #[test]
     fn the_constructed_weak_curves_pass_the_test_and_random_ones_mostly_fail() {
@@ -2758,6 +2813,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "long end-to-end sieve; run in jv-isogeny-walk CI"]
     fn end_to_end_from_a_non_weak_curve_recovers_and_verifies() {
         // A whole-method run (§18.1) at a tiny size: the challenge curve is
         // not weak, the walk reaches a weak curve, the route solves, and the

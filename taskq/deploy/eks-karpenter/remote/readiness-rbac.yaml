@@ -1,0 +1,51 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: isolab-readiness
+rules:
+  - apiGroups: [karpenter.sh]
+    resources: [nodepools]
+    resourceNames: [cpu-spot]
+    verbs: [get]
+  - apiGroups: [karpenter.k8s.aws]
+    resources: [ec2nodeclasses]
+    resourceNames: [cpu]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: isolab-readiness
+subjects:
+  - kind: Group
+    name: isolab:submitters
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: isolab-readiness
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: isolab-controller-readiness
+  namespace: kube-system
+rules:
+  - apiGroups: [apps]
+    resources: [deployments]
+    resourceNames: [karpenter]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: isolab-controller-readiness
+  namespace: kube-system
+subjects:
+  - kind: Group
+    name: isolab:submitters
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: isolab-controller-readiness
+  apiGroup: rbac.authorization.k8s.io

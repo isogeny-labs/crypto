@@ -1,9 +1,9 @@
 # Automatic hyperelliptic cover checks
 
 `curve_cover_check` constructs and replays explicit covers **H -> E** for
-the elliptic models in the ICV1 catalog: short Weierstrass models over
-`GF(p)` and over extensions `GF(p^k)` with `p > 3`, and ordinary binary
-models. Findings are in
+the supported elliptic model forms in the ICV1 catalog: short Weierstrass
+models over `GF(p)` and over extensions `GF(p^k)` with `p > 3`, and ordinary
+binary models. Findings are in
 [`covers.json`](covers.json), joined to [`registry.json`](registry.json)
 by slug **and the full SHA-256 of the exact model JSON**. The registry's
 model and EC1 identities stay unchanged. The lab browser shows the finding
@@ -126,12 +126,24 @@ subfield would prevent an ordinary same-field hyperelliptic cover.
 
 ## Interpretation and scope
 
-These elementary same-field constructions establish existence. They
-perform **no Weil descent to a smaller field**, no subgroup-map computation,
-and no relation-solving or discrete-log benchmark. Those fields remain
-`not_tested`/null. Existence carries no speedup or vulnerability label.
-The elliptic factor already accounts for part of the cover's Jacobian;
-its existence alone does not establish cheaper computation there.
+These elementary same-field constructions establish existence. This geometry
+checker performs **no Weil descent to a smaller field**, no subgroup-map
+computation, and no relation-solving or discrete-log benchmark. Those fields
+remain `not_tested`/null. Existence carries no speedup or vulnerability label.
+The elliptic factor already accounts for part of the cover's Jacobian; its
+existence alone does not establish cheaper computation there.
+
+The separate generated
+[`cover-transfer-assessments.json`](cover-transfer-assessments.json) v2 ledger
+classifies transfer obligations for all 2,100 map rows (2,098 distinct cover
+models) and 664 linked EC1 representations. The population comprises 160
+binary maps and 1,940 odd-characteristic maps: 586 direct prime-field, 30
+normalized-target prime-field, and 1,324 extension-field maps. The EC1 links
+comprise 134 binary and 530 odd-characteristic representations. That
+classification does not alter this geometry catalog: it records bounded binary
+typed-transfer support,
+refutes capabilities absent from the current implementation, and leaves the
+odd-characteristic balanced-Jacobian maps and every solver-cost claim open.
 
 The Rust tests enumerate all affine cover points on every nonsingular
 short Weierstrass model over F5, F7, F11 and F25 (`t^2 + 2`), on four
@@ -155,3 +167,34 @@ and function-field degree arguments above establish the geometric claims.
 - Xavier Xarles, *Hyperelliptic curves covering an elliptic curve twice*,
   [arXiv:1303.4220](https://arxiv.org/abs/1303.4220), Corollary 3.
   This broader two-map theorem is context, not the verifier's algorithm.
+
+## Montgomery and Edwards targets
+
+For `B*y^2=x^3+A*x^2+x` in characteristic greater than three, require
+`B*(A^2-4) != 0`. Put `s=A/3`, and use the short equation with
+`a=(1-A^2/3)/B^2`, `b=(2*s^3-s)/B^3`. The map from short coordinates is
+`x=B*X-s`, `y=B*Y`; its inverse is `X=(x+s)/B`, `Y=y/B`.
+The checker verifies the coefficient identities explicitly.
+
+For `a*x^2+y^2=1+d*x^2*y^2`, require `a*d*(a-d) != 0` and set
+`A=2*(a+d)/(a-d)`, `B=4/(a-d)`. Montgomery coordinates `(u,w)` map to
+`x=u/w`, `y=(u-1)/(u+1)`, with inverse `u=(1+y)/(1-y)`, `w=u/x`.
+After clearing denominators, the Edwards equation has numerator
+`u^2*(a*(u+1)^2-d*(u-1)^2)-4*u*w^2`, which vanishes by
+`B*w^2=u^3+A*u^2+u` and the definitions of A and B.
+For the scaled Edwards equation, divide x and y by nonzero c first;
+this gives a=1 and the coefficient `d*c^4` in the unit-scale equation.
+
+These are rational inverses, hence birational degree-one maps. They extend
+uniquely to the smooth projective models; exceptional affine denominators do
+not invalidate the cover. Certificates store both maps in `target_model_map`.
+The polynomial cover first targets the short equation and then composes with
+that map. Genus two and degree two are preserved. Small-field tests exhaust
+all nonsingular parameter choices in characteristics 5, 7 and 11 and verify
+the forward equations and inverse identities wherever affine formulas apply.
+
+The [standards importer](standards/README.md) expands the inventory, while
+[`cover-links.yaml`](cover-links.yaml) supplies exact ICV1/EC1/HC1/CV1 links.
+Pass `--links PATH` alongside custom registry/report paths. `--check` replays
+both the report and the graph. An unresolved source import is recorded in
+`standards/coverage.json` and is not evidence of cover nonexistence.

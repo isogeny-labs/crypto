@@ -4,6 +4,7 @@
 #                      (rho suites, then the baby-step giant-step suites)
 #   make bench         CUDA benchmark binary (needs nvcc)
 #   make bench ARCH=sm_100   target Blackwell (default: sm_80;sm_90;sm_100)
+#   make bench CURVE=curve25519   Ed25519's group instead of secp256k1
 #   make clean
 #
 # The CPU tests compile the *same* .cuh headers with g++, so a green
@@ -23,14 +24,27 @@ NVCCFLAGS ?= -O3 -std=c++17 -arch=$(ARCH) -lineinfo
 # default: see OPTIMIZATION_BLACKWELL.md section 2 for what has and has not
 # been verified about them.  MIN_BLOCKS sets __launch_bounds__ min-blocks
 # on the rho kernels (0 = unset).
+# On sm_120 (RTX PRO 6000) both are measured: the device selftest passes
+# with FP_PTX=1 and the rho walk runs 1.88x faster with it at MIN_BLOCKS=2
+# (validation/20261017-modal-rtx-pro-6000), so that is the default there.
+ifeq ($(ARCH),sm_120)
+FP_PTX     ?= 1
+MIN_BLOCKS ?= 2
+endif
 FP_PTX     ?= 0
 MIN_BLOCKS ?= 0
 
-GEN := curve_secp256k1.h curve_toy40.h curve_toy36j0.h \
-       vec_secp256k1_mont.h vec_secp256k1_fast.h vec_toy40_mont.h vec_toy36j0_mont.h
+GEN := curve_secp256k1.h curve_toy40.h curve_toy36j0.h curve_curve25519.h \
+       vec_secp256k1_mont.h vec_secp256k1_fast.h vec_toy40_mont.h vec_toy36j0_mont.h \
+       vec_curve25519_mont.h vec_curve25519_fast.h
 
 TESTS := test_secp_fast test_secp_mont test_toy_mont test_toyj0_mont \
-         test_bsgs_toy test_bsgs_secp_fast test_bsgs_secp_mont
+         test_25519_fast test_25519_mont \
+         test_bsgs_toy test_bsgs_secp_fast test_bsgs_secp_mont test_bsgs_25519_fast
+
+# Curve the CUDA benchmark binary is built for: secp256k1 (default) or
+# curve25519 (Ed25519's group in short-Weierstrass form).
+CURVE ?= secp256k1
 
 .PHONY: all test bench clean gen ptxcheck
 all: test
@@ -48,6 +62,10 @@ vec_toy40_mont.h: ecref.py
 	$(PY) ecref.py vectors --curve toy40 --mode mont > $@
 vec_toy36j0_mont.h: ecref.py
 	$(PY) ecref.py vectors --curve toy36j0 --mode mont > $@
+vec_curve25519_mont.h: ecref.py
+	$(PY) ecref.py vectors --curve curve25519 --mode mont > $@
+vec_curve25519_fast.h: ecref.py
+	$(PY) ecref.py vectors --curve curve25519 --mode fast > $@
 
 HDRS := fp256.cuh point.cuh rho.cuh rho_host.hpp
 BSGS_HDRS := fp256.cuh point.cuh bsgs.cuh bsgs_host.hpp
@@ -77,6 +95,17 @@ test_toyj0_mont: test_cpu.cpp $(HDRS) curve_toy36j0.h vec_toy36j0_mont.h
 	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_toy36j0.h"' \
 	  -DGPU_ECC_VECTORS_HEADER='"vec_toy36j0_mont.h"' -DFP_FAST=0 -DSOLVE_RUNS=8 -o $@ $<
 
+# curve25519 (Ed25519's prime-order group, cofactor 8, a != 0) with the
+# 2^256 = 38 special reduction -- the production path for that curve -- and
+# forced through Montgomery, so the two reductions agree on canonical values
+test_25519_fast: test_cpu.cpp $(HDRS) curve_curve25519.h vec_curve25519_fast.h
+	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_curve25519.h"' \
+	  -DGPU_ECC_VECTORS_HEADER='"vec_curve25519_fast.h"' -DFP_FAST=1 -o $@ $<
+
+test_25519_mont: test_cpu.cpp $(HDRS) curve_curve25519.h vec_curve25519_mont.h
+	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_curve25519.h"' \
+	  -DGPU_ECC_VECTORS_HEADER='"vec_curve25519_mont.h"' -DFP_FAST=0 -o $@ $<
+
 # Baby-step giant-step: the engine is curve-generic, so it is checked on
 # both secp256k1 paths (table build, steppers, a 2^22 interval log) and on
 # the toy curve, where whole-group logs fit a CPU run.
@@ -89,6 +118,9 @@ test_bsgs_secp_fast: test_bsgs.cpp $(BSGS_HDRS) curve_secp256k1.h
 test_bsgs_secp_mont: test_bsgs.cpp $(BSGS_HDRS) curve_secp256k1.h
 	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_secp256k1.h"' -DFP_FAST=0 -o $@ $<
 
+test_bsgs_25519_fast: test_bsgs.cpp $(BSGS_HDRS) curve_curve25519.h
+	$(CXX) $(CXXFLAGS) -DGPU_ECC_CURVE_HEADER='"curve_curve25519.h"' -DFP_FAST=1 -o $@ $<
+
 test: $(TESTS) ptxcheck
 	@rc=0; for t in $(TESTS); do \
 	  echo "=== ./$$t ==="; ./$$t || rc=1; done; exit $$rc
@@ -99,9 +131,9 @@ ptxcheck: fp256.cuh ptx_asm_check.py
 	@echo "=== ptx_asm_check ==="
 	@python3 ptx_asm_check.py
 
-bench: bench.cu $(HDRS) $(BSGS_HDRS) kernels.cuh kernels_bsgs.cuh curve_secp256k1.h
+bench: bench.cu $(HDRS) $(BSGS_HDRS) kernels.cuh kernels_bsgs.cuh curve_$(CURVE).h
 	$(NVCC) $(NVCCFLAGS) -DFP_PTX=$(FP_PTX) -DRHO_MIN_BLOCKS=$(MIN_BLOCKS) \
-	  -DGPU_ECC_CURVE_HEADER='"curve_secp256k1.h"' -o $@ $<
+	  -DGPU_ECC_CURVE_HEADER='"curve_$(CURVE).h"' -o $@ $<
 
 clean:
 	rm -f $(GEN) $(TESTS) bench

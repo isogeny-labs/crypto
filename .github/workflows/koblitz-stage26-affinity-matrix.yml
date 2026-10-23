@@ -1,38 +1,21 @@
 name: Koblitz Stage 26 one-CPU Phase-B matrix
 
 on:
+  # Historical stage control. Manual only: shared fixture path
+  # filters used to enqueue dozens of these on one PR and starve
+  # GitHub-hosted runners account-wide.
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "scripts/koblitz_stage26_affinity_inputs.py"
-      - "scripts/run_koblitz_stage26_affinity_cell.py"
-      - "scripts/test_koblitz_stage26_affinity.py"
-      - "scripts/score_koblitz_stage26_affinity.py"
-      - "scripts/test_koblitz_stage26_score.py"
-      - "scripts/verify_koblitz_stage26_result.py"
-      - "scripts/compose_koblitz_stage26_stage32.py"
-      - "scripts/test_koblitz_stage26_stage32_composition.py"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage26-affinity-inputs-successor-05-20260911.tar.gz"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage26-affinity-inputs-successor-05-20260911.tar.gz.sha256"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage26-terminal-evidence-successor-01-20260911.tar.gz"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage26-terminal-evidence-successor-01-20260911.tar.gz.sha256"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage32-wdsat-capacity-evidence-34649735091.tar.gz"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage32-wdsat-capacity-evidence-34649735091.tar.gz.sha256"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-26-affinity-artifacts-34632018379.json"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-26-affinity-workflow-34632018379.json"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-26-affinity-matrix-result-20260911/**"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-32-wdsat-artifacts-34649735091.json"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-32-wdsat-workflow-34649735091.json"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-26-affinity-matrix-stage32-corrected-result-20260911/**"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/STAGE26_32_PHASE_B_RESULTS.md"
-      - ".github/workflows/koblitz-stage26-affinity-matrix.yml"
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   validate-controls:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage26-affinity-matrix.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage26-affinity-matrix.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +40,7 @@ jobs:
   build-tools:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     needs: validate-controls
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage26-affinity-matrix.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage26-affinity-matrix.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -82,8 +65,9 @@ jobs:
           git -C "$RUNNER_TEMP/wdsat" status --porcelain=v1
           git -C "$RUNNER_TEMP/cms" status --porcelain=v1
           cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
           /usr/bin/time -v -o "$RUNNER_TEMP/acquisition/rust-crates.time" cargo fetch --locked
-          rm Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh --restore
           git diff --exit-code
           test -z "$(git status --porcelain=v1 --untracked-files=all)"
       - name: Build and meter exact tools
@@ -130,7 +114,7 @@ jobs:
           - n31-l5-m3-ggmp-a0-f0
           - n41-l5-m3-standard-a1-f0
           - n59-l9-m3-standard-a1-f0
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage26-affinity-matrix.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage26-affinity-matrix.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4

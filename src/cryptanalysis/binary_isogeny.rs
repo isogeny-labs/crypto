@@ -4,9 +4,14 @@
 //! magic number is too small (typically `m = 1`, useless), we walk the
 //! `l`-isogeny graph until we find an isogenous curve `E'` whose magic
 //! number is `2 ≤ m' ≤ ~6` — small enough that the descended
-//! hyperelliptic curve has tractable genus.  This is the move that
-//! takes c2pnb176w1 from "structurally interesting but uncrackable
-//! direct-GHS" to "crackable via Hess's generalisation."
+//! hyperelliptic curve has tractable genus.  This is the move Hess's
+//! generalisation adds to direct GHS.  Whether a given curve's isogeny
+//! class actually reaches such an `E'` is a separate, hard question, and
+//! no source read for this repository reports it for any X9.62 curve:
+//! Maurer-Menezes-Teske (LMS J. Comput. Math. 5 (2002) 127-174, Section 6,
+//! Remark 26, Table 4) list a *hypothetical* `m' = 5` instance for
+//! c2pnb176w1 (genus 16 over `F_{2^22}`) and judge finding it infeasible.
+//! Neither Menezes-Teske paper discusses c2pnb176w1.
 //!
 //! ## What this module does
 //!
@@ -34,7 +39,7 @@
 //!   for the workarounds we use in the end-to-end demo.
 
 use crate::binary_ecc::{F2mElement, F2mPoly, IrreduciblePoly};
-use crate::cryptanalysis::ec_trapdoor::{magic_number_full, FieldTower};
+use crate::cryptanalysis::ec_trapdoor::{magic_number_full, mmt_condition_8, FieldTower};
 use crate::cryptanalysis::ghs_descent::ECurve;
 use crate::cryptanalysis::modular_polynomial::{phi_2, phi_3, ModularPolynomial};
 use num_bigint::BigInt;
@@ -89,6 +94,16 @@ fn phi_l_coeffs_mod2(phi: &ModularPolynomial) -> HashMap<(u32, u32), u8> {
         }
     }
     out
+}
+
+/// Monomials `(X-degree, Y-degree)` of `Φ_l(X, Y) mod 2` (both halves of the
+/// symmetric table), sorted, for callers that evaluate `Φ_l` in their own
+/// field representation.  `None` when `Φ_l` is not tabled.
+pub fn phi_l_mod2_monomials(l: u32) -> Option<Vec<(u32, u32)>> {
+    let phi = modular_polynomial_lookup(l)?;
+    let mut out: Vec<(u32, u32)> = phi_l_coeffs_mod2(&phi).into_keys().collect();
+    out.sort_unstable();
+    Some(out)
 }
 
 /// Build `Φ_l(X, Y = j) ∈ F_{2^m}[X]` from the integer-coefficient
@@ -338,13 +353,15 @@ impl Default for WalkOptions {
 
 /// BFS the small-`l` isogeny graph from `start`.  At each visited
 /// curve, compute its magic number with respect to the given field
-/// tower; stop and return as soon as we reach `target_magic` or above.
+/// tower; stop and return as soon as we reach `target_magic` or above on a
+/// curve whose GHS cover descends (MMT Lemma 6 condition (8),
+/// [`mmt_condition_8`]).
 ///
 /// We track visited `j`-invariants to avoid cycles.  This is the
 /// "macroscopic" Hess-attack search loop.
 pub fn walk_to_magic(start: &ECurve, tower: &FieldTower, opts: &WalkOptions) -> Option<WalkResult> {
     let start_magic = magic_number_full(tower, &start.a, &start.b);
-    if start_magic >= opts.target_magic {
+    if start_magic >= opts.target_magic && mmt_condition_8(tower, &start.a, &start.b) {
         return Some(WalkResult {
             curve: start.clone(),
             magic: start_magic,
@@ -372,7 +389,7 @@ pub fn walk_to_magic(start: &ECurve, tower: &FieldTower, opts: &WalkOptions) -> 
                 let nb_magic = magic_number_full(tower, &nb.a, &nb.b);
                 let mut path2 = path.clone();
                 path2.push(nb_j.clone());
-                if nb_magic >= opts.target_magic {
+                if nb_magic >= opts.target_magic && mmt_condition_8(tower, &nb.a, &nb.b) {
                     return Some(WalkResult {
                         curve: nb,
                         magic: nb_magic,

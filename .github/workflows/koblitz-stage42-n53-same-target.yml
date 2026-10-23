@@ -1,29 +1,21 @@
 name: Koblitz Stage 42 n53 same target
 
 on:
-  pull_request:
-    paths:
-      - "examples/koblitz_rank_fixture.rs"
-      - "examples/koblitz_rho_fixture.rs"
-      - "scripts/run_koblitz_stage42_n53_same_target.py"
-      - "scripts/verify_koblitz_stage42_result.py"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage41-n53-tuning-evidence-20260912.tar.gz"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage41-n53-tuning-evidence-20260912.tar.gz.sha256"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage42-n53-same-target-evidence-34705118094.tar.gz"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/koblitz-stage42-n53-same-target-evidence-34705118094.tar.gz.sha256"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-42-workflow-34705118094.json"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-42-artifacts-34705118094.json"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-42-n53-same-target-result-20260912/**"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/STAGE41_42_N53_SAME_TARGET.md"
-      - ".github/workflows/koblitz-stage42-n53-same-target.yml"
+  # Historical stage control. Manual only: shared fixture path
+  # filters used to enqueue dozens of these on one PR and starve
+  # GitHub-hosted runners account-wide.
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   validate-control:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage42-n53-same-target.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage42-n53-same-target.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -64,7 +56,7 @@ jobs:
   n53-same-target:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     needs: validate-control
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage42-n53-same-target.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage42-n53-same-target.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4

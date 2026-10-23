@@ -12,6 +12,10 @@ the existing tournament, independent certificate checker, portfolio selector,
 portable development driver, and frozen historical evidence. Extend these;
 do not create a parallel scoreboard or redefine historical protocols.
 
+Every autolab or tournament round leaves a run report, graph and PDF beside
+its records, and every PR that lands its result carries the result's graphs
+and PDF (`research-visuals`, "Every experiment run" and "Every result PR").
+
 ## Begin or resume
 
 **The current `AGENTS.md` requires native research execution and verification.**
@@ -470,6 +474,15 @@ phases from different runs. Include some initially slower mechanisms: interactio
 can reverse their ranking. This mitigates local search traps; it does not prove
 a global optimum. Track trials across rounds to avoid rediscovering the same
 configuration and count a new family/size/resource regime as a separate panel.
+
+### Under Claude Code
+
+A round whose protocol is frozen (panel, seeds, budget, evaluator) may run
+as a command card: `experiment-director` compiles the native commands into a
+card, the main session relays it verbatim to `executor-mechanical`, and
+`experiment-director` assesses the returned text against the round's
+outputs on disk (AGENTS.md "Model tiers"). Selection, confirmation,
+accounting classification and the scoreboard stay with the reasoning tier.
 
 ## Confirm, report, continue
 

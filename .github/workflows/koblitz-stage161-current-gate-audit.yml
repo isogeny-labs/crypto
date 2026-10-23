@@ -1,18 +1,9 @@
 name: Koblitz Stage 161 historical gate audit
 
 on:
-  pull_request:
-    paths:
-      - "docs/index-calculus-scoreboard.html"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/GATE_STATUS.md"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-160-current-gate-audit-20260923/**"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-161-fast-mask-hash-20260923/**"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-161-fast-hash-verification.json"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-161-current-gate-audit-20260923/**"
-      - "scripts/compose_koblitz_stage160_gate_audit.py"
-      - "scripts/compose_koblitz_stage161_gate_audit.py"
-      - "scripts/verify_koblitz_stage161_fast_hash.py"
-      - ".github/workflows/koblitz-stage161-current-gate-audit.yml"
+  # Historical stage control. Manual only: shared fixture path
+  # filters used to enqueue dozens of these on one PR and starve
+  # GitHub-hosted runners account-wide.
   workflow_dispatch:
 
 permissions:
@@ -26,7 +17,7 @@ concurrency:
 
 jobs:
   verify-current-audit:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage161-current-gate-audit.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage161-current-gate-audit.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4

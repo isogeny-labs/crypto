@@ -23,7 +23,7 @@
 //! roots and measures the empirical success threshold.
 //!
 //! ```bash
-//! cargo run --release --example prime_ecdlp_breakthrough_probe -- [--probe a|b|ab]
+//! cargo run --release --example prime_ecdlp_breakthrough_probe -- [--probe a|b|c|abc]
 //!     [--rho-bits 32,36,40,44] [--lattice-bits 40,56] [--targets 16] [--json out.json]
 //! ```
 //!
@@ -36,9 +36,11 @@ use std::sync::Mutex;
 use std::time::Instant;
 
 use crypto_lib::cryptanalysis::lattice::lll_reduce;
-use crypto_lib::cryptanalysis::prime_fast::{find_a3_curve, rho_parallel, FastCurve, Pt, RhoConfig};
+use crypto_lib::cryptanalysis::prime_fast::{
+    find_a3_curve, rho_parallel, FastCurve, Pt, RhoConfig,
+};
 use num_bigint::{BigInt, BigUint};
-use num_traits::{One, Signed, ToPrimitive, Zero};
+use num_traits::{One, ToPrimitive, Zero};
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 use serde_json::json;
@@ -150,7 +152,8 @@ fn precompute(
             let done = &done;
             let steps = &steps;
             s.spawn(move || {
-                let mut rng = StdRng::seed_from_u64(seed ^ (tid as u64 + 11) * 0x9E37_79B9_7F4A_7C15);
+                let mut rng =
+                    StdRng::seed_from_u64(seed ^ ((tid as u64 + 11) * 0x9E37_79B9_7F4A_7C15));
                 let w = walkers;
                 let cap: u32 = (24u64 << walk.dp_bits).max(256) as u32;
                 let mut xs = vec![0u64; w];
@@ -162,7 +165,13 @@ fn precompute(
                 let mut js = vec![0usize; w];
                 let mut reset = vec![false; w];
                 let mut scratch = Vec::with_capacity(w);
-                let restart = |i: usize, rng: &mut StdRng, xs: &mut [u64], ys: &mut [u64], as_: &mut [u64], prev: &mut [u64], cnt: &mut [u32]| loop {
+                let restart = |i: usize,
+                               rng: &mut StdRng,
+                               xs: &mut [u64],
+                               ys: &mut [u64],
+                               as_: &mut [u64],
+                               prev: &mut [u64],
+                               cnt: &mut [u32]| loop {
                     let a = rng.gen_range(1..n);
                     if let Some(pt) = curve.mul(Some(g), a) {
                         let (pt, flipped) = curve.canonical_sign(pt);
@@ -205,7 +214,11 @@ fn precompute(
                             a = neg_mod(a, n);
                         }
                         if x3 == prev[i] {
-                            let (cx, cy, ca) = if xs[i] < x3 { (xs[i], ys[i], as_[i]) } else { (x3, y3, a) };
+                            let (cx, cy, ca) = if xs[i] < x3 {
+                                (xs[i], ys[i], as_[i])
+                            } else {
+                                (x3, y3, a)
+                            };
                             match curve.double(Pt { x: cx, y: cy }) {
                                 Some(pt) => {
                                     let (pt, flipped) = curve.canonical_sign(pt);
@@ -216,7 +229,10 @@ fn precompute(
                                     prev[i] = u64::MAX;
                                 }
                                 None => {
-                                    restart(i, &mut rng, &mut xs, &mut ys, &mut as_, &mut prev, &mut cnt);
+                                    restart(
+                                        i, &mut rng, &mut xs, &mut ys, &mut as_, &mut prev,
+                                        &mut cnt,
+                                    );
                                     continue;
                                 }
                             }
@@ -262,7 +278,15 @@ fn precompute(
 /// coefficients (`a·G + b·Q`, both mod n) and *the same* fruitless-cycle
 /// escape as the precomputation, so an online trail that merges into a
 /// precomputed trail follows it all the way to its distinguished point.
-fn online(curve: &FastCurve, g: Pt, q: Pt, walk: &GWalk, table: &PreTable, seed: u64, max_steps: u64) -> Option<(u64, u64)> {
+fn online(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    walk: &GWalk,
+    table: &PreTable,
+    seed: u64,
+    max_steps: u64,
+) -> Option<(u64, u64)> {
     let f = curve.f;
     let n = curve.n;
     let mut rng = StdRng::seed_from_u64(seed ^ 0x0F0F_1234_5678_9ABC);
@@ -270,7 +294,9 @@ fn online(curve: &FastCurve, g: Pt, q: Pt, walk: &GWalk, table: &PreTable, seed:
     let mut total = 0u64;
     while total < max_steps {
         let a0 = rng.gen_range(1..n);
-        let Some(start) = curve.add(curve.mul(Some(g), a0), Some(q)) else { continue };
+        let Some(start) = curve.add(curve.mul(Some(g), a0), Some(q)) else {
+            continue;
+        };
         let (mut cur, flipped) = curve.canonical_sign(start);
         let mut a = if flipped { neg_mod(a0, n) } else { a0 };
         let mut b = if flipped { n - 1 } else { 1 };
@@ -310,7 +336,11 @@ fn online(curve: &FastCurve, g: Pt, q: Pt, walk: &GWalk, table: &PreTable, seed:
             }
             if np.x == prev {
                 // Same deterministic escape as `precompute`: double the member with smaller x.
-                let (cp, ca, cb) = if cur.x < np.x { (cur, a, b) } else { (np, na, nb) };
+                let (cp, ca, cb) = if cur.x < np.x {
+                    (cur, a, b)
+                } else {
+                    (np, na, nb)
+                };
                 match curve.double(cp) {
                     Some(pt) => {
                         let (pt, fl2) = curve.canonical_sign(pt);
@@ -341,16 +371,20 @@ fn probe_a(bits_list: &[u32], targets: usize, out: &mut Vec<serde_json::Value>) 
     println!("`S = 2^s` table entries, `2^dp ≈ √(n/S)`, online walks single-threaded; plain rho = `rho_parallel` on the same targets.\n");
     println!("| bits | S (2^s) | dp | precompute steps | precompute wall s | online steps mean (targets) | 2√(n/S) | plain rho steps √(πn/4) | per-target speed-up (steps) | online wall ms mean | plain rho wall s | break-even targets |");
     println!("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|");
-    let avail = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(1);
+    let avail = std::thread::available_parallelism()
+        .map(|n| n.get())
+        .unwrap_or(1);
     for &bits in bits_list {
-        let Some((curve, g)) = find_a3_curve(bits, 3) else { continue };
+        let Some((curve, g)) = find_a3_curve(bits, 3) else {
+            continue;
+        };
         let n = curve.n as f64;
         let s_bits = ((n.ln() / 3.0) / 2f64.ln()).round() as u32; // S ≈ n^{1/3}
         let s = (1u64 << s_bits) as f64;
         let dp_bits = ((n / s).sqrt().log2()).round().max(1.0) as u32;
         let walk = GWalk::new(&curve, g, 10, dp_bits, 77);
         let table = precompute(&curve, g, &walk, s_bits, avail, 512, 99);
-        let mut rng = StdRng::seed_from_u64(2026_10_08 + bits as u64);
+        let mut rng = StdRng::seed_from_u64(20_261_008 + bits as u64);
         let mut online_steps = Vec::new();
         let mut online_walls = Vec::new();
         let mut rho_steps = Vec::new();
@@ -380,14 +414,24 @@ fn probe_a(bits_list: &[u32], targets: usize, out: &mut Vec<serde_json::Value>) 
                 rho_walls.push(r.wall_secs);
             }
         }
-        let mean = |v: &[f64]| if v.is_empty() { 0.0 } else { v.iter().sum::<f64>() / v.len() as f64 };
+        let mean = |v: &[f64]| {
+            if v.is_empty() {
+                0.0
+            } else {
+                v.iter().sum::<f64>() / v.len() as f64
+            }
+        };
         let on_mean = mean(&online_steps);
         let rho_mean = mean(&rho_steps);
         let rho_theory = (std::f64::consts::PI * n / 4.0).sqrt();
         let on_theory = 2.0 * (n / s).sqrt();
         let on_wall = mean(&online_walls);
         let rho_wall = mean(&rho_walls);
-        let breakeven = if rho_wall > on_wall { table.precompute_wall / (rho_wall - on_wall) } else { f64::INFINITY };
+        let breakeven = if rho_wall > on_wall {
+            table.precompute_wall / (rho_wall - on_wall)
+        } else {
+            f64::INFINITY
+        };
         println!(
             "| {bits} | 2^{s_bits} | {dp_bits} | {:.3e} | {:.1} | {:.3e} ({solved}/{targets}) | {:.3e} | {:.3e} (measured {:.3e}) | {:.0}× | {:.2} | {:.3} | {:.0} |",
             table.precompute_steps as f64,
@@ -461,7 +505,12 @@ fn poly_eval(p: &BiPoly, u: &BigInt, v: &BigInt) -> BigInt {
 
 /// One lattice trial: plant `x_i, x_j ≤ bound`, build the level-`m`
 /// lattice, LLL, count reduced rows that vanish at the root over Z.
-fn lattice_trial(curve: &FastCurve, m: usize, bound: u64, rng: &mut StdRng) -> Option<(usize, bool)> {
+fn lattice_trial(
+    curve: &FastCurve,
+    m: usize,
+    bound: u64,
+    rng: &mut StdRng,
+) -> Option<(usize, bool)> {
     let p = BigInt::from(curve.f.p);
     // plant
     let pick = |rng: &mut StdRng| -> Option<Pt> {
@@ -566,11 +615,15 @@ fn probe_b(bits_list: &[u32], out: &mut Vec<serde_json::Value>) {
     println!("|---|---|---:|---:|---:|---:|---:|---:|---:|");
     let deltas = [0.04, 0.06, 0.08, 0.10, 0.12, 0.14, 0.16, 0.20, 0.25];
     for &bits in bits_list {
-        let Some((curve, _g)) = find_a3_curve(bits, 3) else { continue };
+        let Some((curve, _g)) = find_a3_curve(bits, 3) else {
+            continue;
+        };
         for m in 1..=3usize {
             for &delta in &deltas {
                 let bound = ((curve.f.p as f64).powf(delta)).floor().max(2.0) as u64;
-                let mut rng = StdRng::seed_from_u64(0xB00B + bits as u64 * 100 + m as u64 * 10 + (delta * 100.0) as u64);
+                let mut rng = StdRng::seed_from_u64(
+                    0xB00B + bits as u64 * 100 + m as u64 * 10 + (delta * 100.0) as u64,
+                );
                 let mut succ = 0usize;
                 let mut hg = 0usize;
                 let mut vsum = 0usize;
@@ -605,6 +658,216 @@ fn probe_b(bits_list: &[u32], out: &mut Vec<serde_json::Value>) {
     println!();
 }
 
+/// Which lattice to build for the `S₃` small-root problem.
+#[derive(Clone, Copy, Debug)]
+enum LatticeKind {
+    /// Jochemsz–May basic/extended: monomials `u^α v^β`, `α ≤ 2m + t`, `β ≤ 2m`,
+    /// row `u^{α−2k} v^{β−2k} f^k p^{m−k}` with `k = min(⌊α/2⌋, ⌊β/2⌋, m)`.
+    Rect { m: usize, t: usize },
+    /// Symmetric rewriting in `(e₁, e₂) = (x₁+x₂, x₁x₂)`, bounds `(2B, B²)`,
+    /// triangle `α + β ≤ 2m`, row `e₁^α e₂^{β−2k} f^k p^{m−k}`, `k = min(⌊β/2⌋, m)`.
+    Sym { m: usize },
+}
+
+/// One generalised lattice trial; returns (vanishing rows, HG-on-first-two, dim).
+fn lattice_trial_kind(
+    curve: &FastCurve,
+    kind: LatticeKind,
+    bound: u64,
+    rng: &mut StdRng,
+) -> Option<(usize, bool, usize)> {
+    let p = BigInt::from(curve.f.p);
+    let pick = |rng: &mut StdRng| -> Option<Pt> {
+        for _ in 0..10_000 {
+            let x = rng.gen_range(1..=bound);
+            if let Some(pt) = curve.lift_x(x) {
+                return Some(pt);
+            }
+        }
+        None
+    };
+    let fi = pick(rng)?;
+    let fj = pick(rng)?;
+    let fj_signed = if rng.gen_bool(0.5) { fj } else { curve.neg(fj) };
+    let r = curve.add(Some(fi), Some(fj_signed))?;
+    let (xi, _) = curve.canonical(fi);
+    let (xj, _) = curve.canonical(fj);
+    let c = s3_coeffs(curve, r.x);
+    let big = |v: u64| BigInt::from(v);
+    // polynomial, bounds and monomial set per kind
+    let (f, bounds, monos, m): (BiPoly, (BigInt, BigInt), Vec<(usize, usize)>, usize) = match kind {
+        LatticeKind::Rect { m, t } => {
+            let mut f: BiPoly = HashMap::new();
+            for a in 0..3 {
+                for b in 0..3 {
+                    if c[a][b] != 0 {
+                        f.insert((a, b), big(c[a][b]));
+                    }
+                }
+            }
+            let mut monos = Vec::new();
+            for alpha in 0..=(2 * m + t) {
+                for beta in 0..=(2 * m) {
+                    monos.push((alpha, beta));
+                }
+            }
+            (f, (big(bound), big(bound)), monos, m)
+        }
+        LatticeKind::Sym { m } => {
+            // f(u,v) = Σ c_ab u^a v^b, symmetric: rewrite in e1 = u+v, e2 = uv.
+            // S3 = (e1² − 4e2) z² − 2[e1(e2 + A) + 2B] z + (e2 − A)² − 4B e1.
+            // Read the needed scalars back from the (u,v) coefficients:
+            //   z² = c[2][0], −2z = c[2][1], −2z² − 2A = c[1][1], lin = c[1][0], const = c[0][0].
+            let pm = &p;
+            let md = |x: BigInt| ((x % pm) + pm) % pm;
+            let z2 = big(c[2][0]);
+            let m2z = big(c[2][1]); // −2z
+            let c11 = big(c[1][1]); // −2z² − 2A
+            let lin = big(c[1][0]); // −2Az − 4B
+            let c00 = big(c[0][0]); // −4Bz + A²
+                                    // e1²: z²; e2: −4z² + (coefficient of uv from (uv−A)² and −2(u+v)(uv)z ... ) — derive directly:
+                                    // (e1² − 4e2) z²  → e1²·z², e2·(−4z²)
+                                    // −2[e1 e2 + A e1 + 2B] z → e1e2·(−2z), e1·(−2Az), const·(−4Bz)
+                                    // (e2 − A)² → e2²·1, e2·(−2A), const·A²
+                                    // −4B e1 → e1·(−4B)
+                                    // In terms of available scalars: e1 e2 coefficient = −2z = m2z; e1 coefficient = lin;
+                                    // const = c00; e2 coefficient = −4z² − 2A = c11 − 2z² ; e2² = 1; e1² = z2.
+            let mut f: BiPoly = HashMap::new();
+            f.insert((2, 0), md(z2.clone()));
+            f.insert((0, 2), BigInt::one());
+            f.insert((1, 1), md(m2z));
+            f.insert((1, 0), md(lin));
+            f.insert((0, 1), md(c11 - BigInt::from(2u8) * &z2));
+            f.insert((0, 0), md(c00));
+            let mut monos = Vec::new();
+            for alpha in 0..=(2 * m) {
+                for beta in 0..=(2 * m) {
+                    if alpha + beta <= 2 * m {
+                        monos.push((alpha, beta));
+                    }
+                }
+            }
+            (f, (big(2 * bound), big(bound) * big(bound)), monos, m)
+        }
+    };
+    // roots in the chosen variables
+    let (ru, rv) = match kind {
+        LatticeKind::Rect { .. } => (big(xi), big(xj)),
+        LatticeKind::Sym { .. } => (big(xi) + big(xj), big(xi) * big(xj)),
+    };
+    debug_assert!((poly_eval(&f, &ru, &rv) % &p).is_zero());
+    let mut fpow: Vec<BiPoly> = vec![HashMap::from([((0usize, 0usize), BigInt::one())])];
+    for k in 1..=m {
+        let next = poly_mul(&fpow[k - 1], &f);
+        fpow.push(next);
+    }
+    let dim = monos.len();
+    let index: HashMap<(usize, usize), usize> =
+        monos.iter().enumerate().map(|(i, &mn)| (mn, i)).collect();
+    let (xb, yb) = bounds;
+    let mut basis: Vec<Vec<BigInt>> = Vec::with_capacity(dim);
+    for &(alpha, beta) in &monos {
+        let k = match kind {
+            LatticeKind::Rect { m, .. } => (alpha / 2).min(beta / 2).min(m),
+            LatticeKind::Sym { m } => (beta / 2).min(m),
+        };
+        let (a, b) = match kind {
+            LatticeKind::Rect { .. } => (alpha - 2 * k, beta - 2 * k),
+            LatticeKind::Sym { .. } => (alpha, beta - 2 * k),
+        };
+        let pk = p.pow((m - k) as u32);
+        let mut row = vec![BigInt::zero(); dim];
+        for ((pa, pb), cf) in &fpow[k] {
+            let mono = (pa + a, pb + b);
+            let &col = index.get(&mono)?; // shape mismatch guard
+            row[col] += cf * &pk * xb.pow(mono.0 as u32) * yb.pow(mono.1 as u32);
+        }
+        basis.push(row);
+    }
+    if lll_reduce(&mut basis, 0.99).is_err() {
+        return None;
+    }
+    let mut vanishing = 0usize;
+    let mut hg = true;
+    let pm = p.pow(m as u32);
+    let dimf = (dim as f64).sqrt();
+    for (ri, row) in basis.iter().enumerate() {
+        let mut poly: BiPoly = HashMap::new();
+        let mut norm2 = BigInt::zero();
+        for (col, &(alpha, beta)) in monos.iter().enumerate() {
+            let cf = &row[col];
+            if cf.is_zero() {
+                continue;
+            }
+            norm2 += cf * cf;
+            poly.insert(
+                (alpha, beta),
+                cf / (xb.pow(alpha as u32) * yb.pow(beta as u32)),
+            );
+        }
+        if poly.is_empty() {
+            continue;
+        }
+        if poly_eval(&poly, &ru, &rv).is_zero() {
+            vanishing += 1;
+        }
+        if ri < 2 {
+            let norm = norm2.to_f64().unwrap_or(f64::INFINITY).sqrt();
+            hg &= norm * dimf < pm.to_f64().unwrap_or(f64::INFINITY);
+        }
+    }
+    Some((vanishing, hg, dim))
+}
+
+fn probe_c(bits: u32, out: &mut Vec<serde_json::Value>) {
+    println!("## C. Best lattice reach for S₃: extended Jochemsz–May shifts and the symmetric (e₁, e₂) lattice\n");
+    println!("Same planted instances and success criteria as probe B. `Rect{{m,t}}` = basic lattice at level m with t extra u-shifts; `Sym{{m}}` = symmetric formulation (bounds 2B, B²). 8 trials per cell on the {bits}-bit curve.\n");
+    println!("| lattice | dim | δ | B | ≥2 vanishing / trials | HG first two | mean vanishing | ms per LLL |");
+    println!("|---|---:|---:|---:|---:|---:|---:|---:|");
+    let Some((curve, _g)) = find_a3_curve(bits, 3) else {
+        return;
+    };
+    let kinds = [
+        LatticeKind::Rect { m: 2, t: 1 },
+        LatticeKind::Rect { m: 2, t: 2 },
+        LatticeKind::Rect { m: 3, t: 1 },
+        LatticeKind::Sym { m: 1 },
+        LatticeKind::Sym { m: 2 },
+        LatticeKind::Sym { m: 3 },
+    ];
+    let deltas = [0.06, 0.08, 0.10, 0.12, 0.14, 0.16, 0.18, 0.20];
+    for kind in kinds {
+        for &delta in &deltas {
+            let bound = ((curve.f.p as f64).powf(delta)).floor().max(2.0) as u64;
+            let mut rng =
+                StdRng::seed_from_u64(0xC0DE + bits as u64 * 100 + (delta * 100.0) as u64);
+            let (mut succ, mut hgc, mut vsum, mut done, mut dim) =
+                (0usize, 0usize, 0usize, 0usize, 0usize);
+            let t0 = Instant::now();
+            for _ in 0..8 {
+                if let Some((v, h, d)) = lattice_trial_kind(&curve, kind, bound, &mut rng) {
+                    done += 1;
+                    vsum += v;
+                    dim = d;
+                    if v >= 2 {
+                        succ += 1;
+                    }
+                    if h {
+                        hgc += 1;
+                    }
+                }
+            }
+            let ms = t0.elapsed().as_secs_f64() * 1e3 / done.max(1) as f64;
+            println!("| {kind:?} | {dim} | {delta:.2} | {bound} | {succ}/{done} | {hgc}/{done} | {:.1} | {ms:.0} |", vsum as f64 / done.max(1) as f64);
+            out.push(json!({"probe":"C","bits":bits,"lattice":format!("{kind:?}"),"dim":dim,"delta":delta,"bound":bound,"trials":done,"successes":succ,"hg_first_two":hgc,"mean_vanishing":vsum as f64/done.max(1) as f64,"ms_per_lll":ms}));
+            if succ == 0 && delta >= 0.14 {
+                break;
+            }
+        }
+    }
+    println!();
+}
+
 fn main() {
     let argv: Vec<String> = std::env::args().collect();
     let mut probe = "ab".to_string();
@@ -621,11 +884,17 @@ fn main() {
             }
             "--rho-bits" => {
                 i += 1;
-                rho_bits = argv.get(i).map(|s| s.split(',').filter_map(|x| x.parse().ok()).collect()).unwrap_or(rho_bits);
+                rho_bits = argv
+                    .get(i)
+                    .map(|s| s.split(',').filter_map(|x| x.parse().ok()).collect())
+                    .unwrap_or(rho_bits);
             }
             "--lattice-bits" => {
                 i += 1;
-                lattice_bits = argv.get(i).map(|s| s.split(',').filter_map(|x| x.parse().ok()).collect()).unwrap_or(lattice_bits);
+                lattice_bits = argv
+                    .get(i)
+                    .map(|s| s.split(',').filter_map(|x| x.parse().ok()).collect())
+                    .unwrap_or(lattice_bits);
             }
             "--targets" => {
                 i += 1;
@@ -641,15 +910,27 @@ fn main() {
     }
     let mut out = Vec::new();
     println!("# Prime-field ECDLP breakthrough probe\n");
-    println!("Host threads: {}.\n", std::thread::available_parallelism().map(|n| n.get()).unwrap_or(1));
+    println!(
+        "Host threads: {}.\n",
+        std::thread::available_parallelism()
+            .map(|n| n.get())
+            .unwrap_or(1)
+    );
     if probe.contains('a') {
         probe_a(&rho_bits, targets, &mut out);
     }
     if probe.contains('b') {
         probe_b(&lattice_bits, &mut out);
     }
+    if probe.contains('c') {
+        probe_c(lattice_bits[0], &mut out);
+    }
     if let Some(path) = json_path {
-        std::fs::write(&path, serde_json::to_string_pretty(&json!({"results": out})).unwrap()).unwrap();
+        std::fs::write(
+            &path,
+            serde_json::to_string_pretty(&json!({"results": out})).unwrap(),
+        )
+        .unwrap();
         println!("JSON written to {path}");
     }
     let _ = BigUint::zero();

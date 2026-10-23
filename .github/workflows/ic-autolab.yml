@@ -2,6 +2,10 @@ name: IC autolab integration
 on:
   pull_request:
     paths:
+      - 'Cargo.lock'
+      - 'build.rs'
+      - '.cargo/**'
+      - 'rust-toolchain*'
       - 'src/**'
       - 'examples/ic_tournament_worker.rs'
       - 'examples/ic_query_law_vectors.rs'
@@ -14,11 +18,11 @@ permissions:
   contents: read
 concurrency:
   group: ic-autolab-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
-  linux-integration:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
+  linux-integration-controls:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-autolab.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-autolab.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -31,12 +35,28 @@ jobs:
       - name: Install calibrated profiler
         run: |
           sudo apt-get update
-          sudo apt-get install -y valgrind
+          sudo apt-get install -y valgrind zstd
           test "$(valgrind --version)" = valgrind-3.22.0
       - name: Freeze dependency resolution
         run: |
-          cp research/ic_candidate_tournament_20260915/ci/Cargo.lock Cargo.lock
+          # The committed root lock matches the current manifest. Keep the
+          # tournament's older lock intact for its retained source replays.
           cargo fetch --locked
+      - name: Resolve the interpreter's own libpython without LD_LIBRARY_PATH
+        run: |
+          # setup-python's builds carry RUNPATH /opt/hostedtoolcache/...; on a
+          # self-hosted runner the tool cache lives elsewhere, so the SAT
+          # runtime's child (which drops LD_LIBRARY_PATH) loads the system
+          # libpython and sees a different interpreter. Point that RUNPATH at
+          # this interpreter's lib; a no-op where it already exists.
+          rp=$(readelf -d "$pythonLocation/bin/python3" | sed -n 's/.*(RUNPATH).*\[\(.*\)\]/\1/p')
+          if [ -n "$rp" ] && [ ! -e "$rp" ]; then
+            sudo mkdir -p "$(dirname "$rp")"
+            sudo ln -s "$pythonLocation/lib" "$rp"
+          fi
+          env -u LD_LIBRARY_PATH "$pythonLocation/bin/python3" -I -c \
+            'import platform, sys; assert platform.python_version() == sys.argv[1], platform.python_version()' \
+            "$(python -c 'import platform; print(platform.python_version())')"
       - name: Harness and accounting regression tests
         run: |
           python -m unittest discover -s research/ic_candidate_tournament_20260915 -p 'test_*.py' -v
@@ -46,6 +66,28 @@ jobs:
           cargo run --locked --release --example ic_query_law_vectors > "$RUNNER_TEMP/ic-query-law-rust-vectors.json"
           python research/ic_candidate_tournament_20260915/generic_query_law.py \
             --rust-vectors "$RUNNER_TEMP/ic-query-law-rust-vectors.json"
+      - name: Preserve controls and replay evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ic-autolab-controls-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/ic-query-law-rust-vectors.json
+            Cargo.lock
+          retention-days: 30
+          if-no-files-found: warn
+
+  linux-integration-release:
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-autolab.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-autolab.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.94.1
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ic-autolab-integration
+      - name: Freeze dependency resolution
+        run: cargo fetch --locked
       - name: Release arithmetic and descent regressions
         run: |
           cargo test --locked --release --lib pdp_admission_ -- --test-threads=1
@@ -63,11 +105,39 @@ jobs:
           cargo test --locked --release --example ic_tournament_worker public_input_ -- --test-threads=1
           RAYON_NUM_THREADS=1 cargo test --locked --release --example ic_tournament_worker exclusive_worker_ -- --include-ignored --test-threads=1
           RAYON_NUM_THREADS=1 cargo test --locked --release --example ic_tournament_worker prepared_target_tests -- --ignored --test-threads=1
+      - name: Preserve release regression evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ic-autolab-release-${{ github.run_id }}-${{ github.run_attempt }}
+          path: Cargo.lock
+          retention-days: 30
+
+  linux-integration:
+    needs: [linux-integration-controls, linux-integration-release]
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-autolab.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-autolab.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@1.94.1
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ic-autolab-integration
+      - name: Install calibrated profiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y valgrind zstd
+          test "$(valgrind --version)" = valgrind-3.22.0
+      - name: Freeze dependency resolution
+        run: cargo fetch --locked
       - name: Build source-bound generic worker and audit scientific controls
         run: |
           run_start=$(python research/ic_candidate_tournament_20260915/execution_ids.py \
             --workflow-run "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT" --lane controls)
-          python research/ic_candidate_tournament_20260915/generic_build.py \
+          python research/ic_candidate_tournament_20260915/generic_build_v2.py \
             --out "$RUNNER_TEMP/ic-generic-build"
           python research/ic_candidate_tournament_20260915/goal_20260924/generic-scientific-admission/run_controls.py \
             --build "$RUNNER_TEMP/ic-generic-build" --out "$RUNNER_TEMP/ic-generic-admission" \

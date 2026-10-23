@@ -1,19 +1,21 @@
 name: Koblitz Stage 77 n53 compact query scratch
 
 on:
-  pull_request:
-    paths:
-      - "examples/koblitz_rank_fixture.rs"
-      - "scripts/run_koblitz_stage77_compact_scratch.py"
-      - ".github/workflows/koblitz-stage77-compact-scratch.yml"
+  # Historical stage control. Manual only: shared fixture path
+  # filters used to enqueue dozens of these on one PR and starve
+  # GitHub-hosted runners account-wide.
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   validate-control:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage77-compact-scratch.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage77-compact-scratch.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -29,7 +31,7 @@ jobs:
   n53-compact-scratch:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     needs: validate-control
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage77-compact-scratch.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage77-compact-scratch.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4

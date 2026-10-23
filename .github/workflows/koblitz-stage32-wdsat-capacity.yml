@@ -1,22 +1,22 @@
 name: Koblitz Stage 32 WDSat capacity correction
 
 on:
-  pull_request:
-    paths:
-      - "scripts/run_koblitz_stage32_wdsat_correction.py"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-32-wdsat-config.h"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-32-wdsat-capacity-protocol.json"
-      - "research/sat_factor_base_review_20260908/continuation-05-sota-gates/STAGE32_WDSAT_CAPACITY.md"
-      - ".github/workflows/koblitz-stage32-wdsat-capacity.yml"
+  # Historical stage control. Manual only: shared fixture path
+  # filters used to enqueue dozens of these on one PR and starve
+  # GitHub-hosted runners account-wide.
   workflow_dispatch:
 
 permissions:
   contents: read
   actions: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   validate-control:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage32-wdsat-capacity.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage32-wdsat-capacity.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     steps:
       - uses: actions/checkout@v4
       - run: python3 scripts/run_koblitz_stage32_wdsat_correction.py self-test
@@ -24,7 +24,7 @@ jobs:
   correction:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     needs: validate-control
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage32-wdsat-capacity.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage32-wdsat-capacity.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4

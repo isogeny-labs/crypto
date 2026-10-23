@@ -62,8 +62,15 @@
 //! worked example of adding a solver, how to run a sweep, and how to
 //! report what comes out.
 
+pub mod cm_orbit;
+pub mod fiber;
+pub mod large_prime;
 pub mod linalg;
+pub mod planner;
 pub mod plugins;
+pub mod prime_tower;
+pub mod residual;
+pub mod rootfind;
 pub mod shared_rank;
 pub mod solvers;
 pub mod stages;
@@ -73,9 +80,10 @@ use std::time::Instant;
 use serde::Serialize;
 
 use crate::cryptanalysis::ic_boundary::{
-    collect_and_solve_with_completion, price_phase, Calibration, CompletionRule, CountedGroup,
+    collect_and_solve_relations, price_phase, Calibration, CompletionRule, CountedGroup,
     FactorBase, GroupOps, PhaseCost, PipelineOutcome, RelationSolver, RestartPool, TargetSource,
 };
+use crate::cryptanalysis::ic_framework::residual as residual_mod;
 use crate::cryptanalysis::ic_measurement as measurement;
 use linalg::matrix_by_name;
 use stages::{DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, SystemShape, Targets};
@@ -92,8 +100,9 @@ pub struct PipelineSpec {
     pub solver_params: Params,
     pub targets: Targets,
     /// The matrix and stop rule: `incremental-gauss`,
-    /// `incremental-gauss-full-rank`, its `-checked` variant, or
-    /// `structured-gauss`.
+    /// `incremental-gauss-full-rank`, its `-checked` variant,
+    /// `structured-gauss`, or a deferred sparse solver (`sparse-cado`,
+    /// `filter+wiedemann`, `filter+lanczos`, `wiedemann`, `lanczos`; full-rank rule).
     pub linalg: String,
     /// Cap on targets drawn before the run gives up.
     pub max_trials: u64,
@@ -248,6 +257,26 @@ pub struct RunReport {
     pub exhausted: bool,
 }
 
+/// Whether `op_unit` is the dense Macaulay word-XOR unit that
+/// `ns_per_word_xor` prices.  Bare `word XORs` (pricing tests) and the
+/// inherited-F4 / pdp3 qualifier
+/// `word XORs (elimination, specialisation and linear elimination only)`
+/// both count; `vector XORs` / `word operations (…)` do not.
+///
+/// Accounting, not an algorithm change: before PR #1774 (merge `cd226d0ce`,
+/// 2026-10-14) only the bare unit matched, so inherited-F4 / pdp3 records
+/// left their word XORs unpriced (`solver_word_XORs_(…)_uncharged`,
+/// `lower_bound: true`) even where `docs/ic/calibration.json` pins
+/// `ns_per_word_xor`.  Since then those curves charge them (K_0/GF(2^13):
+/// 0.002304 GAE per word XOR, e.g. `ic-f4-m3` target 0 671 → 24,415 GAE at
+/// that merge, same word-XOR count),
+/// while curves without a pinned ratio still record a lower bound.  Do not
+/// compare an F4 `S` from before that merge with one after it, or a priced
+/// curve with an unpriced one: `research/f4_pricing_jump_20261018/`.
+fn is_word_xor_op_unit(op_unit: &str) -> bool {
+    op_unit == "word XORs" || op_unit.starts_with("word XORs (")
+}
+
 /// Certify the solved logarithm of one nonzero-coefficient point in each
 /// factor-base column. A relation uses `coef_of[i] * x_col` for point `P_i`;
 /// after cofactor projection its full-point identity must be
@@ -348,30 +377,99 @@ pub fn run_pipeline<G: CountedGroup>(
     let mut matrix: Box<dyn RelationSolver> = matrix_by_name(linalg_name, fb.columns + 1, ctx.r)?;
     let source = match spec.targets {
         Targets::Random => TargetSource::Random,
-        Targets::Walk => TargetSource::Walk,
+        Targets::Stride => TargetSource::Stride,
+        Targets::StrideRenew => TargetSource::StrideRenew,
+        Targets::Walk | Targets::Residual => TargetSource::Walk,
+        Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
+        Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
+            lanes: 4,
+            batched: false,
+        },
+        Targets::WalkPrimeSerial8 => TargetSource::WalkPrimeLanes {
+            lanes: 8,
+            batched: false,
+        },
+        Targets::WalkPrimeSerial16 => TargetSource::WalkPrimeLanes {
+            lanes: 16,
+            batched: false,
+        },
+        Targets::WalkPrimeBatch4 => TargetSource::WalkPrimeLanes {
+            lanes: 4,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch8 => TargetSource::WalkPrimeLanes {
+            lanes: 8,
+            batched: true,
+        },
+        Targets::WalkPrimeBatch16 => TargetSource::WalkPrimeLanes {
+            lanes: 16,
+            batched: true,
+        },
     };
+    if matches!(spec.targets, Targets::WalkPrimeFast) && ctx.group.native_walk_adder().is_none() {
+        return Err("walk-prime-fast requires a prime curve with p < 2^62".into());
+    }
+    if matches!(source, TargetSource::WalkPrimeLanes { .. })
+        && !ctx.group.supports_native_lane_walk()
+    {
+        return Err("walk-prime-serial/batch requires a prime curve with p < 2^62".into());
+    }
     measurement::begin_online(measurement::Phase::TargetQuery);
     let checked_full_rank = linalg_name == "incremental-gauss-full-rank-checked";
-    let completion = if linalg_name == "incremental-gauss-full-rank" || checked_full_rank {
+    // `sparse-cado` is a batch solver that answers only at full column
+    // rank, so it runs under the full-rank rule.
+    let completion = if linalg_name == "incremental-gauss-full-rank"
+        || checked_full_rank
+        || linalg::is_deferred_sparse(linalg_name)
+    {
         CompletionRule::FullRank
     } else {
         CompletionRule::TargetPinned
     };
-    let mut outcome: PipelineOutcome = collect_and_solve_with_completion(
-        ctx.group,
-        ctx.generator,
-        ctx.target,
-        ctx.r,
-        ctx.cofactor,
-        &fb,
-        spec.seed,
-        spec.max_trials,
-        source,
-        RestartPool::Lazy,
-        matrix.as_mut(),
-        completion,
-        |ops, counters, point| oracle.decompose(ctx, &fb, ops, counters, point),
-    );
+    let mut outcome: PipelineOutcome = if spec.targets == Targets::Residual {
+        if completion != CompletionRule::TargetPinned {
+            return Err(
+                "the residual collector stops when the target is pinned; use incremental-gauss"
+                    .into(),
+            );
+        }
+        residual_mod::collect_residual_and_solve(
+            ctx.group,
+            ctx.generator,
+            ctx.target,
+            ctx.r,
+            ctx.cofactor,
+            &fb,
+            spec.seed,
+            spec.max_trials,
+            matrix.as_mut(),
+        )
+    } else {
+        // `decompose_relations` is `decompose` for every oracle without
+        // large primes (the trait default), so this is the loop every
+        // recorded run took; the large-prime collector returns merged
+        // rows through the same call.
+        collect_and_solve_relations(
+            ctx.group,
+            ctx.generator,
+            ctx.target,
+            ctx.r,
+            ctx.cofactor,
+            &fb,
+            spec.seed,
+            spec.max_trials,
+            source,
+            RestartPool::Lazy,
+            matrix.as_mut(),
+            completion,
+            |ops, counters, point, a, b| {
+                oracle.decompose_relations(ctx, &fb, ops, counters, point, a, b)
+            },
+        )
+    };
+    for (name, value) in oracle.relation_counters() {
+        outcome.relations.count(&name, value);
+    }
     // Kept opt-in so the previously recorded full-rank sessions retain
     // byte-identical replay and charging. A checked run cannot claim a
     // verified full-rank solution solely from the target-point check.
@@ -414,21 +512,44 @@ pub fn run_pipeline<G: CountedGroup>(
         // calibration measures one), and a freshly generated curve has
         // no table entry.  A count priced at the measured ratio is still
         // `measured`, with that ratio recorded as `ns_per_op`.
-        let (gae, priced_by, ns_per_op) = match (t.op_unit.as_str(), calib.ns_per_word_xor) {
-            ("word XORs", Some(ns)) if calib.ns_per_add > 0.0 => (
-                t.ops as f64 * ns / calib.ns_per_add,
-                if calib.is_pinned("ns_per_word_xor") {
-                    "pinned"
-                } else {
-                    "measured"
-                },
-                Some(ns),
-            ),
-            _ if calib.ns_per_add > 0.0 => {
-                (t.wall_ns as f64 / calib.ns_per_add, "measured", wall_per_op)
-            }
-            _ => (0.0, "unpriced", wall_per_op),
-        };
+        // Inherited-F4 / pdp3 report
+        // `word XORs (elimination, specialisation and linear elimination only)`;
+        // the pricing test uses the bare unit `word XORs`.  Both are the
+        // dense Macaulay row-XOR unit §5 priced — match by prefix so a
+        // pinned `ns_per_word_xor` reaches admitted S (exact equality
+        // left F4 permanently unpriced beside a calibrated ratio).
+        let (gae, priced_by, ns_per_op) =
+            match (is_word_xor_op_unit(&t.op_unit), calib.ns_per_word_xor) {
+                (true, Some(ns)) if calib.ns_per_add > 0.0 => (
+                    t.ops as f64 * ns / calib.ns_per_add,
+                    if calib.is_pinned("ns_per_word_xor") {
+                        "pinned"
+                    } else {
+                        "measured"
+                    },
+                    Some(ns),
+                ),
+                // Field multiplications counted by the same field whose
+                // additions the group charges (the `gaudry-d4` oracle on
+                // `E(F_{p⁴})`, `gaudry-d4-bin` on `E(F_{q⁴})`, `q = 2^m`):
+                // priced by count at the curve's own multiplications per
+                // addition, which the oracle reports.
+                (_, _)
+                    if (t.op_unit == "F_p multiplications"
+                        || t.op_unit == "F_q multiplications")
+                        && t.extra.get("fp_muls_per_add").is_some_and(|&v| v > 0) =>
+                {
+                    (
+                        t.ops as f64 / t.extra["fp_muls_per_add"] as f64,
+                        "counted",
+                        None,
+                    )
+                }
+                _ if calib.ns_per_add > 0.0 => {
+                    (t.wall_ns as f64 / calib.ns_per_add, "measured", wall_per_op)
+                }
+                _ => (0.0, "unpriced", wall_per_op),
+            };
         rel.count("solver_calls", t.calls);
         rel.count("solver_ops", t.ops);
         rel.count("solver_budget_exceeded", t.budget_exceeded);
@@ -622,6 +743,62 @@ mod tests {
         assert!(report.s > 0.0 && report.s.is_finite());
         assert!(report.factor_base.columns > 0);
         assert!(report.decomposition.relations_found >= report.linear_algebra.rank);
+    }
+
+    /// **The stride reaches the walk's answer without the walk's jump
+    /// table.**  Its set-up is `S` and `R₀` (four scalar
+    /// multiplications) where the walk draws sixteen jumps at two each;
+    /// every other target costs one addition under both.
+    #[test]
+    fn the_strides_recover_the_logarithm_without_a_jump_table() {
+        let inst = roster_prime_instance(16).unwrap();
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = PrimeAbscissaBase { instance: &inst };
+        let run = |targets| {
+            let mut spec = PipelineSpec {
+                factor_base: "prime-abscissa".into(),
+                oracle: "mitm".into(),
+                targets,
+                max_trials: 2_000_000,
+                seed: 7,
+                ..Default::default()
+            };
+            spec.factor_base_params.set("size", "24");
+            spec.oracle_params.set("negation_folded", "1");
+            let mut oracle = MitmOracle::new(2);
+            run_pipeline(
+                &ctx,
+                &spec,
+                &base,
+                &mut oracle,
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .expect("the configuration should run")
+        };
+        let (walk, stride) = (run(Targets::Walk), run(Targets::Stride));
+        let renew = run(Targets::StrideRenew);
+        assert!(walk.verified && stride.verified && renew.verified);
+        assert_eq!(renew.recovered, Some(planted));
+        // One renewal a relation-bearing target, and set-up of S, T, R₀.
+        let rn = &renew.decomposition.cost;
+        assert!(rn.native.get("stride_renewals").copied().unwrap_or(0) >= 1);
+        assert!(rn.group_ops.scalar_mults >= 6 && rn.group_ops.scalar_mults < 32);
+        assert_eq!(stride.recovered, Some(planted));
+        let rel = &stride.decomposition.cost;
+        assert_eq!(rel.native.get("stride_restarts"), Some(&1));
+        assert!(rel.group_ops.scalar_mults <= 4, "{:?}", rel.group_ops);
+        assert!(walk.decomposition.cost.group_ops.scalar_mults >= 32);
+        assert_eq!(
+            rel.native.get("stride_steps").copied().unwrap_or(0) + 1,
+            stride.decomposition.targets_tried
+                + rel
+                    .native
+                    .get("direct_relations_skipped")
+                    .copied()
+                    .unwrap_or(0)
+        );
     }
 
     /// **Two oracles on the same base must agree on the answer and
@@ -959,6 +1136,25 @@ mod tests {
         assert!(measured.verified && pinned.verified);
     }
 
+    /// Inherited-F4's qualified op_unit must take the same pinned path as
+    /// the bare unit — otherwise a calibrated `ns_per_word_xor` never
+    /// reaches admitted S and F4 stays a permanent lower bound.
+    #[test]
+    fn inherited_f4_word_xor_unit_is_priced_when_pinned() {
+        assert!(super::is_word_xor_op_unit("word XORs"));
+        assert!(super::is_word_xor_op_unit(
+            "word XORs (elimination, specialisation and linear elimination only)"
+        ));
+        assert!(super::is_word_xor_op_unit("word XORs (elimination only)"));
+        assert!(!super::is_word_xor_op_unit(
+            "vector XORs (Gray-code steps, 4 lanes of 32 bits)"
+        ));
+        assert!(!super::is_word_xor_op_unit(
+            "word operations (partial: extraction, transform and filter; per-point solves in solve_row_ops)"
+        ));
+        assert!(!super::is_word_xor_op_unit("monomial operations"));
+    }
+
     /// **Two oracles that solve the same decomposition problem must agree
     /// on the logarithm.**  The algebraic oracle replaces the pair table;
     /// AGENTS.md asks that a new oracle be cross-checked against the one
@@ -1198,6 +1394,63 @@ mod tests {
         assert_eq!(result.linear_algebra.cost.get("full_rank_reached"), 1);
         assert!(result.linear_algebra.cost.get("first_target_pinned_rank") > 0);
         assert_eq!(result.verify.get("base_log_columns_checked"), 0);
+    }
+
+    /// The CADO-style batch solver behind the incremental contract must
+    /// recover the same logarithm from the same relation stream as the
+    /// dense full-rank matrix, reading at most `max(1, cols / 32)` more
+    /// relations than the full-rank point (its retry interval).
+    #[test]
+    fn sparse_cado_matches_the_full_rank_matrix_end_to_end() {
+        let inst = roster_prime_instance(16).unwrap();
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = PrimeAbscissaBase { instance: &inst };
+        let mut spec = PipelineSpec {
+            factor_base: "prime-abscissa".into(),
+            oracle: "mitm".into(),
+            targets: Targets::Walk,
+            max_trials: 2_000_000,
+            seed: 7,
+            linalg: "incremental-gauss-full-rank".into(),
+            ..Default::default()
+        };
+        spec.factor_base_params.set("size", "24");
+        spec.oracle_params.set("negation_folded", "1");
+        let run = |spec: &PipelineSpec| {
+            run_pipeline(
+                &ctx,
+                spec,
+                &base,
+                &mut MitmOracle::new(2),
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .unwrap()
+        };
+        let dense = run(&spec);
+        for name in ["wiedemann", "lanczos", "filter+lanczos", "filter+wiedemann"] {
+            spec.linalg = name.into();
+            let other = run(&spec);
+            assert!(other.verified, "{name}");
+            assert_eq!(other.recovered, dense.recovered, "{name}");
+            assert_eq!(other.linear_algebra.work_unit, "row_ops", "{name}");
+            assert!(other.linear_algebra.work > 0, "{name}");
+        }
+        spec.linalg = "sparse-cado".into();
+        let sparse = run(&spec);
+        assert!(dense.verified && sparse.verified);
+        assert_eq!(sparse.recovered, dense.recovered);
+        assert_eq!(sparse.linear_algebra.rank, dense.linear_algebra.rank);
+        assert_eq!(sparse.linear_algebra.work_unit, "row_ops");
+        assert!(sparse.linear_algebra.work > 0);
+        assert!(sparse.decomposition.relations_found >= dense.decomposition.relations_found);
+        assert!(
+            sparse.decomposition.relations_found <= dense.decomposition.relations_found + 1,
+            "{} against {} relations",
+            sparse.decomposition.relations_found,
+            dense.decomposition.relations_found
+        );
     }
 
     #[test]
