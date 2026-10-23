@@ -202,7 +202,7 @@ class Registry:
         if standard and standard not in e["standard_names"]:
             e["standard_names"].append(standard)
             self.alias(standard, key)
-        if source not in e["sources"] and len(e["sources"]) < 6:
+        if source not in e["sources"]:
             e["sources"].append(source)
         return e
 
@@ -211,7 +211,7 @@ class Registry:
         uid = ec1.curve_identity(field, curve, "x")["curve_uid"]
         rep = self.reps[ident["model_sha256"]].setdefault(
             uid, {"field": field, "curve": curve, "sources": []})
-        if source not in rep["sources"] and len(rep["sources"]) < 6:
+        if source not in rep["sources"]:
             rep["sources"].append(source)
 
     def alias(self, spelling: str, key: str) -> None:

@@ -1,7 +1,9 @@
 # Full-tree curve registry rebuild, 2026-10-23
 
-This branch rebuilds the live ICV1 registry from a complete checkout of
-`a53a7e2bfa20080a424b9a2484a16932b6e3c116` and its tracked sources.
+This branch rebuilds the live ICV1 registry from a complete checkout after
+merging main at `d7daaa6b42e7b5209e78c2407b2eaf35da25fbe4`. The
+source-bound delta checker uses the earlier
+`a53a7e2bfa20080a424b9a2484a16932b6e3c116` baseline.
 The builder now reads the exact `*curve_ids.json` EC1 records, including the
 conductor-gap prepared lists that name their subgroup order `r`. It excludes
 its own generated registry and alias index from text-name harvesting, so a
@@ -24,11 +26,14 @@ The first-source inventory of the new models is 7,760 from the volcano
 cost-v2 study, 4,583 from the volcano census, 870 from the earlier volcano
 cost study, three from isogeny-volcano rho, and three from the weak-curve
 leaderboard. Those are source counts, not new performance results.
-Among the 2,572 preexisting models, 71 entries gain or change metadata:
-51 source lists, 30 representation lists, one unresolved-EC1 status, and one
+Among the 2,572 preexisting models, 236 entries gain or change metadata:
+216 source lists, 57 representation lists, one unresolved-EC1 status, and one
 parameter record (categories overlap). No prior identity, alias mapping, or
 EC1 UID is removed. The one parameter edit changes only the n73 modulus-rule
 provenance text; its polynomial and curve model stay identical.
+The builder now retains every distinct model and representation source rather
+than truncating those lists. A merge check confirms that all 15,791 models,
+their aliases, EC1 UIDs, and source references from both parents survive.
 
 The order proof uses a point of certified order plus Hasse-interval uniqueness
 for 13,216 models, and exhaustive field counts for three small models. The
@@ -42,7 +47,7 @@ boundaries.
 
 | Generated artifact | SHA-256 | Scope |
 | --- | --- | --- |
-| `registry.json` | `fe66fc852bb0bbd9688a284338b5bdc785f60f16309b98959a7ea3d16b8c7cfd` | 15,791 models |
+| `registry.json` | `e39687f5d46346faa2b65ca0fa7d635afec6b01b5025951192d3fa4d1829c3cb` | 15,791 models |
 | `traits.json` | `a9ca14c3e4588d3e1815defaa8596047afb2763f30f2e302b70f631c7faf1edc` | 15,967 trait rows, budget 262,144; 73,577,404 bytes |
 | `covers.json` | `65c2d68bf4886fad9805e7507487f851a7cef8fdd6a8d69ec936211a35b04648` | 15,791 verified models, zero invalid |
 | `cover-links.yaml` | `966619ae9aa07f5cb5beb787d2718abf935c6764a8189d6ef3eafa16afaa73f3` | 15,791 exact maps, 979 EC1 records |
