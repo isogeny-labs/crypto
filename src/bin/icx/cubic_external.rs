@@ -2,11 +2,11 @@
 
 use clap::Args;
 use crypto_lib::cryptanalysis::gaudry_cubic::{
-    Curve3, E3, Fp3, GaudryOptions, Instance3, Pt3, SubspaceBase, run_gaudry_opts, run_rho3,
+    run_gaudry_opts, run_rho3, Curve3, Fp3, GaudryOptions, Instance3, Pt3, SubspaceBase, E3,
 };
-use rand::{SeedableRng, rngs::StdRng};
+use rand::{rngs::StdRng, SeedableRng};
 use serde::Deserialize;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::path::PathBuf;
 
 #[derive(Args)]
@@ -79,8 +79,19 @@ pub fn solve(args: &CubicArgs) -> Result<Value, String> {
         return Err("--route-file and --route-id must be supplied together".into());
     }
     let resolved = crypto_lib::store::resolve_path(&args.input)?;
+    if std::fs::metadata(&resolved)
+        .map_err(|e| format!("{}: {e}", args.input.display()))?
+        .len()
+        > 64 * 1024
+    {
+        return Err("cubic target input exceeds 64 KiB".into());
+    }
     let bytes = std::fs::read(&resolved)
         .map_err(|e| format!("cannot read {}: {e}", args.input.display()))?;
+    if bytes.len() > 64 * 1024 {
+        return Err("cubic target input exceeds 64 KiB".into());
+    }
+    let input_sha256 = hex::encode(crypto_lib::hash::sha256::sha256(&bytes));
     let input: Input =
         serde_json::from_slice(&bytes).map_err(|e| format!("invalid cubic input JSON: {e}"))?;
     if !(7..=101).contains(&input.p) || !super::prime_external::prime(input.p) {
@@ -142,7 +153,6 @@ pub fn solve(args: &CubicArgs) -> Result<Value, String> {
     // verified by replay of the recovered scalar, without a planted answer.
     let source = Instance3 { curve, q, d: 0 };
     let (inst, route) = if let (Some(path), Some(id)) = (&args.route_file, &args.route_id) {
-        let input_sha256 = hex::encode(crypto_lib::hash::sha256::sha256(&bytes));
         let transport =
             super::cubic_route::transport(&source.curve, q, path, id, Some(&input_sha256))?;
         let destination_order = count_curve_order3(
@@ -220,6 +230,11 @@ pub fn solve(args: &CubicArgs) -> Result<Value, String> {
         "operation": "solve-cubic",
         "status": if verified { "complete" } else { "bounded_unknown" },
         "verified": verified,
+        "input_artifact": {
+            "reference": args.input.display().to_string(),
+            "sha256": input_sha256,
+            "bytes": bytes.len(),
+        },
         "input": {
             "p": input.p, "c": input.c, "a": input.a, "b": input.b,
             "n": input.n, "curve_order": curve_order, "cofactor": cofactor,
@@ -271,6 +286,12 @@ mod tests {
         .unwrap();
         assert_eq!(report["input"]["curve_order"], 348);
         assert_eq!(report["input"]["cofactor"], 12);
+        let input_bytes = std::fs::read(fixture("cubic_f7_cofactor12_public_target.json")).unwrap();
+        assert_eq!(report["input_artifact"]["bytes"], input_bytes.len());
+        assert_eq!(
+            report["input_artifact"]["sha256"],
+            hex::encode(crypto_lib::hash::sha256::sha256(&input_bytes))
+        );
         assert_eq!(report["ic"]["recovered_scalar"], 5);
         assert_eq!(report["ic"]["verified"], true);
         assert!(report["ic"]["torsion_lift_fp_muls"].as_u64().unwrap() > 0);

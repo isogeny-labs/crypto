@@ -226,6 +226,12 @@ the full group, then projects each relation by `[h]` before linear algebra.
 The projected factor base must contain a nonidentity subgroup point.
 `--input` also accepts `store:NAME` or `sha256:DIGEST`; the artifact store
 checks the indexed content hash when it fetches the JSON into its cache.
+The JSON input is capped at 64 KiB, and `input_artifact` in the result records
+the exact reference, SHA-256, and byte count used for the solve. This binds a
+local or retrieved target to the reported scalar and route validation.
+The [input-identity acceptance receipt](../store/CUBIC_TARGET_INPUT_IDENTITY_ACCEPTANCE_20261023.json)
+records a local and a fresh-cache Setec S3 solve, a routed solve through a
+digest reference, remote byte checks, and exact-object cleanup.
 It reports the Gaudry-style relation and linear-algebra counters and runs a
 same-target rho reference unless `--skip-rho` is set.
 The checked `ic solve-cubic` output for this input is frozen as
