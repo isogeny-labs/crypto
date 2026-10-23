@@ -78,3 +78,24 @@ and publication/admission-correction-publication-v2. Prior entries were checked
 structurally unchanged; objects were neither overwritten nor deleted. Copies
 were made readable only in the new staging directory. No corrected continuation
 has run at this publication freeze; see RESPEC-C2.md for the exact bounded plan.
+
+## Assessed launch failure and validated C3 correction
+
+`evidence/n83/arena-reclamation-20261023/launch-correction.tar.xz`:
+37112636bytes, SHA256
+`0debd4e2016dc99c12ff152e6921b111861fe97c169d135b1e70cd2c6e285018`.
+Includes the complete K2048-c2 launch-failed raw tree, exact card/spec/binds,
+verbatim relay/receipt/streams/source, director custody assessment, readiness
+checks including the refused usage invocation, all new21/44+7 test/build/source
+records, cumulative43/8957 accounting and negative released-worker control,
+Docker diagnostics and native barrier/scope/swap/cleanup smoke, inspected
+separate one-page failure report and actual full-PR large-files PASS (the
+initial missing-base invocation error is retained separately).
+
+Source bundle through99516b4af7f40b053c62db598e5905bedc94fbef includes the
+interveningde389 publication commit, with prerequisiteb877 in the previous
+admission-correction archive. All payload hashes, source bundle, native launch
+accounting and byte-identical repack pass from a fresh S3 GET after PUT/HEAD.
+Receipts/manifests: publication/launch-correction-publication. Prior store
+entries are structurally unchanged. No object was overwritten or deleted.
+No c3/K4096 continuation has run at this publication freeze. See RESPEC-C3.md.
