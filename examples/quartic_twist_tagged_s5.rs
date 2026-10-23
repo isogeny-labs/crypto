@@ -460,6 +460,13 @@ pub(crate) fn collect_mixed_pattern(
     rng: &mut StdRng,
 ) -> MixedCollect {
     assert!((1..=3).contains(&k));
+    let line0_len = base.iter().take_while(|pt| pt.x.0[2] == 0).count();
+    assert!(line0_len > 0 && line0_len < base.len());
+    assert!(base[..line0_len].iter().all(|pt| pt.x.0[1..] == [0, 0, 0]));
+    assert!(base[line0_len..]
+        .iter()
+        .all(|pt| pt.x.0[0] == 0 && pt.x.0[1] == 0 && pt.x.0[3] == 0));
+    let p = c.f.p;
     c.f.reset_muls();
     c.reset_ops();
     let start = Instant::now();
@@ -483,7 +490,11 @@ pub(crate) fn collect_mixed_pattern(
         got.extend(signed_relations(c, base, residual, &ids));
     };
     if k == 1 || k == 3 {
-        let peel = if k == 1 { 36..48 } else { 0..36 };
+        let peel = if k == 1 {
+            line0_len..base.len()
+        } else {
+            0..line0_len
+        };
         let scale = if k == 1 { E4::ONE } else { E4([0, 0, 1, 0]) };
         for id in peel {
             for sign in [-1, 1] {
@@ -501,9 +512,9 @@ pub(crate) fn collect_mixed_pattern(
                 let comps = s4.weil_line(&c.f, &remain.x, &scale);
                 st.weil_muls = c.f.muls() - before;
                 systems += 1;
-                if let Some(solutions) = solve_system_n::<3>(&comps, 4, 10, 37, rng, &mut st) {
+                if let Some(solutions) = solve_system_n::<3>(&comps, 4, 10, p, rng, &mut st) {
                     for sol in solutions {
-                        if let Some(xs) = split(&sol, 37) {
+                        if let Some(xs) = split(&sol, p) {
                             let peeled_x = if k == 1 {
                                 base[id].x.0[2]
                             } else {
@@ -526,8 +537,8 @@ pub(crate) fn collect_mixed_pattern(
             }
         }
     } else {
-        for i in 36..48 {
-            for j in i + 1..48 {
+        for i in line0_len..base.len() {
+            for j in i + 1..base.len() {
                 for si in [-1, 1] {
                     for sj in [-1, 1] {
                         let pi = if si == 1 { base[i] } else { c.neg(&base[i]) };
@@ -538,10 +549,10 @@ pub(crate) fn collect_mixed_pattern(
                         }
                         let comps = s3_weil(c, &remain.x);
                         systems += 1;
-                        let (solutions, muls) = solve_s3_fp_scan(&comps, 37);
+                        let (solutions, muls) = solve_s3_fp_scan(&comps, p);
                         internal_muls += muls;
                         for sol in solutions {
-                            if let Some(xs) = split(&sol, 37) {
+                            if let Some(xs) = split(&sol, p) {
                                 process(xs.to_vec(), vec![base[i].x.0[2], base[j].x.0[2]]);
                             } else {
                                 split_failures += 1;
