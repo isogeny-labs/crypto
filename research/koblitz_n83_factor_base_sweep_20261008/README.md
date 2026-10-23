@@ -248,3 +248,9 @@ and [publication](verification/native-natural-1m-20261020/PUBLICATION.md).
 Both final K2048/K4096 runs reach1Mconflicts with zero models/relations/rank;
 59/61memory samples pass at8GiB/zero extra swap. Earlier refusals, interruption
 and failed resource profiles remain unadmitted. No base or runtime winner is selected.
+
+Continuation correction: the first K2048 1.5M command was refused before SAT
+by the worker's old 7200-second admission gate. [RESPEC-C2.md](verification/native-arena-reclamation-20261023/RESPEC-C2.md)
+records the retained failure, validated narrow gate correction and conservative
+13-second charge inside the original slot. The corrective ceiling is8987 seconds;
+K4096 retains9000. The total allowance remains30000, with no automatic retries.

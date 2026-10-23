@@ -997,6 +997,24 @@ struct ChainRunConfig<'a> {
     source_attestation_mode: &'static str,
 }
 
+fn supported_chain_wall_budget(
+    columns: usize,
+    m: usize,
+    conflicts: u64,
+    seconds: u64,
+    frobenius_orbits: bool,
+    order_first_pair: bool,
+) -> bool {
+    (1..=7200).contains(&seconds)
+        || (m == 5
+            && frobenius_orbits
+            && !order_first_pair
+            && matches!(
+                (columns, conflicts, seconds),
+                (2048, 1_500_000, 8987) | (4096, 1_500_000, 9000)
+            ))
+}
+
 /// Execute one replay-bound primary chained-S3 search only inside a verified
 /// hard-memory cgroup. The outer supervisor owns the separate wall deadline.
 #[allow(clippy::too_many_arguments)]
@@ -1035,8 +1053,14 @@ pub(super) fn run_chain_cli(
         || limits.max_models > 1_000_000
         || limits.conflict_budget == 0
         || limits.conflict_budget > 10_000_000_000
-        || budget_seconds == 0
-        || budget_seconds > 7200
+        || !supported_chain_wall_budget(
+            columns,
+            m,
+            limits.conflict_budget,
+            budget_seconds,
+            frobenius_orbits,
+            order_first_pair,
+        )
         || memory_mib < 128
         || memory_mib > 65536
         || (order_first_pair && !frobenius_orbits)
@@ -1385,6 +1409,54 @@ fn run_with_config(
 mod tests {
     use super::super::construct;
     use super::*;
+
+    #[test]
+    fn continuation_wall_admission_preserves_legacy_and_rejects_nearby_requests() {
+        for (columns, seconds) in [(2048, 8987), (4096, 9000)] {
+            assert!(supported_chain_wall_budget(columns, 5, 1_500_000, seconds, true, false));
+            for (k, m, conflicts, wall, orbits, ordered) in [
+                (columns, 5, 1_500_000, seconds - 1, true, false),
+                (columns, 5, 1_500_000, seconds + 1, true, false),
+                (columns, 5, 1_500_001, seconds, true, false),
+                (columns, 6, 1_500_000, seconds, true, false),
+                (columns, 5, 1_500_000, seconds, false, false),
+                (columns, 5, 1_500_000, seconds, true, true),
+                (8192, 5, 1_500_000, seconds, true, false),
+            ] {
+                assert!(!supported_chain_wall_budget(k, m, conflicts, wall, orbits, ordered));
+            }
+        }
+        for seconds in [1, 6000, 7200] {
+            assert!(supported_chain_wall_budget(64, 6, 100, seconds, false, false));
+        }
+        assert!(!supported_chain_wall_budget(2048, 5, 1_500_000, 0, true, false));
+        assert!(!supported_chain_wall_budget(2048, 5, 1_500_000, 9000, true, false));
+        assert!(!supported_chain_wall_budget(4096, 5, 1_500_000, 8987, true, false));
+    }
+
+    #[test]
+    fn actual_chain_entry_passes_continuation_admission_before_cgroup_or_input_refusal() {
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
+        let tmp = std::env::temp_dir().join(format!("n83-wall-admission-{}-{nonce}", std::process::id()));
+        let fixtures = tmp.join("fixtures");
+        fs::create_dir_all(&fixtures).unwrap();
+        fs::write(fixtures.join("probe-corpus.json"), b"{}").unwrap();
+        fs::write(fixtures.join("probe-validation.json"), b"{}").unwrap();
+        for (columns, seconds) in [(2048, 8987), (4096, 9000)] {
+            // The deliberately absent panel prevents any SAT execution even
+            // if the test happens to run inside a matching hard-memory cgroup.
+            let err = run_chain_cli(
+                &tmp.join("absent-panel"), &fixtures, columns, "public_x_hash",
+                2026100801, 5, 1,
+                ChainS3Limits { max_variables:150000, max_domain_clauses:2000000,
+                    max_models:32, conflict_budget:1500000 },
+                seconds, 8192, &tmp.join(format!("out-{columns}")), true, false,
+            ).unwrap_err().to_string();
+            assert_ne!(err, "primary chained-S3 search caps or base selection outside supported domain");
+        }
+        fs::remove_dir_all(tmp).unwrap();
+    }
     use crypto_lib::cryptanalysis::koblitz_index_calculus::{
         enumerate_decompose, koblitz_index_calculus_dlp_with_factor_base, KoblitzIcOptions,
     };

@@ -1,0 +1,196 @@
+diff --git a/research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs b/research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs
+index e642d2754..1d60339b6 100644
+--- a/research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs
++++ b/research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs
+@@ -997,6 +997,24 @@ struct ChainRunConfig<'a> {
+     source_attestation_mode: &'static str,
+ }
+ 
++fn supported_chain_wall_budget(
++    columns: usize,
++    m: usize,
++    conflicts: u64,
++    seconds: u64,
++    frobenius_orbits: bool,
++    order_first_pair: bool,
++) -> bool {
++    (1..=7200).contains(&seconds)
++        || (m == 5
++            && frobenius_orbits
++            && !order_first_pair
++            && matches!(
++                (columns, conflicts, seconds),
++                (2048, 1_500_000, 8987) | (4096, 1_500_000, 9000)
++            ))
++}
++
+ /// Execute one replay-bound primary chained-S3 search only inside a verified
+ /// hard-memory cgroup. The outer supervisor owns the separate wall deadline.
+ #[allow(clippy::too_many_arguments)]
+@@ -1035,8 +1053,14 @@ pub(super) fn run_chain_cli(
+         || limits.max_models > 1_000_000
+         || limits.conflict_budget == 0
+         || limits.conflict_budget > 10_000_000_000
+-        || budget_seconds == 0
+-        || budget_seconds > 7200
++        || !supported_chain_wall_budget(
++            columns,
++            m,
++            limits.conflict_budget,
++            budget_seconds,
++            frobenius_orbits,
++            order_first_pair,
++        )
+         || memory_mib < 128
+         || memory_mib > 65536
+         || (order_first_pair && !frobenius_orbits)
+@@ -1385,6 +1409,54 @@ fn run_with_config(
+ mod tests {
+     use super::super::construct;
+     use super::*;
++
++    #[test]
++    fn continuation_wall_admission_preserves_legacy_and_rejects_nearby_requests() {
++        for (columns, seconds) in [(2048, 8987), (4096, 9000)] {
++            assert!(supported_chain_wall_budget(columns, 5, 1_500_000, seconds, true, false));
++            for (k, m, conflicts, wall, orbits, ordered) in [
++                (columns, 5, 1_500_000, seconds - 1, true, false),
++                (columns, 5, 1_500_000, seconds + 1, true, false),
++                (columns, 5, 1_500_001, seconds, true, false),
++                (columns, 6, 1_500_000, seconds, true, false),
++                (columns, 5, 1_500_000, seconds, false, false),
++                (columns, 5, 1_500_000, seconds, true, true),
++                (8192, 5, 1_500_000, seconds, true, false),
++            ] {
++                assert!(!supported_chain_wall_budget(k, m, conflicts, wall, orbits, ordered));
++            }
++        }
++        for seconds in [1, 6000, 7200] {
++            assert!(supported_chain_wall_budget(64, 6, 100, seconds, false, false));
++        }
++        assert!(!supported_chain_wall_budget(2048, 5, 1_500_000, 0, true, false));
++        assert!(!supported_chain_wall_budget(2048, 5, 1_500_000, 9000, true, false));
++        assert!(!supported_chain_wall_budget(4096, 5, 1_500_000, 8987, true, false));
++    }
++
++    #[test]
++    fn actual_chain_entry_passes_continuation_admission_before_cgroup_or_input_refusal() {
++        let nonce = std::time::SystemTime::now()
++            .duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
++        let tmp = std::env::temp_dir().join(format!("n83-wall-admission-{}-{nonce}", std::process::id()));
++        let fixtures = tmp.join("fixtures");
++        fs::create_dir_all(&fixtures).unwrap();
++        fs::write(fixtures.join("probe-corpus.json"), b"{}").unwrap();
++        fs::write(fixtures.join("probe-validation.json"), b"{}").unwrap();
++        for (columns, seconds) in [(2048, 8987), (4096, 9000)] {
++            // The deliberately absent panel prevents any SAT execution even
++            // if the test happens to run inside a matching hard-memory cgroup.
++            let err = run_chain_cli(
++                &tmp.join("absent-panel"), &fixtures, columns, "public_x_hash",
++                2026100801, 5, 1,
++                ChainS3Limits { max_variables:150000, max_domain_clauses:2000000,
++                    max_models:32, conflict_budget:1500000 },
++                seconds, 8192, &tmp.join(format!("out-{columns}")), true, false,
++            ).unwrap_err().to_string();
++            assert_ne!(err, "primary chained-S3 search caps or base selection outside supported domain");
++        }
++        fs::remove_dir_all(tmp).unwrap();
++    }
+     use crypto_lib::cryptanalysis::koblitz_index_calculus::{
+         enumerate_decompose, koblitz_index_calculus_dlp_with_factor_base, KoblitzIcOptions,
+     };
+diff --git a/tools/n83-sweep-runner/src/main.rs b/tools/n83-sweep-runner/src/main.rs
+index 11c1ced40..a992abfab 100644
+--- a/tools/n83-sweep-runner/src/main.rs
++++ b/tools/n83-sweep-runner/src/main.rs
+@@ -1,5 +1,6 @@
+ //! Native bounded diagnostic runner. Deliberately admits no scalar recovery or runtime winner.
+ use serde_json::{json, Value};
++mod admission_refusal;
+ mod card;
+ mod memory_profile;
+ #[allow(dead_code)]
+@@ -301,6 +302,12 @@ fn memory_profile_refuses_escaping_or_nonunified_cgroups() {
+     assert!(absent["cgroup_error"].is_string());
+     assert!(absent.get("memory.current").is_none());
+ }
++fn continuation_budget(columns: u64, conflicts: u64, wall: u64) -> bool {
++    matches!(
++        (columns, conflicts, wall),
++        (2048, 1_500_000, 8987) | (4096, 1_500_000, 9000)
++    )
++}
+ fn memory_limit(v: &Value) -> R<u64> {
+     let bytes = match v.get("memory_limit_bytes") {
+         None => 4u64 << 30,
+@@ -310,7 +317,11 @@ fn memory_limit(v: &Value) -> R<u64> {
+         && ((v["conflicts"] == 450000u64 && v["wall_seconds"] == 2400u64)
+             || (v["conflicts"] == 800000u64 && v["wall_seconds"] == 4800u64)
+             || (v["conflicts"] == 1000000u64 && v["wall_seconds"] == 6000u64)
+-            || (v["conflicts"] == 1500000u64 && v["wall_seconds"] == 9000u64))
++            || continuation_budget(
++                v["columns"].as_u64().unwrap_or(0),
++                v["conflicts"].as_u64().unwrap_or(0),
++                v["wall_seconds"].as_u64().unwrap_or(0),
++            ))
+         && !v["external_solver"].is_string()
+         && !v["external_solver_blake3"].is_string();
+     require(
+@@ -330,7 +341,7 @@ fn explicit_memory_extension_keeps_legacy_and_control_limits() {
+         (4096, 800000, 4800),
+         (2048, 1000000, 6000),
+         (4096, 1000000, 6000),
+-        (2048, 1500000, 9000),
++        (2048, 1500000, 8987),
+         (4096, 1500000, 9000),
+     ] {
+         let base = json!({"columns":k,"conflicts":conflicts,"wall_seconds":wall,"memory_limit_bytes":8u64<<30});
+@@ -1027,10 +1038,10 @@ fn external_replay(dir: &Path) -> R<Vec<bool>> {
+ }
+ 
+ fn validate_run_budget(columns: u64, external: bool, conflicts: u64, wall: u64) -> R<()> {
+-    // This preregistered continuation is one exact budget pair for two
+-    // natural panels. All other natural, witness and external limits stay
+-    // at their existing ceilings.
+-    if matches!(columns, 2048 | 4096) && !external && conflicts == 1_500_000 && wall == 9000 {
++    // Exact preregistered natural-panel budgets: K2048 charges the refused
++    // command inside its original slot, leaving 8987 seconds; K4096 keeps 9000.
++    // All other natural, witness and external limits retain their ceilings.
++    if !external && continuation_budget(columns, conflicts, wall) {
+         return Ok(());
+     }
+     let natural = columns != 0 && !external;
+@@ -1380,6 +1391,9 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
+ fn main() -> R<()> {
+     let a: Vec<_> = std::env::args().collect();
+     match a.get(1).map(String::as_str) {
++        Some("account-admission-refusal") if a.len() == 5 => {
++            admission_refusal::account(Path::new(&a[2]), Path::new(&a[3]), Path::new(&a[4]))
++        }
+         Some("systemd-barrier-smoke") if a.len() == 3 => systemd_scope::smoke(Path::new(&a[2])),
+         Some("prepare-systemd-swap") if a.len() == 4 => {
+             let live = read(&a[2])?;
+@@ -1616,14 +1630,16 @@ fn natural_budget_admits_1m_but_stays_bounded() {
+ 
+ #[test]
+ fn continuation_budget_is_an_exact_natural_panel_pair() {
+-    for columns in [2048, 4096] {
+-        assert!(validate_run_budget(columns, false, 1_500_000, 9000).is_ok());
++    assert!(validate_run_budget(2048, false, 1_500_000, 9000).is_err());
++    assert!(validate_run_budget(4096, false, 1_500_000, 8987).is_err());
++    for (columns, wall) in [(2048, 8987), (4096, 9000)] {
++        assert!(validate_run_budget(columns, false, 1_500_000, wall).is_ok());
+         for (conflicts, wall) in [
+-            (1_500_001, 9000),
+-            (1_499_999, 9000),
+-            (1_500_000, 9001),
+-            (1_500_000, 8999),
+-            (1_000_000, 9000),
++            (1_500_001, wall),
++            (1_499_999, wall),
++            (1_500_000, wall + 1),
++            (1_500_000, wall - 1),
++            (1_000_000, wall),
+             (1_500_000, 6000),
+             (0, 9000),
+             (1_500_000, 0),

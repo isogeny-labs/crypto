@@ -1,5 +1,6 @@
 //! Native bounded diagnostic runner. Deliberately admits no scalar recovery or runtime winner.
 use serde_json::{json, Value};
+mod admission_refusal;
 mod card;
 mod memory_profile;
 #[allow(dead_code)]
@@ -301,6 +302,12 @@ fn memory_profile_refuses_escaping_or_nonunified_cgroups() {
     assert!(absent["cgroup_error"].is_string());
     assert!(absent.get("memory.current").is_none());
 }
+fn continuation_budget(columns: u64, conflicts: u64, wall: u64) -> bool {
+    matches!(
+        (columns, conflicts, wall),
+        (2048, 1_500_000, 8987) | (4096, 1_500_000, 9000)
+    )
+}
 fn memory_limit(v: &Value) -> R<u64> {
     let bytes = match v.get("memory_limit_bytes") {
         None => 4u64 << 30,
@@ -310,7 +317,11 @@ fn memory_limit(v: &Value) -> R<u64> {
         && ((v["conflicts"] == 450000u64 && v["wall_seconds"] == 2400u64)
             || (v["conflicts"] == 800000u64 && v["wall_seconds"] == 4800u64)
             || (v["conflicts"] == 1000000u64 && v["wall_seconds"] == 6000u64)
-            || (v["conflicts"] == 1500000u64 && v["wall_seconds"] == 9000u64))
+            || continuation_budget(
+                v["columns"].as_u64().unwrap_or(0),
+                v["conflicts"].as_u64().unwrap_or(0),
+                v["wall_seconds"].as_u64().unwrap_or(0),
+            ))
         && !v["external_solver"].is_string()
         && !v["external_solver_blake3"].is_string();
     require(
@@ -330,7 +341,7 @@ fn explicit_memory_extension_keeps_legacy_and_control_limits() {
         (4096, 800000, 4800),
         (2048, 1000000, 6000),
         (4096, 1000000, 6000),
-        (2048, 1500000, 9000),
+        (2048, 1500000, 8987),
         (4096, 1500000, 9000),
     ] {
         let base = json!({"columns":k,"conflicts":conflicts,"wall_seconds":wall,"memory_limit_bytes":8u64<<30});
@@ -1027,10 +1038,10 @@ fn external_replay(dir: &Path) -> R<Vec<bool>> {
 }
 
 fn validate_run_budget(columns: u64, external: bool, conflicts: u64, wall: u64) -> R<()> {
-    // This preregistered continuation is one exact budget pair for two
-    // natural panels. All other natural, witness and external limits stay
-    // at their existing ceilings.
-    if matches!(columns, 2048 | 4096) && !external && conflicts == 1_500_000 && wall == 9000 {
+    // Exact preregistered natural-panel budgets: K2048 charges the refused
+    // command inside its original slot, leaving 8987 seconds; K4096 keeps 9000.
+    // All other natural, witness and external limits retain their ceilings.
+    if !external && continuation_budget(columns, conflicts, wall) {
         return Ok(());
     }
     let natural = columns != 0 && !external;
@@ -1380,6 +1391,9 @@ fn run(spec: &Path, dir: &Path) -> R<()> {
 fn main() -> R<()> {
     let a: Vec<_> = std::env::args().collect();
     match a.get(1).map(String::as_str) {
+        Some("account-admission-refusal") if a.len() == 5 => {
+            admission_refusal::account(Path::new(&a[2]), Path::new(&a[3]), Path::new(&a[4]))
+        }
         Some("systemd-barrier-smoke") if a.len() == 3 => systemd_scope::smoke(Path::new(&a[2])),
         Some("prepare-systemd-swap") if a.len() == 4 => {
             let live = read(&a[2])?;
@@ -1616,14 +1630,16 @@ fn natural_budget_admits_1m_but_stays_bounded() {
 
 #[test]
 fn continuation_budget_is_an_exact_natural_panel_pair() {
-    for columns in [2048, 4096] {
-        assert!(validate_run_budget(columns, false, 1_500_000, 9000).is_ok());
+    assert!(validate_run_budget(2048, false, 1_500_000, 9000).is_err());
+    assert!(validate_run_budget(4096, false, 1_500_000, 8987).is_err());
+    for (columns, wall) in [(2048, 8987), (4096, 9000)] {
+        assert!(validate_run_budget(columns, false, 1_500_000, wall).is_ok());
         for (conflicts, wall) in [
-            (1_500_001, 9000),
-            (1_499_999, 9000),
-            (1_500_000, 9001),
-            (1_500_000, 8999),
-            (1_000_000, 9000),
+            (1_500_001, wall),
+            (1_499_999, wall),
+            (1_500_000, wall + 1),
+            (1_500_000, wall - 1),
+            (1_000_000, wall),
             (1_500_000, 6000),
             (0, 9000),
             (1_500_000, 0),
