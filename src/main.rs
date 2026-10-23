@@ -970,8 +970,18 @@ fn cmd_rho_collab(op: RhoCollabOp) {
     ) -> JobSpec {
         match (job, mailbox) {
             (Some(p), _) => {
-                let s = std::fs::read_to_string(p)
+                let resolved = crypto_lib::store::resolve_path(p).unwrap_or_else(|e| die(e));
+                let size = std::fs::metadata(&resolved)
+                    .unwrap_or_else(|e| die(format!("{}: {e}", p.display())))
+                    .len();
+                if size > 64 * 1024 {
+                    die("rho job input exceeds 64 KiB");
+                }
+                let s = std::fs::read_to_string(&resolved)
                     .unwrap_or_else(|e| die(format!("{}: {e}", p.display())));
+                if s.len() > 64 * 1024 {
+                    die("rho job input exceeds 64 KiB");
+                }
                 JobSpec::from_json(&s).unwrap_or_else(|e| die(e))
             }
             (None, Some(d)) => Mailbox::read_job(d).unwrap_or_else(|e| die(e)),
@@ -1129,6 +1139,7 @@ fn cmd_rho_collab(op: RhoCollabOp) {
                 cairn.as_ref().map(|_| {
                     let dir = job
                         .as_ref()
+                        .filter(|p| !p.to_str().is_some_and(crypto_lib::store::is_store_ref))
                         .and_then(|p| p.parent().map(|d| d.to_path_buf()))
                         .or_else(|| mailbox.clone())
                         .unwrap_or_else(|| std::path::PathBuf::from("."));
