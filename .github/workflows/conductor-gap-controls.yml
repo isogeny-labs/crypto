@@ -141,6 +141,8 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: /research/conductor_gap_cm_orbits_20261015/lean/
+      # The self-hosted image ships no zstd, which `tar --zstd` needs.
+      - run: command -v zstd || (sudo apt-get update && sudo apt-get install -y zstd)
       - name: Install hash-pinned Lean 4.34.1
         shell: bash
         run: |
