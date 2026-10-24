@@ -2,7 +2,7 @@
 
 Workstream F of `/Volumes/SSD990-2/ic-regime-review-20261024/PLAN.md`, answering REVIEW.md §3 item 6 and §5.2 M1 and M5. Desk audit: no solver was run, nothing was pushed. Labels: **measured** = read from a committed file (path and line given); **derived** = inference from measured items; **proposed** = recommendation.
 
-The N83 cold-base panel directory `research/n83_cold_base_confirm_20261021/` exists only on `ci/*` branches, not on `origin/main`; it was read from commit `753b622349`. All other `crypto` inputs were read from `origin/main` (`5cb553810e`), and `cryptanalysis` inputs from its `origin/main`.
+The N83 cold-base panel directory `research/n83_cold_base_confirm_20261021/` is on `origin/main`: commit `753b622349` is an ancestor of `origin/main` and the tree holds RESULT.md, targets.jsonl and the rest (14 entries). It was read from that commit. All other `crypto` inputs were read from `origin/main` (`5cb553810e`), and `cryptanalysis` inputs from its `origin/main`.
 
 ## 1. Which rho the N83 panels and the leaderboard use
 
@@ -11,7 +11,7 @@ The N83 cold-base panel directory `research/n83_cold_base_confirm_20261021/` exi
 - Config: `research/n83_dense_root_20261013/rho_config.json` = `{"backend":"fold","lanes":64,"dp_bits":6,"escape_fruitless":false,"step_cap_factor":2000}`.
 - The example builds `StrongRhoG` (lines 174-190) and calls `rho.solve` (line 288). `solve` dispatches to `solve_dispatch::<false>` (`src/cryptanalysis/koblitz_strong_rho.rs`, `solve` near line 1434), which calls `canonicalize` (line 1372), not `canonicalize_legacy` (line 1339).
 - Receipt field `"quotient": "signed_frobenius"` (example line 381). The receipt does not name the canonicalisation basis; that gap is what REVIEW §3.6 points at.
-- Same-point rho online geometric mean over 16 points: 2,334.964 ms (`RESULT.md` line 10). This is the 2,335 ms in REVIEW.
+- Same-point rho online geometric mean over the panel's 16 points: 2,334.964 ms (`RESULT.md` line 10). This is the panel's same-point rho geometric mean, not a K1107-only figure; it is the 2,335 ms cited in REVIEW.
 
 **Canonicalisation used by the N83 rho.** measured, `src/cryptanalysis/koblitz_strong_rho.rs` header lines 10-13 and `canonicalize` (line 1372): the canonical representative of `{±φ^k(P)}` is the least rotation of the x normal coordinates (`least_rotation`, line 780), sign chosen by y, ties resolved by `choice_exhaustive`, orbit multiplier `±λ^k` from a table. So it is **normal-basis signed-Frobenius least rotation**: not plain negation, not a polynomial-basis orbit minimum. The N83 rho is therefore already the canonicalised walk that cryptanalysis calls R2.
 
@@ -32,6 +32,8 @@ The N83 cold-base panel directory `research/n83_cold_base_confirm_20261021/` exi
 - `examples/koblitz_rho_batch_ks.rs` (the vs_rho comparator) uses squaring-walk canonicalisation with Fermat inversion (per `boundary_targets.json`); it is the older polynomial-basis path.
 
 **What cryptanalysis measured.** measured: `papers/frobenius-orbits/sec-benchmarks.tex` (table `tab:rho-ladder`, around lines 160-190, n=53, 1024 targets, Callgrind Ir): R0 371.1e9, R1 (library field, hardware clmul, still polynomial-basis canonicalisation) 281.0e9, R2 (+normal-coordinate canonicalisation) 68.9e9, R3 (+32 lanes, batched inversion) 46.4e9. R1 to R2 is 4.08x, the "4.1x" in `sec-abstract.tex`. The abstract's "reverses an apparent index-calculus win" refers to IC/rho going from 0.317 (R1) to 1.294 (R2).
+
+**Caveat (derived from source, not measured):** the source check shows the same canonicalisation mechanism is present in crypto. It does not show equal speed. No cross-repo Ir comparison exists: the 4.1x was measured in cryptanalysis at n=53, and crypto's `StrongRho` has not been measured against R1 in the same binary or process.
 
 **Derived:** the 4.1x is the step from the old polynomial-basis reference to the normal-basis one, and crypto's `StrongRho` already contains that step (crypto boundary record `rho_r2_normal_coordinate_canonicalization`). It does not show that the N83 rho is weaker than the best available rho. Its real content is that IC/rho ratios measured against a polynomial-basis rho are inflated about 4x. Any such ratio in crypto that cites `koblitz_rho_fixture ... strong` or `StrongRho` is already normal-basis; any that cites `koblitz_index_calculus::canonicalize_signed_rho` or `koblitz_rho_batch_ks` is not.
 
@@ -72,4 +74,4 @@ Sources: `research/equal_advice_wide_20261018/{README.md,PROTOCOL.md,run.sh}`, `
 
 - M5 is largely already done in code: the N83 rho and Table A rho are normal-basis. The residual work is a basis label in the receipt and an optional polynomial-basis control (card `XP-20261024-rho-canonicalisation-control`).
 - M1 cannot run on this Mac. It needs an idle Linux host with 48 GiB RAM.
-- The N83 K1107 2,335 ms rho figure is measured with the normal-basis canonicalisation; the review's concern about the rho's strength is answered in code, not by measurement.
+- The 2,335 ms figure is the panel's same-point rho geometric mean over 16 points, not a K1107-only figure. Its canonicalisation is the normal-basis one by source check. The review's concern about the rho's strength is answered in code, not by measurement.

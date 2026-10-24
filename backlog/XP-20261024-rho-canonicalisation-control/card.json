@@ -10,7 +10,7 @@
   "status_note": "Draft, unqueued. The normal-basis rho arm already exists in crypto (koblitz_strong_rho), so no port is needed for that arm. Ready needs the polynomial-basis control arm written, point files staged from the ci-branch panel, recorded hashes, and a verify script.",
   "blocked_on": [
     "note: Write the polynomial-basis control arm (koblitz_index_calculus.rs canonicalize_signed_rho or an equivalent example) with a receipt that names its canonical basis",
-    "note: Stage point_<i>.jsonl from research/n83_cold_base_confirm_20261021/targets.jsonl (ci branch, commit 753b622349; not on main)",
+    "note: Stage point_<i>.jsonl from research/n83_cold_base_confirm_20261021/targets.jsonl (on origin/main; commit 753b622349 is an ancestor)",
     "note: Write the verify script and receipt schema for the control arm (verify argv is a placeholder)"
   ],
   "links": {
@@ -30,7 +30,7 @@
   "decision_value": "A measured P/N ratio at n=83 says how much polynomial-basis IC/rho ratios are inflated (the cryptanalysis 4.1x was measured at n=53). It does not change the leaderboard and makes no speed claim.",
   "protocol": {
     "path": "PROTOCOL.md",
-    "blob": "a73fb57c8944602dac1ab192ac8bcbca7b189aee"
+    "blob": "9660763a895bc6c178913f35965a7efe2a78148b"
   },
   "code": {
     "repo": "crypto",

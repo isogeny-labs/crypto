@@ -11,9 +11,9 @@ The M5 text said "port normal-basis canonicalisation from cryptanalysis". That i
 ## Before promotion to ready
 
 1. Write arm P with a receipt that names its canonical basis.
-2. Stage the sixteen point files from `research/n83_cold_base_confirm_20261021/targets.jsonl`. That directory is on a ci branch (commit `753b622349`), not main.
+2. Stage the sixteen point files from `research/n83_cold_base_confirm_20261021/targets.jsonl`. The directory is on `origin/main` (commit `753b622349` is an ancestor); the same files also sit on ci branches.
 3. Record SHA-256 of the point files, the source commit and the executed binary.
 4. Write the verify script the card names (`research/rho_canonicalisation_audit_20261024/verify_rho_receipts.py`).
 5. Pick a cairn space and an environment recipe. Operation counts are valid at L0; any wall figure needs L2 on a quiet Linux host.
 
-Files: `card.json` (schema `backlog.card/v1`, validated against `backlog/schema/card.v1.json`), `PROTOCOL.md` (draft, blob `a73fb57c8944602dac1ab192ac8bcbca7b189aee`).
+Files: `card.json` (schema `backlog.card/v1`, validated against `backlog/schema/card.v1.json`), `PROTOCOL.md` (draft, blob `9660763a895bc6c178913f35965a7efe2a78148b`).

@@ -13,7 +13,7 @@ Decision value: the cryptanalysis claim (4.1x in `papers/frobenius-orbits/sec-be
 
 ## Frozen inputs (to be recorded before the run)
 
-- Points: `targets.jsonl` (16 lines, each a JSON array of two decimal strings) in `research/n83_cold_base_confirm_20261021/` at commit `753b622349` (ci branch). Each line is written to `point_<i>.jsonl` (one array per file) as `run.py` `point_inputs` does. TBD: record the SHA-256 of each point file.
+- Points: `targets.jsonl` (16 lines, each a JSON array of two decimal strings) in `research/n83_cold_base_confirm_20261021/` at commit `753b622349` (an ancestor of `origin/main`). Each line is written to `point_<i>.jsonl` (one array per file) as `run.py` `point_inputs` does. TBD: record the SHA-256 of each point file.
 - Seeds: `RHO_SEED_BASE + point_index` with `RHO_SEED_BASE = 2026102100` (`run.py` line 21), point index 1 to 16.
 - Configuration: `research/n83_dense_root_20261013/rho_config.json` (`fold`, 64 lanes, `dp_bits` 6, `escape_fruitless` false, `step_cap_factor` 2000). The arm P must use the same lanes, `dp_bits` and step cap; if its config schema differs, record the difference and do not claim equal policy.
 - Binary: built with `cargo build --release --locked --example n83_rho_optimization_eval` from the source commit that carries the arm. TBD: record source and executed-binary SHA-256. The panel's binary is `4ed1335f55240ff98470caf0096b9c0cbb3da0a01b157ce88bc83cf886f761e9` (`results/source.json`); arm N should reproduce its receipts' policy fields.
