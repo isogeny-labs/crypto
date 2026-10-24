@@ -243,6 +243,11 @@ jobs:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|perf-history.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|perf-history.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 90 }}
     steps:
+      - name: Free disk used by unrelated Ubuntu SDKs
+        if: runner.os == 'Linux'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/hostedtoolcache/CodeQL
+          df -h .
       - uses: actions/checkout@v4
       - name: Check out the history branch
         uses: actions/checkout@v4
@@ -276,7 +281,7 @@ jobs:
             --allocation-index docs/perf/f4-f5-allocation-history.json \
             --root . --out "$RUNNER_TEMP/groebner-reports/plot-data.json"
           python3 -m venv "$RUNNER_TEMP/groebner-render"
-          "$RUNNER_TEMP/groebner-render/bin/pip" install -r scripts/perf/groebner-render-requirements.txt
+          "$RUNNER_TEMP/groebner-render/bin/pip" install --no-cache-dir -r scripts/perf/groebner-render-requirements.txt
           "$RUNNER_TEMP/groebner-render/bin/python" scripts/perf/render_groebner_history.py \
             --data "$RUNNER_TEMP/groebner-reports/plot-data.json" --out "$RUNNER_TEMP/groebner-reports"
       - name: Compare against the latest snapshot

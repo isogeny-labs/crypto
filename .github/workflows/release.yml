@@ -320,6 +320,11 @@ jobs:
     # Windows compiles both native and software-hash targets before the installed CLI checks.
     timeout-minutes: ${{ matrix.os == 'windows-latest' && 45 || ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 50) }}
     steps:
+      - name: Free disk used by unrelated Ubuntu SDKs
+        if: runner.os == 'Linux'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/hostedtoolcache/CodeQL
+          df -h .
       # Keep Cargo output outside the package tree while it is fingerprinted.
       # `runner.temp` is not available in job-level `env`, so set it per job.
       - name: Keep Cargo output outside the package tree
