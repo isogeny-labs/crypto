@@ -391,6 +391,7 @@ fn parse_number(text: &str) -> Result<BigUint, String> {
         .ok_or_else(|| format!("invalid unsigned integer: {text}"))
 }
 
+#[cfg(test)]
 fn parse_binary_field_element(text: &str) -> Result<BigUint, String> {
     if text.len() > 1300 {
         return Err("integer exceeds field-size limit".into());
@@ -1042,14 +1043,12 @@ mod tests {
                     .as_array()
                     .filter(|coordinates| coordinates.len() == 2)
                     .expect("binary generator pair");
-                let generator_x = parse_binary_field_element(
-                    generator[0].as_str().expect("binary generator x"),
-                )
-                    .expect("parsed x");
-                let generator_y = parse_binary_field_element(
-                    generator[1].as_str().expect("binary generator y"),
-                )
-                    .expect("parsed y");
+                let generator_x =
+                    parse_binary_field_element(generator[0].as_str().expect("binary generator x"))
+                        .expect("parsed x");
+                let generator_y =
+                    parse_binary_field_element(generator[1].as_str().expect("binary generator y"))
+                        .expect("parsed y");
                 assert!(
                     generator_x.bits() <= irreducible.degree as u64,
                     "{ec1}: generator x is not canonical for the declared field"
