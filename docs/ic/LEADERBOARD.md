@@ -421,6 +421,6 @@ Instruction counts are a separate unit and favor some tiny subfield pipelines:
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
-- `docs/curves/registry.json` — sha256 `d8ffa268c0de3a67…`
+- `docs/curves/registry.json` — sha256 `7ed7e190945636d3…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`

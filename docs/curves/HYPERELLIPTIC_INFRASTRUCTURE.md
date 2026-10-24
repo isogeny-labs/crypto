@@ -37,16 +37,18 @@ are:
 ```
 
 The catalog-wide assessment distinguishes current source from the executable
-that has actually been published. Current-source tests accept all 2,100 catalog
-map inputs (2,098 distinct cover models). The pinned
-`v0.1.0-main.1371` source allowlist and the current model-profile partition
-imply a 746-row syntactic support boundary: 160 binary and 586 direct
-prime-field inputs are within that allowlist, while 1,324 odd-characteristic
-extension-field and 30 normalized-target inputs are outside it. That
-746/1,354 split is a static source/applicability classification, not a direct
-2,100-command replay of the published executable. The artifact was directly
+that has actually been published. Current-source tests accept all 20,051 catalog
+map inputs (20,049 distinct cover models) at catalog commit
+`a857883776846d01b13355996ea433951a6ff9d7`. The pinned
+`v0.1.0-main.1371` source allowlist and an earlier 2,100-row model-profile
+partition implied a historical 746-row syntactic support boundary: 160 binary
+and 586 direct prime-field inputs were within that allowlist, while 1,324
+odd-characteristic extension-field and 30 normalized-target inputs were
+outside it. That historical 746/1,354 split is a static
+source/applicability classification, not a direct replay of either the earlier
+or current catalog with the published executable. The artifact was directly
 replayed only against its own bundled 592-row registry. A new release and
-direct replay of all 2,100 current commands remain open obligations.
+direct replay of all 20,051 current commands remain open obligations.
 
 For the first three commands, `--input -` reads standard input. Omitting
 `--output` writes JSON to standard output. Successful `catalog-export` writes
@@ -401,13 +403,23 @@ structural contract
 [`cover-transfer-assessment.schema.json`](cover-transfer-assessment.schema.json)
 and a dated
 [transfer report](../../research/cover_transfer_assessment_20261013/README.md).
-It classifies all 2,100 map rows, representing 2,098 distinct cover models, and
-all 664 exact EC1 representations. Its map profiles contain 160 binary cubic
-covers, 586 direct prime-field quadratic covers, 30 normalized-target
-prime-field covers, and 1,324 odd-characteristic extension-field covers. Its
-subgroup profiles contain 134 binary and 530 odd-characteristic
-representations. “Assessed” means that every declared claim has an explicit
-status; it does not mean that every capability is supported.
+It classifies all 20,051 map rows, representing 20,049 distinct cover models,
+and all 987 exact EC1 representations on 981 curve models. Its map profiles
+contain 192 binary cubic covers, 18,458 direct prime-field quadratic covers,
+30 normalized-target prime-field covers, and 1,371 odd-characteristic
+extension-field covers. Its subgroup profiles contain 148 binary and 839
+odd-characteristic representations. “Assessed” means that every declared claim
+has an explicit status; it does not mean that every capability is supported.
+
+This current population is pinned to catalog commit
+`a857883776846d01b13355996ea433951a6ff9d7`. The SHA-256 digests are
+`7ed7e190945636d32fae4d5865a6f265d23999522de47356b4830954571c237e`
+for `registry.json`,
+`e0b158fde852d3884ab248762f4e12f960ed6aa693f4b08ee9e353ffc03e101d`
+for `covers.json`, and
+`0b3cc6e201fc0ee4652c686175f63f7a902055b3a2c8f89a841000178cbbfd37`
+for `cover-links.yaml`. The generated typed bindings contain 759 declared
+fields, 20,049 Jacobian contexts, and 20,051 map contexts.
 
 The binary profile has checked one-infinity Jacobian arithmetic and a bounded
 typed transfer domain. The odd-characteristic covers are even-degree sextics
@@ -417,7 +429,7 @@ open catalog-wide except for the order-29 overlay and the
 implementation-separated cardinality-486 certificate for the separate fixed
 F8 source fixture. The
 latter is not an EC1 subgroup-order certificate. All computational-advantage
-and end-to-end solver costs for these 2,100 assessed cover paths remain
+and end-to-end solver costs for these 20,051 assessed cover paths remain
 unknown. The retained cryptanalysis parity receipt predates the fixed-F8 norm,
 so current mirror/integration evidence is also open. The assessment does not change
 the geometry semantics or browser status fields in `covers.json` and
@@ -434,7 +446,7 @@ node research/cover_transfer_assessment_20261013/verify_assessment.mjs
 ```
 
 The verifier replays membership partitions, claim/evidence bindings, source
-pins, and all 2,100 cover formulas. The accompanying Lean package formalizes
+pins, and all 20,051 cover formulas. The accompanying Lean package formalizes
 only the conditional group-theoretic injectivity step under an already-proved
 push-pull identity, exact finite subgroup cardinality, and coprimality. It does
 not construct the maps or certify catalog subgroup orders. A full Jacobian
@@ -467,7 +479,7 @@ The exported catalog identifies its wrapper with
 `producer_source_sha256` is SHA-256 of the exact UTF-8 checker source, model
 normalization source, and `hyperelliptic-cover` wrapper source concatenated in
 that order. For the current source it is
-`f4ca4c21cd4f55c2ea15508d05de9ab310c75bf0aef897a87e05591275cdadcb`.
+`a6abc3a13f3b3966908e121d802dd9a1cc576687e99a98d96cdb96db2dd905e2`.
 Thus changing any of the three producer inputs changes the provenance digest.
 Both
 `hyperelliptic-cover catalog-export` and `curve_cover_check` require callers
