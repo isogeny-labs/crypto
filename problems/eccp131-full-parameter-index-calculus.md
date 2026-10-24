@@ -40,3 +40,5 @@ These conditions would establish a completed run on this point. A speed claim wo
 ## Resolution and history
 
 Unresolved. The 2026-10-20 exact two-sum probe makes its method-specific coverage obstruction measurable on the published group. The 2026-10-21 stage matrix extends the bounded observation through B1024 without natural rows or rank and records the separate ecbench harness limit. The 2026-10-22 exact three-point implementation and bounded run expand the checked relation path, but its natural-row and rank counts remain zero. The published-point scalar and full cold cost criteria remain open while bounded BSGS and the scaled index-calculus entry points remain available.
+
+The 2026-10-22 [x86 baseline](../research/certicom131_rho_ic_bench_20261022/README.md) reproduced the exact-curve probe on a Xeon core (25 runs, B256 to B1024 two-point and B128 three-point): zero natural relations and rank zero again; no new relation method.

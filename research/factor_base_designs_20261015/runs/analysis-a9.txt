@@ -1,0 +1,63 @@
+Factor-base designs, Amendment 9 (P4, Z1, M5): rows from research/factor_base_designs_20261015/runs
+
+════ P4: p4 = 10007297 = 2^8 · 39091 + 1 (2-adic valuation 8), generic target, f4_fp
+  arm  m  t   D(new)  D(p1)   max_cols(new)  max_cols(p1)
+  A0   2  2   4.0     4.0     37             37
+  A0   2  3   4.0     4.0     127            127
+  A0   2  4   4.0     4.0     280            280
+  A0   2  5   4.0     4.0     606            606
+  A0   2  6   5.0     5.0     2451           2451
+  A0   2  7   5.0     5.0     5031           5031
+  A0   2  8   5.0     5.0     9119           9119
+  A0   3  2   5.0     5.0     368            368
+  A0   3  3   6.0     6.0     3285           3285
+  A0   3  4   6.0     6.0     12314          12314
+  A11  2  2   3.0     3.0     31             31
+  A11  2  3   3.0     3.0     78             78
+  A11  2  4   3.0     3.0     208            208
+  A11  2  5   4.0     4.0     1431           1431
+  A11  2  6   4.0     4.0     2673           2673
+  A11  2  7   4.0     4.0     5282           5282
+  A11  2  8   4.0     4.0     8763           8763
+  A11  3  2   4.0     4.0     62             62
+  A11  3  3   4.0     4.0     781            781
+  A11  3  4   4.0     4.0     3096           3096
+  rule: 20 shared completed cells → PRIME-INDEPENDENT (D equals the p1 D at every shared completed cell)
+  gap at m = 3 (A11 D ≤ A0 D − 1 at every shared t): 3 cells → HOLDS
+  max_cols against the p1 cell (descriptive): 20 equal, 0 smaller, 0 larger
+
+════ Z1: structured target x_R = 0, p1, f4_fp (the curve is built around each target)
+  arm  m  t   D(new)  D(p1)   max_cols(new)  max_cols(p1)
+  A0   2  3   4.0     4.0     113            127
+  A0   2  4   4.0     4.0     287            280
+  A0   2  5   4.0     4.0     570            606
+  A0   2  6   5.0     5.0     2246           2451
+  A0   2  7   5.0     5.0     3934           5031
+  A0   2  8   5.0     5.0     8589           9119
+  A0   2  9   5.0     5.0     14855          14922
+  A0 m=2: not completed: t=2:aborted/aborted
+  A0   3  2   5.0     5.0     368            368
+  A0   3  3   6.0     6.0     3361           3285
+  A0   3  4   6.0     6.0     12158          12314
+  A11  2  3   3.0     3.0     78             78
+  A11  2  4   3.0     3.0     208            208
+  A11  2  5   4.0     4.0     1427           1431
+  A11  2  6   4.0     4.0     2664           2673
+  A11  2  7   4.0     4.0     5406           5282
+  A11  2  8   4.0     4.0     8883           8763
+  A11  2  9   4.0     4.0     14011          13579
+  A11 m=2: not completed: t=2:aborted/aborted
+  A11  3  2   4.0     4.0     49             62
+  A11  3  3   4.0     4.0     723            781
+  A11  3  4   4.0     4.0     3114           3096
+  rule: 20 shared completed cells → TARGET-INDEPENDENT (D equals the generic D at every shared completed cell)
+  gap at m = 3 (A11 D ≤ A0 D − 1 at every shared t): 3 cells → HOLDS
+  max_cols against the p1 cell (descriptive): 3 equal, 11 smaller, 6 larger
+
+════ M5: A0 at m = 5, the smallest cell (t = 3: |V| = 8 ≥ 5), p1, f4_fp
+
+── A0 m = 5 p1
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  3   3.000  18     19     []            117005,117005        315.2,312.7           timeout,timeout
+  completed cells 0: σ = -  →  inconclusive (fewer than 3 completed cells);  Δlog₂ max_cols/Δb = - (secondary, descriptive)
+  t=3: did not complete (timeout, timeout)

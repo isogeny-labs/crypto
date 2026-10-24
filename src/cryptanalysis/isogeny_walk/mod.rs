@@ -22,6 +22,7 @@
 //! generator and target points through its kernel maps, and checks any scalar
 //! answer back on the caller's original curve.
 
+pub mod checkpoint;
 pub mod curve;
 pub mod field;
 pub mod kernel;

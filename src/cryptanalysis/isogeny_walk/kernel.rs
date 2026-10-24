@@ -39,6 +39,7 @@ use super::curve::{self, Model};
 use super::field::{Fe, Field};
 use super::modpoly::ModPoly;
 use super::poly::{self, Poly};
+use serde::{Deserialize, Serialize};
 
 /// An `ℓ`-isogeny `E → E'` with its kernel polynomial.
 #[derive(Clone, Debug)]
@@ -51,7 +52,7 @@ pub struct Isogeny {
 }
 
 /// Why a construction or a certificate failed.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum EdgeError {
     SpecialJ,
     MultipleRoot,

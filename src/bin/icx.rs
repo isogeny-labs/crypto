@@ -16,6 +16,9 @@
 //! Every subcommand supports `--json`. Its provenance block records the package
 //! version, OS, architecture, and host field-backend capability label.
 
+use std::sync::mpsc;
+use std::thread::JoinHandle;
+use std::time::{Duration, Instant};
 use std::{fs::OpenOptions, io::Write, path::PathBuf, process::ExitCode};
 
 use clap::{Args, Parser, Subcommand};
@@ -29,6 +32,9 @@ mod cubic_route;
 mod parameters;
 #[path = "icx/prime_external.rs"]
 mod prime_external;
+#[path = "icx/state.rs"]
+mod state;
+use state::RunState;
 
 use crypto_lib::cryptanalysis::curve_catalog::{self, CatalogCurve, Family};
 use crypto_lib::cryptanalysis::ic_engine;
@@ -59,6 +65,12 @@ struct Cli {
     /// Publish --out through the configured artifact store under a new logical name.
     #[arg(long, global = true, requires = "out")]
     store_name: Option<String>,
+    /// Stream stage progress on stderr, including with --json.
+    #[arg(long, global = true)]
+    verbose: bool,
+    /// Seconds between live run heartbeats (implies --verbose).
+    #[arg(long, global = true, value_parser = clap::value_parser!(u64).range(1..))]
+    progress_every: Option<u64>,
 }
 
 #[derive(Subcommand)]
@@ -150,6 +162,15 @@ struct RunArgs {
     /// Per-solver-call budget in seconds (0 for none).
     #[arg(long, default_value_t = 60)]
     solver_budget_seconds: u64,
+    /// Dedicated directory for completed-repeat checkpoints and reports.
+    #[arg(long)]
+    state_dir: Option<PathBuf>,
+    /// Continue saved repeats from --state-dir or restore them from S3.
+    #[arg(long)]
+    resume: bool,
+    /// Mirror the state directory to this S3 prefix with the AWS CLI.
+    #[arg(long)]
+    s3_uri: Option<String>,
 }
 
 #[derive(Args)]
@@ -532,9 +553,51 @@ fn display(report: &Value) {
     }
 }
 
-fn run_cmd(args: &RunArgs, json: bool) -> Result<Value, String> {
+struct Heartbeat {
+    stop: mpsc::Sender<()>,
+    worker: Option<JoinHandle<()>>,
+}
+
+impl Heartbeat {
+    fn start(seconds: u64) -> Self {
+        let (stop, receiver) = mpsc::channel();
+        let worker = std::thread::spawn(move || {
+            let started = Instant::now();
+            while receiver
+                .recv_timeout(Duration::from_secs(seconds))
+                .is_err_and(|e| e == mpsc::RecvTimeoutError::Timeout)
+            {
+                eprintln!(
+                    "Info:Index calculus: running  elapsed {:.1}s",
+                    started.elapsed().as_secs_f64()
+                );
+            }
+        });
+        Self {
+            stop,
+            worker: Some(worker),
+        }
+    }
+}
+
+impl Drop for Heartbeat {
+    fn drop(&mut self) {
+        let _ = self.stop.send(());
+        if let Some(worker) = self.worker.take() {
+            let _ = worker.join();
+        }
+    }
+}
+
+fn run_cmd(
+    args: &RunArgs,
+    json: bool,
+    verbose: bool,
+    progress_every: Option<u64>,
+) -> Result<Value, String> {
+    use crypto_lib::cryptanalysis::ic_framework::RunReport;
     use crypto_lib::cryptanalysis::ic_progress::ProgressReporter;
-    use crypto_lib::cryptanalysis::ic_run::{run_curve, RunConfig};
+    use crypto_lib::cryptanalysis::ic_run::{run_curve_from_repeat, RhoRef, RunConfig};
 
     let curve = curve_catalog::by_name(&args.curve)
         .ok_or_else(|| format!("unknown curve '{}'; try `icx list`", args.curve))?;
@@ -559,26 +622,136 @@ fn run_cmd(args: &RunArgs, json: bool) -> Result<Value, String> {
         envelope_bits: args.envelope,
         solver_budget_seconds: args.solver_budget_seconds,
     };
-    // In JSON mode the progress log would interleave with the document, so
-    // silence it; in human mode it streams the CADO-style stage lines to stderr.
-    let mut progress = ProgressReporter::new(false, json);
-    let result = run_curve(&curve, &cfg, &mut progress)?;
-    let verified_any = result.reports.iter().any(|r| r.verified);
+    if args.repeats == 0 {
+        return Err("repeats must be greater than zero".into());
+    }
+    if args.state_dir.is_none() && (args.resume || args.s3_uri.is_some()) {
+        return Err("--resume and --s3-uri require --state-dir".into());
+    }
+    // Progress uses stderr. Keep stdout as one final JSON document even when
+    // requested stage lines are live in JSON report mode.
+    let verbose = verbose || progress_every.is_some();
+    let manifest = json!({
+        "schema_version": 1,
+        "curve": curve.name,
+        "factor_base": args.factor_base,
+        "oracle": args.oracle,
+        "solver": args.solver,
+        "linalg": args.linalg,
+        "degree": args.degree,
+        "bits": args.bits,
+        "seed": args.seed,
+        "max_trials": args.max_trials,
+        "repeats": args.repeats,
+        "rho_runs": args.rho_runs,
+        "envelope": args.envelope,
+        "solver_budget_seconds": args.solver_budget_seconds,
+        "binary_blake3": if args.state_dir.is_some() {
+            Some(state::binary_digest()?)
+        } else {
+            None
+        },
+    });
+    let mut state = args
+        .state_dir
+        .as_ref()
+        .map(|dir| {
+            RunState::prepare(
+                dir.clone(),
+                args.resume,
+                args.s3_uri.clone(),
+                verbose,
+                manifest,
+            )
+        })
+        .transpose()?;
+    let completed = state.as_ref().map_or(0, RunState::completed);
+    if completed > cfg.repeats {
+        return Err("ICX checkpoint has more repeats than requested".into());
+    }
+    let current_host = state::host_name();
+    if let Some(saved) = &state {
+        if completed > 0 && cfg.rho_runs > 0 {
+            if saved.snapshot.rho.is_none() {
+                return Err("ICX checkpoint is missing its rho reference".into());
+            }
+            if saved.snapshot.origin_host != current_host {
+                return Err(
+                    "rho reference is host-specific; cross-host resume needs --rho-runs 0".into(),
+                );
+            }
+        }
+    }
+    let prior_rho = state.as_ref().and_then(|s| s.snapshot.rho.clone());
+    let prior_reports = state
+        .as_ref()
+        .map(|s| s.snapshot.reports.clone())
+        .unwrap_or_default();
+    let mut progress = ProgressReporter::new(false, json && !verbose);
+    if completed > 0 {
+        progress.info(&format!("resuming after {completed} complete repeat(s)"));
+    }
+    let heartbeat = verbose.then(|| Heartbeat::start(progress_every.unwrap_or(5)));
+    let managed = state.is_some();
+    let mut on_repeat = |rep: usize, report: &RunReport, rho: Option<&RhoRef>, label: &str| {
+        state
+            .as_mut()
+            .expect("managed repeat callback")
+            .repeat(rep, report, rho, label)
+    };
+    let result = run_curve_from_repeat(
+        &curve,
+        &cfg,
+        &mut progress,
+        completed,
+        prior_rho,
+        managed.then_some(&mut on_repeat),
+    )?;
+    drop(on_repeat);
+    drop(heartbeat);
+    let mut result_value = serde_json::to_value(&result).map_err(|e| e.to_string())?;
+    let mut reports = prior_reports;
+    let fresh = result_value["reports"]
+        .as_array()
+        .ok_or("invalid ICX report list")?;
+    reports.extend(fresh.iter().cloned());
+    if fresh.is_empty() {
+        if let Some(saved) = &state {
+            result_value["config_label"] = json!(saved.snapshot.config_label);
+        }
+    }
+    let verified_count = reports.iter().filter(|r| r["verified"] == true).count();
+    let verified_any = verified_count > 0;
+    result_value["reports"] = Value::Array(reports);
     if !json {
         progress.summary(&format!(
             "{} — {} of {} configuration(s) verified",
-            result.curve,
-            result.reports.iter().filter(|r| r.verified).count(),
-            result.reports.len()
+            result.curve, verified_count, cfg.repeats
         ));
     }
-    Ok(json!({
+    let mut envelope = json!({
         "schema_version": 1,
         "operation": "run",
         "status": if verified_any { "complete" } else { "incomplete" },
         "verified": verified_any,
-        "result": serde_json::to_value(&result).map_err(|e| e.to_string())?,
-    }))
+        "result": result_value,
+    });
+    if args.resume {
+        if let Some(saved) = &state {
+            envelope["resume"] = json!({
+                "completed_before_restart": completed,
+                "origin_host": saved.snapshot.origin_host,
+                "current_host": current_host,
+                "cross_host": saved.snapshot.origin_host != current_host,
+                "accounting": "per-repeat reports; restart setup and storage are excluded from those costs"
+            });
+        }
+    }
+    envelope["software"] = provenance();
+    if let Some(saved) = state.as_mut() {
+        saved.finish(&envelope)?;
+    }
+    Ok(envelope)
 }
 
 fn fes_cmd(args: &FesArgs) -> Result<Value, String> {
@@ -627,7 +800,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
             parameters::validate(&curve)
         }
         Some(Action::Estimate(a)) => estimate(a),
-        Some(Action::Run(a)) => run_cmd(a, cli.json),
+        Some(Action::Run(a)) => run_cmd(a, cli.json, cli.verbose, cli.progress_every),
         Some(Action::SolvePrime(a)) => prime_external::solve(a),
         Some(Action::SolvePrimeFile(a)) => prime_external::solve_file(a),
         Some(Action::PrimeRouteGenerate(a)) => prime_external::generate_route(a),
