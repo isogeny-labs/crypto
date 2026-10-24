@@ -16,7 +16,7 @@ one() { # name dir pairs...
   rm -rf "$TMP/fixed"; cp -r "$d" "$TMP/fixed"; rm -rf "$TMP/fixed/comparisons"; $E "$TMP/fixed" > /dev/null
   for v in recorded corrected; do
     local dd=$d; [ $v = corrected ] && dd=$TMP/fixed
-    $B table --dir "$dd" > "$S/tables/$name.$v.md"
+    $B table --dir "$dd" > "$S/tables/$name.$v.txt"
     for pair in "$@"; do
       $B compare --dir "$dd" --a "${pair%%/*}" --b "${pair##*/}" --json --allow-interrupted > "$S/compare/$name.${pair##*/}__${pair%%/*}.$v.json"
     done
