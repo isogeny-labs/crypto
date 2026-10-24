@@ -1,0 +1,43 @@
+# Execution and retained failures
+
+The protocol was committed before implementing or solving the candidate.
+The original saved implementation was uncompiled. No old 189+21 case,
+BSGS, five-factor scalar census or public-point census is repeated.
+
+## Native build and test continuation, 2026-10-24
+
+| Saved attempt | Observation | Treatment |
+|---|---|---|
+| `native-gate-v1` managed launch | Exit 2: isolation wrapper excluded by the custom sparse checkout; no compilation started | Retained journal and reconciliation |
+| Standard sparse helper | Exit 2: existing checkout has no helper-managed profile | Retained refusal; materialized only the committed wrapper with explicit Git restore |
+| `native-gate-v2` | Exit 127 during metadata enumeration: rg absent from managed PATH | Retained partial metadata; added the documented find fallback |
+| `native-gate-v3` | Cargo exit 101: committed identity-certificate include fixture absent from sparse checkout | Retained compiler failure; materialized the exact committed fixture |
+| `native-gate-v4` | Native test compilation receipt exits 0; managed launch exits 1; no completed test gate | Preserve both observations; never infer tests passed |
+| `native-gate-v5` | Test and runner compilation receipts exit 0; traced managed launch refuses pre-existing output | Preserve directory and refusal; no completed test gate inferred |
+| `native-completion-20261024T1934Z` | No live science owner/lock remained; successful build files were reconciled and copied; actual native suite passes 84/84 | Before/after source checks pass; only this continuation is credited as the test gate |
+
+The final continuation runs a frozen test binary through the common busy
+wrapper, serially, with 8 GiB and a 1,200-second watchdog. Its clock is a
+diagnostic, not admitted timing. Production and test executable digests,
+the reused compilation directory, owner PID, exact command, source checks,
+stdout/stderr and actual exit are retained. The compact receipts are in
+`results/native-completion-v1/metadata/`; all original raw directories remain.
+
+The full 42-case-arm panel is not yet reported complete. It will use a new
+output directory and the frozen production executable only after its source
+and driver are committed. Phase 2's complete one-target price remains open.
+
+## Preservation fix before the first candidate solve
+
+The initial collector accumulated all system records in memory. Before any
+candidate solve, durable JSONL input and result journals were added, with an
+input synced before F4 and a result synced after decoding. A killed process
+therefore leaves its processed prefix and pending system. Incompleteness is
+still reported as incompleteness. Diagnostics include this journaling overhead
+and are not admitted algorithm timings.
+
+`native-gate-journal-20261024T1940Z` is the new gate for that source. At this
+checkpoint its exact busy-wrapper owner is live and waiting for the shared
+reservation. The earlier 84-test pass is not credited to the changed source.
+The dependent panel controller must see this gate's terminal success before
+starting any of the 42 case-arms.

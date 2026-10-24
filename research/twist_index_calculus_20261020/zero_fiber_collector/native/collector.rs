@@ -1,9 +1,24 @@
 //! Fixed-zero pair quotient and exact S4 collector. No reference input enters collect.
 use super::*;
+use std::io::Write;
 use std::time::Instant;
+#[path = "audit.rs"]
+mod independent_audit;
+#[path = "panel.rs"]
+mod panel;
+
+pub(super) fn summarize(run: &Path, out: &Path) -> bool {
+    panel::summarize(run, out)
+}
 
 type Pair = (usize, i8, usize, i8);
 type Action = Vec<(usize, i8)>;
+
+fn append_journal(file: &mut std::fs::File, record: &Value) {
+    serde_json::to_writer(&mut *file, record).unwrap();
+    file.write_all(b"\n").unwrap();
+    file.sync_data().unwrap();
+}
 
 fn transform(pair: Pair, action: &Action) -> Pair {
     let (i, si, j, sj) = pair;
@@ -118,6 +133,14 @@ pub(super) fn collect(public: &Path, sha: &str, arm_name: &str, out: &Path) -> b
     );
     assert!(!out.exists());
     std::fs::create_dir_all(out).unwrap();
+    write(
+        &out.join("started.json"),
+        &json!({"schema":"twist-zero-five-started/v1",
+        "public_input_sha256":sha,"arm":arm_name,"phase":"cold-build-and-derivation"}),
+    );
+    let mut input_journal = std::fs::File::create(out.join("system-inputs.jsonl")).unwrap();
+    let mut result_journal = std::fs::File::create(out.join("system-results.jsonl")).unwrap();
+    let memory_start = cold::allocation_begin();
     let clock = Instant::now();
     let deadline = clock + Duration::from_secs(1180);
     let case = cold::build(raw, arm);
@@ -133,7 +156,7 @@ pub(super) fn collect(public: &Path, sha: &str, arm_name: &str, out: &Path) -> b
     let mut undetermined = 0usize;
     let mut f4_muls = 0u64;
     let mut deadline_hit = false;
-    for &(ordinary, os, image, ims) in &representatives {
+    for (system_index, &(ordinary, os, image, ims)) in representatives.iter().enumerate() {
         let remaining = deadline.saturating_duration_since(Instant::now());
         if remaining.is_zero() {
             deadline_hit = true;
@@ -161,6 +184,13 @@ pub(super) fn collect(public: &Path, sha: &str, arm_name: &str, out: &Path) -> b
                 )
             })
             .collect();
+        append_journal(
+            &mut input_journal,
+            &json!({"system_index":system_index,
+            "pair":[ordinary,os,image,ims],"remaining_point":PointRecord::from(r),
+            "equations":equations.iter().map(|p|p.iter().map(|(e,c)|json!([e,c])).collect::<Vec<_>>()).collect::<Vec<_>>(),
+            "phase":"f4-pending"}),
+        );
         let remaining = deadline.saturating_duration_since(Instant::now());
         if remaining.is_zero() {
             deadline_hit = true;
@@ -233,11 +263,13 @@ pub(super) fn collect(public: &Path, sha: &str, arm_name: &str, out: &Path) -> b
                 }
             }
         }
-        records.push(json!({"pair":[ordinary,os,image,ims],"remaining_point":PointRecord::from(r),
+        let record = json!({"pair":[ordinary,os,image,ims],"remaining_point":PointRecord::from(r),
             "equations":equations.iter().map(|p|p.iter().map(|(e,c)|json!([e,c])).collect::<Vec<_>>()).collect::<Vec<_>>(),
             "verdict":verdict,"field_roots":roots,"accepted_representative_relations":accepted,
             "rejected_decode":rejected_decode,"f4_row_reduction_fp_muls":solved.field_ops,
-            "max_rows":solved.max_rows,"max_cols":solved.max_cols}));
+            "max_rows":solved.max_rows,"max_cols":solved.max_cols});
+        append_journal(&mut result_journal, &record);
+        records.push(record);
     }
     let cols = case.columns(arm) - 1;
     let mut matrix = Matrix::new(case.n, cols);
@@ -272,6 +304,7 @@ pub(super) fn collect(public: &Path, sha: &str, arm_name: &str, out: &Path) -> b
     assert_eq!(point_verified, matrix.rank() == cols);
     let complete = records.len() == representatives.len() && undetermined == 0 && !deadline_hit;
     let total_ns = clock.elapsed().as_nanos();
+    let memory = cold::allocation_end(memory_start);
     let value = json!({"schema":"twist-zero-five-polynomial/v1",
         "status":if complete {"complete-polynomial-enumeration"} else {"partial"},
         "p":case.p,"seed":case.seed,"arm":ARMS[arm],"public_input_sha256":sha,
@@ -282,9 +315,9 @@ pub(super) fn collect(public: &Path, sha: &str, arm_name: &str, out: &Path) -> b
         "signed_physical_set":found,"zero_augmented_rows":zero_rows,"unique_projective_augmented_rows":projective.len(),
         "factor_log_rank":matrix.rank(),"unanchored_factor_columns":cols,"factor_log_solution":solution,
         "factor_log_solution_point_verified":point_verified,"target_column_zero":true,"target_recovery_attempted":false,
-        "setup_work":setup_work,"collection_and_matrix_work":meter::snapshot(),"f4_row_reduction_fp_muls":f4_muls,
+        "setup_work":setup_work,"collection_and_matrix_work":meter::snapshot(),"f4_row_reduction_fp_muls":f4_muls,"memory":memory,
         "diagnostic_elapsed_ns":{"setup":setup_ns,"remaining":total_ns-setup_ns,"total":total_ns},
-        "systems":records,"scope":"Complete zero-only polynomial enumeration if every system is complete; actual lifts, map, action quotient, roots, groups and matrix charged in diagnostics. Shared migrated host: elapsed values are not admitted timing or complete calibrated IC prices. No reference logs, BSGS or physical sets read by collector."});
+        "systems":records,"scope":"Complete zero-only polynomial enumeration if every system is complete; actual lifts, map, action quotient, roots, groups, matrix and durable per-system journaling included in diagnostics. Final record serialization is excluded. Shared migrated host: elapsed values are not admitted timing or complete calibrated IC prices. No reference logs, BSGS or physical sets read by collector."});
     write(&out.join("record.json"), &value);
     println!(
         "{}",
@@ -380,10 +413,11 @@ fn inspect(
     {
         return Err("quotient-accounting");
     }
+    let trace = independent_audit::inspect_records(case, arm, value, expected)?;
     Ok(
         json!({"relations":actual.len(),"factor_log_rank":rank,"unanchored_factor_columns":cols,
         "zero_augmented_rows":zero,"unique_projective_augmented_rows":projective.len(),
-        "factor_log_solution_point_verified":verified}),
+        "factor_log_solution_point_verified":verified,"pair_and_work_trace":trace}),
     )
 }
 
@@ -441,6 +475,30 @@ pub(super) fn audit(
             "incomplete-systems"
         );
         controls.push(json!({"control":"unresolved-system","rejected_as":"incomplete-systems"}));
+        let mut changed = value.clone();
+        changed["systems"].as_array_mut().unwrap().pop();
+        assert_eq!(
+            inspect(&case, arm, sha, &changed, &expected).unwrap_err(),
+            "system-record-count"
+        );
+        controls.push(json!({"control":"omitted-system-with-unchanged-headline-counts","rejected_as":"system-record-count"}));
+        let mut changed = value.clone();
+        changed["systems"][1]["pair"] = changed["systems"][0]["pair"].clone();
+        assert_eq!(
+            inspect(&case, arm, sha, &changed, &expected).unwrap_err(),
+            "pair-coverage"
+        );
+        controls.push(json!({"control":"duplicated-pair-with-unchanged-headline-counts","rejected_as":"pair-coverage"}));
+        let mut changed = value.clone();
+        let work = changed["systems"][0]["f4_row_reduction_fp_muls"]
+            .as_u64()
+            .unwrap();
+        changed["systems"][0]["f4_row_reduction_fp_muls"] = json!(work.wrapping_add(1));
+        assert_eq!(
+            inspect(&case, arm, sha, &changed, &expected).unwrap_err(),
+            "f4-work-sum"
+        );
+        controls.push(json!({"control":"changed-per-system-work-with-unchanged-total","rejected_as":"f4-work-sum"}));
         if !expected.is_empty() {
             let mut changed = value.clone();
             changed["signed_physical_set"].as_array_mut().unwrap().pop();

@@ -29,6 +29,9 @@ mod zero_identity;
 pub(crate) fn zero_five_collect(public: &Path, sha: &str, arm: &str, out: &Path) -> bool {
     zero_collector::collect(public, sha, arm, out)
 }
+pub(crate) fn zero_five_polynomial_summary(run: &Path, out: &Path) -> bool {
+    zero_collector::summarize(run, out)
+}
 pub(crate) fn zero_five_audit(
     public: &Path,
     sha: &str,

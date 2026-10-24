@@ -43,6 +43,19 @@ unsafe impl GlobalAlloc for ObservedAllocator {
 #[global_allocator]
 static GLOBAL: ObservedAllocator = ObservedAllocator;
 
+pub(super) fn allocation_begin() -> (u64, u64) {
+    PEAK.store(LIVE.load(AO::Relaxed), AO::Relaxed);
+    (ALLOCS.load(AO::Relaxed), ALLOC_BYTES.load(AO::Relaxed))
+}
+
+pub(super) fn allocation_end(start: (u64, u64)) -> Value {
+    let calls = ALLOCS.load(AO::Relaxed) - start.0;
+    let bytes = ALLOC_BYTES.load(AO::Relaxed) - start.1;
+    let peak = PEAK.load(AO::Relaxed);
+    json!({"allocation_calls":calls,"allocated_bytes":bytes,"peak_live_rust_bytes":peak,
+        "scope":"Allocation calls and requested bytes during the charged interval; peak live Rust bytes includes retained decoded input. Process RSS is separate."})
+}
+
 fn ns(t: Instant) -> u64 {
     t.elapsed().as_nanos().try_into().unwrap()
 }
