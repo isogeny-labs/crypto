@@ -1783,8 +1783,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                             return Err(format!(
                                 "commitment {} is dated {} ms, in the future",
                                 cm.commitment_id, cm.committed_unix_ms
-                            )
-                            .into());
+                            ));
                         }
                         let epoch = challenge::epoch_from(&c, &cm, &b)?;
                         (challenge::spec_for_committed(&c, &m, &cm, &b)?, epoch)
