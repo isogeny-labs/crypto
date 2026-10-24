@@ -14,15 +14,27 @@ Fresh extraction, byte-identical canonical repacking, and a native replay
 of all four committed CSVs passed; see
 [the replay certificate](results/replay-certificate.json).
 
-**Repository store registration is pending.** `ecbench store push` received
-S3 `403 Forbidden` under the migrated worker identity. No store index entry
-was created. The intended name is
+**Repository store registration and remote verification passed.** The name is
 `store:evidence/twist-index-calculus/20261023-image-base-runs.tar.xz`.
-The failed attempt and the successful immutable backup upload are recorded
-in `results/publication/`. Existing study jobs retain their original raw
+The initial migrated worker identity received S3 `403 Forbidden`. After the
+user supplied the existing store credential, the native store uploaded the
+archive, registered its digest in `store/index.json`, and verified the cache
+and remote object. The first receipt wrapper then failed while parsing the
+verifier's plain-text output as JSON; the successful upload was reconciled
+from the native index and exact remote object before any retry. The failed
+attempt, successful reconciliation, and immutable backup are recorded in
+`results/publication/`. Existing study jobs retain their original raw
 objects. The verified canonical archive is also backed up in the existing
 research artifact bucket; its S3 checksum and byte count match the local
-archive. Fetch, verify and extract that backup from this directory:
+archive. Fetch the registered archive from this directory:
+
+```sh
+ecbench store pull store:evidence/twist-index-calculus/20261023-image-base-runs.tar.xz --out runs.tar.xz
+sha256sum -c runs.tar.xz.sha256
+tar -xJf runs.tar.xz
+```
+
+The immutable research backup remains available:
 
 ```sh
 aws s3 cp --region us-east-1 s3://ephemeral-runs-104186811093-us-east-1/jobs/twist-image-base-evidence/1e0a2139c9a32571a9476e4b9579f73da91e93e4a8cc7c2143d2bf4536c36038/runs.tar.xz runs.tar.xz
@@ -61,8 +73,8 @@ sha256sum runs.tar.xz > runs.tar.xz.sha256
 
 Packing the extracted tree with this command produces the same bytes.
 The canonical archive exceeds the Git blob limit and remains outside Git.
-Its repository store registration requires the existing scoped store
-credential to be restored. Raw text is not compressed to evade that limit.
+Its digest and provenance are registered in the repository store. Raw text
+is not compressed to evade that limit.
 
 ## Frozen inputs and revisions
 
