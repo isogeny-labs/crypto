@@ -7,11 +7,15 @@ joint_study="$joint_repo/research/twist_index_calculus_20261020/joint_image_elim
 joint_native="$joint_study/../endomorphism_image_base/native"
 joint_out=${1:?new output directory}
 test ! -e "$joint_out"
+# A managed caller may queue this audit while the required independent
+# replay is still running. Waiting consumes no heavy-work reservation.
+while systemctl is-active --quiet twist-joint-square-zero-verify-v1.service; do sleep 10; done
 # The stronger square result, rather than the weaker discriminant statement,
 # is required before this experiment by SUPPLEMENT_SQUARE_PRUNING.md.
 test "$(cat "$joint_study/runs/square-ideal-lean-v1/exit")" = 0
 test "$(jq -r .status "$joint_study/runs/square-zero-verify-v1/verified/summary.json")" = pass
 test "$(jq -r .target "$joint_study/runs/square-zero-verify-v1/verified/summary.json")" = square-defect-cube
+test ! -e "$joint_out"
 mkdir -p "$joint_out/metadata" "$joint_out/cases"
 joint_out=$(cd "$joint_out" && pwd)
 cp "$0" "$joint_out/metadata/executed-script.sh"
