@@ -28,6 +28,18 @@ case "${WORKSPACE_OFFLINE:-0}" in
   *) echo "WORKSPACE_OFFLINE must be 0 or 1" >&2; exit 2 ;;
 esac
 
+# The ECDLP lead atlas lives in aburan28/crypto-autoresearcher
+# (knowledge/leads/ecdlp/). It says what has already been tried across this
+# repository and its siblings, and whether anything changed since the last
+# review. Printed before the remote-only setup, so a local session sees it too.
+# Never fatal.
+atlas_repo="$(dirname "${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}")/crypto-autoresearcher"
+if [ -f "$atlas_repo/tools/lead_atlas.py" ]; then
+  python3 "$atlas_repo/tools/lead_atlas.py" --brief 2>/dev/null || true
+else
+  echo "ECDLP lead atlas: clone aburan28/crypto-autoresearcher next to this checkout and run python3 tools/lead_atlas.py --brief. It records every lead already tried here, so check it before proposing an ECDLP idea."
+fi
+
 if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
   exit 0
 fi
@@ -45,11 +57,19 @@ echo "== $(date -u +%FT%TZ) session start"
 project=crypto
 repo="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 
-# Optional sparse checkout (docs/sparse-checkout.md): CRYPTO_SPARSE_PROFILE=harness
-# (or minimal) in the environment leaves research archives off disk. Never fatal.
-if [ -n "${CRYPTO_SPARSE_PROFILE:-}" ]; then
-  (cd "$repo" && scripts/sparse-checkout.sh apply --profile "$CRYPTO_SPARSE_PROFILE") \
-    || echo "sparse profile '$CRYPTO_SPARSE_PROFILE' not applied; checkout stays full"
+# Sparse checkout by default (docs/sparse-checkout.md): the harness profile
+# leaves the 18 largest research/ archives off disk. CRYPTO_SPARSE_PROFILE picks
+# minimal instead, or full to keep the whole checkout. Applied once, on a full
+# checkout only, so a resumed session keeps the paths it added. Never fatal.
+sparse_profile="${CRYPTO_SPARSE_PROFILE:-harness}"
+if [ "$(git -C "$repo" config --bool core.sparseCheckout 2>/dev/null)" = true ]; then
+  sparse_summary="Sparse checkout already applied ($(cd "$repo" && scripts/sparse-checkout.sh status 2>/dev/null | head -n 1))"
+elif [ "$sparse_profile" = full ]; then
+  sparse_summary="Full checkout (CRYPTO_SPARSE_PROFILE=full)"
+elif (cd "$repo" && scripts/sparse-checkout.sh apply --profile "$sparse_profile"); then
+  sparse_summary="Sparse profile $sparse_profile applied: some research/ directories are off disk but still in git; scripts/sparse-checkout.sh add --path P/ materializes one"
+else
+  sparse_summary="Sparse profile $sparse_profile not applied; checkout stays full"
 fi
 
 # Conductor, through the Go module proxy. The release installer cannot download
@@ -136,4 +156,4 @@ cairn_version="$(cairn --version 2>/dev/null | head -n 1)"
 # here, before the summary line.
 cairn_node="$("$repo/scripts/cairn-node.sh" status 2>&1 | head -n 1 || true)"
 echo "ready: $conductor_version; $cairn_version; $plane; $cairn_node; $setup_summary"
-echo "Workspace tools: $conductor_version and $cairn_version are installed; Conductor is using $plane. $cairn_node. $setup_summary. Log: $state/session-start.log" >&3
+echo "Workspace tools: $conductor_version and $cairn_version are installed; Conductor is using $plane. $cairn_node. $setup_summary. $sparse_summary. Log: $state/session-start.log" >&3
