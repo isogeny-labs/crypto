@@ -309,7 +309,7 @@ jobs:
           auto-config: false
           use-mathlib-cache: true
           build: true
-          build-args: 'AdditiveGrid CrossPivotRectangles FullFanCycleArithmetic QueryCubicLineRelation QueryBundleIncidence'
+          build-args: 'AdditiveGrid CrossPivotRectangles FullFanCycleArithmetic QueryCubicLineRelation QueryBundleIncidence CrossEndpointQueryTriple'
           test: false
           lint: false
           leanchecker: true
@@ -320,11 +320,13 @@ jobs:
           lake env leanchecker --fresh --verbose FullFanCycleArithmetic
           lake env leanchecker --fresh --verbose QueryCubicLineRelation
           lake env leanchecker --fresh --verbose QueryBundleIncidence
+          lake env leanchecker --fresh --verbose CrossEndpointQueryTriple
           lake env lean AdditiveGrid.lean
           lake env lean CrossPivotRectangles.lean
           lake env lean FullFanCycleArithmetic.lean
           lake env lean QueryCubicLineRelation.lean
           lake env lean QueryBundleIncidence.lean
+          lake env lean CrossEndpointQueryTriple.lean
   p192-cross-pivot-replay:
     runs-on: ubuntu-latest
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 30 || 25 }}
@@ -393,8 +395,10 @@ jobs:
           python3 -B research/p192_extension_cover_20261012/verify_known_scalar_query_relation_screen.py
           python3 -B research/p192_extension_cover_20261012/verify_known_scalar_query_cross_fan.py
           python3 -B research/p192_extension_cover_20261012/analyze_known_scalar_query_incidence.py
+          python3 -B research/p192_extension_cover_20261012/analyze_cross_endpoint_query_triples.py
           grep -Ev '  (\.github/workflows/weak-curve-database\.yml|research/p192_extension_cover_20261012/lean/lakefile\.toml)$' research/p192_extension_cover_20261012/reports/run-20261018T2034Z/ARTIFACTS.sha256 | sha256sum -c -
-          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261019T1940Z/ARTIFACTS.sha256
+          grep -Ev '  (\.github/(workflows/weak-curve-database\.yml|scripts/test-pr-budgets\.py)|research/p192_extension_cover_20261012/lean/lakefile\.toml)$' research/p192_extension_cover_20261012/reports/run-20261019T1940Z/ARTIFACTS.sha256 | sha256sum -c -
+          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261024/ARTIFACTS.sha256
   leaderboard-lean-proof:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|weak-curve-database.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
