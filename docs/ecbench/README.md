@@ -649,17 +649,64 @@ remain descriptive.
   round). Within a session the two arms of a round share an algorithm
   seed; across two sessions of one spec (a baseline binary and a
   candidate) they do too, and `same_seeds` says so. The ratio is
-  `Σ S_B / Σ S_A` over the matched verified pairs, AGENTS.md §8's
+  `Σ S_B / Σ S_A` over the matched pairs, AGENTS.md §8's
   `baseline_total / candidate_total` in `S`. It is never a mean of
   ratios, which is biased whenever the arms spread differently (rho's
   cost varies with its seed, BSGS's does not).
-- **Two-stage (cluster) bootstrap.** Intervals resample *workloads*, then
-  pairs within each, and recompute the same ratio of totals. This
-  matters: BSGS's cost is fixed by its target, so all its variance is
-  between workloads, and an interval that held the workloads fixed would
-  be a point. With one workload only the within-workload interval exists,
-  and the comparison says `ci_method: within`. Runs without a partner
+- **The primary interval is linearised (`ecbench.comparison/v2`).** With
+  workloads as clusters, `A_k = Σ S_A` and `B_k = Σ S_B` over cluster `k`,
+  `R = ΣB/ΣA`, the influence values are `z_k = (B_k − R·A_k) / mean(A)`,
+  the standard error is `sd(z)/√K` and the interval
+  `R · exp(± t(K−1, 0.975) · se/R)`, the same linearisation read on the
+  log scale so that a ratio of costs never gets a non-positive end (on the
+  ratio scale, `R ± t·se`, the coverage is the same: 0.957, 0.948, 0.947
+  at K = 2, 4, 8 against 0.956, 0.946, 0.950; the quantile is computed in
+  `stats.rs` and tested against the published table). The reason is coverage: the percentile two-stage bootstrap of
+  the ratio of totals covers 85 % at two workloads and 92–93 % at three
+  or four (it over-covers at eight or more), where the linearised interval
+  covers 94–96 % at every `K`; `stats::tests` pins this with a seeded
+  Monte-Carlo (rho-like Rayleigh costs against BSGS-like per-target costs).
+  `ci_method` is `linearised_t`; the bootstrap interval of the same
+  statistic stays beside it as `ci95_bootstrap` (`cluster`, or `within`
+  with one workload).
+- **Few workloads are indicative.** Below five workloads `ops.indicative`
+  is true and the verdict says `INDICATIVE`: the t quantile at one or two
+  degrees of freedom is 12.7 or 4.3, so the interval is honest and wide.
+  With one workload the clusters are the pairs (`ci_method: within_t`,
+  `interval_scope: within_workload`): the interval covers seeds on that
+  target and says nothing about other targets. Runs without a partner
   make the comparison `partial`.
+- **Censored runs bound the ratio.** Ratios are not formed over verified
+  pairs alone: a timeout or an exhausted budget drops the arm's most
+  expensive draw and biases the survivors low. An exhausted run enters at
+  the cost it spent (its record carries it); a timed-out run carries no
+  cost, so it enters at the cost its wall time implies (process wall minus
+  the arm's largest fork-and-setup overhead, divided by the arm's largest
+  ns per GAE over its verified runs, so it is a lower bound; `0` when the
+  arm has no verified run to convert with). The pair is `censored`,
+  `ops.censored_pairs` counts them, and `ops.bound` says which way the
+  ratio is bounded: `lower` when only B is censored (Σ S_B is a lower
+  bound), `upper` when only A is, `indeterminate` when both are. The
+  verdict says `BOUND` whenever any pair is censored, the status stays
+  `incomplete` (not admissible), and `verified_only_ratio` keeps the old
+  figure. The interval of a bounded ratio is that of the bounded
+  statistic, not a coverage statement about the true ratio.
+- **Tail diagnostics.** Each arm reports max/median `S` and the largest
+  run's share of the arm's total (`tail`). Above 25 % the verdict adds
+  `heavy tail; more runs needed`: the mean is carried by one run.
+- **The pricing band (AGENTS.md §5a).** Each arm lists every unpriced
+  counter with its count (`unpriced_counts`, summed over verified runs;
+  `null` is a counter with no count). `ops.band` prices that native work,
+  and any pinned-calibration work, at 0, 0.1 and 1 GAE per operation on
+  every arm alike (the same function as `ecbench band`) and reports the
+  ratio of totals at each weight; `order` names a winner only when it
+  holds at every weight and otherwise says `unresolved inside the band`
+  (or `unrankable` when a counter is uncounted). It is over the verified
+  pairs, with censored pairs excluded.
+- **Sessions must be complete.** `compare` refuses a session whose status
+  is not `complete`. `--allow-interrupted` compares it anyway as
+  descriptive evidence: the comparison records the statuses and the flag,
+  sets `admissible: false` and the verdict says so.
 - **Per curve.** A ratio is reported per curve (one size each) as well as
   pooled. A claim about scaling reads the per-curve rows and fits
   exponents over at least four sizes (AGENTS.md §5).
@@ -667,18 +714,53 @@ remain descriptive.
   the same seeds do identical work, so the ops A/A is a check of
   determinism, not of noise. The noise in operations comes from targets
   and seeds, and the intervals above already carry it. The A/A arm is
-  for wall time, where its interval is the session's noise floor.
-- **Wall time is gated.** It is compared only within one session, only
-  over pairs where both runs reached `isolation_required`, only with at
-  least five such pairs. It is reported as the median per-pair ratio with
-  a bootstrap interval, set beside the A/A interval (which needs five
-  admitted pairs of its own), and marked `outside_noise` only when it
-  excludes 1 and does not overlap the A/A interval. Anything less prints
-  as `descriptive`, never as a result.
+  for wall time, where it estimates the session's position bias and noise.
+- **Wall time is gated, and is a cost per operation.** It is compared
+  only within one session, only over pairs where both runs reached
+  `isolation_required`, only with at least five such pairs; anything less
+  prints as `descriptive`, never as a result. The statistic is each arm's
+  `ns per GAE = Σ solve_wall / Σ total_gae` over the admitted pairs
+  (`ns_per_gae_a`, `ns_per_gae_b`) and its ratio B/A (`wall.ratio_b_over_a`),
+  with a linearised `t(n−1)` interval (log scale) whose clusters are the pairs (the
+  timing replicates). It answers what operation counts cannot, the constant
+  factor, and does not inherit the work variance of rho: in the deep dive's
+  simulation (5 workloads × 3 rounds, 3 % jitter, B truly 5 % slower per
+  operation) the per-pair median ratio spans [0.56, 1.54] and the ns/GAE
+  ratio [1.025, 1.075]. The v1 headline, the median of per-pair wall
+  ratios, is a different estimand from the ops ratio (biased about +6 % for
+  a deterministic arm against a random one) and stays only as
+  `median_ratio`. The ratio of total wall times (`total_wall_ratio`, with
+  `total_wall_ci95`) is the secondary "end-to-end wall" and keeps the work
+  variance. When an arm's GAE is a lower bound (unpriced work,
+  `ns_per_gae_upper_bound_arms`), its ns per GAE is an upper bound on its
+  cost per operation, and the verdict says so.
+- **The noise test corrects for bias.** The A/A pair is the pair of arms
+  running one method that includes arm A (else one including the
+  reference arm, else the first alphabetical; `aa_selection` and `aa_arms`
+  record the choice). Its ns/GAE ratio (`aa_ratio`, interval `aa_ci95`;
+  needs five admitted pairs) is the systematic bias between two identical
+  arms, positions included. `corrected_ratio` is `ratio_b_over_a /
+  aa_ratio`, with a `t` interval from the two standard errors combined as
+  independent on the log scale (conservative when the A/A shares arm A)
+  and Welch–Satterthwaite degrees of freedom; `outside_noise` is whether
+  the corrected interval excludes 1. A comparison of two arms that run one
+  method is itself an A/A (`self_aa`), with nothing to correct. The v1
+  rule (the median interval excludes 1 and does not overlap the A/A
+  median interval, roughly p < 0.005 and counting noise twice) is kept as
+  `legacy_outside_noise`, with `legacy_ci95`, `legacy_aa_arms` and
+  `legacy_aa_ci95`; `legacy_comparison_id` is the v1 id of the same inputs.
+  The measurement-quality score reads the A/A interval (the control's own
+  interval for a `self_aa` comparison) for its +10 bonus.
   This `compare` wall field uses the whole solve, including IC's reusable
   setup. For the primary one-target IC question, read the separate online
   windows and `ecbench claim`'s same-point interval; a cold wall ratio is
   never an online speedup.
+- **Schema.** New comparisons are `ecbench.comparison/v2`; v1 files are
+  still read (every added field is optional) and keep their meaning:
+  there `ci95` is the percentile bootstrap and `wall.ci95` is the median's.
+  `ecbench table` prints each arm's mean `S` with the same linearised
+  interval (marked `indicative` below five workloads), flags a mean that
+  leaves unverified runs out (`survivors only`) and a heavy tail.
 
 A speedup in the sense of AGENTS.md §8 is still
 `baseline_total_operations / candidate_total_operations`, over the whole
