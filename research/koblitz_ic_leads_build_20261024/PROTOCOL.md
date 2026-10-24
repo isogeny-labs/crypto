@@ -148,11 +148,12 @@ satisfiable control, with a spend cap of $80.
   dense engine. The dense engine is the instrument whose degree-4 verdicts
   G1 matched. Its §11.3 (`dreg_closure_m4l6_20261018`) memory floor of
   280 GB still applies.
-- **Host.** RunPod secure cloud `cpu3m-48-384` (48 vCPU, 384 GB) at
-  $2.64/h. The pod lifetime is capped at 26 h, so the worst case is about
-  $69.
+- **Host.** RunPod secure cloud `cpu3m-64-512` (64 vCPU, 512 GB) at
+  $3.52/h. RunPod refused 48 vCPU because the count must be a power of 2,
+  and 32 vCPU has only 256 GB. The pod lifetime is capped at 21 h, so the
+  worst case is about $74.
 - **Job.** `pod/boot.sh` runs the unsatisfiable draws 0, 3, 5, 7 in order.
-  Each gets a 5 h timeout under `prlimit --as` at 92% of the host limit.
+  Each gets a 4 h timeout under `prlimit --as` at 92% of the host limit.
   Satisfiable draw 1 runs after them with whatever time is left.
 - **Outcomes** are read as in §C1: refuted at 5; saturated without
   refuting (at least 6); or timed out or out of memory (unmeasured). Any

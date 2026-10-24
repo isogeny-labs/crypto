@@ -6,7 +6,7 @@
 # Serves /workspace/out on :8000. No API key lives on the pod.
 set -u
 BRANCH=${BRANCH:?BRANCH}
-T0=$(date +%s); CAPS=${POD_MAX_SECONDS:-93600}
+T0=$(date +%s); CAPS=${POD_MAX_SECONDS:-75600}
 remaining() { echo $(( CAPS - ($(date +%s) - T0) )); }
 OUT=/workspace/out; mkdir -p "$OUT"; ln -sf /root/boot.log "$OUT/boot.log"
 status() { echo "$(date -u +%FT%TZ) $1" >> "$OUT/STATUS"; }
@@ -27,7 +27,7 @@ L=target/release/examples/dreg_ladder; C=target/release/examples/dreg_closure
 S=research/dreg_closure_m4l6_20261018/run.sh
 F=research/dreg_closure_scale_20261016/draws/m3-19-7.jsonl
 $S $L $C host
-export DEG5_DRAWS=4 DEG5_MIN_LIMIT=280000000000 TMO5=${TMO5:-18000}
+export DEG5_DRAWS=4 DEG5_MIN_LIMIT=280000000000 TMO5=${TMO5:-14400}
 status "DEG5 C1 draws=4 TMO5=$TMO5"; $S $L $C deg5; status C1_UNSAT_DONE
 # Satisfiable control (draw 1): must never refute; a timeout is expected.
 TC=$(( $(remaining) - ${SERVE_SECONDS:-2700} - 900 ))
