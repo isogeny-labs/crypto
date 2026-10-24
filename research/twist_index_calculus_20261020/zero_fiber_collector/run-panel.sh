@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 # Thin orchestration only. Every science subprocess has a separate busy lease.
 set -euo pipefail
+# An outer busy wrapper would deadlock the per-phase reservations below.
+zero_parent=$PPID
+for zero_depth in {1..16}; do
+  test "$zero_parent" -gt 1 || break
+  test -r "/proc/$zero_parent/cmdline" || break
+  mapfile -d '' -t zero_parent_args < "/proc/$zero_parent/cmdline"
+  for ((zero_arg=0; zero_arg+1<${#zero_parent_args[@]}; zero_arg++)); do
+    if [[ ${zero_parent_args[zero_arg]} == */isolated_bench.py && ${zero_parent_args[zero_arg+1]} == busy ]]; then
+      printf 'run-panel.sh manages per-phase reservations; invoke without an outer busy wrapper.\n' >&2
+      exit 64
+    fi
+  done
+  zero_parent=$(ps -o ppid= -p "$zero_parent" 2>/dev/null | tr -d ' ') || break
+done
 if test "${1:-}" != --frozen; then
   zero_out=${1:?fresh output directory}
   test ! -e "$zero_out"

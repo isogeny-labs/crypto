@@ -7,11 +7,10 @@ cold-build routine are updated in the parent native crate. The public p37
 fixture is copied exactly from the completed parent study, SHA-256
 5a55715c3d8f532634722ff6f58562e8f7e9f7d339f529cda724677da0f9b393.
 
-**Before journaling: compiled, native suite 84/84 passes.** A subsequent
-preservation fix adds durable per-system input/result journals so a timeout
-or allocation failure does not erase the completed prefix. That version's
-new native gate is live, queued on the shared reservation, and has not yet
-passed. The stronger post-run audit uses
+**Journalled version: compiled, native suite 84/84 passes; source checks pass.**
+Durable per-system input/result journals preserve the completed prefix under
+a timeout or allocation failure. Earlier passes and failures remain separate.
+The stronger post-run audit uses
 scalar-multiplication action maps, verifies actual pair coverage, per-pair
 physical relations, the transported union and F4 counter sums. The fixed
 42-case-arm Rust reducer and per-phase-reservation shell driver are implemented.

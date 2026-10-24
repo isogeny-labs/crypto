@@ -41,3 +41,33 @@ checkpoint its exact busy-wrapper owner is live and waiting for the shared
 reservation. The earlier 84-test pass is not credited to the changed source.
 The dependent panel controller must see this gate's terminal success before
 starting any of the 42 case-arms.
+
+## Existing panel reconciliation and nested reservation
+
+An existing `twist-zero-five-panel-v1.service` was found with frozen inputs
+and a runner under `runs/panel-v1`. It held the outer common busy reservation
+while its first collector's inner busy wrapper waited for that same lock.
+Process/cgroup and wait-channel checks, zero candidate/audit records and the
+exact first command confirm that no native collector started. Its pre-stop
+service state, journal, runner digest and reconciliation are retained under
+`results/nested-reservation-v1/`. Only that verified deadlocked study service
+was stopped; the separate live journalled native gate was kept queued.
+
+Additional existing `native-gate-v6`/`v7` receipts were reconciled: v6 has
+78 passing and six failing tests; v7 passes 84/84. Both predate the journalled
+collector and their source manifests differ at that file, so neither is
+substituted for the queued gate. All raw evidence remains unchanged.
+
+The panel driver now refuses an outer busy ancestor with exit 64 before
+creating outputs. Its controller verifies that refusal under a bounded
+negative control, then launches the driver directly. Individual science
+phases still acquire the shared reservation. The new panel uses a fresh
+directory; the blocked old prefix is preserved, not called a scientific run.
+
+The queued journalled gate subsequently completes all three phases with exit
+zero, 84 passing native tests, zero failures and unchanged source hashes.
+Its production executable is SHA-256
+`ba3b7c62dd51dbb158a5407e75780cd4065bbd63d9d6baa8400e5468051b4a5f`.
+Compact raw metadata is copied unchanged to `results/native-journal-gate-v1/`.
+The explicit outer-busy negative control returns 64 and creates no candidate
+directory. The corrected panel may now start directly, without an outer lock.

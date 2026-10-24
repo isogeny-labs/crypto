@@ -35,5 +35,13 @@ while true; do
   sleep 10
 done
 sha256sum -c "$zero_gate/metadata/sources.sha256" > "$zero_control/gate-sources-unchanged.txt"
+zero_guard_rc=0
+python3 tools/isolated_bench.py busy -- timeout --kill-after=2s 10s \
+  bash "$zero_study/run-panel.sh" "$zero_control/must-not-exist" \
+  "$zero_public" "$zero_reference" "$zero_point_summary" "$zero_gate" \
+  > "$zero_control/outer-busy-control.stdout" 2> "$zero_control/outer-busy-control.stderr" || zero_guard_rc=$?
+printf '%s\n' "$zero_guard_rc" > "$zero_control/outer-busy-control.exit"
+test "$zero_guard_rc" = 64
+test ! -e "$zero_control/must-not-exist"
 date -u +%FT%TZ > "$zero_control/panel-launch-utc.txt"
 exec bash "$zero_study/run-panel.sh" "$zero_panel" "$zero_public" "$zero_reference" "$zero_point_summary" "$zero_gate"

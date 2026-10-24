@@ -33,7 +33,7 @@ flowchart LR
 | Registered 21 cases and both image controls | [Protocol](PROTOCOL.md); seven curves, all three presentations |
 | Public-only candidate inputs and charged reconstruction | Native collector calls the original cold builder; no reference argument |
 | Independent pair coverage and work-record auditing | Separate scalar-multiplication maps, exact partition, per-pair reference equality, transported union, and checked F4 counter sum |
-| Native correctness gate | Before per-system journaling: 84 tests pass with source checks before/after; [receipts](results/native-completion-v1/metadata/native-tests.stdout). Journalled version's new gate is queued, not yet passed. |
+| Native correctness gate | Journalled version: 84/84 tests pass, source checks pass; [current receipts](results/native-journal-gate-v1/metadata/native-tests.stdout). Earlier passes/failures are retained separately. |
 | Complete physical enumeration on all 42 case-arms | Pending registered panel; a timeout is never a zero-yield observation |
 | Independent complete-set and matrix comparison | Implemented; execution pending |
 | Charged target descent and matched controls | Not yet implemented or executed |
@@ -52,6 +52,10 @@ POINT_REPLAY_SUMMARY GATE` freezes its actual script, binary, protocol, all
 gets its own busy reservation, 8 GiB address-space cap and 1,200-second outer
 watchdog. The collector also uses a 1,180-second cooperative deadline.
 No BSGS, scalar census or public-point census is repeated.
+
+Invoke `run-panel.sh` directly: it manages its own per-phase reservations.
+An outer busy wrapper is refused before creating outputs; the bounded
+[negative control](results/outer-busy-control-v1/exit) confirms exit 64.
 
 Raw runs stay under ignored `runs/` and will be archived with hashes, exact
 commands, failed attempts and compact native summaries. See
