@@ -60,6 +60,43 @@ pub enum PeMode {
     Partial { batch_rows: usize },
 }
 
+/// Queue order of [`PeMode::Partial`] (the order sweep of
+/// `research/koblitz_ic_leads_build_20261024/`, Amendment 3).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum PeOrder {
+    /// Lowest leading degree first, then the smallest leading variable.
+    LowFirst,
+    /// Highest leading degree first (below `D`), then the smallest leading
+    /// variable.
+    HighFirst,
+    /// A fixed pseudo-random permutation of the pivot columns.
+    Random(u64),
+}
+
+/// Options of [`pe_closure_with`]; [`Default`] is [`pe_closure`]'s order.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct PeOptions {
+    pub order: PeOrder,
+    /// Seed degree of [`PeMode::Partial`]; `None` is `D − 1` (at least the
+    /// system's degree).
+    pub seed_degree: Option<u32>,
+    /// MXL's restriction: multiply a row only by the variables not larger
+    /// than its leading variable; when the queue empties, a completion pass
+    /// re-expands every low row by every variable, so the closure computed
+    /// is the same.
+    pub restrict_vars: bool,
+}
+
+impl Default for PeOptions {
+    fn default() -> Self {
+        Self {
+            order: PeOrder::LowFirst,
+            seed_degree: None,
+            restrict_vars: false,
+        }
+    }
+}
+
 /// One closure run at a fixed degree.
 #[derive(Clone, Debug, PartialEq)]
 pub struct PeReport {
@@ -90,6 +127,11 @@ pub struct PeReport {
     /// The run stopped at the row cap before refuting or saturating:
     /// unmeasured, never evidence about the degree.
     pub capped: bool,
+    /// Basis rows when the restricted phase ended and the completion pass
+    /// began (`restrict_vars` only).
+    pub completion_at_rows: Option<usize>,
+    /// `1` entered during the completion pass, not the restricted phase.
+    pub refuted_in_completion: bool,
     pub secs: f64,
 }
 
@@ -182,6 +224,8 @@ impl Engine {
             products: 0,
             word_ops: 0,
             capped: false,
+            completion_at_rows: None,
+            refuted_in_completion: false,
             secs: 0.0,
         };
         Some(Self {
@@ -291,8 +335,9 @@ impl Engine {
         self.piv.binary_search(&c).ok().map(|i| &self.basis[i])
     }
 
-    /// `row` times every variable, as dense rows; zero products dropped.
-    fn expand(&mut self, row: &[u64], out: &mut Vec<Vec<u64>>) {
+    /// `row` times every variable (or, with `below`, only the variables of
+    /// bit index at least `below`), as dense rows; zero products dropped.
+    fn expand(&mut self, row: &[u64], below: Option<u32>, out: &mut Vec<Vec<u64>>) {
         let mut set: Vec<usize> = Vec::new();
         for (i, &w) in row.iter().enumerate() {
             let mut bits = w;
@@ -302,6 +347,9 @@ impl Engine {
             }
         }
         for v in 0..self.vars.len() {
+            if below.is_some_and(|b| self.vars[v].trailing_zeros() < b) {
+                continue;
+            }
             let mut p = vec![0u64; self.words];
             for &c in &set {
                 let t = self.times[v][c];
@@ -383,6 +431,36 @@ pub fn pe_closure(
     max_cols: usize,
     max_rows: usize,
 ) -> Option<PeReport> {
+    pe_closure_with(
+        system,
+        n_vars,
+        degree,
+        mode,
+        max_cols,
+        max_rows,
+        PeOptions::default(),
+    )
+}
+
+fn splitmix(mut z: u64) -> u64 {
+    z = z.wrapping_add(0x9e37_79b9_7f4a_7c15);
+    z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+    z ^ (z >> 31)
+}
+
+/// [`pe_closure`] with a queue order, seed degree and variable restriction
+/// ([`PeOptions`]).  Every option computes the same closure; only the
+/// order in which `1` can appear changes.
+pub fn pe_closure_with(
+    system: &[F2BoolPoly],
+    n_vars: usize,
+    degree: u32,
+    mode: PeMode,
+    max_cols: usize,
+    max_rows: usize,
+    opts: PeOptions,
+) -> Option<PeReport> {
     let started = Instant::now();
     let label = match mode {
         PeMode::Full => "full",
@@ -392,7 +470,7 @@ pub fn pe_closure(
     let occurring = e.vars.iter().fold(0u64, |a, v| a | v);
     let seed_degree = match mode {
         PeMode::Full => degree,
-        PeMode::Partial { .. } => degree.saturating_sub(1).max(
+        PeMode::Partial { .. } => opts.seed_degree.unwrap_or(degree.saturating_sub(1)).max(
             system
                 .iter()
                 .filter_map(|p| p.terms.first())
@@ -413,15 +491,34 @@ pub fn pe_closure(
     }
     // Queue keyed (leading degree, leading-variable rank, column): the
     // lowest degree first; within a degree the smallest leading variable
-    // (highest index) first.
-    let key = |e: &Engine, c: usize| (e.lead_degree(c), 64 - e.lead_var(c), c);
+    // (highest index) first.  The other orders change the first component.
+    let key = |e: &Engine, c: usize| match opts.order {
+        PeOrder::LowFirst => (e.lead_degree(c), 64 - e.lead_var(c), c),
+        PeOrder::HighFirst => (degree - e.lead_degree(c), 64 - e.lead_var(c), c),
+        PeOrder::Random(s) => ((splitmix(c as u64 ^ s) >> 32) as u32, 0, c),
+    };
+    let mut full_vars = !opts.restrict_vars;
     let mut queue: BTreeSet<(u32, u32, usize)> = BTreeSet::new();
     for c in new {
         if e.lead_degree(c) < degree {
             queue.insert(key(&e, c));
         }
     }
-    while !e.report.refuted && !queue.is_empty() {
+    loop {
+        if queue.is_empty() && !full_vars && !e.report.refuted {
+            // Completion pass: every low row by every variable.
+            full_vars = true;
+            e.report.completion_at_rows = Some(e.basis.len());
+            for i in 0..e.piv.len() {
+                let c = e.piv[i];
+                if e.lead_degree(c) < degree {
+                    queue.insert(key(&e, c));
+                }
+            }
+        }
+        if e.report.refuted || queue.is_empty() {
+            break;
+        }
         if e.basis.len() > max_rows {
             e.report.capped = true;
             break;
@@ -446,7 +543,8 @@ pub fn pe_closure(
             let Some(row) = e.row_at(c).cloned() else {
                 continue;
             };
-            e.expand(&row, &mut batch);
+            let below = (!full_vars).then(|| e.lead_var(c));
+            e.expand(&row, below, &mut batch);
         }
         e.report.products += batch.len() as u64;
         while !batch.is_empty() && !e.report.refuted {
@@ -459,6 +557,7 @@ pub fn pe_closure(
             }
         }
     }
+    e.report.refuted_in_completion = e.report.refuted && e.report.completion_at_rows.is_some();
     e.report.saturated = e.report.refuted || (queue.is_empty() && !e.report.capped);
     e.report.final_rows = e.basis.len();
     e.report.secs = started.elapsed().as_secs_f64();
@@ -539,6 +638,57 @@ mod tests {
     }
 
     /// A planted solution is never refuted, in either mode.
+    #[test]
+    fn every_order_computes_the_same_closure() {
+        let orders = [
+            PeOrder::LowFirst,
+            PeOrder::HighFirst,
+            PeOrder::Random(1),
+            PeOrder::Random(2),
+        ];
+        let mut refuted_seen = 0;
+        for (m, n, ell) in [(3usize, 7u32, 2usize), (3, 9, 3), (4, 5, 2)] {
+            for (sys, n_vars) in draws(m, n, ell, 4, 20261025 + n as u64) {
+                for d in 3..=4u32 {
+                    let Some((dense, _)) =
+                        ReducedBasis::from_system_closed_full(&sys, n_vars, d, 1_000_000)
+                    else {
+                        continue;
+                    };
+                    for order in orders {
+                        for restrict_vars in [false, true] {
+                            for seed_degree in [None, Some(0)] {
+                                let opts = PeOptions {
+                                    order,
+                                    seed_degree,
+                                    restrict_vars,
+                                };
+                                let r = pe_closure_with(
+                                    &sys,
+                                    n_vars,
+                                    d,
+                                    PeMode::Partial { batch_rows: 3 },
+                                    1 << 20,
+                                    usize::MAX,
+                                    opts,
+                                )
+                                .unwrap();
+                                assert_eq!(r.refuted, dense.is_refuted(), "{opts:?} m={m} d={d}");
+                                assert!(r.saturated);
+                                if !dense.is_refuted() {
+                                    assert_eq!(r.final_rows, dense.rank(), "{opts:?} m={m} d={d}");
+                                } else {
+                                    refuted_seen += 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        assert!(refuted_seen > 0, "the panel exercises refutation");
+    }
+
     #[test]
     fn satisfiable_systems_are_never_refuted() {
         use crate::cryptanalysis::pq_groebner_f2::F2BoolMono;

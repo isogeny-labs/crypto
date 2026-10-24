@@ -43,20 +43,58 @@ fn run_lambda() {
                 .take(12)
                 .map(|&d| (0..d).map(|_| rng.gen::<u64>() & mask).collect())
                 .collect();
-            let started = Instant::now();
-            let r = lambda::check(&irr, a, &bases);
-            println!(
-                r#"{{"lead":"L1","n":{n},"a":{a},"points":{},"doubling_identity":{},"negation_identity":{},"subspaces":{},"closure_identity":{},"base_sizes":{:?},"secs":{:.3}}}"#,
-                r.points,
-                r.doubling_identity,
-                r.negation_identity,
-                r.subspaces,
-                r.closure_identity,
-                r.base_sizes,
-                started.elapsed().as_secs_f64()
-            );
+            emit_lambda(&irr, a, 1, &bases);
         }
     }
+}
+
+/// Amendment 3: subspaces holding `1`, and curves with `b ≠ 1`, over
+/// `F_{2^11}` and `F_{2^13}` (a separate stream, seed + 1).
+fn run_lambda_general() {
+    let mut rng = StdRng::seed_from_u64(SEED + 1);
+    for n in [11u32, 13] {
+        let irr = find_irreducible_sparse(n).expect("field");
+        let mask = (1u64 << n) - 1;
+        let bs: Vec<u64> = std::iter::once(1)
+            .chain((0..3).map(|_| (rng.gen::<u64>() & mask).max(2)))
+            .collect();
+        for &b in &bs {
+            for a in 0..2u64 {
+                let bases: Vec<Vec<u64>> = [3usize, n as usize / 2, n as usize - 3]
+                    .iter()
+                    .cycle()
+                    .take(12)
+                    .enumerate()
+                    .map(|(i, &d)| {
+                        let mut v: Vec<u64> = (0..d).map(|_| rng.gen::<u64>() & mask).collect();
+                        if i % 2 == 0 {
+                            v[0] = 1;
+                        }
+                        v
+                    })
+                    .collect();
+                emit_lambda(&irr, a, b, &bases);
+            }
+        }
+    }
+}
+
+fn emit_lambda(irr: &crypto_lib::binary_ecc::IrreduciblePoly, a: u64, b: u64, bases: &[Vec<u64>]) {
+    let started = Instant::now();
+    let r = lambda::check_curve(irr, a, b, bases);
+    println!(
+        r#"{{"lead":"L1","n":{},"a":{a},"b":{b},"points":{},"doubling_identity":{},"negation_identity":{},"subspaces":{},"closure_identity":{},"subspaces_with_one":{},"closure_identity_with_one":{},"base_sizes":{:?},"secs":{:.3}}}"#,
+        r.n,
+        r.points,
+        r.doubling_identity,
+        r.negation_identity,
+        r.subspaces,
+        r.closure_identity,
+        r.subspaces_with_one,
+        r.closure_identity_with_one,
+        r.base_sizes,
+        started.elapsed().as_secs_f64()
+    );
 }
 
 fn run_gluing() {
@@ -82,17 +120,77 @@ fn run_gluing() {
                 ps.solutions, ag.solutions,
                 "m={m} n={n} ell={ell} draw={draw}"
             );
+            // The other m = 4 gluing order, `(L₁ ⋈ L₂) ⋈ L₃` (Amendment 3).
+            let left = (m == 4).then(|| {
+                let t = Instant::now();
+                let r = agreeing_gluing::agreeing_gluing_left(&words, xr, 1, &irr);
+                assert_eq!(r.solutions, ag.solutions, "left order n={n} ell={ell} draw={draw}");
+                format!(
+                    r#","gluing_left":{{"root_solves":{},"probes":{},"table_entries":{},"secs":{:.4}}}"#,
+                    r.root_solves,
+                    r.probes,
+                    r.table_entries,
+                    t.elapsed().as_secs_f64()
+                )
+            });
             println!(
-                r#"{{"lead":"L3","m":{m},"n":{n},"ell":{ell},"draw":{draw},"solutions":{},"pairs":{{"root_solves":{},"probes":{},"secs":{t1:.4}}},"gluing":{{"root_solves":{},"probes":{},"table_entries":{},"discarded":{},"secs":{t3:.4}}}}}"#,
+                r#"{{"lead":"L3","m":{m},"n":{n},"ell":{ell},"draw":{draw},"solutions":{},"pairs":{{"root_solves":{},"probes":{},"secs":{t1:.4}}},"gluing":{{"root_solves":{},"probes":{},"table_entries":{},"discarded":{},"secs":{t3:.4}}}{}}}"#,
                 ps.solutions,
                 ps.root_solves,
                 ps.probes,
                 ag.root_solves,
                 ag.probes,
                 ag.table_entries,
-                ag.discarded
+                ag.discarded,
+                left.unwrap_or_default()
             );
         }
+    }
+}
+
+/// L3 bit-level census (Amendment 3): the support (variables occurring)
+/// of every descended equation, by kind.  A bit-level Agreeing–Gluing
+/// keeps one local solution list per equation over its support.
+fn run_census() {
+    let cells: &[(usize, u32, usize)] =
+        &[(3, 16, 6), (3, 19, 7), (3, 22, 6), (4, 11, 5), (4, 15, 6)];
+    let mut rng = StdRng::seed_from_u64(SEED);
+    for &(m, n, ell) in cells {
+        let irr = find_irreducible_sparse(n).expect("field");
+        let st = FieldStructure::new(n, &irr);
+        let (basis, x_r) = ladder_sample(n, ell, &mut rng);
+        let sys =
+            build_decomposition_system(&basis, &x_r, &F2mElement::one(n), m, &st).expect("system");
+        let mut cubic: Vec<u32> = Vec::new();
+        let mut quad: Vec<u32> = Vec::new();
+        for p in &sys.equations {
+            let support = p.terms.iter().fold(0u64, |a, t| a | t.mask).count_ones();
+            match p.terms.iter().map(|t| t.mask.count_ones()).max() {
+                Some(3) => cubic.push(support),
+                _ => quad.push(support),
+            }
+        }
+        cubic.sort_unstable();
+        quad.sort_unstable();
+        let stats = |v: &[u32]| -> String {
+            if v.is_empty() {
+                return "null".into();
+            }
+            format!(
+                r#"{{"count":{},"min":{},"median":{},"max":{}}}"#,
+                v.len(),
+                v[0],
+                v[v.len() / 2],
+                v[v.len() - 1]
+            )
+        };
+        println!(
+            r#"{{"lead":"L3","census":true,"m":{m},"n":{n},"ell":{ell},"n_vars":{},"cubic_support":{},"quadratic_support":{},"two_ell":{}}}"#,
+            sys.n_vars,
+            stats(&cubic),
+            stats(&quad),
+            2 * ell
+        );
     }
 }
 
@@ -123,16 +221,22 @@ fn run_bounds() {
             .iter()
             .filter(|p| p.terms.iter().map(|t| t.mask.count_ones()).max() == Some(3))
             .count();
-        assert_eq!(cubic, (m - 2) * n as usize, "cubic links are the ones not through x_R");
+        assert_eq!(
+            cubic,
+            (m - 2) * n as usize,
+            "cubic links are the ones not through x_R"
+        );
         println!(
-            r#"{{"lead":"L4","m":{m},"n":{n},"ell":{ell},"n_vars":{},"equations":{},"cubic_equations":{cubic},"max_degree":{},"generic_coordinates":{},"macaulay_bound":{},"shape_bound":{},"measured_closure_degree":"{measured}","source":"{source}","field_level_bound_log2":{:.1}}}"#,
+            r#"{{"lead":"L4","m":{m},"n":{n},"ell":{ell},"n_vars":{},"equations":{},"cubic_equations":{cubic},"max_degree":{},"generic_coordinates":{},"macaulay_bound":{},"shape_bound":{},"measured_closure_degree":"{measured}","source":"{source}","field_level_bound_log2":{:.1},"weil_restriction_bound_log2":{:.1},"last_fall_bound":{}}}"#,
             b.n_vars,
             b.equations,
             b.max_degree,
             b.generic_coordinates,
             b.bound,
             shape_bound(b.n_vars, cubic, 3),
-            degree_bounds::field_level_bound_log2(m, n, ell as u32)
+            degree_bounds::field_level_bound_log2(m, n, ell as u32),
+            degree_bounds::weil_restriction_bound_log2(m, n, ell as u32),
+            degree_bounds::last_fall_bound(m, ell as u32)
         );
     }
     // ECC2K-130 at m = 4, ℓ = 33: N = 2·131 + 4·33 and 3·131 links.  The
@@ -143,9 +247,11 @@ fn run_bounds() {
     let eqs = (m - 1) * n as usize;
     let cubic = (m - 2) * n as usize;
     println!(
-        r#"{{"lead":"L4","m":{m},"n":{n},"ell":{ell},"n_vars":{nv},"equations":{eqs},"cubic_equations":{cubic},"max_degree":3,"generic_coordinates":true,"macaulay_bound":null,"shape_bound":{},"measured_closure_degree":"unmeasured","source":"ECC2K-130 shape","field_level_bound_log2":{:.1}}}"#,
+        r#"{{"lead":"L4","m":{m},"n":{n},"ell":{ell},"n_vars":{nv},"equations":{eqs},"cubic_equations":{cubic},"max_degree":3,"generic_coordinates":true,"macaulay_bound":null,"shape_bound":{},"measured_closure_degree":"unmeasured","source":"ECC2K-130 shape","field_level_bound_log2":{:.1},"weil_restriction_bound_log2":{:.1},"last_fall_bound":{}}}"#,
         shape_bound(nv, cubic, 3),
-        degree_bounds::field_level_bound_log2(m, n, ell as u32)
+        degree_bounds::field_level_bound_log2(m, n, ell as u32),
+        degree_bounds::weil_restriction_bound_log2(m, n, ell as u32),
+        degree_bounds::last_fall_bound(m, ell as u32)
     );
 }
 
@@ -164,6 +270,8 @@ fn main() {
         Some("lambda") => run_lambda(),
         Some("gluing") => run_gluing(),
         Some("bounds") => run_bounds(),
-        _ => panic!("usage: koblitz_ic_leads_bench lambda|gluing|bounds"),
+        Some("census") => run_census(),
+        Some("lambda-general") => run_lambda_general(),
+        _ => panic!("usage: koblitz_ic_leads_bench lambda|lambda-general|gluing|bounds|census"),
     }
 }

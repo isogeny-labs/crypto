@@ -1,5 +1,5 @@
 //! Lead L2: the degree-`D` MutantXL closure by partial enlargement, on
-//! committed refutation-degree draws ([`pe_closure`]).
+//! committed refutation-degree draws ([`pe_closure_with`]).
 //!
 //! ```sh
 //! cargo run --release --example pe_closure -- \
@@ -16,7 +16,7 @@
 use crypto_lib::binary_ecc::F2mElement;
 use crypto_lib::cryptanalysis::koblitz_groebner::{build_decomposition_system, FieldStructure};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
-use crypto_lib::cryptanalysis::partial_enlargement::{pe_closure, PeMode};
+use crypto_lib::cryptanalysis::partial_enlargement::{pe_closure_with, PeMode, PeOptions, PeOrder};
 use num_bigint::BigUint;
 use serde_json::Value;
 
@@ -51,6 +51,21 @@ fn main() {
         Some("partial") | None => PeMode::Partial { batch_rows: batch },
         Some(m) => panic!("--mode full|partial, got {m}"),
     };
+    // Amendment 3: `--order low|high|random:S`, `--restrict`, `--seed-degree K`.
+    let order = match flag("--order").as_deref() {
+        None | Some("low") => PeOrder::LowFirst,
+        Some("high") => PeOrder::HighFirst,
+        Some(o) => PeOrder::Random(
+            o.strip_prefix("random:")
+                .and_then(|v| v.parse().ok())
+                .unwrap_or_else(|| panic!("--order low|high|random:S, got {o}")),
+        ),
+    };
+    let opts = PeOptions {
+        order,
+        seed_degree: flag("--seed-degree").map(|v| v.parse().expect("--seed-degree")),
+        restrict_vars: args.iter().any(|a| a == "--restrict"),
+    };
     let max_cols: usize = flag("--max-cols").map_or(1_200_000, |v| v.parse().expect("--max-cols"));
     let max_rows: usize = flag("--max-rows").map_or(usize::MAX, |v| v.parse().expect("--max-rows"));
     let text = std::fs::read_to_string(&draws).unwrap_or_else(|e| panic!("{draws}: {e}"));
@@ -80,12 +95,20 @@ fn main() {
         v["n_vars"].as_u64().unwrap(),
         "rebuilt shape"
     );
-    let r = pe_closure(&sys.equations, sys.n_vars, degree, mode, max_cols, max_rows);
+    let r = pe_closure_with(
+        &sys.equations,
+        sys.n_vars,
+        degree,
+        mode,
+        max_cols,
+        max_rows,
+        opts,
+    );
     let hwm = vm_hwm_kb();
     let body = match &r {
         None => r#""built":false"#.to_string(),
         Some(r) => format!(
-            r#""built":true,"mode":"{}","batch":{},"refuted":{},"saturated":{},"capped":{},"columns":{},"peak_basis_rows":{},"peak_matrix_rows":{},"peak_matrix_bytes":{},"final_rows":{},"absorbs":{},"expanded":{},"products":{},"word_ops":{},"secs":{:.3}"#,
+            r#""built":true,"mode":"{}","batch":{},"refuted":{},"saturated":{},"capped":{},"columns":{},"peak_basis_rows":{},"peak_matrix_rows":{},"peak_matrix_bytes":{},"final_rows":{},"absorbs":{},"expanded":{},"products":{},"word_ops":{},"order":"{:?}","restrict":{},"seed_degree":{},"completion_at_rows":{},"refuted_in_completion":{},"secs":{:.3}"#,
             r.mode,
             match mode {
                 PeMode::Partial { batch_rows } => batch_rows,
@@ -103,6 +126,12 @@ fn main() {
             r.expanded,
             r.products,
             r.word_ops,
+            opts.order,
+            opts.restrict_vars,
+            opts.seed_degree.map_or("null".into(), |d| d.to_string()),
+            r.completion_at_rows
+                .map_or("null".into(), |d| d.to_string()),
+            r.refuted_in_completion,
             r.secs
         ),
     };

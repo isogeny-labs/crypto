@@ -158,3 +158,59 @@ satisfiable control, with a spend cap of $80.
 - **Outcomes** are read as in §C1: refuted at 5; saturated without
   refuting (at least 6); or timed out or out of memory (unmeasured). Any
   refutation of draw 1 is an instrument failure.
+
+## Amendment 3 (2026-10-24, before any of these runs): closing every lead exhaustively
+
+The owner's standard is that each lead is closed exhaustively, not only
+along the one path built first. Each item below is frozen before it runs.
+None of them changes a registered falsifier.
+
+**L2: order, batch, seed and restriction sweep.** `pe_closure_with`
+(`PeOptions`) computes the same closure in any order. The unit test
+`every_order_computes_the_same_closure` checks that against the dense
+closure.
+
+- **Cells.** m = 4 (11, 5) draw 8 and m = 3 (22, 6) draw 0, degree 4,
+  `partial` mode.
+- **Grid.** Order ∈ {low-first, high-first, random(1), random(2)} ×
+  MXL variable restriction ∈ {off, on} × seed degree ∈ {D − 1, the system
+  degree 3}, at batch 64. Then batch ∈ {16, 256} at the default order.
+  That is 18 runs per cell.
+- **Reading.** The metric is peak basis rows / columns at refutation. The
+  lead is closed as order-insensitive if every run is ≥ 0.5, the P1
+  falsifier. Any run below 0.25 (the payoff) reopens it on that cell.
+
+**L2: full-order coverage.** `full` mode on the m = 3 (24, 6) draws 0–3
+and the m = 4 (12, 5) draws 24, 26, 47, 52. This completes the A/A
+reference on all four cells.
+
+**L3: every gluing order and a bit-level census.**
+
+- **Gluing orders.** At m = 4 the remaining gluing order,
+  `(L₁ ⋈ L₂) ⋈ L₃` (`agreeing_gluing_left`), is run on the same draws as
+  `l3-gluing.jsonl`, re-generated from the same seed. Its solution count
+  must equal the other solvers' on every draw.
+- **Census.** `census` records the support of every descended equation on
+  five cells.
+- **Reading.** If no order fits below 2^{2ℓ}, then Agreeing–Gluing on this
+  chain is the meet-in-the-middle at every order. If every bit-level
+  support exceeds 2ℓ, a bit-level Agreeing–Gluing's local lists exceed
+  the block-level ones.
+
+**L4: the other proved bounds.** Both bounds are recorded per cell, and
+both are read against the registered falsifier (bound ≥ ℓ + 4 means
+uninformative).
+
+- **Caminata–Ceria–Gorla** (arXiv 2112.10506, Corollary 4.12) Weil
+  restriction bound, `n · reg(F′ʰ) − n + 1`.
+- **Huang–Kosters–Yang–Yeo** (arXiv 1505.02532, Theorem 1.1) last fall
+  degree bound, at q = 2.
+
+Their unverified hypotheses are named in the code. Steiner's Theorem 3.7
+is checked by hand against its hypothesis (ii) and recorded in the
+README.
+
+**L1: the remaining cases.** `lambda-general` covers subspaces W ∋ 1,
+where the expected identity is A = B exactly. It runs on b = 1 and on
+three random b ≠ 0, over F_{2^11} and F_{2^13}, both a, with 12
+subspaces each.

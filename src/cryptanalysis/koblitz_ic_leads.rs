@@ -26,7 +26,8 @@ pub mod lambda {
     /// A finite affine point `(x, y)`; `None` is the point at infinity.
     pub type Pt = Option<(u64, u64)>;
 
-    /// Affine group law on `y² + xy = x³ + a·x² + 1` over `gf`.
+    /// Affine group law on `y² + xy = x³ + a·x² + b` over `gf` (the
+    /// formulas do not involve `b`).
     pub fn add(gf: &Gf2, a: u64, p: Pt, q: Pt) -> Pt {
         let (x1, y1) = match p {
             None => return q,
@@ -61,12 +62,13 @@ pub mod lambda {
         x ^ gf.mul(y, gf.inv(x))
     }
 
-    /// Every affine point with `x ≠ 0`, via `y = x·z`, `z² + z = x + a + 1/x²`.
-    pub fn points(gf: &Gf2, a: u64) -> Vec<(u64, u64)> {
+    /// Every affine point with `x ≠ 0` of `y² + xy = x³ + a·x² + b`, via
+    /// `y = x·z`, `z² + z = x + a + b/x²`.
+    pub fn points(gf: &Gf2, a: u64, b: u64) -> Vec<(u64, u64)> {
         let ash = ArtinSchreier::new(gf);
         let mut out = Vec::new();
         for x in 1..(1u64 << gf.n) {
-            let c = x ^ a ^ gf.sqr(gf.inv(x));
+            let c = x ^ a ^ gf.mul(b, gf.sqr(gf.inv(x)));
             if let Some(z) = ash.solve(c) {
                 let y = gf.mul(x, z);
                 out.push((x, y));
@@ -92,6 +94,12 @@ pub mod lambda {
         pub subspaces: usize,
         pub closure_identity: bool,
         pub base_sizes: Vec<usize>,
+        /// The curve constant `b` (Koblitz curves: `1`).
+        pub b: u64,
+        /// Subspaces `W ∋ 1` tried, and for every one: `A = −A`,
+        /// `|L(W)| = |W|/2` and `A = [2]⁻¹{P : x(P) ∈ L(W) + a}` exactly.
+        pub subspaces_with_one: usize,
+        pub closure_identity_with_one: bool,
     }
 
     fn span(basis: &[u64]) -> Vec<u64> {
@@ -104,12 +112,19 @@ pub mod lambda {
     }
 
     /// Check the closure on `y² + xy = x³ + a·x² + 1` over `F_2[t]/irr`
-    /// for the subspaces spanned by each of `bases` (each must be
-    /// independent and avoid `1`; dependent or `1`-containing ones are
-    /// skipped and not counted).
+    /// for the subspaces spanned by each of `bases` (dependent ones are
+    /// skipped and not counted).  [`check_curve`] with `b = 1`.
     pub fn check(irr: &IrreduciblePoly, a: u64, bases: &[Vec<u64>]) -> LambdaCheck {
+        check_curve(irr, a, 1, bases)
+    }
+
+    /// [`check`] on `y² + xy = x³ + a·x² + b` for any `b ≠ 0`.  Subspaces
+    /// avoiding `1` are checked against `B = A ⊔ (−A)`; subspaces holding
+    /// `1` against `A = B`.
+    pub fn check_curve(irr: &IrreduciblePoly, a: u64, b: u64, bases: &[Vec<u64>]) -> LambdaCheck {
+        assert!(b != 0, "b = 0 is singular");
         let gf = Gf2::new(irr);
-        let pts = points(&gf, a);
+        let pts = points(&gf, a, b);
         let aux = Some(pts[pts.len() / 3]);
         let mut doubled: HashMap<(u64, u64), Option<u64>> = HashMap::with_capacity(pts.len());
         let (mut dbl, mut negok) = (true, true);
@@ -131,14 +146,18 @@ pub mod lambda {
             subspaces: 0,
             closure_identity: true,
             base_sizes: Vec::new(),
+            b,
+            subspaces_with_one: 0,
+            closure_identity_with_one: true,
         };
         for basis in bases {
             let mut w = span(basis);
             w.sort_unstable();
             w.dedup();
-            if w.len() != 1 << basis.len() || w.contains(&1) {
+            if w.len() != 1 << basis.len() {
                 continue;
             }
+            let has_one = w.contains(&1);
             let wset: HashSet<u64> = w.iter().copied().collect();
             let wp: HashSet<u64> = w.iter().map(|&v| gf.sqr(v) ^ v ^ a).collect();
             let set_a: HashSet<(u64, u64)> = pts
@@ -152,6 +171,13 @@ pub mod lambda {
                 .filter(|p| matches!(doubled[p], Some(v) if wp.contains(&v)))
                 .collect();
             let neg_a: HashSet<(u64, u64)> = set_a.iter().map(|&(x, y)| (x, y ^ x)).collect();
+            if has_one {
+                let ok = wp.len() * 2 == w.len() && neg_a == set_a && set_a == set_b;
+                out.closure_identity_with_one &= ok;
+                out.subspaces_with_one += 1;
+                out.base_sizes.push(set_a.len());
+                continue;
+            }
             let ok = wp.len() == w.len()
                 && set_a.is_disjoint(&neg_a)
                 && set_a.union(&neg_a).copied().collect::<HashSet<_>>() == set_b;
@@ -378,6 +404,52 @@ pub mod agreeing_gluing {
         }
         c
     }
+
+    /// The other gluing order at `m = 4`, `(L₁ ⋈ L₂) ⋈ L₃`: list `e₁` per
+    /// `(x₁, x₂)`, extend each by `e₂` per `x₃`, and agree on `e₂` against
+    /// the right link's table `e₂ → #x₄`.  `L₁ ⋈ (L₂ ⋈ L₃)` is
+    /// [`agreeing_gluing`]'s order, so with it every order of the
+    /// three-link chain is measured.
+    pub fn agreeing_gluing_left(
+        basis: &[u64],
+        x_r: u64,
+        b: u64,
+        irr: &IrreduciblePoly,
+    ) -> ChainCount {
+        let f = Field::new(irr, b);
+        let v = span(basis);
+        let mut c = ChainCount::default();
+        let (mut r1, mut r2) = (Vec::new(), Vec::new());
+        let mut right: HashMap<u64, u64> = HashMap::new();
+        for &x4 in &v {
+            f.roots(x4, x_r, &mut r1);
+            c.root_solves += 1;
+            for &e2 in &r1 {
+                *right.entry(e2).or_insert(0) += 1;
+            }
+        }
+        c.table_entries = right.len() as u64;
+        for &x1 in &v {
+            for &x2 in &v {
+                f.roots(x1, x2, &mut r1);
+                c.root_solves += 1;
+                for &e1 in &r1 {
+                    for &x3 in &v {
+                        f.roots(e1, x3, &mut r2);
+                        c.root_solves += 1;
+                        for &e2 in &r2 {
+                            c.probes += 1;
+                            match right.get(&e2) {
+                                Some(&k) => c.solutions += k,
+                                None => c.discarded += 1,
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        c
+    }
 }
 
 /// Solving-degree bounds for the descended chained systems (lead L4).
@@ -457,6 +529,41 @@ pub mod degree_bounds {
         let l = (vars + 1).min(degrees.len());
         (degrees[..l].iter().sum::<f64>() - l as f64 + 1.0).log2()
     }
+
+    /// Caminata–Ceria–Gorla (arXiv 2112.10506, Corollary 4.12), `log₂`:
+    /// the descended system is `Weil(F′)` for the field-level chain `F′`
+    /// (links, `L_V(xᵢ)`, field equations of `F_{2^n}`), so
+    /// `sd ≤ n · reg(F′ʰ) − n + 1`, with `reg(F′ʰ)` taken at its Macaulay
+    /// bound ([`field_level_bound_log2`]).  The hypothesis `t ∤ 0` modulo
+    /// `F′ʰ` is not checked; the value is reported only to show the order.
+    pub fn weil_restriction_bound_log2(m: usize, n: u32, ell: u32) -> f64 {
+        let reg = 2f64.powf(field_level_bound_log2(m, n, ell));
+        (n as f64 * reg - n as f64 + 1.0).log2()
+    }
+
+    /// `τ(r, c, t)` of Huang–Kosters–Yang–Yeo (arXiv 1505.02532,
+    /// Theorem 1.1): `max(⌊2t(c − 1)(log_c(r/2t) + 1)⌋, 0)`.
+    fn hkyy_tau(r: f64, c: f64, t: f64) -> f64 {
+        (2.0 * t * (c - 1.0) * ((r / (2.0 * t)).ln() / c.ln() + 1.0))
+            .floor()
+            .max(0.0)
+    }
+
+    /// The HKYY last-fall-degree bound of the descended chain over `F₂`
+    /// (arXiv 1505.02532, Theorem 1.1, `q = 2`), independent of `n`.  The
+    /// field-level system has `2m − 2` unknowns and at most
+    /// `s = 2^{mℓ + m − 2}` solutions (`2^ℓ` roots of each `L_V(xᵢ)`, at
+    /// most two of each quadratic link in `eⱼ`).  Its last fall degree
+    /// `d_F` is unmeasured; the bound is evaluated with `d_F ≤ (2m − 1)s`,
+    /// where it no longer depends on `d_F`.  Radicality and the injective
+    /// projection are not checked.
+    pub fn last_fall_bound(m: usize, ell: u32) -> f64 {
+        let t = (2 * m - 2) as f64;
+        let s = 2f64.powi((m as u32 * ell + m as u32 - 2) as i32);
+        let first = hkyy_tau(((t + 1.0) * s).max(2f64.powi(ell as i32)), 2.0, t);
+        let second = t * hkyy_tau(2.0 * s, 2.0, 1.0);
+        first.max(second).max(2.0)
+    }
 }
 
 #[cfg(test)]
@@ -493,6 +600,36 @@ mod tests {
         }
     }
 
+    /// L1, Amendment 3: subspaces holding `1` give `A = B` exactly, and the
+    /// closure holds for `b ≠ 1` too.
+    #[test]
+    fn lambda_closure_with_one_and_any_b() {
+        let mut rng = StdRng::seed_from_u64(20261025);
+        let n = 11u32;
+        let irr = find_irreducible_sparse(n).unwrap();
+        let mask = (1u64 << n) - 1;
+        for b in [1u64, 0x2a5, 0x713] {
+            for a in 0..2u64 {
+                let bases: Vec<Vec<u64>> = (0..8)
+                    .map(|i| {
+                        let mut v: Vec<u64> = (0..4).map(|_| rng.gen::<u64>() & mask).collect();
+                        if i % 2 == 0 {
+                            v[0] = 1;
+                        }
+                        v
+                    })
+                    .collect();
+                let r = lambda::check_curve(&irr, a, b, &bases);
+                assert!(r.doubling_identity && r.negation_identity, "b={b} a={a}");
+                assert!(r.subspaces >= 2 && r.subspaces_with_one >= 3, "b={b} a={a}");
+                assert!(
+                    r.closure_identity && r.closure_identity_with_one,
+                    "b={b} a={a}"
+                );
+            }
+        }
+    }
+
     /// L3: both counted solvers return the exact solution count.
     #[test]
     fn agreeing_gluing_counts_exactly() {
@@ -512,6 +649,10 @@ mod tests {
                 let ag = agreeing_gluing::agreeing_gluing(m, &words, xr, 1, &irr);
                 assert_eq!(ps.solutions, exact, "pairs m={m} n={n} ell={ell}");
                 assert_eq!(ag.solutions, exact, "A-G m={m} n={n} ell={ell}");
+                if m == 4 {
+                    let left = agreeing_gluing::agreeing_gluing_left(&words, xr, 1, &irr);
+                    assert_eq!(left.solutions, exact, "left order n={n} ell={ell}");
+                }
                 nonzero += (exact > 0) as u32;
             }
         }
@@ -544,5 +685,8 @@ mod tests {
         assert_eq!(b.bound, 3 * top3 + 2 * (l - top3) - l + 1);
         assert!(b.bound >= 21 + 2 && b.bound <= 2 * 21 + 3);
         assert!(degree_bounds::field_level_bound_log2(4, 131, 33) > 131.0);
+        assert!(degree_bounds::weil_restriction_bound_log2(4, 131, 33) > 138.0);
+        // Independent of n, but far above the measured degree 4 at ℓ = 6.
+        assert!(degree_bounds::last_fall_bound(3, 6) > 6.0 + 4.0);
     }
 }
