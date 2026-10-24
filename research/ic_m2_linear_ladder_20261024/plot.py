@@ -20,7 +20,9 @@ rungs = [r for r in fit["rungs"] if float(r["cofactor"]) <= 4]
 
 def save(fig, name):
     fig.tight_layout()
-    fig.savefig(HERE / f"{name}.svg")
+    svg = HERE / f"{name}.svg"
+    fig.savefig(svg)
+    svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
     fig.savefig(HERE / f"{name}.png", dpi=150)
     plt.close(fig)
 

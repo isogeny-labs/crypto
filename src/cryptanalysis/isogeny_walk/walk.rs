@@ -2,7 +2,7 @@
 //! curve's `F_p`-isogeny class, and the records it writes.
 
 use std::collections::HashMap;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use num_bigint::{BigInt, BigUint};
 use num_integer::Integer;
@@ -345,7 +345,7 @@ impl ClassInfo {
 }
 
 /// A curve the walk found.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Node {
     pub j: Fe,
     pub model: Model,
@@ -362,7 +362,7 @@ pub struct Node {
 }
 
 /// A verified edge `source → target` of degree `ℓ`.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Edge {
     pub ell: u64,
     /// `h` when every curve is proved to sit at level 0, else `x`.
@@ -376,7 +376,7 @@ pub struct Edge {
 }
 
 /// A root of `Φ_ℓ(j, Y)` that did not yield a certified edge.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Failure {
     pub source: usize,
     pub ell: u64,
@@ -488,11 +488,30 @@ impl Walk {
     }
 
     pub fn run(&mut self) {
+        self.run_with_progress(None)
+            .expect("walk without a checkpoint callback");
+    }
+
+    /// Expand complete breadth-first batches, reporting each durable boundary.
+    pub fn run_with_progress(
+        &mut self,
+        mut progress: Option<&mut dyn FnMut(&Self, bool) -> Result<(), String>>,
+    ) -> Result<(), String> {
         let t = Instant::now();
         let f = &self.field;
-        let mut index: HashMap<Fe, usize> = HashMap::new();
-        index.insert(self.nodes[0].j, 0);
-        let mut next = 0usize;
+        let mut index: HashMap<Fe, usize> = self
+            .nodes
+            .iter()
+            .enumerate()
+            .map(|(i, n)| (n.j, i))
+            .collect();
+        let mut next = self
+            .nodes
+            .iter()
+            .position(|n| !n.expanded)
+            .unwrap_or(self.nodes.len());
+        let prior_walk_ms = self.stats.walk_ms;
+        let mut checkpoint_time = Duration::ZERO;
         let chunk = rayon::current_num_threads().max(1) * 4;
         while next < self.nodes.len() && self.nodes.len() < self.config.max_curves {
             let depth = self.nodes[next].depth;
@@ -590,9 +609,24 @@ impl Walk {
                 }
             }
             next = end;
+            self.stats.walk_ms =
+                prior_walk_ms + t.elapsed().saturating_sub(checkpoint_time).as_millis();
+            if let Some(callback) = progress.as_mut() {
+                let saved_at = Instant::now();
+                callback(self, false)?;
+                checkpoint_time += saved_at.elapsed();
+            }
+        }
+        self.stats.walk_ms =
+            prior_walk_ms + t.elapsed().saturating_sub(checkpoint_time).as_millis();
+        if let Some(callback) = progress.as_mut() {
+            let saved_at = Instant::now();
+            callback(self, true)?;
+            checkpoint_time += saved_at.elapsed();
         }
         self.resolve_levels();
-        self.stats.walk_ms = t.elapsed().as_millis();
+        self.stats.walk_ms =
+            prior_walk_ms + t.elapsed().saturating_sub(checkpoint_time).as_millis();
         let t = Instant::now();
         let f = &self.field;
         let n = self.start.order.clone();
@@ -607,6 +641,7 @@ impl Walk {
             node.audit = Some(a);
         }
         self.stats.audit_ms = t.elapsed().as_millis();
+        Ok(())
     }
 }
 

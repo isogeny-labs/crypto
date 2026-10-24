@@ -69,21 +69,21 @@ spec:
           values: [spot]
         - key: karpenter.k8s.aws/instance-category
           operator: In
-          values: [m, r]
+          values: [r]
         - key: karpenter.k8s.aws/instance-generation
           operator: Gt
           values: ["5"]
         - key: karpenter.k8s.aws/instance-cpu
           operator: In
-          values: ["8", "16", "32"]
+          values: ["8", "16"]
         - key: karpenter.k8s.aws/instance-family
           operator: NotIn
           values: [m7i-flex, m8i-flex]
       expireAfter: Never
       terminationGracePeriod: 6h
   limits:
-    cpu: "128"
-    memory: 1Ti
+    cpu: "16"
+    memory: 128Gi
   disruption:
     consolidationPolicy: WhenEmpty
     consolidateAfter: 5m
@@ -135,8 +135,8 @@ spec:
       expireAfter: Never
       terminationGracePeriod: 6h
   limits:
-    cpu: "32"
-    memory: 256Gi
+    cpu: "16"
+    memory: 128Gi
   disruption:
     consolidationPolicy: WhenEmpty
     consolidateAfter: 5m

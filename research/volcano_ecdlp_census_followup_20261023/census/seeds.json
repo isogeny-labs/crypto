@@ -1,0 +1,31 @@
+{
+  "schema": "volcano-census.seeds/v1",
+  "study": "volcano_ecdlp_census_followup_20261023",
+  "recorded_before": "the follow-up searches, walks and any spec",
+  "ca_seed": 20261023,
+  "target_seed_paired": 20261123,
+  "target_seed_native": 20261125,
+  "target_seed_M": 20261127,
+  "targets_per_curve": 8,
+  "ecbench_measurement_seed": 20261023,
+  "pairing_note": "as the census: D, Ua, Ub, S and ctl share target_seed_paired (same k_i, different source generators); N uses target_seed_native (fresh generators). Tcr (V5 only) uses target_seed_native, so its k_i equal those of the source vertex's own N rows. M uses target_seed_M, shared by the 8 models of a curve (k_i identical across models).",
+  "source_choice": "as the census (H = first 8 hex digits of SHA-256 as an integer): crater root = level-0 vertex of least j; crater-b = level-0 vertex farthest (BFS) from it, ties least j (V6 only); floor-a = floor vertex (sorted by j) at index H('floor-a:'+V) mod #floor; floor-b = scanning on from H('floor-b:'+V) mod #floor, the first floor vertex whose ancestor at the first level with >= 2 vertices differs from floor-a's",
+  "Tcr": {
+    "applies_to": "V5, every non-crater vertex v (63 specs)",
+    "curve": "the census crater model (a=0, b of vertex 0) as prime_explicit",
+    "generator": "psi_v(gn_v): v's native generator gn_v (census vertices.jsonl) carried up to the crater by verified 2-isogenies. ca carries its own root generator P_v, so gn_v = [c]P_v is found by a baby-step giant-step discrete log (c) and ks = [c, c*k_i mod r] are carried by `ca --ks`; the last step (level 1 -> j=0, which ca does not take) is a Velu 2-isogeny done in the study's own helper, verified (codomain, homomorphism, order), then moved to the census crater model by the isomorphism with u^6 = b_crater / b_codomain (u = g^(L/6), g the least primitive root)",
+    "targets": "planted_shared, target_seed_native",
+    "arms": ["rho-cubic", "rho-neg"],
+    "rounds": "the N family's rounds at v's level"
+  },
+  "M": {
+    "arms": ["rho-neg", "bsgs", "ic"],
+    "targets_per_model": 16,
+    "rounds": 4,
+    "models_per_curve": 8,
+    "model": "(u^4 a, u^6 b), generator (u^2 x, u^3 y) of the vertex's native generator gn",
+    "u": "u = 2 + H('M-u:' + V + ':' + j + ':' + m + ':' + t) mod (p - 3) for model m = 0..7, t = 0,1,2,... the least t such that u^2 is new among the models of the curve and the model (u^4 a, u^6 b) is new (so u is never +-1 and no two models coincide); a, b, j are the vertex's census values",
+    "V5_curves": "the crater (vertex 0) plus one vertex at each of levels 4, 5 and 6: vertices of the level sorted by j, index H('M:V5:L' + level) mod #level",
+    "V6_curves": "8 vertices over levels 0..4 with 2, 2, 2, 1, 1 per level: vertices of the level sorted by j, the i-th pick at index H('M:V6:L' + level + ':' + i + ':' + s) mod #level for the least salt s = 0,1,2,... that gives a vertex not yet picked at that level"
+  }
+}
