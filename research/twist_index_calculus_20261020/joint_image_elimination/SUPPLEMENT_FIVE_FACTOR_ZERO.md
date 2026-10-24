@@ -100,3 +100,12 @@ This reconstructs already established factor logs from saved equations;
 it repeats neither the collector nor BSGS. Keep the resulting oracle-only
 array outside candidate interfaces. Domain, cases, arms, rank questions,
 resource limits and required independent completeness replay are unchanged.
+
+## Implementation status before execution
+
+The native pair/triple join, five-point checks, factor-log RREF and native
+summary are implemented. Two independent small-group tests compare the
+join to direct five-term enumeration and check ten/six partitions.
+Registration follows the completed 77-test runner freeze. The new suite
+must pass before its runner is copied. Science waits for all 21 existing
+matrix replays to pass. No five-factor result or price is claimed here.
