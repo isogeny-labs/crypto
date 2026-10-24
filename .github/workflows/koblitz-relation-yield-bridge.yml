@@ -32,14 +32,18 @@ concurrency:
 jobs:
   smoke-and-custody:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-relation-yield-bridge.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-relation-yield-bridge.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    timeout-minutes: 20
+    # The metered smoke takes about 12 minutes on ARC and longer on hosted
+    # runners; keep the PR cap high enough for the hosted fallback.
+    timeout-minutes: 25
     # Keep the full test set and assertions while avoiding oversized debug artifacts.
     env:
       CARGO_INCREMENTAL: "0"
       CARGO_PROFILE_DEV_DEBUG: "0"
       CARGO_PROFILE_TEST_DEBUG: "0"
     steps:
-      - name: Free runner disk before the release smoke
+      # The full checkout plus a debug build no longer fits the hosted runner disk.
+      - name: Free runner disk
+        if: runner.environment == 'github-hosted'
         run: |
           df -h /
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
