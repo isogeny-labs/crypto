@@ -86,6 +86,21 @@ pub struct RungLine {
     /// Worst `S_trial / S_baseline` over the band.
     pub ratio: Option<f64>,
     pub log2_ratio: Option<f64>,
+    /// The solver's unit family (`None` when no solver ran).
+    #[serde(default)]
+    pub op_unit: Option<String>,
+    /// Whether this rung's score may be ranked against the baseline's: false
+    /// when the solver counts in a different unit.  A rung that is not
+    /// rankable is recorded in full and never enters an objective.
+    #[serde(default = "yes")]
+    pub rankable: bool,
+    /// Native counters nobody prices (`context.other_native_unscored`).
+    #[serde(default)]
+    pub other_native: serde_json::Value,
+}
+
+fn yes() -> bool {
+    true
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]

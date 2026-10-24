@@ -44,9 +44,10 @@ priced_gae(w) = (adds + doubles) + w · (native operations)        w ∈ {0, 0.1
 S(w)          = priced_gae(w) / √r
 ```
 
-No calibration ratio, host timing or solver wall pricing enters: the same
-configuration scores identically on any host, which is what an optimiser
-needs. *Native operations* are the counters `price_phase` converts, every
+No calibration ratio, host timing or solver wall pricing enters, so the same
+configuration scores identically. *Checked:* a debug and a release build on one
+host gave identical `S`. *Not checked:* other hosts, and a solver that reads
+the clock internally could still differ. *Native operations* are the counters `price_phase` converts, every
 `*_uncharged` counter, and the solver's own `ops` in its own unit (the same
 set ecbench's `ic.pipeline` lists as priced or unpriced). Any other native
 counter appears under `context.other_native_unscored` rather than being
@@ -62,6 +63,18 @@ Every trial ends in exactly one class, and only `ok` is scored:
 | `refused` | the instance or model cannot represent the configuration |
 | `invalid_config` | the configuration is malformed |
 | `crashed` | the run panicked or produced no rows |
+
+**The solver's unit must match the baseline's.** `solver.ops` is counted in
+whatever unit the engine uses: word XORs for the F4 family and Gray-code FES
+(one priced family, as in `ic_framework::is_word_xor_op_unit`), monomial
+operations for `buchberger-f2`, conflicts for `sat-cdcl`, partial word
+operations for `crossbred-f2` (measured at n = 13). A ratio across units says
+which engine counts coarsely, not which is cheaper, and a search would learn to
+pick it (AGENTS.md §6, changing the unit). So a rung whose solver unit differs
+from the baseline's is recorded in full (`rankable: false`, its band and
+`op_unit` kept) and **fails the trial**: it is never scored, never `best`, and
+the sampler learns to avoid it. A study whose baseline and candidates should
+compare across units needs a pinned price for each unit first.
 
 Budgets are counts (`max_trials`, solver node and conflict budgets). A
 wall-clock solver budget is never passed (`--solver-budget-seconds 0`), since
@@ -142,9 +155,23 @@ ratios, so the search space is the same on every rung. Absolute caps
   baseline is inherited F4 on the S3 descent (`m = 2`) at `d = ⌊(n+1)/3⌋`: the
   `m = 3` arm finishes only at n = 13 through this framework. Where a baseline
   exhausts, that rung is dropped, and a study needs at least two.
-- **Rho is context, not scored.** The record carries `w0_over_rho_lower_bound`
-  (`S(0)` over the matched rho's mean `S`), a lower bound: rho's own native
-  work is not band-priced here.
+- **Rho is context, not scored.** The record carries
+  `w0_group_ops_over_rho_group_ops`: `S(0)` over the matched rho's mean `S`,
+  group operations on both sides and native work on neither. It is a ratio of
+  two partial counts, not a bound on either method.
+- **Rungs.** `--min-fit 4` needs four scorable rungs. K_0 degrees that exist
+  are 9, 13, 15, 19, 23, 31, 37, 39, 41, 45, 51, 53, 57, 59, 61 (K_1: 9, 11, 15,
+  17, 19, 23, 29, 43, 45, 47, 51, 57, 59, 61). The cofactor-4 K_0 rungs an F4
+  baseline reaches are 13, 19 and 23 only; n = 15 has a larger cofactor
+  (log2 r 9.6), so four rungs mix cofactors, or a baseline that reaches n = 31
+  or 41 is needed.
+- **The projection amplifies noise.** The objective reads a fitted line at the
+  target. With rungs spanning about 10 bits and a target 60 bits away, the
+  rung-to-rung rounding of integer dimensions (and ordinary measurement noise)
+  is multiplied roughly sixfold: in a synthetic test a configuration that beat
+  the baseline at every measured rung scored worse than it at the target.
+  Treat a projected objective as a hypothesis and read the per-rung ratios
+  beside it; a confidence interval on the slope is future work.
 
 ## Files
 

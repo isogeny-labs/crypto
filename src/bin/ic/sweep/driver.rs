@@ -30,7 +30,7 @@ use super::objective::{project, worst_ratio};
 use super::space::{Assignment, Space};
 use super::store::{BaselineLine, RungLine, Store, TrialLine, TrialState};
 use super::tpe::{suggest, Obs, Rng, State, TpeOptions};
-use super::trial::{Class, TrialConfig, TrialRecord, SCHEMA};
+use super::trial::{solver_unit, Class, TrialConfig, TrialRecord, SCHEMA};
 
 /// Runs one configuration and says what happened.
 pub trait Evaluator: Sync {
@@ -356,13 +356,23 @@ pub fn run_study(
                         band: None,
                         ratio: None,
                         log2_ratio: None,
+                        op_unit: None,
+                        rankable: true,
+                        other_native: Value::Null,
                     });
                     break;
                 }
             };
             let rec = eval.evaluate(&cfg);
+            // A score is comparable with the baseline's only where the
+            // solver counts in the same unit.  Otherwise the ratio measures
+            // which engine counts coarsely (AGENTS.md §6: changing the unit),
+            // and a search would learn to pick it.  Record the rung in full,
+            // rank nothing from it.
+            let (unit, base_unit) = (solver_unit(&rec), solver_unit(base));
+            let rankable = unit == base_unit;
             let scored = match (&rec.class, &rec.band, &base.band) {
-                (Class::Ok, Some(b), Some(bb)) => worst_ratio(b, bb).map(Some),
+                (Class::Ok, Some(b), Some(bb)) if rankable => worst_ratio(b, bb).map(Some),
                 _ => Ok(None),
             };
             let ratio = match scored {
@@ -374,14 +384,31 @@ pub fn run_study(
                 }
             };
             let log2_ratio = ratio.map(f64::log2);
+            let mut detail = rec.detail.clone();
+            if rec.class == Class::Ok && !rankable {
+                detail = format!(
+                    "not rankable: solver counts in `{}`, the baseline in `{}`",
+                    unit.as_deref().unwrap_or("none"),
+                    base_unit.as_deref().unwrap_or("none")
+                );
+                state = TrialState::Failed;
+                note = format!("rung {scale}: {detail}");
+            }
             rungs.push(RungLine {
                 scale: *scale,
                 class: rec.class,
-                detail: rec.detail.clone(),
+                detail,
                 log2_r: rec.log2_r,
                 band: rec.band.clone(),
                 ratio,
                 log2_ratio,
+                op_unit: unit,
+                rankable,
+                other_native: rec
+                    .context
+                    .get("other_native_unscored")
+                    .cloned()
+                    .unwrap_or(Value::Null),
             });
             let (Some(log2_ratio), Some(log2_r)) = (log2_ratio, rec.log2_r) else {
                 state = TrialState::Failed;
@@ -554,13 +581,31 @@ mod tests {
                 .unwrap();
             let m: f64 = field(&cfg.oracle, "m").unwrap().parse().unwrap();
             let ideal = n / 3.0;
-            let solver_factor = if solver.starts_with("crossbred-f2") {
+            // `matrix-f5` is genuinely cheaper and in the baseline's unit.
+            // `crossbred-f2` and `buchberger-f2` look far cheaper, but count
+            // in other units: a ratio against the word-XOR baseline would
+            // reward the unit, not the engine.
+            let solver_factor = if solver.starts_with("matrix-f5") {
                 0.5
+            } else if solver.starts_with("crossbred-f2") {
+                0.3
+            } else if solver.starts_with("buchberger-f2") {
+                0.01
             } else if solver.starts_with("fes-f2") {
                 3.0
             } else {
                 1.0
             };
+            let unit = if solver.starts_with("buchberger-f2") {
+                "monomial operations"
+            } else if solver.starts_with("crossbred-f2") {
+                "word operations (partial: extraction, transform and filter)"
+            } else if solver.starts_with("sat-cdcl") {
+                "conflicts"
+            } else {
+                "word XORs (elimination only)"
+            };
+            rec.context = serde_json::json!({"solver": {"op_unit": unit}});
             let growth = 2f64.powf(0.5 * n);
             let shape =
                 1.0 + 4.0 * ((dim - ideal) / ideal).powi(2) + if m == 2.0 { 0.2 } else { 0.0 };
@@ -602,7 +647,10 @@ mod tests {
     fn study(trials: usize) -> Study {
         Study {
             rungs: vec![13, 17, 19, 23],
-            target_log2_r: 81.0,
+            // Near the rungs: these tests are about the loop, and the
+            // projection has its own tests.  A far target multiplies the
+            // rung-to-rung rounding noise of the mock.
+            target_log2_r: 30.0,
             min_fit: 4,
             trials,
             workers: 1,
@@ -639,10 +687,12 @@ mod tests {
             "the best configuration must beat the baseline: {:?}",
             best.objective
         );
-        assert_eq!(
-            best.assignment["solver"],
-            serde_json::json!("crossbred-f2"),
-            "{:?}",
+        assert!(
+            matches!(
+                best.assignment["solver"].as_str(),
+                Some("inherited-f4" | "matrix-f4" | "matrix-f5" | "f4-f2" | "fes-f2")
+            ),
+            "only a solver in the baseline's unit can win: {:?}",
             best.assignment
         );
         assert!(best.projected, "four rungs are enough for a fit");
@@ -663,6 +713,64 @@ mod tests {
         assert!(pruned.rungs.len() < 4);
         // Four baselines were scored once each, then trials.
         assert_eq!(store.baselines.len(), 4);
+        let _ = std::fs::remove_file(&path);
+    }
+
+    /// The unit guard.  The mock makes `buchberger-f2` (monomial operations)
+    /// 100× and `crossbred-f2` (partial word operations) 3× cheaper than the
+    /// word-XOR baseline by their units alone.  A search that minimised the
+    /// ratio would learn to pick them; it must not be able to win with them.
+    #[test]
+    fn a_coarser_solver_unit_cannot_win_by_changing_the_unit() {
+        let space = space_for("koblitz-algebraic", &instance()).unwrap();
+        let st = study(80);
+        let path = tmp("units");
+        let mut store = Store::open(&path, &header(&st, &space)).unwrap();
+        let mock = Mock {
+            calls: AtomicUsize::new(0),
+        };
+        let summary = run_study(&space, &st, &mut store, &mock, &|_| {}).unwrap();
+        let other_unit = |t: &TrialLine| {
+            matches!(
+                t.assignment["solver"].as_str(),
+                Some("buchberger-f2" | "crossbred-f2" | "sat-cdcl")
+            )
+        };
+        let tried: Vec<&TrialLine> = store.trials.iter().filter(|t| other_unit(t)).collect();
+        assert!(
+            !tried.is_empty(),
+            "the search must have tried a coarse-unit solver for this test to mean anything"
+        );
+        for t in &tried {
+            assert_eq!(
+                t.state,
+                TrialState::Failed,
+                "trial {} used {:?}",
+                t.id,
+                t.assignment["solver"]
+            );
+            assert!(t.objective.is_none());
+        }
+        // The first rung of such a trial is recorded in full, marked not
+        // rankable, with no ratio, so the store shows what was refused.
+        let rec = tried
+            .iter()
+            .find(|t| t.assignment["solver"] != serde_json::json!("sat-cdcl"))
+            .and_then(|t| t.rungs.last())
+            .expect("a recorded rung");
+        assert!(!rec.rankable && rec.ratio.is_none() && rec.band.is_some());
+        assert!(rec.detail.contains("not rankable"), "{}", rec.detail);
+        assert_eq!(rec.op_unit.as_deref().is_some(), true);
+        let best = summary.best.expect("a rankable trial completes");
+        assert!(!other_unit(&best), "{:?}", best.assignment);
+        assert!(
+            store
+                .trials
+                .iter()
+                .filter(|t| t.state == TrialState::Complete)
+                .all(|t| !other_unit(t)),
+            "no coarse-unit trial may complete"
+        );
         let _ = std::fs::remove_file(&path);
     }
 

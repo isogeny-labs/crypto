@@ -21,13 +21,18 @@
 //! ```
 //!
 //! and no calibration ratio, host timing or solver wall pricing enters.  Two
-//! runs of the same configuration therefore score identically, which is the
-//! property an optimiser needs.  `native operations` are the counters
+//! runs of the same configuration therefore score identically (checked: a
+//! debug and a release build, one host), which is the property an optimiser
+//! needs.  It has not been checked across hosts.  `native operations` are the counters
 //! `price_phase` converts (`PRICED_NATIVE`), every `*_uncharged` counter,
 //! and the solver's own `ops` in its own unit, the same set
 //! `ecbench`'s `ic.pipeline` method lists as priced or unpriced.  Any other
 //! native counter is reported under `other_native` and not scored, so a
 //! counter that deserves a price is visible rather than silently free.
+//!
+//! The solver's operations are in the solver's own unit, so a trial's score
+//! is comparable with a baseline's only where the units agree: see
+//! [`unit_family`].
 //!
 //! # Failure classes
 //!
@@ -71,6 +76,34 @@ const PRICED_NATIVE: &[&str] = &[
     "canonicalisations",
     "target_guard_probes",
 ];
+
+/// The unit a solver's operations are counted in, normalised the way the
+/// repository's own pricing does it (`ic_framework::is_word_xor_op_unit`):
+/// `word XORs` with or without a qualifier is one family, priced by the one
+/// pinned ratio.  Any other unit stands for itself.
+///
+/// Two solvers' operations can be compared only inside one family.  The
+/// framework measured a Buchberger monomial operation at about 50 ns against
+/// 0.4 ns for a word XOR, and a SAT conflict is neither, so a ratio of
+/// `S` across units says which engine counts coarsely, not which is cheaper.
+/// An optimiser would find the coarsest unit, which is "changing the unit"
+/// (AGENTS.md §6).
+pub fn unit_family(op_unit: &str) -> String {
+    if op_unit == "word XORs" || op_unit.starts_with("word XORs (") {
+        "word XORs".into()
+    } else {
+        op_unit.to_string()
+    }
+}
+
+/// The unit family of a record's solver, `None` when no solver ran.
+pub fn solver_unit(record: &TrialRecord) -> Option<String> {
+    record
+        .context
+        .pointer("/solver/op_unit")
+        .and_then(Value::as_str)
+        .map(unit_family)
+}
 
 /// Where each phase's cost sits in a `RunReport`.
 const PHASE_PATHS: &[&[&str]] = &[
@@ -512,7 +545,9 @@ pub fn record_from_report(config: &TrialConfig, report: &Value) -> TrialRecord {
         // is NOT what the sweeper scores.
         "framework_s_mean": mean(verified.iter().filter_map(|r| r.get("s").and_then(Value::as_f64))),
         "rho_mean_s": rho_s,
-        "w0_over_rho_lower_bound": band_s0.zip(rho_s).map(|(s, rho)| s / rho),
+        // Group operations on both sides, native work on neither: a ratio of
+        // two partial counts, not a bound on either method's cost.
+        "w0_group_ops_over_rho_group_ops": band_s0.zip(rho_s).map(|(s, rho)| s / rho),
         "calibration_pinned_units": report.pointer("/calibration/pinned_units"),
         "software_note": "score is a function of operation counts; wall time is not used",
     });
@@ -739,6 +774,29 @@ mod tests {
         );
         let empty = json!({"rows": [], "configurations_skipped": []});
         assert_eq!(record_from_report(&config(), &empty).class, Class::Crashed);
+    }
+
+    #[test]
+    fn units_are_compared_by_the_repositorys_family_rule() {
+        // The F4 family and Gray-code FES are one priced unit, as in
+        // `ic_framework::is_word_xor_op_unit`.
+        for u in [
+            "word XORs",
+            "word XORs (elimination only)",
+            "word XORs (elimination, specialisation and linear elimination only)",
+            "word XORs (Gray-code steps)",
+        ] {
+            assert_eq!(unit_family(u), "word XORs", "{u}");
+        }
+        // Everything else is its own unit, and none is a word XOR.
+        for u in [
+            "monomial operations",
+            "conflicts",
+            "word operations (partial: extraction, transform and filter; per-point solves in solve_row_ops)",
+        ] {
+            assert_eq!(unit_family(u), u);
+            assert_ne!(unit_family(u), "word XORs");
+        }
     }
 
     #[test]
