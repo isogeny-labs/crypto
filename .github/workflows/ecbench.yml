@@ -352,8 +352,15 @@ jobs:
       - name: Pinned session as root
         run: |
           sudo git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          # auto needs a whole core away from CPU 0. A one-core runner has none,
+          # so inherit: still pinned to one CPU (checked below), recorded at L0.
+          cpus=auto
+          if [ "$(lscpu -p=CORE | grep -v '^#' | sort -u | wc -l)" -lt 2 ]; then
+            cpus=inherit
+            echo "::notice::one physical core on this runner; pinned session uses --cpus inherit"
+          fi
           sudo ./target/release/ecbench run --spec docs/ecbench/specs/smoke-prime.json \
-            --out "$RUNNER_TEMP/prime" --allow-busy --settle 1 --quiet
+            --out "$RUNNER_TEMP/prime" --cpus "$cpus" --allow-busy --settle 1 --quiet
           sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/prime"
       - name: Pinning took effect in every measured child
         run: |
