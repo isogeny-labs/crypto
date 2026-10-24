@@ -1,24 +1,32 @@
 # Koblitz modular and low-genus carrier investigation
 
-The current round is [19](rounds/19/README.md), with its
-[report](rounds/19/REPORT.md), [PDF](rounds/19/report.pdf),
-[controlled-pole maps](rounds/19/CM.md), [mixed sections](rounds/19/THETA.md),
-[saturation](rounds/19/SATURATION.md), [proof map](rounds/19/PROOF_MAP.md)
-and [ledger](rounds/19/ledger.json).
+The current round is [20](rounds/20/README.md), with its
+[report](rounds/20/REPORT.md), [PDF](rounds/20/report.pdf),
+[controlled-pole maps](rounds/20/CM.md), [source geometry](rounds/20/THETA.md),
+[saturation](rounds/20/SATURATION.md), [proof map](rounds/20/PROOF_MAP.md)
+and [ledger](rounds/20/ledger.json).
 
-The controlled-pole search exhausts335544320 x numerators in five
-families. Only64 constant maps survive18 actual incidence constraints.
-The integral level77 factor inclusion and its divisor evaluator remain open.
-G25 supplies a positive weighted orbit divisor of polarization3*105² H
-on graphs0/2 and41 evaluated F2 sections. The primitive modulo5
-obstruction is cleared on this scalar cover. Forced fixed components,
-48 kernel noninvariance witnesses and unmatched canonical Pic2 class
-keep243 sections and proper quotient embeddings open. Coupled elimination excludes Q28 and Q30; four Q32 models on
-[123,124,126,127] remain unclassified. There are79 new named Lean results
-with explicit geometric/native proof limits. Earlier ranks and divisors
-stay frozen; no IC cost or efficiency assessment is supplied.
+An explicit integral CM left inverse of the20 weighted row maps gives a
+proper scalar-cover embedding and20 global source-image equations,or100
+Galois-stable conjugates. The canonical symmetric Pic2 class matches under
+the written geometric bridges. Full elliptic factor bases specify a
+factorized proper polarized source embedding;2952 ordinary F2 sections
+have binary evaluation rank2688 on16 tuples per sign. All48 tested
+scalar-kernel shifts are noninvariant;the final243-space and quotient
+kernel actions remain open.
+
+The complementary524288 quadratic numerator/sign search leaves ten
+constant maps. Q33's coupled relation has top(U+V)^19 and excludes none
+of Q32;Q34 retains four complete uncapped models on123,124,126,127.
+The integral level77 map and whole saturation remain open. There are76
+new named Lean results with explicit written/native proof limits. Earlier
+relation ranks,divisors and cost rows stay frozen;no IC efficiency
+assessment is supplied.
 
 Earlier evidence stays frozen:
+
+- [Round 19](rounds/19/README.md):335544320 controlled-pole numerators,
+  correctly polarized weighted orbit divisor and Q28/Q30 exclusions.
 
 - [Round 18](rounds/18/README.md): canonical characters, selected-cover no-lift,
   scalar refinement, independent map refutations and Q24/Q26 exclusions.

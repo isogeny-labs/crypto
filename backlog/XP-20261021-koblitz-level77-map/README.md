@@ -21,6 +21,12 @@ numerators:335544320 x numerators leave only64 constants on18 actual
 incidences. Actual coordinate pole supports and a complete prescribed
 Riemann--Roch space remain open. See
 [Round19 CM](../../research/koblitz_modular_ic_20261018/rounds/19/CM.md).
+Round20 complements that search with524288 F2-quadratic x numerator/sign
+cases in eight families and F32-quadratic y spaces. All ten finite fits
+are constant as independent free-polynomial identities;no unexpanded
+spaces remain. This still leaves the proper pole geometry and complete
+prescribed function spaces uncomputed. See
+[Round20 CM](../../research/koblitz_modular_ic_20261018/rounds/20/CM.md).
 The card remains blocked on proper normalization, the evaluated integral
 correspondence and its divisor checker. The simple projector denominator704
 is still divisible by11. See [Round17 CM](../../research/koblitz_modular_ic_20261018/rounds/17/CM.md).
@@ -42,6 +48,6 @@ not establish this F2 modular map. A positive result establishes only
 its actual map/subgroup/divisor obligations. Runtime, relation usefulness
 and IC assessment remain separate.
 
-The related3Theta section construction, new Q32 complete-arc/separator identification and460/367
+The related3Theta section construction, new Q34 complete-arc/separator identification and460/367
 ordinary-support source fibers remain explicit acceptance tests in the
 [recurring problem](../../problems/koblitz-modular-carrier-transfer.md).

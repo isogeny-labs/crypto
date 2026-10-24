@@ -475,3 +475,6 @@ mod tests {
         }
     }
 }
+
+#[path = "source20.rs"]
+pub(crate) mod next;

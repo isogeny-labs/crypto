@@ -11,27 +11,31 @@ pre-registered hypotheses)
 *On index calculus algorithms for subfield curves*, SAC 2020
 (ePrint 2020/1315).
 
-**Modular and low-genus carrier follow-up (2026-10-23):**
-[Round19](research/koblitz_modular_ic_20261018/rounds/19/REPORT.md)
-exhausts335544320 controlled-pole x numerators across five denominator
-families, with quadratic y numerators and18 actual incidence constraints.
-Only64 constant maps survive; the evaluated integral factor inclusion,
-proper pole divisors and divisor evaluator remain open. Round17's
-conditional prime-to11 existence argument is unchanged.
+**Modular and low-genus carrier follow-up (2026-10-24):**
+[Round20](research/koblitz_modular_ic_20261018/rounds/20/REPORT.md)
+constructs an explicit integral CM retraction for the20 weighted orbit
+maps. It gives a proper scalar-cover embedding and20 global source-image
+equations,or100 Galois-stable conjugates,under the written morphism/descent
+bridges. Canonical symmetric Pic2 matching holds. Full degree45,315,63,171
+elliptic bases and the57 companion basis specify a factorized polarized
+source embedding. The2952 ordinary F2 orbit sections have binary evaluation
+rank2688 on16 retained tuples per sign;this is a section-independence lower
+bound,not an IC relation rank. All48 scalar-kernel probes are noninvariant.
+The final105/19 quotient,complete kernel actions and243 sections remain open.
 
-G25 constructs an explicit F2 orbit divisor of polarization3*105² H on
-the stable scalar cover for graphs0/2, with41 evaluated mixed sections.
-The primitive modulo5 transfer obstruction is cleared by this cover.
-All48 scalar-kernel probes show noninvariance, and the sections have
-forced fixed components. Canonical Pic2 matching, full weighted section
-spaces, kernel actions and243 target sections remain open.
-Coupled elliptic resultants exclude all four Q28 models;266 further
-pure-source resultants also exclude Q30. Four checked Q32 models on
-[123,124,126,127] remain unclassified. Whole saturation and proper
-polarized embeddings remain open. Seventy-nine new named Lean results
-cover the universal implications, actual source/leading-term/model
-bindings and constant-map controls; geometric bridges and native search
-exhaustion retain their explicit proof-map limits.
+A complementary524288 quadratic numerator/sign search yields ten exact
+constant maps only. Proper normalization,pole divisors and the evaluated
+integral level77 factor/divisor map remain open. Q33's186-term coupled
+relation has top(U+V)^19 and excludes none of Q32. Q34 retains four complete
+uncapped models on123,124,126,127;complete simultaneous source arcs or
+separators and whole quotient saturation remain open. Seventy-six new
+named Lean results distinguish actual matrices and finite bindings from
+native field/search semantics and written geometry.
+
+[Round19](research/koblitz_modular_ic_20261018/rounds/19/REPORT.md)'s
+335544320-case controlled-pole null,G25 weighted polarization and Q28/Q30
+exclusions remain frozen inputs. Its canonical-class and proper-source
+obligations are advanced above;the quotient obligations stay open.
 
 [Round18](research/koblitz_modular_ic_20261018/rounds/18/REPORT.md)'s
 canonical symmetric characters, selected-cover rotation obstruction and

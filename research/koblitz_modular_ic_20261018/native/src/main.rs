@@ -402,6 +402,54 @@ fn main() {
         oddtheta17::lifts::run(std::path::Path::new(&args10[2]));
         return;
     }
+    if args10.get(1).map(String::as_str) == Some("--round20-projector") {
+        mixed19::next::projector::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round20-retraction") {
+        mixed19::next::retraction(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round20-sections") {
+        mixed19::next::sections::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round20-boundary") {
+        kummer08::descent09::polynomial10::boundary12::saturation13::square13::products14::boundary20::run(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round20-maps") {
+        poles19::next::run(std::path::Path::new(&args10[2]), args10[3].parse().unwrap());
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round20-map-summary") {
+        poles19::next::summary(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--record-round20") {
+        round13_record::round20::record(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round20-issue-identities") {
+        round13_record::round20::identities(std::path::Path::new(&args10[2]), true);
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round20-check-identities") {
+        round13_record::round20::identities(std::path::Path::new(&args10[2]), false);
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round20-picard") {
+        mixed19::next::picard(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round20-kernel") {
+        mixed19::next::kernels(std::path::Path::new(&args10[2]));
+        return;
+    }
+    if args10.get(1).map(String::as_str) == Some("--round20-quotient") {
+        survivors17::source19::next::quotient(std::path::Path::new(&args10[2]));
+        return;
+    }
     if args10.get(1).map(String::as_str) == Some("--round19-profile") {
         survivors17::source19::profile(std::path::Path::new(&args10[2]));
         return;

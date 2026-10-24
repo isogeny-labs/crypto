@@ -317,3 +317,6 @@ mod tests {
         assert!(solve(rows, 75).is_some());
     }
 }
+
+#[path = "poles20.rs"]
+pub(crate) mod next;

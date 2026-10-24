@@ -482,3 +482,6 @@ pub fn cover(dir: &Path) {
         &json!({"schema":"koblitz.round19/g25-v1","graphs":[0,2],"rows":rows,"orbits":orbits,"weights":weights,"actual_Gram":gram,"target_polarization_scalar":33075,"field_degree":168,"modulus_low":95,"forced_fixed_divisor_weights":weights.map(|n|n-3),"target":"3*105^2 H on the stable scalar cover","constructed_sections":41,"ordinary_divisor":"sum_i weight_i sum_j(ell_i R^j)^*[O]","companion_divisor":"57[O]","records":records,"canonical_symmetric_Pic2_class_matched":false,"theta_kernel_actions_constructed":false,"final_243_sections_extracted":false,"scope":"explicit F2-invariant mixed effective divisor with correct pulled-back polarization and41 evaluated sections;canonical bundle class/kernel descent/proper embedding still open;G24 primitive obstruction does not apply to scalar105 pullback"}),
     );
 }
+
+#[path = "mixed20.rs"]
+pub(crate) mod next;

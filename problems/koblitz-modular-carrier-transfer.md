@@ -837,3 +837,54 @@ Acceptance now requires canonical symmetric Pic2 matching, complete
 weighted factor-section spaces and verified theta actions on both
 kernels. The other graphs and243 quotient sections remain open. The
 79-result proof map includes all four actual G25 matrix/source bindings.
+
+
+## Round20: integral recovery and proper source equations
+
+[Round20](../research/koblitz_modular_ic_20261018/rounds/20/REPORT.md)
+advances the actual graphs0/2 scalar105 source. G26 matches the canonical
+symmetric Pic2 class by actual axis correction and absence of nonzero
+Frobenius-fixed geometric Pic0[2] differences,under the written Picard/
+symmetry/descent bridges. It still lacks a rational trivializing function.
+G27 gives six actual prime3,5,7 left inverses and960 point-column checks.
+G28 then supplies a literal integral4x20 CM left inverse L*Phi=I4,with
+eight actual tuple round trips. This proves a proper source embedding
+under the written CM-morphism/descent bridge,independent of primary-kernel
+completeness. G30 gives E=Phi*L and20 global fixed equations,or100 in a
+Galois-stable system,with the exact functorial image proof.
+
+G29 specifies complete elliptic bases at weights45,315,63,171 and the57
+companion,so the factorized product/Segre system embeds the proper source.
+It is a symbolic tensor system,not a small projective ideal or a spanning
+claim for source H0. The2952 sparse ordinary F2 sections have native binary
+evaluation rank2688 on16 tuples per sign. All190 row pairs are independent;
+the added highest-pole product removes the forced ordinary fixed divisor
+under the written divisor bridge. Sparse basepoint freeness remains open,
+and48 scalar-kernel probes remain noninvariant.
+
+The remaining quotient acceptance is explicit rational canonical
+trivialization,complete actions of both kernels,243 independent invariant
+sections and proper quotient equations. The source embedding does not
+meet those final105/19 quotient criteria. Other graphs are not promoted.
+
+CM25/26 exhausts524288 complementary F2-quadratic numerator/sign cases
+against18 actual incidences,with F32-quadratic y spaces. Its ten fits are
+constant as independent free-polynomial identities;no affine spaces are
+left unexpanded. This does not compute normalization,pole supports or
+the full prescribed Riemann--Roch spaces. Those and the actual integral
+level77 factor/divisor map remain the modular acceptance criteria.
+
+Q33's186-term coupled quotient norms have top(U+V)^19. Their reduced
+consequence U=V leaves all Q32 models. Q34 retains four complete uncapped
+models on123,124,126,127,nine visits each. The initial false hopeful export
+was never built;the corrected actual satisfaction is proved and the failed
+attempt retained. The next test needs a complete simultaneous source arc
+including inverse witnesses,Kummer roots and coefficient-Frobenius blocks,
+or an exact rejecting source separator. Whole saturation still requires
+an ideal-equality certificate. The460/367 source fibers/images remain open.
+
+Seventy-six new named Lean statements check actual CM/basis/gate/model
+certificates and structural lift/projector/fixed-image implications.
+Group schemes,divisors,descent,native field semantics,exhaustion and section
+rank retain their explicit proof-map limits. No IC assessment,relation-rank
+promotion or proof of nonexistence is supplied.
