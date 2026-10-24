@@ -4,7 +4,7 @@
 - **Kind:** remaining formal implementation gap; coordination tool/access limit
 - **Affected work:** [quadratic-twist study](../research/quadratic_twist_evidence_20261021/README.md)
 - **Next action owner:** authoring session for PR #2381; shared coordination unassigned
-- **Last updated:** 2026-10-23
+- **Last updated:** 2026-10-24
 
 ## Problem
 
@@ -17,6 +17,9 @@ property are now checked too, without the earlier hB assumption for that image.
 Addition and scalar compatibility, an actual isomorphism onto the entire
 short-model minus eigenspace, and the rational fixed-point identification are
 now checked. Source annihilators are transported by the proved group map.
+The explicit F43 Miller-function reduction is now checked on all 121 generator
+pairs, with unique exponent transport. General geometric pairing theory and a
+uniform reduction remain open; the finite IC algorithm is not formalized.
 The actual shared Conductor task state is also unavailable in this environment.
 Neither gap is a mathematical nonexistence result.
 
@@ -31,7 +34,7 @@ Neither gap is a mathematical nonexistence result.
   ranks pass the separate auditor. False relations, missing coverage, and a false
   historical census count are rejected. The tower/simple-basis conversion checks
   2,401 elements, 2,475 points and 2,025 group-law identities.
-- **Checked implications:** [49 named Lean theorems and proof map](../research/quadratic_twist_evidence_20261021/lean/README.md)
+- **Checked implications:** [68 named Lean theorems and proof map](../research/quadratic_twist_evidence_20261021/lean/README.md)
   pass the repository proof gate on standard foundations, with no extra trusted
   native axioms. This proves their explicit group/ring statements, not all the
   historical geometric identifications. Four declarations use the actual
@@ -56,9 +59,17 @@ Neither gap is a mathematical nonexistence result.
   with independent Rust point arithmetic and DP replay. The 1,718,592 mixed
   zero words give no rank gain over pure rows. All 260,064 rational/twist
   pairs satisfy the obstruction, with 14,688 nonzero two-torsion exceptions.
+- **Positive pairing angle (2026-10-24):** [new run and inspected report](../research/quadratic_twist_evidence_20261021/reports/pairing-20261024T0442Z/README.md)
+  kernel-checks actual F43 twist/source/Frobenius bindings and all 121 explicit
+  Miller generator pairs. The finite transport does not use a log lookup.
+  Independent native arithmetic checks 4,616 auxiliary points across 274
+  shared-prime cases, all 649 nonshared-prime cases, and eleven native IC logs.
+  Degenerate and undefined evaluations remain distinct; wrong-subgroup and
+  corrupted-payload controls reject. Nineteen new named statements bring the
+  unmodified gate to 85 audited declarations, zero failing/extra trusted.
 - **Identity records:** three original IDC1 records, the source-bound
   cleared-monic-map certificate, and four new group-coordinate/discriminant
-  records, linked to the actual Lean sources;
+  records, plus the new norm-product IDC1h23c0696a12358b08, linked to the actual Lean sources;
   1,921 registered ICV1 models and 27 exact selected EC1 representations. Models
   without an experimental cyclic generator retain that unknown.
 - **Tool/access:** Rust and Lean were installed for this continuation; the former
@@ -85,8 +96,11 @@ Neither gap is a mathematical nonexistence result.
 - [x] Prove actual addition/scalar compatibility and source-annihilator transport.
 - [x] Construct the isomorphism onto the full minus eigenspace for the explicit
   short models; identify the rational fixed eigenspace on actual Weierstrass points.
+- [x] Check the explicit F43 Miller-function table, twist/Frobenius bindings and
+  exact finite logarithm transport; independently verify all eleven native IC logs.
 - [ ] Prove general-model normalization with compatible group maps,
-  exceptional summation-polynomial lift statements, and nondegenerate pairing DLP reduction.
+  exceptional summation-polynomial lift statements, and the general geometric
+  pairing correctness/nondegeneracy and uniform DLP reduction.
 - [ ] Complete the universal trace-zero/counting bridge under exact field,
   degree, separability, and rationality hypotheses.
 - [ ] Run the actual shared Conductor check with its configured task state.
@@ -97,14 +111,16 @@ still not prove general ECDLP hardness or an asymptotic solver advantage.
 
 ## Next discriminating step
 
-- **Action:** attempt exceptional-case S3/S4 lifting, so a purported polynomial
-  relation is tied to actual lifted points. In parallel as a mathematical
-  obligation (not a claim of scheduled execution), transport the checked
-  short-model result through general Weierstrass normalization group maps.
+- **Action:** extend the positive pairing angle beyond the checked k2 fixture:
+  preregister denominator-safe subgroup families and price the destination
+  solver before an advantage claim. General geometric pairing correctness is
+  a separate formal obligation. Exceptional-case S3/S4 lifting and compatible
+  general-model normalization remain additional obligations, not running jobs.
 - **Inputs/control:** keep characteristic, model, nonsquare and extension
   hypotheses; retain nonzero two-torsion and square-parameter countercontrols.
-- **Acceptance:** kernel-checked normalization and exceptional lifting theorems,
-  without assumed conclusions, with axiom audits. Any new bounded relation
+- **Acceptance:** retain explicit subgroup/embedding-degree/nondegeneracy
+  conditions and independent actual-point/field-log checks. General theorems
+  need kernel proofs and axiom audits. Any new bounded relation
   search must preregister its field/factor-base family and include pure-component
   and actual-point controls rather than infer impossibility from absent gains.
 - **Outcomes:** a passing theorem closes only its stated bridge. A new valid
@@ -129,3 +145,7 @@ Jacobian catalog is repaired natively without changing prior model objects.
 Current merge conflicts, inaccessible complete checks/statuses, external CI
 service failures and shared Conductor access remain operational gates, not
 mathematical obstructions. No broader hardness or no-connection claim follows.
+The 2026-10-24 continuation follows the user's positive pairing request and
+checks the explicit finite transfer, its native IC recoveries and degeneracy
+controls. It closes that bounded bridge, retaining the generic geometric,
+cost, coordination, review, CI/access and merge-conflict holds.

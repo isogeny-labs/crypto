@@ -11,8 +11,8 @@
 | Independent verification of saved/new IC data | verified | tuple-based auditor verifies three headline and 81 complete-log certificates |
 | Native controls | verified | false new relation, removed log certificate and false historical census count rejected |
 | Historical general readable arguments | preserved | archived report remains available with its original hypotheses |
-| Checked Lean implications and proof map | partial overall; explicit short-model group/eigenspace bridge verified | 49 named theorems / 57 audited declarations, zero extra trusted; actual addition/scalars, source annihilators, full minus-group isomorphism and rational fixed eigenspace checked; general-model normalization, exceptional summation-lifting and pairing bridges remain open |
-| Algebraic identity certificates | verified for eight stated identities | three original certificates, cleared-monic-map IDC1, and four new group-map/discriminant records; 32+16 point replay, false identities/source hashes and exact Lean source pointers |
+| Checked Lean implications and proof map | partial overall; explicit short-model group/eigenspace and finite F43 Miller bridges verified | 68 named theorems / 85 audited declarations, zero extra trusted; actual addition/scalars, source annihilators, full minus-group isomorphism, rational fixed eigenspace and 121-pair table checked; general-model normalization, exceptional summation-lifting and generic geometric pairing bridges remain open |
+| Algebraic identity certificates | verified for nine stated identities | three original certificates, cleared-monic-map IDC1, four group-map/discriminant records and norm-product IDC1h23c0696a12358b08; 32+16 point replay, false identities/source hashes and exact Lean source pointers |
 | Exact curve/model/subgroup identities | verified within stated representations | 1,921 registered monic models, 27 EC1 representations; unused subgroup choices stay unknown |
 | Shared Conductor check | blocked by unavailable tool/configuration | CLI exits 127; shared workflow/state unavailable; no reservation claimed |
 | Repository `cargo test --release --lib --locked` | passed on refreshed code and unchanged registry | 4,479 passed, 119 existing ignores; earlier 4,474 receipt and prior failures retained in `validation/` |
@@ -24,6 +24,10 @@
 | New source-linked report and inspected PDF | supplied | `reports/mixed-20261022T0718Z/`; earlier reports retained |
 | PR-caused stale Jacobian metadata (2026-10-23) | verified repaired | unchanged native producer; base passes and old head fails; new report covers exactly 4,493 models, preserving all 2,572 prior objects and the cost model; altered file rejected |
 | Group-map continuation report, diagram and PDF | supplied | `reports/group-map-20261023/`; actual Lean proof and new native certificate receipts in `validation/group-map-20261023/` |
+| Positive twist-assisted pairing angle (2026-10-24) | verified finite connection | actual F43 Miller evaluations and all 121 generator pairs checked in Lean; all eleven scalar logs recovered by native finite-field IC, independently checked |
+| Auxiliary-point/nondegeneracy census | independently verified finite coverage | 942 models, 274 shared-prime and 649 nonshared-prime cases; 4,616 auxiliary points, 3,312 nonzero targets; degenerate/undefined/wrong-subgroup and corruption controls retained |
+| Pairing continuation report, graph and PDF | supplied | `reports/pairing-20261024T0442Z/`; seven-module gate, full native replay, 22 backend and four metadata tests in `validation/pairing-20261024T0442Z/` |
+| Uniform geometric pairing reduction / practical advantage | still open / not measured | finite table does not establish general Weil correctness/nondegeneracy; no matched-cost or external-fastest comparison admitted |
 
 The fresh library suite after the current-main refresh passes 4,479 tests with
 119 existing ignores. The new isolated native auditor's backend suite passes

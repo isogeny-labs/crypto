@@ -3,8 +3,8 @@
 Lean 4.34.1 and Mathlib commit `d13f23b723b8a846827a245b89c10fc7d3f11612`
 are pinned in the toolchain, Lake file, and dependency manifest. The repository
 proof gate builds the module and audits all transitive theorem axioms. The current
-latest receipt reports **49 named research theorems, zero trusted native declarations**;
-the expanded audit checks 57 declarations including eight generated helper lemmas. Only standard
+latest receipt reports **68 named research theorems, zero trusted native declarations**;
+the expanded audit checks 85 declarations including 17 generated helper lemmas. Only standard
 `propext`, `Classical.choice`, and `Quot.sound` occur, and some proofs need fewer.
 No theorem source contains a placeholder or a custom research axiom.
 
@@ -120,20 +120,63 @@ Four [new native IDC1 records](../validation/group-map-20261023/certificates/rec
 bind the exact new Lean sources, replay 32+16 points each, reject false plus-one
 identities arithmetically, and reject false source hashes. They certify only the
 polynomial identities; the checked Lean proofs establish division, actual-point
-addition and Frobenius consequences. The 57-declaration axiom receipt covers
-every reported theorem and the generated helpers; all five modules build.
+addition and Frobenius consequences. That 2026-10-23 axiom receipt covers
+57 declarations in the then-current five modules and remains frozen.
+
+## Positive pairing transfer (2026-10-24)
+
+`PairingFixture.lean` constructs the computable field `QuadraticAlgebra (ZMod 43) 2 0`
+and actual nonsingular points on E:y²=x³+x. The rational generator is P=(31,18),
+Q=(13,24), and the monic twist point T=(35,12) maps to S=(39,3u).
+The explicit `weil11` function uses line functions and a linear Miller chain;
+support collisions give `none`. It is not defined by a logarithm lookup.
+Kernel evaluation, including `decide +kernel`, uses no trusted native axiom.
+
+| Declaration in `PairingFixture` | Exact finite statement |
+| --- | --- |
+| `explicit_twist_source` | the existing actual twist map sends T to S |
+| `source_frobenius`, `twist_frobenius` | P is Frobenius-fixed and S is negated |
+| `source_order`, `twist_order` | 11P=11S=O |
+| `source_known_scalar` | 7P=Q on the actual Mathlib group |
+| `target_nontrivial`, `target_order` | g=2+25u is nontrivial and g^11=1 |
+| `target_known_scalar`, `target_norm_one` | g^7=11+19u and g^43*g=1 |
+| `pairing_generator`, `pairing_target` | explicit Miller evaluations give g and g^7 |
+| `pairing_table` | every one of the 121 generator pairs has value g^(a*b), for a,b in Fin11 |
+| `target_powers_injective` | the eleven powers are distinct |
+| `logarithm_transport` | the concrete value on ([a]P,S) equals g^b iff a=b in Fin11 |
+
+`PairingTransfer.lean` separately proves the generic implication with its
+homomorphism/nondegeneracy hypotheses explicit:
+
+| Declaration | Exact scope |
+| --- | --- |
+| `character_scalar` | an additive-to-multiplicative homomorphism transports natural scalars to powers |
+| `character_order` | prime r annihilating P and a nontrivial image imply exact image order r |
+| `character_log_recovery` | under those hypotheses, exponents in Fin r agree iff their target values agree |
+| `norm_product_identity` | universal quadratic norm multiplication polynomial; native source-bound IDC1h23c0696a12358b08 |
+
+These 19 new statements bring the total to 68 named theorems. The
+[unmodified latest gate](../validation/pairing-20261024T0442Z/lean-gate-final/)
+audits 85 declarations in seven modules, including 17 generated helpers, with
+zero failing/extra trusted axioms. The [finite native census and report](../reports/pairing-20261024T0442Z/README.md)
+independently check 4,616 auxiliary points in 274 shared-prime cases and all
+eleven F43 IC certificates. Native IC relation collection/solving is not formalized.
+The finite Miller table does not prove equality with the geometric divisor
+definition or general Weil bilinearity/nondegeneracy. The generic character
+theorem does not assume those properties have been proved for every curve.
 
 **Remaining bridges.** The explicit short-model image's Frobenius-negation
 property, additive isomorphism onto the entire minus subgroup, and rational
 fixed-point identification are checked under the hypotheses above. General-model
 normalization with compatible group maps remains open, as do
-S3/S4 lifting including exceptional cases, Weil-pairing nondegeneracy
-and the complete DLP reduction. Its abstract implications are fully proved;
+S3/S4 lifting including exceptional cases, general geometric Weil-pairing
+correctness/nondegeneracy and the uniform DLP reduction. The explicit F43
+Miller transfer is now checked as stated above. Its abstract implications are fully proved;
 the complete historical geometric theorems are only partially formalized.
 Finite enumerations check the original fixtures, not those universal bridges.
 The trace-zero counting theorem and general GHS construction likewise remain open.
-The [latest build and axiom receipts](../validation/group-map-20261023/)
-include all five modules. The earlier 14-, 18- and 28-theorem gate receipts and
+The [latest build and axiom receipts](../validation/pairing-20261024T0442Z/)
+include all seven modules. The earlier 14-, 18-, 28- and 49-theorem gate receipts and
 their exact Lake configurations are retained unchanged.
 
 Reproduce from the repository root:

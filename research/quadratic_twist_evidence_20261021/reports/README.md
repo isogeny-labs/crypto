@@ -1,5 +1,11 @@
 # Evidence import report
 
+Latest continuation: [positive twist-assisted pairing transfer](pairing-20261024T0442Z/README.md),
+with an independently replayed 4,616-point census and a kernel-checked F43
+121-pair Miller table. The four-page inspected PDF, recorded-count graph and
+editable transfer diagram are versioned in that dated directory. Earlier
+dated reports and the original import report below remain frozen.
+
 [Report PDF](report.pdf) · [Report source](report.tex) ·
 [Historical count graph](coverage.svg) · [Native-audit scope diagram](audit-scope.svg)
 

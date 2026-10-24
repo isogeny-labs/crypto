@@ -1,4 +1,20 @@
-# Quadratic twists: full native replay and checked algebraic implications
+# Quadratic twists: native experiments and checked point/pairing transfers
+
+The [2026-10-24 pairing continuation](reports/pairing-20261024T0442Z/README.md)
+checks the positive twist-assisted route to finite-field index calculus.
+On the retained F43 order11 fixture, Lean checks the explicit Miller function
+on actual Mathlib points, all **121 generator pairs**, and exact logarithm
+transport. Native IC recovers all eleven scalars with independent Rust checks.
+The new full native sweep independently verifies **4,616 auxiliary points** in
+274 shared-prime cases: 3,312 nonzero twist images give nontrivial order-r
+targets, while 1,304 cofactor-zero images and 274 same-source controls are
+degenerate. The direct formula is explicitly undefined on the same-source
+controls; shifted disjoint-divisor evaluation verifies their value one.
+The proof gate now passes **68 named theorems / 85 audited declarations**, zero
+extra trusted axioms. This establishes the finite transfer, not generic Weil
+theory or a speedup. [Protocol](PAIRING_20261024_PROTOCOL.md),
+[results/audit/certificate](native/pairing-20261024T0442Z/),
+[validation](validation/pairing-20261024T0442Z/README.md).
 
 The full finite workload now runs in C++17. All **434 deterministic fields**
 match the frozen historical results: 942 nonsingular models, 4,188,162 ordered
@@ -68,7 +84,8 @@ The Lean proofs establish the stated group/ring implications, with explicit
 hypotheses. The actual Frobenius point map and rational-point lifts are now
 formalized, including the explicit short-model twist-to-minus-eigenspace group
 isomorphism. General-model normalization, exceptional summation-polynomial
-lifting and Weil-pairing bridges remain open.
+lifting and general geometric Weil-pairing bridges remain open; the explicit
+F43 Miller-function reduction is now kernel-checked as described above.
 This study establishes finite correctness and specific obstructions; it supplies
 neither a general ECDLP hardness proof nor a general GHS attack or speedup result.
 Invalid-curve attacks are outside its scope; every experiment uses valid points.
@@ -83,6 +100,7 @@ native ICV1/IDC1 implementations; it does not build a substitute Python path.
 study=research/quadratic_twist_evidence_20261021
 bash "$study/run-native.sh" /tmp/twist-native-fresh
 bash "$study/test-native.sh" /tmp/twist-native-fresh /tmp/twist-controls-fresh
+bash "$study/run-pairing.sh" /tmp/twist-pairing-fresh
 cargo test --release --locked --manifest-path "$study/native/metadata/Cargo.toml"
 cargo run --release --locked --manifest-path "$study/native/metadata/Cargo.toml" -- \
   "$PWD" /tmp/twist-native-fresh/results.json /tmp/twist-metadata-fresh

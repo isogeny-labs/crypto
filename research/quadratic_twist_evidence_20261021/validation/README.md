@@ -99,3 +99,16 @@ assessment's source bindings are refreshed without changing any non-source
 semantic section or existing transfer status. Raw failures and all earlier
 reports remain unchanged. General normalization, exceptional lifting, pairing,
 trace-zero and shared-Conductor gates stay open.
+
+The [2026-10-24 pairing continuation](pairing-20261024T0442Z/README.md) passes
+the unchanged seven-module proof gate with 68 named theorems / 85 audited
+declarations, zero failing/extra trusted. It checks the actual F43 twist source,
+Frobenius signs, explicit Miller function, all 121 generator pairs and exact
+finite logarithm transport. A full native sweep of 942 models and 4,616 auxiliary
+points passes independent coefficient-pair/linear-Miller replay, exact frozen
+bytes, four corrupted-payload controls and the new norm-product certificate.
+All eleven fixture IC certificates and their six-dimensional ranks pass the
+independent auditor; the IC algorithm is not formalized. The fresh full library
+suite passes 4,479 with 119 existing ignores; 22 backend and four workflow tests
+pass. Earlier failed attempts and all frozen sources remain unchanged. General
+geometric pairing theory and practical advantage remain distinct open questions.
