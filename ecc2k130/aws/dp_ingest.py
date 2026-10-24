@@ -673,7 +673,8 @@ def findCollisions(cur, key):
     the *same* seed by a different object is a re-report: harmless from a
     resumed worker, and the entire output of a run that is walking another
     run's seeds, so it is counted rather than dropped in silence. The
-    object's own rows are neither.
+    An object's newly inserted row matches itself and is neither; a second
+    seed in that same object can still meet it and is a collision.
     """
     cur.execute(
         "SELECT i.point_key, i.a, i.b, i.walk_seed, "
@@ -685,8 +686,6 @@ def findCollisions(cur, key):
     out = []
     duplicates = 0
     for point_key, mineA, mineB, mineSeed, theirsA, theirsB, theirsSeed, worker in cur.fetchall():
-        if worker == mine:
-            continue
         if theirsA is None:
             # `a` is NOT NULL for everything this program writes, but the
             # corpus predates it. A stored point with no seed cannot be
@@ -700,8 +699,14 @@ def findCollisions(cur, key):
         # themselves is the question, and a width difference between eras is
         # not a collision.
         if seedOf(mineA) == seedOf(theirsA):
-            duplicates += 1
+            # A freshly inserted row joins to itself. A repeated row in the
+            # same object does too; only another object's replay is counted.
+            if worker != mine:
+                duplicates += 1
             continue
+        # Different seeds can meet within one object. Its first row was just
+        # inserted with this same worker_id, so the worker ID alone cannot
+        # distinguish that collision from a row joining to itself.
         out.append({
             "point_key": bytes(point_key),
             # The live rho_collisions table requires both coefficient pairs.

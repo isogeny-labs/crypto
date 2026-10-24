@@ -2025,6 +2025,33 @@ class PostgresReplicaIntegration(unittest.TestCase):
                                    "old-worker", dp_ingest.workerId(LEGACY)))
             self.assertEqual(conn.execute("SELECT count(*) FROM dp_ingest_progress").fetchone(),
                              (1,))
+            # Both records are in one object and have the same point. One
+            # inserts; the other must become a collision even though the
+            # stored row has that same object's worker_id.
+            second_body = record(11, 4, 5, 6) + record(12, 4, 5, 6)
+            second_key = orbitKey(second_body)
+            second_result = dp_ingest.ingestObject(
+                conn, EnvelopeS3(second_body), "bucket", second_key,
+                "2026-10-24 00:00:00+00", replica_id="new-worker", expected_records=2)
+            self.assertEqual(second_result, (1, 2, 1))
+            second_point = second_body[8:32]
+            second_collision = conn.execute(
+                "SELECT a1, a2, worker1, worker2 FROM rho_collisions "
+                "WHERE point_key = %s", (second_point,)).fetchone()
+            self.assertIsNotNone(second_collision)
+            self.assertEqual(
+                {int.from_bytes(second_collision[0], "big"),
+                 int.from_bytes(second_collision[1], "big")}, {11, 12})
+            self.assertEqual(second_collision[2:],
+                             (dp_ingest.workerId(second_key),) * 2)
+            repeated_body = record(13, 7, 8, 9) * 2
+            repeated_key = orbitKey(repeated_body)
+            repeated_result = dp_ingest.ingestObject(
+                conn, EnvelopeS3(repeated_body), "bucket", repeated_key,
+                "2026-10-24 00:00:00+00", replica_id="new-worker", expected_records=2)
+            self.assertEqual(repeated_result, (1, 2, 0))
+            self.assertEqual(conn.execute(
+                "SELECT count(*) FROM rho_collisions").fetchone(), (2,))
         finally:
             dp_ingest._collisionCols = original_cols
             dp_ingest.applyRollup = original_rollup
