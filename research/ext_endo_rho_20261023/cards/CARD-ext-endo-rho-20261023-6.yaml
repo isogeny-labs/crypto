@@ -1,0 +1,138 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-ext-endo-rho-20261023-6
+experiment_id: ext_endo_rho_20261023
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: a2eefe194c7db611d12bc26128b99cc1addebf09
+receipt: research/ext_endo_rho_20261023/cards/CARD-ext-endo-rho-20261023-6.receipt.json
+binds:
+- path: research/ext_endo_rho_20261023/PROTOCOL.md
+  sha256: 04339c24e163138bfacc98981c6d21c296ea2bc2a46828b58e480f57583ea451
+- path: research/ext_endo_rho_20261023/specs/SPEC-gls-fp2.json
+  sha256: aacf7e8c9020caf65d8b250286cce75cc56f2992bd314d50a80028c4078f7ba2
+- path: Cargo.toml
+  sha256: def239e6a4e217a3059fc5b6740d658fa353f6cb023b685aeb2c40e528e94bfc
+- path: Cargo.lock
+  sha256: bf9f2d9eae5f6bfea66b0473d44bf77d63141dcc335fad01b30c420be444ea42
+- path: ./target/release/ecbench
+  sha256: 1153d340d7b81a58ff9622c81e9bed51396dc2b2e48b6ae0016e7d7a0799a6bc
+must_not_exist:
+- research/ext_endo_rho_20261023/sessions-a1/gls-fp2
+commands:
+- id: run-gls-fp2
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --allow-busy
+  - --cpus
+  - auto
+  - --lock
+  - /tmp/crypto-bench-ext-gls.lock
+  - --spec
+  - research/ext_endo_rho_20261023/specs/SPEC-gls-fp2.json
+  - --out
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/receipts/card6-run-gls-fp2.stdout
+  stderr: research/ext_endo_rho_20261023/receipts/card6-run-gls-fp2.stderr
+- id: verify-gls-fp2
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2
+  - --replay
+  - '16'
+  - --out
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2.audit.json
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/receipts/card6-verify-gls-fp2.stdout
+  stderr: research/ext_endo_rho_20261023/receipts/card6-verify-gls-fp2.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2.audit.json
+- id: compare-plain-gls-fp2
+  argv:
+  - ./target/release/ecbench
+  - compare
+  - --dir
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2
+  - --a
+  - rho-plain
+  - --b
+  - rho-neg
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/sessions-a1/gls-fp2.compare-rho-plain__rho-neg.txt
+  stderr: research/ext_endo_rho_20261023/receipts/card6-compare-plain-gls-fp2.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2.compare-rho-plain__rho-neg.txt
+- id: compare-cand-gls-fp2
+  argv:
+  - ./target/release/ecbench
+  - compare
+  - --dir
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2
+  - --a
+  - rho-neg
+  - --b
+  - rho-gls
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/sessions-a1/gls-fp2.compare-rho-neg__rho-gls.txt
+  stderr: research/ext_endo_rho_20261023/receipts/card6-compare-cand-gls-fp2.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2.compare-rho-neg__rho-gls.txt
+- id: table-gls-fp2
+  argv:
+  - ./target/release/ecbench
+  - table
+  - --dir
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/sessions-a1/gls-fp2.table.md
+  stderr: research/ext_endo_rho_20261023/receipts/card6-table-gls-fp2.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2.table.md
+- id: band-gls-fp2
+  argv:
+  - ./target/release/ecbench
+  - band
+  - --dir
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2
+  - --ranks
+  - --json
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2.band.json
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/sessions-a1/gls-fp2.band.md
+  stderr: research/ext_endo_rho_20261023/receipts/card6-band-gls-fp2.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2.band.json
+  - research/ext_endo_rho_20261023/sessions-a1/gls-fp2.band.md
+bus_address: executor-mechanical-ext-endo-rho-20261023-6
+background: true
+write_scope:
+- research/ext_endo_rho_20261023/sessions-a1/
+- research/ext_endo_rho_20261023/receipts/
+- research/ext_endo_rho_20261023/cards/
+- target/
+stop_when:
+- Any command in the card exits with a status other than 0.
+- The tool exits with status 2 and prints an IMPEDIMENT line.
+- A line printed by the tool begins with 'command' and ends with 'FAILED'.

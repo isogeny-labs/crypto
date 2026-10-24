@@ -1497,10 +1497,10 @@ fn main() {
         }
     };
     assert!(e0.mul(&f, Some(p0), n).is_none());
-    let k_secret = rng.gen_range(1..n);
-    let q0 = e0.mul(&f, Some(p0), k_secret).unwrap();
+    let k_planted = rng.gen_range(1..n);
+    let q0 = e0.mul(&f, Some(p0), k_planted).unwrap();
     if args.instance_study {
-        instance_study(&args, &f, e0, n, cof, p0, k_secret, dp_bits);
+        instance_study(&args, &f, e0, n, cof, p0, k_planted, dp_bits);
         return;
     }
 
@@ -1747,7 +1747,7 @@ fn main() {
             "arm": a.label, "vertex": a.vertex, "level": a.level, "group": "ec",
             "p": f.p, "a": a.inst.curve.a, "b": a.inst.curve.b, "order": n,
             "g": format!("{},{}", a.inst.p.0, a.inst.p.1),
-            "h": format!("{},{}", a.inst.q.0, a.inst.q.1), "x": k_secret,
+            "h": format!("{},{}", a.inst.q.0, a.inst.q.1), "x": k_planted,
         })
         .to_string();
         jl.push('\n');
@@ -1820,7 +1820,7 @@ fn main() {
         })
         .collect();
     let rho_s = t_rho.elapsed().as_secs_f64();
-    let wrong = results.iter().filter(|r| r.2.k != Some(k_secret)).count();
+    let wrong = results.iter().filter(|r| r.2.k != Some(k_planted)).count();
     if wrong > 0 {
         die(&format!(
             "{wrong} rho solves returned no or the wrong logarithm"
@@ -1941,7 +1941,7 @@ fn main() {
         "problem": {"p": f.p, "root": {"a": e0.a, "b": e0.b}, "order": found.order, "n": n,
                     "cofactor": found.order / n, "trace": found.t, "disc": -(found.d_abs as i64),
                     "fundamental_disc": dk, "conductor": cond, "volcano_depth": depth,
-                    "crater": crater, "given": args.curve.is_some(), "P": [p0.0, p0.1], "Q": [q0.0, q0.1], "k": k_secret,
+                    "crater": crater, "given": args.curve.is_some(), "P": [p0.0, p0.1], "Q": [q0.0, q0.1], "k": k_planted,
                     "search_curves_tried": found.tried, "search_s": search_s},
         "walk": {"radius_measured": r_meas, "radius_explored": r_explore, "vertices": vs.len(),
                  "edges_verified": edges_checked, "special_j_skipped": skipped_special,
@@ -1968,7 +1968,7 @@ fn main() {
     )
     .unwrap();
 
-    println!("\nPollard rho on one instance (k = {k_secret}, n = {n}) across the {ell}-volcano");
+    println!("\nPollard rho on one instance (k = {k_planted}, n = {n}) across the {ell}-volcano");
     println!(
         "engine {}: expected iterations ~ sqrt(pi n / 2) = {expected:.0}, with a negation map sqrt(pi n / 4) = {:.0}",
         args.engine,

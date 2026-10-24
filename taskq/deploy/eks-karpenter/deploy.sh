@@ -47,6 +47,7 @@ eksctl create iamserviceaccount --cluster isolab --region us-east-2 \
   --attach-policy-arn arn:aws:iam::104186811093:policy/isolab-job-artifacts --approve
 helm upgrade --install karpenter oci://public.ecr.aws/karpenter/karpenter \
   --version 1.15.0 --namespace kube-system --values karpenter-values.yaml --wait --timeout 10m
+kubectl apply -f spot-only-policy.yaml
 kubectl apply -f nodepool.yaml
 kubectl wait --for=condition=Ready ec2nodeclass/cpu --timeout=180s
 kubectl wait --for=condition=Ready nodepool/cpu-spot --timeout=180s
