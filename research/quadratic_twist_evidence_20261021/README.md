@@ -1,13 +1,27 @@
 # Quadratic twists: native experiments and checked point/pairing transfers
 
+The [actual S3 yield/degree experiment](reports/s3-yield-20261024/README.md)
+checks124 base comparisons /1,904 target systems with independent C++/Rust
+arithmetic and matrices. In the F43 prefix example, the first public relation
+target gives two independent twist rows versus zero, closure degree4 versus6,
+and a Lean-verified injective scalar-preserving base-field map. Pulling back
+the twist base reproduces the entire gain on the main curve. The homogeneous
+leading ideal has the same first-zero degree in both arms; all-target mean
+closure is also equal. This is a finite factor-base/target effect, not a speed
+result. The unmodified gate now checks **144 named research theorems /185
+audited declarations**, zero extra trusted, including exact degree4-obstruction
+and degree5-refutation certificates. [Protocol](S3_YIELD_20261024_PROTOCOL.md),
+[validation](validation/s3-yield-20261024/README.md), [inspected PDF publication pending](validation/s3-yield-20261024/ARTIFACTS_UPLOAD_PENDING.json).
+
 The [relation-yield/solver-degree continuation](reports/yield-20261024/README.md)
 adds exact Lean theorems for accepted coefficient sets and row rank, an actual
 short-model twist instantiation, uniform whole-group raw-yield ratio N/Nt, and
 conditional cost inequalities for useful yield and a degree-dependent dense work
 model. An actual F5 control has more raw twist zeros but no nonzero rows modulo3.
-The unchanged gate passes **106 named theorems / 127 audited declarations**,
-zero extra trusted axioms. Higher useful yield, a genuinely lower relevant degree
-and a main-DLP reduction remain hypotheses to verify, not consequences of twisting.
+That round's unchanged gate passed **106 named theorems /127 audited declarations**,
+zero extra trusted axioms. The actual continuation above checks a finite useful-
+row/closure example and F43 reduction; uniform useful yield, lower regularity
+in another encoding and compatible complete work bounds remain unresolved.
 [Protocol](YIELD_20261024_PROTOCOL.md), [proof sources](lean/RelationYield.lean),
 [cost theorem](lean/RelationCost.lean), [validation](validation/yield-20261024/README.md).
 
@@ -113,6 +127,7 @@ bash "$study/run-native.sh" /tmp/twist-native-fresh
 bash "$study/test-native.sh" /tmp/twist-native-fresh /tmp/twist-controls-fresh
 bash "$study/run-pairing.sh" /tmp/twist-pairing-fresh
 bash "$study/run-yield.sh" /tmp/twist-yield-fresh
+bash "$study/run-s3-yield.sh" /tmp/twist-s3-fresh
 cargo test --release --locked --manifest-path "$study/native/metadata/Cargo.toml"
 cargo run --release --locked --manifest-path "$study/native/metadata/Cargo.toml" -- \
   "$PWD" /tmp/twist-native-fresh/results.json /tmp/twist-metadata-fresh

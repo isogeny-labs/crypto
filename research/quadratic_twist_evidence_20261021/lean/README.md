@@ -204,6 +204,36 @@ IDC1h1fac46ceb41801ac covers only the cleared-budget polynomial; Lean separately
 checks positivity, counts, row rank and inequalities. All previous sources and
 certificate bindings remain unchanged.
 
+## Actual S3 systems, degree certificates and F43 reduction (2026-10-24)
+
+`S3System.lean` adds23 named theorems. It proves the actual S3 leading component
+is x^2*y^2, the degree2/3 base-polynomial leading components, and the actual
+leading ideals <x^2*y^2,x^b,y^b>. Monomial membership and the sharp first-empty
+degree b+1 are checked. This refutes a strict homogeneous-regularity gain for
+this specific encoding, not other descent systems. Its actual F43 point map
+phi(x,y)=(41x,11y) is injective/additive and preserves arbitrary scalar solutions.
+The actual first-target main base has no signed decomposition; the twist base
+has two independent rows, uniquely determining logs5 and7.
+
+`S3DegreeFixture.lean` adds15 named theorems. An explicit dual functional
+annihilates all13 degree4 main input multiples but maps1 to1. An explicit
+degree5 combination derives1. Both are checked on the actual bound S3/base
+polynomials; native closure degree6 is a separate, stronger matrix criterion.
+The module also proves that pulling the twist base back to main reproduces
+the accepted relation sets for every finite integer coefficient candidate set,
+with the target included. It checks both actual pulled-back point relations.
+The universal cleared unit identity has its own source-bound IDC1 record.
+
+The [report and inspected PDF](../reports/s3-yield-20261024/README.md) distinguish
+homogeneous first-empty degree, finite vanishing-space closure degree, actual
+refutation degree and unmeasured F4/F5 work. The [unmodified current gate](../validation/s3-yield-20261024/lean-gate-final/)
+audits185 declarations in twelve modules, including144 named research theorems,
+zero extra trusted; only standard propext, Classical.choice, Quot.sound occur.
+The independent native audit checks124 comparisons /1,904 systems. The F43
+first-target closure4 versus6 is target/basis dependent, with equal full-target
+means and exact inverse-transport equality. No source/receipt in earlier dated
+rounds is changed, and native matrix replay is not silently called a Lean proof.
+
 **Remaining bridges.** The explicit short-model image's Frobenius-negation
 property, additive isomorphism onto the entire minus subgroup, and rational
 fixed-point identification are checked under the hypotheses above. General-model
@@ -214,11 +244,12 @@ Miller transfer is now checked as stated above. Its abstract implications are fu
 the complete historical geometric theorems are only partially formalized.
 Finite enumerations check the original fixtures, not those universal bridges.
 The trace-zero counting theorem and general GHS construction likewise remain open.
-Actual small-base useful-yield improvement, lower regularity/solver-degree
-certificates and compatible solver work bounds remain unestablished for the new
-conditional comparison. No measured speedup is claimed.
-The [latest build and axiom receipts](../validation/yield-20261024/)
-include all ten modules. The earlier 14-, 18-, 28-, 49- and 68-theorem gate receipts and
+The finite S3 useful-row/closure example and actual F43 source reduction are now
+checked above. Uniform useful yield, a lower relevant degree in a different
+encoding and compatible complete solver work bounds remain unestablished.
+No measured speedup is claimed.
+The [latest build and axiom receipts](../validation/s3-yield-20261024/)
+include all twelve modules. The earlier 14-,18-,28-,49-,68- and106-theorem gate receipts and
 their exact Lake configurations are retained unchanged.
 
 Reproduce from the repository root:

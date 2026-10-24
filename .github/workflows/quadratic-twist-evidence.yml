@@ -58,6 +58,8 @@ jobs:
         run: bash research/quadratic_twist_evidence_20261021/run-pairing.sh "$RUNNER_TEMP/twist-pairing"
       - name: Replay conditional yield-cost polynomial and source controls
         run: bash research/quadratic_twist_evidence_20261021/run-yield.sh "$RUNNER_TEMP/twist-yield"
+      - name: Replay actual S3 useful yield, degrees and scalar transfers
+        run: bash research/quadratic_twist_evidence_20261021/run-s3-yield.sh "$RUNNER_TEMP/twist-s3-yield"
       - name: Upload native audit receipts
         if: always()
         uses: actions/upload-artifact@v4
@@ -72,4 +74,5 @@ jobs:
             ${{ runner.temp }}/twist-group-map/
             ${{ runner.temp }}/twist-pairing/
             ${{ runner.temp }}/twist-yield/
+            ${{ runner.temp }}/twist-s3-yield/
           if-no-files-found: error

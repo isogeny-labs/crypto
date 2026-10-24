@@ -1,5 +1,11 @@
 # Evidence import report
 
+Latest actual-system experiment: [S3 useful yield, degrees and source-DLP transport](s3-yield-20261024/README.md),
+with124 comparisons /1,904 target systems, a finite F43 rank/closure example,
+Lean scalar/degree certificates, equal homogeneous regularity and an exact
+main-curve pullback control. Its four-page PDF includes all nonzero target
+profiles; no speedup or uniform twist advantage is inferred.
+
 Latest proof continuation: [relation yield, row rank and conditional degree cost](yield-20261024/README.md),
 with actual twist transport, exact whole-group yield ratio, a kernel-checked F5
 control and an inspected four-page report. It supplies conditional mathematical

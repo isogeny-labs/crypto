@@ -23,6 +23,13 @@ uniform reduction remain open; the finite IC algorithm is not formalized.
 The actual shared Conductor task state is also unavailable in this environment.
 Neither gap is a mathematical nonexistence result.
 
+The new actual S3 comparison checks a finite F43 useful-row/closure improvement
+and an injective scalar-preserving base-field map for that example. Its leading
+homogeneous ideal is identical at fixed size2/3; a strict regularity improvement
+is refuted for this encoding. A different leading ideal/solver bridge, uniform
+useful yield and compatible complete work bounds remain unresolved. The gain is
+reproduced by an exact pulled-back factor base on the main curve.
+
 ## Evidence and uncertainty
 
 - **Verified finite observations:** [native parity receipt](../research/quadratic_twist_evidence_20261021/native/runs/run-20261021T150125Z/parity.json)
@@ -84,11 +91,35 @@ Neither gap is a mathematical nonexistence result.
   main-to-twist DLP reduction is silently supplied. See the
   [lead-atlas handoff](../research/quadratic_twist_evidence_20261021/validation/yield-20261024/atlas-handoff.json)
   for existing related leads; their dispositions are not changed by this proof.
+- **Actual S3 continuation:** [report and proof map](../research/quadratic_twist_evidence_20261021/reports/s3-yield-20261024/README.md)
+  independently checks124 factor-base comparisons /1,904 systems. The first F43
+  prefix target gives main/twist rank0/2 and finite closure degree6/4. Lean checks
+  the concrete main-DLP scalar equivalence and actual useful twist relations,
+  the main's degree4 non-refutation /degree5 unit certificate, and exact accepted
+  relation-set equality after pulling the twist base back to main. The actual
+  leading ideal <x^2*y^2,x^b,y^b> has first-empty degree b+1 in both arms for
+  b2/3. All-target mean closure is5.2 in both F43 arms, and the twist loses on
+  targets4--7. This is a basis/target effect with no measured work advantage.
+  The unmodified gate now passes144 named theorems /185 audited declarations,
+  zero extra trusted. Both new polynomial certificates and rehashed false-rank,
+  false-degree, omitted-case and false-scaling controls pass. Previous evidence
+  and all ten prior study certificates remain unchanged. The newly used twist
+  generator(24,26) is explicit and has no registered EC1 record; the existing
+  generator(35,12) alias is never reused for it.
 - **Tool/access:** Rust and Lean were installed for this continuation; the former
   claim that they were unavailable no longer describes the current environment.
   The library suite and native backend tests are recorded in the study validation
   directory. Conductor still exits 127; its shared workflow/configuration is absent.
   No shared reservation is claimed, and no replacement local coordinator was started.
+- **Artifact publication hold:** the new inspected PDF, two PNG copies and raw
+  archive require current-main S3 storage. Automatic approval review rejected
+  uploading the specific raw payload/destination without explicit user
+  authorization, citing possible non-public research data. No upload was
+  performed or retried. The [exact four-file pending manifest](../research/quadratic_twist_evidence_20261021/validation/s3-yield-20261024/ARTIFACTS_UPLOAD_PENDING.json)
+  records684,341 local bytes with hashes/intended keys; compact data/proofs and
+  editable report source remain reviewable in the PR. This is an authorization
+  gate, not a mathematical or test failure. Keep publication incomplete until
+  approval, actual upload and remote verification succeed.
 - **Not established:** general ECDLP hardness, an asymptotic IC advantage, or a
   general GHS algorithm. The finite observations and proved conditional
   implications do not establish those conclusions.
@@ -112,9 +143,15 @@ Neither gap is a mathematical nonexistence result.
   exact finite logarithm transport; independently verify all eleven native IC logs.
 - [x] Prove exact matched relation-set/rank transport, whole-group yield counts
   and explicit conditional useful-yield/degree/overhead comparisons.
-- [ ] Establish actual small-base useful-yield and regularity/solving-degree
-  bounds, compatible complete work bounds and a main-DLP reduction before
-  turning the conditional comparison into an actual speed claim.
+- [x] Check a finite actual small-base useful-row/closure improvement and an
+  applicable main-DLP reduction: F43 prefix fixture; verify its factor-base
+  pullback control and all-target losses, without claiming uniform advantage.
+- [ ] Establish a useful-yield improvement beyond a changed base/finite rank
+  state, a genuinely lower regularity/solver-degree bound in an applicable
+  encoding, and compatible complete work bounds before an actual speed claim.
+  For the tested S3 encoding, equal leading ideals rule out a strict homogeneous
+  regularity gain. A new encoding must name the changed leading ideal rather
+  than silently substitute finite closure degree for regularity.
 - [ ] Prove general-model normalization with compatible group maps,
   exceptional summation-polynomial lift statements, and the general geometric
   pairing correctness/nondegeneracy and uniform DLP reduction.
@@ -122,12 +159,22 @@ Neither gap is a mathematical nonexistence result.
   degree, separability, and rationality hypotheses.
 - [ ] Run the actual shared Conductor check with its configured task state.
   Do not substitute a new local coordination instance.
+- [ ] Obtain explicit approval for the four-file pending artifact manifest,
+  upload those immutable bytes to the named S3 store and verify remote hashes.
 
 Satisfying these conditions would establish the stated formal parity. It would
 still not prove general ECDLP hardness or an asymptotic solver advantage.
 
 ## Next discriminating step
 
+- **Actual-system construction obligation:** specify a descent/rationality
+  encoding whose actual leading ideal can differ between the two arms, an
+  admissible factor-base distribution and a scalar-preserving subgroup map.
+  Acceptance needs independent useful-rank progression, a certified relevant
+  degree bound with the solver bridge stated, and a pullback/base-choice control.
+  A mapped equal ideal is a scoped obstruction; a finite first-target gain is
+  not a stationary yield law. Full work accounting is still required. No such
+  new experiment is currently running; this does not assert all encodings fail.
 - **Action:** extend the positive pairing angle beyond the checked k2 fixture:
   preregister denominator-safe subgroup families and price the destination
   solver before an advantage claim. General geometric pairing correctness is

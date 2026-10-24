@@ -1,5 +1,16 @@
 # Validation record
 
+Current actual-system continuation: [s3-yield-20261024](s3-yield-20261024/README.md).
+The unmodified twelve-module gate passes144 named research theorems /185
+audited declarations, zero failing/extra trusted. Exact native replay checks124
+base comparisons /1,904 systems, two-way coefficient/degree transport controls,
+all eleven independently solved F43 targets, two source-bound certificates and
+four rehashed semantic-corruption controls. Backend22 and metadata4 tests pass.
+The fresh full release library suite passes4,479 with119 existing ignores after
+granting loopback network access; the initial nine socket-denied failures remain
+recorded. No source/test patch or weakened gate was used. Earlier receipts below
+are historical and remain unchanged.
+
 The original import's `tooling.log` and native audit receipts remain unchanged.
 This continuation installed Rust 1.99.1 and Lean 4.34.1 and ran the previously
 unavailable checks. Earlier missing-tool statements describe the earlier environment.
