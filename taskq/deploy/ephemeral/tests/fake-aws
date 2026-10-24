@@ -93,6 +93,11 @@ case "$svc $op" in
     tail -c +"$((from + 1))" "$p" >"$out"
     echo '{}'
     ;;
+"s3api head-object")
+    p="$FAKE_AWS/s3/$(opt --bucket)/$(opt --key)"
+    [ -f "$p" ] || { echo "NoSuchKey" >&2; exit 254; }
+    echo '{}'
+    ;;
 "ec2 describe-instance-types")
     case $(opt --instance-types) in
     g* | p*) echo "x86_64	NVIDIA" ;;

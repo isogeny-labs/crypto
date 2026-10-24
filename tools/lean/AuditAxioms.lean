@@ -50,8 +50,10 @@ def readTrusted (path : String) : IO (List Name) := do
     if n.isEmpty then none else some n.toName
 
 def main (args : List String) : IO UInt32 := do
-  -- Lean versions differ on whether --run consumes the argument separator.
-  let args := if args.head? == some "--" then args.drop 1 else args
+  -- Older Lean releases consume this separator; newer ones pass it to main.
+  let args := match args with
+    | "--" :: rest => rest
+    | _ => args
   let (trusted, args) ← match args with
     | "--trusted" :: f :: rest => do pure ((← readTrusted f), rest)
     | _ => pure ([], args)

@@ -291,13 +291,9 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
     // Target: planted or supplied.
     let (target, planted): (nist::AnyPoint, Option<BigUint>) = if args.challenge {
         if curve.name.eq_ignore_ascii_case("ECCp-131") {
-            (
-                curve.parse_point(
-                    "03AA6F004FC62E2DA1ED0BFB62C3FFB568",
-                    "009C21C284BA8A445BB2701BF55E3A67ED",
-                )?,
-                None,
-            )
+            let (x, y) = crypto_lib::ecc::curve::CurveParams::certicom_eccp131_target();
+            let target = curve.parse_point(&x.to_str_radix(16), &y.to_str_radix(16))?;
+            (target, None)
         } else {
             let (_, target) = BinaryCurve::certicom_challenge(&curve.name)
                 .ok_or_else(|| format!("{} is not a supported Certicom challenge", curve.name))?;

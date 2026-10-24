@@ -1,6 +1,8 @@
 Open pull requests ready for review, never as drafts, whatever the runtime
 defaults to, and mark an existing draft ready; only a user request in the task
-makes a draft. This and the repository's other rules are in
+makes a draft. Enable auto-merge as you open the PR (`gh pr merge <n> --auto
+--merge`); a stacked PR cannot auto-merge until it is retargeted to `main`.
+This and the repository's other rules are in
 [`AGENTS.md`](AGENTS.md) ("Default workflow").
 
 **Success criterion** (owner, 2026-10-15): every verified, measured
@@ -66,7 +68,11 @@ land it".
 Model tiers (owner, 2026-10-17): frontier/core models reason and decide;
 `experiment-director` (Sonnet) writes a frozen command card, the main session
 relays it verbatim to `executor-mechanical` (Haiku), and the director assesses
-the run. AGENTS.md, "Model tiers".
+the run. AGENTS.md, "Model tiers". After a relay the main session records what
+it cost: `python3 tools/token_usage.py session --units <cards> --unit-name card`
+(tokens and list-price cost per agent and tier, cache hit ratio, cost per card;
+`autofix-queue.yml` records each attempt the same way). Metrics and the
+transcript accounting traps: [`docs/token-efficiency.md`](docs/token-efficiency.md).
 
 Every cross-method ECDLP comparison prices the unpriced native work of
 every arm, rho references included, at 0, 0.1 and 1 GAE per operation and
