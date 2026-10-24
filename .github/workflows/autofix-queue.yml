@@ -32,6 +32,19 @@ name: autofix-queue
 #   vars.AUTOFIX_MID_MODEL      default claude-sonnet-5-5
 #   vars.AUTOFIX_MAX_PER_SWEEP  PRs queued per sweep, default 3
 #   vars.AUTOFIX_MIN_AGE_MINUTES  quiet period after the last push, default 45
+#   vars.AUTOFIX_MAX_ATTEMPTS   lifetime model attempts per PR, default 4; then
+#                               `needs-human` (0 disables). Counted from hidden
+#                               markers in the queue's own comments, so it
+#                               survives the green-PR label reset. A maintainer
+#                               comment `/autofix reset` restarts the count.
+#   vars.AUTOFIX_MAX_BEHIND     sweeps skip PRs more than this many commits
+#                               behind their base, default 50 (0 disables)
+#   vars.AUTOFIX_MAX_QUEUED     a sweep pauses while more than this many
+#                               workflow runs are queued or in progress,
+#                               default 40 (0 disables)
+#   Sweeps never queue drafts, forks, or already-green PRs. An explicit `autofix`
+#   label bypasses the behind-main skip and the pause, not the attempt cap.
+#   Details: .github/ci-autofix-throttle.md
 # Per PR: label `autofix` to queue it now, `autofix:off` to opt it out.
 #
 # Security: like any job that checks out a PR branch with write access, this
@@ -69,6 +82,9 @@ env:
   MID_MODEL: ${{ vars.AUTOFIX_MID_MODEL || 'claude-sonnet-5-5' }}
   AUTOFIX_MAX_PER_SWEEP: ${{ vars.AUTOFIX_MAX_PER_SWEEP || '3' }}
   AUTOFIX_MIN_AGE_MINUTES: ${{ vars.AUTOFIX_MIN_AGE_MINUTES || '45' }}
+  AUTOFIX_MAX_ATTEMPTS: ${{ vars.AUTOFIX_MAX_ATTEMPTS || '4' }}
+  AUTOFIX_MAX_BEHIND: ${{ vars.AUTOFIX_MAX_BEHIND || '50' }}
+  AUTOFIX_MAX_QUEUED: ${{ vars.AUTOFIX_MAX_QUEUED || '40' }}
   # Checks a cheap model can handle: linters, formatters, and the
   # generated-output staleness checks (curve-names, ic-leaderboard, ic-dashboard).
   AUTOFIX_MECHANICAL_CHECKS: '(?i)(lint|fmt|format|clippy|rustfmt|ruff|black|prettier|typos|spell|yaml|parse|syntax|whitespace|^names$|^leaderboard$|^current$|^overview$)'
@@ -89,11 +105,13 @@ jobs:
     permissions:
       contents: read
       checks: read
+      actions: read # count queued / in-progress runs for the queue-depth pause
       pull-requests: write
       issues: write
     outputs:
       matrix: ${{ steps.triage.outputs.matrix }}
       count: ${{ steps.triage.outputs.count }}
+      paused: ${{ steps.triage.outputs.paused }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -318,6 +336,13 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           api="repos/$GITHUB_REPOSITORY/issues/$PR"
+          # Lifetime attempt counter read by autofix_triage.py (count_attempts):
+          # a hidden marker in the comment, so no label event fires. Every
+          # model run counts, including ones discarded as stale.
+          attempts=0
+          [ "$HAIKU_RAN" = "true" ] && attempts=$((attempts + 1))
+          [ "$SONNET_RAN" = "true" ] && attempts=$((attempts + 1))
+          marker="<!-- autofix-attempt n=$attempts -->"
           add() { gh api "$api/labels" -X POST -f "labels[]=$1" >/dev/null || true; }
           gh api -X DELETE "$api/labels/autofix:running" >/dev/null 2>&1 || true
           [ "$HAIKU_RAN" = "true" ] && add autofix:haiku
@@ -325,6 +350,8 @@ jobs:
 
           if [ "$STATUS" = "stale" ]; then
             echo "Branch moved during the attempt; the next sweep will look again."
+            printf '**autofix** discarded an attempt: the branch moved while it ran.\n\n%s\n' "$marker" > comment.md
+            gh api "$api/comments" -X POST -F body=@comment.md >/dev/null || true
             exit 0
           fi
 
@@ -347,5 +374,6 @@ jobs:
             fi
             echo
             echo "<sub>[run]($RUN_URL)</sub>"
+            echo "$marker"
           } > comment.md
           gh api "$api/comments" -X POST -F body=@comment.md >/dev/null

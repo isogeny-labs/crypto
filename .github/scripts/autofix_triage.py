@@ -20,6 +20,23 @@ When a PR comes back clean (no conflicts, every check green) its
 autofix:haiku / autofix:sonnet labels are removed, so the next breakage starts
 again at the bottom of the ladder.
 
+Throttles (see .github/ci-autofix-throttle.md)
+  lifetime attempt cap   the labels above reset when a PR goes green, so they
+                         cannot bound total spend. Every finished attempt also
+                         leaves a hidden `<!-- autofix-attempt n=K -->` marker
+                         in its report comment (no label event, so no extra
+                         workflow runs); a PR whose markers sum to
+                         AUTOFIX_MAX_ATTEMPTS gets `needs-human` and is never
+                         queued again. A maintainer comment `/autofix reset`
+                         restarts the count.
+  skipped before a model drafts, forks, green PRs and PRs more than
+                         AUTOFIX_MAX_BEHIND commits behind their base (a human
+                         or the hygiene job should rebase or close those).
+  queue-depth pause      a sweep does nothing while queued + in_progress
+                         workflow runs exceed AUTOFIX_MAX_QUEUED.
+An explicit --pr request bypasses the behind-main skip and the pause, never the
+fork, label, or attempt-cap checks.
+
 Standard library only; talks to GitHub through `gh api` (REST).
 """
 from __future__ import annotations
@@ -47,6 +64,27 @@ DEFAULT_MECHANICAL_FILES = (
 )
 # Check runs produced by the queue itself or by advisory reviewers.
 DEFAULT_IGNORE_CHECKS = r"^(autofix|triage|review|claude)( |$|\()"
+
+DEFAULT_MAX_ATTEMPTS = 4   # lifetime model attempts per PR (0 disables the cap)
+DEFAULT_MAX_BEHIND = 50    # commits behind base before a sweep skips the PR (0 disables)
+DEFAULT_MAX_QUEUED = 40    # queued + in_progress runs before a sweep pauses (0 disables)
+COMMENT_PAGES = 10         # 1000 comments; more than that counts as "over the cap"
+
+# Written by the "Report and release" step of autofix-queue.yml, one per
+# finished attempt (n = model attempts in that run: Haiku and/or Sonnet).
+ATTEMPT_MARKER = re.compile(r"<!--\s*autofix-attempt(?:\s+n=(\d+))?\s*-->")
+RESET_COMMAND = re.compile(r"^\s*/autofix\s+reset\b", re.I)
+RESET_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
+
+
+def env_int(name: str, default: int) -> int:
+    raw = (os.environ.get(name) or "").strip()
+    try:
+        return max(0, int(raw)) if raw else default
+    except ValueError:
+        print(f"::warning::{name}={raw!r} is not an integer; using {default}",
+              file=sys.stderr)
+        return default
 
 
 def env_regex(name: str, default: str) -> re.Pattern[str] | None:
@@ -86,6 +124,70 @@ def pr_detail(repo: str, number: int) -> dict:
             return pr
         time.sleep(3 * (attempt + 1))
     return pr
+
+
+def count_attempts(comments: list[dict]) -> int:
+    """Lifetime model attempts recorded in a PR's comments.
+
+    Counts bot comments carrying the attempt marker (summing its n=), plus
+    pre-marker reports that start with "**autofix** " (hand-offs from triage
+    start with "**autofix:**" and are not attempts). A `/autofix reset`
+    comment from a maintainer zeroes the count so far. Comment text from
+    anyone else is ignored, so pasting a marker cannot change the count.
+    """
+    total = 0
+    for c in comments:
+        body = c.get("body") or ""
+        user = c.get("user") or {}
+        if (RESET_COMMAND.match(body)
+                and c.get("author_association") in RESET_ASSOCIATIONS
+                and user.get("type") != "Bot"):
+            total = 0
+        elif user.get("type") == "Bot":
+            m = ATTEMPT_MARKER.search(body)
+            if m:
+                total += int(m.group(1)) if m.group(1) is not None else 1
+            elif body.startswith("**autofix** "):
+                total += 1
+    return total
+
+
+def attempts_used(repo: str, number: int) -> int:
+    comments = gh(f"repos/{repo}/issues/{number}/comments?per_page=100",
+                  paginate=True, max_pages=COMMENT_PAGES)
+    if len(comments) >= 100 * COMMENT_PAGES:
+        return 10**9  # history truncated: treat the PR as over the cap
+    return count_attempts(comments)
+
+
+def behind_by(repo: str, base: str, sha: str) -> int | None:
+    """Commits on `base` that `sha` lacks, or None if GitHub will not say."""
+    try:
+        data = gh(f"repos/{repo}/compare/{base}...{sha}?per_page=1")
+        return int(data["behind_by"])
+    except (RuntimeError, KeyError, TypeError, ValueError) as exc:
+        print(f"  compare failed: {exc}", file=sys.stderr)
+        return None
+
+
+def queue_depth(repo: str) -> int:
+    """Workflow runs currently queued or in progress in this repository.
+
+    Counts runs, not jobs: a run with some jobs waiting for a runner and
+    others executing is `in_progress`, so this under-reports a job backlog.
+    """
+    return sum(int(gh(f"repos/{repo}/actions/runs?status={status}&per_page=1"
+                      )["total_count"])
+               for status in ("queued", "in_progress"))
+
+
+def pause_reason(depth: int, limit: int, own: int = 0) -> str | None:
+    """Why a sweep should pause, or None. `own` discounts this run itself."""
+    busy = max(0, depth - own)
+    if limit > 0 and busy > limit:
+        return (f"{busy} workflow runs are queued or in progress "
+                f"(> AUTOFIX_MAX_QUEUED={limit}); not adding more load")
+    return None
 
 
 def check_runs(repo: str, sha: str, ignore: re.Pattern[str] | None) -> list[dict]:
@@ -144,11 +246,15 @@ def triage(args: argparse.Namespace) -> list[dict]:
     mech_files = env_regex("AUTOFIX_MECHANICAL_FILES", DEFAULT_MECHANICAL_FILES)
     protected = env_regex("AUTOFIX_PROTECTED_PATHS", "")
     ignore = env_regex("AUTOFIX_IGNORE_CHECKS", DEFAULT_IGNORE_CHECKS)
+    trust_clean = os.environ.get("AUTOFIX_TRUST_CLEAN_STATE") == "true"
 
     if args.pr:
         prs = [gh(f"repos/{repo}/pulls/{n}") for n in args.pr]
     else:
         prs = gh(f"repos/{repo}/pulls?state=open&per_page=100", paginate=True)
+        if len(prs) >= 1000:
+            print("::warning::open PR listing hit the 1000-PR page cap; "
+                  "older PRs are not considered this sweep")
 
     queue: list[dict] = []
     for pr in prs:
@@ -173,17 +279,27 @@ def triage(args: argparse.Namespace) -> list[dict]:
         if detail.get("mergeable") is None:
             print("  skip: GitHub has not computed mergeability yet"); continue
 
-        if not args.pr and args.min_age > 0:
-            # Leave branches alone while their author (often another agent)
-            # is still pushing to them.
-            when = gh(f"repos/{repo}/commits/{pr['head']['sha']}")["commit"][
-                "committer"]["date"]
-            age = (time.time() - calendar.timegm(
-                time.strptime(when, "%Y-%m-%dT%H:%M:%SZ"))) / 60
-            if age < args.min_age:
-                print(f"  skip: head commit is {age:.0f} min old "
-                      f"(< {args.min_age}); author may still be pushing")
+        # Cheapest filters first; the model is only ever reached by PRs that
+        # survive all of them.
+        if not args.pr and args.max_behind > 0:
+            # A PR this far behind needs a rebase or a close, which is a human
+            # (or the hygiene job), not a model. Its conflicts would also
+            # exceed the --depth=300 fetch below.
+            behind = behind_by(repo, pr["base"]["ref"], pr["head"]["sha"])
+            if behind is None:
+                print("  skip: could not determine how far behind main it is")
                 continue
+            if behind > args.max_behind:
+                print(f"  skip: {behind} commits behind {pr['base']['ref']} "
+                      f"(> AUTOFIX_MAX_BEHIND={args.max_behind}); rebase or "
+                      "close it by hand")
+                continue
+
+        if (trust_clean and not args.pr and not conflict
+                and detail.get("mergeable_state") == "clean"
+                and not labels & {L_HAIKU, L_SONNET}):
+            print("  skip: mergeable_state is clean (already green)")
+            continue
 
         runs = check_runs(repo, pr["head"]["sha"], ignore)
         pending = [r["name"] for r in runs if r["status"] != "completed"]
@@ -198,6 +314,19 @@ def triage(args: argparse.Namespace) -> list[dict]:
             else:
                 print(f"  ok ({len(pending)} pending)")
             continue
+
+        if not args.pr and args.min_age > 0:
+            # Leave branches alone while their author (often another agent)
+            # is still pushing to them. Only PRs that need work pay for this.
+            when = gh(f"repos/{repo}/commits/{pr['head']['sha']}")["commit"][
+                "committer"]["date"]
+            age = (time.time() - calendar.timegm(
+                time.strptime(when, "%Y-%m-%dT%H:%M:%SZ"))) / 60
+            if age < args.min_age:
+                print(f"  skip: head commit is {age:.0f} min old "
+                      f"(< {args.min_age}); author may still be pushing")
+                continue
+
         if pending and not conflict:
             print(f"  wait: {len(failing)} failing but {len(pending)} still running")
             continue
@@ -234,6 +363,24 @@ def triage(args: argparse.Namespace) -> list[dict]:
             and all(mech_files and mech_files.search(f) for f in files))
         tier = "haiku" if (checks_mech and files_mech) else "sonnet"
 
+        if args.max_attempts > 0:
+            try:
+                used = attempts_used(repo, n)
+            except RuntimeError as exc:
+                # Unknown history must not become unbounded spend.
+                print(f"  skip: could not read attempt history ({exc})")
+                continue
+            if used >= args.max_attempts:
+                set_labels(repo, n, add=[L_HUMAN], dry=args.dry_run)
+                comment(repo, n,
+                        f"**autofix:** this PR has used {used} of "
+                        f"{args.max_attempts} lifetime autofix attempts "
+                        "(`AUTOFIX_MAX_ATTEMPTS`) and is still broken. Handing it "
+                        "to a human. To allow more, a maintainer can comment "
+                        "`/autofix reset` and remove `needs-human`.",
+                        dry=args.dry_run)
+                continue
+
         if L_SONNET in labels:
             set_labels(repo, n, add=[L_HUMAN], dry=args.dry_run)
             comment(repo, n,
@@ -266,6 +413,17 @@ def triage(args: argparse.Namespace) -> list[dict]:
     return queue
 
 
+def write_outputs(queue: list[dict], paused: bool = False) -> None:
+    payload = json.dumps(queue)
+    print(f"\nqueued {len(queue)}: {payload}")
+    out = os.environ.get("GITHUB_OUTPUT")
+    if out:
+        with open(out, "a") as fh:
+            fh.write(f"matrix={payload}\n")
+            fh.write(f"count={len(queue)}\n")
+            fh.write(f"paused={'true' if paused else 'false'}\n")
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -278,6 +436,19 @@ def main() -> int:
                    default=int(os.environ.get("AUTOFIX_MIN_AGE_MINUTES") or 45),
                    help="minutes since the head commit before a sweep touches "
                         "a PR (ignored with --pr)")
+    p.add_argument("--max-attempts", type=int,
+                   default=env_int("AUTOFIX_MAX_ATTEMPTS", DEFAULT_MAX_ATTEMPTS),
+                   help="lifetime model attempts per PR before needs-human "
+                        "(0 = no cap)")
+    p.add_argument("--max-behind", type=int,
+                   default=env_int("AUTOFIX_MAX_BEHIND", DEFAULT_MAX_BEHIND),
+                   help="skip sweep PRs more than this many commits behind "
+                        "their base (0 = no limit; ignored with --pr)")
+    p.add_argument("--max-queued", type=int,
+                   default=env_int("AUTOFIX_MAX_QUEUED", DEFAULT_MAX_QUEUED),
+                   help="pause a sweep while more workflow runs than this are "
+                        "queued or in progress (0 = never pause; ignored "
+                        "with --pr)")
     p.add_argument("--include-drafts", action="store_true")
     p.add_argument("--dry-run", action="store_true",
                    help="print decisions; change no labels, post no comments")
@@ -285,14 +456,26 @@ def main() -> int:
     if not args.repo:
         p.error("--repo or GITHUB_REPOSITORY is required")
 
+    if not args.pr and args.max_queued > 0:
+        try:
+            depth = queue_depth(args.repo)
+        except (RuntimeError, KeyError, TypeError, ValueError) as exc:
+            # Fail open: the pause is a cost control, and a transient API
+            # error should not silently disable the queue. The attempt cap and
+            # max-per-sweep still bound the damage.
+            print(f"::warning::queue depth unavailable ({exc}); sweeping anyway")
+        else:
+            own = 1 if os.environ.get("GITHUB_RUN_ID") else 0
+            reason = pause_reason(depth, args.max_queued, own)
+            print(f"queue depth: {depth} queued+in_progress runs "
+                  f"(limit {args.max_queued})")
+            if reason:
+                print(f"::notice title=autofix sweep paused::{reason}")
+                write_outputs([], paused=True)
+                return 0
+
     queue = triage(args)
-    payload = json.dumps(queue)
-    print(f"\nqueued {len(queue)}: {payload}")
-    out = os.environ.get("GITHUB_OUTPUT")
-    if out:
-        with open(out, "a") as fh:
-            fh.write(f"matrix={payload}\n")
-            fh.write(f"count={len(queue)}\n")
+    write_outputs(queue)
     return 0
 
 

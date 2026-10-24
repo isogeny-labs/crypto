@@ -1,0 +1,37 @@
+name: autofix-triage-tests
+# Offline unit tests for the autofix queue's triage throttles (lifetime attempt
+# cap, behind-main and green skips, queue-depth pause). No network and no
+# secrets: GitHub is replaced by fixtures. Runs only when the queue's own files
+# change, so unrelated pull requests pay nothing. Not a required check.
+# See .github/ci-autofix-throttle.md.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/scripts/autofix_triage.py'
+      - '.github/scripts/autofix_run.py'
+      - '.github/scripts/test_autofix_triage.py'
+      - '.github/workflows/autofix-queue.yml'
+      - '.github/workflows/autofix-triage-tests.yml'
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions: {}
+
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/scripts/
+      - name: Triage selection and throttle tests
+        run: python3 -B -m unittest discover -s .github/scripts -p 'test_autofix_triage.py' -v
