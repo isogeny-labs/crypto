@@ -1,0 +1,118 @@
+{
+  "base_objects": [
+    {
+      "earlier_roundtrip_status": "PASS_DOWNLOADED_SHA256",
+      "gzip_bytes": 3930670,
+      "gzip_sha256": "115391d004768be1108d02176bceef2c9bad982decd74697cfa77a4f2055f3cd",
+      "head_present_2026_10_24": true,
+      "head_size_match_2026_10_24": true,
+      "k": 992,
+      "s3_uri": "s3://crypto-autoresearcher/factor-bases/icv1/etc/n83_current_source_finalists_20261019/a1/objects/115391d004768be1108d02176bceef2c9bad982decd74697cfa77a4f2055f3cd.jsonl.gz"
+    },
+    {
+      "earlier_roundtrip_status": "PASS_DOWNLOADED_SHA256",
+      "gzip_bytes": 4058350,
+      "gzip_sha256": "fd7a79674ed74e12f70de75f702fe5371f692347d5042541a29f80683bdccce2",
+      "head_present_2026_10_24": true,
+      "head_size_match_2026_10_24": true,
+      "k": 1024,
+      "s3_uri": "s3://crypto-autoresearcher/factor-bases/icv1/etc/n83_current_source_finalists_20261019/a1/objects/fd7a79674ed74e12f70de75f702fe5371f692347d5042541a29f80683bdccce2.jsonl.gz"
+    },
+    {
+      "earlier_roundtrip_status": "PASS_DOWNLOADED_SHA256",
+      "gzip_bytes": 13084292,
+      "gzip_sha256": "a04f4559cc796ae147517bcc7f7483e4deaac189f62cdc939bc7a8bc6d6f668e",
+      "head_present_2026_10_24": true,
+      "head_size_match_2026_10_24": true,
+      "k": 3300,
+      "s3_uri": "s3://crypto-autoresearcher/factor-bases/icv1/etc/n83_current_source_finalists_20261019/a1/objects/a04f4559cc796ae147517bcc7f7483e4deaac189f62cdc939bc7a8bc6d6f668e.jsonl.gz"
+    },
+    {
+      "earlier_roundtrip_status": "PASS_DOWNLOADED_SHA256",
+      "gzip_bytes": 9135776,
+      "gzip_sha256": "d5711731d01b4061c4feaa7c5ec6654b073b40856355ec78fc5fb284b41f266e",
+      "head_present_2026_10_24": true,
+      "head_size_match_2026_10_24": true,
+      "k": 2304,
+      "s3_uri": "s3://crypto-autoresearcher/factor-bases/icv1/etc/n83_current_source_finalists_20261019/a2/objects/d5711731d01b4061c4feaa7c5ec6654b073b40856355ec78fc5fb284b41f266e.jsonl.gz"
+    },
+    {
+      "earlier_roundtrip_status": "PASS_DOWNLOADED_SHA256",
+      "gzip_bytes": 4387310,
+      "gzip_sha256": "ccdbf619478990570bfba982c7d1bdfe361ed4530c32407ece4a7ad1be5c42a5",
+      "head_present_2026_10_24": true,
+      "head_size_match_2026_10_24": true,
+      "k": 1107,
+      "s3_uri": "s3://crypto-autoresearcher/factor-bases/icv1/etc/n83_current_source_finalists_20261019/a2/objects/ccdbf619478990570bfba982c7d1bdfe361ed4530c32407ece4a7ad1be5c42a5.jsonl.gz"
+    }
+  ],
+  "notes": [
+    "Both independent local stratum replays exactly matched the archived cloud analyses.",
+    "The two IC binaries and two rho binaries have different SHA-256 values, so the frozen cross-stratum selector rejects this run.",
+    "The first three base objects and final two base objects have earlier downloaded-byte SHA checks in their separate sealed custody receipts."
+  ],
+  "provider_run_attempt": 1,
+  "provider_run_id": 39282996293,
+  "recorded_run_commit": "8bf07aefb3fb2a65248ce379da7284cb58a5581d",
+  "schema": "n83.fresh-cold-finalists-custody/v1",
+  "selected_best_total_runtime": null,
+  "selection_gate": "same_source_and_binary",
+  "sha256": {
+    "provider_jobs": "a7ab829d37bf8892a41e198c6e8a908c904c6b69466264b4eabde3dcf1a8959b",
+    "selection": "a268dcbe9fe7c59ce203403e2e049c8dfafd6659badf54440ba3b692a69bda77",
+    "validated_rows": "c233ceaae477309dbe678c84190c094e7b44cba3f1779363c0c89afd143643dc"
+  },
+  "status": "CENSORED_BINARY_MISMATCH",
+  "strata": [
+    {
+      "calibration_status": "PASS_10_PERCENT_PER_PAIR",
+      "cloud_analysis_sha256": "3613725134484e44d5601e162d0929d9b79fdf53c7571198cf53974aac0f0d2c",
+      "evidence_status": "PASS_INDEPENDENT_REPLAY",
+      "expanded_bytes": 998031129,
+      "github_artifact_id": 12213496669,
+      "github_job_id": 118161048148,
+      "github_runner_id": 1000355402,
+      "ic_binary_sha256": "c4af7e27c0c7918c41e32cff89ec33b5e0d72ac429715831a4e8aded9ed4517a",
+      "local_replay_exit": 0,
+      "local_replay_stderr_empty": true,
+      "local_replay_stdout_sha256": "c55f4edc0edb7087abc411517da7da9861fae5eb751eb2b72a951200750f7168",
+      "provider_and_s3_bytes_equal": true,
+      "raw_archive_bytes": 293347392,
+      "raw_archive_sha256": "5e0f57d376b0d2344dad4b02772a4c921746d2232743f13e92010b98a1116ded",
+      "rho_binary_sha256": "4af717e15faaabf0335a194a3dd5d782519d7e15655c17390d93ce460d568b38",
+      "s3_head_sha256_metadata": "5e0f57d376b0d2344dad4b02772a4c921746d2232743f13e92010b98a1116ded",
+      "s3_uri": "s3://crypto-autoresearcher/factor-bases/icv1/etc/n83_current_source_finalists_20261019/run_39282996293/stratum_0.zip",
+      "safe_unique_zip_members": true,
+      "source_sha256": "4a94e4e570f0cc4e39ba5c0846e411a6c43820c28119f7b9802e549023596507",
+      "stratum": 0,
+      "stratum_status": "STRATUM_ADMITTED",
+      "tier_status": "PASS_TIER1",
+      "zip_member_count": 2320
+    },
+    {
+      "calibration_status": "PASS_10_PERCENT_PER_PAIR",
+      "cloud_analysis_sha256": "b87da532d163a2a530dcfb095c1d14b42d074c168055dbac072e69a691d94fb4",
+      "evidence_status": "PASS_INDEPENDENT_REPLAY",
+      "expanded_bytes": 998015437,
+      "github_artifact_id": 12210758551,
+      "github_job_id": 118161048170,
+      "github_runner_id": 1000355401,
+      "ic_binary_sha256": "4be33ac0a9ce5bc1d9f0206c5ccb58e24bbac1e75d40f43a40ffbaf7e827026e",
+      "local_replay_exit": 0,
+      "local_replay_stderr_empty": true,
+      "local_replay_stdout_sha256": "5ada414cd037304d9529c18e1050fe46d2124b1e79c3011375df93c2194d2a19",
+      "provider_and_s3_bytes_equal": true,
+      "raw_archive_bytes": 293341687,
+      "raw_archive_sha256": "21af4a8bacd00ff192357fb2ac588cd3eac4a7bbc55fb47ac1311e83cedeb806",
+      "rho_binary_sha256": "4ed1335f55240ff98470caf0096b9c0cbb3da0a01b157ce88bc83cf886f761e9",
+      "s3_head_sha256_metadata": "21af4a8bacd00ff192357fb2ac588cd3eac4a7bbc55fb47ac1311e83cedeb806",
+      "s3_uri": "s3://crypto-autoresearcher/factor-bases/icv1/etc/n83_current_source_finalists_20261019/run_39282996293/stratum_1.zip",
+      "safe_unique_zip_members": true,
+      "source_sha256": "4a94e4e570f0cc4e39ba5c0846e411a6c43820c28119f7b9802e549023596507",
+      "stratum": 1,
+      "stratum_status": "STRATUM_ADMITTED",
+      "tier_status": "PASS_TIER1",
+      "zip_member_count": 2320
+    }
+  ]
+}
