@@ -35,6 +35,7 @@
 //! | `mitm-frobenius` | 2 or 3 | the same on a Frobenius-folded table (Koblitz) |
 //! | `mitm-frobenius-counted` | 2 or 3 | the same table and probe, with native table setup counters |
 //! | `rootfind-subtract` | 2 or 3 | prime curves: `prime_fast`'s direct-subtraction root finding, every `x(R ∓ F_i)` of a target from one Montgomery batched inversion, then a lookup (`m = 2`) or a probe of the negation-folded pair table (`m = 3`) |
+//! | `chained-x` | 2, 3 or 4 | Koblitz subspace bases: the chained `x`-frame descent (`groebner_decompose`), `m − 1` Semaev `S₃` links solved by boolean F4 with splitting |
 //!
 //! The pair table is where memory buys time, and `mitm`'s
 //! `negation_folded` parameter halves the additions that build it.
@@ -2705,6 +2706,343 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for SymmetrisedOracle<'_> {
     }
 }
 
+// ── The chained x-frame descent as an oracle ────────────────────────
+
+/// Why one call of [`ChainedXOracle`] ended, with what it consumed:
+/// the per-target record the discrepancy protocol of round 6 (R6.1)
+/// asks every driver to keep.
+#[derive(Clone, Debug, serde::Serialize)]
+pub struct ChainedXCall {
+    /// `found`, `refuted` (the solve completed without a liftable root),
+    /// `budget` (the node budget ran out), `unbuildable` (no system for
+    /// this target) or `lift_failure` (a root whose abscissae did not
+    /// re-lift through the framework's sign resolution).
+    pub outcome: &'static str,
+    /// Algebraic reductions consumed: the unit `node_budget` caps.
+    pub reductions: u64,
+    pub splits: u64,
+    pub word_xors: u64,
+    pub wall_ns: u64,
+}
+
+/// Decompose over an `F_2`-subspace base by the library's chained
+/// `x`-frame descent ([`groebner_decompose`]): `m − 1` Semaev `S₃`
+/// links with `(m − 2)·n` free intermediate abscissae, solved by the
+/// repository's boolean F4 with splitting.
+///
+/// This is the system round 4 (lead 16.1) found feasible wherever the
+/// symmetrised oracle is, which `ic` could not run before: the
+/// `descent-algebraic` oracle is the direct `S_{m+1}` descent only.
+/// `m = 2, 3, 4`; the layout has `m·ℓ + (m − 2)·n` unknowns and is
+/// refused above the engine's 64.
+///
+/// ## What it charges
+///
+/// Engine work in word XORs, through `solver_totals`, in the same unit
+/// string and by the same rule as the `inherited-f4` adapter and the
+/// `symmetrised` oracle; the sign resolution goes through the
+/// framework's `lift_abscissae`, so its group additions are charged to
+/// `ops`.
+///
+/// ## Parameters
+///
+/// `m` (2, 3 or 4), `engine` (`inherited-f4` default, `matrix-f4`,
+/// `matrix-f5`), `max_degree` (Macaulay cap, default 3), `node_budget`
+/// (algebraic reduction calls before a solve gives up, default 4096) and
+/// `trace` (`1` keeps a [`ChainedXCall`] per call in `calls`).
+pub struct ChainedXOracle<'i> {
+    summands: u32,
+    instance: &'i BinaryInstance,
+    view: Option<crate::cryptanalysis::koblitz_index_calculus::FrobeniusFactorBase>,
+    index_of: std::collections::HashMap<(num_bigint::BigUint, num_bigint::BigUint), usize>,
+    st: Option<FieldStructure>,
+    engine: SolverEngine,
+    node_budget: usize,
+    shape: Option<SystemShape>,
+    totals: SolverTotals,
+    trace: bool,
+    /// One record per call when `trace=1`.
+    pub calls: Vec<ChainedXCall>,
+    /// Roots that lifted in the descent but not through the framework.
+    pub unliftable: u64,
+    /// Targets the system could not be built for.
+    pub unbuildable: u64,
+}
+
+impl<'i> ChainedXOracle<'i> {
+    pub fn new(summands: u32, instance: &'i BinaryInstance) -> Self {
+        Self {
+            summands,
+            instance,
+            view: None,
+            index_of: Default::default(),
+            st: None,
+            engine: SolverEngine::InheritedF4 { max_degree: 3 },
+            node_budget: 4096,
+            shape: None,
+            totals: SolverTotals::default(),
+            trace: false,
+            calls: Vec::new(),
+            unliftable: 0,
+            unbuildable: 0,
+        }
+    }
+
+    /// Unknowns of the chained layout for subspace dimension `ell`.
+    pub fn layout_vars(m: usize, ell: usize, n: usize) -> usize {
+        m * ell + m.saturating_sub(2) * n
+    }
+
+    fn record(&mut self, call: ChainedXCall) {
+        if self.trace {
+            self.calls.push(call);
+        }
+    }
+}
+
+impl<'a> DecompositionOracle<BinaryGroup<'a>> for ChainedXOracle<'_> {
+    fn name(&self) -> &str {
+        "chained-x"
+    }
+
+    fn summands(&self) -> u32 {
+        self.summands
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "chained x-frame descent: {} S3 links over the base's subspace, {} (Macaulay cap {}, {} reduction calls)",
+            self.summands.saturating_sub(1),
+            params.get("engine").unwrap_or("inherited-f4"),
+            params.get("max_degree").unwrap_or("3"),
+            params.get("node_budget").unwrap_or("4096"),
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("m", "summands, 2, 3 or 4 (m − 1 chained S3 links)"),
+            ("engine", "inherited-f4 (default), matrix-f4 or matrix-f5"),
+            (
+                "max_degree",
+                "highest Macaulay degree built before splitting (default 3)",
+            ),
+            (
+                "node_budget",
+                "algebraic reduction calls before a solve gives up (default 4096)",
+            ),
+            (
+                "trace",
+                "1 keeps a per-call record (outcome, reductions, XORs)",
+            ),
+        ]
+    }
+
+    fn prepare(
+        &mut self,
+        _ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<(), String> {
+        if !(2..=4).contains(&self.summands) {
+            return Err(format!(
+                "chained-x takes m = 2, 3 or 4, got {}",
+                self.summands
+            ));
+        }
+        let kc =
+            self.instance.koblitz.as_ref().ok_or(
+                "chained-x needs a Koblitz instance (the library's chained descent is b = 1)",
+            )?;
+        let words = fb.subspace_basis.as_ref().ok_or(
+            "chained-x needs a factor base whose abscissae form an F_2-subspace; \
+             use binary-subspace or koblitz-orbit",
+        )?;
+        let n = kc.n;
+        let basis: Vec<crate::binary_ecc::F2mElement> = words
+            .iter()
+            .map(|&w| crate::binary_ecc::F2mElement::from_biguint(&num_bigint::BigUint::from(w), n))
+            .collect();
+        let vars = Self::layout_vars(self.summands as usize, basis.len(), n as usize);
+        if vars > crate::cryptanalysis::koblitz_groebner::MAX_VARS {
+            return Err(format!(
+                "the chained layout at m = {} needs {vars} unknowns (dimension {}, n = {n}); \
+                 the engine holds {}",
+                self.summands,
+                basis.len(),
+                crate::cryptanalysis::koblitz_groebner::MAX_VARS
+            ));
+        }
+        let view =
+            crate::cryptanalysis::koblitz_symmetrised::plain_subspace_factor_base(kc, &basis)
+                .ok_or("the base's subspace basis is not linearly independent")?;
+        // The descent names points of its own view.  Every base point must
+        // be one of them; a view point the base leaves out (`binary-subspace`
+        // drops the abscissa 0) is removed from the lift's index, so a root
+        // through it is never returned as a relation.
+        let mut index_of = view.index_map();
+        let mut in_base = 0usize;
+        for p in &view.points {
+            if fb.index_of_key(self.instance.fast.lift(p).pack()).is_some() {
+                in_base += 1;
+            } else {
+                index_of.remove(&crate::cryptanalysis::koblitz_index_calculus::point_key(p));
+            }
+        }
+        if in_base != fb.points.len() {
+            return Err(format!(
+                "chained-x: {} of the base's {} points lie over the base's subspace; \
+                 the base is not the subspace base its basis names",
+                in_base,
+                fb.points.len()
+            ));
+        }
+        let max_degree = params.u64_or("max_degree", 3)? as u32;
+        self.engine = match params.get("engine").unwrap_or("inherited-f4") {
+            "inherited-f4" => SolverEngine::InheritedF4 { max_degree },
+            "matrix-f4" => SolverEngine::MatrixF4 { max_degree },
+            "matrix-f5" => SolverEngine::MatrixF5 { max_degree },
+            other => {
+                return Err(format!(
+                    "unknown engine `{other}`; try inherited-f4, matrix-f4 or matrix-f5"
+                ))
+            }
+        };
+        self.node_budget = params.u64_or("node_budget", 4096)? as usize;
+        self.trace = params.u64_or("trace", 0)? == 1;
+        let st = FieldStructure::new(n, &kc.curve.irreducible);
+        let g = self.instance.fast.lower(self.instance.generator);
+        let crate::binary_ecc::BinaryPoint::Affine { x: x_g, .. } = &g else {
+            return Err("the generator is the point at infinity".into());
+        };
+        let sys = crate::cryptanalysis::koblitz_groebner::build_decomposition_system(
+            &basis,
+            x_g,
+            &kc.curve.b,
+            self.summands as usize,
+            &st,
+        )
+        .ok_or("the chained system could not be built for the generator")?;
+        self.shape = Some(
+            BooleanSystem {
+                equations: sys.equations,
+                n_vars: sys.n_vars,
+            }
+            .shape(),
+        );
+        self.totals = SolverTotals {
+            solver: format!(
+                "chained-x {} (cap {}, budget {})",
+                match self.engine {
+                    SolverEngine::InheritedF4 { .. } => "inherited-f4",
+                    SolverEngine::MatrixF4 { .. } => "matrix-f4",
+                    SolverEngine::MatrixF5 { .. } => "matrix-f5",
+                    _ => "engine",
+                },
+                max_degree,
+                self.node_budget
+            ),
+            ..Default::default()
+        };
+        self.index_of = index_of;
+        self.view = Some(view);
+        self.st = Some(st);
+        self.calls.clear();
+        Ok(())
+    }
+
+    fn decompose(
+        &mut self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: FastPoint,
+    ) -> Option<Vec<usize>> {
+        let kc = self.instance.koblitz.as_ref()?;
+        let (Some(view), Some(st), Some(shape)) = (&self.view, &self.st, &self.shape) else {
+            return None;
+        };
+        let target = self.instance.fast.lower(point);
+        let before = f4_word_ops_thread();
+        let started = Instant::now();
+        let (relation, stats) = crate::cryptanalysis::koblitz_index_calculus::groebner_decompose(
+            kc,
+            view,
+            &self.index_of,
+            st,
+            &target,
+            self.summands as usize,
+            self.engine,
+            self.node_budget,
+        );
+        let word_xors = f4_word_ops_thread().wrapping_sub(before);
+        let wall_ns = started.elapsed().as_nanos() as u64;
+        let mut call = ChainedXCall {
+            outcome: "refuted",
+            reductions: stats.reductions as u64,
+            splits: stats.splits as u64,
+            word_xors,
+            wall_ns,
+        };
+        if stats.unsupported {
+            self.unbuildable += 1;
+            call.outcome = "unbuildable";
+            self.record(call);
+            return None;
+        }
+        let shape = shape.clone();
+        let exhausted = stats.exhausted;
+        let mut extra = BTreeMap::new();
+        extra.insert("splits".to_string(), stats.splits as u64);
+        extra.insert("reductions".to_string(), stats.reductions as u64);
+        extra.insert("oversize".to_string(), stats.oversize as u64);
+        let cost = SolverCost {
+            ops: word_xors,
+            op_unit: "word XORs (elimination, specialisation and linear elimination only)".into(),
+            wall_ns,
+            peak_bytes: 0,
+            degree_reached: Some(stats.max_degree_built),
+            solving_degree: None,
+            timed_out: exhausted,
+            extra,
+        };
+        self.totals.absorb(&shape, Some(&cost), exhausted);
+        let Some(indices) = relation else {
+            call.outcome = if exhausted { "budget" } else { "refuted" };
+            self.record(call);
+            return None;
+        };
+        let xs: Vec<u64> = indices
+            .iter()
+            .map(|&i| self.instance.fast.lift(&view.points[i]).x)
+            .collect();
+        match crate::cryptanalysis::ic_boundary::lift_abscissae(ctx.group, fb, ops, &xs, point) {
+            Some(found) => {
+                call.outcome = "found";
+                self.record(call);
+                Some(found)
+            }
+            None => {
+                counters.lift_failures += 1;
+                self.unliftable += 1;
+                call.outcome = "lift_failure";
+                self.record(call);
+                None
+            }
+        }
+    }
+
+    fn last_system(&self) -> Option<SystemShape> {
+        self.shape.clone()
+    }
+
+    fn solver_totals(&self) -> Option<SolverTotals> {
+        Some(self.totals.clone())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2747,6 +3085,116 @@ mod tests {
         assert!(divisor_indices(&p)
             .unwrap_err()
             .contains("`x` is not a number"));
+    }
+
+    fn koblitz_ctx<'a>(
+        inst: &BinaryInstance,
+        g: &'a BinaryGroup<'a>,
+    ) -> InstanceCtx<'a, BinaryGroup<'a>> {
+        InstanceCtx {
+            group: g,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        }
+    }
+
+    /// Every relation the chained oracle returns re-sums to its target,
+    /// every completed refusal agrees with exhaustive enumeration over
+    /// the base, and the per-call trace accounts for every call.
+    #[test]
+    fn chained_x_relations_resum_and_refutations_match_enumeration() {
+        let inst = koblitz_instance(1, 11).expect("registered n11 Koblitz instance");
+        let g = BinaryGroup(&inst.fast);
+        let ctx = koblitz_ctx(&inst, &g);
+        let (_, base_params) = Params::parse_spec("binary-subspace:dimension=5").unwrap();
+        let mut ops = GroupOps::default();
+        let fb = BinarySubspaceBase { instance: &inst }
+            .build(&ctx, &base_params, &mut ops)
+            .unwrap();
+        let fc = &inst.fast;
+        for m in [2u32, 3] {
+            let (_, params) =
+                Params::parse_spec(&format!("chained-x:m={m},node_budget=4096,trace=1")).unwrap();
+            let mut oracle = ChainedXOracle::new(m, &inst);
+            oracle.prepare(&ctx, &fb, &params, &mut ops).unwrap();
+            let mut counters = OracleCounters::default();
+            let (mut found, mut refuted) = (0, 0);
+            let mut target = inst.generator;
+            for _ in 0..24 {
+                target = fc.add(target, fc.add(inst.generator, target));
+                let decomposes = match m {
+                    2 => fb
+                        .points
+                        .iter()
+                        .any(|&p| fb.index_of_key(fc.add(target, fc.neg(p)).pack()).is_some()),
+                    _ => fb.points.iter().any(|&p| {
+                        fb.points.iter().any(|&q| {
+                            let rest = fc.add(fc.add(target, fc.neg(p)), fc.neg(q));
+                            fb.index_of_key(rest.pack()).is_some()
+                        })
+                    }),
+                };
+                match oracle.decompose(&ctx, &fb, &mut ops, &mut counters, target) {
+                    Some(idx) => {
+                        assert_eq!(idx.len(), m as usize);
+                        let sum = idx
+                            .iter()
+                            .fold(FastPoint::INFINITY, |s, &i| fc.add(s, fb.points[i]));
+                        assert_eq!(sum, target, "m = {m}: relation does not re-sum");
+                        found += 1;
+                    }
+                    None => {
+                        let last = oracle.calls.last().unwrap();
+                        if last.outcome == "refuted" {
+                            assert!(!decomposes, "m = {m}: refuted a decomposable target");
+                            refuted += 1;
+                        }
+                    }
+                }
+            }
+            assert_eq!(oracle.calls.len(), 24);
+            assert!(found > 0, "m = {m}: no relation in 24 targets");
+            assert!(found + refuted > 12, "m = {m}: mostly budget-limited");
+            let totals = oracle.solver_totals().unwrap();
+            assert_eq!(totals.calls, 24);
+            assert!(totals.ops > 0);
+        }
+    }
+
+    /// The layout guard and the arity guard refuse in `prepare`, once.
+    #[test]
+    fn chained_x_refuses_bad_arity_and_oversize_layouts() {
+        let inst = koblitz_instance(1, 11).expect("registered n11 Koblitz instance");
+        let g = BinaryGroup(&inst.fast);
+        let ctx = koblitz_ctx(&inst, &g);
+        let mut ops = GroupOps::default();
+        let (_, base_params) = Params::parse_spec("binary-subspace:dimension=5").unwrap();
+        let fb = BinarySubspaceBase { instance: &inst }
+            .build(&ctx, &base_params, &mut ops)
+            .unwrap();
+        let params = Params::default();
+        let err = ChainedXOracle::new(5, &inst)
+            .prepare(&ctx, &fb, &params, &mut ops)
+            .unwrap_err();
+        assert!(err.contains("m = 2, 3 or 4"), "{err}");
+        assert_eq!(ChainedXOracle::layout_vars(4, 9, 17), 70);
+        // n = 17, dimension 8, m = 4: 4·8 + 2·17 = 66 > 64.
+        let inst13 = koblitz_instance(1, 17).expect("registered n17 Koblitz instance");
+        let g13 = BinaryGroup(&inst13.fast);
+        let ctx13 = koblitz_ctx(&inst13, &g13);
+        let (_, big) = Params::parse_spec("binary-subspace:dimension=8").unwrap();
+        let fb_big = BinarySubspaceBase { instance: &inst13 }
+            .build(&ctx13, &big, &mut ops)
+            .unwrap();
+        let err = ChainedXOracle::new(4, &inst13)
+            .prepare(&ctx13, &fb_big, &params, &mut ops)
+            .unwrap_err();
+        assert!(err.contains("66 unknowns"), "{err}");
     }
 
     #[test]
