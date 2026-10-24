@@ -1516,7 +1516,11 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
                 for &(ma, mb) in &multipliers {
                     let sa = to_scalar(ma);
                     let sb = to_scalar(mb);
-                    let pa = if sa == 0 { g.identity() } else { g.mul(ops, seed, sa) };
+                    let pa = if sa == 0 {
+                        g.identity()
+                    } else {
+                        g.mul(ops, seed, sa)
+                    };
                     let pb = if sb == 0 {
                         g.identity()
                     } else {
@@ -1534,7 +1538,14 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
                     seen.insert(g.key(&nimg));
                     let weight = ((sa as u128 + (sb as u128 * lambda as u128) % r as u128)
                         % r as u128) as u64;
-                    push_pair(&mut points, &mut col_of, &mut coef_of, image, column, weight);
+                    push_pair(
+                        &mut points,
+                        &mut col_of,
+                        &mut coef_of,
+                        image,
+                        column,
+                        weight,
+                    );
                 }
             }
             if columns == size {
@@ -1674,7 +1685,10 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinaryMultiplierBase<'_> {
             }
         }
         FactorBase::from_column_map(
-            format!("{columns} seeds with multiples [1..{mult}]P ({} points)", points.len()),
+            format!(
+                "{columns} seeds with multiples [1..{mult}]P ({} points)",
+                points.len()
+            ),
             points,
             col_of,
             coef_of,
@@ -3161,7 +3175,10 @@ mod tests {
                 .build(&ctx, &params, &mut ops)
                 .unwrap();
             assert_eq!(fb.columns, 5);
-            assert!(fb.points.len() > 5 * 2 * 3, "multiples add points ({family:?})");
+            assert!(
+                fb.points.len() > 5 * 2 * 3,
+                "multiples add points ({family:?})"
+            );
             let mut seeds: Vec<Option<PrimePoint>> = vec![None; fb.columns];
             for (i, p) in fb.points.iter().enumerate() {
                 if fb.coef_of[i] == 1 && seeds[fb.col_of[i]].is_none() {

@@ -1042,7 +1042,10 @@ fn construct_base_norm(
     u64,
     Vec<u64>,
 ) {
-    assert!(norm_cap > 0 && fast.a == 0, "KIC_NORM needs a = 0 (mu = -1)");
+    assert!(
+        norm_cap > 0 && fast.a == 0,
+        "KIC_NORM needs a = 0 (mu = -1)"
+    );
     let gf = &fast.gf;
     let n = fast.n as usize;
     let lambda = curve.lambda.to_u64().unwrap();
@@ -1063,21 +1066,23 @@ fn construct_base_norm(
     let mut orbit_reps = Vec::new();
     let mut scanned = 0u64;
     let mut raw_x = 1u64;
-    let push_orbit =
-        |points: &mut Vec<FastPoint>, labels: &mut Vec<(usize, u64)>, column: usize,
-         (px, py): (u64, u64), weight: u64| {
-            let (mut cx, mut cy) = (px, py);
-            let mut coefficient = weight;
-            for _ in 0..n {
-                points.push(Some((cx, cy)));
-                labels.push((column, coefficient));
-                points.push(Some((cx, cx ^ cy)));
-                labels.push((column, (r - coefficient) % r));
-                cx = gf.sqr(cx);
-                cy = gf.sqr(cy);
-                coefficient = mulmod(coefficient, lambda, r);
-            }
-        };
+    let push_orbit = |points: &mut Vec<FastPoint>,
+                      labels: &mut Vec<(usize, u64)>,
+                      column: usize,
+                      (px, py): (u64, u64),
+                      weight: u64| {
+        let (mut cx, mut cy) = (px, py);
+        let mut coefficient = weight;
+        for _ in 0..n {
+            points.push(Some((cx, cy)));
+            labels.push((column, coefficient));
+            points.push(Some((cx, cx ^ cy)));
+            labels.push((column, (r - coefficient) % r));
+            cx = gf.sqr(cx);
+            cy = gf.sqr(cy);
+            coefficient = mulmod(coefficient, lambda, r);
+        }
+    };
     while reps.len() < columns {
         scanned += 1;
         for point in fast.points_with_x(b, raw_x) {
@@ -2171,7 +2176,10 @@ mod wide {
         u64,
         Vec<u128>,
     ) {
-        assert!(norm_cap > 0 && fast.a == 0, "KIC_NORM needs a = 0 (mu = -1)");
+        assert!(
+            norm_cap > 0 && fast.a == 0,
+            "KIC_NORM needs a = 0 (mu = -1)"
+        );
         let gf = &fast.gf;
         let n = fast.n as usize;
         let lambda = curve.lambda.to_u64().unwrap();
@@ -2730,7 +2738,10 @@ mod wide {
         });
         println!("{summary}");
         if let Ok(path) = std::env::var("KIC_DUMP_BASE") {
-            assert_eq!(norm_cap, 0, "KIC_DUMP_BASE does not record KIC_NORM orbit representatives");
+            assert_eq!(
+                norm_cap, 0,
+                "KIC_DUMP_BASE does not record KIC_NORM orbit representatives"
+            );
             let dump = json!({
                 "kind":"point_defined_factor_base",
                 "n":n, "a":a,
@@ -3424,7 +3435,10 @@ fn main() -> ExitCode {
     }
     println!("{summary}");
     if let Ok(path) = std::env::var("KIC_DUMP_BASE") {
-        assert_eq!(norm_cap, 0, "KIC_DUMP_BASE does not record KIC_NORM orbit representatives");
+        assert_eq!(
+            norm_cap, 0,
+            "KIC_DUMP_BASE does not record KIC_NORM orbit representatives"
+        );
         let dump = json!({
             "kind":"point_defined_factor_base",
             "n":n, "a":a,
@@ -3587,10 +3601,7 @@ mod norm_base_tests {
         assert_eq!(distinct.len(), orbits.len());
         for (point, &(column, coefficient)) in points.iter().zip(&labels) {
             let seed = reps[column].map(|[x, y]| (x, y));
-            assert_eq!(
-                fast.scalar_mul(seed, &BigUint::from(coefficient)),
-                *point
-            );
+            assert_eq!(fast.scalar_mul(seed, &BigUint::from(coefficient)), *point);
         }
     }
 
