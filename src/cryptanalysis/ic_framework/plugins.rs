@@ -947,6 +947,220 @@ impl FactorBaseBuilder<PrimeCurve> for GlvOrbitBase<'_> {
     }
 }
 
+/// **Lead A1 on a prime-field CM curve**: the `Z[φ]` multiplier closure
+/// over the curve's small CM endomorphism (`D = −7, −8`: degree 2;
+/// `D = −11`: degree 3; or the free automorphism of a `j = 0` / `1728` curve), the prime-field twin of
+/// `compact-orbit-scan:norm=N`.  Every seed `P` contributes, for each
+/// `α = a + bφ` of norm `a² + t·ab + d·b² ≤ norm` (`φ² − tφ + d = 0`),
+/// the point `α(P) = [a]P + [b]φ(P)` on `P`'s column with weight
+/// `a + bλ`, so `K` seeds behave like `K·M` independent points for the
+/// pair table while the rank stage needs `K + 1` relations.  `norm = 0`
+/// takes the seeds alone (the control).  The endomorphism comes from
+/// `glv_invariant_base::velu_degree{2,3}_endomorphisms`; its evaluation
+/// is charged as one inversion-equivalent group addition per image.
+pub struct CmMultiplierBase<'i> {
+    pub instance: &'i PrimeInstance,
+}
+
+impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
+    fn name(&self) -> &str {
+        "cm-multiplier"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "{} smallest-abscissa seeds, each with its Z[phi] multiples of norm <= {} on its column",
+            params.get("size").unwrap_or("?"),
+            params.get("norm").unwrap_or("0")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("size", "seed abscissae (columns)"),
+            (
+                "norm",
+                "include alpha(P) for every alpha = a + b*phi of norm <= this; 0 or absent: seeds only",
+            ),
+            ("endo", "index of the curve's CM endomorphism; default 0"),
+        ]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        use crate::cryptanalysis::glv_invariant_base::{
+            smallest_abscissa_points, velu_degree2_endomorphisms, velu_degree3_endomorphisms,
+            Endomorphism,
+        };
+        let inst = self.instance;
+        let g = ctx.group;
+        let r = ctx.r;
+        let size = params.u64("size")? as usize;
+        if size == 0 {
+            return Err("size must be positive".into());
+        }
+        let norm_cap = match params.get("norm") {
+            None => 0i64,
+            Some(_) => params.u64("norm")? as i64,
+        };
+        let which = match params.get("endo") {
+            None => 0usize,
+            Some(_) => params.u64("endo")? as usize,
+        };
+        let mut endos: Vec<Box<dyn Endomorphism<PrimeCurve>>> = Vec::new();
+        // The curve's own automorphism (`j = 0`: zeta_3, `j = 1728`: i) is
+        // free to evaluate; it comes first, after the leading negation.
+        if let Ok(gens) = crate::cryptanalysis::glv_invariant_base::automorphism_generators(
+            inst,
+            AutomorphismGroup::Auto,
+        ) {
+            endos.extend(gens.into_iter().skip(1));
+        }
+        for e in velu_degree2_endomorphisms(inst) {
+            endos.push(Box::new(e));
+        }
+        for e in velu_degree3_endomorphisms(inst) {
+            endos.push(Box::new(e));
+        }
+        if norm_cap > 0 && endos.is_empty() {
+            return Err(
+                "cm-multiplier needs a curve with a rational degree-2 or degree-3 CM endomorphism (--family d7, d8 or d11)".into(),
+            );
+        }
+        let endo = endos.get(which);
+        let (lambda, degree, trace) = match endo {
+            Some(e) => {
+                let l = e.eigenvalue();
+                let d = e.degree() as i64;
+                let lm = l as i128;
+                let rm = r as i128;
+                let t = (-8i64..=8)
+                    .find(|&t| (lm * lm - t as i128 * lm + d as i128).rem_euclid(rm) == 0)
+                    .ok_or("eigenvalue does not satisfy a small characteristic polynomial")?;
+                (l, d, t)
+            }
+            None => (0, 0, 0),
+        };
+        let mut multipliers: Vec<(i64, i64)> = Vec::new();
+        if norm_cap > 0 {
+            let bound = ((4 * norm_cap) as f64).sqrt() as i64 + 2;
+            for a in -bound..=bound {
+                for b in -bound..=bound {
+                    if (a, b) != (0, 0) && a * a + trace * a * b + degree * b * b <= norm_cap {
+                        multipliers.push((a, b));
+                    }
+                }
+            }
+        }
+        let to_scalar = |v: i64| -> u64 { v.rem_euclid(r as i64) as u64 };
+        let mut points: Vec<PrimePoint> = Vec::new();
+        let mut col_of: Vec<usize> = Vec::new();
+        let mut coef_of: Vec<u64> = Vec::new();
+        let mut seen: HashSet<u64> = HashSet::new();
+        let mut columns = 0usize;
+        let mut endo_applies = 0u64;
+        let push_pair = |points: &mut Vec<PrimePoint>,
+                         col_of: &mut Vec<usize>,
+                         coef_of: &mut Vec<u64>,
+                         q: PrimePoint,
+                         column: usize,
+                         weight: u64| {
+            points.push(q);
+            col_of.push(column);
+            coef_of.push(weight);
+            let nq = g.neg(q);
+            if nq != q {
+                points.push(nq);
+                col_of.push(column);
+                coef_of.push((r - weight) % r);
+            }
+        };
+        // Seeds: the smallest abscissae (one per sign pair), projected into
+        // the order-r subgroup; a little slack covers projections that
+        // collide or vanish.
+        let candidates = smallest_abscissa_points(inst, 2 * size + 16);
+        let mut last_x = u64::MAX;
+        for cand in &candidates {
+            if cand.x == last_x {
+                continue;
+            }
+            last_x = cand.x;
+            let seed = if ctx.cofactor == 1 {
+                *cand
+            } else {
+                g.mul(ops, *cand, ctx.cofactor)
+            };
+            let nseed = g.neg(seed);
+            if g.is_identity(&seed) || seen.contains(&g.key(&seed)) || seen.contains(&g.key(&nseed))
+            {
+                continue;
+            }
+            seen.insert(g.key(&seed));
+            seen.insert(g.key(&nseed));
+            let column = columns;
+            columns += 1;
+            push_pair(&mut points, &mut col_of, &mut coef_of, seed, column, 1);
+            if !multipliers.is_empty() {
+                let e = endo.ok_or("no endomorphism")?;
+                let phi_seed = e.apply(g, seed);
+                endo_applies += 1;
+                if e.degree() > 1 {
+                    ops.adds += 1; // an inversion-equivalent evaluation of phi
+                }
+                for &(ma, mb) in &multipliers {
+                    let sa = to_scalar(ma);
+                    let sb = to_scalar(mb);
+                    let pa = if sa == 0 { g.identity() } else { g.mul(ops, seed, sa) };
+                    let pb = if sb == 0 {
+                        g.identity()
+                    } else {
+                        g.mul(ops, phi_seed, sb)
+                    };
+                    let image = g.add(ops, pa, pb);
+                    if g.is_identity(&image) {
+                        continue;
+                    }
+                    let nimg = g.neg(image);
+                    if seen.contains(&g.key(&image)) || seen.contains(&g.key(&nimg)) {
+                        continue;
+                    }
+                    seen.insert(g.key(&image));
+                    seen.insert(g.key(&nimg));
+                    let weight = ((sa as u128 + (sb as u128 * lambda as u128) % r as u128)
+                        % r as u128) as u64;
+                    push_pair(&mut points, &mut col_of, &mut coef_of, image, column, weight);
+                }
+            }
+            if columns == size {
+                break;
+            }
+        }
+        if columns < size {
+            return Err(format!("only {columns} of {size} seeds found"));
+        }
+        let curve = &inst.curve;
+        let mut fb = FactorBase::from_column_map(
+            format!(
+                "{columns} seeds with Z[phi] multiples of norm <= {norm_cap} ({} points)",
+                points.len()
+            ),
+            points,
+            col_of,
+            coef_of,
+            columns,
+            |p| curve.key(p),
+            |p| curve.key(&curve.neg(*p)),
+            |p| p.x,
+        )?;
+        fb.cost.count("endomorphism_applies", endo_applies);
+        Ok(fb)
+    }
+}
+
 /// The `ψ`-stable line of a GLS twist over `F_{p²}`, folded by
 /// `⟨−1, ψ⟩`; `no_fold` folds the same points by negation only.  See
 /// `gls_fp2`.
@@ -2363,6 +2577,51 @@ mod tests {
         assert!(divisor_indices(&p)
             .unwrap_err()
             .contains("`x` is not a number"));
+    }
+
+    /// Every point of a `cm-multiplier` base is `[coefficient]` times its
+    /// column's seed (the first point of the column, weight 1), on `j = 0`
+    /// (free automorphism) and `D = -7` (degree-2 Velu endomorphism), so every
+    /// relation row over the base is a true logarithm identity.
+    #[test]
+    fn cm_multiplier_columns_are_scalar_multiples_of_their_seed() {
+        use crate::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
+        for (family, seed) in [(CmFamily::J0, 7u64), (CmFamily::D7, 31)] {
+            let inst = generate_cm_instance(family, 24, seed, 8).unwrap();
+            let curve = inst.curve.clone();
+            let ctx = InstanceCtx {
+                group: &curve,
+                generator: inst.generator_point(),
+                target: inst.generator_point(),
+                r: inst.r,
+                cofactor: inst.cofactor,
+                group_order: inst.group_order,
+                name: inst.name.clone(),
+                field_degree: None,
+            };
+            let mut ops = GroupOps::default();
+            let (_, params) = Params::parse_spec("cm-multiplier:size=5,norm=32").unwrap();
+            let fb = CmMultiplierBase { instance: &inst }
+                .build(&ctx, &params, &mut ops)
+                .unwrap();
+            assert_eq!(fb.columns, 5);
+            assert!(fb.points.len() > 5 * 2 * 3, "multiples add points ({family:?})");
+            let mut seeds: Vec<Option<PrimePoint>> = vec![None; fb.columns];
+            for (i, p) in fb.points.iter().enumerate() {
+                if fb.coef_of[i] == 1 && seeds[fb.col_of[i]].is_none() {
+                    seeds[fb.col_of[i]] = Some(*p);
+                }
+            }
+            let mut check = GroupOps::default();
+            for (i, p) in fb.points.iter().enumerate() {
+                let seed = seeds[fb.col_of[i]].expect("every column has a weight-1 seed");
+                assert_eq!(
+                    curve.mul(&mut check, seed, fb.coef_of[i]),
+                    *p,
+                    "{family:?} point {i}"
+                );
+            }
+        }
     }
 
     #[test]
