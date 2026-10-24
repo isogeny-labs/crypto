@@ -386,6 +386,12 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
     }
 
     fn describe(&self, params: &Params) -> String {
+        if params.get("basis").is_some() {
+            return format!(
+                "points whose abscissa lies in the explicitly recorded {}-dimensional subspace",
+                params.get("dimension").unwrap_or("?")
+            );
+        }
         format!(
             "points whose abscissa lies in the {}-dimensional subspace spanned by {{1, z, …}}",
             params.get("dimension").unwrap_or("?")
@@ -393,10 +399,16 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[(
-            "dimension",
-            "F_2-dimension of the abscissa subspace; about 2^dimension abscissae",
-        )]
+        &[
+            (
+                "dimension",
+                "F_2-dimension of the abscissa subspace; about 2^dimension abscissae",
+            ),
+            (
+                "basis",
+                "optional explicit full-rank polynomial-basis words separated by semicolons",
+            ),
+        ]
     }
 
     fn build(
@@ -409,7 +421,42 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
         if dim == 0 || dim > 30 {
             return Err(format!("subspace dimension {dim} outside 1..=30"));
         }
-        let basis: Vec<u64> = (0..dim).map(|k| 1u64 << k).collect();
+        let basis: Vec<u64> = if let Some(text) = params.get("basis") {
+            let basis: Vec<u64> = text
+                .split(';')
+                .map(|word| {
+                    if let Some(word) = word.strip_prefix("0x") {
+                        u64::from_str_radix(word, 16)
+                    } else {
+                        word.parse()
+                    }
+                })
+                .collect::<Result<_, _>>()
+                .map_err(|e| format!("invalid explicit subspace basis: {e}"))?;
+            if basis.len() != dim as usize
+                || basis.iter().any(|x| *x == 0 || *x >> self.instance.n != 0)
+            {
+                return Err("explicit basis dimension or field word is invalid".into());
+            }
+            let mut pivots = [0u64; 64];
+            for &word in &basis {
+                let mut word = word;
+                while word != 0 {
+                    let k = 63 - word.leading_zeros() as usize;
+                    if pivots[k] == 0 {
+                        pivots[k] = word;
+                        break;
+                    }
+                    word ^= pivots[k];
+                }
+                if word == 0 {
+                    return Err("explicit subspace basis is linearly dependent".into());
+                }
+            }
+            basis
+        } else {
+            (0..dim).map(|k| 1u64 << k).collect()
+        };
         Ok(binary_subspace_factor_base(self.instance, &basis))
     }
 }
@@ -3329,5 +3376,47 @@ mod tests {
         );
         assert!(ops.scalar_mults > 0 && fb.cost.get("inversions") > 0);
         assert!(fb.cost.get("min_key_field_squares_uncharged") > 0);
+    }
+}
+
+#[cfg(test)]
+mod explicit_subspace_tests {
+    use super::*;
+    #[test]
+    fn explicit_basis_preserves_the_legacy_points_and_rejects_bad_bases() {
+        let inst = crate::cryptanalysis::ic_boundary::koblitz_instance(1, 7).unwrap();
+        let g = BinaryGroup(&inst.fast);
+        let ctx = InstanceCtx {
+            group: &g,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let builder = BinarySubspaceBase { instance: &inst };
+        let (_, plain) = Params::parse_spec("binary-subspace:dimension=3").unwrap();
+        let (_, explicit) =
+            Params::parse_spec("binary-subspace:dimension=3,basis=0x1;0x2;0x4").unwrap();
+        let a = builder
+            .build(&ctx, &plain, &mut GroupOps::default())
+            .unwrap();
+        let b = builder
+            .build(&ctx, &explicit, &mut GroupOps::default())
+            .unwrap();
+        assert_eq!(a.points, b.points);
+        assert_eq!(a.col_of, b.col_of);
+        assert_eq!(a.coef_of, b.coef_of);
+        assert_eq!(a.subspace_basis, b.subspace_basis);
+        for recipe in [
+            "binary-subspace:dimension=3,basis=1;2;3",
+            "binary-subspace:dimension=3,basis=1;2",
+            "binary-subspace:dimension=3,basis=1;2;128",
+        ] {
+            let (_, bad) = Params::parse_spec(recipe).unwrap();
+            assert!(builder.build(&ctx, &bad, &mut GroupOps::default()).is_err());
+        }
     }
 }

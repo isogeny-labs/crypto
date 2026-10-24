@@ -30,6 +30,12 @@ class SnapshotTests(unittest.TestCase):
         db.commit()
         self.assertTrue((self.home/'state_5.sqlite-wal').exists())
         snapshot.snapshot(self.home,self.root,[{'id':'saved-thread'}])
+        generation, _ = snapshot.load_generation(self.root)
+        self.assertFalse(list(generation.glob('*.sqlite-wal')))
+        self.assertFalse(list(generation.glob('*.sqlite-shm')))
+        self.assertEqual((generation/'state_5.sqlite').read_bytes()[18:20], b'\x01\x01')
+        db.execute("INSERT INTO threads VALUES ('later-thread')")
+        db.commit()
         target = self.base/'restored'
         self.assertEqual(snapshot.restore(self.root,target),[{'id':'saved-thread'}])
         with closing(sqlite3.connect(target/'state_5.sqlite')) as restored:
