@@ -1,8 +1,24 @@
 //! Joint mixed-image S5 construction. Candidate input excludes reference data.
 //! Process durations in this module are not admitted performance measurements.
 use super::*;
+#[path = "joint_proof.rs"]
+mod proof;
+#[path = "joint_report.rs"]
+mod report;
 #[path = "joint_solver.rs"]
 mod solver;
+#[path = "joint_variants.rs"]
+mod variants;
+
+pub(crate) fn construction_report(run: &Path, out: &Path) -> bool {
+    report::construction(run, out)
+}
+pub(crate) fn orbit_proofs(out: &Path) {
+    proof::write_proofs(out)
+}
+pub(crate) fn export_variant(public: &Path, expected: &str, arm: &str, qi: usize, out: &Path) {
+    variants::export(public, expected, arm, qi, out)
+}
 
 const PUBLIC_KEYS: [&str; 13] = [
     "p",
@@ -724,7 +740,7 @@ fn input_json(input: &[f4_fp::Poly]) -> Value {
         .collect::<Vec<_>>())
 }
 fn msolve_input(input: &[f4_fp::Poly], p: u64, n: usize) -> String {
-    let names = ["e1", "e2", "e3", "u", "v"];
+    let names = ["e1", "e2", "e3", "u", "v", "s"];
     let polys = input
         .iter()
         .map(|poly| {

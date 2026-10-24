@@ -14,7 +14,7 @@ fn system(path: &Path, expected: &str) -> (Value, Vec<f4_fp::Poly>) {
     let p = v["p"].as_u64().unwrap();
     assert!(PRIMES.contains(&p));
     let variables = v["variables"].as_u64().unwrap() as usize;
-    assert!([4, 5].contains(&variables));
+    assert!([4, 5, 6].contains(&variables));
     let raw: Vec<Vec<(Vec<u32>, u64)>> = serde_json::from_value(v["equations"].clone()).unwrap();
     assert!(raw.iter().all(|p| p
         .iter()
@@ -111,39 +111,75 @@ fn solve_until(
             input.iter().all(|p| f4_fp::eval(p, root, case.p) == 0),
             "false Fp root"
         );
-        let Some(&source) = by_x.get(&f.scalar(root[3])) else {
-            *rejected.entry("source_outside_base".into()).or_default() += 1;
-            continue;
+        let mut ids = if spec["root_encoding"] == "elementary-four" {
+            assert_eq!(arm, 8);
+            let xs: Vec<_> = (0..case.p)
+                .filter(|&x| {
+                    (((((x + case.p - root[0]) % case.p * x + root[1]) % case.p * x + case.p
+                        - root[2])
+                        % case.p
+                        * x)
+                        + root[3])
+                        % case.p
+                        == 0
+                })
+                .collect();
+            if xs.len() != 4 {
+                *rejected
+                    .entry("quartic_not_four_distinct_Fp_roots".into())
+                    .or_default() += 1;
+                continue;
+            }
+            let Some(ids) = xs
+                .iter()
+                .map(|&x| by_x.get(&f.scalar(x)).copied())
+                .collect::<Option<Vec<_>>>()
+            else {
+                *rejected
+                    .entry("ordinary_factor_outside_base".into())
+                    .or_default() += 1;
+                continue;
+            };
+            ids
+        } else {
+            let Some(&source) = by_x.get(&f.scalar(root[3])) else {
+                *rejected.entry("source_outside_base".into()).or_default() += 1;
+                continue;
+            };
+            let image_id = by_source[&source];
+            let xs: Vec<_> = (0..case.p)
+                .filter(|&x| {
+                    (((x + case.p - root[0]) % case.p * x + root[1]) % case.p * x + case.p
+                        - root[2])
+                        % case.p
+                        == 0
+                })
+                .collect();
+            if xs.len() != 3 {
+                *rejected
+                    .entry("cubic_not_three_distinct_Fp_roots".into())
+                    .or_default() += 1;
+                continue;
+            }
+            let ordinary: Option<Vec<_>> = xs
+                .iter()
+                .map(|&x| by_x.get(&f.scalar(x)).copied())
+                .collect();
+            let Some(mut ids) = ordinary else {
+                *rejected
+                    .entry("ordinary_factor_outside_base".into())
+                    .or_default() += 1;
+                continue;
+            };
+            if ids.contains(&image_id) {
+                *rejected.entry("repeated_fourth_factor".into()).or_default() += 1;
+                continue;
+            }
+            ids.push(image_id);
+            ids
         };
-        let image_id = by_source[&source];
-        let xs: Vec<_> = (0..case.p)
-            .filter(|&x| {
-                (((x + case.p - root[0]) % case.p * x + root[1]) % case.p * x + case.p - root[2])
-                    % case.p
-                    == 0
-            })
-            .collect();
-        if xs.len() != 3 {
-            *rejected
-                .entry("cubic_not_three_distinct_Fp_roots".into())
-                .or_default() += 1;
-            continue;
-        }
-        let ordinary: Option<Vec<_>> = xs
-            .iter()
-            .map(|&x| by_x.get(&f.scalar(x)).copied())
-            .collect();
-        let Some(mut ids) = ordinary else {
-            *rejected
-                .entry("ordinary_factor_outside_base".into())
-                .or_default() += 1;
-            continue;
-        };
-        if ids.contains(&image_id) {
-            *rejected.entry("repeated_fourth_factor".into()).or_default() += 1;
-            continue;
-        }
-        ids.push(image_id);
+        ids.sort();
+        assert_eq!(ids.iter().collect::<BTreeSet<_>>().len(), 4);
         for mask in 0..16 {
             group_assignments += 1;
             let mut sum = INF;
@@ -184,7 +220,7 @@ fn solve_until(
     }
     write(
         &out.join("summary.json"),
-        &json!({"schema":"joint-image-query-solve/v1","status":if complete {"complete"}else{"undetermined"},"p":case.p,"seed":case.seed,"arm":arm_name,"query_index":qi,"orbit_value":spec["orbit_value"],"public_input_sha256":public_sha,"system_sha256":system_sha,"roots_complete":complete,"field_roots":roots.len(),"rejections":rejected,"group_sign_assignments":group_assignments,"signed_relations":got,"unique_projective_augmented_rows":rows.len(),"rank":matrix.rank(),"columns":matrix.cols,"recovered":solution.as_ref().map(|s|s[matrix.cols-1]),"all_target_and_factor_logs_verified":solution.as_ref().map(|_|true),"f4_reported_ms":solved.ms,"diagnostic_process_ms":start.elapsed().as_secs_f64()*1000.0,"cost_scope":"Unadmitted diagnostic process duration; supplied point encodings, no complete lifting/cold/rho price; not an end-to-end speedup"}),
+        &json!({"schema":"joint-image-query-solve/v1","status":if complete {"complete"}else{"undetermined"},"p":case.p,"seed":case.seed,"arm":arm_name,"query_index":qi,"orbit_value":spec["orbit_value"],"encoding":spec["encoding"],"root_encoding":spec["root_encoding"],"public_input_sha256":public_sha,"system_sha256":system_sha,"roots_complete":complete,"field_roots":roots.len(),"rejections":rejected,"group_sign_assignments":group_assignments,"signed_relations":got,"unique_projective_augmented_rows":rows.len(),"rank":matrix.rank(),"columns":matrix.cols,"recovered":solution.as_ref().map(|s|s[matrix.cols-1]),"all_target_and_factor_logs_verified":solution.as_ref().map(|_|true),"f4_reported_ms":solved.ms,"diagnostic_process_ms":start.elapsed().as_secs_f64()*1000.0,"cost_scope":"Unadmitted diagnostic process duration; supplied point encodings, no complete lifting/cold/rho price; not an end-to-end speedup"}),
     );
     println!(
         "{}",
@@ -323,6 +359,11 @@ pub(super) fn check(
         .map(|terms| case.row(terms, &case.raw["query_trace"][qi], arm))
         .collect();
     let (rank, solution) = independent_rref(&rows, case.columns(arm), case.n);
+    let unique_rows: BTreeSet<_> = rows
+        .iter()
+        .filter_map(|r| canonical_row(r.clone(), case.n))
+        .collect();
+    assert_eq!(s["unique_projective_augmented_rows"], unique_rows.len());
     if let Some(solution) = solution {
         assert!(case.verify_solution(&solution, arm));
     }
@@ -330,7 +371,7 @@ pub(super) fn check(
     let pass = s["roots_complete"] == true && actual == expected;
     write(
         &out.join("audit.json"),
-        &json!({"schema":"joint-image-query-audit/v1","status":if pass{"pass"}else{"partial"},"p":case.p,"seed":case.seed,"arm":s["arm"],"query_index":qi,"orbit_value":s["orbit_value"],"candidate_roots_complete":s["roots_complete"],"reference_sha256":hex::encode(hash::sha256::sha256(&bytes)),"expected_signed_relations":expected.len(),"actual_signed_relations":actual.len(),"missing":expected.difference(&actual).collect::<Vec<_>>(),"extra":actual.difference(&expected).collect::<Vec<_>>(),"rank":rank,"columns":case.columns(arm),"scope":"Exact physical signed-set comparison against the earlier independently audited group/BSGS reference and separate RREF; not a complete-GB or performance certificate"}),
+        &json!({"schema":"joint-image-query-audit/v1","status":if pass{"pass"}else{"partial"},"p":case.p,"seed":case.seed,"arm":s["arm"],"query_index":qi,"orbit_value":s["orbit_value"],"candidate_roots_complete":s["roots_complete"],"reference_sha256":hex::encode(hash::sha256::sha256(&bytes)),"expected_signed_relations":expected.len(),"actual_signed_relations":actual.len(),"missing":expected.difference(&actual).collect::<Vec<_>>(),"extra":actual.difference(&expected).collect::<Vec<_>>(),"unique_projective_augmented_rows":unique_rows.len(),"rank":rank,"columns":case.columns(arm),"scope":"Exact physical signed-set comparison against the earlier independently audited group/BSGS reference and separate RREF; not a complete-GB or performance certificate"}),
     );
     pass
 }
