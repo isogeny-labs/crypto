@@ -21,6 +21,9 @@ in the [unvalidated benchmark archive](ARCHIVE.md), with their exact former row
 text, digest, reason, and source provenance. Archived rows are not measurements
 admitted by this table and cannot satisfy the validation gate.
 
+The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
+is preserved separately pending validation admission.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-22 | [`20261017-volcano-ecdlp-census`](20261017-volcano-ecdlp-census/) | rho (`rho.negation`, `rho.plain`), BSGS (`textbook`, `negation`) and IC (`ic.pipeline`, `prime-abscissa:size=64` + `mitm:negation_folded=1`) on every curve of three whole 26-bit ℓ-volcanoes (V1 ℓ=2, 400 curves; V2 ℓ=3, 378; V3 ℓ=2 j=0 crater, 16), plus 2 isomorphic re-scalings per vertex; instances carried down, up (two floor subtrees), sideways and native by verified Vélu maps (`planted_shared` targets); 79 sessions, 403,168 measured runs, all verified, every audit OK; preregistered plan + frozen analysis | positive control passes (j=0 crater `rho.cubic`/`rho.negation` 0.573 [0.562, 0.585], theory 0.577); no level effect: 33/35 level ratios equivalent (TOST ±5% rho/BSGS, ±10% IC), 2 inconclusive, 0 different; no curve effect beyond the isomorphic-control spread; transport is exact and ≤1.3% of a solve, never faster than solving at source; IC/matched rho 42.4× (V1) and 61.5× (V2) at 0 GAE, 65.1× / 92.7× at 1 GAE, rho ahead across the §5a band; V3 crater vs `rho.cubic` 84.9×; a null result (no volcano-level effect), not an advance; erratum A3 after first validation, residual wording notes R1–R4 in VALIDATOR_REPORT.md | 4 vCPU Xeon VM, `ecbench run --cpus auto`; counts only (wall not admitted: 6–13% of rows at L1) | [`research/volcano_ecdlp_census_20261017`](../research/volcano_ecdlp_census_20261017/REPORT.md) ([PDF](20261017-volcano-ecdlp-census/report.pdf)) |

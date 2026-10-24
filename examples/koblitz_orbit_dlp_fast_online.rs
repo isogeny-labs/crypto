@@ -39,7 +39,8 @@
 //! When `:<columns>` is omitted, `construct:` uses the tuned K: 125 / 280 / 500
 //! for n = 41 / 53 / 61 (a = 0); other sizes must pass K explicitly.
 //! Environment: KIC_FREE_RELATIONS=0|1 (default 1), KIC_PAIR_SYMMETRY,
-//! KIC_ROOT_BLOOM, KIC_RANK_PROBE_CAP, KIC_DUMP_RANK, KIC_DUMP_BASE.
+//! KIC_ROOT_BLOOM, KIC_RANK_PROBE_CAP, KIC_DUMP_RANK, KIC_DUMP_BASE,
+//! KIC_NORM=N (u64 `construct:` bases: add the Z[tau] multiplier images of norm <= N).
 
 #![recursion_limit = "256"]
 
@@ -676,6 +677,10 @@ fn harvest_free_relations(
 ) -> Harvest {
     let mut out = Harvest::default();
     for &(stored, inserting) in &index.collisions {
+        // Full rank already: the remaining collisions cannot add a pivot.
+        if echelon.rank >= base.columns {
+            break;
+        }
         let (l1, r1, rel1, s1) = unpack(stored);
         let (l2, r2, rel2, s2) = unpack(inserting);
         let t = (s2 as usize + n - s1 as usize) % n;
@@ -986,6 +991,143 @@ fn construct_base(
         "Frobenius must act as lambda on the subgroup"
     );
     (points, labels, reps, scanned)
+}
+
+/// `KIC_NORM`: unset or `0` (default) keeps the plain `{+-phi^k R_j}` orbits.
+/// `N > 0` adds, for every seed `R_j`, the orbits of `alpha(R_j) = [a]R_j +
+/// [b]phi(R_j)` for each `alpha = a + b*tau` of norm `a^2 - a*b + 2*b^2 <= N`
+/// (lead A1, `compact-orbit-scan:norm=N` in the `ic` framework). Each image
+/// joins `R_j`'s column with weight `a + b*lambda`, so a base of K columns
+/// behaves like K times the multiplier count of independent orbits for the
+/// root index while the rank stage still needs only K + 1 relations.
+fn norm_cap_flag() -> i64 {
+    match std::env::var("KIC_NORM") {
+        Err(_) => 0,
+        Ok(raw) => raw
+            .parse::<i64>()
+            .ok()
+            .filter(|&cap| cap >= 0)
+            .expect("KIC_NORM must be a non-negative integer"),
+    }
+}
+
+/// Multipliers `(a, b)` of `a + b*tau` with norm `<= cap`, excluding zero.
+fn norm_multipliers(cap: i64) -> Vec<(i64, i64)> {
+    let bound = (cap as f64).sqrt() as i64 + 2;
+    let mut out = Vec::new();
+    for a in -bound..=bound {
+        for b in -bound..=bound {
+            if (a, b) != (0, 0) && a * a - a * b + 2 * b * b <= cap {
+                out.push((a, b));
+            }
+        }
+    }
+    out
+}
+
+/// `construct_base` with the Z[tau] multiplier closure. Returns, besides the
+/// base, one x-code per *orbit* (the root index treats each as an independent
+/// representative); `reps` stays one seed point per column.
+fn construct_base_norm(
+    fast: &FastBinaryCurve,
+    curve: &KoblitzCurve,
+    b: u64,
+    columns: usize,
+    r: u64,
+    norm_cap: i64,
+) -> (
+    Vec<FastPoint>,
+    Vec<(usize, u64)>,
+    Vec<Option<[u64; 2]>>,
+    u64,
+    Vec<u64>,
+) {
+    assert!(
+        norm_cap > 0 && fast.a == 0,
+        "KIC_NORM needs a = 0 (mu = -1)"
+    );
+    let gf = &fast.gf;
+    let n = fast.n as usize;
+    let lambda = curve.lambda.to_u64().unwrap();
+    let multipliers = norm_multipliers(norm_cap);
+    let orbit_key = |mut x: u64| {
+        let mut key = x;
+        for _ in 1..n {
+            x = gf.sqr(x);
+            key = key.min(x);
+        }
+        key
+    };
+    let scalar = |v: i64| BigUint::from(v.rem_euclid(r as i64) as u64);
+    let mut seen = std::collections::HashSet::new();
+    let mut points = Vec::new();
+    let mut labels = Vec::new();
+    let mut reps = Vec::with_capacity(columns);
+    let mut orbit_reps = Vec::new();
+    let mut scanned = 0u64;
+    let mut raw_x = 1u64;
+    let push_orbit = |points: &mut Vec<FastPoint>,
+                      labels: &mut Vec<(usize, u64)>,
+                      column: usize,
+                      (px, py): (u64, u64),
+                      weight: u64| {
+        let (mut cx, mut cy) = (px, py);
+        let mut coefficient = weight;
+        for _ in 0..n {
+            points.push(Some((cx, cy)));
+            labels.push((column, coefficient));
+            points.push(Some((cx, cx ^ cy)));
+            labels.push((column, (r - coefficient) % r));
+            cx = gf.sqr(cx);
+            cy = gf.sqr(cy);
+            coefficient = mulmod(coefficient, lambda, r);
+        }
+    };
+    while reps.len() < columns {
+        scanned += 1;
+        for point in fast.points_with_x(b, raw_x) {
+            let Some((px, py)) = fast.scalar_mul(point, &curve.cofactor) else {
+                continue;
+            };
+            if px <= 1 || !seen.insert(orbit_key(px)) {
+                continue;
+            }
+            let column = reps.len();
+            reps.push(Some([px, py]));
+            orbit_reps.push(px);
+            push_orbit(&mut points, &mut labels, column, (px, py), 1);
+            let seed = Some((px, py));
+            let tau_seed = Some((gf.sqr(px), gf.sqr(py)));
+            for &(ma, mb) in &multipliers {
+                let pa = if ma.rem_euclid(r as i64) == 0 {
+                    None
+                } else {
+                    fast.scalar_mul(seed, &scalar(ma))
+                };
+                let pb = if mb.rem_euclid(r as i64) == 0 {
+                    None
+                } else {
+                    fast.scalar_mul(tau_seed, &scalar(mb))
+                };
+                let Some((ix, iy)) = fast.add(pa, pb) else {
+                    continue;
+                };
+                if ix <= 1 || !seen.insert(orbit_key(ix)) {
+                    continue;
+                }
+                let weight = (ma.rem_euclid(r as i64) as u64
+                    + mulmod(mb.rem_euclid(r as i64) as u64, lambda, r))
+                    % r;
+                orbit_reps.push(ix);
+                push_orbit(&mut points, &mut labels, column, (ix, iy), weight);
+            }
+            if reps.len() == columns {
+                break;
+            }
+        }
+        raw_x += 1;
+    }
+    (points, labels, reps, scanned, orbit_reps)
 }
 
 fn mulmod(a: u64, b: u64, r: u64) -> u64 {
@@ -2017,6 +2159,109 @@ mod wide {
         (points, labels, reps, scanned)
     }
 
+    /// Wide twin of `construct_base_norm` (lead A1, `KIC_NORM`): the Z[tau]
+    /// multiplier images of each seed join its column; one x-code per orbit
+    /// is returned for the root index.
+    fn construct_base128_norm(
+        fast: &FastBinaryCurve128,
+        curve: &KoblitzCurve,
+        b: u128,
+        columns: usize,
+        r: u64,
+        norm_cap: i64,
+    ) -> (
+        Vec<FastPoint128>,
+        Vec<(usize, u64)>,
+        Vec<Option<[u128; 2]>>,
+        u64,
+        Vec<u128>,
+    ) {
+        assert!(
+            norm_cap > 0 && fast.a == 0,
+            "KIC_NORM needs a = 0 (mu = -1)"
+        );
+        let gf = &fast.gf;
+        let n = fast.n as usize;
+        let lambda = curve.lambda.to_u64().unwrap();
+        let multipliers = super::norm_multipliers(norm_cap);
+        let orbit_key = |mut x: u128| {
+            let mut key = x;
+            for _ in 1..n {
+                x = gf.sqr(x);
+                key = key.min(x);
+            }
+            key
+        };
+        let residue = |v: i64| v.rem_euclid(r as i64) as u64;
+        let mut seen = std::collections::HashSet::new();
+        let mut points = Vec::new();
+        let mut labels = Vec::new();
+        let mut reps = Vec::with_capacity(columns);
+        let mut orbit_reps = Vec::new();
+        let mut scanned = 0u64;
+        let mut raw_x = 1u64;
+        let push_orbit = |points: &mut Vec<FastPoint128>,
+                          labels: &mut Vec<(usize, u64)>,
+                          column: usize,
+                          (px, py): (u128, u128),
+                          weight: u64| {
+            let (mut cx, mut cy) = (px, py);
+            let mut coefficient = weight;
+            for _ in 0..n {
+                points.push(Some((cx, cy)));
+                labels.push((column, coefficient));
+                points.push(Some((cx, cx ^ cy)));
+                labels.push((column, (r - coefficient) % r));
+                cx = gf.sqr(cx);
+                cy = gf.sqr(cy);
+                coefficient = super::mulmod(coefficient, lambda, r);
+            }
+        };
+        while reps.len() < columns {
+            scanned += 1;
+            for point in fast.points_with_x(b, raw_x as u128) {
+                let Some((px, py)) = fast.scalar_mul(point, &curve.cofactor) else {
+                    continue;
+                };
+                if px <= 1 || !seen.insert(orbit_key(px)) {
+                    continue;
+                }
+                let column = reps.len();
+                reps.push(Some([px, py]));
+                orbit_reps.push(px);
+                push_orbit(&mut points, &mut labels, column, (px, py), 1);
+                let seed = Some((px, py));
+                let tau_seed = Some((gf.sqr(px), gf.sqr(py)));
+                for &(ma, mb) in &multipliers {
+                    let pa = if residue(ma) == 0 {
+                        None
+                    } else {
+                        fast.scalar_mul(seed, &BigUint::from(residue(ma)))
+                    };
+                    let pb = if residue(mb) == 0 {
+                        None
+                    } else {
+                        fast.scalar_mul(tau_seed, &BigUint::from(residue(mb)))
+                    };
+                    let Some((ix, iy)) = fast.add(pa, pb) else {
+                        continue;
+                    };
+                    if ix <= 1 || !seen.insert(orbit_key(ix)) {
+                        continue;
+                    }
+                    let weight = (residue(ma) + super::mulmod(residue(mb), lambda, r)) % r;
+                    orbit_reps.push(ix);
+                    push_orbit(&mut points, &mut labels, column, (ix, iy), weight);
+                }
+                if reps.len() == columns {
+                    break;
+                }
+            }
+            raw_x += 1;
+        }
+        (points, labels, reps, scanned, orbit_reps)
+    }
+
     fn relation_row128(base: &Base128, relation: &Relation128, rhs: u64, r: u64) -> Vec<u64> {
         let mut row = vec![0u64; base.columns + 1];
         for &index in &relation.point_indices {
@@ -2100,11 +2345,24 @@ mod wide {
             crypto_lib::binary_ecc::BinaryPoint::Infinity => panic!("generator must be affine"),
         };
         let mut scanned_x = None;
+        let norm_cap = super::norm_cap_flag();
+        assert!(
+            norm_cap == 0 || constructed.is_some(),
+            "KIC_NORM applies to construct: bases only"
+        );
+        let mut orbit_reps: Option<Vec<u128>> = None;
         let (points, labels, representatives): (
             Vec<FastPoint128>,
             Vec<(usize, u64)>,
             Vec<Option<[u128; 2]>>,
         ) = match constructed {
+            Some((_, _, columns)) if norm_cap > 0 => {
+                let (points, labels, reps, scanned, orbits) =
+                    construct_base128_norm(&fast, &curve, b, columns, r, norm_cap);
+                scanned_x = Some(scanned);
+                orbit_reps = Some(orbits);
+                (points, labels, reps)
+            }
             Some((_, _, columns)) => {
                 let (points, labels, reps, scanned) =
                     construct_base128(&fast, &curve, b, columns, r);
@@ -2149,10 +2407,12 @@ mod wide {
             by_x,
             columns: representatives.len(),
         };
-        let reps: Vec<u128> = representatives
-            .iter()
-            .map(|p| p.expect("affine representative")[0])
-            .collect();
+        let reps: Vec<u128> = orbit_reps.unwrap_or_else(|| {
+            representatives
+                .iter()
+                .map(|p| p.expect("affine representative")[0])
+                .collect()
+        });
         let base_elapsed = setup_started.elapsed();
         let base_load_ms = ms(base_elapsed);
 
@@ -2478,6 +2738,10 @@ mod wide {
         });
         println!("{summary}");
         if let Ok(path) = std::env::var("KIC_DUMP_BASE") {
+            assert_eq!(
+                norm_cap, 0,
+                "KIC_DUMP_BASE does not record KIC_NORM orbit representatives"
+            );
             let dump = json!({
                 "kind":"point_defined_factor_base",
                 "n":n, "a":a,
@@ -2597,7 +2861,14 @@ fn main() -> ExitCode {
         Ok("0") | Err(_) => false,
         Ok(_) => panic!("KIC_PAIR_SYMMETRY must be 0 or 1"),
     };
-    let free_relations = free_relations_flag();
+    // With KIC_NORM the images of one seed satisfy Z[tau] identities among
+    // themselves, so almost every root-table collision is a trivial row; the
+    // harvest is then off unless KIC_FREE_RELATIONS=1 asks for it.
+    let free_relations = if norm_cap_flag() > 0 {
+        std::env::var("KIC_FREE_RELATIONS").as_deref() == Ok("1")
+    } else {
+        free_relations_flag()
+    };
     let mut out = std::fs::File::create(&arguments[4]).expect("create output");
 
     let setup_started = Instant::now();
@@ -2627,11 +2898,24 @@ fn main() -> ExitCode {
         crypto_lib::binary_ecc::BinaryPoint::Infinity => panic!("generator must be affine"),
     };
     let mut scanned_x = None;
+    let norm_cap = norm_cap_flag();
+    assert!(
+        norm_cap == 0 || constructed.is_some(),
+        "KIC_NORM applies to construct: bases only"
+    );
+    let mut orbit_reps: Option<Vec<u64>> = None;
     let (points, labels, representatives): (
         Vec<FastPoint>,
         Vec<(usize, u64)>,
         Vec<Option<[u64; 2]>>,
     ) = match constructed {
+        Some((_, _, columns)) if norm_cap > 0 => {
+            let (points, labels, reps, scanned, orbits) =
+                construct_base_norm(&fast, &curve, b, columns, r, norm_cap);
+            scanned_x = Some(scanned);
+            orbit_reps = Some(orbits);
+            (points, labels, reps)
+        }
         Some((_, _, columns)) => {
             let (points, labels, reps, scanned) = construct_base(&fast, &curve, b, columns, r);
             scanned_x = Some(scanned);
@@ -2673,10 +2957,14 @@ fn main() -> ExitCode {
         by_x,
         columns: representatives.len(),
     };
-    let reps: Vec<u64> = representatives
-        .iter()
-        .map(|p| p.expect("affine representative")[0])
-        .collect();
+    // One root-index representative per orbit: the column seeds, or with
+    // KIC_NORM every multiplier image as well.
+    let reps: Vec<u64> = orbit_reps.unwrap_or_else(|| {
+        representatives
+            .iter()
+            .map(|p| p.expect("affine representative")[0])
+            .collect()
+    });
     let base_elapsed = setup_started.elapsed();
     let base_load_ms = ms(base_elapsed);
 
@@ -3078,6 +3366,8 @@ fn main() -> ExitCode {
         "base_source":if constructed.is_some() { "constructed_in_process_x_scan" } else { "retained_header" },
         "base_scanned_x":scanned_x,
         "orbit_columns":base.columns,
+        "kic_norm":norm_cap,
+        "orbit_representatives":index.shifted.len(),
         "factor_base_points":base.points.len(),
         "regular_states":index.states.len(),
         "index_pair_candidates":index.pair_candidates,
@@ -3145,6 +3435,10 @@ fn main() -> ExitCode {
     }
     println!("{summary}");
     if let Ok(path) = std::env::var("KIC_DUMP_BASE") {
+        assert_eq!(
+            norm_cap, 0,
+            "KIC_DUMP_BASE does not record KIC_NORM orbit representatives"
+        );
         let dump = json!({
             "kind":"point_defined_factor_base",
             "n":n, "a":a,
@@ -3282,6 +3576,40 @@ mod pair_symmetry_tests {
         for pivot in echelon.pivots.iter().flatten() {
             assert_eq!(pivot[base.columns], 0, "free rows are homogeneous");
         }
+    }
+}
+
+#[cfg(test)]
+mod norm_base_tests {
+    use super::*;
+
+    /// Every point of the multiplier base is `[coefficient]` times its
+    /// column's seed on the subgroup, so every relation row it produces is a
+    /// true log identity; the orbit representatives are the distinct orbits.
+    #[test]
+    fn norm_base_labels_are_scalar_multiples_of_the_column_seed() {
+        let curve = KoblitzCurve::new(0, 41).unwrap();
+        let r = curve.subgroup_order.to_u64().unwrap();
+        let fast = FastBinaryCurve::new(&curve.curve.irreducible, 0).unwrap();
+        let gf = Gf2::new(&curve.curve.irreducible);
+        let b = gf.from_element(&curve.curve.b);
+        let (points, labels, reps, _, orbits) = construct_base_norm(&fast, &curve, b, 4, r, 16);
+        assert_eq!(reps.len(), 4);
+        assert!(orbits.len() > reps.len(), "multiplier images add orbits");
+        assert_eq!(points.len(), orbits.len() * 2 * fast.n as usize);
+        let distinct: std::collections::HashSet<u64> = orbits.iter().copied().collect();
+        assert_eq!(distinct.len(), orbits.len());
+        for (point, &(column, coefficient)) in points.iter().zip(&labels) {
+            let seed = reps[column].map(|[x, y]| (x, y));
+            assert_eq!(fast.scalar_mul(seed, &BigUint::from(coefficient)), *point);
+        }
+    }
+
+    #[test]
+    fn norm_zero_multipliers_are_empty_and_norm_two_has_units() {
+        assert!(norm_multipliers(0).is_empty());
+        let two = norm_multipliers(2);
+        assert!(two.contains(&(1, 0)) && two.contains(&(-1, 0)) && two.contains(&(0, 1)));
     }
 }
 
