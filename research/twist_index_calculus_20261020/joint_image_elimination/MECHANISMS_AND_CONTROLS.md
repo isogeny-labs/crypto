@@ -1,12 +1,12 @@
 # Mechanisms to distinguish in twist-assisted index calculus
 
 Search round: 2026-10-24. This inventory preserves the broader research
-question while the registered runs finish. Proposed constructions below
+question after the finite registered runs have reached terminal receipts. Proposed constructions below
 are not executed results or novelty claims.
 
 ![Separate construction, rank and cost obligations](figures/joint-mechanism.svg)
 
-## Mechanisms already tested or currently running
+## Mechanisms tested in this round
 
 | Mechanism | What could improve | Required distinguishing control | Evidence boundary |
 |---|---|---|---|
@@ -15,7 +15,7 @@ are not executed results or novelty claims.
 | Exploit phi's coordinate equation jointly | Polynomial construction and root-solving work | Same joint construction for doubling; strongest pure symmetry | 297 constructions validated; global native failures and source-block/implicit comparisons retained separately |
 | Partition sources by U^12 | Bounded-degree elimination while keeping all phases | Same source partition for all arms; union of complete physical sets | All three regression unions match their independent signed-set/RREF oracle; local ranks pure 1/3, phi 2/3, doubling 1/3 |
 | Use all ordinary-factor permutations | Smaller pure baseline representation | Full four-factor elementary coordinates, not a distinguished fourth source | Pure finite and geometric regression solves are complete and independently audited; both rank 1/3 |
-| Concentrate at R=O | Reusable factor-log relations | Count zero folded rows and independent factor-log rank; then charge target descent | 21 zero fibers and three full p37 population censuses registered; no target recovery from zero-only rows |
+| Concentrate at R=O | Reusable factor-log relations | Count zero folded rows and independent factor-log rank; then charge target descent | All 21 four-factor zero fibers, three full p37 populations and 21 five-factor censuses complete; five-factor point replay passes; no target recovery from zero-only rows |
 
 Uniform total signed-tuple mass is conserved when the candidate domain has
 the same size. A higher probability of any useful relation, lower variance,
@@ -79,12 +79,14 @@ is not implemented or run in the present receipts.
 
 The predeclared [doubled-triangle control](SUPPLEMENT_ZERO_DOUBLING_IDENTITY.md)
 predicts genuine physical zero relations whose folded rows vanish.
-The separately implemented post-run checker is registered. Its native
-version-2 gate passes 75 tests; the separate block-oracle correction in the
-external checker passes a fresh 76-test version-3 gate. The zero checker is
-designed to reconstruct them from group points and read the retained oracle
-sets without repeating the oracle. The resulting check would distinguish
-zero-fiber physical counts from useful precomputation rank.
+The separate post-run checker now reconstructs every predicted tuple from
+actual group points and checks all 21 saved complete zero sets, without
+repeating the oracle. Every predicted folded row vanishes. At p337, the
+observed 384 tuples include 360 such zero rows and 24 additional tuples
+with factor-log rank 1/14; on the other six curves all observed tuples are
+predicted zero rows. The [actual audit](reports/run-20261024T0841Z-zero-identities/REPORT.md)
+passes every case. Earlier 75/76-test checker gates retain their own source
+labels; the final audit reuses the separately frozen 79-test runner.
 
 The subsequent exact [pure-zero component search](reports/run-20261024T0303Z-pure-zero/REPORT.md)
 finds a certificate expressing 2048 times the quartic discriminant in the
@@ -104,10 +106,11 @@ finds 64*S³ in the same ideal, S=64*s4-(4*s2-s1²)². Its combined
 10-theorem Lean gate passes and excludes three distinct roots, allowing
 the fourth abscissa to repeat. Independent IDC1h65c11f01d0b1e67a passes
 exact replay, 32 extra points and both mutation controls.
-The proposed finite-Fp residual filter retains infinity and must pass
-the frozen full-tape physical-presentation, unique-row, RREF and recovery
-audit before use. Both mixed image controls can use it; no twist-specific
-or complete-cost gain has been measured from it.
+The finite-Fp residual audit retains infinity and now passes every frozen
+full-tape physical-presentation, unique-row, RREF and recovery check on all
+21 cases. It proposes one phi and two doubling rejections in the full
+stream, and zero before either arm reaches full rank. No filter is deployed
+and this predicate supplies no through-rank system saving on the tape.
 
 Five or more distinct ordinary factors remain an explicit open
 precomputation avenue. A useful test must count independent factor-log
@@ -118,8 +121,24 @@ The [frozen five-factor diagnostic](SUPPLEMENT_FIVE_FACTOR_ZERO.md)
 specifies all 21 cases, pure/phi/doubling domains, exact partition
 multiplicities and anchored factor-log rank. Its provenance amendment
 reconstructs factor logs from the saved verified matrix, because the
-historical `recovered` field stores only the target scalar. No five-factor
-run is claimed.
+historical `recovered` field stores only the target scalar. The native census
+now completes all 21 cases. Both mixed arms give 504 physical tuples and
+15 projective rows in aggregate, with different ranks: phi/doubling are
+2/2 versus 1/2 at p37, 2/8 versus 1/8 at p157, and 1/14 versus 3/14 at
+p337. Pure has no relation. These are oracle results, not a polynomial
+price. Independent public-point completeness replay is implemented and
+owned separately; all 21 cases and 63 arm comparisons now pass. The public
+field/curve arithmetic is shared, while enumeration, point keys, partition
+and matrix elimination differ. The [point-replay report](reports/run-20261024T0908Z-five-point/REPORT.md)
+states the exact remaining collection and cost obligations.
+
+**Proposed next collector control.** At the zero residual, test an orbit
+quotient of the image/ordinary peel pairs against every saved five-factor
+set and rank. Charge map construction, all failed S4 systems, matrix work
+and subsequent target descent. Apply the same action quotient to doubling.
+This could test whether fixed-zero symmetry saves relation-finding work;
+transported copies must still count as one projective row. No polynomial
+implementation or cost result for this proposed quotient is claimed here.
 
 Another untested construction uses several distinct known-log images in
 one relation, rather than the present three-plus-one pattern. Low-degree
@@ -137,7 +156,7 @@ algorithm over the supported small prime fields. This is an untested
 representation control: components saturated by their discriminant can
 be supplied without the explicit inverse-discriminant variable. It would
 need a fresh frozen input, checked projection equivalence and the same
-physical-set oracle; it is not one of the currently running 21 literal
+physical-set oracle; it is not one of the completed 21 literal
 GB inputs. The exact installed help is retained in
 `results/msolve-0.11.0-help.txt`. Likewise a
 complete GB and a complete Fp physical decomposition are different

@@ -42,7 +42,8 @@ certificate. Earlier failed attempts remain under their original IDs.
 
 All listed scientific lanes are terminal and their reports cite the actual
 receipts, including bounded failures and the duplicate audit's partial work.
-The full 43-directory checkpoint is being packaged and independently
-compared; its publication is separate from scientific completion. No finite-Fp
+The full 43-directory checkpoint passes fresh extraction, all 9,088 file
+comparisons, byte-identical repacking and verified canonical publication;
+its publication is separate from scientific completion. No finite-Fp
 filter is deployed, and no new complete-cost, strongest-rho, scaling or
 generic-ideal conclusion is established by these run reports.

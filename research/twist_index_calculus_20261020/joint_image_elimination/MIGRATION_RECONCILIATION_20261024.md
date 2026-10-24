@@ -206,3 +206,38 @@ owner was confirmed absent before its single launch at about 10:04 UTC.
 All packing and extraction staging is on the durable workspace volume.
 The old 22-directory canonical f4ddf5ce checkpoint remains published until
 this replacement passes verification and actual remote publication.
+
+## Complete checkpoint and current-main integration
+
+The level-1 replacement completes all integrity checks: 43 selected run
+directories, 9,088 exact native file comparisons, matching inside manifest
+and byte-identical repacking. Canonical publication passes at 1,153,392,456
+bytes, SHA-256 54b31b3d73602d7758dad263939bdfdcbd8c305df2299fe7beb498029090b729.
+Native remote verification and S3 whole-object checksum/size pass; the
+older f4ddf5ce object is retained, remotely checksum-verified and recorded
+as superseded. Actual receipts are in `complete-archive-verify-v3/` and
+`complete-store-publish-v3.json`. The original partial level-6 compression
+and its stop receipts remain intact. An intermediate chat update misstated
+8,708 comparisons before reading the native receipt; it was corrected
+immediately to the actual 9,088. No artifact contains the mistaken count.
+
+Fetched main at 092d1ff47e merges cleanly into the study branch as
+1055dcbcdb4998e78e22c900ab737ddc9913de70, without manual resolution,
+rebase, force push or frozen-evidence conflict. It changes seven runtime
+files; the earlier root gate is not claimed to cover these new inputs.
+The first new integration launcher, post-latest-main-v2, exits 127 before
+compilation because managed systemd PATH lacks rustc. Its metadata and
+journal are retained. Corrected v3 sets the existing /home/ec2-user/.cargo/bin
+path explicitly and preserves every original resource limit. Its live
+managed owner must be checked before resuming or repeating any phase.
+
+New AGENTS.md from main requires the autoresearcher lead atlas before a new
+ECDLP proposal. The current local autoresearcher checkout and the explicitly
+fetched main 5af7ee216b7053543eaaff737e20ac781b50b54c contain neither
+tools/lead_atlas.py, knowledge/leads/ecdlp nor the lead-atlas skill. This
+is verified against Git trees, not inferred from a sparse filesystem.
+The pointer-only WIP commit is 8559b6b673aad8cab5bac33ff56b81653134dcd4.
+The prospective zero-fiber protocol was recorded before reading this newly
+merged rule; no new collector implementation or solve is represented as
+having passed that missing atlas check. Existing scientific results and
+publication work do not depend on proposing a new mechanism.
