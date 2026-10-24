@@ -1099,6 +1099,94 @@ fn pdp3_koblitz_rootfind_engine_follows_f4_query_stream_without_a_solver() {
 }
 
 #[test]
+fn pdp3_koblitz_linear_harvest_is_a_method_parameter_not_an_environment_switch() {
+    // PR #1862 turned the root linear-row harvest on by default, and the
+    // only opt-out was `KIC_LINEAR_HARVEST`, which `pdp3-koblitz` refuses
+    // because it would change the search without changing the method's
+    // identity.  `linear_harvest` puts it in the identity instead.  Omitted
+    // it changes nothing; `default` spells out what omission means; `off`
+    // is the engine before #1862.  Same targets, same base: every arm
+    // verifies and finds the same relations, `off` and `default` differ in
+    // counted word XORs (the harvest changes the splitting tree), and the
+    // parameter is refused where it would be ignored or is not understood.
+    let dir = scratch("pdp3-harvest");
+    let arm = |name: &str, oracle: &str| {
+        format!(
+            r#"{{"name": "{name}", "role": "candidate", "method": {{"id": "ic.pipeline", "params": {{
+              "factor_base": "koblitz-standard-subspace:dimension=5",
+              "oracle": "{oracle}"}}}}}}"#
+        )
+    };
+    let base = "pdp3-koblitz:m=3,engine=inherited-f4,degree=3,node_budget=8192";
+    let spec = format!(
+        r#"{{
+      "schema": "ecbench.spec/v1",
+      "label": "pdp3-koblitz linear_harvest test",
+      "workloads": {{"curves": [{{"kind": "koblitz", "a": 0, "n": 13}}],
+                    "targets_per_curve": 2, "target_seed": 7, "target_kind": "public"}},
+      "arms": [{}, {}, {}, {}, {}, {}],
+      "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 600}}
+    }}"#,
+        arm("omitted", base),
+        arm("default", &format!("{base},linear_harvest=default")),
+        arm("off", &format!("{base},linear_harvest=off")),
+        arm(
+            "bad-root",
+            "pdp3-koblitz:m=2,engine=rootfind,linear_harvest=off"
+        ),
+        arm(
+            "bad-matrix",
+            "pdp3-koblitz:m=3,engine=matrix-f4,degree=3,node_budget=8192,linear_harvest=off"
+        ),
+        arm("bad-value", &format!("{base},linear_harvest=maybe")),
+    );
+    std::fs::write(dir.join("spec.json"), spec).unwrap();
+    let out = dir.join("s");
+    let (ok, err) = run_spec(&dir, &out, &[]);
+    assert!(ok, "{err}");
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut ops: std::collections::BTreeMap<String, Vec<u64>> = Default::default();
+    let mut found: std::collections::BTreeMap<String, Vec<u64>> = Default::default();
+    let mut method_ids: std::collections::BTreeMap<String, String> = Default::default();
+    for line in text.lines() {
+        let r: Value = serde_json::from_str(line).unwrap();
+        let arm = r["arm"].as_str().unwrap().to_string();
+        if arm.starts_with("bad-") {
+            assert_eq!(r["outcome"]["status"], "error", "{line}");
+            let reason = r["outcome"]["error"].as_str().unwrap_or_default();
+            let want = match arm.as_str() {
+                "bad-root" => "no Groebner search",
+                "bad-matrix" => "does not take linear_harvest",
+                _ => "is not off, default, gpv or every",
+            };
+            assert!(reason.contains(want), "{arm}: {line}");
+            continue;
+        }
+        assert_eq!(r["outcome"]["status"], "verified", "{line}");
+        ops.entry(arm.clone())
+            .or_default()
+            .push(r["solver"]["ops"].as_u64().unwrap());
+        found
+            .entry(arm.clone())
+            .or_default()
+            .push(r["counters"]["relations_found"].as_u64().unwrap());
+        method_ids.insert(arm, r["method"]["method_id"].as_str().unwrap().to_string());
+    }
+    assert_eq!(ops["omitted"].len(), 2);
+    assert_eq!(
+        ops["omitted"], ops["default"],
+        "spelling out the default must not change a count"
+    );
+    assert_eq!(found["omitted"], found["off"], "same relations either way");
+    assert_ne!(
+        ops["off"], ops["default"],
+        "the harvest must change the splitting tree on this workload"
+    );
+    assert_ne!(method_ids["omitted"], method_ids["off"]);
+    assert_ne!(method_ids["omitted"], method_ids["default"]);
+}
+
+#[test]
 fn pdp3_koblitz_rootfind_window_shortens_m3_scan_and_records_window_len() {
     // engine=rootfind-window keeps the pair-table set-up charge but scans
     // only ⌈|F|/3⌉ third summands a target.  It must verify, refuse m ≠ 3
