@@ -986,9 +986,8 @@ fn generic_report(
     field_ops: Option<FieldOps>,
 ) -> SolveReport {
     let total = out.setup.gae() + out.search.gae();
-    // A kangaroo re-placement is search; `detail` carries it so `verify`
-    // can reproduce a record written while it was charged to the set-up
-    // (`audit::legacy_restart_phase`).  `detail` is not compared on replay.
+    // A kangaroo re-placement is search.  `detail` says how much of the
+    // search it was (informational; `detail` is not compared on replay).
     let detail = if out.restarts == GroupOps::default() {
         Value::Null
     } else {

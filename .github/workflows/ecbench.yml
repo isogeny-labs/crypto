@@ -452,6 +452,22 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Audit with replays
         run: ./target/release/ecbench verify --dir "$RUNNER_TEMP/prime" --replay 8 --exit-code --out "$RUNNER_TEMP/prime-audit.json" > /dev/null
+      # The pre-2026-10-18 class set-up reconstruction is admitted only for
+      # the producer binaries in audit::PRE_CLASS_SETUP_BINARIES; these
+      # sessions are outside the weekly all-run replay, so replay a sample
+      # of each here and require that the reconstruction was what passed.
+      # (docs/ecbench/CLASS_SETUP_AUDIT.md; the negative controls are in
+      # tests/ecbench.rs.)
+      - name: Pre-fix quartic and cubic records replay under the closed producer list
+        run: |
+          for d in research/prime_rho_automorphism_20261015/sessions/quartic \
+            research/prime_rho_automorphism_20261015/sessions/cubic \
+            research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic \
+            research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto; do
+            ./target/release/ecbench verify --dir "$d" --replay 8 --exit-code --out "$RUNNER_TEMP/class-setup.json" > /dev/null
+            jq -e '[.replays[].detail] | any(startswith("identical (pre-2026-10-18 phase accounting"))' \
+              "$RUNNER_TEMP/class-setup.json" > /dev/null
+          done
       - name: Compare and tabulate
         run: |
           ./target/release/ecbench compare --dir "$RUNNER_TEMP/prime" --a rho-neg --b bsgs-neg | tee -a "$GITHUB_STEP_SUMMARY"

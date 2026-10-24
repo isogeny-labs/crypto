@@ -2086,3 +2086,106 @@ fn field_operations_are_counted_bounded_and_judged() {
     assert!(!kv["statement"].as_str().unwrap().contains("field_"));
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+/// A quartic session the current harness writes, on the smallest curve of
+/// `research/prime_rho_automorphism_20261015/sessions/quartic`.
+const QUARTIC_SPEC: &str = r#"{
+  "schema": "ecbench.spec/v1",
+  "label": "class set-up accounting control",
+  "workloads": {
+    "curves": [{"kind": "prime_explicit", "p": 2395681, "a": 13, "b": 0,
+                "group_order": 2392850, "r": 47857, "gx": 462051, "gy": 856555}],
+    "targets_per_curve": 2,
+    "target_seed": 2026
+  },
+  "arms": [
+    {"name": "rho-quartic", "role": "candidate", "method": {"id": "rho.quartic"}}
+  ],
+  "measurement": {"rounds": 1, "warmup": 0, "seed": 3, "isolation_required": "L0", "timeout_seconds": 60}
+}"#;
+
+/// Rewrite one measured record of `out` with `edit`, reseal it and rehash
+/// the file, so every seal and digest agrees and only a replay can tell.
+fn forge_one_record(
+    out: &Path,
+    edit: impl FnOnce(&mut crypto_lib::cryptanalysis::ecbench::record::Record),
+) {
+    use crypto_lib::cryptanalysis::ecbench::canonical::sha256_hex;
+    use crypto_lib::cryptanalysis::ecbench::record::Record;
+    use crypto_lib::cryptanalysis::ecbench::runner::Session;
+    let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+    let mut lines: Vec<String> = text.lines().map(String::from).collect();
+    let i = lines
+        .iter()
+        .position(|l| l.contains("\"warmup\":false") && l.contains("\"status\":\"verified\""))
+        .unwrap();
+    let mut rec: Record = serde_json::from_str(&lines[i]).unwrap();
+    edit(&mut rec);
+    lines[i] = rec.seal();
+    let body = lines.join("\n") + "\n";
+    std::fs::write(out.join("records.jsonl"), &body).unwrap();
+    let mut session: Session =
+        serde_json::from_str(&std::fs::read_to_string(out.join("session.json")).unwrap()).unwrap();
+    session.records_sha256 = Some(sha256_hex(body.as_bytes()));
+    std::fs::write(
+        out.join("session.json"),
+        serde_json::to_string_pretty(&session).unwrap() + "\n",
+    )
+    .unwrap();
+}
+
+/// The pre-2026-10-18 class set-up reconstruction admits only the listed
+/// historical sessions.  Negative controls: a record the current harness
+/// wrote, undercharged by exactly its own class set-up (the error the
+/// reconstruction undoes) and resealed, fails its replay, whether it keeps
+/// `detail.class_setup` or is dressed in the pre-fix shape without it.
+/// Positive control: the same session, untouched, replays exactly.
+#[test]
+fn a_current_record_undercharged_by_its_class_setup_fails_replay() {
+    let dir = scratch("class-setup");
+    std::fs::write(dir.join("spec.json"), QUARTIC_SPEC).unwrap();
+    let clean = dir.join("clean");
+    assert!(run_spec(&dir, &clean, &[]).0);
+    let (ok, stdout, _) = ecbench(&[
+        "verify",
+        "--dir",
+        clean.to_str().unwrap(),
+        "--replay-all",
+        "--exit-code",
+    ]);
+    assert!(ok, "{stdout}");
+    assert!(!stdout.contains("pre-2026-10-18"), "{stdout}");
+
+    for strip_marker in [false, true] {
+        let out = dir.join(format!("forged-{strip_marker}"));
+        copy_dir(&clean, &out);
+        forge_one_record(&out, |rec| {
+            let setup = rec.detail["class_setup"]["gae"]
+                .as_f64()
+                .expect("current records carry it");
+            assert!(setup > 0.0);
+            let total = rec.cost.total_gae.unwrap() - setup;
+            let r = rec.workload.curve.r as f64;
+            let floor = rec.cost.s.unwrap() / rec.boundaries.ratio_to_floor.unwrap();
+            rec.cost.total_gae = Some(total);
+            rec.cost.s = Some(total / r.sqrt());
+            rec.boundaries.ratio_to_floor = Some(total / r.sqrt() / floor);
+            if strip_marker {
+                rec.detail.as_object_mut().unwrap().remove("class_setup");
+            }
+        });
+        let (ok, stdout, _) = ecbench(&[
+            "verify",
+            "--dir",
+            out.to_str().unwrap(),
+            "--replay-all",
+            "--exit-code",
+        ]);
+        assert!(!ok, "strip_marker={strip_marker}: {stdout}");
+        assert!(
+            stdout.contains("differs in total_gae"),
+            "strip_marker={strip_marker}: {stdout}"
+        );
+    }
+    let _ = std::fs::remove_dir_all(&dir);
+}

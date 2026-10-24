@@ -124,40 +124,62 @@ pub fn legacy_solver_rounding(
 pub const LEGACY_ACCOUNTING_IDENTICAL: &str =
     "identical (pre-2026-10-18 phase accounting, reproduced from the replay)";
 
+/// The ecbench binaries that wrote `rho.quartic` / `rho.cubic` records
+/// before the class set-up was charged to the total (2026-10-18), with the
+/// commit each was built from (none of which has `charge_class_setup`) and
+/// where their records are.  This list is closed: these are the only
+/// producers whose undercharge is historical, found by scanning every
+/// session in this repository and its siblings, archived ones included
+/// (`docs/ecbench/CLASS_SETUP_AUDIT.md` has the census and the impact).  A
+/// record from any other binary, including every record the current
+/// harness writes, must replay exactly.
+pub const PRE_CLASS_SETUP_BINARIES: [(&str, &str, &str); 4] = [
+    (
+        "0a8a48d7580df43d089a62e02f228e93e27ad4a049285cb28a0f5b87eb1473b6",
+        "c9db37d01bc776a1e8594ce5495e58ba2ccf5a1d",
+        "research/prime_rho_automorphism_20261015/sessions/{quartic,cubic}",
+    ),
+    (
+        "1a87842e671358071b2950e6b780bb9d0c750c2a35684329fd5a1fc1967505fa",
+        "466035c18f651bdc675806dfaa767c9a9c0073f5",
+        "research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-*-cubic",
+    ),
+    (
+        "d24c224771974018c0655d0df87af54d6cc787fba1daba4377bff3f56ade6acf",
+        "7fa17f92e0247d885285f90dd215db4f0068a6a4",
+        "research/drastic_prime_conductor_gap_round3_20261012/sessions/{d4-*-auto,d3-*-cubic}",
+    ),
+    (
+        "ac4bc5b26f858a4d8a374208297157840af25fb1dc25ea1c19dd41360735fb35",
+        "d13f5259c4313f96fbe0837f810a3cbd83eaeecc",
+        "research/volcano_ecdlp_census_20261017/sessions/V3-*.tar.xz and \
+         research/volcano_ecdlp_census_followup_20261023/sessions/V5-*.tar.xz",
+    ),
+];
+
+/// Whether `r` may be replayed under the pre-2026-10-18 class set-up
+/// accounting.  Every condition must hold, so anything unforeseen fails
+/// closed to an exact comparison: the method is one the correction
+/// changed; the record carries no `detail.class_setup` (every binary since
+/// the correction writes it); and the record names a listed producer.
+pub fn pre_class_setup_record(r: &Record) -> bool {
+    matches!(r.method.id.as_str(), "rho.quartic" | "rho.cubic")
+        && r.detail.get("class_setup").is_none()
+        && PRE_CLASS_SETUP_BINARIES
+            .iter()
+            .any(|&(binary, _, _)| r.binary_sha256.as_deref() == Some(binary))
+}
+
 /// The figures a `rho.quartic` / `rho.cubic` record written before
 /// 2026-10-18 carries.  Those binaries merged the class set-up into the
 /// ledger the phases are read from, but not into the total, so the total
 /// fell short of the phase sum by exactly the set-up.  The replay reports
 /// its own set-up (`detail.class_setup`, computed by the replay, never read
-/// from the record), so the record cannot choose the amount.
+/// from the record), so the record cannot choose the amount.  Applied only
+/// to a record [`pre_class_setup_record`] admits.
 pub fn legacy_class_setup(rep: &SolveReport) -> Option<(Vec<PhaseRecord>, f64)> {
     let d = rep.detail.pointer("/class_setup/gae")?.as_f64()?;
     (d > 0.0).then(|| (rep.phases.clone(), rep.total_gae - d))
-}
-
-/// The phases a `kangaroo.vow` record written before 2026-10-18 carries.
-/// Those binaries charged a kangaroo's re-placement after a same-kind
-/// collision to `setup`; it is search.  The total is unchanged.  The
-/// replay reports the re-placement work it moved (`detail.
-/// restarts_in_search`, computed by the replay), and this moves it back.
-pub fn legacy_restart_phase(rep: &SolveReport) -> Option<(Vec<PhaseRecord>, f64)> {
-    let moved = rep.detail.get("restarts_in_search")?;
-    let field = |k: &str| moved.get(k).and_then(serde_json::Value::as_u64);
-    let (adds, doubles, sm) = (field("adds")?, field("doubles")?, field("scalar_mults")?);
-    let mut phases = rep.phases.clone();
-    let si = phases.iter().position(|p| p.name == "setup")?;
-    let wi = phases.iter().position(|p| p.name == "search")?;
-    let w = &mut phases[wi];
-    w.adds = w.adds.checked_sub(adds)?;
-    w.doubles = w.doubles.checked_sub(doubles)?;
-    w.scalar_mults = w.scalar_mults.checked_sub(sm)?;
-    w.gae = (w.adds + w.doubles) as f64;
-    let s = &mut phases[si];
-    s.adds += adds;
-    s.doubles += doubles;
-    s.scalar_mults += sm;
-    s.gae = (s.adds + s.doubles) as f64;
-    Some((phases, rep.total_gae))
 }
 
 pub const AUDIT_SCHEMA: &str = "ecbench.audit/v1";
@@ -614,16 +636,12 @@ pub fn audit_with(
                     };
                     let mut counts_ok = ints(&rep.phases) == ints(&r.phases);
                     let mut accounting = false;
-                    if !(total_ok && phases_ok && counts_ok) {
-                        for undo in [legacy_class_setup, legacy_restart_phase] {
-                            let Some((ph, tot)) = undo(&rep) else {
-                                continue;
-                            };
+                    if !(total_ok && phases_ok && counts_ok) && pre_class_setup_record(r) {
+                        if let Some((ph, tot)) = legacy_class_setup(&rep) {
                             let g: Vec<f64> = ph.iter().map(|p| p.gae).collect();
                             if same_gae(&g, tot) == (true, true) && ints(&ph) == ints(&r.phases) {
                                 (total_ok, phases_ok, counts_ok, accounting) =
                                     (true, true, true, true);
-                                break;
                             }
                         }
                     }
@@ -737,35 +755,42 @@ mod tests {
         }
     }
 
-    /// A replay that moved `m` re-placement operations into `search`
-    /// reconstructs the old split exactly: the same total, `m` more in
-    /// `setup`, `m` fewer in `search`, scalar multiplications with them.
+    /// The first `rho.quartic` record of
+    /// `research/prime_rho_automorphism_20261015/sessions/quartic`, byte for
+    /// byte (embedded, so every lane that builds the tests has it).
+    const PRE_FIX_QUARTIC_RECORD: &str = r##"{"schema":"ecbench.record/v1","record_id":"ECR1h4dd135adc8ea","session_id":"ECBS1hf8d1171784f1","run_id":"ECM1h6a12f9c4f6abW91a1cc55dfeaR1","seq":1,"round":0,"warmup":true,"arm":"rho-quartic","role":"candidate","method":{"id":"rho.quartic","family":"rho","params":{"cap_multiple":"64"},"method_id":"ECM1h6a12f9c4f6ab","method_sha256":"6a12f9c4f6ab11596019028dd7660932fc0f3e7507f6c31cd0aa47e92af4e9b1","entry":"ic_boundary::QuarticClasses with RhoWalk::negation()"},"workload":{"workload_id":"W91a1cc55dfea","workload_sha256":"91a1cc55dfeadc5ddf41905dbc4d419dd96bbf2857a758a8928a037f0bb7b6ed","curve_spec":{"kind":"prime_explicit","p":2463541,"a":8,"b":0,"group_order":2460762,"r":136709,"gx":1664813,"gy":581781},"curve":{"slug":"icv1-fp22-t2780-de70e970","icv1":"ICV1:fp-2463541:2780:2460762:1728:unk:unk:r:de70e970f651","family":"prime","construction":"PrimeCurve { p: 2463541, a: 8, b: 0 } (explicit)","field_degree":null,"field_bits":22,"group_order":2460762,"r":136709,"cofactor":18,"generator":["0x19672d","0x8e095"],"automorphisms_available":2,"registered":true,"ec1":"EC1P22Cfphf792205717b1","curve_uid":"urn:ec-record:1:sha256:f792205717b10dcdea770c208a6cf129d5410f857ced08197e5ef86f86f5deb3"},"target_law":"uniform_scalar_sha256_v1","target_seed":20261011,"target_index":0,"target":["0xf267","0x1881e9"],"planted":74430},"algorithm_seed":"11412311281651647685","outcome":{"status":"verified","recovered":"74430","matches_target":true,"matches_planted":true,"error":null,"exit":"exit 0","stderr_sha256":null},"cost":{"unit":"ecbench.gae","total_gae":562.0,"s":1.5199796108001962,"lower_bound":true,"unpriced":["canonicalisations_uncharged"],"deterministic":true,"nondeterminism":[]},"boundaries":{"automorphisms_available":2,"automorphisms_used":4,"floor_s":0.8862269254527579,"ratio_to_floor":1.7151133272368868},"phases":[{"name":"setup","adds":60,"doubles":77,"scalar_mults":0,"gae":137.0,"wall_ns":null,"native":{}},{"name":"search","adds":0,"doubles":0,"scalar_mults":11,"gae":422.0,"wall_ns":null,"native":{}},{"name":"internal_verification","adds":0,"doubles":0,"scalar_mults":0,"gae":24.0,"wall_ns":null,"native":{}}],"counters":{"canonicalisations_uncharged":402,"cycle_escape_doublings":1,"cycles_length_2":0,"cycles_length_4":1,"cycles_other_length":0,"distinguished_point_bits":4,"distinguished_points":26,"jump_coefficient_bits":9,"jumps":8,"look_ahead_additions":11,"setup_additions":60,"setup_doublings":77,"start_additions":25,"steps":364,"useless_collisions":0,"verification_operations":24,"walk_operations":376,"walks":26,"walks_abandoned_in_a_cycle":0,"walks_capped":0},"factor_base":null,"detail":{"expected_steps":231.70131367765455,"method":"quartic-automorphism r-adding walk on {±i^i(P)}: look-ahead, short-cycle escape by doubling, distinguished points, stride starts"},"online":{"wall_ns":1790074,"phases_ns":{"rho_solve":1790074},"zero_phases":{},"start_event":"first target-dependent operation (the jump table [a]G + [b]Q, or the first table step)","stop_event":"[d]G = Q verified inside the method","included_stages":["walk","collision","recovery_check"],"mapping":"rho: the whole target-dependent solve, one exclusive phase"},"solver":null,"field_ops":{"muls":1901,"sqrs":694,"invs":583},"time":{"solve_wall_ns":1791114,"process_wall_ns":15139992,"user_ns":14767000,"sys_ns":0,"max_rss_kib":28540,"minor_faults":4290,"major_faults":0,"voluntary_switches":2,"involuntary_switches":0,"schedstat_solve":{"cpu_ns":0,"run_delay_ns":0,"timeslices":0},"hw_solve":{"instructions":10372594,"cycles":9004985,"instructions_time_enabled_ns":1862340,"instructions_time_running_ns":1862340,"cycles_time_enabled_ns":1855560,"cycles_time_running_ns":1855560,"error":null}},"isolation":{"level":"L0","blockers":["L1: 68 user threads could not be moved off the reserved CPUs (not root?)","L3: run CPU is in neither isolcpus nor nohz_full","L3: governor is None, not performance","L3: turbo/boost is not known to be off","L3: not known to be bare metal"],"run_cpu":1,"reserved":[1],"node":0,"placement":{"affinity":[1],"cpu_at_start":1,"cpu_at_end":1,"mems_allowed":"0","mempolicy":"default","anon_pages_by_node":{"0":4061}},"foreign_busy_ticks":1,"steal_ticks":0,"idle_sibling_busy_ticks":0,"before":{"unix_ms":1792105531447,"loadavg":[0.16,0.09,0.03],"psi_cpu_some_avg10":0.92,"psi_cpu_some_total_us":66171250,"psi_memory_some_avg10":0.0,"psi_memory_some_total_us":2010415,"reserved_ticks":{"1":{"busy":65662,"idle":7618750,"steal":39}}},"after":{"unix_ms":1792105531462,"loadavg":[0.16,0.09,0.03],"psi_cpu_some_avg10":0.92,"psi_cpu_some_total_us":66171259,"psi_memory_some_avg10":0.0,"psi_memory_some_total_us":2010415,"reserved_ticks":{"1":{"busy":65664,"idle":7618750,"steal":39}}}},"env_class_id":"ECBENV2h0e1f15f7c61e","binary_sha256":"0a8a48d7580df43d089a62e02f228e93e27ad4a049285cb28a0f5b87eb1473b6"}"##;
+
+    /// The reconstruction's gate on a committed pre-fix record: admitted
+    /// as written (its seal still checks), refused when any one condition
+    /// is changed.  The end to
+    /// end negative control (a current record undercharged and resealed)
+    /// is `tests/ecbench.rs`,
+    /// `a_current_record_undercharged_by_its_class_setup_fails_replay`.
     #[test]
-    fn legacy_restart_phase_moves_the_restart_back_to_setup() {
-        let rep = SolveReport {
-            phases: vec![phase("setup", 10, 40, 2), phase("search", 900, 3, 1)],
-            total_gae: 953.0,
-            detail: serde_json::json!({"restarts_in_search":
-                {"adds": 7, "doubles": 2, "scalar_mults": 1}}),
-            ..Default::default()
-        };
-        let (old, total) = legacy_restart_phase(&rep).unwrap();
-        assert_eq!(total, 953.0);
-        assert_eq!(old[0], phase("setup", 17, 42, 3));
-        assert_eq!(old[1], phase("search", 893, 1, 0));
-        // Nothing to undo without the replay's own report of it.
-        let plain = SolveReport {
-            detail: serde_json::Value::Null,
-            ..rep.clone()
-        };
-        assert!(legacy_restart_phase(&plain).is_none());
-        // More moved than the phase holds cannot be a reconstruction.
-        let bad = SolveReport {
-            detail: serde_json::json!({"restarts_in_search":
-                {"adds": 901, "doubles": 0, "scalar_mults": 0}}),
-            ..rep
-        };
-        assert!(legacy_restart_phase(&bad).is_none());
+    fn only_a_listed_pre_fix_record_is_eligible_for_the_class_setup_undo() {
+        let rec: Record = serde_json::from_str(PRE_FIX_QUARTIC_RECORD).unwrap();
+        assert!(crate::cryptanalysis::ecbench::record::check_line_seal(
+            PRE_FIX_QUARTIC_RECORD,
+            &rec.record_id
+        ));
+        assert!(pre_class_setup_record(&rec));
+        let mut other_binary = rec.clone();
+        other_binary.binary_sha256 = Some("0".repeat(64));
+        assert!(!pre_class_setup_record(&other_binary));
+        let mut no_binary = rec.clone();
+        no_binary.binary_sha256 = None;
+        assert!(!pre_class_setup_record(&no_binary));
+        let mut marked = rec.clone();
+        marked.detail = json!({"class_setup": {"gae": 21.0}});
+        assert!(!pre_class_setup_record(&marked));
+        let mut other_method = rec.clone();
+        other_method.method.id = "rho.negation".into();
+        assert!(!pre_class_setup_record(&other_method));
+        // Each listed producer is a full digest and a full commit.
+        for (b, c, _) in PRE_CLASS_SETUP_BINARIES {
+            assert!(b.len() == 64 && b.bytes().all(|x| x.is_ascii_hexdigit()));
+            assert!(c.len() == 40 && c.bytes().all(|x| x.is_ascii_hexdigit()));
+        }
     }
 
     /// A `rho.quartic` / `rho.cubic` replay's class set-up is subtracted

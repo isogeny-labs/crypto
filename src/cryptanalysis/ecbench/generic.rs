@@ -361,8 +361,8 @@ mod tests {
     /// a function of `r` alone; any re-placement after a same-kind
     /// collision is charged to `search`.  So the set-up charge is the same
     /// on every seed.  (A same-kind collision needs a kangaroo to land on
-    /// its own trail; none occurs on these seeds, and the restart's
-    /// accounting is tested on a report in `audit::tests`.)
+    /// its own trail; none occurs on these seeds.  The restart itself is
+    /// exercised by `a_kangaroo_restart_is_charged_to_search`.)
     #[test]
     fn kangaroo_setup_is_a_function_of_r_alone() {
         let inst = find_prime_order_curve(14, 59297);
@@ -384,6 +384,49 @@ mod tests {
             setups.iter().all(|&s| s == setups[0]),
             "set-up varies with the seed: {setups:?}"
         );
+    }
+
+    /// Positive control for the re-placement accounting.  On this 11-bit
+    /// curve (r = 1553) the walk from Q = G is periodic before it meets the
+    /// tame kangaroo's trail, so the wild kangaroo lands on its own
+    /// distinguished point and is re-placed; this happens on every seed
+    /// (the walk does not depend on it, only the re-placement offset does).
+    /// The re-placement must be in `search`, `setup` must equal a run with
+    /// no restart on the same group, and the logarithm must still be right.
+    #[test]
+    fn a_kangaroo_restart_is_charged_to_search() {
+        let inst = find_prime_order_curve(11, 0);
+        assert_eq!(inst.r, 1553, "the pinned control curve moved");
+        let g = &inst.curve;
+        let gen = inst.generator_point();
+        let plain = (2..inst.r)
+            .map(|k| {
+                let q = g.mul(&mut GroupOps::default(), gen, k);
+                (k, kangaroo(g, gen, q, inst.r, 0, 64 * inst.r))
+            })
+            .find(|(_, o)| !o.counters.contains_key("same_kind_collisions"))
+            .expect("some target has no restart");
+        assert_eq!(plain.1.recovered, Some(plain.0));
+        assert_eq!(plain.1.restarts, GroupOps::default());
+        for seed in 0..32u64 {
+            let out = kangaroo(g, gen, gen, inst.r, seed, 64 * inst.r);
+            assert_eq!(out.recovered, Some(1), "seed {seed}");
+            assert!(out.counters["same_kind_collisions"] >= 1, "seed {seed}");
+            assert_eq!(
+                out.counters["starts"],
+                2 + out.counters["same_kind_collisions"]
+            );
+            // A re-placement is one scalar multiplication (plus the wild
+            // kangaroo's addition of Q), all of it in `search`.
+            assert!(out.restarts.scalar_mults >= 1, "seed {seed}");
+            assert!(out.search.adds >= out.restarts.adds);
+            assert!(out.search.doubles >= out.restarts.doubles);
+            assert!(out.search.scalar_mults >= out.restarts.scalar_mults);
+            assert_eq!(
+                out.setup, plain.1.setup,
+                "seed {seed}: a restart leaked into setup"
+            );
+        }
     }
 
     #[test]
