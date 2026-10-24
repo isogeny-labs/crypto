@@ -19,7 +19,7 @@ Run `n83_msweep_20261024`, 2026-10-24 (UTC start ≈ 07:00). Protocol: `research
   [rho (n=83)], [strong signed-Frobenius rho], [—], [—], [3 seeds],
 )
 
-500 cells recorded: 452 completed, 48 killed at the 180 s per-cell cap (`process_cap`). Each cell is a fresh process; each query is a public probe $[a]G$ (or a planted sum of $m$ base points for the positive control) and every witness is re-added in the curve group.
+500 cells recorded: 422 completed, 78 killed at the 180 s per-cell cap (`process_cap`). Each cell is a fresh process; each query is a public probe $[a]G$ (or a planted sum of $m$ base points for the positive control) and every witness is re-added in the curve group.
 
 == Findings (measured unless marked derived)
 
@@ -33,7 +33,7 @@ Run `n83_msweep_20261024`, 2026-10-24 (UTC start ≈ 07:00). Protocol: `research
 
 #figure(image("n83_projected_vs_m.svg", width: 90%), caption: [N83: derived projected collection time of the only decided public cell, the m = 4 rootfinder's complete-DLP process wall, and the rho mean (log₂ seconds).])
 
-#figure(image("k1n61_engines_m2.svg", width: 100%), caption: [Companion $K_1/F_(2^61)$, m = 2: mean seconds per decided query by engine and subspace dimension (16 probes each).])
+#figure(image("companion_f2m61_engines_m2.svg", width: 100%), caption: [Companion $K_1/F_(2^61)$, m = 2: mean seconds per decided query by engine and subspace dimension (16 probes each).])
 
 == Deviations, limits, missing data
 

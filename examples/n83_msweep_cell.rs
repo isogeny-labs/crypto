@@ -1,6 +1,7 @@
 //! One cell of the N83 summand sweep: a factor-base construction, a
 //! decomposition engine and a summand count `m`, measured on the pinned
-//! `K_1 / F_2^83` fixture (`KoblitzCurve::known_n83_k1`, 53-bit subgroup).
+//! fixture `icv1-f2m83-t6151469093347-cdcc5432` (`KoblitzCurve::known_n83_k1`,
+//! 53-bit subgroup).
 //!
 //! Every query is a fresh public probe `R = [a]G` from a seeded stream and
 //! goes straight to the library's decomposer, so the collector's cofactor

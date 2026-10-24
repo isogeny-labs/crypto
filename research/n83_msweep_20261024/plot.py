@@ -16,6 +16,8 @@ a = json.loads(Path(sys.argv[1]).read_text())
 out = Path(sys.argv[2])
 cells = a["cells"]
 MS = list(range(2, 10))
+N83 = "icv1-f2m83-t6151469093347-cdcc5432"
+N61 = "icv1-f2m61-tm158598901-405ca675"
 ALG = ["f4-matrix", "f5-matrix", "f4-inherited", "f6-ic", "f6-ic-pair", "crossbred",
        "sat-native", "sat-cnf", "sat-restrict", "mq-fes"]
 CHAIN = [("chain-s3", "union:2"), ("chain-s3", "union:3"), ("chain-s3", "union:4"),
@@ -55,7 +57,7 @@ def save(fig, name):
 out.mkdir(parents=True, exist_ok=True)
 
 # 1. Status map at n = 83: what each engine did at each m (public probes; algebraic rows are planted).
-rows = [("n83k1", "subspace:8", e, "planted") for e in ALG] + [("n83k1", fb, e, p) for e, fb in CHAIN for p in ("public", "planted")]
+rows = [(N83, "subspace:8", e, "planted") for e in ALG] + [(N83, fb, e, p) for e, fb in CHAIN for p in ("public", "planted")]
 fig, ax = plt.subplots(figsize=(10, 9))
 for i, (cv, fb, e, p) in enumerate(rows):
     for j, m in enumerate(MS):
@@ -90,7 +92,7 @@ plotted = False
 for e, fb in CHAIN:
     xs, ys = [], []
     for m in MS:
-        c = find("n83k1", m, fb, e, "public")
+        c = find(N83, m, fb, e, "public")
         if c and c.get("log2_projected_collection_seconds") is not None:
             xs.append(m); ys.append(c["log2_projected_collection_seconds"])
     if xs:
@@ -117,7 +119,7 @@ w = 0.2
 for k, fb in enumerate(dims):
     ys = []
     for e in ALG:
-        c = find("k1n61", 2, fb, e, "public")
+        c = find(N61, 2, fb, e, "public")
         ys.append(c["seconds_per_trial"] if c and c.get("seconds_per_trial") and cat(c) == "decided" else float("nan"))
     ax.bar([i + (k - 1.5) * w for i in range(len(ALG))], ys, w, label=fb)
 ax.set_yscale("log"); ax.set_xticks(range(len(ALG)), ALG, rotation=30, fontsize=8)
@@ -125,5 +127,5 @@ ax.set_ylabel("mean seconds per decided query (16 public probes)")
 ax.set_title("Companion K1/F_2^61, m = 2: engine × factor-base dimension (all queries proved UNSAT;\n"
              "m ≥ 3 refused by the 64-variable descent mask) — run n83_msweep_20261024", fontsize=9)
 ax.legend(fontsize=8); ax.grid(alpha=0.3, axis="y")
-fig.tight_layout(); save(fig, "k1n61_engines_m2")
+fig.tight_layout(); save(fig, "companion_f2m61_engines_m2")
 print("ok", plotted)

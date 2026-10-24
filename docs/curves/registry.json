@@ -2565,6 +2565,34 @@
    ]
   },
   {
+   "slug": "icv1-f2m61-tm158598901-405ca675",
+   "icv1": "ICV1:f2m-61-78c443be:-158598901:2305843009372292854:0x1:-7:unk:r:405ca6756923",
+   "family": "koblitz",
+   "params": {
+    "a": 1,
+    "n": 61,
+    "modulus": "0x2000000000000027",
+    "modulus_rule": "find_irreducible_sparse(n)"
+   },
+   "model_json": "{\"a\":\"0x1\",\"b\":\"0x1\",\"field\":\"f2m-61-78c443be\",\"form\":\"y^2+xy=x^3+a*x^2+b\",\"modulus\":\"0x2000000000000027\",\"v\":\"1\"}",
+   "trace": -158598901,
+   "order": "2305843009372292854",
+   "j": "0x1",
+   "end": "-7",
+   "aliases": [
+    "k1n61",
+    "K_1 / GF(2^61)",
+    "K_1/2^61",
+    "K_1/F_2^61"
+   ],
+   "standard_names": [],
+   "sources": [
+    "prose, by the constructor rule: research/n83_msweep_20261024/ANALYSIS.json"
+   ],
+   "representations": [],
+   "ec1_unresolved": "no tracked record carries this model's subgroup and generator"
+  },
+  {
    "slug": "icv1-f2m67-tm19346764963-82c84cca",
    "icv1": "ICV1:f2m-67-e7132a5d:-19346764963:147573952609023177892:0x1:-7:unk:r:82c84cca3f09",
    "family": "koblitz",
@@ -2922,7 +2950,7 @@
    "aliases": [],
    "standard_names": [],
    "sources": [
-    "prose, by the constructor rule: research/ic_single_target_20260930/curve_ids.json"
+    "prose, by the constructor rule: examples/n83_msweep_cell.rs"
    ],
    "representations": [],
    "ec1_unresolved": "no generator recorded; KoblitzCurve covers n <= 63 and no tracked record carries this model's subgroup and generator"

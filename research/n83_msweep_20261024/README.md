@@ -45,3 +45,15 @@ No improvement over the IC baseline is measured, so no leaderboard or
 | `resume/` | core-session resume of the same frozen commands: HEAD, hashes, stdout |
 | `ANALYSIS.json`, `table.tsv` | `cargo run --release --example n83_msweep_analyze -- research/n83_msweep_20261024` |
 | `plot.py` | lays out `ANALYSIS.json` into the SVG/PNG graphs |
+
+## Names (curve-name lint, after the run)
+
+The companion curve's short driver spec in `grid.tsv` is a retired curve name
+(AGENTS.md §11). After the run, the 340 companion records and the companion
+figure were renamed mechanically to carry the slug
+`icv1-f2m61-tm158598901-405ca675` (figure: `companion_f2m61_engines_m2`). The
+record bytes are unchanged: their `curve_spec` field keeps the short spec, and
+their `curve` field carries the slug. The only post-freeze edit to
+`PROTOCOL.md` is that name rewrite on one table row, made by
+`check_curve_names.py --fix`; the version the cards bind is at `b654e95b6`.
+`docs/curves/registry.json` was regenerated so the slug resolves.

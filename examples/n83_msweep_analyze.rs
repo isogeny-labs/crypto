@@ -15,6 +15,9 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::path::Path;
 
+/// `KoblitzCurve::known_n83_k1`, the sweep's curve.
+const N83: &str = "icv1-f2m83-t6151469093347-cdcc5432";
+
 fn read_json(path: &Path) -> Option<Value> {
     serde_json::from_str(fs::read_to_string(path).ok()?.lines().next()?).ok()
 }
@@ -26,10 +29,21 @@ fn cells(study: &Path) -> Vec<Value> {
     };
     let mut shards: Vec<_> = raw.flatten().map(|e| e.path()).collect();
     shards.sort();
-    for shard in shards.iter().filter(|p| p.file_name().is_some_and(|n| n.to_string_lossy().starts_with("shard"))) {
-        let mut files: Vec<_> = fs::read_dir(shard).into_iter().flatten().flatten().map(|e| e.path()).collect();
+    for shard in shards.iter().filter(|p| {
+        p.file_name()
+            .is_some_and(|n| n.to_string_lossy().starts_with("shard"))
+    }) {
+        let mut files: Vec<_> = fs::read_dir(shard)
+            .into_iter()
+            .flatten()
+            .flatten()
+            .map(|e| e.path())
+            .collect();
         files.sort();
-        for f in files.iter().filter(|p| p.extension().is_some_and(|e| e == "json")) {
+        for f in files
+            .iter()
+            .filter(|p| p.extension().is_some_and(|e| e == "json"))
+        {
             if let Some(mut v) = read_json(f) {
                 v["record"] = json!(f.strip_prefix(study).unwrap_or(f).to_string_lossy());
                 out.push(v);
@@ -44,14 +58,38 @@ fn cells(study: &Path) -> Vec<Value> {
 /// the file name, `curve__mM__fb__engine__probes.json`.
 fn identity(v: &Value) -> (String, u64, String, String, String) {
     let name = v["record"].as_str().unwrap_or("");
-    let stem = Path::new(name).file_stem().map(|s| s.to_string_lossy().into_owned()).unwrap_or_default();
+    let stem = Path::new(name)
+        .file_stem()
+        .map(|s| s.to_string_lossy().into_owned())
+        .unwrap_or_default();
     let parts: Vec<&str> = stem.split("__").collect();
-    let s = |k: &str, i: usize| v[k].as_str().map_or_else(|| parts.get(i).copied().unwrap_or("").to_string(), str::to_string);
+    let s = |k: &str, i: usize| {
+        v[k].as_str().map_or_else(
+            || parts.get(i).copied().unwrap_or("").to_string(),
+            str::to_string,
+        )
+    };
     let probes = match s("probes", 4).as_str() {
         "public_subgroup" => "public".to_string(),
         other => other.to_string(),
     };
-    (s("curve_spec", 0), v["m"].as_u64().unwrap_or(0), s("factor_base", 2), s("engine", 3), probes)
+    // Every curve is keyed by its ICV1 slug: a completed record carries it
+    // as `curve`; a process-cap record has only the file-name prefix, which
+    // is the slug or the driver's name for the pinned N83 fixture.
+    let curve = match v["curve"].as_str() {
+        Some(slug) => slug.to_string(),
+        None => match parts.first().copied().unwrap_or("") {
+            "n83k1" => N83.to_string(),
+            other => other.to_string(),
+        },
+    };
+    (
+        curve,
+        v["m"].as_u64().unwrap_or(0),
+        s("factor_base", 2),
+        s("engine", 3),
+        probes,
+    )
 }
 
 fn rho(study: &Path) -> Value {
@@ -97,7 +135,9 @@ fn rootfinder(study: &Path) -> Vec<Value> {
 }
 
 fn main() {
-    let study = std::env::args().nth(1).expect("usage: n83_msweep_analyze <study_dir>");
+    let study = std::env::args()
+        .nth(1)
+        .expect("usage: n83_msweep_analyze <study_dir>");
     let study = Path::new(&study);
     let rho = rho(study);
     let rho_s = rho["mean_online_seconds"].as_f64();
@@ -111,7 +151,7 @@ fn main() {
         let verified = v["verified_relations"].as_u64().unwrap_or(0);
         let log2_proj = v["log2_projected_collection_seconds"].as_f64();
         let gap = match (log2_proj, rho_s, curve.as_str(), probes.as_str()) {
-            (Some(p), Some(r), "n83k1", "public") => Some(p - r.log2()),
+            (Some(p), Some(r), N83, "public") => Some(p - r.log2()),
             _ => None,
         };
         if probes == "planted" {
@@ -139,23 +179,38 @@ fn main() {
     }
     // Best informative public n83 cell per m (smallest projected time).
     let mut best: BTreeMap<u64, Value> = BTreeMap::new();
-    for r in rows.iter().filter(|r| r["curve"] == "n83k1" && r["probes"] == "public") {
-        let Some(p) = r["log2_projected_collection_seconds"].as_f64() else { continue };
+    for r in rows
+        .iter()
+        .filter(|r| r["curve"] == N83 && r["probes"] == "public")
+    {
+        let Some(p) = r["log2_projected_collection_seconds"].as_f64() else {
+            continue;
+        };
         let m = r["m"].as_u64().unwrap_or(0);
-        if best.get(&m).and_then(|b| b["log2_projected_collection_seconds"].as_f64()).is_none_or(|b| p < b) {
+        if best
+            .get(&m)
+            .and_then(|b| b["log2_projected_collection_seconds"].as_f64())
+            .is_none_or(|b| p < b)
+        {
             best.insert(m, r.clone());
         }
     }
     let mut counts: BTreeMap<String, u64> = BTreeMap::new();
     for r in &rows {
-        *counts.entry(format!("{}|{}", r["curve"].as_str().unwrap_or(""), r["status"].as_str().unwrap_or(""))).or_default() += 1;
+        *counts
+            .entry(format!(
+                "{}|{}",
+                r["curve"].as_str().unwrap_or(""),
+                r["status"].as_str().unwrap_or("")
+            ))
+            .or_default() += 1;
     }
     let analysis = json!({
         "schema": "n83-msweep-analysis/v1",
         "study": "research/n83_msweep_20261024",
         "derivations": {
             "log2_projected_collection_seconds": "cell driver: log2(relations_needed / p * seconds_per_trial), only when >= 90% of queries decided",
-            "log2_gap_to_rho": "log2_projected_collection_seconds - log2(rho mean_online_seconds); n83k1 public cells only",
+            "log2_gap_to_rho": "log2_projected_collection_seconds - log2(rho mean_online_seconds); public cells on the N83 curve only",
             "control.passed": "status complete and every planted probe returned a group-verified witness",
         },
         "cell_status_counts": counts,
@@ -165,20 +220,48 @@ fn main() {
         "best_projected_per_m": best.into_values().collect::<Vec<_>>(),
         "cells": rows,
     });
-    fs::write(study.join("ANALYSIS.json"), serde_json::to_string_pretty(&analysis).unwrap()).unwrap();
+    fs::write(
+        study.join("ANALYSIS.json"),
+        serde_json::to_string_pretty(&analysis).unwrap(),
+    )
+    .unwrap();
     let mut tsv = String::from("curve\tm\tfactor_base\tengine\tprobes\tstatus\ttrials\tdecided\tverified\ts_per_trial\tlog2_proj_s\tlog2_gap_rho\n");
     for r in analysis["cells"].as_array().unwrap() {
         let f = |k: &str| match &r[k] {
             Value::Null => "".to_string(),
             Value::String(s) => s.clone(),
-            Value::Number(n) => n.as_f64().map_or(n.to_string(), |x| if x.fract() == 0.0 { format!("{x}") } else { format!("{x:.4}") }),
+            Value::Number(n) => n.as_f64().map_or(n.to_string(), |x| {
+                if x.fract() == 0.0 {
+                    format!("{x}")
+                } else {
+                    format!("{x:.4}")
+                }
+            }),
             other => other.to_string(),
         };
-        tsv.push_str(&[f("curve"), f("m"), f("factor_base"), f("engine"), f("probes"), f("status"), f("trials"),
-            f("decided_fraction"), f("verified_relations"), f("seconds_per_trial"),
-            f("log2_projected_collection_seconds"), f("log2_gap_to_rho")].join("\t"));
+        tsv.push_str(
+            &[
+                f("curve"),
+                f("m"),
+                f("factor_base"),
+                f("engine"),
+                f("probes"),
+                f("status"),
+                f("trials"),
+                f("decided_fraction"),
+                f("verified_relations"),
+                f("seconds_per_trial"),
+                f("log2_projected_collection_seconds"),
+                f("log2_gap_to_rho"),
+            ]
+            .join("\t"),
+        );
         tsv.push('\n');
     }
     fs::write(study.join("table.tsv"), tsv).unwrap();
-    eprintln!("{} cells, rho mean {:?} s", analysis["cells"].as_array().unwrap().len(), rho_s);
+    eprintln!(
+        "{} cells, rho mean {:?} s",
+        analysis["cells"].as_array().unwrap().len(),
+        rho_s
+    );
 }
