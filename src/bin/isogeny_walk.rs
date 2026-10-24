@@ -532,7 +532,11 @@ fn run(cli: Cli) -> Result<(), String> {
                 ]),
             ));
             let summary = V::Map(summary);
-            write(&out.join("walk.json"), &summary.json())?;
+            let summary_json = summary.json();
+            write(&out.join("walk.json"), &summary_json)?;
+            // Keep stdout machine-readable for direct callers and the crax
+            // JSON bridge; progress and publication diagnostics use stderr.
+            println!("{summary_json}");
             eprintln!(
                 "isogeny_walk: {} curves ({} expanded), {} verified edges, {} failures in {} ms; wrote {}",
                 w.nodes.len(),
