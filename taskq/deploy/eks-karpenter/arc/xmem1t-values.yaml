@@ -1,0 +1,52 @@
+# One runner on a 1 TiB gha-xmem node (x2iedn/x2iezn .8xlarge, 32 vCPU); the
+# 900 GiB request only fits that size. Uses the whole 32-vCPU xmem limit.
+githubConfigUrl: https://github.com/aburan28/crypto
+githubConfigSecret: arc-github-auth
+runnerScaleSetName: crypto-eks-xmem1t
+minRunners: 0
+maxRunners: 1
+containerMode:
+  type: dind
+controllerServiceAccount:
+  namespace: arc-system
+  name: arc-gha-rs-controller
+listenerTemplate:
+  spec:
+    nodeSelector:
+      isolab.dev/role: system
+    containers:
+      - name: listener
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            memory: 256Mi
+template:
+  spec:
+    automountServiceAccountToken: false
+    terminationGracePeriodSeconds: 110
+    nodeSelector:
+      gha.dev/pool: xmem
+    tolerations:
+      - key: gha.dev/workload
+        operator: Equal
+        value: runner
+        effect: NoSchedule
+      - key: gha.dev/pool
+        operator: Equal
+        value: xmem
+        effect: NoSchedule
+    containers:
+      - name: runner
+        image: 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/gha-runner@sha256:71692163462dc305dc4a8f312143e704938b5929b84256bec9d30a5b27e6e7bf
+        command: ["/home/runner/run.sh"]
+        resources:
+          requests:
+            cpu: "30"
+            memory: 900Gi
+            ephemeral-storage: 20Gi
+          limits:
+            cpu: "32"
+            memory: 960Gi
+            ephemeral-storage: 100Gi

@@ -20,6 +20,7 @@ kubectl apply -f nodepool.yaml
 kubectl wait --for=condition=Ready ec2nodeclass/gha --timeout=5m
 kubectl wait --for=condition=Ready nodepool/gha-on-demand --timeout=5m
 kubectl wait --for=condition=Ready nodepool/gha-on-demand-extra --timeout=5m
+kubectl wait --for=condition=Ready nodepool/gha-xmem --timeout=5m
 
 chart=oci://ghcr.io/actions/actions-runner-controller-charts
 version=0.15.0
@@ -32,6 +33,12 @@ helm upgrade --install crypto-eks-linux "$chart/gha-runner-scale-set" \
 helm upgrade --install crypto-eks-highmem "$chart/gha-runner-scale-set" \
   --version "$version" --namespace arc-runners --atomic --wait --timeout 10m \
   -f highmem-values.yaml
+helm upgrade --install crypto-eks-xmem "$chart/gha-runner-scale-set" \
+  --version "$version" --namespace arc-runners --atomic --wait --timeout 10m \
+  -f xmem-values.yaml
+helm upgrade --install crypto-eks-xmem1t "$chart/gha-runner-scale-set" \
+  --version "$version" --namespace arc-runners --atomic --wait --timeout 10m \
+  -f xmem1t-values.yaml
 
 kubectl -n arc-runners get autoscalingrunnersets,pods
 echo "ARC installed. Run the manual ARC smoke workflow before setting CRYPTO_EKS_WORKFLOWS."

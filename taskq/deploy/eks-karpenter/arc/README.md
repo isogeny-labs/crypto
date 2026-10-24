@@ -15,6 +15,8 @@ not control standalone EC2 instances or Auto Scaling groups outside EKS.
 | --- | --- | --- | --- |
 | `crypto-eks-linux` | 4 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 11 |
 | `crypto-eks-highmem` | 16 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
+| `crypto-eks-xmem` | 14 CPU, 440 GiB plus Docker sidecar | 480 GiB runner (x2iedn/x2iezn.4xlarge, 512 GiB) | 1 |
+| `crypto-eks-xmem1t` | 30 CPU, 900 GiB plus Docker sidecar | 960 GiB runner (x2iedn/x2iezn.8xlarge, 1 TiB) | 1 |
 
 The base NodePool admits x86-64 R-family instances with 8 or 16 vCPUs and caps
 aggregate provisioning at 16 vCPUs and 128 GiB. An additional R-family pool
@@ -29,6 +31,22 @@ guaranteed capacity; the regional Spot vCPU quota can prevent new nodes from
 launching. Worker EC2, EBS and NAT traffic are billed. Linux x64 jobs are the
 only migration candidates; ARM, macOS, Windows, GPU and hardware-isolated
 ecbench jobs remain on their current runners.
+
+The `gha-xmem` NodePool (added 2026-10-24) is for single processes larger than
+the 120 GiB highmem pod: msolve on the PKM N=21 system needs at least 256 GB in
+one process and the dense degree-5 Weil-descent closure about 768 GB. It admits
+only Spot x2iedn and x2iezn nodes with 16 or 32 vCPUs and carries its own
+`gha.dev/pool=xmem` taint, so only the two xmem scale sets land there. Its limit
+is 32 vCPUs and 1100 GiB, which is one 1 TiB node or two 512 GiB nodes. The
+runner pools then total at most 64 vCPUs (16 + 16 + 32). Together with the Iso
+Lab pools that total must stay inside the 96-vCPU regional Spot quota, and
+Karpenter fails to launch a node when it would not.
+The two scale sets differ only in their request, so the request decides the
+node size. Spot prices for these families were not checked when the pool was
+written. Read them before dispatching a long job. Every runner pod template sets
+`terminationGracePeriodSeconds: 110`. Within the two-minute Spot notice this
+gives a job's SIGTERM trap time to push its finished records. It does not save
+process memory.
 
 ## Required access and authentication
 
@@ -73,7 +91,8 @@ Check [the current Actions runner release](https://github.com/actions/runner/rel
 regularly; GitHub rejected the older `2.333.1` image as `Outdated` during the
 live deployment test.
 
-After deployment, dispatch `eks-arc-smoke.yml` once per pool.
+After deployment, dispatch `eks-arc-smoke.yml` once per pool (the xmem scale sets are
+checked by their first real job, since a smoke run there costs an x2 node-hour).
 Confirm both jobs pass, `kubectl get nodeclaims` shows a `gha-on-demand` node
 during a run, and GitHub's job log identifies the expected runner name. Check
 that an empty node disappears after the consolidation interval. Linux x64 jobs

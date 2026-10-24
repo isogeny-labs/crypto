@@ -11,7 +11,12 @@ name: Weil-descent closure A3 (EKS high-memory)
 #   stage=measure  takes the draws from RESULTS_BRANCH, checks the sha256, runs the
 #                  first 16 unsatisfiable draws and the control at degree 4, tallies.
 #   stage=both     gen, push, then measure.
-# Spot interruption fails the job; re-dispatch the unfinished stage.
+# Resume (PROTOCOL §11.8): finished closure records are pushed to RESULTS_BRANCH
+# every SYNC_SECONDS and on SIGTERM/SIGINT (Spot drain or cancel), and stage=measure
+# restores every finished record from it first; run.sh skips those closures and
+# reruns only the ones a Spot loss interrupted (their .part files are dropped).
+# Spot interruption fails the job; re-dispatch stage=measure (or gen if the draws
+# were never pushed).
 on:
   workflow_dispatch:
     inputs:
@@ -28,6 +33,7 @@ concurrency:
 env:
   RESULTS_BRANCH: results/dreg-a3-eks-20261024
   D: research/dreg_closure_m4l6_20261018
+  SYNC_SECONDS: "600"
 jobs:
   a3:
     if: github.ref == 'refs/heads/main'
@@ -48,6 +54,13 @@ jobs:
           # Three 39 GB closures at once need the 120 GiB pod; refuse anything smaller.
           test "$memory_bytes" -ge $((112 * 1024 * 1024 * 1024))
           rustc --version; cargo --version
+          # run.sh needs /usr/bin/time (GNU time) and the job's trap needs pkill;
+          # the ARC runner image ships neither package.
+          if [ ! -x /usr/bin/time ] || ! command -v pkill >/dev/null; then
+            sudo apt-get update -q && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends time procps
+          fi
+          /usr/bin/time -v true 2>&1 | grep -q 'Maximum resident set size'
+          command -v prlimit setsid pkill
       - name: Build dreg_ladder and dreg_closure (release)
         run: cargo build --locked --release --example dreg_ladder --example dreg_closure
       - name: Host record
@@ -65,7 +78,9 @@ jobs:
         run: |
           set -euo pipefail
           git fetch origin "$RESULTS_BRANCH"
-          git checkout "origin/$RESULTS_BRANCH" -- "$D/draws/a3-m4-15-6.jsonl" "$D/draws/a3-sha256.txt" "$D/runs/queue.log"
+          git checkout "origin/$RESULTS_BRANCH" -- "$D/draws/a3-m4-15-6.jsonl" "$D/draws/a3-sha256.txt" "$D/runs"
+          git reset -q
+          ls "$D/runs"
           echo "eks: measure from run ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT} runner ${RUNNER_NAME}" >> "$D/runs/queue.log"
           (cd "$D/draws" && sha256sum -c a3-sha256.txt)
       - name: Push draws to the results branch (gen)
@@ -82,21 +97,24 @@ jobs:
         if: inputs.stage != 'gen'
         run: |
           set -euo pipefail
-          "$D/run.sh" target/release/examples/dreg_ladder target/release/examples/dreg_closure measure-a3
+          sync() { "$D/sync-results.sh" "$RESULTS_BRANCH" "A3 closures ($1) from EKS run ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT}" || true; }
+          # Own session, so a signal reaches every closure (timeout(1) puts each in
+          # its own process group, but not its own session).
+          # setsid may fork, so the leader writes its own pid (= the session id).
+          sid="$RUNNER_TEMP/a3-measure.sid"
+          setsid -w bash -c 'echo $$ > "$0"; exec "$@"' "$sid" \
+            "$D/run.sh" target/release/examples/dreg_ladder target/release/examples/dreg_closure measure-a3 &
+          m=$!
+          trap 'pkill -TERM -s "$(cat "$sid")" || true; wait "$m" || true; sync stopped; exit 143' TERM INT
+          while kill -0 "$m" 2>/dev/null; do
+            sleep "$SYNC_SECONDS" & wait $! || true
+            sync periodic
+          done
+          wait "$m"
           "$D/run.sh" target/release/examples/dreg_ladder target/release/examples/dreg_closure tally-a3 | tee "$D/runs/a3-tally.tsv"
       - name: Push closure records to the results branch (measure)
         if: always() && inputs.stage != 'gen'
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          keep="$RUNNER_TEMP/a3-runs"; rm -rf "$keep"; cp -a "$D/runs" "$keep"
-          git fetch origin "$RESULTS_BRANCH"
-          git checkout -f -B "$RESULTS_BRANCH" "origin/$RESULTS_BRANCH"
-          cp -a "$keep/." "$D/runs/"
-          git add "$D/runs"
-          git commit -m "A3 closures from EKS run ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT}" || true
-          git push origin "HEAD:refs/heads/$RESULTS_BRANCH"
+        run: '"$D/sync-results.sh" "$RESULTS_BRANCH" "A3 closures (final) from EKS run ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT}"'
       - name: Upload records
         if: always()
         uses: actions/upload-artifact@v4
