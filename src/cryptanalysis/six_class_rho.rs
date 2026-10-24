@@ -59,6 +59,18 @@ pub struct CampaignResult {
     pub short_cycle_escapes: u64,
     pub log: Option<String>,
     pub first_dp: Option<ClassDp>,
+    #[serde(default)]
+    pub step_additions: u64,
+    #[serde(default)]
+    pub dead_trails: u64,
+    #[serde(default)]
+    pub exceptional_steps: u64,
+    #[serde(default)]
+    pub collision_attempts: u64,
+    #[serde(default)]
+    pub unique_dp_entries: usize,
+    #[serde(default)]
+    pub dp_records_verified: u64,
 }
 
 #[derive(Clone)]
@@ -334,6 +346,12 @@ impl SixClassContext {
             short_cycle_escapes: 0,
             log: None,
             first_dp: None,
+            step_additions: 0,
+            dead_trails: 0,
+            exceptional_steps: 0,
+            collision_attempts: 0,
+            unique_dp_entries: 0,
+            dp_records_verified: 0,
         };
         let mut seen: HashMap<String, ClassDp> = HashMap::new();
         for walker in 0..max_walkers {
@@ -341,6 +359,7 @@ impl SixClassContext {
             let mut state = self.start(walker);
             let mut recent: VecDeque<(BigUint, ClassState)> = VecDeque::new();
             let cap = self.base.step_cap.min(1_000_000);
+            let mut reached_dp = false;
             for step in 0..cap {
                 let Ok((key, _, _)) = self.canonical(&state.point) else {
                     break;
@@ -352,8 +371,12 @@ impl SixClassContext {
                             result.first_dp = Some(record.clone());
                         }
                         result.distinguished += 1;
+                        reached_dp = true;
                         let entry = seen.insert(hex_of(&key), record.clone());
+                        result.unique_dp_entries = seen.len();
                         if let Some(previous) = entry {
+                            result.collision_attempts += 1;
+                            result.dp_records_verified += 2;
                             if let Some(log) = self.recover(&previous, &record) {
                                 result.log = Some(hex_of(&log));
                                 return result;
@@ -387,9 +410,18 @@ impl SixClassContext {
                     recent.pop_front();
                 }
                 match self.step(&state) {
-                    Ok(next) => state = next,
-                    Err(_) => break,
+                    Ok(next) => {
+                        result.step_additions += 1;
+                        state = next;
+                    }
+                    Err(_) => {
+                        result.exceptional_steps += 1;
+                        break;
+                    }
                 }
+            }
+            if !reached_dp {
+                result.dead_trails += 1;
             }
         }
         result
