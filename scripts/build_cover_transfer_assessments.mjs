@@ -848,11 +848,11 @@ async function buildSourceArtifacts() {
   return Promise.all([
     sourceArtifact(
       "docs/curves/registry.json",
-      "exact ICV1/EC1 input registry",
+      "current ICV1/EC1 registry containing the frozen assessed models",
       freshness(
         "supported",
-        "the exact input registry for all 2,572 assessed map rows",
-        "The digest is computed from the current file and every membership is joined through its model hash.",
+        "survival of the 2,572 frozen assessed model hashes in the current registry",
+        "The current-file digest is pinned here; the assessed registry bytes are pinned separately by catalog_commit.",
         ["docs/curves/registry.json"],
       ),
     ),
@@ -861,8 +861,8 @@ async function buildSourceArtifacts() {
       "generated curve-level geometry catalog",
       freshness(
         "supported",
-        "all 2,572 current verified-over-declared-field geometry rows",
-        "The ledger derives every map profile predicate from this exact file.",
+        "the frozen 2,572 verified-over-declared-field geometry rows",
+        "The ledger derives every map profile predicate from this frozen file and its catalog_commit.",
         ["docs/curves/covers.json"],
       ),
     ),
@@ -871,7 +871,7 @@ async function buildSourceArtifacts() {
       "content-addressed ICV1/EC1/HC1/CV1 graph",
       freshness(
         "supported",
-        "2,572 exact map links, 2,570 unique cover objects, and 977 EC1 triples",
+        "2,572 frozen exact map links, 2,570 unique cover objects, and 977 historical EC1 triples",
         "The ledger records exact sorted UID memberships rather than count-only coverage.",
         ["docs/curves/cover-links.yaml"],
       ),

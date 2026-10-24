@@ -11,12 +11,12 @@
   "source_artifacts": [
     {
       "path": "docs/curves/registry.json",
-      "sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf",
-      "role": "exact ICV1/EC1 input registry",
+      "sha256": "2d1c9747484edcadd3ecee7dad242189ae60574215c902e066879d5943e5dd0c",
+      "role": "current ICV1/EC1 registry containing the frozen assessed models",
       "freshness": {
         "status": "supported",
-        "scope": "the exact input registry for all 2,572 assessed map rows",
-        "rationale": "The digest is computed from the current file and every membership is joined through its model hash.",
+        "scope": "survival of the 2,572 frozen assessed model hashes in the current registry",
+        "rationale": "The current-file digest is pinned here; the assessed registry bytes are pinned separately by catalog_commit.",
         "evidence_refs": [
           "docs/curves/registry.json"
         ]
@@ -28,8 +28,8 @@
       "role": "generated curve-level geometry catalog",
       "freshness": {
         "status": "supported",
-        "scope": "all 2,572 current verified-over-declared-field geometry rows",
-        "rationale": "The ledger derives every map profile predicate from this exact file.",
+        "scope": "the frozen 2,572 verified-over-declared-field geometry rows",
+        "rationale": "The ledger derives every map profile predicate from this frozen file and its catalog_commit.",
         "evidence_refs": [
           "docs/curves/covers.json"
         ]
@@ -41,7 +41,7 @@
       "role": "content-addressed ICV1/EC1/HC1/CV1 graph",
       "freshness": {
         "status": "supported",
-        "scope": "2,572 exact map links, 2,570 unique cover objects, and 977 EC1 triples",
+        "scope": "2,572 frozen exact map links, 2,570 unique cover objects, and 977 historical EC1 triples",
         "rationale": "The ledger records exact sorted UID memberships rather than count-only coverage.",
         "evidence_refs": [
           "docs/curves/cover-links.yaml"
@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "ea24b54401970d94cf84b61f053ac3c0da5a4dc7daa6eeeff18ca83ac87e71cf",
+      "sha256": "d813625c58d86b72a3cbae295cddf374f4891409b6e304b368cafe723523148d",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -234,7 +234,7 @@
     },
     {
       "path": ".github/workflows/curve-covers.yml",
-      "sha256": "e7090d810294b6559e3419280aae5e368a3953c5ff44b798792fd4fb2772bfd2",
+      "sha256": "8458b483965628834786e87d900df05df781993d7b1eb8a2269f62887c99285c",
       "role": "exact implementation-version dependency: .github/workflows/curve-covers.yml",
       "freshness": {
         "status": "supported",
@@ -471,7 +471,7 @@
     },
     {
       "path": "docs/curves/COVERS.md",
-      "sha256": "18fb8fdaa9b85dd3501bdad38bd0aef5f1f6626dd361b1942f932e39d9f2f79e",
+      "sha256": "0486a5c22c7ae21a5063638bc98e2f14dead53c4ec6392f3354bd11d38f6fe75",
       "role": "catalog geometry contract and proof boundary",
       "freshness": {
         "status": "supported",
@@ -536,7 +536,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
-      "sha256": "4c8c50fc9ef002388803f88d2433e3d30c0db5db722560372c804549bc8d4589",
+      "sha256": "1cf989782409a0a9cd36ce4e6cd8d802f359bd6273ec48105c4e5fa041282750",
       "role": "independent catalog-wide assessment verifier",
       "freshness": {
         "status": "supported",

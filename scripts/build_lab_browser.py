@@ -40,6 +40,8 @@ OUT = os.path.join(ROOT, "docs", "browser", "data.json")
 REGISTRY = "docs/curves/registry.json"
 COVERS = "docs/curves/covers.json"
 COVER_LINKS = "docs/curves/cover-links.yaml"
+FROZEN_COVERS_REGISTRY_SHA256 = "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf"
+FROZEN_COVERS_COUNT = 2572
 STANDARDS_COVERAGE = "docs/curves/standards/coverage.json"
 LEADERBOARD = "docs/ic/leaderboard.json"
 TOURNAMENT_RUNS = "research/ic_candidate_tournament_20260915/runs"
@@ -693,22 +695,31 @@ def attach_covers(
     curves: list[dict],
     report: dict,
     source: RepositoryInputs | None = None,
-) -> None:
-    """Join preverified metadata only; mathematical checks are native Rust."""
-    if (
-        report.get("schema_version") != "curve-covers/v1"
-        or report.get("registry_sha256") != sha256_file(REGISTRY, source)
-    ):
-        raise ValueError("cover report schema or registry digest is stale")
+) -> set[str]:
+    """Join frozen certificates only where the exact model still matches."""
+    if report.get("schema_version") != "curve-covers/v1":
+        raise ValueError("cover report schema is unsupported")
     findings = report.get("curves", [])
     by_slug = {r["slug"]: r for r in findings}
-    if len(by_slug) != len(findings) or set(by_slug) != {c["slug"] for c in curves}:
-        raise ValueError("cover report must have exactly one finding per catalog model")
+    current_slugs = {c["slug"] for c in curves}
+    if len(by_slug) != len(findings) or not set(by_slug) <= current_slugs:
+        raise ValueError("cover report has duplicate or unregistered model identities")
+    current_digest = sha256_file(REGISTRY, source)
+    if report.get("registry_sha256") == current_digest:
+        if set(by_slug) != current_slugs:
+            raise ValueError("current cover report omits registered models")
+    elif (report.get("registry_sha256") != FROZEN_COVERS_REGISTRY_SHA256
+          or len(findings) != FROZEN_COVERS_COUNT):
+        raise ValueError("cover report is neither current nor the complete frozen catalog")
     for curve in curves:
-        finding = by_slug[curve["slug"]]
+        finding = by_slug.get(curve["slug"])
+        if finding is None:
+            curve["hyperelliptic_cover"] = None
+            continue
         if finding.get("model_sha256") != hashlib.sha256(curve["model_json"].encode()).hexdigest():
             raise ValueError(f"cover model digest mismatch: {curve['slug']}")
         curve["hyperelliptic_cover"] = finding
+    return set(by_slug)
 
 
 def build() -> dict:
@@ -716,18 +727,23 @@ def build() -> dict:
     registry = load(REGISTRY, source)
     leaderboard = load(LEADERBOARD, source)
     curves = curve_rows(registry, leaderboard)
-    attach_covers(curves, load(COVERS, source), source)
+    report = load(COVERS, source)
+    covered_slugs = attach_covers(curves, report, source)
     graph = load(COVER_LINKS, source)  # JSON syntax is a subset of YAML 1.2.
     if (
         graph.get("schema_version") != "curve-cover-graph/v1"
-        or graph.get("registry_sha256") != sha256_file(REGISTRY, source)
+        or graph.get("registry_sha256") != report.get("registry_sha256")
     ):
-        raise ValueError("stale cover graph")
+        raise ValueError("cover graph and report have different source registries")
     nodes = {node["icv1_identity"]["slug"]: node for node in graph["curves"]}
-    if len(nodes) != len(graph["curves"]) or set(nodes) != {c["slug"] for c in curves}:
-        raise ValueError("cover graph must bind every catalog model exactly once")
+    if len(nodes) != len(graph["curves"]) or set(nodes) != covered_slugs:
+        raise ValueError("cover graph must bind every assessed model exactly once")
     for curve in curves:
-        node = nodes[curve["slug"]]
+        node = nodes.get(curve["slug"])
+        if node is None:
+            curve["cover_links"] = []
+            curve["standards_provenance"] = []
+            continue
         if node["model_json"] != curve["model_json"]:
             raise ValueError("cover graph model mismatch")
         curve["cover_links"] = [dict(link, cover_id=graph["covers"][link["cover_uid"]]["cover_id"],
@@ -760,7 +776,9 @@ def build() -> dict:
         "schema_version": "lab-browser/1",
         "generated_by": "scripts/build_lab_browser.py",
         "what_this_is": "A searchable index of the curves, methods, factor bases, candidate identities, tournament rounds and ecbench sessions this repository names, joined on the identities it already computes (ICV1 slugs, EC1 aliases, ECM1 method ids, FB1 factor-base ids, IC1 candidate ids). Every figure is quoted from a committed file named in `sources` or in the row; nothing is computed here beyond means over a session's own verified runs.",
-        "counts": {"curves": len(curves), "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates), "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields)},
+        "counts": {"curves": len(curves), "cover_assessed": len(covered_slugs),
+                   "cover_unassessed": len(curves) - len(covered_slugs),
+                   "methods": len(methods), "factor_bases": len(fbs), "candidates": len(candidates), "rounds": len(rounds), "sessions": len(sessions), "yields": len(yields)},
         "sources": sources,
         "vocabulary": VOCABULARY,
         "standards_coverage": load(STANDARDS_COVERAGE, source),

@@ -118,7 +118,10 @@ jobs:
             --repo-root .
       - run: cargo run --bin curve_standards -- --check
       - run: python3 scripts/update_curve_standards.py --check
-      - run: cargo run --bin curve_cover_check -- --check
+      - name: Replay the frozen 2,572-model cover catalog
+        run: |
+          git show 8e4c99759fd8d9594ed207d793b07b59ebaf19f7:docs/curves/registry.json > "$RUNNER_TEMP/curve-cover-registry.json"
+          cargo run --bin curve_cover_check -- --registry "$RUNNER_TEMP/curve-cover-registry.json" --check
       - run: python3 scripts/test_cover_catalog.py
       - name: Check sparse-safe lab-browser generation
         run: |

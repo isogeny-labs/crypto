@@ -65,7 +65,8 @@
     return "GF(p), p = " + c.field.p + " (" + c.field.bits + " bits)";
   }
   function bestRatio(c) {
-    var vals = (c.leaderboard || []).map(function (b) { return b.ratio_rho; }).filter(function (v) { return typeof v === "number"; });
+    var vals = (c.leaderboard || []).filter(function (b) { return b.regime !== "koblitz_batch"; })
+      .map(function (b) { return b.ratio_rho; }).filter(function (v) { return typeof v === "number"; });
     return vals.length ? Math.min.apply(null, vals) : null;
   }
   function parseHash() {
@@ -93,7 +94,11 @@
   function table(columns, rows, opts) {
     opts = opts || {};
     var state = { key: opts.sortKey || columns[0].key, dir: opts.sortDir || 1 };
+    var page = 0;
+    var pageSize = opts.pageSize || 0;
     var wrap = el("div", { class: "scroll" });
+    var container = pageSize ? el("div") : wrap;
+    if (pageSize) container.appendChild(wrap);
     var tbl = el("table");
     var thead = el("thead");
     var tr = el("tr");
@@ -101,6 +106,7 @@
       var th = el("th", { class: col.numeric ? "n" : null, text: col.label, scope: "col" });
       th.addEventListener("click", function () {
         if (state.key === col.key) state.dir = -state.dir; else { state.key = col.key; state.dir = col.numeric ? -1 : 1; }
+        page = 0;
         render();
       });
       tr.appendChild(th);
@@ -110,6 +116,19 @@
     var tbody = el("tbody");
     tbl.appendChild(tbody);
     wrap.appendChild(tbl);
+    var previous, next, pageLabel;
+    if (pageSize) {
+      var controls = el("nav", { class: "pagination", "aria-label": "Table pages" });
+      previous = el("button", { type: "button", text: "Previous" });
+      next = el("button", { type: "button", text: "Next" });
+      pageLabel = el("span", { "aria-live": "polite" });
+      previous.addEventListener("click", function () { if (page > 0) { page--; render(); } });
+      next.addEventListener("click", function () { if ((page + 1) * pageSize < rows.length) { page++; render(); } });
+      controls.appendChild(previous);
+      controls.appendChild(pageLabel);
+      controls.appendChild(next);
+      container.appendChild(controls);
+    }
     function render() {
       var col = columns.filter(function (c) { return c.key === state.key; })[0];
       var sorted = rows.slice().sort(function (a, b) {
@@ -123,10 +142,18 @@
         th.setAttribute("aria-sort", columns[i].key === state.key ? (state.dir > 0 ? "ascending" : "descending") : "none");
       });
       while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+      var visible = pageSize ? sorted.slice(page * pageSize, (page + 1) * pageSize) : sorted;
+      if (pageSize) {
+        previous.disabled = page === 0;
+        next.disabled = (page + 1) * pageSize >= sorted.length;
+        pageLabel.textContent = sorted.length ?
+          "Showing " + (page * pageSize + 1) + "–" + Math.min((page + 1) * pageSize, sorted.length) + " of " + sorted.length :
+          "Showing 0 of 0";
+      }
       if (!sorted.length) {
         tbody.appendChild(el("tr", null, [el("td", { colspan: String(columns.length), class: "empty", text: opts.empty || "Nothing matches." })]));
       }
-      sorted.forEach(function (row) {
+      visible.forEach(function (row) {
         var r = el("tr");
         columns.forEach(function (c) {
           var cell = c.cell ? c.cell(row) : el("td", { class: c.numeric ? "n" : null, text: fmt(row[c.key], c.digits) });
@@ -136,7 +163,7 @@
       });
     }
     render();
-    return wrap;
+    return container;
   }
   function tdLink(href, text) { return el("td", null, [link(href, text)]); }
   function tdText(text, cls) { return el("td", { class: cls || null, text: text }); }
@@ -151,7 +178,7 @@
   function curvesView(q) {
     var head = el("div", null, [
       el("h1", { text: "Curves" }),
-      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. Search by name or identity, filter by family, field, trace, order, subgroup and what has been measured on it. Click a slug for its full record and everything that cites it. This catalog filters the recorded endomorphism discriminant. Volcano conductors require a certified endomorphism order; missing order data is not a conductor assignment." })
+      el("p", { class: "lede", text: "Every curve in the ICV1 registry: " + DATA.counts.curves + " models. Cover certificates are available for " + DATA.counts.cover_assessed + "; the other " + DATA.counts.cover_unassessed + " models remain unassessed in the frozen cover catalog. Search by name or identity, filter by family, field, trace, order, subgroup and what has been measured on it. Click a slug for its full record and everything that cites it. This catalog filters the recorded endomorphism discriminant. Volcano conductors require a certified endomorphism order; missing order data is not a conductor assignment." })
     ]);
     var f = el("form", { class: "filters" });
     function input(name, label, type, extra) {
@@ -255,9 +282,10 @@
         { key: "end", label: "End. disc.", cell: function (c) { return tdText(c.endomorphism_discriminant === null ? "–" : String(c.endomorphism_discriminant), "n"); } },
         { key: "cover", label: "Cover", cell: function (c) {
           var cert = c.hyperelliptic_cover && c.hyperelliptic_cover.certificate;
-          return tdText(cert ? "genus " + cert.genus + ", degree " + cert.degree : "unresolved");
+          return tdText(cert ? "genus " + cert.genus + ", degree " + cert.degree :
+            (c.hyperelliptic_cover ? "unresolved" : "not assessed"));
         } },
-        { key: "best", label: "Best IC / rho", numeric: true, sort: bestRatio, cell: function (c) { return ratioCell(bestRatio(c)); } },
+        { key: "best", label: "Cold one-target IC / rho", numeric: true, sort: bestRatio, cell: function (c) { return ratioCell(bestRatio(c)); } },
         { key: "measured", label: "Cited by", sort: function (c) { return c.ecbench.length + c.tournament_cells.length + (c.on_leaderboard ? 1 : 0); }, cell: function (c) {
           var items = [];
           if (c.on_leaderboard) items.push(chip("leaderboard", "ok"));
@@ -267,7 +295,7 @@
           if (!items.length) items.push(chip("registered only"));
           var td = el("td"); items.forEach(function (i) { td.appendChild(i); }); return td;
         } }
-      ], rows, { sortKey: "field_bits", sortDir: 1 }));
+      ], rows, { sortKey: "field_bits", sortDir: 1, pageSize: 100 }));
     }
     f.addEventListener("input", apply);
     f.addEventListener("submit", function (e) { e.preventDefault(); apply(); });
@@ -329,7 +357,7 @@
         fact("Subfield descent / subgroup transfer", "Not tested"),
         fact("DLP advantage", "Not measured")
       ]));
-      view.appendChild(el("p", { class: "note" }, [cert ? "An explicit geometric cover is recorded. Computational advantage requires separate evidence. " : "This result establishes neither existence nor nonexistence. ", repoLink("docs/curves/COVERS.md", "Proof and scope"), "; ", repoLink("docs/curves/covers.json", "replayable catalog findings"), "; ", repoLink("docs/curves/cover-links.yaml", "YAML identity graph"), "."]));
+      view.appendChild(el("p", { class: "note" }, [cert ? "An explicit geometric cover is recorded. Computational advantage requires separate evidence. " : "This result establishes neither existence nor nonexistence. ", "The cover graph is frozen to the earlier catalog; EC1 identities above come from the current registry. ", repoLink("docs/curves/COVERS.md", "Proof and scope"), "; ", repoLink("docs/curves/covers.json", "replayable catalog findings"), "; ", repoLink("docs/curves/cover-links.yaml", "frozen YAML identity graph"), "."]));
       if (cert) {
         var details = el("details", null, [el("summary", { text: "Cover equation and map certificate" })]);
         details.appendChild(el("p", { text: "Ascending powers of u; H: v² + h(u)v = f(u). Map to the short model: x = x(u), y = y_v(u)v + y_0(u); compose with target_model_map when present. Coefficients use the curve's field representation." }));

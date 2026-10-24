@@ -7,18 +7,22 @@ import build_lab_browser as browser
 
 
 class CoverCatalogTests(unittest.TestCase):
-    def test_complete_catalog_join(self):
+    def test_frozen_cover_join_marks_new_models_unassessed(self):
         data = browser.build()
         self.assertEqual(data["counts"]["curves"], len(browser.load(browser.REGISTRY)["curves"]))
+        self.assertEqual(data["counts"]["cover_assessed"], 2572)
+        self.assertEqual(data["counts"]["cover_unassessed"], data["counts"]["curves"] - 2572)
         for curve in data["curves"]:
             finding = curve["hyperelliptic_cover"]
-            self.assertEqual(finding["slug"], curve["slug"])
-            self.assertEqual(finding["status"], "verified_over_declared_field")
+            if finding is None:
+                self.assertEqual(curve["cover_links"], [])
+            else:
+                self.assertEqual(finding["slug"], curve["slug"])
+                self.assertEqual(finding["status"], "verified_over_declared_field")
+                self.assertTrue(curve["cover_links"])
+                self.assertTrue(curve["cover_links"][0]["cover_uid"].startswith("urn:hc-model:1:sha256:"))
         self.assertIn(browser.COVERS, data["sources"])
         self.assertIn(browser.COVER_LINKS, data["sources"])
-        for curve in data["curves"]:
-            self.assertTrue(curve["cover_links"])
-            self.assertTrue(curve["cover_links"][0]["cover_uid"].startswith("urn:hc-model:1:sha256:"))
 
     def test_source_inventory_and_idempotent_merge(self):
         catalog = browser.load(browser.REGISTRY)

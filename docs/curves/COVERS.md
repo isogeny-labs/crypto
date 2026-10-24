@@ -4,15 +4,17 @@
 the supported elliptic model forms in the ICV1 catalog: short Weierstrass
 models over `GF(p)` and over extensions `GF(p^k)` with `p > 3`, and ordinary
 binary models. Findings are in
-[`covers.json`](covers.json), joined to [`registry.json`](registry.json)
-by slug **and the full SHA-256 of the exact model JSON**. The registry's
-model and EC1 identities stay unchanged. The lab browser shows the finding
-and certificate on each curve page.
+[`covers.json`](covers.json), frozen against the 2,572-model registry at
+`8e4c99759fd8d9594ed207d793b07b59ebaf19f7`. The current registry has
+more models. The lab browser joins a frozen finding only when its slug and
+full model SHA-256 still match; curves outside that frozen set are shown as
+unassessed for covers. The frozen EC1 graph describes the original catalog,
+while the browser uses the current registry for curve and subgroup identities.
 
 ```sh
 cargo test --bin curve_cover_check
-cargo run --bin curve_cover_check --
-cargo run --bin curve_cover_check -- --check
+git show 8e4c99759fd8d9594ed207d793b07b59ebaf19f7:docs/curves/registry.json > /tmp/curve-cover-registry.json
+cargo run --bin curve_cover_check -- --registry /tmp/curve-cover-registry.json --check
 python3 scripts/build_lab_browser.py
 ```
 
@@ -20,6 +22,9 @@ python3 scripts/build_lab_browser.py
 recomputes the report, including all equations and checks, and requires
 byte-identical saved output. It rejects stale registry/source digests and
 altered certificates. No network or external algebra service is used.
+The default writer targets the current registry and would replace these
+frozen files. Use separate output and link paths for a new catalog round,
+then update the pinned transfer assessment before replacing the frozen files.
 
 ## What a finding means
 

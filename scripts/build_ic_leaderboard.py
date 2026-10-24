@@ -1250,7 +1250,7 @@ def markdown(doc: dict) -> str:
     exploratory = audit["exploratory_online"]
     replay = audit["replay_block"]
     rho = audit["rho_optimization"]
-    L += [f"## Latest frontier audit ({audit['date']})", "",
+    L += [f"## Frontier audit and subsequent corrections (implementation result {audit['date']})", "",
           "This performance handoff is published beside the curve-by-curve tables. The standing rho "
           "implementation improved, while its mathematical work and every ranked IC row stayed fixed.", "",
           "| boundary | observed result | leaderboard treatment |",
@@ -1294,6 +1294,12 @@ def markdown(doc: dict) -> str:
               f"- **Floor:** {f['floor']}",
               f"- **Targets:** {f['targets']}",
               f"- **Status:** {f['status']}"]
+        if code == "A":
+            L.append("- **Online reading:** The archived online-only ratios compare IC after its reusable "
+                     "set-up with rho as built in that experiment. They do not establish an equal-advice "
+                     "online advantage. Later retained-setup claims were superseded by "
+                     "equal-advice rho controls; see the frontier audit above. The cold rows remain the "
+                     "ranked comparison.")
         steps = step_line(f)
         if steps:
             L.append(f"- **Rho step:** {steps}")
@@ -1814,11 +1820,13 @@ def page(doc: dict, standalone: bool) -> str:
              'recipe measured on it, against Pollard rho on the same curve and the same point. <strong>The units '
              'differ between the three tables below, and so do the references and the floors: S and the ratios '
              'are comparable inside a table and nowhere else.</strong> <strong>Cold, set-up included, no row is '
-             'below its reference.</strong> On one unseen point of a Koblitz curve (table A) '
-             f'the index calculus\'s online interval is {g3(online_lo)}–{g3(online_hi)}× faster than rho once '
-             'its reusable set-up exists, but the set-up is paid first: cold it is '
-             f'{g3(min(cold))}–{g3(max(cold))}× slower, and a generic walk given the same precomputation would be '
-             f'{g3(min(model))}–{g3(max(model))}× faster online again (a model). Prime and random-binary curves (table B), '
+             'below its reference.</strong> On one unseen point of a Koblitz curve (table A), cold IC is '
+             f'{g3(min(cold))}–{g3(max(cold))}× slower. Its archived {g3(online_lo)}–{g3(online_hi)}× '
+             'online-only ratios compare IC after reusable set-up with rho as built, without an equal-advice '
+             'control. They are phase diagnostics, not an online speedup claim; later '
+             'retained-setup claims were superseded by equal-advice rho controls. The frozen generic-walk '
+             f'model is {g3(min(model))}–{g3(max(model))}× faster online with the same precomputation. '
+             'Prime and random-binary curves (table B), '
              f'one target each: {times(L["prime"]["ratio_rho"])} to {times(L["prime"]["largest"]["ratio_rho"])} and '
              f'{times(L["char2"]["ratio_rho"])} to {times(L["char2"]["largest"]["ratio_rho"])}.</p>'
              '<dl class="facts">')
@@ -1827,8 +1835,9 @@ def page(doc: dict, standalone: bool) -> str:
         return f'<br>× {esc(f["ref_short"])}, in {esc(f["unit_short"])} (table {code})'
 
     P.append(f'<div class="fact"><dt>Koblitz · one point, cold</dt><dd>{times(K1["ratio_rho"])}</dd>'
-             f'<p>at log₂ r = {K1["log2_r"]:.1f}, <span class="slug">{esc(K1["slug"])}</span>; online alone '
-             f'{times(K1["online_speedup"])} faster than rho; largest size {times(K1["largest"]["ratio_rho"])} cold'
+             f'<p>at log₂ r = {K1["log2_r"]:.1f}, <span class="slug">{esc(K1["slug"])}</span>; '
+             f'archived online-only ratio {times(K1["online_speedup"])} against rho as built, without '
+             f'equal-advice control; largest size {times(K1["largest"]["ratio_rho"])} cold'
              f'{unit_ref("A")}</p></div>')
     for g in ("prime", "char2"):
         ld = L[g]
@@ -1845,8 +1854,8 @@ def page(doc: dict, standalone: bool) -> str:
     exploratory = audit["exploratory_online"]
     replay = audit["replay_block"]
     rho = audit["rho_optimization"]
-    P.append(f'<section class="panel" id="frontier-audit"><h2>Latest frontier audit · '
-             f'{esc(audit["date"])} <span class="chip">implementation</span></h2>'
+    P.append(f'<section class="panel" id="frontier-audit"><h2>Frontier audit and subsequent corrections · '
+             f'implementation result {esc(audit["date"])} <span class="chip">accounting</span></h2>'
              '<p>The standing rho implementation improved while its mathematical work and every ranked IC '
              'row stayed fixed. Cold, retained-setup online, exploratory and failed-replay evidence remain separate.</p>'
              '<div class="scroll"><table><thead><tr><th>Boundary</th><th>Observed result</th>'
@@ -2114,8 +2123,10 @@ def page(doc: dict, standalone: bool) -> str:
             ci = (f'<br><span class="muted">[{g3(b["ratio_rho_ci"][0])}, {g3(b["ratio_rho_ci"][1])}]</span>'
                   if "ratio_rho_ci" in b else "")
             if "online_speedup" in b:
-                ci += (f'<br><span class="muted">online {g3(b["online_speedup"])}× faster '
+                ci += (f'<br><span class="muted">archived online-only rho/IC '
+                       f'{g3(b["online_speedup"])}× '
                        f'[{g3(b["online_speedup_ci"][0])}, {g3(b["online_speedup_ci"][1])}]; '
+                       'rho as built, without equal-advice control; '
                        f'{g3(b["online_speedup_canonical_step"])}× at the canonical step</span>'
                        f'<br><span class="muted">model: {g3(b["ic_online_over_precomputation_model"])}× slower online '
                        f'than a generic walk with the same set-up; break-even {g3(b["break_even_targets"])} targets</span>')
@@ -2124,7 +2135,7 @@ def page(doc: dict, standalone: bool) -> str:
                            f'without it {times(b["cold_ratio_without_curve_construction"])}</span>')
             if "ratio_rho_section23" in b:
                 ci += (f'<br><span class="muted">was {times(b["ratio_rho_section23"])} cold, '
-                       f'{g3(b["online_speedup_section23"])}× faster online (§23, at v0)</span>')
+                       f'{g3(b["online_speedup_section23"])}× online-only ratio (§23, at v0)</span>')
             if "ratio_rho_section21" in b:
                 ci += (f'<br><span class="muted">was {times(b["ratio_rho_section21"])} (§21)</span>'
                        f'<br><span class="muted">derived one-target cold estimate: {times(b["one_target_cold_ratio_section20"])} '
@@ -2144,6 +2155,11 @@ def page(doc: dict, standalone: bool) -> str:
         f = doc["families"][code]
         defs = [("Unit", f"{f['unit']}. {f['unit_how']}"), ("Reference", f["reference"]),
                 ("Floor", f["floor"]), ("Targets", f["targets"]), ("Status", f["status"])]
+        if code == "A":
+            defs.append(("Online reading", "The archived online-only ratios compare IC after its reusable "
+                         "set-up with rho as built in that experiment. They do not establish an equal-advice "
+                         "online advantage. Later retained-setup claims were superseded by equal-advice "
+                         "rho controls; see the frontier audit. The cold rows remain the ranked comparison."))
         steps = step_line(f)
         if steps:
             defs.append(("Rho step", steps))
@@ -2171,8 +2187,9 @@ def page(doc: dict, standalone: bool) -> str:
              'A on one unseen public point per process against one-target rho on the same point (§23\'s comparison, '
              're-run at the ic tool programme\'s baseline v3, 64 points per size, §23\'s figures kept as the '
              'before marks), B against the matched negation-map rho (ledger §18). Table C is a historical 32-target '
-             'diagnostic. For the Koblitz rows of A the online interval, the reading with rho at the canonical '
-             'step and the generic-precomputation model sit beside the cold ratio, as §23 requires. The bar '
+             'diagnostic. For the Koblitz rows of A the archived online-only ratio, the reading with rho at the canonical '
+             'step and the generic-precomputation model sit beside the cold ratio as phase diagnostics; '
+             'there is no equal-advice online speedup claim. The bar '
              'splits S into phases. A walked-target row on the ladder is resolved to about a factor 1.8 either '
              'way at three repetitions (ledger §13.7).</p>'
              f'<div class="scroll">{ratio_chart(board)}</div>'

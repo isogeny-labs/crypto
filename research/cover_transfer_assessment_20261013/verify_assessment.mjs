@@ -13,9 +13,18 @@ const registryPath = path.join(curvesDir, "registry.json");
 const reportPath = path.join(curvesDir, "covers.json");
 const graphPath = path.join(curvesDir, "cover-links.yaml");
 const assessmentPath = path.join(curvesDir, "cover-transfer-assessments.json");
+const expectedCatalogCommit = "8e4c99759fd8d9594ed207d793b07b59ebaf19f7";
 
 const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
-const registry = readJson(registryPath);
+// This assessment and its HC1/CV1 graph are sealed to the 2,572-model
+// catalog. Replay that exact registry; check surviving models separately
+// against the current, expanded ICV1 registry below.
+const registryBytes = execFileSync(
+  "git", ["show", `${expectedCatalogCommit}:docs/curves/registry.json`],
+  { cwd: root, maxBuffer: 64 * 1024 * 1024 },
+);
+const registry = JSON.parse(registryBytes.toString("utf8"));
+const currentRegistry = readJson(registryPath);
 const report = readJson(reportPath);
 const graph = readJson(graphPath);
 const assessment = readJson(assessmentPath);
@@ -369,9 +378,17 @@ check(graph.curves.length === 2572, "unexpected graph curve-node count");
 check(Object.keys(graph.maps).length === 2572, "unexpected CV1 map count");
 check(Object.keys(graph.covers).length === 2570, "unexpected HC1 cover count");
 
-const registryBytes = fs.readFileSync(registryPath);
 check(report.registry_sha256 === sha256(registryBytes), "covers.json registry digest mismatch");
 check(graph.registry_sha256 === report.registry_sha256, "cover-links registry digest mismatch");
+
+const currentByModelHash = new Map(currentRegistry.curves.map((curve) =>
+  [sha256(curve.model_json), curve]));
+check(currentByModelHash.size === currentRegistry.curves.length, "duplicate current model hashes");
+for (const frozenCurve of registry.curves) {
+  const currentCurve = currentByModelHash.get(sha256(frozenCurve.model_json));
+  check(currentCurve?.slug === frozenCurve.slug,
+    `frozen cover model is absent or renamed in current registry: ${frozenCurve.slug}`);
+}
 
 const registryByModelHash = new Map();
 const registrySlugs = new Set();
@@ -795,7 +812,6 @@ check(
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "8e4c99759fd8d9594ed207d793b07b59ebaf19f7";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -1119,8 +1135,11 @@ for (const relativePath of [
       ["show", `${assessment.catalog_commit}:${relativePath}`],
       { cwd: root, encoding: "buffer", maxBuffer: 32 * 1024 * 1024 },
     );
+    const replayBytes = relativePath === "docs/curves/registry.json"
+      ? registryBytes
+      : fs.readFileSync(path.join(root, relativePath));
     check(
-      sha256(committedBytes) === sha256(fs.readFileSync(path.join(root, relativePath))),
+      sha256(committedBytes) === sha256(replayBytes),
       `catalog file ${relativePath} does not match catalog_commit ${assessment.catalog_commit}`,
     );
   } catch (error) {

@@ -1,10 +1,12 @@
 """Focused controls for sparse-safe lab-browser source discovery."""
 
+import hashlib
 import os
 import pathlib
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import build_lab_browser as browser
 
@@ -90,6 +92,34 @@ class RepositoryInputsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root:
             with self.assertRaisesRegex(RuntimeError, "cannot enumerate committed"):
                 browser.RepositoryInputs(root)
+
+
+class HistoricalCoverJoinTests(unittest.TestCase):
+    def test_expanded_registry_preserves_only_matching_frozen_certificates(self):
+        curves = [
+            {"slug": "icv1-old", "model_json": '{"a":1}'},
+            {"slug": "icv1-new", "model_json": '{"a":2}'},
+        ]
+        report = {
+            "schema_version": "curve-covers/v1",
+            "registry_sha256": "frozen-registry",
+            "curves": [{"slug": "icv1-old", "model_sha256": hashlib.sha256(
+                curves[0]["model_json"].encode()).hexdigest(), "status": "verified_over_declared_field"}],
+        }
+        with (patch.object(browser, "sha256_file", return_value="current-registry"),
+              patch.object(browser, "FROZEN_COVERS_REGISTRY_SHA256", "frozen-registry"),
+              patch.object(browser, "FROZEN_COVERS_COUNT", 1)):
+            self.assertEqual(browser.attach_covers(curves, report), {"icv1-old"})
+            self.assertEqual(curves[0]["hyperelliptic_cover"], report["curves"][0])
+            self.assertIsNone(curves[1]["hyperelliptic_cover"])
+            report["curves"][0]["model_sha256"] = "0" * 64
+            with self.assertRaisesRegex(ValueError, "cover model digest mismatch"):
+                browser.attach_covers(curves, report)
+            report["curves"][0]["model_sha256"] = hashlib.sha256(
+                curves[0]["model_json"].encode()).hexdigest()
+            report["registry_sha256"] = "current-registry"
+            with self.assertRaisesRegex(ValueError, "current cover report omits"):
+                browser.attach_covers(curves, report)
 
 
 if __name__ == "__main__":
