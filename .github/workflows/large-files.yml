@@ -1,0 +1,43 @@
+name: large-files
+# AGENTS.md §13: a file over 10 MiB goes through `crypto store push`, not Git,
+# because every blob committed stays in every future clone. This fails a pull
+# request that adds or modifies one (scripts/check-large-files.sh). A PR that
+# must commit one anyway carries the `large-file-ok` label, which the owner or
+# a reviewer adds; the check then reports the files and passes. It runs no
+# experiment.
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+# A newer push to the same pull request cancels this workflow's run for the older commit.
+# Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  size:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      # The merge commit and its first parent (the base); blobs on demand only.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /scripts/check-large-files.sh
+      - name: No added or modified file over 10 MiB
+        env:
+          LARGE_FILE_OK: ${{ contains(github.event.pull_request.labels.*.name, 'large-file-ok') }}
+        run: |
+          if scripts/check-large-files.sh HEAD^1 HEAD; then exit 0; fi
+          if [ "$LARGE_FILE_OK" = true ]; then
+            echo "::warning::large files committed under the large-file-ok label"
+            exit 0
+          fi
+          exit 1
