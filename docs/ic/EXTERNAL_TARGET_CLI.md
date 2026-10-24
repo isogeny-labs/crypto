@@ -183,6 +183,12 @@ files with hash verification, and independently verified both fetched edges.
 `ic solve-prime-file` consumed the fetched route and verified scalar 190 on
 the original curve. The four test objects were then removed; see
 [`ISOGENY_WALK_CUSTOM_S3_ACCEPTANCE_20261023.json`](../store/ISOGENY_WALK_CUSTOM_S3_ACCEPTANCE_20261023.json).
+The [current-head local route acceptance](fixtures/current_head_prime_route_20261024/ACCEPTANCE.json)
+retains the generated three-curve walk, two-edge route, independent walk
+verification, and raw `ic` and CRAx reports. The selected route replays the
+public scalar 190 on both command paths. Its SHA-256 manifest checks every
+retained artifact. The walk is bounded to degree 11, depth one, and three
+curves; the solver uses `--rho-steps 0` for deterministic relation replay.
 For an on-demand S3 existence check, use
 `isogeny_walk exists --from s3://BUCKET/PREFIX --run RUN_ID`. It HEADs the
 authoritative `complete.json` marker and returns JSON with `exists`, byte
