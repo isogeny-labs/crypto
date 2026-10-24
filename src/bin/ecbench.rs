@@ -45,7 +45,7 @@ use clap::{Parser, Subcommand};
 use crypto_lib::cryptanalysis::ecbench::{
     audit, bounds, calibration, callgrind, canonical, challenge, claim, compare, db, fbm, frontier,
     full_price, gpu, host, isolab, isolation, methods, record, resources, runner, signals, spec,
-    stats, trend, workload,
+    stats, trend, wordram_price, workload,
 };
 
 #[derive(Parser)]
@@ -129,6 +129,14 @@ enum Cmd {
         curve: Vec<String>,
         #[arg(long, default_value_t = 9)]
         reps: usize,
+    },
+    /// Print the fixed word-RAM reference prices
+    /// (src/cryptanalysis/ecbench/wordram_price.rs) of the `*_wordram`
+    /// methods for Koblitz curves `a:n`; nothing is measured.
+    WordramPrices {
+        /// Curves as `a:n`, e.g. `0:13 0:19 1:29`.
+        #[arg(long, num_args = 1.., required = true)]
+        curve: Vec<String>,
     },
     /// Fit how a paired ratio moves across curves (ln ratio against ln r
     /// and ln n) from `compare --save` files; JSON to stdout.
@@ -780,6 +788,20 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 "host": host::capture()?.stable,
                 "curves": rows,
             }))?;
+        }
+        Cmd::WordramPrices { curve } => {
+            let mut rows = serde_json::Map::new();
+            for c in &curve {
+                let (a, n) = c
+                    .split_once(':')
+                    .ok_or_else(|| format!("curve `{c}` is not a:n"))?;
+                let a: u8 = a.parse().map_err(|_| format!("bad a in `{c}`"))?;
+                let n: u32 = n.parse().map_err(|_| format!("bad n in `{c}`"))?;
+                let cs = workload::CurveSpec::Koblitz { a, n };
+                let facts = cs.build()?.facts(&cs);
+                rows.insert(facts.slug.clone(), wordram_price::describe_curve(&facts)?);
+            }
+            print_json(&serde_json::json!({ "curves": rows }))?;
         }
         Cmd::Trend {
             compare,
