@@ -1,0 +1,140 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261024-published-ic-reference-arm",
+  "title": "Published-IC reference arm: standard-base FGHR-symmetrised Weil/Gaudry descent with msolve F4 and WDSat, cold whole-solve in GAE",
+  "created": "2026-10-24",
+  "authors": [
+    "backlog lane",
+    "ic-regime-review follow-through workstream B"
+  ],
+  "status": "blocked",
+  "status_note": "Specified 2026-10-24 (README, DRAFT PROTOCOL, INVENTORY, RECONCILIATION). One relation-level smoke on Koblitz n = 13, 15, 17 at m = 3 is in SMOKE_20261024.md; it is not a solve and not a claim. The protocol is not frozen. WDSat is not installed; pin 61c6ff3f49445af2729274819edb27b85a89efc1 (mtrimoska/WDSat, 2024-06-20).",
+  "blocked_on": [
+    "note:M1 FGHR symmetrised S_{m+1} for random binary curves and m = 4: symmetrised_terms returns None for m >= 4 (src/cryptanalysis/koblitz_symmetrised.rs:414-443)",
+    "note:M2 msolve is not a SystemSolver (src/cryptanalysis/ic_framework/solvers.rs registry) and root extraction from the msolve basis is not built",
+    "note:M3 WDSat not installed or vendored; GPL-3.0, external process only; pin 61c6ff3f49445af2729274819edb27b85a89efc1",
+    "note:M6 GAE has no unit for an external process; docs/ic/calibration.json lacks Koblitz n = 43..61, random binary n = 13/19/37 and p^4",
+    "note:M8 no code for the p^5 FGHR symmetrisation or instance",
+    "hw:Linux host with Callgrind for Ir-priced msolve/WDSat (Valgrind does not run on this Apple-silicon host)",
+    "xp:XP-20261018-m4-solving-degree-equivariant shares M1 (m = 4 symmetrised S5)"
+  ],
+  "links": {
+    "lead": "ic-regime-review-20261024/REVIEW.md section 1 item 4, section 3 item 5, section 5.1 F2",
+    "notes": [
+      "docs/ic/LEADERBOARD.md Table B (unit, reference)",
+      "docs/ic/calibration.json",
+      "research/gaudry_quartic_d4_ecbench_20261013/README.md",
+      "research/ic_next10_20261014/06-equivariant-f4-m4/README.md",
+      "research/notes/index-calculus/RESEARCH_EXOTIC_COORDINATES.md section 8",
+      "AGENTS.md Success criterion (line 74)"
+    ],
+    "prs": []
+  },
+  "question": "At matched (family, n, m), what does the best published index-calculus pipeline (standard base, FGHR symmetrised, msolve F4 / WDSat) cost cold, whole-solve, one target, verified, in GAE, and how far is each lab producer from it?",
+  "decision_value": "Turns every 'x times rho' in the program into an 'x times published' or shows that the published arm is itself far above rho at these n; prices the (4,6) Weil-descent cell against a published floor; fixes what the word baseline means in an external claim (RECONCILIATION.md).",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": null
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "main",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--example",
+        "ref_arm_smoke_f2"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 4,
+    "ram_gb": 16,
+    "disk_gb": 50,
+    "gpu": null,
+    "est_core_hours": 400,
+    "est_wall_hours": 200,
+    "notes": "Estimate for the run after build M1-M9 (predicted): binary n <= 27 cells are minutes; n = 37 and Koblitz 41..61 at m = 3, 4 dominate; 16 GB cap per run with did-not-complete rows recorded. Build is 45-75 engineer-days (INVENTORY section 3)."
+  },
+  "run": {
+    "argv": [
+      "target/release/examples/published_ic_ref_arm",
+      "--cell",
+      "{cell}",
+      "--targets",
+      "8",
+      "--seed",
+      "{seed}",
+      "--out",
+      "{out}/rows.jsonl"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 86400
+  },
+  "shards": {
+    "count": 2,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {
+          "name": "binary-b3",
+          "vars": {
+            "cell": "binary-m3",
+            "seed": "20261025"
+          }
+        },
+        {
+          "name": "prime-p4",
+          "vars": {
+            "cell": "prime-p4",
+            "seed": "20261025"
+          }
+        }
+      ]
+    },
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": "rows.jsonl",
+    "resume_flag": "--resume"
+  },
+  "outputs": {
+    "result_schema": "one JSONL line per (cell, target): family, n, m, ell, base, solver, n_vars, relations, rank, msolve_ir or wdsat_ir, gae_S, rho_S, verified",
+    "verify": [
+      "target/release/examples/published_ic_ref_arm",
+      "--verify",
+      "{out}/rows.jsonl"
+    ],
+    "land": "research/published_ic_reference_arm_20261024"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "notes": "Two shards, each runnable only after its build milestones (INVENTORY section 3); none runnable today.",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261024-published-ic-reference-arm/shard-{k}"
+    ],
+    "ttl_s": 86400,
+    "env": {
+      "name": "crypto-published-ic-ref",
+      "recipe": "A rust image with the pinned crypto commit, msolve built from source, WDSat built at 61c6ff3f49445af2729274819edb27b85a89efc1 and valgrind on a Linux host; then cairn lab env import."
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 16384,
+      "timeout_s": 86400,
+      "sandbox": "none",
+      "sandbox_reason": "external solvers (msolve, WDSat) run as child processes under Callgrind; jail limits untested",
+      "publish": "runs/XP-20261024-published-ic-reference-arm"
+    },
+    "funding": {
+      "units": 300000,
+      "rationale": "Placeholder pending owner: the card is blocked on 45-75 engineer-days of build; it sets the external baseline every ratio is quoted against, so it is priced above a single heavy run but not at exponent-level."
+    }
+  }
+}
