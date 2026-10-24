@@ -17,7 +17,7 @@ physical relations, the transported union and F4 counter sums. The fixed
 The corrected `panel-v2` is terminal: all 42 case-arm collections and
 independent comparisons pass, with 33,696 complete S4 systems per arm.
 The saved physical census and ranks are reproduced exactly. Target recovery
-and admitted timing are still unperformed. The completed 189+21
+and admitted timing were unperformed in that Phase 1 panel. The completed 189+21
 study and all 43 joint raw directories remain in the original worktree and
 verified canonical store object; do not rerun them.
 
@@ -42,3 +42,21 @@ records relevant existing leads and the remaining cross-repository delta.
 No global review stamp, lead transition or novelty claim is inferred.
 Continue preserving all original controls, budgets, proof gaps and
 completion requirements.
+
+## Phase 2 positive control, 2026-10-24
+
+The frozen public-input-only pipeline now separates reusable setup from
+target validation and performs actual stopped precomputation, target
+decomposition, rank accumulation, recovery and point verification. The
+native `phase2-native-gate-v1` completed with **89 tests passed**, including
+all four zero/plain phi/doubling variants on p37 seed0, independent replay
+against immutable prior physical sets, and two A/A executions. The retained
+records are positive controls, not the full registered comparison.
+
+The post-gate audit review identified a validation gap: deserializing an
+array into a set silently collapses duplicate physical tuples. The auditor
+now rejects those duplicates, with a target-tuple mutation control. A fresh
+native gate is required for that verifier revision before the full panel.
+The frozen family-baseline selection gives **85 distinct configurations
+and 255 first/A/A executions**. That panel has not started at this checkpoint;
+no elapsed-time or complete-price improvement is claimed.

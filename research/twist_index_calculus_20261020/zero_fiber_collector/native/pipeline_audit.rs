@@ -10,7 +10,13 @@ fn require(ok: bool, why: &'static str) -> Result<(), &'static str> {
     }
 }
 fn terms(value: &Value) -> Result<BTreeSet<Terms>, &'static str> {
-    serde_json::from_value(value.clone()).map_err(|_| "physical-set-format")
+    let parsed: BTreeSet<Terms> =
+        serde_json::from_value(value.clone()).map_err(|_| "physical-set-format")?;
+    require(
+        value.as_array().ok_or("physical-set-format")?.len() == parsed.len(),
+        "duplicate-physical-tuple",
+    )?;
+    Ok(parsed)
 }
 fn number(value: &Value) -> Result<u64, &'static str> {
     value.as_u64().ok_or("numeric-field")
@@ -553,6 +559,18 @@ pub(super) fn audit(
                     .is_some_and(|v| !v.is_empty())
             });
         if let Some(qi) = nonempty {
+            let mut changed = value.clone();
+            let duplicate =
+                changed["deterministic"]["target_queries"][qi]["signed_relations"][0].clone();
+            changed["deterministic"]["target_queries"][qi]["signed_relations"]
+                .as_array_mut()
+                .unwrap()
+                .push(duplicate);
+            assert_eq!(
+                inspect(&case, sha, &changed, zero.as_ref(), &target).unwrap_err(),
+                "duplicate-physical-tuple"
+            );
+            controls.push("duplicate-target-tuple");
             let mut changed = value.clone();
             changed["deterministic"]["target_queries"][qi]["signed_relations"]
                 .as_array_mut()
