@@ -39,10 +39,13 @@ certificate. Earlier failed attempts remain under their original IDs.
 | external-audit-completion-v1 correction | [Duplicate retry and preserved failure](run-20261024T0539Z-external-followup/REPORT.md) | Duplicate terminal timeout was stopped and retained; corrected driver binds exact argv and hashes before reusing terminal failures |
 | external-regression-v2 / external-audit-completion-v2 | [All 21 external positions](run-20261024T0841Z-external-terminal/REPORT.md) | Eleven physical-set passes, nine msolve timeouts and one native-root timeout; reverse ideal containment unverified |
 | publication-gate-v1 | [Post-merge software gates](run-20261024T0828Z-publication-gate/REPORT.md) | All ten phases exit zero; 4,488 library tests and 1+3 example tests pass; separate native run passes 81 |
+| complete-archive-v3 / canonical publication | [Complete checkpoint](run-20261024T1003Z-complete-checkpoint/REPORT.md) | All 43 raw directories, 9,088 exact file comparisons, identical repack and verified canonical S3 replacement; old object retained |
+| post-latest-main-v2/v3 | [Current-main integration](run-20261024T1025Z-current-main/REPORT.md) | V2 PATH failure before compilation retained; corrected v3 passes all ten phases, 4,492 library tests and 1+3 examples |
 
 All listed scientific lanes are terminal and their reports cite the actual
 receipts, including bounded failures and the duplicate audit's partial work.
-The full 43-directory checkpoint is being packaged and independently
-compared; its publication is separate from scientific completion. No finite-Fp
+The full 43-directory checkpoint passes fresh extraction, all 9,088 file
+comparisons, byte-identical repacking and verified canonical publication;
+its publication is separate from scientific completion. No finite-Fp
 filter is deployed, and no new complete-cost, strongest-rho, scaling or
 generic-ideal conclusion is established by these run reports.

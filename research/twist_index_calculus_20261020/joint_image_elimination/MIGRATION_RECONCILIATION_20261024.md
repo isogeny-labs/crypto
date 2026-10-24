@@ -206,3 +206,63 @@ owner was confirmed absent before its single launch at about 10:04 UTC.
 All packing and extraction staging is on the durable workspace volume.
 The old 22-directory canonical f4ddf5ce checkpoint remains published until
 this replacement passes verification and actual remote publication.
+
+## Complete checkpoint and current-main integration
+
+The level-1 replacement completes all integrity checks: 43 selected run
+directories, 9,088 exact native file comparisons, matching inside manifest
+and byte-identical repacking. Canonical publication passes at 1,153,392,456
+bytes, SHA-256 54b31b3d73602d7758dad263939bdfdcbd8c305df2299fe7beb498029090b729.
+Native remote verification and S3 whole-object checksum/size pass; the
+older f4ddf5ce object is retained, remotely checksum-verified and recorded
+as superseded. Actual receipts are in `complete-archive-verify-v3/` and
+`complete-store-publish-v3.json`. The original partial level-6 compression
+and its stop receipts remain intact. An intermediate chat update misstated
+8,708 comparisons before reading the native receipt; it was corrected
+immediately to the actual 9,088. No artifact contains the mistaken count.
+
+Fetched main at 092d1ff47e merges cleanly into the study branch as
+1055dcbcdb4998e78e22c900ab737ddc9913de70, without manual resolution,
+rebase, force push or frozen-evidence conflict. It changes seven runtime
+files; the earlier root gate is not claimed to cover these new inputs.
+The first new integration launcher, post-latest-main-v2, exits 127 before
+compilation because managed systemd PATH lacks rustc. Its metadata and
+journal are retained. Corrected v3 sets the existing /home/ec2-user/.cargo/bin
+path explicitly and preserves every original resource limit. Its live
+managed owner must be checked before resuming or repeating any phase.
+
+New AGENTS.md from main requires the autoresearcher lead atlas before a new
+ECDLP proposal. The current local autoresearcher checkout and the explicitly
+fetched main 5af7ee216b7053543eaaff737e20ac781b50b54c contain neither
+tools/lead_atlas.py, knowledge/leads/ecdlp nor the lead-atlas skill. This
+is verified against Git trees, not inferred from a sparse filesystem.
+The pointer-only WIP commit is 8559b6b673aad8cab5bac33ff56b81653134dcd4.
+The prospective zero-fiber protocol was recorded before reading this newly
+merged rule; no new collector implementation or solve is represented as
+having passed that missing atlas check. Existing scientific results and
+publication work do not depend on proposing a new mechanism.
+
+## Later migration: completed integration gate reused
+
+Diem was inspected first again and retains the expired original deadline,
+50/52 records, no pending work and no generator. The scoped EKS overview
+retains the same terminal twist capability probe; no twist job is active
+or resubmitted. Unrelated terminal jobs are left to their existing owners.
+No legacy waiting-freeze followup is resumed by this study.
+
+The saved current-main v3 gate finishes at 11:11:56 UTC: all ten phase
+exits are zero, 4,492 library tests pass with zero failures and 119 existing
+ignores, and the examples pass 1+3 tests. No successful test phase is rerun.
+An initial source-hash observation used the study directory for a root-
+relative manifest and reports missing paths; the correctly rooted check
+then passes all 855 root inputs and all 22 point-replay source inputs.
+The observation failure is not a changed source, test failure or reason to
+repeat the suite. The existing canonical publication receipt still passes.
+
+The isolated zero-fiber worktree is saved at
+`/home/ec2-user/crypto-twist-zero-fiber`, branch
+`codex/twist-zero-fiber-20261024`. Its prospective protocol is committed;
+collector and separate audit source are written but not yet compiled or
+executed. No collector service, frozen runner or scientific result is
+inferred from those files. The completed 43-directory snapshot and its
+published object remain unchanged.

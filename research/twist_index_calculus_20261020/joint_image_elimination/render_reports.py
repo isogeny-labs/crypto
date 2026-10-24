@@ -189,6 +189,44 @@ def publication_gate_figure():
             transform=ax.transAxes,ha="center",fontsize=10)
     saved(fig,"publication-software-gates")
 
+def complete_checkpoint_figure():
+    v = json.loads((ROOT / "results/publication/complete-archive-verify-v3/complete-verification.json").read_text())
+    p = json.loads((ROOT / "results/publication/complete-store-publish-v3.json").read_text())
+    assert v["status"] == p["status"] == "pass" and v["byte_identical_repack"]
+    fig, ax = plt.subplots(figsize=(10,3.2),layout="constrained")
+    ax.axis("off")
+    labels = ["43 reconciled runs\nLiteral manifest\nFailures retained",
+              f'{v["exact_regular_file_comparisons"]:,} files\nFresh extraction\nEvery native cmp passes',
+              "Identical repack\nWhole SHA-256 matches\nNo program executed",
+              "Canonical S3 verified\nSize and full checksum\nPrior object retained"]
+    for x,label in zip([.12,.37,.63,.88],labels):
+        ax.text(x,.63,label,transform=ax.transAxes,ha="center",va="center",fontsize=9,
+                bbox={"boxstyle":"round,pad=.6","facecolor":"#eef3f7","edgecolor":"#245e7d"})
+    for x in [.245,.50,.755]:
+        ax.annotate("",xy=(x+.02,.63),xytext=(x-.02,.63),xycoords="axes fraction",arrowprops={"arrowstyle":"->","color":"#245e7d"})
+    ax.text(.5,.14,"Artifact integrity and preservation only; no new scientific completeness or performance claim.",
+            transform=ax.transAxes,ha="center",fontsize=10)
+    saved(fig,"complete-checkpoint-verification")
+
+def latest_main_gate_figure():
+    meta = ROOT / "results/publication/post-latest-main-v3/metadata"
+    for phase in ["library-compile","library-tests","examples-compile","quartic_twist_s4_integer",
+                  "quartic_twist_s4_structure","curve-id-selftest","curve-names","validation-gate-tests",
+                  "validation-gate","large-files"]:
+        assert (meta / f"{phase}.exit").read_text().strip() == "0"
+    assert "4492 passed; 0 failed; 119 ignored" in (meta/"library-tests.stdout").read_text()
+    fig, ax = plt.subplots(figsize=(9.8,3.3),layout="constrained")
+    ax.axis("off")
+    labels = ["V2 launcher\nPATH lacks rustc\nExit 127 before compilation",
+              "V3 uses existing PATH\n4,492 library tests pass\n119 existing ignores; 1+3 examples",
+              "All ten phases pass\nIdentity, naming, validation, size\nNo scientific run repeated"]
+    for x,label in zip([.16,.50,.84],labels):
+        ax.text(x,.63,label,transform=ax.transAxes,ha="center",va="center",fontsize=9,
+                bbox={"boxstyle":"round,pad=.6","facecolor":"#eef3f7","edgecolor":"#245e7d"})
+    ax.text(.5,.14,"Current-main software validation; no new solver timing, GitHub CI or merge inferred.",
+            transform=ax.transAxes,ha="center",fontsize=10)
+    saved(fig,"latest-main-software-gates")
+
 def figures():
     v = json.loads((ROOT / "results/algebra-v1-validation.json").read_text())
     rows = v["arms"]
@@ -309,7 +347,11 @@ def square_figure():
     saved(fig,"square-obstruction")
 
 if __name__ == "__main__":
-    if sys.argv[1:] == ["--zero-identity-figure"]:
+    if sys.argv[1:] == ["--complete-checkpoint-figure"]:
+        complete_checkpoint_figure()
+    elif sys.argv[1:] == ["--latest-main-gate-figure"]:
+        latest_main_gate_figure()
+    elif sys.argv[1:] == ["--zero-identity-figure"]:
         zero_identity_figure()
     elif sys.argv[1:] == ["--external-terminal-figure"]:
         external_terminal_figure()

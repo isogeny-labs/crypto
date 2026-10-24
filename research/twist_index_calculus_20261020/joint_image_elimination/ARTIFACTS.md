@@ -13,7 +13,7 @@ That registration is published in PR #2368 at
 successful receipts remain in the parent study's `results/publication/`.
 No credential appears in repository files.
 
-## Joint raw checkpoint
+## Earlier 22-directory joint raw checkpoint
 
 `pack-terminal-checkpoint.sh` packages an immutable selection of 22
 terminal or explicitly reconciled interrupted run directories. It includes
@@ -24,12 +24,12 @@ search. The selected input list is literal in the script. The archive
 contains `raw-checkpoint-manifest.json` with the actual packing source
 commit and timestamp.
 
-Six newer managed lanes are deliberately omitted from this checkpoint:
+At that checkpoint's earlier snapshot, six newer lanes were omitted:
 external-audit-v3, external-regression-v2, pure-zero-lean-v1,
 pure-zero-verify-v1, uniform-zero-v2 and variant-population-v1. Their raw
 trees remain under `runs/`; exclusion is not a statement that they failed
-or finished. A later canonical archive must include their reconciled
-outputs and retain the earlier digest as a superseded version.
+or finished. The complete replacement below includes the reconciled later
+outputs and retains this earlier digest as a superseded version.
 
 The checkpoint output is `runs.tar.xz`, with byte count, SHA-256 and exact
 manifest sidecars. Packing and fresh extraction verification now pass:
@@ -55,6 +55,47 @@ report copies do not establish a successful publication.
 The deterministic GNU tar/xz command and one-thread compression are in
 the packaging script; packaging uses the busy reservation and never reads
 active run trees as a completed snapshot.
+
+## Complete 43-directory checkpoint: published and verified
+
+The same canonical name now resolves to all 43 literal reconciled run
+directories, including failed/interrupted attempts, every new census and
+independent public-point replay, external terminal inventories, proof gates,
+and the original post-merge software gate:
+
+    store:evidence/twist-index-calculus/20261024-joint-image-runs.tar.xz
+    1,153,392,456 bytes
+    SHA-256 54b31b3d73602d7758dad263939bdfdcbd8c305df2299fe7beb498029090b729
+
+`pack-complete-checkpoint-level1.sh` records the exact 43-name selection,
+source label and normalized GNU tar/xz parameters. One compression worker
+uses level 1 under the shared busy reservation. The earlier level-6 packing
+attempt was stopped deliberately before completing or uploading; its partial
+file, hash and before/after stop receipts are preserved separately. No
+scientific run or successful upload was repeated to change compression.
+
+The complete verifier freshly extracts the archive, compares all **9,088**
+regular files with native `cmp`, matches the inside manifest to its sidecar,
+and reproduces the identical archive SHA from the extracted tree. No
+archived script is executed. Exact receipts and the packing wrapper are in
+`results/publication/complete-archive-verify-v3/`. The interrupted packing
+metadata is in `results/publication/interrupted-packaging-v2/`; its 99 MiB
+partial remains on the durable workspace at the path in that record.
+
+`results/publication/complete-store-publish-v3.json` records native store
+push with `--replace`, successful native cache/remote verification, S3
+whole-object SHA-256 and size, and successful checksum/size verification
+of the unchanged older f4ddf5ce object. The index retains that prior digest
+and byte count in `superseded`; no remote object was deleted. The local old
+archive is retained separately before the canonical local copy is updated.
+Credentials entered hidden stdin only and are absent from repository files.
+
+This checkpoint is raw-content preservation for the completed finite joint
+round. It does not turn timeouts into zero yield or establish a generic S5
+ideal, a complete IC price, a strongest-rho comparison or a breakthrough.
+Later integration checks after newer main commits live separately under
+`results/publication/` and do not mutate the fixed 43-run snapshot. The
+prospective zero-fiber collector has its own sibling study and protocol.
 
 ## Source and numerical replay
 
@@ -86,5 +127,9 @@ three listed documents. The refreshed study, mechanism, pure-zero,
 square-obstruction and full variant-population PDFs now also have actual
 page-by-page review in `results/pdf-inspection-20261024-v8.json`. Its
 five exact PDF hashes were rechecked before copying the reports and
-figures into the unlisted benchmark diagnostics. Later managed lanes are
-outside the checkpoint's literal selection even if they have since finished.
+figures into the unlisted benchmark diagnostics. Later reviews are retained
+in v9, v10, v11-partial and v12 inspection receipts. The v11 receipt covers
+five documents/eight pages; v12 separately covers the corrected three-page
+mechanisms inventory. Exact hashes and byte-identical benchmark copies are
+recorded. All benchmark diagnostics remain unlisted, without a promoted
+`VALIDATION.json`/rho/GAE claim.
