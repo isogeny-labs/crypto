@@ -90,22 +90,66 @@ def zero_figure():
     ax.axis("off")
     boxes = [(0.17,.76,"Four distinct abscissae in Fp\nZero group sum\nS4 necessity: group bridge"),
              (.53,.76,"H4 = C0 + C1 B + C2 B² + C3 B³\nDegree of B is four\nHence every Ci = 0"),
-             (.85,.76,"2048 D = sum Ai Ci\nExact integer certificate\nIDC / new Lean gates separate"),
-             (.70,.28,"Odd characteristic implies D = 0\nField cancellation\nNew Lean statement pending"),
+             (.85,.76,"2048 D = sum Ai Ci\nExact integer certificate\nLean and IDC pass\nMutations rejected"),
+             (.70,.28,"2048 nonzero implies D = 0\nField cancellation\nLean gate passes"),
              (.23,.28,"Distinct roots imply D is nonzero\nProduct of squared differences\nQuartic identity: Lean gate passes")]
     for x,y,label in boxes:
-        ax.text(x,y,label,transform=ax.transAxes,ha="center",va="center",fontsize=9,
+        ax.text(x,y,label,transform=ax.transAxes,ha="center",va="center",fontsize=13,
                 bbox={"boxstyle":"round,pad=.65","facecolor":"#eef3f7","edgecolor":"#245e7d"})
-    for a,b in [((.34,.76),(.37,.76)),((.70,.76),(.72,.76)),((.85,.61),(.74,.43))]:
+    for a,b in [((.34,.76),(.37,.76)),((.69,.76),(.70,.76)),((.85,.58),(.74,.43))]:
         ax.annotate("",xy=b,xytext=a,xycoords="axes fraction",arrowprops={"arrowstyle":"->","color":"#245e7d"})
-    ax.annotate("contradiction",xy=(.42,.28),xytext=(.53,.28),xycoords="axes fraction",ha="center",fontsize=9,
+    ax.annotate("contradiction",xy=(.42,.28),xytext=(.50,.28),xycoords="axes fraction",ha="center",fontsize=11,
                 arrowprops={"arrowstyle":"->","color":"#9b4380"})
     fig.suptitle("Pure zero fiber: conditional algebraic obstruction; no nonzero-target or cost result",fontsize=11)
     saved(fig,"pure-zero-obstruction")
 
+def variant_population_figure():
+    v = json.loads((ROOT / "results/variant-population-v1-validation.json").read_text())
+    assert v["status"] == "pass"
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 3.9), layout="constrained")
+    arms = [("phi-l0-active", "Phi", "#147d92"),
+            ("double-l0-active", "Doubling", "#9b4380"),
+            ("l0-peel", "Pure full symmetry", "#b07c28")]
+    for i,(arm,label,color) in enumerate(arms):
+        rows = [r for r in v["successful_records"] if r["arm"] == arm]
+        axes[0].scatter([i for r in rows], [r["relation_stats"]["total_degree"] for r in rows], color=color, alpha=.3)
+        axes[1].scatter([i for r in rows], [r["relation_stats"]["extension_terms"] for r in rows], color=color, alpha=.3)
+    for ax in axes:
+        ax.set_xticks([0,1,2], [arm[1] for arm in arms])
+        ax.set_xlim(-.5,2.5)
+        ax.grid(axis="y", alpha=.2)
+    axes[0].set_ylabel("Recorded total degree")
+    axes[1].set_ylabel("Recorded extension monomials (log scale)")
+    axes[1].set_yscale("log")
+    fig.suptitle(f'variant-population-v1: {v["requested_positions"]} validated positions; markers overlap; no root/cost result', fontsize=10)
+    saved(fig,"variant-population")
+
+def square_figure():
+    fig, ax = plt.subplots(figsize=(10.6, 4.6), layout="constrained")
+    ax.axis("off")
+    nodes = [(.17,.76,"Four abscissae in Fp\nH4 = 0; B has degree four\nHence all Ci = 0\nGroup/basis bridge is separate"),
+             (.52,.76,"64 S³ = sum Ai Ci\nNative exact search passes\nIndependent IDC passes"),
+             (.85,.76,"8 is nonzero\nHence S = 0\nCombined Lean: 10 pass"),
+             (.83,.28,"512 f = 8 q²\nEvery root of f roots q\nSeven-theorem bridge passes"),
+             (.47,.28,"Three distinct roots\nCannot fit a quadratic\nField contradiction"),
+             (.13,.28,"Retain infinity\nCM triangles can sum to O\nVerify group presentations")]
+    for x,y,label in nodes:
+        ax.text(x,y,label,transform=ax.transAxes,ha="center",va="center",fontsize=12,
+            bbox={"boxstyle":"round,pad=.6","facecolor":"#eef3f7","edgecolor":"#245e7d"})
+    for a,b in [((.33,.76),(.35,.76)),((.68,.76),(.70,.76)),
+                ((.85,.58),(.84,.45)),((.68,.28),(.65,.28))]:
+        ax.annotate("",xy=b,xytext=a,xycoords="axes fraction",
+            arrowprops={"arrowstyle":"->","color":"#245e7d"})
+    fig.suptitle("Stronger S4 obstruction: exact scope and checks; no measured cost gain",fontsize=11)
+    saved(fig,"square-obstruction")
+
 if __name__ == "__main__":
     if sys.argv[1:] == ["--zero-figure"]:
         zero_figure()
+    elif sys.argv[1:] == ["--square-figure"]:
+        square_figure()
+    elif sys.argv[1:] == ["--variant-population-figure"]:
+        variant_population_figure()
     elif len(sys.argv) > 1:
         for name in sys.argv[1:]:
             path = (ROOT / name).resolve()
