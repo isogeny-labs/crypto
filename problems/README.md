@@ -46,6 +46,7 @@ Keep resolved and superseded records in the index.
 | [Binary decomposition systems capped at 64 Boolean unknowns](binary-boolean-system-64-variable-cap.md) | open | Gröbner/SAT decomposition arms on chain systems with `md + (m−2)n > 64` unknowns (the `m = 4`, n ≥ 23 cells of `research/ic_m3_algebraic_vs_mitm_20261014/`); the study itself was completed with the `u128` `wide_groebner` solver (amendment 1) | a ≥128-variable monomial type in `build_decomposition_system`, inherited F4 and the SAT encoder, agreeing with the floor on 12 targets at `m = 4`, n = 23 |
 
 | [ECDLP portfolio exhaustive-reading coverage](ecdlp-portfolio-reading-coverage.md) | open | certifying the owner's request to read all six-month portfolio sources and artifacts | complete acknowledged source coverage, branch/history reconciliation and access to named missing raw evidence; indexing and hashing remain separate |
+| [claim-n13 replay fails on accounting-version drift](ecbench-claim-n13-replay-accounting-version-drift.md) | open | replaying the Apple-recorded `claim-n13` inherited-F4 arms on `main` (BMI2 and portable paths already agree) | owner decision on the specialisation accounting identity (lazy vs eager) plus a method-identity field for it |
 
 ## Add or update a problem
 
