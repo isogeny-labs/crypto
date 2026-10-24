@@ -253,6 +253,10 @@ def s3Objects(s3, bucket, prefix="dp/"):
             records = item["Size"] // RECORD_BYTES
             if records:
                 out.append((key, records, when))
+            else:
+                # A recognized name is not evidence of a complete upload.
+                # Report a short body so pending/status cannot look caught up.
+                unrecognised.append(key)
         if not page.get("IsTruncated"):
             break
         token = page["NextContinuationToken"]
@@ -673,19 +677,19 @@ def findCollisions(cur, key):
     the *same* seed by a different object is a re-report: harmless from a
     resumed worker, and the entire output of a run that is walking another
     run's seeds, so it is counted rather than dropped in silence. The
-    object's own rows are neither.
+    An object's newly inserted row matches itself and is neither; a second
+    seed in that same object can still meet it and is a collision.
     """
     cur.execute(
-        "SELECT i.point_key, i.a, i.walk_seed, d.a, d.walk_seed, d.worker_id "
+        "SELECT i.point_key, i.a, i.b, i.walk_seed, "
+        "d.a, d.b, d.walk_seed, d.worker_id "
         "FROM dp_in i JOIN distinguished_points d "
         "  ON d.campaign_id = %s AND d.point_key = i.point_key",
         (CAMPAIGN,))
     mine = workerId(key)
     out = []
     duplicates = 0
-    for point_key, mineA, mineSeed, theirsA, theirsSeed, worker in cur.fetchall():
-        if worker == mine:
-            continue
+    for point_key, mineA, mineB, mineSeed, theirsA, theirsB, theirsSeed, worker in cur.fetchall():
         if theirsA is None:
             # `a` is NOT NULL for everything this program writes, but the
             # corpus predates it. A stored point with no seed cannot be
@@ -699,16 +703,27 @@ def findCollisions(cur, key):
         # themselves is the question, and a width difference between eras is
         # not a collision.
         if seedOf(mineA) == seedOf(theirsA):
-            duplicates += 1
+            # A freshly inserted row joins to itself. A repeated row in the
+            # same object does too; only another object's replay is counted.
+            if worker != mine:
+                duplicates += 1
             continue
+        # Different seeds can meet within one object. Its first row was just
+        # inserted with this same worker_id, so the worker ID alone cannot
+        # distinguish that collision from a row joining to itself.
         out.append({
             "point_key": bytes(point_key),
+            # The live rho_collisions table requires both coefficient pairs.
             "a1": bytes(theirsA),
+            "b1": bytes(theirsB),
             "walk_seed1": bytes(theirsSeed) if theirsSeed is not None else None,
             "worker_id1": worker,
+            "worker1": worker,
             "a2": bytes(mineA),
+            "b2": bytes(mineB),
             "walk_seed2": bytes(mineSeed),
             "worker_id2": mine,
+            "worker2": mine,
             "object_key": key,
         })
     return out, duplicates
@@ -728,8 +743,9 @@ def recordCollisions(cur, found):
                seedOf(row["a2"]), row["worker_id2"]))
     if not found or not {"campaign_id", "point_key"} <= _collisionCols:
         return 0
-    cols = [c for c in ("point_key", "a1", "walk_seed1", "worker_id1",
-                        "a2", "walk_seed2", "worker_id2", "object_key")
+    cols = [c for c in ("point_key", "a1", "b1", "walk_seed1", "worker_id1",
+                        "worker1", "a2", "b2", "walk_seed2", "worker_id2",
+                        "worker2", "object_key")
             if c in _collisionCols]
     sql = ("INSERT INTO rho_collisions (campaign_id, %s) VALUES (%s) "
            "ON CONFLICT DO NOTHING"
@@ -754,10 +770,21 @@ def readEnvelope(s3, bucket, key):
     """
     try:
         raw = s3.get_object(Bucket=bucket, Key=key + ".json")["Body"].read()
+    except Exception as exc:
+        # Older objects have no marker. A timeout, AccessDenied, or other S3
+        # failure is not evidence of absence and must leave the object pending.
+        response = getattr(exc, "response", None)
+        code = response.get("Error", {}).get("Code") if isinstance(response, dict) else None
+        if code in ("NoSuchKey", "404", "NotFound"):
+            return None
+        raise
+    try:
         manifest = json.loads(raw.decode("utf-8"))
-        return manifest if isinstance(manifest, dict) else None
-    except Exception:
-        return None
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("%s: invalid commit marker JSON" % key) from exc
+    if not isinstance(manifest, dict):
+        raise ValueError("%s: commit marker must be an object" % key)
+    return manifest
 
 
 def tableRecordBody(body):
@@ -778,18 +805,32 @@ def checkEnvelope(key, body, manifest):
     points once stored. Raising here leaves the object outstanding and logged
     rather than letting it into the corpus.
     """
-    if not manifest:
+    # Current orbit keys carry the producer's SHA-256 even when its optional
+    # .bin.json marker is absent. The live corpus has such markerless objects.
+    m = ORBIT_KEY_RE.match(key)
+    got = None
+    if m:
+        got = hashlib.sha256(body).hexdigest()
+        if got != m.group(4):
+            raise ValueError("%s: body does not match its object-key sha256" % key)
+    if manifest is None:
         return
     want = manifest.get("sha256")
-    if want:
-        got = hashlib.sha256(body).hexdigest()
-        if got != want:
-            raise ValueError("%s: body does not match its manifest sha256 "
-                             "(%s != %s)" % (key, got, want))
+    if not isinstance(want, str) or re.fullmatch(r"[0-9a-f]{64}", want) is None:
+        raise ValueError("%s: commit marker has no valid sha256" % key)
+    if (got or hashlib.sha256(body).hexdigest()) != want:
+        raise ValueError("%s: body does not match its manifest sha256" % key)
+    size = manifest.get("bytes")
+    if type(size) is not int or size != len(body):
+        raise ValueError("%s: commit marker byte count differs from body" % key)
     want = manifest.get("records")
-    if isinstance(want, int) and want != len(body) // RECORD_BYTES:
-        raise ValueError("%s: manifest says %d records, body carries %d"
+    if type(want) is not int or want != len(body) // RECORD_BYTES:
+        raise ValueError("%s: manifest says %r records, body carries %d"
                          % (key, want, len(body) // RECORD_BYTES))
+    if "producedAt" in manifest:
+        produced = manifest["producedAt"]
+        if type(produced) is not int or produced <= 0:
+            raise ValueError("%s: invalid commit marker producedAt" % key)
 
 
 def objectLockKey(key):
@@ -880,12 +921,14 @@ def ingestObject(conn, s3, bucket, key, found_at, *, replica_id=None,
     manifest = readEnvelope(s3, bucket, key)
     checkEnvelope(key, body, manifest)
     body = tableRecordBody(body)
+    if len(body) % RECORD_BYTES:
+        raise ValueError("%s: partial distinguished-point record" % key)
     # The producer's own clock, where it recorded one. found_at from the
     # caller is the object's S3 LastModified for the orbit key shape, and that
     # is storage metadata: a copy, a replication or a lifecycle transition
     # rewrites it and silently moves points between hourly buckets.
     produced = manifest.get("producedAt") if manifest else None
-    if isinstance(produced, int) and produced > 0:
+    if produced is not None:
         found_at = time.strftime("%Y-%m-%d %H:%M:%S+00", time.gmtime(produced))
     whole = len(body) - len(body) % RECORD_BYTES
     wid = workerId(key)
