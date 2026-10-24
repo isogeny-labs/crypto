@@ -9,6 +9,16 @@ fn digest(path: &Path, expected: &str) -> Vec<u8> {
     bytes
 }
 
+fn source_block_contains(case: &Case, arm: usize, terms: &Terms, t: u64) -> bool {
+    terms.iter().any(|&(id, _)| {
+        if !case.peels[arm].contains(&id) {
+            return false;
+        }
+        let source = case.pool[id].source_id;
+        fpow(case.pool[source].p.x[0], 12, case.p) == t
+    })
+}
+
 fn parse(text: &str, p: u64, names: &[&str]) -> Vec<f4_fp::Poly> {
     assert!(text
         .lines()
@@ -402,13 +412,16 @@ pub(super) fn audit(
     assert_eq!(query["query_index"], qi);
     assert_eq!(query["a"], case.raw["query_trace"][qi][0]);
     assert_eq!(query["b"], case.raw["query_trace"][qi][1]);
-    let expected: BTreeSet<Terms> =
+    let mut expected: BTreeSet<Terms> =
         serde_json::from_value(query["signed_relations"].clone()).unwrap();
+    if let Some(t) = spec["orbit_value"].as_u64() {
+        expected.retain(|terms| source_block_contains(&case, arm, terms, t));
+    }
     let all_physical = complete_basis_variety && relations == expected;
     write(
         &out.join("summary.json"),
         &json!({"schema":"joint-image-external-audit/v1",
-        "p":case.p,"seed":case.seed,"arm":spec["arm"],"query_index":qi,
+        "p":case.p,"seed":case.seed,"arm":spec["arm"],"query_index":qi,"orbit_value":spec["orbit_value"],
         "public_input_sha256":public_sha,"system_sha256":system_sha,"basis_sha256":basis_sha,
         "reference_sha256":hex::encode(hash::sha256::sha256(&ref_bytes)),
         "input_reductions_and_s_pairs_zero":true,"reverse_ideal_containment_verified":false,
@@ -428,6 +441,33 @@ pub(super) fn audit(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn known_physical_relations_use_the_correct_source_block_scope() {
+        let tape =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../quartic_twist_mixed_v1.ndjson");
+        let scratch =
+            std::env::temp_dir().join(format!("joint-external-scope-check-{}", std::process::id()));
+        assert!(!scratch.exists());
+        std::fs::create_dir(&scratch).unwrap();
+        let case = Case::new(public_record(&load(&tape, INPUT_SHA, 37, 0)), &scratch);
+        let residual = case.residual(&case.raw["query_trace"][2]);
+        // Frozen positive fixture, independently audited in regression-v2.
+        let pure = vec![(5, -1), (21, -1), (23, 1), (24, 1)];
+        let phi = vec![(7, -1), (13, 1), (29, 1), (71, 1)];
+        case.verify_terms(&pure, residual);
+        case.verify_terms(&phi, residual);
+        // One pure physical tuple has presentations in all three blocks.
+        for t in [1, 10, 26] {
+            assert!(source_block_contains(&case, 8, &pure, t));
+        }
+        assert!(!source_block_contains(&case, 8, &pure, 2));
+        // The image's source, rather than an arbitrary ordinary factor,
+        // fixes the mixed block. The saved independent audit puts it in T=10.
+        assert!(source_block_contains(&case, 7, &phi, 10));
+        assert!(!source_block_contains(&case, 7, &phi, 1));
+        assert!(!source_block_contains(&case, 7, &phi, 26));
+        std::fs::remove_dir_all(scratch).unwrap();
+    }
     #[test]
     fn multicharacter_variable_parser_handles_all_six_exported_names() {
         let basis = parse(
