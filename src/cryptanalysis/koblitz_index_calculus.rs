@@ -8890,7 +8890,15 @@ pub fn sat_decompose_chained_s3_any_m(
             },
         );
     }
-    sat_decompose_chained_s3_checked(kc, fb, target, m, limits, frobenius_orbits, order_first_pair)
+    sat_decompose_chained_s3_checked(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        frobenius_orbits,
+        order_first_pair,
+    )
 }
 
 fn sat_decompose_chained_s3_with_domain(
@@ -8911,7 +8919,15 @@ fn sat_decompose_chained_s3_with_domain(
             },
         );
     }
-    sat_decompose_chained_s3_checked(kc, fb, target, m, limits, frobenius_orbits, order_first_pair)
+    sat_decompose_chained_s3_checked(
+        kc,
+        fb,
+        target,
+        m,
+        limits,
+        frobenius_orbits,
+        order_first_pair,
+    )
 }
 
 fn sat_decompose_chained_s3_checked(
