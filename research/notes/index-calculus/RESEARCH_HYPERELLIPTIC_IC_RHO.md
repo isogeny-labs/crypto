@@ -1792,3 +1792,75 @@ index calculus already folds `±P` in its factor base (class
 **accounting**, against index calculus: the reference gets cheaper by the
 measured ratio). If N1 fails, the fold has a defect of its own, examined
 next.
+
+## Round thirteen: measured — the fold fails on the full-width walk too, worse with `N`
+
+Registered run: card `CARD-HEIC-ROUND13-1` (commit `41718e59`, binary
+sha256 `597159e4…886705`), receipt
+`research/notes/index-calculus/round13/run1/receipt.json` (completed,
+nine commands exit 0), output `run1/R13.txt`, isolation record
+uncontended on reserved CPU 3 (772 s). 18 instances × 40 seeds × 2 arms,
+every `k` verified; the plain column reproduces round twelve's
+full-width Jacobian column exactly.
+
+| | registered test | result |
+|--|--|--|
+| N1 | median folded/plain walk ops, `N ≥ 10⁵`, ≤ 0.80 | **falsified**: 1.580 |
+| N2 | fruitless share ≤ 10% on every row | holds as counted: max 5.7% |
+| N3 | median folded `S_walk`, `N ≥ 10⁵`, ≤ 1.05 | **falsified**: 2.033 |
+| N4 | every run verified | holds |
+
+The fold works below `N ≈ 3·10⁴` (ratios 0.57–0.90, ideal 0.707) and
+fails increasingly above: 1.077, 1.217, 1.580, 1.698, 3.984 and 4.148 on
+the larger rows, the two largest folded walks at `S_walk` 4.83 and 6.14.
+
+**Reading it, within the registration.** N1 failed, so as registered the
+fold has a defect of its own. N2 "holds" only as counted: the fruitless
+counter records look-ahead trials and the single step of each
+gap escape, not the steps a walk spends going round a fruitless cycle
+before the escape fires. Class: none; the reference stays the plain
+full-width walk.
+
+## Round fourteen: fruitless cycles longer than two — protocol, written before measuring
+
+**Mechanism.** The look-ahead removes fruitless 2-cycles only. Longer
+fruitless cycles (4, 6, …) still form, at about `(r−1)/(4r³)` per step
+for the 4-cycle (Duursma–Gaudry–Morain 1999; Bos–Kleinjung–Lenstra 2010),
+about one per 1100 steps at `r = 16`. A walk in one meets no
+distinguished point and leaves only when the gap limit
+`32·2^θ ≈ √N` fires, so each trap costs about `√N` steps. Below
+`√N ≈ 1100` a walk rarely meets one before its collision; at the largest
+row (`√N ≈ 4100`) it meets a few, each costing up to `√N`: the observed
+3–4× growth.
+
+**Instrument.** A window of the last `W = 32` walk hashes. A walk whose
+current hash already appears in the window is inside a cycle. In
+*passive* mode the window only counts those steps (`cycle_ops`), and the
+walk is otherwise unchanged, step for step, so round thirteen's folded
+column must reproduce exactly. In *active* mode the first repeat
+triggers the escape round thirteen already uses (one random branch
+step), so a trap costs at most its cycle length plus one.
+
+**Arms.** Same 18 instances, 40 seeds, counted operations: plain
+full-width (reference); folded full-width with the passive window
+(round thirteen's walk, instrumented); folded full-width with the active
+window.
+
+**Registered hypotheses.**
+
+- **C14-1 (mechanism).** In the passive arm, `cycle_ops` is at least
+  **50%** of folded walk operations on each of the two largest rows, and
+  the passive arm's folded walk counts equal round thirteen's exactly.
+- **C14-2.** Active arm: median folded/plain walk operations over the 7
+  rows with `N ≥ 10⁵` is **≤ 0.80**.
+- **C14-3.** Active arm: median folded `S_walk` over those rows is
+  **≤ 1.05** (ideal 0.886).
+- **C14-4.** Active arm: fruitless work (look-ahead trials, escapes,
+  and steps inside a cycle before detection) is **≤ 10%** of walk
+  operations on every row; every run verified.
+
+The window costs hash comparisons, not group operations; it is
+unpriced native work and is reported as a count (`W` comparisons per
+step) for §5a. If C14-2 to C14-4 hold, the active folded walk becomes the
+reference (class **accounting**, against index calculus). If C14-1
+fails, long cycles are not the cause and the fold is examined further.
