@@ -430,6 +430,10 @@ pub fn build_decomposition_system_reusing(
     m: usize,
     st: &FieldStructure,
 ) -> Option<DecompositionSystem> {
+    // A truncated structure table (n > 64) describes another system.
+    if !st.is_exact() {
+        return None;
+    }
     if !algebra_cache::enabled(Layer::Preprocessing) {
         static MEMO_OFF: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
         if *MEMO_OFF.get_or_init(|| std::env::var("IC_TEMPLATE_MEMO").as_deref() == Ok("0")) {

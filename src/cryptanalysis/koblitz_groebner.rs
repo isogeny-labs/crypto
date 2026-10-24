@@ -176,6 +176,14 @@ impl FieldStructure {
             squares,
         }
     }
+
+    /// Whether the one-word structure constants hold the whole field.
+    /// Past `n = 64` the table keeps only the low word of each product,
+    /// so a system built from it is a different system: it must not be
+    /// built at all, or its UNSAT would be reported as a refutation.
+    pub fn is_exact(&self) -> bool {
+        self.n <= 64
+    }
 }
 
 /// An element of `F_{2^n}` whose coordinates are Boolean polynomials —
@@ -915,7 +923,7 @@ pub fn build_decomposition_system(
     m: usize,
     st: &FieldStructure,
 ) -> Option<DecompositionSystem> {
-    if m < 2 {
+    if m < 2 || !st.is_exact() {
         return None;
     }
     let ell = basis.len();
