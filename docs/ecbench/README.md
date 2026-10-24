@@ -410,6 +410,31 @@ default; the ids are:
 | `ic.pipeline` | factor base, oracle set-up (pair tables), relation trials, linear algebra, verification, each a phase; native work (lookups, row operations, square roots, Artin–Schreier solves, …) at the pinned ratio where the repository has one | native work with no pinned ratio for this curve; algebraic-solver operations |
 | `ic.pipeline_counted` | the same pipeline with the relation phase charge rebuilt from counted work and pinned conversions for deterministic SAT/PDP replays | algebraic-solver operations without a pinned conversion, including SAT conflicts; these runs remain lower bounds |
 | `ic.large_prime` | cofactor projection, exact combination-table group additions, target probes, and relation witness checks; the external runner verifies the returned scalar | combination states, MITM lookups, large-prime merge operations, and modular row operations; the record is therefore a lower bound, not a speed claim |
+| `rho.plain`, `rho.negation`, `rho.frozen_reference`, `bsgs.*`, `kangaroo.vow` on a hyperelliptic Jacobian | as on a curve: one Cantor composition-and-reduction (`hyperelliptic_word::HCurve`) is one addition or one doubling, whatever its degree; the walk's set-up, starts, steps, look-ahead, escapes and internal verification as `rho.*` | as `rho.*` (`canonicalisations_uncharged`, …) and `bsgs.*`; the `F_p` work inside a Cantor step is neither charged nor tallied (`counts_field_ops` is `false`) |
+
+**Hyperelliptic Jacobians** (`ecbench::hyper`, family `hyperelliptic`).
+`{"kind": "hyperelliptic_thread", "p": 41, "genus": 2}` builds the
+hyperelliptic index-calculus thread's instance
+(`hyperelliptic_ic_bench::thread_instance(p, genus)`: `y² = f(x)`,
+`deg f = 2g + 1`, `g ∈ {2, 3, 4}`, `p < 256`, its first `c` and its
+generator `D₁` of prime order `r`), so the generic arms run on the very
+Jacobians the thread's IC is compared on. `#J = h·r` comes from the
+L-polynomial: its first `g − 1` coefficients from point counts over
+`F_{p^k}`, `k < g`, leave one unknown, and of the multiples of `r` in that
+window and the Hasse–Weil interval exactly one must kill 32 random
+divisors, or the build fails (`HCurve::jacobian_order`). Measured children
+rebuild from `hyperelliptic_explicit` (`f`, `#J`, `r`, the generator's
+`gu`/`gv`), so they repeat neither the thread search nor the counts. A
+divisor is two hex words: word 0 is `deg u` (bits 0–7) and the non-leading
+coefficients of `u` (bytes 1–4), word 1 the coefficients of `v` (bytes
+0–3). The group key, which the distinguished points, the jump partition,
+the BSGS tables and the `{D, −D}` choice all read, is injective:
+`Σ_{e<deg} p^{2e}` plus the base-`p` index of `(u, v)` among degree-`deg`
+pairs. The name keeps ICV1's shape with a `hyp` tag
+(`icv1-hypg<g>p<p>-n<#J>-<8 hex>`) and is never registered; targets are
+planted only (no public-target law), and every IC method and endomorphism
+walk is refused at plan time. `A = 2`: the hyperelliptic involution is the
+negation; a curve with more automorphisms is not detected.
 
 `rho.multitarget_pooled` is the one method whose run solves more than its
 record's target. The record's target is solved last, after `L − 1` companion
@@ -1067,7 +1092,9 @@ FROM method_by_curve ORDER BY curve_slug, mean_s;
   `GF((t² + 19ℓ²)/4)` of prime order `q + 1 − t` whose endomorphism
   conductor is 1 at the crater and the prime `ℓ` at the floor, certified
   without computing an isogeny; it is the construction behind
-  `research/conductor_gap_cm_pairs_20261010/`.
+  `research/conductor_gap_cm_pairs_20261010/`. `hyperelliptic_thread`
+  and `hyperelliptic_explicit` build genus 2–4 Jacobians over `F_p`,
+  `p < 256` (§7, "Hyperelliptic Jacobians").
 - **A factor base or oracle:** add it to `ic_framework` as a plug-in;
   `ic.pipeline` reaches it through its name. Dump it with `ecbench fb` to
   store its points.

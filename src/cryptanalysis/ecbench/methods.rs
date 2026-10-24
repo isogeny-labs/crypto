@@ -28,6 +28,7 @@ use crate::cryptanalysis::ecbench::full_price;
 use crate::cryptanalysis::ecbench::generic::{
     bsgs_interleaved, bsgs_negation, bsgs_textbook, kangaroo, GenericOutcome,
 };
+use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench::wordram_price;
 use crate::cryptanalysis::ecbench::workload::{CurveFacts, Instance, WideInstance};
 use crate::cryptanalysis::ecbench_large_prime::{
@@ -1338,6 +1339,13 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         ));
     }
     match inst {
+        Instance::Hyper(h) => {
+            if is_hyper_generic(m.id.as_str()) {
+                Ok(())
+            } else {
+                Err(hyper_refusal(m.id.as_str(), h))
+            }
+        }
         Instance::Wide(wi) => match id {
             "rho.signed_frobenius_strong"
             | "rho.signed_frobenius_strong_legacy"
@@ -1458,6 +1466,9 @@ fn solve_inner(
     }
     if let Instance::Ext(i) = inst {
         return solve_ext(m, i, tx, ty, seed);
+    }
+    if let Instance::Hyper(i) = inst {
+        return solve_hyper(m, i, tx, ty, seed);
     }
     if m.id == "rho.frobenius_orbit" || m.id == "rho.gls" {
         return Err(format!(
@@ -1625,10 +1636,51 @@ fn solve_inner(
             };
             solve_generic(m, &i.curve, i.generator, target, i.r, seed)
         }
-        (Instance::Wide(_), _) | (Instance::Fp4(_), _) | (Instance::Ext(_), _) => {
+        (Instance::Wide(_), _)
+        | (Instance::Fp4(_), _)
+        | (Instance::Ext(_), _)
+        | (Instance::Hyper(_), _) => {
             unreachable!("returned above")
         }
     }
+}
+
+/// The methods that run on a hyperelliptic Jacobian: the generic ones,
+/// which see only [`CountedGroup`] (no IC arm, no endomorphism walk).
+fn is_hyper_generic(id: &str) -> bool {
+    matches!(
+        id,
+        "rho.plain"
+            | "rho.negation"
+            | "rho.frozen_reference"
+            | "bsgs.textbook"
+            | "bsgs.interleaved"
+            | "bsgs.negation"
+            | "kangaroo.vow"
+    )
+}
+
+fn hyper_refusal(id: &str, h: &HyperInstance) -> String {
+    format!(
+        "`{id}` has no hyperelliptic-Jacobian implementation; on a genus-{} Jacobian over F_{} only rho.plain, rho.negation, rho.frozen_reference, bsgs.* and kangaroo.vow run",
+        h.genus, h.p
+    )
+}
+
+/// A hyperelliptic Jacobian (`ecbench::hyper`): a generic method on the
+/// Cantor group, one composition-and-reduction per group operation.
+fn solve_hyper(
+    m: &ResolvedMethod,
+    i: &HyperInstance,
+    w0: u64,
+    w1: u64,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    if !is_hyper_generic(m.id.as_str()) {
+        return Err(hyper_refusal(m.id.as_str(), i));
+    }
+    let target = i.decode(w0, w1)?;
+    solve_generic(m, &i.curve, i.generator, target, i.r, seed)
 }
 
 /// A GLS or subfield curve (`ecbench::ext`): the endomorphism-orbit rho
@@ -3241,6 +3293,9 @@ pub fn dump_factor_base(
     if let Instance::Ext(_) = &inst {
         return Err("no factor-base plug-in runs on a gls_fp2 or subfield_fp3 curve".into());
     }
+    if let Instance::Hyper(_) = &inst {
+        return Err("no factor-base plug-in runs on a hyperelliptic Jacobian".into());
+    }
     if let Instance::Fp4Torsion(_) | Instance::F2m4(_) = &inst {
         return Err("factor-base dumps cover prime and binary curves".into());
     }
@@ -3344,7 +3399,8 @@ pub fn dump_factor_base(
         | Instance::Fp4(_)
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
-        | Instance::Ext(_) => unreachable!("returned above"),
+        | Instance::Ext(_)
+        | Instance::Hyper(_) => unreachable!("returned above"),
     }
 }
 

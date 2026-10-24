@@ -197,6 +197,7 @@ pub mod hnp_ecdsa;
 pub mod hwcost;
 pub mod hyperelliptic_ic_bench;
 pub mod hyperelliptic_index_calculus;
+pub mod hyperelliptic_word;
 pub mod ic_boundary;
 pub mod ic_corpus;
 pub mod ic_descent_degrees;

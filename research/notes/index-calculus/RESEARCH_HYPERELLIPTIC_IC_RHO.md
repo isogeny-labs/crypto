@@ -2034,3 +2034,52 @@ is a smoke test, not a result.
 **Not in this step.** No IC arm (it needs an adapter from the thread's
 index calculus to ecbench's IC interface), no measured comparison, no
 leaderboard or benchmarks row.
+
+## Lead: a hyperelliptic family in ecbench — built
+
+What the plan above called for now exists (infrastructure only; no
+measured claim):
+
+- `src/cryptanalysis/hyperelliptic_word.rs`: a `Copy` reduced Mumford
+  divisor (genus ≤ 4, `p < 256`), Cantor composition and reduction in
+  fixed 32-slot polynomials, `CountedGroup` (one composition = one counted
+  addition, or one doubling when the inputs are equal; field work inside
+  a step is not tallied). `key` is the degree-offset base-`p` index of the
+  reduced divisor: injective by construction (all reduced divisors of a
+  genus-2, `p = 11` curve enumerated: distinct keys, count = `#J` from
+  `genus2_fp`), and below `2^64` up to genus 4, `p = 251`.
+- `#J`: point counts over `F_{p^k}`, `k < g`, give every L-polynomial
+  coefficient but `a_g`; the candidates are the multiples of `ℓ` in the
+  resulting window and the Hasse–Weil interval that annihilate 32 random
+  divisors, and exactly one must survive (else the build errors). The
+  plan's simpler rule (Hasse–Weil interval alone) was not enough at small
+  `p`: at genus 4, `p = 17` it left `2#J … 5#J` standing. Cross-checked
+  against `genus2_fp` at genus 2 and full point counts at genus 3.
+- `src/cryptanalysis/ecbench/hyper.rs` and `workload.rs`:
+  `hyperelliptic_thread {p, genus}` and an explicit form the measured
+  child rebuilds from (checks squarefree `f`, a valid generator,
+  `[ℓ]G = 0`, `ℓ | #J`, the Hasse–Weil interval and `#J` against random
+  divisors); unregistered ICV1-shaped slugs, family `hyperelliptic`,
+  `A = 2`, planted targets only.
+- `methods.rs`: `rho.plain`, `rho.negation`, `rho.frozen_reference`,
+  `bsgs.*` and `kangaroo.vow` dispatch through `solve_generic`; IC methods
+  are refused at plan time with the reason.
+
+**Smoke test (not a measurement).** `ecbench_hyper_smoke/`: spec, plan,
+run and audit output for genus 2 `p = 41`, genus 3 `p = 23`, genus 4
+`p = 17`, two targets each, `rho.plain` and `rho.negation`: 36 of 36 runs
+verified, `audit OK: 36 records, 36 verified, 6 replays reproduced,
+0 problems`. The groups are tiny; no `S` value from it is read.
+
+**Open.** No IC arm yet (the thread's index calculus needs an adapter to
+ecbench's IC interface). `docs/ecbench/schema.sql` still restricts
+`family` to prime/koblitz/binary, so database loads of these sessions
+need that check widened. Two `tests/ecbench.rs` tests
+(`bounds_a_frontier_and_challenge_verdicts_round_trip`,
+`field_operations_are_counted_bounded_and_judged`) fail on the committed
+tree with or without this change (prime curves only; a missing audit
+receipt under fit v2).
+
+**Next.** Re-measure the thread's rho on its 18 instances through
+ecbench (`rho.negation` against the thread's collide-first fold), then
+the IC adapter, so IC and rho run under §12 and §5a in one session.
