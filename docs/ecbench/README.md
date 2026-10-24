@@ -866,9 +866,29 @@ record's own counts (`S = total/√r`, the floor, the ratio, the
 lower-bound flag) and, for a session graded under the current rules,
 regrades every run from its recorded observations. A figure edited by
 hand and resealed is caught. The receipt names every file by SHA-256,
-and its own SHA-256 is the replay certificate a claim cites. CI
-re-audits every committed session under `research/ecbench_*/sessions`
-on a Linux x86-64 runner with every run replayed.
+and its own SHA-256 is the replay certificate a claim cites.
+
+What CI replays (`.github/workflows/ecbench.yml`):
+
+- **every pull request** that touches ecbench: every committed session,
+  found by schema wherever it lives, is integrity-audited (hashes, seals,
+  plan, answers, derived figures, grading) without replays; a fresh
+  smoke session replays 8 runs; and four sessions written before the
+  class set-up fix replay 8 runs each, which must pass through the
+  pre-fix reconstruction ([`CLASS_SETUP_AUDIT.md`](CLASS_SETUP_AUDIT.md));
+- **weekly, and on demand**: the same integrity audit, plus every
+  measured run replayed for the sessions under `research/ecbench_*/sessions`,
+  the binary-curve comparison and the n37 compact-orbit notes.
+
+A replay that disagrees reports what differs (`differs in total_gae,
+phase counts, …`). One that agrees reports `identical`, or names the
+historical reconstruction it needed:
+
+| replay detail | meaning |
+|:--|:--|
+| `identical` | every compared figure is bit for bit the record's |
+| `identical (legacy gae rounding, …)` | an `ic.pipeline` record from before 2026-10-05 whose solver wall term was removed by subtraction, reproduced from the record's own solver term |
+| `identical (pre-2026-10-18 phase accounting, reproduced from the replay)` | a `rho.quartic` / `rho.cubic` record from one of the five pre-fix producers, whose total left out the class set-up |
 
 **A method's counts are frozen by its id.** Changing what a registered
 method counts breaks the replay of every committed session that used it,

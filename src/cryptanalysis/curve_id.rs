@@ -419,6 +419,91 @@ pub fn same_curve(a: &str, b: &str) -> bool {
     matches!((ra, rb), (Some(x), Some(y)) if x == y)
 }
 
+// A measured ecbench child is a fresh process that asks one question of
+// the alias table: which of a frozen report's names is this instance.
+// Building the map for that parses 2.8 MB of JSON (about 150 million
+// instructions, 97% of an IC child), so the functions below read the
+// generated text instead.  It is `json.dumps(indent=0)` of a sorted
+// object, one `"<name>": "<slug>",` per line (`scripts/curve_id.py`,
+// `alias_map_text`).  A name or slug the scan cannot place exactly (one
+// JSON would escape) goes to the map, so every answer is the map's.
+
+/// The `"aliases"` object of the alias table, from its first entry.
+fn alias_text() -> &'static str {
+    const OPEN: &str = "\"aliases\": {";
+    ALIASES
+        .find(OPEN)
+        .map_or("", |i| &ALIASES[i + OPEN.len()..])
+}
+
+/// Whether `s` is written verbatim inside a JSON string.
+fn json_verbatim(s: &str) -> bool {
+    !s.is_empty() && !s.chars().any(|c| c == '"' || c == '\\' || c.is_control())
+}
+
+/// [`resolve`] of one normalised name, read from the table's text.
+fn resolve_key(key: &str) -> Option<&'static str> {
+    if !json_verbatim(key) {
+        return aliases().get(key).map(String::as_str);
+    }
+    let text = alias_text();
+    let at = text.find(&format!("\n\"{key}\": \""))? + key.len() + 6;
+    let len = text[at..].find('"')?;
+    Some(&text[at..at + len])
+}
+
+/// Every normalised name that [`resolve`]s to `slug`.
+fn keys_of(slug: &str) -> Vec<&'static str> {
+    let from_map = || -> Vec<&'static str> {
+        aliases()
+            .iter()
+            .filter(|(_, v)| v.as_str() == slug)
+            .map(|(k, _)| k.as_str())
+            .collect()
+    };
+    if !json_verbatim(slug) {
+        return from_map();
+    }
+    let text = alias_text();
+    let needle = format!("\": \"{slug}\"");
+    let mut keys = Vec::new();
+    let mut from = 0;
+    while let Some(i) = text[from..].find(&needle) {
+        let at = from + i;
+        from = at + needle.len();
+        if !matches!(text.as_bytes().get(from), Some(b',' | b'\n')) {
+            continue;
+        }
+        let start = text[..at].rfind('\n').map_or(0, |n| n + 1);
+        match text[start..at].strip_prefix('"') {
+            Some(key) if !key.contains('\\') => keys.push(key),
+            _ => return from_map(),
+        }
+    }
+    keys
+}
+
+/// The first `(name, value)` whose name denotes the same curve as
+/// `instance`, in the sense of [`same_curve`], without building the alias
+/// map: one lookup for `instance` and one scan for its slug's names.
+pub fn find_same_curve<'n, T>(
+    instance: &str,
+    candidates: impl IntoIterator<Item = (&'n str, T)>,
+) -> Option<T> {
+    let target = resolve_key(&normalise(instance))
+        .or_else(|| instance.starts_with("icv1-").then_some(instance));
+    let keys = target.map(keys_of).unwrap_or_default();
+    candidates.into_iter().find_map(|(name, value)| {
+        let hit = name == instance
+            || target.is_some_and(|t| {
+                let key = normalise(name);
+                keys.contains(&key.as_str())
+                    || (name == t && name.starts_with("icv1-") && resolve_key(&key).is_none())
+            });
+        hit.then_some(value)
+    })
+}
+
 /// The degree of the binary field a curve name carries: `m` of an ICV1
 /// slug's `f2m<m>`, `n` of a legacy `…-n<n>-…` or `…GF(2^<n>)`.
 pub fn binary_degree(name: &str) -> Option<u32> {
@@ -434,4 +519,85 @@ pub fn binary_degree(name: &str) -> Option<u32> {
     }
     let at = name.find("-n")? + 2;
     digits(&name[at..])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The text scans agree with the map on every name the table holds
+    /// (every 41st, and every slug), on names it does not hold, and on
+    /// names JSON would escape.
+    #[test]
+    fn the_text_scans_agree_with_the_map() {
+        let map = aliases();
+        assert!(map.len() > 1000, "alias table has {} names", map.len());
+        let mut keys: Vec<&String> = map.keys().collect();
+        keys.sort();
+        for key in keys.iter().step_by(41) {
+            assert_eq!(resolve_key(key), map.get(*key).map(String::as_str), "{key}");
+        }
+        for key in [
+            "",
+            "no-such-curve",
+            "icv1-fp20-t0-00000000",
+            "a\"b",
+            "a\\b",
+            "secp256k",
+        ] {
+            assert_eq!(
+                resolve_key(key),
+                map.get(key).map(String::as_str),
+                "{key:?}"
+            );
+        }
+        let mut slugs: Vec<&String> = map.values().collect();
+        slugs.sort();
+        slugs.dedup();
+        for slug in slugs.iter().step_by(97) {
+            let mut scanned = keys_of(slug);
+            scanned.sort();
+            let mut expected: Vec<&str> = map
+                .iter()
+                .filter(|(_, v)| v == slug)
+                .map(|(k, _)| k.as_str())
+                .collect();
+            expected.sort();
+            assert_eq!(scanned, expected, "{slug}");
+        }
+        assert!(keys_of("icv1-no-such-slug").is_empty());
+    }
+
+    /// `find_same_curve` returns what a search with [`same_curve`] returns,
+    /// for every row of the pinned calibration table against instances
+    /// named every way the table and the registry name them.
+    #[test]
+    fn find_same_curve_is_same_curve() {
+        let doc: serde_json::Value =
+            serde_json::from_str(include_str!("../../docs/ic/calibration.json")).unwrap();
+        let rows: Vec<&str> = doc["instances"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .filter_map(|k| k.split_once('/').map(|(_, n)| n))
+            .collect();
+        let mut instances: Vec<String> = rows.iter().map(|r| r.to_string()).collect();
+        instances.extend(rows.iter().filter_map(|r| resolve(r).map(str::to_string)));
+        instances.extend(rows.iter().map(|r| r.to_uppercase()));
+        instances.extend(
+            [
+                "icv1-fp20-t0-00000000",
+                "unknown curve",
+                "",
+                "secp256k1",
+                "P-256",
+            ]
+            .map(str::to_string),
+        );
+        for instance in &instances {
+            let expected = rows.iter().position(|r| same_curve(r, instance));
+            let found = find_same_curve(instance, rows.iter().enumerate().map(|(i, r)| (*r, i)));
+            assert_eq!(found, expected, "{instance:?}");
+        }
+    }
 }
