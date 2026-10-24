@@ -132,9 +132,13 @@ class Listing(unittest.TestCase):
         self.assertEqual([o[0] for o in objects], [ORBIT])
         self.assertEqual(unrecognised, [])
 
-    def test_a_short_object_carrying_no_whole_record_is_not_listed(self):
-        objects, _ = self.objects([(ORBIT, 16, when("2026-09-17T18:47:34"))])
+    def test_a_short_object_carrying_no_whole_record_is_reported(self):
+        objects, unrecognised = self.objects([
+            (ORBIT, 16, when("2026-09-17T18:47:34")),
+            (LEGACY, 0, when("2026-09-17T13:50:59")),
+        ])
         self.assertEqual(objects, [])
+        self.assertEqual(unrecognised, [ORBIT, LEGACY])
 
     def test_paging_does_not_lose_objects(self):
         items = [(LEGACY.replace("0000000000000000", "%016d" % i), 64,

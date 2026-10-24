@@ -253,6 +253,10 @@ def s3Objects(s3, bucket, prefix="dp/"):
             records = item["Size"] // RECORD_BYTES
             if records:
                 out.append((key, records, when))
+            else:
+                # A recognized name is not evidence of a complete upload.
+                # Report a short body so pending/status cannot look caught up.
+                unrecognised.append(key)
         if not page.get("IsTruncated"):
             break
         token = page["NextContinuationToken"]
