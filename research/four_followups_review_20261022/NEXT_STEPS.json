@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "objective_target_count": 1260,
+  "current_status": {
+    "factor_base_verified_targets_per_arm": 1260,
+    "projective_verified_targets_per_arm": 1260,
+    "pencil_verified_candidate_targets": 543,
+    "pencil_cap_only_targets": 1,
+    "pencil_no_record_targets": 716,
+    "pencil_open_targets": 717,
+    "kummer_verified_targets": 1260
+  },
+  "steps": [
+    {
+      "id": "N1",
+      "name": "freeze_open_pencil_inventory",
+      "execution_class": "metadata_only",
+      "closes_pencil_cohort": false,
+      "acceptance": [
+        "1260 unique archive workload keys",
+        "543 verified candidate keys",
+        "717 exact open keys",
+        "no duplicate workload identity"
+      ]
+    },
+    {
+      "id": "N2",
+      "name": "build_handoff_and_synthetic_intake_gate",
+      "execution_class": "non_solving",
+      "closes_pencil_cohort": false,
+      "acceptance": [
+        "hash and seed drift rejected",
+        "unknown and duplicate workloads rejected",
+        "failures require null candidate prices",
+        "missing or mismatched replay rejected"
+      ]
+    },
+    {
+      "id": "N3",
+      "name": "independently_authorized_open_cohort",
+      "execution_class": "external_authorization_required",
+      "closes_pencil_cohort": false,
+      "acceptance": [
+        "717 primary records",
+        "717 fresh-process replay records",
+        "all failures and caps retained",
+        "same-process matched rho retained"
+      ]
+    },
+    {
+      "id": "N4",
+      "name": "admit_and_publish_returned_evidence",
+      "execution_class": "verification_and_reporting",
+      "closes_pencil_cohort": true,
+      "acceptance": [
+        "plan-set and checksum equality",
+        "source scalar and replay validation",
+        "all 36 price cells recomputed",
+        "standard CSV JSONL graphs PDF and manifest regenerated",
+        "full aggregate ratio only when all 1260 candidates verify"
+      ]
+    },
+    {
+      "id": "N5",
+      "name": "reviewer_pattern_appendix",
+      "execution_class": "derived_existing_evidence",
+      "closes_pencil_cohort": false
+    },
+    {
+      "id": "N6",
+      "name": "projective_divisor_class_proof",
+      "execution_class": "formal_verification",
+      "closes_pencil_cohort": false
+    },
+    {
+      "id": "N7",
+      "name": "kummer_sidecar_obstruction_theorem",
+      "execution_class": "formal_verification",
+      "closes_pencil_cohort": false
+    },
+    {
+      "id": "N8",
+      "name": "factor_base_seed_replication",
+      "execution_class": "public_known_answer_experiment",
+      "closes_pencil_cohort": false
+    }
+  ],
+  "reporting": {
+    "price_cells": 36,
+    "matched_reference": "same-process source-negation rho",
+    "required_outputs": [
+      "standardized JSONL",
+      "standardized CSV",
+      "SVG and PNG graphs",
+      "neutral PDF",
+      "checksum manifest",
+      "independent replay certificate"
+    ]
+  }
+}

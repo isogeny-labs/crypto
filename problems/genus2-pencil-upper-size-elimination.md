@@ -6,6 +6,12 @@
 - **Next action owner:** PR #2304 follow-up
 - **Last updated:** 2026-10-24
 
+The ordered, machine-checkable continuation plan is recorded in
+[`NEXT_STEPS.md`](../research/four_followups_review_20261022/NEXT_STEPS.md)
+and [`NEXT_STEPS.json`](../research/four_followups_review_20261022/NEXT_STEPS.json).
+It preserves the full cohort and separates metadata/intake preparation from
+the independently authorized primary and replay execution.
+
 ## Problem
 
 The point-driven pencil collector has not completed the frozen 1,260-target
@@ -76,6 +82,13 @@ same-process source-negation rho and the two-point control.
 - [ ] Independently replay all records, verify both recovered scalars on the
   source curve, recompute all 36 prices per model and compare with the frozen
   two-point control.
+
+The exact open inventory is expected to contain 177 remaining 28-bit targets
+and 180 targets at each of 32, 36, and 40 bits. Step N1 must establish this by
+set equality against the frozen archive before any new execution. Attempt
+coverage and verified candidate coverage remain separate: a retained cap or
+failure can complete an attempted workload record but cannot contribute a
+candidate/rho ratio.
 
 These conditions would give an end-to-end operation-count cohort. Qualified
 wall-speed claims would additionally need the repository's isolation and
