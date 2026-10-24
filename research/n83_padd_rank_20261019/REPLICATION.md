@@ -54,3 +54,33 @@ path); none is in `KoblitzCurve::new` or `find_irreducible_sparse_wide`, the onl
 functions of that file the producer calls. So the producer's executed path is
 unchanged, but the file is not, and the linked binary differs. This is another
 reason the replication on the merged head is wanted and is still not run.
+
+## Replication on a second host (2026-10-24)
+
+Another session re-ran this panel's runner unchanged (`run.py` functions, arm
+order, rank seed 29, rho seeds `2026101900 + 10 i + d`) from binaries built at
+PR head `e00d818a4`, on its 4-vCPU cloud container (Intel Xeon @ 2.80 GHz),
+inside a larger panel (`research/n83_mitm3_ic_20261024`, unrelated arms run
+after each point's block). That session stopped the panel after point 2 when
+it moved to other work. Points 1 and 2 completed every arm (cur_a, cur_b,
+padd, three rho draws), point 3 completed its padd arm, and point 3's cur_a
+was stopped mid-run. Records are in [`replication-20261024/`](replication-20261024/);
+base dumps are replaced by their SHA-256.
+
+All 13 completed replayed arms reproduce the original Actions arms exactly:
+recovered scalar, relation point indices and probes, rank attempts, relations,
+failures, rows without gain, probe mean and rank, factor-base digest, and for
+rho the scalar and group-addition count. That gives 26 scalar checks against
+the sealed answers (`examples/n83_panel_analyze.rs replay-2282`;
+[`replay-certificate.json`](replication-20261024/replay-certificate.json), status `verified`).
+
+This host is slower than the Actions runner. The baseline arms took about
+216–221 s per cold process here, against about 120 s there. That was one host
+and two points, so no timing claim is drawn from this replication; it
+establishes reproducibility of the counted work and the answers.
+
+Validation gate: [`benchmarks/20261019-n83-padd-rank-stage/VALIDATION.json`](../../benchmarks/20261019-n83-padd-rank-stage/VALIDATION.json)
+names this replay certificate. It also names the validator report, which
+recomputes the 11 headline point estimates exactly from the raw Actions
+records, and the strong-rho reference with the §5a band. Rho is cheaper at 0,
+0.1 and 1 GAE: 34×, 41× and 61×.

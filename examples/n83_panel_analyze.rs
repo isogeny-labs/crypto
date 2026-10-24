@@ -66,13 +66,20 @@ const BOOT: usize = 10_000;
 
 fn quantiles(mut v: Vec<f64>) -> [f64; 2] {
     v.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    [v[(0.025 * v.len() as f64) as usize], v[(0.975 * v.len() as f64) as usize]]
+    [
+        v[(0.025 * v.len() as f64) as usize],
+        v[(0.975 * v.len() as f64) as usize],
+    ]
 }
 
 /// Bootstrap of the mean of paired differences, resampling points.
 fn boot_mean(d: &[f64], rng: &mut Rng) -> [f64; 2] {
     let k = d.len();
-    quantiles((0..BOOT).map(|_| (0..k).map(|_| d[rng.below(k)]).sum::<f64>() / k as f64).collect())
+    quantiles(
+        (0..BOOT)
+            .map(|_| (0..k).map(|_| d[rng.below(k)]).sum::<f64>() / k as f64)
+            .collect(),
+    )
 }
 
 /// Bootstrap of a ratio of means over paired points.
@@ -138,14 +145,19 @@ fn ic_run(dir: &Path) -> IcRun {
     let base = if dir.join("base_dump.jsonl").exists() {
         sha256_file(&dir.join("base_dump.jsonl"))
     } else {
-        fs::read_to_string(dir.join("base_dump.sha256")).map(|s| s.trim().to_string()).unwrap_or_default()
+        fs::read_to_string(dir.join("base_dump.sha256"))
+            .map(|s| s.trim().to_string())
+            .unwrap_or_default()
     };
     let t = &summary["timing_ms"];
     IcRun {
         cold_s: f(&usage["wall_seconds"]),
         rank_s: f(&t["rank_stage"]) / 1000.0,
         setup_s: f(&t["setup_total"]) / 1000.0,
-        scalar: target["recovered_scalar"].to_string().trim_matches('"').to_string(),
+        scalar: target["recovered_scalar"]
+            .to_string()
+            .trim_matches('"')
+            .to_string(),
         identity: json!({
             "point_indices": target["point_indices"], "probes": target["probes"],
             "rank_attempts": summary["rank_attempts"], "rank_relations": summary["rank_relations"],
@@ -174,20 +186,29 @@ fn rho_run(dir: &Path) -> RhoRun {
     assert_eq!(r["generic_scalar_replay_verified"], true);
     fn find(v: &Value, key: &str) -> Option<Value> {
         match v {
-            Value::Object(m) => m.get(key).cloned().or_else(|| m.values().find_map(|x| find(x, key))),
+            Value::Object(m) => m
+                .get(key)
+                .cloned()
+                .or_else(|| m.values().find_map(|x| find(x, key))),
             _ => None,
         }
     }
     RhoRun {
         online_s: f(&r["online_ms"]) / 1000.0,
         wall_s: f(&usage["wall_seconds"]),
-        scalar: r["recovered_scalar"].to_string().trim_matches('"').to_string(),
+        scalar: r["recovered_scalar"]
+            .to_string()
+            .trim_matches('"')
+            .to_string(),
         charges: find(&r, "charges_setup_and_solve").unwrap_or(Value::Null),
     }
 }
 
 fn answers(path: &Path) -> Vec<String> {
-    jsonl(path).iter().map(|a| a["scalar"].as_str().unwrap().to_string()).collect()
+    jsonl(path)
+        .iter()
+        .map(|a| a["scalar"].as_str().unwrap().to_string())
+        .collect()
 }
 
 fn headline(name: &str, claimed: f64, recomputed: f64) -> Value {
@@ -235,16 +256,56 @@ fn validate_2282(raw: &Path, answers_path: &Path, claimed_path: &Path, out: &Pat
     let m = &claimed["metrics"];
     let heads = vec![
         headline("cold_s.cur_mean", f(&m["cold_s"]["cur_mean"]), mean(&cur)),
-        headline("cold_s.padd_mean", f(&m["cold_s"]["padd_mean"]), mean(&padd)),
-        headline("cold_s.paired_saving_mean", f(&m["cold_s"]["paired_saving_mean"]), mean(&saving)),
-        headline("cold_s.ratio_cur_over_padd", f(&m["cold_s"]["ratio_cur_over_padd"]), cur.iter().sum::<f64>() / padd.iter().sum::<f64>()),
-        headline("cold_s.aa_ratio_a_over_b", f(&m["cold_s"]["aa_ratio_a_over_b"]), aa_a.iter().sum::<f64>() / aa_b.iter().sum::<f64>()),
-        headline("rank_s.cur_mean", f(&m["rank_s"]["cur_mean"]), mean(&rank_cur)),
-        headline("rank_s.padd_mean", f(&m["rank_s"]["padd_mean"]), mean(&rank_padd)),
-        headline("rank_s.ratio_cur_over_padd", f(&m["rank_s"]["ratio_cur_over_padd"]), rank_cur.iter().sum::<f64>() / rank_padd.iter().sum::<f64>()),
-        headline("rho.mean_online_s", f(&claimed["rho"]["mean_online_s"]), rho_mean),
-        headline("rho.ratios.cur.ic_over_rho_online", f(&claimed["rho"]["ratios"]["cur"]["ic_over_rho_online"]), mean(&cur) / rho_mean),
-        headline("rho.ratios.padd.ic_over_rho_online", f(&claimed["rho"]["ratios"]["padd"]["ic_over_rho_online"]), mean(&padd) / rho_mean),
+        headline(
+            "cold_s.padd_mean",
+            f(&m["cold_s"]["padd_mean"]),
+            mean(&padd),
+        ),
+        headline(
+            "cold_s.paired_saving_mean",
+            f(&m["cold_s"]["paired_saving_mean"]),
+            mean(&saving),
+        ),
+        headline(
+            "cold_s.ratio_cur_over_padd",
+            f(&m["cold_s"]["ratio_cur_over_padd"]),
+            cur.iter().sum::<f64>() / padd.iter().sum::<f64>(),
+        ),
+        headline(
+            "cold_s.aa_ratio_a_over_b",
+            f(&m["cold_s"]["aa_ratio_a_over_b"]),
+            aa_a.iter().sum::<f64>() / aa_b.iter().sum::<f64>(),
+        ),
+        headline(
+            "rank_s.cur_mean",
+            f(&m["rank_s"]["cur_mean"]),
+            mean(&rank_cur),
+        ),
+        headline(
+            "rank_s.padd_mean",
+            f(&m["rank_s"]["padd_mean"]),
+            mean(&rank_padd),
+        ),
+        headline(
+            "rank_s.ratio_cur_over_padd",
+            f(&m["rank_s"]["ratio_cur_over_padd"]),
+            rank_cur.iter().sum::<f64>() / rank_padd.iter().sum::<f64>(),
+        ),
+        headline(
+            "rho.mean_online_s",
+            f(&claimed["rho"]["mean_online_s"]),
+            rho_mean,
+        ),
+        headline(
+            "rho.ratios.cur.ic_over_rho_online",
+            f(&claimed["rho"]["ratios"]["cur"]["ic_over_rho_online"]),
+            mean(&cur) / rho_mean,
+        ),
+        headline(
+            "rho.ratios.padd.ic_over_rho_online",
+            f(&claimed["rho"]["ratios"]["padd"]["ic_over_rho_online"]),
+            mean(&padd) / rho_mean,
+        ),
     ];
     let agree = heads.iter().all(|h| {
         let (c, r) = (f(&h["claimed"]), f(&h["recomputed"]));
@@ -257,7 +318,16 @@ fn validate_2282(raw: &Path, answers_path: &Path, claimed_path: &Path, out: &Pat
     raw_files.sort();
     let raw_data: Vec<Value> = raw_files
         .iter()
-        .filter(|p| p.file_name().map(|n| n == "usage.json" || n == "receipt.json" || n == "stdout.jsonl" || n == "targets_result.jsonl").unwrap_or(false))
+        .filter(|p| {
+            p.file_name()
+                .map(|n| {
+                    n == "usage.json"
+                        || n == "receipt.json"
+                        || n == "stdout.jsonl"
+                        || n == "targets_result.jsonl"
+                })
+                .unwrap_or(false)
+        })
         .map(|p| json!({"path": p.to_string_lossy(), "sha256": sha256_file(p)}))
         .collect();
     let report = json!({
@@ -273,7 +343,10 @@ fn validate_2282(raw: &Path, answers_path: &Path, claimed_path: &Path, out: &Pat
         "raw_data": raw_data,
     });
     fs::write(out, serde_json::to_string_pretty(&report).unwrap() + "\n").unwrap();
-    println!("validator status {} ({} scalar checks, {} identity checks)", report["status"], scalar_checks, identity_checks);
+    println!(
+        "validator status {} ({} scalar checks, {} identity checks)",
+        report["status"], scalar_checks, identity_checks
+    );
     assert!(agree, "headline mismatch");
 }
 
@@ -295,12 +368,14 @@ fn panel(dir: &Path, answers_path: &Path, first: usize, out: &Path) {
     let runs = dir.join("runs");
     let mut rng = Rng(20261024);
     let mut rows = vec![];
-    let (mut cur, mut padd, mut h4, mut h1, mut aa_a, mut aa_b) = (vec![], vec![], vec![], vec![], vec![], vec![]);
+    let (mut cur, mut padd, mut h4, mut h1, mut aa_a, mut aa_b) =
+        (vec![], vec![], vec![], vec![], vec![], vec![]);
     let mut rho_online: Vec<Vec<f64>> = vec![];
     let mut rho_wall: Vec<Vec<f64>> = vec![];
     let mut problems: Vec<String> = vec![];
     let mut rank_probe_set = std::collections::BTreeSet::new();
-    let (mut h3_ops, mut base_ops, mut rho_adds, mut rho_unpriced) = (vec![], vec![], vec![], vec![]);
+    let (mut h3_ops, mut base_ops, mut rho_adds, mut rho_unpriced) =
+        (vec![], vec![], vec![], vec![]);
     let mut h3_split = vec![];
     for i in first..=20 {
         let arm = |a: &str| ic_run(&runs.join(format!("p{i}_{a}")));
@@ -321,7 +396,9 @@ fn panel(dir: &Path, answers_path: &Path, first: usize, out: &Path) {
             }
             let s = read(&d.join("summary.json"));
             let tr = &s["targets"][0];
-            if tr["recovered_scalar"].as_str() != Some(ans[i - 1].as_str()) || tr["group_verified"] != true {
+            if tr["recovered_scalar"].as_str() != Some(ans[i - 1].as_str())
+                || tr["group_verified"] != true
+            {
                 problems.push(format!("p{i} h3_t{t} scalar"));
             }
             (f(&usage["wall_seconds"]), s)
@@ -344,7 +421,12 @@ fn panel(dir: &Path, answers_path: &Path, first: usize, out: &Path) {
             let ch = &r.charges;
             adds.push(f(&ch["group_additions"]));
             let mut u = 0.0;
-            for key in ["canonicalizations", "partition_hashes", "table_queries", "table_inserts"] {
+            for key in [
+                "canonicalizations",
+                "partition_hashes",
+                "table_queries",
+                "table_inserts",
+            ] {
                 if let Some(v) = ch.get(key) {
                     u += f(v);
                 }
@@ -437,15 +519,105 @@ fn panel(dir: &Path, answers_path: &Path, first: usize, out: &Path) {
     println!("{}", serde_json::to_string_pretty(&json!({"verdict": verdict, "primary": out_v["primary"], "ic_over_rho": out_v["ic_over_rho"], "problems": out_v["problems"]})).unwrap());
 }
 
+/// Replay certificate for PR #2282: the replication panel re-ran the PR's
+/// runner (same arms, rank seed and rho seeds) on another host; every
+/// completed replayed arm must reproduce the original arm's relation, probe
+/// and rank counters, base digest and scalar, and every rho replay its
+/// scalar and group-addition count.
+fn replay_2282(orig: &Path, panel_dir: &Path, answers_path: &Path, out: &Path) {
+    let ans = answers(answers_path);
+    let orig_base: std::collections::HashMap<String, String> =
+        fs::read_to_string(orig.join("base_dump_sha256.txt"))
+            .unwrap()
+            .lines()
+            .filter_map(|l| {
+                let mut it = l.split_whitespace();
+                let h = it.next()?.to_string();
+                let path = it.next()?;
+                Some((path.split('/').next()?.to_string(), h))
+            })
+            .collect();
+    let mut runs = Vec::new();
+    let mut ok_all = true;
+    let mut scalar_checks = 0usize;
+    for e in fs::read_dir(panel_dir.join("runs")).unwrap() {
+        let dir = e.unwrap().path();
+        let name = dir.file_name().unwrap().to_string_lossy().to_string();
+        if name.contains("_h3_") {
+            continue;
+        }
+        let usage = if dir.join("usage.json").exists() {
+            read(&dir.join("usage.json"))
+        } else {
+            json!({"status": "KILLED_NO_USAGE"})
+        };
+        if usage["status"] != "PASS_PRODUCER" {
+            runs.push(json!({"run": name, "status": usage["status"], "compared": false,
+                             "note": "replay process did not complete (panel stopped by the operator)"}));
+            continue;
+        }
+        let point: usize = name[1..name.find('_').unwrap()].parse().unwrap();
+        let o = orig.join("runs").join(&name);
+        let pass = if name.contains("_rho") {
+            let (a, b) = (rho_run(&o), rho_run(&dir));
+            scalar_checks += 2;
+            a.scalar == ans[point - 1]
+                && b.scalar == ans[point - 1]
+                && a.charges["group_additions"] == b.charges["group_additions"]
+        } else {
+            let (a, b) = (ic_run(&o), ic_run(&dir));
+            scalar_checks += 2;
+            let mut ia = a.identity.clone();
+            let mut ib = b.identity.clone();
+            ia["base_sha256"] = json!(orig_base.get(&name).cloned().unwrap_or_default());
+            ib["base_sha256"] = json!(fs::read_to_string(dir.join("base_dump.sha256"))
+                .unwrap_or_default()
+                .trim());
+            a.scalar == ans[point - 1] && b.scalar == ans[point - 1] && ia == ib
+        };
+        ok_all &= pass;
+        runs.push(json!({"run": name, "compared": true, "pass": pass}));
+    }
+    runs.sort_by(|x, y| x["run"].as_str().cmp(&y["run"].as_str()));
+    let compared = runs.iter().filter(|r| r["compared"] == true).count();
+    let doc = json!({
+        "schema": "n83.padd-rank-replay-certificate/v1",
+        "status": if ok_all && compared > 0 { "verified" } else { "failed" },
+        "independent": true,
+        "independence": "the PR's frozen runner and binary sources re-executed on a different host (this session's cloud container) by a different session; comparison and scalar checks by examples/n83_panel_analyze.rs",
+        "scalars_verified": ok_all,
+        "scalar_checks": scalar_checks,
+        "sample": "points 1-2 complete (cur_a, cur_b, padd, three rho draws each) and point 3 padd; the replication was stopped after point 2 when the session moved to other work",
+        "runs": runs,
+    });
+    fs::write(out, serde_json::to_string_pretty(&doc).unwrap() + "\n").unwrap();
+    println!(
+        "replay {} ({} compared runs, {} scalar checks)",
+        doc["status"], compared, scalar_checks
+    );
+}
+
 fn main() {
     let a: Vec<String> = std::env::args().collect();
     match a.get(1).map(String::as_str) {
-        Some("validate-2282") if a.len() == 6 => {
-            validate_2282(Path::new(&a[2]), Path::new(&a[3]), Path::new(&a[4]), Path::new(&a[5]))
-        }
-        Some("panel") if a.len() == 6 => {
-            panel(Path::new(&a[2]), Path::new(&a[3]), a[4].parse().unwrap(), Path::new(&a[5]))
-        }
+        Some("validate-2282") if a.len() == 6 => validate_2282(
+            Path::new(&a[2]),
+            Path::new(&a[3]),
+            Path::new(&a[4]),
+            Path::new(&a[5]),
+        ),
+        Some("replay-2282") if a.len() == 6 => replay_2282(
+            Path::new(&a[2]),
+            Path::new(&a[3]),
+            Path::new(&a[4]),
+            Path::new(&a[5]),
+        ),
+        Some("panel") if a.len() == 6 => panel(
+            Path::new(&a[2]),
+            Path::new(&a[3]),
+            a[4].parse().unwrap(),
+            Path::new(&a[5]),
+        ),
         _ => {
             eprintln!("usage: n83_panel_analyze validate-2282 <raw> <answers> <claimed> <out> | panel <dir> <answers> <first_point> <out>");
             std::process::exit(2);
