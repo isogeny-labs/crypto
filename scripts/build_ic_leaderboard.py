@@ -1791,7 +1791,9 @@ def page(doc: dict, standalone: bool) -> str:
             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500'
             '&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">\n'
-            f"<style>{STYLE}</style>\n")
+            f"<style>{STYLE}</style>\n"
+            '<link rel="stylesheet" href="ic-leaderboard/layout.css">\n'
+            '<script src="ic-leaderboard/layout.js" defer></script>\n')
     P = []
     K1 = L["koblitz"]
     kob_rows = by_regime["koblitz"]
