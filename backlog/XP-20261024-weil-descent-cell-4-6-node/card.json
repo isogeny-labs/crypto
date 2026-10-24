@@ -8,9 +8,9 @@
     "ic-launch-cards workstream H"
   ],
   "status": "blocked",
-  "status_note": "Launch card written 2026-10-24. Activation-gated on the m = 4 repricing (research/m4_reprice_20261024/, not on origin/main at writing) and an owner threshold in rho-units; the expected D = 5 bracket (+37 to +59 bits) sits above REVIEW.md F1's +30-bit downgrade line. FGHR, Faugere-Svartz, WDSat and crossbred are not built.",
+  "status_note": "Launch card written 2026-10-24. Activation-gated on the m = 4 repricing (workstream A table, rho-step bracket +37.3 to +49.2 bits over w = 2 to 2.33; not on origin/main at writing). Under REVIEW F1 (+30 rho-step bits) the gate is closed unless the owner overrides it. FGHR, Faugere-Svartz, WDSat and crossbred are not built.",
   "blocked_on": [
-    "note:activation gate: m = 4 repricing D = 5 bracket in rho-units (research/m4_reprice_20261024/, workstream A) and an owner threshold for within reach",
+    "note:activation gate closed under REVIEW F1 (+30 rho-step bits) at the workstream A bracket (+37.3 to +49.2) unless the owner overrides it; table on workstream A branch (research/m4_reprice_20261024/table.md)",
     "note:FGHR m = 4 system not built (backlog/XP-20261018-m4-solving-degree-equivariant M1)",
     "note:Faugere-Svartz C3 blocks not integrated (backlog/XP-20261018-m4-solving-degree-equivariant M2)",
     "note:WDSat recorded as absent from the repository (PLAN.md workstream B inventory)",
@@ -26,10 +26,10 @@
     "prs": []
   },
   "question": "At the Weil-descent cells (4,6), (m = 3, l = 8) and (m = 4, l = 7), does the dense closure refutation degree stay at 4 or rise to 5, with the FGHR 2-torsion arm's degree and WDSat and crossbred timings on the same PDP instances?",
-  "decision_value": "The three cells decide whether the degree-5 price row at ECC2K-130 (+10.32 bits at w = 1, leads section 3.1; the repricing bracket is the gate, not that figure) keeps its support or whether degree follows l. If the repricing puts degree 5 within reach, the result changes the ECC2K-130 price row; if not, the cell is a degree curiosity and this 128 GB node is not rented.",
+  "decision_value": "The three cells decide whether the degree-5 price row at ECC2K-130 (+10.32 bits at w = 1 in column-touch units, leads section 3.1; the gate reads workstream A's rho-step bracket, +37.3 to +49.2 at w = 2 to 2.33, which is closed under F1 unless overridden) keeps its support or whether degree follows l. If the repricing puts degree 5 within reach, the result changes the ECC2K-130 price row; if not, the cell is a degree curiosity and this 128 GB node is not rented.",
   "protocol": {
     "path": "PROTOCOL.md",
-    "blob": "07ecc461824a079794fa8270debb2c65a061899d"
+    "blob": "7b991ea75f834afd4821dac46ff2e1f5efd8c2dd"
   },
   "code": {
     "repo": "crypto",

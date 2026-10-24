@@ -397,7 +397,7 @@ Written from the 2026-10-24 review's section 5 (REVIEW.md, outside this reposito
 |:--|:--|--:|:--|
 | [XP-20261024-equal-advice-n73-n83](XP-20261024-equal-advice-n73-n83/README.md) | draft | 250,000 | an idle host with at least 48 GiB and 32 threads (this host at load 70 is inadmissible); card PROTOCOL not frozen |
 | [XP-20261024-fp4-d4-plus-2lp-stacked](XP-20261024-fp4-d4-plus-2lp-stacked/README.md) | blocked | 600,000 | stacked arm not built; completion rule to be named before data |
-| [XP-20261024-weil-descent-cell-4-6-node](XP-20261024-weil-descent-cell-4-6-node/README.md) | blocked | 600,000 | activation gate on the m = 4 repricing (research/m4_reprice_20261024/); FGHR, Faugere-Svartz, WDSat, crossbred not built; 128 GB node |
+| [XP-20261024-weil-descent-cell-4-6-node](XP-20261024-weil-descent-cell-4-6-node/README.md) | blocked | 600,000 | activation gate closed under REVIEW F1 (+30 rho-step bits) at the m = 4 bracket (+37.3 to +49.2) unless the owner overrides; FGHR, Faugere-Svartz, WDSat, crossbred not built; 128 GB node |
 | [XP-20261024-pkm-m3-n21-27-largemem](XP-20261024-pkm-m3-n21-27-largemem/README.md) | blocked | 1,000,000 | conditional on workstream E not deciding H0; 256 and 512 GB hosts; N = 27 system |
 | [XP-20261024-genus3-2lp-pair-04b-vs-04](XP-20261024-genus3-2lp-pair-04b-vs-04/README.md) | blocked | 400,000 | instance rule and counted unit differ between 04 and 04b; gate 0 not run |
 
