@@ -1,0 +1,117 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261024-weil-descent-cell-4-6-node",
+  "title": "Weil-descent dense closure cells (4,6), m = 3 l = 8, m = 4 l = 7 with FGHR 2-torsion, WDSat and crossbred on one 128 GB node (activation-gated)",
+  "created": "2026-10-24",
+  "authors": [
+    "backlog lane",
+    "ic-launch-cards workstream H"
+  ],
+  "status": "blocked",
+  "status_note": "Launch card written 2026-10-24. Activation-gated on the m = 4 repricing (research/m4_reprice_20261024/, not on origin/main at writing) and an owner threshold in rho-units; the expected D = 5 bracket (+37 to +59 bits) sits above REVIEW.md F1's +30-bit downgrade line. FGHR, Faugere-Svartz, WDSat and crossbred are not built.",
+  "blocked_on": [
+    "note:activation gate: m = 4 repricing D = 5 bracket in rho-units (research/m4_reprice_20261024/, workstream A) and an owner threshold for within reach",
+    "note:FGHR m = 4 system not built (backlog/XP-20261018-m4-solving-degree-equivariant M1)",
+    "note:Faugere-Svartz C3 blocks not integrated (backlog/XP-20261018-m4-solving-degree-equivariant M2)",
+    "note:WDSat recorded as absent from the repository (PLAN.md workstream B inventory)",
+    "hw:one 128 GB node (degree-5 closure about 70 GB at N = 40, research/dreg_closure_driver_20261016/RESULTS.md)"
+  ],
+  "links": {
+    "lead": "research/ic_leads_review_20261018/README.md section 3.1",
+    "notes": [
+      "research/dreg_closure_driver_20261016/RESULTS.md",
+      "backlog/XP-20261018-m4-solving-degree-equivariant/",
+      "research/m4_reprice_20261024/ (workstream A, not yet on origin/main)"
+    ],
+    "prs": []
+  },
+  "question": "At the Weil-descent cells (4,6), (m = 3, l = 8) and (m = 4, l = 7), does the dense closure refutation degree stay at 4 or rise to 5, with the FGHR 2-torsion arm's degree and WDSat and crossbred timings on the same PDP instances?",
+  "decision_value": "The three cells decide whether the degree-5 price row at ECC2K-130 (+10.32 bits at w = 1, leads section 3.1; the repricing bracket is the gate, not that figure) keeps its support or whether degree follows l. If the repricing puts degree 5 within reach, the result changes the ECC2K-130 price row; if not, the cell is a degree curiosity and this 128 GB node is not rented.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "07ecc461824a079794fa8270debb2c65a061899d"
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "main",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--example",
+        "dreg_ladder",
+        "--example",
+        "dreg_closure"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 128,
+    "disk_gb": 20,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "ESTIMATE: 128 GB node (leads section 3.1, one node for several days). Dense closure degree 5 about 70 GB at N = 40 (RESULTS.md). CPU count unknown; cpus 1 is a placeholder for the single-process closure driver. Core-hours and wall are null: the FGHR, Faugere-Svartz, WDSat and crossbred runs are not sized in the sources read."
+  },
+  "run": {
+    "argv": [
+      "target/release/examples/dreg_closure",
+      "--to",
+      "5",
+      "--max-cols",
+      "760000",
+      "--draw",
+      "{draw}"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 604800
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "dreg_closure driver rows per draw (closure refutation per degree, columns, RSS) plus the FGHR, WDSat and crossbred rows",
+    "verify": [
+      "target/release/examples/dreg_closure",
+      "--verify",
+      "{out}"
+    ],
+    "land": "research/weil_descent_cells_4_6_20261024"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "notes": "Gated: do not schedule until the activation gate reads open. The run argv is the degree-5 dense closure only; it is a derived call, not yet run, and the --verify flag must be confirmed against the examples.",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261024-weil-descent-cell-4-6-node/shard-{k}"
+    ],
+    "ttl_s": 604800,
+    "env": {
+      "name": "crypto-weil-descent",
+      "recipe": "TBD"
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 131072,
+      "timeout_s": 604800,
+      "sandbox": "none",
+      "sandbox_reason": "Working set about 70 GB for the closure; the jail memory limit is untested at that size.",
+      "publish": "runs/XP-20261024-weil-descent-cell-4-6-node"
+    },
+    "funding": {
+      "units": 600000,
+      "rationale": "Can add or withdraw an ECC2K-130 price row, set at the level of the m = 4 design card (600,000) because it shares its question; lower than the seed PKM lead (1,000,000) because the gate may close it."
+    }
+  },
+  "owner_hint": "Owner of the 128 GB node; the activation gate owner."
+}

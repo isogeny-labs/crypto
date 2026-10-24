@@ -1,0 +1,136 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261024-fp4-d4-plus-2lp-stacked",
+  "title": "Stacked D4 symmetrisation plus double large primes on E(F_{p^4}), end to end in ecbench (sparse-cado matrix)",
+  "created": "2026-10-24",
+  "authors": [
+    "backlog lane",
+    "ic-launch-cards workstream H"
+  ],
+  "status": "blocked",
+  "status_note": "Launch card written 2026-10-24. Blocked: the stacked arm (D4 oracle with DLP relations) is not built in the sources read, and the completion rule must be named in PROTOCOL.md before any data.",
+  "blocked_on": [
+    "note:stacked arm (D4 oracle with two-large-prime relations) not implemented; no code located in the sources read",
+    "note:completion rule (full rank or pinned column) to be fixed in PROTOCOL.md; the sparse null (research/sparse_la_timing_20261018) is caused by this rule"
+  ],
+  "links": {
+    "lead": "research/ic_next10_20261014/01-fp4-ladder/README.md; research/gaudry_quartic_d4_ecbench_20261013/README.md",
+    "notes": [
+      "research/sparse_la_timing_20261018/README.md",
+      "backlog/XP-20261018-m4-solving-degree-equivariant/ (for the D4-style symmetry arms at m = 4)",
+      "REVIEW.md section 5.2 M3 (review workspace)"
+    ],
+    "prs": []
+  },
+  "question": "On E(F_{p^4}), does D4 symmetrisation stacked with two-large-prime relations lower the whole-solve cost below plain D4, with a fitted exponent in #E separated from D4's?",
+  "decision_value": "The ladder shows D4 is the cheapest arm by about 18 times over plain (derived) and DLP changes the linear-algebra exponent (0.420 against 0.495). If stacking lowers the whole-solve exponent below D4's 0.217 with separated CIs, the program has a sub-rho regime with a combined method to scale; if not, D4 remains the best arm there and the DLP stacking route is not supported at these sizes.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "938a020f4d175b77b370b8e09804f6ec7d9ca9a4"
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "main",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 8,
+    "disk_gb": 5,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "ESTIMATE, not measured. Plain S4 solve 25 min and 3.7 GB; D4 solve 34 to 49 s single-threaded (01-fp4-ladder/README.md). RAM 8 GB is the plain solve plus margin. Core-hours and wall are null until a 1-curve pilot is run."
+  },
+  "run": {
+    "argv": [
+      "ecbench",
+      "run",
+      "{spec}",
+      "--out",
+      "{out}"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 86400
+  },
+  "shards": {
+    "count": 4,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {
+          "name": "p101",
+          "vars": {
+            "spec": "TBD-p101"
+          }
+        },
+        {
+          "name": "p181",
+          "vars": {
+            "spec": "TBD-p181"
+          }
+        },
+        {
+          "name": "p269",
+          "vars": {
+            "spec": "TBD-p269"
+          }
+        },
+        {
+          "name": "p397",
+          "vars": {
+            "spec": "TBD-p397"
+          }
+        }
+      ]
+    },
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "ecbench session JSONL with audit (ecbench verify --replay-all)",
+    "verify": [
+      "ecbench",
+      "verify",
+      "--replay-all",
+      "{out}"
+    ],
+    "land": "research/ic_fp4_d4_plus_2lp_stacked_20261024"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "notes": "One shard per ladder size. The spec names are placeholders until the ecbench spec is located and the stacked arm is built.",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261024-fp4-d4-plus-2lp-stacked/shard-{k}"
+    ],
+    "ttl_s": 86400,
+    "env": {
+      "name": "crypto-fp4-stacked",
+      "recipe": "TBD"
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 8192,
+      "timeout_s": 86400,
+      "sandbox": "none",
+      "sandbox_reason": "Operation counts only; wall time is not a claim.",
+      "publish": "runs/XP-20261024-fp4-d4-plus-2lp-stacked"
+    },
+    "funding": {
+      "units": 600000,
+      "rationale": "Exponent-level test of the only regime with a proven sub-rho exponent, and the only unrun combination there (REVIEW.md M3). Set at the level of the m = 4 design card (600,000)."
+    }
+  },
+  "owner_hint": "Whoever builds the stacked arm in ecbench."
+}

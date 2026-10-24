@@ -1,0 +1,124 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261024-genus3-2lp-pair-04b-vs-04",
+  "title": "Paired check of 04b's genus-3 IC-2LP arms against 04's recorded IC-2LP arm on the same instances, seeds and counted unit",
+  "created": "2026-10-24",
+  "authors": [
+    "backlog lane",
+    "ic-launch-cards workstream H"
+  ],
+  "status": "blocked",
+  "status_note": "Launch card written 2026-10-24. Blocked: the two studies use different instance rules and counted units, and the tool that runs 04b's arms has not been checked against 04's recorded rows (gate 0).",
+  "blocked_on": [
+    "note:instance rule differs: 04 uses next prime above 2^b + 1 with seed 20261014 * 1000 + 10 b + curve; 04b uses the largest prime below 2^k with seed 20261016",
+    "note:counted unit differs: 04 cost (c_ell = 1) against 04b S = total / sqrt(ell); the conversion must be stated",
+    "note:gate 0 not run: 04b's tool must reproduce one recorded 04 row under 04's instance rule",
+    "problem:problems/ic-improve-04-genus3-2lp-study-missing.md"
+  ],
+  "links": {
+    "lead": "research/ic_improve_20261014/04-genus3-2lp/README.md; research/ic_improve_20261014/04b-genus3-2lp-rebalance/README.md",
+    "notes": [
+      "research/ic_improve_20261014/04-genus3-2lp/PROTOCOL.md",
+      "research/ic_improve_20261014/04-genus3-2lp/results/run-20261014/",
+      "research/ic_improve_20261014/04b-genus3-2lp-rebalance/analysis.json",
+      "problems/ic-improve-04-genus3-2lp-study-missing.md"
+    ],
+    "prs": []
+  },
+  "question": "On the same instances, seeds and counted unit, do 04b's arms reproduce the exponent and per-size constant of 04's recorded IC-2LP arm, and does the departure from 4/3 carry over from the original baseline to the rebuild?",
+  "decision_value": "04b's verdict (the departure from 4/3 is in the linear algebra, and A2 raises the exponent) holds for the original baseline only if the paired exponents agree. If they disagree, the A1 and A2 verdicts must be re-run on the original tool, and the 4/3 settling question changes. The result decides which genus-3 baseline the program's claims rest on.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "5e2dbc8c6d5da4748e9997cb42a79cd4865efae4"
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "main",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--example",
+        "ic_improve_04_genus3_2lp",
+        "--example",
+        "ic_improve_04_analyze",
+        "--example",
+        "ic_improve_04b_genus3_2lp",
+        "--example",
+        "ic_improve_04b_analyze"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 3,
+    "disk_gb": 2,
+    "gpu": null,
+    "est_core_hours": 60,
+    "est_wall_hours": 30,
+    "notes": "ESTIMATE, not measured. 04's budget: 3 GB, single-threaded, 60 min per job, about 4 h for the whole item on a shared host. Only 04b's arms are run (about 4 arms by about 9 sizes by 3 curves, roughly 100 jobs), with 04's recorded arm read from its records. Job count times up to 40 min at 2^18 gives an upper bound near 60 core-hours; wall assumes 2 parallel jobs."
+  },
+  "run": {
+    "argv": [
+      "target/release/examples/ic_improve_04b_genus3_2lp",
+      "--bits",
+      "{bits}",
+      "--curve",
+      "{curve}",
+      "--arms",
+      "{arm}",
+      "--out",
+      "{out}"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 3600
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "04b-arm JSONL rows on 04's instances, paired with 04's recorded rows, analysed by the 04 analysis procedure",
+    "verify": [
+      "target/release/examples/ic_improve_04_analyze",
+      "xcheck",
+      "research/ic_improve_20261014/04-genus3-2lp/results/run-20261014",
+      "{out}"
+    ],
+    "land": "research/ic_improve_20261014/04b-genus3-2lp-rebalance/paired-with-04"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "notes": "Single shard as a placeholder; the real shard list is one per (arm, size, curve) after the instance rule is fixed. The verify argv is 04's xcheck analysis and is a placeholder until the paired analysis exists. Gate 0 must pass before any arm is scheduled. The run argv flags are NOT verified against examples/ic_improve_04b_genus3_2lp.rs; confirm before ready.",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261024-genus3-2lp-pair-04b-vs-04/shard-{k}"
+    ],
+    "ttl_s": 14400,
+    "env": {
+      "name": "crypto-genus3-pair",
+      "recipe": "TBD"
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 3072,
+      "timeout_s": 3600,
+      "sandbox": "none",
+      "sandbox_reason": "Counted-unit runs; the 3 GB cap is set by prlimit as in 04's protocol.",
+      "publish": "runs/XP-20261024-genus3-2lp-pair-04b-vs-04"
+    },
+    "funding": {
+      "units": 400000,
+      "rationale": "Decides which genus-3 baseline the 04b verdicts rest on; set at 400,000, equal to the Kummer depth card, because it can reverse a verdict. Below the PKM and m = 4 cards because the cost is small (about 60 core-hours, estimate)."
+    }
+  },
+  "owner_hint": "Whoever owns 04b and the 04 records."
+}

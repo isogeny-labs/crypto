@@ -1,0 +1,158 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261024-pkm-m3-n21-27-largemem",
+  "title": "PKM m = 3 at N = 21, 24, 27: msolve -t 16 on 256 to 512 GB (conditional on workstream E not deciding H0)",
+  "created": "2026-10-24",
+  "authors": [
+    "backlog lane",
+    "ic-launch-cards workstream H"
+  ],
+  "status": "blocked",
+  "status_note": "Launch card written 2026-10-24. Conditional: runs only if research/pkm_m3_specialise_20261024/ (workstream E) does not already decide H0. Also blocked on a 256 GB host, a 512 GB host, and the N = 27 system, none yet named or generated.",
+  "blocked_on": [
+    "note:activation gate: research/pkm_m3_specialise_20261024/ (workstream E) must not already decide H0; not on origin/main at writing",
+    "hw:a 256 GB host for the N = 21 target 1 run (RESULTS.md Amendment A1 next step)",
+    "hw:a 512 GB host for N = 24 and N = 27 (N = 21 degree-8 round reached 99.6 GiB under a 108.8 GB cap and exited)",
+    "note:N = 27 system not generated"
+  ],
+  "links": {
+    "lead": "docs/ic/factor-base-encyclopedia/README.md section 8 item 1 (is the tower's F4 solving degree bounded?)",
+    "notes": [
+      "research/pkm_m3_n21_msolve_20261018/RESULTS.md",
+      "research/pkm_m3_n21_msolve_20261018/run_mt.sh",
+      "backlog/XP-20261015-pkm-m3-n21-m4-n20/ (seed card, same question; not superseded by this card)"
+    ],
+    "prs": []
+  },
+  "question": "At m = 3, does the Kummer-tower F4 solving degree stay at 7 at N = 21, 24 and 27, or does it rise to 8 or more?",
+  "decision_value": "A rise to degree 8 or more at N = 21 or 24 extends the m = 4 negative (D >= 8 at N = 20) to m = 3 and counts against H1 for m = 3 at these sizes; a plateau at degree 7 through N = 27 is the H1a precondition (L > 10). Both outcomes change whether the 256 to 512 GB spend is worth making, which is why the run is gated on workstream E first.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "63719397a731b4758ac9d89b843dd1ac9fb68327"
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "main",
+    "build": [
+      [
+        "msolve",
+        "v0.6.5 (external, built from source; version pinned per RESULTS.md)"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 16,
+    "ram_gb": 512,
+    "disk_gb": 50,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "msolve -t 16 (16 threads). RAM 512 is the top of the requested range (256 to 512 GB); the 256 GB host covers N = 21 target 1 only. Disk 50 is an ESTIMATE. Core-hours and wall are null: per-round times in reports/run-20261018T2208Z-mt/ not yet read."
+  },
+  "run": {
+    "argv": [
+      "nice",
+      "prlimit",
+      "--as={cap}",
+      "--",
+      "timeout",
+      "{wall}",
+      "msolve",
+      "-t",
+      "16",
+      "-v",
+      "2",
+      "-f",
+      "{sys}",
+      "-o",
+      "{out}/{name}.out"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 259200
+  },
+  "shards": {
+    "count": 4,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {
+          "name": "n21-t0",
+          "vars": {
+            "sys": "research/pkm_m3_n21_msolve_20261018/m3_t7_x221026520.ms",
+            "cap": "240G",
+            "wall": "259200"
+          }
+        },
+        {
+          "name": "n21-t1",
+          "vars": {
+            "sys": "research/pkm_m3_n21_msolve_20261018/m3_t7_x704078485.ms",
+            "cap": "240G",
+            "wall": "259200"
+          }
+        },
+        {
+          "name": "n24-t0",
+          "vars": {
+            "sys": "research/pkm_m3_n21_msolve_20261018/m3_t8_x1227422598.ms",
+            "cap": "480G",
+            "wall": "259200"
+          }
+        },
+        {
+          "name": "n27-t0",
+          "vars": {
+            "sys": "TBD-N27-system.ms",
+            "cap": "480G",
+            "wall": "259200"
+          }
+        }
+      ]
+    },
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "msolve per-round log (degree, pairs selected, new elements, matrix size, peak RSS) with the outcome class from README.md",
+    "verify": [
+      "msolve",
+      "-f",
+      "{sys}",
+      "-o",
+      "{out}/{name}.out",
+      "-t",
+      "1"
+    ],
+    "land": "research/pkm_m3_largemem_20261024"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "notes": "Four shards, one per system. Gated on workstream E. The N = 27 system is a placeholder until generated. The verify argv re-runs msolve single-threaded and is a placeholder check, not an independent verifier; the independent check is open.",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261024-pkm-m3-n21-27-largemem/shard-{k}"
+    ],
+    "ttl_s": 259200,
+    "env": {
+      "name": "crypto-pkm-largemem",
+      "recipe": "TBD: msolve v0.6.5 from source"
+    },
+    "exec": {
+      "cpus": 16,
+      "memory_mb": 491520,
+      "timeout_s": 259200,
+      "sandbox": "none",
+      "sandbox_reason": "msolve working sets of 100 to 480 GB; a jail memory limit would read as an infrastructure error.",
+      "publish": "runs/XP-20261024-pkm-m3-n21-27-largemem"
+    },
+    "funding": {
+      "units": 1000000,
+      "rationale": "Same question and funding as the seed PKM lead (1,000,000); this card is the large-memory execution of it. The owner should decide whether it supersedes XP-20261015-pkm-m3-n21-m4-n20 for the m = 3 half."
+    }
+  },
+  "owner_hint": "Whoever holds a 256 to 512 GB host."
+}

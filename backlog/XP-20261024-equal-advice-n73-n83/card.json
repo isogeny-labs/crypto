@@ -1,0 +1,129 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261024-equal-advice-n73-n83",
+  "title": "Equal-advice preprocessing rho vs compact-orbit IC at n = 73 and n = 83 (wide rungs, one idle host)",
+  "created": "2026-10-24",
+  "authors": [
+    "backlog lane",
+    "ic-launch-cards workstream H"
+  ],
+  "status": "draft",
+  "status_note": "Launch card written 2026-10-24. Protocol and instrument frozen in research/equal_advice_wide_20261018/. Not ready: no idle host named, card PROTOCOL.md not frozen, wide step cost unmeasured. Inadmissible on the 2026-10-24 review host (load 60 to 70).",
+  "blocked_on": [],
+  "links": {
+    "lead": "research/ic_leads_review_20261018/README.md section 2.1 item 1 and section 3.2",
+    "notes": [
+      "research/equal_advice_wide_20261018/PROTOCOL.md",
+      "research/equal_advice_wide_20261018/README.md",
+      "research/20261016-n83-precomputed-rho-control/ (PR #1987)"
+    ],
+    "prs": []
+  },
+  "question": "At equal advice bytes on the n = 73 (K = 600) and n = 83 (K = 3240) rungs, is Bernstein-Lange preprocessing rho or compact-orbit index calculus faster per target?",
+  "decision_value": "This decides whether any online N83 number may be quoted and whether the IC online advantage over rho survives once the IC's own advice is charged. BL winning at the IC-favourable tier on both rungs triggers a recommended leaderboard edit; IC winning at the generous tier on both rungs keeps the IC claim at equal advice; anything else is UNRESOLVED and moves nothing.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "3e0ba27bc585fe3d338be56bff8f65ed66397a4c"
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "main",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--example",
+        "ic_equal_advice_wide",
+        "--example",
+        "ic_equal_advice_claims",
+        "--example",
+        "koblitz_orbit_dlp_fast"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 32,
+    "ram_gb": 48,
+    "disk_gb": 2,
+    "gpu": null,
+    "est_core_hours": 173,
+    "est_wall_hours": 9,
+    "notes": "ESTIMATE derived from PROTOCOL.md 'Memory, time and hosts': BL walks 40 to 100 core-hours (n73) and 27 to 67 (n83), IC rank stage 5.1 h single-thread (n73), n83 IC setup about 0.2 h on 4 threads. Upper values used. Wall: session 3 to 5 h (n73) and 2 to 3.5 h (n83), projected at 32 threads. 48 GiB is the preflight floor; resident peak is about 30 GB. Host must be idle."
+  },
+  "run": {
+    "argv": [
+      "bash",
+      "research/equal_advice_wide_20261018/run.sh",
+      "{rung}"
+    ],
+    "env": {
+      "CARGO_TARGET_DIR": "target",
+      "THREADS": "32",
+      "OUT_ROOT": "{out}",
+      "ISOLATION_LEVEL": "L0"
+    },
+    "timeout_per_shard_s": 28800
+  },
+  "shards": {
+    "count": 2,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {
+          "name": "n73",
+          "vars": {
+            "rung": "n73"
+          }
+        },
+        {
+          "name": "n83",
+          "vars": {
+            "rung": "n83"
+          }
+        }
+      ]
+    },
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "ic_equal_advice_claims session and decision JSON per rung (decision.json, claims/, certs/, rows.json)",
+    "verify": [
+      "target/release/examples/ic_equal_advice_claims",
+      "{out}/session.json",
+      "{out}/claims"
+    ],
+    "land": "research/equal_advice_n73_n83_20261024"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "notes": "Two shards, one per rung, one process group per rung. The rungs are judged separately. Host is the owner's choice and must meet the card's host requirement.",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261024-equal-advice-n73-n83/shard-{k}"
+    ],
+    "ttl_s": 36000,
+    "env": {
+      "name": "crypto-equal-advice",
+      "recipe": "TBD: a Rust image with the pinned commit and the examples built; no docker recipe in the repository"
+    },
+    "exec": {
+      "cpus": 32,
+      "memory_mb": 49152,
+      "timeout_s": 28800,
+      "sandbox": "none",
+      "sandbox_reason": "A timing measurement; address-space caps are set by run.sh (16 GiB and 32 GiB).",
+      "publish": "runs/XP-20261024-equal-advice-n73-n83"
+    },
+    "funding": {
+      "units": 250000,
+      "rationale": "Accounting and audit class: moves no exponent but can edit a leaderboard claim. Below the seed PKM lead (1,000,000) and the m = 4 design card (600,000); above the Kummer depth card (400,000) only if the owner judges the claim edit urgent."
+    }
+  },
+  "owner_hint": "Whoever holds an idle 32-thread, 48 GiB or larger host."
+}
