@@ -10,12 +10,21 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(process.argv[2] ?? path.resolve(here, "../.."));
 const curvesDir = path.join(root, "docs", "curves");
 const registryPath = path.join(curvesDir, "registry.json");
+const catalogPath = path.join(curvesDir, "cover-catalog.json");
 const reportPath = path.join(curvesDir, "covers.json");
 const graphPath = path.join(curvesDir, "cover-links.yaml");
 const assessmentPath = path.join(curvesDir, "cover-transfer-assessments.json");
 
 const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
-const registry = readJson(registryPath);
+// The cover report and graph certify the registry rows the cover catalog
+// names, not every registry row (census curves are outside it).
+const fullRegistry = readJson(registryPath);
+const catalogManifest = readJson(catalogPath);
+const catalogSlugs = new Set(catalogManifest.slugs);
+const registry = {
+  schema_version: fullRegistry.schema_version,
+  curves: fullRegistry.curves.filter((curve) => catalogSlugs.has(curve.slug)),
+};
 const report = readJson(reportPath);
 const graph = readJson(graphPath);
 const assessment = readJson(assessmentPath);
@@ -31,6 +40,37 @@ function canonicalJson(value) {
       .join(",")}}`;
   }
   return JSON.stringify(value);
+}
+
+// catalog_rows_sha256 is computed by serde_json over exact number text; JS
+// numbers would round the registry's large integers, so keep their source.
+const RAW_NUMBER = Symbol("raw JSON number");
+function exactCanonicalJson(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map(exactCanonicalJson).join(",")}]`;
+  }
+  if (value !== null && typeof value === "object") {
+    if (RAW_NUMBER in value) {
+      return value[RAW_NUMBER];
+    }
+    return `{${Object.keys(value)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${exactCanonicalJson(value[key])}`)
+      .join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function catalogRowsSha256() {
+  const exact = JSON.parse(fs.readFileSync(registryPath, "utf8"), (key, value, context) =>
+    typeof value === "number" ? { [RAW_NUMBER]: context.source } : value,
+  );
+  return sha256(
+    exactCanonicalJson({
+      schema_version: exact.schema_version,
+      curves: exact.curves.filter((curve) => catalogSlugs.has(curve.slug)),
+    }),
+  );
 }
 
 function sha256(value) {
@@ -363,15 +403,28 @@ function check(condition, message) {
   }
 }
 
-check(registry.curves.length === 2572, "unexpected registry row count");
+check(
+  catalogManifest.schema_version === "curve-cover-catalog/v1" &&
+    catalogSlugs.size === catalogManifest.slugs.length &&
+    catalogManifest.count === catalogSlugs.size &&
+    registry.curves.length === catalogSlugs.size,
+  "cover catalog must name distinct registry rows",
+);
+check(registry.curves.length === 2572, "unexpected cover-catalog row count");
 check(report.curves.length === 2572, "unexpected cover-report row count");
 check(graph.curves.length === 2572, "unexpected graph curve-node count");
 check(Object.keys(graph.maps).length === 2572, "unexpected CV1 map count");
 check(Object.keys(graph.covers).length === 2570, "unexpected HC1 cover count");
 
-const registryBytes = fs.readFileSync(registryPath);
-check(report.registry_sha256 === sha256(registryBytes), "covers.json registry digest mismatch");
-check(graph.registry_sha256 === report.registry_sha256, "cover-links registry digest mismatch");
+check(
+  report.schema_version === "curve-covers/v2" && report.catalog === "docs/curves/cover-catalog.json",
+  "covers.json must bind the cover catalog",
+);
+check(
+  report.catalog_rows_sha256 === catalogRowsSha256(),
+  "covers.json catalog digest mismatch",
+);
+check(graph.catalog_rows_sha256 === report.catalog_rows_sha256, "cover-links catalog digest mismatch");
 
 const registryByModelHash = new Map();
 const registrySlugs = new Set();
@@ -482,9 +535,9 @@ check(
   "graph model hashes are not a unique exact copy of the registry model hashes",
 );
 
-check(representationCount === 977, "unexpected EC1 representation count");
-check(ec1Aliases.size === 977, "unexpected unique EC1 count");
-check(curveUids.size === 977, "unexpected unique curve-UID count");
+check(representationCount === 978, "unexpected EC1 representation count");
+check(ec1Aliases.size === 978, "unexpected unique EC1 count");
+check(curveUids.size === 978, "unexpected unique curve-UID count");
 check(
   mapReferenceCounts.size === 2572 && [...mapReferenceCounts.values()].every((count) => count === 1),
   "CV1 references are not bijective with curve nodes",
@@ -1022,9 +1075,9 @@ const expectedControlStatuses = {
 };
 const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
-  result_templates: "1a4955b6d4dd016e0cad661afde21257ae6845904904917568414f2ae601f05e",
+  result_templates: "36b35108fb48f0575d6d16052ac22b746869931446eb7bcc4586839441eee0dd",
   profiles: "807800e78066e8c3b0caa6634072a585cf4ae924a40b13817d9ca7a3c0aa3710",
-  controls: "f5e73ff82f722d7f3f435e3c4d238b856d2b613111a28012dffa5b8ef5e7d3c6",
+  controls: "7531474486db1c3acc0c3a97bddc87ac468dd7a65e2beaa5e44e9a07898e28b6",
   open_obligations: "ba227bbd94320d317ccfbf71b1e0dd3f05854e7aa4e62693472dfdf34c8f2373",
   global_cost_accounting:
     "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",
@@ -1049,7 +1102,7 @@ const requiredSourceArtifactPaths = [
   "Cargo.lock",
   ".github/workflows/curve-covers.yml",
   ".github/workflows/release.yml",
-  "docs/curves/registry.json",
+  "docs/curves/cover-catalog.json",
   "docs/curves/covers.json",
   "docs/curves/cover-links.yaml",
   "docs/curves/cover-transfer-assessment.schema.json",
@@ -1109,7 +1162,7 @@ check(
   "assessment catalog commit changed",
 );
 for (const relativePath of [
-  "docs/curves/registry.json",
+  "docs/curves/cover-catalog.json",
   "docs/curves/covers.json",
   "docs/curves/cover-links.yaml",
 ]) {
@@ -1833,7 +1886,7 @@ const expectedPredicateCounts = {
   odd_prime_quadratic_direct_same_field: 1053,
   odd_prime_quadratic_normalized_same_field: 30,
   odd_extension_quadratic_direct_same_field: 1324,
-  linked_subgroup_degree3: 140,
+  linked_subgroup_degree3: 141,
   linked_subgroup_degree2: 837,
 };
 const actualPredicateCounts = {};
@@ -2177,7 +2230,7 @@ check(
 );
 check(coverage.assessed_maps === 2572 && coverage.unassessed_maps === 0, "map coverage is incomplete");
 check(
-  coverage.assessed_subgroups === 977 && coverage.unassessed_subgroups === 0,
+  coverage.assessed_subgroups === 978 && coverage.unassessed_subgroups === 0,
   "subgroup coverage is incomplete",
 );
 
@@ -2454,7 +2507,8 @@ const summary = {
   problem_count: problems.length,
   problems: problems.slice(0, 100),
   counts: {
-    registry_rows: registry.curves.length,
+    registry_rows: fullRegistry.curves.length,
+    cover_catalog_rows: registry.curves.length,
     cover_report_rows: report.curves.length,
     graph_curve_nodes: graph.curves.length,
     maps: Object.keys(graph.maps).length,

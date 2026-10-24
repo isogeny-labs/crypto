@@ -1,13 +1,13 @@
 ---
 title: "Catalog-wide curve-cover transfer assessment"
-subtitle: "All 2,572 current maps and all 977 EC1 bindings"
+subtitle: "All 2,572 current maps and all 978 EC1 bindings"
 date: "2026-10-19"
-subject: "cover-transfer-assessments/v2; catalog_maps=2572; unique_cover_models=2570; geometry_verified_maps=2572; ec1_representations=977; assessed_maps=2572; unassessed_maps=0; assessed_subgroups=977; unassessed_subgroups=0"
+subject: "cover-transfer-assessments/v2; catalog_maps=2572; unique_cover_models=2570; geometry_verified_maps=2572; ec1_representations=978; assessed_maps=2572; unassessed_maps=0; assessed_subgroups=978; unassessed_subgroups=0"
 geometry: margin=0.8in
 fontsize: 10pt
 ---
 
-<!-- cover-transfer-assessments/v2; catalog_maps=2572; unique_cover_models=2570; geometry_verified_maps=2572; ec1_representations=977; assessed_maps=2572; unassessed_maps=0; assessed_subgroups=977; unassessed_subgroups=0 -->
+<!-- cover-transfer-assessments/v2; catalog_maps=2572; unique_cover_models=2570; geometry_verified_maps=2572; ec1_representations=978; assessed_maps=2572; unassessed_maps=0; assessed_subgroups=978; unassessed_subgroups=0 -->
 
 # Outcome
 
@@ -22,7 +22,7 @@ The main results are:
   to the field-validity assumptions stated below;
 - all 165 binary maps have the implemented one-infinity genus-three Jacobian
   arithmetic and bounded rational-point-class transfer;
-- all 140 binary EC1 bindings pass typed native tests for generator membership,
+- all 141 binary EC1 bindings pass typed native tests for generator membership,
   `[r]G=O`, pullback validity, `[r]phi^*(G)=0`, composition, and
   degree-inverse recovery;
 - those generator-level tests do **not** prove pullback additivity,
@@ -94,7 +94,7 @@ the fixed-`GF(8)` order or all-class transfer results.
 | Separate supported input models | implemented with explicit boundaries | binary and odd-characteristic constructors are separate; unsupported infinity configurations return a structured result |
 | Constructive covers | supported for the two fixed catalog families | all 2,572 formulas are explicit and replayed; this is not a theorem-complete Xarles constructor |
 | Genuine Jacobian arithmetic | partial | binary one-infinity sources are supported; all 2,407 odd two-infinity catalog sources remain outside the current backend |
-| Pullback, pushforward, and subgroup transfer | partial | bounded binary point-class domains and 140 generator checks; exhaustive arbitrary-class pushforward exists only for the non-catalog exact fixed-`GF(8)` fixture; catalog-general binary norm and all odd induced maps remain open |
+| Pullback, pushforward, and subgroup transfer | partial | bounded binary point-class domains and 141 generator checks; exhaustive arbitrary-class pushforward exists only for the non-catalog exact fixed-`GF(8)` fixture; catalog-general binary norm and all odd induced maps remain open |
 | EC1/ICV1 catalog evidence | partial | exact memberships, typed object bindings, hashes, statuses, and four narrow overlays cover the 2,572 catalog geometry rows; the positive fixed-GF(8) source/target/Jacobian/map fixture is non-catalog and has no EC1/ICV1/HC1/CV1 export or transfer-certificate binding |
 | Standalone executable | source verified; packaged scope incomplete | current-source tests cover 2,572 inputs; the published artifact was replayed on its bundled 592-row registry, not on all current inputs |
 | Validation and shipping | partial | deterministic checks and native tests exist; independent divisor-class replay, local Lean kernel receipt, fresh package, and final CI gates remain open |
@@ -121,11 +121,11 @@ rows and 1,324 extension-field rows.
 
 | Subgroup profile | EC1 bindings | Established catalog-wide facts | Still open |
 |---|---:|---|---|
-| Binary degree 3 | 140 | exact identity joins, `gcd(3,r)=1`, typed generator-level transfer checks | additivity and all-element composition; injectivity and image order; proof-grade numeric exact order except order 29; arbitrary-result norm/recovery |
+| Binary degree 3 | 141 | exact identity joins, `gcd(3,r)=1`, typed generator-level transfer checks | additivity and all-element composition; injectivity and image order; proof-grade numeric exact order except order 29; arbitrary-result norm/recovery |
 | Odd degree 2 | 837 | exact identity joins and `gcd(2,r)=1` | generator/order certificates and every induced-map claim |
-| **Total** | **977** | **every binding classified** | **unknowns remain explicit** |
+| **Total** | **978** | **every binding classified** | **unknowns remain explicit** |
 
-These are 977 EC1 representations on 972 curve models; five models have two
+These are 978 EC1 representations on 973 curve models; five models have two
 distinct representations. The semantic verifier computes the effective
 `supported`, `unknown`, `refuted`, and `not_applicable` assignment totals from
 the generated ledger. Those are claim assignments, not counts of distinct
@@ -321,7 +321,7 @@ behavior. For every catalog binary profile, the same entry point still returns
 claim, not the mathematical existence of a norm. This boundary is tracked in
 [`binary-cover-arbitrary-jacobian-norm-missing.md`](../../problems/binary-cover-arbitrary-jacobian-norm-missing.md).
 
-## The 140 binary subgroup checks
+## The 141 binary subgroup checks
 
 For every exact linked binary EC1 triple, the native batch test decodes the
 catalog generator and verifies:
@@ -342,7 +342,7 @@ composition identity for every subgroup element through an independent map
 oracle. Catalog-wide kernel intersection and actual image/source-order
 equality therefore remain `unknown` and conditional. It also does **not**
 prove `ord(G)=r`. Proof-grade numeric equality with the catalog order remains
-`unknown` for 139 of the 140 binary bindings; the retained
+`unknown` for 140 of the 141 binary bindings; the retained
 \(\mathbf F_{2^7}\) order-29 overlay is the one narrow exception.
 
 The elementary group-theoretic core is formalized in
@@ -355,7 +355,7 @@ cardinality is coprime to `d`.
 
 That Lean theorem assumes exact cardinality and the composition identity; it
 constructs neither map, does not supply the missing `IDC1h…` identity
-certificate, and does not promote the 140 catalog rows by itself.
+certificate, and does not promote the 141 catalog rows by itself.
 The additional bridge from `[r]G=O` to
 `ord(G) | r`, and hence coprimality with the actual generated-subgroup order,
 is used in the native certificate but is not a separately formalized Lean
@@ -456,11 +456,11 @@ new norm or CLI changes.
 
 | Control | Status | Scope and limit |
 |---|---|---|
-| Exact identity joins | `supported` | all 2,572 map UIDs and 977 EC1/curve/map triples; identity alone claims no arithmetic |
+| Exact identity joins | `supported` | all 2,572 map UIDs and 978 EC1/curve/map triples; identity alone claims no arithmetic |
 | Cover geometry | `supported` | all 2,572 fixed-family rows; equations, smoothness, genus, degree, separability, and infinity behavior, conditional on the declared odd base-prime assumptions described above |
 | Internal Jacobian arithmetic | `supported` on stated models | binary and separate odd-prime one-infinity fixtures; not the 2,407 odd two-infinity cover sources |
 | Independent arithmetic/map oracle | `unknown` | no separate CAS or independently implemented divisor-class replay across the catalog |
-| Binary catalog generators | `supported` on tested generators | all 140 triples pass the listed membership, annihilation, pullback, composition, and inverse-degree checks; no subgroup-wide promotion |
+| Binary catalog generators | `supported` on tested generators | all 141 triples pass the listed membership, annihilation, pullback, composition, and inverse-degree checks; no subgroup-wide promotion |
 | Odd cover/backend compatibility | `refuted` as a current implementation claim | the one-infinity backend cannot accept the 2,407 even-sextic sources; mathematical induced maps remain `unknown` |
 | Published artifact on all current inputs | `refuted` as evidence claim | only its bundled 592 rows were directly replayed; 746/1,354 is a historical static allowlist classification, not a 2,572-command receipt |
 | Historical cross-repository core parity | `supported` on the pinned receipt snapshot | offline rerun verified exactly seven bindings; CLI, Cargo, catalogs, schema, ledger, workflows, packages, and actual-HEAD binding are excluded |
@@ -577,6 +577,34 @@ python3 -m pip install pypdf==6.0.0
 python3 set_pdf_metadata.py
 pdfinfo cover_transfer_assessment_20261013.pdf
 ```
+
+# Addendum, 2026-10-24: catalog binding and one added binary triple
+
+This assessment was frozen against the 2,572-row registry. After
+aburan28/crypto#2446 rebuilt `docs/curves/registry.json` to 15,791 rows
+(13,219 isogeny-volcano census curves), the report, graph and this ledger
+went stale on its digest. Two additive changes re-freeze the assessment:
+
+- `covers.json`, `cover-links.yaml` and this ledger now bind the registry
+  rows [`docs/curves/cover-catalog.json`](../../docs/curves/cover-catalog.json)
+  names (`catalog_rows_sha256`; [`COVERS.md`](../../docs/curves/COVERS.md),
+  "The cover catalog"), exactly the 2,572 rows assessed here. Census rows no
+  longer stale them. Map counts, profiles and cover objects are unchanged.
+- The #2446 rebuild gave `icv1-f2m73-tm184271214331-9d25cc67` its first EC1
+  representation, `EC1N73Ce0h9999c3e90683`, from
+  `research/curve_shortlist_20261016/curves.json`. It is a binary degree-three
+  binding, so the binary subgroup population is 141, not 140, and the total
+  is 978 EC1 representations on 973 models, not 977 on 972. The native batch
+  test `every_binary_ec1_generator_has_checked_typed_transfer_hypotheses`
+  now asserts 141 and passes on it, with all six checks listed under "The 141
+  binary subgroup checks". Nothing else changed status.
+
+The same rebuild had also dropped 278 EC1 representations of catalog curves:
+the registry builder read a subgroup order only as `subgroup_order`, and the
+`research/conductor_gap_cm_orbits_20261015/prepared/*curve_ids.json` records
+call it `r`. The builder now accepts `r`, which restores those
+representations (257 byte-identical to the pre-#2446 rows, 21 with extra
+provenance), so the odd-characteristic count stays 837.
 
 # Open obligations
 

@@ -1,5 +1,7 @@
 {
-  "checker_source_sha256": "741c19d1566bf1a54f860b2d598bd7cbbea6c34b4fac2a97d63a5e3e3e1b7f62",
+  "catalog": "docs/curves/cover-catalog.json",
+  "catalog_rows_sha256": "cc8a570f4206b3af686e547db3cdad835ed20d3cf9c914cafdeaca8134a3bc47",
+  "checker_source_sha256": "ad75ab67cd3709ecd58d3af099a411000a0986b1b6fb1d001c426c3a89df74d6",
   "coefficient_encoding": "0x field elements, ascending powers of u; H: v^2+h(u)*v=f(u); x=x(u), y=y_v(u)*v+y_0(u); a GF(p^k) element e_0+e_1*t+...+e_{k-1}*t^(k-1) is the integer e_0+e_1*p+...+e_{k-1}*p^(k-1)",
   "curves": [
     {
@@ -102848,8 +102850,7 @@
   ],
   "generated_by": "cargo run --bin curve_cover_check --",
   "proof": "docs/curves/COVERS.md",
-  "registry_sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf",
-  "schema_version": "curve-covers/v1",
+  "schema_version": "curve-covers/v2",
   "scope": "same-field existence for the supplied elliptic model; no optimality, descent, subgroup-map or DLP-cost claim",
   "summary": {
     "invalid_input": 0,

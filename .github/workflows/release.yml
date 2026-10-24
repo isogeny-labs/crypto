@@ -229,7 +229,8 @@ jobs:
           cp "target/${{ matrix.target }}/release/curve_cover_check$ext" "dist/$name/"
           cp "target/${{ matrix.target }}/release/curve_standards$ext" "dist/$name/"
           mkdir -p "dist/$name/docs/curves"
-          cp docs/curves/registry.json docs/curves/covers.json docs/curves/cover-links.yaml \
+          cp docs/curves/registry.json docs/curves/cover-catalog.json \
+             docs/curves/covers.json docs/curves/cover-links.yaml \
              docs/curves/cover-links.schema.json docs/curves/COVERS.md docs/curves/ICV1.md \
              docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md \
              docs/curves/hyperelliptic-infrastructure.schema.json \
@@ -268,6 +269,7 @@ jobs:
             "./ecdlp-audit$ext" --help > /dev/null
             "./curve_cover_check$ext" \
               --registry docs/curves/registry.json \
+              --catalog docs/curves/cover-catalog.json \
               --output docs/curves/covers.json \
               --links docs/curves/cover-links.yaml --check \
               > curve-cover-check-smoke.json

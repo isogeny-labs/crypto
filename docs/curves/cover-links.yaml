@@ -1,4 +1,6 @@
 {
+  "catalog": "docs/curves/cover-catalog.json",
+  "catalog_rows_sha256": "cc8a570f4206b3af686e547db3cdad835ed20d3cf9c914cafdeaca8134a3bc47",
   "covers": {
     "urn:hc-model:1:sha256:00022e5b548fe42482a98d1a9fabb1d3429a39cdf3052511eec62b5e4a62bd7e": {
       "cover_id": "HC1G2h00022e5b548f",
@@ -74277,7 +74279,46 @@
       },
       "model_json": "{\"a\":\"0x0\",\"b\":\"0x1\",\"field\":\"f2m-73-8354f78f\",\"form\":\"y^2+xy=x^3+a*x^2+b\",\"modulus\":\"0x200000000000000001d\",\"v\":\"1\"}",
       "model_sha256": "9d25cc67948cbec5096032cae2b2e20c4f80e0e59c741437e17960bf1d9570e8",
-      "representations": [],
+      "representations": [
+        {
+          "curve": {
+            "coefficients": [
+              1,
+              0,
+              0,
+              0,
+              1
+            ],
+            "cofactor": 109796,
+            "generator": [
+              "0x11430ec1c08feac733c",
+              "0xb046263a043175f48f"
+            ],
+            "model": "binary Weierstrass",
+            "subgroup_order": "86020738150056119",
+            "target_group": "prime-order subgroup"
+          },
+          "curve_uid": "urn:ec-record:1:sha256:9999c3e9068310bbfdef49da0bb3e43251d8a89431b9e79715225d5671ab2abd",
+          "ec1": "EC1N73Ce0h9999c3e90683",
+          "field": {
+            "characteristic": 2,
+            "degree": 73,
+            "element_encoding": "hex polynomial coefficient bitset, least significant bit is constant",
+            "modulus_exponents": [
+              73,
+              4,
+              3,
+              2,
+              0
+            ],
+            "representation": "polynomial"
+          },
+          "subgroup_transport": {
+            "evidence_ref": null,
+            "status": "not_tested"
+          }
+        }
+      ],
       "standard_names": [],
       "standards_provenance": null,
       "status": "verified_over_declared_field"
@@ -225808,6 +225849,5 @@
       "verification_status": "verified_over_declared_field"
     }
   },
-  "registry_sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf",
-  "schema_version": "curve-cover-graph/v1"
+  "schema_version": "curve-cover-graph/v2"
 }

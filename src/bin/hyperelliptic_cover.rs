@@ -887,6 +887,7 @@ mod tests {
 
     const CURRENT_REGISTRY: &str = include_str!("../../docs/curves/registry.json");
     const CURRENT_COVER_GRAPH: &str = include_str!("../../docs/curves/cover-links.yaml");
+    const CURRENT_COVER_CATALOG: &str = include_str!("../../docs/curves/cover-catalog.json");
 
     fn binary_model() -> Value {
         let modulus = BigUint::from(0xbu32);
@@ -981,7 +982,19 @@ mod tests {
     #[test]
     fn every_current_catalog_model_reaches_the_standalone_constructor() {
         let registry: Value = serde_json::from_str(CURRENT_REGISTRY).expect("current registry");
-        let rows = registry["curves"].as_array().expect("registry curve array");
+        let manifest: Value = serde_json::from_str(CURRENT_COVER_CATALOG).expect("cover catalog");
+        let catalog: std::collections::HashSet<&str> = manifest["slugs"]
+            .as_array()
+            .expect("cover catalog slugs")
+            .iter()
+            .map(|slug| slug.as_str().expect("cover catalog slug"))
+            .collect();
+        let rows: Vec<&Value> = registry["curves"]
+            .as_array()
+            .expect("registry curve array")
+            .iter()
+            .filter(|row| catalog.contains(row["slug"].as_str().expect("catalog slug")))
+            .collect();
         assert_eq!(rows.len(), 2572);
         for row in rows {
             let slug = row["slug"].as_str().expect("catalog slug");
@@ -1120,7 +1133,7 @@ mod tests {
                 checked += 1;
             }
         }
-        assert_eq!(checked, 140);
+        assert_eq!(checked, 141);
     }
 
     #[test]

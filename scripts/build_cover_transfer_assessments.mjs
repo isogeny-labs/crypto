@@ -411,7 +411,7 @@ const resultTemplates = {
   "subgroup.binary-generator.supported": {
     status: "supported",
     scope:
-      "All 140 linked binary EC1 generators, using their exact catalog fields and curve coefficients.",
+      "All 141 linked binary EC1 generators, using their exact catalog fields and curve coefficients.",
     rationale:
       "The content-addressed graph and independent semantic verifier establish each exact EC1/curve/map join; the native batch certificate then decodes that row's generator canonically and checks its binary Weierstrass equation.",
     evidence_refs: [
@@ -423,7 +423,7 @@ const resultTemplates = {
   "subgroup.binary-annihilation.supported": {
     status: "supported",
     scope:
-      "All 140 linked binary generators and their numeric catalog subgroup-order values r.",
+      "All 141 linked binary generators and their numeric catalog subgroup-order values r.",
     rationale:
       "The native batch certificate checks [r]G=O. This proves ord(G) divides r, not by itself that ord(G)=r.",
     evidence_refs: [
@@ -455,7 +455,7 @@ const resultTemplates = {
     scope:
       "Every checked binary pullback image and its numeric catalog order value r.",
     rationale:
-      "The native batch certificate checks [r]phi^*(G)=0 for all 140 exact triples.",
+      "The native batch certificate checks [r]phi^*(G)=0 for all 141 exact triples.",
     evidence_refs: [
       "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses",
     ],
@@ -465,7 +465,7 @@ const resultTemplates = {
     scope:
       "phi_*phi^*(G)=[3]G for every linked binary generator, within the typed fiber witness domain.",
     rationale:
-      "The native batch certificate compares both sides for all 140 exact triples.",
+      "The native batch certificate compares both sides for all 141 exact triples.",
     evidence_refs: [
       "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses",
     ],
@@ -473,7 +473,7 @@ const resultTemplates = {
   "subgroup.binary-injective-generated.unknown": {
     status: "unknown",
     scope:
-      "The actual generated subgroup <G> for each of the 140 linked binary triples.",
+      "The actual generated subgroup <G> for each of the 141 linked binary triples.",
     rationale:
       "The checked generator identity would imply injectivity after pullback additivity and phi_*phi^*=[3] are certified on every element of <G>; the current batch test does not certify those all-element hypotheses.",
     evidence_refs: [
@@ -506,7 +506,7 @@ const resultTemplates = {
   "subgroup.binary-inverse-recovery.supported": {
     status: "supported",
     scope:
-      "Recovery of G from the typed pull-push value [3]G using 3^{-1} mod r for all 140 linked binary triples.",
+      "Recovery of G from the typed pull-push value [3]G using 3^{-1} mod r for all 141 linked binary triples.",
     rationale:
       "The batch certificate checks the modular inverse and exact point equality for each catalog value r; this is bounded typed-domain recovery, not a general Jacobian norm.",
     evidence_refs: [
@@ -847,13 +847,13 @@ const IMPLEMENTATION_VERSION_PATHS = [
 async function buildSourceArtifacts() {
   return Promise.all([
     sourceArtifact(
-      "docs/curves/registry.json",
-      "exact ICV1/EC1 input registry",
+      "docs/curves/cover-catalog.json",
+      "cover-catalog membership: the docs/curves/registry.json rows the cover report and graph certify",
       freshness(
         "supported",
-        "the exact input registry for all 2,572 assessed map rows",
-        "The digest is computed from the current file and every membership is joined through its model hash.",
-        ["docs/curves/registry.json"],
+        "the exact ICV1/EC1 input rows for all 2,572 assessed map rows, bound by catalog_rows_sha256 in covers.json and cover-links.yaml",
+        "The registry is read through this manifest: census rows outside it do not change catalog_rows_sha256, and every membership is joined through its model hash.",
+        ["docs/curves/cover-catalog.json"],
       ),
     ),
     sourceArtifact(
@@ -871,7 +871,7 @@ async function buildSourceArtifacts() {
       "content-addressed ICV1/EC1/HC1/CV1 graph",
       freshness(
         "supported",
-        "2,572 exact map links, 2,570 unique cover objects, and 977 EC1 triples",
+        "2,572 exact map links, 2,570 unique cover objects, and 978 EC1 triples",
         "The ledger records exact sorted UID memberships rather than count-only coverage.",
         ["docs/curves/cover-links.yaml"],
       ),
@@ -941,7 +941,7 @@ async function buildSourceArtifacts() {
       "standalone CLI and native binary subgroup batch certificate",
       freshness(
         "supported",
-        "all 140 exact linked binary EC1 triples at the pinned source revision",
+        "all 141 exact linked binary EC1 triples at the pinned source revision",
         "The batch test is cited only for the checks it performs; it is not proof of every numeric order's primality.",
         ["src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses"],
       ),
@@ -1125,6 +1125,14 @@ async function buildLedger() {
     readJson("docs/curves/covers.json"),
     readJson("docs/curves/cover-links.yaml"),
   ]);
+  assert(
+    covers.schema_version === "curve-covers/v2" &&
+      graph.schema_version === "curve-cover-graph/v2" &&
+      covers.catalog === "docs/curves/cover-catalog.json" &&
+      /^[0-9a-f]{64}$/.test(covers.catalog_rows_sha256) &&
+      graph.catalog_rows_sha256 === covers.catalog_rows_sha256,
+    "cover report and graph must bind the same cover-catalog rows",
+  );
   assert(covers.curves.length === 2572, "unexpected covers row count");
   assert(Object.keys(graph.maps).length === 2572, "unexpected graph map count");
   assert(Object.keys(graph.covers).length === 2570, "unexpected graph cover count");
@@ -1251,7 +1259,7 @@ async function buildLedger() {
   const mapCount = mapBase.reduce((sum, group) => sum + group.count, 0);
   const subgroupCount = subgroupBase.reduce((sum, group) => sum + group.count, 0);
   assert(mapCount === 2572, `map membership count is ${mapCount}`);
-  assert(subgroupCount === 977, `subgroup membership count is ${subgroupCount}`);
+  assert(subgroupCount === 978, `subgroup membership count is ${subgroupCount}`);
   assert(fieldBindings.size === 509, `declared-field binding count is ${fieldBindings.size}`);
   assert(jacobianBindings.size === 2570, `Jacobian binding count is ${jacobianBindings.size}`);
   assert(typedMapBindings.size === 2572, `typed map binding count is ${typedMapBindings.size}`);
@@ -1268,7 +1276,7 @@ async function buildLedger() {
     );
   }
   const expectedSubgroupCounts = new Map([
-    ["subgroup.binary-degree3", 140],
+    ["subgroup.binary-degree3", 141],
     ["subgroup.odd-degree2", 837],
   ]);
   for (const group of subgroupBase) {
@@ -1443,10 +1451,10 @@ async function buildLedger() {
       catalog_maps: 2572,
       unique_cover_models: 2570,
       geometry_verified_maps: 2572,
-      ec1_representations: 977,
+      ec1_representations: 978,
       assessed_maps: 2572,
       unassessed_maps: 0,
-      assessed_subgroups: 977,
+      assessed_subgroups: 978,
       unassessed_subgroups: 0,
       map_membership_entries: mapCount,
       subgroup_membership_entries: subgroupCount,
@@ -1491,7 +1499,7 @@ async function buildLedger() {
         control: "identity",
         assessment: freshness(
           "supported",
-          "all 2,572 map UIDs and 977 exact EC1/curve/map triples",
+          "all 2,572 map UIDs and 978 exact EC1/curve/map triples",
           "The generator resolves exact content-addressed joins and rejects duplicates or missing rows.",
           [
             "scripts/build_cover_transfer_assessments.mjs",
@@ -1538,7 +1546,7 @@ async function buildLedger() {
         control: "binary_catalog_subgroups",
         assessment: freshness(
           "supported",
-          "native generator-level checks for all 140 binary representations after independent exact EC1/curve/map identity joins",
+          "native generator-level checks for all 141 binary representations after independent exact EC1/curve/map identity joins",
           "The semantic verifier reconstructs the exact graph joins. The native batch certificate reads those representation rows and checks generator membership, catalog-order annihilation, pullback validity, image annihilation, composition on the tested generator, and degree-inverse recovery of that generator; it does not itself validate every content UID and does not certify subgroup-wide injectivity.",
           [
             "docs/curves/cover-links.yaml",
@@ -1622,7 +1630,7 @@ async function buildLedger() {
     ],
     exploration_boundary: [
       "No search for production targets, private keys, or discrete logarithms was performed.",
-      "All 2,572 map rows and all 977 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
+      "All 2,572 map rows and all 978 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
       "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
       "The 2,407 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
       "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",

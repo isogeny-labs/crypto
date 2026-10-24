@@ -34,6 +34,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import cover_catalog  # noqa: E402
 import curve_id as cid  # noqa: E402
 import validation_gate as gate  # noqa: E402
 
@@ -81,6 +82,7 @@ SOURCES = {
     "rho_optimization": "research/ecbench_rho_optimized_20261014/RESULT.json",
     "jv_sieve_strong_rho": "research/jv_sieve_strong_rho_20261019/review-20261020/summary.json",
     "registry": "docs/curves/registry.json",
+    "cover_catalog": cover_catalog.MANIFEST,
     "curves_schema": "docs/curves/ic/curves.schema.json",
     "curves_yaml": "docs/curves/ic/curves.yaml",
 }
@@ -204,8 +206,14 @@ def load(rel: str):
 
 
 class Names:
+    """Curve names, resolved in the registry; the page reads only the
+    cover-catalog rows (docs/curves/cover-catalog.json), so census curves the
+    registry builder adds leave it current."""
+
     def __init__(self) -> None:
         self.reg = load(SOURCES["registry"])
+        self.catalog = cover_catalog.subset(self.reg, load(SOURCES["cover_catalog"]))
+        self.in_catalog = {c["slug"] for c in self.catalog["curves"]}
         self.by = {}
         for c in self.reg["curves"]:
             for a in c["aliases"] + c["standard_names"] + [c["slug"]]:
@@ -215,7 +223,22 @@ class Names:
         c = self.by.get(cid.normalise_alias(legacy))
         if c is None:
             raise SystemExit(f"{legacy!r} is not in docs/curves/registry.json")
+        if c["slug"] not in self.in_catalog:
+            raise SystemExit(f"{legacy!r} is {c['slug']}, which {SOURCES['cover_catalog']} does not name; "
+                             "add it there (and regenerate the cover report) before it reaches the board")
         return c
+
+
+def source_digests() -> dict:
+    """Each source's file SHA-256, except the registry's: that is the
+    cover-catalog rows' digest (catalog_rows_sha256 in docs/curves/covers.json),
+    the only rows the page reads."""
+    out = {k: {"path": v, "sha256": sha256(v)} for k, v in SOURCES.items()}
+    reg = load(SOURCES["registry"])
+    out["registry"] = {"path": SOURCES["registry"],
+                       "sha256": cover_catalog.rows_sha256(cover_catalog.subset(reg, load(SOURCES["cover_catalog"]))),
+                       "scope": f"rows named by {SOURCES['cover_catalog']}"}
+    return out
 
 
 def curve_records() -> dict:
@@ -555,7 +578,7 @@ def exponents() -> dict:
 
 def roster(names: Names, measured: set[str]) -> list[dict]:
     out = []
-    for c in names.reg["curves"]:
+    for c in names.catalog["curves"]:
         p = c["params"]
         if c["family"] == "prime":
             field = f"GF(p), p = {p['p']}" if len(p["p"]) < 40 else f"GF(p), {int(p['p']).bit_length()}-bit p"
@@ -1137,7 +1160,7 @@ def build(allow_unvalidated: bool = False) -> dict:
                         "No new measurement.",
         "what_this_is_not": ["a measurement", "a speedup", "a claim about any curve not on it"],
         "class": "accounting",
-        "sources": {k: {"path": v, "sha256": sha256(v)} for k, v in SOURCES.items()},
+        "sources": source_digests(),
         "validation_gate": {"rule": "AGENTS.md, Validation gate (owner, 2026-10-19)",
                             "schema": gate.SCHEMA, "status_counts": gate.status_counts(board)},
         "families": families(board),
@@ -1660,7 +1683,8 @@ def markdown(doc: dict) -> str:
           "operation-unit S rankings.", ""]
     L += ["", "## Sources", ""]
     for k, v in doc["sources"].items():
-        L.append(f"- `{v['path']}` — sha256 `{v['sha256'][:16]}…`")
+        scope = f" ({v['scope']})" if v.get("scope") else ""
+        L.append(f"- `{v['path']}`{scope} — sha256 `{v['sha256'][:16]}…`")
     return "\n".join(L) + "\n"
 
 
@@ -1838,7 +1862,7 @@ def page(doc: dict, standalone: bool) -> str:
                  f'at the largest size, log₂ r = {big["log2_r"]:.1f}: {times(big["ratio_rho"])}'
                  f'{unit_ref("B")}</p></div>')
     P.append(f'<div class="fact"><dt>Curves</dt><dd>{len({r["slug"] for r in board})} priced</dd>'
-             f'<p>of {len(doc["roster"])} named in the repository; every one by its ICV1 slug</p></div></dl></header>')
+             f'<p>of {len(doc["roster"])} in the cover catalog; every one by its ICV1 slug</p></div></dl></header>')
     audit = doc["latest_frontier_audit"]
     acold = audit["cold"]
     admitted = audit["admitted_online"]
@@ -2358,8 +2382,9 @@ def page(doc: dict, standalone: bool) -> str:
 
     # The curve roster.
     fam_order = ("koblitz", "subfield", "binary", "prime")
-    P.append('<section class="panel" id="curves"><h2>Every curve the repository names</h2>'
-             '<p>From the curve registry. The slug is the curve\'s name in text; the EC1 alias identifies the exact '
+    P.append('<section class="panel" id="curves"><h2>Every curve in the cover catalog</h2>'
+             f'<p>From the curve registry, the rows {gh(SOURCES["cover_catalog"])} names; census curves the registry also '
+             'holds (the isogeny-volcano runs) are in the lab browser. The slug is the curve\'s name in text; the EC1 alias identifies the exact '
              'representation measured (subgroup and generator included) for comparisons across repositories. '
              'Legacy spellings are what older notes and frozen reports called the curve.</p>')
     cr = doc["curve_records"]
@@ -2462,7 +2487,7 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>Current through ledger §{LEDGER_COVERED_THROUGH}; latest frontier audit '
              f'{esc(doc["latest_frontier_audit"]["date"])}. Built by '
              '<code>scripts/build_ic_leaderboard.py</code> from: '
-             + ", ".join(f'<code>{esc(v["path"])}</code> ({v["sha256"][:12]})' for v in doc["sources"].values())
+             + ", ".join(f'<code>{esc(v["path"])}</code> ({esc(v["scope"]) + ", " if v.get("scope") else ""}{v["sha256"][:12]})' for v in doc["sources"].values())
              + '. Curves are named by ICV1 slug (<a href="https://github.com/aburan28/crypto/blob/main/docs/curves/ICV1.md">docs/curves/ICV1.md</a>); '
              f'curve records: {gh(SOURCES["curves_schema"])} and {gh(SOURCES["curves_yaml"])} '
              '(<a href="#curve-records">coverage</a>).</p></footer></div>')

@@ -279,7 +279,7 @@ def generator_of(o: dict) -> tuple[int, int] | None:
 
 
 def subgroup_of(o: dict, order: int) -> tuple[int, int] | None:
-    r = _int(o.get("subgroup_order"))
+    r = _int(o.get("subgroup_order", o.get("r")))
     h = _int(o.get("cofactor"))
     if r is None:
         return None

@@ -132,7 +132,12 @@
   },
   "registry": {
    "path": "docs/curves/registry.json",
-   "sha256": "584d070fbec7e21fd3f6b9ec31bc4d0ee533ce66da76a07fed0d818e5ae3a1cf"
+   "sha256": "cc8a570f4206b3af686e547db3cdad835ed20d3cf9c914cafdeaca8134a3bc47",
+   "scope": "rows named by docs/curves/cover-catalog.json"
+  },
+  "cover_catalog": {
+   "path": "docs/curves/cover-catalog.json",
+   "sha256": "719bf2f5d30edd78b3354a59bfc65ed701804a133cbf3c0b1c5d7022c2383811"
   },
   "curves_schema": {
    "path": "docs/curves/ic/curves.schema.json",
@@ -9394,8 +9399,10 @@
    "coefficients": "a = 0, b = 1",
    "order_bits": 74,
    "standard": [],
-   "ec1": [],
-   "ec1_unresolved": "no generator recorded; KoblitzCurve covers n <= 63 and no tracked record carries this model's subgroup and generator",
+   "ec1": [
+    "EC1N73Ce0h9999c3e90683"
+   ],
+   "ec1_unresolved": null,
    "legacy": [
     "k0n73",
     "K_0 / GF(2^73)",
