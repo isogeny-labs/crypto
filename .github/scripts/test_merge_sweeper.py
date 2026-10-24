@@ -52,6 +52,12 @@ class CheckVerdict(unittest.TestCase):
                                        run("b", conclusion="failure")], [])
         self.assertEqual(verdict, "fail")
 
+    def test_budget_counts_only_started_checks(self):
+        checks = [run("queued", "queued", None), run("running", "in_progress", None),
+                  run("finished"), run("skipped", conclusion="skipped"),
+                  run("neutral", conclusion="neutral")]
+        self.assertEqual(ms.checks_ran(checks), 2)
+
     def test_own_check_is_ignored(self):
         self.assertEqual(ms.check_verdict([run("a"), run("sweep", "in_progress", None)], []),
                          ("pass", []))
@@ -136,6 +142,8 @@ class Assess(unittest.TestCase):
         self.assertEqual(self.bucket(), "over-budget")
         self.runs = [run(f"c{i}") for i in range(30)] + [run("x", conclusion="skipped")]
         self.assertEqual(self.bucket(), "ready")
+        self.runs = [run(f"queued{i}", "queued", None) for i in range(31)]
+        self.assertEqual(self.bucket(), "pending")
 
     def test_full_tier_marker_is_required_after_the_tiers_land(self):
         since = T("2026-10-23T06:00:00Z")
