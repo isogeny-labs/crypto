@@ -445,6 +445,12 @@ jobs:
     needs: [scope, harness]
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 25
+    # The whole audit no longer fits one 2-vCPU hosted runner inside the PR
+    # cap (it timed out at 20 min), so four jobs each audit every fourth session.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -478,9 +484,10 @@ jobs:
           name: ecbench-pr-audit-bin
           path: target/release
       - name: Validate committed evidence integrity on pull requests
-        # One audit per CPU over ~500 sessions: about 7 min on 4 vCPUs, about
-        # 14 min on the 2-vCPU hosted runners.
+        # One audit per CPU over a quarter of the sessions.
         timeout-minutes: 20
+        env:
+          AUDIT_SHARD: ${{ matrix.shard }}/4
         run: |
           chmod +x target/release/ecbench
           bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
