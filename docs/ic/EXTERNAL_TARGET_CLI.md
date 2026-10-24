@@ -189,6 +189,14 @@ verification, and raw `ic` and CRAx reports. The selected route replays the
 public scalar 190 on both command paths. Its SHA-256 manifest checks every
 retained artifact. The walk is bounded to degree 11, depth one, and three
 curves; the solver uses `--rho-steps 0` for deterministic relation replay.
+The [current-head S3 route receipt](../store/PRIME_ROUTE_S3_ACCEPTANCE_20261024.json)
+checks the complete artifact path with an isolated `ic/v1/acceptance` prefix:
+it uploads the public input and route, verifies remote HEAD metadata and
+downloaded bytes, pulls both through a fresh cache, solves from their
+`store:` names, publishes the JSON report during the solve, verifies and
+pulls that report through another fresh cache, then removes the three exact
+S3 objects. The fetched route has two verified graph edges and the solver
+reports scalar 190 with `verified: true`.
 For an on-demand S3 existence check, use
 `isogeny_walk exists --from s3://BUCKET/PREFIX --run RUN_ID`. It HEADs the
 authoritative `complete.json` marker and returns JSON with `exists`, byte
