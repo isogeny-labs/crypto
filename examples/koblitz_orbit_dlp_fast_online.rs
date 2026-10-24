@@ -2154,6 +2154,106 @@ mod wide {
         (points, labels, reps, scanned)
     }
 
+    /// Wide twin of `construct_base_norm` (lead A1, `KIC_NORM`): the Z[tau]
+    /// multiplier images of each seed join its column; one x-code per orbit
+    /// is returned for the root index.
+    fn construct_base128_norm(
+        fast: &FastBinaryCurve128,
+        curve: &KoblitzCurve,
+        b: u128,
+        columns: usize,
+        r: u64,
+        norm_cap: i64,
+    ) -> (
+        Vec<FastPoint128>,
+        Vec<(usize, u64)>,
+        Vec<Option<[u128; 2]>>,
+        u64,
+        Vec<u128>,
+    ) {
+        assert!(norm_cap > 0 && fast.a == 0, "KIC_NORM needs a = 0 (mu = -1)");
+        let gf = &fast.gf;
+        let n = fast.n as usize;
+        let lambda = curve.lambda.to_u64().unwrap();
+        let multipliers = super::norm_multipliers(norm_cap);
+        let orbit_key = |mut x: u128| {
+            let mut key = x;
+            for _ in 1..n {
+                x = gf.sqr(x);
+                key = key.min(x);
+            }
+            key
+        };
+        let residue = |v: i64| v.rem_euclid(r as i64) as u64;
+        let mut seen = std::collections::HashSet::new();
+        let mut points = Vec::new();
+        let mut labels = Vec::new();
+        let mut reps = Vec::with_capacity(columns);
+        let mut orbit_reps = Vec::new();
+        let mut scanned = 0u64;
+        let mut raw_x = 1u64;
+        let push_orbit = |points: &mut Vec<FastPoint128>,
+                          labels: &mut Vec<(usize, u64)>,
+                          column: usize,
+                          (px, py): (u128, u128),
+                          weight: u64| {
+            let (mut cx, mut cy) = (px, py);
+            let mut coefficient = weight;
+            for _ in 0..n {
+                points.push(Some((cx, cy)));
+                labels.push((column, coefficient));
+                points.push(Some((cx, cx ^ cy)));
+                labels.push((column, (r - coefficient) % r));
+                cx = gf.sqr(cx);
+                cy = gf.sqr(cy);
+                coefficient = super::mulmod(coefficient, lambda, r);
+            }
+        };
+        while reps.len() < columns {
+            scanned += 1;
+            for point in fast.points_with_x(b, raw_x as u128) {
+                let Some((px, py)) = fast.scalar_mul(point, &curve.cofactor) else {
+                    continue;
+                };
+                if px <= 1 || !seen.insert(orbit_key(px)) {
+                    continue;
+                }
+                let column = reps.len();
+                reps.push(Some([px, py]));
+                orbit_reps.push(px);
+                push_orbit(&mut points, &mut labels, column, (px, py), 1);
+                let seed = Some((px, py));
+                let tau_seed = Some((gf.sqr(px), gf.sqr(py)));
+                for &(ma, mb) in &multipliers {
+                    let pa = if residue(ma) == 0 {
+                        None
+                    } else {
+                        fast.scalar_mul(seed, &BigUint::from(residue(ma)))
+                    };
+                    let pb = if residue(mb) == 0 {
+                        None
+                    } else {
+                        fast.scalar_mul(tau_seed, &BigUint::from(residue(mb)))
+                    };
+                    let Some((ix, iy)) = fast.add(pa, pb) else {
+                        continue;
+                    };
+                    if ix <= 1 || !seen.insert(orbit_key(ix)) {
+                        continue;
+                    }
+                    let weight = (residue(ma) + super::mulmod(residue(mb), lambda, r)) % r;
+                    orbit_reps.push(ix);
+                    push_orbit(&mut points, &mut labels, column, (ix, iy), weight);
+                }
+                if reps.len() == columns {
+                    break;
+                }
+            }
+            raw_x += 1;
+        }
+        (points, labels, reps, scanned, orbit_reps)
+    }
+
     fn relation_row128(base: &Base128, relation: &Relation128, rhs: u64, r: u64) -> Vec<u64> {
         let mut row = vec![0u64; base.columns + 1];
         for &index in &relation.point_indices {
@@ -2237,11 +2337,24 @@ mod wide {
             crypto_lib::binary_ecc::BinaryPoint::Infinity => panic!("generator must be affine"),
         };
         let mut scanned_x = None;
+        let norm_cap = super::norm_cap_flag();
+        assert!(
+            norm_cap == 0 || constructed.is_some(),
+            "KIC_NORM applies to construct: bases only"
+        );
+        let mut orbit_reps: Option<Vec<u128>> = None;
         let (points, labels, representatives): (
             Vec<FastPoint128>,
             Vec<(usize, u64)>,
             Vec<Option<[u128; 2]>>,
         ) = match constructed {
+            Some((_, _, columns)) if norm_cap > 0 => {
+                let (points, labels, reps, scanned, orbits) =
+                    construct_base128_norm(&fast, &curve, b, columns, r, norm_cap);
+                scanned_x = Some(scanned);
+                orbit_reps = Some(orbits);
+                (points, labels, reps)
+            }
             Some((_, _, columns)) => {
                 let (points, labels, reps, scanned) =
                     construct_base128(&fast, &curve, b, columns, r);
@@ -2286,10 +2399,12 @@ mod wide {
             by_x,
             columns: representatives.len(),
         };
-        let reps: Vec<u128> = representatives
-            .iter()
-            .map(|p| p.expect("affine representative")[0])
-            .collect();
+        let reps: Vec<u128> = orbit_reps.unwrap_or_else(|| {
+            representatives
+                .iter()
+                .map(|p| p.expect("affine representative")[0])
+                .collect()
+        });
         let base_elapsed = setup_started.elapsed();
         let base_load_ms = ms(base_elapsed);
 
@@ -2615,6 +2730,7 @@ mod wide {
         });
         println!("{summary}");
         if let Ok(path) = std::env::var("KIC_DUMP_BASE") {
+            assert_eq!(norm_cap, 0, "KIC_DUMP_BASE does not record KIC_NORM orbit representatives");
             let dump = json!({
                 "kind":"point_defined_factor_base",
                 "n":n, "a":a,
