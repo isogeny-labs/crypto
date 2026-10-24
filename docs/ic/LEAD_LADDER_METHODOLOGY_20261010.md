@@ -476,3 +476,16 @@ What is **not** an opportunity, measured: cheaper canonicalisation (L2,
 gauge-fixing (L7/G2), and any isogeny move away from `K_0` (L8: the floor
 curve loses `τ` and gains nothing).
 
+
+## Correction 2026-10-24: G2 equivariant F4 entry refined by measurement
+
+The line "What is **not** an opportunity, measured: ... equivariant F4 over gauge-fixing (L7/G2) ..." above, and the L7 status that predicted "no gain over gauge-fixing unless combined with the `S_m` symmetry", are refined by the measured outcome below. The original text is left unchanged as the frozen record of the 2026-10-10 anchor.
+
+Measured outcome, per the sources named:
+
+- `research/ic_improve_20261014/02-equivariant-oracle/README.md`: the G2 pass is correct on all 48 targets. At oracle level the verdict is **TRADES**: the candidate regresses at `n = 5, 7` (I/C = 0.25×, 0.17×) and advances at `n = 11` (5.1× [4.85, 5.34]) and `n = 13` (15.5× [15.1, 15.9]). Most of that win comes from the root's ordinary degree-3 degree-fall rows (attribution arm F: I/F = 4.1× at `n = 11`, 11.6× at `n = 13`). The equivariant pass adds F/C = 1.25× [1.20, 1.31] at `n = 11` and 1.34× [1.30, 1.37] at `n = 13`. At the step level, the degree-3 Macaulay pass alone fails its gate on all 37 targets: it yields one linear consequence fewer than the incumbent.
+- `research/ic_leads_review_20261018/README.md` §2.1 item 4: "G2 pass bit-identical to full F₂ RREF; 44–73× was against a naive kernel, 2–3× against `gf2_elim`. Oracle-level verdict TRADES (0.25× at n = 5, 15.5× at n = 13), most of it from fall rows, not equivariance; production never builds σ-symmetric systems, so the hook is dead code."
+
+Refined reading: the equivariant F4 pass is bit-identical to the full F2 RREF on its tested targets and runs 2 to 3 times faster than `gf2_elim` on the measured targets. At oracle level, equivariance adds a measured F/C of 1.25x at `n = 11` and 1.34x at `n = 13`. That contradicts the L7 prediction of no gain over gauge-fixing, and the L7 negative should be read with this figure. It has no production use, because production never builds sigma-symmetric systems, so the hook is dead code.
+
+Limits: the figures are oracle-level, per-target thread CPU seconds with 95% bootstrap intervals, on toy sizes `n = 5` to `13`. They are not a cost exponent (the OLS slope 4.74 [4.51, 4.97] is the slope of a ratio). Per AGENTS.md §5a, a cross-method ranking against the rho reference is not established by this entry.

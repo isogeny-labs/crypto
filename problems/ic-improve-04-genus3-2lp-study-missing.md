@@ -93,3 +93,11 @@ original tool.
   - Headline only, unpaired: 04's IC-2LP fits q^1.385 [1.379, 1.391] over
     2^10–2^18. 04b's rebuilt baseline fits q^1.383 [1.382, 1.384] over
     2^14–2^20. The two ranges differ, so this is not a comparison.
+
+## Update 2026-10-24
+
+- **Artefacts on `origin/main`.** `research/ic_improve_20261014/04-genus3-2lp/` is in the tree at `origin/main` (`5cb553810e`). It was first added by commit `8683cba67f` (`research/ic_improve: work in progress (items 1-4)`, dated 2026-10-14 by author and committer date, ancestor of `origin/main`). `git log --diff-filter=A` for that path reports this single commit. The "Resolution and history" entry dated 2026-10-15 above records the same artefacts as merged into `main` by a parallel session. This note does not reconcile the two dates; the commit date is the one git reports.
+- **First unblock condition: met.** The original tool and records are in the repository (`PROTOCOL.md`, `README.md`, `RULES.md`, `examples/ic_improve_04_*.rs`, `results/`).
+- **Second unblock condition: open.** No matched comparison of the original 04 baseline and the 04b rebuild in one counted unit (local and phase exponents, row weights) exists yet. Design differences named in this record (large-prime elimination order, stop margin, factor-base order, Lanczos variant) are not yet checked against the original.
+- **Status.** Left as `investigating`. The `resolved` status in `problems/README.md` requires the stated exit criteria to be met, and the second is not. Setting it to `resolved` now would be an overstatement.
+- **Next discriminating step.** Run the matched-size comparison of 04 and 04b on one counted unit, with the design differences named. Acceptance: local exponents, phase exponents and row weights reported for both baselines on the same sizes, with the design deltas listed. If the exponents agree, 04b's verdicts stand for both baselines. If they do not, A1 and A2 must be re-run on the original tool.
