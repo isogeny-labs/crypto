@@ -136,3 +136,24 @@ host with at least 96 GB, where the incremental engine fits under the
 dense engine's 217 GB projection. The satisfiable C1 control is dropped
 with it. G1, P1 and the degree-4 controls run as registered. This
 amendment is post hoc, so it is reported as such.
+
+## Amendment 2 (2026-10-24, before any C1 run): C1 on a rented host
+
+The owner approved C1 on RunPod: all four unsatisfiable draws plus the
+satisfiable control, with a spend cap of $80.
+
+- **Engine.** The dense closure (`examples/dreg_closure`, `--to 5`), not
+  `pe_closure`. At degree 5 the incremental engine costs about 10^15 word
+  XORs per draw, roughly 25–50 h each, against about 1 h projected for the
+  dense engine. The dense engine is the instrument whose degree-4 verdicts
+  G1 matched. Its §11.3 (`dreg_closure_m4l6_20261018`) memory floor of
+  280 GB still applies.
+- **Host.** RunPod secure cloud `cpu3m-48-384` (48 vCPU, 384 GB) at
+  $2.64/h. The pod lifetime is capped at 26 h, so the worst case is about
+  $69.
+- **Job.** `pod/boot.sh` runs the unsatisfiable draws 0, 3, 5, 7 in order.
+  Each gets a 5 h timeout under `prlimit --as` at 92% of the host limit.
+  Satisfiable draw 1 runs after them with whatever time is left.
+- **Outcomes** are read as in §C1: refuted at 5; saturated without
+  refuting (at least 6); or timed out or out of memory (unmeasured). Any
+  refutation of draw 1 is an instrument failure.
