@@ -290,6 +290,25 @@ land in `2E`, which contains every target.
 5. **H7.** Enlarge the binary and odd `n = 4` cells to readable
    `ℓ`-subgroup sizes.
 
+## Erratum (2026-10-24): native work priced in GAE
+
+This erratum was found during validation for the benchmark gate (PROTOCOL.md,
+Erratum V). The H2 and H6 bands price native operations at 0, 0.1 and 1
+`F_p` multiplications. AGENTS.md §5a prices them at 0, 0.1 and 1 GAE.
+
+Repriced with the same runs, the same cells and the same cost model
+(`validation/gae-band/`):
+
+| run | frozen band (native in M) | band with native in GAE | verdict |
+|:--|:--|:--|:--|
+| H2, h = 1, 28–40 bits | 0.59–1.94 | 0.59–2.04 | unresolved at every size (unchanged) |
+| H2, h = 4, 36–40 bits | 1.14–2.79 | 1.14–2.88 | rho cheaper in every cell (unchanged) |
+| H6, Arm J, 44 / 48 bits | 0.99–2.96 / 0.77–2.32 | 0.99–3.04 / 0.77–2.38 | unresolved (unchanged) |
+
+At the gate's three points (`I = 3M`, measured Jacobian cost, native 0,
+0.1 and 1 GAE), H2 at 40 bits with `h = 1` costs 1.78×, 1.80× and 1.88×
+rho. That is the distance remaining to the matched rho at measured cost.
+
 ## Run reports
 
 - `reports/H1-hsweep-run-20261018T2240Z/run-report.pdf`

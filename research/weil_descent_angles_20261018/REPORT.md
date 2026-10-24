@@ -540,6 +540,28 @@ and left unchanged, because no number they plot changed. The
 index-calculus leaderboard is unchanged because this round touches none of
 its instances (see §3).
 
+## Erratum (2026-10-24): native work priced in GAE
+
+This erratum was found during validation for the benchmark gate (PROTOCOL.md,
+Erratum V). The bands in §3.3 price native operations (hashing,
+distinguished points, linear algebra mod `ℓ`) at 0, 0.1 and 1 `F_p`
+multiplications. AGENTS.md §5a prices them at 0, 0.1 and 1 GAE.
+
+Repriced with the same runs, the same cells and the same cost model
+(`validation/gae-band/itemOJ-run-20261018T2132Z.txt`):
+
+| arm | frozen band (native in M) | band with native in GAE | verdict |
+|:--|:--|:--|:--|
+| J, 20–40 bits | 0.51–2.83 | 0.51–2.98 | unresolved at every size (unchanged) |
+| J, 40 bits | 0.93–2.83 | 0.93–2.98 | unresolved |
+| D, 20–40 bits | 2.73–70.1 | 2.73–70.1 (40 bits: 11.2–70.1) | rho cheaper in every cell (unchanged) |
+
+**Arm J.** The lower ends (native weight 0) are unchanged and the upper
+ends rise.
+
+**Arm D.** The lower ends fall at the larger sizes. Rho's native hashing
+grows faster than D's, but D stays far above rho. No verdict in §3.3 changes.
+
 ## Run reports
 
 - `reports/item4-run-20261018T2049Z/run-report.pdf`

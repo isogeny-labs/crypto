@@ -684,3 +684,24 @@ requires `c_J ≤ 22 M + I`.
   `research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md` and
   `research/pkm_tower_round*`, `pkm_dickson_torus_20261015`. Re-measuring
   would duplicate them.
+
+### Erratum V (2026-10-24, after every run): native work in GAE, not M
+
+This erratum was written after all the runs, during validation for the
+benchmark gate (`docs/VALIDATION_GATE.md`). It changes no recorded result.
+
+- **What was wrong.** Amendment C and the Addendum H pricing price native
+  operations at `0`, `0.1` and `1` `F_p` multiplications, yet both cite
+  AGENTS.md §5a. §5a prices native work at `0`, `0.1` and `1`
+  group-addition equivalents (GAE) per operation. The frozen band is
+  therefore narrower than §5a requires.
+- **Re-pricing.** One GAE is the row's own measured affine `E(F_{p²})`
+  addition at the cell's inversion price, `eadd_M + ipr·eadd_I`: about
+  15 M at `I = 3M` and about 50–110 M at `I = 2·log2 p M`.
+- **Everything else stays frozen**: the cost model, the cells, the
+  Legendre split test at one `I` for H2, and Arm D's 6 cells.
+- **Tool and outputs.** The tool is `n2_routes <dir> gaeband <csv>`
+  (commit d01c574a2). Its outputs are in `validation/gae-band/`; the
+  recorded results are unchanged.
+- **Ranking rule.** Unchanged: rank only where the order holds in every
+  cell.
