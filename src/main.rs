@@ -53,6 +53,7 @@ use crypto_lib::{
     utils::encoding::{bigint_to_bytes_be, from_hex, to_hex},
 };
 use num_bigint::BigUint;
+use sha2::Digest;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use subtle::ConstantTimeEq;
@@ -3379,7 +3380,13 @@ fn load_hash_input(
 }
 
 enum StreamingHash {
+    Sha1(crypto_lib::hash::sha1::Sha1),
+    Sha224(sha2::Sha224),
     Sha256(crypto_lib::hash::sha256::Sha256),
+    Sha384(sha2::Sha384),
+    Sha512(sha2::Sha512),
+    Sha512_224(sha2::Sha512_224),
+    Sha512_256(sha2::Sha512_256),
     Keccak(crypto_lib::hash::sha3::KeccakSponge, usize),
     Blake3(blake3::Hasher),
 }
@@ -3392,7 +3399,13 @@ fn cmd_hash_file_streamed(
     function_name: Option<&[u8]>,
 ) -> Result<Option<String>, String> {
     let mut engine = match algorithm {
+        "sha1" | "sha-1" => StreamingHash::Sha1(crypto_lib::hash::sha1::Sha1::new()),
+        "sha224" | "sha-224" => StreamingHash::Sha224(sha2::Sha224::new()),
         "sha256" | "sha-256" => StreamingHash::Sha256(crypto_lib::hash::sha256::Sha256::new()),
+        "sha384" | "sha-384" => StreamingHash::Sha384(sha2::Sha384::new()),
+        "sha512" | "sha-512" => StreamingHash::Sha512(sha2::Sha512::new()),
+        "sha512-224" | "sha-512-224" => StreamingHash::Sha512_224(sha2::Sha512_224::new()),
+        "sha512-256" | "sha-512-256" => StreamingHash::Sha512_256(sha2::Sha512_256::new()),
         "sha3-224" | "sha-3-224" => {
             StreamingHash::Keccak(crypto_lib::hash::sha3::KeccakSponge::new(144, 0x06), 28)
         }
@@ -3431,7 +3444,13 @@ fn cmd_hash_file_streamed(
             break;
         }
         match &mut engine {
+            StreamingHash::Sha1(state) => state.update(&buffer[..count]),
+            StreamingHash::Sha224(state) => state.update(&buffer[..count]),
             StreamingHash::Sha256(state) => state.update(&buffer[..count]),
+            StreamingHash::Sha384(state) => state.update(&buffer[..count]),
+            StreamingHash::Sha512(state) => state.update(&buffer[..count]),
+            StreamingHash::Sha512_224(state) => state.update(&buffer[..count]),
+            StreamingHash::Sha512_256(state) => state.update(&buffer[..count]),
             StreamingHash::Keccak(state, _) => state.update(&buffer[..count]),
             StreamingHash::Blake3(state) => {
                 state.update(&buffer[..count]);
@@ -3439,7 +3458,13 @@ fn cmd_hash_file_streamed(
         }
     }
     let digest = match engine {
+        StreamingHash::Sha1(state) => state.finalize().to_vec(),
+        StreamingHash::Sha224(state) => state.finalize().to_vec(),
         StreamingHash::Sha256(state) => state.finalize().to_vec(),
+        StreamingHash::Sha384(state) => state.finalize().to_vec(),
+        StreamingHash::Sha512(state) => state.finalize().to_vec(),
+        StreamingHash::Sha512_224(state) => state.finalize().to_vec(),
+        StreamingHash::Sha512_256(state) => state.finalize().to_vec(),
         StreamingHash::Keccak(state, length) => state.finalize(length),
         StreamingHash::Blake3(state) => state.finalize().as_bytes().to_vec(),
     };
@@ -4037,8 +4062,35 @@ fn cmd_visual(op: VisualOp) {
 #[cfg(test)]
 mod hash_cli_tests {
     use super::{
-        cmd_hash, cmd_hash_custom, cmd_mac, load_hash_input, load_mac_key, verify_mac_tag,
+        cmd_hash, cmd_hash_custom, cmd_hash_file_streamed, cmd_mac, load_hash_input, load_mac_key,
+        verify_mac_tag,
     };
+
+    #[test]
+    fn sha_family_file_streaming_matches_independent_one_shot_paths() {
+        let path = std::env::temp_dir().join(format!(
+            "crypto-sha-stream-{}-{}.bin",
+            std::process::id(),
+            std::thread::current().name().unwrap_or("test")
+        ));
+        let bytes: Vec<u8> = (0..65_537).map(|i| (i * 37) as u8).collect();
+        std::fs::write(&path, &bytes).unwrap();
+        for name in [
+            "sha1",
+            "sha224",
+            "sha256",
+            "sha384",
+            "sha512",
+            "sha512-224",
+            "sha512-256",
+        ] {
+            let got = cmd_hash_file_streamed(name, &path, None, None, None)
+                .unwrap()
+                .expect("SHA family files stream");
+            assert_eq!(got, cmd_hash(name, &bytes, None).unwrap(), "{name}");
+        }
+        std::fs::remove_file(path).unwrap();
+    }
 
     #[test]
     fn sha_variants_match_independent_abc_vectors() {
