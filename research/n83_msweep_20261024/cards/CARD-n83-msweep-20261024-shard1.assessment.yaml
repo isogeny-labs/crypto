@@ -1,0 +1,29 @@
+card_id: CARD-n83-msweep-20261024-shard1
+relay_verbatim: not_checkable   # check-relay reported relay_verbatim=false only because "no receipt: the card never ran"; no card receipt exists, so there is nothing to recompute against (applicable=true, missing_lines=[])
+outcome: stopped
+stopped_at_step: run-shard1
+recommendation: rerun_after_infrastructure_fix   # stop cause is the background time limit (resource/infrastructure); run_shard.sh skips existing cell files, but the card's must_not_exist guard on raw/shard1 now blocks a rerun of the same card, so a new card is needed
+execution_class: partially_executed   # 1 of 1 command started, killed before exit; 79 of 130 expected cells (grid.tsv rows for m=2,9) written
+per_command:
+  run-shard1:
+    on_disk: interrupted
+    evidence:
+      - raw/shard1 holds 79 *.json cell files; 72 have status complete and 7 have status process_cap (counted by parsing each file's status key)
+      - grid.tsv expands to 130 cells for m in {2,9} (product of engines and factor bases per row); 79 of 130 are present
+      - raw/shard1 holds one in-progress pair k1n61__m2__subspace-20__mq-fes__public.json.tmp and .err with no .json, consistent with a kill mid-cell
+      - receipts/ directory does not exist, so the card's stdout and stderr files shard1.stdout and shard1.stderr were never created
+      - executor report: background job killed at the background time limit, output file contains only "[killed]"; no exit status of 0, 2 or 3 and no IMPEDIMENT line
+      - no run_shard.sh, n83_msweep_cell or shard1 task_card.py process is alive now (the processes visible belong to shard4)
+checks:
+  card_receipt_exists: false
+  receipts_dir_exists: false
+  relay_checked_by_tool: "python3 tools/task_card.py check-relay ... --report ...shard1.report.txt exited 1: relay_verbatim=false, verify_findings=[no receipt: the card never ran]"
+  report_file_written_exactly: true
+  only_card_argv_ran: not_determinable from disk (no receipt)
+  write_scope: not_checked beyond raw/shard1 and cards/ listing
+reasons:
+  - "Stop cause is a runtime limit (background task killed), not a card or spec error; the stop_when rule for a non-zero exit applies, and the executor did not rerun."
+  - "The card was not executed to completion: 79 of 130 cells exist and a .tmp/.err pair remains for the interrupted cell."
+  - "No receipt exists, so exit codes and verbatim relay of the executor text cannot be checked; those fields are not assessed rather than assumed."
+  - "The executor reported it did not inspect raw/ and receipts/; the counts above were taken by the director from disk."
+interpretation: not_assessed
