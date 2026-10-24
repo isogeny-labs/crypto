@@ -103,6 +103,13 @@ repeats all 4,478 library tests and passes 29 affected-example tests after addin
 independent construction-policy checks to the native freezer and auditor.
 The worker, construction tool and general-field replayer are unchanged.
 
+The subsequent Linux gate failed (4,473 passed, 15 failed, 119 ignored): nine
+missing runtime-fixture failures and six solver assertions, two explicitly
+timed out. Exact committed fixtures are materialized; a full serial rerun is
+queued without changing tests or caps. [Validation v5](../research/n83_d18_shared_bits_20261020/reports/run-20261024T0650Z/RUN_REPORT.md)
+retains the failure and does not infer that all six solver failures share a
+cause. Bounded construction and the paired card remain gated on that rerun.
+
 The executable gate still requires a 4 GiB zero-swap Linux construction receipt,
 then a committed actual-host card for 22 constructed
 controls, 22 fresh independent replays and 18 natural queries. The native

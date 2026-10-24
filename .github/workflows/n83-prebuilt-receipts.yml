@@ -63,6 +63,8 @@ jobs:
         with:
           toolchain: '1.98'
       - uses: Swatinem/rust-cache@v2
+      - name: Check event-driven host-card admission notification
+        run: bash research/n83_d18_shared_bits_20261020/admission/test-notification.sh "$RUNNER_TEMP/n83-admission-notification"
       - name: Native worker, card and audit regression tests
         run: |
           cargo test --release \

@@ -2,9 +2,10 @@
 
 **Status: all local native gates pass on the updated parent: 4,478 library tests,
 29 affected-example tests, release builds and all six full-size constructions.
-The input inventory and Lean proof pass. The SSH runner has acquired the
-benchmark lock and started native validation. Bounded Linux construction and
-the paired solver card remain pending.**
+The input inventory and Lean proof pass. The Linux gate failed with 4,473
+passes and 15 failures; exact missing runtime fixtures are now materialized
+and a full serial rerun is queued. Bounded Linux construction and the paired
+solver card remain pending.**
 
 The encoding baseline is PR #2271 revision
 `e294f8c927b019f59e6552039d32e6b4ba237f84`. Both policies retain the same
@@ -22,7 +23,7 @@ The working curve is `icv1-f2m83-tm6151469093347-debefd74`.
 | Prove selector-implication factorization and clause identity | Verified complete within stated scope | [Proof map](PROOF_MAP.md), Lean 4.34.1 gate PASS. No compiler or full-solver proof is claimed. |
 | Exhaustive native semantics, rejection/cap atomicity and worker/replay tests | Verified complete for the native suite | Updated-parent release library: 4,478 passed, zero failed, 119 ignored. All 29 affected-example tests pass, including independent construction-policy rejection in [validation v4](reports/run-20261024T0640Z/RUN_REPORT.md). [Validation v3](reports/run-20261024T0603Z/RUN_REPORT.md) retains the earlier nine socket-permission failures separately. |
 | Build both full-size encodings for m=2,3,4 | Local structural check passes; bounded host gate pending | All six actual models match preflight; choice wires, variable counts and XOR rows agree between policies. The frozen memory-bound gate additionally requires `run-construction.sh` on Linux. |
-| Execute 22 controls, 22 replays, and 18 natural m=4 queries | Not attempted | Requires all validation gates and a committed host card. The bounded-admission Linux validation job is now running under the benchmark lock; its results are not yet available. |
+| Execute 22 controls, 22 replays, and 18 natural m=4 queries | Not attempted | Requires all validation gates and a committed host card. [Validation v5](reports/run-20261024T0650Z/RUN_REPORT.md) preserves the failed Linux gate and queued complete rerun. The admission pipeline cannot launch the card after a failed prerequisite. |
 | Natural useful rank, complete cold/reused cost, matched rho and best-base selection | Open | Original requirements remain in [the problem record](../../problems/n83-prebuilt-base-quality-m2-m4.md). |
 
 The [construction receipt](construction.json) now verifies these actual total
@@ -77,6 +78,14 @@ memory-bound and solver-cost gates.
 - [Receipt collector](collect-card.sh): preserves a consumed card in a new
   archive, including failed/capped attempts. The native auditor admits only
   a complete bounded card; the collector also retains interrupted evidence.
+- [Bounded admission continuation](admission/continue-linux-card.sh): prepares
+  the actual card after the Linux gates pass, releases the benchmark lock
+  during publication, and admits only a matching committed-card digest.
+  [The publication driver](admission/publish-and-admit.sh) independently freezes
+  a copy with the updated local auditor, compares both host cards, commits and
+  pushes the actual metadata, checks the remote branch, then signals admission.
+  A native Linux notification helper waits for file events; no repeated CI
+  polling is involved. Its readiness, failure and timeout paths run in CI.
 
 ## Execution record and resources
 
@@ -99,6 +108,14 @@ policy audit. Its [run report](reports/run-20261024T0640Z/RUN_REPORT.md) records
 checked after extraction and the archive repacked identically. The worker,
 general-field replayer and construction executable are unchanged; the Linux
 worker checkout remains `4e1d311d8`, while this audit fix is `5e2dc2583`.
+
+The [39-file validation-v5 archive](validation-v5.tar.xz) preserves the Linux
+failure and another full passing local rerun. Nine Linux failures came from
+missing runtime fixtures; six were solver assertions, of which two explicitly
+reported timeouts. The exact fixture paths are restored. A complete one-thread
+rerun and bounded construction are queued, with no tests skipped or caps changed.
+See the [run report](reports/run-20261024T0650Z/RUN_REPORT.md) for the limits of
+the timeout diagnosis and the ordered publication/admission continuation.
 
 The initial local release compilation was stopped after static review
 identified unit-placement/count behavior; that attempt produced no test
