@@ -221,7 +221,10 @@ impl MerkleDamgardHash for Sha256 {
         for (i, word) in words.iter_mut().enumerate() {
             *word = u32::from_be_bytes(state[4 * i..4 * i + 4].try_into().unwrap());
         }
-        crate::hash::sha256::compress(&mut words, block);
+        // Use an independent implementation of the low-level compression step.
+        // The repository SHA-256 source is pinned by historical replay evidence.
+        let block = sha2::digest::generic_array::GenericArray::from_slice(block);
+        sha2::compress256(&mut words, std::slice::from_ref(block));
         for (i, word) in words.iter().enumerate() {
             state[4 * i..4 * i + 4].copy_from_slice(&word.to_be_bytes());
         }
