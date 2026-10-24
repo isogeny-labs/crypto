@@ -1,6 +1,8 @@
 //! Joint mixed-image S5 construction. Candidate input excludes reference data.
 //! Process durations in this module are not admitted performance measurements.
 use super::*;
+#[path = "joint_solver.rs"]
+mod solver;
 
 const PUBLIC_KEYS: [&str; 13] = [
     "p",
@@ -18,6 +20,34 @@ const PUBLIC_KEYS: [&str; 13] = [
     "query_trace",
 ];
 const JOINT_ARMS: [&str; 3] = ["phi-l0-active", "double-l0-active", "l0-peel"];
+
+pub(crate) fn solve_query(
+    public: &Path,
+    public_sha: &str,
+    system: &Path,
+    system_sha: &str,
+    out: &Path,
+) -> bool {
+    solver::solve(public, public_sha, system, system_sha, out)
+}
+pub(crate) fn check_query(
+    public: &Path,
+    public_sha: &str,
+    candidate: &Path,
+    reference: &Path,
+    out: &Path,
+) -> bool {
+    solver::check(public, public_sha, candidate, reference, out)
+}
+pub(crate) fn solve_orbit_query(
+    public: &Path,
+    public_sha: &str,
+    manifest: &Path,
+    manifest_sha: &str,
+    out: &Path,
+) -> bool {
+    solver::solve_orbits(public, public_sha, manifest, manifest_sha, out)
+}
 type Exponent = [u16; 5];
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -433,6 +463,177 @@ fn compose(f: Field, p: &Polynomial, n: &Polynomial, d: &Polynomial, power: u16)
     out
 }
 
+fn reduce_orbit(f: Field, polynomial: &Polynomial, orbit: u64) -> Polynomial {
+    let mut result = Polynomial::default();
+    for (&powers, &coefficient) in &polynomial.0 {
+        let mut reduced = powers;
+        reduced[3] %= 12;
+        result.term(
+            f,
+            reduced,
+            f.mul(
+                coefficient,
+                f.scalar(fpow(orbit, (powers[3] / 12) as u64, f.p)),
+            ),
+        );
+    }
+    result
+}
+
+fn compose_orbit(
+    f: Field,
+    polynomial: &Polynomial,
+    z: &Polynomial,
+    power: u16,
+    orbit: u64,
+) -> Polynomial {
+    let mut powers = vec![Polynomial::scalar(f, 1)];
+    for i in 1..=power {
+        powers.push(reduce_orbit(f, &powers[i as usize - 1].mul(f, z), orbit));
+    }
+    let mut result = Polynomial::default();
+    for (&e, &c) in &polynomial.0 {
+        assert!(e[3] <= power && e[4] == 0);
+        let mut coefficient = Polynomial::default();
+        coefficient.term(f, [e[0], e[1], e[2], 0, 0], c);
+        result = result.add(f, &coefficient.mul(f, &powers[e[3] as usize]));
+    }
+    result
+}
+
+fn source_orbits(case: &Case) -> BTreeMap<u64, Vec<usize>> {
+    let mut orbits = BTreeMap::<u64, Vec<usize>>::new();
+    for (i, p) in case.pool[..case.l0].iter().enumerate() {
+        assert_ne!(p.p.x[0], 0);
+        assert_eq!(p.p.x[1..], [0, 0, 0]);
+        orbits
+            .entry(fpow(p.p.x[0], 12, case.p))
+            .or_default()
+            .push(i);
+    }
+    let mut product = vec![1u64];
+    for (&t, ids) in &orbits {
+        assert_ne!(t, 0);
+        assert_eq!(ids.len(), 12, "registered source orbit has wrong size");
+        let mut next = vec![0; product.len() + 12];
+        for (i, &c) in product.iter().enumerate() {
+            next[i] = (next[i] + case.p - c * t % case.p) % case.p;
+            next[i + 12] = (next[i + 12] + c) % case.p;
+        }
+        product = next;
+    }
+    assert_eq!(
+        product,
+        domain(case),
+        "source-orbit factorization does not equal full domain"
+    );
+    orbits
+}
+
+fn orbit_map(case: &Case, arm: usize, t: u64) -> Polynomial {
+    let f = case.c.f;
+    let u = Polynomial::var(f, 3);
+    let b = case.c.b;
+    match arm {
+        7 => {
+            let den = 3 * t % f.p;
+            assert_ne!(den, 0);
+            let scale =
+                f.neg(f.scalar(case.omega * case.omega % f.p * fpow(den, f.p - 2, f.p) % f.p));
+            u.scale(f, f.mul(scale, f.scalar(t))).add(
+                f,
+                &u.pow(f, 10).scale(f, f.mul(scale, f.mul(f.scalar(4), b))),
+            )
+        }
+        9 => {
+            let c = f.pow(b, 4);
+            assert_eq!(c[1..], [0, 0, 0]);
+            let den = 4 * (t + f.p - c[0]) % f.p;
+            assert_ne!(den, 0);
+            let inverse = f.scalar(fpow(den, f.p - 2, f.p));
+            u.scale(f, f.mul(f.add(f.scalar(t), f.mul(f.scalar(8), c)), inverse))
+                .add(
+                    f,
+                    &u.pow(f, 10)
+                        .scale(f, f.mul(f.neg(f.mul(f.scalar(9), b)), inverse)),
+                )
+                .add(
+                    f,
+                    &u.pow(f, 7)
+                        .scale(f, f.mul(f.mul(f.scalar(9), f.pow(b, 2)), inverse)),
+                )
+                .add(
+                    f,
+                    &u.pow(f, 4)
+                        .scale(f, f.mul(f.neg(f.mul(f.scalar(9), f.pow(b, 3))), inverse)),
+                )
+        }
+        8 => u,
+        _ => panic!("unregistered orbit map"),
+    }
+}
+
+pub(crate) fn export_orbits(public: &Path, expected: &str, arm_name: &str, qi: usize, out: &Path) {
+    let raw = checked_public(public, expected);
+    let arm = arm_index(arm_name);
+    assert!(qi < raw["query_trace"].as_array().unwrap().len());
+    assert!(!out.exists());
+    std::fs::create_dir_all(out).unwrap();
+    let case = Case::new(raw, out);
+    let f = case.c.f;
+    let r = case.residual(&case.raw["query_trace"][qi]);
+    let (_, h) = integer::derive();
+    let (generic, matrix, power) = generic(f, case.c.b, &h, r);
+    let checks = probes(f, &generic, &matrix);
+    let mut blocks = Vec::new();
+    for (t, source_ids) in source_orbits(&case) {
+        let label = format!("orbit-{t}");
+        let directory = out.join(&label);
+        std::fs::create_dir(&directory).unwrap();
+        let z = orbit_map(&case, arm, t);
+        for &source in &source_ids {
+            let x = [[0; 4], [0; 4], [0; 4], case.pool[source].p.x, [0; 4]];
+            let image = case.peels[arm]
+                .iter()
+                .find(|&&id| case.pool[id].source_id == source)
+                .unwrap();
+            assert_eq!(
+                z.eval(f, &x),
+                case.pool[*image].p.x,
+                "orbit formula changed the image point"
+            );
+        }
+        let joined = compose_orbit(f, &generic, &z, power, t);
+        assert!(joined.0.keys().all(|e| e[3] < 12));
+        let mut equations = joined.components(f, 5);
+        let guard = Polynomial::var(f, 4)
+            .mul(f, &geometric_guard(f, arm))
+            .sub(f, &Polynomial::scalar(f, 1));
+        equations.push(guard.fp_equation(f, 5));
+        let constraint = Polynomial::var(f, 3)
+            .pow(f, 12)
+            .sub(f, &Polynomial::scalar(f, t));
+        equations.push(constraint.fp_equation(f, 5));
+        let record = json!({"schema":"joint-image-system/v1","p":case.p,"seed":case.seed,"arm":arm_name,"query_index":qi,"orbit_value":t,"source_ids":source_ids,"variables":5,"equations":input_json(&equations)});
+        write(&directory.join("system.json"), &record);
+        std::fs::write(
+            directory.join("system.ms"),
+            msolve_input(&equations, case.p, 5),
+        )
+        .unwrap();
+        let bytes = std::fs::read(directory.join("system.json")).unwrap();
+        blocks.push(json!({"id":label,"orbit_value":t,"source_ids":source_ids,"system_path":format!("{label}/system.json"),"system_sha256":hex::encode(hash::sha256::sha256(&bytes)),"relation_stats":joined.stats(),"equations":equations.len()}));
+    }
+    write(
+        &out.join("manifest.json"),
+        &json!({"schema":"joint-image-orbit-inputs/v1","p":case.p,"seed":case.seed,"arm":arm_name,"query_index":qi,"public_input_sha256":expected,"determinant_evaluation_checks":checks,"blocks":blocks,"source_orbit_factorization_verified":true,"status":"exported-not-solved"}),
+    );
+    println!(
+        "{}",
+        json!({"p":case.p,"seed":case.seed,"arm":arm_name,"query":qi,"blocks":blocks.len(),"degree_u_bound_after_reduction":11})
+    );
+}
+
 fn discriminant(f: Field) -> Polynomial {
     let a = Polynomial::var(f, 0);
     let b = Polynomial::var(f, 1);
@@ -754,6 +955,68 @@ pub(crate) fn audit(tape: &Path, refs: &Path, double_refs: &Path, out: &Path) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn every_registered_source_orbit_preserves_all_three_maps() {
+        let tape =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../quartic_twist_mixed_v1.ndjson");
+        let out = std::env::temp_dir().join(format!("joint-orbit-check-{}", std::process::id()));
+        std::fs::create_dir(&out).unwrap();
+        for p in PRIMES {
+            for seed in 0..3 {
+                let raw = public_record(&load(&tape, INPUT_SHA, p, seed));
+                validate_public(&raw);
+                let case = Case::new(raw, &out);
+                let f = case.c.f;
+                let orbits = source_orbits(&case);
+                for arm in [7, 8, 9] {
+                    for (&t, sources) in &orbits {
+                        let z = orbit_map(&case, arm, t);
+                        for &source in sources {
+                            let image = case.peels[arm]
+                                .iter()
+                                .find(|&&i| case.pool[i].source_id == source)
+                                .unwrap();
+                            let x = [[0; 4], [0; 4], [0; 4], case.pool[source].p.x, [0; 4]];
+                            assert_eq!(z.eval(f, &x), case.pool[*image].p.x);
+                        }
+                    }
+                }
+                if p == 37 && seed == 0 {
+                    let (_, h) = integer::derive();
+                    let r = case.residual(&case.raw["query_trace"][2]);
+                    let (generic, _, power) = generic(f, case.c.b, &h, r);
+                    for arm in [7, 8, 9] {
+                        for (&t, sources) in &orbits {
+                            let z = orbit_map(&case, arm, t);
+                            let reduced = compose_orbit(f, &generic, &z, power, t);
+                            let mut nonzero = 0;
+                            for &source in sources {
+                                let x = [
+                                    f.scalar(3),
+                                    f.scalar(7),
+                                    f.scalar(11),
+                                    case.pool[source].p.x,
+                                    [0; 4],
+                                ];
+                                let mut value = x;
+                                value[3] = z.eval(f, &x);
+                                let direct = generic.eval(f, &value);
+                                assert_eq!(reduced.eval(f, &x), direct);
+                                if direct != [0; 4] {
+                                    nonzero += 1;
+                                }
+                            }
+                            assert!(
+                                nonzero > 0,
+                                "orbit reduction test accidentally checked only zeros"
+                            );
+                        }
+                    }
+                }
+            }
+        }
+        std::fs::remove_dir(&out).unwrap();
+    }
     #[test]
     fn determinant_matches_gaussian_including_singular_inputs() {
         let f = Field::new(37);

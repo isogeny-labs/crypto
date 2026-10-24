@@ -759,6 +759,46 @@ fn solve_fixtures(fixture_path: &Path, expected_sha: &str, root: &Path, out: &Pa
 
 fn main() {
     let args: Vec<_> = std::env::args().collect();
+    if args.len() == 7 && args[1] == "--joint-orbit-solve" {
+        let pass = image::joint::solve_orbit_query(
+            Path::new(&args[2]),
+            &args[3],
+            Path::new(&args[4]),
+            &args[5],
+            Path::new(&args[6]),
+        );
+        std::process::exit(if pass { 0 } else { 2 });
+    }
+    if args.len() == 7 && args[1] == "--joint-orbit-export" {
+        image::joint::export_orbits(
+            Path::new(&args[2]),
+            &args[3],
+            &args[4],
+            args[5].parse().unwrap(),
+            Path::new(&args[6]),
+        );
+        return;
+    }
+    if args.len() == 7 && args[1] == "--joint-solve" {
+        let pass = image::joint::solve_query(
+            Path::new(&args[2]),
+            &args[3],
+            Path::new(&args[4]),
+            &args[5],
+            Path::new(&args[6]),
+        );
+        std::process::exit(if pass { 0 } else { 2 });
+    }
+    if args.len() == 7 && args[1] == "--joint-check" {
+        let pass = image::joint::check_query(
+            Path::new(&args[2]),
+            &args[3],
+            Path::new(&args[4]),
+            Path::new(&args[5]),
+            Path::new(&args[6]),
+        );
+        std::process::exit(if pass { 0 } else { 2 });
+    }
     if args.len() == 4 && args[1] == "--joint-prepare" {
         image::joint::prepare(Path::new(&args[2]), Path::new(&args[3]));
         return;
