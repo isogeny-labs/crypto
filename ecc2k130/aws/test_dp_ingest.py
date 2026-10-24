@@ -39,6 +39,11 @@ def when(iso):
 LEGACY = "dp/slot-00002/1789311001-0000000000000000.bin"
 ORBIT = ("dp/slot-00140/a8b4133d5c5f414ebd1337f15603588d-0000000000791392-"
          "9c6a7dae1862f8393fe196b0c4f890e5e01f7f45615be019252b86ca3e429914.bin")
+
+
+def orbitKey(body):
+    """Give a test body the same content-addressed shape as a real orbit upload."""
+    return ORBIT.rsplit("-", 1)[0] + "-" + hashlib.sha256(body).hexdigest() + ".bin"
 HASH_SPAN_BODY = bytes(range(32)) * 2
 HASH_SPAN = ("dp/slot-00002/" + hashlib.sha256(HASH_SPAN_BODY).hexdigest()
              + "-0000000000000000-0000000000000064.bin")
@@ -659,11 +664,17 @@ class CollisionConn:
         self.commits += 1
 
 
+class NoSuchKey(Exception):
+    response = {"Error": {"Code": "NoSuchKey"}}
+
+
 class CollisionS3:
     def __init__(self, body):
         self.body = body
 
     def get_object(self, **kw):
+        if kw["Key"].endswith(".bin.json"):
+            raise NoSuchKey()
         return {"Body": io.BytesIO(self.body)}
 
 
@@ -706,7 +717,7 @@ class Collisions(unittest.TestCase):
     def ingest(self, body, inserted, candidates=()):
         conn = CollisionConn(inserted=inserted, candidates=candidates)
         result = dp_ingest.ingestObject(conn, CollisionS3(body), "bucket",
-                                        ORBIT, "2026-09-19 00:00:00+00")
+                                        orbitKey(body), "2026-09-19 00:00:00+00")
         return conn, result
 
     def test_a_point_reached_by_two_seeds_is_recorded(self):
@@ -754,7 +765,7 @@ class Collisions(unittest.TestCase):
         # The join returns the object's own freshly inserted rows too (same
         # worker_id); a retried partial ingest must not count them.
         own = list(self.candidate(b"pk", 7, 7))
-        own[7] = dp_ingest.workerId(ORBIT)
+        own[7] = dp_ingest.workerId(orbitKey(record(7) + record(8)))
         conn, _ = self.ingest(record(7) + record(8), inserted=1, candidates=[tuple(own)])
         self.assertEqual(self.progressRow(conn)[3], 0)
 
@@ -893,8 +904,10 @@ class EnvelopeS3:
         self.fetched.append(key)
         if key.endswith(".bin.json"):
             if self.manifest is None:
-                raise RuntimeError("NoSuchKey")
-            return {"Body": io.BytesIO(json.dumps(self.manifest).encode())}
+                raise NoSuchKey()
+            raw = (self.manifest if isinstance(self.manifest, bytes)
+                   else json.dumps(self.manifest).encode())
+            return {"Body": io.BytesIO(raw)}
         return {"Body": io.BytesIO(self.body)}
 
 
@@ -922,7 +935,7 @@ class Envelopes(unittest.TestCase):
 
     def ingest(self, s3, inserted=2):
         conn = CollisionConn(inserted=inserted)
-        return conn, dp_ingest.ingestObject(conn, s3, "bucket", ORBIT,
+        return conn, dp_ingest.ingestObject(conn, s3, "bucket", orbitKey(s3.body),
                                             "2026-09-19 00:00:00+00")
 
     def test_a_body_matching_its_manifest_is_ingested(self):
@@ -946,6 +959,39 @@ class Envelopes(unittest.TestCase):
         # a missing marker is not an error.
         conn, (added, seen, _) = self.ingest(EnvelopeS3(self.body, manifest=None))
         self.assertEqual((added, seen), (2, 2))
+
+    def test_present_marker_requires_complete_counts_and_hash(self):
+        for changes in ({"sha256": None}, {"records": None},
+                        {"bytes": len(self.body) + 1}):
+            with self.subTest(changes=changes):
+                with self.assertRaises(ValueError):
+                    self.ingest(EnvelopeS3(self.body, self.manifest(**changes)))
+
+    def test_orbit_key_hash_refuses_markerless_corruption(self):
+        # Recent live objects have no marker, but their names still bind bytes.
+        altered = self.body[:-1] + bytes([self.body[-1] ^ 1])
+        conn = CollisionConn(inserted=2)
+        with self.assertRaisesRegex(ValueError, "object-key sha256"):
+            dp_ingest.ingestObject(conn, EnvelopeS3(altered), "bucket",
+                                   orbitKey(self.body), "2026-09-19 00:00:00+00")
+        self.assertEqual(conn.queries, [])
+        self.assertEqual(conn.commits, 0)
+
+    def test_malformed_existing_marker_is_not_treated_as_missing(self):
+        for bad in (b"{broken", [1, 2], {}):
+            with self.subTest(marker=bad):
+                with self.assertRaises(ValueError):
+                    self.ingest(EnvelopeS3(self.body, bad))
+
+    def test_marker_access_error_is_not_treated_as_missing(self):
+        class Denied(EnvelopeS3):
+            def get_object(self, **kw):
+                if kw["Key"].endswith(".bin.json"):
+                    raise RuntimeError("AccessDenied")
+                return super().get_object(**kw)
+
+        with self.assertRaisesRegex(RuntimeError, "AccessDenied"):
+            self.ingest(Denied(self.body))
 
     def test_produced_at_is_preferred_over_the_listing_time(self):
         s3 = EnvelopeS3(self.body, self.manifest(producedAt=1789311001))
@@ -984,7 +1030,7 @@ class CorpusFormats(unittest.TestCase):
     def ingest(self, body, inserted):
         conn = CollisionConn(inserted=inserted)
         result = dp_ingest.ingestObject(conn, CollisionS3(body), "bucket",
-                                        ORBIT, "2026-10-06 00:00:00+00")
+                                        orbitKey(body), "2026-10-06 00:00:00+00")
         return conn, result
 
     def test_a_witness_corpus_is_refused_before_anything_is_written(self):
@@ -995,6 +1041,13 @@ class CorpusFormats(unittest.TestCase):
                                    "2026-10-06 00:00:00+00")
         self.assertEqual(conn.queries, [])
         self.assertEqual(conn.commits, 0)
+
+    def test_legacy_object_with_partial_record_is_refused(self):
+        conn = CollisionConn()
+        with self.assertRaisesRegex(ValueError, "partial distinguished-point record"):
+            dp_ingest.ingestObject(conn, CollisionS3(record(7) + b"x"),
+                                   "bucket", LEGACY, "2026-10-06 00:00:00+00")
+        self.assertEqual(conn.queries, [])
 
     def test_campaign_records_are_still_read(self):
         conn, (added, seen, hits) = self.ingest(record(1) + record(2) + record(3), 3)
@@ -1100,8 +1153,9 @@ class Rollup(unittest.TestCase):
 
     def test_the_counters_are_written_in_the_insert_transaction(self):
         conn = CollisionConn(inserted=100)
-        dp_ingest.ingestObject(conn, CollisionS3(record(7) * 100), "bucket",
-                               ORBIT, "2026-09-19 07:31:00+00")
+        body = record(7) * 100
+        dp_ingest.ingestObject(conn, CollisionS3(body), "bucket",
+                               orbitKey(body), "2026-09-19 07:31:00+00")
         order = [q for q, _ in conn.queries]
         # After the points, before the single commit: the counters cannot
         # describe rows that were never stored, nor miss rows that were.
@@ -2023,7 +2077,8 @@ class PostgresReplicaIntegration(unittest.TestCase):
             class S3:
                 def get_object(self, **kwargs):
                     if kwargs["Key"].endswith(".json"):
-                        marker = {"sha256": hashlib.sha256(body).hexdigest(), "records": 2}
+                        marker = {"sha256": hashlib.sha256(body).hexdigest(),
+                                  "bytes": len(body), "records": 2}
                         return {"Body": io.BytesIO(json.dumps(marker).encode())}
                     calls.append(kwargs["Key"])
                     if len(calls) == 1:

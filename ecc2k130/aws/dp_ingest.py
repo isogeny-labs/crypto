@@ -761,10 +761,21 @@ def readEnvelope(s3, bucket, key):
     """
     try:
         raw = s3.get_object(Bucket=bucket, Key=key + ".json")["Body"].read()
+    except Exception as exc:
+        # Older objects have no marker. A timeout, AccessDenied, or other S3
+        # failure is not evidence of absence and must leave the object pending.
+        response = getattr(exc, "response", None)
+        code = response.get("Error", {}).get("Code") if isinstance(response, dict) else None
+        if code in ("NoSuchKey", "404", "NotFound"):
+            return None
+        raise
+    try:
         manifest = json.loads(raw.decode("utf-8"))
-        return manifest if isinstance(manifest, dict) else None
-    except Exception:
-        return None
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("%s: invalid commit marker JSON" % key) from exc
+    if not isinstance(manifest, dict):
+        raise ValueError("%s: commit marker must be an object" % key)
+    return manifest
 
 
 def tableRecordBody(body):
@@ -785,17 +796,27 @@ def checkEnvelope(key, body, manifest):
     points once stored. Raising here leaves the object outstanding and logged
     rather than letting it into the corpus.
     """
-    if not manifest:
+    # Current orbit keys carry the producer's SHA-256 even when its optional
+    # .bin.json marker is absent. The live corpus has such markerless objects.
+    m = ORBIT_KEY_RE.match(key)
+    got = None
+    if m:
+        got = hashlib.sha256(body).hexdigest()
+        if got != m.group(4):
+            raise ValueError("%s: body does not match its object-key sha256" % key)
+    if manifest is None:
         return
     want = manifest.get("sha256")
-    if want:
-        got = hashlib.sha256(body).hexdigest()
-        if got != want:
-            raise ValueError("%s: body does not match its manifest sha256 "
-                             "(%s != %s)" % (key, got, want))
+    if not isinstance(want, str) or re.fullmatch(r"[0-9a-f]{64}", want) is None:
+        raise ValueError("%s: commit marker has no valid sha256" % key)
+    if (got or hashlib.sha256(body).hexdigest()) != want:
+        raise ValueError("%s: body does not match its manifest sha256" % key)
+    size = manifest.get("bytes")
+    if type(size) is not int or size != len(body):
+        raise ValueError("%s: commit marker byte count differs from body" % key)
     want = manifest.get("records")
-    if isinstance(want, int) and want != len(body) // RECORD_BYTES:
-        raise ValueError("%s: manifest says %d records, body carries %d"
+    if type(want) is not int or want != len(body) // RECORD_BYTES:
+        raise ValueError("%s: manifest says %r records, body carries %d"
                          % (key, want, len(body) // RECORD_BYTES))
 
 
@@ -887,6 +908,8 @@ def ingestObject(conn, s3, bucket, key, found_at, *, replica_id=None,
     manifest = readEnvelope(s3, bucket, key)
     checkEnvelope(key, body, manifest)
     body = tableRecordBody(body)
+    if len(body) % RECORD_BYTES:
+        raise ValueError("%s: partial distinguished-point record" % key)
     # The producer's own clock, where it recorded one. found_at from the
     # caller is the object's S3 LastModified for the orbit key shape, and that
     # is storage metadata: a copy, a replication or a lifecycle transition
