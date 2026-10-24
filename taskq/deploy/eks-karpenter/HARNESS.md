@@ -1,5 +1,9 @@
 # Trigger Iso Lab from a harness or GitHub Actions
 
+For client installation and authentication, follow [agent access and setup](ACCESS.md).
+It includes Claude Code, Codex and OpenCode examples and the permissions an
+administrator must grant a caller on another machine.
+
 The portable request contract is [isolab.eks.request/v1](contracts/request.schema.json).
 The existing host can use the registered stdio MCP tools directly. Callers on
 other machines use the AWS launcher; they need no Kubernetes network route,

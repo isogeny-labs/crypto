@@ -72,6 +72,10 @@ expiration and drift replacement are disabled to protect long running jobs.
 
 ## Submit from the harness
 
+Start with [agent access and setup](ACCESS.md) for Claude Code, Codex and
+OpenCode: authentication, client registration, remote caller permissions and
+submission/result verification commands.
+
 For the versioned request/result schemas, portable AWS launcher and GitHub
 Actions trigger, see [the end-to-end harness contract](HARNESS.md).
 
@@ -355,8 +359,10 @@ For an in-cluster harness, use the `harness` ServiceAccount and enable a project
 Kubernetes API token on that harness pod explicitly. External AWS roles can be
 given an EKS access entry mapped to `isolab:submitters`. This group can submit,
 inspect and cancel Jobs and read pod logs only in `isolab`. The current host
-instance role is the cluster creator/admin; no static Kubernetes bearer tokens
-were generated. These are trusted same-lab workloads, not mutually hostile tenants.
+role is mapped to this submitter group; temporary operator/admin grants were
+removed after deployment. No static Kubernetes bearer tokens were generated.
+See [identity setup](ACCESS.md) before connecting another environment. These are
+trusted same-lab workloads, not mutually hostile tenants.
 
 ## Operations and teardown
 

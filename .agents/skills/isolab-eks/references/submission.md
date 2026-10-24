@@ -1,5 +1,9 @@
 # Portable submission
 
+For first-time setup, read [agent access and authentication](../../../../taskq/deploy/eks-karpenter/ACCESS.md).
+It includes Claude/Codex/OpenCode configuration, the current host's preflight,
+remote caller grants and the distinction between Kubernetes tokens and AWS roles.
+
 The maintained schemas and executable validators are under
 [`taskq/deploy/eks-karpenter/contracts`](../../../../taskq/deploy/eks-karpenter/contracts)
 and [`remote`](../../../../taskq/deploy/eks-karpenter/remote). Use those definitions;

@@ -1,15 +1,22 @@
 ---
 name: isolab-eks
-description: Submit crypto experiments to Iso Lab on EKS Spot workers from Claude, Codex, another harness, or GitHub Actions; verify the tested commit, earned L2 isolation, private S3 results, and checkpoint/resume readiness. Use for Kubernetes lab execution, not the separate legacy NATS Iso Lab service.
+description: Submit crypto experiments to Iso Lab on EKS Spot workers from Claude, Codex, OpenCode, another harness, or GitHub Actions; verify the tested commit, earned L2 isolation, private S3 results, and checkpoint/resume readiness. Use for Kubernetes lab execution, not the separate legacy NATS Iso Lab service.
 ---
 
 # Iso Lab on EKS
 
 Use the repository's maintained harness contract in
 [`taskq/deploy/eks-karpenter/HARNESS.md`](../../../taskq/deploy/eks-karpenter/HARNESS.md).
-This skill is shared with Claude through `.claude/skills/isolab-eks`.
+This skill is shared with Claude through `.claude/skills/isolab-eks`; OpenCode
+can discover the same `.agents/skills` and `.claude/skills` locations.
 Work from the repository root. It does not grant AWS or GitHub access; use the
 caller's configured identity without copying credentials into requests or Git.
+For a missing connection or a new machine, read
+[agent access and setup](../../../taskq/deploy/eks-karpenter/ACCESS.md): choose
+the host MCP, remote AWS bridge, GitHub or in-cluster route, configure the client,
+and verify the actual caller's permissions before submitting. No shared static
+service-account key is required. Creating new identities or broadening access
+is a separate administrative action, not an implicit effect of loading this skill.
 
 The lab's recovery policy is **CRIU plus EBS volume snapshots**. Preserve
 computation progress after a Spot interruption, invalidate the interrupted
