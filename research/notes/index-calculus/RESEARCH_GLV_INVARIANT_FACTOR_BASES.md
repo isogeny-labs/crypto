@@ -2832,3 +2832,118 @@ improvement of the baseline under the 2026-10-15 criterion.  The band (G2.94) sa
 survives once the Macaulay matrix's own entries are priced: most of it at `0.1` GAE, a few percent
 at `1` GAE, where the matrix A still builds dominates.  The rows would stay `≈ 4·10³`–`10⁵×` from
 the matched rho: the distance remaining.  After A the echelon is the next lever.
+
+### 9.23 E31 measured: the chain solve cuts the `k = 4` solve `2.6×` (A) and `5.1×` (B) for the same output, and `S` by `2.5×` and `4.7×`
+
+*2026-10-24.*  Code: `klein_v4::solve_weighted_chain` beside the unchanged `solve_weighted_traced`
+(commit `f6ab6b7253`), selected by `V4Solver` / `quartic_pipeline_gls --solver`.  **Stage A:**
+`examples/e31_stage_a.rs`, binary `a8f52422d5` (`experiments/31_solve_cost/binary_commit.txt`), one
+thread, the first 1,000 targets of E25 arm A's stream on each of E25's ten curves, the three solvers
+interleaved per call from the same per-target RNG seed (`stage_a.{json,log}`).  **End to end:**
+`experiments/31_solve_cost/run_e2e.sh` (E25's `run_all.sh` plus `--solver`, `RAYON_NUM_THREADS=4`), same
+binary, both solvers, both arms, all ten curves (`e2e_{chain,chain-sparsest}_p*s*.json`, logs).
+Tables: `experiments/31_solve_cost/tables.md` (`examples/e31_tables.rs`).  Host: the 4-vCPU container;
+wall times are a practicality note.
+
+**Stage A** (per call; existing = E25's solver; all calls, fallbacks charged):
+
+| p | seed | `C` median existing | A | B | existing / A | existing / B | NF existing / A | charpoly existing / A | eigvec existing / A | echelon A / B | fallbacks A | wall existing / A / B (µs, median) |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|:--|
+| 101 | 1 | `1,617,013` | `600,981` | `304,257` | 2.69 | 5.31 | 9.2 | 2.85 | 16.4 | 2.52 | 12 | `15,381` / `9,804` / `10,008` |
+| 101 | 2 | `1,616,974` | `600,890` | `304,103` | 2.69 | 5.32 | 9.7 | 2.87 | 15.7 | 2.54 | 11 | `17,333` / `10,884` / `11,332` |
+| 149 | 1 | `1,632,660` | `612,064` | `313,237` | 2.67 | 5.21 | 10.6 | 2.87 | 18.7 | 2.58 | 7 | `16,666` / `10,569` / `10,795` |
+| 149 | 2 | `1,633,472` | `612,068` | `313,320` | 2.67 | 5.21 | 9.5 | 2.82 | 15.4 | 2.54 | 10 | `15,494` / `9,838` / `9,984` |
+| 197 | 1 | `1,645,617` | `620,058` | `320,425` | 2.65 | 5.14 | 10.9 | 2.88 | 20.4 | 2.60 | 5 | `15,757` / `9,755` / `9,943` |
+| 197 | 2 | `1,646,416` | `620,152` | `320,741` | 2.65 | 5.13 | 10.0 | 2.84 | 15.6 | 2.56 | 8 | `17,060` / `10,422` / `10,477` |
+| 269 | 1 | `1,650,218` | `623,969` | `323,602` | 2.64 | 5.10 | 10.9 | 2.84 | 20.5 | 2.60 | 5 | `15,215` / `9,747` / `9,926` |
+| 269 | 2 | `1,651,643` | `624,544` | `324,142` | 2.64 | 5.10 | 11.2 | 2.85 | 25.9 | 2.61 | 4 | `16,602` / `10,308` / `10,540` |
+| 397 | 1 | `1,663,086` | `633,960` | `333,134` | 2.62 | 4.99 | 11.6 | 2.86 | 26.5 | 2.62 | 3 | `19,819` / `11,849` / `11,388` |
+| 397 | 2 | `1,661,986` | `633,419` | `332,624` | 2.62 | 5.00 | 12.4 | 2.89 | 30.0 | 2.65 | 1 | `18,678` / `11,614` / `11,202` |
+
+Agreement: A and B returned the existing solver's solutions, degree, outcome and decomposition set
+on all 10,000 calls each; on the 9,996 calls the existing solver does not refuse, `M_{P₂}` and the
+characteristic polynomial were identical too.  On the calls that did not fall back, A's normal forms
+cost `65.6`–`66.8·10³` (the registered bound, `≈ 6.7·10⁴`, holds) and B's `31.6`–`32.2·10³`.
+A's per-call `C` is now echelon `≈ 70 %`, charpoly `≈ 15 %`; B's echelon `≈ 170·10³`, charpoly
+`≈ 94·10³`.  The unit test (`e31_chain_solve_agrees_with_the_existing_solver`: E25 `p = 101, 149`,
+E24 `p = 101, 53`, both pivot rules) agrees on every call, and its negative control (one coefficient
+of one equation moved) changes every non-empty solution set.
+
+**What the fallbacks are.**  In all 40 end-to-end runs the number of fallbacks equals E25's
+`reruns + unsolved` exactly (e.g. `488 = 467 + 21` at `p = 101` seed 1, arm A): the chain solve hands
+back precisely the calls that the existing solver itself cannot finish cleanly at degree 11
+(degenerate eigenspaces, unresolved vectors, unreachable borders), and no others.  Those calls cost
+the existing solver `4.5`–`4.8·10⁶` each, and the chain attempt adds `≈ 13 %` to them.
+
+**End to end** (E25's ten curves, both arms, `S` in `F_p` multiplications; the matched walk is the
+`⟨±ψ⟩` walk; E25's numbers from its records):
+
+| p | seed | arm | `S` E25 | `S` A | `S` B | E25 / A | E25 / B | `S`/rho E25 | `S`/rho A | `S`/rho B |
+|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|
+| 101 | 1 | A | `6.76·10¹⁰` | `2.71·10¹⁰` | `1.49·10¹⁰` | 2.50 | 4.53 | `1.31·10⁵` | `5.27·10⁴` | `2.90·10⁴` |
+| 101 | 1 | B | `3.48·10¹⁰` | `1.39·10¹⁰` | `7.63·10⁹` | 2.51 | 4.57 | `6.77·10⁴` | `2.70·10⁴` | `1.48·10⁴` |
+| 101 | 2 | A | `2.47·10¹⁰` | `9.87·10⁹` | `5.42·10⁹` | 2.50 | 4.56 | `6.19·10⁴` | `2.47·10⁴` | `1.36·10⁴` |
+| 101 | 2 | B | `1.17·10¹⁰` | `4.68·10⁹` | `2.58·10⁹` | 2.50 | 4.54 | `2.93·10⁴` | `1.17·10⁴` | `6.46·10³` |
+| 149 | 1 | A | `5.83·10¹¹` | `2.30·10¹¹` | `1.25·10¹¹` | 2.53 | 4.66 | `7.07·10⁵` | `2.79·10⁵` | `1.52·10⁵` |
+| 149 | 1 | B | `2.19·10¹¹` | `8.64·10¹⁰` | `4.70·10¹⁰` | 2.53 | 4.65 | `2.65·10⁵` | `1.05·10⁵` | `5.71·10⁴` |
+| 149 | 2 | A | `1.01·10¹¹` | `3.98·10¹⁰` | `2.17·10¹⁰` | 2.53 | 4.64 | `1.24·10⁵` | `4.92·10⁴` | `2.68·10⁴` |
+| 149 | 2 | B | `5.67·10¹⁰` | `2.25·10¹⁰` | `1.23·10¹⁰` | 2.52 | 4.62 | `7.01·10⁴` | `2.78·10⁴` | `1.52·10⁴` |
+| 197 | 1 | A | `8.53·10¹⁰` | `3.35·10¹⁰` | `1.83·10¹⁰` | 2.54 | 4.67 | `8.24·10⁴` | `3.24·10⁴` | `1.76·10⁴` |
+| 197 | 1 | B | `6.32·10¹⁰` | `2.49·10¹⁰` | `1.36·10¹⁰` | 2.54 | 4.66 | `6.11·10⁴` | `2.40·10⁴` | `1.31·10⁴` |
+| 197 | 2 | A | `4.39·10¹⁰` | `1.72·10¹⁰` | `9.37·10⁹` | 2.55 | 4.68 | `4.44·10⁴` | `1.74·10⁴` | `9.48·10³` |
+| 197 | 2 | B | `2.59·10¹⁰` | `1.02·10¹⁰` | `5.53·10⁹` | 2.55 | 4.68 | `2.62·10⁴` | `1.03·10⁴` | `5.60·10³` |
+| 269 | 1 | A | `1.37·10¹¹` | `5.36·10¹⁰` | `2.90·10¹⁰` | 2.56 | 4.73 | `8.41·10⁴` | `3.29·10⁴` | `1.78·10⁴` |
+| 269 | 1 | B | `7.88·10¹⁰` | `3.09·10¹⁰` | `1.67·10¹⁰` | 2.55 | 4.72 | `4.84·10⁴` | `1.90·10⁴` | `1.02·10⁴` |
+| 269 | 2 | A | `5.10·10¹⁰` | `1.99·10¹⁰` | `1.07·10¹⁰` | 2.56 | 4.76 | `3.16·10⁴` | `1.23·10⁴` | `6.65·10³` |
+| 269 | 2 | B | `2.52·10¹⁰` | `9.83·10⁹` | `5.30·10⁹` | 2.56 | 4.75 | `1.56·10⁴` | `6.09·10³` | `3.29·10³` |
+| 397 | 1 | A | `7.19·10¹⁰` | `2.81·10¹⁰` | `1.52·10¹⁰` | 2.56 | 4.72 | `1.95·10⁴` | `7.62·10³` | `4.13·10³` |
+| 397 | 1 | B | `4.17·10¹⁰` | `1.63·10¹⁰` | `8.82·10⁹` | 2.56 | 4.73 | `1.13·10⁴` | `4.42·10³` | `2.39·10³` |
+| 397 | 2 | A | `1.31·10¹¹` | `5.15·10¹⁰` | `2.79·10¹⁰` | 2.55 | 4.70 | `3.97·10⁴` | `1.56·10⁴` | `8.45·10³` |
+| 397 | 2 | B | `5.65·10¹⁰` | `2.22·10¹⁰` | `1.20·10¹⁰` | 2.55 | 4.70 | `1.71·10⁴` | `6.71·10³` | `3.64·10³` |
+
+Every record reproduces E25's field for field apart from the solve's multiplications, what is
+derived from them, wall time, `macaulay_entries` (a fallback builds the matrix twice) and the solver
+tags: the same residuals, unsolved targets, reruns, decompositions, relations, linear algebra, logs
+and walks.  Every log recovered, every walk correct, every kept row re-added (as in E25).  The solves
+are now `98.4`–`98.9 %` of `S` (A) and `97.0`–`97.9 %` (B).
+
+**§5a band** (one GAE, `97` `F_p` multiplications, per Macaulay entry and per walk step, as E25 priced
+it): `S_E25 / S_A` is `2.50`–`2.56` at `0`, `1.39`–`1.43` at `0.1`, `1.034`–`1.053` at `1` GAE;
+`S_E25 / S_B` is `4.53`–`4.76`, `1.59`–`1.64`, `1.051`–`1.071`.  Both stay below E25 on every row at every
+weight, and the matched rho stays ahead of every row of both at every weight.  At `1` GAE the matrix
+the chain solve still builds (`393 × 448` entries per call) is almost all of the cost: what E31 cut is
+the arithmetic, not the matrix.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.85 | identical outputs on all 10,000 Stage A calls (A and B) and all 40 end-to-end records; `M_{P₂}` and charpoly identical on 9,996 of 9,996 applicable calls; the negative control differs on every non-empty set | **holds** |
+| G2.86 | NF existing / A, all calls with fallbacks charged: `9.2`–`12.4` (in band on one curve of ten); on calls without fallback `≈ 13×` (A's NF `65.6`–`66.8·10³`) | **falsified low**: the band was set from the clean-call bound and did not price the charged fallbacks, which carry the existing `≈ 8.5·10⁵` normal forms on top |
+| G2.87 | charpoly existing / A `2.82`–`2.89` | **holds** |
+| G2.88 | eigenvectors existing / A `15.4`–`30.0` | **holds** |
+| G2.89 | `C` median existing / A `2.62`–`2.69` on every curve | **holds**; kill (`< 1.5`) not reached |
+| G2.90 | fallbacks `0.1`–`1.2 %` per curve in Stage A (`1.2 %`, `1.1 %` at `p = 101`), `0.2`–`1.1 %` per end-to-end run | **falsified at `p = 101`**, holds at `p ≥ 149`; the fallbacks are exactly E25's reruns and unsolved targets |
+| G2.91 | wall existing / A `1.56`–`1.67` | **holds** |
+| G2.92 | echelon A / B `2.52`–`2.65`; B's `C` median `49`–`50 %` below A's on every curve | **falsified high** (band `[1.0, 1.6]`); B carried to end to end by the registered rule |
+| G2.93 | every E25 count reproduced; `S_E25 / S_A` `2.50`–`2.56` on every curve and arm; gap to the matched rho shrinks by the same factor | **holds** |
+| G2.94 | `1.39`–`1.43` at `0.1` GAE, `1.034`–`1.053` at `1` GAE; A below E25 at every weight | **holds** |
+
+**What it says.**  The `k = 4` decomposition on the `V₄` line was paying for a dense 64-wide normal
+form at each of 240 pivots, a dense Hessenberg reduction and a dense 64-dimensional kernel, while
+its quotient is a 12-generator module over `F_p[P₂]`.  Working in that module — left-looking normal
+forms of the 12 chain ends, `det R(x)` of a `12 × 12` polynomial matrix, kernels of `R(λ)` — and
+choosing the sparsest pivot rows cuts one call from `1.62`–`1.66·10⁶` to `3.04`–`3.33·10⁵` `F_p`
+multiplications (B), with the same decompositions on every call.  **End to end, on E25's curves and
+target streams, `S` falls `4.53`–`4.76×` (B; `2.50`–`2.56×` with A alone), with every relation, log and
+walk unchanged.**  **Class: engineering** (a constant on the dominant phase; the exponents and the
+matrix are unchanged) — a verified, measured improvement of the baseline under the 2026-10-15
+criterion, and B is the new baseline on this family.  It is an operation-count result at `0` GAE;
+at `1` GAE per Macaulay entry it is `5`–`7 %`.  **Distance remaining:** every row is still
+`2.39·10³`–`1.52·10⁵×` slower than the matched `⟨±ψ⟩` rho (`2.39·10³×` at `p = 397` seed 1, arm B, the
+best; E25's best was `1.13·10⁴×`).  The §11.16 handover was not recomputed here.  **Scope:** E25's
+GLS twists, `p ≤ 397`, the degree-11 solve; E24's curves use the same solver and the unit test covers
+two of them, but E24 was not rerun end to end.  **Next levers, in order of measured weight:** B's
+echelon (`≈ 1.7·10⁵`, wall time `≈ 10` ms of `≈ 11` ms per call), `det R(x)` (`≈ 9.4·10⁴`, `64`
+evaluations of a `12 × 12` determinant), and the `0.2`–`1.1 %` fallbacks (`≈ 4.6·10⁶` each, up to
+`≈ 16 %` of B's mean `C` at `p = 101`), which a chain-side treatment of degenerate eigenspaces would
+remove.  Not done here: the validation gate (independent replay certificate and validator report),
+the leaderboard, `benchmarks/` and the visual report.
