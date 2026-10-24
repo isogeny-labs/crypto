@@ -96,6 +96,7 @@ pub mod aes;
 pub mod ai_schoof;
 pub mod algebra_cache;
 pub mod aut_folded_rho;
+pub mod six_class_rho;
 pub mod auto_attack;
 pub mod avalanche;
 pub mod b_seed_profile;
