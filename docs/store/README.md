@@ -100,6 +100,10 @@ one JSON object with `status`, `checked`, `problems`, `remote_checked`,
 `remote.status: "bytes_ok"` means the downloaded bytes matched the index;
 `"ok"` means the remote HEAD metadata matched. A missing local cache is
 reported as `cache.status: "missing"` and does not itself fail a remote check.
+If a store command fails before producing a detailed report, `--json` prints
+one `{"status":"error","error":"..."}` object and exits nonzero. A failed
+`verify` that inspected entries prints its detailed report once and exits
+nonzero.
 
 The remote is **never deleted from**: `rm` edits the index, `gc` prunes the
 local cache. Deleting remote objects is a decision for the bucket's owner.

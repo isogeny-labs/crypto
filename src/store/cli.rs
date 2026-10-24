@@ -81,6 +81,17 @@ fn mib(bytes: u64) -> String {
 }
 
 pub fn run(args: &StoreArgs) -> Result<(), String> {
+    let mut report_emitted = false;
+    let result = run_inner(args, &mut report_emitted);
+    if args.json && !report_emitted {
+        if let Err(error) = &result {
+            println!("{}", json!({"status": "error", "error": error}));
+        }
+    }
+    result
+}
+
+fn run_inner(args: &StoreArgs, report_emitted: &mut bool) -> Result<(), String> {
     let mut store = Store::open_default()?;
     match &args.cmd {
         StoreCmd::Status => {
@@ -306,18 +317,17 @@ pub fn run(args: &StoreArgs) -> Result<(), String> {
                                "cache": cache, "remote": remote})
                     })
                     .collect();
-                println!(
-                    "{}",
-                    serde_json::to_string_pretty(&json!({
-                        "status": if bad == 0 { "ok" } else { "error" },
-                        "checked": rows.len(),
-                        "problems": bad,
-                        "remote_checked": *remote || *download,
-                        "download_checked": *download,
-                        "entries": entries,
-                    }))
-                    .map_err(|e| e.to_string())?
-                );
+                let report = serde_json::to_string_pretty(&json!({
+                    "status": if bad == 0 { "ok" } else { "error" },
+                    "checked": rows.len(),
+                    "problems": bad,
+                    "remote_checked": *remote || *download,
+                    "download_checked": *download,
+                    "entries": entries,
+                }))
+                .map_err(|e| e.to_string())?;
+                println!("{report}");
+                *report_emitted = true;
             } else {
                 for r in &rows {
                     let cache = match &r.cache {
