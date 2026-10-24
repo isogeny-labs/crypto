@@ -157,6 +157,10 @@ jobs:
         working-directory: research/cover_transfer_assessment_20261013/lean
     steps:
       - uses: actions/checkout@v4
+      - name: Free runner disk before installing Lean
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
       - name: Build the conditional injectivity theorem and replay it in a fresh kernel
         uses: leanprover/lean-action@v1
         with:
