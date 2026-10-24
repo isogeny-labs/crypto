@@ -27,6 +27,7 @@ use crate::cryptanalysis::ecbench::full_price;
 use crate::cryptanalysis::ecbench::generic::{
     bsgs_interleaved, bsgs_negation, bsgs_textbook, kangaroo, GenericOutcome,
 };
+use crate::cryptanalysis::ecbench::wordram_price;
 use crate::cryptanalysis::ecbench::workload::{CurveFacts, Instance, WideInstance};
 use crate::cryptanalysis::ecbench_large_prime::{
     self as large_prime, SolveConfig as LargePrimeConfig,
@@ -525,6 +526,30 @@ pub fn registry() -> &'static [MethodDecl] {
             params: STRONG_PARAMS,
         },
         MethodDecl {
+            id: "ic.pipeline_wordram",
+            family: "ic",
+            summary: "ic.pipeline unchanged, then every native counter priced by ecbench::wordram_price: fixed 256-bit word-RAM budgets over the reference affine addition (CurveSmash's accounting), host-independent; unknown counters stay unpriced",
+            entry: "ic_framework::run_pipeline + ecbench::wordram_price::reprice",
+            applies: Applies::BinaryOnly,
+            params: IC_PIPELINE_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.signed_frobenius_wordram",
+            family: "rho",
+            summary: "rho.signed_frobenius unchanged, with its canonicalisations and distinguished-point probes priced by ecbench::wordram_price's fixed word-RAM budgets",
+            entry: "ic_boundary::signed_frobenius_rho_tuned + ecbench::wordram_price::reprice",
+            applies: Applies::KoblitzOnly,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.signed_frobenius_strong_wordram",
+            family: "rho",
+            summary: "rho.signed_frobenius_strong unchanged, with its canonicalisations, partition hashes and table probes priced by ecbench::wordram_price's fixed word-RAM budgets",
+            entry: "koblitz_strong_rho::StrongRho::solve + ecbench::wordram_price::reprice",
+            applies: Applies::KoblitzOnly,
+            params: STRONG_PARAMS,
+        },
+        MethodDecl {
             id: "ic.pipeline_counted",
             family: "ic",
             summary: "index calculus with solver wall pricing excluded by deterministic phase recomputation; unpriced solver work remains explicit",
@@ -631,6 +656,8 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
         | "rho.signed_frobenius_full"
         | "rho.signed_frobenius_strong"
         | "rho.signed_frobenius_strong_full"
+        | "rho.signed_frobenius_wordram"
+        | "rho.signed_frobenius_strong_wordram"
         | "rho.signed_frobenius_strong_escape" => {
             Some((PI / (2.0 * a_available.max(1) as f64)).sqrt())
         }
@@ -1152,10 +1179,12 @@ pub fn solve(
     if m.id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
     }
-    // A `*_full` method runs its base unchanged and is repriced after.
+    // A `*_full` or `*_wordram` method runs its base unchanged and is
+    // repriced after.
     let full = full_price::base_of(&m.id);
+    let wordram = wordram_price::base_of(&m.id);
     let base_m;
-    let (m, run_d) = match full {
+    let (m, run_d) = match full.or(wordram) {
         Some(base) => {
             base_m = ResolvedMethod {
                 id: base.to_string(),
@@ -1189,6 +1218,9 @@ pub fn solve(
     };
     if full.is_some() {
         full_price::reprice(&mut rep, d.family, &curve.slug)?;
+    }
+    if wordram.is_some() {
+        wordram_price::reprice(&mut rep, d.family, curve)?;
     }
     match session.map(|s| s.finish()) {
         Some(Ok(snap)) if rep.online.is_none() => {

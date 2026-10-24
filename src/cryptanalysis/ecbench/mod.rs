@@ -67,4 +67,5 @@ pub mod spec;
 pub mod stats;
 pub mod three_leads;
 pub mod trend;
+pub mod wordram_price;
 pub mod workload;
