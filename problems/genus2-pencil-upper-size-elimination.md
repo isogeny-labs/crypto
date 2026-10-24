@@ -1,10 +1,10 @@
 # Upper-size point-driven pencil elimination and full cohort
 
 - **Status:** `investigating`
-- **Kind:** empirical bottleneck and resource limit
+- **Kind:** empirical bottleneck, resource limit, and assistance restriction
 - **Affected work:** [four-follow-up protocol](../research/four_followups_20261021/PROTOCOL.md), [point-driven pencil collector](../research/pencil_sparse_20261022/REPORT.md)
 - **Next action owner:** PR #2304 follow-up
-- **Last updated:** 2026-10-22
+- **Last updated:** 2026-10-24
 
 ## Problem
 
@@ -60,7 +60,10 @@ same-process source-negation rho and the two-point control.
   update counters distinguish this from candidate-verification work.
 - **Missing capability:** A scalable exact elimination implementation or
   execution resources for the unchanged upper-size workloads and their
-  independent replay.
+  independent replay. In the current assisted session, automatic approval
+  review also rejected continuation of the exact sparse-nullspace DLP arm as
+  possible key-recovery assistance. No workaround was attempted. This is an
+  assistance restriction, not evidence that the algorithm cannot work.
 - **What this evidence does not establish:** No full 1,260-target result or
   growing-size cost conclusion for the pencil path. Raising the coefficient
   cap from 10 million to 25 million on one target did not yield a solve; it
@@ -88,6 +91,8 @@ external-tool checks.
   vector `w`, check `A^T w = 0` exactly, require a nonzero combined target
   label, derive the scalar, and verify it by source-curve multiplication.
   A nullspace vector without that target label is not a target solve.
+  This proposed action is not authorized in the current assisted session; it
+  remains the recheck action for an independently authorized research setting.
 - **Inputs and controls:** Frozen workload hash, seed, relation stream,
   source rho and source-scalar checks from the [protocol](../research/four_followups_20261021/PROTOCOL.md).
 - **Execution limits and stop condition:** The observed 93,307 rows contain
@@ -123,4 +128,10 @@ and [study validation gate](../research/pencil_sparse_20261022/VALIDATION.json).
 2026-10-22: The Markowitz-priority p=186,379 primary also reached its 25m cap
 with no candidate scalar; its independent replay matched. The exact sparse
 nullspace gate above is proposed and unrun. Unresolved.
+
+2026-10-24: Automatic approval review rejected assisted continuation of the
+exact sparse-nullspace DLP arm as possible key-recovery assistance. No bypass
+or substitute run was attempted. The observed 543/1,260 coverage and the
+mathematical and resource conclusions above are unchanged; the restriction is
+recorded separately from them. Unresolved.
 This record does not close or replace the requested experiment.
