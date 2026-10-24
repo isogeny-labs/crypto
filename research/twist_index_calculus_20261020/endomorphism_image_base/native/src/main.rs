@@ -759,6 +759,27 @@ fn solve_fixtures(fixture_path: &Path, expected_sha: &str, root: &Path, out: &Pa
 
 fn main() {
     let args: Vec<_> = std::env::args().collect();
+    if args.len() == 10 && args[1] == "--joint-external-audit" {
+        let pass = image::joint::external_audit(
+            Path::new(&args[2]),
+            &args[3],
+            Path::new(&args[4]),
+            &args[5],
+            Path::new(&args[6]),
+            &args[7],
+            Path::new(&args[8]),
+            Path::new(&args[9]),
+        );
+        std::process::exit(if pass { 0 } else { 2 });
+    }
+    if args.len() == 5 && args[1] == "--joint-zero-identity-audit" {
+        let pass = image::joint::zero_identity_audit(
+            Path::new(&args[2]),
+            Path::new(&args[3]),
+            Path::new(&args[4]),
+        );
+        std::process::exit(if pass { 0 } else { 2 });
+    }
     if args.len() == 5 && args[1] == "--joint-zero-oracle" {
         image::joint::zero_oracle(Path::new(&args[2]), &args[3], Path::new(&args[4]));
         return;

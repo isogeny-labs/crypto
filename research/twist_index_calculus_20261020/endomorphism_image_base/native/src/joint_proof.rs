@@ -131,7 +131,7 @@ pub(super) fn write_proofs(out: &Path) {
         proofs.push(json!({"map":name,"certificate_id":cert.id,"exact_integer_remainder_terms":0,"additional_checks":32,"mutated_identity_rejected":true,"certificate_path":path.file_name().unwrap().to_str().unwrap()}));
     }
     std::fs::write(
-        out.join("OrbitCoordinates.lean"),
+        out.join("OrbitCoordinates.lean.txt"),
         r#"import Std.Tactic
 set_option maxRecDepth 10000
 set_option maxHeartbeats 3000000

@@ -1,6 +1,8 @@
 //! Joint mixed-image S5 construction. Candidate input excludes reference data.
 //! Process durations in this module are not admitted performance measurements.
 use super::*;
+#[path = "../../../joint_image_elimination/native/external_check.rs"]
+mod external_check;
 #[path = "joint_proof.rs"]
 mod proof;
 #[path = "joint_report.rs"]
@@ -11,6 +13,8 @@ mod solver;
 mod uniform;
 #[path = "joint_variants.rs"]
 mod variants;
+#[path = "../../../joint_image_elimination/native/zero_identity.rs"]
+mod zero_identity;
 
 pub(crate) fn zero_oracle(public: &Path, sha: &str, out: &Path) {
     uniform::zero(public, sha, out)
@@ -20,6 +24,23 @@ pub(crate) fn population_oracle(public: &Path, sha: &str, out: &Path) {
 }
 pub(crate) fn population_summary(run: &Path, out: &Path) -> bool {
     uniform::summarize(run, out)
+}
+pub(crate) fn external_audit(
+    public: &Path,
+    public_sha: &str,
+    system: &Path,
+    system_sha: &str,
+    basis: &Path,
+    basis_sha: &str,
+    reference: &Path,
+    out: &Path,
+) -> bool {
+    external_check::audit(
+        public, public_sha, system, system_sha, basis, basis_sha, reference, out,
+    )
+}
+pub(crate) fn zero_identity_audit(run: &Path, public_root: &Path, out: &Path) -> bool {
+    zero_identity::audit(run, public_root, out)
 }
 
 pub(crate) fn construction_report(run: &Path, out: &Path) -> bool {
