@@ -75,8 +75,12 @@ def acquire(db, ec2, table, key, origin, owner):
         return True
     prior_dead = (current.get('OwnerTerminated', {}).get('BOOL') is True or
                   (prior == origin and (origin_dead or released)))
-    if prior != owner and not prior_dead and state(ec2, prior) != 'terminated':
-        return False
+    confirmed_prior_dead = (current.get('OwnerTerminated', {}).get('BOOL') is True
+                            or (prior == origin and origin_dead))
+    if prior != owner and not prior_dead:
+        if state(ec2, prior) != 'terminated':
+            return False
+        confirmed_prior_dead = True
     # A node may not resurrect old source work while its source remains alive.
     if (owner != origin and not origin_dead and not released
             and state(ec2, origin) != 'terminated'):
@@ -93,6 +97,15 @@ def acquire(db, ec2, table, key, origin, owner):
                       expression_attribute_values={':prior':{'S':prior}})
     else:
         kwargs['condition_expression'] = 'attribute_not_exists(Id)'
+    if prior != owner and confirmed_prior_dead:
+        # Preserve the predecessor fence before its mutable ownership row is
+        # replaced, even if the scheduled controller has not observed death yet.
+        db('put-item', table_name=table, item={
+            'Id': {'S': 'terminated-owner-' + prior}, 'Owner': {'S': prior},
+            'Origin': {'S': origin}, 'OwnerTerminated': {'BOOL': True}},
+            condition_expression='attribute_not_exists(Id) OR (#owner = :owner AND #origin = :origin)',
+            expression_attribute_names={'#owner': 'Owner', '#origin': 'Origin'},
+            expression_attribute_values={':owner': {'S': prior}, ':origin': {'S': origin}})
     db('put-item', **kwargs)
     return True
 

@@ -141,6 +141,68 @@ remain open. Disk use still grows; this is not an empirical full-class RSS
 measurement or completed enumeration. The old header bound remains valid
 for the old backend.
 
+2026-10-18: [the frozen continuation](../research/prime61_disk_continue_20261018/README.md)
+restored the real Drive checkpoint into a fresh workspace and extended it
+to 1,344 discovered curves, 256 expanded sources, 3,840 verified maps and
+512 measured curves. All 6,144 committed streams complete 614,400,000
+target trials with zero relations or solves. Of those, 5,376 streams and
+537,600,000 trials are new; collection replays are separate controls.
+All 1,500 inherited immutable rows are unchanged. All three new Drive
+archives pass metadata, byte, manifest and restore comparisons. Worker
+peak RSS across the phases is 18,396 KiB; final live database size is
+3,387,392 bytes. This remains prefix capacity evidence. There are 1,088
+pending sources and 832 discovered unmeasured curves.
+
+The current main source failed unrelated ecbench compilation; the
+preregistered amendment pins the validated prior source `b68341cd` for
+the continuation. Its release library and example tests pass after
+materializing the tracked sparse-checkout fixtures; the failed attempts
+remain recorded. No class-count, selected-prime generation, full-run
+provisioning or class-wide ranking obligation is closed. Next freeze a
+larger envelope from this checkpoint while separately certifying class
+coverage; a larger prefix alone still cannot discharge the full request.
+
+2026-10-18, larger frozen extension:
+[the additive study](../research/prime61_disk_extend_20261018/README.md)
+reaches 4,184 discovered curves, 1,024 expanded sources, 15,360 verified maps
+and 1,024 measured curves. Its 12,288 committed streams perform
+1,228,800,000 target trials with zero relations/solves. All 11,330 inherited
+immutable logical rows match. Both new Drive checkpoint round trips pass;
+the final restored database reproduces the native logical dump exactly.
+Worker peak RSS across the native phases is 20,044 KiB; the final live
+database occupies 11,173,888 bytes. There are 3,160 pending sources.
+This is another bounded prefix; the growing disk index and full workloads
+remain unresolved.
+
+The separate [explicit class-relation certificate](../research/prime61_disk_extend_20261018/COMPONENT-CERTIFICATE.md)
+now establishes that the eight selected prime classes generate exactly
+545,296,208 proper ideal classes, with structure C68162026 × C2^3.
+An odd prime-order generator, four independent involutions, sixteen
+canonical products and eight exact generator relations supply this result
+without a whole-class-number oracle. A separate witness checker using the
+same PARI library rejects two corruptions. Under standard ordinary
+maximal-order CM theory, the selected curve component has this size.
+**This settles the selected subgroup size, not its equality with the whole
+class group or the requested enumeration.** The entire class number still
+needs a rigorous upper certificate. Earlier conditional whole-class values
+remain conditional; earlier frozen evidence is not rewritten.
+
+The Lean project checks fourteen explicit finite/arithmetic theorems;
+the axiom gate audits sixteen including two generated equation lemmas,
+with no extra trusted axioms. Coordinate encoding and its inverse are
+formalized. Proper ideal classes, native exact-form arithmetic, the group
+cardinality argument and CM bridges remain outside Lean, as the proof maps
+state. No full formalization claim is made.
+
+The next discriminating implementation step is a coordinate-based streaming
+walker using the certified C68162026 × C2^3 structure. It is not implemented
+or tested. First validate complete small-class coordinate/orientation sets
+and transported targets, plus degree-97/113 involution-map controls; then
+freeze full-run storage and compute. Separately certify a whole-class upper
+bound, so the chosen component can be equated with the entire horizontal
+class. Existing vertical-edge exclusion remains valid. No full-class ranking,
+full-cost gain, paid remote run or scheduled unattended continuation is claimed.
+
 2026-10-18: unresolved. Coverage design, sizing probes and a draft
 protocol are recorded in the card; no class enumeration or measurement was
 started. The unconditional vertex lower bound rises to 545,296,208
