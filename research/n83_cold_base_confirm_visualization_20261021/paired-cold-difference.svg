@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>',
+       f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-labelledby="title desc">',
+       '<title id="title">Paired cold-process difference by public point</title>',
+       f'<desc id="desc">All 16 points favor K1107. Mean K1103 minus K1107 is {mean:.3f} seconds; 95% paired Student-t interval [{lo:.3f}, {hi:.3f}] seconds.</desc>',
+       '<rect width="100%" height="100%" fill="white"/>',
+       '<style>text{font-family:system-ui,sans-serif;fill:#182230}.grid{stroke:#d9e0e8}.axis{stroke:#344054;stroke-width:1.5}.point{fill:#1769aa;stroke:white;stroke-width:1.5}.mean{stroke:#bd4b00;stroke-width:3}.ci{stroke:#bd4b00;stroke-width:2;stroke-dasharray:7 5}.band{fill:#f4a261;fill-opacity:.18}.small{font-size:14px}.label{font-size:16px}.title{font-size:22px;font-weight:700}.sub{font-size:15px;fill:#475467}</style>',
+       '<text class="title" x="105" y="32">K1107 cold-process advantage on 16 held-out N83 points</text>',
+       f'<text class="sub" x="105" y="56">K1103 − K1107; positive favors K1107. Mean {mean:.3f} s, 95% CI [{lo:.3f}, {hi:.3f}] s.</text>']
+    for t in (0,.5,1,1.5,2):
+        yy=y(t);s.extend([f'<line class="grid" x1="{L}" y1="{yy:.1f}" x2="{R}" y2="{yy:.1f}"/>',f'<text class="small" x="{L-12}" y="{yy+5:.1f}" text-anchor="end">{t:.1f}</text>'])
+    s.append(f'<rect class="band" x="{L}" y="{y(hi):.1f}" width="{R-L}" height="{y(lo)-y(hi):.1f}"/>')
+    for i in range(1,17):
+        xx=x(i);s.extend([f'<line class="grid" x1="{xx:.1f}" y1="{T}" x2="{xx:.1f}" y2="{B}"/>',f'<text class="small" x="{xx:.1f}" y="{B+22}" text-anchor="middle">{i}</text>'])
+    s.extend([f'<line class="axis" x1="{L}" y1="{B}" x2="{R}" y2="{B}"/>',f'<line class="axis" x1="{L}" y1="{T}" x2="{L}" y2="{B}"/>',f'<line class="ci" x1="{L}" y1="{y(lo):.1f}" x2="{R}" y2="{y(lo):.1f}"/>',f'<line class="ci" x1="{L}" y1="{y(hi):.1f}" x2="{R}" y2="{y(hi):.1f}"/>',f'<line class="mean" x1="{L}" y1="{y(mean):.1f}" x2="{R}" y2="{y(mean):.1f}"/>'])
+    for i,v in pts:s.append(f'<circle class="point" cx="{x(i):.1f}" cy="{y(v):.1f}" r="6"><title>Point {i}: {v:.3f} s</title></circle>')
+    s.extend([f'<text class="label" x="{(L+R)/2}" y="{B+52}" text-anchor="middle">Public point index (n = 16)</text>',f'<text class="label" transform="translate(27 {(T+B)/2}) rotate(-90)" text-anchor="middle">Cold-process difference (seconds)</text>','<line class="mean" x1="655" y1="515" x2="690" y2="515"/><text class="small" x="699" y="520">paired mean</text>','<line class="ci" x1="805" y1="515" x2="840" y2="515"/><text class="small" x="849" y="520">95% CI</text>','<text class="small" x="105" y="552">Source: research/n83_cold_base_confirm_20261021/results/analysis.json; cold selection only.</text>','</svg>',''])
+    return '\n'.join(s).encode()
+def main():
+    p=argparse.ArgumentParser();p.add_argument("--check",action="store_true");args=p.parse_args()
+    data=render(json.loads(SOURCE.read_text()))
+    if args.check:
+        if not OUTPUT.exists() or OUTPUT.read_bytes()!=data: raise SystemExit("graph differs from admitted analysis")
+    else: OUTPUT.write_bytes(data)
+    print("PASS paired-cold-difference.svg (16 points)")
+if __name__=="__main__":main()
+
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="570" viewBox="0 0 1000 570" role="img" aria-labelledby="title desc">
+<title id="title">Paired cold-process difference by public point</title>
+<desc id="desc">All 16 points favor K1107. Mean K1103 minus K1107 is 1.195 seconds; 95% paired Student-t interval [0.957, 1.433] seconds.</desc>
+<rect width="100%" height="100%" fill="white"/>
+<style>text{font-family:system-ui,sans-serif;fill:#182230}.grid{stroke:#d9e0e8}.axis{stroke:#344054;stroke-width:1.5}.point{fill:#1769aa;stroke:white;stroke-width:1.5}.mean{stroke:#bd4b00;stroke-width:3}.ci{stroke:#bd4b00;stroke-width:2;stroke-dasharray:7 5}.band{fill:#f4a261;fill-opacity:.18}.small{font-size:14px}.label{font-size:16px}.title{font-size:22px;font-weight:700}.sub{font-size:15px;fill:#475467}</style>
+<text class="title" x="105" y="32">K1107 cold-process advantage on 16 held-out N83 points</text>
+<text class="sub" x="105" y="56">K1103 − K1107; positive favors K1107. Mean 1.195 s, 95% CI [0.957, 1.433] s.</text>
+<line class="grid" x1="105" y1="440.0" x2="950" y2="440.0"/>
+<text class="small" x="93" y="445.0" text-anchor="end">0.0</text>
+<line class="grid" x1="105" y1="357.0" x2="950" y2="357.0"/>
+<text class="small" x="93" y="362.0" text-anchor="end">0.5</text>
+<line class="grid" x1="105" y1="274.1" x2="950" y2="274.1"/>
+<text class="small" x="93" y="279.1" text-anchor="end">1.0</text>
+<line class="grid" x1="105" y1="191.1" x2="950" y2="191.1"/>
+<text class="small" x="93" y="196.1" text-anchor="end">1.5</text>
+<line class="grid" x1="105" y1="108.2" x2="950" y2="108.2"/>
+<text class="small" x="93" y="113.2" text-anchor="end">2.0</text>
+<rect class="band" x="105" y="202.3" width="845" height="78.9"/>
+<line class="grid" x1="105.0" y1="75" x2="105.0" y2="440"/>
+<text class="small" x="105.0" y="462" text-anchor="middle">1</text>
+<line class="grid" x1="161.3" y1="75" x2="161.3" y2="440"/>
+<text class="small" x="161.3" y="462" text-anchor="middle">2</text>
+<line class="grid" x1="217.7" y1="75" x2="217.7" y2="440"/>
+<text class="small" x="217.7" y="462" text-anchor="middle">3</text>
+<line class="grid" x1="274.0" y1="75" x2="274.0" y2="440"/>
+<text class="small" x="274.0" y="462" text-anchor="middle">4</text>
+<line class="grid" x1="330.3" y1="75" x2="330.3" y2="440"/>
+<text class="small" x="330.3" y="462" text-anchor="middle">5</text>
+<line class="grid" x1="386.7" y1="75" x2="386.7" y2="440"/>
+<text class="small" x="386.7" y="462" text-anchor="middle">6</text>
+<line class="grid" x1="443.0" y1="75" x2="443.0" y2="440"/>
+<text class="small" x="443.0" y="462" text-anchor="middle">7</text>
+<line class="grid" x1="499.3" y1="75" x2="499.3" y2="440"/>
+<text class="small" x="499.3" y="462" text-anchor="middle">8</text>
+<line class="grid" x1="555.7" y1="75" x2="555.7" y2="440"/>
+<text class="small" x="555.7" y="462" text-anchor="middle">9</text>
+<line class="grid" x1="612.0" y1="75" x2="612.0" y2="440"/>
+<text class="small" x="612.0" y="462" text-anchor="middle">10</text>
+<line class="grid" x1="668.3" y1="75" x2="668.3" y2="440"/>
+<text class="small" x="668.3" y="462" text-anchor="middle">11</text>
+<line class="grid" x1="724.7" y1="75" x2="724.7" y2="440"/>
+<text class="small" x="724.7" y="462" text-anchor="middle">12</text>
+<line class="grid" x1="781.0" y1="75" x2="781.0" y2="440"/>
+<text class="small" x="781.0" y="462" text-anchor="middle">13</text>
+<line class="grid" x1="837.3" y1="75" x2="837.3" y2="440"/>
+<text class="small" x="837.3" y="462" text-anchor="middle">14</text>
+<line class="grid" x1="893.7" y1="75" x2="893.7" y2="440"/>
+<text class="small" x="893.7" y="462" text-anchor="middle">15</text>
+<line class="grid" x1="950.0" y1="75" x2="950.0" y2="440"/>
+<text class="small" x="950.0" y="462" text-anchor="middle">16</text>
+<line class="axis" x1="105" y1="440" x2="950" y2="440"/>
+<line class="axis" x1="105" y1="75" x2="105" y2="440"/>
+<line class="ci" x1="105" y1="281.2" x2="950" y2="281.2"/>
+<line class="ci" x1="105" y1="202.3" x2="950" y2="202.3"/>
+<line class="mean" x1="105" y1="241.7" x2="950" y2="241.7"/>
+<circle class="point" cx="105.0" cy="273.0" r="6"><title>Point 1: 1.007 s</title></circle>
+<circle class="point" cx="161.3" cy="200.4" r="6"><title>Point 2: 1.444 s</title></circle>
+<circle class="point" cx="217.7" cy="237.7" r="6"><title>Point 3: 1.219 s</title></circle>
+<circle class="point" cx="274.0" cy="368.8" r="6"><title>Point 4: 0.429 s</title></circle>
+<circle class="point" cx="330.3" cy="111.8" r="6"><title>Point 5: 1.978 s</title></circle>
+<circle class="point" cx="386.7" cy="288.2" r="6"><title>Point 6: 0.915 s</title></circle>
+<circle class="point" cx="443.0" cy="228.4" r="6"><title>Point 7: 1.275 s</title></circle>
+<circle class="point" cx="499.3" cy="191.3" r="6"><title>Point 8: 1.499 s</title></circle>
+<circle class="point" cx="555.7" cy="149.1" r="6"><title>Point 9: 1.753 s</title></circle>
+<circle class="point" cx="612.0" cy="351.3" r="6"><title>Point 10: 0.535 s</title></circle>
+<circle class="point" cx="668.3" cy="212.8" r="6"><title>Point 11: 1.369 s</title></circle>
+<circle class="point" cx="724.7" cy="211.8" r="6"><title>Point 12: 1.376 s</title></circle>
+<circle class="point" cx="781.0" cy="210.5" r="6"><title>Point 13: 1.383 s</title></circle>
+<circle class="point" cx="837.3" cy="373.6" r="6"><title>Point 14: 0.400 s</title></circle>
+<circle class="point" cx="893.7" cy="213.0" r="6"><title>Point 15: 1.368 s</title></circle>
+<circle class="point" cx="950.0" cy="245.9" r="6"><title>Point 16: 1.170 s</title></circle>
+<text class="label" x="527.5" y="492" text-anchor="middle">Public point index (n = 16)</text>
+<text class="label" transform="translate(27 257.5) rotate(-90)" text-anchor="middle">Cold-process difference (seconds)</text>
+<line class="mean" x1="655" y1="515" x2="690" y2="515"/><text class="small" x="699" y="520">paired mean</text>
+<line class="ci" x1="805" y1="515" x2="840" y2="515"/><text class="small" x="849" y="520">95% CI</text>
+<text class="small" x="105" y="552">Source: research/n83_cold_base_confirm_20261021/results/analysis.json; cold selection only.</text>
+</svg>
