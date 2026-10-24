@@ -109,8 +109,7 @@ pub fn pmac<C: BlockCipher128>(cipher: &C, message: &[u8]) -> [u8; 16] {
         message.len().div_ceil(BLOCK)
     };
     let max_log = if m > 1 {
-        // `bit_width` is unstable on the CI toolchain; for m > 1 this equals it.
-        (m - 1).ilog2() as usize + 1
+        (usize::BITS - (m - 1).leading_zeros()) as usize
     } else {
         1
     };
