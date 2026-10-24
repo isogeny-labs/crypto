@@ -3393,6 +3393,13 @@ enum StreamingHash {
     Blake2b(crypto_lib::hash::blake2b::Blake2bStream),
     Blake2s(crypto_lib::hash::blake2s::Blake2sStream),
     Sm3(crypto_lib::hash::sm3::Sm3),
+    Ripemd160(crypto_lib::hash::ripemd160::Ripemd160Stream),
+    Streebog(crypto_lib::hash::streebog::Streebog),
+    Whirlpool(crypto_lib::hash::whirlpool::Whirlpool),
+    Tiger(crypto_lib::hash::tiger::Tiger),
+    Skein256(crypto_lib::hash::skein::SkeinStream<32>),
+    Skein512(crypto_lib::hash::skein::SkeinStream<64>),
+    Skein1024(crypto_lib::hash::skein::SkeinStream<128>),
 }
 
 /// MD4 and MD5 have the same block size, padding, and initial state.
@@ -3535,6 +3542,36 @@ fn cmd_hash_file_streamed(
             StreamingHash::Blake2s(crypto_lib::hash::blake2s::Blake2sStream::new(length))
         }
         "sm3" => StreamingHash::Sm3(crypto_lib::hash::sm3::Sm3::new()),
+        "ripemd160" => {
+            StreamingHash::Ripemd160(crypto_lib::hash::ripemd160::Ripemd160Stream::new())
+        }
+        "streebog-256" => StreamingHash::Streebog(crypto_lib::hash::streebog::Streebog::new_256()),
+        "streebog-512" => StreamingHash::Streebog(crypto_lib::hash::streebog::Streebog::new_512()),
+        "whirlpool" => StreamingHash::Whirlpool(crypto_lib::hash::whirlpool::Whirlpool::new()),
+        "tiger" => StreamingHash::Tiger(crypto_lib::hash::tiger::Tiger::new()),
+        "tiger2" => StreamingHash::Tiger(crypto_lib::hash::tiger::Tiger::new_tiger2()),
+        "skein256" | "skein512" | "skein1024" => {
+            let default = match algorithm {
+                "skein256" => 32,
+                "skein512" => 64,
+                _ => 128,
+            };
+            let length = output_bytes.unwrap_or(default);
+            if !(1..=1_048_576).contains(&length) {
+                return Err("Skein --output-bytes must be in 1..=1048576".into());
+            }
+            match algorithm {
+                "skein256" => StreamingHash::Skein256(
+                    crypto_lib::hash::skein::SkeinStream::<32>::new_256(length),
+                ),
+                "skein512" => StreamingHash::Skein512(
+                    crypto_lib::hash::skein::SkeinStream::<64>::new_512(length),
+                ),
+                _ => StreamingHash::Skein1024(
+                    crypto_lib::hash::skein::SkeinStream::<128>::new_1024(length),
+                ),
+            }
+        }
         _ => return Ok(None),
     };
     // Reuse the text-input parameter checks, including SHAKE's output bound
@@ -3567,6 +3604,13 @@ fn cmd_hash_file_streamed(
             StreamingHash::Blake2b(state) => state.update(&buffer[..count]),
             StreamingHash::Blake2s(state) => state.update(&buffer[..count]),
             StreamingHash::Sm3(state) => state.update(&buffer[..count]),
+            StreamingHash::Ripemd160(state) => state.update(&buffer[..count]),
+            StreamingHash::Streebog(state) => state.update(&buffer[..count]),
+            StreamingHash::Whirlpool(state) => state.update(&buffer[..count]),
+            StreamingHash::Tiger(state) => state.update(&buffer[..count]),
+            StreamingHash::Skein256(state) => state.update(&buffer[..count]),
+            StreamingHash::Skein512(state) => state.update(&buffer[..count]),
+            StreamingHash::Skein1024(state) => state.update(&buffer[..count]),
         }
     }
     let digest = match engine {
@@ -3583,6 +3627,13 @@ fn cmd_hash_file_streamed(
         StreamingHash::Blake2b(state) => state.finalize(),
         StreamingHash::Blake2s(state) => state.finalize(),
         StreamingHash::Sm3(state) => state.finalize().to_vec(),
+        StreamingHash::Ripemd160(state) => state.finalize().to_vec(),
+        StreamingHash::Streebog(state) => state.finalize(),
+        StreamingHash::Whirlpool(state) => state.finalize().to_vec(),
+        StreamingHash::Tiger(state) => state.finalize().to_vec(),
+        StreamingHash::Skein256(state) => state.finalize(),
+        StreamingHash::Skein512(state) => state.finalize(),
+        StreamingHash::Skein1024(state) => state.finalize(),
     };
     Ok(Some(to_hex(&digest)))
 }
@@ -4262,6 +4313,89 @@ mod hash_cli_tests {
                     let got = cmd_hash_file_streamed(name, &path, Some(length), None, None)
                         .unwrap()
                         .expect("BLAKE2 files stream");
+                    assert_eq!(
+                        got,
+                        cmd_hash(name, &bytes, Some(length)).unwrap(),
+                        "{name} at {size}, {length} bytes"
+                    );
+                }
+            }
+        }
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn ripemd160_file_streaming_matches_one_shot_at_padding_boundaries() {
+        let path = std::env::temp_dir().join(format!(
+            "crypto-ripemd160-stream-{}-{}.bin",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        for size in [0, 1, 55, 56, 63, 64, 65, 119, 120, 127, 128, 65_535, 65_537] {
+            let bytes: Vec<u8> = (0..size).map(|i| (i * 37) as u8).collect();
+            std::fs::write(&path, &bytes).unwrap();
+            let got = cmd_hash_file_streamed("ripemd160", &path, None, None, None)
+                .unwrap()
+                .expect("RIPEMD-160 files stream");
+            assert_eq!(got, cmd_hash("ripemd160", &bytes, None).unwrap(), "{size}");
+        }
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn existing_incremental_hashes_stream_from_files() {
+        let path = std::env::temp_dir().join(format!(
+            "crypto-other-stream-{}-{}.bin",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        for size in [0, 1, 31, 32, 33, 55, 56, 63, 64, 65, 127, 128, 129, 65_537] {
+            let bytes: Vec<u8> = (0..size).map(|i| (i * 37) as u8).collect();
+            std::fs::write(&path, &bytes).unwrap();
+            for name in [
+                "streebog-256",
+                "streebog-512",
+                "whirlpool",
+                "tiger",
+                "tiger2",
+            ] {
+                let got = cmd_hash_file_streamed(name, &path, None, None, None)
+                    .unwrap()
+                    .expect("incremental hash files stream");
+                assert_eq!(
+                    got,
+                    cmd_hash(name, &bytes, None).unwrap(),
+                    "{name} at {size}"
+                );
+            }
+        }
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn skein_file_streaming_matches_one_shot_across_ubi_boundaries() {
+        let path = std::env::temp_dir().join(format!(
+            "crypto-skein-stream-{}-{}.bin",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        for size in [0, 1, 31, 32, 33, 63, 64, 65, 127, 128, 129, 65_537] {
+            let bytes: Vec<u8> = (0..size).map(|i| (i * 37) as u8).collect();
+            std::fs::write(&path, &bytes).unwrap();
+            for name in ["skein256", "skein512", "skein1024"] {
+                for length in [1, 32, 129] {
+                    let got = cmd_hash_file_streamed(name, &path, Some(length), None, None)
+                        .unwrap()
+                        .expect("Skein files stream");
                     assert_eq!(
                         got,
                         cmd_hash(name, &bytes, Some(length)).unwrap(),

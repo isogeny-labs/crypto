@@ -151,6 +151,67 @@ fn compress(state: &mut [u32; 5], block: &[u8; 64]) {
     state[0] = t;
 }
 
+/// Incremental RIPEMD-160 state for bounded-memory file hashing.
+pub struct Ripemd160Stream {
+    state: [u32; 5],
+    block: [u8; 64],
+    filled: usize,
+    length: u64,
+}
+
+impl Ripemd160Stream {
+    pub fn new() -> Self {
+        Self {
+            state: RIPEMD160_IV,
+            block: [0; 64],
+            filled: 0,
+            length: 0,
+        }
+    }
+
+    pub fn update(&mut self, mut data: &[u8]) {
+        self.length = self.length.wrapping_add(data.len() as u64);
+        if self.filled != 0 {
+            let take = data.len().min(64 - self.filled);
+            self.block[self.filled..self.filled + take].copy_from_slice(&data[..take]);
+            self.filled += take;
+            data = &data[take..];
+            if self.filled < 64 {
+                return;
+            }
+            let block = self.block;
+            compress(&mut self.state, &block);
+            self.filled = 0;
+        }
+        for chunk in data.chunks_exact(64) {
+            let mut block = [0; 64];
+            block.copy_from_slice(chunk);
+            compress(&mut self.state, &block);
+        }
+        let whole = data.len() - data.len() % 64;
+        self.filled = data.len() - whole;
+        self.block[..self.filled].copy_from_slice(&data[whole..]);
+    }
+
+    pub fn finalize(mut self) -> [u8; 20] {
+        let mut tail = [0u8; 128];
+        tail[..self.filled].copy_from_slice(&self.block[..self.filled]);
+        tail[self.filled] = 0x80;
+        let end = if self.filled < 56 { 64 } else { 128 };
+        tail[end - 8..end].copy_from_slice(&self.length.wrapping_mul(8).to_le_bytes());
+        for chunk in tail[..end].chunks_exact(64) {
+            let mut block = [0; 64];
+            block.copy_from_slice(chunk);
+            compress(&mut self.state, &block);
+        }
+        let mut digest = [0u8; 20];
+        for (index, word) in self.state.iter().enumerate() {
+            digest[index * 4..index * 4 + 4].copy_from_slice(&word.to_le_bytes());
+        }
+        digest
+    }
+}
+
 /// RIPEMD-160 of an arbitrary-length message.  Returns 20 bytes.
 pub fn ripemd160(message: &[u8]) -> [u8; 20] {
     let mut state = RIPEMD160_IV;
@@ -187,6 +248,20 @@ pub fn hash160(input: &[u8]) -> [u8; 20] {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn streaming_matches_one_shot_across_split_padding_blocks() {
+        for size in [0, 1, 55, 56, 63, 64, 65, 119, 120, 127, 128, 129, 1025] {
+            let input: Vec<u8> = (0..size).map(|i| (i * 37) as u8).collect();
+            for split in [1, 7, 64, 65] {
+                let mut stream = Ripemd160Stream::new();
+                for chunk in input.chunks(split) {
+                    stream.update(chunk);
+                }
+                assert_eq!(stream.finalize(), ripemd160(&input), "{size}/{split}");
+            }
+        }
+    }
 
     fn hex(bytes: &[u8]) -> String {
         bytes.iter().map(|b| format!("{:02x}", b)).collect()
