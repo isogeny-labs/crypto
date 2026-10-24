@@ -433,8 +433,10 @@ negative bar fails that bar.}
 \begin{description}[style=nextline]
 \item[Tier A: gate count under MAXDEPTH (NIST's stated metric).] L1, L3 and
   L5 clear the AES-128, -192 and -256 references at all three depth limits.
-  The margins are 21, 25 and 26 bits at the tightest limit. In this metric
-  they are \emph{conjectured} to be categories 1, 3 and 5.
+  Under the corrected $2^{7.5}$ step cost, the margins at the tightest limit
+  are about 20.2, 24 and 25 bits; the table and figure retain the original
+  $2^8$ model. In this metric they are \emph{conjectured} to be categories
+  1, 3 and 5.
 \item[Tier B: at least $2^\lambda$ quantum queries against every known attack.]
   The binding attack on the L sets, Grover over the mask ratio, needs only
   $2^{\lambda/2}$ queries. That is $2^{64.5}$ at L1 and $2^{96.5}$ at L3,
