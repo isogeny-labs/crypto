@@ -90,7 +90,11 @@ jobs:
       run:
         working-directory: taskq/deploy/ephemeral/cli
     steps:
+      # The crate is self-contained; the full 8 GB checkout plus its build no
+      # longer fits a hosted runner's disk.
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: taskq/deploy/ephemeral/cli
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
