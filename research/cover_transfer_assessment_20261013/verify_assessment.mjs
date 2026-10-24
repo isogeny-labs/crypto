@@ -848,7 +848,7 @@ check(
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "18515104e8b1e694698e5030781eb9545bce01ff";
+const expectedCatalogCommit = "887c1fde02e06ae605a11c40b93a2b7af6eaca0c";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -1075,9 +1075,9 @@ const expectedControlStatuses = {
 };
 const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
-  result_templates: "36b35108fb48f0575d6d16052ac22b746869931446eb7bcc4586839441eee0dd",
+  result_templates: "5470ecac7ef17b749fae984a64d979c59c91cdb3e8fdbbddba6031d6fa6e956e",
   profiles: "807800e78066e8c3b0caa6634072a585cf4ae924a40b13817d9ca7a3c0aa3710",
-  controls: "7531474486db1c3acc0c3a97bddc87ac468dd7a65e2beaa5e44e9a07898e28b6",
+  controls: "71022e3cd37db43c0f0a54742b66716d9c93477a6c26fd750ed44acc2d7cbaa7",
   open_obligations: "ba227bbd94320d317ccfbf71b1e0dd3f05854e7aa4e62693472dfdf34c8f2373",
   global_cost_accounting:
     "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",

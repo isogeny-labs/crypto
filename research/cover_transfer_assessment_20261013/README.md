@@ -412,7 +412,7 @@ screen is not imported as a map, order, or recovery certificate.
 The current source allowlist accepts all four catalog input profiles. The
 catalog-wide constructor test exercises the standalone `construct` path for
 all 2,572 models in catalog snapshot
-[18515104](https://github.com/aburan28/crypto/commit/18515104e8b1e694698e5030781eb9545bce01ff)
+[887c1fde](https://github.com/aburan28/crypto/commit/887c1fde02e06ae605a11c40b93a2b7af6eaca0c)
 (before the 2026-10-24 addendum,
 [8e4c9975](https://github.com/aburan28/crypto/commit/8e4c99759fd8d9594ed207d793b07b59ebaf19f7)). That commit pins the three
 catalog files (the cover-catalog manifest, report and graph); the test assertion is part of the current source. This is
@@ -580,33 +580,33 @@ python3 set_pdf_metadata.py
 pdfinfo cover_transfer_assessment_20261013.pdf
 ```
 
-# Addendum, 2026-10-24: catalog binding and one added binary triple
+# Addendum, 2026-10-24: catalog binding and restored EC1 bindings
 
 This assessment was frozen against the 2,572-row registry. After
 aburan28/crypto#2446 rebuilt `docs/curves/registry.json` to 15,791 rows
 (13,219 isogeny-volcano census curves), the report, graph and this ledger
-went stale on its digest. Two additive changes re-freeze the assessment:
+went stale on its digest. aburan28/crypto#2486 then re-sealed them over all
+15,791 rows; aburan28/crypto#2479 binds them back to the assessed rows:
 
-- `covers.json`, `cover-links.yaml` and this ledger now bind the registry
-  rows [`docs/curves/cover-catalog.json`](../../docs/curves/cover-catalog.json)
+- `covers.json`, `cover-links.yaml` and this ledger bind the registry rows
+  [`docs/curves/cover-catalog.json`](../../docs/curves/cover-catalog.json)
   names (`catalog_rows_sha256`; [`COVERS.md`](../../docs/curves/COVERS.md),
   "The cover catalog"), exactly the 2,572 rows assessed here. Census rows no
   longer stale them. Map counts, profiles and cover objects are unchanged.
-- The #2446 rebuild gave `icv1-f2m73-tm184271214331-9d25cc67` its first EC1
-  representation, `EC1N73Ce0h9999c3e90683`, from
-  `research/curve_shortlist_20261016/curves.json`. It is a binary degree-three
-  binding, so the binary subgroup population is 141, not 140, and the total
-  is 978 EC1 representations on 973 models, not 977 on 972. The native batch
-  test `every_binary_ec1_generator_has_checked_typed_transfer_hypotheses`
-  now asserts 141 and passes on it, with all six checks listed under "The 141
-  binary subgroup checks". Nothing else changed status.
-
-The same rebuild had also dropped 278 EC1 representations of catalog curves:
-the registry builder read a subgroup order only as `subgroup_order`, and the
-`research/conductor_gap_cm_orbits_20261015/prepared/*curve_ids.json` records
-call it `r`. The builder now accepts `r`, which restores those
-representations (257 byte-identical to the pre-#2446 rows, 21 with extra
-provenance), so the odd-characteristic count stays 837.
+- The #2446 rebuild had dropped 278 EC1 representations of catalog curves
+  (the conductor-gap `curve_ids.json` records name the subgroup order `r`).
+  aburan28/crypto#2474's harvester and the builder's `r` alias restore them,
+  so the odd-characteristic count stays 837.
+- `icv1-f2m73-tm184271214331-9d25cc67` gained two binary EC1
+  representations: `EC1N73Ce0h9999c3e90683`
+  (`research/curve_shortlist_20261016/curves.json`) and
+  `EC1N73Ce0h243f847bccdd` (`research/ic_single_target_20260930/curve_ids.json`).
+  The binary subgroup population is therefore 142, not 140, and the total
+  is 979 EC1 representations on 973 models, six with two, not 977 on 972.
+  The native batch test
+  `every_binary_ec1_generator_has_checked_typed_transfer_hypotheses` asserts
+  142 and passes, with all six checks listed under "The 142 binary subgroup
+  checks". Nothing else changed status.
 
 # Open obligations
 
