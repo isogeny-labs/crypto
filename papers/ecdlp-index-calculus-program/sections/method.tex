@@ -156,6 +156,13 @@ Building the harness and the ledger exposed errors in earlier claims,
 including our own. We list them because they change how earlier numbers
 must be read.
 \begin{enumerate}
+\item \emph{Results below rho that reversed against a stronger rho}
+  (September; \S\ref{sec:koblitz-strong}). A tournament candidate at
+  $0.5347$ of rho's instructions lost all five cells once rho used the same
+  canonical form (\art{research/ic_triple_counted_20260923/}); an orbit-DLP
+  ratio of $0.2403$ became $1.923$ against a strengthened rho and was
+  withdrawn; a compact-orbit batch lead of $0.309$ reversed against a
+  batched-inversion rho.
 \item \emph{Online Koblitz ratios relabelled} (7--8 October,
   \art{docs/ic/PLAN_IC_ACCOUNTING_FIXES_20261007.md}). Same-point online
   ratios of $124.85\times$ ($n=61$), $2{,}864.1\times$ ($n=71$),
@@ -211,6 +218,13 @@ must be read.
   \art{research/ic_frontier_campaign_20261015/select/SELECTION.md}): below
   rho with native work free, above it otherwise, so the pair is unresolved
   inside the band rather than a win for either side.
+\item \emph{Wall-time figures recomputed} (validation sweep). Recomputing
+  from the committed per-target records gives $2{,}321\times$ for the
+  $\ell=12$ binary MITM oracle (quoted $2{,}187\times$), $98.1\times$ for its
+  $\ell=8$ run 3 (quoted $100.7\times$), and $6.08\times$ and 6.14\,s for the
+  quartic solve at $d=6$ (quoted $6.4\times$ and 5.9\,s); all are shared-host
+  wall times left unvalidated, and the counted evidence behind them stands
+  (\art{research/validation_sweep_20261019/B-benchmarks/VERDICT_TABLE.md}).
 \item \emph{An unmatched rho reference} (21--24 October). The Koblitz
   leaderboard's rule v3 priced its rho as built rather than at the canonical
   batched step. Re-pricing rho in the same process raised the cold distance

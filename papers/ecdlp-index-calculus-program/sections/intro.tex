@@ -27,7 +27,9 @@ the measurement or proof that would settle it (\S\ref{sec:open}).
 
 The measurements come from one open repository and a programme of work
 there between July and October 2026 (\S\ref{sec:chronology}): about
-6{,}900 commits and 450 dated study directories, a boundary ledger
+6{,}900 commits and, on \texttt{main} at the paper's date, 784 study
+directories under \art{research/}, 205 benchmark rows, 39 open-problem
+records and about 400 research notes and programme documents, a boundary ledger
 (\art{docs/ic/boundary_targets.json}), a native harness
 (\art{src/cryptanalysis/ecbench/}), and the engineering results of
 \S\S\ref{sec:rootfinding}--\ref{sec:transfer}. It is easy, in a body of
@@ -37,6 +39,17 @@ result is stated with the boundary on which it was measured (oracle stage,
 complete solve, cold one-target cost, online cost after retained set-up),
 the unit, the sample, the interval, and the committed artefact that holds
 the records.
+
+The paper is meant to be exhaustive for that repository. The family
+sections (\S\ref{sec:koblitz} Koblitz, \S\ref{sec:binary} random and
+prime-degree binary, \S\ref{sec:prime} prime fields, \S\ref{sec:transfer}
+covers and transfers) discuss every line of work that produced a result,
+and Appendix~\ref{sec:catalogue} lists all 1{,}444 entries---every study
+directory, benchmark row, problem record and note---by family, with each
+one's headline number, class and status, and a check that none is missing.
+Work in open pull requests is listed separately and not used
+(Appendix~\ref{sec:openprs}). Other repositories of the same laboratory
+are out of scope.
 
 \paragraph{The routes measured.} The engineering lines, each a section below:
 \begin{enumerate}
