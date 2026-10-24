@@ -542,6 +542,17 @@ pub struct Conditions {
     /// `/proc/stat` ticks of the observed CPUs: the reservation and the
     /// run CPU's siblings (the field keeps its first name).
     pub reserved_ticks: BTreeMap<u32, CpuTicks>,
+    /// Threads that could run on the reservation when this was sampled
+    /// (grading version 3); absent when no scan was taken.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub intruders: Option<IntruderScan>,
+}
+
+/// [`conditions`] plus a scan of the reservation for intruders.
+pub fn conditions_scanned(observed: &[u32], reserved: &[u32]) -> Conditions {
+    let mut c = conditions(observed);
+    c.intruders = Some(scan_intruders(reserved));
+    c
 }
 
 pub fn conditions(reserved: &[u32]) -> Conditions {
@@ -562,6 +573,7 @@ pub fn conditions(reserved: &[u32]) -> Conditions {
             .iter()
             .filter_map(|c| ticks.get(c).map(|t| (*c, *t)))
             .collect(),
+        intruders: None,
     }
 }
 
@@ -660,6 +672,28 @@ pub struct EvictionSummary {
     /// per-CPU kernel thread).
     pub failed_user_threads: u64,
     pub failed_kernel_threads: u64,
+    /// Threads that exited between the affinity read and the write
+    /// (`ESRCH`): they are gone, so they are neither moved nor unmovable.
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub vanished_threads: u64,
+    /// Interrupt lines whose affinity was moved off the reserved CPUs
+    /// (`/proc/irq/<n>/smp_affinity_list`), restored when the eviction ends.
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub irq_moved: u64,
+    /// Interrupt lines that touch the reservation and could not be moved
+    /// (not root, a managed or per-CPU interrupt, or only the reservation
+    /// allowed).
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub irq_unmovable: u64,
+    /// Why interrupt affinity was left alone or partly refused, when it was
+    /// (the first error text); `None` when every line moved or none
+    /// touched the reservation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub irq_note: Option<String>,
+}
+
+fn is_zero(v: &u64) -> bool {
+    *v == 0
 }
 
 /// Threads moved off the reserved CPUs, put back when this is dropped
@@ -680,6 +714,9 @@ pub struct Eviction {
     /// Each narrowed mask the eviction set, and the original it came from.
     #[cfg_attr(not(target_os = "linux"), allow(dead_code))]
     narrowed: BTreeMap<Vec<u32>, Vec<u32>>,
+    /// `(irq, original smp_affinity_list)` of every interrupt line moved.
+    #[cfg_attr(not(target_os = "linux"), allow(dead_code))]
+    irqs: Vec<(u32, String)>,
     pub summary: EvictionSummary,
 }
 
@@ -733,16 +770,26 @@ fn other_threads() -> Vec<(i32, i32, bool)> {
     out
 }
 
+/// Set a thread's affinity; the error is the raw `errno`.
 #[cfg(target_os = "linux")]
-fn set_affinity(tid: i32, cpus: &[u32]) -> bool {
+fn set_affinity_errno(tid: i32, cpus: &[u32]) -> Result<(), i32> {
     // SAFETY: the set is zeroed and filled with valid indices.
     unsafe {
         let mut set: libc::cpu_set_t = std::mem::zeroed();
         for &c in cpus {
             libc::CPU_SET(c as usize, &mut set);
         }
-        libc::sched_setaffinity(tid, std::mem::size_of::<libc::cpu_set_t>(), &set) == 0
+        if libc::sched_setaffinity(tid, std::mem::size_of::<libc::cpu_set_t>(), &set) == 0 {
+            Ok(())
+        } else {
+            Err(std::io::Error::last_os_error().raw_os_error().unwrap_or(0))
+        }
     }
+}
+
+#[cfg(target_os = "linux")]
+fn set_affinity(tid: i32, cpus: &[u32]) -> bool {
+    set_affinity_errno(tid, cpus).is_ok()
 }
 
 #[cfg(target_os = "linux")]
@@ -781,17 +828,27 @@ pub fn evict(reserved: &[u32]) -> Eviction {
                 .copied()
                 .filter(|c| !reserved.contains(c))
                 .collect();
-            if !rest.is_empty() && set_affinity(tid, &rest) {
-                let start = thread_start_ticks(pid, tid).unwrap_or(0);
-                ev.narrowed.entry(rest).or_insert_with(|| mask.clone());
-                ev.moved.push((tid, start, mask));
-                ev.summary.moved_count += 1;
-            } else if kernel {
-                ev.summary.failed_kernel_threads += 1;
+            let moved = if rest.is_empty() {
+                Err(libc::EINVAL)
             } else {
-                ev.summary.failed_user_threads += 1;
+                set_affinity_errno(tid, &rest)
+            };
+            match moved {
+                Ok(()) => {
+                    let start = thread_start_ticks(pid, tid).unwrap_or(0);
+                    ev.narrowed.entry(rest).or_insert_with(|| mask.clone());
+                    ev.moved.push((tid, start, mask));
+                    ev.summary.moved_count += 1;
+                }
+                // The thread exited between the read and the write: it is
+                // not an unmovable thread, it is no thread at all.
+                Err(libc::ESRCH) => ev.summary.vanished_threads += 1,
+                Err(_) if affinity_of(tid).is_none() => ev.summary.vanished_threads += 1,
+                Err(_) if kernel => ev.summary.failed_kernel_threads += 1,
+                Err(_) => ev.summary.failed_user_threads += 1,
             }
         }
+        move_irqs(reserved, &mut ev);
     }
     #[cfg(not(target_os = "linux"))]
     {
@@ -829,6 +886,81 @@ impl Eviction {
                     }
                 }
                 self.narrowed.clear();
+            }
+            for (irq, original) in self.irqs.drain(..) {
+                let _ = write_irq_affinity(irq, &original);
+            }
+        }
+    }
+}
+
+// ── Interrupt affinity ─────────────────────────────────────────────
+
+#[cfg(target_os = "linux")]
+fn irq_ids() -> Vec<u32> {
+    let mut ids: Vec<u32> = std::fs::read_dir("/proc/irq")
+        .into_iter()
+        .flatten()
+        .filter_map(|e| e.ok())
+        .filter_map(|e| e.file_name().to_str()?.parse().ok())
+        .collect();
+    ids.sort_unstable();
+    ids
+}
+
+#[cfg(target_os = "linux")]
+fn write_irq_affinity(irq: u32, list: &str) -> std::io::Result<()> {
+    std::fs::write(format!("/proc/irq/{irq}/smp_affinity_list"), list)
+}
+
+/// Move every interrupt line's affinity off `reserved` where the kernel
+/// permits it (root, a movable line), so a device interrupt does not
+/// land on the measured CPU.  Lines the kernel manages or pins to one
+/// CPU, and every line when not root, are counted and the first reason
+/// is kept; the originals are restored with the threads.  The runner's
+/// own record of what happened is in the summary, never silent.
+#[cfg(target_os = "linux")]
+fn move_irqs(reserved: &[u32], ev: &mut Eviction) {
+    let ids = irq_ids();
+    if ids.is_empty() {
+        ev.summary.irq_note = Some("no /proc/irq on this system".into());
+        return;
+    }
+    for irq in ids {
+        let Some(original) = read_trim(&format!("/proc/irq/{irq}/smp_affinity_list")) else {
+            continue;
+        };
+        let mask = parse_cpulist(&original);
+        if !mask.iter().any(|c| reserved.contains(c)) {
+            continue;
+        }
+        let rest: Vec<u32> = mask
+            .iter()
+            .copied()
+            .filter(|c| !reserved.contains(c))
+            .collect();
+        if rest.is_empty() {
+            ev.summary.irq_unmovable += 1;
+            ev.summary
+                .irq_note
+                .get_or_insert_with(|| format!("irq {irq} may run only on the reservation"));
+            continue;
+        }
+        let list = rest
+            .iter()
+            .map(u32::to_string)
+            .collect::<Vec<_>>()
+            .join(",");
+        match write_irq_affinity(irq, &list) {
+            Ok(()) => {
+                ev.irqs.push((irq, original));
+                ev.summary.irq_moved += 1;
+            }
+            Err(e) => {
+                ev.summary.irq_unmovable += 1;
+                ev.summary
+                    .irq_note
+                    .get_or_insert_with(|| format!("irq {irq}: {e}"));
             }
         }
     }
@@ -1107,6 +1239,276 @@ mod tests {
     }
 }
 
+// ── Interrupts and per-CPU scheduler counters ────────────────────
+
+/// Interrupts one CPU took, by class, as a delta over a window.
+///
+/// `/proc/stat` ticks are 10 ms: a run of a few milliseconds cannot see
+/// foreign work in them.  Interrupt counts are exact, so the finer gate
+/// reads these around the solve and records them.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct IrqCounts {
+    /// Numbered `/proc/interrupts` lines: devices.
+    pub device: u64,
+    /// The local timer (`LOC`): the scheduler tick, present on every
+    /// CPU that is not `nohz_full`.
+    pub local_timer: u64,
+    /// The other named lines: IPIs, TLB shootdowns, NMIs, machine checks.
+    pub ipi_other: u64,
+    /// Softirq work: `HI`, `NET_TX`, `NET_RX`, `BLOCK`, `IRQ_POLL`, `TASKLET`.
+    pub softirq_work: u64,
+    /// Tick-driven softirqs: `TIMER`, `SCHED`, `HRTIMER`, `RCU`.
+    pub softirq_tick: u64,
+}
+
+impl IrqCounts {
+    /// `self - earlier`, saturating.
+    pub fn since(&self, earlier: &IrqCounts) -> IrqCounts {
+        IrqCounts {
+            device: self.device.saturating_sub(earlier.device),
+            local_timer: self.local_timer.saturating_sub(earlier.local_timer),
+            ipi_other: self.ipi_other.saturating_sub(earlier.ipi_other),
+            softirq_work: self.softirq_work.saturating_sub(earlier.softirq_work),
+            softirq_tick: self.softirq_tick.saturating_sub(earlier.softirq_tick),
+        }
+    }
+
+    /// Interrupts that are not the scheduler's own tick: what a quiet
+    /// CPU should not see during a short solve.
+    pub fn non_tick(&self) -> u64 {
+        self.device + self.ipi_other + self.softirq_work
+    }
+}
+
+/// The per-CPU columns of `/proc/interrupts` text for `cpu`:
+/// `(device, local timer, other named)`.  `None` when the header does
+/// not list the CPU.
+pub fn parse_interrupts(text: &str, cpu: u32) -> Option<(u64, u64, u64)> {
+    let mut lines = text.lines();
+    let header = lines.next()?;
+    let col = header
+        .split_whitespace()
+        .position(|h| h.strip_prefix("CPU").and_then(|n| n.parse::<u32>().ok()) == Some(cpu))?;
+    let ncols = header.split_whitespace().count();
+    let (mut device, mut timer, mut other) = (0u64, 0u64, 0u64);
+    for line in lines {
+        let mut it = line.split_whitespace();
+        let Some(label) = it.next().and_then(|l| l.strip_suffix(':')) else {
+            continue;
+        };
+        let counts: Vec<u64> = it
+            .by_ref()
+            .take(ncols)
+            .map_while(|t| t.parse::<u64>().ok())
+            .collect();
+        // `ERR` and `MIS` carry one total, not a column per CPU.
+        if counts.len() < ncols {
+            continue;
+        }
+        let v = counts[col];
+        if label.chars().all(|c| c.is_ascii_digit()) {
+            device += v;
+        } else if label == "LOC" {
+            timer += v;
+        } else {
+            other += v;
+        }
+    }
+    Some((device, timer, other))
+}
+
+/// The per-CPU column of `/proc/softirqs` text for `cpu`:
+/// `(work, tick-driven)`.
+pub fn parse_softirqs(text: &str, cpu: u32) -> Option<(u64, u64)> {
+    let mut lines = text.lines();
+    let header = lines.next()?;
+    let col = header
+        .split_whitespace()
+        .position(|h| h.strip_prefix("CPU").and_then(|n| n.parse::<u32>().ok()) == Some(cpu))?;
+    let (mut work, mut tick) = (0u64, 0u64);
+    for line in lines {
+        let mut it = line.split_whitespace();
+        let Some(label) = it.next().and_then(|l| l.strip_suffix(':')) else {
+            continue;
+        };
+        let Some(v) = it.nth(col).and_then(|t| t.parse::<u64>().ok()) else {
+            continue;
+        };
+        match label {
+            "TIMER" | "SCHED" | "HRTIMER" | "RCU" => tick += v,
+            _ => work += v,
+        }
+    }
+    Some((work, tick))
+}
+
+/// What `cpu` has taken so far: `/proc/interrupts` and `/proc/softirqs`.
+/// `None` where either is unreadable.
+pub fn irq_counts(cpu: u32) -> Option<IrqCounts> {
+    #[cfg(target_os = "linux")]
+    {
+        let (device, local_timer, ipi_other) =
+            parse_interrupts(&std::fs::read_to_string("/proc/interrupts").ok()?, cpu)?;
+        let (softirq_work, softirq_tick) =
+            parse_softirqs(&std::fs::read_to_string("/proc/softirqs").ok()?, cpu)?;
+        Some(IrqCounts {
+            device,
+            local_timer,
+            ipi_other,
+            softirq_work,
+            softirq_tick,
+        })
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = cpu;
+        None
+    }
+}
+
+/// One CPU's line of `/proc/schedstat` (present only with
+/// `CONFIG_SCHEDSTATS`), or the same difference of two readings.  These
+/// are exact event counts, unlike the 10 ms ticks of `/proc/stat`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CpuSched {
+    /// Calls of `schedule()` on this CPU.
+    pub sched_count: u64,
+    pub ttwu_count: u64,
+    /// Time tasks that left this CPU had run on it, ns.  A task is added
+    /// when it departs, so a window sees the foreign tasks that ran and
+    /// left in it, and the child only if it was switched out.
+    pub rq_cpu_ns: u64,
+    /// Time tasks waited on this CPU's run queue, ns.
+    pub run_delay_ns: u64,
+    /// Times a task started running on this CPU.
+    pub pcount: u64,
+}
+
+impl CpuSched {
+    pub fn since(&self, earlier: &CpuSched) -> CpuSched {
+        CpuSched {
+            sched_count: self.sched_count.saturating_sub(earlier.sched_count),
+            ttwu_count: self.ttwu_count.saturating_sub(earlier.ttwu_count),
+            rq_cpu_ns: self.rq_cpu_ns.saturating_sub(earlier.rq_cpu_ns),
+            run_delay_ns: self.run_delay_ns.saturating_sub(earlier.run_delay_ns),
+            pcount: self.pcount.saturating_sub(earlier.pcount),
+        }
+    }
+}
+
+/// `cpu<N>`'s line of `/proc/schedstat` text: nine numbers after the
+/// name (`yld_count 0 sched_count sched_goidle ttwu_count ttwu_local
+/// rq_cpu_time run_delay pcount`).
+pub fn parse_cpu_schedstat(text: &str, cpu: u32) -> Option<CpuSched> {
+    let name = format!("cpu{cpu}");
+    let line = text
+        .lines()
+        .find(|l| l.split_whitespace().next() == Some(name.as_str()))?;
+    let v: Vec<u64> = line
+        .split_whitespace()
+        .skip(1)
+        .filter_map(|t| t.parse().ok())
+        .collect();
+    if v.len() < 9 {
+        return None;
+    }
+    Some(CpuSched {
+        sched_count: v[2],
+        ttwu_count: v[4],
+        rq_cpu_ns: v[6],
+        run_delay_ns: v[7],
+        pcount: v[8],
+    })
+}
+
+pub fn cpu_schedstat(cpu: u32) -> Option<CpuSched> {
+    #[cfg(target_os = "linux")]
+    {
+        parse_cpu_schedstat(&std::fs::read_to_string("/proc/schedstat").ok()?, cpu)
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = cpu;
+        None
+    }
+}
+
+// ── Intruders on the reservation ───────────────────────────────────
+
+/// A cheap scan, per run, for threads that could run on the reserved
+/// CPUs: a user thread that appeared after the eviction, or got a wide
+/// mask back, shares the measured core.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct IntruderScan {
+    /// User threads (other than the runner's own process) whose affinity
+    /// mask includes a reserved CPU.
+    pub user_threads: u32,
+    /// Kernel threads whose mask includes a reserved CPU (per-CPU
+    /// housekeeping threads are always among them); context only.
+    pub kernel_threads: u32,
+    /// Up to three `pid/tid comm` examples of the user threads.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub examples: Vec<String>,
+}
+
+/// Scan every thread but the runner's for the reserved CPUs in its mask.
+pub fn scan_intruders(reserved: &[u32]) -> IntruderScan {
+    #[allow(unused_mut)]
+    let mut scan = IntruderScan::default();
+    #[cfg(target_os = "linux")]
+    {
+        let me = std::process::id() as i32;
+        let Ok(procs) = std::fs::read_dir("/proc") else {
+            return scan;
+        };
+        for p in procs.filter_map(|e| e.ok()) {
+            let Some(pid) = p.file_name().to_str().and_then(|s| s.parse::<i32>().ok()) else {
+                continue;
+            };
+            if pid == me {
+                continue;
+            }
+            let Ok(tasks) = std::fs::read_dir(format!("/proc/{pid}/task")) else {
+                continue;
+            };
+            let mut kernel: Option<bool> = None;
+            for t in tasks.filter_map(|e| e.ok()) {
+                let Some(tid) = t.file_name().to_str().and_then(|s| s.parse::<i32>().ok()) else {
+                    continue;
+                };
+                // A thread that exited meanwhile has no mask to read.
+                let Some(mask) = affinity_of(tid) else {
+                    continue;
+                };
+                if !mask.iter().any(|c| reserved.contains(c)) {
+                    continue;
+                }
+                let is_kernel = *kernel.get_or_insert_with(|| {
+                    std::fs::read_link(format!("/proc/{pid}/exe")).is_err()
+                        && std::fs::read_to_string(format!("/proc/{pid}/cmdline"))
+                            .map(|c| c.is_empty())
+                            .unwrap_or(true)
+                });
+                if is_kernel {
+                    scan.kernel_threads += 1;
+                } else {
+                    scan.user_threads += 1;
+                    if scan.examples.len() < 3 {
+                        let comm =
+                            read_trim(&format!("/proc/{pid}/task/{tid}/comm")).unwrap_or_default();
+                        scan.examples.push(format!("{pid}/{tid} {comm}"));
+                    }
+                }
+            }
+        }
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let _ = reserved;
+    }
+    scan
+}
+
 // ── Hardware counters ──────────────────────────────────────────────
 
 /// What the CPU's own counters saw across a solve: user-space
@@ -1115,6 +1517,13 @@ mod tests {
 /// binary, and untouched by frequency scaling.  Absent (`None`, with the
 /// reason) where the kernel offers no hardware PMU (macOS, most VMs, a
 /// `perf_event_paranoid` that forbids it).
+///
+/// The counters form one group (instructions leading, cycles with it),
+/// so both are scheduled onto the PMU together and share one
+/// `time_enabled`/`time_running`.  When the PMU is shared the group runs
+/// only part of the time (`multiplexed`): the raw counts then fall short
+/// of the truth and the `*_scaled` fields extrapolate them by
+/// `time_enabled / time_running`.  The raw counts are kept as read.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct HwCounts {
     pub instructions: Option<u64>,
@@ -1124,82 +1533,191 @@ pub struct HwCounts {
     pub cycles_time_enabled_ns: Option<u64>,
     pub cycles_time_running_ns: Option<u64>,
     pub error: Option<String>,
+    /// `inherit` was set: threads the solve spawns are counted too.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub inherit: Option<bool>,
+    /// The two events were opened as one group.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub grouped: Option<bool>,
+    /// A counter was on the PMU for less than the time it was enabled.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub multiplexed: Option<bool>,
+    /// `instructions × time_enabled / time_running`; equal to the raw
+    /// count when not multiplexed.  `None` if the counter never ran.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub instructions_scaled: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cycles_scaled: Option<u64>,
 }
 
-/// Two `perf_event_open` counters on the calling process, user space only.
+/// `raw × enabled / running`, the multiplexing correction; `None` when
+/// the counter never ran while enabled.
+pub fn scale_counter(raw: u64, enabled: u64, running: u64) -> Option<u64> {
+    if running == 0 {
+        return (enabled == 0).then_some(raw);
+    }
+    if running >= enabled {
+        return Some(raw);
+    }
+    Some((raw as u128 * enabled as u128 / running as u128).min(u64::MAX as u128) as u64)
+}
+
+impl HwCounts {
+    /// Fill the scaled fields and the multiplexed flag from the raw reads.
+    fn finish(&mut self) {
+        let mut mux = false;
+        let mut any = false;
+        if let (Some(v), Some(e), Some(r)) = (
+            self.instructions,
+            self.instructions_time_enabled_ns,
+            self.instructions_time_running_ns,
+        ) {
+            any = true;
+            mux |= r < e;
+            self.instructions_scaled = scale_counter(v, e, r);
+        }
+        if let (Some(v), Some(e), Some(r)) = (
+            self.cycles,
+            self.cycles_time_enabled_ns,
+            self.cycles_time_running_ns,
+        ) {
+            any = true;
+            mux |= r < e;
+            self.cycles_scaled = scale_counter(v, e, r);
+        }
+        if any {
+            self.multiplexed = Some(mux);
+        }
+    }
+
+    /// The instruction count to report: scaled when the PMU was shared,
+    /// else the raw read.
+    pub fn instructions_best(&self) -> Option<u64> {
+        self.instructions_scaled.or(self.instructions)
+    }
+
+    pub fn cycles_best(&self) -> Option<u64> {
+        self.cycles_scaled.or(self.cycles)
+    }
+}
+
+/// Two `perf_event_open` counters on the calling process, user space
+/// only, as one group.
 pub struct HwCounters {
     #[cfg(target_os = "linux")]
     fds: Vec<(libc::c_int, u64)>,
     error: Option<String>,
+    inherit: bool,
 }
 
+/// `perf_event_open` of one hardware event: `group` is the leader's fd
+/// (or -1 to lead), `inherit` follows threads and children created
+/// later.
 #[cfg(target_os = "linux")]
-fn perf_open(config: u64) -> Result<libc::c_int, String> {
+fn perf_open(
+    config: u64,
+    group: libc::c_int,
+    inherit: bool,
+) -> Result<libc::c_int, std::io::Error> {
     // struct perf_event_attr, PERF_ATTR_SIZE_VER5 (112 bytes): type at 0,
-    // size at 4, config at 8, read_format at 32, flags at 40 (disabled bit 0, exclude_kernel
-    // bit 5, exclude_hv bit 6).  The rest stays zero.
+    // size at 4, config at 8, read_format at 32, flags at 40 (disabled bit 0,
+    // inherit bit 1, exclude_kernel bit 5, exclude_hv bit 6).  The rest
+    // stays zero.
     let mut attr = [0u8; 112];
     attr[0..4].copy_from_slice(&0u32.to_ne_bytes()); // PERF_TYPE_HARDWARE
     attr[4..8].copy_from_slice(&112u32.to_ne_bytes());
     attr[8..16].copy_from_slice(&config.to_ne_bytes());
-    // PERF_FORMAT_TOTAL_TIME_ENABLED | PERF_FORMAT_TOTAL_TIME_RUNNING.
+    // PERF_FORMAT_TOTAL_TIME_ENABLED | PERF_FORMAT_TOTAL_TIME_RUNNING.  Not
+    // PERF_FORMAT_GROUP: the kernel refuses `inherit` with a group read.
     attr[32..40].copy_from_slice(&3u64.to_ne_bytes());
-    let flags: u64 = 1 | (1 << 5) | (1 << 6);
+    // Only the leader starts disabled; members follow it.
+    let mut flags: u64 = (1 << 5) | (1 << 6);
+    if group < 0 {
+        flags |= 1;
+    }
+    if inherit {
+        flags |= 1 << 1;
+    }
     attr[40..48].copy_from_slice(&flags.to_ne_bytes());
     // SAFETY: a valid attr buffer of the size it declares; pid 0 = this
-    // process, cpu -1 = any, no group, close on exec.
+    // process, cpu -1 = any, close on exec.
     let fd = unsafe {
         libc::syscall(
             libc::SYS_perf_event_open,
             attr.as_ptr(),
             0 as libc::pid_t,
             -1 as libc::c_int,
-            -1 as libc::c_int,
+            group,
             8 as libc::c_ulong, // PERF_FLAG_FD_CLOEXEC
         )
     };
     if fd < 0 {
-        return Err(format!(
-            "perf_event_open: {}",
-            std::io::Error::last_os_error()
-        ));
+        return Err(std::io::Error::last_os_error());
     }
     Ok(fd as libc::c_int)
 }
 
+#[cfg(target_os = "linux")]
+fn open_group(inherit: bool) -> Result<Vec<(libc::c_int, u64)>, std::io::Error> {
+    // PERF_COUNT_HW_INSTRUCTIONS = 1 leads; PERF_COUNT_HW_CPU_CYCLES = 0.
+    let leader = perf_open(1, -1, inherit)?;
+    match perf_open(0, leader, inherit) {
+        Ok(member) => Ok(vec![(leader, 1), (member, 0)]),
+        Err(e) => {
+            // SAFETY: closing the fd opened above.
+            unsafe {
+                libc::close(leader);
+            }
+            Err(e)
+        }
+    }
+}
+
 impl HwCounters {
     /// Open the counters, disabled.  Never fails: a counter that cannot
-    /// open records why.
+    /// open records why.  `inherit` is tried first; a kernel that refuses
+    /// it gets the plain group, and the record says which was used.
     pub fn open() -> Self {
         #[cfg(target_os = "linux")]
         {
-            let mut fds = Vec::new();
-            let mut error = None;
-            // PERF_COUNT_HW_INSTRUCTIONS = 1, PERF_COUNT_HW_CPU_CYCLES = 0.
-            for config in [1u64, 0u64] {
-                match perf_open(config) {
-                    Ok(fd) => fds.push((fd, config)),
-                    Err(e) => error = Some(e),
-                }
+            match open_group(true) {
+                Ok(fds) => Self {
+                    fds,
+                    error: None,
+                    inherit: true,
+                },
+                Err(first) => match open_group(false) {
+                    Ok(fds) => Self {
+                        fds,
+                        error: Some(format!("perf_event_open with inherit: {first}")),
+                        inherit: false,
+                    },
+                    Err(e) => Self {
+                        fds: Vec::new(),
+                        error: Some(format!("perf_event_open: {e}")),
+                        inherit: false,
+                    },
+                },
             }
-            Self { fds, error }
         }
         #[cfg(not(target_os = "linux"))]
         {
             Self {
                 error: Some("no perf_event_open on this OS".into()),
+                inherit: false,
             }
         }
     }
 
-    /// Reset and enable.
+    /// Reset and enable the whole group.
     pub fn start(&self) {
         #[cfg(target_os = "linux")]
-        for (fd, _) in &self.fds {
-            // SAFETY: an open perf fd; RESET = 0x2403, ENABLE = 0x2400.
+        if let Some((leader, _)) = self.fds.first() {
+            // SAFETY: an open perf fd; RESET = 0x2403, ENABLE = 0x2400,
+            // PERF_IOC_FLAG_GROUP = 1 applies it to every member.
             unsafe {
-                libc::ioctl(*fd, 0x2403, 0);
-                libc::ioctl(*fd, 0x2400, 0);
+                libc::ioctl(*leader, 0x2403, 1);
+                libc::ioctl(*leader, 0x2400, 1);
             }
         }
     }
@@ -1212,35 +1730,241 @@ impl HwCounters {
             ..Default::default()
         };
         #[cfg(target_os = "linux")]
-        for (fd, config) in &self.fds {
-            let mut values = [0u64; 3];
-            // SAFETY: an open perf fd; DISABLE = 0x2401; the requested
-            // read_format returns value, time_enabled, and time_running.
-            let n = unsafe {
-                libc::ioctl(*fd, 0x2401, 0);
-                libc::read(*fd, values.as_mut_ptr() as *mut libc::c_void, 24)
-            };
-            if n == 24 {
-                match config {
-                    1 => {
-                        out.instructions = Some(values[0]);
-                        out.instructions_time_enabled_ns = Some(values[1]);
-                        out.instructions_time_running_ns = Some(values[2]);
-                    }
-                    _ => {
-                        out.cycles = Some(values[0]);
-                        out.cycles_time_enabled_ns = Some(values[1]);
-                        out.cycles_time_running_ns = Some(values[2]);
-                    }
+        {
+            if let Some((leader, _)) = self.fds.first() {
+                // SAFETY: an open perf fd; DISABLE = 0x2401 on the group.
+                unsafe {
+                    libc::ioctl(*leader, 0x2401, 1);
                 }
-            } else {
-                out.error = Some(format!("perf counter read returned {n} bytes, expected 24"));
+                out.grouped = Some(true);
+                out.inherit = Some(self.inherit);
             }
-            // SAFETY: closing the fd this struct owns.
-            unsafe {
-                libc::close(*fd);
+            for (fd, config) in &self.fds {
+                let mut values = [0u64; 3];
+                // SAFETY: an open perf fd; the requested read_format
+                // returns value, time_enabled and time_running.
+                let n = unsafe { libc::read(*fd, values.as_mut_ptr() as *mut libc::c_void, 24) };
+                if n == 24 {
+                    match config {
+                        1 => {
+                            out.instructions = Some(values[0]);
+                            out.instructions_time_enabled_ns = Some(values[1]);
+                            out.instructions_time_running_ns = Some(values[2]);
+                        }
+                        _ => {
+                            out.cycles = Some(values[0]);
+                            out.cycles_time_enabled_ns = Some(values[1]);
+                            out.cycles_time_running_ns = Some(values[2]);
+                        }
+                    }
+                } else {
+                    out.error = Some(format!("perf counter read returned {n} bytes, expected 24"));
+                }
+                // SAFETY: closing the fd this struct owns.
+                unsafe {
+                    libc::close(*fd);
+                }
             }
         }
+        out.finish();
         out
+    }
+}
+
+#[cfg(test)]
+mod counter_tests {
+    use super::*;
+
+    const INTERRUPTS: &str = "\
+           CPU0       CPU1       CPU2       CPU3
+  24:          1          0          5          0  IO-APIC   5-edge      ACPI:Ged
+  29:          0         10          0          7  PCI-MSIX   0-edge      virtio0
+ NMI:          0          0          0          2   Non-maskable interrupts
+ LOC:      14000      15000      16000      17000   Local timer interrupts
+ RES:         11         12         13         14   Rescheduling interrupts
+ TLB:          1          2          3          4   TLB shootdowns
+ ERR:          0
+ MIS:          0
+";
+
+    const SOFTIRQS: &str = "\
+                    CPU0       CPU1       CPU2       CPU3
+          HI:          0          0          0          1
+       TIMER:        100        200        300        400
+      NET_TX:          0          0          2          0
+      NET_RX:          5          6          7          8
+       BLOCK:          0          0          0          9
+    IRQ_POLL:          0          0          0          0
+     TASKLET:          1          1          1          1
+       SCHED:         10         20         30         40
+     HRTIMER:          0          0          0          0
+         RCU:         50         60         70         80
+";
+
+    #[test]
+    fn interrupts_split_into_devices_the_tick_and_ipis() {
+        // CPU 3: devices 0 + 7, the timer 17000, other named 2 + 14 + 4.
+        assert_eq!(parse_interrupts(INTERRUPTS, 3), Some((7, 17_000, 20)));
+        assert_eq!(parse_interrupts(INTERRUPTS, 0), Some((1, 14_000, 12)));
+        // `ERR` and `MIS` carry no per-CPU columns and are skipped; a CPU
+        // the header does not list has no answer.
+        assert_eq!(parse_interrupts(INTERRUPTS, 9), None);
+    }
+
+    #[test]
+    fn softirqs_split_into_work_and_tick_driven() {
+        // CPU 3: work 1 + 0 + 8 + 9 + 0 + 1 = 19; tick 400 + 40 + 0 + 80.
+        assert_eq!(parse_softirqs(SOFTIRQS, 3), Some((19, 520)));
+        assert_eq!(
+            parse_softirqs(SOFTIRQS, 2),
+            Some((2 + 7 + 1, 300 + 30 + 70))
+        );
+    }
+
+    #[test]
+    fn irq_counts_difference_and_exclude_the_tick() {
+        let a = IrqCounts {
+            device: 1,
+            local_timer: 100,
+            ipi_other: 2,
+            softirq_work: 3,
+            softirq_tick: 50,
+        };
+        let b = IrqCounts {
+            device: 4,
+            local_timer: 104,
+            ipi_other: 2,
+            softirq_work: 9,
+            softirq_tick: 54,
+        };
+        let d = b.since(&a);
+        assert_eq!(d.device, 3);
+        assert_eq!(d.local_timer, 4);
+        assert_eq!(d.non_tick(), 3 + 0 + 6);
+        // Counters that went backwards (a CPU hot-unplugged) saturate.
+        assert_eq!(a.since(&b), IrqCounts::default());
+        // The live counters parse on this machine.
+        #[cfg(target_os = "linux")]
+        if let Some(c) = current_cpu_counts() {
+            assert!(c.local_timer > 0 || c.softirq_tick > 0);
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    fn current_cpu_counts() -> Option<IrqCounts> {
+        irq_counts(0)
+    }
+
+    #[test]
+    fn cpu_schedstat_line_parses() {
+        let text = "version 15\ntimestamp 4300000000\n\
+            cpu0 0 0 100 40 50 20 1000000 2000 30\n\
+            cpu1 0 0 200 80 90 40 7000000 8000 60\n";
+        let c = parse_cpu_schedstat(text, 1).unwrap();
+        assert_eq!(
+            c,
+            CpuSched {
+                sched_count: 200,
+                ttwu_count: 90,
+                rq_cpu_ns: 7_000_000,
+                run_delay_ns: 8000,
+                pcount: 60
+            }
+        );
+        assert!(parse_cpu_schedstat(text, 2).is_none());
+        let d = c.since(&parse_cpu_schedstat(text, 0).unwrap());
+        assert_eq!(d.pcount, 30);
+        assert_eq!(d.sched_count, 100);
+        assert!(parse_cpu_schedstat("cpu0 1 2 3", 0).is_none());
+    }
+
+    #[test]
+    fn multiplexed_counts_are_scaled_and_raw_counts_kept() {
+        assert_eq!(scale_counter(500, 1000, 1000), Some(500));
+        assert_eq!(scale_counter(500, 1000, 500), Some(1000));
+        assert_eq!(scale_counter(500, 3000, 1000), Some(1500));
+        // Never on the PMU while enabled: no extrapolation is possible.
+        assert_eq!(scale_counter(0, 1000, 0), None);
+        assert_eq!(scale_counter(0, 0, 0), Some(0));
+        let mut h = HwCounts {
+            instructions: Some(500),
+            instructions_time_enabled_ns: Some(1000),
+            instructions_time_running_ns: Some(500),
+            cycles: Some(900),
+            cycles_time_enabled_ns: Some(1000),
+            cycles_time_running_ns: Some(500),
+            ..Default::default()
+        };
+        h.finish();
+        assert_eq!(h.multiplexed, Some(true));
+        assert_eq!(h.instructions, Some(500));
+        assert_eq!(h.instructions_scaled, Some(1000));
+        assert_eq!(h.instructions_best(), Some(1000));
+        assert_eq!(h.cycles_best(), Some(1800));
+        // A full-time counter is not multiplexed and best == raw.
+        let mut h = HwCounts {
+            instructions: Some(7),
+            instructions_time_enabled_ns: Some(10),
+            instructions_time_running_ns: Some(10),
+            ..Default::default()
+        };
+        h.finish();
+        assert_eq!(h.multiplexed, Some(false));
+        assert_eq!(h.instructions_best(), Some(7));
+    }
+
+    #[test]
+    fn counters_open_group_and_inherit_or_say_why_not() {
+        let c = HwCounters::open();
+        c.start();
+        let mut x = 0u64;
+        for i in 0..100_000u64 {
+            x = x.wrapping_add(std::hint::black_box(i));
+        }
+        std::hint::black_box(x);
+        let h = c.stop();
+        // No PMU in a VM is an error text, never a panic or a fake count.
+        match h.instructions {
+            Some(n) => {
+                assert!(n > 0);
+                assert_eq!(h.grouped, Some(true));
+                assert!(h.inherit.is_some());
+                assert!(
+                    h.instructions_scaled.is_some() || h.instructions_time_running_ns == Some(0)
+                );
+            }
+            None => assert!(h.error.is_some()),
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn a_thread_that_is_gone_is_esrch_not_an_unmovable_thread() {
+        // A thread id no process has.
+        let e = set_affinity_errno(i32::MAX, &[0]).unwrap_err();
+        assert_eq!(e, libc::ESRCH);
+        // Evicting nothing moves nothing and fails nothing.
+        let ev = evict(&[]);
+        assert_eq!(ev.summary.moved_count, 0);
+        assert_eq!(ev.summary.failed_user_threads, 0);
+        assert_eq!(ev.summary.irq_moved, 0);
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn the_intruder_scan_sees_a_user_thread_with_the_reserved_cpu_in_its_mask() {
+        let all: Vec<u32> = own_affinity().unwrap();
+        let mut child = std::process::Command::new("sleep")
+            .arg("5")
+            .spawn()
+            .expect("sleep");
+        let scan = scan_intruders(&all);
+        let none = scan_intruders(&[]);
+        let _ = child.kill();
+        let _ = child.wait();
+        assert!(scan.user_threads >= 1, "{scan:?}");
+        assert!(!scan.examples.is_empty() || scan.user_threads == 0);
+        assert_eq!(none.user_threads, 0);
+        assert_eq!(none.kernel_threads, 0);
     }
 }

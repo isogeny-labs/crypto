@@ -9,7 +9,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
       autoconf automake bison build-essential clang cmake flex gfortran \
       libffi-dev libgmp-dev libmpc-dev libmpfr-dev libsqlite3-dev libssl-dev \
       libtool libzstd-dev musl-tools ninja-build pkg-config python-is-python3 \
-      python3-pip python3-venv \
+      python3-pip python3-venv zstd \
     && rm -rf /var/lib/apt/lists/* \
     && for tool in node npm npx corepack; do \
          ln -s "/home/runner/externals/node24/bin/$tool" "/usr/local/bin/$tool"; \

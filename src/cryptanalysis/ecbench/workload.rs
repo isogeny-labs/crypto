@@ -15,10 +15,12 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use std::sync::OnceLock;
 
 use crate::binary_ecc::IrreduciblePoly;
 use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128, derive_u64};
 use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
+use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::Fp4Instance;
 use crate::cryptanalysis::ecbench_large_prime::binary_explicit_instance;
 use crate::cryptanalysis::gaudry_quartic::Pt4;
@@ -148,6 +150,26 @@ pub enum CurveSpec {
         gy: u64,
         family: String,
         parameter: u64,
+    },
+    /// `gls_fp2::generate_gls_instance(p_bits, seed, max_cofactor)`: the
+    /// GLS twist over `F_{p²} = F_p[s]/(s² − ν)` of a curve over `F_p`,
+    /// `p` of `p_bits ≤ 24` bits, with the verified `ψ` (`ψ² = −1` on the
+    /// subgroup, `A = 4`).  A point is two packed words `c₀ + c₁ p`.
+    GlsFp2 {
+        p_bits: u32,
+        seed: u64,
+        max_cofactor: u64,
+    },
+    /// `subfield_fp3::generate_subfield_instance(p_bits, seed, false,
+    /// max_cofactor_ratio)`: a curve over `F_p` (`j ≠ 0`) on its group
+    /// over `F_{p³} = F_p[s]/(s³ − ν)`, `p ≡ 1 (mod 3)` of `p_bits ≤ 20`
+    /// bits, the prime subgroup outside `E(F_p)`, with the verified
+    /// Frobenius of order 3 on it (`A = 6`).  A point is two packed words
+    /// `c₀ + c₁ p + c₂ p²`.
+    SubfieldFp3 {
+        p_bits: u32,
+        seed: u64,
+        max_cofactor_ratio: u64,
     },
 }
 
@@ -381,6 +403,18 @@ impl CurveSpec {
             CurveSpec::Fp4Translation { p, seed } => {
                 Fp4Instance::build(p, seed).map(|i| Instance::Fp4(Box::new(i)))
             }
+            CurveSpec::GlsFp2 {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => ExtInstance::build_gls(p_bits, seed, max_cofactor)
+                .map(|i| Instance::Ext(Box::new(i))),
+            CurveSpec::SubfieldFp3 {
+                p_bits,
+                seed,
+                max_cofactor_ratio,
+            } => ExtInstance::build_subfield(p_bits, seed, max_cofactor_ratio)
+                .map(|i| Instance::Ext(Box::new(i))),
         }
     }
 
@@ -423,7 +457,8 @@ impl CurveSpec {
             | Instance::Fp4(_)
             | Instance::Fp4Torsion(_)
             | Instance::F2m4(_)
-            | Instance::ThreeLeads(_) => None,
+            | Instance::ThreeLeads(_)
+            | Instance::Ext(_) => None,
         }
     }
 
@@ -473,6 +508,18 @@ impl CurveSpec {
             CurveSpec::Fp4Translation { p, seed } => {
                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
             }
+            CurveSpec::GlsFp2 {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => format!("gls_fp2::generate_gls_instance({p_bits}, {seed}, {max_cofactor})"),
+            CurveSpec::SubfieldFp3 {
+                p_bits,
+                seed,
+                max_cofactor_ratio,
+            } => format!(
+                "subfield_fp3::generate_subfield_instance({p_bits}, {seed}, false, {max_cofactor_ratio})"
+            ),
         }
     }
 }
@@ -491,6 +538,9 @@ pub enum Instance {
     /// A curve over `F_{p⁴}` (`ecbench::fp4`); a point is one 64-bit word
     /// per coordinate, four 16-bit limbs.
     Fp4(Box<Fp4Instance>),
+    /// A GLS curve over `F_{p²}` or a subfield curve on `E(F_{p³})`
+    /// (`ecbench::ext`); a coordinate is one packed word.
+    Ext(Box<ExtInstance>),
 }
 
 /// A wide Koblitz curve and the strong reference's arithmetic on it, which
@@ -502,8 +552,7 @@ pub struct WideInstance {
 
 /// The registry's modulus for `K_a` over `F_{2^n}`, if it lists one.
 pub fn registry_koblitz_modulus(a: u8, n: u32) -> Option<IrreduciblePoly> {
-    let doc: Value = serde_json::from_str(REGISTRY).ok()?;
-    let entry = doc.get("curves")?.as_array()?.iter().find(|c| {
+    let entry = registry_curves().iter().find(|c| {
         let p = c.get("params");
         c.get("family").and_then(Value::as_str) == Some("koblitz")
             && p.and_then(|p| p.get("a")).and_then(Value::as_u64) == Some(u64::from(a))
@@ -558,14 +607,100 @@ pub struct CurveFacts {
 
 const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
 
-/// The registry entry of `slug`, if any.
+/// The registry's curves, parsed once per process, for the lookups that
+/// scan every entry (a wide Koblitz modulus) and as the fallback of
+/// [`registry_entry`]; several megabytes, so nothing on the per-execution
+/// path parses it.
+fn registry_curves() -> &'static [Value] {
+    static CURVES: OnceLock<Vec<Value>> = OnceLock::new();
+    CURVES.get_or_init(|| {
+        serde_json::from_str::<Value>(REGISTRY)
+            .ok()
+            .and_then(|mut doc| doc.get_mut("curves").map(Value::take))
+            .and_then(|curves| match curves {
+                Value::Array(curves) => Some(curves),
+                _ => None,
+            })
+            .unwrap_or_default()
+    })
+}
+
+/// The registry entry of `slug`, parsed from its own text alone.
+///
+/// The document is 4.7 MB and every measured execution is a fresh child
+/// process, so parsing it whole cost 97% of a toy solve's instructions
+/// (callgrind, 2026-10-18: 147.6M of 153M Ir in `ecbench exec`); a
+/// per-process cache cannot help a child.  A slug is a plain `icv1-…`
+/// string that occurs in the document as its own entry's `"slug"` value,
+/// the first key of the entry, so the entry is cut out between the brace
+/// before that key and its string-aware match and parsed on its own.  The
+/// extracted object is checked to carry the slug, and anything the fast
+/// path cannot place falls back to the full parse, so the answer is the
+/// one the full parse gives: the first entry with that slug.
 fn registry_entry(slug: &str) -> Option<Value> {
-    let doc: Value = serde_json::from_str(REGISTRY).ok()?;
-    doc.get("curves")?
-        .as_array()?
-        .iter()
-        .find(|c| c.get("slug").and_then(Value::as_str) == Some(slug))
-        .cloned()
+    let needle = format!("\"{slug}\"");
+    let mut from = 0;
+    while let Some(pos) = REGISTRY[from..].find(&needle) {
+        let at = from + pos;
+        from = at + needle.len();
+        let Some(entry) = registry_entry_around(at) else {
+            // A slug quoted somewhere the fast path cannot read: the
+            // full parse decides.
+            return registry_curves()
+                .iter()
+                .find(|c| c.get("slug").and_then(Value::as_str) == Some(slug))
+                .cloned();
+        };
+        if entry.get("slug").and_then(Value::as_str) == Some(slug) {
+            return Some(entry);
+        }
+    }
+    None
+}
+
+/// The object whose first key, `"slug"`, has its value at byte `at` of
+/// the registry; `None` when the text around `at` is not that shape.
+fn registry_entry_around(at: usize) -> Option<Value> {
+    let before = REGISTRY[..at].trim_end_matches(|c: char| c == ':' || c.is_whitespace());
+    let key = before.strip_suffix("\"slug\"")?;
+    let open = key.rfind('{')?;
+    if !key[open + 1..].trim().is_empty() {
+        return None;
+    }
+    let close = json_object_end(REGISTRY.as_bytes(), open)?;
+    serde_json::from_str(&REGISTRY[open..=close]).ok()
+}
+
+/// The index of the `}` closing the object that opens at `open`, reading
+/// strings and their escapes so braces inside them do not count.
+fn json_object_end(text: &[u8], open: usize) -> Option<usize> {
+    let mut depth = 0usize;
+    let mut in_string = false;
+    let mut escaped = false;
+    for (i, &b) in text.iter().enumerate().skip(open) {
+        if in_string {
+            if escaped {
+                escaped = false;
+            } else if b == b'\\' {
+                escaped = true;
+            } else if b == b'"' {
+                in_string = false;
+            }
+            continue;
+        }
+        match b {
+            b'"' => in_string = true,
+            b'{' => depth += 1,
+            b'}' => {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(i);
+                }
+            }
+            _ => {}
+        }
+    }
+    None
 }
 
 fn parse_hex(s: &str) -> Option<u128> {
@@ -605,12 +740,32 @@ impl Instance {
             Instance::Fp4(i) => u128::from(i.r),
             Instance::Fp4Torsion(i) => u128::from(i.r),
             Instance::F2m4(i) => u128::from(i.r),
+            Instance::Ext(i) => u128::from(i.r()),
         }
     }
 
     pub fn facts(&self, spec: &CurveSpec) -> CurveFacts {
         if let Instance::ThreeLeads(i) = self {
             return super::three_leads::facts(i, spec);
+        }
+        if let Instance::Ext(i) = self {
+            let id = i.id();
+            return CurveFacts {
+                slug: id.slug,
+                icv1: id.icv1,
+                family: "extension".into(),
+                construction: spec.call(),
+                field_degree: None,
+                field_bits: Some(64 - i.p().leading_zeros()),
+                group_order: u128::from(i.group_order()),
+                r: u128::from(i.r()),
+                cofactor: u128::from(i.cofactor()),
+                generator: i.generator_hex(),
+                automorphisms_available: i.automorphisms_available(),
+                registered: false,
+                ec1: None,
+                curve_uid: None,
+            };
         }
         if let Instance::Fp4(i) = self {
             let (icv1, slug) = i.names();
@@ -661,7 +816,9 @@ impl Instance {
                 u128::from(i.generator.y),
                 if i.koblitz.is_some() { 2 * i.n } else { 2 },
             ),
-            Instance::Fp4(_) | Instance::ThreeLeads(_) => unreachable!("returned above"),
+            Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Ext(_) => {
+                unreachable!("returned above")
+            }
             Instance::Wide(i) => (
                 i.kc.curve_id(),
                 "koblitz",
@@ -771,6 +928,9 @@ impl Instance {
             let p = i.curve.mul(i.generator, k);
             return (!p.inf).then(|| [format!("0x{:x}", p.x), format!("0x{:x}", p.y)]);
         }
+        if let Instance::Ext(i) = self {
+            return i.mul_generator_hex(k);
+        }
         match self {
             Instance::Prime(i) => {
                 let p = i.curve.mul(&mut scratch, i.generator_point(), k);
@@ -802,7 +962,7 @@ impl Instance {
                     ]
                 })
             }
-            Instance::Wide(_) | Instance::Fp4(_) | Instance::ThreeLeads(_) => {
+            Instance::Wide(_) | Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Ext(_) => {
                 unreachable!("returned above")
             }
         }
@@ -875,6 +1035,11 @@ impl Instance {
                 }
                 Instance::Wide(_) | Instance::Fp4(_) | Instance::ThreeLeads(_) => {
                     unreachable!("handled above")
+                }
+                Instance::Ext(i) => {
+                    if let Some(t) = i.hash_to_subgroup_hex(h) {
+                        return Some((t, counter));
+                    }
                 }
                 Instance::Fp4Torsion(i) => {
                     let c = &i.inst.curve;
@@ -1219,6 +1384,29 @@ impl Workload {
 mod tests {
     use super::*;
 
+    /// The slug-targeted extraction answers exactly as the full parse:
+    /// the first entry carrying the slug, or none.
+    #[test]
+    fn registry_entry_matches_the_full_parse() {
+        let all = registry_curves();
+        assert!(all.len() > 100, "the registry is populated");
+        for c in all.iter().step_by(97) {
+            let slug = c.get("slug").and_then(Value::as_str).unwrap();
+            let fast = registry_entry(slug).unwrap_or_else(|| panic!("{slug} not found"));
+            let full = all
+                .iter()
+                .find(|x| x.get("slug").and_then(Value::as_str) == Some(slug))
+                .unwrap();
+            assert_eq!(&fast, full, "{slug}");
+        }
+        assert!(registry_entry("icv1-no-such-curve-00000000").is_none());
+        // A slug that is a prefix of a real one is not that one.
+        let first = all[0].get("slug").and_then(Value::as_str).unwrap();
+        assert!(registry_entry(&first[..first.len() - 1]).is_none());
+        // A string with braces and escaped quotes inside is skipped as text.
+        assert_eq!(json_object_end(br#"{"a":"}\"{","b":{}}"#, 0), Some(18));
+    }
+
     fn public_fixture() -> CurveSpec {
         CurveSpec::PrimePublicFixture {
             p: 343073,
@@ -1464,5 +1652,37 @@ mod tests {
     #[test]
     fn unusable_koblitz_curve_is_refused() {
         assert!(CurveSpec::Koblitz { a: 0, n: 17 }.build().is_err());
+    }
+}
+
+#[cfg(test)]
+mod merged_variant_tests {
+    use super::*;
+    #[test]
+    fn distinct_quartic_constructors_keep_their_metadata_and_generators() {
+        let specs = [
+            CurveSpec::Fp4Translation { p: 29, seed: 1 },
+            CurveSpec::Fp4Torsion {
+                p: 29,
+                seed: 1,
+                max_cofactor: 16,
+            },
+            CurveSpec::F2m4Torsion {
+                m: 4,
+                seed: 1,
+                max_cofactor: 16,
+            },
+        ];
+        for spec in specs {
+            let i = spec.build().unwrap();
+            let facts = i.facts(&spec);
+            assert!(facts.r > 2);
+            assert_eq!(i.mul_generator_hex(1).unwrap(), facts.generator);
+            assert!(i.mul_generator_hex(i.r()).is_none());
+            assert_eq!(
+                serde_json::from_str::<CurveSpec>(&serde_json::to_string(&spec).unwrap()).unwrap(),
+                spec
+            );
+        }
     }
 }

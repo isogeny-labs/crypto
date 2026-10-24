@@ -196,6 +196,17 @@
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ic_planner_validation_20261020/README.md",
      "value": 14.39
+    },
+    {
+     "date": "2026-10-20",
+     "value": 1236267.0,
+     "reference": "matched",
+     "unit": "F_p multiplications",
+     "label": "k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)",
+     "detail": "Native complete DLPs paired with rho on the same target: 1.24e6x (p = 61), 1.94e6x (p = 41), 3.39e6x and 5.77e6x (p = 31), 5.2e6x (p = 71), all verified; a sixth arm (p = 41, six-point base) stopped at its 10-hour cap at >= 1.5e7x. Rho's unpriced walk work priced at 0, 0.1, 1 GAE: rho ahead at every weight (4.1e5x best at 1 GAE). Trace replay cuts the test 1.74-1.77x (5.85e7 to 3.3e7). Extrapolated parity n = 2^227 (2^233 without replay). Engineering; no ecbench session (no F_{p^k} instance on main).",
+     "class": "engineering",
+     "anchor": "#rho-parity-ledger",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
     }
    ],
    "role": "emphasis"
@@ -428,7 +439,7 @@
      "anchor": "#three-leads-e2e-0",
      "class": "accounting",
      "date": "2026-10-19",
-     "detail": "Best tested curve/recipe after observation: binary-q16-v2::icv1-f2m8-tm17-ec7ed2e8, 8 matched targets; cold default arithmetic IC/rho-neg 2.0158; 12-price range 1.965–2.146. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "detail": "Best tested curve/recipe after observation: binary-q16-v2::icv1-f2m8-tm17-ec7ed2e8, 8 matched targets; cold default arithmetic IC/rho-neg 2.0158; 12-price range 1.965\u20132.146. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "label": "Three-leads fresh Binary subfield",
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
@@ -439,7 +450,7 @@
      "anchor": "#three-leads-e2e-1",
      "class": "accounting",
      "date": "2026-10-19",
-     "detail": "Best tested curve/recipe after observation: odd-p5-v2::icv1-fp3k2-t4-1f351b3a, 8 matched targets; cold default arithmetic IC/rho-neg 2.2283; 12-price range 2.079–2.274. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "detail": "Best tested curve/recipe after observation: odd-p5-v2::icv1-fp3k2-t4-1f351b3a, 8 matched targets; cold default arithmetic IC/rho-neg 2.2283; 12-price range 2.079\u20132.274. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "label": "Three-leads fresh Odd subfield",
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
@@ -450,7 +461,7 @@
      "anchor": "#three-leads-e2e-2",
      "class": "accounting",
      "date": "2026-10-19",
-     "detail": "Best tested curve/recipe after observation: pkm_dickson-d2-lo8192-v2::icv1-fp14-t60-aa1a2317, 8 matched targets; cold default arithmetic IC/rho-neg 7.7116; 12-price range 6.304–8.289. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "detail": "Best tested curve/recipe after observation: pkm_dickson-d2-lo8192-v2::icv1-fp14-t60-aa1a2317, 8 matched targets; cold default arithmetic IC/rho-neg 7.7116; 12-price range 6.304\u20138.289. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "label": "Three-leads fresh PKM fixed fibers",
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
@@ -461,7 +472,7 @@
      "anchor": "#three-leads-e2e-3",
      "class": "accounting",
      "date": "2026-10-19",
-     "detail": "Best tested curve/recipe after observation: genus-16-v2::icv1-fp9k2-tm342-02fbacd7, 60 matched targets; cold default arithmetic IC/rho-neg 5.2546; 12-price range 3.614–6.841. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "detail": "Best tested curve/recipe after observation: genus-16-v2::icv1-fp9k2-tm342-02fbacd7, 60 matched targets; cold default arithmetic IC/rho-neg 5.2546; 12-price range 3.614\u20136.841. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "label": "Three-leads fresh Genus transfer, field cohort",
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
@@ -472,12 +483,23 @@
      "anchor": "#three-leads-e2e-4",
      "class": "accounting",
      "date": "2026-10-19",
-     "detail": "Best tested curve/recipe after observation: order-genus-16::icv1-fp10k2-tm230-7cd9e337, 60 matched targets; cold default arithmetic IC/rho-neg 5.3922; 12-price range 3.295–7.162. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
+     "detail": "Best tested curve/recipe after observation: order-genus-16::icv1-fp10k2-tm230-7cd9e337, 60 matched targets; cold default arithmetic IC/rho-neg 5.3922; 12-price range 3.295\u20137.162. Native work unpriced; L0 walls unqualified. Complete frozen costs and all curves retained.",
      "label": "Three-leads fresh Genus transfer, subgroup cohort",
      "reference": "matched",
      "source": "https://github.com/aburan28/crypto/blob/main/research/three_leads_e2e_20261018/README.md",
      "unit": "cold arithmetic-model diagnostic; native unpriced",
      "value": 5.392179273237021
+    },
+    {
+     "date": "2026-10-20",
+     "value": 158.9,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "PKM Kummer tower (t=12) + rootfind-mitm, 30-bit prime curve icv1-fp30-t49927-d70f5de2",
+     "detail": "IC / rho-negation S ratio 158.9 [121.6, 221.4] at w = 0 (175x at w = 0.1, 247x at w = 1) over 24 matched measured pairs on eight public targets, session ECBS1hfb8f08d66f01, audit OK (160 records verified, 120 replays reproduced). Extends the registered 20-28 bit ladder (140.6x at 28 bits): the gap grew. L0, operation counts only; native field work unpriced. Class: measurement; not an improvement.",
+     "class": "accounting",
+     "anchor": "#lab-ecbench-all",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/certicom131_ic_program_20261020/README.md"
     }
    ],
    "role": "context"
@@ -994,7 +1016,7 @@
   {
    "barrier_test": true,
    "id": "genus2-kummer-matched-gae",
-   "label": "Elliptic curve over Fp², genus-2 Kummer transfer, complete cold counted GAE",
+   "label": "Elliptic curve over Fp\u00b2, genus-2 Kummer transfer, complete cold counted GAE",
    "note": "The signed differential quotient collector and source-negation rho ran on the same 1,260 public targets in one process. Cold setup is charged per target. This is a modeled operation-cost comparison, not calibrated wall time.",
    "points": [
     {
@@ -1002,7 +1024,7 @@
      "value": 14.356662,
      "reference": "matched",
      "label": "Uncached signed Kummer differential collector vs source-negation rho, 1,260 targets",
-     "detail": "Complete cold ratio at M + 0.5S + 10I and native logical operation = 0.1 GAE. Across 36 pooled price cells the ratio is 8.959687–55.935424; 0 cells below rho. All 1,260 scalar recoveries and same-process rho controls are independently source-verified. Every 45,360 target/cell comparison is a loss. The arbitrary-jump signed-label sidecar remains unimplemented.",
+     "detail": "Complete cold ratio at M + 0.5S + 10I and native logical operation = 0.1 GAE. Across 36 pooled price cells the ratio is 8.959687\u201355.935424; 0 cells below rho. All 1,260 scalar recoveries and same-process rho controls are independently source-verified. Every 45,360 target/cell comparison is a loss. The arbitrary-jump signed-label sidecar remains unimplemented.",
      "class": "engineering",
      "anchor": "#kummer-matched-20261022",
      "source": "https://github.com/aburan28/crypto/blob/main/research/kummer_differential_collector_20261022/MATCHED_REPORT.md"

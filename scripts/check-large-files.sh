@@ -19,7 +19,7 @@ limit=${3:-10485760}
 ALLOW=(
   docs/browser/data.json
   'docs/curves/*.json'
-  docs/curves/cover-links.yaml
+  docs/curves/cover-links.yaml  # JSON graph regenerated with registry.json
 )
 
 # The diff below runs in a process substitution, whose failure set -e misses.

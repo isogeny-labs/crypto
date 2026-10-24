@@ -179,6 +179,15 @@ pub struct GF3n {
 impl GF3n {
     /// GF(3^n) with a low-weight monic irreducible t^n - red found by search (Rabin's test):
     /// the fewest non-zero tail terms, and among those the smallest packed tail.
+    /// The monic modulus t^n - red(t), coefficients lowest first (digits in 0..3).
+    pub fn modulus(&self) -> Vec<u64> {
+        let mut m: Vec<u64> = (0..self.n as usize)
+            .map(|k| (3 - self.red.get(k).copied().unwrap_or(0) as u64) % 3)
+            .collect();
+        m.push(1);
+        m
+    }
+
     pub fn new(n: u32) -> Self {
         assert!((1..=40).contains(&n));
         let pow3n = 3u64.pow(n);
