@@ -190,3 +190,52 @@ not verified. `q = 9` (not prime) is not covered: the tool needs `q` prime.
 `results/<item>-run-<UTC>/` with `env.txt` (git HEAD, tool sha256, command,
 protocol sha256, rustc, host), CSVs and `summary.txt`; `REPORT.md`,
 `REPORT.pdf`, `figures/` (SVG, PNG), `scripts/` (plot, build).
+
+## Amendment 1 (2026-10-24, before the q = 5 census and every Tian/join run)
+
+Runs `ctrlH-q3`, `ctrlK-q3-{cone,split,nonsplit}`, `ctrlH-q5`, `ctrlH-q7` were made
+with the tool as frozen. After them, and before any other run, the tool gained,
+without touching existing code paths: `hurwitz` (Hurwitz class number),
+`haar_density` (Katz-Sarnak density at `T^8 - tT^4 + q^4`, [L]), `spearman`,
+parts `JOIN` and `TIANTHEORY`, and the unit tests for them. `TIANTHEORY`
+checks Theorem 6 (a closed form for the number of Tian kernels at `n = 4` when
+`T^8 - tT^4 + qbar^4` is squarefree mod odd `l`, derived in the report) against
+the linear algebra on every cell, `l = 3, 5, 7`. Predictors for P4, fixed now:
+(A) `H(4q^4 - t^2)`; (B) Haar density; (C) `B·H/sqrt(4q^4 - t^2)`; (D) number of
+`l` with a Tian kernel. Held-out metric: Spearman correlation of the mass `mu(t)`
+with each predictor over the ordinary prime-order traces. `q = 7` stays held out
+until a conjecture is written as Amendment 2.
+
+Amendment 1b (2026-10-24): `JOIN` accepts a comma-separated list of `mass_by_t.csv`
+files (one per quadric type); no other change.
+
+## Amendment 2 (2026-10-24, after the q = 3 and q = 5 data, before any q = 7 census run)
+
+Data seen so far (runs `ctrlK-q3-*`, `classes-q3-*`, `cen-q5-*`, `tian-q3/5`,
+`join-q3/5`, `tiantheory`): all four valid prime-order traces at q = 3 and 13 of
+14 at q = 5 have hits; the exception is t = 49 (#E = 577, one below the
+Hasse bound 50), Haar density 0.0005. A Tian kernel at l = 2 exists for every
+prime-order trace (Frobenius class T^2+T+1, unique kernel), so the Tian
+predictor (D) has no discriminating power at l = 2. Spearman(mass, predictor) at
+q = 5: Haar density 0.775, Haar·H/sqrt 0.775, H 0.565, Tian count 0.29.
+(The `join-q7pre` and `tian-q7` runs above used empty census files: they list the
+q = 7 traces and predictors only and contain no q = 7 census data.)
+
+**Conjecture (mined from q = 3, 5; a conjecture, not a theorem).**
+(R1) A prime-order trace t is realised by a smooth non-hyperelliptic genus-4
+curve iff its Haar density D(t) = prod_{j<k}|cos φ_j − cos φ_k| prod_j sin φ_j,
+φ_k = (θ+2πk)/4, cos θ = t/(2q²), is not tiny: realised for D >= 0.0143 (the
+smallest realised value at q = 5), unrealised at D <= 0.0005 (the unrealised
+value at q = 5); in between no claim. (R2) The mass of hits per trace is
+rank-correlated with D(t). (R3) Existence of Tian kernels at l <= 7 does not predict
+either.
+**Predictions for the held-out q = 7 census** (frozen now): the 20 prime-order
+traces are t ∈ {-75,-71,-65,-57,-45,-39,-15,-9,3,9,13,19,25,31,45,51,55,61,69,93}.
+(P-a) the 19 traces with D >= 0.0143 (all but t = 93, D = 0.00199) each have at
+least one smooth hit; t = 93 is in the no-claim band, with a lean towards no hit.
+(P-b) Spearman(mass, D) >= 0.5 and |Spearman(mass, Tian count)| < 0.5.
+(P-c) the total mass lies within a factor 1.5 of N_t · 11.7 · (7/5)^3.4 with
+N_t = 20 (mean mass per trace 2.1 at q = 3 and 11.7 at q = 5 gives the exponent
+3.4; a two-point extrapolation, registered as such): 20·11.7·3.14 ≈ 735, i.e.
+within [490, 1100]. Sizes: 3·10^7 per type as in section 3 (split and cone without the N_4
+pre-filter, non-split with it, seed 20261024·10 + 7).

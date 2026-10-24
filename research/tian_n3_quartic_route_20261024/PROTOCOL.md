@@ -273,3 +273,93 @@ A constant in `q` over a few primes does not establish an asymptotic exponent.
    the within-prime contrast is the primary one.
 3. The tool sha256 in `env.txt` is of the working-tree file at run time; the
    tool is not edited between the run and the report.
+
+## Amendment 2 (2026-10-24, after the item (a) run started, before any item (b) run)
+
+Item (a)'s run recorded the sha256 of the file as of Amendment 1; this
+amendment concerns item (b) only and changes nothing item (a) uses.
+
+Calibration on separate curve seeds (9000 + i; `q = 251` and `1021`, 2 to 3
+curves each, outputs discarded, not evidence) changed the index-calculus
+design from section 5 as follows, before any measured run:
+1. The base point `O` joins the factor base as a pinned point (value 0) in the
+   pair enumeration. Reason: every pair relation has four points and `x_h`, so
+   `x_P = c, x_h = 4c` solves the homogeneous system and the kernel was
+   always at least 2-dimensional; a relation containing `O` removes it.
+2. The pair order is a Fisher-Yates shuffle of all `(B+1) B / 2` pairs (a
+   mixing-permutation first tried was visibly non-uniform).
+3. Pairs are processed until the ground component has at least `2B + 30`
+   independent cycles (not `B + 21`): the cycle rows are far from independent
+   (rank about 0.7 of the row count in calibration). If the nullspace is still
+   not one-dimensional, the attempt is repeated with `B` larger by 100 per
+   cent of `sqrt q` (up to 3 times) and the costs of all attempts are summed.
+4. `B = ceil(3.00 sqrt q)` initially (calibration: 2.0 and 2.5 failed at
+   `q = 1021`, 3.0 worked).
+5. Instance condition: cofactor `h <= 1000` (was 2000 in the text; 1000 is
+   what the runs use) and `ell^2 !| N`. The rho and index-calculus costs are
+   normalised by `sqrt(ell)` where shown, since `ell` varies with `h`.
+6. Rho: `r = 32` multipliers `T_j = m_j P + n_j Q` with 16-bit `m_j, n_j`;
+   distinguished with probability `2^-5`; after a distinguished point the walk
+   continues from it plus a random multiplier (no fresh scalar
+   multiplications); walks longer than `40 * 2^5` steps are restarted
+   (cycle guard); the step budget is `60 sqrt(ell) + 10^5`.
+7. Primes and instance counts: `q = 127, 251, 509, 1021, 2039` with
+   `8, 8, 6, 6, 4` instances (curve seed `1000 q + i`, run seed `q`); plain
+   rho and the index calculus at every `q`, rho with the negation map at
+   `q <= 509` only (its cost is dominated by the extra operation, see P-b4).
+8. `GAE` for pricing is the mean `M` and `I` of 100 successful additions of
+   random classes on the instance's own curve, measured after the instance is
+   built; instance construction (point count, order search, planting) is not
+   charged to either arm.
+9. Degenerate configurations (about 5 per cent of operations at `q = 251`,
+   falling with `q`) are retried with a fresh random cubic and, if still
+   degenerate, handled through a random pool element; every attempt's `M`
+   and `I` is counted. An element whose own divisor cannot be written as a
+   Mumford pair makes the walk restart (`dead` in the rho rows).
+10. No sparse linear algebra: the dense elimination modulo `ell` is counted
+    (`LA`), so the index-calculus total includes `~B^3` multiply-adds. This is
+    the main reason P-b3 expects no resolved ranking at weight 1.
+
+## Amendment 3 (2026-10-24, after the first item (b) run `b-ic-vs-rho-run-20261024T2232Z`, before the second)
+
+The first run finished in about four minutes, far below the budget, and its
+rho-with-negation rows were dominated by two-cycles of the r-adding walk on
+classes modulo sign (steps per `sqrt(ell)` of 20 to 39 against about 1 to 3 for
+plain rho, 4 to 200 restarts per instance): the walk had no cycle escape, so
+those rows measure a defective implementation. Changes, fixed before the second run:
+1. Rho with the negation map detects a two-cycle (the canonical state equals the
+   state two steps earlier) and jumps with a random multiplier; escapes are counted
+   (`cycle_escapes`). Plain rho and the index calculus are unchanged.
+2. Scope: `q = 127, 251, 509, 1021, 2039, 4093, 8191` with `12, 12, 10, 10, 8, 6, 4`
+   instances (same curve-seed rule `1000 q + i`, so the first instances share curves
+   with the first run); rho with the negation map for `q <= 2039`.
+3. The first run's directory stays as a record; its `ic` and `rho` rows are valid
+   and agree in kind with the second run's; its `rhoneg` rows are superseded and
+   are not used for P-b4.
+Hypotheses and pricing are unchanged. The fitted exponents are reported with
+and without the one-off rho set-up (32 multipliers, one start) because that
+set-up is a constant of roughly 4 000 additions that dominates rho's total at
+small `q`.
+
+## Amendment 4 (2026-10-24, after an aborted second run, before the third)
+
+The second run (`b-ic-vs-rho-run-20261024T2234Z`, Amendment 3's scope) was
+stopped by the operator at `q = 509`, curve seed 509009: the planted `Q = kP`
+was an element whose scalar multiples could not be formed (every `smul(t, Q)`
+returned "not representable"; 199 of 199 probes), and both arms looped on it
+(one index-calculus row of 1.4e10 `M` was recorded before the stop). Changes,
+fixed before the third run:
+1. Instance usability filter: a planted pair `(P, Q)` is accepted only if the
+   multiples `3, 5, 7, 11, 13, 17` of `P` and `1009 t` of `Q` are computable;
+   otherwise a new `k` (up to 8 times) or a new curve is drawn. The number of
+   instances rejected is not recorded per instance (the generator loops), so the
+   filter is stated here as a selection rule; it removes pairs on which the
+   group-law implementation, not the algorithm, fails.
+2. Guards: rho multipliers and starts, and the index calculus' target loop, stop
+   after a fixed number of failures (an arm that stops is a failed, unverified
+   row and stays in the table).
+3. Each instance's rows are appended to the CSV as soon as the instance is done.
+4. `summarize` can also report medians over instances (`QIC_STAT=median`); both
+   the mean (primary, as preregistered) and the median are reported, because a
+   single slow instance moves a mean.
+Scope, parameters and hypotheses are those of Amendments 2 and 3.
