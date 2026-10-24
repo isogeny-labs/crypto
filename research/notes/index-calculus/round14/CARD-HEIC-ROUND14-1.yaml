@@ -6,7 +6,7 @@ executor_role: executor-mechanical
 kind: frozen_command
 bus_address: executor-mechanical-heic-round14
 background: false
-commit: 6a3d95cd77d24395afb2dbe65062b28b48873664
+commit: 2fc38dc72dc7683d0e1b0f77aa5d6da4b41599c5
 write_scope:
   - research/notes/index-calculus/round14/run1/
 receipt: research/notes/index-calculus/round14/run1/receipt.json
@@ -99,4 +99,4 @@ stop_when:
   - "python3 tools/task_card.py run exits with status 2"
   - "the dispatch text differs from the text python3 tools/task_card.py prompt prints for this card"
   - "the directory /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r14/attempt1 already exists before the command starts"
-notes: "Command 1 creates the empty directory /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r14/attempt1 with mkdir, which fails if it exists. Command 2 runs the frozen binary once, pinned to CPU 3 by tools/isolated_bench.py, and writes its table and verdict lines to /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r14/attempt1/R14.txt. Commands 3 to 9 only print that file and the last record of /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r14/attempt1/isolated_bench.jsonl. The argument --max-other-cpu 1.0 lets the run start while the agent harness uses some CPU. This run reports counted group operations only, which are deterministic in the seed and hold at any isolation level; isolation gates wall-clock figures, which this run does not report. Core pinning and the conditions record stay, and the record may be marked contended. Return all of it verbatim and compute nothing."
+notes: "Command 1 creates the empty directory /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r14/attempt1 with mkdir, which fails if it exists. Command 2 runs the frozen binary once, pinned to CPU 3 by tools/isolated_bench.py, and writes its table and verdict lines to /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r14/attempt1/R14.txt. Commands 3 to 9 only print that file and the last record of /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r14/attempt1/isolated_bench.jsonl. The argument --max-other-cpu 1.0 lets the run start while the agent harness uses some CPU. This run reports counted group operations only, which are deterministic in the seed and hold at any isolation level; isolation gates wall-clock figures, which this run does not report. Core pinning and the conditions record stay, and the record may be marked contended. The binary was built from commit 6a3d95cd77d24395afb2dbe65062b28b48873664 and stays bound by its sha256; the commit pin moved to 2fc38dc72dc7683d0e1b0f77aa5d6da4b41599c5 because only the note and the card changed since then. Return all of it verbatim and compute nothing."
