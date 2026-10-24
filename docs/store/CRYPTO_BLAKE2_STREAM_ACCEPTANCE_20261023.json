@@ -1,0 +1,76 @@
+{
+  "schema": "crypto.blake2-stream-s3-acceptance/v1",
+  "checked_at_utc": "2026-10-24T04:42:35.303345+00:00",
+  "source_base_commit": "dc78327876990c4cb82a4ed8b5dd65079101285a",
+  "source_state": "committed BLAKE2 streaming implementation",
+  "binary_sha256": "d61f09c00300ad37caa32c9720400fbd5f3f0d76e4a363fc4e47ceac30055645",
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261024T044229Z-c4702921",
+  "logical_name": "evidence/crypto-blake2-stream/20261024T044229Z-c4702921/input.bin",
+  "object": {
+    "key": "ic/v1/acceptance/20261024T044229Z-c4702921/sha256/dc/dceb11fea27458999b9aa5d4fbea9519d01712ec5b930b228df516f0632b0fba",
+    "sha256": "dceb11fea27458999b9aa5d4fbea9519d01712ec5b930b228df516f0632b0fba",
+    "bytes": 1048577
+  },
+  "checks": {
+    "local_comparisons": 112,
+    "local_algorithms": [
+      "blake2b",
+      "blake2s"
+    ],
+    "local_size_cases": [
+      0,
+      1,
+      63,
+      64,
+      65,
+      127,
+      128,
+      129,
+      255,
+      256,
+      257,
+      65535,
+      65536,
+      65537,
+      1048577,
+      8388745
+    ],
+    "local_output_bytes": {
+      "blake2b": [
+        1,
+        16,
+        32,
+        64
+      ],
+      "blake2s": [
+        1,
+        16,
+        32
+      ]
+    },
+    "remote_download_status": "bytes_ok",
+    "fresh_cache_matches": {
+      "blake2b:1": "2e",
+      "blake2b:16": "51d200ff6d79917e196b6798cd4dba1b",
+      "blake2b:32": "404fddca54a32d3507fa33a0c6c3091763af75397a329c27e09216bcebac4692",
+      "blake2b:64": "c0ab4c39b9d55909180caabba8d4ee05f324597ea802760b6d44d926c926462340dc4b93975ba8c7ff926ef686b5645c90552d651c0fa4affb244f8f8d897861",
+      "blake2s:1": "c6",
+      "blake2s:16": "7a7c770985f426e70e23688489deb7c5",
+      "blake2s:32": "283272cda44365345159ea54e83f05cd8189e0772e99c965a69607aac2d523d5"
+    },
+    "release_binary_tests_passed": 30,
+    "release_binary_tests_failed": 0,
+    "blake2_library_tests_passed": 17,
+    "blake2_library_tests_failed": 0
+  },
+  "external_reference": "Python hashlib BLAKE2b/BLAKE2s with digest_size",
+  "cleanup": {
+    "objects_deleted": 1,
+    "prefix_empty": true,
+    "errors": []
+  },
+  "source_commit": "8e677d56409"
+}
