@@ -1,0 +1,100 @@
+{
+  "observed_utc": "2026-10-19T06:08:00Z",
+  "groups": [
+    {
+      "schema": "spot.criu-export/v1",
+      "bucket": "spot-experiments-runtimebucket-g8acwaz3kewm",
+      "batch": "20261019T060000Z-2f1b37bb0acd",
+      "committed": true,
+      "committed_utc": "2026-10-19T06:00:00.341922+00:00",
+      "indexes": [
+        {
+          "bytes": 19814,
+          "download_sha256_verified": true,
+          "key": "checkpoints/criu/20261019T060000Z-2f1b37bb0acd/index.json",
+          "server_side_encryption": "AES256",
+          "sha256": "d1643f22f5a45c65e3823b373b3eeb1dee7e4170106693e956200dac0db4d5fa"
+        },
+        {
+          "bytes": 19814,
+          "download_sha256_verified": true,
+          "key": "checkpoints/criu/20261019T054500Z-bb55260769d3/index.json",
+          "server_side_encryption": "AES256",
+          "sha256": "c1299782470008cca57fcb46b0710fb413e3927e1852d5a4a588e38befb8579f"
+        },
+        {
+          "bytes": 19814,
+          "download_sha256_verified": true,
+          "key": "checkpoints/criu/20261019T053317Z-edfce3d4381f/index.json",
+          "server_side_encryption": "AES256",
+          "sha256": "3ffcb630adc4606690b567d062c1794d6541a749ab4519b78a518794e4157fe7"
+        }
+      ],
+      "objects": [],
+      "group": "factor",
+      "completed_count": 5
+    },
+    {
+      "schema": "spot.criu-export/v1",
+      "bucket": "spot-experiments-runtimebucket-g8acwaz3kewm",
+      "batch": "20261019T060000Z-9b05e5950026",
+      "committed": true,
+      "committed_utc": "2026-10-19T06:00:02.318070+00:00",
+      "indexes": [
+        {
+          "bytes": 2250,
+          "download_sha256_verified": true,
+          "key": "checkpoints/criu/diem/20261019T060000Z-9b05e5950026/index.json",
+          "server_side_encryption": "AES256",
+          "sha256": "38a305a21adb0b43feac0e56b96dd5c4bdf46d4ae831025d37387535f633f7ba"
+        },
+        {
+          "bytes": 2250,
+          "download_sha256_verified": true,
+          "key": "checkpoints/criu/diem/20261019T054500Z-5656fd6b8a37/index.json",
+          "server_side_encryption": "AES256",
+          "sha256": "5615297af40c8e4de14365fb8bd94a13ebd54cd162e77689461deb4813fc0079"
+        },
+        {
+          "bytes": 2250,
+          "download_sha256_verified": true,
+          "key": "checkpoints/criu/diem/20261019T054433Z-d639f18c8ce3/index.json",
+          "server_side_encryption": "AES256",
+          "sha256": "ba7f815c74ae14b5b65b638b40e2de10532758b09a1d252d4c9a7549a41b654f"
+        }
+      ],
+      "objects": [
+        {
+          "bytes": 22533879,
+          "captured_utc": "2026-10-19T06:00:00.544022+00:00",
+          "download_sha256_verified": true,
+          "generation": "gen-1792389600309073130",
+          "job": {
+            "command_sha256": "56090b2072e99bcf01ed402d7aa8b5577e0e9df5e96754d1898c1640d313f826",
+            "cwd": "/home/ec2-user/crypto-w2a-diem-relations",
+            "executable": "/tmp/claude-1000/-home-ec2-user/bdf27874-83ea-5a78-b96c-6f6833f8168c/scratchpad/sa2/target/release/examples/diem_quartic_study",
+            "pid": 400334,
+            "start_ticks": "1232754"
+          },
+          "kernel": "6.18.54-121.166.amzn2023.x86_64",
+          "key": "checkpoints/criu/diem/20261019T060000Z-9b05e5950026/400334.tar.zst",
+          "pid": 400334,
+          "server_side_encryption": "AES256",
+          "sha256": "a2fd21051d8d4f3980b7d16ea503c162cdbdbfa541ed94c1906f97a4727f14bd",
+          "state": "checkpoint"
+        }
+      ],
+      "group": "diem",
+      "completed_count": 0
+    }
+  ],
+  "schema": "spot.recurring-private-backups/v1",
+  "recurring_sensitive_memory_export_authorized": true,
+  "schedule": "OnCalendar=*:0/15",
+  "source_instance": "i-01f85a6c905181498",
+  "original_processes_preserved": true,
+  "timers_enabled": [
+    "spot-legacy-backup.timer",
+    "spot-diem-backup.timer"
+  ]
+}

@@ -5,6 +5,10 @@
 # MCP server in .mcp.json work in every cloud session. docs/CONDUCTOR.md
 # explains each step.
 #
+# It then runs scripts/setup-workstation.sh for the rest of the toolchain
+# (system libraries, PARI/GP, the codex and opencode CLIs, the cryptanalysis
+# checkout, per-repo virtualenvs) and starts SageMath's install detached.
+#
 # It starts one cairn node (scripts/cairn-node.sh: `cairn run --no-mcp`, which
 # syncs the log with the seed nodes and verifies claims) and no autonomous agent:
 # no `conductor worker`, no `cairn agent run`.
@@ -41,11 +45,19 @@ echo "== $(date -u +%FT%TZ) session start"
 project=crypto
 repo="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 
-# Optional sparse checkout (docs/sparse-checkout.md): CRYPTO_SPARSE_PROFILE=harness
-# (or minimal) in the environment leaves research archives off disk. Never fatal.
-if [ -n "${CRYPTO_SPARSE_PROFILE:-}" ]; then
-  (cd "$repo" && scripts/sparse-checkout.sh apply --profile "$CRYPTO_SPARSE_PROFILE") \
-    || echo "sparse profile '$CRYPTO_SPARSE_PROFILE' not applied; checkout stays full"
+# Sparse checkout by default (docs/sparse-checkout.md): the harness profile
+# leaves the 18 largest research/ archives off disk. CRYPTO_SPARSE_PROFILE picks
+# minimal instead, or full to keep the whole checkout. Applied once, on a full
+# checkout only, so a resumed session keeps the paths it added. Never fatal.
+sparse_profile="${CRYPTO_SPARSE_PROFILE:-harness}"
+if [ "$(git -C "$repo" config --bool core.sparseCheckout 2>/dev/null)" = true ]; then
+  sparse_summary="Sparse checkout already applied ($(cd "$repo" && scripts/sparse-checkout.sh status 2>/dev/null | head -n 1))"
+elif [ "$sparse_profile" = full ]; then
+  sparse_summary="Full checkout (CRYPTO_SPARSE_PROFILE=full)"
+elif (cd "$repo" && scripts/sparse-checkout.sh apply --profile "$sparse_profile"); then
+  sparse_summary="Sparse profile $sparse_profile applied: some research/ directories are off disk but still in git; scripts/sparse-checkout.sh add --path P/ materializes one"
+else
+  sparse_summary="Sparse profile $sparse_profile not applied; checkout stays full"
 fi
 
 # Conductor, through the Go module proxy. The release installer cannot download
@@ -98,8 +110,38 @@ else
   plane="a control plane in this container (http://localhost:8080; it coordinates nothing outside it)"
 fi
 
+# The rest of the research toolchain: scripts/setup-workstation.sh, minus the
+# parts this hook already did. It skips what is installed, so a container
+# restored from the cache only re-checks. Workspace is the directory holding
+# this checkout, where attached sibling repositories sit; of the missing ones
+# only cryptanalysis (~1.5 GB) is cloned, since the others are attached when a
+# session needs them (CRYPTO_SETUP_CLONE overrides). SageMath (~8 GiB, several
+# minutes) installs detached, so the session does not wait on it and the hook
+# stays inside its timeout; it skips itself below 10 GiB free.
+# CRYPTO_WORKSTATION_SETUP=0 turns all of this off. Never fatal.
+setup_summary="workstation setup off"
+if [ "${CRYPTO_WORKSTATION_SETUP:-1}" != 0 ]; then
+  setup="$repo/scripts/setup-workstation.sh"
+  workspace="$(dirname "$repo")"
+  if CLONE_REPOS="${CRYPTO_SETUP_CLONE-cryptanalysis}" "$setup" --workspace "$workspace" \
+      --skip conductor,cairn,control-plane,sage; then
+    setup_summary="workstation setup ran"
+  else
+    setup_summary="workstation setup failed"
+  fi
+  if [ "${CRYPTO_SETUP_SAGE:-1}" != 0 ] && ! command -v sage >/dev/null \
+      && [ ! -x /opt/conda-sage/bin/sage ]; then
+    setsid nohup "$setup" --only sage >"$state/sage-install.log" 2>&1 3>&- </dev/null &
+    setup_summary="$setup_summary; SageMath install started in the background ($state/sage-install.log)"
+  fi
+  [ -x /opt/conda-sage/bin/sage ] && [ -n "${CLAUDE_ENV_FILE:-}" ] \
+    && echo 'export PATH="/opt/conda-sage/bin:$PATH"' >>"$CLAUDE_ENV_FILE"
+fi
+
 conductor_version="$(conductor version 2>/dev/null | head -n 1)"
 cairn_version="$(cairn --version 2>/dev/null | head -n 1)"
-cairn_node="$("$repo/scripts/cairn-node.sh" status 2>&1 | head -n 1)"
-echo "ready: $conductor_version; $cairn_version; $plane; $cairn_node"
-echo "Workspace tools: $conductor_version and $cairn_version are installed; Conductor is using $plane. $cairn_node. Log: $state/session-start.log" >&3
+# `status` exits 1 while the node is down; under pipefail that ended the hook
+# here, before the summary line.
+cairn_node="$("$repo/scripts/cairn-node.sh" status 2>&1 | head -n 1 || true)"
+echo "ready: $conductor_version; $cairn_version; $plane; $cairn_node; $setup_summary"
+echo "Workspace tools: $conductor_version and $cairn_version are installed; Conductor is using $plane. $cairn_node. $setup_summary. $sparse_summary. Log: $state/session-start.log" >&3

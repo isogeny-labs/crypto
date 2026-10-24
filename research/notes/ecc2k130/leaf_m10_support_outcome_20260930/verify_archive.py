@@ -46,12 +46,14 @@ def main() -> None:
         else:
             assert item["provenance"] == "mac_replay"
             assert item["path"] == "mac_replay.json"
-    # The sibling raw-run directory is a separately checksummed receipt copy
-    # (its own SHA256SUMS); the manifest covers everything outside it.
+    # The archive manifest excludes separately sealed top-level run_* directories.
     present = {path.relative_to(EVIDENCE).as_posix()
                for path in EVIDENCE.rglob("*")
-               if path.is_file() and RAW_RUN not in path.relative_to(EVIDENCE).parts}
+               if path.is_file()
+               and not path.relative_to(EVIDENCE).parts[0].startswith("run_")
+               and RAW_RUN not in path.relative_to(EVIDENCE).parts}
     assert paths == present
+    # The specifically pinned raw run is independently verified when present.
     raw = EVIDENCE / RAW_RUN
     if raw.is_dir():
         listed = set()

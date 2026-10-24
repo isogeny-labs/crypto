@@ -28,7 +28,7 @@ concurrency:
 jobs:
   metadata:
     name: canonical identities and upstream mirror
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ic-semantic-metadata.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ic-semantic-metadata.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -39,17 +39,36 @@ jobs:
         run: python -m pip install pyyaml==6.0.2 jsonschema==4.23.0
       - name: Negative controls
         run: python -m unittest discover -s docs/curves/ic -p 'test_validate_semantics.py' -v
+      # aburan28/cryptanalysis is private: an unauthenticated fetch returns 404.
+      # CRYPTANALYSIS_READ_TOKEN (a fine-grained token with contents: read on
+      # that repository) enables the byte comparison; without it the committed
+      # metadata is still validated and the run warns that the mirror was not.
       - name: Fetch authoritative cryptanalysis registry for byte comparison
+        id: peer
         shell: bash
+        env:
+          PEER_TOKEN: ${{ secrets.CRYPTANALYSIS_READ_TOKEN }}
         run: |
           set -euo pipefail
+          if [ -z "$PEER_TOKEN" ]; then
+            echo "::warning::CRYPTANALYSIS_READ_TOKEN is not set; the upstream mirror comparison is skipped (aburan28/cryptanalysis is private)"
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           base=cryptanalysis-peer/experiments/ic-candidate-catalog
           mkdir -p "$base/curve-links"
           for file in curves.yaml curves.schema.json curve-links/link.schema.json \
                       validate_semantics.py test_validate_semantics.py; do
             curl --fail --location --show-error --silent --retry 3 \
-              "https://raw.githubusercontent.com/aburan28/cryptanalysis/main/experiments/ic-candidate-catalog/$file" \
+              -H "Authorization: Bearer $PEER_TOKEN" \
+              -H "Accept: application/vnd.github.raw" \
+              "https://api.github.com/repos/aburan28/cryptanalysis/contents/experiments/ic-candidate-catalog/$file?ref=main" \
               --output "$base/$file"
           done
+          echo "available=true" >> "$GITHUB_OUTPUT"
       - name: Validate committed metadata and upstream mirror
+        if: steps.peer.outputs.available == 'true'
         run: python docs/curves/ic/validate_semantics.py --peer cryptanalysis-peer
+      - name: Validate committed metadata (mirror not compared)
+        if: steps.peer.outputs.available != 'true'
+        run: python docs/curves/ic/validate_semantics.py

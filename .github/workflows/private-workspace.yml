@@ -5,6 +5,7 @@ on:
       - '.claude/hooks/session-start.sh'
       - 'scripts/private-workspace.sh'
       - 'scripts/test-private-workspace.sh'
+      - 'scripts/test-private-workspace-native.sh'
       - 'scripts/setup-cloud-environment.sh'
       - 'scripts/setup-workstation.sh'
       - '.github/workflows/private-workspace.yml'
@@ -14,14 +15,21 @@ on:
       - '.claude/hooks/session-start.sh'
       - 'scripts/private-workspace.sh'
       - 'scripts/test-private-workspace.sh'
+      - 'scripts/test-private-workspace-native.sh'
       - 'scripts/setup-cloud-environment.sh'
       - 'scripts/setup-workstation.sh'
       - '.github/workflows/private-workspace.yml'
 permissions:
   contents: read
+# A newer push to the same pull request cancels this workflow's run for the older commit.
+# Every other event (push, schedule, dispatch, merge queue) gets a group of its own and is never cancelled.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   private-startup:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|private-workspace.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|private-workspace.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     # Syntax check and offline contract tests; about one second locally.
     timeout-minutes: 10
     steps:
@@ -31,6 +39,6 @@ jobs:
             .claude/hooks
             scripts
       - name: Shell syntax
-        run: bash -n scripts/private-workspace.sh scripts/test-private-workspace.sh scripts/setup-cloud-environment.sh scripts/setup-workstation.sh .claude/hooks/session-start.sh
+        run: bash -n scripts/private-workspace.sh scripts/test-private-workspace.sh scripts/test-private-workspace-native.sh scripts/setup-cloud-environment.sh scripts/setup-workstation.sh .claude/hooks/session-start.sh
       - name: Fail-closed offline contracts
         run: bash scripts/test-private-workspace.sh

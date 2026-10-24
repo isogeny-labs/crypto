@@ -7,6 +7,7 @@ pub mod adx_gen;
 pub mod api;
 pub mod bigint;
 pub mod binary;
+pub mod binary_volcano;
 pub mod cm;
 pub mod curve;
 /// Research-only Eigen-Séta design helpers.  This module is deliberately not
@@ -28,6 +29,7 @@ pub mod gf3n;
 pub mod gls_loop;
 pub mod icv1;
 pub mod int;
+pub mod isobench;
 pub mod json;
 pub mod kernel;
 /// Exact integer LLL in any dimension.
