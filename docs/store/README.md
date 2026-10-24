@@ -59,13 +59,15 @@ let path = crypto_lib::store::resolve_path(&arg)?;   // a plain path is returned
 |:--|:--|
 | **object** | immutable bytes, keyed by their SHA-256: `sha256/ab/abcdef…` |
 | **index** | `store/index.json`, tracked in Git: name → sha256, bytes, description, tags, provenance, superseded digests |
-| **cache** | `$CRYPTO_STORE_CACHE`, default `~/.cache/crypto-store`; verified objects, read-only, written atomically |
+| **cache** | `$CRYPTO_STORE_CACHE`, default `~/.cache/crypto-store`; read-only objects written atomically and re-hashed when resolved |
 | **remote** | `s3://bucket/prefix` through the `aws` CLI, or `file:///directory` |
 
 Why content addressing: a cached copy never goes stale, a remote object is
-never overwritten with different bytes, and every download is hashed against
-the digest the index promised, so a wrong or damaged object is refused and
-never reaches the cache.
+never overwritten with different bytes, and every cache hit and download is
+hashed against the digest the index promised. A damaged cache entry is
+replaced only after a verified remote download. Re-hashing a large cached
+artifact costs a sequential read on each resolution; use one resolved path
+throughout a run instead of resolving the same reference repeatedly.
 
 The index is the manifest `AGENTS.md` asks for when output is too large for
 Git: content hash, byte count, durable location (the remote in

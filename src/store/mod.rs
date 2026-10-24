@@ -328,29 +328,46 @@ impl Store {
         }
     }
 
-    /// A verified local path for a named object, downloading it when it is
-    /// not cached. A cached object is trusted by size only (it was hashed
-    /// when it entered the cache and is read-only); `verify` re-hashes.
+    /// A verified local path for a named object. Cached bytes are re-hashed
+    /// before use; a damaged entry is replaced from the remote only after
+    /// the downloaded replacement passes the same digest check.
     pub fn ensure(&self, spec: &str) -> Result<Resolved, String> {
         let (name, sha256, expected) = self.lookup(spec)?;
         let path = self.cache_path(&sha256);
-        if let Ok(meta) = fs::metadata(&path) {
-            if expected.is_none_or(|b| b == meta.len()) {
-                return Ok(Resolved {
-                    path,
-                    sha256,
-                    bytes: meta.len(),
-                    fetched: false,
-                    name,
-                });
+        let mut cache_damaged = false;
+        match fs::symlink_metadata(&path) {
+            Ok(meta) => {
+                if !meta.file_type().is_file() {
+                    return Err(format!(
+                        "{}: cached object is not a regular file",
+                        path.display()
+                    ));
+                }
+                if let Ok((digest, bytes)) = hash_file(&path) {
+                    if digest == sha256 && expected.is_none_or(|b| b == bytes) {
+                        return Ok(Resolved {
+                            path,
+                            sha256,
+                            bytes,
+                            fetched: false,
+                            name,
+                        });
+                    }
+                }
+                cache_damaged = true;
             }
-            // Wrong size: the cache entry is damaged. Replace it.
-            let _ = fs::remove_file(&path);
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+            Err(e) => return Err(format!("{}: {e}", path.display())),
         }
         let remote = self.remote().map_err(|e| {
             format!(
-                "{} is not in the local cache ({}) and cannot be fetched: {e}",
+                "{} {} ({}) and cannot be fetched: {e}",
                 name.as_deref().unwrap_or(&sha256),
+                if cache_damaged {
+                    "has a damaged local cache entry"
+                } else {
+                    "is not in the local cache"
+                },
                 self.cfg.cache_dir.display()
             )
         })?;
@@ -379,15 +396,18 @@ impl Store {
                 return Err(e);
             }
         };
-        if got != sha256 {
+        if got != sha256 || expected.is_some_and(|b| b != bytes) {
             let _ = fs::remove_file(&tmp);
             return Err(format!(
-                "{key}: downloaded bytes hash to {got}, expected {sha256}; discarded"
+                "{key}: downloaded bytes hash to {got} ({bytes} bytes), expected {sha256}; discarded"
             ));
         }
         make_read_only(&tmp);
         if let Some(dir) = path.parent() {
             fs::create_dir_all(dir).map_err(|e| format!("{}: {e}", dir.display()))?;
+        }
+        if cache_damaged {
+            fs::remove_file(&path).map_err(|e| format!("{}: {e}", path.display()))?;
         }
         fs::rename(&tmp, &path).map_err(|e| {
             let _ = fs::remove_file(&tmp);
@@ -848,19 +868,29 @@ mod tests {
         let src = file(&root, "y", b"payload-1234");
         let r = s.push("y", &src, PushMeta::default()).unwrap();
         let cached = s.cache_path(&r.sha256);
-        // Same size, wrong bytes: only `verify` can see it.
+        // Same size, wrong bytes: verify reports it and ensure refetches.
         fs::remove_file(&cached).unwrap();
         fs::write(&cached, b"payload-9999").unwrap();
         let rows = s.verify(&[], true).unwrap();
         assert!(matches!(rows[0].cache, CacheState::Corrupt(_)));
         assert_eq!(rows[0].remote, Some(RemoteState::Ok));
-        // Wrong size: `ensure` notices and refetches.
+        let got = s.ensure("y").unwrap();
+        assert!(got.fetched);
+        assert_eq!(fs::read(&got.path).unwrap(), b"payload-1234");
+        // Wrong size is also replaced.
         fs::remove_file(&cached).unwrap();
         fs::write(&cached, b"short").unwrap();
         let got = s.ensure("y").unwrap();
         assert!(got.fetched);
         assert_eq!(fs::read(&got.path).unwrap(), b"payload-1234");
         assert_eq!(s.verify(&[], false).unwrap()[0].cache, CacheState::Ok);
+        // A damaged cache entry cannot be returned when the remote is absent.
+        fs::remove_file(&cached).unwrap();
+        fs::write(&cached, b"payload-9999").unwrap();
+        let remote_path = root.join("remote").join(object_key(&r.sha256).unwrap());
+        fs::remove_file(remote_path).unwrap();
+        assert!(s.ensure("y").unwrap_err().contains("absent"));
+        assert_eq!(fs::read(&cached).unwrap(), b"payload-9999");
         let _ = fs::remove_dir_all(&root);
     }
 
