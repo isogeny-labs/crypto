@@ -473,6 +473,12 @@ def check_thread_ids(curves: list[dict], fatal: list[str]) -> None:
             if uid and uid not in held:
                 fatal.append(f"{path.relative_to(REPO)}: {c.get('curve_id')} ({uid[-12:]}) "
                              "is not a representation in the registry")
+        # List-format files record no UID; derive it from the record itself.
+        for p, a, b, order, r, h, g in prepared_prime_rows(doc):
+            uid = ec1.curve_identity(*prime_record(p, a, b, order, r, h, g), "x")["curve_uid"]
+            if uid not in held:
+                fatal.append(f"{path.relative_to(REPO)}: prime record p={p} a={a} b={b} "
+                             f"({uid[-12:]}) is not a representation in the registry")
 
 
 def check_calibration(reg: "Registry", fatal: list[str]) -> None:
@@ -511,6 +517,36 @@ def harvest_curve_records(reg: Registry) -> None:
             reg.add(ident, "koblitz" if koblitz else "binary", params, rel,
                     koblitz_aliases(a, m) if koblitz else [])
             reg.represent(ident, f, {k: v for k, v in c.items() if k != "curve_id"}, rel)
+
+
+def prepared_prime_rows(doc) -> list[tuple]:
+    """The rows of a list-format curve_ids.json (the conductor-gap threads):
+    each {p, a, b, order, r, generator} is one prime-field EC1 record."""
+    rows = []
+    for c in doc if isinstance(doc, list) else []:
+        if not isinstance(c, dict):
+            continue
+        p, a, b = _int(c.get("p")), _int(c.get("a")), _int(c.get("b"))
+        order, r, g = _int(c.get("order")), _int(c.get("r")), c.get("generator")
+        if None in (p, a, b, order, r) or not r or order % r or not isinstance(g, list) or len(g) != 2:
+            continue
+        rows.append((p, a, b, order, r, order // r, (int(g[0], 16), int(g[1], 16))))
+    return rows
+
+
+def harvest_prepared_curve_ids(reg: Registry) -> None:
+    """List-format curve_ids.json files carry no EC1 UID, only the record:
+    representations are rebuilt from it, so a registry rebuild keeps them."""
+    for path in tracked("*curve_ids.json"):
+        rel = str(path.relative_to(REPO))
+        try:
+            doc = json.loads(path.read_text())
+        except (OSError, ValueError):
+            continue
+        for p, a, b, order, r, h, g in prepared_prime_rows(doc):
+            ident = cid.prime_id(p, a, b, order)
+            reg.add(ident, "prime", {"p": str(p), "a": str(a % p), "b": str(b % p)}, rel)
+            reg.represent(ident, *prime_record(p, a, b, order, r, h, g), rel)
 
 
 def harvest_bench(reg: Registry) -> None:
@@ -720,6 +756,7 @@ def build() -> tuple[dict, list[str], list[str]]:
     harvest_bench(reg)
     harvest_json(reg, problems, fatal)
     harvest_curve_records(reg)
+    harvest_prepared_curve_ids(reg)
     harvest_text_koblitz(reg)
     harvest_native_standards(reg)
     harvest_native_factor_base_history(reg)
