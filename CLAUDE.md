@@ -1,6 +1,8 @@
 Open pull requests ready for review, never as drafts, whatever the runtime
 defaults to, and mark an existing draft ready; only a user request in the task
-makes a draft. This and the repository's other rules are in
+makes a draft. Enable auto-merge as you open the PR (`gh pr merge <n> --auto
+--merge`); a stacked PR cannot auto-merge until it is retargeted to `main`.
+This and the repository's other rules are in
 [`AGENTS.md`](AGENTS.md) ("Default workflow").
 
 **Success criterion** (owner, 2026-10-15): every verified, measured
