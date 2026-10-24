@@ -823,6 +823,10 @@ def checkEnvelope(key, body, manifest):
     if type(want) is not int or want != len(body) // RECORD_BYTES:
         raise ValueError("%s: manifest says %r records, body carries %d"
                          % (key, want, len(body) // RECORD_BYTES))
+    if "producedAt" in manifest:
+        produced = manifest["producedAt"]
+        if type(produced) is not int or produced <= 0:
+            raise ValueError("%s: invalid commit marker producedAt" % key)
 
 
 def objectLockKey(key):
@@ -920,7 +924,7 @@ def ingestObject(conn, s3, bucket, key, found_at, *, replica_id=None,
     # is storage metadata: a copy, a replication or a lifecycle transition
     # rewrites it and silently moves points between hourly buckets.
     produced = manifest.get("producedAt") if manifest else None
-    if isinstance(produced, int) and produced > 0:
+    if produced is not None:
         found_at = time.strftime("%Y-%m-%d %H:%M:%S+00", time.gmtime(produced))
     whole = len(body) - len(body) % RECORD_BYTES
     wid = workerId(key)

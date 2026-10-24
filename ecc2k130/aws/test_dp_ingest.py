@@ -1002,6 +1002,18 @@ class Envelopes(unittest.TestCase):
         self.assertIn(time.strftime("%Y-%m-%d %H:%M:%S+00", time.gmtime(1789311001)),
                       stamps[0])
 
+    def test_present_but_invalid_produced_at_is_refused(self):
+        # bool is an int subclass in Python; accepting true would put a
+        # correctly hashed object in the 1970 hourly bucket.
+        for produced in (True, False, None, "1789311001", 0, -1):
+            with self.subTest(produced=produced):
+                conn = CollisionConn(inserted=2)
+                with self.assertRaisesRegex(ValueError, "producedAt"):
+                    dp_ingest.ingestObject(
+                        conn, EnvelopeS3(self.body, self.manifest(producedAt=produced)),
+                        "bucket", orbitKey(self.body), "2026-09-19 00:00:00+00")
+                self.assertEqual(conn.queries, [])
+
     def test_without_produced_at_the_listing_time_stands(self):
         conn, _ = self.ingest(EnvelopeS3(self.body, self.manifest()))
         stamps = [a for q, a in conn.queries
