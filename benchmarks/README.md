@@ -21,6 +21,9 @@ in the [unvalidated benchmark archive](ARCHIVE.md), with their exact former row
 text, digest, reason, and source provenance. Archived rows are not measurements
 admitted by this table and cannot satisfy the validation gate.
 
+The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
+is preserved separately pending validation admission.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-22 | [`20261022-ecbench-harness-overhead`](20261022-ecbench-harness-overhead/) | ecbench harness overhead: `docs/curves/registry.json` (4.7 MB) parsed once per process instead of on every registry lookup, and `GenericOutcome::count` allocating a counter key only on first use; old binary (main 412b60289) vs this change, `smoke-prime-20` (every method, 20-bit prime-order curve) and `generic-32` (rho, BSGS, kangaroo, 32-bit), 3 alternated sessions per binary; one binary per change for attribution | timed solve window 0.03–0.07× at 20 bits (≈4 ms of old-binary overhead inside a 0.3 ms solve) and 0.64–0.81× at 32 bits for every rho, BSGS and kangaroo arm; measured child 0.75–0.85×; `ic.pipeline` solve 0.96×; 2,376 records identical outside timing, 1,044 cross-binary replays reproduced, §5a band identical — engineering, no counted result changes; old solve wall times on small curves carry the offset | Intel Xeon @ 2.10 GHz (family 6 model 207), 4 vCPU cloud container, `--cpus auto --allow-busy` (below L2) | [`research/ecbench_overhead_review_20261022`](../research/ecbench_overhead_review_20261022/README.md) ([PDF](20261022-ecbench-harness-overhead/REPORT.pdf)) |
