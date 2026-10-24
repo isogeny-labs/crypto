@@ -3,6 +3,8 @@
 use super::*;
 #[path = "../../../joint_image_elimination/native/external_check.rs"]
 mod external_check;
+#[path = "../../../joint_image_elimination/native/fp_pruning_audit.rs"]
+mod fp_pruning_audit;
 #[path = "joint_proof.rs"]
 mod proof;
 #[path = "joint_report.rs"]
@@ -46,6 +48,19 @@ pub(crate) fn zero_identity_audit(run: &Path, public_root: &Path, out: &Path) ->
 }
 pub(crate) fn variant_construction_report(run: &Path, out: &Path) -> bool {
     variant_report::construction(run, out)
+}
+pub(crate) fn fp_pruning_audit(
+    public: &Path,
+    sha: &str,
+    workload: &Path,
+    refs: &Path,
+    double_refs: &Path,
+    out: &Path,
+) -> bool {
+    fp_pruning_audit::audit(public, sha, workload, refs, double_refs, out)
+}
+pub(crate) fn fp_pruning_summary(run: &Path, out: &Path) -> bool {
+    fp_pruning_audit::summarize(run, out)
 }
 
 pub(crate) fn construction_report(run: &Path, out: &Path) -> bool {
