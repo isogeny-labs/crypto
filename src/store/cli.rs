@@ -226,7 +226,7 @@ pub fn run(args: &StoreArgs) -> Result<(), String> {
         }
         StoreCmd::Pull { spec, out } => {
             let got = store.ensure(spec)?;
-            if got.fetched {
+            if got.fetched && !args.json {
                 eprintln!(
                     "fetched {} ({}, sha256 {})",
                     got.name.as_deref().unwrap_or(spec),
@@ -234,14 +234,32 @@ pub fn run(args: &StoreArgs) -> Result<(), String> {
                     got.sha256
                 );
             }
-            if let Some(out) = out {
+            let result_path = if let Some(out) = out {
                 if std::fs::symlink_metadata(out).is_ok() {
                     return Err(format!("{} already exists; not overwriting", out.display()));
                 }
                 super::backend::copy_into(&got.path, out)?;
-                println!("{}", out.display());
+                out.clone()
             } else {
-                println!("{}", got.path.display());
+                got.path.clone()
+            };
+            if args.json {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&json!({
+                        "status": "ok",
+                        "name": got.name,
+                        "sha256": got.sha256,
+                        "bytes": got.bytes,
+                        "fetched": got.fetched,
+                        "cache_path": got.path,
+                        "path": result_path,
+                        "copied": out.is_some(),
+                    }))
+                    .map_err(|e| e.to_string())?
+                );
+            } else {
+                println!("{}", result_path.display());
             }
         }
         StoreCmd::Verify {
@@ -329,22 +347,51 @@ pub fn run(args: &StoreArgs) -> Result<(), String> {
         StoreCmd::Gc { apply } => {
             let doomed = store.gc(*apply)?;
             let total: u64 = doomed.iter().map(|(_, b)| b).sum();
-            for (p, _) in &doomed {
-                println!("{}", p.display());
+            if args.json {
+                let files: Vec<_> = doomed
+                    .iter()
+                    .map(|(path, bytes)| json!({"path": path, "bytes": bytes}))
+                    .collect();
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&json!({
+                        "status": "ok", "applied": apply, "count": doomed.len(),
+                        "total_bytes": total, "files": files,
+                    }))
+                    .map_err(|e| e.to_string())?
+                );
+            } else {
+                for (p, _) in &doomed {
+                    println!("{}", p.display());
+                }
+                eprintln!(
+                    "{} {} file(s), {}",
+                    if *apply { "removed" } else { "would remove" },
+                    doomed.len(),
+                    mib(total)
+                );
             }
-            eprintln!(
-                "{} {} file(s), {}",
-                if *apply { "removed" } else { "would remove" },
-                doomed.len(),
-                mib(total)
-            );
         }
         StoreCmd::Rm { name } => {
-            if store.index.entries.remove(name).is_none() {
-                return Err(format!("{name} is not in the index"));
-            }
+            let removed = store
+                .index
+                .entries
+                .remove(name)
+                .ok_or_else(|| format!("{name} is not in the index"))?;
             store.save_index()?;
-            eprintln!("removed {name} from the index; the remote object is kept");
+            if args.json {
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&json!({
+                        "status": "ok", "name": name,
+                        "sha256": removed.sha256, "bytes": removed.bytes,
+                        "remote_unchanged": true,
+                    }))
+                    .map_err(|e| e.to_string())?
+                );
+            } else {
+                eprintln!("removed {name} from the index; the remote object is kept");
+            }
         }
     }
     Ok(())

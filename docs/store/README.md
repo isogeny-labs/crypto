@@ -82,10 +82,10 @@ figure stays visible as the "was".
 | `store ls [prefix]` | indexed names, with whether each is cached |
 | `store info <spec>` | one entry in full |
 | `store push <file> --name N` | upload (skipped if the remote already holds the bytes), cache, index |
-| `store pull <spec> [--out P]` | make available locally, print the path |
+| `store pull <spec> [--out P] [--json]` | make available locally and print the path, or report the path, digest, byte count, and whether this call fetched it as JSON |
 | `store verify [names] [--remote] [--download] [--json]` | re-hash cached objects; `--remote` checks existence, size, and digest metadata through S3 HEAD; `--download` also downloads and hashes the remote bytes in a temporary file. `--json` returns one report with per-entry cache and remote statuses, including failures. |
-| `store gc [--apply]` | drop cached objects the index no longer names (dry run by default) |
-| `store rm <name>` | remove a name from the index |
+| `store gc [--apply] [--json]` | drop cached objects the index no longer names (dry run by default); JSON lists the selected paths and whether removal was applied |
+| `store rm <name> [--json]` | remove a name from the index; JSON records the removed digest and byte count |
 
 A `<spec>` is a name, `store:NAME`, or `sha256:DIGEST` (a full digest, or a
 prefix of 8 or more digits that the index resolves).
