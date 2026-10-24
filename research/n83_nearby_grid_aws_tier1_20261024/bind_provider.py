@@ -22,14 +22,19 @@ def digest(path):
 
 def archive_commit(path):
     decoder = shutil.which("zstd") or "/opt/homebrew/bin/zstd"
+    subprocess.run([decoder, "-t", str(path)], check=True,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
     process = subprocess.Popen([decoder, "-dc", str(path)],
-                               stdout=subprocess.PIPE)
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     try:
         commit = subprocess.check_output(["git", "get-tar-commit-id"],
                                          stdin=process.stdout, text=True).strip()
     finally:
         process.stdout.close()
-    if process.wait() not in (0, -signal.SIGPIPE) or len(commit) != 40:
+    stderr = process.communicate()[1].decode(errors="replace")
+    if (process.returncode not in (0, -signal.SIGPIPE) and
+            not (process.returncode == 70 and "Broken pipe" in stderr)) or \
+            len(commit) != 40:
         raise ValueError("source archive commit could not be replayed")
     return commit
 
