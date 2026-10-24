@@ -908,7 +908,19 @@ defines for the primary IC question: one index-calculus run against one
 strong-rho run (`rho.signed_frobenius_strong`) on one public target,
 compared on their one-target online windows (§3), keyed by
 `(candidate_id, workload_id, run_id)` in the repository's IC1 convention.
-The ledger calls its one-run ratio `online_speedup`; a checker `PASS`
+The ledger calls its one-run ratio `online_speedup`; it is the ratio of the
+one round the claim carries, and it stays under that name because the ledger
+(and `boundary_autolab.py`) require it. A claim built from this version on
+also carries `online_speedup_single_run` (the same number, named for what it
+is), `online_speedup_single_run_round`, and `paired_rounds`: **every** measured
+round of that workload in which both arms verified and recorded an online
+window, with how many (`n_pairs`), each pair's ratio, the aggregate
+`Σ rho ms / Σ IC ms`, and a percentile-bootstrap interval over the rounds
+only from five pairs (one target, so run-to-run variation only). The round the
+claim is built on must be among them. The checker adds `speedup_basis`
+(`single_run` below five pairs or without an interval, `paired_aggregate_with_interval`
+otherwise) and a note to its output for such a claim, and validates the block;
+a claim without it is checked, and answered, as before. A checker `PASS`
 certifies the report's pairing, timing fields and provenance conditions,
 not a statistically established runtime gain. That requires at least five
 admitted matched pairs, an A/A noise interval, and a paired 95% interval

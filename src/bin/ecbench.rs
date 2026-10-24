@@ -20,8 +20,9 @@
 //! ecbench bound check --record B.json      re-derive a committed bound from its sessions
 //! ecbench frontier build --bounds DIR --out F.json --markdown FRONTIER.md [--check]
 //! ecbench challenge seal --draft C.json --out C.json    validate and seal a challenge
-//! ecbench challenge spec --challenge C --candidate '{"id":"..."}' --epoch N --out spec.json
-//! ecbench challenge verdict --challenge C --dir D --epoch N --replay-all --out V.json
+//! ecbench challenge commit --challenge C --candidate '{"id":"..."}' --out commitment.json
+//! ecbench challenge spec --challenge C --candidate '{"id":"..."}' --commitment K --beacon HEX --out spec.json
+//! ecbench challenge verdict --challenge C --dir D --commitment K --beacon HEX --bounds DIR --replay-all --out V.json
 //! ecbench gpu-stage --binary gpu/ecc/bench --out D --mode rho -- --iters 256
 //! ecbench gpu-match --binary gpu/ecc/bench --workload W.json --out D
 //! ```
@@ -430,6 +431,11 @@ enum BoundCmd {
         /// the rule text enters the bound's method identity.
         #[arg(long)]
         param_rule: Option<String>,
+        /// The fit procedure (`docs/bounds/README.md` §3a).  Version 1
+        /// re-derives records fitted before the version-2 refusals; new
+        /// bounds are version 2.
+        #[arg(long, default_value_t = bounds::FIT_VERSION)]
+        fit_version: u32,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -453,6 +459,10 @@ enum FrontierCmd {
         /// field_muls, field_sqrs, field_invs.
         #[arg(long, default_value = "ops,memory")]
         axes: String,
+        /// The frontier procedure (1 or 2).  Default: the procedure the
+        /// existing --out file names under --check, otherwise 2.
+        #[arg(long)]
+        procedure: Option<u32>,
         #[arg(long)]
         out: Option<PathBuf>,
         #[arg(long)]
@@ -480,15 +490,40 @@ enum ChallengeCmd {
         #[arg(long, num_args = 1..)]
         file: Vec<PathBuf>,
     },
-    /// The spec a candidate runs against the challenge in an epoch.
+    /// Commit a candidate to a challenge before its spec exists.  The
+    /// epoch is then derived from this commitment and a later public
+    /// beacon (`docs/bounds/README.md` §5), never chosen.
+    Commit {
+        #[arg(long)]
+        challenge: PathBuf,
+        /// The candidate as a method spec, e.g. '{"id":"rho.plain"}'.
+        #[arg(long)]
+        candidate: String,
+        /// Free text recorded in the commitment.
+        #[arg(long, default_value = "")]
+        note: String,
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
+    /// The spec a committed candidate runs against the challenge: the
+    /// epoch derives from the commitment and a beacon, a public value
+    /// (a git commit id, a randomness-beacon value) published after the
+    /// commitment.  `--legacy-epoch N` writes a version-1 spec instead.
     Spec {
         #[arg(long)]
         challenge: PathBuf,
         /// The candidate as a method spec, e.g. '{"id":"rho.plain"}'.
         #[arg(long)]
         candidate: String,
+        #[arg(long, requires = "beacon", conflicts_with = "legacy_epoch")]
+        commitment: Option<PathBuf>,
+        /// At least 16 lowercase hex digits, public and later than the commitment.
+        #[arg(long, requires = "commitment")]
+        beacon: Option<String>,
+        /// A version-1 epoch, chosen by the candidate.  Verdicts over it
+        /// are version 1 only.
         #[arg(long)]
-        epoch: u64,
+        legacy_epoch: Option<u64>,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -498,8 +533,20 @@ enum ChallengeCmd {
         challenge: PathBuf,
         #[arg(long)]
         dir: PathBuf,
+        /// The epoch of a version-1 verdict (`--procedure 1`); procedure 2
+        /// derives it from `--commitment` and `--beacon`.
         #[arg(long)]
-        epoch: u64,
+        epoch: Option<u64>,
+        /// The candidate's commitment (`challenge commit`).
+        #[arg(long, requires = "beacon")]
+        commitment: Option<PathBuf>,
+        /// The public value the epoch was derived with.
+        #[arg(long, requires = "commitment")]
+        beacon: Option<String>,
+        /// The verdict procedure: 2 (default) or 1, which re-derives the
+        /// two committed version-1 verdicts.
+        #[arg(long, default_value_t = challenge::VERDICT_PROCEDURE)]
+        procedure: u32,
         #[arg(long, default_value = challenge::CANDIDATE_ARM)]
         candidate: String,
         #[arg(long, default_value = challenge::INCUMBENT_ARM)]
@@ -1447,6 +1494,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 seed,
                 weight,
                 param_rule,
+                fit_version,
                 out,
             } => {
                 let b = bounds::bound_from_sessions(&bounds::FitInputs {
@@ -1463,7 +1511,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         seed,
                         weight,
                         param_rule,
+                        fit_version,
                     },
+                    audit_refs: &[],
                 })?;
                 let mut b = b;
                 let text = b.seal()?;
@@ -1507,6 +1557,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             FrontierCmd::Build {
                 bounds: paths,
                 axes,
+                procedure,
                 out,
                 markdown,
                 check,
@@ -1518,7 +1569,22 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     .map(|s| s.trim().to_string())
                     .filter(|s| !s.is_empty())
                     .collect();
-                let mut f = frontier::build(&loaded, &axes)?;
+                // A committed frontier re-derives under the procedure its
+                // schema names; a new one is built under the current.
+                let committed_version = if check {
+                    out.as_deref()
+                        .and_then(|o| std::fs::read_to_string(o).ok())
+                        .and_then(|t| serde_json::from_str::<serde_json::Value>(&t).ok())
+                        .and_then(|v| {
+                            v.get("schema")
+                                .and_then(|x| x.as_str())
+                                .and_then(frontier::version_of_schema)
+                        })
+                } else {
+                    None
+                };
+                let version = procedure.or(committed_version).unwrap_or(2);
+                let mut f = frontier::build_version(&loaded, &axes, version)?;
                 let text = f.seal()?;
                 let records_dir = paths
                     .first()
@@ -1558,14 +1624,24 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 }
                 for d in &f.domains {
                     eprintln!(
-                        "{} {} {} {}: {} bound(s), {} on the frontier; ops leader {}",
+                        "{} {} {} {}: {} bound(s), {} on the frontier; ops leader {}{}{}",
                         d.domain.family,
                         d.domain.target_kind,
                         d.domain.tier,
                         d.domain_id,
                         d.entries.len(),
                         d.entries.iter().filter(|e| e.is_frontier).count(),
-                        d.ops_leader.as_deref().unwrap_or("–")
+                        d.ops_leader.as_deref().unwrap_or("–"),
+                        if d.ops_tie.is_empty() {
+                            String::new()
+                        } else {
+                            format!(" (none named; tie set of {})", d.ops_tie.len())
+                        },
+                        if d.unranked.is_empty() {
+                            String::new()
+                        } else {
+                            format!("; {} listed, not ranked", d.unranked.len())
+                        }
                     );
                 }
                 if !f.inadmissible.is_empty() {
@@ -1624,17 +1700,64 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     return Ok(ExitCode::from(1));
                 }
             }
-            ChallengeCmd::Spec {
+            ChallengeCmd::Commit {
                 challenge: path,
                 candidate,
-                epoch,
+                note,
                 out,
             } => {
                 let c = challenge::Challenge::read(&path)?;
                 challenge::validate(&c)?;
                 let m: methods::MethodSpec =
                     serde_json::from_str(&candidate).map_err(|e| format!("--candidate: {e}"))?;
-                let s = challenge::spec_for(&c, &m, epoch);
+                let now_ms = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map_err(|e| e.to_string())?
+                    .as_millis() as u64;
+                let (cm, text) = challenge::commit(&c, &m, &note, now_ms)?;
+                write_or_print(out.as_deref(), &text)?;
+                eprintln!(
+                    "commitment {} of {} to challenge {} at {} ms; commit this file, then take the beacon from a public value published after it",
+                    cm.commitment_id, m.id, c.challenge_id, cm.committed_unix_ms
+                );
+            }
+            ChallengeCmd::Spec {
+                challenge: path,
+                candidate,
+                commitment,
+                beacon,
+                legacy_epoch,
+                out,
+            } => {
+                let c = challenge::Challenge::read(&path)?;
+                challenge::validate(&c)?;
+                let m: methods::MethodSpec =
+                    serde_json::from_str(&candidate).map_err(|e| format!("--candidate: {e}"))?;
+                let (s, epoch) = match (commitment, beacon, legacy_epoch) {
+                    (Some(cp), Some(b), None) => {
+                        let cm = challenge::Commitment::read(&cp)?;
+                        let now_ms = std::time::SystemTime::now()
+                            .duration_since(std::time::UNIX_EPOCH)
+                            .map_err(|e| e.to_string())?
+                            .as_millis() as u64;
+                        if cm.committed_unix_ms > now_ms {
+                            return Err(format!(
+                                "commitment {} is dated {} ms, in the future",
+                                cm.commitment_id, cm.committed_unix_ms
+                            )
+                            .into());
+                        }
+                        let epoch = challenge::epoch_from(&c, &cm, &b)?;
+                        (challenge::spec_for_committed(&c, &m, &cm, &b)?, epoch)
+                    }
+                    (None, None, Some(e)) => (challenge::spec_for(&c, &m, e), e),
+                    _ => {
+                        return Err(
+                            "pass --commitment FILE --beacon HEX (procedure 2), or --legacy-epoch N (version 1)"
+                                .into(),
+                        )
+                    }
+                };
                 let p = spec::plan(s.clone())?;
                 let text = serde_json::to_string_pretty(&s).map_err(|e| e.to_string())? + "\n";
                 write_or_print(out.as_deref(), &text)?;
@@ -1650,6 +1773,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 challenge: path,
                 dir,
                 epoch,
+                commitment,
+                beacon,
+                procedure,
                 candidate,
                 incumbent,
                 control,
@@ -1665,10 +1791,27 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 exit_code,
             } => {
                 let c = challenge::Challenge::read(&path)?;
+                let cm = commitment
+                    .as_deref()
+                    .map(challenge::Commitment::read)
+                    .transpose()?;
+                let epoch = match (procedure, epoch, cm.as_ref(), beacon.as_deref()) {
+                    (1, Some(e), _, _) => e,
+                    (1, None, _, _) => return Err("procedure 1 needs --epoch".into()),
+                    (_, _, Some(cm), Some(b)) => challenge::epoch_from(&c, cm, b)?,
+                    _ => {
+                        return Err(
+                            "procedure 2 derives the epoch: pass --commitment and --beacon".into(),
+                        )
+                    }
+                };
                 let o = challenge::verdict(&challenge::VerdictInputs {
                     challenge: &c,
                     dir: &dir,
                     epoch,
+                    commitment: cm.as_ref(),
+                    beacon: beacon.as_deref(),
+                    procedure,
                     candidate_arm: &candidate,
                     incumbent_arm: &incumbent,
                     control_arm: Some(&control),

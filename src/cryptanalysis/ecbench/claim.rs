@@ -752,7 +752,16 @@ pub fn build(
     round: Option<u32>,
     independent: Option<&Independent>,
 ) -> Result<Value, String> {
-    build_from_session(dir, ic_arm, rho_arm, workload_id, round, independent, true)
+    build_from_session(
+        dir,
+        ic_arm,
+        rho_arm,
+        workload_id,
+        round,
+        independent,
+        true,
+        true,
+    )
 }
 
 /// Attach a later independent replay to a claim made by the session's
@@ -769,7 +778,19 @@ pub fn attach_independent(
     original: &Value,
     independent: &Independent,
 ) -> Result<Value, String> {
-    let reconstructed = build_from_session(dir, ic_arm, rho_arm, workload_id, round, None, false)?;
+    // A claim written before `paired_rounds` existed is reconstructed
+    // without it; one that has it, with it.
+    let paired = original.get("paired_rounds").is_some();
+    let reconstructed = build_from_session(
+        dir,
+        ic_arm,
+        rho_arm,
+        workload_id,
+        round,
+        None,
+        false,
+        paired,
+    )?;
     if &reconstructed != original {
         return Err(
             "the original claim differs from the frozen session or this binary's claim sources"
@@ -784,6 +805,7 @@ pub fn attach_independent(
         round,
         Some(independent),
         false,
+        paired,
     )
 }
 
@@ -825,6 +847,110 @@ fn native_operation_accounting(ic: &Record, rho: &Record) -> Value {
     })
 }
 
+/// Rounds of one workload that both arms ran and verified, with the
+/// aggregate of their online ratios.
+struct PairedRounds {
+    block: Value,
+    summary: String,
+}
+
+/// Minimum paired rounds for an aggregate interval (README §9, §8).
+const MIN_PAIRS_FOR_INTERVAL: usize = 5;
+
+/// Every measured round of `workload_id` in which both arms verified and
+/// recorded an online window: the single round a claim carries is one of
+/// them, never the whole.  The aggregate is `Σ rho ms / Σ IC ms`; with at
+/// least [`MIN_PAIRS_FOR_INTERVAL`] pairs it has a percentile bootstrap
+/// interval over the rounds (one target, so run-to-run variation only).
+fn paired_rounds(
+    records: &[Record],
+    ic_arm: &str,
+    rho_arm: &str,
+    workload_id: &str,
+    selected_round: u32,
+) -> PairedRounds {
+    use crate::cryptanalysis::ecbench::bounds::{RESAMPLES, SEED};
+    use crate::cryptanalysis::ecbench::stats::{bootstrap_ci, median};
+    let online = |arm: &str, round: u32| -> Option<f64> {
+        records
+            .iter()
+            .find(|r| {
+                r.arm == arm
+                    && !r.warmup
+                    && r.round == round
+                    && r.workload.workload_id == workload_id
+                    && r.outcome.status == "verified"
+                    && r.outcome.matches_target == Some(true)
+            })
+            .and_then(|r| r.online.as_ref())
+            .map(|w| ms(w.wall_ns))
+            .filter(|v| *v > 0.0)
+    };
+    let mut rounds: Vec<u32> = records
+        .iter()
+        .filter(|r| !r.warmup && r.arm == ic_arm && r.workload.workload_id == workload_id)
+        .map(|r| r.round)
+        .collect();
+    rounds.sort_unstable();
+    rounds.dedup();
+    let mut kept = Vec::new();
+    let mut pairs: Vec<(f64, f64)> = Vec::new();
+    for round in rounds {
+        if let (Some(ic), Some(rho)) = (online(ic_arm, round), online(rho_arm, round)) {
+            kept.push(round);
+            pairs.push((ic, rho));
+        }
+    }
+    let ratios: Vec<f64> = pairs.iter().map(|(ic, rho)| rho / ic).collect();
+    let n = pairs.len();
+    let ratio_of = |s: &[Vec<(f64, f64)>]| {
+        let (mut a, mut b) = (0.0, 0.0);
+        for (ic, rho) in s.iter().flatten() {
+            a += ic;
+            b += rho;
+        }
+        (a > 0.0).then(|| b / a)
+    };
+    let aggregate = ratio_of(&[pairs.clone()]);
+    let ci = if n >= MIN_PAIRS_FOR_INTERVAL {
+        bootstrap_ci(&[pairs.clone()], RESAMPLES, SEED, ratio_of)
+            .filter(|(lo, hi)| aggregate.is_some_and(|a| *lo <= a && a <= *hi))
+    } else {
+        None
+    };
+    let med = median(&ratios);
+    let summary = match (aggregate, ci) {
+        (None, _) => "no paired round of this workload".to_string(),
+        (Some(a), Some((lo, hi))) => format!(
+            "{n} paired round(s) on this target: aggregate {a:.4} [{lo:.4}, {hi:.4}], rounds {:?}",
+            kept
+        ),
+        (Some(a), None) => format!(
+            "{n} paired round(s) on this target: aggregate {a:.4}, no interval below {MIN_PAIRS_FOR_INTERVAL} pairs, rounds {:?}",
+            kept
+        ),
+    };
+    let block = json!({
+        "scope": "every measured round of this workload in which both arms verified and recorded an online window",
+        "workload": workload_id,
+        "n_pairs": n,
+        "rounds": kept,
+        "pair_ratios": ratios,
+        "ic_online_wall_ms": pairs.iter().map(|p| p.0).collect::<Vec<_>>(),
+        "rho_online_wall_ms": pairs.iter().map(|p| p.1).collect::<Vec<_>>(),
+        "selected_round": selected_round,
+        "selected_round_included": kept.contains(&selected_round),
+        "aggregate_statistic": "sum(rho_online_wall_ms) / sum(ic_online_wall_ms)",
+        "aggregate": aggregate,
+        "median_ratio": med,
+        "min_pairs_for_interval": MIN_PAIRS_FOR_INTERVAL,
+        "ci95": ci.map(|(lo, hi)| json!([lo, hi])).unwrap_or(Value::Null),
+        "ci_method": format!("percentile bootstrap over the paired rounds, {RESAMPLES} resamples, seed {SEED}; one target, so run-to-run variation only"),
+        "basis": "online_speedup is the single round named by online_speedup_single_run_round; the speedup of this workload is the aggregate, and only with an interval from at least min_pairs_for_interval pairs",
+    });
+    PairedRounds { block, summary }
+}
+
 fn build_from_session(
     dir: &Path,
     ic_arm: &str,
@@ -833,6 +959,7 @@ fn build_from_session(
     round: Option<u32>,
     independent: Option<&Independent>,
     require_recorded_binary: bool,
+    paired: bool,
 ) -> Result<Value, String> {
     let session = read_session(dir)?;
     let records = read_records(dir)?;
@@ -1005,6 +1132,11 @@ fn build_from_session(
     let levels = (ic.isolation.level, rho.isolation.level);
     let admissible = levels.0 >= required && levels.1 >= required;
     let speedup = rho_ms / ic_ms;
+    let pairs = paired.then(|| paired_rounds(&records, ic_arm, rho_arm, workload_id, round));
+    let pair_suffix = pairs
+        .as_ref()
+        .map(|p| format!("; {}", p.summary))
+        .unwrap_or_default();
     // A receipt that is not an independent replay of these two runs is
     // refused, not cited: without one the certificates stay null and the
     // checker says so.
@@ -1084,7 +1216,16 @@ fn build_from_session(
     put("rho_online_ms", json!(rho_ms));
     put("ic_online_wall_ms", json!(ic_ms));
     put("rho_online_wall_ms", json!(rho_ms));
+    // The ledger's `online_speedup` is the ratio of the one round this claim
+    // carries.  It stays under that name for the checker's sake and is not
+    // the speedup: `online_speedup_single_run` says what it is, and
+    // `paired_rounds` carries every round of this workload both arms ran.
     put("online_speedup", json!(speedup));
+    if let Some(p) = &pairs {
+        put("online_speedup_single_run", json!(speedup));
+        put("online_speedup_single_run_round", json!(round));
+        put("paired_rounds", p.block.clone());
+    }
     put(
         "ic_online_phase_ms",
         json!({
@@ -1151,11 +1292,11 @@ fn build_from_session(
         "verdict",
         json!(match (admissible, independent.is_some()) {
             (true, true) => format!(
-                "one-run online ratio {speedup:.4} (rho / IC) on one public target, both runs at {} or above, replayed independently; a runtime gain additionally requires paired rounds and an A/A noise interval",
+                "one-run online ratio {speedup:.4} (rho / IC) on one public target, both runs at {} or above, replayed independently{pair_suffix}; a runtime gain additionally requires paired rounds and an A/A noise interval",
                 required.name()
             ),
             (true, false) => format!(
-                "one-run online ratio {speedup:.4} (rho / IC) on one public target, both runs at {} or above; an independent replay and paired A/A evidence are still required for a runtime claim",
+                "one-run online ratio {speedup:.4} (rho / IC) on one public target, both runs at {} or above{pair_suffix}; an independent replay and paired A/A evidence are still required for a runtime claim",
                 required.name()
             ),
             (false, _) => format!(
@@ -1787,11 +1928,103 @@ pub fn check_vs_rho(report: &Value) -> Result<Value, String> {
             }
         }
     }
+    // Reports that carry `paired_rounds` (written from this version on) are
+    // held to it: the single round the ledger's `online_speedup` names must
+    // be one of the paired rounds, the aggregate must be what the pairs
+    // give, and an interval exists exactly from five pairs.  The extra keys
+    // appear in the output only for such reports; one without them is
+    // checked, and answered, as before.
+    let mut extra = Map::new();
+    if let Some(pr) = get("paired_rounds") {
+        let n = pr.get("n_pairs").and_then(Value::as_u64);
+        let ratios: Vec<f64> = pr
+            .get("pair_ratios")
+            .and_then(Value::as_array)
+            .map(|a| a.iter().filter_map(Value::as_f64).collect())
+            .unwrap_or_default();
+        let nums = |k: &str| -> Vec<f64> {
+            pr.get(k)
+                .and_then(Value::as_array)
+                .map(|a| a.iter().filter_map(Value::as_f64).collect())
+                .unwrap_or_default()
+        };
+        let (ics, rhos) = (nums("ic_online_wall_ms"), nums("rho_online_wall_ms"));
+        if n != Some(ratios.len() as u64) || ics.len() != ratios.len() || rhos.len() != ratios.len()
+        {
+            err("paired_rounds.n_pairs must equal the number of pair_ratios and times".into());
+        } else {
+            for (i, ((ic, rho), ratio)) in ics.iter().zip(&rhos).zip(&ratios).enumerate() {
+                if !ic.is_finite() || *ic <= 0.0 || !isclose(*ratio, rho / ic, 1e-9, 1e-12) {
+                    err(format!(
+                        "paired_rounds.pair_ratios[{i}] must equal rho / IC online wall"
+                    ));
+                }
+            }
+            let aggregate = pr.get("aggregate").and_then(Value::as_f64);
+            let (sa, sb): (f64, f64) = (ics.iter().sum(), rhos.iter().sum());
+            match (aggregate, ratios.is_empty()) {
+                (Some(a), false) if isclose(a, sb / sa, 1e-9, 1e-12) => {}
+                (None, true) => {}
+                _ => {
+                    err("paired_rounds.aggregate must be sum(rho) / sum(IC) over the pairs".into())
+                }
+            }
+        }
+        let rounds_len = pr
+            .get("rounds")
+            .and_then(Value::as_array)
+            .map(Vec::len)
+            .unwrap_or(0);
+        if rounds_len != ratios.len() {
+            err("paired_rounds.rounds must list one round per pair".into());
+        }
+        if pr.get("selected_round_included") != Some(&Value::Bool(true)) {
+            err("paired_rounds must include the round online_speedup was taken from".into());
+        }
+        if let (Some(sp), Some(sel)) = (
+            positive_cost(get("online_speedup_single_run")),
+            positive_cost(get("online_speedup")),
+        ) {
+            if !isclose(sp, sel, 1e-12, 1e-12) {
+                err("online_speedup_single_run must equal online_speedup".into());
+            }
+        } else {
+            err("online_speedup_single_run must be a positive finite number".into());
+        }
+        let interval = pr
+            .get("ci95")
+            .and_then(Value::as_array)
+            .filter(|a| a.len() == 2 && a.iter().all(|x| x.as_f64().is_some()));
+        let min_pairs = pr
+            .get("min_pairs_for_interval")
+            .and_then(Value::as_u64)
+            .unwrap_or(5);
+        if interval.is_some() != (ratios.len() as u64 >= min_pairs) {
+            err(format!(
+                "paired_rounds.ci95 must be present exactly from {min_pairs} pairs"
+            ));
+        }
+        let basis = if interval.is_some() {
+            "paired_aggregate_with_interval"
+        } else {
+            "single_run"
+        };
+        extra.insert("speedup_basis".into(), json!(basis));
+        extra.insert("paired_rounds".into(), json!(ratios.len()));
+        extra.insert(
+            "speedup_note".into(),
+            json!(if interval.is_some() {
+                "the speedup of this workload is paired_rounds.aggregate with its interval; online_speedup is one round of it"
+            } else {
+                "fewer than five paired rounds: online_speedup is a single-run ratio, not a speedup"
+            }),
+        );
+    }
     let ok = missing_stage.is_empty()
         && missing_global.is_empty()
         && pairing_errors.is_empty()
         && errors.is_empty();
-    Ok(json!({
+    let mut out = json!({
         "schema_version": ledger.get("schema_version"),
         "stage": "vs_rho",
         "fail_closed": true,
@@ -1802,7 +2035,11 @@ pub fn check_vs_rho(report: &Value) -> Result<Value, String> {
         "validation_errors": errors,
         "required_stage_fields": required,
         "required_global_provenance": global,
-    }))
+    });
+    if let Some(o) = out.as_object_mut() {
+        o.extend(extra);
+    }
+    Ok(out)
 }
 
 /// Every problem a [`check_vs_rho`] result lists, one line each.
@@ -2137,5 +2374,134 @@ mod tests {
                             "candidate_id": f.candidate.0, "record_sha256": f.candidate.1,
                             "workload_id": f.workload.0, "workload_sha256": f.workload.1}})
         );
+    }
+    fn native_wall_records() -> Vec<Record> {
+        read_records(
+            &std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01"),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn a_claim_carries_every_paired_round_of_its_workload() {
+        let records = native_wall_records();
+        let w = "W1d32ca72ad26";
+        // The single round a claim is built on (the first both arms ran).
+        let p = paired_rounds(&records, "ic-k16", "rho-strong", w, 1);
+        let b = &p.block;
+        assert_eq!(b["n_pairs"], 5);
+        assert_eq!(b["rounds"], json!([1, 2, 3, 4, 5]));
+        assert_eq!(b["selected_round_included"], true);
+        let agg = b["aggregate"].as_f64().unwrap();
+        let ci = b["ci95"].as_array().unwrap();
+        let (lo, hi) = (ci[0].as_f64().unwrap(), ci[1].as_f64().unwrap());
+        assert!(lo <= agg && agg <= hi, "{lo} {agg} {hi}");
+        // The single-run ratio of round 1 is not the aggregate.
+        let ratios = b["pair_ratios"].as_array().unwrap();
+        let first = ratios[0].as_f64().unwrap();
+        assert!((first - agg).abs() > 0.1, "{first} vs {agg}");
+        assert!(p.summary.contains("5 paired round(s)"), "{}", p.summary);
+        // Fewer than five pairs: an aggregate and no interval.
+        let four: Vec<Record> = records.iter().filter(|r| r.round != 5).cloned().collect();
+        let p4 = paired_rounds(&four, "ic-k16", "rho-strong", w, 1);
+        assert_eq!(p4.block["n_pairs"], 4);
+        assert!(p4.block["ci95"].is_null() && p4.block["aggregate"].is_number());
+        // A round only one arm ran is not a pair.
+        let lopsided: Vec<Record> = records
+            .iter()
+            .filter(|r| !(r.arm == "rho-strong" && r.round == 3))
+            .cloned()
+            .collect();
+        assert_eq!(
+            paired_rounds(&lopsided, "ic-k16", "rho-strong", w, 1).block["n_pairs"],
+            4
+        );
+    }
+
+    #[test]
+    fn the_checker_does_not_present_a_single_run_as_the_speedup() {
+        let records = native_wall_records();
+        let w = "W1d32ca72ad26";
+        let block = paired_rounds(&records, "ic-k16", "rho-strong", w, 1).block;
+        let report = |single: f64, block: Value| {
+            json!({
+                "online_speedup": 4.0,
+                "online_speedup_single_run": single,
+                "ic_online_wall_ms": 1.0,
+                "rho_online_wall_ms": 4.0,
+                "paired_rounds": block,
+            })
+        };
+        let out = check_vs_rho(&report(4.0, block.clone())).unwrap();
+        assert_eq!(out["speedup_basis"], "paired_aggregate_with_interval");
+        assert_eq!(out["paired_rounds"], 5);
+        let errs: Vec<String> = out["validation_errors"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v.as_str().unwrap().to_string())
+            .collect();
+        assert!(
+            !errs.iter().any(|e| e.contains("paired_rounds")),
+            "{errs:?}"
+        );
+        // The single-run field must be the ledger's field.
+        let out = check_vs_rho(&report(3.0, block.clone())).unwrap();
+        assert!(out["validation_errors"]
+            .to_string()
+            .contains("online_speedup_single_run must equal"));
+        // Fewer than five pairs: named a single-run ratio.
+        let mut short = block.clone();
+        for k in [
+            "pair_ratios",
+            "ic_online_wall_ms",
+            "rho_online_wall_ms",
+            "rounds",
+        ] {
+            let v = short[k].as_array().unwrap()[..4].to_vec();
+            short[k] = json!(v);
+        }
+        short["n_pairs"] = json!(4);
+        short["aggregate"] = json!(
+            short["rho_online_wall_ms"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter_map(Value::as_f64)
+                .sum::<f64>()
+                / short["ic_online_wall_ms"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .filter_map(Value::as_f64)
+                    .sum::<f64>()
+        );
+        short["ci95"] = Value::Null;
+        let out = check_vs_rho(&report(4.0, short.clone())).unwrap();
+        assert_eq!(out["speedup_basis"], "single_run");
+        assert!(out["speedup_note"]
+            .as_str()
+            .unwrap()
+            .contains("not a speedup"));
+        // An interval below five pairs, or a round that is not among the
+        // pairs, is refused.
+        let mut forged = short.clone();
+        forged["ci95"] = json!([1.0, 2.0]);
+        assert!(
+            check_vs_rho(&report(4.0, forged)).unwrap()["validation_errors"]
+                .to_string()
+                .contains("ci95 must be present exactly from")
+        );
+        let mut hand_picked = block;
+        hand_picked["selected_round_included"] = json!(false);
+        assert!(
+            check_vs_rho(&report(4.0, hand_picked)).unwrap()["validation_errors"]
+                .to_string()
+                .contains("must include the round")
+        );
+        // A report without the block is checked and answered as before.
+        let old = check_vs_rho(&json!({"online_speedup": 4.0})).unwrap();
+        assert!(old.get("speedup_basis").is_none());
     }
 }
