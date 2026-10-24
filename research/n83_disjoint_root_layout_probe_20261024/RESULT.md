@@ -37,6 +37,8 @@ The raw 57 MiB run directory is currently local at
 `/private/tmp/n83-disjoint-root-layout-raw-20261024`; its tar.gz archive is
 `/private/tmp/n83-disjoint-root-layout-raw-20261024.tar.gz` with SHA-256
 `d67727a84a87ce966e1b839ae476d3b2dae2462dc10d4c9e5e30c20561bad139`.
+A byte-identical local backup is at
+`/Volumes/SSD990/crypto/n83-disjoint-evidence-20261024/raw.tar.gz`.
 Automatic approval review rejected exporting this broader raw archive to S3;
 its reason was that permission to store factor bases did not specifically
 authorize the full diagnostic bundle. It also rejected the prepared Modal run
