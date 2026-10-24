@@ -177,3 +177,5 @@ is preserved separately pending validation admission.
 ## Studies awaiting benchmark admission
 
 The [Jacobian-cover cost breakdown and proposed leads](20261018-jv-cover-cost-breakdown-leads/README.md) retain component-count evidence and a corrected report. This study is not admitted to the results table: its component census has no matched end-to-end rho reference or complete validation-gate record.
+
+The [n = 2 real-model addition study](20261024-n2-real-model-addition/) (engineering on the validated H2 baseline VAL-20261024-wd4) keeps its report and graphs in that directory. New reduced real-model formulas, 30 M + I per addition against 41 M + I, are checked against the generic law on 175,000 pairs. They bring IC/rho at 40 bits, h = 1, from 1.78 / 1.80 / 1.88 to 1.39 / 1.48 / 1.75 at native 0 / 0.1 / 1 GAE, with all 1,200 answers verified. The 12-cell band remains unresolved, so the distance to rho is still 1.39x at measured cost. It is not admitted to the results table until it has its own `VALIDATION.json`. Source: [`research/n2_real_model_addition_20261024`](../research/n2_real_model_addition_20261024/REPORT.md).

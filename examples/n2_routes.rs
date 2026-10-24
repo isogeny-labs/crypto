@@ -19,7 +19,7 @@
 //! separately and priced afterwards at 0, 0.1 and 1 M.
 //!
 //! std-only; `rustc --edition 2021 -O examples/n2_routes.rs`.
-//! Usage: `n2_routes <out-dir> [run|check|control|summarize|hsweep|memsweep|hsummarize|gluecheck|glue|gluesummarize]`; env `N2_THREADS`, `N2_SIZES`
+//! Usage: `n2_routes <out-dir> [run|check|control|summarize|hsweep|memsweep|hsummarize|gluecheck|glue|gluesummarize|glue2check|glue2|glue2summarize]`; env `N2_THREADS`, `N2_SIZES`
 //! (comma-separated `log2 #E` targets, default `20,24,28,32,36,40`).
 #![allow(dead_code)]
 #![allow(
@@ -3614,6 +3614,642 @@ fn arm_glue(g: &Glue, pt: EP, q: EP, rng: &mut u64) -> ArmResult {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Real-model Jacobian law, second generation (research/n2_real_model_addition_20261024).
+// Same group law as `radd`/`radd_fast` on the sextic model; fewer counted
+// multiplications. The addition is split at its single inversion so that the
+// pre-inversion state can be batched across independent additions.
+// ---------------------------------------------------------------------------
+
+/// State of a real-model addition or doubling just before its inversion.
+/// `w = r * dq` is the value to invert; `r` is the resultant of the two `u`s
+/// (twice `Res(u, v)` for a doubling), `dq = r^2 - s1p^2`, and the slope is
+/// `s = (s1p x + s0p) / r`. `(c1, c0)` is the second divisor's `u` and
+/// `(e1, e0)` its `v`; `big3`, `big2` are the `x^3`, `x^2` coefficients of `u1 u2`.
+struct RPre<F: Fld> {
+    w: F,
+    r: F,
+    r2: F,
+    dq: F,
+    s1p: F,
+    s0p: F,
+    c1: F,
+    c0: F,
+    e1: F,
+    e0: F,
+    big3: F,
+    big2: F,
+}
+
+/// Shared tail of the pre-inversion phase; `None` on a degenerate slope.
+fn rpre_finish<F: Fld>(
+    r: F,
+    (s1p, s0p): (F, F),
+    (c1, c0): (F, F),
+    (e1, e0): (F, F),
+    (big3, big2): (F, F),
+) -> Option<RPre<F>> {
+    if s1p.is_zero() {
+        return None;
+    }
+    let r2 = r.sqr();
+    let dq = r.sub(s1p).mul(r.add(s1p));
+    if dq.is_zero() {
+        return None;
+    }
+    Some(RPre {
+        w: r.mul(dq),
+        r,
+        r2,
+        dq,
+        s1p,
+        s0p,
+        c1,
+        c0,
+        e1,
+        e0,
+        big3,
+        big2,
+    })
+}
+
+/// Pre-inversion phase of `a + b` (`a != b`, both of weight 2). With
+/// `z1 = a1 - c1`, `z2 = c0 - a0`, `z3 = a1 z1 + z2` the inverse of `u2` mod
+/// `u1` is `(z1 x + z3) / r`, `r = z2 z3 + z1 (a0 z1)`; because
+/// `z3 - a1 z1 = z2` the unnormalised slope is `s1' = z1 w0 + z2 w1`,
+/// `s0' = z3 w0 - (a0 z1) w1`. Resultant 4M, slope 4M, `r^2`, `dq`,
+/// `r dq` 3M, `big2` 1M: 12M.
+fn radd2_pre<F: Fld>(a: &Div<F>, b: &Div<F>) -> Option<RPre<F>> {
+    let g = |v: &Vec<F>, i: usize| v.get(i).copied().unwrap_or(F::zero());
+    let (a1, a0, b1, b0) = (a.u[1], a.u[0], g(&a.v, 1), g(&a.v, 0));
+    let (c1, c0, d1, d0) = (b.u[1], b.u[0], g(&b.v, 1), g(&b.v, 0));
+    let z1 = a1.sub(c1);
+    let z2 = c0.sub(a0);
+    let z3 = a1.mul(z1).add(z2);
+    let t = a0.mul(z1);
+    let r = z2.mul(z3).add(z1.mul(t));
+    if r.is_zero() {
+        return None;
+    }
+    // s' = (v1 - v2)(z1 x + z3) mod u1
+    let (w1, w0) = (b1.sub(d1), b0.sub(d0));
+    let s1p = z1.mul(w0).add(z2.mul(w1));
+    let s0p = z3.mul(w0).sub(t.mul(w1));
+    let big2 = a0.add(c0).add(a1.mul(c1));
+    rpre_finish(r, (s1p, s0p), (c1, c0), (d1, d0), (a1.add(c1), big2))
+}
+
+/// Pre-inversion phase of `2a`: `k mod u` from `f mod u^2` (10M), `Res(u, v)`
+/// (3M, sharing `b1^2`), slope (5M), `r^2`, `dq`, `r dq` (3M): 21M.
+fn rdbl2_pre<F: Fld>(f: &[F], a: &Div<F>) -> Option<RPre<F>> {
+    let g = |v: &Vec<F>, i: usize| v.get(i).copied().unwrap_or(F::zero());
+    let (a1, a0, b1, b0) = (a.u[1], a.u[0], g(&a.v, 1), g(&a.v, 0));
+    // f = u^2 (x^2 + e1 x + e0) + phi, k mod u = (phi - v^2) / u
+    let t1 = a1.sqr();
+    let two_a1 = a1.add(a1);
+    let big2 = t1.add(a0).add(a0);
+    let e1 = f[5].sub(two_a1);
+    let e0 = f[4].sub(big2).sub(two_a1.mul(e1));
+    let a1a0 = a1.mul(a0);
+    let phi3 = f[3]
+        .sub(a1a0.add(a1a0))
+        .sub(e1.mul(big2))
+        .sub(two_a1.mul(e0));
+    let x = e1.mul(a1a0);
+    let phi2 = f[2].sub(a0.sqr()).sub(x.add(x)).sub(e0.mul(big2));
+    let b1s = b1.sqr();
+    let (kr1, kr0) = (phi3, phi2.sub(b1s).sub(a1.mul(phi3)));
+    // inverse of 2v mod u is (-b1 x + rho) / (2 Res(u, v))
+    let rho = b0.sub(a1.mul(b1));
+    let rv = b0.mul(rho).add(b1s.mul(a0));
+    if rv.is_zero() {
+        return None;
+    }
+    let (z1, z3) = (b1.neg(), rho);
+    let w2 = z3.mul(kr0);
+    let w3 = z1.mul(kr1);
+    let kk = z3.add(z1).mul(kr0.add(kr1));
+    let s1p = kk.sub(w2).sub(w3).sub(a1.mul(w3));
+    let s0p = w2.sub(a0.mul(w3));
+    rpre_finish(rv.add(rv), (s1p, s0p), (a1, a0), (b1, b0), (two_a1, big2))
+}
+
+/// Post-inversion phase: normalise the slope, then `u'` from the top
+/// coefficients of `f - v^2` and `v'` by Horner reduction: 18M.
+fn rpost2<F: Fld>(f: &[F], p: &RPre<F>, iw: F) -> Div<F> {
+    let a_ = p.dq.mul(iw); // 1/r
+    let idq = p.r.mul(iw); // 1/dq
+    let q2inv = p.r2.mul(idq); // 1/(1 - s1^2)
+    let s1 = p.s1p.mul(a_);
+    let s0 = p.s0p.mul(a_);
+    // v = e + u2 s = c3 x^3 + c2 x^2 + c1v x + c0v, Karatsuba
+    let p11 = p.c1.mul(s1);
+    let p00 = p.c0.mul(s0);
+    let pm = p.c1.add(p.c0).mul(s1.add(s0));
+    let c3 = s1;
+    let c2 = s0.add(p11);
+    let c1v = p.e1.add(pm.sub(p11).sub(p00));
+    let c0v = p.e0.add(p00);
+    // f - v^2 = q2 x^6 + n5 x^5 + n4 x^4 + ...; u' = x^2 + up1 x + up0
+    let c3c2 = c3.mul(c2);
+    let n5 = f[5].sub(c3c2.add(c3c2));
+    let c3c1 = c3.mul(c1v);
+    let n4 = f[4].sub(c2.sqr()).sub(c3c1.add(c3c1));
+    let up1 = n5.mul(q2inv).sub(p.big3);
+    let up0 = n4.mul(q2inv).sub(p.big2).sub(up1.mul(p.big3));
+    // v' = -(v mod u')
+    let t = c3.mul(up1).sub(c2);
+    let x1 = c1v.add(up1.mul(t)).sub(c3.mul(up0));
+    let x0 = c0v.add(up0.mul(t));
+    Div {
+        u: vec![up0, up1, F::one()],
+        v: trim(vec![x0.neg(), x1.neg()]),
+    }
+}
+
+/// Pre-inversion state of `a + b`, or `None` for a case that `radd` must handle.
+fn rpre<F: Fld>(f: &[F], a: &Div<F>, b: &Div<F>) -> Option<RPre<F>> {
+    // the formulas assume the monic sextic; a twisted model (leading
+    // coefficient kappa) takes the generic law
+    if a.u.len() != 3 || b.u.len() != 3 || f[6] != F::one() {
+        return None;
+    }
+    if a == b {
+        rdbl2_pre(f, a)
+    } else {
+        radd2_pre(a, b)
+    }
+}
+
+/// Real-model addition/doubling with the second-generation formulas: one
+/// inversion, same results and same fall-backs as `radd_fast`/`radd`.
+fn radd_fast2<F: Fld>(f: &[F], a: &Div<F>, b: &Div<F>) -> Option<Div<F>> {
+    let Some(pre) = rpre(f, a, b) else {
+        return radd(f, a, b);
+    };
+    CJ.with(|c| c.set(c.get() + 1));
+    let iw = pre.w.inv();
+    Some(rpost2(f, &pre, iw))
+}
+
+fn rmul_fast2<F: Fld>(f: &[F], a: &Div<F>, mut k: u64) -> Option<Div<F>> {
+    let mut r = Div::zero();
+    let mut b = a.clone();
+    while k > 0 {
+        if k & 1 == 1 {
+            r = radd_fast2(f, &r, &b)?;
+        }
+        k >>= 1;
+        if k > 0 {
+            b = radd_fast2(f, &b, &b)?;
+        }
+    }
+    Some(r)
+}
+
+/// Montgomery's trick: all inverses of `v` (nonzero) with one inversion and
+/// `3 (n - 1)` multiplications.
+fn batch_inv<F: Fld>(v: &[F]) -> Vec<F> {
+    let n = v.len();
+    if n == 0 {
+        return Vec::new();
+    }
+    let mut pref = Vec::with_capacity(n);
+    let mut acc = v[0];
+    pref.push(acc);
+    for &x in &v[1..] {
+        acc = acc.mul(x);
+        pref.push(acc);
+    }
+    let mut inv = pref[n - 1].inv();
+    let mut out = vec![F::zero(); n];
+    for i in (1..n).rev() {
+        out[i] = inv.mul(pref[i - 1]);
+        inv = inv.mul(v[i]);
+    }
+    out[0] = inv;
+    out
+}
+
+/// `radd_fast2` on independent pairs with one shared inversion.
+fn radd_batch2<F: Fld>(f: &[F], pairs: &[(Div<F>, Div<F>)]) -> Vec<Option<Div<F>>> {
+    let mut out: Vec<Option<Div<F>>> = vec![None; pairs.len()];
+    let mut pres = Vec::new();
+    let mut idx = Vec::new();
+    for (i, (a, b)) in pairs.iter().enumerate() {
+        match rpre(f, a, b) {
+            Some(p) => {
+                CJ.with(|c| c.set(c.get() + 1));
+                pres.push(p);
+                idx.push(i);
+            }
+            None => out[i] = radd(f, a, b),
+        }
+    }
+    let ws: Vec<F> = pres.iter().map(|p| p.w).collect();
+    for ((i, p), iw) in idx.iter().zip(&pres).zip(batch_inv(&ws)) {
+        out[*i] = Some(rpost2(f, p, iw));
+    }
+    out
+}
+
+/// Arm Jglue2: `arm_glue` unchanged except that every Jacobian operation is
+/// `radd_fast2`/`rmul_fast2`. Same instances, same random stream, same walk
+/// (the results of the two laws are equal, checked by `glue2check`), so the
+/// steps and relations equal Jglue's and only the operation counts differ.
+fn arm_glue2(g: &Glue, pt: EP, q: EP, rng: &mut u64) -> ArmResult {
+    let t0 = Instant::now();
+    let c0 = Counts::now();
+    let p = g.p;
+    let ell = g.ell;
+    let f = &g.hf;
+    let inv2 = (ell + 1) / 2;
+    let mut res = ArmResult {
+        arm: "Jglue2".into(),
+        c: 0,
+        ..Default::default()
+    };
+    let mut jac = Counts::default();
+    let s = Counts::now();
+    let (tp, tq) = loop {
+        if let (Some(a), Some(b)) = (g.transfer(pt), g.transfer(q)) {
+            break (a, b);
+        }
+    };
+    jac = jac.add(s.since());
+    let mut lin = Lin::new(ell, 0);
+    let mut mults = Vec::new();
+    while mults.len() < IC_R {
+        let (a, b) = (xorshift(rng) % ell, xorshift(rng) % ell);
+        let s = Counts::now();
+        let d = rmul_fast2(f, &tp, a)
+            .and_then(|x| rmul_fast2(f, &tq, b).and_then(|y| radd_fast2(f, &x, &y)));
+        jac = jac.add(s.since());
+        if let Some(d) = d {
+            mults.push((d, a, b));
+        }
+    }
+    let half = Fp((p + 1) / 2);
+    let mut steps = 0u64;
+    'walk: loop {
+        let (mut a, mut b) = (xorshift(rng) % ell, xorshift(rng) % ell);
+        let s = Counts::now();
+        let d0 = rmul_fast2(f, &tp, a)
+            .and_then(|x| rmul_fast2(f, &tq, b).and_then(|y| radd_fast2(f, &x, &y)));
+        jac = jac.add(s.since());
+        let Some(mut d) = d0 else { continue };
+        for _ in 0..IC_RESTART {
+            if d.u.len() == 3 {
+                let (u0, u1) = (d.u[0], d.u[1]);
+                let disc = u1.sqr().sub(u0.mul(Fp(4)));
+                if let Some(sq) = sqrt_p(disc.0) {
+                    let v0 = d.v.first().copied().unwrap_or(Fp(0));
+                    let v1 = d.v.get(1).copied().unwrap_or(Fp(0));
+                    let mut row = Row {
+                        a,
+                        b,
+                        ..Default::default()
+                    };
+                    let roots = if sq == 0 {
+                        vec![Fp(sq)]
+                    } else {
+                        vec![Fp(sq), Fp(sq).neg()]
+                    };
+                    let mult = if sq == 0 { 2 } else { 1 };
+                    for sgn in roots {
+                        cnt_n(1);
+                        let xi = u1.neg().add(sgn).mul(half);
+                        let w = v1.mul(xi).add(v0).0;
+                        let pos = w <= p - w;
+                        let coef = mm(inv2, mult, ell);
+                        add_entry(
+                            &mut row.lp,
+                            xi.0,
+                            if pos { coef } else { (ell - coef) % ell },
+                            ell,
+                        );
+                    }
+                    res.rels += 1;
+                    let s = Counts::now();
+                    let cand = lin.push(row);
+                    res.la = res.la.add(s.since());
+                    if let Some(k) = cand.filter(|&k| g.e.mul(pt, k) == q) {
+                        res.k = k;
+                        res.ok = true;
+                        res.steps = steps;
+                        res.jac = jac;
+                        res.jac_ops = jac.j;
+                        res.mem = lin.pivots.len() as u64;
+                        res.walk = c0.since().minus(res.la);
+                        res.secs = t0.elapsed().as_secs_f64();
+                        return res;
+                    }
+                }
+            }
+            cnt_n(1);
+            let hx =
+                d.u.iter()
+                    .chain(d.v.iter())
+                    .fold(0u64, |h, c| (h ^ c.0).wrapping_mul(0x9e37_79b9_7f4a_7c15))
+                    >> 40;
+            let (m, ma, mb) = &mults[(hx as usize) % IC_R];
+            let s = Counts::now();
+            let nd = radd_fast2(f, &d, m);
+            jac = jac.add(s.since());
+            steps += 1;
+            match nd {
+                Some(x) => d = x,
+                None => continue 'walk,
+            }
+            a = (a + ma) % ell;
+            b = (b + mb) % ell;
+        }
+    }
+}
+
+/// One glued instance, `TARGETS` targets, arms R, Jglue (replay of H2) and
+/// Jglue2 on the same targets. Jglue2 starts from the random state Jglue
+/// started from, and the stream continues from Jglue's end state, so the R
+/// and Jglue rows equal `glue_job`'s byte for byte (but the seconds).
+fn glue_job2(job: &HJob) -> Vec<String> {
+    let mut rng = job.seed | 1;
+    let g = Glue::new(job.bits, job.h, &mut rng);
+    let inst = g.as_instance();
+    let pt = loop {
+        let v = g.e.mul(g.e.random_point(&mut rng), g.h);
+        if v != EP::O {
+            break v;
+        }
+    };
+    let (pa, pb) = (g.e.random_point(&mut rng), g.e.random_point(&mut rng));
+    let s = Counts::now();
+    let _ = g.e.add(pa, pb);
+    let eadd = s.since();
+    let mut rows = Vec::new();
+    for tgt in 0..TARGETS {
+        let k = 1 + xorshift(&mut rng) % (g.ell - 1);
+        let q = g.e.mul(pt, k);
+        let r_rho = arm_rho(&inst, pt, q, &mut rng);
+        let snap = rng;
+        let r_old = arm_glue(&g, pt, q, &mut rng);
+        let mut rng2 = snap;
+        let r_new = arm_glue2(&g, pt, q, &mut rng2);
+        for (name, r) in [("R", r_rho), ("Jglue", r_old), ("Jglue2", r_new)] {
+            dump_run(
+                "glue2",
+                &[
+                    ("bits", job.bits as u64),
+                    ("h", g.h),
+                    ("instance", job.inst_id as u64),
+                    ("target", tgt as u64),
+                ],
+                &g.e,
+                pt,
+                q,
+                g.ell,
+                g.n,
+                k,
+                name,
+                r.k,
+            );
+            let ok = r.ok && r.k == k && g.e.mul(pt, r.k) == q;
+            rows.push(format!(
+                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{:.3}",
+                job.bits,
+                g.h,
+                job.inst_id,
+                g.p,
+                g.n,
+                g.ell,
+                u8::from(g.twist),
+                tgt,
+                name,
+                r.steps,
+                r.rels,
+                r.jac_ops,
+                r.walk.m,
+                r.walk.i,
+                r.walk.n,
+                r.jac.m,
+                r.jac.i,
+                r.la.n,
+                eadd.m,
+                eadd.i,
+                u8::from(ok),
+                r.secs
+            ));
+        }
+    }
+    eprintln!(
+        "glue2 bits {} h {} inst {} done",
+        job.bits, job.h, job.inst_id
+    );
+    rows
+}
+
+/// The H2 summary logic applied twice on the same CSV: once with the original
+/// Jglue rows against R (the replay of H2), once with the Jglue2 rows renamed
+/// to Jglue against R, so both are read by the frozen cost model unchanged.
+fn summarize_glue2(csv: &str) -> String {
+    let hdr = csv.lines().next().unwrap_or("");
+    let sub = |keep: &str, rename: bool| -> String {
+        let mut s = format!("{hdr}\n");
+        for l in csv.lines().skip(1) {
+            let v: Vec<&str> = l.split(',').collect();
+            if v[8] == "R" || v[8] == keep {
+                if rename && v[8] == keep {
+                    let mut w = v.clone();
+                    w[8] = "Jglue";
+                    s.push_str(&w.join(","));
+                } else {
+                    s.push_str(l);
+                }
+                s.push('\n');
+            }
+        }
+        s
+    };
+    let mut out = String::from("== Jglue (original formulas, replay of H2) ==\n");
+    out.push_str(&summarize_glue(&sub("Jglue", false)));
+    out.push_str("== Jglue2 (second-generation formulas) ==\n");
+    out.push_str(&summarize_glue(&sub("Jglue2", true)));
+    out
+}
+
+/// Mean (M, I) per operation of `f` over `pairs`, and how many agree with the
+/// generic law `radd`.
+fn op_cost<F: Fld>(
+    f: &[F],
+    pairs: &[(Div<F>, Div<F>)],
+    op: &dyn Fn(&[F], &Div<F>, &Div<F>) -> Option<Div<F>>,
+) -> (f64, f64, usize, usize) {
+    let (mut m, mut i, mut n, mut agree) = (0u64, 0u64, 0usize, 0usize);
+    for (a, b) in pairs {
+        let s = Counts::now();
+        let x = op(f, a, b);
+        let c = s.since();
+        m += c.m;
+        i += c.i;
+        n += 1;
+        agree += usize::from(x == radd(f, a, b));
+    }
+    (m as f64 / n as f64, i as f64 / n as f64, n, agree)
+}
+
+/// Exhaustive check on every pair of reduced divisors of random sextic curves
+/// over tiny fields: `radd_fast2` and `radd_fast` against `radd`.
+fn glue2_small_fields(log: &mut String, rng: &mut u64) {
+    for &p in &[7u64, 11, 13] {
+        let kappa = (2..p)
+            .find(|&k| powmod(k, (p - 1) / 2, p) == p - 1)
+            .unwrap();
+        set_field(p, kappa);
+        for curve in 0..4 {
+            // random squarefree sextic
+            // curve 3 is a twisted (non-monic) model: the fast laws must defer to `radd`
+            let lc = if curve == 3 { Fp(kappa) } else { Fp(1) };
+            let f = loop {
+                let mut f: Vec<Fp> = (0..6).map(|_| Fp(xorshift(rng) % p)).collect();
+                f.push(lc);
+                let df: Vec<Fp> = (1..7).map(|i| f[i].mul(Fp(i as u64 % p))).collect();
+                if deg(&df) == 5 && pxgcd(&f, &df).0.len() == 1 {
+                    break f;
+                }
+            };
+            let mut ds = vec![Div::zero()];
+            for a1 in 0..p {
+                for a0 in 0..p {
+                    for b1 in 0..p {
+                        for b0 in 0..p {
+                            let d = Div {
+                                u: vec![Fp(a0), Fp(a1), Fp(1)],
+                                v: trim(vec![Fp(b0), Fp(b1)]),
+                            };
+                            if jvalid(&f, &d) {
+                                ds.push(d);
+                            }
+                        }
+                    }
+                }
+            }
+            let (mut pairs, mut agree, mut agree_old, mut dbl, mut same_u, mut nones) =
+                (0u64, 0u64, 0u64, 0u64, 0u64, 0u64);
+            for a in &ds {
+                for b in &ds {
+                    let want = radd(&f, a, b);
+                    pairs += 1;
+                    agree += u64::from(radd_fast2(&f, a, b) == want);
+                    agree_old += u64::from(radd_fast(&f, a, b) == want);
+                    dbl += u64::from(a == b);
+                    same_u += u64::from(a.u == b.u && a != b);
+                    nones += u64::from(want.is_none());
+                }
+            }
+            log.push_str(&format!(
+                "SMALL p={p} curve {curve}: {} divisors, {pairs} ordered pairs ({dbl} doublings, {same_u} equal-u distinct-v, {nones} generic None): radd_fast2 = radd on {agree}/{pairs}, radd_fast = radd on {agree_old}/{pairs}\n",
+                ds.len()
+            ));
+        }
+    }
+}
+
+fn glue2_checks(out: &Path) {
+    let mut rng = 0x6c75_3200_u64;
+    let mut log = String::new();
+    glue2_small_fields(&mut log, &mut rng);
+    let mut totals = (0u64, 0u64);
+    for &bits in &[20u32, 28, 36, 40, 44] {
+        let g = Glue::new(bits, 1, &mut rng);
+        let f = &g.hf;
+        // a pool of group elements: transfers of random l-part points
+        let mut pool: Vec<Div<Fp>> = Vec::new();
+        while pool.len() < IC_R {
+            let v = g.e.mul(g.e.random_point(&mut rng), g.h);
+            if let Some(t) = g.transfer(v) {
+                pool.push(t);
+            }
+        }
+        // a random walk d <- d + pool[j]: 10,000 additions, and at every step
+        // the doubling, the negation, zero and a fresh random pair
+        let steps = 10_000usize;
+        let mut d = pool[0].clone();
+        let mut adds: Vec<(Div<Fp>, Div<Fp>)> = Vec::new();
+        let mut dbls: Vec<(Div<Fp>, Div<Fp>)> = Vec::new();
+        let mut special: Vec<(Div<Fp>, Div<Fp>)> = Vec::new();
+        while adds.len() < steps {
+            let m = pool[xorshift(&mut rng) as usize % pool.len()].clone();
+            let other = pool[xorshift(&mut rng) as usize % pool.len()].clone();
+            adds.push((d.clone(), m.clone()));
+            adds.push((other.clone(), d.clone()));
+            dbls.push((d.clone(), d.clone()));
+            special.push((d.clone(), d.neg()));
+            special.push((d.clone(), Div::zero()));
+            special.push((Div::zero(), d.clone()));
+            special.push((d.clone(), pool[0].clone()));
+            match radd(f, &d, &m) {
+                Some(x) if x.u.len() == 3 => d = x,
+                _ => d = pool[0].clone(),
+            }
+        }
+        adds.truncate(steps);
+        dbls.truncate(steps);
+        // walk additions D + R_j, R_j one of the 32 fixed multipliers
+        let walk: Vec<(Div<Fp>, Div<Fp>)> = adds.iter().step_by(2).cloned().collect();
+        let (m_old_a, i_old_a, n_a, ag_old_a) = op_cost(f, &adds, &|f, a, b| radd_fast(f, a, b));
+        let (m_new_a, i_new_a, _, ag_new_a) = op_cost(f, &adds, &|f, a, b| radd_fast2(f, a, b));
+        let (m_old_d, i_old_d, n_d, ag_old_d) = op_cost(f, &dbls, &|f, a, b| radd_fast(f, a, b));
+        let (m_new_d, i_new_d, _, ag_new_d) = op_cost(f, &dbls, &|f, a, b| radd_fast2(f, a, b));
+        let (m_old_w, i_old_w, n_w, ag_old_w) = op_cost(f, &walk, &|f, a, b| radd_fast(f, a, b));
+        let (m_new_w, i_new_w, _, ag_new_w) = op_cost(f, &walk, &|f, a, b| radd_fast2(f, a, b));
+        let (_, _, n_s, ag_new_s) = op_cost(f, &special, &|f, a, b| radd_fast2(f, a, b));
+        let (_, _, _, ag_old_s) = op_cost(f, &special, &|f, a, b| radd_fast(f, a, b));
+        totals.0 += (n_a + n_d + n_s) as u64;
+        totals.1 += (ag_new_a + ag_new_d + ag_new_s) as u64;
+        log.push_str(&format!(
+            "REAL bits {bits} p={} twist={} ({} pool elements): add (generic pairs, n={n_a}) old {m_old_a:.2}M+{i_old_a:.2}I new {m_new_a:.2}M+{i_new_a:.2}I | agree with radd new {ag_new_a}/{n_a} old {ag_old_a}/{n_a}\n",
+            g.p,
+            g.twist,
+            pool.len()
+        ));
+        log.push_str(&format!(
+            "REAL bits {bits}: double (n={n_d}) old {m_old_d:.2}M+{i_old_d:.2}I new {m_new_d:.2}M+{i_new_d:.2}I | agree new {ag_new_d}/{n_d} old {ag_old_d}/{n_d}\n"
+        ));
+        log.push_str(&format!(
+            "REAL bits {bits}: walk add D+R_j, R_j fixed (n={n_w}) old {m_old_w:.2}M+{i_old_w:.2}I new {m_new_w:.2}M+{i_new_w:.2}I | agree new {ag_new_w}/{n_w} old {ag_old_w}/{n_w}\n"
+        ));
+        log.push_str(&format!(
+            "REAL bits {bits}: special pairs (negation, zero, repeated operand; n={n_s}) agree new {ag_new_s}/{n_s} old {ag_old_s}/{n_s}\n"
+        ));
+        // batched inversion across independent additions (a stage diagnostic,
+        // not an algorithm: one walk is sequential)
+        for &w in &[4usize, 16, 64] {
+            let (mut m, mut i, mut n, mut ok) = (0u64, 0u64, 0u64, 0u64);
+            for chunk in adds.chunks(w).filter(|c| c.len() == w) {
+                let s = Counts::now();
+                let res = radd_batch2(f, chunk);
+                let c = s.since();
+                m += c.m;
+                i += c.i;
+                n += w as u64;
+                for ((a, b), x) in chunk.iter().zip(&res) {
+                    ok += u64::from(*x == radd(f, a, b));
+                }
+            }
+            log.push_str(&format!(
+                "REAL bits {bits}: batched add, W={w}: {:.2}M+{:.3}I per op (n={n}), agree {ok}/{n}\n",
+                m as f64 / n as f64,
+                i as f64 / n as f64
+            ));
+        }
+    }
+    log.push_str(&format!(
+        "TOTAL on real instances (fast2 vs radd; adds + doubles + special pairs): {}/{} agree\n",
+        totals.1, totals.0
+    ));
+    std::fs::write(out.join("glue2_checks.txt"), &log).unwrap();
+    eprint!("{log}");
+}
+
 fn glue_checks(out: &Path) {
     let mut rng = 0x6c75_6500_u64;
     let mut log = String::new();
@@ -4002,7 +4638,7 @@ fn gae_band(csv: &str) -> String {
             c -= col(r, "jac_M") + ipr * col(r, "jac_I");
             c += col(r, "jac_ops") * gae;
         }
-        if glue && arm == "Jglue" {
+        if glue && arm.starts_with("Jglue") {
             c += col(r, "steps") * ipr;
         }
         c
@@ -4099,6 +4735,71 @@ fn main() {
     }
     if mode == "gluecheck" {
         glue_checks(out);
+        return;
+    }
+    if mode == "glue2check" {
+        glue2_checks(out);
+        return;
+    }
+    if mode == "glue2summarize" {
+        let t = summarize_glue2(&std::fs::read_to_string(out.join("glue2.csv")).unwrap());
+        std::fs::write(out.join("glue2_summary.txt"), &t).unwrap();
+        eprint!("{t}");
+        return;
+    }
+    if mode == "glue2" {
+        let threads: usize = std::env::var("N2_THREADS")
+            .ok()
+            .and_then(|s| s.parse().ok())
+            .unwrap_or(1);
+        let env_list = |k: &str, d: &str| -> Vec<u64> {
+            std::env::var(k)
+                .unwrap_or_else(|_| d.into())
+                .split(',')
+                .map(|x| x.trim().parse().unwrap())
+                .collect()
+        };
+        // the same instances and seeds as `glue` (H2)
+        let mut jobs = Vec::new();
+        for &bits in &env_list("N2_SIZES", "28,32,36,40") {
+            for &h in &env_list("N2_HS", "1,4") {
+                for inst_id in 0..4 {
+                    jobs.push(HJob {
+                        bits: bits as u32,
+                        h,
+                        inst_id,
+                        seed: splitmix(0x6c75_0000 ^ (bits << 40) ^ (h << 8) ^ inst_id as u64),
+                        theta: 1.0,
+                    });
+                }
+            }
+        }
+        jobs.sort_by_key(|j| (j.bits, j.h));
+        let t0 = Instant::now();
+        let queue = std::sync::Mutex::new(jobs);
+        let results = std::sync::Mutex::new(Vec::<String>::new());
+        std::thread::scope(|s| {
+            for _ in 0..threads {
+                s.spawn(|| loop {
+                    let j = queue.lock().unwrap().pop();
+                    let Some(job) = j else { break };
+                    let r = glue_job2(&job);
+                    results.lock().unwrap().extend(r);
+                });
+            }
+        });
+        let mut rows = results.into_inner().unwrap();
+        rows.sort();
+        let mut csv = String::from("bits,h,instance,p,N,ell,twist,target,arm,steps,relations,jac_ops,walk_M,walk_I,walk_native,jac_M,jac_I,la_native,eadd_M,eadd_I,verified,seconds\n");
+        for r in &rows {
+            csv.push_str(r);
+            csv.push('\n');
+        }
+        std::fs::write(out.join("glue2.csv"), &csv).unwrap();
+        let t = summarize_glue2(&csv);
+        std::fs::write(out.join("glue2_summary.txt"), &t).unwrap();
+        eprint!("{t}");
+        eprintln!("done in {:.1}s", t0.elapsed().as_secs_f64());
         return;
     }
     if mode == "glue" {
@@ -4395,6 +5096,103 @@ mod tests {
         assert!(fast_hits > 2000);
         let a = rand_div(&mut rng);
         assert_eq!(jmul_fast(f, &a, 123457), jmul(f, &a, 123457));
+    }
+
+    #[test]
+    fn real_model_second_generation_matches_generic() {
+        // every pair of reduced divisors of one random sextic over F_7 and F_11
+        let mut rng = 0xfeed_u64;
+        for (p, twisted) in [(7u64, false), (11, false), (7, true)] {
+            let kappa = (2..p)
+                .find(|&k| powmod(k, (p - 1) / 2, p) == p - 1)
+                .unwrap();
+            set_field(p, kappa);
+            let f = loop {
+                let mut f: Vec<Fp> = (0..6).map(|_| Fp(xorshift(&mut rng) % p)).collect();
+                f.push(Fp(if twisted { kappa } else { 1 }));
+                let df: Vec<Fp> = (1..7).map(|i| f[i].mul(Fp(i as u64 % p))).collect();
+                if deg(&df) == 5 && pxgcd(&f, &df).0.len() == 1 {
+                    break f;
+                }
+            };
+            let mut ds = vec![Div::zero()];
+            for k in 0..p * p * p * p {
+                let d = Div {
+                    u: vec![Fp(k % p), Fp(k / p % p), Fp(1)],
+                    v: trim(vec![Fp(k / (p * p) % p), Fp(k / (p * p * p) % p)]),
+                };
+                if jvalid(&f, &d) {
+                    ds.push(d);
+                }
+            }
+            for a in &ds {
+                for b in &ds {
+                    assert_eq!(radd_fast2(&f, a, b), radd(&f, a, b), "p {p} {a:?} {b:?}");
+                }
+            }
+            let pairs: Vec<_> = ds
+                .iter()
+                .zip(ds.iter().rev())
+                .map(|(a, b)| (a.clone(), b.clone()))
+                .collect();
+            for ((a, b), x) in pairs.iter().zip(radd_batch2(&f, &pairs)) {
+                assert_eq!(x, radd(&f, a, b));
+            }
+        }
+        // glued instance: a walk with doublings, negations and zero
+        let mut rng = 0x5eed_u64;
+        let g = loop {
+            let g = Glue::new(20, 1, &mut rng);
+            if !g.twist {
+                break g;
+            }
+        };
+        let f = &g.hf;
+        let pool: Vec<Div<Fp>> = (0..8)
+            .map(|_| loop {
+                let v = g.e.mul(g.e.random_point(&mut rng), g.h);
+                if let Some(t) = g.transfer(v) {
+                    break t;
+                }
+            })
+            .collect();
+        let mut d = pool[0].clone();
+        let (mut add_m, mut add_n, mut dbl_m, mut dbl_n) = (0u64, 0u64, 0u64, 0u64);
+        for i in 0..1500 {
+            let m = &pool[i % pool.len()];
+            for (j, (x, y)) in [(&d, m), (&d, &d), (&d, &d.neg()), (m, &d)]
+                .into_iter()
+                .enumerate()
+            {
+                assert_eq!(
+                    radd_fast2(f, x, y),
+                    radd(f, x, y),
+                    "i {i} case {j} x==y {} p {}",
+                    x == y,
+                    g.p
+                );
+            }
+            let s = Counts::now();
+            let _ = radd_fast2(f, &d, m);
+            add_m += s.since().m;
+            add_n += 1;
+            let s = Counts::now();
+            let _ = radd_fast2(f, &d, &d);
+            dbl_m += s.since().m;
+            dbl_n += 1;
+            if let Some(x) = radd(f, &d, m) {
+                if x.u.len() == 3 {
+                    d = x;
+                }
+            }
+        }
+        // 30M + 1I per addition and 39M + 1I per doubling, up to rare fall-backs
+        assert!((add_m as f64 / add_n as f64 - 30.0).abs() < 0.5);
+        assert!((dbl_m as f64 / dbl_n as f64 - 39.0).abs() < 0.5);
+        assert_eq!(
+            rmul_fast2(f, &pool[0], 123457),
+            rmul_fast(f, &pool[0], 123457)
+        );
     }
 
     #[test]
