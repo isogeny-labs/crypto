@@ -117,6 +117,9 @@ baseline. Every such improvement is a success and is reported as one.**
   surface and the shared-code parity list are stated once in
   `crypto-autoresearcher:docs/lab-contract.md`. That file wins on a shared
   convention; this file wins on anything specific to this repository.
+  `s3://setec-astronomy-artifacts` is the only writable bucket; the legacy
+  buckets (`s3://crypto-autoresearcher/**`, `ecc2k130-*`, `aburan28-n83-tier1-*`,
+  `cairn-swarm-*`) are read-only.
 - **What has already been tried against ECDLP, here and in the sibling
   repositories:** the lead atlas in aburan28/crypto-autoresearcher,
   `knowledge/leads/ecdlp/` (`python3 tools/lead_atlas.py --brief`, printed by
@@ -156,8 +159,6 @@ commands, and interpretation limits.
   profile, without the 18 largest `research/` archives. In a sparse checkout
   (`docs/sparse-checkout.md`) a path `git ls-files` lists is materialized with
   `scripts/sparse-checkout.sh add --path`, never reported missing.
-
-# AGENTS.md
 
 ## Preserve scope and report evidence
 
@@ -398,7 +399,9 @@ and `aburan28/ml-cryptanalysis`:
 revised mathematical result, include a faithful Lean 4 theorem and checked
 proof whenever formalization is feasible. Treat the formalization attempt as
 part of the requested work, and prioritize the central theorem and its
-dependencies. Keep the readable mathematical proof in the report.
+dependencies. Keep the readable mathematical proof in the report. The shared
+library and gate live in `aburan28/crypto-lean`; pin its revision with the
+toolchain, and treat a gate change as a dependency change.
 
 - Maintain a proof map from each report theorem, proposition, lemma or
   corollary to its Lean declaration, exact hypotheses and verification status.
@@ -1504,9 +1507,9 @@ verify` replays them.
 The user guide, including S3 storage, is
 [docs/isogeny-walk/README.md](docs/isogeny-walk/README.md).
 
-# Agent rules for IC measurements
+## IC measurement rules
 
-## Primary comparison uses one target
+### Primary comparison uses one target
 
 The default elliptic-curve index-calculus (IC) question is the cost to solve
 one previously unseen public target. Every primary comparison run must use
@@ -1556,12 +1559,12 @@ Its launch interface now permits one target per run only.
 <!-- conductor:begin -->
 Before making code changes, obtain or attach to a Conductor task. Run
 `conductor check --summary "…" --scope path:…` first — if someone already holds
-those files, it will tell you who and what to do about it. Read `.conductor/WORKFLOW.md`
+those files, it will tell you who and what to do about it. Read `docs/CONDUCTOR.md`
 and the active task card. Report scope expansion before editing outside the reserved paths.
 Do not publish chat transcripts or secrets as task metadata.
 <!-- conductor:end -->
 
-## Progress metrics (daily lab report)
+### Progress metrics (daily lab report)
 
 `tools/progress_metrics.py` exports this repo's progress KPIs as JSONL for the lab-wide daily
 report (`/Volumes/SSD990-2/progress-metrics`). It reads committed state at `origin/<default>` and

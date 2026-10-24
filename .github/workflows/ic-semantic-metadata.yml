@@ -72,3 +72,8 @@ jobs:
       - name: Validate committed metadata (mirror not compared)
         if: steps.peer.outputs.available != 'true'
         run: python docs/curves/ic/validate_semantics.py
+      # Source (cryptanalysis curves.yaml) -> mirror (docs/curves/ic) -> the
+      # registry the site reads. A stale registry is drift even when the mirror
+      # matches, so it is checked on the same run.
+      - name: Registry is current
+        run: python3 scripts/build_curve_registry.py --check
