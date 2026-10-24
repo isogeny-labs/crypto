@@ -42,4 +42,3 @@ Credentials entered hidden stdin only and are absent from repository files.
 The checkpoint does not certify a generic S5 ideal, strongest-rho
 comparison, calibrated complete price or breakthrough. Later current-main
 integration checks live separately; the completed 43-run snapshot is fixed.
-
