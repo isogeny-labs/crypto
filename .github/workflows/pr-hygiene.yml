@@ -42,9 +42,13 @@ on:
         type: string
         default: '14'
       max_deletes:
-        description: 'Maximum branch deletions per run'
+        description: 'Maximum branch deletions per run (0 = none, for a PR-actions-only run)'
         type: string
         default: '50'
+      pr_actions:
+        description: 'Maximum stale-PR warn/close actions per apply run. Default 0: an apply run only deletes branches. The allow globs do NOT limit these actions, which touch every lane.'
+        type: string
+        default: '0'
 
 # Never cancel a sweep midway; a second one waits.
 concurrency:
@@ -68,7 +72,9 @@ jobs:
       PR_MERGED_DAYS: ${{ inputs.merged_days || '3' }}
       PR_CLOSED_DAYS: ${{ inputs.closed_days || '30' }}
       PR_ORPHAN_DAYS: ${{ inputs.orphan_days || '14' }}
-      PR_MAX_DELETES: ${{ inputs.max_deletes || '50' }}
+      PR_MAX_DELETES: ${{ inputs.max_deletes }}
+      # Empty on schedule runs (script default); on dispatch the plan preview matches apply.
+      PR_MAX_PR_ACTIONS: ${{ inputs.pr_actions }}
     steps:
       # Commits only (tree:0): enough for for-each-ref and ancestry over all
       # branches without downloading the multi-gigabyte tree.
@@ -113,7 +119,10 @@ jobs:
       PR_MERGED_DAYS: ${{ inputs.merged_days || '3' }}
       PR_CLOSED_DAYS: ${{ inputs.closed_days || '30' }}
       PR_ORPHAN_DAYS: ${{ inputs.orphan_days || '14' }}
-      PR_MAX_DELETES: ${{ inputs.max_deletes || '50' }}
+      # Passed verbatim: the apply job runs on dispatch only, so every input is set, and
+      # no `|| default` fallback can turn an explicit 0 into the default.
+      PR_MAX_DELETES: ${{ inputs.max_deletes }}
+      PR_MAX_PR_ACTIONS: ${{ inputs.pr_actions }}
     steps:
       - uses: actions/checkout@v4
         with:

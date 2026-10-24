@@ -88,9 +88,18 @@ LABEL_NO_AUTO_DELETE = "no-auto-delete"
 STALE_EXEMPT_LABELS = frozenset(
     {LABEL_KEEP_OPEN, "needs-human", "autofix:running", "large-file-ok"}
 )
+# On a PR, any of these labels stops every branch-deletion rule for that PR's head
+# ref (rule C also never deletes the branch of a PR closed by the stale sweep).
+NO_DELETE_LABELS = frozenset({LABEL_NO_AUTO_DELETE, LABEL_KEEP_OPEN, "needs-human"})
 MARK_CAP = "<!-- pr-hygiene:lane-cap -->"
 MARK_WARN = "<!-- pr-hygiene:stale-warn -->"
 MARK_CLOSE = "<!-- pr-hygiene:stale-close -->"
+
+# The warn comment and the stale label are written seconds apart and both advance
+# the PR's updated_at; anything later than warn time + this is real activity.
+WARN_SLACK = 600.0
+# apply refuses to delete when branch-protect.txt was last scanned longer ago.
+MANIFEST_MAX_AGE_DAYS = 14.0
 
 PAGE = 100
 MAX_PAGES = 400  # 40k items; exceeding it is an error, never a silent truncation
@@ -245,6 +254,7 @@ def normalize_pr(raw):
         "merged_at": parse_ts(raw.get("merged_at")),
         "closed_at": parse_ts(raw.get("closed_at")),
         "user": (raw.get("user") or {}).get("login"),
+        "warned_at": None,  # filled by collect() for open PRs that carry LABEL_STALE
     }
 
 
@@ -350,6 +360,43 @@ def read_manifest(path):
     return out
 
 
+_STAMP_RE = re.compile(r"^#\s*(scan-date|scan-rev):\s*(\S+)\s*$")
+
+
+def read_manifest_stamp(path):
+    """The ``# scan-date: YYYY-MM-DD`` / ``# scan-rev: <sha>`` header written by
+    gen_branch_protect.py.  Missing fields are None (a hand-written manifest)."""
+    stamp = {"scan_date": None, "scan_rev": None}
+    if not path or not os.path.exists(path):
+        return stamp
+    with open(path, encoding="utf-8") as fh:
+        for ln in fh:
+            m = _STAMP_RE.match(ln)
+            if not m:
+                continue
+            if m.group(1) == "scan-date":
+                try:
+                    stamp["scan_date"] = calendar.timegm(time.strptime(m.group(2), "%Y-%m-%d"))
+                except ValueError:
+                    pass
+            elif re.fullmatch(r"[0-9a-f]{40}", m.group(2)):
+                stamp["scan_rev"] = m.group(2)
+    return stamp
+
+
+def manifest_stale_reason(snap, max_age_days=MANIFEST_MAX_AGE_DAYS):
+    """Why the manifest may not be trusted to protect cited evidence (None if fresh)."""
+    stamp = snap.get("manifest_stamp") or {}
+    when = stamp.get("scan_date")
+    if when is None:
+        return "branch-protect.txt has no scan-date stamp; regenerate it with gen_branch_protect.py"
+    age = (snap["now"] - when) / DAY
+    if age > max_age_days:
+        return ("branch-protect.txt was scanned %.0f days ago (limit %g); regenerate it with "
+                "gen_branch_protect.py" % (age, max_age_days))
+    return None
+
+
 def protected_reason(name, snap):
     """Why `name` must never be deleted (None if nothing protects it)."""
     low = name.casefold()
@@ -435,42 +482,65 @@ def is_stale_exempt(pr, protected):
 
 
 def classify_branch(b, snap, cfg, idx):
-    """Return (verdict, rule, reason) for one remote branch.
+    """Return (verdict, rule, reason, evidence) for one remote branch.
 
     verdict: delete | protected | in-use | skip | keep
-    Only ``delete`` ever becomes an action.
+    Only ``delete`` ever becomes an action.  ``evidence`` names the PR a B or C
+    deletion rests on (number, base ref, labels) so the final gate can re-check it.
     """
     name, now = b["name"], snap["now"]
+    default = snap["default_branch"]
     why = protected_reason(name, snap) if isinstance(name, str) else "invalid"
     if why:
-        return "protected", "protected", why
+        return "protected", "protected", why, {}
     if not safe_name(name):
-        return "skip", "invalid-name", "name fails validation; never touched"
+        return "skip", "invalid-name", "name fails validation; never touched", {}
     if name in idx["open_heads"] or name in idx["open_bases"]:
-        return "in-use", "open-pr", "head or base of an open PR"
+        return "in-use", "open-pr", "head or base of an open PR", {}
     if branch_lane(name) not in DELETABLE_LANES:
-        return "skip", "not-allowlisted", "lane is not in the deletion allowlist"
+        return "skip", "not-allowlisted", "lane is not in the deletion allowlist", {}
     prs = idx["by_ref"].get(name, [])
+    for p in prs:
+        if p["labels"] & NO_DELETE_LABELS:
+            return "keep", "label-hold", "PR #%s carries a keep/no-auto-delete label" % p["number"], {}
     merged_prs = [p for p in prs if p["merged"]]
     closed_prs = [p for p in prs if p["state"] == "closed" and not p["merged"]]
     min_merged = cfg["merged_days"] * DAY
     min_closed = cfg["closed_days"] * DAY
     sha = b["sha"]
-    # B: squash/rebase-merged PR whose final head is exactly the branch tip.
+
+    def ev(p):
+        return {"pr": p["number"], "base": p["base_ref"], "labels": sorted(p["labels"])}
+
+    # B: squash/rebase-merged PR whose final head is exactly the branch tip.  The PR
+    # must have been merged INTO THE DEFAULT BRANCH: a PR merged into another feature
+    # branch (a stack) leaves the work only in that unmerged branch, and the tip is
+    # then reachable only through refs/pull/N/head.
     for p in merged_prs:
-        if p["head_sha"] == sha and p["merged_at"] and now - p["merged_at"] >= min_merged:
-            return "delete", "B", "tip equals head of PR #%s merged >= %gd ago" % (p["number"], cfg["merged_days"])
+        if (p["base_ref"] == default and p["head_sha"] == sha and p["merged_at"]
+                and now - p["merged_at"] >= min_merged):
+            return ("delete", "B", "tip equals head of PR #%s merged into %s >= %gd ago"
+                    % (p["number"], default, cfg["merged_days"]), ev(p))
     # A: tip already reachable from the default branch AND a merged PR exists
     # for this ref (a PR-less ancestor may be a fresh agent branch cut from main).
+    # The safety condition is git ancestry (b["merged"]), not the PR, so the PR's
+    # base does not matter here: a stacked child whose parent later landed in the
+    # default branch has all its commits there.
     if b["merged"] and merged_prs:
         latest = max((p["merged_at"] or 0) for p in merged_prs)
         if latest and now - latest >= min_merged:
-            return "delete", "A", "tip is an ancestor of the default branch; PR merged >= %gd ago" % cfg["merged_days"]
-    # C: closed-unmerged PR whose final head is the tip, closed long ago.
+            return ("delete", "A", "tip is an ancestor of the default branch; PR merged >= %gd ago"
+                    % cfg["merged_days"], {})
+    # C: closed-unmerged PR whose final head is the tip, closed long ago.  Never for
+    # a PR closed by the stale sweep: that PR still carries LABEL_STALE, and ~21 idle
+    # days must not chain into erasing the only named ref to unmerged work.
     for p in closed_prs:
+        if LABEL_STALE in p["labels"]:
+            continue
         if p["head_sha"] == sha and p["closed_at"] and now - p["closed_at"] >= min_closed:
-            return "delete", "C", "tip equals head of PR #%s closed unmerged >= %gd ago" % (p["number"], cfg["closed_days"])
-    return "keep", "keep", "no deletion rule matched"
+            return ("delete", "C", "tip equals head of PR #%s closed unmerged >= %gd ago"
+                    % (p["number"], cfg["closed_days"]), ev(p))
+    return "keep", "keep", "no deletion rule matched", {}
 
 
 def analyze(snap, cfg):
@@ -484,11 +554,11 @@ def analyze(snap, cfg):
     merged_undeleted = []
     orphans = []
     for b in snap["branches"]:
-        verdict, rule, reason = classify_branch(b, snap, cfg, idx)
+        verdict, rule, reason, evidence = classify_branch(b, snap, cfg, idx)
         has_pr = bool(idx["by_ref"].get(b["name"]))
         age = (snap["now"] - b["ts"]) / DAY if b["ts"] else None
-        row = dict(b, verdict=verdict, rule=rule, reason=reason, has_pr=has_pr, age_days=age,
-                   lane=branch_lane(b["name"]))
+        row = dict(b, verdict=verdict, rule=rule, reason=reason, evidence=evidence, has_pr=has_pr,
+                   age_days=age, lane=branch_lane(b["name"]))
         branch_rows.append(row)
         if verdict == "delete":
             deletes.append(row)
@@ -511,10 +581,16 @@ def analyze(snap, cfg):
         # base-of-another-PR check
         exempt = is_stale_exempt(pr, prot)
         stage = None
-        if LABEL_STALE in pr["labels"]:
-            if idle >= cfg["close_after_days"]:
+        warned = pr.get("warned_at")
+        if (LABEL_STALE in pr["labels"] and warned is not None
+                and pr["updated"] <= warned + WARN_SLACK):
+            # Warned, and nothing has touched the PR since the warning: the close
+            # clock runs from the warning itself.
+            if snap["now"] - warned >= cfg["close_after_days"] * DAY:
                 stage = "close"
         elif idle >= cfg["stale_days"]:
+            # Never warned (no marker comment), or the PR saw activity after its
+            # warning (a leftover label from an older warning): warn again.
             stage = "warn"
         stale.append({"number": pr["number"], "lane": lane, "idle_days": idle, "stage": stage,
                       "exempt": exempt, "head_ref": pr["head_ref"], "head_sha": pr["head_sha"]})
@@ -543,8 +619,10 @@ def build_plan(snap, cfg):
     actions = []
     dels = sorted(an["deletes"], key=lambda r: (r["ts"] or 0, r["name"]))
     for r in dels[: cfg["max_deletes"]]:
+        e = r.get("evidence") or {}
         actions.append({"kind": "delete_branch", "branch": r["name"], "sha": r["sha"],
-                        "rule": r["rule"], "reason": r["reason"]})
+                        "rule": r["rule"], "reason": r["reason"], "evidence_pr": e.get("pr"),
+                        "pr_base": e.get("base"), "pr_labels": e.get("labels")})
     deferred_deletes = max(0, len(dels) - cfg["max_deletes"])
     pr_actions = []
     for s in an["stale"]:
@@ -650,6 +728,10 @@ def render_report(snap, cfg):
     w("")
     w("%d of %d branches are protected: %s." % (sum(prot.values()), len(an["branches"]),
       ", ".join("%s %d" % (k, v) for k, v in sorted(prot.items())) or "none"))
+    w("")
+    stale = manifest_stale_reason(snap)
+    w("Cited-evidence manifest: %s." % (("STALE, apply will refuse to delete: " + stale) if stale
+                                        else "scan stamp is current"))
     return "\n".join(out) + "\n"
 
 
@@ -697,6 +779,16 @@ def deletion_allowed(action, snap, allow_globs):
         return why
     if not (isinstance(sha, str) and re.fullmatch(r"[0-9a-f]{40}", sha)):
         return "no full 40-hex expected sha"
+    rule = action.get("rule")
+    if rule == "B" and action.get("pr_base") != snap["default_branch"]:
+        return "rule B needs a PR merged into the default branch"
+    if rule == "C" and not isinstance(action.get("pr_labels"), list):
+        return "rule C without PR label evidence"
+    labels = set(action.get("pr_labels") or ())
+    if labels & NO_DELETE_LABELS:
+        return "PR carries a keep/no-auto-delete label"
+    if rule == "C" and LABEL_STALE in labels:
+        return "PR was closed by the stale sweep"
     if not any(fnmatch.fnmatchcase(name, g) for g in allow_globs):
         return "no --allow pattern matches"
     return None
@@ -743,6 +835,11 @@ def apply_plan(plan, snap, args, api, git, token, out, environ=None):
         return 0
     if not snap["prs"] or not snap["branches"]:
         raise IncompleteData("refusing to apply with an empty PR or branch listing")
+    if any(a["kind"] == "delete_branch" for a in plan["actions"]):
+        stale = manifest_stale_reason(snap)
+        if stale:
+            out.write("ABORT (fail closed): %s. Nothing changed.\n" % stale)
+            return 1
     env = git_auth_env(token, environ)
     remote = args["remote_url"] or ("https://github.com/%s.git" % snap["repo"])
     done = 0
@@ -770,6 +867,9 @@ def apply_plan(plan, snap, args, api, git, token, out, environ=None):
                     api("POST", base + "/labels", {"labels": [LABEL_STALE]})
                 else:
                     api("POST", base + "/comments", {"body": pr_comment_body("close", a)})
+                    # Re-assert the label rule C reads: a PR closed here is never
+                    # branch-deleted by the sweep.
+                    api("POST", base + "/labels", {"labels": [LABEL_STALE]})
                     api("PATCH", "repos/%s/pulls/%d" % (snap["repo"], n), {"state": "closed"})
                 out.write("%s PR #%d\n" % ("WARNED" if a["kind"] == "warn_pr" else "CLOSED", n))
                 done += 1
@@ -907,6 +1007,17 @@ def collect(args, api, git, now):
     if not default_branch:
         raise IncompleteData("cannot determine default branch")
     prs = [normalize_pr(p) for p in paginate(api, "repos/%s/pulls?state=all" % repo)]
+    for pr in prs:
+        # Only PRs that already carry the stale label need their warning time.  Any
+        # listing failure aborts (fail closed); the marker is accepted from any author
+        # because the label, which only a maintainer can add, is required as well.
+        if (pr["state"] == "open" and LABEL_STALE in pr["labels"]
+                and lane_of(pr["head_ref"], pr["head_repo"], repo) != "fork"):
+            comments = paginate(api, "repos/%s/issues/%d/comments" % (repo, pr["number"]))
+            times = [parse_ts(c.get("created_at")) for c in comments
+                     if isinstance(c, dict) and MARK_WARN in (c.get("body") or "")]
+            times = [t for t in times if t is not None]
+            pr["warned_at"] = max(times) if times else None
     if args.branches_file:
         with open(args.branches_file, encoding="utf-8") as fh:
             btext = fh.read()
@@ -924,7 +1035,8 @@ def collect(args, api, git, now):
     wt = worktree_branches(git, args.git_dir) if args.local_worktrees else set()
     return {"repo": repo, "default_branch": default_branch, "now": now, "branches": branches,
             "prs": prs, "workflow_literal": literal, "workflow_globs": globs,
-            "manifest": manifest, "worktree_branches": wt}
+            "manifest": manifest, "manifest_stamp": read_manifest_stamp(args.manifest),
+            "worktree_branches": wt}
 
 
 def main(argv=None, *, api=None, git=None, now=None, out=None, environ=None):
