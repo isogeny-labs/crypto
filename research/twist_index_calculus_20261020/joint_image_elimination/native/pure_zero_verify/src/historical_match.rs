@@ -25,8 +25,26 @@ fn read(path: &Path) -> (String, Value) {
         serde_json::from_slice(&bytes).unwrap(),
     )
 }
+fn public_projection(raw: &Value) -> Value {
+    let mut projected: serde_json::Map<String, Value> = PUBLIC
+        .iter()
+        .map(|key| ((*key).into(), raw[*key].clone()))
+        .collect();
+    // The frozen exporter excludes per-query oracle hit counts. It keeps
+    // every query in order, with exactly the two public coefficients.
+    projected.insert(
+        "query_trace".into(),
+        json!(raw["query_trace"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|q| vec![q[0].clone(), q[1].clone()])
+            .collect::<Vec<_>>()),
+    );
+    Value::Object(projected)
+}
 fn compatible(raw: &Value, public: &Value, old: &Value, solution: &Value, audit: &Value) -> bool {
-    PUBLIC.iter().all(|key| raw[*key] == public[*key])
+    public_projection(raw) == *public
         && public.as_object().unwrap().len() == 13
         && ["p", "seed", "n", "b0"]
             .iter()
@@ -89,6 +107,20 @@ fn main() {
     assert_eq!(old["k"], 0);
     assert_eq!(old["rows"][0]["polynomial_signed_relations"], json!([]));
     assert_eq!(solution["public_input_sha256"], public_sha);
+    std::fs::create_dir_all(out).unwrap();
+    let diagnostics = json!({"public_parameters":PUBLIC.iter().filter(|key| **key != "query_trace")
+        .map(|key|((*key).to_string(),json!(raw[*key]==public[*key]))).collect::<serde_json::Map<String,Value>>(),
+        "whole_public_projection_identical":public_projection(&raw)==public,
+        "historical_query_a":old["rows"][0]["a"]==public["query_trace"][2][0],
+        "historical_query_b":old["rows"][0]["b"]==public["query_trace"][2][1],
+        "physical_set_identical":old["rows"][0]["reference_signed_relations"]==solution["signed_relations"],
+        "audit_matches_solution_fields":["p","seed","query_index","arm","rank","columns"].iter()
+            .map(|key|((*key).to_string(),json!(audit[*key]==solution[*key]))).collect::<serde_json::Map<String,Value>>()});
+    std::fs::write(
+        out.join("diagnostics.json"),
+        serde_json::to_vec_pretty(&diagnostics).unwrap(),
+    )
+    .unwrap();
     assert!(compatible(&raw, &public, &old, &solution, &audit));
     let mut bad = public.clone();
     bad["target_x"][0] = json!(public["target_x"][0].as_u64().unwrap() + 1);
@@ -99,13 +131,16 @@ fn main() {
     let mut bad = solution.clone();
     bad["signed_relations"] = json!([]);
     assert!(!compatible(&raw, &public, &old, &bad, &audit));
-    std::fs::create_dir_all(out).unwrap();
+    let mut bad = public.clone();
+    bad["query_trace"].as_array_mut().unwrap().pop();
+    assert!(!compatible(&raw, &bad, &old, &solution, &audit));
     let result = json!({"schema":"historical-s5-fixture-crosscheck/v1","status":"source-and-record-match",
         "p":37,"seed":0,"query_index":2,"k":0,"tape_sha256":tape_sha,"public_sha256":public_sha,
         "historical_report_sha256":old_sha,"solution_sha256":solution_sha,"independent_audit_sha256":audit_sha,
-        "all_public_fields_identical_to_frozen_tape":true,"query_identical":true,
+        "all_public_fields_match_frozen_export_projection":true,"query_identical":true,
+        "projection":"All 13 public keys; raw query oracle-count column removed, every a/b pair and its order retained",
         "signed_physical_tuple_identical":true,"new_roots_complete":true,"independent_signed_set_audit_pass":true,
-        "changed_coordinate_rejected":true,"changed_query_rejected":true,"omitted_tuple_rejected":true,
+        "changed_coordinate_rejected":true,"changed_query_rejected":true,"omitted_tuple_rejected":true,"truncated_trace_rejected":true,
         "scope":"Source-and-record binding of the one historical p37/seed0/query2 pure S5 miss to the completed source-block solution. The historical report itself does not carry a full runtime input SHA; no retroactive runtime seal, whole-61-query completion, generic ideal proof or cost improvement is claimed. Field representation compatibility is a separate source audit of the two first-nonsquare quartic constructors."});
     std::fs::write(
         out.join("summary.json"),
