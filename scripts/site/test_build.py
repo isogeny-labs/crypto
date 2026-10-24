@@ -894,6 +894,17 @@ class BuildTests(unittest.TestCase):
                 self.assertNotIn(f["recorded_curve"], slugs, f["fb_id"])
                 self.assertEqual(f["registration_status"], "pending")
             self.assertRegex(f["points_sha256"] or "", r"^[a-f0-9]{64}$", f["fb_id"])
+        store_index = json.loads(read(os.path.join(ROOT, "store", "index.json")))
+        self.assertEqual({o["name"] for o in data["store"]["objects"]}, set(store_index["entries"]), "every stored file and no other")
+        for o in data["store"]["objects"]:
+            self.assertRegex(o["sha256"], r"^[a-f0-9]{64}$", o["name"])
+            self.assertEqual(o["sha256"], store_index["entries"][o["name"]]["sha256"], o["name"])
+            self.assertTrue(o["curve"] is None or o["curve"] in slugs, o["name"])
+            self.assertTrue(o["fb_id"] is None or o["fb_id"] in fbs, o["name"])
+        for c in data["curves"]:
+            for n in c["store_objects"]:
+                self.assertEqual(next(o for o in data["store"]["objects"] if o["name"] == n)["curve"], c["slug"], n)
+        self.assertEqual(data["counts"]["store_objects"], len(data["store"]["objects"]))
         for k in data["candidates"]:
             self.assertTrue(k["slug"] is None or k["slug"] in slugs, k["candidate_id"])
             for path in k["where"]:

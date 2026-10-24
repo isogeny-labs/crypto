@@ -656,7 +656,8 @@ enum ClaimCmd {
 enum DbCmd {
     /// Print the schema.
     Schema,
-    /// Print SQL for session directories, comparison files and factor-base dumps.
+    /// Print SQL for session directories, comparison files, factor-base dumps and
+    /// the store index (`store/index.json`). A `store:NAME` path is fetched first.
     Sql {
         #[arg(required = true)]
         paths: Vec<PathBuf>,
@@ -1442,7 +1443,13 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
         Cmd::Db { cmd } => match cmd {
             DbCmd::Schema => print!("{}", db::SCHEMA_SQL),
             DbCmd::Sql { paths } => {
-                let refs: Vec<&Path> = paths.iter().map(|p| p.as_path()).collect();
+                // `store:NAME` and `sha256:DIGEST` fetch (and verify) the
+                // object first, so stored factor-base dumps load as they are.
+                let resolved: Vec<PathBuf> = paths
+                    .iter()
+                    .map(|p| crypto_lib::store::resolve_path(p))
+                    .collect::<Result<_, _>>()?;
+                let refs: Vec<&Path> = resolved.iter().map(|p| p.as_path()).collect();
                 print!("{}", db::sql(&refs)?);
             }
         },

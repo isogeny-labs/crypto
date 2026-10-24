@@ -475,4 +475,45 @@ BEGIN
   SELECT RAISE(ABORT, 'fbm_id collision: same short id, different sha256');
 END;
 
-INSERT OR REPLACE INTO schema_info (key, value) VALUES ('ecbench_schema_version', '3');
+-- ── The artifact store ───────────────────────────────────────────────
+-- Large files kept in object storage and named in the tracked index
+-- `store/index.json` (docs/store/README.md).  `ecbench db sql store/index.json`
+-- REPLACES these rows with the index's current content; the index in Git is
+-- the record, and `crypto store verify --remote` audits the objects.
+-- `kind`, `curve_slug` and `fb_id` are read from the object's NAME by the
+-- convention `factor-bases/<ICV1 slug>/<FB1 id>.json`; they are NULL when a
+-- name does not follow it.
+CREATE TABLE IF NOT EXISTS store_objects (
+  name        TEXT PRIMARY KEY,
+  sha256      TEXT NOT NULL,                          -- of the stored bytes
+  bytes       INTEGER NOT NULL,
+  kind        TEXT NOT NULL,                          -- first segment of the name
+  curve_slug  TEXT,                                   -- no foreign key: the curve need not be loaded
+  fb_id       TEXT,
+  description TEXT,
+  provenance  TEXT
+);
+
+CREATE TABLE IF NOT EXISTS store_tags (
+  name TEXT NOT NULL REFERENCES store_objects(name),
+  tag  TEXT NOT NULL,
+  PRIMARY KEY (name, tag)
+);
+
+-- What a name pointed at before `store push --replace` moved it.
+CREATE TABLE IF NOT EXISTS store_superseded (
+  name   TEXT NOT NULL REFERENCES store_objects(name),
+  sha256 TEXT NOT NULL,
+  bytes  INTEGER NOT NULL,
+  PRIMARY KEY (name, sha256)
+);
+
+-- Stored factor-base dumps, and whether their points are loaded here.
+CREATE VIEW IF NOT EXISTS store_factor_bases AS
+SELECT o.name, o.sha256, o.bytes, o.curve_slug, o.fb_id,
+       f.fb_id IS NOT NULL AS loaded, f.family, f.signed_points, f.fb_sha256
+FROM store_objects o
+LEFT JOIN factor_bases f ON f.fb_id = o.fb_id
+WHERE o.kind = 'factor-bases';
+
+INSERT OR REPLACE INTO schema_info (key, value) VALUES ('ecbench_schema_version', '4');

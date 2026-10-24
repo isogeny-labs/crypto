@@ -250,6 +250,113 @@ fn a_factor_base_dump_carries_its_points() {
         .starts_with("FB1h"));
 }
 
+#[test]
+fn a_stored_factor_base_loads_into_the_database_by_its_store_name() {
+    // The path a stored dump takes: `ecbench fb` writes it, `ecbench store
+    // push` moves it to the object store under its curve and FB1 id, and
+    // `ecbench db sql store:NAME` fetches it into an empty cache and loads
+    // its points, next to the store index, without a copy in the checkout.
+    let dir = scratch("store-fb");
+    let (ok, dump_text, err) = ecbench(&[
+        "fb",
+        "--curve",
+        r#"{"kind":"prime_search","bits":16,"seed":59297}"#,
+        "--factor-base",
+        "prime-abscissa:size=8",
+    ]);
+    assert!(ok, "{err}");
+    let d: Value = serde_json::from_str(&dump_text).unwrap();
+    let fb_id = d["factor_base"]["fb_id"].as_str().unwrap().to_string();
+    let slug = d["curve"]["slug"].as_str().unwrap().to_string();
+    let file = dir.join("dump.json");
+    std::fs::write(&file, &dump_text).unwrap();
+    let name = format!("factor-bases/{slug}/{fb_id}.json");
+    let index = dir.join("index.json");
+    let remote = dir.join("remote");
+    let with_store = |cache: &str, args: &[&str]| {
+        let out = Command::new(exe())
+            .args(args)
+            .env("CRYPTO_STORE_INDEX", &index)
+            .env("CRYPTO_STORE_CACHE", dir.join(cache))
+            .env(
+                "CRYPTO_STORE_REMOTE",
+                format!("file://{}", remote.display()),
+            )
+            .output()
+            .expect("ecbench runs");
+        (
+            out.status.success(),
+            String::from_utf8_lossy(&out.stdout).into_owned(),
+            String::from_utf8_lossy(&out.stderr).into_owned(),
+        )
+    };
+    let (ok, _, err) = with_store(
+        "pusher",
+        &["store", "push", file.to_str().unwrap(), "--name", &name],
+    );
+    assert!(ok, "{err}");
+    let store_ref = format!("store:{name}");
+    let (ok, sql, err) = with_store(
+        "fresh-cache",
+        &["db", "sql", &store_ref, index.to_str().unwrap()],
+    );
+    assert!(ok, "{err}");
+    assert!(
+        sql.contains("INSERT INTO factor_bases VALUES"),
+        "dump rows missing"
+    );
+    assert!(
+        sql.contains("INSERT INTO factor_base_points"),
+        "points missing"
+    );
+    assert!(
+        sql.contains("INSERT INTO store_objects VALUES"),
+        "store rows missing"
+    );
+    assert!(sql.contains(&format!("'{fb_id}'")));
+    // A name the index does not hold is refused with the store's message.
+    let (ok, _, err) = with_store(
+        "fresh-cache",
+        &["db", "sql", "store:factor-bases/none/FB1hnone.json"],
+    );
+    assert!(!ok && err.contains("is not in"), "{err}");
+
+    let Ok(probe) = Command::new("sqlite3").arg("-version").output() else {
+        eprintln!("sqlite3 not installed; the SQL was checked, not loaded");
+        let _ = std::fs::remove_dir_all(&dir);
+        return;
+    };
+    if probe.status.success() {
+        let db = dir.join("t.db");
+        let run = |sql: &str| {
+            let mut child = Command::new("sqlite3")
+                .args(["-bail", db.to_str().unwrap()])
+                .stdin(std::process::Stdio::piped())
+                .stdout(std::process::Stdio::piped())
+                .stderr(std::process::Stdio::piped())
+                .spawn()
+                .unwrap();
+            use std::io::Write;
+            child
+                .stdin
+                .take()
+                .unwrap()
+                .write_all(sql.as_bytes())
+                .unwrap();
+            child.wait_with_output().unwrap()
+        };
+        assert!(run(&sql).status.success(), "the SQL must load");
+        assert!(
+            run(&sql).status.success(),
+            "and load again, changing nothing"
+        );
+        let q = run("SELECT loaded, signed_points FROM store_factor_bases;");
+        let text = String::from_utf8_lossy(&q.stdout);
+        assert!(text.starts_with("1|"), "the stored dump is loaded: {text}");
+    }
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
 fn run_spec(dir: &Path, out: &Path, extra: &[&str]) -> (bool, String) {
     let spec = dir.join("spec.json");
     if !spec.exists() {

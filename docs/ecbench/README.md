@@ -1024,10 +1024,12 @@ on another hash) is stopped by the schema's identity triggers.
 | `hosts`, `sessions`, `arms` | the host class and capsule, the session's build and reservation, its arms |
 | `runs`, `phases`, `run_counters`, `isolation_blockers` | one row per execution, its phases, its counters, and why it did not reach a higher level |
 | `run_solver` | the decomposition solver's statistics for an algebraic or SAT IC run (the record's `solver` block): the system's variables, equations and semi-regular degree, the solving degree reached, Macaulay rows, columns, degree and rank where the solver reports them, SAT variables, clauses, conflicts, decisions and propagations, and every solver-specific counter verbatim. Absent for table oracles. Informational: outside `S` beyond the relations phase's `solver_*` counters, and outside the replay comparison |
+| `store_objects`, `store_tags`, `store_superseded` | the object store's index (`store/index.json`, loaded like any other input): each large file's name, SHA-256, size, kind, and, for `factor-bases/<curve>/<FB1h…>.json` names, the curve slug and `fb_id` parsed from the name. A load replaces these three tables with the index it is given, so the tables mirror the index and never accumulate removed names |
 | `comparisons` | every saved comparison |
 | `claims` | every loaded `vs_rho` claim, keyed by its IC1 `run_id`, with the checker's status at load time; a claim rebuilt with an independent receipt replaces its earlier form |
 
-Views: `arm_workload_summary` (the AGENTS.md §2 table, per workload),
+Views: `store_factor_bases` (the stored factor-base dumps, with `loaded` set where the
+database also holds that `fb_id`'s row), `arm_workload_summary` (the AGENTS.md §2 table, per workload),
 `method_by_curve` (each method's mean `S` and ratio to the floor per curve,
 across sessions), `ic_phase_split` (each IC run's phase shares with its
 factor base), `ic_yield` (the yield ledger: one row per IC run with its
@@ -1045,6 +1047,15 @@ The same ledger, joined with the curve registry and the tournament's
 rounds, is the Yield view of the lab browser (`docs/browser/`,
 AGENTS.md §7c). A yield is a stage diagnostic: it ranks bases and oracles
 on the same targets, and only the whole-pipeline `S` decides speed.
+
+Paths given to `db sql` may be `store:NAME` or `sha256:DIGEST`; the file is
+fetched into the verified cache first, so a stored factor-base dump loads
+without a manual `store pull`:
+
+```bash
+./target/release/ecbench db sql store/index.json \
+  store:factor-bases/icv1-f2m17-tm101-00378d4e/FB1h585d0da5e4b8.json | sqlite3 -bail ecbench.db
+```
 
 ```sql
 SELECT method, curve_slug, verified_runs, round(mean_s, 3), round(mean_ratio_to_floor, 2)
