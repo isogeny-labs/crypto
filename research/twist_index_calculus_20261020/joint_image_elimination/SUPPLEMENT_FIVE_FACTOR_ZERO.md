@@ -80,3 +80,23 @@ do not claim impossibility for larger arities or different components.
 
 Status at freezing: protocol only. No five-factor execution or result
 is claimed.
+
+## Pre-execution provenance correction
+
+Schema inspection after freezing, before any five-factor computation,
+shows that the historical reference's `recovered` field stores only the
+target scalar, not a factor-log vector. The original proposed direct
+reuse of a serialized factor-log vector therefore cannot be implemented
+from that field. This is an artifact-layout gap, not mathematical
+evidence about the five-factor domain.
+
+The corrected input source is the independently reconstructed RREF
+solution of the saved, hash-bound historical signed relations, with the
+same public anchor and query coefficients. The already required
+finite-Fp pruning audit computes and point-verifies exactly that solution;
+it now retains it as `oracle_replay_verified_solution`. Use it only after
+the replay passes and every source/image factor and target point verifies.
+This reconstructs already established factor logs from saved equations;
+it repeats neither the collector nor BSGS. Keep the resulting oracle-only
+array outside candidate interfaces. Domain, cases, arms, rank questions,
+resource limits and required independent completeness replay are unchanged.

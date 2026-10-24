@@ -208,6 +208,7 @@ pub(super) fn audit(
             "original_rank":rank,"retained_rank":kept_rank,"columns":cols,
             "original_first_full_rank_query":first_rank,"retained_first_full_rank_query":first_retained_rank,
             "original_recovery_verified":original_verified,"retained_recovery_verified":retained_verified,
+            "oracle_replay_verified_solution":solution,
             "through_original_full_rank":prefix,"query_records":query_records}));
     }
     write(
