@@ -1,11 +1,11 @@
 """Render recorded values only (research-visuals skill; AGENTS.md "no Python" for results: nothing here computes a result).
 Every bar is a `group` record (scope=self, by=mod4_E2: curves per minimal genus) written by cover_census_n4.rs; the one
 arithmetic line is the model exponent 2 - 2/g printed under each cell, labelled model.
-Usage: python3 -I plot.py <results-dir> <outdir>      Writes SVG, PDF (reportlab graphics) and PNG (pdftoppm of that PDF; no rsvg/cairo PNG backend on the host)."""
-import json, sys, os
+Usage: python3 -I plot.py <results-dir> <outdir>
+Writes SVG, PDF (reportlab graphics) and PNG (pdftoppm of that PDF; no rsvg/cairo PNG backend on the host)."""
+import json, sys, os, subprocess
 from reportlab.graphics.shapes import Drawing, Rect, String, Line
 from reportlab.graphics import renderSVG, renderPDF
-import subprocess
 from reportlab.lib.colors import HexColor
 src, out = sys.argv[1], sys.argv[2]
 os.makedirs(out, exist_ok=True)
@@ -15,7 +15,7 @@ INK, MUTED, BAR = HexColor("#1a1a19"), HexColor("#6b6a63"), HexColor("#1f6fd1")
 def load(f):
     p = os.path.join(src, f)
     return [json.loads(l) for l in open(p)] if os.path.exists(p) and os.path.getsize(p) > 0 else []
-rows = [(t, load(f)) for t, f in PANELS]; rows = [(t, r) for t, r in rows if r]
+rows = [(t, load(f)) for t, f in PANELS]; rows = [(t, r) for t, r in rows if any(x.get("rec") == "group" for x in r)]
 W, CW, CH, LM, ROWH = 900, 205, 110, 30, 185
 H = 70 + len(rows) * ROWH + 30
 d = Drawing(W, H)
@@ -45,6 +45,6 @@ for ri, (title, recs) in enumerate(rows):
         txt(x0, base + 35, f"model exponent 2 - 2/g = {2 - 2 / lo:.3f}  (rho: 2)", 8, MUTED)
 txt(15, H - 8, "Model exponents are asymptotic formulas (constants ~g! and descent costs not included), not measurements. Source: results/run-20261024/*.jsonl", 7, MUTED)
 renderSVG.drawToFile(d, os.path.join(out, "n4_min_genus_by_2torsion.svg"))
-renderPDF.drawToFile(d, os.path.join(out, "n4_min_genus_by_2torsion.pdf"))   # vector copy, embedded in the report PDF
+renderPDF.drawToFile(d, os.path.join(out, "n4_min_genus_by_2torsion.pdf"))   # vector copy
 subprocess.run(["pdftoppm", "-png", "-r", "150", "-singlefile", os.path.join(out, "n4_min_genus_by_2torsion.pdf"), os.path.join(out, "n4_min_genus_by_2torsion")], check=True)
-print("wrote svg+png to", out)
+print("wrote svg, pdf, png to", out)

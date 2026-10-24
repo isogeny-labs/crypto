@@ -1,6 +1,6 @@
-"""Lay out README.md as REPORT.pdf (reportlab platypus; no LaTeX/typst/wkhtmltopdf engine on the host, so pandoc could not
-produce a PDF). Handles the Markdown subset the README uses: # headings, paragraphs, - bullets, | tables, ``` code, `code`,
-**bold**, and ![](image) (raster PNG). Computes nothing. Usage: python3 -I build_pdf.py <README.md> <out.pdf>"""
+"""Lay out README.md as REPORT.pdf (reportlab platypus; no LaTeX/typst/wkhtmltopdf engine on the host, so `pandoc -o x.pdf`
+could not produce a PDF). Handles the Markdown subset the README uses: # headings, paragraphs, - bullets, | tables, ``` code,
+`code`, **bold**, and ![](image) (PNG). Computes nothing. Usage: python3 -I build_pdf.py <README.md> <out.pdf>"""
 import re, sys, os
 from xml.sax.saxutils import escape
 from reportlab.lib.pagesizes import A4
@@ -8,6 +8,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Preformatted, Image, ListFlowable, ListItem
+from PIL import Image as PI
 src, out = sys.argv[1], sys.argv[2]; base = os.path.dirname(os.path.abspath(src))
 ss = getSampleStyleSheet()
 body = ParagraphStyle("b", parent=ss["BodyText"], fontSize=9, leading=12)
@@ -31,8 +32,8 @@ while i < len(lines):
     if m: story.append(Paragraph(inline(m.group(2)), H[len(m.group(1))])); i += 1; continue
     m = re.match(r"^!\[[^\]]*\]\(([^)]+)\)", l)
     if m:
-        p = os.path.join(base, m.group(1)); from PIL import Image as PI
-        w, h = PI.open(p).size; W = 17.4 * cm; story += [Image(p, width=W, height=W * h / w), Spacer(1, 4)]; i += 1; continue
+        p = os.path.join(base, m.group(1)); w, h = PI.open(p).size; W = 17.4 * cm
+        story += [Image(p, width=W, height=W * h / w), Spacer(1, 4)]; i += 1; continue
     if l.startswith("|"):
         rows = []
         while i < len(lines) and lines[i].startswith("|"):
