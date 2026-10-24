@@ -443,20 +443,18 @@ pub fn birthday_collision_search<H: HashFunction>(
 
 // ── Attack 3: Joux multicollision (CRYPTO 2004) ──────────────────────
 
-/// **Joux multicollision** on an MD-Damgård hash truncated to
-/// `truncate_bits`.  Chains `t` independent block-level collisions to
-/// produce `2^t` messages with the same digest.  Cost: `t · 2^(b/2)`
-/// (vs the naive expectation that `2^t`-fold collision should cost
-/// `t · 2^(b · (2^t − 1) / 2^t)` for an ideal hash).
+/// **Joux multicollision in a reduced-state MD construction**. The
+/// compression output is truncated to `truncate_bits` after *every* block,
+/// with the remaining state bits cleared before the next compression.
+/// Chains `t` block-level collisions to produce `2^t` paths with the same
+/// reduced state at every merge. This does not produce a multicollision for
+/// the full-width hash or for a hash truncated only after finalization.
 ///
 /// Returns the chain of `t` `(block_a, block_b)` colliding pairs.
-/// Any combination of choosing one from each pair yields a message
-/// hashing to the same value.
+/// Any combination of choosing one from each pair reaches the same final
+/// reduced state when replayed from the reduced `H(empty)` starting state.
 ///
-/// The truncation parameter exists so toy demos run in seconds:
-/// finding a single 32-bit collision in MD5 takes ~65 k trials; eight
-/// chained collisions take ~520 k trials and demonstrate `2^8 = 256`
-/// equivalent messages.
+/// A 16-bit state makes a short chain practical in a bounded demonstration.
 pub fn joux_multicollision<H: MerkleDamgardHash>(
     hash: &H,
     truncate_bits: u32,
@@ -465,28 +463,9 @@ pub fn joux_multicollision<H: MerkleDamgardHash>(
     seed: u64,
 ) -> Option<Vec<(Vec<u8>, Vec<u8>)>> {
     assert!(truncate_bits as usize <= hash.state_bytes() * 8);
-    let truncate_bytes = (truncate_bits as usize).div_ceil(8);
-    let leftover = (truncate_bytes * 8) as u32 - truncate_bits;
     let bb = hash.block_bytes();
-
-    // Start from a fixed initial state — for MD5/MD4 that's MD-IV.
-    // We get the IV by hashing the empty message and inverting the
-    // final compression: easier to just snapshot after compressing
-    // a known block.  Cleanest is to take the IV implicitly by
-    // calling `hash.compress` on a fresh state-bytes buffer that we
-    // initialise from `H(empty)`'s pre-padding state... but we don't
-    // expose that.  Workaround: just iterate from the digest of the
-    // empty-string padding block.
-    let pad_block = hash.padding_for_length(0);
-    let mut state = vec![0u8; hash.state_bytes()];
-    // Initialise to the IV by un-doing the final padding compression.
-    // Simpler: hash the empty message and adopt its digest as the
-    // "starting state" — this means our multicollision is on
-    // messages of the form (empty-pad-block || colliding_chain),
-    // which still demonstrates the property.
-    let initial_digest = hash.hash(&[]);
-    state.copy_from_slice(&initial_digest[..hash.state_bytes().min(initial_digest.len())]);
-    let _ = pad_block;
+    let mut state = hash.hash(&[])[..hash.state_bytes()].to_vec();
+    truncate_compression_state(&mut state, truncate_bits);
 
     let mut rng = StdRng::seed_from_u64(seed);
     let mut chain = Vec::with_capacity(chain_length);
@@ -496,15 +475,9 @@ pub fn joux_multicollision<H: MerkleDamgardHash>(
         for _ in 0..max_trials_per_block {
             let mut b = vec![0u8; bb];
             rng.fill_bytes(&mut b);
-            let mut s = state.clone();
-            hash.compress(&mut s, &b);
-            let mut key = s.clone();
-            key.truncate(truncate_bytes);
-            if leftover > 0 {
-                if let Some(last) = key.last_mut() {
-                    *last &= 0xFFu8 >> leftover;
-                }
-            }
+            let mut key = state.clone();
+            hash.compress(&mut key, &b);
+            truncate_compression_state(&mut key, truncate_bits);
             if let Some(prev) = seen.get(&key) {
                 if prev != &b {
                     found = Some((prev.clone(), b));
@@ -514,15 +487,20 @@ pub fn joux_multicollision<H: MerkleDamgardHash>(
             seen.insert(key, b);
         }
         let (a, b) = found?;
-        // Advance the chain state via `a` (any of the two would do —
-        // they produce the same truncated state).
-        let mut s = state.clone();
-        hash.compress(&mut s, &a);
-        state = s.clone();
-        // Also keep `s` truncated identically for the next iteration.
+        // Both branches now produce precisely the same reduced state.
+        hash.compress(&mut state, &a);
+        truncate_compression_state(&mut state, truncate_bits);
         chain.push((a, b));
     }
     Some(chain)
+}
+
+fn truncate_compression_state(state: &mut [u8], bits: u32) {
+    let bytes = (bits as usize).div_ceil(8);
+    if bytes > 0 && bits % 8 != 0 {
+        state[bytes - 1] &= 0xFFu8 >> (8 - bits % 8);
+    }
+    state[bytes..].fill(0);
 }
 
 // ── Attack 4: differential bias ──────────────────────────────────────
@@ -953,8 +931,7 @@ mod tests {
         assert_eq!(h.hash(&m2)[..3], d[..3]);
     }
 
-    /// Joux multicollision: chain 3 collisions on 16-bit-truncated
-    /// MD5 → demonstrates `2^3 = 8` equivalent message paths exist.
+    /// Every branch must merge after each reduced-state compression.
     #[test]
     fn joux_multicollision_md5_chain_of_3() {
         let h = Md5;
@@ -966,6 +943,17 @@ mod tests {
             assert_eq!(b.len(), 64);
             assert_ne!(a, b);
         }
+        let mut final_states = Vec::new();
+        for choices in 0..(1 << chain.len()) {
+            let mut state = h.hash(&[])[..h.state_bytes()].to_vec();
+            truncate_compression_state(&mut state, 16);
+            for (index, (a, b)) in chain.iter().enumerate() {
+                h.compress(&mut state, if choices & (1 << index) == 0 { a } else { b });
+                truncate_compression_state(&mut state, 16);
+            }
+            final_states.push(state);
+        }
+        assert!(final_states.iter().all(|state| state == &final_states[0]));
     }
 
     /// Differential-bias measurement runs end-to-end and returns the
