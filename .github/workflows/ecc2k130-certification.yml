@@ -65,8 +65,16 @@ jobs:
   no-fruitless-cycles:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-certification.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-certification.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 20
+    env:
+      CARGO_INCREMENTAL: "0"
+      CARGO_PROFILE_DEV_DEBUG: "0"
     steps:
       - uses: actions/checkout@v4
+      - name: Free hosted runner disk for Rust artifacts
+        if: ${{ runner.environment == 'github-hosted' }}
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/hostedtoolcache/CodeQL
+          df -h .
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: "1.98"
@@ -80,8 +88,16 @@ jobs:
   merge-parity:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-certification.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-certification.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
+    env:
+      CARGO_INCREMENTAL: "0"
+      CARGO_PROFILE_DEV_DEBUG: "0"
     steps:
       - uses: actions/checkout@v4
+      - name: Free hosted runner disk for Rust artifacts
+        if: ${{ runner.environment == 'github-hosted' }}
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/hostedtoolcache/CodeQL
+          df -h .
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -234,7 +250,14 @@ jobs:
     container:
       image: nvidia/cuda:13.3.1-devel-ubuntu24.04
     steps:
+      - name: Install Git for filtered checkout
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends git ca-certificates
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: ecc2k130
       - name: Install native host compiler
         run: |
           apt-get update -qq
