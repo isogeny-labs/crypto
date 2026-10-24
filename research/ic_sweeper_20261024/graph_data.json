@@ -1,0 +1,39 @@
+{
+  "note": "Recorded values only, copied from the cited sources; no new computation.",
+  "panel_a_wall_ratio": {
+    "unit": "IC wall time / strong-rho wall time, same process or same host; one-target cold solve",
+    "ladder": {
+      "source": "origin/claude/ic-m2-linear-ladder-20261024 : research/ic_m2_linear_ladder_20261024/REPORT.md (Runs table)",
+      "method": "algebraic linear m=2 Weil descent of S3",
+      "points": [
+        {"curve": "a0 n13", "log2_r": 11.0, "ratio": 4},
+        {"curve": "a1 n17", "log2_r": 16.0, "ratio": 15},
+        {"curve": "a0 n19", "log2_r": 17.0, "ratio": 48},
+        {"curve": "a1 n19", "log2_r": 18.0, "ratio": 43},
+        {"curve": "a0 n23", "log2_r": 21.0, "ratio": 169},
+        {"curve": "a1 n23", "log2_r": 22.0, "ratio": 197},
+        {"curve": "a0 n41", "log2_r": 39.0, "ratio": 36440}
+      ]
+    },
+    "msweep_reference": {
+      "source": "origin/claude/sweep-n83-varied-algorithms-rovr0x : research/n83_msweep_20261024/README.md (Answer)",
+      "method": "table/root-finder m=4 K=1107 complete DLP (excluded by the 2026-10-24 algebraic criterion; shown as context)",
+      "points": [
+        {"curve": "a1 n83 root22", "log2_r": 52.93, "ratio": 116},
+        {"curve": "a1 n83 root11", "log2_r": 52.93, "ratio": 125}
+      ]
+    }
+  },
+  "panel_b_S_ratio": {
+    "unit": "S_IC / S_rho (batched affine additions per sqrt(r), reference rho); Koblitz, one target",
+    "source": "docs/ic/LEADERBOARD.md Table A as summarised in the technique audit; Table A is not comparable to panel A (different unit)",
+    "points": [
+      {"curve": "f2m47", "log2_r": 36.6, "ratio": 5.23},
+      {"curve": "f2m57", "log2_r": 38.0, "ratio": 6.12},
+      {"curve": "f2m41", "log2_r": 39.0, "ratio": 7.66},
+      {"curve": "f2m53", "log2_r": 44.3, "ratio": 13.2},
+      {"curve": "f2m59", "log2_r": 44.5, "ratio": 12.0},
+      {"curve": "f2m61", "log2_r": 47.2, "ratio": 21.0}
+    ]
+  }
+}
