@@ -123,6 +123,26 @@ languages now wait only for `scope`; they used to wait for the Rust database
 and warm-cache jobs as well. Their PR budget is 25 minutes (60 on push and
 schedule, as before), where they previously inherited the Rust job's 60.
 
+**Evidence for the 25-minute non-Rust cap.** The only committed run in which
+the non-Rust languages did real work is the check-run snapshot
+`research/isogeny_world_frontier_20261016/ci-budget-repair-2f3fad538b/raw/current-head-checks-1206.json`
+(head `2f3fad538b`, whole-repository `build-mode: none` extraction, as now).
+Job wall times from its `startedAt`/`completedAt`: actions 3 m 33 s, c-cpp
+4 m 26 s, javascript-typescript 2 m 40 s, python 8 m 47 s. The sibling snapshot
+`ci-repair-81e9e0ade6/raw/current-head-checks.json` shows python and c-cpp at
+2-3 seconds (scope-skipped empty shells, which this change stops starting, and
+which say nothing about the cap) and actions and javascript-typescript at about
+2 minutes, consistent with the first snapshot. At that commit the tree had 3,215 `.py` files (29.4 MB); `origin/main`
+now has 3,856 (33.3 MB), 13% more bytes and 20% more files. Scaling the one
+python sample linearly gives roughly 10-11 minutes, about 2.3x under the cap.
+That is a single sample on one day's runner, taken before this change, so it is
+a basis for the cap and not a guarantee. If a real `Analyze (python)` run on a
+Python-touching PR exceeds about 18 minutes, add a
+`(".github/workflows/codeql.yml", "analyze-python")` entry to
+`NAMED_BUDGET_EXCEPTIONS` in `check-pr-budgets.py` (the checker rejects any
+other timeout above 25 on PR and merge-group jobs) rather than leaving the
+check to fail by timeout.
+
 **One Rust analysis, not four.** The `rust`, `rust-boolean`, `rust-research` and
 `rust-aux` rows all checked out the complete Rust source, ran the same analysis
 and, on PRs and merge groups, uploaded the same `/language:rust` category; their
