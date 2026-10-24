@@ -22,8 +22,10 @@ pub enum ChainBuildError {
 
 /// Worst-case SAT variable count for the field-product circuit, before a
 /// finite-coordinate domain. The bound is exact for the all-affine pattern.
+/// Defined through `m = 9`, the summand sweep's range; the five- and
+/// six-summand decomposers keep their own admission.
 pub fn chain_s3_max_variables(n: u32, m: usize) -> Option<u64> {
-    if !(2..=6).contains(&m) || !(2..=127).contains(&n) {
+    if !(2..=9).contains(&m) || !(2..=127).contains(&n) {
         return None;
     }
     let n = u64::from(n);
@@ -920,7 +922,8 @@ mod tests {
     fn source_bound_covers_degree_83_without_constructing_a_model() {
         assert_eq!(chain_s3_max_variables(83, 5), Some(84_743));
         assert_eq!(chain_s3_max_variables(83, 6), Some(105_908));
-        assert_eq!(chain_s3_max_variables(83, 7), None);
+        assert_eq!(chain_s3_max_variables(83, 9), Some(169_403));
+        assert_eq!(chain_s3_max_variables(83, 10), None);
     }
 
     #[test]
