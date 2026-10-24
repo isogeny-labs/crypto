@@ -50,6 +50,7 @@ def fig_l2():
     for v, lab in ((0.5, "falsifier 0.5"), (0.25, "payoff 0.25")):
         ax.axhline(v, color=INK2, lw=1, ls=(0, (6, 3)))
         ax.text(len(cells) - 0.55, v + 0.015, lab, color=INK2, fontsize=8, ha="right")
+    ax.set_xlim(-0.5, len(cells) - 0.5)
     ax.set_xticks(range(len(cells)))
     names = {"n22l6": "m=3 (22,6)", "n24l6": "m=3 (24,6)", "n11l5m4": "m=4 (11,5)",
              "n12l5m4": "m=4 (12,5)"}
