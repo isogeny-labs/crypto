@@ -74,8 +74,7 @@ D=2 `+8.83 / +5.44` at w=2.
 - The conversion to rho steps takes off about 8.4 bits; it does not close more than that.
 - The dominant uncertainty is the extrapolation of w from matrices of 2^12 to 2^14 columns to
   `C(398, <=5)`, about 2^36 columns. The measured ratio rises with size and degree (1.83 to 1.95, then
-  2.19), so w at 2^36 columns is more likely above 2.33 than below it, and every bit of w adds
-  about 36 bits. Sparse or structured elimination could also go the other way, below 2; none is measured.
+  2.19), so w at 2^36 columns is more likely above 2.33 than below it, and each unit of w adds about 36 bits. Sparse or structured elimination could also go the other way, below 2; none is measured.
 - The degree cell (does the closure stay at 5 up to N near 394) is still unmeasured and still the
   larger lever: D = 4 to 7 spans `+25` to `+61` bits in B at w = 2.
 

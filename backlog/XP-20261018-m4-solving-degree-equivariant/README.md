@@ -242,15 +242,21 @@ blocked arm-B cells, plus whatever the msolve probes justify there.
 The `m = 4`, degree-5 row quoted above as `2^71.13`, `+10.32` bits over rho is priced at `w = 1`
 (one touch per Macaulay column), which `RESEARCH_ECC2K130_DESCENT_DEGREE.md` §2 itself describes as
 a price "no elimination beats". It is a **lower bound**, not the optimistic case. The same note
-already prints the `w = 2` row in §7/§8: `2^106.52`, `+45.71` bits. The measured exponent of the
-repository's own dense closure is 2.18 to 2.33 (`research/dreg_closure_driver_20261016/RESULTS.md`),
-and the recomputation in `research/m4_reprice_20261024/` (README.md, `table.md`, `examples/m4_reprice.rs`;
-the existing rows reproduce exactly as a positive control) gives for `m = 4`, degree 5:
+already prints the `w = 2` row in §7/§8: `2^106.52`, `+45.71` bits (column-touch units).
 
-- **measured-exponent optimistic case, w = 2.25: `2^115.58`, `+54.77` bits** in the note's column-touch
-  units, and `2^107.14`, `+46.33` bits in rho steps (word-op to rho-step conversion of
-  `-8.44` bits from `research/k_conversion_20261018/raw.jsonl`);
-- bracket for w from 2.0 to 2.33: `+45.7` to `+57.7` (column touches), `+37.3` to `+49.2` (rho steps).
+What the repository has measured of the oracle exponent is a ratio, not a fitted w:
+`log2 work / log2 columns` is 2.18 to 2.33 at the degree-4 cells
+(`research/dreg_closure_driver_20261016/RESULTS.md` lines 23-24 and 30) and 1.83 to 1.95 on the
+degree-3 closures (`research/k_conversion_20261018/raw.jsonl`). No honest fitted w exists in the
+recorded data (confounded by degree, and a span of under 2 bits of log2 columns). The
+recomputation in `research/m4_reprice_20261024/` (README.md, `table.md`, `examples/m4_reprice.rs`;
+the existing rows reproduce exactly as a positive control) gives for `m = 4`, degree 5, taking
+w = 2.25 inside the 2.18 to 2.33 range:
+
+- **in rho steps (the unit of the review's F1 gate): `2^107.14`, `+46.33` bits at w = 2.25;
+  bracket `+37.3` to `+49.2` bits for w from 2 to 2.33.** The word-op to rho-step conversion is
+  `-8.44` bits, from `research/k_conversion_20261018/raw.jsonl`;
+- in the note's column-touch units: `2^115.58`, `+54.77` bits at w = 2.25; bracket `+45.7` to `+57.7`.
 
 The `K` of `k_conversion_20261018/README.md` (Ir per column) is not stacked on `cols^w`: it already contains
 the super-linear elimination cost. w at 2^36 columns is extrapolated from matrices of 2^12 to 2^14
