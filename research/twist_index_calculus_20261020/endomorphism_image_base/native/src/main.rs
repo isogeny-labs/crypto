@@ -759,6 +759,50 @@ fn solve_fixtures(fixture_path: &Path, expected_sha: &str, root: &Path, out: &Pa
 
 fn main() {
     let args: Vec<_> = std::env::args().collect();
+    if args.len() == 6 && args[1] == "--zero-pipeline-test-fixtures" {
+        image::joint::zero_pipeline_test_fixtures(
+            Path::new(&args[2]),
+            Path::new(&args[3]),
+            Path::new(&args[4]),
+            Path::new(&args[5]),
+        );
+        return;
+    }
+    if args.len() == 5 && args[1] == "--zero-pipeline-baseline" {
+        image::joint::zero_pipeline_baseline(Path::new(&args[2]), &args[3], Path::new(&args[4]));
+        return;
+    }
+    if args.len() == 7 && args[1] == "--zero-pipeline" {
+        let pass = image::joint::zero_pipeline(
+            Path::new(&args[2]),
+            &args[3],
+            &args[4],
+            &args[5],
+            Path::new(&args[6]),
+        );
+        std::process::exit(if pass { 0 } else { 2 });
+    }
+    if args.len() == 10 && args[1] == "--zero-pipeline-audit" {
+        let pass = image::joint::zero_pipeline_audit(
+            Path::new(&args[2]),
+            &args[3],
+            Path::new(&args[4]),
+            Path::new(&args[5]),
+            &args[6],
+            Path::new(&args[7]),
+            &args[8],
+            Path::new(&args[9]),
+        );
+        std::process::exit(if pass { 0 } else { 2 });
+    }
+    if args.len() == 5 && args[1] == "--zero-pipeline-parity" {
+        let pass = image::joint::zero_pipeline_parity(
+            Path::new(&args[2]),
+            Path::new(&args[3]),
+            Path::new(&args[4]),
+        );
+        std::process::exit(if pass { 0 } else { 2 });
+    }
     if args.len() == 4 && args[1] == "--zero-five-polynomial-summary" {
         let pass =
             image::joint::zero_five_polynomial_summary(Path::new(&args[2]), Path::new(&args[3]));

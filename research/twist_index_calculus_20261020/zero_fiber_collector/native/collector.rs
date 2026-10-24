@@ -6,6 +6,8 @@ use std::time::Instant;
 mod independent_audit;
 #[path = "panel.rs"]
 mod panel;
+#[path = "pipeline.rs"]
+pub(super) mod pipeline;
 
 pub(super) fn summarize(run: &Path, out: &Path) -> bool {
     panel::summarize(run, out)

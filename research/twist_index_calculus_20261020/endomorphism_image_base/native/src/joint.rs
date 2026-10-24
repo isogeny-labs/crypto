@@ -26,6 +26,40 @@ mod zero_collector;
 #[path = "../../../joint_image_elimination/native/zero_identity.rs"]
 mod zero_identity;
 
+pub(crate) fn zero_pipeline_baseline(csv: &Path, sha: &str, out: &Path) {
+    zero_collector::pipeline::select_baseline(csv, sha, out)
+}
+pub(crate) fn zero_pipeline_test_fixtures(zero: &Path, nine: &Path, double: &Path, out: &Path) {
+    zero_collector::pipeline::test_fixtures(zero, nine, double, out)
+}
+pub(crate) fn zero_pipeline(public: &Path, sha: &str, arm: &str, mode: &str, out: &Path) -> bool {
+    zero_collector::pipeline::execute(public, sha, arm, mode, out)
+}
+pub(crate) fn zero_pipeline_audit(
+    public: &Path,
+    sha: &str,
+    candidate: &Path,
+    zero_reference: &Path,
+    zero_sha: &str,
+    target_reference: &Path,
+    target_sha: &str,
+    out: &Path,
+) -> bool {
+    zero_collector::pipeline::audit(
+        public,
+        sha,
+        candidate,
+        zero_reference,
+        zero_sha,
+        target_reference,
+        target_sha,
+        out,
+    )
+}
+pub(crate) fn zero_pipeline_parity(first: &Path, second: &Path, out: &Path) -> bool {
+    zero_collector::pipeline::parity(first, second, out)
+}
+
 pub(crate) fn zero_five_collect(public: &Path, sha: &str, arm: &str, out: &Path) -> bool {
     zero_collector::collect(public, sha, arm, out)
 }

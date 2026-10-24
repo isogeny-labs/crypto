@@ -2,9 +2,9 @@
 //! the collector's Frobenius/psi tables and pair canonicalizer are not called.
 use super::*;
 
-type SignedMap = BTreeMap<(usize, i8), (usize, i8)>;
+pub(super) type SignedMap = BTreeMap<(usize, i8), (usize, i8)>;
 
-fn scalar_maps(case: &Case, arm: usize) -> Result<Vec<SignedMap>, &'static str> {
+pub(super) fn scalar_maps(case: &Case, arm: usize) -> Result<Vec<SignedMap>, &'static str> {
     let usable = case.usable(arm);
     let mut points = BTreeMap::new();
     for &id in &usable {
@@ -64,7 +64,7 @@ fn pair_orbit(pair: Pair, maps: &[SignedMap]) -> Result<BTreeSet<Pair>, &'static
         .collect()
 }
 
-fn partition(
+pub(super) fn partition(
     pairs: &[Pair],
     ordinary: &[usize],
     images: &[usize],

@@ -97,6 +97,16 @@ fn square_root(f: Field, a: E, non_square: E) -> Option<E> {
 }
 
 pub(super) fn build(raw: Value, arm: usize) -> Case {
+    build_inner(raw, arm, true)
+}
+
+/// Target-independent arithmetic setup for reusable zero precomputation.
+/// The public Q encoding is retained, but its validation is charged online.
+pub(super) fn build_reusable(raw: Value, arm: usize) -> Case {
+    build_inner(raw, arm, false)
+}
+
+fn build_inner(raw: Value, arm: usize, validate_target: bool) -> Case {
     let p = raw["p"].as_u64().unwrap();
     let seed = raw["seed"].as_u64().unwrap();
     let n = raw["n"].as_u64().unwrap();
@@ -118,9 +128,14 @@ pub(super) fn build(raw: Value, arm: usize) -> Case {
         y: element(&raw["target_y"]),
         inf: false,
     };
-    assert!(c.on_curve(g) && c.on_curve(q));
+    assert!(c.on_curve(g));
+    if validate_target {
+        assert!(c.on_curve(q));
+    }
     assert_eq!(c.mul(g, n), INF);
-    assert_eq!(c.mul(q, n), INF);
+    if validate_target {
+        assert_eq!(c.mul(q, n), INF);
+    }
     let omega = raw["omega"].as_u64().unwrap();
     let lc = raw["lambda_cubic"].as_u64().unwrap();
     let lf = raw["lambda_frob"].as_u64().unwrap();
