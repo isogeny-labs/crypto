@@ -2083,3 +2083,43 @@ receipt under fit v2).
 **Next.** Re-measure the thread's rho on its 18 instances through
 ecbench (`rho.negation` against the thread's collide-first fold), then
 the IC adapter, so IC and rho run under §12 and §5a in one session.
+
+## Round sixteen: the thread's instances through ecbench — protocol, written before measuring
+
+**Question.** With the hyperelliptic family now in ecbench, does
+ecbench's generic `rho.negation` give the `±` saving on the thread's 18
+instances, and where does it sit against the floor and against the
+thread's own reference (round fifteen's collide-first folded walk)?
+
+**Spec.** `research/hyperelliptic_ecbench_20261024/spec-r16.json`: the 18
+`hyperelliptic_thread` instances of rounds 7–15, 8 planted targets each
+(`target_seed` 20261024), arms `rho.negation` (reference) and
+`rho.plain` (baseline), 2 rounds after 1 warm-up, alternating order.
+Counted operations only (`isolation_required: L0`); no wall-time figure
+is read. Boundary: ecbench's floor `√(π/2A)` with `A = 2`, i.e. 0.886,
+recorded per run.
+
+**Registered hypotheses.**
+
+- **E1 (instrument).** Every run verifies, and `ecbench verify
+  --replay-all` reports every replay identical.
+- **E2.** Over the 7 instances with `N ≥ 10⁵`, the median per-curve ratio
+  `S(rho.negation) / S(rho.plain)` (ecbench `compare`, per-curve rows) is
+  **≤ 0.80** (ideal 0.707).
+- **E3 (descriptive, no threshold).** The median `S(rho.negation)` over
+  the same 7 instances, set beside round fifteen's median folded
+  `S_walk` 1.008. The two differ in targets, seeds and accounting
+  (ecbench's `S` includes every charged operation; `S_walk` excludes
+  set-up), so they are reported side by side and not ranked.
+
+§5a: each arm's `*_uncharged` counters are listed with their counts and
+the comparison is priced at 0, 0.1 and 1 GAE per operation; the E2 order
+is stated only if it holds across the band. If E2 holds, ecbench's
+`rho.negation` becomes the thread's rho reference and the thread's own
+walk is retired (class **accounting**). If E2 fails, the generic fold has
+a problem on this family that the thread's rounds 13–15 did not, which is
+examined next.
+
+**Run.** Built from the commit that carries the IC adapter (once
+reviewed), so the same binary can later run the IC arm; card relay
+through `experiment-director` and `executor-mechanical`.
