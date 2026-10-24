@@ -159,6 +159,12 @@ pub struct Ripemd160Stream {
     length: u64,
 }
 
+impl Default for Ripemd160Stream {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Ripemd160Stream {
     pub fn new() -> Self {
         Self {

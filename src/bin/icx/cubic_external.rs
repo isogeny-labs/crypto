@@ -2,11 +2,11 @@
 
 use clap::Args;
 use crypto_lib::cryptanalysis::gaudry_cubic::{
-    Curve3, E3, Fp3, GaudryOptions, Instance3, Pt3, SubspaceBase, run_gaudry_opts, run_rho3,
+    run_gaudry_opts, run_rho3, Curve3, Fp3, GaudryOptions, Instance3, Pt3, SubspaceBase, E3,
 };
-use rand::{SeedableRng, rngs::StdRng};
+use rand::{rngs::StdRng, SeedableRng};
 use serde::Deserialize;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::path::PathBuf;
 
 #[derive(Args)]

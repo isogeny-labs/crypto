@@ -1,15 +1,15 @@
 //! Checked prime-degree Vélu routes over the exact cubic field supplied to IC.
 
 use clap::Args;
-use crypto_lib::cryptanalysis::gaudry_cubic::{Curve3, E3, Fp3, Pt3};
+use crypto_lib::cryptanalysis::gaudry_cubic::{Curve3, Fp3, Pt3, E3};
 use crypto_lib::hash::sha256::sha256;
 use isogeny_algos::curve::{self, Curve, Isogeny, Pt};
 use isogeny_algos::field::{Field, Rng, Zp};
-use isogeny_algos::kernel::velu::{VeluIso, velu_cyclic, velu_from_point};
+use isogeny_algos::kernel::velu::{velu_cyclic, velu_from_point, VeluIso};
 use isogeny_algos::path::graph::{self, PhiCache};
 use isogeny_algos::poly;
 use serde::Deserialize;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
@@ -1100,13 +1100,11 @@ mod tests {
             .find(|node| node["j"] == json!(destination_j.0))
             .unwrap();
         let id = node["id"].as_u64().unwrap();
-        assert!(
-            j_graph["edges"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .any(|edge| edge["source"] == 0 && edge["target"] == id && edge["degree"] == 3)
-        );
+        assert!(j_graph["edges"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|edge| edge["source"] == 0 && edge["target"] == id && edge["degree"] == 3));
         let mut requested = args;
         requested.target_j = Some(destination_j.0.to_vec());
         assert_eq!(

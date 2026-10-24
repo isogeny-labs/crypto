@@ -497,7 +497,7 @@ pub fn joux_multicollision<H: MerkleDamgardHash>(
 
 fn truncate_compression_state(state: &mut [u8], bits: u32) {
     let bytes = (bits as usize).div_ceil(8);
-    if bytes > 0 && bits % 8 != 0 {
+    if bytes > 0 && !bits.is_multiple_of(8) {
         state[bytes - 1] &= 0xFFu8 >> (8 - bits % 8);
     }
     state[bytes..].fill(0);
@@ -822,7 +822,7 @@ mod tests {
     fn length_extension_sha512_across_padding_boundary() {
         let h = Sha512;
         let secret = b"sha512-secret";
-        let msg = vec![0x5au8; 102];
+        let msg = [0x5au8; 102];
         let suffix = b"&admin=1";
         let combined = [&secret[..], &msg[..]].concat();
         assert!(combined.len() >= 112);

@@ -327,10 +327,8 @@ pub fn key_recovery_two_round(
                                 ) == expected
                             })
                         });
-                        if consistent {
-                            if recovered.replace(tuple).is_some() {
-                                return Err("ambiguous — supply more pairs");
-                            }
+                        if consistent && recovered.replace(tuple).is_some() {
+                            return Err("ambiguous — supply more pairs");
                         }
                     }
                 }

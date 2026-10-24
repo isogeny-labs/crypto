@@ -221,6 +221,7 @@ fn lock_index(path: &Path) -> Result<fs::File, String> {
     let lock = OpenOptions::new()
         .create(true)
         .write(true)
+        .truncate(false)
         .open(&lock_path)
         .map_err(|e| format!("{}: {e}", lock_path.display()))?;
     lock.lock()
