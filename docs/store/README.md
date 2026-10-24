@@ -301,8 +301,12 @@ customization prefixes. Empty prefixes retain the SHAKE-equivalent domain;
 nonempty prefixes use the SP 800-185 cSHAKE domain. The
 [`CRYPTO_CSHAKE_STREAM_ACCEPTANCE_20261023.json`](CRYPTO_CSHAKE_STREAM_ACCEPTANCE_20261023.json)
 receipt records block-boundary, external-reference, and fresh-cache S3 checks.
-The remaining BLAKE2, Skein, RIPEMD-160, Streebog, Whirlpool, Tiger, and
-related file paths still buffer the complete input file in memory.
+BLAKE2b and BLAKE2s use native incremental states that retain the last block
+until finalization, including for shortened output lengths. Their
+[`CRYPTO_BLAKE2_STREAM_ACCEPTANCE_20261023.json`](CRYPTO_BLAKE2_STREAM_ACCEPTANCE_20261023.json)
+receipt records boundary, independent-reference, and fresh-cache S3 checks.
+The remaining Skein, RIPEMD-160, Streebog, Whirlpool, and Tiger file paths
+still buffer the complete input file in memory.
 The generated two-edge cubic degree-2 route passed fresh-cache `solve-cubic`
 replay, including source and destination scalar checks and same-target rho.
 Its live upload, HEAD, remote download verification, pull, and exact-object

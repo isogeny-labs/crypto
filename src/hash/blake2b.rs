@@ -92,6 +92,67 @@ fn compress(h: &mut [u64; 8], block: &[u8; BLOCK_BYTES], t: u128, last: bool) {
     }
 }
 
+/// Incremental unkeyed BLAKE2b. Retains the last block until finalization
+/// because its final-block flag differs from every preceding compression.
+pub struct Blake2bStream {
+    state: [u64; 8],
+    block: [u8; BLOCK_BYTES],
+    filled: usize,
+    consumed: u128,
+    out_len: usize,
+}
+
+impl Blake2bStream {
+    pub fn new(out_len: usize) -> Self {
+        assert!((1..=64).contains(&out_len));
+        let mut state = IV;
+        state[0] ^= 0x0101_0000 ^ out_len as u64;
+        Self {
+            state,
+            block: [0; BLOCK_BYTES],
+            filled: 0,
+            consumed: 0,
+            out_len,
+        }
+    }
+
+    pub fn update(&mut self, mut data: &[u8]) {
+        if self.filled != 0 {
+            let take = data.len().min(BLOCK_BYTES - self.filled);
+            self.block[self.filled..self.filled + take].copy_from_slice(&data[..take]);
+            self.filled += take;
+            data = &data[take..];
+            if data.is_empty() {
+                return;
+            }
+            let block = self.block;
+            self.consumed = self.consumed.wrapping_add(BLOCK_BYTES as u128);
+            compress(&mut self.state, &block, self.consumed, false);
+            self.filled = 0;
+        }
+        while data.len() > BLOCK_BYTES {
+            let mut block = [0; BLOCK_BYTES];
+            block.copy_from_slice(&data[..BLOCK_BYTES]);
+            self.consumed = self.consumed.wrapping_add(BLOCK_BYTES as u128);
+            compress(&mut self.state, &block, self.consumed, false);
+            data = &data[BLOCK_BYTES..];
+        }
+        self.block[..data.len()].copy_from_slice(data);
+        self.filled = data.len();
+    }
+
+    pub fn finalize(mut self) -> Vec<u8> {
+        self.block[self.filled..].fill(0);
+        let total = self.consumed.wrapping_add(self.filled as u128);
+        compress(&mut self.state, &self.block, total, true);
+        let mut full = [0u8; 64];
+        for (index, word) in self.state.iter().enumerate() {
+            full[index * 8..index * 8 + 8].copy_from_slice(&word.to_le_bytes());
+        }
+        full[..self.out_len].to_vec()
+    }
+}
+
 fn blake2b_core(key: &[u8], data: &[u8], out_len: usize) -> Vec<u8> {
     assert!(
         (1..=64).contains(&out_len),
@@ -157,6 +218,20 @@ pub fn blake2b_keyed(key: &[u8], data: &[u8], out_len: usize) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn streaming_matches_one_shot_across_split_final_blocks() {
+        for size in [0, 1, 127, 128, 129, 255, 256, 257, 1025] {
+            let input: Vec<u8> = (0..size).map(|i| (i * 37) as u8).collect();
+            for split in [1, 7, 128, 129] {
+                let mut stream = Blake2bStream::new(31);
+                for chunk in input.chunks(split) {
+                    stream.update(chunk);
+                }
+                assert_eq!(stream.finalize(), blake2b(&input, 31), "{size}/{split}");
+            }
+        }
+    }
 
     fn hex(bytes: &[u8]) -> String {
         bytes.iter().map(|b| format!("{:02x}", b)).collect()

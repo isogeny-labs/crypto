@@ -3390,6 +3390,8 @@ enum StreamingHash {
     Sha512_256(sha2::Sha512_256),
     Keccak(crypto_lib::hash::sha3::KeccakSponge, usize),
     Blake3(blake3::Hasher),
+    Blake2b(crypto_lib::hash::blake2b::Blake2bStream),
+    Blake2s(crypto_lib::hash::blake2s::Blake2sStream),
     Sm3(crypto_lib::hash::sm3::Sm3),
 }
 
@@ -3518,6 +3520,20 @@ fn cmd_hash_file_streamed(
             StreamingHash::Keccak(sponge, output_bytes.unwrap_or(0))
         }
         "blake3" => StreamingHash::Blake3(blake3::Hasher::new()),
+        "blake2b" => {
+            let length = output_bytes.unwrap_or(64);
+            if !(1..=64).contains(&length) {
+                return Err("BLAKE2b --output-bytes must be in 1..=64".into());
+            }
+            StreamingHash::Blake2b(crypto_lib::hash::blake2b::Blake2bStream::new(length))
+        }
+        "blake2s" => {
+            let length = output_bytes.unwrap_or(32);
+            if !(1..=32).contains(&length) {
+                return Err("BLAKE2s --output-bytes must be in 1..=32".into());
+            }
+            StreamingHash::Blake2s(crypto_lib::hash::blake2s::Blake2sStream::new(length))
+        }
         "sm3" => StreamingHash::Sm3(crypto_lib::hash::sm3::Sm3::new()),
         _ => return Ok(None),
     };
@@ -3548,6 +3564,8 @@ fn cmd_hash_file_streamed(
             StreamingHash::Blake3(state) => {
                 state.update(&buffer[..count]);
             }
+            StreamingHash::Blake2b(state) => state.update(&buffer[..count]),
+            StreamingHash::Blake2s(state) => state.update(&buffer[..count]),
             StreamingHash::Sm3(state) => state.update(&buffer[..count]),
         }
     }
@@ -3562,6 +3580,8 @@ fn cmd_hash_file_streamed(
         StreamingHash::Sha512_256(state) => state.finalize().to_vec(),
         StreamingHash::Keccak(state, length) => state.finalize(length),
         StreamingHash::Blake3(state) => state.finalize().as_bytes().to_vec(),
+        StreamingHash::Blake2b(state) => state.finalize(),
+        StreamingHash::Blake2s(state) => state.finalize(),
         StreamingHash::Sm3(state) => state.finalize().to_vec(),
     };
     Ok(Some(to_hex(&digest)))
@@ -4215,6 +4235,38 @@ mod hash_cli_tests {
                     let expected =
                         cmd_hash_custom(name, &bytes, Some(32), custom, function_name).unwrap();
                     assert_eq!(got, expected, "{name} at {size}");
+                }
+            }
+        }
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn blake2_file_streaming_matches_one_shot_at_final_block_boundaries() {
+        let path = std::env::temp_dir().join(format!(
+            "crypto-blake2-stream-{}-{}.bin",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        for size in [0, 1, 63, 64, 65, 127, 128, 129, 65_535, 65_536, 65_537] {
+            let bytes: Vec<u8> = (0..size).map(|i| (i * 37) as u8).collect();
+            std::fs::write(&path, &bytes).unwrap();
+            for (name, lengths) in [
+                ("blake2b", &[1, 16, 32, 64][..]),
+                ("blake2s", &[1, 16, 32][..]),
+            ] {
+                for &length in lengths {
+                    let got = cmd_hash_file_streamed(name, &path, Some(length), None, None)
+                        .unwrap()
+                        .expect("BLAKE2 files stream");
+                    assert_eq!(
+                        got,
+                        cmd_hash(name, &bytes, Some(length)).unwrap(),
+                        "{name} at {size}, {length} bytes"
+                    );
                 }
             }
         }
