@@ -21,8 +21,23 @@ mod uniform;
 mod variant_report;
 #[path = "joint_variants.rs"]
 mod variants;
+#[path = "../../../zero_fiber_collector/native/collector.rs"]
+mod zero_collector;
 #[path = "../../../joint_image_elimination/native/zero_identity.rs"]
 mod zero_identity;
+
+pub(crate) fn zero_five_collect(public: &Path, sha: &str, arm: &str, out: &Path) -> bool {
+    zero_collector::collect(public, sha, arm, out)
+}
+pub(crate) fn zero_five_audit(
+    public: &Path,
+    sha: &str,
+    candidate: &Path,
+    reference: &Path,
+    out: &Path,
+) -> bool {
+    zero_collector::audit(public, sha, candidate, reference, out)
+}
 
 pub(crate) fn zero_oracle(public: &Path, sha: &str, out: &Path) {
     uniform::zero(public, sha, out)

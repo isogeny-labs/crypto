@@ -759,6 +759,25 @@ fn solve_fixtures(fixture_path: &Path, expected_sha: &str, root: &Path, out: &Pa
 
 fn main() {
     let args: Vec<_> = std::env::args().collect();
+    if args.len() == 6 && args[1] == "--zero-five-polynomial" {
+        let pass = image::joint::zero_five_collect(
+            Path::new(&args[2]),
+            &args[3],
+            &args[4],
+            Path::new(&args[5]),
+        );
+        std::process::exit(if pass { 0 } else { 2 });
+    }
+    if args.len() == 7 && args[1] == "--zero-five-polynomial-audit" {
+        let pass = image::joint::zero_five_audit(
+            Path::new(&args[2]),
+            &args[3],
+            Path::new(&args[4]),
+            Path::new(&args[5]),
+            Path::new(&args[6]),
+        );
+        std::process::exit(if pass { 0 } else { 2 });
+    }
     if args.len() == 6 && args[1] == "--joint-five-point-replay" {
         let pass = image::joint::five_point_replay(
             Path::new(&args[2]),

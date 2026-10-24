@@ -83,7 +83,7 @@ fn square_root(f: Field, a: E, non_square: E) -> Option<E> {
     Some(r)
 }
 
-fn build(raw: Value, arm: usize) -> Case {
+pub(super) fn build(raw: Value, arm: usize) -> Case {
     let p = raw["p"].as_u64().unwrap();
     let seed = raw["seed"].as_u64().unwrap();
     let n = raw["n"].as_u64().unwrap();
