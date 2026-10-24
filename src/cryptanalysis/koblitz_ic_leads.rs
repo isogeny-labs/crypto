@@ -424,7 +424,7 @@ pub mod degree_bounds {
             .collect();
         let max_degree = degrees.iter().copied().max().unwrap_or(0);
         // One field equation per variable, degree 2.
-        degrees.extend(std::iter::repeat(2).take(n_vars));
+        degrees.extend(std::iter::repeat_n(2, n_vars));
         degrees.sort_unstable_by(|a, b| b.cmp(a));
         let l = (n_vars + 1).min(degrees.len());
         let bound = degrees[..l].iter().map(|&d| d as u64).sum::<u64>() - l as u64 + 1;
@@ -450,9 +450,9 @@ pub mod degree_bounds {
     pub fn field_level_bound_log2(m: usize, n: u32, ell: u32) -> f64 {
         let vars = 2 * m - 2;
         let mut degrees: Vec<f64> = Vec::new();
-        degrees.extend(std::iter::repeat(4.0).take(m - 1));
-        degrees.extend(std::iter::repeat(2f64.powi(ell as i32)).take(m));
-        degrees.extend(std::iter::repeat(2f64.powi(n as i32)).take(m - 2));
+        degrees.extend(std::iter::repeat_n(4.0, m - 1));
+        degrees.extend(std::iter::repeat_n(2f64.powi(ell as i32), m));
+        degrees.extend(std::iter::repeat_n(2f64.powi(n as i32), m - 2));
         degrees.sort_by(|a, b| b.partial_cmp(a).unwrap());
         let l = (vars + 1).min(degrees.len());
         (degrees[..l].iter().sum::<f64>() - l as f64 + 1.0).log2()

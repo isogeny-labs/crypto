@@ -143,12 +143,10 @@ impl Engine {
             .collect();
         // Count before materialising.
         let n = vars.len() as u64;
-        let mut count = 0u64;
+        let mut count = 1u64;
         let mut binom = 1u64;
-        for k in 0..=degree as u64 {
-            if k > 0 {
-                binom = binom * (n + 1 - k) / k;
-            }
+        for k in 1..=degree as u64 {
+            binom = binom * (n + 1).saturating_sub(k) / k;
             count += binom;
         }
         if count as usize > max_cols {
