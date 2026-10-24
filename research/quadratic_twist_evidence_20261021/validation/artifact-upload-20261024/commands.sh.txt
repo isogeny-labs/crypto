@@ -1,0 +1,19 @@
+# Run from the repository root. Exact authorized attempt; exit2 is recorded.
+ARTIFACTS_REMOTE=s3://setec-astronomy-artifacts/store \
+ARTIFACTS_CACHE=/workspace/twist-tooling/cache/artifacts \
+ARTIFACTS_AWS=/workspace/twist-tooling/awscli-venv/bin/aws \
+AWS_DEFAULT_REGION=us-west-2 \
+timeout 45 python3 research/quadratic_twist_evidence_20261021/validation/s3-yield-20261024/artifacts.py.txt push \
+  research/quadratic_twist_evidence_20261021/validation/s3-yield-20261024/runs.tar.xz \
+  research/quadratic_twist_evidence_20261021/reports/s3-yield-20261024/report.pdf \
+  research/quadratic_twist_evidence_20261021/reports/s3-yield-20261024/bridge.png \
+  research/quadratic_twist_evidence_20261021/reports/s3-yield-20261024/profiles.png \
+  --jobs 1
+
+# Completed before the attempt; all four returned OK.
+jq -r '.payloads[] | "\(.sha256)  \(.path)"' \
+  research/quadratic_twist_evidence_20261021/validation/s3-yield-20261024/ARTIFACTS_UPLOAD_PENDING.json | sha256sum -c -
+
+# Read-only verification after the attempt; both complete and pass.
+sha256sum -c research/quadratic_twist_evidence_20261021/validation/s3-yield-20261024/INPUTS.sha256
+sha256sum -c research/quadratic_twist_evidence_20261021/validation/s3-yield-20261024/OUTPUTS.sha256

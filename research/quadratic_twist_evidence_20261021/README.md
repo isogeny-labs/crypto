@@ -11,7 +11,14 @@ closure is also equal. This is a finite factor-base/target effect, not a speed
 result. The unmodified gate now checks **144 named research theorems /185
 audited declarations**, zero extra trusted, including exact degree4-obstruction
 and degree5-refutation certificates. [Protocol](S3_YIELD_20261024_PROTOCOL.md),
-[validation](validation/s3-yield-20261024/README.md), [inspected PDF publication pending](validation/s3-yield-20261024/ARTIFACTS_UPLOAD_PENDING.json).
+[validation](validation/s3-yield-20261024/README.md), [current artifact publication status](validation/artifact-upload-20261024/README.md).
+
+The user approved uploading the four prepared artifacts to the named S3 store.
+Their hashes match the frozen proposal; the authorized attempt stopped with
+AWS **Unable to locate credentials**. No files were uploaded or remotely
+verified. Upload permission is resolved; AWS connection setup is the remaining
+publication blocker. The approved PDF/PNG/archive bytes and older records stay
+unchanged while credentials are unavailable.
 
 The [relation-yield/solver-degree continuation](reports/yield-20261024/README.md)
 adds exact Lean theorems for accepted coefficient sets and row rank, an actual
