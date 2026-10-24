@@ -241,3 +241,28 @@ The prospective zero-fiber protocol was recorded before reading this newly
 merged rule; no new collector implementation or solve is represented as
 having passed that missing atlas check. Existing scientific results and
 publication work do not depend on proposing a new mechanism.
+
+## Later migration: completed integration gate reused
+
+Diem was inspected first again and retains the expired original deadline,
+50/52 records, no pending work and no generator. The scoped EKS overview
+retains the same terminal twist capability probe; no twist job is active
+or resubmitted. Unrelated terminal jobs are left to their existing owners.
+No legacy waiting-freeze followup is resumed by this study.
+
+The saved current-main v3 gate finishes at 11:11:56 UTC: all ten phase
+exits are zero, 4,492 library tests pass with zero failures and 119 existing
+ignores, and the examples pass 1+3 tests. No successful test phase is rerun.
+An initial source-hash observation used the study directory for a root-
+relative manifest and reports missing paths; the correctly rooted check
+then passes all 855 root inputs and all 22 point-replay source inputs.
+The observation failure is not a changed source, test failure or reason to
+repeat the suite. The existing canonical publication receipt still passes.
+
+The isolated zero-fiber worktree is saved at
+`/home/ec2-user/crypto-twist-zero-fiber`, branch
+`codex/twist-zero-fiber-20261024`. Its prospective protocol is committed;
+collector and separate audit source are written but not yet compiled or
+executed. No collector service, frozen runner or scientific result is
+inferred from those files. The completed 43-directory snapshot and its
+published object remain unchanged.

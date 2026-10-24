@@ -198,7 +198,7 @@ is no higher-arity polynomial collector or new complete price. See the
 | Finite Fp residual prefilter | All 21 saved-tape audits pass after 77-test gate; sets/rank/recovery preserved, zero rejections through rank; no filter deployed |
 | New cold DLP, GAE and strongest matched rho | Not measured; no new performance ranking |
 | Selecting among different twists | Not tested by these fixed-model image comparisons |
-| Current software gates | Post-merge release library 4,488 pass/119 existing ignores, touched examples 1+3 pass, naming/validation/size gates pass; separate native suite 81/81 |
+| Current software gates | New current-main gate passes 4,492 library tests/119 existing ignores, touched examples 1+3, and all ten phases; earlier 4,488-test receipt remains separate; native point replay suite 81/81 |
 
 The [proof map](proof/PROOF_MAP.md) lists hypotheses and missing bridges.
 The [migration reconciliation](MIGRATION_RECONCILIATION_20261024.md)
