@@ -140,7 +140,7 @@ pub fn unit_word_ops(field: Field, r_bits: u32) -> BTreeMap<&'static str, u64> {
     let as_solve = match field {
         Field::Binary(m) => {
             let m = u64::from(m);
-            (m - 1) * b.sqr + (m + 1) / 2 * b.add + b.add
+            (m - 1) * b.sqr + m.div_ceil(2) * b.add + b.add
         }
         // No Artin–Schreier equation in odd characteristic; a square
         // root by Fermat powering is the nearest budget.
