@@ -1,0 +1,71 @@
+CARD SWB-RECOMPUTE-12  (frozen before dispatch; experiment-director style; mechanical tier)
+GOAL  Recompute, from raw records committed in this repository, the headline numbers of the benchmark-README rows listed below, and check the identical-output claims. COMPUTE AND COPY ONLY. You do not judge, classify, explain or repair anything.
+REPO  /home/user/crypto (cwd). Read everything; write ONLY under research/validation_sweep_20261019/B-benchmarks/scripts/recompute/ and research/validation_sweep_20261019/B-benchmarks/recompute/.
+TOOLS  python3 -I (isolated mode) for every computation; grep/ls/zcat/xz -dc/tar -tf/sed for reading. FORBIDDEN: cargo/rustc builds or tests, running any benchmark or ecbench/crypto binary, network access, editing or deleting any file outside the two write dirs, git commands other than read-only (git log/show/ls-files).
+PER ROW (do these in order; at most 25 tool calls per row, then record status cannot_define for what is left):
+ 1. Open the row's study directories (listed per row) and read the README/PROTOCOL/REPORT only as needed to find which raw files hold per-run records.
+ 2. From the row's HEADLINE copy up to 10 numeric claims, preferring ratios, speedups, quotients, medians, intervals and counts (verbatim string each).
+ 3. For each, find the raw per-run/per-pair records in the repo that the number is computed from. Write ONE script per row at scripts/recompute/<row_no>.py (python3 -I, reads only committed files, prints the computed values with the field names used). Run it. If the aggregation (median vs mean, paired vs pooled, which rounds are excluded) is not stated in the study, try the study's stated rule; if still undefined record status cannot_define and say which choice is missing. Never pick the aggregation that happens to match.
+ 4. status per claim: match (relative difference <= 1% or equal at the precision the row prints), mismatch (state both numbers), no_raw_in_repo (the records are not in the repo), cannot_define, partial.
+ 5. If the HEADLINE or MEASURED text claims identical/bit-identical/equal outputs, counters, answers, digests or checksums between arms: find the corresponding fields in the raw records of both arms and report n_compared, n_equal, n_differ, files. If the raw records contain no such field, status no_raw_in_repo.
+ 6. Copy verbatim (path:line) every sentence in the row's study files that points to data outside the repo (drive.google.com, /Volumes, SSD, /Users, s3://, gs://, store:<name>, Modal volume, 'not committed', 'scratch'). For each store:<name> check store/index.json lists it (yes/no).
+ 7. Copy verbatim from the study files: (a) the A/A or null-control result lines (path:line), (b) the isolation tier or isolation statement (path:line), (c) whether PROTOCOL/spec is committed in git before the first raw record (run `git log --diff-filter=A --format=%H%x20%cI -- <protocol path>` and `git log --diff-filter=A --format=%H%x20%cI -- <first raw file>` and print both dates; if either is empty say so).
+OUTPUT  Write research/validation_sweep_20261019/B-benchmarks/recompute/SWB-RECOMPUTE-12.jsonl, one JSON object per row: {"row_no":int,"slug":str,"claims":[{"claimed":str,"computed":str,"definition":str,"files":[str],"status":str}],"identical":{"claimed":bool,"n_compared":int|null,"n_equal":int|null,"n_differ":int|null,"files":[str],"status":str},"offrepo_refs":[str],"aa_lines":[str],"isolation_lines":[str],"protocol_git_date":str,"first_raw_git_date":str,"script":str,"notes":str}. notes holds only facts you saw, never opinions. Then reply with the file path and one line per row: row_no, number of match/mismatch/no_raw/cannot_define claims.
+STOP_WHEN  a row's study directory does not exist; a file you must read is unreadable; you are about to write outside the two write dirs. Report the stop verbatim and continue with the next row.
+ROWS
+
+--- ROW 89 | 2026-10-14 | 20261014-secg-small-x-s3-cost
+MEASURED: cost of deciding a target by a Semaev S₃ solve over a small-x factor base (one quadratic per base abscissa) against the pair-sum table lookup and against Pollard rho, on all 33 SECG curves (`secp112r1` to `secp521r1`, `sect113r1` to `sect571r1`); B = 1024 and 4096, 20 random subgroup targets per run, one thread; with the exact two-point yield `2B²/(n − 1)` of the base
+HEADLINE: S₃ per target at B = 4096: 5.4 ms `sect113r1`, 9.6 ms `sect163r2`, 42 ms `secp160r1`; table lookup 2 to 5 µs (S₃ is 2600 to 313 000 times dearer, no table); B + 1 relations by S₃ solves are 52 (`sect113r1`), 77 (`sect163r2`), 79 (`secp160r1`) bits slower than rho on the same machine, 52 to 280 bits over the 33 curves; the S₃ decision equals the table on every element of toy fields and in 66 runs; not a speedup
+HOST (as reported): 4 vCPU shared container, single runs per curve and size, no isolation receipt
+STUDY DIRS: research/secg_small_x_20261014
+RAW CANDIDATES (largest first): research/secg_small_x_20261014/data/s3_secp256r1_4096.json, research/secg_small_x_20261014/data/s3_sect409k1_4096.json, research/secg_small_x_20261014/data/s3_sect571k1_1024.json, research/secg_small_x_20261014/data/s3_sect571k1_4096.json, research/secg_small_x_20261014/data/s3_sect571r1_1024.json, research/secg_small_x_20261014/data/s3_sect571r1_4096.json
+
+--- ROW 90 | 2026-10-14 | 20261014-greedy-factor-base-yield
+MEASURED: greedy coverage-driven factor base against uniformly random orbits of the same count, Koblitz `K₀/2¹³`, `K₀/2¹⁵`, `K₁/2¹⁷` (partial coverage) and `K₀/2⁹`, `K₁/2⁹`, `K₁/2¹⁵` (saturated); exhaustive subgroup targets, pair sums (`m = 2`), 20 seeds, production census; equal columns and equal points
+HEADLINE: expected trials at the best column count 4.46 vs 5.29 (1.18×) on `K₀/2¹³`, 3.00 vs 3.25 (1.08×) on `K₀/2¹⁵`, 16.35 vs 18.18 (1.11×) on `K₁/2¹⁷`; coverage ratio up to 1.181 [1.138, 1.230]; full-scan construction on `K₁/2¹⁷` 0.23 s at 4 columns, 1.5 s at 12 (about 85 ms of it subgroup enumeration, shared with the random control; the shipped sampler's 0.2 ms does not enumerate, so not comparable); the dense selector enumerates the subgroup and stops at `r ≤ 2²²`; a sampled selector runs past it and its gain shrinks with `r` (best ratio 1.090 at `r = 2¹⁶`, 1.046 at `2²¹`, 1.012 at `2²⁷·⁸`, 1.0000 at `2³⁹`), so this is not a cryptographic-size result
+HOST (as reported): 4 vCPU Xeon 2.10 GHz, shared container, one run, no isolation receipt
+STUDY DIRS: research/greedy_factor_base_yield_20261014
+RAW CANDIDATES (largest first): research/greedy_factor_base_yield_20261014/data/rows.json, research/greedy_factor_base_yield_20261014/data/summary.json, research/greedy_factor_base_yield_20261014/e2e/wf17-report.json, research/greedy_factor_base_yield_20261014/scaling/icv1-f2m37-tm534059-32aad96b-large/rows.json, research/greedy_factor_base_yield_20261014/scaling/main/rows.json, research/greedy_factor_base_yield_20261014/scaling/main/summary.json
+
+--- ROW 91 | 2026-10-14 | 20261014-ic-m3-algebraic-vs-mitm
+MEASURED: decomposition cost per relation (wall ns, one core) of inherited F4 (S₃ chain), F6-IC, CDCL+XOR SAT and unsplit/split S₄ hybrids against the pair-table MITM floor, binary Koblitz `K_a/F_{2^n}`, `d = ⌈n/m⌉`, `m = 3` (n = 13…31) and `m = 4` (n = 11…19 algebraic; ≥ 23 unsupported, 64-variable cap); exactness against the floor and exhaustive enumeration
+HEADLINE: no arm grows more slowly than the floor: slopes log₂ ns/relation per unit n, `m = 3` floor 0.207 [0.204, 0.211], f4-chain 0.534 (Δ [0.315, 0.338]), f6-ic 0.583 (Δ [0.366, 0.384]); `m = 4` floor 0.363, f4-chain 0.560 (Δ [0.342, 0.453]); cheapest arm ÷ floor 3.0·10² (n = 13) → 3.8·10⁴ (n = 31); SAT and split hybrid censored (undetermined), lower bounds 10⁶–10⁷× floor
+HOST (as reported): cloud container, 4 vCPU Xeon @ 2.1 GHz, L0 (shared, two grids concurrent)
+STUDY DIRS: research/ic_m3_algebraic_vs_mitm_20261014/README.md; research/ic_m3_algebraic_vs_mitm_20261014/reports/run-20261014T1854Z/README.md
+RAW CANDIDATES (largest first): research/ic_m3_algebraic_vs_mitm_20261014/runs/m3/truth-m3-n13-d5.json, research/ic_m3_algebraic_vs_mitm_20261014/runs/m3/truth-m3-n17-d6.json, research/ic_m3_algebraic_vs_mitm_20261014/runs/m3/truth-m3-n19-d7.json, research/ic_m3_algebraic_vs_mitm_20261014/runs/m3/truth-m3-n23-d8.json, research/ic_m3_algebraic_vs_mitm_20261014/runs/m3/truth-m3-n29-d10.json, research/ic_m3_algebraic_vs_mitm_20261014/runs/m3/truth-m3-n31-d11.json
+
+--- ROW 92 | 2026-10-14 | 20261014-ecbench-rho-optimized
+MEASURED: standing `rho.signed_frobenius_strong` canonicalization against its trajectory-identical legacy path; 48 public workloads on six registered Koblitz curves, 240 measured pairs, plus a frozen n=61 complete-solve Callgrind census
+HEADLINE: optimized/same-binary legacy 0.802155 `callgrind.Ir` (1,600,543,701 / 1,995,304,985; 19.785% fewer), clearing the 0.85 gate; optimized/pre-change 0.804582; GAE 1.0000 [1.0000, 1.0000], 720/720 measured replays identical; native 0.9586 wall median is L0 descriptive only, not a result
+HOST (as reported): virtual AMD EPYC 9V74, Linux x86_64, `ECBENV2h217559836c7c`; PSI unavailable, zero L2 pairs; Valgrind 3.19.0 deterministic instruction result
+STUDY DIRS: research/ecbench_rho_optimized_20261014
+RAW CANDIDATES (largest first): research/ecbench_rho_optimized_20261014/METHODS.txt, research/ecbench_rho_optimized_20261014/sessions/run-20261014T012000Z/audit-replay-all.json, research/ecbench_rho_optimized_20261014/sessions/run-20261014T012000Z/comparisons/rho-legacy__rho-strong.json, research/ecbench_rho_optimized_20261014/sessions/run-20261014T012000Z/comparisons/rho-strong__rho-strong-aa.json, research/ecbench_rho_optimized_20261014/sessions/run-20261014T012000Z/plan.json, research/ecbench_rho_optimized_20261014/sessions/run-20261014T012000Z/records.jsonl
+
+--- ROW 93 | 2026-10-13 | 20261013-ecc-arithmetic-modal
+MEASURED: Two source-bound x86-64 public binary-field multiply panels, each with 24 AB/BA pairs per field and 500,000 products per arm; 34 tests per run and all 384 arm rows checked
+HEADLINE: GF(2^131) median baseline/candidate milliseconds: 36.079/33.580 in run 1 and 28.825/27.043 in run 2; absolute times shifted substantially between workers and the unchanged four-limb control was biased; descriptive only, no qualified speedup
+HOST (as reported): Modal Linux/gVisor x86-64, 2 vCPUs requested, CPU model unknown, no isolation receipt
+STUDY DIRS: research/ecc_arithmetic_20261013; research/ecc_arithmetic_20261013/modal_paired.csv
+RAW CANDIDATES (largest first): research/ecc_arithmetic_20261013/modal_paired.csv, research/ecc_arithmetic_20261013/modal_result_attempt2_run1.json, research/ecc_arithmetic_20261013/modal_result_attempt2_run2.json, research/ecc_arithmetic_20261013/p521_validation/p521_rows.txt.gz, research/ecc_arithmetic_20261013/x25519_validation/field_rows.txt, research/ecc_arithmetic_20261013/x25519_validation/x25519_rows.txt
+
+--- ROW 94 | 2026-10-13 | 20261013-ecc-arithmetic
+MEASURED: Paired public `F2mElement::mul` for GF(2^113/131/163/233), 24 AB/BA rounds and 500,000 products per arm/round; 17 focused tests passed
+HEADLINE: GF(2^131) baseline 27,826,500–932,235,083 ns, candidate 16,801,958–694,301,375 ns per 500,000; wall comparison rejected for host contention; no speedup claimed
+HOST (as reported): Apple M4 Pro, macOS 26.6, shared L0, load over 100
+STUDY DIRS: research/ecc_arithmetic_20261013; research/ecc_arithmetic_20261013/reports/run-20261013T1837Z/report.md
+RAW CANDIDATES (largest first): research/ecc_arithmetic_20261013/modal_paired.csv, research/ecc_arithmetic_20261013/modal_result_attempt2_run1.json, research/ecc_arithmetic_20261013/modal_result_attempt2_run2.json, research/ecc_arithmetic_20261013/p521_validation/p521_rows.txt.gz, research/ecc_arithmetic_20261013/x25519_validation/field_rows.txt, research/ecc_arithmetic_20261013/x25519_validation/x25519_rows.txt
+
+--- ROW 95 | 2026-10-14 | 20261014-rootfinding-buffers
+MEASURED: Prime synchronized lane collector reuses request, native left/right, and output vectors; baseline-candidate-baseline on eight public targets with serial-8, batch-8, rho and rho A/A arms
+HEADLINE: 384/384 verified sealed executions, 288/288 identical measured replays, zero deterministic differences across 128 candidate/baseline pairs; batch-8 relation-phase wall ratio 0.937 (0.786–1.122) and whole-solve 0.993 (0.803–1.251), L0 descriptive; no resolved wall gain and native costs remain unpriced
+HOST (as reported): macOS arm64, shared, L0
+STUDY DIRS: research/ecbench_rootfinding_alloc_20261014
+RAW CANDIDATES (largest first): research/ecbench_rootfinding_alloc_20261014/sessions/baseline-a0/plan.json, research/ecbench_rootfinding_alloc_20261014/sessions/baseline-a0/records.jsonl, research/ecbench_rootfinding_alloc_20261014/sessions/baseline-a1/plan.json, research/ecbench_rootfinding_alloc_20261014/sessions/baseline-a1/records.jsonl, research/ecbench_rootfinding_alloc_20261014/sessions/candidate-b/plan.json, research/ecbench_rootfinding_alloc_20261014/sessions/candidate-b/records.jsonl
+
+--- ROW 96 | 2026-10-15 | 20261015-gaudry-k4-d4-char2
+MEASURED: one `k = 4` D₄ decomposition over `F_{(2^m)^4}` (`C₄`, `F_q` multiplications; plain, weighted and Frobenius-reduced forms) and end-to-end ecbench `S` against rho at `m = 6–14` (sessions `ECBS1h03a1d62aba88`, `ECBS1h4d63e1551dc1`, `ECBS1hb9229e3a0f30`)
+HEADLINE: Frobenius form `C₄` **1.98·10⁵**, **481×** below plain (479–483) at `m = 8`; `S` Frobenius ÷ plain 0.0057 at `m = 6`; IC ÷ rho theory 5,080 (`m = 6`) → **6.06** (`m = 14`); fitted slope −0.248, crossover extrapolated `2^{68.1}` — engineering, no crossover measured
+HOST (as reported): 4 vCPU Xeon 2.10 GHz, one core reserved; deterministic counts, wall L1
+STUDY DIRS: research/gaudry_quartic_d4_char2_20261015; research/gaudry_quartic_d4_char2_20261015/REPORT.pdf
+RAW CANDIDATES (largest first): research/gaudry_quartic_d4_char2_20261015/raw/m10_uniform.jsonl, research/gaudry_quartic_d4_char2_20261015/raw/m12_uniform.jsonl, research/gaudry_quartic_d4_char2_20261015/raw/m8_uniform.jsonl, research/gaudry_quartic_d4_char2_20261015/raw/summary.json, research/gaudry_quartic_d4_char2_20261015/sessions/char2-forms-m6/records.jsonl, research/gaudry_quartic_d4_char2_20261015/sessions/char2-ladder/records.jsonl

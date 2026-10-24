@@ -14,6 +14,7 @@ from pathlib import Path
 import re
 import shutil
 import sqlite3
+import tempfile
 import time
 import uuid
 
@@ -80,11 +81,18 @@ def snapshot(home, root, threads, include_auth=False, retain=3):
             files[name] = {'symlink': target}
             continue
         if source.suffix == '.sqlite':
-            with closing(sqlite3.connect('file:'+str(source)+'?mode=ro', uri=True, timeout=15)) as src:
-                with closing(sqlite3.connect(destination)) as dst:
-                    src.backup(dst)
-                    if dst.execute('PRAGMA quick_check').fetchone()[0] != 'ok':
-                        raise ValueError('SQLite snapshot integrity check failed: '+name)
+            # SQLite backup inherits the source journal mode. Keep its database
+            # and WAL operations on local storage, then publish a closed,
+            # standalone file to EFS; NFS is not a live SQLite/WAL destination.
+            with tempfile.TemporaryDirectory(prefix='.codex-backup-', dir=home.parent) as temporary:
+                backup = Path(temporary) / source.name
+                with closing(sqlite3.connect('file:'+str(source)+'?mode=ro', uri=True, timeout=15)) as src:
+                    with closing(sqlite3.connect(backup)) as dst:
+                        src.backup(dst)
+                        if dst.execute('PRAGMA quick_check').fetchone()[0] != 'ok':
+                            raise ValueError('SQLite snapshot integrity check failed: '+name)
+                        dst.execute('PRAGMA journal_mode=DELETE')
+                shutil.copyfile(backup, destination)
         else:
             # A changed file is copied into this generation, never over a hard
             # link from an earlier immutable generation.
