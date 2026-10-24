@@ -173,7 +173,17 @@ rather than forking it.
 ## Reports in S3
 
 Once a report is on `main`, `.github/workflows/reports-s3.yml` copies it to
-`s3://crypto-autoresearcher/reports/crypto/<repository path>` with a per-push
-manifest (`docs/reports-s3.md`). It takes everything under
-`docs/ic/measurement/reports/` and `research/**/reports/` and every PDF under
-`research/`, so keep reports at those paths. Sessions never upload to S3.
+`s3://setec-astronomy-artifacts/reports/crypto/<repository path>` (region
+`us-east-2`) with a per-push manifest (`docs/reports-s3.md`). It takes
+everything under `docs/ic/measurement/reports/` and `research/**/reports/` and
+every PDF under `research/`, so keep reports at those paths.
+
+Sessions never upload, overwrite or delete in that prefix; the workflow is the
+only writer. To read a published report, list or copy it down and check it
+against the manifest's SHA-256:
+
+```sh
+aws s3 ls s3://setec-astronomy-artifacts/reports/crypto/<repository path> --region us-east-2
+aws s3 cp s3://setec-astronomy-artifacts/reports/crypto/<repository path> . --region us-east-2
+aws s3 presign s3://setec-astronomy-artifacts/reports/crypto/<repository path> --expires-in 604800 --region us-east-2
+```
