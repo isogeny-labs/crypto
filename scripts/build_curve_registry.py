@@ -519,6 +519,53 @@ def harvest_curve_records(reg: Registry) -> None:
             reg.represent(ident, f, {k: v for k, v in c.items() if k != "curve_id"}, rel)
 
 
+def harvest_thread_binary_representations(reg: Registry) -> None:
+    """Keep full binary EC1 records in curve_ids.json in the registry too.
+
+    Some frozen thread inventories retain an exact generator representation
+    that predates (or was not copied into) their companion curve_records.json.
+    The UID is recomputed before importing the row, so this cannot silently
+    turn a stale identifier into a catalog entry.
+    """
+    held = {uid for reps in reg.reps.values() for uid in reps}
+    for path in tracked("*curve_ids.json"):
+        rel = str(path.relative_to(REPO))
+        try:
+            doc = json.loads(path.read_text())
+        except (OSError, ValueError):
+            continue
+        for row in doc.get("curves", []) if isinstance(doc, dict) else []:
+            if not isinstance(row, dict) or not row.get("curve_uid") or row["curve_uid"] in held:
+                continue
+            field, curve = row.get("field"), row.get("curve")
+            if not isinstance(field, dict) or not isinstance(curve, dict):
+                continue
+            coeff = curve.get("coefficients")
+            order = _int(row.get("group_order"))
+            if (field.get("characteristic") != 2 or not isinstance(coeff, list)
+                    or len(coeff) != 5 or coeff[0] != 1 or coeff[2] or coeff[3]
+                    or not order or not isinstance(field.get("degree"), int)
+                    or not isinstance(field.get("modulus_exponents"), list)):
+                continue
+            m = field["degree"]
+            modulus = sum(1 << e for e in field["modulus_exponents"])
+            a, b = coeff[1], coeff[4]
+            ident = cid.binary_id(m, modulus, a, b, order,
+                                  end="-7" if b == 1 and a in (0, 1) else "unk")
+            rep = ec1.curve_identity(field, curve, "x")
+            if rep["curve_uid"] != row["curve_uid"]:
+                raise ValueError(f"{rel}: stored EC1 UID does not match its binary record")
+            koblitz = b == 1 and a in (0, 1)
+            params = ({"a": a, "n": m, "modulus": cid._hex(modulus),
+                       "modulus_rule": "recorded in the run"}
+                      if koblitz else {"m": m, "modulus": cid._hex(modulus),
+                                      "a": cid._hex(a), "b": cid._hex(b)})
+            reg.add(ident, "koblitz" if koblitz else "binary", params, rel,
+                    koblitz_aliases(a, m) if koblitz else [])
+            reg.represent(ident, field, curve, rel)
+            held.add(rep["curve_uid"])
+
+
 def prepared_prime_rows(doc) -> list[tuple]:
     """The rows of a list-format curve_ids.json (the conductor-gap threads):
     each {p, a, b, order, r, generator} is one prime-field EC1 record."""
@@ -756,6 +803,7 @@ def build() -> tuple[dict, list[str], list[str]]:
     harvest_bench(reg)
     harvest_json(reg, problems, fatal)
     harvest_curve_records(reg)
+    harvest_thread_binary_representations(reg)
     harvest_prepared_curve_ids(reg)
     harvest_text_koblitz(reg)
     harvest_native_standards(reg)
