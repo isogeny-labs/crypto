@@ -87,6 +87,10 @@ does not merge distinct Git checkout indexes or coordinate remote prefixes.
 The [parallel CLI acceptance](INDEX_CONCURRENCY_ACCEPTANCE_20261023.json)
 checks distinct-name publication, remote downloaded bytes, simultaneous
 removals, and a same-name conflict using separate processes.
+The [live S3 concurrency acceptance](INDEX_CONCURRENCY_S3_ACCEPTANCE_20261023.json)
+checks four parallel uploads, a competing same-name pair, fresh-cache pull,
+remote downloaded bytes through `crypto` and `crax`, and exact-prefix cleanup
+in the Setec bucket.
 
 ## Commands
 
