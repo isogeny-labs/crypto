@@ -14,6 +14,12 @@ remaining, not as a pass/fail gate. Relabelling and accounting changes are
 not improvements. Full rule: [`AGENTS.md`](AGENTS.md), "Success criterion:
 iterative improvement of the index-calculus baseline".
 
+Before surveying for ECDLP leads or proposing one, read the lead atlas in the
+sibling crypto-autoresearcher checkout (`knowledge/leads/ecdlp/`,
+`python3 tools/lead_atlas.py --brief`, printed at session start). It records
+what has already been tried here and in the sibling repositories, and whether
+anything changed since its last review (AGENTS.md "Pointers").
+
 Every experiment run, every PR that lands a result, and every research search
 leaves a report, a graph, and a PDF: follow the `research-visuals` skill
 (`.claude/skills/research-visuals/SKILL.md`; AGENTS.md "Research searches must
@@ -52,7 +58,8 @@ warn and let edits through.
 
 The session that opens a PR stays with it until it is merged or closed: it
 checks in on CI, reviews and merge state, fixes the failures and feedback its
-change causes, and merges once green and authorized. Any runtime may do this,
+change causes, and merges once green and authorized (a non-required check
+queued 24 hours without starting does not block the merge). Any runtime may do this,
 Claude Opus and Fable included. Check in through PR-activity subscriptions or
 safety-net check-ins (about 50 minutes, then about 4 hours; stop after 3 quiet
 check-ins), and never busy-poll, sleep in a loop, or re-read job logs faster
