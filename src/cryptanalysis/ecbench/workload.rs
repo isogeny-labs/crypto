@@ -15,6 +15,7 @@
 
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use std::sync::OnceLock;
 
 use crate::binary_ecc::IrreduciblePoly;
 use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128, derive_u64};
@@ -448,8 +449,7 @@ pub struct WideInstance {
 
 /// The registry's modulus for `K_a` over `F_{2^n}`, if it lists one.
 pub fn registry_koblitz_modulus(a: u8, n: u32) -> Option<IrreduciblePoly> {
-    let doc: Value = serde_json::from_str(REGISTRY).ok()?;
-    let entry = doc.get("curves")?.as_array()?.iter().find(|c| {
+    let entry = registry_curves().iter().find(|c| {
         let p = c.get("params");
         c.get("family").and_then(Value::as_str) == Some("koblitz")
             && p.and_then(|p| p.get("a")).and_then(Value::as_u64) == Some(u64::from(a))
@@ -504,14 +504,100 @@ pub struct CurveFacts {
 
 const REGISTRY: &str = include_str!("../../../docs/curves/registry.json");
 
-/// The registry entry of `slug`, if any.
+/// The registry's curves, parsed once per process, for the lookups that
+/// scan every entry (a wide Koblitz modulus) and as the fallback of
+/// [`registry_entry`]; several megabytes, so nothing on the per-execution
+/// path parses it.
+fn registry_curves() -> &'static [Value] {
+    static CURVES: OnceLock<Vec<Value>> = OnceLock::new();
+    CURVES.get_or_init(|| {
+        serde_json::from_str::<Value>(REGISTRY)
+            .ok()
+            .and_then(|mut doc| doc.get_mut("curves").map(Value::take))
+            .and_then(|curves| match curves {
+                Value::Array(curves) => Some(curves),
+                _ => None,
+            })
+            .unwrap_or_default()
+    })
+}
+
+/// The registry entry of `slug`, parsed from its own text alone.
+///
+/// The document is 4.7 MB and every measured execution is a fresh child
+/// process, so parsing it whole cost 97% of a toy solve's instructions
+/// (callgrind, 2026-10-18: 147.6M of 153M Ir in `ecbench exec`); a
+/// per-process cache cannot help a child.  A slug is a plain `icv1-…`
+/// string that occurs in the document as its own entry's `"slug"` value,
+/// the first key of the entry, so the entry is cut out between the brace
+/// before that key and its string-aware match and parsed on its own.  The
+/// extracted object is checked to carry the slug, and anything the fast
+/// path cannot place falls back to the full parse, so the answer is the
+/// one the full parse gives: the first entry with that slug.
 fn registry_entry(slug: &str) -> Option<Value> {
-    let doc: Value = serde_json::from_str(REGISTRY).ok()?;
-    doc.get("curves")?
-        .as_array()?
-        .iter()
-        .find(|c| c.get("slug").and_then(Value::as_str) == Some(slug))
-        .cloned()
+    let needle = format!("\"{slug}\"");
+    let mut from = 0;
+    while let Some(pos) = REGISTRY[from..].find(&needle) {
+        let at = from + pos;
+        from = at + needle.len();
+        let Some(entry) = registry_entry_around(at) else {
+            // A slug quoted somewhere the fast path cannot read: the
+            // full parse decides.
+            return registry_curves()
+                .iter()
+                .find(|c| c.get("slug").and_then(Value::as_str) == Some(slug))
+                .cloned();
+        };
+        if entry.get("slug").and_then(Value::as_str) == Some(slug) {
+            return Some(entry);
+        }
+    }
+    None
+}
+
+/// The object whose first key, `"slug"`, has its value at byte `at` of
+/// the registry; `None` when the text around `at` is not that shape.
+fn registry_entry_around(at: usize) -> Option<Value> {
+    let before = REGISTRY[..at].trim_end_matches(|c: char| c == ':' || c.is_whitespace());
+    let key = before.strip_suffix("\"slug\"")?;
+    let open = key.rfind('{')?;
+    if !key[open + 1..].trim().is_empty() {
+        return None;
+    }
+    let close = json_object_end(REGISTRY.as_bytes(), open)?;
+    serde_json::from_str(&REGISTRY[open..=close]).ok()
+}
+
+/// The index of the `}` closing the object that opens at `open`, reading
+/// strings and their escapes so braces inside them do not count.
+fn json_object_end(text: &[u8], open: usize) -> Option<usize> {
+    let mut depth = 0usize;
+    let mut in_string = false;
+    let mut escaped = false;
+    for (i, &b) in text.iter().enumerate().skip(open) {
+        if in_string {
+            if escaped {
+                escaped = false;
+            } else if b == b'\\' {
+                escaped = true;
+            } else if b == b'"' {
+                in_string = false;
+            }
+            continue;
+        }
+        match b {
+            b'"' => in_string = true,
+            b'{' => depth += 1,
+            b'}' => {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(i);
+                }
+            }
+            _ => {}
+        }
+    }
+    None
 }
 
 fn parse_hex(s: &str) -> Option<u128> {
@@ -1152,6 +1238,29 @@ impl Workload {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The slug-targeted extraction answers exactly as the full parse:
+    /// the first entry carrying the slug, or none.
+    #[test]
+    fn registry_entry_matches_the_full_parse() {
+        let all = registry_curves();
+        assert!(all.len() > 100, "the registry is populated");
+        for c in all.iter().step_by(97) {
+            let slug = c.get("slug").and_then(Value::as_str).unwrap();
+            let fast = registry_entry(slug).unwrap_or_else(|| panic!("{slug} not found"));
+            let full = all
+                .iter()
+                .find(|x| x.get("slug").and_then(Value::as_str) == Some(slug))
+                .unwrap();
+            assert_eq!(&fast, full, "{slug}");
+        }
+        assert!(registry_entry("icv1-no-such-curve-00000000").is_none());
+        // A slug that is a prefix of a real one is not that one.
+        let first = all[0].get("slug").and_then(Value::as_str).unwrap();
+        assert!(registry_entry(&first[..first.len() - 1]).is_none());
+        // A string with braces and escaped quotes inside is skipped as text.
+        assert_eq!(json_object_end(br#"{"a":"}\"{","b":{}}"#, 0), Some(18));
+    }
 
     fn public_fixture() -> CurveSpec {
         CurveSpec::PrimePublicFixture {
