@@ -1,10 +1,9 @@
 # N83 D18 shared-bit encoding
 
-**Status: full-size local construction, 23 example tests, input inventory and
-Lean proof pass on the retained implementation. The latest library run passed
-the shared-bit tests but failed nine local-network tests under sandbox socket
-restrictions. Full validation on the updated parent, bounded Linux construction
-and the paired solver card remain pending.**
+**Status: all local native gates pass on the updated parent: 4,478 library tests,
+28 affected-example tests, release builds and all six full-size constructions.
+The input inventory and Lean proof pass. Bounded Linux construction and the
+paired solver card remain pending behind the SSH runner's benchmark lock.**
 
 The encoding baseline is PR #2271 revision
 `e294f8c927b019f59e6552039d32e6b4ba237f84`. Both policies retain the same
@@ -17,10 +16,10 @@ The working curve is `icv1-f2m83-tm6151469093347-debefd74`.
 |---|---|---|
 | Apply the two approved benchmark index rows | Verified complete in PR #2271 | Both rows are committed in `e294f8c92`. |
 | Get PR #2271 through CI and merge | Merged; historical CI failure retained | Merged at `18a6735fbefc53b0bffb2443a0075faa9c1ebfb0` on 2026-10-21. Its later workflow-parser job rejected the 45-minute harness timeout; the other applicable jobs passed. The current census parent already contains the named budget exception and separate historical-audit job. Follow-up validation remains required. |
-| Preserve default encoding and exact finite domain | Implemented; executable validation pending | Explicit `FrobeniusOrbitRootEncoding::SharedBits`; old APIs retain `PerRepresentative`. |
+| Preserve default encoding and exact finite domain | Verified within the tested/proved scope | Explicit `FrobeniusOrbitRootEncoding::SharedBits`; old APIs retain `PerRepresentative`. Exhaustive native selected-representative/phase/x tests and the stated Lean theorem pass. |
 | Check the complete D18 input list | Verified complete | [Native inventory](INVENTORY.md), [receipt](root-inventory.json), [inspected PDF](inventory-report.pdf). 66 shared zero bits; 17 varying coordinates. |
 | Prove selector-implication factorization and clause identity | Verified complete within stated scope | [Proof map](PROOF_MAP.md), Lean 4.34.1 gate PASS. No compiler or full-solver proof is claimed. |
-| Exhaustive native semantics, rejection/cap atomicity and worker/replay tests | Partial | The retained 23 affected-example tests pass. The fresh library run passed 4,395 tests including exhaustive shared-bit semantics; nine socket tests failed with `Operation not permitted`, and 118 were ignored. The complete gate is being rerun with local socket access. |
+| Exhaustive native semantics, rejection/cap atomicity and worker/replay tests | Verified complete for the native suite | Updated-parent release library: 4,478 passed, zero failed, 119 ignored. All 28 affected-example tests pass. [Validation v3 run report](reports/run-20261024T0603Z/RUN_REPORT.md) retains the earlier nine socket-permission failures separately. |
 | Build both full-size encodings for m=2,3,4 | Local structural check passes; bounded host gate pending | All six actual models match preflight; choice wires, variable counts and XOR rows agree between policies. The frozen memory-bound gate additionally requires `run-construction.sh` on Linux. |
 | Execute 22 controls, 22 replays, and 18 natural m=4 queries | Not attempted | Requires all validation gates, a committed host card and available SSH runner. Deferred Linux validation stopped at its other-container guard. |
 | Natural useful rank, complete cold/reused cost, matched rho and best-base selection | Open | Original requirements remain in [the problem record](../../problems/n83-prebuilt-base-quality-m2-m4.md). |
@@ -80,10 +79,15 @@ memory-bound and solver-cost gates.
 
 [Validation version 1](VALIDATION.md) preserves 48 records in a deterministic,
 hash-checked archive, including the unsuccessful attempts below. Its input and
-proof successes do not substitute for the pending native test suites.
+proof successes did not substitute for the then-pending native test suites.
 The later [construction run report](reports/run-20261021T0203Z/RUN_REPORT.md)
 and 20-file validation-v2 archive preserve the passing example/build/construction
 gates and the first example-compilation failure.
+The [34-file validation-v3 archive](validation-v3.tar.xz) preserves the fresh
+sandbox failure and the complete successful updated-parent validation. Its
+[manifest and archive digests](validation-v3.sha256) were checked after extraction
+and an identical repack. The rebuilt construction receipt equals the committed
+receipt byte-for-byte. No solver search was run by this local gate.
 
 The initial local release compilation was stopped after static review
 identified unit-placement/count behavior; that attempt produced no test
@@ -127,11 +131,12 @@ Use the full native gates before pushing or launching the paired card:
 ```sh
 cargo test --release --lib
 cargo test --release \
-  --example n83_d18_shared_bits --example n83_prebuild_cost_m23 \
+  --example n83_d18_shared_bits --example n83_d18_shared_card_audit \
+  --example n83_prebuild_cost_m23 \
   --example n83_small_m4_replay --example n83_full_m4_audit \
   --example n83_xor_cache_audit --example n83_full_m4_card_check \
   --example n83_prebuild_reuse_accounting
-cargo build --release --example n83_d18_shared_bits \
+cargo build --release --example n83_d18_shared_bits --example n83_d18_shared_card_audit \
   --example n83_prebuild_cost_m23 --example n83_small_m4_replay
 ELAN_TOOLCHAIN=leanprover/lean4:v4.34.1 tools/lean/proof-gate.sh \
   --out /tmp/n83-shared-proof-new \

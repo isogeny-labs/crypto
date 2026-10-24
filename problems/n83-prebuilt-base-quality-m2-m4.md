@@ -92,11 +92,14 @@ The [proof map](../research/n83_d18_shared_bits_20261020/PROOF_MAP.md) identifie
 the checked Lean factorization and counting statements and their implementation
 boundary. The original local example tests passed. On 2026-10-24 UTC the fresh
 library run passed all shared-bit tests, but nine unrelated socket tests failed
-under sandbox permissions; the complete native gate is being rerun with socket
-access on the updated census parent.
+under sandbox permissions. The complete updated-parent rerun then passed:
+4,478 library tests, zero failures, 119 ignored, plus all 28 affected-example
+tests. Its rebuilt construction receipt is byte-identical to the committed
+receipt; [validation v3](../research/n83_d18_shared_bits_20261020/reports/run-20261024T0603Z/RUN_REPORT.md)
+retains both attempts.
 
-The executable gate still requires full native validation, a 4 GiB zero-swap
-Linux construction receipt, then a committed actual-host card for 22 constructed
+The executable gate still requires a 4 GiB zero-swap Linux construction receipt,
+then a committed actual-host card for 22 constructed
 controls, 22 fresh independent replays and 18 natural queries. The native
 shared-card auditor checks source/input/binary identities, container policies,
 schedule, control equivalence, durable progress, every replay binding and

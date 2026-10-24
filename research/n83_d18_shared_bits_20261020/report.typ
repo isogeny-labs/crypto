@@ -10,13 +10,14 @@ _Construction and semantic validation · frozen protocol dated 2026-10-20_
 The user requested completion of PR 2271 and continued D18 shared-bit
 encoding optimization. This report covers exact construction counts for
 the full retained 16,627-class D18 base at m=2,3,4, Boolean equivalence,
-23 passing example tests and the implemented common-public m=4 comparison.
-The complete release-library suite and paired solver execution are pending.
+4,478 passing library tests, 28 passing example tests and the implemented
+common-public m=4 comparison. Bounded Linux construction and paired solver
+execution are pending. The updated-parent validation ran on 2026-10-24 UTC.
 The source baseline is `e294f8c927b019f59e6552039d32e6b4ba237f84`.
 It is the encoding baseline; a complete verified N83 IC cost is still
 an open gate of the broader factor-base study.
 
-#align(center, image("counts.svg", width: 100%))
+#align(center, image("counts.svg", width: 90%))
 
 == Exact transformation
 
@@ -81,16 +82,20 @@ The additional `lean4checker` implementation is unavailable on this host.
 The count polynomial also has native certificate #data.count_identity.id,
 issued on 32 points and checked on 32 additional points. That fixed-field
 certificate has a narrower scope than the Lean natural-number theorem.
-Twenty-three affected-example tests pass, including receipt tampering and
+Twenty-eight affected-example tests pass, including receipt tampering and
 command-card order/failure handling. The implemented library tests cover
 exhaustive degree-3 representative/phase/x domains, shared ones and zeros,
-atomic caps and invalid domains. Their execution remains pending in the
-full release-library suite. Counts, commands and failure receipts are
+atomic caps and invalid domains. The full release-library suite passed with
+4,478 passed, zero failed and 119 ignored. Counts, commands and failure receipts are
 tracked in `README.md` and the versioned validation archives.
 The first example build failed with E0282; an explicit count-tuple type
 fixed it before the passing run. Earlier SSD-space and interrupted-build
 receipts are preserved in validation v1; the passing gates and compile
-failure are in validation v2. Neither archive claims a full-library pass.
+failure are in validation v2. The 34-file validation v3 archive retains the
+successful updated-parent run and its identical construction receipt. It also
+retains an earlier sandbox run's nine local-socket permission failures.
+The actual Cargo compiler receipt names Rust 1.98.0 on Apple arm64; the later
+interactive shell's Homebrew compiler observation is retained separately.
 
 == Remaining experiment and original gates
 
