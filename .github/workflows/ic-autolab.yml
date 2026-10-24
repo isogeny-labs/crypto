@@ -16,6 +16,10 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+env:
+  # Runtime registrations hash the interpreter's existing stdlib bytecode.
+  # Keep the test controller from creating new caches after that snapshot.
+  PYTHONDONTWRITEBYTECODE: '1'
 concurrency:
   group: ic-autolab-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
