@@ -129,11 +129,12 @@ pub const LEGACY_ACCOUNTING_IDENTICAL: &str =
 /// commit each was built from (none of which has `charge_class_setup`) and
 /// where their records are.  This list is closed: these are the only
 /// producers whose undercharge is historical, found by scanning every
-/// session in this repository and its siblings, archived ones included
-/// (`docs/ecbench/CLASS_SETUP_AUDIT.md` has the census and the impact).  A
-/// record from any other binary, including every record the current
+/// session in this repository and its siblings, archived (`.tar.xz`) and
+/// compressed (`records.jsonl.gz`) ones included
+/// (`docs/ecbench/CLASS_SETUP_AUDIT.md` has the census and the impact).
+/// A record from any other binary, including every record the current
 /// harness writes, must replay exactly.
-pub const PRE_CLASS_SETUP_BINARIES: [(&str, &str, &str); 4] = [
+pub const PRE_CLASS_SETUP_BINARIES: [(&str, &str, &str); 5] = [
     (
         "0a8a48d7580df43d089a62e02f228e93e27ad4a049285cb28a0f5b87eb1473b6",
         "c9db37d01bc776a1e8594ce5495e58ba2ccf5a1d",
@@ -154,6 +155,11 @@ pub const PRE_CLASS_SETUP_BINARIES: [(&str, &str, &str); 4] = [
         "d13f5259c4313f96fbe0837f810a3cbd83eaeecc",
         "research/volcano_ecdlp_census_20261017/sessions/V3-*.tar.xz and \
          research/volcano_ecdlp_census_followup_20261023/sessions/V5-*.tar.xz",
+    ),
+    (
+        "7da27ec3f0dadbae565181b0faa74582eb94a8f36cf6fe806eecc7b4b1fa7a9f",
+        "3d191d8069b3acd3cd3e1f8535d41651560cc431",
+        "research/isogeny-volcano-cost_20261017/sessions/{j0,j1728}/spec-crater-aut (gzip)",
     ),
 ];
 
