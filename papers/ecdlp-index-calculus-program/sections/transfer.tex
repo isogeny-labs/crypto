@@ -1,4 +1,4 @@
-\section{Isogeny, transfer and structure routes}\label{sec:transfer}
+\section{Covers, isogenies and other transfers}\label{sec:transfer}
 
 A recurring hope was that some other representation of the same
 instance---an isogenous curve, a curve at another level of the isogeny
@@ -84,6 +84,82 @@ bits); and two censuses bound what covers exist at toy sizes (genus floor 13
 for odd-order $E/\FF_{q^4}$; a $2^{-l}$ genus-3 fraction over
 $\FF_{2^{3l}}$). All are in \S\ref{sec:ladder3}. None touches a prime field
 or a prime-degree binary field, where the GHS genus is out of reach.
+
+\paragraph{Genus three against the strongest rho.} Rounds three and four
+of the genus-3 work ran without a rho arm; a 23 October study supplied one
+(\art{research/ghs3_vs_rho_20261023/TABLES.md}; the directory has a
+protocol and tables but no README). On round 4's instances, $q=2^{14}$ to
+$2^{20}$, three curves per size, in one unit and one binary, the
+preregistered per-size decision is \emph{IC below the strong rho} at
+$q=2^{16}$ (geometric mean IC/$R_{\mathrm{ideal}}$ $0.701$) and
+\emph{unresolved} at the other six sizes (geometric means $0.97$--$1.52$;
+$1.274$ at $2^{20}$). The ratio carries $\sqrt c$ of the cofactor, because IC
+depends on $q$ alone and rho on $\ell=\#E_0/c$; a post-hoc fit attributes the
+sub-rho cells to cofactor 4. Pricing the subgroup multiplication at
+$c_\ell=9$ instead puts every instance at $2.7$--$12.4\times$ rho, and the fitted
+trend is flat ($0.034$ $[-0.047,0.105]$ per bit), so the extrapolated
+crossover is undetermined ($\log_2q=11.5$, interval $[-35.6,60.4]$). Genus
+three after cubic GHS is therefore at parity with rho to within the pricing
+of one operation on these sizes, not past it. The class is structured
+($E_0/\FF_{q^3}$ with $4\mid\#E_0$), not prime-order.
+
+\paragraph{Joux--Vitse: two generations of comparison.} The current
+reading is the 24 October $p$-scaling study, $1.59$--$1.98\times$ a pooled rho
+constant at $p=1009$ and closing as about $p^{-2}$ (\S\ref{sec:ladder3}).
+Earlier readings were lower and are not current. A sieve variant measured
+$0.024$ $[0.019,0.031]$ of a strong rho at $p=1009$ and $0.0042$ at
+$p=1823$, but its 20 October review withheld every comparison (no numeric
+acceptance for the controls, uncharged rho hashes, incomplete accounting;
+\art{research/jv_sieve_strong_rho_20261019/}); a prospective re-run is
+registered and has not run. A 9 October whole-route replay from a non-weak
+challenge curve, through an isogeny walk to a weak curve and its cover, read
+$0.058$ of a pooled rho at $p=1009$ and $0.011$ at $p=1511$, on one seed per
+prime, with the historical method revision and an unmatched rho
+(\art{research/jv_cover_e2e_30bit_20261009/RESULT.md}). The cover-decomposition
+note still states a measured sieve crossover near $p\approx430$
+(\art{research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md}
+\S11) and carries no erratum; it should be read through the review.
+Leaderboard Table~D, the historical JV study, is withheld. On the method
+side, a sparse-FGLM linear stage made the cover $1.28\times$ cheaper end to
+end (\art{research/jv_cover_sparse_fglm_20261018/}); relation collection is
+$99.99\%$ of $S$ (\art{research/ic_cover_leads_20261018/}); depth-1 isogeny
+classes hold no weak curve over 4{,}871{,}062 curves, while 86--95\% of
+deeper classes hold one (\art{research/jv_weak_class_law_20261007/}); and
+the $(n-1)$-decomposition variant is $4.5\cdot10^7$--$1.8\cdot10^8\times$
+rho (\art{research/joux_vitse_n1_20261015/}).
+
+\paragraph{Cover censuses.} The minimal cubic GHS genus over an isogeny
+class follows $\#E(K)\bmod4$: 13 for odd order, 5 for $2\bmod4$, 3 for
+$0\bmod4$, and genus 3 is the only value below rho's $q^{3/2}$
+(\art{research/ghs_cubic_cover_census_20261012/}); at $n=5$ the floors are
+33, 33, 25 and 5 by 2-torsion type (\art{research/ghs_cover_census_n5_20261013/}).
+No deployed prime-field or prime-degree binary curve has a usable subfield;
+only the RFC~2409 Oakley groups 3 and 4 are reachable, at genus 15--16, where
+exponent models disagree in sign and the measured genus-16 relation phase
+alone is 5.2 bits slower than rho (\art{research/cover_route_prime_binary_20261008/},
+\art{research/ghs_oakley_extended_20261023/}). All 15{,}791 cover maps in the
+registry were assessed: 165 binary maps have genus-3 arithmetic and the
+15{,}626 odd-characteristic genus-2 covers lack a Jacobian implementation
+(\art{research/cover_transfer_assessment_20261013/}). An inventory of about
+90 cover and decomposition studies found every route on prime, Koblitz and
+prime-degree binary curves closed, negative or constant-factor
+(\art{research/cover_decomposition_gap_search_20261018/}). Smith's
+$(2,2,2)$-isogeny route was reproduced natively (full success $0.18638$
+against a theoretical $0.18574$ over $10^6$ curves) and its sign bias shrinks
+like $1/\sqrt p$ (\art{research/smith_prop24_native_20261014/},
+\art{research/smith_sign_scaling_20261016/}).
+
+\paragraph{Volcano levels and generators.} A 403{,}168-run census found the
+level effect equivalent in 33 of 35 comparisons and different in none
+(\art{research/volcano_ecdlp_census_20261017/}), and a large-sample rho study
+found the floor/crater ratio $0.998$ $[0.986,1.010]$
+(\art{research/conductor_gap_rho_large_sample_20261018/}). The one real level
+effect is the automorphism group: $\sqrt3$ on the $j=0$ crater, confirmed at
+$1.86$--$1.92\times$ (\art{research/drastic_prime_conductor_gap_round3_20261012/}).
+At $\ell=2$, floors give $5.8\%$ fewer relations than craters, and 99\% of the
+contrast is explained by the base's cofactor classes
+(\art{research/isogeny-volcano-cost-v2_20261017/},
+\art{research/generator_effect_ic_20261019/}).
 
 \paragraph{Named obstructions.} Blocked requirements are kept open as
 problem records (\art{problems/README.md}), among them the complete-cost

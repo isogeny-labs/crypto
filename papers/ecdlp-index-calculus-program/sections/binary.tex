@@ -1,0 +1,217 @@
+\section{Random and prime-degree binary curves}\label{sec:binary}
+
+This section covers ordinary binary curves $y^2+xy=x^3+ax^2+b$ over
+$\FF_{2^n}$ without a small-field Frobenius: the Weil-descent route and the
+degree question behind the subexponential claims
+(\S\ref{sec:theory}), the decomposition oracles, the random-binary
+leaderboard rows, and the 131-bit ECC2-131 target. Many of the descent
+studies were priced for ECC2K-130 because it was the programme's named
+target, but their systems are built on prime-degree fields with random
+subspaces and use no Frobenius structure (the systems at $n=19,21$ say so
+explicitly), so they belong here. The Gröbner and $\FF_2$ engines they run
+on are in \S\ref{sec:groebner}; every study is listed in
+Appendix~\ref{sec:catalogue}.
+
+\subsection{The degree question, measured}\label{sec:binary-descent}
+
+The subexponential claims for prime-degree binary curves rest on the
+first-fall-degree heuristic: that Weil-descended summation systems have a
+solving degree close to their first fall degree (FFD), which stays small.
+The programme measured both, on toy fields, in about thirty preregistered
+studies from late September to 24 October.
+
+\paragraph{First fall degree stays low; the solving degree does not.} Every
+Weil-descended $\Sem3$ system for $n=3$--$7$ has first fall degree 3
+(\art{research/notes/index-calculus/RESEARCH_FFD_MEASUREMENT.md}), and the
+HKY last fall degree $d_F$ is 3 or 4 at every reachable size---$m=2$ to
+$n=32$, $m=3$ at $\ell\le6$, $m=4$ at $\ell\le3$, $m=5,6$ to $N=54$
+unknowns---while the plain refutation degree rises from 5 to at least 7
+and random controls rise with it (\art{research/fall_degree_bounds_20261008/}).
+At $m=2$ the Semaev $d_F$ sits one below the semi-regular degree at
+$n\le18$, and the gap does not grow over $n=10$--$18$.
+
+\paragraph{The refutation degree tracks $\ell$, within one of semi-regular.}
+For chained $m=3$ systems at fixed surplus the refutation degree reads 5 at
+$\ell=2$, 6 at $\ell=3,4$, and exactly 7 at $\ell=5$ on all four draws of
+the $(10,5)$ cell, with FFD 3 throughout
+(\art{research/dreg_ell_grid_20260925/},
+\art{research/dreg_surplus_control_20260925/},
+\art{research/dreg_degree7_ell5_20260930/}). At $m=4$ it reads 5, 6 and at
+least 7 at $\ell=1,2,3$, flat in $n$ at fixed $\ell$
+(\art{research/dreg_m4_chain_20261006/}). In 10 of 14 exact cells the
+semi-regular $D_{\mathrm{reg}}$ equals the measured degree and in all 14 it
+is within one. With a dense in-tree engine at $\ell=6$ ($n=19$, both
+Koblitz curves) the $x_4$ formulation refutes at 11 and the RR formulation at
+8 on every draw, 4 above the sharp first-fall bound of 7, rising one degree
+per rung from $\ell=3$ (\art{research/ic_dense_ladder_20261004/}). A
+registered semi-regular law then fitted none of seven discriminating cells,
+with $x_4$ inside $[d_{\mathrm{reg}},d_{\mathrm{reg}}+1]$ on all 32 draws
+(\art{research/ic_semiregular_law_20261005/}).
+
+\paragraph{Closure algorithms refute earlier, but rise.} A MutantXL-style
+closure refutes all 92 unsatisfiable draws at degree 3--4 where XL needs
+5--7, and none of 345 satisfiable draws
+(\art{research/dreg_closure_mutantxl_20261016/}). It stays at degree 4 to
+$N=42$ at $m=4$, $\ell\le4$, but rises past 4 at $m=3$, $\ell=7$ on 8 of 8
+draws (\art{research/dreg_closure_scale_20261016/}); the number of unknowns
+is not the driver, and of two candidate explanations only ``$\ell=7$''
+survives a run at $(m,\ell)=(4,6)$, $N=54$, which refuted at degree 4
+(\art{research/dreg_closure_driver_20261016/},
+\art{research/dreg_closure_m4l6_20261018/}). Guessing one or two variables
+restores degree 4 at $(3,7)$ on 10 of 10 draws at $1/116$--$1/260$ of the
+projected degree-5 cost (\art{research/dreg_hybrid_guess_20261024/}).
+
+\paragraph{What the measurements price.} Applied to ECC2K-130's $m=4$ row,
+the closure results contradict the degree-4 floor ($+7.62$ bits over rho)
+and leave degree 5 as the optimistic case, $+10.32$ bits at $w=1$ and
+$+45.71$ at $w=2$; the hybrid gives $+8.43$ bits if the number of guesses
+stays flat in $\ell$ and $+58.27$ if it grows linearly, which only a run at
+$\ell=8$ can separate (\S\ref{sec:ladder3}). The $m=4$ cost slope on this
+engine is $0.985$--$1.060$ bits per unit of $n$ against the $0.25$ an exponent
+lead would need, and a symmetrised refutation degree rises about one per
+unit of $\ell$ (\art{research/ic_m4_exponent_audit_20260928/},
+\art{research/ic_m4_head_engine_20260929/},
+\art{research/ic_symmetry_lever_slope_20260929/}).
+
+\paragraph{Levers that did not move the degree.} Decomposition trees cut
+on the curve's own structure have the same sampled cut-out degree as random
+sets in all 102 cells (\art{research/ic_tree_split_structured_v2_20261011/});
+nonlinear factor-base labels refute nowhere through degree 6
+(\art{research/nonlinear_factor_labels_20261002/}); Hamming-weight ideals
+answer correctly but resolve only after 7--18 of $n$ coordinates are
+assigned (\art{research/hamming_ideal_pdp_20260930/}); the one measured
+subspace-shape effect on the degree was a trace artefact
+(\art{research/notes/index-calculus/RESEARCH_FACTOR_BASE_SHAPE_SEARCH.md}),
+and frozen shape cells were killed at a gap of zero
+(\art{research/shape_search_g1_g6_20261015/}). The offensive first-fall-degree
+thread found no lever within 9 bits of the $2^N$ boundary
+(\art{research/notes/index-calculus/RESEARCH_DEGREE_REDUCTION.md}). A census
+over $\FF_{2^7}$ found non-subfield quasi-subfield polynomials below the
+HKPYY Lemma 4.1 bound, which answers a tightness question but moves no
+cost (\art{research/notes/index-calculus/RESEARCH_QUASI_SUBFIELD.md}).
+
+\paragraph{Reading.} On toy fields, the evidence says the solving degree of
+Weil-descended summation systems grows with $\ell$ and stays within one of
+the semi-regular prediction, while the first and last fall degrees stay
+at 3--4. That is the behaviour of a generic system, and it supports no
+subexponential claim. It does not refute one: the sizes are small, the
+closure algorithms bend the curve by a degree or two, and the $(4,6)$ and
+$\ell=8$ cells that would decide the $m=4$ question have not run. The PKM
+analogue over prime fields (\S\ref{sec:prime}) is in the same state.
+
+\subsection{Decomposition oracles}
+
+\paragraph{The pair-table floor.} On the non-Koblitz curve
+$y^2+xy=x^3+zx+1$ the meet-in-the-middle pair table is the floor every
+oracle is measured against. Over Gaudry's pairs-and-solve it is
+$94$--$277\times$ at $\ell=8$, $2{,}474\times$ and $4{,}244\times$ at
+$\ell=9,10$, and $928\times$ and $2{,}321\times$ at $\ell=11,12$, with no
+disagreement on 128 targets per rung
+(\art{research/binary_mitm_oracle_l8_20261015/},
+\art{research/binary_mitm_oracle_l9_l10_20261015/},
+\art{research/binary_mitm_oracle_l11_l12_20261016/}; the $\ell=12$ figure is
+the validation sweep's recomputation from the committed per-target medians,
+the study quotes $2{,}187\times$). These are wall times on a shared host and
+unvalidated; the counted evidence---8{,}068 and 16{,}092 point additions
+against 2.1 and 8.4 million quartic solves---carries the result. An earlier
+pairs-and-root-find oracle was $926\times$ faster than triple enumeration at
+$\ell=8$ and decided $\ell=12$ (11.5 billion triples) in 15\,s
+(\art{research/notes/index-calculus/RESEARCH_SEMAEV_DECOMPOSITION.md}).
+
+\paragraph{Algebraic oracles against the floor.} No algebraic arm beats the
+pair table: the cheapest is $303\times$ the floor at $n=13$ and
+$3.8\cdot10^4\times$ at $n=31$ for $m=3$, and the slopes in $n$ are steeper
+(F4 $0.534$, F6-IC $0.583$, floor $0.207$; at $m=4$ a wide chained solver
+$0.805$ against $0.333$; \art{research/ic_m3_algebraic_vs_mitm_20261014/}).
+
+\paragraph{SAT, SMT and WDSat are enumerators.} Every SAT, SMT and WDSat
+back end spends about one conflict per candidate tuple (CDCL $0.97$--$1.02$
+per triple), so the best enumerate-and-root-find oracle beats every solver
+by $10^2$--$10^4$
+(\art{research/notes/index-calculus/RESEARCH_PDP_SAT_SMT_NAGAO_SURVEY.md}).
+The SAT pipeline decides all 11 satisfiable $n=19$, $\ell=6$ corpus
+instances in 17.8\,s; SMT runs at $0.44$--$2.63\times$ the native CDCL+XOR
+solver (\art{research/pdp_smt_oracle_20261008/}); WDSat solves $n=5$
+($47$ against $51{,}425$ conflicts with and without XOR-Gauss) and crashes
+at $n=9$ on a static allocation limit, where CryptoMiniSat takes
+0.4--2.6\,s (\art{research/wdsat_rr_20260920/}). The SAT route is closed
+as an exponent lead. Isogenous and random-$b$ neighbours give identical
+Macaulay ranks and FFD 3 (\art{research/pdp_isogeny_probe_20261008/}).
+
+\paragraph{The PDP oracle programme.} The point-decomposition speed-up
+programme (\art{research/pdp_oracle_speedup_20261011/}), run over
+$\FF_{2^{3\ell}}$, measured the oracle in steps before root finding replaced
+it: a baseline (PS-0; $338$--$452$\,ns per pair across five rungs, A/A
+spread $\le8.8\%$), a gate-count model of the group-law form (PS-1;
+$7{,}410$--$14{,}608$ fused ternary-logic issues against
+$70{,}695$--$190{,}275$, $9.5$--$13.0\times$), a scalar group-law kernel (PS-2;
+$29.8$--$40.8$\,ns per pair, $0.067$--$0.123$ of baseline, 400 corpus root
+sets agreeing), and a bit-sliced kernel ($50$--$62\times$ the baseline on two
+hosts, about equal to the scalar kernel). The root-finding oracle then ran
+$3{,}007$--$115{,}160\times$ the PS-0 baseline at $\ell=8$--$14$, at the generic
+floor's slope (\art{benchmarks/20261012-pdp-root-finder/}). A split/hybrid
+solving-degree study (Koblitz $b=1$) projected its closest relation phase at
+$22.8\times$ strong rho, $391\times$ signed-Frobenius rho
+(\art{research/pdp_split_dreg_20261011/}); with Frobenius closure the priced
+$S$ fell to $0.35$--$0.54$ of the standard base but the best arm stayed at
+$36\times$ strong rho at $n=11$ and $889\times$ at $n=19$
+(\art{research/pdp_split_slots_20261012/}). A shape-replay switch cost more
+on all 9 cells and stays off (\art{research/pdp_shape_replay_20261015/}).
+
+\paragraph{Norm and circuit searches at $n=83$.} The 17--19 October
+autolab cycles built a native norm predicate over GF$(2^{83})$: a cutoff-8
+circuit cuts AND gates $60.5\%$ and clauses $32.9\%$, an affine support limit
+of 2 cuts internal coordinates from $58{,}176$ to $45{,}427$, and 1{,}237 of
+1{,}800 positive-dimensional cells were certified empty. Every hard search
+returned \textsc{unknown} with zero verified witnesses, and a primary-source
+check found the hybrid ANF/CNF approach already established in Bosphorus,
+SMFF and PolyBoRi (\art{research/autolab_cycle_20261019_v1/},
+\art{research/autolab_cycle_20261019_v3/}). The companion draft
+\art{papers/norm-rootfinding/} reports the same: no measured speed-up.
+
+\paragraph{Toy end-to-end.} On toy fields the fastest index calculus, a
+cached Nagao arm, was $2.33\times$ plain rho, and $\Sem4$/$\Sem3$ with
+CryptoMiniSat $14.5$--$14.7\times$ (\art{research/toy_ic_e2e_candidates_20260922/}).
+Frobenius transport preserves zero and lift sets; a constant term $c$
+changes zero counts only; neighbouring curves show no consistent F5
+advantage; symmetry quotients help three summands ($0.26$--$0.31$ of the
+ordered cost) but not two ($1.06$--$1.32$)
+(\art{research/toy_binary_elimination_20260924/} and the toy cluster).
+
+\subsection{Leaderboard rows}
+
+Table~B of \art{docs/ic/LEADERBOARD.md} has five random-binary rows,
+$\FF_{2^{15}}$ to $\FF_{2^{27}}$ ($\log_2 r=14$--$24.4$), one target, $m=2$,
+folded pair table with walked targets: IC is $13.1$, $10.6$, $18$, $23$ and
+$38.2\times$ matched rho. All five passed the validation gate
+(commit \texttt{a8d8e3cd38}; \art{research/ic_validation_gate_20261024/}),
+which the ledger paper, written a day earlier, records as no row passing.
+The cofactor-projected base of LEAD-19 cuts three of these rows by
+$1.29$, $1.58$ and $3.36\times$ in cold $S$, leaving $6.1$--$14.4\times$ to
+matched rho (\art{research/lead19_projected_base/}); it is not yet a
+leaderboard row. The integer-multiple closure of 23 October cuts $S$
+$3$--$4\times$ against plain seeds at degree 26--28 and remains $6$--$12\times$
+the framework's rho reference (\S\ref{sec:ladder3}).
+
+\subsection{ECC2-131}
+
+The Certicom ECC2-131 target ($\log_2 r=130.0$, rho $2^{64.83}$ GAE with the
+negation map) has a cost model, gates and two falsifiers
+(\art{docs/ic/CERTICOM131_IC_PROGRAM.md}), all on toy instances. With a free
+oracle the $m=3$ floor is $2^{65.2}$--$2^{67.2}$, above rho from linear
+algebra alone; $m=4$ is the first usable arity and needs a solving degree of
+at most 3 (generous pricing) or 1 (plain). On random-$b$ curves at $m=3$,
+$n=5$--$11$, the measured degree is $D=4,5,6$ at $\ell=1,2,3$, equal to the
+semi-regular reference with zero spread over 60 draws, and equal to the
+Koblitz $b=1$ value on 52 of 52 paired draws; extrapolated to $n=131$ it is
+between about 6--7 (if it plateaus) and 39 (semi-regular). One CPU core walks
+ECC2-131 rho at 8.50 million steps per second with a batched pclmul walk, and
+11.46 million bit-sliced (\art{research/certicom131_rho_ic_bench_20261022/},
+\art{research/certicom131_rho_parity_20261023/}); a CUDA port compiles but
+has not run on a GPU. The bench's IC ladders on smaller random-binary
+curves read $11$--$24\times$ matched rho; it is not an admitted row.
+
+\paragraph{sect113r1.} The 113-bit SECG curve is weak by size alone
+($2^{56.33}$ generic work); its two degree-5 isogeny routes transfer the
+problem without an established speed-up, and the GHS and Semaev routes
+reached no conclusion (\art{research/sect113r1-weak-curve-20261006/}).

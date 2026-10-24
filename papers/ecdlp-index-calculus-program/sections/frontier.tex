@@ -180,14 +180,14 @@ Quotient-curve $m=2$ model & St & E & $1.34$--$1.64$ & five cells \\
 \multicolumn{5}{@{}l}{\emph{Factor bases and symmetry}}\\
 Compact orbit vs full orbit & Cold & E & $\le1.87$ & Koblitz $n=17$; compact is LB \\
 FGHR $D_4$ vs Gaudry $S_4$, $C_4$ & St & E & $47.5$--$48.4$ & $\FF_{269^4}$ \\
-\texttt{gaudry\_quartic} solve & St & E & $1.9$--$6.4$ & $d=4..6$ \\
+\texttt{gaudry\_quartic} solve & St & E & $1.96$--$6.08$ & $d=4..6$ (sweep recompute) \\
 \addlinespace
 \multicolumn{5}{@{}l}{\emph{One-target online}}\\
 Compact-orbit IC vs strong rho & On & E & $13.94$ & $n=61$; rho without a table; retired (\S\ref{sec:ladder}) \\
 \addlinespace
 \multicolumn{5}{@{}l}{\emph{Accounting (costs that went up when priced)}}\\
 F4 word XORs priced & Cold & A & $1/25.2$ & $16.75\to421.4$, K13 \\
-F6-IC batched geometry priced & Cold & A & $1/64.6$--$1/1{,}353$ & $m=13,19$ \\
+F6-IC batched geometry priced & Cold & A & $1/64.6$--$1/1{,}353$ & $m=13,19$; F4 unpriced (about $1/2.5$ priced) \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -438,8 +438,11 @@ one inversion, to $0.715\times$, with local exponent $1.356$ (fitted
 $1.368$ over $2^{16}$--$2^{22}$), $0.023$ above $4/3$. Chained with round
 three, the whole solve is about $0.44\times$ the second round's at
 $q=2^{22}$ (derived, in the inversion-charging unit). Rounds three and four
-ran no rho arm, so the last matched distance is still $1.15\times$ at
-$q=2^{20}$; and re-tuning $\kappa$ on training again steepened the schedule
+ran no rho arm; a 23 October study then measured round 4 against the
+strongest rho at $q=2^{14}$--$2^{20}$ and found it at parity within the
+pricing of one operation (geometric means $0.70$--$1.52$, below rho at
+$2^{16}$ only; \S
+ef{sec:transfer}). Re-tuning $\kappa$ on training again steepened the schedule
 and raised the exponent. A separate rebalance study measured IC at
 $0.16\times$ ($0.25\times$ renormalised) a rho on $\mathrm{Jac}(C)$ at
 $q=2^{14}$: that rho walks on the Jacobian (four walks per size, at
@@ -471,7 +474,8 @@ groups near $2^{291}$.
 \paragraph{Binary oracles and their floor.} The MITM pair-table oracle on a
 non-Koblitz curve reached $\ell=12$ over $\FF_{2^{37}}$
 ($2{,}474$--$4{,}244\times$ over pairs-and-solve at $\ell=9,10$;
-$928$--$2{,}187\times$ at $\ell=11,12$; 0 disagreements on 256 targets).
+$928$--$2{,}321\times$ at $\ell=11,12$, the last as recomputed by the
+validation sweep; 0 disagreements on 256 targets).
 Against that floor, no algebraic oracle (inherited F4, F6-IC, SAT, split
 $\Sem4$ hybrids, a wide chained $\Sem3$ solver) grows more slowly in $n$:
 the cheapest is $3\cdot10^2\times$ the floor at $n=13$ and $3.8\cdot10^4\times$
@@ -482,8 +486,11 @@ $r=2^{39}$. On the 33 SECG curves an $\Sem3$ solve over a small-$x$ base,
 with no table, is $52$--$280$ bits over rho.
 
 \paragraph{The reference moved again.} The strong signed-Frobenius rho of
-every Koblitz comparison now executes 718 instructions per walk step, down
-from 1{,}196 (three rounds, outputs identical; steps per ideal
+every Koblitz comparison executed 718 instructions per walk step after
+three rounds, down from 1{,}196; a fourth round of batched inversion took
+main from $707.2$ to $679.7$ Callgrind instructions per step at $n=53$, with
+no established native-time gain (outputs identical;
+\art{research/rho_batchinv_20261022/}; steps per ideal
 $0.92$--$0.99$ on 400 fixtures), and ecbench's standing
 \texttt{rho.signed\_frobenius\_strong} runs at $0.802\times$ its former
 instruction count with identical GAE. On hyperelliptic Jacobians the
@@ -515,9 +522,12 @@ path is stated, and until the method identity records it the root-finder
 rows rest on the recorded receipt. (iii) The equal-bytes preprocessing control at
 $n=73$ and $n=83$ is built and frozen but not run.
 \emph{Next improvement} (from the 18 October leads review): a large-memory
-host. The two exponent-level questions left---the Weil-descent cell
-$(m,\ell)=(4,6)$, about 70\,GB dense, and the PKM tower at $m=3$, $N=21$ to
-$m=4$, $N=20$, 256--512\,GB---are blocked on memory, not on instruments.
+host. The two exponent-level questions named then---the Weil-descent cell
+$(m,\ell)=(4,6)$ and the PKM tower at $m=3$, $N=21$---have since run on
+rented hosts: the $(4,6)$ cell refuted at degree 4 at $N=54$, and the PKM
+cell finished degree 7 and stopped on memory inside degree 8, implying
+$D\ge8$ but read as inconclusive (\S\S\ref{sec:binary-descent},\ref{sec:pkm}).
+The $(3,7)$, $\ell=8$ and $m=4$, $N=20$ cells remain.
 
 \subsection{The ladder continued, 21--24 October}\label{sec:ladder3}
 
@@ -690,8 +700,8 @@ Prime-field arms are $12$--$239\times$ rho and diverge with size (the
 30-bit Kummer-tower row of \S\ref{sec:ladder3} is $159\times$). Off the
 prime and prime-degree binary fields, three families are within a
 single-digit factor, all in weak classes: genus three after cubic GHS
-($1.15\times$ a measured rho at $q=2^{20}$, with $0.44\times$ of further
-improvement not yet matched against rho), $k=4$ over $\FF_{(2^m)^4}$
+(at parity with the strongest rho over $q=2^{14}$--$2^{20}$ to within the
+pricing of one operation, below it at $2^{16}$ only), $k=4$ over $\FF_{(2^m)^4}$
 ($4.3\times$ a measured rho at $n\approx2^{56}$, closing as $n^{-1/4}$), and
 the Joux--Vitse cover of $E(\FF_{p^6})$ ($1.59$--$1.98\times$ a pooled rho
 constant at $p=1009$, closing as about $p^{-2}$; a lower-bound comparison).
@@ -701,7 +711,8 @@ preprocessing rho. The admitted compact-orbit point at Koblitz $n=61$,
 $13.9\times$ $[9.8,19.1]$ over strong rho without a table (cold median
 $83.4\times$ rho), is $53$--$221\times$ slower online than preprocessing rho
 given equal or less advice (\S\ref{sec:ladder}), and the $n=83$ points
-lose every pair matched on set-up time or memory (\S\ref{sec:ladder2}).
+lose every pair run with rho given a table matched on set-up time or
+memory (\S\S\ref{sec:ladder2},\ref{sec:n83}).
 
 \paragraph{Stage.} Moved substantially: the decomposition oracle is two to
 five orders of magnitude cheaper than at the start of the programme on the
@@ -740,8 +751,8 @@ cold session at $n=83$ with every set-up phase and retained byte charged;
 three items have moved to the front: (vi) run $k=4$ over
 $\FF_{(2^m)^4}$ at $m=15$--$17$ against a measured negation-map rho, where
 the fitted trend predicts parity near $n\approx2^{68}$; (vii) measure the
-matched rho on $E_0(\FF_{q^3})$ in the genus-3 rounds' unit, so that the
-last two rounds' $0.44\times$ has a distance; (viii) obtain a
+matched rho on $E_0(\FF_{q^3})$ in the genus-3 rounds' unit (done on 23
+October: parity within one operation's pricing, \S\ref{sec:transfer}); (viii) obtain a
 large-memory host for the $(4,6)$ Weil-descent cell and the PKM tower.
 The 21--24 October work adds two more and re-weights one: (ix) measure rho
 on the Joux--Vitse cover family at $p\ge503$ (or a size where it can be run)

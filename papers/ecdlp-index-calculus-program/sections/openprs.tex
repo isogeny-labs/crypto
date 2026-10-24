@@ -1,0 +1,121 @@
+\section{Work in open pull requests}\label{sec:openprs}
+
+At the paper's date, 111 open pull requests in the repository concern elliptic-curve index calculus or its baselines. Their results are not on \texttt{main}, have not been reviewed here, and are not used anywhere in the paper; the titles below are quoted as their authors filed them and are claims, not findings. Two bear on the text: \#2359 reports a plane-quartic IC/rho of $0.024$, but the plane-quartic $S$ values on \texttt{main} are unverified because their degree-3 reduction merges distinct classes (\S\ref{sec:corrections}); and \#2324 records that a Joux--Vitse sieve replication failed its acceptance rule and withheld its decisions. As these merge, they are folded into the sections above and the catalogue under the same rules as everything else. Source: \art{papers/ecdlp-index-calculus-program/data/open_prs.tsv}.
+
+{\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}r l >{\raggedright\arraybackslash}p{0.78\linewidth}@{}}
+\toprule PR & Updated & Title as filed\\ \midrule \endhead
+\bottomrule \endfoot
+\href{https://github.com/aburan28/crypto/pull/2514}{\#2514} & 2026-10-24 & Record N83 Spot replay failure and AWS resume custody\\
+\href{https://github.com/aburan28/crypto/pull/2513}{\#2513} & 2026-10-24 & isoclass-rho: same-host repeat runs of P0 and K (data only)\\
+\href{https://github.com/aburan28/crypto/pull/2511}{\#2511} & 2026-10-24 & R6.1: direct S5 systems, chained-x ic oracle plug-in, discrepancy protocol\\
+\href{https://github.com/aburan28/crypto/pull/2509}{\#2509} & 2026-10-24 & Twist IC: polynomial zero-fiber collection with independent pair and rank audits\\
+\href{https://github.com/aburan28/crypto/pull/2505}{\#2505} & 2026-10-24 & Hyperelliptic IC rounds 13--15: the negation fold reaches its $\surd$2 on the full-width rho walk and becomes the reference\\
+\href{https://github.com/aburan28/crypto/pull/2504}{\#2504} & 2026-10-24 & isoclass-rho: 46-bit replica of the prime-field class (data, null result)\\
+\href{https://github.com/aburan28/crypto/pull/2503}{\#2503} & 2026-10-24 & Weil-descent closure A3 on the EKS high-memory runner, Spot-loss resume, and xmem runner pools\\
+\href{https://github.com/aburan28/crypto/pull/2502}{\#2502} & 2026-10-24 & R6.9 GHS phase two: isogeny walk cost and relation rate on binary Jacobians\\
+\href{https://github.com/aburan28/crypto/pull/2497}{\#2497} & 2026-10-24 & Audit a noisy local N83 five-base cold screen\\
+\href{https://github.com/aburan28/crypto/pull/2494}{\#2494} & 2026-10-24 & N83 summand sweep m=2..9 across factor bases and F4/\allowbreak{}F5/\allowbreak{}F6/\allowbreak{}SAT engines; fail-closed wide-field descent\\
+\href{https://github.com/aburan28/crypto/pull/2493}{\#2493} & 2026-10-24 & Algebraic IC ladder: linear two-summand S3 decomposition, slope 0.65 vs F4's 1.08, n up to 41\\
+\href{https://github.com/aburan28/crypto/pull/2490}{\#2490} & 2026-10-24 & Factor D18 shared root bits and audit the frozen N83 comparison\\
+\href{https://github.com/aburan28/crypto/pull/2489}{\#2489} & 2026-10-24 & Refresh index-calculus dashboard for current curve registry\\
+\href{https://github.com/aburan28/crypto/pull/2488}{\#2488} & 2026-10-24 & Run frozen N83 shared-binary panel on capacity-gated Spot runners\\
+\href{https://github.com/aburan28/crypto/pull/2479}{\#2479} & 2026-10-24 & curves: bind cover report and IC roster to a cover-catalog subset of the registry\\
+\href{https://github.com/aburan28/crypto/pull/2470}{\#2470} & 2026-10-24 & Record exploratory Certicom 131-bit rho and S3 stage benchmarks\\
+\href{https://github.com/aburan28/crypto/pull/2465}{\#2465} & 2026-10-23 & ecbench accounting: v2 method ids, automorphism-aware floor, scaled strong-rho reference\\
+\href{https://github.com/aburan28/crypto/pull/2462}{\#2462} & 2026-10-24 & rho.negation\_\allowbreak{}lanes (batched-inversion rho, 1.5--2.1$\times$ faster wall) and prime IC lane prefetch\\
+\href{https://github.com/aburan28/crypto/pull/2460}{\#2460} & 2026-10-24 & ecbench verify and db: tamper-evident, fail-closed audit and index\\
+\href{https://github.com/aburan28/crypto/pull/2441}{\#2441} & 2026-10-24 & ecbench compare: add --weight (unblocks prime-base-oracle-tuning card)\\
+\href{https://github.com/aburan28/crypto/pull/2437}{\#2437} & 2026-10-24 & Certify exact ECCp-131 structured bases and auxiliary tower\\
+\href{https://github.com/aburan28/crypto/pull/2433}{\#2433} & 2026-10-24 & ecbench: Cheon DLP-with-auxiliary-inputs methods with a counted static-DH oracle\\
+\href{https://github.com/aburan28/crypto/pull/2431}{\#2431} & 2026-10-23 & Round 2 identical-output speedups: Koblitz IC set-up 0.80--0.92$\times$, prime rho 0.90--0.95$\times$\\
+\href{https://github.com/aburan28/crypto/pull/2430}{\#2430} & 2026-10-24 & ECDLP across a large prime conductor gap on a deep 2-volcano: theorems, Lean, and a preregistered rho measurement\\
+\href{https://github.com/aburan28/crypto/pull/2429}{\#2429} & 2026-10-24 & ECC2K-130 descent: four guessed variables bring every $\ell$ = 8 draw back to degree 4\\
+\href{https://github.com/aburan28/crypto/pull/2427}{\#2427} & 2026-10-24 & IC orbit-layout and generator-orbit optimizations; n29 like-for-like crossing, validator band unresolved\\
+\href{https://github.com/aburan28/crypto/pull/2426}{\#2426} & 2026-10-24 & research(pkm): Kummer tower at P-224's Solinas 2-adic shape, priced against matched rho\\
+\href{https://github.com/aburan28/crypto/pull/2422}{\#2422} & 2026-10-24 & Measure Cheon's attack on P-224-shaped curves (7 sizes, both variants, matched rho)\\
+\href{https://github.com/aburan28/crypto/pull/2420}{\#2420} & 2026-10-24 & Stream isogeny class progress and resume SQLite snapshots from S3\\
+\href{https://github.com/aburan28/crypto/pull/2416}{\#2416} & 2026-10-24 & Resume icx runs at completed repeats from local and S3 state\\
+\href{https://github.com/aburan28/crypto/pull/2415}{\#2415} & 2026-10-24 & Stream icx progress and resume isogeny walks from local or S3 state\\
+\href{https://github.com/aburan28/crypto/pull/2407}{\#2407} & 2026-10-24 & ecbench: parse the curve registry once per process; allocate counter keys once\\
+\href{https://github.com/aburan28/crypto/pull/2384}{\#2384} & 2026-10-24 & research: native representation joins and verified IC row adapter\\
+\href{https://github.com/aburan28/crypto/pull/2383}{\#2383} & 2026-10-23 & Benchmark target-blind known-log recovery on arbitrary toy-curve targets\\
+\href{https://github.com/aburan28/crypto/pull/2381}{\#2381} & 2026-10-24 & Quadratic twists: prove relation-yield/\allowbreak{}rank transport and conditional IC cost bounds\\
+\href{https://github.com/aburan28/crypto/pull/2380}{\#2380} & 2026-10-24 & Verify twist gluing geometry and run matched IC relation controls\\
+\href{https://github.com/aburan28/crypto/pull/2375}{\#2375} & 2026-10-24 & Run the priced inversion and residue tests; one self-check policy for bitop/\allowbreak{}v1 (accounting)\\
+\href{https://github.com/aburan28/crypto/pull/2371}{\#2371} & 2026-10-24 & IC leaderboard rigor: recompute, reference-currency and replay checks, drift bisect, Table B validation\\
+\href{https://github.com/aburan28/crypto/pull/2370}{\#2370} & 2026-10-23 & Add archive IC symmetry options and verified useful rank\\
+\href{https://github.com/aburan28/crypto/pull/2369}{\#2369} & 2026-10-24 & Factor-base designs: Amendment 8, the m = 4 cells on the EKS high-memory runner (registered, ready to dispatch)\\
+\href{https://github.com/aburan28/crypto/pull/2368}{\#2368} & 2026-10-24 & Twist IC: complete 189+21 controls and independent zero-fiber rank audits\\
+\href{https://github.com/aburan28/crypto/pull/2366}{\#2366} & 2026-10-24 & Factor-base designs: retain m=4 runs and correct memory-limit attribution\\
+\href{https://github.com/aburan28/crypto/pull/2359}{\#2359} & 2026-10-24 & N4 iteration 2: double large primes cut the plane-quartic IC cost to 0.22-0.36 of the baseline (IC/\allowbreak{}rho 0.024 at q = 1,048,507, GHS-weak family)\\
+\href{https://github.com/aburan28/crypto/pull/2357}{\#2357} & 2026-10-24 & Repair Lean proof gates and refresh cover-transfer evidence\\
+\href{https://github.com/aburan28/crypto/pull/2356}{\#2356} & 2026-10-24 & Export exact ecbench plan documents and repair runner dependencies\\
+\href{https://github.com/aburan28/crypto/pull/2344}{\#2344} & 2026-10-24 & Tuned GAE unit (proposed) and a fast, step-efficient prime rho reference\\
+\href{https://github.com/aburan28/crypto/pull/2333}{\#2333} & 2026-10-23 & research: census of the NIST binary and prime-curve seed runs for skipped candidates; register the skipped m = 277 Koblitz curve\\
+\href{https://github.com/aburan28/crypto/pull/2332}{\#2332} & 2026-10-24 & volcano-rho: negation map by default; audit of every rho walk\\
+\href{https://github.com/aburan28/crypto/pull/2329}{\#2329} & 2026-10-24 & T21: wide producer arithmetic cuts (no 1.2x on the K=600 scan) and early-stop factorise (8 s per process start)\\
+\href{https://github.com/aburan28/crypto/pull/2324}{\#2324} & 2026-10-23 & JV sieve vs strong rho, replication V2: thresholds fixed before data; acceptance rule A4 failed, decisions withheld\\
+\href{https://github.com/aburan28/crypto/pull/2304}{\#2304} & 2026-10-24 & Publish genus-2 follow-up cohorts and review packet\\
+\href{https://github.com/aburan28/crypto/pull/2302}{\#2302} & 2026-10-23 & Plain S5 C4 re-measured with \#1792's solver options: 1.21e12 $\to$ 8.69e10 (13.9$\times$); cost.rs updated, no registry verdict changes\\
+\href{https://github.com/aburan28/crypto/pull/2297}{\#2297} & 2026-10-23 & Known-log factor base and E1 dry run (generator-effect study)\\
+\href{https://github.com/aburan28/crypto/pull/2286}{\#2286} & 2026-10-24 & R10: pinned IC baseline ledger per curve family and size; round claims re-rated against it\\
+\href{https://github.com/aburan28/crypto/pull/2282}{\#2282} & 2026-10-24 & N83 K1120: padd rank stage (cryptanalysis \#970 port) cuts cold time 12.5 s (10.4\%); paired panel vs matched rho\\
+\href{https://github.com/aburan28/crypto/pull/2275}{\#2275} & 2026-10-23 & H2 settled: genus-2 IC on glued h=1 instances does not beat negation rho in any of 12 price cells\\
+\href{https://github.com/aburan28/crypto/pull/2256}{\#2256} & 2026-10-23 & Track weighted Weil-restriction experiments on larger curves\\
+\href{https://github.com/aburan28/crypto/pull/2254}{\#2254} & 2026-10-24 & Explore small chart grafts with a native factor-base support census\\
+\href{https://github.com/aburan28/crypto/pull/2253}{\#2253} & 2026-10-23 & Sync IC semantic mirror and generated curve indexes\\
+\href{https://github.com/aburan28/crypto/pull/2250}{\#2250} & 2026-10-23 & Support ECC2-130/\allowbreak{}ECCp-130 solvers on CPU, CUDA and Metal\\
+\href{https://github.com/aburan28/crypto/pull/2246}{\#2246} & 2026-10-23 & Audit N83 factor-base gates and S3-custody finalist evidence\\
+\href{https://github.com/aburan28/crypto/pull/2231}{\#2231} & 2026-10-23 & Optimize Boolean F4/\allowbreak{}F5 construction and recursion; compare F6 and root solvers end to end\\
+\href{https://github.com/aburan28/crypto/pull/2229}{\#2229} & 2026-10-23 & Run fresh end-to-end checks of three ECDLP leads, including two 1,260-target genus cohorts\\
+\href{https://github.com/aburan28/crypto/pull/2227}{\#2227} & 2026-10-23 & W1: canonical Pic\textasciicircum{}0 arithmetic on smooth plane quartics\\
+\href{https://github.com/aburan28/crypto/pull/2224}{\#2224} & 2026-10-23 & jv\_\allowbreak{}cover: large-prime variation (L6 of \#2216) does not pay at p \textless{}= 12k\\
+\href{https://github.com/aburan28/crypto/pull/2223}{\#2223} & 2026-10-23 & ecbench: prime-field PKM tower oracle; tower F4, signature F5 and an F6 analogue on prime curves (preregistered round)\\
+\href{https://github.com/aburan28/crypto/pull/2215}{\#2215} & 2026-10-24 & Koblitz IC: integral recovery and proper source equations\\
+\href{https://github.com/aburan28/crypto/pull/2206}{\#2206} & 2026-10-24 & crypto volcano: native CLI, $\Phi$\_\allowbreak{}$\ell$(X,j$_0$) builder, tall-volcano sampler; level studies (generic rho equivalent across levels within $\pm$5\%)\\
+\href{https://github.com/aburan28/crypto/pull/2205}{\#2205} & 2026-10-23 & Conductor gap round 6: early-stopping F4 and the trace coset on every Koblitz curve\\
+\href{https://github.com/aburan28/crypto/pull/2204}{\#2204} & 2026-10-24 & Record bounded N83 K16627 m4 natural query and replayed controls\\
+\href{https://github.com/aburan28/crypto/pull/2202}{\#2202} & 2026-10-24 & Verify N83 K16627 m4 selector-only phase freedom\\
+\href{https://github.com/aburan28/crypto/pull/2192}{\#2192} & 2026-10-24 & R5.3: three-prime NTT for isogeny\_\allowbreak{}eval; $\surd$\'elu crossover re-measured\\
+\href{https://github.com/aburan28/crypto/pull/2191}{\#2191} & 2026-10-24 & IC: two orbit columns under the lazy oracle: cheaper on 1 of 5 curves, dearer on 4 (stacked on \#2158)\\
+\href{https://github.com/aburan28/crypto/pull/2187}{\#2187} & 2026-10-24 & papers: isogeny-class rho historical measurements, checked algebra and review limits\\
+\href{https://github.com/aburan28/crypto/pull/2186}{\#2186} & 2026-10-24 & isoclass-rho: whole-class Pollard rho study --- protocol, run records, report, benchmarks entry (null result)\\
+\href{https://github.com/aburan28/crypto/pull/2185}{\#2185} & 2026-10-23 & Conductor gap round 5: the cofactor penalty is self-inflicted (cleared base 0.28--0.71$\times$ the fiber-closed table; best cell 7.29$\times$ rho)\\
+\href{https://github.com/aburan28/crypto/pull/2182}{\#2182} & 2026-10-23 & The faster f4\_\allowbreak{}fp (\#1717) in the end-to-end Jacobian-cover index calculus: S 5.0$\times$ lower, same relations\\
+\href{https://github.com/aburan28/crypto/pull/2170}{\#2170} & 2026-10-24 & Weil descent and Weil restriction: Teske variants, the isogeny census, four measured angles, and round-4 follow-ups (genus-2 IC on prime-order E/\allowbreak{}F\_\allowbreak{}\{p$^2$\})\\
+\href{https://github.com/aburan28/crypto/pull/2168}{\#2168} & 2026-10-23 & ECDLP pass: exponent assessment, leads and their runs (L1--L5), ecbench report/\allowbreak{}sweep, comprehensive generic sweep\\
+\href{https://github.com/aburan28/crypto/pull/2167}{\#2167} & 2026-10-24 & Verify N83 K16627 m4 selector-pinned constructed relation\\
+\href{https://github.com/aburan28/crypto/pull/2166}{\#2166} & 2026-10-24 & N83 K16627 m4 post-root search progress and capped outcome\\
+\href{https://github.com/aburan28/crypto/pull/2165}{\#2165} & 2026-10-24 & N83 K16627 m4 root fixpoint and capped post-root search\\
+\href{https://github.com/aburan28/crypto/pull/2160}{\#2160} & 2026-10-24 & research: large-memory IC runs on a 124 GB host (PKM m=3 N=21; shape G1 frozen cells)\\
+\href{https://github.com/aburan28/crypto/pull/2159}{\#2159} & 2026-10-23 & dreg closure slope (undecided), L1 closed, eliminated-S4 oracle 5-6x at toy cells, Lean for Lemmas 1-2, L2 and K-233 rows\\
+\href{https://github.com/aburan28/crypto/pull/2158}{\#2158} & 2026-10-24 & IC: lazy orbit-member index in the Frobenius-folded pair table (1.12--1.44$\times$ cheaper, engineering)\\
+\href{https://github.com/aburan28/crypto/pull/2156}{\#2156} & 2026-10-23 & IC leads assessment with tracked follow-ups (T01--T17)\\
+\href{https://github.com/aburan28/crypto/pull/2155}{\#2155} & 2026-10-23 & Refresh the IC registers: G2 record, lit2026 statuses, benchmarks index, generic-bound column\\
+\href{https://github.com/aburan28/crypto/pull/2152}{\#2152} & 2026-10-24 & GLV-invariant IC, G2: k = 4 end to end (E19), the V4 line (E20--E24, 35--240$\times$ below D4) and GLS on the V4 line (E25)\\
+\href{https://github.com/aburan28/crypto/pull/2148}{\#2148} & 2026-10-23 & Run bounded controls for the 20-item ECDLP audit\\
+\href{https://github.com/aburan28/crypto/pull/2147}{\#2147} & 2026-10-24 & N83 K16627 m4 complete-witness phase control and capped result\\
+\href{https://github.com/aburan28/crypto/pull/2141}{\#2141} & 2026-10-24 & Blind-spot campaign: twenty frozen ECDLP index-calculus experiments\\
+\href{https://github.com/aburan28/crypto/pull/2140}{\#2140} & 2026-10-24 & N83 K=16,627 m=4 planted relation control and capped receipt\\
+\href{https://github.com/aburan28/crypto/pull/2138}{\#2138} & 2026-10-24 & Measure N83 K16627 retained-base m4 model capacity\\
+\href{https://github.com/aburan28/crypto/pull/2124}{\#2124} & 2026-10-24 & Construct and retain a 16,627-column N83 symmetric factor base\\
+\href{https://github.com/aburan28/crypto/pull/2121}{\#2121} & 2026-10-24 & N83 retained structured base: bounded m4 gate and m5 control\\
+\href{https://github.com/aburan28/crypto/pull/2119}{\#2119} & 2026-10-24 & Enable checked four-summand chained S3 for retained N83 bases\\
+\href{https://github.com/aburan28/crypto/pull/2106}{\#2106} & 2026-10-23 & Verify full selected-order C and deliver 7937-vertex volcano survey checkpoint\\
+\href{https://github.com/aburan28/crypto/pull/2103}{\#2103} & 2026-10-23 & Add backend frontiers with pinned reproduction contracts\\
+\href{https://github.com/aburan28/crypto/pull/2101}{\#2101} & 2026-10-23 & Extend Rust IC plug-ins and harden shared crypto primitives\\
+\href{https://github.com/aburan28/crypto/pull/2092}{\#2092} & 2026-10-24 & Screen N83 root11 30-bit indexed IDs through K5086\\
+\href{https://github.com/aburan28/crypto/pull/2084}{\#2084} & 2026-10-24 & Seal fresh N83 root11 fine-grid confirmation fixture\\
+\href{https://github.com/aburan28/crypto/pull/2036}{\#2036} & 2026-10-24 & N83: indexed XOR, validated arena reclamation and bounded native continuation\\
+\href{https://github.com/aburan28/crypto/pull/2035}{\#2035} & 2026-10-24 & Freeze N83 finalist holdout public points\\
+\href{https://github.com/aburan28/crypto/pull/2022}{\#2022} & 2026-10-24 & Screen N83 root22 against root11 at cold frontier\\
+\href{https://github.com/aburan28/crypto/pull/1978}{\#1978} & 2026-10-23 & ic programme R10--R12 and the rule at v6/\allowbreak{}v7: baselines v4--v8, 1.90--1.98$\times$ faster cold, distance to rho 3.43--11.51$\times$\\
+\href{https://github.com/aburan28/crypto/pull/1970}{\#1970} & 2026-10-23 & bitop/\allowbreak{}v1: one unit of work for every ECDLP method, solvers and linear algebra charged\\
+\href{https://github.com/aburan28/crypto/pull/1853}{\#1853} & 2026-10-24 & ecbench: ten IC questions and versioned orbit/\allowbreak{}shape follow-ups\\
+\href{https://github.com/aburan28/crypto/pull/1830}{\#1830} & 2026-10-24 & Construct binary genus-2 covers and add full-subgroup rho comparisons\\
+\href{https://github.com/aburan28/crypto/pull/1828}{\#1828} & 2026-10-23 & Measure matched degree-83 IC versus optimized rho and publish unified report\\
+\href{https://github.com/aburan28/crypto/pull/1790}{\#1790} & 2026-10-23 & Measure Koblitz six-sum extraction and end-to-end bottleneck against rho\\
+\href{https://github.com/aburan28/crypto/pull/1740}{\#1740} & 2026-10-23 & N53 fixed-base S3 root batching: nine verified one-target pairs\\
+\end{longtable}}
+

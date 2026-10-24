@@ -36,7 +36,9 @@ holes, all fixed with regression tests.
 headline ratios; all are \cls{engineering} with identical outputs.
 \begin{itemize}
 \item \emph{Inherited versus matrix F4}: matrix work $198.6\times$ (K13)
-  and $222.1\times$ (random-13) the inherited engine's on identical trees;
+  and $222.1\times$ (random-13) the inherited engine's on the same targets (the two can return
+  different decompositions, so their splitting trees may differ; only
+  matrix F4 and F5 share a tree by construction);
   at $m=19$ every matrix F4/F5 run timed out at 1{,}800\,s while
   inherited F4 finished in about 6\,s
   (\art{research/f4_f5_f6_cross_family_20261011/}).
@@ -44,10 +46,13 @@ headline ratios; all are \cls{engineering} with identical outputs.
   random-13), wall $0.79$--$0.86$.
 \item \emph{F6-IC versus inherited F4}: word XORs about $0.82$ at $m=13$
   and $0.77$--$0.78$ at $m=19$, relation wall $1.7$--$1.9\times$ faster.
-  But once its batched group additions are charged, F6-IC's $S$ is
+  But once its batched group additions are charged, F6-IC's $S$ was
   $64.6$--$68.8\times$ inherited F4's at $m=13$ and
   $1{,}303$--$1{,}353\times$ at $m=19$: an accounting loss, not a frontier
-  move. At $m=31$ both engines hit the 3{,}600\,s cap on the first target.
+  move. Those ratios used inherited F4 before its word XORs were priced
+  (\#1774); priced, at K13, F6-IC's $S$ is $1{,}572.1/634.12\approx2.5\times$
+  inherited F4's, still a loss, while the R13 and $m=19$ cells remain lower
+  bounds (\art{research/f4_pricing_jump_20261018/}). At $m=31$ both engines hit the 3{,}600\,s cap on the first target.
 \item \emph{Kernel routing and rewrite}: routing every echelon call to the
   Four-Russians kernel gave $1.75$--$3.22\times$ on the oracle's own
   Macaulay matrices; a word-level \texttt{pext}/\texttt{pdep} rewrite plan
@@ -70,7 +75,10 @@ headline ratios; all are \cls{engineering} with identical outputs.
   criteria, packed monomials, interned symbolic preprocessing and a
   parallel symbolic pass made \texttt{f4\_fp} $29.8$--$54.1\times$ faster
   than its predecessor on square generic systems, with msolve/ours at
-  $0.96$--$1.22$ single-threaded. A day earlier msolve had been
+  $0.96$--$1.22$ single-threaded; a later blocked pair reduction made ours
+  $0.75$--$0.78\times$ msolve's time on the two largest square systems but
+  $1.11$--$1.49\times$ on four others
+  (\art{research/f4_fp_blocked_pairs_20261016/}). A day earlier msolve had been
   $12$--$24\times$ faster (\art{research/gb_cas_comparison_20261011/});
   every reduced basis agrees with Singular or msolve. On Boolean
   decomposition systems ($n=17$, 8 targets) our oracle decides in
