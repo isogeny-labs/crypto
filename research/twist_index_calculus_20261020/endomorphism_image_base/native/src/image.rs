@@ -8,6 +8,8 @@ pub(super) mod cold;
 pub(super) mod cold_catalog;
 #[path = "external.rs"]
 pub(super) mod external;
+#[path = "joint.rs"]
+pub(super) mod joint;
 #[path = "report.rs"]
 pub(super) mod report;
 type Terms = Vec<(usize, i8)>;
