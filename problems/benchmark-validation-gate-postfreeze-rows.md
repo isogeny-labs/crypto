@@ -12,6 +12,12 @@ At crypto `main` `5cb553810e5bbfbd8691ec614ffcaacefc625757`, 25 post-freeze benc
 
 The exact branch now passes `python3 scripts/validation_gate.py check --base 5cb553810e5bbfbd8691ec614ffcaacefc625757` and the 49 `scripts/test_validation_gate.py` cases. The gate was not weakened, the pre-gate freeze was not enlarged, and admitted measurements were not changed. This restores the admission invariant while leaving the scientific evidence backlog visible.
 
+The scope of this repair is the **post-freeze admission defect**. On the exact
+tree, only 5 of 121 admitted benchmark rows are independently validated; 116
+are allowed solely by their frozen pre-gate digests. The IC leaderboard has
+19 independently validated rows and 9 frozen pre-gate rows. Those 125 frozen
+rows are a separate validation sweep, not proof-complete results.
+
 ## Evidence and limits
 
 - **Observed:** The gate has zero leaderboard, benchmark, and archive errors after the exact archival dispositions. [ARCHIVE.json](../benchmarks/ARCHIVE.json) preserves each of the 21 old row strings and its digest. The [archive index](../benchmarks/ARCHIVE.md) links the retained study records.
@@ -20,6 +26,7 @@ The exact branch now passes `python3 scripts/validation_gate.py check --base 5cb
 - **Derived or proved:** The admission gate and exact archival correspondence now hold for this branch. This does not prove the archived numeric claims or a general algorithmic speedup.
 - **Missing capability:** Each of the 21 archived rows still needs row-specific independent scalar/output replay where applicable, headline recomputation from retained raw records, and a protocol-matched strongest-rho reference in the same unit before it can return to the admitted table.
 - **What this evidence does not establish:** An archived row is not an invalid experiment. It is a historical observation with insufficient evidence for the repository's current result-admission rule. Lean proofs can cover mathematical lemmas and bounded executable contracts; they do not prove empirical timings.
+- **What remains:** The 116 benchmark and 9 leaderboard rows marked `unvalidated (pre-gate)` still require independent evidence or a review verdict before anyone can claim all historical results are validated.
 
 ## Re-admission conditions
 

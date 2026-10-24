@@ -24,7 +24,11 @@ digests, source paths, and graphs retained. Two earlier archive overlaps are
 resolved as well. Three other rows (`strong-rho-batchinv`,
 `volcano-ecdlp-census`, and `isogeny-volcano-cost-v2`) already had valid
 SHA-bound evidence on main; a partial checkout initially hid their manifests
-and raw files from the gate. See the [benchmark gate problem record](../problems/benchmark-validation-gate-postfreeze-rows.md)
+and raw files from the gate. Of the 121 admitted rows on this exact tree,
+5 are independently validated and 116 retain the permitted **unvalidated
+(pre-gate)** status. A passing gate enforces admission history; it is not a
+verdict that every historical measurement is verified. See the
+[benchmark gate problem record](../problems/benchmark-validation-gate-postfreeze-rows.md)
 for remaining independent validation work. `scripts/validation_gate.py check`
 is the machine admission test.
 
