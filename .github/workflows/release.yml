@@ -318,7 +318,8 @@ jobs:
           - {target: aarch64-apple-darwin,      os: macos-latest}
           - {target: x86_64-pc-windows-msvc,    os: windows-latest}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 30 }}
+    # Windows compiles both native and software-hash targets before the installed CLI checks.
+    timeout-minutes: ${{ matrix.os == 'windows-latest' && 45 || ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 50) }}
     steps:
       # Keep Cargo output outside the package tree while it is fingerprinted.
       # `runner.temp` is not available in job-level `env`, so set it per job.
@@ -492,7 +493,8 @@ jobs:
             "klpt --p 1152921504606847067 --norm 1000003" \
             "richelot --p 211 --roots 1,2,3,4,5,6 --lc 3" \
             "modpoly --ell 5 --p 10007 --j 1234"; do
-            "$B" $args > family.json
+            read -r -a family_args <<< "$args"
+            "$B" "${family_args[@]}" > family.json
             grep -Fq '"status":"PASS"' family.json || { echo "FAILED: $args"; cat family.json; exit 1; }
           done
       - name: Stage the archive
