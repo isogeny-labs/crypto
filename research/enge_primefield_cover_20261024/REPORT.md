@@ -195,6 +195,8 @@ by Lean** until a clean `lake build` and axiom audit complete.
   [diagram](cover_projection.svg), and [graph data](relation_counts.csv).
 - [Norm product certificate](target_norm_identity.certificate.json) and its
   [native issuer/replayer](src/bin/issue_cover_identity.rs).
+- [Validation record](validation/VALIDATION.md), including the root-suite
+  failures from a shared sparse checkout and focused replays.
 
 ```sh
 cargo test --release --offline --manifest-path research/enge_primefield_cover_20261024/Cargo.toml
