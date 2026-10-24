@@ -12,7 +12,7 @@
 # Thin git orchestration only, per AGENTS.md ("Implementation language").
 set -euo pipefail
 
-MAX=${LARGE_FILE_MAX:-5000000}
+MAX=${LARGE_FILE_MAX:-10485760}
 ALLOW=.github/large-files-allowed.txt
 base_ref=${1:-origin/main}
 head_ref=${2:-HEAD}
@@ -59,6 +59,9 @@ if [ -f "$ALLOW" ]; then
 fi
 
 allowed() {
+  case "$1" in
+    docs/browser/data.json|docs/curves/*.json) return 0 ;;
+  esac
   local p
   for p in ${patterns[@]+"${patterns[@]}"}; do
     # shellcheck disable=SC2053  # the pattern is a glob on purpose

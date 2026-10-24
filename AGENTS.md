@@ -7,6 +7,12 @@
   on a feature branch. If the branch already has an open PR, extend that
   PR and update its title and description to match the new scope instead of
   opening a second one. Do not leave finished work uncommitted.
+- **Use regular PRs.** Create pull requests with `draft=false` and mark an
+  existing draft ready for review when you update it. Record pending CI,
+  review, and follow-up work in the PR description; draft status is not a
+  holding queue. Ready for review invites review; it does not authorize a
+  merge. All validation, evidence, review, and merge gates below still apply.
+  Use a draft only when the user explicitly asks for one.
 - **Verify before pushing:** run `cargo test --release --lib`, the touched
   examples' tests, and the relevant Python suites (for example
   `research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py`)
@@ -124,8 +130,9 @@ commands, and interpretation limits.
   `*.jsonl`, logs and CSVs by key or range (`jq`, `rg`), never whole; a
   session is read through its audit, replay or claim JSON.
 - **Paths, not contents,** in handoffs and subagent prompts.
-- **Off disk is not absent.** In a sparse checkout (`docs/sparse-checkout.md`)
-  a path `git ls-files` lists is materialized with
+- **Off disk is not absent.** Cloud sessions start in the sparse `harness`
+  profile, without the 18 largest `research/` archives. In a sparse checkout
+  (`docs/sparse-checkout.md`) a path `git ls-files` lists is materialized with
   `scripts/sparse-checkout.sh add --path`, never reported missing.
 
 # AGENTS.md
@@ -470,10 +477,10 @@ separate small-model automation did the CI work and the merge.
 commits, pushes, and opens the PR (or updates the existing one). It then
 follows the PR until it lands, under the check-in and merge rules below.
 
-- **Open every PR ready for review, never as a draft**, whatever a tool or
-  runtime defaults to, and mark an existing draft ready when you update it,
-  so reviews and checks that skip drafts (`llm-review`) run from the first
-  push. Open a draft only when the user asks for one in that task.
+- **Open every PR ready for review (`draft=false`)**, whatever a tool or
+  runtime defaults to. Before ending an update to an existing draft, mark it
+  ready so reviews and checks that skip drafts (`llm-review`) can run. An
+  explicit user request to keep a particular PR in draft is the only exception.
 - Review the final diff and confirm that the requested scope, relevant tests,
   evidence, and documentation are complete before opening the PR. Passing CI
   does not substitute for checking that the work is finished.
@@ -1252,14 +1259,6 @@ Historical autolab, tournament and ICMS evidence keeps its own protocols.
 
 ### 13. Large files go through the store
 
-"Too big for Git" means over 5 MB (5,000,000 bytes). The `large-files` CI
-check (`scripts/check-large-files.sh`) fails a PR that adds or rewrites a
-larger file whose path `.github/large-files-allowed.txt` does not name; that
-list holds files the repository regenerates or compiles in (catalogs,
-fixtures), never raw evidence, and an entry is added only in a reviewed PR.
-Every clone downloads every file at HEAD, so each byte committed is paid again
-by every session and CI job.
-
 A factor base, relation table or raw evidence file too big for Git is pushed
 with `crypto store push` (or `ecbench store push`) and referred to by name,
 not by a local path or a one-off bucket URL: `store:<name>`, accepted
@@ -1271,6 +1270,16 @@ entry in the PR that lands the result. Objects are immutable and keyed by
 SHA-256; a name is not repointed without `--replace`, which keeps the old
 digest as superseded. Never delete remote objects from an agent session.
 See [docs/store/README.md](docs/store/README.md).
+
+"Too big for Git" means over 10 MiB (owner, 2026-10-22): every blob committed
+stays in every future clone. The `large-files` workflow
+(`scripts/check-large-files.sh`) fails a PR that adds or modifies such a file,
+except generated text that git delta-compresses well (`docs/browser/data.json`,
+`docs/curves/*.json`) and the reviewed paths in
+`.github/large-files-allowed.txt`. A PR that must commit another one anyway
+carries the `large-file-ok` label, added by the owner or a reviewer. Do not
+pre-compress text files to get under the limit: compressed blobs do not delta,
+so each revision costs its full size again.
 
 ### 13a. Raw run trees land as one archive
 
