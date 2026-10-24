@@ -111,6 +111,12 @@ baseline. Every such improvement is a success and is reported as one.**
 
 ## Pointers
 
+- **Shared conventions with `crypto-autoresearcher`, `cryptanalysis` and
+  `crypto-lean`:** object storage (one bucket, `setec-astronomy-artifacts`,
+  region `us-east-2`), the validation vocabulary, curve identity, the skill
+  surface and the shared-code parity list are stated once in
+  `crypto-autoresearcher:docs/lab-contract.md`. That file wins on a shared
+  convention; this file wins on anything specific to this repository.
 - **What has already been tried against ECDLP, here and in the sibling
   repositories:** the lead atlas in aburan28/crypto-autoresearcher,
   `knowledge/leads/ecdlp/` (`python3 tools/lead_atlas.py --brief`, printed by
