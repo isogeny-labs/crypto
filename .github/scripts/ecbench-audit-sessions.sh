@@ -8,7 +8,15 @@
 # exits 1. Frozen scratch sessions without spec/host capsules are listed by
 # hash and reported as incomplete evidence, never counted as audited passes.
 # Usage: ecbench-audit-sessions.sh LIST [ECBENCH] [INCOMPLETE_TSV]
+# AUDIT_SHARD=K/N audits only every N-th session from the K-th (0-based), so N
+# jobs together audit the whole list; the incomplete-session pins are still
+# checked against the whole list in every shard.
 set -euo pipefail
+shard=${AUDIT_SHARD:-0/1}
+shard_k=${shard%/*}; shard_n=${shard#*/}
+if [[ ! "$shard_k" =~ ^[0-9]+$ || ! "$shard_n" =~ ^[1-9][0-9]*$ || "$shard_k" -ge "$shard_n" ]]; then
+  echo "::error::AUDIT_SHARD must be K/N with 0 <= K < N, got $shard" >&2; exit 1
+fi
 list=${1:?usage: ecbench-audit-sessions.sh LIST [ECBENCH] [INCOMPLETE_TSV]}
 ecbench=${2:-./target/release/ecbench}
 incomplete=${3:-docs/ecbench/INCOMPLETE_SESSIONS.tsv}
@@ -43,14 +51,18 @@ done < "$incomplete"
 audit_list=$(mktemp)
 audited=0
 incomplete_count=0
+index=0
 while IFS= read -r dir; do
   if grep -Fxq "$dir" "$excluded_list"; then
     printf '%s\n' "$dir" >> "$matched_list"
     incomplete_count=$((incomplete_count + 1))
     echo "::warning::$dir is hash-pinned incomplete scratch evidence (spec.json and host.json absent)" >&2
   else
-    printf '%s\0' "$dir" >> "$audit_list"
-    audited=$((audited + 1))
+    if (( index % shard_n == shard_k )); then
+      printf '%s\0' "$dir" >> "$audit_list"
+      audited=$((audited + 1))
+    fi
+    index=$((index + 1))
   fi
 done < "$list"
 if ! cmp -s <(sort "$excluded_list") <(sort "$matched_list"); then
@@ -90,4 +102,4 @@ if [ -s "$failed" ]; then
   exit 1
 fi
 rm -f "$failed"
-echo "$audited committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); $incomplete_count hash-pinned scratch sessions remain incomplete"
+echo "shard $shard: $audited of $index committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); $incomplete_count hash-pinned scratch sessions remain incomplete"
