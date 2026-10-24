@@ -175,6 +175,7 @@ jobs:
         with:
           # Phase-B custody checks the bound Phase-A revision is an ancestor.
           fetch-depth: 0
+          filter: blob:none
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Build frozen executables

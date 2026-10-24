@@ -1274,6 +1274,15 @@ Historical autolab, tournament and ICMS evidence keeps its own protocols.
 
 ### 13. Large files go through the store
 
+Data files follow the artifact-store policy (owner, 2026-10-24): any non-code
+file over 1 MiB, and any data-suffixed file (`.jsonl`, `.gz`, `.npy`, logs,
+archives) over 64 KiB, lives in `s3://setec-astronomy-artifacts` with a
+`.artifacts.json` manifest in its directory, moved with `tools/artifacts`
+(`artifacts.py push`, `pull`, `status`, `verify`) instead of `git add`. See
+[docs/artifacts.md](docs/artifacts.md). The rest of this section describes
+`crypto store`, which stays for named single-file references (`store:NAME`);
+both share one object layout and cache.
+
 A factor base, relation table or raw evidence file too big for Git is pushed
 with `crypto store push` (or `ecbench store push`) and referred to by name,
 not by a local path or a one-off bucket URL: `store:<name>`, accepted
@@ -1286,7 +1295,9 @@ SHA-256; a name is not repointed without `--replace`, which keeps the old
 digest as superseded. Never delete remote objects from an agent session.
 See [docs/store/README.md](docs/store/README.md).
 
-"Too big for Git" means over 10 MiB (owner, 2026-10-22): every blob committed
+"Too big for Git" means over 10 MiB (owner, 2026-10-22); for data files the
+thresholds above now apply first, and the 10 MiB limit still covers anything the
+artifact policy does not select. Every blob committed
 stays in every future clone. The `large-files` workflow
 (`scripts/check-large-files.sh`) fails a PR that adds or modifies such a file,
 except generated text that git delta-compresses well (`docs/browser/data.json`,
@@ -1323,9 +1334,12 @@ manifest or verifier names individual run records by repository path (the
 records stay committed as loose files. Only the part nothing names goes in the
 archive; say in the README which part is which.
 
-This applies to new run trees. Never re-pack, compress or move a committed
-tree, or rewrite history to slim one: committed evidence stays as it was
-written. A tree too big for Git even compressed goes through the store (§13).
+This applies to new run trees. Never re-pack or compress a committed tree, or
+rewrite history to slim one: committed evidence stays as it was written. The
+one exception (owner, 2026-10-24): data files move out of Git to
+`s3://setec-astronomy-artifacts` ([docs/artifacts.md](docs/artifacts.md)); a
+moved file keeps its path and bytes (checked by hash) and history is not
+rewritten. A tree too big for Git even compressed goes through the store (§13).
 Checkouts that do not need a research tree leave it off disk instead
 ([docs/sparse-checkout.md](docs/sparse-checkout.md)).
 
