@@ -482,9 +482,9 @@ check(
   "graph model hashes are not a unique exact copy of the registry model hashes",
 );
 
-check(representationCount === 978, "unexpected EC1 representation count");
-check(ec1Aliases.size === 978, "unexpected unique EC1 count");
-check(curveUids.size === 978, "unexpected unique curve-UID count");
+check(representationCount === 979, "unexpected EC1 representation count");
+check(ec1Aliases.size === 979, "unexpected unique EC1 count");
+check(curveUids.size === 979, "unexpected unique curve-UID count");
 check(
   mapReferenceCounts.size === 15791 && [...mapReferenceCounts.values()].every((count) => count === 1),
   "CV1 references are not bijective with curve nodes",
@@ -795,7 +795,7 @@ check(
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "93b87bbcc3eb774bc937b535ed34898f466d05e7";
+const expectedCatalogCommit = "728304718cb0ab6df70da620a908a5f76f175293";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -1022,9 +1022,9 @@ const expectedControlStatuses = {
 };
 const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
-  result_templates: "36b35108fb48f0575d6d16052ac22b746869931446eb7bcc4586839441eee0dd",
+  result_templates: "5470ecac7ef17b749fae984a64d979c59c91cdb3e8fdbbddba6031d6fa6e956e",
   profiles: "807800e78066e8c3b0caa6634072a585cf4ae924a40b13817d9ca7a3c0aa3710",
-  controls: "04ece706cd6b2546e6f4d3b41db129adcc079c6dfdc7103af58aeac415de0f7c",
+  controls: "73b73e3b963c82264d942170e20186c1f9f78ffa6ef556e7eca4299e90998055",
   open_obligations: "dffb0831f47c54218afaf9e9d81a54b117bd8017db4014400d56986d61f3c5a7",
   global_cost_accounting:
     "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",
@@ -1833,7 +1833,7 @@ const expectedPredicateCounts = {
   odd_prime_quadratic_direct_same_field: 14272,
   odd_prime_quadratic_normalized_same_field: 30,
   odd_extension_quadratic_direct_same_field: 1324,
-  linked_subgroup_degree3: 141,
+  linked_subgroup_degree3: 142,
   linked_subgroup_degree2: 837,
 };
 const actualPredicateCounts = {};
@@ -2177,7 +2177,7 @@ check(
 );
 check(coverage.assessed_maps === 15791 && coverage.unassessed_maps === 0, "map coverage is incomplete");
 check(
-  coverage.assessed_subgroups === 978 && coverage.unassessed_subgroups === 0,
+  coverage.assessed_subgroups === 979 && coverage.unassessed_subgroups === 0,
   "subgroup coverage is incomplete",
 );
 
