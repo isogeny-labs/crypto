@@ -319,7 +319,13 @@ finish() {
     $FINISHED && return
     FINISHED=true
     [ -n "${LOG_PID:-}" ] && kill "$LOG_PID" 2>/dev/null
-    [ -n "${SPOT_PID:-}" ] && kill "$SPOT_PID" 2>/dev/null
+    if [ -f "$W/spot-interrupt" ] && [ -n "${SPOT_PID:-}" ]; then
+        # The monitor gives the command time to finish its SIGTERM checkpoint
+        # and uploads it. Do not terminate that monitor when the wrapper exits.
+        wait "$SPOT_PID" 2>/dev/null || true
+    elif [ -n "${SPOT_PID:-}" ]; then
+        kill "$SPOT_PID" 2>/dev/null || true
+    fi
     if [ -z "$FINAL" ]; then
         FINAL=error FINAL_REASON="runner exited during $PHASE"
         # `ephemeral kill` already recorded why the instance is going away.
@@ -359,7 +365,14 @@ if [ "$LIFECYCLE" = spot ]; then
     (
         while sleep 5; do
             if imds spot/instance-action >/dev/null; then
-                say "spot interruption notice: uploading what exists"
+                say "spot interruption notice: asking the command to checkpoint"
+                : >"$W/spot-interrupt"
+                if [ -s "$W/command.pid" ]; then
+                    kill -TERM -- "-$(cat "$W/command.pid")" 2>/dev/null || true
+                fi
+                # Leave time for the command's SIGTERM handler to publish its
+                # checkpoint into EPHEMERAL_OUT before copying it to S3.
+                sleep 60
                 say "phase: interrupted (spot reclaim)"
                 push_outputs
                 push_log
@@ -389,12 +402,20 @@ aws s3 cp --only-show-errors "$S3/job.json" "$W/job.json" || fail "no job.json"
 status setup
 # rpm -q is instant; dnf spends ~15 s on metadata even when nothing is missing.
 missing=()
-for p in git jq tar gzip zstd time; do rpm -q "$p" >/dev/null 2>&1 || missing+=("$p"); done
+for p in git jq tar gzip zstd time util-linux; do rpm -q "$p" >/dev/null 2>&1 || missing+=("$p"); done
 if [ ${#missing[@]} -gt 0 ]; then
     dnf install -y -q "${missing[@]}" >/dev/null || fail "dnf install failed"
 fi
 
 job() { jq -r "$1" "$W/job.json"; }
+RESUME_JOB=$(job '.resume_job // empty')
+if [ -n "$RESUME_JOB" ]; then
+    [[ $RESUME_JOB =~ ^[A-Za-z0-9._-]+$ ]] || fail "bad resume job id"
+    mkdir -p "$W/resume"
+    aws s3 sync --only-show-errors "s3://$EPHEMERAL_BUCKET/jobs/$RESUME_JOB/out/" "$W/resume/" \
+        || fail "resume outputs unavailable for $RESUME_JOB"
+    say "restored outputs from $RESUME_JOB"
+fi
 KEEP=$(job '.keep // false')
 TOOLCHAIN=$(job '.toolchain // "rust"')
 # A baked image (ephemeral bake) records the preset it already contains.
@@ -484,14 +505,19 @@ if [ "$TOOLCHAIN" = rust ] && [ "$(job 'if .cache == false then "off" else "on" 
     cache_restore
 fi
 
+export EPHEMERAL_JOB_ID=$EPHEMERAL_JOB EPHEMERAL_OUT=$OUT EPHEMERAL_SRC=$SRC
+export EPHEMERAL_RESUME_DIR=${RESUME_JOB:+$W/resume}
 SETUP=$(job '.setup // ""')
 if [ -n "$SETUP" ]; then
     say "setup: $SETUP"
     (cd "$WORKDIR" && bash -c "$SETUP") || fail "setup command failed"
 fi
+if [ -f "$W/spot-interrupt" ]; then
+    FINAL=interrupted FINAL_REASON="spot reclaim during setup"
+    exit 0
+fi
 
 # ---- run ------------------------------------------------------------------
-export EPHEMERAL_JOB_ID=$EPHEMERAL_JOB EPHEMERAL_OUT=$OUT EPHEMERAL_SRC=$SRC
 set -a
 # shellcheck disable=SC1091
 . "$W/env"
@@ -502,8 +528,14 @@ BUDGET=$((EPHEMERAL_DEADLINE - $(date +%s) - 600))
 [ "$BUDGET" -gt 60 ] || fail "no time left before the deadline"
 status running "$(job '.command_display')"
 cd "$WORKDIR" || exit 1
-/usr/bin/time -v -o "$W/rusage.txt" \
-    timeout --signal=TERM --kill-after=60 "$BUDGET" bash "$W/cmd.sh"
+# Keep time outside the command session. Record the timeout session's own
+# group, so Spot signals reach the app and timeout can still stop descendants.
+/usr/bin/time -v -o "$W/rusage.txt" setsid bash -c \
+    'printf "%s\n" "$$" > "$1"; shift; exec "$@"' \
+    ephemeral-command "$W/command.pid" \
+    timeout --signal=TERM --kill-after=60 "$BUDGET" bash "$W/cmd.sh" &
+CMD_PID=$!
+wait "$CMD_PID"
 EXIT_CODE=$?
 say "command exited $EXIT_CODE"
 
@@ -529,4 +561,7 @@ case $EXIT_CODE in
 124 | 137) FINAL=timeout FINAL_REASON="stopped ${BUDGET}s after start to leave upload time" ;;
 *) FINAL=failed FINAL_REASON="exit $EXIT_CODE" ;;
 esac
+if [ -f "$W/spot-interrupt" ]; then
+    FINAL=interrupted FINAL_REASON="spot reclaim; resume from this job's outputs"
+fi
 exit 0
