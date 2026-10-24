@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Reconcile all terminal external outputs using the already frozen v3 verifier.
-# Reuse earlier audit receipts; never repeat msolve or a relation oracle.
+# Reuse successful AND failed terminal audits; never repeat unchanged work.
 set -euo pipefail
 joint_repo=$(git rev-parse --show-toplevel)
 joint_study="$joint_repo/research/twist_index_calculus_20261020/joint_image_elimination"
@@ -32,25 +32,43 @@ while IFS= read -r joint_id; do
   joint_case="$joint_external/systems/$joint_id"
   joint_status=missing-terminal-receipt
   joint_rc=null
+  joint_native_rc=null
   if test -f "$joint_case/exit"; then
     joint_rc=$(cat "$joint_case/exit")
     joint_status=external-process-incomplete-or-failed
     if test "$joint_rc" = 0 && test -s "$joint_case/basis.txt"; then
       joint_basis_sha=$(sha256sum "$joint_case/basis.txt" | cut -d ' ' -f 1)
       read -r joint_system_sha joint_system < "$joint_case/inputs.sha256"
+      case "$joint_id" in
+        double-l0-active-*) joint_ref=/home/ec2-user/.cache/ephemeral/runs/20261023-052011-twist-image-doubling-e8f20f/out/reference-first/p37-seed0/double-l0-active.json ;;
+        phi-l0-active-*) joint_ref=/home/ec2-user/.cache/ephemeral/runs/20261023-041850-twist-image-nine-ref-0cbad7/out/reference-first/p37-seed0/phi-l0-active.json ;;
+        l0-peel-*) joint_ref=/home/ec2-user/.cache/ephemeral/runs/20261023-041850-twist-image-nine-ref-0cbad7/out/reference-first/p37-seed0/l0-peel.json ;;
+        *) exit 3 ;;
+      esac
       joint_prior_summary="$joint_prior/audits/$joint_id/summary.json"
       if test -f "$joint_prior_summary"; then
         # Bind reused physical-set evidence to the same exact basis and input.
         jq -e --arg basis "$joint_basis_sha" --arg input "$joint_system_sha" '.basis_sha256==$basis and .system_sha256==$input' "$joint_prior_summary" > /dev/null
         cp "$joint_prior_summary" "$joint_out/inventory/$joint_id.native-summary.json"
         joint_status=reused-native-audit
+        test -f "$joint_prior/metadata/$joint_id.exit"
+        joint_native_rc=$(cat "$joint_prior/metadata/$joint_id.exit")
+      elif test -f "$joint_prior/metadata/$joint_id.exit"; then
+        # A completed timeout/failure is a terminal result even without a
+        # summary. Bind the exact public/system/basis and frozen executable
+        # to its original argv, including the original output location.
+        joint_prior_command=(prlimit --as=8589934592 -- timeout --kill-after=10s 1200s "$joint_prior/runner" --joint-external-audit "$joint_public" "$joint_public_sha" "$joint_system" "$joint_system_sha" "$joint_case/basis.txt" "$joint_basis_sha" "$joint_ref" "$joint_prior/audits/$joint_id")
+        test -f "$joint_prior/metadata/$joint_id.command.txt"
+        cmp <(printf '%q ' "${joint_prior_command[@]}") "$joint_prior/metadata/$joint_id.command.txt"
+        joint_native_rc=$(cat "$joint_prior/metadata/$joint_id.exit")
+        cp "$joint_prior/metadata/$joint_id.command.txt" "$joint_out/inventory/$joint_id.prior-command.txt"
+        cp "$joint_prior/metadata/$joint_id.exit" "$joint_out/inventory/$joint_id.prior-exit"
+        if test "$joint_native_rc" = 0; then
+          joint_status=reused-native-exit-zero-without-summary
+        else
+          joint_status=reused-native-terminal-failure
+        fi
       else
-        case "$joint_id" in
-          double-l0-active-*) joint_ref=/home/ec2-user/.cache/ephemeral/runs/20261023-052011-twist-image-doubling-e8f20f/out/reference-first/p37-seed0/double-l0-active.json ;;
-          phi-l0-active-*) joint_ref=/home/ec2-user/.cache/ephemeral/runs/20261023-041850-twist-image-nine-ref-0cbad7/out/reference-first/p37-seed0/phi-l0-active.json ;;
-          l0-peel-*) joint_ref=/home/ec2-user/.cache/ephemeral/runs/20261023-041850-twist-image-nine-ref-0cbad7/out/reference-first/p37-seed0/l0-peel.json ;;
-          *) exit 3 ;;
-        esac
         joint_command=(prlimit --as=8589934592 -- timeout --kill-after=10s 1200s "$joint_prior/runner" --joint-external-audit "$joint_public" "$joint_public_sha" "$joint_system" "$joint_system_sha" "$joint_case/basis.txt" "$joint_basis_sha" "$joint_ref" "$joint_out/audits/$joint_id")
         printf '%q ' "${joint_command[@]}" > "$joint_out/metadata/$joint_id.command.txt"
         set +e
@@ -58,6 +76,7 @@ while IFS= read -r joint_id; do
         joint_audit_rc=$?
         set -e
         printf '%s\n' "$joint_audit_rc" > "$joint_out/metadata/$joint_id.exit"
+        joint_native_rc=$joint_audit_rc
         joint_status=new-native-audit-incomplete-or-failed
         if test -f "$joint_out/audits/$joint_id/summary.json"; then
           cp "$joint_out/audits/$joint_id/summary.json" "$joint_out/inventory/$joint_id.native-summary.json"
@@ -70,7 +89,7 @@ while IFS= read -r joint_id; do
   fi
   joint_saved_status=absent
   if test -f "$joint_case/status.txt"; then joint_saved_status=$(cat "$joint_case/status.txt"); fi
-  jq -n --arg id "$joint_id" --arg status "$joint_status" --arg original_status "$joint_saved_status" --argjson process_exit "$joint_rc" '{id:$id,reconciliation:$status,external_process_exit:$process_exit,original_status:$original_status}' > "$joint_out/inventory/$joint_id.owner.json"
+  jq -n --arg id "$joint_id" --arg status "$joint_status" --arg original_status "$joint_saved_status" --argjson process_exit "$joint_rc" --argjson native_exit "$joint_native_rc" '{id:$id,reconciliation:$status,external_process_exit:$process_exit,native_audit_exit:$native_exit,original_status:$original_status}' > "$joint_out/inventory/$joint_id.owner.json"
 done < "$joint_out/metadata/expected-cases.txt"
 # Workflow inventory only. Mathematical yields/ranks stay in native summaries.
 jq -s '{schema:"external-audit-terminal-inventory/v1",status:"terminal-inventory",cases:.,scope:"Owner/output reconciliation only; failures and absent bases are not zero physical yield. Read each native summary for mathematical checks. No timing comparison."}' "$joint_out"/inventory/*.owner.json > "$joint_out/summary.json"
