@@ -176,8 +176,10 @@ unseen target**, cold, with every phase charged, verified.
   The runner checks `[k]G = Q` and `k = planted` in its own process, and
   `ecbench verify` checks it again from the files. A run that does not
   verify is a row with status `wrong_answer`, `exhausted`, `error`,
-  `timeout` or `crashed`. It is kept, never dropped, and it makes any
-  comparison involving it `incomplete`.
+  `timeout`, `crashed`, `interrupted` (the session's own interruption
+  killed the child) or `spawn_error` (the child could not be started or
+  pinned; the session stops there). It is kept, never dropped, and it makes
+  any comparison involving it `incomplete`.
 - **Planted or public targets.** By default a target is `Q = [k]G` for a
   derived `k` (`uniform_scalar_sha256_v1`), kept for the check above. With
   `"target_kind": "public"` a target is hashed to the subgroup
@@ -209,7 +211,7 @@ identity, and two objects that hash alike are the same object.
 | method | `ECM1h` + 12 hex | registry id and every parameter, defaults written out |
 | factor base | `FB1h` + 12 hex | curve slug, family, parameters, column count, point count, SHA-256 of the sorted point keys |
 | spec | `ECS1h` + 12 hex | the spec without its label and description |
-| host class | `ECBENV2h` + 12 hex (`ECBENV1h` before version 2) | the stable host facts (§5): topology shape, memory in whole GiB, so a reboot keeps the class |
+| host class | `ECBENV3h` + 12 hex (`ECBENV2h` before version 3, `ECBENV1h` before version 2) | the stable host facts (§5): topology shape, memory in whole GiB, so a reboot keeps the class; version 3 leaves the compiler out (below) |
 | session | `ECBS1h` + 12 hex | spec, host and plan hashes, start time |
 | record | `ECR1h` + 12 hex | the exact record line, with the id empty |
 | run | `<method_id><workload_id>R<n>` | the repository's `{candidate}W{workload}R{number}` convention; `n ≥ 1` counts executions of the pair in the session |
@@ -245,31 +247,34 @@ a run that fails the check loses its isolation level), or **recorded**
 |---|---|---|---|
 | Which target | rho's and BSGS's cost depend on the target; a lucky target flatters a method | targets are derived by SHA-256 from (curve, seed, index), every arm solves the same ones, and intervals resample workloads (§8) | controlled |
 | Algorithm randomness | one rho walk is one draw of a wide distribution | one seed per (workload, round) is shared by every arm, so arms are paired; rounds vary it | controlled |
-| Order and drift | heat, a filling page cache, a background job ramping up | arms interleave every round (`alternate` reverses order on odd rounds; `shuffle` permutes by seed); warm-up rounds are run and marked | controlled |
+| Order and drift | heat, a filling page cache, a background job ramping up | arms interleave every round (`alternate` reverses order on odd rounds, counting the warm-up rounds in the parity; `alternate_measured` counts the measured rounds only, so the first measured round is always in spec order; `shuffle` permutes by seed); warm-up rounds are run and marked. An odd number of measured rounds cannot be balanced by either alternating mode: `plan` and `run` print a warning (existing specs expand exactly as before) | controlled |
 | One-time costs | page faults, lazy statics, allocator warm-up land on whoever runs first | every execution is a fresh process; nothing is cached across executions | controlled |
-| Another benchmark | two timed jobs on one machine measure each other | the shared lock `/tmp/crypto-bench.lock`, the one `isolated_bench` takes; `--wait` queues | controlled |
-| Other processes on the core | preemption, cache eviction | whole-core reservation; every movable thread moved off, and put back when the session ends however it ends (threads the evicted ones spawned meanwhile included, recycled thread ids excluded); the runner itself leaves the reservation; busy ticks on the run CPU not explained by the child are measured per run | gated (L1, L2) |
+| Allocator state inherited from set-up | the child builds its workload (curve, target, tables) before the timed solve, and on glibc that leaves the fastbins full of freed chunks; the first sizeable allocation inside the solve (a distinguished-point table, a jump table) then pays `malloc_consolidate` for all of it. At small sizes that is 3–6 ms against a solve of 0.1–0.2 ms, it differs with how much garbage each method's set-up left (an arm-dependent bias, not just noise), and it is invisible to Callgrind, which replaces `malloc` | the child calls `malloc_trim(0)` after the workload is built and before any clock, counter or window opens, so every solve starts from a consolidated allocator; each record's `allocator` block says what ran (name and version, whether the pre-solve trim ran, its return value) and the host capsule's `build.allocator` names the allocator. Where the platform has no such call (macOS, musl) the block says the trim did not run. This changes wall time only, never a count | controlled, recorded |
+| Another benchmark | two timed jobs on one machine measure each other | the shared lock `/tmp/crypto-bench.lock`, the one `isolated_bench` takes; `--wait` queues. The lock is taken **first**: planning (a prime search can burn minutes of CPU), the host capture and the choice of CPUs all happen inside it, so a queued session neither disturbs the one running nor chooses its CPUs from a mask that session narrowed. `gpu-stage` and `gpu-match` take it too | controlled |
+| Other processes on the core | preemption, cache eviction | whole-core reservation; every movable thread moved off, and put back when the session ends however it ends (threads the evicted ones spawned meanwhile included, recycled thread ids excluded; a thread that exits between the affinity read and the write is counted as gone, not as unmovable); interrupt affinity (`/proc/irq/*/smp_affinity_list`) is moved off the reservation where the kernel permits it (root) and restored the same way, with the number moved, the number that would not move and the first reason recorded; the runner itself leaves the reservation; busy ticks on the run CPU not explained by the child are measured per run; before and after every run the reservation is scanned for user threads that could run on it (a thread that appeared after the eviction, or got a wide mask back) | gated (L1, L2) |
 | SMT sibling | a neighbour on the sibling shares the pipeline and caches | a CPU is reserved only with all its siblings; under an inherited placement a sibling outside it costs the run L1; every sibling's busy ticks are checked per run, reserved or not | gated (L1, L2) |
 | CPU 0 | the kernel's housekeeping and many IRQs land there | `auto` never picks CPU 0's core; a run on it loses L1 | gated (L1) |
 | Migration | a process moved mid-run pays cold caches | pinned between fork and exec; the child reads its own mask back and reports the CPU it started and ended on | gated (L1) |
 | NUMA | memory on the far node costs every miss | memory is bound to the run CPU's node with `set_mempolicy(MPOL_BIND)` in the child; the child reads the policy back with `get_mempolicy` and counts its anonymous pages per node in `/proc/self/numa_maps` after the solve | gated (L1, multi-node hosts) |
-| Run-queue delay | time runnable but not running is not the method's | the child's `/proc/self/schedstat` across the solve; above 0.5 % of the solve, L2 is lost | gated (L2) |
-| Preemption | each one costs cache and branch state | involuntary context switches per second from `wait4` | gated (L2) |
-| Hypervisor steal | invisible to a process tick count | per-CPU steal ticks from `/proc/stat` around every run | gated (L2) |
+| Run-queue delay | time runnable but not running is not the method's | the child's `/proc/self/task/*/schedstat` summed over its threads, across the solve; above 0.5 % of the solve and above 100 µs (one wake-up), L2 is lost | gated (L2) |
+| Preemption | each one costs cache and branch state | involuntary context switches over **the solve** (`getrusage` read by the child just outside the timed window); one is allowed, beyond that 50 per second of solve | gated (L2) |
+| Hypervisor steal | invisible to a process tick count | per-CPU steal ticks from `/proc/stat` around every run; one tick (the counter's resolution) is allowed, beyond that 1 % of the run | gated (L2) |
+| Interrupts and foreign slices on a short run | `/proc/stat` ticks are 10 ms: a few-millisecond solve cannot see foreign work in them | the child reads the run CPU's `/proc/interrupts` and `/proc/softirqs` columns (devices, the local timer, IPIs and other named lines, softirq work and tick-driven softirqs) and, where the kernel has `CONFIG_SCHEDSTATS`, its `/proc/schedstat` line, around the solve and records the differences; non-tick interrupts above a floor of 2 plus 100 per second of solve, or more than one foreign task slice on the CPU during the solve, cost L2. The scheduler tick is never an intrusion | recorded, gated (L2) |
+| Too short to time | at a few tens of microseconds one wake-up or one interrupt is a visible fraction of the figure, whatever the gates allow | a solve under 1 ms cannot admit wall time: an L2 blocker `solve too short to admit wall time` records it explicitly, so the run is graded L1 and its wall time is descriptive | gated (L2) |
 | Memory pressure | reclaim stalls a run | PSI memory `some` total around every run | gated (L2) |
-| A busy host at start | everything above, before the first run | a settle-window preflight (busy ticks per reserved CPU, PSI); refused unless `--allow-busy`, which records it and caps runs below L2 | gated (L2) |
+| A busy host at start | everything above, before the first run | a settle-window preflight (busy ticks per reserved CPU, PSI); refused unless `--allow-busy`, which records it and caps runs below L2. `--settle` below 2 s, `--max-other-cpu` above 0.10, `--max-psi` above 5 (or a looser preemption limit) loosen the preflight, and a run under such thresholds carries an L2 blocker that names them | gated (L2) |
 | Frequency and turbo | the clock is the denominator of wall time | governor, `no_turbo`, `boost`, `isolcpus`, `nohz_full` and SMT control recorded per CPU; required for L3 | recorded, gated (L3) |
-| Instruction count | wall time moves with frequency and contention, instructions retired barely do | user-space instructions and cycles across the solve from the CPU's counters (`perf_event_open`), where the host exposes a PMU; elsewhere the record says why not | recorded |
+| Instruction count | wall time moves with frequency and contention, instructions retired barely do | user-space instructions and cycles across the solve from the CPU's counters (`perf_event_open`), where the host exposes a PMU; elsewhere the record says why not. The two events form one group with `inherit` set (threads the solve spawns count; the record says whether the kernel accepted it), and when the PMU was shared (`time_running < time_enabled`) the record keeps the raw counts and adds `instructions_scaled`/`cycles_scaled` (`raw × enabled / running`) and `multiplexed`; sums over runs use the scaled counts | recorded |
 | Virtualisation | a guest cannot see or control most of the above | CPU `hypervisor` flag, DMI, `systemd-detect-virt`, `kern.hv_vmm_present` recorded; bare metal required for L3 | recorded, gated (L3) |
 | Heterogeneous cores | Apple P and E cores differ by about 2× | performance levels recorded; with no affinity control the runs are L0 | recorded |
-| Threads | four Rayon threads on one pinned CPU wait on each other | `RAYON_NUM_THREADS=1`, `OMP_NUM_THREADS=1`; child CPU time over wall above 1.05 loses L1 | controlled, gated (L1) |
+| Threads | four Rayon threads on one pinned CPU wait on each other | `RAYON_NUM_THREADS=1`, `OMP_NUM_THREADS=1`; the child counts its own threads (`/proc/self/task`) before and after the solve, and more than one loses L1 (CPU time over wall above 1.05 still does, but a pinned child's CPU time can never exceed its wall time, so that check alone cannot fire) | controlled, gated (L1) |
 | Environment leakage | an engine knob in the operator's shell changes the search | the child's environment is cleared and rebuilt: `PATH`, `HOME`, a pinned locale and thread counts, nothing else; its hash is in the session | controlled |
-| Build | a debug build or another binary is another experiment | the binary's SHA-256, the source commit embedded at build time and its declared dirty state, any runtime worktree commit as a diagnostic only, `rustc -Vv`, compiler flags in the environment; on Linux each child execs `/proc/self/exe`, so a rebuild mid-session cannot swap the code (elsewhere a changed binary stops the session); a debug build loses L1 | recorded, gated (L1) |
-| Host | the same binary differs by 17–20 % across hosts | the host capsule's stable facts hash to the class id; wall-clock ratios are formed only inside one session | recorded, controlled |
+| Build | a debug build or another binary is another experiment | the binary's SHA-256, the source commit embedded at build time and its declared dirty state, any runtime worktree commit as a diagnostic only, `rustc -Vv` on `PATH` as a diagnostic outside the host class (from class version 3; it moved with the shell and a toolchain file in the current directory), compiler flags in the environment; the binary is hashed from `/proc/self/exe` at the very start of `run`, so a rebuild during planning cannot null or swap the hash, and each child execs `/proc/self/exe`, so a rebuild mid-session cannot swap the code (elsewhere a changed binary stops the session); a debug build loses L1 | recorded, gated (L1) |
+| Host | the same binary differs by 17–20 % across hosts | the host capsule's stable facts hash to the class id; wall-clock ratios are formed only inside one session. Class version 3 (`ECBENV3h`) leaves the compiler out: it used to be `rustc -Vv` of whatever `PATH` and the current directory named, so a `sudo` run landed in another class on the same machine. Capsules of versions 1 and 2 still recompute under their own definitions | recorded, controlled |
 | What each method counts | one tool counts additions, another wall time, another instructions | one `CountedGroup` ledger for every method; native work the unit does not charge is counted as `*_uncharged` and makes the total a lower bound (§7) | controlled |
 | Pricing drift | per-run measured ratios repriced identical runs by up to 8 % | IC native work is priced only at the repository's pinned ratios (`docs/ic/calibration.json`); a unit without one stays unpriced, never host-measured; an algebraic solver's wall-priced work is taken back out | controlled |
-| Selective reporting | dropping a failure, rerunning until it looks good | every execution writes a sealed record before the next starts; the output directory is claimed with an atomic `mkdir` under the lock, so a session queued for a used directory fails instead of writing over it; an interrupted session is marked, never deleted | controlled |
-| Interruption | a killed runner leaves narrowed masks behind and a child solving on an unprotected core | SIGINT, SIGTERM, SIGHUP and SIGQUIT are taken by one thread, which kills the child's process group; the session is marked `interrupted`, the eviction restored, and the runner exits `128 + signal`; the child dies with the runner (`PR_SET_PDEATHSIG`). A runner killed outright (SIGKILL, host loss) cannot mark the session, which keeps reading `running` as first written; `ecbench verify --allow-interrupted` audits such a session as interrupted (`interruption: never_finalised`, `records_bound: false`), with every per-record check (seal, sequence, plan, answer, grading) still applied. No whole-file records hash was ever written, so the file is explicitly unbound: truncation or appended records are seen only through the unkeyed per-record seals, and such a session must not be cited as complete | controlled |
+| Selective reporting | dropping a failure, rerunning until it looks good | every execution writes a sealed record before the next starts; the output directory is claimed with an atomic `mkdir` under the lock, so a session queued for a used directory fails instead of writing over it; an interrupted session is marked, never deleted; a child that cannot be started or pinned is a `spawn_error` record and the session stops there with the reason recorded, not a silent end; a child killed by the session's own interruption is `interrupted`, not `crashed`; `timeout` is recorded only when the watchdog's SIGKILL actually ended the child (a child that exited by itself in the instant the deadline passed keeps its answer) | controlled |
+| Interruption | a killed runner leaves narrowed masks behind and a child solving on an unprotected core | SIGINT, SIGTERM, SIGHUP and SIGQUIT are taken by one thread, which kills the child's process group; the session is marked `interrupted`, the eviction restored, and the runner exits `128 + signal`; the child dies with the runner (`PR_SET_PDEATHSIG`). `session.json` is replaced atomically (temporary file, `fsync`, rename) after **every** record, with `records_written`, `last_seq` and the per-status counts, and `stop` (`kind`: `interrupt`, `spawn_error` or `error`; the `seq` it stopped at; the signal or message) once the session stops early. A runner killed outright (SIGKILL, host loss) cannot mark the session, which keeps reading `running` with the counts of the last record it wrote; `ecbench verify --allow-interrupted` audits such a session as interrupted (`interruption: never_finalised`, `records_bound: false`), with every per-record check (seal, sequence, plan, answer, grading) still applied. No whole-file records hash was ever written, so the file is explicitly unbound: truncation or appended records are seen only through the unkeyed per-record seals, and such a session must not be cited as complete | controlled |
 | Tampering and transcription | a figure edited by hand, or copied wrong | every file is hashed into `session.json`; `verify` re-derives identities, the plan, the answers and the seals, and replays runs | controlled |
 
 ## 6. Isolation levels
@@ -282,12 +287,25 @@ a bare label.
 | level | requires |
 |---|---|
 | **L0 recorded** | the run executed under a saved host capsule. Enough for operation counts, which do not depend on contention |
-| **L1 pinned** | a reservation (`--cpus` not `none`) inside this process's cpuset; a release build; no SMT sibling of the run CPU outside the reservation; the child's own affinity read back as exactly the run CPU, and the run CPU at its start and end; the run CPU not on CPU 0's core; the runner off the run CPU (under an inherited placement with no other CPU it may sleep on an idle sibling, where the sibling check sees it); no user thread left unmovable on the reserved CPUs (a non-root run usually fails this); child CPU time over wall ≤ 1.05; on a multi-node host, the memory policy read back as `bind:<node>` of the run CPU and at least 99 % of the solve's anonymous pages on that node |
-| **L2 quiet** | L1, and: a quiet preflight; zero steal ticks on the run CPU; foreign busy time on the run CPU within max(2 ticks, 1 % of wall); the run CPU's siblings and the rest of the reservation within 2 ticks; run-queue delay ≤ 0.5 % of the solve; ≤ 50 preemptions per second; memory stall ≤ 0.5 % of wall |
+| **L1 pinned** | a reservation (`--cpus` not `none`) inside this process's cpuset; a release build; no SMT sibling of the run CPU outside the reservation; the child's own affinity read back as exactly the run CPU, and the run CPU at its start and end; the run CPU not on CPU 0's core; the runner off the run CPU (under an inherited placement with no other CPU it may sleep on an idle sibling, where the sibling check sees it); no user thread left unmovable on the reserved CPUs (a non-root run usually fails this), and none that appeared on the reservation since (the per-run scan); a single-threaded child (its thread count read from `/proc/self/task`; child CPU time over wall ≤ 1.05 as before); on a multi-node host, the memory policy read back as `bind:<node>` of the run CPU and at least 99 % of the solve's anonymous pages on that node |
+| **L2 quiet** | L1, and: a quiet preflight, run with the default or tighter thresholds (a loosened `--settle`, `--max-psi`, `--max-other-cpu` is an L2 blocker that names it); a solve of at least 1 ms (`solve too short to admit wall time` otherwise); steal within one tick or 1 % of the run; foreign busy time on the run CPU within max(2 ticks, 1 % of wall); the run CPU's siblings and the rest of the reservation within the same allowance; over the solve alone, run-queue delay ≤ max(100 µs, 0.5 % of the solve), involuntary switches ≤ max(1, 50 per second of solve), non-tick interrupts on the run CPU ≤ 2 + 100 per second of solve and at most one foreign task slice; memory stall ≤ max(1 ms, 0.5 % of wall) |
 | **L3 isolated** | L2, and the host configured for measurement: run CPU in `isolcpus` or `nohz_full`; `performance` governor; turbo known off; bare metal known |
 
 A spec's `isolation_required` (default L2) is the level a **wall-clock**
 figure needs to be admitted. Operation counts never need one.
+
+**Grading versions.** The rules above are version 3 (`grading_version` in
+`session.json`). Version 2 judged a few-millisecond solve by figures taken
+over the whole process (exec, set-up and exit included): on 216 smoke
+records one extra context switch, one wake-up or one 10 ms steal tick cost
+27, 14 and 17 runs their L2, the foreign-busy gate could not see anything
+under about 2 s, and the thread gate could not fire on a pinned child.
+Version 3 measures the solve, gives every gate an absolute floor so a single
+event cannot fail a short solve, scales the allowance with the duration,
+counts threads, reads interrupt and scheduler counters, scans for intruders
+and refuses to admit wall time from a solve under 1 ms. A session is
+regraded under the version it was graded with (`grade_for_version`; version 2
+is frozen), so historical sessions regrade identically.
 
 `ecbench compare` also reports a **measurement quality score** from 0 to
 100. This is an operational rubric, not a probability that the result is
@@ -1028,9 +1046,13 @@ Stated so that nothing here is read as more than it is:
   then read it with `ecbench callgrind-ir --prefix PREFIX`. The parser counts
   every numbered part after the pre-solve reset through the post-solve reset,
   including internal phase dumps, and rejects missing markers. This is a
-  complete user-space **implementation** instruction count for the one solve;
-  it has its own `callgrind.Ir` unit. It is not a PMU count or an isolated
-  native wall-time result. Keep its binary, Valgrind version, CPU feature
+  user-space **implementation** instruction count for the one solve, **under
+  Valgrind's allocator**; it has its own `callgrind.Ir` unit. Valgrind replaces
+  `malloc`, so the glibc allocator's own work (`malloc_consolidate`,
+  `_int_malloc`, `free` bookkeeping) never runs under Callgrind and is not in
+  the Ir: it is not a complete count of what the real binary executes, and it
+  cannot see the allocator confounder of §5 at all. It is not a PMU count or
+  an isolated native wall-time result. Keep its binary, Valgrind version, CPU feature
   dispatch, input, child output, and raw parts together. The
   [n37 protocol](../../research/ecbench_callgrind_solve_20261004/PROTOCOL.md)
   freezes a same-target IC/rho census using this path.
@@ -1071,6 +1093,18 @@ vector, exit code, timeout, timestamps, and output hashes. A failed device
 self-test prevents the benchmark. The directory is never overwritten.
 `--solve` is excluded from this stage command so a large-group solver does
 not run indefinitely under a throughput request.
+
+Both GPU commands take the shared benchmark lock (`--lock`, default
+`/tmp/crypto-bench.lock`; `--wait` queues) before they create anything, as a
+CPU session does, and write the host capsule beside the receipt as `host.json`
+(its SHA-256 and class are in the receipt, and `gpu-match-verify` checks the
+hash). The receipts' `elapsed_ns`/`elapsed_ms` run from spawn to reap, so
+they include process start, CUDA runtime and context initialisation, and
+teardown (`elapsed_scope` says so); they are not the benchmark's time. For
+`gpu-match`, `process_overhead_seconds` is that elapsed time less the driver's
+own `host_seconds`, so the overhead outside the benchmark's clock is reported
+separately; a stage's driver output is not parsed, so its elapsed time stays
+labelled whole-process.
 
 This entry point runs real CUDA code, but its current fixed curves and
 targets do not share `ecbench run`'s workload identity or independently
