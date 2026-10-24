@@ -130,7 +130,7 @@ Precedence is environment, then `store/config.json`, then the default.
 
 | setting | environment | `store/config.json` | default |
 |:--|:--|:--|:--|
-| remote | `CRYPTO_STORE_REMOTE` | `remote` | none (the committed config names `s3://crypto-autoresearcher/store`) |
+| remote | `CRYPTO_STORE_REMOTE` | `remote` | none; this checkout has no committed `store/config.json` |
 | endpoint (MinIO, LocalStack, …) | `CRYPTO_STORE_ENDPOINT` | `endpoint` | AWS |
 | cache directory | `CRYPTO_STORE_CACHE` | | `$XDG_CACHE_HOME/crypto-store`, else `~/.cache/crypto-store` |
 | index file | `CRYPTO_STORE_INDEX` | | `store/index.json` at the repository root |
@@ -138,6 +138,16 @@ Precedence is environment, then `store/config.json`, then the default.
 
 A local directory works as a remote (`CRYPTO_STORE_REMOTE=file:///srv/store`),
 which is how a lab without S3, a shared volume, or a test uses the store.
+
+For the approved Setec bucket, use `s3://setec-astronomy-artifacts/ic/v1/runs`
+for retained run artifacts and a unique
+`s3://setec-astronomy-artifacts/ic/v1/acceptance/RUN_ID` prefix for temporary
+acceptance checks. Keep logical index names scoped to the campaign and run;
+the store places immutable bytes beneath `sha256/XX/DIGEST` within the chosen
+remote prefix. Use the same `CRYPTO_STORE_REMOTE` and `CRYPTO_STORE_INDEX`
+when pushing, solving from `store:NAME`, verifying, and pulling. The
+[prime-route S3 acceptance](PRIME_ROUTE_S3_ACCEPTANCE_20261024.json) exercises
+all four operations and removes only its isolated test objects.
 
 ## S3 details
 
@@ -159,6 +169,7 @@ HTTP stack. Uploads follow the `isogeny_walk::store` conventions:
   composite. A fresh download is hashed against the index before caching.
   `CRYPTO_STORE_MULTIPART_THRESHOLD_BYTES` and
   `CRYPTO_STORE_MULTIPART_PART_BYTES` can lower the threshold and part size
+  for bounded acceptance runs; defaults are 4 GiB and 64 MiB.
 
 `crypto store verify --download NAME` is the byte-level remote check. It
 downloads the named object to a temporary file, compares its SHA-256 and byte
@@ -166,7 +177,6 @@ count to the index, and removes that file afterward. It does not use an
 existing cached copy as evidence. This is useful for multipart objects because
 their S3 HEAD checksum is composite and their full-file digest is recorded in
 metadata. `--remote` remains a faster HEAD-only check.
-  for bounded acceptance runs; defaults are 4 GiB and 64 MiB.
 * **Checked on download.** Every object is hashed as it enters the cache, and
   a mismatch is discarded.
 
