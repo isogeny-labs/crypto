@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Seeded native replay of Table C runs (stdlib only). usage: replay_C.py REPO IC_BINARY OUTDIR SUMMARY.json
 Resumable: a replay whose output file exists is not re-run. Compares counts, recovered, all_verified."""
-import hashlib, json, os, subprocess, sys
+import hashlib, json, os, re, subprocess, sys
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 SEED = "ic_validation_gate_20261024"
 
@@ -20,6 +22,15 @@ def get(d, p):
         except (KeyError, IndexError, TypeError): return None
     return d
 
+def slug_of(stem):
+    """Output files are named by ICV1 slug (scripts/check_curve_names.py)."""
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+    import check_curve_names as cn
+    a, n = re.fullmatch(r"k([01])n(\d+)", stem).groups()
+    res = cn.Resolver()
+    return res.name(res.koblitz(int(a), int(n)))
+
+
 def main(repo, ic, outdir, summary):
     repo, outdir = Path(repo), Path(outdir); outdir.mkdir(parents=True, exist_ok=True)
     main_dir = repo / "research/ic_descent_20260930/runs-isolated/main"
@@ -34,7 +45,7 @@ def main(repo, ic, outdir, summary):
         keyed = sorted(cand, key=lambda t: hashlib.sha256(f"{SEED}|{d.name}|{t[0]}".encode()).hexdigest())[:3]
         for rid, f in keyed:
             arch = json.load(open(f))
-            out = outdir / f"{d.name}-{rid.replace('/', '_')}.json"
+            out = outdir / f"{slug_of(d.name)}-{rid.replace('/', '_')}.json"
             if not out.is_file() or out.stat().st_size == 0:
                 env = dict(os.environ, RAYON_NUM_THREADS="1")
                 with open(outdir / (out.stem + ".err"), "w") as e:

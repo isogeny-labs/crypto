@@ -13,8 +13,9 @@ import ec_verify as ev
 repo = Path(sys.argv[1]).resolve(); runs = Path(sys.argv[2]); out_p = sys.argv[3]
 evid = Path(sys.argv[4]).resolve() if len(sys.argv) > 4 else None
 V4 = repo / "research/ic_tool_program/rule/v4"; V3 = repo / "research/ic_tool_program/rule/v3"
-SIZES = [("k1n47", 47), ("k0n57", 57), ("k0n41", 41), ("k0n53", 53), ("k1n59", 59), ("k0n61", 61)]
 AN = json.load(open(V4 / "analysis.json")); CERT = json.load(open(V4 / "replay-certificate.json"))
+# (archive key, n) per size, in the analysis order; keys are the archive's own.
+SIZES = [(s["curve"], s["n"]) for s in AN["sizes"]]
 CL = {s["curve"]: s for s in AN["sizes"]}
 BOOT = 10000
 sha = lambda p: hashlib.sha256(Path(p).read_bytes()).hexdigest()

@@ -96,7 +96,8 @@ enum Cmd {
         /// Stop cleanly after the process that ends past this many minutes.
         #[arg(long, default_value_t = 25.0)]
         max_minutes: f64,
-        /// Sizes by name (`k0n41`), comma separated; default all six.
+        /// Sizes by archive key (the `curve` field of analysis.json),
+        /// comma separated; default all six.
         #[arg(long)]
         sizes: Option<String>,
         /// `isolated_bench --max-other-cpu`: the CPUs other processes may use
