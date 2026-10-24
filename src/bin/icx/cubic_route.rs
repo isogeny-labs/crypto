@@ -24,6 +24,9 @@ pub(super) struct GraphArgs {
     /// A non-cube in F_p defining t^3 = c.
     #[arg(long)]
     c: Option<u64>,
+    /// Three coefficients of an irreducible monic cubic (constant first); exclusive with --c.
+    #[arg(long, num_args = 3)]
+    modulus: Option<Vec<u64>>,
     /// Three coefficients of the source curve's a parameter.
     #[arg(long, num_args = 3)]
     a: Vec<u64>,
@@ -79,7 +82,8 @@ pub(super) struct GenerateArgs {
 #[serde(deny_unknown_fields)]
 struct PublicTarget {
     p: u64,
-    c: u64,
+    c: Option<u64>,
+    modulus: Option<[u64; 3]>,
     a: [u64; 3],
     b: [u64; 3],
     n: u64,
@@ -89,10 +93,27 @@ struct PublicTarget {
     qy: [u64; 3],
 }
 
-fn graph_source(args: &GraphArgs) -> Result<(u64, u64, [u64; 3], [u64; 3], Option<Value>), String> {
+fn graph_source(
+    args: &GraphArgs,
+) -> Result<
+    (
+        u64,
+        Option<u64>,
+        Option<[u64; 3]>,
+        [u64; 3],
+        [u64; 3],
+        Option<Value>,
+    ),
+    String,
+> {
     if let Some(path) = &args.input {
-        if args.p.is_some() || args.c.is_some() || !args.a.is_empty() || !args.b.is_empty() {
-            return Err("--input cannot be combined with --p, --c, --a, or --b".into());
+        if args.p.is_some()
+            || args.c.is_some()
+            || args.modulus.is_some()
+            || !args.a.is_empty()
+            || !args.b.is_empty()
+        {
+            return Err("--input cannot be combined with --p, --c, --modulus, --a, or --b".into());
         }
         let resolved = crypto_lib::store::resolve_path(path)?;
         if std::fs::metadata(&resolved)
@@ -112,14 +133,26 @@ fn graph_source(args: &GraphArgs) -> Result<(u64, u64, [u64; 3], [u64; 3], Optio
             "sha256": hex::encode(sha256(&bytes)),
             "bytes": bytes.len(),
         });
-        Ok((target.p, target.c, target.a, target.b, Some(artifact)))
+        Ok((
+            target.p,
+            target.c,
+            target.modulus,
+            target.a,
+            target.b,
+            Some(artifact),
+        ))
     } else {
         let p = args
             .p
             .ok_or("cubic graph needs --input or --p --c --a --b")?;
-        let c = args
-            .c
-            .ok_or("cubic graph needs --input or --p --c --a --b")?;
+        let modulus = args
+            .modulus
+            .clone()
+            .map(|v| {
+                v.try_into()
+                    .map_err(|_| "--modulus needs three coefficients")
+            })
+            .transpose()?;
         let a = args
             .a
             .clone()
@@ -130,7 +163,7 @@ fn graph_source(args: &GraphArgs) -> Result<(u64, u64, [u64; 3], [u64; 3], Optio
             .clone()
             .try_into()
             .map_err(|_| "cubic graph needs three --b coefficients")?;
-        Ok((p, c, a, b, None))
+        Ok((p, args.c, modulus, a, b, None))
     }
 }
 
@@ -202,7 +235,8 @@ fn selected_graph_node(
     if graph["schema_version"].as_u64() != Some(1)
         || graph["graph_kind"].as_str() != Some("cubic-rational-j-neighbours")
         || graph["field_characteristic"].as_u64() != Some(input.p)
-        || graph["cubic_nonresidue"].as_u64() != Some(input.c)
+        || graph["cubic_nonresidue"] != json!(input.c)
+        || graph["field_modulus"] != json!(input.modulus)
         || graph["source_curve"]["a"] != json!(input.a)
         || graph["source_curve"]["b"] != json!(input.b)
     {
@@ -315,14 +349,10 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
     let all = [
         &input.a, &input.b, &input.gx, &input.gy, &input.qx, &input.qy,
     ];
-    if input.c >= input.p || all.into_iter().flatten().any(|&v| v >= input.p) {
+    if all.into_iter().flatten().any(|&v| v >= input.p) {
         return Err("cubic target field coefficients must be canonical".into());
     }
-    let _checked_field = Fp3::with_cube_nonresidue(input.p, input.c)?;
-    let f = CubicField {
-        p: input.p,
-        c: input.c,
-    };
+    let f = CubicField::checked(input.p, input.c, input.modulus)?;
     let curve = Curve::new(E3(input.a), E3(input.b));
     if !curve::is_smooth(&f, &curve) {
         return Err("cubic target source curve is singular".into());
@@ -450,6 +480,7 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
         "schema_version":1,
         "field_characteristic":input.p,
         "cubic_nonresidue":input.c,
+        "field_modulus":input.modulus,
         "curve_nodes":nodes,
         "edges":edges,
         "routes":[{"id":route_id,"edge_ids":edge_ids}]
@@ -464,7 +495,7 @@ pub(super) fn generate(args: &GenerateArgs) -> Result<Value, String> {
 /// This is a graph of j-invariants; explicit point transport requires a
 /// separately certified route of curve models and kernel generators.
 pub(super) fn enumerate_j(args: &GraphArgs) -> Result<Value, String> {
-    let (p, c, a, b, input_artifact) = graph_source(args)?;
+    let (p, c, modulus, a, b, input_artifact) = graph_source(args)?;
     if !(7..=101).contains(&p)
         || !prime(p)
         || !(2..=7).contains(&args.max_ell)
@@ -474,11 +505,10 @@ pub(super) fn enumerate_j(args: &GraphArgs) -> Result<Value, String> {
             "cubic graph requires prime p in 7..=101, max-ell in 2..=7, max-nodes in 1..=64".into(),
         );
     }
-    if c >= p || a.iter().chain(&b).any(|&v| v >= p) {
+    if a.iter().chain(&b).any(|&v| v >= p) {
         return Err("cubic graph field coefficients must be canonical triples".into());
     }
-    let _checked_field = Fp3::with_cube_nonresidue(p, c)?;
-    let f = CubicField { p, c };
+    let f = CubicField::checked(p, c, modulus)?;
     let source = Curve::new(E3(a), E3(b));
     if !curve::is_smooth(&f, &source) {
         return Err("cubic graph source curve is singular".into());
@@ -550,6 +580,7 @@ pub(super) fn enumerate_j(args: &GraphArgs) -> Result<Value, String> {
         "graph_kind":"cubic-rational-j-neighbours",
         "field_characteristic":p,
         "cubic_nonresidue":c,
+        "field_modulus":modulus,
         "source_curve":{"a":a,"b":b},
         "degrees":degrees,
         "nodes":nodes.iter().enumerate().map(|(id,j)| json!({"id":id,"j":j.0})).collect::<Vec<_>>(),
@@ -570,6 +601,22 @@ pub(super) fn enumerate_j(args: &GraphArgs) -> Result<Value, String> {
 struct CubicField {
     p: u64,
     c: u64,
+    modulus: Option<[u64; 3]>,
+}
+
+impl CubicField {
+    fn checked(p: u64, c: Option<u64>, modulus: Option<[u64; 3]>) -> Result<Self, String> {
+        let checked = match (c, modulus) {
+            (Some(c), None) => Fp3::with_cube_nonresidue(p, c)?,
+            (None, Some(modulus)) => Fp3::with_irreducible_cubic(p, modulus)?,
+            _ => return Err("supply exactly one of c or modulus for the cubic field".into()),
+        };
+        Ok(Self {
+            p,
+            c: checked.c,
+            modulus: checked.modulus,
+        })
+    }
 }
 
 impl Field for CubicField {
@@ -597,9 +644,24 @@ impl Field for CubicField {
                 product[i + j] += a.0[i] * b.0[j];
             }
         }
-        E3(std::array::from_fn(|i| {
-            (product[i] + if i < 2 { self.c * product[i + 3] } else { 0 }) % self.p
-        }))
+        if let Some(modulus) = self.modulus {
+            for k in (3..=4).rev() {
+                let high = product[k] % self.p;
+                for i in 0..3 {
+                    product[k - 3 + i] =
+                        (product[k - 3 + i] + self.p * self.p - high * modulus[i]) % self.p;
+                }
+            }
+            E3([
+                product[0] % self.p,
+                product[1] % self.p,
+                product[2] % self.p,
+            ])
+        } else {
+            E3(std::array::from_fn(|i| {
+                (product[i] + if i < 2 { self.c * product[i + 3] } else { 0 }) % self.p
+            }))
+        }
     }
     fn inv(&self, a: E3) -> E3 {
         assert_ne!(a, Fp3::ZERO, "cannot invert zero in cubic route");
@@ -624,7 +686,9 @@ impl Field for CubicField {
 struct Graph {
     schema_version: u64,
     field_characteristic: u64,
-    cubic_nonresidue: u64,
+    cubic_nonresidue: Option<u64>,
+    #[serde(default)]
+    field_modulus: Option<[u64; 3]>,
     curve_nodes: Vec<Node>,
     edges: Vec<Edge>,
     routes: Vec<Route>,
@@ -732,7 +796,13 @@ pub(super) fn transport(
         serde_json::from_slice(&bytes).map_err(|e| format!("{}: {e}", resolved.display()))?;
     if graph.schema_version != 1
         || graph.field_characteristic != source.field.p
-        || graph.cubic_nonresidue != source.field.c
+        || graph.cubic_nonresidue
+            != (if source.field.modulus.is_none() {
+                Some(source.field.c)
+            } else {
+                None
+            })
+        || graph.field_modulus != source.field.modulus
     {
         return Err("cubic route field identity or schema differs from the supplied input".into());
     }
@@ -746,6 +816,7 @@ pub(super) fn transport(
     let f = CubicField {
         p: source.field.p,
         c: source.field.c,
+        modulus: source.field.modulus,
     };
     let mut nodes = HashMap::new();
     for node in &graph.curve_nodes {
@@ -907,6 +978,76 @@ mod tests {
     use super::*;
 
     #[test]
+    fn general_modulus_graph_and_checked_route() {
+        let input = Path::new(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/docs/ic/fixtures/cubic_f11_route_public_target.json"
+        ));
+        let field = CubicField::checked(11, None, Some([1, 0, 4])).unwrap();
+        let reference = Fp3::with_irreducible_cubic(11, [1, 0, 4]).unwrap();
+        for x in 0..11 {
+            for y in 0..11 {
+                let a = E3([x, y, 4]);
+                let b = E3([y, x, 7]);
+                assert_eq!(field.mul(a, b), reference.mul(&a, &b));
+            }
+        }
+        let graph = enumerate_j(&GraphArgs {
+            input: Some(input.to_path_buf()),
+            p: None,
+            c: None,
+            modulus: None,
+            a: vec![],
+            b: vec![],
+            max_ell: 2,
+            include_degree_two: true,
+            include_multiplicity: false,
+            max_nodes: 16,
+            seed: 1,
+        })
+        .unwrap();
+        assert_eq!(graph["field_modulus"], json!([1, 0, 4]));
+        assert_eq!(graph["nodes"][1]["j"], json!([7, 0, 0]));
+        let graph_path =
+            std::env::temp_dir().join(format!("cubic-f11-graph-{}.json", std::process::id()));
+        let route_path =
+            std::env::temp_dir().join(format!("cubic-f11-route-{}.json", std::process::id()));
+        std::fs::write(&graph_path, serde_json::to_vec(&graph).unwrap()).unwrap();
+        let route = generate(&GenerateArgs {
+            input: input.to_path_buf(),
+            degree: 2,
+            target_j: None,
+            graph_file: Some(graph_path.clone()),
+            target_node: Some(1),
+            seed: 1,
+            max_samples: 256,
+            max_depth: 1,
+        })
+        .unwrap();
+        std::fs::write(&route_path, serde_json::to_vec(&route).unwrap()).unwrap();
+        let generator = Pt3::affine(E3([9, 8, 10]), E3([6, 8, 10]));
+        let target = Pt3::affine(E3([6, 7, 2]), E3([4, 0, 0]));
+        let source = Curve3::new(reference, E3([1, 0, 0]), E3([1, 0, 0]), 13, generator);
+        let transported = transport(&source, target, &route_path, "root-to-velu2", None).unwrap();
+        assert_eq!(
+            transported.curve.mul(&transported.curve.g, 5),
+            transported.target
+        );
+        assert_eq!(transported.receipt["edges_verified"], 1);
+        let mut mismatched = route;
+        mismatched["field_modulus"] = json!([2, 0, 4]);
+        std::fs::write(&route_path, serde_json::to_vec(&mismatched).unwrap()).unwrap();
+        assert!(
+            transport(&source, target, &route_path, "root-to-velu2", None)
+                .err()
+                .unwrap()
+                .contains("field identity")
+        );
+        std::fs::remove_file(graph_path).unwrap();
+        std::fs::remove_file(route_path).unwrap();
+    }
+
+    #[test]
     fn generated_public_f7_route_is_consumable_and_in_j_graph() {
         let input = Path::new(concat!(
             env!("CARGO_MANIFEST_DIR"),
@@ -936,12 +1077,13 @@ mod tests {
         let result = transport(&source, target, &path, "root-to-velu3", None).unwrap();
         std::fs::remove_file(path).unwrap();
         assert_eq!(result.curve.mul(&result.curve.g, 5), result.target);
-        let f = CubicField { p: 7, c: 2 };
+        let f = CubicField::checked(7, Some(2), None).unwrap();
         let destination_j = curve::jinv(&f, &Curve::new(result.curve.a, result.curve.b));
         let j_graph = enumerate_j(&GraphArgs {
             input: None,
             p: Some(7),
             c: Some(2),
+            modulus: None,
             a: vec![3, 6, 4],
             b: vec![4, 4, 6],
             max_ell: 5,
@@ -979,6 +1121,7 @@ mod tests {
             input: None,
             p: Some(7),
             c: Some(2),
+            modulus: None,
             a: vec![3, 6, 4],
             b: vec![4, 4, 6],
             max_ell: 5,
@@ -1011,7 +1154,7 @@ mod tests {
                 )
             })
             .collect();
-        let f = CubicField { p: 7, c: 2 };
+        let f = CubicField::checked(7, Some(2), None).unwrap();
         let cache = PhiCache::new(&Zp::new(7), &[3, 5]).lift(|v| E3([v, 0, 0]));
         let mut expected = HashSet::new();
         for (source, &j) in nodes.iter().enumerate() {
@@ -1037,6 +1180,7 @@ mod tests {
             input: None,
             p: Some(7),
             c: Some(2),
+            modulus: None,
             a: vec![3, 6, 4],
             b: vec![4, 4, 6],
             max_ell: 2,
@@ -1065,7 +1209,7 @@ mod tests {
                 (source, nodes[target])
             })
             .collect();
-        let f = CubicField { p: 7, c: 2 };
+        let f = CubicField::checked(7, Some(2), None).unwrap();
         let phi = PhiCache::new(&Zp::new(7), &[2]).lift(|v| E3([v, 0, 0]));
         let mut expected = HashSet::new();
         let mut omitted = false;
@@ -1096,6 +1240,7 @@ mod tests {
             input: None,
             p: Some(7),
             c: Some(2),
+            modulus: None,
             a: vec![0, 0, 0],
             b: vec![1, 0, 0],
             max_ell: 2,
@@ -1148,7 +1293,7 @@ mod tests {
         std::fs::remove_file(path).unwrap();
         assert_eq!(mapped.curve.mul(&mapped.curve.g, 5), mapped.target);
         assert_eq!(mapped.receipt["edges_verified"], 1);
-        let f = CubicField { p: 7, c: 2 };
+        let f = CubicField::checked(7, Some(2), None).unwrap();
         let source_j = curve::jinv(&f, &Curve::new(source.a, source.b));
         let destination_j = curve::jinv(&f, &Curve::new(mapped.curve.a, mapped.curve.b));
         let phi = PhiCache::new(&Zp::new(7), &[2]).lift(|v| E3([v, 0, 0]));

@@ -312,7 +312,10 @@ ic solve-cubic \
 ```
 
 The route file can also be an indexed `store:NAME` or `sha256:DIGEST`
-reference. Its schema fixes `field_characteristic` and `cubic_nonresidue`,
+reference. Its schema fixes `field_characteristic` and exactly one of
+`cubic_nonresidue` or `field_modulus`. The latter is the three canonical
+coefficients of an irreducible monic cubic, in increasing degree order. The
+route field presentation must exactly match the input presentation. It
 lists bounded short-Weierstrass `curve_nodes` with canonical three-coefficient
 `a` and `b`, and records each edge's source, target, prime degree in
 `2..=31`, and affine `kernel_generator`. Each route is a root-origin sequence
@@ -346,20 +349,40 @@ ic cubic-graph --p 7 --c 2 --a 3 6 4 --b 4 4 6 \
 ic cubic-graph --p 7 --c 2 --a 0 0 0 --b 1 0 0 \
   --max-ell 2 --include-degree-two --include-multiplicity \
   --max-nodes 8 --seed 1 --json
+ic cubic-graph --input docs/ic/fixtures/cubic_f11_routed_solve_target.json \
+  --max-ell 2 --include-degree-two --max-nodes 16 --json > graph.json
+ic cubic-route-generate \
+  --input docs/ic/fixtures/cubic_f11_routed_solve_target.json \
+  --degree 2 --graph-file graph.json --target-node 1 --json > route.json
+ic solve-cubic --input docs/ic/fixtures/cubic_f11_routed_solve_target.json \
+  --route-file route.json --route-id root-to-velu2 \
+  --seed 1 --max-residuals 1000 --json
 ```
+
+The F11 example checks a degree-2 isogeny, transports the order-29 subgroup,
+and recovers scalar 5 with both IC and same-target rho. Its
+[`CUBIC_ROUTED_GENERAL_S3_ACCEPTANCE_20261024.json`](../store/CUBIC_ROUTED_GENERAL_S3_ACCEPTANCE_20261024.json)
+receipt also records target and route upload, remote byte verification,
+fresh-cache `store:` solves through `ic` and `icx`, pull, and exact-object
+cleanup in the approved Setec bucket. Graph numeration is bounded by
+`max-nodes`, and a modular-polynomial j-neighbour alone does not certify a
+rational kernel; route generation checks one explicitly.
 
 `--input` accepts the same strict public cubic target JSON used by
 `solve-cubic`, including a checked `store:NAME` or `sha256:DIGEST` reference.
-It supplies `p`, `c`, `a`, and `b` and cannot be combined with those explicit
-flags. The graph report records the input reference, SHA-256, and byte count;
+It supplies `p`, exactly one of `c` or `modulus`, `a`, and `b` and cannot be
+combined with those explicit flags. Explicit input may use `--modulus M0 M1 M2`
+instead of `--c C`. The graph report records the input reference, SHA-256, and byte count;
 point and subgroup checks remain the responsibility of `solve-cubic`.
 The [target-file acceptance receipt](fixtures/CUBIC_GRAPH_TARGET_FILE_ACCEPTANCE_20261023.json)
 compares both release CLIs with explicit coefficients, records five rejected
 inputs, and checks fresh-cache `store:` and digest references against one live
 Setec object before exact-prefix cleanup.
 
-The field must be exactly `F_p[t]/(t³-c)` with canonical coefficients,
-prime `p` in `7..=101` (necessarily `p ≡ 1 mod 3`), and noncube `c`.
+The field is `F_p[t]/(t³-c)` for a noncube `c`, or
+`F_p[t]/(t³+M2*t²+M1*t+M0)` for an irreducible monic cubic. Coefficients
+must be canonical and `p` prime in `7..=101`; the binomial presentation
+requires `p ≡ 1 mod 3`.
 Supported odd prime degrees are 3, 5, and 7 when `p > degree + 1`.
 `--include-degree-two` also includes degree 2 when `--max-ell >= 2`; the
 default remains the odd-degree graph. Both `ic` and `icx` accept the flag.

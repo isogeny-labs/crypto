@@ -2,11 +2,11 @@
 
 use clap::Args;
 use crypto_lib::cryptanalysis::gaudry_cubic::{
-    run_gaudry_opts, run_rho3, Curve3, Fp3, GaudryOptions, Instance3, Pt3, SubspaceBase, E3,
+    Curve3, E3, Fp3, GaudryOptions, Instance3, Pt3, SubspaceBase, run_gaudry_opts, run_rho3,
 };
-use rand::{rngs::StdRng, SeedableRng};
+use rand::{SeedableRng, rngs::StdRng};
 use serde::Deserialize;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::path::PathBuf;
 
 #[derive(Args)]
@@ -123,9 +123,6 @@ pub fn solve(args: &CubicArgs) -> Result<Value, String> {
         (None, Some(modulus)) => Fp3::with_irreducible_cubic(input.p, modulus)?,
         _ => return Err("supply exactly one of c or modulus for the cubic field".into()),
     };
-    if input.modulus.is_some() && args.route_file.is_some() {
-        return Err("cubic isogeny routes currently require the t^3-c field presentation".into());
-    }
     let a = E3(input.a);
     let b = E3(input.b);
     let a3 = field.mul(&field.sq(&a), &a);
@@ -303,6 +300,25 @@ mod tests {
         assert_eq!(report["rho"]["recovered_scalar"], 5);
         assert_eq!(report["verified"], true);
         assert_eq!(report["rho"]["verified"], true);
+    }
+
+    #[test]
+    fn general_cubic_graph_route_recovers_source_scalar() {
+        let fixtures = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("docs/ic/fixtures");
+        let report = solve(&CubicArgs {
+            input: fixtures.join("cubic_f11_routed_solve_target.json"),
+            route_file: Some(fixtures.join("cubic_f11_routed_solve_route.json")),
+            route_id: Some("root-to-velu2".into()),
+            seed: 1,
+            max_residuals: 1_000,
+            skip_rho: false,
+        })
+        .unwrap();
+        assert_eq!(report["input"]["curve_order"], 1392);
+        assert_eq!(report["route"]["edges_verified"], 1);
+        assert_eq!(report["ic"]["recovered_scalar"], 5);
+        assert_eq!(report["rho"]["recovered_scalar"], 5);
+        assert_eq!(report["verified"], true);
     }
 
     #[test]
