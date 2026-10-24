@@ -45,7 +45,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          # The PR check needs both parents of the synthetic merge commit,
+          # not the repository's full history.
+          fetch-depth: 2
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            **/*.md
+            **/*.html
+            **/*manifest*.json
+            **/*seal*.json
+            **/*audit*.json
+            **/*SHA256SUMS*
+            **/*.sha256
+            /scripts/
+            /docs/curves/registry.json
+            /src/cryptanalysis/curve_id.rs
+            /src/cryptanalysis/curve_aliases.json
+            /.github/workflows/curve-names.yml
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'

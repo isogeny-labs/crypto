@@ -1,7 +1,6 @@
-Open pull requests as drafts and mark them ready for review only when the
-work is finished: drafts run only the fast CI tier, ready PRs the full tier
-(owner, 2026-10-23; replaces the 2026-10-17 ready-for-review rule). Push work
-for an existing research lane to its `lane/<lane>` branch with
+Open pull requests ready for review (`draft=false`) by default. Use a draft
+only when the user explicitly asks for one. Push work for an existing research
+lane to its `lane/<lane>` branch with
 `scripts/lane-push.sh` instead of opening another PR, and keep a PR's head
 within 30 CI checks. This and the repository's other rules are in
 [`AGENTS.md`](AGENTS.md) ("Default workflow") and

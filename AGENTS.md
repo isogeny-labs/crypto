@@ -7,6 +7,12 @@
   on a feature branch. If the branch already has an open PR, extend that
   PR and update its title and description to match the new scope instead of
   opening a second one. Do not leave finished work uncommitted.
+- **Use regular PRs.** Create pull requests with `draft=false` and mark an
+  existing draft ready for review when you update it. Record pending CI,
+  review, and follow-up work in the PR description; draft status is not a
+  holding queue. Ready for review invites review; it does not authorize a
+  merge. All validation, evidence, review, and merge gates below still apply.
+  Use a draft only when the user explicitly asks for one.
 - **Verify before pushing:** run `cargo test --release --lib`, the touched
   examples' tests, and the relevant Python suites (for example
   `research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py`)
@@ -471,13 +477,10 @@ separate small-model automation did the CI work and the merge.
 commits, pushes, and opens the PR (or updates the existing one). It then
 follows the PR until it lands, under the check-in and merge rules below.
 
-- **Open every PR as a draft; mark it ready when the work is done** (owner,
-  2026-10-23). Every push to a draft runs only the fast CI tier, and marking
-  the PR ready runs the full tier once on the current head (`.github/CI.md`,
-  "CI tiers"). Mark it ready after the final local validation, not to see
-  what CI says; a later push to a ready PR re-runs the full tier. The merge
-  sweeper requires the `full-tier` check and moves red PRs back to draft
-  (`ci:parked`). This replaces the 2026-10-17 rule that opened every PR ready.
+- **Open every PR ready for review (`draft=false`)**, whatever a tool or
+  runtime defaults to. Before ending an update to an existing draft, mark it
+  ready so reviews and checks that skip drafts (`llm-review`) can run. An
+  explicit user request to keep a particular PR in draft is the only exception.
 - **One PR per research lane, not per session.** Before opening a PR, look for
   an open PR from `lane/<lane>` for the same study (IC autolab, volcano,
   conductor gap, N83, ...). If there is one, push to it with

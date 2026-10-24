@@ -247,16 +247,15 @@ behind 11 EKS runners. The fix is to run less, not to wait longer:
   (`MERGE_SWEEPER_MAX_CHECKS`; skipped and neutral checks do not count) and
   labels it `ci:over-budget`. On 2026-10-23, 9 of the 30 most recently
   updated PRs were over.
-- **Capacity:** with `MERGE_SWEEPER_APPLY=true` the sweeper moves red,
-  conflicted, over-budget and `needs-human` PRs back to draft (`ci:parked`)
-  and keeps at most `MERGE_SWEEPER_MAX_READY` (default 40) PRs ready, the
-  newest beyond that going to draft with `ci:waiting`. Given
-  `MERGE_SWEEPER_TOKEN` it marks waiting drafts, then `lane/*` drafts idle for
-  six hours, ready as slots free; events made with `GITHUB_TOKEN` start no
-  workflows, so without that token nothing is promoted.
+- **Capacity:** with `MERGE_SWEEPER_APPLY=true`, red, conflicted,
+  over-budget and `needs-human` PRs receive `ci:parked`; PRs beyond
+  `MERGE_SWEEPER_MAX_READY` (default 40) receive `ci:waiting` for merge
+  prioritization. These labels never change a PR's draft/ready state. Waiting
+  labels clear when PRs return within the prioritization cap. Drafts remain
+  drafts only when explicitly requested by the user.
 - **Lanes:** sessions working one study push to `lane/<lane>` with
   `scripts/lane-push.sh <lane>` instead of opening a PR each; the lane has one
-  draft PR.
+  regular PR by default.
 
 Queued runs keep the workflow revision they were created with; only new events
 use the tiers.
