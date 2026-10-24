@@ -390,6 +390,21 @@ fn detectors_class_audits_and_queued_shards_agree() {
     let text = w.routes_json(&ids, &routes).json();
     // The root's detectors: P-224 is an a = -3 model with a valid generator.
     let one = queue::run_shard(&text, &w.start, 0, 1, 0).unwrap();
+    let mut saved = Vec::new();
+    let interrupted =
+        queue::run_shard_resume(&text, &w.start, 0, 1, 0, &[], &mut |done, _, line| {
+            if done == 2 {
+                return Err("interrupted after one committed curve".into());
+            }
+            saved.push(line.to_string());
+            Ok(())
+        });
+    assert!(interrupted.err().unwrap().contains("interrupted"));
+    assert_eq!(saved.len(), 1);
+    let resumed =
+        queue::run_shard_resume(&text, &w.start, 0, 1, 0, &saved, &mut |_, _, _| Ok(())).unwrap();
+    assert_eq!(resumed.jsonl, one.jsonl);
+    assert_eq!(resumed.metrics.json(), one.metrics.json());
     let root: serde_json::Value = serde_json::from_str(one.jsonl.lines().next().unwrap()).unwrap();
     assert_eq!(root["traits"]["a_minus_3_model"]["value"], true);
     assert_eq!(root["traits"]["generator_valid"]["value"], true);

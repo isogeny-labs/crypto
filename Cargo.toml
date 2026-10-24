@@ -41,8 +41,21 @@ name = "volcano-rho"
 path = "src/bin/volcano_rho.rs"
 
 [[bin]]
+# `isoclass-rho` — ECDLP cost across a whole isogeny class (prime, binary and
+# Koblitz curves): multi-ℓ walk with verified Vélu/Elkies maps, Pollard rho
+# with folds, generator sweeps, shifted instances and controls.
+name = "isoclass-rho"
+path = "src/bin/isoclass_rho/main.rs"
+
+[[bin]]
 name = "volcano-stats"
 path = "src/bin/volcano_stats.rs"
+
+# `generator-n0` — E3a of research/generator_effect_ic_20261019: the base's
+# cofactor-class count N0 against the volcano study's IC relation yield.
+[[bin]]
+name = "generator-n0"
+path = "src/bin/generator_n0.rs"
 
 [[bin]]
 name = "pkm-aux-search"
@@ -248,3 +261,7 @@ path = "research/conductor_gap_followups_20261016/native/followups.rs"
 [[example]]
 name = "conductor_gap_followup_posthoc"
 path = "research/conductor_gap_followups_20261016/native/posthoc.rs"
+
+[[bin]]
+name = "factor-base-sweep"
+path = "src/bin/factor_base_sweep.rs"

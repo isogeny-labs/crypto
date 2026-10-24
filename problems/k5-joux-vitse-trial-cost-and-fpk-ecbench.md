@@ -4,7 +4,7 @@
 - **Kind:** empirical bottleneck (the per-trial Gröbner constant); implementation gap (no `F_{p^k}` curve family in ecbench on `main`; extension-field curves not harvested by the curve registry)
 - **Affected work:** [`research/joux_vitse_n1_20261015/`](../research/joux_vitse_n1_20261015/README.md); [`RESEARCH_K5_TORSION_JOUX_VITSE.md`](../research/notes/index-calculus/RESEARCH_K5_TORSION_JOUX_VITSE.md) §5–6; PR #1863 / #1792 (the `F_{p⁴}` ecbench instance, unmerged)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-15
+- **Last updated:** 2026-10-20
 
 ## Problem
 
@@ -38,6 +38,13 @@ unregistered ICV1 identities (`research/joux_vitse_n1_20261015/curves.json`).
   five generic octics in four unknowns; nothing about the curve lowers it
   without a symmetry (the 2-torsion Edwards variant reaches `7.3·10⁷`,
   RESEARCH_K5 §3).
+- **Observed (Edwards route, 2026-10-20):** the 2-torsion Edwards route end
+  to end with F4 trace replay (`research/joux_vitse_n1_20261015/REPORT_EDWARDS.pdf`):
+  the replay cuts its four-point test `1.74–1.77×` (`5.85·10⁷ → 3.3·10⁷`),
+  below the `3–10×` RESEARCH_K5 §5 priced; five complete verified DLPs at
+  `log₂ n = 22.8–28.7` cost `1.2·10⁶–5.8·10⁶` times rho (`4.1·10⁵–1.9·10⁶`
+  with rho's unpriced walk work at 1 GAE), a sixth stopped at its cap at
+  `≥ 1.5·10⁷`; extrapolated parity `2^{227}` (was `2^{233}`).
 - **Missing capability:** an ecbench `F_{p^k}` instance with a counted
   group and a full-price table; registry harvesting for extension curves.
 - **What this evidence does not establish:** it does not establish that
@@ -62,14 +69,13 @@ existing measurement auditable in the harness.
 
 ## Next discriminating step
 
-- **Action:** run the 2-torsion Edwards test (`jv_quintic_edwards`) under
-  F4 trace replay and price its end-to-end DLP at `p ≈ 271` (RESEARCH_K5
-  §6 sized it at 27 h on four cores without replay).
+- **Action:** the replay lever is now measured (`1.74–1.77×`). The next lever is a smaller test, not a faster elimination of the same one: RESEARCH_K5 §5's remaining route is a symmetry or cover that changes the system's shape. This study measures no such candidate.
 - **Inputs and controls:** the same pair-table oracle; rho on the same
   target; the plain route of this study as the baseline.
-- **Outcomes:** a replay factor of 3–10× moves the extrapolated crossover
-  by 16–33 bits (RESEARCH_K5 §5), still past `2^{200}`; a larger factor
-  would reopen the route.
+- **Outcomes:** the measured replay factor `1.74–1.77×` moved the extrapolated
+  crossover about 6 bits (`2^{233} → 2^{227}`), short of the 16–33 bits
+  RESEARCH_K5 §5 allowed; a candidate that cuts the test by `≥ 10³` would
+  be needed to bring parity near `2^{128}` (`C″ ≲ 5·10⁴`).
 - **Recheck trigger:** #1792 merging (ecbench `F_{p⁴}`), or a new symmetry
   for `E(F_{p⁵})`.
 
@@ -77,3 +83,7 @@ existing measurement auditable in the harness.
 
 - 2026-10-15: recorded with the study's complete DLPs and ladder.
   Unresolved.
+- 2026-10-20: the Edwards route run end to end with trace replay
+  (`REPORT_EDWARDS.pdf`; `1.74–1.77×` on the test; five complete verified
+  DLPs at `1.2·10⁶–5.8·10⁶` times rho; one arm capped). Evidence updated
+  above; the obstruction stands. Unresolved.
