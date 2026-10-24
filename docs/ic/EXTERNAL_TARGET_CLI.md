@@ -224,14 +224,21 @@ missing second object that leaves neither an output directory nor staging files.
 ```sh
 ic solve-cubic --input docs/ic/fixtures/cubic_f7_public_target.json \
   --seed 1 --max-residuals 100000 --json
+ic solve-cubic --input docs/ic/fixtures/cubic_f11_public_target.json \
+  --seed 1 --max-residuals 100000 --json
 ```
 
-The input describes `F_p[t]/(t³-c)` and `y²=x³+ax+b`, with field elements
-as three canonical coefficients in increasing powers of `t`. The included
-fixture has `p=7`, `c=2`, full curve order `347`, and target `[5]G`; its
+The input describes either `F_p[t]/(t³-c)` using `"c": c`, or
+`F_p[t]/(t³+m₂t²+m₁t+m₀)` using `"modulus": [m₀,m₁,m₂]`. Supply exactly
+one field presentation. The latter accepts any monic cubic without a root in
+`F_p`; for degree three, that is the irreducibility test. Curve coefficients
+and points are three canonical coefficients in increasing powers of `t`.
+The first fixture has `p=7`, `c=2`, full curve order `347`, and target `[5]G`; its
 coordinates and curve order were also computed independently with direct
 extension-field arithmetic and point enumeration. The command requires prime
-`p` in `7..=101`, a noncube `c<p`, prime `n` in `3..=2000000`, a nonsingular
+`p` in `7..=101`, a noncube `c<p` for the binomial form or canonical
+irreducible cubic coefficients for the general form, prime `n` in
+`3..=2000000`, a nonsingular
 curve, and valid subgroup points. It counts `#E(F_{p³})`, requires `n` to
 divide that order, and requires the cofactor `h = #E/n` to be invertible modulo
 `n`. There is no separate cofactor size limit within the stated field and
@@ -243,6 +250,20 @@ checks the indexed content hash when it fetches the JSON into its cache.
 The JSON input is capped at 64 KiB, and `input_artifact` in the result records
 the exact reference, SHA-256, and byte count used for the solve. This binds a
 local or retrieved target to the reported scalar and route validation.
+The second fixture uses `p=11` and `t³+4t²+1`, a field for which an
+irreducible binomial `t³-c` does not exist. Its independently enumerated curve
+has order `1289`; the CLI recovers scalar 5 and the same-target rho reference
+also verifies 5. Cubic isogeny route files currently require the binomial
+presentation and are rejected for a general-modulus input.
+The [independent Python verifier](fixtures/verify_cubic_f11.py) checks the
+modulus has no base-field root, enumerates all 1,331 field elements to count
+the curve order, and checks `[5]G=Q` and `[1289]G=O`; its
+[receipt](fixtures/cubic_f11_acceptance_20261024.json) binds the target SHA-256.
+The [release CLI acceptance](fixtures/cubic_f11_cli_acceptance_20261024.json)
+records `ic`, `icx`, both CRAx bridges, the old binomial control, and five
+rejection cases. The [live S3 receipt](../store/CUBIC_GENERAL_MODULUS_S3_ACCEPTANCE_20261024.json)
+checks remote existence and downloaded bytes, then solves through four fresh
+caches from the same `store:` name before exact-object cleanup.
 The [input-identity acceptance receipt](../store/CUBIC_TARGET_INPUT_IDENTITY_ACCEPTANCE_20261023.json)
 records a local and a fresh-cache Setec S3 solve, a routed solve through a
 digest reference, remote byte checks, and exact-object cleanup.

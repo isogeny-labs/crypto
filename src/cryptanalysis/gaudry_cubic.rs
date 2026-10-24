@@ -96,13 +96,16 @@ pub(crate) fn sm(a: u64, b: u64, p: u64) -> u64 {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize)]
 pub struct E3(pub [u64; 3]);
 
-/// The cubic extension `F_p[t]/(t³ − c)`, `c` a non-cube, with an
-/// `F_p`-multiplication counter.
+/// A cubic extension in the basis `1,t,t²`, with an `F_p`-multiplication
+/// counter. The usual representation is `t³ = c`; `modulus` supports a
+/// general monic irreducible cubic `t³ + m₂t² + m₁t + m₀`.
 #[derive(Clone, Debug, Serialize)]
 pub struct Fp3 {
     pub p: u64,
-    /// `t³ = c`.
+    /// Binomial constant in `t³ = c`; zero when `modulus` is present.
     pub c: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub modulus: Option<[u64; 3]>,
     #[serde(skip)]
     muls: Cell<u64>,
 }
@@ -121,6 +124,7 @@ impl Fp3 {
         Fp3 {
             p,
             c,
+            modulus: None,
             muls: Cell::new(0),
         }
     }
@@ -139,6 +143,33 @@ impl Fp3 {
         Ok(Fp3 {
             p,
             c: c % p,
+            modulus: None,
+            muls: Cell::new(0),
+        })
+    }
+
+    /// Construct `F_p[t]/(t³ + m₂t² + m₁t + m₀)` from canonical
+    /// coefficients. A degree-three polynomial is irreducible over a field
+    /// exactly when it has no root in that field.
+    pub fn with_irreducible_cubic(p: u64, modulus: [u64; 3]) -> Result<Fp3, String> {
+        if !(3..=1_000_000).contains(&p) || !is_prime_u64(p) {
+            return Err("cubic field base must be prime and at most 1000000".into());
+        }
+        if modulus.iter().any(|&coefficient| coefficient >= p) {
+            return Err("cubic modulus coefficients must be less than p".into());
+        }
+        if (0..p).any(|x| {
+            let value = am(x, modulus[2], p);
+            let value = am(mm(value, x, p), modulus[1], p);
+            let value = am(mm(value, x, p), modulus[0], p);
+            value == 0
+        }) {
+            return Err("cubic modulus has a root and is reducible".into());
+        }
+        Ok(Fp3 {
+            p,
+            c: 0,
+            modulus: Some(modulus),
             muls: Cell::new(0),
         })
     }
@@ -193,6 +224,23 @@ impl Fp3 {
         let p = self.p;
         let (a0, a1, a2) = (a.0[0], a.0[1], a.0[2]);
         let (b0, b1, b2) = (b.0[0], b.0[1], b.0[2]);
+        if let Some([m0, m1, m2]) = self.modulus {
+            self.count(15);
+            let mut d = [
+                mm(a0, b0, p),
+                am(mm(a0, b1, p), mm(a1, b0, p), p),
+                am(am(mm(a0, b2, p), mm(a1, b1, p), p), mm(a2, b0, p), p),
+                am(mm(a1, b2, p), mm(a2, b1, p), p),
+                mm(a2, b2, p),
+            ];
+            for degree in (3..=4).rev() {
+                let coefficient = d[degree];
+                d[degree - 3] = sm(d[degree - 3], mm(coefficient, m0, p), p);
+                d[degree - 2] = sm(d[degree - 2], mm(coefficient, m1, p), p);
+                d[degree - 1] = sm(d[degree - 1], mm(coefficient, m2, p), p);
+            }
+            return E3([d[0], d[1], d[2]]);
+        }
         self.count(11);
         let d0 = mm(a0, b0, p);
         let d1 = am(mm(a0, b1, p), mm(a1, b0, p), p);
@@ -208,9 +256,13 @@ impl Fp3 {
     pub fn sq(&self, a: &E3) -> E3 {
         self.mul(a, a)
     }
-    /// Inverse via the norm: `a⁻¹ = (a^{p} a^{p²}) / N(a)` computed as
-    /// the adjugate of the multiplication matrix.
+    /// Invert in the selected cubic presentation. The binomial path uses
+    /// an adjugate; the general path uses `a^(p³-2)` in the verified field.
     pub fn inv(&self, a: &E3) -> E3 {
+        if self.modulus.is_some() {
+            assert_ne!(*a, Fp3::ZERO, "inverse of zero in F_p³");
+            return self.pow(a, (self.p as u128).pow(3) - 2);
+        }
         let p = self.p;
         let c = self.c;
         let (a0, a1, a2) = (a.0[0], a.0[1], a.0[2]);
@@ -4057,6 +4109,29 @@ mod tests {
         assert_eq!(f.mul(&f.mul(&t, &t), &t), f.from_base(f.c));
         let q = (f.p as u128).pow(3) - 1;
         assert_eq!(f.pow(&t, q), Fp3::ONE);
+    }
+
+    #[test]
+    fn irreducible_non_binomial_cubic_field_axioms() {
+        // t^3 + 4t^2 + 1 has no root over F_11; no irreducible
+        // binomial t^3-c exists there because 11 is 2 modulo 3.
+        let f = Fp3::with_irreducible_cubic(11, [1, 0, 4]).unwrap();
+        assert!(Fp3::with_irreducible_cubic(11, [0, 0, 1]).is_err());
+        assert!(Fp3::with_irreducible_cubic(11, [1, 0, 11]).is_err());
+        let t = E3([0, 1, 0]);
+        let t3 = f.mul(&f.sq(&t), &t);
+        assert_eq!(t3, E3([10, 0, 7]));
+        let mut rng = StdRng::seed_from_u64(11);
+        for _ in 0..64 {
+            let value = E3([
+                rng.gen_range(0..11),
+                rng.gen_range(0..11),
+                rng.gen_range(0..11),
+            ]);
+            if value != Fp3::ZERO {
+                assert_eq!(f.mul(&value, &f.inv(&value)), Fp3::ONE);
+            }
+        }
     }
 
     #[test]

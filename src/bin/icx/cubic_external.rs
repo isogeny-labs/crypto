@@ -1,4 +1,4 @@
-//! Explicit public ECDLP input over F_p[t]/(t^3-c).
+//! Explicit public ECDLP input over a checked cubic extension of F_p.
 
 use clap::Args;
 use crypto_lib::cryptanalysis::gaudry_cubic::{
@@ -11,7 +11,7 @@ use std::path::PathBuf;
 
 #[derive(Args)]
 pub struct CubicArgs {
-    /// JSON file or store:NAME/sha256:DIGEST reference with p, c, a, b, n, gx, gy, qx, qy.
+    /// JSON file or store reference with p, exactly one of c or modulus, a, b, n, gx, gy, qx, qy.
     #[arg(long)]
     input: PathBuf,
     /// Checked cubic-field isogeny graph JSON or store:NAME/sha256:DIGEST reference.
@@ -33,7 +33,8 @@ pub struct CubicArgs {
 #[serde(deny_unknown_fields)]
 struct Input {
     p: u64,
-    c: u64,
+    c: Option<u64>,
+    modulus: Option<[u64; 3]>,
     a: [u64; 3],
     b: [u64; 3],
     n: u64,
@@ -112,10 +113,19 @@ pub fn solve(args: &CubicArgs) -> Result<Value, String> {
     if !(1..=10_000_000).contains(&args.max_residuals) {
         return Err("max-residuals must be in 1..=10000000".into());
     }
-    if input.c >= input.p {
-        return Err("c must use its canonical representative below p".into());
+    let field = match (input.c, input.modulus) {
+        (Some(c), None) => {
+            if c >= input.p {
+                return Err("c must use its canonical representative below p".into());
+            }
+            Fp3::with_cube_nonresidue(input.p, c)?
+        }
+        (None, Some(modulus)) => Fp3::with_irreducible_cubic(input.p, modulus)?,
+        _ => return Err("supply exactly one of c or modulus for the cubic field".into()),
+    };
+    if input.modulus.is_some() && args.route_file.is_some() {
+        return Err("cubic isogeny routes currently require the t^3-c field presentation".into());
     }
-    let field = Fp3::with_cube_nonresidue(input.p, input.c)?;
     let a = E3(input.a);
     let b = E3(input.b);
     let a3 = field.mul(&field.sq(&a), &a);
@@ -225,6 +235,18 @@ pub fn solve(args: &CubicArgs) -> Result<Value, String> {
         row["verified"] = json!(rho_verified);
         Some(row)
     };
+    let mut input_report = json!({
+        "p": input.p, "a": input.a, "b": input.b,
+        "n": input.n, "curve_order": curve_order, "cofactor": cofactor,
+        "generator": [input.gx, input.gy],
+        "target": [input.qx, input.qy],
+    });
+    if let Some(c) = input.c {
+        input_report["c"] = json!(c);
+    }
+    if let Some(modulus) = input.modulus {
+        input_report["modulus"] = json!(modulus);
+    }
     let mut result = json!({
         "schema_version": 1,
         "operation": "solve-cubic",
@@ -235,12 +257,7 @@ pub fn solve(args: &CubicArgs) -> Result<Value, String> {
             "sha256": input_sha256,
             "bytes": bytes.len(),
         },
-        "input": {
-            "p": input.p, "c": input.c, "a": input.a, "b": input.b,
-            "n": input.n, "curve_order": curve_order, "cofactor": cofactor,
-            "generator": [input.gx, input.gy],
-            "target": [input.qx, input.qy],
-        },
+        "input": input_report,
         "config": {"seed": args.seed, "max_residuals": args.max_residuals, "cofactor": cofactor},
         "ic": ic,
         "rho": rho,
@@ -266,6 +283,26 @@ mod tests {
             count_curve_order3(&field, &E3([1, 0, 0]), &E3([0, 0, 0])),
             344
         );
+    }
+
+    #[test]
+    fn non_binomial_cubic_target_recovers_with_matched_rho() {
+        let report = solve(&CubicArgs {
+            input: PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("docs/ic/fixtures/cubic_f11_public_target.json"),
+            route_file: None,
+            route_id: None,
+            seed: 1,
+            max_residuals: 100_000,
+            skip_rho: false,
+        })
+        .unwrap();
+        assert_eq!(report["input"]["modulus"], json!([1, 0, 4]));
+        assert_eq!(report["input"]["curve_order"], 1289);
+        assert_eq!(report["ic"]["recovered_scalar"], 5);
+        assert_eq!(report["rho"]["recovered_scalar"], 5);
+        assert_eq!(report["verified"], true);
+        assert_eq!(report["rho"]["verified"], true);
     }
 
     #[test]
