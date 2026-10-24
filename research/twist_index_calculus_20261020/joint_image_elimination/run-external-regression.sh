@@ -4,6 +4,7 @@ set -euo pipefail
 joint_repo=$(git rev-parse --show-toplevel)
 joint_study="$joint_repo/research/twist_index_calculus_20261020/joint_image_elimination"
 joint_out=${1:?new output directory}
+joint_variants=${2:-"$joint_study/runs/verification-v8/variants"}
 test ! -e "$joint_out"
 mkdir -p "$joint_out/metadata" "$joint_out/systems"
 joint_out=$(cd "$joint_out" && pwd)
@@ -16,7 +17,7 @@ joint_image=twist-joint-msolve:0.11.0
 "${joint_docker[@]}" run --rm --network=none "$joint_image" sh -c 'cat /opt/msolve-source-commit.txt; sha256sum /usr/local/bin/msolve /usr/local/lib/libmsolve.so.4.0.0; gcc --version | head -1' > "$joint_out/metadata/versions.txt"
 joint_case() {
   local joint_id=$1 joint_source=$2 joint_name joint_rc joint_input
-  joint_name="twist-joint-ext-v1-$joint_id"
+  joint_name="twist-joint-$(basename "$joint_out")-$joint_id"
   mkdir "$joint_out/systems/$joint_id"
   if ! test -f "$joint_source.ms" || ! test -f "$joint_source.json"; then
     printf 'not-run-input-unavailable\n' > "$joint_out/systems/$joint_id/status.txt"
@@ -56,7 +57,7 @@ for joint_arm in l0-peel phi-l0-active double-l0-active; do
     joint_case "$joint_arm-$joint_block" "$joint_study/runs/regression-v1/orbit-inputs/$joint_arm/$joint_block/system"
   done < <(jq -r '.blocks[].id' "$joint_study/runs/regression-v1/orbit-inputs/$joint_arm/manifest.json")
   for joint_encoding in system geometric; do
-    joint_case "$joint_arm-variant-$joint_encoding" "$joint_study/runs/verification-v7/variants/$joint_arm/$joint_encoding"
+    joint_case "$joint_arm-variant-$joint_encoding" "$joint_variants/$joint_arm/$joint_encoding"
   done
 done
 date -u '+%Y-%m-%dT%H:%M:%SZ' > "$joint_out/metadata/finished-utc.txt"
