@@ -13,6 +13,15 @@
   holding queue. Ready for review invites review; it does not authorize a
   merge. All validation, evidence, review, and merge gates below still apply.
   Use a draft only when the user explicitly asks for one.
+- **Enable auto-merge when you open the PR** (owner, 2026-10-24):
+  `gh pr merge <n> --auto --merge`. It is the default for every PR whose base
+  is `main`, not an optional extra, and it does not replace the check-in and
+  merge rules below. GitHub offers auto-merge only when the base is the
+  repository's default branch: a PR stacked on a feature branch cannot
+  auto-merge, so retarget it to `main` once its parent lands and enable
+  auto-merge then, or merge the stack bottom-up. If the user asks to keep a PR
+  open or wait for review, disable auto-merge (`gh pr merge <n>
+  --disable-auto`).
 - **Verify before pushing:** run `cargo test --release --lib`, the touched
   examples' tests, and the relevant Python suites (for example
   `research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py`)
@@ -562,9 +571,10 @@ requires explicit authorization for that merge, and it follows these rules:
 - If a documentation-only change legitimately triggers no CI, verify the
   workflow filters, inspect the diff, and run any relevant local validation.
   State that no CI applied; do not claim that nonexistent checks passed.
-- Merge using the repository's permitted merge method and an expected-head-SHA
-  guard where supported. Confirm that GitHub reports the PR as merged, then
-  record the merge commit and validation outcome on the PR.
+- Auto-merge is already enabled when the PR was opened, so merge with the
+  repository's permitted merge method and an expected-head-SHA guard where
+  supported. Confirm that GitHub reports the PR as merged, then record the
+  merge commit and validation outcome on the PR.
 - If access, required external review, a persistent CI failure, or another
   concrete gate prevents merging, report that blocker precisely on the PR
   rather than asking the user to repeat the authorization already given.
