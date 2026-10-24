@@ -85,6 +85,25 @@ for odd-order $E/\FF_{q^4}$; a $2^{-l}$ genus-3 fraction over
 $\FF_{2^{3l}}$). All are in \S\ref{sec:ladder3}. None touches a prime field
 or a prime-degree binary field, where the GHS genus is out of reach.
 
+\paragraph{The published scale of high-genus index calculus.} The largest
+Weil-descent hyperelliptic discrete logarithms in the literature are at
+genus 31. Jacobson, Menezes and Stein~\cite{jms2001} applied GHS to elliptic
+curves over $\FF_{2^{62}}$, $\FF_{2^{93}}$, $\FF_{2^{124}}$ and
+$\FF_{2^{155}}$ and obtained genus-31 curves $C_{62}$, $C_{93}$, $C_{124}$
+and $C_{155}$ over $\FF_{2^2}$ to $\FF_{2^5}$, each with $\#J=2r$, $r$
+prime. They solved $C_{62}$, $C_{93}$ and $C_{124}$ with Enge--Gaudry
+(relation collection for $C_{124}$ took 379 CPU-days on a mixed cluster) and
+only estimated $C_{155}$, at 26{,}290 days on one 1\,GHz Pentium III.
+Velichka~\cite{velichka2008} solved $C_{155}$ ($\#J\approx2^{155}$) with
+Vollmer's algorithm and sieving: 136{,}533 relations, about 1{,}735 CPU-days
+in total, 21 days wall-clock, of which 14 days were linear algebra. No genus
+above 31 appears in that thesis; the journal version~\cite{vjs2014} was not
+available to us and is unchecked. Our genus-255 per-trial measurement
+(\S\ref{sec:ladder3}) is a cost sample, not a solved instance, at about
+eight times the largest published genus. The cover ECC2K-130 would need, of
+genus about $2^{130}$ (\S\ref{sec:ecc2k130}), lies about $2^{125}$ times
+beyond it.
+
 \paragraph{Genus three against the strongest rho.} Rounds three and four
 of the genus-3 work ran without a rho arm; a 23 October study supplied one
 (\art{research/ghs3_vs_rho_20261023/}; it has a frozen protocol and tables
