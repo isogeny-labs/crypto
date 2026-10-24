@@ -172,6 +172,14 @@ jobs:
       run:
         working-directory: research/cover_transfer_assessment_20261013/lean
     steps:
+      - name: Reclaim hosted runner disk for the Mathlib proof cache
+        if: runner.environment == 'github-hosted'
+        working-directory: .
+        run: |
+          df -h .
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/local/share/powershell
+          df -h .
       - uses: actions/checkout@v4
         with:
           sparse-checkout-cone-mode: false
@@ -182,6 +190,7 @@ jobs:
           lake-package-directory: research/cover_transfer_assessment_20261013/lean
           auto-config: false
           use-mathlib-cache: true
+          use-github-cache: false
           build: true
           build-args: 'CoverTransfer'
           test: false
