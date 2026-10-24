@@ -29,6 +29,8 @@ already present in the starting head.
 | Full release library suite |4,479 passed,0 failed,119 existing ignores | `cargo-lib-network.log`, `.exit` |
 | First full library run |4,470 passed,9 failed,119 ignored; loopback socket permission denied | `cargo-lib-final.log`, `.exit`; preserved environment failure |
 | Workflow metadata |4 passed | `workflow-tests.log`, `.exit` |
+| Full ICV1 naming metadata check |0 problems after exact tracked prose/pin hydration | `curve-names-hydrated.log`; sparse failures in `curve-names-initial.log` and `curve-names-missing-pins.log` are superseded |
+| Current-main artifact policy check | no data files committed | `artifact-policy-check.log`; four selected files remain ignored/pending approval |
 | Report | four final local pages rendered/inspected; large assets awaiting publication approval | `pdf-build-02.log`, `pdf-inspection.txt`, committed report source/SVGs and pending manifest |
 | Conductor | CLI127; no reservation or replacement coordinator | `conductor.log`, `.exit`; initial tool result before edits recorded in protocol |
 
@@ -97,6 +99,15 @@ Every matrix is rebuilt; no producer rank is trusted as an input.
 - `proof-gate-final.log` is the earlier180-declaration pass; the final source's
   separate `proof-gate-final-02.log` is185. Old gate receipts are retained without
   repurposing or changing their counts.
+- The extra full naming metadata check first lacked3,618 tracked Markdown/HTML
+  files in the sparse checkout. After materializing them with the repository
+  helper, it reported seven findings while the corresponding frozen-data pin
+  manifests were still off disk. Materializing the five applicable tracked
+  manifest/checksum paths makes the unchanged full `check_curve_names.py
+  --diff 5fed419c1a9818a524abc66f7912fbe7c35672c5` pass with zero problems.
+  No old prose, registry, matcher, exemption, or validation gate is patched.
+  These are sparse-environment diagnostics, not current-head CI failures or
+  a claim that an inherited naming failure needs repair.
 
 ## Data and artifact policy
 
