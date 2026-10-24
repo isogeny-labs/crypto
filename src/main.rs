@@ -1578,9 +1578,64 @@ fn resolve_isogeny_class_store_input(
     ))
 }
 
+fn prepare_isogeny_class_publication(
+    args: &[String],
+) -> Result<
+    (
+        Vec<String>,
+        Option<(String, std::path::PathBuf, crypto_lib::store::Store)>,
+    ),
+    String,
+> {
+    let mut mapped = args.to_vec();
+    let positions: Vec<_> = mapped
+        .iter()
+        .enumerate()
+        .filter_map(|(i, arg)| (arg == "--store-name").then_some(i))
+        .collect();
+    if positions.is_empty() {
+        return Ok((mapped, None));
+    }
+    if positions.len() != 1 {
+        return Err("--store-name must occur exactly once".into());
+    }
+    let command = mapped.first().cloned().unwrap_or_default();
+    let path_flag = match command.as_str() {
+        "build" => "--out",
+        "resume" => "--input",
+        _ => return Err("--store-name is supported only for isogeny class build/resume".into()),
+    };
+    let position = positions[0];
+    let name = mapped
+        .get(position + 1)
+        .ok_or("--store-name requires a logical name")?
+        .clone();
+    crypto_lib::store::index::validate_name(&name)?;
+    mapped.drain(position..=position + 1);
+    let path_position = mapped
+        .iter()
+        .position(|arg| arg == path_flag)
+        .ok_or_else(|| format!("isogeny class {command} requires {path_flag} with --store-name"))?;
+    let path = mapped
+        .get(path_position + 1)
+        .ok_or_else(|| format!("{path_flag} requires a path"))?
+        .clone();
+    if crypto_lib::store::is_store_ref(&path) {
+        return Err(format!(
+            "isogeny class {command} needs a writable local {path_flag} path for publication"
+        ));
+    }
+    let store = crypto_lib::store::Store::open_default()?;
+    store.remote()?;
+    if store.index.get(&name).is_some() {
+        return Err(format!("store name already exists: {name}"));
+    }
+    Ok((mapped, Some((name, std::path::PathBuf::from(path), store))))
+}
+
 #[cfg(test)]
 mod isogeny_class_store_input_tests {
-    use super::resolve_isogeny_class_store_input;
+    use super::{prepare_isogeny_class_publication, resolve_isogeny_class_store_input};
 
     #[test]
     fn mutable_graph_commands_require_a_writable_copy() {
@@ -1592,6 +1647,18 @@ mod isogeny_class_store_input_tests {
             ];
             let error = resolve_isogeny_class_store_input(&args).unwrap_err();
             assert!(error.contains("crypto store pull"), "{error}");
+        }
+    }
+
+    #[test]
+    fn publication_rejects_unsupported_commands_before_store_access() {
+        for command in ["plan", "status", "verify", "solve", "vertex"] {
+            let args = vec![
+                command.to_string(),
+                "--store-name".to_string(),
+                "graphs/public.sqlite".to_string(),
+            ];
+            assert!(prepare_isogeny_class_publication(&args).is_err());
         }
     }
 }
@@ -1612,16 +1679,66 @@ fn cmd_isogeny(op: IsogenyOp) {
 
     match op {
         IsogenyOp::Class { args } => {
-            let (value, code) = match resolve_isogeny_class_store_input(&args) {
-                Ok((resolved_args, input_artifact)) => {
-                    let (mut value, code) = match volcano_cli::run(&resolved_args) {
-                        Ok(result) => result,
+            let (value, code) = match prepare_isogeny_class_publication(&args) {
+                Ok((publication_args, mut publication)) => {
+                    match resolve_isogeny_class_store_input(&publication_args) {
+                        Ok((resolved_args, input_artifact)) => {
+                            let (mut value, mut code) = match volcano_cli::run(&resolved_args) {
+                                Ok(result) => result,
+                                Err(error) => {
+                                    (serde_json::json!({"status":"ERROR","error":error}), 2)
+                                }
+                            };
+                            if let Some(help) = value["help"].as_str() {
+                                value["help"] = serde_json::json!(format!(
+                                    "{help}\ncrypto wrapper: build/resume --store-name NAME \
+                                     publishes the SQLite graph; plan/build --curve and \
+                                     status/vertex/solve --input accept store:NAME or \
+                                     sha256:DIGEST."
+                                ));
+                            }
+                            if let Some(input_artifact) = input_artifact {
+                                value["input_artifact"] = input_artifact;
+                            }
+                            if code == 0 || code == 3 {
+                                if let Some((name, path, store)) = publication.as_mut() {
+                                    let meta = crypto_lib::store::PushMeta {
+                                        description: "isogeny class SQLite graph".into(),
+                                        provenance: format!(
+                                            "crypto isogeny class {}, git commit {}",
+                                            resolved_args[0],
+                                            crypto_lib::build_provenance::git_commit()
+                                                .unwrap_or("unknown")
+                                        ),
+                                        ..Default::default()
+                                    };
+                                    match store.push(name, path, meta) {
+                                        Ok(published) => {
+                                            value["publication"] = serde_json::json!({
+                                                "status": "published",
+                                                "reference": format!("store:{name}"),
+                                                "sha256": published.sha256,
+                                                "bytes": published.bytes,
+                                                "uploaded": published.uploaded,
+                                                "local_path": path,
+                                            });
+                                        }
+                                        Err(error) => {
+                                            value["publication"] = serde_json::json!({
+                                                "status": "error",
+                                                "reference": format!("store:{name}"),
+                                                "local_path": path,
+                                                "error": error,
+                                            });
+                                            code = 2;
+                                        }
+                                    }
+                                }
+                            }
+                            (value, code)
+                        }
                         Err(error) => (serde_json::json!({"status":"ERROR","error":error}), 2),
-                    };
-                    if let Some(input_artifact) = input_artifact {
-                        value["input_artifact"] = input_artifact;
                     }
-                    (value, code)
                 }
                 Err(error) => (serde_json::json!({"status":"ERROR","error":error}), 2),
             };
