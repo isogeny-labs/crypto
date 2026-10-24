@@ -22,9 +22,11 @@ name: ecbench
 # lives: a directory whose session.json has schema `ecbench.session/v1`,
 # wherever it is in the tree (sheriff case SHF-20261016-3caa6f, E2: 167
 # sessions outside research/ecbench_*/sessions/ were never re-verified).
-# Each is integrity-audited (hashes, seals, plan, answers, derived figures,
-# grading; --replay 0) on ecbench pull requests and in the weekly/manual
-# lane, and is evidence that is never edited.  An interrupted session,
+# Each complete or interrupted session is integrity-audited (hashes, seals,
+# plan, answers, derived figures, grading; --replay 0) on ecbench pull
+# requests and in the weekly/manual lane, and is evidence that is never
+# edited. Four scratch sessions lacking spec/host capsules are hash-pinned in
+# docs/ecbench/INCOMPLETE_SESSIONS.tsv and reported separately. An interrupted session,
 # including one whose runner was killed before it could mark it (still
 # `running`), is accepted by --allow-interrupted as evidence of the
 # interruption: every per-record check still applies.
@@ -51,7 +53,7 @@ defaults:
     shell: bash
 jobs:
   scope:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 5
     permissions:
       contents: read
@@ -94,10 +96,10 @@ jobs:
   harness:
     if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
     needs: scope
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     # Keep the exhaustive scientific audit's existing 300-minute budget in
-    # the weekly/manual lane; ordinary PR validation is bounded at 25 minutes.
-    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 300 }}
+    # the weekly/manual lane; ordinary PR validation is bounded at 45 minutes.
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 300 }}
     steps:
       - name: Require successful scope classification
         if: needs.scope.result != 'success'
@@ -189,6 +191,12 @@ jobs:
         run: cargo test --release --test ecbench_large_prime
       - name: Build
         run: cargo build --release --bin ecbench
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        with:
+          name: ecbench-pr-audit-bin
+          path: target/release/ecbench
+          if-no-files-found: error
       - name: Factor-base catalog fb_id / fbm_id checks
         run: |
           python3 research/ecbench_factor_bases_20261013/check_fb_ids.py
@@ -344,8 +352,11 @@ jobs:
       - name: Pinned session as root
         run: |
           sudo git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          # Hosted cpusets may expose only part of each physical core. This
+          # root smoke inherits the runner affinity and records L0 isolation; the
+          # 72 measured children are checked separately below.
           sudo ./target/release/ecbench run --spec docs/ecbench/specs/smoke-prime.json \
-            --out "$RUNNER_TEMP/prime" --allow-busy --settle 1 --quiet
+            --out "$RUNNER_TEMP/prime" --cpus inherit --allow-busy --settle 1 --quiet
           sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/prime"
       - name: Pinning took effect in every measured child
         run: |
@@ -398,13 +409,7 @@ jobs:
           for _ in 1 2; do ./target/release/ecbench db sql "$RUNNER_TEMP/claim" "$RUNNER_TEMP/claim.json" | sqlite3 -bail "$RUNNER_TEMP/ecbench.db"; done
           test "$(sqlite3 "$RUNNER_TEMP/ecbench.db" 'select count(*), min(check_status) from claims')" = "1|FAIL"
           jq -r '.verdict' "$RUNNER_TEMP/claim.json" | tee -a "$GITHUB_STEP_SUMMARY"
-      - name: Validate committed evidence integrity on pull requests
-        if: (github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false'
-        timeout-minutes: 12
-        run: |
-          bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
-          echo 'PR evidence validation: every committed ecbench session (by schema) hash/seal/answer audited. Fresh smoke sessions exercise deterministic replay; exhaustive historical replay belongs to the weekly/manual lane.' >> "$GITHUB_STEP_SUMMARY"
-      - name: Every committed ecbench session passes integrity
+      - name: Audit complete and interrupted sessions; pin incomplete scratch evidence
         if: (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
         run: bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
       - name: Committed evidence reproduces exhaustively on this host
@@ -430,3 +435,47 @@ jobs:
             ${{ runner.temp }}/claim
             ${{ runner.temp }}/claim.json
           if-no-files-found: ignore
+
+  evidence_audit_pr:
+    if: (github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false'
+    needs: [scope, harness]
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecbench.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/scripts/
+            /docs/ecbench/INCOMPLETE_SESSIONS.tsv
+            /research/ecbench_*/
+            /research/ghs_curve_comparison_20261009/
+            /research/notes/ecc2k130/cold_compact_orbit_ic_20261003/
+            /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
+      - name: Check out and list every committed ecbench session
+        run: |
+          list="$RUNNER_TEMP/ecbench-sessions.txt"
+          mapfile -t candidates < <(git ls-tree -r --name-only HEAD | sed -n 's#/session\.json$##p')
+          test "${#candidates[@]}" -gt 0 || { echo '::error::no session.json in the tree'; exit 1; }
+          printf '/%s/\n' "${candidates[@]}" | git sparse-checkout add --stdin
+          : > "$list"
+          for d in "${candidates[@]}"; do
+            test -f "$d/session.json" || { echo "::error::$d/session.json was not checked out"; exit 1; }
+            if jq -e '.schema == "ecbench.session/v1"' "$d/session.json" > /dev/null; then
+              echo "$d" >> "$list"
+            fi
+          done
+          test -s "$list" || { echo '::error::no committed ecbench sessions found'; exit 1; }
+          echo "$(wc -l < "$list") committed ecbench sessions (by schema)" | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/download-artifact@v4
+        with:
+          name: ecbench-pr-audit-bin
+          path: target/release
+      - name: Validate committed evidence integrity on pull requests
+        timeout-minutes: 12
+        run: |
+          chmod +x target/release/ecbench
+          bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
+          echo 'PR evidence validation: every committed ecbench session with complete inputs (by schema) hash/seal/answer audited; four hash-pinned scratch sessions lacking spec/host capsules remain incomplete. Fresh smoke sessions exercise deterministic replay; exhaustive historical replay belongs to the weekly/manual lane.' >> "$GITHUB_STEP_SUMMARY"

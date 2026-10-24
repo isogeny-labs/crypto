@@ -32,3 +32,7 @@ records made on aarch64 under the lazy path stay evidence at their commit.
 
 **Not measured.** No aarch64 host was available; the ratio there is
 unmeasured (task: Arm64 measurements via CI runners).
+Measured since on GitHub's Arm runners (Neoverse-N2, Apple M1): the lazy
+rewrite with the bit scatter costs 1.08–1.69× (Linux) and 0.97–1.87×
+(macOS) the shift runs' CPU, with
+identical decisions and units; see `research/arm64_f4_defaults_20261022`.
