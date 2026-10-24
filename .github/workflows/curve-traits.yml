@@ -122,11 +122,17 @@ jobs:
       - name: Reject an altered file
         if: matrix.task == 'altered'
         run: |
-          cp docs/curves/traits.json /tmp/altered.json
-          sed -i '0,/"conductor": "7"/s//"conductor": "11"/' /tmp/altered.json
-          if cmp -s docs/curves/traits.json /tmp/altered.json; then
-            echo 'the edit did not apply'; exit 1
-          fi
+          node <<'NODE'
+          const fs = require('node:fs');
+          const traits = JSON.parse(fs.readFileSync('docs/curves/traits.json', 'utf8'));
+          const curve = traits.curves.find((entry) => /^\d+$/u.test(entry.frobenius?.conductor ?? ''));
+          if (!curve) throw new Error('no numeric Frobenius conductor to mutate');
+          curve.frobenius.conductor = (BigInt(curve.frobenius.conductor) + 1n).toString();
+          fs.writeFileSync('/tmp/altered.json', JSON.stringify(traits));
+          NODE
+          cmp -s docs/curves/traits.json /tmp/altered.json && {
+            echo 'the edit did not apply'; exit 1;
+          }
           if ./target/release/curve_traits check --traits /tmp/altered.json; then
             exit 1
           fi
