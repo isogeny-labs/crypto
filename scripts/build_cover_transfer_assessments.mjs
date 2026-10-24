@@ -9,7 +9,7 @@ const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
 const ASSESSMENT_DATE = "2026-10-24";
-const CATALOG_COMMIT = "4a181ccb3201d3275cbf7aed29bfd72f58d82467";
+const CATALOG_COMMIT = "728304718cb0ab6df70da620a908a5f76f175293";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
@@ -411,7 +411,7 @@ const resultTemplates = {
   "subgroup.binary-generator.supported": {
     status: "supported",
     scope:
-      "All 140 linked binary EC1 generators, using their exact catalog fields and curve coefficients.",
+      "All 142 linked binary EC1 generators, using their exact catalog fields and curve coefficients.",
     rationale:
       "The content-addressed graph and independent semantic verifier establish each exact EC1/curve/map join; the native batch certificate then decodes that row's generator canonically and checks its binary Weierstrass equation.",
     evidence_refs: [
@@ -423,7 +423,7 @@ const resultTemplates = {
   "subgroup.binary-annihilation.supported": {
     status: "supported",
     scope:
-      "All 140 linked binary generators and their numeric catalog subgroup-order values r.",
+      "All 142 linked binary generators and their numeric catalog subgroup-order values r.",
     rationale:
       "The native batch certificate checks [r]G=O. This proves ord(G) divides r, not by itself that ord(G)=r.",
     evidence_refs: [
@@ -455,7 +455,7 @@ const resultTemplates = {
     scope:
       "Every checked binary pullback image and its numeric catalog order value r.",
     rationale:
-      "The native batch certificate checks [r]phi^*(G)=0 for all 140 exact triples.",
+      "The native batch certificate checks [r]phi^*(G)=0 for all 142 exact triples.",
     evidence_refs: [
       "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses",
     ],
@@ -465,7 +465,7 @@ const resultTemplates = {
     scope:
       "phi_*phi^*(G)=[3]G for every linked binary generator, within the typed fiber witness domain.",
     rationale:
-      "The native batch certificate compares both sides for all 140 exact triples.",
+      "The native batch certificate compares both sides for all 142 exact triples.",
     evidence_refs: [
       "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses",
     ],
@@ -473,7 +473,7 @@ const resultTemplates = {
   "subgroup.binary-injective-generated.unknown": {
     status: "unknown",
     scope:
-      "The actual generated subgroup <G> for each of the 140 linked binary triples.",
+      "The actual generated subgroup <G> for each of the 142 linked binary triples.",
     rationale:
       "The checked generator identity would imply injectivity after pullback additivity and phi_*phi^*=[3] are certified on every element of <G>; the current batch test does not certify those all-element hypotheses.",
     evidence_refs: [
@@ -506,7 +506,7 @@ const resultTemplates = {
   "subgroup.binary-inverse-recovery.supported": {
     status: "supported",
     scope:
-      "Recovery of G from the typed pull-push value [3]G using 3^{-1} mod r for all 140 linked binary triples.",
+      "Recovery of G from the typed pull-push value [3]G using 3^{-1} mod r for all 142 linked binary triples.",
     rationale:
       "The batch certificate checks the modular inverse and exact point equality for each catalog value r; this is bounded typed-domain recovery, not a general Jacobian norm.",
     evidence_refs: [
@@ -871,7 +871,7 @@ async function buildSourceArtifacts() {
       "content-addressed ICV1/EC1/HC1/CV1 graph",
       freshness(
         "supported",
-        "15,791 exact map links, 15,789 unique cover objects, and 700 EC1 triples",
+        "15,791 exact map links, 15,789 unique cover objects, and 979 EC1 triples",
         "The ledger records exact sorted UID memberships rather than count-only coverage.",
         ["docs/curves/cover-links.yaml"],
       ),
@@ -941,7 +941,7 @@ async function buildSourceArtifacts() {
       "standalone CLI and native binary subgroup batch certificate",
       freshness(
         "supported",
-        "all 140 exact linked binary EC1 triples at the pinned source revision",
+        "all 142 exact linked binary EC1 triples at the pinned source revision",
         "The batch test is cited only for the checks it performs; it is not proof of every numeric order's primality.",
         ["src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses"],
       ),
@@ -1251,7 +1251,7 @@ async function buildLedger() {
   const mapCount = mapBase.reduce((sum, group) => sum + group.count, 0);
   const subgroupCount = subgroupBase.reduce((sum, group) => sum + group.count, 0);
   assert(mapCount === 15791, `map membership count is ${mapCount}`);
-  assert(subgroupCount === 700, `subgroup membership count is ${subgroupCount}`);
+  assert(subgroupCount === 979, `subgroup membership count is ${subgroupCount}`);
   assert(fieldBindings.size === 557, `declared-field binding count is ${fieldBindings.size}`);
   assert(jacobianBindings.size === 15789, `Jacobian binding count is ${jacobianBindings.size}`);
   assert(typedMapBindings.size === 15791, `typed map binding count is ${typedMapBindings.size}`);
@@ -1268,8 +1268,8 @@ async function buildLedger() {
     );
   }
   const expectedSubgroupCounts = new Map([
-    ["subgroup.binary-degree3", 141],
-    ["subgroup.odd-degree2", 559],
+    ["subgroup.binary-degree3", 142],
+    ["subgroup.odd-degree2", 837],
   ]);
   for (const group of subgroupBase) {
     assert(
@@ -1438,35 +1438,15 @@ async function buildLedger() {
         boundary:
           "The exact order-823 catalog identity is retained, but no transfer-preservation claim follows from cover geometry alone.",
       },
-      {
-        overlay_id: "subgroup.binary-new-registry-unvalidated",
-        kind: "subgroup",
-        target: [
-          "EC1N73Ce0h9999c3e90683",
-          "urn:ec-record:1:sha256:9999c3e9068310bbfdef49da0bb3e43251d8a89431b9e79715225d5671ab2abd",
-          "urn:curve-cover-map:1:sha256:753aa4b663b50db4dee22881f5e9f60e9ff1b1379986b06af1a8785c5ee58bb4",
-        ],
-        claim_overrides: {
-          generator_on_curve: "subgroup.prime-generator.unknown",
-          catalog_order_annihilates_generator: "subgroup.prime-generator.unknown",
-          pullback_valid: "subgroup.prime-transfer.unknown",
-          image_annihilated_by_catalog_order: "subgroup.prime-transfer.unknown",
-          composition_on_generator: "subgroup.prime-transfer.unknown",
-          degree_inverse_recovery: "subgroup.prime-transfer.unknown",
-        },
-        evidence_additions: ["docs/curves/cover-links.yaml#EC1N73Ce0h9999c3e90683"],
-        boundary:
-          "This binary EC1 triple entered the expanded registry after the retained native batch receipt. Identity and degree-coprimality are supported; generator and transfer checks remain unknown.",
-      },
     ],
     coverage: {
       catalog_maps: 15791,
       unique_cover_models: 15789,
       geometry_verified_maps: 15791,
-      ec1_representations: 700,
+      ec1_representations: 979,
       assessed_maps: 15791,
       unassessed_maps: 0,
-      assessed_subgroups: 700,
+      assessed_subgroups: 979,
       unassessed_subgroups: 0,
       map_membership_entries: mapCount,
       subgroup_membership_entries: subgroupCount,
@@ -1511,7 +1491,7 @@ async function buildLedger() {
         control: "identity",
         assessment: freshness(
           "supported",
-          "all 15,791 map UIDs and 700 exact EC1/curve/map triples",
+          "all 15,791 map UIDs and 979 exact EC1/curve/map triples",
           "The generator resolves exact content-addressed joins and rejects duplicates or missing rows.",
           [
             "scripts/build_cover_transfer_assessments.mjs",
@@ -1558,7 +1538,7 @@ async function buildLedger() {
         control: "binary_catalog_subgroups",
         assessment: freshness(
           "supported",
-          "native generator-level checks for all 140 binary representations after independent exact EC1/curve/map identity joins",
+          "native generator-level checks for all 142 binary representations after independent exact EC1/curve/map identity joins",
           "The semantic verifier reconstructs the exact graph joins. The native batch certificate reads those representation rows and checks generator membership, catalog-order annihilation, pullback validity, image annihilation, composition on the tested generator, and degree-inverse recovery of that generator; it does not itself validate every content UID and does not certify subgroup-wide injectivity.",
           [
             "docs/curves/cover-links.yaml",
@@ -1573,7 +1553,7 @@ async function buildLedger() {
         control: "odd_degree2_transfer",
         assessment: freshness(
           "refuted",
-          "claim that the current one-infinity odd-prime implementation supports the 2,407 even-sextic source models",
+          "claim that the current one-infinity odd-prime implementation supports the 15,626 even-sextic source models",
           "The current model contract and the catalog infinity configuration are structurally incompatible.",
           ["src/prime_hyperelliptic/curve.rs", "docs/curves/covers.json"],
         ),
@@ -1642,7 +1622,7 @@ async function buildLedger() {
     ],
     exploration_boundary: [
       "No search for production targets, private keys, or discrete logarithms was performed.",
-      "All 15,791 map rows and all 700 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
+      "All 15,791 map rows and all 979 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
       "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
       "The 15,626 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
       "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",
