@@ -1,6 +1,11 @@
 {
   "schema_version": 1,
   "objective_target_count": 1260,
+  "frozen_archive": {
+    "path": "research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst",
+    "sha256": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339",
+    "unique_workloads": 1260
+  },
   "current_status": {
     "factor_base_verified_targets_per_arm": 1260,
     "projective_verified_targets_per_arm": 1260,
@@ -20,7 +25,8 @@
         "1260 unique archive workload keys",
         "543 verified candidate keys",
         "717 exact open keys",
-        "no duplicate workload identity"
+        "no duplicate workload identity",
+        "canonical open inventory sha256 16d33685b156b3ba753fff577c11c4958335a4ce80384ca292100bc5bbadda5a"
       ]
     },
     {
@@ -32,7 +38,8 @@
         "hash and seed drift rejected",
         "unknown and duplicate workloads rejected",
         "failures require null candidate prices",
-        "missing or mismatched replay rejected"
+        "missing or mismatched replay rejected",
+        "synthetic-only executable rejects real cohort identifiers"
       ]
     },
     {
@@ -64,7 +71,11 @@
       "id": "N5",
       "name": "reviewer_pattern_appendix",
       "execution_class": "derived_existing_evidence",
-      "closes_pencil_cohort": false
+      "closes_pencil_cohort": false,
+      "priced_target_observations": 11586,
+      "null_pencil_attempts": 4,
+      "coordinate_only_rows_excluded_from_cost_plots": 1260,
+      "break_even_equation": "dM+dS*S+dI*I+dL*N*(9+4*S+I)=0"
     },
     {
       "id": "N6",

@@ -26,6 +26,18 @@ and output digests. Assert set equality for 1,260 unique workload keys, 543
 verified keys, and 717 open keys, with no duplicate `(bits,p,target_index)` or
 workload ID.
 
+The frozen source is
+`research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst`,
+SHA-256 `550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339`.
+It contains 1,260 unique workload identities, each represented by one rho and
+two IC records. The only cap-only identity is `(32,186379,0)`, workload
+`Wa0fc1e72d7a0`. A read-only construction of the canonical 717-row inventory
+produced SHA-256
+`16d33685b156b3ba753fff577c11c4958335a4ce80384ca292100bc5bbadda5a`;
+the generator, stored output, and regression check remain N1 deliverables.
+Because the full JSONL is 371,572 bytes, it must use the repository artifact
+store rather than be added directly to Git.
+
 The expected open shards are 177 targets at 28 bits and 180 targets at each of
 32, 36, and 40 bits. A mismatch stops the plan before execution.
 
@@ -43,6 +55,16 @@ This assisted session does not run matrix export, exact nullspace, collector,
 or replay commands rejected by automatic approval review. The handoff makes an
 independently authorized execution mechanically reviewable; it does not count
 as execution.
+
+Implement the gate as a standalone, standard-library-only reader at
+`research/pencil_sparse_20261022/intake_gate.py`, with a versioned contract,
+fabricated `SYNTH-*` workloads, and negative fixtures. Its executable mode is
+synthetic-only: it rejects real cohort IDs, absolute or escaping paths,
+duplicate or unknown workloads, seed/hash drift, missing setup, non-disjoint
+primary and replay processes, incomplete replay, non-wall replay mismatch,
+unverified rho, and a non-null candidate price on a failed or capped record.
+It emits a `pencil-intake-validation/v1` receipt and cannot invoke a collector,
+replay, matrix, nullspace, or recovery command.
 
 ### N3. Execute the open cohort under independent authorization
 
@@ -77,6 +99,16 @@ model-cluster bootstrap intervals, ECDFs, heatmaps, outlier tables, and exact
 break-even surfaces from the current operation counts. Publish the underlying
 CSV beside SVG/PNG graphs and a neutral PDF appendix. All 1,260 workload keys
 remain visible, including pencil nulls.
+
+The existing rows support 11,586 verified priced target observations, four
+failed pencil attempts with null candidate ratios, and 1,260 coordinate-only
+Kummer rows that remain outside cost plots. Pencil ECDFs are conditional on the
+observed verified subset and show the missing cohort mass. Bootstrap intervals
+are labeled descriptive resampling intervals over the 21 frozen curve models.
+For the common source-add unit `9M+4S+I`, the exact candidate-minus-rho
+break-even surface is
+`dM + dS*S + dI*I + dL*N*(9 + 4S + I) = 0`; the generator must reproduce all
+36 source price cells before publishing that surface.
 
 ### N6. Close the projective-law proof boundary
 
