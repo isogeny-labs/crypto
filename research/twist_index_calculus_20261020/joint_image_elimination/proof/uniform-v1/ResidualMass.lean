@@ -47,7 +47,7 @@ theorem total_of_bounded (n : Nat) (ks : List Nat)
       intro a ha
       exact h a (by simp [ha])
     rw [cons_mass, singleton_mass]
-    simp [hk, ih ht]
+    simp [hk, ih ht, Nat.add_comm]
 
 theorem mapped_candidates_total {A : Type} (candidates : List A)
     (n : Nat) (residual : A → Nat)

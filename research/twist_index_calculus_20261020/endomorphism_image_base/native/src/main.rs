@@ -759,6 +759,18 @@ fn solve_fixtures(fixture_path: &Path, expected_sha: &str, root: &Path, out: &Pa
 
 fn main() {
     let args: Vec<_> = std::env::args().collect();
+    if args.len() == 5 && args[1] == "--joint-zero-oracle" {
+        image::joint::zero_oracle(Path::new(&args[2]), &args[3], Path::new(&args[4]));
+        return;
+    }
+    if args.len() == 5 && args[1] == "--joint-population-oracle" {
+        image::joint::population_oracle(Path::new(&args[2]), &args[3], Path::new(&args[4]));
+        return;
+    }
+    if args.len() == 4 && args[1] == "--joint-population-summary" {
+        let pass = image::joint::population_summary(Path::new(&args[2]), Path::new(&args[3]));
+        std::process::exit(if pass { 0 } else { 2 });
+    }
     if args.len() == 7 && args[1] == "--joint-variant-export" {
         image::joint::export_variant(
             Path::new(&args[2]),

@@ -7,8 +7,20 @@ mod proof;
 mod report;
 #[path = "joint_solver.rs"]
 mod solver;
+#[path = "../../../joint_image_elimination/native/uniform.rs"]
+mod uniform;
 #[path = "joint_variants.rs"]
 mod variants;
+
+pub(crate) fn zero_oracle(public: &Path, sha: &str, out: &Path) {
+    uniform::zero(public, sha, out)
+}
+pub(crate) fn population_oracle(public: &Path, sha: &str, out: &Path) {
+    uniform::population(public, sha, out)
+}
+pub(crate) fn population_summary(run: &Path, out: &Path) -> bool {
+    uniform::summarize(run, out)
+}
 
 pub(crate) fn construction_report(run: &Path, out: &Path) -> bool {
     report::construction(run, out)
