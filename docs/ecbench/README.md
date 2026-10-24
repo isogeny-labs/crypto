@@ -614,6 +614,39 @@ Two consequences to read every table with:
   ratio moves with `ln r` and `ln n` across curves. First use:
   `research/ecbench_frobenius_orbit_vs_rho_20261014/`.
 
+- **Word-RAM reference pricing is the host-independent alternative.**
+  `ic.pipeline_wordram`, `rho.signed_frobenius_wordram` and
+  `rho.signed_frobenius_strong_wordram` run the same base solvers and
+  charge the same counters by the same rules as the `*_full` methods.
+  They take each unit's price from fixed formulas, not from one host's
+  timings. The scheme is
+  [CurveSmash's](https://github.com/zac-williamson/curvesmash/blob/main/docs/COST_MODEL.md)
+  (after HashSmash). The curve's affine addition is the reference operation
+  and costs 1. Its budget `C`, in operations on a 256-bit word RAM, is fixed by
+  formula. Every other unit costs its own word-operation budget divided
+  by `C`. For a `k`-bit field in `s` words: `A = 128(s+1)`,
+  `M = k(2A+64) + 128(s+1)` and `C = I + 16M + 32A + 4096`.
+  Prime fields use CurveSmash's Fermat inversion,
+  `I = 2k(M+64) + 128(s+1)`, unchanged; at `k = 256` this gives its
+  secp256k1 price, `C = 78,037,248`, and a unit test holds both published
+  constants. In `GF(2^m)` a squaring is linear, so `S = 8k + 128(s+1)`
+  and `I = k(S+M+128) + 128(s+1)`. Frobenius maps, signed-Frobenius
+  canonicalisations, half-trace Artin–Schreier solves, hash probes,
+  row operations modulo `r` and word XORs are built from those budgets
+  (`src/cryptanalysis/ecbench/wordram_price.rs` documents each one).
+  The record's `detail.wordram_pricing` gives every budget, `C` and the
+  charge by counter. `ecbench wordram-prices --curve 0:31 …` prints the
+  table for any Koblitz curve; nothing is measured.
+  These are conservative portable allowances that define the unit, not
+  timings. The word RAM charges one operation per memory transfer
+  whatever the cache level, so a hash probe is much cheaper here than in
+  `full_prices.json`. Native work is priced in the same unit on every
+  host and needs no `price-units` run, but its rate is a modelling
+  choice: §5a's band (0, 0.1 and 1 GAE per native operation) still
+  decides any ranking, and a word-RAM total is one point to quote beside
+  it, not a replacement for it. A counter with no rule stays unpriced,
+  and the record stays marked as a lower bound.
+
 `ecbench resources --dir SESSION --out resources.json` reports, for every
 measured attempt including failures, the native integer counters by phase,
 charged GAE and clocks by phase, the target's exclusive online window,
