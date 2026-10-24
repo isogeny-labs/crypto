@@ -14,7 +14,9 @@ study = Path(__file__).resolve().parent
 packed = Path('/home/ec2-user/scratch/twist-zero-complete-archive-v2')
 archive = packed / 'runs.tar.xz'
 dest = study / 'results/publication'
-receipt = dest / 'store-publication-v1.json'
+attempt = sys.argv[1] if len(sys.argv) == 2 else 'v1'
+assert attempt in ('v1', 'v2')
+receipt = dest / ('store-publication-' + attempt + '.json')
 name = 'evidence/twist-index-calculus/20261024-zero-fiber-runs.tar.xz'
 cli = Path('/home/ec2-user/crypto-twist-ic/target/release/ecbench')
 check = json.loads((study / 'results/archive-verification-v2.json').read_text())
@@ -96,7 +98,7 @@ try:
                existing_remote_object=remote)
     assert head_exit == 0 or head_code in ('404', 'NotFound', 'NoSuchKey')
     save()
-    backup = dest / 'store-index-before-v1.json'
+    backup = dest / ('store-index-before-' + attempt + '.json')
     assert not backup.exists()
     backup.write_text(json.dumps(index_before, indent=2) + '\n')
     if prior is None:

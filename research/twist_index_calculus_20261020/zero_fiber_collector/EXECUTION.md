@@ -108,3 +108,18 @@ SHA-256 `86a7f68e331a24c4bb1048aab3932ce9b30901c7f64def2cae1f617f93ce8bb8`.
 Both earlier local archives, the permission failure and its successful repair
 remain. No cryptographic collector, oracle, target stream or census is rerun.
 Remote publication is separate and requires its own successful receipt.
+
+## Publication transport and sparse-index corrections
+
+The first transport stops on terminal input in the busy wrapper's child
+process group. It has no AWS child and no publication receipt; the verified
+publication process group is stopped and its state/exit 247 retained in
+`results/publication/transport-attempt-v1/`. A foreground reader now pipes
+input through the wrapper without writing credentials to disk.
+
+The first actual publication attempt authenticates successfully, then fails
+with `FileNotFoundError` because `store/index.json` is tracked but absent
+from this sparse worktree. The failed `store-publication-v1.json` is kept.
+No remote-head or push command ran in that attempt. Materializing the exact
+tracked index does not change its contents. A new attempt uses its own v2
+receipt and rechecks the alias and immutable remote object before pushing.
