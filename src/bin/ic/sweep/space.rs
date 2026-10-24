@@ -145,7 +145,10 @@ pub struct InstanceKind {
 impl InstanceKind {
     pub fn describe(&self) -> String {
         match self.regime.as_str() {
-            "koblitz" => format!("koblitz a={}", self.koblitz_a.map_or("auto".into(), |a| a.to_string())),
+            "koblitz" => format!(
+                "koblitz a={}",
+                self.koblitz_a.map_or("auto".into(), |a| a.to_string())
+            ),
             "prime" => format!("prime {}", self.family.as_deref().unwrap_or("generic")),
             other => other.to_string(),
         }
@@ -195,11 +198,21 @@ pub fn space_for(name: &str, instance: &InstanceKind) -> Result<Space, String> {
     match name {
         "koblitz-algebraic" => {
             want("koblitz")?;
-            Ok(algebraic_space(Kind::KoblitzAlgebraic, "koblitz-algebraic", true, instance))
+            Ok(algebraic_space(
+                Kind::KoblitzAlgebraic,
+                "koblitz-algebraic",
+                true,
+                instance,
+            ))
         }
         "char2-algebraic" => {
             want("char2")?;
-            Ok(algebraic_space(Kind::Char2Algebraic, "char2-algebraic", false, instance))
+            Ok(algebraic_space(
+                Kind::Char2Algebraic,
+                "char2-algebraic",
+                false,
+                instance,
+            ))
         }
         "koblitz-table" => {
             want("koblitz")?;
@@ -226,29 +239,95 @@ fn algebraic_space(kind: Kind, name: &'static str, koblitz: bool, inst: &Instanc
     };
     let mut params = vec![
         Param::cat("m", &["2", "3"], "summands: 2 descends S3, 3 descends S4"),
-        Param::cat("base", bases, "factor base kind (a subspace base, as descent needs)"),
-        Param::float("dim_frac", 0.15, 0.5, false, "subspace dimension as a fraction of the field degree n; the unknown count is m·dim"),
+        Param::cat(
+            "base",
+            bases,
+            "factor base kind (a subspace base, as descent needs)",
+        ),
+        Param::float(
+            "dim_frac",
+            0.15,
+            0.5,
+            false,
+            "subspace dimension as a fraction of the field degree n; the unknown count is m·dim",
+        ),
     ];
     if koblitz {
         params.push(
-            Param::cat("slots", &["default", "all"], "descend over every Frobenius image of V (needs the closure base)")
-                .when("base", &["koblitz-closure"]),
+            Param::cat(
+                "slots",
+                &["default", "all"],
+                "descend over every Frobenius image of V (needs the closure base)",
+            )
+            .when("base", &["koblitz-closure"]),
         );
     }
     params.extend([
         Param::cat(
             "solver",
-            &["inherited-f4", "matrix-f4", "matrix-f5", "f4-f2", "crossbred-f2", "fes-f2", "sat-cdcl", "buchberger-f2"],
+            &[
+                "inherited-f4",
+                "matrix-f4",
+                "matrix-f5",
+                "f4-f2",
+                "crossbred-f2",
+                "fes-f2",
+                "sat-cdcl",
+                "buchberger-f2",
+            ],
             "the polynomial system solver",
         ),
-        Param::int("max_degree", 3, 6, false, "Macaulay degree cap before splitting").when("solver", MATRIX_SOLVERS),
-        Param::int("node_budget", 256, 65536, true, "algebraic reduction calls before a solve gives up (a count)").when("solver", MATRIX_SOLVERS),
-        Param::int("crossbred_D", 2, 5, false, "Macaulay degree of the Crossbred preprocessing").when("solver", &["crossbred-f2"]),
-        Param::int("crossbred_k", 4, 16, false, "variables Crossbred enumerates").when("solver", &["crossbred-f2"]),
-        Param::int("sat_conflicts", 10_000, 1_000_000, true, "CDCL conflict budget (a count, not a time)").when("solver", &["sat-cdcl"]),
+        Param::int(
+            "max_degree",
+            3,
+            6,
+            false,
+            "Macaulay degree cap before splitting",
+        )
+        .when("solver", MATRIX_SOLVERS),
+        Param::int(
+            "node_budget",
+            256,
+            65536,
+            true,
+            "algebraic reduction calls before a solve gives up (a count)",
+        )
+        .when("solver", MATRIX_SOLVERS),
+        Param::int(
+            "crossbred_D",
+            2,
+            5,
+            false,
+            "Macaulay degree of the Crossbred preprocessing",
+        )
+        .when("solver", &["crossbred-f2"]),
+        Param::int(
+            "crossbred_k",
+            4,
+            16,
+            false,
+            "variables Crossbred enumerates",
+        )
+        .when("solver", &["crossbred-f2"]),
+        Param::int(
+            "sat_conflicts",
+            10_000,
+            1_000_000,
+            true,
+            "CDCL conflict budget (a count, not a time)",
+        )
+        .when("solver", &["sat-cdcl"]),
         Param::cat("sat_xor", &["cnf", "native"], "parity encoding").when("solver", &["sat-cdcl"]),
-        Param::cat("linalg", &["incremental-gauss", "structured-gauss"], "relation matrix"),
-        Param::cat("targets", &["walk", "random"], "how trial points are produced"),
+        Param::cat(
+            "linalg",
+            &["incremental-gauss", "structured-gauss"],
+            "relation matrix",
+        ),
+        Param::cat(
+            "targets",
+            &["walk", "random"],
+            "how trial points are produced",
+        ),
     ]);
     Space {
         name,
@@ -289,11 +368,32 @@ fn prime_table_space(inst: &InstanceKind) -> Space {
     let params = vec![
         Param::cat("m", &["2", "3"], "summands of the pair-table oracle"),
         Param::cat("base", &bases, "factor base kind"),
-        Param::float("size_exp", 0.08, 0.45, false, "base size is 2^(size_exp · bits), capped at MAX_BASE"),
-        Param::int("norm", 0, 64, false, "CM multiplier closure norm; 0 for the seeds alone").when("base", &["cm-multiplier"]),
+        Param::float(
+            "size_exp",
+            0.08,
+            0.45,
+            false,
+            "base size is 2^(size_exp · bits), capped at MAX_BASE",
+        ),
+        Param::int(
+            "norm",
+            0,
+            64,
+            false,
+            "CM multiplier closure norm; 0 for the seeds alone",
+        )
+        .when("base", &["cm-multiplier"]),
         Param::cat("negation_folded", &["1"], "halve the table's additions"),
-        Param::cat("linalg", &["incremental-gauss", "structured-gauss"], "relation matrix"),
-        Param::cat("targets", &["walk", "random"], "how trial points are produced"),
+        Param::cat(
+            "linalg",
+            &["incremental-gauss", "structured-gauss"],
+            "relation matrix",
+        ),
+        Param::cat(
+            "targets",
+            &["walk", "random"],
+            "how trial points are produced",
+        ),
     ];
     Space {
         name: "prime-table",
@@ -367,7 +467,13 @@ impl Space {
         })
     }
 
-    fn base_config(&self, scale: u32, factor_base: String, oracle: String, solver: Option<String>) -> TrialConfig {
+    fn base_config(
+        &self,
+        scale: u32,
+        factor_base: String,
+        oracle: String,
+        solver: Option<String>,
+    ) -> TrialConfig {
         TrialConfig {
             regime: self.instance.regime.clone(),
             degree: scale,
@@ -439,7 +545,10 @@ impl Space {
                 if let Some(lp) = a.get("large_primes").and_then(Value::as_str) {
                     oracle.push_str(&format!(",large_primes={lp}"));
                     if lp != "0" {
-                        oracle.push_str(&format!(",lp_domain_factor={:.3}", float(a, "lp_domain_factor")?));
+                        oracle.push_str(&format!(
+                            ",lp_domain_factor={:.3}",
+                            float(a, "lp_domain_factor")?
+                        ));
                     }
                 }
                 let mut cfg = self.base_config(scale, fb, oracle, None);
@@ -474,13 +583,18 @@ impl Space {
     pub fn baseline(&self, scale: u32) -> TrialConfig {
         match self.kind {
             Kind::Custom => unreachable!("a custom space has no baseline"),
-            // ecbench's `pdp3-koblitz`: inherited F4 on the Weil descent of
-            // S4 over span{1..z^{d-1}}, m = 3 (the ladder report's algebraic
-            // baseline), d = ⌊(n+1)/3⌋.
+            // Inherited F4 on the Weil descent of S3 over span{1..z^{d-1}},
+            // d = ⌊(n+1)/3⌋.  The ladder report's algebraic baseline is the
+            // S4 (m = 3) descent in ecbench's `pdp3-koblitz`; through this
+            // framework's `descent-algebraic` the m = 3 arm finishes only at
+            // n = 13 (n = 15 passes 600 s), which leaves a study one rung, so
+            // the baseline is the m = 2 arm, which scores on n = 13..23 in
+            // 1 s, 1 s, 1 s and 27 s.  Provisional, and not published index
+            // calculus.
             Kind::KoblitzAlgebraic | Kind::Char2Algebraic => self.base_config(
                 scale,
                 format!("binary-subspace:dimension={}", ((scale + 1) / 3).max(2)),
-                "descent-algebraic:m=3".into(),
+                "descent-algebraic:m=2".into(),
                 Some("inherited-f4".into()),
             ),
             // The leaderboard's Koblitz recipe: a small compact base, m = 3.
@@ -507,7 +621,12 @@ mod tests {
     use super::*;
 
     fn koblitz0() -> InstanceKind {
-        InstanceKind { regime: "koblitz".into(), koblitz_a: Some(0), family: None, max_cofactor: None }
+        InstanceKind {
+            regime: "koblitz".into(),
+            koblitz_a: Some(0),
+            family: None,
+            max_cofactor: None,
+        }
     }
 
     fn sample(a: &mut Assignment, k: &str, v: Value) {
@@ -519,13 +638,25 @@ mod tests {
         assert!(space_for("koblitz-algebraic", &koblitz0()).is_ok());
         assert!(space_for("koblitz-table", &koblitz0()).is_ok());
         assert!(space_for("prime-table", &koblitz0()).is_err());
-        assert!(space_for("no-such-space", &koblitz0()).unwrap_err().contains("koblitz-algebraic"));
+        assert!(space_for("no-such-space", &koblitz0())
+            .unwrap_err()
+            .contains("koblitz-algebraic"));
     }
 
     #[test]
     fn parents_come_before_the_parameters_that_depend_on_them() {
-        let prime = InstanceKind { regime: "prime".into(), koblitz_a: None, family: Some("j0".into()), max_cofactor: None };
-        let char2 = InstanceKind { regime: "char2".into(), koblitz_a: None, family: None, max_cofactor: Some(8) };
+        let prime = InstanceKind {
+            regime: "prime".into(),
+            koblitz_a: None,
+            family: Some("j0".into()),
+            max_cofactor: None,
+        };
+        let char2 = InstanceKind {
+            regime: "char2".into(),
+            koblitz_a: None,
+            family: None,
+            max_cofactor: Some(8),
+        };
         for space in [
             space_for("koblitz-algebraic", &koblitz0()).unwrap(),
             space_for("char2-algebraic", &char2).unwrap(),
@@ -535,7 +666,13 @@ mod tests {
             let mut seen = Vec::new();
             for p in &space.params {
                 for c in &p.when {
-                    assert!(seen.contains(&c.param), "{}: `{}` is conditioned on `{}`, which comes later or does not exist", space.name, p.name, c.param);
+                    assert!(
+                        seen.contains(&c.param),
+                        "{}: `{}` is conditioned on `{}`, which comes later or does not exist",
+                        space.name,
+                        p.name,
+                        c.param
+                    );
                 }
                 seen.push(p.name.clone());
             }
@@ -545,13 +682,20 @@ mod tests {
     #[test]
     fn conditions_activate_only_on_the_named_values() {
         let space = space_for("koblitz-algebraic", &koblitz0()).unwrap();
-        let crossbred_d = space.params.iter().find(|p| p.name == "crossbred_D").unwrap();
+        let crossbred_d = space
+            .params
+            .iter()
+            .find(|p| p.name == "crossbred_D")
+            .unwrap();
         let mut a = Assignment::new();
         sample(&mut a, "solver", json!("crossbred-f2"));
         assert!(crossbred_d.active(&a));
         sample(&mut a, "solver", json!("sat-cdcl"));
         assert!(!crossbred_d.active(&a));
-        assert!(!crossbred_d.active(&Assignment::new()), "a missing parent means inactive");
+        assert!(
+            !crossbred_d.active(&Assignment::new()),
+            "a missing parent means inactive"
+        );
     }
 
     #[test]
@@ -576,7 +720,10 @@ mod tests {
         assert_eq!(cfg.oracle, "descent-algebraic:m=2,slots=all");
         assert_eq!(cfg.solver.as_deref(), Some("crossbred-f2:D=3,k=8"));
         assert_eq!(cfg.linalg, "structured-gauss");
-        assert_eq!((cfg.regime.as_str(), cfg.degree, cfg.koblitz_a), ("koblitz", 23, Some(0)));
+        assert_eq!(
+            (cfg.regime.as_str(), cfg.degree, cfg.koblitz_a),
+            ("koblitz", 23, Some(0))
+        );
     }
 
     #[test]
@@ -590,7 +737,12 @@ mod tests {
 
     #[test]
     fn every_space_has_a_baseline_that_parses_as_a_configuration() {
-        let prime = InstanceKind { regime: "prime".into(), koblitz_a: None, family: Some("generic".into()), max_cofactor: None };
+        let prime = InstanceKind {
+            regime: "prime".into(),
+            koblitz_a: None,
+            family: Some("generic".into()),
+            max_cofactor: None,
+        };
         for space in [
             space_for("koblitz-algebraic", &koblitz0()).unwrap(),
             space_for("koblitz-table", &koblitz0()).unwrap(),
@@ -603,15 +755,38 @@ mod tests {
 
     #[test]
     fn only_the_algebraic_track_is_counted() {
-        assert!(space_for("koblitz-algebraic", &koblitz0()).unwrap().track.counted());
-        assert!(!space_for("koblitz-table", &koblitz0()).unwrap().track.counted());
+        assert!(space_for("koblitz-algebraic", &koblitz0())
+            .unwrap()
+            .track
+            .counted());
+        assert!(!space_for("koblitz-table", &koblitz0())
+            .unwrap()
+            .track
+            .counted());
     }
 
     #[test]
     fn generic_prime_curves_are_not_offered_automorphism_bases() {
-        let generic = InstanceKind { regime: "prime".into(), koblitz_a: None, family: Some("generic".into()), max_cofactor: None };
-        let j0 = InstanceKind { regime: "prime".into(), koblitz_a: None, family: Some("j0".into()), max_cofactor: None };
-        let bases = |i: &InstanceKind| match &space_for("prime-table", i).unwrap().params.iter().find(|p| p.name == "base").unwrap().domain {
+        let generic = InstanceKind {
+            regime: "prime".into(),
+            koblitz_a: None,
+            family: Some("generic".into()),
+            max_cofactor: None,
+        };
+        let j0 = InstanceKind {
+            regime: "prime".into(),
+            koblitz_a: None,
+            family: Some("j0".into()),
+            max_cofactor: None,
+        };
+        let bases = |i: &InstanceKind| match &space_for("prime-table", i)
+            .unwrap()
+            .params
+            .iter()
+            .find(|p| p.name == "base")
+            .unwrap()
+            .domain
+        {
             Domain::Cat(v) => v.clone(),
             _ => unreachable!(),
         };

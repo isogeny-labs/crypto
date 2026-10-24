@@ -138,8 +138,10 @@ ratios, so the search space is the same on every rung. Absolute caps
 - **No algebraic prime space.** The framework has no algebraic prime oracle;
   `prime-table` is reference only.
 - **`m ≥ 4`.** `descent-algebraic` is `m ∈ {2, 3}`.
-- **Baselines.** Provisional, and chosen so the F4 baseline runs on the
-  rungs a study uses; where it exhausts, the rung is dropped.
+- **Baselines.** Provisional, and not published index calculus. The algebraic
+  baseline is inherited F4 on the S3 descent (`m = 2`) at `d = ⌊(n+1)/3⌋`: the
+  `m = 3` arm finishes only at n = 13 through this framework. Where a baseline
+  exhausts, that rung is dropped, and a study needs at least two.
 - **Rho is context, not scored.** The record carries `w0_over_rho_lower_bound`
   (`S(0)` over the matched rho's mean `S`), a lower bound: rho's own native
   work is not band-priced here.

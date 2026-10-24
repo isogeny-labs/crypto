@@ -63,7 +63,13 @@ fn crashed(config: &TrialConfig, detail: String) -> TrialRecord {
 
 fn tail(text: &str, n: usize) -> String {
     let t = text.trim();
-    t.chars().rev().take(n).collect::<Vec<_>>().into_iter().rev().collect()
+    t.chars()
+        .rev()
+        .take(n)
+        .collect::<Vec<_>>()
+        .into_iter()
+        .rev()
+        .collect()
 }
 
 impl Evaluator for ProcessEvaluator {
@@ -97,7 +103,8 @@ impl Evaluator for ProcessEvaluator {
         let err = drain(Box::new(child.stderr.take().expect("piped")));
         // The child enforces its own limits; this is the backstop for a child
         // that cannot (it hung before arming them, or was stopped).
-        let hard = (self.timeout_seconds > 0).then(|| Duration::from_secs(self.timeout_seconds + 60));
+        let hard =
+            (self.timeout_seconds > 0).then(|| Duration::from_secs(self.timeout_seconds + 60));
         let started = Instant::now();
         let status = loop {
             match child.try_wait() {
@@ -238,7 +245,10 @@ fn score_baselines(
             Some(b) => b,
             None => {
                 let cfg = study.stamp(space.baseline(scale));
-                log(&format!("baseline at {scale}: {} + {}", cfg.factor_base, cfg.oracle));
+                log(&format!(
+                    "baseline at {scale}: {} + {}",
+                    cfg.factor_base, cfg.oracle
+                ));
                 let record = eval.evaluate(&cfg);
                 let line = BaselineLine { scale, record };
                 store.append_baseline(line.clone())?;
@@ -338,7 +348,15 @@ pub fn run_study(
                 Err(e) => {
                     state = TrialState::Failed;
                     note = format!("rung {scale}: {e}");
-                    rungs.push(RungLine { scale: *scale, class: Class::InvalidConfig, detail: e, log2_r: None, band: None, ratio: None, log2_ratio: None });
+                    rungs.push(RungLine {
+                        scale: *scale,
+                        class: Class::InvalidConfig,
+                        detail: e,
+                        log2_r: None,
+                        band: None,
+                        ratio: None,
+                        log2_ratio: None,
+                    });
                     break;
                 }
             };
@@ -402,7 +420,16 @@ pub fn run_study(
         } else {
             (None, false, None)
         };
-        let line = TrialLine { id, assignment: assignment.clone(), state, rungs, objective, projected, slope, note };
+        let line = TrialLine {
+            id,
+            assignment: assignment.clone(),
+            state,
+            rungs,
+            objective,
+            projected,
+            slope,
+            note,
+        };
         let mut g = shared.lock().unwrap();
         g.pending.retain(|(pid, _)| *pid != id);
         g.history.push(to_obs(&line));
@@ -416,9 +443,17 @@ pub fn run_study(
             line.state,
             line.objective.map_or(String::new(), |o| format!(
                 ", log2 ratio at target {o:+.3}{}",
-                if line.projected { " (projected)" } else { " (last rung, not projected)" }
+                if line.projected {
+                    " (projected)"
+                } else {
+                    " (last rung, not projected)"
+                }
             )),
-            if line.note.is_empty() { String::new() } else { format!(" — {}", line.note) }
+            if line.note.is_empty() {
+                String::new()
+            } else {
+                format!(" — {}", line.note)
+            }
         ));
     };
 
@@ -436,12 +471,25 @@ pub fn run_study(
     let best = trials
         .iter()
         .filter(|t| t.state == TrialState::Complete)
-        .min_by(|a, b| a.objective.unwrap_or(f64::INFINITY).total_cmp(&b.objective.unwrap_or(f64::INFINITY)))
+        .min_by(|a, b| {
+            a.objective
+                .unwrap_or(f64::INFINITY)
+                .total_cmp(&b.objective.unwrap_or(f64::INFINITY))
+        })
         .cloned();
     Ok(Summary {
-        complete: trials.iter().filter(|t| t.state == TrialState::Complete).count(),
-        pruned: trials.iter().filter(|t| t.state == TrialState::Pruned).count(),
-        failed: trials.iter().filter(|t| t.state == TrialState::Failed).count(),
+        complete: trials
+            .iter()
+            .filter(|t| t.state == TrialState::Complete)
+            .count(),
+        pruned: trials
+            .iter()
+            .filter(|t| t.state == TrialState::Pruned)
+            .count(),
+        failed: trials
+            .iter()
+            .filter(|t| t.state == TrialState::Failed)
+            .count(),
         ran_now: ran.load(std::sync::atomic::Ordering::SeqCst),
         usable_rungs: usable,
         best,
@@ -457,7 +505,12 @@ mod tests {
     use std::sync::atomic::{AtomicUsize, Ordering};
 
     fn instance() -> InstanceKind {
-        InstanceKind { regime: "koblitz".into(), koblitz_a: Some(0), family: None, max_cofactor: None }
+        InstanceKind {
+            regime: "koblitz".into(),
+            koblitz_a: Some(0),
+            family: None,
+            max_cofactor: None,
+        }
     }
 
     /// A stand-in pipeline whose cost is a known function of the
@@ -469,7 +522,8 @@ mod tests {
     }
 
     fn field<'a>(s: &'a str, key: &str) -> Option<&'a str> {
-        s.split(|c| c == ':' || c == ',').find_map(|kv| kv.strip_prefix(&format!("{key}=")))
+        s.split(|c| c == ':' || c == ',')
+            .find_map(|kv| kv.strip_prefix(&format!("{key}=")))
     }
 
     impl Evaluator for Mock {
@@ -494,15 +548,34 @@ mod tests {
                 rec.detail = "conflict budget".into();
                 return rec;
             }
-            let dim: f64 = field(&cfg.factor_base, "dimension").unwrap().parse().unwrap();
+            let dim: f64 = field(&cfg.factor_base, "dimension")
+                .unwrap()
+                .parse()
+                .unwrap();
             let m: f64 = field(&cfg.oracle, "m").unwrap().parse().unwrap();
             let ideal = n / 3.0;
-            let solver_factor = if solver.starts_with("crossbred-f2") { 0.5 } else if solver.starts_with("fes-f2") { 3.0 } else { 1.0 };
+            let solver_factor = if solver.starts_with("crossbred-f2") {
+                0.5
+            } else if solver.starts_with("fes-f2") {
+                3.0
+            } else {
+                1.0
+            };
             let growth = 2f64.powf(0.5 * n);
-            let shape = 1.0 + 4.0 * ((dim - ideal) / ideal).powi(2) + if m == 2.0 { 0.2 } else { 0.0 };
+            let shape =
+                1.0 + 4.0 * ((dim - ideal) / ideal).powi(2) + if m == 2.0 { 0.2 } else { 0.0 };
             let g = growth * shape * solver_factor;
-            let s: Vec<f64> = [0.0, 0.1, 1.0].iter().map(|w| (g + w * 2.0 * g) / 10.0).collect();
-            rec.band = Some(Band { weights: vec![0.0, 0.1, 1.0], s, group_gae: g, native_ops: 2.0 * g, solver_ops: g });
+            let s: Vec<f64> = [0.0, 0.1, 1.0]
+                .iter()
+                .map(|w| (g + w * 2.0 * g) / 10.0)
+                .collect();
+            rec.band = Some(Band {
+                weights: vec![0.0, 0.1, 1.0],
+                s,
+                group_gae: g,
+                native_ops: 2.0 * g,
+                solver_ops: g,
+            });
             rec
         }
     }
@@ -554,18 +627,39 @@ mod tests {
         let st = study(60);
         let path = tmp("find");
         let mut store = Store::open(&path, &header(&st, &space)).unwrap();
-        let mock = Mock { calls: AtomicUsize::new(0) };
+        let mock = Mock {
+            calls: AtomicUsize::new(0),
+        };
         let summary = run_study(&space, &st, &mut store, &mock, &|_| {}).unwrap();
         assert_eq!(summary.complete + summary.pruned + summary.failed, 60);
         assert_eq!(summary.ran_now, 60);
         let best = summary.best.expect("some trial completes");
-        assert!(best.objective.unwrap() < 0.0, "the best configuration must beat the baseline: {:?}", best.objective);
-        assert_eq!(best.assignment["solver"], serde_json::json!("crossbred-f2"), "{:?}", best.assignment);
+        assert!(
+            best.objective.unwrap() < 0.0,
+            "the best configuration must beat the baseline: {:?}",
+            best.objective
+        );
+        assert_eq!(
+            best.assignment["solver"],
+            serde_json::json!("crossbred-f2"),
+            "{:?}",
+            best.assignment
+        );
         assert!(best.projected, "four rungs are enough for a fit");
-        assert!(summary.pruned > 0, "the median rule should stop some trials early");
-        assert!(summary.failed > 0, "SAT exhausts on the larger rungs and must be recorded as failed");
+        assert!(
+            summary.pruned > 0,
+            "the median rule should stop some trials early"
+        );
+        assert!(
+            summary.failed > 0,
+            "SAT exhausts on the larger rungs and must be recorded as failed"
+        );
         // A pruned trial never ran the later rungs.
-        let pruned = store.trials.iter().find(|t| t.state == TrialState::Pruned).unwrap();
+        let pruned = store
+            .trials
+            .iter()
+            .find(|t| t.state == TrialState::Pruned)
+            .unwrap();
         assert!(pruned.rungs.len() < 4);
         // Four baselines were scored once each, then trials.
         assert_eq!(store.baselines.len(), 4);
@@ -579,7 +673,9 @@ mod tests {
         let first = {
             let st = study(12);
             let mut store = Store::open(&path, &header(&st, &space)).unwrap();
-            let mock = Mock { calls: AtomicUsize::new(0) };
+            let mock = Mock {
+                calls: AtomicUsize::new(0),
+            };
             run_study(&space, &st, &mut store, &mock, &|_| {}).unwrap();
             mock.calls.load(Ordering::SeqCst)
         };
@@ -587,11 +683,17 @@ mod tests {
         let st = study(20);
         let mut store = Store::open(&path, &header(&st, &space)).unwrap();
         assert_eq!(store.trials.len(), 12);
-        let mock = Mock { calls: AtomicUsize::new(0) };
+        let mock = Mock {
+            calls: AtomicUsize::new(0),
+        };
         let summary = run_study(&space, &st, &mut store, &mock, &|_| {}).unwrap();
         assert_eq!(summary.ran_now, 8, "only the 8 missing trials run");
         let ids: Vec<usize> = store.trials.iter().map(|t| t.id).collect();
-        assert_eq!(ids, (0..20).collect::<Vec<_>>(), "ids continue with no gaps or repeats");
+        assert_eq!(
+            ids,
+            (0..20).collect::<Vec<_>>(),
+            "ids continue with no gaps or repeats"
+        );
         // The baselines came from the store, not from new runs: 8 trials of
         // at most 4 rungs each.
         assert!(mock.calls.load(Ordering::SeqCst) <= 8 * 4);
@@ -604,7 +706,7 @@ mod tests {
         impl Evaluator for Capped {
             fn evaluate(&self, cfg: &TrialConfig) -> TrialRecord {
                 let mut r = self.0.evaluate(cfg);
-                if cfg.degree >= 23 && cfg.oracle == "descent-algebraic:m=3" {
+                if cfg.degree >= 23 && cfg.oracle == "descent-algebraic:m=2" {
                     // The incumbent F4 baseline runs out of budget here.
                     r.class = Class::Exhausted;
                     r.band = None;
@@ -616,9 +718,21 @@ mod tests {
         let st = study(8);
         let path = tmp("drop");
         let mut store = Store::open(&path, &header(&st, &space)).unwrap();
-        let summary = run_study(&space, &st, &mut store, &Capped(Mock { calls: AtomicUsize::new(0) }), &|_| {}).unwrap();
+        let summary = run_study(
+            &space,
+            &st,
+            &mut store,
+            &Capped(Mock {
+                calls: AtomicUsize::new(0),
+            }),
+            &|_| {},
+        )
+        .unwrap();
         assert_eq!(summary.usable_rungs, vec![13, 17, 19]);
-        assert!(summary.best.map_or(true, |b| !b.projected), "three rungs are below min_fit, so nothing is projected");
+        assert!(
+            summary.best.map_or(true, |b| !b.projected),
+            "three rungs are below min_fit, so nothing is projected"
+        );
         let _ = std::fs::remove_file(&path);
     }
 
@@ -646,7 +760,16 @@ mod tests {
         st.workers = 4;
         let path = tmp("parallel");
         let mut store = Store::open(&path, &header(&st, &space)).unwrap();
-        let summary = run_study(&space, &st, &mut store, &Mock { calls: AtomicUsize::new(0) }, &|_| {}).unwrap();
+        let summary = run_study(
+            &space,
+            &st,
+            &mut store,
+            &Mock {
+                calls: AtomicUsize::new(0),
+            },
+            &|_| {},
+        )
+        .unwrap();
         assert_eq!(summary.complete + summary.pruned + summary.failed, 24);
         let mut ids: Vec<usize> = store.trials.iter().map(|t| t.id).collect();
         ids.sort();

@@ -141,7 +141,12 @@ pub fn run_sweep(args: SweepArgs, json_only: bool) -> Result<Value, String> {
     }
 }
 
-fn instance_for(space: &str, koblitz_a: u8, family: &str, max_cofactor: u64) -> Result<InstanceKind, String> {
+fn instance_for(
+    space: &str,
+    koblitz_a: u8,
+    family: &str,
+    max_cofactor: u64,
+) -> Result<InstanceKind, String> {
     let regime = match space {
         s if s.starts_with("koblitz") => "koblitz",
         "char2-algebraic" => "char2",
@@ -258,7 +263,11 @@ fn run(a: RunArgs, json_only: bool) -> Result<Value, String> {
         "{} ({} track, {}) on {}: rungs {:?}, {} trials, {} worker(s), store {}",
         space.name,
         space.track.as_str(),
-        if space.track.counted() { "counted" } else { "reference only" },
+        if space.track.counted() {
+            "counted"
+        } else {
+            "reference only"
+        },
         inst.describe(),
         a.rungs,
         a.trials,

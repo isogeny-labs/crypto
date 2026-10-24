@@ -317,7 +317,8 @@ fn row_cost(row: &Value) -> Result<RowCost, String> {
     let mut other_native = BTreeMap::new();
     for path in PHASE_PATHS {
         let Some(phase) = at(row, path) else { continue };
-        group_gae += u64_at(phase, &["group_ops", "adds"]) + u64_at(phase, &["group_ops", "doubles"]);
+        group_gae +=
+            u64_at(phase, &["group_ops", "adds"]) + u64_at(phase, &["group_ops", "doubles"]);
         if let Some(native) = phase.get("native").and_then(Value::as_object) {
             for (name, count) in native {
                 let count = count.as_u64().unwrap_or(0);
@@ -713,10 +714,8 @@ mod tests {
 
     #[test]
     fn an_unverified_repeat_is_never_scored() {
-        let exhausted = record_from_report(
-            &config(),
-            &report(vec![row(true, false), row(false, true)]),
-        );
+        let exhausted =
+            record_from_report(&config(), &report(vec![row(true, false), row(false, true)]));
         assert_eq!(exhausted.class, Class::Exhausted);
         assert!(exhausted.band.is_none());
         // Recovered the wrong logarithm: a defect, not "gave up".
@@ -751,7 +750,10 @@ mod tests {
     #[test]
     fn a_wall_clock_budget_is_never_passed_through() {
         let argv = config().argv().unwrap();
-        let i = argv.iter().position(|a| a == "--solver-budget-seconds").unwrap();
+        let i = argv
+            .iter()
+            .position(|a| a == "--solver-budget-seconds")
+            .unwrap();
         assert_eq!(argv[i + 1], "0");
         let args = config().bench_args().unwrap();
         assert_eq!(args.solver_budget_seconds, 0);
@@ -784,7 +786,10 @@ mod tests {
         let band = a.band.clone().unwrap();
         assert!(band.s[0] > 0.0 && band.s[0] <= band.s[1] && band.s[1] <= band.s[2]);
         let b = run_trial(&cfg);
-        assert_eq!(a.band, b.band, "the same configuration must score identically");
+        assert_eq!(
+            a.band, b.band,
+            "the same configuration must score identically"
+        );
     }
 
     /// The algebraic track on a Koblitz curve: an F4-family solver whose
@@ -799,9 +804,21 @@ mod tests {
         }))
         .unwrap();
         let rec = run_trial(&cfg);
-        assert_eq!(rec.class, Class::Ok, "{}: {}", rec.class.as_str(), rec.detail);
+        assert_eq!(
+            rec.class,
+            Class::Ok,
+            "{}: {}",
+            rec.class.as_str(),
+            rec.detail
+        );
         let band = rec.band.unwrap();
-        assert!(band.solver_ops > 0.0, "an algebraic oracle's solver ops are native work");
-        assert!(band.s[2] > band.s[0], "native work must separate w = 1 from w = 0");
+        assert!(
+            band.solver_ops > 0.0,
+            "an algebraic oracle's solver ops are native work"
+        );
+        assert!(
+            band.s[2] > band.s[0],
+            "native work must separate w = 1 from w = 0"
+        );
     }
 }

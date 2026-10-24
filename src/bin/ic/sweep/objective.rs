@@ -28,7 +28,9 @@ pub fn worst_ratio(trial: &Band, baseline: &Band) -> Result<f64, String> {
     let mut worst = f64::NEG_INFINITY;
     for (t, b) in trial.s.iter().zip(&baseline.s) {
         if !(*b > 0.0) || !t.is_finite() {
-            return Err(format!("cannot form a ratio from S = {t} over a baseline S = {b}"));
+            return Err(format!(
+                "cannot form a ratio from S = {t} over a baseline S = {b}"
+            ));
         }
         worst = worst.max(t / b);
     }
@@ -137,17 +139,25 @@ mod tests {
 
     #[test]
     fn the_fit_recovers_a_line() {
-        let pts: Vec<(f64, f64)> = (0..6).map(|i| (10.0 + 4.0 * i as f64, 0.5 + 0.2 * (10.0 + 4.0 * i as f64))).collect();
+        let pts: Vec<(f64, f64)> = (0..6)
+            .map(|i| (10.0 + 4.0 * i as f64, 0.5 + 0.2 * (10.0 + 4.0 * i as f64)))
+            .collect();
         let f = fit(&pts).unwrap();
         assert!((f.slope - 0.2).abs() < 1e-9 && (f.intercept - 0.5).abs() < 1e-9);
-        assert!(fit(&[(3.0, 1.0), (3.0, 2.0)]).is_none(), "one distinct x has no slope");
+        assert!(
+            fit(&[(3.0, 1.0), (3.0, 2.0)]).is_none(),
+            "one distinct x has no slope"
+        );
         assert!(fit(&[(3.0, 1.0)]).is_none());
     }
 
     #[test]
     fn four_rungs_project_to_the_target_fewer_fall_back_to_the_last_measurement() {
         let line = |x: f64| -1.0 + 0.1 * x;
-        let pts: Vec<(f64, f64)> = [11.0, 17.0, 21.0, 39.0].iter().map(|&x| (x, line(x))).collect();
+        let pts: Vec<(f64, f64)> = [11.0, 17.0, 21.0, 39.0]
+            .iter()
+            .map(|&x| (x, line(x)))
+            .collect();
         let p = project(&pts, 81.0, 4).unwrap();
         assert!(p.projected && p.rungs == 4);
         assert!((p.value - line(81.0)).abs() < 1e-9);
@@ -161,10 +171,25 @@ mod tests {
 
     #[test]
     fn a_flatter_line_wins_at_the_target_even_if_worse_at_the_small_rungs() {
-        let steep: Vec<(f64, f64)> = [11.0, 17.0, 21.0, 39.0].iter().map(|&x| (x, -1.0 + 0.10 * (x - 11.0))).collect();
-        let flat: Vec<(f64, f64)> = [11.0, 17.0, 21.0, 39.0].iter().map(|&x| (x, -0.5 + 0.02 * (x - 11.0))).collect();
-        assert!(steep[0].1 < flat[0].1, "steep is better at the smallest rung");
-        let (s, f) = (project(&steep, 81.0, 4).unwrap(), project(&flat, 81.0, 4).unwrap());
-        assert!(f.value < s.value, "…but the flatter line is better at the target");
+        let steep: Vec<(f64, f64)> = [11.0, 17.0, 21.0, 39.0]
+            .iter()
+            .map(|&x| (x, -1.0 + 0.10 * (x - 11.0)))
+            .collect();
+        let flat: Vec<(f64, f64)> = [11.0, 17.0, 21.0, 39.0]
+            .iter()
+            .map(|&x| (x, -0.5 + 0.02 * (x - 11.0)))
+            .collect();
+        assert!(
+            steep[0].1 < flat[0].1,
+            "steep is better at the smallest rung"
+        );
+        let (s, f) = (
+            project(&steep, 81.0, 4).unwrap(),
+            project(&flat, 81.0, 4).unwrap(),
+        );
+        assert!(
+            f.value < s.value,
+            "…but the flatter line is better at the target"
+        );
     }
 }

@@ -56,7 +56,10 @@ impl Header {
                 }
             )*};
         }
-        check!(schema, space, track, counted, instance, rungs, min_fit, repeats, seed, max_trials, rho_runs);
+        check!(
+            schema, space, track, counted, instance, rungs, min_fit, repeats, seed, max_trials,
+            rho_runs
+        );
         if (self.target_log2_r - other.target_log2_r).abs() > 1e-9 {
             out.push(format!(
                 "target_log2_r: store has {}, this run has {}",
@@ -134,7 +137,11 @@ impl Line {
 
     fn parse(bytes: &[u8]) -> Result<Line, String> {
         let v: serde_json::Value = serde_json::from_slice(bytes).map_err(|e| e.to_string())?;
-        let kind = v.get("kind").and_then(|k| k.as_str()).unwrap_or("").to_string();
+        let kind = v
+            .get("kind")
+            .and_then(|k| k.as_str())
+            .unwrap_or("")
+            .to_string();
         let bad = |e: serde_json::Error| e.to_string();
         match kind.as_str() {
             "header" => serde_json::from_value(v).map(Line::Header).map_err(bad),
@@ -174,7 +181,12 @@ impl Store {
         let mut it = lines.into_iter();
         let header = match it.next() {
             Some(Line::Header(h)) => h,
-            _ => return Err(format!("{} does not start with a study header", path.display())),
+            _ => {
+                return Err(format!(
+                    "{} does not start with a study header",
+                    path.display()
+                ))
+            }
         };
         let bad = header.mismatches(expected);
         if !bad.is_empty() {
@@ -189,14 +201,21 @@ impl Store {
             match line {
                 Line::Baseline(b) => baselines.push(b),
                 Line::Trial(t) => trials.push(t),
-                Line::Header(_) => return Err("a second study header in the middle of the store".into()),
+                Line::Header(_) => {
+                    return Err("a second study header in the middle of the store".into())
+                }
             }
         }
         let file = OpenOptions::new()
             .append(true)
             .open(path)
             .map_err(|e| format!("cannot append to {}: {e}", path.display()))?;
-        if torn_at.is_none() && std::fs::read(path).map_err(|e| e.to_string())?.last().is_some_and(|b| *b != b'\n') {
+        if torn_at.is_none()
+            && std::fs::read(path)
+                .map_err(|e| e.to_string())?
+                .last()
+                .is_some_and(|b| *b != b'\n')
+        {
             let mut f = &file;
             f.write_all(b"\n").map_err(|e| e.to_string())?;
         }
@@ -220,14 +239,21 @@ impl Store {
         let mut it = lines.into_iter();
         let header = match it.next() {
             Some(Line::Header(h)) => h,
-            _ => return Err(format!("{} does not start with a study header", path.display())),
+            _ => {
+                return Err(format!(
+                    "{} does not start with a study header",
+                    path.display()
+                ))
+            }
         };
         let (mut baselines, mut trials) = (vec![], vec![]);
         for line in it {
             match line {
                 Line::Baseline(b) => baselines.push(b),
                 Line::Trial(t) => trials.push(t),
-                Line::Header(_) => return Err("a second study header in the middle of the store".into()),
+                Line::Header(_) => {
+                    return Err("a second study header in the middle of the store".into())
+                }
             }
         }
         Ok((header, baselines, trials))
@@ -282,7 +308,11 @@ fn read_lines(path: &Path) -> Result<(Vec<Line>, Option<u64>), String> {
             Ok(line) => out.push(line),
             Err(_) if Some(i) == last => torn = Some(start as u64),
             Err(e) => {
-                return Err(format!("{}:{}: corrupt store line: {e}", path.display(), i + 1));
+                return Err(format!(
+                    "{}:{}: corrupt store line: {e}",
+                    path.display(),
+                    i + 1
+                ));
             }
         }
     }
@@ -330,7 +360,8 @@ mod tests {
     }
 
     fn tmp(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("ic-sweep-store-{}-{name}", std::process::id()));
+        let dir =
+            std::env::temp_dir().join(format!("ic-sweep-store-{}-{name}", std::process::id()));
         let _ = std::fs::remove_file(&dir);
         dir
     }
@@ -376,7 +407,8 @@ mod tests {
         }
         // A crash cut the next write short.
         let mut f = OpenOptions::new().append(true).open(&path).unwrap();
-        f.write_all(b"{\"kind\":\"trial\",\"id\":1,\"assign").unwrap();
+        f.write_all(b"{\"kind\":\"trial\",\"id\":1,\"assign")
+            .unwrap();
         drop(f);
         let mut s = Store::open(&path, &header()).unwrap();
         assert_eq!(s.trials.len(), 1, "the torn trial is not counted");

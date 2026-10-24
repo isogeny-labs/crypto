@@ -181,7 +181,8 @@ fn erf(x: f64) -> f64 {
     let t = 1.0 / (1.0 + 0.327_591_1 * x);
     let poly = t
         * (0.254_829_592
-            + t * (-0.284_496_736 + t * (1.421_413_741 + t * (-1.453_152_027 + t * 1.061_405_429))));
+            + t * (-0.284_496_736
+                + t * (1.421_413_741 + t * (-1.453_152_027 + t * 1.061_405_429))));
     sign * (1.0 - poly * (-x * x).exp())
 }
 
@@ -206,8 +207,16 @@ impl Mixture {
         let mut sigma = Vec::with_capacity(n);
         let mut weight = Vec::with_capacity(n);
         for k in 0..n {
-            let left = if k == 0 { mus[k].0 } else { mus[k].0 - mus[k - 1].0 };
-            let right = if k + 1 == n { 1.0 - mus[k].0 } else { mus[k + 1].0 - mus[k].0 };
+            let left = if k == 0 {
+                mus[k].0
+            } else {
+                mus[k].0 - mus[k - 1].0
+            };
+            let right = if k + 1 == n {
+                1.0 - mus[k].0
+            } else {
+                mus[k + 1].0 - mus[k].0
+            };
             let (s, w) = if mus[k].1 {
                 (1.0, prior_weight)
             } else {
@@ -224,7 +233,12 @@ impl Mixture {
             .zip(&sigma)
             .map(|(&m, &s)| (phi((1.0 - m) / s) - phi((0.0 - m) / s)).max(1e-12))
             .collect();
-        Mixture { mu, sigma, weight, norm }
+        Mixture {
+            mu,
+            sigma,
+            weight,
+            norm,
+        }
     }
 
     fn log_pdf(&self, x: f64) -> f64 {
@@ -305,7 +319,13 @@ fn choose_categorical(
     Value::from(values[best.1].clone())
 }
 
-fn choose_numeric(p: &Param, below: &[&Value], above: &[&Value], rng: &mut Rng, opt: &TpeOptions) -> Value {
+fn choose_numeric(
+    p: &Param,
+    below: &[&Value],
+    above: &[&Value],
+    rng: &mut Rng,
+    opt: &TpeOptions,
+) -> Value {
     let unit = |group: &[&Value]| -> Vec<f64> {
         group
             .iter()
@@ -337,13 +357,18 @@ pub fn suggest(space: &Space, history: &[Obs], rng: &mut Rng, opt: &TpeOptions) 
         if !p.active(&chosen) {
             continue;
         }
-        let seen: Vec<&Value> = order.iter().filter_map(|o| o.assignment.get(&p.name)).collect();
+        let seen: Vec<&Value> = order
+            .iter()
+            .filter_map(|o| o.assignment.get(&p.name))
+            .collect();
         if !model || seen.len() < 2 {
             chosen.insert(p.name.clone(), prior_sample(p, rng));
             continue;
         }
         let n = seen.len();
-        let below_n = ((opt.gamma * n as f64).ceil() as usize).clamp(1, opt.gamma_cap).min(n - 1);
+        let below_n = ((opt.gamma * n as f64).ceil() as usize)
+            .clamp(1, opt.gamma_cap)
+            .min(n - 1);
         let (below, above) = seen.split_at(below_n);
         let value = match &p.domain {
             Domain::Cat(values) => choose_categorical(values, below, above, rng, opt),
@@ -477,7 +502,12 @@ mod tests {
                 };
                 let loss = (p.loss)(&a);
                 best = best.min(loss);
-                history.push(Obs { assignment: a, state: State::Complete, value: loss, rungs_done: 1 });
+                history.push(Obs {
+                    assignment: a,
+                    state: State::Complete,
+                    value: loss,
+                    rungs_done: 1,
+                });
             }
             total += best - p.optimum;
         }
@@ -491,13 +521,28 @@ mod tests {
     #[ignore]
     fn tune_defaults() {
         let problems = [smooth(), conditional(), deceptive()];
-        let variants: [(f64, f64); 6] = [(0.10, 0.0), (0.25, 0.0), (0.10, 0.15), (0.25, 0.15), (0.25, 0.30), (0.15, 0.10)];
+        let variants: [(f64, f64); 6] = [
+            (0.10, 0.0),
+            (0.25, 0.0),
+            (0.10, 0.15),
+            (0.25, 0.15),
+            (0.25, 0.30),
+            (0.15, 0.10),
+        ];
         for p in &problems {
             let rnd = mean_best(p, None, 60, 40);
             eprintln!("TUNE {:<12} random            regret {rnd:.4}", p.name);
             for (gamma, explore) in variants {
-                let opt = TpeOptions { gamma, explore, ..TpeOptions::default() };
-                eprintln!("TUNE {:<12} gamma {gamma:.2} explore {explore:.2} regret {:.4}", p.name, mean_best(p, Some(&opt), 60, 40));
+                let opt = TpeOptions {
+                    gamma,
+                    explore,
+                    ..TpeOptions::default()
+                };
+                eprintln!(
+                    "TUNE {:<12} gamma {gamma:.2} explore {explore:.2} regret {:.4}",
+                    p.name,
+                    mean_best(p, Some(&opt), 60, 40)
+                );
             }
         }
     }
@@ -507,7 +552,10 @@ mod tests {
         let p = smooth();
         let tpe = mean_best(&p, Some(&TpeOptions::default()), 60, 40);
         let rnd = mean_best(&p, None, 60, 40);
-        assert!(tpe < 0.6 * rnd, "TPE regret {tpe:.4} should be well under random's {rnd:.4}");
+        assert!(
+            tpe < 0.6 * rnd,
+            "TPE regret {tpe:.4} should be well under random's {rnd:.4}"
+        );
     }
 
     #[test]
@@ -515,7 +563,10 @@ mod tests {
         let p = conditional();
         let tpe = mean_best(&p, Some(&TpeOptions::default()), 60, 40);
         let rnd = mean_best(&p, None, 60, 40);
-        assert!(tpe < 0.8 * rnd, "TPE regret {tpe:.4} should be under random's {rnd:.4}");
+        assert!(
+            tpe < 0.8 * rnd,
+            "TPE regret {tpe:.4} should be under random's {rnd:.4}"
+        );
     }
 
     /// The floor on a problem built to defeat independent models: not
@@ -525,7 +576,10 @@ mod tests {
         let p = deceptive();
         let tpe = mean_best(&p, Some(&TpeOptions::default()), 60, 40);
         let rnd = mean_best(&p, None, 60, 40);
-        assert!(tpe < 3.0 * rnd + 0.05, "TPE regret {tpe:.4} vs random {rnd:.4}");
+        assert!(
+            tpe < 3.0 * rnd + 0.05,
+            "TPE regret {tpe:.4} vs random {rnd:.4}"
+        );
     }
 
     #[test]
@@ -538,7 +592,12 @@ mod tests {
             assert_eq!(a.contains_key("x"), a["c"] == json!("b"), "{a:?}");
             assert_eq!(a.contains_key("y"), a["c"] == json!("a"), "{a:?}");
             assert!(a.contains_key("z"));
-            history.push(Obs { assignment: a.clone(), state: State::Complete, value: (p.loss)(&a), rungs_done: 1 });
+            history.push(Obs {
+                assignment: a.clone(),
+                state: State::Complete,
+                value: (p.loss)(&a),
+                rungs_done: 1,
+            });
         }
     }
 
@@ -552,7 +611,12 @@ mod tests {
             assert!((1e-3..=1e3).contains(&f(&a, "x")));
             assert!((0.0..=1.0).contains(&f(&a, "z1")) && (0.0..=1.0).contains(&f(&a, "z2")));
             assert!((1..=64).contains(&a["k"].as_i64().unwrap()));
-            history.push(Obs { assignment: a.clone(), state: State::Complete, value: (p.loss)(&a), rungs_done: 1 });
+            history.push(Obs {
+                assignment: a.clone(),
+                state: State::Complete,
+                value: (p.loss)(&a),
+                rungs_done: 1,
+            });
         }
     }
 
@@ -563,7 +627,12 @@ mod tests {
         let mut out = Vec::new();
         for _ in 0..30 {
             let a = suggest(&p.space, &history, &mut rng, &TpeOptions::default());
-            history.push(Obs { assignment: a.clone(), state: State::Complete, value: (p.loss)(&a), rungs_done: 1 });
+            history.push(Obs {
+                assignment: a.clone(),
+                state: State::Complete,
+                value: (p.loss)(&a),
+                rungs_done: 1,
+            });
             out.push(a);
         }
         out
@@ -582,14 +651,24 @@ mod tests {
         let area: f64 = (0..steps)
             .map(|i| mix.log_pdf((i as f64 + 0.5) / steps as f64).exp() / steps as f64)
             .sum();
-        assert!((area - 1.0).abs() < 0.02, "the truncated mixture integrates to {area}");
+        assert!(
+            (area - 1.0).abs() < 0.02,
+            "the truncated mixture integrates to {area}"
+        );
         let mut rng = Rng::new(3);
-        assert!((0..2000).map(|_| mix.sample(&mut rng)).all(|x| (0.0..=1.0).contains(&x)));
+        assert!((0..2000)
+            .map(|_| mix.sample(&mut rng))
+            .all(|x| (0.0..=1.0).contains(&x)));
     }
 
     #[test]
     fn observations_rank_complete_then_pruned_then_failed() {
-        let mk = |state, value, rungs| Obs { assignment: Assignment::new(), state, value, rungs_done: rungs };
+        let mk = |state, value, rungs| Obs {
+            assignment: Assignment::new(),
+            state,
+            value,
+            rungs_done: rungs,
+        };
         let mut v = vec![
             mk(State::Failed, 0.0, 0),
             mk(State::Pruned, 1.0, 1),
@@ -615,7 +694,12 @@ mod tests {
     fn a_study_of_only_failures_still_suggests() {
         let p = conditional();
         let history: Vec<Obs> = (0..20)
-            .map(|_| Obs { assignment: Assignment::new(), state: State::Failed, value: f64::INFINITY, rungs_done: 0 })
+            .map(|_| Obs {
+                assignment: Assignment::new(),
+                state: State::Failed,
+                value: f64::INFINITY,
+                rungs_done: 0,
+            })
             .collect();
         let a = suggest(&p.space, &history, &mut Rng::new(1), &TpeOptions::default());
         assert!(a.contains_key("c") && a.contains_key("z"));

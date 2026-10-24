@@ -412,3 +412,61 @@ layout (`PROTOCOL.md`, `raw/*.json`, `fit.json`).
 - Sources read by delegated read-only audits and not re-verified line by line:
   the technique and curve inventories, and the leaderboard values in
   `graph_data.json` panel B.
+
+## 8. Status: plan steps 1–3 built (2026-10-24, later the same day)
+
+Implemented on branch `feat/ic-sweep-trial-20261024` (stacked on this note's
+branch), documented in [`docs/ic/SWEEPER.md`](../../docs/ic/SWEEPER.md):
+
+- **P1, the trial interface** — `ic sweep-trial`. Scores from operation counts
+  alone, `S(w) = (adds + doubles + w · native operations) / √r`. This follows
+  from §5a: the pinned calibration ratios cancel between `G − C` and `n_C`, so
+  no host timing or calibration enters. *Measured:* the n = 13 baseline scored
+  `S = [19.1, 143911.0, 1438937.6]` in both a debug and a release build.
+  Failure classes `exhausted / invalid / refused / invalid_config / crashed`
+  are never scored. Time and memory limits are enforced from inside the
+  process (`ps` is unavailable in the sandbox; macOS ignores `RLIMIT_AS`);
+  the time limit fired at 600.1 s in the three runs that reached it.
+- **P2, the search space** — four typed, conditional, scale-relative spaces.
+  The algebraic ones are the counted track; the table ones are tagged
+  reference-only in code. `rootfind-*` is offered by no space, pending the
+  owner's ruling (§6, D1 follow-up).
+- **P3, the optimiser** — in-tree TPE, median pruning over the rung ladder,
+  an append-only resumable store, one child process per trial. 42 unit tests,
+  two of them end-to-end through the real pipeline.
+
+**Findings from building it** (each measured):
+
+1. A tagged-enum parse of the store failed on every `f64`, because the
+   workspace enables `serde_json`'s `arbitrary_precision`. The store now reads
+   through `Value`.
+2. My first sampler defaults were wrong. On three synthetic problems
+   (`tune_defaults`, 40 studies × 60 trials) a wider good-fraction
+   (`gamma` 0.25) was worse everywhere; `gamma` 0.10 with a 15% exploration
+   probability gave regret 0.211 against random's 0.407 (smooth), 0.004 against
+   0.050 (conditional), and 0.157 against 0.118 on a problem built to defeat
+   independent models, the one case where it is worse than random.
+3. **The ladder report's baseline does not run through this framework.** The
+   framework's `descent-algebraic` with inherited F4 at `m = 3` finishes only
+   at n = 13 (21 s in release); n = 15, 19 and 23 each hit a 600 s limit. The
+   `m = 2` arm finishes on all four (about 1, 1, 1 and 27 s). The study
+   baseline is therefore the `m = 2` arm, and §4's reference to the `m = 3`
+   `pdp3-koblitz` arm stands only for ecbench, not for the sweeper.
+4. **K_0 degrees that exist** (`koblitz_instance(0, n)`, n ≤ 63): 9, 13, 15,
+   19, 23, 31, 37, 39, 41, 45, 51, 53, 57, 59, 61. n = 17 does not. K_1:
+   9, 11, 15, 17, 19, 23, 29, 43, 45, 47, 51, 57, 59, 61.
+
+**First study (a smoke run of the tool, not a result).** `koblitz-algebraic`,
+K_0, rungs 13/15/19/23, 18 trials, 3 workers, 90 s per trial: finished in
+4 min 16 s; 6 complete, 6 pruned, 6 failed. The n = 23 baseline hit the 90 s
+cap under load, so 3 rungs were usable, below `--min-fit 4`, and nothing was
+projected (reported as such). **No configuration beat the baseline**: the best
+trial is +2.41 in log2 (5.3× worse). All 6 failures were `exhausted`
+(Crossbred recovered no logarithm at these sizes; a SAT and an F4 run reached
+the cap). Eighteen trials on a small space says little; it shows the loop,
+the classes, the pruning and the store behave.
+
+**Not done:** widening the framework past n = 63 and `m ≥ 4` (plan P5, P6); the
+published-IC reference arm (P4b); prime and random-binary curve generation
+(P7); the §5a band for rho itself (the record's rho gap is a `w = 0` lower
+bound); a larger study with four usable rungs and a projection.
