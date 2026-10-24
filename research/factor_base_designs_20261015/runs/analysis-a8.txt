@@ -1,0 +1,115 @@
+Factor-base designs, Amendment 8 (T4, K1, X1): rows from research/factor_base_designs_20261015/runs
+
+════ K1: curve families, p1, f4_fp (generic = the first run's committed A0 and A11 rows)
+
+── family a0
+  arm  m  t   D(fam)  D(generic)  max_cols(fam)  max_cols(generic)
+  A0   2  2   4.0     4.0         37             37
+  A0   2  3   4.0     4.0         127            127
+  A0   2  4   4.0     4.0         280            280
+  A0   2  5   4.0     4.0         606            606
+  A0   2  6   5.0     5.0         2451           2451
+  A0   2  7   5.0     5.0         5031           5031
+  A0   2  8   5.0     5.0         9119           9119
+  A0   2  9   5.0     5.0         14922          14922
+  A0   3  2   5.0     5.0         363            368
+  A0   3  3   6.0     6.0         3268           3285
+  A0   3  4   6.0     6.0         12266          12314
+  A11  2  2   3.0     3.0         31             31
+  A11  2  3   3.0     3.0         78             78
+  A11  2  4   3.0     3.0         208            208
+  A11  2  5   4.0     4.0         1431           1431
+  A11  2  6   4.0     4.0         2673           2673
+  A11  2  7   4.0     4.0         5282           5282
+  A11  2  8   4.0     4.0         8765           8763
+  A11  2  9   4.0     4.0         13579          13579
+  A11  3  2   4.0     4.0         62             62
+  A11  3  3   4.0     4.0         781            781
+  A11  3  4   4.0     4.0         3096           3096
+  rule: 22 shared completed cells → CURVE-INDEPENDENT (every shared D equals the generic D)
+  gap at m = 3 (A11 D ≤ A0 D − 1 at every shared t): 3 cells → HOLDS
+  max_cols against generic (descriptive): equal at every shared cell: false; at most generic at every shared cell: false
+
+── family am3
+  arm  m  t   D(fam)  D(generic)  max_cols(fam)  max_cols(generic)
+  A0   2  2   4.0     4.0         37             37
+  A0   2  3   4.0     4.0         127            127
+  A0   2  4   4.0     4.0         280            280
+  A0   2  5   4.0     4.0         606            606
+  A0   2  6   5.0     5.0         2451           2451
+  A0   2  7   5.0     5.0         5031           5031
+  A0   2  8   5.0     5.0         9119           9119
+  A0   2  9   5.0     5.0         14922          14922
+  A0   3  2   5.0     5.0         368            368
+  A0   3  3   6.0     6.0         3285           3285
+  A0   3  4   6.0     6.0         12314          12314
+  A11  2  2   3.0     3.0         31             31
+  A11  2  3   3.0     3.0         78             78
+  A11  2  4   3.0     3.0         208            208
+  A11  2  5   4.0     4.0         1431           1431
+  A11  2  6   4.0     4.0         2673           2673
+  A11  2  7   4.0     4.0         5282           5282
+  A11  2  8   4.0     4.0         8763           8763
+  A11  2  9   4.0     4.0         13579          13579
+  A11  3  2   4.0     4.0         62             62
+  A11  3  3   4.0     4.0         781            781
+  A11  3  4   4.0     4.0         3096           3096
+  rule: 22 shared completed cells → CURVE-INDEPENDENT (every shared D equals the generic D)
+  gap at m = 3 (A11 D ≤ A0 D − 1 at every shared t): 3 cells → HOLDS
+  max_cols against generic (descriptive): equal at every shared cell: true; at most generic at every shared cell: true
+
+════ T4: a staircase stop (k = 64) on the tower engine, A0
+T4a, gating (m = 4, 4 systems): 4 of 4 complete with the committed D, no derived 1, planted solution kept  →  ADMITTED
+  m = 2 (reported): 12 of 16 systems equal the committed D; 4 lower under the stop
+  m = 3 (reported): 6 of 6 systems equal the committed D; 0 lower under the stop
+  m = 4 (gating): 4 of 4 systems equal the committed D; 0 lower under the stop
+  mismatch: "A0-m2.jsonl" m=2 t=2 target=0: stop-bounded D 3 vs 4, staircase 10, "ok"
+  mismatch: "A0-m2.jsonl" m=2 t=2 target=1: stop-bounded D 3 vs 4, staircase 10, "ok"
+  mismatch: "A0-m2.jsonl" m=2 t=3 target=0: stop-bounded D 3 vs 4, staircase 40, "ok"
+  mismatch: "A0-m2.jsonl" m=2 t=3 target=1: stop-bounded D 3 vs 4, staircase 40, "ok"
+T4b A0 m=4 t=4: D [] (stop-bounded), max_cols [Some(76837), Some(76837)], time [3600.888759613, 3600.845128398], timeout,timeout
+  system target 0: staircase_at_stop null, status "timeout", reason "tower engine budget of 3600 s"
+  system target 1: staircase_at_stop null, status "timeout", reason "tower engine budget of 3600 s"
+
+════ X1: p3 = 40961 on the narrow f4_fp path (A0 and A11 only)
+
+── X1 A0 m = 3 p3
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  5   5.000  16     17     []            -,-                  908.4,911.3           aborted,aborted
+  completed cells 0: σ = -  →  inconclusive (fewer than 3 completed cells);  Δlog₂ max_cols/Δb = - (secondary, descriptive)
+
+── X1 A0 m = 4 p3
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  4   4.000  18     19     []            -,-                  327.1,330.6           aborted,aborted
+  completed cells 0: σ = -  →  inconclusive (fewer than 3 completed cells);  Δlog₂ max_cols/Δb = - (secondary, descriptive)
+
+── X1 A11 m = 4 p3
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  4   4.000  35     36     [6, 6]        88740,88740          514.4,499.2           ok,ok
+  completed cells 1: σ = -  →  inconclusive (fewer than 3 completed cells);  Δlog₂ max_cols/Δb = - (secondary, descriptive)
+
+Cross-engine check (A0, m = 3, t = 5): tower engine D (T2, p1) = 7.0; f4_fp on p3: did not complete  →  INCONCLUSIVE
+A11, m = 4, t = 4: p3 D = 6.0, p1 D (G1) = 6.0
+
+════ A0 m = 4: the series with each source of a t = 4 cell (the bound: a completed t = 4 cell has σ ≥ 0.5)
+
+── A0 m = 4, F4 cells only
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  10     11     [6, 6]        1911,1911            0.3,0.3               ok,ok
+  3   3.000  14     15     [7, 7]        21619,21619          96.4,93.8             ok,ok
+  completed cells 2: σ = 1.0000  →  inconclusive (fewer than 3 completed cells);  Δlog₂ max_cols/Δb = 3.500 (secondary, descriptive)
+
+── A0 m = 4, with the T4b stop-bounded cell
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  10     11     [6, 6]        1911,1911            0.3,0.3               ok,ok
+  3   3.000  14     15     [7, 7]        21619,21619          96.4,93.8             ok,ok
+  4   4.000  18     19     []            76837,76837          3600.9,3600.8         timeout,timeout
+  completed cells 2: σ = 1.0000  →  inconclusive (fewer than 3 completed cells);  Δlog₂ max_cols/Δb = 3.500 (secondary, descriptive)
+
+── A0 m = 4, with the X1 p3 cell
+  t   b      n_vars n_eqs  D per system  max_cols per system   time per system (s)   status
+  2   2.000  10     11     [6, 6]        1911,1911            0.3,0.3               ok,ok
+  3   3.000  14     15     [7, 7]        21619,21619          96.4,93.8             ok,ok
+  4   4.000  18     19     []            -,-                  327.1,330.6           aborted,aborted
+  completed cells 2: σ = 1.0000  →  inconclusive (fewer than 3 completed cells);  Δlog₂ max_cols/Δb = 3.500 (secondary, descriptive)
+  (width slopes on lines above mix engines or primes where a source differs; D and σ are the readings)

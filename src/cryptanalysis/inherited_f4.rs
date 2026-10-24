@@ -923,6 +923,10 @@ enum EagerMode {
 /// the same in every mode; the specialisation word count charges every
 /// kept row's rewrite, identically in both eager modes.
 fn eager_mode() -> EagerMode {
+    #[cfg(test)]
+    if let Some((mode, _)) = rewrite_path_override::get() {
+        return mode;
+    }
     static MODE: std::sync::OnceLock<EagerMode> = std::sync::OnceLock::new();
     *MODE.get_or_init(|| {
         let var = std::env::var("KIC_F4_EAGER");
@@ -937,9 +941,35 @@ fn eager_mode() -> EagerMode {
     })
 }
 
+/// Test-only, per-thread choice of the rewrite path, so one process can run
+/// the BMI2 path and the portable path (what every aarch64 host runs) on the
+/// same input and compare images and charged work.
+#[cfg(test)]
+mod rewrite_path_override {
+    use super::EagerMode;
+    use std::cell::Cell;
+    thread_local! {
+        static PATH: Cell<Option<(EagerMode, bool)>> = const { Cell::new(None) };
+    }
+    pub(super) fn get() -> Option<(EagerMode, bool)> {
+        PATH.with(Cell::get)
+    }
+    /// Run `f` with `eager_mode()` and `wordwise_rewrite()` forced.
+    pub(super) fn with<T>(mode: EagerMode, wordwise: bool, f: impl FnOnce() -> T) -> T {
+        let old = PATH.with(|p| p.replace(Some((mode, wordwise))));
+        let out = f();
+        PATH.with(|p| p.set(old));
+        out
+    }
+}
+
 /// Whether the word-wise rewrite is used: `pext`/`pdep` need BMI2, and
 /// `KIC_F4_REWRITE=scatter` keeps the bit scatter as a same-binary control.
 fn wordwise_rewrite() -> bool {
+    #[cfg(test)]
+    if let Some((_, wordwise)) = rewrite_path_override::get() {
+        return wordwise;
+    }
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ENABLED.get_or_init(|| {
         if std::env::var("KIC_F4_REWRITE").as_deref() == Ok("scatter") {
@@ -3447,6 +3477,110 @@ mod tests {
                 )
             })
             .collect()
+    }
+
+    /// Every rewrite path charges the same work and builds the same rows.
+    ///
+    /// The BMI2 host path (`pext`/`pdep`, eager through the step plan) and
+    /// the portable one that every aarch64 host runs (shift runs, and the
+    /// bit scatter for rows from older layouts) are forced in turn, in the
+    /// same process, on the same random specialisation chains.  Counted
+    /// work is part of a method's recorded identity, so a session recorded
+    /// on one path must replay on the other: every counter of
+    /// [`InheritCost`], at every step, and every row's words must match
+    /// exactly.  The lazy modes (`Off`) are compared pairwise the same way.
+    #[test]
+    fn rewrite_paths_charge_identical_work_and_build_identical_rows() {
+        type Print = Vec<(u32, u32, u32, u32, Vec<u64>)>;
+        fn print(b: &ReducedBasis) -> Print {
+            b.rows
+                .iter()
+                .zip(&b.pivot_col)
+                .map(|(r, &pc)| (pc, r.version, r.start, r.lead, r.live().to_vec()))
+                .collect()
+        }
+        // One chain of specialisations under a forced path: the cost and
+        // the rows after every step, and the cost of reading the tail.
+        fn chain(
+            mode: EagerMode,
+            wordwise: bool,
+            system: &[F2BoolPoly],
+            n_vars: usize,
+            degree: u32,
+            steps: &[(u32, bool)],
+        ) -> Vec<(InheritCost, Print)> {
+            rewrite_path_override::with(mode, wordwise, || {
+                let (mut basis, root_cost) =
+                    ReducedBasis::from_system(system, n_vars, degree).unwrap();
+                let mut out = vec![(root_cost, print(&basis))];
+                for &(v, value) in steps {
+                    let (next, cost) = basis.specialise(v, value);
+                    basis = next;
+                    out.push((cost, print(&basis)));
+                    let mut tail_cost = InheritCost::default();
+                    let _ = basis.linear_tail(&mut tail_cost);
+                    out.push((tail_cost, print(&basis)));
+                }
+                out
+            })
+        }
+        let have_bmi2 = cfg!(target_arch = "x86_64") && {
+            #[cfg(target_arch = "x86_64")]
+            let b = std::arch::is_x86_feature_detected!("bmi2");
+            #[cfg(not(target_arch = "x86_64"))]
+            let b = false;
+            b
+        };
+        // (host path, portable path) pairs; the BMI2 ones need the CPU.
+        let mut pairs = vec![(EagerMode::Runs, EagerMode::Runs, false, false)];
+        pairs.push((EagerMode::Off, EagerMode::Off, false, false));
+        if have_bmi2 {
+            pairs.push((EagerMode::Bmi2, EagerMode::Runs, true, false));
+            pairs.push((EagerMode::Off, EagerMode::Off, true, false));
+        }
+        let mut seed = 0x0bad_5eed_1234_5678u64;
+        let mut compared = 0usize;
+        for trial in 0..60 {
+            let n_vars = 6 + trial % 5;
+            let m = 3 + trial % 4;
+            let system: Vec<F2BoolPoly> = (0..m)
+                .map(|k| random_poly(n_vars, if k % 4 == 3 { 1 } else { 2 }, 5 + k, &mut seed))
+                .filter(|p| poly_degree(p) >= 1)
+                .collect();
+            if system.is_empty() {
+                continue;
+            }
+            let degree = 2 + (trial % 2) as u32;
+            let steps: Vec<(u32, bool)> = (0..3)
+                .map(|i| ((xorshift(&mut seed) % n_vars as u64) as u32 + i) % n_vars as u32)
+                .zip([false, true, true])
+                .map(|(v, b)| (v, b ^ (trial % 2 == 0)))
+                .collect();
+            // distinct variables only
+            let mut steps_d: Vec<(u32, bool)> = Vec::new();
+            for st in steps {
+                if steps_d.iter().all(|&(v, _)| v != st.0) {
+                    steps_d.push(st);
+                }
+            }
+            for &(mode_a, mode_b, wordwise_a, wordwise_b) in &pairs {
+                let a = chain(mode_a, wordwise_a, &system, n_vars, degree, &steps_d);
+                let b = chain(mode_b, wordwise_b, &system, n_vars, degree, &steps_d);
+                assert_eq!(a.len(), b.len());
+                for (i, ((ca, pa), (cb, pb))) in a.iter().zip(&b).enumerate() {
+                    assert_eq!(
+                        ca, cb,
+                        "trial {trial} step {i}: charged work differs ({mode_a:?}/{wordwise_a} vs {mode_b:?}/{wordwise_b})"
+                    );
+                    assert_eq!(
+                        pa, pb,
+                        "trial {trial} step {i}: rows differ ({mode_a:?}/{wordwise_a} vs {mode_b:?}/{wordwise_b})"
+                    );
+                    compared += 1;
+                }
+            }
+        }
+        assert!(compared > 100, "too few comparisons: {compared}");
     }
 
     #[test]

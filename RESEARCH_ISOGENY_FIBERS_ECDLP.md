@@ -1706,12 +1706,15 @@ crossover in range).
 *Round 6 (R6.4, `research/isogeny_fibers_20261010/round6/r6_4_vertical_margin_2/`),
 supersedes the generic row above.* With NTT products the ladder's projected
 exponent falls from 2.58 to 1.919 [1.724, 2.115] for ℓ ≥ 2^13 (per-step counts
-measured exactly to ℓ = 2^16; no interval below 2), so the generic crossover
+measured exactly to ℓ = 2^16; the interval contains values below 2, so this is insufficient evidence of an exponent below 2), so the generic crossover
 at r = 2^128 moves up from 2^21.7 to 2^24.2–2^25.1 (2^54–2^58 at r = 2^256);
-extrapolations. ψ_ℓ + Cantor–Zassenhaus is ℓ^3.6 and never cheapest; Φ_ℓ(j, Y)
+extrapolations. ψ_ℓ + Cantor–Zassenhaus is ℓ^3.6; Φ_ℓ(j, Y)
 evaluation and roots count ℓ^1.9 but Φ_ℓ mod p itself is uncounted (ℓ^4.6 wall),
-so that route is open. Ascending edges cost the same as descending ones on the
-ladder (paired ratio 1.001); the ψ and Φ routes are 0.50× and 0.36× cheaper
+so that route is open. Additions are uncounted in every arm, so route rankings
+and crossover orderings hold only under the restricted cost model (M + W + 91 I);
+the complete-cost ordering is unresolved. On the ladder the disjoint-level test
+did not trigger, but the paired ascending/descending ratio 1.001 [1.001, 1.002]
+detects a small difference; the ψ and Φ routes are 0.50× and 0.36× cheaper
 ascending, because the floor's factorisation pattern differs.
 
 ### 17.4 The ζ-fold over F_{p²} is free; the M penalty depends on the oracle

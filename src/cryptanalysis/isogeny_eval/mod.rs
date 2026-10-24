@@ -22,7 +22,7 @@
 //! * [`velu`]: `O(ℓ)` Vélu for odd prime `ℓ` (Costello–Hisil images,
 //!   Meyer–Reith codomain).
 //! * [`sqrt_velu`]: √élu (Bernstein–De Feo–Leroux–Smith 2020).
-//! * [`small_degree`]: `ℓ ∈ {2, 3}` on short Weierstrass curves with `(x, y)`
+//! * [`small_degree`]: `ℓ ∈ {2, 3, 5, 7}` on short Weierstrass curves with `(x, y)`
 //!   point evaluation, `F_p`-isomorphisms and a certified dual.
 //!
 //! Scope and limits: prime fields only (no `F_{p^k}` type; the x-only
@@ -59,7 +59,7 @@ pub use velu::{velu, IsogenyEvaluation};
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum IsogenyEvalError {
     /// The degree is not supported here (not an odd prime for
-    /// [`velu()`]/[`sqrt_velu()`], not 2 or 3 for [`SmallIsogeny`]).
+    /// [`velu()`]/[`sqrt_velu()`], not 2, 3, 5 or 7 for [`SmallIsogeny`]).
     InvalidDegree(u64),
     /// A curve (given or computed) is singular.
     SingularCurve,

@@ -43,7 +43,7 @@ Paired asc/desc: ladder 1.001 [1.001, 1.002]; $psi$ 0.501 [0.457, 0.548]; $Phi$ 
 )
 
 == Verdict
-Exponent $>= 2$: *not falsified* (no CI below 2), but NTT moves it from 2.58 toward ≈ 2. Crossover moves < 1 bit: *refuted in projection* ($2^21.7 -> 2^24.2..2^25.1$ at $r = 2^128$; more margin, not less). Asc = desc: *holds for the ladder*, *falsified for (b) and (c)* (floor factorisation structure); the cheapest route (a′) is direction-neutral. Whether a Sutherland-style $Phi$ evaluation beats (a′) is open.
+Exponent $>= ell^2$: *not falsified*, but not confirmed: the projected CI [1.724, 2.115] contains values below 2, i.e. insufficient evidence of an exponent below 2. Meanwhile NTT moves it from 2.58 toward ≈ 2. Crossover moves < 1 bit: *refuted in projection* ($2^21.7 -> 2^24.2..2^25.1$ at $r = 2^128$; more margin, not less). Asc = desc: the disjoint-level criterion did not trigger for the ladder, but the paired ratio 1.001 [1.001, 1.002] excludes 1, so a small difference was detected (no equality claimed); *falsified for (b) and (c)* (floor factorisation structure). *Restricted cost model:* only M, W = 1 M and I = 91 M are priced; additions are uncounted in every arm and in the rho reference, and (c) omits $Phi_ell$ construction and Elkies work. All route rankings and crossover orderings hold only under this model; the complete-cost ordering (with an addition-weight band 0 / 0.1 / 1 M) is unresolved.
 
 == Limits
-W = 1 M stated, not measured. (a′) is a projection beyond $ell = 863$. Crossovers are extrapolations. Time caps: $psi$ at 131, $Phi$ at 103; $Phi_ell$ generation uncounted; one instance per $ell$.
+W = 1 M stated, not measured. (a′) is a projection beyond $ell = 863$. Crossovers are extrapolations. Time caps: $psi$ at 131, $Phi$ at 103; $Phi_ell$ generation and all additions uncounted (rankings conditional); one instance per $ell$.

@@ -47,12 +47,12 @@ python $D/plot.py
 | (c) library Φ_ℓ mod p, wall seconds | 20..103 | 4.600 [4.515, 4.684] | 19 |
 
 Ascending / descending at equal ℓ (paired ratio of counted Meq, 95% CI):
-- (a) ladder, expected find: 1.001 [1.001, 1.002] (n = 19) — levels overlap; equal to 0.2%.
+- (a) ladder, expected find: 1.001 [1.001, 1.002] (n = 19) — the preregistered disjoint-level criterion did not trigger (levels overlap), but the paired interval excludes 1: a small difference (ascending ≈ 0.1% dearer) was detected. No equivalence margin was prespecified, so this is not a claim of equality.
 - (b) ψ route: 0.501 [0.457, 0.548] (n = 8) — levels disjoint: the floor's kernel factor is found by one gcd with x^{p^k} − x, while the crater needs CZ splitting of ψ_ℓ.
 - (c) Φ route: 0.360 [0.347, 0.373] (n = 20) — levels disjoint: on the floor Φ_ℓ(j, Y) has one rational root (the crater), on the crater ℓ+1 (rational roots 1 vs ℓ+1), so root extraction is cheaper.
 
 ## Derived (extrapolated) crossovers with rho, g = 6 M/op, log2 ℓ*
-Cheapest route sets the margin (largest ℓ*). Full table, incl. g = 12, in `analysis.txt`.
+Full table, incl. g = 12, in `analysis.txt`. **Restricted cost model:** every row prices only M, W (= 1 M) and I (= 91 M); additions are not counted in any arm or in the rho reference, and row (c) further omits Φ_ℓ construction and Elkies work. The rows below are therefore stage counts under that model, not complete costs, and any ordering between them (which route is "cheapest", which crossover is largest) holds only under that model. The complete-cost ordering, with additions priced (e.g. a 0 / 0.1 / 1 M band) and Φ_ℓ construction counted, is **unresolved**: the library's counter has no addition tally, so this round adds no addition counts.
 
 | model | r = 2^64 | r = 2^128 | r = 2^256 |
 |---|---|---|---|
@@ -65,14 +65,14 @@ Cheapest route sets the margin (largest ℓ*). Full table, incl. g = 12, in `ana
 | (c) Φ eval + roots, LOWER BOUND (Φ_ℓ not counted) | 13.52 | 29.98 | 63.42 |
 
 ## Verdict against the preregistration
-- "Generic kernel finding stays ≥ ℓ²": **not falsified.** No interval lies below 2 (projected ℓ ≥ 2^13: 1.919 [1.724, 2.115]). The NTT does move the exponent: from 2.58 (Karatsuba, and Auto inside the measured range ℓ ≤ 863) toward ≈ 2 once k exceeds the NTT threshold — consistent with the ℓ² field-degree term (log2 ℓ bits per step × k-coefficient products) dominating.
+- "Generic kernel finding stays ≥ ℓ²": **not falsified** — but not confirmed either: the projected ℓ ≥ 2^13 interval 1.919 [1.724, 2.115] contains values below 2 as well as 2 itself, so this is insufficient evidence of an exponent below 2, not evidence that the exponent is ≥ 2. The NTT does move the exponent: from 2.58 (Karatsuba, and Auto inside the measured range ℓ ≤ 863) toward ≈ 2 once k exceeds the NTT threshold — consistent with the ℓ² field-degree term (log2 ℓ bits per step × k-coefficient products) dominating.
 - "The §17.3 generic crossover moves by less than one bit": **refuted for the projected ladder.** At r = 2^128 the ladder crossover moves from 2^21.7 (round 4 / R5.3 fit) to 2^24.2–2^25.1 (2^26.1 at the CI low end); at r = 2^256 from 2^46.4 to 2^54–2^58. These are extrapolations of a measured-per-step projection, not end-to-end measurements beyond ℓ = 863. The direction is *more* protection from the gap, not less. Inside ℓ ≤ 863 the measured crossover is unchanged (2^21.74).
-- ψ_ℓ factoring (b) is never the cheapest route (exponent ≈ 3.5–3.7, crossover 2^15.4 at r = 2^128).
+- ψ_ℓ factoring (b) has the smallest crossover of the counted routes under the restricted cost model (exponent ≈ 3.5–3.7, crossover 2^15.4 at r = 2^128); its complete-cost rank is unresolved.
 - Φ_ℓ(j, Y) (c): the counted evaluation + roots alone gives an exponent ≈ 1.9, but the library's Φ_ℓ mod p costs ℓ^4.6 in wall seconds and is not counted, so (c) is only a lower bound (2^30 at r = 2^128). A Sutherland CRT evaluation (≈ ℓ^{2+o(1)} per j) was not implemented; whether (c) beats (a′) is **open**.
-- "Ascending = descending": **holds for the ladder** (ratio 1.001); **falsified for (b) and (c)** (ascending 0.50× and 0.36×, intervals disjoint). The difference is the factorisation structure on the floor vs the crater, not the edge's direction per se; it does not change the margin because (a′) is the cheapest route and its ratio is 1.
+- "Ascending = descending": **not falsified for the ladder** by the preregistered disjoint-interval criterion, but the paired ratio 1.001 [1.001, 1.002] detects a small difference (≈ 0.1%), so equality is not claimed; **falsified for (b) and (c)** (ascending 0.50× and 0.36×, intervals disjoint). The (b)/(c) difference is the factorisation structure on the floor vs the crater, not the edge's direction per se. Whether direction changes the margin depends on which route is cheapest at complete cost, which is unresolved (see the restricted-cost-model note above); under the restricted model the ladder rows are within 0.2% in the two directions.
 
 ## §17.3 table, superseded (r = 2^128, g = 6)
-Generic kernel, cheapest counted route: ℓ* ≈ 2^21.7 (measured fit ≤ 863) → 2^24.2–2^25.1 (NTT ladder, projected to 2^16). Rational kernel: unchanged from R5.3 (no crossover within ℓ ≤ 2√p).
+Generic kernel, ladder route under the restricted cost model (M + W + 91 I, additions unpriced; complete-cost ordering of routes unresolved): ℓ* ≈ 2^21.7 (measured fit ≤ 863) → 2^24.2–2^25.1 (NTT ladder, projected to 2^16). Rational kernel: unchanged from R5.3 (no crossover within ℓ ≤ 2√p).
 
 ## Limits
-W = 1 M is stated, not measured (R5.3: this NTT is slower per counted unit in wall time). (a′) multiplies a measured per-step count by an exact step count; it does not run the full find beyond ℓ = 863. Crossovers are extrapolations. ψ arm capped at ℓ = 131 and Φ arm at ℓ = 103 by time. Φ_ℓ mod p generation is uncounted. One instance per ℓ (seed 0x1630 ^ ℓ).
+W = 1 M is stated, not measured (R5.3: this NTT is slower per counted unit in wall time). (a′) multiplies a measured per-step count by an exact step count; it does not run the full find beyond ℓ = 863. Crossovers are extrapolations. ψ arm capped at ℓ = 131 and Φ arm at ℓ = 103 by time. Φ_ℓ mod p generation is uncounted. Additions are uncounted in every arm and reference, so route rankings and crossover orderings are conditional on the restricted cost model; the 0 / 0.1 / 1 M addition-weight band was not computed (no native addition counts exist for these runs). One instance per ℓ (seed 0x1630 ^ ℓ).

@@ -27,7 +27,10 @@ use super::counted_fp::{is_prime_u64, NoCount, OpCounter, OpTally, PolyMul, Prim
 use super::montgomery::{batch_to_affine, is_kernel_generator, ladder, xadd, MontgomeryCurve, XZ};
 use super::ntt::{mul_ntt, ntt_mul_cost, MAX_LOG2_LEN, NTT_PRIMES};
 use super::poly::{self, MonicDivisor, ProductTree};
-use super::small_degree::{isomorphisms, kernel_x_coordinates, ShortWeierstrass, SmallIsogeny};
+use super::small_degree::{
+    isomorphisms, kernel_orbit, kernel_representatives, kernel_x_coordinates, ShortWeierstrass,
+    SmallIsogeny,
+};
 use super::sqrt_velu::sqrt_velu;
 use super::velu::{kernel_polynomial, velu};
 use super::IsogenyEvalError;
@@ -612,16 +615,18 @@ fn check_small(f: &PrimeField, e: &ShortWeierstrass, ell: u64, x0: u64, rng: &mu
     assert_eq!(dual.codomain(), e, "dual lands on the same model");
     assert_eq!(dual.degree(), ell);
     assert_eq!(phi_at(f.p(), ell, e.j_invariant(f), cod.j_invariant(f)), 0);
-    if ell == 3 {
+    if ell >= 3 {
         let lf = lib_field(f.p());
-        let lib = lib_kernel::velu_codomain(
-            &lf,
-            &Model {
-                a: lf.from_u64(e.a),
-                b: lf.from_u64(e.b),
-            },
-            &vec![lf.from_u64(f.neg(x0)), lf.one()],
-        );
+        let model = Model {
+            a: lf.from_u64(e.a),
+            b: lf.from_u64(e.b),
+        };
+        let mut h = vec![lf.one()];
+        for xi in kernel_orbit(f, e, ell, x0).unwrap() {
+            h = lib_poly::mul(&lf, &h, &vec![lf.from_u64(f.neg(xi)), lf.one()]);
+        }
+        let lib = lib_kernel::velu_codomain(&lf, &model, &h);
+        assert!(lib_kernel::verify_kernel(&lf, &model, ell, &h).is_ok());
         assert_eq!((lib_u64(&lf, &lib.a), lib_u64(&lf, &lib.b)), (cod.a, cod.b));
     }
     for _ in 0..6 {
@@ -699,8 +704,12 @@ fn small_degree_special_j_and_errors() {
     assert_eq!(isomorphisms(&f, &e0, &e1728), Vec::<u64>::new());
     // Errors.
     assert_eq!(
+        SmallIsogeny::new(&f, &e1728, 11, 0),
+        Err(IsogenyEvalError::InvalidDegree(11))
+    );
+    assert_eq!(
         SmallIsogeny::new(&f, &e1728, 5, 0),
-        Err(IsogenyEvalError::InvalidDegree(5))
+        Err(IsogenyEvalError::NotAKernelPoint)
     );
     assert_eq!(
         SmallIsogeny::new(&f, &e1728, 2, 1),
@@ -759,5 +768,59 @@ fn karatsuba_cost_is_the_counted_cost() {
         let _ = poly::mul_karatsuba(&f, &a, &b);
         assert_eq!(f.tally().mul, poly::karatsuba_cost(la, lb), "{la}x{lb}");
         assert_eq!(poly::karatsuba_cost(la, lb), poly::karatsuba_cost(lb, la));
+    }
+}
+
+// ------------------------------------------------- ℓ ∈ {5, 7} ----
+
+#[test]
+fn degree_five_and_seven_isogenies_and_certified_duals() {
+    let mut rng = StdRng::seed_from_u64(62);
+    for bits in [30u32, 50] {
+        let p = random_prime(&mut rng, bits);
+        let f = PrimeField::new(p).unwrap();
+        for ell in [5u64, 7] {
+            let mut done = 0;
+            let mut tries = 0;
+            while done < 2 {
+                tries += 1;
+                assert!(tries < 20_000, "no rational {ell}-kernel found");
+                let (a, b) = (rng.gen_range(1..p), rng.gen_range(1..p));
+                let Ok(e) = ShortWeierstrass::new(&f, a, b) else {
+                    continue;
+                };
+                let roots = kernel_x_coordinates(&f, &e, ell).unwrap();
+                let reps = kernel_representatives(&f, &e, ell).unwrap();
+                assert_eq!(roots.len(), reps.len() * (ell as usize - 1) / 2);
+                for x0 in reps {
+                    let orbit = kernel_orbit(&f, &e, ell, x0).unwrap();
+                    assert_eq!(orbit.len(), (ell as usize - 1) / 2);
+                    for &xi in &orbit {
+                        assert!(roots.contains(&xi), "orbit abscissas are roots of f_ℓ");
+                    }
+                    let dual_rational = p % ell == 1 || p % ell == ell - 1;
+                    // Frobenius acts on ker φ by λ = ±1 (rational abscissas)
+                    // and on ker φ̂ by p/λ, so φ̂ has rational kernel
+                    // abscissas exactly when p ≡ ±1 (mod ℓ).
+                    let phi = SmallIsogeny::new(&f, &e, ell, x0).unwrap();
+                    assert_eq!(
+                        phi.dual(&f).is_ok(),
+                        dual_rational,
+                        "p mod {ell} = {}",
+                        p % ell
+                    );
+                    if dual_rational {
+                        check_small(&f, &e, ell, x0, &mut rng);
+                    }
+                    // Any orbit member generates the same kernel and isogeny.
+                    let other = SmallIsogeny::new(&f, &e, ell, orbit[orbit.len() - 1]).unwrap();
+                    assert_eq!(
+                        other.codomain(),
+                        SmallIsogeny::new(&f, &e, ell, x0).unwrap().codomain()
+                    );
+                    done += 1;
+                }
+            }
+        }
     }
 }
