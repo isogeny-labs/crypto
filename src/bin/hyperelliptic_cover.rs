@@ -992,7 +992,7 @@ mod tests {
     fn every_current_catalog_model_reaches_the_standalone_constructor() {
         let registry: Value = serde_json::from_str(CURRENT_REGISTRY).expect("current registry");
         let rows = registry["curves"].as_array().expect("registry curve array");
-        assert_eq!(rows.len(), 15990);
+        assert_eq!(rows.len(), 20051);
         for row in rows {
             let slug = row["slug"].as_str().expect("catalog slug");
             let model: Value = serde_json::from_str(
@@ -1132,7 +1132,7 @@ mod tests {
                 checked += 1;
             }
         }
-        assert_eq!(checked, 142);
+        assert_eq!(checked, 148);
     }
 
     #[test]
