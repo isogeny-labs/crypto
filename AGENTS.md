@@ -7,6 +7,12 @@
   on a feature branch. If the branch already has an open PR, extend that
   PR and update its title and description to match the new scope instead of
   opening a second one. Do not leave finished work uncommitted.
+- **Use regular PRs.** Create pull requests with `draft=false` and mark an
+  existing draft ready for review when you update it. Record pending CI,
+  review, and follow-up work in the PR description; draft status is not a
+  holding queue. Ready for review invites review; it does not authorize a
+  merge. All validation, evidence, review, and merge gates below still apply.
+  Use a draft only when the user explicitly asks for one.
 - **Verify before pushing:** run `cargo test --release --lib`, the touched
   examples' tests, and the relevant Python suites (for example
   `research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py`)
@@ -474,10 +480,10 @@ separate small-model automation did the CI work and the merge.
 commits, pushes, and opens the PR (or updates the existing one). It then
 follows the PR until it lands, under the check-in and merge rules below.
 
-- **Open every PR ready for review, never as a draft**, whatever a tool or
-  runtime defaults to, and mark an existing draft ready when you update it,
-  so reviews and checks that skip drafts (`llm-review`) run from the first
-  push. Open a draft only when the user asks for one in that task.
+- **Open every PR ready for review (`draft=false`)**, whatever a tool or
+  runtime defaults to. Before ending an update to an existing draft, mark it
+  ready so reviews and checks that skip drafts (`llm-review`) can run. An
+  explicit user request to keep a particular PR in draft is the only exception.
 - Review the final diff and confirm that the requested scope, relevant tests,
   evidence, and documentation are complete before opening the PR. Passing CI
   does not substitute for checking that the work is finished.
