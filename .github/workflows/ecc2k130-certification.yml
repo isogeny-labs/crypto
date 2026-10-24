@@ -256,7 +256,6 @@ jobs:
           apt-get install -y -qq --no-install-recommends git ca-certificates
       - uses: actions/checkout@v4
         with:
-          filter: blob:none
           sparse-checkout: ecc2k130
       - name: Install native host compiler
         run: |
