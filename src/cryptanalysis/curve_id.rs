@@ -422,13 +422,16 @@ pub fn same_curve(a: &str, b: &str) -> bool {
 // A measured ecbench child is a fresh process that asks one question of
 // the alias table: which of a frozen report's names is this instance.
 // Building the map for that parses 2.8 MB of JSON (about 150 million
-// instructions, 97% of an IC child), so the functions below read the
-// generated text instead.  It is `json.dumps(indent=0)` of a sorted
-// object, one `"<name>": "<slug>",` per line (`scripts/curve_id.py`,
-// `alias_map_text`).  A name or slug the scan cannot place exactly (one
-// JSON would escape) goes to the map, so every answer is the map's.
+// instructions, 97% of an IC child), so `find_same_curve` reads the
+// generated text instead.  It is `json.dumps(indent=0)` of an object sorted
+// by name, one `"<name>": "<slug>",` per line (`scripts/curve_id.py`,
+// `alias_map_text`), so a name is found by binary search over the lines.
+// Anything the search cannot read exactly (a name JSON would escape, or an
+// escaped name met on the way) goes to the map, so every answer is the
+// map's.
 
-/// The `"aliases"` object of the alias table, from its first entry.
+/// The `"aliases"` object of the alias table, from the newline before its
+/// first entry.
 fn alias_text() -> &'static str {
     const OPEN: &str = "\"aliases\": {";
     ALIASES
@@ -436,106 +439,86 @@ fn alias_text() -> &'static str {
         .map_or("", |i| &ALIASES[i + OPEN.len()..])
 }
 
-/// Whether `s` is written verbatim inside a JSON string.
-fn json_verbatim(s: &str) -> bool {
-    !s.is_empty() && !s.chars().any(|c| c == '"' || c == '\\' || c.is_control())
-}
-
-/// [`resolve`] of one normalised name, read from the table's text.
+/// [`resolve`] of one normalised name, by binary search over the lines
+/// of the table's text.
 fn resolve_key(key: &str) -> Option<&'static str> {
-    if !json_verbatim(key) {
-        return aliases().get(key).map(String::as_str);
+    let verbatim = |s: &str| !s.chars().any(|c| c == '"' || c == '\\' || c.is_control());
+    let map = || aliases().get(key).map(String::as_str);
+    if key.is_empty() || !verbatim(key) {
+        return map();
     }
     let text = alias_text();
-    let at = text.find(&format!("\n\"{key}\": \""))? + key.len() + 6;
-    let len = text[at..].find('"')?;
-    Some(&text[at..at + len])
-}
-
-/// Every normalised name that [`resolve`]s to `slug`.
-fn keys_of(slug: &str) -> Vec<&'static str> {
-    let from_map = || -> Vec<&'static str> {
-        aliases()
-            .iter()
-            .filter(|(_, v)| v.as_str() == slug)
-            .map(|(k, _)| k.as_str())
-            .collect()
-    };
-    if !json_verbatim(slug) {
-        return from_map();
-    }
-    let text = alias_text();
-    let needle = format!("\": \"{slug}\"");
-    let mut keys = Vec::new();
-    let mut from = 0;
-    while let Some(i) = text[from..].find(&needle) {
-        let at = from + i;
-        from = at + needle.len();
-        if !matches!(text.as_bytes().get(from), Some(b',' | b'\n')) {
+    // Every entry that can match starts in [lo, hi), just after a newline.
+    let (mut lo, mut hi) = (0, text.len());
+    while lo < hi {
+        let mid = (lo + hi) / 2;
+        let Some(nl) = text[mid.max(1) - 1..].find('\n') else {
+            hi = mid;
+            continue;
+        };
+        let start = mid.max(1) - 1 + nl + 1;
+        if start >= hi {
+            hi = mid;
             continue;
         }
-        let start = text[..at].rfind('\n').map_or(0, |n| n + 1);
-        match text[start..at].strip_prefix('"') {
-            Some(key) if !key.contains('\\') => keys.push(key),
-            _ => return from_map(),
+        let Some(name) = text[start..]
+            .strip_prefix('"')
+            .and_then(|t| t.split('"').next())
+        else {
+            hi = start; // the closing brace: past the last entry
+            continue;
+        };
+        if !verbatim(name) || name.contains('\\') {
+            return map();
+        }
+        match name.cmp(key) {
+            std::cmp::Ordering::Less => lo = start + 1,
+            std::cmp::Ordering::Greater => hi = start,
+            std::cmp::Ordering::Equal => {
+                let rest = &text[start + name.len() + 2..];
+                let value = rest.strip_prefix(": \"")?;
+                return value.split('"').next();
+            }
         }
     }
-    keys
+    None
 }
 
 /// The first `(name, value)` whose name denotes the same curve as
 /// `instance`, in the sense of [`same_curve`], without building the alias
-/// map: one lookup for `instance` and one scan for its slug's names.
+/// map: one binary search per name.
 pub fn find_same_curve<'n, T>(
     instance: &str,
     candidates: impl IntoIterator<Item = (&'n str, T)>,
 ) -> Option<T> {
-    let target = resolve_key(&normalise(instance))
-        .or_else(|| instance.starts_with("icv1-").then_some(instance));
-    let keys = target.map(keys_of).unwrap_or_default();
+    fn resolved(name: &str) -> Option<&str> {
+        resolve_key(&normalise(name)).or_else(|| name.starts_with("icv1-").then_some(name))
+    }
+    let target = resolved(instance);
     candidates.into_iter().find_map(|(name, value)| {
-        let hit = name == instance
-            || target.is_some_and(|t| {
-                let key = normalise(name);
-                keys.contains(&key.as_str())
-                    || (name == t && name.starts_with("icv1-") && resolve_key(&key).is_none())
-            });
+        let hit = name == instance || (target.is_some() && resolved(name) == target);
         hit.then_some(value)
     })
-}
-
-/// The degree of the binary field a curve name carries: `m` of an ICV1
-/// slug's `f2m<m>`, `n` of a legacy `…-n<n>-…` or `…GF(2^<n>)`.
-pub fn binary_degree(name: &str) -> Option<u32> {
-    let digits = |s: &str| -> Option<u32> {
-        let d: String = s.chars().take_while(char::is_ascii_digit).collect();
-        d.parse().ok()
-    };
-    if let Some(rest) = name.strip_prefix("icv1-f2m") {
-        return digits(rest);
-    }
-    if let Some(at) = name.find("2^") {
-        return digits(&name[at + 2..]);
-    }
-    let at = name.find("-n")? + 2;
-    digits(&name[at..])
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    /// The text scans agree with the map on every name the table holds
-    /// (every 41st, and every slug), on names it does not hold, and on
-    /// names JSON would escape.
+    /// The binary search agrees with the map on every name the table
+    /// holds, the first and last included, on names it does not hold
+    /// (before the first, after the last, between two), and on names JSON
+    /// would escape.
     #[test]
-    fn the_text_scans_agree_with_the_map() {
+    fn the_binary_search_agrees_with_the_map() {
         let map = aliases();
         assert!(map.len() > 1000, "alias table has {} names", map.len());
         let mut keys: Vec<&String> = map.keys().collect();
         keys.sort();
-        for key in keys.iter().step_by(41) {
+        for key in &keys {
             assert_eq!(resolve_key(key), map.get(*key).map(String::as_str), "{key}");
+            let between = format!("{key}~");
+            assert_eq!(resolve_key(&between), map.get(&between).map(String::as_str));
         }
         for key in [
             "",
@@ -544,6 +527,9 @@ mod tests {
             "a\"b",
             "a\\b",
             "secp256k",
+            "!",
+            "~~~~",
+            "0",
         ] {
             assert_eq!(
                 resolve_key(key),
@@ -551,21 +537,6 @@ mod tests {
                 "{key:?}"
             );
         }
-        let mut slugs: Vec<&String> = map.values().collect();
-        slugs.sort();
-        slugs.dedup();
-        for slug in slugs.iter().step_by(97) {
-            let mut scanned = keys_of(slug);
-            scanned.sort();
-            let mut expected: Vec<&str> = map
-                .iter()
-                .filter(|(_, v)| v == slug)
-                .map(|(k, _)| k.as_str())
-                .collect();
-            expected.sort();
-            assert_eq!(scanned, expected, "{slug}");
-        }
-        assert!(keys_of("icv1-no-such-slug").is_empty());
     }
 
     /// `find_same_curve` returns what a search with [`same_curve`] returns,
