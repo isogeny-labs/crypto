@@ -11,6 +11,8 @@ mod report;
 mod solver;
 #[path = "../../../joint_image_elimination/native/uniform.rs"]
 mod uniform;
+#[path = "../../../joint_image_elimination/native/variant_report.rs"]
+mod variant_report;
 #[path = "joint_variants.rs"]
 mod variants;
 #[path = "../../../joint_image_elimination/native/zero_identity.rs"]
@@ -41,6 +43,9 @@ pub(crate) fn external_audit(
 }
 pub(crate) fn zero_identity_audit(run: &Path, public_root: &Path, out: &Path) -> bool {
     zero_identity::audit(run, public_root, out)
+}
+pub(crate) fn variant_construction_report(run: &Path, out: &Path) -> bool {
+    variant_report::construction(run, out)
 }
 
 pub(crate) fn construction_report(run: &Path, out: &Path) -> bool {
