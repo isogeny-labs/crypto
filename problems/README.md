@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [ECCp-131 full-parameter index-calculus relation pipeline](eccp131-full-parameter-index-calculus.md) | open | checked two- and three-point small-x probes have zero natural rank in bounded exact-curve runs; three-point support is at most `8B³` points | exact relation oracle beyond the fixed small-x support bound, independently replayed rank and target-descent chain |
 | [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | implemented; client activation remains | enrolled legacy process recovery | private recurring backups, fenced two-hop recovery and Diem copy restore passed; laptop installation/trust needs client access |
 | [Rho worker confirmation after physical-host panel](rho-worker-tier1-host-access.md) | open | qualified 32-Q serial/batch worker throughput and default-routing decision | new independently verified targets, prospective A/A gate, dedicated host after AWS quota, complete audit |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |
