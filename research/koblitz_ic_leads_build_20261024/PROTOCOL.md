@@ -115,3 +115,24 @@ and how each outcome is read. All four leads are built natively in Rust.
   or changed. L2 is an instrument; L1 and L4 are closures or bounds; L3 is
   an equivalence check.
 - No result here is a speedup claim. `benchmarks/` receives no row.
+
+## Amendment 1 (2026-10-24, after G1 data, before any C1 run)
+
+**What G1 showed.** The 12 G1 draws measured by then all refuted at degree
+4, with peak basis rows of 0.66–0.997 × columns
+(`runs/g1-*.jsonl`). `1` enters only once the basis nearly fills the
+space, so early stopping saves little, and the registered falsifier
+(≥ 0.5 × columns) fires on every cell measured.
+
+**What follows for C1.** The engine never holds more than the echelon
+(at most one row per column) plus one absorb chunk. At degree 5 and
+N = 40 that is about 760,099 + 10,752 rows of 95,016 bytes, about 73 GB.
+G1's refutation ratios put the C1 peak in that range. The registered
+100,000-row cap is about 13% of it, so a C1 run here can only end
+capped, which is unmeasured by §C1.
+
+**Change.** C1 is not run on this 15 GB container. It is deferred to a
+host with at least 96 GB, where the incremental engine fits under the
+dense engine's 217 GB projection. The satisfiable C1 control is dropped
+with it. G1, P1 and the degree-4 controls run as registered. This
+amendment is post hoc, so it is reported as such.
