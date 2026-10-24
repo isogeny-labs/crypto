@@ -53,6 +53,27 @@ fn contract(receipt: &Value) -> Result<(&str, &str, usize, usize)> {
                 && receipt["conflict_budget"] == 10000
                 && receipt["target_index"].as_u64().is_some_and(|n| n < 8)
         }
+        Some(p) if p == "d18-shared-root-m4/v1" => {
+            matches!(arm, "U" | "D")
+                && (mode != "natural" || arm == "D")
+                && (mode != "positive" || receipt["target_index"] == 0)
+                && receipt["xor_decided_cache"] == true
+                && receipt["conflict_budget"] == 10000
+                && receipt["target_index"].as_u64().is_some_and(|n| n < 8)
+                && matches!(
+                    receipt["root_encoding"].as_str(),
+                    Some("per-representative" | "shared-bits")
+                )
+                && receipt["root_representatives_blake3"]
+                    .as_str()
+                    .is_some_and(|s| s.len() == 64 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+                && receipt["source_encoding_sha256"]
+                    .as_str()
+                    .is_some_and(|s| s.len() == 64 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+                && receipt["root_shared_bit_count"]
+                    .as_u64()
+                    .is_some_and(|n| n < 83)
+        }
         Some(p) => {
             p == "small-m4-xor-cache/v1"
                 && matches!(arm, "K2048" | "D12")
@@ -164,14 +185,42 @@ fn replay(base: &Path, corpus: &Path, receipt_path: &Path, output: &Path) -> Res
         needed.insert((i / 166) * 166);
     }
     let mut rows = BTreeMap::new();
-    for ordinal in 0..=*needed.last().ok_or("no selected rows")? {
+    let shared_policy = receipt["experiment_policy"] == "d18-shared-root-m4/v1";
+    let last = if shared_policy {
+        points - 1
+    } else {
+        *needed.last().ok_or("no selected rows")?
+    };
+    let mut roots = Vec::new();
+    for ordinal in 0..=last {
         line.clear();
         if reader.read_line(&mut line)? == 0 {
             return Err("archive truncated".into());
         }
-        if needed.contains(&ordinal) {
-            rows.insert(ordinal, serde_json::from_str::<Value>(&line)?);
+        if needed.contains(&ordinal) || (shared_policy && ordinal % 166 == 0) {
+            let row = serde_json::from_str::<Value>(&line)?;
+            if shared_policy && ordinal % 166 == 0 {
+                if row["column"] != ordinal / 166
+                    || row["phase"] != 0
+                    || row["negative"] != false
+                    || row["coefficient"] != "1"
+                {
+                    return Err("root row labels differ".into());
+                }
+                let text = row["point"][0].as_str().ok_or("root coordinate absent")?;
+                let x: u128 = text.parse()?;
+                if x >= 1 << 83 || x.to_string() != text {
+                    return Err("root coordinate outside canonical field".into());
+                }
+                roots.push(x);
+            }
+            if needed.contains(&ordinal) {
+                rows.insert(ordinal, row);
+            }
         }
+    }
+    if shared_policy {
+        check_root_inventory(&roots, &receipt)?;
     }
     let kc = KoblitzCurve::known_n83_k0().ok_or("curve absent")?;
     if kc.label() != CURVE || kc.subgroup_order.to_string() != "2417851639230796216685689" {
@@ -262,6 +311,34 @@ fn replay(base: &Path, corpus: &Path, receipt_path: &Path, output: &Path) -> Res
     Ok(())
 }
 
+fn check_root_inventory(roots: &[u128], receipt: &Value) -> Result<()> {
+    if roots.len() != 16_627 || roots.iter().any(|&x| x >= 1 << 83) {
+        return Err("root inventory dimensions differ".into());
+    }
+    let mut digest = blake3::Hasher::new();
+    digest.update(b"n83.root-representatives/v1");
+    let mut varying = 0u128;
+    for &x in roots {
+        digest.update(&x.to_le_bytes());
+        varying |= x ^ roots[0];
+    }
+    let shared = 83 - varying.count_ones();
+    let removed = if receipt["root_encoding"] == "shared-bits" {
+        4 * 16_626 * shared as usize
+    } else {
+        0
+    };
+    if receipt["root_representatives_blake3"] != digest.finalize().to_hex().as_str()
+        || receipt["root_shared_bit_count"] != shared
+        || receipt["sat_variables"] != 201_598
+        || receipt["sat_xor_rows"] != 3_901
+        || receipt["sat_clauses"] != 5_915_238usize - removed
+    {
+        return Err("root inventory or construction counts differ".into());
+    }
+    Ok(())
+}
+
 fn main() -> Result<()> {
     let a: Vec<_> = std::env::args().collect();
     if a.len() != 5 {
@@ -325,5 +402,52 @@ mod tests {
         assert!(point(&json!(["00", "1"])).is_err());
         assert!(point(&json!([(BigUint::from(1u8) << 83usize).to_string(), "1"])).is_err());
         assert!(point(&json!(["0", "1"])).is_ok());
+    }
+
+    #[test]
+    fn shared_root_replay_rejects_policy_and_inventory_tampering() {
+        let roots: Vec<_> = (0..16_627u128).collect();
+        let mut hash = blake3::Hasher::new();
+        hash.update(b"n83.root-representatives/v1");
+        for x in &roots {
+            hash.update(&x.to_le_bytes());
+        }
+        let mut r = json!({"schema":"n83.small-m4-worker/v1","status":"PASS_NATURAL_PENDING_REPLAY",
+            "mode":"natural","curve_id":CURVE,"arm":"D","m":4,"target_index":7,"rank":1,
+            "group_verified":true,"changed_target_rejected":true,"changed_row_rejected":true,
+            "public_corpus_sha256":CORPUS,"columns":16627,"points":2760082,
+            "experiment_policy":"d18-shared-root-m4/v1","root_encoding":"shared-bits",
+            "xor_decided_cache":true,"conflict_budget":10000,
+            "root_representatives_blake3":hash.finalize().to_hex().to_string(),
+            "source_encoding_sha256":"1".repeat(64),"root_shared_bit_count":68,
+            "sat_variables":201598,"sat_xor_rows":3901,"sat_clauses":5915238-4*16626*68});
+        assert!(contract(&r).is_ok());
+        assert!(check_root_inventory(&roots, &r).is_ok());
+        for (key, value) in [
+            ("root_encoding", json!("auto")),
+            ("arm", json!("U")),
+            ("xor_decided_cache", json!(false)),
+            ("target_index", json!(8)),
+            ("source_encoding_sha256", json!("missing")),
+        ] {
+            let mut bad = r.clone();
+            bad[key] = value;
+            assert!(contract(&bad).is_err(), "{key}");
+        }
+        for (key, value) in [
+            ("root_representatives_blake3", json!("0".repeat(64))),
+            ("root_shared_bit_count", json!(67)),
+            ("sat_clauses", json!(5915238)),
+            ("sat_variables", json!(201597)),
+            ("sat_xor_rows", json!(3900)),
+        ] {
+            let mut bad = r.clone();
+            bad[key] = value;
+            assert!(check_root_inventory(&roots, &bad).is_err(), "{key}");
+        }
+        r["root_encoding"] = json!("per-representative");
+        r["sat_clauses"] = json!(5915238);
+        assert!(contract(&r).is_ok());
+        assert!(check_root_inventory(&roots, &r).is_ok());
     }
 }

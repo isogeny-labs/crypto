@@ -77,6 +77,17 @@ pub struct FrobeniusOrbitChoiceWires {
     pub phase: Vec<u32>,
 }
 
+/// How representative selectors constrain the root before Frobenius.
+/// The default retains one implication per selector and field bit.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum FrobeniusOrbitRootEncoding {
+    #[default]
+    PerRepresentative,
+    /// Emit one unit for a bit shared by every representative. The existing
+    /// at-least-one selector clause makes this exactly equivalent.
+    SharedBits,
+}
+
 pub fn frobenius_orbit_domain_size(
     n: u32,
     m: usize,
@@ -103,6 +114,65 @@ pub fn frobenius_orbit_domain_size(
         clauses: clauses_per.checked_mul(m)?,
         xor_rows: bits.checked_add(1)?.checked_mul(n)?.checked_mul(m)?,
     })
+}
+
+/// Exact, data-dependent preflight for an explicitly selected root encoding.
+/// As with installation, duplicate or out-of-field representatives are rejected.
+pub fn frobenius_orbit_domain_size_with_encoding(
+    n: u32,
+    m: usize,
+    representatives: &[BigUint],
+    encoding: FrobeniusOrbitRootEncoding,
+) -> Option<FrobeniusOrbitDomainSize> {
+    let baseline = frobenius_orbit_domain_size(n, m, representatives.len())?;
+    if representatives.iter().any(|x| x.bits() > u64::from(n)) {
+        return None;
+    }
+    let mut sorted = representatives.to_vec();
+    sorted.sort_unstable();
+    sorted.dedup();
+    if sorted.len() != representatives.len() {
+        return None;
+    }
+    let shared = shared_root_bits(n, &sorted, encoding);
+    size_with_shared_bits(baseline, m, sorted.len(), shared.as_deref())
+}
+
+fn shared_root_bits(
+    n: u32,
+    representatives: &[BigUint],
+    encoding: FrobeniusOrbitRootEncoding,
+) -> Option<Vec<Option<bool>>> {
+    match encoding {
+        FrobeniusOrbitRootEncoding::PerRepresentative => None,
+        FrobeniusOrbitRootEncoding::SharedBits => Some(
+            (0..u64::from(n))
+                .map(|bit| {
+                    let value = representatives[0].bit(bit);
+                    representatives
+                        .iter()
+                        .all(|rep| rep.bit(bit) == value)
+                        .then_some(value)
+                })
+                .collect(),
+        ),
+    }
+}
+
+fn size_with_shared_bits(
+    mut baseline: FrobeniusOrbitDomainSize,
+    m: usize,
+    representatives: usize,
+    shared: Option<&[Option<bool>]>,
+) -> Option<FrobeniusOrbitDomainSize> {
+    if let Some(shared) = shared {
+        let common = shared.iter().filter(|bit| bit.is_some()).count();
+        let removed = common
+            .checked_mul(representatives.checked_sub(1)?)?
+            .checked_mul(m)?;
+        baseline.clauses = baseline.clauses.checked_sub(removed)?;
+    }
+    Some(baseline)
 }
 
 fn reduced_monomial(degree: usize, irr: &IrreduciblePoly) -> Vec<usize> {
@@ -383,6 +453,24 @@ impl ChainedS3Encoding {
         max_variables: u32,
         max_domain_clauses: usize,
     ) -> Result<FrobeniusOrbitDomainSize, ChainBuildError> {
+        self.constrain_frobenius_orbit_summands_with_encoding(
+            representatives,
+            max_variables,
+            max_domain_clauses,
+            FrobeniusOrbitRootEncoding::PerRepresentative,
+        )
+    }
+
+    /// Opt-in shared-root-bit version of the exact common orbit domain.
+    /// The selected encoding changes clauses only; choice wires keep their
+    /// allocation and interpretation. Every cap is checked before mutation.
+    pub fn constrain_frobenius_orbit_summands_with_encoding(
+        &mut self,
+        representatives: &[BigUint],
+        max_variables: u32,
+        max_domain_clauses: usize,
+        encoding: FrobeniusOrbitRootEncoding,
+    ) -> Result<FrobeniusOrbitDomainSize, ChainBuildError> {
         if self.domain_installed || representatives.iter().any(|x| x.bits() > u64::from(self.n)) {
             return Err(ChainBuildError::Unsupported);
         }
@@ -392,7 +480,10 @@ impl ChainedS3Encoding {
         if sorted.len() != representatives.len() {
             return Err(ChainBuildError::Unsupported);
         }
-        let required = frobenius_orbit_domain_size(self.n, self.m, sorted.len())
+        let baseline = frobenius_orbit_domain_size(self.n, self.m, sorted.len())
+            .ok_or(ChainBuildError::Unsupported)?;
+        let shared = shared_root_bits(self.n, &sorted, encoding);
+        let required = size_with_shared_bits(baseline, self.m, sorted.len(), shared.as_deref())
             .ok_or(ChainBuildError::Unsupported)?;
         let total = u64::from(self.solver.n_vars())
             .checked_add(required.variables)
@@ -415,6 +506,7 @@ impl ChainedS3Encoding {
                 block,
                 &sorted,
                 &self.irr,
+                shared.as_deref(),
             ));
         }
         self.domain_installed = true;
@@ -432,10 +524,28 @@ impl ChainedS3Encoding {
         max_variables: u32,
         max_domain_clauses: usize,
     ) -> Result<FrobeniusOrbitDomainSize, ChainBuildError> {
+        self.constrain_frobenius_orbit_domains_with_encoding(
+            representatives_by_summand,
+            max_variables,
+            max_domain_clauses,
+            FrobeniusOrbitRootEncoding::PerRepresentative,
+        )
+    }
+
+    /// Exact per-summand domains with an explicitly selected root encoding.
+    /// Shared bits are computed separately for each domain.
+    pub fn constrain_frobenius_orbit_domains_with_encoding(
+        &mut self,
+        representatives_by_summand: &[Vec<BigUint>],
+        max_variables: u32,
+        max_domain_clauses: usize,
+        encoding: FrobeniusOrbitRootEncoding,
+    ) -> Result<FrobeniusOrbitDomainSize, ChainBuildError> {
         if self.domain_installed || representatives_by_summand.len() != self.m {
             return Err(ChainBuildError::Unsupported);
         }
         let mut sorted_domains = Vec::with_capacity(self.m);
+        let mut shared_domains = Vec::with_capacity(self.m);
         let mut required = FrobeniusOrbitDomainSize {
             variables: 0,
             clauses: 0,
@@ -451,7 +561,10 @@ impl ChainedS3Encoding {
             if sorted.len() != representatives.len() {
                 return Err(ChainBuildError::Unsupported);
             }
-            let size = frobenius_orbit_domain_size(self.n, 1, sorted.len())
+            let baseline = frobenius_orbit_domain_size(self.n, 1, sorted.len())
+                .ok_or(ChainBuildError::Unsupported)?;
+            let shared = shared_root_bits(self.n, &sorted, encoding);
+            let size = size_with_shared_bits(baseline, 1, sorted.len(), shared.as_deref())
                 .ok_or(ChainBuildError::Unsupported)?;
             required.variables = required
                 .variables
@@ -466,6 +579,7 @@ impl ChainedS3Encoding {
                 .checked_add(size.xor_rows)
                 .ok_or(ChainBuildError::Unsupported)?;
             sorted_domains.push(sorted);
+            shared_domains.push(shared);
         }
         let total = u64::from(self.solver.n_vars())
             .checked_add(required.variables)
@@ -483,12 +597,17 @@ impl ChainedS3Encoding {
             });
         }
         self.first_pair_exchangeable = sorted_domains[0] == sorted_domains[1];
-        for (block, representatives) in self.blocks[..self.m].iter().zip(&sorted_domains) {
+        for ((block, representatives), shared) in self.blocks[..self.m]
+            .iter()
+            .zip(&sorted_domains)
+            .zip(&shared_domains)
+        {
             self.orbit_choice_wires.push(add_frobenius_orbit_domain(
                 &mut self.solver,
                 block,
                 representatives,
                 &self.irr,
+                shared.as_deref(),
             ));
         }
         self.domain_installed = true;
@@ -626,6 +745,7 @@ fn add_frobenius_orbit_domain(
     block: &[u32],
     representatives: &[BigUint],
     irr: &IrreduciblePoly,
+    shared: Option<&[Option<bool>]>,
 ) -> FrobeniusOrbitChoiceWires {
     fn take(next: &mut u32, count: usize) -> Vec<u32> {
         let start = *next;
@@ -643,6 +763,16 @@ fn add_frobenius_orbit_domain(
     let prefix = take(&mut next, r - 1);
     let root = take(&mut next, n);
     let phase = take(&mut next, bits);
+    // Install units last: add_clause eagerly simplifies against root
+    // assignments. Delaying them preserves the unchanged phase CNF/XOR
+    // construction and makes the exact preflight count independent of it.
+    let shared_units: Vec<Lit> = shared
+        .into_iter()
+        .flat_map(|bits| root.iter().zip(bits))
+        .filter_map(|(&wire, value)| {
+            value.map(|value| if value { wire as Lit } else { -(wire as Lit) })
+        })
+        .collect();
 
     // Sequential exactly-one selection. No quadratic pairwise clauses.
     solver.add_clause(selectors.iter().map(|&v| v as Lit).collect());
@@ -653,16 +783,33 @@ fn add_frobenius_orbit_domain(
         solver.add_clause(vec![-(selectors[i] as Lit), -(prefix[i - 1] as Lit)]);
     }
     solver.add_clause(vec![-(selectors[r - 1] as Lit), -(prefix[r - 2] as Lit)]);
-    for (&selector, rep) in selectors.iter().zip(representatives) {
-        for (bit, &wire) in root.iter().enumerate() {
-            solver.add_clause(vec![
-                -(selector as Lit),
-                if rep.bit(bit as u64) {
-                    wire as Lit
-                } else {
-                    -(wire as Lit)
-                },
-            ]);
+    if let Some(shared) = shared {
+        for (&selector, rep) in selectors.iter().zip(representatives) {
+            for (bit, (&wire, shared)) in root.iter().zip(shared).enumerate() {
+                if shared.is_none() {
+                    solver.add_clause(vec![
+                        -(selector as Lit),
+                        if rep.bit(bit as u64) {
+                            wire as Lit
+                        } else {
+                            -(wire as Lit)
+                        },
+                    ]);
+                }
+            }
+        }
+    } else {
+        for (&selector, rep) in selectors.iter().zip(representatives) {
+            for (bit, &wire) in root.iter().enumerate() {
+                solver.add_clause(vec![
+                    -(selector as Lit),
+                    if rep.bit(bit as u64) {
+                        wire as Lit
+                    } else {
+                        -(wire as Lit)
+                    },
+                ]);
+            }
         }
     }
 
@@ -712,6 +859,9 @@ fn add_frobenius_orbit_domain(
     }
     for (&output, &summand) in current.iter().zip(block) {
         solver.add_xor(&[output, summand], false);
+    }
+    for unit in shared_units {
+        solver.add_clause(vec![unit]);
     }
     debug_assert_eq!(next - 1, *allocated.end());
     FrobeniusOrbitChoiceWires { selectors, phase }
@@ -1262,7 +1412,7 @@ mod tests {
         for x in 0..8u8 {
             let mut solver = Solver::new(3);
             let before = (solver.n_vars(), solver.n_clauses(), solver.n_xors());
-            add_frobenius_orbit_domain(&mut solver, &[1, 2, 3], &representatives, &irr);
+            add_frobenius_orbit_domain(&mut solver, &[1, 2, 3], &representatives, &irr, None);
             let size = frobenius_orbit_domain_size(3, 1, 2).unwrap();
             assert_eq!(solver.n_vars() as u64 - before.0 as u64, size.variables);
             assert_eq!(solver.n_clauses() - before.1, size.clauses);
@@ -1448,5 +1598,251 @@ mod tests {
         equal.order_first_pair(2_000).unwrap();
         assert_eq!(equal.solver.solve(), SolveResult::Sat);
         assert!(equal.verify_model());
+    }
+
+    #[test]
+    fn shared_bits_preserve_every_selected_representative_phase_and_x() {
+        let irr = IrreduciblePoly {
+            degree: 3,
+            low_terms: vec![0, 1],
+        };
+        // Shared zeros, shared ones, no common bits, and an unsorted input.
+        for values in [vec![0u8, 1], vec![6, 7], vec![0, 7], vec![3, 1, 2]] {
+            let mut reps: Vec<_> = values.into_iter().map(BigUint::from).collect();
+            reps.sort_unstable();
+            for encoding in [
+                FrobeniusOrbitRootEncoding::PerRepresentative,
+                FrobeniusOrbitRootEncoding::SharedBits,
+            ] {
+                let shared = shared_root_bits(3, &reps, encoding);
+                let size =
+                    frobenius_orbit_domain_size_with_encoding(3, 1, &reps, encoding).unwrap();
+                for (selected, rep) in reps.iter().enumerate() {
+                    for phase in 0..4u8 {
+                        let image = F2mElement::from_biguint(rep, 3)
+                            .square_k_times(u32::from(phase), &irr)
+                            .to_biguint();
+                        for x in 0..8u8 {
+                            let mut solver = Solver::new(3);
+                            let wires = add_frobenius_orbit_domain(
+                                &mut solver,
+                                &[1, 2, 3],
+                                &reps,
+                                &irr,
+                                shared.as_deref(),
+                            );
+                            assert_eq!(u64::from(solver.n_vars()) - 3, size.variables);
+                            assert_eq!(solver.n_clauses(), size.clauses);
+                            assert_eq!(solver.n_xors(), size.xor_rows);
+                            solver.add_clause(vec![wires.selectors[selected] as Lit]);
+                            for (bit, &wire) in wires.phase.iter().enumerate() {
+                                solver.add_clause(vec![if phase & (1 << bit) != 0 {
+                                    wire as Lit
+                                } else {
+                                    -(wire as Lit)
+                                }]);
+                            }
+                            for bit in 0..3 {
+                                solver.add_clause(vec![if x & (1 << bit) != 0 {
+                                    (bit + 1) as Lit
+                                } else {
+                                    -((bit + 1) as Lit)
+                                }]);
+                            }
+                            assert_eq!(
+                                solver.solve() == SolveResult::Sat,
+                                phase < 3 && BigUint::from(x) == image,
+                                "{encoding:?}, reps={reps:?}, selected={selected}, phase={phase}, x={x}"
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn shared_bits_preflight_is_atomic_and_keeps_choice_wires() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let reps: Vec<_> = [3u8, 1, 2].into_iter().map(BigUint::from).collect();
+        let policy = FrobeniusOrbitRootEncoding::SharedBits;
+        let size = frobenius_orbit_domain_size_with_encoding(7, 3, &reps, policy).unwrap();
+        let baseline = frobenius_orbit_domain_size(7, 3, 3).unwrap();
+        assert_eq!(baseline.clauses - size.clauses, 3 * 5 * 2);
+        assert_eq!(baseline.variables, size.variables);
+        assert_eq!(baseline.xor_rows, size.xor_rows);
+        let build = || {
+            ChainedS3Encoding::build(3, &kc.curve.irreducible, &kc.curve.b, None, 0, 10_000)
+                .unwrap()
+        };
+        let counts = |enc: &ChainedS3Encoding| {
+            (
+                enc.solver.n_vars(),
+                enc.solver.n_clauses(),
+                enc.solver.n_xors(),
+            )
+        };
+        let mut enc = build();
+        let before = counts(&enc);
+        let max_variables = before.0 + size.variables as u32;
+        assert!(matches!(
+            enc.constrain_frobenius_orbit_summands_with_encoding(
+                &reps,
+                max_variables - 1,
+                size.clauses,
+                policy
+            ),
+            Err(ChainBuildError::VariableCap { .. })
+        ));
+        assert!(matches!(
+            enc.constrain_frobenius_orbit_summands_with_encoding(
+                &reps,
+                max_variables,
+                size.clauses - 1,
+                policy
+            ),
+            Err(ChainBuildError::DomainClauseCap { .. })
+        ));
+        for invalid in [vec![], vec![1u8], vec![1, 1], vec![1, 128]] {
+            let invalid: Vec<_> = invalid.into_iter().map(BigUint::from).collect();
+            assert_eq!(
+                frobenius_orbit_domain_size_with_encoding(7, 3, &invalid, policy),
+                None
+            );
+            assert_eq!(
+                enc.constrain_frobenius_orbit_summands_with_encoding(
+                    &invalid,
+                    max_variables,
+                    size.clauses,
+                    policy
+                ),
+                Err(ChainBuildError::Unsupported)
+            );
+            assert_eq!(counts(&enc), before);
+            assert!(enc.orbit_choice_wires().is_none());
+        }
+        assert_eq!(
+            enc.constrain_frobenius_orbit_summands_with_encoding(
+                &reps,
+                max_variables,
+                size.clauses,
+                policy
+            ),
+            Ok(size)
+        );
+        assert_eq!(
+            counts(&enc),
+            (
+                max_variables,
+                before.1 + size.clauses,
+                before.2 + size.xor_rows
+            )
+        );
+        let mut original = build();
+        original
+            .constrain_frobenius_orbit_summands(&reps, max_variables, baseline.clauses)
+            .unwrap();
+        assert_eq!(enc.orbit_choice_wires(), original.orbit_choice_wires());
+        assert_eq!(
+            enc.constrain_frobenius_orbit_summands_with_encoding(
+                &reps,
+                max_variables,
+                size.clauses,
+                policy
+            ),
+            Err(ChainBuildError::Unsupported)
+        );
+    }
+
+    #[test]
+    fn shared_bits_heterogeneous_caps_validate_every_domain_before_mutation() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let policy = FrobeniusOrbitRootEncoding::SharedBits;
+        let domains: Vec<Vec<BigUint>> = [vec![0u8, 1], vec![126, 127]]
+            .into_iter()
+            .map(|v| v.into_iter().map(BigUint::from).collect())
+            .collect();
+        let sizes: Vec<_> = domains
+            .iter()
+            .map(|r| frobenius_orbit_domain_size_with_encoding(7, 1, r, policy).unwrap())
+            .collect();
+        let expected = FrobeniusOrbitDomainSize {
+            variables: sizes.iter().map(|s| s.variables).sum(),
+            clauses: sizes.iter().map(|s| s.clauses).sum(),
+            xor_rows: sizes.iter().map(|s| s.xor_rows).sum(),
+        };
+        let mut enc =
+            ChainedS3Encoding::build(2, &kc.curve.irreducible, &kc.curve.b, None, 0, 10_000)
+                .unwrap();
+        let before = (
+            enc.solver.n_vars(),
+            enc.solver.n_clauses(),
+            enc.solver.n_xors(),
+        );
+        let max_variables = before.0 + expected.variables as u32;
+        for invalid in [
+            vec![domains[0].clone()],
+            vec![domains[0].clone(), vec![]],
+            vec![
+                domains[0].clone(),
+                vec![BigUint::from(128u8), BigUint::from(1u8)],
+            ],
+            vec![domains[0].clone(), vec![BigUint::from(1u8); 2]],
+        ] {
+            assert_eq!(
+                enc.constrain_frobenius_orbit_domains_with_encoding(
+                    &invalid,
+                    max_variables,
+                    expected.clauses,
+                    policy,
+                ),
+                Err(ChainBuildError::Unsupported)
+            );
+        }
+        assert!(matches!(
+            enc.constrain_frobenius_orbit_domains_with_encoding(
+                &domains,
+                max_variables,
+                expected.clauses - 1,
+                policy,
+            ),
+            Err(ChainBuildError::DomainClauseCap { .. })
+        ));
+        assert_eq!(
+            (
+                enc.solver.n_vars(),
+                enc.solver.n_clauses(),
+                enc.solver.n_xors()
+            ),
+            before
+        );
+        assert!(enc.orbit_choice_wires().is_none());
+        assert_eq!(
+            enc.constrain_frobenius_orbit_domains_with_encoding(
+                &domains,
+                max_variables,
+                expected.clauses,
+                policy,
+            ),
+            Ok(expected)
+        );
+        assert_eq!(
+            (
+                enc.solver.n_vars(),
+                enc.solver.n_clauses(),
+                enc.solver.n_xors()
+            ),
+            (
+                max_variables,
+                before.1 + expected.clauses,
+                before.2 + expected.xor_rows
+            )
+        );
+        assert_eq!(
+            enc.order_first_pair(max_variables + 7),
+            Err(ChainBuildError::Unsupported)
+        );
+        // Disjoint exact orbit closures cannot represent a two-summand zero.
+        assert_eq!(enc.solver.solve(), SolveResult::Unsat);
     }
 }

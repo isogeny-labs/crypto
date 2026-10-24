@@ -977,6 +977,8 @@ fn main() -> Result<()> {
         Some("small-m4-cache") => Err("usage: n83_prebuild_cost_m23 small-m4-cache off|on preflight|positive|natural K2048|D12 BASE_DIR PUBLIC_JSON 0|1 NEW_RESULT_JSON".into()),
         Some("full-m4") if args.len()==9 => small_m4::full_run(&args[2],&args[3],&args[4],Path::new(&args[5]),Path::new(&args[6]),args[7].parse()?,Path::new(&args[8])),
         Some("full-m4") => Err("usage: n83_prebuild_cost_m23 full-m4 off|on preflight|positive|natural U|D BASE_DIR PUBLIC_JSON TARGET_0_TO_7 NEW_RESULT_JSON; off is control-only".into()),
+        Some("shared-root-m4") if args.len()==9 => small_m4::shared_root_run(&args[2],&args[3],&args[4],Path::new(&args[5]),Path::new(&args[6]),args[7].parse()?,Path::new(&args[8])),
+        Some("shared-root-m4") => Err("usage: n83_prebuild_cost_m23 shared-root-m4 per-representative|shared-bits preflight|positive|natural U|D BASE_DIR PUBLIC_JSON TARGET_0_TO_7 NEW_RESULT_JSON; U is control-only".into()),
         Some("full-m4-control-check") if args.len()==7 => small_m4::full_control_pair(Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]),Path::new(&args[6])),
         Some("targets") if args.len()==4 => targets(Path::new(&args[2]),Path::new(&args[3])),
         Some("setup") if args.len()==5 => setup(&args[2],Path::new(&args[3]),Path::new(&args[4])),

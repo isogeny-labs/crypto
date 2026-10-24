@@ -1,6 +1,8 @@
 //! Explicit frozen m=4 policies; the parent owns the byte-pinned base importer.
 use super::*;
-use crypto_lib::cryptanalysis::binary_semaev_chain_sat::ChainedS3Encoding;
+use crypto_lib::cryptanalysis::binary_semaev_chain_sat::{
+    ChainedS3Encoding, FrobeniusOrbitRootEncoding,
+};
 use crypto_lib::cryptanalysis::sat::{RootPropagationResult, SolveResult, SolverProgress};
 use std::fs::File;
 use std::sync::{mpsc, Arc};
@@ -10,6 +12,7 @@ enum Policy {
     Legacy,
     SmallCache(bool),
     Full(bool),
+    SharedRoot(FrobeniusOrbitRootEncoding),
 }
 impl Policy {
     fn check(self, mode: &str, arm: &str, target: usize) -> Result<()> {
@@ -23,6 +26,12 @@ impl Policy {
                         && (mode != "positive" || target == 0)
                         && (cache || mode == "positive")
                 }
+                Self::SharedRoot(_) => {
+                    matches!(arm, "U" | "D")
+                        && target < 8
+                        && (mode != "positive" || target == 0)
+                        && (mode != "natural" || arm == "D")
+                }
             };
         if valid {
             Ok(())
@@ -34,6 +43,7 @@ impl Policy {
         match self {
             Self::Legacy => None,
             Self::SmallCache(b) | Self::Full(b) => Some(b),
+            Self::SharedRoot(_) => Some(true),
         }
     }
     fn name(self) -> &'static str {
@@ -41,7 +51,22 @@ impl Policy {
             Self::Legacy => "small-m4/v1",
             Self::SmallCache(_) => "small-m4-xor-cache/v1",
             Self::Full(_) => "full-m4-common-public/v1",
+            Self::SharedRoot(_) => "d18-shared-root-m4/v1",
         }
+    }
+    fn root_encoding(self) -> FrobeniusOrbitRootEncoding {
+        match self {
+            Self::SharedRoot(encoding) => encoding,
+            _ => FrobeniusOrbitRootEncoding::PerRepresentative,
+        }
+    }
+}
+
+fn root_setting(setting: &str) -> Result<FrobeniusOrbitRootEncoding> {
+    match setting {
+        "per-representative" => Ok(FrobeniusOrbitRootEncoding::PerRepresentative),
+        "shared-bits" => Ok(FrobeniusOrbitRootEncoding::SharedBits),
+        _ => Err("root encoding must be per-representative or shared-bits".into()),
     }
 }
 fn cache_setting(cache: &str) -> Result<bool> {
@@ -322,6 +347,26 @@ pub(super) fn full_run(
     )
 }
 
+pub(super) fn shared_root_run(
+    encoding: &str,
+    mode: &str,
+    arm: &str,
+    root: &Path,
+    corpus: &Path,
+    target_index: usize,
+    output: &Path,
+) -> Result<()> {
+    run_inner(
+        mode,
+        arm,
+        root,
+        corpus,
+        target_index,
+        output,
+        Policy::SharedRoot(root_setting(encoding)?),
+    )
+}
+
 fn run_inner(
     mode: &str,
     arm: &str,
@@ -353,6 +398,18 @@ fn run_inner(
         identity["experiment_policy"] = json!(policy.name());
         identity["xor_decided_cache"] = json!(enabled);
         identity["conflict_budget"] = json!(conflict_budget);
+    }
+    if let Policy::SharedRoot(encoding) = policy {
+        identity["root_encoding"] = json!(match encoding {
+            FrobeniusOrbitRootEncoding::PerRepresentative => "per-representative",
+            FrobeniusOrbitRootEncoding::SharedBits => "shared-bits",
+        });
+        identity["source_encoding_sha256"] = json!(format!(
+            "{:x}",
+            Sha256::digest(include_bytes!(
+                "../../src/cryptanalysis/binary_semaev_chain_sat.rs"
+            ))
+        ));
     }
     let mut phases = OpenOptions::new()
         .create_new(true)
@@ -416,6 +473,19 @@ fn run_inner(
         .step_by(166)
         .map(|r| BigUint::from(r.point.0))
         .collect();
+    if matches!(policy, Policy::SharedRoot(_)) {
+        let mut digest = blake3::Hasher::new();
+        digest.update(b"n83.root-representatives/v1");
+        for row in base.rows.iter().step_by(166) {
+            digest.update(&row.point.0.to_le_bytes());
+        }
+        identity["root_representatives_blake3"] = json!(digest.finalize().to_hex().to_string());
+        identity["root_shared_bit_count"] = json!((0..83u64)
+            .filter(|&bit| representatives
+                .iter()
+                .all(|r| r.bit(bit) == representatives[0].bit(bit)))
+            .count());
+    }
     let target_x = fast.element(target.0);
     phase(
         "model_entered",
@@ -430,8 +500,13 @@ fn run_inner(
         300000,
     )
     .map_err(|_| "small m4 model build failed")?;
-    enc.constrain_frobenius_orbit_summands(&representatives, 300000, 8000000)
-        .map_err(|_| "small m4 orbit-domain failed")?;
+    enc.constrain_frobenius_orbit_summands_with_encoding(
+        &representatives,
+        300000,
+        8000000,
+        policy.root_encoding(),
+    )
+    .map_err(|_| "small m4 orbit-domain failed")?;
     identity["model_domain_ms"] = json!(part.elapsed().as_secs_f64() * 1000.0);
     identity["sat_variables"] = json!(enc.solver.n_vars());
     identity["sat_clauses"] = json!(enc.solver.n_clauses());
@@ -673,6 +748,33 @@ mod policy_tests {
         assert!(Policy::SmallCache(true).check("natural", "D12", 2).is_err());
         assert!(Policy::Legacy.check("natural", "D12", 1).is_err());
         assert!(cache_setting("default").is_err());
+    }
+
+    #[test]
+    fn shared_root_policy_requires_explicit_encoding_and_full_d_natural_inputs() {
+        for name in ["per-representative", "shared-bits"] {
+            let encoding = root_setting(name).unwrap();
+            let policy = Policy::SharedRoot(encoding);
+            assert_eq!(policy.cache(), Some(true));
+            assert_eq!(policy.root_encoding(), encoding);
+            for target in 0..8 {
+                assert!(policy.check("natural", "D", target).is_ok());
+                assert!(policy.check("natural", "U", target).is_err());
+            }
+            for arm in ["U", "D"] {
+                assert!(policy.check("positive", arm, 0).is_ok());
+                assert!(policy.check("positive", arm, 1).is_err());
+            }
+            assert!(policy.check("natural", "D", 8).is_err());
+            assert!(policy.check("natural", "D12", 0).is_err());
+            assert!(policy.check("natural", "K2048", 0).is_err());
+        }
+        assert!(root_setting("default").is_err());
+        assert!(root_setting("on").is_err());
+        assert_eq!(
+            Policy::Full(true).root_encoding(),
+            FrobeniusOrbitRootEncoding::PerRepresentative
+        );
     }
     #[test]
     fn full_control_gate_requires_model_work_and_cache_conservation() {

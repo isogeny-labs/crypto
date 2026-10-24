@@ -6,6 +6,12 @@ on:
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'src/cryptanalysis/sat.rs'
+      - 'src/cryptanalysis/binary_semaev_chain_sat.rs'
+      - 'examples/n83_d18_shared_bits.rs'
+      - 'examples/n83_d18_shared_card_audit.rs'
+      - 'examples/n83_d18_root_inventory.rs'
+      - 'research/n83_d18_shared_bits_20261020/**'
+      - 'research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv'
       - 'examples/n83_full_m4_audit.rs'
       - 'examples/n83_xor_cache_audit.rs'
       - 'examples/n83_full_m4_card_check.rs'
@@ -20,6 +26,12 @@ on:
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'src/cryptanalysis/sat.rs'
+      - 'src/cryptanalysis/binary_semaev_chain_sat.rs'
+      - 'examples/n83_d18_shared_bits.rs'
+      - 'examples/n83_d18_shared_card_audit.rs'
+      - 'examples/n83_d18_root_inventory.rs'
+      - 'research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv'
+      - 'research/n83_d18_shared_bits_20261020/**'
       - 'examples/n83_full_m4_audit.rs'
       - 'examples/n83_xor_cache_audit.rs'
       - 'examples/n83_full_m4_card_check.rs'
@@ -59,8 +71,25 @@ jobs:
             --example n83_full_m4_card_check \
             --example n83_prebuild_cost_m23 \
             --example n83_prebuild_reuse_accounting \
-            --example n83_small_m4_replay
+            --example n83_small_m4_replay \
+            --example n83_d18_shared_bits \
+            --example n83_d18_shared_card_audit
+          cargo test --release --lib binary_semaev_chain_sat
           cargo build --release --example n83_full_m4_audit --example n83_xor_cache_audit
+      - name: Independently reconstruct the root inventory
+        run: |
+          cargo run --release --example n83_d18_root_inventory -- \
+            research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv \
+            "$RUNNER_TEMP/d18-root-inventory.json"
+          cmp "$RUNNER_TEMP/d18-root-inventory.json" \
+            research/n83_d18_shared_bits_20261020/root-inventory.json
+      - name: Rebuild all full-size D18 encoding counts
+        run: |
+          cargo run --release --example n83_d18_shared_bits -- \
+            research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv \
+            "$RUNNER_TEMP/d18-shared-bits-construction.json"
+          cmp "$RUNNER_TEMP/d18-shared-bits-construction.json" \
+            research/n83_d18_shared_bits_20261020/construction.json
       - name: Replay both complete frozen receipt archives
         shell: bash
         run: |
