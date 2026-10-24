@@ -16,6 +16,39 @@ def workflow(job, event="pull_request", **jobs):
 
 
 class BudgetPolicyTests(unittest.TestCase):
+    def test_every_static_matrix_row_must_have_a_valid_budget(self):
+        rows = [{"os": "ubuntu-latest", "minutes": 25},
+                {"os": "windows-latest", "minutes": 26}]
+        job = {"strategy": {"matrix": {"include": rows}},
+               "timeout-minutes": "${{ matrix.minutes }}"}
+        self.assertTrue(policy.problems(workflow(job)))
+        rows[1]["minutes"] = 20
+        self.assertFalse(policy.problems(workflow(job)))
+        del rows[1]["minutes"]
+        self.assertTrue(policy.problems(workflow(job)))
+
+    def test_unresolved_matrix_shapes_fail_closed(self):
+        for matrix in ("${{ fromJSON(needs.plan.outputs.matrix) }}",
+                       {"include": []}, {"include": [None]},
+                       {"os": ["ubuntu-latest"], "include": [{"minutes": 20}]}):
+            job = {"strategy": {"matrix": matrix},
+                   "timeout-minutes": "${{ matrix.minutes }}"}
+            self.assertTrue(policy.problems(workflow(job)))
+
+    def test_windows_dual_build_exception_keeps_other_rows_short(self):
+        timeout = "${{ matrix.os == 'windows-latest' && 45 || ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 30) }}"
+        rows = [{"os": "ubuntu-latest"}, {"os": "windows-latest"}]
+        job = {"strategy": {"matrix": {"include": rows}}, "timeout-minutes": timeout}
+        document = {"on": {"pull_request": None, "merge_group": None},
+                    "jobs": {"isogeny": job}}
+        self.assertFalse(policy.problems(document, ".github/workflows/release.yml"))
+        self.assertTrue(policy.problems(document, ".github/workflows/other.yml"))
+        for event in ("pull_request", "merge_group"):
+            self.assertEqual(policy.expression(timeout, event, matrix=rows[0]), 25)
+            self.assertEqual(policy.expression(timeout, event, matrix=rows[1]), 45)
+        job["timeout-minutes"] = timeout.replace("45", "46")
+        self.assertTrue(policy.problems(document, ".github/workflows/release.yml"))
+
     def test_long_and_missing_automatic_budgets_fail(self):
         for budget in (None, 30, 75, 300):
             job = {} if budget is None else {"timeout-minutes": budget}
@@ -113,6 +146,20 @@ class BudgetPolicyTests(unittest.TestCase):
                 workflow_file.write_bytes(workflow_file.read_bytes() + b"\n# modified\n")
                 self.assertFalse(policy.frozen_proof_budget_exception(
                     workflow_path, job, timeout, "pull_request", root=root))
+
+    def test_named_exceptions_are_exact(self):
+        for (workflow_path, job), exception in policy.NAMED_BUDGET_EXCEPTIONS.items():
+            timeout = exception["timeout"]
+            doc = {"on": {"pull_request": None, "merge_group": None},
+                   "jobs": {job: {"timeout-minutes": timeout}}}
+            self.assertFalse(policy.problems(doc, workflow_path))
+            # another timeout, another job or another workflow is not covered
+            doc["jobs"][job]["timeout-minutes"] = timeout + 1
+            self.assertTrue(policy.problems(doc, workflow_path))
+            doc = {"on": {"pull_request": None}, "jobs": {"other": {"timeout-minutes": timeout}}}
+            self.assertTrue(policy.problems(doc, workflow_path))
+            doc = {"on": {"pull_request": None}, "jobs": {job: {"timeout-minutes": timeout}}}
+            self.assertTrue(policy.problems(doc, ".github/workflows/other.yml"))
 
     def test_metadata_is_not_executed(self):
         self.assertIs(policy.expression("__import__('os').system('false')", "pull_request"), policy.UNKNOWN)

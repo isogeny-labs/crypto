@@ -18,10 +18,16 @@ on:
       # summation polynomials, so a change here changes every key.
       - 'src/cryptanalysis/semaev_leading_form.rs'
       - '.github/workflows/polynomial-reuse.yml'
+# A newer push to the same pull request cancels this workflow's run for the older commit.
+# Every other event (push, schedule, dispatch, merge queue) gets a group of its own and is never cancelled.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   correctness:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|polynomial-reuse.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|polynomial-reuse.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
+    timeout-minutes: 30
     permissions:
       contents: read
     services:

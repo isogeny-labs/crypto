@@ -355,6 +355,12 @@ fn prime_curves(v: &mut Vec<CatalogCurve>) {
     // Core standardized prime curves (src/ecc/curve.rs).
     let core: &[(&str, &[&str], &str, fn() -> CurveParams)] = &[
         (
+            "eccp-131",
+            &["eccp131"],
+            "Certicom ECC Challenge",
+            CurveParams::eccp131,
+        ),
+        (
             "secp256k1",
             &["k256", "ansix9p256k1"],
             "SEC 2 v2 / Bitcoin",
@@ -675,6 +681,30 @@ fn binary_curves(v: &mut Vec<CatalogCurve>) {
             family: *family,
             standard: std,
             object: CurveObject::Binary(Box::new(ctor())),
+        });
+    }
+    for name in [
+        "ecc2k-130",
+        "ecc2-131",
+        "ecc2k-163",
+        "ecc2-163",
+        "ecc2-191",
+        "ecc2k-238",
+        "ecc2-238",
+        "ecc2k-358",
+        "ecc2-353",
+    ] {
+        let (curve, _) = BinaryCurve::certicom_challenge(name).expect("Certicom curve record");
+        v.push(CatalogCurve {
+            name,
+            aliases: &[],
+            family: if name.starts_with("ecc2k") {
+                Family::Koblitz
+            } else {
+                Family::BinaryRandom
+            },
+            standard: "Certicom ECC Challenge",
+            object: CurveObject::Binary(Box::new(curve)),
         });
     }
 }

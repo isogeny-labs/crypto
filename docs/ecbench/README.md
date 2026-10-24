@@ -168,7 +168,10 @@ unseen target**, cold, with every phase charged, verified.
     reference (`rho.signed_frobenius_strong`), whose jump table `[a]G` is
     target-independent, the window starts at the first walk start
     `[c]G + Q`. The stages it includes are `walk`, `collision` and
-    `recovery_check`.
+    `recovery_check`. `rho.signed_frobenius_strong_legacy` retains the
+    literal pre-2026-10-14 canonicalization only as a trajectory-identical
+    implementation control; it has the same boundary and accounting and is
+    not a second mathematical reference.
 - **Verified, by someone else.** No solver receives the planted scalar.
   The runner checks `[k]G = Q` and `k = planted` in its own process, and
   `ecbench verify` checks it again from the files. A run that does not
@@ -266,7 +269,7 @@ a run that fails the check loses its isolation level), or **recorded**
 | What each method counts | one tool counts additions, another wall time, another instructions | one `CountedGroup` ledger for every method; native work the unit does not charge is counted as `*_uncharged` and makes the total a lower bound (§7) | controlled |
 | Pricing drift | per-run measured ratios repriced identical runs by up to 8 % | IC native work is priced only at the repository's pinned ratios (`docs/ic/calibration.json`); a unit without one stays unpriced, never host-measured; an algebraic solver's wall-priced work is taken back out | controlled |
 | Selective reporting | dropping a failure, rerunning until it looks good | every execution writes a sealed record before the next starts; the output directory is claimed with an atomic `mkdir` under the lock, so a session queued for a used directory fails instead of writing over it; an interrupted session is marked, never deleted | controlled |
-| Interruption | a killed runner leaves narrowed masks behind and a child solving on an unprotected core | SIGINT, SIGTERM, SIGHUP and SIGQUIT are taken by one thread, which kills the child's process group; the session is marked `interrupted`, the eviction restored, and the runner exits `128 + signal`; the child dies with the runner (`PR_SET_PDEATHSIG`) | controlled |
+| Interruption | a killed runner leaves narrowed masks behind and a child solving on an unprotected core | SIGINT, SIGTERM, SIGHUP and SIGQUIT are taken by one thread, which kills the child's process group; the session is marked `interrupted`, the eviction restored, and the runner exits `128 + signal`; the child dies with the runner (`PR_SET_PDEATHSIG`). A runner killed outright (SIGKILL, host loss) cannot mark the session, which keeps reading `running` as first written; `ecbench verify --allow-interrupted` audits such a session as interrupted (`interruption: never_finalised`, `records_bound: false`), with every per-record check (seal, sequence, plan, answer, grading) still applied. No whole-file records hash was ever written, so the file is explicitly unbound: truncation or appended records are seen only through the unkeyed per-record seals, and such a session must not be cited as complete | controlled |
 | Tampering and transcription | a figure edited by hand, or copied wrong | every file is hashed into `session.json`; `verify` re-derives identities, the plan, the answers and the seals, and replays runs | controlled |
 
 ## 6. Isolation levels
@@ -333,6 +336,7 @@ rho's expectation `√(π/2)`; the curve's floor is `√(π/2A)` (§3).
 |---|---|---|
 | `rho.*` | jump-table set-up, walk starts, every step, cycle escapes, look-ahead additions, internal verification | canonicalisations (negation, signed Frobenius), Frobenius maps |
 | `rho.signed_frobenius_strong` | group additions exactly; each scalar multiplication (jump table, walk start stride, candidate checks) at `1.5·log₂ r` additions, `ic_boundary::signed_frobenius_rho`'s convention | canonicalisations, partition hashes, distinguished-point table queries and inserts |
+| `rho.signed_frobenius_strong_legacy` | identical to `rho.signed_frobenius_strong`; comparison-only implementation control | identical to `rho.signed_frobenius_strong` |
 | `bsgs.*` | baby steps, the giant stride, giant steps | table inserts and lookups |
 | `kangaroo.vow` | jump-table set-up, starts and restarts, every jump | table inserts and lookups |
 | `claw.pair_table` | the known-log base's seed scalar multiplications, every table addition `P_i + F_b`, both query additions `Q − (F_k + F_l)`, the addition that rebuilds a hit's table sum; phases `base`, `table`, `search`, `recover` | Frobenius maps, canonicalisations, table inserts and probes |
@@ -345,6 +349,14 @@ retain their exact parameter and accounting contract. It removes solver wall
 pricing from the reported group-addition equivalents. Solver conflicts and
 other work without a pinned conversion stay visible as unpriced counters;
 the recorded `S` is therefore a lower bound on the complete pipeline cost.
+
+The standing strong-rho implementation applies paired normal-basis maps and
+paired coefficient reductions during signed-Frobenius canonicalization. The
+[2026-10-14 optimization study](../../research/ecbench_rho_optimized_20261014/README.md)
+records identical trajectories and counts over 240 matched pairs and a
+complete-solve Callgrind ratio of 0.802155 against the same-binary legacy
+path. That is implementation evidence in `callgrind.Ir`; it does not change
+the generic-group floor or turn uncharged canonicalization into charged GAE.
 
 `ic.pipeline` defaults to `linalg=incremental-gauss`, which stops when the
 target scalar is pinned; the factor-base logs can still be underdetermined.
@@ -359,6 +371,34 @@ column by checking `[coefficient × column_log]G = [cofactor]P`. It charges
 both scalar multiplications and records checked, missing and failing
 columns in the verification phase. The existing full-rank mode keeps its
 historical accounting and replay identity.
+
+`linalg=sparse-cado` runs the large-matrix pipeline from
+`koblitz_sparse_la`: CADO-NFS-style filtering (duplicates, singletons,
+clique purge, then a Markowitz merge that combines rows along a spanning
+tree) followed by block Wiedemann on the core. That pipeline was measured
+1.93× faster than CADO-NFS 3.0's own `purge`/`merge-dl`/`replay-dl`/`bwc`
+at 262,144 columns
+([`research/la_engines_20261014`](../../research/la_engines_20261014/REPORT.pdf);
+the leaderboard's linear-algebra section). It is a batch solver: it
+buffers the relations and re-solves once every column appears and the rows
+number at least the columns, then again every `max(1, columns / 32)`
+relations. It answers only at full column rank, so it runs under the
+full-rank stop rule and its trials compare with
+`incremental-gauss-full-rank`, not with the target-pinned default. A
+solution is accepted when two independently seeded solves return the
+same vector. `solve_sparse_system` checks every row but does not certify
+rank, and in a rank-deficient system two seeded solves differ by a random
+kernel element. Work is charged in the same `row_ops` unit as the
+eliminations: one per entry multiply-subtract in merges, folding, sparse
+products (non-zeros × block lanes), checks and reconstruction, summed
+over every solve tried. The `block × block` arithmetic of the approximant
+basis is not counted, just as the dense matrix's column scans are not.
+The recorded `S` prices those `row_ops` with the calibrated
+`ns_per_row_op`. The same plug-in is selectable as
+`ic bench --linalg sparse-cado`, and
+[`specs/smoke-prime-sparse-cado.json`](specs/smoke-prime-sparse-cado.json)
+runs it beside `incremental-gauss-full-rank` on one relation stream (a
+plumbing check, not a performance claim).
 
 `compact-orbit-scan:columns=N,raw_x_cap=M` builds a Koblitz factor base
 from a bounded raw-abscissa scan. Its cofactor projections, subgroup checks
@@ -555,6 +595,39 @@ Two consequences to read every table with:
   other method are unchanged. `ecbench trend --compare …` fits how a paired
   ratio moves with `ln r` and `ln n` across curves. First use:
   `research/ecbench_frobenius_orbit_vs_rho_20261014/`.
+
+- **Word-RAM reference pricing is the host-independent alternative.**
+  `ic.pipeline_wordram`, `rho.signed_frobenius_wordram` and
+  `rho.signed_frobenius_strong_wordram` run the same base solvers and
+  charge the same counters by the same rules as the `*_full` methods.
+  They take each unit's price from fixed formulas, not from one host's
+  timings. The scheme is
+  [CurveSmash's](https://github.com/zac-williamson/curvesmash/blob/main/docs/COST_MODEL.md)
+  (after HashSmash). The curve's affine addition is the reference operation
+  and costs 1. Its budget `C`, in operations on a 256-bit word RAM, is fixed by
+  formula. Every other unit costs its own word-operation budget divided
+  by `C`. For a `k`-bit field in `s` words: `A = 128(s+1)`,
+  `M = k(2A+64) + 128(s+1)` and `C = I + 16M + 32A + 4096`.
+  Prime fields use CurveSmash's Fermat inversion,
+  `I = 2k(M+64) + 128(s+1)`, unchanged; at `k = 256` this gives its
+  secp256k1 price, `C = 78,037,248`, and a unit test holds both published
+  constants. In `GF(2^m)` a squaring is linear, so `S = 8k + 128(s+1)`
+  and `I = k(S+M+128) + 128(s+1)`. Frobenius maps, signed-Frobenius
+  canonicalisations, half-trace Artin–Schreier solves, hash probes,
+  row operations modulo `r` and word XORs are built from those budgets
+  (`src/cryptanalysis/ecbench/wordram_price.rs` documents each one).
+  The record's `detail.wordram_pricing` gives every budget, `C` and the
+  charge by counter. `ecbench wordram-prices --curve 0:31 …` prints the
+  table for any Koblitz curve; nothing is measured.
+  These are conservative portable allowances that define the unit, not
+  timings. The word RAM charges one operation per memory transfer
+  whatever the cache level, so a hash probe is much cheaper here than in
+  `full_prices.json`. Native work is priced in the same unit on every
+  host and needs no `price-units` run, but its rate is a modelling
+  choice: §5a's band (0, 0.1 and 1 GAE per native operation) still
+  decides any ranking, and a word-RAM total is one point to quote beside
+  it, not a replacement for it. A counter with no rule stays unpriced,
+  and the record stays marked as a lower bound.
 
 `ecbench resources --dir SESSION --out resources.json` reports, for every
 measured attempt including failures, the native integer counters by phase,
