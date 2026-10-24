@@ -1,0 +1,135 @@
+name: PR and branch hygiene
+# Weekly report-only sweep: open PRs per lane, stale PRs, merged-but-undeleted
+# branches, branches with no PR. Written to the job summary.
+#
+# Deliberately NOT triggered by any pull_request event: it runs the workflow file
+# from the default branch (schedule) or a dispatched ref, never from a PR.
+# `apply` is dispatch-only, default-branch-only, needs dry_run=false and an
+# explicit `allow` glob, and is the only job holding contents: write.
+# Design and owner-only steps: .github/ci-pr-capacity.md
+# Pause everything by setting repo variable PR_HYGIENE_PAUSED=true.
+on:
+  schedule:
+    - cron: '41 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Report and plan only (true). Set false to apply the plan.'
+        type: boolean
+        default: true
+      allow:
+        description: 'Comma-separated globs a branch must match to be deleted, for example codex/old-prefix-*. Required when dry_run is false.'
+        type: string
+        default: ''
+      stale_days:
+        description: 'Warn on PRs idle for at least this many days'
+        type: string
+        default: '14'
+      close_after_days:
+        description: 'Close PRs that carry the stale label and have been idle this many days'
+        type: string
+        default: '7'
+      merged_days:
+        description: 'Minimum days since merge before a merged branch may be deleted'
+        type: string
+        default: '3'
+      closed_days:
+        description: 'Minimum days since close before a closed-unmerged PR branch may be deleted'
+        type: string
+        default: '30'
+      orphan_days:
+        description: 'Report branches with no PR whose tip is older than this many days'
+        type: string
+        default: '14'
+      max_deletes:
+        description: 'Maximum branch deletions per run'
+        type: string
+        default: '50'
+
+# Never cancel a sweep midway; a second one waits.
+concurrency:
+  group: pr-hygiene
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  report:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      pull-requests: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_LANE_CAPS: ${{ vars.PR_LANE_CAPS }}
+      PR_STALE_DAYS: ${{ inputs.stale_days || '14' }}
+      PR_CLOSE_AFTER_DAYS: ${{ inputs.close_after_days || '7' }}
+      PR_MERGED_DAYS: ${{ inputs.merged_days || '3' }}
+      PR_CLOSED_DAYS: ${{ inputs.closed_days || '30' }}
+      PR_ORPHAN_DAYS: ${{ inputs.orphan_days || '14' }}
+      PR_MAX_DELETES: ${{ inputs.max_deletes || '50' }}
+    steps:
+      # Commits only (tree:0): enough for for-each-ref and ancestry over all
+      # branches without downloading the multi-gigabyte tree.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/
+          persist-credentials: false
+
+      - name: Offline unit tests
+        run: python3 -B .github/scripts/test_pr_hygiene.py
+
+      - name: Report
+        run: python3 -B .github/scripts/pr_hygiene.py report >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Plan (dry run, nothing is changed)
+        run: python3 -B .github/scripts/pr_hygiene.py plan >> "$GITHUB_STEP_SUMMARY"
+
+  apply:
+    needs: report
+    # dispatch only; schedule runs never get here. Dispatching from a non-default
+    # ref is refused so the code that deletes is always the reviewed default branch.
+    if: >-
+      github.event_name == 'workflow_dispatch' && inputs.dry_run == false &&
+      github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR_LANE_CAPS: ${{ vars.PR_LANE_CAPS }}
+      PR_HYGIENE_PAUSED: ${{ vars.PR_HYGIENE_PAUSED }}
+      PR_HYGIENE_ALLOW: ${{ inputs.allow }}
+      PR_STALE_DAYS: ${{ inputs.stale_days || '14' }}
+      PR_CLOSE_AFTER_DAYS: ${{ inputs.close_after_days || '7' }}
+      PR_MERGED_DAYS: ${{ inputs.merged_days || '3' }}
+      PR_CLOSED_DAYS: ${{ inputs.closed_days || '30' }}
+      PR_ORPHAN_DAYS: ${{ inputs.orphan_days || '14' }}
+      PR_MAX_DELETES: ${{ inputs.max_deletes || '50' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/
+          persist-credentials: false
+
+      - name: Offline unit tests
+        run: python3 -B .github/scripts/test_pr_hygiene.py
+
+      # The plan is recomputed from fresh data here, not carried over from the
+      # report job. The script refuses --apply without a non-empty allow list,
+      # re-checks every deletion against the lane allowlist and protections, and
+      # uses git push --force-with-lease=<ref>:<sha> --delete.
+      - name: Apply
+        run: python3 -B .github/scripts/pr_hygiene.py plan --apply >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,47 @@
+name: PR lane cap notice
+# Advisory only. When a newly opened or reopened PR is above its author lane's
+# soft cap (codex/, claude/, cursor/, ... by head branch prefix), add the
+# `over-lane-cap` label and one comment. It cannot block a merge: the job never
+# fails (continue-on-error, the script always exits 0) and no branch protection
+# or required check refers to it.
+#
+# Safe for pull_request: same-repo PRs only, and it does not check out or run
+# anything from the PR. The script comes from the default branch; the PR is read
+# as API data only. The comment and label are written with GITHUB_TOKEN, which
+# does not start further workflow runs.
+# Caps: repo variable PR_LANE_CAPS (JSON, see .github/ci-pr-capacity.md).
+# Switch off: repo variable PR_HYGIENE_PAUSED=true.
+on:
+  pull_request:
+    types: [opened, reopened]
+
+concurrency:
+  group: pr-lane-cap-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  notice:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+          sparse-checkout: .github/scripts
+
+      - name: Lane cap notice
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_LANE_CAPS: ${{ vars.PR_LANE_CAPS }}
+          PR_HYGIENE_PAUSED: ${{ vars.PR_HYGIENE_PAUSED }}
+        run: python3 -B .github/scripts/pr_hygiene.py notice --pr "$PR_NUMBER" || true
