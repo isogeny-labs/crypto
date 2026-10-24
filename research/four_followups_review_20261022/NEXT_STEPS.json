@@ -21,12 +21,13 @@
       "name": "freeze_open_pencil_inventory",
       "execution_class": "metadata_only",
       "closes_pencil_cohort": false,
+      "status": "verified_complete",
       "acceptance": [
         "1260 unique archive workload keys",
         "543 verified candidate keys",
         "717 exact open keys",
         "no duplicate workload identity",
-        "canonical open inventory sha256 16d33685b156b3ba753fff577c11c4958335a4ce80384ca292100bc5bbadda5a"
+        "canonical open inventory sha256 efd504b64437309408c3f199fcf3ed85e94322ef01d7d1545d87f6bf1409ae3e"
       ]
     },
     {
@@ -34,6 +35,7 @@
       "name": "build_handoff_and_synthetic_intake_gate",
       "execution_class": "non_solving",
       "closes_pencil_cohort": false,
+      "status": "verified_complete_synthetic_only",
       "acceptance": [
         "hash and seed drift rejected",
         "unknown and duplicate workloads rejected",
@@ -47,6 +49,7 @@
       "name": "independently_authorized_open_cohort",
       "execution_class": "external_authorization_required",
       "closes_pencil_cohort": false,
+      "status": "blocked_assistance_boundary_external_execution_required",
       "acceptance": [
         "717 primary records",
         "717 fresh-process replay records",
@@ -59,6 +62,7 @@
       "name": "admit_and_publish_returned_evidence",
       "execution_class": "verification_and_reporting",
       "closes_pencil_cohort": true,
+      "status": "waiting_on_N3",
       "acceptance": [
         "plan-set and checksum equality",
         "source scalar and replay validation",
@@ -72,28 +76,43 @@
       "name": "reviewer_pattern_appendix",
       "execution_class": "derived_existing_evidence",
       "closes_pencil_cohort": false,
+      "status": "partial_missing_phase_fractions",
       "priced_target_observations": 11586,
       "null_pencil_attempts": 4,
       "coordinate_only_rows_excluded_from_cost_plots": 1260,
-      "break_even_equation": "dM+dS*S+dI*I+dL*N*(9+4*S+I)=0"
+      "break_even_equation": "dM+dS*S+dI*I+dL*N*(9+4*S+I)=0",
+      "completed_outputs": [
+        "paired_deltas",
+        "right_continuous_ecdf_with_missing_mass_bounds",
+        "descriptive_tails",
+        "model_cluster_resampling",
+        "36_cell_heatmap",
+        "break_even_surfaces",
+        "svg_png_pdf_and_checksums"
+      ],
+      "remaining_gap": "Phase fractions are not generated because the standardized cross-lead inputs contain total representative costs but no common phase-counter columns.",
+      "acceptance_to_close": "Normalize each source study's phase counters into one declared cross-lead phase schema, verify every normalized phase sum against its recorded cold total, and publish the normalized phase rows without inferring a split from aggregate totals."
     },
     {
       "id": "N6",
       "name": "projective_divisor_class_proof",
       "execution_class": "formal_verification",
-      "closes_pencil_cohort": false
+      "closes_pencil_cohort": false,
+      "status": "ready"
     },
     {
       "id": "N7",
       "name": "kummer_sidecar_obstruction_theorem",
       "execution_class": "formal_verification",
-      "closes_pencil_cohort": false
+      "closes_pencil_cohort": false,
+      "status": "ready"
     },
     {
       "id": "N8",
       "name": "factor_base_seed_replication",
       "execution_class": "public_known_answer_experiment",
-      "closes_pencil_cohort": false
+      "closes_pencil_cohort": false,
+      "status": "ready"
     }
   ],
   "reporting": {
