@@ -47,7 +47,7 @@ jobs:
         run: |
           df -h /
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
-            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/local/share/powershell
           df -h /
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
