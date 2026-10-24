@@ -66,6 +66,15 @@ memory-bound and solver-cost gates.
   stops if a constructed control or fresh replay fails. Its fixtures test
   the complete schedule and failure paths; they are not executed solver
   controls.
+- [Native card auditor](../../examples/n83_d18_shared_card_audit.rs): freezes
+  the actual prepared host card before launch, checks the entire archived
+  schedule, container limits, progress and independent replay bindings, and
+  computes retained factor-row ranks separately for each encoding. Tests
+  reject changed encodings, root inventories, source hashes, counter
+  regressions, false finality, control rows and rows lacking fresh replay.
+- [Receipt collector](collect-card.sh): preserves a consumed card in a new
+  archive, including failed/capped attempts. The native auditor admits only
+  a complete bounded card; the collector also retains interrupted evidence.
 
 ## Execution record and resources
 

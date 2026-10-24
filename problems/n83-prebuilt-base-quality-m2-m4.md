@@ -80,9 +80,33 @@ the named bases under that oracle. The separate full-cost gate would determine
 their cost ordering at that workload. Neither would establish a universal
 best base, asymptotic crossover or transfer to a different curve.
 
+## D18 shared-bit continuation
+
+The [frozen shared-bit protocol](../research/n83_d18_shared_bits_20261020/PROTOCOL.md)
+keeps all 16,627 D18 representatives and 2,760,082 signed-Frobenius points.
+The independent inventory finds 66 common zero coordinates. Both actual local
+encodings have equal variables, XOR rows and choice wires; the m=2,3,4 clause
+counts change from 2,926,660 / 4,420,949 / 5,915,238 to 732,028 / 1,129,001 /
+1,525,974. These are structural counts, without a solver-time comparison.
+The [proof map](../research/n83_d18_shared_bits_20261020/PROOF_MAP.md) identifies
+the checked Lean factorization and counting statements and their implementation
+boundary. The original local example tests passed. On 2026-10-24 UTC the fresh
+library run passed all shared-bit tests, but nine unrelated socket tests failed
+under sandbox permissions; the complete native gate is being rerun with socket
+access on the updated census parent.
+
+The executable gate still requires full native validation, a 4 GiB zero-swap
+Linux construction receipt, then a committed actual-host card for 22 constructed
+controls, 22 fresh independent replays and 18 natural queries. The native
+shared-card auditor checks source/input/binary identities, container policies,
+schedule, control equivalence, durable progress, every replay binding and
+retained natural-row rank separately by encoding. A cap remains censored.
+Qualified solver timing, natural useful rank and complete cold/reused IC cost
+remain open until those specific measurements pass their existing gates.
+
 ## Next discriminating step
 
-- **Action or proof obligation:** Obtain checked natural relation and useful-rank increments under a separately frozen m=4 search strategy or a separately defined partial-relation event, then measure rank/linear algebra, individual logarithm, verification and matched same-point rho with full cold/reuse charges. The full-size replacement card is complete; its cap receipts remain censored.
+- **Action or proof obligation:** Complete the frozen shared-bit validation and common-public m=4 card above, preserving the original default encoding as its same-binary comparison. Obtain checked natural relation and useful-rank increments under this policy or a separately frozen partial-relation event, then measure rank/linear algebra, individual logarithm, verification and matched same-point rho with full cold/reuse charges. The earlier full-size replacement card is complete; its cap receipts remain censored.
 - **Inputs and controls:** Exact primary curve and subgroup above; byte-pinned K=2,048, structured dimension-12 and K=16,627 archives; common public query points and coefficients; duplicate-index and planted relation controls; unchanged baseline and A/A repeats.
 - **Execution limits and stop condition:** Freeze the time, memory, query and solver caps before execution under the repository's admission rules. A cap or infrastructure failure remains a preserved bounded result.
 - **Outcomes and next actions:** A checked natural relation with an independent useful-rank increment would justify a larger common-query rank comparison and complete-cost measurement. A cap with progress but no row identifies solver effort only; it directs one sound propagation or branching change rather than a base ranking. An interrupted arm is repeated only under a newly frozen same-host design. A cap never proves absence of a relation.
