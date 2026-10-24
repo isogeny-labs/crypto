@@ -40,9 +40,10 @@ use crate::cryptanalysis::gaudry_quartic_d4::{
     fp_muls_per_add, unpack_e4, D4Curve, D4Options, D4Oracle, YLineBase,
 };
 use crate::cryptanalysis::ic_boundary::{
-    price_phase, rho_cap, rho_reference, rho_walk_with, signed_frobenius_rho_tuned, BinaryGroup,
-    BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses,
-    PhaseCost, PointClasses, PrimeInstance, PrimePoint, QuarticClasses, RhoResult, RhoWalk,
+    price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_with, signed_frobenius_rho_tuned,
+    BinaryGroup, BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps,
+    NegationClasses, PhaseCost, PointClasses, PrimeInstance, PrimePoint, QuarticClasses,
+    RhoBatchResult, RhoResult, RhoWalk,
 };
 use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
 use crate::cryptanalysis::ic_framework::fiber::{
@@ -193,6 +194,24 @@ const RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
     help: "step budget as a multiple of √r before the run counts as exhausted",
 }];
 
+const POOLED_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "cap_multiple",
+        default: Some("64"),
+        help: "step budget per target as a multiple of √r before that target counts as unsolved",
+    },
+    ParamDecl {
+        name: "batch",
+        default: None,
+        help: "L, the number of targets pooled into one run: the record's target plus L − 1 public companions",
+    },
+];
+
+/// Domain of the companion targets of `rho.multitarget_pooled`: the
+/// public-target law of [`Instance::hash_to_subgroup`] at indices
+/// `POOLED_COMPANION_INDEX + j`, far from any workload's own index.
+const POOLED_COMPANION_INDEX: u64 = 1 << 40;
+
 // Keep the defaults of the frozen `ic.pipeline_counted` sessions. The
 // existing `ic.pipeline` declaration below retains main's newer options.
 const IC_COUNTED_PARAMS: &[ParamDecl] = &[
@@ -260,6 +279,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())",
             applies: Applies::Any,
             params: RHO_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.multitarget_pooled",
+            family: "rho",
+            summary: "Kuhn–Struik batch: the record's target and L − 1 public companions (hashed to ⟨G⟩, logs unknown to anyone) solved in sequence on {P, −P} (A = 2) with one shared distinguished-point table and jumps in G only; S is the whole batch's operations over √r, expected ≈ Σ_{i<L} C(2i,i)4^{−i}·√(π/4) → √L",
+            entry: "ic_boundary::rho_batch_with(NegationClasses, RhoWalk::negation())",
+            applies: Applies::Any,
+            params: POOLED_PARAMS,
         },
         MethodDecl {
             id: "ic.k4_gaudry",
@@ -1010,6 +1037,130 @@ fn rho_report(res: RhoResult, wall: u64, field_ops: Option<FieldOps>) -> SolveRe
     }
 }
 
+/// The phases and counters of a [`rho_batch_with`] run: the shared jump
+/// table and every target's `G + Q_i` and stride as `setup`, the internal
+/// `[d]G = Q_i` checks as `internal_verification`, the rest as `search`.
+fn pooled_report(res: RhoBatchResult, wall: u64, field_ops: Option<FieldOps>) -> SolveReport {
+    let c = &res.counters;
+    let get = |k: &str| c.get(k).copied().unwrap_or(0);
+    let setup_adds = get("setup_additions") + get("target_setup_additions");
+    let setup_dbls = get("setup_doublings") + get("target_setup_doublings");
+    let verify = get("verification_operations");
+    let total = res.group_ops.adds + res.group_ops.doubles;
+    let search = total.saturating_sub(setup_adds + setup_dbls + verify);
+    let mk = |name: &str, gae: u64| PhaseRecord {
+        name: name.into(),
+        gae: gae as f64,
+        ..Default::default()
+    };
+    let mut s = mk("setup", setup_adds + setup_dbls);
+    s.adds = setup_adds;
+    s.doubles = setup_dbls;
+    let mut w = mk("search", search);
+    w.scalar_mults = res.group_ops.scalar_mults;
+    let phases = vec![s, w, mk("internal_verification", verify)];
+    let mut counters = res.counters.clone();
+    let steps: u64 = res.per_target.iter().map(|t| t.steps).sum();
+    let walks: u64 = res.per_target.iter().map(|t| t.walks).sum();
+    let dps: u64 = res.per_target.iter().map(|t| t.distinguished_points).sum();
+    counters.insert("steps".into(), steps);
+    counters.insert("walks".into(), walks);
+    counters.insert("distinguished_points".into(), dps);
+    let last = res.per_target.last();
+    let recovered = last.and_then(|t| t.recovered);
+    let per_target: Vec<Value> = res
+        .per_target
+        .iter()
+        .map(|t| {
+            json!({
+                "adds": t.group_ops.adds,
+                "doubles": t.group_ops.doubles,
+                "steps": t.steps,
+                "walks": t.walks,
+                "distinguished_points": t.distinguished_points,
+                "solved_by": t.solved_by,
+                "recovered": t.recovered,
+            })
+        })
+        .collect();
+    SolveReport {
+        recovered: recovered.map(u128::from),
+        exhausted: recovered.is_none(),
+        total_gae: res.gae,
+        automorphisms_used: res.automorphisms,
+        unpriced: unpriced_of(&counters),
+        counters,
+        phases,
+        deterministic: true,
+        nondeterminism: vec![],
+        solve_wall_ns: wall,
+        factor_base: None,
+        detail: json!({
+            "method": res.method,
+            "targets": res.targets,
+            "record_target_index": res.targets.saturating_sub(1),
+            "all_verified_internally": res.all_verified,
+            "expected_single": res.expected_single,
+            "per_target": per_target,
+        }),
+        online: None,
+        online_error: None,
+        solver: None,
+        field_ops,
+    }
+}
+
+/// `rho.multitarget_pooled` on a prime curve: `L − 1` public companion
+/// targets, then the record's target last, through one [`rho_batch_with`]
+/// run on `{P, −P}`.  The companions are hashed to `⟨G⟩` by the workload's
+/// public-target law, so nobody knows their logarithms; each one the batch
+/// recovers is checked inside the run (`[d]G = Q_j`, charged as
+/// `internal_verification`) and listed in `detail.per_target` with its
+/// point in `detail.companions`.  The record's target is verified by the
+/// runner as every other method's is.
+fn solve_pooled(
+    m: &ResolvedMethod,
+    inst: &Instance,
+    curve: &CurveFacts,
+    i: &PrimeInstance,
+    target: PrimePoint,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    let batch = param_u64(m, "batch")?;
+    if !(1..=65_536).contains(&batch) {
+        return Err(format!("`batch` must be in 1..=65536, not {batch}"));
+    }
+    let cap = rho_cap(i.r, param_u64(m, "cap_multiple")? as f64);
+    let mut targets = Vec::with_capacity(batch as usize);
+    let mut companions = Vec::with_capacity(batch as usize - 1);
+    for j in 0..batch - 1 {
+        let (xy, _) = inst
+            .hash_to_subgroup(curve, seed, POOLED_COMPANION_INDEX + j)
+            .ok_or("no public companion target on this curve")?;
+        targets.push(PrimePoint::affine(parse_hex(&xy[0])?, parse_hex(&xy[1])?));
+        companions.push(xy);
+    }
+    targets.push(target);
+    let t = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let res = rho_batch_with(
+        &i.curve,
+        &NegationClasses { r: i.r },
+        i.generator_point(),
+        &targets,
+        i.r,
+        seed,
+        cap,
+        RhoWalk::negation(),
+    );
+    measurement::end_online();
+    let wall = t.elapsed().as_nanos() as u64;
+    let f = field_ops_of(&i.curve, &[res.group_ops]);
+    let mut rep = pooled_report(res, wall, f);
+    rep.detail["companions"] = json!(companions);
+    Ok(rep)
+}
+
 /// Run the generic and rho methods on any counted group.
 fn solve_generic<G: CountedGroup>(
     m: &ResolvedMethod,
@@ -1324,6 +1475,9 @@ fn solve_inner(
             measurement::end_online();
             let f = FieldOps::total(&[res.group_ops]);
             Ok(rho_report(res, t.elapsed().as_nanos() as u64, Some(f)))
+        }
+        (Instance::Prime(i), _) if m.id == "rho.multitarget_pooled" => {
+            solve_pooled(m, inst, curve, i, PrimePoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _) => solve_generic(
             m,
@@ -3004,6 +3158,52 @@ mod tests {
         .unwrap();
         assert_eq!(a.method_id, b.method_id);
         assert!(a.method_id.starts_with("ECM1h"));
+    }
+
+    #[test]
+    fn pooled_multitarget_rho_recovers_the_record_target_and_its_companions() {
+        use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
+        let spec = CurveSpec::PrimeSearch { bits: 24, seed: 3 };
+        for batch in ["1", "6"] {
+            let mut params = BTreeMap::new();
+            params.insert("batch".to_string(), batch.to_string());
+            let m = resolve(&MethodSpec {
+                id: "rho.multitarget_pooled".into(),
+                params,
+            })
+            .unwrap();
+            for index in 0..3 {
+                let (w, inst) = Workload::build(&spec, 11, index, TargetKind::Planted).unwrap();
+                let rep = solve(&m, &inst, &w.curve, &w.target, 40 + index).unwrap();
+                assert_eq!(rep.recovered, w.planted, "record target");
+                assert_eq!(rep.automorphisms_used, 2);
+                let per = rep.detail["per_target"].as_array().unwrap();
+                assert_eq!(per.len(), batch.parse::<usize>().unwrap());
+                assert!(rep.detail["all_verified_internally"].as_bool().unwrap());
+                // Each companion's log, checked here as well: [d]G = Q_j.
+                let Instance::Prime(pi) = &inst else {
+                    panic!("prime")
+                };
+                let comps = rep.detail["companions"].as_array().unwrap();
+                for (t, q) in per.iter().zip(comps) {
+                    let d = t["recovered"].as_u64().unwrap();
+                    let mut ops = GroupOps::default();
+                    let got = pi.curve.mul(&mut ops, pi.generator_point(), d);
+                    let x = parse_hex(q[0].as_str().unwrap()).unwrap();
+                    let y = parse_hex(q[1].as_str().unwrap()).unwrap();
+                    assert_eq!(got, PrimePoint::affine(x, y));
+                }
+                // Deterministic in (workload, seed).
+                let again = solve(&m, &inst, &w.curve, &w.target, 40 + index).unwrap();
+                assert_eq!(again.total_gae, rep.total_gae);
+            }
+        }
+        // `batch` has no default.
+        assert!(resolve(&MethodSpec {
+            id: "rho.multitarget_pooled".into(),
+            params: BTreeMap::new(),
+        })
+        .is_err());
     }
 
     #[test]
