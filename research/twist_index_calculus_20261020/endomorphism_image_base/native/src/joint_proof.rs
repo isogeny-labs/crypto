@@ -49,7 +49,35 @@ fn products() -> Vec<(&'static str, Z, Z, Expr)> {
         )
     };
     let (quartic_lhs, quartic_rhs) = variants::integer_quartic_discriminant();
-    let quartic_expression = expression(&quartic_lhs);
+    let roots: [Z; 4] = std::array::from_fn(Z::var);
+    let mut es = vec![
+        Z::constant(1),
+        Z::default(),
+        Z::default(),
+        Z::default(),
+        Z::default(),
+    ];
+    for x in &roots {
+        for k in (1..=4).rev() {
+            es[k] = es[k].add(&es[k - 1].mul(x));
+        }
+    }
+    // Keep the displayed discriminant formula factored in the statement.
+    // The checker, rather than this producer, expands these products.
+    let quartic_expression = Expr::sum(
+        variants::quartic_discriminant_terms()
+            .into_iter()
+            .map(|(c, e)| {
+                let mut factors = vec![Expr::Const(c)];
+                for i in 0..4 {
+                    for _ in 0..e[i] {
+                        factors.push(expression(&es[i + 1]));
+                    }
+                }
+                Expr::product(factors)
+            })
+            .collect(),
+    );
     vec![
         (
             "phi",

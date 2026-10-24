@@ -116,6 +116,16 @@ pub(super) fn construction(run: &Path, out: &Path) -> bool {
         zero_exit(run, phase);
     }
     let w = read(&run.join("workload.json"));
+    let source_commit = std::fs::read_to_string(run.join("metadata/source-commit.txt")).unwrap();
+    assert_eq!(
+        source_commit.trim(),
+        "054b22b41d8e8c0d4296c9119b06e88df5d95fab"
+    );
+    let workload_seal = std::fs::read_to_string(run.join("metadata/workload.sha256")).unwrap();
+    assert_eq!(
+        digest(&run.join("workload.json"))["sha256"],
+        workload_seal.split_whitespace().next().unwrap()
+    );
     assert_eq!(w["schema"], "joint-image-workload/v1");
     let tasks = w["tasks"].as_array().unwrap();
     assert_eq!(tasks.len(), 297, "frozen algebra-v1 workload count changed");
