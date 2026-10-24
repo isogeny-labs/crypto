@@ -26,6 +26,7 @@ on:
     paths:
       - 'src/**'
       - 'examples/perfbench/**'
+      - 'examples/perfindex/**'
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'scripts/perf/perfhistory.py'
@@ -33,6 +34,7 @@ on:
       - 'docs/perf/ecbench-children.json'
       - 'docs/perf/ic-factor-base-j0.spec.json'
       - 'docs/perf/weights.json'
+      - 'docs/perf/fingerprints.json'
       - 'docs/perf/groebner-groups.json'
       - 'docs/perf/f4-f5-allocation-history.json'
       - 'tools/groebner-history/**'
@@ -46,6 +48,7 @@ on:
       - 'rust-toolchain*'
       - 'src/**'
       - 'examples/perfbench/**'
+      - 'examples/perfindex/**'
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'scripts/perf/perfhistory.py'
@@ -53,6 +56,7 @@ on:
       - 'docs/perf/ecbench-children.json'
       - 'docs/perf/ic-factor-base-j0.spec.json'
       - 'docs/perf/weights.json'
+      - 'docs/perf/fingerprints.json'
       - 'docs/perf/groebner-groups.json'
       - 'docs/perf/f4-f5-allocation-history.json'
       - 'tools/groebner-history/**'
@@ -267,8 +271,18 @@ jobs:
           python3 -m unittest discover -s scripts/perf -p test_perfhistory.py -v
           cargo test --release --lib cryptanalysis::ecbench::callgrind
           cargo test --release --example perfbench
+          cargo test --release --example perfindex
       - name: Build perfbench and ecbench
         run: cargo build --release --example perfbench --bin ecbench
+      - name: Check kernel fingerprints
+        # A kernel's fingerprint is the work it does; if a change moves it, the
+        # change is not a speed-up and the index must not be read across it.
+        # Also fails if a kernel's fingerprint depends on the thread count
+        # without being recorded as such.
+        run: |
+          cargo run --release --example perfindex -- fingerprints \
+            --bin target/release/examples/perfbench \
+            --golden docs/perf/fingerprints.json
       - name: Validate native F4/F5 plot data and render reports
         run: |
           cargo test --locked --manifest-path tools/groebner-history/Cargo.toml \
