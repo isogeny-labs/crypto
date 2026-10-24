@@ -1876,3 +1876,47 @@ ecbench's generic arms, under §12 and §5a, rather than keep a separate
 implementation. Likewise `LEAD-RHO-r-adding-walk-mixing` (closed_known)
 covers round twelve's finding: a walk whose steps are not effectively
 random elements pays extra steps.
+
+## Round fourteen: measured — long fruitless cycles were the cause; the active window over-escapes on small groups
+
+Registered run: card `CARD-HEIC-ROUND14-1` (commit pin `2fc38dc7`, re-pinned
+from `6a3d95cd` because only the note and the card changed; binary built
+from `6a3d95cd`, sha256 `fdad7013…9a575e`), receipt
+`research/notes/index-calculus/round14/run1/receipt.json` (completed,
+nine commands exit 0), output `run1/R14.txt`, isolation record
+uncontended on reserved CPU 3 (597 s; a different host from rounds 9–13,
+Xeon @ 2.30 GHz, which does not affect counted operations). 18 instances
+× 40 seeds × 3 arms, every `k` verified.
+
+| | registered test | result |
+|--|--|--|
+| C14-1 | passive `cycle_ops` ≥ 50% of the folded walk on the two largest rows, and the passive arm reproduces round thirteen | **holds**: 78.1%, 71.6%; reproduces exactly |
+| C14-2 | active folded/plain, median over `N ≥ 10⁵`, ≤ 0.80 | **holds**: 0.752 |
+| C14-3 | active folded `S_walk`, median over `N ≥ 10⁵`, ≤ 1.05 | **holds**: 1.045 |
+| C14-4 | active fruitless share ≤ 10% on every row; every run verified | **falsified**: up to 32.0% at `N ≤ 1.2·10⁴` (3.8–5.2% at `N ≥ 6·10⁴`); every run verified |
+
+Largest rows (walk ops, means of 40 seeds):
+
+| g | `p` | `N` | plain | folded, no escape | trapped share | folded, active window | active / plain |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 3 | 151 | 1180351 | 1583 | 2688 | 56.1% | 1023 | 0.646 |
+| 3 | 211 | 4620611 | 2604 | 10375 | 71.6% | 2556 | 0.981 |
+| 4 | 61 | 16790591 | 6069 | 25173 | 78.1% | 4164 | 0.686 |
+
+**What it means.**
+
+- The mechanism is confirmed: on the largest rows most of the folded
+  walk's steps were spent going round fruitless cycles that the
+  gap limit escapes only after about `√N` steps. Escaping on the first
+  repeat brings the fold to its expected range at large `N` (C14-2, C14-3).
+- C14-4 fails, so as registered the active folded walk does **not**
+  become the reference; the plain full-width walk stays. Class: none.
+- Not registered, stated as what the table shows: on the small rows the
+  active window makes the fold *worse* than no window (active/plain
+  0.93–1.08 at `N ≤ 1.2·10⁴`, against about 0.70 without the window).
+  A walk's genuine rho cycle has length about `√(πN/8)`, under 32 steps
+  for the smallest rows, so the window also sees the useful collision as a
+  repeat and escapes it as if it were fruitless. That is the hypothesis
+  for round fifteen: on a repeat, try the collision first (a repeat with
+  different `(a, b)` solves the logarithm) and escape only a degenerate
+  one.
