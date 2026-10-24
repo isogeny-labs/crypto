@@ -206,6 +206,136 @@ fn callgrind_request(request: u64) {
     let _ = request;
 }
 
+/// What the process itself reports about the cost of a run: CPU time, peak
+/// resident set, context switches and page faults.  Wall time alone cannot
+/// say whether a slow sample was slow work or a descheduled process, and a
+/// comparison that cannot say is not evidence (AGENTS.md section 10).  The
+/// two calls are declared here, not taken from the `libc` crate, because the
+/// harness is overlaid on older revisions whose manifests may not list it;
+/// `std` links the symbols on every unix target.
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+mod acct {
+    #[repr(C)]
+    struct Timespec {
+        sec: i64,
+        nsec: i64,
+    }
+
+    #[repr(C)]
+    struct Rusage {
+        utime: [i64; 2],
+        stime: [i64; 2],
+        maxrss: i64,
+        ixrss: i64,
+        idrss: i64,
+        isrss: i64,
+        minflt: i64,
+        majflt: i64,
+        nswap: i64,
+        inblock: i64,
+        oublock: i64,
+        msgsnd: i64,
+        msgrcv: i64,
+        nsignals: i64,
+        nvcsw: i64,
+        nivcsw: i64,
+    }
+
+    extern "C" {
+        fn clock_gettime(clock: i32, ts: *mut Timespec) -> i32;
+        fn getrusage(who: i32, usage: *mut Rusage) -> i32;
+    }
+
+    #[cfg(target_os = "linux")]
+    const CLOCK_PROCESS_CPUTIME_ID: i32 = 2;
+    #[cfg(target_os = "macos")]
+    const CLOCK_PROCESS_CPUTIME_ID: i32 = 12;
+    const RUSAGE_SELF: i32 = 0;
+
+    #[derive(Clone, Copy, Default)]
+    pub struct Usage {
+        pub max_rss_kb: u64,
+        pub vol_csw: u64,
+        pub invol_csw: u64,
+        pub minflt: u64,
+        pub majflt: u64,
+    }
+
+    /// CPU time the whole process (every thread) has used, in nanoseconds.
+    pub fn process_cpu_ns() -> Option<u64> {
+        let mut ts = Timespec { sec: 0, nsec: 0 };
+        // SAFETY: `ts` is a valid, writable `timespec` for the call.
+        let rc = unsafe { clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &mut ts) };
+        (rc == 0).then(|| ts.sec as u64 * 1_000_000_000 + ts.nsec as u64)
+    }
+
+    pub fn usage() -> Option<Usage> {
+        let mut r = Rusage {
+            utime: [0; 2],
+            stime: [0; 2],
+            maxrss: 0,
+            ixrss: 0,
+            idrss: 0,
+            isrss: 0,
+            minflt: 0,
+            majflt: 0,
+            nswap: 0,
+            inblock: 0,
+            oublock: 0,
+            msgsnd: 0,
+            msgrcv: 0,
+            nsignals: 0,
+            nvcsw: 0,
+            nivcsw: 0,
+        };
+        // SAFETY: `r` matches the C `struct rusage` of 64-bit Linux and macOS
+        // field for field, and is valid and writable for the call.
+        let rc = unsafe { getrusage(RUSAGE_SELF, &mut r) };
+        if rc != 0 {
+            return None;
+        }
+        // Linux reports kilobytes, macOS bytes.
+        #[cfg(target_os = "macos")]
+        let max_rss_kb = r.maxrss as u64 / 1024;
+        #[cfg(target_os = "linux")]
+        let max_rss_kb = r.maxrss as u64;
+        Some(Usage {
+            max_rss_kb,
+            vol_csw: r.nvcsw as u64,
+            invol_csw: r.nivcsw as u64,
+            minflt: r.minflt as u64,
+            majflt: r.majflt as u64,
+        })
+    }
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "macos")))]
+mod acct {
+    #[derive(Clone, Copy, Default)]
+    pub struct Usage {
+        pub max_rss_kb: u64,
+        pub vol_csw: u64,
+        pub invol_csw: u64,
+        pub minflt: u64,
+        pub majflt: u64,
+    }
+    pub fn process_cpu_ns() -> Option<u64> {
+        None
+    }
+    pub fn usage() -> Option<Usage> {
+        None
+    }
+}
+
+/// JSON for an optional number.
+fn json_opt(x: Option<u64>) -> String {
+    x.map_or_else(|| "null".to_string(), |v| v.to_string())
+}
+
+/// Bumped when a field of the output row changes meaning.  Version 2 added
+/// the cost-accounting fields; the first five fields keep their meaning.
+const ROW_SCHEMA: u32 = 2;
+
 struct Options {
     filters: Vec<String>,
     exact: bool,
@@ -303,6 +433,7 @@ fn measure(k: &Kernel, o: &Options) {
     let setup_start = Instant::now();
     let mut w = (k.setup)();
     let setup_ns = setup_start.elapsed().as_nanos() as u64;
+    let rss_after_setup = acct::usage().map(|u| u.max_rss_kb);
 
     if o.instr {
         // One warm run outside the region, one measured run inside it, both
@@ -326,11 +457,12 @@ fn measure(k: &Kernel, o: &Options) {
         drop(pool);
         assert_eq!(fp0, fp, "{}: fingerprint changed between runs", k.id);
         println!(
-            "{{\"id\":{},\"area\":{},\"fingerprint\":\"{:016x}\",\"setup_ns\":{}}}",
+            "{{\"id\":{},\"area\":{},\"fingerprint\":\"{:016x}\",\"setup_ns\":{},\"schema\":{}}}",
             json_str(k.id),
             json_str(k.area),
             fp,
-            setup_ns
+            setup_ns,
+            ROW_SCHEMA
         );
         return;
     }
@@ -339,23 +471,35 @@ fn measure(k: &Kernel, o: &Options) {
     let warm_start = Instant::now();
     w.prepare();
     let fp = black_box(w.run());
+    let mut warmup_runs = 1u32;
     while warm_start.elapsed().as_secs_f64() < o.warmup_seconds {
         w.prepare();
         let again = black_box(w.run());
         assert_eq!(fp, again, "{}: fingerprint changed between runs", k.id);
+        warmup_runs += 1;
     }
 
     let budget = Duration::from_secs_f64(o.max_seconds);
     let start = Instant::now();
     let mut samples = Vec::with_capacity(o.samples);
+    let mut cpu_samples: Vec<u64> = Vec::with_capacity(o.samples);
+    let usage_before = acct::usage();
     while samples.len() < o.samples && (samples.len() < o.min_samples || start.elapsed() < budget) {
         w.prepare();
+        let cpu0 = acct::process_cpu_ns();
         let t = Instant::now();
         let got = black_box(w.run());
         let ns = t.elapsed().as_nanos() as u64;
+        let cpu1 = acct::process_cpu_ns();
         assert_eq!(fp, got, "{}: fingerprint changed between runs", k.id);
         samples.push(ns);
+        if let (Some(a), Some(b)) = (cpu0, cpu1) {
+            cpu_samples.push(b.saturating_sub(a));
+        }
     }
+    let usage_after = acct::usage();
+    // The time budget, not the requested count, ended the sampling.
+    let budget_hit = samples.len() < o.samples;
     let list = samples
         .iter()
         .map(u64::to_string)
@@ -363,15 +507,47 @@ fn measure(k: &Kernel, o: &Options) {
         .join(",");
     let min = *samples.iter().min().unwrap();
     let med = median(&mut samples.clone());
+    let cpu_list = cpu_samples
+        .iter()
+        .map(u64::to_string)
+        .collect::<Vec<_>>()
+        .join(",");
+    let med_cpu = if cpu_samples.is_empty() {
+        None
+    } else {
+        Some(median(&mut cpu_samples.clone()))
+    };
+    // Counters are differences over the timed samples only; the peak
+    // resident set is the process's high-water mark (setup included) and
+    // the figure after setup is printed beside it.
+    let delta = |f: fn(&acct::Usage) -> u64| -> Option<u64> {
+        Some(f(&usage_after?).saturating_sub(f(&usage_before?)))
+    };
     println!(
-        "{{\"id\":{},\"area\":{},\"fingerprint\":\"{:016x}\",\"setup_ns\":{},\"median_ns\":{},\"min_ns\":{},\"samples_ns\":[{}]}}",
+        "{{\"id\":{},\"area\":{},\"fingerprint\":\"{:016x}\",\"setup_ns\":{},\"median_ns\":{},\"min_ns\":{},\"samples_ns\":[{}],\
+\"schema\":{},\"threads\":{},\"samples\":{},\"budget_hit\":{},\"warmup_runs\":{},\
+\"cpu_ns\":[{}],\"median_cpu_ns\":{},\"maxrss_setup_kb\":{},\"maxrss_kb\":{},\
+\"vol_csw\":{},\"invol_csw\":{},\"minflt\":{},\"majflt\":{}}}",
         json_str(k.id),
         json_str(k.area),
         fp,
         setup_ns,
         med,
         min,
-        list
+        list,
+        ROW_SCHEMA,
+        rayon::current_num_threads(),
+        samples.len(),
+        budget_hit,
+        warmup_runs,
+        cpu_list,
+        json_opt(med_cpu),
+        json_opt(rss_after_setup),
+        json_opt(usage_after.map(|u| u.max_rss_kb)),
+        json_opt(delta(|u| u.vol_csw)),
+        json_opt(delta(|u| u.invol_csw)),
+        json_opt(delta(|u| u.minflt)),
+        json_opt(delta(|u| u.majflt)),
     );
 }
 
