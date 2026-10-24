@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [ECCp-131 full-parameter index-calculus relation pipeline](eccp131-full-parameter-index-calculus.md) | open | checked two- and three-point small-x probes have zero natural rank in bounded exact-curve runs; three-point support is at most `8B³` points | exact relation oracle beyond the fixed small-x support bound, independently replayed rank and target-descent chain |
 | [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | implemented; client activation remains | enrolled legacy process recovery | private recurring backups, fenced two-hop recovery and Diem copy restore passed; laptop installation/trust needs client access |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |
 | [SQISign statistical root gate](sqisign-statistical-root-gate.md) | investigating | green complete release-library validation of source3ce9694 | controlled cause and a complete passing final-source root gate; no substitution by a focused pass |
