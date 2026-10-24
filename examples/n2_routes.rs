@@ -2290,6 +2290,54 @@ fn run_checks(out: &Path) {
     eprint!("{log}");
 }
 
+/// Validation replay hook: with `N2_DUMP=<file>` set, every (job, target, arm)
+/// appends one JSON line with the instance (p, i^2 = kappa, E: y^2 = x^3 + a x + b
+/// over F_p[i]), the base point, the target, the planted scalar and the arm's
+/// answer, so a separate verifier can check `k P = Q` without this code. It
+/// makes no RNG draws and no counted operations, so rows replay unchanged.
+fn dump_run(
+    tag: &str,
+    ids: &[(&str, u64)],
+    e: &Ell,
+    pt: EP,
+    q: EP,
+    ell: u64,
+    n: u64,
+    k: u64,
+    arm: &str,
+    found: u64,
+) {
+    let Ok(path) = std::env::var("N2_DUMP") else {
+        return;
+    };
+    let f2 = |x: Fp2| format!("[{},{}]", x.0, x.1);
+    let ep = |p: EP| match p {
+        EP::O => "null".to_string(),
+        EP::A(x, y) => format!("[{},{}]", f2(x), f2(y)),
+    };
+    let mut line = format!("{{\"mode\":\"{tag}\"");
+    for (k, v) in ids {
+        line += &format!(",\"{k}\":{v}");
+    }
+    line += &format!(
+        ",\"p\":{},\"kappa\":{},\"a\":{},\"b\":{},\"P\":{},\"Q\":{},\"ell\":{ell},\"N\":{n},\"k\":{k},\"arm\":\"{arm}\",\"k_found\":{found}}}\n",
+        pp(),
+        kap(),
+        f2(e.a),
+        f2(e.b),
+        ep(pt),
+        ep(q)
+    );
+    static LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    let _g = LOCK.lock().unwrap();
+    let mut f = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(path)
+        .unwrap();
+    f.write_all(line.as_bytes()).unwrap();
+}
+
 #[derive(Clone, Debug)]
 struct Job {
     bits: u32,
@@ -2328,6 +2376,23 @@ fn run_job(job: &Job) -> Vec<String> {
             results.push(arm_dec(&inst, pt, q, nb, c, &mut rng));
         }
         for r in results {
+            let arm = format!("{}{}", r.arm, r.c);
+            dump_run(
+                "run",
+                &[
+                    ("bits", job.bits as u64),
+                    ("instance", job.inst_id as u64),
+                    ("target", tgt as u64),
+                ],
+                &inst.e,
+                pt,
+                q,
+                inst.ell,
+                inst.n,
+                k,
+                &arm,
+                r.k,
+            );
             let ok = r.ok && inst.e.mul(pt, r.k) == q && r.k == k;
             rows.push(format!(
                 "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{:.3}",
@@ -2573,6 +2638,22 @@ fn control_job(job: &Job) -> Vec<String> {
         let q = inst.e.mul(pt, k);
         for (name, indep) in [("Jwalk", false), ("Jind", true)] {
             let r = arm_jac_impl(&inst, pt, q, 2, &mut rng, true, indep, 1.0);
+            dump_run(
+                "control",
+                &[
+                    ("bits", job.bits as u64),
+                    ("instance", job.inst_id as u64),
+                    ("target", tgt as u64),
+                ],
+                &inst.e,
+                pt,
+                q,
+                inst.ell,
+                inst.n,
+                k,
+                name,
+                r.k,
+            );
             let ok = r.ok && r.k == k && inst.e.mul(pt, r.k) == q;
             rows.push(format!(
                 "{},{},{},{},{},{},{},{},{},{},{},{}",
@@ -2820,6 +2901,24 @@ fn hsweep_job(job: &HJob) -> Vec<String> {
             ));
         }
         for (name, r) in arms {
+            dump_run(
+                "hsweep",
+                &[
+                    ("bits", job.bits as u64),
+                    ("h", job.h),
+                    ("instance", job.inst_id as u64),
+                    ("target", tgt as u64),
+                    ("theta_milli", (job.theta * 1000.0) as u64),
+                ],
+                &inst.e,
+                pt,
+                q,
+                inst.ell,
+                inst.n,
+                k,
+                name,
+                r.k,
+            );
             let ok = r.ok && r.k == k && inst.e.mul(pt, r.k) == q;
             rows.push(format!(
                 "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{:.3},{},{:.6}",
@@ -3675,6 +3774,23 @@ fn glue_job(job: &HJob) -> Vec<String> {
             ("R", arm_rho(&inst, pt, q, &mut rng)),
             ("Jglue", arm_glue(&g, pt, q, &mut rng)),
         ] {
+            dump_run(
+                "glue",
+                &[
+                    ("bits", job.bits as u64),
+                    ("h", g.h),
+                    ("instance", job.inst_id as u64),
+                    ("target", tgt as u64),
+                ],
+                &g.e,
+                pt,
+                q,
+                g.ell,
+                g.n,
+                k,
+                name,
+                r.k,
+            );
             let ok = r.ok && r.k == k && g.e.mul(pt, r.k) == q;
             rows.push(format!(
                 "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{:.3}",
@@ -3844,6 +3960,105 @@ fn summarize_glue(csv: &str) -> String {
     out
 }
 
+/// §5a erratum (validation, 2026-10-24): the frozen band priced native
+/// operations at 0, 0.1 and 1 `F_p` multiplications; AGENTS.md §5a prices them
+/// at 0, 0.1 and 1 group-addition equivalents (GAE). Here one GAE is the row's
+/// own measured affine E(F_{p^2}) addition at the cell's inversion price
+/// (`eadd_M + ipr * eadd_I`). Everything else is the frozen cost model:
+/// `row_cost` for routes.csv, `summarize_glue`'s cost (with the Legendre split
+/// test at one I on Jglue) for glue.csv. Reads one CSV, writes the band text.
+fn gae_band(csv: &str) -> String {
+    use std::collections::BTreeMap;
+    let mut lines = csv.lines();
+    let hdr: Vec<&str> = lines.next().unwrap().split(',').collect();
+    let glue = hdr.contains(&"twist");
+    let col = |r: &HashMap<&str, f64>, k: &str| r.get(k).copied().unwrap_or(0.0);
+    // key: (bits, h, arm label)
+    let mut rows: BTreeMap<(u64, u64, String), Vec<HashMap<&str, f64>>> = BTreeMap::new();
+    for l in lines {
+        let v: Vec<&str> = l.split(',').collect();
+        let mut m = HashMap::new();
+        let mut arm = String::new();
+        for (k, x) in hdr.iter().zip(v.iter()) {
+            if *k == "arm" {
+                arm = x.to_string();
+            } else {
+                m.insert(*k, x.parse::<f64>().unwrap_or(f64::NAN));
+            }
+        }
+        if !glue && arm != "R" {
+            arm = format!("{arm}{}", m["c"]);
+        }
+        // routes.csv is summarized per size over all instances (as `summarize`)
+        let key = (m["bits"] as u64, if glue { m["h"] as u64 } else { 0 }, arm);
+        rows.entry(key).or_default().push(m);
+    }
+    let cost = |r: &HashMap<&str, f64>, arm: &str, ipr: f64, eadd_price: bool, w_gae: f64| -> f64 {
+        let gae = col(r, "eadd_M") + ipr * col(r, "eadd_I");
+        let native = col(r, "walk_native") + col(r, "la_native");
+        let mut c = col(r, "walk_M") + col(r, "la_M") + ipr * (col(r, "walk_I") + col(r, "la_I"));
+        c += w_gae * gae * native;
+        if eadd_price && arm != "R" {
+            c -= col(r, "jac_M") + ipr * col(r, "jac_I");
+            c += col(r, "jac_ops") * gae;
+        }
+        if glue && arm == "Jglue" {
+            c += col(r, "steps") * ipr;
+        }
+        c
+    };
+    let mean = |v: &[HashMap<&str, f64>], f: &dyn Fn(&HashMap<&str, f64>) -> f64| -> f64 {
+        v.iter().map(f).sum::<f64>() / v.len() as f64
+    };
+    let mut out = String::new();
+    for ((bits, h, arm), v) in &rows {
+        if arm == "R" {
+            continue;
+        }
+        let Some(rr) = rows.get(&(*bits, *h, "R".to_string())) else {
+            continue;
+        };
+        let (mut lo, mut hi, mut icw, mut cells) = (f64::MAX, 0f64, 0, 0);
+        for ik in 0..2 {
+            for jp in [false, true] {
+                for w in [0.0, 0.1, 1.0] {
+                    let ipr =
+                        |r: &HashMap<&str, f64>| if ik == 0 { 3.0 } else { 2.0 * r["p"].log2() };
+                    let ci = mean(v, &|r| cost(r, arm, ipr(r), jp, w));
+                    let cr = mean(rr, &|r| cost(r, "R", ipr(r), false, w));
+                    let ratio = ci / cr;
+                    lo = lo.min(ratio);
+                    hi = hi.max(ratio);
+                    cells += 1;
+                    icw += usize::from(ratio < 1.0);
+                }
+            }
+        }
+        let verdict = if icw == cells {
+            "IC cheaper in every cell"
+        } else if icw == 0 {
+            "rho cheaper in every cell"
+        } else {
+            "unresolved"
+        };
+        out.push_str(&format!(
+            "GAE band bits {bits} h {h} {arm}: {arm}/rho in [{lo:.3}, {hi:.3}] over {cells} cells (IC cheaper in {icw}) -> {verdict}\n"
+        ));
+        // the gate's three points: I = 3M, measured Jacobian op, mean cost per
+        // solve in GAE (one GAE = the row's E(F_{p^2}) addition at I = 3M)
+        for w in [0.0, 0.1, 1.0] {
+            let g = |r: &HashMap<&str, f64>| col(r, "eadd_M") + 3.0 * col(r, "eadd_I");
+            let ci = mean(v, &|r| cost(r, arm, 3.0, false, w) / g(r));
+            let cr = mean(rr, &|r| cost(r, "R", 3.0, false, w) / g(r));
+            out.push_str(&format!(
+                "GAE point bits {bits} h {h} {arm} w {w}: ic {ci:.6e} GAE, rho {cr:.6e} GAE, ratio {:.4}\n",
+                ci / cr
+            ));
+        }
+    }
+    out
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let out = Path::new(args.get(1).expect("usage: n2_routes <out-dir> [run|check]"));
@@ -3866,6 +4081,16 @@ fn main() {
         let t = summarize_glue(&std::fs::read_to_string(out.join("glue.csv")).unwrap());
         std::fs::write(out.join("glue_summary.txt"), &t).unwrap();
         eprint!("{t}");
+        return;
+    }
+    if mode == "gaeband" {
+        let csv = std::fs::read_to_string(args.get(3).expect("gaeband <out-dir> <csv>")).unwrap();
+        let txt = gae_band(&csv);
+        print!("{txt}");
+        File::create(out.join("gae_band.txt"))
+            .unwrap()
+            .write_all(txt.as_bytes())
+            .unwrap();
         return;
     }
     if mode == "gluecheck" {
