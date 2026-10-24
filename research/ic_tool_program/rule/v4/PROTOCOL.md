@@ -32,7 +32,7 @@ target's seed (`public_hash_seed = 23000 + i`) and the recipe seed set per pair
 `ic` binary**, not v3's: the arms differ in recipe only, so a kernel gain
 since `995ea207` is not credited to v4 and the paired ratio is clean. (The
 published v3 figures were measured by the older binary; this tree's `ic` is
-faster per unit, e.g. `k0n61` T01 set-up 306 M units here against 363 M
+faster per unit, e.g. `icv1-f2m61-t158598901-ab42b6c5` T01 set-up 306 M units here against 363 M
 there. The distance to rho is therefore reported for **both arms of this
 run**, not copied from v3.)
 
@@ -394,7 +394,7 @@ work differently would be reported as such.
 ## Smoke runs before this freeze (not data)
 
 To size the panel and check the code: `ic` at the unmodified tree on
-`k0n61`/T01 (set-up 306 M units, 3.5 s collect), and functional runs of
+`icv1-f2m61-t158598901-ab42b6c5`/T01 (set-up 306 M units, 3.5 s collect), and functional runs of
 `KIC_FREE_RELATIONS` off and on at T01 (seed 201, one repetition) of `n` = 57,
 47 and 41. With the lever on, the build harvested 4,358, 3,251 and 4,160 pairs
 of places with one key, of which 4,352, 3,248 and 4,160 were the conjugates of
