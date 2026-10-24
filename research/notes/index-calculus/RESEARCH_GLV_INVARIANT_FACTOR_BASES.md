@@ -2743,3 +2743,92 @@ state:
   operation.  Pricing one GAE (`97` `F_p` multiplications, the measured cost of an affine addition)
   per Macaulay-matrix entry and per walk step, it is `19`–`132×` at `0.1` GAE and `6.5`–`45×` at
   `1` GAE (recomputed from the raw JSON); E24 stays below E19 on every curve at every price.
+
+### 9.22 E31 pre-registration: the solve itself, by its `P₂`-chains
+
+*Registered 2026-10-24, after the profile below and before any E31 solver code.*  **Numbering:**
+§9.20–§9.21 and G2.41–G2.84 are claimed by unregistered drafts (E27–E30) on other branches, so
+E31 takes §9.22 and starts at G2.85.  The red team's finding stands as the motivation: the solve
+is `99.0`–`99.4 %` of `S` on every E25 run and nothing proposed so far touches it.  The baseline is
+E25 (§9.16) as validated (§9.19), both arms, its binary `46202dc97`.
+
+**The profile (step 1).**  `examples/e31_solve_profile.rs` (commit `a2de57077a`) rebuilds four E25
+curves and replays the first 400 targets of arm A's stream exactly as `collect_and_solve` draws
+them with four workers, through the unchanged `v4_system` → `solve_weighted_traced` (degree 11) →
+`lift_back_v4`, summing the solver's own phase counters (`experiments/31_solve_cost/profile*.{json,log}`).
+Per-call medians are `1.650`, `1.652`, `1.663`, `1.660·10⁶`, E25's `C`.
+
+| phase, per call (mean) | p = 269 s1 | p = 269 s2 | p = 397 s1 | p = 397 s2 | share |
+|:--|--:|--:|--:|--:|--:|
+| Weil restriction | `5,691` | `5,691` | `5,691` | `5,691` | `0.3 %` |
+| triangularise | `175` | `175` | `175` | `175` | `0.0 %` |
+| echelon (393 × 448 Macaulay matrix, 384 pivots) | `427,590` | `430,028` | `431,110` | `426,309` | `25.6`–`25.9 %` |
+| normal forms (border of `M_{P₂}`, 240 pivots reached) | `859,113` | `857,751` | `864,187` | `851,998` | `51.4`–`51.9 %` |
+| characteristic polynomial of the `64 × 64` `M_{P₂}` | `268,238` | `268,746` | `269,168` | `267,733` | `16.0`–`16.3 %` |
+| rational roots | `32,577` | `32,648` | `40,998` | `40,743` | `2.0`–`2.5 %` |
+| eigenvectors | `61,153` | `70,561` | `69,349` | `53,666` | `3.3`–`4.2 %` |
+| solution checks | `270` | `310` | `305` | `236` | `0.0 %` |
+| lift-back (outside `C`, in `S`) | `454` | `535` | `584` | `515` | — |
+
+Wall time per call (one thread): echelon `10.2`–`11.9` ms of `17.7`–`21.1` ms; the echelon's
+dense row updates cost far more time than the `F_p` multiplications it is charged.
+
+**Two structural facts, measured on the same 1,600 calls.**  (1) The 64 standard monomials fall
+into exactly **12 `P₂`-chains** `h, P₂h, …, P₂^{k−1}h` on every call.  `M_{P₂}` is the unit shift
+inside each chain; only the 12 chain ends map to non-standard monomials, so only 12 of its 64
+columns need a normal form, and they are what the existing normal-form phase computes — by back
+substitution of a dense 64-vector through all 240 reached pivots.  (2) A *left-looking* normal form
+of each of the 12 targets separately (substitute pivot rows left to right into one sparse
+accumulator) costs at most `Σ_t Σ_{c reached from t} nnz(row c)`, measured at `≈ 6.7·10⁴` per call,
+against `8.6·10⁵`.  Moreover `F_p[e₂, e₃, P₁, P₂]/I` is presented over `F_p[x]`, `x = P₂`, by the
+12 chain heads with the relation matrix `R(x) = diag(x^{k_i}) − C(x)` (`C` read off the 12 normal
+forms), so `charpoly(M_{P₂}) = det R(x)`, monic of degree `Σk_i = 64`, and a dual eigenvector at a
+rational root `λ` is a kernel vector of the `12 × 12` matrix `R(λ)`.
+
+**What is not proposed, and why.**  A shape trace or elimination template (Joux–Vitse, F4Remake)
+on this matrix: E21 (§9.11) measured `1.02×` on the `D₄` solve because a Macaulay matrix at its
+bound has little to skip, and the counted echelon already charges only nonzero pivot entries.  A
+symbolic eliminant precomputed per curve: the coefficients depend on `z_R ∈ F_{p⁴}`, four `F_p`
+parameters, through degree 8; an eliminant in them is far larger than the system.  More symmetry:
+`V₄⁴_0 ⋊ S₄` is already quotiented (§9.10), and `ψ` acts on the base, not the system (§8.0).
+
+**The solvers (E31).**  Beside `solve_weighted_traced`, never replacing it, selected by a flag:
+
+- **A, the chain solve.**  The same rows, triangularisation and echelon (the same code path and
+  count); the 12 border targets by left-looking normal forms; `det R(x)` by evaluation at 65 points
+  of `F_p` and interpolation (each inversion charged `2⌈log₂ p⌉`, which the existing echelon and
+  Hessenberg do not charge — conservative against A); the same root finder on the same polynomial;
+  at each rational root a kernel of `R(λ)`; the same solution check.  Anything other than one
+  clean solve at degree 11 — an eigenspace of dimension above 1, an unresolved vector, an
+  unreachable border, a non-standard unknown — reruns the existing solver from the same RNG state,
+  and both runs are charged.
+- **B, A with sparsest pivots.**  `echelon_by_lead_with(…, sparsest = true)`: the same row space and
+  pivot columns, hence the same standard monomials and the same (unique) normal forms, with less
+  fill.  Exploratory.
+
+**Correctness bar.**  On every call, the same decomposition set, outcome and degree as the
+existing solver; in the agreement test also the same `M_{P₂}` and the same characteristic
+polynomial.  Because the outputs and the RNG state after each call coincide, an end-to-end rerun of
+E25 with A or B must reproduce every E25 count except the solve's multiplications — itself a
+replay check.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.85 | agreement | A and B return the existing solver's decomposition set, outcome and degree on every call of Stage A and of the end-to-end runs; `M_{P₂}` and `charpoly` identical on every call of the test; the negative control (one coefficient of one equation perturbed) changes the set | any disagreement, or a control that agrees |
+| G2.86 | normal forms, existing / A, per-call mean | `[12, 40]` (the bound gives `≥ 12.8`) | outside |
+| G2.87 | characteristic polynomial, existing / A (with A's evaluations, interpolation and inversions) | `[1.8, 3.2]` (derived `≈ 2.4`) | outside |
+| G2.88 | eigenvectors, existing / A | `[15, 80]` | outside |
+| G2.89 | per-call `C` median, existing / A, every curve of Stage A (`p = 101`–`397`, two seeds each) | `[2.2, 3.0]` (derived `≈ 2.55`, the echelon becoming `≈ 2/3` of `C`) | outside; **kill** below `1.5` on any curve (then E31 is recorded as a negative and stops before end to end) |
+| G2.90 | fallbacks of A (charged reruns of the existing solver) | `≤ 1 %` of calls | more |
+| G2.91 | per-call wall time, existing / A (practicality note) | `[1.2, 2.0]` | outside |
+| G2.92 | B against A: echelon multiplications, A / B | `[1.0, 1.6]`; B is carried to end to end only if its per-call `C` median is `≥ 2 %` below A's on every curve | — (exploratory; reported either way) |
+| G2.93 | end to end, E25's ten curves, both arms, rerun with A (and B if carried) | every E25 count other than the solve's reproduced exactly; `S_E25 / S_A` in `[2.1, 2.9]` on every curve and arm at `0` GAE; the gap to the matched `⟨±ψ⟩` rho shrinks by the same factor | any count differs, or outside the band |
+| G2.94 | §5a band | unpriced native work as in E25 (one GAE per Macaulay entry, unchanged by A; one per walk step): `S_E25 / S_A` `[1.3, 1.6]` at `0.1` GAE and `[1.03, 1.10]` at `1` GAE; A below E25 at every weight | A above E25 at any weight |
+
+**What it would say.**  If G2.85–G2.89 and G2.93 hold, the `k = 4` index calculus on the `V₄` line
+costs `≈ 2.5×` less end to end on E25's curves with the same relations, logs and walks: **class
+engineering** (a constant on the dominant phase; exponents unchanged), a verified, measured
+improvement of the baseline under the 2026-10-15 criterion.  The band (G2.94) says how much of it
+survives once the Macaulay matrix's own entries are priced: most of it at `0.1` GAE, a few percent
+at `1` GAE, where the matrix A still builds dominates.  The rows would stay `≈ 4·10³`–`10⁵×` from
+the matched rho: the distance remaining.  After A the echelon is the next lever.
