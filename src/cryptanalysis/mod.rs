@@ -179,6 +179,8 @@ pub mod gf3m;
 pub mod ghs_class_coverage;
 pub mod ghs_descent;
 pub mod ghs_full_attack;
+pub mod ghs_generalized;
+pub mod ghs_quadratic;
 pub mod ghs_screen;
 pub mod ghs_transport;
 pub mod gls_fp2;

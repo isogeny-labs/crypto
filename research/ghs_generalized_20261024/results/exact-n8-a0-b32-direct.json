@@ -1,0 +1,229 @@
+{
+  "cost_comparison_status": "uncalibrated_field_degree_and_memory_operations",
+  "ghs": {
+    "factor_base_size": 16,
+    "image_generator": {
+      "u": [
+        "0xf",
+        "0x1"
+      ],
+      "v": [
+        "0xb"
+      ]
+    },
+    "image_target": {
+      "u": [
+        "0xa",
+        "0x5",
+        "0x1"
+      ],
+      "v": [
+        "0xd",
+        "0x1"
+      ]
+    },
+    "map": {
+      "absolute_degree": 8,
+      "base_degree": 4,
+      "base_modulus_low_terms": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "beta": "0xc5",
+      "cover_degree": 2,
+      "f": [
+        "0x0",
+        "0x5",
+        "0x5",
+        "0x9",
+        "0x0",
+        "0x9"
+      ],
+      "genus": 2,
+      "h": [
+        "0x0",
+        "0x1",
+        "0x1"
+      ],
+      "lambda": "0x12",
+      "mu": "0xec",
+      "schema": "ghs-quadratic-map/v1",
+      "source_map": "trace_K/k(conorm_C/E(P-O))",
+      "subfield_embedding_basis": [
+        "0x1",
+        "0xc",
+        "0x50",
+        "0xed"
+      ],
+      "trace_a": "0x0",
+      "trace_beta": "0x51"
+    },
+    "matrix_entry_operations": 1448,
+    "matrix_rank": 16,
+    "matrix_rows": 16,
+    "phases": {
+      "factor_base": {
+        "field_operations": {
+          "f2m4_add": 9378,
+          "f2m4_inverse_informational": 768,
+          "f2m4_mul": 10094,
+          "f2m4_square": 2816
+        },
+        "wall_level": "L0_descriptive",
+        "wall_ns": 5026959
+      },
+      "map": {
+        "field_operations": {
+          "f2m4_add": 86,
+          "f2m4_inverse_informational": 6,
+          "f2m4_mul": 81,
+          "f2m4_square": 20,
+          "f2m8_add": 623,
+          "f2m8_inverse_informational": 28,
+          "f2m8_mul": 604,
+          "f2m8_square": 176
+        },
+        "wall_level": "L0_descriptive",
+        "wall_ns": 285333
+      },
+      "relations_and_linear_algebra": {
+        "field_operations": {
+          "f2m4_add": 22189,
+          "f2m4_inverse_informational": 889,
+          "f2m4_mul": 20130,
+          "f2m4_square": 2434
+        },
+        "wall_level": "L0_descriptive",
+        "wall_ns": 7370792
+      },
+      "target_descent_and_replay": {
+        "field_operations": {
+          "f2m4_add": 208,
+          "f2m4_inverse_informational": 9,
+          "f2m4_mul": 195,
+          "f2m4_square": 26,
+          "f2m8_add": 43,
+          "f2m8_inverse_informational": 7,
+          "f2m8_mul": 42,
+          "f2m8_square": 33
+        },
+        "wall_level": "L0_descriptive",
+        "wall_ns": 137542
+      }
+    },
+    "relation_counts": {
+      "attempts": 66,
+      "jacobian_additions": 66,
+      "nonsmooth": 16,
+      "smooth": 50
+    },
+    "status": "verified",
+    "target_descent": {
+      "jacobian_additions": 0,
+      "offset": 0,
+      "scalar": 37,
+      "smooth": 1
+    },
+    "unpriced_operations": {
+      "decomposition_reconstructions": 51,
+      "factor_base_hash_inserts": 16,
+      "factor_base_hash_lookups": 86,
+      "matrix_entry_operations": 1448,
+      "polynomial_root_tests": 1072
+    }
+  },
+  "ghs_error": null,
+  "ghs_status": "verified",
+  "isogeny": null,
+  "limits": {
+    "relations": 20000,
+    "target_descent": 20000
+  },
+  "rho": {
+    "cost": {
+      "field_operations": {
+        "f2m8_add": 96,
+        "f2m8_inverse_informational": 13,
+        "f2m8_mul": 78,
+        "f2m8_square": 59
+      },
+      "wall_level": "L0_descriptive",
+      "wall_ns": 48833
+    },
+    "result": {
+      "algorithm": "rho.negation",
+      "elliptic_additions": 5,
+      "elliptic_doublings": 2,
+      "hash_inserts": 6,
+      "hash_lookups": 7,
+      "negation_folds": 1,
+      "restarts": 0,
+      "scalar": 37,
+      "steps": 6
+    }
+  },
+  "same_source_target": true,
+  "schema": "ghs-quadratic-attack/v1",
+  "setup_phases": {
+    "construction": {
+      "field_operations": {
+        "f2m4_add": 26,
+        "f2m4_inverse_informational": 3,
+        "f2m4_mul": 29,
+        "f2m4_square": 10,
+        "f2m8_add": 100,
+        "f2m8_inverse_informational": 4,
+        "f2m8_mul": 56,
+        "f2m8_square": 170
+      },
+      "wall_level": "L0_descriptive",
+      "wall_ns": 65917
+    },
+    "full_subgroup_checked_scalars": 67,
+    "full_subgroup_map_check": {
+      "field_operations": {
+        "f2m4_add": 14814,
+        "f2m4_inverse_informational": 659,
+        "f2m4_mul": 12956,
+        "f2m4_square": 1854,
+        "f2m8_add": 21884,
+        "f2m8_inverse_informational": 993,
+        "f2m8_mul": 20926,
+        "f2m8_square": 6127
+      },
+      "wall_level": "L0_descriptive",
+      "wall_ns": 7398875
+    },
+    "source_order_enumeration": {
+      "field_operations": {
+        "f2m8_add": 899,
+        "f2m8_inverse_informational": 255,
+        "f2m8_mul": 1408,
+        "f2m8_square": 1283
+      },
+      "wall_level": "L0_descriptive",
+      "wall_ns": 707791
+    }
+  },
+  "source": {
+    "a": "0",
+    "absolute_degree": 8,
+    "b": "32",
+    "generator": [
+      244,
+      61,
+      0
+    ],
+    "group_order": 268,
+    "modulus": "0x11b",
+    "subgroup_order": 67,
+    "target": [
+      4,
+      8,
+      0
+    ],
+    "target_scalar_for_replay": 37
+  }
+}

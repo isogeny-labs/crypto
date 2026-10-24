@@ -1,0 +1,273 @@
+{
+  "cost_comparison_status": "uncalibrated_field_degree_and_memory_operations",
+  "ghs": {
+    "factor_base_size": 16,
+    "image_generator": {
+      "u": [
+        "0xf",
+        "0x0",
+        "0x1"
+      ],
+      "v": [
+        "0x3",
+        "0x9"
+      ]
+    },
+    "image_target": {
+      "u": [
+        "0xc",
+        "0x0",
+        "0x1"
+      ],
+      "v": [
+        "0x6",
+        "0x3"
+      ]
+    },
+    "map": {
+      "absolute_degree": 8,
+      "base_degree": 4,
+      "base_modulus_low_terms": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "beta": "0x9a",
+      "cover_degree": 2,
+      "f": [
+        "0x0",
+        "0x3",
+        "0x3",
+        "0xe",
+        "0x0",
+        "0xe"
+      ],
+      "genus": 2,
+      "h": [
+        "0x0",
+        "0x1",
+        "0x1"
+      ],
+      "lambda": "0x12",
+      "mu": "0x5d",
+      "schema": "ghs-quadratic-map/v1",
+      "source_map": "trace_K/k(conorm_C/E(P-O))",
+      "subfield_embedding_basis": [
+        "0x1",
+        "0xc",
+        "0x50",
+        "0xed"
+      ],
+      "trace_a": "0x0",
+      "trace_beta": "0xd"
+    },
+    "matrix_entry_operations": 857,
+    "matrix_rank": 16,
+    "matrix_rows": 16,
+    "phases": {
+      "factor_base": {
+        "field_operations": {
+          "f2m4_add": 9378,
+          "f2m4_inverse_informational": 768,
+          "f2m4_mul": 10094,
+          "f2m4_square": 2816
+        },
+        "wall_level": "L0_descriptive",
+        "wall_ns": 1941917
+      },
+      "map": {
+        "field_operations": {
+          "f2m4_add": 87,
+          "f2m4_inverse_informational": 6,
+          "f2m4_mul": 79,
+          "f2m4_square": 20,
+          "f2m8_add": 555,
+          "f2m8_inverse_informational": 25,
+          "f2m8_mul": 545,
+          "f2m8_square": 167
+        },
+        "wall_level": "L0_descriptive",
+        "wall_ns": 134375
+      },
+      "relations_and_linear_algebra": {
+        "field_operations": {
+          "f2m4_add": 25025,
+          "f2m4_inverse_informational": 942,
+          "f2m4_mul": 22354,
+          "f2m4_square": 2540
+        },
+        "wall_level": "L0_descriptive",
+        "wall_ns": 4100250
+      },
+      "target_descent_and_replay": {
+        "field_operations": {
+          "f2m4_add": 212,
+          "f2m4_inverse_informational": 8,
+          "f2m4_mul": 197,
+          "f2m4_square": 24,
+          "f2m8_add": 43,
+          "f2m8_inverse_informational": 7,
+          "f2m8_mul": 42,
+          "f2m8_square": 33
+        },
+        "wall_level": "L0_descriptive",
+        "wall_ns": 51709
+      }
+    },
+    "relation_counts": {
+      "attempts": 66,
+      "jacobian_additions": 66,
+      "nonsmooth": 16,
+      "smooth": 50
+    },
+    "status": "verified",
+    "target_descent": {
+      "jacobian_additions": 0,
+      "offset": 0,
+      "scalar": 37,
+      "smooth": 1
+    },
+    "unpriced_operations": {
+      "decomposition_reconstructions": 51,
+      "factor_base_hash_inserts": 16,
+      "factor_base_hash_lookups": 85,
+      "matrix_entry_operations": 857,
+      "polynomial_root_tests": 1072
+    }
+  },
+  "ghs_error": null,
+  "ghs_status": "verified",
+  "isogeny": {
+    "codomain_a": "0x0",
+    "codomain_b": "0xc5",
+    "construction_and_validation_cost": {
+      "field_operations": {
+        "f2m8_add": 25754,
+        "f2m8_inverse_informational": 2020,
+        "f2m8_mul": 12949,
+        "f2m8_square": 8659
+      },
+      "wall_level": "L0_descriptive",
+      "wall_ns": 4035583
+    },
+    "curve_equation_verified_on_all_rational_points": true,
+    "degree": 2,
+    "formula": "X=x(P)+sum_{T in kernel_except_O}(x(P+T)+x(T)); Y=y(P)+sum_{T in kernel_except_O}(y(P+T)+y(T))+y_shift",
+    "group_law_checked_pairs": 400,
+    "image_generator": [
+      232,
+      168,
+      0
+    ],
+    "image_target": [
+      254,
+      218,
+      0
+    ],
+    "kernel_generator": [
+      0,
+      197,
+      0
+    ],
+    "kernel_points": [
+      [
+        0,
+        197,
+        0
+      ]
+    ],
+    "subgroup_map_checked_scalars": 67,
+    "subgroup_map_verified": true,
+    "y_shift": "0xc5"
+  },
+  "limits": {
+    "relations": 20000,
+    "target_descent": 20000
+  },
+  "rho": {
+    "cost": {
+      "field_operations": {
+        "f2m8_add": 96,
+        "f2m8_inverse_informational": 13,
+        "f2m8_mul": 78,
+        "f2m8_square": 59
+      },
+      "wall_level": "L0_descriptive",
+      "wall_ns": 31291
+    },
+    "result": {
+      "algorithm": "rho.negation",
+      "elliptic_additions": 5,
+      "elliptic_doublings": 2,
+      "hash_inserts": 6,
+      "hash_lookups": 7,
+      "negation_folds": 1,
+      "restarts": 0,
+      "scalar": 37,
+      "steps": 6
+    }
+  },
+  "same_source_target": true,
+  "schema": "ghs-quadratic-attack/v1",
+  "setup_phases": {
+    "construction": {
+      "field_operations": {
+        "f2m4_add": 26,
+        "f2m4_inverse_informational": 3,
+        "f2m4_mul": 29,
+        "f2m4_square": 10,
+        "f2m8_add": 100,
+        "f2m8_inverse_informational": 4,
+        "f2m8_mul": 56,
+        "f2m8_square": 170
+      },
+      "wall_level": "L0_descriptive",
+      "wall_ns": 117041
+    },
+    "full_subgroup_checked_scalars": 67,
+    "full_subgroup_map_check": {
+      "field_operations": {
+        "f2m4_add": 17674,
+        "f2m4_inverse_informational": 712,
+        "f2m4_mul": 15192,
+        "f2m4_square": 1960,
+        "f2m8_add": 22788,
+        "f2m8_inverse_informational": 1058,
+        "f2m8_mul": 21307,
+        "f2m8_square": 6388
+      },
+      "wall_level": "L0_descriptive",
+      "wall_ns": 13344041
+    },
+    "source_order_enumeration": {
+      "field_operations": {
+        "f2m8_add": 899,
+        "f2m8_inverse_informational": 255,
+        "f2m8_mul": 1408,
+        "f2m8_square": 1283
+      },
+      "wall_level": "L0_descriptive",
+      "wall_ns": 940416
+    }
+  },
+  "source": {
+    "a": "0",
+    "absolute_degree": 8,
+    "b": "32",
+    "generator": [
+      244,
+      61,
+      0
+    ],
+    "group_order": 268,
+    "modulus": "0x11b",
+    "subgroup_order": 67,
+    "target": [
+      4,
+      8,
+      0
+    ],
+    "target_scalar_for_replay": 37
+  }
+}
