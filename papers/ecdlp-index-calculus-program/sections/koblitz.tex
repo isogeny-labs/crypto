@@ -124,6 +124,31 @@ audit measured a cost slope of $0.985$--$1.060$ bits per unit of $n$ at
 $n\le19$, against the $0.25$ the lead needed
 (\art{research/ic_m4_exponent_audit_20260928/}).
 
+\paragraph{Other Koblitz lines.} The remaining Koblitz campaigns moved
+constants inside index calculus and are catalogued in
+Appendix~\ref{sec:catalogue}. Instruction-level rounds on the Gröbner stage
+left the whole relation log at $964\times$ rho on $K_0$ over $\FF_{2^{13}}$
+(\art{research/groebner_instructions_20260925/}); a September autolab
+campaign cut cold instructions by $47.7\%$ and left the candidate at
+$4.98\times$ matched rho's instructions (\art{research/ic_autolab_next30_20260915/});
+at $n=37$ a full-rank compact-orbit gate passed with IC at $22.6\times$ rho
+(\art{research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/RESULT.md}).
+Pipeline kernels gave laned canonical keys $1.09$--$1.31\times$
+(\art{research/canon_laned_keys_20261008/}), u64 root batching
+$3.26\times$ whole-process wall (rank cell corrected to $2.47\times$), and
+aimed gathering $1.037\times$ set-up (\art{research/ic_aimed_gather_20261023/}).
+Transporting a base through ECC2K-130's degree-263 and degree-7 isogenies
+was built and certified, but on toy fields the transported and descendant
+bases cost $3.6$--$4.0\times$ the original
+(\art{research/ecc2k130_factor_base_pilot_20260924/}); and $\tau$-adic
+known-scalar arithmetic is $0.413$ of the binary cost at $m=131$ with no
+measured rho benefit
+(\art{research/notes/ecc2k130/tau_adic_arithmetic_20260929/README.md}).
+On the rho side, GPU iteration redesigns for the ECC2K-130 walk did not
+beat the shipping distinguished-point walk
+(\art{research/ecc2k130_iteration_redesign_20261012/},
+\art{research/dp32_sigma_table_20261012/}).
+
 \subsection{The one-target online ladder}
 
 The ledger's primary \texttt{vs\_rho} question is: with reusable IC
@@ -333,8 +358,18 @@ route prices below rho.
   (\art{research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md}).
   The studies behind these rows, and the hybrid guess that puts the $m=4$
   row at $+8.43$ to $+58.27$ bits, are in \S\ref{sec:binary-descent}.
-\item \emph{Covers.} After the magic-number correction, a genus-130
-  hyperelliptic curve would cost $2^{37.17}$, but no such cover exists; the
+\item \emph{Covers.} Over $\FF_{2^{131}}$ every ordinary curve has GHS
+  magic number 1 or 131, so GHS descends ECC2K-130 to genus 1 (a zero map on
+  the subgroup) or to genus about $2^{130}$, and the Hess--Menezes--Teske walk
+  has nowhere to land. One question is open: $\langle G\rangle$ is the group
+  of a simple 130-dimensional abelian variety, and if that variety were
+  isogenous to a Jacobian with an evaluable isogeny, index calculus on the
+  genus-130 curve would cost $2^{37.17}$, $2^{23.64}$ times \emph{less} than
+  rho; no such curve is known, the Torelli codimension at genus 130 is
+  8{,}128, and CM constructions with prescribed Frobenius stop at genus 3
+  (\art{research/notes/ecc2k130/RESEARCH_ECC2K130_HYPERELLIPTIC.md}, with the
+  magic-number correction of
+  \art{docs/audits/GHS_MAGIC_NUMBER_MMT_CORRECTION_20261013.md}). The
   $N=130$ counterfactual is genus 255 at a modelled $2^{55.60}$ against rho's
   $2^{60.31}$, and measuring one relation trial turns that margin negative
   (\S\ref{sec:ladder3}). The best explicit curve construction reaches genus
@@ -351,9 +386,11 @@ route prices below rho.
   cut modelled GPU time to $0.961$--$0.970$
   (\art{benchmarks/20261014-ecc2k130-signed-sigma/}).
 \end{itemize}
-Index calculus is not a route to ECC2K-130 on this evidence; every priced
-route is at least about 5 bits above rho (the $m=4$ single-relation row, at
-$2^{70.79}$ bytes), and most are tens of bits.
+Index calculus is not a route to ECC2K-130 on this evidence: every route
+that has been constructed or priced is at least about 5 bits above rho (the
+$m=4$ single-relation row, at $2^{70.79}$ bytes), most by tens of bits, and
+the one hypothetical route below rho needs a genus-130 curve that no known
+method can construct.
 
 \subsection{Factor bases closed under $\ZZ[\tau]$}
 

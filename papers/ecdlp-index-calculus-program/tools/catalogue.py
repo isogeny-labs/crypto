@@ -128,7 +128,7 @@ def render(rows):
         r"%d entries in all, grouped by curve family. Campaigns of many "
         r"directories are collapsed to one row, with every member path "
         r"listed under it. Each row gives the study's own headline number "
-        r"with its class and status; a number marked superseded or "
+        r"with its class and status (the study's own class: \\emph{exponent vs own incumbent} is a change of exponent against the index-calculus incumbent, not the paper's \\cls{advance}); a number marked superseded or "
         r"corrected must be read through the correcting path. Rows were "
         r"compiled from each study's README and results files and are "
         r"summaries, not re-measurements; where a study states no number, "

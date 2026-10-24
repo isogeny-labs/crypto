@@ -150,6 +150,21 @@ arm before any comparative statement. Blockers are recorded as named
 problems (\art{problems/}) with exit criteria rather than silently dropped.
 Measurement code is native (Rust); Python only lays out recorded values.
 
+\paragraph{Generic baselines.} The rho, BSGS and Pohlig--Hellman
+references were engineered alongside index calculus, which is why each
+round's distance is quoted against the strongest reference at the time. On
+Koblitz curves the strong signed-Frobenius rho fell from 1{,}196 to 679.7
+instructions per step over four rounds with no established native-time gain
+(\S\ref{sec:ladder2}). On hyperelliptic Jacobians a negation fold and hash mixing each fell short
+of their registered gains, and full-width branch coefficients showed that
+the earlier 8-bit reference walk had been slow at large $N$
+(\art{benchmarks/20261018-hec-rho-negation/},
+\art{benchmarks/20261019-hec-rho-branch-width/}).
+Generic DLP fixes cut Pohlig--Hellman steps $26.6\times$ and BSGS time
+$1.3$--$2.0\times$, and the candidates run at $0.020$--$0.167$ of PARI's
+\texttt{elllog} time, in shared-host wall time the validation sweep left
+unvalidated (\art{research/generic_dlp_memory_parallelism_20261017/}).
+
 \subsection{Corrections the accounting forced}\label{sec:corrections}
 
 Building the harness and the ledger exposed errors in earlier claims,

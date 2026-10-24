@@ -19,7 +19,9 @@ each study's README and results files, checked for errata against the
 validation sweep, the ledger's audit section, `problems/` and the
 leaderboard, and wrote one row per path. The rows were then checked
 mechanically: of 4,420 numbers in 1,041 headlines, 76% appear literally in
-the study's own files and most of the rest trace to rounding, PDFs or the
-validation sweep; a random sample of rows was read against its sources. The
+the study's own files. A sample of the remaining 529 was traced by hand to
+rounding, to the study's PDF, or to the validation sweep; the rest are not
+individually verified. A random sample of rows was read against its
+sources for meaning. The
 rows are summaries, not re-measurements; the paper's text cites the
 primary files directly.

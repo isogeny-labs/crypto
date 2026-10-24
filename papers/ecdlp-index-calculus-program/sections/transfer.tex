@@ -87,41 +87,61 @@ or a prime-degree binary field, where the GHS genus is out of reach.
 
 \paragraph{Genus three against the strongest rho.} Rounds three and four
 of the genus-3 work ran without a rho arm; a 23 October study supplied one
-(\art{research/ghs3_vs_rho_20261023/TABLES.md}; the directory has a
-protocol and tables but no README). On round 4's instances, $q=2^{14}$ to
-$2^{20}$, three curves per size, in one unit and one binary, the
-preregistered per-size decision is \emph{IC below the strong rho} at
-$q=2^{16}$ (geometric mean IC/$R_{\mathrm{ideal}}$ $0.701$) and
-\emph{unresolved} at the other six sizes (geometric means $0.97$--$1.52$;
-$1.274$ at $2^{20}$). The ratio carries $\sqrt c$ of the cofactor, because IC
-depends on $q$ alone and rho on $\ell=\#E_0/c$; a post-hoc fit attributes the
-sub-rho cells to cofactor 4. Pricing the subgroup multiplication at
-$c_\ell=9$ instead puts every instance at $2.7$--$12.4\times$ rho, and the fitted
-trend is flat ($0.034$ $[-0.047,0.105]$ per bit), so the extrapolated
-crossover is undetermined ($\log_2q=11.5$, interval $[-35.6,60.4]$). Genus
-three after cubic GHS is therefore at parity with rho to within the pricing
-of one operation on these sizes, not past it. The class is structured
-($E_0/\FF_{q^3}$ with $4\mid\#E_0$), not prime-order.
+(\art{research/ghs3_vs_rho_20261023/}; it has a frozen protocol and tables
+but no README, and no review is recorded in it). On round 4's instances,
+$q=2^{14}$ to $2^{20}$, three curves per size, in round 4's unit and binary,
+the reference was an ideal negation rho priced with Karatsuba products and
+32 walks per inversion ($R_{\mathrm{ideal}}$, the primary reference, the
+most favourable to rho) and a measured negation walk ($R_{\mathrm{meas}}$).
+The frozen rule declares ``IC below the strong rho'' at a size only if every
+curve is below both references at every weight of the band. At $q=2^{16}$
+it is: IC/$R_{\mathrm{ideal}}$ is $0.70$, $0.71$, $0.70$ at $w=0$ and $0.64$
+and $0.38$ (geometric means) at $w=0.1$ and $1$. At the other six sizes the
+decision is \emph{unresolved}, with geometric means $0.97$--$1.52$ ($1.27$ at
+$2^{20}$). Three things qualify the result. The registered unit prices one
+subgroup multiplication as one $\FF_q$ multiplication ($c_\ell=1$); the
+protocol's own sensitivity, $c_\ell=9$, puts every instance at $2.7$--$12.4\times$
+rho. The ratio carries $\sqrt c$ of the cofactor, because IC depends on $q$
+alone and rho on $\ell=\#E_0/c$: the three curves at $2^{16}$ all have
+cofactor 4, and a post-hoc fit gives exponent $0.474$ in $c$ (theory $0.5$)
+and $-0.081$ per bit of $q$ at fixed $c$ (theory $-0.167$). And the pooled
+trend over all 21 instances is flat ($0.034$ $[-0.047,0.105]$ per bit), so
+no crossover size is determined. This is the programme's only
+preregistered decision of index calculus below the strongest rho. It is a
+measurement of a known pipeline in a structured, weak class
+($E_0/\FF_{q^3}$ with $4\mid\#E_0$, never prime order), where theory
+predicts $q^{4/3}$ against $q^{3/2}$; it depends on the pricing of one
+operation; and it is not yet reviewed. It updates the ledger paper's
+``$1.15\times$ at $2^{20}$'' and bears on that paper's prediction of a
+crossover at $q\le2^{22}$ once rho is measured: below rho at one size,
+unresolved at the others, with no measurable pooled trend.
 
-\paragraph{Joux--Vitse: two generations of comparison.} The current
-reading is the 24 October $p$-scaling study, $1.59$--$1.98\times$ a pooled rho
-constant at $p=1009$ and closing as about $p^{-2}$ (\S\ref{sec:ladder3}).
-Earlier readings were lower and are not current. A sieve variant measured
-$0.024$ $[0.019,0.031]$ of a strong rho at $p=1009$ and $0.0042$ at
-$p=1823$, but its 20 October review withheld every comparison (no numeric
-acceptance for the controls, uncharged rho hashes, incomplete accounting;
-\art{research/jv_sieve_strong_rho_20261019/}); a prospective re-run is
-registered and has not run. A 9 October whole-route replay from a non-weak
-challenge curve, through an isogeny walk to a weak curve and its cover, read
-$0.058$ of a pooled rho at $p=1009$ and $0.011$ at $p=1511$, on one seed per
-prime, with the historical method revision and an unmatched rho
-(\art{research/jv_cover_e2e_30bit_20261009/RESULT.md}). The cover-decomposition
-note still states a measured sieve crossover near $p\approx430$
+\paragraph{Joux--Vitse: two arms of one cover.} The Joux--Vitse cover of
+$E(\FF_{p^6})$ (full rational 2-torsion, a weak class) has been measured
+with two solvers, and their comparisons with rho do not agree. The
+\emph{plain Nagao arm} with a sparse-FGLM linear stage is $1.59$--$1.98\times$
+a pooled rho constant at $p=1009$ and closes as about $p^{-2}$
+(\art{research/jv_cover_p_scaling_20261024/}; \S\ref{sec:ladder3}); it is a
+lower-bound comparison and current. The \emph{sieve arm}
+(\texttt{jv\_cover --exp sieve}) measured $0.024$ $[0.019,0.031]$ of a strong
+rho at $p=1009$ and $0.0042$ at $p=1823$ on 19 October, but its 20 October
+review withheld every comparison (no numeric acceptance for the controls,
+uncharged rho hashes, incomplete accounting;
+\art{research/jv_sieve_strong_rho_20261019/}); a replication with fixed
+thresholds failed its acceptance rule and is in an open pull request, and a
+prospective re-run is registered and has not run. A 9 October whole-route
+replay from a non-weak challenge curve, through an isogeny walk to a weak
+curve and its cover, read $0.058$ of a pooled, unmatched rho at $p=1009$ on
+one seed per prime, with an earlier revision of the solver whose source
+includes the sieve module (\art{research/jv_cover_e2e_30bit_20261009/RESULT.md}).
+The roughly thirtyfold gap between the arms at $p=1009$ is unexplained on
+\texttt{main}. The cover-decomposition note still states a measured sieve
+crossover near $p\approx430$
 (\art{research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md}
-\S11) and carries no erratum; it should be read through the review.
-Leaderboard Table~D, the historical JV study, is withheld. On the method
-side, a sparse-FGLM linear stage made the cover $1.28\times$ cheaper end to
-end (\art{research/jv_cover_sparse_fglm_20261018/}); relation collection is
+\S11) with no erratum; it should be read through the review. Leaderboard
+Table~D, the historical study, is withheld. On the method side, the
+sparse-FGLM stage made the plain arm $1.28\times$ cheaper end to end
+(\art{research/jv_cover_sparse_fglm_20261018/}); relation collection is
 $99.99\%$ of $S$ (\art{research/ic_cover_leads_20261018/}); depth-1 isogeny
 classes hold no weak curve over 4{,}871{,}062 curves, while 86--95\% of
 deeper classes hold one (\art{research/jv_weak_class_law_20261007/}); and
@@ -160,6 +180,20 @@ At $\ell=2$, floors give $5.8\%$ fewer relations than craters, and 99\% of the
 contrast is explained by the base's cofactor classes
 (\art{research/isogeny-volcano-cost-v2_20261017/},
 \art{research/generator_effect_ic_20261019/}).
+
+\paragraph{Other transfer lines.} Index calculus on genus-2 to -4
+Jacobians over $\FF_p$ (the ADH--Gaudry attack, measured against rho on the
+same Jacobian) read below a distinguished-point rho in early rounds, but the
+reference was later found slow and the ratios are lower bounds, unranked
+under the band (\art{research/notes/index-calculus/RESEARCH_HYPERELLIPTIC_IC_RHO.md});
+later rounds are in review. A weak-curve atlas of 922 exact models and 36
+published cases ranks covering-model and pairing signals but leaves the
+selected-subgroup advantage unmeasured
+(\art{research/weak_curve_leaderboard_20261012/}); three complete isogeny
+volcano graphs (24{,}823 vertices) were built and their graph-wide IC
+surveys halted at checkpoints (\art{research/full_volcano_graphwide_ic_20261017/}).
+Weil restriction of ECC2K-130 to extension fields costs at least $2^{131}$,
+$2^{70.19}$ times rho (cluster ``transfer-boundaries'').
 
 \paragraph{Named obstructions.} Blocked requirements are kept open as
 problem records (\art{problems/README.md}), among them the complete-cost

@@ -41,7 +41,7 @@ improvement it reports is *engineering* or *accounting*.
 - **Koblitz curves** (§8): bases and oracles, the September results below
   rho that reversed against a stronger rho, the online ladder and its
   retirement, the full `n = 83` campaign (145 entries, 4–21 Oct), Table A
-  rules v3–v8 (4.67–18.07× at v8), and ECC2K-130 (every priced route at
+  rules v3–v8 (4.67–18.07× at v8), and ECC2K-130 (every constructed or priced route at
   least about 5 bits above rho).
 - **Random and prime-degree binary curves** (§9, new): the degree question
   measured (fall degrees 3–4, solving degree tracks ℓ within one of
