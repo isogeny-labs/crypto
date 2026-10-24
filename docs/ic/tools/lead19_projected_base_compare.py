@@ -398,9 +398,9 @@ def main():
     frozen = json.load(open(arg("--frozen"))) if arg("--frozen") else None
     out_path = arg("--out")
     md_path = arg("--md")
-    # The frozen ledger predates ICV1 slugs and names its curves
-    # `random-binary-n15-b524b`; the regime and subgroup order identify
-    # the instance across both namings.
+    # The frozen ledger predates ICV1 slugs and names its curves by the
+    # older random-binary scheme; the regime and the subgroup order
+    # identify the instance across both namings.
     frozen_by_key = {}
     if frozen:
         for i in frozen["ledger"]["instances"]:
