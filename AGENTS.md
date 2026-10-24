@@ -7,6 +7,12 @@
   on a feature branch. If the branch already has an open PR, extend that
   PR and update its title and description to match the new scope instead of
   opening a second one. Do not leave finished work uncommitted.
+- **Use regular PRs.** Create pull requests with `draft=false` and mark an
+  existing draft ready for review when you update it. Record pending CI,
+  review, and follow-up work in the PR description; draft status is not a
+  holding queue. Ready for review invites review; it does not authorize a
+  merge. All validation, evidence, review, and merge gates below still apply.
+  Use a draft only when the user explicitly asks for one.
 - **Verify before pushing:** run `cargo test --release --lib`, the touched
   examples' tests, and the relevant Python suites (for example
   `research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py`)
@@ -29,6 +35,29 @@
   or a component (an engine, filter, oracle, solver or kernel), regenerates
   `docs/ic-leaderboard.html` and its twins in the same PR (§7b), even when
   no row of tables A–C moves; it is not a follow-up.
+- **Validation gate** (owner, 2026-10-19; schema and mechanics in
+  [`docs/VALIDATION_GATE.md`](docs/VALIDATION_GATE.md)). No row reaches the
+  IC leaderboard (`docs/ic/LEADERBOARD.md`, `docs/ic/leaderboard.json`,
+  `docs/ic-leaderboard.html`) or `benchmarks/README.md` unless its evidence
+  directory carries a `VALIDATION.json` pointing to three artifacts: (1) a
+  **replay certificate**, an independent replay of the recorded runs with the
+  scalars verified; (2) a **validator report**, an independent recompute of the
+  headline numbers from raw data that is in the repository; (3) a **rho
+  reference matched to the protocol**, the reference the protocol names and
+  the strongest available for that curve (negation, Frobenius or the
+  automorphism fold), priced in the same unit and the same binary or process,
+  with the §5a band at 0, 0.1 and 1 GAE. `scripts/build_ic_leaderboard.py`
+  refuses a row without them, and `scripts/validation_gate.py check` (workflow
+  `validation-gate`) fails a PR that adds or changes such a row. Existing
+  rows are not deleted: those frozen in `docs/ic/validation/PRE_GATE.json` and
+  `benchmarks/PRE_GATE.json` render as "unvalidated (pre-gate)" until a
+  validation sweep verdict
+  (`research/validation_sweep_20261019/{A-leaderboard,B-benchmarks}/verdicts.jsonl`)
+  or a `VALIDATION.json` validates them; the freeze files may only shrink. The
+  `audit-runs` skill re-audits finished runbook and ecbench sessions daily
+  (`.github/workflows/audit-runs-daily.yml`). Like the success criterion, the
+  gate decides what may be shown as a result, never whether an honest null or
+  negative result may be recorded: those stay in their research directories.
 - **Conductor:** run `conductor check --summary "…" --scope path:…` before
   editing; report scope expansion before editing outside reserved paths. Do
   not publish chat transcripts or secrets as task metadata.
@@ -101,8 +130,9 @@ commands, and interpretation limits.
   `*.jsonl`, logs and CSVs by key or range (`jq`, `rg`), never whole; a
   session is read through its audit, replay or claim JSON.
 - **Paths, not contents,** in handoffs and subagent prompts.
-- **Off disk is not absent.** In a sparse checkout (`docs/sparse-checkout.md`)
-  a path `git ls-files` lists is materialized with
+- **Off disk is not absent.** Cloud sessions start in the sparse `harness`
+  profile, without the 18 largest `research/` archives. In a sparse checkout
+  (`docs/sparse-checkout.md`) a path `git ls-files` lists is materialized with
   `scripts/sparse-checkout.sh add --path`, never reported missing.
 
 # AGENTS.md
@@ -447,10 +477,10 @@ separate small-model automation did the CI work and the merge.
 commits, pushes, and opens the PR (or updates the existing one). It then
 follows the PR until it lands, under the check-in and merge rules below.
 
-- **Open every PR ready for review, never as a draft**, whatever a tool or
-  runtime defaults to, and mark an existing draft ready when you update it,
-  so reviews and checks that skip drafts (`llm-review`) run from the first
-  push. Open a draft only when the user asks for one in that task.
+- **Open every PR ready for review (`draft=false`)**, whatever a tool or
+  runtime defaults to. Before ending an update to an existing draft, mark it
+  ready so reviews and checks that skip drafts (`llm-review`) can run. An
+  explicit user request to keep a particular PR in draft is the only exception.
 - Review the final diff and confirm that the requested scope, relevant tests,
   evidence, and documentation are complete before opening the PR. Passing CI
   does not substitute for checking that the work is finished.
@@ -1240,6 +1270,15 @@ entry in the PR that lands the result. Objects are immutable and keyed by
 SHA-256; a name is not repointed without `--replace`, which keeps the old
 digest as superseded. Never delete remote objects from an agent session.
 See [docs/store/README.md](docs/store/README.md).
+
+"Too big for Git" means over 10 MiB (owner, 2026-10-22): every blob committed
+stays in every future clone. The `large-files` workflow
+(`scripts/check-large-files.sh`) fails a PR that adds or modifies such a file,
+except generated text that git delta-compresses well (`docs/browser/data.json`,
+`docs/curves/*.json`). A PR that must commit one anyway carries the
+`large-file-ok` label, added by the owner or a reviewer. Do not pre-compress
+text files to get under the limit: compressed blobs do not delta, so each
+revision costs its full size again.
 
 ### 13a. Raw run trees land as one archive
 
