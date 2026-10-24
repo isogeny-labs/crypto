@@ -571,7 +571,10 @@ fn validate_class_number_evidence(
     }
 }
 
-fn validate_generation_envelope(path: &Path, envelope: &GenerationEnvelope) -> Result<(), String> {
+fn validate_generation_envelope_metadata(
+    path: &Path,
+    envelope: &GenerationEnvelope,
+) -> Result<(), String> {
     if envelope.status != "pass"
         || envelope.receipt.status != "pass"
         || envelope.receipt.schema != RECEIPT_SCHEMA
@@ -585,6 +588,11 @@ fn validate_generation_envelope(path: &Path, envelope: &GenerationEnvelope) -> R
             path.display()
         ));
     }
+    Ok(())
+}
+
+fn validate_generation_envelope(path: &Path, envelope: &GenerationEnvelope) -> Result<(), String> {
+    validate_generation_envelope_metadata(path, envelope)?;
     ensure_digest(&envelope.segment, &envelope.segment_digest, "segment")?;
     ensure_digest(
         &envelope.checkpoint,
@@ -594,7 +602,7 @@ fn validate_generation_envelope(path: &Path, envelope: &GenerationEnvelope) -> R
     Ok(())
 }
 
-fn validate_verification_envelope(
+fn validate_verification_envelope_metadata(
     path: &Path,
     envelope: &VerificationEnvelope,
 ) -> Result<(), String> {
@@ -609,6 +617,14 @@ fn validate_verification_envelope(
             path.display()
         ));
     }
+    Ok(())
+}
+
+fn validate_verification_envelope(
+    path: &Path,
+    envelope: &VerificationEnvelope,
+) -> Result<(), String> {
+    validate_verification_envelope_metadata(path, envelope)?;
     ensure_digest(
         &envelope.segment,
         &envelope.segment_digest,
@@ -968,8 +984,11 @@ fn validate_entry_artifacts(
     )?;
     let generation: GenerationEnvelope = read_json(&entry.generation_receipt)?;
     let verification: VerificationEnvelope = read_json(&entry.verification_receipt)?;
-    validate_generation_envelope(&entry.generation_receipt, &generation)?;
-    validate_verification_envelope(&entry.verification_receipt, &verification)?;
+    // The four ledger artifacts were digest-verified immediately above.  Re-run
+    // the envelope admission checks without hashing the same segment and
+    // checkpoint twice more before the strict record-stream audit.
+    validate_generation_envelope_metadata(&entry.generation_receipt, &generation)?;
+    validate_verification_envelope_metadata(&entry.verification_receipt, &verification)?;
     if generation.segment != entry.segment
         || generation.segment_digest != entry.segment_digest
         || generation.checkpoint != entry.checkpoint
