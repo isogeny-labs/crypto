@@ -32,16 +32,15 @@ concurrency:
 jobs:
   smoke-and-custody:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-relation-yield-bridge.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-relation-yield-bridge.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    timeout-minutes: 20
-    # Keep the full test set and assertions while avoiding oversized debug artifacts.
-    env:
-      CARGO_INCREMENTAL: "0"
-      CARGO_PROFILE_DEV_DEBUG: "0"
-      CARGO_PROFILE_TEST_DEBUG: "0"
+    # The metered smoke alone takes ~12 min on an ARC runner and more on a
+    # hosted one, which this workflow now falls back to; 25 is the PR cap.
+    timeout-minutes: 25
     steps:
-      - name: Free runner disk before the release smoke
+      # The full checkout plus a debug build of the crate no longer fits a
+      # hosted runner's disk (rustc exits 101 mid-build); free the unused SDKs.
+      - name: Free runner disk
+        if: runner.environment == 'github-hosted'
         run: |
-          df -h /
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
             /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
           df -h /

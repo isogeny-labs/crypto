@@ -352,8 +352,15 @@ jobs:
       - name: Pinned session as root
         run: |
           sudo git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          # auto needs a whole core away from CPU 0. A one-core runner has none,
+          # so inherit: still pinned to one CPU (checked below), recorded at L0.
+          cpus=auto
+          if [ "$(lscpu -p=CORE | grep -v '^#' | sort -u | wc -l)" -lt 2 ]; then
+            cpus=inherit
+            echo "::notice::one physical core on this runner; pinned session uses --cpus inherit"
+          fi
           sudo ./target/release/ecbench run --spec docs/ecbench/specs/smoke-prime.json \
-            --out "$RUNNER_TEMP/prime" --cpus inherit --allow-busy --settle 1 --quiet
+            --out "$RUNNER_TEMP/prime" --cpus "$cpus" --allow-busy --settle 1 --quiet
           sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/prime"
       - name: Pinning took effect in every measured child
         run: |
@@ -471,10 +478,7 @@ jobs:
           name: ecbench-pr-audit-bin
           path: target/release
       - name: Validate committed evidence integrity on pull requests
-        # The job keeps its 25-minute PR budget (check-pr-budgets.py). The 113
-        # gzipped isogeny-volcano-cost-v2 sessions alone take about 8 minutes
-        # to audit on 4 cores (decompress + verify --replay 0), so 12 is too short.
-        timeout-minutes: 22
+        timeout-minutes: 12
         run: |
           chmod +x target/release/ecbench
           bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
