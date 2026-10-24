@@ -18,7 +18,8 @@
 # run options:
 #   --type T          instance type (default c7i.4xlarge). GPU types (g*, p*)
 #                     get the NVIDIA Deep Learning AMI, Graviton types arm64.
-#   --spot            spot capacity; an interruption ends the job as `interrupted`
+#   --spot            accepted for compatibility; every launch uses Spot
+#   --resume ID       restore a prior job's S3 out/ as EPHEMERAL_RESUME_DIR
 #   --ttl SPAN        hard lifetime, e.g. 90m, 6h, 2d (default from config).
 #                     The command is stopped 10 min before it to upload results.
 #   --disk GB         root volume size (default 100)
@@ -54,7 +55,15 @@
 
 set -euo pipefail
 
-HERE=$(cd "$(dirname "$(readlink -f "$0")")" && pwd)
+self=$0
+while [ -L "$self" ]; do
+    link=$(readlink "$self")
+    case $link in
+    /*) self=$link ;;
+    *) self=$(dirname "$self")/$link ;;
+    esac
+done
+HERE=$(cd -P "$(dirname "$self")" && pwd)
 CACHE=${XDG_CACHE_HOME:-$HOME/.cache}/ephemeral
 REGION=${EPHEMERAL_REGION:-${AWS_REGION:-${AWS_DEFAULT_REGION:-us-east-1}}}
 export AWS_REGION=$REGION AWS_DEFAULT_REGION=$REGION
@@ -68,6 +77,9 @@ need() { command -v "$1" >/dev/null || die "$1 is required"; }
 
 need aws
 need jq
+
+file_size() { stat -c %s -- "$1" 2>/dev/null || stat -f %z -- "$1"; }
+utc_epoch() { date -u -d "@$1" +%FT%TZ 2>/dev/null || date -u -r "$1" +%FT%TZ; }
 
 CONFIG=
 load_config() {
@@ -166,8 +178,8 @@ worktree_patch() {
                 case /$f in
                 */.venv/* | */venv/* | */node_modules/* | */__pycache__/*) continue ;;
                 esac
-                if [ "$(stat -c %s -- "$f")" -gt $((5 << 20)) ]; then
-                    echo "ephemeral: not shipping untracked $f ($(($(stat -c %s -- "$f") >> 20)) MiB); commit it or use --artifact on the box" >&2
+                if [ "$(file_size "$f")" -gt $((5 << 20)) ]; then
+                    echo "ephemeral: not shipping untracked $f ($(($(file_size "$f") >> 20)) MiB); commit it or use --artifact on the box" >&2
                     continue
                 fi
                 printf '%s\0' "$f"
@@ -181,13 +193,14 @@ worktree_patch() {
 # ---- run ------------------------------------------------------------------
 
 cmd_run() {
-    local type=c7i.4xlarge spot=false ttl='' disk=100 toolchain=rust setup='' name='' detach=false
-    local keep=false out='' ami='' ref='' source=true untracked=true paths=() artifacts=() envs=()
+    local type=c7i.4xlarge spot=true ttl='' disk=100 toolchain=rust setup='' name='' detach=false
+    local keep=false out='' ami='' ref='' resume='' source=true untracked=true paths=() artifacts=() envs=()
     local cache=true cargo_dir=.
     while [ $# -gt 0 ]; do
         case $1 in
         --type) type=$2; shift 2 ;;
         --spot) spot=true; shift ;;
+        --resume) resume=$(resolve_id "$2"); shift 2 ;;
         --ttl) ttl=$2; shift 2 ;;
         --disk) disk=$2; shift 2 ;;
         --toolchain) toolchain=$2; shift 2 ;;
@@ -298,6 +311,10 @@ cmd_run() {
     now=$(date +%s)
     deadline=$((now + ttl_s))
     owner="$(id -un)@$(hostname -s)"
+    if [ -n "$resume" ]; then
+        aws s3api head-object --bucket "$BUCKET" --key "jobs/$resume/job.json" >/dev/null \
+            || die "resume job $resume is missing or unreadable"
+    fi
 
     local paths_json artifacts_json
     paths_json=$(printf '%s\n' ${paths[@]+"${paths[@]}"} | jq -R . | jq -sc 'map(select(. != ""))')
@@ -307,13 +324,13 @@ cmd_run() {
         --arg setup "$setup" --arg repo "$repo_url" --arg commit "$commit" --arg head "$head" \
         --argjson patch "$patch" --argjson keep "$keep" --arg display "$display" --arg ami "$ami_ref" \
         --argjson disk "$disk" --argjson paths "$paths_json" --argjson artifacts "$artifacts_json" \
-        --argjson cache "$cache" --arg cargo_dir "$cargo_dir" \
+        --argjson cache "$cache" --arg cargo_dir "$cargo_dir" --arg resume "$resume" \
         '{
             id: $id, created: (now | todate), owner: $owner, instance_type: $type, spot: $spot,
             ttl: $ttl, deadline: $deadline, disk_gb: $disk, ami: $ami, toolchain: $toolchain,
             setup: $setup, repo_url: $repo, commit: $commit, local_head: $head, patch: $patch,
             keep: $keep, command_display: $display, paths: $paths, artifacts: $artifacts,
-            cache: $cache, cargo_dir: $cargo_dir
+            cache: $cache, cargo_dir: $cargo_dir, resume_job: $resume
         }' >"$stage/job.json"
 
     cp "$HERE/runner.sh" "$stage/runner.sh"
@@ -342,10 +359,7 @@ EOF
 
     local tags
     tags="{Key=Name,Value=ephemeral-$id},{Key=ephemeral:job,Value=$id},{Key=ephemeral:deadline,Value=$deadline},{Key=$(cfg .managed_tag),Value=true},{Key=ephemeral:owner,Value=$owner}"
-    local market=()
-    if $spot; then
-        market=(--instance-market-options 'MarketType=spot,SpotOptions={SpotInstanceType=one-time,InstanceInterruptionBehavior=terminate}')
-    fi
+    local market=(--instance-market-options 'MarketType=spot,SpotOptions={SpotInstanceType=one-time,InstanceInterruptionBehavior=terminate}')
 
     mkdir -p "$CACHE"
     echo "$id" >"$CACHE/last"
@@ -360,7 +374,12 @@ EOF
 
     # Try each configured subnet (one per AZ) until one has capacity.
     local subnets iid='' err subnet
-    mapfile -t subnets < <(cfg '.subnet_ids[]' | shuf)
+    subnets=()
+    if command -v shuf >/dev/null; then
+        while IFS= read -r subnet; do subnets+=("$subnet"); done < <(cfg '.subnet_ids[]' | shuf)
+    else
+        while IFS= read -r subnet; do subnets+=("$subnet"); done < <(cfg '.subnet_ids[]')
+    fi
     for subnet in "${subnets[@]}"; do
         if iid=$(aws ec2 run-instances \
             --launch-template "LaunchTemplateId=$(cfg .launch_template),Version=\$Default" \
@@ -382,10 +401,10 @@ EOF
         *) launch_failed "run-instances failed: $err" ;;
         esac
     done
-    [ -n "$iid" ] || launch_failed "no zone could launch $type (reasons above); try another type, --spot or not, or later"
+    [ -n "$iid" ] || launch_failed "no Spot capacity for $type in the configured zones; try another type or later"
 
     info "job $id"
-    info "  $type$($spot && echo ' spot') $iid ($ami_ref), ttl $ttl (terminates by $(date -u -d "@$deadline" +%FT%TZ))"
+    info "  $type$($spot && echo ' spot') $iid ($ami_ref), ttl $ttl (terminates by $(utc_epoch "$deadline"))"
     info "  ${commit:+source ${commit:0:12}$($patch && echo ' + local patch'), }command: $display"
     info "  s3://$BUCKET/jobs/$id/"
     if $detach; then

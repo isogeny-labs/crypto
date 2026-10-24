@@ -1,8 +1,9 @@
 # Full-tree curve registry rebuild, 2026-10-23
 
 This branch rebuilds the live ICV1 registry from a complete checkout after
-merging main at `d7daaa6b42e7b5209e78c2407b2eaf35da25fbe4`. The
-source-bound delta checker uses the earlier
+merging main at `d7daaa6b42e7b5209e78c2407b2eaf35da25fbe4` and was
+subsequently reconciled with main
+`5cb553810e5bbfbd8691ec614ffcaacefc625757`. The source-bound delta checker uses the earlier
 `a53a7e2bfa20080a424b9a2484a16932b6e3c116` baseline.
 The builder now reads the exact `*curve_ids.json` EC1 records, including the
 conductor-gap prepared lists that name their subgroup order `r`. It excludes
@@ -48,12 +49,17 @@ boundaries.
 | Generated artifact | SHA-256 | Scope |
 | --- | --- | --- |
 | `registry.json` | `e39687f5d46346faa2b65ca0fa7d635afec6b01b5025951192d3fa4d1829c3cb` | 15,791 models |
-| `traits.json` | `27fcf4646f142411bb95949a4e91b2a35dbcda6f2c23221f3f3ccf39f4583c91` | 15,967 trait rows, budget 262,144; 73,577,404 bytes |
+| `traits.json` | `adfaf5814a41b34b6d816892f00722e422bdb548dc6379207102b3d844728baf` | 15,967 trait rows, budget 262,144; 73,577,494 bytes |
 | `covers.json` | `af2b530b5f5022c4f331e35508a366691e1b720e9326f6e6e8a3999c5408ed0a` | 15,791 verified models, zero invalid |
 | `cover-links.yaml` | `8707d3e522ba56a7500fd0fd3808aff3f5e598113979e2c6a2986144909eb32b` | 15,791 exact maps, 979 EC1 records |
 | `jacobian-transfers.json` | `92c3a75954717c7f4248f6b19385a1d99af759fc44a2752c2d14b5d80022b5b1` | 15,791 models, 46,222 modeled routes |
-| `docs/ic/leaderboard.json` | `5d4dd2350405b03eee362687914f8b1dd07e357af7c7518cea8b5a3cb9363f91` | current curve roster; no new performance result |
-| `docs/browser/data.json` | `2fdf9bd635e7ac6b9abaa0f52aea3b87933915747fc48e2539361a5b1bae8103` | current searchable catalog |
+| `docs/ic/leaderboard.json` | `abc6ba9e9a06e35e104f17a2f6eb2c349d4e698059dc8977faa616ac89a5d908` | main's curve roster and result status; no new performance result from this rebuild |
+| `docs/browser/data.json` | `11da300c1018743f7790921234109b6feabd4f758acf3fd40961929b948e0751` | searchable catalog; 15,791 curves, 240 sessions, 14,830 yields |
+
+The latest main's trait cost weighting changes 13 conductor entries from the
+PR's earlier generated traits, only in their endomorphism resolution and
+grouping keys. The curve roster, order fields, and source digests are unchanged;
+the current trait digest above is for the exact merged builder.
 
 The cover geometry and Jacobian inventory are regenerated on the expanded
 catalog. The 2026-10-19 cover-transfer assessment, PDF, and figures remain a
@@ -61,9 +67,12 @@ catalog. The 2026-10-19 cover-transfer assessment, PDF, and figures remain a
 models. `scripts/check_historical_cover_transfer_assessment.mjs` replays that
 assessment on its exact `a53a7e2...` inputs and compares it with the published
 artifact. The current browser shows the new cover geometry, not an inferred
-transfer speedup. Its curve rows changed only in source lists, and its methods,
-factor bases, candidates, rounds, sessions, yields, and counts are byte-equivalent
-after parsing. No new benchmark or performance claim is made here.
+transfer speedup. Relative to this PR's earlier browser artifact, the merge
+incorporates six leaderboard annotations and two ecbench annotations on curve
+rows. It also indexes 14 sessions and 182 yield records from the already
+tracked `research/ecbench_allocator_confound_20261023/sessions/` tree; method
+and factor-base counters follow those records. No benchmark was run by this
+rebuild, and it makes no new performance claim.
 
 Local replay:
 
@@ -79,6 +88,15 @@ python3 scripts/build_lab_browser.py --check
 node scripts/check_historical_cover_transfer_assessment.mjs
 bash research/sea_point_count_20261016/formal/verify.sh
 ```
+
+On exact main `5cb5538`, the leaderboard check remains a baseline gate
+failure: six rule-v7 Table A rows have neither an independent evidence
+manifest nor a pre-gate digest. The
+[problem record](../../../problems/rule-v7-leaderboard-independent-validation.md)
+tracks the separate validation work. [PR #2512](https://github.com/aburan28/crypto/pull/2512)
+now contains independent v6/v7 evidence and a locally passing gate, but hosted
+checks and merge are pending. This registry rebuild does not bypass the gate
+or treat those six rows as validated on its `5cb5538` baseline.
 
 The generated `cover-links.yaml` is 44,446,725 bytes. It is JSON-compatible
 YAML but does not fall under the repository's `docs/curves/*.json` large-text

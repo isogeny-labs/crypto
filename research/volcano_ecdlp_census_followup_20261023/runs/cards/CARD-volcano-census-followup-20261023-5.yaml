@@ -1,0 +1,95 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-volcano-census-followup-20261023-5
+experiment_id: volcano_ecdlp_census_followup_20261023
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/volcano_ecdlp_census_followup_20261023/runs/cards/CARD-volcano-census-followup-20261023-5.receipt.json
+binds:
+- path: research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh
+  sha256: 48d039423073ca6380f489eea2640efb7af3389741cac9266f1711af0507c11f
+- path: research/volcano_ecdlp_census_followup_20261023/scripts/ca.sha256
+  sha256: e3578adc661b5ccfb27d9452aaf759fcc6cd238cfdf7b687f12b8234bfa985a1
+- path: research/volcano_ecdlp_census_followup_20261023/census/V5/walks/D/R.json
+  sha256: e0c1e6f9079482267ba73ed114dd413df7c5f23715c38b20e55638b74e51df03
+- path: research/volcano_ecdlp_census_followup_20261023/census/V5/walks/floor-a/R.json
+  sha256: b0b2464881d1e5c069715d1600ad087c33864667668bdd1764522b8ae4a924a4
+- path: research/volcano_ecdlp_census_followup_20261023/census/V5/walks/floor-b/R.json
+  sha256: 98d3128e6cde373303c6bfda369ee124d4cfe9ff5c7176ec6719ca9d66d535aa
+commands:
+- id: guard-ecbench-not-running
+  argv:
+  - pgrep
+  - -x
+  - ecbench
+  timeout_seconds: 10
+  success_exit_codes:
+  - 1
+- id: guard-driver-pid-15982-dead
+  argv:
+  - kill
+  - '-0'
+  - '15982'
+  timeout_seconds: 10
+  success_exit_codes:
+  - 1
+- id: guard-ca-sha256
+  argv:
+  - sha256sum
+  - -c
+  - research/volcano_ecdlp_census_followup_20261023/scripts/ca.sha256
+  timeout_seconds: 10
+  success_exit_codes:
+  - 0
+- id: walk-v5-d
+  argv:
+  - bash
+  - research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh
+  - walk
+  - V5
+  - D
+  timeout_seconds: 30
+  success_exit_codes:
+  - 0
+- id: walk-v5-floor-a
+  argv:
+  - bash
+  - research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh
+  - walk
+  - V5
+  - floor-a
+  timeout_seconds: 30
+  success_exit_codes:
+  - 0
+- id: walk-v5-floor-b
+  argv:
+  - bash
+  - research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh
+  - walk
+  - V5
+  - floor-b
+  timeout_seconds: 30
+  success_exit_codes:
+  - 0
+- id: publish
+  argv:
+  - bash
+  - research/volcano_ecdlp_census_followup_20261023/scripts/transfer_cost_part.sh
+  - publish
+  - V5 source walks
+  timeout_seconds: 150
+  success_exit_codes:
+  - 0
+bus_address: executor-mechanical-volcano-followup
+background: false
+write_scope:
+- research/volcano_ecdlp_census_followup_20261023/
+stop_when:
+- Any command exits with a status that is not in its success_exit_codes.
+- A printed line starts with MISSING, BAD_, EMPTY_BENCH, LEVEL1_ROWS_NOT_ONE or PUSH_FAILED.
+- The tool exits with status 2 and prints an IMPEDIMENT line.
+notes: Appends rows idempotently to runs/transfer_cost.jsonl (rows of the same volcano
+  and src are replaced) and commits and pushes only that file. Run it with python3
+  research/volcano_ecdlp_census_followup_20261023/scripts/card_instance.py followed
+  by the card path, so that each run has its own receipt. The sum of the command timeouts
+  is below nine minutes.
