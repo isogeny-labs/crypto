@@ -1,5 +1,16 @@
 # Quadratic twists: native experiments and checked point/pairing transfers
 
+The [relation-yield/solver-degree continuation](reports/yield-20261024/README.md)
+adds exact Lean theorems for accepted coefficient sets and row rank, an actual
+short-model twist instantiation, uniform whole-group raw-yield ratio N/Nt, and
+conditional cost inequalities for useful yield and a degree-dependent dense work
+model. An actual F5 control has more raw twist zeros but no nonzero rows modulo3.
+The unchanged gate passes **106 named theorems / 127 audited declarations**,
+zero extra trusted axioms. Higher useful yield, a genuinely lower relevant degree
+and a main-DLP reduction remain hypotheses to verify, not consequences of twisting.
+[Protocol](YIELD_20261024_PROTOCOL.md), [proof sources](lean/RelationYield.lean),
+[cost theorem](lean/RelationCost.lean), [validation](validation/yield-20261024/README.md).
+
 The [2026-10-24 pairing continuation](reports/pairing-20261024T0442Z/README.md)
 checks the positive twist-assisted route to finite-field index calculus.
 On the retained F43 order11 fixture, Lean checks the explicit Miller function
@@ -10,7 +21,7 @@ The new full native sweep independently verifies **4,616 auxiliary points** in
 targets, while 1,304 cofactor-zero images and 274 same-source controls are
 degenerate. The direct formula is explicitly undefined on the same-source
 controls; shifted disjoint-divisor evaluation verifies their value one.
-The proof gate now passes **68 named theorems / 85 audited declarations**, zero
+That round's proof gate passed **68 named theorems / 85 audited declarations**, zero
 extra trusted axioms. This establishes the finite transfer, not generic Weil
 theory or a speedup. [Protocol](PAIRING_20261024_PROTOCOL.md),
 [results/audit/certificate](native/pairing-20261024T0442Z/),
@@ -101,6 +112,7 @@ study=research/quadratic_twist_evidence_20261021
 bash "$study/run-native.sh" /tmp/twist-native-fresh
 bash "$study/test-native.sh" /tmp/twist-native-fresh /tmp/twist-controls-fresh
 bash "$study/run-pairing.sh" /tmp/twist-pairing-fresh
+bash "$study/run-yield.sh" /tmp/twist-yield-fresh
 cargo test --release --locked --manifest-path "$study/native/metadata/Cargo.toml"
 cargo run --release --locked --manifest-path "$study/native/metadata/Cargo.toml" -- \
   "$PWD" /tmp/twist-native-fresh/results.json /tmp/twist-metadata-fresh

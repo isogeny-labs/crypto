@@ -1,0 +1,91 @@
+import Mathlib.Data.Nat.Choose.Basic
+import Mathlib.Data.Rat.Cast.Order
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.Positivity
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.FieldSimp
+
+/-! Conditional, deterministic cost accounting. No assertion that a twist
+has better useful yield, lower regularity, or an available DLP reduction. -/
+namespace RelationCost
+
+/-- All excluded phases must be put in overhead: setup, transfer, LA, descent, verification. -/
+def budget (overhead rows attemptWork usefulRate : ℚ) : ℚ :=
+  overhead + rows * (attemptWork / usefulRate)
+
+/-- A degree-parameterized dense monomial model, not a measured F4/F5 runtime. -/
+def macaulayWork (variables omega degree : ℕ) : ℚ :=
+  (Nat.choose (variables + degree) variables : ℚ) ^ omega
+
+theorem macaulayWork_mono (variables omega : ℕ) :
+    Monotone (macaulayWork variables omega) := by
+  intro dT dE hd
+  unfold macaulayWork
+  have hc : (Nat.choose (variables + dT) variables : ℚ) ≤
+      (Nat.choose (variables + dE) variables : ℚ) := by
+    exact_mod_cast Nat.choose_le_choose variables (Nat.add_le_add_left hd variables)
+  exact pow_le_pow_left₀ (by positivity) hc omega
+
+theorem batch_normalization (work : ℚ) (attempts useful : ℕ)
+    (ha : 0 < attempts) (hu : 0 < useful) :
+    (work / attempts) / ((useful : ℚ) / attempts) = work / useful := by
+  have ha0 : (attempts : ℚ) ≠ 0 := by exact_mod_cast (Nat.ne_of_gt ha)
+  have hu0 : (useful : ℚ) ≠ 0 := by exact_mod_cast (Nat.ne_of_gt hu)
+  field_simp [ha0, hu0]
+
+theorem overhead_threshold (oT oE rows cT cE pT pE : ℚ) :
+    budget oT rows cT pT < budget oE rows cE pE ↔
+      oT - oE < rows * (cE / pE - cT / pT) := by
+  unfold budget
+  rw [mul_sub]
+  constructor <;> intro h <;> linarith
+
+theorem faster_of_useful_yield (oT oE rows cT cE pT pE : ℚ)
+    (hrows : 0 < rows) (hcE : 0 < cE) (hpE : 0 < pE)
+    (hp : pE < pT) (hc : cT ≤ cE) (ho : oT ≤ oE) :
+    budget oT rows cT pT < budget oE rows cE pE := by
+  have hpT : 0 < pT := lt_trans hpE hp
+  have hcost : cT / pT < cE / pE := lt_of_le_of_lt
+    (div_le_div_of_nonneg_right hc (le_of_lt hpT))
+    (div_lt_div_of_pos_left hcE hpE hp)
+  unfold budget
+  exact add_lt_add_of_le_of_lt ho (mul_lt_mul_of_pos_left hcost hrows)
+
+theorem faster_of_attempt_work (oT oE rows cT cE pT pE : ℚ)
+    (hrows : 0 < rows) (hcT : 0 ≤ cT) (hpE : 0 < pE)
+    (hp : pE ≤ pT) (hc : cT < cE) (ho : oT ≤ oE) :
+    budget oT rows cT pT < budget oE rows cE pE := by
+  have hcost : cT / pT < cE / pE := lt_of_le_of_lt
+    (div_le_div_of_nonneg_left hcT hpE hp)
+    ((div_lt_div_iff_of_pos_right hpE).mpr hc)
+  unfold budget
+  exact add_lt_add_of_le_of_lt ho (mul_lt_mul_of_pos_left hcost hrows)
+
+/-- The degree and useful-yield improvements are supplied hypotheses, not consequences of twisting. -/
+theorem faster_of_yield_and_degree (variables omega dT dE : ℕ)
+    (oT oE rows pT pE : ℚ) (hrows : 0 < rows) (hpE : 0 < pE)
+    (hp : pE < pT) (hd : dT ≤ dE) (ho : oT ≤ oE) :
+    budget oT rows (macaulayWork variables omega dT) pT <
+      budget oE rows (macaulayWork variables omega dE) pE := by
+  have hchoose : 0 < Nat.choose (variables + dE) variables :=
+    Nat.choose_pos (Nat.le_add_right variables dE)
+  have hc : 0 < macaulayWork variables omega dE := by
+    unfold macaulayWork
+    positivity
+  exact faster_of_useful_yield oT oE rows _ _ pT pE hrows hc hpE hp
+    (macaulayWork_mono variables omega hd) ho
+
+/-- Bounds must be independently justified; the budget comparison alone is a model result. -/
+theorem actual_faster_of_bounds (actualT actualE upperT lowerE : ℚ)
+    (hT : actualT ≤ upperT) (hE : lowerE ≤ actualE) (h : upperT < lowerE) :
+    actualT < actualE := lt_of_le_of_lt hT (lt_of_lt_of_le h hE)
+
+#print axioms batch_normalization
+#print axioms macaulayWork_mono
+#print axioms overhead_threshold
+#print axioms faster_of_useful_yield
+#print axioms faster_of_attempt_work
+#print axioms faster_of_yield_and_degree
+#print axioms actual_faster_of_bounds
+
+end RelationCost

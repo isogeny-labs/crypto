@@ -1,6 +1,6 @@
 name = "twistproof"
 version = "0.1.0"
-defaultTargets = ["TwistProof", "FrobeniusBridge", "TwistEmbedding", "TwistGroupMap", "TwistEigenspace", "PairingFixture", "PairingTransfer"]
+defaultTargets = ["TwistProof", "FrobeniusBridge", "TwistEmbedding", "TwistGroupMap", "TwistEigenspace", "PairingFixture", "PairingTransfer", "RelationYield", "RelationCost", "YieldFixture"]
 
 [[require]]
 name = "mathlib"
@@ -27,3 +27,12 @@ name = "PairingFixture"
 
 [[lean_lib]]
 name = "PairingTransfer"
+
+[[lean_lib]]
+name = "RelationYield"
+
+[[lean_lib]]
+name = "RelationCost"
+
+[[lean_lib]]
+name = "YieldFixture"

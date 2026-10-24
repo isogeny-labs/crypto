@@ -112,3 +112,15 @@ independent auditor; the IC algorithm is not formalized. The fresh full library
 suite passes 4,479 with 119 existing ignores; 22 backend and four workflow tests
 pass. Earlier failed attempts and all frozen sources remain unchanged. General
 geometric pairing theory and practical advantage remain distinct open questions.
+
+The [relation-yield continuation](yield-20261024/README.md) passes the unchanged
+ten-module proof gate:106 named research theorems /127 audited declarations,
+zero failing/extra trusted. Matched actual twist factor bases preserve the
+accepted coefficient set, useful yield under the same predicate, row span and
+rank. Whole-group raw rates are inverse group orders, with exact twist/main
+ratio N/Nt. The useful-yield/degree cost and overhead theorems are explicitly
+conditional. The F5 raw-yield control and synthetic budget controls are kernel
+checked. A new source-bound cleared-budget polynomial certificate, exact byte
+replay, false identities/source bindings and22 native backend tests pass.
+All failed elaborations and sparse-checkout validation failures are retained;
+no frozen record or actual speed claim is rewritten.

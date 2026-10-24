@@ -34,7 +34,7 @@ Neither gap is a mathematical nonexistence result.
   ranks pass the separate auditor. False relations, missing coverage, and a false
   historical census count are rejected. The tower/simple-basis conversion checks
   2,401 elements, 2,475 points and 2,025 group-law identities.
-- **Checked implications:** [68 named Lean theorems and proof map](../research/quadratic_twist_evidence_20261021/lean/README.md)
+- **Checked implications:** [106 named Lean theorems and proof map](../research/quadratic_twist_evidence_20261021/lean/README.md)
   pass the repository proof gate on standard foundations, with no extra trusted
   native axioms. This proves their explicit group/ring statements, not all the
   historical geometric identifications. Four declarations use the actual
@@ -69,9 +69,21 @@ Neither gap is a mathematical nonexistence result.
   unmodified gate to 85 audited declarations, zero failing/extra trusted.
 - **Identity records:** three original IDC1 records, the source-bound
   cleared-monic-map certificate, and four new group-coordinate/discriminant
-  records, plus the new norm-product IDC1h23c0696a12358b08, linked to the actual Lean sources;
+  records, the norm-product IDC1h23c0696a12358b08 and cleared-budget
+  IDC1h1fac46ceb41801ac, linked to the actual Lean sources;
   1,921 registered ICV1 models and 27 exact selected EC1 representations. Models
   without an experimental cyclic generator retain that unknown.
+- **Yield/rank/cost continuation:** [new proof and report](../research/quadratic_twist_evidence_20261021/reports/yield-20261024/README.md)
+  add38 named statements. Actual matched twist bases have identical coefficient
+  relation sets and row rank. Uniform whole-group raw yields are1/N, with exact
+  twist/main ratio N/Nt. Conditional useful-yield and solver-degree cost models
+  have checked strict-improvement and overhead thresholds. A kernel-checked F5
+  control has higher raw twist zero count but no nonzero rows modulo3. The
+  unmodified gate audits127 declarations, zero failing/extra trusted. No actual
+  useful-yield advantage, lower regularity certificate, solver work bound or
+  main-to-twist DLP reduction is silently supplied. See the
+  [lead-atlas handoff](../research/quadratic_twist_evidence_20261021/validation/yield-20261024/atlas-handoff.json)
+  for existing related leads; their dispositions are not changed by this proof.
 - **Tool/access:** Rust and Lean were installed for this continuation; the former
   claim that they were unavailable no longer describes the current environment.
   The library suite and native backend tests are recorded in the study validation
@@ -98,6 +110,11 @@ Neither gap is a mathematical nonexistence result.
   short models; identify the rational fixed eigenspace on actual Weierstrass points.
 - [x] Check the explicit F43 Miller-function table, twist/Frobenius bindings and
   exact finite logarithm transport; independently verify all eleven native IC logs.
+- [x] Prove exact matched relation-set/rank transport, whole-group yield counts
+  and explicit conditional useful-yield/degree/overhead comparisons.
+- [ ] Establish actual small-base useful-yield and regularity/solving-degree
+  bounds, compatible complete work bounds and a main-DLP reduction before
+  turning the conditional comparison into an actual speed claim.
 - [ ] Prove general-model normalization with compatible group maps,
   exceptional summation-polynomial lift statements, and the general geometric
   pairing correctness/nondegeneracy and uniform DLP reduction.

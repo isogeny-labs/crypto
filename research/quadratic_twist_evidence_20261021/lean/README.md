@@ -3,8 +3,8 @@
 Lean 4.34.1 and Mathlib commit `d13f23b723b8a846827a245b89c10fc7d3f11612`
 are pinned in the toolchain, Lake file, and dependency manifest. The repository
 proof gate builds the module and audits all transitive theorem axioms. The current
-latest receipt reports **68 named research theorems, zero trusted native declarations**;
-the expanded audit checks 85 declarations including 17 generated helper lemmas. Only standard
+latest receipt reports **106 named research theorems, zero trusted native declarations**;
+the expanded audit checks 127 declarations including 21 generated helper lemmas. Only standard
 `propext`, `Classical.choice`, and `Quot.sound` occur, and some proofs need fewer.
 No theorem source contains a placeholder or a custom research axiom.
 
@@ -156,7 +156,7 @@ homomorphism/nondegeneracy hypotheses explicit:
 | `norm_product_identity` | universal quadratic norm multiplication polynomial; native source-bound IDC1h23c0696a12358b08 |
 
 These 19 new statements bring the total to 68 named theorems. The
-[unmodified latest gate](../validation/pairing-20261024T0442Z/lean-gate-final/)
+[unmodified pairing-round gate](../validation/pairing-20261024T0442Z/lean-gate-final/)
 audits 85 declarations in seven modules, including 17 generated helpers, with
 zero failing/extra trusted axioms. The [finite native census and report](../reports/pairing-20261024T0442Z/README.md)
 independently check 4,616 auxiliary points in 274 shared-prime cases and all
@@ -164,6 +164,45 @@ eleven F43 IC certificates. Native IC relation collection/solving is not formali
 The finite Miller table does not prove equality with the geometric divisor
 definition or general Weil bilinearity/nondegeneracy. The generic character
 theorem does not assume those properties have been proved for every curve.
+
+## Relation yield, row rank and conditional solver-degree costs (2026-10-24)
+
+`RelationYield.lean` defines finite accepted integer coefficient sets by actual
+zero sums of the indexed factor-base points. For every injective additive map,
+the accepted coefficient set is identical before and after transport. Raw yield,
+the same useful-row predicate's yield, and the actual coefficient span/rank over
+any field are therefore equal. `twist_relationRows`, `twist_rawYield` and
+`twist_rowRank` instantiate that result on the actual short-model map into E(K).
+It does not identify E(k) with E_d(k).
+
+For uniformly sampled entire finite groups, `completeRelationEquiv` gives the
+unique last point completing any prefix to zero. `full_relation_count` proves
+N^m accepted tuples; `full_factor_base_yield` proves raw rate1/N;
+`full_yield_ratio` proves twist/main rate ratio N/Nt, and
+`full_yield_comparison` gives higher raw rate for a smaller group. Arbitrary
+small factor-base distributions and useful independent rows are outside that
+whole-group rate theorem.
+
+`RelationCost.lean` proves finite-batch work/useful normalization, exact overhead
+thresholds, monotonicity (and strict monotonicity under n,omega>0) of the explicit
+binomial(n+D,n)^omega work model, and sufficient yield/degree budget inequalities.
+The supplied D is a relevant solver-degree parameter. No actual polynomial
+ideal's regularity, regularity-to-solving-degree bridge or F4/F5 work bound is
+silently formalized. Independently justified actual work bounds and a genuine
+scalar-preserving source-to-destination reduction remain required for an actual
+main-DLP speed claim. `scalar_solution_iff` and `actual_faster_of_bounds` expose
+those separate bridges.
+
+`YieldFixture.lean` checks actual F5 main/twist points: one versus three zero
+relations on n=0,...,8, but all twist rows are zero modulo3. Its two synthetic
+budget examples separately show possible model improvement and reversal by
+overhead, without attributing those costs to the F5 curves. The [source-linked
+report](../reports/yield-20261024/README.md) maps all 38 new named theorems.
+The [unmodified final gate](../validation/yield-20261024/lean-gate-final/)
+audits127 declarations in ten modules, zero failing/extra trusted. Source-bound
+IDC1h1fac46ceb41801ac covers only the cleared-budget polynomial; Lean separately
+checks positivity, counts, row rank and inequalities. All previous sources and
+certificate bindings remain unchanged.
 
 **Remaining bridges.** The explicit short-model image's Frobenius-negation
 property, additive isomorphism onto the entire minus subgroup, and rational
@@ -175,8 +214,11 @@ Miller transfer is now checked as stated above. Its abstract implications are fu
 the complete historical geometric theorems are only partially formalized.
 Finite enumerations check the original fixtures, not those universal bridges.
 The trace-zero counting theorem and general GHS construction likewise remain open.
-The [latest build and axiom receipts](../validation/pairing-20261024T0442Z/)
-include all seven modules. The earlier 14-, 18-, 28- and 49-theorem gate receipts and
+Actual small-base useful-yield improvement, lower regularity/solver-degree
+certificates and compatible solver work bounds remain unestablished for the new
+conditional comparison. No measured speedup is claimed.
+The [latest build and axiom receipts](../validation/yield-20261024/)
+include all ten modules. The earlier 14-, 18-, 28-, 49- and 68-theorem gate receipts and
 their exact Lake configurations are retained unchanged.
 
 Reproduce from the repository root:

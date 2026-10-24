@@ -1,5 +1,10 @@
 # Evidence import report
 
+Latest proof continuation: [relation yield, row rank and conditional degree cost](yield-20261024/README.md),
+with actual twist transport, exact whole-group yield ratio, a kernel-checked F5
+control and an inspected four-page report. It supplies conditional mathematical
+results, not a new measured IC/rho point.
+
 Latest continuation: [positive twist-assisted pairing transfer](pairing-20261024T0442Z/README.md),
 with an independently replayed 4,616-point census and a kernel-checked F43
 121-pair Miller table. The four-page inspected PDF, recorded-count graph and

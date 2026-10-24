@@ -11,8 +11,8 @@
 | Independent verification of saved/new IC data | verified | tuple-based auditor verifies three headline and 81 complete-log certificates |
 | Native controls | verified | false new relation, removed log certificate and false historical census count rejected |
 | Historical general readable arguments | preserved | archived report remains available with its original hypotheses |
-| Checked Lean implications and proof map | partial overall; explicit short-model group/eigenspace and finite F43 Miller bridges verified | 68 named theorems / 85 audited declarations, zero extra trusted; actual addition/scalars, source annihilators, full minus-group isomorphism, rational fixed eigenspace and 121-pair table checked; general-model normalization, exceptional summation-lifting and generic geometric pairing bridges remain open |
-| Algebraic identity certificates | verified for nine stated identities | three original certificates, cleared-monic-map IDC1, four group-map/discriminant records and norm-product IDC1h23c0696a12358b08; 32+16 point replay, false identities/source hashes and exact Lean source pointers |
+| Checked Lean implications and proof map | partial overall; explicit short-model and finite pairing bridges plus yield/rank/cost implications verified | 106 named theorems / 127 audited declarations, zero extra trusted; actual point/group/eigenspace, finite Miller table, relation-set/rank transport, whole-group yield and conditional degree-cost statements checked; general geometry and actual useful-yield/regularity/work bridges remain open |
+| Algebraic identity certificates | verified for ten stated identities | previous nine unchanged, plus cleared-budget IDC1h1fac46ceb41801ac; 32+16 replay, arithmetic false identities and false source hashes |
 | Exact curve/model/subgroup identities | verified within stated representations | 1,921 registered monic models, 27 EC1 representations; unused subgroup choices stay unknown |
 | Shared Conductor check | blocked by unavailable tool/configuration | CLI exits 127; shared workflow/state unavailable; no reservation claimed |
 | Repository `cargo test --release --lib --locked` | passed on refreshed code and unchanged registry | 4,479 passed, 119 existing ignores; earlier 4,474 receipt and prior failures retained in `validation/` |
@@ -28,6 +28,10 @@
 | Auxiliary-point/nondegeneracy census | independently verified finite coverage | 942 models, 274 shared-prime and 649 nonshared-prime cases; 4,616 auxiliary points, 3,312 nonzero targets; degenerate/undefined/wrong-subgroup and corruption controls retained |
 | Pairing continuation report, graph and PDF | supplied | `reports/pairing-20261024T0442Z/`; seven-module gate, full native replay, 22 backend and four metadata tests in `validation/pairing-20261024T0442Z/` |
 | Uniform geometric pairing reduction / practical advantage | still open / not measured | finite table does not establish general Weil correctness/nondegeneracy; no matched-cost or external-fastest comparison admitted |
+| User-requested twist/main relation-yield theorem | verified in stated domains | matched factor bases preserve the exact coefficient set and rank under actual psi; uniform whole-group raw rate1/N and twist/main ratio N/Nt; these are different comparisons |
+| Potential benefit from higher useful yield/lower degree | conditional theorem verified | explicit useful yield and dense binomial-degree work model, exact overhead threshold; no actual twist regularity bound or speedup claimed |
+| Raw-yield/nonzero-row control | kernel-checked | F5 points of orders9 and3, one versus three zeros over nine coefficients, zero nonzero twist rows modulo3; synthetic budget gain/reversal examples are separate |
+| Yield continuation report and proof/identity replay | supplied | `reports/yield-20261024/`, `validation/yield-20261024/`; all four PDF pages inspected |
 
 The fresh library suite after the current-main refresh passes 4,479 tests with
 119 existing ignores. The new isolated native auditor's backend suite passes
