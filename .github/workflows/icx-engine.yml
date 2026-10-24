@@ -83,6 +83,13 @@ jobs:
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
             /gpu/fes/
             /docs/ic/nist-parameter-reference.json
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/ic gpu tools
       - name: Materialize compile-time fixture inputs
         run: node .github/scripts/ci-scope.mjs --materialize
       - uses: dtolnay/rust-toolchain@stable
@@ -158,6 +165,13 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /gpu/fes/
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/ic gpu tools
       - name: Install nvcc (compiler + CUDA headers only)
         run: |
           distro="ubuntu$(lsb_release -rs | tr -d .)"

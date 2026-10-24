@@ -42,6 +42,12 @@ jobs:
           --health-retries 10
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/f4_linear_algebra_20260914 research/weil_factor_composition_20260914
       - uses: dtolnay/rust-toolchain@1.90.0
       - run: cargo check --no-default-features --lib --bin ic
       - run: cargo test --release --features redis-cache --lib polynomial_reuse

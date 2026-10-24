@@ -19,6 +19,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: 9abf6afe8bc52ad4f136a19ff1603d60c344f30d
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research
 
       - name: Verify frozen source, point and arm order
         shell: bash

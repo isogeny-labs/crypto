@@ -57,6 +57,13 @@ jobs:
             /research/notes/ecc2k130/base_window_screen_20261001/development/*
             /research/notes/ecc2k130/disjoint_cold_v2_outcome_20261001/evidence_run_36803331080/raw/n41_L1024.tar.gz
             /research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/base_window_screen_20261001
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'

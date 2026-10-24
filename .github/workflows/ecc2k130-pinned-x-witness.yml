@@ -26,6 +26,13 @@ jobs:
             research/notes/ecc2k130/compact_orbit_rank_evidence_20260929/verify_rank.py
             research/notes/ecc2k130/compact_orbit_point_panel_20260929/verify_panel.py
             research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130 research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924
       - name: Replay archived witness and tamper checks
         run: |
           python3 -m py_compile research/notes/ecc2k130/pinned_x_witness_20260930/*.py

@@ -89,6 +89,13 @@ jobs:
             tools/curve_identity.py
             tools/isolated_bench.py
             .github/workflows/compact-orbit-n61-single-target-isolated.yml
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs experiments/koblitz-single-target-n61-20260925 experiments/koblitz-single-target-n71-20261002 experiments/koblitz-single-target-n73-20261003 experiments/koblitz-single-target-n83-20261006 isogeny_algos research tools
       - uses: Swatinem/rust-cache@v2
       - name: Harness tests and single-target guards
         run: |
@@ -141,6 +148,13 @@ jobs:
             tools/curve_identity.py
             tools/isolated_bench.py
             .github/workflows/compact-orbit-n61-single-target-isolated.yml
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs experiments/koblitz-single-target-n61-20260925 experiments/koblitz-single-target-n71-20261002 experiments/koblitz-single-target-n73-20261003 experiments/koblitz-single-target-n83-20261006 isogeny_algos research tools
       - uses: Swatinem/rust-cache@v2
       - run: cargo build --release --locked --example koblitz_orbit_dlp_fast_online --example koblitz_rho_batch_ks_strong_online --example koblitz_orbit_dlp_fast --example koblitz_rho_batch_ks_strong
       - name: Run the single-target panel through the autolab on a reserved core

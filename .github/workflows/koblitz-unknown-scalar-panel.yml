@@ -49,6 +49,12 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/sat_factor_base_review_20260908/continuation-05-sota-gates research/weil_factor_composition_20260914
       - uses: dtolnay/rust-toolchain@stable
       # Current-code validation uses the PR checkout's own Cargo.lock. The
       # Stage-23 historical producer is checked independently from its sealed

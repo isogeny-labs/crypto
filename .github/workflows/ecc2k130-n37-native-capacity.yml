@@ -27,6 +27,13 @@ jobs:
             research/notes/ecc2k130/disjoint_cold_v2_20261001
             research/koblitz_isogeny_descent_37_results_20260925
             research/koblitz_isogeny_descent_37_20260925
+            tools/artifacts
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research
       - name: Recompute closed form and independent dynamic-programming count
         run: |
           python3 research/notes/ecc2k130/n37_native_column_capacity_20261001/bound.py \

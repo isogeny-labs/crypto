@@ -38,6 +38,13 @@ jobs:
           sparse-checkout: |
             /isogeny_algos/
             /research/p192_p224_large_degree_isogenies_20261008/PROTOCOL.md
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 isogeny_algos research/p192_p224_large_degree_isogenies_20261008
       - uses: dtolnay/rust-toolchain@1.98
         with:
           components: rustfmt, clippy

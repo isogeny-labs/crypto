@@ -16,6 +16,12 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/ic research/sat_factor_base_review_20260908/continuation-05-sota-gates
       - name: Replay Stage 133 historical audit and Stage 134 current audit
         run: |
           python3 -m py_compile scripts/compose_koblitz_stage133_gate_audit.py scripts/compose_koblitz_stage134_gate_audit.py

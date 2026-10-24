@@ -45,6 +45,12 @@ jobs:
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 360 }}
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves/sources isogeny_algos research/f4_f5_history_20261012/reports/run-20261012T0009Z research/isogeny_fibers_20261010/round4/16_7_agm_isogeny_oracles tools
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'

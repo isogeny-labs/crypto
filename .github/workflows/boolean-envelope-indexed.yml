@@ -22,6 +22,12 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/boolean_envelope_indexed_20261002 tools
       - uses: dtolnay/rust-toolchain@stable
       - name: Frozen math and compatibility controls
         run: |
@@ -37,6 +43,12 @@ jobs:
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/boolean_envelope_indexed_20261002 tools
       - uses: dtolnay/rust-toolchain@stable
       - name: Native frozen discovery and resource replay
         run: bash research/boolean_envelope_indexed_20261002/run.sh discovery research/boolean_envelope_indexed_20261002/ci_discovery_${{ github.run_id }}_${{ github.run_attempt }}
@@ -58,6 +70,12 @@ jobs:
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/boolean_envelope_indexed_20261002 tools
       - uses: dtolnay/rust-toolchain@stable
       - name: Native fresh holdouts bound to qualified discovery
         run: bash research/boolean_envelope_indexed_20261002/run.sh full research/boolean_envelope_indexed_20261002/ci_full_${{ github.run_id }}_${{ github.run_attempt }} research/boolean_envelope_indexed_20261002/qualified_discovery_01

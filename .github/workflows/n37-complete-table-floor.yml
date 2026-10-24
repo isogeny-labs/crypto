@@ -59,6 +59,13 @@ jobs:
             research/notes/ecc2k130/n37_four_policy_support_20261003/SOURCE42.jsonl
             research/notes/ecc2k130/n37_four_policy_support_20261003/RESULT.json.gz
             research/notes/ecc2k130/n37_complete_table_floor_20261003
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs isogeny_algos research tools
       - uses: Swatinem/rust-cache@v2
       # Builds against the root Cargo.lock: the 2026-10-02 frozen lockfile this
       # replay used to copy in predates the volcano-cli path dependency, so

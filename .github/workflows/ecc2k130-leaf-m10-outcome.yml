@@ -33,6 +33,13 @@ jobs:
             research/ecc2k130_relations/relations.py
             .github/workflows/ecc2k130-leaf-m10-support.yml
             .github/workflows/ecc2k130-leaf-m10-outcome.yml
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research
       - name: Verify every archived byte and source receipt
         run: |
           python3 research/notes/ecc2k130/leaf_m10_support_outcome_20260930/verify_archive.py

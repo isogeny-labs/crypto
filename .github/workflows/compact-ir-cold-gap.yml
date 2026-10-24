@@ -45,6 +45,13 @@ jobs:
             research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
             tools/isolated_bench.py
             .github/workflows/compact-s3-prefilter.yml
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs isogeny_algos research/notes/ecc2k130 research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924 tools
       - uses: Swatinem/rust-cache@v2
       - name: Check frozen cells and Python syntax
         run: |
@@ -127,6 +134,13 @@ jobs:
             research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
             tools/isolated_bench.py
             .github/workflows/compact-s3-prefilter.yml
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs isogeny_algos research/notes/ecc2k130 research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924 tools
       - uses: Swatinem/rust-cache@v2
       - name: Materialize and build the exact frozen source
         run: |

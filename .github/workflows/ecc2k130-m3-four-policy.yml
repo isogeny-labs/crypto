@@ -25,6 +25,13 @@ jobs:
             research/ecc2k130_relations
             research/ecc2k130_oriented_transport_20260924
             .github/workflows/ecc2k130-m3-four-policy.yml
+            tools/artifacts
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'

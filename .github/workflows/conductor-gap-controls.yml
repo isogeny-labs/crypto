@@ -40,6 +40,13 @@ jobs:
             /research/conductor_gap_followups_20261016/
             /scripts/build_lab_browser.py
             /scripts/test_lab_browser_cost_admission.py
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/conductor_gap_cm_orbits_20261015 research/conductor_gap_followups_20261016
       - name: Materialize compile-time inputs without research archives
         run: node .github/scripts/ci-scope.mjs --materialize
       - uses: dtolnay/rust-toolchain@master
@@ -141,6 +148,12 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: /research/conductor_gap_cm_orbits_20261015/lean/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/conductor_gap_cm_orbits_20261015 research/conductor_gap_followups_20261016
       - name: Install hash-pinned Lean 4.34.1
         shell: bash
         run: |

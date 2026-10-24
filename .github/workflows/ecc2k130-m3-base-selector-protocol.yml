@@ -21,7 +21,14 @@ jobs:
             research/notes/ecc2k130/m3_base_selector_20260930
             research/notes/ecc2k130/m3_four_policy_20260930/CONFIG.json
             research/notes/ecc2k130/m3_four_policy_20260930/evidence_run_36722040881/result.json
+            /tools/artifacts/
           sparse-checkout-cone-mode: false
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130
       - name: Check frozen pre-outcome contract
         run: |
           python3 -m py_compile research/notes/ecc2k130/m3_base_selector_20260930/check_protocol.py

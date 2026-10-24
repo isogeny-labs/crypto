@@ -36,6 +36,13 @@ jobs:
           sparse-checkout: |
             research/sea_point_count_20261016/formal
             research/sea_point_count_20261016/lean
+            tools/artifacts
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 isogeny_algos research/sea_point_count_20261016
       - uses: actions/setup-java@v4
         with:
           distribution: temurin

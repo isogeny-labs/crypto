@@ -71,6 +71,13 @@ jobs:
             /docs/curves/registry.json
             /docs/curves/jacobian-transfers.json
             /docs/curves/JACOBIAN_TRANSFERS.md
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves
       - name: Materialize compile-time fixture inputs
         run: node .github/scripts/ci-scope.mjs --materialize
       - uses: dtolnay/rust-toolchain@master

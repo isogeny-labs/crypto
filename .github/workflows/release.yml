@@ -85,6 +85,13 @@ jobs:
             /benches/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecdlp-audit ecc2k130 gpu isogeny_algos research/p192_p224_large_degree_isogenies_20261009 tools
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -104,6 +111,12 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: /Cargo.toml
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecdlp-audit ecc2k130 gpu isogeny_algos research/p192_p224_large_degree_isogenies_20261009 tools
       - id: v
         run: |
           version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
@@ -167,6 +180,14 @@ jobs:
             /docs/ecdlp-audit/
             /README.md
             /LICENSE*
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecdlp-audit ecc2k130 gpu isogeny_algos research/p192_p224_large_degree_isogenies_20261009 tools
       - name: Materialize compile-time inputs without research archives
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         run: node .github/scripts/ci-scope.mjs --materialize
@@ -335,6 +356,13 @@ jobs:
         run: git config --global core.longpaths true
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecdlp-audit ecc2k130 gpu isogeny_algos research/p192_p224_large_degree_isogenies_20261009 tools
       - uses: dtolnay/rust-toolchain@1.93.1
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         with:
@@ -446,6 +474,14 @@ jobs:
             /isogeny_algos/
             /LICENSE
             /LICENSE.md
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecdlp-audit ecc2k130 gpu isogeny_algos research/p192_p224_large_degree_isogenies_20261009 tools
       # the crate's own CI toolchain (isogeny-algos.yml); it uses slice APIs newer than 1.93
       - uses: dtolnay/rust-toolchain@1.98
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
@@ -537,6 +573,13 @@ jobs:
           exit 1
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
         uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecdlp-audit ecc2k130 gpu isogeny_algos research/p192_p224_large_degree_isogenies_20261009 tools
       - name: Build the ECC2K-130 CPU client
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
         run: make -C ecc2k130 cpu MARCH="$ECC_MARCH"
@@ -609,6 +652,14 @@ jobs:
             /gpu/semaev/
             /gpu/macaulay/
             /gpu/btcpuzzle/
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_cuda != 'false'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecdlp-audit ecc2k130 gpu isogeny_algos research/p192_p224_large_degree_isogenies_20261009 tools
       - name: Install nvcc
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_cuda != 'false'
         # Compiler and CUDA headers only, not the full toolkit: ~330 MB
@@ -653,6 +704,12 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecdlp-audit ecc2k130 gpu isogeny_algos research/p192_p224_large_degree_isogenies_20261009 tools
       - name: Test binary asset publication
         run: |
           bash -n .github/scripts/publish_release_assets.sh .github/scripts/test_publish_release_assets.sh
@@ -671,6 +728,12 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecdlp-audit ecc2k130 gpu isogeny_algos research/p192_p224_large_degree_isogenies_20261009 tools
       - uses: actions/download-artifact@v4
         with:
           path: staging

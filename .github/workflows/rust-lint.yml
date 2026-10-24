@@ -68,6 +68,13 @@ jobs:
             /benches/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -109,6 +116,13 @@ jobs:
             /examples/
             /benches/
             /cd_attack/
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
@@ -203,6 +217,14 @@ jobs:
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
             /cd_attack/
             /scripts/clippy-maintained.sh
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        if: needs.scope.outputs[matrix.scope] != 'false'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research
       - name: Materialize compile-time inputs without research archives
         if: needs.scope.outputs[matrix.scope] != 'false'
         run: node .github/scripts/ci-scope.mjs --materialize

@@ -59,6 +59,13 @@ jobs:
             /research/pkm_tower_round5_20260926/
             /research/pkm_tower_round6_20260930/
             /research/pkm_tower_round7_20261006/
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research
       - name: Materialize compile-time fixture inputs
         run: node .github/scripts/ci-scope.mjs --materialize
       - uses: dtolnay/rust-toolchain@stable
@@ -124,6 +131,13 @@ jobs:
             /benches/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research
       - name: Materialize compile-time fixture inputs
         run: node .github/scripts/ci-scope.mjs --materialize
       - uses: dtolnay/rust-toolchain@stable

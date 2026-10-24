@@ -18,6 +18,12 @@ jobs:
         working-directory: research/weak_curve_properties_lean_20261011
     steps:
       - uses: actions/checkout@v4
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/weak_curve_properties_20261010 research/weak_curve_properties_lean_20261011
       - uses: dtolnay/rust-toolchain@stable
       - name: Verify source and evidence pins
         run: |

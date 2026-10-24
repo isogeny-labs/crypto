@@ -70,6 +70,13 @@ jobs:
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
             /research/ic_tree_split_structured_v_20261011/
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research/ic_tree_split_structured_v_20261011
       - name: Materialize compile-time fixture inputs
         working-directory: ${{ github.workspace }}
         run: node .github/scripts/ci-scope.mjs --materialize

@@ -31,6 +31,13 @@ jobs:
             research/notes/ecc2k130/point_sum_cold_20260930
             research/notes/ecc2k130/point_sum_cold_outcome_20260930
             research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs research/notes/ecc2k130 research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924
       - name: Independently rehash the raw run and second-host receipts
         run: |
           python3 -m py_compile research/notes/ecc2k130/point_sum_cold_outcome_20260930/*.py

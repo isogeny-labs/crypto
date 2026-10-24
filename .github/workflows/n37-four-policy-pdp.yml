@@ -63,6 +63,13 @@ jobs:
             research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json
             research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz
             research/notes/ecc2k130/n37_four_policy_pdp_20261003
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs isogeny_algos research tools
       # Check the byte-matching historical source snapshot separately from
       # current-code checks, which use the PR checkout's own lock.
       - uses: actions/checkout@v4

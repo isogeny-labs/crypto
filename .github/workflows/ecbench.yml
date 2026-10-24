@@ -87,6 +87,13 @@ jobs:
             /benches/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs research
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -133,6 +140,13 @@ jobs:
             /research/ghs_curve_comparison_20261009/
             /research/notes/ecc2k130/cold_compact_orbit_ic_20261003/
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs research
       # Sessions are found by schema, wherever they live: check out every
       # directory holding a session.json (tree only, no blobs needed to
       # list them), then keep those whose session.json is an ecbench
@@ -454,6 +468,13 @@ jobs:
             /research/ghs_curve_comparison_20261009/
             /research/notes/ecc2k130/cold_compact_orbit_ic_20261003/
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 docs research
       - name: Check out and list every committed ecbench session
         run: |
           list="$RUNNER_TEMP/ecbench-sessions.txt"

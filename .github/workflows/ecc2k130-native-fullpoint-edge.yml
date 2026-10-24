@@ -34,6 +34,13 @@ jobs:
             research/ecc2k130_factor_base_replication_20260925/exact_replay.json
             research/ecc2k130_relations/relations.py
             research/ecc2k130_relations/fastfield.py
+            /tools/artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: python3 tools/artifacts/artifacts.py pull --jobs 16 research
       - name: Validate frozen source and input hashes
         run: python3 research/notes/ecc2k130/native_fullpoint_edge_20260929/ci_replay.py
       - name: Independently replay the archived exact rows
