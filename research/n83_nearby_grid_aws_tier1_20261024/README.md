@@ -79,3 +79,10 @@ python3 -m research.n83_nearby_grid_aws_tier1_20261024.verify \
 The result remains a screen of 19 contiguous signed-Frobenius orbit bases.
 Fresh 16-point confirmation and a wider factor-base family comparison are
 separate acceptance steps.
+
+The first allocation request on 2026-10-24 passed source, placement and
+price preflight, and staged the immutable 3.08 GB bundle. EC2 rejected
+`RunInstances` with `Client.MaxSpotInstanceCountExceeded`; CloudTrail and S3
+receipts are indexed in `admission_20261024.json`. No instance was created
+and the candidate measurements remain `BOUNDED_UNKNOWN`. The separate hosted
+runner continues under its own commit and artifact trail.
