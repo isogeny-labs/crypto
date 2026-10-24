@@ -74,6 +74,18 @@ independent exhaustive census of all nonsingular models.
 Use a working copy when auditing a byte-frozen snapshot; check its file hash
 before that update.
 
+The `crypto isogeny class` wrapper accepts checked `store:NAME` or
+`sha256:DIGEST` references for `plan/build --curve` and the read-only
+`status/vertex/solve --input` commands. It downloads on demand, verifies the
+cached bytes, and adds `input_artifact` with the original reference, SHA-256,
+and byte count to the JSON report. The standalone `isogeny-class` binary
+accepts local paths. `resume` and `verify` update the SQLite input; for an
+indexed graph, first use `crypto store pull store:NAME --out graph.sqlite`,
+then pass that writable copy through `--input graph.sqlite`.
+The live Setec upload, remote byte check, empty-cache reads, DLP verification,
+and exact-object cleanup are recorded in
+[`ISOGENY_CLASS_STORE_S3_ACCEPTANCE_20261023.json`](../../docs/store/ISOGENY_CLASS_STORE_S3_ACCEPTANCE_20261023.json).
+
 SQLite is the lossless graph export: `nodes(id,a,b,j,expanded,conductor)` and
 `edges(source,ell,kernel,target,u)`, with the full plan and replay receipt in
 `metadata`. `kernel` lists ascending coefficients. Reconstruct the normalized

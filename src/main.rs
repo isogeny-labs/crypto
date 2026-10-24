@@ -1526,6 +1526,76 @@ fn parse_ell_list(s: &str) -> Vec<u64> {
         .collect()
 }
 
+fn resolve_isogeny_class_store_input(
+    args: &[String],
+) -> Result<(Vec<String>, Option<serde_json::Value>), String> {
+    let command = args.first().map(String::as_str).unwrap_or("");
+    let flag = match command {
+        "plan" | "build" => "--curve",
+        "resume" | "status" | "verify" | "solve" | "vertex" => "--input",
+        _ => return Ok((args.to_vec(), None)),
+    };
+    let Some(position) = args.iter().position(|arg| arg == flag) else {
+        return Ok((args.to_vec(), None));
+    };
+    let Some(reference) = args.get(position + 1) else {
+        return Ok((args.to_vec(), None));
+    };
+    if !crypto_lib::store::is_store_ref(reference) {
+        return Ok((args.to_vec(), None));
+    }
+    if matches!(command, "resume" | "verify") {
+        return Err(format!(
+            "isogeny class {command} updates its SQLite input; pull {reference} \
+             with `crypto store pull {reference} --out graph.sqlite` and use \
+             --input graph.sqlite"
+        ));
+    }
+    let store = crypto_lib::store::Store::open_default()?;
+    let resolved = store.ensure(reference)?;
+    let local = resolved
+        .path
+        .to_str()
+        .ok_or("resolved store path is not UTF-8")?
+        .to_string();
+    if resolved.fetched {
+        eprintln!(
+            "store: fetched {} ({} bytes, sha256 {})",
+            reference,
+            resolved.bytes,
+            &resolved.sha256[..16]
+        );
+    }
+    let mut mapped = args.to_vec();
+    mapped[position + 1] = local;
+    Ok((
+        mapped,
+        Some(serde_json::json!({
+            "reference": reference,
+            "sha256": resolved.sha256,
+            "bytes": resolved.bytes,
+        })),
+    ))
+}
+
+#[cfg(test)]
+mod isogeny_class_store_input_tests {
+    use super::resolve_isogeny_class_store_input;
+
+    #[test]
+    fn mutable_graph_commands_require_a_writable_copy() {
+        for command in ["resume", "verify"] {
+            let args = vec![
+                command.to_string(),
+                "--input".to_string(),
+                "store:graphs/public.sqlite".to_string(),
+            ];
+            let error = resolve_isogeny_class_store_input(&args).unwrap_err();
+            assert!(error.contains("crypto store pull"), "{error}");
+        }
+    }
+}
+
 fn cmd_isogeny(op: IsogenyOp) {
     use crypto_lib::isogeny::{
         class_group::{class_above_prime, class_number, enumerate_reduced_forms, ClassGroup},
@@ -1542,8 +1612,17 @@ fn cmd_isogeny(op: IsogenyOp) {
 
     match op {
         IsogenyOp::Class { args } => {
-            let (value, code) = match volcano_cli::run(&args) {
-                Ok(result) => result,
+            let (value, code) = match resolve_isogeny_class_store_input(&args) {
+                Ok((resolved_args, input_artifact)) => {
+                    let (mut value, code) = match volcano_cli::run(&resolved_args) {
+                        Ok(result) => result,
+                        Err(error) => (serde_json::json!({"status":"ERROR","error":error}), 2),
+                    };
+                    if let Some(input_artifact) = input_artifact {
+                        value["input_artifact"] = input_artifact;
+                    }
+                    (value, code)
+                }
                 Err(error) => (serde_json::json!({"status":"ERROR","error":error}), 2),
             };
             println!("{}", serde_json::to_string_pretty(&value).unwrap());
