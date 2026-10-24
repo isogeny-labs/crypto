@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
-# Regenerate every seed bound record and the frontier page from the committed
-# sessions.  Thin orchestration only (AGENTS.md): every figure is computed by
+# Regenerate every seed bound record (fit version 1 as published, and its
+# fit-version-2 twin) and the frontier page
+# (procedure 2) from the committed sessions.  Thin orchestration only
+# (AGENTS.md): every figure is computed by
 # `ecbench`.  Run from the repository root after `cargo build --release --bin
 # ecbench`.  Records are content-addressed, so an unchanged session yields an
 # unchanged file; a changed one yields a new id, which `git status` shows.
@@ -13,9 +15,17 @@ mkdir -p "$R"
 # fit TOPIC SESSION ARM RECEIPT OUT [TIER]: one arm of research/TOPIC/sessions/SESSION
 # into $R/OUT.json, citing the receipt research/TOPIC/RECEIPT.  TIER keeps one
 # tier of a session whose sizes span two; a mixed fit is refused.
+#
+# Every published record stays byte for byte what it was: OUT.json is the
+# fit-version-1 record (re-derived here and by `bound check`, cited by its id
+# in challenges, leaderboards and research notes), and its version-2 twin,
+# the one the frontier ranks, is written beside it as OUT-v2.json
+# (README §3a).
 fit() {
   "$E" bound fit --dir "research/$1/sessions/$2" --arm "$3" --audit "research/$1/$4" \
-    ${6:+--tier "$6"} --root . --out "$R/$5.json" 2>&1 | grep -v '^wrote' || true
+    --fit-version 1 ${6:+--tier "$6"} --root . --out "$R/$5.json" 2>&1 | grep -v '^wrote' || true
+  "$E" bound fit --dir "research/$1/sessions/$2" --arm "$3" --audit "research/$1/$4" \
+    ${6:+--tier "$6"} --root . --out "$R/$5-v2.json" 2>&1 | grep -v '^wrote' || true
 }
 
 # Every candidate (research/ecbench_all_candidates_20261003): four sizes per
@@ -50,16 +60,32 @@ for arm in rho-strong claw-c1 claw-pr bsgs-neg; do
   fit "$P" koblitz "$arm" audit-koblitz.json "pair-claw-koblitz-$arm"
 done
 
+# Challenge sessions (research/ecbench_bounds_challenges_20261006), fitted as
+# ordinary version-2 bounds, one per arm that is not the A/A control, so the
+# measured entries stand on the frontier on their own evidence.
+K=ecbench_bounds_challenges_20261006
+for arm in incumbent candidate; do
+  "$E" bound fit --dir "research/$K/sessions/prime-toy-reference-e1" --arm "$arm" \
+    --audit "research/$K/audit-prime-toy-reference-e1.json" --root . \
+    --out "$R/session-prime-toy-reference-e1-$arm-v2.json" 2>&1 | grep -v '^wrote' || true
+  "$E" bound fit --dir "research/$K/sessions/koblitz-toy-reference-e1" --arm "$arm" \
+    --audit "research/$K/audit-koblitz-toy-reference-e1.json" --root . \
+    --out "$R/session-koblitz-toy-reference-e1-$arm-v2.json" 2>&1 | grep -v '^wrote' || true
+done
+
 # Challenge verdicts (research/ecbench_bounds_challenges_20261006): the two
-# epoch-1 sessions judged again, every run replayed.  A verdict is
+# epoch-1 sessions judged again, every run replayed, under verdict procedure 1
+# (the procedure they were written under: the epoch is chosen, there is no
+# commitment, and the records they wrote are fit version 1).  A verdict is
 # re-derivable, so the verdict file and the bound it wrote come back byte for
 # byte (the command reports on stderr); the committed audit receipts carry a
-# timestamp and are left alone.
+# timestamp and are left alone.  A new verdict is procedure 2
+# (`--commitment`/`--beacon`, README §6).
 # An inadmissible verdict stops the script (`--exit-code` under `set -e`).
 B=research/ecbench_bounds_challenges_20261006
 verdict() { # challenge session epoch bound
   "$E" challenge verdict --challenge "docs/bounds/challenges/$1.json" --dir "$B/sessions/$2" \
-    --epoch "$3" --replay-all --bounds "$R" --root . --out "$B/verdict-$2.json" \
+    --procedure 1 --epoch "$3" --replay-all --bounds "$R" --root . --out "$B/verdict-$2.json" \
     --bound-out "$R/$4.json" --exit-code
 }
 verdict prime-toy-reference prime-toy-reference-e1 1 challenge-prime-toy-reference-e1-bsgs-negation

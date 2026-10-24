@@ -93,6 +93,82 @@ jobs:
           CI_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
         run: node .github/scripts/ci-scope.mjs
 
+  factor-base-sweep:
+    name: factor-base sweep CLI
+    needs: scope
+    if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CARGO_BUILD_JOBS: 2
+      RAYON_NUM_THREADS: 2
+    steps:
+      - name: Require successful scope classification
+        if: needs.scope.result != 'success'
+        run: |
+          echo '::error::CI scope classification failed; refusing to skip CLI validation.'
+          exit 1
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /Cargo.toml
+            /Cargo.lock
+            /.cargo/
+            /.github/scripts/
+            /rust-toolchain*
+            /rustfmt.toml
+            /clippy.toml
+            /src/
+            /tests/
+            /examples/
+            /benches/
+            /tools/volcano-cli/
+            /isogeny_algos/
+            /docs/
+            /research/factor_base_shape_leads_20261018/
+            /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
+            /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+      - name: Materialize native fixture inputs
+        run: node .github/scripts/ci-scope.mjs --materialize
+      - uses: dtolnay/rust-toolchain@1.98
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ecbench
+      - name: Native shape, polynomial and progress comparison unit tests
+        run: cargo test --locked --release --bin factor-base-sweep
+      - name: Actual CLI witnesses, caps, interruption, resume and corruption
+        run: cargo test --locked --release --test factor_base_sweep_cli -- --test-threads=1
+      - name: Independent native shape audit tests and strict lint
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/target
+        run: |
+          cargo test --locked --release --manifest-path research/factor_base_shape_leads_20261018/analysis/Cargo.toml
+          cargo clippy --locked --all-targets --manifest-path research/factor_base_shape_leads_20261018/analysis/Cargo.toml -- -D warnings
+          cargo build --locked --release --manifest-path research/factor_base_shape_leads_20261018/analysis/Cargo.toml
+      - name: Recheck sealed shape evidence and independent exact coverage
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/target
+        run: |
+          study=research/factor_base_shape_leads_20261018
+          replay="$RUNNER_TEMP/factor-base-shape-evidence"
+          mkdir -p "$replay"
+          (cd "$study" && sha256sum -c runs.tar.xz.sha256)
+          tar -xJf "$study/runs.tar.xz" -C "$replay"
+          (cd "$replay" && sha256sum -c "$GITHUB_WORKSPACE/$study/RUNS_SHA256SUMS")
+          for panel in primary secondary confirmation representation subgroup-guard; do
+            "$CARGO_TARGET_DIR/release/factor-base-sweep" verify --run "$replay/runs/$panel"
+          done
+          "$CARGO_TARGET_DIR/release/factor-base-lead-audit" "$replay/runs" primary secondary confirmation representation > "$replay/observations.json"
+          cmp "$study/observations.json" "$replay/observations.json"
+          "$CARGO_TARGET_DIR/release/factor-base-lead-audit" --coverage "$replay/runs" docs/curves/registry.json primary secondary confirmation representation > "$replay/coverage.json"
+          cmp "$study/exact-coverage.json" "$replay/coverage.json"
+          "$CARGO_TARGET_DIR/release/factor-base-lead-audit" --coverage "$replay/runs" docs/curves/registry.json subgroup-guard > "$replay/guard-coverage.json"
+          cmp "$replay/runs/guard-coverage.json" "$replay/guard-coverage.json"
+
   harness:
     if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
     needs: scope
@@ -352,8 +428,11 @@ jobs:
       - name: Pinned session as root
         run: |
           sudo git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          # Hosted cpusets may expose only part of each physical core. This
+          # root smoke inherits the runner affinity and records L0 isolation; the
+          # 72 measured children are checked separately below.
           sudo ./target/release/ecbench run --spec docs/ecbench/specs/smoke-prime.json \
-            --out "$RUNNER_TEMP/prime" --allow-busy --settle 1 --quiet
+            --out "$RUNNER_TEMP/prime" --cpus inherit --allow-busy --settle 1 --quiet
           sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/prime"
       - name: Pinning took effect in every measured child
         run: |
@@ -471,7 +550,10 @@ jobs:
           name: ecbench-pr-audit-bin
           path: target/release
       - name: Validate committed evidence integrity on pull requests
-        timeout-minutes: 12
+        # The job keeps its 25-minute PR budget (check-pr-budgets.py). The 113
+        # gzipped isogeny-volcano-cost-v2 sessions alone take about 8 minutes
+        # to audit on 4 cores (decompress + verify --replay 0), so 12 is too short.
+        timeout-minutes: 22
         run: |
           chmod +x target/release/ecbench
           bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
