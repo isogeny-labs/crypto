@@ -326,3 +326,23 @@ and carry no new value from this review.
   `report.pdf`.
 - `figures/plot.py`, `figures/ecc2k130_degree_rows.{svg,png}`,
   `figures/memory_wall.{svg,png}`.
+
+## Correction 2026-10-24: the +10.32 bits row is a w = 1 floor
+
+The `m = 4`, degree-5 row quoted above as `2^71.13`, `+10.32` bits over rho is priced at `w = 1`
+(one touch per Macaulay column), which `RESEARCH_ECC2K130_DESCENT_DEGREE.md` §2 itself describes as
+a price "no elimination beats". It is a **lower bound**, not the optimistic case. The same note
+already prints the `w = 2` row in §7/§8: `2^106.52`, `+45.71` bits. The measured exponent of the
+repository's own dense closure is 2.18 to 2.33 (`research/dreg_closure_driver_20261016/RESULTS.md`),
+and the recomputation in `research/m4_reprice_20261024/` (README.md, `table.md`, `examples/m4_reprice.rs`;
+the existing rows reproduce exactly as a positive control) gives for `m = 4`, degree 5:
+
+- **measured-exponent optimistic case, w = 2.25: `2^115.58`, `+54.77` bits** in the note's column-touch
+  units, and `2^107.14`, `+46.33` bits in rho steps (word-op to rho-step conversion of
+  `-8.44` bits from `research/k_conversion_20261018/raw.jsonl`);
+- bracket for w from 2.0 to 2.33: `+45.7` to `+57.7` (column touches), `+37.3` to `+49.2` (rho steps).
+
+The `K` of `k_conversion_20261018/README.md` (Ir per column) is not stacked on `cols^w`: it already contains
+the super-linear elimination cost. w at 2^36 columns is extrapolated from matrices of 2^12 to 2^14
+columns and is the dominant uncertainty. The degree cell (5 held to N near 394) remains unmeasured. The original text above is
+left unchanged.
