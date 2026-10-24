@@ -83,12 +83,21 @@ figure stays visible as the "was".
 | `store info <spec>` | one entry in full |
 | `store push <file> --name N` | upload (skipped if the remote already holds the bytes), cache, index |
 | `store pull <spec> [--out P]` | make available locally, print the path |
-| `store verify [names] [--remote] [--download]` | re-hash cached objects; `--remote` checks existence, size, and digest metadata through S3 HEAD; `--download` also downloads and hashes the remote bytes in a temporary file |
+| `store verify [names] [--remote] [--download] [--json]` | re-hash cached objects; `--remote` checks existence, size, and digest metadata through S3 HEAD; `--download` also downloads and hashes the remote bytes in a temporary file. `--json` returns one report with per-entry cache and remote statuses, including failures. |
 | `store gc [--apply]` | drop cached objects the index no longer names (dry run by default) |
 | `store rm <name>` | remove a name from the index |
 
 A `<spec>` is a name, `store:NAME`, or `sha256:DIGEST` (a full digest, or a
 prefix of 8 or more digits that the index resolves).
+
+For automation, `crypto store verify NAME --remote --download --json` prints
+one JSON object with `status`, `checked`, `problems`, `remote_checked`,
+`download_checked`, and an `entries` array. Each entry has `name`, `sha256`,
+`bytes`, `cache.status`, and `remote.status`; a failed check includes a
+`detail` on the affected state, prints the report, and exits nonzero.
+`remote.status: "bytes_ok"` means the downloaded bytes matched the index;
+`"ok"` means the remote HEAD metadata matched. A missing local cache is
+reported as `cache.status: "missing"` and does not itself fail a remote check.
 
 The remote is **never deleted from**: `rm` edits the index, `gc` prunes the
 local cache. Deleting remote objects is a decision for the bucket's owner.

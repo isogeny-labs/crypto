@@ -254,35 +254,77 @@ pub fn run(args: &StoreArgs) -> Result<(), String> {
             } else {
                 store.verify(names, *remote)?
             };
-            let mut bad = 0;
-            for r in &rows {
-                let cache = match &r.cache {
-                    CacheState::Ok => "cache ok".to_string(),
-                    CacheState::Missing => "not cached".to_string(),
-                    CacheState::Corrupt(why) => {
-                        bad += 1;
-                        format!("CACHE CORRUPT: {why}")
-                    }
-                };
-                let remote = match &r.remote {
-                    None => String::new(),
-                    Some(RemoteState::Ok) => ", remote ok".to_string(),
-                    Some(RemoteState::BytesOk) => ", remote bytes ok".to_string(),
-                    Some(RemoteState::Absent) => {
-                        bad += 1;
-                        ", REMOTE ABSENT".to_string()
-                    }
-                    Some(RemoteState::Mismatch(why)) => {
-                        bad += 1;
-                        format!(", REMOTE MISMATCH: {why}")
-                    }
-                };
-                println!("{}: {cache}{remote}", r.name);
+            let bad = rows
+                .iter()
+                .map(|r| {
+                    usize::from(matches!(&r.cache, CacheState::Corrupt(_)))
+                        + usize::from(matches!(
+                            &r.remote,
+                            Some(RemoteState::Absent | RemoteState::Mismatch(_))
+                        ))
+                })
+                .sum::<usize>();
+            if args.json {
+                let entries: Vec<_> = rows
+                    .iter()
+                    .map(|r| {
+                        let cache = match &r.cache {
+                            CacheState::Ok => json!({"status": "ok"}),
+                            CacheState::Missing => json!({"status": "missing"}),
+                            CacheState::Corrupt(why) => {
+                                json!({"status": "corrupt", "detail": why})
+                            }
+                        };
+                        let remote = match &r.remote {
+                            None => serde_json::Value::Null,
+                            Some(RemoteState::Ok) => json!({"status": "ok"}),
+                            Some(RemoteState::BytesOk) => json!({"status": "bytes_ok"}),
+                            Some(RemoteState::Absent) => json!({"status": "absent"}),
+                            Some(RemoteState::Mismatch(why)) => {
+                                json!({"status": "mismatch", "detail": why})
+                            }
+                        };
+                        json!({"name": r.name, "sha256": r.sha256, "bytes": r.bytes,
+                               "cache": cache, "remote": remote})
+                    })
+                    .collect();
+                println!(
+                    "{}",
+                    serde_json::to_string_pretty(&json!({
+                        "status": if bad == 0 { "ok" } else { "error" },
+                        "checked": rows.len(),
+                        "problems": bad,
+                        "remote_checked": *remote || *download,
+                        "download_checked": *download,
+                        "entries": entries,
+                    }))
+                    .map_err(|e| e.to_string())?
+                );
+            } else {
+                for r in &rows {
+                    let cache = match &r.cache {
+                        CacheState::Ok => "cache ok".to_string(),
+                        CacheState::Missing => "not cached".to_string(),
+                        CacheState::Corrupt(why) => format!("CACHE CORRUPT: {why}"),
+                    };
+                    let remote = match &r.remote {
+                        None => String::new(),
+                        Some(RemoteState::Ok) => ", remote ok".to_string(),
+                        Some(RemoteState::BytesOk) => ", remote bytes ok".to_string(),
+                        Some(RemoteState::Absent) => ", REMOTE ABSENT".to_string(),
+                        Some(RemoteState::Mismatch(why)) => {
+                            format!(", REMOTE MISMATCH: {why}")
+                        }
+                    };
+                    println!("{}: {cache}{remote}", r.name);
+                }
             }
             if bad > 0 {
                 return Err(format!("{bad} problem(s)"));
             }
-            eprintln!("{} entries verified", rows.len());
+            if !args.json {
+                eprintln!("{} entries verified", rows.len());
+            }
         }
         StoreCmd::Gc { apply } => {
             let doomed = store.gc(*apply)?;
