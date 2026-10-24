@@ -4,7 +4,7 @@
 - **Kind:** native solver failure; implementation and measurement gaps; external-tool availability
 - **Affected work:** [mixed polynomial report](../research/twist_index_calculus_20261020/MIXED_POLYNOMIAL_REPORT.md), [larger-curve scaling and occupancy report](../research/twist_index_calculus_20261020/K1_SCALING_REPORT.md), [peeled-orbit reuse report](../research/twist_index_calculus_20261020/K1_PEELED_ORBIT_REUSE.md), [frozen protocol](../research/twist_index_calculus_20261020/QUARTIC_TWIST_LINE_PROTOCOL.md)
 - **Next action owner:** quartic twist IC study
-- **Last updated:** 2026-10-23
+- **Last updated:** 2026-10-24
 
 ## Problem
 
@@ -49,6 +49,57 @@ DLP cost remain open; these image-base controls do not discharge them.
 
 ## Evidence and uncertainty
 
+- **Joint S5 construction, independently validated:** The
+  [joint-image continuation](../research/twist_index_calculus_20261020/joint_image_elimination/README.md)
+  completes all 297 frozen constructions, 694 system files and 63 case-arm
+  sets. Every arm has 84 fixed-query positions plus separately labelled
+  positive/regression controls. The native validator checks workload and
+  source seals, public input hashes, coefficients, dimensions, statistics,
+  msolve inputs and terminal exits. A separate incidence audit checks
+  4,110 unique signed relations in 5,433 presentations and actual group
+  sums. These are record/coefficient and incidence checks, not an independent
+  exact derivation of the generic S5 ideal or a complete-root certificate.
+- **Bounded global S5 results:** In the p37/seed0/query2 global regression,
+  five native processes hit allocation failure under 8 GiB; the remaining
+  pure finite-domain process returns an explicit cooperative incomplete
+  result. An empty returned root set is not zero physical yield. All six
+  terminal results and the failed complete-set check remain retained.
+  Previously interrupted source-block unions now complete in fresh records.
+  All three independent signed-set/RREF audits pass: pure gives one
+  relation and rank 1/3, phi two and rank 2/3, doubling one and rank 1/3.
+  Both full-symmetry pure encodings also complete and pass their independent
+  audits, each at rank 1/3. This is one selected positive residual, not a
+  population or full-cost gain. It is not yet claimed as a repair of the historical
+  tagged S5 input without matching the exact curve, residual and domain.
+- **Fair representation controls:** The implicit mixed encodings retain
+  and reduce their inverse equations. The fully symmetric pure-L0 control
+  eliminates the distinguished fourth source coordinate by an exact
+  coefficient check. On the constructed p37 regression it lowers total
+  degree 16 to 8, with 1,485 to 495 extension terms. An exponent-arity
+  exporter defect is preserved in v6, repaired, and checked by an actual
+  export test; v8 passes 69 tests and writes all six corrected inputs.
+  All four mixed implicit native attempts fail allocation under the
+  unchanged 8 GiB limit. The full 297-position variant population now
+  passes independent native record/export consistency validation: 294 new
+  and three reused inputs, with no missing or invalid positions. This
+  does not certify complete roots or a generic ideal derivation. Remaining
+  official msolve root audits, complete collection and cold prices remain open.
+- **Proof and attribution gaps:** Three exact integer identities and IDC
+  mutation checks pass. The combined Lean check hits memory limits;
+  separately bounded faithful targets retain the original statements.
+  The split coordinate gate passes all four theorems. The finite-count
+  proof exposes and repairs an arithmetic goal; its new gate passes all
+  12 audited declarations. The factored quartic v6 module now passes the
+  build and axiom audit: seven named theorems and two local AC declarations.
+  It preserves the universal discriminant identity and nonrepetition
+  consequence. Earlier memory/PATH failures remain recorded. Group,
+  finite-base membership, complete-root and cost bridges remain explicit.
+  Equal-size disjoint images have the same uniform signed-tuple total
+  mass; this does not equate rank, higher moments or conditioned traces.
+  The 21-case zero-fiber rank audit and three p37 full-population censuses
+  are explicitly separate oracle diagnostics, with no target coefficient
+  in zero-only rows. They are not priced polynomial algorithms.
+
 - **Observed:** The [pilot audit](../research/twist_index_calculus_20261020/quartic_twist_tagged_s5_audit_p37_v1.json) enumerated all `r` subgroup logs and found five complete signed relations among the first four residuals. `k=1,2,3` reproduce their entire pattern-specific sets; `k=0` misses one and `k=4` has one system failure. The [one-target k=1 audit](../research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_audit_p37_v1.json) independently reconstructs all eight processed sets, rank four, all physical factor logs, scalar 271, and the same-target twist24 rho replay. The native producer counts 116,050,118 `Fp M` and 3,936 group operations against rho's 348,941 `Fp M` and 2,745 group operations, in separate units.
 - **Bounded S5 retry:** [Degree 30](../research/twist_index_calculus_20261020/quartic_twist_tagged_s5_k0_q2_d30_p37_v1.json) and [degree 31](../research/twist_index_calculus_20261020/quartic_twist_tagged_s5_k0_q2_d31_p37_v1.json) still return “border unreachable at this degree”; the `k=4` control does likewise. The 8 GiB and 1,200 s caps were observed. A repeated quotient dimension of 4,090 is recorded; its cause is unknown.
 - **Derived:** Four `k=1` rows suffice only after the 24-action folds the 48 physical factors to four columns and the public generator log anchors one of them. Flat and cubic-only encodings have 48 and 16 anchored unknowns respectively, so these same four rows cannot solve either. This statement is specific to this base and trace.
@@ -62,6 +113,19 @@ DLP cost remain open; these image-base controls do not discharge them.
 - **Image-base attribution control:** On the same 9,658-query full reference streams, phi(L0) supplies 1,865 unique signed tuples and 1,698 distinct projective augmented rows; [2]L0 supplies 1,804 and 1,705 respectively. Both active-column variants attain full rank on all 21 cases. These distinct rows are not all linearly independent. The psi control reproduces the original's exact sets; phi(L2) gives 1,472 tuples against the original's 1,473 with equal peel counts. All 210 candidate-prefix audits pass, both A/A trees match, and hash/omission negative controls reject. All 105 whole cold rounds and 630 non-timing records are admitted; original deadlines, isolation refusals and Spot reclaims are retained. Through first full rank, phi consumes 5.868804% more systems than doubling. Per-record paired doubling/phi median elapsed ratios span 0.405438–5.524357, with both gains and losses. The exact fixture boundary includes encoded public points for alignment while recomputing and charging every lift. The same-input GB control completes 378 fixed systems in eight passes, with 3,024 matching native/msolve bases and generally slower native timers. Complete operation pricing, strongest rho, S5 and full external DLP comparisons remain open.
 
 ## What would unblock it
+
+The S4 component-ideal follow-up now has two checked consequences:
+2048 times the discriminant lies in the component ideal (independent
+IDC1h09d838b7dca9895f and two Lean theorems pass), and 64 times the cube
+of S=64*s4-(4*s2-s1²)² lies there (native exact search and combined
+10-theorem Lean gate pass). The latter excludes three distinct roots
+in odd characteristic when all four components vanish. Full curve/group
+and field-embedding formalization is separate. The stronger independent
+replay now passes as IDC1h65c11f01d0b1e67a, with zero integer remainder,
+32 extra points and both mutation controls. Its finite-Fp residual filter must retain
+infinity and preserve every saved physical presentation, unique row,
+rank and recovery on all 21 cases before deployment. This neither rules
+out higher-arity precomputation nor establishes a twist-specific gain.
 
 - [ ] Reproduce every `k=0…4` signed decomposition on the frozen 61-residual stream with no failed algebraic systems, retaining all extraneous, duplicate, and invalid roots and a scalar-keyed independent audit.
 - [ ] Export identical Weil-restricted S4/S5 systems to the native engine and msolve on the same host, compare complete roots, memory and all solver phases; include Magma if available and name its absence otherwise.
@@ -81,12 +145,35 @@ or asymptotic advantage. The other items address ranking and transfer.
 
 ## Next discriminating step
 
-- **Action:** Export the frozen failed `k=0` residual-2 S5 system and the successful `k=1` S4 systems to msolve's accepted format; compare roots and border behavior on the same host and exact curve model.
-- **Inputs and controls:** Existing frozen p=37 residuals and signed base; scalar-keyed exact oracle; failed degree-29/30/31 native records; no change to target or factor signs.
-- **Limits and stop:** Retain the 8 GiB/1,200 s cap per system and record timeout/OOM separately. A successful S5 repair proceeds to full-stream completeness; another failure motivates algebraic-system diagnosis, not an impossibility conclusion.
+- **Action:** Extend the completed source-block and pure-symmetry controls;
+  finish the running mixed implicit-image
+  and official msolve regression records; independently compare complete
+  signed physical sets and RREF on exactly the same public inputs. Finish
+  the separately frozen uniform-mass and zero-rank diagnostics. Match the
+  historical tagged input explicitly before calling a newer result its repair.
+- **Inputs and controls:** The completed 297-construction workload, frozen
+  p37/seed0/query2 regression, pure L0 with full permutation symmetry, and
+  generic doubling with the same image size and represented logs. Keep
+  original failures and scalar/group oracle separate from candidate inputs.
+- **Limits and stop:** Retain one thread, 8 GiB/1,200 s per executed system,
+  the busy reservation and separate timeout/OOM outcomes. Check managed
+  owners and receipts before retrying after app/host recovery. Complete
+  physical equality motivates full-stream collection and complete costing;
+  a rank increase in zero-only rows motivates an actual invariant collector
+  plus charged target descent. A bounded failure or zero-row concentration
+  does not establish an obstruction or an IC improvement.
 - **Recheck trigger:** Solver repair or external solver installation, completion of cost instrumentation, or new evidence beyond p=97.
 
 ## Resolution and history
+
+2026-10-24: All 297 joint S5 constructions pass independent validation.
+Six native global solves remain bounded failures. All three source-block
+unions and both pure full-symmetry encodings have complete signed-set/RREF
+audits. Phi inverse-coordinate attempts fail allocation. The exact quartic
+discriminant/nonrepetition Lean proof now passes. Remaining comparisons
+continue under managed owners after explicit migration reconciliation.
+The broader IC gain and full-price
+requirements remain unresolved.
 
 2026-10-22: The restricted `k=1` one-target path and independent replay
 landed as evidence; S5 degree 29–31 retries remained partial. Unresolved.

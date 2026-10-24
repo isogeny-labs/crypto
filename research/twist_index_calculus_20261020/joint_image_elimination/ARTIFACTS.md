@@ -82,6 +82,9 @@ mathematical, isolation or complete-cost validation gate.
 
 Three later unchanged PDFs have an additional actual page-by-page review
 in `results/pdf-inspection-20261024-v5-partial.json`. It covers only the
-three listed documents; refreshed study, pure-zero and square-obstruction
-PDFs require their own rendering and review. Later managed lanes are
+three listed documents. The refreshed study, mechanism, pure-zero,
+square-obstruction and full variant-population PDFs now also have actual
+page-by-page review in `results/pdf-inspection-20261024-v8.json`. Its
+five exact PDF hashes were rechecked before copying the reports and
+figures into the unlisted benchmark diagnostics. Later managed lanes are
 outside the checkpoint's literal selection even if they have since finished.
