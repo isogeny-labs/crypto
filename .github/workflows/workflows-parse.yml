@@ -11,6 +11,7 @@ on:
   pull_request:
     paths:
       - '.github/workflows/**'
+      - '.github/workflows_archive/**'
       - 'scripts/test_workflows_parse.py'
       - '.github/scripts/*ci-scope*'
       - '.github/scripts/*frozen-workflow*'
@@ -38,6 +39,7 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /.github/workflows/
+            /.github/workflows_archive/
             /.github/scripts/
             /scripts/test_workflows_parse.py
             /research/weak_curve_properties_lean_20261011/EVIDENCE_SHA256.tsv
@@ -51,3 +53,38 @@ jobs:
       - run: node --test .github/scripts/test-frozen-workflow-check.mjs
       - run: python3 -B .github/scripts/test-pr-budgets.py -v
       - run: python3 -B .github/scripts/check-pr-budgets.py
+      # Archived workflows are not registered by GitHub and are skipped by the
+      # globs above on purpose, but the cheap invariants still hold: they parse,
+      # stay manual-only, do not shadow a live workflow, and match the manifest.
+      - name: Archived workflows stay parseable and manual-only
+        run: |
+          python3 -B - <<'PY'
+          import json, pathlib, sys, yaml
+          live = pathlib.Path('.github/workflows')
+          arch = pathlib.Path('.github/workflows_archive')
+          problems = []
+          files = sorted(arch.glob('*.yml')) + sorted(arch.glob('*.yaml'))
+          for p in files:
+              try:
+                  doc = yaml.safe_load(p.read_text(encoding='utf-8'))
+              except yaml.YAMLError as err:
+                  problems.append('%s: unparseable: %s' % (p.name, err))
+                  continue
+              on = doc.get('on') or doc.get(True) if isinstance(doc, dict) else None
+              if not (on == 'workflow_dispatch' or (isinstance(on, dict) and set(on) == {'workflow_dispatch'})):
+                  problems.append('%s: archived workflows must be workflow_dispatch-only' % p.name)
+              if not (isinstance(doc, dict) and doc.get('jobs')):
+                  problems.append('%s: no jobs' % p.name)
+              if (live / p.name).exists():
+                  problems.append('%s: also present in .github/workflows' % p.name)
+          manifest = json.loads((arch / 'MANIFEST.json').read_text(encoding='utf-8'))
+          listed = sorted(m['file'] for m in manifest['moved'])
+          if listed != sorted(p.name for p in files):
+              problems.append('MANIFEST.json moved list does not match the archive directory')
+          for m in manifest['left_in_place_with_reason']:
+              if not (live / m['file']).exists():
+                  problems.append('%s: listed as left in place but missing from .github/workflows' % m['file'])
+          if problems:
+              sys.exit('\n'.join(problems))
+          print('archive ok: %d workflows' % len(files))
+          PY
