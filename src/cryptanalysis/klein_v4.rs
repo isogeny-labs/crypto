@@ -1114,6 +1114,245 @@ pub fn lift_back_v4(
     lb
 }
 
+// ── E31: the chain solve (RESEARCH_GLV_INVARIANT_FACTOR_BASES.md, E31) ───
+//
+// Additive.  Nothing above is changed; `solve_weighted_traced` stays the
+// E24/E25 solver.
+
+/// The Macaulay matrix at weighted degree `d`, triangularised and in
+/// forward echelon, built by exactly the operations (and counts) of
+/// `solve_at`'s first half.
+#[allow(dead_code)] // `comps` and `std_index` serve the E31 solver
+struct Built {
+    cols: Vec<[u8; 4]>,
+    col_index: HashMap<[u8; 4], usize>,
+    comps: Vec<HashMap<[u8; 4], u64>>,
+    ech: super::gaudry_quartic::Echelon,
+    is_std: Vec<bool>,
+    standard: Vec<usize>,
+    std_index: Vec<u32>,
+}
+
+fn build_echelon(
+    comps: &[HashMap<[u8; 4], u64>],
+    d: u16,
+    p: u64,
+    st: &mut QuarticSolve,
+    row_selection: bool,
+) -> Result<Built, String> {
+    assert!(p < 1 << 15, "rows are u16 and products must fit u32");
+    let t0 = Instant::now();
+    st.equation_degree = EQUATION_WDEG as u8;
+    st.macaulay_degree = d as u8;
+    let cols = weighted_monomials_desc(d);
+    let col_index: HashMap<[u8; 4], usize> =
+        cols.iter().enumerate().map(|(i, m)| (*m, i)).collect();
+    let mut tri = 0u64;
+    let (comps, leads) = triangularise(comps, p, &mut tri);
+    st.triangularise_muls += tri;
+    let divides = |lm: &[u8; 4], m: &[u8; 4]| (0..4).all(|k| lm[k] <= m[k]);
+    let mut rows: Vec<Vec<u16>> = Vec::new();
+    for (i, comp) in comps.iter().enumerate() {
+        let Some(dg) = comp
+            .iter()
+            .filter(|(_, &v)| v != 0)
+            .map(|(m, _)| wdeg(m))
+            .max()
+        else {
+            continue;
+        };
+        if dg > d {
+            return Err("an equation above the Macaulay degree".into());
+        }
+        for sh in weighted_monomials_desc(d - dg) {
+            if row_selection
+                && leads
+                    .iter()
+                    .take(i)
+                    .any(|lm| lm.is_some_and(|lm| divides(&lm, &sh)))
+            {
+                continue;
+            }
+            let mut row = vec![0u16; cols.len()];
+            for (&e, &c) in comp {
+                let m: [u8; 4] = core::array::from_fn(|k| e[k] + sh[k]);
+                let ci = col_index[&m];
+                row[ci] = am(row[ci] as u64, c, p) as u16;
+            }
+            rows.push(row);
+        }
+    }
+    st.rows = rows.len();
+    st.cols = cols.len();
+    st.build_ms += t0.elapsed().as_secs_f64() * 1e3;
+    let t1 = Instant::now();
+    let mut ech_muls = 0u64;
+    let ech = echelon_by_lead(rows, p as u32, &mut ech_muls, false);
+    st.echelon_muls += ech_muls;
+    st.echelon_ms += t1.elapsed().as_secs_f64() * 1e3;
+    st.zero_rows = ech.zero_rows;
+    st.pivots = ech.pivot_row.iter().filter(|&&r| r != u32::MAX).count();
+    let is_std: Vec<bool> = (0..cols.len())
+        .map(|c| ech.pivot_row[c] == u32::MAX && wdeg(&cols[c]) < d)
+        .collect();
+    let standard: Vec<usize> = (0..cols.len()).filter(|&c| is_std[c]).collect();
+    st.dim = standard.len();
+    let mut std_index = vec![u32::MAX; cols.len()];
+    for (i, &c) in standard.iter().enumerate() {
+        std_index[c] = i as u32;
+    }
+    Ok(Built {
+        cols,
+        col_index,
+        comps,
+        ech,
+        is_std,
+        standard,
+        std_index,
+    })
+}
+
+/// The `P₂`-chains of the standard monomials: `heads[i]` and its length
+/// `len[i]` (`h, P₂h, …, P₂^{len−1}h` standard, `P₂^{len}h` not), and the
+/// column of each chain's border target `P₂^{len}h` (`None` if outside the
+/// matrix).  Every standard monomial lies in exactly one chain.
+struct Chains {
+    heads: Vec<usize>,
+    len: Vec<usize>,
+    target: Vec<Option<usize>>,
+}
+
+fn p2_chains(b: &Built) -> Chains {
+    let up = |c: usize| -> Option<usize> {
+        let mut m = b.cols[c];
+        m[EIG_VAR] += 1;
+        b.col_index.get(&m).copied()
+    };
+    let down_is_std = |c: usize| -> bool {
+        let mut m = b.cols[c];
+        if m[EIG_VAR] == 0 {
+            return false;
+        }
+        m[EIG_VAR] -= 1;
+        b.col_index.get(&m).is_some_and(|&j| b.is_std[j])
+    };
+    let mut ch = Chains {
+        heads: Vec::new(),
+        len: Vec::new(),
+        target: Vec::new(),
+    };
+    for &h in &b.standard {
+        if down_is_std(h) {
+            continue;
+        }
+        let mut k = 1usize;
+        let mut c = h;
+        let target = loop {
+            match up(c) {
+                Some(n) if b.is_std[n] => {
+                    c = n;
+                    k += 1;
+                }
+                other => break other,
+            }
+        };
+        ch.heads.push(h);
+        ch.len.push(k);
+        ch.target.push(target);
+    }
+    ch
+}
+
+/// E31 step 1: the structure that prices the chain solve, on one system.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct ChainStructure {
+    pub dim: usize,
+    pub pivots: usize,
+    /// Number of `P₂`-chains (border targets needing a normal form).
+    pub chains: usize,
+    pub chain_lengths: Vec<usize>,
+    /// Pivots reached from all targets together (what the existing normal
+    /// forms resolve).
+    pub reached_union: usize,
+    /// `Σ_t |reached from t|`.
+    pub reached_sum: usize,
+    /// Nonzero entries right of the pivot on the union's rows, on
+    /// non-standard and on standard columns.
+    pub union_nnz_nonstd: u64,
+    pub union_nnz_std: u64,
+    /// `Σ_t Σ_{c reached from t}` (nonzeros right of the pivot of row `c`):
+    /// an upper bound on a left-looking normal form's multiplications.
+    pub left_looking_bound: u64,
+    pub unreachable: bool,
+}
+
+/// [`ChainStructure`] of one system at weighted degree `d` (a diagnostic;
+/// it charges nothing anywhere).
+pub fn chain_structure(comps: &[HashMap<[u8; 4], u64>], d: u16, p: u64) -> Option<ChainStructure> {
+    let mut st = QuarticSolve::default();
+    let b = build_echelon(comps, d, p, &mut st, true).ok()?;
+    let ch = p2_chains(&b);
+    let ncols = b.cols.len();
+    let mut out = ChainStructure {
+        dim: b.standard.len(),
+        pivots: st.pivots,
+        chains: ch.heads.len(),
+        chain_lengths: ch.len.clone(),
+        ..Default::default()
+    };
+    let right = |c: usize| -> (u64, u64) {
+        let row = &b.ech.rows[b.ech.pivot_row[c] as usize];
+        let (mut ns, mut s) = (0u64, 0u64);
+        for j in (c + 1)..ncols {
+            if row[j] != 0 {
+                if b.is_std[j] {
+                    s += 1;
+                } else {
+                    ns += 1;
+                }
+            }
+        }
+        (ns, s)
+    };
+    let mut union = vec![false; ncols];
+    for t in &ch.target {
+        let Some(t) = *t else {
+            out.unreachable = true;
+            return Some(out);
+        };
+        let mut seen = vec![false; ncols];
+        let mut stack = vec![t];
+        seen[t] = true;
+        while let Some(c) = stack.pop() {
+            let pr = b.ech.pivot_row[c];
+            if pr == u32::MAX {
+                out.unreachable = true;
+                return Some(out);
+            }
+            out.reached_sum += 1;
+            union[c] = true;
+            let (ns, s) = right(c);
+            out.left_looking_bound += ns + s;
+            let row = &b.ech.rows[pr as usize];
+            for j in (c + 1)..ncols {
+                if row[j] != 0 && !b.is_std[j] && !seen[j] {
+                    seen[j] = true;
+                    stack.push(j);
+                }
+            }
+        }
+    }
+    for c in 0..ncols {
+        if union[c] {
+            out.reached_union += 1;
+            let (ns, s) = right(c);
+            out.union_nnz_nonstd += ns;
+            out.union_nnz_std += s;
+        }
+    }
+    Some(out)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
