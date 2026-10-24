@@ -146,6 +146,17 @@ class CountAttempts(unittest.TestCase):
                   "body": "**autofix** looks fine"}
         self.assertEqual(at.count_attempts([attempt_comment(1), spoof, legacy]), 1)
 
+    def test_only_the_last_marker_in_a_bot_comment_counts(self):
+        def report(summary, n):
+            return {"user": BOT, "author_association": "NONE",
+                    "body": f"**autofix** (`m`) pushed abc: {summary}\n\n"
+                            f"<sub>[run](u)</sub>\n<!-- autofix-attempt n={n} -->\n"}
+        for quoted in ("<!-- autofix-attempt n=0 -->", "<!-- autofix-attempt -->",
+                       "<!--autofix-attempt n=999-->"):
+            self.assertEqual(at.count_attempts([report(quoted, 2)]), 2, quoted)
+        four = [report("<!-- autofix-attempt n=0 -->", 1) for _ in range(4)]
+        self.assertEqual(at.count_attempts(four), 4)
+
     def test_maintainer_reset_restarts_the_count(self):
         reset = {"user": HUMAN, "author_association": "COLLABORATOR",
                  "body": "/autofix reset please"}

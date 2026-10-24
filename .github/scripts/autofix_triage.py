@@ -129,7 +129,9 @@ def pr_detail(repo: str, number: int) -> dict:
 def count_attempts(comments: list[dict]) -> int:
     """Lifetime model attempts recorded in a PR's comments.
 
-    Counts bot comments carrying the attempt marker (summing its n=), plus
+    Counts bot comments carrying the attempt marker (summing its n=; only the
+    last marker in a comment counts, since model-written text before it may
+    quote one), plus
     pre-marker reports that start with "**autofix** " (hand-offs from triage
     start with "**autofix:**" and are not attempts). A `/autofix reset`
     comment from a maintainer zeroes the count so far. Comment text from
@@ -144,9 +146,13 @@ def count_attempts(comments: list[dict]) -> int:
                 and user.get("type") != "Bot"):
             total = 0
         elif user.get("type") == "Bot":
-            m = ATTEMPT_MARKER.search(body)
-            if m:
-                total += int(m.group(1)) if m.group(1) is not None else 1
+            # The workflow appends the real marker as the last thing in the
+            # comment, after model-written text that may quote a marker of
+            # its own, so only the last match counts.
+            found = list(ATTEMPT_MARKER.finditer(body))
+            if found:
+                n = found[-1].group(1)
+                total += int(n) if n is not None else 1
             elif body.startswith("**autofix** "):
                 total += 1
     return total

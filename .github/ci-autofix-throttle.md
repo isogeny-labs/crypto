@@ -46,8 +46,9 @@ that reset.
   ("stale") now also posts a one-line comment carrying the marker, because the
   model still ran. A comment is used rather than a counter label so no
   `labeled` event fires: label events start a run of this and other workflows.
-* **Counted**: markers in comments by a bot account; earlier reports that start
-  with `**autofix** ` (before markers existed) count as one each. Hand-off
+* **Counted**: the last marker in each comment by a bot account (model-written
+  text before it may quote a marker; the workflow appends the real one
+  last); earlier reports that start with `**autofix** ` (before markers existed) count as one each. Hand-off
   comments (`**autofix:** ...`) and anything written by a human are ignored, so
   a pasted marker cannot change the count.
 * **Cap**: `AUTOFIX_MAX_ATTEMPTS` (default **4**, i.e. two full ladders; `0`
