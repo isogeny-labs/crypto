@@ -1,0 +1,228 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261024-rho-canonicalisation-control",
+  "title": "N83 K1107 panel: rho arms under polynomial-basis vs normal-basis canonicalisation",
+  "created": "2026-10-24",
+  "authors": [
+    "Workstream F, rho canonicalisation audit (Claude)"
+  ],
+  "status": "draft",
+  "status_note": "Draft, unqueued. The normal-basis rho arm already exists in crypto (koblitz_strong_rho), so no port is needed for that arm. Ready needs the polynomial-basis control arm written, point files staged from the ci-branch panel, recorded hashes, and a verify script.",
+  "blocked_on": [
+    "note: Write the polynomial-basis control arm (koblitz_index_calculus.rs canonicalize_signed_rho or an equivalent example) with a receipt that names its canonical basis",
+    "note: Stage point_<i>.jsonl from research/n83_cold_base_confirm_20261021/targets.jsonl (ci branch, commit 753b622349; not on main)",
+    "note: Write the verify script and receipt schema for the control arm (verify argv is a placeholder)"
+  ],
+  "links": {
+    "lead": "backlog/XP-20261024-rho-canonicalisation-control/README.md",
+    "notes": [
+      "research/rho_canonicalisation_audit_20261024/README.md",
+      "research/n83_cold_base_confirm_20261021/PROTOCOL.md",
+      "research/n83_dense_root_20261013/rho_config.json",
+      "examples/n83_rho_optimization_eval.rs",
+      "src/cryptanalysis/koblitz_strong_rho.rs",
+      "src/cryptanalysis/koblitz_index_calculus.rs",
+      "cryptanalysis:papers/frobenius-orbits/sec-benchmarks.tex"
+    ],
+    "prs": []
+  },
+  "question": "On the sixteen N83 panel points, how does the rho arm's cost change when the polynomial-basis orbit minimum replaces normal-basis least-rotation canonicalisation, on identical points, seeds and configuration?",
+  "decision_value": "A measured P/N ratio at n=83 says how much polynomial-basis IC/rho ratios are inflated (the cryptanalysis 4.1x was measured at n=53). It does not change the leaderboard and makes no speed claim.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "a73fb57c8944602dac1ab192ac8bcbca7b189aee"
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": null,
+    "branch": "research/rho-canonicalisation-audit-20261024",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--example",
+        "n83_rho_optimization_eval"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 4,
+    "ram_gb": 16,
+    "disk_gb": 2,
+    "gpu": null,
+    "est_core_hours": 1,
+    "est_wall_hours": 1,
+    "notes": "Sixteen points, two arms, cap 120 s per arm: about 64 arm-runs, at most about 2.1 h of capped rho time. Operation counts stand at L0; wall time needs L2 (quiet cpuset host)."
+  },
+  "run": {
+    "argv": [
+      "target/release/examples/n83_rho_optimization_eval",
+      "{point}",
+      "{seed}",
+      "research/n83_dense_root_20261013/rho_config.json",
+      "{out}/receipt.json"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 150
+  },
+  "shards": {
+    "count": 16,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {
+          "name": "p1",
+          "vars": {
+            "point": "{out}/point_1.jsonl",
+            "seed": "2026102101"
+          }
+        },
+        {
+          "name": "p2",
+          "vars": {
+            "point": "{out}/point_2.jsonl",
+            "seed": "2026102102"
+          }
+        },
+        {
+          "name": "p3",
+          "vars": {
+            "point": "{out}/point_3.jsonl",
+            "seed": "2026102103"
+          }
+        },
+        {
+          "name": "p4",
+          "vars": {
+            "point": "{out}/point_4.jsonl",
+            "seed": "2026102104"
+          }
+        },
+        {
+          "name": "p5",
+          "vars": {
+            "point": "{out}/point_5.jsonl",
+            "seed": "2026102105"
+          }
+        },
+        {
+          "name": "p6",
+          "vars": {
+            "point": "{out}/point_6.jsonl",
+            "seed": "2026102106"
+          }
+        },
+        {
+          "name": "p7",
+          "vars": {
+            "point": "{out}/point_7.jsonl",
+            "seed": "2026102107"
+          }
+        },
+        {
+          "name": "p8",
+          "vars": {
+            "point": "{out}/point_8.jsonl",
+            "seed": "2026102108"
+          }
+        },
+        {
+          "name": "p9",
+          "vars": {
+            "point": "{out}/point_9.jsonl",
+            "seed": "2026102109"
+          }
+        },
+        {
+          "name": "p10",
+          "vars": {
+            "point": "{out}/point_10.jsonl",
+            "seed": "2026102110"
+          }
+        },
+        {
+          "name": "p11",
+          "vars": {
+            "point": "{out}/point_11.jsonl",
+            "seed": "2026102111"
+          }
+        },
+        {
+          "name": "p12",
+          "vars": {
+            "point": "{out}/point_12.jsonl",
+            "seed": "2026102112"
+          }
+        },
+        {
+          "name": "p13",
+          "vars": {
+            "point": "{out}/point_13.jsonl",
+            "seed": "2026102113"
+          }
+        },
+        {
+          "name": "p14",
+          "vars": {
+            "point": "{out}/point_14.jsonl",
+            "seed": "2026102114"
+          }
+        },
+        {
+          "name": "p15",
+          "vars": {
+            "point": "{out}/point_15.jsonl",
+            "seed": "2026102115"
+          }
+        },
+        {
+          "name": "p16",
+          "vars": {
+            "point": "{out}/point_16.jsonl",
+            "seed": "2026102116"
+          }
+        }
+      ]
+    },
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "n83-rho-canonicalisation-control/v1 (proposed, not written)",
+    "verify": [
+      "python3",
+      "research/rho_canonicalisation_audit_20261024/verify_rho_receipts.py",
+      "{out}"
+    ],
+    "land": "research/rho_canonicalisation_audit_20261024/runs"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261024-rho-canonicalisation-control"
+    ],
+    "ttl_s": 7200,
+    "env": {
+      "name": "n83-rho-canonicalisation-control-TBD",
+      "recipe": "TBD: pinned Rust toolchain from Cargo.lock, a Linux host with taskset and prlimit, and a quiet cpuset for L2 wall figures."
+    },
+    "exec": {
+      "cpus": 4,
+      "memory_mb": 16384,
+      "timeout_s": 7200,
+      "sandbox": "auto",
+      "sandbox_reason": "",
+      "publish": "runs/XP-20261024-rho-canonicalisation-control"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Unqueued draft; no priority against funded cards until the control arm, staged points and verify script exist."
+    }
+  }
+}
