@@ -1,0 +1,37 @@
+name: Profile tool
+on:
+  pull_request:
+    paths:
+      - 'tools/profile.sh'
+      - 'tools/test_profile.sh'
+      - 'tools/testdata/profile/**'
+      - '.agents/skills/profile/**'
+      - '.github/workflows/profile-tool.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/profile.sh'
+      - 'tools/test_profile.sh'
+      - 'tools/testdata/profile/**'
+      - '.github/workflows/profile-tool.yml'
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install jq, gawk, valgrind and perf
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq jq gawk valgrind linux-tools-common linux-tools-generic
+          # GitHub's runners set perf_event_paranoid=4; 2 lets a user sample
+          # its own processes (as rho-formal.yml does).
+          sudo sysctl -w kernel.perf_event_paranoid=2
+      - name: Parsers, graphs, refusal paths and CPU profiling
+        run: tools/test_profile.sh
