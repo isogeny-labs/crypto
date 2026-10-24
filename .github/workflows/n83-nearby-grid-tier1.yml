@@ -53,6 +53,16 @@ jobs:
             --example koblitz_orbit_dlp_fast \
             --example n83_rho_optimization_eval > \
             "$RUNNER_TEMP/n83-nearby-grid-build.log" 2>&1
+          mkdir -p "$RUNNER_TEMP/n83-nearby-grid-executed-bins"
+          install -m 755 \
+            "$CARGO_TARGET_DIR/release/examples/koblitz_orbit_dlp_fast" \
+            "$RUNNER_TEMP/n83-nearby-grid-executed-bins/koblitz_orbit_dlp_fast"
+          install -m 755 \
+            "$CARGO_TARGET_DIR/release/examples/n83_rho_optimization_eval" \
+            "$RUNNER_TEMP/n83-nearby-grid-executed-bins/n83_rho_optimization_eval"
+          cargo +1.99.1 clean --release --target-dir "$CARGO_TARGET_DIR" > \
+            "$RUNNER_TEMP/n83-nearby-grid-clean.log" 2>&1
+          df -h "$RUNNER_TEMP" | tee "$RUNNER_TEMP/n83-nearby-grid-disk.txt"
 
       - name: Run twelve short controlled same-point IC and rho blocks
         shell: bash
@@ -60,8 +70,8 @@ jobs:
           set -euo pipefail
           export PYTHONDONTWRITEBYTECODE=1
           python3 -m research.n83_nearby_grid_tier1_20261024.run \
-            --binary "$RUNNER_TEMP/n83-nearby-grid-target/release/examples/koblitz_orbit_dlp_fast" \
-            --rho-binary "$RUNNER_TEMP/n83-nearby-grid-target/release/examples/n83_rho_optimization_eval" \
+            --binary "$RUNNER_TEMP/n83-nearby-grid-executed-bins/koblitz_orbit_dlp_fast" \
+            --rho-binary "$RUNNER_TEMP/n83-nearby-grid-executed-bins/n83_rho_optimization_eval" \
             --output "$RUNNER_TEMP/n83-nearby-grid-results" \
             | tee "$RUNNER_TEMP/n83-nearby-grid-run.log"
 
@@ -86,6 +96,7 @@ jobs:
             ${{ runner.temp }}/n83-nearby-grid-results/
             ${{ runner.temp }}/n83-nearby-grid-*.log
             ${{ runner.temp }}/n83-nearby-grid-*.json
+            ${{ runner.temp }}/n83-nearby-grid-disk.txt
             ${{ runner.temp }}/n83-nearby-grid-rustc.txt
           if-no-files-found: warn
           retention-days: 14
