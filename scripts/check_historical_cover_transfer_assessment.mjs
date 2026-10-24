@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-// The v2 assessment is an immutable 2,572-model study. Replay it against the
-// complete input revision it assessed, even after the live registry grows.
+// Replay the immutable 2,572-model study from its complete original revision.
+// The live catalog and its current assessment are checked separately.
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,7 +11,10 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const baseline = "a53a7e2bfa20080a424b9a2484a16932b6e3c116";
 const assessmentPath = "docs/curves/cover-transfer-assessments.json";
-const assessment = JSON.parse(readFileSync(join(root, assessmentPath), "utf8"));
+const assessment = JSON.parse(execFileSync(
+  "git", ["show", `${baseline}:${assessmentPath}`],
+  { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
+));
 const paths = new Set([
   assessmentPath,
   "scripts/build_cover_transfer_assessments.mjs",
@@ -28,11 +31,6 @@ function git(...args) {
 
 try {
   git("cat-file", "-e", `${baseline}^{commit}`);
-  const originalBlob = git("rev-parse", `${baseline}:${assessmentPath}`).toString().trim();
-  const publishedBlob = git("hash-object", assessmentPath).toString().trim();
-  if (originalBlob !== publishedBlob) {
-    throw new Error("published v2 assessment differs from its pinned baseline");
-  }
   git("worktree", "add", "--detach", "--no-checkout", temp, baseline);
   added = true;
   git("-C", temp, "sparse-checkout", "set", "--no-cone", ...[...paths].sort().map((path) => `/${path}`));

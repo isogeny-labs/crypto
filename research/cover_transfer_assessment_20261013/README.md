@@ -1,13 +1,13 @@
 ---
 title: "Catalog-wide curve-cover transfer assessment"
-subtitle: "All 15,791 current maps and all 700 EC1 bindings"
+subtitle: "All 15,791 current maps and all 979 EC1 bindings"
 date: "2026-10-24"
-subject: "cover-transfer-assessments/v2; catalog_maps=15791; unique_cover_models=15789; geometry_verified_maps=15791; ec1_representations=700; assessed_maps=15791; unassessed_maps=0; assessed_subgroups=700; unassessed_subgroups=0"
+subject: "cover-transfer-assessments/v2; catalog_maps=15791; unique_cover_models=15789; geometry_verified_maps=15791; ec1_representations=979; assessed_maps=15791; unassessed_maps=0; assessed_subgroups=979; unassessed_subgroups=0"
 geometry: margin=0.8in
 fontsize: 10pt
 ---
 
-<!-- cover-transfer-assessments/v2; catalog_maps=15791; unique_cover_models=15789; geometry_verified_maps=15791; ec1_representations=700; assessed_maps=15791; unassessed_maps=0; assessed_subgroups=700; unassessed_subgroups=0 -->
+<!-- cover-transfer-assessments/v2; catalog_maps=15791; unique_cover_models=15789; geometry_verified_maps=15791; ec1_representations=979; assessed_maps=15791; unassessed_maps=0; assessed_subgroups=979; unassessed_subgroups=0 -->
 
 # Outcome
 
@@ -22,9 +22,9 @@ The main results are:
   to the field-validity assumptions stated below;
 - all 165 binary maps have the implemented one-infinity genus-three Jacobian
   arithmetic and bounded rational-point-class transfer;
-- the retained native batch receipt covers 140 binary EC1 bindings for generator membership,
+- the retained native batch receipt covers 140 of 142 binary EC1 bindings for generator membership,
   `[r]G=O`, pullback validity, `[r]phi^*(G)=0`, composition, and
-  degree-inverse recovery; the refreshed catalog adds one binary binding without
+  degree-inverse recovery; the refreshed catalog has two binary bindings without
   native batch evidence;
 - those generator-level tests do **not** prove pullback additivity,
   all-element composition, injectivity, or image-order equality on the full
@@ -123,11 +123,11 @@ rows.
 
 | Subgroup profile | EC1 bindings | Established catalog-wide facts | Still open |
 |---|---:|---|---|
-| Binary degree 3 | 141 | exact identity joins, `gcd(3,r)=1`; 140 have typed generator-level transfer checks | additivity and all-element composition; injectivity and image order; proof-grade numeric exact order except order 29; arbitrary-result norm/recovery; one newly linked binding lacks native batch evidence |
-| Odd degree 2 | 559 | exact identity joins and `gcd(2,r)=1` | generator/order certificates and every induced-map claim |
-| **Total** | **700** | **every binding classified** | **unknowns remain explicit** |
+| Binary degree 3 | 142 | exact identity joins, `gcd(3,r)=1`; 140 have typed generator-level transfer checks | additivity and all-element composition; injectivity and image order; proof-grade numeric exact order except order 29; arbitrary-result norm/recovery; two linked bindings lack native batch evidence |
+| Odd degree 2 | 837 | exact identity joins and `gcd(2,r)=1` | generator/order certificates and every induced-map claim |
+| **Total** | **979** | **every binding classified** | **unknowns remain explicit** |
 
-These are 700 EC1 representations on 695 curve models; five models have two
+These are 979 EC1 representations on 973 curve models; six models have two
 distinct representations. The semantic verifier computes the effective
 `supported`, `unknown`, `refuted`, and `not_applicable` assignment totals from
 the generated ledger. Those are claim assignments, not counts of distinct
@@ -382,7 +382,7 @@ Consequently:
   `refuted`;
 - balanced/two-infinity divisor arithmetic, pullback, pushforward, and
   `phi_*phi^*=[2]` remain `unknown`; and
-- for the 559 linked odd EC1 records, the exact identity join and numerical
+- for the 837 linked odd EC1 records, the exact identity join and numerical
   `gcd(2,r)=1` are supported, but generator, order, kernel, image-order, and
   recovery certificates remain unknown.
 
@@ -458,11 +458,11 @@ new norm or CLI changes.
 
 | Control | Status | Scope and limit |
 |---|---|---|
-| Exact identity joins | `supported` | all 15,791 map UIDs and 700 EC1/curve/map triples; identity alone claims no arithmetic |
+| Exact identity joins | `supported` | all 15,791 map UIDs and 979 EC1/curve/map triples; identity alone claims no arithmetic |
 | Cover geometry | `supported` | all 15,791 fixed-family rows; equations, smoothness, genus, degree, separability, and infinity behavior, conditional on the declared odd base-prime assumptions described above |
 | Internal Jacobian arithmetic | `supported` on stated models | binary and separate odd-prime one-infinity fixtures; not the 15,626 odd two-infinity cover sources |
 | Independent arithmetic/map oracle | `unknown` | no separate CAS or independently implemented divisor-class replay across the catalog |
-| Binary catalog generators | `supported` on tested generators | 140 retained triples pass the listed membership, annihilation, pullback, composition, and inverse-degree checks; one additional binary triple is not in that test receipt; no subgroup-wide promotion |
+| Binary catalog generators | `supported` on tested generators | 140 retained triples pass the listed membership, annihilation, pullback, composition, and inverse-degree checks; two additional binary triples are absent from that test receipt; no subgroup-wide promotion |
 | Odd cover/backend compatibility | `refuted` as a current implementation claim | the one-infinity backend cannot accept the 15,626 even-sextic sources; mathematical induced maps remain `unknown` |
 | Published artifact on all current inputs | `refuted` as evidence claim | only its bundled 592 rows were directly replayed; 746/1,354 is a historical static allowlist classification, not a catalog-wide receipt |
 | Historical cross-repository core parity | `supported` on the pinned receipt snapshot | offline rerun verified exactly seven bindings; CLI, Cargo, catalogs, schema, ledger, workflows, packages, and actual-HEAD binding are excluded |
@@ -594,14 +594,17 @@ assessment into a solver or advantage result.
    induced maps over both prime and declared extension fields.
 3. Add proof-grade exact-order evidence and map-bound certificates wherever a
    numeric EC1 order or image-order claim is desired.
-4. Replay map additivity and composition through an independent divisor-class
+4. Replay generator membership and catalog-order annihilation for the 837 odd
+   bindings and the two binary bindings outside the retained native batch;
+   replay typed transfer for those two binary bindings.
+5. Replay map additivity and composition through an independent divisor-class
    implementation.
-5. Add coordinate-isomorphism commutation and proper-subfield descent controls.
-6. Publish and replay a standalone artifact that accepts all 15,791 current
+6. Add coordinate-isomorphism commutation and proper-subfield descent controls.
+7. Publish and replay a standalone artifact that accepts all 15,791 current
    model forms.
-7. Refresh the legacy formula inventory without promoting modeled routes to
+8. Refresh the legacy formula inventory without promoting modeled routes to
    certificates.
-8. Keep the full solver and every cost claim behind its separate acceptance
+9. Keep the full solver and every cost claim behind its separate acceptance
    gates.
 
 # Exploration boundary

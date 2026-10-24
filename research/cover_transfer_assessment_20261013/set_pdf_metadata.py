@@ -24,8 +24,8 @@ writer.add_metadata(
         "/Title": "Catalog-wide curve-cover transfer assessment",
         "/Subject": subject,
         "/Creator": "Pandoc, Tectonic, pypdf 6.0.0",
-        "/CreationDate": "D:20261019000000Z",
-        "/ModDate": "D:20261019000000Z",
+        "/CreationDate": "D:20261024000000Z",
+        "/ModDate": "D:20261024000000Z",
     }
 )
 temp = PDF.with_suffix(".pdf.tmp")

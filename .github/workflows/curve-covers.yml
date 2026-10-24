@@ -128,6 +128,10 @@ jobs:
       - name: Replay source-bound registry order certificates
         run: python3 -O docs/curves/registry-rebuild-20261023/check_registry_transfer.py
       - run: cargo run --bin curve_cover_check -- --check
+      - name: Check current cover transfer assessment against the merged catalog
+        run: |
+          node scripts/build_cover_transfer_assessments.mjs --check
+          node research/cover_transfer_assessment_20261013/verify_assessment.mjs
       - run: python3 scripts/test_cover_catalog.py
       - name: Check sparse-safe lab-browser generation
         run: |

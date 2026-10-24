@@ -9,7 +9,7 @@ const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
 const ASSESSMENT_DATE = "2026-10-24";
-const CATALOG_COMMIT = "4a181ccb3201d3275cbf7aed29bfd72f58d82467";
+const CATALOG_COMMIT = "0c7310ba96739ab57c35ac4e4a7654e117a854ad";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
@@ -158,7 +158,13 @@ const obligations = [
   {
     id: "catalog_generator_validation",
     description:
-      "Replay generator membership and catalog-order annihilation for every linked odd-characteristic EC1 representation.",
+      "Replay generator membership and catalog-order annihilation for all 837 linked odd-characteristic EC1 representations and the two binary triples outside the retained native batch.",
+    status: "unknown",
+  },
+  {
+    id: "binary_catalog_transfer_replay",
+    description:
+      "Replay pullback validity, image annihilation, composition, and degree-inverse recovery for the two binary EC1 triples outside the retained 140-triple native batch.",
     status: "unknown",
   },
   {
@@ -513,6 +519,24 @@ const resultTemplates = {
       "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses",
     ],
   },
+  "subgroup.binary-untested-generator.unknown": {
+    status: "unknown",
+    scope:
+      "Generator membership and [r]G=O for the two linked binary EC1 triples absent from the retained 140-triple native batch.",
+    rationale:
+      "The exact EC1/curve/map identities are bound, but no native generator arithmetic receipt covers these two triples.",
+    evidence_refs: ["docs/curves/cover-links.yaml"],
+    obligation_id: "catalog_generator_validation",
+  },
+  "subgroup.binary-untested-transfer.unknown": {
+    status: "unknown",
+    scope:
+      "Pullback validity, image annihilation, composition, and degree-inverse recovery for those two untested binary EC1 triples.",
+    rationale:
+      "The retained binary point-class implementation and batch certificate do not establish these generator-level results for the two later triples.",
+    evidence_refs: ["docs/curves/cover-links.yaml"],
+    obligation_id: "binary_catalog_transfer_replay",
+  },
   "subgroup.prime-generator.unknown": {
     status: "unknown",
     scope:
@@ -700,7 +724,7 @@ const profiles = {
     hypotheses: [
       "the exact EC1/curve UID record links to a binary cubic map",
       "the catalog subgroup-order integer is coprime to 3",
-      "the native batch certificate decodes and checks the linked generator",
+      "the retained native batch checks 140 exact triples; two later triples have explicit unknown-result overlays",
     ],
     claims: {
       subgroup_identity: "subgroup.identity.supported",
@@ -723,7 +747,7 @@ const profiles = {
       computational_advantage: "map.advantage.unknown",
     },
     boundary:
-      "Catalog-wide binary checks prove the listed generator-level typed identities and degree-inverse recovery. Pullback additivity, all-element composition, generated-subgroup injectivity, and actual image-order preservation remain conditional; exact numeric-order equality is proved only where an overlay supplies proof-grade evidence.",
+      "Retained binary checks support the listed generator-level typed identities for exactly 140 triples. Two later triples have explicit unknown-result overlays. Pullback additivity, all-element composition, generated-subgroup injectivity, and actual image-order preservation remain conditional; exact numeric-order equality is proved only where an overlay supplies proof-grade evidence.",
   },
   "subgroup.odd-degree2": {
     kind: "subgroup_base",
@@ -871,7 +895,7 @@ async function buildSourceArtifacts() {
       "content-addressed ICV1/EC1/HC1/CV1 graph",
       freshness(
         "supported",
-        "15,791 exact map links, 15,789 unique cover objects, and 700 EC1 triples",
+        "15,791 exact map links, 15,789 unique cover objects, and 979 EC1 triples",
         "The ledger records exact sorted UID memberships rather than count-only coverage.",
         ["docs/curves/cover-links.yaml"],
       ),
@@ -1251,7 +1275,7 @@ async function buildLedger() {
   const mapCount = mapBase.reduce((sum, group) => sum + group.count, 0);
   const subgroupCount = subgroupBase.reduce((sum, group) => sum + group.count, 0);
   assert(mapCount === 15791, `map membership count is ${mapCount}`);
-  assert(subgroupCount === 700, `subgroup membership count is ${subgroupCount}`);
+  assert(subgroupCount === 979, `subgroup membership count is ${subgroupCount}`);
   assert(fieldBindings.size === 557, `declared-field binding count is ${fieldBindings.size}`);
   assert(jacobianBindings.size === 15789, `Jacobian binding count is ${jacobianBindings.size}`);
   assert(typedMapBindings.size === 15791, `typed map binding count is ${typedMapBindings.size}`);
@@ -1268,8 +1292,8 @@ async function buildLedger() {
     );
   }
   const expectedSubgroupCounts = new Map([
-    ["subgroup.binary-degree3", 141],
-    ["subgroup.odd-degree2", 559],
+    ["subgroup.binary-degree3", 142],
+    ["subgroup.odd-degree2", 837],
   ]);
   for (const group of subgroupBase) {
     assert(
@@ -1447,26 +1471,46 @@ async function buildLedger() {
           "urn:curve-cover-map:1:sha256:753aa4b663b50db4dee22881f5e9f60e9ff1b1379986b06af1a8785c5ee58bb4",
         ],
         claim_overrides: {
-          generator_on_curve: "subgroup.prime-generator.unknown",
-          catalog_order_annihilates_generator: "subgroup.prime-generator.unknown",
-          pullback_valid: "subgroup.prime-transfer.unknown",
-          image_annihilated_by_catalog_order: "subgroup.prime-transfer.unknown",
-          composition_on_generator: "subgroup.prime-transfer.unknown",
-          degree_inverse_recovery: "subgroup.prime-transfer.unknown",
+          generator_on_curve: "subgroup.binary-untested-generator.unknown",
+          catalog_order_annihilates_generator: "subgroup.binary-untested-generator.unknown",
+          pullback_valid: "subgroup.binary-untested-transfer.unknown",
+          image_annihilated_by_catalog_order: "subgroup.binary-untested-transfer.unknown",
+          composition_on_generator: "subgroup.binary-untested-transfer.unknown",
+          degree_inverse_recovery: "subgroup.binary-untested-transfer.unknown",
         },
         evidence_additions: ["docs/curves/cover-links.yaml#EC1N73Ce0h9999c3e90683"],
         boundary:
           "This binary EC1 triple entered the expanded registry after the retained native batch receipt. Identity and degree-coprimality are supported; generator and transfer checks remain unknown.",
+      },
+      {
+        overlay_id: "subgroup.binary-pr2452-registry-unvalidated",
+        kind: "subgroup",
+        target: [
+          "EC1N73Ce0h243f847bccdd",
+          "urn:ec-record:1:sha256:243f847bccdd57c5fb0e458c368f5dee255dbd26406ce6c72e727b45cede73d3",
+          "urn:curve-cover-map:1:sha256:753aa4b663b50db4dee22881f5e9f60e9ff1b1379986b06af1a8785c5ee58bb4",
+        ],
+        claim_overrides: {
+          generator_on_curve: "subgroup.binary-untested-generator.unknown",
+          catalog_order_annihilates_generator: "subgroup.binary-untested-generator.unknown",
+          pullback_valid: "subgroup.binary-untested-transfer.unknown",
+          image_annihilated_by_catalog_order: "subgroup.binary-untested-transfer.unknown",
+          composition_on_generator: "subgroup.binary-untested-transfer.unknown",
+          degree_inverse_recovery: "subgroup.binary-untested-transfer.unknown",
+        },
+        evidence_additions: ["docs/curves/cover-links.yaml#EC1N73Ce0h243f847bccdd"],
+        boundary:
+          "This binary EC1 triple is in the expanded registry but absent from the retained native batch. Identity and degree-coprimality are supported; generator and transfer checks remain unknown.",
       },
     ],
     coverage: {
       catalog_maps: 15791,
       unique_cover_models: 15789,
       geometry_verified_maps: 15791,
-      ec1_representations: 700,
+      ec1_representations: 979,
       assessed_maps: 15791,
       unassessed_maps: 0,
-      assessed_subgroups: 700,
+      assessed_subgroups: 979,
       unassessed_subgroups: 0,
       map_membership_entries: mapCount,
       subgroup_membership_entries: subgroupCount,
@@ -1511,7 +1555,7 @@ async function buildLedger() {
         control: "identity",
         assessment: freshness(
           "supported",
-          "all 15,791 map UIDs and 700 exact EC1/curve/map triples",
+          "all 15,791 map UIDs and 979 exact EC1/curve/map triples",
           "The generator resolves exact content-addressed joins and rejects duplicates or missing rows.",
           [
             "scripts/build_cover_transfer_assessments.mjs",
@@ -1642,7 +1686,7 @@ async function buildLedger() {
     ],
     exploration_boundary: [
       "No search for production targets, private keys, or discrete logarithms was performed.",
-      "All 15,791 map rows and all 700 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
+      "All 15,791 map rows and all 979 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
       "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
       "The 15,626 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
       "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",

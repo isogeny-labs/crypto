@@ -7,11 +7,11 @@
     "not_applicable"
   ],
   "assessment_date": "2026-10-24",
-  "catalog_commit": "4a181ccb3201d3275cbf7aed29bfd72f58d82467",
+  "catalog_commit": "0c7310ba96739ab57c35ac4e4a7654e117a854ad",
   "source_artifacts": [
     {
       "path": "docs/curves/registry.json",
-      "sha256": "2d1c9747484edcadd3ecee7dad242189ae60574215c902e066879d5943e5dd0c",
+      "sha256": "e39687f5d46346faa2b65ca0fa7d635afec6b01b5025951192d3fa4d1829c3cb",
       "role": "exact ICV1/EC1 input registry",
       "freshness": {
         "status": "supported",
@@ -24,7 +24,7 @@
     },
     {
       "path": "docs/curves/covers.json",
-      "sha256": "9464772a4d1a3d671a7b6b21a2320647c1569ea1614871751a46d4026bf1f652",
+      "sha256": "af2b530b5f5022c4f331e35508a366691e1b720e9326f6e6e8a3999c5408ed0a",
       "role": "generated curve-level geometry catalog",
       "freshness": {
         "status": "supported",
@@ -37,11 +37,11 @@
     },
     {
       "path": "docs/curves/cover-links.yaml",
-      "sha256": "9769443fb248e6218b4a4577600034fd9c0808ea10a7ae73371f3ddffc191263",
+      "sha256": "8707d3e522ba56a7500fd0fd3808aff3f5e598113979e2c6a2986144909eb32b",
       "role": "content-addressed ICV1/EC1/HC1/CV1 graph",
       "freshness": {
         "status": "supported",
-        "scope": "15,791 exact map links, 15,789 unique cover objects, and 700 EC1 triples",
+        "scope": "15,791 exact map links, 15,789 unique cover objects, and 979 EC1 triples",
         "rationale": "The ledger records exact sorted UID memberships rather than count-only coverage.",
         "evidence_refs": [
           "docs/curves/cover-links.yaml"
@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "835f3a54f10407c5a4b26e42a40036c42ef4b6ba64488cf60f8a0211937b92b9",
+      "sha256": "2b69d3715418610d69a9d638b6da2fa0983f13726e1dcfb97e4dbdd4b21d9b36",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -128,7 +128,7 @@
     },
     {
       "path": "src/bin/hyperelliptic_cover.rs",
-      "sha256": "3cc84bf90685c63653b96b1d7f134efacbdb37e30ea8d8762bd3d28308df0a00",
+      "sha256": "fc6725d4fa517f948f1811ef9fac559917c013a71102171407722b34c72fbfa5",
       "role": "standalone CLI and native binary subgroup batch certificate",
       "freshness": {
         "status": "supported",
@@ -234,7 +234,7 @@
     },
     {
       "path": ".github/workflows/curve-covers.yml",
-      "sha256": "e7090d810294b6559e3419280aae5e368a3953c5ff44b798792fd4fb2772bfd2",
+      "sha256": "e7a3ca8fbea7543f913204ce0ddb8cec696e66bfea9b94b93bd64396d98e2803",
       "role": "exact implementation-version dependency: .github/workflows/curve-covers.yml",
       "freshness": {
         "status": "supported",
@@ -247,7 +247,7 @@
     },
     {
       "path": ".github/workflows/release.yml",
-      "sha256": "8635bc85fb5f3f266ceffdafaf10c817d36076dc26184576b431c1300481c5d8",
+      "sha256": "d58f10537b9ce25b931687dcd8d3989b89465bc154561674a7f179b42882ffa7",
       "role": "exact implementation-version dependency: .github/workflows/release.yml",
       "freshness": {
         "status": "supported",
@@ -443,7 +443,7 @@
     },
     {
       "path": "docs/curves/jacobian-transfers.json",
-      "sha256": "616c2fa7a51bb3402f8f7305ee17cdc71046fda8209d8046184611133bb6a345",
+      "sha256": "92c3a75954717c7f4248f6b19385a1d99af759fc44a2752c2d14b5d80022b5b1",
       "role": "legacy formula-screen inventory; not a transfer certificate",
       "freshness": {
         "status": "refuted",
@@ -484,7 +484,7 @@
     },
     {
       "path": "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
-      "sha256": "ddeafc3ccbcc4cb227c4754eb45b0fa5a3d6eda4c0064c01485e0fbe5173d4d6",
+      "sha256": "056421e90088a3553bd12b8bfcced9e7e13c15fc5c45cacf6769254bc08b7fc1",
       "role": "standalone CLI and supported-model documentation",
       "freshness": {
         "status": "supported",
@@ -536,7 +536,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
-      "sha256": "2c4709e47dca4d84002ead0bf3a942eab7da277089ff608aa6e5c3a506606a76",
+      "sha256": "6bf9546e66b6665a7e267826735b72fce83deab232eff68a8a2734559f0305fb",
       "role": "independent catalog-wide assessment verifier",
       "freshness": {
         "status": "supported",
@@ -549,7 +549,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
-      "sha256": "931ff983a3ee710a23c5d7a1963ddfc878e3b51aa4a88cfedfb71044de80f2e1",
+      "sha256": "7545519f62dcba7d48ae85ebb2e657b1b462dac95fee820e103d6c010150a0da",
       "role": "PDF coverage-marker metadata normalization source",
       "freshness": {
         "status": "supported",
@@ -562,7 +562,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/README.md",
-      "sha256": "ce5b5b232629f4e641c21fbada7ab1c5cf23b2665043ab979ccb7d5b701240f9",
+      "sha256": "ae3f4ecf2c2d77a00e631d8c8846b5a3f3fa2cc3a8480787297e469b4efd0476",
       "role": "source-linked catalog-wide assessment report",
       "freshness": {
         "status": "supported",
@@ -588,7 +588,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.dot",
-      "sha256": "17ea88c54076f86f70ee4b00e106db9a5cba500cfe2fd3ba3ba09dc8fed3b061",
+      "sha256": "fb343f6f174e685ae29fc015cadfa4ee536f8b0bc84bb7d00cb4c70d70e60c19",
       "role": "assessment diagram source",
       "freshness": {
         "status": "supported",
@@ -601,7 +601,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.svg",
-      "sha256": "d5d987d5c6143e4d6955ab55ba3b9ed77c7101c5ca621ff956a245b2bd1d0237",
+      "sha256": "2a935af310ff420840298ba19ae4f57e0047d5642c0a9c627f2ac1bc43f93a91",
       "role": "rendered assessment diagram in SVG format",
       "freshness": {
         "status": "supported",
@@ -614,7 +614,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.png",
-      "sha256": "6150e7cd431e555011a79bd70836b715549584d54d6eae1b6334b918cd039583",
+      "sha256": "3348475eea6267ef0055eeb9aed8d21811ab597f2882667f6e6c9699fd4770e7",
       "role": "rendered assessment diagram in PNG format",
       "freshness": {
         "status": "supported",
@@ -627,7 +627,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.dot",
-      "sha256": "a50bc70c8a5d1e4a6a135242e9c4fadf22d4ffaa62bc7beac43268c076d27104",
+      "sha256": "0d168395a4401c572d4ee158791c9cb72f04f49e787a74a0cd4d3aabfaa9222c",
       "role": "typed transfer-context diagram source",
       "freshness": {
         "status": "supported",
@@ -640,7 +640,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.svg",
-      "sha256": "06f575e687a9a920bfe40cf48382467191ed852d936b14771259976270ae0319",
+      "sha256": "110d9596fa1f9c5d2a7ef283f87e1434193a707707e4eee40c5c2b38fa8481d5",
       "role": "rendered typed transfer-context diagram in SVG format",
       "freshness": {
         "status": "supported",
@@ -653,7 +653,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_transfer_context.png",
-      "sha256": "04ffe1afdd1a12fa614cff36539e7b24627b31f9d52c3c2e2343d05e828632fc",
+      "sha256": "d534f36f429c1f9dc5404507c5f793d442048824d831f14f75bd1df721c0b54a",
       "role": "rendered typed transfer-context diagram in PNG format",
       "freshness": {
         "status": "supported",
@@ -666,7 +666,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/cover_transfer_assessment_20261013.pdf",
-      "sha256": "87a9bc25632354e7c023c93e4c2b86c0603f4ab16e5f9096ed6a6b91a080d0a6",
+      "sha256": "d1d4e86af65f0ca409fd2f11dc733469eb9605fd5f79e75afa392e6224e8d5c6",
       "role": "rendered catalog-wide assessment PDF",
       "freshness": {
         "status": "supported",
@@ -976,6 +976,24 @@
         "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses"
       ]
     },
+    "subgroup.binary-untested-generator.unknown": {
+      "status": "unknown",
+      "scope": "Generator membership and [r]G=O for the two linked binary EC1 triples absent from the retained 140-triple native batch.",
+      "rationale": "The exact EC1/curve/map identities are bound, but no native generator arithmetic receipt covers these two triples.",
+      "evidence_refs": [
+        "docs/curves/cover-links.yaml"
+      ],
+      "obligation_id": "catalog_generator_validation"
+    },
+    "subgroup.binary-untested-transfer.unknown": {
+      "status": "unknown",
+      "scope": "Pullback validity, image annihilation, composition, and degree-inverse recovery for those two untested binary EC1 triples.",
+      "rationale": "The retained binary point-class implementation and batch certificate do not establish these generator-level results for the two later triples.",
+      "evidence_refs": [
+        "docs/curves/cover-links.yaml"
+      ],
+      "obligation_id": "binary_catalog_transfer_replay"
+    },
     "subgroup.prime-generator.unknown": {
       "status": "unknown",
       "scope": "Generator membership and [r]G=O replay for all 837 linked odd-characteristic EC1 representations.",
@@ -1144,7 +1162,7 @@
       "hypotheses": [
         "the exact EC1/curve UID record links to a binary cubic map",
         "the catalog subgroup-order integer is coprime to 3",
-        "the native batch certificate decodes and checks the linked generator"
+        "the retained native batch checks 140 exact triples; two later triples have explicit unknown-result overlays"
       ],
       "claims": {
         "subgroup_identity": "subgroup.identity.supported",
@@ -1162,7 +1180,7 @@
         "recovery_from_arbitrary_jacobian_result": "subgroup.arbitrary-recovery.unknown",
         "computational_advantage": "map.advantage.unknown"
       },
-      "boundary": "Catalog-wide binary checks prove the listed generator-level typed identities and degree-inverse recovery. Pullback additivity, all-element composition, generated-subgroup injectivity, and actual image-order preservation remain conditional; exact numeric-order equality is proved only where an overlay supplies proof-grade evidence."
+      "boundary": "Retained binary checks support the listed generator-level typed identities for exactly 140 triples. Two later triples have explicit unknown-result overlays. Pullback additivity, all-element composition, generated-subgroup injectivity, and actual image-order preservation remain conditional; exact numeric-order equality is proved only where an overlay supplies proof-grade evidence."
     },
     "subgroup.odd-degree2": {
       "kind": "subgroup_base",
@@ -17016,8 +17034,8 @@
     "subgroup_base": [
       {
         "profile_id": "subgroup.binary-degree3",
-        "count": 141,
-        "members_sha256": "45b918f182a0375f14d55385e84ca5eb1282b672cbe24ffb4617823be6249518",
+        "count": 142,
+        "members_sha256": "ecae2dea5e6394f69224faafe6b54dd10b26b922e37e118588b26ba9b9aba3d9",
         "members": [
           [
             "EC1N10Csfh6e9d8ba543f9",
@@ -17690,6 +17708,11 @@
             "urn:curve-cover-map:1:sha256:3bf99094e967f4459145a09ff29470c30c5dab2ff1892decf94a11f0eae85483"
           ],
           [
+            "EC1N73Ce0h243f847bccdd",
+            "urn:ec-record:1:sha256:243f847bccdd57c5fb0e458c368f5dee255dbd26406ce6c72e727b45cede73d3",
+            "urn:curve-cover-map:1:sha256:753aa4b663b50db4dee22881f5e9f60e9ff1b1379986b06af1a8785c5ee58bb4"
+          ],
+          [
             "EC1N73Ce0h9999c3e90683",
             "urn:ec-record:1:sha256:9999c3e9068310bbfdef49da0bb3e43251d8a89431b9e79715225d5671ab2abd",
             "urn:curve-cover-map:1:sha256:753aa4b663b50db4dee22881f5e9f60e9ff1b1379986b06af1a8785c5ee58bb4"
@@ -17728,8 +17751,8 @@
       },
       {
         "profile_id": "subgroup.odd-degree2",
-        "count": 559,
-        "members_sha256": "fdf3c5c299140f9ffa905633e88a711c91c2696239bf553a21f6ea66e5a9c795",
+        "count": 837,
+        "members_sha256": "7ed5e624cebaaa6f1b75b13a7874c6b46b3f70daa76c4e09b2611cdb2e19af17",
         "members": [
           [
             "EC1P10Cfphcf15d87ab724",
@@ -18197,6 +18220,16 @@
             "urn:curve-cover-map:1:sha256:d9a637fdb518c2e92815d13de07e89327d661904e0174a64e5c7c906df03d5fe"
           ],
           [
+            "EC1P19Cfphb7d3466a27f9",
+            "urn:ec-record:1:sha256:b7d3466a27f98e6d820872a02c9a152e776f68be64c33739b199495e6807763a",
+            "urn:curve-cover-map:1:sha256:b2378e6ed34b15819a8e109a5f96881eae31627342d5fb433786f45f0984fe22"
+          ],
+          [
+            "EC1P19Cfphc54d8212d6d1",
+            "urn:ec-record:1:sha256:c54d8212d6d184b714eb6bd5139a341dd21989e104dc97c71d719f0cd4a11eb7",
+            "urn:curve-cover-map:1:sha256:9fad609f3190518a74ebd80c6ed24220ea6cf503d01077424d44c3c6bdb53aa3"
+          ],
+          [
             "EC1P20Cfph0cb8fb796d66",
             "urn:ec-record:1:sha256:0cb8fb796d6690d952990a3d9c00926d8a1e508f31ed42f29906e52bc0c80288",
             "urn:curve-cover-map:1:sha256:534834d29fdac977225aa4d6613dfb6671c8647a078bc9699921dbeafe3fbb37"
@@ -18215,6 +18248,16 @@
             "EC1P20Cfphd19e740ea95d",
             "urn:ec-record:1:sha256:d19e740ea95dfa20b38c78009a4067ce877a0e0d2ee70bb71e58deb560c2228c",
             "urn:curve-cover-map:1:sha256:24a5eb10d3a9d4df280ad254709b238b510de4b0ca3da430b3c22936bed94ec8"
+          ],
+          [
+            "EC1P21Cfph3cf2374c4388",
+            "urn:ec-record:1:sha256:3cf2374c4388dc5f996c98b91e7af465056f1da10cfcd0406fc5e00e6bc374b5",
+            "urn:curve-cover-map:1:sha256:f5bf59b04bff676e83e5a2aa1d45863e49d2761889b30efb75f73ab084b6bf35"
+          ],
+          [
+            "EC1P21Cfph461280188d91",
+            "urn:ec-record:1:sha256:461280188d91284bef12892a9f82abfb1af46cbae26d9e9b78570d13e4495815",
+            "urn:curve-cover-map:1:sha256:1a2f4ccbda327c595570fcb424e8785871b7235743e890ee11c71385608f0aa4"
           ],
           [
             "EC1P221Cfph91a35d337eec",
@@ -20397,6 +20440,1316 @@
             "urn:curve-cover-map:1:sha256:4956b6aa087de1cbbaf30b8164ac02056a4b5297425e2629b799e2c7ca48540e"
           ],
           [
+            "EC1P53Cfph01844a0f0e3d",
+            "urn:ec-record:1:sha256:01844a0f0e3d3a486cbaacc2055db7fbf384662d09d00f2e5b94158423da7f0b",
+            "urn:curve-cover-map:1:sha256:694514547fd2aa529d9d3490202951229ccf51a0790f77c782c136e4e0f4d29f"
+          ],
+          [
+            "EC1P53Cfph02f26bc5d715",
+            "urn:ec-record:1:sha256:02f26bc5d715290f0fc93773e5ae5662292f88f8bfbc075d01fce3d18dab77c7",
+            "urn:curve-cover-map:1:sha256:1299e0dd84500ec763cafd3a89d2fc1712bfb4ab57dc752ba1940d45ba75e47b"
+          ],
+          [
+            "EC1P53Cfph0445613129ad",
+            "urn:ec-record:1:sha256:0445613129ad2c3233d2177eb3f03e2311f70db54fe02396d7e5a4414fc0cf50",
+            "urn:curve-cover-map:1:sha256:1fe21c2151de5e70e151847f6c69da7bbf74bf6010582a94517f92391f9ee9ff"
+          ],
+          [
+            "EC1P53Cfph06aed8c76545",
+            "urn:ec-record:1:sha256:06aed8c76545d4a8873ee05d566e6081e72537d9c2f24ff55aee967a72fddd47",
+            "urn:curve-cover-map:1:sha256:2a8ed75e0946e3a28a8d46885317835d59261d6866450fd62d61dbf421b5d690"
+          ],
+          [
+            "EC1P53Cfph070f090ffc6b",
+            "urn:ec-record:1:sha256:070f090ffc6bea34dd6a329a62df424f05b8a3e3cabc82be727a45fb66a3c49c",
+            "urn:curve-cover-map:1:sha256:62a07a2de9657151d4244692cb057ffb1d49812ce102707742d7ac844f6da3af"
+          ],
+          [
+            "EC1P53Cfph085070bfe134",
+            "urn:ec-record:1:sha256:085070bfe1344009ace16cc26baeefa1b3be65c81e643402c59cb1b4de21f13b",
+            "urn:curve-cover-map:1:sha256:e05fa4b09f165b722d1be2a7504a62b61ea57e4a893bf369429a1f7f3487059a"
+          ],
+          [
+            "EC1P53Cfph08d7c7b5e1bd",
+            "urn:ec-record:1:sha256:08d7c7b5e1bdf85e4c90737017c3fd4f8085ee7935b7f2c525e7ec9b4efecf15",
+            "urn:curve-cover-map:1:sha256:944043e65f0f55f46c03ac1ff8beaa9b528992616ad0f9d9e3df6e3ad3a51813"
+          ],
+          [
+            "EC1P53Cfph097597faccb7",
+            "urn:ec-record:1:sha256:097597faccb722cd04f6df162bdbc10c04f02a37e36244f0924de2e21d431f2a",
+            "urn:curve-cover-map:1:sha256:199c6fbc592f6a479692fb71acc372925cafb6e946d36afbb1488f4bd5c149b1"
+          ],
+          [
+            "EC1P53Cfph0a4caf17a30c",
+            "urn:ec-record:1:sha256:0a4caf17a30ca37ef77c745c3da4a04242e7228e985c6725170899f6c67c0794",
+            "urn:curve-cover-map:1:sha256:95e16bc863134562fa3a7d45db0e5d9598109152a009d1b7c501609fe7b4fe5d"
+          ],
+          [
+            "EC1P53Cfph0bc63ca361df",
+            "urn:ec-record:1:sha256:0bc63ca361dfd9bd84bcdb5ecbfe57d967e9fc5ae6d1e28c924ac78ca0d9cdde",
+            "urn:curve-cover-map:1:sha256:1a45834d20a5784371f1a895fad5e5eb5d312428072d209087e024a7dffdcf23"
+          ],
+          [
+            "EC1P53Cfph0c33e49d1c50",
+            "urn:ec-record:1:sha256:0c33e49d1c5093b0071f2897aae6dbf41d1eca5ad19ac2230b3786a681571577",
+            "urn:curve-cover-map:1:sha256:7e01af29b1194cb25d4a227889ee5c6f530f39fc7f36b3d6148ac47cf95385bd"
+          ],
+          [
+            "EC1P53Cfph0cfebf93329d",
+            "urn:ec-record:1:sha256:0cfebf93329df5f84215b36c821d543d89466aa1abf61220d076da58711eaec8",
+            "urn:curve-cover-map:1:sha256:6c2f1c83889d03b77fff1fdd56e40943bb9ae3dc37f5e1d01cf46ac5b7ac8e05"
+          ],
+          [
+            "EC1P53Cfph0d24689b35da",
+            "urn:ec-record:1:sha256:0d24689b35da4d8714864a9abdfd714470d07ae5a79914623f7b4f6307d39408",
+            "urn:curve-cover-map:1:sha256:b40e3966cb630b4b75b825239cb4564056dccf656a8fae0e8f7ec1dab1221268"
+          ],
+          [
+            "EC1P53Cfph0df4f5e1b5f1",
+            "urn:ec-record:1:sha256:0df4f5e1b5f17a84b220a84d2ce813736823b712d6e8f7c81804d8e8abea1438",
+            "urn:curve-cover-map:1:sha256:96033b7faf899f73a77c7cbbf310ec7a979034def99a64c6197eb1567094afc3"
+          ],
+          [
+            "EC1P53Cfph0fbe28bd9774",
+            "urn:ec-record:1:sha256:0fbe28bd9774f7a7499f9c4fc590a56f0c9d985825e127336bb1ba16952d4be4",
+            "urn:curve-cover-map:1:sha256:0e84b044dabbc7bfa431815f3fd0466853691d54691c3bdaa7ecd8fa5a4b6f6c"
+          ],
+          [
+            "EC1P53Cfph0fd173da9c40",
+            "urn:ec-record:1:sha256:0fd173da9c4038124b72a5de6265b15555579afab2a00bb279bea8658c4f31d3",
+            "urn:curve-cover-map:1:sha256:89b2375cf2ad11fc69f594cb4d2fdb908bde6c2cd5e7c4996b0885a6c227c62e"
+          ],
+          [
+            "EC1P53Cfph128408677990",
+            "urn:ec-record:1:sha256:128408677990bb52db745ba88a374850cab648a658955999c0b0dfb7142be58a",
+            "urn:curve-cover-map:1:sha256:42e76f2d6b4f8652b5aad3e70c0918d0784b4da61484ae8aa798afb60f362e3e"
+          ],
+          [
+            "EC1P53Cfph138f92f24e85",
+            "urn:ec-record:1:sha256:138f92f24e85e237e25630c73622cbc515f939c5575ea279dece22d1e9ec6c2a",
+            "urn:curve-cover-map:1:sha256:c31cd6996d289d27472e9e0323edc883d765e759f77ba6bc3aca94acb6a83c50"
+          ],
+          [
+            "EC1P53Cfph13a90e5b44d2",
+            "urn:ec-record:1:sha256:13a90e5b44d2a0ebccb40540f6512bca722f8e4f5f1989e93d4a66e27d25b6f7",
+            "urn:curve-cover-map:1:sha256:8f940f087c7243c5504913c51fcf715a01e867fdec0a04e0a01aaf23aaaacac7"
+          ],
+          [
+            "EC1P53Cfph149c160022bb",
+            "urn:ec-record:1:sha256:149c160022bbc2c0bc0c15b6c93063a0795687c64a1aa826fa2d7e2caffeb111",
+            "urn:curve-cover-map:1:sha256:af6cf89b2d4c88f4156cde2fedac610ac1d104d683591af65a8e69772ca48815"
+          ],
+          [
+            "EC1P53Cfph16397cec8a24",
+            "urn:ec-record:1:sha256:16397cec8a249bdd74ae45946cff84e89925f3f6775cd86ac90129be1860e170",
+            "urn:curve-cover-map:1:sha256:67984a4ef67de23bcd9236f3123821b54735e3199f7229950e9cc4b855aae354"
+          ],
+          [
+            "EC1P53Cfph1723166d5805",
+            "urn:ec-record:1:sha256:1723166d58052159b28e61b81e19dcffa8fc44f4bb4bb12a2c26d2485232ec92",
+            "urn:curve-cover-map:1:sha256:a0b41c64031cd2974a537263de3bc94d02749c29221ebb0cee7e20aeee77c448"
+          ],
+          [
+            "EC1P53Cfph17bf3152547b",
+            "urn:ec-record:1:sha256:17bf3152547b47b7694395aaec214fdc77be19111f9d03fabe3275be6e31a0d6",
+            "urn:curve-cover-map:1:sha256:07ff29c3b79b5aeee728745f894f4f479ceb4a7e8e54c4a4ab00bbda3ea161e6"
+          ],
+          [
+            "EC1P53Cfph197116df5c1c",
+            "urn:ec-record:1:sha256:197116df5c1c467882fd37cac71bcd0ebc17c277bdd0f8ad4236439e0a6e68d6",
+            "urn:curve-cover-map:1:sha256:0fd63cee98c91bbdf194271c89ea520b7a0a1d0f2246388d7b90eaee43bdf2fe"
+          ],
+          [
+            "EC1P53Cfph19d2a80d5b65",
+            "urn:ec-record:1:sha256:19d2a80d5b655ec24c2d1c16a26e117f6c6fcd33bee7e79f8f350b0c2522a8ec",
+            "urn:curve-cover-map:1:sha256:37a03ac1004488b63acde398208697950766ce5d8c9bb3c737d3fd32d4111e81"
+          ],
+          [
+            "EC1P53Cfph19d9d682e7cf",
+            "urn:ec-record:1:sha256:19d9d682e7cf97f2b941af7de43043f3c8e9e951a31c2db7360e3fcbb9dc6bb8",
+            "urn:curve-cover-map:1:sha256:d40fb4243559c1280419dfcf6456d3ae5e8457546b00ccb22b00c29444d5d2c3"
+          ],
+          [
+            "EC1P53Cfph1af497b6fea3",
+            "urn:ec-record:1:sha256:1af497b6fea3987fb60f2a388a0162f9a7235cc061ea2c471e4a08a15c496439",
+            "urn:curve-cover-map:1:sha256:758f843f50870498f1219d18b067e1a1030c3640d898999948e2cdeaa255551e"
+          ],
+          [
+            "EC1P53Cfph1afbb6be58ad",
+            "urn:ec-record:1:sha256:1afbb6be58ad7c6eb515fb3e4a1781ab0f334f09af5749278c1b9d3a1bedde4b",
+            "urn:curve-cover-map:1:sha256:2a218a57b63f5abf1a3dfd0b3686d1d81be525dddc327e60a877be16a4311626"
+          ],
+          [
+            "EC1P53Cfph1b436056e663",
+            "urn:ec-record:1:sha256:1b436056e6636ad8f2db0e7fac7363a32f09beb41aace90e0a5e923a82d74855",
+            "urn:curve-cover-map:1:sha256:17b7f6dbc70515ce0803bc6ec3e39b768fe6f2f57a9dc27cb878290c0004377e"
+          ],
+          [
+            "EC1P53Cfph1bb46a705d79",
+            "urn:ec-record:1:sha256:1bb46a705d79755dee90d1902a736a975b47c3f556e3add83ea16137fbbfc57b",
+            "urn:curve-cover-map:1:sha256:4980bc207496f50f89ce7b3600acc6942da17111adb791dde6ff3ae81f4f2d12"
+          ],
+          [
+            "EC1P53Cfph1d8bd8ac66ed",
+            "urn:ec-record:1:sha256:1d8bd8ac66ed5c35e6e09bad16b357e19eb7ba7a7d523bcba20ac1e127ab7092",
+            "urn:curve-cover-map:1:sha256:ca2e1fae1fc5275efad9e51737dc7bb2a7d4a7747855728543fb78f9212c8d10"
+          ],
+          [
+            "EC1P53Cfph1e39e092a475",
+            "urn:ec-record:1:sha256:1e39e092a4752c2d457c09f7d93d3e847d4f75b35019907400da1ddb181a9f77",
+            "urn:curve-cover-map:1:sha256:5c8c5a52437fd43d01107a185d7e77471232818bee223a141531a144b719dcb8"
+          ],
+          [
+            "EC1P53Cfph1e9118139a7b",
+            "urn:ec-record:1:sha256:1e9118139a7b538682f2544b2303c1803cfbca8fca48ffec358c6c602dfb1aa3",
+            "urn:curve-cover-map:1:sha256:46e2fbb8d253b9b595896cbf14c5daae588816cbd0d3d9ecab822718aa5426e0"
+          ],
+          [
+            "EC1P53Cfph1ee51af9c076",
+            "urn:ec-record:1:sha256:1ee51af9c0763f7bb7a62ee2e79bb753349b263019300672e33fa9e681580d69",
+            "urn:curve-cover-map:1:sha256:77210c6bc60a98f83683bde09c8f096eb575b16027f8f55c429c4675ddb2d884"
+          ],
+          [
+            "EC1P53Cfph1f3ead5c0865",
+            "urn:ec-record:1:sha256:1f3ead5c0865d340bfa48024279eb704b85217e9e1e11deb2864eaf835610da0",
+            "urn:curve-cover-map:1:sha256:abd4f28206adf69968fc12a8e608bd62e7dc42cfdeb82b74557196e22f3b57d0"
+          ],
+          [
+            "EC1P53Cfph1fabe0371173",
+            "urn:ec-record:1:sha256:1fabe03711734764f4605df6f05a8d5ddfe51a5fed9ba072494c27c5d477b65d",
+            "urn:curve-cover-map:1:sha256:a2a6d4e0b053e24d98211c8ccb2bf790c0f94f655d3a83fddab26a2989b512cc"
+          ],
+          [
+            "EC1P53Cfph207af8512b87",
+            "urn:ec-record:1:sha256:207af8512b87503ae4637687b36ef6ddacd996618a9d6d548eb62c02f4e11632",
+            "urn:curve-cover-map:1:sha256:0faa9f4d7bb1ea2cf5e09590137fda909ee313e587efda54f1a87ec7053b4bba"
+          ],
+          [
+            "EC1P53Cfph216f44b0872c",
+            "urn:ec-record:1:sha256:216f44b0872c1dc714bf7fe658954969663002d6dcfd46e3a8ebdf0c0de593f3",
+            "urn:curve-cover-map:1:sha256:4fcf742a14ae22556928a3bd01f87122140d3e2b8242f981b79b3f0f5533ff08"
+          ],
+          [
+            "EC1P53Cfph21bf4bcc96a7",
+            "urn:ec-record:1:sha256:21bf4bcc96a771addc9bdda276411430925a2d2841b63bf09feeb13581655bd1",
+            "urn:curve-cover-map:1:sha256:fa374a9537feb0f39e819db28fa2858005815b07676fcc55c4654b26d15982ea"
+          ],
+          [
+            "EC1P53Cfph2432465c7728",
+            "urn:ec-record:1:sha256:2432465c77280b73aff905a71bc1165d4653472d568c09a14889b7b3cab629fb",
+            "urn:curve-cover-map:1:sha256:193eda0a3bbff6da8f65182d38b4472684451f5f34900eb253a515e7c1100624"
+          ],
+          [
+            "EC1P53Cfph24cd6aec10b9",
+            "urn:ec-record:1:sha256:24cd6aec10b96a2f27e8bfb8475fc3a3ac535bdbf27b801ed53dce7d2a84e55e",
+            "urn:curve-cover-map:1:sha256:6646b1edd9dd81602209f8b0bc49d40ad7a83cc4d8a66907e6e24f347adddfad"
+          ],
+          [
+            "EC1P53Cfph2573d4231441",
+            "urn:ec-record:1:sha256:2573d42314414acbb0e78c0c4ff1e6e245fc4f19b4dd0d19d3759966ca22c99c",
+            "urn:curve-cover-map:1:sha256:42e7ea79f8d7335e8224e7342e0169f716a3bced7a6fbbc8643ca64ded2315e3"
+          ],
+          [
+            "EC1P53Cfph2642401daa37",
+            "urn:ec-record:1:sha256:2642401daa37fef83105a1edd6accb2add628b5b3a6a8e46110d1529dad11561",
+            "urn:curve-cover-map:1:sha256:8463eec7eb8b179fd52d3de25eb6d2462618642aae4b4c0306e5c155a9c90574"
+          ],
+          [
+            "EC1P53Cfph2716c017b9d4",
+            "urn:ec-record:1:sha256:2716c017b9d426656c9c425c6c56bad0db9ac37e2464b58868a52d7a2208eb28",
+            "urn:curve-cover-map:1:sha256:19a91e915d371746d97527ad2d12e59a4b2809df6d470b2c821adfa00580eb4c"
+          ],
+          [
+            "EC1P53Cfph273e01199b55",
+            "urn:ec-record:1:sha256:273e01199b5519b9db79272c409ee621e76711b472cafa2d52e62ef0934138fc",
+            "urn:curve-cover-map:1:sha256:ada757a533980af8751cf7b0541b0bbcd9e52bc63779a950c3afb1cb04ca3607"
+          ],
+          [
+            "EC1P53Cfph289846b77251",
+            "urn:ec-record:1:sha256:289846b77251fef10b0c419455f41557ed0674045506504c6d701d80b3615650",
+            "urn:curve-cover-map:1:sha256:a77bcdda61c9b7b1315718738045fe53b4414fdd06ef93ff2a27f2340811c260"
+          ],
+          [
+            "EC1P53Cfph28ee752107c9",
+            "urn:ec-record:1:sha256:28ee752107c9e2460acfec886cfc0ebade3fd405889b9874a9a723001af75fde",
+            "urn:curve-cover-map:1:sha256:f17355be3ea6c41bedeecab0a40b86b84522fcdd931902f3dd400a3af6d41a04"
+          ],
+          [
+            "EC1P53Cfph28ffdece8dea",
+            "urn:ec-record:1:sha256:28ffdece8dea733b804c5d411af67227f3f3ccb240316290f893c22628309803",
+            "urn:curve-cover-map:1:sha256:2f121e046bd724b75bfcde9eb6ed57eaf3bfc37852fa1d69c812ffb2cfdd8aeb"
+          ],
+          [
+            "EC1P53Cfph29393c607738",
+            "urn:ec-record:1:sha256:29393c607738935f82431bf2403b91634e3bb6567e8764173a6dc0d69af3e2d5",
+            "urn:curve-cover-map:1:sha256:c9ba6ac6abf67a75b1f7d8b15543e79b440cdb7516eb0b106107c405f26852bf"
+          ],
+          [
+            "EC1P53Cfph2971bebd8aec",
+            "urn:ec-record:1:sha256:2971bebd8aec60a11f3712155e77e58abbb9e35ed3082d117a76a31b3c02587a",
+            "urn:curve-cover-map:1:sha256:a7292a272ca8f893a92ef61a6d6319012d9f4d42ff8b4218073c9e68ac02d765"
+          ],
+          [
+            "EC1P53Cfph298039877e00",
+            "urn:ec-record:1:sha256:298039877e00a3cf3c6c68b4e85ed414918336140447d534f1e87f8c65068c05",
+            "urn:curve-cover-map:1:sha256:4bf674ba331aafed88def0c5883e0b549bc0fa1fea06d874c6c5e49ec60226a6"
+          ],
+          [
+            "EC1P53Cfph29f711fe98ef",
+            "urn:ec-record:1:sha256:29f711fe98efb7529b98de0056f7bd5f8496bfe45faa4e328bc70dc097b3b227",
+            "urn:curve-cover-map:1:sha256:c6e3b7466b27071bbf896d7bedc1e925fffb0271893513f02ade686309101a0c"
+          ],
+          [
+            "EC1P53Cfph2ce650bca4c3",
+            "urn:ec-record:1:sha256:2ce650bca4c3676afc8899b39975e6c69dc81050d2727a160241fa3a372064f3",
+            "urn:curve-cover-map:1:sha256:37dcce325a0dc8f3fb439636871009de8fdbfdee7232964c66cf48cf833f6042"
+          ],
+          [
+            "EC1P53Cfph2ebb23bdd5d1",
+            "urn:ec-record:1:sha256:2ebb23bdd5d14708490c4f3b83738914990e2c5cd39b970630b5d8100771079f",
+            "urn:curve-cover-map:1:sha256:0dc3886a16d28057cca0f3499fc09d3fd736c0c3975da53143fb49cc39b4d34c"
+          ],
+          [
+            "EC1P53Cfph3318db8add2a",
+            "urn:ec-record:1:sha256:3318db8add2a9117c819bb0dfe7c411e7a1407f599b9324c2159c0527d524a2d",
+            "urn:curve-cover-map:1:sha256:bccb4b26ec9f7817c1ae9393b760dc2d872dfe87026728acbfd84bccf364a8e1"
+          ],
+          [
+            "EC1P53Cfph33d79e6a5b4c",
+            "urn:ec-record:1:sha256:33d79e6a5b4c29fa45fff99bc14b551f8a21e768fff86027b2b394aaf8908098",
+            "urn:curve-cover-map:1:sha256:218d530178413f7a755e28e274137eb64a92ba29092afb5ffa1d49d08e7e6e55"
+          ],
+          [
+            "EC1P53Cfph354b5e09ee67",
+            "urn:ec-record:1:sha256:354b5e09ee675ec24576187974fa754407686888fd1465cc5eedec53946ecaa9",
+            "urn:curve-cover-map:1:sha256:5a98a3fc1aeabd321615a5dea2d08d6d21536ca44c7794cde7d88b8f122e4694"
+          ],
+          [
+            "EC1P53Cfph35e1c37a87d9",
+            "urn:ec-record:1:sha256:35e1c37a87d94439cece6fbe0c5b16d30b5bcef742b4b52c2d565d0cc60878aa",
+            "urn:curve-cover-map:1:sha256:ea9c65b1526fc5fa3c11b6ea57c2d25ec7be4c2d03cc475325ede888dafbed7e"
+          ],
+          [
+            "EC1P53Cfph3756211e1627",
+            "urn:ec-record:1:sha256:3756211e1627869df23673195bfaa8c0670727bb9c39409ff76b226fd342af01",
+            "urn:curve-cover-map:1:sha256:4da6e84dc1b7352572282da107ed6bf22fe1307352b865d93669707788c85570"
+          ],
+          [
+            "EC1P53Cfph38bb77f6b366",
+            "urn:ec-record:1:sha256:38bb77f6b3667fe190ce4fbe8f97a41f63ef3ab7b555fca421b9564d5c81921b",
+            "urn:curve-cover-map:1:sha256:49fbac6675bd0a6e546f7ce9a20e13aa6801e012a49772687a178e1537331b42"
+          ],
+          [
+            "EC1P53Cfph3a7557a82ff1",
+            "urn:ec-record:1:sha256:3a7557a82ff1e2eaf10ac8069776ad90820eb11786185e1911cd2638135679a4",
+            "urn:curve-cover-map:1:sha256:3d5c439bd8e869235bfb5688023f5b6e9d681d9fab5f105cd43e4a3e07453c84"
+          ],
+          [
+            "EC1P53Cfph3c13b28201e4",
+            "urn:ec-record:1:sha256:3c13b28201e4fc81fbc77158b0d6d56c5b3f896746ee5c2991fc4f595189bc10",
+            "urn:curve-cover-map:1:sha256:6355586cb640332e15ce90fb80dca580cb2ff15a73124e61f79ff0bec5974333"
+          ],
+          [
+            "EC1P53Cfph3d6b62962f4f",
+            "urn:ec-record:1:sha256:3d6b62962f4f49e4ab6dfcc618e0f3d8e8f314128ede1f051ea14b82e3f9c4b7",
+            "urn:curve-cover-map:1:sha256:8ea2498f87e68526338a23e4d6288daed6f22c4e42407489a737584a341ea3ce"
+          ],
+          [
+            "EC1P53Cfph3fbfe071a5db",
+            "urn:ec-record:1:sha256:3fbfe071a5db0aee5b2c60116e91f12a85fff96439788f41ab2f48fbb7da1eb8",
+            "urn:curve-cover-map:1:sha256:716c2ef422fb237629c0b5f0c72e8f454cde7a82822b1e86e10103babc072f0e"
+          ],
+          [
+            "EC1P53Cfph3fe75c28de19",
+            "urn:ec-record:1:sha256:3fe75c28de19e34023032695f7902382ac5f332049100f8a40149bd4af079d38",
+            "urn:curve-cover-map:1:sha256:bfb05a274934795379d65150eff485f838931a470cc4a13e03a3e7542827505d"
+          ],
+          [
+            "EC1P53Cfph41438151f03b",
+            "urn:ec-record:1:sha256:41438151f03b525096d3a9dbdd52e3f3a970c0178260b32fbc1fdc4d1c1e065a",
+            "urn:curve-cover-map:1:sha256:4e1e2a7fa1d17881d658aa8ac6038f7ae5d85a90b0f60a187ff0585ed36f1d70"
+          ],
+          [
+            "EC1P53Cfph41b56323b2c4",
+            "urn:ec-record:1:sha256:41b56323b2c46ce9743ab0a517acb56409b858085b8c451ac2e07cd5a333ca9f",
+            "urn:curve-cover-map:1:sha256:6fcd4795159bd061e29834168496287394555889ae0404e88271b989e6d3a2be"
+          ],
+          [
+            "EC1P53Cfph41f72d77d587",
+            "urn:ec-record:1:sha256:41f72d77d5872b3d08c79b68ca1ce4da86e9ef02e08aca681e81c1911bdecd3a",
+            "urn:curve-cover-map:1:sha256:298b9f5c497309cf7d9e8d1f23baa0c59cef77a39e1705c760d5ed81436a8c3f"
+          ],
+          [
+            "EC1P53Cfph4203408af1cc",
+            "urn:ec-record:1:sha256:4203408af1cc8a5a4f0e7fe303c45d73ba469b380c2334cdcb20054018f33d8c",
+            "urn:curve-cover-map:1:sha256:02dd1a2eed84b3f1f1e579ef90f883024fb76a0f24391d9867d8471db872a1b9"
+          ],
+          [
+            "EC1P53Cfph425979c2a4ca",
+            "urn:ec-record:1:sha256:425979c2a4ca23dc903745307784becbfc9a10d7a9e65e3b2423f65a1ca77698",
+            "urn:curve-cover-map:1:sha256:8009e11bc704f0930e474edef246d1333bfe5de50d3257d1a682bb8ec7936994"
+          ],
+          [
+            "EC1P53Cfph43ab05808efa",
+            "urn:ec-record:1:sha256:43ab05808efa1eea17e245963a1f4f36009aaccc0e12b39425749c086a8c898c",
+            "urn:curve-cover-map:1:sha256:b99163c466f2b01f2598f0720394adf1544c5156c088d0aacf64c2297225e08a"
+          ],
+          [
+            "EC1P53Cfph43b756c7216d",
+            "urn:ec-record:1:sha256:43b756c7216d6e6a73e5104607855336216caf61baf9446d371caff0450b6015",
+            "urn:curve-cover-map:1:sha256:b395b7c794b94140416c0f44fd028e005c2bf682d811f07736a36a40e9a64645"
+          ],
+          [
+            "EC1P53Cfph4847e7d54660",
+            "urn:ec-record:1:sha256:4847e7d546600eeebd6c9df67cd970d2808099477cf412bd54c839de352026d0",
+            "urn:curve-cover-map:1:sha256:c8c02938aedfa2c1afe854f2cd0b6ef3549cc86083912b17b98ad516e649d2be"
+          ],
+          [
+            "EC1P53Cfph49fda4c0a173",
+            "urn:ec-record:1:sha256:49fda4c0a173bbcbca2d7d757faf0f2d94a4e92258fee0e27dbf0785374e3508",
+            "urn:curve-cover-map:1:sha256:2c6d8f1d6bb6a38324fb61267d1b30d48ba673130b66d9b8392605122a3a3177"
+          ],
+          [
+            "EC1P53Cfph4b670c280878",
+            "urn:ec-record:1:sha256:4b670c2808780a3746919759dd05c2e333731e3133f68aa3f3b154dea4b12c36",
+            "urn:curve-cover-map:1:sha256:2a68e2ef68d273af914ec1e8eb61930c0bfc8b0a17c7420590ec25e15b3bebdb"
+          ],
+          [
+            "EC1P53Cfph4c640a8e446e",
+            "urn:ec-record:1:sha256:4c640a8e446e265653f113e9813ebc020eee74bb9aeedde2f889714a00935e29",
+            "urn:curve-cover-map:1:sha256:be64f4d52adae188d2f2417c39106996b379c9ce62c7f7caff1cd75f2d0d4af4"
+          ],
+          [
+            "EC1P53Cfph4e527e0933ab",
+            "urn:ec-record:1:sha256:4e527e0933ab04f62d6c68d5ed7dffd3c35a2cdb764f7d8fce996e3e8fb9b5ff",
+            "urn:curve-cover-map:1:sha256:6f4182f0201f15d0011a759b8ca8d11a81f9e79b338cbaf67c4a5308c65309f9"
+          ],
+          [
+            "EC1P53Cfph4eb93a825f96",
+            "urn:ec-record:1:sha256:4eb93a825f96418bf23415d8219a607681b18dcc622d6dbf0e7e0b4959608928",
+            "urn:curve-cover-map:1:sha256:64cdeca8d2d95148b913290bab8210ae503ada2c11e9c12ad83ada53a20fdfbe"
+          ],
+          [
+            "EC1P53Cfph4ebdf7c346b5",
+            "urn:ec-record:1:sha256:4ebdf7c346b52778c41e3666fb4e5dc6ae9b259b44513518e8b4101b374cda51",
+            "urn:curve-cover-map:1:sha256:ee85e891cb59f7cd1551b0845107bd41e4ea0c1dca52dba053569602fe5abba0"
+          ],
+          [
+            "EC1P53Cfph4f1cd9718510",
+            "urn:ec-record:1:sha256:4f1cd9718510f02242dbe23d499163ccbba7f0169e4e08d5cefa3c6824254f8b",
+            "urn:curve-cover-map:1:sha256:0fd044e087e62853c2d8c359afc55d76fca0dbb32c86ffaf17973fdd0bcd92ae"
+          ],
+          [
+            "EC1P53Cfph4f69086cea98",
+            "urn:ec-record:1:sha256:4f69086cea986399e9bc97be97286f438d83c20c494f5b727ce2bd65c1178d42",
+            "urn:curve-cover-map:1:sha256:2515067b1ea2c622912b5f0b816970c50a27896bee0070d6193a85b4bfa8f4f2"
+          ],
+          [
+            "EC1P53Cfph507722dd2851",
+            "urn:ec-record:1:sha256:507722dd28515f116a7b9976841a51d17c6914d9c89a838e59f1dabc8ba2812c",
+            "urn:curve-cover-map:1:sha256:7561403b00699bdc123cda138054018e9ad4d4c685770adf6320a5f2fc2cb112"
+          ],
+          [
+            "EC1P53Cfph50b2c517e2b8",
+            "urn:ec-record:1:sha256:50b2c517e2b8736f73693e77f7dc335ae9bbf8b9eb39207e6cd485ff51b95a79",
+            "urn:curve-cover-map:1:sha256:f157283c4fce747f6e157ce42937c5899f08832e665538b2b3bad41ff452990c"
+          ],
+          [
+            "EC1P53Cfph51b5f5212482",
+            "urn:ec-record:1:sha256:51b5f52124821501022f7fe464fcf6795244baaff193165449a266d8cace8b30",
+            "urn:curve-cover-map:1:sha256:ff3878ae4f2c42611fc1e1db548a9f77f8b36cf8a2e470ec84493f25ad28e6e6"
+          ],
+          [
+            "EC1P53Cfph529aecfeba88",
+            "urn:ec-record:1:sha256:529aecfeba8817cc3fe07408ca7742f64e1a15d16df52a6055a382c83bb1a276",
+            "urn:curve-cover-map:1:sha256:0c109e978c24489b6264812876b1494c391c793f80323e0fbcb4449619a86f74"
+          ],
+          [
+            "EC1P53Cfph5389f98965f5",
+            "urn:ec-record:1:sha256:5389f98965f5a0dc414add0a1d830ff2cb53d272de129ce7a73cf58adda2ffac",
+            "urn:curve-cover-map:1:sha256:7fdc989d5ce9982965c6f381b33ede84cc4c4e5f4dc4cda302b7613f8b796d01"
+          ],
+          [
+            "EC1P53Cfph560279c314be",
+            "urn:ec-record:1:sha256:560279c314be37a08bffe2a8295a906c47d9a00036e6bea62269453f2f274947",
+            "urn:curve-cover-map:1:sha256:974e62068250850a4fc972f79ab26163597ea8edb04ceff8afc69e7ed1fa4e1a"
+          ],
+          [
+            "EC1P53Cfph5646d3c3366e",
+            "urn:ec-record:1:sha256:5646d3c3366eb68d3f0b619deeeb886bc243631db30edd7f96e9303b16ca418a",
+            "urn:curve-cover-map:1:sha256:3d48e07856f977df0aff89985f473b9bdabec3a6852a65a58d6322f809365b34"
+          ],
+          [
+            "EC1P53Cfph56bef242d537",
+            "urn:ec-record:1:sha256:56bef242d53713884c7c54d2d95b5763bc023ff7e3397293a09d91023f077e24",
+            "urn:curve-cover-map:1:sha256:9a7e668ce82b9bb5f4258870b063cfbae4a8df2c1bae7e783b40c2bfd8da3fcb"
+          ],
+          [
+            "EC1P53Cfph570f31bf0536",
+            "urn:ec-record:1:sha256:570f31bf0536bdd203414bf2ce7f6bb59a1d1285b87672bdedd4130fda046cb4",
+            "urn:curve-cover-map:1:sha256:e757e60a7b32e61fc3ded7502592bceb52082832a0de3501fbb0ac4cdc7ae9d6"
+          ],
+          [
+            "EC1P53Cfph589a49b563b1",
+            "urn:ec-record:1:sha256:589a49b563b15df900cb27805ed157458ee6088882673df992eab23b28bf5e52",
+            "urn:curve-cover-map:1:sha256:bf8cf7de58d166dc88ff77e6d3f4ed9ab3a68b67008456a710909d2a6192b967"
+          ],
+          [
+            "EC1P53Cfph5a9e63a015cc",
+            "urn:ec-record:1:sha256:5a9e63a015cceac15c248cc2aee46ac56ae342282760f0130710ee7064c259cf",
+            "urn:curve-cover-map:1:sha256:9a0246c3a55fd64a3de38f3eaa59aa9fc547be706167b12bf1e477576dd552d3"
+          ],
+          [
+            "EC1P53Cfph5ba783082e02",
+            "urn:ec-record:1:sha256:5ba783082e021b6626cce23a5027ac5d243f104849bc3941bcc02c262b3db12f",
+            "urn:curve-cover-map:1:sha256:4abab5de421d0e8fc942c3c12ffd3dd73c85e007830ee7d2a32495d25c73ed11"
+          ],
+          [
+            "EC1P53Cfph5bb9657f1844",
+            "urn:ec-record:1:sha256:5bb9657f1844adaeed2110484d0e0fa9a57b9c528be51d56502483df79492541",
+            "urn:curve-cover-map:1:sha256:82233032c737295c9e0cee0c6dc2b622fb4f0097d4d87a7d87cf6277ecf8b45d"
+          ],
+          [
+            "EC1P53Cfph5bbf90c5fb8a",
+            "urn:ec-record:1:sha256:5bbf90c5fb8a90f9f944fa888e4c5d75473b38618b8fd2f3b29e194135bd18eb",
+            "urn:curve-cover-map:1:sha256:a1e815fb3fdfb3607a295091e0275137686257b8e149688585d6d95c813297bc"
+          ],
+          [
+            "EC1P53Cfph5ca6745eba8b",
+            "urn:ec-record:1:sha256:5ca6745eba8b3ff6ed669794cd6718dc8ada4f041b611514d4c7bb8cbe6e9465",
+            "urn:curve-cover-map:1:sha256:fbc3c3842762bbabd449fe12aef09291c6b0b886e20d3723b4be631ba5b08d60"
+          ],
+          [
+            "EC1P53Cfph5d0a885b1ab2",
+            "urn:ec-record:1:sha256:5d0a885b1ab2dd81bb03bf0298239c1c0faaa7aa915e4e5588bb16477fd972e0",
+            "urn:curve-cover-map:1:sha256:c4078f60432f1e1366ef2ddcca47d3a0a51776e14b038d5200be6d2e4bb64dd0"
+          ],
+          [
+            "EC1P53Cfph5e00390274f3",
+            "urn:ec-record:1:sha256:5e00390274f347dc61f1d5a6e630d0f665c40d8b0b00029ed44bdaf96b3c2e6d",
+            "urn:curve-cover-map:1:sha256:a9fc2a6ef075523d939ea22ae1df2fbc3b64f5539c56b41615feaaef6eebd6d0"
+          ],
+          [
+            "EC1P53Cfph5e30b9dc56d1",
+            "urn:ec-record:1:sha256:5e30b9dc56d13dcdad80ec067d11533affd5394cb8f4214bbd8f0ac05ccdb1dc",
+            "urn:curve-cover-map:1:sha256:de566b8979e1c766d901c57d497e1711d3b03f4c47b5330e1b622324a6d8eb81"
+          ],
+          [
+            "EC1P53Cfph5e821cf796ba",
+            "urn:ec-record:1:sha256:5e821cf796ba0e31526c6e3f918cd2f9282e72e85039737be052c19656b7a8f8",
+            "urn:curve-cover-map:1:sha256:0f8a154b830664268d396ad3cf63d5656d21dc833d25fcfb8c0b2d89a2bc33a3"
+          ],
+          [
+            "EC1P53Cfph5eb20fa27c33",
+            "urn:ec-record:1:sha256:5eb20fa27c330735f265c44802f1caa20adfc261f56f8ebe0e20c30a73f06951",
+            "urn:curve-cover-map:1:sha256:d6c674771362938e92587502fe013876a3eef1d20814335a50f2a224d0db9e4c"
+          ],
+          [
+            "EC1P53Cfph5f5f4bb338b0",
+            "urn:ec-record:1:sha256:5f5f4bb338b0cd11dbeea59240ddca1ae1c96bf08790b293ac867e1666fb2997",
+            "urn:curve-cover-map:1:sha256:41d28a553def21663f29e6cb8cb0167403723abcc507c80fc196c76ebe9c86f9"
+          ],
+          [
+            "EC1P53Cfph6056807bd41d",
+            "urn:ec-record:1:sha256:6056807bd41dad4a6c997c09647e6aec0e261f485c15de8bdb56d90310153136",
+            "urn:curve-cover-map:1:sha256:278ac128f869899e6b052cb8e2ee99be2d0e0542c2116b238c1eeaef4d3b20f6"
+          ],
+          [
+            "EC1P53Cfph648289c43052",
+            "urn:ec-record:1:sha256:648289c430528ed17989c82d5497ea466672f6620604e713957967c5b098b856",
+            "urn:curve-cover-map:1:sha256:4ce907f1afd9730f0f2a027bab03cfe803649e791f2b08f29997acc5bed7353d"
+          ],
+          [
+            "EC1P53Cfph650c6b3e1bf9",
+            "urn:ec-record:1:sha256:650c6b3e1bf9473e0862166fde4e6653f54deec42d1b8cffb63e7297d5f7ed16",
+            "urn:curve-cover-map:1:sha256:9c943cf8eebd88c1ca62497a1fe5d431ec8f318d71007ba9fb1dc0d017d3af44"
+          ],
+          [
+            "EC1P53Cfph659b89012867",
+            "urn:ec-record:1:sha256:659b89012867cbc0a1fbf83eb15ff25066035b76a0e51c84d989b0dda42747c1",
+            "urn:curve-cover-map:1:sha256:ff7a6d42e66e60c3b38715bbe4b3a4529651127ad7c73949179509b5cf3c6886"
+          ],
+          [
+            "EC1P53Cfph66a54087dcb4",
+            "urn:ec-record:1:sha256:66a54087dcb491c32ac5b29a3a81742c109d012dbec2f878073332ada6416d04",
+            "urn:curve-cover-map:1:sha256:edb30c63c96f421451208b50ce782e0ed18fe9134fca5f95dfaf9e40a699b2ff"
+          ],
+          [
+            "EC1P53Cfph682f230d2c37",
+            "urn:ec-record:1:sha256:682f230d2c37f3ac6aacf6f8f23134c3531795d33ba567464af67a1a377fee7f",
+            "urn:curve-cover-map:1:sha256:0ae8f4736b45a88b818f58c76666eef9d6b7a5b6f37e38d28803e16d4a570a3f"
+          ],
+          [
+            "EC1P53Cfph6b593e8dd85e",
+            "urn:ec-record:1:sha256:6b593e8dd85e816a5e34a5609a33a5ca8535598dac00efbd3a3e7c0d8f49b58b",
+            "urn:curve-cover-map:1:sha256:06bba53f5d2a5f61be05b4ff9f758338a5c52e11b842bf79b7dccd9dcb2f70a6"
+          ],
+          [
+            "EC1P53Cfph6c5a8dd5a3de",
+            "urn:ec-record:1:sha256:6c5a8dd5a3de9f98cc8979c152fe07dfb4e906ffc5deb99bab7178549a74cb3f",
+            "urn:curve-cover-map:1:sha256:83dff32f7f4adba2b6ba07caee7a61baed6beb61f3da63ca33145065a1d78554"
+          ],
+          [
+            "EC1P53Cfph6e0d14136a1c",
+            "urn:ec-record:1:sha256:6e0d14136a1c0f570b79f45b3c0b98870ddab24382e73150fbc70b639c809945",
+            "urn:curve-cover-map:1:sha256:05be8f86bd0b1d3b28a4c1854418af493a211bbd7bc12dcaa6b39b6e570a6a8f"
+          ],
+          [
+            "EC1P53Cfph6f0d0d9e1d30",
+            "urn:ec-record:1:sha256:6f0d0d9e1d30f4ee2a11685e53ace5af18bc96588b64c8182b36c9c431cdb133",
+            "urn:curve-cover-map:1:sha256:927a919731cd0312f9c992ddea5f52265ebe1cef89b4af848233c860c078eb69"
+          ],
+          [
+            "EC1P53Cfph6f34816aa83c",
+            "urn:ec-record:1:sha256:6f34816aa83c41aae322914f7ba0adb07f73b0328fd5dbe8805c9b5d3674e173",
+            "urn:curve-cover-map:1:sha256:e37beeb5f75bb1a2000f44f24e83d34d2d8920cc2aafde640def23d184522991"
+          ],
+          [
+            "EC1P53Cfph6f7bf4093f84",
+            "urn:ec-record:1:sha256:6f7bf4093f84a76441cada53fd58251d4d8f54185597187bf773823385bacc9c",
+            "urn:curve-cover-map:1:sha256:7a2001fb4185efe1b9c23a2330a0774fc375f3f032386b24615cdd36ca74f8ae"
+          ],
+          [
+            "EC1P53Cfph6ffda3ee15ed",
+            "urn:ec-record:1:sha256:6ffda3ee15ed4d2c9da9918a9351b09b08cd0235ae2e143a252afc12f4ae887e",
+            "urn:curve-cover-map:1:sha256:028f7036776e9ed964a050158ff68f33d465a39552a0885478ad805de2324036"
+          ],
+          [
+            "EC1P53Cfph715d300521e1",
+            "urn:ec-record:1:sha256:715d300521e1ffe3085a19215bd750887f4a74248372f0dfd77ac3c452029d77",
+            "urn:curve-cover-map:1:sha256:0724d4773050582a1cd360b7ac229a83bb1fde3043460b2cd85b48a50938924f"
+          ],
+          [
+            "EC1P53Cfph71c7b9fa8186",
+            "urn:ec-record:1:sha256:71c7b9fa8186b33441a3650c5e132fe5f8b2953ed8c22cfd1468936bbb68efbd",
+            "urn:curve-cover-map:1:sha256:97bb416bdf33d440f15c92773eeaccfd3a9bbbb782529531e439bd2bf96c3148"
+          ],
+          [
+            "EC1P53Cfph72e22d2a3f8c",
+            "urn:ec-record:1:sha256:72e22d2a3f8cc60a526510221e9ffed0aeb3e9daefe721bb5099b5e301ad3659",
+            "urn:curve-cover-map:1:sha256:d19c0be639afa30e24bd12110a669bb1f06dd84f8944c2cd61ce55aef64210f7"
+          ],
+          [
+            "EC1P53Cfph73c700b96e79",
+            "urn:ec-record:1:sha256:73c700b96e793515f0c50af94f13b9c077d03f9a8ade0fd444b2e23fe4968a95",
+            "urn:curve-cover-map:1:sha256:bddfb013207462a4994391edaace4d323e8f9f5c86d4115661845e01d5eb866d"
+          ],
+          [
+            "EC1P53Cfph74a31f58df62",
+            "urn:ec-record:1:sha256:74a31f58df62996ea936c60dfe6d9f11743bf528e10ba3e46f0a23cd205233bf",
+            "urn:curve-cover-map:1:sha256:7ca68f0b32658097a74fb06e010c7b531d3f006e1d8968cf593c1f40f1584e85"
+          ],
+          [
+            "EC1P53Cfph757e993c4f66",
+            "urn:ec-record:1:sha256:757e993c4f66565740b0c6647bce0e0cc82f6d4212f9b8fe4f162f6631ef2a48",
+            "urn:curve-cover-map:1:sha256:c4bee786dd4a5cab2af8f2ffd0fb2dedcac5c93bb3c811e184a59172d9664bd6"
+          ],
+          [
+            "EC1P53Cfph777458d076b3",
+            "urn:ec-record:1:sha256:777458d076b33217ea26d09354c648ad84e97334be5da4e476087d585f471e0d",
+            "urn:curve-cover-map:1:sha256:a11cf3624076ec732f4d1762851e0aa26343099c3272f2adabb586cc5a17acc1"
+          ],
+          [
+            "EC1P53Cfph7798b3c07e73",
+            "urn:ec-record:1:sha256:7798b3c07e738006fc814189e12496c87c2fc0803e32a97b4cb9252e297fcfc3",
+            "urn:curve-cover-map:1:sha256:22eeca19c3293a93c2a08458e98db72f4a5d842bbb37e37d77c6557b47eb35f9"
+          ],
+          [
+            "EC1P53Cfph779ea8d2d09f",
+            "urn:ec-record:1:sha256:779ea8d2d09fffd0e31c4f31125c4564204e7bf070a0c89d8a4fb40e3057528d",
+            "urn:curve-cover-map:1:sha256:c7c875cd97629ffd86cc202f18b23183ceb4db4684160c118b9723403a66819f"
+          ],
+          [
+            "EC1P53Cfph783b3d17e094",
+            "urn:ec-record:1:sha256:783b3d17e09439245c56dedc15b8e6bd9ad3ee0c783933f67b0ff36785ea6d77",
+            "urn:curve-cover-map:1:sha256:b881e8866c444c781372e5360482c844e4035e86dbac2e418453f943a5fe1370"
+          ],
+          [
+            "EC1P53Cfph79c347e08f79",
+            "urn:ec-record:1:sha256:79c347e08f79ce87fcb22e72131b67c89f8ac0ed372d41be85be5ff41570d447",
+            "urn:curve-cover-map:1:sha256:6c48e4e72b14ede34a77a85a3db1f17d030df9b7a221e5a9bdc90746a9b6d5b8"
+          ],
+          [
+            "EC1P53Cfph7ad3246b70db",
+            "urn:ec-record:1:sha256:7ad3246b70db88b5eefd65c907206c44fbc5cb756a69843befed1aa8949fbe10",
+            "urn:curve-cover-map:1:sha256:996ecca3407ca20ed96c618cd6499b2c95621ff9a528112bb2dcb2f239736539"
+          ],
+          [
+            "EC1P53Cfph7ad9cdc143b6",
+            "urn:ec-record:1:sha256:7ad9cdc143b63af171a7606962ea575ce4386d715979ffc5e0f61b80e7f41c03",
+            "urn:curve-cover-map:1:sha256:4dbf35f465627b8c7f1120c06e3f99212bbbb539647c137a82784894fcb52ece"
+          ],
+          [
+            "EC1P53Cfph7b4e2d70eee9",
+            "urn:ec-record:1:sha256:7b4e2d70eee9dd2fc3b1566baef725d83726f8ff9b7e069760bdfb5db684adbc",
+            "urn:curve-cover-map:1:sha256:e893160ce5f2c7c28a4c4889e9c3a07a5bbfad33482efa6661cdde509a33753a"
+          ],
+          [
+            "EC1P53Cfph7c1f41e6dc2f",
+            "urn:ec-record:1:sha256:7c1f41e6dc2fd37b7a6cf905e43f042e1a2be41b015bf18731b583d03f10f207",
+            "urn:curve-cover-map:1:sha256:526928edff0d665803bc2e8494f377d743ba4c7a27ef8926c83ad2edbd7905e2"
+          ],
+          [
+            "EC1P53Cfph7d663dd2640a",
+            "urn:ec-record:1:sha256:7d663dd2640aa61b0f37fe165d14909f543d0ee4205b0bf8fd533f25f82bef49",
+            "urn:curve-cover-map:1:sha256:9dc30343ae619b1c30632033866579df0e6cefd929f64db8f5183374142ce069"
+          ],
+          [
+            "EC1P53Cfph7f5fafd81fc1",
+            "urn:ec-record:1:sha256:7f5fafd81fc18389635a4c018be80b77bba581ddeb5c7aae5c099bd475efa622",
+            "urn:curve-cover-map:1:sha256:6ce98298d67aca4f77f9222c7fdc80b825c676a87e4c7dcab5d4599bb2572ed0"
+          ],
+          [
+            "EC1P53Cfph7fa7a4bdd081",
+            "urn:ec-record:1:sha256:7fa7a4bdd0819182ec31aaf0cdd03b8f78f48111bc40d0c3186ee0e0d609a072",
+            "urn:curve-cover-map:1:sha256:73e902db3f8c32136556ff15a69825df10520fa5ef6a74f924fe5ff291a50993"
+          ],
+          [
+            "EC1P53Cfph805e3b195b7f",
+            "urn:ec-record:1:sha256:805e3b195b7f50b49829fd0e6a6dba80c05c3007960458fccd9e456011f4ae76",
+            "urn:curve-cover-map:1:sha256:756283ef5f14388dc6a94d12154b4f6612925f421f7447c6d861c387bf83a2a7"
+          ],
+          [
+            "EC1P53Cfph81816fc2e8e4",
+            "urn:ec-record:1:sha256:81816fc2e8e4951d8556078220ef83abe9d2ae1ec19ffec56ded821e946da1d5",
+            "urn:curve-cover-map:1:sha256:2e2c792bdb77c2e78cfb0d8a11014160ac1531b30bb0cd7f8ad18637b2ff49a8"
+          ],
+          [
+            "EC1P53Cfph82869520f93f",
+            "urn:ec-record:1:sha256:82869520f93feed0846a7bf12d8cd23ef26a44ed8e6cafa8a082c2c904563a8e",
+            "urn:curve-cover-map:1:sha256:545a15d0c6ed3cf13b1ef76a86f75a7574d66fad4eea0412fa9a71ce8c365fc1"
+          ],
+          [
+            "EC1P53Cfph87161e5e3b1c",
+            "urn:ec-record:1:sha256:87161e5e3b1cef38565caf1fe83cf3737d7c1ba1510f028ac9153270b7e8858e",
+            "urn:curve-cover-map:1:sha256:124cc802df3e54ff397c3bb4777438ac16138df620268c1168a255bcbe70f3cc"
+          ],
+          [
+            "EC1P53Cfph8722650817a8",
+            "urn:ec-record:1:sha256:8722650817a8636794c28b9112125fd4f753eedded15878f20cdc574afad89f9",
+            "urn:curve-cover-map:1:sha256:6ceb5068cdf9c4e80345b9934fc211a098bd9f7d8ceab59ccb69ed9011517b5b"
+          ],
+          [
+            "EC1P53Cfph87a572d43b77",
+            "urn:ec-record:1:sha256:87a572d43b77eeed641de9ded9ced2d384982ad43d4bb99718689513e5ba0047",
+            "urn:curve-cover-map:1:sha256:9d10c726ac710257b2b241db197a58f717a2ffa76cf1ab5fdbee236cc7335704"
+          ],
+          [
+            "EC1P53Cfph87ce858d7632",
+            "urn:ec-record:1:sha256:87ce858d7632ba8cebb86be986a3b7836800c2e7a580aaccf690c24018455d8f",
+            "urn:curve-cover-map:1:sha256:9d994a78ddb11af0330dd6beec2e6891de73be9ff0771a2cd8d53ae9a89e8d51"
+          ],
+          [
+            "EC1P53Cfph884bab75efa5",
+            "urn:ec-record:1:sha256:884bab75efa58cbe0ae8c3dcc5a5e467884ac0088d13cdf515800c0895e9f571",
+            "urn:curve-cover-map:1:sha256:8e2085bf055715d37cc372def656989838149d2ac4f4134ddbab08fe50fb37ef"
+          ],
+          [
+            "EC1P53Cfph89f33ea41181",
+            "urn:ec-record:1:sha256:89f33ea41181b8db4922ff812a0ea481a323c8181ddd8b85e32e7c9e0e9a3c41",
+            "urn:curve-cover-map:1:sha256:580a68280dd4a9b05130e4cd419b991cbbb4e5948e388d6d3b66f504a18782d7"
+          ],
+          [
+            "EC1P53Cfph8a24f637b685",
+            "urn:ec-record:1:sha256:8a24f637b685710f65975615d09b557618e9fa4f14d8e4efbed7de795ef3de22",
+            "urn:curve-cover-map:1:sha256:537bf4aec9d450198e42bad0deec17570dff42c66430831943bf48ff658fdad8"
+          ],
+          [
+            "EC1P53Cfph8a467dee5859",
+            "urn:ec-record:1:sha256:8a467dee585916687ca859ce73b82ea34b77f650e3dcb83b089b2c38578bc49d",
+            "urn:curve-cover-map:1:sha256:6955b6402d1cd0e7776b07ab5f0b80402cb45bebdb44f45fcd6c1ec50d57d9b0"
+          ],
+          [
+            "EC1P53Cfph8a72c845ce57",
+            "urn:ec-record:1:sha256:8a72c845ce5721d25445d08cbf825a127edfa482f0f08d8accf56682009fb5b7",
+            "urn:curve-cover-map:1:sha256:70d638d2bbb8d83ac385f2031b61e885ebf7e6c89308a13d257ceda5423fbe2d"
+          ],
+          [
+            "EC1P53Cfph8a9b84cb3093",
+            "urn:ec-record:1:sha256:8a9b84cb309363e1cbd410808d82a9cb4736bdf87d30d1e4799d19941f768a8e",
+            "urn:curve-cover-map:1:sha256:c2ad7bd9da4320af032db34804887972fb0dc0ac5b7a147a25134e8db1390480"
+          ],
+          [
+            "EC1P53Cfph8aa435897fc6",
+            "urn:ec-record:1:sha256:8aa435897fc6781b7bbec2d327e4eb28462ff84caf367b8068d6578935c36a17",
+            "urn:curve-cover-map:1:sha256:7b3c89d40f189aaef3a888d2f7600befe1e5d6dce955ac2a93e92e8092203741"
+          ],
+          [
+            "EC1P53Cfph8b3052b94fc8",
+            "urn:ec-record:1:sha256:8b3052b94fc838cae85f65c9452c0ef43702436545f87e407cee15f2f2d36f5f",
+            "urn:curve-cover-map:1:sha256:ea79e8e19944a56a0c191df7b5ea0f9c8b0c3ec607d70a27149abb05e52612e2"
+          ],
+          [
+            "EC1P53Cfph8bac523a1d33",
+            "urn:ec-record:1:sha256:8bac523a1d33fcc615512e0894e338a786cf1b80b768d455b6a34c1a2f1386c5",
+            "urn:curve-cover-map:1:sha256:2f3b8acdfbb5d85e082c01c742bd8261ff368b7d6ad94d5ce99d000129b8791d"
+          ],
+          [
+            "EC1P53Cfph8bc59c64bc03",
+            "urn:ec-record:1:sha256:8bc59c64bc03b58766d51fa425d60403a5d4fad20289bf4074dbc1451de90940",
+            "urn:curve-cover-map:1:sha256:8300a0d2993f85ed36262311e993d77e215f7c50de413eff53cd2f64fd46f95c"
+          ],
+          [
+            "EC1P53Cfph8c33eb0d8ce4",
+            "urn:ec-record:1:sha256:8c33eb0d8ce46089ee2716176a17f7ba638ece2754d1f95832dba412a02eca60",
+            "urn:curve-cover-map:1:sha256:051e41383f9c690370e41493ea9a419694768ff7233b233be01063abf9df065a"
+          ],
+          [
+            "EC1P53Cfph8c59221de1b2",
+            "urn:ec-record:1:sha256:8c59221de1b25f4aa2c4e49ed3d97c0817cdffba322d8a56e086dafb62920447",
+            "urn:curve-cover-map:1:sha256:52d6859b302cdf88bd3aeff8e127b3cd1cc43e29f6cf7300a7c142e9f3e863fb"
+          ],
+          [
+            "EC1P53Cfph8cbddd0ed77e",
+            "urn:ec-record:1:sha256:8cbddd0ed77e3181849a935b5c780d784d9b45f245de999b6baabe63b058b373",
+            "urn:curve-cover-map:1:sha256:e752e007aa6979bf8989622090e673b8dda260a536fc90394377ae2fd9fb6e3a"
+          ],
+          [
+            "EC1P53Cfph8d8703388274",
+            "urn:ec-record:1:sha256:8d87033882742e1809e8cd5510d2b04b09df7a3ba3ad8dd6da26685cd1bded3a",
+            "urn:curve-cover-map:1:sha256:fc46b728df1f9acf7e51aef68b7b89078f6e5dbff49804b8d64e67fb15be8248"
+          ],
+          [
+            "EC1P53Cfph8df4490ae802",
+            "urn:ec-record:1:sha256:8df4490ae8029c31e9157611ce97e5d5487f5168384403114c8a8b28f0dc5786",
+            "urn:curve-cover-map:1:sha256:18648bd268824c36a4432b30b113121c238f393912905468af90ac4ad6cbb6ba"
+          ],
+          [
+            "EC1P53Cfph8dfa6b87267c",
+            "urn:ec-record:1:sha256:8dfa6b87267cd2ad6a136950a7c02117d15b698c50271985f8299f05360f97dd",
+            "urn:curve-cover-map:1:sha256:bc6c119ef1b230f461441bcad642baabfe79ddfc16b930c9df0bde307133fca3"
+          ],
+          [
+            "EC1P53Cfph8e148902e8ec",
+            "urn:ec-record:1:sha256:8e148902e8ec8074d7ee4e174930e8eef01aeb25661090f40b8eea21ff01d5b9",
+            "urn:curve-cover-map:1:sha256:52921947eb8923f1e503de8474c7133ef33dd9caff2725cd24842b8c61b2b28b"
+          ],
+          [
+            "EC1P53Cfph8e1c5b3fb9c2",
+            "urn:ec-record:1:sha256:8e1c5b3fb9c27a63396fc9be475f25499f3d6c65198668ead854587ce1db4d8e",
+            "urn:curve-cover-map:1:sha256:fa3ae6a4a3d7bcab620efa0d3996910d3409f9d39fbfb5b8a000b686d847ed64"
+          ],
+          [
+            "EC1P53Cfph8f7e4beb3739",
+            "urn:ec-record:1:sha256:8f7e4beb3739bf49b0cbd1ce147a64a4a3b6d10f89c1d08aebe4ed2599d0bb6a",
+            "urn:curve-cover-map:1:sha256:cc6f77d86489e30ae2765af398c8aa583ceff8375b78ecb475c8d25c5896091d"
+          ],
+          [
+            "EC1P53Cfph91ffad38a8eb",
+            "urn:ec-record:1:sha256:91ffad38a8ebef58e832768d6a73195dc1fca04652a2632c64c4459b826ba64c",
+            "urn:curve-cover-map:1:sha256:d1af91d5b184c54f2ffcd19f5a332dcf600a9ce304e090fc5d512f027679cf46"
+          ],
+          [
+            "EC1P53Cfph94a7ce5d7c7d",
+            "urn:ec-record:1:sha256:94a7ce5d7c7d5b3a64dea46f7f07afb5c6d4cbda673dafcea21fbf21c7fb1a85",
+            "urn:curve-cover-map:1:sha256:e3bab4937c357fe34c3258924f5334d8ffd61180835f85fdc8f20052f9af7420"
+          ],
+          [
+            "EC1P53Cfph94de265a16ea",
+            "urn:ec-record:1:sha256:94de265a16ea7983c730db34a59b56e5f1c3304db990baba08f4c5dc9dc91473",
+            "urn:curve-cover-map:1:sha256:b5eb65c1de85fb840e6df060168b39f0ddac976e5cbf08cc68b2f747d07a273c"
+          ],
+          [
+            "EC1P53Cfph95279cd28d72",
+            "urn:ec-record:1:sha256:95279cd28d72cf9b4a95d9c6bbc66ebf8f76262b37d5984f4a99231a224979a0",
+            "urn:curve-cover-map:1:sha256:cea6c133d8ad4811539dd446bdcce93ccd1f58792cec0811273d522a6de3a7f0"
+          ],
+          [
+            "EC1P53Cfph961ea07c6882",
+            "urn:ec-record:1:sha256:961ea07c68823305ac26a664c2935d2c29f686b83e05bb6dec0a0fad9f26c5a6",
+            "urn:curve-cover-map:1:sha256:838527f83ccba1a249986401b3d5a25b4fe85313ba5ed210f49935305a9f6656"
+          ],
+          [
+            "EC1P53Cfph96c8c46e3bf1",
+            "urn:ec-record:1:sha256:96c8c46e3bf199e2460cc296f609772e1e63a7016a9896252c9c27ccd7edbb65",
+            "urn:curve-cover-map:1:sha256:0114ff0e95d7e6fb3a5a173807b2443697da98ebdf25dab74843fbc5012bbd23"
+          ],
+          [
+            "EC1P53Cfph96e04370e7f3",
+            "urn:ec-record:1:sha256:96e04370e7f389fe3568c2df05b3916eb8b04094e3826775b9cb40b13ac68196",
+            "urn:curve-cover-map:1:sha256:9b47ca718e0b9ed0d47bbbe7f04c8e53947bd05e5301e85d1cd884e0f18e6e81"
+          ],
+          [
+            "EC1P53Cfph96e281b62a11",
+            "urn:ec-record:1:sha256:96e281b62a1193d92dae2e5a8e206eaca2c3a115635775cd06cd77ceaa9b9359",
+            "urn:curve-cover-map:1:sha256:fec8fd66d0d66fc84e0c7525eb502d4d37507838aab32d19778bac3e5c623dd1"
+          ],
+          [
+            "EC1P53Cfph99705340e20b",
+            "urn:ec-record:1:sha256:99705340e20bbf2e51b8d8f7d32b0a0ec803c972db1bd208ad6e8635202f4610",
+            "urn:curve-cover-map:1:sha256:f48650711e59bfa21ecba49ccf749c9d4ef56a3d106fee2e6f7cc6e1409c9959"
+          ],
+          [
+            "EC1P53Cfph9a5c20da4f59",
+            "urn:ec-record:1:sha256:9a5c20da4f593a57e17d1602affe4aac480fcb6556cbb3071df93aa38eb3bd0d",
+            "urn:curve-cover-map:1:sha256:d23c5a4e97d045bf86d94899153ded071457ec82b8f48bf1dd2a69b264651194"
+          ],
+          [
+            "EC1P53Cfph9bc5110ac911",
+            "urn:ec-record:1:sha256:9bc5110ac9116ae0b907b2e289b2f6c0f05bed40e2ab352c3a2b4ed4db3abde2",
+            "urn:curve-cover-map:1:sha256:ce264522d4de9eb0863fd83c2a41858c13f02a1fc9a76160c4a6f701fcef8a93"
+          ],
+          [
+            "EC1P53Cfph9cf2d7fcd5b8",
+            "urn:ec-record:1:sha256:9cf2d7fcd5b827b52233cfc0116c5965c38c748ee1d6cc21b052b72d887860cb",
+            "urn:curve-cover-map:1:sha256:870ae5f58ae4d17b86ecab283164cc930a95001ec8b423bfc4ff556dce083e4f"
+          ],
+          [
+            "EC1P53Cfph9fe7f3b83f6c",
+            "urn:ec-record:1:sha256:9fe7f3b83f6cc4e1af1cb554526cba98b9ccd9d293d8360e9831e16d58e0628a",
+            "urn:curve-cover-map:1:sha256:7f3cfc56adff021a232f1047b69dd4e9903063eaf83328187553d566ce25b790"
+          ],
+          [
+            "EC1P53Cfpha05ff1dc04e4",
+            "urn:ec-record:1:sha256:a05ff1dc04e4cf7e1bd9a6a6a69897dffd74772e8862d2ac92d1f54a71d75b10",
+            "urn:curve-cover-map:1:sha256:fc703c3543279288f74f5749363595ac1afd301e077174ed86a8ca3519de01c0"
+          ],
+          [
+            "EC1P53Cfpha08a5026998f",
+            "urn:ec-record:1:sha256:a08a5026998f3f7737bc10231358904f482b59f43f85d9a79608b9ea878d4354",
+            "urn:curve-cover-map:1:sha256:96ae4eacff30ac31d5fd044592578059980e387a47b054ec51e7c008a176bc01"
+          ],
+          [
+            "EC1P53Cfpha0e82bd7e3ad",
+            "urn:ec-record:1:sha256:a0e82bd7e3ad4a145796966eac1733e49e3a391d4e7f6c474bb2b75ca166310e",
+            "urn:curve-cover-map:1:sha256:138ddf0bf1c140f71beba10ba366994aa728deba2d5ea79c631ebee999d0393e"
+          ],
+          [
+            "EC1P53Cfpha12a88ec04ff",
+            "urn:ec-record:1:sha256:a12a88ec04ff0f8f2e50cfcee8a134a8e5aac6b05d933a575fb69dc0c44f659d",
+            "urn:curve-cover-map:1:sha256:7d3ec3abdfa3166431c2dd7c3217b4be305fff411730690a000f389f55155f1e"
+          ],
+          [
+            "EC1P53Cfpha16d3b1ed89c",
+            "urn:ec-record:1:sha256:a16d3b1ed89c1ea5fb87f3496fd77a0821c027d8f206c2d0d5334589de93c6a6",
+            "urn:curve-cover-map:1:sha256:9d21b0910df7989a1b7eeac02602d0021bdf85d3b29105463f9c7c674194ee7b"
+          ],
+          [
+            "EC1P53Cfpha245c203da2b",
+            "urn:ec-record:1:sha256:a245c203da2bcaedc110f9d29cf81037ba672bfcdce0b08d963f4b25b6cbbc08",
+            "urn:curve-cover-map:1:sha256:e8edffd4511eb7b0e7eda97312aab3885642c90f50103fdd4471a49cf796d491"
+          ],
+          [
+            "EC1P53Cfpha388cfabe0f4",
+            "urn:ec-record:1:sha256:a388cfabe0f4804d1a4c36be8f6c22ef2020da54a21da6afda878254ba81c9ac",
+            "urn:curve-cover-map:1:sha256:ba6e7c984f94265cec4633a67c55020cb7dc46ca62869c1c63a9715fdf2777c1"
+          ],
+          [
+            "EC1P53Cfpha3b8d0f827f3",
+            "urn:ec-record:1:sha256:a3b8d0f827f3627aea8913db0cd12ad0733346114e652014cb81bc5abcceeb60",
+            "urn:curve-cover-map:1:sha256:58acee3654fc51b5ebb7525131fb249c298c124d98d88fbe08801c077cdf86e9"
+          ],
+          [
+            "EC1P53Cfpha48ada02edd2",
+            "urn:ec-record:1:sha256:a48ada02edd2472356c43f194fcb7d7302e5cdf04b634bc1f37b06e4353a048f",
+            "urn:curve-cover-map:1:sha256:eb139386e1be70c2e624fb487a1de2359020f9afb11aeab1e44ef07207a0cedf"
+          ],
+          [
+            "EC1P53Cfpha4c4a65491bd",
+            "urn:ec-record:1:sha256:a4c4a65491bdc77c05eca35975d4ea15b51b44169530b3183c6493e84f357f44",
+            "urn:curve-cover-map:1:sha256:e71715caef777f4c743f31aec2215af784508aa80eea768d503db6cc158eeff4"
+          ],
+          [
+            "EC1P53Cfpha53c8d9d68c4",
+            "urn:ec-record:1:sha256:a53c8d9d68c47f83c6c377a1e39a611872afd4d2655b0f8b3181965a3df7b090",
+            "urn:curve-cover-map:1:sha256:a39750ed125cfb229c06131d28dac226e3c0cbd146e871f1390699c6b1972aef"
+          ],
+          [
+            "EC1P53Cfpha56a96505aa5",
+            "urn:ec-record:1:sha256:a56a96505aa56779d82967a269250a4f15acd75e75e716fbe4878c28acb2eb69",
+            "urn:curve-cover-map:1:sha256:c0619a20d057fc32c09e8944bc4c7f1d03245f87b995292424d2bbe5b99dd0fc"
+          ],
+          [
+            "EC1P53Cfpha76a9dd11c90",
+            "urn:ec-record:1:sha256:a76a9dd11c903cdfdea52cec823d51b590cc54a31bea3d65a2f62ef02ecb29bb",
+            "urn:curve-cover-map:1:sha256:f9211558bb314beca0f4c109904230ac613ed5713fd9d868ca5042e299418636"
+          ],
+          [
+            "EC1P53Cfpha7d323c6aa84",
+            "urn:ec-record:1:sha256:a7d323c6aa845aac078417df5ac2c1c17d616bb581877074ce3344e75905d798",
+            "urn:curve-cover-map:1:sha256:e8fd1a320b4a78b9b28d103a91e9c0bba254c8d433066bd57c89dc1fd6487432"
+          ],
+          [
+            "EC1P53Cfpha8ac428c6324",
+            "urn:ec-record:1:sha256:a8ac428c63244ef5b4541e653a0954dc044d4d3ca3da04d03236d39795b9bb93",
+            "urn:curve-cover-map:1:sha256:247262571496e569f0de3d49b4278cbd24d664132d3e22a5510f353777b51fbc"
+          ],
+          [
+            "EC1P53Cfpha92c1c689c48",
+            "urn:ec-record:1:sha256:a92c1c689c48af760b120f2be9664eeea84d8e931eeede71a7647ce833fcef33",
+            "urn:curve-cover-map:1:sha256:a0a4b9389db036e04bf33694c4943057fd07f626451617dd6cb7c72b91a846b8"
+          ],
+          [
+            "EC1P53Cfphaa99cc23ede7",
+            "urn:ec-record:1:sha256:aa99cc23ede7a8897e5858346e008283d732ff183926c34daf076a2f7299e550",
+            "urn:curve-cover-map:1:sha256:28c709b2abafbe490ec22d0c25936fbb72a6fff8ada9cc7ed6b732f9fa97dd2c"
+          ],
+          [
+            "EC1P53Cfphab434ed272ec",
+            "urn:ec-record:1:sha256:ab434ed272ecf1d7400e4342694a5b4701574688ecf09ff030e5f497457e1345",
+            "urn:curve-cover-map:1:sha256:111579299558cf2e77e764b94d839c8e694329d8e544e16d73147393b17ec5bb"
+          ],
+          [
+            "EC1P53Cfphabef07a3a44e",
+            "urn:ec-record:1:sha256:abef07a3a44e45465e97c5596adcfca150afb622bb1da4c1c3692c777cf127f0",
+            "urn:curve-cover-map:1:sha256:d12b6b7dbc2365326efa0fc08affa338ef2ceda77edebca9e8033c76b9e8eba8"
+          ],
+          [
+            "EC1P53Cfphadec1104d1e9",
+            "urn:ec-record:1:sha256:adec1104d1e9b835fd79c661b690dad3b3efbdecb9f8874e6ed8ed5845c9361c",
+            "urn:curve-cover-map:1:sha256:eeef6f726c583f2e2039cd506daa9666736e318df818cbff38ee992332e94b4c"
+          ],
+          [
+            "EC1P53Cfphaeb7489493d4",
+            "urn:ec-record:1:sha256:aeb7489493d4cb02da6157f77117ff6de2d96544f08ae2e7c9d590d05792a38d",
+            "urn:curve-cover-map:1:sha256:17166d5c923a48d712832025a4800d4c15de9ad93ff8fb5ad22f094d1128525d"
+          ],
+          [
+            "EC1P53Cfphaf24e5d0e4fa",
+            "urn:ec-record:1:sha256:af24e5d0e4faac66907595deaf4827706f304d73a821edc5c816f66e4a9eccf3",
+            "urn:curve-cover-map:1:sha256:eabb5ae222020ea8e3eb0bcd4926d42e6b7b52fcd56d9a29f78c8a37603d6fa3"
+          ],
+          [
+            "EC1P53Cfphaf9fc9f61a72",
+            "urn:ec-record:1:sha256:af9fc9f61a722de4a3ea789e30ef23bc60c456bfae7920a13c70097035fe96ed",
+            "urn:curve-cover-map:1:sha256:285f9c67df7008ca47af1a8a5390e5d2015dedc4427668fafd83bd99c35f6e9a"
+          ],
+          [
+            "EC1P53Cfphb1b2f1ff2575",
+            "urn:ec-record:1:sha256:b1b2f1ff2575a7f0bfd295c021942ec2d27f6009ba973f5173abae8ebc292496",
+            "urn:curve-cover-map:1:sha256:8e8988c427e38f5261434792ec504f0c44ce363b97355379474ad301ac26c972"
+          ],
+          [
+            "EC1P53Cfphb437b1c528e8",
+            "urn:ec-record:1:sha256:b437b1c528e87d7971c7d9ad9979ee1b5bb435e66fb51a1138bc2bb1c12bba78",
+            "urn:curve-cover-map:1:sha256:0a36413630b463ae4898d84fb059a2e58fada612d2f2780bc311981fe41c31a9"
+          ],
+          [
+            "EC1P53Cfphb5a250188772",
+            "urn:ec-record:1:sha256:b5a25018877208d0515bd2ca2a176da5d16917e1fa2c4a1d206d59a5f842eb06",
+            "urn:curve-cover-map:1:sha256:66f2d2b8422955e765f7ee1c95be53015a3ca01ba81e2d4f00f3442010be3e6f"
+          ],
+          [
+            "EC1P53Cfphb737cba91fdf",
+            "urn:ec-record:1:sha256:b737cba91fdf0488dc85faecfd184e994c0420e402f4453a654734db9ad33544",
+            "urn:curve-cover-map:1:sha256:2ac5869781fa6208623b6261a007e3365dbd9a778ab56c61300a94fbe2eae901"
+          ],
+          [
+            "EC1P53Cfphb875931d1ebf",
+            "urn:ec-record:1:sha256:b875931d1ebf6472814770798a02a012a38034149317a207d66931cc1a8f7215",
+            "urn:curve-cover-map:1:sha256:34f257a4a3ae54e20d3602e5f3e7e3a7f0eb1acedb684db7d5158b8d1eedd5ee"
+          ],
+          [
+            "EC1P53Cfphbbdbc1279ece",
+            "urn:ec-record:1:sha256:bbdbc1279ece94b3b4f9f3c625d81463a3dd7c8fd5840773a71c9a6b1b03cd5f",
+            "urn:curve-cover-map:1:sha256:3fe566f4bc0c260f66cf9f50280cb4bac4c35caae8bff5204f9b2f52714ab117"
+          ],
+          [
+            "EC1P53Cfphbd7a8311e052",
+            "urn:ec-record:1:sha256:bd7a8311e052ca598596a16d1b08d610028cee40a52d79c0724c4bd1a7a5230c",
+            "urn:curve-cover-map:1:sha256:00b58e63893bad6aac257e45d2a0dba122fb42eae781054abd21c48a59377fd8"
+          ],
+          [
+            "EC1P53Cfphbe5c01465de6",
+            "urn:ec-record:1:sha256:be5c01465de667c2d58b6287140be8389e4c9239e953ab81644e03aa7cb4cc11",
+            "urn:curve-cover-map:1:sha256:373db8c8f4dde92eddbdb6466b35c007dd652ef20d14d4d0ddce54ea00480d5b"
+          ],
+          [
+            "EC1P53Cfphbf1da0f20fd4",
+            "urn:ec-record:1:sha256:bf1da0f20fd435886587a846e493810e77201a56e4c4701f6fff7a724ab0b202",
+            "urn:curve-cover-map:1:sha256:5eed7ec74a214be0693912586f3625402771a84fa0c893fd4d65d72bc2918fcf"
+          ],
+          [
+            "EC1P53Cfphbf217e818f88",
+            "urn:ec-record:1:sha256:bf217e818f887a0d74ca09ff0429eb04bc71bb596b64251ca6e9099695446712",
+            "urn:curve-cover-map:1:sha256:56fe6a9a6430012deb0c7dd8f7851670a1c1c42a2942056a3ecc823cc235731c"
+          ],
+          [
+            "EC1P53Cfphbf3ac98ce00b",
+            "urn:ec-record:1:sha256:bf3ac98ce00b4123c4be42a1cceced1c9957be64015ea5c12681575b5b5ca382",
+            "urn:curve-cover-map:1:sha256:561636aa035a420ccc3eaa0467c9adc989ab425e928e64b978b3424b802dfb4d"
+          ],
+          [
+            "EC1P53Cfphbf4335638fff",
+            "urn:ec-record:1:sha256:bf4335638ffff1ebb1de9364225dab7634c1f06fb50e0f6652838cf91bffbace",
+            "urn:curve-cover-map:1:sha256:b812272ba3c7150d3670e769398c46cc8d67ca7b11f33cdb12934210d7cf6065"
+          ],
+          [
+            "EC1P53Cfphc00c30b2c71e",
+            "urn:ec-record:1:sha256:c00c30b2c71efeaf4dc26b66adf6a903350f87954ec62eea7a4ff496e904989c",
+            "urn:curve-cover-map:1:sha256:e9c842ac404ce2cf0dd88cceaf718e0cb6d768a821f6b1a28bb376ca9deda7ab"
+          ],
+          [
+            "EC1P53Cfphc313947ca35d",
+            "urn:ec-record:1:sha256:c313947ca35d04a566f729dd51f6cfb64db0e6a1e5cbc7899760e231a30e301e",
+            "urn:curve-cover-map:1:sha256:b8db895dcc9a1b6036f3265880cac795b6d7b6b8599d235581b6125b45f59e33"
+          ],
+          [
+            "EC1P53Cfphc41e48874660",
+            "urn:ec-record:1:sha256:c41e488746603c60557c4d82026d4b158c5aac65286907aa43cf5d5a68055f40",
+            "urn:curve-cover-map:1:sha256:d39aae57e8d78ffe51df9fa48f5031d7f9d7e104318fdef8136162c4a88799ab"
+          ],
+          [
+            "EC1P53Cfphc4a9b1c61bb4",
+            "urn:ec-record:1:sha256:c4a9b1c61bb4efea1edbc1f72932ffbe059598ef0fa5b1cdf6518deb744a45b2",
+            "urn:curve-cover-map:1:sha256:ad25b8ce5f663f5868084c53e40490095b30f57482bbf0e892c74d87428a380f"
+          ],
+          [
+            "EC1P53Cfphc4e034acacd1",
+            "urn:ec-record:1:sha256:c4e034acacd18ed08ccf1f1606c9ef719610dcaa4ee47c5d08c1014ceb8a152a",
+            "urn:curve-cover-map:1:sha256:ea15836901063944683a040c566dc7882c5bb5fda8eb09bfaa9c396680dff6ef"
+          ],
+          [
+            "EC1P53Cfphc6844ad2d499",
+            "urn:ec-record:1:sha256:c6844ad2d4992e45412bb5f6154d878a95c62daa6a051909b52510d8266532bb",
+            "urn:curve-cover-map:1:sha256:3a442daed73928ff7f88c64f9997b4dd6ce59780ea902a4d3b2c6fb9ce9f759b"
+          ],
+          [
+            "EC1P53Cfphc8293fb26c61",
+            "urn:ec-record:1:sha256:c8293fb26c61b846a31d19b300473f4f4e7bfebb7d86e2bfdf06be8364dac0b3",
+            "urn:curve-cover-map:1:sha256:0bc8d34293ad786fbe154d71fb19a05bcfbb88ec1b81c0110331f09221d260f2"
+          ],
+          [
+            "EC1P53Cfphcaff1664dcba",
+            "urn:ec-record:1:sha256:caff1664dcba7db979d5edebfba66168b8af8d649887cbf9a60dd2771deb7dfe",
+            "urn:curve-cover-map:1:sha256:ece624003b74a92c4826ea59e004b9eb79c8213c9061d698bea3458b54c5bd16"
+          ],
+          [
+            "EC1P53Cfphcbc1307da703",
+            "urn:ec-record:1:sha256:cbc1307da7034447c0039a24aa7bd2f564de8cf041e68e660aae942f5fce3f28",
+            "urn:curve-cover-map:1:sha256:96bb03067627707342d5a6efd336da289316a7df9df7a69bdd608a29192add31"
+          ],
+          [
+            "EC1P53Cfphcbe27acbba46",
+            "urn:ec-record:1:sha256:cbe27acbba46d293bc4f42a4d18fc13f03728fc515ce4f68a3744979f0c3d14f",
+            "urn:curve-cover-map:1:sha256:c5bb6990e8182472f6ffd3603bee6b1fdaff4910a3f5b2b9e14a6cf87912a282"
+          ],
+          [
+            "EC1P53Cfphcceaa7c7f1da",
+            "urn:ec-record:1:sha256:cceaa7c7f1dad19340433fe0e52a75ca7a60160c70f6fc868b55d41a0fc296cd",
+            "urn:curve-cover-map:1:sha256:13f187b274214f706815508e559516666d30c152e9df635b51830d368cca26fd"
+          ],
+          [
+            "EC1P53Cfphcdfca905f584",
+            "urn:ec-record:1:sha256:cdfca905f584b6a8ec33fe64c3b2d57b1ccff7ebfa601d0bcbf2f0a7a0e9da34",
+            "urn:curve-cover-map:1:sha256:4d2f84b48bb4f706c31703688077276d89aa1f5d3dc4aa243708ea58d14daa81"
+          ],
+          [
+            "EC1P53Cfphcfebef65f004",
+            "urn:ec-record:1:sha256:cfebef65f004e8ee7818bc9b8ac29fd709ba3d48d2e61d451ffe7b485534557d",
+            "urn:curve-cover-map:1:sha256:6448fb7568ba1265b7c0a3c41af0f7b31909d134bb3134368331a156d24d7999"
+          ],
+          [
+            "EC1P53Cfphd04b39d906cc",
+            "urn:ec-record:1:sha256:d04b39d906cc3576f0c7de7d3b0bb5fc0cfc422f549a96454f5c7a5c562e190e",
+            "urn:curve-cover-map:1:sha256:d1244d8520da257e95e9af1b074ede4d9b9b74ead423a45a3f480d4e98958e96"
+          ],
+          [
+            "EC1P53Cfphd06badff0767",
+            "urn:ec-record:1:sha256:d06badff0767e80a039c746adc0bc5213e8d5ee53fee035f33829164c1dfeb7c",
+            "urn:curve-cover-map:1:sha256:7217a7e1c87ebf184bd940466c4c5d4d25750efb770cdbfdbf7b51a97700032d"
+          ],
+          [
+            "EC1P53Cfphd07747aacd62",
+            "urn:ec-record:1:sha256:d07747aacd62bc274a40a203db59f5ce53c8e34b8c5ff0fe0ddd515a9fbebe52",
+            "urn:curve-cover-map:1:sha256:b6dbf605b9c3951c6f58bcb4a73e4720d3db06abd3b3fde2af6eccff849bdc80"
+          ],
+          [
+            "EC1P53Cfphd25aa2fe8fb1",
+            "urn:ec-record:1:sha256:d25aa2fe8fb1a127cdc1d1a8b5cbc34b27e9da9b16ca42f5eeed943134e1f77b",
+            "urn:curve-cover-map:1:sha256:db10b77d10e9762509e3cad3c070bd89e8280ee258e9f3cf18d411cd4827d014"
+          ],
+          [
+            "EC1P53Cfphd315fccee83c",
+            "urn:ec-record:1:sha256:d315fccee83cecd65ebb407720073e0c90815659cbecdfaf3e6982b6d72ed3e9",
+            "urn:curve-cover-map:1:sha256:527a253ee032ccd481505b30aafd21c610d0a4fde5269701e76b1a9119b406d2"
+          ],
+          [
+            "EC1P53Cfphd3784f37e5bb",
+            "urn:ec-record:1:sha256:d3784f37e5bb866fa797521dd21365fbf2d203bbd8a453a54f95f4a23df3c3ef",
+            "urn:curve-cover-map:1:sha256:4af5cd3c38e2af3f64a24746aaec61cabd4ed1291231492714c089a651cf407c"
+          ],
+          [
+            "EC1P53Cfphd60d85332098",
+            "urn:ec-record:1:sha256:d60d85332098d01116c3ae692462a99faef4109d4fb40b8342a8d1962bfe8c72",
+            "urn:curve-cover-map:1:sha256:f8295ae0b5686262b55606b7bef51b317291cc9f8d089ec284e5791b7303f3e7"
+          ],
+          [
+            "EC1P53Cfphd6267ae9ec75",
+            "urn:ec-record:1:sha256:d6267ae9ec75b1a278c1fb4fc0a89f1b79ad78602f5357ae1ef3c6f63ce27b30",
+            "urn:curve-cover-map:1:sha256:3d670dd367ba21f4af87ec43483bf65115db6cfa864a0fc94abc794d75a11489"
+          ],
+          [
+            "EC1P53Cfphd69343002194",
+            "urn:ec-record:1:sha256:d693430021942b7c12c5e920e74026ddfc1aaa36095a6fd8a6c8724b163db79f",
+            "urn:curve-cover-map:1:sha256:1e35b75359158da117f4ccaefc42474f1e29329fc7511512f614d3fac41ba2ad"
+          ],
+          [
+            "EC1P53Cfphd879564c09cd",
+            "urn:ec-record:1:sha256:d879564c09cd8ed2256352804f44b59be25f9c2c37d4f9a9ced8b2cafd5a2f34",
+            "urn:curve-cover-map:1:sha256:c5d8a0e30c41861be14f059b97bbcf1b47bbb6686ab358db5bfecb800567b204"
+          ],
+          [
+            "EC1P53Cfphd95f5cb69b4e",
+            "urn:ec-record:1:sha256:d95f5cb69b4eb76fc2d06b9791b300c4165e7b7da624473078ed6cbf4afc7217",
+            "urn:curve-cover-map:1:sha256:95459c8da158f4bc125b4b246910aa5b28e74e24f69163b352dee4e8ab821dd6"
+          ],
+          [
+            "EC1P53Cfphda2cc702ef88",
+            "urn:ec-record:1:sha256:da2cc702ef885c9c8ce8551b2a51a60af342f5b4a5ceed537ae7006028869802",
+            "urn:curve-cover-map:1:sha256:56402d5c4b1a3b58bdd74885cfad3d63bbf1c51fc99cdb791b6f04beb9e08313"
+          ],
+          [
+            "EC1P53Cfphddb2d80fba7a",
+            "urn:ec-record:1:sha256:ddb2d80fba7ae077b7e8f7e3f75b60b2623d71d90cdcb95e467349a09ac4f615",
+            "urn:curve-cover-map:1:sha256:890060de18b34e4aa6ebd0f7cf61bd98862f7bf5cba41e0da9898a7458c1c178"
+          ],
+          [
+            "EC1P53Cfphde9eb0410f71",
+            "urn:ec-record:1:sha256:de9eb0410f71c99209a0e59fb14dfc37ccfd6eefca04f81b3c1b2c15694f4b88",
+            "urn:curve-cover-map:1:sha256:07a1f47951adba6f1b9c564ea399039a239dabbdc5a4929f711ae5dd91706331"
+          ],
+          [
+            "EC1P53Cfphe071910028bc",
+            "urn:ec-record:1:sha256:e071910028bc1c59e1ff64d71e513e8cbca0285cca1dac7b1c408b8843b94561",
+            "urn:curve-cover-map:1:sha256:f31a2e86c24bc3e3fb5e95a6f5ef5c0d7dbde1fb00b5918e8fa0e1f3cd0098ef"
+          ],
+          [
+            "EC1P53Cfphe0e2da5cdabc",
+            "urn:ec-record:1:sha256:e0e2da5cdabc0285ada07ba17c8ed8b0b100051870d519583739ec92124e6662",
+            "urn:curve-cover-map:1:sha256:2e61b1ac20d02eb251966eacd5724074479d15fddc22dce76cdf849a54767209"
+          ],
+          [
+            "EC1P53Cfphe1a9c6d9b6a4",
+            "urn:ec-record:1:sha256:e1a9c6d9b6a41a17337f60ab7c5f4cf093b46d87bc4e177fca5dca9c1bebb7fc",
+            "urn:curve-cover-map:1:sha256:37dad36bd0ab3fdc6e22f1b7976cd277376adb118f1fb729b52b8bde23872bcd"
+          ],
+          [
+            "EC1P53Cfphe243223639d8",
+            "urn:ec-record:1:sha256:e243223639d8141dc4f8a72968f96fa1bbcf9fc7b96120c4a3d931451b1e7a21",
+            "urn:curve-cover-map:1:sha256:ac575af3cc8ec893d32e22bf6e195e6e202e95c46d4e1ce588420f75250956aa"
+          ],
+          [
+            "EC1P53Cfphe3ca0e2b312a",
+            "urn:ec-record:1:sha256:e3ca0e2b312a4f32e45cdff94233f0598b8e3f8940fe5a52ea983959d2020617",
+            "urn:curve-cover-map:1:sha256:e39003cc8e16287b8385db07080d6ab82dfe274bed4a8ac16bc9ba87407eeeb5"
+          ],
+          [
+            "EC1P53Cfphe45c46b80d3e",
+            "urn:ec-record:1:sha256:e45c46b80d3e488ccd28895e1747918d6517072d876dd48958378d48c77e2cb9",
+            "urn:curve-cover-map:1:sha256:a1453292217742d1066e25c698a64fe9a35ddddb36e0255339ecddd2cf38d154"
+          ],
+          [
+            "EC1P53Cfphe4bcfbda1563",
+            "urn:ec-record:1:sha256:e4bcfbda156334bb59dc2809540a901e9c51cc2a3d90caf752d0bb967bf47d63",
+            "urn:curve-cover-map:1:sha256:a97b31f6f0e49f8dae888539be9f41e60b3392eb4b90dfc69286799aeccd9611"
+          ],
+          [
+            "EC1P53Cfphe6168053ab9f",
+            "urn:ec-record:1:sha256:e6168053ab9fd9f0849a6967a85d52543ea24071c7b336b7be5b3313122a7f42",
+            "urn:curve-cover-map:1:sha256:167243c38747b4e12fcfa117696715f2e8f63678585e0c116d12e433625cea7f"
+          ],
+          [
+            "EC1P53Cfphe7b74b59102b",
+            "urn:ec-record:1:sha256:e7b74b59102b0dcee777968a281d61d06ff3618daed26fecc2c49f087600ce90",
+            "urn:curve-cover-map:1:sha256:d8551d449e515d94adf3a7a2308260270ab41b9740182df93b058b04cbe2a668"
+          ],
+          [
+            "EC1P53Cfphea14e54aaf30",
+            "urn:ec-record:1:sha256:ea14e54aaf3006d41bf053947c233aa5d08b0e2b7d35dd87f80db6a3889cd80e",
+            "urn:curve-cover-map:1:sha256:ec03a63a73c0f7320726fd9d16a1b184e6dc0c190b90817aab8b185ac0e51316"
+          ],
+          [
+            "EC1P53Cfpheae4083f35fb",
+            "urn:ec-record:1:sha256:eae4083f35fbb77f9f221aa8e2e6eff2f84ac9174b21a9c97d54f6073db1d88c",
+            "urn:curve-cover-map:1:sha256:92deef65336f2ad8ba70efa38f9a5073aa1f08d72c819b77ccd7b6fb741203fb"
+          ],
+          [
+            "EC1P53Cfpheb53b286d777",
+            "urn:ec-record:1:sha256:eb53b286d77742e9d69dd031a3abc4b31c8043c5419d4939b6070aca836fc2f7",
+            "urn:curve-cover-map:1:sha256:95361d4e719d19347fce883f75a5444064760c6918b7045f70228ad756a1b9af"
+          ],
+          [
+            "EC1P53Cfpheda84f847c0c",
+            "urn:ec-record:1:sha256:eda84f847c0c999c262bb08fa2f19cbaf13dd57c86a9852afd617715c9e00109",
+            "urn:curve-cover-map:1:sha256:5ac5ba06ec50270f1db27f4cef2e84d3c0b6819f52498781d542fd4ac23213d2"
+          ],
+          [
+            "EC1P53Cfpheec8b5098090",
+            "urn:ec-record:1:sha256:eec8b5098090d664374e6f120db6482966b91893dc003f66325adf8cc15bc00d",
+            "urn:curve-cover-map:1:sha256:7d84a4aa5fc002a983bd9af71d362d8f7045c1381f6daba9ba28ce160e2bea42"
+          ],
+          [
+            "EC1P53Cfpheeced3117580",
+            "urn:ec-record:1:sha256:eeced31175803e3362f8d68711fce4b60b4edd97fac77717a8e5408e753f8056",
+            "urn:curve-cover-map:1:sha256:bf6df7f3129c801273c5f95f7ccc3b56f6384b103c97b82a49d3101f9441c050"
+          ],
+          [
+            "EC1P53Cfphef0597bb6526",
+            "urn:ec-record:1:sha256:ef0597bb65262d3558b363b276f82727e2bfd92ebad24438af2fbafaeb4e1707",
+            "urn:curve-cover-map:1:sha256:1fdbda6fdc33e750062b51dfb90a166a6130a5b1a641f18495703d14ee88456e"
+          ],
+          [
+            "EC1P53Cfphefe9128f7548",
+            "urn:ec-record:1:sha256:efe9128f7548c6ca4735ba65ab2f85a5631584707507fe8629dfcb8d831b57bb",
+            "urn:curve-cover-map:1:sha256:ba7edf48c57cb30026f7ba4a37c3ae81da8cf164e999f5d924908ea8b694b50b"
+          ],
+          [
+            "EC1P53Cfphf0b5a946629b",
+            "urn:ec-record:1:sha256:f0b5a946629b4e7cecb7eff4d265b5091bba0412cc791e26f78d6be7a069c93a",
+            "urn:curve-cover-map:1:sha256:0764ad4eb78823f3f05f3e8031bb5f523840198463b2ab21dbb3b57d888193a2"
+          ],
+          [
+            "EC1P53Cfphf13246551aa7",
+            "urn:ec-record:1:sha256:f13246551aa7bc01db1fb96433f3d90559e0fbd1a8b5bc9a628ec62400283cb9",
+            "urn:curve-cover-map:1:sha256:efabc3e584e961bdbd492515c1f741146efa20fef06f611323242416a7f6a2e4"
+          ],
+          [
+            "EC1P53Cfphf1f267178b06",
+            "urn:ec-record:1:sha256:f1f267178b06f3bfff044499728e7ca40af0e9fdad862f4e2c27540156196b06",
+            "urn:curve-cover-map:1:sha256:4af09a9775676b2b88d22cf544c419c5f81fe1848c0c8db11cd6948d968fc033"
+          ],
+          [
+            "EC1P53Cfphf299d06106c2",
+            "urn:ec-record:1:sha256:f299d06106c28cccc758baf9699b92d0f14cb78657013ec3529d9d04b9ffef0b",
+            "urn:curve-cover-map:1:sha256:3c5d54c630c6a27852423f68ed8da9203b418fd4365797405680871acd9ea22a"
+          ],
+          [
+            "EC1P53Cfphf2db077c95a8",
+            "urn:ec-record:1:sha256:f2db077c95a83b3ccedf954e5796c85856aee96f91067ad4b07683bad82e888b",
+            "urn:curve-cover-map:1:sha256:4213e89266af873e11b8b72ac8fece9e00e1230124b4fdfe6be575c15829a9a5"
+          ],
+          [
+            "EC1P53Cfphf6e80b58519c",
+            "urn:ec-record:1:sha256:f6e80b58519ce6923aadd7e6f63bc931b28d334efe29877f8ac1d15e9a9dac34",
+            "urn:curve-cover-map:1:sha256:dd1eae9475a8b046af8a49e90155dda35f5bd7df001aaaaa30b6c24eebc2dbdd"
+          ],
+          [
+            "EC1P53Cfphf6fb8f8e3b53",
+            "urn:ec-record:1:sha256:f6fb8f8e3b5372254a10335dc1de456251aab3ab69ba11abf86a74a5306050c1",
+            "urn:curve-cover-map:1:sha256:b315bc934b1c08ca11c16dd63658f9038dae3ac6cdd6df7356d135da92cc548f"
+          ],
+          [
+            "EC1P53Cfphf738caed3eb7",
+            "urn:ec-record:1:sha256:f738caed3eb7d41e66d7701245f12df1edd4d9a300ef3932b8b609808a6f6758",
+            "urn:curve-cover-map:1:sha256:8949b086506c5eb4ef859ebe825ed6b729c63eae8c43c99d547e710ea68fc407"
+          ],
+          [
+            "EC1P53Cfphf8655f863d6b",
+            "urn:ec-record:1:sha256:f8655f863d6be67242f3d1f9d24b916dd5da838a43f37c15eb2bc6c235280380",
+            "urn:curve-cover-map:1:sha256:4cd0863cdb5bf3d9f80c302f740f218f5efbff0bad21ec98b0cf2310477cbbd6"
+          ],
+          [
+            "EC1P53Cfphfba94381fb16",
+            "urn:ec-record:1:sha256:fba94381fb161ef0ad380c4864d8fe8abc415d8ada3d57dbad753db7f911e707",
+            "urn:curve-cover-map:1:sha256:4985c526164c140db077c4356f44c8cc5a90e48efd44d68221e7609f43012ea7"
+          ],
+          [
+            "EC1P53Cfphfc37aef7c10a",
+            "urn:ec-record:1:sha256:fc37aef7c10a4257dffcb892ed9d55bae74de488b064c0d041a6604d80b0769a",
+            "urn:curve-cover-map:1:sha256:9b81ad8cfcabb8126d90e27b7c3be8729127d9b1061d1e81b90b74eac4a58b09"
+          ],
+          [
             "EC1P542Cfph02016a341490",
             "urn:ec-record:1:sha256:02016a34149042e40454b84a69f61a86e136b274c7248729e571a1517d2c639c",
             "urn:curve-cover-map:1:sha256:859171e1eed1573b62622a4fb274ebb6962063c5f18be1f7c686329b87ccbe46"
@@ -20480,6 +21833,66 @@
             "EC1P638Cfphdc0d9da426bd",
             "urn:ec-record:1:sha256:dc0d9da426bd326c0a5274bfbaf6965c6749ce8c5389d50c36064bc6c7f48c3d",
             "urn:curve-cover-map:1:sha256:8ca93237d42d5b1f2d2a1566687f58b4b090a5a03f3e33cf55e3cd3f6f4071a9"
+          ],
+          [
+            "EC1P63Cfph084aedcbd4bf",
+            "urn:ec-record:1:sha256:084aedcbd4bf61fec1b61a946b2665955cb10518e94556675357af4eb56426a5",
+            "urn:curve-cover-map:1:sha256:917d0e00a20f9a06fc39895ad58792154bcbba4fd016365daea86ae8f501d8b6"
+          ],
+          [
+            "EC1P63Cfphc8906d7fcb67",
+            "urn:ec-record:1:sha256:c8906d7fcb6708c3fa76ad80caf6929ef2899caf6c0aaa13caabd98616c994dd",
+            "urn:curve-cover-map:1:sha256:6ef09c4215e051ee51ef0b780d095944f2be411753c37716ab81d63951907b6a"
+          ],
+          [
+            "EC1P73Cfph354b7e2ab3c1",
+            "urn:ec-record:1:sha256:354b7e2ab3c13fb9cfb8cf2483954cb7d323e5615903bf257a69f55bad361f22",
+            "urn:curve-cover-map:1:sha256:7688ffc48db0ffecc59e77ed39cd080f29a08c076f550b639a3cb19423f54609"
+          ],
+          [
+            "EC1P73Cfpha4ae221b6e8b",
+            "urn:ec-record:1:sha256:a4ae221b6e8b8ea813bfa24cbf3e86b9901433d8873b27b7fe6730c2a754c25a",
+            "urn:curve-cover-map:1:sha256:a5e1abe4821697be17414d522d7625ee4119aefaafc3f1637e50611ebc49b082"
+          ],
+          [
+            "EC1P83Cfph48a5b4d1b440",
+            "urn:ec-record:1:sha256:48a5b4d1b440a8a496e1129104851e5c0bf91aa704da003154bb082c409f11ff",
+            "urn:curve-cover-map:1:sha256:54f1e978cce384245315dedb3c7d657e982d14e1010abebf4ba1ef7ee42ab5fe"
+          ],
+          [
+            "EC1P83Cfph63916e07cbe3",
+            "urn:ec-record:1:sha256:63916e07cbe388c49937109870327a9a4300d834a78841ddc088d14bfa0cd827",
+            "urn:curve-cover-map:1:sha256:08afb321d03eca4bdc61cb3ef9bbf4801256417ebf4785b147779e465f75b816"
+          ],
+          [
+            "EC1P91Cfph37960153decd",
+            "urn:ec-record:1:sha256:37960153decd2f7b997e2683f75f0d68634d42addd065045481645cc5e13f1e9",
+            "urn:curve-cover-map:1:sha256:359aa7c71d06f0f4b136ed398a0d3bfabe61d93cebb1ef05539cba1a9756caa5"
+          ],
+          [
+            "EC1P91Cfph84f5b9ca1c61",
+            "urn:ec-record:1:sha256:84f5b9ca1c61ef9b6b68ece783df0493f46d41a1875336fc85975def0ad43b24",
+            "urn:curve-cover-map:1:sha256:c84ff282edd826510f0294271ef8c4cc5440ebe0c4153e33b473477451128d96"
+          ],
+          [
+            "EC1P95Cfphc60682717b26",
+            "urn:ec-record:1:sha256:c60682717b268ab723dda7a98453c3d1d674bc4730d00e9dfa4733585c58ee41",
+            "urn:curve-cover-map:1:sha256:a3d5ddf7cd37927d4876164e39701c706379478848485f9bb401b0c7640bdd2e"
+          ],
+          [
+            "EC1P96Cfph66101fee929f",
+            "urn:ec-record:1:sha256:66101fee929f4b3734044ad576d3109beb8c4819d01c7848df84340f01cccb93",
+            "urn:curve-cover-map:1:sha256:1210446db67dcf6118f0c0f188a7ab29143081e7a11749064467f71770a07771"
+          ],
+          [
+            "EC1P96Cfph9cb83c027360",
+            "urn:ec-record:1:sha256:9cb83c0273605c857f3d5451d2f2f45fd33edd7375b956c4cf141757676864d6",
+            "urn:curve-cover-map:1:sha256:608b3ac50b2a8df4bb87efb210f45ceaecd369d71dc24793d4bded60326aeb4a"
+          ],
+          [
+            "EC1P96Cfpha1efd00c6c86",
+            "urn:ec-record:1:sha256:a1efd00c6c866be56c7adfef498bd8007cbcff9b99eab97d9b67922472bc0afb",
+            "urn:curve-cover-map:1:sha256:19760885f70870d76a67c2ddecb54e1dc1fb6ec8b2667a7b4d35ecbccc1fb543"
           ],
           [
             "EC1Q1009D3Cfpkh957c64a1ac0d",
@@ -405483,30 +406896,51 @@
         "urn:curve-cover-map:1:sha256:753aa4b663b50db4dee22881f5e9f60e9ff1b1379986b06af1a8785c5ee58bb4"
       ],
       "claim_overrides": {
-        "generator_on_curve": "subgroup.prime-generator.unknown",
-        "catalog_order_annihilates_generator": "subgroup.prime-generator.unknown",
-        "pullback_valid": "subgroup.prime-transfer.unknown",
-        "image_annihilated_by_catalog_order": "subgroup.prime-transfer.unknown",
-        "composition_on_generator": "subgroup.prime-transfer.unknown",
-        "degree_inverse_recovery": "subgroup.prime-transfer.unknown"
+        "generator_on_curve": "subgroup.binary-untested-generator.unknown",
+        "catalog_order_annihilates_generator": "subgroup.binary-untested-generator.unknown",
+        "pullback_valid": "subgroup.binary-untested-transfer.unknown",
+        "image_annihilated_by_catalog_order": "subgroup.binary-untested-transfer.unknown",
+        "composition_on_generator": "subgroup.binary-untested-transfer.unknown",
+        "degree_inverse_recovery": "subgroup.binary-untested-transfer.unknown"
       },
       "evidence_additions": [
         "docs/curves/cover-links.yaml#EC1N73Ce0h9999c3e90683"
       ],
       "boundary": "This binary EC1 triple entered the expanded registry after the retained native batch receipt. Identity and degree-coprimality are supported; generator and transfer checks remain unknown."
+    },
+    {
+      "overlay_id": "subgroup.binary-pr2452-registry-unvalidated",
+      "kind": "subgroup",
+      "target": [
+        "EC1N73Ce0h243f847bccdd",
+        "urn:ec-record:1:sha256:243f847bccdd57c5fb0e458c368f5dee255dbd26406ce6c72e727b45cede73d3",
+        "urn:curve-cover-map:1:sha256:753aa4b663b50db4dee22881f5e9f60e9ff1b1379986b06af1a8785c5ee58bb4"
+      ],
+      "claim_overrides": {
+        "generator_on_curve": "subgroup.binary-untested-generator.unknown",
+        "catalog_order_annihilates_generator": "subgroup.binary-untested-generator.unknown",
+        "pullback_valid": "subgroup.binary-untested-transfer.unknown",
+        "image_annihilated_by_catalog_order": "subgroup.binary-untested-transfer.unknown",
+        "composition_on_generator": "subgroup.binary-untested-transfer.unknown",
+        "degree_inverse_recovery": "subgroup.binary-untested-transfer.unknown"
+      },
+      "evidence_additions": [
+        "docs/curves/cover-links.yaml#EC1N73Ce0h243f847bccdd"
+      ],
+      "boundary": "This binary EC1 triple is in the expanded registry but absent from the retained native batch. Identity and degree-coprimality are supported; generator and transfer checks remain unknown."
     }
   ],
   "coverage": {
     "catalog_maps": 15791,
     "unique_cover_models": 15789,
     "geometry_verified_maps": 15791,
-    "ec1_representations": 700,
+    "ec1_representations": 979,
     "assessed_maps": 15791,
     "unassessed_maps": 0,
-    "assessed_subgroups": 700,
+    "assessed_subgroups": 979,
     "unassessed_subgroups": 0,
     "map_membership_entries": 15791,
-    "subgroup_membership_entries": 700,
+    "subgroup_membership_entries": 979,
     "map_profiles": 4,
     "subgroup_profiles": 2,
     "scope_note": "Every current map UID and every exact [EC1, curve UID, map UID] triple has one base profile. Assessment means each claim receives an explicit supported, refuted, unknown, or not-applicable result; it does not mean every transfer capability is supported."
@@ -405622,7 +407056,7 @@
       "control": "identity",
       "assessment": {
         "status": "supported",
-        "scope": "all 15,791 map UIDs and 700 exact EC1/curve/map triples",
+        "scope": "all 15,791 map UIDs and 979 exact EC1/curve/map triples",
         "rationale": "The generator resolves exact content-addressed joins and rejects duplicates or missing rows.",
         "evidence_refs": [
           "scripts/build_cover_transfer_assessments.mjs",
@@ -405759,7 +407193,7 @@
   ],
   "exploration_boundary": [
     "No search for production targets, private keys, or discrete logarithms was performed.",
-    "All 15,791 map rows and all 700 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
+    "All 15,791 map rows and all 979 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
     "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
     "The 15,626 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
     "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",
@@ -405794,7 +407228,12 @@
     },
     {
       "id": "catalog_generator_validation",
-      "description": "Replay generator membership and catalog-order annihilation for every linked odd-characteristic EC1 representation.",
+      "description": "Replay generator membership and catalog-order annihilation for all 837 linked odd-characteristic EC1 representations and the two binary triples outside the retained native batch.",
+      "status": "unknown"
+    },
+    {
+      "id": "binary_catalog_transfer_replay",
+      "description": "Replay pullback validity, image annihilation, composition, and degree-inverse recovery for the two binary EC1 triples outside the retained 140-triple native batch.",
       "status": "unknown"
     },
     {
