@@ -24,6 +24,171 @@ def saved(fig, name):
     fig.savefig(FIG / f"{name}.png", dpi=150)
     plt.close(fig)
 
+def verification_gate_figure():
+    fig, ax = plt.subplots(figsize=(9.8, 3.5), layout="constrained")
+    ax.axis("off")
+    boxes = [(.16, "Required proof and IDC\n10 Lean theorems pass\nStronger IDC replay passes"),
+             (.50, "Native software gate\n77 tests pass, zero failures\nRunner copied and hash checked"),
+             (.84, "21 saved-tape audits\nSeparate science receipts\nNo collector or BSGS repeated")]
+    for x,label in boxes:
+        ax.text(x,.62,label,transform=ax.transAxes,ha="center",va="center",fontsize=10,
+                bbox={"boxstyle":"round,pad=.65","facecolor":"#eef3f7","edgecolor":"#245e7d"})
+    for x in (.33,.67):
+        ax.annotate("",xy=(x+.025,.62),xytext=(x-.025,.62),xycoords="axes fraction",
+                    arrowprops={"arrowstyle":"->","color":"#245e7d"})
+    ax.text(.5,.16,"fp-pruning-audit-v1: a software pass does not establish useful pruning or a lower IC price.",
+            transform=ax.transAxes,ha="center",fontsize=10)
+    saved(fig,"pruning-software-gate")
+
+def historical_failures_figure():
+    fig, ax = plt.subplots(figsize=(9.8, 3.4), layout="constrained")
+    ax.axis("off")
+    boxes = [(.25, "Historical match v1\nBuild passes; match exits 101\nRaw/public query shapes differ"),
+             (.75, "Historical match v2\nBuild exits 101\nDiagnostic JSON syntax error")]
+    for x,label in boxes:
+        ax.text(x,.65,label,transform=ax.transAxes,ha="center",va="center",fontsize=11,
+                bbox={"boxstyle":"round,pad=.75","facecolor":"#f7eee8","edgecolor":"#9b4380"})
+    ax.text(.5,.18,"Both failures are preserved. Neither is a passed fixture match or a failed mathematical relation.",
+            transform=ax.transAxes,ha="center",fontsize=10)
+    saved(fig,"historical-match-failures")
+
+def pruning_outcome_figure():
+    v = json.loads((ROOT / "results/fp-pruning-v1-headline.json").read_text())
+    rows = v["arms"]
+    labels = ["Phi", "Doubling", "Pure L0"]
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 3.9), layout="constrained")
+    for ax, key, title in [(axes[0], "case_local_count_sums", "Entire 9,658-residual tape"),
+                            (axes[1], "through_original_full_rank_sums", "Through first full rank")]:
+        values = [r[key]["proposed_finite_rejections"] for r in rows]
+        ax.bar(labels, values, color=["#147d92", "#9b4380", "#b07c28"])
+        for i,value in enumerate(values): ax.text(i,value+.05,str(value),ha="center")
+        ax.set_ylim(0,2.5); ax.set_yticks([0,1,2]); ax.set_ylabel("Recorded proposed finite rejections")
+        ax.set_title(title,fontsize=10); ax.grid(axis="y",alpha=.2)
+    fig.suptitle("fp-pruning-audit-v1: 21 cases per arm; exact sets/ranks preserved; no measured price",fontsize=10)
+    saved(fig,"pruning-outcome")
+
+def external_reconciliation_figure():
+    fig, ax = plt.subplots(figsize=(9.8,3.3),layout="constrained")
+    ax.axis("off")
+    boxes = [(.16,"Original root audit\nUnchanged input and basis\nTimeout 124 preserved"),
+             (.50,"V1 duplicate detected\nActual native child stopped\nPartial output preserved"),
+             (.84,"Corrected V2\nBind exact hashes and argv\nReuse failures; audit new bases")]
+    for x,label in boxes:
+        ax.text(x,.64,label,transform=ax.transAxes,ha="center",va="center",fontsize=10,
+                bbox={"boxstyle":"round,pad=.6","facecolor":"#eef3f7","edgecolor":"#245e7d"})
+    for x in (.33,.67):
+        ax.annotate("",xy=(x+.025,.64),xytext=(x-.025,.64),xycoords="axes fraction",arrowprops={"arrowstyle":"->","color":"#245e7d"})
+    ax.text(.5,.16,"An owner stop or a successful external process does not establish complete physical roots.",
+            transform=ax.transAxes,ha="center",fontsize=10)
+    saved(fig,"external-reconciliation")
+
+def uniform_population_figure():
+    v = json.loads((ROOT / "results/uniform-zero-v2-summary.json").read_text())
+    names = ["original", "phi-l0-active", "double-l0-active", "l0-peel"]
+    labels = ["Original L2", "Phi", "Doubling", "Pure L0"]
+    colors = ["#68717a", "#147d92", "#9b4380", "#b07c28"]
+    fig, axes = plt.subplots(1,2,figsize=(9.4,3.9),layout="constrained")
+    for case in v["population_cases"]:
+        for i,name in enumerate(names):
+            a = next(a for a in case["arms"] if a["arm"]==name)
+            x = i+(case["seed"]-1)*.055
+            for ax,key in zip(axes,["support","second_moment_sum"]):
+                ax.scatter([x],[a[key]],color=colors[i],marker=["o","s","^"][case["seed"]],s=34)
+    for ax in axes:
+        ax.set_xticks(range(4),labels); ax.grid(axis="y",alpha=.2)
+    axes[0].set_ylabel("Nonempty residuals (recorded count)")
+    axes[1].set_ylabel("Sum of squared yields (recorded integer)")
+    fig.suptitle("uniform-zero-v2: complete p37 population; all three seed presentations, no IC timing",fontsize=10)
+    saved(fig,"uniform-population")
+
+def five_zero_figure():
+    v = json.loads((ROOT / "results/five-zero-v1-summary.json").read_text())
+    primes = [37,73,97,157,229,241,337]
+    arms = [("l0-peel","Pure L0","#b07c28",-.22),
+            ("phi-l0-active","Phi","#147d92",0),
+            ("double-l0-active","Doubling","#9b4380",.22)]
+    fig, ax = plt.subplots(figsize=(9.4,4.1),layout="constrained")
+    for record in v["records"]:
+        case = record["summary"]
+        for name,label,color,offset in arms:
+            a = next(a for a in case["arms"] if a["arm"]==name)
+            x = primes.index(case["p"])+offset+(case["seed"]-1)*.045
+            ax.scatter([x],[a["factor_log_rank"]],color=color,marker=["o","s","^"][case["seed"]],s=34,
+                       label=label if case["p"]==37 and case["seed"]==0 else None)
+        a = case["arms"][0]
+        ax.scatter([primes.index(case["p"])+(case["seed"]-1)*.045],[a["unanchored_factor_columns"]],
+                   color="#68717a",marker="_",s=85,label="Factor columns" if case["p"]==37 and case["seed"]==0 else None)
+    ax.set_xticks(range(7),[str(p) for p in primes]); ax.set_xlabel("p (three seed presentations per curve)")
+    ax.set_ylabel("Factor-log rank / number of columns"); ax.set_ylim(-.5,15); ax.grid(axis="y",alpha=.2)
+    ax.legend(ncol=4,fontsize=8,loc="upper left")
+    fig.suptitle("five-zero-v1: all 21 cases; oracle census, independent completeness replay separate",fontsize=10)
+    saved(fig,"five-zero-rank")
+
+def zero_identity_figure():
+    v = json.loads((ROOT / "results/zero-identity-audit-v1-summary.json").read_text())
+    assert v["status"] == "pass" and not v["missing"]
+    primes = [37,73,97,157,229,241,337]
+    fig, axes = plt.subplots(1,2,figsize=(9.4,3.8),layout="constrained")
+    for case in v["cases"]:
+        x = primes.index(case["p"])+(case["seed"]-1)*.045
+        axes[0].scatter([x-.06],[case["predicted_signed_relations"]],color="#68717a",marker="_",s=70,
+                        label="Doubled triangles" if case["p"]==37 and case["seed"]==0 else None)
+        axes[0].scatter([x+.06],[case["observed_signed_relations"]],color="#9b4380",marker=["o","s","^"][case["seed"]],s=26,
+                        label="All observed tuples" if case["p"]==37 and case["seed"]==0 else None)
+        axes[1].scatter([x],[case["observed_rank"]],color="#9b4380",marker=["o","s","^"][case["seed"]],s=26)
+    for ax in axes:
+        ax.set_xticks(range(7),primes); ax.set_xlabel("p (three seed presentations)"); ax.grid(axis="y",alpha=.2)
+    axes[0].set_ylabel("Signed physical tuples"); axes[0].legend(fontsize=8)
+    axes[1].set_ylabel("Observed factor-log rank"); axes[1].set_yticks([0,1]); axes[1].set_ylim(-.15,1.3)
+    fig.suptitle("zero-identity-audit-v1: all 21 pass; predicted rows are zero; target column is zero",fontsize=10)
+    saved(fig,"zero-identity-outcome")
+
+def external_terminal_figure():
+    v = json.loads((ROOT / "results/external-audit-completion-v2-inventory.json").read_text())
+    records = {r["id"]:r for r in v["cases"]}
+    arms = [("l0-peel","Pure L0"),("phi-l0-active","Phi"),("double-l0-active","Doubling")]
+    variants = [("global-finite-domain","Global finite"),("global-geometric","Global geometric"),
+                ("orbit-1","T = 1"),("orbit-10","T = 10"),("orbit-26","T = 26"),
+                ("variant-system","Variant finite"),("variant-geometric","Variant geometric")]
+    fig, ax = plt.subplots(figsize=(9.2,4.5),layout="constrained")
+    for x,(arm,_) in enumerate(arms):
+        for y,(variant,_) in enumerate(variants):
+            key = f"{arm}-{variant}"
+            case = records[key]
+            if case["external_process_exit"] != 0:
+                label,color = "msolve 124", "#f4e1d5"
+            elif case["native_audit_exit"] != 0:
+                label,color = "Roots 124", "#f4e1d5"
+            else:
+                audit = json.loads((ROOT / "runs/external-audit-completion-v2/inventory" / f"{key}.native-summary.json").read_text())
+                assert audit["all_physical_sets_equal"]
+                label,color = f'Pass: rank {audit["rank"]}/{audit["columns"]}', "#dfefed"
+            ax.add_patch(plt.Rectangle((x-.47,y-.43),.94,.86,facecolor=color,edgecolor="white"))
+            ax.text(x,y,label,ha="center",va="center",fontsize=10)
+    ax.set_xticks(range(3),[a[1] for a in arms]); ax.set_yticks(range(7),[v[1] for v in variants])
+    ax.set_xlim(-.5,2.5); ax.set_ylim(6.5,-.5); ax.tick_params(length=0)
+    for spine in ax.spines.values(): spine.set_visible(False)
+    fig.suptitle("All 21 terminal positions: 11 physical-set passes; 10 censored, never zero-yield claims",fontsize=10)
+    saved(fig,"external-terminal-outcomes")
+
+def publication_gate_figure():
+    meta = ROOT / "runs/publication-gate-v1/metadata"
+    for phase in ["library-compile","library-tests","examples-compile","quartic_twist_s4_integer",
+                  "quartic_twist_s4_structure","curve-id-selftest","curve-names","validation-gate-tests",
+                  "validation-gate","large-files"]:
+        assert (meta / f"{phase}.exit").read_text().strip() == "0"
+    fig, ax = plt.subplots(figsize=(9.8,3.5),layout="constrained")
+    ax.axis("off")
+    boxes = [(.16,"Root + examples\n4,488 library tests pass\n119 existing ignores\n1 + 3 example tests pass"),
+             (.50,"Metadata gates\nIdentity and naming pass\nValidation and size pass\nAll ten phases exit zero"),
+             (.84,"Separate native run\n81 tests pass\nOwn source and runner hash\nPublic-point replay scope")]
+    for x,label in boxes:
+        ax.text(x,.63,label,transform=ax.transAxes,ha="center",va="center",fontsize=10,
+                bbox={"boxstyle":"round,pad=.6","facecolor":"#eef3f7","edgecolor":"#245e7d"})
+    ax.text(.5,.12,"Software validation only: no admitted timing, scientific promotion, GitHub CI or merge implied.",
+            transform=ax.transAxes,ha="center",fontsize=10)
+    saved(fig,"publication-software-gates")
+
 def figures():
     v = json.loads((ROOT / "results/algebra-v1-validation.json").read_text())
     rows = v["arms"]
@@ -144,7 +309,25 @@ def square_figure():
     saved(fig,"square-obstruction")
 
 if __name__ == "__main__":
-    if sys.argv[1:] == ["--zero-figure"]:
+    if sys.argv[1:] == ["--zero-identity-figure"]:
+        zero_identity_figure()
+    elif sys.argv[1:] == ["--external-terminal-figure"]:
+        external_terminal_figure()
+    elif sys.argv[1:] == ["--publication-gate-figure"]:
+        publication_gate_figure()
+    elif sys.argv[1:] == ["--external-reconciliation-figure"]:
+        external_reconciliation_figure()
+    elif sys.argv[1:] == ["--pruning-outcome-figure"]:
+        pruning_outcome_figure()
+    elif sys.argv[1:] == ["--uniform-population-figure"]:
+        uniform_population_figure()
+    elif sys.argv[1:] == ["--five-zero-figure"]:
+        five_zero_figure()
+    elif sys.argv[1:] == ["--verification-gate-figure"]:
+        verification_gate_figure()
+    elif sys.argv[1:] == ["--historical-failures-figure"]:
+        historical_failures_figure()
+    elif sys.argv[1:] == ["--zero-figure"]:
         zero_figure()
     elif sys.argv[1:] == ["--square-figure"]:
         square_figure()

@@ -101,15 +101,16 @@ relations or an impossibility proof. Official msolve comparisons must still
 verify complete signed physical sets and independent rank before a
 full-cost collector is priced.
 
-The external pure finite-domain and T=1,10,26 source-block outputs now
-pass the separate physical-set/RREF audit on p37/seed0/query2. Each
-recovers the same single signed physical relation and rank 1/3 as its
-properly scoped group oracle. Input reductions and S-pairs vanish;
-reverse ideal containment is explicitly unverified. Other external
-outputs remain under their existing managed owners. This is a fixture
-correctness result, not an admitted solver or DLP cost comparison.
-The three blocks present the same physical tuple; their union does not
-create three distinct relations.
+All 21 external positions are now reconciled: 11 complete physical-set
+audits, nine msolve timeouts and one native root-audit timeout after a
+basis. Every pure source block recovers the same single signed tuple and
+rank 1/3. Phi's block ranks are 0,2,0; doubling's are 0,0,1. Input reductions
+and S-pairs vanish for audited bases; reverse ideal containment remains
+unverified. The [terminal report](reports/run-20261024T0841Z-external-terminal/REPORT.md)
+retains every encoding and failure. These are selected-fixture correctness
+results, not admitted solver or complete DLP costs. A corrected follow-up
+reuses terminal failures as well as successes; its earlier duplicate
+timeout retry and consumed work remain explicitly preserved.
 
 The resumed source-block regression is now complete on the predeclared
 p37/seed0/query2 fixture. All three unions have complete native roots and
@@ -138,13 +139,40 @@ estimate an independent uniform-residual mean.
 
 Zero is fixed by the action and might concentrate relations useful for
 factor-log precomputation. It can also concentrate identities whose entire
-folded row vanishes. The next exact diagnostic covers all 21 zero fibers
+folded row vanishes. The completed exact diagnostic covers all 21 zero fibers
 and the entire residual population for p=37, seeds 0,1,2. It records signed
 physical sets, zero rows, distinct rows and independent RREF. Every zero
 query has target coefficient zero; no target recovery is claimed from
 zero-only rows. This is a separate oracle diagnostic, not a polynomial
 candidate or an IC price. Its protocol is
 [SUPPLEMENT_UNIFORM_AND_ZERO.md](SUPPLEMENT_UNIFORM_AND_ZERO.md).
+
+The full p37 population gives phi and doubling exactly 4,112,640 signed
+tuples each. Doubling has greater support (1,584,745 residuals versus
+1,551,768) and smaller recorded second moment. All 21 four-factor zero
+fibers have no original, phi or pure relation. Doubling has genuine
+relations; at p337 its factor-log rank is 1/14, so not every relation is
+a zero-row identity. See the [complete census report](reports/run-20261024T0153Z-uniform-zero/REPORT.md).
+
+The finite-Fp rejection audit preserves every saved physical set, row,
+rank and recovery. It rejects one phi and two doubling systems over the
+whole tape, but zero systems before first full rank in either arm. This
+predicate supplies no through-rank system saving here. The [audit report](reports/run-20261024T0607Z-pruning-science/REPORT.md)
+retains all 21 cases and its exact boundary; no filter is deployed.
+
+![Five-factor factor-log rank, all 21 cases](figures/five-zero-rank.svg)
+
+The completed five-factor oracle census gives both mixed arms 504 signed
+physical tuples and 15 distinct projective rows in aggregate. Pure is
+empty. At p37, phi has factor-log rank 2/2 and doubling 1/2; at p157,
+2/8 versus 1/8; at p337, 1/14 versus 3/14. Every seed's result remains
+separate. Only the p37 phi rows recover all factor logs; no target is
+recovered from zero-only equations. These are oracle-census observations,
+with [independent point-keyed completeness replay](reports/run-20261024T0908Z-five-point/REPORT.md)
+now passing all 21 cases and 63 arm comparisons. The field/curve kernel is
+shared, while point keys, canonical partition and elimination differ. There
+is no higher-arity polynomial collector or new complete price. See the
+[five-factor report](reports/run-20261024T0802Z-five-zero/REPORT.md).
 
 ## Verification and completion criteria
 
@@ -157,17 +185,20 @@ candidate or an IC price. Its protocol is
 | Source-block regression | Complete on p37/seed0/query2: all three unions and independent signed-set/rank audits pass; ranks 1/3 pure, 2/3 phi, 1/3 doubling |
 | Implicit and fully symmetric regression | Complete: pure finite/geometric audited, each rank 1/3; all four mixed processes fail allocation |
 | Full input population for new variants | Independent native validation passes all 297 positions: 294 new and 3 reused, no missing/invalid/bounded-failure records; [run report](reports/run-20261024T0320Z-variant-population/REPORT.md) |
-| External S5 bases and roots | Processes and independent verification remain separate obligations |
-| Uniform mass and zero-rank diagnostic | Implemented; explicit 21+3 run inventory retained |
+| External S5 bases and roots | All 21 positions reconciled: 11 physical-set passes, nine external timeouts and one native root timeout; reverse ideal containment remains unverified |
+| Uniform mass and zero-rank diagnostic | Complete native census: all 21 zero cases and three p37 full populations; exact masses, support, histograms, second moments and rank retained |
+| Five-factor zero census | All 21 cases complete; all 63 separate public-point set/rank comparisons pass; equal mixed aggregate counts conceal curve-dependent rank differences |
+| Historical pure S5 miss binding | Corrected checker passes full 13-key/61-query projection, exact tuple and four corruption controls; no retroactive runtime seal or full-stream collector claim |
 | Polynomial identities | Three exact integer/IDC checks and four coordinate Lean theorems pass; factored quartic gate v6 passes seven theorems plus two local AC declarations; all earlier failures retained |
 | Finite-count Lean proof | Repaired module passes the gate and 12-declaration axiom audit |
-| Zero-triangle coefficient identity | Lean theorem passes; group/row/count bridges remain the separate native check |
+| Zero-triangle coefficient identity | Lean theorem and all 21 separate actual-point/set/row checks pass; p337 has 24 additional tuples per seed and rank 1/14 |
 | External audit software gate | Version 2 passes 75 tests; block-scope error caught before use; corrected version 3 passes all 76 tests including the actual physical fixture scope test |
 | Pure-zero algebraic certificate | Exact native 2048*D=sum Ai*Ci, two Lean theorems and independent IDC1h09d838b7dca9895f pass; full curve/basis formal bridges remain open |
 | Stronger finite-component obstruction | Exact 64*S³ certificate, combined 10-theorem Lean gate and independent IDC1h65c11f01d0b1e67a pass; full curve/group bridge remains separate |
-| Finite Fp residual prefilter | Full-tape counterfactual audit released after proof/replay; native build gate queued; no filter deployed |
+| Finite Fp residual prefilter | All 21 saved-tape audits pass after 77-test gate; sets/rank/recovery preserved, zero rejections through rank; no filter deployed |
 | New cold DLP, GAE and strongest matched rho | Not measured; no new performance ranking |
 | Selecting among different twists | Not tested by these fixed-model image comparisons |
+| Current software gates | Post-merge release library 4,488 pass/119 existing ignores, touched examples 1+3 pass, naming/validation/size gates pass; separate native suite 81/81 |
 
 The [proof map](proof/PROOF_MAP.md) lists hypotheses and missing bridges.
 The [migration reconciliation](MIGRATION_RECONCILIATION_20261024.md)

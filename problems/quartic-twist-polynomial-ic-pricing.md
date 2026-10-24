@@ -11,10 +11,12 @@
 The canonical `p=37,b0=2,r=1,873,633` quartic twist has a complete
 mixed-pattern `k=1` polynomial one-target solve, but a complete
 line-union S5 relation finder and an admitted IC/rho cost comparison
-cannot yet be established. The native S5 solver misses a verified
-`k=0` relation at the frozen residual index 2, and hash/allocator CPU,
-peak bytes, isolated online intervals, calibrated GAE and same-input
-external solver comparisons remain absent.
+cannot yet be established. The historical native S5 solver misses a verified
+`k=0` relation at frozen residual index 2. A separately constructed complete
+source-block union now reproduces that exact tuple and public input; the
+old solver and its complete 61-query stream have not been repaired/repriced.
+Hash/allocator CPU, peak bytes, calibrated GAE and complete same-input
+external DLP comparisons remain absent.
 
 The original broader request asks whether twist symmetry speeds relation
 finding and index calculus across relevant regimes. The p=73/p=97
@@ -69,8 +71,11 @@ DLP cost remain open; these image-base controls do not discharge them.
   relation and rank 1/3, phi two and rank 2/3, doubling one and rank 1/3.
   Both full-symmetry pure encodings also complete and pass their independent
   audits, each at rank 1/3. This is one selected positive residual, not a
-  population or full-cost gain. It is not yet claimed as a repair of the historical
-  tagged S5 input without matching the exact curve, residual and domain.
+  population or full-cost gain. The separate historical-match-v3 checker now
+  binds all 13 public keys and 61 query pairs, the old miss and the complete
+  new pure source-block set. All four corruption controls reject. The old
+  report has no full runtime-input seal, so no retroactive seal or repair of
+  its whole solver stream is claimed.
 - **Fair representation controls:** The implicit mixed encodings retain
   and reduce their inverse equations. The fully symmetric pure-L0 control
   eliminates the distinguished fourth source coordinate by an exact
@@ -83,7 +88,12 @@ DLP cost remain open; these image-base controls do not discharge them.
   passes independent native record/export consistency validation: 294 new
   and three reused inputs, with no missing or invalid positions. This
   does not certify complete roots or a generic ideal derivation. Remaining
-  official msolve root audits, complete collection and cold prices remain open.
+  complete collection and cold prices remain open. All 21 official msolve
+  positions are now terminal: 11 complete physical-set audits pass, nine
+  external solves time out, and one native-root audit times out. Reverse
+  ideal containment remains unverified. The earlier accidental retry of that
+  terminal root timeout was stopped; its partial work and correction are
+  preserved, not counted as a new successful computation.
 - **Proof and attribution gaps:** Three exact integer identities and IDC
   mutation checks pass. The combined Lean check hits memory limits;
   separately bounded faithful targets retain the original statements.
@@ -99,6 +109,18 @@ DLP cost remain open; these image-base controls do not discharge them.
   The 21-case zero-fiber rank audit and three p37 full-population censuses
   are explicitly separate oracle diagnostics, with no target coefficient
   in zero-only rows. They are not priced polynomial algorithms.
+- **Five-factor zero relations, independently replayed:** All 21 pure/phi/
+  doubling censuses complete. Each mixed arm has 504 signed physical tuples
+  and 15 projective rows in aggregate, but per-curve ranks differ. At p37,
+  phi spans 2/2 factor-log columns versus doubling's 1/2; at p157, 2/8 versus
+  1/8; at p337, 1/14 versus 3/14. Other cases have rank zero; pure has no
+  five-factor relation on this panel. An independently partitioned public-
+  point meet-in-the-middle enumerator and separate matrix elimination match
+  all 21 cases and 63 arm sets/ranks, including the full-factor point checks.
+  Its enumeration uses no factor logs or BSGS input, but shares the field/
+  curve kernel and orbit builder. This is bounded structural evidence and an
+  executable group-based enumerator, not a measured polynomial/complete-IC
+  price. All zero-only target coefficients are zero.
 
 - **Observed:** The [pilot audit](../research/twist_index_calculus_20261020/quartic_twist_tagged_s5_audit_p37_v1.json) enumerated all `r` subgroup logs and found five complete signed relations among the first four residuals. `k=1,2,3` reproduce their entire pattern-specific sets; `k=0` misses one and `k=4` has one system failure. The [one-target k=1 audit](../research/twist_index_calculus_20261020/quartic_twist_mixed_polynomial_ic_k1_audit_p37_v1.json) independently reconstructs all eight processed sets, rank four, all physical factor logs, scalar 271, and the same-target twist24 rho replay. The native producer counts 116,050,118 `Fp M` and 3,936 group operations against rho's 348,941 `Fp M` and 2,745 group operations, in separate units.
 - **Bounded S5 retry:** [Degree 30](../research/twist_index_calculus_20261020/quartic_twist_tagged_s5_k0_q2_d30_p37_v1.json) and [degree 31](../research/twist_index_calculus_20261020/quartic_twist_tagged_s5_k0_q2_d31_p37_v1.json) still return “border unreachable at this degree”; the `k=4` control does likewise. The 8 GiB and 1,200 s caps were observed. A repeated quotient dimension of 4,090 is recorded; its cause is unknown.
@@ -122,9 +144,11 @@ of S=64*s4-(4*s2-s1²)² lies there (native exact search and combined
 in odd characteristic when all four components vanish. Full curve/group
 and field-embedding formalization is separate. The stronger independent
 replay now passes as IDC1h65c11f01d0b1e67a, with zero integer remainder,
-32 extra points and both mutation controls. Its finite-Fp residual filter must retain
-infinity and preserve every saved physical presentation, unique row,
-rank and recovery on all 21 cases before deployment. This neither rules
+32 extra points and both mutation controls. Its finite-Fp residual audit now retains
+infinity and preserves every saved physical presentation, unique row,
+rank and recovery on all 21 cases. It rejects one phi and two doubling
+systems over the full tape, and zero systems before first full rank in
+either arm. No filter is deployed and no through-rank saving results. This neither rules
 out higher-arity precomputation nor establishes a twist-specific gain.
 
 - [ ] Reproduce every `k=0…4` signed decomposition on the frozen 61-residual stream with no failed algebraic systems, retaining all extraneous, duplicate, and invalid roots and a scalar-keyed independent audit.
@@ -137,6 +161,10 @@ out higher-arity precomputation nor establishes a twist-specific gain.
 - [x] Execute all 189 image-base cases plus 21 doubling controls through rank or their frozen cap on all seven primes, with complete independently checked processed sets, rank progress, source parity and A/A.
 - [x] Reconcile and admit all 105 complete same-origin cold rounds and 630 non-timing replays for the ten image-base arms; check complete elapsed phase sums and retain every censored, interrupted and refused record. Complete GAE prices are still missing.
 - [x] Compare complete native and msolve reduced bases on all 378 preselected image-study systems in eight passes, preserving losing rows and internal timer ranges. This is a GB component comparison, not all S5 roots or external DLP cost.
+- [x] Bind the historical p37 pure S5 miss to the new complete source-block set with full public projection and corruption controls; preserve the missing runtime seal and incomplete old whole-stream solver.
+- [x] Reconcile all 21 joint external positions and audit every completed available basis's physical roots; retain nine external timeouts, one native-root timeout, and the stopped duplicate retry.
+- [x] Complete all 21 four-factor zero fibers, three full p37 populations, all 21 five-factor censuses and 63 independently enumerated public-point set/rank comparisons; count zero/projective rows separately.
+- [ ] Implement a polynomial five-factor zero collector with the same orbit quotient for phi and doubling, preserve the exact complete physical sets/ranks, and charge setup, failed systems, matrix work and target descent against the strongest existing IC baseline.
 - [ ] For any priced leaderboard result, provide the replay certificate, validator report and strongest matched rho receipt in `VALIDATION.json` under `docs/VALIDATION_GATE.md`.
 
 The first item would establish a complete tagged-line-union polynomial
@@ -145,12 +173,15 @@ or asymptotic advantage. The other items address ranking and transfer.
 
 ## Next discriminating step
 
-- **Action:** Extend the completed source-block and pure-symmetry controls;
-  finish the running mixed implicit-image
-  and official msolve regression records; independently compare complete
-  signed physical sets and RREF on exactly the same public inputs. Finish
-  the separately frozen uniform-mass and zero-rank diagnostics. Match the
-  historical tagged input explicitly before calling a newer result its repair.
+- **Action:** Implement and check a five-factor zero-residual polynomial
+  collector, first testing a quotient of image/ordinary peel pairs by the
+  existing action. Match every independently enumerated saved physical set
+  and factor-log rank. Then charge setup, all failed systems, matrix work
+  and target descent; compare phi, the same quotient for generic doubling,
+  and the strongest existing invariant-base IC pipeline. Orbit copies add
+  no independent folded rows. The preceding finite diagnostics and
+  historical input binding are complete and must not be rerun merely to
+  produce new receipts.
 - **Inputs and controls:** The completed 297-construction workload, frozen
   p37/seed0/query2 regression, pure L0 with full permutation symmetry, and
   generic doubling with the same image size and represented logs. Keep

@@ -160,3 +160,49 @@ bytes need fresh page review. No new conditional proof is represented
 as a measured filter gain. Other managed owners and their original
 budgets remain intact; no original collector, BSGS, Diem generator or
 EKS job was duplicated.
+
+## 10:00–10:07 UTC reconciliation after the repeated migration steering
+
+Diem's native state was inspected first, before any other action. It remains
+`deadline-expired`, 50/52, with no pending work or launcher; its managed owner
+is inactive. The approved handoff receipt was read. The EKS service overview
+again lists only `twist-joint-capability-20261024-v1`, terminal with
+`DeadlineExceeded`. Direct kubectl has no configured context and was not
+used to change configuration or assume another role. No Diem generator,
+legacy waiting-freeze followup or EKS job was restarted. The legacy source
+lane remains quiesced under its original authorization.
+
+Every scientific lane from the 07:23 snapshot is now terminal. All 21 pruning
+audits, all 21 four-factor zero fibers and three full p37 populations, all 21
+five-factor censuses and all 63 independent public-point arm comparisons
+pass within their stated scope. All 21 doubled-triangle point/set/row checks
+pass. All 21 external positions are reconciled: 11 physical-set passes,
+nine external timeouts and one native-root timeout. The original historical
+miss is bound by the corrected checker, with its absent runtime seal still
+explicit. No original collector or BSGS run was repeated for these checks.
+
+One external-audit followup did accidentally repeat an already terminal
+native-root timeout before detection. Its duplicate child was stopped and
+its partial outputs, before/after stop receipts and whole-service CPU counter
+132461232000 ns are retained in `external-audit-completion-v1`. The corrected
+v2 reuses failures only after exact argv/hash binding and audits newly
+available bases. A service stop's success is not a native audit pass.
+
+The main-branch merge retains all 15,797 curve identities and parent aliases;
+the 325 differing shared metadata records are one-sided main changes.
+The semantic addendum preserves the changed modulus-provenance descriptor.
+All ten post-merge software phases exit zero; the release library passes
+4,488 tests with 119 existing ignores, examples pass 1+3, and the separate
+native point-replay gate passes 81. These are software gates, not new solver
+prices or published-head CI. Exact sources and commands remain in the raw
+metadata. Unrelated dirty source files are excluded from publication.
+
+The 43-directory level-6 archive attempt was deliberately stopped at 09:52
+without a completed archive or upload. Its 99 MiB partial and stop/hash
+receipts remain in scratch. Only infrastructure compression changed:
+committed level-1 scripts retain one worker, the shared busy lock, exact
+fresh extraction/cmp of every file and byte-identical repacking. The v3
+owner was confirmed absent before its single launch at about 10:04 UTC.
+All packing and extraction staging is on the durable workspace volume.
+The old 22-directory canonical f4ddf5ce checkpoint remains published until
+this replacement passes verification and actual remote publication.

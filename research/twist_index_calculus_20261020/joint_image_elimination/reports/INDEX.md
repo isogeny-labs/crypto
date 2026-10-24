@@ -28,10 +28,21 @@ certificate. Earlier failed attempts remain under their original IDs.
 | pure-zero-certificate / Lean / IDC v1 | [Discriminant obstruction](run-20261024T0303Z-pure-zero/REPORT.md) | Exact identity, two Lean theorems and independent IDC pass |
 | pure-zero-square / square-bridge / square-ideal v1 | [Stronger square obstruction](run-20261024T0445Z-square/REPORT.md) | Native search, combined 10-theorem gate and independent IDC1h65c11f01d0b1e67a pass |
 | variant-population-v1 / variant-validation-v1 | [All-position variant validation](run-20261024T0320Z-variant-population/REPORT.md) | All 297 positions pass native record/export consistency; no root/cost claim |
+| fp-pruning-audit-v1 software | [77-test native gate](run-20261024T0607Z-pruning-software/REPORT.md) | Build, serial tests and immutable runner copy pass; 21 case audits are separate |
+| historical-s5-match-v1/v2 | [Retained checker failures](run-20261024T0728Z-historical-failures/REPORT.md) | Version 1 match assertion and version 2 compile syntax failure; neither is a passed match |
+| historical-s5-match-v3 | [Exact fixture binding](run-20261024T0816Z-historical-match/REPORT.md) | Full public projection, historical tuple and four corruption controls pass; runtime-seal limitation retained |
+| fp-pruning-audit-v1 science | [Complete saved-tape audit](run-20261024T0607Z-pruning-science/REPORT.md) | All 21 cases preserve sets/rank/recovery; zero proposed rejections through rank |
+| uniform-zero-v2 | [All zero and population cases](run-20261024T0153Z-uniform-zero/REPORT.md) | All 21+3 complete; equal mixed mean, differing support/second moment; doubling zero rank is nonzero at p337 |
+| five-zero-v1 | [All 21 five-factor censuses](run-20261024T0802Z-five-zero/REPORT.md) | Equal mixed aggregate counts with curve-dependent rank; independent point replay remains separate |
+| five-point-replay-v1 | [Independent public-point completeness and rank](run-20261024T0908Z-five-point/REPORT.md) | All 21 cases and 63 arm comparisons pass; exact sets/ranks and full-factor point checks match |
+| zero-identity-audit-v1 | [Doubled-triangle identities](run-20261024T0841Z-zero-identities/REPORT.md) | All 21 actual group/set/row checks pass; p337 has 24 additional tuples and rank 1/14 |
+| external-audit-completion-v1 correction | [Duplicate retry and preserved failure](run-20261024T0539Z-external-followup/REPORT.md) | Duplicate terminal timeout was stopped and retained; corrected driver binds exact argv and hashes before reusing terminal failures |
+| external-regression-v2 / external-audit-completion-v2 | [All 21 external positions](run-20261024T0841Z-external-terminal/REPORT.md) | Eleven physical-set passes, nine msolve timeouts and one native-root timeout; reverse ideal containment unverified |
+| publication-gate-v1 | [Post-merge software gates](run-20261024T0828Z-publication-gate/REPORT.md) | All ten phases exit zero; 4,488 library tests and 1+3 example tests pass; separate native run passes 81 |
 
-The external basis/roots, 21 zero fibers and three population censuses,
-independent validation of the 297 terminal variant positions have existing
-managed owners. Their terminal run reports must cite their actual final
-receipts; they are not counted as completed by this index. The proposed
-finite-Fp residual audit is released after proof/replay and awaiting its
-native build gate. No filter is deployed.
+All listed scientific lanes are terminal and their reports cite the actual
+receipts, including bounded failures and the duplicate audit's partial work.
+The full 43-directory checkpoint is being packaged and independently
+compared; its publication is separate from scientific completion. No finite-Fp
+filter is deployed, and no new complete-cost, strongest-rho, scaling or
+generic-ideal conclusion is established by these run reports.
