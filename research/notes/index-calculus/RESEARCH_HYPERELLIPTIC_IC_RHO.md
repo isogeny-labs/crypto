@@ -1920,3 +1920,37 @@ Largest rows (walk ops, means of 40 seeds):
   for round fifteen: on a repeat, try the collision first (a repeat with
   different `(a, b)` solves the logarithm) and escape only a degenerate
   one.
+
+## Round fifteen: try the collision before escaping — protocol, written before measuring
+
+**Question.** Round fourteen's active window escaped on any repeat within
+32 steps. On small groups a walk's genuine rho cycle (about `√(πN/8)`
+steps) fits in the window, so the escape threw away useful collisions.
+Does trying the collision first, and escaping only a degenerate one
+(equal `b`, which carries no information), repair the small groups
+without losing the large ones?
+
+**Arms.** Same 18 instances, 40 seeds, counted operations: plain
+full-width walk (reference); folded full-width walk with round fourteen's
+active window (reproduces round fourteen's column); folded full-width
+walk with the active window that, on a repeat, solves from the stored
+`(a, b)` of the earlier visit when that collision is non-degenerate and
+escapes only otherwise.
+
+**Registered hypotheses** (all on the collide-first arm).
+
+- **R15-1.** Median folded/plain walk operations over the 10 rows with
+  `N ≤ 6·10⁴` is **≤ 0.85**.
+- **R15-2.** Median folded/plain over the 7 rows with `N ≥ 10⁵` is
+  **≤ 0.80**.
+- **R15-3.** Median folded `S_walk` over the rows with `N ≥ 10⁵` is
+  **≤ 1.05**.
+- **R15-4.** Fruitless share (look-ahead trials, escapes, and the
+  charged cycle length of each escaped cycle) is **≤ 10%** on every row;
+  every run verified; the round-fourteen active arm reproduces its
+  recorded column.
+
+If R15-1 to R15-4 hold, the collide-first folded walk becomes the
+thread's rho reference (class **accounting**, against index calculus:
+the reference gets cheaper by the measured ratio). If R15-1 fails, the
+small-group excess has another cause.
