@@ -1,0 +1,91 @@
+name: N83 current-source nearby 19-base Tier 1 grid
+
+on:
+  push:
+    branches: [codex/n83-nearby-grid-tier1-20261024]
+    paths:
+      - .github/workflows/n83-nearby-grid-tier1.yml
+      - research/n83_nearby_grid_tier1_20261024/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: n83-nearby-grid-tier1-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  same-point-19-base-grid:
+    if: github.repository == 'aburan28/crypto'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pinned Rust and freeze the public fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup toolchain install 1.99.1 --profile minimal
+          export PYTHONDONTWRITEBYTECODE=1
+          python3 -m research.n83_nearby_grid_tier1_20261024.run --preflight \
+            | tee "$RUNNER_TEMP/n83-nearby-grid-preflight.json"
+          python3 -m unittest \
+            research.n83_nearby_grid_tier1_20261024.test_gates -v \
+            > "$RUNNER_TEMP/n83-nearby-grid-gates-test.log" 2>&1
+          rustc +1.99.1 --version | tee "$RUNNER_TEMP/n83-nearby-grid-rustc.txt"
+
+      - name: Test and build the exact IC and rho producers
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/n83-nearby-grid-target"
+          export CARGO_BUILD_JOBS=2
+          export RUST_TEST_THREADS=1
+          cargo +1.99.1 test --release --locked --lib > \
+            "$RUNNER_TEMP/n83-nearby-grid-libtest.log" 2>&1
+          cargo +1.99.1 test --release --locked --example koblitz_orbit_dlp_fast > \
+            "$RUNNER_TEMP/n83-nearby-grid-ic-test.log" 2>&1
+          cargo +1.99.1 test --release --locked --example n83_rho_optimization_eval > \
+            "$RUNNER_TEMP/n83-nearby-grid-rho-test.log" 2>&1
+          cargo +1.99.1 build --release --locked \
+            --example koblitz_orbit_dlp_fast \
+            --example n83_rho_optimization_eval > \
+            "$RUNNER_TEMP/n83-nearby-grid-build.log" 2>&1
+
+      - name: Run twelve short controlled same-point IC and rho blocks
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PYTHONDONTWRITEBYTECODE=1
+          python3 -m research.n83_nearby_grid_tier1_20261024.run \
+            --binary "$RUNNER_TEMP/n83-nearby-grid-target/release/examples/koblitz_orbit_dlp_fast" \
+            --rho-binary "$RUNNER_TEMP/n83-nearby-grid-target/release/examples/n83_rho_optimization_eval" \
+            --output "$RUNNER_TEMP/n83-nearby-grid-results" \
+            | tee "$RUNNER_TEMP/n83-nearby-grid-run.log"
+
+      - name: Independently replay every child and the Tier 1 noise gate
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PYTHONDONTWRITEBYTECODE=1
+          if [ -f "$RUNNER_TEMP/n83-nearby-grid-results/source.json" ]; then
+            python3 -m research.n83_nearby_grid_tier1_20261024.verify \
+              "$RUNNER_TEMP/n83-nearby-grid-results" \
+              | tee "$RUNNER_TEMP/n83-nearby-grid-verify.log"
+          fi
+
+      - name: Preserve raw child receipts and bounded failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-nearby-grid-tier1-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/n83-nearby-grid-results/
+            ${{ runner.temp }}/n83-nearby-grid-*.log
+            ${{ runner.temp }}/n83-nearby-grid-*.json
+            ${{ runner.temp }}/n83-nearby-grid-rustc.txt
+          if-no-files-found: warn
+          retention-days: 14
