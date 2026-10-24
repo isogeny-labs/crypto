@@ -75,6 +75,7 @@ SOURCES = {
     "la_engines": "research/la_engines_20261014/summary.json",
     "glv_k4": "research/glv_k4_pipeline_d4_20261017/summary.json",
     "glv_gls": "research/glv_gls_v4_20261018/summary.json",
+    "glv_e31": "research/e31_chain_solve_20261024/summary.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
@@ -642,10 +643,31 @@ def k4_v4_component() -> dict:
             or gls.get("all_verified") is not True
             or gls.get("class") != "engineering"):
         raise SystemExit("review the E25 GLS summary before updating the leaderboard")
+    e31 = load(SOURCES["glv_e31"])
+    e2e = e31.get("end_to_end", {})
+    if (e31.get("experiment") != "E31"
+            or e31.get("class") != "engineering (phase speed-up)"
+            or e2e.get("all_correct") is not True
+            or e2e.get("all_replay_fields_identical") is not True
+            or e2e.get("rho_ahead_every_row_every_weight") is not True):
+        raise SystemExit("review the E31 chain-solve summary before updating the leaderboard")
     return {**sm, "source": SOURCES["glv_k4"],
             "report": "research/glv_k4_pipeline_d4_20261017/REPORT.pdf",
             "gls": {**gls, "source": SOURCES["glv_gls"],
-                    "report": "research/glv_gls_v4_20261018/REPORT.pdf"}}
+                    "report": "research/glv_gls_v4_20261018/REPORT.pdf"},
+            "e31": {"source": SOURCES["glv_e31"],
+                    "report": "research/e31_chain_solve_20261024/REPORT.pdf",
+                    "validation": "benchmarks/20261024-e31-chain-solve/VALIDATION.json",
+                    "e25_over_a": e2e["E25_over_A_range_by_weight"],
+                    "e25_over_b": e2e["E25_over_B_range_by_weight"],
+                    "s_over_rho_e25": e2e["S_over_rho_E25_range_by_weight"],
+                    "s_over_rho_a": e2e["S_over_rho_A_range_by_weight"],
+                    "s_over_rho_b": e2e["S_over_rho_B_range_by_weight"],
+                    "per_call_a": e31["stage_a"]["existing_over_A_range"],
+                    "per_call_b": e31["stage_a"]["existing_over_B_range"],
+                    "rows": [{k: z[k] for k in ("p", "seed", "arm", "log2_n", "S_E25", "S_A", "S_B",
+                                                "E25_over_A", "E25_over_B", "S_over_rho_A")}
+                             for z in e2e["rows"]]}}
 
 
 def secs(x: float) -> str:
@@ -1719,6 +1741,20 @@ def markdown(doc: dict) -> str:
         L.append(f"| {z['p']} | {z['seed']} | {z['log2_n']:.1f} | {z['columns'][0]} / {z['columns'][1]} | "
                  f"{z['s_a_over_s_b']:.2f} | {z['s_a_over_rho_negation']:.2e} | {z['s_b_over_rho_psi']:.2e} |")
     L.append("")
+    e = k["e31"]
+    R = lambda r, f="{:.2f}": f"{f.format(r[0])}–{f.format(r[1])}×"
+    L += [("The chain solve (E31, phase speed-up). E25's k = 4 solve replaced by its P₂-chain solve, identical decompositions on every call; per call {pa} (A) and {pb} (B) fewer F_p multiplications. End to end on E25's 20 arm runs S_E25 / S_A is {a0} at 0 GAE, {a1} at 0.1 and {a2} at 1 (ahead across the §5a band under the registered model). B is {b0} at 0 GAE but, with its pivot-selection pass priced, falls behind E25 at 0.1 and 1 GAE: its rank is unresolved across the band. Distance remaining to the matched ⟨±ψ⟩ rho: A {r0} at 0 GAE (E25 {e0}); rho ahead at every weight. Class: engineering, a constant; validated (note §9.21–§9.24).").format(pa=R(e["per_call_a"]), pb=R(e["per_call_b"]), a0=R(e["e25_over_a"][0]),
+                      a1=R(e["e25_over_a"][1]), a2=R(e["e25_over_a"][2], "{:.3f}"), b0=R(e["e25_over_b"][0]),
+                      r0=R(e["s_over_rho_a"][0], "{:.2e}"), e0=R(e["s_over_rho_e25"][0], "{:.2e}"))
+          + f" Read the [report](../../{e['report']}), [summary](../../{e['source']}) and "
+            f"[validation](../../{e['validation']}).", "",
+          "| p | seed | arm | S E25 | S A | S B | E25 / A (0, 0.1, 1 GAE) | E25 / B (0 GAE) | S_A / rho (0 GAE) |",
+          "|--:|--:|:--|--:|--:|--:|:--|--:|--:|"]
+    for z in e["rows"]:
+        L.append(f"| {z['p']} | {z['seed']} | {z['arm']} | {z['S_E25']:.2e} | {z['S_A']:.2e} | {z['S_B']:.2e} | "
+                 f"{z['E25_over_A'][0]:.2f}, {z['E25_over_A'][1]:.2f}, {z['E25_over_A'][2]:.3f} | "
+                 f"{z['E25_over_B'][0]:.2f} | {z['S_over_rho_A'][0]:.2e} |")
+    L.append("")
     return "\n".join(L) + "\n"
 
 
@@ -2543,7 +2579,22 @@ def page(doc: dict, standalone: bool) -> str:
         P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["log2_n"]:.1f}</td>'
                  f'<td>{z["columns"][0]} / {z["columns"][1]}</td><td>{z["s_a_over_s_b"]:.2f}</td>'
                  f'<td>{z["s_a_over_rho_negation"]:.2e}</td><td>{z["s_b_over_rho_psi"]:.2e}</td></tr>')
-    P.append('</tbody></table></div>' + gh(g["source"], 'Frozen study summary') + '</section>')
+    e = k["e31"]
+    R = lambda r, f="{:.2f}": f"{f.format(r[0])}–{f.format(r[1])}×"
+    P.append('</tbody></table></div>' + gh(g["source"], 'Frozen study summary')
+             + '<h3>The chain solve (E31)</h3><p>' + esc(("The chain solve (E31, phase speed-up). E25's k = 4 solve replaced by its P₂-chain solve, identical decompositions on every call; per call {pa} (A) and {pb} (B) fewer F_p multiplications. End to end on E25's 20 arm runs S_E25 / S_A is {a0} at 0 GAE, {a1} at 0.1 and {a2} at 1 (ahead across the §5a band under the registered model). B is {b0} at 0 GAE but, with its pivot-selection pass priced, falls behind E25 at 0.1 and 1 GAE: its rank is unresolved across the band. Distance remaining to the matched ⟨±ψ⟩ rho: A {r0} at 0 GAE (E25 {e0}); rho ahead at every weight. Class: engineering, a constant; validated (note §9.21–§9.24).").format(
+                 pa=R(e["per_call_a"]), pb=R(e["per_call_b"]), a0=R(e["e25_over_a"][0]),
+                 a1=R(e["e25_over_a"][1]), a2=R(e["e25_over_a"][2], "{:.3f}"), b0=R(e["e25_over_b"][0]),
+                 r0=R(e["s_over_rho_a"][0], "{:.2e}"), e0=R(e["s_over_rho_e25"][0], "{:.2e}"))) + '</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>seed</th><th>arm</th><th>S E25</th><th>S A</th>'
+             '<th>S B</th><th>E25 / A (0, 0.1, 1 GAE)</th><th>E25 / B (0 GAE)</th><th>S_A / rho (0 GAE)</th>'
+             '</tr></thead><tbody>')
+    for z in e["rows"]:
+        P.append(f'<tr><td>{z["p"]}</td><td>{z["seed"]}</td><td>{z["arm"]}</td><td>{z["S_E25"]:.2e}</td>'
+                 f'<td>{z["S_A"]:.2e}</td><td>{z["S_B"]:.2e}</td><td>{z["E25_over_A"][0]:.2f}, '
+                 f'{z["E25_over_A"][1]:.2f}, {z["E25_over_A"][2]:.3f}</td><td>{z["E25_over_B"][0]:.2f}</td>'
+                 f'<td>{z["S_over_rho_A"][0]:.2e}</td></tr>')
+    P.append('</tbody></table></div>' + gh(e["source"], 'Frozen study summary') + '</section>')
 
     # Footer.
     P.append('<footer><p><strong>What this is not.</strong> A view of frozen measurements, class accounting: no row '

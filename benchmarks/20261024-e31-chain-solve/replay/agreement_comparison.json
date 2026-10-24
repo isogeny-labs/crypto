@@ -1,0 +1,212 @@
+{
+ "stage_a": [
+  {
+   "file": "replay/agreement/stage_a_p113s4.json",
+   "sha256": "95826b6fc5f78eeb790048d4663a7ac7ce2a0c70b7a19b25b76f19ad439ef5e5",
+   "p": 113,
+   "seed": 4,
+   "calls": 1000,
+   "agree_A": 1000,
+   "agree_B": 1000,
+   "quotient_agree": [
+    1000,
+    1000
+   ],
+   "quotient_checked": [
+    1000,
+    1000
+   ],
+   "fallbacks": [
+    4,
+    4
+   ],
+   "fallbacks_derived": 4,
+   "C_median": [
+    1622876,
+    604239,
+    306964
+   ],
+   "existing_over_A": 2.6858180289587397,
+   "existing_over_B": 5.28686099998697,
+   "clean_echelon_A_eq_existing": true,
+   "charpoly_eig_A_eq_B": true,
+   "agrees": true
+  },
+  {
+   "file": "replay/agreement/stage_a_p229s3.json",
+   "sha256": "1becf2a678b72d3ea7fcd29ea752b74fb0543fd054ace3742b870f3402b603bb",
+   "p": 229,
+   "seed": 3,
+   "calls": 1000,
+   "agree_A": 1000,
+   "agree_B": 1000,
+   "quotient_agree": [
+    1000,
+    1000
+   ],
+   "quotient_checked": [
+    1000,
+    1000
+   ],
+   "fallbacks": [
+    3,
+    3
+   ],
+   "fallbacks_derived": 3,
+   "C_median": [
+    1652225,
+    625172,
+    325224
+   ],
+   "existing_over_A": 2.6428326924430396,
+   "existing_over_B": 5.0802677539173,
+   "clean_echelon_A_eq_existing": true,
+   "charpoly_eig_A_eq_B": true,
+   "agrees": true
+  },
+  {
+   "file": "replay/agreement/stage_a_p353s3.json",
+   "sha256": "d97644ee5dc1d117505f375859fbb01b6ca0921009cbd7f7b28e74bb818db5cd",
+   "p": 353,
+   "seed": 3,
+   "calls": 1000,
+   "agree_A": 1000,
+   "agree_B": 1000,
+   "quotient_agree": [
+    1000,
+    1000
+   ],
+   "quotient_checked": [
+    1000,
+    1000
+   ],
+   "fallbacks": [
+    2,
+    2
+   ],
+   "fallbacks_derived": 2,
+   "C_median": [
+    1664736,
+    636171,
+    335462
+   ],
+   "existing_over_A": 2.6168058588021146,
+   "existing_over_B": 4.9625173641127756,
+   "clean_echelon_A_eq_existing": true,
+   "charpoly_eig_A_eq_B": true,
+   "agrees": true
+  }
+ ],
+ "e2e": {
+  "curve": "GLS p = 113 seed 4",
+  "records": {
+   "macaulay": {
+    "path": "replay/agreement/e2e_macaulay_p113s4.json",
+    "sha256": "e262a4e7c79b82de75aa0c079575bfacc2b9dc571ad563ac1f8069fedb3ed9f8"
+   },
+   "chain": {
+    "path": "replay/agreement/e2e_chain_p113s4.json",
+    "sha256": "9820164a7acd21da195b0bd3d5e17448d188ae976fa8dea9215ceda2aa79138d"
+   },
+   "chain-sparsest": {
+    "path": "replay/agreement/e2e_chain-sparsest_p113s4.json",
+    "sha256": "98b16fb0a22681c4a30d3ffcb65205feb356199e362b70c31abc4e2c1c77d09c"
+   }
+  },
+  "arms": [
+   {
+    "solver": "chain",
+    "arm": "A",
+    "leaves": 412,
+    "differing": 12,
+    "unexpected": [],
+    "added": [
+     "solver",
+     "solver_fallbacks"
+    ],
+    "missing": [],
+    "fallbacks": 416,
+    "reruns_plus_unsolved": 416,
+    "residuals": 34159,
+    "correct": true,
+    "walks_correct": true,
+    "S_macaulay": 56758625911,
+    "S": 22744193552,
+    "S_macaulay_over_S": 2.4955215836179407,
+    "C_median_macaulay": 1624001.0,
+    "C_median": 604309.0,
+    "agrees": true
+   },
+   {
+    "solver": "chain",
+    "arm": "B",
+    "leaves": 412,
+    "differing": 12,
+    "unexpected": [],
+    "added": [
+     "solver",
+     "solver_fallbacks"
+    ],
+    "missing": [],
+    "fallbacks": 201,
+    "reruns_plus_unsolved": 201,
+    "residuals": 15566,
+    "correct": true,
+    "walks_correct": true,
+    "S_macaulay": 25900525990,
+    "S": 10411877330,
+    "S_macaulay_over_S": 2.4875942319616247,
+    "C_median_macaulay": 1624026.0,
+    "C_median": 604329.0,
+    "agrees": true
+   },
+   {
+    "solver": "chain-sparsest",
+    "arm": "A",
+    "leaves": 412,
+    "differing": 12,
+    "unexpected": [],
+    "added": [
+     "solver",
+     "solver_fallbacks"
+    ],
+    "missing": [],
+    "fallbacks": 416,
+    "reruns_plus_unsolved": 416,
+    "residuals": 34159,
+    "correct": true,
+    "walks_correct": true,
+    "S_macaulay": 56758625911,
+    "S": 12595510954,
+    "S_macaulay_over_S": 4.506258310463775,
+    "C_median_macaulay": 1624001.0,
+    "C_median": 306905.0,
+    "agrees": true
+   },
+   {
+    "solver": "chain-sparsest",
+    "arm": "B",
+    "leaves": 412,
+    "differing": 12,
+    "unexpected": [],
+    "added": [
+     "solver",
+     "solver_fallbacks"
+    ],
+    "missing": [],
+    "fallbacks": 201,
+    "reruns_plus_unsolved": 201,
+    "residuals": 15566,
+    "correct": true,
+    "walks_correct": true,
+    "S_macaulay": 25900525990,
+    "S": 5787260522,
+    "S_macaulay_over_S": 4.475438057702839,
+    "C_median_macaulay": 1624026.0,
+    "C_median": 306919.0,
+    "agrees": true
+   }
+  ]
+ },
+ "all_agree": true
+}

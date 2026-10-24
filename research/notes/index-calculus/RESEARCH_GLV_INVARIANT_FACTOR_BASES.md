@@ -2947,3 +2947,56 @@ evaluations of a `12 × 12` determinant), and the `0.2`–`1.1 %` fallbacks (`�
 `≈ 16 %` of B's mean `C` at `p = 101`), which a chain-side treatment of degenerate eigenspaces would
 remove.  Not done here: the validation gate (independent replay certificate and validator report),
 the leaderboard, `benchmarks/` and the visual report.
+
+### 9.24 E31 validated, with errata and a §5a qualification on solver B
+
+*2026-10-24.*  Independent validation `VAL-20261024-24ef8b` (`benchmarks/20261024-e31-chain-solve/`:
+`VALIDATION.json`, `replay-certificate.json`, `validator-report.json`, `validate.py`, `replay/`) passed.
+It rebuilt from a tree whose build inputs equal the recorded binary `a8f52422d5` and replayed all 40
+end-to-end records and all ten Stage A curves.  Every deterministic field was identical (only wall
+times differ).  It also ran a control of the existing solver through the new path, which reproduces
+E25 `p = 101` seed 2 exactly.  An out-of-sample agreement check on three new GLS curves
+(`(113, 4)`, `(229, 3)`, `(353, 3)`) agreed on all 3,000 calls.  It found no uncounted
+multiplication, cache or per-curve precomputation in the chain solve; fallbacks are charged in full.
+All 361 deciding figures of §9.23 and the ten G2.85–G2.94 verdicts recompute.  §9.21–§9.23 stand as
+recorded; the following are additive corrections.
+
+**Errata** (none changes a table cell or a verdict):
+
+1. "B's `C` median `49`–`50 %` below A's" (G2.92) is `47.45`–`49.39 %`.
+2. "`0.2`–`1.1 %` fallbacks per end-to-end run" (G2.90 and "Next levers") is `0.266`–`1.196 %`.
+3. "Those calls cost the existing solver `4.5`–`4.8·10⁶` each" holds for the 62 Stage A reruns
+   (`4.54`–`4.84·10⁶`).  The 4 calls the existing solver itself refuses cost `0.44`–`0.52·10⁶`.
+4. A's echelon share "≈ 70 %" is `66.1`–`67.4 %` of the mean `C`; only the median over calls without
+   a fallback reaches `≈ 68`–`70 %`.  B's fallback weight at `p = 101`, "up to ≈ 16 %", is at most
+   `≈ 15 %` (4 fallbacks unidentified in Stage A, so approximate).
+5. "Every row is still `2.39·10³`–`1.52·10⁵×`" and "at 1 GAE it is 5–7 %" are solver B's ranges; A's
+   rows reach `2.79·10⁵×` and its 1-GAE saving is `3.4`–`5.3 %`.
+6. §9.22's quoted "the solve is `99.0`–`99.4 %` of `S`" fits neither definition: solve/`S` is
+   `99.03`–`99.20 %`, (Weil + solve)/`S` is `99.37`–`99.54 %`.
+7. The E31 JSON records carry `"experiment": "e25"`; only the `solver` field distinguishes them.
+
+**§5a qualification on solver B.**  The sparsest-pivot rule counts the nonzeros of every row it
+builds and recounts each updated row.  That work is neither counted nor emitted, and the registered
+band model (one native operation per Macaulay entry) does not see it.  The validator priced it at the
+band's rate from an exact lower bound (`2 E_E25 − E_E31` entry reads per record).  On that basis B
+falls *behind* E25 on all 20 rows at `0.1` GAE (`S_E25/S_B = 0.885`–`0.899`) and at `1` GAE
+(`0.542`–`0.544`).  So **B beats E25 and A only at 0 GAE; across the band its rank is unresolved**,
+and B is not a new baseline.  On wall clock B is no faster than A on this host (`B/A = 0.96`–`1.04`).
+**Solver A** is ahead of E25 at every weight under the registered model: `S_E25/S_A = 2.50`–`2.56`
+(0), `1.39`–`1.43` (0.1), `1.034`–`1.053` (1 GAE).  A's 1-GAE margin is smaller than the native
+traffic both solvers leave unpriced, so at 1 GAE it holds only under that model.
+
+**Distance remaining to the matched `⟨±ψ⟩` rho** (`S`/rho over the 20 rows):
+
+| GAE | E25 | A | B (registered model) | B, pivot pass priced |
+|--:|:--|:--|:--|:--|
+| 0 | `1.13·10⁴`–`7.07·10⁵` | `4.42·10³`–`2.79·10⁵` | `2.39·10³`–`1.52·10⁵` | `2.39·10³`–`1.52·10⁵` |
+| 0.1 | `2.15·10⁴`–`1.38·10⁶` | `1.50·10⁴`–`9.77·10⁵` | `1.31·10⁴`–`8.55·10⁵` | `2.39·10⁴`–`1.55·10⁶` |
+| 1 | `7.72·10⁴`–`5.45·10⁶` | `7.33·10⁴`–`5.22·10⁶` | `7.21·10⁴`–`5.14·10⁶` | `1.42·10⁵`–`1.0·10⁷` |
+
+Rho is ahead of every row at every weight.  **What E31 establishes:** a validated engineering
+(phase) speed-up of the `k = 4` solve, solver A, ranked ahead of E25 across the band under the
+registered model.  It is not an exponent change.  Next levers are unchanged from §9.23.  B's
+pivot-selection pass should be counted, or replaced by a counted sparsity estimate, before B is
+ranked.
