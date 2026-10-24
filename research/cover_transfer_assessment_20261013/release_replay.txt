@@ -84,7 +84,8 @@ Current-catalog compatibility boundary
 
 The successful 592-row catalog-export above concerns the registry bundled in
 v0.1.0-main.1371. It must not be extrapolated to the then-current 2,100-row
-registry, or to the current 2,572-row registry.
+registry, to the later 2,572-row registry, or to the current 15,791-row
+registry.
 
 The 2,100-row catalog of that snapshot was partitioned into these exact
 standalone-constructor input profiles:
@@ -105,7 +106,7 @@ record ran all 2,100 inputs of that snapshot against the archived
 executable. It does not invalidate the artifact's direct replay against its
 own bundled data, and it is not evidence that any outside-domain cover fails
 to exist. This historical static comparison has not been rerun against the
-2,572-row catalog.
+later 2,572-row or current 15,791-row catalogs.
 
 The current source repairs the strict model allowlist for the normalized and
 extension-field forms. The catalog-wide source test is:
@@ -128,7 +129,7 @@ f926db9f9756509c484262b9e371739836afc841b64b67a495be6e6df8b9dedf) reported
 13 passed for the 2,100-row registry of that snapshot. Neither is a replay of
 the 2,572-row catalog.
 
-A separate current-worktree replay was run on 2026-10-18 with Rust and Cargo
+A separate worktree replay was run on 2026-10-18 with Rust and Cargo
 1.97.0:
 
   cargo test --locked --offline --bin hyperelliptic-cover -- \
@@ -146,9 +147,31 @@ The command exited 0 and reported:
   test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out;
   finished in 126.84s
 
-That result supports current source-level construction for all 2,572 model
-forms, and the binary test checked all 140 linked binary EC1 generators. It is
-not a clean-checkout or packaged-binary receipt. No standalone
+That result supported source-level construction for all 2,572 model forms of
+that snapshot, and the binary test checked all 140 linked binary EC1
+generators then linked.
+
+A replay against the current 15,791-row registry was run on 2026-10-24 with
+Rust and Cargo 1.97.0, on main 732d8912d7ab1ce7bb9e39c432f2938f994fadc8
+merged into this record's branch:
+
+  cargo test --locked --offline --bin hyperelliptic-cover -- \
+    --test-threads=1
+
+Its inputs were bound as follows:
+
+  registry SHA-256: 595b71600e1f471a2792d89666a8378ddbbeddc7a1425a808d16dfcbced76bb7
+  hyperelliptic-cover source SHA-256:
+    0e99ca0fd9eaee74d6b5214b47b725afcbe9c45d9b88be8efe742540e2d28191
+
+The command exited 0 and reported:
+
+  test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out;
+  finished in 174.90s
+
+That result supports current source-level construction for all 15,791 model
+forms, and the binary test checked all 142 linked binary EC1 generators. Like
+the earlier replays, it is not a clean-checkout or packaged-binary receipt. No standalone
 artifact containing the repair has yet been pinned and replayed here, so
 catalog-wide packaged-binary support remains an open obligation. Constructor
 acceptance also does not establish a general Jacobian norm, subgroup
