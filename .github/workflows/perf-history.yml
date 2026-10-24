@@ -100,6 +100,13 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      # The full-history checkout has exhausted the hosted runner's disk before
+      # recording could start. Free unused SDKs before either checkout.
+      - name: Free disk used by unrelated Ubuntu SDKs
+        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/hostedtoolcache/CodeQL
+          df -h .
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref || github.sha }}
@@ -248,7 +255,7 @@ jobs:
     timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 90 }}
     steps:
       - name: Free disk used by unrelated Ubuntu SDKs
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
         run: |
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/hostedtoolcache/CodeQL
           df -h .
