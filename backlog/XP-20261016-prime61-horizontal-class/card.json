@@ -7,24 +7,30 @@
     "native research lane"
   ],
   "status": "blocked",
-  "status_note": "Disk-backed implementation and Drive restore controls pass; the 250-curve pilot removes the retained-vector requirement. Full class/degree-set coverage, all-class workloads and a sized disk/compute envelope remain open.",
+  "status_note": "Designed 2026-10-18, not frozen: the degree set's genus vectors (design-time, C1 to replay natively) give an unconditional lower bound of 545,296,208 vertices, covered by eight l=7 cycles of 68,162,026 run with the existing advance command (specs/coset-*.json). Envelope: ~234,936 core-hours (measurement 217,361), ~1.0 TB, <2 GB RAM; enumeration (716 core-hours) fits this host, measurement does not (~283 days on 32 vCPUs). Still needs code C1-C4, C6 (PROTOCOL.md section 8), an unconditional class number, and compute beyond one host or an owner decision. The larger verified continuation has 4184 discovered curves, 1024 expanded/measured sources, 15360 verified maps and 12288 streams (1228800000 target trials, zero relations/solves). Explicit exact-form relations certify the selected subgroup has 545296208 classes; standard CM transfers this to its curve component. Whole-class equality, exhaustive workloads and a full-run disk/compute envelope remain open.",
   "blocked_on": [
-    "problem:problems/prime61-horizontal-class-memory.md"
+    "problem:problems/prime61-horizontal-class-memory.md",
+    "note:code items C1 class-cover certificate, C2 unconditional h(D), C3 range-sharded measurement, C4 range verification, C6 union check; see PROTOCOL.md section 8",
+    "hw:about 217,361 core-hours of measurement; about 283 days on the 32-vCPU host, so a fleet or an owner decision is needed"
   ],
   "links": {
-    "lead": "research/prime61_disk_walk_20261017/README.md",
+    "lead": "research/prime61_disk_extend_20261018/README.md",
     "notes": [
       "problems/prime61-horizontal-class-memory.md",
-      "research/prime61_isogeny_20261016/README.md"
+      "research/prime61_disk_walk_20261017/README.md",
+      "research/prime61_isogeny_20261016/README.md",
+      "research/prime61_disk_continue_20261018/README.md",
+      "research/prime61_disk_extend_20261018/COMPONENT-CERTIFICATE.md"
     ],
     "prs": [
-      1977
+      1977,
+      2144
     ]
   },
   "question": "What are the factor-base results over every base-field isomorphism class in the fixed ordinary prime61 trace class?",
   "decision_value": "Discharges the full-horizontal-class interpretation of the user's request. The degree-61 one-hop panel is complete within its bound but cannot establish a class-wide ranking. A verified resumable traversal would retain every cap and failure rather than infer the unseen results.",
   "protocol": {
-    "path": null,
+    "path": "PROTOCOL.md",
     "blob": null
   },
   "code": {
@@ -34,29 +40,88 @@
     "build": []
   },
   "resources": {
-    "cpus": 1,
+    "cpus": 32,
     "ram_gb": 16,
-    "disk_gb": 2,
+    "disk_gb": 1100,
     "gpu": null,
-    "est_core_hours": null,
-    "est_wall_hours": null,
-    "notes": "Pilot envelope only. SQLite cache is bounded; full-class disk, CPU and runtime sizing remain unknown. Drive checkpoint upload/download/resume is verified for small archives, not full quota. Freeze a complete envelope before readiness; no remote compute is provisioned."
+    "est_core_hours": 234936,
+    "est_wall_hours": 7342,
+    "notes": "Derived in README.md from 2026-10-18 probes (probes/): N=545,296,208 vertices; enumeration 716 core-h (8 x 89.6, 4.73 ms/vertex), measurement 217,361 core-h (1.435 s/vertex), verification ~16,859 core-h (predicted, crude). Wall 7,342 h assumes 32 ideal workers; SMT and the shared host make it longer. Disk 562 GB for the eight cycle databases plus 1,117 GB raw run rows (~349 GB gzipped); RAM <2 GB (8 MiB SQLite cache, <20 MB per worker). run/shards below are Stage 2 (enumeration) only, which the existing CLI supports; Stage 3 needs C3. Continuation prefix (PR 2144): Bounded-prefix envelope only: worker peak RSS 20044 KiB; final live database 11173888 bytes at 4184 curves/15360 maps/12288 streams; 3160 sources remain pending. Both new Drive archive round trips pass. Exact selected-component coordinates enable a proposed index-free walker, not yet implemented/tested; validate complete small-class coordinate and degree-97/113 controls first. Whole-class upper certificate and full-run disk/CPU/runtime sizing remain open. Source pins validated b68341cd; no remote compute is provisioned."
   },
   "run": {
     "argv": [
       "target/release/examples/isogeny_disk_walk",
       "advance",
-      "research/prime61_disk_walk_20261017/spec.json",
+      "backlog/XP-20261016-prime61-horizontal-class/specs/coset-{coset}.json",
       "{out}/walk.db",
-      "1000000000"
+      "68162026"
     ],
     "env": {},
-    "timeout_per_shard_s": 300
+    "timeout_per_shard_s": 7776000
   },
   "shards": {
-    "count": 1,
-    "scheme": "single",
-    "params": {},
+    "count": 8,
+    "scheme": "list",
+    "params": {
+      "items": [
+        {
+          "name": "coset-0",
+          "vars": {
+            "coset": "0"
+          },
+          "note": "root: pilot curve 1 (source)"
+        },
+        {
+          "name": "coset-1",
+          "vars": {
+            "coset": "1"
+          },
+          "note": "pilot curve 2: p3"
+        },
+        {
+          "name": "coset-2",
+          "vars": {
+            "coset": "2"
+          },
+          "note": "pilot curve 5: l11"
+        },
+        {
+          "name": "coset-3",
+          "vars": {
+            "coset": "3"
+          },
+          "note": "pilot curve 15: l61"
+        },
+        {
+          "name": "coset-4",
+          "vars": {
+            "coset": "4"
+          },
+          "note": "pilot curve 19: p3 l11"
+        },
+        {
+          "name": "coset-5",
+          "vars": {
+            "coset": "5"
+          },
+          "note": "pilot curve 29: p3 l61"
+        },
+        {
+          "name": "coset-6",
+          "vars": {
+            "coset": "6"
+          },
+          "note": "pilot curve 66: l11 l61"
+        },
+        {
+          "name": "coset-7",
+          "vars": {
+            "coset": "7"
+          },
+          "note": "pilot curve 164: p3 l11 l61"
+        }
+      ]
+    },
     "stop": "all"
   },
   "checkpoint": {
@@ -64,31 +129,38 @@
     "resume_flag": null
   },
   "outputs": {
-    "result_schema": "isogeny-disk-status/v1 plus SQLite snapshot; full coverage certificate and protocol still required",
+    "result_schema": "isogeny-disk-status/v1 per cycle (closed: discovered=68162026, edges=136324052, pending=0, failures=0) plus SQLite snapshot; class-wide table of PROTOCOL.md section 6 after Stage 3",
     "verify": [
       "target/release/examples/isogeny_disk_walk",
       "verify",
-      "research/prime61_disk_walk_20261017/spec.json",
+      "backlog/XP-20261016-prime61-horizontal-class/specs/coset-{coset}.json",
       "{out}/walk.db",
-      "16"
+      "0"
     ],
-    "land": "research/prime61_disk_walk_20261017"
+    "land": "research/prime61_horizontal_class_full"
   },
   "cairn": {
     "mode": "lab-task",
     "space": "TBD",
     "tasks": [
-      "XP-20261016-prime61-horizontal-class"
+      "XP-20261016-prime61-horizontal-class/shard-0",
+      "XP-20261016-prime61-horizontal-class/shard-1",
+      "XP-20261016-prime61-horizontal-class/shard-2",
+      "XP-20261016-prime61-horizontal-class/shard-3",
+      "XP-20261016-prime61-horizontal-class/shard-4",
+      "XP-20261016-prime61-horizontal-class/shard-5",
+      "XP-20261016-prime61-horizontal-class/shard-6",
+      "XP-20261016-prime61-horizontal-class/shard-7"
     ],
     "ttl_s": 3600,
     "env": {
       "name": "crypto-native",
-      "recipe": "Native Rust worker with system libsqlite3.so.0; full coverage certificate and complete protocol pending"
+      "recipe": "Native Rust worker built with --no-default-features at the freezing commit; system libsqlite3.so.0; one process per coset database"
     },
     "exec": {
       "cpus": 1,
-      "memory_mb": 16384,
-      "timeout_s": 300,
+      "memory_mb": 2048,
+      "timeout_s": 7776000,
       "sandbox": "auto",
       "publish": "runs/XP-20261016-prime61-horizontal-class"
     },

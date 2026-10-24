@@ -84,7 +84,7 @@ jobs:
     if: >-
       vars.AUTOFIX_PAUSED != 'true' &&
       (github.event_name != 'pull_request' || github.event.label.name == 'autofix')
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     permissions:
       contents: read
@@ -140,7 +140,7 @@ jobs:
     needs: triage
     if: needs.triage.outputs.count != '' && needs.triage.outputs.count != '0'
     name: "#${{ matrix.pr.number }} (${{ matrix.pr.tier }})"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|autofix-queue.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 75
     strategy:
       max-parallel: 1
@@ -177,6 +177,7 @@ jobs:
         with:
           ref: ${{ matrix.pr.head_ref }}
           fetch-depth: 0
+          filter: blob:none
           # No token left in .git/config while a model runs here; the scripts
           # pass one explicitly for the base fetch and the final push.
           persist-credentials: false
@@ -215,6 +216,24 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 .github/scripts/autofix_run.py verify
+
+      # Both attempts write $RUNNER_TEMP/claude-execution-output.json, so each
+      # attempt's usage is recorded before the next one can overwrite it.
+      - name: Token usage (Haiku)
+        if: always() && steps.haiku.outcome != 'skipped'
+        continue-on-error: true
+        env:
+          EXEC_FILE: ${{ steps.haiku.outputs.execution_file }}
+          OK: ${{ steps.haiku_check.outputs.ok }}
+          STATUS: ${{ steps.haiku_check.outputs.status }}
+        run: |
+          [ -f tools/token_usage.py ] || { echo "tools/token_usage.py not on this branch; usage not recorded."; exit 0; }
+          case "$OK:$STATUS" in true:*) outcome=accepted ;; *:stale) outcome=stale ;; *) outcome=rejected ;; esac
+          mkdir -p "$RUNNER_TEMP/token-usage"
+          python3 tools/token_usage.py action "${EXEC_FILE:-$RUNNER_TEMP/none}" --label haiku \
+            --outcome "$outcome" --units 1 --unit-name attempt \
+            --json "$RUNNER_TEMP/token-usage/pr$PR-haiku.json" \
+            --ledger "$RUNNER_TEMP/token-usage/ledger.jsonl" >> "$GITHUB_STEP_SUMMARY"
 
       # --------------------------------------------------------------- Sonnet
       # Model-written text (reasons, titles) only ever reaches a shell through
@@ -263,6 +282,35 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 .github/scripts/autofix_run.py verify
+
+      # Both attempts write $RUNNER_TEMP/claude-execution-output.json, so each
+      # attempt's usage is recorded before the next one can overwrite it.
+      - name: Token usage (Sonnet)
+        if: always() && steps.sonnet.outcome != 'skipped'
+        continue-on-error: true
+        env:
+          EXEC_FILE: ${{ steps.sonnet.outputs.execution_file }}
+          OK: ${{ steps.sonnet_check.outputs.ok }}
+          STATUS: ${{ steps.sonnet_check.outputs.status }}
+        run: |
+          [ -f tools/token_usage.py ] || { echo "tools/token_usage.py not on this branch; usage not recorded."; exit 0; }
+          case "$OK:$STATUS" in true:*) outcome=accepted ;; *:stale) outcome=stale ;; *) outcome=rejected ;; esac
+          mkdir -p "$RUNNER_TEMP/token-usage"
+          python3 tools/token_usage.py action "${EXEC_FILE:-$RUNNER_TEMP/none}" --label sonnet \
+            --outcome "$outcome" --units 1 --unit-name attempt \
+            --json "$RUNNER_TEMP/token-usage/pr$PR-sonnet.json" \
+            --ledger "$RUNNER_TEMP/token-usage/ledger.jsonl" >> "$GITHUB_STEP_SUMMARY"
+
+      # Token records only (aggregate counts and prices; no transcript content).
+      - name: Upload token usage
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: token-usage-pr${{ env.PR }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/token-usage/
+          if-no-files-found: ignore
+          retention-days: 90
 
       # -------------------------------------------------------------- Publish
       - name: Pick the accepted attempt

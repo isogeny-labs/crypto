@@ -29,6 +29,7 @@ pub mod gf3n;
 pub mod gls_loop;
 pub mod icv1;
 pub mod int;
+pub mod isobench;
 pub mod json;
 pub mod kernel;
 /// Exact integer LLL in any dimension.
@@ -36,6 +37,7 @@ pub mod lattice;
 /// Multivariate integer polynomials and resultants.
 pub mod mpoly;
 pub mod ntt;
+pub mod padic;
 pub mod path;
 pub mod poly;
 pub mod quat;

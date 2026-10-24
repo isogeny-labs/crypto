@@ -38,12 +38,28 @@ concurrency:
 
 jobs:
   names:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|curve-names.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|curve-names.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          # The PR check needs both parents of the synthetic merge commit,
+          # not the repository's full history.
+          fetch-depth: 2
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            **/*.md
+            **/*.html
+            **/*manifest*.json
+            **/*seal*.json
+            **/*audit*.json
+            **/*SHA256SUMS*
+            **/*.sha256
+            /scripts/
+            /docs/curves/registry.json
+            /src/cryptanalysis/curve_id.rs
+            /src/cryptanalysis/curve_aliases.json
+            /.github/workflows/curve-names.yml
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'

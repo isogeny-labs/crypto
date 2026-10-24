@@ -24,6 +24,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             .github/workflows/ecc2k130-native-fullpoint-edge.yml

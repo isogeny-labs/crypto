@@ -1,0 +1,69 @@
+name: validation-gate
+
+# AGENTS.md, "Validation gate" (owner rule, 2026-10-19): no row reaches the IC
+# leaderboard or benchmarks/README.md without a replay certificate, a validator
+# report and a matched rho reference, named by the VALIDATION.json of its
+# evidence directory (docs/VALIDATION_GATE.md).  Rows that predate the gate are
+# frozen in docs/ic/validation/PRE_GATE.json and benchmarks/PRE_GATE.json and
+# render as "unvalidated (pre-gate)"; a row added or changed after the freeze
+# must be validated, and the freeze files may only shrink.
+#
+# This runs on every pull request (no paths filter): the check is cheap, and a
+# filter would let a row slip in through a file the filter forgot.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      # The full-history checkout no longer fits a hosted runner: from
+      # 2026-10-23 04:20 UTC every run died with "No space left on device".
+      # The gate reads the head's working tree and, through `git show`, two
+      # files on the base tip, so it needs no history. Free the preinstalled
+      # SDKs it does not use, check out only the head, and fetch only the
+      # base tip; its blobs arrive on demand.
+      - name: Free runner disk
+        run: |
+          df -h /
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+      - name: Fetch the base tip
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          git fetch --no-tags --depth=1 --filter=blob:none origin \
+            "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+          # validation_gate.py treats an unreadable base file as absent, so
+          # fail here rather than let the freeze comparison pass silently.
+          git rev-parse --verify "origin/$BASE_REF^{commit}"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: The gate's own tests, with a positive and a negative fixture
+        run: python3 scripts/test_validation_gate.py
+      - name: Every leaderboard and benchmarks row is validated or frozen pre-gate
+        run: |
+          base=""
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="--base origin/${{ github.base_ref }}"
+          fi
+          python3 scripts/validation_gate.py check $base
