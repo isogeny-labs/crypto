@@ -1,0 +1,132 @@
+{
+  "schema": "validation-gate/validator-report/v1",
+  "status": "pass",
+  "independent": false,
+  "study": "research/ecbench_allocator_confound_20261023",
+  "independence": {
+    "independent": false,
+    "validator": "the study author (same agent, same host)",
+    "reason": "headline medians were recomputed from the raw records with a different code path (jq field extraction, sort and awk in validation/recompute.sh) than the one that produced the claimed values (analysis/summarise.sh), but by the same author who ran the sessions and wrote both; the gate requires an independent validator, so this report is a candidate only."
+  },
+  "raw_data": [
+    {
+      "path": "../sessions/base-claim/records.jsonl",
+      "sha256": "fb00c9a8efa14714ec4d940b5fb144d212712df35fb848cd227452493d0e89db"
+    },
+    {
+      "path": "../sessions/base-claim-rev/records.jsonl",
+      "sha256": "40a5e9deb8332cb91e36f57e7c44e89e22863e3cf45efbb5328aca25a433868d"
+    },
+    {
+      "path": "../sessions/base-smoke/records.jsonl",
+      "sha256": "5f332ecb9c178bbc54686f4eca0048203523a0652f22c1b85fb60afe732bf3b6"
+    },
+    {
+      "path": "../sessions/base-smoke-rev/records.jsonl",
+      "sha256": "2046a1cc30561e82c2028484b4d43e2e22c365b77a2d086c013c136f975780e7"
+    },
+    {
+      "path": "../sessions/fix-claim/records.jsonl",
+      "sha256": "8dbe5f2f555b2a6768914d90eec9522510d1bababf1a09890b6ae8202bde3d62"
+    },
+    {
+      "path": "../sessions/fix-claim-rev/records.jsonl",
+      "sha256": "2f22e6993a6162e3446174aea732cec71d0960fbfdcb36fee7c94ea25507e3f1"
+    },
+    {
+      "path": "../sessions/fix-noprobe-claim/records.jsonl",
+      "sha256": "8e901face5edfa7196506f0afabad46271bedeca3694c66da0344bac4d2f8f56"
+    },
+    {
+      "path": "../sessions/fix-noprobe-smoke/records.jsonl",
+      "sha256": "67222168ba28c0f97db74b423ee2273f55b95bf38f6974d8e817aa3a4dfd4e9b"
+    },
+    {
+      "path": "../sessions/fix-notrim-claim/records.jsonl",
+      "sha256": "206444ef70a2e1c3b128c63794d3116a05828a5fa84efeff025f5fb8bb4ec63b"
+    },
+    {
+      "path": "../sessions/fix-notrim-smoke/records.jsonl",
+      "sha256": "4e53bf57feca4b36a4d51f8cbdd2dbfad789a0d713c66fcb9f65d811207efc95"
+    },
+    {
+      "path": "../sessions/fix-notrim2-claim/records.jsonl",
+      "sha256": "ca535ad1ffd25cb8829d35a5e12f06335a946f8424006e86ff5e41d6c3b45a6b"
+    },
+    {
+      "path": "../sessions/fix-notrim2-smoke/records.jsonl",
+      "sha256": "bde9fcd89e9a3b439a5519c0084003ed0b29d84f35bd0c6ad2c36704f2981631"
+    },
+    {
+      "path": "../sessions/fix-smoke/records.jsonl",
+      "sha256": "34592cbc4fe5834d343f23996e2fddcf22f3601e7fab8a01e4d6178e8cf3f441"
+    },
+    {
+      "path": "../sessions/fix-smoke-rev/records.jsonl",
+      "sha256": "df4edc08953cde7933d41af5a0ee808a4c88e21e67a3c866a72099b0bf4bdf6e"
+    }
+  ],
+  "headline": [
+    {
+      "name": "smoke_bsgs_solve_median_base_ns",
+      "claimed": 5391516.5,
+      "recomputed": 5391516.5,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "smoke_bsgs_solve_median_fix_ns",
+      "claimed": 186055.5,
+      "recomputed": 186055.5,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "smoke_rho-neg_solve_median_base_ns",
+      "claimed": 5833393,
+      "recomputed": 5833393,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "smoke_rho-neg_solve_median_fix_ns",
+      "claimed": 249587.5,
+      "recomputed": 249587.5,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "smoke_kangaroo_solve_median_base_ns",
+      "claimed": 6239711.5,
+      "recomputed": 6239711.5,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "smoke_kangaroo_solve_median_fix_ns",
+      "claimed": 196220,
+      "recomputed": 196220,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "claim_ic_online_median_base_ns",
+      "claimed": 127055,
+      "recomputed": 127055,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "claim_ic_online_median_fix_ns",
+      "claimed": 119054,
+      "recomputed": 119054,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "claim_rho-strong_solve_median_base_ns",
+      "claimed": 5658356.5,
+      "recomputed": 5658356.5,
+      "rel_tol": 1E-9
+    },
+    {
+      "name": "claim_rho-strong_solve_median_fix_ns",
+      "claimed": 148716,
+      "recomputed": 148716,
+      "rel_tol": 1E-9
+    }
+  ],
+  "note": "claimed = median in analysis/summary.json; recomputed = validation/recomputed.tsv"
+}
