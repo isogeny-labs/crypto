@@ -41,6 +41,14 @@ jobs:
           --health-timeout 3s
           --health-retries 10
     steps:
+      # The full checkout plus a build of the crate no longer fits a
+      # hosted runner's disk (rustc exits 101 mid-build); free the unused SDKs.
+      - name: Free runner disk
+        if: runner.environment == 'github-hosted'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.90.0
       - run: cargo check --no-default-features --lib --bin ic
