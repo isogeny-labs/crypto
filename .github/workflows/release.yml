@@ -318,7 +318,7 @@ jobs:
           - {target: x86_64-pc-windows-msvc,    os: windows-latest}
     runs-on: ${{ matrix.os }}
     # Windows compiles both native and software-hash targets before the installed CLI checks.
-    timeout-minutes: ${{ matrix.os == 'windows-latest' && 45 || ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 30) }}
+    timeout-minutes: ${{ matrix.os == 'windows-latest' && 45 || ((github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 50) }}
     steps:
       # Keep Cargo output outside the package tree while it is fingerprinted.
       # `runner.temp` is not available in job-level `env`, so set it per job.
