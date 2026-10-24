@@ -11,6 +11,8 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [NIST extension-twist composite cofactors](nist-extension-twist-composite-cofactors.md) | open | complete P-256 block-876 degree-2 extension-twist factorization; one timeout field | proper split of the exact remaining 444-bit residual followed by prime-certificate and exact-product replay |
+| [NIST factorization raw archive publication](nist-factorization-raw-archive-publication.md) | open | durable publication of complete R02 NFS evidence and R05 relation checkpoint, larger than Git's file limit | observed-ready AWS connection, unchanged archive uploads through `crypto store`, manifest commit and verified remote readback |
 | [ECCp-131 full-parameter index-calculus relation pipeline](eccp131-full-parameter-index-calculus.md) | open | checked two- and three-point small-x probes have zero natural rank in bounded exact-curve runs; three-point support is at most `8B³` points | exact relation oracle beyond the fixed small-x support bound, independently replayed rank and target-descent chain |
 | [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | implemented; client activation remains | enrolled legacy process recovery | private recurring backups, fenced two-hop recovery and Diem copy restore passed; laptop installation/trust needs client access |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |
