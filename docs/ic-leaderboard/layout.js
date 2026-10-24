@@ -49,8 +49,11 @@
   originalVerdict.before(intro);
   const context = disclosure('Comparison scope and online results', [originalVerdict]);
   header.append(context);
+  // Keep the scientific verdict tied to the generated source as new results land.
+  const coldVerdict = Array.from(originalVerdict.querySelectorAll('strong'))
+    .find(node => /cold/i.test(node.textContent))?.textContent || '';
   const notice = element('p', 'comparison-notice',
-    'Every ranked cold result is above its reference. Each table has its own unit and reference; compare ratios within that table only.');
+    `${coldVerdict} Each table has its own unit and reference; compare ratios within that table only.`.trim());
   intro.after(notice);
   const actions = element('div', 'header-actions');
   actions.append(link('Browse the curve library →', libraryURL, 'primary-link'),
