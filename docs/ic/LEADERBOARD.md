@@ -372,7 +372,7 @@ Instruction counts are a separate unit and favor some tiny subfield pipelines:
 - `research/kummer_differential_collector_20261022/VALIDATION.json` — sha256 `8f0f53f2aa7630c2…`
 - `research/kummer_differential_collector_20261022/results/paired/analysis/summary.json` — sha256 `97fe6496519b1b7e…`
 - `research/kummer_differential_collector_20261022/results/paired/analysis/price-grid.csv` — sha256 `f76aeb6758bbf4bc…`
-- `research/projective_law_followup_20261022/REPORT.md` — sha256 `3c864364d649d46d…`
+- `research/projective_law_followup_20261022/REPORT.md` — sha256 `6488388baf14d7e9…`
 - `research/projective_law_followup_20261022/VALIDATION.json` — sha256 `c681c8f5a8434395…`
 - `research/projective_law_followup_20261022/results/summary-projective.json` — sha256 `06d11a57882fae79…`
 - `research/projective_law_followup_20261022/results/summary-state.json` — sha256 `74623ead9cfd9e6c…`
@@ -421,6 +421,6 @@ Instruction counts are a separate unit and favor some tiny subfield pipelines:
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
-- `docs/curves/registry.json` — sha256 `e7bc24a974598923…`
+- `docs/curves/registry.json` — sha256 `b4e8dc0f36ae5812…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
