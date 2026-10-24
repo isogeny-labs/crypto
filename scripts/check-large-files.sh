@@ -26,7 +26,7 @@ ALLOW=(
 git rev-parse --quiet --verify "$base^{commit}" >/dev/null || { echo "check-large-files: not a commit: $base" >&2; exit 2; }
 git rev-parse --quiet --verify "$head^{commit}" >/dev/null || { echo "check-large-files: not a commit: $head" >&2; exit 2; }
 
-over=0
+declare -a blobs=() paths=()
 # --raw -z: ":<old mode> <new mode> <old blob> <new blob> <status>\0<path>\0"
 while IFS= read -r -d '' meta && IFS= read -r -d '' path; do
   read -r _ mode _ blob _ <<<"$meta"
@@ -35,12 +35,34 @@ while IFS= read -r -d '' meta && IFS= read -r -d '' path; do
     # shellcheck disable=SC2053  # $pat is a glob on purpose
     [[ $path == $pat ]] && continue 2
   done
-  size=$(git cat-file -s "$blob")
+  blobs+=("$blob")
+  paths+=("$path")
+done < <(git diff --raw -z --no-abbrev --no-renames --diff-filter=AMT "$base" "$head")
+
+# A research PR can change thousands of blobs. Asking Git once per blob made
+# the required check exceed its ten-minute job limit, whereas batch-check
+# reads the same object metadata through one Git process.
+declare -a sizes=()
+if [ "${#blobs[@]}" -gt 0 ]; then
+  mapfile -t sizes < <(printf '%s\n' "${blobs[@]}" | git cat-file --batch-check='%(objectsize)')
+fi
+[ "${#sizes[@]}" -eq "${#blobs[@]}" ] || {
+  echo "check-large-files: incomplete git cat-file batch response" >&2
+  exit 2
+}
+
+over=0
+for i in "${!blobs[@]}"; do
+  size=${sizes[$i]}
+  [[ $size =~ ^[0-9]+$ ]] || {
+    echo "check-large-files: invalid size for ${paths[$i]}: $size" >&2
+    exit 2
+  }
   if [ "$size" -gt "$limit" ]; then
-    printf '%12d bytes  %s\n' "$size" "$path"
+    printf '%12d bytes  %s\n' "$size" "${paths[$i]}"
     over=$((over + 1))
   fi
-done < <(git diff --raw -z --no-abbrev --no-renames --diff-filter=AMT "$base" "$head")
+done
 
 if [ "$over" -gt 0 ]; then
   echo "check-large-files: $over file(s) over $limit bytes. Push them with 'crypto store push' and commit the store/index.json entry (AGENTS.md §13), or pack a raw run tree as runs.tar.xz (§13a)." >&2
