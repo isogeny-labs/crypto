@@ -383,12 +383,7 @@ fn run_inner(args: &StoreArgs, report_emitted: &mut bool) -> Result<(), String> 
             }
         }
         StoreCmd::Rm { name } => {
-            let removed = store
-                .index
-                .entries
-                .remove(name)
-                .ok_or_else(|| format!("{name} is not in the index"))?;
-            store.save_index()?;
+            let removed = store.remove_name(name)?;
             if args.json {
                 println!(
                     "{}",

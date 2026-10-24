@@ -38,7 +38,7 @@ pub mod backend;
 pub mod cli;
 pub mod index;
 
-use std::fs;
+use std::fs::{self, OpenOptions};
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -207,7 +207,25 @@ pub struct VerifyRow {
 pub struct Store {
     pub cfg: Config,
     pub index: Index,
+    index_at_open: Index,
     backend: Option<Box<dyn Backend>>,
+}
+
+fn lock_index(path: &Path) -> Result<fs::File, String> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|e| format!("{}: {e}", parent.display()))?;
+    }
+    let mut name = path.as_os_str().to_os_string();
+    name.push(".lock");
+    let lock_path = PathBuf::from(name);
+    let lock = OpenOptions::new()
+        .create(true)
+        .write(true)
+        .open(&lock_path)
+        .map_err(|e| format!("{}: {e}", lock_path.display()))?;
+    lock.lock()
+        .map_err(|e| format!("{}: {e}", lock_path.display()))?;
+    Ok(lock)
 }
 
 fn make_backend(cfg: &Config) -> Option<Box<dyn Backend>> {
@@ -244,6 +262,7 @@ impl Store {
         let backend = make_backend(&cfg);
         Ok(Self {
             cfg,
+            index_at_open: index.clone(),
             index,
             backend,
         })
@@ -269,8 +288,33 @@ impl Store {
         })
     }
 
-    pub fn save_index(&self) -> Result<(), String> {
-        self.index.save(&self.cfg.index_path)
+    pub fn save_index(&mut self) -> Result<(), String> {
+        let _lock = lock_index(&self.cfg.index_path)?;
+        let current = Index::load(&self.cfg.index_path)?;
+        if current != self.index_at_open {
+            return Err(format!(
+                "{}: index changed since this store was opened; reopen before saving",
+                self.cfg.index_path.display()
+            ));
+        }
+        self.index.save(&self.cfg.index_path)?;
+        self.index_at_open = self.index.clone();
+        Ok(())
+    }
+
+    /// Remove a name from the current on-disk index under the same lock as push.
+    /// The remote object and cached bytes are left alone.
+    pub fn remove_name(&mut self, name: &str) -> Result<Entry, String> {
+        let _lock = lock_index(&self.cfg.index_path)?;
+        let mut next = Index::load(&self.cfg.index_path)?;
+        let removed = next
+            .entries
+            .remove(name)
+            .ok_or_else(|| format!("{name} is not in the index"))?;
+        next.save(&self.cfg.index_path)?;
+        self.index_at_open = next.clone();
+        self.index = next;
+        Ok(removed)
     }
 
     /// Turn `store:NAME`, `NAME` or `sha256:DIGEST` into
@@ -439,9 +483,12 @@ impl Store {
             provenance: meta.provenance.clone(),
             superseded: vec![],
         };
-        // Settle the index first: a name conflict must fail before any upload.
-        let replaced = self.index.get(name).is_some_and(|old| old.sha256 != sha256);
-        let mut next = self.index.clone();
+        // A separate process may have published since this Store was opened.
+        // Hold the index lock through the remote write and manifest commit so
+        // both names and replacement history are checked against the latest file.
+        let _lock = lock_index(&self.cfg.index_path)?;
+        let mut next = Index::load(&self.cfg.index_path)?;
+        let replaced = next.get(name).is_some_and(|old| old.sha256 != sha256);
         next.put(name, entry, meta.replace)?;
 
         let remote = self.remote()?;
@@ -486,8 +533,9 @@ impl Store {
             }
             cached = true;
         }
+        next.save(&self.cfg.index_path)?;
+        self.index_at_open = next.clone();
         self.index = next;
-        self.save_index()?;
         Ok(PushReport {
             name: name.to_string(),
             sha256,
@@ -808,6 +856,33 @@ mod tests {
         );
         // The index on disk is what a reader sees.
         assert_eq!(Index::load(&s.cfg.index_path).unwrap(), s.index);
+        let _ = fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn stale_store_handles_preserve_other_names_and_reject_conflicts() {
+        let (root, mut first) = scratch();
+        let mut second = Store::open(first.cfg.clone()).unwrap();
+        let a = file(&root, "a", b"one");
+        let b = file(&root, "b", b"two");
+        first.push("first", &a, PushMeta::default()).unwrap();
+        second.push("second", &b, PushMeta::default()).unwrap();
+        let on_disk = Index::load(&first.cfg.index_path).unwrap();
+        assert!(on_disk.get("first").is_some());
+        assert!(on_disk.get("second").is_some());
+
+        let err = first.push("second", &a, PushMeta::default()).unwrap_err();
+        assert!(err.contains("--replace"), "{err}");
+        assert_eq!(first.remote().unwrap().list("").unwrap().len(), 2);
+
+        first.remove_name("first").unwrap();
+        let err = second.save_index().unwrap_err();
+        assert!(err.contains("index changed"), "{err}");
+        second.remove_name("second").unwrap();
+        assert!(Index::load(&first.cfg.index_path)
+            .unwrap()
+            .entries
+            .is_empty());
         let _ = fs::remove_dir_all(&root);
     }
 

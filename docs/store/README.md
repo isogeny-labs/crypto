@@ -76,6 +76,18 @@ A name that already holds other content is not repointed without
 `--replace`, and the old digest is kept in `superseded`, so a replaced
 figure stays visible as the "was".
 
+`push` and `rm` serialize updates to a shared index with a sibling `.lock`
+file, reload the latest manifest while locked, and save it atomically. A
+long-running upload holds that lock until its remote object and index entry
+are checked and committed; other writers to the same index wait. A caller
+that edits an in-memory index directly and calls `save_index` after another
+writer has changed the file gets an error instead of replacing the newer
+manifest. The lock coordinates processes using the same local index path; it
+does not merge distinct Git checkout indexes or coordinate remote prefixes.
+The [parallel CLI acceptance](INDEX_CONCURRENCY_ACCEPTANCE_20261023.json)
+checks distinct-name publication, remote downloaded bytes, simultaneous
+removals, and a same-name conflict using separate processes.
+
 ## Commands
 
 | command | does |
