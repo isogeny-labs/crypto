@@ -435,8 +435,9 @@ claimed as the full group-law proof.
 
 The implemented 1+1, 1+2, and 2+2 branch map now has exact
 integer-polynomial output certificates and written divisor arguments
-for each reachable case under the assumptions at the start of this
-audit. This is not a mechanized universal theorem: the divisor-class
+for each reachable case in the implemented mapped family: smooth monic
+quintics with no `x^4` term over odd-characteristic fields, with valid
+reduced inputs and nonzero weights. This is not a mechanized universal theorem: the divisor-class
 reasoning, branch composition, and smooth-curve hypotheses have no
 faithful Lean declarations, and an independent mathematical review
 has not yet been recorded. In particular, no exhaustive all-divisor
@@ -449,8 +450,9 @@ the implemented weighted law was found in that audit.
 A separate agent inspected the branch predicates and `None` exits in
 `src/bin/projective_law_gate.rs`, this written case split, and all eight
 `projective_symbolic_*` certificate programs. It found no concrete
-missing reachable branch or contradictory predicate under the stated
-smooth odd-characteristic, valid reduced-input, nonzero-weight assumptions.
+missing reachable branch or contradictory predicate for that mapped family
+under the stated smoothness, odd-characteristic, valid reduced-input, and
+nonzero-weight assumptions.
 The eight committed certificate results report 145 exact
 integer-polynomial equalities in total: 16, 12, 16, 19, 18, 7, 30,
 and 27 respectively. This is a static review observation, not an

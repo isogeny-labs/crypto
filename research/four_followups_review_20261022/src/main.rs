@@ -911,6 +911,7 @@ fn main() {
     let mut pencil_cap_rows = 0;
     let mut zero = 0;
     let mut coordinate_fail = 0;
+    let mut observation_ids = BTreeSet::new();
     for r in &targets {
         let key = (
             val(r, "bits").to_string(),
@@ -920,6 +921,18 @@ fn main() {
         keys.entry(key.clone())
             .or_default()
             .insert(val(r, "workload_id").into());
+        assert!(
+            observation_ids.insert((
+                val(r, "lead").to_string(),
+                val(r, "arm").to_string(),
+                val(r, "bits").to_string(),
+                val(r, "p").to_string(),
+                val(r, "target_index").to_string(),
+                val(r, "workload_id").to_string(),
+                val(r, "source_record").to_string(),
+            )),
+            "duplicate standardized observation identity"
+        );
         assert_eq!(val(r, "source_verified").to_lowercase(), "true");
         if val(r, "lead") == "pencil_collector" {
             pencil_rows += 1;

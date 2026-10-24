@@ -61,6 +61,13 @@ same-process `rho_GAE` while `candidate_GAE` and its ratio are empty.
 other leads. `signed_recover_verified` and `recover_method` join the separate
 source-checked signed-Recover gate; `recover_record` links its raw file.
 `source_record` links the coordinate raw file or the exact source price grid.
+The standardized observation identity is
+`(lead,arm,bits,p,target_index,workload_id,source_record)`, and the converter
+checks that it is unique. `source_record` is therefore also the deterministic
+attempt identifier when one arm has more than one run on a target. In
+particular, the two p=186,379 `peel_identity` cap rows point to the distinct
+10-million- and 25-million-coefficient raw records; they are two attempts on
+one workload, not duplicate target solves.
 This index keeps zero-coordinate
 cases and the three exceptional Recover methods visible without treating them
 as failed DLP solves.

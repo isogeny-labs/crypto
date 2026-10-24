@@ -38,7 +38,8 @@ The companion target index has 12,850 rows: 6,300 factor-base, 2,520
 projective-law, 1,510 pencil, 1,260 Kummer differential collector, and 1,260
 Kummer coordinate records. The converter verifies
 one shared workload ID for each of the 1,260 exact `(bits,p,target_index)`
-keys, all source checks, seven Kummer zero outputs, zero coordinate failures,
+keys, unique standardized observation identities including `source_record`,
+all source checks, seven Kummer zero outputs, zero coordinate failures,
 and 1,260 matching source-checked signed Recover rows. It additionally checks
 1,506 source-verified pencil arm-target solves and four null-candidate-cost
 cap records with measured rho costs.
@@ -51,6 +52,12 @@ grids, and matched rho controls independently. The Kummer study validator checks
 and same-process rho source scalars, unmodified candidate trajectory, per-target
 cold costs, and native price band. This packet does not replace
 the separate source studies' arithmetic and scalar validators.
+The pencil manifests are generation-time provenance records rather than
+checksums of a later checkout or mutable ignored `target/` output. Their
+historical hashes remain unchanged; the exact interpretation and current-file
+boundary are recorded in
+`research/pencil_sparse_20261022/MANIFEST_NOTES.md` and
+`research/pencil_markowitz_20261022/MANIFEST_NOTES.md`.
 
 The factor-base/law/Kummer graph is rendered from the same representative grid rows as the JSON summary; the
 paired pencil graph uses all 36 price cells per measured curve. The coverage graph groups all 1,260 pencil workload keys by status. Their PNGs are
