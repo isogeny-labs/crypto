@@ -303,3 +303,20 @@ memory (exit 137). Those files are kept as test records, not in `draws/`, so
 the pod generates the whole range itself. Draws 251–254 are fixed by the
 seed, and the selection rule (§11.2) reads only draw order, so this changes
 nothing in what will be measured.
+
+### 11.8 Host change for A3 (2026-10-24, before any draw ≥ 251 is kept)
+
+On the owner's request A3 moves from RunPod to the `crypto-eks-highmem` ARC
+runner on the Karpenter Spot EKS cluster (`taskq/deploy/eks-karpenter/arc/`),
+dispatched by `.github/workflows/dreg-a3-eks-highmem.yml` from `main`. Nothing in
+§11.1–§11.5 changes. `run.sh` already sizes both stages to the host: `J` = nproc
+shards (16 there) and `P = ⌊A / 39 GB⌋` closures at once with `A` = 0.92 × the
+pod's 120 GiB limit (P = 3, each under about 39.5 GB; the recorded A1 peak was
+25.8 GB). The workflow pushes the draw file and `a3-sha256.txt` to
+`results/dreg-a3-eks-20261024` before any closure runs, which is the §11.2 anchor.
+
+The stopped RunPod host of 2026-10-18 left 473 shard lines for draws 251–730
+(`research/ic_leads_rented_20261018/snapshots/6sh5qyoyusv6ux/draws/a3-shards/`).
+They are not the A3 draw file. The fresh EKS file must equal them line for line
+on every field but `secs`; a mismatch is reported with the result and voids the
+run as §11.2's replay control would.

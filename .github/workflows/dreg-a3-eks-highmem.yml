@@ -1,0 +1,109 @@
+name: Weil-descent closure A3 (EKS high-memory)
+# Runs research/dreg_closure_m4l6_20261018/PROTOCOL.md §11 (amendment A3) on the
+# crypto-eks-highmem ARC runner (Karpenter Spot node, 16 CPU, 120 GiB pod limit),
+# moved off RunPod on the owner's request (2026-10-24). The protocol is unchanged:
+# run.sh sizes the draw shards to nproc and the closures to the cgroup limit.
+#
+#   stage=gen      replay control, then draws 251..3250 in nproc shards; the draw
+#                  file and its sha256 are pushed to RESULTS_BRANCH before anything
+#                  is measured (§11.2 anchor), so a Spot loss later costs only the
+#                  measuring stage.
+#   stage=measure  takes the draws from RESULTS_BRANCH, checks the sha256, runs the
+#                  first 16 unsatisfiable draws and the control at degree 4, tallies.
+#   stage=both     gen, push, then measure.
+# Spot interruption fails the job; re-dispatch the unfinished stage.
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: gen, measure or both
+        type: choice
+        options: [both, gen, measure]
+        default: both
+permissions:
+  contents: write
+concurrency:
+  group: dreg-a3-eks-highmem
+  cancel-in-progress: false
+env:
+  RESULTS_BRANCH: results/dreg-a3-eks-20261024
+  D: research/dreg_closure_m4l6_20261018
+jobs:
+  a3:
+    if: github.ref == 'refs/heads/main'
+    runs-on: crypto-eks-highmem
+    # gen about 5 h at 16 shards, measure about 3 h (3 closures at once); margin.
+    timeout-minutes: 900
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+      - name: Host and toolchain
+        run: |
+          set -euo pipefail
+          printf 'runner=%s commit=%s\n' "$RUNNER_NAME" "$GITHUB_SHA"
+          test "$(uname -m)" = x86_64
+          memory_bytes=$(cat /sys/fs/cgroup/memory.max)
+          printf 'memory_bytes=%s cpu_quota=%s nproc=%s\n' "$memory_bytes" "$(cat /sys/fs/cgroup/cpu.max)" "$(nproc)"
+          # Three 39 GB closures at once need the 120 GiB pod; refuse anything smaller.
+          test "$memory_bytes" -ge $((112 * 1024 * 1024 * 1024))
+          rustc --version; cargo --version
+      - name: Build dreg_ladder and dreg_closure (release)
+        run: cargo build --locked --release --example dreg_ladder --example dreg_closure
+      - name: Host record
+        run: |
+          set -euo pipefail
+          "$D/run.sh" target/release/examples/dreg_ladder target/release/examples/dreg_closure host
+          echo "eks: run ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT} runner ${RUNNER_NAME} commit ${GITHUB_SHA}" >> "$D/runs/queue.log"
+      - name: Generate draws 251..3250 (gen)
+        if: inputs.stage != 'measure'
+        run: |
+          set -euo pipefail
+          "$D/run.sh" target/release/examples/dreg_ladder target/release/examples/dreg_closure gen-a3
+      - name: Fetch committed draws (measure only)
+        if: inputs.stage == 'measure'
+        run: |
+          set -euo pipefail
+          git fetch origin "$RESULTS_BRANCH"
+          git checkout "origin/$RESULTS_BRANCH" -- "$D/draws/a3-m4-15-6.jsonl" "$D/draws/a3-sha256.txt" "$D/runs/queue.log"
+          echo "eks: measure from run ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT} runner ${RUNNER_NAME}" >> "$D/runs/queue.log"
+          (cd "$D/draws" && sha256sum -c a3-sha256.txt)
+      - name: Push draws to the results branch (gen)
+        if: inputs.stage != 'measure'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$RESULTS_BRANCH"
+          git add "$D/draws/a3-m4-15-6.jsonl" "$D/draws/a3-sha256.txt" "$D/runs/queue.log" "$D/runs/"host-*.txt
+          git commit -m "A3 draws 251..3250 from EKS run ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT} (before any closure)"
+          git push -f origin "HEAD:refs/heads/$RESULTS_BRANCH"
+      - name: Closures at degree 4 (measure)
+        if: inputs.stage != 'gen'
+        run: |
+          set -euo pipefail
+          "$D/run.sh" target/release/examples/dreg_ladder target/release/examples/dreg_closure measure-a3
+          "$D/run.sh" target/release/examples/dreg_ladder target/release/examples/dreg_closure tally-a3 | tee "$D/runs/a3-tally.tsv"
+      - name: Push closure records to the results branch (measure)
+        if: always() && inputs.stage != 'gen'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          keep="$RUNNER_TEMP/a3-runs"; rm -rf "$keep"; cp -a "$D/runs" "$keep"
+          git fetch origin "$RESULTS_BRANCH"
+          git checkout -f -B "$RESULTS_BRANCH" "origin/$RESULTS_BRANCH"
+          cp -a "$keep/." "$D/runs/"
+          git add "$D/runs"
+          git commit -m "A3 closures from EKS run ${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT}" || true
+          git push origin "HEAD:refs/heads/$RESULTS_BRANCH"
+      - name: Upload records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dreg-a3-${{ inputs.stage }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.D }}/runs/
+            ${{ env.D }}/draws/a3-*
+          retention-days: 90
+          if-no-files-found: warn
