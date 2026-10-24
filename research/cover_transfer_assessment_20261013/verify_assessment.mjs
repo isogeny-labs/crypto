@@ -482,9 +482,9 @@ check(
   "graph model hashes are not a unique exact copy of the registry model hashes",
 );
 
-check(representationCount === 700, "unexpected EC1 representation count");
-check(ec1Aliases.size === 700, "unexpected unique EC1 count");
-check(curveUids.size === 700, "unexpected unique curve-UID count");
+check(representationCount === 979, "unexpected EC1 representation count");
+check(ec1Aliases.size === 979, "unexpected unique EC1 count");
+check(curveUids.size === 979, "unexpected unique curve-UID count");
 check(
   mapReferenceCounts.size === 15791 && [...mapReferenceCounts.values()].every((count) => count === 1),
   "CV1 references are not bijective with curve nodes",
@@ -795,7 +795,7 @@ check(
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "4a181ccb3201d3275cbf7aed29bfd72f58d82467";
+const expectedCatalogCommit = "728304718cb0ab6df70da620a908a5f76f175293";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -1022,9 +1022,9 @@ const expectedControlStatuses = {
 };
 const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
-  result_templates: "1a4955b6d4dd016e0cad661afde21257ae6845904904917568414f2ae601f05e",
+  result_templates: "5470ecac7ef17b749fae984a64d979c59c91cdb3e8fdbbddba6031d6fa6e956e",
   profiles: "807800e78066e8c3b0caa6634072a585cf4ae924a40b13817d9ca7a3c0aa3710",
-  controls: "ced7cde5819c147ab3fb37b724e4950e1a2771df718f2d7f6ed87f295b12992c",
+  controls: "73b73e3b963c82264d942170e20186c1f9f78ffa6ef556e7eca4299e90998055",
   open_obligations: "dffb0831f47c54218afaf9e9d81a54b117bd8017db4014400d56986d61f3c5a7",
   global_cost_accounting:
     "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",
@@ -1117,7 +1117,7 @@ for (const relativePath of [
     const committedBytes = execFileSync(
       "git",
       ["show", `${assessment.catalog_commit}:${relativePath}`],
-      { cwd: root, encoding: "buffer", maxBuffer: 64 * 1024 * 1024 },
+      { cwd: root, encoding: "buffer", maxBuffer: 128 * 1024 * 1024 },
     );
     check(
       sha256(committedBytes) === sha256(fs.readFileSync(path.join(root, relativePath))),
@@ -1833,8 +1833,8 @@ const expectedPredicateCounts = {
   odd_prime_quadratic_direct_same_field: 14272,
   odd_prime_quadratic_normalized_same_field: 30,
   odd_extension_quadratic_direct_same_field: 1324,
-  linked_subgroup_degree3: 141,
-  linked_subgroup_degree2: 559,
+  linked_subgroup_degree3: 142,
+  linked_subgroup_degree2: 837,
 };
 const actualPredicateCounts = {};
 for (const context of mapContexts.values()) {
@@ -1903,23 +1903,6 @@ const expectedExactOverlays = {
       "docs/curves/cover-links.yaml#EC1P10Cfphcf15d87ab724",
       "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#icv1-fp10-t5-192cb216",
     ],
-  },
-  "subgroup.binary-new-registry-unvalidated": {
-    kind: "subgroup",
-    target: [
-      "EC1N73Ce0h9999c3e90683",
-      "urn:ec-record:1:sha256:9999c3e9068310bbfdef49da0bb3e43251d8a89431b9e79715225d5671ab2abd",
-      "urn:curve-cover-map:1:sha256:753aa4b663b50db4dee22881f5e9f60e9ff1b1379986b06af1a8785c5ee58bb4",
-    ],
-    claim_overrides: {
-      generator_on_curve: "subgroup.prime-generator.unknown",
-      catalog_order_annihilates_generator: "subgroup.prime-generator.unknown",
-      pullback_valid: "subgroup.prime-transfer.unknown",
-      image_annihilated_by_catalog_order: "subgroup.prime-transfer.unknown",
-      composition_on_generator: "subgroup.prime-transfer.unknown",
-      degree_inverse_recovery: "subgroup.prime-transfer.unknown",
-    },
-    evidence_additions: ["docs/curves/cover-links.yaml#EC1N73Ce0h9999c3e90683"],
   },
 };
 const exactOverlays = Array.isArray(assessment.exact_overlays)
@@ -2194,7 +2177,7 @@ check(
 );
 check(coverage.assessed_maps === 15791 && coverage.unassessed_maps === 0, "map coverage is incomplete");
 check(
-  coverage.assessed_subgroups === 700 && coverage.unassessed_subgroups === 0,
+  coverage.assessed_subgroups === 979 && coverage.unassessed_subgroups === 0,
   "subgroup coverage is incomplete",
 );
 
@@ -2423,8 +2406,8 @@ for (const [kind, relativePath] of Object.entries(reportArtifacts)) {
   if (kind === "context_graph_source") {
     const contents = bytes.toString("utf8");
     for (const marker of [
-      "509 fields / 2,570 Jacobian contexts / 2,572 maps",
-      "current-source test: 2,572 / 2,572",
+      "557 fields / 15,789 Jacobian contexts / 15,791 maps",
+      "current-source test: 15,791 / 15,791",
       "746 inside / 1,354 outside old allowlist",
     ]) {
       check(contents.includes(marker), `context graph lacks current marker: ${marker}`);
