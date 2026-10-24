@@ -102,6 +102,13 @@ baseline. Every such improvement is a success and is reported as one.**
 
 ## Pointers
 
+- **What has already been tried against ECDLP, here and in the sibling
+  repositories:** the lead atlas in aburan28/crypto-autoresearcher,
+  `knowledge/leads/ecdlp/` (`python3 tools/lead_atlas.py --brief`, printed by
+  `.claude/hooks/session-start.sh`). Read it before surveying `research/` for
+  leads, and run `--match "<idea>"` before proposing an ECDLP mechanism. A
+  result that lands here updates the lead it advances in the same PR or the
+  next atlas review (skill `lead-atlas` there).
 - Boundary ledger (machine): `docs/ic/boundary_targets.json`
 - Boundary scoreboard (human): `docs/ic/BOUNDARY_TARGETS.md`
 - Autolab runner: `research/sat_factor_base_review_20260908/autolab/`

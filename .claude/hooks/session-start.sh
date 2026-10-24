@@ -28,6 +28,18 @@ case "${WORKSPACE_OFFLINE:-0}" in
   *) echo "WORKSPACE_OFFLINE must be 0 or 1" >&2; exit 2 ;;
 esac
 
+# The ECDLP lead atlas lives in aburan28/crypto-autoresearcher
+# (knowledge/leads/ecdlp/). It says what has already been tried across this
+# repository and its siblings, and whether anything changed since the last
+# review. Printed before the remote-only setup, so a local session sees it too.
+# Never fatal.
+atlas_repo="$(dirname "${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}")/crypto-autoresearcher"
+if [ -f "$atlas_repo/tools/lead_atlas.py" ]; then
+  python3 "$atlas_repo/tools/lead_atlas.py" --brief 2>/dev/null || true
+else
+  echo "ECDLP lead atlas: clone aburan28/crypto-autoresearcher next to this checkout and run python3 tools/lead_atlas.py --brief. It records every lead already tried here, so check it before proposing an ECDLP idea."
+fi
+
 if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
   exit 0
 fi
