@@ -251,9 +251,8 @@ pub enum RhoVariant {
     /// `a_j, b_j` uniform in `[0, N)` instead of `RHO_STEP_BITS`-bit ones
     /// (round twelve).  With short coefficients a walk's displacement
     /// `ΔA + ΔB·k` concentrates on a small 2-D set, which can delay its
-    /// rho collision at large `N`.  The default reference since round
-    /// twelve.
-    #[default]
+    /// rho collision at large `N`.  The reference from round twelve to
+    /// round fifteen.
     DistinguishedPointsFullWidth,
     /// [`Self::DistinguishedPointsNegation`] on the full-width walk
     /// (round thirteen).  Carries a passive cycle window (round
@@ -269,7 +268,9 @@ pub enum RhoVariant {
     /// [`Self::DistinguishedPointsNegationFullWidthCycleEscape`] that
     /// first tries a repeat as a collision and escapes only a degenerate
     /// one (round fifteen): on small groups a genuine rho cycle fits in
-    /// the window.
+    /// the window.  The default reference since round fifteen: the
+    /// `±` fold index calculus already uses, at its expected `√2`.
+    #[default]
     DistinguishedPointsNegationFullWidthCollideFirst,
 }
 

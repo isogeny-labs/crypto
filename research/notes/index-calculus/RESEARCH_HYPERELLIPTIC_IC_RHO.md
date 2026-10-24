@@ -1954,3 +1954,43 @@ If R15-1 to R15-4 hold, the collide-first folded walk becomes the
 thread's rho reference (class **accounting**, against index calculus:
 the reference gets cheaper by the measured ratio). If R15-1 fails, the
 small-group excess has another cause.
+
+## Round fifteen: measured — the folded walk reaches its `√2`; it becomes the reference
+
+Registered run: card `CARD-HEIC-ROUND15-1` (commit `16e7f548`, binary
+sha256 `8a732b5d…a1b623`), receipt
+`research/notes/index-calculus/round15/run1/receipt.json` (completed,
+nine commands exit 0), output `run1/R15.txt`, isolation record
+uncontended on reserved CPU 3 (434 s). 18 instances × 40 seeds × 3 arms,
+every `k` verified; the active arm reproduces round fourteen's column.
+
+| | registered test | result |
+|--|--|--|
+| R15-1 | collide-first folded/plain, median over `N ≤ 6·10⁴`, ≤ 0.85 | **holds**: 0.698 |
+| R15-2 | same over `N ≥ 10⁵`, ≤ 0.80 | **holds**: 0.716 |
+| R15-3 | folded `S_walk`, median over `N ≥ 10⁵`, ≤ 1.05 | **holds**: 1.008 |
+| R15-4 | fruitless ≤ 10% on every row; every run verified; round fourteen reproduced | **holds**: max 4.4%; yes; yes |
+
+**What it means.**
+
+- The folded walk now gives its expected saving at every size: median
+  folded/plain 0.698 on the small rows and 0.716 on the large ones
+  (ideal 0.707), with folded `S_walk` 1.008 at `N ≥ 10⁵` (ideal 0.886,
+  the same ~14% above ideal the plain walk sits at).
+- As registered, the collide-first folded walk becomes the thread's rho
+  reference: `RhoVariant`'s default is now
+  `DistinguishedPointsNegationFullWidthCollideFirst`. Earlier variants
+  keep their meaning, so every frozen round reproduces.
+- **Class: accounting, against index calculus.** The reference rho gets
+  cheaper by about 0.70× in walk operations, because index calculus
+  already folds `±P` and the reference now does too. Every thread IC/rho
+  ratio is to be re-measured against this reference. Those ratios already
+  carried the "lower-bound, unranked" label (§5a/§12); against the
+  current reference they would be up to `1.5 / 0.70 ≈ 2.1×` less
+  favourable to index calculus than when first measured, but they are
+  re-measured, not rescaled.
+- The window's unpriced native work is up to 32 hash comparisons per
+  step, plus one `(a, b)` copy per step; reported, not priced (§5a).
+- This reproduces the known result (`LEAD-RHO-negation-map-fruitless-cycles`,
+  closed_known) inside the thread. It is not a new lead and not an
+  improvement to index calculus.

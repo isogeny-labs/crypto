@@ -5883,7 +5883,13 @@ Increasing factor-base dimension remains the next scaling test.</p></div></div>
     8 bits, which keeps a walk&rsquo;s displacement on a small 2-D set and delays its collision at
     large <code>N</code>. With full-width coefficients, registered W1&ndash;W4 all hold: Jacobian median
     <code>S_walk</code> 1.390 over the 7 rows with <code>N</code> &ge; 10<sup>5</sup>, and the largest row drops
-    from 2.100 to 1.481. The full-width walk is now the default reference. Every IC/rho ratio above
+    from 2.100 to 1.481. Rounds thirteen to fifteen then folded <code>&plusmn;</code> classes on
+    that walk: fruitless cycles longer than two trapped it until a gap limit of about
+    <code>&radic;N</code> (78% of its steps on the largest row), and a 32-step window that tries a
+    repeat as a collision before escaping it brings the fold to its expected saving at every size
+    (median folded/plain 0.698 below <code>N</code> = 6&middot;10<sup>4</sup>, 0.716 above 10<sup>5</sup>; ideal
+    0.707). That folded full-width walk is now the default reference, as index calculus already
+    folds <code>&plusmn;P</code>. Every IC/rho ratio above
     measured against the 8-bit walk at <code>N</code> &ge; 10<sup>5</sup> flattered index calculus by up to
     1.5&times; and is to be re-measured. <span class="chip">accounting</span> Frozen source:
     <a href="https://github.com/aburan28/crypto/blob/main/research/notes/index-calculus/round12/run1/R12.txt">round twelve</a>.</p>
