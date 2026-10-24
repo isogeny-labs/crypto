@@ -292,7 +292,17 @@ the existing SHA-3, SHAKE, and BLAKE3 paths. The seven SHA-1/SHA-2 variants
 matched Python `hashlib` at padding and read boundaries and on an 8 MiB file;
 all seven also matched from a fresh S3-backed cache. The exact acceptance is
 [`CRYPTO_SHA_STREAM_ACCEPTANCE_20261023.json`](CRYPTO_SHA_STREAM_ACCEPTANCE_20261023.json).
-Other hash algorithms still buffer the complete input file in memory.
+MD4, MD5, and SM3 now use the same bounded file-read path. Their 48 local
+cross-implementation comparisons cover block and read boundaries through an
+8 MiB file; a fresh-cache S3 round trip and exact cleanup are recorded in
+[`CRYPTO_MD_SM3_STREAM_ACCEPTANCE_20261023.json`](CRYPTO_MD_SM3_STREAM_ACCEPTANCE_20261023.json).
+cSHAKE128 and cSHAKE256 also stream file input with their function-name and
+customization prefixes. Empty prefixes retain the SHAKE-equivalent domain;
+nonempty prefixes use the SP 800-185 cSHAKE domain. The
+[`CRYPTO_CSHAKE_STREAM_ACCEPTANCE_20261023.json`](CRYPTO_CSHAKE_STREAM_ACCEPTANCE_20261023.json)
+receipt records block-boundary, external-reference, and fresh-cache S3 checks.
+The remaining BLAKE2, Skein, RIPEMD-160, Streebog, Whirlpool, Tiger, and
+related file paths still buffer the complete input file in memory.
 The generated two-edge cubic degree-2 route passed fresh-cache `solve-cubic`
 replay, including source and destination scalar checks and same-target rho.
 Its live upload, HEAD, remote download verification, pull, and exact-object

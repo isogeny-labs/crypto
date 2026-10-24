@@ -3380,6 +3380,7 @@ fn load_hash_input(
 }
 
 enum StreamingHash {
+    Md(Merkle64),
     Sha1(crypto_lib::hash::sha1::Sha1),
     Sha224(sha2::Sha224),
     Sha256(crypto_lib::hash::sha256::Sha256),
@@ -3389,6 +3390,78 @@ enum StreamingHash {
     Sha512_256(sha2::Sha512_256),
     Keccak(crypto_lib::hash::sha3::KeccakSponge, usize),
     Blake3(blake3::Hasher),
+    Sm3(crypto_lib::hash::sm3::Sm3),
+}
+
+/// MD4 and MD5 have the same block size, padding, and initial state.
+struct Merkle64 {
+    md5: bool,
+    state: [u32; 4],
+    block: [u8; 64],
+    filled: usize,
+    length: u64,
+}
+
+impl Merkle64 {
+    fn new(md5: bool) -> Self {
+        Self {
+            md5,
+            state: crypto_lib::cryptanalysis::md5_differential::MD5_IV,
+            block: [0; 64],
+            filled: 0,
+            length: 0,
+        }
+    }
+
+    fn compress(&mut self, block: &[u8; 64]) {
+        if self.md5 {
+            crypto_lib::cryptanalysis::md5_differential::md5_compress(&mut self.state, block, 64);
+        } else {
+            crypto_lib::hash::md4::md4_compress(&mut self.state, block);
+        }
+    }
+
+    fn update(&mut self, mut data: &[u8]) {
+        self.length = self.length.wrapping_add(data.len() as u64);
+        if self.filled != 0 {
+            let take = data.len().min(64 - self.filled);
+            self.block[self.filled..self.filled + take].copy_from_slice(&data[..take]);
+            self.filled += take;
+            data = &data[take..];
+            if self.filled < 64 {
+                return;
+            }
+            let block = self.block;
+            self.compress(&block);
+            self.filled = 0;
+        }
+        for chunk in data.chunks_exact(64) {
+            let mut block = [0; 64];
+            block.copy_from_slice(chunk);
+            self.compress(&block);
+        }
+        let whole = data.len() - data.len() % 64;
+        self.filled = data.len() - whole;
+        self.block[..self.filled].copy_from_slice(&data[whole..]);
+    }
+
+    fn finalize(mut self) -> [u8; 16] {
+        let mut tail = [0u8; 128];
+        tail[..self.filled].copy_from_slice(&self.block[..self.filled]);
+        tail[self.filled] = 0x80;
+        let end = if self.filled < 56 { 64 } else { 128 };
+        tail[end - 8..end].copy_from_slice(&self.length.wrapping_mul(8).to_le_bytes());
+        for chunk in tail[..end].chunks_exact(64) {
+            let mut block = [0; 64];
+            block.copy_from_slice(chunk);
+            self.compress(&block);
+        }
+        let mut digest = [0u8; 16];
+        for (index, word) in self.state.iter().enumerate() {
+            digest[index * 4..index * 4 + 4].copy_from_slice(&word.to_le_bytes());
+        }
+        digest
+    }
 }
 
 fn cmd_hash_file_streamed(
@@ -3399,6 +3472,8 @@ fn cmd_hash_file_streamed(
     function_name: Option<&[u8]>,
 ) -> Result<Option<String>, String> {
     let mut engine = match algorithm {
+        "md4" => StreamingHash::Md(Merkle64::new(false)),
+        "md5" => StreamingHash::Md(Merkle64::new(true)),
         "sha1" | "sha-1" => StreamingHash::Sha1(crypto_lib::hash::sha1::Sha1::new()),
         "sha224" | "sha-224" => StreamingHash::Sha224(sha2::Sha224::new()),
         "sha256" | "sha-256" => StreamingHash::Sha256(crypto_lib::hash::sha256::Sha256::new()),
@@ -3426,7 +3501,24 @@ fn cmd_hash_file_streamed(
             crypto_lib::hash::sha3::KeccakSponge::new(136, 0x1f),
             output_bytes.unwrap_or(0),
         ),
+        "cshake128" | "cshake256" => {
+            let rate = if algorithm == "cshake128" { 168 } else { 136 };
+            let name = function_name.unwrap_or_default();
+            let customization = custom.unwrap_or_default();
+            let empty_domain = name.is_empty() && customization.is_empty();
+            let mut sponge = crypto_lib::hash::sha3::KeccakSponge::new(
+                rate,
+                if empty_domain { 0x1f } else { 0x04 },
+            );
+            if !empty_domain {
+                let mut encoded = crypto_lib::hash::cshake::encode_string(name);
+                encoded.extend_from_slice(&crypto_lib::hash::cshake::encode_string(customization));
+                sponge.update(&crypto_lib::hash::cshake::bytepad(&encoded, rate));
+            }
+            StreamingHash::Keccak(sponge, output_bytes.unwrap_or(0))
+        }
         "blake3" => StreamingHash::Blake3(blake3::Hasher::new()),
+        "sm3" => StreamingHash::Sm3(crypto_lib::hash::sm3::Sm3::new()),
         _ => return Ok(None),
     };
     // Reuse the text-input parameter checks, including SHAKE's output bound
@@ -3444,6 +3536,7 @@ fn cmd_hash_file_streamed(
             break;
         }
         match &mut engine {
+            StreamingHash::Md(state) => state.update(&buffer[..count]),
             StreamingHash::Sha1(state) => state.update(&buffer[..count]),
             StreamingHash::Sha224(state) => state.update(&buffer[..count]),
             StreamingHash::Sha256(state) => state.update(&buffer[..count]),
@@ -3455,9 +3548,11 @@ fn cmd_hash_file_streamed(
             StreamingHash::Blake3(state) => {
                 state.update(&buffer[..count]);
             }
+            StreamingHash::Sm3(state) => state.update(&buffer[..count]),
         }
     }
     let digest = match engine {
+        StreamingHash::Md(state) => state.finalize().to_vec(),
         StreamingHash::Sha1(state) => state.finalize().to_vec(),
         StreamingHash::Sha224(state) => state.finalize().to_vec(),
         StreamingHash::Sha256(state) => state.finalize().to_vec(),
@@ -3467,6 +3562,7 @@ fn cmd_hash_file_streamed(
         StreamingHash::Sha512_256(state) => state.finalize().to_vec(),
         StreamingHash::Keccak(state, length) => state.finalize(length),
         StreamingHash::Blake3(state) => state.finalize().as_bytes().to_vec(),
+        StreamingHash::Sm3(state) => state.finalize().to_vec(),
     };
     Ok(Some(to_hex(&digest)))
 }
@@ -4065,6 +4161,65 @@ mod hash_cli_tests {
         cmd_hash, cmd_hash_custom, cmd_hash_file_streamed, cmd_mac, load_hash_input, load_mac_key,
         verify_mac_tag,
     };
+
+    #[test]
+    fn md_and_sm3_file_streaming_matches_one_shot_at_block_boundaries() {
+        let path = std::env::temp_dir().join(format!(
+            "crypto-md-sm3-stream-{}-{}.bin",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        for size in [0, 1, 55, 56, 63, 64, 65, 111, 112, 127, 128, 65_535, 65_537] {
+            let bytes: Vec<u8> = (0..size).map(|i| (i * 37) as u8).collect();
+            std::fs::write(&path, &bytes).unwrap();
+            for name in ["md4", "md5", "sm3"] {
+                let got = cmd_hash_file_streamed(name, &path, None, None, None)
+                    .unwrap()
+                    .expect("hash files stream");
+                assert_eq!(
+                    got,
+                    cmd_hash(name, &bytes, None).unwrap(),
+                    "{name} at {size}"
+                );
+            }
+        }
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn cshake_file_streaming_matches_one_shot_with_domain_separation() {
+        let path = std::env::temp_dir().join(format!(
+            "crypto-cshake-stream-{}-{}.bin",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::SystemTime::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        for size in [0, 1, 135, 136, 137, 167, 168, 169, 65_537] {
+            let bytes: Vec<u8> = (0..size).map(|i| (i * 37) as u8).collect();
+            std::fs::write(&path, &bytes).unwrap();
+            for name in ["cshake128", "cshake256"] {
+                for (custom, function_name) in [
+                    (None, None),
+                    (Some(b"Email Signature".as_slice()), None),
+                    (None, Some(b"test-function".as_slice())),
+                    (Some(b"custom".as_slice()), Some(b"function".as_slice())),
+                ] {
+                    let got = cmd_hash_file_streamed(name, &path, Some(32), custom, function_name)
+                        .unwrap()
+                        .expect("cSHAKE files stream");
+                    let expected =
+                        cmd_hash_custom(name, &bytes, Some(32), custom, function_name).unwrap();
+                    assert_eq!(got, expected, "{name} at {size}");
+                }
+            }
+        }
+        std::fs::remove_file(path).unwrap();
+    }
 
     #[test]
     fn sha_family_file_streaming_matches_independent_one_shot_paths() {
