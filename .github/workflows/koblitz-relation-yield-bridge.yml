@@ -32,15 +32,21 @@ concurrency:
 jobs:
   smoke-and-custody:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-relation-yield-bridge.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-relation-yield-bridge.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    timeout-minutes: 20
+    # The metered smoke alone takes ~12 min on an ARC runner and more on a
+    # hosted one, which this workflow now falls back to; 25 is the PR cap.
+    timeout-minutes: 25
     env:
       CARGO_PROFILE_DEV_DEBUG: "0"
       CARGO_INCREMENTAL: "0"
     steps:
-      - name: Reclaim unused GitHub-hosted SDK space
+      # The full checkout plus a debug build of the crate no longer fits a
+      # hosted runner's disk (rustc exits 101 mid-build); free the unused SDKs.
+      - name: Free runner disk
         if: runner.environment == 'github-hosted'
         run: |
-          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/powershell
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/local/share/powershell
+          df -h /
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Validate Python custody rules
