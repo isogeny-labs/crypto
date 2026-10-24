@@ -39,6 +39,7 @@ use num_traits::{One, ToPrimitive, Zero};
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use rayon::prelude::*;
 use serde::Serialize;
+use sha2::{Digest, Sha256};
 
 use super::p192_native::{
     p192_order, p192_prime, AffinePoint, Fp, JacobianPoint, P192Arithmetic, B_HEX, GX_HEX, GY_HEX,
@@ -675,6 +676,339 @@ pub fn pair_sum_keys<F: PrimeField>(c: &Curve<F>, base: &[Pt<F::E>]) -> Vec<F::K
     keys
 }
 
+/// A checked row from a natural scalar sample.  For a setup row,
+/// `[coefficient]G = sum(terms)`; for a target row,
+/// `Q + [coefficient]G = sum(terms)`.  Indices refer to the factor-base
+/// digest in [`ExactIcProbe`].
+#[derive(Clone, Debug, Serialize)]
+pub struct ExactIcRelation {
+    pub candidate: u64,
+    pub coefficient: String,
+    pub target_dependent: bool,
+    pub terms: Vec<(usize, i8)>,
+}
+
+/// Bounded exact-curve relation, rank, and target-descent probe.
+/// A missing scalar means that this precise base and candidate budget did
+/// not determine the target logarithm; it is never a zero logarithm.
+#[derive(Clone, Debug, Serialize)]
+pub struct ExactIcProbe {
+    pub curve: String,
+    /// Number of signed base points admitted in each relation (two or three).
+    pub relation_arity: u8,
+    pub factor_base_abscissae: usize,
+    /// SHA-256 of `ECC-IC-FB-v1`, curve name, field modulus,
+    /// coefficient keys, subgroup order, cofactor, and each canonical
+    /// point-key pair in base order, separated by newlines.
+    pub factor_base_sha256: String,
+    pub distinct_pair_sum_abscissae: usize,
+    pub setup_candidates: u64,
+    pub target_candidates: u64,
+    pub setup_relations: usize,
+    pub setup_rank: usize,
+    pub target_relations: usize,
+    pub combined_rank: usize,
+    pub target_log_determined: bool,
+    pub recovered_scalar: Option<String>,
+    pub verified: bool,
+    pub relations: Vec<ExactIcRelation>,
+    pub elapsed_ms: f64,
+}
+
+/// Enumerate a fixed small-x base, check scalar-derived candidates against
+/// its complete two-sum set, independently recheck each hit as a group
+/// identity, and solve the resulting modular relation matrix.  The first
+/// target candidate is exactly `Q`; later candidates are `Q + [a]G`.
+/// The seed fixes all nonzero scalar samples.  This routine never infers a
+/// logarithm from a rank-deficient matrix.
+pub fn exact_ic_probe<F: PrimeField>(
+    c: &Curve<F>,
+    g: &Pt<F::E>,
+    q: &Pt<F::E>,
+    size: usize,
+    setup_candidates: u64,
+    target_candidates: u64,
+    seed: u64,
+) -> Result<ExactIcProbe, String> {
+    exact_ic_probe_with_arity(c, g, q, size, setup_candidates, target_candidates, seed, 2)
+}
+
+/// As [`exact_ic_probe`], with an optional third signed base point. The
+/// three-point search subtracts each signed base point from a candidate and
+/// probes the existing pair-sum keys; it never materializes a cubic table.
+pub fn exact_ic_probe_with_arity<F: PrimeField>(
+    c: &Curve<F>,
+    g: &Pt<F::E>,
+    q: &Pt<F::E>,
+    size: usize,
+    setup_candidates: u64,
+    target_candidates: u64,
+    seed: u64,
+    relation_arity: u8,
+) -> Result<ExactIcProbe, String> {
+    let started = Instant::now();
+    if ![2, 3].contains(&relation_arity) {
+        return Err("relation arity must be two or three".into());
+    }
+    if !c.order_is_prime || c.order <= BigUint::from(2u8) {
+        return Err("the relation solver requires a prime subgroup order".into());
+    }
+    if size < 2 {
+        return Err("a base needs at least two abscissae".into());
+    }
+    check_memory(size, std::mem::size_of::<F::K>())?;
+    let mut f = c.field.clone();
+    if !c.on_curve(&mut f, g)
+        || !c.on_curve(&mut f, q)
+        || c.mul_big(&mut f, g, &c.order).is_some()
+        || c.mul_big(&mut f, q, &c.order).is_some()
+    {
+        return Err("generator or target failed curve/subgroup validation".into());
+    }
+    let base = small_x_base(c, size)?;
+    let mut hasher = Sha256::new();
+    hasher.update(format!(
+        "ECC-IC-FB-v1\n{}\n{:x}\n{:?}\n{:?}\n{:x}\n{}\n",
+        c.name,
+        f.modulus(),
+        f.key(c.a),
+        f.key(c.b),
+        c.order,
+        c.cofactor
+    ));
+    for point in &base {
+        hasher.update(format!("{:?}:{:?}\n", f.key(point.x), f.key(point.y)));
+    }
+    let factor_base_sha256 = format!("{:x}", hasher.finalize());
+    let mut keys = pair_sum_keys(c, &base);
+    keys.dedup();
+    let index: HashMap<F::K, usize> = base
+        .iter()
+        .enumerate()
+        .map(|(i, p)| (f.key(p.x), i))
+        .collect();
+    let mut rng = StdRng::seed_from_u64(seed);
+    let mut relations = Vec::new();
+    let nonzero_scalar = |rng: &mut StdRng| {
+        let bits = c.order.bits() as usize;
+        let mut bytes = vec![0u8; bits.div_ceil(8)];
+        let top_mask = if bits.is_multiple_of(8) {
+            u8::MAX
+        } else {
+            (1u8 << (bits % 8)) - 1
+        };
+        loop {
+            rng.fill(bytes.as_mut_slice());
+            *bytes.last_mut().expect("nonzero subgroup order") &= top_mask;
+            let a = BigUint::from_bytes_le(&bytes);
+            if !a.is_zero() && a < c.order {
+                break a;
+            }
+        }
+    };
+    for candidate in 0..setup_candidates {
+        let a = nonzero_scalar(&mut rng);
+        let Some(r) = c.mul_big(&mut f, g, &a) else {
+            return Err("nonzero generator scalar produced infinity".into());
+        };
+        if let Some(terms) = checked_relation(c, &mut f, &base, &index, &keys, &r, relation_arity)?
+        {
+            relations.push(ExactIcRelation {
+                candidate,
+                coefficient: a.to_str_radix(16),
+                target_dependent: false,
+                terms,
+            });
+        }
+    }
+    let setup_relations = relations.len();
+    let setup_rank = relation_system(&relations, size, false, &c.order)?.0;
+    for candidate in 0..target_candidates {
+        let a = if candidate == 0 {
+            BigUint::zero()
+        } else {
+            nonzero_scalar(&mut rng)
+        };
+        let r = if a.is_zero() {
+            Some(*q)
+        } else {
+            c.mul_big(&mut f, g, &a)
+                .and_then(|ag| c.add_points(&mut f, q, &ag))
+        };
+        let Some(r) = r else { continue };
+        if let Some(terms) = checked_relation(c, &mut f, &base, &index, &keys, &r, relation_arity)?
+        {
+            relations.push(ExactIcRelation {
+                candidate,
+                coefficient: a.to_str_radix(16),
+                target_dependent: true,
+                terms,
+            });
+        }
+    }
+    let target_relations = relations.len() - setup_relations;
+    let (combined_rank, solution) = relation_system(&relations, size, true, &c.order)?;
+    let determined = solution.as_ref().is_some_and(|s| s.determined[size]);
+    let scalar = solution
+        .filter(|_| determined)
+        .map(|s| s.values[size].clone());
+    let verified = if let Some(ref x) = scalar {
+        c.mul_big(&mut f, g, x).as_ref() == Some(q)
+    } else {
+        false
+    };
+    if scalar.is_some() && !verified {
+        return Err("determined logarithm failed independent point verification".into());
+    }
+    Ok(ExactIcProbe {
+        curve: c.name.clone(),
+        relation_arity,
+        factor_base_abscissae: size,
+        factor_base_sha256,
+        distinct_pair_sum_abscissae: keys.len(),
+        setup_candidates,
+        target_candidates,
+        setup_relations,
+        setup_rank,
+        target_relations,
+        combined_rank,
+        target_log_determined: determined,
+        recovered_scalar: scalar.map(|x| format!("0x{}", x.to_str_radix(16))),
+        verified,
+        relations,
+        elapsed_ms: started.elapsed().as_secs_f64() * 1000.0,
+    })
+}
+
+fn checked_relation<F: PrimeField>(
+    c: &Curve<F>,
+    f: &mut F,
+    base: &[Pt<F::E>],
+    index: &HashMap<F::K, usize>,
+    pair_keys: &[F::K],
+    target: &Pt<F::E>,
+    arity: u8,
+) -> Result<Option<Vec<(usize, i8)>>, String> {
+    if pair_keys.binary_search(&f.key(target.x)).is_ok() {
+        return checked_two_sum(c, f, base, index, target)
+            .map(Some)
+            .ok_or_else(|| "pair-sum key hit had no geometric decomposition".into());
+    }
+    if arity == 2 {
+        return Ok(None);
+    }
+    for (i, point) in base.iter().enumerate() {
+        for sign in [1i8, -1] {
+            let first = if sign == 1 {
+                *point
+            } else {
+                c.negate(f, point)
+            };
+            let minus_first = c.negate(f, &first);
+            let Some(rest) = c.add_points(f, target, &minus_first) else {
+                continue;
+            };
+            if pair_keys.binary_search(&f.key(rest.x)).is_err() {
+                continue;
+            }
+            let mut terms = checked_two_sum(c, f, base, index, &rest)
+                .ok_or("three-point pair key hit had no geometric decomposition")?;
+            terms.push((i, sign));
+            let mut sum: Option<Pt<F::E>> = None;
+            for &(j, s) in &terms {
+                let term = if s == 1 {
+                    base[j]
+                } else {
+                    c.negate(f, &base[j])
+                };
+                sum = match sum {
+                    Some(p) => c.add_points(f, &p, &term),
+                    None => Some(term),
+                };
+            }
+            if sum.as_ref() != Some(target) {
+                return Err("three-point relation failed group-law verification".into());
+            }
+            return Ok(Some(terms));
+        }
+    }
+    Ok(None)
+}
+
+fn checked_two_sum<F: PrimeField>(
+    c: &Curve<F>,
+    f: &mut F,
+    base: &[Pt<F::E>],
+    index: &HashMap<F::K, usize>,
+    target: &Pt<F::E>,
+) -> Option<Vec<(usize, i8)>> {
+    for (i, p) in base.iter().enumerate() {
+        for si in [1i8, -1] {
+            let first = if si == 1 { *p } else { c.negate(f, p) };
+            let minus_first = c.negate(f, &first);
+            let Some(rest) = c.add_points(f, target, &minus_first) else {
+                continue;
+            };
+            let Some(&j) = index.get(&f.key(rest.x)) else {
+                continue;
+            };
+            for sj in [1i8, -1] {
+                let second = if sj == 1 {
+                    base[j]
+                } else {
+                    c.negate(f, &base[j])
+                };
+                if c.add_points(f, &first, &second).as_ref() == Some(target) {
+                    return Some(vec![(i, si), (j, sj)]);
+                }
+            }
+        }
+    }
+    None
+}
+
+fn relation_system(
+    relations: &[ExactIcRelation],
+    size: usize,
+    include_target: bool,
+    n: &BigUint,
+) -> Result<(usize, Option<super::ec_index_calculus::ModNSolution>), String> {
+    use super::ec_index_calculus::gaussian_eliminate_mod_n_particular;
+    let cols = size + usize::from(include_target);
+    let mut matrix = Vec::new();
+    let mut rhs = Vec::new();
+    for rel in relations {
+        if rel.target_dependent && !include_target {
+            continue;
+        }
+        let mut row = vec![BigUint::zero(); cols];
+        for &(i, sign) in &rel.terms {
+            if i >= size || ![-1, 1].contains(&sign) {
+                return Err("invalid relation term".into());
+            }
+            row[i] = if sign == 1 {
+                (&row[i] + BigUint::one()) % n
+            } else {
+                (&row[i] + n - BigUint::one()) % n
+            };
+        }
+        if rel.target_dependent {
+            row[size] = n - BigUint::one();
+        }
+        matrix.push(row);
+        rhs.push(
+            BigUint::parse_bytes(rel.coefficient.as_bytes(), 16)
+                .ok_or("invalid coefficient in relation")?,
+        );
+    }
+    if matrix.is_empty() {
+        return Ok((0, None));
+    }
+    let sol = gaussian_eliminate_mod_n_particular(&mut matrix, &mut rhs, n)
+        .ok_or("relation matrix is inconsistent or has a noninvertible pivot")?;
+    Ok((sol.rank, Some(sol)))
+}
+
 // ── Measurement ────────────────────────────────────────────────────
 
 /// What to measure.
@@ -1244,6 +1578,87 @@ pub fn p192_native_sum(a: &Pt<Fp>, b: &Pt<Fp>, ar: &mut P192Arithmetic) -> Optio
 mod tests {
     use super::*;
     use std::collections::HashSet;
+
+    #[test]
+    fn exact_eccp131_three_point_relation_is_checked() {
+        let p = crate::ecc::curve::CurveParams::eccp131();
+        let record = SecgCurve {
+            name: p.name.into(),
+            oid: String::new(),
+            field: SecgField::Prime { p: p.p.clone() },
+            a: p.a.clone(),
+            b: p.b.clone(),
+            gx: p.gx.clone(),
+            gy: p.gy.clone(),
+            order: p.n.clone(),
+            cofactor: p.h as u64,
+        };
+        let c = Curve::<MontField<3>>::from_secg(&record).expect("curve");
+        let g = c.secg_generator(&record).expect("generator");
+        let base = small_x_base(&c, 16).expect("base");
+        let mut f = c.field.clone();
+        let pair = c.add_points(&mut f, &base[0], &base[1]).expect("pair");
+        let target = c.add_points(&mut f, &pair, &base[2]).expect("triple");
+        let pair_keys = pair_sum_keys(&c, &base);
+        assert!(pair_keys.binary_search(&f.key(target.x)).is_err());
+        let report = exact_ic_probe_with_arity(&c, &g, &target, 16, 0, 1, 131, 3)
+            .expect("three-point probe");
+        assert_eq!(report.relation_arity, 3);
+        assert_eq!(report.target_relations, 1);
+        assert_eq!(report.relations[0].terms.len(), 3);
+        assert_eq!(report.setup_rank, 0);
+        assert!(!report.target_log_determined);
+    }
+
+    #[test]
+    fn three_point_natural_rows_feed_rank_and_target_reconstruction() {
+        let mut passing = None;
+        for curve_seed in 0..20 {
+            let c = toy_curve(8, curve_seed).expect("small prime curve");
+            if !c.order_is_prime {
+                continue;
+            }
+            let base = small_x_base(&c, 2).expect("base");
+            let g = base[0];
+            let mut f = c.field.clone();
+            let Some(q) = c.mul_big(&mut f, &g, &BigUint::from(37u32)) else {
+                continue;
+            };
+            let report = exact_ic_probe_with_arity(&c, &g, &q, 2, 500, 40, 9, 3)
+                .expect("three-point natural-row probe");
+            if report.relations.iter().any(|r| r.terms.len() == 3)
+                && report.setup_rank == 2
+                && report.target_log_determined
+                && report.verified
+            {
+                passing = Some(report);
+                break;
+            }
+        }
+        let report = passing.expect("a three-point row must reach the rank and target solver");
+        assert_eq!(report.recovered_scalar.as_deref(), Some("0x25"));
+    }
+
+    #[test]
+    fn exact_ic_probe_recovers_a_fresh_target_from_natural_rows() {
+        let c = (0..100)
+            .map(|seed| toy_curve(8, seed).expect("curve"))
+            .find(|c| c.order_is_prime)
+            .expect("prime-order curve");
+        let mut f = c.field.clone();
+        let base = small_x_base(&c, 8).expect("base");
+        let g = base[0];
+        let q = c
+            .mul_big(&mut f, &g, &BigUint::from(37u32))
+            .expect("target");
+        let report = exact_ic_probe(&c, &g, &q, 8, 500, 40, 9).expect("probe");
+        assert!(report.setup_relations > 8);
+        assert!(report.target_relations > 0);
+        assert_eq!(report.setup_rank, 8);
+        assert!(report.target_log_determined);
+        assert!(report.verified);
+        assert_eq!(report.recovered_scalar.as_deref(), Some("0x25"));
+    }
 
     /// Every point of a toy curve, found by walking the field.
     fn all_points(c: &Curve<SmallPrime>) -> Vec<Pt<u64>> {
