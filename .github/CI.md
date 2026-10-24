@@ -6,6 +6,11 @@ the entire historical research corpus. Failures and timeouts remain failures.
 
 ## Observed baseline (2026-10-11)
 
+Historical: the problems this document started from. The current shape, with
+the 2026-10-23 job counts, is under "Always-on PR gate shape" below. The
+default branch now has 444 workflow files: 142 declare `pull_request`, nine
+`merge_group`, 138 `push`, ten `schedule` and 411 `workflow_dispatch`.
+
 - The default branch has 348 workflows: 216 declare a pull-request trigger,
   87 a push trigger, 292 manual dispatch, and five a schedule. These categories
   overlap. Most historical research workflows already have path filters.
@@ -38,8 +43,13 @@ separate 60-minute `proofs` job in `weak-curve-lean.yml`.
 [ci-scope.mjs](scripts/ci-scope.mjs) compares local git trees, with NUL-delimited
 paths and both sides of renames. It has no changed-file API truncation. A missing
 base, failed fetch/diff, missing source, or manual/scheduled event selects all
-checks. PR comparisons use the tested merge tree against the event's base SHA;
-merge groups use their base SHA. Deleted files remain relevant.
+checks. PR comparisons use the tested merge commit against its own first parent
+(the base tip that merge was built on), falling closed to all checks if the
+checkout is not the merge of the event's head; merge groups use their base SHA.
+Comparing against the event payload's base SHA instead would attribute every
+file merged to main since the event to the PR, so a docs-only PR could select
+Rust, CodeQL and ecbench work after any unrelated merge. Deleted files remain
+relevant.
 
 The core workflows keep their existing check names and run on every PR. Their
 jobs or expensive steps decide applicability after classification, so an
@@ -70,6 +80,135 @@ continues to check every root target. Rust release builds and ecbench use caches
 Main-branch rolling releases retain their existing full packaging behavior.
 The ecbench workflow also starts on every PR/merge group so dependency and
 embedded-data changes cannot disappear behind an incomplete trigger allowlist.
+
+## Always-on PR gate shape (2026-10-23)
+
+Four workflows run on every pull request and merge group so that a required
+check can never stay pending behind a path filter: `codeql.yml`, `rust-lint.yml`,
+`rust-all-targets.yml` and `ecbench.yml` (`validation-gate.yml` and
+`large-files.yml` are the two other unfiltered PR workflows and are unchanged).
+Each starts with its own `scope` job (a sparse, blobless checkout and
+`ci-scope.mjs`, five-minute budget) and every later job decides from the scope
+outputs whether it has work.
+
+**Skipped jobs cost no runner; empty matrix shells did.** A job-level `if` cannot
+read the `matrix` context, so a matrix job that must stay named
+`Analyze (${{ matrix.language }})` had to start a runner for every row, run a
+fail-closed step and skip the rest. CodeQL's eight `analyze` rows and the two
+`clippy` rows were such shells. They are now literal-named jobs with a
+job-level condition of the same form `fmt`, `check` and `harness` already use:
+`always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.<scope> != 'false')`.
+A failed scope job therefore runs the job, and its first step ("Require
+successful scope classification") fails it; classification never silently
+skips validation.
+
+| Check name | Job id | Runs when |
+| --- | --- | --- |
+| `Analyze (actions)` | `analyze-actions` | `actions` scope |
+| `Analyze (c-cpp)` | `analyze-c-cpp` | `c_cpp` scope |
+| `Analyze (javascript-typescript)` | `analyze-javascript-typescript` | `javascript` scope |
+| `Analyze (python)` | `analyze-python` | `python` scope |
+| `Analyze (rust)` | `analyze` (budget exception key) | `rust` scope; needs the database and warm-cache jobs |
+| `Build database (rust)`, `Warm cache (rust)` | unchanged | `rust` scope on PR and merge group |
+| `rustfmt (changed files)` | `fmt` | `rust_fmt` scope, PR only |
+| `clippy (crypto)` | `clippy-crypto` | `rust_root` scope |
+| `clippy (cd_attack)` | `clippy-cd-attack` | `rust_cd` scope |
+| `check` | `check` | `rust_root` scope |
+| `harness`, `evidence_audit_pr` | unchanged | `ecbench_replay` scope |
+
+Every check name is exactly the one the workflow reported before. The only job
+ids that changed are those of the former matrix rows; the one that carries a
+budget exception (`analyze` in `codeql.yml`) keeps its id. The non-Rust CodeQL
+languages now wait only for `scope`; they used to wait for the Rust database
+and warm-cache jobs as well. Their PR budget is 25 minutes (60 on push and
+schedule, as before), where they previously inherited the Rust job's 60.
+
+**One Rust analysis, not four.** The `rust`, `rust-boolean`, `rust-research` and
+`rust-aux` rows all checked out the complete Rust source, ran the same analysis
+and, on PRs and merge groups, uploaded the same `/language:rust` category; their
+`rust_paths` lists were read only by the non-Rust checkout. They are now one
+job. Pushes to main and scheduled scans upload `/language:rust` instead of four
+per-row categories. This changes which code-scanning category holds main's
+Rust alerts; see "Not verified" below.
+
+**Baseline job counts.** Runner jobs started per event, derived from the job
+conditions (not measured from runs):
+
+| Change | Before | After |
+| --- | --- | --- |
+| README or prose only | 14 | 4 |
+| Edit under `src/*.rs` | 20 | 12 |
+
+README-only, before: four scope jobs, eight empty `analyze` shells and two empty
+`clippy` shells; after: the four scope jobs. Rust edit, before: four scope jobs,
+Build, Warm, eight `analyze` rows (four empty non-Rust shells and four identical
+Rust analyses), `fmt`, `clippy (crypto)` plus an empty `clippy (cd_attack)`
+shell, `check`, `harness` and `evidence_audit_pr`; after: four scope jobs,
+Build, Warm, `Analyze (rust)`, `fmt`, `clippy (crypto)`, `check`, `harness` and
+`evidence_audit_pr`. Label events start no runner job in these four workflows.
+Run times and queue waits were not re-measured; the 2026-10-11 queue
+observations above are the only timing data.
+
+**Why there is still one scope job per workflow.** Sharing a single scope job
+across the four workflows was evaluated and not done:
+
+- `needs:` only spans one workflow. Calling a reusable scope workflow from each
+  of them still runs one scope job per workflow, and renames that job's check
+  to `scope / scope`; a reusable workflow carries no `timeout-minutes`, which
+  `check-pr-budgets.py` rejects. Putting the heavy jobs in reusable workflows
+  would rename every context to `caller / callee`.
+- `workflow_run` attaches checks to the default branch's commit, not the PR
+  head.
+- A single PR/merge-group gate workflow holding all four sets of jobs would
+  save three scope jobs per event, but moves the CodeQL analysis key
+  (`codeql.yml:analyze`), the `(path, job id)` budget exceptions, the
+  filename-keyed ARC routing variables (`CRYPTO_EKS_WORKFLOWS`, set outside the
+  repository), `ci-scope.mjs` filename rules and the 340-line ecbench harness,
+  whose steps interleave PR and weekly behavior. None of that can be checked
+  without repository settings and run history, so it is left as a follow-up.
+
+The PR comparisons in the scope jobs of `codeql.yml`, `rust-all-targets.yml` and
+`ecbench.yml` now use the merge commit's first parent, as `rust-lint.yml`
+already did (see the scope contract).
+
+**CodeQL stays on pull requests.** The classifier already limits each language
+to its own files, so a README-only PR runs no analysis step and, now, no
+analysis job. Moving CodeQL to merge groups, pushes and the weekly schedule
+would remove PR annotations and gates the PR on a merge queue whose existence
+and rulesets cannot be read from the repository (the `merge_group` trigger is
+present, but whether a queue is enabled is a repository setting). A
+workflow-level `paths:` filter is not used: it leaves a required check pending
+on an irrelevant path. Neither the tests nor this document forbid the change;
+it is left for the owner once the queue and ruleset state are confirmed.
+
+**Cargo cache policy.** `Swatinem/rust-cache` steps in the four workflows set
+`save-if: ${{ github.ref == 'refs/heads/main' }}`: pull requests and merge
+groups restore, and only runs on main save. Caches are scoped to the ref that
+saved them (a PR's merge ref, a merge-queue ref), so a cache saved there cannot
+be restored by other PRs or by main; saving it only consumes the repository's
+cache quota and evicts caches others can read. `rust-all-targets.yml` had no
+main-side event, so it gains a daily scheduled run (selects every check) to seed
+the cache; `rust-lint.yml` seeds on push to main and `ecbench.yml` on its weekly
+schedule. The clippy cache keys start cold once because the job ids changed,
+and `rust-all-targets` PRs are cold until the first scheduled run (or a manual
+dispatch on main) has saved a cache.
+
+**`ecc2k130-m10-capacity-once.yml` is kept.** It is label-gated and branch-gated,
+so every job is skipped and no runner starts on other PRs' label events (one
+empty run per label event). It is not unreferenced: the frozen study under
+`research/notes/ecc2k130/m10_export_capacity_20260925/` names its path
+(`FROZEN.json`, `ci_replay.py`, `dispatch_gate.py`), and
+`disable-retired-workflows.yml`, `docs/ci-runner-pool-plan.md` and the ARC
+first-wave list name it as well. Deleting it is a decision about that study, not
+a CI trim.
+
+**Not verified offline.** This shape was checked with the local tools below, not
+against GitHub: that a skipped literal-named job reports as a passing check
+under the same name; branch protection, rulesets and merge-queue state; the
+effect on code-scanning alert history of the moved analysis keys
+(`codeql.yml:analyze-*`) and of main's Rust alerts moving to `/language:rust`;
+the values of `CRYPTO_EKS_WORKFLOWS` and `CRYPTO_EKS_HIGHMEM_WORKFLOWS`; cache
+sizes and hit rates; and real queue and run times.
 
 ## Budgets and evidence coverage
 
@@ -104,7 +243,9 @@ The event-aware [budget checker](scripts/check-pr-budgets.py) rejects missing,
 unknown or over-budget timeouts on PR/merge-group jobs, accounting for job
 conditions and dependencies. Its fixtures preserve the separate rules for labeled, manual and disabled work.
 
-The only exceptions are the `proofs` job in `weak-curve-lean.yml` and the
+Besides the jobs named in `NAMED_BUDGET_EXCEPTIONS` in the checker (each exact on
+workflow path, job id and timeout, with its reason), the only exceptions are the
+`proofs` job in `weak-curve-lean.yml` and the
 `evidence` job in `weak-curve-conjectures.yml`, each with a 60-minute timeout
 included in its Lean proof evidence seal. These frozen jobs perform a cold
 dependency build and fresh kernel replay; their hosted cold runtimes have not
@@ -119,11 +260,13 @@ workloads.
 | --- | --- |
 | Scope / syntax / changed-file format | Five minutes |
 | Each clippy crate | 15 minutes |
-| Root all-target compile / CodeQL language | 25 minutes |
-| Rust CodeQL: database build, cache warming | 25 minutes each |
+| Root all-target compile | 25 minutes |
+| CodeQL actions, c-cpp, javascript-typescript, python (PR/merge group) | 25 minutes (60 on push/schedule) |
+| Rust CodeQL database build | 25 minutes |
+| Rust CodeQL cache warming (`warm-rust-cache`, named exception) | 45 minutes |
 | Rust CodeQL queries (`analyze`, named exception) | 60 minutes |
 | Each PR or merge-group packaging component | 25 minutes |
-| ecbench PR harness | 25 minutes, including a 12-minute historical integrity step |
+| ecbench PR harness (`harness`, named exception) | 45 minutes; the `evidence_audit_pr` job is 25, with a 12-minute integrity step |
 | ecbench weekly/manual exhaustive audit | Existing 300-minute scientific budget |
 
 The PR Rust CodeQL lane runs in three jobs that hand one database forward:

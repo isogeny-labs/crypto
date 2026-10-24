@@ -152,26 +152,20 @@ jobs:
           fi
           exit $bad
 
-  clippy:
-    if: always() && !cancelled()
+  # Two literal-named jobs instead of a `clippy (${{ matrix.crate }})` matrix:
+  # a job-level `if` cannot read `matrix`, so the matrix job started a runner
+  # for each crate even when its scope output was false. The check names
+  # `clippy (crypto)` and `clippy (cd_attack)` are unchanged. A failed scope job
+  # still fails closed through the first step of each job.
+  clippy-crypto:
+    if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.rust_root != 'false')
     needs: scope
-    name: clippy (${{ matrix.crate }})
+    name: clippy (crypto)
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        crate: [crypto, cd_attack]
-        include:
-          - crate: crypto
-            dir: .
-            scope: rust_root
-          - crate: cd_attack
-            dir: cd_attack
-            scope: rust_cd
     defaults:
       run:
-        working-directory: ${{ matrix.dir }}
+        working-directory: .
     steps:
       - name: Require successful scope classification
         if: needs.scope.result != 'success'
@@ -179,8 +173,7 @@ jobs:
           echo '::error::CI scope or release metadata failed; refusing to skip validation.'
           exit 1
         working-directory: ${{ github.workspace }}
-      - if: needs.scope.outputs[matrix.scope] != 'false'
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           filter: blob:none
           sparse-checkout-cone-mode: false
@@ -204,23 +197,70 @@ jobs:
             /cd_attack/
             /scripts/clippy-maintained.sh
       - name: Materialize compile-time inputs without research archives
-        if: needs.scope.outputs[matrix.scope] != 'false'
         run: node .github/scripts/ci-scope.mjs --materialize
         working-directory: ${{ github.workspace }}
-      - if: needs.scope.outputs[matrix.scope] != 'false'
-        uses: dtolnay/rust-toolchain@master
+      - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
           components: clippy
-      - if: needs.scope.outputs[matrix.scope] != 'false'
-        uses: Swatinem/rust-cache@v2
+      # Pull requests restore the cache main saved; only main saves it.
+      - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: ${{ matrix.dir }}
+          workspaces: .
+          save-if: ${{ github.ref == 'refs/heads/main' }}
       - name: Clippy
-        if: needs.scope.outputs[matrix.scope] != 'false'
+        run: bash scripts/clippy-maintained.sh
+
+  clippy-cd-attack:
+    if: always() && !cancelled() && (needs.scope.result != 'success' || needs.scope.outputs.rust_cd != 'false')
+    needs: scope
+    name: clippy (cd_attack)
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|rust-lint.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: cd_attack
+    steps:
+      - name: Require successful scope classification
+        if: needs.scope.result != 'success'
         run: |
-          if [ "${{ matrix.crate }}" = "crypto" ]; then
-            bash scripts/clippy-maintained.sh
-          else
-            cargo clippy --all-targets -- -D warnings
-          fi
+          echo '::error::CI scope or release metadata failed; refusing to skip validation.'
+          exit 1
+        working-directory: ${{ github.workspace }}
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /Cargo.toml
+            /tools/volcano-cli/
+            /isogeny_algos/
+            /Cargo.lock
+            /.cargo/
+            /rust-toolchain*
+            /.github/scripts/
+            /build.rs
+            /rustfmt.toml
+            /clippy.toml
+            /src/
+            /tests/
+            /examples/
+            /benches/
+            /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
+            /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /cd_attack/
+            /scripts/clippy-maintained.sh
+      - name: Materialize compile-time inputs without research archives
+        run: node .github/scripts/ci-scope.mjs --materialize
+        working-directory: ${{ github.workspace }}
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          components: clippy
+      # Pull requests restore the cache main saved; only main saves it.
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: cd_attack
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings

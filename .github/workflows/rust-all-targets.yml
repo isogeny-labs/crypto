@@ -8,10 +8,19 @@ name: Rust all targets compile
 # exists to own no measurement at all, only the claim that the workspace
 # compiles, so a field added in src is checked against every caller in the
 # tree. It runs on any Rust change and takes the cargo cache with it.
+#
+# Cache policy: pull requests and merge groups only restore the cargo cache;
+# only a run on main saves it (`save-if` below), and the daily schedule is the
+# only main-side event, so the cache has a seed that every PR can read. A
+# PR-scoped cache is invisible to other PRs and to main, so saving one per PR
+# only evicts caches that other workflows can use. The scheduled run selects
+# every check in ci-scope.mjs and is not a PR event.
 on:
   workflow_dispatch:
   pull_request:
   merge_group:
+  schedule:
+    - cron: "17 4 * * *"
 # A newer push to the same pull request cancels this workflow's run for the older commit.
 # Every other event (push, schedule, dispatch) gets a group of its own and is never cancelled.
 concurrency:
@@ -40,6 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 2
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
@@ -58,7 +68,19 @@ jobs:
         env:
           CI_EVENT: ${{ github.event_name }}
           CI_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
-        run: node .github/scripts/ci-scope.mjs
+          CI_PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Compare against the merge commit's first parent, not the event's
+          # base SHA: when main has moved since the event, the base SHA makes
+          # unrelated merged files look like this PR's changes and selects
+          # checks the PR does not need. Fails closed if the checkout is not
+          # the merge of the event's head.
+          if [ "$CI_EVENT" = pull_request ]; then
+            test "$(git rev-parse HEAD^2)" = "$CI_PR_HEAD"
+            CI_BASE="$(git rev-parse HEAD^1)"
+            export CI_BASE
+          fi
+          node .github/scripts/ci-scope.mjs
 
   check:
     needs: scope
@@ -99,6 +121,8 @@ jobs:
         run: node .github/scripts/ci-scope.mjs --materialize
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
       # Warnings stay out of the gate: this job answers "does it compile",
       # and the examples carry dead code on purpose.
       - run: RUSTFLAGS=-Awarnings cargo check --workspace --all-targets

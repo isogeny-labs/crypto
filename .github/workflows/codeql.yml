@@ -5,9 +5,11 @@
 # or to provide custom queries or build logic.
 #
 # ******** NOTE ********
-# We have attempted to detect the languages in your repository. Please check
-# the `language` matrix defined below to confirm you have the correct set of
-# supported CodeQL languages.
+# The analyzed languages are the literal-named `Analyze (<language>)` jobs
+# below (actions, c-cpp, javascript-typescript, python, rust). CodeQL supports
+# 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript',
+# 'python', 'ruby', 'rust' and 'swift'; add a language by adding a job with the
+# same shape (scope output, fail-closed first step, `languages:` value).
 #
 name: "CodeQL Advanced"
 
@@ -47,6 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 2
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
@@ -65,10 +68,160 @@ jobs:
         env:
           CI_EVENT: ${{ github.event_name }}
           CI_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
-        run: node .github/scripts/ci-scope.mjs
+          CI_PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Compare against the merge commit's first parent, not the event's
+          # base SHA: when main has moved since the event, the base SHA makes
+          # unrelated merged files look like this PR's changes and selects
+          # checks the PR does not need. Fails closed if the checkout is not
+          # the merge of the event's head.
+          if [ "$CI_EVENT" = pull_request ]; then
+            test "$(git rev-parse HEAD^2)" = "$CI_PR_HEAD"
+            CI_BASE="$(git rev-parse HEAD^1)"
+            export CI_BASE
+          fi
+          node .github/scripts/ci-scope.mjs
 
+  # One literal-named job per language instead of a matrix. A job-level `if`
+  # cannot read the `matrix` context, so the former matrix job had to start a
+  # runner for every row (eight per PR, four of them identical Rust analyses)
+  # only to skip every step. Literal jobs keep the check names
+  # `Analyze (<language>)` and let a skipped language cost nothing.
+  #
+  # Each job still fails closed: if `scope` did not succeed the job runs and
+  # its first step fails, instead of silently skipping validation. The four
+  # non-Rust jobs depend only on `scope`, not on the Rust database pipeline.
+  analyze-actions:
+    name: Analyze (actions)
+    if: always() && !cancelled() && github.event_name != 'workflow_dispatch' && (needs.scope.result != 'success' || needs.scope.outputs.actions != 'false')
+    needs: scope
+    # Routine events stay within the 25-minute PR budget; scheduled and
+    # main-branch scans keep the former 60-minute cap.
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 60 }}
+    runs-on: ubuntu-latest
+    permissions:
+      # required for all workflows
+      security-events: write
+      # required to fetch internal or private CodeQL packs
+      packages: read
+      # only required for workflows in private repositories
+      actions: read
+      contents: read
+    steps:
+    - name: Require successful scope classification
+      if: needs.scope.result != 'success'
+      run: |
+        echo '::error::CI scope or release metadata failed; refusing to skip validation.'
+        exit 1
+    - name: Checkout repository
+      uses: actions/checkout@v7
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: actions
+        build-mode: none
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
+      with:
+        category: /language:actions
+
+  analyze-c-cpp:
+    name: Analyze (c-cpp)
+    if: always() && !cancelled() && github.event_name != 'workflow_dispatch' && (needs.scope.result != 'success' || needs.scope.outputs.c_cpp != 'false')
+    needs: scope
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 60 }}
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+    steps:
+    - name: Require successful scope classification
+      if: needs.scope.result != 'success'
+      run: |
+        echo '::error::CI scope or release metadata failed; refusing to skip validation.'
+        exit 1
+    - name: Checkout repository
+      uses: actions/checkout@v7
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: c-cpp
+        build-mode: none
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
+      with:
+        category: /language:c-cpp
+
+  analyze-javascript-typescript:
+    name: Analyze (javascript-typescript)
+    if: always() && !cancelled() && github.event_name != 'workflow_dispatch' && (needs.scope.result != 'success' || needs.scope.outputs.javascript != 'false')
+    needs: scope
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 60 }}
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+    steps:
+    - name: Require successful scope classification
+      if: needs.scope.result != 'success'
+      run: |
+        echo '::error::CI scope or release metadata failed; refusing to skip validation.'
+        exit 1
+    - name: Checkout repository
+      uses: actions/checkout@v7
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: javascript-typescript
+        build-mode: none
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
+      with:
+        category: /language:javascript-typescript
+
+  analyze-python:
+    name: Analyze (python)
+    if: always() && !cancelled() && github.event_name != 'workflow_dispatch' && (needs.scope.result != 'success' || needs.scope.outputs.python != 'false')
+    needs: scope
+    timeout-minutes: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 25 || 60 }}
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+    steps:
+    - name: Require successful scope classification
+      if: needs.scope.result != 'success'
+      run: |
+        echo '::error::CI scope or release metadata failed; refusing to skip validation.'
+        exit 1
+    - name: Checkout repository
+      uses: actions/checkout@v7
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: python
+        build-mode: none
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
+      with:
+        category: /language:python
+
+  # Rust keeps the job id `analyze`: check-pr-budgets.py names (codeql.yml,
+  # analyze) as its one 60-minute exception. This is one job, not four: the
+  # former rust, rust-boolean, rust-research and rust-aux matrix rows all
+  # checked out the same complete Rust source, ran the same analysis and, on
+  # PRs and merge groups, uploaded the same `/language:rust` category (their
+  # `rust_paths` partition was only read by the non-Rust checkout step). Pushes
+  # and scheduled scans now upload the same `/language:rust` category too,
+  # instead of four per-row categories holding duplicate alerts.
   analyze:
-    if: always() && !cancelled() && github.event_name != 'workflow_dispatch'
+    if: always() && !cancelled() && github.event_name != 'workflow_dispatch' && (needs.scope.result != 'success' || needs.scope.outputs.rust != 'false')
     needs: [scope, build-rust-database, warm-rust-cache]
     # Routine Rust scans consume the database finalized by the first job and
     # the evaluation cache the second job warmed; queries retain this existing
@@ -78,100 +231,15 @@ jobs:
     # gets 60 minutes; check-pr-budgets.py names this job as its one exception.
     # The warmed cache leaves this job far below that cap on PRs.
     timeout-minutes: 60
-    name: Analyze (${{ matrix.language }})
-    # Runner size impacts CodeQL analysis time. To learn more, please see:
-    #   - https://gh.io/recommended-hardware-resources-for-running-codeql
-    #   - https://gh.io/supported-runners-and-hardware-resources
-    #   - https://gh.io/using-larger-runners (GitHub.com only)
-    # Consider using larger runners or machines with greater resources for possible analysis time improvements.
+    name: Analyze (rust)
     # Rust uses the standard public-repository ARM runner with the same four
     # CPUs and 16 GiB envelope; CodeQL provides a Linux arm64 bundle.
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || (matrix.language == 'rust' && 'ubuntu-24.04-arm') || 'ubuntu-latest' }}
+    runs-on: ubuntu-24.04-arm
     permissions:
-      # required for all workflows
       security-events: write
-
-      # required to fetch internal or private CodeQL packs
       packages: read
-
-      # only required for workflows in private repositories
       actions: read
       contents: read
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-        - language: actions
-          scope: actions
-          build-mode: none
-        - language: c-cpp
-          scope: c_cpp
-          build-mode: none
-        - language: javascript-typescript
-          scope: javascript
-          build-mode: none
-        - language: python
-          scope: python
-          build-mode: none
-        - language: rust
-          scope: rust
-          build-mode: none
-          check_name: rust
-          category: /language:rust-core
-          rust_paths: |
-            /Cargo.toml
-            /Cargo.lock
-            /build.rs
-            /src/
-            /tests/
-            /benches/
-        - language: rust
-          scope: rust
-          build-mode: none
-          check_name: rust-boolean
-          category: /language:rust-boolean
-          rust_paths: |
-            /Cargo.toml
-            /Cargo.lock
-            /research/boolean_*/
-        - language: rust
-          scope: rust
-          build-mode: none
-          check_name: rust-research
-          category: /language:rust-research
-          rust_paths: |
-            /Cargo.toml
-            /Cargo.lock
-            /research/
-            !/research/boolean_*/
-            /examples/
-            /experiments/
-            /docs/
-        - language: rust
-          scope: rust
-          build-mode: none
-          check_name: rust-aux
-          category: /language:rust-aux
-          rust_paths: |
-            /Cargo.toml
-            /Cargo.lock
-            /isogeny_algos/
-            /tools/
-            /eigen_seta/
-            /cd_attack/
-            /ecc2k130/
-            /spotlab/
-            /gpu/
-            /quantum_circuit_secp256k1/
-        # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'rust', 'swift'
-        # Use `c-cpp` to analyze code written in C, C++ or both
-        # Use 'java-kotlin' to analyze code written in Java, Kotlin or both
-        # Use 'javascript-typescript' to analyze code written in JavaScript, TypeScript or both
-        # To learn more about changing the languages that are analyzed or customizing the build mode for your analysis,
-        # see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/customizing-your-advanced-setup-for-code-scanning.
-        # If you are analyzing a compiled language, you can modify the 'build-mode' for that language to customize how
-        # your codebase is analyzed, see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/codeql-code-scanning-for-compiled-languages
     steps:
     - name: Require successful scope classification
       if: needs.scope.result != 'success'
@@ -179,22 +247,15 @@ jobs:
         echo '::error::CI scope or release metadata failed; refusing to skip validation.'
         exit 1
     - name: Require the complete Rust database handoff
-      if: needs.scope.outputs[matrix.scope] != 'false' && matrix.language == 'rust' && (github.event_name == 'pull_request' || github.event_name == 'merge_group') && (needs.build-rust-database.result != 'success' || needs.warm-rust-cache.result != 'success')
+      if: (github.event_name == 'pull_request' || github.event_name == 'merge_group') && (needs.build-rust-database.result != 'success' || needs.warm-rust-cache.result != 'success')
       run: |
         echo '::error::Complete Rust database creation or cache warming failed; refusing incomplete analysis.'
         exit 1
-    - name: Checkout repository
-      if: needs.scope.outputs[matrix.scope] != 'false' && matrix.language != 'rust'
-      uses: actions/checkout@v7
-      with:
-        sparse-checkout: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && matrix.rust_paths || '' }}
-        sparse-checkout-cone-mode: false
 
     # The repository contains many research receipts that CodeQL does not
     # parse as Rust. Keep every tracked Rust source and Cargo manifest while
     # avoiding those unrelated blobs in the time-limited PR scan.
     - name: Checkout complete Rust source
-      if: needs.scope.outputs[matrix.scope] != 'false' && matrix.language == 'rust'
       uses: actions/checkout@v7
       with:
         filter: blob:none
@@ -212,7 +273,6 @@ jobs:
           /.cargo/**
 
     - name: Prove complete Rust source coverage
-      if: needs.scope.outputs[matrix.scope] != 'false' && matrix.language == 'rust'
       shell: bash
       run: |
         python3 - <<'PY'
@@ -236,64 +296,34 @@ jobs:
               "tracked Rust sources and Cargo manifests")
         PY
 
-    # Add any setup steps before running the `github/codeql-action/init` action.
-    # This includes steps like installing compilers or runtimes (`actions/setup-node`
-    # or others). This is typically only required for manual builds.
-    # - name: Setup runtime (example)
-    #   uses: actions/setup-example@v1
-
-    # Initializes the CodeQL tools for scanning.
+    # Push and scheduled scans build, finalize and query in this one job.
     - name: Initialize CodeQL
-      id: init
-      if: needs.scope.outputs[matrix.scope] != 'false' && !(matrix.language == 'rust' && (github.event_name == 'pull_request' || github.event_name == 'merge_group'))
+      if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
       uses: github/codeql-action/init@v4
       with:
-        languages: ${{ matrix.language }}
-        build-mode: ${{ matrix.build-mode }}
-        # If you wish to specify custom queries, you can do so here or in a config file.
-        # By default, queries listed here will override any specified in a config file.
-        # Prefix the list here with "+" to use these queries and those in the config file.
-
-        # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
-        # queries: security-extended,security-and-quality
-
-    # If the analyze step fails for one of the languages you are analyzing with
-    # "We were unable to automatically build your code", modify the matrix above
-    # to set the build mode to "manual" for that language. Then modify this step
-    # to build your code.
-    # ℹ️ Command-line programs to run using the OS shell.
-    # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-    - name: Run manual build steps
-      if: needs.scope.outputs[matrix.scope] != 'false' && matrix.build-mode == 'manual' && (matrix.language != 'rust' || matrix.check_name == 'rust' || github.event_name == 'pull_request' || github.event_name == 'merge_group')
-      shell: bash
-      run: |
-        echo 'If you are using a "manual" build mode for one or more of the' \
-          'languages you are analyzing, replace this with the commands to build' \
-          'your code, for example:'
-        echo '  make bootstrap'
-        echo '  make release'
-        exit 1
-
+        languages: rust
+        build-mode: none
     - name: Perform CodeQL Analysis
-      if: needs.scope.outputs[matrix.scope] != 'false' && !(matrix.language == 'rust' && (github.event_name == 'pull_request' || github.event_name == 'merge_group'))
+      if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
       uses: github/codeql-action/analyze@v4
       with:
-        category: ${{ matrix.category || format('/language:{0}', matrix.language) }}
+        category: /language:rust
 
+    # PRs and merge groups query the database the two upstream jobs built.
     - name: Set up CodeQL for the finalized Rust database
       id: rust-tools
-      if: needs.scope.outputs[matrix.scope] != 'false' && matrix.language == 'rust' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
+      if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
       uses: github/codeql-action/setup-codeql@v4
       with:
         languages: rust
     - name: Download this workflow attempt's warmed database
-      if: needs.scope.outputs[matrix.scope] != 'false' && matrix.language == 'rust' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
+      if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
       uses: actions/download-artifact@v4
       with:
         name: rust-codeql-warm-db-${{ github.run_id }}-${{ github.run_attempt }}
         path: ${{ runner.temp }}/rust-codeql-handoff/
     - name: Verify handoff and run its complete query configuration
-      if: needs.scope.outputs[matrix.scope] != 'false' && matrix.language == 'rust' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
+      if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
       shell: bash
       env:
         CODEQL_CLI: ${{ steps.rust-tools.outputs.codeql-path }}
@@ -314,7 +344,7 @@ jobs:
           --sarif-category=/language:rust --threads=4 --ram=14000 \
           --expect-discarded-cache --min-disk-free=1024
     - name: Upload complete Rust analysis
-      if: needs.scope.outputs[matrix.scope] != 'false' && matrix.language == 'rust' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
+      if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
       uses: github/codeql-action/upload-sarif@v4
       with:
         sarif_file: ${{ runner.temp }}/rust.sarif
