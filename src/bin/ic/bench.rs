@@ -30,9 +30,9 @@ use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
 use crypto_lib::cryptanalysis::ic_framework::planner::{self, CurveProfile, PlanOptions};
 use crypto_lib::cryptanalysis::ic_framework::plugins::{
     BinarySubspaceBase, CompactOrbitScanBase, DescentAlgebraicOracle, FrobeniusMitmOracle,
-    CmMultiplierBase, GlvOrbitBase, KoblitzClosureBase, KoblitzOrbitBase, KoblitzSymmetrisedBase,
-    KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase, PrimeBatchMitmOracle,
-    RootfindSubtractOracle, SubtractOracle, SymmetrisedOracle,
+    BinaryMultiplierBase, CmMultiplierBase, GlvOrbitBase, KoblitzClosureBase, KoblitzOrbitBase,
+    KoblitzSymmetrisedBase, KoblitzTraceZeroBase, MitmOracle, PrimeAbscissaBase,
+    PrimeBatchMitmOracle, RootfindSubtractOracle, SubtractOracle, SymmetrisedOracle,
 };
 use crypto_lib::cryptanalysis::ic_framework::solvers::{
     solver_by_name, solver_registry, validate_solver_params,
@@ -253,6 +253,10 @@ fn listing() -> Value {
                     {"name": "gls-line", "regimes": ["gls (examples/glv_invariant_bench.rs)"],
                      "parameters": [
                         {"name": "no_fold", "means": "1 to fold the same points by negation only"}]},
+                    {"name": "binary-multiplier", "regimes": ["char2", "koblitz"],
+                     "parameters": [
+                        {"name": "size", "means": "seed abscissae (columns)"},
+                        {"name": "mult", "means": "include [m]P for m = 2..=mult with weight m; 1 for the seeds alone"}]},
                     {"name": "binary-subspace", "regimes": ["char2", "koblitz"],
                      "parameters": [{"name": "dimension", "means": "F_2-dimension of the abscissa subspace"}]},
                     {"name": "koblitz-orbit", "regimes": ["koblitz"],
@@ -623,7 +627,9 @@ fn run_binary(
     let symmetrised_base = KoblitzSymmetrisedBase { instance: inst };
     let compact_orbit = CompactOrbitScanBase { instance: inst };
     let closure = KoblitzClosureBase { instance: inst };
+    let multiplier = BinaryMultiplierBase { instance: inst };
     let base: &dyn FactorBaseBuilder<BinaryGroup> = match fb_name {
+        "binary-multiplier" => &multiplier,
         "koblitz-closure" => &closure,
         "binary-subspace" => &subspace,
         "koblitz-orbit" => &orbit,
