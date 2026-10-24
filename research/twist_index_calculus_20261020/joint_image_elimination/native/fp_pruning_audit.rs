@@ -22,6 +22,22 @@ pub(super) fn audit(
     std::fs::create_dir_all(out).unwrap();
     let raw = checked_public(public, public_sha);
     let case = Case::new(raw, out);
+    // In this concrete Fp basis, 1,B,B²,B³ have nonzero coefficients on
+    // four different coordinate axes. This directly checks the field-basis
+    // assumption used by the readable coefficient-independence argument.
+    let mut basis_axes = BTreeSet::new();
+    let b_powers: Vec<_> = (0..4).map(|i| case.c.f.pow(case.c.b, i)).collect();
+    for power in &b_powers {
+        let axes: Vec<_> = power
+            .iter()
+            .enumerate()
+            .filter(|(_, v)| **v != 0)
+            .map(|(i, _)| i)
+            .collect();
+        assert_eq!(axes.len(), 1);
+        basis_axes.insert(axes[0]);
+    }
+    assert_eq!(basis_axes.len(), 4);
     let (workload_bytes, workload) = read(workload);
     assert_eq!(workload["schema"], "joint-image-workload/v1");
     let tasks = workload["tasks"].as_array().unwrap();
@@ -37,6 +53,10 @@ pub(super) fn audit(
             .map(|t| t["reference_sha256"].as_str().unwrap())
             .collect();
         assert_eq!(expected.len(), 1);
+        assert!(tasks
+            .iter()
+            .filter(|t| t["p"] == case.p && t["seed"] == case.seed)
+            .all(|t| t["public_sha256"] == public_sha));
         let reference_sha = hex::encode(hash::sha256::sha256(&bytes));
         assert!(
             expected.contains(reference_sha.as_str()),
@@ -107,7 +127,15 @@ pub(super) fn audit(
                     .filter(|t| allowed.contains(&t.0))
                     .copied()
                     .collect();
-                assert!(!presentations.is_empty());
+                assert_eq!(presentations.len(), if arm == 8 { 4 } else { 1 });
+                assert_eq!(
+                    terms
+                        .iter()
+                        .map(|&(id, _)| case.pool[id].p.x)
+                        .collect::<BTreeSet<_>>()
+                        .len(),
+                    4
+                );
                 for &(id, sign) in &presentations {
                     if pruned.contains(&(id, sign)) {
                         false_rejections.push(json!({"query_index":qi,"peel_id":id,"sign":sign,"physical_relation":terms}));
@@ -187,10 +215,105 @@ pub(super) fn audit(
         &json!({"schema":"joint-image-fp-pruning-audit/v1","p":case.p,"seed":case.seed,
         "public_input_sha256":public_sha,"workload_sha256":hex::encode(hash::sha256::sha256(&workload_bytes)),
         "status":if all_pass {"hypothesis-audit-pass"}else{"partial"},"arms":arms,
+        "concrete_B_power_basis":b_powers,"concrete_B_power_basis_independent":true,
         "predicate":"finite peeled S4 residual whose abscissa has only Fp component; infinity is retained",
         "scope":"Counterfactual audit against retained, independently verified group-oracle sets. No BSGS or polynomial collector is repeated, no prefilter deployed, no elapsed speedup or complete price claimed. Square ideal certificate and structural proof are separate prerequisites."}),
     );
     all_pass
+}
+
+/// Recompute the summary in native Rust from every per-case audit receipt.
+/// Values are sums of case-local counts, never pooled ranks or timing claims.
+pub(super) fn summarize(run: &Path, out: &Path) -> bool {
+    assert!(!out.exists());
+    let mut records = Vec::new();
+    let mut missing = Vec::new();
+    for p in PRIMES {
+        for seed in 0..3 {
+            let id = format!("p{p}-seed{seed}");
+            let path = run.join("cases").join(&id).join("summary.json");
+            if !path.is_file() {
+                missing.push(id);
+                continue;
+            }
+            let (bytes, record) = read(&path);
+            assert_eq!(record["schema"], "joint-image-fp-pruning-audit/v1");
+            assert_eq!(record["p"], p);
+            assert_eq!(record["seed"], seed);
+            records.push(
+                json!({"id":id,"sha256":hex::encode(hash::sha256::sha256(&bytes)),"record":record}),
+            );
+        }
+    }
+    let totals: Vec<_> = [7usize, 9, 8]
+        .iter()
+        .map(|&arm| {
+            let mut sums = BTreeMap::<&str, u64>::new();
+            let mut through = BTreeMap::<&str, u64>::new();
+            let mut false_rejections = 0usize;
+            let mut passing_cases = 0usize;
+            let mut ranks = Vec::new();
+            for case in &records {
+                let a = case["record"]["arms"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .find(|a| a["arm"] == ARMS[arm])
+                    .unwrap();
+                if a["status"] == "hypothesis-audit-pass" {
+                    passing_cases += 1;
+                }
+                false_rejections += a["false_rejected_presentations"].as_array().unwrap().len();
+                for key in [
+                    "queries",
+                    "tested_signed_peels",
+                    "finite_signed_peels",
+                    "infinite_peels_retained",
+                    "proposed_finite_rejections",
+                    "projected_remaining_finite_peels",
+                    "original_distinct_physical_tuples",
+                    "retained_distinct_physical_tuples",
+                    "original_projective_rows",
+                    "retained_projective_rows",
+                ] {
+                    *sums.entry(key).or_default() += a[key].as_u64().unwrap();
+                }
+                let prefix = &a["through_original_full_rank"];
+                if !prefix.is_null() {
+                    for key in [
+                        "queries_consumed",
+                        "tested_signed_peels",
+                        "finite_signed_peels",
+                        "infinite_peels_retained",
+                        "proposed_finite_rejections",
+                        "projected_remaining_finite_peels",
+                    ] {
+                        *through.entry(key).or_default() += prefix[key].as_u64().unwrap();
+                    }
+                }
+                ranks.push(json!({"case":case["id"],"original_rank":a["original_rank"],
+                "retained_rank":a["retained_rank"],"columns":a["columns"],
+                "original_first_full_rank_query":a["original_first_full_rank_query"],
+                "retained_first_full_rank_query":a["retained_first_full_rank_query"]}));
+            }
+            json!({"arm":ARMS[arm],"passing_cases":passing_cases,
+            "false_rejected_presentations":false_rejections,"case_local_count_sums":sums,
+            "through_original_full_rank_sums":through,"per_case_rank":ranks})
+        })
+        .collect();
+    let pass = missing.is_empty()
+        && records.len() == 21
+        && totals
+            .iter()
+            .all(|t| t["passing_cases"] == 21 && t["false_rejected_presentations"] == 0);
+    write(
+        out,
+        &json!({"schema":"joint-image-fp-pruning-audit-summary/v1",
+        "status":if pass {"hypothesis-audit-pass"}else{"partial"},"completed_cases":records.len(),
+        "missing_cases":missing,"arms":totals,"records":records,
+        "scope":"Counterfactual rejection counts and exact saved physical-set/RREF preservation. No candidate run or timing; hypothetical finite-system savings do not establish complete-cost savings."}),
+    );
+    pass
 }
 
 #[cfg(test)]
