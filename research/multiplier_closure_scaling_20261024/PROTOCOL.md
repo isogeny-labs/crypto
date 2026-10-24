@@ -70,3 +70,15 @@ are in `total_gae` as the bench reports them. No wall time is used.
 The 20-minute cap is a **CPU-time** cap (`RLIMIT_CPU` 1200 s per invocation, i.e. `ulimit -t 1200`), not a wall cap,
 because host load is 60-100; a 4 h wall guard exists only to prevent hangs. Build target dir is the shared
 `/Volumes/SSD990-2/cargo-target-ic-followthrough-20261024`. Nothing else changes.
+
+## Amendment 2 (2026-10-24, before any recorded result; compute budget)
+Probing at 28 bit under load 100-150 showed single large-table cells cost 10-50 s wall each and the
+frozen grids would not finish; the 24-bit full-grid probe was abandoned unrecorded (no result from it is used).
+The signed-point cap is lowered to about 8,000 points per configuration (table cost scales with points^2):
+* prime: multiplier cells `256 <= K*N <= 2048`, N in {4,8,16,32,64,128,256}; glv-orbit sizes
+  {50,100,200,400} (24), {100,200,400,800} (28), {200,400,800,1300} (32), {400,800,1000,1300} (36).
+  Sizes: j0 24, 28, 32, 36; j1728 24, 28, 32 (bits 40 dropped: the capped grid cannot reach the incumbent optimum
+  of about 9,000 points there; r spans 2^12 = 12 doublings).
+* binary: multiplier cells `64 <= K*M <= 1024`; plain seeds K in {64,128,256,384,512}; degrees 20, 22, 24, 26
+  (28 only if budget remains, appended as a labelled follow-on).
+Boundary flags (rule 2) apply: a minimum on the cap edge is reported as a bound. Everything else unchanged.

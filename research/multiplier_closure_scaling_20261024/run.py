@@ -4,7 +4,7 @@ Builds one sweep file (all grid cells on one instance), runs `ic bench --sweep`,
 import resource, json, sys, os, subprocess, hashlib, tempfile, math, time
 IC = os.environ.get("IC", "/Volumes/SSD990-2/cargo-target-ic-followthrough-20261024/release/ic")
 ORACLE = "mitm:negation_folded=1,m=3"
-GLV = {24:[50,100,200,400],28:[100,200,400,800],32:[200,400,800,1600],36:[400,800,1600,3200],40:[800,1500,3000,6000]}
+GLV = {24:[50,100,200,400],28:[100,200,400,800],32:[200,400,800,1300],36:[400,800,1000,1300]}
 SUB = {20:range(6,10),22:range(7,11),24:range(8,12),26:range(9,13),28:range(9,13)}
 
 def cells(kind, size):
@@ -12,14 +12,14 @@ def cells(kind, size):
     if kind == "prime":
         inc = [("glv-orbit", f"glv-orbit:size={s}") for s in GLV[size]]
         for K in (4,8,16,32,64,256,512):
-            for N in (8,16,32,64,128,256):
-                if 256 <= K*N <= 8192: mul.append(("cm-multiplier", f"cm-multiplier:size={K},norm={N}"))
+            for N in (4,8,16,32,64,128,256):
+                if 256 <= K*N <= 2048: mul.append(("cm-multiplier", f"cm-multiplier:size={K},norm={N}"))
     else:
         inc = [("binary-subspace", f"binary-subspace:dimension={d}") for d in SUB[size]]
-        inc += [("binary-plain", f"binary-multiplier:size={K},mult=1") for K in (64,128,256,384,512,1024)]
+        inc += [("binary-plain", f"binary-multiplier:size={K},mult=1") for K in (64,128,256,384,512)]
         for K in (2,3,4,8,16,32,256,512):
             for M in (2,4,8,16,32,64):
-                if 64 <= K*M <= 4096: mul.append(("binary-multiplier", f"binary-multiplier:size={K},mult={M}"))
+                if 64 <= K*M <= 1024: mul.append(("binary-multiplier", f"binary-multiplier:size={K},mult={M}"))
     return [("incumbent",)+c for c in inc] + [("multiplier",)+c for c in mul]
 
 def main():
@@ -30,7 +30,7 @@ def main():
     sweep = {"instance": {"regime": "prime" if kind=="prime" else "char2", "degree": size,
                           **({"family": family} if kind=="prime" else {})},
              "repeats": 4, "seed": seed,
-             "configurations": [{"factor_base": c[2], "oracle": ORACLE} for c in cs]}
+             "matrix": {"factor_base": [c[2] for c in cs], "oracle": [ORACLE]}}  # `configurations` + empty matrix yields a spurious empty config (bench.rs expand_matrix), so use the matrix form
     d = tempfile.mkdtemp(); sp = os.path.join(d, "sweep.json"); rp = os.path.join(d, "report.json")
     json.dump(sweep, open(sp, "w"))
     cmd = [IC, "bench", "--sweep", sp, "--json", "--out", rp, "--rho-runs", "4"]
