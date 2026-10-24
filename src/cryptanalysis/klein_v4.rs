@@ -24,10 +24,12 @@ use std::time::Instant;
 use rand::rngs::StdRng;
 use serde::Serialize;
 
-use super::gaudry_cubic::{am, charpoly_mod_p, eigenvectors_mod_p, mm, rref_mod_p, sm, PolyRing};
+use super::gaudry_cubic::{
+    am, charpoly_mod_p, eigenvectors_mod_p, mm, rref_mod_p, sm, PolyRing, UPoly,
+};
 use super::gaudry_quartic::{
-    charpoly_u16, echelon_by_lead, eigenvectors_u16, split_quartic, Curve4, Fp4, NormalForms4, Pt4,
-    QuarticSolve, ReplayOutcome, E4,
+    charpoly_u16, echelon_by_lead, echelon_by_lead_with, eigenvectors_u16, split_quartic, Curve4,
+    Fp4, NormalForms4, Pt4, QuarticSolve, ReplayOutcome, E4,
 };
 use super::quartic_folds::KleinInstance;
 use super::residual_walk::{inv_mod, pow_mod};
@@ -1122,7 +1124,6 @@ pub fn lift_back_v4(
 /// The Macaulay matrix at weighted degree `d`, triangularised and in
 /// forward echelon, built by exactly the operations (and counts) of
 /// `solve_at`'s first half.
-#[allow(dead_code)] // `comps` and `std_index` serve the E31 solver
 struct Built {
     cols: Vec<[u8; 4]>,
     col_index: HashMap<[u8; 4], usize>,
@@ -1139,6 +1140,7 @@ fn build_echelon(
     p: u64,
     st: &mut QuarticSolve,
     row_selection: bool,
+    sparsest: bool,
 ) -> Result<Built, String> {
     assert!(p < 1 << 15, "rows are u16 and products must fit u32");
     let t0 = Instant::now();
@@ -1187,7 +1189,7 @@ fn build_echelon(
     st.build_ms += t0.elapsed().as_secs_f64() * 1e3;
     let t1 = Instant::now();
     let mut ech_muls = 0u64;
-    let ech = echelon_by_lead(rows, p as u32, &mut ech_muls, false);
+    let ech = echelon_by_lead_with(rows, p as u32, &mut ech_muls, false, sparsest);
     st.echelon_muls += ech_muls;
     st.echelon_ms += t1.elapsed().as_secs_f64() * 1e3;
     st.zero_rows = ech.zero_rows;
@@ -1290,7 +1292,7 @@ pub struct ChainStructure {
 /// it charges nothing anywhere).
 pub fn chain_structure(comps: &[HashMap<[u8; 4], u64>], d: u16, p: u64) -> Option<ChainStructure> {
     let mut st = QuarticSolve::default();
-    let b = build_echelon(comps, d, p, &mut st, true).ok()?;
+    let b = build_echelon(comps, d, p, &mut st, true, false).ok()?;
     let ch = p2_chains(&b);
     let ncols = b.cols.len();
     let mut out = ChainStructure {
@@ -1353,6 +1355,594 @@ pub fn chain_structure(comps: &[HashMap<[u8; 4], u64>], d: u16, p: u64) -> Optio
     Some(out)
 }
 
+/// Which solver decomposes a target on the `V₄` line.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+pub enum V4Solver {
+    /// [`solve_weighted_traced`], the E24/E25 solver.
+    #[default]
+    Macaulay,
+    /// E31 A: [`solve_weighted_chain`] with the existing pivot rule.
+    Chain,
+    /// E31 B: [`solve_weighted_chain`] with sparsest pivots.
+    ChainSparsest,
+}
+
+impl V4Solver {
+    pub fn parse(s: &str) -> Option<V4Solver> {
+        match s {
+            "macaulay" | "existing" => Some(V4Solver::Macaulay),
+            "chain" => Some(V4Solver::Chain),
+            "chain-sparsest" => Some(V4Solver::ChainSparsest),
+            _ => None,
+        }
+    }
+    pub fn name(self) -> &'static str {
+        match self {
+            V4Solver::Macaulay => "macaulay",
+            V4Solver::Chain => "chain",
+            V4Solver::ChainSparsest => "chain-sparsest",
+        }
+    }
+}
+
+/// What the chain solve did besides its result.
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct ChainInfo {
+    /// The existing solver was rerun (charged on top of the chain attempt).
+    pub fell_back: bool,
+    pub reason: String,
+    pub chains: usize,
+}
+
+/// One inversion by Fermat, charged as `2⌈log₂ p⌉` multiplications.
+fn inv_charge(p: u64) -> u64 {
+    2 * u64::from(64 - (p - 1).leading_zeros())
+}
+
+/// Determinant of a small square matrix over `F_p` by elimination, every
+/// multiplication and inversion charged.
+fn det_small(mut a: Vec<Vec<u64>>, p: u64, muls: &mut u64) -> u64 {
+    let n = a.len();
+    let ic = inv_charge(p);
+    let mut det = 1u64;
+    for c in 0..n {
+        let Some(r) = (c..n).find(|&r| a[r][c] != 0) else {
+            return 0;
+        };
+        if r != c {
+            a.swap(r, c);
+            det = (p - det) % p;
+        }
+        det = mm(det, a[c][c], p);
+        *muls += 1;
+        if ((c + 1)..n).all(|r| a[r][c] == 0) {
+            continue;
+        }
+        let inv = inv_mod(a[c][c], p);
+        *muls += ic;
+        for r in (c + 1)..n {
+            if a[r][c] == 0 {
+                continue;
+            }
+            let f = mm(a[r][c], inv, p);
+            *muls += 1;
+            for j in (c + 1)..n {
+                if a[c][j] != 0 {
+                    a[r][j] = sm(a[r][j], mm(f, a[c][j], p), p);
+                    *muls += 1;
+                }
+            }
+            a[r][c] = 0;
+        }
+    }
+    det
+}
+
+/// A kernel basis of a small square matrix over `F_p` (reduced row
+/// echelon form; free variable `1`), every multiplication and inversion
+/// charged.
+fn kernel_small(mut a: Vec<Vec<u64>>, p: u64, muls: &mut u64) -> Vec<Vec<u64>> {
+    let n = a.len();
+    let ic = inv_charge(p);
+    let mut pivots: Vec<usize> = Vec::new();
+    let mut row = 0usize;
+    for c in 0..n {
+        let Some(r) = (row..n).find(|&r| a[r][c] != 0) else {
+            continue;
+        };
+        a.swap(r, row);
+        let inv = inv_mod(a[row][c], p);
+        *muls += ic;
+        for j in c..n {
+            if a[row][j] != 0 {
+                a[row][j] = mm(a[row][j], inv, p);
+                *muls += 1;
+            }
+        }
+        let piv = a[row].clone();
+        for (r2, line) in a.iter_mut().enumerate() {
+            if r2 == row || line[c] == 0 {
+                continue;
+            }
+            let f = line[c];
+            for j in c..n {
+                if piv[j] != 0 {
+                    line[j] = sm(line[j], mm(f, piv[j], p), p);
+                    *muls += 1;
+                }
+            }
+        }
+        pivots.push(c);
+        row += 1;
+        if row == n {
+            break;
+        }
+    }
+    let mut is_piv = vec![false; n];
+    for &c in &pivots {
+        is_piv[c] = true;
+    }
+    (0..n)
+        .filter(|&c| !is_piv[c])
+        .map(|fc| {
+            let mut v = vec![0u64; n];
+            v[fc] = 1;
+            for (r, &pc) in pivots.iter().enumerate() {
+                v[pc] = (p - a[r][fc]) % p;
+            }
+            v
+        })
+        .collect()
+}
+
+/// The quotient as the chain solve sees it: the 12-or-so chains, each
+/// border target's normal form, and the relation matrix's coefficients.
+struct ChainQuotient {
+    chains: Chains,
+    /// `(chain, power)` of every standard index.
+    place: Vec<(usize, usize)>,
+    /// Normal form of chain `i`'s border target, over standard indices.
+    nf: Vec<Vec<u64>>,
+    /// `poly[i][j][l]`: coefficient of `P₂^l h_j` in `nf[i]`.
+    poly: Vec<Vec<Vec<u64>>>,
+    reached: usize,
+}
+
+/// The chains and the left-looking normal forms of their border targets.
+/// `Err` reproduces the existing solver's refusals ("1 or an unknown is
+/// not standard", "border unreachable"), decided structurally as it
+/// decides them.
+fn chain_quotient(b: &Built, p: u64, muls: &mut u64) -> Result<ChainQuotient, String> {
+    let ncols = b.cols.len();
+    let dim = b.standard.len();
+    for v in 0..=4usize {
+        let m: [u8; 4] = core::array::from_fn(|k| u8::from(v > 0 && k == v - 1));
+        if !b.is_std[b.col_index[&m]] {
+            return Err("1 or an unknown is not standard".into());
+        }
+    }
+    let chains = p2_chains(b);
+    // The existing solver's reachability test: every column structurally
+    // reachable from a border target is standard or a pivot.
+    let mut seen = vec![false; ncols];
+    let mut stack: Vec<usize> = Vec::new();
+    for t in &chains.target {
+        let t = t.ok_or("border unreachable at this degree")?;
+        if !seen[t] {
+            seen[t] = true;
+            stack.push(t);
+        }
+    }
+    let mut reached = 0usize;
+    while let Some(c) = stack.pop() {
+        let pr = b.ech.pivot_row[c];
+        if pr == u32::MAX {
+            return Err("border unreachable at this degree".into());
+        }
+        reached += 1;
+        let row = &b.ech.rows[pr as usize];
+        for j in (c + 1)..ncols {
+            if row[j] != 0 && !b.is_std[j] && !seen[j] {
+                seen[j] = true;
+                stack.push(j);
+            }
+        }
+    }
+    let mut place = vec![(usize::MAX, 0usize); dim];
+    for (i, &h) in chains.heads.iter().enumerate() {
+        let mut c = h;
+        for l in 0..chains.len[i] {
+            place[b.std_index[c] as usize] = (i, l);
+            if l + 1 < chains.len[i] {
+                let mut m = b.cols[c];
+                m[EIG_VAR] += 1;
+                c = b.col_index[&m];
+            }
+        }
+    }
+    // Left-looking normal forms: one accumulator per target, pivot rows
+    // substituted left to right (one multiplication per nonzero right of
+    // the pivot, the pivot rows being normalised).
+    let pp = p as u32;
+    let mut nf = Vec::with_capacity(chains.heads.len());
+    let mut acc = vec![0u32; ncols];
+    for t in &chains.target {
+        let t = t.expect("checked above");
+        acc.iter_mut().for_each(|x| *x = 0);
+        acc[t] = 1;
+        for c in t..ncols {
+            let f = acc[c];
+            if f == 0 || b.is_std[c] {
+                continue;
+            }
+            acc[c] = 0;
+            let row = &b.ech.rows[b.ech.pivot_row[c] as usize];
+            let nf_ = pp - f;
+            let mut k = 0u64;
+            for j in (c + 1)..ncols {
+                let a = row[j] as u32;
+                if a != 0 {
+                    acc[j] = (acc[j] + nf_ * a) % pp;
+                    k += 1;
+                }
+            }
+            *muls += k;
+        }
+        let v: Vec<u64> = b.standard.iter().map(|&s| u64::from(acc[s])).collect();
+        nf.push(v);
+    }
+    let m = chains.heads.len();
+    let mut poly = vec![vec![Vec::new(); m]; m];
+    for i in 0..m {
+        for j in 0..m {
+            poly[i][j] = vec![0u64; chains.len[j]];
+        }
+        for (s, &c) in nf[i].iter().enumerate() {
+            let (j, l) = place[s];
+            poly[i][j][l] = c;
+        }
+    }
+    Ok(ChainQuotient {
+        chains,
+        place,
+        nf,
+        poly,
+        reached,
+    })
+}
+
+/// `R(x)` at `x`: `x^{k_i}δ_ij − Σ_l poly[i][j][l]·x^l`, Horner from the
+/// highest nonzero coefficient, every multiplication charged.
+fn relation_at(q: &ChainQuotient, x: u64, p: u64, muls: &mut u64) -> Vec<Vec<u64>> {
+    let m = q.chains.heads.len();
+    let kmax = q.chains.len.iter().copied().max().unwrap_or(0);
+    let mut pw = vec![1u64; kmax + 1];
+    for e in 1..=kmax {
+        pw[e] = mm(pw[e - 1], x, p);
+        *muls += 1;
+    }
+    let mut r = vec![vec![0u64; m]; m];
+    for i in 0..m {
+        for j in 0..m {
+            let c = &q.poly[i][j];
+            let mut v = 0u64;
+            if let Some(top) = c.iter().rposition(|&a| a != 0) {
+                v = c[top];
+                for l in (0..top).rev() {
+                    v = am(mm(v, x, p), c[l], p);
+                    *muls += 1;
+                }
+            }
+            r[i][j] = (p - v) % p;
+        }
+        r[i][i] = am(r[i][i], pw[q.chains.len[i]], p);
+    }
+    r
+}
+
+/// `det R(x)` (`= charpoly(M_{P₂})`, monic of degree `dim`) by evaluation
+/// at `x = 0, …, dim − 1` and Newton interpolation of `det R − x^{dim}`.
+/// `None` when `p ≤ dim` (too few points).
+fn charpoly_by_chains(q: &ChainQuotient, dim: usize, p: u64, muls: &mut u64) -> Option<UPoly> {
+    if p as usize <= dim {
+        return None;
+    }
+    let ic = inv_charge(p);
+    let mut dd: Vec<u64> = (0..dim as u64)
+        .map(|x| {
+            let d = det_small(relation_at(q, x, p, muls), p, muls);
+            let mut xd = 1u64;
+            let mut b = x;
+            let mut e = dim;
+            while e > 0 {
+                if e & 1 == 1 {
+                    xd = mm(xd, b, p);
+                    *muls += 1;
+                }
+                e >>= 1;
+                if e > 0 {
+                    b = mm(b, b, p);
+                    *muls += 1;
+                }
+            }
+            sm(d, xd, p)
+        })
+        .collect();
+    // Divided differences on consecutive nodes: divide by k at order k.
+    for k in 1..dim {
+        let ik = inv_mod(k as u64, p);
+        *muls += ic;
+        for i in (k..dim).rev() {
+            dd[i] = mm(sm(dd[i], dd[i - 1], p), ik, p);
+            *muls += 1;
+        }
+    }
+    // Newton form to monomials: c = dd[dim−1]; c ← c·(x − k) + dd[k].
+    let mut c: Vec<u64> = vec![dd[dim - 1]];
+    for k in (0..dim - 1).rev() {
+        let mut next = vec![0u64; c.len() + 1];
+        for (j, &v) in c.iter().enumerate() {
+            next[j + 1] = am(next[j + 1], v, p);
+            if v != 0 && k != 0 {
+                next[j] = sm(next[j], mm(v, k as u64, p), p);
+                *muls += 1;
+            }
+        }
+        next[0] = am(next[0], dd[k], p);
+        c = next;
+    }
+    c.resize(dim + 1, 0);
+    c[dim] = am(c[dim], 1, p);
+    Some(UPoly(c))
+}
+
+/// `M_{P₂}` assembled from the chain normal forms (unit shifts inside the
+/// chains, the normal forms at the chain ends): no multiplication.
+fn chain_mult_matrix(q: &ChainQuotient, dim: usize) -> Vec<Vec<u64>> {
+    let mut m = vec![vec![0u64; dim]; dim];
+    let mut index = vec![vec![usize::MAX; 0]; q.chains.heads.len()];
+    for (i, len) in q.chains.len.iter().enumerate() {
+        index[i] = vec![usize::MAX; *len];
+    }
+    for (s, &(i, l)) in q.place.iter().enumerate() {
+        index[i][l] = s;
+    }
+    for (s, &(i, l)) in q.place.iter().enumerate() {
+        if l + 1 < q.chains.len[i] {
+            m[index[i][l + 1]][s] = 1;
+        } else {
+            for (r, &v) in q.nf[i].iter().enumerate() {
+                m[r][s] = v;
+            }
+        }
+    }
+    m
+}
+
+/// One chain attempt at degree `d`; `Err(reason)` hands the call to the
+/// existing solver.
+fn chain_at(
+    comps: &[HashMap<[u8; 4], u64>],
+    d: u16,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    sparsest: bool,
+    info: &mut ChainInfo,
+) -> Result<Vec<[u64; 4]>, String> {
+    let b = build_echelon(comps, d, p, st, true, sparsest)?;
+    let dim = b.standard.len();
+    let t2 = Instant::now();
+    let mut nf_muls = 0u64;
+    let q = chain_quotient(&b, p, &mut nf_muls);
+    st.nf_muls += nf_muls;
+    st.nf_ms += t2.elapsed().as_secs_f64() * 1e3;
+    let q = q?;
+    st.reached_pivots = q.reached;
+    info.chains = q.chains.heads.len();
+    let t3 = Instant::now();
+    let mut cp_muls = 0u64;
+    let cp = match charpoly_by_chains(&q, dim, p, &mut cp_muls) {
+        Some(cp) => cp,
+        None => charpoly_u16(&chain_mult_matrix(&q, dim), p as u32, &mut cp_muls),
+    };
+    st.charpoly_muls += cp_muls;
+    st.charpoly_ms += t3.elapsed().as_secs_f64() * 1e3;
+    let t4 = Instant::now();
+    let ring = PolyRing::new(p);
+    let lambdas = ring.roots(&cp, rng);
+    st.roots_muls += ring.muls.get();
+    st.rational_eigenvalues = lambdas.len();
+    // Standard index → (chain, power) of the five monomials read off.
+    let low: Vec<(usize, usize)> = (0..=4usize)
+        .map(|v| {
+            let m: [u8; 4] = core::array::from_fn(|k| u8::from(v > 0 && k == v - 1));
+            q.place[b.std_index[b.col_index[&m]] as usize]
+        })
+        .collect();
+    let ic = inv_charge(p);
+    let mut out = Vec::new();
+    for lam in lambdas {
+        let mut ev = 0u64;
+        let r = relation_at(&q, lam, p, &mut ev);
+        let ker = kernel_small(r, p, &mut ev);
+        if ker.len() != 1 {
+            st.eigenvector_muls += ev;
+            return Err(format!(
+                "an eigenspace of π = {lam} has dimension {}",
+                ker.len()
+            ));
+        }
+        let w = &ker[0];
+        // w(P₂^l h_j) = λ^l w(h_j).
+        let mut val = [0u64; 5];
+        for (k, &(j, l)) in low.iter().enumerate() {
+            let mut v = w[j];
+            for _ in 0..l {
+                v = mm(v, lam, p);
+                ev += 1;
+            }
+            val[k] = v;
+        }
+        if val[0] == 0 {
+            st.eigenvector_muls += ev;
+            return Err(format!("an eigenvector of π = {lam} has no 1-coordinate"));
+        }
+        let inv = inv_mod(val[0], p);
+        ev += ic + 4;
+        let e: [u64; 4] = core::array::from_fn(|k| mm(val[k + 1], inv, p));
+        st.eigenvector_muls += ev;
+        if e[EIG_VAR] != lam {
+            return Err(format!(
+                "an eigenvector of π = {lam} reads π = {}",
+                e[EIG_VAR]
+            ));
+        }
+        let mut vm = 0u64;
+        let ok = b.comps.iter().all(|c| eval(c, &e, p, &mut vm) == 0);
+        st.verify_muls += vm;
+        if !ok {
+            return Err(format!("the point read at π = {lam} fails the system"));
+        }
+        out.push(e);
+    }
+    st.eigen_ms += t4.elapsed().as_secs_f64() * 1e3;
+    out.sort_unstable();
+    out.dedup();
+    st.e_solutions = out.len();
+    Ok(out)
+}
+
+/// **E31's chain solve** (§9.22): the existing matrix and echelon, the
+/// normal forms of the `P₂`-chain ends only (left-looking), `charpoly` as
+/// `det R(x)` of the chains' relation matrix, and kernels of `R(λ)`.
+///
+/// Returns exactly what [`solve_weighted_traced`] (no trace, row
+/// selection on) returns: any call that is not one clean solve at `d` is
+/// rerun by the existing solver from the RNG state on entry, and both runs
+/// are charged in `st`.  `st.weil_muls` is kept as the caller set it.
+pub fn solve_weighted_chain(
+    comps: &[HashMap<[u8; 4], u64>],
+    d: u16,
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+    sparsest: bool,
+) -> (Option<Vec<[u64; 4]>>, u16, ChainInfo) {
+    let t0 = Instant::now();
+    let rng0 = rng.clone();
+    let mut info = ChainInfo::default();
+    st.degenerate_eigenspaces = 0;
+    match chain_at(comps, d, p, rng, st, sparsest, &mut info) {
+        Ok(sols) => {
+            st.outcome = "solved".into();
+            st.total_ms = t0.elapsed().as_secs_f64() * 1e3;
+            st.close_public();
+            (Some(sols), d, info)
+        }
+        Err(why) => {
+            info.fell_back = true;
+            info.reason = why;
+            let spent = std::mem::replace(
+                st,
+                QuarticSolve {
+                    weil_muls: st.weil_muls,
+                    ..Default::default()
+                },
+            );
+            *rng = rng0;
+            let (res, deg) = solve_weighted_traced(comps, d, p, rng, st, true, false, None, None);
+            st.triangularise_muls += spent.triangularise_muls;
+            st.echelon_muls += spent.echelon_muls;
+            st.nf_muls += spent.nf_muls;
+            st.charpoly_muls += spent.charpoly_muls;
+            st.roots_muls += spent.roots_muls;
+            st.eigenvector_muls += spent.eigenvector_muls;
+            st.verify_muls += spent.verify_muls;
+            st.build_ms += spent.build_ms;
+            st.echelon_ms += spent.echelon_ms;
+            st.nf_ms += spent.nf_ms;
+            st.charpoly_ms += spent.charpoly_ms;
+            st.eigen_ms += spent.eigen_ms;
+            st.total_ms = t0.elapsed().as_secs_f64() * 1e3;
+            st.close_public();
+            (res, deg, info)
+        }
+    }
+}
+
+/// Dispatch on [`V4Solver`]: `(solutions, degree, fell back)`.
+pub fn solve_v4(
+    solver: V4Solver,
+    comps: &[HashMap<[u8; 4], u64>],
+    p: u64,
+    rng: &mut StdRng,
+    st: &mut QuarticSolve,
+) -> (Option<Vec<[u64; 4]>>, u16, bool) {
+    match solver {
+        V4Solver::Macaulay => {
+            let (s, d) =
+                solve_weighted_traced(comps, MACAULAY_BOUND, p, rng, st, true, false, None, None);
+            (s, d, false)
+        }
+        V4Solver::Chain | V4Solver::ChainSparsest => {
+            let (s, d, info) = solve_weighted_chain(
+                comps,
+                MACAULAY_BOUND,
+                p,
+                rng,
+                st,
+                solver == V4Solver::ChainSparsest,
+            );
+            (s, d, info.fell_back)
+        }
+    }
+}
+
+/// E31 agreement check on one system (a diagnostic, nothing charged): the
+/// chain solve's `M_{P₂}` against the one the existing normal forms build
+/// on the same echelon, and `det R(x)` against `charpoly_u16` of it.
+/// `None` when the existing solver itself would refuse the system.
+pub fn chain_quotient_agrees(
+    comps: &[HashMap<[u8; 4], u64>],
+    d: u16,
+    p: u64,
+    sparsest: bool,
+) -> Option<(bool, bool)> {
+    let mut st = QuarticSolve::default();
+    let b = build_echelon(comps, d, p, &mut st, true, sparsest).ok()?;
+    let mut scratch = 0u64;
+    let q = chain_quotient(&b, p, &mut scratch).ok()?;
+    let dim = b.standard.len();
+    let ours = chain_mult_matrix(&q, dim);
+    let mut nfs = NormalForms4 {
+        ech: &b.ech,
+        is_std: b.is_std.clone(),
+        std_index: b.std_index.clone(),
+        dim,
+        p: p as u32,
+        memo: vec![None; b.cols.len()],
+        reached: 0,
+    };
+    let mut targets = Vec::with_capacity(dim);
+    for &bc in &b.standard {
+        let mut m = b.cols[bc];
+        m[EIG_VAR] += 1;
+        targets.push(b.col_index[&m]);
+    }
+    nfs.ensure(&targets, &mut scratch).ok()?;
+    let mut theirs = vec![vec![0u64; dim]; dim];
+    for (bi, &tc) in targets.iter().enumerate() {
+        for (ri, v) in nfs.vector(tc).into_iter().enumerate() {
+            theirs[ri][bi] = v;
+        }
+    }
+    let cp_old = charpoly_u16(&theirs, p as u32, &mut scratch);
+    let cp_new = charpoly_by_chains(&q, dim, p, &mut scratch)
+        .unwrap_or_else(|| charpoly_u16(&ours, p as u32, &mut scratch));
+    Some((ours == theirs, cp_old == cp_new))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1362,6 +1952,119 @@ mod tests {
     /// A planted sum of four base points from four distinct translation
     /// orbits comes back with its 64 translates, the quotient is 64, and
     /// every returned quadruple sums to `±R` in the group (§9.10, E22).
+    /// E31, G2.85: on uniform targets of E24 and E25 curves, the chain
+    /// solve (both pivot rules) returns the existing solver's solutions,
+    /// degree, outcome and decomposition set on every call, and builds the
+    /// same `M_{P₂}` and characteristic polynomial; perturbing one
+    /// coefficient of one equation (the negative control) changes every
+    /// non-empty solution set.
+    #[test]
+    fn e31_chain_solve_agrees_with_the_existing_solver() {
+        use crate::cryptanalysis::quartic_folds::generate_gls_klein_instance;
+        use rand::Rng;
+        let mut calls = 0usize;
+        let mut nonempty = 0usize;
+        let mut perturbed_differ = 0usize;
+        let mut quotient_checked = 0usize;
+        let curves: Vec<(KleinInstance, u64)> = vec![
+            (generate_gls_klein_instance(101, 1, 16).unwrap(), 101),
+            (generate_gls_klein_instance(149, 2, 16).unwrap(), 149),
+            (generate_klein_instance(101, 2, 16).unwrap(), 101),
+            (generate_klein_instance(53, 1, 16).unwrap(), 53),
+        ];
+        for (ki, p) in &curves {
+            let p = *p;
+            let curve = ki.inst.curve();
+            let f = &curve.f;
+            let mut rng = StdRng::seed_from_u64(p ^ 0xE31);
+            let pre = SymmetrisedV4::precompute(ki, &curve, &mut rng, 4).unwrap();
+            let n = ki.inst.n;
+            let mut done = 0;
+            while done < 24 {
+                let (a, b) = (rng.gen_range(0..n), rng.gen_range(1..n));
+                let r = curve.add(&curve.mul(&ki.inst.g, a), &curve.mul(&ki.inst.q, b));
+                let Some(z_r) = ki.z_of_x(f, &r.x) else {
+                    continue;
+                };
+                done += 1;
+                let mut fp = 0u64;
+                let comps = v4_system(&pre, f, &z_r, &mut fp);
+                let tseed: u64 = rng.gen();
+                let mut r_old = StdRng::seed_from_u64(tseed);
+                let mut st_old = QuarticSolve::default();
+                let (s_old, d_old) = solve_weighted_traced(
+                    &comps,
+                    MACAULAY_BOUND,
+                    p,
+                    &mut r_old,
+                    &mut st_old,
+                    true,
+                    false,
+                    None,
+                    None,
+                );
+                let lb_old =
+                    lift_back_v4(ki, &curve, s_old.as_deref().unwrap_or(&[]), &r, &mut r_old);
+                for sparsest in [false, true] {
+                    let mut r_new = StdRng::seed_from_u64(tseed);
+                    let mut st_new = QuarticSolve::default();
+                    let (s_new, d_new, _) = solve_weighted_chain(
+                        &comps,
+                        MACAULAY_BOUND,
+                        p,
+                        &mut r_new,
+                        &mut st_new,
+                        sparsest,
+                    );
+                    let lb_new =
+                        lift_back_v4(ki, &curve, s_new.as_deref().unwrap_or(&[]), &r, &mut r_new);
+                    assert_eq!(s_old, s_new, "p = {p}: solutions");
+                    assert_eq!(d_old, d_new, "p = {p}: degree");
+                    assert_eq!(st_old.outcome, st_new.outcome, "p = {p}: outcome");
+                    assert_eq!(lb_old.decompositions, lb_new.decompositions, "p = {p}");
+                    if let Some((m_eq, cp_eq)) =
+                        chain_quotient_agrees(&comps, MACAULAY_BOUND, p, sparsest)
+                    {
+                        assert!(m_eq && cp_eq, "p = {p}: M or charpoly differs");
+                        quotient_checked += 1;
+                    }
+                    calls += 1;
+                }
+                // Negative control: one coefficient of one equation moved.
+                if s_old.as_ref().is_some_and(|s| !s.is_empty()) {
+                    nonempty += 1;
+                    let mut bad = comps.clone();
+                    let m = *bad[0].keys().min().unwrap();
+                    let e = bad[0].get_mut(&m).unwrap();
+                    *e = (*e + 1) % p;
+                    let mut r_bad = StdRng::seed_from_u64(tseed);
+                    let mut st_bad = QuarticSolve::default();
+                    let (s_bad, _, _) = solve_weighted_chain(
+                        &bad,
+                        MACAULAY_BOUND,
+                        p,
+                        &mut r_bad,
+                        &mut st_bad,
+                        false,
+                    );
+                    if s_bad != s_old {
+                        perturbed_differ += 1;
+                    }
+                }
+            }
+        }
+        assert_eq!(calls, 4 * 24 * 2);
+        assert!(
+            quotient_checked >= calls * 9 / 10,
+            "{quotient_checked} of {calls}"
+        );
+        assert!(
+            nonempty >= 10,
+            "too few solved targets for the control: {nonempty}"
+        );
+        assert_eq!(perturbed_differ, nonempty, "the negative control agreed");
+    }
+
     #[test]
     fn v4_solve_returns_the_planted_orbit_of_decompositions() {
         let ki = generate_klein_instance(37, 1, 64).unwrap();

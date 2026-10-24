@@ -18,8 +18,7 @@ use std::time::Instant;
 
 use crypto_lib::cryptanalysis::gaudry_quartic::QuarticSolve;
 use crypto_lib::cryptanalysis::klein_v4::{
-    chain_structure, lift_back_v4, solve_weighted_traced, v4_system, SymmetrisedV4,
-    MACAULAY_BOUND,
+    chain_structure, lift_back_v4, solve_weighted_traced, v4_system, SymmetrisedV4, MACAULAY_BOUND,
 };
 use crypto_lib::cryptanalysis::quartic_folds::{generate_gls_klein_instance, klein_base_with};
 use crypto_lib::cryptanalysis::residual_walk::mix64;

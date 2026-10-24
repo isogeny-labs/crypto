@@ -999,6 +999,12 @@ pub struct K4PipelineReport {
     /// `total_muls / rho_matched_muls`.
     pub ratio: f64,
     pub wall_ms: f64,
+    /// E31: the `V₄` solver, when not the E24/E25 one (absent otherwise).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub solver: Option<String>,
+    /// E31: calls the chain solve handed to the existing solver (charged).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub solver_fallbacks: Option<u64>,
 }
 
 /// One target's trip through the solve, priced by its own counters.
@@ -1022,6 +1028,8 @@ struct TargetOut {
     failures: usize,
     /// Verified decompositions: base indices with signs (`+1` or `-1`).
     decs: Vec<[(usize, i64); 4]>,
+    /// E31: the chain solve fell back to the existing solver.
+    fallback: bool,
 }
 
 /// Decompose `r` over the base by the weighted `D₄` solve at degree 26:
@@ -1121,6 +1129,7 @@ fn d4_decompose(
         off_base: off,
         failures,
         decs,
+        fallback: false,
     }
 }
 
@@ -1183,6 +1192,7 @@ pub fn run_k4_d4_pipeline(
             fp_muls_per_add,
             start,
             matched: RhoFold::Negation,
+            solver: None,
         },
         &|r: &Pt4, tseed: u64| d4_decompose(&inst, &pre, base, &by_y, r, tseed),
     )
@@ -1197,6 +1207,8 @@ struct Setup {
     /// The walk `ratio` is quoted against: the negation walk, or on a GLS
     /// curve the `⟨±ψ⟩` walk (E25).
     matched: RhoFold,
+    /// E31: the `V₄` solver's name when it is not the E24/E25 one.
+    solver: Option<&'static str>,
 }
 
 /// The relation phase, the solve and the walks shared by E19 and E24: targets
@@ -1224,7 +1236,9 @@ fn collect_and_solve(
         fp_muls_per_add,
         start,
         matched,
+        solver,
     } = setup;
+    let mut fallbacks = 0u64;
     let mut folded = Arm::new(arm, fb.columns);
     let mut unsolved_outcomes = std::collections::BTreeMap::new();
     let mut per_target = [0u64; 10];
@@ -1265,6 +1279,7 @@ fn collect_and_solve(
                 break;
             }
             residuals += 1;
+            fallbacks += u64::from(o.fallback);
             calls.push(o.call_muls);
             gen_muls += o.gen_muls;
             weil_muls += o.weil_muls;
@@ -1402,6 +1417,8 @@ fn collect_and_solve(
         ratio: total_muls as f64 / rho_matched_muls,
         rho,
         wall_ms: start.elapsed().as_secs_f64() * 1e3,
+        solver: solver.map(String::from),
+        solver_fallbacks: solver.map(|_| fallbacks),
     })
 }
 
@@ -1920,6 +1937,7 @@ fn v4_decompose(
     by_z: &HashMap<u64, usize>,
     r: &Pt4,
     tseed: u64,
+    solver: super::klein_v4::V4Solver,
 ) -> TargetOut {
     use super::klein_v4 as kv;
     let mut trng = StdRng::seed_from_u64(tseed);
@@ -1945,6 +1963,7 @@ fn v4_decompose(
         off_base: 0,
         failures: 0,
         decs: Vec::new(),
+        fallback: false,
     };
     let before = c.f.muls();
     let Some(z_r) = ki.z_of_x(&c.f, &r.x) else {
@@ -1956,17 +1975,9 @@ fn v4_decompose(
     let mut fp = 0u64;
     let comps = kv::v4_system(pre, &c.f, &z_r, &mut fp);
     st.weil_muls = c.f.muls() - before + fp;
-    let (sols, degree) = kv::solve_weighted_traced(
-        &comps,
-        kv::MACAULAY_BOUND,
-        ki.inst.p,
-        &mut trng,
-        &mut st,
-        true,
-        false,
-        None,
-        None,
-    );
+    // E31: `Macaulay` is exactly the E24/E25 call
+    // (`solve_weighted_traced`, degree 11, row selection, no trace).
+    let (sols, degree, fallback) = kv::solve_v4(solver, &comps, ki.inst.p, &mut trng, &mut st);
     let solved = sols.is_some();
     let sols = sols.unwrap_or_default();
     let lb = kv::lift_back_v4(ki, c, &sols, r, &mut trng);
@@ -2021,12 +2032,14 @@ fn v4_decompose(
         weil_muls: st.weil_muls,
         lift_muls: lb.muls,
         check_muls: c.f.muls() - before,
-        entries: st.rows as u64 * st.cols as u64,
+        // A fallback built the degree-11 matrix twice.
+        entries: st.rows as u64 * st.cols as u64 * (1 + u64::from(fallback)),
         ms: st.total_ms,
         lifted: lb.decompositions.len(),
         off_base: off,
         failures,
         decs,
+        fallback,
     }
 }
 
@@ -2081,8 +2094,19 @@ pub fn run_k4_v4_pipeline(
             fp_muls_per_add,
             start,
             matched: RhoFold::Negation,
+            solver: None,
         },
-        &|r: &Pt4, tseed: u64| v4_decompose(&ki, &pre, base, &by_z, r, tseed),
+        &|r: &Pt4, tseed: u64| {
+            v4_decompose(
+                &ki,
+                &pre,
+                base,
+                &by_z,
+                r,
+                tseed,
+                super::klein_v4::V4Solver::Macaulay,
+            )
+        },
     )
 }
 
@@ -2273,6 +2297,26 @@ pub fn run_k4_gls_pipeline(
     max_residuals: u64,
     fold_psi: bool,
 ) -> Result<K4PipelineReport, String> {
+    run_k4_gls_pipeline_with(
+        p,
+        seed,
+        rho_runs,
+        max_residuals,
+        fold_psi,
+        super::klein_v4::V4Solver::Macaulay,
+    )
+}
+
+/// [`run_k4_gls_pipeline`] with the `V₄` solver chosen (E31, §9.22):
+/// `Macaulay` is E25 exactly.
+pub fn run_k4_gls_pipeline_with(
+    p: u64,
+    seed: u64,
+    rho_runs: usize,
+    max_residuals: u64,
+    fold_psi: bool,
+    solver: super::klein_v4::V4Solver,
+) -> Result<K4PipelineReport, String> {
     let start = Instant::now();
     let ki = generate_gls_klein_instance(p, seed, 16)?;
     let inst = ki.inst;
@@ -2318,8 +2362,9 @@ pub fn run_k4_gls_pipeline(
             fp_muls_per_add,
             start,
             matched: RhoFold::Gls,
+            solver: (solver != super::klein_v4::V4Solver::Macaulay).then(|| solver.name()),
         },
-        &|r: &Pt4, tseed: u64| v4_decompose(&ki, &pre, base, &by_z, r, tseed),
+        &|r: &Pt4, tseed: u64| v4_decompose(&ki, &pre, base, &by_z, r, tseed, solver),
     )
 }
 

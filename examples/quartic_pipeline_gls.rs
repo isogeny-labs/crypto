@@ -13,11 +13,15 @@
 //!
 //! Tables: `cargo run --release --example glv_invariant_experiment_tables
 //! -- experiments/30_gls_v4/p*s*.json`.
+//!
+//! E31 (§9.22): `--solver chain` or `--solver chain-sparsest` decomposes with
+//! the chain solve instead; the default (`macaulay`) is E25's solver.
 
 use std::env;
 use std::fs;
 
-use crypto_lib::cryptanalysis::quartic_folds::run_k4_gls_pipeline;
+use crypto_lib::cryptanalysis::klein_v4::V4Solver;
+use crypto_lib::cryptanalysis::quartic_folds::run_k4_gls_pipeline_with;
 use serde_json::Value;
 
 fn main() {
@@ -28,6 +32,7 @@ fn main() {
     let mut rho_runs = 16usize;
     let mut max_residuals = 200_000u64;
     let mut json: Option<String> = None;
+    let mut solver = V4Solver::Macaulay;
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
@@ -54,6 +59,10 @@ fn main() {
                 i += 1;
                 max_residuals = args[i].parse().expect("--max-residuals");
             }
+            "--solver" => {
+                i += 1;
+                solver = V4Solver::parse(&args[i]).expect("--solver macaulay|chain|chain-sparsest");
+            }
             "--json" => {
                 i += 1;
                 json = Some(args[i].clone());
@@ -67,7 +76,14 @@ fn main() {
         for seed in first_seed..first_seed + seeds {
             for fold_psi in [false, true] {
                 let arm = if fold_psi { "B" } else { "A" };
-                let r = match run_k4_gls_pipeline(p, seed, rho_runs, max_residuals, fold_psi) {
+                let r = match run_k4_gls_pipeline_with(
+                    p,
+                    seed,
+                    rho_runs,
+                    max_residuals,
+                    fold_psi,
+                    solver,
+                ) {
                     Ok(r) => r,
                     Err(e) => {
                         eprintln!("e25 p={p} seed={seed} arm {arm}: {e}");
