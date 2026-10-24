@@ -21,6 +21,9 @@ in the [unvalidated benchmark archive](ARCHIVE.md), with their exact former row
 text, digest, reason, and source provenance. Archived rows are not measurements
 admitted by this table and cannot satisfy the validation gate.
 
+The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
+is preserved separately pending validation admission.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-24 | [`20261024-e31-chain-solve`](20261024-e31-chain-solve/) | E31: the `k = 4` `V₄`-line decomposition solve by its `P₂`-chains (solver A) and with sparsest pivots (B), beside E25's solver, selected by a flag; Stage A on the same 1,000 calls per curve and end to end on E25's ten GLS curves (`p = 101`–`397`), both arms, every phase charged in `F_p` multiplications, matched `⟨±ψ⟩` walks; identical decompositions on all 10,000 calls per solver | per call A `2.62`–`2.69×`, B `4.99`–`5.32×` fewer `F_p` multiplications; end to end `S_E25/S_A` `2.50`–`2.56` (0 GAE), `1.39`–`1.43` (0.1), `1.034`–`1.053` (1): A ahead of E25 across the band under the registered model; B ahead only at 0 GAE (`4.53`–`4.76×`) once its pivot-selection pass is priced, rank unresolved across the band; best `S`/rho `4.42·10³` (A) at 0 GAE, rho ahead at every weight; engineering (phase speed-up), errata in note §9.24 | one shared 4-vCPU container, L0; operation counts only | [study](../research/e31_chain_solve_20261024/), [report](20261024-e31-chain-solve/REPORT.pdf), [validation](20261024-e31-chain-solve/VALIDATION.json), note §9.21–§9.24 |
