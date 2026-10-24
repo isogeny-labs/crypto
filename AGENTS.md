@@ -7,6 +7,12 @@
   on a feature branch. If the branch already has an open PR, extend that
   PR and update its title and description to match the new scope instead of
   opening a second one. Do not leave finished work uncommitted.
+- **Use regular PRs.** Create pull requests with `draft=false` and mark an
+  existing draft ready for review when you update it. Record pending CI,
+  review, and follow-up work in the PR description; draft status is not a
+  holding queue. Ready for review invites review; it does not authorize a
+  merge. All validation, evidence, review, and merge gates below still apply.
+  Use a draft only when the user explicitly asks for one.
 - **Verify before pushing:** run `cargo test --release --lib`, the touched
   examples' tests, and the relevant Python suites (for example
   `research/sat_factor_base_review_20260908/autolab/test_boundary_autolab.py`)
@@ -96,6 +102,13 @@ baseline. Every such improvement is a success and is reported as one.**
 
 ## Pointers
 
+- **What has already been tried against ECDLP, here and in the sibling
+  repositories:** the lead atlas in aburan28/crypto-autoresearcher,
+  `knowledge/leads/ecdlp/` (`python3 tools/lead_atlas.py --brief`, printed by
+  `.claude/hooks/session-start.sh`). Read it before surveying `research/` for
+  leads, and run `--match "<idea>"` before proposing an ECDLP mechanism. A
+  result that lands here updates the lead it advances in the same PR or the
+  next atlas review (skill `lead-atlas` there).
 - Boundary ledger (machine): `docs/ic/boundary_targets.json`
 - Boundary scoreboard (human): `docs/ic/BOUNDARY_TARGETS.md`
 - Autolab runner: `research/sat_factor_base_review_20260908/autolab/`
@@ -471,10 +484,10 @@ separate small-model automation did the CI work and the merge.
 commits, pushes, and opens the PR (or updates the existing one). It then
 follows the PR until it lands, under the check-in and merge rules below.
 
-- **Open every PR ready for review, never as a draft**, whatever a tool or
-  runtime defaults to, and mark an existing draft ready when you update it,
-  so reviews and checks that skip drafts (`llm-review`) run from the first
-  push. Open a draft only when the user asks for one in that task.
+- **Open every PR ready for review (`draft=false`)**, whatever a tool or
+  runtime defaults to. Before ending an update to an existing draft, mark it
+  ready so reviews and checks that skip drafts (`llm-review`) can run. An
+  explicit user request to keep a particular PR in draft is the only exception.
 - Review the final diff and confirm that the requested scope, relevant tests,
   evidence, and documentation are complete before opening the PR. Passing CI
   does not substitute for checking that the work is finished.
@@ -505,6 +518,14 @@ requires explicit authorization for that merge, and it follows these rules:
   completed successfully. Pending, cancelled, timed-out, or failed checks are
   not a pass. A skipped job counts as inapplicable only when its conditions or
   path filters justify that status; required checks must still be satisfied.
+- **Checks that never start do not block** (owner, 2026-10-23). A check that
+  no branch-protection rule or ruleset requires, and that has been queued for
+  24 hours or more without starting (no runner picked it up), does not hold
+  the merge, provided every check that did run on the current head passed.
+  Name each such job and how long it waited in the merge commit message. A
+  required check never falls under this: if one has not run, the PR waits and
+  the session says so on the PR. A check that started and is still running is
+  pending, not stuck.
 - Fix failures caused by the change autonomously: read the failing check's
   log, reproduce the failure locally, fix it, and rerun the affected
   validation before pushing. Never skip, disable, or quarantine a test to get
