@@ -1,0 +1,43 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "276819b32b1bd6ee4b50555a8e48595b1672e9afdd4a3bfdc2d640806dba0c1d"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "bf7e8a11ee97afd90585b9b7aca4c51464e9074e02e4fceac62f7e7690f7468b"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "unit": "counted F_p operations (M, I, native) priced in GAE; 1 GAE = the run's own measured affine E(F_{p^2}) addition at I = 3M",
+  "binary_or_process": "examples/n2_routes.rs: rho (arm R) and the index-calculus arms run in the same process and thread, on the same instance and targets, with the same counters and the same pricing function",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "protocol": "research/weil_descent_angles_20261018/PROTOCOL.md, Addendum H (H2, H3), Amendments H-a and H-b, Erratum V: the same negation-map rho as round 3, on the same glued instances",
+  "gae_band": {
+   "0": {
+    "ic": 1703751.0,
+    "rho": 958531.9
+   },
+   "0.1": {
+    "ic": 2063570.0,
+    "rho": 1145340.0
+   },
+   "1": {
+    "ic": 5301941.0,
+    "rho": 2826612.0
+   }
+  },
+  "order_holds_across_band": true,
+  "note": "H2, h = 1 (prime-order E), 40 bits, I = 3M, measured Jacobian cost, Legendre split test at one I, cost per solve in GAE. Rho is cheaper at all three points (1.78x / 1.80x / 1.88x). Over the full 12-cell band the ranking is unresolved at 28-40 bits (0.59-2.04)."
+ },
+ "validation": {
+  "id": "VAL-20261024-wd4",
+  "report": "research/weil_descent_angles_20261018/validation/validation_report.yaml",
+  "verifier": "research/weil_descent_angles_20261018/validation/verify_dump.rs",
+  "tool_commit": "d01c574a271dbf8d04b19636d4612cf9926915eb"
+ }
+}

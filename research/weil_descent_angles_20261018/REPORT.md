@@ -562,6 +562,37 @@ ends rise.
 **Arm D.** The lower ends fall at the larger sizes. Rho's native hashing
 grows faster than D's, but D stays far above rho. No verdict in §3.3 changes.
 
+## Validation (2026-10-24)
+
+Both benchmark studies of this directory pass the validation gate
+(`docs/VALIDATION_GATE.md`): `VAL-20261024-wd3` (round 3) and
+`VAL-20261024-wd4` (round 4), `validation/validation_report.yaml`.
+
+- **Replay.** An independent validator drew a nonce from `os.urandom`
+  and selected 14 jobs from it. It also replayed every remaining cell.
+  - All 5,228 recorded rows replay exactly in every column except wall
+    time: round 3 has 1,368 (itemOJ and itemF), round 4 has 3,860 (H1,
+    H2, H4 and H6).
+  - The replays use the tool at d01c574a2 with `N2_DUMP`.
+- **Scalars.** Every dumped answer was checked by
+  `validation/verify_dump.rs`, which shares no code with `n2_routes.rs`.
+  - It checks that `ℓ` is prime, `ℓP = O`, `N` is in the Hasse interval
+    and `N·R = O`.
+  - It checks that `k_found·P = Q` and `k_found = k` for every arm.
+- **Recompute.** 167 headline numbers recompute from the CSVs. All 15
+  summary, ranking and gae-band files reproduce byte for byte.
+- **Rho reference.** Negation is the strongest symmetry available:
+  `j(E) ∉ F_p` on all 176 curves, and `j ≠ 0, 1728`. Rho and the IC run in
+  the same process, with the same counters.
+- **The gate's three points.** `I = 3M`, measured Jacobian cost, native
+  work at 0, 0.1 and 1 GAE, 40 bits; rho is cheaper at every point.
+  - Round 3, Arm J with `c = 1`: 2.79×, 2.84× and 2.98× rho.
+  - H2 with `h = 1`: 1.78×, 1.80× and 1.88× rho.
+- **Limitation.** The recompute independently implements the producer's
+  definitions; it is not a blind derivation. The operation counts were
+  shown to reproduce, not re-derived by a second implementation of the
+  arms.
+
 ## Run reports
 
 - `reports/item4-run-20261018T2049Z/run-report.pdf`

@@ -179,7 +179,7 @@ H8 was not run, and H9 is answered by existing studies. Every cost is a counted 
   ]
 )
 
-#strong[Distance to rho (prime-order `E/F_{p²}`).] About 1.7× at 40 bits under measured costs. Under the IC-favourable price (one Jacobian operation \= one `E(F_{p²})` addition), the IC is cheaper: 0.76× at 40 bits. Closing the gap needs a genus-2 sextic-model addition of about 22 M + I, measured. This round’s reduced formulas take 41 M + I.
+#strong[Distance to rho (prime-order `E/F_{p²}`).] About 1.8× at 40 bits under measured costs (1.78× with the H3 Legendre split test at one `I`, as the band prices it; the 1.68× in `glue_summary.txt` leaves the split test out, corrected 2026-10-24 on the validator’s report). Under the IC-favourable price (one Jacobian operation \= one `E(F_{p²})` addition), the IC is cheaper: 0.76× at 40 bits. Closing the gap needs a genus-2 sextic-model addition of about 22 M + I, measured. This round’s reduced formulas take 41 M + I.
 
 == H4: memory against time (run `H4-memsweep-run-20261018T2209Z`)
 <h4-memory-against-time-run-h4-memsweep-run-20261018t2209z>
@@ -386,6 +386,51 @@ In both cases the factor base sits in one coset of `2E`, and its sums land in `2
 + #strong[H5 follow-up.] Build a large-`p` family of Res-shaped curves with an order-4 automorphism. Measure Arm J on the automorphism-reduced graph against rho in `Jac(C)` with the same automorphism.
 + #strong[H8.] Build a descended-`S_4` oracle over `F_{p³}` and measure the `n = 3` crossover.
 + #strong[H7.] Enlarge the binary and odd `n = 4` cells to readable `ℓ`-subgroup sizes.
+
+== Erratum (2026-10-24): native work priced in GAE
+<erratum-2026-10-24-native-work-priced-in-gae>
+This erratum was found during validation for the benchmark gate (PROTOCOL.md, Erratum V). The H2 and H6 bands price native operations at 0, 0.1 and 1 `F_p` multiplications. AGENTS.md §5a prices them at 0, 0.1 and 1 GAE.
+
+Repriced with the same runs, the same cells and the same cost model (`validation/gae-band/`):
+
+#align(center)[#table(
+  columns: 4,
+  align: (col, row) => (left,left,left,left,).at(col),
+  inset: 6pt,
+  [run], [frozen band (native in M)], [band with native in GAE], [verdict],
+  [H2, h \= 1, 28–40 bits],
+  [0.59–1.94],
+  [0.59–2.04],
+  [unresolved at every size (unchanged)],
+  [H2, h \= 4, 36–40 bits],
+  [1.14–2.79],
+  [1.14–2.88],
+  [rho cheaper in every cell (unchanged)],
+  [H6, Arm J, 44 / 48 bits],
+  [0.99–2.96 / 0.77–2.32],
+  [0.99–3.04 / 0.77–2.38],
+  [unresolved (unchanged)],
+)
+]
+
+At the gate’s three points (`I = 3M`, measured Jacobian cost, native 0, 0.1 and 1 GAE), H2 at 40 bits with `h = 1` costs 1.78×, 1.80× and 1.88× rho. That is the distance remaining to the matched rho at measured cost.
+
+== Validation (2026-10-24)
+<validation-2026-10-24>
+Both benchmark studies of this directory pass the validation gate (`docs/VALIDATION_GATE.md`): `VAL-20261024-wd3` (round 3) and `VAL-20261024-wd4` (round 4), `validation/validation_report.yaml`.
+
+- #strong[Replay.] An independent validator drew a nonce from `os.urandom` and selected 14 jobs from it. It also replayed every remaining cell.
+  - All 5,228 recorded rows replay exactly in every column except wall time: round 3 has 1,368 (itemOJ and itemF), round 4 has 3,860 (H1, H2, H4 and H6).
+  - The replays use the tool at d01c574a2 with `N2_DUMP`.
+- #strong[Scalars.] Every dumped answer was checked by `validation/verify_dump.rs`, which shares no code with `n2_routes.rs`.
+  - It checks that `ℓ` is prime, `ℓP = O`, `N` is in the Hasse interval and `N·R = O`.
+  - It checks that `k_found·P = Q` and `k_found = k` for every arm.
+- #strong[Recompute.] 167 headline numbers recompute from the CSVs. All 15 summary, ranking and gae-band files reproduce byte for byte.
+- #strong[Rho reference.] Negation is the strongest symmetry available: `j(E) ∉ F_p` on all 176 curves, and `j ≠ 0, 1728`. Rho and the IC run in the same process, with the same counters.
+- #strong[The gate’s three points.] `I = 3M`, measured Jacobian cost, native work at 0, 0.1 and 1 GAE, 40 bits; rho is cheaper at every point.
+  - Round 3, Arm J with `c = 1`: 2.79×, 2.84× and 2.98× rho.
+  - H2 with `h = 1`: 1.78×, 1.80× and 1.88× rho.
+- #strong[Limitation.] The recompute independently implements the producer’s definitions; it is not a blind derivation. The operation counts were shown to reproduce, not re-derived by a second implementation of the arms.
 
 == Run reports
 <run-reports>
