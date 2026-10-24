@@ -149,8 +149,9 @@ fn solve(mut a: Vec<Vec<Q>>, cols: usize) -> Option<Vec<Q>> {
 }
 fn main() {
     let args: Vec<_> = std::env::args().collect();
-    assert_eq!(args.len(), 2);
-    let out = Path::new(&args[1]);
+    let square = args.len() == 3 && args[1] == "--square";
+    assert!(args.len() == 2 || square);
+    let out = Path::new(&args[if square { 2 } else { 1 }]);
     assert!(!out.exists());
     std::fs::create_dir_all(out).unwrap();
     let (raw, _) = integer::derive();
@@ -161,7 +162,13 @@ fn main() {
         f[4] = 0;
         cs[e[4] as usize].add_term(f, c);
     }
-    let target = discriminant();
+    let [a, b, _c, d, _] = std::array::from_fn(ZPoly::var);
+    let defect = d.scale(64).sub(&b.scale(4).sub(&a.pow(2)).pow(2));
+    let target = if square {
+        defect.pow(3)
+    } else {
+        discriminant()
+    };
     let mut descriptors = Vec::new();
     let mut columns = Vec::new();
     for (i, c) in cs.iter().enumerate() {
@@ -186,7 +193,18 @@ fn main() {
         })
         .collect();
     let solution = solve(matrix, columns.len());
-    let mut json=format!("{{\n\"schema\":\"pure-zero-s4-certificate/v1\",\n\"coefficient_weights\":[12,9,6,3],\n\"equations\":{},\n\"unknowns\":{},\n\"h4\":{},\n\"coefficients\":[{}],\n\"discriminant\":{},\n",support.len(),columns.len(),poly_json(&h),cs.iter().map(poly_json).collect::<Vec<_>>().join(","),poly_json(&target));
+    let target_key = if square {
+        "square_defect_cube"
+    } else {
+        "discriminant"
+    };
+    let mut json=format!("{{\n\"schema\":\"pure-zero-s4-certificate/v1\",\n\"coefficient_weights\":[12,9,6,3],\n\"equations\":{},\n\"unknowns\":{},\n\"h4\":{},\n\"coefficients\":[{}],\n\"{}\":{},\n",support.len(),columns.len(),poly_json(&h),cs.iter().map(poly_json).collect::<Vec<_>>().join(","),target_key,poly_json(&target));
+    if square {
+        json.push_str(&format!(
+            "\"square_defect\":{},\n\"target_power\":3,\n",
+            poly_json(&defect)
+        ));
+    }
     if let Some(solution) = solution {
         let denominator = solution
             .iter()
