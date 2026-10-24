@@ -1,0 +1,1100 @@
+{
+  "a": 0,
+  "arm_wall_s": 600.0,
+  "experiment": "R6.1 end-to-end through ic_framework::run_pipeline (the ic bench pipeline)",
+  "h": 4,
+  "instance": "icv1-f2m19-t797-b6cf2467",
+  "max_trials": 20000,
+  "n": 19,
+  "node_budget": 4096,
+  "planted": 65803,
+  "r": 130873,
+  "rho_floor_S_derived": 0.8862269254527579,
+  "rows": [
+    {
+      "S": 5868.73907003407,
+      "arm": "chained-m3",
+      "call_outcomes": {
+        "found": 106
+      },
+      "columns": 123,
+      "ell": 8,
+      "exhausted": false,
+      "extra": null,
+      "full_report": {
+        "decomposition": {
+          "cost": {
+            "gae": 2122888.7569768243,
+            "group_ops": {
+              "adds": 3202,
+              "doubles": 3204,
+              "scalar_mults": 212
+            },
+            "native": {
+              "canonicalisations": 0,
+              "direct_relations_skipped": 0,
+              "frobfold_mismatches": 0,
+              "inversions": 0,
+              "lift_failures": 0,
+              "lookups": 0,
+              "relations": 106,
+              "repeated_targets_skipped": 0,
+              "s4_hits": 0,
+              "s4_pairs": 0,
+              "solver_budget_exceeded": 0,
+              "solver_calls": 106,
+              "solver_ops": 594556194,
+              "sqrt_solves": 0,
+              "target_guard_probes": 106,
+              "trials": 106,
+              "unliftable_systems": 0
+            },
+            "wall_ns": 4820303930
+          },
+          "description": "chained x-frame descent: 2 S3 links over the base's subspace, inherited-f4 (Macaulay cap 3, 4096 reduction calls)",
+          "gae_before_solver": 6406.0,
+          "hit_rate": 1.0,
+          "name": "chained-x",
+          "relations_found": 106,
+          "setup": {
+            "gae": 0.0,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {},
+            "wall_ns": 1239620
+          },
+          "solver": {
+            "budget_exceeded": 0,
+            "calls": 106,
+            "degree_over_bound": null,
+            "extra": {
+              "oversize": 0,
+              "reductions": 69775,
+              "splits": 34813
+            },
+            "gae": 2116482.7569768243,
+            "name": "chained-x inherited-f4 (cap 3, budget 4096)",
+            "ns_per_op": 0.5084404296875,
+            "op_unit": "word XORs (elimination, specialisation and linear elimination only)",
+            "ops": 594556194,
+            "peak_bytes": 0,
+            "priced_by": "measured",
+            "semi_regular_degree": 10,
+            "solving_degree_max": 0,
+            "solving_degree_mean": null,
+            "wall_ns": 4817846380
+          },
+          "summands": 3,
+          "system": {
+            "degrees": [
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "n_equations": 38,
+            "n_vars": 43,
+            "semi_regular_degree": 10
+          },
+          "targets_tried": 106
+        },
+        "exhausted": false,
+        "factor_base": {
+          "abscissae": 129,
+          "columns": 123,
+          "cost": {
+            "gae": 11.648944115999477,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {
+              "abscissae_scanned": 0,
+              "as_solves": 0,
+              "cofactor_multiplications": 129,
+              "derived_counts": 1,
+              "frobenius_coordinate_squarings": 9348,
+              "frobenius_maps": 257
+            },
+            "wall_ns": 1473986
+          },
+          "description": "F_x random V",
+          "name": "r6-fixed-subspace",
+          "points_per_column": 2.089430894308943,
+          "signed_points": 257
+        },
+        "group_order": 523492,
+        "instance": "icv1-f2m19-t797-b6cf2467",
+        "label": "r6-fixed-subspace + chained-x[m=3,node_budget=4096,trace=1] + — + random",
+        "linear_algebra": {
+          "cost": {
+            "gae": 176.56011013315097,
+            "group_ops": {
+              "adds": 0,
+              "doubles": 0,
+              "scalar_mults": 0
+            },
+            "native": {
+              "columns": 124,
+              "pinned_by_repeated_row": 0,
+              "rank": 106,
+              "repeated_column_rows": 0,
+              "row_ops": 11484,
+              "rows": 106,
+              "single_column_rows": 0,
+              "two_column_rows": 17
+            },
+            "wall_ns": 1477090
+          },
+          "dependent": 0,
+          "name": "incremental-gauss",
+          "rank": 106,
+          "rows": 106,
+          "work": 11484,
+          "work_unit": "row_ops"
+        },
+        "log2_r": 16.997807964508816,
+        "r": 130873,
+        "recovered": 65803,
+        "rho_s": null,
+        "s": 5868.73907003407,
+        "s_over_rho": null,
+        "spec": {
+          "factor_base": "r6-fixed-subspace",
+          "factor_base_params": {},
+          "linalg": "",
+          "max_trials": 20000,
+          "oracle": "chained-x",
+          "oracle_params": {
+            "m": "3",
+            "node_budget": "4096",
+            "trace": "1"
+          },
+          "seed": 123212651130,
+          "solver": null,
+          "solver_budget_seconds": 0,
+          "solver_params": {},
+          "targets": "Random"
+        },
+        "total_gae": 2123096.9660310736,
+        "verified": true,
+        "verify": {
+          "gae": 20.0,
+          "group_ops": {
+            "adds": 4,
+            "doubles": 16,
+            "scalar_mults": 1
+          },
+          "native": {},
+          "wall_ns": 3335
+        },
+        "wall_seconds": 4.823073031
+      },
+      "hit_rate": 1.0,
+      "instance": "icv1-f2m19-t797-b6cf2467",
+      "label": "r6-fixed-subspace + chained-x[m=3,node_budget=4096,trace=1] + — + random",
+      "m": 3,
+      "per_call": [
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 462,
+          "splits": 231,
+          "wall_ms_contended": 37.70118,
+          "word_xors": 4535560
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 583,
+          "splits": 292,
+          "wall_ms_contended": 40.058173,
+          "word_xors": 5184424
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 2680,
+          "splits": 1329,
+          "wall_ms_contended": 157.050324,
+          "word_xors": 16424749
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 80,
+          "splits": 43,
+          "wall_ms_contended": 11.545781,
+          "word_xors": 2505290
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1822,
+          "splits": 903,
+          "wall_ms_contended": 106.891556,
+          "word_xors": 11991393
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 19,
+          "splits": 13,
+          "wall_ms_contended": 8.686814,
+          "word_xors": 2251105
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 710,
+          "splits": 354,
+          "wall_ms_contended": 48.646571,
+          "word_xors": 5954314
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 133,
+          "splits": 69,
+          "wall_ms_contended": 14.421415,
+          "word_xors": 2797036
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 34,
+          "splits": 20,
+          "wall_ms_contended": 9.122782,
+          "word_xors": 2289130
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 264,
+          "splits": 133,
+          "wall_ms_contended": 21.767048,
+          "word_xors": 3532868
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1010,
+          "splits": 502,
+          "wall_ms_contended": 59.816288,
+          "word_xors": 7490858
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 24,
+          "splits": 15,
+          "wall_ms_contended": 8.43992,
+          "word_xors": 2245665
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 80,
+          "splits": 43,
+          "wall_ms_contended": 11.205413,
+          "word_xors": 2503371
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 645,
+          "splits": 321,
+          "wall_ms_contended": 41.630433,
+          "word_xors": 5534059
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 522,
+          "splits": 261,
+          "wall_ms_contended": 35.452488,
+          "word_xors": 4893767
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 388,
+          "splits": 194,
+          "wall_ms_contended": 28.982793,
+          "word_xors": 4288450
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 181,
+          "splits": 93,
+          "wall_ms_contended": 16.296755,
+          "word_xors": 3013892
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 874,
+          "splits": 436,
+          "wall_ms_contended": 52.512327,
+          "word_xors": 6704303
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 97,
+          "splits": 51,
+          "wall_ms_contended": 11.900046,
+          "word_xors": 2578552
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 322,
+          "splits": 162,
+          "wall_ms_contended": 25.090452,
+          "word_xors": 3858637
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1658,
+          "splits": 823,
+          "wall_ms_contended": 96.053753,
+          "word_xors": 11052949
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 894,
+          "splits": 445,
+          "wall_ms_contended": 54.624927,
+          "word_xors": 6834914
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 115,
+          "splits": 61,
+          "wall_ms_contended": 13.862521,
+          "word_xors": 2703919
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 186,
+          "splits": 95,
+          "wall_ms_contended": 16.848178,
+          "word_xors": 3028324
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 656,
+          "splits": 327,
+          "wall_ms_contended": 42.103338,
+          "word_xors": 5522107
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 299,
+          "splits": 150,
+          "wall_ms_contended": 22.929375,
+          "word_xors": 3614983
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 119,
+          "splits": 62,
+          "wall_ms_contended": 13.813879,
+          "word_xors": 2777642
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 182,
+          "splits": 93,
+          "wall_ms_contended": 16.73841,
+          "word_xors": 3080416
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 228,
+          "splits": 115,
+          "wall_ms_contended": 18.709962,
+          "word_xors": 3241052
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 185,
+          "splits": 95,
+          "wall_ms_contended": 17.067485,
+          "word_xors": 2970502
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 283,
+          "splits": 142,
+          "wall_ms_contended": 22.380851,
+          "word_xors": 3616125
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 116,
+          "splits": 61,
+          "wall_ms_contended": 13.809692,
+          "word_xors": 2792881
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 249,
+          "splits": 126,
+          "wall_ms_contended": 20.923595,
+          "word_xors": 3481197
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 598,
+          "splits": 300,
+          "wall_ms_contended": 38.794847,
+          "word_xors": 5057931
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1856,
+          "splits": 919,
+          "wall_ms_contended": 110.839616,
+          "word_xors": 12166456
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 259,
+          "splits": 130,
+          "wall_ms_contended": 23.088743,
+          "word_xors": 3464747
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 679,
+          "splits": 338,
+          "wall_ms_contended": 52.572608,
+          "word_xors": 5745763
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1974,
+          "splits": 979,
+          "wall_ms_contended": 148.412553,
+          "word_xors": 12650724
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 281,
+          "splits": 141,
+          "wall_ms_contended": 32.171692,
+          "word_xors": 3601281
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 323,
+          "splits": 162,
+          "wall_ms_contended": 30.646612,
+          "word_xors": 3904134
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 52,
+          "splits": 29,
+          "wall_ms_contended": 10.815538,
+          "word_xors": 2399887
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 265,
+          "splits": 133,
+          "wall_ms_contended": 22.414544,
+          "word_xors": 3492338
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 2373,
+          "splits": 1177,
+          "wall_ms_contended": 148.209148,
+          "word_xors": 14601018
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 391,
+          "splits": 196,
+          "wall_ms_contended": 29.714309,
+          "word_xors": 4264514
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 875,
+          "splits": 436,
+          "wall_ms_contended": 57.306664,
+          "word_xors": 6759120
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 119,
+          "splits": 62,
+          "wall_ms_contended": 14.282215,
+          "word_xors": 2752127
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 181,
+          "splits": 93,
+          "wall_ms_contended": 17.042699,
+          "word_xors": 3023483
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 87,
+          "splits": 46,
+          "wall_ms_contended": 11.981426,
+          "word_xors": 2555055
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 327,
+          "splits": 164,
+          "wall_ms_contended": 27.166391,
+          "word_xors": 3941152
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 70,
+          "splits": 38,
+          "wall_ms_contended": 11.588744,
+          "word_xors": 2414624
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1336,
+          "splits": 663,
+          "wall_ms_contended": 80.573821,
+          "word_xors": 9255094
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 19,
+          "splits": 13,
+          "wall_ms_contended": 8.886352,
+          "word_xors": 2252979
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 257,
+          "splits": 129,
+          "wall_ms_contended": 22.073801,
+          "word_xors": 3482953
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 618,
+          "splits": 308,
+          "wall_ms_contended": 42.60366,
+          "word_xors": 5367292
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1311,
+          "splits": 652,
+          "wall_ms_contended": 80.541335,
+          "word_xors": 9225681
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 86,
+          "splits": 46,
+          "wall_ms_contended": 11.60653,
+          "word_xors": 2486129
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1100,
+          "splits": 547,
+          "wall_ms_contended": 66.496057,
+          "word_xors": 7792250
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1305,
+          "splits": 649,
+          "wall_ms_contended": 79.749453,
+          "word_xors": 9148691
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 741,
+          "splits": 369,
+          "wall_ms_contended": 51.429535,
+          "word_xors": 6115549
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 121,
+          "splits": 64,
+          "wall_ms_contended": 14.023215,
+          "word_xors": 2735850
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1863,
+          "splits": 923,
+          "wall_ms_contended": 109.533168,
+          "word_xors": 12000985
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1101,
+          "splits": 547,
+          "wall_ms_contended": 70.409528,
+          "word_xors": 7952892
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 392,
+          "splits": 196,
+          "wall_ms_contended": 38.335597,
+          "word_xors": 4309133
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 419,
+          "splits": 209,
+          "wall_ms_contended": 30.644942,
+          "word_xors": 4287344
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 115,
+          "splits": 61,
+          "wall_ms_contended": 17.623499,
+          "word_xors": 2717407
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 249,
+          "splits": 126,
+          "wall_ms_contended": 21.099418,
+          "word_xors": 3447373
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 3574,
+          "splits": 1772,
+          "wall_ms_contended": 211.056367,
+          "word_xors": 20999503
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 388,
+          "splits": 194,
+          "wall_ms_contended": 28.740628,
+          "word_xors": 4276337
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 418,
+          "splits": 209,
+          "wall_ms_contended": 29.777433,
+          "word_xors": 4437694
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 2734,
+          "splits": 1356,
+          "wall_ms_contended": 156.128663,
+          "word_xors": 16800123
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 203,
+          "splits": 103,
+          "wall_ms_contended": 17.42132,
+          "word_xors": 3091034
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 626,
+          "splits": 312,
+          "wall_ms_contended": 41.035663,
+          "word_xors": 5419994
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 52,
+          "splits": 29,
+          "wall_ms_contended": 10.824492,
+          "word_xors": 2380314
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 585,
+          "splits": 293,
+          "wall_ms_contended": 39.334902,
+          "word_xors": 5217028
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 358,
+          "splits": 179,
+          "wall_ms_contended": 27.220151,
+          "word_xors": 3974791
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 274,
+          "splits": 137,
+          "wall_ms_contended": 22.179559,
+          "word_xors": 3498506
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 745,
+          "splits": 371,
+          "wall_ms_contended": 51.398237,
+          "word_xors": 5911370
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 344,
+          "splits": 172,
+          "wall_ms_contended": 30.379049,
+          "word_xors": 3961217
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 179,
+          "splits": 92,
+          "wall_ms_contended": 19.219258,
+          "word_xors": 2965057
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 515,
+          "splits": 258,
+          "wall_ms_contended": 40.50966,
+          "word_xors": 4867127
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 287,
+          "splits": 144,
+          "wall_ms_contended": 23.684708,
+          "word_xors": 3637177
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 82,
+          "splits": 44,
+          "wall_ms_contended": 12.423631,
+          "word_xors": 2491112
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 147,
+          "splits": 76,
+          "wall_ms_contended": 15.249786,
+          "word_xors": 2896262
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 83,
+          "splits": 44,
+          "wall_ms_contended": 11.367827,
+          "word_xors": 2534723
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1402,
+          "splits": 695,
+          "wall_ms_contended": 86.189132,
+          "word_xors": 9669492
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 327,
+          "splits": 164,
+          "wall_ms_contended": 28.231669,
+          "word_xors": 3964405
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 874,
+          "splits": 436,
+          "wall_ms_contended": 58.86201,
+          "word_xors": 6788247
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 216,
+          "splits": 110,
+          "wall_ms_contended": 23.705145,
+          "word_xors": 3116741
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 125,
+          "splits": 65,
+          "wall_ms_contended": 15.245436,
+          "word_xors": 2767885
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1702,
+          "splits": 844,
+          "wall_ms_contended": 102.516727,
+          "word_xors": 11229614
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 253,
+          "splits": 127,
+          "wall_ms_contended": 23.952281,
+          "word_xors": 3529432
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1403,
+          "splits": 695,
+          "wall_ms_contended": 91.281432,
+          "word_xors": 9767750
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 547,
+          "splits": 274,
+          "wall_ms_contended": 40.662246,
+          "word_xors": 4982398
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 402,
+          "splits": 201,
+          "wall_ms_contended": 33.137104,
+          "word_xors": 4188151
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 2223,
+          "splits": 1103,
+          "wall_ms_contended": 149.721845,
+          "word_xors": 13908616
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 2212,
+          "splits": 1098,
+          "wall_ms_contended": 156.514251,
+          "word_xors": 13825182
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 209,
+          "splits": 107,
+          "wall_ms_contended": 18.18893,
+          "word_xors": 3114952
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 153,
+          "splits": 79,
+          "wall_ms_contended": 15.692995,
+          "word_xors": 2877986
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 3903,
+          "splits": 1934,
+          "wall_ms_contended": 225.848587,
+          "word_xors": 22989002
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 594,
+          "splits": 297,
+          "wall_ms_contended": 42.202894,
+          "word_xors": 5216261
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 1069,
+          "splits": 532,
+          "wall_ms_contended": 81.417504,
+          "word_xors": 7609024
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 210,
+          "splits": 107,
+          "wall_ms_contended": 18.871286,
+          "word_xors": 3130596
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 886,
+          "splits": 442,
+          "wall_ms_contended": 55.159316,
+          "word_xors": 6748033
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 392,
+          "splits": 196,
+          "wall_ms_contended": 29.786469,
+          "word_xors": 4280863
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 715,
+          "splits": 356,
+          "wall_ms_contended": 46.272111,
+          "word_xors": 5847762
+        },
+        {
+          "build_ms_contended": 0.0,
+          "outcome": "found",
+          "reductions": 521,
+          "splits": 261,
+          "wall_ms_contended": 36.672891,
+          "word_xors": 4978043
+        }
+      ],
+      "r": 130873,
+      "reductions_total": 69775,
+      "relations_found": 106,
+      "solver_budget_exceeded": 0,
+      "solver_calls": 106,
+      "solver_ops": 594556194,
+      "targets_tried": 106,
+      "total_gae": 2123096.9660310736,
+      "verified": true,
+      "wall_s_contended": 4.823073031,
+      "wall_truncated": false
+    }
+  ],
+  "seed": 123212651130,
+  "v_seed": 370935120
+}
