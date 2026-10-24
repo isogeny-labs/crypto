@@ -21,6 +21,9 @@ in the [unvalidated benchmark archive](ARCHIVE.md), with their exact former row
 text, digest, reason, and source provenance. Archived rows are not measurements
 admitted by this table and cannot satisfy the validation gate.
 
+The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
+is preserved separately pending validation admission.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-23 | [`20261023-volcano-gap-speedups`](20261023-volcano-gap-speedups/) | Speed-ups to the deep-volcano prime-gap study, outputs identical before and after: ecbench `rho.negation` against the new `rho.negation_lanes` (32 lockstep walks, one batch inversion a round) paired in one session on 48 curve models × 4 targets × 3 rounds (r ≈ 2^40.8); external `ca solve --alg rho` (cryptanalysis 1aa48b5) on the same targets; `ecbench plan` registry cache; Jacobian/Montgomery cross-gap N-isogeny; sharded sessions | rho median solve **362 → 155 ms** (wall ratio 0.419 [0.417, 0.421]), 294 → 119 ns per counted op; counted cost **+2.5%** [2.1, 2.9]% (no GAE improvement); external `ca` 58 ms / 45 ns per op, so the lanes walk is still **≈ 2.6× slower** than the fastest rho at hand; plan 96.6 → 0.31 s (plan byte-identical); N-isogeny set-up 0.154 → 0.047 s on 1 CPU (map: no gain on 1 CPU, 2.95× on 4 threads); 6840-run measurement span 2120 → 734 s (records identical; total CPU time rose) | Intel Xeon @ 2.10 GHz, 4 vCPU shared VM, L1/L2 (rho), pinned `taskset` (timings) | [study](../research/deep_volcano_prime_gap_20261022/speedups-20261023/README.md) ([PDF](20261023-volcano-gap-speedups/report.pdf), [run report: rho](20261023-volcano-gap-speedups/run-report-rho-lanes.pdf), [run report: sharded](20261023-volcano-gap-speedups/run-report-sharded.pdf)) |
