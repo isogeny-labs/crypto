@@ -233,3 +233,60 @@ versus the (more likely, and still valuable) defensive negative — that at the
 prime challenge degrees the class is excluded by structure, and at composite
 degrees it is hideable only when the published generator hands the author more
 seed freedom than the weakness costs to grind.
+
+## 11. N=51 honest-prior phase, frozen before the run (2026-10-24)
+
+This phase measures only the distribution of the minimum *applicable* GHS
+genus. It does not run a grinder, a rarity detector, a descended DLP, or rho.
+The preregistered panel is 16,384 indices `0..16383` under the 32-byte seed
+`2026102420261024202610242026102420261024202610242026102420261024`.
+The public mapping is `ghs-honest-prior-v1-blake3-xof` in
+`src/cryptanalysis/seed_grind_trapdoor.rs`: domain-separated BLAKE3 XOF
+blocks are modeled as uniform 51-bit `a` and rejection-sampled nonzero 51-bit
+`b`. The field uses the repository's least sparse irreducible degree-51
+polynomial, and its low terms are frozen in the output manifest.
+
+The statistic is the least genus among `audit_curve` rows with `descends=true`
+and a **proper intermediate subfield** (`l=3` or `17`). The `l=1` row is
+retained in each raw audit but excluded from this statistic because it is
+descent to `GF(2)`, outside the intermediate-subfield trapdoor class.
+Thresholds fixed before the run are `g* ∈ {0,1,2,3,4,8}`. The report gives
+hit counts, empirical `p`, and `-log2(p)` only for observed hits; a zero-hit
+threshold gets the exact one-sided 95% binomial upper bound
+`1-0.05^(1/16384)`, not a finite estimate of grind bits. The same code's
+`--verify` mode checks the raw byte digest, then replays every seed index and
+compares each decoded audit and the aggregate. The run directory is created
+once and cannot be overwritten.
+
+**Corrections to the earlier protocol, before reading data.** `audit_curve`
+now reports MMT condition (8) and exact `BigUint` genus; a row that cannot
+descend is excluded. The earlier words "hideable exactly when
+`grind_bits ≤ freedom_bits`" were too strong: for `2^f` independent seed
+choices and event probability `p`, success probability is
+`1-(1-p)^(2^f)`, not a step function. The `grind_bits/freedom_bits` ratio is
+an expected-work comparison, and detector error rates require the later
+declared freedom model. No such rate or attack `S` is inferred from this
+phase. The raw sample is an anonymous seed-indexed panel, not a set of named
+benchmark curves; any later individually cited candidate must obtain an ICV1
+identity and registry entry first.
+
+## 12. N=51 honest-prior phase 1 result (2026-10-24)
+
+The 16,384-index panel produced minimum applicable genus 4 through `l=17`
+for all 16,384 indices. Each threshold `g* ≤ 3` had zero hits; the exact
+one-sided 95% binomial upper bound on its event probability, conditional on
+indexed BLAKE3 outputs modeled as independent uniform draws, is
+`0.0001828282722735608`. At
+`g* = 4` or `8`, the sample had 16,384 hits, empirical probability 1 and
+empirical grind cost 0 bits. This is a panel distribution, not the singular
+honest-baseline end-to-end `S` row in §2.
+
+The [run report](reports/run-20261024T2112Z/REPORT.md),
+[figure](reports/run-20261024T2112Z/genus-histogram.svg),
+[PDF](reports/run-20261024T2112Z/report.pdf),
+[summary](seed_grind_trapdoor_20261024_run/summary.json), and
+[raw observations](seed_grind_trapdoor_20261024_run/observations.jsonl)
+record the frozen protocol, exact inputs, full audit rows, digest and replay.
+The same implementation rederived every observation. The next phase must
+freeze the available seed freedom and detector before testing grind selection;
+its generator, detector error, solver costs and matched rho remain open.

@@ -140,6 +140,7 @@ pub mod diem_descent;
 pub mod ec_index_calculus;
 pub mod ec_index_calculus_j0;
 pub mod ec_trapdoor;
+pub mod seed_grind_trapdoor;
 pub mod ecbench;
 pub mod ecbench_large_prime;
 pub mod ecc2k130_guard;
