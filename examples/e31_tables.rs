@@ -93,7 +93,9 @@ fn load(path: &str) -> Option<Vec<Value>> {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    let dir = args.get(1).map_or("experiments/31_solve_cost", |s| s.as_str());
+    let dir = args
+        .get(1)
+        .map_or("experiments/31_solve_cost", |s| s.as_str());
     let e25 = args.get(2).map_or("experiments/30_gls_v4", |s| s.as_str());
     let mut o = String::new();
 
@@ -213,8 +215,14 @@ fn main() {
             let s_at = |r: &Value, g: f64| f(r, "total_muls") + g * gae * f(r, "macaulay_entries");
             let rho_at =
                 |r: &Value, g: f64| f(r, "rho_matched_muls") + g * gae * f(r, "rho_matched_steps");
-            let rs: Vec<f64> = [0.0, 0.1, 1.0].iter().map(|&g| s_at(a, g) / s_at(b, g)).collect();
-            let gr: Vec<f64> = [0.0, 0.1, 1.0].iter().map(|&g| s_at(b, g) / rho_at(b, g)).collect();
+            let rs: Vec<f64> = [0.0, 0.1, 1.0]
+                .iter()
+                .map(|&g| s_at(a, g) / s_at(b, g))
+                .collect();
+            let gr: Vec<f64> = [0.0, 0.1, 1.0]
+                .iter()
+                .map(|&g| s_at(b, g) / rho_at(b, g))
+                .collect();
             let _ = writeln!(
                 band,
                 "| {p} | {s} | {arm} | {gae:.1} | {:.2} | {:.2} | {:.3} | {} | {} | {} | {} |",
@@ -224,7 +232,11 @@ fn main() {
                 g3(gr[0]),
                 g3(gr[1]),
                 g3(gr[2]),
-                if rs.iter().all(|&x| x > 1.0) { "yes" } else { "**no**" },
+                if rs.iter().all(|&x| x > 1.0) {
+                    "yes"
+                } else {
+                    "**no**"
+                },
             );
         }
         let _ = writeln!(
