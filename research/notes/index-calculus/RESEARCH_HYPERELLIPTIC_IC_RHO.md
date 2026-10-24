@@ -1864,3 +1864,15 @@ unpriced native work and is reported as a count (`W` comparisons per
 step) for §5a. If C14-2 to C14-4 hold, the active folded walk becomes the
 reference (class **accounting**, against index calculus). If C14-1
 fails, long cycles are not the cause and the fold is examined further.
+
+**Lead atlas (read 2026-10-24).** `LEAD-RHO-negation-map-fruitless-cycles`
+in crypto-autoresearcher's `knowledge/leads/ecdlp/` is `closed_known`: the
+`√2` gain and fruitless-cycle escape are established (KR-RHO-fb88e6), and
+ecbench's generic `rho.negation` reproduces them on prime toy curves
+(0.757 against 0.707). Rounds thirteen and fourteen are therefore not a
+new lead: they bring this thread's own reference to that known result.
+That strengthens the standing plan to run the thread's rho through
+ecbench's generic arms, under §12 and §5a, rather than keep a separate
+implementation. Likewise `LEAD-RHO-r-adding-walk-mixing` (closed_known)
+covers round twelve's finding: a walk whose steps are not effectively
+random elements pays extra steps.
