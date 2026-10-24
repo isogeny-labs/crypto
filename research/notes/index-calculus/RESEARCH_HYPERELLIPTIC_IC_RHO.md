@@ -1994,3 +1994,43 @@ every `k` verified; the active arm reproduces round fourteen's column.
 - This reproduces the known result (`LEAD-RHO-negation-map-fruitless-cycles`,
   closed_known) inside the thread. It is not a new lead and not an
   improvement to index calculus.
+
+## Lead: a hyperelliptic family in ecbench — plan, written before code
+
+**Why.** Under §12 a cross-method measurement goes through ecbench, and
+under §5a every arm's unpriced work is counted and priced. This thread
+has done neither, which is why every IC/rho ratio in it is labelled
+"lower-bound, unranked". Rounds twelve to fifteen also showed the
+thread's own rho reference needed four corrections to reach the
+behaviour ecbench's generic `rho.negation` already has. Running the
+thread's instances through ecbench removes the separate reference.
+
+**What is built (infrastructure; no performance claim).**
+
+1. A word-size, `Copy` Mumford divisor for genus ≤ 4 over `F_p`,
+   `p < 256`, with Cantor composition and reduction in fixed arrays,
+   implementing `CountedGroup`: each composition or doubling is one
+   counted group operation, and `key` is an injective encoding of the
+   reduced divisor (degree-offset, base `p`), so the distinguished-point
+   table, the jump partition and the `±` class rule see distinct
+   divisors as distinct.
+2. An ecbench instance for the thread's curves
+   (`hyperelliptic_thread {p, genus}`, plus an explicit form the measured
+   child rebuilds from without repeating the order search). `#J` is
+   `c·ℓ` for the thread's prime `ℓ`; `c` is the unique small multiplier
+   with `c·ℓ` in the Hasse–Weil interval that annihilates random divisors.
+3. Dispatch of the generic arms (`rho.plain`, `rho.negation`, and the
+   generic BSGS and kangaroo if they come with it) on that instance; IC
+   methods refused until an IC arm exists.
+
+**Correctness checks before any measurement.** Agreement of add,
+double, negation and scalar multiplication with the BigUint
+`MumfordDivisorP` on genus 2, 3 and 4 thread curves; `ℓ·D₁ = 0`;
+key injectivity and `key(D) ≠ key(−D)`; genus-2 `#J` against
+`genus2_fp`; an end-to-end ecbench plan/run/verify on small instances
+with every run verified and every replay identical. The end-to-end run
+is a smoke test, not a result.
+
+**Not in this step.** No IC arm (it needs an adapter from the thread's
+index calculus to ecbench's IC interface), no measured comparison, no
+leaderboard or benchmarks row.
