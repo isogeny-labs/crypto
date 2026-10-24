@@ -2,7 +2,13 @@
 # Cloud-init body. launch_spot.py prepends the four pinned N83_* variables.
 set -euo pipefail
 
-shutdown -h +160
+deadline_seconds="$(date -u -d "$N83_SHUTDOWN_DEADLINE_UTC" +%s)"
+remaining_seconds="$((deadline_seconds - $(date -u +%s)))"
+if (( remaining_seconds <= 0 )); then
+  shutdown -h now
+  exit 1
+fi
+shutdown -h +"$((remaining_seconds / 60))"
 mkdir -p /opt/n83/logs /opt/n83/src
 exec > >(tee -a /opt/n83/logs/bootstrap.log) 2>&1
 

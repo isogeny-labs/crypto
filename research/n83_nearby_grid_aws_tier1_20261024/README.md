@@ -26,7 +26,8 @@ replay, or any K1107/rho A/A spread over 20% leaves the screen
 The approved launch envelope is one `g5g.metal` Spot instance for at most
 165 minutes and $5. `launch_spot.py` fixes a $1.70/hour maximum bid,
 one-time Spot request, encrypted 80 GiB root volume, IMDSv2, no inbound
-network, and a 160-minute shutdown deadline. The bootstrap also shuts down
+network, and an absolute 160-minute shutdown deadline set before the launch
+request. The bootstrap also shuts down
 when it finishes. The instance role reads only the task's S3 prefix and
 has SSM access. An interrupted or capped run preserves its partial rows;
 it is never silently restarted as the same run.

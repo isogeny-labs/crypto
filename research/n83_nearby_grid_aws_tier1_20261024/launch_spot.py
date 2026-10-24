@@ -2,7 +2,7 @@
 """Stage a pinned source archive and launch one budget-capped N83 Spot host."""
 
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 from pathlib import Path
@@ -56,13 +56,15 @@ def plan(bundle_path, commit):
     if image["Architecture"] != "arm64" or image["State"] != "available":
         raise ValueError("Ubuntu ARM64 image differs")
     source_uri = f"s3://{BUCKET}/jobs/n83-nearby-grid-aws-tier1/{commit}/source.tar.zst"
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    now = datetime.now(timezone.utc)
+    stamp = now.strftime("%Y%m%dT%H%M%SZ")
     results_uri = f"s3://{BUCKET}/jobs/n83-nearby-grid-aws-tier1/{commit}/runs/{stamp}"
     return {"commit": commit, "bundle_path": str(bundle_path),
             "bundle_sha256": bundle_sha, "bundle_s3_uri": source_uri,
             "results_s3_uri": results_uri, "quote_usd_per_hour": price,
             "quote_time": quote["SpotPriceHistory"][0]["Timestamp"],
             "max_hourly_usd": MAX_HOURLY_USD, "max_minutes": MAX_MINUTES,
+            "shutdown_deadline_utc": (now + timedelta(minutes=MAX_MINUTES)).isoformat(),
             "ami": ami, "root_device_name": image["RootDeviceName"]}
 
 
@@ -95,6 +97,7 @@ def user_data(value):
         "N83_BUNDLE_SHA256": value["bundle_sha256"],
         "N83_BUNDLE_S3_URI": value["bundle_s3_uri"],
         "N83_RESULTS_S3_URI": value["results_s3_uri"],
+        "N83_SHUTDOWN_DEADLINE_UTC": value["shutdown_deadline_utc"],
     }
     lines = ["#!/bin/bash", *(f"export {key}={shlex.quote(data)}"
                               for key, data in variables.items())]
