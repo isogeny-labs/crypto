@@ -1665,7 +1665,7 @@ mod tests {
     ) -> Option<LevelCertificate> {
         let q = BigUint::from(f.p).pow(f.k() as u32);
         let k = eigen_order(ell, t);
-        let (m, twist) = if k % 2 == 0 {
+        let (m, twist) = if k.is_multiple_of(2) {
             (k / 2, true)
         } else {
             (k, false)

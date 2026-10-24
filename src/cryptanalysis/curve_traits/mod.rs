@@ -2166,9 +2166,9 @@ impl TraitFile {
         Ok((file, fx))
     }
 
-    /// Pretty JSON with a trailing newline, as committed.
+    /// Compact JSON with a trailing newline.
     pub fn to_json(&self) -> String {
-        let mut s = serde_json::to_string_pretty(self).expect("serialisable");
+        let mut s = serde_json::to_string(self).expect("serialisable");
         s.push('\n');
         s
     }
