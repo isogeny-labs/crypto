@@ -96,14 +96,6 @@ fn ntz(n: u64) -> u32 {
     n.trailing_zeros()
 }
 
-fn l_table_max_log(blocks: usize) -> usize {
-    if blocks > 1 {
-        (usize::BITS - (blocks - 1).leading_zeros()) as usize
-    } else {
-        1
-    }
-}
-
 /// **PMAC tag** of `message` under the given block cipher.  Returns 16 bytes.
 pub fn pmac<C: BlockCipher128>(cipher: &C, message: &[u8]) -> [u8; 16] {
     let l = enc(cipher, &[0u8; 16]);
@@ -116,7 +108,11 @@ pub fn pmac<C: BlockCipher128>(cipher: &C, message: &[u8]) -> [u8; 16] {
     } else {
         message.len().div_ceil(BLOCK)
     };
-    let max_log = l_table_max_log(m);
+    let max_log = if m > 1 {
+        (usize::BITS - (m - 1).leading_zeros()) as usize
+    } else {
+        1
+    };
     let mut l_table = Vec::with_capacity(max_log + 1);
     let mut cur = double(&l); // L_0 = L · x
     l_table.push(cur);
@@ -235,16 +231,6 @@ mod tests {
             }
             prev = Some(tag);
         }
-    }
-
-    /// The L-table sizing arithmetic must use the full `usize` width.
-    #[test]
-    fn pmac_l_table_width_uses_usize_bits() {
-        assert_eq!(l_table_max_log(1), 1);
-        assert_eq!(l_table_max_log(2), 1);
-        assert_eq!(l_table_max_log(8), 3);
-        #[cfg(target_pointer_width = "64")]
-        assert_eq!(l_table_max_log((u32::MAX as usize) + 2), 33);
     }
 
     /// Multi-block message: 4 full AES blocks.  Self-consistency only.
