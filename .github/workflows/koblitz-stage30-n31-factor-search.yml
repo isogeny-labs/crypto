@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   validate-control:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage30-n31-factor-search.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage30-n31-factor-search.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     steps:
       - uses: actions/checkout@v4
       - run: python3 scripts/run_koblitz_stage30_n31_search.py self-test
@@ -23,7 +23,7 @@ jobs:
   search:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     needs: validate-control
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|koblitz-stage30-n31-factor-search.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|koblitz-stage30-n31-factor-search.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
@@ -32,6 +32,7 @@ jobs:
         run: |
           mkdir "$RUNNER_TEMP/stage30-build"
           cp research/sat_factor_base_review_20260908/continuation-05-sota-gates/stage-20-rust-build/Cargo.lock Cargo.lock
+          bash .github/scripts/frozen-lock-source.sh
           /usr/bin/time -v -o "$RUNNER_TEMP/stage30-build/build.time" cargo build --release --locked --bin ic
       - name: Run the fixed n31 search
         run: |
