@@ -11,11 +11,18 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use serde::{Deserialize, Serialize};
 
 use super::canonical::sha256_hex;
+use super::host;
+use super::isolation::BenchLock;
 use super::record::Record;
 use super::workload::{Instance, Workload};
 
 pub const GPU_STAGE_SCHEMA: &str = "ecbench.gpu_stage/v1";
 pub const GPU_MATCH_SCHEMA: &str = "ecbench.gpu_match/v1";
+
+/// What the elapsed times of a GPU command receipt cover.  The driver's
+/// own figures (`host_seconds`, `device_seconds`, ...) are the
+/// benchmark's; `elapsed_ns` is the whole process.
+pub const ELAPSED_SCOPE: &str = "elapsed_ns/elapsed_ms run from spawn to reap: process start, CUDA runtime and context initialisation, allocation, the benchmark itself, and teardown. They are not the benchmark's time; use the driver's own reported figures for that.";
 
 #[derive(Clone, Debug)]
 pub struct GpuOptions {
@@ -24,6 +31,20 @@ pub struct GpuOptions {
     pub mode: String,
     pub args: Vec<String>,
     pub timeout_seconds: u64,
+    /// The shared benchmark lock (`isolation::DEFAULT_LOCK`): a GPU
+    /// stage is timed work and does not run beside another timed session.
+    pub lock_path: String,
+    /// Queue behind a session holding the lock.
+    pub wait_for_lock: bool,
+}
+
+/// Write the host capsule beside the receipt and return its SHA-256 and
+/// the host class, so the numbers keep their host.
+fn write_host_capsule(out: &Path) -> Result<(String, String), String> {
+    let capsule = host::capture()?;
+    let text = serde_json::to_string_pretty(&capsule).map_err(|e| e.to_string())? + "\n";
+    std::fs::write(out.join("host.json"), &text).map_err(|e| e.to_string())?;
+    Ok((sha256_hex(text.as_bytes()), capsule.env_class_id))
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -56,6 +77,16 @@ pub struct GpuStage {
     pub benchmark_output_recognized: Option<bool>,
     pub status: String,
     pub limitation: String,
+    /// SHA-256 of `host.json`, the capsule captured under the lock.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub host_sha256: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub env_class_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lock_path: Option<String>,
+    /// What `elapsed_ns` covers (it includes process start and CUDA init).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub elapsed_scope: Option<String>,
 }
 
 fn unix_ms() -> u128 {
@@ -191,8 +222,12 @@ pub fn run(opts: &GpuOptions) -> Result<GpuStage, String> {
     let binary = std::fs::canonicalize(&opts.binary)
         .map_err(|e| format!("{}: {e}", opts.binary.display()))?;
     let bytes = std::fs::read(&binary).map_err(|e| format!("{}: {e}", binary.display()))?;
+    // Timed work takes the lock first, as a session does, then captures
+    // the host it ran on.
+    let _lock = BenchLock::acquire(&opts.lock_path, opts.wait_for_lock)?;
     std::fs::create_dir(&opts.out)
         .map_err(|e| format!("{}: {e}; use a new output directory", opts.out.display()))?;
+    let (host_sha256, env_class_id) = write_host_capsule(&opts.out)?;
     // Execute a private byte copy so a concurrent rebuild cannot change
     // the binary between the device self-test and the measured stage.
     let snapshot = opts.out.join("gpu-bench.binary");
@@ -255,6 +290,10 @@ pub fn run(opts: &GpuOptions) -> Result<GpuStage, String> {
         benchmark_output_recognized,
         status: status.into(),
         limitation: "Fixed-curve GPU stage output: no shared EC Bench workload identity, external answer replay, matched CPU baseline, GPU contention sampling, or admitted end-to-end comparison".into(),
+        host_sha256: Some(host_sha256),
+        env_class_id: Some(env_class_id),
+        lock_path: Some(opts.lock_path.clone()),
+        elapsed_scope: Some(ELAPSED_SCOPE.into()),
     };
     let body = serde_json::to_string_pretty(&receipt).map_err(|e| e.to_string())? + "\n";
     std::fs::write(opts.out.join("gpu-stage.json"), body).map_err(|e| e.to_string())?;
@@ -270,6 +309,9 @@ pub struct GpuMatchOptions {
     pub telemetry_binary: PathBuf,
     pub cpu_record: Option<PathBuf>,
     pub args: Vec<String>,
+    /// The shared benchmark lock and whether to queue behind it.
+    pub lock_path: String,
+    pub wait_for_lock: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -314,6 +356,21 @@ pub struct GpuMatch {
     pub wall_blockers: Vec<String>,
     pub status: String,
     pub cost_scope: String,
+    /// SHA-256 of `host.json`, the capsule captured under the lock.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub host_sha256: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub env_class_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lock_path: Option<String>,
+    /// `solve.elapsed_ns` less the driver's `host_seconds`: process start,
+    /// CUDA context initialisation, teardown, outside the benchmark's own
+    /// clock.  `None` when the driver did not report `host_seconds`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_overhead_seconds: Option<f64>,
+    /// What `solve.elapsed_ns` covers.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub elapsed_scope: Option<String>,
 }
 
 fn sample_gpu(binary: &Path) -> GpuSample {
@@ -574,8 +631,12 @@ pub fn run_match(opts: &GpuMatchOptions) -> Result<GpuMatch, String> {
     }
     let binary = std::fs::canonicalize(&opts.binary).map_err(|e| e.to_string())?;
     let bytes = std::fs::read(&binary).map_err(|e| e.to_string())?;
+    // Timed work takes the lock first, as a session does, then captures
+    // the host it ran on.
+    let _lock = BenchLock::acquire(&opts.lock_path, opts.wait_for_lock)?;
     std::fs::create_dir(&opts.out)
         .map_err(|e| format!("{}: {e}; use a new output directory", opts.out.display()))?;
+    let (host_sha256, env_class_id) = write_host_capsule(&opts.out)?;
     std::fs::write(opts.out.join("workload.json"), &raw_workload).map_err(|e| e.to_string())?;
     if let Some(raw) = cpu_raw {
         std::fs::write(opts.out.join("cpu-record.json"), raw).map_err(|e| e.to_string())?;
@@ -621,6 +682,11 @@ pub fn run_match(opts: &GpuMatchOptions) -> Result<GpuMatch, String> {
         wall_blockers: Vec::new(),
         status: "selftest_failed".into(),
         cost_scope: "solve.elapsed_ns includes process startup, allocation, transfers, table build, device kernels, candidate recovery and teardown. host_seconds runs from BSGS entry through the answer, excluding process startup and teardown. CUDA event time covers measured device phases only. GPU steps are not EC Bench GAE.".into(),
+        host_sha256: Some(host_sha256),
+        env_class_id: Some(env_class_id),
+        lock_path: Some(opts.lock_path.clone()),
+        process_overhead_seconds: None,
+        elapsed_scope: Some(ELAPSED_SCOPE.into()),
     };
     if receipt.selftest.exit_code == Some(0)
         && !receipt.selftest.timed_out
@@ -703,6 +769,13 @@ pub fn run_match(opts: &GpuMatchOptions) -> Result<GpuMatch, String> {
             receipt.d2d_bytes = field_u64(v, "d2d_bytes");
             receipt.recovered = v.get("k").cloned();
         }
+        // Process start, CUDA context creation and teardown sit in the
+        // command's elapsed time and outside the driver's own clock; the
+        // difference is reported, not folded into either figure.
+        receipt.process_overhead_seconds = receipt
+            .host_seconds
+            .filter(|h| h.is_finite())
+            .map(|h| solve.elapsed_ns as f64 / 1e9 - h);
         let k = receipt.recovered.as_deref().and_then(parse_scalar_hex);
         receipt.independently_verified = k.is_some_and(|k| {
             k < u128::from(prime.r) && inst.mul_generator_hex(k).as_ref() == Some(&target)
@@ -765,6 +838,12 @@ pub fn audit_match(dir: &Path) -> Result<Vec<String>, String> {
     let mut issues = Vec::new();
     if receipt.schema != GPU_MATCH_SCHEMA {
         issues.push("receipt schema mismatch".into());
+    }
+    if let Some(expected) = &receipt.host_sha256 {
+        match std::fs::read(dir.join("host.json")) {
+            Ok(bytes) if &sha256_hex(&bytes) == expected => {}
+            _ => issues.push("host capsule missing or altered".into()),
+        }
     }
     let workload_raw = std::fs::read(dir.join("workload.json")).map_err(|e| e.to_string())?;
     let workload: Workload = serde_json::from_slice(&workload_raw).map_err(|e| e.to_string())?;
@@ -1011,6 +1090,8 @@ mod tests {
             mode: "rho".into(),
             args: vec!["--iters".into(), "8".into()],
             timeout_seconds: 3,
+            lock_path: root.join("lock").display().to_string(),
+            wait_for_lock: false,
         })
         .unwrap();
         assert_eq!(r.status, "stage_completed");
@@ -1028,7 +1109,9 @@ mod tests {
             out,
             mode: "rho".into(),
             args: vec![],
-            timeout_seconds: 3
+            timeout_seconds: 3,
+            lock_path: root.join("lock").display().to_string(),
+            wait_for_lock: false,
         })
         .is_err());
 
@@ -1040,6 +1123,8 @@ mod tests {
             mode: "rho".into(),
             args: vec![],
             timeout_seconds: 3,
+            lock_path: root.join("lock").display().to_string(),
+            wait_for_lock: false,
         })
         .unwrap();
         assert_eq!(r.status, "selftest_failed");
@@ -1085,6 +1170,8 @@ mod tests {
             workload: workload_path,
             out: out.clone(),
             timeout_seconds: 5,
+            lock_path: root.join("lock").display().to_string(),
+            wait_for_lock: false,
             telemetry_binary: telemetry,
             cpu_record: None,
             args: vec!["--iters".into(), "8".into()],
@@ -1103,6 +1190,8 @@ mod tests {
             workload: root.join("workload.json"),
             out: bad.clone(),
             timeout_seconds: 5,
+            lock_path: root.join("lock").display().to_string(),
+            wait_for_lock: false,
             telemetry_binary: root.join("telemetry.sh"),
             cpu_record: None,
             args: Vec::new(),
@@ -1111,5 +1200,74 @@ mod tests {
         assert_eq!(failed.status, "selftest_failed");
         assert!(audit_match(&bad).unwrap().is_empty());
         std::fs::remove_dir_all(root).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod lock_and_capsule_tests {
+    use super::*;
+
+    fn tmp(name: &str) -> PathBuf {
+        let d = std::env::temp_dir().join(format!("ecbench-gpu-{name}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).unwrap();
+        d
+    }
+
+    fn options(d: &Path, lock: &str) -> GpuOptions {
+        GpuOptions {
+            binary: PathBuf::from("/bin/true"),
+            out: d.join("out"),
+            mode: "rho".into(),
+            args: vec![],
+            timeout_seconds: 20,
+            lock_path: lock.into(),
+            wait_for_lock: false,
+        }
+    }
+
+    #[test]
+    fn a_gpu_stage_takes_the_bench_lock_before_it_creates_anything() {
+        let d = tmp("lock");
+        let lock = d.join("lock").display().to_string();
+        let held = BenchLock::acquire(&lock, false).unwrap();
+        let err = run(&options(&d, &lock)).unwrap_err();
+        assert!(err.contains("another benchmark holds"), "{err}");
+        assert!(!d.join("out").exists());
+        drop(held);
+    }
+
+    #[test]
+    fn a_gpu_stage_writes_a_host_capsule_the_receipt_binds() {
+        let d = tmp("capsule");
+        let lock = d.join("lock").display().to_string();
+        // /bin/true has no device self-test output: the stage stops at
+        // `selftest_failed`, after the lock and the capsule.
+        let receipt = run(&options(&d, &lock)).unwrap();
+        assert_eq!(receipt.status, "selftest_failed");
+        let host_json = std::fs::read(d.join("out/host.json")).unwrap();
+        assert_eq!(
+            receipt.host_sha256.as_deref(),
+            Some(&*sha256_hex(&host_json))
+        );
+        assert!(receipt
+            .env_class_id
+            .as_deref()
+            .unwrap()
+            .starts_with("ECBENV3h"));
+        assert_eq!(receipt.lock_path.as_deref(), Some(lock.as_str()));
+        // The elapsed times are labelled for what they cover.
+        assert!(receipt.elapsed_scope.as_deref().unwrap().contains("CUDA"));
+        // The lock was released when the stage ended.
+        drop(BenchLock::acquire(&lock, false).unwrap());
+    }
+
+    #[test]
+    fn receipts_written_before_the_capsule_fields_still_read() {
+        let old = r#"{"schema":"ecbench.gpu_stage/v1","kind":"gpu_ecc_stage","binary":"b","binary_sha256":"x","cuda_visible_devices":null,"mode":"rho","args":[],"timeout_seconds":1,"selftest":{"argv":[],"started_unix_ms":0,"elapsed_ms":0,"child_pid":0,"exit_code":0,"timed_out":false,"stdout_sha256":"","stderr_sha256":""},"benchmark":null,"benchmark_output_recognized":null,"status":"selftest_failed","limitation":"l"}"#;
+        let r: GpuStage = serde_json::from_str(old).unwrap();
+        assert!(r.host_sha256.is_none() && r.elapsed_scope.is_none());
+        let text = serde_json::to_string(&r).unwrap();
+        assert!(!text.contains("host_sha256"));
     }
 }

@@ -384,6 +384,140 @@ pub fn estimated_storage_for_phi_l(l_log2: u64) -> (u64, u64) {
     (num_coefs_log2, total_bits_log2)
 }
 
+/// `Φ_l(X, Y)` over `Z` for a prime `l`, from the `q`-series of `j`.
+///
+/// Same triangular scheme as `isogeny_walk::modpoly` but over `Z`, so the
+/// result can be reduced mod 2 (the F_p version needs `p > 3` to invert
+/// 1728). `j = E4³ / (Δ/q) · q⁻¹` with `Δ/q = Π(1 − qⁿ)²⁴` a unit series,
+/// so no rational arithmetic occurs. `Φ_l = X^{l+1} + Y^{l+1} − X^lY^l + Σ c_ab X^aY^b`;
+/// the unknown `c_ab` (`a ≤ b`) first appears at `q^{−(a + l b)}` with
+/// coefficient one, and every other exponent through `q^{CHECK}` must vanish
+/// (checked: `None` if any does not).
+pub fn phi_exact(l: u32) -> Option<ModularPolynomial> {
+    const CHECK: usize = 8;
+    let lu = l as usize;
+    let top = lu * (lu + 1);
+    let len = top + CHECK + 1;
+    let n = len + 1;
+    let sigma = |k: u32, m: usize| -> BigInt {
+        (1..=m).filter(|d| m % d == 0).map(|d| BigInt::from(d).pow(k)).sum()
+    };
+    let mul = |a: &[BigInt], b: &[BigInt], cut: usize| -> Vec<BigInt> {
+        let mut out = vec![BigInt::zero(); cut];
+        for (i, x) in a.iter().enumerate().take(cut) {
+            if x.is_zero() {
+                continue;
+            }
+            for (j, y) in b.iter().enumerate().take(cut - i) {
+                out[i + j] += x * y;
+            }
+        }
+        out
+    };
+    let mut e4 = vec![BigInt::zero(); n];
+    e4[0] = BigInt::one();
+    for m in 1..n {
+        e4[m] = BigInt::from(240) * sigma(3, m);
+    }
+    let e4_3 = mul(&mul(&e4, &e4, n), &e4, n);
+    // Δ/q = Π (1 − qⁿ)^24, and its inverse as a series (leading coeff 1).
+    let mut delta = vec![BigInt::zero(); n];
+    delta[0] = BigInt::one();
+    for k in 1..n {
+        let mut f = vec![BigInt::zero(); n];
+        f[0] = BigInt::one();
+        if k < n {
+            f[k] = BigInt::from(-1);
+        }
+        for _ in 0..24 {
+            delta = mul(&delta, &f, n);
+        }
+    }
+    let mut inv = vec![BigInt::zero(); n];
+    inv[0] = BigInt::one();
+    for k in 1..n {
+        let mut acc = BigInt::zero();
+        for i in 1..=k {
+            acc += &delta[i] * &inv[k - i];
+        }
+        inv[k] = -acc;
+    }
+    let jser = mul(&e4_3, &inv, len); // j = q⁻¹ Σ jser[k] q^k
+    let ser_pow = |base: &[BigInt], e: usize| -> Vec<BigInt> {
+        let mut r = vec![BigInt::zero(); len];
+        r[0] = BigInt::one();
+        for _ in 0..e {
+            r = mul(&r, base, len);
+        }
+        r
+    };
+    let mut jl = vec![BigInt::zero(); len];
+    for k in 0..len {
+        if k * lu < len {
+            jl[k * lu] = jser[k].clone();
+        }
+    }
+    let apow: Vec<Vec<BigInt>> = (0..=lu + 1).map(|a| ser_pow(&jser, a)).collect();
+    let bpow: Vec<Vec<BigInt>> = (0..=lu + 1).map(|b| ser_pow(&jl, b)).collect();
+    // X^a Y^b = q^{-(a + l b)} A[a] B[b]; its q^e lands at index e + top.
+    let add = |r: &mut Vec<BigInt>, a: usize, b: usize, coef: &BigInt| {
+        let base = top - (a + lu * b);
+        for (i, bi) in bpow[b].iter().enumerate() {
+            if bi.is_zero() || base + i >= len {
+                continue;
+            }
+            let cb = coef * bi;
+            for (k, ak) in apow[a].iter().enumerate() {
+                if base + i + k >= len {
+                    break;
+                }
+                r[base + i + k] += &cb * ak;
+            }
+        }
+    };
+    let mut r = vec![BigInt::zero(); len];
+    add(&mut r, lu + 1, 0, &BigInt::one());
+    add(&mut r, 0, lu + 1, &BigInt::one());
+    add(&mut r, lu, lu, &BigInt::from(-1));
+    let mut by_pole: Vec<Option<(usize, usize)>> = vec![None; top + 1];
+    for b in 0..=lu {
+        for a in 0..=b {
+            if a == lu && b == lu {
+                continue;
+            }
+            by_pole[a + lu * b] = Some((a, b));
+        }
+    }
+    let mut coeffs = HashMap::new();
+    coeffs.insert((0, lu as u32 + 1), BigInt::one());
+    coeffs.insert((lu as u32, lu as u32), BigInt::from(-1));
+    for idx in 0..len {
+        let pole = top as isize - idx as isize;
+        let slot = if pole >= 0 { by_pole[pole as usize] } else { None };
+        match slot {
+            Some((a, b)) => {
+                let c = -r[idx].clone();
+                add(&mut r, a, b, &c);
+                if a != b {
+                    add(&mut r, b, a, &c);
+                }
+                if !r[idx].is_zero() {
+                    return None;
+                }
+                if !c.is_zero() {
+                    coeffs.insert((a as u32, b as u32), c);
+                }
+            }
+            None => {
+                if !r[idx].is_zero() {
+                    return None;
+                }
+            }
+        }
+    }
+    Some(ModularPolynomial { l: l as u64, coeffs })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -410,6 +544,39 @@ mod tests {
         // higher).  Actually max total degree in Φ_3 is 6 (X³Y³).
         let td = phi.total_degree();
         assert!(td >= 4);
+    }
+
+    /// The exact q-series construction reproduces the tabled Φ_2, Φ_3 and
+    /// satisfies Kronecker's congruence Φ_l ≡ (X^l − Y)(X − Y^l) mod l for
+    /// l = 5, 7, 11, 13 (an independent check on the new tables).
+    #[test]
+    fn phi_exact_matches_tables_and_kronecker() {
+        for (l, tab) in [(2u32, phi_2()), (3, phi_3())] {
+            let ex = phi_exact(l).expect("construction");
+            for i in 0..=l + 1 {
+                for j in 0..=l + 1 {
+                    assert_eq!(ex.coeff(i, j), tab.coeff(i, j), "Φ_{l} ({i},{j})");
+                }
+            }
+        }
+        for l in [5u32, 7, 11, 13] {
+            let ex = phi_exact(l).expect("construction");
+            let lb = BigInt::from(l);
+            // (X^l − Y)(X − Y^l) = X^{l+1} − X^l Y^l − XY + Y^{l+1}
+            for i in 0..=l + 1 {
+                for j in 0..=l + 1 {
+                    let want = match (i, j) {
+                        (a, 0) if a == l + 1 => 1,
+                        (0, b) if b == l + 1 => 1,
+                        (a, b) if a == l && b == l => -1,
+                        (1, 1) => -1,
+                        _ => 0,
+                    };
+                    let c = ex.coeff(i, j);
+                    assert_eq!((c - BigInt::from(want)) % &lb, BigInt::zero(), "Φ_{l} ({i},{j})");
+                }
+            }
+        }
     }
 
     /// Storage estimate scaling.  Demonstrates the l → 2²⁵⁶ blow-up

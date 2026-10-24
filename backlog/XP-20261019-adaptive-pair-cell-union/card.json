@@ -1,0 +1,87 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261019-adaptive-pair-cell-union",
+  "title": "Exact adaptive pair-cell union and residual controller",
+  "created": "2026-10-19",
+  "authors": [
+    "rootfinding research"
+  ],
+  "status": "draft",
+  "status_note": "No hosted task or lease created; native union controller and independent verifier must be implemented and frozen.",
+  "blocked_on": [],
+  "links": {
+    "lead": "research/autolab_cycle_20261019_v3/REPORT.md",
+    "notes": [
+      "research/adaptive_pair_cells_20261019_v1/PROOF.md"
+    ],
+    "prs": [
+      2099
+    ]
+  },
+  "question": "Can exact disjoint adaptive-cell coverage reduce the paid full original-chain search rather than only certify conditional components?",
+  "decision_value": "If unions leave a small, cheaply represented residual and preserve all small original roots, preregister a changed hard controller. If overlap/state explosion dominates, refute that route and seek a different conditional partition; no larger unchanged timeout.",
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "aburan28/crypto",
+    "branch": "codex/rootfinding-v8-v10-evidence-20261017",
+    "build": []
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 4,
+    "disk_gb": 1,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Draft implementation; first profile90s,15min session cap. No rental authorized."
+  },
+  "run": {
+    "argv": [
+      "TODO-native-union-controller",
+      "{out}"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 90
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "scientific_result_v1",
+    "verify": [],
+    "land": "research/adaptive_pair_cell_union_next"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261019-adaptive-pair-cell-union"
+    ],
+    "ttl_s": 900,
+    "env": {
+      "name": "native-cpp",
+      "recipe": "TODO-native-controller"
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 4096,
+      "timeout_s": 90,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261019-adaptive-pair-cell-union"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Local research queue only; no external compute or posting authorized."
+    }
+  }
+}
