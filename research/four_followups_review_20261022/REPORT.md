@@ -58,9 +58,10 @@ inputs with `u(x) != 0`. A separate exact certificate covers exceptional
 tripling (`x4 = x`). Separate exact certificates and written divisor
 arguments cover coprime 2+2 with `B != 0` (including `C = 0` degree
 drop), same-`u` mixed composition and doubling, and `B = 0` shared
-support. This covers the implemented 1+1, 1+2, and 2+2 branch map for
-smooth odd-characteristic curves, valid reduced inputs, and nonzero
-weights. A faithful mechanized theorem and independent mathematical
+support. This covers the implemented 1+1, 1+2, and 2+2 branch map for the
+implemented mapped family of smooth monic quintics with zero `x^4`
+coefficient over odd-characteristic fields, with valid reduced inputs and
+nonzero weights. A faithful mechanized theorem and independent mathematical
 review have not been recorded.
 
 The [Kummer coordinate evidence](../kummer_coordinates_20261022/REPORT.md)

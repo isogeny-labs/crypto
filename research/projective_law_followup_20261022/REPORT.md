@@ -70,6 +70,17 @@ an unshown equation in the [published paper](https://link.springer.com/article/1
 Finite branch checks do not establish universal correctness for every curve
 or input.
 
+The subsequent [proof audit](PROOF_AUDIT.md) compared another 1,224,000
+weighted additions on 42 models with independent Cantor arithmetic, with zero
+mismatches or unresolved branches. Eight exact integer-polynomial certificates,
+together with written divisor-class arguments, cover the implemented 1+1,
+1+2, and 2+2 branches on smooth monic quintics with no fourth-degree term
+over odd-characteristic fields, for valid reduced inputs and nonzero weights.
+The certificates separately transcribe the runtime
+formulas; their agreement with the implementation is manually reviewed and
+sampled by the finite audit. A faithful mechanized theorem and independent
+mathematical peer review have not been recorded.
+
 The [protocol](PROTOCOL.md) defines the frozen input and accounting.
 [DATA_DICTIONARY.md](DATA_DICTIONARY.md) defines raw JSONL, per-target
 normalized records, cost grids, and failure fields. The independent Rust

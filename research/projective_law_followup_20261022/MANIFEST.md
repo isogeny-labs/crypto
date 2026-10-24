@@ -56,7 +56,7 @@ The subsequent symbolic certificate for the generic weighted-input 1+2
 branch is built with `--bin projective-symbolic-12` and run from the
 repository root with stdout redirected to
 `results/symbolic-1plus2.json`. It checks exact sparse integer-polynomial
-coefficients; the algebra and the still-open branches are in
+coefficients; the algebra and subsequent branch certificates are in
 `PROOF_AUDIT.md`. This certificate does not alter the measured collector
 or its frozen outputs.
 
@@ -70,7 +70,7 @@ Build `--bin projective-symbolic-triple` and redirect stdout to
 and weighted-scale certificate. Build `--bin projective-symbolic-22-common`
 and redirect stdout to `results/symbolic-2plus2-common.json` for the exact
 generic coprime 2+2 CRT and weighted-scale certificate. The hypotheses,
-written divisor arguments, and still-open exceptional 2+2 cases are in
+written divisor arguments, and subsequent exceptional 2+2 certificates are in
 `PROOF_AUDIT.md`. Neither binary changes the frozen collector records.
 
 Build `--bin projective-symbolic-22-drop` and redirect stdout to
@@ -89,8 +89,8 @@ Build `--bin projective-symbolic-22-double` and redirect stdout to
 `results/symbolic-2plus2-double.json` for the same-`u`, equal-`v`
 doubling certificate. It checks exact Hermite interpolation for the
 `B≠0` paths, the `C=0` degree-one specialization, and weighted
-extraction when `B=0`. The divisor-class argument and remaining
-shared-support gap are in `PROOF_AUDIT.md`.
+extraction when `B=0`. The divisor-class argument and subsequent
+shared-support certificate are in `PROOF_AUDIT.md`.
 
 Build `--bin projective-symbolic-22-shared` and redirect stdout to
 `results/symbolic-2plus2-shared.json` for the versioned shared-root

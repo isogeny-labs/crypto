@@ -14,6 +14,8 @@ collector.
 
 The copied [study results PDF](results-report.pdf), [run PDF](run-report.pdf),
 and [cross-lead review PDF](cross-lead-report.pdf) retain their source reports.
+The run PDF is the original 05:47 UTC evidence snapshot; the study results PDF
+includes the later [proof audit](../../research/projective_law_followup_20261022/PROOF_AUDIT.md).
 Every graph in those PDFs has an SVG copy here, including
 [cost ratios](cost-ratios.svg), [direct price grid](direct-price-grid.svg),
 [branch coverage](branch-coverage.svg), and the review packet's

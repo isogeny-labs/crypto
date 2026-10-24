@@ -80,11 +80,10 @@ arbitrary-jump measurement requires the still-open recurrence.
   `K(T+G)` and each `K(T-J_i)` under the two prospective arbitrary jumps of
   the frozen collector, or substitute a fully specified differential walk
   whose candidate and relation distribution is measured against the control.
-- **Coordinate prerequisite:** Starting from the checked p=739 Rosenhain
-  normalization, derive theta constants and projection coordinates, then check
-  Gaudry's xDBL/xADD and the signed recovery of Chung--Costello--Smith
-  against the Jacobian, including all vanishing-denominator branches. The
-  rational-root and Rosenhain gates do not establish this projection.
+- **Coordinate basis:** Reuse the checked theta projection, xDBL/xADD and
+  signed Recover implementation from the fixed-difference collector. Check
+  any coordinate or vanishing-denominator branches newly reached by the
+  arbitrary-jump sidecar against the Jacobian before pricing that walk.
 - **Inputs and controls:** All 21 exact models; the signed Jacobian and
   source-curve oracles; the frozen 16-jump collector and its 1,260 target
   workload. Verify the sidecar after every jump, restart and cycle closure.

@@ -38,5 +38,7 @@ and torsion matrix before emitting counts. It also recomputes each source
 target's transfer and `k·P=Q`. The collector recomputes every candidate
 scalar through signed graph elimination and checks its transferred group
 identity and planted scalar. The independent Rust analyzer recomputes
-`k·P=Q` on the original elliptic curve over `Fp²`, joins the archived rho
-control and recalculates every cost cell from raw operations.
+`k·P=Q` on the original elliptic curve over `Fp²` and recalculates every
+cost cell from raw operations. The historical mode joins the archived
+same-source rho control; `KUMMER_RHO_SOURCE=paired` joins the fresh
+same-process rho control.

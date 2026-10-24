@@ -35,6 +35,7 @@ Rho & 0.860 & 734.608 & 84.414 & 0.079 \\
 \begin{center}\includegraphics[width=0.95\textwidth]{cost-ratios.png}\end{center}
 \begin{center}\includegraphics[width=0.95\textwidth]{direct-price-grid.png}\end{center}
 \noindent\textbf{Arithmetic gate.} Raw branch records cover all 21 normalized models with non-unit $Z,W$ checks and targeted inverse, coincident-support, degree-drop, and doubling cases. The separate $p=739$ regression preserves the exact input and both $N_6$ variants. These are finite checks, not a proof of universal branch correctness.
+\par\noindent\textbf{Later proof audit.} Another 1,224,000 weighted additions on 42 models matched Cantor with no unresolved branches. Eight exact integer-polynomial certificates and written divisor arguments cover the reachable 1+1, 1+2, and 2+2 branches on smooth monic quintics without an $x^4$ term over odd-characteristic fields, for valid reduced inputs and nonzero weights. The certificate formulas are manually matched to runtime code; no mechanized theorem or independent mathematical peer review is recorded. See \texttt{PROOF\_AUDIT.md}.
 \begin{center}\includegraphics[width=0.85\textwidth]{branch-coverage.png}\end{center}
 \medskip
 \noindent\textbf{Review files.} PROTOCOL.md defines the cohort and accounting. results/ contains raw per-target JSONL, source-replay and price summaries, both 36-cell grids, and the regression JSON. DATA\_DICTIONARY.md defines every standardized field. VALIDATION\_NOTES.md lists checks and remaining gaps. The SVG and PNG share the same recorded-values source.

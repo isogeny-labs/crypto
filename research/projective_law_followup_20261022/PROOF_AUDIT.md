@@ -71,7 +71,7 @@ homogeneity of one `W` power in the doubling expression; the retained
 a different result. The paper's completeness statement cannot by itself
 certify the modified implementation.
 
-## Remaining proof obligation
+## Exact coefficient certificates and divisor arguments
 
 ### Exact generic 1+2 identity, added after the finite audit
 
