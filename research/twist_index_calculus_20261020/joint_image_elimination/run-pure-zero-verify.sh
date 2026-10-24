@@ -3,6 +3,8 @@ set -euo pipefail
 joint_repo=$(git rev-parse --show-toplevel)
 joint_study="$joint_repo/research/twist_index_calculus_20261020/joint_image_elimination"
 joint_out=${1:?new output directory}
+joint_mode=${2:-discriminant}
+test "$joint_mode" = discriminant || test "$joint_mode" = square
 test ! -e "$joint_out"
 mkdir -p "$joint_out/metadata"
 joint_out=$(cd "$joint_out" && pwd)
@@ -27,8 +29,16 @@ joint_phase compile timeout --kill-after=10s 1200s cargo build --release --locke
 cp "$CARGO_TARGET_DIR/release/twist-pure-zero-verify" "$joint_out/runner"
 chmod 500 "$joint_out/runner"
 sha256sum "$joint_out/runner" > "$joint_out/metadata/runner.sha256"
-joint_input="$joint_study/runs/pure-zero-certificate-v1/search/certificate.json"
+if test "$joint_mode" = square; then
+  joint_input="$joint_study/runs/pure-zero-square-v1/search/certificate.json"
+else
+  joint_input="$joint_study/runs/pure-zero-certificate-v1/search/certificate.json"
+fi
 joint_sha=$(sha256sum "$joint_input" | cut -d ' ' -f 1)
-joint_phase verify prlimit --as=8589934592 -- timeout --kill-after=10s 60s "$joint_out/runner" "$joint_input" "$joint_sha" "$joint_out/verified"
+if test "$joint_mode" = square; then
+  joint_phase verify prlimit --as=8589934592 -- timeout --kill-after=10s 60s "$joint_out/runner" --square "$joint_input" "$joint_sha" "$joint_out/verified"
+else
+  joint_phase verify prlimit --as=8589934592 -- timeout --kill-after=10s 60s "$joint_out/runner" "$joint_input" "$joint_sha" "$joint_out/verified"
+fi
 date -u '+%Y-%m-%dT%H:%M:%SZ' > "$joint_out/metadata/finished-utc.txt"
 printf 'Independent exact/IDC replay terminal. Read the certificate scope and separate formalization gate.\n' > "$joint_out/complete.txt"
