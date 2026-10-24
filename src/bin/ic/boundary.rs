@@ -14,7 +14,7 @@
 use clap::{Args, ValueEnum};
 use crypto_lib::cryptanalysis::ic_boundary::{
     fit_exponents, format_markdown, run_char2_ladder, run_koblitz_ladder, run_prime_ladder,
-    BoundaryConfig, BoundaryLedger,
+    BaseArm, BoundaryConfig, BoundaryLedger,
 };
 use crypto_lib::cryptanalysis::ic_oracle_pricing::{
     format_oracle_markdown, price_oracles, price_swaps, OraclePricingConfig,
@@ -161,6 +161,15 @@ pub struct BoundaryArgs {
     /// the offsets each row paid for.
     #[arg(long)]
     pub eager_restart_pool: bool,
+    /// Factor-base arms of the two-summand walk rows (LEAD-19): `raw`
+    /// (every row as it is), `projected` (each base point multiplied by
+    /// the cofactor, same abscissa count) and `subgroup` (subgroup points
+    /// only, scanned to the same abscissa count).  `raw` is the default
+    /// and changes nothing; the others add `…_walk_projected[_balanced]`
+    /// and `…_walk_subgroup[_balanced]` rows and the class census of the
+    /// raw bases.
+    #[arg(long, value_delimiter = ',')]
+    pub base_arms: Option<Vec<String>>,
 }
 
 fn host() -> Value {
@@ -212,6 +221,18 @@ pub fn run(args: BoundaryArgs, json: bool) -> Result<Value, String> {
     }
     cfg.unguarded_targets = args.unguarded_targets;
     cfg.eager_restart_pool = args.eager_restart_pool;
+    if let Some(names) = &args.base_arms {
+        let mut arms = Vec::new();
+        for name in names {
+            let arm = BaseArm::parse(name)?;
+            if !arms.contains(&arm) {
+                arms.push(arm);
+            }
+        }
+        if !arms.is_empty() {
+            cfg.base_arms = arms;
+        }
+    }
     for &b in &cfg.prime_bits {
         if !(8..=32).contains(&b) {
             return Err(format!("prime ladder bits must lie in 8..=32, got {b}"));

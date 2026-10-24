@@ -124,6 +124,8 @@ fn every_problem_runs_verifies_and_rejects_wrong_answers() {
         ("path.supersingular", 12, vec![]),
         ("csidh.action", 1, vec![("preset", "n=6")]),
         ("klpt", 30, vec![]),
+        ("radical.chain", 6, vec![("ell", "7"), ("bits", "61")]),
+        ("radical.chain", 6, vec![("ell", "5"), ("bits", "61")]),
     ];
     for (problem, size, ps) in cases {
         let decl = problems::problem(problem).unwrap();
@@ -170,6 +172,40 @@ fn every_problem_runs_verifies_and_rejects_wrong_answers() {
             );
         }
     }
+}
+
+/// The radical.chain runner and verifier share one input-domain check (`radical_params`), so bad
+/// parameters are rejected cleanly instead of panicking: an unsupported or zero degree never
+/// reaches prime generation (degree zero would otherwise be a modulo-by-zero), and a chain length
+/// below two is refused at entry.
+#[test]
+fn radical_chain_rejects_invalid_parameters() {
+    let mk = |ell: &str| -> Params {
+        [
+            ("ell".to_string(), ell.to_string()),
+            ("bits".to_string(), "61".to_string()),
+        ]
+        .into_iter()
+        .collect()
+    };
+    // The guard runs before the answer is parsed, so the answer string is irrelevant here.
+    let any = "1,2,3,4,5,6,7";
+    // Verifier: zero degree (the modulo-by-zero path), an unsupported degree, and n < 2.
+    assert!(problems::verify("radical.chain", "radical", &mk("0"), 6, 0, any).is_err());
+    assert!(problems::verify("radical.chain", "radical", &mk("3"), 6, 0, any).is_err());
+    assert!(problems::verify("radical.chain", "radical", &mk("7"), 1, 0, "1,2").is_err());
+    // Runner: the same domain is refused with an error outcome, not a panic.
+    let c = cal();
+    assert!(
+        harness::child("radical.chain", "radical", &mk("0"), 6, 0, 11, &c)
+            .error
+            .is_some()
+    );
+    assert!(
+        harness::child("radical.chain", "radical", &mk("7"), 1, 0, 11, &c)
+            .error
+            .is_some()
+    );
 }
 
 #[test]

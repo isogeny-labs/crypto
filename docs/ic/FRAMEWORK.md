@@ -24,6 +24,12 @@ is visible where it lands, not only in the total.
 
 ## 1. Quick start
 
+For one-command structured-base search with live CADO-style progress, exact
+inventories, verified decomposition probes and resumable attempts, see
+[the native factor-base sweeper](factor-base-sweep/README.md). Its live rates
+and ETAs are provisional diagnostics; it does not certify regularity or a
+complete discrete-log speedup.
+
 ```bash
 cargo build --release --bin ic
 
