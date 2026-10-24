@@ -55,7 +55,8 @@ warn and let edits through.
 
 The session that opens a PR stays with it until it is merged or closed: it
 checks in on CI, reviews and merge state, fixes the failures and feedback its
-change causes, and merges once green and authorized. Any runtime may do this,
+change causes, and merges once green and authorized (a non-required check
+queued 24 hours without starting does not block the merge). Any runtime may do this,
 Claude Opus and Fable included. Check in through PR-activity subscriptions or
 safety-net check-ins (about 50 minutes, then about 4 hours; stop after 3 quiet
 check-ins), and never busy-poll, sleep in a loop, or re-read job logs faster

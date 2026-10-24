@@ -518,6 +518,14 @@ requires explicit authorization for that merge, and it follows these rules:
   completed successfully. Pending, cancelled, timed-out, or failed checks are
   not a pass. A skipped job counts as inapplicable only when its conditions or
   path filters justify that status; required checks must still be satisfied.
+- **Checks that never start do not block** (owner, 2026-10-23). A check that
+  no branch-protection rule or ruleset requires, and that has been queued for
+  24 hours or more without starting (no runner picked it up), does not hold
+  the merge, provided every check that did run on the current head passed.
+  Name each such job and how long it waited in the merge commit message. A
+  required check never falls under this: if one has not run, the PR waits and
+  the session says so on the PR. A check that started and is still running is
+  pending, not stuck.
 - Fix failures caused by the change autonomously: read the failing check's
   log, reproduce the failure locally, fix it, and rerun the affected
   validation before pushing. Never skip, disable, or quarantine a test to get
