@@ -13,7 +13,7 @@ We try to falsify H: H is falsified if the 95% interval of the slope lies entire
 
 ## Frozen inputs
 * Binary: `ic` built from this branch (`cargo build --release --bin ic`,
-  `CARGO_TARGET_DIR=/Volumes/SSD990-2/cargo-target-multiplier-scaling`); its sha256 goes in every JSONL row.
+  `CARGO_TARGET_DIR=/Volumes/SSD990-2/cargo-target-ic-followthrough-20261024` (amended, see below)); its sha256 goes in every JSONL row.
 * Oracle for every row: `mitm:negation_folded=1,m=3`; `--targets walk`; `--repeats 4`;
   `--rho-runs 4` (rho reference is context only, not part of any decision).
 * Instance seeds 5, 6, 7 (three instances per size). Metric: `S = total_gae / sqrt(r)` from the
@@ -65,3 +65,8 @@ S, log2 r, folded columns (`factor_base.columns`), points (`signed_points`), rel
 ## Cost accounting
 Counted gae only; all costs including factor-base construction, table build, oracle, linear algebra
 are in `total_gae` as the bench reports them. No wall time is used.
+
+## Amendment 1 (2026-10-24, before any run; coordinator instruction)
+The 20-minute cap is a **CPU-time** cap (`RLIMIT_CPU` 1200 s per invocation, i.e. `ulimit -t 1200`), not a wall cap,
+because host load is 60-100; a 4 h wall guard exists only to prevent hangs. Build target dir is the shared
+`/Volumes/SSD990-2/cargo-target-ic-followthrough-20261024`. Nothing else changes.

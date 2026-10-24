@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Frozen run script for PROTOCOL.md. Usage: run.py REGIME(bits|char2) FAMILY SIZE SEED OUT.jsonl
 Builds one sweep file (all grid cells on one instance), runs `ic bench --sweep`, appends one JSONL row per cell."""
-import json, sys, os, subprocess, hashlib, tempfile, math, time
-IC = os.environ.get("IC", "/Volumes/SSD990-2/cargo-target-multiplier-scaling/release/ic")
+import resource, json, sys, os, subprocess, hashlib, tempfile, math, time
+IC = os.environ.get("IC", "/Volumes/SSD990-2/cargo-target-ic-followthrough-20261024/release/ic")
 ORACLE = "mitm:negation_folded=1,m=3"
 GLV = {24:[50,100,200,400],28:[100,200,400,800],32:[200,400,800,1600],36:[400,800,1600,3200],40:[800,1500,3000,6000]}
 SUB = {20:range(6,10),22:range(7,11),24:range(8,12),26:range(9,13),28:range(9,13)}
@@ -37,10 +37,11 @@ def main():
     t0 = time.time()
     meta = {"kind": kind, "family": family if kind=="prime" else "random", "size": size, "seed": seed, "ic_sha256": sha}
     try:
-        p = subprocess.run(cmd, capture_output=True, text=True, timeout=1200)
-        status = f"rc={p.returncode}"; err = p.stderr[-300:]
+        p = subprocess.run(cmd, capture_output=True, text=True, timeout=14400,
+                           preexec_fn=lambda: resource.setrlimit(resource.RLIMIT_CPU, (1200, 1200)))  # CPU-time cap, not wall (load 60-100)
+        status = f"rc={p.returncode}" + (" (CPU cap 1200s hit)" if p.returncode < 0 else ""); err = p.stderr[-300:]
     except subprocess.TimeoutExpired:
-        status, err = "timeout_1200s", ""
+        status, err = "timeout_wallguard_4h", ""
     rows = []
     if os.path.exists(rp):
         rep = json.load(open(rp))
