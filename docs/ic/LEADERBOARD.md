@@ -345,6 +345,6 @@ Cold IC / matched rho online (60 rho draws, mean 2.035 s): 58.9 [50.3, 70.3] bef
 - `research/n83_padd_rank_20261019/analysis.json` — sha256 `0d993bec92eddef3…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
-- `docs/curves/registry.json` — sha256 `2d1c9747484edcad…`
+- `docs/curves/registry.json` — sha256 `595b71600e1f471a…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
