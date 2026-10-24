@@ -319,6 +319,11 @@ pub(super) fn export(public: &Path, expected: &str, arm_name: &str, qi: usize, o
     let geometric_variables = if arm == 8 { 5 } else { 6 };
     let mut geometric = joined.components(f, variables);
     if arm == 8 {
+        for equation in &mut geometric {
+            for (e, _) in equation {
+                e.resize(5, 0);
+            }
+        }
         let guard = quartic_discriminant(f)
             .mul(f, &Polynomial::var(f, 4))
             .sub(f, &Polynomial::scalar(f, 1));
@@ -372,6 +377,34 @@ pub(super) fn export(public: &Path, expected: &str, arm_name: &str, qi: usize, o
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn full_symmetric_regression_export_has_consistent_geometric_arity() {
+        let tape =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../quartic_twist_mixed_v1.ndjson");
+        let scratch =
+            std::env::temp_dir().join(format!("joint-four-export-check-{}", std::process::id()));
+        assert!(!scratch.exists());
+        std::fs::create_dir(&scratch).unwrap();
+        let public = public_record(&load(&tape, INPUT_SHA, 37, 0));
+        let bytes = serde_json::to_vec(&public).unwrap();
+        let sha = hex::encode(hash::sha256::sha256(&bytes));
+        let path = scratch.join("public.json");
+        std::fs::write(&path, bytes).unwrap();
+        let out = scratch.join("export");
+        export(&path, &sha, "l0-peel", 2, &out);
+        for (name, n) in [("system", 4), ("geometric", 5)] {
+            let v: Value =
+                serde_json::from_slice(&std::fs::read(out.join(format!("{name}.json"))).unwrap())
+                    .unwrap();
+            let equations: Vec<f4_fp::Poly> =
+                serde_json::from_value(v["equations"].clone()).unwrap();
+            assert_eq!(v["variables"], n);
+            assert!(equations.iter().flatten().all(|(e, _)| e.len() == n));
+            assert_eq!(v["root_encoding"], "elementary-four");
+            assert!(out.join(format!("{name}.ms")).is_file());
+        }
+        std::fs::remove_dir_all(scratch).unwrap();
+    }
     #[test]
     fn implicit_coordinates_match_every_registered_group_image() {
         let tape =

@@ -740,6 +740,10 @@ fn input_json(input: &[f4_fp::Poly]) -> Value {
         .collect::<Vec<_>>())
 }
 fn msolve_input(input: &[f4_fp::Poly], p: u64, n: usize) -> String {
+    assert!(
+        input.iter().flatten().all(|(e, _)| e.len() == n),
+        "exported exponent dimension mismatch"
+    );
     let names = ["e1", "e2", "e3", "u", "v", "s"];
     let polys = input
         .iter()
