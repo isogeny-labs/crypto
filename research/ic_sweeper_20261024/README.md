@@ -133,19 +133,74 @@ found nothing); §6 turns it into an explicit decision.
 ![distance to rho](distance_to_rho.svg)
 
 Graph data and source: `graph_data.json`, `plot.py`. Recorded values only.
+Panel B's six values were checked against `origin/main:docs/ic/LEADERBOARD.md`;
+those rows are marked "unvalidated (pre-gate)" there (validation gate,
+2026-10-19), so they are context, not admitted results.
+
+### 2.5 Same-day skeptical review (desk review, not a measurement)
+
+`/Volumes/SSD990-2/ic-regime-review-20261024/REVIEW.md` (2026-10-24; outside
+the repository, written by another session; every number in it is quoted from a
+file it names, and I did not re-verify them). The points that bear on this plan:
+
+- **No published-IC baseline exists in the repo.** No experiment runs a standard
+  FGHR-style symmetric Gröbner decomposition with the standard base
+  `{P : x(P) ∈ F_q}` as the reference arm, and WDSat appears only in
+  cryptanalysis `pdp-scaling`. Every "× times" in the program is against rho or
+  against the program's own previous producer. The stated goal (2026-10-22) is
+  to beat published IC at matched (q, n, m). The review's F2 proposes the
+  reference protocol: standard base, FGHR symmetrised S_{m+1}, msolve (and
+  WDSat for binary) as solver, cold whole-solve S in GAE.
+- **The repo's own F4 is not a published engine.** `E3.md` on branch
+  `prime-semaev-20261019` finds it needs 10³–10⁷ more operations than a brute
+  grid on the same PKM systems, so any cost comparison that used the in-house F4
+  (e.g. "383–46,911× faster than F4" root-finding) is not evidence about
+  published Gröbner solvers. Degree measurements that used msolve are unaffected.
+- **Multiplier-closure wins at toy sizes do not transfer** (cm-multiplier,
+  binary-multiplier, Z[τ] norm bases): the gain is at most the multiplier-set
+  size and per-relation cost is unchanged; the review also records unfair
+  controls in the Z[τ] n = 71 row. Its stop list includes toy-size multiplier
+  comparisons, further twist/GLS at p < 1000, and new Koblitz rungs n = 85, 89.
+- **The "+10 bits" m = 4 row is a w = 1 lower bound**; at the measured exponent
+  (w ≈ 2.2–2.3) and K = 4–16 it is about +45 bits (the review's arithmetic, its
+  F1 is the check). cryptanalysis `pdp-scaling` finds MITM best over 35–51 bits
+  with algebraic solvers scaling worse (WDSat 3.0, CryptoMiniSat 3.95–6.97,
+  msolve 5.25 bits per unit of l against MITM's 2).
+- Rho conventions differ across documents (three in use), adding 25–30% unit
+  noise to any cross-document ratio. The review asks which canonicalisation the
+  N83 panel's rho uses; the sweeper's rho reference must record it.
 
 ## 3. Curves
 
 Koblitz curves are `y² + xy = x³ + a x² + 1`. Frobenius has order n and acts
 as λ on the prime subgroup; the signed orbit has size 2n.
 
-| id | family | n | log₂ r | cofactor | status |
+| id | family | n | log₂ r | cofactor | role |
 |---|---|--:|--:|--:|---|
-| a = 0, modulus `z^83+z^45+z^2+z+1` (`known_n83_k0()`; `icv1-f2m83-tm6151469093347-debefd74`) | Koblitz | 83 | **81.0** | 4 | **primary**; registered in `docs/curves/registry.json` (order 9671406556923184866742756) but with **no generator recorded** (`ec1_unresolved`: `KoblitzCurve` covers n ≤ 63); rho only (~2^37.5 steps) |
-| a = 1, n = 83 (`icv1-f2m83-t6151469093347-9eba6cd5`) | Koblitz | 83 | 52.9 | 1,128,547,018 | **control**; IC runs end to end |
-| a = 0, n = 97 (`icv1-f2m97-t378251973071909-f27192f3`) | Koblitz | 97 | 95.0 | 4 | registered, no runs |
-| a = 1 n = 79 / 85 / 89 / 97 | Koblitz | — | 69.7 / 64.5 / 64.7 / 87.4 | 634 / 1.4·10⁶ / 2.1·10⁷ / 778 | computed in audit, unregistered, no runs |
-| prime ≈ 83 bits | any | — | — | — | **none exists**; nearest `fp-j0-b80` has a 32-bit subgroup |
+| a = 0, `debefd74` | Koblitz | 83 | **81.0** | 4 | **primary** |
+| a = 1, `9eba6cd5` / `cdcc5432` | Koblitz | 83 | 52.9 | 1,128,547,018 | **control** |
+| a = 0, `f27192f3` | Koblitz | 97 | 95.0 | 4 | registered, no runs |
+| a = 1, n = 79 / 85 / 89 / 97 | Koblitz | — | 69.7 / 64.5 / 64.7 / 87.4 | 634 / 1.4·10⁶ / 2.1·10⁷ / 778 | unregistered, no runs |
+| prime ≈ 83 bits | any | — | — | — | none exists |
+
+Slugs are abbreviated to their hash suffix; the full ICV1 slugs are
+`icv1-f2m83-tm6151469093347-debefd74`, `icv1-f2m83-t6151469093347-9eba6cd5`,
+`icv1-f2m83-t6151469093347-cdcc5432` and `icv1-f2m97-t378251973071909-f27192f3`,
+all in `docs/curves/registry.json`.
+
+- **Primary (a = 0, n = 83).** Modulus `z^83+z^45+z^2+z+1` (`known_n83_k0()`).
+  Registered with order 9671406556923184866742756 but **no generator recorded**
+  (`ec1_unresolved`: `KoblitzCurve` covers n ≤ 63). Rho only (~2^37.5 steps).
+- **Control (a = 1, n = 83).** Two registered representations of one group
+  (same trace and order): `9eba6cd5` (modulus `z^83+z^7+z^4+z^2+1`) and
+  `cdcc5432` (modulus `z^83+z^45+z^2+z+1`, fixture `known_n83_k1`). The summand
+  sweep ran its decomposers on `cdcc5432` and its rho reference on the
+  `9eba6cd5` basis (its PROTOCOL.md says so). Results are quoted per
+  representation and never merged by degree. IC runs end to end on this curve.
+- **a = 1, n = 79 / 85 / 89 / 97.** Computed in the audit, not registered.
+  n = 85 and 89 are on the §2.5 review's stop list, so not a priority.
+- **Prime ≈ 83 bits.** None exists in the repository. The nearest, `fp-j0-b80`
+  (cryptanalysis catalog), has a 32-bit prime subgroup.
 
 Two curve names for degree 83 must never be merged by degree
 (`research/n83_evaluation_20261012/verification/CURVE_ID_ERRATUM.md`); the
@@ -182,6 +237,14 @@ a = 1: only the root-table pipeline completes). So the objective cannot be an
   with its own rungs (a = 0, n = 13, 19, 23, 41, … primes with #E = 4·prime) —
   plus the n = 83 diagnostics measured directly (decided fraction, seconds per
   query, capacity). *Derived, not measured*; reported as such.
+- **Baselines, named and frozen before the search starts.** (i) *Incumbent
+  algebraic baseline* per family: ecbench `pdp3-koblitz` with inherited F4 on
+  the S4 Weil descent over `span{1..z^{d-1}}`, m = 3 (named by the ladder
+  report), with the linear m = 2 ladder as the current best algebraic arm.
+  (ii) *Matched rho*, with the canonicalisation recorded. (iii) *Published-IC
+  reference arm*: **missing** (§2.5). Until P4b builds it, every result is
+  reported as "vs the repository's incumbent" and "distance to rho", and none
+  is called an improvement over published index calculus.
 - **Scale-relative knobs.** Optimising S at one toy size selects
   configurations that only work at that size, because the base size scales
   like r^{1/3}. Every size-like knob is expressed relative to scale: base size
@@ -262,6 +325,14 @@ sweep finds constants, not a changed exponent; both measured IC exponents
 the gap to rho reported as distance remaining is the realistic success under
 the owner's criterion.
 
+**P4b — Published-IC reference arm and external solvers.** Specify and build
+the arm the review's F2 describes (standard base, FGHR symmetrised S_{m+1},
+msolve, WDSat for binary, cold whole-solve S in GAE) on the existing ladder
+sizes, and add adapters that run msolve, WDSat and CryptoMiniSat as sweepable
+engines beside the in-house ones. External-solver cost is priced by wall time
+(`measured`), so such rows are comparable only on the same host. This is the
+precondition for using the words "beats published".
+
 **P5 — Wide tier (n = 61…83).** Lift the u64 caps so `S` is measured above
 n = 63: plug `Gf2_128`/`koblitz_wide`/wide mod-r arithmetic into the framework
 (the `InstanceCtx r: u64`, `CountedGroup::mul k: u64` and linalg u64 limits are
@@ -324,6 +395,13 @@ layout (`PROTOCOL.md`, `raw/*.json`, `fit.json`).
   UNKNOWN, `BOUNDED_*` or at the cap).
 - Several ratios in the cited documents are weight-0 lower bounds recorded
   before the §5a rule.
+- **Rung gap on the primary family.** The a = 0 curves with cofactor 4 and
+  prime degree are n = 41, 83, 97 in the 24–130 range (cryptanalysis README);
+  the intermediate a = 0 rungs (53, 61, 71, 73) have cofactors of 10⁴–10⁶. A
+  fit projected to n = 83 therefore either extrapolates by 2× in n from n = 41,
+  or mixes cofactors across rungs. The note does not resolve this; the fit must
+  report which it did. The a = 1 control has the opposite problem (large
+  cofactor at every rung).
 - The Conductor control plane was unreachable from this session (404), and the
   sandbox blocked creating `.mcp.json` in the worktree. The lead atlas named in
   `CLAUDE.md` was not found in the sibling `crypto-autoresearcher` checkout
