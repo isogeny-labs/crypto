@@ -155,8 +155,9 @@ def check_verdict(runs: list[dict], statuses: list[dict]) -> tuple[str, list[str
 
 
 def checks_ran(runs: list[dict]) -> int:
-    """Checks that took a runner: everything but skipped and neutral ones."""
+    """Count checks that started on a runner; queued checks have not run yet."""
     return sum(1 for r in runs if r.get("name") not in IGNORE_CHECKS
+               and r.get("status") in {"in_progress", "completed"}
                and r.get("conclusion") not in {"skipped", "neutral"})
 
 
