@@ -93,6 +93,13 @@ jobs:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|curve-covers.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 45
     steps:
+      # Ported from #2452 (codex/curve-registry-full-tree-20261023): the
+      # hosted runner runs out of disk during checkout of the cover corpus.
+      - name: Free disk before checking out the cover corpus
+        if: runner.os == 'Linux'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/hostedtoolcache/CodeQL
+          df -h .
       - uses: actions/checkout@v4
         with:
           # verify-plan replays three immutable historical Git blobs.
