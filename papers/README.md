@@ -5,12 +5,17 @@ directory per paper.
 
 | directory | title | status |
 |---|---|---|
+| [norm-rootfinding/](norm-rootfinding/) | Exact Norm-Based Search for Constrained Roots over Finite Fields: Predicates, Circuit Representations, and Bounded Evidence | research draft, anonymized, not submitted or cleared; exact component proofs, native coordinate profile and UNKNOWN hard search; no qualified speedup |
+| [`ecdlp-six-month-portfolio/`](ecdlp-six-month-portfolio/) | A Six-Month ECDLP Research Programme: Implementations, Experiments, Structural Leads, and Evidence | research draft, anonymized, not submitted; 19-repository retrospective with pinned evidence and explicit coverage limits |
 | [`structural-completeness/`](structural-completeness/) | Structural Completeness of Prime-Field Elliptic Curves Against Isogeny-Graph Cryptanalysis | research draft, anonymized, not submitted; Markdown twin in `research/notes/cm-isogeny/PAPER_STRUCTURAL_COMPLETENESS.md` |
 | [`lll-degeneracy-note/`](lll-degeneracy-note/) | LLL Failures on the Boneh–Venkatesan Lattice Were Floating-Point Artifacts: A Corrected Note | corrected 2026-10-16 and 2026-10-17 (earlier curve-specificity claim and P-521 mechanism withdrawn); anonymized, not submitted |
 | [`eigen-seta/`](eigen-seta/) | Eigen-Séta: an isogeny KEM whose trapdoor is a hidden-degree endomorphism | revision 2 (2026-10-17): assessment added, unqualified NIST-category conjecture withdrawn (two claim tiers); research draft, anonymized, not peer reviewed, not submitted; maintained code in sibling repo `eigenx`, historical code in `eigen_seta/` |
+| [`eigen-seta-whitepaper/`](eigen-seta-whitepaper/) | Eigen-Séta: performance and security white paper | research document, anonymized, not peer reviewed; measured timings of every operation at L1–Q5 on one host, security levels in both NIST readings, attacks, risks and open questions; companion to `eigen-seta/` |
 | [`rootfinding-decomposition/`](rootfinding-decomposition/) | Point Decomposition by Root Finding: Replacing Gröbner-Basis Solvers in Elliptic-Curve Index Calculus, with Measurements on Prime and Binary Curves up to NIST P-521 | research draft, anonymized, not submitted, not cleared; engineering-class stage result, no security claim; Markdown twin in `RESEARCH_SEMAEV_ROOTFIND_VS_GROEBNER.md`; Prop. 1 machine-checked in `rootfinding-decomposition/lean/` |
+| [`conductor-gap-rho/`](conductor-gap-rho/) | Pollard Rho Across a Large Prime Conductor Gap: A Large-Sample Measurement and a Formal Invariance | research draft, anonymized, not submitted; null result on a measured question (24 audited ecbench sessions, 87,000 solves) plus a Lean theorem; study in `research/conductor_gap_rho_large_sample_20261018/` |
 | [`ecdlp-index-calculus-program/`](ecdlp-index-calculus-program/) | Index Calculus for the Elliptic-Curve Discrete Logarithm, Measured: a fourteen-week programme record (July–October 2026) | research draft, anonymized, not submitted; synthesis of committed evidence, no new measurement; proposes a split into five papers (README) |
 | [`isogeny-class-rho/`](isogeny-class-rho/) | The Elliptic-Curve Discrete Logarithm Does Not Know Which Curve It Is On: Pollard Rho Across Whole Isogeny Classes of Prime, Binary and Koblitz Curves | research draft, anonymized, not submitted, not cleared; null result with passing positive controls (rho against rho, 77,900 verified solves on four classes), no speedup claim; target IACR ePrint, authors owed (README) |
+| [`ecdlp-ic-improvement-ledger/`](ecdlp-ic-improvement-ledger/) | Ratcheting Elliptic-Curve Index Calculus Toward Pollard Rho: A Ledger of Verified Improvements, the Distance That Remains, and the Claims That Did Not Survive (July–October 2026) | research draft, anonymized, not submitted; synthesis of committed evidence through 2026-10-23, no new measurement; every improvement against its own incumbent with its distance to matched rho; 0 of 28 IC leaderboard rows validated at writing |
 
 Markdown drafts that are not yet typeset stay with their notes and are listed
 here so they are not lost: `research/ecdlp_autolab/PAPER_DRAFT.md` (An Empirical
@@ -41,3 +46,4 @@ Conventions shared by every paper here and by the sibling repositories
   the authors from an untracked `AUTHORS` file copied from `AUTHORS.example`.
 
 Add a new paper as a new subdirectory and a row in the table above.
+

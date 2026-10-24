@@ -65,7 +65,8 @@ $E cache                            # list the git and cargo cache entries
 | option | default | |
 |---|---|---|
 | `--type T` | `c7i.4xlarge` | GPU types (`g*`, `p*`) boot the NVIDIA Deep Learning Base AMI (AL2023); Graviton types boot arm64 AL2023 |
-| `--spot` | on-demand | one-time spot request; cheaper, can be reclaimed |
+| `--spot` | Spot only | accepted for compatibility; launches always request Spot and fail when unavailable |
+| `--resume ID` | none | restore the prior job's `out/` from S3 into `$EPHEMERAL_RESUME_DIR` before setup |
 | `--ttl SPAN` | `4h` | `90m`, `6h`, `2d`; 15 min to `max_ttl_hours` (48 h) |
 | `--disk GB` | 100 | encrypted gp3 root |
 | `--toolchain P` | `rust` | `none`, `build` (Development Tools, cmake, clang, gmp, mpfr, openssl), `rust` (build + rustup stable). `build` and `rust` boot the baked image when there is one |
@@ -80,6 +81,17 @@ $E cache                            # list the git and cargo cache entries
 | `--no-source` | | no checkout at all |
 | `--keep` | | leave the box up after the job, until the TTL (debugging with `shell`) |
 | `--name`, `--out`, `--ami` | | job label, output dir, explicit AMI |
+
+Every `ephemeral run` now uses a one-time Spot request. If all configured
+zones lack Spot capacity, the launch fails and creates no On-Demand instance.
+The command should write a complete checkpoint periodically into
+`$EPHEMERAL_OUT` and save one on SIGTERM. On a Spot interruption notice, the
+runner signals the command's process group, allows 60 seconds for its handler,
+then uploads `out/` to S3. To resume, rerun the same command with
+`--resume <interrupted-job-id>`; the application reads the prior checkpoint
+from `$EPHEMERAL_RESUME_DIR`. The previous S3 output is kept separate from the
+new job's `$EPHEMERAL_OUT`. The direct runner requires this explicit relaunch;
+taskq automatically requeues and resumes a checkpoint-enabled command.
 
 The job sees `EPHEMERAL_JOB_ID`, `EPHEMERAL_OUT` (write results here) and
 `EPHEMERAL_SRC` (the checkout, also the working directory).
@@ -124,12 +136,27 @@ behind an HTTPS proxy:
 | `run --type c7i.large --toolchain none --paths taskq -- '…; exit 5'` with 1 unpushed commit | 66 KiB patch applied on the box, `$EPHEMERAL_OUT/arch.txt` fetched, CLI exit 5, instance `terminated` (job `20261017-043626-rs-smoke-29351c`) |
 | `run --detach -- sleep 600`, then `ls`, `kill last`, `status last`, `logs last` | listed as running, killed, status stays `killed`, instance shutting down (job `20261017-043746-sleep-76db6b`) |
 
-Not run against AWS yet: `bake`, `shell`, `--spot`, GPU types, and the
-capacity fallback across zones (they use the same calls as the bash CLI, but
-the Rust paths have not been exercised). `cargo test` covers the pure parts:
+Not run against AWS through the Rust CLI yet: `bake`, `shell`, Spot launches,
+GPU types, and the capacity retry across zones. `cargo test` covers the pure parts:
 id and slug rules, TTL spans, bash quoting of the command and `env` (checked
 by running bash), the user data (`bash -n`, deadline armed first) and the
 exit-status table.
+
+### Live Spot smoke on 2026-10-17
+
+The Bash CLI was run from macOS against account `104186811093` in `us-east-1`
+with `--type c7i.large --toolchain none --ttl 20m --no-source`. Both launches
+had `lifecycle: spot`, exit code 0, and EC2 state `terminated` after result
+upload. The first instance's live `instanceInitiatedShutdownBehavior` was
+also read back as `terminate`.
+
+| job | instance | verified S3 result |
+|---|---|---|
+| `20261018-000532-spot-smoke-e16821` | `i-0dd79b09071349226` | `out/checkpoint.txt` contained `spot-ok` |
+| `20261018-000811-spot-resume-smoke-a82fb6` | `i-0b87684b75f41526c` | `--resume` restored the first job's output; `out/result.txt` contained `resumed-ok` |
+
+This verifies Spot selection, S3 output persistence, explicit resume, and
+self-termination. A real interruption notice was not induced in this smoke.
 
 ### What ships from the working tree
 
@@ -358,10 +385,11 @@ in the region; as of 2026-10-16 it exists in no region of account
 **Spot capacity:** on 2026-10-16, us-east-1 had no spot capacity for
 `c7i.4xlarge` or `c6i.4xlarge` in any zone, while 2- and 4-vCPU spot types
 launched at once. When every zone refuses, `run` prints each zone's reason;
-drop `--spot` or pick another type.
+pick another Spot eligible type or retry later.
 
-The machine running the CLI needs `aws` (v2), `jq` and `git`, plus the
-`ephemeral-launcher` policy. Set `EPHEMERAL_REGION` if the stack is not in
+The machine running the Bash CLI needs `aws` (v2), `jq` and `git`, plus the
+`ephemeral-launcher` policy. The Bash CLI works with macOS's Bash 3.2 as well
+as Linux Bash. Set `EPHEMERAL_REGION` if the stack is not in
 `us-east-1`, and `EPHEMERAL_CONFIG` if `name` is not `ephemeral`.
 
 Teardown: `terraform destroy`. Empty the bucket first, or destroy refuses.

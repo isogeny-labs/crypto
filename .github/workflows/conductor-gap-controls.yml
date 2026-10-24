@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   native-controls:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|conductor-gap-controls.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|conductor-gap-controls.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -133,7 +133,7 @@ jobs:
       - name: Browser keeps unpriced native work out of S rankings
         run: python3 scripts/test_lab_browser_cost_admission.py
   conditional-proofs:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|conductor-gap-controls.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|conductor-gap-controls.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -141,12 +141,24 @@ jobs:
           filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: /research/conductor_gap_cm_orbits_20261015/lean/
+      - name: Install Lean archive dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v zstd >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y zstd
+          fi
       - name: Install hash-pinned Lean 4.34.1
         shell: bash
         run: |
           set -euo pipefail
           curl --fail --location --retry 3 https://github.com/leanprover/lean4/releases/download/v4.34.1/lean-4.34.1-linux.tar.zst -o /tmp/lean.tar.zst
           echo '47bf4bbd78f70c2e9670598ab7124d92b6efb7330ff33e5fbb4030f6fd72e4e4  /tmp/lean.tar.zst' | sha256sum --check
+          # The self-hosted runner image has no zstd; ubuntu-latest does.
+          if ! command -v zstd > /dev/null; then
+            sudo apt-get update && sudo apt-get install -y zstd
+          fi
           mkdir /tmp/lean
           tar --zstd -xf /tmp/lean.tar.zst -C /tmp/lean --strip-components=1
           /tmp/lean/bin/lean research/conductor_gap_cm_orbits_20261015/lean/OrbitControls.lean
