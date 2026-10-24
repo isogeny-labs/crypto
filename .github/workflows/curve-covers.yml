@@ -97,6 +97,7 @@ jobs:
         with:
           # verify-plan replays three immutable historical Git blobs.
           fetch-depth: 0
+          filter: blob:none
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'
@@ -133,6 +134,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          filter: blob:none
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
