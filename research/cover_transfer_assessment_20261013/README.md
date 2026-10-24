@@ -1,7 +1,7 @@
 ---
 title: "Catalog-wide curve-cover transfer assessment"
 subtitle: "All 15,791 current maps and all 979 EC1 bindings"
-date: "2026-10-19"
+date: "2026-10-24"
 subject: "cover-transfer-assessments/v2; catalog_maps=15791; unique_cover_models=15789; geometry_verified_maps=15791; ec1_representations=979; assessed_maps=15791; unassessed_maps=0; assessed_subgroups=979; unassessed_subgroups=0"
 geometry: margin=0.8in
 fontsize: 10pt
@@ -412,7 +412,7 @@ screen is not imported as a map, order, or recovery certificate.
 The current source allowlist accepts all four catalog input profiles. The
 catalog-wide constructor test exercises the standalone `construct` path for
 all 15,791 models in catalog snapshot
-[93b87bbc](https://github.com/aburan28/crypto/commit/93b87bbcc3eb774bc937b535ed34898f466d05e7). That commit pins the three
+[72830471](https://github.com/aburan28/crypto/commit/728304718cb0ab6df70da620a908a5f76f175293). That commit pins the three
 catalog files; the test assertion is part of the current source. This is
 source-level evidence, not a published-artifact claim.
 
