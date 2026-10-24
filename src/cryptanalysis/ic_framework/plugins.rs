@@ -983,6 +983,10 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
                 "include alpha(P) for every alpha = a + b*phi of norm <= this; 0 or absent: seeds only",
             ),
             ("endo", "index of the curve's CM endomorphism; default 0"),
+            (
+                "mult",
+                "also include [m]P for m = 2..=mult with weight m (needs no endomorphism); default 1",
+            ),
         ]
     }
 
@@ -1026,6 +1030,10 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
         for e in velu_degree3_endomorphisms(inst) {
             endos.push(Box::new(e));
         }
+        let mult = match params.get("mult") {
+            None => 1i64,
+            Some(_) => params.u64("mult")?.max(1) as i64,
+        };
         if norm_cap > 0 && endos.is_empty() {
             return Err(
                 "cm-multiplier needs a curve with a rational degree-2 or degree-3 CM endomorphism (--family d7, d8 or d11)".into(),
@@ -1054,6 +1062,11 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
                         multipliers.push((a, b));
                     }
                 }
+            }
+        }
+        for m in 2..=mult {
+            if !multipliers.contains(&(m, 0)) {
+                multipliers.push((m, 0));
             }
         }
         let to_scalar = |v: i64| -> u64 { v.rem_euclid(r as i64) as u64 };
@@ -1105,12 +1118,16 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
             columns += 1;
             push_pair(&mut points, &mut col_of, &mut coef_of, seed, column, 1);
             if !multipliers.is_empty() {
-                let e = endo.ok_or("no endomorphism")?;
-                let phi_seed = e.apply(g, seed);
-                endo_applies += 1;
-                if e.degree() > 1 {
-                    ops.adds += 1; // an inversion-equivalent evaluation of phi
-                }
+                let phi_seed = match endo {
+                    Some(e) if multipliers.iter().any(|&(_, mb)| mb != 0) => {
+                        endo_applies += 1;
+                        if e.degree() > 1 {
+                            ops.adds += 1; // an inversion-equivalent evaluation of phi
+                        }
+                        e.apply(g, seed)
+                    }
+                    _ => g.identity(),
+                };
                 for &(ma, mb) in &multipliers {
                     let sa = to_scalar(ma);
                     let sb = to_scalar(mb);
@@ -1158,6 +1175,129 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
         )?;
         fb.cost.count("endomorphism_applies", endo_applies);
         Ok(fb)
+    }
+}
+
+/// **Integer-multiple closure on any binary curve** (lead A1 without an
+/// endomorphism): each seed `P` (a point with one of the smallest
+/// abscissae, projected into the order-`r` subgroup) contributes
+/// `[m]P` for `m = 1..=mult` on its own column with weight `m`, built by
+/// repeated addition (one group addition per multiple).  `K` seeds then
+/// behave like `K * mult` independent points for the pair table while
+/// the rank stage needs only `K + 1` relations.  Nothing here uses
+/// structure, so it applies to a random curve; as `K -> 1` it becomes a
+/// baby-step/giant-step table (the honest limit of the idea).
+pub struct BinaryMultiplierBase<'i> {
+    pub instance: &'i BinaryInstance,
+}
+
+impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinaryMultiplierBase<'_> {
+    fn name(&self) -> &str {
+        "binary-multiplier"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "{} smallest-abscissa seeds, each with its multiples [1..{}]P on its column",
+            params.get("size").unwrap_or("?"),
+            params.get("mult").unwrap_or("1")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("size", "seed abscissae (columns)"),
+            (
+                "mult",
+                "include [m]P for m = 2..=mult with weight m; 1 or absent: seeds only",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<FastPoint>, String> {
+        let inst = self.instance;
+        let g = ctx.group;
+        let size = params.u64("size")? as usize;
+        if size == 0 {
+            return Err("size must be positive".into());
+        }
+        let mult = match params.get("mult") {
+            None => 1u64,
+            Some(_) => params.u64("mult")?.max(1),
+        };
+        let mut points: Vec<FastPoint> = Vec::new();
+        let mut col_of: Vec<usize> = Vec::new();
+        let mut coef_of: Vec<u64> = Vec::new();
+        let mut seen: HashSet<u64> = HashSet::new();
+        let mut columns = 0usize;
+        let mut x = 1u64;
+        let cap = (1u64 << inst.n.min(40)).min(1 << 24);
+        while columns < size {
+            if x >= cap {
+                return Err(format!("only {columns} of {size} seeds in {cap} abscissae"));
+            }
+            let candidates = inst.points_with_x(x);
+            x += 1;
+            let Some(&cand) = candidates.first() else {
+                continue;
+            };
+            let seed = if ctx.cofactor == 1 {
+                cand
+            } else {
+                g.mul(ops, cand, ctx.cofactor)
+            };
+            if g.is_identity(&seed) {
+                continue;
+            }
+            let column = columns;
+            let mut member = seed;
+            let mut added = 0usize;
+            for m in 1..=mult {
+                if m > 1 {
+                    member = g.add(ops, member, seed);
+                }
+                if g.is_identity(&member) {
+                    break;
+                }
+                let nm = g.neg(member);
+                if seen.contains(&g.key(&member)) || seen.contains(&g.key(&nm)) {
+                    continue;
+                }
+                seen.insert(g.key(&member));
+                seen.insert(g.key(&nm));
+                let weight = m % ctx.r;
+                points.push(member);
+                col_of.push(column);
+                coef_of.push(weight);
+                added += 1;
+                if nm != member {
+                    points.push(nm);
+                    col_of.push(column);
+                    coef_of.push((ctx.r - weight) % ctx.r);
+                }
+            }
+            if added > 0 {
+                columns += 1;
+            } else {
+                // Roll back nothing: no point of this seed was kept.
+                continue;
+            }
+        }
+        FactorBase::from_column_map(
+            format!("{columns} seeds with multiples [1..{mult}]P ({} points)", points.len()),
+            points,
+            col_of,
+            coef_of,
+            columns,
+            |p| p.pack(),
+            |p| inst.fast.neg(*p).pack(),
+            |p| p.x,
+        )
     }
 }
 
@@ -2621,6 +2761,43 @@ mod tests {
                     "{family:?} point {i}"
                 );
             }
+        }
+    }
+
+    /// Every point of a `binary-multiplier` base is `[coefficient]` times
+    /// its column's seed (the weight-1 point), so each relation row over the
+    /// base is a true logarithm identity on a curve with no endomorphism use.
+    #[test]
+    fn binary_multiplier_columns_are_scalar_multiples_of_their_seed() {
+        let inst = koblitz_instance(1, 9).expect("registered n9 Koblitz instance");
+        let group = BinaryGroup(&inst.fast);
+        let ctx = InstanceCtx {
+            group: &group,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let mut ops = GroupOps::default();
+        let (_, params) = Params::parse_spec("binary-multiplier:size=3,mult=6").unwrap();
+        let fb = BinaryMultiplierBase { instance: &inst }
+            .build(&ctx, &params, &mut ops)
+            .unwrap();
+        assert_eq!(fb.columns, 3);
+        assert!(fb.points.len() > 3 * 2, "multiples add points");
+        let mut seeds: Vec<Option<FastPoint>> = vec![None; fb.columns];
+        for (i, p) in fb.points.iter().enumerate() {
+            if fb.coef_of[i] == 1 && seeds[fb.col_of[i]].is_none() {
+                seeds[fb.col_of[i]] = Some(*p);
+            }
+        }
+        let mut check = GroupOps::default();
+        for (i, p) in fb.points.iter().enumerate() {
+            let seed = seeds[fb.col_of[i]].expect("weight-1 seed per column");
+            assert_eq!(group.mul(&mut check, seed, fb.coef_of[i]), *p, "point {i}");
         }
     }
 
