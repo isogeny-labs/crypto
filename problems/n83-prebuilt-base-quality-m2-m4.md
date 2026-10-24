@@ -98,6 +98,11 @@ tests. Its rebuilt construction receipt is byte-identical to the committed
 receipt; [validation v3](../research/n83_d18_shared_bits_20261020/reports/run-20261024T0603Z/RUN_REPORT.md)
 retains both attempts.
 
+The subsequent [validation v4](../research/n83_d18_shared_bits_20261020/reports/run-20261024T0640Z/RUN_REPORT.md)
+repeats all 4,478 library tests and passes 29 affected-example tests after adding
+independent construction-policy checks to the native freezer and auditor.
+The worker, construction tool and general-field replayer are unchanged.
+
 The executable gate still requires a 4 GiB zero-swap Linux construction receipt,
 then a committed actual-host card for 22 constructed
 controls, 22 fresh independent replays and 18 natural queries. The native

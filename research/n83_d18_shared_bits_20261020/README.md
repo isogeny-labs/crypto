@@ -1,9 +1,10 @@
 # N83 D18 shared-bit encoding
 
 **Status: all local native gates pass on the updated parent: 4,478 library tests,
-28 affected-example tests, release builds and all six full-size constructions.
-The input inventory and Lean proof pass. Bounded Linux construction and the
-paired solver card remain pending behind the SSH runner's benchmark lock.**
+29 affected-example tests, release builds and all six full-size constructions.
+The input inventory and Lean proof pass. The SSH runner has acquired the
+benchmark lock and started native validation. Bounded Linux construction and
+the paired solver card remain pending.**
 
 The encoding baseline is PR #2271 revision
 `e294f8c927b019f59e6552039d32e6b4ba237f84`. Both policies retain the same
@@ -19,9 +20,9 @@ The working curve is `icv1-f2m83-tm6151469093347-debefd74`.
 | Preserve default encoding and exact finite domain | Verified within the tested/proved scope | Explicit `FrobeniusOrbitRootEncoding::SharedBits`; old APIs retain `PerRepresentative`. Exhaustive native selected-representative/phase/x tests and the stated Lean theorem pass. |
 | Check the complete D18 input list | Verified complete | [Native inventory](INVENTORY.md), [receipt](root-inventory.json), [inspected PDF](inventory-report.pdf). 66 shared zero bits; 17 varying coordinates. |
 | Prove selector-implication factorization and clause identity | Verified complete within stated scope | [Proof map](PROOF_MAP.md), Lean 4.34.1 gate PASS. No compiler or full-solver proof is claimed. |
-| Exhaustive native semantics, rejection/cap atomicity and worker/replay tests | Verified complete for the native suite | Updated-parent release library: 4,478 passed, zero failed, 119 ignored. All 28 affected-example tests pass. [Validation v3 run report](reports/run-20261024T0603Z/RUN_REPORT.md) retains the earlier nine socket-permission failures separately. |
+| Exhaustive native semantics, rejection/cap atomicity and worker/replay tests | Verified complete for the native suite | Updated-parent release library: 4,478 passed, zero failed, 119 ignored. All 29 affected-example tests pass, including independent construction-policy rejection in [validation v4](reports/run-20261024T0640Z/RUN_REPORT.md). [Validation v3](reports/run-20261024T0603Z/RUN_REPORT.md) retains the earlier nine socket-permission failures separately. |
 | Build both full-size encodings for m=2,3,4 | Local structural check passes; bounded host gate pending | All six actual models match preflight; choice wires, variable counts and XOR rows agree between policies. The frozen memory-bound gate additionally requires `run-construction.sh` on Linux. |
-| Execute 22 controls, 22 replays, and 18 natural m=4 queries | Not attempted | Requires all validation gates, a committed host card and available SSH runner. Deferred Linux validation stopped at its other-container guard. |
+| Execute 22 controls, 22 replays, and 18 natural m=4 queries | Not attempted | Requires all validation gates and a committed host card. The bounded-admission Linux validation job is now running under the benchmark lock; its results are not yet available. |
 | Natural useful rank, complete cold/reused cost, matched rho and best-base selection | Open | Original requirements remain in [the problem record](../../problems/n83-prebuilt-base-quality-m2-m4.md). |
 
 The [construction receipt](construction.json) now verifies these actual total
@@ -71,6 +72,8 @@ memory-bound and solver-cost gates.
   computes retained factor-row ranks separately for each encoding. Tests
   reject changed encodings, root inventories, source hashes, counter
   regressions, false finality, control rows and rows lacking fresh replay.
+  Both freezing and auditing independently enforce native/proof success,
+  the construction executable digest and the raw container resource policy.
 - [Receipt collector](collect-card.sh): preserves a consumed card in a new
   archive, including failed/capped attempts. The native auditor admits only
   a complete bounded card; the collector also retains interrupted evidence.
@@ -88,6 +91,14 @@ sandbox failure and the complete successful updated-parent validation. Its
 [manifest and archive digests](validation-v3.sha256) were checked after extraction
 and an identical repack. The rebuilt construction receipt equals the committed
 receipt byte-for-byte. No solver search was run by this local gate.
+
+The [17-file validation-v4 archive](validation-v4.tar.xz) retains the full
+library and affected-example rerun after strengthening the native construction
+policy audit. Its [run report](reports/run-20261024T0640Z/RUN_REPORT.md) records
+4,478 passing library tests and 29 passing example tests. All file hashes were
+checked after extraction and the archive repacked identically. The worker,
+general-field replayer and construction executable are unchanged; the Linux
+worker checkout remains `4e1d311d8`, while this audit fix is `5e2dc2583`.
 
 The initial local release compilation was stopped after static review
 identified unit-placement/count behavior; that attempt produced no test

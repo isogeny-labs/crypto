@@ -41,10 +41,13 @@ representatives, valid and forbidden phase codes, and every field element
 at degree 3, alongside exact native count and cap checks. The complete
 field/group relation remains subject to independent general-field replay.
 The native bridge tests now pass as part of the updated-parent full release
-library suite (4,478 passed, zero failed, 119 ignored); all 28 affected-example
+library suite (4,478 passed, zero failed, 119 ignored); all 29 affected-example
 tests and the six actual full-size constructions also pass. The
 [validation-v3 run report](reports/run-20261024T0603Z/RUN_REPORT.md) links the
-commands, source hashes and preserved failure/rerun receipts. These executable
+commands, source hashes and preserved failure/rerun receipts. The later
+[validation-v4 report](reports/run-20261024T0640Z/RUN_REPORT.md) adds independent
+construction-resource rejection checks and repeats the full native suites.
+These executable
 checks supplement the Lean predicate theorem; they are not a compiler proof
 or an exhaustive proof about every 83-bit SAT instance.
 
