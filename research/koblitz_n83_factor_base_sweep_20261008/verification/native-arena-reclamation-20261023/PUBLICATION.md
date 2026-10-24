@@ -120,3 +120,24 @@ manifest: publication/k2048-c3-publication. Previous entries remain unchanged;
 no objects were overwritten or deleted. Original private artifact permissions
 are unchanged; only staging copies were normalized. K4096-c1 remains open at
 this publication freeze. No speed, base winner, UNSAT, minimum-memory or rho claim.
+
+## K4096-c1 continuation stopped before worker timing
+
+`evidence/n83/arena-reclamation-20261023/k4096-c1-lock-refusal.tar`:
+40960 bytes, SHA256
+`5816e6396a98a6abfed356ba5580fc396c3761d149cda7f6561b3448ed329619`.
+The single frozen attempt stopped at command 1, exit 1/no command timeout,
+after the original 600-second benchmark-lock queue deadline. The native
+`lock-wait.json` records `acquired=false` after 600.000080831 seconds, before
+CPU planning, eviction, container creation or worker timing. No worker search
+seconds or search result are claimed; this is not a scientific outcome, and
+the frozen single-attempt authorization is consumed with no retry.
+
+The raw tar retains the exact card/spec/prompt, native receipt and verbatim
+relay, command streams, lock record and director custody assessment. Native
+card-check verifies relay and recorded output digests; regenerated prompt
+matches the frozen prompt; the receipt reports unchanged card and clean
+tracked checkout. The content-addressed object passed PUT/HEAD/freshGET,
+all payload hashes and deterministic uncompressed-tar repack. Packaging stayed
+uncompressed while the pre-existing global benchmark queue continued running;
+no peer worker was stopped. No new allowance is claimed.
