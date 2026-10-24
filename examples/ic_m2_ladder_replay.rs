@@ -18,8 +18,15 @@ use std::fs;
 use std::process::Command;
 
 const INT_FIELDS: [&str; 9] = [
-    "secret", "ic_recovered", "ic_trials", "ic_relations", "ic_consistent",
-    "ic_split_attempts", "ic_columns", "rho_recovered", "rho_walk_steps",
+    "secret",
+    "ic_recovered",
+    "ic_trials",
+    "ic_relations",
+    "ic_consistent",
+    "ic_split_attempts",
+    "ic_columns",
+    "rho_recovered",
+    "rho_walk_steps",
 ];
 
 fn main() {
@@ -30,13 +37,23 @@ fn main() {
     let mut scalar_checks = 0usize;
     for path in &args[3..] {
         let rec: Value = serde_json::from_str(&fs::read_to_string(path).unwrap()).unwrap();
-        let (a, n, d) = (rec["a"].as_u64().unwrap(), rec["n"].as_u64().unwrap(), rec["d"].as_u64().unwrap());
+        let (a, n, d) = (
+            rec["a"].as_u64().unwrap(),
+            rec["n"].as_u64().unwrap(),
+            rec["d"].as_u64().unwrap(),
+        );
         let rows = rec["rows"].as_array().unwrap();
         let replay_targets = if n >= 41 { 1 } else { rows.len() };
         let tmp = std::env::temp_dir().join(format!("ic_m2_replay_a{a}_n{n}.json"));
         let status = Command::new(binary)
-            .args([a.to_string(), n.to_string(), d.to_string(), replay_targets.to_string(),
-                   rec["seed"].to_string(), tmp.to_string_lossy().to_string()])
+            .args([
+                a.to_string(),
+                n.to_string(),
+                d.to_string(),
+                replay_targets.to_string(),
+                rec["seed"].to_string(),
+                tmp.to_string_lossy().to_string(),
+            ])
             .stderr(std::process::Stdio::null())
             .status()
             .expect("run producer");
@@ -45,7 +62,10 @@ fn main() {
         for (i, row) in rep["rows"].as_array().unwrap().iter().enumerate() {
             for k in INT_FIELDS {
                 if row[k] != rows[i][k] {
-                    mismatches.push(format!("target {i} {k}: recorded {} replayed {}", rows[i][k], row[k]));
+                    mismatches.push(format!(
+                        "target {i} {k}: recorded {} replayed {}",
+                        rows[i][k], row[k]
+                    ));
                 }
             }
         }

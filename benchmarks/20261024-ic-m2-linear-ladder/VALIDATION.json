@@ -1,0 +1,39 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "../../research/ic_m2_linear_ladder_20261024/replay-certificate.json",
+  "sha256": "9f2657d0345a6fa0b6dae83f369aac329280ac3ee78c80485d2ecfee172f5238"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "552c494f25db815887797de9715e5e2e0b026f5e3339bad72e74b967eb93d0a0"
+ },
+ "rho_reference": {
+  "kind": "negation_frobenius",
+  "protocol": "StrongRho (rho.signed_frobenius_strong: signed Frobenius and negation, 32 lanes, dp 4) on the same target, in the same process, after each IC solve (PROTOCOL.md, 'Rungs and runs')",
+  "unit": "group additions per one-target solve (counted); wall seconds in the same process reported beside",
+  "binary_or_process": "examples/ic_m2_linear.rs, one process per rung, binary sha256 in raw/binary.sha256; both arms use semaev_decomp::Gf2",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "strongest_available_basis": "Koblitz curves over prime-degree fields: Aut is negation and the Frobenius eigenvalue lambda, both folded by StrongRho (automorphisms = 2n)",
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 4484129.75,
+    "rho": 96269.5
+   },
+   "0.1": {
+    "ic": 7255820941.45,
+    "rho": 123329.875
+   },
+   "1": {
+    "ic": 72517852246.75,
+    "rho": 366873.25
+   }
+  },
+  "gae_band_statistic": "rung a=0 n=41 (4 targets), mean per solve. IC = counted group additions + w x counted elimination word XORs (its uncounted field multiplications omitted, which only raises it). Rho = counted group additions + w x 3 x walk steps (an upper bound on its canonicalizations, partition hashes and table accesses; its receipt counters were not recorded per row). Every smaller rung orders the same way (REPORT.md, section 5a).",
+  "order_holds_across_band": true,
+  "order_basis": "rho below the IC at w = 0, 0.1 and 1 on every rung"
+ }
+}

@@ -29,7 +29,9 @@
 //! (`d = 0` selects `(n + 1) / 3`).
 
 use crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
-use crypto_lib::cryptanalysis::koblitz_strong_rho::{RawPoint, StrongRho, StrongRhoCharges, StrongRhoParams};
+use crypto_lib::cryptanalysis::koblitz_strong_rho::{
+    RawPoint, StrongRho, StrongRhoCharges, StrongRhoParams,
+};
 use crypto_lib::cryptanalysis::semaev_decomp::Gf2;
 use num_traits::ToPrimitive;
 use rand::rngs::StdRng;
@@ -226,7 +228,9 @@ impl Decomposer {
             let k = self.col_of_x[xr as usize];
             let p = Some(self.points[k as usize]);
             let e = if p == Some(r) { 1 } else { -1 };
-            out.push(Rel { terms: vec![(k, e)] });
+            out.push(Rel {
+                terms: vec![(k, e)],
+            });
         }
         // Columns: s-part xR² z^{2i} (i < d), p-part z^{2j} + xR z^j (j < 2d−1).
         let f = &cv.f;
@@ -264,7 +268,9 @@ impl Decomposer {
             for i in 0..d {
                 scol.push((1u64 << (2 * i)) ^ clmul(s, 1u64 << i));
             }
-            let Some((x1, _)) = solve_f2(&scol, p, &mut c.gauss_xors) else { continue };
+            let Some((x1, _)) = solve_f2(&scol, p, &mut c.gauss_xors) else {
+                continue;
+            };
             let x2 = x1 ^ s;
             if x1 == 0 || x2 == 0 || x1 > dmask || x2 > dmask {
                 continue;
@@ -273,13 +279,20 @@ impl Decomposer {
             if k1 == u32::MAX || k2 == u32::MAX {
                 continue;
             }
-            let (p1, p2) = (Some(self.points[k1 as usize]), Some(self.points[k2 as usize]));
+            let (p1, p2) = (
+                Some(self.points[k1 as usize]),
+                Some(self.points[k2 as usize]),
+            );
             if k1 == k2 {
                 let dbl = cv.add(p1, p1, c);
                 if dbl == Some(r) {
-                    out.push(Rel { terms: vec![(k1, 2)] });
+                    out.push(Rel {
+                        terms: vec![(k1, 2)],
+                    });
                 } else if cv.neg(dbl) == Some(r) {
-                    out.push(Rel { terms: vec![(k1, -2)] });
+                    out.push(Rel {
+                        terms: vec![(k1, -2)],
+                    });
                 }
                 continue;
             }
@@ -299,7 +312,9 @@ impl Decomposer {
                 }
             };
             if let Some((e1, e2)) = rel {
-                out.push(Rel { terms: vec![(k1, e1), (k2, e2)] });
+                out.push(Rel {
+                    terms: vec![(k1, e1), (k2, e2)],
+                });
             }
         }
         out
@@ -320,12 +335,24 @@ struct Graph {
 
 impl Graph {
     fn new(k: usize, r: u64) -> Self {
-        Self { r, parent: (0..k as u32).collect(), sigma: vec![1; k], off: vec![0; k],
-               value: vec![None; k], determined: 0, size: vec![1; k], largest: 1 }
+        Self {
+            r,
+            parent: (0..k as u32).collect(),
+            sigma: vec![1; k],
+            off: vec![0; k],
+            value: vec![None; k],
+            determined: 0,
+            size: vec![1; k],
+            largest: 1,
+        }
     }
 
     fn sgn(&self, s: i64, v: u64) -> u64 {
-        if s >= 0 { v % self.r } else { (self.r - v % self.r) % self.r }
+        if s >= 0 {
+            v % self.r
+        } else {
+            (self.r - v % self.r) % self.r
+        }
     }
 
     /// (root, σ, c) with ℓ_v = σ ℓ_root + c.
@@ -362,7 +389,10 @@ impl Graph {
             let coef = self.sgn(e * s, e.unsigned_abs());
             let cst = self.sgn(e, mulmod(e.unsigned_abs(), c, r));
             match groups.iter_mut().find(|g| g.0 == root) {
-                Some(g) => { g.1 = (g.1 + coef) % r; g.2 = (g.2 + cst) % r; }
+                Some(g) => {
+                    g.1 = (g.1 + coef) % r;
+                    g.2 = (g.2 + cst) % r;
+                }
                 None => groups.push((root, coef, cst)),
             }
         }
@@ -378,11 +408,6 @@ impl Graph {
 
     fn largest(&self) -> usize {
         self.largest
-    }
-
-    fn value_of(&mut self, v: u32) -> Option<u64> {
-        let (root, s, c) = self.find(v);
-        self.value[root as usize].map(|x| (self.sgn(s, x) + c) % self.r)
     }
 
     /// Add `Σ e_i ℓ_{v_i} = k`.
@@ -404,11 +429,18 @@ impl Graph {
         let (rv, sv, cv) = self.find(v);
         let a = e1 * su; // coefficient of ℓ_ru
         let bco = e2 * sv; // coefficient of ℓ_rv
-        let kp = (k + 2 * r - mulmod(self.sgn(e1, e1.unsigned_abs()), cu, r) - mulmod(self.sgn(e2, e2.unsigned_abs()), cv, r)) % r;
+        let kp = (k + 2 * r
+            - mulmod(self.sgn(e1, e1.unsigned_abs()), cu, r)
+            - mulmod(self.sgn(e2, e2.unsigned_abs()), cv, r))
+            % r;
         if ru == rv {
             // (a + b) ℓ_root = kp
             if a + bco != 0 {
-                let val = mulmod(kp, invmod(self.sgn(a + bco, (a + bco).unsigned_abs()), r), r);
+                let val = mulmod(
+                    kp,
+                    invmod(self.sgn(a + bco, (a + bco).unsigned_abs()), r),
+                    r,
+                );
                 self.set_root(ru, val);
             }
             return;
@@ -454,14 +486,23 @@ fn main() {
     if d == 0 {
         d = (n as usize + 1) / 3;
     }
-    assert!(2 * d - 1 <= n as usize && 3 * d - 1 <= 63, "need 2d − 1 ≤ n and 3d − 1 ≤ 63");
+    assert!(
+        2 * d - 1 <= n as usize && 3 * d - 1 <= 63,
+        "need 2d − 1 ≤ n and 3d − 1 ≤ 63"
+    );
 
     let kc = KoblitzCurve::new(a, n).expect("Koblitz curve with a usable subgroup");
     let r = kc.subgroup_order.to_u64().expect("r fits u64");
     let h = kc.cofactor.to_u64().expect("cofactor fits u64");
     let f = Gf2::new(&kc.curve.irreducible);
     let irr = f.irr;
-    let cv = Curve { f, n, a: a as u64, b: 1, irr };
+    let cv = Curve {
+        f,
+        n,
+        a: a as u64,
+        b: 1,
+        irr,
+    };
     let g: (u64, u64) = match RawPoint::from_binary(kc.generator()) {
         RawPoint::Affine { x, y } => (x, y),
         RawPoint::Infinity => panic!("generator at infinity"),
@@ -469,7 +510,11 @@ fn main() {
     let lambda = kc.lambda.to_u64().unwrap_or(0);
     let mut scratch = Counts::default();
     assert_eq!(cv.mul(Some(g), r, &mut scratch), None, "[r]G = O");
-    assert_eq!(cv.frob(Some(g)), cv.mul(Some(g), lambda, &mut scratch), "φ(G) = [λ]G");
+    assert_eq!(
+        cv.frob(Some(g)),
+        cv.mul(Some(g), lambda, &mut scratch),
+        "φ(G) = [λ]G"
+    );
 
     let rho = StrongRho::new(&kc);
     let mut rows = Vec::new();
@@ -503,7 +548,12 @@ fn main() {
             let zj = if j < n as usize { 1u64 << j } else { 0 };
             z2.push(cv.f.sqr(zj));
         }
-        let dec = Decomposer { d, z2, col_of_x, points };
+        let dec = Decomposer {
+            d,
+            z2,
+            col_of_x,
+            points,
+        };
         let mut graph = Graph::new(k, r);
         // Columns whose projection [h]P is O have logarithm 0.
         for (i, &p) in dec.points.iter().enumerate() {
@@ -531,15 +581,29 @@ fn main() {
             for _ in 0..n {
                 for rel in dec.decompose(&cv, p.unwrap(), &mut c) {
                     // [h]A = Σ e_i [h]P_i  =>  h·log A = Σ e_i ℓ_i
-                    graph.add(&rel.terms.iter().map(|&(k, e)| (k, e)).collect::<Vec<_>>(), mulmod(h % r, lg, r));
+                    graph.add(
+                        &rel.terms.iter().map(|&(k, e)| (k, e)).collect::<Vec<_>>(),
+                        mulmod(h % r, lg, r),
+                    );
                     c.relations += 1;
                     rels_used += 1;
                 }
                 p = cv.frob(p);
                 lg = mulmod(lg, lambda, r);
             }
-            if std::env::var("M2_DEBUG").is_ok() && (c.trials < 60 || (c.trials / n as u64) % 20000 == 0) {
-                eprintln!("  trials {} consistent {} splits {} relations {} determined {}/{} {:.2}s", c.trials, c.consistent, c.split_attempts, rels_used, graph.determined, k, rel_started.elapsed().as_secs_f64());
+            if std::env::var("M2_DEBUG").is_ok()
+                && (c.trials < 60 || (c.trials / n as u64).is_multiple_of(20000))
+            {
+                eprintln!(
+                    "  trials {} consistent {} splits {} relations {} determined {}/{} {:.2}s",
+                    c.trials,
+                    c.consistent,
+                    c.split_attempts,
+                    rels_used,
+                    graph.determined,
+                    k,
+                    rel_started.elapsed().as_secs_f64()
+                );
             }
             let (w, wl) = steps[(next() % 16) as usize];
             match cv.add(Some(anchor), Some(w), &mut c) {
@@ -560,7 +624,7 @@ fn main() {
         let tgt_started = Instant::now();
         let mut a_log = next() % (r - 1) + 1;
         let mut base_pt = cv.add(Some(target), cv.mul(Some(g), a_log, &mut c), &mut c);
-        let mut recovered = None;
+        let recovered: Option<u64>;
         'outer: loop {
             if let Some(bp) = base_pt {
                 let mut p = Some(bp);
@@ -594,7 +658,10 @@ fn main() {
         let jumps = rho.jumps(seed ^ 0x6a75 ^ ti as u64, &mut charges);
         let mut rng = StdRng::seed_from_u64(seed ^ 0x7268 ^ ti as u64);
         let params = StrongRhoParams::default();
-        let q = RawPoint::Affine { x: target.0, y: target.1 };
+        let q = RawPoint::Affine {
+            x: target.0,
+            y: target.1,
+        };
         let out = rho.solve(q, &jumps, &mut rng, &params, charges);
         let rho_s = rho_started.elapsed().as_secs_f64();
         let (rho_scalar, rho_steps, rho_adds) = match &out {
@@ -613,8 +680,10 @@ fn main() {
             "rho_verified": rho_scalar == Some(t_secret % r),
             "rho_walk_steps": rho_steps, "rho_group_additions": rho_adds,
         }));
-        eprintln!("n={n} d={d} t={ti}: ic {:.3}s ({} trials, {} rels, K={k}) verified={} | rho {:.4}s",
-                  ic_s, c.trials, rels_used, verified, rho_s);
+        eprintln!(
+            "n={n} d={d} t={ti}: ic {:.3}s ({} trials, {} rels, K={k}) verified={} | rho {:.4}s",
+            ic_s, c.trials, rels_used, verified, rho_s
+        );
     }
     let out = json!({
         "schema": "ic-m2-linear/v1", "a": a, "n": n, "d": d, "seed": seed,

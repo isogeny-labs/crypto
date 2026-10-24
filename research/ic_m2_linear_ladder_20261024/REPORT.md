@@ -67,8 +67,11 @@ Every IC and rho scalar equals the secret mod r (52/52 each). The check rung
 a = 0, n = 37 (cofactor 596) was stopped by the operator after 99 s. Its relation
 graph splits into about 298 cofactor classes of about 7 of the 2,048 columns, so
 the frozen stopping rule (largest component ≥ 0.9 of the base) cannot be met.
-The protocol states this limit, and [`raw/operator-notes.txt`](raw/operator-notes.txt)
-records the stop.
+The protocol states this limit but set no time cap, so the stop is a disclosed
+operator decision taken after the run started.
+[`raw/operator-notes.txt`](raw/operator-notes.txt) records it. The rung is
+"not applicable as built", not negative evidence about the method on curves
+where it applies.
 
 ## Exponents
 
@@ -82,6 +85,12 @@ with a 10,000-resample bootstrap of targets within rungs ([`fit.json`](fit.json)
 | strong rho: group additions | 0.377 | [0.364, 0.393] |
 | strong rho: wall | 0.250 | [0.241, 0.260] |
 | F4 arm: solver word XORs (n = 13, 19, 23; committed) | 1.079 | three medians, no interval |
+
+The F4 row measures solver word XORs, not decomposition trials. The two
+slopes count different units over different n ranges. The independent
+validator computed the like-for-like slope of the linear method's elimination
+XORs: 0.848 per bit over n ≤ 23 and 0.780 over all rungs. Both are still below
+F4's 1.079.
 
 The rho slopes sit below 0.5 because the Frobenius fold divides rho's work by
 √(2n), and fixed per-solve costs dominate at the smallest rungs. They are
@@ -129,6 +138,24 @@ which would only raise it. Neither changes the order.
   so three summands do not linearize the same way. The large-cofactor case
   needs a factor base or relation scheme that does not split by cofactor
   class.
+
+## Validation
+
+- [`replay-certificate.json`](replay-certificate.json): `verified`. Each rung
+  was re-executed in a fresh process (all targets, n = 41 sampled at target 0),
+  and every integer field matched the record. All 104 IC and rho scalars were
+  checked with `KoblitzCurve::mul` (BigUint), separate from the producer's
+  field code.
+- [`validator-report.json`](validator-report.json): `pass`. An independent
+  validator agent recomputed all 18 headline numbers with jq/awk from the raw
+  rung files, without reading the fit or replay code; differences were zero.
+  It also confirmed every rung's h·r against the curve order and judged the
+  method algebraic under the owner's criterion. Its caveats: the 2¹² cap on
+  solution enumeration can miss relations but never yield wrong ones; the
+  F4 comparison mixes units, as above; and the method depends on the cofactor.
+- The producer was frozen at `995b187c1`. Its source in this PR differs only by
+  rustfmt layout and three clippy fixes: an unused helper removed, an
+  uninitialized `let`, and `is_multiple_of`. None of these changes behaviour.
 
 ## Files
 

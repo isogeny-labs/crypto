@@ -51,7 +51,9 @@ fn main() {
         let d: Value = serde_json::from_str(&fs::read_to_string(path).unwrap()).unwrap();
         let rows = d["rows"].as_array().unwrap();
         let col = |k: &str| rows.iter().map(|r| f(&r[k])).collect::<Vec<f64>>();
-        let all_ok = rows.iter().all(|r| r["ic_verified"] == true && r["rho_verified"] == true);
+        let all_ok = rows
+            .iter()
+            .all(|r| r["ic_verified"] == true && r["rho_verified"] == true);
         rungs.push(json!({
             "file": path, "a": d["a"], "n": d["n"], "d": d["d"], "cofactor": d["cofactor"],
             "log2_r": d["log2_r"], "targets": rows.len(), "all_verified": all_ok,
@@ -67,15 +69,23 @@ fn main() {
     let small: Vec<&Value> = rungs.iter().filter(|r| f(&r["cofactor"]) <= 4.0).collect();
     let ns: Vec<f64> = small.iter().map(|r| f(&r["n"])).collect();
     let fit_key = |key: &str, rng: &mut Rng| {
-        let ys: Vec<f64> = small.iter().map(|r| mean(&r[key].as_array().unwrap().iter().map(f).collect::<Vec<_>>()).log2()).collect();
+        let ys: Vec<f64> = small
+            .iter()
+            .map(|r| mean(&r[key].as_array().unwrap().iter().map(f).collect::<Vec<_>>()).log2())
+            .collect();
         let (b, a0) = slope(&ns, &ys);
         let mut boots = Vec::with_capacity(10_000);
         for _ in 0..10_000 {
-            let ys_b: Vec<f64> = small.iter().map(|r| {
-                let v: Vec<f64> = r[key].as_array().unwrap().iter().map(f).collect();
-                let s: Vec<f64> = (0..v.len()).map(|_| v[(rng.next() % v.len() as u64) as usize]).collect();
-                mean(&s).log2()
-            }).collect();
+            let ys_b: Vec<f64> = small
+                .iter()
+                .map(|r| {
+                    let v: Vec<f64> = r[key].as_array().unwrap().iter().map(f).collect();
+                    let s: Vec<f64> = (0..v.len())
+                        .map(|_| v[(rng.next() % v.len() as u64) as usize])
+                        .collect();
+                    mean(&s).log2()
+                })
+                .collect();
             boots.push(slope(&ns, &ys_b).0);
         }
         boots.sort_by(|x, y| x.partial_cmp(y).unwrap());
@@ -93,10 +103,19 @@ fn main() {
     for p in f4["per_size"].as_array().unwrap() {
         let arm = &p["arms"]["ic-f4"];
         if arm["median_word_xors"].is_number() {
-            f4_pts.push((f(&p["m"]), f(&arm["median_word_xors"]), f(&arm["median_s_lower"]), f(&p["rho_median_s"]), f(&p["r"])));
+            f4_pts.push((
+                f(&p["m"]),
+                f(&arm["median_word_xors"]),
+                f(&arm["median_s_lower"]),
+                f(&p["rho_median_s"]),
+                f(&p["r"]),
+            ));
         }
     }
-    let (b4, _) = slope(&f4_pts.iter().map(|p| p.0).collect::<Vec<_>>(), &f4_pts.iter().map(|p| p.1.log2()).collect::<Vec<_>>());
+    let (b4, _) = slope(
+        &f4_pts.iter().map(|p| p.0).collect::<Vec<_>>(),
+        &f4_pts.iter().map(|p| p.1.log2()).collect::<Vec<_>>(),
+    );
     let out = json!({
         "schema": "ic-m2-linear-ladder-fit/v1",
         "rungs": rungs, "fit_small_cofactor": fits,
@@ -105,5 +124,9 @@ fn main() {
                           "slope_log2_word_xors_per_n": b4},
     });
     fs::write(&args[2], serde_json::to_string_pretty(&out).unwrap()).unwrap();
-    println!("{}", serde_json::to_string_pretty(&json!({"fits": out["fit_small_cofactor"], "f4_slope": b4})).unwrap());
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&json!({"fits": out["fit_small_cofactor"], "f4_slope": b4}))
+            .unwrap()
+    );
 }
