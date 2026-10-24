@@ -126,6 +126,78 @@ fn manifest(root: &Path, archive: &str, expected: &str) -> Result<usize> {
     Ok(actual.len())
 }
 
+fn construction_limits(records: &Value) -> Result<()> {
+    require(
+        records.as_array().is_some_and(|a| a.len() == 1),
+        "construction container count",
+    )?;
+    let c = &records[0];
+    let h = &c["HostConfig"];
+    let state = &c["State"];
+    require(
+        state["Status"] == "exited"
+            && state["Running"] == false
+            && state["OOMKilled"] == false
+            && state["ExitCode"] == 0
+            && state["Error"] == "",
+        "construction did not finish successfully",
+    )?;
+    require(
+        h["Memory"] == 4294967296u64
+            && h["MemorySwap"] == 4294967296u64
+            && h["NanoCpus"] == 1000000000u64
+            && h["CpusetCpus"] == "31"
+            && h["NetworkMode"] == "none"
+            && h["ReadonlyRootfs"] == true
+            && h["PidsLimit"] == 256
+            && h["CapDrop"] == json!(["ALL"])
+            && h["SecurityOpt"] == json!(["no-new-privileges"]),
+        "construction resource/isolation policy",
+    )?;
+    require(
+        c["Config"]["Image"] == IMAGE
+            && c["Image"] == IMAGE_ID
+            && c["Path"] == "/usr/bin/timeout"
+            && c["Args"]
+                == json!([
+                    "-s",
+                    "TERM",
+                    "-k",
+                    "5",
+                    "1800",
+                    "/opt/construction",
+                    "/inputs/selected.csv",
+                    "/out/construction.json"
+                ]),
+        "construction image/command",
+    )?;
+    Ok(())
+}
+
+fn prerequisites(root: &Path, gate_sha256: &str) -> Result<()> {
+    require(digest(gate_sha256), "construction binary digest syntax")?;
+    for gate in ["lib", "tests", "build", "proof"] {
+        require(
+            text(&root.join(format!("build/{gate}-exit.txt")))? == "0",
+            "native/proof gate failed",
+        )?;
+    }
+    require(
+        text(&root.join("construction-run/exit.txt"))? == "0",
+        "construction host exit",
+    )?;
+    require(
+        fs::read_to_string(root.join("construction-run/binary.sha256"))?
+            .split_whitespace()
+            .next()
+            == Some(gate_sha256),
+        "construction binary binding",
+    )?;
+    construction_limits(&read(
+        &root.join("construction-run/container-inspect.json"),
+    )?)
+}
+
 // These are orchestration records only. Their digest is committed before launch.
 fn freeze(root: &Path, source: &Path) -> Result<Value> {
     require(!root.join("runs").exists(), "card already consumed")?;
@@ -159,12 +231,7 @@ fn freeze(root: &Path, source: &Path) -> Result<Value> {
     ] {
         files.insert(p.into(), json!(sha(&root.join(p))?));
     }
-    for gate in ["lib", "tests", "build", "proof"] {
-        require(
-            text(&root.join(format!("build/{gate}-exit.txt")))? == "0",
-            "native/proof gate failed",
-        )?;
-    }
+    prerequisites(root, &sha(&root.join("gate"))?)?;
     let construction = read(&root.join("construction.json"))?;
     require(
         construction["status"] == "PASS"
@@ -705,6 +772,12 @@ fn audit(root: &Path, card: &Value, archive: &str, manifest_hash: &str) -> Resul
         sha(&root.join("host/public-targets.json"))? == CORPUS,
         "corpus hash",
     )?;
+    prerequisites(
+        &root.join("host"),
+        card["gate_sha256"]
+            .as_str()
+            .ok_or("construction binary digest")?,
+    )?;
     let corpus = read(&root.join("host/public-targets.json"))?;
     let construction = read(&root.join("host/construction.json"))?;
     let mut last = String::new();
@@ -881,6 +954,37 @@ fn main() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn construction_receipt_cannot_hide_a_relaxed_cap_or_failed_container() {
+        let good = json!([{"HostConfig":{"Memory":4294967296u64,"MemorySwap":4294967296u64,
+            "NanoCpus":1000000000u64,"CpusetCpus":"31","NetworkMode":"none","ReadonlyRootfs":true,
+            "PidsLimit":256,"CapDrop":["ALL"],"SecurityOpt":["no-new-privileges"]},
+            "State":{"Status":"exited","Running":false,"OOMKilled":false,"ExitCode":0,"Error":""},
+            "Config":{"Image":IMAGE},"Image":IMAGE_ID,"Path":"/usr/bin/timeout",
+            "Args":["-s","TERM","-k","5","1800","/opt/construction","/inputs/selected.csv","/out/construction.json"]}]);
+        assert!(construction_limits(&good).is_ok());
+        for (key, value) in [
+            ("Memory", json!(8589934592u64)),
+            ("MemorySwap", json!(0)),
+            ("CpusetCpus", json!("0")),
+            ("ReadonlyRootfs", json!(false)),
+            ("NetworkMode", json!("host")),
+        ] {
+            let mut bad = good.clone();
+            bad[0]["HostConfig"][key] = value;
+            assert!(construction_limits(&bad).is_err(), "{key}");
+        }
+        for (key, value) in [
+            ("Running", json!(true)),
+            ("OOMKilled", json!(true)),
+            ("ExitCode", json!(124)),
+        ] {
+            let mut bad = good.clone();
+            bad[0]["State"][key] = value;
+            assert!(construction_limits(&bad).is_err(), "{key}");
+        }
+        assert!(construction_limits(&json!([])).is_err());
+    }
     #[test]
     fn full_schedule_has_22_controls_22_replays_and_18_queries() {
         let controls = controls();
