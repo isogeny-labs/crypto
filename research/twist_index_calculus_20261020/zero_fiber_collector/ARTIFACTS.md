@@ -6,16 +6,19 @@ SHA-256 is in `native-summary.sha256`. The actual run starts at
 2026-10-24T20:03:47Z and terminates successfully at 20:39:43Z. Counts are
 correctness/counter diagnostics; elapsed values are not admitted timing.
 
-## Complete raw archive: integrity verified; publication pending
+## Complete raw archive: verified and published
 
 The canonical candidate is 105,608,944 bytes, SHA-256
 `86a7f68e331a24c4bb1048aab3932ce9b30901c7f64def2cae1f617f93ce8bb8`.
-Its prospective name is
+Its canonical name is
 `store:evidence/twist-index-calculus/20261024-zero-fiber-runs.tar.xz`.
-Until `results/publication/store-publication-v1.json` reports `pass`, this
-name is not claimed as remotely published. The
+The [publication receipt](results/publication/store-publication-v2.json)
+reports `pass`: native store verification and the remote whole-object size
+and SHA-256 checksum match; every unrelated index entry is unchanged. The
 [integrity receipt](results/archive-verification-v2.json) records a fresh
 extraction, all 1,112 native file comparisons and a byte-identical repack.
+That earlier integrity receipt retains its pre-publication pending field;
+publication is certified by the separate successful v2 receipt.
 
 `pack-verify.sh` selects these ten terminal raw directories explicitly:
 
@@ -41,7 +44,9 @@ AGENTS.md section 13a. The first local archive is retained at SHA-256
 `8418084d7e25f6076f69e17d46a20a3ede3f67df73699eb4c7fc4b0df0ef74bd`;
 it was not uploaded. No collector or old oracle was repeated.
 
-After pulling the published archive, check and extract into a fresh directory:
+Pull with `ecbench store pull
+evidence/twist-index-calculus/20261024-zero-fiber-runs.tar.xz --out
+runs.tar.xz` (one shell command). Then check and extract into a fresh directory:
 
 ```sh
 sha256sum -c runs.tar.xz.sha256

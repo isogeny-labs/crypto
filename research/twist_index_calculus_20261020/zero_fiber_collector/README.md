@@ -67,7 +67,8 @@ An outer busy wrapper is refused before creating outputs; the bounded
 
 Raw runs stay under ignored `runs/`. Their complete selected archive passes
 fresh extraction, all 1,112 byte comparisons and deterministic repacking;
-publication has its own receipt in [raw artifacts](ARTIFACTS.md). See
+canonical publication and remote SHA-256 verification pass, with their own
+receipt in [raw artifacts](ARTIFACTS.md). See
 [execution history](EXECUTION.md) and [implementation status](IMPLEMENTATION_STATUS.md).
 
 `wait-gate-and-panel.sh` follows one verified native-gate owner. It starts

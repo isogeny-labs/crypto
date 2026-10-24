@@ -123,3 +123,9 @@ from this sparse worktree. The failed `store-publication-v1.json` is kept.
 No remote-head or push command ran in that attempt. Materializing the exact
 tracked index does not change its contents. A new attempt uses its own v2
 receipt and rechecks the alias and immutable remote object before pushing.
+
+The v2 publication passes. The previously absent alias and immutable object
+are reconciled before the single native push. Native cache/remote verification
+and S3 whole-object SHA-256 and size checks match the canonical archive.
+All unrelated index entries remain byte-value equivalent. Failed v1 and
+terminal-transport records remain alongside the successful v2 receipt.
