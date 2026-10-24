@@ -157,6 +157,10 @@ jobs:
         working-directory: research/cover_transfer_assessment_20261013/lean
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            research/cover_transfer_assessment_20261013/lean
+          sparse-checkout-cone-mode: true
       - name: Build the conditional injectivity theorem and replay it in a fresh kernel
         uses: leanprover/lean-action@v1
         with:
