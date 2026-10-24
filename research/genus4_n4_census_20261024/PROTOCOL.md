@@ -239,3 +239,7 @@ N_t = 20 (mean mass per trace 2.1 at q = 3 and 11.7 at q = 5 gives the exponent
 3.4; a two-point extrapolation, registered as such): 20·11.7·3.14 ≈ 735, i.e.
 within [490, 1100]. Sizes: 3·10^7 per type as in section 3 (split and cone without the N_4
 pre-filter, non-split with it, seed 20261024·10 + 7).
+
+Amendment 2b (2026-10-24): `read_hits` accepts comma-separated files (used by
+`PLANE`, `TIAN`); no other change. The `q = 7` census ran with the tool of
+Amendment 1b.
