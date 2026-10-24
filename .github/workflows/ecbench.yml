@@ -352,8 +352,11 @@ jobs:
       - name: Pinned session as root
         run: |
           sudo git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          # Hosted cpusets may expose only part of each physical core. This
+          # root smoke inherits the runner affinity and records L0 isolation; the
+          # 72 measured children are checked separately below.
           sudo ./target/release/ecbench run --spec docs/ecbench/specs/smoke-prime.json \
-            --out "$RUNNER_TEMP/prime" --allow-busy --settle 1 --quiet
+            --out "$RUNNER_TEMP/prime" --cpus inherit --allow-busy --settle 1 --quiet
           sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/prime"
       - name: Pinning took effect in every measured child
         run: |
