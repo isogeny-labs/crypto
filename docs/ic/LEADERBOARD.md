@@ -284,6 +284,20 @@ Component speed-up, class engineering: the dense linear stage against sparse FGL
 | 101 | 1 | 53 | 287.8 | 224.4 | 1.28 | 194 | 151 |
 | 101 | 2 | 50 | 466.3 | 365.5 | 1.28 | 373 | 293 |
 
+## Algebraic-decomposition IC ladder (linear two-summand S3), outside tables A–C
+
+Owner criterion (2026-10-24): relations come from solving summation-polynomial systems over an algebraically defined factor base, with no table collisions. Factor base x ∈ span{1..z^(d−1)}; the Weil descent of S3 is linear in the symmetric unknowns (x1+x2, x1x2). One-target cold solves, every scalar verified, beside same-process strong rho (`research/ic_m2_linear_ladder_20261024/`). Fitted slope of log2(trials) per bit of n: 0.647 [0.639, 0.655] (wall 0.717); the F4 algebraic arm's solver work grows at 1.079. The IC ÷ rho column is the distance remaining.
+
+| a | n | d | cofactor | targets | mean trials | mean IC s | mean rho s | IC ÷ rho (wall) |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 0 | 13 | 4 | 4 | 8 | 592 | 0.0004041 | 0.000112 | 4 |
+| 1 | 17 | 6 | 2 | 8 | 3,231 | 0.00377 | 0.000259 | 15 |
+| 0 | 19 | 6 | 4 | 8 | 11,477 | 0.00819 | 0.00017 | 48 |
+| 1 | 19 | 6 | 2 | 8 | 12,077 | 0.007837 | 0.000183 | 43 |
+| 0 | 23 | 8 | 4 | 8 | 41,856 | 0.0461 | 0.000273 | 169 |
+| 1 | 23 | 8 | 2 | 8 | 48,821 | 0.07077 | 0.000359 | 197 |
+| 0 | 41 | 14 | 4 | 4 | 181,803,464 | 478.4 | 0.0131 | 36,440 |
+
 ## N83 Tier 1 one-target cold factor-base holdout
 
 Five sealed public points, one fresh process per IC arm, and a same-point rho solve per point completed on one GitHub-hosted cloud instance. Each of the 25 IC arms and five rho arms passed independent replay. K1152 ran twice per point as the local A/A control. The selected candidate is `null`; the frozen decision is `BOUNDED_UNKNOWN`.
@@ -326,12 +340,13 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/ecbench_conductor_gap_20261012/analysis.json` — sha256 `0ff9b20fd773ea67…`
 - `research/la_engines_20261014/summary.json` — sha256 `b34650a95c5f106c…`
 - `research/jv_cover_sparse_fglm_20261018/summary.json` — sha256 `4217cb1de3458ee8…`
+- `research/ic_m2_linear_ladder_20261024/fit.json` — sha256 `f69558da047b752a…`
 - `research/ic_oracle_setup_blocked_20261020/RESULT.json` — sha256 `e6f6f56f9db4c125…`
 - `research/ic_planner_validation_20261020/analysis/summary.json` — sha256 `c8fb751cea39e55e…`
 - `research/ecbench_frontier_20261013/frontier-data.json` — sha256 `0bc0d0f440184651…`
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
-- `docs/curves/registry.json` — sha256 `584d070fbec7e21f…`
+- `docs/curves/registry.json` — sha256 `2d1c9747484edcad…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`

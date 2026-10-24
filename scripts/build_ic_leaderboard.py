@@ -74,6 +74,7 @@ SOURCES = {
     "conductor_gap_counts": "research/ecbench_conductor_gap_20261012/analysis.json",
     "la_engines": "research/la_engines_20261014/summary.json",
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
+    "ic_m2_linear_ladder": "research/ic_m2_linear_ladder_20261024/fit.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
     "planner_validation": "research/ic_planner_validation_20261020/analysis/summary.json",
     "frontier_audit": "research/ecbench_frontier_20261013/frontier-data.json",
@@ -1182,6 +1183,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         # A component speed-up (the linear stage after F4 in jv_cover) copied
         # from its study's frozen summary; it moves no row of tables A-C.
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
+        "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
         "planner_component": planner_component(),
         "phases": [{"id": i, "name": n, "what": w} for i, n, w in PHASES],
@@ -1205,6 +1207,24 @@ def g3(v: float | None) -> str:
 
 def times(v: float) -> str:
     return f"{g3(v)}×"
+
+
+def algebraic_ladder() -> dict:
+    """The algebraic-decomposition IC ladder (owner criterion 2026-10-24):
+    rung means and fitted slopes copied from the study's native fit; it moves
+    no row of tables A-C."""
+    fit = load(SOURCES["ic_m2_linear_ladder"])
+    if fit.get("schema") != "ic-m2-linear-ladder-fit/v1" or not all(r["all_verified"] for r in fit["rungs"]):
+        raise ValueError("algebraic ladder source is not a complete verified fit")
+    return {
+        "source": SOURCES["ic_m2_linear_ladder"], "study": "research/ic_m2_linear_ladder_20261024/",
+        "report": "research/ic_m2_linear_ladder_20261024/REPORT.md",
+        "rungs": [{k: r[k] for k in ("a", "n", "d", "cofactor", "log2_r", "targets", "mean_ic_trials",
+                                     "mean_ic_s", "mean_rho_s", "ic_over_rho_wall")} for r in fit["rungs"]],
+        "slope_ic_trials": fit["fit_small_cofactor"]["ic_trials"],
+        "slope_ic_wall": fit["fit_small_cofactor"]["ic_wall"],
+        "f4_slope": fit["f4_reference"]["slope_log2_word_xors_per_n"],
+    }
 
 
 def esc(s) -> str:
@@ -1622,6 +1642,21 @@ def markdown(doc: dict) -> str:
     for r in ls["dlp"]:
         L.append(f"| {r['p']} | {r['seed']} | {r['relations']} | {r['s_before']:.4g} | {r['s_after']:.4g} | "
                  f"{r['s_ratio']:.2f} | {r['s_over_rho_before']:.0f} | {r['s_over_rho_after']:.0f} |")
+    al = doc["algebraic_ladder"]
+    st, sw = al["slope_ic_trials"], al["slope_ic_wall"]
+    L += ["", "## Algebraic-decomposition IC ladder (linear two-summand S3), outside tables A–C", "",
+          "Owner criterion (2026-10-24): relations come from solving summation-polynomial systems over an "
+          "algebraically defined factor base, with no table collisions. Factor base x ∈ span{1..z^(d−1)}; the Weil "
+          "descent of S3 is linear in the symmetric unknowns (x1+x2, x1x2). One-target cold solves, every scalar "
+          f"verified, beside same-process strong rho (`{al['study']}`). Fitted slope of log2(trials) per bit of n: "
+          f"{st['slope_log2_per_n']:.3f} [{st['boot95'][0]:.3f}, {st['boot95'][1]:.3f}] (wall "
+          f"{sw['slope_log2_per_n']:.3f}); the F4 algebraic arm's solver work grows at {al['f4_slope']:.3f}. "
+          "The IC ÷ rho column is the distance remaining.", "",
+          "| a | n | d | cofactor | targets | mean trials | mean IC s | mean rho s | IC ÷ rho (wall) |",
+          "|--:|--:|--:|--:|--:|--:|--:|--:|--:|"]
+    for r in al["rungs"]:
+        L.append(f"| {r['a']} | {r['n']} | {r['d']} | {r['cofactor']} | {r['targets']} | {r['mean_ic_trials']:,.0f} | "
+                 f"{r['mean_ic_s']:.4g} | {r['mean_rho_s']:.3g} | {r['ic_over_rho_wall']:,.0f} |")
     n83 = doc["n83_tier1_cold_holdout"]
     ab = n83["paired_intervals"]["k1120|k1152"]
     close = n83["paired_intervals"]["k1120|k1104"]
@@ -2414,6 +2449,24 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{r["s_after"]:.4g}</td><td>{r["s_ratio"]:.2f}</td><td>{r["s_over_rho_before"]:.0f}</td>'
                  f'<td>{r["s_over_rho_after"]:.0f}</td></tr>')
     P.append('</tbody></table>' + gh(ls["study"], 'Study, run report and raw records') + '</section>')
+
+    al = doc["algebraic_ladder"]
+    st = al["slope_ic_trials"]
+    P.append('<section id="algebraic-ic-ladder-20261024"><h2>Algebraic-decomposition IC ladder (linear two-summand S3)</h2>'
+             '<p>Owner criterion (2026-10-24): relations come from solving summation-polynomial systems over an '
+             'algebraically defined factor base, with no table collisions. The Weil descent of S3 is linear in the '
+             'symmetric unknowns (x1+x2, x1x2) over the factor base x ∈ span{1..z<sup>d−1</sup>}. One-target cold '
+             'solves, every scalar verified, beside same-process strong rho. It moves no row of tables A–C. '
+             f'Slope of log<sub>2</sub>(trials) per bit of n: {st["slope_log2_per_n"]:.3f} '
+             f'[{st["boot95"][0]:.3f}, {st["boot95"][1]:.3f}]; the F4 algebraic arm: {al["f4_slope"]:.3f}. '
+             'The last column is the distance remaining to rho.</p>'
+             '<table><thead><tr><th>a</th><th>n</th><th>d</th><th>cofactor</th><th>targets</th><th>mean trials</th>'
+             '<th>mean IC s</th><th>mean rho s</th><th>IC ÷ rho (wall)</th></tr></thead><tbody>')
+    for r in al["rungs"]:
+        P.append(f'<tr><td>{r["a"]}</td><td>{r["n"]}</td><td>{r["d"]}</td><td>{r["cofactor"]}</td><td>{r["targets"]}</td>'
+                 f'<td>{r["mean_ic_trials"]:,.0f}</td><td>{r["mean_ic_s"]:.4g}</td><td>{r["mean_rho_s"]:.3g}</td>'
+                 f'<td>{r["ic_over_rho_wall"]:,.0f}</td></tr>')
+    P.append('</tbody></table>' + gh(al["study"], 'Study, report, raw records and validation') + '</section>')
 
     n83 = doc["n83_tier1_cold_holdout"]
     baseline = n83["paired_intervals"]["k1120|k1152"]
