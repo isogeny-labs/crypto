@@ -676,14 +676,15 @@ def findCollisions(cur, key):
     object's own rows are neither.
     """
     cur.execute(
-        "SELECT i.point_key, i.a, i.walk_seed, d.a, d.walk_seed, d.worker_id "
+        "SELECT i.point_key, i.a, i.b, i.walk_seed, "
+        "d.a, d.b, d.walk_seed, d.worker_id "
         "FROM dp_in i JOIN distinguished_points d "
         "  ON d.campaign_id = %s AND d.point_key = i.point_key",
         (CAMPAIGN,))
     mine = workerId(key)
     out = []
     duplicates = 0
-    for point_key, mineA, mineSeed, theirsA, theirsSeed, worker in cur.fetchall():
+    for point_key, mineA, mineB, mineSeed, theirsA, theirsB, theirsSeed, worker in cur.fetchall():
         if worker == mine:
             continue
         if theirsA is None:
@@ -703,12 +704,17 @@ def findCollisions(cur, key):
             continue
         out.append({
             "point_key": bytes(point_key),
+            # The live rho_collisions table requires both coefficient pairs.
             "a1": bytes(theirsA),
+            "b1": bytes(theirsB),
             "walk_seed1": bytes(theirsSeed) if theirsSeed is not None else None,
             "worker_id1": worker,
+            "worker1": worker,
             "a2": bytes(mineA),
+            "b2": bytes(mineB),
             "walk_seed2": bytes(mineSeed),
             "worker_id2": mine,
+            "worker2": mine,
             "object_key": key,
         })
     return out, duplicates
@@ -728,8 +734,9 @@ def recordCollisions(cur, found):
                seedOf(row["a2"]), row["worker_id2"]))
     if not found or not {"campaign_id", "point_key"} <= _collisionCols:
         return 0
-    cols = [c for c in ("point_key", "a1", "walk_seed1", "worker_id1",
-                        "a2", "walk_seed2", "worker_id2", "object_key")
+    cols = [c for c in ("point_key", "a1", "b1", "walk_seed1", "worker_id1",
+                        "worker1", "a2", "b2", "walk_seed2", "worker_id2",
+                        "worker2", "object_key")
             if c in _collisionCols]
     sql = ("INSERT INTO rho_collisions (campaign_id, %s) VALUES (%s) "
            "ON CONFLICT DO NOTHING"

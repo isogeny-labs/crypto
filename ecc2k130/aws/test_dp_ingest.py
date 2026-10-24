@@ -696,8 +696,10 @@ class Collisions(unittest.TestCase):
         """One row as the join returns it: same point, two different seeds."""
         return (minePoint,
                 mineSeed.to_bytes(dp_ingest.COEFF_BYTES, "big"),
+                bytes(dp_ingest.COEFF_BYTES),
                 mineSeed.to_bytes(8, "big").lstrip(b"\x00"),
                 theirsSeed.to_bytes(dp_ingest.COEFF_BYTES, "big"),
+                bytes(dp_ingest.COEFF_BYTES),
                 theirsSeed.to_bytes(8, "big").lstrip(b"\x00"),
                 "dp-slot-00002-old.bin")
 
@@ -752,7 +754,7 @@ class Collisions(unittest.TestCase):
         # The join returns the object's own freshly inserted rows too (same
         # worker_id); a retried partial ingest must not count them.
         own = list(self.candidate(b"pk", 7, 7))
-        own[5] = dp_ingest.workerId(ORBIT)
+        own[7] = dp_ingest.workerId(ORBIT)
         conn, _ = self.ingest(record(7) + record(8), inserted=1, candidates=[tuple(own)])
         self.assertEqual(self.progressRow(conn)[3], 0)
 
@@ -794,7 +796,7 @@ class Collisions(unittest.TestCase):
         # from this program's. Comparing bytes would call every legacy
         # re-ingest a collision; the seed is an integer.
         row = list(self.candidate(b"pk", 7, 7))
-        row[3] = (7).to_bytes(8, "big")  # same seed, narrower column
+        row[4] = (7).to_bytes(8, "big")  # same seed, narrower column
         conn, (_, _, hits) = self.ingest(record(7), inserted=0, candidates=[tuple(row)])
         self.assertEqual(hits, 0)
         self.assertEqual(conn.stored, [])
@@ -825,7 +827,7 @@ class Collisions(unittest.TestCase):
         # predates it. Calling an uncomparable row a collision would make one
         # of every record that meets it.
         row = list(self.candidate(b"pk", 7, 9))
-        row[3] = None
+        row[4] = None
         conn, (_, _, hits) = self.ingest(record(7), inserted=0, candidates=[tuple(row)])
         self.assertEqual(hits, 0)
         self.assertEqual(conn.stored, [])
@@ -842,6 +844,27 @@ class Collisions(unittest.TestCase):
         self.assertIn("(campaign_id, point_key)", sql)
         self.assertEqual(sql.count("%s"), 2)
         self.assertNotIn("walk_seed1", sql)
+
+    def test_live_source_collision_shape_keeps_both_coefficients(self):
+        # The restored rho-dp schema requires b1 and b2. Omitting them made
+        # PostgreSQL reject a real collision and roll back the whole object.
+        dp_ingest._collisionCols = {
+            "id", "campaign_id", "point_key", "a1", "b1", "a2", "b2",
+            "worker1", "worker2", "walk_seed1", "walk_seed2", "detected_at"}
+        row = list(self.candidate(b"pk", 7, 9))
+        row[5] = b"stored-b-coefficient"
+        conn, (_, _, hits) = self.ingest(record(7), inserted=0,
+                                         candidates=[tuple(row)])
+        self.assertEqual(hits, 1)
+        sql, values = next((q, args) for q, args in conn.queries
+                           if "INSERT INTO rho_collisions" in q)
+        self.assertIn("b1", sql)
+        self.assertIn("b2", sql)
+        self.assertIn("worker1", sql)
+        self.assertIn("worker2", sql)
+        self.assertNotIn("worker_id1", sql)
+        self.assertIn(b"stored-b-coefficient", values)
+        self.assertIn(bytes(dp_ingest.COEFF_BYTES), values)
 
     def test_a_pass_reports_collisions_so_the_page_publishes_at_once(self):
         real = dp_ingest.pending
@@ -1891,6 +1914,71 @@ class _StopParsing(Exception):
 
 @unittest.skipUnless(os.environ.get("DP_INGEST_TEST_DSN"), "local PostgreSQL DSN not set")
 class PostgresReplicaIntegration(unittest.TestCase):
+    def test_collision_persists_with_the_live_rho_dp_column_shape(self):
+        # The live schema predates COLLISIONS_DDL and requires b1 and b2.
+        # A fake cursor accepted the old INSERT, while PostgreSQL rejected it
+        # and rolled back the progress row for the colliding object.
+        from urllib.parse import urlsplit
+        import psycopg
+        from psycopg import sql
+
+        dsn = os.environ["DP_INGEST_TEST_DSN"]
+        if urlsplit(dsn).hostname not in ("127.0.0.1", "localhost", "::1"):
+            self.fail("integration test requires a loopback PostgreSQL DSN")
+        schema = "dp_collision_test_" + uuid.uuid4().hex[:12]
+        conn = psycopg.connect(dsn, connect_timeout=5)
+        original_cols = dp_ingest._collisionCols
+        original_rollup = dp_ingest.applyRollup
+        try:
+            conn.execute(sql.SQL("CREATE SCHEMA {}").format(sql.Identifier(schema)))
+            conn.execute(sql.SQL("SET search_path TO {}").format(sql.Identifier(schema)))
+            conn.execute(
+                "CREATE TABLE distinguished_points (campaign_id text NOT NULL, "
+                "point_key bytea NOT NULL, a bytea NOT NULL, b bytea NOT NULL, "
+                "walk_seed bytea, worker_id text, found_at timestamptz, "
+                "PRIMARY KEY (campaign_id, point_key))")
+            conn.execute(
+                "CREATE TABLE rho_collisions (id bigserial PRIMARY KEY, "
+                "campaign_id text NOT NULL, point_key bytea NOT NULL, "
+                "a1 bytea NOT NULL, b1 bytea NOT NULL, "
+                "a2 bytea NOT NULL, b2 bytea NOT NULL, "
+                "worker1 text, worker2 text, walk_seed1 bytea, walk_seed2 bytea, "
+                "detected_at timestamptz DEFAULT now(), "
+                "UNIQUE (campaign_id, point_key, a1, b1, a2, b2))")
+            conn.commit()
+            dp_ingest.ensureProgress(conn)
+            dp_ingest.ensureCollisions(conn)
+            body = struct.pack("<QQQQ", 8, 1, 2, 3)
+            point_key = body[8:]
+            old_a = (7).to_bytes(dp_ingest.COEFF_BYTES, "big")
+            old_b = b"stored-b"
+            conn.execute(
+                "INSERT INTO distinguished_points "
+                "(campaign_id, point_key, a, b, walk_seed, worker_id) "
+                "VALUES (%s, %s, %s, %s, %s, %s)",
+                (dp_ingest.CAMPAIGN, point_key, old_a, old_b, b"\x07", "old-worker"))
+            conn.commit()
+            dp_ingest.applyRollup = lambda *_args: None
+            result = dp_ingest.ingestObject(
+                conn, EnvelopeS3(body), "bucket", LEGACY,
+                "2026-10-24 00:00:00+00", replica_id="new-worker", expected_records=1)
+            self.assertEqual(result, (0, 1, 1))
+            row = conn.execute(
+                "SELECT a1, b1, a2, b2, worker1, worker2 FROM rho_collisions").fetchone()
+            self.assertEqual(row, (old_a, old_b,
+                                   (8).to_bytes(dp_ingest.COEFF_BYTES, "big"),
+                                   bytes(dp_ingest.COEFF_BYTES),
+                                   "old-worker", dp_ingest.workerId(LEGACY)))
+            self.assertEqual(conn.execute("SELECT count(*) FROM dp_ingest_progress").fetchone(),
+                             (1,))
+        finally:
+            dp_ingest._collisionCols = original_cols
+            dp_ingest.applyRollup = original_rollup
+            conn.rollback()
+            conn.execute(sql.SQL("DROP SCHEMA IF EXISTS {} CASCADE").format(sql.Identifier(schema)))
+            conn.commit()
+            conn.close()
+
     def test_two_connections_claim_one_object_and_recover_after_crash(self):
         # Set DP_INGEST_TEST_DSN to a disposable loopback PostgreSQL cluster.
         # This drives the real advisory lock, COPY, point insert, and progress
