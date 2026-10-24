@@ -14,8 +14,9 @@ The stronger post-run audit uses
 scalar-multiplication action maps, verifies actual pair coverage, per-pair
 physical relations, the transported union and F4 counter sums. The fixed
 42-case-arm Rust reducer and per-phase-reservation shell driver are implemented.
-No candidate polynomial panel or target descent has yet run; no new physical
-set, matrix rank, target recovery or timing is claimed. The completed 189+21
+The corrected `panel-v2` is running with a frozen journalled executable and
+post-run comparisons. No final 42-case-arm verdict, target recovery or
+admitted timing is claimed yet. The completed 189+21
 study and all 43 joint raw directories remain in the original worktree and
 verified canonical store object; do not rerun them.
 

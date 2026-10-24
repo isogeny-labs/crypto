@@ -34,8 +34,8 @@ flowchart LR
 | Public-only candidate inputs and charged reconstruction | Native collector calls the original cold builder; no reference argument |
 | Independent pair coverage and work-record auditing | Separate scalar-multiplication maps, exact partition, per-pair reference equality, transported union, and checked F4 counter sum |
 | Native correctness gate | Journalled version: 84/84 tests pass, source checks pass; [current receipts](results/native-journal-gate-v1/metadata/native-tests.stdout). Earlier passes/failures are retained separately. |
-| Complete physical enumeration on all 42 case-arms | Pending registered panel; a timeout is never a zero-yield observation |
-| Independent complete-set and matrix comparison | Implemented; execution pending |
+| Complete physical enumeration on all 42 case-arms | Corrected `panel-v2` is running; final verdict pending; a timeout is never a zero-yield observation |
+| Independent complete-set and matrix comparison | Running after each saved collector result; final 42-case-arm verdict pending |
 | Charged target descent and matched controls | Not yet implemented or executed |
 | Calibrated complete IC price, strongest rho and external solver comparison | Open; this shared host admits correctness/counter diagnostics only |
 
