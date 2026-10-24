@@ -14,7 +14,7 @@ on:
 jobs:
   pencil-and-four-cell:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|p192-geometry-collector-lean.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|p192-geometry-collector-lean.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 45 || 25 }}
+    timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 45 || 35 }}
     defaults:
       run:
         working-directory: research/p192_extension_cover_20261012/lean
@@ -27,7 +27,7 @@ jobs:
           auto-config: false
           use-mathlib-cache: true
           build: true
-          build-args: 'PencilThreeSum FourCellDensity TraceThree'
+          build-args: 'PencilThreeSum FourCellDensity TraceThree CrossEndpointQueryTriple'
           test: false
           lint: false
           leanchecker: true
@@ -38,3 +38,10 @@ jobs:
         run: lake env leanchecker --fresh --verbose FourCellDensity && lake env lean FourCellDensity.lean
       - name: Fresh-check three-step trace theorem and audit axioms
         run: lake env leanchecker --fresh --verbose TraceThree && lake env lean TraceThree.lean
+      - name: Fresh-check cross-endpoint query theorem and replay coordinate certificate
+        run: |
+          lake env leanchecker --fresh --verbose CrossEndpointQueryTriple
+          lake env lean CrossEndpointQueryTriple.lean
+          python3 -B ../analyze_cross_endpoint_query_triples.py
+          cd ../../..
+          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261024/ARTIFACTS.sha256
