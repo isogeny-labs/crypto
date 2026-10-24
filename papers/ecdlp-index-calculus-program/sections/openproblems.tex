@@ -66,8 +66,9 @@ its absence would locate the term the model misses.
 \paragraph{7. Pricing and calibration infrastructure.} Rankings now
 require every arm's native work to be counted (AGENTS.md \S5a).
 \emph{Work:} count the three uncounted categories of the shared-rank arm;
-calibrate every ladder size on one fixed host; resolve the inherited-F4
-cross-host counter drift; register the $n=83$ dense root index in the
+calibrate every ladder size on one fixed host; record the inherited-F4 code
+path (BMI2 or portable) in its method identity, now that the cross-host
+counter drift is traced to it; register the $n=83$ dense root index in the
 harness.
 
 \paragraph{8. Genus three after cubic GHS, to the crossover.} The one
@@ -93,4 +94,33 @@ $q\le11$) and through Smith's $(2,2,2)$-isogeny from the hyperelliptic case
 October (\art{research/plane_quartic_program_20261018/PROGRAM.md}).
 \emph{Experiment:} the hyperelliptic ladder's instances, carried to plane
 quartics where Smith's conditions pass, with Diem's relation search and the
-same linear algebra, against the same matched rho.
+same linear algebra, against the same matched rho. The existing toy
+plane-quartic $S$ values are unverified (their degree-3 reduction merges
+distinct classes; \S\ref{sec:corrections}), so the arithmetic must be
+rebuilt first; the 23 October literature round ranks this branch as its one
+exponent candidate (LEAD-15, \art{research/pdp_literature_leads_20261022/}).
+
+\paragraph{10. A published index calculus as the reference arm.} Every
+ratio in this paper is against rho or the programme's own previous arm;
+none is against the state of the art in index calculus at the same
+$(q,n,m)$ (\S\ref{sec:ladder3}). \emph{Work:} fix, per curve and size, the
+standard base $\{P:x(P)\in\FF_q\}$, the FGHR-symmetrised summation
+polynomial (2-torsion and, on Koblitz curves, Frobenius invariants), msolve
+as the solver and WDSat for binary decompositions, and run it in ecbench
+on the existing ladders (binary $n=13$--$37$, Koblitz $n=41$--$61$, $k=4$
+extension fields). \emph{Settles:} whether any engineering result of
+\S\S\ref{sec:rootfinding}--\ref{sec:transfer} improves on published index
+calculus, as opposed to on this programme's own baseline. Stage ratios
+quoted against the in-house F4 say nothing about published Gr\"obner
+engines until this is done.
+
+\paragraph{11. The Joux--Vitse cover, to the crossover.} The cover of
+$E(\FF_{p^6})$ closes on rho as about $p^{-2}$ and is $1.6$--$2.0\times$ a
+pooled rho constant at $p=1009$, with the line meeting rho near
+$p\approx1330$ by extrapolation (\S\ref{sec:ladder3}). \emph{Experiment:}
+emit the cover arm's unpriced F4 and Wiedemann counters, measure rho at the
+largest $p$ it can run (or with a memory-light rho at $p\ge503$), and run
+both at $p\approx1300$--$2000$, across the band. A measured crossover would
+be the programme's first \cls{advance} against rho, on a weak and undeployed
+class; its absence at the predicted $p$ would locate the term the cost
+model misses.

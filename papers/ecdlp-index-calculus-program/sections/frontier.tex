@@ -120,7 +120,12 @@ an exponent):
 \end{itemize}
 No index-calculus arm has a fitted exponent below rho's at any weight, so
 no crossover with rho is supported by these data, extrapolated or
-otherwise. The sixty-three fits are in
+otherwise. The fitted rho exponents ($0.435$--$0.444$) lie below the
+theoretical $1/2$, which reads as a toy-size effect (fixed per-run overheads
+and the size-dependent automorphism count) rather than a property of rho; so
+the measured widening of the gap is a fit on small sizes, and the conclusion
+that it widens as $r^{1/6}$ rests on the generic-oracle bound, not on these
+fits alone. The sixty-three fits are in
 \art{research/ic_frontier_campaign_20261015/analysis/bounds/}.
 
 \paragraph{Limits.} Operation counts only (isolation L0); wall time and a
@@ -420,7 +425,7 @@ Algebraic $m=3,4$ oracles vs MITM floor & R & slope $0.53$--$0.81$ vs $0.21$--$0
 \texttt{f4\_fp} blocked pair reduction & E & $0.78$--$0.89$ (wall, quad $n10,11$) & beats msolve there \\
 Sparse-CADO LA inside ecbench & E & $S$ $1.000$; LA wall $0.25$--$0.72$ & $149\times$ rho \\
 $S_3$ solve on SECG small-$x$ bases & --- & table $2{,}600$--$313{,}000\times$ cheaper & $52$--$280$ bits over rho \\
-Column-touch conversion $K$ (ECC2K-130 $m=4$) & A & $+7.62/+10.32\to+9.78/+12.48$ bits & accounting \\
+Column-touch conversion $K$ (ECC2K-130 $m=4$) & A & $+7.62/+10.32\to+9.78/+12.48$ bits ($w=1$ floor; $+45.71$ at $w=2$, unconverted) & accounting \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -500,14 +505,178 @@ memory, precomputed rho is faster in every matched $n=83$ pair
 $82$--$396\times$ against $K=600$). They join the $n=61$ point as retired.
 (ii) The root-finder session's replay-all, recorded as 120/168 identical with
 the 48 mismatches confined to inherited F4, replays 72/168 on current
-\texttt{main}, with mismatches in all four IC arms, root finding included;
-the cause is open. Its root-finder rows are therefore not relied on here
-beyond the recorded receipt. (iii) The equal-bytes preprocessing control at
+\texttt{main}, with mismatches in all four IC arms, root finding included.
+The sweep later isolated the cause: an x86-only BMI2 rewrite in inherited F4
+charges a different word-XOR count from the portable path, and with it
+disabled x86 and emulated aarch64 both replay 168/168
+(\art{research/validation_sweep_20261019/D-known-issues/item1_cross_isa_20261020/RESULT.md}).
+F4 counts are therefore comparable across instruction sets only when the
+path is stated, and until the method identity records it the root-finder
+rows rest on the recorded receipt. (iii) The equal-bytes preprocessing control at
 $n=73$ and $n=83$ is built and frozen but not run.
 \emph{Next improvement} (from the 18 October leads review): a large-memory
 host. The two exponent-level questions left---the Weil-descent cell
 $(m,\ell)=(4,6)$, about 70\,GB dense, and the PKM tower at $m=3$, $N=21$ to
 $m=4$, $N=20$, 256--512\,GB---are blocked on memory, not on instruments.
+
+\subsection{The ladder continued, 21--24 October}\label{sec:ladder3}
+
+Work that reached \texttt{main} between 21 and 24 October falls into four
+groups: factor bases closed under cheap known-logarithm maps, a paired
+re-run of the Koblitz leaderboard recipe, a guess-and-determine attack on
+the Weil-descent degree question, and transfer measurements, among them a
+third family whose measured gap to rho is now single-digit
+(Table~\ref{tab:ladder3}). The reading rules of \S\ref{sec:ladder} apply:
+each row is against its own incumbent and on its study's boundary. The
+companion ledger (\art{papers/ecdlp-ic-improvement-ledger/}) records the
+same period as a ratchet of incumbents; this section keeps to what moves
+the frontier or corrects it.
+
+\begin{table}[p]
+\centering\small
+\caption[]{Changes that landed 21--24 October 2026, against their own
+incumbents; columns and classes as in Table~\ref{tab:ladder} (N = null or
+diagnostic, no cost row). Sources under \art{research/}:
+\texttt{ic\_improve\_20261023/} (\texttt{README.md},
+\texttt{PRIME\_README.md}, \texttt{BINARY\_README.md}),
+\texttt{lead19\_projected\_base/}, \texttt{ic\_tool\_program/rule/v4/},
+\texttt{dreg\_hybrid\_guess\_20261024/}, \texttt{jv\_cover\_p\_scaling\_20261024/},
+\texttt{hcdlp\_trial\_cost\_20261024/}, \texttt{ghs\_cover\_census\_n4\_20261024/},
+\texttt{coppersmith\_s3\_theta2\_20261023/}; and
+\art{docs/ic/CERTICOM131_IC_PROGRAM.md}.}
+\label{tab:ladder3}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}Xl>{\raggedright}p{3.6cm}>{\raggedright\arraybackslash}p{3.2cm}@{}}
+\toprule
+Change & Cl. & Ratio [95\%] & To rho \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Factor bases closed under known-log maps}}\\
+$\ZZ[\tau]$ small-norm multipliers, Koblitz $n=41$--$61$ & Ic & $1/1.9$--$1/4.4$ child CPU (3 targets, loaded host) & not measured \\
+Same, wide path, $n=71$ & Ic & $1/6.2$ equal points; $1/10.5$ retuned (1 target) & not measured \\
+$\ZZ[\phi]$ multipliers, prime CM curves, 36--40 bit & Ic & $1/10$--$1/20$ in $S$ & $7$--$12\times$ \\
+Integer-multiple closure, random binary, degree 26--28 & Ic & $1/3.1$--$1/3.9$ vs plain & $6$--$12\times$ \\
+Cofactor-projected base (LEAD-19), $\FF_{2^{15}},\FF_{2^{21}},\FF_{2^{27}}$ & Ic & $1/1.29$ $[1/1.52,1/1.12]$, $1/1.58$ $[1/1.82,1/1.35]$, $1/3.36$ $[1/4.02,1/2.80]$ & $6.1$, $11.5$, $14.4\times$ \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Koblitz leaderboard recipe (Table A, $n=41$--$61$)}}\\
+Rule v4 recipe vs v3, paired, six sizes & Ic & $0.953$ $[0.904,0.998]$ at $n=57$; five sizes not separated & $9.9$--$43\times$ at the canonical step \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Weil descent, degree question}}\\
+Hybrid guess, $(m,\ell)=(3,7)$, $k^*\le2$ guesses & E & $1/116$--$1/260$ of projected degree-5 closure & --- \\
+Implied ECC2K-130 $m=4$ row (derived) & N & $+8.43$ (flat $k$) to $+58.27$ bits (linear $k$) & vs $+10.32$ ($w=1$), $+45.71$ ($w=2$) \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Prime fields}}\\
+Kummer tower, 30 bit (new row) & N & --- & $158.9\times$ $[121.6,221.4]$ \\
+Coppersmith lattice on $\Sem3$, $\ell\le3$ & N & 0/10 recovered in all 96 cells with $\beta\ge0.20$ & ceiling $\beta=1/4$ stands \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Transfer and covers}}\\
+Joux--Vitse cover of $E(\FF_{p^6})$, $p=53$--$1009$ & N & slope $-2.05$ $[-2.28,-1.83]$ in $\ln p$ & $1.59$--$1.98\times$ at $p=1009$ (LB) \\
+Measured trial cost, genus-255 binary Jacobian & A & $103$ curve additions per trial ($2^{6.69}$) & $N=130$ margin $+4.71\to-1.83$ bits \\
+GHS covers of $E/\FF_{q^4}$, odd $q$, census & N & genus floor 13 on odd-order curves & model exponent gap $0.154$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{One mechanism, four factor bases.} The week's measured gains on
+the index-calculus side are all the same idea: put a point and its images
+under maps of known logarithm---the Frobenius $\tau$ on a Koblitz curve, the
+CM endomorphism $\phi$, small integer multiples, the cofactor $[h]$---into
+one column with a known coefficient, so the linear-algebra stage needs fewer
+relations. On Koblitz curves the $\ZZ[\tau]$ base needs $K+1$ relations
+instead of about one per orbit: child CPU of the complete process falls
+$1.9$--$4.4\times$ at $n=41$--$61$ and $6.2$--$10.5\times$ at $n=71$. These
+are measured against the repository's own tuned producer, on a host at load
+about 20 (child CPU is the less affected number), with three targets up to
+$n=61$ and one at $n=71$. The prime CM base ($j=0$, $j=1728$, $D=-7,-8$) cuts
+$S$ $10$--$20\times$, and the integer-multiple base on random binary curves
+$3$--$4\times$; both at 36--40-bit or degree-26--28 sizes, where the best
+bases have 3--10 columns over 512--3{,}480 points and, as their sources note,
+tend to a baby-step giant-step table over multiples as the column count
+falls. The
+cofactor-projected base (LEAD-19) is the only one measured on leaderboard
+rows, with 20 repeats and the order stable across the band: $1.29$--$3.36\times$
+in cold $S$, leaving $6.1$--$14.4\times$ to matched rho. Every source states
+that the exponent is unchanged; the gain is bounded by the size of the
+multiplier set and shrinks as linear algebra's share of the cost shrinks.
+The known-coefficient columns are those of GGMP's Frobenius-orbit bases
+\cite{ggmp2020} (\S\ref{sec:koblitz}); what is new here is extending them
+from automorphisms to small-norm and integer multipliers. Whether that
+extension is in the literature has not been checked. All four are
+\cls{engineering}, and none is measured against a published index
+calculus; the $\ZZ[\tau]$ source notes that the summation-polynomial methods
+have no table-based counterpart at these parameters.
+
+\paragraph{Koblitz: the recipe is near its optimum, the distance is
+larger.} Rule v4 retuned columns, collection window and unit size on
+disjoint training seeds and re-ran Table A paired against rule v3 (32 pairs
+per size, 16 seeds, A/A and a positive control that detects a 10--15\%
+slowdown). One size improves ($0.953$ $[0.904,0.998]$ at $n=57$) and five are
+not separated, so it is not a Table A improvement under its own rule. The
+free-relation lever costs 5--9\% in this pipeline. More consequential is the
+reference: with rho priced in the same process at the canonical batched step,
+the cold distance is $9.9$--$43\times$, $1.76$--$1.94\times$ the as-built
+figure that rule v3 used. The ledger's rule v8 reads $4.67$--$18.07\times$ on
+the same sizes in its own unit; the two are different domains in the sense of
+Definition~\ref{def:domain} and are not combined here.
+
+\paragraph{Weil descent: a hybrid closes one cell, the degree question
+stays open.} The $(m,\ell)=(3,7)$ cell had no refutation at degree 4. Fixing
+one or two variables restores degree 4: all branches refute with $k^*\le2$ on
+10 of 10 unsatisfiable draws, at $1/116$--$1/260$ of the projected degree-5
+cost, in 3--6\,GB (planted-solution and placebo controls passed). For the
+ECC2K-130 $m=4$ row this changes less. Its often-quoted ``$+10.32$ bits over
+rho if degree 5 holds'' prices one column touch per Macaulay column ($w=1$),
+a floor no elimination beats; at $w=2$, the exponent the measured closure
+tracks, the same row is $+45.71$ bits, and the measured conversion
+$K=4$--$16$ rho steps per touch raises both (\S\ref{sec:ladder2}). With the
+hybrid, the row is $+8.43$ bits if the number of guesses stays flat in $\ell$
+and $+58.27$ bits if it grows linearly; one value of $\ell$ cannot separate
+them, and the run at $\ell=8$ that would did not complete. In no scenario does
+the row go below the degree-4 floor of $+7.62$ bits, so the route does not
+reach rho.
+
+\paragraph{Prime fields: further behind.} A new 30-bit Kummer-tower row in
+ecbench (160/160 verified, loaded host) is $158.9\times$ $[121.6,221.4]$ rho at
+$w=0$, against $141\times$ at 28 bits in the campaign; its source calls it ``a
+measurement, not an improvement''. Two falsifiers for the Certicom 131-bit
+programme (random-$b$ binary degrees of regularity; structured bases) were
+null. A frozen-protocol test of a Coppersmith lattice on $\Sem3$ recovered no
+planted decomposition in any of 96 cells with $\beta\ge0.20$ at 24--56 bits,
+with positive controls passing below, so the $\beta=1/4$ ceiling stands at
+multiplicity $\le3$.
+
+\paragraph{A third family approaches rho: the Joux--Vitse cover.} The
+genus-3 cover of $E(\FF_{p^6})$ over $\FF_{p^2}$ with Nagao decompositions
+(full rational 2-torsion; a weak class, not prime-order curves) ran at
+$p=53$--$1009$, three seeds per prime, every logarithm checked. The gap to
+rho falls from a geometric mean of $620\times$ at $p=53$ to $1.73\times$ at
+$p=1009$ ($1.59$--$1.98$), with fitted slope $-2.05$ $[-2.28,-1.83]$ in $\ln p$
+against the cost model's $-2$; the line meets rho near $p\approx1330$
+($[1170,1540]$, an extrapolation). Two limits keep it a lower-bound comparison:
+the cover arm does not emit its unpriced F4 and Wiedemann work, so it cannot be
+ranked under the band; and rho cannot be run at $p\ge503$ (subgroups of
+$2^{52}$--$2^{58}$), so those ratios use the pooled rho constant $S=1.344$
+measured at $p\le251$. If that constant kept falling at its (insignificant)
+point trend, the ratio at $p=1009$ would be about 20\% higher.
+
+\paragraph{Covers: censuses and a repriced counterfactual.} Measuring the
+cost of one relation trial (a Cantor addition plus a smoothness test) on a
+genus-255 binary Jacobian gives 103 additions of a point over $\FF_{2^{131}}$
+($2^{6.69}$), which turns the $N=130$ GHS counterfactual's modelled margin
+over rho from $+4.71$ bits to $-1.83$ bits; only a trial below about 29
+additions would preserve it, and the smoothness test alone costs 16.5. Two
+censuses fix what covers exist at toy sizes: for $E/\FF_{q^4}$ in odd
+characteristic the genus floor is 13 on odd-order curves ($2-2/g$ against
+rho's 2 leaves an exponent gap of $0.154$, constants excluded), and for
+binary curves over $\FF_{2^{3l}}$ the genus-3 class is a $2^{-l}$ fraction
+($0.78\%$ at $l=7$).
+
+\paragraph{What is still not measured.} No arm in the programme has yet
+been compared with a published index calculus at the same $(q,n,m)$:
+FGHR-style symmetrised summation polynomials over the standard base
+$\{P: x(P)\in\FF_q\}$, solved by msolve, or WDSat for binary
+decompositions. Every ratio in Tables~\ref{tab:ladder}--\ref{tab:ladder3} is
+against rho or against the programme's own previous arm. Defining and running
+that reference arm (open problem~10) is the precondition for any claim of
+improving on the state of the art.
 
 \subsection{Three frontiers}
 
@@ -517,12 +686,15 @@ Every measured index-calculus arm is above its matched rho
 at $1.55\times$ strong signed-Frobenius rho at $n=13$; the closest
 lower-bound arms are $1.08\times$ (compact orbit with a counted Frobenius
 table) and $6.97\times$ (matrix F4/F5 against rho-negation at K13).
-Prime-field arms are $12$--$239\times$ rho and diverge with size. Off the
-prime and prime-degree binary fields, two families are within a single-digit
-factor: genus three after cubic GHS ($1.15\times$ a measured rho at
-$q=2^{20}$, with $0.44\times$ of further improvement not yet matched
-against rho) and $k=4$ over $\FF_{(2^m)^4}$ ($4.3\times$ a measured rho at
-$n\approx2^{56}$, closing as $n^{-1/4}$).
+Prime-field arms are $12$--$239\times$ rho and diverge with size (the
+30-bit Kummer-tower row of \S\ref{sec:ladder3} is $159\times$). Off the
+prime and prime-degree binary fields, three families are within a
+single-digit factor, all in weak classes: genus three after cubic GHS
+($1.15\times$ a measured rho at $q=2^{20}$, with $0.44\times$ of further
+improvement not yet matched against rho), $k=4$ over $\FF_{(2^m)^4}$
+($4.3\times$ a measured rho at $n\approx2^{56}$, closing as $n^{-1/4}$), and
+the Joux--Vitse cover of $E(\FF_{p^6})$ ($1.59$--$1.98\times$ a pooled rho
+constant at $p=1009$, closing as about $p^{-2}$; a lower-bound comparison).
 
 \paragraph{Online, after retained set-up.} Generic again: Bernstein--Lange
 preprocessing rho. The admitted compact-orbit point at Koblitz $n=61$,
@@ -571,5 +743,12 @@ the fitted trend predicts parity near $n\approx2^{68}$; (vii) measure the
 matched rho on $E_0(\FF_{q^3})$ in the genus-3 rounds' unit, so that the
 last two rounds' $0.44\times$ has a distance; (viii) obtain a
 large-memory host for the $(4,6)$ Weil-descent cell and the PKM tower.
+The 21--24 October work adds two more and re-weights one: (ix) measure rho
+on the Joux--Vitse cover family at $p\ge503$ (or a size where it can be run)
+and emit the cover arm's unpriced counters, so that the $p^{-2}$ trend can be
+ranked under the band and tested past $p\approx1330$; (x) define and run a
+published-index-calculus reference arm (open problem~10); and (viii) is worth
+less than it looked for the binary question, since the $m=4$ row at $w=2$ is
+about $+46$ bits over rho even if degree 5 holds (\S\ref{sec:ladder3}).
 A result in the cold domain that beats rho at four sizes would be the first
 \cls{advance} of the programme.

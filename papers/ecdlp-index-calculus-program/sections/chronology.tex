@@ -12,7 +12,8 @@ post-quantum benchmarks), which dominates week 37.
 \centering
 \includegraphics[width=\linewidth]{figures/fig-timeline.pdf}
 \caption[]{Commits per ISO week on \texttt{main}, 1 July--14 October 2026
-(6{,}882 commits; week 42 partial). Lines: commits whose subject matches
+(6{,}882 commits; week 42 partial; the figure has not been extended past
+14 October). Lines: commits whose subject matches
 each theme's keywords. Source: \texttt{git log} at the paper's base commit;
 values in \art{figures/data.json}.}
 \label{fig:timeline}
@@ -97,4 +98,19 @@ $6.1\times$ at $n\approx2^{56}$ (\S\ref{sec:ladder2}). The binary MITM oracle
 reached $\ell=12$, the strong rho reference shed 40\% of its instructions
 per step, and a precomputed-rho control at $n=83$ (16 Oct) and a
 repository-wide validation sweep (19--20 Oct) retired the remaining online
-wins and reopened the root-finder replay.
+wins and reopened the root-finder replay, whose cause (an x86-only BMI2 path
+in inherited F4) it then isolated.
+
+\paragraph{Phase 7, 21--24 October: folded bases, a third family, and the
+reference question.} Four factor bases closed under known-logarithm maps
+($\ZZ[\tau]$ on Koblitz curves, $\ZZ[\phi]$ on CM curves, integer multiples
+on random binary curves, the cofactor projection of LEAD-19) cut cost
+$1.3$--$20\times$ against the programme's own arms without changing an
+exponent (\S\ref{sec:ladder3}). A two-round literature search drafted 19
+point-decomposition leads and closed most at the desk. Re-pricing rho at the
+canonical step nearly doubled the Koblitz leaderboard's distance; a hybrid
+guess closed the $(3,7)$ Weil-descent cell without moving the $m=4$ row
+below rho; the Joux--Vitse cover family came within $1.6$--$2.0\times$ of a
+pooled rho constant at $p=1009$. No arm has yet been measured against a
+published index calculus at the same parameters; that reference arm is now
+open problem~10.

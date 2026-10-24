@@ -186,8 +186,13 @@ must be read.
   unchanged. The failed receipt is kept; the F4 stage comparison is
   historical until the drift is explained. A replay of the same session on
   current \texttt{main} (20 October) matches only 72/168, with mismatches
-  in all four IC arms, root finding included; that regression is open, and
-  the session's root-finder rows rest on the original receipt.
+  in all four IC arms, root finding included. The cause was then isolated:
+  an x86-only BMI2 rewrite in inherited F4 counts word XORs differently from
+  the portable path; with it disabled the replay is 168/168 on x86 and on
+  emulated aarch64
+  (\art{research/validation_sweep_20261019/D-known-issues/item1_cross_isa_20261020/RESULT.md}).
+  F4 counts are comparable across instruction sets only when the path is
+  stated, which the method identity does not yet record.
 \item \emph{A soundness bug} (\art{docs/ic/GROEBNER_F4F5F6_AUDIT_20261010.md}
   \S2.1): a degree-bounded \texttt{f4\_fp::solve} could certify solutions
   of an inconsistent system (over $\FF_5$, $\{x^3+1,xy-1,x+y\}$ returned
@@ -205,4 +210,16 @@ must be read.
   \art{research/ic_frontier_campaign_20261015/select/SELECTION.md}): below
   rho with native work free, above it otherwise, so the pair is unresolved
   inside the band rather than a win for either side.
+\item \emph{An unmatched rho reference} (21--24 October). The Koblitz
+  leaderboard's rule v3 priced its rho as built rather than at the canonical
+  batched step. Re-pricing rho in the same process raised the cold distance
+  $1.76$--$1.94\times$, to $9.9$--$43\times$
+  (\art{research/ic_tool_program/rule/v4/README.md}); the ledger's rule v8,
+  matching the reference its own way, raised it $1.30$--$1.58\times$ and found
+  that an apparent flattening of the gap's slope was mostly this artefact
+  (\art{papers/ecdlp-ic-improvement-ledger/}). The same week withdrew a
+  volcano-crater claim (IC 22--25\% cheaper) whose reference should have been
+  the cubic-automorphism rho, against which IC is $84.9\times$ rho, and marked
+  the plane-quartic $S$ values unverified because their degree-3 reduction
+  merges distinct classes.
 \end{enumerate}

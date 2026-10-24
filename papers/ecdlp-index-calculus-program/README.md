@@ -1,8 +1,8 @@
 # Index Calculus for the Elliptic-Curve Discrete Logarithm, Measured
 
-`ic_program.tex` (built: [`ic_program.pdf`](ic_program.pdf), 21 pages) is the
+`ic_program.tex` (built: [`ic_program.pdf`](ic_program.pdf)) is the
 programme record of the repository's ECDLP index-calculus work from
-2026-07-01 to 2026-10-14: the routes pursued, the measurement infrastructure
+2026-07-01 to 2026-10-24 (last folded in: 21–24 October): the routes pursued, the measurement infrastructure
 (ecbench, the boundary ledger, claim hygiene), what improved and on which
 boundary, the negative results, and where the frontier stands.
 
@@ -45,6 +45,16 @@ improvement it reports is *engineering* or *accounting*.
   class; cold one-target frontier still rho; one admitted online point
   (compact-orbit IC at Koblitz `n = 61`, 13.9× [9.8, 19.1] over strong rho,
   64 targets, set-up excluded; 83× rho with set-up charged).
+- **21–24 October** (frontier section, "The ladder continued, 21–24 October"): four factor bases closed under known-log maps
+  (Z[τ], Z[φ], integer multiples, LEAD-19 cofactor projection), 1.3–20×
+  against the programme's own arms, exponent unchanged; Koblitz Table A
+  re-priced at the canonical rho step (9.9–43×); hybrid guess closes the
+  (3,7) descent cell, m = 4 row stays +8.4 to +58 bits over rho (+45.7 at
+  w = 2 even at degree 5); Joux–Vitse cover of E(F_{p^6}) at 1.6–2.0× a
+  pooled rho constant at p = 1009, slope −2.05 (lower bound); the inherited-F4
+  replay regression traced to a BMI2 path.
+- **Not yet measured**: any comparison with a published index calculus at
+  the same (q, n, m) (open problem 10).
 - **Appendix A**: how to organise the material for publication (below).
 
 ## What it does not say

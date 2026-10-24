@@ -1,6 +1,6 @@
 \section{Conclusion}\label{sec:conclusion}
 
-Fifteen weeks of work produced three kinds of result. The first is
+Sixteen weeks of work produced three kinds of result. The first is
 infrastructure: a single unit and harness in which rho, BSGS, the kangaroo
 and every index-calculus variant are charged the same way on the same
 one-target workloads, with sealed records, exact replays and admitted
@@ -21,7 +21,9 @@ question the survey asks---does index calculus solve one unseen
 elliptic-curve target, cold, for less than rho?---the answer on every curve
 we measured, at every weight of the pricing band, is no. The closest arm is
 a compact Frobenius-orbit Koblitz index calculus at $4$--$18\times$
-signed-Frobenius rho, prime-field index calculus falls behind as $r^{1/6}$,
+signed-Frobenius rho in the campaign (separately, the leaderboard's Koblitz
+pipeline is $9.9$--$43\times$ at 36.6--47.2 bits once rho is priced at the
+canonical step), prime-field index calculus falls behind as $r^{1/6}$,
 and no fitted exponent of an index-calculus arm lies below rho's. The
 online $13.9\times$ at $n=61$ compared a table against no table and loses
 $53$--$317\times$ to preprocessing rho with equal advice; it is retired.
@@ -43,6 +45,22 @@ experiment. Both families are known to be weak in theory (Gaudry, Diem,
 GHS); what the programme adds is a measured, verified approach to the
 crossover, and neither is a deployed curve shape. The validation sweep of
 19--20 October also retired the remaining online wins at $n=83$ and
-reopened a replay regression in the root-finder session. The stages that now
-dominate are relation yield, factor-base size and linear algebra, and the
-open problems of \S\ref{sec:open} say what would move them.
+reopened a replay regression in the root-finder session, since traced to an
+x86-only code path in inherited F4.
+
+The week to 24 October added a third family of the same kind: a
+Joux--Vitse cover of $E(\FF_{p^6})$ whose gap closes as about $p^{-2}$ and
+is $1.6$--$2.0\times$ a pooled rho constant at $p=1009$, with the crossover
+extrapolated near $p\approx1330$; measuring rho and the cover's unpriced
+work at that size is, with the $k=4$ run near $2^{68}$, a direct test of a
+predicted crossover.
+It also added four factor bases closed under known-logarithm maps, worth
+$1.3$--$20\times$ against the programme's own arms and nothing in the
+exponent, and a re-priced rho that nearly doubled the Koblitz leaderboard's
+distance. The stages that now dominate are relation yield, factor-base size
+and linear algebra. One thing the paper cannot yet say is how any of this
+compares with published index calculus at the same parameters: every ratio
+here is against rho or against the programme itself. Building that
+reference arm (open problem~10) comes before any claim of improving on the
+state of the art, and the other open problems of \S\ref{sec:open} say what
+would move the stages that dominate.
