@@ -123,6 +123,7 @@ fn run_bounds() {
             .iter()
             .filter(|p| p.terms.iter().map(|t| t.mask.count_ones()).max() == Some(3))
             .count();
+        assert_eq!(cubic, (m - 2) * n as usize, "cubic links are the ones not through x_R");
         println!(
             r#"{{"lead":"L4","m":{m},"n":{n},"ell":{ell},"n_vars":{},"equations":{},"cubic_equations":{cubic},"max_degree":{},"generic_coordinates":{},"macaulay_bound":{},"shape_bound":{},"measured_closure_degree":"{measured}","source":"{source}","field_level_bound_log2":{:.1}}}"#,
             b.n_vars,
@@ -134,14 +135,16 @@ fn run_bounds() {
             degree_bounds::field_level_bound_log2(m, n, ell as u32)
         );
     }
-    // ECC2K-130 at m = 4, ℓ = 33: N = 2·131 + 4·33 and 3·131 links, all
-    // taken cubic (an upper value: a quadratic link lowers the bound).
+    // ECC2K-130 at m = 4, ℓ = 33: N = 2·131 + 4·33 and 3·131 links.  The
+    // built cells have exactly (m − 2)·n cubic links (the links not through
+    // x_R) and the rest quadratic, so the same split is used here.
     let (m, n, ell) = (4usize, 131u32, 33usize);
     let nv = (m - 2) * n as usize + m * ell;
     let eqs = (m - 1) * n as usize;
+    let cubic = (m - 2) * n as usize;
     println!(
-        r#"{{"lead":"L4","m":{m},"n":{n},"ell":{ell},"n_vars":{nv},"equations":{eqs},"cubic_equations":{eqs},"max_degree":3,"generic_coordinates":true,"macaulay_bound":null,"shape_bound":{},"measured_closure_degree":"unmeasured","source":"ECC2K-130 shape","field_level_bound_log2":{:.1}}}"#,
-        shape_bound(nv, eqs, 3),
+        r#"{{"lead":"L4","m":{m},"n":{n},"ell":{ell},"n_vars":{nv},"equations":{eqs},"cubic_equations":{cubic},"max_degree":3,"generic_coordinates":true,"macaulay_bound":null,"shape_bound":{},"measured_closure_degree":"unmeasured","source":"ECC2K-130 shape","field_level_bound_log2":{:.1}}}"#,
+        shape_bound(nv, cubic, 3),
         degree_bounds::field_level_bound_log2(m, n, ell as u32)
     );
 }
