@@ -90,13 +90,27 @@ already downloaded. For less network, clone blobless.
 
 ## Claude Code cloud sessions
 
-A cloud session clones the repository itself, before any hook runs. Two
-session settings shrink that clone (they are parameters of a new session, for
-example `create_session` when one session starts another):
+A cloud session clones the repository itself, before any hook runs, so
+nothing in the repository can change what that clone downloads. Two things
+shrink a session:
 
-- `blob_limit_kb`: files larger than this are left out and fetched when a
-  command reads them. `1024` alone skips the 829 files over 1 MiB, 72.5% of
-  the bytes, and leaves every path in place.
+**The checkout, by default.** `.claude/hooks/session-start.sh` applies the
+`harness` profile when the session starts on a full checkout (owner,
+2026-10-22): on 2026-10-22 it took a fresh session's working tree from
+8.0 GB to 3.9 GB in 8 s. It does nothing on a checkout that is already
+sparse, so a resumed session keeps the paths it added. The environment
+variable `CRYPTO_SPARSE_PROFILE` picks `minimal` instead, or `full` to keep
+the whole checkout. The hook's summary line says which applied. This frees
+disk and makes searches lighter; the history was already downloaded.
+
+**The download, per session.** Two settings of a new session, for example
+`create_session` when one session starts another, shrink the clone itself.
+Pass one whenever you start a session on this repository:
+
+- `blob_limit_kb: 1024`: files larger than this are left out and fetched when
+  a command reads them. It skips the 829 files over 1 MiB, 72.5% of the
+  bytes, and leaves every path in place. Use it when the task's directories
+  are not known in advance.
 - `sparse_checkout_paths`: a cone-mode list, the directories plus the files
   directly in their parent folders and at the root. Give it the plain-git
   list above plus the research directories the task needs, and add the two
@@ -104,9 +118,8 @@ example `create_session` when one session starts another):
   examples. When it is set, `blob_limit_kb` is ignored; prefer it when the
   task's directories are known.
 
-`CRYPTO_SPARSE_PROFILE=harness` (or `minimal`) in the environment's variables
-makes `.claude/hooks/session-start.sh` apply that profile after the clone.
-That frees disk, not download time.
+Sessions started by hand from the web or the app take whatever clone options
+their cloud environment's settings offer; a repository file cannot set them.
 
 ## Off disk is not absent
 
