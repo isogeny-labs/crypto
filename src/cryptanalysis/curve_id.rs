@@ -501,6 +501,23 @@ pub fn find_same_curve<'n, T>(
     })
 }
 
+/// The degree of the binary field a curve name carries: `m` of an ICV1
+/// slug's `f2m<m>`, `n` of a legacy `…-n<n>-…` or `…GF(2^<n>)`.
+pub fn binary_degree(name: &str) -> Option<u32> {
+    let digits = |s: &str| -> Option<u32> {
+        let d: String = s.chars().take_while(char::is_ascii_digit).collect();
+        d.parse().ok()
+    };
+    if let Some(rest) = name.strip_prefix("icv1-f2m") {
+        return digits(rest);
+    }
+    if let Some(at) = name.find("2^") {
+        return digits(&name[at + 2..]);
+    }
+    let at = name.find("-n")? + 2;
+    digits(&name[at..])
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -89,6 +89,7 @@ enum Cmd {
     },
     /// Run CUDA BSGS on a frozen EC Bench workload and verify its scalar here.
     GpuMatch {
+        /// A built gpu/ecc/bench CUDA binary (snapshotted into `--out`).
         #[arg(long)]
         binary: PathBuf,
         /// One workload JSON exported from `ecbench plan --json` or a session.
@@ -97,8 +98,10 @@ enum Cmd {
         /// A new directory for the binary snapshot, raw streams and receipt.
         #[arg(long)]
         out: PathBuf,
+        /// Watchdog limit for the GPU solve.
         #[arg(long, default_value_t = 600)]
         timeout_seconds: u64,
+        /// The program that samples GPU clocks and power during the solve.
         #[arg(long, default_value = "nvidia-smi")]
         telemetry_binary: PathBuf,
         /// The shared benchmark lock; a GPU solve is timed work.
@@ -116,20 +119,25 @@ enum Cmd {
     },
     /// Recheck a GPU receipt, raw streams, workload and scalar without a GPU.
     GpuMatchVerify {
+        /// The `--out` directory of a `gpu-match` run.
         #[arg(long)]
         dir: PathBuf,
     },
     /// Check A/A interval coverage and false admissions across quiet and contended sessions.
     Calibrate {
+        /// Sessions run on a quiet host (A/A arms whose intervals should cover 1).
         #[arg(long, num_args = 1..)]
         quiet: Vec<PathBuf>,
+        /// Sessions run under deliberate contention (whose wall results should not be admitted).
         #[arg(long, num_args = 1..)]
         contended: Vec<PathBuf>,
+        /// Write the calibration report here (it is also printed).
         #[arg(long)]
         out: PathBuf,
     },
     /// List every method with its parameters.
     Methods {
+        /// Print JSON instead of a table.
         #[arg(long)]
         json: bool,
     },
@@ -164,18 +172,22 @@ enum Cmd {
     },
     /// Print the host capsule.
     Host {
+        /// Print the capsule as JSON.
         #[arg(long)]
         json: bool,
     },
     /// Validate a spec and print what it expands to.
     Plan {
+        /// An `ecbench.spec/v1` file.
         #[arg(long)]
         spec: PathBuf,
+        /// Print the whole plan (workloads, arms, every execution) as JSON.
         #[arg(long)]
         json: bool,
     },
     /// Run a session.
     Run {
+        /// An `ecbench.spec/v1` file; `plan` shows what it expands to.
         #[arg(long)]
         spec: PathBuf,
         /// A new directory; `${VAR}` is expanded from the environment.
@@ -185,6 +197,7 @@ enum Cmd {
         /// placement, e.g. isolab's), none (record only, L0), or a list.
         #[arg(long, default_value = "auto")]
         cpus: String,
+        /// The shared benchmark lock: one timed session per host at a time.
         #[arg(long, default_value = isolation::DEFAULT_LOCK)]
         lock: String,
         /// Queue behind another benchmark holding the lock.
@@ -193,12 +206,16 @@ enum Cmd {
         /// Record a busy preflight and continue; every run stays below L2.
         #[arg(long)]
         allow_busy: bool,
+        /// Seconds the preflight watches the reserved CPUs before starting.
         #[arg(long, default_value_t = 2.0)]
         settle: f64,
+        /// Busy fraction of a reserved CPU above which the host is not quiet.
         #[arg(long, default_value_t = 0.10)]
         max_other_cpu: f64,
+        /// PSI `some avg10` ceiling, percent, above which the host is not quiet.
         #[arg(long, default_value_t = 5.0)]
         max_psi: f64,
+        /// Print only the final summary line.
         #[arg(long)]
         quiet: bool,
     },
@@ -207,8 +224,10 @@ enum Cmd {
     Exec,
     /// Export one exact measured-child input from a frozen spec and sequence.
     ProfileInput {
+        /// The session's frozen spec.
         #[arg(long)]
         spec: PathBuf,
+        /// The execution's sequence number (`seq` in its record).
         #[arg(long)]
         seq: u64,
     },
@@ -226,6 +245,7 @@ enum Cmd {
     },
     /// Audit a session from its own files.
     Verify {
+        /// The session directory (`session.json`, `records.jsonl`, …).
         #[arg(long)]
         dir: String,
         /// Re-execute this many measured runs and require identical counts.
@@ -247,22 +267,28 @@ enum Cmd {
     },
     /// Compare arm B against arm A.
     Compare {
+        /// The session directory.
         #[arg(long)]
         dir: PathBuf,
+        /// The baseline arm's name (the ratio's denominator).
         #[arg(long)]
         a: String,
+        /// The candidate arm's name (the ratio's numerator).
         #[arg(long)]
         b: String,
         /// B's session, when it is another one (operations only).
         #[arg(long)]
         b_dir: Option<PathBuf>,
+        /// Bootstrap resamples for the intervals.
         #[arg(long, default_value_t = 4000)]
         resamples: usize,
+        /// Bootstrap seed; the same seed gives the same intervals.
         #[arg(long, default_value_t = 20261002)]
         seed: u64,
         /// Save to <dir>/comparisons/<a>__<b>.json.
         #[arg(long)]
         save: bool,
+        /// Print the whole comparison as JSON instead of the verdict.
         #[arg(long)]
         json: bool,
         /// Compare a session whose status is not `complete` (recorded in
@@ -299,8 +325,10 @@ enum Cmd {
     },
     /// Resource vectors for all measured attempts; no invented SAT/GAE conversion.
     Resources {
+        /// The session directory.
         #[arg(long)]
         dir: PathBuf,
+        /// Write the vectors here instead of standard output.
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -312,6 +340,7 @@ enum Cmd {
         /// A factor-base plug-in spec, e.g. 'koblitz-orbit:divisor=1'.
         #[arg(long)]
         factor_base: String,
+        /// Write the factor base here instead of standard output.
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -335,6 +364,7 @@ enum Cmd {
         /// Instrument tag (default ecbench.ic_pipeline/v1).
         #[arg(long, default_value = "ecbench.ic_pipeline/v1")]
         instrument: String,
+        /// Write the sealed identity here instead of standard output.
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -351,6 +381,7 @@ enum Cmd {
     },
     /// An isolab.job/v1 that runs a spec on an independent lab worker.
     IsolabJob {
+        /// The spec the worker runs.
         #[arg(long)]
         spec: PathBuf,
         /// Upload this binary (built for the worker's architecture).
@@ -359,18 +390,26 @@ enum Cmd {
         /// Or build from this repository at `--commit` on the worker.
         #[arg(long, requires = "commit")]
         git_url: Option<String>,
+        /// The commit `--git-url` is built at.
         #[arg(long)]
         commit: Option<String>,
+        /// The isolab worker pool.
         #[arg(long, default_value = "default")]
         pool: String,
+        /// Whole cores to reserve on one NUMA node.
         #[arg(long, default_value_t = 2)]
         cpus: u32,
+        /// Memory limit for the job.
         #[arg(long)]
         memory_mb: Option<u64>,
+        /// Container image to run in (isolab's default when absent).
         #[arg(long)]
         image: Option<String>,
+        /// isolab's fidelity policy: strict, standard or best_effort.
         #[arg(long, default_value = "strict")]
         policy: String,
+        /// Job time limit; never below what the plan needs (executions ×
+        /// the spec's per-run timeout, plus 10 minutes), which 0 selects.
         #[arg(long, default_value_t = 0)]
         timeout_seconds: u64,
     },

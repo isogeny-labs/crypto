@@ -66,6 +66,10 @@ Factor bases (build with `ecbench fb`, publish to Git/`store:`, run
 | `isolab-job` | an `isolab.job/v1` for an independent lab worker | §9 |
 | `bound`, `frontier`, `challenge` | sealed cost bounds, the frontier of unbeaten methods, and the frozen paired challenge that moves it | [../bounds/README.md](../bounds/README.md) |
 | `gpu-stage`, `gpu-match`, `gpu-match-verify` | the separately labelled GPU stage and its CPU recheck | §13 |
+| `wordram-prices` | print the fixed word-RAM reference prices of the `*_wordram` methods; nothing is measured | §7 |
+
+`ecbench <command> --help` describes every option of every command, with
+its default.
 
 ## 1. Quick start
 
