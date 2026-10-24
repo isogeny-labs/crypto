@@ -71,6 +71,9 @@ pub struct CampaignResult {
     pub unique_dp_entries: usize,
     #[serde(default)]
     pub dp_records_verified: u64,
+    /// Joint class/branch counts for testing the H1 routing assumption.
+    #[serde(default)]
+    pub route_by_twist: Vec<Vec<u64>>,
 }
 
 #[derive(Clone)]
@@ -314,6 +317,59 @@ impl SixClassContext {
         Ok(())
     }
 
+    /// Replay a claimed trail from its deterministic start, including cycle
+    /// escapes. A valid endpoint equation alone does not establish provenance.
+    pub fn verify_trail(&self, dp: &ClassDp) -> Result<(), String> {
+        self.verify_record(dp)?;
+        let cap = self.base.step_cap.min(1_000_000);
+        if dp.steps >= cap {
+            return Err("trail exceeds step cap".into());
+        }
+        let mut state = self.start(dp.walker);
+        let mut recent: VecDeque<(BigUint, ClassState)> = VecDeque::new();
+        for step in 0..=dp.steps {
+            let (key, _, _) = self.canonical(&state.point)?;
+            if self.is_dp(&key) {
+                if step != dp.steps {
+                    return Err("trail crossed an earlier distinguished point".into());
+                }
+                let actual = self.record(dp.walker, step, &state)?;
+                return if actual.x == dp.x
+                    && actual.y == dp.y
+                    && actual.a == dp.a
+                    && actual.b == dp.b
+                {
+                    Ok(())
+                } else {
+                    Err("trail endpoint differs from record".into())
+                };
+            }
+            if let Some(prior) = recent.iter().position(|(seen, _)| seen == &key) {
+                let mut best_key = key.clone();
+                let mut best = state.clone();
+                for (candidate_key, candidate) in recent.iter().skip(prior) {
+                    if candidate_key < &best_key {
+                        best_key = candidate_key.clone();
+                        best = candidate.clone();
+                    }
+                }
+                state = ClassState {
+                    point: best.point.double_vartime(&self.base.a),
+                    a: (&best.a << 1) % &self.base.n,
+                    b: (&best.b << 1) % &self.base.n,
+                };
+                recent.clear();
+            } else {
+                recent.push_back((key, state.clone()));
+                if recent.len() > 64 {
+                    recent.pop_front();
+                }
+                state = self.step(&state)?;
+            }
+        }
+        Err("trail did not reach claimed distinguished point".into())
+    }
+
     pub fn recover(&self, first: &ClassDp, second: &ClassDp) -> Option<BigUint> {
         self.verify_record(first).ok()?;
         self.verify_record(second).ok()?;
@@ -352,6 +408,7 @@ impl SixClassContext {
             collision_attempts: 0,
             unique_dp_entries: 0,
             dp_records_verified: 0,
+            route_by_twist: vec![vec![0; self.job.curve.num_branches as usize]; 6],
         };
         let mut seen: HashMap<String, ClassDp> = HashMap::new();
         for walker in 0..max_walkers {
@@ -361,10 +418,15 @@ impl SixClassContext {
             let cap = self.base.step_cap.min(1_000_000);
             let mut reached_dp = false;
             for step in 0..cap {
-                let Ok((key, _, _)) = self.canonical(&state.point) else {
+                let Ok((key, twist, _)) = self.canonical(&state.point) else {
                     break;
                 };
                 result.class_visits += 1;
+                let branch = (&key & &self.branch_mask)
+                    .iter_u64_digits()
+                    .next()
+                    .unwrap_or(0) as usize;
+                result.route_by_twist[twist][branch] += 1;
                 if self.is_dp(&key) {
                     if let Ok(record) = self.record(walker, step, &state) {
                         if result.first_dp.is_none() {
@@ -495,5 +557,15 @@ mod tests {
         let result = ctx.campaign(1000);
         assert_eq!(result.log.as_deref(), Some("3039"));
         assert!(result.distinguished > 0);
+        assert_eq!(
+            result.route_by_twist.iter().flatten().sum::<u64>(),
+            result.class_visits
+        );
+        let dp = result.first_dp.unwrap();
+        ctx.verify_trail(&dp).unwrap();
+        let mut false_provenance = dp;
+        false_provenance.walker += 1;
+        ctx.verify_record(&false_provenance).unwrap();
+        assert!(ctx.verify_trail(&false_provenance).is_err());
     }
 }

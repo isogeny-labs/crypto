@@ -33,6 +33,7 @@ struct Arm {
     dp_entries: usize,
     log: Option<String>,
     first_dp_verified: bool,
+    route_by_twist: Option<Vec<Vec<u64>>>,
 }
 
 fn baseline(spec: &JobSpec, max_walkers: u64) -> Result<Arm, String> {
@@ -103,6 +104,7 @@ fn baseline(spec: &JobSpec, max_walkers: u64) -> Result<Arm, String> {
         dp_entries: seen.len(),
         log,
         first_dp_verified,
+        route_by_twist: None,
     })
 }
 
@@ -113,7 +115,7 @@ fn sixclass(job: &SixClassJob, max_walkers: u64) -> Result<Arm, String> {
     let campaign = Instant::now();
     let result = ctx.campaign(max_walkers);
     if let Some(dp) = &result.first_dp {
-        ctx.verify_record(dp)?;
+        ctx.verify_trail(dp)?;
     }
     if let Some(log) = &result.log {
         let scalar = BigUint::parse_bytes(log.as_bytes(), 16).ok_or("invalid log hex")?;
@@ -136,6 +138,7 @@ fn sixclass(job: &SixClassJob, max_walkers: u64) -> Result<Arm, String> {
         dp_entries: result.unique_dp_entries,
         log: result.log,
         first_dp_verified: result.first_dp.is_some(),
+        route_by_twist: Some(result.route_by_twist),
     })
 }
 
