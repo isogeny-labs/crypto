@@ -21,6 +21,9 @@ in the [unvalidated benchmark archive](ARCHIVE.md), with their exact former row
 text, digest, reason, and source provenance. Archived rows are not measurements
 admitted by this table and cannot satisfy the validation gate.
 
+The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
+is preserved separately pending validation admission.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-22 | [`20261022-kummer-paired-replay`](20261022-kummer-paired-replay/) | uncached differential Kummer collector versus same-process negation rho on 21 models × 60 public targets; 1,260 source-verified solves per arm, 36 pooled price cells, and an isolated byte-identical validation replay | modeled full-cold candidate/rho cost is 8.959687–55.935424× across the 36 cells, with 0 wins; at `M+0.5S+10I` and 0.1 GAE/native logical operation it is 14.356662×. The fresh 24:50.16 elapsed time is validation telemetry on a shared host, not a wall-speed comparison. | Intel Xeon 6975P-C, 32 visible CPUs, L0 shared host; modeled GAE costs | [study](../research/kummer_differential_collector_20261022/MATCHED_REPORT.md), [results PDF](20261022-kummer-paired-replay/results-report.pdf), [original run PDF](20261022-kummer-paired-replay/original-run-report.pdf), [isolated replay PDF](20261022-kummer-paired-replay/run-report.pdf), [graph](20261022-kummer-paired-replay/collector-cost-paired.svg), [validation](20261022-kummer-paired-replay/VALIDATION.json) |
