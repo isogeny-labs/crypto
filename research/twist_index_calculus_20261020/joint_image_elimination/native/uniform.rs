@@ -36,7 +36,7 @@ fn zero_arm(
     pairs: &FxMap<u64, Vec<[(usize, i8); 2]>>,
 ) -> Value {
     let terms = reference_sets(case, logs, &case.peels[arm], 0, pairs);
-    let query = json!({"a":0,"b":0});
+    let query = json!([0, 0]);
     let cols = case.columns(arm);
     let mut rows = Vec::new();
     let mut unique = BTreeSet::new();
@@ -313,6 +313,25 @@ pub(super) fn summarize(run: &Path, out: &Path) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn real_zero_fiber_uses_public_query_encoding_and_has_no_target_column() {
+        let tape =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../quartic_twist_mixed_v1.ndjson");
+        let scratch =
+            std::env::temp_dir().join(format!("joint-zero-row-check-{}", std::process::id()));
+        assert!(!scratch.exists());
+        std::fs::create_dir(&scratch).unwrap();
+        let case = Case::new(public_record(&load(&tape, INPUT_SHA, 37, 0)), &scratch);
+        let logs = reference_logs(&case);
+        let table = pairs(&case, &logs);
+        for arm in AUDIT_ARMS {
+            let result = zero_arm(&case, &logs, arm, &table);
+            assert_eq!(result["status"], "pass");
+            assert_eq!(result["target_recovery"], false);
+            assert_eq!(result["target_column_zero"], true);
+        }
+        std::fs::remove_dir_all(scratch).unwrap();
+    }
     #[test]
     fn equal_disjoint_image_domains_have_equal_mass_but_different_histograms() {
         let ordinary = [1, 3, 7, 11];
