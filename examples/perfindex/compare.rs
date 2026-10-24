@@ -398,6 +398,9 @@ pub struct Plan {
     pub invocations: usize,
     #[serde(default)]
     pub provenance_problems: Vec<String>,
+    /// Set by `reanalyze`: where this plan came from and which thresholds changed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reanalysis: Option<Value>,
 }
 
 impl Plan {
@@ -584,6 +587,7 @@ pub fn make_plan(
         schedule_hash: schedule_hash(&sched),
         invocations: sched.len(),
         provenance_problems: problems,
+        reanalysis: None,
     }
 }
 

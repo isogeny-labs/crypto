@@ -405,6 +405,18 @@ why the report prints `†` and the sign test and why the index, not a single
 kernel, is the headline.  `null` over a subset is a smoke test of the pipeline,
 not a measurement of this rate.
 
+The run is committed as
+[`research/perfindex_validation_20261024/null-136x5/`](../../research/perfindex_validation_20261024/null-136x5/)
+(raw rows, plan, summary, checksums; `perfindex replay` reproduces the summary)
+with a [run report](../../research/perfindex_validation_20261024/reports/run-20261024T0208Z/report.pdf).
+Its summary is `qualified: false` (28 kernels kept only four usable rounds
+after contended rounds were left out, and one kernel has no A/A spread), and
+both false verdicts rest on four rounds.  The run was first summarised with
+the involuntary-switch limit on; `perfindex reanalyze DIR --out NEW
+--no-invol-limit` re-summarises the same raw rows under other thresholds, and
+the new `plan.json` records the hashes of the run it came from and both
+threshold sets, so a changed rule is never an edit of a result.
+
 ### The Python tool
 
 `scripts/perf/perfindex.py` is the earlier implementation and is kept

@@ -77,6 +77,14 @@ enum Cmd {
     Report { json: PathBuf },
     /// Recompute compare.json from plan.json and raw.jsonl.
     Replay { dir: PathBuf },
+    /// Recompute a recorded run under different contention thresholds into a new directory.
+    Reanalyze {
+        dir: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[command(flatten)]
+        args: evidence::ReanalyzeArgs,
+    },
     /// Copy a replayed run into a directory fit to commit.
     Bundle {
         dir: PathBuf,
@@ -112,6 +120,7 @@ fn run(cli: Cli) -> Result<i32, String> {
             Ok(0)
         }
         Cmd::Replay { dir } => evidence::run_replay(&dir),
+        Cmd::Reanalyze { dir, out, args } => evidence::run_reanalyze(&dir, &out, &args),
         Cmd::Bundle { dir, dest, max_mb } => evidence::run_bundle(&dir, &dest, max_mb),
         Cmd::Fingerprints(a) => fingerprints::run_fingerprints(&a),
     }
