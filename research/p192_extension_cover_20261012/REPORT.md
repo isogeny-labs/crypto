@@ -430,3 +430,5 @@ lake build CrossRatio > lean-build.log 2>&1
 The exact parameters above are from [NIST FIPS 186-4, Appendix D.1.2.1](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf).
 
 **Cross-endpoint query triples (2026-10-24).** The [new certificate](reports/run-20261024/REPORT.md) joins bundles at all three roots of a query cubic and compares different cubics with a known scalar. On the frozen P-192 graph it raises exact rank from 181 to 201 using 392 rows and 1,348 active columns; the maximum bundle-column multiplicity remains two.
+
+**Residual-endpoint column recurrence (2026-10-24).** The [targeted certificate](reports/run-20261024-high-degree/REPORT.md) completes query-cubic bundles at residual endpoints of same-cubic root-pair lines. Two projected query roots each occur in four active bundles; the combined known-scalar rows have rank 219 on 1,486 columns. A checked mixed-support incidence theorem gives a necessary degree-eight threshold at the frozen rank.

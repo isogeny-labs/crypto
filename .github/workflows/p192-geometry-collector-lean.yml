@@ -45,3 +45,30 @@ jobs:
           python3 -B ../analyze_cross_endpoint_query_triples.py
           cd ../../..
           sha256sum -c research/p192_extension_cover_20261012/reports/run-20261024/ARTIFACTS.sha256
+  residual-endpoint-clique:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and fresh-check residual-endpoint theorems
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: research/p192_extension_cover_20261012/lean
+          auto-config: false
+          use-mathlib-cache: true
+          build: true
+          build-args: 'ResidualEndpointClique'
+          test: false
+          lint: false
+          leanchecker: true
+          leanchecker-args: '--fresh --verbose ResidualEndpointClique'
+      - name: Audit theorem axioms and replay frozen coordinate receipts
+        run: |
+          cd research/p192_extension_cover_20261012/lean
+          lake env lean ResidualEndpointClique.lean
+          cd ../../..
+          python3 -B research/p192_extension_cover_20261012/verify_residual_endpoint_clique_pilot.py
+          python3 -B research/p192_extension_cover_20261012/screen_same_cubic_residual_endpoints.py
+          python3 -B research/p192_extension_cover_20261012/verify_residual_endpoint_high_degree.py
+          python3 -B research/p192_extension_cover_20261012/analyze_residual_endpoint_combined_rows.py
+          sha256sum -c research/p192_extension_cover_20261012/reports/run-20261024-high-degree/ARTIFACTS.sha256
