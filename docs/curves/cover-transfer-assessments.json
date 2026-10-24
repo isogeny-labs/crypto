@@ -24,7 +24,7 @@
     },
     {
       "path": "docs/curves/covers.json",
-      "sha256": "6f56f32fce0c537d551390bee906cbf5603c204d26433a2ef2018c9f0d1d0c7a",
+      "sha256": "33c92e9661c673fb86e31775b40e042cce0b5139bedd90c19c9bdc516c5000ff",
       "role": "generated curve-level geometry catalog",
       "freshness": {
         "status": "supported",
@@ -37,11 +37,11 @@
     },
     {
       "path": "docs/curves/cover-links.yaml",
-      "sha256": "ac60fe0ac0c0eedfcb63ecccd8838fb0116db05630791cc9378c0abf7fe763ed",
+      "sha256": "83d34ea13b2a9cec961d40511624dc50d87cc1b9dc7d48c06e4541f64ae612f4",
       "role": "content-addressed ICV1/EC1/HC1/CV1 graph",
       "freshness": {
         "status": "supported",
-        "scope": "2,572 exact map links, 2,570 unique cover objects, and 978 EC1 triples",
+        "scope": "2,572 exact map links, 2,570 unique cover objects, and 979 EC1 triples",
         "rationale": "The ledger records exact sorted UID memberships rather than count-only coverage.",
         "evidence_refs": [
           "docs/curves/cover-links.yaml"
@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "12104bc87d11de394a4edbce224384ffeadd1bc7a56aa2f9477e992b87fe10f3",
+      "sha256": "dc3e22311081544194ea794068a6c323888eaf85630c0ccbce4b3a00be123f82",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -128,11 +128,11 @@
     },
     {
       "path": "src/bin/hyperelliptic_cover.rs",
-      "sha256": "5ec056b0d893ee38a78b11dcfc4ea68e20249cc5b849ff2e690697194fc69c30",
+      "sha256": "91592b68d5bc3f3405666a74bceb78a2d9e6061145b1408090e649bece612640",
       "role": "standalone CLI and native binary subgroup batch certificate",
       "freshness": {
         "status": "supported",
-        "scope": "all 141 exact linked binary EC1 triples at the pinned source revision",
+        "scope": "all 142 exact linked binary EC1 triples at the pinned source revision",
         "rationale": "The batch test is cited only for the checks it performs; it is not proof of every numeric order's primality.",
         "evidence_refs": [
           "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses"
@@ -536,7 +536,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
-      "sha256": "bc8c7e72d53808d7179edc81c4f3496e9c1eaea28fdb9d8bb195e62e214b6121",
+      "sha256": "1261ddf3ec996f3aa64469ea0908968e9ce608d4bbe284fd5a4a0c5069cda5f7",
       "role": "independent catalog-wide assessment verifier",
       "freshness": {
         "status": "supported",
@@ -562,7 +562,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/README.md",
-      "sha256": "5aa4278deea2971ebe3e2d7b4f00721b0c17146048820ba603b2990e4312a489",
+      "sha256": "f9c7aac7687fc85d244d0702c54bfd790a0f7ab9c473e761f95840505ec2837f",
       "role": "source-linked catalog-wide assessment report",
       "freshness": {
         "status": "supported",
@@ -588,7 +588,7 @@
     },
     {
       "path": "research/cover_transfer_assessment_20261013/typed_correspondence.dot",
-      "sha256": "4ea00fdfd2f1eeb24aba4f43cfca9ccfb73f771664571aaedf230c89da086d65",
+      "sha256": "18806374b400468f1f3ed42ea373accbb8a4bfd99c908cf1b6d0e9d0ec91d024",
       "role": "assessment diagram source",
       "freshness": {
         "status": "supported",
@@ -893,7 +893,7 @@
     },
     "subgroup.binary-generator.supported": {
       "status": "supported",
-      "scope": "All 141 linked binary EC1 generators, using their exact catalog fields and curve coefficients.",
+      "scope": "All 142 linked binary EC1 generators, using their exact catalog fields and curve coefficients.",
       "rationale": "The content-addressed graph and independent semantic verifier establish each exact EC1/curve/map join; the native batch certificate then decodes that row's generator canonically and checks its binary Weierstrass equation.",
       "evidence_refs": [
         "docs/curves/cover-links.yaml",
@@ -903,7 +903,7 @@
     },
     "subgroup.binary-annihilation.supported": {
       "status": "supported",
-      "scope": "All 141 linked binary generators and their numeric catalog subgroup-order values r.",
+      "scope": "All 142 linked binary generators and their numeric catalog subgroup-order values r.",
       "rationale": "The native batch certificate checks [r]G=O. This proves ord(G) divides r, not by itself that ord(G)=r.",
       "evidence_refs": [
         "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses"
@@ -928,7 +928,7 @@
     "subgroup.binary-image-annihilation.supported": {
       "status": "supported",
       "scope": "Every checked binary pullback image and its numeric catalog order value r.",
-      "rationale": "The native batch certificate checks [r]phi^*(G)=0 for all 141 exact triples.",
+      "rationale": "The native batch certificate checks [r]phi^*(G)=0 for all 142 exact triples.",
       "evidence_refs": [
         "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses"
       ]
@@ -936,14 +936,14 @@
     "subgroup.binary-composition.supported": {
       "status": "supported",
       "scope": "phi_*phi^*(G)=[3]G for every linked binary generator, within the typed fiber witness domain.",
-      "rationale": "The native batch certificate compares both sides for all 141 exact triples.",
+      "rationale": "The native batch certificate compares both sides for all 142 exact triples.",
       "evidence_refs": [
         "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses"
       ]
     },
     "subgroup.binary-injective-generated.unknown": {
       "status": "unknown",
-      "scope": "The actual generated subgroup <G> for each of the 141 linked binary triples.",
+      "scope": "The actual generated subgroup <G> for each of the 142 linked binary triples.",
       "rationale": "The checked generator identity would imply injectivity after pullback additivity and phi_*phi^*=[3] are certified on every element of <G>; the current batch test does not certify those all-element hypotheses.",
       "evidence_refs": [
         "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses",
@@ -970,7 +970,7 @@
     },
     "subgroup.binary-inverse-recovery.supported": {
       "status": "supported",
-      "scope": "Recovery of G from the typed pull-push value [3]G using 3^{-1} mod r for all 141 linked binary triples.",
+      "scope": "Recovery of G from the typed pull-push value [3]G using 3^{-1} mod r for all 142 linked binary triples.",
       "rationale": "The batch certificate checks the modular inverse and exact point equality for each catalog value r; this is bounded typed-domain recovery, not a general Jacobian norm.",
       "evidence_refs": [
         "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses"
@@ -3797,8 +3797,8 @@
     "subgroup_base": [
       {
         "profile_id": "subgroup.binary-degree3",
-        "count": 141,
-        "members_sha256": "45b918f182a0375f14d55385e84ca5eb1282b672cbe24ffb4617823be6249518",
+        "count": 142,
+        "members_sha256": "ecae2dea5e6394f69224faafe6b54dd10b26b922e37e118588b26ba9b9aba3d9",
         "members": [
           [
             "EC1N10Csfh6e9d8ba543f9",
@@ -4469,6 +4469,11 @@
             "EC1N71Ce0hac1355ef3db6",
             "urn:ec-record:1:sha256:ac1355ef3db6e4a4ddcffb7c98dc7b22a53f806e23e08a6e82415b5e2b3df897",
             "urn:curve-cover-map:1:sha256:3bf99094e967f4459145a09ff29470c30c5dab2ff1892decf94a11f0eae85483"
+          ],
+          [
+            "EC1N73Ce0h243f847bccdd",
+            "urn:ec-record:1:sha256:243f847bccdd57c5fb0e458c368f5dee255dbd26406ce6c72e727b45cede73d3",
+            "urn:curve-cover-map:1:sha256:753aa4b663b50db4dee22881f5e9f60e9ff1b1379986b06af1a8785c5ee58bb4"
           ],
           [
             "EC1N73Ce0h9999c3e90683",
@@ -75914,13 +75919,13 @@
     "catalog_maps": 2572,
     "unique_cover_models": 2570,
     "geometry_verified_maps": 2572,
-    "ec1_representations": 978,
+    "ec1_representations": 979,
     "assessed_maps": 2572,
     "unassessed_maps": 0,
-    "assessed_subgroups": 978,
+    "assessed_subgroups": 979,
     "unassessed_subgroups": 0,
     "map_membership_entries": 2572,
-    "subgroup_membership_entries": 978,
+    "subgroup_membership_entries": 979,
     "map_profiles": 4,
     "subgroup_profiles": 2,
     "scope_note": "Every current map UID and every exact [EC1, curve UID, map UID] triple has one base profile. Assessment means each claim receives an explicit supported, refuted, unknown, or not-applicable result; it does not mean every transfer capability is supported."
@@ -76036,7 +76041,7 @@
       "control": "identity",
       "assessment": {
         "status": "supported",
-        "scope": "all 2,572 map UIDs and 978 exact EC1/curve/map triples",
+        "scope": "all 2,572 map UIDs and 979 exact EC1/curve/map triples",
         "rationale": "The generator resolves exact content-addressed joins and rejects duplicates or missing rows.",
         "evidence_refs": [
           "scripts/build_cover_transfer_assessments.mjs",
@@ -76086,7 +76091,7 @@
       "control": "binary_catalog_subgroups",
       "assessment": {
         "status": "supported",
-        "scope": "native generator-level checks for all 141 binary representations after independent exact EC1/curve/map identity joins",
+        "scope": "native generator-level checks for all 142 binary representations after independent exact EC1/curve/map identity joins",
         "rationale": "The semantic verifier reconstructs the exact graph joins. The native batch certificate reads those representation rows and checks generator membership, catalog-order annihilation, pullback validity, image annihilation, composition on the tested generator, and degree-inverse recovery of that generator; it does not itself validate every content UID and does not certify subgroup-wide injectivity.",
         "evidence_refs": [
           "docs/curves/cover-links.yaml",
@@ -76173,7 +76178,7 @@
   ],
   "exploration_boundary": [
     "No search for production targets, private keys, or discrete logarithms was performed.",
-    "All 2,572 map rows and all 978 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
+    "All 2,572 map rows and all 979 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
     "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
     "The 2,407 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
     "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",

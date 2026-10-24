@@ -535,9 +535,9 @@ check(
   "graph model hashes are not a unique exact copy of the registry model hashes",
 );
 
-check(representationCount === 978, "unexpected EC1 representation count");
-check(ec1Aliases.size === 978, "unexpected unique EC1 count");
-check(curveUids.size === 978, "unexpected unique curve-UID count");
+check(representationCount === 979, "unexpected EC1 representation count");
+check(ec1Aliases.size === 979, "unexpected unique EC1 count");
+check(curveUids.size === 979, "unexpected unique curve-UID count");
 check(
   mapReferenceCounts.size === 2572 && [...mapReferenceCounts.values()].every((count) => count === 1),
   "CV1 references are not bijective with curve nodes",
@@ -1886,7 +1886,7 @@ const expectedPredicateCounts = {
   odd_prime_quadratic_direct_same_field: 1053,
   odd_prime_quadratic_normalized_same_field: 30,
   odd_extension_quadratic_direct_same_field: 1324,
-  linked_subgroup_degree3: 141,
+  linked_subgroup_degree3: 142,
   linked_subgroup_degree2: 837,
 };
 const actualPredicateCounts = {};
@@ -2230,7 +2230,7 @@ check(
 );
 check(coverage.assessed_maps === 2572 && coverage.unassessed_maps === 0, "map coverage is incomplete");
 check(
-  coverage.assessed_subgroups === 978 && coverage.unassessed_subgroups === 0,
+  coverage.assessed_subgroups === 979 && coverage.unassessed_subgroups === 0,
   "subgroup coverage is incomplete",
 );
 
