@@ -21,6 +21,9 @@ in the [unvalidated benchmark archive](ARCHIVE.md), with their exact former row
 text, digest, reason, and source provenance. Archived rows are not measurements
 admitted by this table and cannot satisfy the validation gate.
 
+The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
+is preserved separately pending validation admission.
+
 | date | entry | measured | headline (as reported) | host | study |
 |:--|:--|:--|:--|:--|:--|
 | 2026-10-22 | [`20261022-strong-rho-batchinv`](20261022-strong-rho-batchinv/) | strong signed-Frobenius rho reference (`koblitz_rho_fixture … strong`), round 4: `Gf2::batch_inv_clmul` walks fixed-width `as_chunks::<4>()` arrays instead of zipped variable-length chunks; Callgrind instructions per walk step at n = 41, 53; native ns/step A/A + 5 A/B rounds at n = 53, 61; independent replay and validator report ([`VALIDATION.json`](20261022-strong-rho-batchinv/VALIDATION.json)) | 707.2 → 679.7 instructions per step at n53 (−3.9%, 1.040×), 706.5 → 679.0 at n41, outputs identical at n = 41, 53, 61 and every scalar independently verified; native **not established**: 1.117× at n53 rests on baseline drift (other readings 1.039–1.058×, inside the 7.0% A/A spread) and an independent 16-round rerun read 0.989×; 1.076× at n61 inside the 14.4% A/A spread; counted GAE identical at 0, 0.1 and 1 (no counted-unit order); IPC unavailable (no hardware PMU) | Intel Xeon @ 2.10 GHz, 4 vCPU cloud VM, `isolated_bench --cpus 3 --max-other-cpu 0.3`, 0 of 32 runs contended | [`research/rho_batchinv_20261022/`](../research/rho_batchinv_20261022/), [report](../research/rho_batchinv_20261022/report/report.pdf) |
