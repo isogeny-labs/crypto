@@ -4021,6 +4021,10 @@ fn gae_band(csv: &str) -> String {
         let (mut lo, mut hi, mut icw, mut cells) = (f64::MAX, 0f64, 0, 0);
         for ik in 0..2 {
             for jp in [false, true] {
+                // as `summarize`: Arm D has no Jacobian operation to reprice
+                if arm.starts_with('D') && jp {
+                    continue;
+                }
                 for w in [0.0, 0.1, 1.0] {
                     let ipr =
                         |r: &HashMap<&str, f64>| if ik == 0 { 3.0 } else { 2.0 * r["p"].log2() };
