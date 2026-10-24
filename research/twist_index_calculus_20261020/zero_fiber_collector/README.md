@@ -34,12 +34,20 @@ flowchart LR
 | Public-only candidate inputs and charged reconstruction | Native collector calls the original cold builder; no reference argument |
 | Independent pair coverage and work-record auditing | Separate scalar-multiplication maps, exact partition, per-pair reference equality, transported union, and checked F4 counter sum |
 | Native correctness gate | Journalled version: 84/84 tests pass, source checks pass; [current receipts](results/native-journal-gate-v1/metadata/native-tests.stdout). Earlier passes/failures are retained separately. |
-| Complete physical enumeration on all 42 case-arms | Corrected `panel-v2` is running; final verdict pending; a timeout is never a zero-yield observation |
-| Independent complete-set and matrix comparison | Running after each saved collector result; final 42-case-arm verdict pending |
+| Complete physical enumeration on all 42 case-arms | Verified complete; 33,696 S4 systems per arm, no undetermined systems |
+| Independent complete-set and matrix comparison | All 42 pass, including pair coverage, work records, RREF and corruption controls |
 | Charged target descent and matched controls | Not yet implemented or executed |
 | Calibrated complete IC price, strongest rho and external solver comparison | Open; this shared host admits correctness/counter diagnostics only |
 
 ## Reproduction
+
+The [results report](REPORT.md), [three-page PDF](REPORT.pdf) and
+[run report](reports/run-20261024T2003Z-polynomial-panel/REPORT.md) record the
+complete panel. Each arm reproduces 504 signed tuples and 15 projective rows
+in case-local totals. Phi/doubling ranks are 2/2 versus 1/2 at p37, 2/8
+versus 1/8 at p157, and 1/14 versus 3/14 at p337; the other tested primes
+have zero factor-log rank. Equal aggregate counts do not imply equal rank.
+Target recovery and complete cost remain open.
 
 Run `run-native-gate.sh OUT CARGO_TARGET` through the repository's common busy
 wrapper. The saved continuation `run-complete-native-gate.sh` reuses only
@@ -57,8 +65,9 @@ Invoke `run-panel.sh` directly: it manages its own per-phase reservations.
 An outer busy wrapper is refused before creating outputs; the bounded
 [negative control](results/outer-busy-control-v1/exit) confirms exit 64.
 
-Raw runs stay under ignored `runs/` and will be archived with hashes, exact
-commands, failed attempts and compact native summaries. See
+Raw runs stay under ignored `runs/`. Their complete selected archive passes
+fresh extraction, all 1,112 byte comparisons and deterministic repacking;
+publication has its own receipt in [raw artifacts](ARTIFACTS.md). See
 [execution history](EXECUTION.md) and [implementation status](IMPLEMENTATION_STATUS.md).
 
 `wait-gate-and-panel.sh` follows one verified native-gate owner. It starts

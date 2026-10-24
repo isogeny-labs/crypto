@@ -92,3 +92,19 @@ Original archive, first extraction, mismatching repack and exit 1 remain.
 The separate `repair-repack-permissions.sh` reuses the original archive,
 extracts with preserved permissions and repeats the required integrity check.
 Its terminal result remains pending until its own exit receipt exists.
+
+The permission-preserving continuation subsequently exits zero. All 1,112
+comparisons and the byte-identical repack pass; its separate raw receipts
+remain under `results/pack-permission-repair-v1/`. The original exit 1 and
+permission-difference record are not rewritten.
+
+The publication check then identifies an additional packaging-policy issue:
+the first archive used epoch-zero tar timestamps instead of the study date
+required by AGENTS.md section 13a. The separate `pack-with-study-date.sh`
+reuses that verified extracted payload, normalizes only tar timestamp/mode
+headers, and checks a fresh extraction and repack. It exits zero with all
+1,112 comparisons passing. The canonical candidate is now 105,608,944 bytes,
+SHA-256 `86a7f68e331a24c4bb1048aab3932ce9b30901c7f64def2cae1f617f93ce8bb8`.
+Both earlier local archives, the permission failure and its successful repair
+remain. No cryptographic collector, oracle, target stream or census is rerun.
+Remote publication is separate and requires its own successful receipt.

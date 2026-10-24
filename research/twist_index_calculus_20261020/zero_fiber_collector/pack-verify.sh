@@ -56,7 +56,7 @@ cp "$zero_out/SHA256SUMS" "$zero_out/staging/SHA256SUMS"
   cd "$zero_out/staging"
   find . -type f -not -name SHA256SUMS -printf '%s\t%P\n' | LC_ALL=C sort -k2
 ) > "$zero_out/staging/FILE_SIZES.tsv"
-tar --format=gnu --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner --hard-dereference -C "$zero_out/staging" -cf - . | xz -1 -T1 > "$zero_out/runs.tar.xz"
+tar --format=gnu --sort=name --mtime='2026-10-24 00:00:00Z' --owner=0 --group=0 --numeric-owner --mode='u+rwX,go+rX,go-w' --hard-dereference -C "$zero_out/staging" -cf - . | xz -1 -T1 > "$zero_out/runs.tar.xz"
 sha256sum "$zero_out/runs.tar.xz" > "$zero_out/archive.sha256"
 stat -c '%s' "$zero_out/runs.tar.xz" > "$zero_out/archive.bytes"
 mkdir "$zero_out/fresh"
@@ -73,7 +73,7 @@ while IFS= read -r zero_line; do
 done < "$zero_out/SHA256SUMS"
 zero_payload_count=$(wc -l < "$zero_out/SHA256SUMS")
 printf '%s\n' "$((zero_payload_count + 2))" > "$zero_out/exact-file-comparisons.txt"
-tar --format=gnu --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner --hard-dereference -C "$zero_out/fresh" -cf - . | xz -1 -T1 > "$zero_out/repacked.tar.xz"
+tar --format=gnu --sort=name --mtime='2026-10-24 00:00:00Z' --owner=0 --group=0 --numeric-owner --mode='u+rwX,go+rX,go-w' --hard-dereference -C "$zero_out/fresh" -cf - . | xz -1 -T1 > "$zero_out/repacked.tar.xz"
 cmp "$zero_out/runs.tar.xz" "$zero_out/repacked.tar.xz"
 sha256sum "$zero_out/repacked.tar.xz" > "$zero_out/repacked.sha256"
 date -u +%FT%TZ > "$zero_out/finished-utc.txt"

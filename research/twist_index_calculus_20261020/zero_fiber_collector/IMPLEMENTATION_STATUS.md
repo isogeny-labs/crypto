@@ -14,9 +14,10 @@ The stronger post-run audit uses
 scalar-multiplication action maps, verifies actual pair coverage, per-pair
 physical relations, the transported union and F4 counter sums. The fixed
 42-case-arm Rust reducer and per-phase-reservation shell driver are implemented.
-The corrected `panel-v2` is running with a frozen journalled executable and
-post-run comparisons. No final 42-case-arm verdict, target recovery or
-admitted timing is claimed yet. The completed 189+21
+The corrected `panel-v2` is terminal: all 42 case-arm collections and
+independent comparisons pass, with 33,696 complete S4 systems per arm.
+The saved physical census and ranks are reproduced exactly. Target recovery
+and admitted timing are still unperformed. The completed 189+21
 study and all 43 joint raw directories remain in the original worktree and
 verified canonical store object; do not rerun them.
 
@@ -25,16 +26,19 @@ Next implementation steps:
 1. Native build/test is verified; all launcher, sparse-fixture and guarded
    attempts remain in [execution history](EXECUTION.md). The actual final
    test continuation and both compiled executable hashes are retained.
-2. Commit the implementation and driver, then freeze the verified production
-   runner before executing all 21 cases for both phi and doubling.
-3. Compare every complete physical set and matrix result with the existing
-   scalar census independently confirmed by the public-point enumeration.
-   Keep all incomplete/timeout outcomes and corruption controls.
+2. Implementation and driver were committed before the corrected panel;
+   the verified production runner and protocol were frozen.
+3. All 42 physical sets and matrices match the existing census independently
+   confirmed by point enumeration. Corruption controls and all earlier
+   unsuccessful gates remain. See [results](REPORT.md).
 4. Execute Phase 2's target descent and matched complete-cost comparison;
    Phase 1 alone does not establish a cost advantage or breakthrough.
 
-The newly merged atlas pointer references files absent from the explicitly
-fetched autoresearcher main. This line was proposed in the saved study before
-that instruction; no atlas pass or novelty claim is inferred. Match/update
-that evidence when the referenced atlas is available. Continue preserving
-all original controls, budgets, proof gaps and completion requirements.
+At the earlier saved checkpoint, the atlas pointer referenced files absent
+from the then-fetched autoresearcher main. The later pinned main contains
+them: a successful brief and mechanism match now run from a separate
+detached checkout. The [partial reconciliation](ATLAS_RECONCILIATION.md)
+records relevant existing leads and the remaining cross-repository delta.
+No global review stamp, lead transition or novelty claim is inferred.
+Continue preserving all original controls, budgets, proof gaps and
+completion requirements.
