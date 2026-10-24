@@ -29,25 +29,32 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
+      # The full-history checkout no longer fits a hosted runner: from
+      # 2026-10-23 04:20 UTC every run died with "No space left on device".
+      # The gate reads the head's working tree and, through `git show`, two
+      # files on the base tip, so it needs no history. Free the preinstalled
+      # SDKs it does not use, check out only the head, and fetch only the
+      # base tip; its blobs arrive on demand.
+      - name: Free runner disk
+        run: |
+          df -h /
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          df -h /
       - uses: actions/checkout@v4
         with:
-          # The full research tree exceeds 7 GiB and exhausted a hosted runner
-          # before this job reached its tests. Keep the complete evidence paths
-          # used by the current leaderboard and benchmark rows. A new validated
-          # row that cites another directory must add that directory here.
-          fetch-depth: 2
-          sparse-checkout: |
-            benchmarks
-            docs/ic
-            papers
-            research/validation_sweep_20261019
-            research/ic_oracle_setup_blocked_20261020
-            research/ic_tool_program
-            research/isogeny-volcano-cost-v2_20261017
-            research/pdp_split_slots_20261012
-            research/two_sylow_fp64_20261017
-            research/volcano_ecdlp_census_20261017
-            scripts
+          fetch-depth: 1
+          filter: blob:none
+      - name: Fetch the base tip
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          git fetch --no-tags --depth=1 --filter=blob:none origin \
+            "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+          # validation_gate.py treats an unreadable base file as absent, so
+          # fail here rather than let the freeze comparison pass silently.
+          git rev-parse --verify "origin/$BASE_REF^{commit}"
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -57,9 +64,6 @@ jobs:
         run: |
           base=""
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            # Checkout's synthetic PR merge commit has the exact base as its
-            # first parent and the submitted head as its second parent.
-            test "$(git rev-parse HEAD^2)" = "${{ github.event.pull_request.head.sha }}"
-            base="--base HEAD^1"
+            base="--base origin/${{ github.base_ref }}"
           fi
           python3 scripts/validation_gate.py check $base
