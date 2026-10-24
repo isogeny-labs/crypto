@@ -35,7 +35,7 @@ use crypto_lib::cryptanalysis::ecdlp_nist::{
     name = "ecdlp-nist",
     version,
     about = "ECDLP solvers and structural audit across NIST and Certicom curves",
-    long_about = "Solve Q = [k]G on the NIST P, K and B curves and nine Certicom binary \
+    long_about = "Solve Q = [k]G on the NIST P, K and B curves and Certicom prime/binary \
                   challenges by the \
                   branch the curve calls for (Smart on anomalous prime curves, \
                   Pohlig–Hellman on composite orders, BSGS/kangaroo on an interval, \
@@ -296,7 +296,7 @@ fn cmd_solve(args: &SolveArgs, json: bool) -> Result<(), String> {
             (target, None)
         } else {
             let (_, target) = BinaryCurve::certicom_challenge(&curve.name)
-                .ok_or_else(|| format!("{} is not a Certicom challenge", curve.name))?;
+                .ok_or_else(|| format!("{} is not a supported Certicom challenge", curve.name))?;
             (nist::AnyPoint::Binary(target), None)
         }
     } else if let Some(pt) = &args.point {
