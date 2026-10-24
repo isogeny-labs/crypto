@@ -54,10 +54,13 @@ ax.plot([5 * r["log2_q"] for r in mw["rows"]], [r["ic_over_rho"] for r in mw["ro
 for d in E["dlp"]:
     if d.get("complete") and d.get("verified"):
         ax.plot(d["log2_n"], d["ratio_online_ic_over_rho"], "o", color=PURPLE)
+    elif d.get("wall_capped"):
+        ax.plot(d["log2_n"], d["lower_bound_ic_over_rho"], "^", color=PURPLE, mfc="none")
 for d in W["dlp"]:
     if d["ic_complete"] and d["ic"]["verified"]:
         ax.plot(math.log2(int(d["ell"])), d["ratio_online_ic_over_rho"], "s", color=GREY)
-ax.plot([], [], "o", color=PURPLE, label="Edwards, complete DLP (measured)")
+ax.plot([], [], "o", color=PURPLE, label="Edwards, complete DLP (measured, 5 arms)")
+ax.plot([], [], "^", color=PURPLE, mfc="none", label="Edwards, stopped at the cap: cost to the cap (lower bound)")
 ax.plot([], [], "s", color=GREY, label="plain, complete DLP (measured)")
 ax.axhline(1, color="black", lw=0.8)
 ax.axvline(233, color=ORANGE, ls=":", lw=1, label="RESEARCH_K5: 2^233 without replay")

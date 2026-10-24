@@ -1,0 +1,168 @@
+\section{The ratchet, IV: families where the exponent moves}\label{sec:families}
+
+Two families have a fitted cost exponent below rho's. On both, the ratchet
+moved fastest. Neither is a deployed curve shape.
+
+\subsection{Genus three after the cubic GHS transfer}
+
+The GHS Weil descent~\cite{ghs2002} maps the discrete logarithm in
+$E_0(\FF_{q^3})$ to the Jacobian of a genus-three hyperelliptic curve over
+$\FF_q$. There, double-large-prime index calculus~\cite{gtthd2007} costs
+$\tilde O(q^{2-2/g})=\tilde O(q^{4/3})$, against rho's $q^{3/2}$ on
+$E_0(\FF_{q^3})$. The asymptotics are known. The programme contributes a
+priced, end-to-end, verified implementation:
+\begin{itemize}
+\item the family has $4\mid\#E_0(\FF_{q^3})$, split arm;
+\item it runs for $q=2^{8}$ to $2^{22}$;
+\item every logarithm is checked against the planted scalar;
+\item cost is counted in $\FF_q$ multiplications, with inversions charged
+  from round three on.
+\end{itemize}
+Five rounds, each against the previous one's frozen incumbent:
+
+\begin{enumerate}
+\item \emph{Double large primes} (Ie): $q^{1.910}\to q^{1.385}$
+  $[1.379,1.391]$, and $0.036$ $[0.035,0.036]$ of the full-base incumbent at
+  $q=2^{18}$ (benchmarks row \texttt{20261014-ic-improve-04-genus3-2lp}).
+\item \emph{Large primes kept as columns, structured Gaussian elimination
+  and Wiedemann} (Ie): $q^{1.398}\to q^{1.380}$, $0.653$ $[0.647,0.660]$ at
+  $q=2^{20}$.
+\item \emph{A frozen schedule $\kappa(q)$ for the factor-base fraction, plus
+  block Wiedemann}~\cite{coppersmith1994} (T): $0.929$ at $q=2^{21}$; with
+  round two, $0.605\times$ the first double-large-prime arm. After this
+  round a matched negation-map rho was measured at $q=2^{20}$: IC costs
+  $2.31\cdot10^{10}$ $\FF_q$ multiplications against rho's $2.01\cdot10^{10}$,
+  i.e.\ $1.15\times$ (overlapping but not identical curves).
+\item \emph{Cheaper relation primitives} (Ic): one-inversion Cantor
+  addition, a Stickelberger pre-filter and reused exponentiations, with
+  $\kappa$ re-tuned. The result is $0.617$ $[0.616,0.619]$ at $q=2^{22}$,
+  without changing a single relation
+  (\art{research/ic_improve3_20261015/01-genus3-relations}).
+\item \emph{A Lucas-ladder splitting test} on the Cardano resolvent's cubic
+  character, plus 32 walks sharing one inversion (Ie, then Ic). The
+  per-trial log factor falls from 9.75 to 2.71 units per bit. The whole
+  solve is $0.756$ $[0.755,0.756]$, then $0.715\times$, at $q=2^{22}$; the
+  local exponent is $1.356$, and the fit over $2^{16}$--$2^{22}$ is $1.368$
+  (\art{research/ic_improve4_20261015/01-genus3-relations}).
+\end{enumerate}
+Chained, rounds three and four bring the whole solve to about $0.44\times$
+the round-two pipeline at $q=2^{22}$. This is derived, in the
+inversion-charging unit.
+
+\paragraph{Distance.} The last matched distance is $1.15\times$ rho at
+$q=2^{20}$, after round two. Rounds three and four ran no rho arm in their
+unit. Whether the $0.44\times$ carries the family across rho is therefore
+\emph{not established}, and we do not claim it.
+\begin{itemize}
+\item A separate study measured IC at $0.16\times$ a rho on
+  $\mathrm{Jac}(C)$ at $q=2^{14}$. That rho walks on the Jacobian, not on
+  $E_0(\FF_{q^3})$, so it is not the matched reference.
+\item The local exponents ($1.36$--$1.41$) sit above $4/3$. The linear
+  algebra grows faster than $q^{4/3}$, and re-tuning $\kappa$ steepens the
+  schedule.
+\item Memory now bounds the ladder: $q=2^{22}$ peaks at 3.9\,GB of a
+  4.5\,GB cap.
+\end{itemize}
+
+\subsection{$k=4$: Gaudry's index calculus with FGHR symmetry}
+
+Over $\FF_{p^4}$ with a base of points whose abscissa lies in $\FF_p$, each
+relation needs a four-term decomposition~\cite{gaudry2009}. On a curve with
+rational 2-torsion $T$, the coordinate $Y$ with $Y(P+T)=-Y(P)$ makes $S_5$
+invariant under the Weyl group $D_4$, of order 192~\cite{fghr2014}. The
+ratchet on this family:
+\begin{enumerate}
+\item \emph{$D_4$ invariants} (E): the Macaulay matrix shrinks from
+  $41{,}780\times40{,}920$ to $13{,}412\times11{,}628$. One decomposition
+  costs $47.5$--$48.4\times$ less at $p=269$
+  (\art{research/gaudry_quartic_d4_20261013/}).
+\item \emph{$D_4$ $Y$-line on a complete ladder} (Ic): $0.0548$
+  $[0.048,0.061]$ of plain $S_4$ on $p=101$--$1033$, 21 curves.
+\item \emph{Sparsest pivots, the weighted grading $\sigma_4=\pi^2$, shape
+  replay} (E/Ic): $C_4$ falls from $2.55\cdot10^{10}$ to $6.89\cdot10^7$
+  $\FF_p$ multiplications ($369.8\times$ $[367.9,371.6]$; 648 of 648 solves
+  exact). Ecbench $S$ falls $398$--$406\times$
+  (\art{research/gaudry_quartic_d4_cost_20261014/}).
+\item \emph{First-dependency stop} (Ic): $0.979$ $[0.973,0.986]$. Double
+  large primes cut the linear algebra to $0.827\times$ but regress the
+  whole solve ($1.025\times$).
+\item \emph{A Frobenius-reduced $D_4$ form in characteristic two} (E/Ic):
+  weights $(2,2,1,1)$, Macaulay degree 11, a $384\times448$ matrix. It is
+  $481\times$ below the plain form at $m=8$, and ecbench $S$ is $0.0057$ of
+  the plain form at $m=6$ (\art{research/gaudry_quartic_d4_char2_20261015/}).
+\end{enumerate}
+
+\paragraph{Distance.} The two characteristics are far apart.
+\begin{itemize}
+\item Over $\FF_{p^4}$ index calculus is still $1.39\cdot10^6\times$ rho at
+  the measured sizes.
+\item Over $\FF_{(2^m)^4}$ the gap closes with size
+  (Figure~\ref{fig:families}). IC over the negation-map rho model is
+  $5{,}080$ at $m=6$ ($n\approx2^{24}$), $648$ at $m=8$, $80.6$ at $m=10$,
+  $49.7$ at $m=12$ and $6.06$ at $m=14$ ($n\approx2^{56}$). Against a
+  measured rho the last value is $4.27$, from a single target. The fitted
+  slope is $-0.248$ in $\log_2 n$, which is Gaudry's $n^{-1/4}$. The
+  extrapolated crossover is near $n\approx2^{68}$, where rho takes about
+  $2^{34}$ steps, so the extrapolation can be tested directly.
+\end{itemize}
+After genus three, this is the nearest any index calculus in the programme
+has come to rho.
+
+\paragraph{Joux--Vitse.} An $(n-1)$-decomposition~\cite{jouxvitse2012} at
+$n=5$ over $E(\FF_{p^5})$ completed verified logarithms at
+$4.5\cdot10^7$--$1.8\cdot10^8\times$ rho
+(\art{research/joux_vitse_n1_20261015/}). It is a route reproduction, not an
+improvement.
+
+\subsection{The ledger in one table}
+
+Table~\ref{tab:ledger} lists every improvement of
+\S\S\ref{sec:oracle}--\ref{sec:families} that changed a default or a
+baseline, with its class and the distance to rho that remained after it.
+
+\begin{table}[p]
+\centering\small
+\caption[]{The ratchet: changes that became the new incumbent, July--October
+2026. Ratio is candidate/incumbent. Class against the IC incumbent: Ie
+exponent, Ic constant, E one stage, T trades. Boundary: St stage, Cx
+complete, Cd cold. ``To rho'' is IC/matched rho after the change, on the
+study's own boundary; a dash means no matched rho in that unit. Every
+row's IC answers were verified. ``d'' marks a derived reciprocal.}
+\label{tab:ledger}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}Xlll>{\raggedright\arraybackslash}p{2.5cm}@{}}
+\toprule
+Change & Cl. & Bd. & Ratio [95\%] & To rho \\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Oracle}}\\
+$S_3$ root finding vs matrix F4 & E & St & $1/1{,}535$--$1/383$ & --- \\
+Inherited vs matrix F4 & E & St & $1/222$--$1/199$ & --- \\
+\texttt{f4\_fp} to msolve parity & E & St & $1/54.1$--$1/29.8$ & --- \\
+Negfold root finding vs priced F4, K13 & Ic & Cd & $0.0545$ $[0.047,0.064]$ & $1.55\times$ strong rho \\
+F6-IC gate-first & E & St & $0.65$ $[0.58,0.75]$ & --- \\
+Root-rank harvest gate & Ic & Cx & $1/1.20$ (St $1/1.41$) & --- \\
+\addlinespace
+\multicolumn{5}{@{}l}{\emph{Factor base and yield}}\\
+Free relations in production & Ic & Cx & $0.960$ $[0.946,0.976]$ & $3.8$--$15\times$ ($w=0$) \\
+\texttt{stride-renew} targets, $n=13$ & Ic & Cd & $0.531$ $[0.506,0.557]$ & $4.7\times$ at $n=19$ \\
+N83 base K1107 vs K1103 & Ic & Cd & $0.990$ (d; $-1.195$\,s $[0.957,1.433]$) & $55.4\times$ (K1120) \\
+\addlinespace
+\multicolumn{5}{@{}l}{\emph{Set-up and linear algebra}}\\
+N83 stacked producer & Ic & Cd & $1/3.24$ $[1/3.52,1/2.98]$ & $94.4\times$ (in-run) \\
+Cache-blocked pair table (wall, L1) & E & St & $0.24$ $[0.22,0.26]$ & $33$--$269\times$ \\
+CADO-style LA, $2^{18}$ columns & E & St & $1/10.40$ $[1/11.06,1/9.99]$ & $149\times$ \\
+\addlinespace
+\multicolumn{5}{@{}l}{\emph{Genus three after cubic GHS ($\FF_q$ multiplications)}}\\
+Double large primes & Ie & Cx & $0.036$; $q^{1.910}\to q^{1.385}$ & $2.58\times$ model \\
+LP columns, SGE, Wiedemann & Ie & Cx & $0.653$ $[0.647,0.660]$ & --- \\
+$\kappa(q)$ + block Wiedemann & T & Cx & $0.929$ & $1.15\times$ measured \\
+Relation primitives & Ic & Cx & $0.617$ $[0.616,0.619]$ & --- \\
+Lucas splitting + shared inversion & Ie/Ic & Cx & $0.715$; local $1.356$ & --- \\
+\addlinespace
+\multicolumn{5}{@{}l}{\emph{$k=4$ with $D_4$ symmetry}}\\
+$D_4$ $Y$-line ladder & Ic & Cx & $0.0548$ $[0.048,0.061]$ & model handover $2^{126}$--$2^{137}$ \\
+Pivots, weights, replay ($S$) & Ic & Cd & $0.00249$ $[0.00246,0.00251]$ & $1.39\cdot10^6\times$ \\
+First-dependency stop & Ic & Cx & $0.979$ $[0.973,0.986]$ & --- \\
+Frobenius-reduced form, char.\ 2 ($S$) & Ic & Cd & $0.0057$ & $6.06\times$ model, $4.27\times$ measured, $n\approx2^{56}$ \\
+\bottomrule
+\end{tabularx}
+\end{table}

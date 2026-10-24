@@ -1,0 +1,93 @@
+{
+  "card_id": "CARD-ext-endo-rho-20261023-1",
+  "card_path": "research/ext_endo_rho_20261023/cards/CARD-ext-endo-rho-20261023-1.yaml",
+  "card_sha256": "34ad529e4010269802e8cd99e1fe33698eb8c6686c87cdd676a6f1d1eaf810a5",
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--bin",
+        "ecbench"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 344.908,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build-ecbench",
+      "index": 1,
+      "outputs": {},
+      "seconds": 344.908,
+      "stderr_sha256": "197cf795dc1bc51ceb0b60c47dd76b0e7ac36e09b4a32e8e81637ce8b2771973",
+      "stderr_tail": [
+        "   Compiling crypto v0.1.0 (/home/user/crypto)",
+        "    Finished `release` profile [optimized] target(s) in 5m 44s"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--cpus",
+        "auto",
+        "--spec",
+        "research/ext_endo_rho_20261023/specs/SPEC-subfield-fp3.json",
+        "--out",
+        "research/ext_endo_rho_20261023/sessions/subfield-fp3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 2,
+          "seconds": 3.194,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 2,
+      "id": "run-subfield-fp3",
+      "index": 2,
+      "outputs": {},
+      "seconds": 3.194,
+      "stderr_sha256": "beb7dc52b2d642e8217cecdd40500cbbba66c2479cfe7be912e43c0db2c1eda8",
+      "stderr_tail": [
+        "ecbench: host is not quiet (PSI cpu some avg10 8.26 > 5.00); wait, or pass --allow-busy to record runs below L2"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 13,
+  "commit": "16b4fcca2b308e5ef7308d43dbd4e751479f7b1f",
+  "dirty_after": [
+    "examples/ghs3_vs_rho_20261023.rs",
+    "research/conductor_gap_cm_orbits_20261015/native/ecbench_next.rs",
+    "research/ext_endo_rho_20261023/cards/CARD-ext-endo-rho-20261023-1.yaml",
+    "research/ext_endo_rho_20261023/receipts/build-ecbench.stderr",
+    "research/ext_endo_rho_20261023/receipts/build-ecbench.stdout",
+    "research/ext_endo_rho_20261023/receipts/run-subfield-fp3.stderr",
+    "research/ext_endo_rho_20261023/receipts/run-subfield-fp3.stdout",
+    "xamples/n83_precomputed_rho_analyze.rs"
+  ],
+  "dirty_before": [
+    "research/conductor_gap_cm_orbits_20261015/native/ecbench_next.rs",
+    "research/ext_endo_rho_20261023/cards/CARD-ext-endo-rho-20261023-1.yaml",
+    "xamples/n83_precomputed_rho_analyze.rs"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 2"
+}

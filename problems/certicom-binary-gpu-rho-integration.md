@@ -1,10 +1,14 @@
 # Generalized GPU rho workers for the nine Certicom binary challenges
 
-- **Status:** `open`
+- **Status:** `partial` — exact ECCp-131/ECC2-131 native arithmetic is
+  host-verified; CUDA device replay and the generalized persistent worker
+  remain open
 - **Kind:** implementation gap; measurement and hardware access gap
 - **Affected work:** the nine Certicom binary challenge records in `src/binary_ecc/curve.rs`, the `ecdlp-nist` rho CLI, and the curve-specific `ecc2k130/` GPU campaign; see also [the matched GPU workload problem](ecbench-gpu-matched-workload-contract.md). The in-progress service worktree has a separate, unpublished record at `/Volumes/SSD990-2/cryptanalysis/wt/ecc-challenges-deploy/problems/multi-campaign-worker-and-verifier.md`.
-- **Next action owner:** Conductor task `T-3352` for the curve and CPU path; the `cryptanalysis` service worktree owns its separate v2 campaign integration
-- **Last updated:** 2026-10-16
+- **Next action owner:** Conductor task `T-4099` for the exact ECCp-131 and
+  ECC2-131 arithmetic path; the `cryptanalysis` service worktree owns its
+  separate v2 campaign integration
+- **Last updated:** 2026-10-18
 
 ## Problem
 
@@ -19,6 +23,18 @@ The affected groups are ECC2K-130 and ECC2-131 over GF(2^131); ECC2K-163 and ECC
 - **Derived or proved:** A walk rate alone omits durable DP transfer, merge, collision replay and verification. End-to-end throughput and a fastest-kernel choice therefore require measurements covering those phases. No mathematical obstruction is established.
 - **Suspected explanation:** Unknown whether one field representation and kernel geometry will be best at all five field degrees; this is a measurement question.
 - **Missing capability in this repository:** an integrated GPU path and durable DP store for the nine catalog entries. For the separate service candidate, revised-walk controls and release canary remain open. Matched device performance receipts and an external fastest-tool comparison are absent for both paths.
+- **Native two-curve arithmetic candidate (2026-10-18):**
+  `gpu/certicom131/` now preserves the recovered ECCp-131/ECC2-131
+  parameters and vectors and adds one native host/CUDA implementation and a
+  stable verifier.  The host verifier passed 256 field-vector sets per curve,
+  16 scalar vectors per curve, point identities, and four subgroup checks;
+  the final merged-head Rust library suite passed 4,399 tests after two
+  tracked sparse fixtures were materialized.  CUDA device replay is not complete: an
+  approved 30-minute `g7e.2xlarge` correctness job was rejected before
+  instance creation because the AWS GPU vCPU quota is zero.  This establishes
+  host arithmetic for these two exact curves only; it does not establish a
+  GPU result, a persistent worker, or coverage of the other challenge curves.
+  See `gpu/certicom131/PROTOCOL.md` and `gpu/certicom131/RESULT.md`.
 - **What this evidence does not establish:** It gives no speed ranking for the nine curves and no conclusion about the feasibility of their discrete logarithms.
 
 ## What would unblock it
@@ -32,7 +48,12 @@ These conditions would establish runnable, validated implementations and qualifi
 
 ## Next discriminating step
 
-- **Action or proof obligation:** After the nine CPU parameter/subgroup checks pass, replay the corrected `cryptanalysis` v2 hash-walk on ECC2-131 with CPU and CUDA, then extend the same frozen controls to the other eight binary challenges and complete its service canary. Integrating that verified worker with this repository is a separate code step.
+- **Action or proof obligation:** First replay `gpu/certicom131/test_cuda.cu`
+  on an approved CUDA 13.x RTX PRO 6000 runner and retain the device receipt.
+  Then replay the corrected `cryptanalysis` v2 hash-walk on ECC2-131 with CPU
+  and CUDA, extend the same frozen controls to the other eight binary
+  challenges, and complete its service canary.  The arithmetic verifier does
+  not replace those persistent-worker and durable-store gates.
 - **Inputs and controls:** the exact ECC2-131 field/curve/subgroup record; an independent binary affine reference; a planted scalar with known answer; the published target as an answer-free collection input; nonempty distinguished-point output, matched kernel baseline and A/A timings.
 - **Execution limits and stop condition:** freeze the seed, step count, DP predicate, hardware and maximum process memory before running; stop on any arithmetic mismatch, record drop, sanitizer fault or resource watchdog. These limits bound the validation run, not the broader campaign budget.
 - **Outcomes and next actions:** passing replay permits the remaining eight curve replays, service canary and measured tuning; a mismatch localizes a correctness defect; a bounded no-collision run says nothing about the target logarithm; missing hardware or a failed launch is infrastructure evidence and is rerun only after the dependency is restored.
@@ -42,5 +63,16 @@ These conditions would establish runnable, validated implementations and qualifi
 
 - 2026-10-16: Opened while integrating the nine published parameter records. GPU and durable campaign support remain unimplemented in this repository for the full set.
 - 2026-10-16: Cross-linked the in-progress `cryptanalysis` v2 service candidate and its revised distinguished-point predicate gate. Earlier arithmetic receipts do not release the revised walk.
+- 2026-10-18: Added host-verified native arithmetic and frozen known-answer
+  replay for exact ECCp-131 and ECC2-131.  The CUDA verifier is implemented
+  but its device run was rejected before launch by a zero AWS GPU vCPU quota;
+  no device or performance result is recorded.
 
-Unresolved. Completing this record does not complete the requested integration.
+- 2026-10-22: Single-core CPU baseline for the three 131-bit targets ([study](../research/certicom131_rho_ic_bench_20261022/README.md)): batched-inversion walks on the exact ECC2-131 and ECCp-131 groups with checked arithmetic (8.50 M and 1.23 M steps/s). No CUDA result; the device replay above remains open.
+
+- 2026-10-23: Single-core CPU parity study ([study](../research/certicom131_rho_parity_20261023/README.md)): ECCp-131 AVX-512 walk 15.06 M and ECC2-131 bitsliced walk 11.46 M steps/s against 10.3 M for the ECC2K-130 client in one isolated session, all gates passing. No CUDA result; the device replay above remains open.
+
+- 2026-10-23: CUDA port of both walks ([study](../research/certicom131_cuda_port_20261023/README.md)): per-thread code gated on the CPU against the header arithmetic, kernels compile for sm_80 to sm_90 (and retargeted sm_120). No device parity result and no GPU rate: `walk_cuda` has not run on a GPU. Running it is the next step on the first CUDA machine.
+
+Partially resolved.  Completing the two-curve host arithmetic does not
+complete the requested GPU and durable campaign integration.

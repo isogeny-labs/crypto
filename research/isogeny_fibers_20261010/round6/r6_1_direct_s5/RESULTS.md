@@ -248,3 +248,19 @@ specialisation instead of being Weil-restricted up front.
   records. `results/host.txt`: the host.
 * `plot.py`, `plot_data.csv`, `s_by_arm.svg` / `.png`: the graph.
 * `report.typ`, `report.pdf`: the report.
+
+## Gates
+
+* `rustfmt --edition 2021 --check` passes on the changed `.rs` files.
+* `cargo test --release --lib chained_x`: 2 passed, both before and after
+  merging origin/main.
+* `cargo +1.98 clippy --release --example r6_1_direct_s5 -- -D warnings` and
+  `cargo +1.98 clippy --lib --tests -- -D warnings` were both clean before the
+  merge.
+* After merging origin/main, clippy on the lib stops on one existing lint in
+  `src/cryptanalysis/modular_polynomial.rs:403` (`manual_is_multiple_of`).
+  That line comes from main and is not touched here, and it is the only lint
+  reported for the crate.
+* `scripts/check_curve_names.py --diff origin/main` crashes on files the
+  sparse checkout leaves out. These files use no curve names other than the
+  instance labels `icv1-*` and "Koblitz".
