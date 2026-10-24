@@ -63,18 +63,33 @@ fn root_records(
             system["f4_attempted"] == false
                 && system["verdict"] == "checked-infinity-branch"
                 && work == 0
-                && system["equations"].is_null(),
+                && system["normalized_f4_input_sha256"].is_null(),
             "infinity-work",
         )?;
         return Ok(work);
     }
     require(system["f4_attempted"] == true, "missing-finite-system")?;
     let equations = restrict_exact(case.c.f, case.c.b, h, remaining.x);
-    let encoded = json!(equations
+    let input: Vec<_> = equations
         .iter()
-        .map(|p| p.iter().map(|(e, c)| json!([e, c])).collect::<Vec<_>>())
-        .collect::<Vec<_>>());
-    require(system["equations"] == encoded, "system-equations")?;
+        .map(|poly| {
+            f4_fp::normalise(
+                &poly
+                    .iter()
+                    .map(|(e, &v)| (e.iter().map(|&x| x as u32).collect(), v))
+                    .collect::<Vec<_>>(),
+                case.p,
+                f4_fp::Ordering::Grevlex,
+            )
+        })
+        .collect();
+    let input_sha = hex::encode(hash::sha256::sha256(
+        &serde_json::to_vec(&input_json(&input)).unwrap(),
+    ));
+    require(
+        system["normalized_f4_input_sha256"] == input_sha,
+        "system-equations",
+    )?;
     let roots: Vec<Vec<u64>> =
         serde_json::from_value(system["field_roots"].clone()).map_err(|_| "root-format")?;
     require(roots.windows(2).all(|w| w[0] < w[1]), "root-order")?;
@@ -376,6 +391,12 @@ fn inspect(
         }
         rank = independent_rref(&rows, cols, case.n).0;
         require(query["rank_after"] == rank, "target-rank")?;
+        if !use_zero {
+            require(
+                ref_trace[qi]["rank_after"] == rank,
+                "plain-reference-rank-parity",
+            )?;
+        }
         if rank == cols {
             first_full = Some(qi);
         }
@@ -385,6 +406,12 @@ fn inspect(
         d["first_full_rank_query"] == json!(first_full) && d["rank"] == rank,
         "target-stop",
     )?;
+    if !use_zero {
+        require(
+            d["first_full_rank_query"] == target_reference["first_full_rank_query"],
+            "plain-reference-stop-parity",
+        )?;
+    }
     require(
         terms(&d["target_signed_physical_set"])? == target_set
             && d["target_projective_rows"] == json!(target_projective),

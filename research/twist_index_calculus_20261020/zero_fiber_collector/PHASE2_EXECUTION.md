@@ -63,6 +63,10 @@ query order, journaling and final verification policy.
 Each finite solve receives the remaining cooperative deadline, including
 failed work. Durable input journals precede F4 and result journals follow
 decoding. A killed case leaves its completed prefix and pending system.
+Each finite input is bound by its context, remaining point and SHA-256 of
+the exact normalized F4 polynomials. The post-run verifier reconstructs
+those polynomials and checks that signature before checking roots. Full
+deterministic coefficients need not be duplicated in every journal/result.
 Separate setup, zero precomputation, target-query generation, decomposition,
 matrix work, back substitution, point verification and journal intervals.
 Record allocation calls/bytes and peak live Rust bytes separately from

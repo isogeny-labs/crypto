@@ -101,7 +101,7 @@ pub(super) fn build(raw: Value, arm: usize) -> Case {
 }
 
 /// Target-independent arithmetic setup for reusable zero precomputation.
-/// The public Q encoding is retained, but its validation is charged online.
+/// No target coordinates are decoded here; the pipeline supplies Q online.
 pub(super) fn build_reusable(raw: Value, arm: usize) -> Case {
     build_inner(raw, arm, false)
 }
@@ -123,10 +123,14 @@ fn build_inner(raw: Value, arm: usize, validate_target: bool) -> Case {
         y: element(&raw["generator_y"]),
         inf: false,
     };
-    let q = Point {
-        x: element(&raw["target_x"]),
-        y: element(&raw["target_y"]),
-        inf: false,
+    let q = if validate_target {
+        Point {
+            x: element(&raw["target_x"]),
+            y: element(&raw["target_y"]),
+            inf: false,
+        }
+    } else {
+        INF
     };
     assert!(c.on_curve(g));
     if validate_target {

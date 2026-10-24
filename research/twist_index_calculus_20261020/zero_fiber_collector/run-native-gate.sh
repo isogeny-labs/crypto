@@ -25,8 +25,10 @@ cargo --version > "$zero_out/metadata/cargo.txt"
     src/cryptanalysis/f4_fp.rs src/cryptanalysis/fx_hash.rs src/cryptanalysis/identity_certificate.rs \
     docs/identity-certificates/schoenhage-10mult.json \
     examples/quartic_twist_s4_integer.rs examples/quartic_twist_s4_structure.rs tools/isolated_bench.py
+  find "$zero_study/fixtures" -type f -name '*.json'
 } | LC_ALL=C sort -u | xargs sha256sum > "$zero_out/metadata/sources.sha256"
 export CARGO_TARGET_DIR="$zero_target" CARGO_BUILD_JOBS=1 RAYON_NUM_THREADS=1
+export TWIST_ZERO_PIPELINE_TEST_OUTPUT_ROOT="$(cd "$zero_out" && pwd)/test-artifacts"
 zero_phase() {
   local zero_id=$1 zero_rc
   shift

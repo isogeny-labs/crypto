@@ -147,17 +147,18 @@ fn solve(
                 .collect()
         })
         .unwrap_or_default();
-    let equation_record = equations.as_ref().map(|polys| {
-        polys
-            .iter()
-            .map(|p| p.iter().map(|(e, c)| json!([e, c])).collect::<Vec<_>>())
-            .collect::<Vec<_>>()
-    });
+    let input_sha = if remaining.inf {
+        None
+    } else {
+        Some(hex::encode(hash::sha256::sha256(
+            &serde_json::to_vec(&input_json(&input)).unwrap(),
+        )))
+    };
     journals.event(
         clock,
         true,
         &json!({"context":context,"prefix":prefix,
-        "remaining_point":PointRecord::from(remaining),"equations":equation_record,
+        "remaining_point":PointRecord::from(remaining),"normalized_f4_input_sha256":input_sha,
         "phase":"solve-pending"}),
     );
     let budget = deadline.saturating_duration_since(Instant::now());
@@ -251,7 +252,7 @@ fn solve(
         verdict
     };
     let result = json!({"context":context,"prefix":prefix,
-        "remaining_point":PointRecord::from(remaining),"equations":equation_record,
+        "remaining_point":PointRecord::from(remaining),"normalized_f4_input_sha256":input_sha,
         "verdict":verdict,"field_roots":roots,"accepted_relations":accepted,
         "f4_attempted":attempted,"f4_row_reduction_fp_muls":f4_muls,
         "rejected_decode":rejected_decode,"max_rows":max_rows,"max_cols":max_cols});
@@ -302,6 +303,12 @@ fn verify_factor_logs(case: &Case, arm: usize, logs: &[u64]) -> bool {
 
 pub(crate) fn execute(public: &Path, sha: &str, arm_name: &str, mode: &str, out: &Path) -> bool {
     let raw = checked_public(public, sha);
+    // Input decoding is outside the operational interval for every mode.
+    let target_point = Point {
+        x: element(&raw["target_x"]),
+        y: element(&raw["target_y"]),
+        inf: false,
+    };
     let arm = ARMS.iter().position(|&name| name == arm_name).unwrap();
     let use_zero = match mode {
         "plain" => false,
@@ -324,7 +331,7 @@ pub(crate) fn execute(public: &Path, sha: &str, arm_name: &str, mode: &str, out:
     let memory_start = cold::allocation_begin();
     let mut clock = Clock::new();
     let deadline = clock.last + Duration::from_secs(1180);
-    let case = cold::build_reusable(raw, arm);
+    let mut case = cold::build_reusable(raw, arm);
     let (_, h) = integer::derive();
     let by_x: BTreeMap<_, _> = (0..case.l0).map(|id| (case.pool[id].p.x, id)).collect();
     let mut matrix = Matrix::new(case.n, case.columns(arm));
@@ -433,6 +440,7 @@ pub(crate) fn execute(public: &Path, sha: &str, arm_name: &str, mode: &str, out:
     clock.enter(POINT_QUERIES);
     let reusable_wall_ns = clock.total();
     // First target-dependent arithmetic: base construction above never checked Q.
+    case.q = target_point;
     assert!(case.c.on_curve(case.q));
     assert_eq!(case.c.mul(case.q, case.n), INF);
     let mut query_records = Vec::new();
@@ -614,8 +622,104 @@ mod tests {
             serde_json::to_value(&a.pool).unwrap(),
             serde_json::to_value(&b.pool).unwrap()
         );
-        assert_ne!(a.q, b.q);
-        assert!(!b.c.on_curve(b.q));
+        assert_eq!(a.q, INF);
+        assert_eq!(b.q, INF);
         assert!(std::panic::catch_unwind(|| cold::build(altered, 7)).is_err());
+    }
+
+    #[test]
+    fn public_p37_pipeline_recovers_target_with_both_controls_and_independent_replay() {
+        let root = std::env::var_os("TWIST_ZERO_PIPELINE_TEST_OUTPUT_ROOT")
+            .map(std::path::PathBuf::from)
+            .unwrap_or_else(|| {
+                std::env::temp_dir()
+                    .join(format!("twist-zero-pipeline-tests-{}", std::process::id()))
+            });
+        let root = root.join("p37-roundtrip");
+        assert!(!root.exists());
+        std::fs::create_dir_all(&root).unwrap();
+        let public = root.join("public.json");
+        let data = include_bytes!("../fixtures/p37-seed0-public.json");
+        std::fs::write(&public, data).unwrap();
+        let public_sha = hex::encode(hash::sha256::sha256(data));
+        let fixture_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../zero_fiber_collector/fixtures/phase2-p37-seed0");
+        let manifest: Value =
+            serde_json::from_slice(&std::fs::read(fixture_root.join("provenance.json")).unwrap())
+                .unwrap();
+        for arm in [7, 9] {
+            let name = ARMS[arm];
+            let seals = manifest["sources"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|r| r["arm"] == name)
+                .unwrap();
+            let mut stopped = None;
+            let mut plain = None;
+            for mode in ["zero", "plain"] {
+                let folder = root.join(format!("{mode}-{name}"));
+                assert!(execute(&public, &public_sha, name, mode, &folder));
+                let record: Value =
+                    serde_json::from_slice(&std::fs::read(folder.join("record.json")).unwrap())
+                        .unwrap();
+                assert_eq!(record["deterministic"]["recovered"], 271);
+                assert_eq!(
+                    record["deterministic"]["all_usable_factor_logs_and_target_verified"],
+                    true
+                );
+                assert!(audit(
+                    &public,
+                    &public_sha,
+                    &folder,
+                    &fixture_root.join(name).join("zero-reference.json"),
+                    seals["zero_fixture_sha256"].as_str().unwrap(),
+                    &fixture_root.join(name).join("target-reference.json"),
+                    seals["target_reference_sha256"].as_str().unwrap(),
+                    &root.join(format!("audit-{mode}-{name}"))
+                ));
+                if mode == "zero" {
+                    stopped = Some(record);
+                } else {
+                    plain = Some(record);
+                }
+            }
+            let stopped = stopped.unwrap();
+            let plain = plain.unwrap();
+            assert!(
+                stopped["deterministic"]["target_queries"]
+                    .as_array()
+                    .unwrap()
+                    .len()
+                    <= plain["deterministic"]["target_queries"]
+                        .as_array()
+                        .unwrap()
+                        .len()
+            );
+            if arm == 7 {
+                assert_eq!(
+                    stopped["deterministic"]["zero_factor_log_points_verified"],
+                    true
+                );
+                assert!(
+                    stopped["deterministic"]["zero_systems"]
+                        .as_array()
+                        .unwrap()
+                        .len()
+                        < stopped["deterministic"]["zero_pair_representatives"]
+                            .as_u64()
+                            .unwrap() as usize
+                );
+                for pass in ["aa1", "aa2"] {
+                    let repeated = root.join(format!("{pass}-zero-{name}"));
+                    assert!(execute(&public, &public_sha, name, "zero", &repeated));
+                    assert!(parity(
+                        &root.join(format!("zero-{name}")),
+                        &repeated,
+                        &root.join(format!("{pass}-parity.json"))
+                    ));
+                }
+            }
+        }
     }
 }
