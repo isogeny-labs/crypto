@@ -19,7 +19,7 @@ changes? Where is the distance to the matched rho smallest?
 |---|---|---|---|---|---|
 | chained | n83k1 | chained-S3 full-width SAT: explicit domain (`chain-s3`), signed-Frobenius orbit domain (`chain-s3-orbit`), orbit + first-pair order (`chain-s3-orbit-ordered`) | Frobenius unions of `span(1, z, …, z^{S-1})`, S = 2, 3, 4 | 2…9 | public `[a]G` (4) and planted (2) |
 | algebraic | n83k1 | matrix-F4, matrix-F5, inherited-F4, F6-IC, F6-IC pair index, crossbred, Weil-descent SAT (native XOR / CNF / base-restricted), MQ-FES | standard subspace D = 8 | 2…9 | planted (2) |
-| companion | icv1-f2m61-tm158598901-405ca675 | the same ten algebraic engines, exact single-word field | standard subspace D = 8, 12, 16, 20 | 2…9 | public (16); planted (4) at D = 12, m = 2, 3 |
+| companion | `KoblitzCurve::new(1, 61)` | the same ten algebraic engines, exact single-word field | standard subspace D = 8, 12, 16, 20 | 2…9 | public (16); planted (4) at D = 12, m = 2, 3 |
 | reference | n83k1 | the repository's m = 4 root-table rootfinder (`koblitz_orbit_dlp_fast`, `construct:83:1:1107`, root11 and root22 layouts), full DLP | compact signed-orbit base K = 1107 | 4 | the exposed public point `point.jsonl` |
 | rho | n83k1 | strong signed-Frobenius rho (`n83_rho_optimization_eval`, `rho_config.json`) | — | — | same point, 3 seeds, alternated with the IC arms |
 

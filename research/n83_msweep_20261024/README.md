@@ -3,7 +3,7 @@
 Stage diagnostic on the pinned N83 fixture (`icv1-f2m83-t6151469093347-cdcc5432`,
 `KoblitzCurve::known_n83_k1`, 53-bit subgroup), with the repository's m = 4
 rootfinder and the matched strong rho as complete-DLP references, and an
-exact-field companion on `icv1-f2m61-tm158598901-405ca675`. Preregistered in
+exact-field companion on the degree-61 Koblitz curve `KoblitzCurve::new(1, 61)`. Preregistered in
 [`PROTOCOL.md`](PROTOCOL.md) (frozen at `b654e95b6`); frozen grid
 [`grid.tsv`](grid.tsv). Report with graphs and PDF:
 [`reports/run-20261024T0700Z/report.pdf`](reports/run-20261024T0700Z/report.pdf).
@@ -36,10 +36,17 @@ No improvement over the IC baseline is measured, so no leaderboard or
 
 ## Files
 
+Extract and check the raw tree before re-running the analysis:
+
+```sh
+cd research/n83_msweep_20261024 && sha256sum -c raw.tar.xz.sha256 && tar -xJf raw.tar.xz
+cargo run --release --example n83_msweep_analyze -- research/n83_msweep_20261024   # from the repo root
+```
+
+
 | path | what |
 |---|---|
-| `raw/shard{1..4}/` | 500 cell records (`curve__mM__fb__engine__probes.json`), incl. `process_cap` records |
-| `raw/reference/` | rho receipts, rootfinder stdout/result/base dump, wall times |
+| `raw.tar.xz` (+ `.sha256`) | the raw tree `raw/` (AGENTS.md §13a): `raw/shard{1..4}/` holds 500 cell records (`curve__mM__fb__engine__probes.json`), incl. `process_cap` records; `raw/reference/` holds rho receipts, rootfinder stdout/result/base dump, wall times |
 | `raw_superseded/encoder_cap_m7-9/` | the first m = 7–9 chained records, refused by the m ≤ 6 encoder bound |
 | `cards/` | director task cards, executor reports, director assessments (relay stopped; see report) |
 | `resume/` | core-session resume of the same frozen commands: HEAD, hashes, stdout |
@@ -49,11 +56,13 @@ No improvement over the IC baseline is measured, so no leaderboard or
 ## Names (curve-name lint, after the run)
 
 The companion curve's short driver spec in `grid.tsv` is a retired curve name
-(AGENTS.md §11). After the run, the 340 companion records and the companion
-figure were renamed mechanically to carry the slug
-`icv1-f2m61-tm158598901-405ca675` (figure: `companion_f2m61_engines_m2`). The
-record bytes are unchanged: their `curve_spec` field keeps the short spec, and
-their `curve` field carries the slug. The only post-freeze edit to
-`PROTOCOL.md` is that name rewrite on one table row, made by
-`check_curve_names.py --fix`; the version the cards bind is at `b654e95b6`.
-`docs/curves/registry.json` was regenerated so the slug resolves.
+(AGENTS.md §11). That curve is not in `docs/curves/registry.json`: adding it
+would re-certify the frozen catalog-wide cover-transfer assessment, which
+pins the registry's size. So prose here names it by its constructor,
+`KoblitzCurve::new(1, 61)`. After the run, the 340 companion records and the
+companion figure were renamed mechanically: the record files carry the ICV1
+slug the cell driver printed (the `curve` field of every record), and the
+figure is `companion_f2m61_engines_m2`. The record bytes are unchanged; their
+`curve_spec` field keeps the short spec. The only post-freeze edit to
+`PROTOCOL.md` is that name on one table row. The version the cards bind is
+at `b654e95b6`.
