@@ -22,6 +22,10 @@ for zero_dir in "${zero_dirs[@]}"; do
   cp -al "$zero_study/runs/$zero_dir" "$zero_out/staging/runs/$zero_dir"
   printf '%s\n' "runs/$zero_dir" >> "$zero_out/selected-raw-directories.txt"
 done
+sha256sum -c "$zero_study/runs/panel-v2/metadata/public-inputs.sha256" > "$zero_out/original-public-inputs-unchanged.txt"
+sha256sum -c "$zero_study/runs/panel-v2/metadata/runner.sha256" > "$zero_out/original-runner-unchanged.txt"
+"$zero_out/staging/runs/panel-v2/runner" --zero-five-polynomial-summary "$zero_out/staging/runs/panel-v2" "$zero_out/verified-native-summary.json" > "$zero_out/native-summary-verification.stdout" 2> "$zero_out/native-summary-verification.stderr"
+cmp "$zero_out/staging/runs/panel-v2/summary.json" "$zero_out/verified-native-summary.json"
 cp "$zero_study/runs/panel-v2/metadata/compiled-sources.sha256" "$zero_out/staging/COMPILED_SOURCES.sha256"
 mapfile -t zero_sources < <(cut -c67- "$zero_out/staging/COMPILED_SOURCES.sha256")
 git archive "$zero_producer" "${zero_sources[@]}" | tar -xf - -C "$zero_out/staging/frozen-source"
@@ -40,6 +44,7 @@ for zero_p in 37 73 97 157 229 241 337; do
   done
 done
 cp -p "$zero_prior/runs/five-point-replay-v1/summary.json" "$zero_out/staging/reference-slice/independent-point-replay-summary.json"
+test "$(sha256sum "$zero_out/staging/reference-slice/independent-point-replay-summary.json" | cut -d ' ' -f 1)" = 8b92c608edbb446095ceffb539e995da3f8dbae3e6ee95dd980b87b308a0989d
 printf '%s\n' "$zero_producer" > "$zero_out/staging/FROZEN_SOURCE_COMMIT"
 test -z "$(find "$zero_out/staging" -type l -print -quit)"
 (
