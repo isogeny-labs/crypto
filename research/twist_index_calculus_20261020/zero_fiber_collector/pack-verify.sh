@@ -60,7 +60,7 @@ tar --format=gnu --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner --ha
 sha256sum "$zero_out/runs.tar.xz" > "$zero_out/archive.sha256"
 stat -c '%s' "$zero_out/runs.tar.xz" > "$zero_out/archive.bytes"
 mkdir "$zero_out/fresh"
-tar -xJf "$zero_out/runs.tar.xz" -C "$zero_out/fresh"
+tar -xJpf "$zero_out/runs.tar.xz" -C "$zero_out/fresh"
 (
   cd "$zero_out/fresh"
   sha256sum -c SHA256SUMS

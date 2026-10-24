@@ -71,3 +71,24 @@ Its production executable is SHA-256
 Compact raw metadata is copied unchanged to `results/native-journal-gate-v1/`.
 The explicit outer-busy negative control returns 64 and creates no candidate
 directory. The corrected panel may now start directly, without an outer lock.
+
+## Terminal polynomial panel
+
+`panel-v2` runs from 20:03:47 to 20:39:43 UTC. All 42 collections and
+post-run audits exit zero; the native summary reports all 42 complete with
+no unverified case-arm. Each arm has 33,696 complete S4 systems, 504 signed
+tuples, 15 projective rows and zero zero-rows in case-local totals. All
+per-case ranks match the independently point-replayed reference. The full
+case table and exact counter scope are in [the report](REPORT.md).
+
+## Archive permission repair
+
+The first archive is 105,608,344 bytes, SHA-256
+`8418084d7e25f6076f69e17d46a20a3ede3f67df73699eb4c7fc4b0df0ef74bd`.
+Frozen-source reconstruction, native summary equality, all extracted
+checksums and all 1,112 native file comparisons pass. The first repack differs:
+the session's umask changes 1,072 extracted file/directory permission modes.
+Original archive, first extraction, mismatching repack and exit 1 remain.
+The separate `repair-repack-permissions.sh` reuses the original archive,
+extracts with preserved permissions and repeats the required integrity check.
+Its terminal result remains pending until its own exit receipt exists.
