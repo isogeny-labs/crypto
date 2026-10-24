@@ -415,6 +415,41 @@ def harvest_json(reg: Registry, problems: list[str], fatal: list[str]) -> None:
                 problems.append(f"{rel}: skipped a curve record ({err})")
 
 
+def harvest_generated_extensions(reg: Registry, fatal: list[str]) -> None:
+    """Bind seeded Fp2/Fp3/Fp4 constructors to their native model and generator."""
+    rel = "docs/curves/sources/generated.json"
+    path = REPO / rel
+    if not path.exists():
+        return
+    for row in json.loads(path.read_text())["curves"]:
+        f = row.get("field")
+        if not isinstance(f, dict) or f.get("kind") != "prime_extension":
+            continue
+        p = int(f["p"])
+        mod = [int(v) for v in f["modulus"]]
+        if len(mod) != int(f["degree"]) or len(mod) not in (2, 3, 4):
+            fatal.append(f"{rel}: {row.get('slug')}: invalid extension degree")
+            continue
+        a, b = [int(v) for v in row["a"]], [int(v) for v in row["b"]]
+        order = int(row["group_order"])
+        r, h = int(row["subgroup_order"]), int(row["cofactor"])
+        if r * h != order:
+            fatal.append(f"{rel}: {row.get('slug')}: subgroup/cofactor mismatch")
+            continue
+        ident = cid.extension_id(p, len(mod), mod, a, b, order)
+        if row.get("icv1") != ident["icv1"] or row.get("slug") != ident["slug"]:
+            fatal.append(f"{rel}: {row.get('slug')}: native identity differs from model")
+            continue
+        check_rust(row, ident, rel, fatal)
+        params = {"p": str(p), "k": len(mod), "modulus": [str(v) for v in mod],
+                  "a": [str(v) for v in a], "b": [str(v) for v in b],
+                  "generator_call": row["generator_call"]}
+        reg.add(ident, "extension", params, rel, [])
+        g = row["generator"]
+        generator = ([int(v) for v in g["x"]], [int(v) for v in g["y"]])
+        reg.represent(ident, *extension_record(p, mod, a, b, r, h, generator), rel)
+
+
 def unbuilt_specs() -> dict[str, str]:
     """Constructor calls examples/curve_id_generated.rs could not build."""
     path = REPO / "docs/curves/sources/generated.json"
@@ -756,6 +791,7 @@ def build() -> tuple[dict, list[str], list[str]]:
     harvest_standards(reg)
     harvest_bench(reg)
     harvest_json(reg, problems, fatal)
+    harvest_generated_extensions(reg, fatal)
     harvest_conductor_prime_ids(reg, fatal)
     harvest_curve_records(reg)
     harvest_text_koblitz(reg)

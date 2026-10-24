@@ -7,6 +7,9 @@ on:
       - 'tests/test_curve_identity.py'
       - 'tests/test_benchmark_export.py'
       - 'scripts/build_curve_registry.py'
+      - 'scripts/build_certicom_prime_sources.py'
+      - 'scripts/test_generated_extension_curves.py'
+      - 'examples/curve_id_generated.rs'
       - 'scripts/test_prime_model_normalization.py'
       - 'scripts/check_curve_names.py'
       - 'scripts/test_curve_names_archived_labels.py'
@@ -14,6 +17,16 @@ on:
       - 'tools/isogeny-cli/src/bin/registry_models.rs'
       - 'isogeny_algos/src/field.rs'
       - 'docs/curves/sources/prime-models.json'
+      - 'docs/curves/sources/certicom-prime-models.json'
+      - 'docs/curves/sources/generated.json'
+      - 'docs/curves/sources/specs.txt'
+      - 'research/ext_endo_rho_20261023/sessions-a1/gls-fp2/records.jsonl'
+      - 'research/ext_endo_rho_20261023/sessions-a1/subfield-fp3/records.jsonl'
+      - 'research/certicom131_ic_program_20261020/pkm_ext/specs/SPEC-p30.json'
+      - 'research/sparse_la_timing_20261018/specs/SPEC-fp4-p29.json'
+      - 'research/sparse_la_timing_20261018/specs/SPEC-prime-scaling.json'
+      - 'src/cryptanalysis/gaudry_quartic_d4.rs'
+      - 'src/ecc/curve_zoo.rs'
       - 'research/isogeny_fibers_20261010/round4/16_7_agm_isogeny_oracles/out_seed7.json'
       - '.github/workflows/curve-identities.yml'
   push:
@@ -24,6 +37,9 @@ on:
       - 'tests/test_curve_identity.py'
       - 'tests/test_benchmark_export.py'
       - 'scripts/build_curve_registry.py'
+      - 'scripts/build_certicom_prime_sources.py'
+      - 'scripts/test_generated_extension_curves.py'
+      - 'examples/curve_id_generated.rs'
       - 'scripts/test_prime_model_normalization.py'
       - 'scripts/check_curve_names.py'
       - 'scripts/test_curve_names_archived_labels.py'
@@ -31,6 +47,16 @@ on:
       - 'tools/isogeny-cli/src/bin/registry_models.rs'
       - 'isogeny_algos/src/field.rs'
       - 'docs/curves/sources/prime-models.json'
+      - 'docs/curves/sources/certicom-prime-models.json'
+      - 'docs/curves/sources/generated.json'
+      - 'docs/curves/sources/specs.txt'
+      - 'research/ext_endo_rho_20261023/sessions-a1/gls-fp2/records.jsonl'
+      - 'research/ext_endo_rho_20261023/sessions-a1/subfield-fp3/records.jsonl'
+      - 'research/certicom131_ic_program_20261020/pkm_ext/specs/SPEC-p30.json'
+      - 'research/sparse_la_timing_20261018/specs/SPEC-fp4-p29.json'
+      - 'research/sparse_la_timing_20261018/specs/SPEC-prime-scaling.json'
+      - 'src/cryptanalysis/gaudry_quartic_d4.rs'
+      - 'src/ecc/curve_zoo.rs'
       - 'research/isogeny_fibers_20261010/round4/16_7_agm_isogeny_oracles/out_seed7.json'
       - '.github/workflows/curve-identities.yml'
 permissions:
@@ -53,3 +79,5 @@ jobs:
           python tests/test_curve_identity.py
           python scripts/test_prime_model_normalization.py
           python scripts/test_curve_names_archived_labels.py
+          python scripts/build_certicom_prime_sources.py --check
+          python scripts/test_generated_extension_curves.py
