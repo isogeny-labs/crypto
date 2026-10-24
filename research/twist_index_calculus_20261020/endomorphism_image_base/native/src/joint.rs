@@ -3,6 +3,8 @@
 use super::*;
 #[path = "../../../joint_image_elimination/native/external_check.rs"]
 mod external_check;
+#[path = "../../../joint_image_elimination/native/five_point_replay.rs"]
+mod five_point_replay;
 #[path = "../../../joint_image_elimination/native/five_zero.rs"]
 mod five_zero;
 #[path = "../../../joint_image_elimination/native/fp_pruning_audit.rs"]
@@ -69,6 +71,12 @@ pub(crate) fn five_zero(public: &Path, sha: &str, replay: &Path, out: &Path) -> 
 }
 pub(crate) fn five_zero_summary(run: &Path, out: &Path) -> bool {
     five_zero::summarize(run, out)
+}
+pub(crate) fn five_point_replay(public: &Path, sha: &str, prior: &Path, out: &Path) -> bool {
+    five_point_replay::audit(public, sha, prior, out)
+}
+pub(crate) fn five_point_summary(run: &Path, out: &Path) -> bool {
+    five_point_replay::summarize(run, out)
 }
 
 pub(crate) fn construction_report(run: &Path, out: &Path) -> bool {
