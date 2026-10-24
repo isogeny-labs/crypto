@@ -114,8 +114,8 @@ fn main() {
         "historical_query_a":old["rows"][0]["a"]==public["query_trace"][2][0],
         "historical_query_b":old["rows"][0]["b"]==public["query_trace"][2][1],
         "physical_set_identical":old["rows"][0]["reference_signed_relations"]==solution["signed_relations"],
-        "audit_matches_solution_fields":["p","seed","query_index","arm","rank","columns"].iter()
-            .map(|key|((*key).to_string(),json!(audit[*key]==solution[*key]))).collect::<serde_json::Map<String,Value>>()});
+        "audit_matches_solution_fields":(["p","seed","query_index","arm","rank","columns"].iter()
+            .map(|key|((*key).to_string(),json!(audit[*key]==solution[*key]))).collect::<serde_json::Map<String,Value>>())});
     std::fs::write(
         out.join("diagnostics.json"),
         serde_json::to_vec_pretty(&diagnostics).unwrap(),
