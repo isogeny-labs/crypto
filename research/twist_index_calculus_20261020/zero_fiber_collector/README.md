@@ -71,6 +71,18 @@ controls use 72. That structural phi gain within precomputation does not
 reduce the matched target-query count and adds systems relative to plain.
 The [control PDF](phase2/BUILD_AND_CONTROLS.pdf) preserves the exact scope.
 
+The separate [native accounting tool](postprocess/README.md) now checks the
+already committed 29-exit historical snapshot without another solve or a
+new live snapshot. All three tests pass, the actual partial-as-complete
+control rejects, and nine configurations retain checked first/A/A evidence.
+At p37 seed 1, zero phi gives factor rank 2 versus doubling's 1 and reduces
+target queries from two to one. Including preprocessing gives 154 finite
+systems versus plain phi's 144; cold native Fp multiplications are
+12,224,047 versus 4,954,250. The [two-page inspected report](postprocess/REPORT.pdf)
+keeps unique physical yield, matrix rank, online counters and cold counters
+separate. Complete price stays null; the full 85-configuration panel still
+has its original managed owner and is not declared complete here.
+
 Run `run-native-gate.sh OUT CARGO_TARGET` through the repository's common busy
 wrapper. The saved continuation `run-complete-native-gate.sh` reuses only
 reconciled successful compilation artifacts and runs the missing test phase;

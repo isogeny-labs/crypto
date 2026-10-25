@@ -63,3 +63,23 @@ and 255 first/A/A executions**. The workload, runner hashes and passing
 launcher controls are frozen in `af66996a19` before comparison. The managed
 `twist-zero-pipeline-panel-v1.service` now owns the full panel. Its terminal
 results are pending; no elapsed-time or complete-price improvement is claimed.
+
+## Separate accounting check, 2026-10-25
+
+The `postprocess/native` crate does not change either frozen producer. Its
+source is committed in `3f2b78c8f9` before the build/analysis starts. The
+successful gate has three passing tests, exact source seals, a successful
+explicit snapshot analysis and an actual exit-2 refusal of partial data in
+complete mode, with no refused output created. The verified executable is
+SHA-256 `e82aaab4ed24f854ee91c7104cb9e0657883edeb46e17d364ce4503c833598e7`.
+
+It recomputes counts from nine configurations verified in the earlier
+29-exit snapshot, binds first/audit/parity hashes, directly checks three
+deterministic records, cross-checks the independently computed matrix/point
+results and requires phase/cut telescoping. It retains all other registered
+rows as missing in that historical snapshot. No newly completed cell is
+silently added. [Compact evidence](results/phase2-accounting-v1/README.md)
+and the [report](postprocess/REPORT.md) expose the preprocessing charge
+behind the p37 seed-1 online rank effect. All complete-price fields remain
+null. Final full-panel analysis and native re-analysis in complete mode
+remain pending.

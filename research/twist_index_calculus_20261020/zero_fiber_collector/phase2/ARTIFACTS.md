@@ -30,3 +30,13 @@ for byte to the unlisted `benchmarks/20261025-twist-zero-pipeline-controls/`.
 Both actual rendered pages are inspected. Layout v1's overflow, corrected
 v2, canceled queued v3 and final v4 output/source snapshots remain separate.
 None alters the native results or admits a timing/GAE claim.
+
+The independent accounting gate and historical partial re-analysis are
+also retained as raw `phase2-accounting-v1` and artifact-only
+`phase2-accounting-layout-v1`. Their compact receipts, 199,384-byte native
+JSON and migration reconciliation are in `../results/phase2-accounting-v1`.
+The two-page PDF and quantitative SVG/150 dpi PNG are under `../postprocess`
+and copied byte for byte to unlisted
+`benchmarks/20261025-twist-zero-accounting/`. Both PDF pages were inspected.
+These new directories join the pending new Phase 2 archive; none overwrites
+the immutable Phase 1 archive or changes the running panel's source seals.
