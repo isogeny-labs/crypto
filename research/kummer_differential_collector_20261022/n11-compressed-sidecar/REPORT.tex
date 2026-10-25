@@ -1,0 +1,36 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\title{N11: compressed sign-safe Kummer sidecar}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Status.} An abstract differential-pair theorem supports one stored
+label when the iteration number is external. A bound for concrete theta xADD
+exceptions remains open. No cohort was run.
+
+\section*{State and proof}
+For odd-prime-order generator $G$ and signed public target $T$, store
+$(K(D),K(D+G),a,n)$ with $D=aG+2^nT$. Branch $c\in\{0,1\}$ sends
+$D$ to $2D+cG$, $a$ to $2a+c\pmod r$, and $n$ to $n+1$.
+This invariant follows by substitution. The new pair is respectively
+$(K(2D),K(2D+G))$ or $(K(2D+G),K(2D+2G))$.
+
+If $(K(X),K(X+G))=(K(Y),K(Y+G))$, then $Y=\pm X$.
+For $Y=-X$, equality of second coordinates implies $2X=0$ (so $Y=X$)
+or $2G=0$ (impossible). Hence the pair is injective, including at identity.
+After lifting its first coordinate, choose the sign with the second coordinate
+and verify $X=aG+(2^n\bmod r)T$ in the signed Jacobian.
+
+\section*{Bounds and interpretation}
+There are exactly $\min(2^n,r)$ reachable labels after $n$ unrestricted branch
+bits, requiring $\lceil\log_2\min(2^n,r)\rceil$ bits in any exact local label
+state without the transcript. The concrete state is 72 bytes with an external
+step count, 80 bytes with a stored counter. The existing path uses three
+regular xADD calls, 72 field multiplications and 108 additions per step.
+The fixed-offset comparator has $r$ explicit classes, or $32r$ bytes, but
+implements a different transition. The 336-row CSV retains every model and
+jump. Mathematical pair-sign ambiguities are zero; coordinate xADD exception
+bound and signed-lift cost are unknown. Cohort eligibility is false.
+
+\end{document}
