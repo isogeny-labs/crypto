@@ -48,7 +48,7 @@ ideal contains 1.
   at a second root, and the m = 4 F0 (already recorded in the earlier study). The N = 15 control got both roots for
   H1 and M1 (H1b, M1b): identical degrees.
 - Process note: the first launch of `run_all.sh` hit a `make_systems.sh` shell-expansion bug on the F0 copies (no run
-  record was produced; fixed in the second commit, runs restarted from scratch). The n = 15 F0 and target-1 F0 wall
+  record was produced; fixed in the results commit 88735efd6c-era script, runs restarted from scratch). The n = 15 F0 and target-1 F0 wall
   times are inflated by host load (CPU 1,112 s for 2,788 s wall at N = 15).
 
 ## 3. Degree table by arm (completed runs; max productive degree)
