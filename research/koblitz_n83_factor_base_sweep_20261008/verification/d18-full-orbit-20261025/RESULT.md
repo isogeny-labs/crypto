@@ -59,6 +59,24 @@ measurement for this new base. `selected_best_total_runtime` remains `null`.
 The next discriminating gate is a source-pinned, same-target four-summand
 natural-query comparison with the prior half-size D18 base, independent
 group/rank replay, full build/import/failed-search charges and matched rho.
-The [AWS resume guide](AWS_RESUME.md) pins the exact S3 GET/replay commands,
-explains the missing full-base natural-query importer, and derives the current
-four-summand solver admission bounds before any hosted search is launched.
+The [AWS resume guide](AWS_RESUME.md) pins the exact S3 GET/replay and
+full-base importer commands, and derives the four-summand solver admission
+bounds before any hosted search is launched.
+
+The opt-in full-base importer and first natural-query protocol were committed
+at `c744d71b5a0fe5e4a11e92077fe084b8aa13de00`. The standalone worker was
+rebuilt from that clean source commit; its SHA-256 is
+`0c6b0b8d4781f836699f1c1d7719ed2f44a4a0ddc5ccc99a8b5cd93c1437557c`.
+Its [retained import receipt](import-check-20261025.json) reports `PASS` for
+all 32,643 signed-Frobenius columns and 5,418,738 point rows from the
+previously fresh-fetched S3 archive. The importer's independent orbit-map
+construction took 64.707 seconds; the raw [process receipt](import-process-20261025.txt)
+records 66.87 seconds wall, 53.02 user seconds, 7.24 system seconds,
+3,755,032,576 bytes maximum resident set size and 5,311,615,128 bytes peak
+memory footprint on this shared macOS host. This L0 import is a component
+cost, not a natural-query yield or a full cold IC runtime. A preliminary
+smoke run used an older standalone executable and is excluded from this
+source-bound result; the retained run followed a clean rebuild and its
+receipt's binary hash matches the rebuilt executable. The frozen
+[first-access protocol](NATURAL_PROTOCOL.md) specifies a separate positive
+control and bounded public natural query; neither has run yet.
