@@ -13,6 +13,12 @@ from research.n83_nearby_grid_confirm16_20261024 import aggregate as nearby_aggr
 from research.n83_nearby_grid_confirm16_20261024 import protocol as nearby_protocol
 from research.n83_nearby_grid_tier1_20261024 import protocol as nearby_catalog
 
+MIDDLE_ID = "IC1N83Ckb1a1fb382464PDP4rootRCguidedLAgaussTDdirectISO0h06c953ec903b"
+MIDDLE_MANIFEST_SHA256 = "75b0215115399fcfafcf4f53aee90e6368d11ee823c5e942ee1a70cdcfefcd02"
+MIDDLE_MANIFEST = (Path(__file__).resolve().parents[1] /
+                   "n83_k2304_current_source_prefix_20261025" /
+                   f"candidate_{MIDDLE_ID}.json")
+
 
 def canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"),
@@ -27,6 +33,25 @@ def reject(reason):
     return {"schema": "n83.crossfamily-bridge-nomination/v1",
             "status": "BOUNDED_UNKNOWN", "reason": reason,
             "candidate_ids": None}
+
+
+def middle_identity():
+    try:
+        raw = MIDDLE_MANIFEST.read_bytes()
+        if hashlib.sha256(raw).hexdigest() != MIDDLE_MANIFEST_SHA256:
+            return False
+        manifest = json.loads(raw)
+        base = manifest["factor_base"]
+        return (manifest.get("candidate_id") == MIDDLE_ID and
+                nearby_catalog.canonical_id(manifest) == MIDDLE_ID and
+                manifest["implementation"]["source_sha256"]["ic"] ==
+                wide_arms.SOURCE_SHA256 and
+                base["actual_usable_points"] == 382464 and
+                base["effective_columns"] == 2304 and
+                base["source_base_hash_blake3"] ==
+                "cc39291fc49ba8d4c25c0c9aba46012bda023b4d7294a46f73d6c3f809727b3f")
+    except (OSError, ValueError, KeyError, TypeError):
+        return False
 
 
 def nearby_recheck(aggregate):
@@ -89,6 +114,8 @@ def nearby_recheck(aggregate):
 def nominate(nearby, wide_validated):
     if nearby_catalog.SOURCE_SHA256 != wide_arms.SOURCE_SHA256:
         return reject("SOURCE_VERSION_DIFFERS")
+    if not middle_identity():
+        return reject("K2304_CURRENT_SOURCE_IDENTITY_DIFFERS")
     nearby_choices = nearby_recheck(nearby)
     if nearby_choices is None:
         return reject("NEARBY_PANEL_NOT_ADMITTED_OR_CHANGED")
@@ -108,13 +135,14 @@ def nominate(nearby, wide_validated):
                  for choice in nearby_choices]
     wide_ids = [wide_choice[metric]["selected_candidate_id"]
                 for metric in ("online", "cold")]
-    ids = sorted(set(small_ids + wide_ids))
+    ids = sorted(set(small_ids + wide_ids + [MIDDLE_ID]))
     wide_hashes = wide_arms.choose()[1]["candidate_manifest_sha256"]
     manifest_hashes = {nearby_catalog.CANDIDATES[k][0]:
                        nearby_catalog.CANDIDATES[k][1]
                        for k in nearby.get("selected_ks", [])}
     manifest_hashes.update(wide_hashes)
-    if not 2 <= len(ids) <= 4 or any(candidate not in manifest_hashes
+    manifest_hashes[MIDDLE_ID] = MIDDLE_MANIFEST_SHA256
+    if not 3 <= len(ids) <= 5 or any(candidate not in manifest_hashes
                                     for candidate in ids):
         return reject("BRIDGE_CANDIDATE_IDENTITY_DIFFERS")
     index_policy = {candidate: "root5_dynamic_load75_no_bloom"
@@ -123,6 +151,7 @@ def nominate(nearby, wide_validated):
         arm[3]: ("root5_fixed30_bloom_wide3" if arm[2] == "root11_wide3"
                  else "root4_fixed31_bloom_standard")
         for arm in wide_arms.ARMS if arm[3] in wide_ids})
+    index_policy[MIDDLE_ID] = "root5_dynamic_load75_no_bloom"
     return {
         "schema": "n83.crossfamily-bridge-nomination/v1",
         "status": "READY_FOR_BRIDGE_DISPATCH",
@@ -138,6 +167,7 @@ def nominate(nearby, wide_validated):
                                          for candidate in ids},
         "small_online_candidate_id": small_ids[0],
         "small_cold_candidate_id": small_ids[1],
+        "middle_k2304_candidate_id": MIDDLE_ID,
         "wide_online_candidate_id": wide_ids[0],
         "wide_cold_candidate_id": wide_ids[1],
         "fresh_bridge_targets_sha256": hashlib.sha256(

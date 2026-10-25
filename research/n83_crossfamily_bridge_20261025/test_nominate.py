@@ -2,6 +2,7 @@
 
 import copy
 import unittest
+from unittest import mock
 
 from research.n83_crossfamily_bridge_20261025 import nominate
 from research.n83_crossfamily_current_20261025 import arms as wide_arms
@@ -80,11 +81,12 @@ class NominationTests(unittest.TestCase):
     def test_complete_panels_nominate_exact_union(self):
         result = nominate.nominate(nearby_panel(), wide_panel())
         self.assertEqual(result["status"], "READY_FOR_BRIDGE_DISPATCH")
-        self.assertEqual(len(result["candidate_ids"]), 4)
+        self.assertEqual(len(result["candidate_ids"]), 5)
         self.assertEqual(set(result["candidate_ids"]), {
             nearby_catalog.CANDIDATES[1107][0],
             nearby_catalog.CANDIDATES[1115][0],
-            wide_arms.ARMS[0][3], wide_arms.ARMS[3][3]})
+            wide_arms.ARMS[0][3], wide_arms.ARMS[3][3],
+            nominate.MIDDLE_ID})
         self.assertEqual(result["comparison_variable"],
                          "factor_base_and_index_policy")
         self.assertEqual(result["index_policy_by_candidate_id"][
@@ -92,6 +94,15 @@ class NominationTests(unittest.TestCase):
             "root5_dynamic_load75_no_bloom")
         self.assertEqual(result["index_policy_by_candidate_id"][
             wide_arms.ARMS[3][3]], "root4_fixed31_bloom_standard")
+        self.assertEqual(result["index_policy_by_candidate_id"][
+            nominate.MIDDLE_ID], "root5_dynamic_load75_no_bloom")
+
+    def test_k2304_manifest_digest_is_required(self):
+        with mock.patch.object(nominate, "MIDDLE_MANIFEST_SHA256", "0" * 64):
+            result = nominate.nominate(nearby_panel(), wide_panel())
+        self.assertEqual(result["status"], "BOUNDED_UNKNOWN")
+        self.assertEqual(result["reason"],
+                         "K2304_CURRENT_SOURCE_IDENTITY_DIFFERS")
 
     def test_changed_nearby_row_fails_closed(self):
         panel = nearby_panel()

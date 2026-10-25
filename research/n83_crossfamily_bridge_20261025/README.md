@@ -18,18 +18,26 @@ contains no comparison timings or selected factor base.
 `nominate.py` freezes the candidate rule before either panel result is
 available: require complete admission and a statistically selected online
 and cold candidate within each family, then compare the deduplicated union
-(two to four exact candidate IDs) on these new points. It recomputes the
+of those selections and the fixed current-source K2304 control (three to
+five exact candidate IDs) on these new points. It recomputes the
 nearby-panel selection from its individual rows and the wide-panel selection
 from its validated rows. An inconclusive panel leaves nomination unknown.
 The raw panel archives must be independently replayed before their aggregate
 JSON is passed to this nominator; the nominator's output is not a bridge
 dispatch or a timing result.
 
+The K2304 control has 382,464 usable points and 2,304 folded columns. Its
+[current-source prefix receipt](../n83_k2304_current_source_prefix_20261025/README.md)
+replays the exact historical base from the current K3596 dump. The earlier
+five-finalist comparison left K2304 and K3300 close in online time on each
+host, so a bridge omitting K2304 would leave that candidate unresolved.
+
 The admitted arms share the same IC producer source but use different root
 index policies: nearby-grid arms use dynamic five-byte slots at 75% load
 without a Bloom filter; K3300/K3450 use fixed five-byte slots with the wide3
 Bloom profile; K3500/K3596 use fixed four-byte slots with the standard Bloom
-profile. The bridge therefore compares complete candidate pipelines while
+profile; K2304 uses dynamic five-byte slots at 75% load without a Bloom
+filter. The bridge therefore compares complete candidate pipelines while
 factor-base size and index policy both vary. A claim about the factor-base
 effect alone needs a matched-index comparison on the same points and hosts.
 
