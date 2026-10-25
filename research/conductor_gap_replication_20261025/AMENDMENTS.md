@@ -52,3 +52,33 @@ For the primary equivalence test, interval containment, rather than a
 rank-test resolution formula, determines achieved precision. Eight classes
 may yield inconclusive intervals; no assertion of pre-established power
 or representative sampling of ordinary curves is made.
+
+## 2026-10-25, v3: calibrated execution guard
+
+Before any primary observation, the separate 128-row calibration completed
+with every answer verified and every deterministic replay identical. Its
+native resource totals are in `analysis/diagnostics-calibration.json` and
+its exact argv, durations and hashes in
+`cards/CARD-conductor-gap-calibration-20261025-1.receipt.json`.
+
+The session wall time is mostly per-child startup/observation overhead.
+For A, representative process totals per 16 observations were
+1.680/1.756 seconds for rho.negation, 1.717/1.808 for rho.plain and
+1.722/1.829 for BSGS, at 32/34 field bits respectively. The planned counts
+per size class are 17,408 negation, 2,048 plain and 1,472 BSGS observations.
+Multiplying those counts by the corresponding per-row rates estimates
+about 4,517 seconds for A. B's four-target per-arm process totals range
+0.417--0.585 seconds, estimating about 220 seconds for 1,664 observations.
+Session overhead is about 0.4 seconds per command (roughly 26 seconds
+across 64 sessions). Calibration replay was 0.65--1.08 seconds per 48 A
+rows and 0.76--0.82 seconds per 16 B rows, estimating about 850 seconds
+for complete replay. Fixed plus per-sample serial estimate: approximately
+5,613 seconds, or 94 minutes; these small calibration samples give only a
+rough feasibility estimate, not a runtime guarantee or a solver result.
+
+The v1 90-minute guard could truncate the preserved full design solely on
+instrument overhead. Set the shared main execution guard to 7,200 seconds
+(120 minutes), retaining the 8 GiB evidence guard, all workloads, seeds,
+watchdogs, inference thresholds and fail-closed conditions. The guard is
+not reset between controls, primary sessions, B, or replay. No paid resource
+is provisioned. All calibration observations stay excluded from inference.

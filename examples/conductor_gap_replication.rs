@@ -21,6 +21,7 @@ use std::{
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
 const ROOT: &str = "research/conductor_gap_replication_20261025";
+const EXECUTION_GUARD_SECONDS: u64 = 7200;
 type Key = (u64, u64, u64, u64, u64);
 fn u(v: &Value, k: &str) -> u64 {
     v[k].as_u64()
@@ -717,7 +718,7 @@ fn execute(out: &Path, audit: bool, selection: &str) {
     if !receipt.exists() {
         save(
             &receipt,
-            &json!({"unix_seconds":clock(),"guard_seconds":5400}),
+            &json!({"unix_seconds":clock(),"guard_seconds":EXECUTION_GUARD_SECONDS}),
         );
     }
     let first = u(&load(&receipt), "unix_seconds");
@@ -726,7 +727,10 @@ fn execute(out: &Path, audit: bool, selection: &str) {
         if (selection == "controls" && !control) || (selection == "primary" && control) {
             continue;
         }
-        assert!(clock() - first < 5400, "90-minute admission guard");
+        assert!(
+            clock() - first < EXECUTION_GUARD_SECONDS,
+            "120-minute admission guard"
+        );
         assert!(
             evidence_bytes(Path::new(ROOT)) < 8 * 1024 * 1024 * 1024,
             "8 GiB evidence guard"
@@ -767,7 +771,7 @@ fn execute(out: &Path, audit: bool, selection: &str) {
             "target/release/ecbench",
             &args,
             &log,
-            5400 - (clock() - first),
+            EXECUTION_GUARD_SECONDS - (clock() - first),
         );
         if !audit {
             for line in BufReader::new(File::open(session.join("records.jsonl")).unwrap()).lines() {

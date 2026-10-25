@@ -1,0 +1,425 @@
+{
+  "card_id": "CARD-conductor-gap-calibration-20261025-1",
+  "card_path": "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.yaml",
+  "card_sha256": "967c753b5d3e9a0283f1a3c399afb12ffaed47c65d3941ed109082449f6876af",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--spec",
+        "research/conductor_gap_replication_20261025/calibration/pilot-a-c2.json",
+        "--out",
+        "research/conductor_gap_replication_20261025/sessions/pilot-a-c2",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 5.582,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pilot-a-c2-run",
+      "index": 1,
+      "outputs": {
+        "research/conductor_gap_replication_20261025/sessions/pilot-a-c2/records.jsonl": "070770ba93416fc051073fe53a71b9f8731bd0f551f6e456e6509064826e38aa",
+        "research/conductor_gap_replication_20261025/sessions/pilot-a-c2/session.json": "d8e6508b6988bfdb65bf89348fc58e340c21cac65526f3f399665e655d128480"
+      },
+      "seconds": 5.582,
+      "stderr_sha256": "64f82068d3a756e2e74c54e46c51e3b9a4f3aedf8e54d7a6b5f1de102e08bcdc",
+      "stderr_tail": [
+        "session ECBS1hd307604b8c73 complete -> research/conductor_gap_replication_20261025/sessions/pilot-a-c2 (48 records: {\"verified\": 48})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/conductor_gap_replication_20261025/sessions/pilot-a-c2",
+        "--replay-all",
+        "--exit-code",
+        "--out",
+        "research/conductor_gap_replication_20261025/sessions/pilot-a-c2.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.653,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pilot-a-c2-verify",
+      "index": 2,
+      "outputs": {
+        "research/conductor_gap_replication_20261025/sessions/pilot-a-c2.audit.json": "dcdf5e24da0c3143727ecf97132e754ae9b0d8d9f16a1cbd99be506d6dca224e"
+      },
+      "seconds": 0.653,
+      "stderr_sha256": "093c0f13a51c2e5af5045f498b2f75c629723264b44e93671980e5fa6491016f",
+      "stderr_tail": [
+        "receipt sha256 dcdf5e24da0c3143727ecf97132e754ae9b0d8d9f16a1cbd99be506d6dca224e",
+        "audit OK: 48 records, 48 verified, 48 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "dcdf5e24da0c3143727ecf97132e754ae9b0d8d9f16a1cbd99be506d6dca224e",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 47,",
+        "      \"record_id\": \"ECR1hfba97f1cc073\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"9466b72508d5fee65210084c1f4110ab1cefa4370fdb9400840738ddf8988eb0\",",
+        "    \"plan.json\": \"199d5f5dfb70533dcd6acbd159a81fd8a0182908b7b83ef196fa14c85199adec\",",
+        "    \"records.jsonl\": \"070770ba93416fc051073fe53a71b9f8731bd0f551f6e456e6509064826e38aa\",",
+        "    \"session.json\": \"d8e6508b6988bfdb65bf89348fc58e340c21cac65526f3f399665e655d128480\",",
+        "    \"spec.json\": \"6843db11d9bac560005f76a9d6e88000f6c30443bf92df318b71d8b4b8bb5cda\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8f1d99783e7062cee608c18755bc2fd3e433e86e8dde812ba5cbf69a043d90eb\",",
+        "  \"auditor_env_class_id\": \"ECBENV2h36a488308f66\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h7373da65e433\",",
+        "  \"audited_unix_ms\": 1792907078441",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--spec",
+        "research/conductor_gap_replication_20261025/calibration/pilot-a-c5.json",
+        "--out",
+        "research/conductor_gap_replication_20261025/sessions/pilot-a-c5",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 5.84,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pilot-a-c5-run",
+      "index": 3,
+      "outputs": {
+        "research/conductor_gap_replication_20261025/sessions/pilot-a-c5/records.jsonl": "7b6b3dd214259b54a6f86a6726245f900e709c2771c9baeb8eb1166a63fe6d22",
+        "research/conductor_gap_replication_20261025/sessions/pilot-a-c5/session.json": "5f66dd0623caf9ef053f13ee2dc965d87a67433e8d9f1dcc70ca944391e1fada"
+      },
+      "seconds": 5.84,
+      "stderr_sha256": "13d117e1f40b9c41710550e7f4a022d07441473e77855325af41f818292fda1a",
+      "stderr_tail": [
+        "session ECBS1h471802fb4f6c complete -> research/conductor_gap_replication_20261025/sessions/pilot-a-c5 (48 records: {\"verified\": 48})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/conductor_gap_replication_20261025/sessions/pilot-a-c5",
+        "--replay-all",
+        "--exit-code",
+        "--out",
+        "research/conductor_gap_replication_20261025/sessions/pilot-a-c5.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.075,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pilot-a-c5-verify",
+      "index": 4,
+      "outputs": {
+        "research/conductor_gap_replication_20261025/sessions/pilot-a-c5.audit.json": "38f002c72077a81c15c53a18b726107a677182f24a274d3be2b44d94faae6755"
+      },
+      "seconds": 1.075,
+      "stderr_sha256": "3f5c2a7d303ef5344f064991a0d1b54f25c5202944bbc309825bc9f82bd8eef4",
+      "stderr_tail": [
+        "receipt sha256 38f002c72077a81c15c53a18b726107a677182f24a274d3be2b44d94faae6755",
+        "audit OK: 48 records, 48 verified, 48 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "38f002c72077a81c15c53a18b726107a677182f24a274d3be2b44d94faae6755",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 47,",
+        "      \"record_id\": \"ECR1ha800249b5807\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"0e380d91e75c220ccfe83a18f874162c1cd867a9722a822c72a41a6b064274ed\",",
+        "    \"plan.json\": \"413cd16424f9aa164fc7d147cc77ad2b5cb1feb025cc6452f38695088c286cc9\",",
+        "    \"records.jsonl\": \"7b6b3dd214259b54a6f86a6726245f900e709c2771c9baeb8eb1166a63fe6d22\",",
+        "    \"session.json\": \"5f66dd0623caf9ef053f13ee2dc965d87a67433e8d9f1dcc70ca944391e1fada\",",
+        "    \"spec.json\": \"11cf05557d1b040c273491bceb425826eac2d7ff08147490a4f8e16ce3974933\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8f1d99783e7062cee608c18755bc2fd3e433e86e8dde812ba5cbf69a043d90eb\",",
+        "  \"auditor_env_class_id\": \"ECBENV2h36a488308f66\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h7373da65e433\",",
+        "  \"audited_unix_ms\": 1792907085357",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--spec",
+        "research/conductor_gap_replication_20261025/calibration/pilot-b-c0.json",
+        "--out",
+        "research/conductor_gap_replication_20261025/sessions/pilot-b-c0",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.453,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pilot-b-c0-run",
+      "index": 5,
+      "outputs": {
+        "research/conductor_gap_replication_20261025/sessions/pilot-b-c0/records.jsonl": "4501b2c9768fa328bb11b7c2502930e294df8752ca39f48d70231c1b7e950811",
+        "research/conductor_gap_replication_20261025/sessions/pilot-b-c0/session.json": "5bb0e2792a132aece237507d84b54fd1ae9a6ba29ff22016a02054217e85212f"
+      },
+      "seconds": 2.453,
+      "stderr_sha256": "06aadc79a39d6957838c1fb7b26fa643e3cbf9d53c4b781c8670cde15cd61977",
+      "stderr_tail": [
+        "session ECBS1h68bbf035b472 complete -> research/conductor_gap_replication_20261025/sessions/pilot-b-c0 (16 records: {\"verified\": 16})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/conductor_gap_replication_20261025/sessions/pilot-b-c0",
+        "--replay-all",
+        "--exit-code",
+        "--out",
+        "research/conductor_gap_replication_20261025/sessions/pilot-b-c0.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.756,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pilot-b-c0-verify",
+      "index": 6,
+      "outputs": {
+        "research/conductor_gap_replication_20261025/sessions/pilot-b-c0.audit.json": "8766de266d30f13bf58f76b35cc52d3b4052e0956d44705a67f81fa81f199e6b"
+      },
+      "seconds": 0.756,
+      "stderr_sha256": "e5f92443f2fa1f0d34cbcdc172ef4a7ff05798e5144f7e38e43616f209a7d569",
+      "stderr_tail": [
+        "receipt sha256 8766de266d30f13bf58f76b35cc52d3b4052e0956d44705a67f81fa81f199e6b",
+        "audit OK: 16 records, 16 verified, 16 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "8766de266d30f13bf58f76b35cc52d3b4052e0956d44705a67f81fa81f199e6b",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 15,",
+        "      \"record_id\": \"ECR1haf498e241b62\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"61e31d52dfa51697be807caa662d2deb04bcad42c9502b62af7c574ff9ae36ec\",",
+        "    \"plan.json\": \"9fb3e388252288fd6b6157357564fbf2542d3a1d627c56e3b193607332de1e9d\",",
+        "    \"records.jsonl\": \"4501b2c9768fa328bb11b7c2502930e294df8752ca39f48d70231c1b7e950811\",",
+        "    \"session.json\": \"5bb0e2792a132aece237507d84b54fd1ae9a6ba29ff22016a02054217e85212f\",",
+        "    \"spec.json\": \"2c2674793c09f06e686f959ebe03cd48e984738892aa8bb1306a39e38057bb27\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8f1d99783e7062cee608c18755bc2fd3e433e86e8dde812ba5cbf69a043d90eb\",",
+        "  \"auditor_env_class_id\": \"ECBENV2h36a488308f66\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h7373da65e433\",",
+        "  \"audited_unix_ms\": 1792907088567",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--wait",
+        "--spec",
+        "research/conductor_gap_replication_20261025/calibration/pilot-b-c2.json",
+        "--out",
+        "research/conductor_gap_replication_20261025/sessions/pilot-b-c2",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--quiet"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 2.558,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pilot-b-c2-run",
+      "index": 7,
+      "outputs": {
+        "research/conductor_gap_replication_20261025/sessions/pilot-b-c2/records.jsonl": "b0da948d75336a9eba8f42121ac79ffb5aea2daad6b4fc88df041987227c2d92",
+        "research/conductor_gap_replication_20261025/sessions/pilot-b-c2/session.json": "8a675b5b7c7dae9cfc653e0253a0d09c9bc562fd660b7b2bc6dc185da09b50c6"
+      },
+      "seconds": 2.558,
+      "stderr_sha256": "3268c3bc9525bb2a34d589148c01942646a96af37552b3821b1bd6334ca6972b",
+      "stderr_tail": [
+        "session ECBS1hc8a4f288bb5b complete -> research/conductor_gap_replication_20261025/sessions/pilot-b-c2 (16 records: {\"verified\": 16})"
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/conductor_gap_replication_20261025/sessions/pilot-b-c2",
+        "--replay-all",
+        "--exit-code",
+        "--out",
+        "research/conductor_gap_replication_20261025/sessions/pilot-b-c2.audit.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.823,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "pilot-b-c2-verify",
+      "index": 8,
+      "outputs": {
+        "research/conductor_gap_replication_20261025/sessions/pilot-b-c2.audit.json": "1f8577a36a8f0180565d31d5465edefe001f53564cbe9ce63fa7e55aaca5a3e4"
+      },
+      "seconds": 0.823,
+      "stderr_sha256": "8312d905808f3becbc755ece2f6828aafcb03a7031a691e5033dfc87855da7b0",
+      "stderr_tail": [
+        "receipt sha256 1f8577a36a8f0180565d31d5465edefe001f53564cbe9ce63fa7e55aaca5a3e4",
+        "audit OK: 16 records, 16 verified, 16 replays reproduced, 0 problems"
+      ],
+      "stdout_sha256": "1f8577a36a8f0180565d31d5465edefe001f53564cbe9ce63fa7e55aaca5a3e4",
+      "stdout_tail": [
+        "    },",
+        "    {",
+        "      \"seq\": 15,",
+        "      \"record_id\": \"ECR1h035818d98e4e\",",
+        "      \"reproduced\": true,",
+        "      \"detail\": \"identical\"",
+        "    }",
+        "  ],",
+        "  \"files\": {",
+        "    \"host.json\": \"15ae33cb21e79fa0cfbc9f05da2e32c5465dadafcc989dc04ac29327121f4c15\",",
+        "    \"plan.json\": \"8ab3ef7dc7c5f8bbcb98b3ec514c1fa3701149345742a2c3f7fe844e93ec6fa0\",",
+        "    \"records.jsonl\": \"b0da948d75336a9eba8f42121ac79ffb5aea2daad6b4fc88df041987227c2d92\",",
+        "    \"session.json\": \"8a675b5b7c7dae9cfc653e0253a0d09c9bc562fd660b7b2bc6dc185da09b50c6\",",
+        "    \"spec.json\": \"637b16660ecfd7c1bb4e77c55ae90ebf3b486432f5ee40333908bc2715afb088\"",
+        "  },",
+        "  \"auditor_binary_sha256\": \"8f1d99783e7062cee608c18755bc2fd3e433e86e8dde812ba5cbf69a043d90eb\",",
+        "  \"auditor_env_class_id\": \"ECBENV2h36a488308f66\",",
+        "  \"auditor_hardware_class_id\": \"ECBHW1h7373da65e433\",",
+        "  \"audited_unix_ms\": 1792907091948",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 8,
+  "commit": "45def5ca7a5546113bc2fb47b44c43138323ac1d",
+  "dirty_after": [
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c2.run.stderr",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c2.run.stdout",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c2.verify.stderr",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c2.verify.stdout",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c5.run.stderr",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c5.run.stdout",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c5.verify.stderr",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-a-c5.verify.stdout",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c0.run.stderr",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c0.run.stdout",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c0.verify.stderr",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c0.verify.stdout",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c2.run.stderr",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c2.run.stdout",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c2.verify.stderr",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.pilot-b-c2.verify.stdout",
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.yaml"
+  ],
+  "dirty_before": [
+    "research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-calibration-20261025-1.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
