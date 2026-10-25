@@ -36,3 +36,17 @@ does not supply missing native field/word counters, physical calibration,
 isolation, or a runtime speedup. Do not promote any leaderboard or benchmark
 row. Produce a source-linked profile report, graph and inspected PDF; raw
 profile archives follow the artifact-store policy without modifying records.
+
+## Explicit post-outcome price-serialization amendment
+
+The original requirement above said phase/counter/GAE equality. The first
+native check found a one-ULP serialization difference in a rho phase:
+114.35576017615719 versus 114.3557601761572. The strict failed check is
+retained. Every integer phase counter and recovered scalar must still match
+exactly. Price fields use an explicitly reported 1e-12 relative tolerance,
+and each row retains whether its phase prices were bit-exact. This changes
+only the numerical comparison of serialized prices, not a workload, native
+counter, profile count or claim gate. No raw record is rewritten. All four
+rho rows have the serialization difference; the six IC rows are bit-exact.
+The native validator also independently multiplies each recorded generator
+by its recovered scalar and checks the recorded target coordinates.

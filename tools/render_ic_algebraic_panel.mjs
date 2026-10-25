@@ -15,6 +15,14 @@ assert.equal(data.status,'recomputed_from_raw');
 assert.equal(data.complete_dlp_cost,null);
 assert.equal(data.rho_ratio,null);
 const hash=createHash('sha256').update(raw).digest('hex');
+const zero=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/guess-zero-draw6-20261025/row.json')));
+const quartic=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/quartic-smoke-20261025-02.json')));
+assert.equal(zero.status,'refuted');
+assert.equal(zero.draw,6);
+assert.deepEqual(zero.guessed_variables,[]);
+assert.equal(quartic.verified_records,24);
+assert.equal(quartic.replays.length,24);
+assert.ok(quartic.replays.every(r=>r.reproduced));
 const fmt=n=>Number(n).toLocaleString('en-US',{maximumFractionDigits:8});
 const base='https://github.com/aburan28/crypto/blob/main/'+study;
 const begin='<!-- BEGIN IC ALGEBRAIC FOLLOWUP -->';
@@ -31,6 +39,8 @@ ${data.panels.map(p=>`<tr><td>${p.degree}</td><td>${fmt(p.complete_extractions)}
 <p>At n=31, ell=4, the recorded geometric product dimensions are 4/7/10, versus 4/10/20 for random bases. That representation advantage does not establish a full-query gain. In the completed symmetric queries, 8,100 algebraic roots yield four verified x-multisets; 8,096 fail splitting or signed lifting.</p>
 <p>The balanced ell=8 three-set [7,15,23] fails on all eight assignments of original draw 0: each saturates degree four without refuting, charging ${fmt(data.balanced_guess_draw0.total_word_ops)} solver word operations in total. This rejects that set on that draw, not a global minimum. Smaller capped attempts and other draws remain separate obligations.</p>
 <p>A separate finite curve-membership audit finds that original UNSAT draw 5 and SAT draw 4 do not lift on the recorded E0 curve. Draw 0 lifts; subgroup membership remains unknown. The Boolean results remain valid, with this qualification on their relevance to ordinary curve queries.</p>
+<p>The larger-cap continuation observes a zero-guess degree-four refutation on original draw 6: ${fmt(zero.columns)} columns and ${fmt(zero.closure_word_ops)} solver word operations. Independent solver/cost replay is outstanding, and the remaining balanced-branch campaign is active. Larger N=58/60/100 probes saturate without refuting at degrees two and three; all degree-four outcomes remain unknown after allocation or entry caps.</p>
+<p>The separate quartic smoke now has 24/24 verified records and 24/24 identical deterministic replays over base-field sizes 6/8/10/12. Its prices use deterministic count conventions; construction, physical conversion and the wider crossover ladder remain separate obligations.</p>
 <p>No new complete-price IC/rho ratio is admitted. Completed n13/n23 solver charges use pinned word rates; the earlier wall-pricing explanation was incorrect and has an explicit native accounting audit. Construction/split costs remain incomplete in both raw S and the native bands. The progress ratio chart, leaderboard, best-of and exponent figures retain their existing values. Larger closure/guess panels and the quartic crossover ladder remain open.</p>
 <p class="dash-footnote"><a href="${base}README.md">Requirement statuses and evidence</a> · <a href="${base}reports/local-structural-20261025/report.pdf">Inspected results PDF</a> · <a href="${base}report-data.json">Native recomputation</a>. Dataset SHA-256 <code>${hash}</code>. Raw rows and failed attempts are in the hash-checked evidence archive; no fastest-CAS, GPU or asymptotic claim.</p>
 </section>
