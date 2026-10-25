@@ -775,6 +775,26 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_natural_cli(
     )
 }
 
+/// Source-bound Linux access gate for the free-choice shared-root circuit.
+/// The worker requires an exact 8-GiB zero-swap cgroup before importing S3.
+pub(super) fn full_d18_m4_linux_shared_phase_first_cli(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        mode,
+        root,
+        fixture_root,
+        output,
+        false,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+    )
+}
+
 fn full_d18_m4_impl(
     mode: &str,
     root: &Path,
@@ -800,11 +820,9 @@ fn full_d18_m4_impl(
         return Err("root-choice pins require the L0 shared-root planted control".into());
     }
     if phase_zero_first
-        && (!l0_diagnostic
-            || encoding != FrobeniusOrbitRootEncoding::SharedBits
-            || choice_pins != "none")
+        && (encoding != FrobeniusOrbitRootEncoding::SharedBits || choice_pins != "none")
     {
-        return Err("phase-first policy requires the free-choice L0 shared-root mode".into());
+        return Err("phase-first policy requires the free-choice shared-root mode".into());
     }
     let root_choice_pinned = choice_pins == "selector_and_phase_zero";
     let search_policy = if phase_zero_first {
@@ -812,10 +830,18 @@ fn full_d18_m4_impl(
     } else {
         "default"
     };
+    let hard_memory_mib = if phase_zero_first { 8_192 } else { 32_768 };
+    let isolation = if l0_diagnostic {
+        "L0_shared_host_no_hard_cgroup"
+    } else if phase_zero_first {
+        "hard_8GiB_cgroup_zero_swap"
+    } else {
+        "hard_32GiB_cgroup_zero_swap"
+    };
     let memory_limit_bytes = if l0_diagnostic {
         None
     } else {
-        Some(checked_cgroup_memory_limit(32_768)?)
+        Some(checked_cgroup_memory_limit(hard_memory_mib)?)
     };
     let budget_seconds = if l0_diagnostic { 300 } else { 1_200 };
     let encoding_name = match encoding {
@@ -843,7 +869,7 @@ fn full_d18_m4_impl(
         let cap = json!({
             "schema":"n83.full-d18-m4-cap/v1", "status":"UNKNOWN_wall_cap",
             "mode":cap_mode, "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy, "budget_seconds":budget_seconds,
-            "isolation":if l0_diagnostic {"L0_shared_host_no_hard_cgroup"} else {"hard_32GiB_cgroup_zero_swap"},
+            "isolation":isolation,
             "elapsed_process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
             "selected_best_total_runtime":Value::Null,
         });
@@ -1087,7 +1113,7 @@ fn full_d18_m4_impl(
         "schema":if l0_diagnostic {if mode == "positive" {"n83.full-d18-m4-l0-positive/v1"} else {"n83.full-d18-m4-l0-natural/v1"}} else {"n83.full-d18-m4-worker/v1"}, "status":status,
         "mode":mode, "source_commit":source_commit,
         "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy,
-        "isolation":if l0_diagnostic {"L0_shared_host_no_hard_cgroup"} else {"hard_32GiB_cgroup_zero_swap"},
+        "isolation":isolation,
         "budget_seconds":budget_seconds,
         "source_attestation_mode":source_attestation_mode,
         "binary_sha256":binary_sha256,
