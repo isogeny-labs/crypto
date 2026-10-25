@@ -1,6 +1,11 @@
 name: taskq
 on:
   workflow_dispatch:
+    inputs:
+      ecdlp_access_probe:
+        description: Read-only ephemeral launcher check for the registered IC campaign
+        type: boolean
+        default: false
   pull_request:
     paths:
       - 'taskq/**'
@@ -15,6 +20,7 @@ concurrency:
 
 jobs:
   test:
+    if: github.event_name != 'workflow_dispatch' || !inputs.ecdlp_access_probe
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|taskq.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|taskq.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     permissions:
@@ -47,6 +53,7 @@ jobs:
       - name: Worker image builds
         run: docker build -f taskq/deploy/Dockerfile taskq
   terraform:
+    if: github.event_name != 'workflow_dispatch' || !inputs.ecdlp_access_probe
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|taskq.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|taskq.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 15
     permissions:
@@ -82,6 +89,7 @@ jobs:
           terraform validate
           terraform test
   ephemeral-cli:
+    if: github.event_name != 'workflow_dispatch' || !inputs.ecdlp_access_probe
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|taskq.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|taskq.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 20
     permissions:
@@ -103,3 +111,40 @@ jobs:
         run: cargo clippy --locked --all-targets -- -D warnings
       - name: Test
         run: cargo test --locked
+
+  ecdlp-access-probe:
+    if: github.event_name == 'workflow_dispatch' && inputs.ecdlp_access_probe && github.repository == 'aburan28/crypto'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: taskq/deploy/ephemeral
+      - name: Configure the repository's existing AWS integration
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+          mask-aws-account-id: true
+      - name: Read identity and deployed launcher configuration
+        env:
+          XDG_CACHE_HOME: ${{ runner.temp }}/ic-launcher-cache
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ic-access"
+          aws sts get-caller-identity > "$RUNNER_TEMP/ic-access/identity.json"
+          taskq/deploy/ephemeral/ephemeral config > "$RUNNER_TEMP/ic-access/launcher.json"
+          jq -n --arg source "$GITHUB_SHA" \
+            '{schema:"ic-cloud-access/v1",source:$source,status:"launcher_readable",paid_launch:false}' \
+            > "$RUNNER_TEMP/ic-access/receipt.json"
+          cat "$RUNNER_TEMP/ic-access/receipt.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ic-ephemeral-access-${{ github.run_id }}
+          path: ${{ runner.temp }}/ic-access
+          retention-days: 7

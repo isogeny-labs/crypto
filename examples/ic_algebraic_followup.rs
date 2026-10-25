@@ -804,9 +804,11 @@ fn verify_fixtures(args: &BTreeMap<String, String>) {
                 assignment |= (u as u128) << (m * bs.len() + i * n as usize);
             }
             let (wide_eqs, _) = wide::chain(&gf, &bs, xr, m);
-            assert!(wide_eqs
+            assert!(wide_eqs.iter().all(|p| p
                 .iter()
-                .all(|p| p.iter().filter(|&&m| assignment & m == m).count() % 2 == 0));
+                .filter(|&&m| assignment & m == m)
+                .count()
+                .is_multiple_of(2)));
             row["witness_assignment_hex"] = json!(format!("{assignment:x}"));
             row["witness_checked"] = json!(true);
             if let Some(sys) = sys {
