@@ -597,10 +597,38 @@ pub(super) fn full_d18_m4_cli(
     fixture_root: &Path,
     output: &Path,
 ) -> Result<Value> {
+    full_d18_m4_impl(mode, root, fixture_root, output, false)
+}
+
+/// Local, positive-control-only SAT diagnostic. This shares the frozen model
+/// and verifier, but makes no hard-cgroup or capacity-worker claim.
+pub(super) fn full_d18_m4_l0_positive_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl("positive", root, fixture_root, output, true)
+}
+
+fn full_d18_m4_impl(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+    l0_diagnostic: bool,
+) -> Result<Value> {
     if !["positive", "natural"].contains(&mode) || output.exists() {
         return Err("full D18 m4 mode or fresh output differs from protocol".into());
     }
-    let memory_limit_bytes = checked_cgroup_memory_limit(32_768)?;
+    if l0_diagnostic && mode != "positive" {
+        return Err("L0 diagnostic permits only the constructed positive control".into());
+    }
+    let memory_limit_bytes = if l0_diagnostic {
+        None
+    } else {
+        Some(checked_cgroup_memory_limit(32_768)?)
+    };
+    let budget_seconds = if l0_diagnostic { 300 } else { 1_200 };
     let (source_commit, source_attestation_mode) = frozen_chain_source()?;
     let binary_sha256 = sha256_hex(&fs::read(std::env::current_exe()?)?);
     let started = Instant::now();
@@ -618,10 +646,11 @@ pub(super) fn full_d18_m4_cli(
     let cap_path = std::path::PathBuf::from(format!("{}.cap.json", output.display()));
     let cap_mode = mode.to_owned();
     std::thread::spawn(move || {
-        std::thread::sleep(Duration::from_secs(1_200));
+        std::thread::sleep(Duration::from_secs(budget_seconds));
         let cap = json!({
             "schema":"n83.full-d18-m4-cap/v1", "status":"UNKNOWN_wall_cap",
-            "mode":cap_mode, "budget_seconds":1_200,
+            "mode":cap_mode, "budget_seconds":budget_seconds,
+            "isolation":if l0_diagnostic {"L0_shared_host_no_hard_cgroup"} else {"hard_32GiB_cgroup_zero_swap"},
             "elapsed_process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
             "selected_best_total_runtime":Value::Null,
         });
@@ -736,7 +765,7 @@ pub(super) fn full_d18_m4_cli(
     write_new_json(&shape_path, &shape)?;
     full_d18_phase(&mut phases, started, "model_constructed", shape.clone())?;
     enc.solver.conflict_budget = 100_000;
-    enc.solver.deadline = Some(started + Duration::from_secs(1_200));
+    enc.solver.deadline = Some(started + Duration::from_secs(budget_seconds));
     let search_start = Instant::now();
     let answer = enc.solver.solve();
     let search_ms = search_start.elapsed().as_secs_f64() * 1000.0;
@@ -791,12 +820,20 @@ pub(super) fn full_d18_m4_cli(
             }
         }
     };
-    let peak_bytes: u64 = fs::read_to_string("/sys/fs/cgroup/memory.peak")?
-        .trim()
-        .parse()?;
+    let peak_bytes: Option<u64> = if l0_diagnostic {
+        None
+    } else {
+        Some(
+            fs::read_to_string("/sys/fs/cgroup/memory.peak")?
+                .trim()
+                .parse()?,
+        )
+    };
     let result = json!({
-        "schema":"n83.full-d18-m4-worker/v1", "status":status,
+        "schema":if l0_diagnostic {"n83.full-d18-m4-l0-positive/v1"} else {"n83.full-d18-m4-worker/v1"}, "status":status,
         "mode":mode, "source_commit":source_commit,
+        "isolation":if l0_diagnostic {"L0_shared_host_no_hard_cgroup"} else {"hard_32GiB_cgroup_zero_swap"},
+        "budget_seconds":budget_seconds,
         "source_attestation_mode":source_attestation_mode,
         "binary_sha256":binary_sha256,
         "phase_file":phase_path.to_string_lossy(),
