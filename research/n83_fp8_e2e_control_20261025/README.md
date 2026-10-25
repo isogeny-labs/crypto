@@ -65,7 +65,10 @@ lists each candidate, workload, and run ID.
 
 The geometric-mean baseline/fingerprint ratios are 1.677 for full-process
 time, 1.558 for index build, and 2.157 for one-target online time. These are
-descriptive local shared-host ratios. The baseline process time fell 15.3%
+descriptive local shared-host ratios. The two adjacent-pair ratios span
+1.498–1.877 for full process, 1.551–1.566 for index build, and
+1.729–2.691 for one-target online time; two pairs do not support a narrow
+confidence interval. The baseline process time fell 15.3%
 between bookends, and its one-target interval fell 34.9%. The latter drift
 prevents a stable online timing aggregate under the Tier 1 gate. The raw
 target records preserve the exclusive query, PDP, relation-check, descent,
