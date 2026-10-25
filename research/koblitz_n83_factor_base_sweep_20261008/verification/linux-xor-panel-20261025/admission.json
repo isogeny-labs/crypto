@@ -1,0 +1,59 @@
+{
+  "schema": "n83.linux-xor-panel-admission/v1",
+  "source_commit": "86be9dd831ada5aa7d354310a0f771fa6e5d0e03",
+  "curve": "icv1-f2m83-tm6151469093347-debefd74",
+  "status": "PROVIDER_ACCOUNT_BLOCKED",
+  "selected_best_total_runtime": null,
+  "coordination": {
+    "task": "T-5132",
+    "scope": "dir:research/koblitz_n83_factor_base_sweep_20261008/verification/linux-xor-panel-20261025",
+    "check_outcome": "allow"
+  },
+  "s3": {
+    "bucket": "crypto-autoresearcher",
+    "prefix": "factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/",
+    "input_put_condition": "If-None-Match: *",
+    "server_side_encryption": "AES256",
+    "downloaded_byte_replay": "PASS",
+    "inputs": {
+      "hash_5_1": {
+        "bytes": 13156532,
+        "sha256": "2c6dba1feabb28bc6b064268a1f53ebe3b0ecd8aa731d26b31016830ce431022",
+        "s3_checksum_sha256_base64": "LG26H+q7KLxrBkJoofU+vjsOzYqnMdJrMQFoMM5DECI="
+      },
+      "gray_5_1": {
+        "bytes": 12396243,
+        "sha256": "220eaeb04a43ee8c853b637d6255420e2e341c6bb3e5f3588ca1295529b327e9",
+        "s3_checksum_sha256_base64": "Ig6usEpD7oyFO2N9YlVCDi40HGuz5fNYjKEpVSmzJ+k="
+      },
+      "hash_4_2": {
+        "bytes": 13156822,
+        "sha256": "9d8392af80cb17e4da99d616933d43feb718cbe897a4cfffbbe5eedbaccfbe69",
+        "s3_checksum_sha256_base64": "nYOSr4DLF+TamdYWkz1D/rcYy+iXpM//u+Xu26zPvmk="
+      },
+      "gray_4_2": {
+        "bytes": 11636244,
+        "sha256": "a39dc89ea7c8c8ea0c6f54cd5900707537cbdc1307b90fc457bc8b50a3ae0bce",
+        "s3_checksum_sha256_base64": "o53InqfIyOoMb1TNWQBwdTfL3BMHuQ/EV7yLUKOuC84="
+      }
+    }
+  },
+  "aws": {
+    "account": "590183823895",
+    "region": "us-west-2",
+    "instance_type": "c7i.2xlarge",
+    "image_id": "ami-08cf17e3856f70154",
+    "image_name": "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-20261023",
+    "instance_profile": "n83-xor-panel-20261025",
+    "metadata_tokens": "required",
+    "shutdown_minutes": 90,
+    "instance_initiated_shutdown_behavior": "terminate",
+    "encrypted_root_gib": 30,
+    "dry_run_response": "DryRunOperation",
+    "launch_response_code": "Blocked",
+    "launch_response_text": "This account is currently blocked and not recognized as a valid account.",
+    "allocated_instance_ids": []
+  },
+  "solver_runs": [],
+  "result_scope": "S3 input custody and provider admission only"
+}
