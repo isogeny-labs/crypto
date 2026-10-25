@@ -13,6 +13,8 @@ from research.n83_crossfamily_current_20261025 import verify as replay
 
 
 HEAD = 'a' * 40
+ARCHIVE = 'b' * 64
+MANIFEST = 'c' * 64
 
 
 class RunPodProviderTests(unittest.TestCase):
@@ -36,7 +38,9 @@ class RunPodProviderTests(unittest.TestCase):
             path = Path(temp) / 'allocation.json'
             path.write_text('{}')
             receipt = dict(pod_id='pod0', machine_id='machine0',
-                           image_name='ubuntu:24.04', _path=path)
+                           image_name='ubuntu:24.04', _path=path,
+                           source_archive_sha256=ARCHIVE,
+                           source_manifest_sha256=MANIFEST)
             parent = runpod_runner.runner.parent
             original_host = parent.host_receipt
             original_write = parent.write_json
@@ -65,6 +69,8 @@ class RunPodProviderTests(unittest.TestCase):
                          image_name='ubuntu:24.04') for i in range(2)]
             snapshot = dict(schema='n83.crossfamily-current-runpod-snapshot/v1',
                             source_head_sha=HEAD,
+                            source_archive_sha256=ARCHIVE,
+                            source_manifest_sha256=MANIFEST,
                             recorded_utc='2026-10-18T22:00:00Z', pods=pods)
             snapshot_path.write_text(json.dumps(snapshot))
             adapter_hash = runpod_provider.digest(
@@ -75,11 +81,15 @@ class RunPodProviderTests(unittest.TestCase):
                 folder.mkdir()
                 allocation = dict(schema='n83.crossfamily-current-runpod-allocation/v1',
                                   source_head_sha=HEAD,
+                                  source_archive_sha256=ARCHIVE,
+                                  source_manifest_sha256=MANIFEST,
                                   snapshot_sha256=runpod_provider.digest(snapshot_path),
                                   **pod)
                 path = folder / 'runpod_allocation.json'
                 path.write_text(json.dumps(allocation))
                 host = dict(provider='runpod', git_sha=HEAD,
+                            source_archive_sha256=ARCHIVE,
+                            source_manifest_sha256=MANIFEST,
                             runpod_pod_id=pod['pod_id'],
                             runpod_machine_id=pod['machine_id'],
                             runpod_allocation_sha256=runpod_provider.digest(path),
@@ -91,6 +101,8 @@ class RunPodProviderTests(unittest.TestCase):
                             recorded_utc=f'2026-10-18T22:0{i}:00Z')
                 (folder / 'host.json').write_text(json.dumps(host))
                 source = dict(
+                    source_archive_sha256=ARCHIVE,
+                    source_manifest_sha256=MANIFEST,
                     runpod_allocation_sha256=runpod_provider.digest(path),
                     runpod_adapter_sha256=adapter_hash)
                 (folder / 'source.json').write_text(json.dumps(source))

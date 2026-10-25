@@ -45,6 +45,14 @@ def provider_receipt(output, host, source, stratum):
             'n83.crossfamily-current-runpod-allocation/v1' or
             allocation.get('stratum') != stratum or
             allocation.get('source_head_sha') != host.get('git_sha') or
+            allocation.get('source_archive_sha256') !=
+            host.get('source_archive_sha256') or
+            allocation.get('source_archive_sha256') !=
+            source.get('source_archive_sha256') or
+            allocation.get('source_manifest_sha256') !=
+            host.get('source_manifest_sha256') or
+            allocation.get('source_manifest_sha256') !=
+            source.get('source_manifest_sha256') or
             allocation.get('desired_status') != 'RUNNING' or
             not isinstance(allocation.get('cost_per_hr'), (int, float)) or
             allocation['cost_per_hr'] <= 0 or

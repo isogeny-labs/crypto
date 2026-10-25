@@ -89,6 +89,7 @@ def aggregate(strata, snapshot, head_sha):
             'calibration_comparison', 'calibration_target_sha256',
             'calibration_answer_sha256', 'global_producer_cap_seconds',
             'ic_cap_seconds', 'layout_receipt_sha256',
+            'source_archive_sha256', 'source_manifest_sha256',
             'runpod_adapter_sha256')
     same_source = all(item['source'][key] == first['source'][key]
                       for item in strata for key in keys)

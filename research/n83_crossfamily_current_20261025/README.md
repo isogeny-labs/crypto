@@ -38,14 +38,38 @@ The panel has not yet dispatched or selected a winner.
 `run.py` freezes the event schedule, per-child caps and exact IC flags.
 `verify.py` independently replays base construction, relations, scalar
 answers, phase timing, child resources, Tier 1 telemetry and calibration.
-`runpod_runner.py` binds each stratum to a Pod allocation and exact checkout;
+`source_bundle.py` packages the exact committed source and retained inputs into
+a content-hashed archive; the Pod checks every extracted file against that
+archive. `runpod_runner.py` binds each stratum to its archive and Pod allocation;
 `runpod_provider.py` requires two distinct machines with overlapping run
 intervals. `aggregate_runpod.py` binds the raw archives to local replay and
 applies `select.py`. The selector tests all 16 paired point differences,
 uses an exact sign-flip test with a 0.05/6 pairwise threshold, and leaves the
 online and cold selections unknown if any required row or host gate fails.
-The allocated Pods, binary hashes and source head must be frozen in provider
+The allocated Pods, binary hashes, source head and archive hashes must be frozen in provider
 receipts before running; no such allocation has been made for this panel.
+`allocate_runpod.py` checks the clean exact-source checkout, sealed inputs,
+the full historical exclusion inventory, and four manifests before any
+provider mutation. It requires a verified source bundle before `--execute`.
+The Pod runner checks sealed file hashes, canonical
+single-target workload IDs, subgroup membership, and all 16 scalar replays
+without needing the repository's historical Git objects. Its two 27 GiB, four-vCPU
+minimum allocations each require an observed rate at most $0.30/hour and a
+provider `terminateAfter` deadline of 330 minutes. The two-rate reservation
+estimate is at most $3.30, below its $5 campaign cap. It reads a configured
+RunPod key from the process environment or `~/.runpod/config.toml`, never
+copies it into the receipts, verifies provider readback and distinct machine
+IDs, and attempts to terminate every discovered Pod if allocation fails.
+The $3.30 figure bounds the observed `costPerHr` field for both Pods over the
+330-minute window; any separately billed storage remains outside that field
+and must fit the remaining $1.70 allowance.
+The allocation output belongs outside the repository. Raw result transfer
+and termination receipts still need to be completed before aggregate replay.
+`launch_on_pod.sh` installs the pinned Rust toolchain, tests and builds the
+two exact producers, runs one stratum with four exposed CPU IDs, verifies the
+raw receipts, and archives them even when a stage fails. The caller must
+transfer the archive and allocation receipt, invoke the launcher, retrieve
+the raw archive and logs, and terminate both Pods before their deadline.
 
 Replay the sealed preparation in a full checkout with Python `blake3==1.0.8`
 installed and the archived K3596 dump available:
@@ -62,4 +86,10 @@ python3 -m research.n83_crossfamily_current_20261025.run --preflight --stratum 0
 python3 -m research.n83_crossfamily_current_20261025.run --preflight --stratum 1
 python3 -m research.n83_crossfamily_current_20261025.test_select
 python3 -m research.n83_crossfamily_current_20261025.test_runpod_provider
+python3 -m research.n83_crossfamily_current_20261025.test_allocate_runpod
+python3 -m research.n83_crossfamily_current_20261025.source_bundle \
+  --build /absolute/path/outside/repository/n83-source-bundle
+python3 -m research.n83_crossfamily_current_20261025.allocate_runpod \
+  --source-bundle /absolute/path/outside/repository/n83-source-bundle \
+  --output /absolute/path/outside/repository/n83-allocation
 ```

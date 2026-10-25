@@ -6,7 +6,6 @@ import json
 import os
 import platform
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
@@ -18,6 +17,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from research.n83_crossfamily_current_20261025 import run as runner
+from research.n83_crossfamily_current_20261025 import source_bundle
 
 
 def read_provider(path, expected_stratum):
@@ -28,6 +28,10 @@ def read_provider(path, expected_stratum):
             not receipt['pod_id'].isalnum() or
             not isinstance(receipt.get('machine_id'), str) or
             not receipt['machine_id'] or
+            not isinstance(receipt.get('source_archive_sha256'), str) or
+            len(receipt['source_archive_sha256']) != 64 or
+            not isinstance(receipt.get('source_manifest_sha256'), str) or
+            len(receipt['source_manifest_sha256']) != 64 or
             receipt.get('desired_status') != 'RUNNING' or
             not isinstance(receipt.get('cost_per_hr'), (int, float)) or
             receipt['cost_per_hr'] <= 0):
@@ -47,6 +51,8 @@ def bind_provider(receipt, head_sha):
             'instance_id': f"rp-{receipt['pod_id']}-{receipt['machine_id']}",
             'run_url': f"https://www.runpod.io/console/pods/{receipt['pod_id']}",
             'git_sha': head_sha,
+            'source_archive_sha256': receipt['source_archive_sha256'],
+            'source_manifest_sha256': receipt['source_manifest_sha256'],
             'runner_name': receipt['pod_id'],
             'runner_os': platform.system(),
             'runner_arch': platform.machine(),
@@ -61,6 +67,8 @@ def bind_provider(receipt, head_sha):
     def write_json(path, value):
         if Path(path).name == 'source.json':
             value = {**value, 'runpod_adapter_sha256': adapter_sha256,
+                     'source_archive_sha256': receipt['source_archive_sha256'],
+                     'source_manifest_sha256': receipt['source_manifest_sha256'],
                      'runpod_allocation_sha256':
                      runner.parent.digest(receipt['_path'])}
         return original_write_json(path, value)
@@ -76,16 +84,23 @@ def main():
     parser.add_argument('--rho-binary', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--provider-receipt', type=Path, required=True)
+    parser.add_argument('--source-bundle', type=Path, required=True)
     args = parser.parse_args()
     receipt_path = args.provider_receipt.resolve()
     receipt = read_provider(receipt_path, args.stratum)
     receipt['_path'] = receipt_path
     if os.environ.get('RUNPOD_POD_ID') not in (None, receipt['pod_id']):
         raise ValueError('Pod environment differs from allocation receipt')
-    head_sha = subprocess.check_output(
-        ['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    bundle_path = args.source_bundle.resolve()
+    bundle = source_bundle.verify(bundle_path / 'source.tar.gz',
+                                  bundle_path / 'manifest.json', ROOT)
+    head_sha = bundle['source_head_sha']
     if head_sha != receipt.get('source_head_sha'):
-        raise ValueError('Pod checkout differs from frozen allocation source')
+        raise ValueError('Pod source differs from frozen allocation head')
+    if (bundle['source_archive_sha256'] != receipt['source_archive_sha256'] or
+            source_bundle.digest(bundle_path / 'manifest.json') !=
+            receipt['source_manifest_sha256']):
+        raise ValueError('Pod source bundle differs from allocation')
     runner.fixture()
     runner.choose()
     bind_provider(receipt, head_sha)

@@ -2,6 +2,7 @@
 """Run one eight-point N83 current-source high-K Tier 1 stratum."""
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import os
@@ -74,16 +75,20 @@ def ic_environment(folder, layout, name):
 
 def fixture():
     hashes = finegrid.frozen_inputs()
-    expected, regenerated = generator.produce()
     manifest = json.loads((HERE / 'fixture_manifest.json').read_text())
-    for name, blob in expected.items():
-        if (HERE / name).read_bytes() != blob:
+    artifacts = ('targets.jsonl', 'answers.jsonl', 'workloads.jsonl',
+                 'exclusion_audit.json')
+    if set(manifest.get('artifacts_sha256', {})) != set(artifacts):
+        raise ValueError('sealed cross-family artifact list differs')
+    for name in artifacts:
+        if parent.digest(HERE / name) != manifest['artifacts_sha256'][name]:
             raise ValueError(f'sealed cross-family fixture differs: {name}')
-    if regenerated != manifest:
-        raise ValueError('cross-family manifest replay differs')
     lines = (HERE / 'targets.jsonl').read_text().splitlines(keepends=True)
     answers = [json.loads(line) for line in
                (HERE / 'answers.jsonl').read_text().splitlines()]
+    workloads = [json.loads(line) for line in
+                 (HERE / 'workloads.jsonl').read_text().splitlines()]
+    audit = json.loads((HERE / 'exclusion_audit.json').read_text())
     points = [generator.group.point_from_json(json.loads(line)) for line in lines]
     if (parent.digest(HERE / 'targets.jsonl') != TARGETS_SHA256 or
             parent.digest(HERE / 'answers.jsonl') != ANSWERS_SHA256 or
@@ -91,17 +96,39 @@ def fixture():
             manifest['artifacts_sha256']['targets.jsonl'] != TARGETS_SHA256 or
             manifest['artifacts_sha256']['answers.jsonl'] != ANSWERS_SHA256 or
             manifest['point_count'] != 16 or
+            manifest['domain'] != generator.DOMAIN.decode() or
+            manifest['curve_id'] != generator.CURVE_ID or
+            manifest['subgroup_order'] != generator.group.R or
             manifest['generator_sha256'] != parent.digest(HERE / 'generate_fixture.py') or
-            len(lines) != 16 or len(answers) != 16 or
+            manifest['workload_ids'] != [w.get('workload_id') for w in workloads] or
+            audit.get('status') != 'PASS_ZERO_OVERLAP' or
+            audit.get('overlap_count') != 0 or
+            audit.get('duplicate_count') != 0 or
+            len(lines) != 16 or len(answers) != 16 or len(workloads) != 16 or
             len(set(points)) != 16 or any(not line.endswith('\n') for line in lines)):
         raise ValueError('sealed cross-family fixture differs')
-    for index, (point, answer) in enumerate(zip(points, answers)):
+    for index, (point, answer, workload, line) in enumerate(
+            zip(points, answers, workloads, lines)):
         seed = generator.hashlib.sha256(
             generator.DOMAIN + index.to_bytes(4, 'little')).digest()
         scalar = 1 + int.from_bytes(seed, 'little') % (generator.group.R - 1)
+        canonical = {key: value for key, value in workload.items()
+                     if key != 'workload_id'}
+        workload_id = hashlib.sha256(generator.canonical(canonical)).hexdigest()[:12]
         if (answer['fixture_index'] != index or
                 answer['seed_sha256'] != seed.hex() or
                 int(answer['scalar']) != scalar or
+                workload.get('workload_id') != workload_id or
+                workload.get('point_index') != index or
+                workload.get('kind') != 'primary_single_target' or
+                workload.get('target_count') != 1 or
+                workload.get('target_point') != json.loads(line) or
+                workload.get('target_stream_sha256') != hashlib.sha256(line.encode()).hexdigest() or
+                workload.get('target_generation_seed_sha256') != seed.hex() or
+                workload.get('target_domain') != generator.DOMAIN.decode() or
+                workload.get('curve_id') != generator.CURVE_ID or
+                not generator.group.on_curve(point) or
+                generator.group.multiply(point, generator.group.R) is not None or
                 generator.group.multiply(generator.group.G, scalar) != point):
             raise ValueError(f'fixture point {index} differs')
     return hashes, lines

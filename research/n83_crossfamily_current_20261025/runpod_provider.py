@@ -47,6 +47,10 @@ def verify(snapshot_path, strata, head_sha):
         pod = pods[number]
         if (allocation.get('schema') != 'n83.crossfamily-current-runpod-allocation/v1' or
                 allocation.get('stratum') != number or
+                allocation.get('source_archive_sha256') !=
+                snapshot.get('source_archive_sha256') or
+                allocation.get('source_manifest_sha256') !=
+                snapshot.get('source_manifest_sha256') or
                 any(allocation.get(key) != pod.get(key) for key in
                     ('pod_id', 'machine_id', 'desired_status', 'cost_per_hr',
                      'image_name')) or
@@ -54,6 +58,14 @@ def verify(snapshot_path, strata, head_sha):
                 allocation.get('snapshot_sha256') != digest(snapshot_path) or
                 host.get('provider') != 'runpod' or
                 host.get('git_sha') != head_sha or
+                host.get('source_archive_sha256') !=
+                allocation.get('source_archive_sha256') or
+                source.get('source_archive_sha256') !=
+                allocation.get('source_archive_sha256') or
+                host.get('source_manifest_sha256') !=
+                allocation.get('source_manifest_sha256') or
+                source.get('source_manifest_sha256') !=
+                allocation.get('source_manifest_sha256') or
                 host.get('runpod_pod_id') != pod['pod_id'] or
                 host.get('runpod_machine_id') != pod['machine_id'] or
                 host.get('runpod_allocation_sha256') != digest(allocation_path) or
