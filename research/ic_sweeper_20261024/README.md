@@ -510,6 +510,22 @@ store not kept) is not cited.
    `unclassified` track, at the owner's request: searched and reported, never
    counted, never ranked against the other tracks until the owner rules.
 
+**Second study: five rungs, one counting scope**
+([`reports/run-20261025T0545Z-koblitz-algebraic/`](reports/run-20261025T0545Z-koblitz-algebraic/report.md)).
+`koblitz-algebraic` on K_0, rungs 13/15/19/23/31, 18 trials: all five baselines
+scored (n = 31 included), so the objective is a projection from five rungs.
+2 complete, 11 pruned, 5 failed (4 recovered no logarithm within the counted-trial
+cap, 1 reached the 900 s limit). **No configuration beat the baseline at any
+rung**: the two completed trials (both `koblitz-closure`, `m = 2`, dimension
+about 0.35 · n) sit at log2 ratios +1.5 to +5.6, projected +16.9 and +20.8.
+
+**Third run, on the unclassified track**
+([`reports/run-20261025T0541Z-prime-rootfind/`](reports/run-20261025T0541Z-prime-rootfind/report.md)).
+`prime-rootfind`, generic prime, rungs 14/16/18/20 bits (22 has no instance), 24
+trials: 10 complete, 14 pruned. The best trials (`m = 3`, `prime-abscissa`,
+random targets) are below their baseline at every rung, by about 4× to 13× in the
+worst-case band ratio, flattening between 18 and 20 bits. Not counted, no claim.
+
 **Not done:** widening the framework past n = 63 and `m ≥ 4` (plan P5, P6); the
 published-IC reference arm (P4b); prime and random-binary curve generation
 (P7); the §5a band for rho itself (the record's rho gap is a `w = 0` lower
