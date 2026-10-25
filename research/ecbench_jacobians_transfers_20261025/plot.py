@@ -25,7 +25,7 @@ FAMILIES = [
 
 def table(name):
     rows = []
-    for line in (HERE / "out" / f"table-{name}.md").read_text().splitlines():
+    for line in (HERE / "out" / f"table-{name}.txt").read_text().splitlines():
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
         if len(cells) < 9 or cells[0] in ("session", "---") or cells[0].startswith("-"):
             continue

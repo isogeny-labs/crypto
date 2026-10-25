@@ -67,4 +67,4 @@ Wall-time comparisons are descriptive only (L1/L2).
 
 == Raw records
 
-`sessions/<family>/records.jsonl`, `sessions/<family>.verify.txt`, `sessions/<family>/comparisons/*.json`, `out/table-<family>.md`, `out/band-<family>.{txt,json}`, `out/compare.txt`. Graph source: `plot.py` (it reads the table and comparison files only).
+`sessions/<family>/records.jsonl`, `sessions/<family>.verify.txt`, `sessions/<family>/comparisons/*.json`, `out/table-<family>.txt`, `out/band-<family>.{txt,json}`, `out/compare.txt`. Graph source: `plot.py` (it reads the table and comparison files only).
