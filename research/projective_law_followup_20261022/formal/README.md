@@ -26,6 +26,16 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   The packet includes a [certificate](cross-scale22.json),
   [CSV](cross-scale22.csv), [graph](cross-scale22.svg), and
   [PDF](CROSS_SCALE22.pdf); it does not prove the returned Jacobian class.
+- The [common residual packet](COMMON22_RESIDUAL.md) proves the exact cleared
+  ordinate congruence in Lean and checks five source-to-theorem output
+  obligations. Its [certificate](common22-residual.json),
+  [summary CSV](common22-residual-summary.csv), [graph](common22-residual.svg),
+  accompany a [PDF](COMMON22_RESIDUAL.pdf) and term-level CSV in the artifact
+  store. Pull both from the repository root with:
+
+  ```sh
+  python3 tools/artifacts/artifacts.py pull research/projective_law_followup_20261022/formal
+  ```
 - `branch-coverage.json` gives the standardized runtime-label, Lean
   constructor, certificate-schema mapping and lists the five rejected or
   exceptional labels separately.
@@ -84,7 +94,7 @@ does not expose that variable.
 those accepted Lean/Mathlib foundations.  The mapping theorem and the explicit
 bridge implication use no axioms.
 
-`verify.py` also runs both source-derived checkers in read-only mode; a stale
+`verify.py` also runs all three source-derived checkers in read-only mode; a stale
 or altered certificate fails verification. It requires exactly four distinct Rust functions and their exact Lean
 declaration sets, parses declarations after removing nested comments and
 strings, and cross-checks the status count, schema, binding kind, and audited

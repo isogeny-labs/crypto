@@ -89,9 +89,12 @@ def evaluate(
     if not rust and isinstance(node, ast.BinOp):
         left = evaluate(node.left, environment, rust=False, variables=variables, rename=rename)
         if isinstance(node.op, ast.Pow):
-            if not isinstance(node.right, ast.Constant) or type(node.right.value) is not int or node.right.value != 2:
-                fail("only square powers are supported")
-            return mul(left, left)
+            if not isinstance(node.right, ast.Constant) or type(node.right.value) is not int or not 0 <= node.right.value <= 5:
+                fail("only nonnegative powers through five are supported")
+            result = {(): 1}
+            for _ in range(node.right.value):
+                result = mul(result, left)
+            return result
         right = evaluate(node.right, environment, rust=False, variables=variables, rename=rename)
         if isinstance(node.op, ast.Add):
             return add(left, right)

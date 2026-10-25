@@ -381,6 +381,37 @@ def main() -> None:
                 f"missing cross-scale artifact: {artifact}")
     require((ROOT / "CROSS_SCALE22.pdf").read_bytes().startswith(b"%PDF-"),
             "invalid cross-scale PDF")
+    subprocess.run(
+        [sys.executable, str(ROOT / "check_common22_residual.py"), "--check"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    residual_source = (ROOT / "Common22Residual.lean").read_text()
+    require(
+        re.search(r"(?m)^theorem returned_v_cleared\b", residual_source) is not None,
+        "common residual theorem missing",
+    )
+    require(forbidden_proof_token.search(residual_source) is None,
+            "forbidden common residual proof token")
+    residual_log = (ROOT / "common22-residual-build.log").read_text()
+    require(
+        "'Common22Residual.returned_v_cleared' depends on axioms: [propext, Quot.sound]"
+        in residual_log,
+        "common residual kernel/axiom receipt missing",
+    )
+    residual_cert = json.loads((ROOT / "common22-residual.json").read_text())
+    require(residual_cert["schema"] == "projective-law-common22-residual/v1",
+            "common residual schema mismatch")
+    require(len(residual_cert["rows"]) == 5 and
+            all(row["equal"] is True for row in residual_cert["rows"]),
+            "common residual obligation mismatch")
+    for artifact in ("COMMON22_RESIDUAL.md", "COMMON22_RESIDUAL.pdf",
+                     "common22-residual-summary.csv", "common22-residual.svg"):
+        require((ROOT / artifact).is_file() and (ROOT / artifact).stat().st_size > 0,
+                f"missing common residual artifact: {artifact}")
+    require((ROOT / "COMMON22_RESIDUAL.pdf").read_bytes().startswith(b"%PDF-"),
+            "invalid common residual PDF")
 
     for name, source in lean_sources.items():
         require(forbidden_proof_token.search(source) is None, f"forbidden proof token in {name}")
