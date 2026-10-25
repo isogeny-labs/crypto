@@ -1,0 +1,24 @@
+{
+  "schema": "n83.known-witness-external-gauss-panel/v1",
+  "status": "FROZEN_BEFORE_100K_CALLS",
+  "scope": "known_answer_solver_stage_diagnostic",
+  "xcnf_sha256": "c2cc36eee7a72dbc583a217a0d42d02c74d5d3fde241536941b6614fc565b81e",
+  "runner_source_sha256": "5423197201fb56f1894fbbe59472597d765b78314da8c08483b3e3183f3fe2b0",
+  "solver_binary_sha256": "a3f85c3709b5e2a040bf82a4a604d1c7b9f10219bbf180a9e0f72319a2e892ac",
+  "calls": [
+    {"label": "default_A", "gauss_profile": "default", "options": []},
+    {"label": "wide", "gauss_profile": "wide", "options": ["--maxmatrixrows=10000", "--maxmatrixcols=50000"]},
+    {"label": "forced", "gauss_profile": "forced", "options": ["--maxmatrixrows=10000", "--maxmatrixcols=50000", "--autodisablegauss=0", "--gaussusefulcutoff=0"]},
+    {"label": "default_B", "gauss_profile": "default", "options": []}
+  ],
+  "threads": 1,
+  "conflict_cap_per_call": 100000,
+  "solver_wall_cap_seconds_per_call": 60,
+  "external_watchdog_slack_seconds": 15,
+  "host_tier": "L0_unisolated_stage_diagnostic",
+  "timing_boundary": "local solver process including XCNF input load, excluding export and independent replay",
+  "model_gate": "verify every CNF and XOR row, fixed x block, original-field S3 node and the curve point sum",
+  "natural_relation_yield": null,
+  "candidate_id": null,
+  "selected_best_total_runtime": null
+}

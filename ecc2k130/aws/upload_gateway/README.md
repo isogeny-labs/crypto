@@ -55,8 +55,9 @@ python3 ecc2k130/aws/upload_gateway/deploy.py deploy
 
 Some accounts deny Lambda service calls independently of the caller's IAM
 policy. The external mode creates the same private quarantine, tables, queue
-and alarm, but runs the broker and validator next to `dp_ingest.py` on one
-cheap RunPod CPU pod. It leaves one narrowly scoped AWS identity on the
+and alarm, but runs the broker, validator and a worker-only `dp_ingest.py` on one
+cheap RunPod CPU pod. The designated publisher is a separate service; this pod
+must never overwrite its public status feed. It leaves one narrowly scoped AWS identity on the
 central service; GPU workers still receive no AWS key:
 
 ```bash
@@ -78,7 +79,7 @@ python3 ecc2k130/aws/upload_gateway/runpod_launch.py service-update POD_ID \
 
 The launcher prints the HTTPS `apiUrl`. The credentials file is mode 0600,
 is never printed, and must not be committed. Its policy is limited to the
-quarantine workflow, campaign control objects, status publication, the RDS
+quarantine workflow, campaign control objects, status reading, the RDS
 secret, and authorizing the pod's exact egress `/32` for PostgreSQL.
 
 The GitHub workflow can perform the same deployment with OIDC when repository

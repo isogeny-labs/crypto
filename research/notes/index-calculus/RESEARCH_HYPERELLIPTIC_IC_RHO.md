@@ -1351,3 +1351,444 @@ large prime variation (Gaudry–Thomé–Thériault–Diem) has the same
 problem in sharper form: it trades even more relation-stage work and
 denser rows for a smaller solve. **At reachable sizes the lever is the
 oracle and the per-trial cost of the walk, not the factor base.**
+
+## Round nine: the reference has no negation map — protocol, written before measuring
+
+**The asymmetry.** Index calculus here folds every place with its
+negative: the factor base keeps one of `±P`, so it already uses the
+hyperelliptic involution `D ↦ −D`, which every Jacobian has and which
+costs one negation of `v`. The rho reference
+(`src/cryptanalysis/hyperelliptic_ic_bench.rs`, `rho_dp`) does not. It
+walks on divisors, not on `±` classes, and pays the full
+`sqrt(πN/2) ≈ 1.2533·sqrt(N)` expected steps. Walking on classes cuts
+that to `sqrt(πN/4) ≈ 0.8862·sqrt(N)`, a factor of `√2` (Wiener and
+Zuccherato, SAC 1998; Duursma, Gaudry and Morain, ASIACRYPT 1999 — the
+same prior art `src/cryptanalysis/aut_folded_rho.rs` cites for elliptic
+`j = 0` curves). A reference that leaves out a standard `√2` flatters
+the method it is compared against, and in this thread that is index
+calculus, so every `S_ic/S_rho` reported so far is optimistic by up to
+`√2`. These curves are generic; the involution is the only cheap
+automorphism, so `√2` is the whole of what folding can give.
+
+**The change.** A third rho variant, `DistinguishedPointsNegation`, on
+the same branches, hash, distinguished-point rule, seeds and step
+accounting as the current default. After every step the position is
+replaced by a canonical representative of `{D, −D}`, and `(a, b)` is
+negated with it, so the walk position stays exactly `a·D₁ + b·D₂`.
+Folding creates fruitless cycles. The two-cycle (step by `S_j`, land on
+the negation, select `S_j` again) happens with probability about
+`1/(2r)` per step at `r = 16` branches, and is removed by the standard
+look-ahead: when the next position would select the same branch, take
+the next branch instead (Wiener–Zuccherato; Bos, Kleinjung and
+Lenstra). Longer cycles are left to the existing distinguished-point
+gap escape. **Every look-ahead trial and every escape is a counted
+group operation.**
+
+**Boundary.** Unchanged for index calculus. The reference moves: the
+ideal walk is now `0.8862·sqrt(N)`, and the walk-renormalised ratios
+renormalise to that.
+
+**Pinned output.** Index calculus is untouched, so its counted work
+(relation stage, oracle and solve mul-mods, `k`) must be identical to
+round seven's frozen rows. The plain DP rho must also be identical to
+round seven's: its operation counts are deterministic in the seed. The
+new variant must return a verified `k` on every run.
+
+**Registered hypotheses.** On round seven's harness
+(`examples/hyperelliptic_ic_vs_rho.rs`, all 18 instances, 40 rho seeds
+per row), reading counted operations, which do not depend on the host:
+
+- **R1 (the fold pays).** On rows with `N ≥ 10⁵`, where the walk
+  dominates rho's precomputation, the median of
+  `walk_ops(negation) / walk_ops(plain)` is at most **0.80** (ideal
+  0.707). Falsified above 0.80.
+- **R2 (fruitless cycles are contained).** Look-ahead trials plus
+  escapes are at most 10% of the folded walk's operations on every
+  row.
+- **R3 (correctness).** Every folded-rho run returns a verified `k`.
+
+If R1 holds, the folded rho becomes the reference: the round-seven
+sweep is re-run three times on one host with it, and the note and the
+scoreboard re-derive every `S_ic/S_rho`, the walk-renormalised ratios
+and the genus exponent fits. If R1 fails, the variant is recorded as
+built and measured, and the reference stays as it is until the cause is
+understood.
+
+**Expected class: accounting**, against index calculus. No algorithm
+under study changes; the comparison does. Predicted direction: every
+ratio rises, by up to `√2` where the walk dominates, by less at toy `N`
+where rho's precomputation does. The genus-4 headline (0.24 walk-
+renormalised) should move to about 0.34.
+
+## Round nine: measured
+
+Registered run: card `CARD-HEIC-ROUND9-5`, receipt
+`research/notes/index-calculus/round9/run5/receipt.json` (status
+completed), output `run5/R9.txt` (sha256 `a6a02c3f…`), isolation record
+`run5/isolated_bench.jsonl` (uncontended, 554 s on reserved CPU 3).
+Counted operations only; they are deterministic in the seed, and attempt
+3's complete output is byte-identical in every row. Four earlier
+attempts failed for reasons unrelated to the walk and are kept beside it
+with an `ATTEMPT.md` each: a constructor change on `main` (attempt 1), an
+executor that returned before its background run finished (2), a
+wrapper timeout just after the binary finished (3), and an isolation
+preflight that counted the agent harness's own 0.21 CPU-seconds (4).
+Card 5 relaxed only that preflight threshold, which gates wall time and
+not counts. All 18 instances are round seven's (`N` identical).
+
+| | registered test | result |
+|--|--|--|
+| **R1** | median folded/plain walk ops ≤ 0.80 at `N ≥ 10⁵` | **falsified: 0.968** (7 rows) |
+| R2 | look-ahead + escape steps ≤ 10% of folded walk | holds: max 6.5% |
+| R3 | every run verified | holds: 18 × 40 × 2 |
+
+| g | `p` | `N` | plain `S_walk` | folded `S_walk` | folded/plain |
+|--:|--:|--:|--:|--:|--:|
+| 2 | 41 – 251 | 1321 – 61667 | 1.25 – 1.42 | 0.87 – 1.09 | 0.67 – 0.87 |
+| 3 | 23 – 41 | 6299 – 7333 | 1.05 – 1.31 | 0.90 – 1.03 | 0.72 – 0.89 |
+| 3 | 61 | 124459 | 1.48 | 1.18 | 0.80 |
+| 3 | 101 | 364747 | 1.41 | 1.36 | 0.97 |
+| 3 | 151 | 1180351 | 1.71 | 0.95 | 0.56 |
+| 3 | 211 | 4620611 | **1.82** | **2.15** | 1.18 |
+| 4 | 17 – 23 | 5639 – 30223 | 1.23 – 1.42 | 1.05 – 1.08 | 0.74 – 0.87 |
+| 4 | 31 | 239753 | 1.30 | 1.49 | 1.14 |
+| 4 | 41 | 333041 | 1.34 | 1.01 | 0.75 |
+| 4 | 61 | 16790591 | **2.10** | **2.16** | 1.03 |
+
+(Ideals: plain 1.2533, folded 0.8862, ratio 0.7071.)
+
+**Reading it.** On small groups the fold works as the theory says. On
+the largest the reference does not: the *plain* walk is 45 – 68% above
+its ideal at the two biggest rows (the drift round five worked around by
+renormalising), and the folded walk loses its whole advantage there. Two
+things the registered tests did not separate are now the question:
+
+1. **Both walks degrade with `N`.** That is a property of the walk, not
+   of the fold. A candidate cause, from reading the code: `divisor_hash`
+   is a multiply-accumulate (`acc·C + limb`), so its low bits — the
+   distinguished-point test — depend only on the low bits of each
+   coefficient, and its branch bits are weakly mixed when every limb is
+   a coefficient below `p ≤ 251`. A poorly mixed branch function makes
+   an `r`-adding walk correlated with its own position, which is worse
+   than random and gets worse with `N`. Unverified.
+2. **R2 under-counts the fold's waste.** It counts the escape step but
+   not the steps spent inside a fruitless cycle before the escape fires
+   (up to `32·2^θ`). The folded walk's loss at large `N` may be that.
+
+**Decision, per the protocol's stop rule:** the folded walk is recorded
+as built and measured; the reference stays as it is until the cause is
+understood. Class: none — no ratio in the thread changes.
+
+**Amendment (additive), on rules that changed after round eight.**
+`AGENTS.md` now requires cross-method ECDLP measurements to go through
+the native `ecbench` harness (§12), requires every arm's unpriced work
+(hashes, canonicalisations, table probes; IC bookkeeping outside the
+timers) to be counted and priced at 0, 0.1 and 1 GAE before arms are
+ranked (§5a), and forbids Python for research harnesses and analysis.
+This thread's IC/rho ratios predate all three: `ecbench` has no
+hyperelliptic family, neither arm emits its unpriced counters, and the
+round-seven and round-eight analyses are Python. **Every IC/rho ratio
+this thread has reported is therefore a lower-bound comparison under
+§5a, and unranked.** Their frozen evidence stands as written. Round nine
+itself reads counts only, was analysed natively, and ranks nothing
+across methods.
+
+**Next.** (a) Test the hash hypothesis: the same walk with
+`divisor_hash` passed through a strong 64-bit finaliser, all else equal,
+registered as round ten; if the plain walk returns to ≈ 1.25 at large
+`N`, every ratio in the thread has been flattered by up to 1.7× and
+must be re-measured. (b) Add a native word-arithmetic Jacobian
+`CountedGroup` to `ecbench`, so that `rho.negation` and the IC can be
+measured under the repository's current rules.
+
+## Round ten: is the reference walk's hash the problem? — protocol, written before measuring
+
+**Hypothesis.** Round nine measured the plain DP rho at `S_walk` 1.82
+and 2.10 on the two largest rows, against an ideal of 1.2533, and the
+folded walk losing its whole advantage there. `divisor_hash` is
+`acc ← acc·C + limb` over the Mumford coefficients, ending in `·C + 1`.
+Its low `θ` bits, which decide whether a point is distinguished, depend
+only on the low `θ` bits of each coefficient. The branch bits are
+`(h ≫ 32) mod 16`, reached through one multiply per limb, with limbs that
+are coefficients below `p ≤ 251`. A branch function that is not close to
+a random function of the point makes an `r`-adding walk correlated with
+its position, which costs steps, and more of them as `N` grows.
+
+**The change.** One variable only: the same walks with the hash passed
+through the SplitMix64 finaliser (`z ^= z ≫ 30; z *= 0xbf58476d1ce4e5b9;
+z ^= z ≫ 27; z *= 0x94d049bb133111eb; z ^= z ≫ 31`) before it is used for
+the branch choice, the distinguished-point test and the look-ahead.
+Same branches, seeds, `θ`, gap limit, look-ahead and accounting. Four
+arms on round seven's 18 instances, 40 seeds each: plain and folded,
+each with the old and the mixed hash. The old-hash arms must reproduce
+round nine exactly (pinned output).
+
+**Registered hypotheses** (counted operations; means of 40 seeds,
+whose standard error is about 0.08 in `S_walk`):
+
+- **H1 (the hash is the cause).** On the rows with `N ≥ 10⁵`, the median
+  plain `S_walk` with the mixed hash is at most **1.45**, and on the two
+  largest rows each is at most 1.55. Falsified otherwise: then the hash
+  is not the cause, and the next suspect is the walk structure itself
+  (`r = 16` branches, 8-bit branch coefficients) or the escape logic.
+- **H2 (the fold recovers).** With the mixed hash, the median
+  folded/plain walk-operation ratio on the rows with `N ≥ 10⁵` is at most
+  **0.80**, which is round nine's R1 re-tested.
+- **H3 (control).** On the rows with `N ≤ 6·10⁴`, where round nine's
+  plain walk was already near ideal (1.05 – 1.42), the mixed hash moves
+  the median plain `S_walk` by less than 0.15. A large move there would
+  mean the change does something other than fix mixing.
+- **H4.** Every run verified.
+
+**What follows.** If H1 holds, every IC/rho ratio in this thread was
+flattered by the broken reference, by up to the ratio of the two plain
+`S_walk` columns, and the round-seven table is re-measured against the
+mixed-hash walk (the folded one, if H2 holds). If H1 fails, the
+reference stays and the walk structure is examined next.
+
+**Expected class: accounting**, against index calculus.
+
+## Round ten: measured — the hash is not the cause
+
+Registered run: card `CARD-HEIC-ROUND10-1`, receipt
+`research/notes/index-calculus/round10/run1/receipt.json` (completed),
+output `run1/R10.txt`, isolation record uncontended on reserved CPU 3
+(1016 s). Four arms × 18 instances × 40 seeds, every `k` verified. The
+two old-hash arms reproduce round nine's columns exactly (pinned).
+
+| | registered test | result |
+|--|--|--|
+| H1 | mixed plain `S_walk`: median ≤ 1.45 at `N ≥ 10⁵` **and** each of the two largest rows ≤ 1.55 | **falsified**: median 1.406, but the two largest rows are 2.240 and 1.696 |
+| H2 | mixed fold/plain ≤ 0.80 at `N ≥ 10⁵` | **falsified**: 0.960 |
+| H3 | control, `N ≤ 6·10⁴`: mixing moves median plain `S_walk` by < 0.15 | holds: 0.023 |
+| H4 | every run verified | holds |
+
+Largest rows, `S_walk` (ideal 1.2533 plain, 0.8862 folded):
+
+| g | `p` | `N` | plain | fold | plain + mix | fold + mix |
+|--:|--:|--:|--:|--:|--:|--:|
+| 3 | 211 | 4620611 | 1.820 | 2.148 | 1.696 | 1.951 |
+| 4 | 61 | 16790591 | 2.100 | 2.162 | 2.240 | 3.112 |
+
+**Reading it.** Mixing the hash does not repair the largest rows; on the
+largest the folded walk gets worse. The degradation is structural, not
+the hash. Next: a per-seed profile, to see whether every seed walks long
+or a few seeds blow up — the latter would point at a pathological event
+(stuck walks, repeated escapes) rather than a slow walk. Class: none; the
+reference is unchanged, and so is every ratio.
+
+### Diagnostic after round ten (not registered): every seed walks long
+
+`examples/hyperelliptic_rho_seed_profile.rs`, plain DP rho, 40 seeds,
+counts only; output `round10/diagnostic/seed_profile.txt`. Run directly,
+not through a card, because it only shapes the next hypothesis.
+
+| row | mean `S_walk` | median | min | restarts |
+|--|--:|--:|--:|--:|
+| g2 `p = 251` (`N = 6.2·10⁴`) | 1.25 | 1.07 | 0.25 | 0 |
+| g3 `p = 151` (`N = 1.2·10⁶`) | 1.71 | 1.64 | 0.50 | 0 |
+| g3 `p = 211` (`N = 4.6·10⁶`) | 1.82 | 1.66 | 0.72 | 0 |
+| g4 `p = 61` (`N = 1.7·10⁷`) | 2.10 | 1.96 | **1.38** | 0 |
+
+No seed restarts, so no pathological event drives the mean. Every seed
+walks long. For an ideal single-walk rho the detection time over `√N`
+is approximately Rayleigh, `P(T < x) = 1 − e^{−x²/2}`, so
+`P(T < 1.375) ≈ 0.61` and the chance that none of 40 seeds lands below
+1.375 is about `0.39⁴⁰`, effectively zero. At the largest row the walk
+cannot collide early: it behaves as if it explored a larger set than
+`N`, or as if early collisions went undetected.
+
+## Round eleven: the walk on integers as a control — protocol, written before measuring
+
+**Question.** Is the reference walk's large-`N` excess in the walk and
+detection logic, or in the Jacobian (its representation, hashing or
+arithmetic)?
+
+**The control.** The identical DP walk run on `Z/N`: the position is the
+logarithm `x = a + b·k mod N` itself, the branches add
+`s_j = a_j + b_j·k mod N` from the same `(a_j, b_j)` the Jacobian walk
+draws from the same seed, the branch and distinguished-point rules read
+a SplitMix64 hash of `x`, and `θ`, the gap limit and the collision
+handling are the same code path's rules. Same 18 instances, same 40
+seeds, plain walk only, counted steps.
+
+**Registered hypotheses.**
+
+- **C1 (instrument).** The integer model's median `S_walk` over the 7
+  rows with `N ≥ 10⁵` lies in **[1.10, 1.40]**. If it does not, the
+  model itself is wrong and nothing below is read.
+- **C2 (localisation).** If C1 holds and the Jacobian walk's
+  `S_walk` exceeds the integer model's by more than **25%** on both of the
+  two largest rows, the excess is in the Jacobian side (representation,
+  hashing, or arithmetic producing a different point than `a·D₁ + b·D₂`),
+  and that is examined next. If the integer model shows the same excess
+  (within 25%) on both, the excess is in the shared walk logic.
+- **C3.** Every integer-model run recovers the planted `k`.
+
+**Expected class: accounting**, against index calculus, if the excess
+is a bug in the reference.
+
+## Round eleven: measured — the control shows the same excess, so C1 fails
+
+Registered run: card `CARD-HEIC-ROUND11-1` (commit `42d29092`, binary
+sha256 `472d8921…578b98`), receipt
+`research/notes/index-calculus/round11/run1/receipt.json` (completed,
+nine commands exit 0), output `run1/R11.txt`, isolation record
+uncontended on reserved CPU 3 (334 s). 18 instances × 40 seeds, plain
+walk; the Jacobian column reproduces round nine's plain column exactly.
+
+| | registered test | result |
+|--|--|--|
+| C1 | integer-model median `S_walk`, `N ≥ 10⁵`, in [1.10, 1.40] | **falsified**: 1.521 |
+| C2 | localisation | **not read** (C1 failed, as registered) |
+| C3 | every integer-model run verified | holds |
+
+Largest rows (`S_walk`, ideal 1.2533):
+
+| g | `p` | `N` | Jacobian | integer model | ratio | integer min over 40 seeds |
+|--:|--:|--:|--:|--:|--:|--:|
+| 3 | 151 | 1180351 | 1.706 | 1.514 | 1.127 | 0.502 |
+| 3 | 211 | 4620611 | 1.820 | 1.752 | 1.039 | 0.835 |
+| 4 | 61 | 16790591 | 2.100 | 2.171 | 0.967 | 1.226 |
+
+**Reading it, within the registration.** C1 was written as an instrument
+check, on the premise that the walk rule both arms share reaches the
+random-map constant on `Z/N`. It does not, so that premise, not just the
+instrument, is what failed, and C2 is not read. Not registered, and
+stated only as what the table shows: the integer model reproduces the
+large-`N` excess row by row (ratios 0.84–1.13 over all 18 rows, 0.967 on
+the largest), including the floor on the minimum (1.226 over 40 seeds on
+the largest row). Nothing Jacobian-specific is needed to produce it.
+Class: none; the reference is unchanged.
+
+## Round twelve: are the short branch coefficients the cause? — protocol, written before measuring
+
+**Mechanism.** Both walks add steps `s_j = a_j + b_j·k` with
+`a_j, b_j < 2^8` (`RHO_STEP_BITS`), chosen on the argument that short
+coefficients "cost rho nothing". A single walk's point is
+`x_t = x_0 + A_t + B_t·k`, with `A_t, B_t` sums of the short
+coefficients, and a rho collision `x_s = x_t` needs
+`ΔA + ΔB·k ≡ 0 (mod N)` with `(ΔA, ΔB) = (A_t − A_s, B_t − B_s)`. Over a gap
+of `Δt` steps that displacement concentrates (central limit) on a 2-D
+blob of area about `Δt·σ_a·σ_b·const` around `Δt·(μ_a, μ_b)`, with
+`σ ≈ 74` for 8-bit draws, while the solutions form a lattice of
+covolume `N`. Once the blob's area at `Δt ≈ √N` falls short of `N`
+(about `N ≳ 10⁷` by this estimate), the walk collides less often than a
+random map: the excess grows with `N`, every seed is slow, and the group
+does not matter. Each of these matches rounds nine to eleven. Full-width
+coefficients (`a_j, b_j` uniform in `[0, N)`) remove the structure: the
+`s_j` are then independent of each other's small-integer relations and
+the walk is Teske's `r = 16` adding walk.
+
+**Arms.** Same 18 instances, same 40 seeds, plain DP walk, counted
+operations: Jacobian and integer model, each with 8-bit coefficients (the
+current rule, reproducing rounds nine and eleven) and with full-width
+coefficients. Everything else (hash, `θ`, gap limit, collision handling)
+unchanged. Precomputation for full-width branches is
+`2·⌈log₂ N⌉` operations per branch (the same doubling-and-add count the
+code already charges), reported separately and not in `S_walk`.
+
+**Registered hypotheses.**
+
+- **W1.** Integer model, full width: median `S_walk` over the 7 rows with
+  `N ≥ 10⁵` lies in **[1.10, 1.40]**, and each of the two largest rows is
+  **≤ 1.55**.
+- **W2.** Jacobian, full width: the same two bounds.
+- **W3 (control).** At `N ≤ 6·10⁴`, the Jacobian's median `S_walk`
+  moves by **< 0.15** between 8-bit and full width.
+- **W4.** Every run recovers the planted `k`.
+
+If W1 and W2 hold, the reference rho was handicapped at large `N` by its
+own step rule, by up to `2.10 / S_full` on the largest row; every thread
+IC/rho ratio at `N ≥ 10⁵` flattered index calculus by that factor, and the
+reference is replaced (class **accounting**, against index calculus). The
+index-calculus walk keeps its short coefficients: it looks for smooth
+points, not collisions, so the argument above does not reach it. If W1
+holds and W2 fails, the Jacobian adds its own excess and is examined
+next. If W1 fails, the short coefficients are not the cause.
+
+## Round twelve: measured — the short branch coefficients were the cause
+
+Registered run: card `CARD-HEIC-ROUND12-1` (commit `be98f8e7`, binary
+sha256 `9ca561b5…391e63`), receipt
+`research/notes/index-calculus/round12/run1/receipt.json` (completed,
+nine commands exit 0), output `run1/R12.txt`, isolation record
+uncontended on reserved CPU 3 (529 s). Four arms × 18 instances × 40
+seeds, every `k` verified. The 8-bit columns reproduce rounds nine and
+eleven exactly.
+
+| | registered test | result |
+|--|--|--|
+| W1 | integer model, full width, `N ≥ 10⁵`: median in [1.10, 1.40], two largest ≤ 1.55 | **holds**: median 1.303; largest rows 1.505, 1.303 |
+| W2 | Jacobian, full width: the same bounds | **holds**: median 1.390; largest rows 1.481, 1.212 |
+| W3 | control, `N ≤ 6·10⁴`: Jacobian median moves < 0.15 | holds: 0.025 |
+| W4 | every run verified | holds |
+
+Rows with `N ≥ 10⁵` (`S_walk`, ideal 1.2533):
+
+| g | `p` | `N` | Jacobian 8-bit | Jacobian full | 8-bit / full | integer 8-bit | integer full |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 3 | 61 | 124459 | 1.477 | 1.390 | 1.063 | 1.521 | 1.347 |
+| 3 | 101 | 364747 | 1.407 | 1.484 | 0.948 | 1.406 | 1.219 |
+| 3 | 151 | 1180351 | 1.706 | 1.457 | 1.171 | 1.514 | 1.331 |
+| 3 | 211 | 4620611 | 1.820 | 1.212 | 1.502 | 1.752 | 1.303 |
+| 4 | 31 | 239753 | 1.303 | 1.287 | 1.012 | 1.549 | 1.239 |
+| 4 | 41 | 333041 | 1.344 | 1.327 | 1.013 | 1.259 | 1.173 |
+| 4 | 61 | 16790591 | 2.100 | 1.481 | 1.418 | 2.171 | 1.505 |
+
+Full-width branches cost `2·(bits(N) + 1)` operations each, 884 on the
+largest row (0.216·√N), reported as precomputation and not in `S_walk`.
+
+**What it means.**
+
+- The reference rho's large-`N` excess came from its own step rule:
+  "short coefficients cost rho nothing" (the comment on `RHO_STEP_BITS`)
+  was wrong for a collision walk. It holds for the index-calculus walk,
+  which looks for smooth points, not collisions.
+- The excess grows with `N`: 1.06 at `N = 1.2·10⁵`, 1.42–1.50 at the two
+  largest rows. Below `6·10⁴` it is absent (W3).
+- **Class: accounting, against index calculus.** Every thread IC/rho ratio
+  measured against the 8-bit reference at `N ≥ 10⁵` flattered index
+  calculus by that row's 8-bit/full factor. Those ratios were already
+  labelled lower-bound and unranked (§5a/§12 amendment); they now also
+  carry a reference that was slow by up to 1.5×, and are to be
+  re-measured against the full-width reference rather than corrected by
+  arithmetic. This is not an improvement to index calculus; it is a
+  correction to its baseline, which moves the gap to rho the other way.
+- The reference is replaced: `RhoVariant`'s default is now
+  `DistinguishedPointsFullWidth`. `DistinguishedPoints` keeps its 8-bit
+  meaning, so every frozen example and round still reproduces exactly.
+- Rounds nine and ten are re-read in this light, not re-run: the
+  negation fold's failure at large `N` (R1) and the mixed-hash failure
+  (H1) were measured on the slow walk. The fold is the next thing to
+  re-test on the full-width walk.
+
+## Round thirteen: the negation fold on the full-width walk — protocol, written before measuring
+
+**Question.** Round nine's fold failed at large `N` (R1 = 0.968), but it
+was measured on the 8-bit walk, which round twelve showed is slow there
+for its own reasons. Does the `±` fold give its `√2` on the full-width
+walk?
+
+**Arms.** Plain full-width DP rho (`DistinguishedPointsFullWidth`, the
+reference) and the same walk folded on `±` classes with round nine's
+look-ahead (`DistinguishedPointsNegationFullWidth`): canonical
+representative by the leading coefficient of `v`, `(a, b)` negated with
+it, every look-ahead trial and gap escape a counted operation. Same 18
+instances, same 40 seeds, counted operations only.
+
+**Registered hypotheses.**
+
+- **N1.** Median folded/plain walk operations over the 7 rows with
+  `N ≥ 10⁵` is **≤ 0.80** (ideal 0.707).
+- **N2.** The fruitless share (look-ahead trials plus escapes) of the
+  folded walk is **≤ 10%** on every row.
+- **N3.** Folded `S_walk` median over the rows with `N ≥ 10⁵` is
+  **≤ 1.05** (ideal √(π/4) = 0.886).
+- **N4.** Every run recovers the planted `k`.
+
+If N1–N4 hold, the folded full-width walk becomes the reference, because
+index calculus already folds `±P` in its factor base (class
+**accounting**, against index calculus: the reference gets cheaper by the
+measured ratio). If N1 fails, the fold has a defect of its own, examined
+next.

@@ -105,6 +105,25 @@ it does three things.
   image on `127.0.0.1:55432`, then `conductor up --project crypto` on
   `http://localhost:8080`. With it the pre-edit hook, `conductor check` and the
   MCP tools work, but it coordinates nothing outside that container.
+- **Installs the rest of the toolchain.** It runs `scripts/setup-workstation.sh`
+  without the parts above: apt libraries (GMP, MPFR, FLINT, PARI/GP), Rust,
+  Go, Node, uv, the codex and opencode CLIs, a clone of `cryptanalysis` next
+  to this checkout (if at least 5 GiB is free), and the virtualenvs of the
+  checkouts it finds there. It skips what is already installed and never
+  moves an existing Rust toolchain. SageMath installs detached, logged to
+  `~/.local/state/workspace-tools/sage-install.log`, and skips itself below
+  10 GiB free. `CRYPTO_WORKSTATION_SETUP=0` turns this step off,
+  `CRYPTO_SETUP_SAGE=0` skips SageMath, and `CRYPTO_SETUP_CLONE` lists the
+  repositories to clone (default `cryptanalysis`; empty clones none).
+- **Signs git and gh in as the GitHub service account**, when the environment
+  carries one as secrets (never in the repository): a GitHub App as
+  `GH_APP_ID`, `GH_APP_INSTALLATION_ID` and `GH_APP_PRIVATE_KEY` (or
+  `GH_APP_PRIVATE_KEY_FILE`), or a machine-user token as `GH_SERVICE_TOKEN`.
+  Add them under the environment's settings (Network secrets, or environment
+  variables). `~/.local/bin/gh-app-token` then serves git a credential for
+  `https://github.com` only when the server asks for one, minting one-hour App
+  installation tokens as needed; `gh-app-token gh-login` refreshes gh's login.
+  With neither set, the step warns and is skipped.
 
 The first launch is the slow one: 128 s when this was tested, mostly
 fetching Go's toolchain and building cairn. The container is cached after the

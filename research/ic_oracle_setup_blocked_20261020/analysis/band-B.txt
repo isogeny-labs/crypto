@@ -1,0 +1,15 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-t7319-90da43e9 | 32.00 | batch-16384 | 8/8 | 4097.226 | 4097.578 | 4100.745 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | blocked-16384 | 8/8 | 4097.226 | 4097.578 | 4100.745 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | rho-neg | 8/8 | 0.802 | 0.881 | 1.597 | — |
+| icv1-fp32-t7319-90da43e9 | 32.00 | scalar-16384 | 8/8 | 4097.226 | 4097.578 | 4100.745 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-t7319-90da43e9 | batch-16384 vs blocked-16384 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | batch-16384 vs rho-neg | rho-neg < batch-16384 |
+| icv1-fp32-t7319-90da43e9 | batch-16384 vs scalar-16384 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | blocked-16384 vs rho-neg | rho-neg < blocked-16384 |
+| icv1-fp32-t7319-90da43e9 | blocked-16384 vs scalar-16384 | unresolved inside the band |
+| icv1-fp32-t7319-90da43e9 | rho-neg vs scalar-16384 | rho-neg < scalar-16384 |
