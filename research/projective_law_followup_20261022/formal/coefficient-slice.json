@@ -1,0 +1,317 @@
+{
+  "schema": "projective-law-coefficient-slice/v1",
+  "scope": "common 2+2 coefficient slice only; no full Rust semantics or Jacobian group-law proof",
+  "rust_source_sha256": "5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0",
+  "lean_source_sha256": "998a68152efb48c1a77bfbb82ed22a8c7d9c9910f1177ce159589e6c1e6cab79",
+  "rows": [
+    {
+      "rust": "dq",
+      "lean": "dq",
+      "monomials": 2,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "q1"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q2"
+          ],
+          "coefficient": -1
+        }
+      ]
+    },
+    {
+      "rust": "dr",
+      "lean": "dr",
+      "monomials": 2,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "r1"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "r2"
+          ],
+          "coefficient": -1
+        }
+      ]
+    },
+    {
+      "rust": "ds",
+      "lean": "ds",
+      "monomials": 2,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "s1"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "s2"
+          ],
+          "coefficient": -1
+        }
+      ]
+    },
+    {
+      "rust": "dt",
+      "lean": "dt",
+      "monomials": 2,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "t1"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "t2"
+          ],
+          "coefficient": -1
+        }
+      ]
+    },
+    {
+      "rust": "bcoef",
+      "lean": "B",
+      "monomials": 7,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "q1",
+            "q1",
+            "r2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "q1",
+            "q2",
+            "r1"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q1",
+            "q2",
+            "r2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q2",
+            "q2",
+            "r1"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "r1",
+            "r1"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "r1",
+            "r2"
+          ],
+          "coefficient": 2
+        },
+        {
+          "variables": [
+            "r2",
+            "r2"
+          ],
+          "coefficient": -1
+        }
+      ]
+    },
+    {
+      "rust": "acoef",
+      "lean": "A",
+      "monomials": 12,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "q1",
+            "q2",
+            "t1"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q1",
+            "q2",
+            "t2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "q1",
+            "r2",
+            "s1"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "q1",
+            "r2",
+            "s2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q2",
+            "q2",
+            "t1"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "q2",
+            "q2",
+            "t2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q2",
+            "r2",
+            "s1"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q2",
+            "r2",
+            "s2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "r1",
+            "t1"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "r1",
+            "t2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "r2",
+            "t1"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "r2",
+            "t2"
+          ],
+          "coefficient": -1
+        }
+      ]
+    },
+    {
+      "rust": "ccoef",
+      "lean": "C",
+      "monomials": 8,
+      "equal": true,
+      "terms": [
+        {
+          "variables": [
+            "q1",
+            "t1"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "q1",
+            "t2"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "q2",
+            "t1"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "q2",
+            "t2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "r1",
+            "s1"
+          ],
+          "coefficient": -1
+        },
+        {
+          "variables": [
+            "r1",
+            "s2"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "r2",
+            "s1"
+          ],
+          "coefficient": 1
+        },
+        {
+          "variables": [
+            "r2",
+            "s2"
+          ],
+          "coefficient": -1
+        }
+      ]
+    }
+  ],
+  "negative_checks": [
+    "Rust bcoef subtraction-to-addition rejected",
+    "Lean B subtraction-to-addition rejected"
+  ]
+}

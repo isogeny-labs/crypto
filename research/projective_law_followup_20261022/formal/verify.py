@@ -8,6 +8,8 @@ import csv
 import hashlib
 import json
 import re
+import subprocess
+import sys
 from pathlib import Path
 from typing import NoReturn
 
@@ -341,6 +343,12 @@ def main() -> None:
     runtime_bindings = json.loads((ROOT / "runtime-bindings.json").read_text())
     validate_runtime_bindings(runtime_bindings, runtime_bytes, declarations)
     negative_checks = run_negative_self_tests(runtime_bindings, runtime_bytes, declarations)
+    subprocess.run(
+        [sys.executable, str(ROOT / "check_coefficient_slice.py"), "--check"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
 
     forbidden_proof_token = re.compile(r"(?m)\b(?:sorry|admit)\b|^\s*axiom\b")
     for name, source in lean_sources.items():

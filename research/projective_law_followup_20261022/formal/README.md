@@ -13,6 +13,12 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   `source-bindings.json`.
 - Four exact Rust function fragments are brace-scanned and bound separately in
   `runtime-bindings.json`; `verify.py` recomputes those fragment hashes.
+- The [coefficient-slice packet](COEFFICIENT_SLICE.md) derives seven common
+  2+2 coefficient expressions from the pinned Rust and Lean source, compares
+  their expanded integer polynomials, and rejects operator mutations on both
+  sides. Its [certificate](coefficient-slice.json), [CSV](coefficient-slice.csv),
+  [graph](coefficient-slice.svg), and [PDF](COEFFICIENT_SLICE.pdf) are reviewable
+  separately. This check covers only those seven expressions.
 - `branch-coverage.json` gives the standardized runtime-label, Lean
   constructor, certificate-schema mapping and lists the five rejected or
   exceptional labels separately.
@@ -71,7 +77,8 @@ does not expose that variable.
 those accepted Lean/Mathlib foundations.  The mapping theorem and the explicit
 bridge implication use no axioms.
 
-`verify.py` requires exactly four distinct Rust functions and their exact Lean
+`verify.py` also runs the coefficient-slice checker in read-only mode; a stale
+or altered certificate fails verification. It requires exactly four distinct Rust functions and their exact Lean
 declaration sets, parses declarations after removing nested comments and
 strings, and cross-checks the status count, schema, binding kind, and audited
 theorem set. Every verifier run also confirms rejection of a duplicate row, a
