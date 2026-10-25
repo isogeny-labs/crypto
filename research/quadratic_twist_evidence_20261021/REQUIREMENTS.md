@@ -11,8 +11,8 @@
 | Independent verification of saved/new IC data | verified | tuple-based auditor verifies three headline and 81 complete-log certificates |
 | Native controls | verified | false new relation, removed log certificate and false historical census count rejected |
 | Historical general readable arguments | preserved | archived report remains available with its original hypotheses |
-| Checked Lean implications and proof map | partial overall; finite S3/degree/source-reduction and preprocessing bridges verified |159 named theorems /207 audited declarations, zero extra trusted; actual point/group/eigenspace, finite Miller table, yield/rank/cost, S3 ideals/degree certificates, F43 reduction and exact reduced-generator equivalence/cutoff checked; general geometry and useful-yield/solver/work bridges remain open |
-| Algebraic identity certificates | verified for twelve stated identities | previous ten unchanged, plus S3 scaling IDC1hf15c17737ed713d5 and cleared unit IDC1hcee4710ff9dcf7e7;32+16 replay, arithmetic false identities and false source hashes |
+| Checked Lean implications and proof map | partial overall; finite S3/degree/source-reduction and named adaptive solver fixture verified |171 named theorems /226 audited declarations, zero extra trusted; actual point/group/eigenspace, finite Miller table, yield/rank/cost, S3 ideals/degree certificates, F43 reduction, row-adjunction, D2/D3 and exact twist quadratic vanishing space checked; general geometry and complete-work bridges remain open |
+| Algebraic identity certificates | verified for fourteen stated study identities | all previous thirteen retained; adaptive degree3 cleared unit IDC1h9eea191ebc3a8def adds32+16 replay, arithmetic false-identity and false-source controls |
 | Exact curve/model/subgroup identities | verified within stated representations | 1,921 registered monic models, 27 EC1 representations; unused subgroup choices stay unknown |
 | Shared Conductor check | blocked by unavailable tool/configuration | CLI exits 127; shared workflow/state unavailable; no reservation claimed |
 | Repository `cargo test --release --lib --locked` | passed on refreshed code and unchanged registry | 4,479 passed, 119 existing ignores; earlier 4,474 receipt and prior failures retained in `validation/` |
@@ -44,9 +44,12 @@
 | Factor-base-reduced actual S3 continuation | executed and independently replayed | 98 cases,188 comparisons,1,384 target comparisons; exact ideals/roots unchanged, new degree/rank profiles and four rehashed controls |
 | Actual preprocessed F43 leading cutoff | kernel checked in both arms | input-generator leading ideal becomes <xy,x^2,y^2>, first-empty degree2 versus original3; affine closure main4/twist2, useful rows0/2; not intrinsic regularity or an F4/F5 timing claim |
 | Reduced-S3 proof and certificate | verified |15 new named theorems; total159 named /207 audited,0 extra trusted; IDC1h77b3276833a18411 polynomial32+16 and false-source/identity controls |
-| Adaptive row reinsertion follow-up | draft next experiment, not executed | validated `backlog/XP-20261025-reduced-s3-mutant-reinsertion`; implement both native paths and freeze a protocol before promotion |
+| Adaptive row reinsertion follow-up | executed locally and independently replayed; PR landing pending | validated `backlog/XP-20261025-reduced-s3-mutant-reinsertion`;98 cases,188 comparisons,1,384 targets,24 joint reduced-input gains/zero original-input gains; five rehashed controls reject |
+| Named operational solver degree and source-DLP recovery | verified for F43 finite fixture | main reduced degree3/unit/rank0 versus twist reduced degree2/three roots/rank2; all11 main scalars recovered via actual point map, base logs and certified root sets; expanded original-input degree separately reported |
+| Intrinsic regularity or complete-work twist advantage | open | both reduced arms retain the same homogeneous cutoff2; no external-fastest or matched total cost measured |
+| Adaptive proof, identity and visual | supplied |12 new public Lean theorems/19 audited; total171/226,0 extra trusted; IDC1h9eea191ebc3a8def; `reports/adaptive-s3-20261025/`, `validation/adaptive-s3-20261025/` |
 
-The fresh library suite for the reduced-S3 continuation again passes 4,479
+The fresh library suite for the adaptive-S3 continuation again passes 4,479
 tests with zero failures and 119 existing ignores; its 22 backend and four
 workflow metadata tests pass. Earlier library and 39/40 metadata-backend
 receipts remain historical records for their original source states.
@@ -54,8 +57,8 @@ receipts remain historical records for their original source states.
 The [continuation policy and ordered queue](CONTINUATION.md) keep the open
 mathematical requirements active across scheduled research iterations. A null
 candidate does not settle the broader objective; concrete access/resource
-limits are recorded separately. The policy itself is complete planning work,
-not evidence that any queued experiment or theorem has executed.
+limits are recorded separately. The policy itself remains a plan; the adaptive
+iteration above has separate executed evidence, and later queue items remain pending.
 
 The original request remains broader than the finite evidence. Closing a native
 implementation gap or passing CI does not settle general ECDLP hardness.

@@ -146,6 +146,10 @@ reproduced by an exact pulled-back factor base on the main curve.
 - [x] Check a finite actual small-base useful-row/closure improvement and an
   applicable main-DLP reduction: F43 prefix fixture; verify its factor-base
   pullback control and all-target losses, without claiming uniform advantage.
+- [x] Certify a named adaptive row solver's operational degree on the actual
+  reduced F43 systems, with independent original-input witnesses and a fresh
+  eleven-target source-DLP recovery. Keep the original-input expanded degree,
+  homogeneous cutoff and total-work questions separate.
 - [ ] Establish a useful-yield improvement under an explicit candidate/target
   policy, a certified lower regularity or applicable solver-degree bound,
   and compatible complete work bounds before an actual speed claim.
@@ -170,17 +174,22 @@ still not prove general ECDLP hardness or an asymptotic solver advantage.
 
 ## Next discriminating step
 
-The [executed reduced-S3 round](../research/quadratic_twist_evidence_20261021/reports/reduced-s3-20261025/README.md)
-adds an exact preprocessing/ideal-equality proof and independently verifies
-98 cases,188 comparisons and1,384 targets. F43 input-leading cutoff drops
-from3 to2 in both arms, with first-target affine closure4/2 and useful rows0/2.
-The unmodified gate now audits207 declarations (159 named theorems), with no
-extra trusted axioms. This closes the stated generator-preprocessing bridge;
-it does not identify that cutoff with intrinsic regularity or a solver runtime.
-The [validated draft follow-up](../backlog/XP-20261025-reduced-s3-mutant-reinsertion/README.md)
-specifies adaptive row reinsertion and separate operational/expanded-witness
-degree accounting. Implement and preregister that next step; no such run is
-claimed as already executed. All earlier evidence and broader gates remain.
+The [executed adaptive-S3 round](../research/quadratic_twist_evidence_20261021/reports/adaptive-s3-20261025/README.md)
+checks the named row-reinsertion solver on all98 prior cases,188 comparisons
+and1,384 targets. Independent native arithmetic checks every row witness,
+rank, promotion, degree and point lift. Reduced inputs have24 target
+comparisons with both larger useful-rank increment and smaller operational
+matrix degree; original S3 inputs have zero. The F43 first target has main
+degree3/unit/rank0 and twist degree2/three roots/rank2. All11 source points
+are recovered through the actual map and checked relation rows. The unmodified
+gate audits226 declarations (171 named public theorems), zero extra trusted;
+IDC1h9eea191ebc3a8def checks the cleared polynomial only. The main original
+S3 run processes degree4 matrices yet expands witnesses to degree6, so the
+operational and original-input bounds are explicitly different. Both reduced
+arms still have the same homogeneous cutoff2, and no F4/F5 or complete-work
+speed result is claimed. The [backlog card](../backlog/XP-20261025-reduced-s3-mutant-reinsertion/README.md)
+records the executed local run while remaining draft until its repository
+landing gate. All earlier evidence and broader obligations remain.
 
 The [bounded continuation policy and queue](../research/quadratic_twist_evidence_20261021/CONTINUATION.md)
 extend the existing scheduled check with active research steps. The unsolved

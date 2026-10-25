@@ -1,5 +1,21 @@
 # Quadratic twists: native experiments and checked point/pairing transfers
 
+The [executed adaptive-S3 continuation](reports/adaptive-s3-20261025/README.md)
+checks a named row-reinsertion solver on the same98 cases,188 comparisons and
+1,384 targets. Independent Rust validates every matrix/promotion, exact input
+witness, elliptic-point relation, and11 fresh main-curve scalar recoveries.
+The reduced input has24 target comparisons with both a larger useful-rank
+increment and lower operational matrix degree; original S3 has zero. For the
+F43 first target, main reduced requires degree3 and gives zero useful rows,
+while twist reduced closes at degree2 with two useful rows. The proof gate
+checks **171 named theorems /226 audited declarations**, zero extra trusted;
+the new polynomial certificate is IDC1h9eea191ebc3a8def. This is a bounded
+named-solver result: the two arms have the same previously proved homogeneous
+input cutoff, and no F4/F5 timing or complete-work speed claim is made.
+[Protocol](ADAPTIVE_S3_20261025_PROTOCOL.md),
+[pre-execution correction](ADAPTIVE_S3_20261025_V2.md),
+[validation](validation/adaptive-s3-20261025/README.md).
+
 The [executed reduced-S3 continuation](reports/reduced-s3-20261025/README.md)
 checks 98 size2 cases, 188 comparisons and 1,384 target comparisons with
 independent native arithmetic/division/matrices. Exact generator preprocessing
@@ -9,7 +25,7 @@ rows and the previously proved main-DLP reduction are retained. Fifteen new
 named Lean theorems bring the study to **159 named theorems /207 audited declarations**,
 zero extra trusted. [Protocol](REDUCED_S3_20261025_PROTOCOL.md),
 [validation](validation/reduced-s3-20261025/README.md),
-[next experiment card](../../backlog/XP-20261025-reduced-s3-mutant-reinsertion/README.md).
+[adaptive experiment card](../../backlog/XP-20261025-reduced-s3-mutant-reinsertion/README.md).
 The cutoff is generator-sensitive; no F4/F5 timing or speed claim is made.
 
 The [research continuation policy and work queue](CONTINUATION.md) directs

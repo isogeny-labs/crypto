@@ -6,7 +6,7 @@
   "cairn": {
     "env": {
       "name": "crypto-rust",
-      "recipe": "Draft: first implement and freeze adaptive native producer/auditor; the current reduced-S3 crate is the baseline dependency."
+      "recipe": "Local native producer/auditor and frozen protocol are complete in PR2381; any Cairn task still needs a main-ancestry code commit and actual shared coordination."
     },
     "exec": {
       "cpus": 1,
@@ -20,7 +20,7 @@
       "rationale": "No funding or paid resource request; use existing local workspace for the next preregistered bounded step."
     },
     "mode": "lab-task",
-    "notes": "Draft only; no reservation, posting or task execution performed.",
+    "notes": "Executed and audited in the local PR workspace; no Cairn reservation, posting or task execution claimed.",
     "space": "unassigned",
     "tasks": [
       "XP-20261025-reduced-s3-mutant-reinsertion"
@@ -41,7 +41,7 @@
         "build",
         "--release",
         "--manifest-path",
-        "research/quadratic_twist_evidence_20261021/native/reduced-s3-audit/Cargo.toml"
+        "research/quadratic_twist_evidence_20261021/native/adaptive-s3-audit/Cargo.toml"
       ]
     ]
   },
@@ -51,7 +51,8 @@
   "links": {
     "lead": "crypto-autoresearcher:LEAD-ICE-descent-closure-degree-at-scale",
     "notes": [
-      "research/quadratic_twist_evidence_20261021/reports/reduced-s3-20261025/README.md",
+      "research/quadratic_twist_evidence_20261021/reports/adaptive-s3-20261025/README.md",
+      "research/quadratic_twist_evidence_20261021/ADAPTIVE_S3_20261025_V2.md",
       "research/quadratic_twist_evidence_20261021/CONTINUATION.md"
     ],
     "prs": [
@@ -59,14 +60,14 @@
     ]
   },
   "outputs": {
-    "result_schema": "quadratic-twist-mutant-s3/v1",
+    "result_schema": "quadratic-twist-adaptive-s3/v1",
     "verify": [],
     "land": "research/quadratic_twist_evidence_20261021"
   },
   "owner_hint": "Existing PR2381 research continuation",
   "protocol": {
-    "blob": null,
-    "path": null
+    "blob": "a5783856c0692c2d109a5df0c3d27bbb5107cce9",
+    "path": "PROTOCOL.md"
   },
   "question": "Can adaptive reinsertion certify a lower operational solver degree on the exact reduced S3 inputs while preserving rank and main-DLP transport?",
   "resources": {
@@ -75,7 +76,7 @@
     "est_core_hours": null,
     "est_wall_hours": null,
     "gpu": null,
-    "notes": "Native-only bounded iteration using existing local caches. Estimates remain null until the producer/auditor and protocol are complete; no paid compute authorized.",
+    "notes": "Native-only bounded iteration used existing local caches; no paid compute, external upload or task reservation was requested. Estimates remain null because this was not a Cairn task.",
     "ram_gb": 4
   },
   "run": {
@@ -96,6 +97,6 @@
     "stop": "all"
   },
   "status": "draft",
-  "status_note": "Next iteration: adaptive producer/auditor and frozen protocol still required; no execution or Cairn publication claimed.",
+  "status_note": "Executed and independently replayed in the PR workspace: 98 cases, 188 comparisons, 1384 targets and 11 main recoveries. Draft status is retained because the code commit is not yet an ancestor of main and no shared Cairn task was reserved or posted.",
   "title": "Adaptive row reinsertion on reduced twist S3 systems"
 }

@@ -2,9 +2,9 @@
 
 2026-10-25. The user asked how to keep this investigation pursuing the next
 experiment or proof without repeatedly needing a "keep going" message.
-The existing PR automation is being extended with this policy; no second
-writer or duplicate PR check is created. This is a continuation plan, not
-a newly executed experiment or a promise that a positive result exists.
+The existing PR automation uses this policy; no second writer or duplicate PR
+check is created. Its first bounded adaptive-S3 iteration is now executed and
+linked below. The policy alone does not promise a positive future result.
 
 ## Objective and current evidence
 
@@ -55,14 +55,19 @@ remains superseded by the positive pairing and yield research requests.
 
 Completed next lead: [factor-base-reduced S3](reports/reduced-s3-20261025/README.md),
 98 cases /188 comparisons /1,384 targets, with15 new named Lean theorems.
-The next concrete work item is
-[adaptive row reinsertion](../../backlog/XP-20261025-reduced-s3-mutant-reinsertion/README.md).
-Its draft status means implement the native paths and freeze the protocol;
-it is not a reason to stop because its future runner is not implemented yet.
+Completed next lead: [adaptive row reinsertion](reports/adaptive-s3-20261025/README.md),
+the same population with all solver witnesses independently checked,24 joint
+reduced-input useful-rank/operational-degree gains, and11 fresh main-source
+recoveries. Its [backlog card](../../backlog/XP-20261025-reduced-s3-mutant-reinsertion/README.md)
+still awaits the repository landing gate; the executed local evidence is
+separate from any Cairn task reservation. The next concrete work item is a
+source-matched, non-isomorphic twist/base-policy test with full solver work
+accounting, followed by a specified intrinsic-regularity computation if the
+candidate survives its pullback control.
 
 | Work item | Next checkable deliverable | Evidence needed before promotion |
 | --- | --- | --- |
-| Solver relevance | Identify a precisely defined solver and certify its required degree on actual inputs | Actual polynomial/output bindings and independently checked certificates; state its relation to regularity rather than equating the two |
+| Solver relevance | Extend the now certified finite solver to source-matched non-isomorphic curves and complete-work inputs | Retain actual polynomial/output bindings, witnesses, and all setup/target costs; do not equate its matrix degree with intrinsic regularity |
 | Alternative encoding | Specify an actual descent/rationality encoding and test whether its leading ideal can differ | Exact field/subgroup/map, actual-point lifting, matched-base/pullback controls, bounded native comparison and faithful Lean statements |
 | Useful yield | Test or prove the yield of rank-increasing rows under an explicit candidate/target policy | Full rank progression, failed attempts and dependence assumptions; raw zeros and multiple rows per call remain distinct |
 | Main-DLP benefit | Combine a surviving candidate with a scalar-preserving reduction and complete work accounting | Setup, relation solving, linear algebra, descent, transfer, recovery and verification on the same public synthetic target; applicable external references for any speed claim |
