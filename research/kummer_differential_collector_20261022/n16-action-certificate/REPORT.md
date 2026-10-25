@@ -88,3 +88,19 @@ before validation:
 python3 tools/artifacts/artifacts.py pull research/kummer_differential_collector_20261022/n16-action-certificate
 cargo run --offline --locked --release --manifest-path research/kummer_differential_collector_20261022/n16-action-certificate/Cargo.toml --bin validate
 ```
+
+## Subsequent exact generic-branch certificate (25 October 2026)
+
+The open generic reduction described above was subsequently executed for all
+105 frozen model/root pairs. The [new packet](GENERIC_IDEAL.md),
+[PDF](GENERIC_IDEAL.pdf), [review graph](generic-ideal-graph.svg),
+[standardized CSV](results/generic-ideal.csv), and
+[raw ideal witnesses](results/generic-ideal.json) retain the separate result.
+An independently implemented native checker verified **630 of 630** exact
+six-cross-product polynomial-ideal identities, with zero nonzero remainders.
+Each cleared translated vector uses `U^6`; in every row its action-side
+first coordinate is a nonzero scalar times `U=u(r)`. This establishes the
+recorded geometric action on the generic degree-two `U!=0` branch under the
+stated Mumford construction. The `U=0`, degree-one, and degree-zero branches
+remain unproved as all-state geometric identities, and no new complete
+collector or rho ratio was measured.

@@ -108,3 +108,9 @@ generic geometric identity remains **not established**. See
 for the explicit exit conditions. A successful generic certificate would
 still need the `U=0` branches and the degree-one/zero geometric charts to
 establish a complete all-state action law.
+
+**Subsequent result (25 October 2026):** the [generic ideal packet](GENERIC_IDEAL.md)
+now contains exact zero-remainder certificates for all 630 cross-products
+on the 105 recorded model/root pairs with `U!=0`, independently checked by
+native code. The preceding paragraph records the prior state of this
+packet; the exceptional and degree-one/zero branches it names remain open.
