@@ -12,7 +12,7 @@ use crypto_lib::binary_ecc::curve::point_neg;
 use crypto_lib::binary_ecc::{BinaryPoint, F2mElement};
 use crypto_lib::cryptanalysis::binary_semaev_chain_sat::{
     chain_s3_max_variables, finite_domain_clause_count, frobenius_orbit_domain_size,
-    ChainedS3Encoding,
+    frobenius_orbit_domain_size_with_encoding, ChainedS3Encoding, FrobeniusOrbitRootEncoding,
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_explicit_frobenius_point_factor_base, build_union_s4_encoding,
@@ -501,6 +501,33 @@ pub(super) fn full_d18_m4_model_cli(
     fixture_root: &Path,
     output: &Path,
 ) -> Result<Value> {
+    full_d18_m4_model_impl(
+        root,
+        fixture_root,
+        output,
+        FrobeniusOrbitRootEncoding::PerRepresentative,
+    )
+}
+
+pub(super) fn full_d18_m4_shared_model_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_model_impl(
+        root,
+        fixture_root,
+        output,
+        FrobeniusOrbitRootEncoding::SharedBits,
+    )
+}
+
+fn full_d18_m4_model_impl(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+    encoding: FrobeniusOrbitRootEncoding,
+) -> Result<Value> {
     if output.exists() {
         return Err("full D18 model output already exists".into());
     }
@@ -532,15 +559,23 @@ pub(super) fn full_d18_m4_model_cli(
             BinaryPoint::Infinity => Err("full D18 model representative is infinity".into()),
         })
         .collect::<Result<_>>()?;
-    let size = frobenius_orbit_domain_size(83, 4, representatives.len())
+    let size = frobenius_orbit_domain_size_with_encoding(83, 4, &representatives, encoding)
         .ok_or("full D18 model domain size overflow")?;
     let required_variables = chain_s3_max_variables(83, 4)
         .ok_or("full D18 model chain size overflow")?
         .checked_add(size.variables)
         .ok_or("full D18 model total size overflow")?;
-    if required_variables != 329_726 || size.clauses != 11_238_656 {
+    let expected_clauses = match encoding {
+        FrobeniusOrbitRootEncoding::PerRepresentative => 11_238_656,
+        FrobeniusOrbitRootEncoding::SharedBits => 2_621_168,
+    };
+    if required_variables != 329_726 || size.clauses != expected_clauses {
         return Err("full D18 model preflight differs from frozen protocol".into());
     }
+    let encoding_name = match encoding {
+        FrobeniusOrbitRootEncoding::PerRepresentative => "per_representative",
+        FrobeniusOrbitRootEncoding::SharedBits => "shared_root_bits",
+    };
     let preflight = json!({
         "schema":"n83.full-d18-m4-model-preflight/v1", "status":"PASS_INPUTS",
         "source_commit":source_commit, "source_attestation_mode":source_attestation_mode,
@@ -550,6 +585,7 @@ pub(super) fn full_d18_m4_model_cli(
         "orbit_columns":representatives.len(),
         "required_max_variables":required_variables,
         "required_domain_clauses":size.clauses,
+        "root_encoding":encoding_name,
         "import_ms":import_ms,
         "isolation":"L0_shared_host_no_hard_cgroup",
         "solver_search_executed":false,
@@ -567,8 +603,13 @@ pub(super) fn full_d18_m4_model_cli(
         400_000,
     )
     .map_err(|_| "full D18 model circuit construction failed")?;
-    enc.constrain_frobenius_orbit_summands(&representatives, 400_000, 12_000_000)
-        .map_err(|_| "full D18 model domain installation failed")?;
+    enc.constrain_frobenius_orbit_summands_with_encoding(
+        &representatives,
+        encoding,
+        400_000,
+        12_000_000,
+    )
+    .map_err(|_| "full D18 model domain installation failed")?;
     let result = json!({
         "schema":"n83.full-d18-m4-model/v1", "status":"PASS_MODEL_CONSTRUCTION_ONLY",
         "preflight":preflight,
@@ -597,7 +638,14 @@ pub(super) fn full_d18_m4_cli(
     fixture_root: &Path,
     output: &Path,
 ) -> Result<Value> {
-    full_d18_m4_impl(mode, root, fixture_root, output, false)
+    full_d18_m4_impl(
+        mode,
+        root,
+        fixture_root,
+        output,
+        false,
+        FrobeniusOrbitRootEncoding::PerRepresentative,
+    )
 }
 
 /// Local, positive-control-only SAT diagnostic. This shares the frozen model
@@ -607,7 +655,29 @@ pub(super) fn full_d18_m4_l0_positive_cli(
     fixture_root: &Path,
     output: &Path,
 ) -> Result<Value> {
-    full_d18_m4_impl("positive", root, fixture_root, output, true)
+    full_d18_m4_impl(
+        "positive",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::PerRepresentative,
+    )
+}
+
+pub(super) fn full_d18_m4_l0_shared_positive_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "positive",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+    )
 }
 
 fn full_d18_m4_impl(
@@ -616,6 +686,7 @@ fn full_d18_m4_impl(
     fixture_root: &Path,
     output: &Path,
     l0_diagnostic: bool,
+    encoding: FrobeniusOrbitRootEncoding,
 ) -> Result<Value> {
     if !["positive", "natural"].contains(&mode) || output.exists() {
         return Err("full D18 m4 mode or fresh output differs from protocol".into());
@@ -629,6 +700,10 @@ fn full_d18_m4_impl(
         Some(checked_cgroup_memory_limit(32_768)?)
     };
     let budget_seconds = if l0_diagnostic { 300 } else { 1_200 };
+    let encoding_name = match encoding {
+        FrobeniusOrbitRootEncoding::PerRepresentative => "per_representative",
+        FrobeniusOrbitRootEncoding::SharedBits => "shared_root_bits",
+    };
     let (source_commit, source_attestation_mode) = frozen_chain_source()?;
     let binary_sha256 = sha256_hex(&fs::read(std::env::current_exe()?)?);
     let started = Instant::now();
@@ -641,7 +716,7 @@ fn full_d18_m4_impl(
         &mut phases,
         started,
         "started",
-        json!({"mode":mode, "source_commit":source_commit, "binary_sha256":binary_sha256}),
+        json!({"mode":mode, "root_encoding":encoding_name, "source_commit":source_commit, "binary_sha256":binary_sha256}),
     )?;
     let cap_path = std::path::PathBuf::from(format!("{}.cap.json", output.display()));
     let cap_mode = mode.to_owned();
@@ -649,7 +724,7 @@ fn full_d18_m4_impl(
         std::thread::sleep(Duration::from_secs(budget_seconds));
         let cap = json!({
             "schema":"n83.full-d18-m4-cap/v1", "status":"UNKNOWN_wall_cap",
-            "mode":cap_mode, "budget_seconds":budget_seconds,
+            "mode":cap_mode, "root_encoding":encoding_name, "budget_seconds":budget_seconds,
             "isolation":if l0_diagnostic {"L0_shared_host_no_hard_cgroup"} else {"hard_32GiB_cgroup_zero_swap"},
             "elapsed_process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
             "selected_best_total_runtime":Value::Null,
@@ -727,8 +802,13 @@ fn full_d18_m4_impl(
         400_000,
     )
     .map_err(|_| "full D18 m4 circuit construction failed")?;
-    enc.constrain_frobenius_orbit_summands(&representatives, 400_000, 12_000_000)
-        .map_err(|_| "full D18 m4 domain installation failed")?;
+    enc.constrain_frobenius_orbit_summands_with_encoding(
+        &representatives,
+        encoding,
+        400_000,
+        12_000_000,
+    )
+    .map_err(|_| "full D18 m4 domain installation failed")?;
     if let Some((indices, partial, _)) = &planted {
         // The documented chained-S3 layout allocates four summand blocks,
         // two intermediate blocks, then the target, each of 83 x bits.
@@ -757,6 +837,7 @@ fn full_d18_m4_impl(
     let model_ms = model_start.elapsed().as_secs_f64() * 1000.0;
     let shape = json!({
         "variables":enc.solver.n_vars(), "clauses":enc.solver.n_clauses(),
+        "root_encoding":encoding_name,
         "xor_rows":enc.solver.n_xors(), "model_ms":model_ms,
         "import_ms":import_ms, "object":row["object"],
         "point_set_blake3":FULL_D18_POINT_SET,
@@ -832,6 +913,7 @@ fn full_d18_m4_impl(
     let result = json!({
         "schema":if l0_diagnostic {"n83.full-d18-m4-l0-positive/v1"} else {"n83.full-d18-m4-worker/v1"}, "status":status,
         "mode":mode, "source_commit":source_commit,
+        "root_encoding":encoding_name,
         "isolation":if l0_diagnostic {"L0_shared_host_no_hard_cgroup"} else {"hard_32GiB_cgroup_zero_swap"},
         "budget_seconds":budget_seconds,
         "source_attestation_mode":source_attestation_mode,

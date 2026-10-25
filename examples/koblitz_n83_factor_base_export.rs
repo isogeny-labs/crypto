@@ -1238,9 +1238,21 @@ fn main() -> Result<()> {
             )?;
             println!("{receipt}");
         },
+        Some("primary-full-d18-m4-shared-model")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-shared-model BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 construction only; shared-root encoding)".into()); }
+            let receipt=primary_adapter::full_d18_m4_shared_model_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
         Some("primary-full-d18-m4-l0-positive")=>{
             if args.len()!=5 { return Err("primary-full-d18-m4-l0-positive BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 positive-control diagnostic; 300-s internal cap)".into()); }
             let receipt=primary_adapter::full_d18_m4_l0_positive_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4-l0-shared-positive")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-l0-shared-positive BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 positive-control diagnostic; shared-root encoding; 300-s internal cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_l0_shared_positive_cli(
                 Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]))?;
             println!("{receipt}");
         },
