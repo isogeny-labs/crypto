@@ -1,19 +1,22 @@
 # Publishing the complete twist follow-up raw evidence
 
-- **Status:** open
-- **Kind:** access/tool limit and repository owner/reviewer exception requirement, separate from the mathematical and cost gaps
+- **Status:** open; corrected remote publication verified, historical size-policy hold remains
+- **Kind:** repository owner/reviewer exception requirement; the wrong-destination access diagnosis is superseded
 - **Affected work:** [follow-up execution](../research/twist_routes_1_3_20261021/execution-v2/README.md), [PR #2380](https://github.com/aburan28/crypto/pull/2380)
-- **Next action owner:** artifact bucket/identity owner; native upload and replay lane after object access is granted
+- **Next action owner:** repository owner/reviewer for the twelve existing oversized blobs; research lane for remaining full replay and experiment requirements
 - **Last updated:** 2026-10-25
 
 ## Problem
 
-The complete 2026-10-23 twist raw run bundle exceeds Git's 10 MiB limit and
-cannot be uploaded to the configured `s3://crypto-autoresearcher/store`
-because the supplied identity is denied object access. The 2026-10-25
-credentials authenticate successfully with STS; S3 denies the native HEAD
-preflight, exact-prefix listing and an atomic create-only PutObject. No
-successful upload, fresh download or index entry is claimed.
+The complete 2026-10-23 twist raw run bundle exceeds Git's 10 MiB limit.
+After the user corrected the destination, its immutable upload to
+`s3://setec-astronomy-artifacts/store`, native study-local index registration,
+fresh-cache download and remote verification all passed. Every original
+member hash matches after restoring loose metadata, and the unchanged
+270-cell incidence CAS input from the download passes the Rust admission
+gate. The prior denials targeted the wrong `crypto-autoresearcher` bucket.
+The proposed policy for that bucket is superseded; no permission change was
+needed. See the [corrected report](../research/twist_routes_1_3_20261021/reports/publication-20261025-setec/REPORT.md).
 
 The full PR also contains twelve older execution-v1 evidence blobs above
 the newly merged size limit. Those files were already committed before
@@ -21,10 +24,10 @@ this follow-up. AGENTS.md §13a prohibits repacking/moving committed evidence;
 §13 requires an owner/reviewer-added `large-file-ok` exception if retained.
 No such exception is self-applied here.
 
-This blocks durable remote publication of the full replay input. Small
-summaries, receipts, source freezes, reports and proof logs are reviewable;
-they do not replace the missing remote raw object. Local verification and
-remote reproducibility are distinct statuses.
+Durable remote publication is now verified. The historical Git size hold
+still prevents closing this combined record. One frozen downloaded-input
+replay does not establish a complete scientific rerun or independent-host
+replay; those broader requirements remain open.
 
 ## Evidence and uncertainty
 
@@ -36,27 +39,30 @@ remote reproducibility are distinct statuses.
   and linked redacted receipts distinguish successful authentication from
   denied S3 calls. The conditional-write denial is not merely a lack of
   bucket-listing permission.
-- **Derived or proved:** no scientific inference follows from this failure.
-- **Suspected explanation:** the particular identity/bucket policy cause is
-  unknown. No IAM or bucket policy was changed.
-- **Missing capability:** authorized PutObject and GetObject for the exact
-  prepared content-addressed object. GetObject is still needed for replay;
-  a successful read has not been established.
-- **Not established:** successful upload, a resolvable store entry, a verified
-  remote pull, complete remote replay, or any IC performance conclusion.
+- **Correction:** those denied calls concerned the wrong destination. The
+  [new receipt](../research/twist_routes_1_3_20261021/execution-v2/publication-20261025-setec-v1/RECEIPT.json)
+  proves successful conditional PutObject, native push/index, fresh pull and
+  remote verification in the user-selected bucket. No IAM or bucket policy
+  was changed.
+- **Verified integrity:** all 35,979 archived members and 104 loose metadata
+  files match the original 36,083-member manifest; the downloaded frozen
+  incidence input passes PARI replay and native Rust adjudication.
+- **Not established:** complete scientific rerun, independent-host replay,
+  any new IC performance conclusion, or a size-policy exception.
 
 ## What would unblock it
 
-- [ ] Grant the intended identity object read/write access using the
-  [narrow proposed policy](../research/twist_routes_1_3_20261021/reports/publication-20261025/REQUIRED_OBJECT_POLICY.json)
-  and relevant bucket policy. This proposal is reviewable and has not been
-  applied; its conditional-write path does not require bucket listing.
-- [ ] Run the native store upload, using the manifest's exact immutable
-  digest/name and an explicitly writable local cache.
-- [ ] Verify a fresh remote pull, byte count and SHA-256; commit the actual
-  `store/index.json` entry and extraction instructions in the PR.
+- [x] Select the intended bucket, `setec-astronomy-artifacts`; confirm actual
+  read/write access by successful immutable upload and fresh download.
+- [x] Run the native store publication using the exact immutable digest/name
+  and an explicitly writable local cache.
+- [x] Verify a fresh remote pull, byte count and SHA-256; commit the real
+  [study-local store index](../research/twist_routes_1_3_20261021/store/index.json)
+  and [extraction instructions](../research/twist_routes_1_3_20261021/store/README.md).
 - [ ] Replay the archived-member hashes and original native/CAS checker
   inputs after extraction. Keep loose live metadata paths intact.
+  All member hashes and the frozen E30 CAS replay pass; a full scientific
+  rerun of every original checker has not been performed in this correction.
 - [ ] Resolve the twelve historical oversized-file entries through the
   owner/reviewer policy exception or an explicitly authorized compliant
   resolution; preserve the failed [full-PR check](../research/twist_routes_1_3_20261021/execution-v2/checks/final-20261023/large-files.stdout).
@@ -66,16 +72,18 @@ missing higher-prime quotients, supply full costs or prove a speedup.
 
 ## Next discriminating step
 
-- **Action:** publish the concrete prepared bundle once object access exists.
-- **Inputs and controls:** immutable digest/size, normalized tar/xz recipe,
-  frozen raw-member inventories, and a fresh verified pull.
+- **Action:** retain the verified publication, resolve the existing size-policy
+  hold through the owner/reviewer, and use the downloaded bytes for further
+  original-protocol replays.
+- **Inputs and controls:** unchanged digest/size, normalized tar/xz recipe,
+  frozen inventories, successful fresh pull and all member-hash checks.
 - **Limits:** one prepared evidence object; no remote deletion, repointing,
   funding or new scientific campaign.
-- **Outcomes:** a verified upload/pull permits remote replay; an access error
-  remains an access failure. Do not add a fictitious store entry or split
-  the bundle to evade the Git policy.
-- **Recheck trigger:** an authorized store identity or owner/reviewer-approved
-  publication mechanism consistent with repository policy.
+- **Outcomes:** complete original-protocol replay extends validation; a
+  permitted size-policy resolution removes the separate merge hold. Neither
+  changes the outstanding mathematical or cost requirements.
+- **Recheck trigger:** owner/reviewer size-policy action or further replay
+  evidence; do not request changes to the wrong bucket's policies.
 
 ## Resolution and history
 
@@ -93,3 +101,13 @@ download was attempted. A policy for this exact artifact is prepared for the
 owner. The access blocker remains unresolved; the reason is now permissions,
 rather than absent credentials. Historical receipts and scientific results
 are unchanged.
+
+2026-10-25 destination correction: the user identified the default bucket as
+the wrong destination. Read-only discovery found `setec-astronomy-artifacts`.
+The same exact prepared archive was conditionally uploaded there with S3
+SHA-256 verification, registered through the native store, downloaded into a
+fresh cache, and verified. All 36,083 restored file hashes match, and the
+frozen E30 input passes independent PARI replay plus its native Rust gate on
+the same host. Earlier denied receipts and the unapplied wrong-bucket policy
+remain historical evidence. The access diagnosis is superseded; the
+historical Git size hold and broader scientific requirements remain open.

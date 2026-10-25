@@ -41,10 +41,12 @@ The eighteen-experiment campaign remains partial: the result table retains
 polarized gluing identification, higher-degree factorization, broader solver
 grids, full accounting/calibration, formal map bridges and independent-host
 replay as open requirements. The backlog cards remain blocked and unfunded.
-E26–E28 have not run. The full raw bundle is prepared locally but its remote
-store publication is blocked by S3 permissions: the 2026-10-25 credentials
-authenticate, but the object write is denied. See the
-[publication record and required object policy](reports/publication-20261025/REPORT.md).
+E26–E28 have not run. The full raw bundle is now published in
+`setec-astronomy-artifacts`: a fresh download and all original member hashes
+verify. The earlier denials targeted the wrong repository-default bucket;
+the proposed policy for that bucket is superseded. See the
+[corrected publication record](reports/publication-20261025-setec/REPORT.md)
+and [study store configuration and reproduction](store/README.md).
 No continuing
 background computation is implied by these records.
 

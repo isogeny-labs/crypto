@@ -8,15 +8,23 @@ const study='research/twist_routes_1_3_20261021';
 const output=process.argv[2];
 if(!output||fs.existsSync(output))throw Error('fresh publication receipt directory required');
 fs.mkdirSync(output,{recursive:true});
+fs.copyFileSync(new URL(import.meta.url),output+'/PUBLISHER.mjs');
+fs.writeFileSync(output+'/.gitignore','/upload-cache/\n/fresh-download-cache/\n/downloaded-runs.tar.xz\n/extracted/\n');
 const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
 const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
 const expected=read(study+'/execution-v2/RAW_ARTIFACTS.json');
-const config=read('store/config.json');
-if(config.remote!=='s3://crypto-autoresearcher/store')throw Error('unexpected configured store');
+// This study uses the user-selected bucket. The repository's shared default
+// serves other artifacts and must not redirect this publication.
+const config=read(study+'/store/config.json');
+const indexPath=path.resolve(study+'/store/index.json');
+if(config.remote!=='s3://setec-astronomy-artifacts/store')throw Error('unexpected study store');
+const remote=new URL(config.remote);
+const objectKey=remote.pathname.replace(/^\/+|\/+$/g,'')+'/sha256/'+expected.archive.sha256.slice(0,2)+'/'+expected.archive.sha256;
 if(sha(expected.archive.local_path)!==expected.archive.sha256||fs.statSync(expected.archive.local_path).size!==expected.archive.bytes)throw Error('prepared archive changed');
 const native=path.resolve('target/release/ecbench');
 const aws='/workspace/shared/twist-tools-20261023/awscli/aws/dist/aws';
 const receipt={schema:'twist.store-publication/v1',started_utc:new Date().toISOString(),remote:config.remote,
+  bucket:remote.hostname,object_key:objectKey,index_path:indexPath,index_before_sha256:sha(indexPath),
   name:expected.expected_store_name,sha256:expected.archive.sha256,bytes:expected.archive.bytes,
   uploader_binary_sha256:sha(native),aws_binary_sha256:sha(aws),inherited_uploader_binary:true,
   script_sha256:sha(new URL(import.meta.url)),
@@ -60,15 +68,15 @@ try{
   const base={...process.env,AWS_ACCESS_KEY_ID:access,AWS_SECRET_ACCESS_KEY:secret,AWS_SESSION_TOKEN:'',
     AWS_EC2_METADATA_DISABLED:'true',AWS_DEFAULT_REGION:'us-east-1',AWS_REGION:'us-east-1',AWS_MAX_ATTEMPTS:'2',
     AWS_CLI_AUTO_PROMPT:'off',AWS_PAGER:'',AWS_CA_BUNDLE:process.env.AWS_CA_BUNDLE||'/etc/ssl/certs/ca-certificates.crt',
-    CRYPTO_STORE_AWS:aws,CRYPTO_STORE_REMOTE:config.remote,CRYPTO_STORE_INDEX:path.resolve('store/index.json'),
+    CRYPTO_STORE_AWS:aws,CRYPTO_STORE_REMOTE:config.remote,CRYPTO_STORE_INDEX:indexPath,
     CRYPTO_STORE_CACHE:path.resolve(output+'/upload-cache')};
   delete base.CRYPTO_STORE_ENDPOINT;
   if(process.argv[3]==='--diagnose-auth'){
     receipt.authentication_diagnostics=[];
-    const key='store/sha256/'+receipt.sha256.slice(0,2)+'/'+receipt.sha256;
+    const key=objectKey;
     for(const [label,args] of [
       ['sts-caller-identity',['sts','get-caller-identity','--output','json']],
-      ['s3-list-exact-object',['s3api','list-objects-v2','--bucket','crypto-autoresearcher','--prefix',key,'--max-keys','1','--output','json']]
+      ['s3-list-exact-object',['s3api','list-objects-v2','--bucket',remote.hostname,'--prefix',key,'--max-keys','1','--output','json']]
     ]){
       try{await command(label,args,base,aws,true);receipt.authentication_diagnostics.push({label,accepted:true});}
       catch(error){receipt.authentication_diagnostics.push({label,accepted:false,error:redact(error)});}
@@ -81,9 +89,9 @@ try{
   // The ordinary store client can register it after the known object exists.
   if(process.argv[3]==='--conditional-put-first'){
     const checksum=Buffer.from(receipt.sha256,'hex').toString('base64');
-    const key='store/sha256/'+receipt.sha256.slice(0,2)+'/'+receipt.sha256;
+    const key=objectKey;
     try{
-      const reply=JSON.parse(await command('conditional-put',['s3api','put-object','--bucket','crypto-autoresearcher',
+      const reply=JSON.parse(await command('conditional-put',['s3api','put-object','--bucket',remote.hostname,
         '--key',key,'--body',expected.archive.local_path,'--if-none-match','*','--checksum-algorithm','SHA256',
         '--checksum-sha256',checksum,'--output','json'],base,aws));
       if(reply.ChecksumSHA256!==checksum)throw Error('S3 conditional-write checksum mismatch');
@@ -95,7 +103,7 @@ try{
       receipt.existing_object_retained=true;
     }
   }
-  const provenance='Exact 2026-10-23 native twist E18-E30 raw remainder; source/packing recipe in '+study+'/execution-v2/RAW_ARTIFACTS.json; no historical committed evidence repacked.';
+  const provenance='Exact 2026-10-23 native twist E18-E30 raw remainder; source/packing recipe in '+study+'/execution-v2/RAW_ARTIFACTS.json; remote '+config.remote+'; study-local store/index.json; no historical committed evidence repacked.';
   const push=JSON.parse(await command('push',['store','push',expected.archive.local_path,'--name',receipt.name,
     '--description','Frozen twist follow-up raw evidence, including failed and incomplete attempts',
     '--provenance',provenance,'--tag','twist-followup-20261023','--no-cache','--json'],base));
@@ -119,5 +127,6 @@ try{
   receipt.status='publication-incomplete';receipt.error=redact(error);
   console.error(receipt.error);process.exitCode=1;
 }finally{
+  receipt.index_after_sha256=sha(indexPath);
   receipt.finished_utc=new Date().toISOString();save();access='';secret='';
 }

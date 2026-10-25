@@ -12,7 +12,8 @@ generated. The new E30 finite-incidence pilot completes its 270 correctness
 cells, including independent PARI replay, and finds no maximum-generator-degree
 reduction in its fixed grid. Its full solver/cost experiment remains open.
 All sixteen route/follow-up cards remain blocked and unfunded; no cairn lease,
-allocation, publication or funding transaction was performed.
+allocation or funding transaction was performed. Raw-artifact publication is
+now verified as described below.
 
 No calibrated IC speedup, novelty, independent-host replay or NIST DLP is
 established. Public P-521 work constructs torsion and explicit cover maps;
@@ -21,19 +22,23 @@ prior art (arXiv:1403.6911, Algorithm 5.4 and Appendix A).
 
 ## Evidence publication and extraction
 
-The full deterministic raw archive exceeds Git's 10 MiB limit. It is prepared
-in the persistent workspace, with its digest, size and exact local location
-in [RAW_ARTIFACTS.json](RAW_ARTIFACTS.json). **The object has not been uploaded
-to the configured store, and no resolvable store name/index entry is claimed.**
-The 2026-10-23 attempts lacked credentials and are preserved in
-[checks/final-20261023/](checks/final-20261023/). On 2026-10-25, ephemeral
-credentials authenticated successfully with AWS STS, but S3 denied object
-HEAD, exact-prefix listing and an atomic conditional PutObject. No upload or
-fresh download succeeded, and the store index is unchanged. See the
-[publication attempt and narrow proposed policy](../reports/publication-20261025/REPORT.md).
-The proposed policy has not been applied; no credential values or caller
-identity values are included in these records.
-See the [publication blocker](../../../problems/twist-followup-evidence-publication.md).
+The full deterministic raw archive exceeds Git's 10 MiB limit. Its exact
+38,156,064 bytes are published in `s3://setec-astronomy-artifacts/store`, using
+the [study-local store index](../store/index.json). **A fresh remote download
+matches the archive SHA-256, and all 36,083 original file hashes verify after
+restoring the 104 separately tracked metadata files.** See
+[RAW_ARTIFACTS.json](RAW_ARTIFACTS.json), the
+[corrected publication report](../reports/publication-20261025-setec/REPORT.md),
+and [store reproduction instructions](../store/README.md).
+
+The 2026-10-23 missing-credential attempts remain in
+[checks/final-20261023/](checks/final-20261023/). The first 2026-10-25 denials
+used the wrong repository-default bucket, `crypto-autoresearcher`; that
+[historical report and unapplied policy](../reports/publication-20261025/REPORT.md)
+do not describe the intended destination's permissions. No IAM or bucket
+policy change was needed for the corrected upload. The
+[remaining merge hold](../../../problems/twist-followup-evidence-publication.md)
+concerns the twelve already committed oversized evidence blobs.
 
 Small `SUMMARY.json`, `ADJUDICATION.json` and `INVENTORY.json` files stay loose
 because the current report, geometry input manifest and assessment name them.
@@ -45,7 +50,17 @@ the complete tree before invoking a checker. The `/runs/` ignore rule prevents
 accidentally adding the large raw tree; the selected loose files are tracked
 explicitly. No committed historical tree was repacked.
 
-Once the local bundle has been supplied, or after a successful store upload:
+Fetch the verified bundle from the repository root:
+
+```sh
+CRYPTO_STORE_REMOTE=s3://setec-astronomy-artifacts/store \
+CRYPTO_STORE_INDEX=research/twist_routes_1_3_20261021/store/index.json \
+ecbench store pull \
+  store:evidence/twist_routes_1_3_20261021/execution-v2-20261023/runs.tar.xz \
+  --out research/twist_routes_1_3_20261021/execution-v2/runs.tar.xz
+```
+
+Then extract from this directory:
 
 ```sh
 # From this directory, after verifying RAW_ARTIFACTS.json's exact digest:
@@ -56,9 +71,10 @@ tar -xJf runs.tar.xz
 Repack the raw remainder with the exact command in `RAW_ARTIFACTS.json`.
 The archive uses sorted names, 2026-10-23 midnight UTC, uid/gid zero,
 normalized modes, GNU tar and single-threaded xz -6. A successful store
-upload must be followed by a verified pull and a committed `store/index.json`
-entry before this publication blocker can close. Do not split the blob or
-add a local-only store entry to evade the limit.
+upload and fresh verified pull now have a real study-local `store/index.json`
+entry. The repository's shared default and its unrelated index entries retain
+their existing destination. Do not split the blob or add a local-only store
+entry to evade the limit.
 
 ## Existing oversized-file merge hold
 
