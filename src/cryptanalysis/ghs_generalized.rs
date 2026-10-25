@@ -5,7 +5,7 @@
 //! adjoining the constant 1 to a span of coefficients, gives wrong genera.
 //! These profiles are construction inputs, not subgroup certificates.
 
-use super::ghs_screen::{GhsCurveInput, validate_input};
+use super::ghs_screen::{validate_input, GhsCurveInput};
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
 use num_bigint::BigUint;
 use num_traits::{One, Zero};

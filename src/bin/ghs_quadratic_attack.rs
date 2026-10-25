@@ -1,14 +1,14 @@
 //! Exact small-field quadratic GHS transfer, degree-one index calculus, and matched rho.
 use clap::Parser;
 use crypto_lib::binary_ecc::hyperelliptic::MumfordDivisor;
-use crypto_lib::binary_ecc::{F2mElement, operation_tally::OperationTally};
+use crypto_lib::binary_ecc::{operation_tally::OperationTally, F2mElement};
 use crypto_lib::cryptanalysis::ghs_descent::{ECurve, Pt};
 use crypto_lib::cryptanalysis::ghs_generalized::GeneralizedContext;
-use crypto_lib::cryptanalysis::ghs_quadratic::{QuadraticDescent, divisor_json};
+use crypto_lib::cryptanalysis::ghs_quadratic::{divisor_json, QuadraticDescent};
 use crypto_lib::cryptanalysis::ghs_screen::GhsCurveInput;
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::{cell::Cell, collections::HashMap, time::Instant};
 
 #[derive(Parser)]

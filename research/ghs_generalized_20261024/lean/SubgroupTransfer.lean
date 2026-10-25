@@ -72,6 +72,36 @@ theorem image_zero_of_no_destination_torsion
   apply destination_torsion_trivial
   rw [← pull.map_zsmul, annihilates x, pull.map_zero]
 
+/-- The degree-zero map induced by the point transformation `P ↦ T-P`
+is the negative of the original additive transfer after subtracting the
+image of the transformed origin `T`.  The concrete Artin--Schreier
+coordinate identity is checked separately for each finite subgroup. -/
+theorem translated_negation
+    (pull : AdditiveTransfer E J) (torsion point : E) :
+    pull.apply (torsion + (-1 : Int) • point) - pull.apply torsion =
+      (-1 : Int) • pull.apply point := by
+  rw [pull.map_add, pull.map_zsmul]
+  grind
+
+/-- Scaling by a nonzero subfield coefficient puts the first
+Artin--Schreier branch in canonical form.  The subfield membership itself
+is checked in the finite-field audit. -/
+theorem normalize_d_branch {K : Type} [Field K]
+    (c d z beta : K) (hd : d ≠ 0) (hz : z ≠ 0)
+    (hproduct : c * d = beta) :
+    c / z + d * z = beta / (d * z) + d * z := by
+  rw [← hproduct]
+  grind
+
+/-- Scaling and inversion put the second Artin--Schreier branch in the
+same canonical form. -/
+theorem normalize_c_branch {K : Type} [Field K]
+    (c d z beta : K) (hc : c ≠ 0) (hz : z ≠ 0)
+    (hproduct : c * d = beta) :
+    c / z + d * z = beta / (c / z) + c / z := by
+  rw [← hproduct]
+  grind
+
 /-- A generator has a nonzero image once injectivity is certified. -/
 theorem image_nonzero
     (pull : AdditiveTransfer E J) (push : AdditiveTransfer J E)

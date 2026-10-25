@@ -10,13 +10,13 @@
 //! injectivity must be checked on the actual generator, never from genus.
 
 use super::ghs_descent::{ECurve, Pt};
-use super::ghs_generalized::{GeneralizedContext, frobenius};
+use super::ghs_generalized::{frobenius, GeneralizedContext};
 use super::ghs_screen::GhsCurveInput;
 use crate::binary_ecc::hyperelliptic::{HyperellipticCurve, MumfordDivisor};
 use crate::binary_ecc::poly_f2m::F2mPoly;
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
 use num_traits::ToPrimitive;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::collections::BTreeMap;
 
 fn elt(x: u64, m: u32) -> F2mElement {
@@ -49,7 +49,7 @@ impl QuadraticDescent {
     /// choosing and inverting the subfield basis here uses enumeration.
     pub fn construct(input: &GhsCurveInput) -> Result<Self, String> {
         let n = input.absolute_degree;
-        if n < 4 || n > 16 || !n.is_multiple_of(2) {
+        if !(4..=16).contains(&n) || !n.is_multiple_of(2) {
             return Err("quadratic constructor requires even absolute degree in 4..=16".into());
         }
         let s = n / 2;

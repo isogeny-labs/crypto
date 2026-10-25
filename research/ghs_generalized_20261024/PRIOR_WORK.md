@@ -17,6 +17,8 @@ This audit addresses the precise tested examples in `results/`. It is not an exh
 
 The degree-12 `c=0x1`, base-degree-four genus-one profile (and 14 other such profiles in `results/leads-n12-a1-b200-g2.json`) is a Hess-parameter structural screen, not an executed map or an attack. For the exact order-199 source subgroup, all 15 are excluded by the Jacobian order bound 25; six base-degree-two genus-two profiles are likewise excluded by the bound 81. `results/subgroup-weil-audit.json` gives the exact parameters and all four screens' low-genus counts. Hess 2004 covers the generalized family; no exact-instance publication claim is made.
 
+The remaining 232 low-genus profiles in the four exact screens are all index-two genus-two profiles with either `c` or `sqrt(b)/c` in the subfield. `C_EQUIVALENCE.md` and `results/c-equivalence-audit.json` show that subfield scaling and inversion normalize every one to the same Artin--Schreier presentation as the executed direct representative for its source curve. This is a specialization of the prior-known Hess/Magma descent parameter, not 232 distinct candidate curves. The exact parameter lists are independently enumerated in the audit; no claim that each parameter has separately timed Jacobian arithmetic is made.
+
 The coefficients alone do not identify a curve: the field polynomial, subgroup generator and target coordinates in each receipt are part of the exact identity. The quotient receipts add the exact kernel and codomain coefficients.
 
 Sources checked, before interpreting these runs:
