@@ -384,9 +384,9 @@ is not a result until that PR merges.
 
 | card | status | funding | blocked on |
 |:--|:--|--:|:--|
-| [XP-20261015-pkm-m3-n21-m4-n20](XP-20261015-pkm-m3-n21-m4-n20/README.md) | blocked | 1,000,000 | 256/512 GB host or a disk-backed reducer; PR #1893 |
+| [XP-20261015-pkm-m3-n21-m4-n20](XP-20261015-pkm-m3-n21-m4-n20/README.md) | blocked | 1,000,000 | 256 GB host for m = 3, N = 21, or a disk-backed reducer (the m = 4 cell is answered: D ≥ 8) |
 | [XP-20261015-kummer-p224-depth](XP-20261015-kummer-p224-depth/README.md) | draft | 400,000 | — (engine on `claude/f4-generic-field`; protocol not frozen) |
-| [XP-20261015-shape-g1-frozen-cells](XP-20261015-shape-g1-frozen-cells/README.md) | blocked | 250,000 | PR #1892; memory |
+| [XP-20261015-shape-g1-frozen-cells](XP-20261015-shape-g1-frozen-cells/README.md) | blocked | 250,000 | memory (47–50 GB at (13, 5), more at the larger cells) |
 | [XP-20261015-p192-isogeny-aux-search-t48](XP-20261015-p192-isogeny-aux-search-t48/README.md) | blocked | 131,072 | tower builder and Stage 0 (in progress); PR #1889; gate on lead 1. Lab tasks, first success; objective is the upgrade path |
 
 ## What is not built

@@ -39,6 +39,10 @@ pub struct ArmResources {
     pub instructions_sum: Option<u64>,
     pub cycles_sum: Option<u64>,
     pub pmu_complete_runs: usize,
+    /// Runs whose counters shared the PMU (time running below time
+    /// enabled): the sums above are then the scaled counts, the raw reads
+    /// stay in each record.
+    pub pmu_multiplexed_runs: usize,
     pub pmu_errors: Vec<String>,
     /// Cold charged work by named phase; the sum is the arm's charged GAE.
     pub phase_gae_totals: BTreeMap<String, f64>,
@@ -104,6 +108,7 @@ fn summarize(arm: &str, records: &[&Record]) -> Result<ArmResources, String> {
         instructions_sum: Some(0),
         cycles_sum: Some(0),
         pmu_complete_runs: 0,
+        pmu_multiplexed_runs: 0,
         pmu_errors: Vec::new(),
         phase_gae_totals: BTreeMap::new(),
         phase_wall_ns_totals: BTreeMap::new(),
@@ -142,15 +147,22 @@ fn summarize(arm: &str, records: &[&Record]) -> Result<ArmResources, String> {
         if hw.and_then(|h| h.instructions).is_some() && hw.and_then(|h| h.cycles).is_some() {
             out.pmu_complete_runs += 1;
         }
+        if hw.and_then(|h| h.multiplexed) == Some(true) {
+            out.pmu_multiplexed_runs += 1;
+        }
         if let Some(error) = hw.and_then(|h| h.error.as_ref()) {
             pmu_errors.insert(error.clone());
         }
         add_optional(
             &mut out.instructions_sum,
-            hw.and_then(|h| h.instructions),
+            hw.and_then(|h| h.instructions_best()),
             "instructions",
         )?;
-        add_optional(&mut out.cycles_sum, hw.and_then(|h| h.cycles), "cycles")?;
+        add_optional(
+            &mut out.cycles_sum,
+            hw.and_then(|h| h.cycles_best()),
+            "cycles",
+        )?;
         if let Some(window) = &r.online {
             out.online_complete_runs += 1;
             add_optional(

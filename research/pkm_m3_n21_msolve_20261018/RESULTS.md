@@ -27,3 +27,18 @@ Either the native `f4_fp_tower` cell (192 GB host, 14–60 h, already frozen
 in `research/pkm_lead1_m3n21_20261016/PROTOCOL.md`) or msolve with
 `-t 8` on a 64 GB host with a 24 h wall; the recorded per-round times give
 the budget. Nothing in this run changes the N ≥ 27 requirement for H1a.
+
+## Addendum: Amendment A1, minimal P2 (run 20261018T2208Z, `-t 16`, target 0 only)
+
+Report: `reports/run-20261018T2208Z-mt/` (README, graph, PDF). Records:
+`runs-mt/`, `progress-mt.txt`.
+
+- Control `m3_t5` at 16 threads: identical answer, 245.9 s.
+- `m3_t7_x221026520` (N = 21): same F4 trace as the first run through all of
+  degree 7. Degree 7 ran out of pairs without the unit ideal. msolve then
+  selected 398,409 degree-8 pairs and exited 139 inside that round at 99.6 GiB
+  under the 108.8 GB cap, before the round reported `new`.
+- A1.4 reading: **inconclusive** (memory stop, no productive degree-8 round,
+  one target of two). Not H0 and not a plateau reading.
+- Next: the same system and target 1 on a host where one process has 256 GB
+  or more (A1.2 hosts, larger memory).

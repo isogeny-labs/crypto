@@ -1,49 +1,10 @@
-test_database_probe_failure_blocks_shutdown (test_activity.ActivityTests) ... ok
-test_missing_manifest_does_not_hide_legacy_workers (test_activity.ActivityTests) ... ok
-test_real_work_queues_count_while_node_daemons_do_not (test_activity.ActivityTests) ... ok
-test_unregistered_user_experiment_keeps_worker_busy (test_activity.ActivityTests) ... ok
-test_draining_worker_cannot_admit_new_job (test_lifecycle.HookTests) ... ok
-test_existing_hooks_preserved_and_install_idempotent (test_lifecycle.HookTests) ... ok
-test_invalid_existing_config_is_not_partially_rewritten (test_lifecycle.HookTests) ... ok
-test_booting_replacement_prevents_stop (test_lifecycle.LifecycleTests) ... ok
-test_busy_controller_requests_retry_not_dropped_prompt (test_lifecycle.LifecycleTests) ... ok
-test_busy_pending_unknown_and_stale_each_cancel_idle (test_lifecycle.LifecycleTests) ... ok
-test_compute_ready_does_not_claim_ssh_ready_while_original_ip_is_protected (test_lifecycle.LifecycleTests) ... ok
-test_exact_thirty_minutes_of_confirmed_idle (test_lifecycle.LifecycleTests) ... ok
-test_missing_instance_during_capacity_shortage_never_stops (test_lifecycle.LifecycleTests) ... ok
-test_missing_report_never_stops (test_lifecycle.LifecycleTests) ... ok
-test_missing_required_report_fields_prevents_stop (test_lifecycle.LifecycleTests) ... ok
-test_new_prompt_resets_shutdown_window (test_lifecycle.LifecycleTests) ... ok
-test_prompt_starts_and_cancels_idle (test_lifecycle.LifecycleTests) ... ok
-test_scaling_error_preserves_demand_for_next_tick (test_lifecycle.LifecycleTests) ... ok
-test_session_end_never_immediately_stops_experiments (test_lifecycle.LifecycleTests) ... ok
-test_short_job_between_timer_ticks_restarts_idle_window (test_lifecycle.LifecycleTests) ... ok
-test_staging_never_starts_or_stops (test_lifecycle.LifecycleTests) ... ok
-test_worker_clock_ahead_prevents_stop (test_lifecycle.LifecycleTests) ... ok
-test_no_capacity_keeps_existing_address (test_system.AddressTests) ... ok
-test_ready_replacement_receives_address (test_system.AddressTests) ... ok
-test_staged_never_moves_address (test_system.AddressTests) ... ok
-test_unhealthy_replacement_cannot_steal_address (test_system.AddressTests) ... ok
-test_unready_replacement_cannot_steal_address (test_system.AddressTests) ... ok
-test_bootstrap_proves_recovery_before_marking_instance_ready (test_system.DeploymentTests) ... ok
-test_compute_lifecycle_is_independent_of_ip_cutover (test_system.DeploymentTests) ... ok
-test_discovery_timer_only_runs_read_only_inventory (test_system.DeploymentTests) ... ok
-test_isolated_worker_root_applies_to_every_service (test_system.DeploymentTests) ... ok
-test_safe_staging_and_durable_storage (test_system.DeploymentTests) ... ok
-test_acquired_lease_released_after_failure (test_system.LeaseTests) ... ok
-test_busy_lease_prevents_ip_reconciliation (test_system.LeaseTests) ... ok
-test_abrupt_worker_death_resumes (test_system.ResumeTests) ... ok
-test_completed_job_not_rerun (test_system.ResumeTests) ... ok
-test_corrupt_application_checkpoint_does_not_restart_from_zero (test_system.ResumeTests) ... ok
-test_directory_escape_rejected (test_system.ResumeTests) ... ok
-test_missing_checkpoint_contract_rejected (test_system.ResumeTests) ... ok
-test_replacement_waits_for_old_supervisor (test_system.ResumeTests) ... ok
-test_sigterm_resumes_from_durable_checkpoint (test_system.ResumeTests) ... ok
-test_spec_change_cannot_reuse_checkpoint (test_system.ResumeTests) ... ok
-
+........................................................................
 ----------------------------------------------------------------------
-Ran 42 tests in 15.362s
+Ran 72 tests in 14.041s
 
 OK
-Hooks prepared in /tmp/tmpuk0y5hon. Review Codex /hooks to trust the exact definitions.
-Hooks prepared in /tmp/tmpuk0y5hon. Review Codex /hooks to trust the exact definitions.
+{"pid": 123, "state": "not-the-registered-live-process"}
+Hooks prepared in /tmp/tmpx5vjwq_g. Review Codex /hooks to trust the exact definitions.
+Hooks prepared in /tmp/tmpx5vjwq_g. Review Codex /hooks to trust the exact definitions.
+Hooks prepared in /tmp/tmpr50gec9l. Review Codex /hooks to trust the exact definitions.
+Hooks prepared in /tmp/tmpr50gec9l. Review Codex /hooks to trust the exact definitions.
