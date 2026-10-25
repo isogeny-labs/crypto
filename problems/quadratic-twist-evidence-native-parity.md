@@ -187,11 +187,15 @@ Five new Lean theorems prove actual shifted recovery and its modulo11 step;
 the scoped gate checks176 public theorems/231 declarations, zero extra trusted.
 This closes a finite demand-recording gap while retaining the unpriced field
 setup, allocation/sorting, primitive calibration and full-work obligations.
-The [validated next draft](../backlog/XP-20261025-known-factor-base-roots/README.md)
-tests the already verified factor-base roots as direct solver input instead of
-129 repeated membership evaluations per query. It is not yet executed. Freeze
-the new root-validation/coverage protocol and require independent equality of
-the constrained roots, rows, witnesses and source recoveries.
+The [checked-root comparison](../research/quadratic_twist_evidence_20261021/reports/known-roots-20261025/README.md)
+now executes80 paired setups/800 verified recoveries. Every certificate, row,
+failed query and scalar is unchanged; cold membership requests are645->4 and
+258->4 in the first main/twist record, including setup validation. Six new public
+Lean theorems prove complete membership roots and actual-input equivalence;
+the scoped gate audits238 declarations /182 public theorems, zero extra trusted.
+The algorithm change is a verified request reduction, not a priced total gain.
+The [next draft](../backlog/XP-20261025-signed-base-cache/README.md) tests a
+setup-charged signed-point cache for the still-repeated actual lifting requests.
 
 The [executed adaptive-S3 round](../research/quadratic_twist_evidence_20261021/reports/adaptive-s3-20261025/README.md)
 checks the named row-reinsertion solver on all98 prior cases,188 comparisons

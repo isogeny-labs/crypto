@@ -234,3 +234,13 @@ No benchmark or leaderboard row is promoted. Canonical IC/rho cost graphs remain
 unchanged because there is no new admissible cost comparison. The new study graph
 shows the expanded native coverage. Research records stay loose where review,
 source, digest, and replay links name their individual paths.
+
+## Checked-root query continuation (2026-10-25)
+
+[Executed report](reports/known-roots-20261025/README.md):80 paired setups and800
+verified separate source recoveries, identical certificates/rows/degrees and9
+rehashed rejection controls. Membership scans are replaced with setup-checked
+roots, four membership evaluations per cold record. All other matrix/group
+requests remain; total cost is unpriced. Six new Lean theorems,182 public/238
+audited total, zero extra trusted. [Next draft](../../backlog/XP-20261025-signed-base-cache/README.md)
+tests charged signed-base caching; no running background job is claimed.

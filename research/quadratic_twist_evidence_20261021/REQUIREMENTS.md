@@ -11,7 +11,7 @@
 | Independent verification of saved/new IC data | verified | tuple-based auditor verifies three headline and 81 complete-log certificates |
 | Native controls | verified | false new relation, removed log certificate and false historical census count rejected |
 | Historical general readable arguments | preserved | archived report remains available with its original hypotheses |
-| Checked Lean implications and proof map | partial overall; finite S3/degree/source-reduction, adaptive fixture and shifted recovery verified |176 public named theorems /231 audited declarations, zero extra trusted; actual point/group/eigenspace, finite Miller table, yield/rank/cost, S3 ideals/degree certificates, F43 reduction, row-adjunction, D2/D3, exact twist vanishing space and annihilator-aware shifted recovery checked; general geometry and complete-work bridges remain open |
+| Checked Lean implications and proof map | partial overall; finite S3/degree/source-reduction, adaptive fixture and shifted recovery verified |182 public named theorems /238 audited declarations, zero extra trusted; actual point/group/eigenspace, finite Miller table, yield/rank/cost, S3 ideals/degree certificates, F43 reduction, row-adjunction, D2/D3, exact twist vanishing space and annihilator-aware shifted recovery checked; general geometry and complete-work bridges remain open |
 | Algebraic identity certificates | verified for fourteen stated study identities | all previous thirteen retained; adaptive degree3 cleared unit IDC1h9eea191ebc3a8def adds32+16 replay, arithmetic false-identity and false-source controls |
 | Exact curve/model/subgroup identities | verified within stated representations | 1,921 registered monic models, 27 EC1 representations; unused subgroup choices stay unknown |
 | Shared Conductor check | blocked by unavailable tool/configuration | CLI exits 127; shared workflow/state unavailable; no reservation claimed |
@@ -51,9 +51,11 @@
 | Setup/online/source-verification request accounting | executed and independently verified |40 setups,400 separate target recoveries,29 explicitly unpriced counters; all400 scalars verify;100 distinct solver certificates also batch-audited; six rehashed controls reject |
 | Demand advantage scope | finite mixed components, not calibrated total cost | first F43 policy/target cold solver calls5/2 and slots540/36, point-add requests125/136; all-policy cold aggregates tie; transported profiles differ only by explicit map multiplications |
 | Shifted-relation recovery proof | kernel checked on actual F43 map | five new public theorems; source annihilator is explicit for modulo reduction; total176/231, zero extra trusted |
-| Known-factor-base-root query optimization | draft next experiment, not executed | `backlog/XP-20261025-known-factor-base-roots`; implement independent paths and freeze its root-validation/coverage protocol before promotion |
+| Known-factor-base-root query | executed locally and independently verified |80 paired setups/800 separate scalars; all100 certificates unchanged; root completeness proved,4 setup membership checks instead of129/query,9 corruption controls reject |
+| Complete-work improvement from checked roots | not priced |32 differently weighted request components; sorting and other overhead unpriced; no speed/GAE/S claim |
+| Signed base point cache | draft next experiment, not executed | `backlog/XP-20261025-signed-base-cache`; freeze exact cache validation/setup/read accounting and preserve all ordered lifts |
 
-The fresh library suite for the phase-demand continuation again passes 4,479
+The fresh library suite for the checked-root continuation again passes 4,479
 tests with zero failures and 119 existing ignores; its 22 backend and four
 workflow metadata tests pass. Earlier library and 39/40 metadata-backend
 receipts remain historical records for their original source states.
