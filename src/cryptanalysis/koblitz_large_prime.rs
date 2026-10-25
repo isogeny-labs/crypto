@@ -386,12 +386,39 @@ impl<'a> MixedOrbitDomains<'a> {
         limits: ChainS3Limits,
         order_first_pair: bool,
     ) -> Result<(ChainedS3Encoding, BinaryPoint), &'static str> {
+        self.pattern_encoding(
+            coef_a,
+            coef_b,
+            public_target,
+            small_summands,
+            residual_summands,
+            0,
+            limits,
+            order_first_pair,
+        )
+    }
+
+    /// Build one specified identity pattern with the same domains and
+    /// symmetry constraint as `search`. The mask spans the `m - 2` chained
+    /// addition steps and is checked before any solver allocation.
+    pub fn pattern_encoding(
+        &self,
+        coef_a: &BigUint,
+        coef_b: &BigUint,
+        public_target: &BinaryPoint,
+        small_summands: usize,
+        residual_summands: usize,
+        identity_mask: u32,
+        limits: ChainS3Limits,
+        order_first_pair: bool,
+    ) -> Result<(ChainedS3Encoding, BinaryPoint), &'static str> {
         let m = small_summands
             .checked_add(residual_summands)
             .ok_or("summand count overflow")?;
         if !(5..=6).contains(&m)
             || small_summands < 3
             || !(1..=2).contains(&residual_summands)
+            || identity_mask >= (1u32 << (m - 2))
             || limits.max_variables == 0
             || limits.max_domain_clauses == 0
             || !self.curve.curve.is_on_curve(public_target)
@@ -435,10 +462,10 @@ impl<'a> MixedOrbitDomains<'a> {
             &self.curve.curve.irreducible,
             &self.curve.curve.b,
             target_x,
-            0,
+            identity_mask,
             limits.max_variables,
         )
-        .map_err(|_| "external first-pattern construction failed")?;
+        .map_err(|_| "external identity-pattern construction failed")?;
         if encoding
             .constrain_frobenius_orbit_domains(
                 &domains,
@@ -449,7 +476,7 @@ impl<'a> MixedOrbitDomains<'a> {
             != Ok(domain_clauses)
             || (order_first_pair && encoding.order_first_pair(limits.max_variables).is_err())
         {
-            return Err("external first-pattern domain or symmetry failed");
+            return Err("external identity-pattern domain or symmetry failed");
         }
         Ok((encoding, target))
     }
@@ -1423,6 +1450,32 @@ mod tests {
             let (small, residual) = domains.lift(&xs, small_count, &group_target).unwrap();
             assert_eq!(small.len(), small_count);
             assert_eq!(residual.len(), residual_count);
+            let (later, later_target) = domains
+                .pattern_encoding(
+                    coefficient,
+                    &BigUint::zero(),
+                    &target,
+                    small_count,
+                    residual_count,
+                    1,
+                    bounded,
+                    true,
+                )
+                .unwrap();
+            assert_eq!(later_target, group_target);
+            assert!(later.solver.n_vars() > 0);
+            assert!(domains
+                .pattern_encoding(
+                    coefficient,
+                    &BigUint::zero(),
+                    &target,
+                    small_count,
+                    residual_count,
+                    16,
+                    bounded,
+                    true,
+                )
+                .is_err());
         }
     }
 

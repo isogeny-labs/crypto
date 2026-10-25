@@ -875,12 +875,31 @@ struct CrossXcnfInstance {
     base_summands: usize,
     residual_summands: usize,
     shared_signed_orbits: usize,
+    trial: u64,
+    identity_mask: u32,
+    extended_metadata: bool,
 }
 
-fn cross_xcnf_instance(args: &[String]) -> Result<CrossXcnfInstance> {
-    if args.len() < 10 {
+fn external_trial_pattern(args: &[String], extended: bool) -> Result<(u64, u32)> {
+    if !extended {
+        return Ok((0, 0));
+    }
+    if args.len() < 12 {
+        return Err("external trial and identity mask missing".into());
+    }
+    let trial: u64 = args[10].parse()?;
+    let identity_mask: u32 = args[11].parse()?;
+    if trial == u64::MAX {
+        return Err("external trial source ID overflow".into());
+    }
+    Ok((trial, identity_mask))
+}
+
+fn cross_xcnf_instance(args: &[String], extended: bool) -> Result<CrossXcnfInstance> {
+    if args.len() < if extended { 12 } else { 10 } {
         return Err("external instance arguments missing".into());
     }
+    let (trial, identity_mask) = external_trial_pattern(args, extended)?;
     let base_summands: usize = args[8].parse()?;
     let residual_summands: usize = args[9].parse()?;
     if base_summands < 3
@@ -905,8 +924,8 @@ fn cross_xcnf_instance(args: &[String]) -> Result<CrossXcnfInstance> {
         .checked_sub(residual.signed_orbits.len())
         .ok_or("residual orbit count exceeds pool")?;
     let (public_point, _) = public_target(Path::new(&args[7]), &curve)?;
-    let coef_a = trial_coefficient(b"a", 0, &curve.subgroup_order);
-    let coef_b = trial_coefficient(b"b", 0, &curve.subgroup_order);
+    let coef_a = trial_coefficient(b"a", trial, &curve.subgroup_order);
+    let coef_b = trial_coefficient(b"b", trial, &curve.subgroup_order);
     let domains = MixedOrbitDomains::new(&curve, &base, &residual)?;
     let limits = ChainS3Limits {
         max_variables: 150_000,
@@ -914,12 +933,13 @@ fn cross_xcnf_instance(args: &[String]) -> Result<CrossXcnfInstance> {
         max_models: 1,
         conflict_budget: 1,
     };
-    let (encoding, group_target) = domains.first_pattern_encoding(
+    let (encoding, group_target) = domains.pattern_encoding(
         &coef_a,
         &coef_b,
         &public_point,
         base_summands,
         residual_summands,
+        identity_mask,
         limits,
         true,
     )?;
@@ -936,11 +956,14 @@ fn cross_xcnf_instance(args: &[String]) -> Result<CrossXcnfInstance> {
         base_summands,
         residual_summands,
         shared_signed_orbits,
+        trial,
+        identity_mask,
+        extended_metadata: extended,
     })
 }
 
 fn cross_xcnf_metadata(instance: &CrossXcnfInstance, xcnf: &[u8]) -> Result<Value> {
-    Ok(json!({
+    let mut metadata = json!({
         "schema":"n83.cross-stream-first-pattern-xcnf/v1",
         "study":STUDY, "curve_slug":CURVE,
         "base_object_blake3":instance.base_hash,
@@ -960,7 +983,7 @@ fn cross_xcnf_metadata(instance: &CrossXcnfInstance, xcnf: &[u8]) -> Result<Valu
         "base_points":instance.base.points.len(),
         "residual_points":instance.residual.points.len(),
         "shared_signed_orbits":instance.shared_signed_orbits,
-        "identity_mask":0, "order_first_pair":true,
+        "identity_mask":instance.identity_mask, "order_first_pair":true,
         "variables":instance.encoding.solver.n_vars(),
         "original_clauses":instance.encoding.solver.n_original_clauses(),
         "xor_rows":instance.encoding.solver.n_xors(),
@@ -968,7 +991,13 @@ fn cross_xcnf_metadata(instance: &CrossXcnfInstance, xcnf: &[u8]) -> Result<Valu
         "xcnf_blake3":blake3::hash(xcnf).to_hex().to_string(),
         "new_n83_solver_search_executed":false,
         "selected_best_total_runtime":null
-    }))
+    });
+    if instance.extended_metadata {
+        metadata["schema"] = json!("n83.cross-stream-pattern-xcnf/v2");
+        metadata["trial"] = json!(instance.trial);
+        metadata["source_id"] = json!(instance.trial + 1);
+    }
+    Ok(metadata)
 }
 
 /// Parse a complete CryptoMiniSat DIMACS model. Missing, repeated, and
@@ -1018,13 +1047,14 @@ fn parse_external_sat_model(output: &[u8], variables: u32) -> Result<Vec<bool>> 
 }
 
 fn export_cross_xcnf(args: &[String]) -> Result<()> {
-    if args.len() != 11 {
-        return Err("usage: export-cross-xcnf BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BASE_SUMMANDS RESIDUAL_SUMMANDS OUTPUT_DIR".into());
+    let extended = args[0] == "export-cross-xcnf-pattern";
+    if args.len() != if extended { 13 } else { 11 } {
+        return Err("usage: export-cross-xcnf[-pattern] BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BASE_SUMMANDS RESIDUAL_SUMMANDS [TRIAL IDENTITY_MASK] OUTPUT_DIR".into());
     }
-    let instance = cross_xcnf_instance(args)?;
+    let instance = cross_xcnf_instance(args, extended)?;
     let xcnf = to_dimacs_xor(&instance.encoding.solver).into_bytes();
     let metadata = cross_xcnf_metadata(&instance, &xcnf)?;
-    let output = Path::new(&args[10]);
+    let output = Path::new(&args[if extended { 12 } else { 10 }]);
     fs::create_dir(output)?;
     let mut stream = OpenOptions::new()
         .write(true)
@@ -1041,19 +1071,20 @@ fn export_cross_xcnf(args: &[String]) -> Result<()> {
 }
 
 fn verify_cross_xcnf(args: &[String]) -> Result<()> {
-    if args.len() != 13 {
-        return Err("usage: verify-cross-xcnf BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BASE_SUMMANDS RESIDUAL_SUMMANDS EXPORT_DIR SOLVER_STDOUT OUTPUT_DIR".into());
+    let extended = args[0] == "verify-cross-xcnf-pattern";
+    if args.len() != if extended { 15 } else { 13 } {
+        return Err("usage: verify-cross-xcnf[-pattern] BASE_HASH BASE_MANIFEST BASE_OBJECT POOL_HASH POOL_MANIFEST POOL_OBJECT CORPUS BASE_SUMMANDS RESIDUAL_SUMMANDS [TRIAL IDENTITY_MASK] EXPORT_DIR SOLVER_STDOUT OUTPUT_DIR".into());
     }
-    let instance = cross_xcnf_instance(args)?;
+    let instance = cross_xcnf_instance(args, extended)?;
     let xcnf = to_dimacs_xor(&instance.encoding.solver).into_bytes();
     let metadata = cross_xcnf_metadata(&instance, &xcnf)?;
-    let export_dir = Path::new(&args[10]);
+    let export_dir = Path::new(&args[if extended { 12 } else { 10 }]);
     if fs::read(export_dir.join("instance.xcnf"))? != xcnf
         || serde_json::from_slice::<Value>(&fs::read(export_dir.join("export.json"))?)? != metadata
     {
         return Err("external XCNF bytes or metadata differ from pinned input replay".into());
     }
-    let solver_output = fs::read(&args[11])?;
+    let solver_output = fs::read(&args[if extended { 13 } else { 11 }])?;
     let assignment = parse_external_sat_model(&solver_output, instance.encoding.solver.n_vars())?;
     if !instance.encoding.verify_external_assignment(&assignment) {
         return Err("external model fails original CNF, XOR, or S3 equations".into());
@@ -1068,7 +1099,7 @@ fn verify_cross_xcnf(args: &[String]) -> Result<()> {
         (
             "PASS_ONE_EXTERNAL_PARTIAL",
             Some(json!({
-                "source_id":1,
+                "source_id":instance.trial + 1,
                 "a":instance.coef_a.to_string(), "b":instance.coef_b.to_string(),
                 "base_point_indices":base_indices,
                 "residual_points":residual_points.iter().map(point_json).collect::<Result<Vec<_>>>()?
@@ -1077,7 +1108,7 @@ fn verify_cross_xcnf(args: &[String]) -> Result<()> {
     } else {
         ("GROUP_REJECTED_EXTERNAL_MODEL", None)
     };
-    let result = json!({
+    let mut result = json!({
         "schema":"n83.cross-stream-first-pattern-external-model/v1",
         "status":status,
         "xcnf_blake3":metadata["xcnf_blake3"],
@@ -1091,7 +1122,12 @@ fn verify_cross_xcnf(args: &[String]) -> Result<()> {
         "new_n83_solver_search_executed":true,
         "selected_best_total_runtime":null
     });
-    let output = Path::new(&args[12]);
+    if extended {
+        result["schema"] = json!("n83.cross-stream-pattern-external-model/v2");
+        result["trial"] = json!(instance.trial);
+        result["identity_mask"] = json!(instance.identity_mask);
+    }
+    let output = Path::new(&args[if extended { 14 } else { 12 }]);
     fs::create_dir(output)?;
     write_new(&output.join("result.json"), &result)?;
     println!(
@@ -1314,7 +1350,9 @@ fn main() -> Result<()> {
         Some("run-alt") => run(&args, &SMALL_600),
         Some("run-cross-pilot") => run_cross_pilot(&args),
         Some("export-cross-xcnf") => export_cross_xcnf(&args),
+        Some("export-cross-xcnf-pattern") => export_cross_xcnf(&args),
         Some("verify-cross-xcnf") => verify_cross_xcnf(&args),
+        Some("verify-cross-xcnf-pattern") => verify_cross_xcnf(&args),
         Some("verify-control") if args.len() == 6 => {
             let (curve, small, residual) = import_pair(&args, &SMALL)?;
             let target = control_target(Path::new(&args[5]), &curve, &small, &residual)?;
@@ -1439,6 +1477,20 @@ mod tests {
         assert_eq!(a, trial_coefficient(b"a", 7, &modulus));
         assert_ne!(a, trial_coefficient(b"a", 8, &modulus));
         assert_ne!(a, trial_coefficient(b"b", 7, &modulus));
+    }
+
+    #[test]
+    fn external_pattern_requires_explicit_finite_trial_and_mask() {
+        let mut args = vec!["placeholder".to_string(); 12];
+        args[10] = "7".into();
+        args[11] = "3".into();
+        assert_eq!(external_trial_pattern(&args, true).unwrap(), (7, 3));
+        assert_eq!(external_trial_pattern(&args, false).unwrap(), (0, 0));
+        args[10] = u64::MAX.to_string();
+        assert!(external_trial_pattern(&args, true).is_err());
+        args[10] = "1".into();
+        args[11] = "4294967296".into();
+        assert!(external_trial_pattern(&args, true).is_err());
     }
 
     #[test]
