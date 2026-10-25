@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h513dba00a329",
+  "label": "PS-6 counted: S4 pairs-and-solve baseline, PS-2 group-law kernel and the MITM incumbent, random binary n=21, l=7",
+  "spec_id": "ECS1h3ac6bf23cc87",
+  "spec_sha256": "3ac6bf23cc87d700acb8f69d268ff4c3bfcb74c0fe914991ffd66bd8e292a597",
+  "env_class_id": "ECBENV2h55b1cb8b1d10",
+  "host_sha256": "5d46eecb4cf0686860f80e55e243b3f55c7a05b9393f821f82d3946dcf88f3b2",
+  "plan_sha256": "20b4ca1360f7cd2c0eeb910e3736374420c68a9eb0e383cc37a6139b239e7a8d",
+  "binary_sha256": "c914f632863426ddd0327176419c3475b54941a73acf38570f6d02f7a21e7e22",
+  "git_commit": "9e7e9a8a5a9bdb6f62374467a558d6be611ef189",
+  "git_dirty": false,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/ps6-inner.lock",
+    "wait_for_lock": true,
+    "allow_busy": false,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792366075657,
+  "finished_unix_ms": 1792366103681,
+  "status": "complete",
+  "executions_planned": 96,
+  "records_written": 96,
+  "records_sha256": "163c4d745dc13da63b63e87876d7b43535cd2d9351699b3b442813d8882d0455",
+  "status_counts": {
+    "verified": 96
+  }
+}

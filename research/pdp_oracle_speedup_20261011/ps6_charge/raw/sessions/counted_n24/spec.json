@@ -1,0 +1,22 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "PS-6 counted: S4 pairs-and-solve baseline, PS-2 group-law kernel and the MITM incumbent, random binary n=24, l=8",
+  "description": "Frozen by research/pdp_oracle_speedup_20261011/protocols/PS-6.md. Ledger char2 rung; one-target workloads; same curve, factor base, targets and seeds for every arm. The group-law kernel row is a lower bound (its pairs have no pinned conversion); see ps6_charge/README.md.",
+  "workloads": {
+    "curves": [{"kind": "binary_random", "n": 24, "seed": 123212651130, "max_cofactor": 8}],
+    "targets_per_curve": 8,
+    "target_seed": 20261018
+  },
+  "arms": [
+    {"name":"rho-negation","role":"reference","method":{"id":"rho.negation","params":{}}},
+    {"name":"s4-baseline","role":"baseline","method":{"id":"ic.pipeline","params":{"factor_base":"binary-subspace:dimension=8","oracle":"semaev-s4-baseline:m=3","targets":"random","max_trials":"200000"}}},
+    {"name":"s4-grouplaw","role":"candidate","method":{"id":"ic.pipeline","params":{"factor_base":"binary-subspace:dimension=8","oracle":"semaev-s4-grouplaw:m=3","targets":"random","max_trials":"200000"}}},
+    {"name":"s4-grouplaw-audit","role":"candidate","method":{"id":"ic.pipeline","params":{"factor_base":"binary-subspace:dimension=8","oracle":"semaev-s4-grouplaw:m=3,audit=1","targets":"random","max_trials":"200000"}}},
+    {"name":"mitm","role":"candidate","method":{"id":"ic.pipeline","params":{"factor_base":"binary-subspace:dimension=8","oracle":"mitm:m=3","targets":"random","max_trials":"200000"}}},
+    {"name":"mitm-negfold","role":"candidate","method":{"id":"ic.pipeline","params":{"factor_base":"binary-subspace:dimension=8","oracle":"mitm:m=3,negation_folded=1","targets":"random","max_trials":"200000"}}}
+  ],
+  "measurement": {
+    "rounds": 2, "warmup": 0, "order": "alternate", "seed": 20261018,
+    "isolation_required": "L0", "timeout_seconds": 14400
+  }
+}
