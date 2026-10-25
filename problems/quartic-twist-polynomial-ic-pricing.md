@@ -80,6 +80,10 @@ regression for search cap versus actual original-product degree. Actual comparis
 production remains pending at this checkpoint. This supplements both full
 panels; no new relation rank, target recovery or complete cost is measured
 by those controls. The existing full-price and proof exit criteria remain.
+The fixed diagnostic subsequently launched under
+[one managed owner](../research/twist_index_calculus_20261020/zero_fiber_collector/degree_closure_probe/RUNNING.md)
+at 2026-10-25T04:08:23Z, after its committed source/input freeze. Its
+complete comparison results remain pending; the full panels continue.
 
 ## Evidence and uncertainty
 

@@ -37,6 +37,9 @@ abscissa only; prior outcomes and costs belong to the later auditor.
 - Input preparation: `../runs/degree-closure-probe-inputs-v1/`.
 - Intended guarded production directory: `../runs/degree-closure-probe-panel-v1/`.
   Launch and completion are reported only with their actual receipts.
+- [Managed launch](RUNNING.md): one owner started 2026-10-25T04:08:23Z,
+  after source/input freeze `c30a3dc6068b9907681e46634df14c52a8a40f1e`.
+  A completed comparison verdict remains pending.
 - [Existing rejection proof and IDC](../collision_certificate/BUILD_AND_PROOF.md).
   The native/field/group bridges remain open. No new general theorem is claimed.
 
