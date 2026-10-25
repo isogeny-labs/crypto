@@ -214,3 +214,17 @@ README.
 where the expected identity is A = B exactly. It runs on b = 1 and on
 three random b ≠ 0, over F_{2^11} and F_{2^13}, both a, with 12
 subspaces each.
+
+## Amendment 4 (2026-10-25, before any C1 measurement): delivering code to the pod
+
+Two pods (`hd6s92ssyztxjh` and `cwacs7yb5zj1hh`) booted but never ran the job. Each idled at 0% CPU and was terminated, at a combined cost of about $4.10. The cause is that `aburan28/crypto` is now private. An unauthenticated `raw.githubusercontent.com` fetch of the boot script returns 404, and so would the job's `git clone`.
+
+- **Delivery.** The pod clones nothing. `pod/upload_launch.py` starts a receiver on :8000 under a fresh random path. This session uploads three files:
+  - the locally built `dreg_closure` (sha256 `9d72c7a4…`, commit of this amendment, glibc 2.39, baseline x86-64);
+  - the committed `m3-19-7.jsonl`;
+  - `pod/job.sh`.
+- **Integrity.** The pod accepts a file only if its sha256 matches the value passed in its environment.
+- **Secrets.** No key or token goes on the pod.
+- **Job.** `pod/job.sh` runs the same command as `run.sh deg5`: `--to 5 --max-cols 1100000`, `prlimit --as` at 92% of the host limit, and a 280 GB floor. It takes the unsatisfiable draws 0, 3, 5 and 7 with 4 h each, then satisfiable draw 1 with the time left.
+- **Budget.** The lifetime cap is 20.5 h on `cpu3m-64-512` ($3.52/h), at most $72.20. That keeps the total under the owner's $80 cap.
+- **Reading.** Outcomes are read as in §C1, unchanged.
