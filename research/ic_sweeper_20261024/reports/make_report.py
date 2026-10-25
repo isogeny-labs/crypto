@@ -73,7 +73,8 @@ md.append(f"- Command: `{command}`")
 commit = header.get("git_commit") or "not recorded (the build could not read it from a git worktree; see the Host line)"
 md.append(f"- Commit: {commit}; binary BLAKE3 `{header.get('binary_blake3')}`")
 md.append(f"- Host: {host}. Isolation level: L0 (shared host, no CPU pinning, 3 trials at a time). Counts are unaffected; wall time is not used by the score.")
-md.append(f"- Track: **{header['track']}** ({'counted' if header['counted'] else 'reference only'}). Rungs requested: {header['rungs']}; usable (baseline scored): {usable}.")
+track_note = {"algebraic": "counted", "table": "reference only", "unclassified": "unclassified: not counted, not ranked against the other tracks"}[header["track"]]
+md.append(f"- Track: **{header['track']}** ({track_note}). Rungs requested: {header['rungs']}; usable (baseline scored): {usable}.")
 md.append(f"- Target for the projection: log2 r = {header['target_log2_r']}; `min_fit` {header['min_fit']}; repeats {header['repeats']}; seed {header['seed']}; counted-trial cap {header['max_trials']}.")
 md.append("- Raw records: [`store.jsonl`](store.jsonl) (every baseline and trial line, as written).\n")
 md.append("## Baseline (frozen before the search)\n")
@@ -105,7 +106,8 @@ md.append("*Figure: recorded values from `store.jsonl`; no value is computed in 
 md.append("## Limits\n")
 md.append("- Few trials on a small space; this says nothing about which configuration is best.")
 md.append("- Rungs below `min_fit` are not projected: the objective is then the last rung's measured ratio.")
-md.append("- K_0 at n = 15 has a larger cofactor than the cofactor-4 rungs, so the rungs mix cofactors.")
+if header["space"].startswith("koblitz"):
+    md.append("- K_0 rungs mix cofactors (log2 r is not n minus 2), and n = 23 and n = 31 have almost the same log2 r.")
 md.append("- Solver rows in a different unit than the baseline's are recorded and not rankable; see the failed rows' notes.")
 (out / "report.md").write_text("\n".join(md) + "\n")
 print("wrote", out)

@@ -64,17 +64,28 @@ Every trial ends in exactly one class, and only `ok` is scored:
 | `invalid_config` | the configuration is malformed |
 | `crashed` | the run panicked or produced no rows |
 
-**The solver's unit must match the baseline's.** `solver.ops` is counted in
-whatever unit the engine uses: word XORs for the F4 family and Gray-code FES
-(one priced family, as in `ic_framework::is_word_xor_op_unit`), monomial
-operations for `buchberger-f2`, conflicts for `sat-cdcl`, partial word
-operations for `crossbred-f2` (measured at n = 13). A ratio across units says
-which engine counts coarsely, not which is cheaper, and a search would learn to
-pick it (AGENTS.md §6, changing the unit). So a rung whose solver unit differs
-from the baseline's is recorded in full (`rankable: false`, its band and
-`op_unit` kept) and **fails the trial**: it is never scored, never `best`, and
-the sampler learns to avoid it. A study whose baseline and candidates should
-compare across units needs a pinned price for each unit first.
+**The solver's unit must match the baseline's, exactly.** `solver.ops` is
+counted in whatever unit the engine uses, and the *scope* of what it counts
+differs even where the unit's name is the same. The repository prices every
+`word XORs` and `word XORs (…)` by one pinned ratio, which is right for pricing
+and wrong for ranking. Measured at n = 31 on one instance with identical
+relations (group operations identical), `f4-f2` ("word XORs (elimination
+only)") scored S(0.1) = 9,078 and `inherited-f4` ("… elimination,
+specialisation and linear elimination only") 630,638: a 70× gap that is only
+the scope each one counts. Other units differ outright: monomial operations
+(`buchberger-f2`), conflicts (`sat-cdcl`), partial word operations
+(`crossbred-f2`), Gray-code steps (`fes-f2`). A ratio across scopes says which
+engine counts least, and a search would learn to pick it (AGENTS.md §6,
+changing the unit). So:
+
+- a rung whose solver's unit string differs from the baseline's is recorded in
+  full (`rankable: false`, band and `op_unit` kept) and **fails the trial**;
+- each algebraic space offers one scope, so its sampler never learns around
+  trials that cannot be ranked (failures caused by one parameter had been
+  poisoning the sampler's model of another: with unrankable solvers on offer,
+  60 trials never sampled the `m = 3` setting that the mock rewarded);
+- engines with no scope-mate (Crossbred, SAT, Buchberger, FES) are not offered.
+  Comparing across scopes needs one common accounting first (plan step P4b).
 
 Budgets are counts (`max_trials`, solver node and conflict budgets). A
 wall-clock solver budget is never passed (`--solver-budget-seconds 0`), since
@@ -128,13 +139,15 @@ algebraically defined factor base, without table collisions.
 
 | track | spaces | counted? |
 |:--|:--|:--|
-| `algebraic` | `koblitz-algebraic`, `char2-algebraic` | yes |
+| `algebraic` | `koblitz-algebraic`, `char2-algebraic` (inherited F4, baseline inherited F4), `koblitz-algebraic-elim`, `char2-algebraic-elim` (`f4-f2`, `matrix-f4`, `matrix-f5`, baseline `f4-f2`) | yes, within a scope |
 | `table` | `koblitz-table`, `prime-table` | no: reference only, never ranked against the algebraic track |
+| `unclassified` | `prime-rootfind` (`rootfind-subtract`) | no: searched and reported on its own, never ranked against either other track |
 
-The `rootfind-*` oracles are in neither track and no space offers them: whether
-solving the univariate Semaev polynomial per base point counts as "solving a
+The `rootfind-*` oracles are `unclassified` because whether solving the
+univariate Semaev polynomial per base point counts as "solving a
 summation-polynomial system" or as a root table is not decided by the
-criterion as recorded.
+criterion as recorded. They are included at the owner's request, and stay
+uncounted until the owner rules.
 
 ## Scale-relative knobs
 
@@ -161,10 +174,15 @@ ratios, so the search space is the same on every rung. Absolute caps
   two partial counts, not a bound on either method.
 - **Rungs.** `--min-fit 4` needs four scorable rungs. K_0 degrees that exist
   are 9, 13, 15, 19, 23, 31, 37, 39, 41, 45, 51, 53, 57, 59, 61 (K_1: 9, 11, 15,
-  17, 19, 23, 29, 43, 45, 47, 51, 57, 59, 61). The cofactor-4 K_0 rungs an F4
-  baseline reaches are 13, 19 and 23 only; n = 15 has a larger cofactor
-  (log2 r 9.6), so four rungs mix cofactors, or a baseline that reaches n = 31
-  or 41 is needed.
+  17, 19, 23, 29, 43, 45, 47, 51, 57, 59, 61). Measured with the `m = 2`
+  descent at `d = ⌊(n+1)/3⌋`: n = 31 scores (`f4-f2` 169 s, `inherited-f4`
+  262 s, eight probes running at once) and n = 41 does not (all four solvers
+  hit a 300 s cap). So the F4-reachable K_0 rungs are 13, 15, 19, 23, 31, and
+  they **mix cofactors**: log2 r is 11.0, 9.6, 17.0, 21.0 and 20.5. The fit uses
+  log2 r on the x axis, so the mix is allowed but the points are not evenly
+  spread (n = 23 and n = 31 have almost the same log2 r), which widens the
+  projection's uncertainty. Use `--timeout-seconds 900` or more when n = 31 is
+  a rung.
 - **The projection amplifies noise.** The objective reads a fitted line at the
   target. With rungs spanning about 10 bits and a target 60 bits away, the
   rung-to-rung rounding of integer dimensions (and ordinary measurement noise)

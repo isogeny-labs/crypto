@@ -428,10 +428,11 @@ branch), documented in [`docs/ic/SWEEPER.md`](../../docs/ic/SWEEPER.md):
   are never scored. Time and memory limits are enforced from inside the
   process (`ps` is unavailable in the sandbox; macOS ignores `RLIMIT_AS`);
   the time limit fired at 600.1 s in the three runs that reached it.
-- **P2, the search space** — four typed, conditional, scale-relative spaces.
-  The algebraic ones are the counted track; the table ones are tagged
-  reference-only in code. `rootfind-*` is offered by no space, pending the
-  owner's ruling (§6, D1 follow-up).
+- **P2, the search space** — seven typed, conditional, scale-relative spaces
+  (two Koblitz and two char2 algebraic, one per accounting scope; two table;
+  one `unclassified` root-finding space). Only the algebraic ones are counted;
+  the table ones are tagged reference-only in code; `prime-rootfind` is searched
+  and reported on its own track until the owner rules (item 8 below).
 - **P3, the optimiser** — in-tree TPE, median pruning over the rung ladder,
   an append-only resumable store, one child process per trial. 42 unit tests,
   two of them end-to-end through the real pipeline.
@@ -459,7 +460,8 @@ branch), documented in [`docs/ic/SWEEPER.md`](../../docs/ic/SWEEPER.md):
 
 **First study (a smoke run of the tool, not a result).** `koblitz-algebraic`,
 K_0, rungs 13/15/19/23, 24 trials, 3 workers, 120 s per trial, run with the
-solver-unit guard. Records, graph and PDF:
+solver-unit guard, **in the space as it was then**, which offered engines that
+item 5 below has since removed. Records, graph and PDF:
 [`reports/run-20261024T2332Z/`](reports/run-20261024T2332Z/report.md). It
 finished in 5 min 31 s with all four baselines scored, so the objective is a
 projection to log2 r = 81. Outcomes: 6 complete, 8 pruned, 10 failed. The
@@ -474,25 +476,39 @@ configuration is best; it shows the loop, the classes, the unit guard, the
 pruning and the store behave. An earlier run without the guard (18 trials,
 store not kept) is not cited.
 
-5. **The solver axis mixes operation units, and a search exploits that.**
-   Measured at n = 13: inherited F4, `f4-f2`, `matrix-f4`, `matrix-f5` and
-   Gray-code `fes-f2` count word XORs (one priced family in the repository);
+5. **The solver axis mixes operation units and counting scopes, and a search
+   exploits that.** Measured at n = 13: inherited F4, `f4-f2`, `matrix-f4`,
+   `matrix-f5` and Gray-code `fes-f2` all report "word XORs" (the repository
+   prices them by one pinned ratio) but with different qualifiers;
    `buchberger-f2` counts monomial operations, `sat-cdcl` conflicts, and
-   `crossbred-f2` partial word operations. A ratio across units rewards the
-   unit, which is AGENTS.md §6's "changing the unit". Trials whose solver unit
-   differs from the baseline's are now recorded in full and fail the trial;
-   a unit test shows a 100× cheaper-by-unit solver cannot win.
+   `crossbred-f2` partial word operations. **Measured at n = 31, one instance,
+   identical relations (group operations identical):** `f4-f2` ("elimination
+   only") S(0.1) = 9,078 against `inherited-f4` ("elimination, specialisation
+   and linear elimination only") 630,638, a 70× gap that is only the scope each
+   counts. A ratio across scopes rewards the engine that counts least, which is
+   AGENTS.md §6's "changing the unit". The guard is therefore an exact match of
+   the unit string, qualifier included: an unmatched rung is recorded in full
+   and fails the trial. And because one parameter's failures had been poisoning
+   the sampler's model of another (60 trials never sampled the `m = 3`
+   setting the mock rewarded), each algebraic space now offers one scope:
+   `koblitz-algebraic` (inherited F4) and `koblitz-algebraic-elim` (`f4-f2`,
+   `matrix-f4`, `matrix-f5`). Engines with no scope-mate are not offered.
 6. **The projected objective amplifies rung-to-rung noise.** With four rungs
    spanning about 10 bits and a target 60 bits away, rounding in the integer
    descent dimension is multiplied roughly sixfold: in a synthetic test a
    configuration better than the baseline at every measured rung scored worse
    at the target. The per-rung ratios are stored and reported beside the
    objective; a confidence interval on the slope is future work.
-7. **Rung constraint for the first real study.** K_0 at n = 15 has log2 r = 9.6
-   (cofactor about 42), so the F4-reachable K_0 rungs 13, 15, 19, 23 mix
-   cofactors; the cofactor-4 ones are 13, 19 and 23, which is below
-   `--min-fit 4`. A baseline that reaches n = 31 or 41, or an accepted
-   mixed-cofactor ladder, is needed before a projection means anything.
+7. **Rungs.** Measured: the `m = 2` baseline scores K_0 at n = 31 (`f4-f2`
+   169 s, `inherited-f4` 262 s under 8-way load) and does not at n = 41 (all
+   four solvers pass 300 s). The F4-reachable K_0 rungs are 13, 15, 19, 23, 31
+   with log2 r 11.0, 9.6, 17.0, 21.0 and 20.5: five rungs, so `--min-fit 4` is
+   met, but the cofactors are mixed and n = 23 and n = 31 sit at almost the
+   same log2 r. The owner accepted mixed cofactors (2026-10-24). A baseline
+   reaching n = 41 (cofactor 4) is not available through this framework.
+8. **The root-finding oracles** are included as `prime-rootfind` on a separate
+   `unclassified` track, at the owner's request: searched and reported, never
+   counted, never ranked against the other tracks until the owner rules.
 
 **Not done:** widening the framework past n = 63 and `m ≥ 4` (plan P5, P6); the
 published-IC reference arm (P4b); prime and random-binary curve generation
