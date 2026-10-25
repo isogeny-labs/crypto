@@ -12,6 +12,7 @@ trap 'rm -rf "$scratch"' EXIT
 tar -xJf "$study/evidence/runs-external-cas-20261025-01.tar.xz" -C "$scratch"
 cd "$root"
 cargo build --release --example ic_cas_correctness
-target/release/examples/ic_cas_correctness verify "$scratch/runs/external-cas-20261025-01" > "$scratch/replay.json"
+bin_root=${CARGO_TARGET_DIR:-target}/release/examples
+"$bin_root/ic_cas_correctness" verify "$scratch/runs/external-cas-20261025-01" > "$scratch/replay.json"
 cmp "$scratch/replay.json" "$study/pipeline-receipts/external-cas-strengthened-20261025/replay.json"
 printf '%s\n' 'PASS: archived external inputs, rebuilt equations and all 44 zero sets reproduce exactly.'
