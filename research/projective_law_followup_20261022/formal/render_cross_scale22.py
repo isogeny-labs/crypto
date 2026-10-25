@@ -13,25 +13,7 @@ assert packet["schema"] == "projective-law-cross-scale22/v1"
 all_rows = packet["rows"]
 rows = [row for row in all_rows if row["kind"] == "cross_input"]
 assert len(all_rows) == 23 and len(rows) == 8 and all(row["equal"] is True for row in all_rows)
-weight_rows = [
-    {"coefficient": "B", "z_power": 8, "w_power": 0,
-     "theorem": "CrossScale22.scale_B", "nonzero_theorem": "CrossScale22.scale_B_ne_zero_iff"},
-    {"coefficient": "A", "z_power": 9, "w_power": 1,
-     "theorem": "CrossScale22.scale_A", "nonzero_theorem": None},
-    {"coefficient": "C", "z_power": 7, "w_power": 1,
-     "theorem": "CrossScale22.scale_C", "nonzero_theorem": "CrossScale22.scale_C_ne_zero_iff"},
-]
-(ROOT / "cross-scale22-weights.json").write_text(json.dumps({
-    "schema": "projective-law-cross-scale22-weights/v1",
-    "hypotheses": "q and r have common weights Z^2 and Z^4; s and t have common weights Z^3 W and Z^5 W; nonzero branch equivalence requires nonzero Z and W",
-    "rows": weight_rows,
-    "runtime_semantic_link": "open",
-    "cost_ratio_change": None,
-}, indent=2) + "\n")
-with (ROOT / "cross-scale22-weights.csv").open("w", newline="") as handle:
-    writer = csv.DictWriter(handle, fieldnames=("coefficient", "z_power", "w_power", "theorem", "nonzero_theorem"), lineterminator="\n")
-    writer.writeheader()
-    writer.writerows(weight_rows)
+weight_rows = json.loads((ROOT / "cross-scale22-weights.json").read_text())["rows"]
 
 with (ROOT / "cross-scale22.csv").open("w", newline="") as handle:
     writer = csv.DictWriter(
@@ -77,7 +59,7 @@ svg += [
 subprocess.run([
     "convert", "-background", "white", "-density", "144",
     str(ROOT / "cross-scale22.svg"), "-resize", "900x620",
-    "-depth", "8", "-colors", "32", f"PNG8:{ROOT / 'cross-scale22.png'}",
+    "-depth", "8", "-colors", "32", "-strip", f"PNG8:{ROOT / 'cross-scale22.png'}",
 ], check=True)
 
 md = """# Weighted 2+2 cross-scaling boundary
@@ -112,6 +94,9 @@ Mumford/Pic⁰ addition theorem. The 1,260-target cost ratios are unchanged.
 
 Recheck from this directory with `python3 check_cross_scale22.py --check`,
 `lake env lean CrossScale22.lean`, and `python3 render_cross_scale22.py`.
+The five additional theorem receipts and weight table have a native checker:
+from the parent study directory run `cargo run --release --bin
+validate-cross-scale-weights`.
 """
 (ROOT / "CROSS_SCALE22.md").write_text(md)
 

@@ -30,3 +30,6 @@ Mumford/Pic⁰ addition theorem. The 1,260-target cost ratios are unchanged.
 
 Recheck from this directory with `python3 check_cross_scale22.py --check`,
 `lake env lean CrossScale22.lean`, and `python3 render_cross_scale22.py`.
+The five additional theorem receipts and weight table have a native checker:
+from the parent study directory run `cargo run --release --bin
+validate-cross-scale-weights`.

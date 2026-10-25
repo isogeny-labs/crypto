@@ -145,6 +145,12 @@ theorem set. Every verifier run also confirms rejection of a duplicate row, a
 hash-valid unexpected Rust function, an unexpected but real Lean declaration,
 and a name present only in a Lean comment.
 
+The additional five weighted 2+2 theorems and their published weight table are
+checked by the native Rust binary `cargo run --release --bin
+validate-cross-scale-weights` from the parent study directory. It checks the
+Lean declaration and kernel receipts, exact CSV/JSON values, explicit open
+runtime link and null cost change, and the report artifact inventory.
+
 ## Remaining theorem bridge
 
 The packet does **not** define the smooth hyperelliptic curve, Mumford
