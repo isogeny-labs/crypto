@@ -156,6 +156,17 @@
      "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
     },
     {
+     "date": "2026-10-20",
+     "value": 1236267.0,
+     "reference": "matched",
+     "unit": "F_p multiplications",
+     "label": "k = 5 2-torsion Edwards route, F4 trace replay, complete DLP at p = 61 (ell = 2^27.7)",
+     "detail": "Native complete DLPs paired with rho on the same target: 1.24e6x (p = 61), 1.94e6x (p = 41), 3.39e6x and 5.77e6x (p = 31), 5.2e6x (p = 71), all verified; a sixth arm (p = 41, six-point base) stopped at its 10-hour cap at >= 1.5e7x. Rho's unpriced walk work priced at 0, 0.1, 1 GAE: rho ahead at every weight (4.1e5x best at 1 GAE). Trace replay cuts the test 1.74-1.77x (5.85e7 to 3.3e7). Extrapolated parity n = 2^227 (2^233 without replay). Engineering; no ecbench session (no F_{p^k} instance on main).",
+     "class": "engineering",
+     "anchor": "#rho-parity-ledger",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/joux_vitse_n1_20261015/README.md"
+    },
+    {
      "date": "2026-10-16",
      "value": 55.36777360324759,
      "reference": "matched",
@@ -423,6 +434,17 @@
      "class": "engineering",
      "anchor": "#rootfinding-buffers-20261014",
      "source": "https://github.com/aburan28/crypto/blob/main/research/ecbench_rootfinding_alloc_20261014/REPORT.md"
+    },
+    {
+     "date": "2026-10-20",
+     "value": 158.9,
+     "reference": "matched",
+     "unit": "counted GAE lower-bound diagnostic",
+     "label": "PKM Kummer tower (t=12) + rootfind-mitm, 30-bit prime curve icv1-fp30-t49927-d70f5de2",
+     "detail": "IC / rho-negation S ratio 158.9 [121.6, 221.4] at w = 0 (175x at w = 0.1, 247x at w = 1) over 24 matched measured pairs on eight public targets, session ECBS1hfb8f08d66f01, audit OK (160 records verified, 120 replays reproduced). Extends the registered 20-28 bit ladder (140.6x at 28 bits): the gap grew. L0, operation counts only; native field work unpriced. Class: measurement; not an improvement.",
+     "class": "accounting",
+     "anchor": "#lab-ecbench-all",
+     "source": "https://github.com/aburan28/crypto/blob/main/research/certicom131_ic_program_20261020/README.md"
     }
    ],
    "role": "context"

@@ -1,6 +1,8 @@
 Open pull requests ready for review, never as drafts, whatever the runtime
 defaults to, and mark an existing draft ready; only a user request in the task
-makes a draft. This and the repository's other rules are in
+makes a draft. Enable auto-merge as you open the PR (`gh pr merge <n> --auto
+--merge`); a stacked PR cannot auto-merge until it is retargeted to `main`.
+This and the repository's other rules are in
 [`AGENTS.md`](AGENTS.md) ("Default workflow").
 
 **Success criterion** (owner, 2026-10-15): every verified, measured
@@ -10,6 +12,12 @@ breakthrough. Report each row's gap to the matched rho as the distance
 remaining, not as a pass/fail gate. Relabelling and accounting changes are
 not improvements. Full rule: [`AGENTS.md`](AGENTS.md), "Success criterion:
 iterative improvement of the index-calculus baseline".
+
+Before surveying for ECDLP leads or proposing one, read the lead atlas in the
+sibling crypto-autoresearcher checkout (`knowledge/leads/ecdlp/`,
+`python3 tools/lead_atlas.py --brief`, printed at session start). It records
+what has already been tried here and in the sibling repositories, and whether
+anything changed since its last review (AGENTS.md "Pointers").
 
 Every experiment run, every PR that lands a result, and every research search
 leaves a report, a graph, and a PDF: follow the `research-visuals` skill
@@ -49,7 +57,8 @@ warn and let edits through.
 
 The session that opens a PR stays with it until it is merged or closed: it
 checks in on CI, reviews and merge state, fixes the failures and feedback its
-change causes, and merges once green and authorized. Any runtime may do this,
+change causes, and merges once green and authorized (a non-required check
+queued 24 hours without starting does not block the merge). Any runtime may do this,
 Claude Opus and Fable included. Check in through PR-activity subscriptions or
 safety-net check-ins (about 50 minutes, then about 4 hours; stop after 3 quiet
 check-ins), and never busy-poll, sleep in a loop, or re-read job logs faster
@@ -59,7 +68,11 @@ land it".
 Model tiers (owner, 2026-10-17): frontier/core models reason and decide;
 `experiment-director` (Sonnet) writes a frozen command card, the main session
 relays it verbatim to `executor-mechanical` (Haiku), and the director assesses
-the run. AGENTS.md, "Model tiers".
+the run. AGENTS.md, "Model tiers". After a relay the main session records what
+it cost: `python3 tools/token_usage.py session --units <cards> --unit-name card`
+(tokens and list-price cost per agent and tier, cache hit ratio, cost per card;
+`autofix-queue.yml` records each attempt the same way). Metrics and the
+transcript accounting traps: [`docs/token-efficiency.md`](docs/token-efficiency.md).
 
 Every cross-method ECDLP comparison prices the unpriced native work of
 every arm, rho references included, at 0, 0.1 and 1 GAE per operation and

@@ -37,6 +37,7 @@ pub mod lattice;
 /// Multivariate integer polynomials and resultants.
 pub mod mpoly;
 pub mod ntt;
+pub mod padic;
 pub mod path;
 pub mod poly;
 pub mod quat;

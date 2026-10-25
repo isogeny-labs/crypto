@@ -349,9 +349,27 @@ fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Resu
         }
     }
 
-    // Build, at the tier the workflow's own probe budget selects.
+    // Build, at the tier the workflow's own probe budget selects.  Under
+    // `KIC_FREE_RELATIONS=1` the build also hands back the pairs of base
+    // points whose sums share a key, and the relations they make (four
+    // base points summing to `O`, no probe) join the system first; the
+    // harvest and its resolution are charged to the build.
+    let free_on = std::env::var("KIC_FREE_RELATIONS").as_deref() == Ok("1");
+    let mut free = crypto_lib::cryptanalysis::koblitz_index_calculus::FreeRelations::default();
     let pair = if ic.strategy == DecompositionStrategy::PairTable {
-        Some(workflow::build_pair_table(&c, &fb, p).ok_or("field too wide for the pair table")?)
+        if free_on {
+            let (table, dups) = workflow::build_pair_table_harvest(&c, &fb, p)
+                .ok_or("field too wide for the pair table")?;
+            if let Some(dups) = dups {
+                free = table.free_relations(&dups);
+            }
+            Some(table)
+        } else {
+            Some(
+                workflow::build_pair_table(&c, &fb, p)
+                    .ok_or("field too wide for the pair table")?,
+            )
+        }
     } else {
         None
     };
@@ -373,6 +391,9 @@ fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Resu
             None
         };
         clock.lap("collect_setup");
+        if let Some(cov) = coverage.as_mut() {
+            cov.add(&free.relations);
+        }
         for u in 0..p.collection.units {
             let aim = coverage
                 .as_ref()
@@ -391,9 +412,11 @@ fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Resu
     clock.lap("collect");
 
     // Logs: verify, solve, and extend until determined.
-    let merged: Vec<CollectedRelation> = units
-        .values()
-        .flat_map(|(rels, _, _)| rels.iter().cloned())
+    let merged: Vec<CollectedRelation> = free
+        .relations
+        .iter()
+        .cloned()
+        .chain(units.values().flat_map(|(rels, _, _)| rels.iter().cloned()))
         .collect();
     let mut solver =
         FactorBaseLogSolver::new(&c, &fb, &ic).ok_or("factor base has no projected columns")?;
@@ -535,7 +558,16 @@ fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Resu
         .iter()
         .map(|(u, (rels, tr, sc))| json!([u, rels.len(), tr, sc]))
         .collect();
-    let counts = json!({
+    let free_counts = free_on.then(|| {
+        json!({
+            "raw_pairs": free.raw_pairs,
+            "same_row_own_orbit": free.same_row_own_orbit,
+            "unresolved": free.unresolved,
+            "trivial_or_repeated": free.trivial_or_repeated,
+            "relations_made": free.relations.len(),
+        })
+    });
+    let mut counts = json!({
         "select": {
             "points": fb.points.len(),
             "signed_orbits": fb.signed_orbits.len(),
@@ -569,6 +601,9 @@ fn one_pass_with(p: &workflow::WorkflowParams, targets: PassTargets<'_>) -> Resu
             "trials_total": trials.iter().sum::<usize>(),
         },
     });
+    if let Some(f) = free_counts {
+        counts["free_relations"] = f;
+    }
     Ok(Pass {
         ns: clock.ns,
         counts,
