@@ -1,8 +1,8 @@
 # Frobenius blocks, hybrid elimination and bounded invariant encodings
 
-**Current status, 2026-10-23: partial / blocked / unfunded.** Four requested block-elimination candidates remain unimplemented and unrun. E30 incidence pilot is a separate encoding experiment and does not replace this requirement.
+**Current status, 2026-10-25: partial / blocked / unfunded.** All four E26 candidates now have a bounded native pilot on 90 frozen workloads, complete affine census, matched ordinary-order controls and independent CAS replay. The 631-cell solver panel retains 388 certified cells and every incomplete/capped cell. Separate and batched instruction diagnostics cover one fixed toy case only. Full counters, root extraction, wider training/heldout and complete costs remain open; E30 remains a separate experiment.
 
-[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/RESULTS.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). No local run of this experiment has executed.
+[New bounded E26 results](../../research/twist_routes_1_3_20261021/reports/block-20261025/RESULTS.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). The original full acceptance criteria below are unchanged.
 
 The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
 

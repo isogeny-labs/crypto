@@ -4,11 +4,18 @@
 - **Kind:** construction gap, proof-verification gap, implementation gap and missing measurements; these are not a universal impossibility theorem.
 - **Affected work:** [routes 1–3 tracker](../research/notes/index-calculus/RESEARCH_TWIST_IC_ROUTES_1_3.md), [trace card](../backlog/XP-20261021-twist-trace-factor-base/README.md), [cover card](../backlog/XP-20261021-twist-cover-transfer/README.md), [solver card](../backlog/XP-20261021-twist-symmetry-solver/README.md).
 - **Next action owner:** unassigned research/implementation lane.
-- **Last updated:** 2026-10-23
+- **Last updated:** 2026-10-25
 
 ## Problem
 
 A calibrated twist-assisted IC improvement for the NIST prime-field P-curve setting is not established. Bounded native restrictions, explicit degree-three cover maps, toy divisor transfers and equivalent solver encodings have local execution evidence and matched same-base controls. Polarized graph identification, higher-prime quotients, full costs, broader grids and independent-host/formal map bridges remain open. The complete new raw bundle also has a separate [publication access blocker](twist-followup-evidence-publication.md).
+
+The earlier publication blocker is resolved in the user-confirmed Setec bucket;
+the original archive and its receipts remain unchanged. The new E26 pilot has
+its own [report and raw manifest](../research/twist_routes_1_3_20261021/reports/block-20261025/RESULTS.md).
+[GitHub repository access](twist-github-repository-access.md) initially blocked
+delivery; CLI access now succeeds and the separate delivery receipt tracks
+the actual pushed head. Scientific gaps remain independent.
 
 The source setting is E/F_p in characteristic p > 3 with the stated odd prime-order rational group. Exact toy fixtures and representations were registered and frozen. The [execution report](../research/twist_routes_1_3_20261021/reports/EXECUTION_RESULTS.md) separates verified finite checks, partial comparisons and the original outstanding requirements. No NIST DLP was executed.
 
@@ -85,3 +92,36 @@ row-module and field/chart bridges remain open. E26, E27 and E28 remain
 unimplemented/unrun; final heldout labels 32–63 stay unopened. The raw bundle
 is prepared locally but [awaits artifact-store credentials](twist-followup-evidence-publication.md).
 No calibrated cost, novelty or IC improvement is promoted.
+
+### 2026-10-25: bounded E26 encodings and instruction-counter checks
+
+All four requested candidate prototypes now run on 90 frozen configurations
+of ten original ordinary fixtures, using target label 0 and B=8,12,16
+abscissae with arities 2,3,4. This base construction is explicitly frozen;
+it does not replace the separate E30 coordinate-box campaign. The new native
+audit validates 90 exact matched-order coefficient checks and complete
+small-fixture signed-group oracles. Independent PARI replays 18,970 retained
+signed witnesses and rejects 18,623 wrong-sign controls. Singular complete-basis
+checks and stock msolve outputs are retained with their own completion states.
+The 631-cell panel has 388 certified cells and preserves every incomplete cell.
+
+Row-reduction multiplications are an incomplete cost counter. On the fixed
+p=59, B=8, m=2 case, eight helper branches record 458 such multiplications
+versus direct's 7,920, while their separate worker processes use 5,784,840
+simulated guest instructions Ir versus 2,423,541. A follow-up using one
+batch worker per candidate records helper 2,458,250 Ir versus direct
+2,431,742. Pair-invariant batch uses 1,847,549 Ir; its separate stock-msolve
+workers exceed direct's Ir. These distinct process/solver diagnostics are
+independently audited, include all branch workers and pass frozen A/A checks.
+They price neither construction nor complete target recovery and establish
+no calibrated IC or general twist-specific advantage.
+
+**Remaining exit conditions:** production root/sign extraction, matrix
+nonzeros and complete primitive accounting; wider training/validation before
+selection; complete E27 cold accounting on the original 24 arms and 1,920
+attempts; a frozen E28 selector before opening labels 32–63; and independent-host
+replay. Full-task coefficient-row ranks include exceptional relations and
+are never used as an affine-solver cost denominator. All full-campaign cards
+remain blocked and unfunded. The next discriminating work is broader paired
+solver-worker costing plus the missing root/construction intervals on a
+frozen training population; these fixed-case probes do not discharge E27.

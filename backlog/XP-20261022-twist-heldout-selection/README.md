@@ -1,8 +1,8 @@
 # Heldout family selection and an honest solver portfolio
 
-**Current status, 2026-10-23: partial / blocked / unfunded.** Final labels 32–63 remain unopened; no final heldout run. E21 diagnostic selection is not a substitute for a frozen complete-cost selector.
+**Current status, 2026-10-25: partial / blocked / unfunded.** E26 now has bounded target-label-0 diagnostics only. Final labels 32–63 remain unopened; no selector or final heldout run. Complete E27 counters and a frozen public-feature selector remain missing.
 
-[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/RESULTS.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). No local run of this experiment has executed.
+[New bounded E26 results](../../research/twist_routes_1_3_20261021/reports/block-20261025/RESULTS.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). The original full acceptance criteria below are unchanged.
 
 The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
 

@@ -1,5 +1,7 @@
 # Twist route 3: equivalent polynomial encodings and Frobenius symmetry
 
+**2026-10-25 update:** E26 now has all four requested candidate prototypes, 90 frozen workloads, independent affine-basis certificates and instruction diagnostics on one fixed toy case. Complete costs, wider training/heldout, production root extraction and E27/E28 remain open. No calibrated IC speedup is established. [E26 report](../../research/twist_routes_1_3_20261021/reports/block-20261025/RESULTS.md).
+
 - **Status:** blocked for the full campaign; bounded local panels completed on 2026-10-21–22.
 - **Tracker:** [routes 1–3](../../research/notes/index-calculus/RESEARCH_TWIST_IC_ROUTES_1_3.md).
 - **Blocker:** [missing constraint and solver comparison](../../problems/twist-trace-constraint-and-solver-gap.md).

@@ -1,6 +1,6 @@
 # Twist experiment delivery: GitHub repository access
 
-- **Status:** open
+- **Status:** CLI access restored; delivery verification pending
 - **Kind:** access/tool limit; local computation is available
 - **Affected work:** [PR #2380](https://github.com/aburan28/crypto/pull/2380)
 - **Last updated:** 2026-10-25
@@ -34,3 +34,15 @@ The user was informed through the asynchronous input channel while local
 experiments continued. Recheck when connection readiness changes or before
 the final delivery attempt; repeated access failures alone supply no new
 evidence about the experiments.
+
+## 2026-10-25 recovery
+
+A final explicit `gh auth git-credential` fetch succeeds, and `gh pr view`
+reads the open, ready PR at the expected head `88a27612152e9fdd74c1ed0a17f964442c4c3159`.
+The canonical returned URL is `https://github.com/isogeny-labs/crypto/pull/2380`.
+The old `aburan28/crypto` connector path still returns 404; the canonical
+`isogeny-labs/crypto` connector read succeeds as well. The exact earlier
+credential failure cause is unknown; the CLI now provides the required route.
+The fetch log and subsequent actual push/head/CI state are recorded in
+[the E26 checks](../research/twist_routes_1_3_20261021/execution-v2/block-checks-20261025/).
+Do not infer that the scientific or historical file-size holds are resolved.

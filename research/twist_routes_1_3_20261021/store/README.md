@@ -28,3 +28,13 @@ the original run tree. The archive and restored tree are ignored by Git.
 The publication receipt, downloaded-member check and frozen CAS replay are
 linked from the [corrected report](../reports/publication-20261025-setec/REPORT.md).
 The earlier proposed policy targeted the wrong bucket and is superseded.
+
+The 2026-10-25 E26 wave has a distinct immutable name:
+`store:evidence/twist_routes_1_3_20261021/block-20261025/runs.tar.xz`.
+Its [manifest, downloaded-member verification and reproduction commands](../execution-v2/block-20261025/README.md)
+cover 12,707 archived files plus 39 separately tracked metadata records.
+Upload, fresh-cache download and all member hashes pass in the same Setec
+bucket. The new native index entry accompanies these records; the
+[delivery receipt](../execution-v2/block-checks-20261025/DELIVERY.json) tracks
+its pushed commit. CLI access recovered after earlier 403/404 failures.
+The older entry is unchanged.

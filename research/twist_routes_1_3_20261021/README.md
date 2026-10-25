@@ -1,8 +1,10 @@
 # Twist routes 1–3: designs and bounded execution
 
-[Current follow-up results and remaining requirements](reports/followup-20261023/RESULTS.md),
+[Earlier follow-up results and remaining requirements](reports/followup-20261023/RESULTS.md),
 [PDF](reports/followup-20261023/RESULTS.pdf), and
 [execution/raw publication status](execution-v2/README.md).
+[New E26 encoding and instruction diagnostics](reports/block-20261025/RESULTS.md) and
+[inspected PDF](reports/block-20261025/RESULTS.pdf).
 [Original execution report](reports/EXECUTION_RESULTS.md).
 [Original experiment designs](EXPERIMENTS.md), [machine-readable status](experiments.json),
 [dependency diagram](PROGRAM.svg), [Lean proof map](lean/README.md).
@@ -41,7 +43,10 @@ The eighteen-experiment campaign remains partial: the result table retains
 polarized gluing identification, higher-degree factorization, broader solver
 grids, full accounting/calibration, formal map bridges and independent-host
 replay as open requirements. The backlog cards remain blocked and unfunded.
-E26–E28 have not run. The full raw bundle is now published in
+E26 now has a bounded four-candidate pilot with independent affine-basis checks,
+matched ordinary controls and two fixed-case instruction diagnostics. Full
+E26 costs, E27 accounting and E28 final selection remain open. The earlier
+follow-up raw bundle is published in
 `setec-astronomy-artifacts`: a fresh download and all original member hashes
 verify. The earlier denials targeted the wrong repository-default bucket;
 the proposed policy for that bucket is superseded. See the

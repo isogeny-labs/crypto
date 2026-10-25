@@ -6,9 +6,10 @@ and [combined PDF](../reports/followup-20261023/RESULTS.pdf).
 [tracking update](TRACKING_20261023.json), and
 [universal supporting certificates](identities-20261023-v1/SUMMARY.json).
 
-E18–E25 and E29 have bounded, locally verified partial evidence. E26–E28
-remain unimplemented/unrun, and final E28 target labels 32–63 have not been
-generated. The new E30 finite-incidence pilot completes its 270 correctness
+E18–E25 and E29 have bounded, locally verified partial evidence. E26 now
+has the separately frozen pilot described below; its full acceptance criteria
+remain open. E27 complete accounting and E28 final selection remain unrun;
+final target labels 32–63 have not been generated. The new E30 finite-incidence pilot completes its 270 correctness
 cells, including independent PARI replay, and finds no maximum-generator-degree
 reduction in its fixed grid. Its full solver/cost experiment remains open.
 All sixteen route/follow-up cards remain blocked and unfunded; no cairn lease,
@@ -91,6 +92,30 @@ an oversized Git blob. Section 13a forbids repacking, compressing or moving
 committed evidence. Preserve those historical files and the failed full-PR
 check; no exception is self-applied and no history is rewritten. This is a
 separate merge hold from uploading the new raw bundle to the store.
+
+## E26 encoding pilot, 2026-10-25
+
+[Current E26 report](../reports/block-20261025/RESULTS.md) and
+[PDF](../reports/block-20261025/RESULTS.pdf) describe all four candidates,
+90 workloads on ten original fixture/target pairs, 90 exact matched-order
+checks, 18,970 independent signed-witness replays and 18,623 wrong-sign
+controls. The 631-cell bounded panel has 388 certified candidate cells;
+incomplete, truncated, timeout and global-cap omissions are retained.
+
+[Separate-worker instructions](runs/block-worker-cost-20261025-v1/COST.json)
+and [one-process-per-candidate instructions](runs/block-batch-cost-20261025-v1/COST.json)
+are distinct fixed-case diagnostics in simulated guest instructions Ir. They
+include worker startup/parse/solver/serialization and exclude construction,
+parent orchestration, certification, lifting and complete IC. No admitted
+time, GAE conversion, fastest-tool or calibrated speedup claim follows.
+The new [raw manifest](block-20261025/RAW_ARTIFACTS.json) and
+[reproduction instructions](block-20261025/README.md) cover this wave only;
+the earlier archive and committed evidence are unchanged. All 16 cards
+remain blocked and unfunded. GitHub initially returned 403/404; CLI access
+now succeeds and resolves the existing PR to isogeny-labs/crypto. The
+[delivery receipt](block-checks-20261025/DELIVERY.json) tracks the actual head
+and CI; the [access history](../../../problems/twist-github-repository-access.md)
+retains the earlier failures.
 
 ## Source and protocol freezes
 

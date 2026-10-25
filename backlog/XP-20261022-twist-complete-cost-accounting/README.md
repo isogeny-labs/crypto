@@ -1,8 +1,8 @@
 # Complete primitive accounting and a cold one-target replay
 
-**Current status, 2026-10-23: partial / blocked / unfunded.** Full primitive accounting, symmetric calibration and complete cold one-target replay remain unimplemented and unrun. High-level proxy counts are not a calibrated cost.
+**Current status, 2026-10-25: partial / blocked / unfunded.** E26 has separate-worker and batched Callgrind Ir diagnostics on one fixed toy case, independently audited. They expose overhead omitted by row-reduction counts, but do not instrument the original 24 arms or replay the required 1,920-attempt cold grid. Complete primitive accounting, symmetric calibration and matched rho remain unimplemented/unrun.
 
-[Current bounded results](../../research/twist_routes_1_3_20261021/reports/followup-20261023/RESULTS.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). No local run of this experiment has executed.
+[New bounded E26 results](../../research/twist_routes_1_3_20261021/reports/block-20261025/RESULTS.md) · [Raw publication/extraction status](../../research/twist_routes_1_3_20261021/execution-v2/README.md). The original full acceptance criteria below are unchanged.
 
 The original 2026-10-22 design and full requirements follow. Its “not started” wording records that historical design date.
 
