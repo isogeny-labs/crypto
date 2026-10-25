@@ -426,7 +426,10 @@ Curves of higher genus and the transfers are described in
 | `transfer.quartic_cover`, `transfer.ghs_cover` | everything: the cover's construction (`cover_setup`, quartic only), the two pullbacks (`transfer`, with the two additions `G + B`, `Q + B` on `E` for the quartic), the inner solve (`target:solve`), the check on `E` (`verify`); Jacobian work counted in `F_p` multiplications and divided by `c_E`, measured in the run (§7a) | nothing |
 | `ic.large_prime` | cofactor projection, exact combination-table group additions, target probes, and relation witness checks; the external runner verifies the returned scalar | combination states, MITM lookups, large-prime merge operations, and modular row operations; the record is therefore a lower bound, not a speed claim |
 
-`rho.multitarget_pooled` is the one method whose run solves more than its
+`rho.multitarget_pooled` is registered `applies: prime_only` (single-word
+prime-field curves, the only instance family it implements): the planner
+refuses a binary or extension workload before a session starts, and `solve`
+refuses it again. It is the one method whose run solves more than its
 record's target. The record's target is solved last, after `L − 1` companion
 targets hashed to `⟨G⟩` by the public-target law (indices `2^40 + j`, the
 algorithm seed as the law's seed), whose logarithms nobody holds; the runner
