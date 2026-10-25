@@ -155,6 +155,20 @@ the [next-step plan](../research/twist_index_calculus_20261020/zero_fiber_collec
   citing its slug in current prose. Add exact representation aliases for
   any cross-repository join. Until then these reports remain fixture-keyed
   diagnostics, not fully registered cross-model benchmark rows.
+- **Native follow-up implementation, production pending:** the
+  [expanded signed-multiset checker](../research/twist_index_calculus_20261020/zero_fiber_collector/multiset_root_audit/PROTOCOL.md)
+  passes six native controls, including complete public-point pair joining
+  against direct four-slot enumeration, weighted columns, separate rank
+  methods and independent Horner evaluation. Existing-output guards
+  preserve their marker. All 42 first/audit/A/A/parity positions remain
+  required. The
+  [native model binder](../research/twist_index_calculus_20261020/zero_fiber_collector/curve_registry_binding/PROTOCOL.md)
+  builds against the actual SDK and passes four controls after two retained
+  sparse-dependency build failures. Both full catalog processes, metadata
+  registry import and all-42 exact bindings remain pending. These are
+  implemented/gated follow-ups, not a new rank, complete-price or model-
+  registration result. Their source/input freeze must be committed before
+  actual corpus production; full original live panels remain unchanged.
 - **CI resource failure:** the Lean gate selftest at head `59e732cff1c`
   failed before proving its positive fixtures because the CI runner had
   only 39 MB free and toolchain extraction returned `No space left on
