@@ -144,7 +144,7 @@ def valid_pod(pod, expected_name):
             int(pod.get("vcpuCount")) < 4 or
             int(pod.get("gpuCount")) != 1 or
             int(pod.get("containerDiskInGb")) != CONTAINER_DISK_GB or
-            Decimal(str(pod.get("volumeInGb"))) != 0 or
+            Decimal(str(pod.get("volumeInGb") or 0)) != 0 or
             price <= 0 or price > PRICE_CAP_PER_HOUR or
             not pod.get("createdAt")):
         raise ValueError("RunPod allocation violates frozen host or price cap")

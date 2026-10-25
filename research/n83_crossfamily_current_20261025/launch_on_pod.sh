@@ -35,10 +35,13 @@ python3 -m research.n83_crossfamily_current_20261025.source_bundle \
 python3 -m research.n83_crossfamily_current_20261025.run \
   --preflight --stratum "$stratum" > "$base/preflight.json" || exit 67
 
-if ! command -v rustup >/dev/null; then
+if ! command -v gcc >/dev/null || ! command -v pkg-config >/dev/null || \
+   ! pkg-config --exists openssl || ! command -v curl >/dev/null; then
   apt-get update > "$base/apt.log" 2>&1 || exit 68
   DEBIAN_FRONTEND=noninteractive apt-get install -y \
     build-essential pkg-config libssl-dev curl >> "$base/apt.log" 2>&1 || exit 68
+fi
+if ! command -v rustup >/dev/null; then
   curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs \
     | sh -s -- -y --profile minimal > "$base/rustup.log" 2>&1 || exit 68
 fi
