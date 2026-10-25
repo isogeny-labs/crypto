@@ -34,7 +34,6 @@ test "$(cat "$cert_gate/metadata/exit")" = 0
 test "$(cat "$cert_prepared/metadata/exit")" = 0
 sha256sum -c "$cert_gate/metadata/sources.sha256" > "$cert_out/metadata/gate-sources-unchanged-before.txt"
 sha256sum -c "$cert_gate/metadata/certificate.sha256" > "$cert_out/metadata/gate-binary-unchanged-before.txt"
-sha256sum -c "$cert_prepared/metadata/workload-and-inputs.sha256" > "$cert_out/metadata/workload-inputs-unchanged-before.txt"
 test "$(sha256sum "$cert_prepared/prepared/workload.json" | cut -d ' ' -f 1)" = "$cert_workload_sha"
 cp "$cert_gate/certificate" "$cert_out/runner"
 chmod 500 "$cert_out/runner"
@@ -103,7 +102,8 @@ cert_phase summarize python3 "$cert_repo/tools/isolated_bench.py" busy -- \
   prlimit --as=8589934592 -- timeout --signal=TERM --kill-after=10s 1200s \
   "$cert_out/runner" summarize "$cert_out" "$cert_out/metadata/workload.json" "$cert_workload_sha" "$cert_out/analysis" || cert_terminal=$?
 sha256sum -c "$cert_out/metadata/sources.sha256" > "$cert_out/metadata/sources-unchanged-after.txt"
-sha256sum -c "$cert_out/metadata/workload-and-inputs.sha256" > "$cert_out/metadata/workload-inputs-unchanged-after.txt"
+cert_phase final-input-seals python3 "$cert_repo/tools/isolated_bench.py" busy -- \
+  sha256sum -c "$cert_out/metadata/workload-and-inputs.sha256" || cert_terminal=$?
 sha256sum -c "$cert_out/metadata/frozen-execution.sha256" > "$cert_out/metadata/frozen-execution-unchanged-after.txt"
 date -u +%FT%TZ > "$cert_out/metadata/finished-utc.txt"
 printf '%s\n' "$cert_terminal" > "$cert_out/metadata/terminal-exit"

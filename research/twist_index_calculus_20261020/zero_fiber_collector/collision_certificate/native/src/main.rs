@@ -711,6 +711,25 @@ fn audit(
                 "certificate label",
             )?;
             let c = Certificate::parse(&r["certificate"], p)?;
+            let attempts = arr(&r["attempts"])?;
+            let ds: Vec<_> = attempts
+                .iter()
+                .map(|v| num(&v["degree"]))
+                .collect::<R<_>>()?;
+            need(
+                ds == (4..=c.d as u64).collect::<Vec<_>>(),
+                "certificate degree prefix",
+            )?;
+            for attempt in &attempts[..attempts.len() - 1] {
+                need(
+                    attempt["found_power"].is_null(),
+                    "ignored earlier certificate",
+                )?;
+            }
+            need(
+                num(&attempts.last().unwrap()["found_power"])? == c.k as u64,
+                "certificate stopping power",
+            )?;
             let polys = arr(&s["equations"])?
                 .iter()
                 .map(|v| parse_poly(v, p))
