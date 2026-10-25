@@ -135,7 +135,8 @@ def stage_one(index, endpoint, bundle_dir, allocation_dir, known_hosts):
            f'mkdir -p {REMOTE_BUNDLE} {REMOTE_SOURCE} '
            f'/workspace/n83-crossfamily-s{index}')
     for path in (bundle_dir / 'source.tar.gz',
-                 bundle_dir / 'manifest.json', allocation):
+                 bundle_dir / 'manifest.json',
+                 allocation_dir / 'allocation_plan.json', allocation):
         destination = (f'{REMOTE_BUNDLE}/{path.name}' if path != allocation else
                        f'{REMOTE_BUNDLE}/allocation_s{index}.json')
         subprocess.run(scp_base(endpoint, known_hosts) +
@@ -210,7 +211,8 @@ def download_one(index, endpoint, output, known_hosts):
     for name in ('run.status', 'source_check.json', 'preflight.json',
                  'apt.log', 'rustup.log', 'toolchain.log', 'rustc.txt',
                  'ic_tests.log', 'rho_tests.log', 'build.log',
-                 'cpu_affinity_ids.txt', 'producer.log', 'producer.exit',
+                 'cpu_affinity_ids.txt', 'pod_deadline_guard.json',
+                 'pod_deadline_guard.log', 'producer.log', 'producer.exit',
                  'replay.log', 'replay.exit', 'dispatch.log',
                  'raw_results.sha256', 'raw_results.tar.gz'):
         destination = target / name

@@ -30,6 +30,20 @@ printf 'START %s\n' "$(date -u +%FT%TZ)" > "$base/run.status"
 
 tar -C "$repository" -xzf "$bundle/source.tar.gz" || exit 65
 cd "$repository" || exit 65
+# RunPod's terminateAfter setting has no enforcement guarantee. Keep an
+# independent Pod-side expiry process in addition to the local watcher.
+command -v runpodctl > /dev/null || exit 75
+nohup python3 -m research.n83_crossfamily_current_20261025.pod_deadline_guard \
+  --allocation "$allocation" --plan "$bundle/allocation_plan.json" \
+  --receipt "$base/pod_deadline_guard.json" \
+  > "$base/pod_deadline_guard.log" 2>&1 < /dev/null &
+guard_pid=$!
+for attempt in 1 2 3 4 5; do
+  test -f "$base/pod_deadline_guard.json" && break
+  kill -0 "$guard_pid" 2>/dev/null || exit 75
+  sleep 1
+done
+test -f "$base/pod_deadline_guard.json" || exit 75
 python3 -m research.n83_crossfamily_current_20261025.source_bundle \
   --verify "$bundle" --root "$repository" > "$base/source_check.json" || exit 66
 python3 -m research.n83_crossfamily_current_20261025.run \

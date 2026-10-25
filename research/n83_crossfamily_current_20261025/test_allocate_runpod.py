@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -67,7 +68,8 @@ class AllocateTests(unittest.TestCase):
                 subject, "frozen_head", return_value=HEAD):
             output = Path(temp) / "allocation"
             result = subject.allocate(output, "fake", BUNDLE, provider.api,
-                                      provider.pods, provider.terminate)
+                                      provider.pods, provider.terminate,
+                                      guard=lambda _: SimpleNamespace(poll=lambda: None))
             self.assertEqual(result["status"], "PASS_TWO_BUDGETED_PODS")
             self.assertEqual(provider.terminated, [])
             snapshot_path = output / "provider_snapshot.json"
@@ -83,6 +85,17 @@ class AllocateTests(unittest.TestCase):
                 self.assertEqual(allocation["source_archive_sha256"],
                                  BUNDLE["source_archive_sha256"])
 
+    def test_unarmed_guard_prevents_paid_mutation(self):
+        provider = FakeProvider()
+        with tempfile.TemporaryDirectory() as temp, patch.object(
+                subject, "frozen_head", return_value=HEAD):
+            with self.assertRaisesRegex(ValueError, "guard unavailable"):
+                subject.allocate(Path(temp) / "allocation", "fixture-key", BUNDLE,
+                                 provider.api, provider.pods, provider.terminate,
+                                 guard=lambda _: (_ for _ in ()).throw(
+                                     ValueError("guard unavailable")))
+            self.assertEqual(provider.live, [])
+
     def test_same_machine_is_retired(self):
         provider = FakeProvider(duplicate_machine=True)
         with tempfile.TemporaryDirectory() as temp, patch.object(
@@ -90,7 +103,8 @@ class AllocateTests(unittest.TestCase):
             output = Path(temp) / "allocation"
             with self.assertRaisesRegex(ValueError, "distinct"):
                 subject.allocate(output, "fake", BUNDLE, provider.api,
-                                 provider.pods, provider.terminate)
+                                 provider.pods, provider.terminate,
+                                      guard=lambda _: SimpleNamespace(poll=lambda: None))
             self.assertEqual(set(provider.terminated), {"pod0", "pod1"})
             self.assertEqual(provider.live, [])
             failure = json.loads((output / "allocation_failure.json").read_text())
@@ -103,7 +117,8 @@ class AllocateTests(unittest.TestCase):
             output = Path(temp) / "allocation"
             with self.assertRaisesRegex(ConnectionError, "response lost"):
                 subject.allocate(output, "fake", BUNDLE, provider.api,
-                                 provider.pods, provider.terminate)
+                                 provider.pods, provider.terminate,
+                                      guard=lambda _: SimpleNamespace(poll=lambda: None))
             self.assertEqual(set(provider.terminated), {"pod0", "pod1"})
             failure = json.loads((output / "allocation_failure.json").read_text())
             self.assertEqual(failure["status"], "UNRESOLVED_PROVIDER_MUTATION")

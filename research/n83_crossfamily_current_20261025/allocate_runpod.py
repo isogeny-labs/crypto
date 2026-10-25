@@ -7,6 +7,7 @@ from decimal import Decimal, ROUND_UP
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 import subprocess
 import time
@@ -116,6 +117,26 @@ def terminate(pod_id, key):
     return False
 
 
+def arm_guard(output):
+    """Start a separate local deadline process before buying any Pod time."""
+    log = open(output / "deadline_guard.log", "ab", buffering=0)
+    try:
+        child = subprocess.Popen(
+            [sys.executable, "-m",
+             "research.n83_crossfamily_current_20261025.deadline_guard",
+             "--allocation-dir", str(output)], cwd=ROOT, stdin=subprocess.DEVNULL,
+            stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+    finally:
+        log.close()
+    for _ in range(50):
+        if child.poll() is not None:
+            raise ValueError("local RunPod deadline guard exited before arming")
+        if (output / "deadline_guard.ready").is_file():
+            return child
+        time.sleep(0.1)
+    raise ValueError("local RunPod deadline guard did not arm")
+
+
 def mutation(name, terminate_at):
     return (
         "mutation { podFindAndDeployOnDemand(input: { name: " +
@@ -171,7 +192,7 @@ def frozen_head():
 
 
 def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
-             terminate_pod=terminate):
+             terminate_pod=terminate, guard=arm_guard):
     head = frozen_head()
     if (bundle_proof.get("source_head_sha") != head or
             not isinstance(bundle_proof.get("source_archive_sha256"), str) or
@@ -191,6 +212,7 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
     write(output / "allocation_plan.json", {
         "schema": "n83.crossfamily-current-allocation-plan/v1",
         "source_head_sha": head, "names": names, "gpu_type": GPU_TYPE,
+        "started_utc": iso(started),
         "source_archive_sha256": bundle_proof["source_archive_sha256"],
         "source_manifest_sha256": bundle_proof["source_manifest_sha256"],
         "image_name": IMAGE, "min_memory_gb": 27, "min_vcpus": 4,
@@ -203,11 +225,14 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
         "total_reserved_cap_usd": str(TOTAL_CAP_USD),
         "existing_named_pods": [],
     })
+    guard_process = guard(output)
     acquired = []
     observed = []
     uncertain = False
     try:
         for stratum, name in enumerate(names):
+            if guard_process.poll() is not None:
+                raise ValueError("local RunPod deadline guard exited")
             try:
                 response = api(mutation(name, terminate_at), key)
                 raw = response["podFindAndDeployOnDemand"]
