@@ -1,8 +1,8 @@
 # Lean proof map
 
 The proof artifacts are `lean/PrimeExamples.lean`,
-`lean/OakleyOrders.lean`, `lean/MinimalPairingField.lean`, and
-`lean/RelationSupport.lean`. Their shared `lean-toolchain`,
+`lean/OakleyOrders.lean`, `lean/MinimalPairingField.lean`,
+`lean/RelationSupport.lean`, and `lean/WeightedSupport.lean`. Their shared `lean-toolchain`,
 `lakefile.toml` and manifest pin Lean 4.34.1 and Mathlib commit
 `d13f23b723b8a846827a245b89c10fc7d3f11612`. The declaration
 `affineCount` is the finite sum of all
@@ -28,6 +28,8 @@ solutions to `y²=x³+ax+b (mod p)` for `0≤x,y<p`.
 | Conditioning on an accepted target set cannot enlarge that fixed-base support | `conditioned_relation_support_bound` | For any finite accepted subset of `A` under the same target map; exact intersection cap, checked |
 | A known-scalar anchor collision determines the unknown logarithm contribution; two representations of one target determine a difference equation | `P192ExtensionCover.scalar_anchor_collision_equation`, `P192ExtensionCover.repeated_target_relation_equation` in [ScalarAnchor.lean](../p192_extension_cover_20261012/lean/ScalarAnchor.lean) | Checked for an additive-group homomorphism and explicit known-log identities. Both use only `propext`; exact P-192 target-set disjointness is native and independently combinatorial, not a concrete Lean finite-field instance. |
 | One private fresh logarithm per generated equation leaves every old assignment feasible | `P192ExtensionCover.private_columns_extend`, `P192ExtensionCover.private_columns_preserve_old_feasibility` in [AdaptiveBase.lean](../p192_extension_cover_20261012/lean/AdaptiveBase.lean) | Checked for any additive commutative group and arbitrary old-column row expressions with unit private columns. The 64 concrete P-192 equations, distinct points, and old-support nonintersection are native and independently replayed. |
+| A finite seeded query law places at most `binomial(B+m-1,m) · M` seed weight on the fixed-base support when every target has at most `M` preimage seeds | `weighted_relation_support_bound` | For any natural-number target weight and any target map `Sym (Fin B) m → A`; no uniformity assumption; checked |
+| The same preimage-weight cap holds after a geometric acceptance filter | `conditioned_weighted_relation_support_bound` | For any finite accepted subset of `A`, with the `M` bound needed only inside that subset; checked |
 
 The relation-support declarations count combinations with repetition before
 any curve-specific group law. Instantiating `target` with a genus-three
@@ -37,6 +39,19 @@ probability bound `min(1, binomial(B+m-1,m)/|accepted|)` additionally assumes
 uniform sampling of a nonempty finite accepted set. Neither theorem proves
 that a particular query is a relation or that the resulting matrix has useful
 rank; the P-192 replay measures those separately.
+
+The weighted declarations replace uniformity by a finite-seed input law:
+`weight(a)` is the number of sampler seeds producing target class `a`.
+If `N>0` seeds are equally likely and every accepted class has at most `M`
+preimage seeds, the supported accepted seed mass is at most
+`binomial(B+m-1,m)·M`, so its hit probability per attempted seed is at most
+that quantity divided by `N`. For a query conditioned on acceptance, use
+the total accepted seed mass as the denominator instead. A per-query
+conditional bound of this form can be applied
+at each adaptive step, but the Lean declarations here prove the one-query
+finite-sum bound; they do not formalize a stochastic process or certify `M`
+for a particular curve sampler. The fixed-base map, exact query law, seed
+domain, and measured relation rank remain separate obligations.
 
 The native Rust genus-128 GHS receipt is an exact-integer computation of irreducible and
 smooth monic-polynomial counts followed by the declared floating-point cost
