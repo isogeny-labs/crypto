@@ -1,10 +1,10 @@
 obligation,kind,status,statement
 support_coprime,premise,kernel_checked_conditional,B nonzero implies IsCoprime u1 u2
-runtime_interpolation,source_link,open_source_link,runtime numerator satisfies both interpolation congruences
+runtime_interpolation,source_link,open_source_link,runtime execution instantiates proof-side numerator and interpolation
 first_residue,premise,kernel_checked_conditional,interpolation and valid input imply first curve residue
 second_residue,premise,kernel_checked_conditional,interpolation and valid input imply second curve residue
 generic_head,implication,kernel_checked_conditional,generic cubic and quadratic residual has recorded coefficients at degrees six five four
-source_head,source_link,open_source_link,runtime residual has required degree-five and degree-four coefficients
+source_head,implication,kernel_checked_conditional,proof-side source-style residual has head coefficients zero B squared zero
 degree_bound,implication,kernel_checked_conditional,matching quintic heads imply difference degree below support product
 crt_uniqueness,implication,kernel_checked_conditional,the four premises imply residual equals scale times curve
 divisor_class,conclusion,open_geometry,residual curve equation yields the intended Pic0 class

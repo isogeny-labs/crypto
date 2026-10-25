@@ -504,6 +504,19 @@ def main() -> None:
         )
     require(forbidden_proof_token.search(polynomial_source) is None,
             "forbidden common polynomial-head proof token")
+    source_head_source = (ROOT / "Common22SourceHead.lean").read_text()
+    source_head_log = (ROOT / "common22-source-head-build.log").read_text()
+    for theorem in ("sourceE_coeff_six", "sourceE_coeff_five",
+                    "sourceE_coeff_four", "canonical_n_eq_interpolant"):
+        require(re.search(r"(?m)^theorem " + theorem + r"\b", source_head_source) is not None,
+                f"common source-head theorem missing: {theorem}")
+        require(
+            f"'Common22SourceHead.{theorem}' depends on axioms: "
+            "[propext, Classical.choice, Quot.sound]" in source_head_log,
+            f"common source-head kernel/axiom receipt missing: {theorem}",
+        )
+    require(forbidden_proof_token.search(source_head_source) is None,
+            "forbidden common source-head proof token")
     uniqueness_source = (ROOT / "Common22Uniqueness.lean").read_text()
     for theorem in ("zero_of_coprime_supports", "residual_eq_curve"):
         require(re.search(r"(?m)^theorem " + theorem + r"\b", uniqueness_source) is not None,
@@ -538,6 +551,10 @@ def main() -> None:
         "Common22PolynomialHead.generic_coeff_six",
         "Common22PolynomialHead.generic_coeff_five",
         "Common22PolynomialHead.generic_coeff_four",
+        "Common22SourceHead.sourceE_coeff_six",
+        "Common22SourceHead.sourceE_coeff_five",
+        "Common22SourceHead.sourceE_coeff_four",
+        "Common22SourceHead.canonical_n_eq_interpolant",
         "Common22Uniqueness.zero_of_coprime_supports",
         "Common22Uniqueness.residual_eq_curve",
     ], "common uniqueness theorem inventory mismatch")
@@ -545,7 +562,7 @@ def main() -> None:
     require([row["status"] for row in uniqueness["rows"]] ==
             ["kernel_checked_conditional", "open_source_link",
              "kernel_checked_conditional", "kernel_checked_conditional",
-             "kernel_checked_conditional", "open_source_link", "kernel_checked_conditional",
+             "kernel_checked_conditional", "kernel_checked_conditional", "kernel_checked_conditional",
              "kernel_checked_conditional", "open_geometry"],
             "common uniqueness proof boundary mismatch")
     with (ROOT / "common22-uniqueness.csv").open(newline="") as handle:

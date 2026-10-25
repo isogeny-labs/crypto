@@ -53,7 +53,9 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   forces the cleared residual difference to vanish. The source polynomial
   head and runtime interpolation links remain open. Four generic polynomial
   theorems now expand `N²-u₁u₂U` and read its degree-six, five, and four
-  coefficients; substituting the runtime common-branch coefficients remains
+  coefficients. Four source-style theorems substitute the proof-side
+  coefficient formulas and recover `0,B²,0`; they also equate the canonical
+  cubic with its interpolation form. Runtime semantic correspondence remains
   open. The [CSV](common22-uniqueness.csv),
   [JSON](common22-uniqueness.json), [graph](common22-uniqueness.svg), and
   [PDF](COMMON22_UNIQUENESS.pdf) distinguish the kernel-checked implication
@@ -67,6 +69,15 @@ Build from this directory:
 ```sh
 MATHLIB_NO_CACHE_ON_UPDATE=1 lake update
 lake build
+```
+
+For the dependent source-head file, build its two local imports before the
+read-only kernel check:
+
+```sh
+lake env lean -o .lake/build/lib/lean/Common22SupportHead.olean Common22SupportHead.lean
+lake env lean -o .lake/build/lib/lean/Common22PolynomialHead.olean Common22PolynomialHead.lean
+lake env lean Common22SourceHead.lean
 ```
 
 `MATHLIB_NO_CACHE_ON_UPDATE=1` avoids unpacking the complete Mathlib binary

@@ -9,11 +9,11 @@ ROOT = Path(__file__).resolve().parent
 SCHEMA = "projective-law-common22-uniqueness/v1"
 ROWS = [
     ("support_coprime", "premise", "kernel_checked_conditional", "B nonzero implies IsCoprime u1 u2"),
-    ("runtime_interpolation", "source_link", "open_source_link", "runtime numerator satisfies both interpolation congruences"),
+    ("runtime_interpolation", "source_link", "open_source_link", "runtime execution instantiates proof-side numerator and interpolation"),
     ("first_residue", "premise", "kernel_checked_conditional", "interpolation and valid input imply first curve residue"),
     ("second_residue", "premise", "kernel_checked_conditional", "interpolation and valid input imply second curve residue"),
     ("generic_head", "implication", "kernel_checked_conditional", "generic cubic and quadratic residual has recorded coefficients at degrees six five four"),
-    ("source_head", "source_link", "open_source_link", "runtime residual has required degree-five and degree-four coefficients"),
+    ("source_head", "implication", "kernel_checked_conditional", "proof-side source-style residual has head coefficients zero B squared zero"),
     ("degree_bound", "implication", "kernel_checked_conditional", "matching quintic heads imply difference degree below support product"),
     ("crt_uniqueness", "implication", "kernel_checked_conditional", "the four premises imply residual equals scale times curve"),
     ("divisor_class", "conclusion", "open_geometry", "residual curve equation yields the intended Pic0 class"),
@@ -39,6 +39,10 @@ packet = {
         "Common22PolynomialHead.generic_coeff_six",
         "Common22PolynomialHead.generic_coeff_five",
         "Common22PolynomialHead.generic_coeff_four",
+        "Common22SourceHead.sourceE_coeff_six",
+        "Common22SourceHead.sourceE_coeff_five",
+        "Common22SourceHead.sourceE_coeff_four",
+        "Common22SourceHead.canonical_n_eq_interpolant",
         "Common22Uniqueness.zero_of_coprime_supports",
         "Common22Uniqueness.residual_eq_curve",
     ],
@@ -47,7 +51,7 @@ packet = {
         {"obligation": name, "kind": kind, "status": status, "statement": statement}
         for name, kind, status, statement in ROWS
     ],
-    "scope": "conditional coprimeness, residues, generic polynomial head, degree implication, and curve equation over a field; runtime interpolation, source-head substitution, and geometry remain open",
+    "scope": "conditional coprimeness, residues, proof-side source-style polynomial head, degree implication, and curve equation over a field; runtime semantic correspondence and geometry remain open",
     "cost_ratio_change": None,
 }
 (ROOT / "common22-uniqueness.json").write_text(json.dumps(packet, indent=2) + "\n")
@@ -91,12 +95,15 @@ coefficients and quadratic-support hypotheses. It covers a degree-at-most-six
 residual whose sixth coefficient vanishes.
 Four additional Lean theorems expand a generic cubic numerator against two
 quadratic supports and a quadratic residual support, then read its coefficients
-at degrees six, five, and four. Substitution of the runtime common-branch
-coefficients into this generic expansion remains open.
+at degrees six, five, and four. Four more substitute the proof-side
+source-style coefficients and show `0`, `B²`, `0`; they also equate the
+canonical numerator with its interpolation expression. The semantic link
+from Rust execution to that proof-side polynomial remains open.
 The [coprime](common22-coprime-build.log), [residue](common22-residues-build.log),
-[degree](common22-degree-build.log), and
-[polynomial-head](common22-polynomial-head-build.log) and
-[uniqueness](common22-uniqueness-build.log) kernel logs record all nineteen
+[degree](common22-degree-build.log),
+[polynomial-head](common22-polynomial-head-build.log),
+[source-head](common22-source-head-build.log), and
+[uniqueness](common22-uniqueness-build.log) kernel logs record all twenty-three
 theorem names and their foundational axioms.
 
 The [CSV](common22-uniqueness.csv) and [JSON](common22-uniqueness.json) list
@@ -106,8 +113,8 @@ printable copy for independent review. It is rendered from
 `COMMON22_UNIQUENESS.tex` with `pdflatex` and optimized with Ghostscript
 `pdfwrite`; the checksum manifest binds the final bytes.
 
-The source interpolation premises and source-head substitution have not been
-mechanically connected to the runtime formulas for all valid inputs. The
+The proof-side head is exact, but Rust-to-Lean semantic correspondence has not
+been mechanically established for all valid inputs. The
 principal-divisor and `Pic^0` bridge remain open. No new DLP experiment ran;
 the recorded cost ratios are unchanged.
 """)
@@ -128,8 +135,9 @@ at most six with zero sixth coefficient, $F$ has degree at most five, their
 scaled coefficients match in degrees five and four, and $u_1,u_2$ are nonzero
 quadratics. These are conditional polynomial statements.
 Four more theorems expand a generic cubic-minus-quadratic product and read its
-coefficients in degrees six, five, and four. The runtime coefficient
-substitution remains open.
+coefficients in degrees six, five, and four. Four source-style theorems show
+those coefficients are $0,B^2,0$ and equate the cubic's canonical and
+interpolation forms. Rust execution is not translated into Lean here.
 
 \begin{center}
 \begin{tabular}{ll}
@@ -140,7 +148,7 @@ Support coprimeness from $B\ne0$ & Kernel checked, conditional\\
 Runtime interpolation link & Open source link\\
 First and second curve residues & Kernel checked, conditional\\
 Generic polynomial head & Kernel checked, conditional\\
-Runtime residual head & Open source link\\
+Proof-side source-style head & Kernel checked, conditional\\
 Degree-bound implication & Kernel checked, conditional\\
 Coprime low-degree implication & Kernel checked, conditional\\
 Divisor-class conclusion & Open geometry\\

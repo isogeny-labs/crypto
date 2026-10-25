@@ -254,9 +254,11 @@ with zero sixth coefficient, matching quintic heads, and quadratic supports,
 and the final coprime-divisibility-plus-degree
 implication in this paragraph. Four further Lean theorems expand a generic
 `N²-u1*u2*U` polynomial and identify its coefficients in degrees six, five,
-and four. Runtime interpolation and substitution of the source common-branch
-coefficients into that polynomial have not been connected mechanically to every source
-execution. The divisor-class step remains written mathematics.
+and four. Four source-style Lean theorems substitute the common-branch
+coefficient formulas into the proof-side polynomial, obtaining `0,B²,0`,
+and identify the cubic with its interpolation expression. Rust-to-Lean
+semantic correspondence has not been proved for every runtime execution.
+The divisor-class step remains written mathematics.
 
 The checker also verifies the cleared identity
 `C⁵N+S*C²X+T = U*[-C⁴X+C³(-Cq1-A)+C²Q]`, where `S,T` are the
