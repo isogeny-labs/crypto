@@ -1,9 +1,14 @@
 # Research Report: Isogeny Fibers, Hidden Geometric Structure, and ECDLP Hardness Discrepancies
 
-**Date.** 2026-10-10. **Status.** Theorem audit + proofs at the level of
+**Date.** 2026-10-10 (rounds 1–3); extended through 2026-10-24 (§17 round 4,
+§19 rounds 5–6). **Status.** Theorem audit + proofs at the level of
 propositions, with a toy-field computational probe
 (`research/isogeny_fibers_20261010/`, pure Python + sympy, reproducible with
-`python3 -I fiber_probe.py` and `python3 -I pullback_factor.py`).
+`python3 -I fiber_probe.py` and `python3 -I pullback_factor.py`). Rounds 4–6
+(§17, §19) are native Rust, toy and synthetic instances only. §19 records the
+verdict of every round-5 and round-6 lead and marks which results are in
+unmerged pull requests; §18 is the reference list as revised by the R6.10
+literature check.
 **Prior notes this builds on.** `RESEARCH_PDP_SPEEDUP_AND_ISOGENY.md` (2-/3-isogenous
 binary neighbours: identical Macaulay ranks, yield moves only with |F|),
 `RESEARCH_KOBLITZ_INDEX_CALCULUS.md`, `RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md`.
@@ -44,8 +49,10 @@ binary neighbours: identical Macaulay ranks, yield moves only with |F|),
    polynomials".** Choosing F₁ = φ⁻¹(F₂) (a union of M^π-cosets) and working in
    the invariant coordinate x(φ(P)) is exactly the construction of
    Faugère–Huot–Joux–Renault–Vitse (EUROCRYPT 2014) for 2-torsion and of
-   Galbraith–Gebregiyorgis (ePrint 2014/806) / Huang–Petit–Shinohara–Takagi
-   (2015) for 2- and 4-torsion over F_{2ⁿ}. The gain is a constant: a factor
+   Galbraith–Gebregiyorgis (ePrint 2014/806, binary Edwards curves) and
+   Huang–Petit–Shinohara–Takagi (IWSEC 2013; Pacific J. Math. Ind. 2015,
+   prime-degree binary extensions) in characteristic two (R6.10: the use of
+   4-torsion in these two papers was not verified). The gain is a constant: a factor
    |M^π| in factor-base size at equal PDP cost, and a sparser symmetrised
    system; measured speedups are small constants, and the method needs
    *rational* kernel points, which prime-order prime-field curves do not have.
@@ -67,9 +74,12 @@ binary neighbours: identical Macaulay ranks, yield moves only with |F|),
 
 5. **What the theorems do not say.** Jao–Miller–Venkatesan (ASIACRYPT 2005) gives
    polynomial-time *random* reducibility among curves with the same endomorphism
-   ring, under GRH; Galbraith–Hess–Smart (2002) and Galbraith (1999) give the
-   Õ(q^{1/4}) isogeny-walk reduction unconditionally-heuristically; across
-   conductor gaps the reduction is polynomial in the largest prime of the gap.
+   ring, under GRH; Galbraith (1999, prime fields) and Galbraith–Hess–Smart (2002) give a
+   heuristic Õ(q^{1/4})-type cost for *computing an isogeny between two given
+   isogenous curves* (for GHS02, O(q^{n/4+ε}) over F_{q^n}, as reported by
+   Maurer–Menezes–Teske 2002; finding which weak curve is isogenous to a given
+   target is a separate search, R6.10 L19); across conductor gaps the reduction
+   is polynomial in the largest prime of the gap.
    None of these bounds *concrete* cost: they say nothing about relation yield,
    degree of regularity, or constants, and they explicitly leave curves on
    different volcano levels with a large-prime conductor gap unrelated. So a
@@ -101,7 +111,22 @@ binary neighbours: identical Macaulay ranks, yield moves only with |F|),
    verified exactly in characteristic 2 and in odd characteristic.
    Automorphisms divide the cost by |A|, image containment divides it by
    the index i, and isogeny-kernel saturation multiplies it by
-   |M|^{m−2}. For prime-order curves only |A| ≤ 6 remains.
+   |M|^{m−2}. For prime-order curves only |A| ≤ 6 remains. The kernel-saturation
+   clause is prior work: Faugère–Huot–Joux–Renault–Vitse (EUROCRYPT 2014, §3.2)
+   state the m^{n−1} loss in decomposition probability of a translation-invariant
+   factor base and its compensation by easier systems; what this note adds is the
+   exact census and the measured class factors (R6.10, §19.14).
+
+9. **Rounds 5 and 6 (§19) change constants and bookkeeping, not the map.**
+   Fifteen leads were run (R5.1–R5.4, R6.1–R6.11); §19 gives each one's
+   hypothesis, falsifier, verdict and numbers, and marks the five whose pull
+   requests were still open on 2026-10-24. A quotient-coordinate oracle removes
+   the 2^{m−2} penalty in characteristic 2 as well (R5.1); a finite-size
+   A-pair correction explains the ensemble ζ-closed census but not the single
+   recorded value (R6.5, falsifier fired); relation yield is the same on the
+   crater and floor of ℓ-volcanoes with ℓ ≤ 13 at toy size (R6.11); the
+   transport-oracle simulation proof is withdrawn and open (R6.8). No lead
+   claims to move an exponent or a row of §15.4; R6.5 states that it moves none.
 
 ---
 
@@ -673,7 +698,8 @@ Jacobian-theoretic image φ_*: J(E₁) → J(E₂); compose with a cover
 C → E₂ of genus g (e.g. the degree-2 cover given by x∘φ ∈ F_q(E₁)… or a
 Weil-descent cover in the GHS sense) and look for a genus-g curve C' whose
 Jacobian contains E₁ and admits a faster index calculus (genus 2 over F_q:
-Õ(q) by Gaudry; over F_{q^k}: GHS/Diem covers).
+Õ(q) at g = 2 is the Gaudry–Thomé–Thériault–Diem double-large-prime bound
+q^{2−2/g}; Gaudry 2000 alone gives Õ(q²) for fixed g; over F_{q^k}: GHS/Diem covers).
 *Mechanism.* Transfer the DLP to J(C') where the factor base is "points of
 C'", with relation generation at Õ(q^{2−2/g}) or better.
 *Obstruction.* The GHS/cover attack depends on the *field* (extension degree,
@@ -1171,7 +1197,8 @@ The graph of φ: E₁ → E₂ inside E₁ × E₂, or Kani's (N,N)-isogeny from
 E₁ × E₂ to a Jacobian J(C) of genus 2 (the Castryck–Decru tool), embeds the
 DLP of E₁ into a 2-dimensional abelian variety isogenous to E₁ × E₂. Generic
 algorithms there cost √(#J) ≈ q, index calculus on genus 2 over F_q costs
-Õ(q) (Gaudry): equal exponent, worse constant, and the DLP in J(C) splits
+Õ(q) (the Gaudry–Thomé–Thériault–Diem bound q^{2−2/g} at g = 2; Gaudry 2000
+alone gives Õ(q²)): equal exponent, worse constant, and the DLP in J(C) splits
 back into the two DLPs by the dual isogeny. The torsion-point information
 that breaks SIDH recovers an isogeny of degree D from its action on
 N-torsion with N² ≳ D; applied to the "isogeny" [k] (degree k² ≈ r²) it
@@ -1264,6 +1291,18 @@ For classes uniform in a subgroup of index i in A, that happens with
 probability i/|A| instead of 1/|A|. (b) Each sum Σ P_j has the μ^{m−1}
 representations Σ (P_j + t_j) with Σ t_j = 0. Projection by [h] kills M,
 so the columns merge in μ-tuples (Prop. 4.1). ∎
+
+*Prior work (R6.10, §19.14).* Clause (b) is anticipated by Faugère–Huot–Joux–
+Renault–Vitse (EUROCRYPT 2014, §3.2): a factor base invariant under translation
+by a point of order m lowers the decomposition probability of a random point
+by m^{n−1}, needs m times fewer relations, and the loss "is more than
+compensated by the improved resolution of the associated polynomial systems".
+The factor μ^{m−2} above is that accounting at a fixed oracle (derived in R6.10
+from their statement), and the oracle-dependence of §17.4 is the quantitative
+form of their compensation remark. This note's contribution to (b) is the
+exact census and the measured class factors. R6.10 found no earlier statement
+of clause (a), of the automorphism clause, or of the three together as one
+law; that is the outcome of its web searches, not a proof of novelty.
 
 **Exact census.** `icv1-f2m19-t797-b6cf2467` (a = 0), N = 4 · 130 873, so h = 4. Bases are built
 from a 6-dimensional subspace (`image_vs_fiber_census.py`,
@@ -1369,7 +1408,7 @@ targets.
 L keys on L different curves of one isogeny class, linked by known
 small-degree isogenies, transport to one curve at Õ(√ℓ) per key per step
 (T1, Prop. 4.1). Batch rho then solves all L in about √(Lr) instead of
-L√r. Issuing per-user curves of one order buys no multi-target protection
+L√r (Kuhn–Struik, SAC 2001: ≈ √(2rL) for L < r^{1/4}). Issuing per-user curves of one order buys no multi-target protection
 unless the curves are separated by a vertical move whose conductor has a
 large prime factor (Prop. 3.3), or are not isogenous at all. This is the
 multi-target face of §13.6.
@@ -1481,6 +1520,17 @@ in odd characteristic, for ℓ = 3, and it matches the characteristic-2,
 ℓ = 2 census of §14.1. The A1 ranking at m = 31 is the same law once
 more.
 
+*Erratum (R6.5, §19.9).* The ζ-closed m = 2 entry "measured c = 1.02" is one
+base at p ≈ 2^20; the three recorded censuses give 0.93 / 0.96 / 1.02 (mean
+0.97). A single base's ratio is fixed by how many of its points lie in G (sd
+≈ 0.12 at |F| = 72) and is not a test of Prop. 15.2. Over 200 random bases per
+size (p = 195709) the ζ-closed/plain m = 2 ratio is 1.130, 1.059, 1.033 at
+|F| = 36, 72, 144 (95% intervals contain 1 + 4/|F|, the finite-size A-pair
+correction with |A| = 6; the pairs {ζᵃP, −ζᵇP} need negation). "c unchanged by
+A" holds as |F| → ∞. R6.5's next step is to replace the single-base rows
+of the table by ensemble means for all four arms; only the ζ-closed m = 2
+entry was re-measured.
+
 **Reading.** In this constant-factor calculus, the endomorphism ring of
 the class contributes only through A, its unit group, at most 6 for
 ordinary curves, or the Frobenius orbit length n for subfield curves.
@@ -1489,6 +1539,11 @@ contribution at m ≥ 3 is a *penalty* unless used as an image condition.
 For prime-order curves, h = 1, the isogeny structure offers index
 calculus nothing beyond |A|.
 
+*Prior work (R6.10, §19.14).* The kernel-saturation clause of Prop. 15.2 is
+the accounting of Faugère–Huot–Joux–Renault–Vitse (EUROCRYPT 2014, §3.2; see
+§14.1). Cite that paper wherever the clause or its oracle-dependence (§17.4,
+Prop. 15.2′ of R5.4) is stated.
+
 ### 15.3 Three corollaries
 
 * **Target screening is impossible.** No fiber invariant can flag
@@ -1496,15 +1551,21 @@ calculus nothing beyond |A|.
   constant on G, and index-calculus targets all lie in G.
 * **Isogenies cannot rescue lifting attacks.** Mordell–Weil rank is an
   isogeny invariant, and an isogeny scales canonical heights by its
-  degree. The height-growth obstruction that defeats xedni-type lifting
-  (Jacobson, Koblitz, Silverman, Stein and Teske, 2000) therefore holds
-  across the class up to a factor of deg ψ.
+  degree. The canonical-height bound on the coefficients of a dependency
+  among lifted points, which defeats xedni-type lifting (Jacobson, Koblitz,
+  Silverman, Stein and Teske, 2000), therefore holds across the class up to a
+  factor of deg ψ. (R6.10 L44: the step from their bound to "isogenies cannot
+  rescue lifting" is this note's own inference, not theirs.)
 * **Fibers help defenders.** The connecting class δ(Q) of Prop. 2.3 is
   the Kummer map. For a kernel of order ℓ it is computed by one reduced
   Tate pairing with a point of the dual kernel, a Miller loop of length
   about log ℓ. This is the mechanism behind pairing-based subgroup
   membership tests (Koshelev, "Subgroup membership testing on elliptic
-  curves via the Tate pairing", J. Cryptogr. Eng. 2023). The one place a
+  curves via the Tate pairing", J. Cryptogr. Eng. 13(1) (2023) 125–128;
+  correction J. Cryptogr. Eng. 14 (2024) 127–128). Reading δ(Q) as the
+  Kummer map computed by one reduced Tate pairing is this note's
+  interpretation; the abstract states a Tate-pairing membership test that needs
+  at most two power-residue symbols for a small cofactor (R6.10 L43). The one place a
   fiber computation is cheap and useful is in validating points, not in
   attacking them.
 
@@ -1678,10 +1739,15 @@ agreeing with binary and τ-NAF [r]P and with `is_valid_public_point`.
 Counted cost on members of G: 1 M + 17 / 30 table lookups against
 346 M + 609 S / 618 M + 1085 S for τ-NAF López–Dahab [r]P. The method is
 not new: trace-based halving validation for cofactor 2 or 4 appears in
-US 7,257,709 (priority 2002) and in King (PKC 2004) and Eagle–Galbraith–Ong
-(ePrint 2009/086). This form only folds the half's trace into Tr(y) + Tr(xH(x)),
-avoiding the square root. The code is not constant-time; the literature
-check used search snippets only.
+US 7,257,709 (priority 2002; Brown–Yamada, Certicom), whose h = 4 test is
+Tr(x) = 0, x ≠ 0, Tr(x·H(b/x²)) = 0 (R6.10 L1: fetched text). That test already
+needs no square root and no y; the form here uses y in place of b/x², which
+removes the inversion (derived by R6.10 from the two formulas, not stated in
+either source). King (PKC 2004) and Eagle–Galbraith–Ong (Adv. Math. Commun. 5
+(2011); ePrint 2009/086) are point-compression papers that use halving when
+Tr(a) = 0; whether they state a cofactor-4 validation test was not verified
+(their texts were not read). The code is not constant-time; a constant-time
+variant measured in R6.3 misses the < 2× bar (§19.7).
 
 ### 17.3 The vertical margin is a margin only when the kernel is not rational
 
@@ -1721,7 +1787,9 @@ oracle in the quotient coordinate x′ = x∘φ enumerates F/⟨T⟩ and pays
 Prop. 15.2:** the |M|^{m−2} factor is a property of oracles that enumerate
 F; an oracle on F/M pays 1. This is §17.7's Theorem 7 seen from the
 measurement side: kernel saturation is the image law on E/M, transported
-back. Structural note (derived, checked on every instance): a j = 0 curve
+back. The qualitative statement, that the loss in decomposition probability of
+a translation-invariant base is compensated by easier systems, is in
+Faugère–Huot–Joux–Renault–Vitse (EUROCRYPT 2014, §3.2; R6.10 L27). Structural note (derived, checked on every instance): a j = 0 curve
 over F_{p²} with a rational 3-torsion point has b square, is a base change
 from F_p, and has #E = N₁N₂ with N_i ≈ p, so the N = 3r setup of §15.2
 cannot occur there.
@@ -1768,9 +1836,15 @@ algebraic representations on oracle inputs:
   converse, so the oracles are worth exactly the transported challenges.
 * Corollary 3: if transport is computable along a spanning tree, oracle-DLP
   on E₁ reduces to plain DLP on E₁. For horizontal classes the path
-  costs a one-time, instance-independent Õ(q^{1/4}) (heuristic).
+  costs a one-time, instance-independent Õ(q^{1/4}) (heuristic; Galbraith
+  1999, prime fields, smooth conductor). Over F_{q^n} the figure O(q^{n/4+ε})
+  (GHS02, as reported by Maurer–Menezes–Teske 2002) is for computing an
+  isogeny between two *given* curves; finding which weak curve is isogenous
+  to a given target "may be difficult" (R6.10 L19), so "the oracle only
+  removes the walk cost" holds only once the weak target is known.
 * Theorem 7: kernel saturation (§14.1(b)) is the image law (§14.1(a)) on
-  E/M, transported back; the μ^{m−2} penalty is μ^m/(μ·μ).
+  E/M, transported back; the μ^{m−2} penalty is μ^m/(μ·μ). The penalty itself
+  is the accounting of Faugère–Huot–Joux–Renault–Vitse (EUROCRYPT 2014, §3.2).
 * Proposition 9: oracle-DLP ≤ min_j DLP(E_j). Whether an exponent moves
   depends only on whether members of the class differ in exponent. Over
   F_{2^n} with composite n they can (GHS Weil descent applies to some
@@ -1802,20 +1876,767 @@ saturation ratios near 2, 1/2, 1/4.
 
 ## 18. References
 
+Revised 2026-10-24 from the R6.10 literature check (§19.14,
+`research/isogeny_fibers_20261010/round6/r6_10_literature/references_proposed.md`).
+Status tags: **[c]** confirmed against a fetched source; **[c2]** confirmed against
+a fetched secondary source; **[b]** bibliographic data fetched, content not
+checked; **[u]** unverified. LNCS volume numbers appear only where a fetched page
+printed them.
 
-* Faugère, Huot, Joux, Renault, Vitse. Symmetrized summation polynomials: using small order torsion points to speed up elliptic curve index calculus. EUROCRYPT 2014.
-* Galbraith, Gebregiyorgis. Summation polynomial algorithms for elliptic curves in characteristic two. INDOCRYPT 2014; ePrint 2014/806.
-* Huang, Petit, Shinohara, Takagi. Improvement of FPPR method to solve ECDLP. Pacific J. Math. Ind. 7 (2015); earlier IWSEC 2013.
-* Jao, Miller, Venkatesan. Do all elliptic curves of the same order have the same difficulty of discrete log? ASIACRYPT 2005; ePrint 2004/312.
-* Galbraith. Constructing isogenies between elliptic curves over finite fields. LMS J. Comput. Math. 2 (1999).
-* Galbraith, Hess, Smart. Extending the GHS Weil descent attack. EUROCRYPT 2002.
-* Teske. An elliptic curve trapdoor system. J. Cryptology 19 (2006).
-* Kohel. Endomorphism rings of elliptic curves over finite fields. PhD thesis, Berkeley 1996.
-* Miret, Moreno, Sadornil, Tena, Valls. An algorithm to compute volcanoes of 2-isogenies of elliptic curves over finite fields. Appl. Math. Comput. 176 (2006).
-* Bernstein, De Feo, Leroux, Smith. Faster computation of isogenies of large prime degree. ANTS XIV (2020).
-* Semaev. Summation polynomials and the discrete logarithm problem on elliptic curves. ePrint 2004/031.
-* Gaudry. Index calculus for abelian varieties of small dimension and the elliptic curve discrete logarithm problem. J. Symb. Comput. 44 (2009).
-* Diem. On the discrete logarithm problem in elliptic curves. Compositio Math. 147 (2011).
-* Gorla, Massierer. Index calculus in the trace zero variety. Adv. Math. Commun. 9 (2015).
-* Duursma, Gaudry, Morain. Speeding up the discrete log computation on curves with automorphisms. ASIACRYPT 1999.
-* This repository: RESEARCH_PDP_SPEEDUP_AND_ISOGENY.md (binary isogeny-class Macaulay measurements), RESEARCH_KOBLITZ_INDEX_CALCULUS.md, ml-cryptanalysis `csd/volcano.py`, `csd/isogeny.py`.
+**Summation polynomials, decomposition, symmetries**
+
+* I. Semaev. Summation polynomials and the discrete logarithm problem on elliptic curves. IACR ePrint 2004/031. [c]
+* P. Gaudry. Index calculus for abelian varieties of small dimension and the elliptic curve discrete logarithm problem. J. Symbolic Comput. 44(12) (2009) 1690–1702. doi:10.1016/j.jsc.2008.08.005 [b]
+* C. Diem. On the discrete logarithm problem in elliptic curves. Compositio Math. 147 (2011) 75–104. doi:10.1112/S0010437X10005075 [b]
+* J.-C. Faugère, P. Gaudry, L. Huot, G. Renault. Using symmetries in the index calculus for elliptic curves discrete logarithm. J. Cryptology 27 (2014) 595–635. doi:10.1007/s00145-013-9158-5 [b]
+* J.-C. Faugère, L. Huot, A. Joux, G. Renault, V. Vitse. Symmetrized summation polynomials: using small order torsion points to speed up elliptic curve index calculus. EUROCRYPT 2014, LNCS, pp. 40–57. doi:10.1007/978-3-642-55220-5_3 [c]. §3.2 contains the m^{n−1} decomposition loss for translation-invariant bases, and its compensation by easier systems. Cite it wherever the saturation law or its oracle dependence is stated.
+* S. D. Galbraith, S. W. Gebregiyorgis. Summation polynomial algorithms for elliptic curves in characteristic two. INDOCRYPT 2014, LNCS, pp. 409–427. doi:10.1007/978-3-319-13039-2_24; ePrint 2014/806. [c]
+* Y.-J. Huang, C. Petit, N. Shinohara, T. Takagi. Improvement of Faugère et al.'s method to solve ECDLP. IWSEC 2013, LNCS, pp. 115–132, doi:10.1007/978-3-642-41383-4_8. Journal version: Improvement of FPPR method to solve ECDLP, Pacific J. Math. Ind. 7 (2015), doi:10.1186/s40736-015-0012-6. [c]
+* E. Gorla, M. Massierer. Index calculus in the trace zero variety. Adv. Math. Commun. 9(4) (2015) 515–539. doi:10.3934/amc.2015.9.515 [b]
+* S. D. Galbraith, P. Gaudry. Recent progress on the elliptic curve discrete logarithm problem. Des. Codes Cryptogr. 78 (2016) 51–72. doi:10.1007/s10623-015-0146-7 [b]
+
+**Isogenies, classes, volcanoes**
+
+* D. Jao, S. D. Miller, R. Venkatesan. Do all elliptic curves of the same order have the same difficulty of discrete log? ASIACRYPT 2005, LNCS, pp. 21–40, doi:10.1007/11593447_2. Preprint: ePrint 2004/312, titled "Ramanujan graphs and the random reducibility of discrete log on isogenous elliptic curves". Journal version: Expander graphs based on GRH with an application to elliptic curve cryptography, J. Number Theory 129 (2009) 1491–1504, doi:10.1016/j.jnt.2008.11.006. [c]
+* S. D. Galbraith. Constructing isogenies between elliptic curves over finite fields. LMS J. Comput. Math. 2 (1999) 118–138. doi:10.1112/S1461157000000097 [c]
+* D. Kohel. Endomorphism rings of elliptic curves over finite fields. PhD thesis, University of California, Berkeley, 1996. [c]
+* J. Miret, R. Moreno, D. Sadornil, J. Tena, M. Valls. An algorithm to compute volcanoes of 2-isogenies of elliptic curves over finite fields. Appl. Math. Comput. 176 (2006) 739–750. doi:10.1016/j.amc.2005.10.020 [b]
+* E. Teske. An elliptic curve trapdoor system. J. Cryptology 19 (2006) 115–133. doi:10.1007/s00145-004-0328-3 [b]
+* J. Vélu. Isogénies entre courbes elliptiques. C. R. Acad. Sci. Paris Sér. A 273 (1971). [u]
+* D. J. Bernstein, L. De Feo, A. Leroux, B. Smith. Faster computation of isogenies of large prime degree. ANTS XIV, Open Book Series 4 (2020) 39–55. doi:10.2140/obs.2020.4.39 [c]
+* E. Kani. The number of curves of genus two with elliptic differentials. J. reine angew. Math. 485 (1997) 93–122. doi:10.1515/crll.1997.485.93 [b]
+* W. Castryck, T. Decru. An efficient key recovery attack on SIDH. EUROCRYPT 2023, LNCS, pp. 423–447. doi:10.1007/978-3-031-30589-4_15 [b]
+
+**Weil descent and GHS**
+
+* P. Gaudry, F. Hess, N. P. Smart. Constructive and destructive facets of Weil descent on elliptic curves. J. Cryptology 15 (2002) 19–46. doi:10.1007/s00145-001-0011-x [c]
+* S. D. Galbraith, F. Hess, N. P. Smart. Extending the GHS Weil descent attack. EUROCRYPT 2002, LNCS 2332, pp. 29–44. doi:10.1007/3-540-46035-7_3; ePrint 2001/054. [c]
+* A. Menezes, M. Qu. Analysis of the Weil descent attack of Gaudry, Hess and Smart. CT-RSA 2001, LNCS 2020, pp. 308–318. doi:10.1007/3-540-45353-9_23 [b]
+* M. Maurer, A. Menezes, E. Teske. Analysis of the GHS Weil descent attack on the ECDLP over characteristic two finite fields of composite degree. LMS J. Comput. Math. 5 (2002) 127–174. doi:10.1112/S1461157000000723 [c]
+* A. Menezes, E. Teske, A. Weng. Weak fields for ECC. CT-RSA 2004, LNCS, pp. 366–386. doi:10.1007/978-3-540-24660-2_28; ePrint 2003/128. [c]
+* C. Diem. The GHS attack in odd characteristic. J. Ramanujan Math. Soc. 18(1) (2003) 1–32. [b]
+
+**Hyperelliptic and genus-2 index calculus**
+
+* P. Gaudry. An algorithm for solving the discrete log problem on hyperelliptic curves. EUROCRYPT 2000, LNCS, pp. 19–34. doi:10.1007/3-540-45539-6_2 [c] *(Õ(q²) for fixed g)*
+* N. Thériault. Index calculus attack for hyperelliptic curves of small genus. ASIACRYPT 2003, LNCS, pp. 75–92. doi:10.1007/978-3-540-40061-5_5 [b]
+* P. Gaudry, E. Thomé, N. Thériault, C. Diem. A double large prime variation for small genus hyperelliptic index calculus. Math. Comp. 76 (2007) 475–492. doi:10.1090/S0025-5718-06-01900-4 [c2] *(Õ(q^{2−2/g}), the source of "Õ(q) in genus 2")*
+* A. Enge, P. Gaudry. A general framework for subexponential discrete logarithm algorithms. Acta Arith. 102 (2002) 83–103. doi:10.4064/aa102-1-6 [c2]
+* K. Nagao. Decomposition attack for the Jacobian of a hyperelliptic curve over an extension field. ANTS IX (2010), LNCS, pp. 285–300. doi:10.1007/978-3-642-14518-6_23 [b]
+
+**Generic and algebraic models**
+
+* V. I. Nechaev. Complexity of a determinate algorithm for the discrete logarithm. Math. Notes 55 (1994) 165–172. doi:10.1007/BF02113297 [b]
+* V. Shoup. Lower bounds for discrete logarithms and related problems. EUROCRYPT 1997, LNCS, pp. 256–266. doi:10.1007/3-540-69053-0_18 [b]
+* G. Fuchsbauer, E. Kiltz, J. Loss. The algebraic group model and its applications. CRYPTO 2018, LNCS, pp. 33–62. doi:10.1007/978-3-319-96881-0_2; ePrint 2017/620. [c]
+* J. Duman, D. Hartmann, E. Kiltz, S. Kunzweiler, J. Lehmann, D. Riepel. Generic models for group actions. PKC 2023, LNCS, pp. 406–435. doi:10.1007/978-3-031-31368-4_15 [c]
+
+**Generic attacks, multi-target, automorphisms**
+
+* I. Duursma, P. Gaudry, F. Morain. Speeding up the discrete log computation on curves with automorphisms. ASIACRYPT 1999, LNCS, pp. 103–121. doi:10.1007/978-3-540-48000-6_10 [b]
+* F. Kuhn, R. Struik. Random walks revisited: extensions of Pollard's rho algorithm for computing multiple discrete logarithms. SAC 2001, LNCS, pp. 212–229. doi:10.1007/3-540-45537-X_17 [c2] *(√(2rL) for L < r^{1/4})*
+* D. J. Bernstein, T. Lange. Computing small discrete logarithms faster. INDOCRYPT 2012, LNCS, pp. 317–338. doi:10.1007/978-3-642-34931-7_19 [c]
+
+**Transfer and lifting attacks (§13.1–13.2, §15.3)**
+
+* A. Menezes, T. Okamoto, S. Vanstone. Reducing elliptic curve logarithms to logarithms in a finite field. IEEE Trans. Inf. Theory 39 (1993) 1639–1646. doi:10.1109/18.259647 [b]
+* G. Frey, H.-G. Rück. A remark concerning m-divisibility and the discrete logarithm in the divisor class group of curves. Math. Comp. 62 (1994) 865–874. doi:10.1090/S0025-5718-1994-1218343-6 [b]
+* N. P. Smart. The discrete logarithm problem on elliptic curves of trace one. J. Cryptology 12 (1999) 193–196. doi:10.1007/s001459900052 [b]
+* M. J. Jacobson, N. Koblitz, J. H. Silverman, A. Stein, E. Teske. Analysis of the xedni calculus attack. Des. Codes Cryptogr. 20 (2000) 41–64. doi:10.1023/A:1008312401197 [c]
+
+**Point halving, validation and subgroup membership (§16.2, §17.2)**
+
+* E. W. Knudsen. Elliptic scalar multiplication using point halving. ASIACRYPT 1999, LNCS, pp. 135–149. doi:10.1007/978-3-540-48000-6_12 [c2]
+* K. Fong, D. Hankerson, J. López, A. Menezes. Field inversion and point halving revisited. IEEE Trans. Computers 53(8) (2004) 1047–1059. doi:10.1109/TC.2004.43 [c]
+* R. Schroeppel. Elliptic curve point ambiguity resolution apparatus and method. PCT/US00/31014, WO 01/35573 A1 (2001). [b; reference as given in Fong et al.]
+* D. R. L. Brown, A. Yamada (Certicom). Method and apparatus for performing validation of elliptic curve public keys. US 7,257,709 B2 (granted 2007-08-14; priority 2002-09-03); published as US 2004/0114760 A1. [c] *(its h = 4 test is Tr(x) = 0, x ≠ 0, Tr(x·H(b/x²)) = 0)*
+* B. King. A point compression method for elliptic curves defined over GF(2^n). PKC 2004, LNCS, pp. 333–345. doi:10.1007/978-3-540-24632-9_24 [b]
+* P. N. J. Eagle, S. D. Galbraith, J. B. Ong. Point compression for Koblitz elliptic curves. Adv. Math. Commun. 5(1) (2011) 1–10. doi:10.3934/amc.2011.5.1; ePrint 2009/086. [b]
+* T. Pornin. Point-halving and subgroup membership in twisted Edwards curves. IACR ePrint 2022/1164. [c]
+* D. Koshelev. Subgroup membership testing on elliptic curves via the Tate pairing. J. Cryptogr. Eng. 13(1) (2023) 125–128, doi:10.1007/s13389-022-00296-9; correction in J. Cryptogr. Eng. 14 (2024) 127–128, doi:10.1007/s13389-023-00331-3. [c]
+* Y. Dai, Y. El Housni, D. Koshelev, K. Reijnders. Divide-and-Pair: faster subgroup membership testing for elliptic curves. IACR ePrint 2026/749. [c]
+* D. V. Bailey et al. Breaking ECC2K-130. IACR ePrint 2009/541 (source for the ECC2K-130 subgroup order). [c]
+
+**This repository**
+
+* RESEARCH_PDP_SPEEDUP_AND_ISOGENY.md (binary isogeny-class Macaulay measurements); RESEARCH_KOBLITZ_INDEX_CALCULUS.md; ml-cryptanalysis `csd/volcano.py`, `csd/isogeny.py`.
+
+## 19. Fifth and sixth rounds: the R5 and R6 leads, measured and reviewed (2026-10-24)
+
+Rounds 5 and 6 ran the leads that `round6/PROGRAM.md` preregistered after §17
+(four in round 5, eleven in round 6). This section gives one subsection per
+lead: the hypothesis, the falsifier, the verdict, the headline numbers exactly
+as the lead's own `RESULTS.md` states them (intervals are the source's), and
+the link. Then a synthesis table and a list of what is settled and what is
+still open. The reference list is §18.
+
+**Scope, as in every round.** Toy and synthetic instances; native Rust for
+every result (Python only plots recorded numbers); ledger slugs or standard
+names; no sub-rho claim and no statement about a deployed curve. Wall times
+are contended and not used for any claim. This section reports; it does not
+promote a hypothesis. Where a source contains a model, a heuristic or an
+extrapolation, the entry says so.
+
+**Verdict words.** *Not fired*: the preregistered falsifier did not occur, so
+the hypothesis survived at the stated scope (that is not a proof). *Fired*:
+the falsifier occurred. *Refuted*: the measurement contradicts the hypothesis
+or the named part of it. *Open*: the data do not decide it. A hypothesis can
+have a part that is refuted and a part that survives; the entry then says
+which.
+
+**Status of the sources (read on 2026-10-24).** Merged into `main`
+(`5cb553810e`): R5.1 #2179, R5.2 #2181, R5.4 #2180, R6.10 #2183, R6.3 #2193,
+R6.5 #2194, R6.6 #2195, R6.7 #2217, R6.11 #2197, R6.2 #2230. **Unmerged, pull
+request still open:** R5.3 #2192 (`e8e0bf1296`), R6.8 #2196 (`7d6d50d268`), R6.4
+#2240 (`325c8345b8`), R6.9 #2502 (`6ac9a3877e`), R6.1 #2511 (`ff6fd1dc6c`).
+Entries from open pull requests are marked **UNMERGED**; they quote the
+`RESULTS.md` on the pull request's branch, can still change, and their links
+name the pull request because the file is not on `main`. Open pull requests
+#2192, #2240 and #2196 carry validation holds recorded in their own
+descriptions (§19.3, §19.8, §19.12). Known defects: R6.2 (merged, two open
+defects, §19.6), one miscount in the merged R6.7 `RESULTS.md` (§19.11), and one
+internal count discrepancy in the unmerged R6.9 (§19.13).
+
+### Round 5
+
+### 19.1 R5.1 — a quotient-coordinate oracle in characteristic 2 (merged, #2179)
+
+*Hypothesis.* On Koblitz curves y² + xy = x³ + ax² + 1 over F_{2^n} with
+kernel M = ⟨T⟩, T = (0, 1), an oracle on E/⟨T⟩ costs about 1× the plain base
+at m = 3 (not 2×), and about twice the index-2 image base.
+*Falsifier.* The quotient arm still pays about 2^{m−2}.
+*Verdict.* **Not fired; confirmed** at n = 31 and 37, the sizes where each
+base holds 4–1000 columns. The map is the Verschiebung (derived in the example
+and validated: image on the codomain, 4000/4000 homomorphism checks per curve,
+kernel exactly {O, T}, #E′ = #E, index 2).
+*Numbers (measured; census ratio to the plain arm, 95% bootstrap over base
+seeds).* Quotient arm (c1): n = 31, m = 3: 0.95 [0.85, 1.05]; n = 37, m = 3:
+0.99 [0.93, 1.05]; m = 4: 1.01 [0.69, 1.53] and 0.92 [0.56, 1.49]. Saturated
+sweeping F (b): m = 3: 1.90 [1.69, 2.11] and 1.99 [1.86, 2.10]; m = 4: 4.02
+[2.77, 6.09] and 3.69 [2.22, 5.93] (law 2 and 4). Image arm (d): 0.50–0.57.
+The pushforward identity D_m(c1) = D_m(b) held in 343 of 343 cells. At the
+§7.A1-R cell `icv1-f2m31-tm90707-c95f16f5` the saturated u-frame swept over F
+costs 1.96 [1.78, 2.14] of the x-arm in total collection cost; the quotient
+oracle costs 1.00 [0.91, 1.09]. The quotient base is the trace-zero base
+translated by T (D_3 = 318 618 for both, exactly), which is R5.4's Theorem 9
+(§19.4).
+*Limits.* The small-n rows (n ≤ 23, one to four orbits per base) do not reach
+the law because the bases are structurally non-random; the source reports them
+and does not use them for the verdict (the ratio (c1)/(b) is still exactly 1/2
+at m = 3 and 1/4 at m = 4 there). The oracle is combinatorial (pair table); no
+algebraic quotient oracle was run; linear algebra and logarithm recovery were
+not run; the m = 4 oracle intervals are wide (n = 37: about 3 hits per seed).
+*Source.* [`round5/r5_1_quotient_oracle/RESULTS.md`](research/isogeny_fibers_20261010/round5/r5_1_quotient_oracle/RESULTS.md).
+
+### 19.2 R5.2 — how much of a binary isogeny class is within GHS reach (merged, #2181)
+
+*Hypothesis.* For composite N the weak share is small but nonzero in many
+classes, and classes with a weak curve are reachable by short walks.
+*Falsifier.* At toy sizes, weak curves are absent from mixed classes or
+unreachable.
+*Verdict (the source's words).* As a cost statement, **inconclusive at toy
+sizes; in the literal sense refuted at these sizes**: under the concrete model
+P (min of g!·q^{2−2/g} and L_{q^g}[1/2, √2] against rho) no curve at N ∈ {12,
+14, 15, 16, 18, 20} is weak, 0 of 2 858 996 curves, so "weak curves absent"
+holds trivially. The structural reading (low-genus reach, g ≤ 2n, n ≥ 5)
+holds: such curves are 0.09%–3.1% of curves where they exist, every class
+that contains one is mixed, and with ℓ ∈ {3, 5, 7} 66%–100% of the strong
+curves in those classes reach one, at mean distance 1.3–3.0 isogeny steps
+(max 15). The models M1 (constant-free) and A (fixed-n exponent) are
+degenerate at these sizes, and model P and the structural definitions were
+added after M1 and A came out degenerate, so they are post-hoc.
+*Other numbers (measured unless noted).* The best class sits 1.65–2.42 bits
+above rho under P (derived). The `ec_trapdoor::audit_curve` genus rule differs
+from the formula derived in the source on 1 248 of 1 500 sampled rows at
+N = 12 (the example's magic number agrees on 1 500/1 500). 2-isogenies never
+change the magic number m (derived; measured invariance).
+*Corrections from R6.10 (§19.14).* The condition "n odd, or m = n, or
+Tr(a) = 0" is the Gaudry–Hess–Smart (GHS02) theorem, not Menezes–Qu (L22), and
+the "m = m′ + [f(1) ≠ 0]" form attributed to Menezes–Qu is unverified. The
+product g!·q^{2−2/g} is this lead's own model, not Gaudry's (L38). The
+Enge–Gaudry constant √2 is confirmed from secondary sources, but its regime is
+large g, and model P applies it at small g (L41).
+*Limits.* No descent was constructed and no Jacobian order computed;
+"transfer" is the Hasse–Weil size test. Only ℓ ∈ {3, 5, 7}, toy N ≤ 20.
+*Source.* [`round5/r5_2_ghs_class/RESULTS.md`](research/isogeny_fibers_20261010/round5/r5_2_ghs_class/RESULTS.md).
+
+### 19.3 R5.3 — a three-prime NTT for √élu (**UNMERGED**, open #2192)
+
+*Hypothesis.* With fast polynomial multiplication the √élu exponent (0.82
+[0.805, 0.838] with Karatsuba in round 4) drops toward 0.5–0.6; the
+rational-kernel conclusion of §17.3 gets stronger; the generic-kernel
+crossover moves only if kernel finding speeds up.
+*Falsifier.* An NTT-arm exponent interval on 2^16 ≤ ℓ ≤ 2^24 inside [0.5, 0.6]
+would confirm; an interval overlapping 0.82 refutes the "drops toward 0.5–0.6"
+part.
+*Verdict.* "Drops toward 0.5–0.6": **refuted at the measured range** (2^10 to
+2^24). Rational-kernel conclusion: confirmed, stronger. Generic-kernel
+crossover: unchanged, because kernel finding did not speed up (null result).
+*Numbers (measured counts in Meq = M + W + 91 I, 95% intervals).* √élu
+Karatsuba 0.822 [0.805, 0.838]; √élu NTT (Auto) 0.798 [0.775, 0.820] on
+2^16..2^24 and 0.745 [0.686, 0.804] on 2^20..2^24; Vélu 0.995 [0.993, 0.997];
+generic find 2.587 [2.550, 2.625] (Karatsuba) and 2.582 [2.544, 2.620] (NTT).
+At ℓ = 2^24 the NTT arm counts 2.21·10^7 Meq against 2.45·10^7 (ratio 1.11).
+Derived crossovers (extrapolated, g = 6 M per group operation, log2 ℓ*): rational
+kernels stay beyond ℓ_max = 2√p for r = 2^64, 2^128, 2^256; generic kernels
+9.6 / 21.7 / 46.4 (round 4: 9.6 / 21.5 / 45.7).
+*Limits.* An NTT word product is counted as 1 M (stated, not measured; the
+contended wall ratio says this NTT is dearer per counted unit); the generic
+arm stopped at ℓ = 863 by the time cap; crossover rows are extrapolations by
+many octaves.
+*Status.* The pull request description records an exact-head validation hold:
+the gate reports a missing `VALIDATION.json` and no pre-gate freeze for
+`20261019-r5-3-ntt-sqrt-velu`, so the benchmark row is unadmitted.
+*Source.* PR #2192, branch `research/r5-ntt-sqrt-velu`,
+`research/isogeny_fibers_20261010/round5/r5_3_ntt_sqrt_velu/RESULTS.md`.
+
+### 19.4 R5.4 — Conjecture 10 over prime fields and the oracle's enumeration domain (merged, #2180)
+
+*Hypotheses.* (i) Every known attack family's exponent is a function of class
+invariants, the endomorphism ring changing only constants. (ii) The μ^{m−2}
+factor is the cost of a redundant sweep over M-translates and disappears for an
+oracle on F/M.
+*Falsifiers (fixed in advance).* (i) An attack family over F_p whose exponent
+provably differs between two members of one class. (ii) A toy census in which
+a transversal sweep misses a decomposable target that the full sweep finds, or
+the hit ratio is not exactly μ^{m−k}; in characteristic 2, one point violating
+[2](F_u) = F_tz.
+*Verdict.* **Not fired** (0 exceptions in every exact check). It is a theory
+round; theorem, cited and heuristic items are labelled in the source, and the
+source states that it is not a proof of Conjecture 10.
+*Results.* (i) For each listed family over F_p the cost is a class invariant
+times a member-dependent factor bounded by an absolute constant (rho with
+automorphisms ≤ √3). Theorem 4 (exponent propagation; the horizontal part
+needs GRH or a heuristic Õ(p^{1/4}) path): if two members' endomorphism rings
+differ only at primes ≤ Δ, the DLP on one reduces to the other at per-instance
+cost poly(Δ, log p). So Conjecture 10 can fail only across a prime conductor
+gap ℓ ≥ p^ε. Measured over all 1 048 576 traces at p ≈ 2^36, the fraction of
+classes with such a prime is 1.7·10⁻² at ε = 0.1, 2.7·10⁻⁴ at ε = 0.25 and
+3.8·10⁻⁶ at ε = 0.4. What remains open (Conjecture 10′) needs an algorithm
+whose cost depends on End(E) beyond O^× and E(F_p)[h]. (ii) Proposition
+15.2′: for an oracle sweeping (m − k)-tuples from a domain Ω and solving a
+k-summand subproblem per call, a kernel-saturated base pays
+μ^{m−2}·(|Ω|/|F|)^{m−k} (the domain ratio is exact by Lemma 7; the
+class-factor part is heuristic). §7.A1-R's 2.95× factors as 2.17 (sweeping F
+instead of F/M) × 1.36 (index-2 image base); the law predicts 3.02 (derived).
+In characteristic 2 (Theorem 9) the quotient coordinate is √(x∘[2]), [2](F_u) =
+F_tz, and a 2-torsion-symmetrised x-frame is null as an algebraic device
+(Corollary 9.2); checked with 0 exceptions on 30 bases over 10 curves
+(n = 11, 13, 17).
+*Limits and later corrections.* Statements marked "cited (recalled)" were not
+re-opened by this lead. R6.10 later found: the genus bound for prime N should
+be stated with ord_N(2) (L23), the Diem 2003 reference was incomplete (L24),
+and the Huang–Petit–Shinohara–Takagi recollection about Edwards models and
+4-torsion is unverified (L30). Corollary 9.2 concerns Weierstrass binary
+curves and the 2-torsion point only. The kernel-saturation penalty that
+Proposition 15.2′ refines is anticipated by Faugère–Huot–Joux–Renault–Vitse
+(§19.14).
+*Source.* [`round5/r5_4_theory/RESULTS.md`](research/isogeny_fibers_20261010/round5/r5_4_theory/RESULTS.md).
+
+### Round 6
+
+### 19.5 R6.1 — direct S5 systems and the chained x-frame `ic` plug-in (**UNMERGED**, open #2511)
+
+*Hypothesis.* The direct symmetrised S5 is feasible wherever the chained
+symmetrised system is and cheaper per relation; it still never beats a
+feasible m = 2 arm at the same n; the panel-versus-`ic bench` hit-rate gap
+(0.04 against 0.22 at n = 23) is a budget-accounting difference.
+*Falsifier.* A direct-S5 arm whose total S (GAE/√r) is below the best m = 2
+arm at the same n.
+*Verdict.* Source: "Mixed: the falsifier is not met, and the hypothesis is
+partly refuted." **Not fired.** *Refuted parts:* the direct S5 is neither
+cheaper per relation nor feasible wherever the chain is. *Discrepancy
+explained as target sampling, not budget accounting.*
+*Numbers (measured).* Both S5 polynomials are unique with F₂ coefficients
+(sym S5: 182 unknowns, Boolean degree 9; x S5: 1 287 unknowns, degree 12),
+verified 200/200 at n = 13, 17, 19, 23, 29, 37; interpolation is cheap, the
+cost is the Weil restriction. At n = 13: direct sym S5 S = 7.61·10^5 against
+mitm m = 2 S = 186 (4 090×), and 177× the chained symmetrised system per
+relation. From ℓ = 6 (n ≥ 17) neither S5 could be built inside a 15-minute
+cell. End to end, S is ordered m = 2 < m = 3 < m = 4 at n = 13, 17, 19 (n = 17:
+543, 1 401, 6 699; n = 19: 1 658, 5 869, 12 680); the best ratio of a chained
+arm to mitm m = 2 is 2.3× (n = 13, m = 3). Discrepancy protocol: panel and
+pipeline drivers agree on 396/396 target outcomes and XOR counts; 1/24 against
+66/300 has Fisher two-sided p = 0.036.
+*Library change.* `ChainedXOracle` (`chained-x`) in
+`src/cryptanalysis/ic_framework/plugins.rs`, two unit tests; not yet
+registered in `src/bin/ic/bench.rs`.
+*Limits.* No instance at n = 15 and a = 1 only at n = 17; six cells marked NOT
+RUN; "not buildable" is a contended wall-time observation, not a counted bound;
+the symbolic build is not counted in the XOR figures; no matched rho was run
+(round-4 rho references on these curves are S ≈ 1–2, below every row).
+*Source.* PR #2511, branch `research/r6-direct-s5`,
+`research/isogeny_fibers_20261010/round6/r6_1_direct_s5/RESULTS.md`.
+
+### 19.6 R6.2 — pooled multi-target rho on an isogeny class, and path-finding cost (merged, #2230; **known defects pending correction**)
+
+*Hypothesis (PROGRAM.md).* The transported batch costs B/C ∈ [0.97, 1.03] of
+single-curve L-target rho for L ≤ 256; path finding between two curves of a
+class costs O(√(class size)) Φ_ℓ-root evaluations and is instance-independent.
+*Falsifier.* B/C outside [0.95, 1.05] with the 95% interval excluding 1 at any
+L; or a path-finding cost that scales with r.
+*Verdict.* **Open.** The harness computed no paired interval, so the report
+makes no difference or equivalence claim and the B/C falsifier was not
+evaluated. The merged result is on hold for two defects (below), so its path
+numbers should not be quoted until corrected.
+*Numbers (measured; one base curve, p = 11018534707, r = 2^28.04, h = 40, a
+class of 257 curves, 20 trials per L; S = total counted group operations/√r,
+mean ± SE).* B (transported) / C (same-curve pooled control): L = 1: 1.084 ±
+0.153 / 0.843 ± 0.106; L = 4: 2.089 ± 0.107 / 2.285 ± 0.092; L = 16: 4.272 ±
+0.097 / 4.424 ± 0.130; L = 64: 9.395 ± 0.093 / 9.266 ± 0.112; L = 256: 20.165
+± 0.138 / 20.170 ± 0.086. The means of B and C lie within about 2 SE of each
+other (source). The ratios of means B/C are 1.287, 0.914, 0.966, 1.014, 0.9998
+(derived). Both pooled arms stay above the Kuhn–Struik reference (15.992 at
+L = 256) and far below L times the single-target mean (1.042 ± 0.120 at
+L = 256, so about 267, derived). Transport costs at most 163.0 M + 18.1 I per
+target at L = 256. 13 740 recovered logarithms were verified on their original
+curves. Paths: 18 components of the rational ℓ ∈ {2, 3, 5, 7} graph (cap 3 000
+curves; 5, 9 and 45 components skipped over the cap at 24, 28 and 32 bits);
+mean neighbour enumerations per pair range from 7.2 to 5 620.8 and, in the
+source's words, "grow with component size and stay on the order of the
+component size". The O(√(class size)) hypothesis is therefore not shown by
+these data (my reading; the source gives no verdict on it); selection is
+biased toward small components by the cap.
+*Known defects (owner's source review on the pull request).* (1) The pooled
+method is registered with `Applies::Any` but its dispatch handles only
+`Instance::Prime`; an explicit prime-only contract with negative controls is
+owed. (2) The bidirectional search expands outgoing neighbours on both sides;
+degree-5/7 root-based edges need not have a reverse edge available, so a
+meeting `a → c ← b` does not construct an executable `a → b` route. A
+symmetric certified edge set, or actual predecessors with the dual edges
+validated and their work counted, plus a versioned corrected path analysis, are
+owed. Until then the path-finding results are pending correction.
+*Limits (source).* Only r = 2^28 of the planned {2^28, 2^32, 2^36}; every ℓ = 5
+and ℓ = 7 edge of the batch class was dropped for lack of a rational-kernel dual
+(p ≡ 2 mod 5, p ≡ 5 mod 7), so the batch class uses ℓ ∈ {2, 3}; no isolated or
+independent-runner measurement, no ecbench session or paired bootstrap, no
+replay certificate.
+*Source.* [`round6/r6_2_pooled_rho/reports/run-20261018T2219Z/report.typ`](research/isogeny_fibers_20261010/round6/r6_2_pooled_rho/reports/run-20261018T2219Z/report.typ)
+(PDF beside it), records `batch.json` and `paths.json` in
+[`round6/r6_2_pooled_rho/`](research/isogeny_fibers_20261010/round6/r6_2_pooled_rho/).
+There is no `RESULTS.md` for this lead.
+
+### 19.7 R6.3 — the trace pair as a coset label of E/4E (merged, #2193)
+
+*Hypothesis.* The first trace bit is the homomorphism E → E/2E; the second is
+constant on each coset of 4E, and on the odd cosets is a fixed function of n
+mod 8.
+*Falsifier.* Any odd n ≤ 25 with a coset on which the pair is not constant, or
+an odd-coset labelling not periodic in n mod 8 (or mod 4, or constant).
+*Verdict.* **Not fired; confirmed, refined:** the dependence is on n mod 4,
+not just n mod 8.
+*Numbers (measured).* y² + xy = x³ + 1 over F_{2^n}; 44 740 508 points
+enumerated exhaustively over the 11 odd n in 5..25, 0 exceptions; 10 000 points
+sampled per n at n ∈ {131, 233, 239, 283, 409, 571}. Lemma R6.3: L(P) =
+(Tr(x), Tr(y) + Tr(x·H(x))) takes the values (0,0), (0,1) on 4E and T + 4E, and
+(1, (n+1)/2 mod 2), (1, (n−1)/2 mod 2) on P₄ + 4E and −P₄ + 4E. This explains
+the round-4 swap (131 ≡ 3, 233 ≡ 1 mod 4). The key trace step was checked on
+22 370 232 points with 0 violations. L is a set bijection E/4E → F₂², not a
+group map. Two accepted `identity.certificate/v1` records cover the polynomial
+cores of the proof (`IDC1h69fde95f7fb937ab`, `IDC1h61e40c496fd9c2cf`); the trace
+statements themselves do not fit the certificate schema and are covered by the
+exhaustive range only.
+*Constant-time variant.* **Missed the preregistered < 2× bar:** 2.5–5.0× in
+contended wall time and 2.0–3.7× in counted word operations against the
+example's table version (1.23–1.57× in wall time against the library's own
+`is_in_4e`). No library change is proposed as a default.
+*Limits.* One curve (a = 0, b = 1); exhaustive only to n = 25; no E/8E.
+*Prior work.* R6.10 found no earlier statement of the label (§19.14).
+*Source.* [`round6/r6_3_coset_label/RESULTS.md`](research/isogeny_fibers_20261010/round6/r6_3_coset_label/RESULTS.md).
+
+### 19.8 R6.4 — the vertical margin, phase two (**UNMERGED**, open #2240; wording as corrected after review)
+
+*Hypothesis.* Generic kernel finding stays ≥ ℓ², so the §17.3 generic
+crossover moves by less than one bit of ℓ; ascending edges cost the same as
+descending ones at equal ℓ.
+*Falsifier.* A generic-kernel exponent below 2 with NTT; or an ascending edge
+measurably cheaper or dearer than a descending one at equal ℓ (disjoint 95%
+intervals).
+*Verdict.* *Generic exponent:* falsifier **not fired**, but the evidence is
+insufficient either way: the projected exponent for ℓ ≥ 2^13 is 1.919
+[1.724, 2.115], which contains values below 2 and 2 itself, so this is
+insufficient evidence of an exponent below 2, not evidence that it is ≥ 2.
+*"Moves by less than one bit":* **refuted in projection**, in the direction of
+more margin. *Ascending against descending:* for the ladder the disjoint-level
+criterion did not trigger, but the paired ratio 1.001 [1.001, 1.002] excludes 1,
+so a small difference (about 0.1%) was detected and no equality is claimed;
+for the ψ route (0.501 [0.457, 0.548]) and the Φ route (0.360 [0.347, 0.373])
+the intervals are disjoint, so the falsifier **fired**, attributed in the
+source to the factorisation structure of the floor against the crater.
+*Numbers (Meq = M + W + 91 I; measured unless marked projected).* Ladder find,
+descending, ℓ = 37..863: 2.582 [2.544, 2.620]; ascending 2.587 [2.547, 2.628];
+projected (per-step counts measured exactly to ℓ = 2^16, times the exact step
+count) with NTT for ℓ ≥ 2^13: 1.919 [1.724, 2.115]; ψ_ℓ + Cantor–Zassenhaus
+3.565 [3.302, 3.828] (ℓ ≤ 131); Φ_ℓ(j, Y) evaluation and roots 1.884
+[1.804, 1.964] with the library's Φ_ℓ mod p, which takes ℓ^4.600 [4.515, 4.684]
+in wall seconds, uncounted, so that route is only a lower bound. Crossover at
+r = 2^128 (extrapolated): 2^21.7 → 2^24.2–2^25.1 (2^26.1 at the interval's low
+end); at r = 2^256: 2^46.4 → 2^54–2^58.
+*Restricted cost model (a limit that governs every ranking).* Every row prices
+only M, W (= 1 M) and I (= 91 M); additions are uncounted in every arm and in
+the rho reference, and the Φ route also omits Φ_ℓ construction and Elkies
+work. Route rankings ("which route is cheapest") and crossover orderings hold
+only under that model; the complete-cost ordering is unresolved, and the
+0 / 0.1 / 1 M addition-weight band was not computed because the library counter
+has no addition tally. A Sutherland CRT evaluation of Φ_ℓ(j, Y) was not
+implemented.
+*Status.* The pull request also adds a paragraph to §17.3 of this note
+superseding the generic-kernel row; that paragraph is not in this text until
+the pull request merges. Its description records a benchmark-admission hold
+(the validation gate names the unvalidated row `r5-3-ntt-sqrt-velu`).
+*Source.* PR #2240, branch `research/r6-vertical-margin-2`,
+`research/isogeny_fibers_20261010/round6/r6_4_vertical_margin_2/RESULTS.md`.
+
+### 19.9 R6.5 — the finite-size A-pair correction applied to the §15.2 census (merged, #2194)
+
+*Hypothesis.* The recorded ζ-closed c(m = 2) values lie within exact-count
+error of 1 + (h−1)(|A|−2)/(2|F|) (|A| = 3 or 6, h = 3, |F| = 72), and the
+residual after correction is within ±1%.
+*Falsifier.* Residual after correction larger than before, or sign-wrong.
+*Verdict.* **Fired on the recorded data; hypothesis refuted for the recorded
+census; the correction itself confirmed in an ensemble.** Mean residual −0.030
+before, −0.085 after the |A| = 6 correction, and the ±1% target is missed on
+every curve; both residuals are within 1.3 SEM of zero under the
+composition model, so three single bases cannot resolve a 5.6% effect whose
+per-base sd is 12% (derived).
+*Numbers (measured counts; predictions derived).* Recorded single-base ratios
+0.931, 0.959, 1.021 (mean 0.970), at p = 195709, 493159, 903163; the "1.02" of
+§15.2 is the third alone. Each is reproduced to ≤ 1.5% by the collision-free
+pair count fixed by that base's number of points in G. Ensemble census at
+p = 195709 (200 random plain and 200 random ζ-closed bases per size), m = 2
+H₂ ratio of means: 1.130 [1.095, 1.170], 1.059 [1.043, 1.077], 1.033 [1.024, 1.044]
+at |F| = 36, 72, 144, against the |A| = 6 predictions 1.111, 1.056, 1.028 (every
+interval contains the prediction and excludes the |A| = 3 values 1.028, 1.014,
+1.007); the excess scales as 1/|F| with slope about 4. The m = 3 raw triple
+counts follow the composition model (excess about 0).
+*Effect.* A constant; the source states that it moves no §15.4 row. Erratum for
+§15.2 applied above.
+*Limits.* Toy curves p ≤ 2^20 of the recorded census; one curve for the
+ensemble arm.
+*Source.* [`round6/r6_5_census_correction/RESULTS.md`](research/isogeny_fibers_20261010/round6/r6_5_census_correction/RESULTS.md).
+
+### 19.10 R6.6 — genus 2 under a Nagao-style oracle and a Richelot image arm (merged, #2195)
+
+*Hypothesis.* ζ₅-closed bases gain |A| = 10 in unknowns at unchanged relation
+yield; the Richelot index-4 base gains ×4 in class factor; saturation is
+unavailable to the oracle.
+*Falsifier.* An A-gain outside [8, 12], an image gain outside [3, 5]
+(bootstrap 95%), or a usable saturated degree-1 base.
+*Verdict.* **Not fired; confirmed.**
+*Numbers (measured; y² = x⁵ + b over F_p, p ∈ {1051, 2131, 4111}, |F| = 80, 40
+bases per cell, two curve families).* A-gain in unknowns 10.00 [10.00, 10.00] on
+all six curves; relation yield unchanged within about ±20% at m = 2 and within
+the interval of 1 at m = 3 on 5 of 6 curves (C2 p = 4111: 0.95 [0.91, 0.98]).
+Image gain in class factor: 3.53–4.20 for the Richelot base R and 3.60–4.07
+for the literal φ images, all intervals inside [3, 5]; at m = 3 and p = 1051
+the values (about 3.5–3.65) lie below 4 with intervals excluding 4, which the
+source reads as a small-p saturation effect of the census, not a violation of
+the stated falsifier. Richelot validation on the three C2 curves: #J′ = #J,
+0/300 homomorphism failures, kernel as expected, ψ-density of φ̂(J′) 0.2507,
+0.2465, 0.2463 against 0.25. Nagao m = 2 oracle: 49–58 counted F_p
+multiplications per call, 0 disagreements with exact enumeration. Translation
+closure: |(C−∞) ∩ (C−∞−t)| ≤ 2 for every rational 2-torsion t and 400 random t
+on all six curves, so a degree-1 base is never closed under a nonzero
+translation.
+*Limits.* |F| = 80 only, one curve per (family, p); the G arm is a control and
+is not interpreted; the Richelot construction lives in the example, not the
+library; the binary that produced the data predates a behaviour-neutral
+clean-up of the source.
+*Source.* [`round6/r6_6_genus2_oracle/RESULTS.md`](research/isogeny_fibers_20261010/round6/r6_6_genus2_oracle/RESULTS.md).
+
+### 19.11 R6.7 — the ζ-fold over F_{p²}, phase two (merged, #2217)
+
+*Hypothesis.* Priced inversions change every arm's cost by the same factor; the
+repository `LineOracle` on F/⟨T⟩ pays about 1 and on F about 3 at m = 3;
+full-rank streams reach rank with a 4× budget on the 3-torsion curves.
+*Falsifier.* Ratios that move with inversion pricing by more than the
+bootstrap interval; the repository oracle on F/⟨T⟩ paying > 1.5.
+*Verdict.* The source's `RESULTS.md` gives no verdict word; it reports its
+status against round 4's falsifier. Read against the PROGRAM falsifier, **not
+fired** (derived from the source's numbers: pricing moves no ratio by more than
+0.011; the F/⟨T⟩ oracle costs 0.980–1.075 against plain). The 4× budget part
+is **not shown**: the stall is reproduced.
+*Numbers (measured; per-curve bootstrap 95% over targets).* m = 3, torsion
+family, 9 curves (bits 9, 10, 11): B/A size-matched 2.976–3.277 (law 3), with
+the interval containing 3 on 8 of 9; C/A 0.980–1.075 (law 1), 8 of 9; B/C
+3.037–3.055 with intervals narrower than 0.001 that exclude 3 on all 9, about
+1.4% above 3, which the source attributes to the wrapper's own charged work
+(φ on R − P₁ and the lift). Inversions are 38–44% of the priced-as-run cost.
+m = 2: (b)/(a) = 0.3333 on 30 of 30 curves under all three pricings. Relation
+streams: on the prime family both arms reach full achievable rank on 9 of 9
+(relations to full rank 2.79–4.97); on the torsion family the base is
+exhausted on 9 of 9 before arm (a) reaches full rank, and arm (b) reaches full
+rank on 3 of 9, so the round-4 stall is reproduced and is not an artefact of the
+old sweep.
+*Correction to the source.* `RESULTS.md` as merged says that 12 of 18
+per-curve (c)/(b) size-matched intervals contain 1 at m = 2. The committed
+`m2_torsion.json` records give 11 of 18 (unpriced), 9 of 18 (priced as run) and
+11 of 18 (priced essential); the review comment on the pull request reports the
+same counts and I recounted them from the records. Use the record counts; the
+merged `RESULTS.md` and `report.pdf` have not been regenerated. The point
+range 0.542–1.127 is unaffected.
+*Limits.* p ≤ 2^11 at m = 3 and ≤ 2^16 at m = 2; 3 seeds per size; the
+inversion price is a Fermat inversion (12–25 M), not a measured hardware I/M
+ratio; contended host.
+*Source.* [`round6/r6_7_zeta_fold_phase2/RESULTS.md`](research/isogeny_fibers_20261010/round6/r6_7_zeta_fold_phase2/RESULTS.md).
+
+### 19.12 R6.8 — transport oracles on factor-base points (**UNMERGED**, open #2196; proof claim withdrawn)
+
+*Hypothesis (theory, Proposition 5′).* A transport oracle lets the attacker use
+the union of pulled-back factor bases; pullbacks only grow (Prop. 3.2, Thm.
+4.2), so the union base is the image/pullback law with constant at most the
+number of oracles |Ψ| and no exponent moves.
+*Falsifier (measurement).* On a toy class with 2- and 3-isogeny oracles, a
+union-of-pullbacks base whose class factor per unknown exceeds that of the
+best single base by more than |Ψ| (exact census, m = 2, 3).
+*Verdict.* *Measurement:* **not fired** in any of the 16 cells (8 census
+files, 4 curves, 2 base sizes, 2 arities). *Theory:* **open.** The earlier
+claim that Proposition 5(c) was closed for IC attackers is withdrawn in the
+pull request's own text, and this section does not restate the superseded
+proof claim.
+*What the pull request says about the proof.* Lemma 5(b) and 5(d) as written
+are false because the image set removes the identity while the decomposition
+oracle requires exactly m summands. Exact counterexample: a cyclic group of
+order 5 generated by P, the identity transport, S = {O, P}, m = 2; the valid
+decomposition P = O + P disappears. Further obligations recorded: choosing an
+arbitrary preimage loses valid kernel-fiber lifts (the projection C₅ × C₂ → C₅);
+IC2 does not forbid later transport paths chosen from challenge-dependent
+observations; a cost comparison for one call does not charge lifting,
+filtering, table construction and path evaluations. These gaps concern the
+proposed proof; they do not show that a corrected simulation is impossible or
+that transport gives an asymptotic advantage. The general exact-simulation
+theorem and its cost bound remain open (tracked in
+`problems/transport-oracle-exact-simulation-gap.md` on the branch); the owner
+has stated that the gap is being corrected separately.
+*Numbers (measured, exact census; retained as finite measurements only, they
+do not validate the withdrawn theorem).* Curves (named by p; the source
+records their ICV1 slugs): three j = 0 curves at p = 195709, 493159 and 903163
+(h = 3, ℓ = 3 neighbour) and one h = 6 curve at p = 1048583 (ℓ = 2 and
+ℓ = 3 neighbours). Union class factor per column
+over the best single base: 0.020–0.268 (limit |Ψ| = 1 for the j = 0 curves, 2
+for the h = 6 curve). Union cost over plain cost: 0.305–0.436 at m = 2 and
+0.516–3.733 at m = 3 (above 1 in 5 of the 8 m = 3 cells). Every isogeny and dual passed 500/500 on-curve,
+homomorphism and ψ̂ψ = [ℓ] checks; the Theorem 1 simulated answers agreed
+2000/2000.
+*Source.* PR #2196, branch `research/r6-transport-oracle`,
+`research/isogeny_fibers_20261010/round6/r6_8_transport_oracle/RESULTS.md`
+(the superseded original is retained there under `historical-04c3e817/`). The
+description records that exact-head CI was not clean when last updated.
+
+### 19.13 R6.9 — GHS phase two: walk cost and relation rate (**UNMERGED**, open #2502)
+
+*Hypothesis.* The walk to the nearest weak curve costs at most 2·(class size)^{1/2}
+isogeny evaluations; the measured relation rate at the smallest weak instance
+is within 4× of the model.
+*Falsifier.* Walk cost growing with N beyond the class size, or a relation rate
+off the model by more than 10×.
+*Verdict.* *Walk:* **not fired** for the stated falsifier; the hypothesis holds
+on average and fails for individual searches. *Relation rate:* **fired against
+the 1/g! heuristic** (recalled from Gaudry 2000) at q = 4 and q = 8; the exact
+split-divisor model holds within 4×. The relation rate was measured on random
+smooth imaginary genus-g curves over the same F_{2^l}, not on descended
+Jacobians (below).
+*Numbers (measured; ratios derived).* Walk, N = 12, 14, 15, 16, 18 (starts
+65, 616, 110, 701, 5 075; LG5 target of R5.2): mean cost 0.28, 0.39, 0.54, 0.48,
+0.67 of 2·√(class size); share of searches above that bound 0%, 6.3%, 24.5%,
+14.4%, 23.9%; worst search 4.07× the bound; log-log slope of evaluations
+against class size 0.84 (derived, pooled), not 0.5; evaluations per curve of
+class size 0.063, 0.057, 0.068, 0.048, 0.048 (flat or falling). 18%–36% of
+random strong starts cannot reach any target with ℓ ∈ {3, 5, 7} (none at
+N = 15) and are excluded from the cost figures. Relation rate, 34 runs (q ∈
+{4, 8, 16, 32}, g ≤ 8, #J validated by [#J]D = 0 on 136 checks, 0 failures):
+measured smooth rate within 0.88–3.22× of the exact split-divisor fraction in
+all 34; against 1/g! off by more than 10× in "6 of 34 runs" per the source (q = 4
+with g ∈ {6, 7, 8}; q = 8 with g = 6; the source's own table has 7 rows above
+10×: the six q = 4 rows at g ∈ {6, 7, 8} and the q = 8, g = 6 row at 12.1×, so
+the count of 6 appears to omit one; recount derived from its table), and by 585× and 858× on the two curves of the
+smallest weak instance (N = 12, (l, n) = (2, 6), descended genus 8 over F₄,
+where all 53 searches ended at a curve with (g, l, n, m) = (8, 2, 6, 4)). The
+source explains it as 1/g! assuming q ≫ g.
+*Library limit, stated.* The library cannot construct the GHS descended curve
+for m ≥ 2 (`descend_m2_affine` has a documented TODO for the smooth model;
+`prime_hyperelliptic` and `jv_cover` are prime-field only), so the relation-rate
+arm is a stand-in. The relation rate covers decomposition-phase smoothness only.
+*Limits.* N ≤ 18, ℓ ≤ 7; the walk uses orbit representatives, and an attacker
+without Galois-orbit canonicalisation may pay up to the orbit length (≤ N),
+which is not measured; larger deviations from the exact model come with low
+coverage and were not resolved.
+*Source.* PR #2502, branch `research/r6-ghs-2`,
+`research/isogeny_fibers_20261010/round6/r6_9_ghs_2/RESULTS.md`.
+
+### 19.14 R6.10 — literature closure for rounds 4–5 (merged, #2183)
+
+*Question.* Which citations in rounds 4–5 were "recalled" or checked only from
+snippets, and which of the programme's results are already in the literature?
+No hypothesis or falsifier (no code; web search was used only here).
+*Verdict.* 47 table rows, bibliographic data fetched for 46 (Vélu 1971 not
+fetched): 13 confirmed, 4 confirmed (secondary), 14 bib-only (our use
+unverified), 8 corrected, 7 mismatch, 1 unverified, 0 withdrawn. "Nothing found"
+means the queries returned nothing relevant, not that nothing exists.
+*Findings that change claims.* (1) **The kernel-saturation penalty and its
+oracle dependence are prior work.** Faugère, Huot, Joux, Renault, Vitse,
+*Symmetrized summation polynomials: using small order torsion points to speed
+up elliptic curve index calculus*, EUROCRYPT 2014, pp. 40–57, §3.2 ("Reducing
+the factor base"): a factor base invariant under translation by a point of
+order m needs m times fewer relations and "decreases the probability that a
+random point R decomposes by a factor m^{n−1} … but this is more than
+compensated by the improved resolution of the associated polynomial systems".
+The μ^{m−2} of Prop. 15.2 is that accounting at a fixed oracle (derived in
+R6.10), and the oracle-dependent penalty of §17.4 and §19.1 is the
+quantitative form of their compensation remark. Our addition is the exact
+census and the measured class factors, not the law of the kernel clause; they
+must be cited wherever the clause or its oracle dependence is stated. (2) The
+4E closed form's stated difference from prior art was wrong: the patent's
+cofactor-4 test (US 7,257,709) already needs no square root and no y; ours
+differs because it needs no inversion (derived from the two formulas). (3) GHS
+cost attributions: g! is Gaudry 2000's relation-search term and q^{2−2/g} is the
+double-large-prime exponent of Gaudry–Thomé–Thériault–Diem, so g!·q^{2−2/g} is
+R5.2's own model; "Õ(q) (Gaudry)" for genus 2 is the GTTD bound, Gaudry 2000
+alone gives Õ(q²). (4) "Transport is an Õ(q^{1/4}) walk" overstates GHS02: per
+Maurer–Menezes–Teske 2002, Remark 20, it is the cost of computing an isogeny
+between two *given* curves, while finding which weak curve is isogenous to a
+target "may be difficult".
+*Prior work for the programme's main results (web search, 2026-10-18).*
+Oracle-dependence of the saturation penalty: **anticipated** (FHJRV 2014;
+Faugère–Gaudry–Huot–Renault, J. Cryptology 27 (2014) have the 2-torsion
+symmetry earlier). Trace pair as an E/4E label: nothing found. Isogeny-augmented
+generic group model: nothing found that states it for isogenies (related work
+on group actions, Duman et al., PKC 2023, and generic models with extra
+operations). AGM with point-evaluation isogeny oracles: nothing found. Class-wide
+multi-target rho: nothing found that states it; the ingredients are standard
+(Kuhn–Struik 2001, √(2rL) for L < r^{1/4}; Galbraith 1999).
+*Other corrections.* Eagle–Galbraith–Ong is Adv. Math. Commun. 5(1) (2011), the
+ePrint being the preprint; Divide-and-Pair (ePrint 2026/749) is a method paper,
+not a survey; the Menezes–Teske–Weng paraphrase did not match its abstract
+(L21); the prime-N genus bound is governed by ord_N(2) (L23); Koshelev's
+journal data and correction notice (L43); the xedni bound is a canonical-height
+bound on dependency coefficients, and "isogenies cannot rescue lifting" is our
+inference (L44); Huang–Petit–Shinohara–Takagi has two versions (L30); √élu has
+its ANTS XIV Open Book Series venue (L35).
+*Unverified, stated.* King's §5 and the Eagle–Galbraith–Ong cofactor-4 test were
+not read; no IACR PDF or Springer page could be fetched.
+*Applied in this note.* §18 is replaced by `references_proposed.md`; the wording
+changes of §0 items 3, 5, 8, the Gaudry attributions in §6 H6 and §13.4, the
+FHJRV citations in §14.1, §15.2, §17.4, §17.7, the §15.3 xedni and Koshelev
+wording, the §17.2 patent sentence and the §17.7 walk qualifier are made in
+this revision (list in §19.18).
+*Source.* [`round6/r6_10_literature/RESULTS.md`](research/isogeny_fibers_20261010/round6/r6_10_literature/RESULTS.md),
+[`references_proposed.md`](research/isogeny_fibers_20261010/round6/r6_10_literature/references_proposed.md),
+status table [`claims_status.json`](research/isogeny_fibers_20261010/round6/r6_10_literature/claims_status.json).
+
+### 19.15 R6.11 — relation yield across a prime conductor gap (merged, #2197)
+
+*Hypothesis.* The class factor c depends on (p, t) only: measured class factors
+on the crater and the floor of an ℓ-volcano agree within exact-count error at
+m = 2 and 3, for ℓ ∈ {5, 7, 11, 13} over toy p.
+*Falsifier.* Across at least two independent instances at some (ℓ, m,
+|F| ≤ 100, smallx rule), |c_crater/c_floor₀ − 1| > 2 sd and |z| > 3.
+*Verdict.* **Not fired; confirmed at toy size.** 24 instances (6 per ℓ), four
+base sizes (60, 80, 100 and a supplementary 200), m = 2 and 3.
+*Numbers (measured; exact census).* Every mean crater/floor₀ ratio is within
+0.5% of 1 and every mean ± 2 sd interval contains 1, for example ℓ = 11,
+|F| = 100, m = 3: 1.0049 mean, [0.9953, 1.0145]; ℓ = 5, |F| = 100, m = 3:
+0.9974 [0.9835, 1.0113]. Construction: class-number-one discriminants D ∈ {−11,
+−19, −43, −67, −163}, p ∈ [2^20, 2^22), N prime so E(F_p) ≅ Z/N, h = 1,
+|Aut| = 2 on every curve; every crater→floor edge certified.
+*Limits (source).* At m = 2, |F|²/2 ≪ N, so c ≈ 1 is forced by the birthday
+bound on any curve and the arm can detect only gross differences; m = 3 is
+the informative arm. The census measures a plain x-frame base and says nothing
+about algorithms that use End(E) explicitly, which is exactly the loophole
+Conjecture 10′ leaves open. Toy p only, single-vertex craters, one vertical
+step. The primes tested are ℓ ≤ 13 at p ≈ 2^20–2^22, i.e. ℓ ≤ p^{0.19}
+(derived); the "large prime" gap of Conjecture 10′ is a toy-size prime here.
+*Source.* [`round6/r6_11_conductor_yield/RESULTS.md`](research/isogeny_fibers_20261010/round6/r6_11_conductor_yield/RESULTS.md).
+
+### 19.16 Synthesis
+
+| lead | PR | falsifier | verdict | headline (measured unless marked) |
+|:--|:--|:--|:--|:--|
+| R5.1 quotient oracle, char 2 | #2179 merged | not fired | confirmed (n = 31, 37) | m = 3 quotient 0.95 [0.85, 1.05], 0.99 [0.93, 1.05] vs sweeping F 1.90 [1.69, 2.11], 1.99 [1.86, 2.10] |
+| R5.2 GHS across a class | #2181 merged | fired, trivially, under model P | open as a cost statement; structural reading holds | 0 of 2 858 996 curves weak under P; low-genus curves 0.09%–3.1%; walks 1.3–3.0 steps |
+| R5.3 NTT √élu | #2192 **open** | refuted part: exponent "toward 0.5–0.6" | refuted at measured range | 0.798 [0.775, 0.820] (2^16..2^24); generic crossover unchanged |
+| R5.4 theory | #2180 merged | not fired | theorems as labelled; Conjecture 10 reduced, not proved | open only across ℓ ≥ p^ε gaps; 2.95 = 2.17 × 1.36 (derived) |
+| R6.1 direct S5 | #2511 **open** | not fired | mixed: falsifier not met, hypothesis partly refuted | sym S5 S = 7.61·10^5 vs mitm m = 2 186 (n = 13) |
+| R6.2 pooled rho | #2230 merged, **defects pending** | not evaluated | open | B/C ratio of means 0.914–1.287, no paired interval; paths ~ component size |
+| R6.3 E/4E label | #2193 merged | not fired | confirmed, refined to n mod 4 | 44 740 508 points, 0 exceptions; CT variant 2.5–5.0× misses < 2× |
+| R6.4 vertical margin 2 | #2240 **open** | not fired (generic); fired (ψ, Φ asc/desc) | mixed | 1.919 [1.724, 2.115] (insufficient evidence either way); 2^21.7 → 2^24.2–2^25.1 (projected, restricted model) |
+| R6.5 A-pair correction | #2194 merged | fired | refuted for the recorded census; correction confirmed in ensemble | 1.130 [1.095, 1.170], 1.059 [1.043, 1.077], 1.033 [1.024, 1.044] |
+| R6.6 genus 2 oracle | #2195 merged | not fired | confirmed | A-gain 10.00 [10.00, 10.00]; image 3.53–4.20; overlap ≤ 2 |
+| R6.7 ζ-fold 2 | #2217 merged | not fired (PROGRAM reading) | consistent with law; 4× budget not shown | B/A 2.976–3.277; C/A 0.980–1.075; torsion streams stall on 9 of 9 |
+| R6.8 transport oracles | #2196 **open** | not fired (census); proof withdrawn | census finite; theorem open | union/best c/U 0.020–0.268 in 16 cells |
+| R6.9 GHS phase 2 | #2502 **open** | not fired (walk); fired vs 1/g! | mixed | slope 0.84; "6 of 34" runs (7 in its table) > 10× from 1/g!; 0.88–3.22× from exact |
+| R6.10 literature | #2183 merged | none | saturation penalty anticipated | 47 rows: 13 / 4 / 14 / 8 / 7 / 1 / 0 |
+| R6.11 conductor yield | #2197 merged | not fired | confirmed at toy size | all crater/floor ratios within 0.5% of 1 |
+
+The summary figure is `round6/s19_summary/verdicts.svg` (data
+`verdicts.json`, report `report.pdf` beside it).
+
+### 19.17 What is settled, and what is still open
+
+*Settled at the stated toy scope, merged results only.*
+* In characteristic 2 an oracle on the quotient E/⟨T⟩ removes the 2^{m−2}
+  kernel-saturation penalty for the pair-table (mitm) oracle at n = 31 and 37
+  (R5.1), as the odd-characteristic ℓ = 3 case of §17.4 did, and it coincides
+  with the trace-zero oracle (R5.1, R5.4 Theorem 9). Together with Corollary
+  9.2, 2-torsion symmetrisation of a Weierstrass x-frame is null as an algebraic
+  device in characteristic 2 (proved for Weierstrass binary curves and the
+  2-torsion point only; no algebraic quotient oracle was run).
+* The kernel-saturation clause of the affine law is prior work (FHJRV 2014,
+  §3.2); the exact census and the measured class factors are this
+  programme's; no earlier statement of the other clauses was found.
+* The §15.2 ζ-closed value 1.02 is one base and is not a test; the ensemble
+  ratio follows 1 + 4/|F| (R6.5).
+* The trace pair is a full label of E/4E on y² + xy = x³ + 1, n odd, with
+  odd-coset labels set by n mod 4 (R6.3). The constant-time variant did not meet
+  its bar.
+* Under a degree-1 (Nagao-style) oracle in genus 2 the law holds, and a
+  degree-1 base is never translation-closed (R6.6).
+* The oracle-dependent penalty on j = 0 curves over F_{p²} is reproduced with
+  the repository `LineOracle` and priced inversions (R6.7); torsion-family
+  streams stall as in round 4.
+* Relation yield of a plain x-frame base is the same on the crater and the
+  floor of ℓ-volcanoes with ℓ ≤ 13 at toy size, to within 0.5% (R6.11).
+* Over F_p every known attack family's cost is a class invariant up to a
+  bounded factor, and Conjecture 10 can fail only across a prime conductor gap
+  (R5.4; some parts conditional on GRH or heuristics, as labelled there).
+
+*Still open or pending.*
+* The exact-simulation theorem for transport oracles (Proposition 5′) and its
+  cost bound: the proof claim is withdrawn, the finite census does not
+  establish it (R6.8, unmerged).
+* The pooled-rho result in ecbench (no paired interval, no replay certificate,
+  one r, ℓ = 5, 7 edges dropped) and the path-finding cost, until the two known
+  defects are corrected (R6.2).
+* The √élu exponent, the generic-kernel exponent (1.919 [1.724, 2.115]) and
+  every crossover, which hold only under the restricted M + W + 91 I cost
+  model; complete-cost ordering of routes; Φ_ℓ construction cost; Sutherland
+  CRT evaluation (R5.3, R6.4, both unmerged).
+* Direct S5 systems are not buildable beyond ℓ = 5; the `chained-x` plug-in is
+  unregistered in `ic bench` (R6.1, unmerged).
+* GHS: whether any toy instance is weak under a cost model (R5.2); the smooth
+  model of the GHS cover is missing in the library, so the relation rate on a
+  real descended Jacobian is unmeasured (R6.9, unmerged); the `audit_curve` genus
+  rule disagrees with the derived formula.
+* Conjecture 10′: a conductor-sensitive algorithm has not been tested (R6.11
+  tests only the plain x-frame, ℓ ≤ 13, h(D) = 1 craters).
+* The E/4E label for a = 1 and for E/8E (R6.3); King §5 and the
+  Eagle–Galbraith–Ong cofactor-4 test were not read (R6.10).
+* The binary-Edwards check of Corollary 9.2 (R5.4); the R6.7 `RESULTS.md`
+  count (12 of 18) and the §17.3 generic row await their corrections to land.
+
+### 19.18 Edits made to earlier sections in this revision
+
+All from R6.10 (§19.14) and R6.5 (§19.9); no frozen result was edited, and the
+measured numbers of earlier sections are unchanged.
+* Header status line and §0: items 3, 5, 8 reworded; item 9 added.
+* §6 H6 and §13.4: the genus-2 cost attribution.
+* §14.1, §15.2, §17.4, §17.7: FHJRV citation; §15.2 erratum for the single-base
+  ζ-closed entry.
+* §14.5: Kuhn–Struik citation.
+* §15.3: xedni wording and Koshelev venue and reading.
+* §17.2: the patent sentence (square root → inversion), King and
+  Eagle–Galbraith–Ong status.
+* §17.7: walk-cost qualifier for composite-degree fields.
+* §18: replaced by the R6.10 reference list with status tags.
+* §17.3 is not edited here; pull request #2240 carries its own superseding
+  paragraph.
