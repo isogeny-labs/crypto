@@ -102,6 +102,8 @@ PAGES = (
     # Beside the scoreboard, whose relative link to it then resolves both in
     # the working tree (docs/) and when published (/scoreboard/).
     ("docs/ic-leaderboard.html", "scoreboard/ic-leaderboard.html"),
+    ("docs/ic-leaderboard/layout.css", "scoreboard/ic-leaderboard/layout.css"),
+    ("docs/ic-leaderboard/layout.js", "scoreboard/ic-leaderboard/layout.js"),
     ("docs/ic-measurement.html", "scoreboard/ic-measurement.html"),
     ("docs/ic-current-state.html", "scoreboard/ic-current-state.html"),
     # The lab browser: a searchable index over curves, methods, factor bases,
