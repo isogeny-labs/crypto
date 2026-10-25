@@ -415,6 +415,21 @@ enum CryptanalysisOp {
         #[arg(long, default_value_t = 128)]
         key_bits: u32,
     },
+    /// Match a four-key biclique grid on the four-cell small-scale AES model.
+    AesBicliqueSmallScale {
+        /// Four hex nibbles for the base key.
+        #[arg(long, default_value = "a53c")]
+        base_key: String,
+        /// Four hex nibbles for the known plaintext.
+        #[arg(long, default_value = "1234")]
+        plaintext: String,
+        /// Four hex nibbles for a captured ciphertext; generated from the base key if omitted.
+        #[arg(long)]
+        ciphertext: Option<String>,
+        /// Number of rounds in the small-scale model (1..=15).
+        #[arg(long, default_value_t = 4)]
+        rounds: usize,
+    },
     /// Check a supplied sequence of AES active-byte patterns against MixColumns branch constraints.
     AesTrailCheck {
         /// One four-digit hex mask per round, bit 4*column+row marking an active byte; repeat --pattern.
@@ -2955,6 +2970,56 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             }
             let cost = crypto_lib::cryptanalysis::aes::quantum_grover::grover_cost_aes(key_bits);
             println!("{cost}");
+        }
+        CryptanalysisOp::AesBicliqueSmallScale {
+            base_key,
+            plaintext,
+            ciphertext,
+            rounds,
+        } => {
+            use crypto_lib::cryptanalysis::aes::{
+                biclique::{construct_toy_biclique, mitm_against_biclique},
+                small_scale::SmallAes,
+            };
+            fn cells(hex: &str) -> Result<[u8; 4], String> {
+                if hex.len() != 4 {
+                    return Err("expected exactly four hex nibbles".into());
+                }
+                let bits = u16::from_str_radix(hex, 16)
+                    .map_err(|_| "expected exactly four hex nibbles".to_string())?;
+                Ok([
+                    (bits >> 12) as u8,
+                    ((bits >> 8) & 15) as u8,
+                    ((bits >> 4) & 15) as u8,
+                    (bits & 15) as u8,
+                ])
+            }
+            if !(1..=15).contains(&rounds) {
+                eprintln!("error: --rounds must be in 1..=15");
+                std::process::exit(2);
+            }
+            let parse = |label: &str, value: &str| {
+                cells(value).unwrap_or_else(|e| {
+                    eprintln!("error: {label}: {e}");
+                    std::process::exit(2);
+                })
+            };
+            let key = parse("--base-key", &base_key);
+            let pt = parse("--plaintext", &plaintext);
+            let ct = ciphertext
+                .as_deref()
+                .map(|s| parse("--ciphertext", s))
+                .unwrap_or_else(|| SmallAes::new(key, rounds).encrypt(pt));
+            let grid = construct_toy_biclique(key);
+            let matches = mitm_against_biclique(&grid, rounds, pt, ct);
+            println!("# Small-scale AES biclique grid");
+            println!("- model: SR({rounds}, 2, 2, 4)");
+            println!("- ciphertext: {:x}{:x}{:x}{:x}", ct[0], ct[1], ct[2], ct[3]);
+            println!("- matching keys in four-key grid: {}", matches.len());
+            for (i, j) in matches {
+                let k = grid.key_at(i, j);
+                println!("  ({i}, {j}): {:x}{:x}{:x}{:x}", k[0], k[1], k[2], k[3]);
+            }
         }
         CryptanalysisOp::AesTrailCheck { pattern } => match aes_trail_check_report(&pattern) {
             Ok(report) => println!("{}", serde_json::to_string_pretty(&report).unwrap()),

@@ -24,7 +24,7 @@ not estimates of the cost of a general cryptographic instance.
 ## AES analysis input and result grid
 
 `crypto aes` provides seven primitive commands for block encryption/decryption,
-CTR, CBC and GCM. The 24 `aes-*` commands below are selected with
+CTR, CBC and GCM. The 25 `aes-*` commands below are selected with
 `crypto cryptanalysis COMMAND`; `crax aes COMMAND` forwards them to the
 sibling binary. Analysis outcomes vary by technique. In particular, a
 statistical observation, a cost estimate, or a candidate set is not a
@@ -37,6 +37,7 @@ gives corpus schemas, work bounds and examples.
 | `aes-algebraic-equations` | None | Checks quadratic equations on all 16 input/output pairs of a four-bit AES-like S-box |
 | `aes-slide-comparison` | Sample count and seed | Pair observations for a repeated-round-key variant and AES-128, limited to the sampled set |
 | `aes-grover-cost` | Key size 128, 192 or 256 | Logical resource estimate, not an executed search |
+| `aes-biclique-small-scale` | Four-nibble base key, plaintext, optional captured ciphertext and 1..15 rounds | Matching keys within a four-key biclique grid on the four-cell small-scale model; no full AES attack claim |
 | `aes-trail-check` | Active-byte pattern sequence | Branch-constraint check for the supplied trail |
 | `aes-attack` | Key, seed and samples; differential, linear or Square technique | Reduced-round recovery: 2-round differential, 1-round linear or 4-round Square |
 | `aes-distinguisher` | Key, samples and selected technique | Bounded impossible, yoyo, mixture, boomerang or S-box zero-correlation measurement |
