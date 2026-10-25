@@ -43,7 +43,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          # The PR check uses HEAD^1 and HEAD^2 of the synthetic merge commit.
+          # Fetching both parents avoids downloading the repository's full history.
+          fetch-depth: 2
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
