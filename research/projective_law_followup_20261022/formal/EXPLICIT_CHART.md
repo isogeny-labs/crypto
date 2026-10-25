@@ -35,8 +35,7 @@ Replay from this directory:
 TMPDIR=/dev/shm lake env lean Common22ExplicitChart.lean
 ```
 
-The latest local compile printed all axiom audits without a Lean error; its
-outer `lake` wrapper stalled after the Lean child exited on this host. The
-theorem bodies were also checked incrementally with successful exits before
-the final Noetherian import. This host-level exit observation is distinct
-from the formal proof state and should be rechecked independently.
+The final local replay of the command above exited 0. Its output contains all
+13 theorem axiom audits, each listing only `propext`, `Classical.choice`, and
+`Quot.sound`, with no Lean errors. The host delayed the `lake` wrapper after
+the Lean child finished, but it subsequently returned a successful exit.
