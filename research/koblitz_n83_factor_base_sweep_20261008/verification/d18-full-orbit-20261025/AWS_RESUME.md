@@ -80,6 +80,10 @@ cargo run --release --manifest-path ../../../../Cargo.toml \
 ```
 
 Require a `PASS` receipt before the [frozen first access gate](NATURAL_PROTOCOL.md).
+The [separate local positive-control diagnostic](l0-positive-20261025/RESULT.md)
+re-imported the complete base and built the pinned circuit, then reached its
+300-second shared-host L0 cap before a solver answer. Its audited censoring
+does not replace the Linux control or justify a natural-yield estimate.
 That gate adds an opt-in `primary-full-d18-m4 positive|natural` worker with
 hard resource checks, durable phase/shape records, SAT-model verification,
 group lift, row replay and rank-one control. Its natural result requires a

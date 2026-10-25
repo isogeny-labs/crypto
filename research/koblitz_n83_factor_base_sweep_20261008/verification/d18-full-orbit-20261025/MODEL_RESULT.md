@@ -41,3 +41,7 @@ but this local result does not establish the memory footprint or success of
 a long SAT search. The next result must run the positive control first, then
 the same-source public natural arm under the specified hard cgroup and
 independent replay before any useful-rank or runtime inference.
+
+A subsequent [L0 planted-control run](l0-positive-20261025/RESULT.md) used
+the complete pinned circuit and reached its 300-second whole-process cap
+without a solver answer. It leaves the Linux positive-control gate open.
