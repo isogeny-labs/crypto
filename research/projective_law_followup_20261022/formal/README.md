@@ -257,3 +257,14 @@ Its [CSV](chart-overlap.csv), [SVG](chart-overlap.svg), and artifact-stored
 PDF record checked and open gates. A principal-open scheme isomorphism,
 two-chart gluing, smooth projective completion, infinity-stalk transport,
 divisor/`Pic⁰` bridge, and Rust-law correspondence remain open.
+
+The [principal-open equation packet](PRINCIPAL_OPEN_EQUATION.md) proves in
+pinned Lean that, after adjoining an inverse for `x` in one ambient ring,
+the transformed infinity equation is a unit multiple of the affine equation.
+It checks vanishing equivalence, principal-ideal equality, a same-ambient
+quotient-ring equivalence, and an instance in `Localization.Away X₀` of
+`K[X,Y]`. Its [CSV](principal-open-equation.csv),
+[SVG](principal-open-equation.svg), and artifact-stored PDF expose the
+checked and open gates. The ring equivalence between the **separately
+presented** chart localizations, the resulting principal-open scheme
+isomorphism, projective gluing, and divisor/`Pic⁰` transport remain open.
