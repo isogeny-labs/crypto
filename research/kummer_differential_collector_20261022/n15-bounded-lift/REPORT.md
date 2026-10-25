@@ -49,9 +49,9 @@ nonzero first coordinate after inversion. Degree-two Mumford projection has
 that first coordinate equal to one. Degree-zero `Q=O` is recognized from
 `K(0)`. For a degree-one class `P-∞`, translation by any rational branch
 point distinct from `P` gives a degree-two class; the implementation tries
-the four recorded 2-torsion action matrices and translates each candidate
-back. A maximum of five generic conversions, ten modular square-root calls,
-and eleven candidate checks follows from the branch structure, conditional
+the five recorded 2-torsion action matrices and translates each candidate
+back. A maximum of six generic conversions, twelve modular square-root calls,
+and thirteen candidate checks follows from the branch structure, conditional
 on exact action matrices and projection identities. The branch proof does
 not depend on the scalar replay. The existing model actions were derived
 and checked on finite cases, not certified symbolically for every group

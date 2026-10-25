@@ -76,7 +76,7 @@ fn bounded_lift(g:Divisor,k:[u64;4],kp:[u64;4],t:&Value,acts:&[(u64,[[u64;4];4])
             let plus=j.add(candidate,g);
             let Some(check_plus)=super::theta::projection(plus,j,t,acts,p) else {continue};
             if same_projective(check_plus,kp,p){
-                let label=["direct","torsion_0","torsion_1","torsion_2","torsion_3"][branch];
+                let label=["direct","torsion_0","torsion_1","torsion_2","torsion_3","torsion_4"][branch];
                 return (Some(candidate),tested,zero_b1,label)
             }
         }
