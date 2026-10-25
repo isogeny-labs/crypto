@@ -165,6 +165,10 @@ factorization, matrix work, memory, and verification. The current `crypto`
 cover infrastructure documents that arbitrary-class pushforward is not yet
 available for the odd-prime even-sextic family, so that implementation is a
 concrete prerequisite rather than a presumed capability.
+The [projected-relation problem](../../problems/prime-cover-projected-relation-cost-missing.md)
+records the high-genus experiment and total-work exit conditions; the
+[existing map problem](../../problems/prime-cover-balanced-jacobian-and-induced-maps-missing.md)
+tracks the underlying degree-two Jacobian arithmetic gap.
 
 ## Proof map
 
