@@ -4169,8 +4169,12 @@ fn legacy_rref_kernel() -> bool {
 /// (`gf2_elim_bench` has it 1.5–4.5× faster on the oracle's own Macaulay
 /// matrices); smaller ones stay on the column-at-a-time kernel, where a
 /// table would cost more to build than it saves.
+pub(crate) fn rref_uses_four_russians(rows: usize, n_cols: usize) -> bool {
+    !legacy_rref_kernel() && !suffix_kernel_forced() && rows >= 128 && n_cols >= 256
+}
+
 pub(crate) fn rref_f2_counted(matrix: &mut [Vec<u64>], n_cols: usize, word_ops: &mut u64) -> usize {
-    if !legacy_rref_kernel() && !suffix_kernel_forced() && matrix.len() >= 128 && n_cols >= 256 {
+    if rref_uses_four_russians(matrix.len(), n_cols) {
         return crate::cryptanalysis::gf2_elim::rref_counted(matrix, n_cols, word_ops);
     }
     rref_f2_legacy_counted(matrix, n_cols, word_ops)

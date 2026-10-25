@@ -372,6 +372,83 @@ fn eliminate_with(
     full_words_override: Option<usize>,
     start: Option<(usize, usize)>,
 ) -> usize {
+    match eliminate_core(
+        matrix,
+        n_cols,
+        reduce_above,
+        defer_above,
+        config,
+        word_ops,
+        reverse_tile_words,
+        reuse_table,
+        full_words_override,
+        start,
+        None,
+    ) {
+        ElimEnd::Done(rank) => rank,
+        ElimEnd::Stopped { .. } => unreachable!("no hook, no stop"),
+    }
+}
+
+/// How an interruptible elimination ended.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ElimEnd {
+    /// The elimination ran to the end; the rank.
+    Done(usize),
+    /// The hook asked to stop at a word boundary.  The matrix is exactly the
+    /// state [`rref_resumable`] continues from with this `pivot_row` and `word`.
+    Stopped { pivot_row: usize, word: usize },
+}
+
+/// Called at the start of every packed word of the elimination, with the
+/// matrix, the number of pivot rows found so far, the word about to be
+/// processed and the word operations charged so far.  `true` stops there.
+pub type ElimHook<'a> = &'a mut dyn FnMut(&[Vec<u64>], usize, usize, u64) -> bool;
+
+/// [`rref_counted`] that can be stopped and continued.  Starting from
+/// `start = None` it is `rref_counted` until the hook stops it; starting from
+/// `Some((pivot_row, word))` with the matrix a stop left behind (and the
+/// `word_ops` it had reached) it continues, and the final matrix, rank and
+/// word operations equal an uninterrupted run's, because the state at a
+/// word boundary is the matrix, the pivot row and the word and nothing else.
+/// The reverse-deferred pass (`KIC_GF2_DEFER_ABOVE`) is not used here, as its
+/// pending blocks are not part of that state.
+pub fn rref_resumable(
+    matrix: &mut [Vec<u64>],
+    n_cols: usize,
+    word_ops: &mut u64,
+    start: Option<(usize, usize)>,
+    hook: Option<ElimHook<'_>>,
+) -> ElimEnd {
+    eliminate_core(
+        matrix,
+        n_cols,
+        true,
+        false,
+        Config::from_env(),
+        word_ops,
+        None,
+        reuse_table_enabled(),
+        None,
+        start,
+        hook,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn eliminate_core(
+    matrix: &mut [Vec<u64>],
+    n_cols: usize,
+    reduce_above: bool,
+    defer_above: bool,
+    config: Config,
+    word_ops: &mut u64,
+    reverse_tile_words: Option<usize>,
+    reuse_table: bool,
+    full_words_override: Option<usize>,
+    start: Option<(usize, usize)>,
+    mut hook: Option<ElimHook<'_>>,
+) -> ElimEnd {
     static BRANCHLESS_STRIP: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     let branchless_strip = *BRANCHLESS_STRIP.get_or_init(|| {
         match std::env::var("KIC_GF2_BRANCHLESS_STRIP").as_deref() {
@@ -395,7 +472,7 @@ fn eliminate_with(
     let pivot_words = n_cols.div_ceil(64);
     let words = full_words_override.unwrap_or(pivot_words);
     if rows == 0 || pivot_words == 0 {
-        return 0;
+        return ElimEnd::Done(0);
     }
     debug_assert!(matrix.iter().all(|r| r.len() >= words));
     let tables = config.tables.clamp(1, 4);
@@ -412,6 +489,13 @@ fn eliminate_with(
     // Columns of the current word below `low` are already decided.
     let mut low = 0u32;
     while pivot_row < rows && word < pivot_words {
+        if low == 0 {
+            if let Some(hook) = hook.as_mut() {
+                if hook(matrix, pivot_row, word, *word_ops) {
+                    return ElimEnd::Stopped { pivot_row, word };
+                }
+            }
+        }
         let block_start = pivot_row;
         pivot_cols.clear();
         // The strip: each unpivoted row's current word, in reduced form
@@ -572,7 +656,7 @@ fn eliminate_with(
             end = first;
         }
     }
-    pivot_row
+    ElimEnd::Done(pivot_row)
 }
 
 #[inline]
@@ -1023,6 +1107,76 @@ mod tests {
                     // SAFETY: AVX2 was checked for this process.
                     unsafe { clear_strip_avx2(&mut vector, bit, pivot) };
                     assert_eq!(vector, expected, "AVX2 len={len} bit={bit}");
+                }
+            }
+        }
+    }
+
+    /// Stopping at a word boundary and continuing from the state it left
+    /// reaches the uninterrupted result exactly: matrix, rank and charged
+    /// word operations, for stops at every word, repeated stops, and shapes
+    /// that fill pivot blocks across words, are tall or are wide.
+    #[test]
+    fn a_stopped_elimination_resumes_to_the_uninterrupted_result() {
+        let mut rng = StdRng::seed_from_u64(0xC4EC_4901);
+        for (rows, cols, density) in [
+            (300usize, 700usize, 0.5f64),
+            (900, 500, 0.5),
+            (200, 1300, 0.02),
+            (150, 450, 0.9),
+            (600, 640, 0.15),
+        ] {
+            let words = cols.div_ceil(64);
+            let base: Vec<Vec<u64>> = (0..rows)
+                .map(|_| {
+                    let mut r = vec![0u64; words];
+                    for c in 0..cols {
+                        if rng.gen::<f64>() < density {
+                            r[c / 64] |= 1 << (c % 64);
+                        }
+                    }
+                    r
+                })
+                .collect();
+            let mut want = base.clone();
+            let mut want_ops = 0;
+            let want_rank = rref_counted(&mut want, cols, &mut want_ops);
+            let total_calls = {
+                let (mut m, mut ops, mut n) = (base.clone(), 0u64, 0usize);
+                let mut count = |_: &[Vec<u64>], _: usize, _: usize, _: u64| {
+                    n += 1;
+                    false
+                };
+                rref_resumable(&mut m, cols, &mut ops, None, Some(&mut count));
+                n
+            };
+            for every in [1usize, 2, 3, 7] {
+                let mut m = base.clone();
+                let (mut ops, mut start, mut stops) = (0u64, None, 0);
+                let rank = loop {
+                    let mut calls = 0usize;
+                    let mut hook = |_: &[Vec<u64>], _: usize, _: usize, _: u64| {
+                        calls += 1;
+                        calls > every
+                    };
+                    match rref_resumable(&mut m, cols, &mut ops, start, Some(&mut hook)) {
+                        ElimEnd::Done(rank) => break rank,
+                        ElimEnd::Stopped { pivot_row, word } => {
+                            stops += 1;
+                            // The state a checkpoint holds: copy it away and back.
+                            m = m.clone();
+                            start = Some((pivot_row, word));
+                        }
+                    }
+                };
+                assert_eq!(
+                    (rank, ops),
+                    (want_rank, want_ops),
+                    "{rows}x{cols} every {every}"
+                );
+                assert_eq!(m, want, "{rows}x{cols} every {every}: matrix");
+                if total_calls > every {
+                    assert!(stops > 0, "{rows}x{cols} every {every}: never stopped");
                 }
             }
         }

@@ -78,7 +78,7 @@ use crate::cryptanalysis::fx_hash::{FxMap as HashMap, MaskMap};
 use crate::cryptanalysis::koblitz_groebner::{
     all_variable_mask, build_inherited_macaulay, build_inherited_macaulay_support_local,
     echelon_f2_counted, macaulay_columns, macaulay_rows_monos_with_mask, monomials_up_to_mask,
-    pack_rows, rref_f2_counted,
+    pack_rows, rref_f2_counted, rref_uses_four_russians,
 };
 use crate::cryptanalysis::pq_groebner_f2::{
     cmp_mono, sort_masks_descending, F2BoolMono, F2BoolPoly,
@@ -609,6 +609,103 @@ impl InheritCost {
         self.displaced_rows += other.displaced_rows;
         self.completion_rows += other.completion_rows;
         self.closure_products += other.closure_products;
+    }
+}
+
+/// What a [`ClosureSink`] asks of the closure.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CloseFlow {
+    Continue,
+    Stop,
+}
+
+/// Where [`ReducedBasis::close_with`] offers its resumable states: between
+/// rounds, and at every word boundary of a round's elimination.  A sink that
+/// answers [`CloseFlow::Stop`] ends the closure at that state, which it has
+/// saved if it wants it back.
+pub trait ClosureSink {
+    /// A round has been absorbed and the closure has more to do; `done`
+    /// rounds are finished.  The basis is readable by
+    /// [`ReducedBasis::closure_view`].
+    fn after_round(&mut self, basis: &ReducedBasis, cost: &InheritCost, done: u32) -> CloseFlow;
+    /// A word boundary of the elimination inside round `done + 1`.
+    fn in_round(&mut self, view: &RoundView<'_>, cost: &InheritCost, done: u32) -> CloseFlow;
+}
+
+/// The sink that never stops and keeps nothing: plain `close`.
+struct NoSink;
+impl ClosureSink for NoSink {
+    fn after_round(&mut self, _: &ReducedBasis, _: &InheritCost, _: u32) -> CloseFlow {
+        CloseFlow::Continue
+    }
+    fn in_round(&mut self, _: &RoundView<'_>, _: &InheritCost, _: u32) -> CloseFlow {
+        CloseFlow::Continue
+    }
+}
+
+/// One closure round caught in the middle of its elimination: the matrix of
+/// the basis rows and the round's products, partly reduced.  Together with
+/// the layout, the pivot bits the basis had, and the elimination's position
+/// it is everything the round still needs; the rest of the basis is rebuilt
+/// from the finished matrix.
+#[derive(Debug)]
+pub struct RoundView<'a> {
+    pub degree: u32,
+    pub n_vars: usize,
+    pub support_local: bool,
+    pub min_fall_degree: u32,
+    pub closure_rounds: u32,
+    pub columns: &'a [u64],
+    /// Whether each column led a row of the basis before this round.
+    pub was_pivot: &'a [bool],
+    pub matrix: &'a [Vec<u64>],
+    /// Pivot rows found so far, and the packed word the elimination is at.
+    pub pivot_row: usize,
+    pub word: usize,
+}
+
+/// A round to continue: the owned form of a [`RoundView`].
+#[derive(Debug)]
+pub struct RoundJob {
+    matrix: Vec<Vec<u64>>,
+    was_pivot: Vec<bool>,
+    /// Where the elimination continues; `None` for a round not yet started.
+    resume: Option<(usize, usize)>,
+}
+
+/// How [`ReducedBasis::close_with`] ended.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct CloseEnd {
+    /// Rounds finished.
+    pub rounds: u32,
+    /// The sink stopped the closure (mid-round, or between rounds).
+    pub stopped: bool,
+}
+
+/// The state of a closure between two rounds, as a checkpoint holds it:
+/// everything [`ReducedBasis::from_closure_state`] needs besides the system
+/// itself, which the caller rebuilds from its inputs.  Rows are in the
+/// current layout, `words` words each, in the order `pending` indexes.
+#[derive(Debug)]
+pub struct ClosureView<'a> {
+    pub degree: u32,
+    pub n_vars: usize,
+    pub support_local: bool,
+    pub min_fall_degree: u32,
+    pub closure_rounds: u32,
+    pub words: usize,
+    pub columns: &'a [u64],
+    pub pending: &'a [u32],
+    rows: &'a [LazyRow],
+}
+
+impl ClosureView<'_> {
+    pub fn n_rows(&self) -> usize {
+        self.rows.len()
+    }
+    /// Row `r`, all `words` words of it.
+    pub fn row(&self, r: usize) -> &[u64] {
+        &self.rows[r].data
     }
 }
 
@@ -2010,6 +2107,40 @@ impl ReducedBasis {
         support_local: bool,
         min_fall_degree: u32,
     ) -> Option<(Self, InheritCost)> {
+        let (mut basis, mut cost) = Self::seed_closure(
+            system,
+            n_vars,
+            degree,
+            rounds,
+            support_local,
+            min_fall_degree,
+        )?;
+        basis.close(&mut cost);
+        Some((basis, cost))
+    }
+
+    /// Full MutantXL at fixed degree, stopped before its first round: the
+    /// root basis with the falls seeded and nothing multiplied out.  The
+    /// first state a closure checkpoint can hold; [`ReducedBasis::close_with`]
+    /// continues it.  [`ReducedBasis::from_system_closed_full`] is this plus
+    /// `close`, so the two reach the same basis.
+    pub fn seed_closure_full(
+        system: &[F2BoolPoly],
+        n_vars: usize,
+        degree: u32,
+        rounds: u32,
+    ) -> Option<(Self, InheritCost)> {
+        Self::seed_closure(system, n_vars, degree, rounds, false, 1)
+    }
+
+    fn seed_closure(
+        system: &[F2BoolPoly],
+        n_vars: usize,
+        degree: u32,
+        rounds: u32,
+        support_local: bool,
+        min_fall_degree: u32,
+    ) -> Option<(Self, InheritCost)> {
         let (mut basis, mut cost) = Self::from_system_with(system, n_vars, degree, support_local)?;
         if rounds == 0 || degree < min_fall_degree + 1 || basis.rows.is_empty() || basis.refuted {
             return Some((basis, cost));
@@ -2053,7 +2184,6 @@ impl ReducedBasis {
                 basis.pending.push(r as u32);
             }
         }
-        basis.close(&mut cost);
         Some((basis, cost))
     }
 
@@ -2081,6 +2211,141 @@ impl ReducedBasis {
     /// Whether the row space contains the constant `1`.
     pub fn is_refuted(&self) -> bool {
         self.refuted
+    }
+
+    /// The closure's state if it is between rounds: not refuted, every row
+    /// materialised in the current layout from its first word.  That holds
+    /// right after the seeding ([`ReducedBasis::seed_closure_full`]) and
+    /// after every absorbed round, which are the only points a checkpoint is
+    /// taken; anywhere else this is `None`.
+    pub fn closure_view(&self) -> Option<ClosureView<'_>> {
+        let epoch = self.epoch();
+        if self.refuted
+            || self.closure_rounds == 0
+            || self
+                .rows
+                .iter()
+                .any(|r| r.version != epoch || r.start != 0 || r.data.len() != self.words)
+        {
+            return None;
+        }
+        Some(ClosureView {
+            degree: self.degree,
+            n_vars: self.n_vars,
+            support_local: self.support_local,
+            min_fall_degree: self.min_fall_degree,
+            closure_rounds: self.closure_rounds,
+            words: self.words,
+            columns: &self.columns,
+            pending: &self.pending,
+            rows: &self.rows,
+        })
+    }
+
+    /// The basis a [`ClosureView`] described, rebuilt from `system` (the
+    /// same system, which the caller checks by digest) and the saved
+    /// parts.  It is a root-like basis, with no layout history: every row is
+    /// in the one layout, so `close_with` continues exactly as the
+    /// uninterrupted closure would.  `None` if the parts do not fit
+    /// (a row of the wrong length, rows without distinct leading columns,
+    /// a pending index out of range).
+    #[allow(clippy::too_many_arguments)]
+    pub fn from_closure_state(
+        system: &[F2BoolPoly],
+        n_vars: usize,
+        degree: u32,
+        support_local: bool,
+        min_fall_degree: u32,
+        closure_rounds: u32,
+        columns: Vec<u64>,
+        rows: Vec<Vec<u64>>,
+        pending: Vec<u32>,
+    ) -> Option<Self> {
+        let words = columns.len().div_ceil(64).max(1);
+        if rows.iter().any(|r| r.len() != words)
+            || pending.iter().any(|&p| p as usize >= rows.len())
+        {
+            return None;
+        }
+        let system = Rc::new(system.to_vec());
+        let generator_degrees = Rc::new(system.iter().map(poly_degree).collect());
+        let mut out = Self::assemble(
+            system,
+            generator_degrees,
+            n_vars,
+            degree,
+            support_local,
+            columns,
+            Vec::new(),
+        );
+        out.closure_rounds = closure_rounds;
+        out.min_fall_degree = min_fall_degree;
+        for row in rows {
+            let c = leading_column(&row)?;
+            if out.pivot_of[c].is_some() {
+                return None;
+            }
+            out.pivot_of[c] = Some(out.rows.len() as u32);
+            out.pivot_col.push(c as u32);
+            out.rows.push(LazyRow {
+                version: 0,
+                start: 0,
+                lead: (c / 64) as u32,
+                data: row.into(),
+            });
+        }
+        out.pending = pending;
+        Some(out)
+    }
+
+    /// A closure caught in the middle of a round's elimination
+    /// ([`RoundView`]), rebuilt from `system` and the saved parts: a shell
+    /// basis holding the layout, and the job to hand to
+    /// [`ReducedBasis::close_with`] as `resume`.  `None` if the parts do not
+    /// fit (a row of the wrong length, a position outside the matrix).
+    #[allow(clippy::too_many_arguments)]
+    pub fn from_round_state(
+        system: &[F2BoolPoly],
+        n_vars: usize,
+        degree: u32,
+        support_local: bool,
+        min_fall_degree: u32,
+        closure_rounds: u32,
+        columns: Vec<u64>,
+        was_pivot: Vec<bool>,
+        matrix: Vec<Vec<u64>>,
+        pivot_row: usize,
+        word: usize,
+    ) -> Option<(Self, RoundJob)> {
+        let words = columns.len().div_ceil(64).max(1);
+        if was_pivot.len() != columns.len()
+            || matrix.iter().any(|r| r.len() != words)
+            || pivot_row > matrix.len()
+            || word > words
+        {
+            return None;
+        }
+        let system = Rc::new(system.to_vec());
+        let generator_degrees = Rc::new(system.iter().map(poly_degree).collect());
+        let mut out = Self::assemble(
+            system,
+            generator_degrees,
+            n_vars,
+            degree,
+            support_local,
+            columns,
+            Vec::new(),
+        );
+        out.closure_rounds = closure_rounds;
+        out.min_fall_degree = min_fall_degree;
+        Some((
+            out,
+            RoundJob {
+                matrix,
+                was_pivot,
+                resume: Some((pivot_row, word)),
+            },
+        ))
     }
 
     /// Degree falls queued for closure and not yet multiplied out: `0`
@@ -2797,76 +3062,128 @@ impl ReducedBasis {
     /// the ideal, so the tail stays sound.  Each product is charged one
     /// word read per word of `q` and one written per word of the product.
     pub fn close(&mut self, cost: &mut InheritCost) {
+        self.close_with(cost, 0, None, &mut NoSink);
+    }
+
+    /// [`ReducedBasis::close`] from round `first_round`, offering `sink` its
+    /// resumable states: between rounds (when the closure has more to do) and
+    /// at each word boundary of a round's elimination.  `resume` continues a
+    /// round that a stop left in its elimination
+    /// ([`ReducedBasis::from_round_state`]).  A sink answering
+    /// [`CloseFlow::Stop`] ends the call there, the basis left mid-round and
+    /// not to be used again.  With a sink that always continues this is
+    /// `close`, round for round, charging the same work.
+    pub fn close_with(
+        &mut self,
+        cost: &mut InheritCost,
+        first_round: u32,
+        mut resume: Option<RoundJob>,
+        sink: &mut dyn ClosureSink,
+    ) -> CloseEnd {
         if self.closure_rounds == 0 || self.refuted {
             self.pending.clear();
-            return;
+            return CloseEnd {
+                rounds: first_round,
+                stopped: false,
+            };
         }
+        let mut done = first_round;
         let multipliers = self
             .system
             .iter()
             .flat_map(|p| p.terms.iter())
             .fold(0u64, |acc, t| acc | t.mask)
             & all_variable_mask(self.n_vars);
-        for _ in 0..self.closure_rounds {
-            let work = std::mem::take(&mut self.pending);
-            if work.is_empty() {
-                break;
-            }
-            let mut products: Vec<Vec<u64>> = Vec::new();
-            let mut read_words = 0u64;
-            for r in work {
-                let r = r as usize;
-                if !self.is_fall(r) {
-                    continue;
-                }
-                let gap = self.degree - self.columns[self.pivot_col[r] as usize].count_ones();
-                let q = self.current_row(r, cost);
-                let mut q_monos: Vec<u64> = Vec::new();
-                for (i, &word) in q.live().iter().enumerate() {
-                    let base = (q.lead as usize + i) * 64;
-                    let mut bits = word;
-                    while bits != 0 {
-                        let b = bits.trailing_zeros() as usize;
-                        bits &= bits - 1;
-                        q_monos.push(self.columns[base + b]);
+        for _ in first_round..self.closure_rounds {
+            let mut job = match resume.take() {
+                Some(job) => job,
+                None => {
+                    let work = std::mem::take(&mut self.pending);
+                    if work.is_empty() {
+                        break;
                     }
-                }
-                for t in monomials_up_to_mask(multipliers, gap) {
-                    if t == 0 {
-                        continue;
-                    }
-                    let product = odd_terms(q_monos.iter().map(|&m| m | t));
-                    if !product.is_empty() {
-                        products.push(product);
-                        read_words += q.live().len() as u64;
-                    }
-                }
-            }
-            if products.is_empty() {
-                break;
-            }
-            self.extend_columns(&products);
-            let words = self.words;
-            cost.specialise_word_ops += read_words + (products.len() * words) as u64;
-            cost.closure_products += products.len() as u64;
-            let packed: Vec<Vec<u64>> = {
-                let index = self.column_index();
-                products
-                    .iter()
-                    .map(|monos| {
-                        let mut row = vec![0u64; words];
-                        for m in monos {
-                            let c = index[m];
-                            row[c / 64] |= 1u64 << (c % 64);
+                    let mut products: Vec<Vec<u64>> = Vec::new();
+                    let mut read_words = 0u64;
+                    for r in work {
+                        let r = r as usize;
+                        if !self.is_fall(r) {
+                            continue;
                         }
-                        row
-                    })
-                    .collect()
+                        let gap =
+                            self.degree - self.columns[self.pivot_col[r] as usize].count_ones();
+                        let q = self.current_row(r, cost);
+                        let mut q_monos: Vec<u64> = Vec::new();
+                        for (i, &word) in q.live().iter().enumerate() {
+                            let base = (q.lead as usize + i) * 64;
+                            let mut bits = word;
+                            while bits != 0 {
+                                let b = bits.trailing_zeros() as usize;
+                                bits &= bits - 1;
+                                q_monos.push(self.columns[base + b]);
+                            }
+                        }
+                        for t in monomials_up_to_mask(multipliers, gap) {
+                            if t == 0 {
+                                continue;
+                            }
+                            let product = odd_terms(q_monos.iter().map(|&m| m | t));
+                            if !product.is_empty() {
+                                products.push(product);
+                                read_words += q.live().len() as u64;
+                            }
+                        }
+                    }
+                    if products.is_empty() {
+                        break;
+                    }
+                    self.extend_columns(&products);
+                    let words = self.words;
+                    cost.specialise_word_ops += read_words + (products.len() * words) as u64;
+                    cost.closure_products += products.len() as u64;
+                    let packed: Vec<Vec<u64>> = {
+                        let index = self.column_index();
+                        products
+                            .iter()
+                            .map(|monos| {
+                                let mut row = vec![0u64; words];
+                                for m in monos {
+                                    let c = index[m];
+                                    row[c / 64] |= 1u64 << (c % 64);
+                                }
+                                row
+                            })
+                            .collect()
+                    };
+                    match self.absorb_begin(packed, cost) {
+                        Some(job) => job,
+                        None => {
+                            done += 1;
+                            continue;
+                        }
+                    }
+                }
             };
-            self.absorb(packed, cost);
+            let Some(rank) = self.absorb_eliminate(&mut job, cost, done, sink) else {
+                return CloseEnd {
+                    rounds: done,
+                    stopped: true,
+                };
+            };
+            self.absorb_finish(job, rank);
+            done += 1;
             if self.refuted {
                 break;
             }
+            if !self.pending.is_empty() && sink.after_round(self, cost, done) == CloseFlow::Stop {
+                return CloseEnd {
+                    rounds: done,
+                    stopped: true,
+                };
+            }
+        }
+        CloseEnd {
+            rounds: done,
+            stopped: false,
         }
     }
 
@@ -2878,9 +3195,14 @@ impl ReducedBasis {
     /// enough that the Four Russians kernel reduces it for a fraction of
     /// that.  Rows whose pivot column is new and whose leading degree is a
     /// fall's are queued for closure.
-    fn absorb(&mut self, batch: Vec<Vec<u64>>, cost: &mut InheritCost) {
+    ///
+    /// Three steps so that a closure can stop inside the elimination:
+    /// [`absorb_begin`](Self::absorb_begin) builds the matrix,
+    /// [`absorb_eliminate`](Self::absorb_eliminate) reduces it (resumably),
+    /// [`absorb_finish`](Self::absorb_finish) rebuilds the basis from it.
+    fn absorb_begin(&mut self, batch: Vec<Vec<u64>>, cost: &mut InheritCost) -> Option<RoundJob> {
         if batch.is_empty() {
-            return;
+            return None;
         }
         self.materialise_all(cost);
         let was_pivot: Vec<bool> = self.pivot_of.iter().map(Option::is_some).collect();
@@ -2895,7 +3217,81 @@ impl ReducedBasis {
             })
             .collect();
         matrix.extend(batch);
-        let rank = rref_f2_counted(&mut matrix, self.columns.len(), &mut cost.reduce_word_ops);
+        Some(RoundJob {
+            matrix,
+            was_pivot,
+            resume: None,
+        })
+    }
+
+    /// Reduce the round's matrix to reduced row echelon form, offering the
+    /// sink every word boundary when the Four Russians kernel runs.  Returns
+    /// the rank, or `None` if the sink stopped it (the job then holds the
+    /// partly reduced matrix and where it stopped).
+    fn absorb_eliminate(
+        &mut self,
+        job: &mut RoundJob,
+        cost: &mut InheritCost,
+        done: u32,
+        sink: &mut dyn ClosureSink,
+    ) -> Option<usize> {
+        let n_cols = self.columns.len();
+        if !rref_uses_four_russians(job.matrix.len(), n_cols) {
+            // Small matrices take the other kernels and finish in moments.
+            return Some(rref_f2_counted(
+                &mut job.matrix,
+                n_cols,
+                &mut cost.reduce_word_ops,
+            ));
+        }
+        let (columns, was_pivot) = (&self.columns, &job.was_pivot);
+        let (degree, n_vars, support_local) = (self.degree, self.n_vars, self.support_local);
+        let (min_fall_degree, closure_rounds) = (self.min_fall_degree, self.closure_rounds);
+        let base = *cost;
+        let mut ops = cost.reduce_word_ops;
+        let mut position = job.resume;
+        let end = {
+            let mut hook = |matrix: &[Vec<u64>], pivot_row: usize, word: usize, ops_now: u64| {
+                let mut at = base;
+                at.reduce_word_ops = ops_now;
+                let view = RoundView {
+                    degree,
+                    n_vars,
+                    support_local,
+                    min_fall_degree,
+                    closure_rounds,
+                    columns,
+                    was_pivot,
+                    matrix,
+                    pivot_row,
+                    word,
+                };
+                sink.in_round(&view, &at, done) == CloseFlow::Stop
+            };
+            crate::cryptanalysis::gf2_elim::rref_resumable(
+                &mut job.matrix,
+                n_cols,
+                &mut ops,
+                position.take(),
+                Some(&mut hook),
+            )
+        };
+        cost.reduce_word_ops = ops;
+        match end {
+            crate::cryptanalysis::gf2_elim::ElimEnd::Done(rank) => Some(rank),
+            crate::cryptanalysis::gf2_elim::ElimEnd::Stopped { pivot_row, word } => {
+                job.resume = Some((pivot_row, word));
+                None
+            }
+        }
+    }
+
+    fn absorb_finish(&mut self, job: RoundJob, rank: usize) {
+        let RoundJob {
+            mut matrix,
+            was_pivot,
+            ..
+        } = job;
         matrix.truncate(rank);
         let epoch = self.epoch();
         self.rows.clear();
