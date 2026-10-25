@@ -17,6 +17,20 @@ IC win. An earlier wall-pricing explanation was incorrect: n=13/n=23
 solvers use pinned word rates. The original PDFs are preserved with
 correction notices; corrected copies supersede that pricing paragraph.
 
+The follow-up browsing copies include the fully replayed 24-record quartic
+smoke, all N=58/60/100 capped probes and the one-cell zero-guess pilot.
+Quartic prices remain count conventions with missing physical conversion;
+all three larger degree-four outcomes remain unknown. The pilot's original
+draw 6 has no base points in either declared reference/twist prime subgroup,
+as established by the later subgroup relevance audit. A zero-guess Boolean
+refutation is not a complete IC relation or an algorithmic speed gain.
+The instruction profiles are attribution diagnostics, not benchmark timings.
+
+PENDING_ARTIFACTS.json records the two new oversized local PDF copies;
+it is not an uploaded manifest. Earlier tracked oversized copies and these
+new bytes must follow the artifact-store policy before publication. All
+existing PDFs and raw results remain unchanged.
+
 No `VALIDATION.json` is fabricated for an unqualified comparison. A matched
 full-cost rho reference, independent replay and complete cost validator
 would be needed for admission. Copies are byte-identical to the study;

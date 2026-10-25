@@ -17,12 +17,15 @@ assert.equal(data.rho_ratio,null);
 const hash=createHash('sha256').update(raw).digest('hex');
 const zero=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/guess-zero-draw6-20261025/row.json')));
 const quartic=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/quartic-smoke-20261025-02.json')));
+const subgroup=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json')));
 assert.equal(zero.status,'refuted');
 assert.equal(zero.draw,6);
 assert.deepEqual(zero.guessed_variables,[]);
 assert.equal(quartic.verified_records,24);
 assert.equal(quartic.replays.length,24);
 assert.ok(quartic.replays.every(r=>r.reproduced));
+assert.equal(subgroup.schema,'ic-fixture-subgroups/v2');
+assert.equal(subgroup.status,'all_lifts_trace_orders_and_membership_checks_agree');
 const fmt=n=>Number(n).toLocaleString('en-US',{maximumFractionDigits:8});
 const base='https://github.com/aburan28/crypto/blob/main/'+study;
 const begin='<!-- BEGIN IC ALGEBRAIC FOLLOWUP -->';
@@ -38,7 +41,8 @@ ${data.panels.map(p=>`<tr><td>${p.degree}</td><td>${fmt(p.complete_extractions)}
 <figure><img src="ic/algebraic-crossover-closure-ratios.svg" alt="Paired symmetric to direct solver-word ratios at closure caps two, three and four, over fields of degree thirteen to thirty-one" style="display:block;width:100%;max-width:900px;margin:auto;background:white"><figcaption>304 completed matched pairs per cap; native deterministic counts, no population interval or wall-time comparison. All completed extractions agree with an independent point oracle.</figcaption></figure>
 <p>At n=31, ell=4, the recorded geometric product dimensions are 4/7/10, versus 4/10/20 for random bases. That representation advantage does not establish a full-query gain. In the completed symmetric queries, 8,100 algebraic roots yield four verified x-multisets; 8,096 fail splitting or signed lifting.</p>
 <p>The balanced ell=8 three-set [7,15,23] fails on all eight assignments of original draw 0: each saturates degree four without refuting, charging ${fmt(data.balanced_guess_draw0.total_word_ops)} solver word operations in total. This rejects that set on that draw, not a global minimum. Smaller capped attempts and other draws remain separate obligations.</p>
-<p>A separate finite curve-membership audit finds that original UNSAT draw 5 and SAT draw 4 do not lift on the recorded E0 curve. Draw 0 lifts; subgroup membership remains unknown. The Boolean results remain valid, with this qualification on their relevance to ordinary curve queries.</p>
+<p>The x-only guessing fixtures do not specify a full curve or subgroup. A native audit checks explicit E0 and trace-one-a twist models in each exact field: ${fmt(subgroup.totals.in_generated_subgroup)} of ${fmt(subgroup.totals.lifted_target_models)} original/fresh target x-values lie in the declared cyclic subgroups, ${fmt(subgroup.totals.outside_generated_subgroup)} lie outside and ${fmt(subgroup.totals.generated_subgroup_unknown)} remain unknown. The initial 152 nulls are retained in a separate receipt; exact enumeration of an 11-point subgroup resolves them in the amended audit. This remains a uniform field-x fixture law, not an ordinary subgroup-query law.</p>
+<p>All seven original E0 factor bases have no points in its largest prime subgroup (r=991); draw 6 has none on either chosen model. The three selected SAT witnesses give signed curve relations, but none with every summand in the declared subgroup. This materially qualifies the ECDLP interpretation while preserving the finite Boolean results. <a href="${base}reports/run-fixture-subgroups-enumerated-20261025/report.pdf">Inspected subgroup report</a>.</p>
 <p>The larger-cap continuation observes a zero-guess degree-four refutation on original draw 6: ${fmt(zero.columns)} columns and ${fmt(zero.closure_word_ops)} solver word operations. Independent solver/cost replay is outstanding, and the remaining balanced-branch campaign is active. Larger N=58/60/100 probes saturate without refuting at degrees two and three; all degree-four outcomes remain unknown after allocation or entry caps.</p>
 <p>The separate quartic smoke now has 24/24 verified records and 24/24 identical deterministic replays over base-field sizes 6/8/10/12. Its prices use deterministic count conventions; construction, physical conversion and the wider crossover ladder remain separate obligations.</p>
 <p>No new complete-price IC/rho ratio is admitted. Completed n13/n23 solver charges use pinned word rates; the earlier wall-pricing explanation was incorrect and has an explicit native accounting audit. Construction/split costs remain incomplete in both raw S and the native bands. The progress ratio chart, leaderboard, best-of and exponent figures retain their existing values. Larger closure/guess panels and the quartic crossover ladder remain open.</p>
