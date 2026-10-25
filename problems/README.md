@@ -12,6 +12,7 @@ Keep resolved and superseded records in the index.
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
 | [Low-degree decomposition complete cost and scaling](ic-low-degree-complete-cost-and-scaling.md) | investigating | guess minima, larger closure and complete-price IC conclusions | all-branch replay, larger fixed points, native construction/split accounting and matched full-pipeline controls |
+| [Algebraic IC evidence publication](ic-algebraic-evidence-publication.md) | open | publishing new local results under the current artifact-store and approval gates | explicit publication approval, unchanged artifact upload/readback, final-source validation and a normal PR update |
 | [Quartic binary IC wide arithmetic](quartic-binary-ic-wide-scalars.md) | open | requested base-field m=16--18 crossover rungs | wider coefficients, keys, order/scalars, old-path agreement and complete verified ladder |
 | [NIST extension-twist composite cofactors](nist-extension-twist-composite-cofactors.md) | open | complete P-256 block-876 degree-2 extension-twist factorization; one timeout field | proper split of the exact remaining 444-bit residual followed by prime-certificate and exact-product replay |
 | [NIST factorization raw archive publication](nist-factorization-raw-archive-publication.md) | open | durable publication of complete R02 NFS evidence and R05 relation checkpoint, larger than Git's file limit | observed-ready AWS connection, unchanged archive uploads through `crypto store`, manifest commit and verified remote readback |
