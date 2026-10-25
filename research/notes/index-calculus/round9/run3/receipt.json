@@ -1,0 +1,85 @@
+{
+  "card_id": "CARD-HEIC-ROUND9-3",
+  "card_path": "research/notes/index-calculus/round9/CARD-HEIC-ROUND9-3.yaml",
+  "card_sha256": "48d62489b9d3e6dff3eadd0ffcd1769ee2c5248acad5116e0bb6396a0794497f",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r9/attempt3"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "r9-mkdir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--wait",
+        "--cpus",
+        "3",
+        "--out",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r9/attempt3/isolated_bench.jsonl",
+        "--label",
+        "R9",
+        "--",
+        "sh",
+        "-c",
+        "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r9/attempt2/rho_neg_bin > /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r9/attempt3/R9.txt 2>&1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": null,
+          "seconds": 540.101,
+          "timed_out": true
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": null,
+      "id": "r9-rho",
+      "index": 2,
+      "outputs": {},
+      "seconds": 540.101,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": true
+    }
+  ],
+  "commands_total": 9,
+  "commit": "0c5c5ba232c0d9fb76dfa2ce9763fc41b3d5bfbc",
+  "dirty_after": [
+    "research/notes/index-calculus/round9/CARD-HEIC-ROUND9-3.yaml",
+    "research/notes/index-calculus/round9/run3/cmd1.stderr",
+    "research/notes/index-calculus/round9/run3/cmd1.stdout",
+    "research/notes/index-calculus/round9/run3/cmd2.stderr",
+    "research/notes/index-calculus/round9/run3/cmd2.stdout"
+  ],
+  "dirty_before": [
+    "research/notes/index-calculus/round9/CARD-HEIC-ROUND9-3.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 2"
+}

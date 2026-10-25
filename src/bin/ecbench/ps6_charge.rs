@@ -44,7 +44,6 @@
 use std::collections::BTreeMap;
 use std::time::Instant;
 
-use crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugins;
 use crypto_lib::cryptanalysis::ic_boundary::{
     lift_abscissae, BinaryGroup, BinaryInstance, FactorBase, GroupOps, OracleCounters,
 };
@@ -400,8 +399,9 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for S4GroupLaw<'_> {
 
 const ORACLE_NAMES: [&str; 2] = ["semaev-s4-baseline", "semaev-s4-grouplaw"];
 
-/// This module's oracles, for the ecbench binary's plug-in table.  It adds
-/// no factor base: the arms use the library's `binary-subspace`.
+/// This module's oracles, for the ecbench binary's plug-in table
+/// (`binary_plugins` in `src/bin/ecbench.rs`).  It adds no factor base: the
+/// arms use the library's `binary-subspace`.
 pub fn oracle<'i>(
     name: &str,
     summands: u32,
@@ -413,27 +413,3 @@ pub fn oracle<'i>(
         _ => Box::new(S4GroupLaw::new(summands, instance)),
     })
 }
-
-/// The binary's whole plug-in table: PDP3's (factor bases and oracle) and
-/// this module's oracles.  `methods::register_binary_plugins` keeps the
-/// first registration only, so the two tables are merged here.
-pub fn plugins(pdp3: BinaryPlugins) -> BinaryPlugins {
-    // `BinaryPlugins` holds plain function pointers, so the merge needs the
-    // PDP3 table in a static; `OnceLock` keeps it for the two closures-free
-    // functions below.
-    let _ = PDP3.set(pdp3);
-    BinaryPlugins {
-        base: |name, instance| {
-            let pdp3 = PDP3.get()?;
-            (pdp3.base)(name, instance)
-        },
-        oracle: |name, summands, instance| {
-            oracle(name, summands, instance).or_else(|| {
-                let pdp3 = PDP3.get()?;
-                (pdp3.oracle)(name, summands, instance)
-            })
-        },
-    }
-}
-
-static PDP3: std::sync::OnceLock<BinaryPlugins> = std::sync::OnceLock::new();
