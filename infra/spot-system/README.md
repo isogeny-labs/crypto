@@ -4,15 +4,28 @@ Source and tests live here. Download the complete private deployment bundle,
 compiled runtime and workstation installer using [ARTIFACTS.md](ARTIFACTS.md)
 and its SHA-256 manifest. Publication checks are in [VALIDATION.md](VALIDATION.md).
 
+The [2026-10-19 interruption repair](RECOVERY_20261019.md) records the current
+partial migration, verified session-restore test and pending ownership handoff.
+Its incident status supersedes the earlier deployment observations below.
+
+[Run records](RUN_RECORDS.md) describe each managed experiment in versioned,
+harness-independent JSON. Codex, Claude, OpenCode or a terminal can submit
+`experiment-runner --root ROOT --resume state/JOB/run.json`; the background
+service resumes the latest valid checkpoint without the original agent session.
+
 [Checkpoint discovery](CHECKPOINT_DISCOVERY.md) inventories live experiments and
 checkpoint candidates. New manifest-contract jobs validate generation checksums
 and automatically select the newest valid state before resuming. A read-only
-timer writes the durable inventory every minute.
+timer writes the durable inventory 15 minutes after its previous run finishes.
+[Native factor-base checkpoints](NATIVE_CHECKPOINTS.md) save and restore the
+actual sparse-elimination state for new runs; existing old processes are separate.
 
-The AWS compute lifecycle is now enabled in an isolated managed workspace;
-IP cutover remains disabled to protect the original jobs. Launch validation
-hit the regional Spot quota. See [AWS deployment](AWS_DEPLOYMENT.md) and
-`validation/aws-deployment.json` for applied settings and the capacity gate.
+The AWS compute lifecycle and guarded IP failover are enabled in an isolated
+managed workspace. The controller keeps the original address on the source while
+it runs. The applied Standard Spot quota is 96 vCPUs. Private memory backups run
+every 15 minutes, and automatic recovery has passed two successive replacement
+hops on disposable hosts.
+See [AWS deployment](AWS_DEPLOYMENT.md) and `validation/aws-deployment.json`.
 
 This deployment targets one logical x86_64 host with 32 vCPUs and 128 GiB RAM
 in us-east-2. It uses Spot only, with capacity gaps accepted. It preserves
@@ -50,8 +63,8 @@ jobs are outside that scan. Tracking remains necessary for checkpoint recovery
 and coordinated job admission.
 
 `LifecycleEnabled` controls managed startup/shutdown independently of `Cutover`,
-which controls IP movement. The deployed settings enable the former and leave
-the latter false until the migration gates below are met.
+which arms guarded IP movement. Both are true in the deployed configuration;
+`ProtectedSource` prevents handoff while the original source is alive.
 The original host is outside the new Auto Scaling group and is not a shutdown
 target. The new Lambda role can change desired capacity only for its worker group.
 Stopping compute keeps EFS, backups, snapshots and the Elastic IP allocation;
@@ -96,8 +109,8 @@ run `python3 package_runtime.py`, upload it as
 `spot-client.tar.gz` contains a ready-to-install client package and a least-privilege
 IAM policy allowing only invocation of this stack's lifecycle Lambda. It contains
 no credentials, prompt text or private host keys. Download/extract it on the
-machine where Claude/Codex/OpenCode run, then run `python3 setup.py` inside its
-`spot-client` directory (`--profile NAME` selects an existing AWS CLI profile).
+machine where Claude/Codex/OpenCode run, then run `bash install_client.sh` inside its
+`spot-client` directory (`bash install_client.sh NAME` selects an existing AWS CLI profile).
 The client needs Python 3, AWS CLI v2, and authenticated InvokeFunction access.
 
 The installer preserves existing settings, backs up changed files, and merges:
@@ -112,11 +125,21 @@ The installer does not bypass this trust check. Hooks are best-effort: missing
 AWS access warns but does not block unrelated coding. Prompt/transcript input
 is neither uploaded nor saved. An interactive readiness wait is available with
 `python3 ~/.local/share/spot-system/wake.py --wait 600`; the function reports
-ready only after a ready group instance holds the expected Elastic IP.
+ready when the protected running source or a ready replacement holds the Elastic IP.
+The installed SSH ProxyCommand wakes capacity and obtains the current public host
+key through authenticated AWS before connecting. It retains strict host verification;
+no private host key is copied.
 
-These client hooks have been prepared and tested in temporary homes. They have
-not been installed on the user's workstation: this session controls the EC2
-host. Installing only on the Spot host cannot wake that same host while it is off.
+For desktop remote connections without coding-client hooks, run
+`python3 install_hooks.py --ssh-only --function FUNCTION --region REGION --profile PROFILE`
+on the client machine, using the deployment's lifecycle function and an existing
+authorized AWS profile. This installs the authenticated SSH proxy and preserves
+Claude, Codex and OpenCode hook settings. Reconnect the remote in the desktop
+app after repairing an earlier connection failure.
+
+The SSH-only recovery path has been installed and verified on the workstation.
+Coding-client hooks remain opt-in. Installing only on the Spot host cannot wake
+that same host while it is off.
 
 Hook schema references: [Codex hooks and trust](https://learn.chatgpt.com/docs/hooks),
 [Claude hook events](https://code.claude.com/docs/en/hooks),
@@ -132,9 +155,12 @@ Hook schema references: [Codex hooks and trust](https://learn.chatgpt.com/docs/h
 - Recovery snapshot requested: `snap-064b6480704e5ced9`. This is a live,
   crash-consistent disk snapshot, not an application checkpoint or RAM image.
 - No existing Auto Scaling membership was present.
-- Five running `factor_base_shape_ladder` jobs were found. The launcher has
-  no checkpoint, resume, or signal handling implementation. They have NOT
-  been migrated or made resumable. Do not terminate the host to test recovery.
+- The five original factor-base jobs finished normally after private CRIU backups
+  were enabled. Their completed summaries remain backed up.
+- The running Diem generator PID 400334 has independent private memory backups
+  and a tested four-thread compatible-worker copy restore. Both backup timers
+  run at 15-minute wall-clock boundaries; automatic recovery is armed. See
+  [CRIU_LOCAL.md](CRIU_LOCAL.md) and [validation](VALIDATION.md).
 
 ## Architecture and limits
 
@@ -146,7 +172,9 @@ EFS automatic backups are enabled; account backup policy/restore must be tested.
 EFS storage, throughput, backup, EC2 roots, IPv4, and snapshot charges are additional
 to compute. No snapshot expiry policy has been installed.
 
-The six currently matching types are m6a, m6i, m7a, m7i, m8a and m8i `.8xlarge`.
+The ordinary pool includes m6a, m6i, m7a, m7i, m8a and m8i `.8xlarge`.
+Unfinished legacy CRIU work temporarily restricts new placement to m8i; the
+controller releases this restriction after every group completes.
 Auto Scaling uses price-capacity-optimized placement and Capacity Rebalancing.
 Price protection defaults to 60% of AWS's optimal matching On-Demand price;
 this is not a fixed USD ceiling. It chooses capacity at launch/replacement;
@@ -203,105 +231,39 @@ must exist before using this example):
 ]
 ```
 
-## Staging and migration
+## Deployment, operations and remaining activation
 
-Build and check:
+The applied system and exact validation scope are documented in
+[AWS_DEPLOYMENT.md](AWS_DEPLOYMENT.md), [VALIDATION.md](VALIDATION.md) and
+[CRIU_LOCAL.md](CRIU_LOCAL.md). `aws-config.json` records current settings;
+`artifacts.json` identifies immutable private S3 releases. Keep prior releases
+for rollback. Stack updates preserve lifecycle-owned desired capacity and do not
+refresh active workers.
 
-```bash
-cd infra/spot-system
-python3 build_template.py > template.json
-python3 -m unittest discover -s . -p 'test_*.py' -v
-cfn-lint template.json
-aws cloudformation validate-template --region us-east-2 --template-body file://template.json
-```
+The current host and its original jobs are outside the managed ASG. Never
+terminate that source or move its IP as a validation shortcut. Replacements may
+restore registered legacy work only after EC2 confirms the previous owner and
+source have terminated. Each group must be ready on the same worker before
+address handoff. If capacity is unavailable, demand persists and the system waits.
 
-`spot-experiments` was initially prepared with capacity zero and cutover false,
-which remain template defaults. The current deployment enables wake/idle control
-in `/srv/experiments/spot-worker` while preserving the original IP. See the AWS
-deployment record for current runtime/parameters and the quota-blocked launch.
-Current resource ids, parameters, snapshot progress and remaining work are saved
-in the private release bundle's `status.json` (download instructions are in `ARTIFACTS.md`). Inspect its current state with:
+The original retained disk is a separate rollback resource. Native managed jobs
+use EFS; legacy images and complete outputs use private S3. New arbitrary jobs
+need a tested checkpoint contract or explicit, restore-tested CRIU enrollment.
+The native scanner's historical-archive coverage is explicitly partial.
 
-```bash
-aws cloudformation describe-stacks --region us-east-2 --stack-name spot-experiments
-```
+The laptop package is prepared and tested in temporary client homes. Installation
+on the user's laptop has not been executed because this session has only EC2
+access. After running it, review Codex `/hooks` and trust the exact definitions.
+Then the original command `ssh -i rootkey.pem ec2-user@3.134.144.201` uses the wake
+proxy. Existing SSH sessions still disconnect on host loss; reconnect resumes
+access after Spot recovery. Hooks transmit only lifecycle actions, not prompts.
 
-Before activation:
-
-1. Finish or checkpoint the five existing non-resumable experiments. Adding
-   checkpoint code to a new binary cannot retrofit running processes.
-2. Mount the stack's EFS output on the current host at `/srv/experiments`
-   using amazon-efs-utils with `tls,iam`. Copy required workspaces and dependencies;
-   verify hashes. Do not copy an actively changing multi-file checkpoint as
-   though it were a coherent generation. Keep the original disk as rollback.
-3. Choose an SSH host identity policy. `PreserveHostKeys=false` is the default:
-   workers have distinct keys, so verify each new fingerprint over SSM before
-   updating the client's known_hosts entry. Do not disable host verification.
-   Automatic approval review rejected copying the original private host keys
-   into shared EFS because this changes their credential storage boundary.
-   No keys have been copied. Only with explicit user approval, place original
-   keys in a root-owned, mode-700 `ssh-host-keys` directory on encrypted EFS
-   and set PreserveHostKeys=true. Bootstrap then imports that identity.
-4. Provide a validated jobs.json. Install workload dependencies via a tested
-   x86_64 AL2023 custom AMI, or a tested extension of bootstrap. The supplied
-   bootstrap installs node services, PostgreSQL, EFS utilities, AWS CLI and Python;
-   research tools still require migration.
-   Validate the image on every admitted CPU family. Keep the root device name
-   `/dev/xvda` and the bootstrap-compatible AL2023 environment.
-5. Stop only the original `spot-nodes.service` before handing node state to the
-   replacement; this releases its EFS writer lock and does not stop the existing
-   experiment processes. Update the stack to Capacity=1, Cutover=false, with the tested AMI. Prove
-   bootstrap and workload restore on the replacement via SSM. Keep live jobs
-   out of the manifest until they have stopped on the original host. The
-   original jobs are not members of the new supervisor's lock domain.
-6. Test graceful termination and a forced worker kill using a disposable job
-   and compare its final result to uninterrupted execution. Test EFS locking
-   across two instances, restart behavior, restore rejection of corrupt state,
-   and a lost instance without an interruption warning.
-7. After migration validation, review the stack update with Cutover=true;
-   LifecycleEnabled is already true in the deployed configuration. A prompt
-   then starts a worker; the IP moves once bootstrap is ready. This interrupts
-   SSH connections. Run this
-   from an independent session, not solely the SSH session being replaced.
-8. Verify reconnect using the original command and prove restart from a real
-   durable checkpoint before retiring the original instance.
-
-Do not run `terminate-instances` against the original host as a shortcut.
-For rollback, disable Cutover first to prevent the controller moving the address
-back, then associate the existing allocation with the original running host.
-Retained EFS and the original volume need explicit retention/cost management.
-
-## Validation status
-
-42 system tests and 20 native discovery tests passed locally; 35 earlier system
-tests also passed with temporary state on the actual
-mounted EFS before the final short-job timer and user-process guard cases. Tests include idle threshold boundaries, wake
-races, missing/stale activity, failed probes, draining-worker admission,
-hook merging and existing checkpoint tests,
-including forced worker death, checkpoint resume,
-spec-change rejection, duplicate supervisor serialization, and safe IP decisions.
-AWS validated the CloudFormation syntax; cfn-lint validated the resource schema.
-AWS resolved the requirements to six equivalent-size instance types.
-The real worker-report protocol (including the DynamoDB lease) published a busy,
-unknown report for the original host, and the packaged client invoked wake and
-release against the deployed Lambda and received the expected staged response.
-Both node endpoints passed checks and a node-service restart preserved the
-database identity. No live idle termination, new-worker cold boot, or workstation
-hook event has been exercised.
-
-The native discovery timer is installed on the original host and refreshes
-`/srv/experiments/discovery/current-host.json`. It identified the five existing
-factor-base workers without checkpoint interfaces. Full archive coverage is
-partial and explicitly reported; see `validation/current-host-discovery.json`.
-Discovery's native kill/restore fixture proves generation selection and supervisor
-integration, not recovery of these non-checkpointed live workers.
-
-The current host successfully mounted `fs-001b57936c90979ed` at `/srv/experiments`
-using TLS and IAM. amazon-efs-utils was installed on the host for that check.
-The mount is temporary; it has not been added to this host's fstab.
-No live experiment directories or private SSH keys have been copied into EFS.
-These checks do not establish a successful cross-AZ EFS mount, running-job
-migration, application checkpoint correctness, or a complete live failover.
+The newest validation includes 72 infrastructure tests, the 4,399-pass release
+library gate and two example tests, guarded controller/public-key invocation,
+managed cold boot, recurring private backup checks, automatic two-hop legacy
+recovery and the Diem copy restore. Earlier AMD cold boot, native cross-worker
+restore and live 30-minute managed shutdown also passed. Laptop event execution,
+universal memory recovery and partition-safe database failover are not claimed.
 
 Refresh actual Spot quotes at any time with `python3 prices.py`. At the first
 observation, m6a.8xlarge in us-east-2c was $0.2362/hour and the current

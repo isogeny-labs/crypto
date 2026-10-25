@@ -1,0 +1,123 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "XP-20261016-prime-base-oracle-tuning sizing probe B: heaviest 32-bit cells on the frontier 32-bit rung",
+ "description": "Pre-freeze sizing probe only (PROTOCOL.md section 10): wall and peak RSS of the largest grid cells at 32 bits. Frontier P32 curve, probe target seed disjoint from every protocol seed. Not a measurement; not decision-bearing.",
+ "workloads": {
+  "targets_per_curve": 1,
+  "target_seed": 20261018903,
+  "target_kind": "public",
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 4294967291,
+    "a": 4294967288,
+    "b": 31,
+    "group_order": 4294959973,
+    "r": 4294959973,
+    "gx": 2,
+    "gy": 2120051858
+   }
+  ]
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "o1-n512",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=512",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "167871873"
+    }
+   }
+  },
+  {
+   "name": "o1-n1024",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "167871873"
+    }
+   }
+  },
+  {
+   "name": "o1-n2048",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "mitm:negation_folded=1",
+     "max_trials": "167871873"
+    }
+   }
+  },
+  {
+   "name": "o3-n512",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=512",
+     "oracle": "mitm:m=3,negation_folded=1",
+     "max_trials": "167871873"
+    }
+   }
+  },
+  {
+   "name": "o3-n1024",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm:m=3,negation_folded=1",
+     "max_trials": "167871873"
+    }
+   }
+  },
+  {
+   "name": "o3-n2048",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "mitm:m=3,negation_folded=1",
+     "max_trials": "167871873"
+    }
+   }
+  },
+  {
+   "name": "o5-n2048",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract:m=3",
+     "max_trials": "167871873"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261018904,
+  "isolation_required": "L0",
+  "timeout_seconds": 1200
+ }
+}

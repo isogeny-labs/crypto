@@ -124,7 +124,7 @@ fn main() {
             .odd_heights(args.ell_max)
             .into_iter()
             .find(|&(_, h)| h >= 2);
-        if samples % 100 == 0 {
+        if samples.is_multiple_of(100) {
             eprintln!(
                 "  sample {samples}: t = {}, f_pi = {} ({:?}) [{:.1}s]",
                 disc.trace,
