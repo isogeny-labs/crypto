@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Benchmark validation gate rejects post-freeze rows](benchmark-validation-gate-postfreeze-rows.md) | investigating | repository-wide validated benchmark dashboard; 24 benchmark rows remain after v6/v7 validation and exact archival cleanup | source-bound evidence or exact archival disposition per row, then green gate |
 | [Executable odd-isogeny transfer to a rational quartic](odd-isogeny-quartic-transfer-execution.md) | open | complete L1/L2 transfer and solver-cost comparisons | checked quotients, rational maps, held-out coverage, source-answer replay and matched rho |
 | [Complete projective arithmetic for the Scholten genus-2 cohort](genus2-projective-transfer-backend.md) | open; two 1,260-target arms measured 2026-10-22 | universal completeness claim for the implemented weighted law; finite-cohort cost comparison is complete | proof of every implemented case on the model family and remaining exceptional-branch checks |
 | [Upper-size point-driven pencil elimination and full cohort](genus2-pencil-upper-size-elimination.md) | investigating | remaining 717 exact-order pencil targets and full cold cost comparison; first p=186,379 target reached a replayed 25-million-coefficient cap | scalable exact elimination or sufficient execution resources, then independent replay and source checks |
