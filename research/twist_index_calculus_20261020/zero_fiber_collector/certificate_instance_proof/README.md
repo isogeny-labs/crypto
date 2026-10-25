@@ -27,12 +27,16 @@ the original exported module and the failed run are preserved.
 Version 2 balances sum syntax and proves each of the four multiplier products
 separately before combining them. All ten theorem axiom sets must pass.
 The same three final statements, literal coefficients and one aggregate
-1,200-second/8 GiB Lean phase remain required. The changed proof encoding
-has not yet consumed the real candidate at this second source freeze.
+1,200-second/8 GiB Lean phase remain required. The second export passed
+with the identical statement hash. Its Lean phase also exited 1 with an
+out-of-memory panic; its recorded maximum RSS was 3,772,400 KiB under the
+8 GiB address-space bound. No instance theorem or IDC is accepted from
+either attempt. Both failed encodings and terminal receipts are retained.
 
 The original execution `../runs/certificate-instance-proof-v1/` and owner
 `twist-certificate-instance-proof-v1.service` are terminal, exit 1. The
-second execution is reserved as `../runs/certificate-instance-proof-v2/`.
+second execution `../runs/certificate-instance-proof-v2/` is also terminal,
+exit 1.
 Inspect the managed unit `twist-certificate-instance-proof-v2.service` and
 its receipts before any launch or resubmission. Use one worker, the shared
 busy reservation, 8 GiB and 1,200 seconds per proof/export/IDC phase.
@@ -42,7 +46,32 @@ This closes neither a curve/decoder/group bridge nor a parametric-family,
 full-panel, complete-cost or asymptotic claim. All three existing panel
 owners retain their workloads and deadlines. The raw16 and closure8 first
 system results are separately audited/repeated by that registered owner;
-they are not inferred from this instance proof. A final report, diagram and
-inspected PDF remain required after the proof attempt is terminal. A repeated
+they are not inferred from this instance proof. See the [report](REPORT.md),
+its editable source and inspected PDF for the actual bounded outcomes. A repeated
 factor excludes the current distinct-factor family; whether signed multisets
 produce nonzero folded rows is a separate unresolved relation-yield question.
+
+## Retained raw evidence
+
+`runs.tar.xz` is a deterministic archive of the two native gates, both failed
+proof runs, inspected layout sources/pages and the historical native progress
+snapshot. It also contains the closed raw16/closure8 system-0 cases and raw16
+system-1 case used in the report. No live panel tree is packed. The raw run
+paths remain rooted at the parent zero-fiber collector directory. From there:
+
+```sh
+(cd certificate_instance_proof && sha256sum -c runs.tar.xz.sha256)
+tar -xJf certificate_instance_proof/runs.tar.xz
+```
+
+Check the archive digest from this directory with `sha256sum -c
+runs.tar.xz.sha256`; its digest filename is local to this directory. To
+repack, run `bash .../certificate_instance_proof/archive-build.sh FRESH_PATH`
+from the repository root, using the full repository-relative script path.
+The script contains the exact closed-path list and deterministic options.
+Native source freezes, original packet/reference/public bindings and all
+failed logs are retained. The broader original 42-arm inputs/reference
+archive remains a separate prerequisite; this checkpoint does not repack it.
+Metadata copies under `../results/certificate-instance-proof-v1/` remain
+loose for source/protocol readers. The benchmark directory contains exact
+copies of the inspected PDF/SVG/PNG and is unlisted.

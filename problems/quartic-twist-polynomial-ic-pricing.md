@@ -85,6 +85,34 @@ The fixed diagnostic subsequently launched under
 at 2026-10-25T04:08:23Z, after its committed source/input freeze. Its
 complete comparison results remain pending; the full panels continue.
 
+The first fixed p37 seed0 phi system now has passing first/audit/A/A
+records for both diagnostic methods. Raw16 finds q squared at degree 12
+with 33,609,631 search multiplications; closure8 finds it at working
+degree 7, actual original-product degree 12, with 916,980. Sparse checks
+use 15,211 and 15,983 multiplications respectively. These are one-system
+certificate counts, not a complete filter or DLP comparison; even closure
+search exceeds this system's partial old F4 row count of 125,327. The
+registered doubling cases and full diagnostic remain under their owner.
+
+The [concrete instance verification](../research/twist_index_calculus_20261020/zero_fiber_collector/certificate_instance_proof/REPORT.md)
+independently verifies all 2,197 dense integer coefficient positions of
+`sum(h_i*f_i)=q^2+37*R`, with 454 nonzero coefficients of R. Both native
+gates pass 13 tests. Both actual Lean 4.34.1 encodings fail with an
+out-of-memory panic within their original 8 GiB address-space bounds;
+maximum RSS is 3,775,120 KiB (flat v1) and 3,772,400 KiB (balanced/product
+v2). Their statement hash is identical. Neither yields an accepted
+instance theorem, axiom audit or IDC. The original sources, integer lift
+and failed receipts are retained. This is a proof-encoding resource
+obstruction, not a failed arithmetic identity or mathematical impossibility.
+The next concrete proof obligation is a kernel-checked, bounded expansion
+of the same literal products and integer lift, followed by characteristic
+37 and repeated-factor implications, all ten axiom audits and the standard
+integer-lift IDC. Splitting normalization into small independently proved
+coefficient or product blocks is a candidate encoding; it has not been
+implemented or run. The same aggregate proof limit and full statement
+must be retained. A successful instance proof would still leave the
+native parser, field/group/decoder and parametric-family bridges open.
+
 ## Evidence and uncertainty
 
 - **Joint S5 construction, independently validated:** The
