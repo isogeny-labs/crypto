@@ -86,6 +86,7 @@ def audit(stratum_id: str, artifact: Path, artifact_sha: str,
     require(len(strata) == 1, "one frozen stratum")
     stratum = strata[0]
     metadata = json.loads(metadata_path.read_bytes())
+    provider_artifact_id = metadata["id"]
     build_metadata = json.loads(build_metadata_path.read_bytes())
     jobs = json.loads(jobs_path.read_bytes())
     run_id = metadata["workflow_run"]["id"]
@@ -266,7 +267,7 @@ def audit(stratum_id: str, artifact: Path, artifact_sha: str,
     return {"schema": "n83.natural-pattern-provider-audit/v1",
             "status": status,
             "run_id": run_id, "attempt": attempt, "stratum": stratum_id,
-            "artifact_id": metadata["id"],
+            "artifact_id": provider_artifact_id,
             "artifact_zip_sha256": artifact_sha,
             "build_artifact_id": build_metadata["id"],
             "build_artifact_zip_sha256": build_sha,
