@@ -146,10 +146,15 @@ S3, cgroup, stage and audit receipts on every terminal path. Its run status
 must be checked live; a queued dispatch or a completed constructed control
 does not establish natural yield or a runtime winner.
 [Run 40220890684](https://github.com/aburan28/crypto/actions/runs/40220890684)
-was accepted from exact source/protocol commit
-`2b7b04e1d613debe9d71c6403afba09ac3d9b289` and initially queued.
-Inspect that run's current provider jobs and artifact before interpreting an
-outcome or retrying; subsequent documentation commits are not its source.
+started from exact source/protocol commit
+`2b7b04e1d613debe9d71c6403afba09ac3d9b289` and [stopped at the S3
+access gate](linux-phase-first-20261025/attempt-1/RESULT.md). GitHub's AWS
+principal has no `GetObject` allow for the D18 manifest. The retained provider
+artifact proves that no binary build, cgroup preflight or worker search ran.
+An [exact two-object read policy](linux-phase-first-20261025/attempt-1/IAM_READ_PROPOSAL.md)
+is prepared but **not applied**. Explicit authorization for that persistent
+cross-service read is required before retrying; subsequent documentation
+commits are not the attempted run's source.
 
 That gate adds an opt-in `primary-full-d18-m4 positive|natural` worker with
 hard resource checks, durable phase/shape records, SAT-model verification,
