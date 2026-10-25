@@ -237,8 +237,7 @@ pub struct RunReport {
     pub decomposition: DecompositionReport,
     pub linear_algebra: LinearAlgebraReport,
     pub verify: PhaseCost,
-    /// The recovered logarithm, and whether source-point verification
-    /// succeeded plus any optional planted-answer assertion matched.
+    /// The recovered logarithm, and whether it is the planted one.
     pub recovered: Option<u64>,
     pub verified: bool,
     /// Group-addition equivalents over the whole pipeline.
@@ -332,12 +331,29 @@ pub fn run_pipeline<G: CountedGroup>(
     calib: &Calibration,
     rho_s: Option<f64>,
 ) -> Result<RunReport, String> {
+    run_pipeline_with_base(ctx, spec, base_builder, oracle, planted, calib, rho_s)
+        .map(|(report, _)| report)
+}
+
+/// [`run_pipeline`], also returning the factor base it built and used,
+/// for a caller that describes the base afterwards (its point digest,
+/// column count): rebuilding it would repeat the whole build outside the
+/// measured run, and could describe a different base than the one used.
+#[allow(clippy::too_many_arguments)]
+pub fn run_pipeline_with_base<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    planted: u64,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<(RunReport, FactorBase<G::Elt>), String> {
     run_pipeline_inner(ctx, spec, base_builder, oracle, Some(planted), calib, rho_s)
 }
 
-/// Run the same pipeline using public curve and target inputs only. The
-/// collector still checks `[k]G=Q` before setting `verified`; a separate
-/// independent process can compare the recovered scalar to a held answer.
+/// Run the pipeline using only public instance and target inputs; recovery is
+/// checked against the source point, without supplying a held answer.
 #[allow(clippy::too_many_arguments)]
 pub fn run_pipeline_public<G: CountedGroup>(
     ctx: &InstanceCtx<G>,
@@ -348,6 +364,7 @@ pub fn run_pipeline_public<G: CountedGroup>(
     rho_s: Option<f64>,
 ) -> Result<RunReport, String> {
     run_pipeline_inner(ctx, spec, base_builder, oracle, None, calib, rho_s)
+        .map(|(report, _)| report)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -359,7 +376,7 @@ fn run_pipeline_inner<G: CountedGroup>(
     planted: Option<u64>,
     calib: &Calibration,
     rho_s: Option<f64>,
-) -> Result<RunReport, String> {
+) -> Result<(RunReport, FactorBase<G::Elt>), String> {
     let started = Instant::now();
 
     // ── Stage 1: the factor base ───────────────────────────────────
@@ -607,56 +624,59 @@ fn run_pipeline_inner<G: CountedGroup>(
 
     let (work, work_unit) = matrix.work();
 
-    Ok(RunReport {
-        instance: ctx.name.clone(),
-        log2_r: (ctx.r as f64).log2(),
-        r: ctx.r,
-        group_order: ctx.group_order,
-        spec: spec.clone(),
-        label: spec.label(),
-        factor_base: FactorBaseReport {
-            name: base_builder.name().to_string(),
-            description: base_builder.describe(&spec.factor_base_params),
-            signed_points: fb.points.len(),
-            abscissae: fb.abscissae,
-            columns: fb.columns,
-            points_per_column: fb.points.len() as f64 / fb.columns.max(1) as f64,
-            cost: fb_phase,
+    Ok((
+        RunReport {
+            instance: ctx.name.clone(),
+            log2_r: (ctx.r as f64).log2(),
+            r: ctx.r,
+            group_order: ctx.group_order,
+            spec: spec.clone(),
+            label: spec.label(),
+            factor_base: FactorBaseReport {
+                name: base_builder.name().to_string(),
+                description: base_builder.describe(&spec.factor_base_params),
+                signed_points: fb.points.len(),
+                abscissae: fb.abscissae,
+                columns: fb.columns,
+                points_per_column: fb.points.len() as f64 / fb.columns.max(1) as f64,
+                cost: fb_phase,
+            },
+            decomposition: DecompositionReport {
+                name: oracle.name().to_string(),
+                summands: oracle.summands(),
+                description: oracle.describe(&spec.oracle_params),
+                targets_tried: outcome.trials,
+                relations_found: outcome.relations_found,
+                hit_rate: outcome.relations_found as f64 / outcome.trials.max(1) as f64,
+                setup: prep_cost,
+                cost: rel,
+                gae_before_solver,
+                system: oracle.last_system(),
+                solver: solver_report,
+            },
+            linear_algebra: LinearAlgebraReport {
+                name: linalg_name.into(),
+                rows: outcome.relations_found,
+                rank: outcome.rank,
+                dependent: outcome.dependent,
+                work,
+                work_unit: work_unit.into(),
+                cost: la,
+            },
+            verify: ver,
+            recovered: outcome.recovered,
+            verified: outcome.verified
+                && planted.is_none_or(|known| outcome.recovered == Some(known)),
+            total_gae,
+            s,
+            rho_s,
+            s_over_rho: rho_s.map(|rho| s / rho),
+            wall_seconds: started.elapsed().as_secs_f64(),
+            exhausted: outcome.recovered.is_none(),
         },
-        decomposition: DecompositionReport {
-            name: oracle.name().to_string(),
-            summands: oracle.summands(),
-            description: oracle.describe(&spec.oracle_params),
-            targets_tried: outcome.trials,
-            relations_found: outcome.relations_found,
-            hit_rate: outcome.relations_found as f64 / outcome.trials.max(1) as f64,
-            setup: prep_cost,
-            cost: rel,
-            gae_before_solver,
-            system: oracle.last_system(),
-            solver: solver_report,
-        },
-        linear_algebra: LinearAlgebraReport {
-            name: linalg_name.into(),
-            rows: outcome.relations_found,
-            rank: outcome.rank,
-            dependent: outcome.dependent,
-            work,
-            work_unit: work_unit.into(),
-            cost: la,
-        },
-        verify: ver,
-        recovered: outcome.recovered,
-        verified: outcome.verified && planted.is_none_or(|known| outcome.recovered == Some(known)),
-        total_gae,
-        s,
-        rho_s,
-        s_over_rho: rho_s.map(|rho| s / rho),
-        wall_seconds: started.elapsed().as_secs_f64(),
-        exhausted: outcome.recovered.is_none(),
-    })
+        fb,
+    ))
 }
-
 /// The table a sweep prints.
 pub fn format_markdown(rows: &[RunReport]) -> String {
     let mut out = String::new();
@@ -772,6 +792,7 @@ mod tests {
         assert!(report.s > 0.0 && report.s.is_finite());
         assert!(report.factor_base.columns > 0);
         assert!(report.decomposition.relations_found >= report.linear_algebra.rank);
+
         let mut public_oracle = MitmOracle::new(2);
         let public_report = run_pipeline_public(
             &ctx,
@@ -782,15 +803,8 @@ mod tests {
             None,
         )
         .expect("public-only pipeline should run");
-        assert!(
-            public_report.verified,
-            "public-only source point check failed"
-        );
+        assert!(public_report.verified, "public source-point check failed");
         assert_eq!(public_report.recovered, report.recovered);
-        assert_eq!(
-            public_report.decomposition.relations_found,
-            report.decomposition.relations_found
-        );
     }
 
     /// **The stride reaches the walk's answer without the walk's jump

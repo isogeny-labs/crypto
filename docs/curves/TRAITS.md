@@ -135,14 +135,13 @@ secp256k1.
   as `F[w]/(m)` with `m` certified irreducible by Rabin's test) find a
   certificate either way: a point whose `ℓ`-part has order `ℓ^{v_ℓ(N)}`
   (cyclic, the floor) or two independent points of order `ℓ` (rank 2,
-  the crater). For even `k` the test also tries the quadratic twist over
-  `GF(q^{k/2})`: there `λ^{k/2} = −1`, so a scalar puts all of `E[ℓ]`
-  in the twist's group (order `q^{k/2} + 1 + V_{k/2}(t, q)`) and a
-  Jordan block only a line. It runs after `E(GF(q^k))`, preserving every
-  earlier decision. Binary curves use the characteristic-2 group law in
-  affine coordinates, sampling points by solving `z² + z = x + a + b/x²`
-  (`y = xz`; half-trace in odd degree, a trace-1 element otherwise). The
-  search is bounded by `POINT_TEST_COST` scalar-
+  the crater). For even `k` the test runs instead on the quadratic twist
+  over `GF(q^{k/2})`: there `λ^{k/2} = −1`, so a scalar puts all of
+  `E[ℓ]` in the twist's group (order `q^{k/2} + 1 + V_{k/2}(t, q)`) and a
+  Jordan block only a line. It is tried after `E(GF(q^k))` itself, so
+  every level the earlier test decided is decided the same way. Binary curves use the char-2 group law in affine
+  coordinates, with points sampled by solving `z² + z = x + a + b/x²`
+  (`y = xz`; the half-trace in odd degree, a trace-1 element otherwise). The search is bounded by `POINT_TEST_COST` scalar-
   multiplication work, `ℓ ≤ 1000` and `k ≤ 64`; a test agrees with the
   division-polynomial test on every small curve where both run.
   The test runs over `GF(p)`, `GF(2^n)` and `GF(p^k)` for `ℓ ≤ 1000`
@@ -253,26 +252,22 @@ coordinate/order adapter is unavailable explicitly report `not_evaluated`;
 Curve25519 is one such record. A complete catalogue entry does not by itself
 certify its coordinates or group order.
 
-The current generated file contains 8211 records: 8035 registered models
-and 176 source records. Its per-record statuses are authoritative for this
-expanded catalogue.
-
-The following aggregate classification counts describe the earlier
-2288-record snapshot (2112 registry curves and 176 from the sources: 175
+In the current file (2572 registry curves and 176 from the sources: 175
 walked curves of the P-256 and P-224 isogeny classes and the ECC2K-130
-degree-263 descendant), `End(E)` is established for 1983 curves (878
-maximal, 1105 non-maximal) and unresolved for 270; 35 have a `Δ` that did
+degree-263 descendant), `End(E)` is established for 2713 curves (1154
+maximal, 1559 non-maximal) and unresolved for 21; 14 have a `Δ` that did
 not factor. Of the 1324 curves over `GF(p^k)`, `k > 1`, 1319 have a
 certified order (9 by generator, 1310 by point orders: 484 proved, 826
-probable). The levels behind it: 1246 decided by the scalar test on `E[ℓ]`
-(730 floors, 516 craters at depth 1), 982 by the prime-power test (459 one
-above the floor, 319 craters, 204 in between), 64 by the point test (52
-floors, 12 craters), 13 walker certificates (each agreeing with the test),
-111 from a certified `End(E)`, 228 where `f₀` is already prime to `ℓ`.
-What stays open: 202 levels the tests only bound (beyond the cost limit or
-`ℓ^j > 64`), 44 depth-1 primes beyond both tests' budgets (large `k`, or
-binary curves, which the point test does not cover), and 72 primes of `v`
-above the test's range. P-256's `Δ` factors with
+probable). The levels behind it: 1306 decided by the scalar test on `E[ℓ]`
+(787 floors, 519 craters at depth 1), 1278 by the prime-power tests (487 one
+above the floor, 377 craters, 414 in between), 74 by the depth-1 point test
+(58 floors, 16 craters; 6 of them on binary curves), 388 by isogeny walks
+(204 craters, 166 floors, 18 in between), 19 by `j(E) = j(O_K)` in a field
+of class number 1, 13 walker certificates (each agreeing with the test), 111
+from a certified `End(E)`, 243 where `f₀` is already prime to `ℓ`. What
+stays open: 21 levels, all but two on `GF(p^k)` curves whose `|d_K|` is far
+too large for a walk, at depth 1 beyond the point test's budget, and two on binary curves (`ℓ = 31` at depth 1 over
+`GF(2^47)`, `ℓ = 31543` over `GF(2^61)`). P-256's `Δ` factors with
 the committed hints as `−3·5·456597257999·p81·p136` (squarefree), so
 `v = 1`, `d_K = Δ` and `End(E) = O_K`, probable through its 136-bit prime
 (the 81-bit one is below the Miller–Rabin proof bound); every walked curve
