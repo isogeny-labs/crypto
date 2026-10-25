@@ -12,13 +12,17 @@ of the existing `taskq/deploy/aws` Redis/managed-worker stack.
   `3.134.144.201/32`, the current harness host. Change this allowlist explicitly
   before connecting from another host; the kubeconfig alone does not grant
   network access.
-- Two On-Demand `t3.medium` system nodes for DNS, CSI and Karpenter.
+- Two Spot system nodes for DNS, CSI and Karpenter, selected from four
+  compatible instance types. The node group has a two-node floor and a
+  three-node ceiling.
 - Karpenter 1.15.0, two replicas on system nodes, scoped controller IAM,
   node access entry, SQS interruption queue and EventBridge interruption rules.
 - `cpu-spot` NodePool: x86-64 Linux, Spot only, C/M/R generation 6+, instances
   with 8/16/32 vCPUs, excluding Flex families, aggregate limits of 64 vCPUs
   and 256 GiB RAM. CPU 0's whole physical core is reserved for housekeeping.
   No GPU or automatic On-Demand fallback is enabled.
+- `spot-only-policy.yaml` rejects Karpenter NodePools that omit a Spot-only
+  capacity requirement or request On-Demand capacity.
 - VPC CNI with network-policy support, CoreDNS, kube-proxy, metrics-server,
   EBS CSI, an encrypted `gp3` StorageClass and seven-day control-plane logs.
 - Versioned, encrypted S3 results bucket and immutable ECR repository
@@ -32,11 +36,12 @@ during concurrent provisioning; this is not a hard spending limit. Namespace
 quota separately caps admitted pod CPU requests and limits at 64. Spot capacity
 can be unavailable or interrupted; jobs needing recovery must checkpoint to S3.
 
-Estimated idle cost at 730 hours/month: about **$175/month** (EKS $73,
-two t3.medium nodes $60.74, NAT $32.85, its IPv4 $3.65, system gp3 disks $4.80).
-Spot workers, worker disks, stored artifacts/images, logs, requests and data
-transfer/processing are additional. The single NAT is a cost choice and an
-egress availability dependency. System nodes and EKS continue billing at idle.
+Idle costs include the EKS control plane, two Spot system nodes, NAT, public
+IPv4, and system EBS disks. Spot workers, worker disks, stored artifacts/images,
+logs, requests and data transfer/processing are additional. The single NAT is
+an egress availability dependency. System nodes and EKS continue billing at
+idle. The account-wide monthly AWS Cost Budget is $1,500 with alerts only;
+it does not stop new capacity.
 
 ## Install or resume
 
@@ -57,6 +62,25 @@ resources, Karpenter and its NodePool. An existing cluster must be ACTIVE; the
 script does not reconcile changes to existing VPC, nodegroup or EKS configuration.
 Review and apply those changes with eksctl/CloudFormation separately. Helm CRD
 upgrades also require explicit review; do not merely change the chart version.
+
+`spot-only-iam-policy.json` is the account's `SpotOnlyEC2Launch` IAM deny policy.
+It blocks direct `ec2:RunInstances` launches and `ec2:StartInstances` restarts
+unless the instance market type is Spot. It is attached to the `coreuser` IAM
+user and the `InstanceRole` and `spot-experiments-WorkerRole-G1FZ84yk3gS6`
+administrator roles. This identity policy does not govern the account root
+user, new roles, service-linked roles, EC2 Fleet requests or future Auto
+Scaling group purchase settings. Review those launch paths separately when
+adding infrastructure; the Karpenter admission policy and Spot EKS node group
+cover this deployment.
+
+The [2026-10-21 restart authorization receipt](validation/spot-restart-20261021.json)
+matches the committed policy to the live version and confirms those attachments.
+For `coreuser`, IAM simulation allows `StartInstances` with Spot market context
+and explicitly denies it with On-Demand context. A real EC2 Spot dry run returns
+`DryRunOperation`; no instance was started. The running/stopped inventory in
+`us-east-2` contained no On-Demand instance, so the On-Demand restart case is
+simulation evidence only. These checks establish authorization behavior, not a
+successful restart or coverage of other launch paths.
 
 The upstream Karpenter CloudFormation template is vendored unmodified from
 release v1.15.0; SHA-256:

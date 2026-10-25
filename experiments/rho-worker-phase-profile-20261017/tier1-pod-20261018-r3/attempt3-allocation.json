@@ -1,0 +1,194 @@
+{
+  "attempt": 3,
+  "computeType": null,
+  "containerDiskInGb": 30,
+  "costPerHr": 0.52,
+  "cpuFlavorId": "cpu5m",
+  "createdAt": "2026-10-18 20:42:49.741 +0000 UTC",
+  "desiredStatus": "RUNNING",
+  "first_attempt_audit_sha256": "32d25c37b3649deb10f694d9f048f1decb50ae02cbfaa06f568d59aee739f737",
+  "id": "94uxi8f876o5gz",
+  "imageName": "runpod/base:1.0.2-ubuntu2404",
+  "lastStartedAt": "2026-10-18 20:42:49.735 +0000 UTC",
+  "machineId": "jzinscrmhe26",
+  "measurement_change": "128 consecutive independently verified walkers per arm; unchanged 32-Q fixture, 4 repetitions, source and binary, CPU placement, A/A limits, and memory gate",
+  "measurement_tier": "tier1_instance",
+  "memoryInGb": 64,
+  "name": "rho-worker-tier1-20261018",
+  "portMappings": {
+    "22": 59070
+  },
+  "ports": [
+    "22/tcp"
+  ],
+  "process_isolation_receipt": {
+    "path": "/workspace/rho-worker-isolation-r2.json",
+    "record": {
+      "execution_cpu": 5,
+      "execution_sibling_cpu": 29,
+      "host_exclusivity": "unproven_container_allocation",
+      "housekeeping_cpus": [
+        2,
+        26
+      ],
+      "live_processes_after_nginx_stop": [
+        1,
+        41,
+        51,
+        8767,
+        8778,
+        8782
+      ],
+      "nginx_action": "stopped after unpinnable non-root nginx worker was observed",
+      "pod_id": "94uxi8f876o5gz",
+      "processes": [
+        {
+          "after": [
+            2,
+            26
+          ],
+          "before": [
+            2,
+            3,
+            4,
+            5,
+            26,
+            27,
+            28,
+            29
+          ],
+          "name": "start.sh",
+          "pid": 1,
+          "status": "pinned"
+        },
+        {
+          "after": [
+            2,
+            26
+          ],
+          "before": [
+            2,
+            3,
+            4,
+            5,
+            26,
+            27,
+            28,
+            29
+          ],
+          "name": "nginx",
+          "pid": 19,
+          "status": "pinned"
+        },
+        {
+          "error": "[Errno 1] Operation not permitted",
+          "pid": 20,
+          "status": "failed"
+        },
+        {
+          "after": [
+            2,
+            26
+          ],
+          "before": [
+            2,
+            3,
+            4,
+            5,
+            26,
+            27,
+            28,
+            29
+          ],
+          "name": "sshd",
+          "pid": 41,
+          "status": "pinned"
+        },
+        {
+          "after": [
+            2,
+            26
+          ],
+          "before": [
+            2,
+            3,
+            4,
+            5,
+            26,
+            27,
+            28,
+            29
+          ],
+          "name": "sleep",
+          "pid": 51,
+          "status": "pinned"
+        },
+        {
+          "after": [
+            2,
+            26
+          ],
+          "before": [
+            2,
+            3,
+            4,
+            5,
+            26,
+            27,
+            28,
+            29
+          ],
+          "name": "sshd",
+          "pid": 8741,
+          "status": "pinned"
+        },
+        {
+          "after": [
+            2,
+            26
+          ],
+          "before": [
+            2,
+            3,
+            4,
+            5,
+            26,
+            27,
+            28,
+            29
+          ],
+          "name": "bash",
+          "pid": 8752,
+          "status": "pinned"
+        },
+        {
+          "after": [
+            2,
+            26
+          ],
+          "before": [
+            2,
+            3,
+            4,
+            5,
+            26,
+            27,
+            28,
+            29
+          ],
+          "name": "python3",
+          "pid": 8753,
+          "status": "pinned"
+        }
+      ],
+      "schema": "rho-worker-pod-process-affinity-v1",
+      "timestamp_ns": 1792359338494868548
+    },
+    "sha256": "5d30cf849053622132b234821311e45fa4a411c5f51625f95ca60d36fe162568"
+  },
+  "receipt_source": "RunPod REST GET /v1/pods/{id}; redacted fields excluded",
+  "second_attempt_audit_sha256": "aeff4a753257498191e8d98db32b141f7cda8883034e3d0d9423245e075762ae",
+  "vcpuCount": 8,
+  "volumeInGb": 0,
+  "volumeMountPath": "/workspace"
+}

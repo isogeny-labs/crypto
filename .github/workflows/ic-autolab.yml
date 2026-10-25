@@ -16,6 +16,10 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+env:
+  # Runtime registrations hash the interpreter's existing stdlib bytecode.
+  # Keep the test controller from creating new caches after that snapshot.
+  PYTHONDONTWRITEBYTECODE: '1'
 concurrency:
   group: ic-autolab-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -137,7 +141,7 @@ jobs:
         run: |
           run_start=$(python research/ic_candidate_tournament_20260915/execution_ids.py \
             --workflow-run "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT" --lane controls)
-          python research/ic_candidate_tournament_20260915/generic_build_v2.py \
+          python research/ic_candidate_tournament_20260915/generic_build_v3.py \
             --out "$RUNNER_TEMP/ic-generic-build"
           python research/ic_candidate_tournament_20260915/goal_20260924/generic-scientific-admission/run_controls.py \
             --build "$RUNNER_TEMP/ic-generic-build" --out "$RUNNER_TEMP/ic-generic-admission" \
