@@ -27,6 +27,16 @@ def sha256(path):
     return digest.hexdigest()
 
 
+def raw_stream(run_dir, name):
+    compressed = run_dir / (name + ".gz")
+    plain = run_dir / name
+    require(not (compressed.exists() and plain.exists()),
+            f"{name}: ambiguous raw stream")
+    if compressed.exists():
+        return gzip.decompress(compressed.read_bytes())
+    return plain.read_bytes()
+
+
 def audit(run_dir, formulas_dir, archives_dir, worker, solver):
     require(sha256(HERE / "protocol.json") == FROZEN_PROTOCOL_SHA256,
             "frozen protocol changed")
@@ -45,6 +55,15 @@ def audit(run_dir, formulas_dir, archives_dir, worker, solver):
     require(sha256(worker) == protocol["worker_binary_sha256"]
             and sha256(solver) == protocol["solver_binary_sha256"],
             "binary digest")
+    require(sha256(HERE.parent / "external-xor-20261025/receipt.json")
+            == protocol["input_export_receipt_sha256"],
+            "source export receipt digest")
+    study = HERE.parent.parent
+    require(sha256(study / "pilot-01/manifest.json")
+            == protocol["public_manifest_sha256"]
+            and sha256(study / "pilot-01/probe-corpus.json")
+            == protocol["public_corpus_sha256"],
+            "public fixture digests")
     formula = formulas_dir / "hash_4_2/instance.xcnf"
     require(sha256(formula) == protocol["xcnf_sha256"], "XCNF digest")
     for role in ("base", "pool"):
@@ -53,8 +72,8 @@ def audit(run_dir, formulas_dir, archives_dir, worker, solver):
                 f"{role} archive digest")
     process = json.loads((run_dir / "process.json").read_bytes())
     summary = json.loads((run_dir / "summary.json").read_bytes())
-    stdout = (run_dir / "solver.stdout").read_bytes()
-    stderr = (run_dir / "solver.stderr").read_bytes()
+    stdout = raw_stream(run_dir, "solver.stdout")
+    stderr = raw_stream(run_dir, "solver.stderr")
     require(process["schema"] == "n83.local-xor-natural-access-process/v1"
             and process["command"] == [str(solver), *protocol["solver_flags"], str(formula)]
             and process["xcnf_sha256"] == protocol["xcnf_sha256"]
@@ -73,7 +92,8 @@ def audit(run_dir, formulas_dir, archives_dir, worker, solver):
     conflicts = int(counters[0]) if len(counters) == 1 else None
     status = process["status"]
     if status == "WATCHDOG":
-        require(process["exit_code"] < 0 and not statuses,
+        require(process["exit_code"] == -9 and not statuses
+                and conflicts is None and process["conflicts"] is None,
                 "watchdog classification")
     else:
         require(len(statuses) == 1 and statuses[0].decode() == status
