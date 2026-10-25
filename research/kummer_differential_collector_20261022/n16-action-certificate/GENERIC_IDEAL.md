@@ -27,8 +27,9 @@ For each recorded root `r`, put `U=u(r)`, `V=v(r)`, and
 `q2*x²+q1*x+q0`; its three residual coefficient polynomials have retained
 membership witnesses in `(E0,E1)`, and `q2=U²`. On `U!=0`, this yields
 `u'=x²+(q1/U²)*x+q0/U²`. Reducing `-L` modulo `u'` supplies the
-translated `b1'`. The direct cancelled chart and recorded conversion
-matrix then give a four-vector for `K(D+T_r)` with common denominator
+translated `b1'`. The direct cancelled degree-two chart matrix `C2`
+(distinct from the source degree-one conversion matrix `C1`) then gives a
+four-vector for `K(D+T_r)` with common denominator
 `U^6`.
 
 For all 105 rows the recorded converted action has first coordinate
@@ -36,7 +37,9 @@ For all 105 rows the recorded converted action has first coordinate
 `kappa_r != 0`. Each of the six projective cross-products between the
 translated four-vector and `M_r*K(D)` is explicitly represented as
 `A_ij*E0+B_ij*E1`; the retained remainder is empty. The conversion
-matrix is invertible by the earlier N16 determinant certificate. Thus the
+degree-two matrix `C2` is invertible by the later
+[separate determinant check](results/exceptional-ideal.json); the earlier
+N16 determinant field referred to `C1`. Thus the
 recorded matrix gives the same projective chart as the generic degree-two
 Jacobian translation on the open locus `U!=0`, conditional on the stated
 Mumford addition construction and recorded Rosenhain model.

@@ -61,7 +61,7 @@ addition to construct translated divisors, and the expected projection
 does not use the action matrix being tested. This is still a finite check
 of the chart's geometric interpretation, not an all-state theorem.
 
-## Open generic action identity
+## Historical generic proof gap (subsequently closed for the declared chart)
 
 For a branch root `r`, a generic divisor with `U=u(r)!=0` can be translated
 by taking `c=-v(r)/U`, `L=v+c*u`, and
@@ -73,12 +73,13 @@ K(u',v')  ~  M_r K(u,v)
 ```
 
 after clearing powers of `U` and reducing every cross-product modulo the
-two coefficients of `v²-f mod u`. The N16 packet does not contain that
-multivariate ideal-reduction certificate for any of the five roots. Matrix
+two coefficients of `v²-f mod u`. At the original N16 freeze, this packet
+did not contain a multivariate ideal-reduction certificate. Matrix
 involutions, commutation, product relations, and finite exceptional checks
-do not imply the generic geometric identity. This is the precise remaining
-all-state action gate. No collector or 1,260-target cohort was run; rho and
-end-to-end cost ratios remain **null**.
+alone did not imply the generic identity. The later exact packets below
+close the declared-chart action identities. No new signed collector or
+1,260-target cohort was run; its rho and end-to-end cost ratios remain
+**null**.
 
 The native validator recomputes all finite row counts, class/action
 coverage, source digests, and packet checksums. Hydrate artifact-store files
@@ -100,7 +101,34 @@ An independently implemented native checker verified **630 of 630** exact
 six-cross-product polynomial-ideal identities, with zero nonzero remainders.
 Each cleared translated vector uses `U^6`; in every row its action-side
 first coordinate is a nonzero scalar times `U=u(r)`. This establishes the
-recorded geometric action on the generic degree-two `U!=0` branch under the
-stated Mumford construction. The `U=0`, degree-one, and degree-zero branches
-remain unproved as all-state geometric identities, and no new complete
-collector or rho ratio was measured.
+recorded projective action for the **declared degree-two chart** on the
+generic `U!=0` branch under the stated Mumford construction. The generic
+packet by itself does not cover `U=0`, degree one, or degree zero; those
+declared-chart cases are addressed in the exceptional packet below.
+Geometric interpretation of the charts and a new collector/rho ratio
+remain unproved/unmeasured.
+
+## Corrected degree-one basis and exceptional branches
+
+The earlier [chart note](CHART_NONVANISHING.md) incorrectly identified the
+degree-two direct chart matrix `C2` with the source degree-one
+`conversion_matrix` (`C1`). Their third columns differ, and the earlier
+N16 determinant in `results/summary.json` was for `C1`. The corrected
+[exceptional packet](EXCEPTIONAL_IDEAL.md) checks nonzero determinants of
+**both** matrices on all 21 fields and retains the
+[wrong-basis raw diagnostic](results/exceptional-ideal-wrong-basis.json):
+when `C2` is wrongly used for degree one, all 105 exceptional pairs have
+six nonzero cross-products, and 84 of 105 `O`/torsion pairs mismatch.
+The original finite replay already used source `C1`, so its recorded
+27,470 matches remain unchanged.
+
+With the source `C1`, the corrected exact reduction gives six zero
+univariate cross-products for every one of the 105 `U=0` model/root pairs.
+The `O` to torsion and torsion to `O` projective checks are also exact in
+all 105 cases. The recorded matrix involutions derive the reverse
+degree-one action away from the branch root. This closes the action
+identities for the **declared charts** on every valid reduced degree-zero,
+one, and two divisor class of the 21 models, conditional on those charts
+representing the geometric Kummer embedding. That geometric chart
+interpretation, a signed relation-label-preserving collector using the
+action, and a new matched-rho end-to-end ratio remain unproved/unmeasured.

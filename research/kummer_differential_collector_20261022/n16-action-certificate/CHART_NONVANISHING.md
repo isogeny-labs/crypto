@@ -1,10 +1,17 @@
 # Exact nonvanishing of the cancelled chart; action gate still open
 
-This note uses the 21 frozen odd-prime Rosenhain models, their recorded theta
-constants, and the matrices in `results/summary.json`. It is an algebraic
-argument over each recorded field, not an extrapolation from the 27,470
-finite action comparisons. It does **not** certify that a recorded torsion
-matrix implements translation on every Jacobian class.
+This note uses the 21 frozen odd-prime Rosenhain models and their recorded
+theta constants. **Correction (25 October 2026):** an earlier version
+identified the degree-two chart matrix with
+`src/main.rs::conversion_matrix` and claimed that the degree-one candidate
+used the same matrix. That identification is false. The degree-two matrix
+`C2` and the source degree-one matrix `C1` have different third columns.
+The original finite replay used the actual source `C1`; its counts are
+unchanged. A retained [wrong-basis diagnostic](results/exceptional-ideal-wrong-basis.json)
+gives nonzero exceptional cross-products in all 105 pairs when `C2` is
+incorrectly reused for degree one. The corrected [exact packet](EXCEPTIONAL_IDEAL.md)
+checks both matrices and all branches. The algebra below is interpreted
+with this correction, and the original mistaken matrix claim is retracted.
 
 ## Degree-two chart
 
@@ -26,15 +33,16 @@ d = (lambda+nu, 1+mu, lambda+mu, 1+nu).
 ```
 
 Let `s=(a,b,c_theta,d_theta)` be the four recorded nonzero theta scaling
-constants, and let `C` be the recorded `general_conversion` matrix, with
+constants, and let `C2` be the **degree-two chart** matrix, with
 row `i` equal to
 
 ```text
-C[i,*] = s[i] * (c[i]*d[i], -c[i], d[i], -1).
+C2[i,*] = s[i] * (c[i]*d[i], -c[i], d[i], -1).
 ```
 
-This is exactly the construction in `src/main.rs::conversion_matrix`; the
-distinct name `c_theta` avoids confusing a theta scale with the array `c`.
+The distinct name `c_theta` avoids confusing a theta scale with the array
+`c`. `C2` differs from `src/main.rs::conversion_matrix`, which is the
+degree-one matrix `C1`; see the corrected proof packet for both exact rows.
 The direct cancelled chart has coordinate
 
 ```text
@@ -44,12 +52,14 @@ K_i = s[i] * ((c[i]-a0)*(d[i]+a1)-H).
 Expanding gives the **polynomial identity**
 
 ```text
-K = C * (1, -a1, -a0, a0*a1+H)^T.                           (2)
+K = C2 * (1, -a1, -a0, a0*a1+H)^T.                          (2)
 ```
 
 No Mumford equation or division is required for (2). The first entry of the
 right-hand input is 1. The exact finite-field determinant checks in
-`results/summary.json` show `det(C) != 0` in each of the 21 fields.
+`results/exceptional-ideal.json` show `det(C2) != 0` in each of the 21
+fields. The older `results/summary.json` determinant refers to `C1`, not
+`C2`.
 Consequently `K != 0` for **every** `a0,a1,b1` in each such field, including
 the source-zero locus `a0=b0=0`. In particular, the direct chart cannot fail
 by producing the zero vector on a valid degree-two Mumford divisor. This
@@ -65,14 +75,14 @@ checked this agreement on the 21,595 translated degree-two classes for
 which the source chart was nonzero and found the remaining 5,599 source-zero
 classes nonzero under the continuation.
 
-The candidate degree-one chart uses the **same** invertible matrix:
-`K_1(x)=C*(0,1,x,x²)^T`. Its input vector has second entry 1, hence it is
-also nonzero for every `x` over all 21 fields. This proves nonvanishing,
-not that `K_1(x)` is the geometric projection of `(x,y)-infinity` for every
-point, nor that it obeys every torsion action. For degree zero, the four
-recorded theta coordinates are nonzero by the separate exact checks.
+The source candidate degree-one chart uses the **different** matrix `C1`:
+`K_1(x)=C1*(0,1,x,x²)^T`. The exact packet independently checks
+`det(C1) != 0` on all 21 fields, so this vector is nonzero for every `x`.
+For degree zero, the four recorded theta coordinates are nonzero by the
+separate exact checks. The chart's geometric interpretation remains a
+separate question from its nonvanishing and algebraic action identities.
 
-## Remaining action identity
+## Action identities and remaining interpretation
 
 For each of the five recorded roots `r`, let `U=u(r)` and work first on
 `U != 0`. Put `c_r=-v(r)/U` and `L=v+c_r*u`. Because `L(r)=f(r)=0`, and
@@ -89,28 +99,21 @@ The second Mumford equation is
 2*b0*b1 - a1*b1² - R1 = 0.                                (3)
 ```
 
-An all-state action certificate for the recorded matrix `M_r` must clear
-the powers of `U` appearing in `u',v'`, substitute the polynomial direct
-chart into every projective cross-product
+The [generic ideal packet](GENERIC_IDEAL.md) clears `U^6` and reduces every
+projective cross-product
 
 ```text
 K_i(u',v') * (M_r K(u,v))_j
     - K_j(u',v') * (M_r K(u,v))_i,  0 <= i < j < 4,
 ```
 
-and reduce the resulting six polynomials modulo equations (1) and (3) over
-the **exact** field and constants of every one of the 21 models, for each
-of the five roots. The result must be zero polynomials, with the denominator
-and exceptional branches documented. The matrix identities and the finite
-Jacobian comparisons in this packet do not perform that reduction; the
-generic geometric identity remains **not established**. See
-[`problems/kummer-generic-action-identity.md`](../../../problems/kummer-generic-action-identity.md)
-for the explicit exit conditions. A successful generic certificate would
-still need the `U=0` branches and the degree-one/zero geometric charts to
-establish a complete all-state action law.
-
-**Subsequent result (25 October 2026):** the [generic ideal packet](GENERIC_IDEAL.md)
-now contains exact zero-remainder certificates for all 630 cross-products
-on the 105 recorded model/root pairs with `U!=0`, independently checked by
-native code. The preceding paragraph records the prior state of this
-packet; the exceptional and degree-one/zero branches it names remain open.
+modulo equations (1) and (3) over the exact field and constants of every
+model/root pair. It retains 630/630 zero remainders on `U!=0` and a
+separate native checker. The [exceptional packet](EXCEPTIONAL_IDEAL.md)
+uses the corrected source `C1` and proves the `U=0` identities and
+`O`/torsion cases; matrix involution yields the reverse degree-one action.
+These results establish the action identities for the **declared charts**
+on every valid reduced class of the 21 models. A source-independent proof
+that the declared formulas give the intended geometric Kummer embedding,
+and a complete signed collector cost against rho, remain open; see
+[`problems/kummer-generic-action-identity.md`](../../../problems/kummer-generic-action-identity.md).
