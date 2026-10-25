@@ -448,7 +448,10 @@ restarting from the seed as the thread does. It refuses an instance with
 `A = 2`: the hyperelliptic involution is the negation; a curve with more
 automorphisms is not detected.
 
-`rho.multitarget_pooled` is the one method whose run solves more than its
+`rho.multitarget_pooled` is registered `applies: prime_only` (single-word
+prime-field curves, the only instance family it implements): the planner
+refuses a binary or extension workload before a session starts, and `solve`
+refuses it again. It is the one method whose run solves more than its
 record's target. The record's target is solved last, after `L − 1` companion
 targets hashed to `⟨G⟩` by the public-target law (indices `2^40 + j`, the
 algorithm seed as the law's seed), whose logarithms nobody holds; the runner
