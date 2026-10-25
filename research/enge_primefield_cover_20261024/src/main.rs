@@ -156,13 +156,14 @@ fn recover(rows: &[Row]) -> Option<i64> {
         for v in &mut matrix[lead] {
             *v = m(*v * scale, ORDER);
         }
-        for r in 0..matrix.len() {
-            if r == lead || matrix[r][col] == 0 {
+        let known = matrix[lead].clone();
+        for (r, candidate) in matrix.iter_mut().enumerate() {
+            if r == lead || candidate[col] == 0 {
                 continue;
             }
-            let factor = matrix[r][col];
-            for j in col..=cols.len() {
-                matrix[r][j] = m(matrix[r][j] - factor * matrix[lead][j], ORDER);
+            let factor = candidate[col];
+            for (j, value) in candidate.iter_mut().enumerate().skip(col) {
+                *value = m(*value - factor * known[j], ORDER);
             }
         }
         pivot_row[col] = Some(lead);
@@ -379,7 +380,10 @@ fn degree(d: usize, shift: i64, elliptic: &[Point]) -> Value {
         .map(|r| r.iter().map(|(&p, &c)| (p, c)).collect())
         .collect();
     let probe = target_probe(d, &xs, &values, elliptic, &rows);
-    let gcd = (1..=d).rev().find(|k| d % k == 0 && 100 % k == 0).unwrap();
+    let gcd = (1..=d)
+        .rev()
+        .find(|k| d.is_multiple_of(*k) && 100usize.is_multiple_of(*k))
+        .unwrap();
     json!({
         "degree":d,"shift":shift,"genus":if d%2==1 {(3*d-1)/2} else {(3*d-2)/2},
         "gcd_d_p_minus_1":gcd,"cover_affine_points":projected.values().sum::<i64>(),

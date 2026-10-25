@@ -9,7 +9,7 @@ Parent study: [REPORT.md](../../REPORT.md).
 - Command: `cargo run --release --offline --manifest-path research/enge_primefield_cover_20261024/Cargo.toml --bin enge-primefield-cover-toy > research/enge_primefield_cover_20261024/reports/run-20261024T2315Z/results.json` from the repository root.
 - Input: hard-coded public curve `E/F_101: y^2=x^3+x+46`, `G=(2,37)`, `Q=(64,19)`, and exhaustive coefficient loops. No random seed; rho uses deterministic salts `0..20`.
 - Host: `ip-172-31-3-58.us-east-2.compute.internal`, x86-64, Intel Xeon 6975P-C, 32 logical CPUs. Shared-host execution, with no CPU pinning or isolation claim.
-- Source base revision: `5cb553810e5bbfbd8691ec614ffcaacefc625757` (`origin/main` at branch creation). The collector was formatted after this run with no logic change; its final source digest is `0dd6356fec61d216348ae1cda94343b6961a573fc97d449a30bb0b44e2ea2470`.
+- Source base revision: `5cb553810e5bbfbd8691ec614ffcaacefc625757` (`origin/main` at branch creation). The collector was formatted and linted after this run with no logic change. The current source digest is `4d5ed2e5ee973bbadffc69c4fb2286ccd5c2b6fad9ac7f8d77b258ea259409c1`; a fresh run from that source reproduced this JSON byte for byte.
 - Raw record: [results.json](results.json). Root copy: [toy_cover_sieve_result.json](../../toy_cover_sieve_result.json).
 - Result SHA-256: `4ec26659815293875c81529b02e22e8693c5eb45ad042fb0907ac23064a31864`.
 
