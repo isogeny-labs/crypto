@@ -21,6 +21,8 @@ mod exact;
 #[allow(dead_code)]
 #[path = "../src/bin/ecbench/structured_s4_math.rs"]
 mod math;
+#[path = "ic_qualified_query_fixtures/reference.rs"]
+mod reference;
 
 fn span(bs: &[u64]) -> Vec<u64> {
     math::span(bs)
@@ -366,11 +368,15 @@ fn fixtures(path: &str, m: usize, ell: usize, family: &str) {
 fn main() {
     let a: Vec<_> = std::env::args().skip(1).collect();
     match a.first().map(String::as_str) {
+        Some("audit") if a.len() == 3 => reference::run(&a[1], &a[2]),
+        Some("summary") if a.len() == 2 => reference::summary(&a[1]),
         Some("model") if a.len() == 2 => construct(a[1].parse().unwrap()),
         Some("fixtures") if a.len() == 5 => {
             fixtures(&a[1], a[2].parse().unwrap(), a[3].parse().unwrap(), &a[4])
         }
-        _ => panic!("model N | fixtures MODEL_JSONL M ELL FAMILY"),
+        _ => panic!(
+            "model N | fixtures MODEL_JSONL M ELL FAMILY | audit MODEL_JSONL INPUT | summary META"
+        ),
     }
 }
 
