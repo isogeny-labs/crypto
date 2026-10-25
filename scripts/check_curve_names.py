@@ -78,6 +78,35 @@ ARCHIVED_LABELS = {
             "K_1 / 2^17": "icv1-f2m17-tm101-00378d4e",
         },
     },
+    # Two unregistered curve IDs are retained in this frozen Certicom
+    # experiment and its generated mirrors. Permit only these exact bytes;
+    # new prose or regenerated artifacts must resolve through the registry.
+    "docs/ic/CERTICOM131_IC_PROGRAM.md": {
+        "sha256": "d71d901ba22434af1319fd2444a737a0a203a1077d0de571186d16f98343767f",
+        "labels": {},
+        "slugs": {
+            "icv1-fp30-t49927-d70f5de2",
+            "icv1-fp131-t29529377007934231835-9681b699",
+        },
+    },
+    "docs/index-calculus-scoreboard.html": {
+        "sha256": "2bb7fb8d2e1cf44ed7078ef76785d278d704b6eb083dd7c7ce6367dbc6ee8af7",
+        "labels": {},
+        "slugs": {"icv1-fp30-t49927-d70f5de2"},
+    },
+    "research/certicom131_ic_program_20261020/README.md": {
+        "sha256": "ea6d90006f2bf0d208609c19de030eec1e653bed54288ffbb9efce9b9264c02c",
+        "labels": {},
+        "slugs": {
+            "icv1-fp30-t49927-d70f5de2",
+            "icv1-fp131-t29529377007934231835-9681b699",
+        },
+    },
+    "research/certicom131_ic_program_20261020/pkm_ext/tables/p30.table.md": {
+        "sha256": "70872ddbc43345886c198e7c6f495850057ea1007ad2e90483e07512b8b33e8a",
+        "labels": {},
+        "slugs": {"icv1-fp30-t49927-d70f5de2"},
+    },
 }
 
 
