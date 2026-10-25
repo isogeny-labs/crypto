@@ -1,4 +1,4 @@
-"""The repository's standard isogeny-volcano heat map (`volcano-diagram/v2`).
+"""The repository's standard isogeny-volcano heat map (`volcano-diagram/v3`).
 
 Draws a recorded ℓ-isogeny volcano as stacked strata: each level is a
 shaded band holding an elliptical ring seen in perspective, the crater on
@@ -17,9 +17,9 @@ or from Python:
     from volcano_diagram import render
     render(spec, "out/volcano")
 
-Input (`volcano-diagram/v2`, see README.md):
+Input (`volcano-diagram/v3`, see README.md):
     {
-      "schema": "volcano-diagram/v2",
+      "schema": "volcano-diagram/v3",
       "ell": 2, "depth": 3,
       "title": "Measured 2-isogeny volcano heat map · ...",
       "subtitle": "run-...",                       # run or session id
@@ -35,8 +35,9 @@ Input (`volcano-diagram/v2`, see README.md):
       ],
       "edges": [{"a": 0, "b": 1, "status": "unverified"}]   # optional; default: nbrs, verified
     }
-`volcano-diagram/v1` input (a single `value` per vertex and `value_label`)
-is still accepted and drawn as one panel. Levels count down from the
+Version 3 adds `synthetic: true` for abstract vertices and simulated ranges.
+Version 2 and `volcano-diagram/v1` input (a single `value` per vertex and
+`value_label`) remain accepted. Levels count down from the
 crater: 0 = crater, depth = floor. Vertices with `level: null` are left
 out. Unverified edges are dashed.
 """
@@ -52,7 +53,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.patches import Ellipse, Rectangle  # noqa: E402
 
-SCHEMA = "volcano-diagram/v2"
+SCHEMA = "volcano-diagram/v3"
 CMAP = "YlOrRd"
 EDGE = "#c3c7cf"
 BAND = "#f4f6fb"
@@ -62,11 +63,11 @@ RING = "#1f4e9e"
 
 
 def _v2(spec):
-    """Accept v1 input as a one-metric v2 spec."""
-    if spec.get("schema") == SCHEMA:
+    """Normalize v1/v2 input; v3 adds an explicit synthetic presentation flag."""
+    if spec.get("schema") in (SCHEMA, "volcano-diagram/v2"):
         return spec
     if spec.get("schema") != "volcano-diagram/v1":
-        raise ValueError(f"expected schema {SCHEMA} or volcano-diagram/v1")
+        raise ValueError(f"expected schema {SCHEMA}, volcano-diagram/v2 or volcano-diagram/v1")
     out = dict(spec)
     out["metrics"] = [{"key": "value", "title": spec.get("value_label", "value"), "label": spec.get("value_label", "value")}]
     out["vertices"] = [dict(v, values={"value": v.get("value")}) for v in spec["vertices"]]
@@ -170,7 +171,10 @@ def _panel(ax, spec, metric, verts, pos, edges, depth):
         head = f"Level {i} · {name}" if name else f"Level {i}"
         ax.text(-width + 0.04, top - 0.05, head, fontsize=9, fontweight="bold", color=INK, va="top")
         cond = f"{ell ** i:,}"
-        cov = f"{counts[i]} curve{'' if counts[i] == 1 else 's'}" + ("" if measured[i] == counts[i] else f", {measured[i]} measured")
+        noun = "abstract vertex" if spec.get("synthetic") else "curve"
+        plural = "abstract vertices" if spec.get("synthetic") else "curves"
+        missing = "valued" if spec.get("synthetic") else "measured"
+        cov = f"{counts[i]} {noun if counts[i] == 1 else plural}" + ("" if measured[i] == counts[i] else f", {measured[i]} {missing}")
         ax.text(-width + 0.04, top - 0.20, f"{cov} · conductor {cond}", fontsize=7.5, color=MUTED, va="top")
 
     for (v, w), status in edges.items():
@@ -218,7 +222,8 @@ def _panel(ax, spec, metric, verts, pos, edges, depth):
     cb.set_ticklabels([_fmt(lo), _fmt((lo + hi) / 2), _fmt(hi)])
     cb.ax.tick_params(labelsize=8)
     across = "both levels" if depth == 1 else "all levels"
-    cb.set_label(f"{metric.get('label', metric['key'])} · one observed-range scale across {across}", fontsize=9, color=INK)
+    range_kind = "simulated" if spec.get("synthetic") else "observed"
+    cb.set_label(f"{metric.get('label', metric['key'])} · one {range_kind}-range scale across {across}", fontsize=9, color=INK)
     return highlights
 
 

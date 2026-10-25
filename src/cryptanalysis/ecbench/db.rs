@@ -401,7 +401,13 @@ fn comparison_row(out: &mut String, c: &Comparison) {
         f(c.ops.ci95.map(|x| x.1)),
         b(c.ops.bounded),
         ts(&c.wall.status),
-        f(c.wall.median_ratio),
+        // `wall_ratio` is the statistic `wall_ci_*` bounds: the v2
+        // per-operation ratio, or the v1 median per-pair ratio.
+        f(if c.schema == crate::cryptanalysis::ecbench::compare::COMPARISON_SCHEMA {
+            c.wall.median_ratio
+        } else {
+            c.wall.ratio_b_over_a
+        }),
         f(c.wall.ci95.map(|x| x.0)),
         f(c.wall.ci95.map(|x| x.1)),
         ts(&c.verdict),
@@ -497,14 +503,73 @@ fn dump_rows(out: &mut String, d: &FactorBaseDump) {
     }
 }
 
-/// SQL for one path: a session directory, a comparison file or a
-/// factor-base dump, recognised by content.
+/// `kind`, curve and factor-base id read from an object's name, by the
+/// convention `factor-bases/<ICV1 slug>/<FB1 id>.json`.
+fn store_name_parts(name: &str) -> (String, Option<String>, Option<String>) {
+    let parts: Vec<&str> = name.split('/').collect();
+    let kind = parts[0].to_string();
+    if kind != "factor-bases" || parts.len() < 3 {
+        return (kind, None, None);
+    }
+    let file = parts[parts.len() - 1];
+    let stem = file.rsplit_once('.').map_or(file, |(s, _)| s);
+    let fb_id = stem.starts_with("FB1h").then(|| stem.to_string());
+    (kind, Some(parts[1].to_string()), fb_id)
+}
+
+/// Replace the store tables with the content of a store index.
+fn store_rows(out: &mut String, v: Value) -> Result<(), String> {
+    let index: crate::store::index::Index =
+        serde_json::from_value(v).map_err(|e| format!("store index: {e}"))?;
+    out.push_str(
+        "DELETE FROM store_superseded;\nDELETE FROM store_tags;\nDELETE FROM store_objects;\n",
+    );
+    for (name, e) in &index.entries {
+        crate::store::index::validate_name(name)?;
+        crate::store::index::validate_sha256(&e.sha256)?;
+        let (kind, curve, fb) = store_name_parts(name);
+        let _ = writeln!(
+            out,
+            "INSERT INTO store_objects VALUES ({}, {}, {}, {}, {}, {}, {}, {});",
+            ts(name),
+            ts(&e.sha256),
+            e.bytes,
+            ts(&kind),
+            t(curve.as_deref()),
+            t(fb.as_deref()),
+            ts(&e.description),
+            ts(&e.provenance),
+        );
+        for tag in &e.tags {
+            let _ = writeln!(
+                out,
+                "INSERT INTO store_tags VALUES ({}, {});",
+                ts(name),
+                ts(tag)
+            );
+        }
+        for old in &e.superseded {
+            let _ = writeln!(
+                out,
+                "INSERT INTO store_superseded VALUES ({}, {}, {});",
+                ts(name),
+                ts(&old.sha256),
+                old.bytes
+            );
+        }
+    }
+    Ok(())
+}
+
+/// SQL for one path: a session directory, a comparison file, a
+/// factor-base dump or a store index, recognised by content.
 pub fn sql_for_path(path: &Path) -> Result<String, String> {
     let mut out = String::new();
     if path.is_dir() {
         let session = read_session(path)?;
         let host: HostCapsule = serde_json::from_str(
-            &std::fs::read_to_string(path.join("host.json")).map_err(|e| e.to_string())?,
+            &std::fs::read_to_string(path.join("host.json"))
+                .map_err(|e| format!("{}: {e}", path.join("host.json").display()))?,
         )
         .map_err(|e| format!("host.json: {e}"))?;
         host_row(&mut out, &host);
@@ -532,7 +597,7 @@ pub fn sql_for_path(path: &Path) -> Result<String, String> {
     let text = std::fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
     let v: Value = serde_json::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))?;
     match v.get("schema").and_then(Value::as_str) {
-        Some(crate::cryptanalysis::ecbench::compare::COMPARISON_SCHEMA) => {
+        Some(s) if crate::cryptanalysis::ecbench::compare::is_comparison_schema(s) => {
             let c: Comparison = serde_json::from_value(v).map_err(|e| e.to_string())?;
             comparison_row(&mut out, &c);
         }
@@ -542,6 +607,9 @@ pub fn sql_for_path(path: &Path) -> Result<String, String> {
         }
         Some(crate::cryptanalysis::ecbench::claim::CLAIM_SCHEMA) => {
             claim_row(&mut out, &v).map_err(|e| format!("{}: {e}", path.display()))?;
+        }
+        Some(crate::store::index::SCHEMA) => {
+            store_rows(&mut out, v).map_err(|e| format!("{}: {e}", path.display()))?;
         }
         other => {
             return Err(format!(
@@ -567,6 +635,61 @@ pub fn sql(paths: &[&Path]) -> Result<String, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn store_names_give_their_curve_and_factor_base() {
+        assert_eq!(
+            store_name_parts("factor-bases/icv1-fp20-t727-cd198a38/FB1h4b3725c0aa92.json"),
+            (
+                "factor-bases".to_string(),
+                Some("icv1-fp20-t727-cd198a38".to_string()),
+                Some("FB1h4b3725c0aa92".to_string())
+            )
+        );
+        // A factor-base object that does not carry an FB1 id keeps its curve only.
+        assert_eq!(
+            store_name_parts("factor-bases/icv1-fp20-t727-cd198a38/notes.txt"),
+            (
+                "factor-bases".to_string(),
+                Some("icv1-fp20-t727-cd198a38".to_string()),
+                None
+            )
+        );
+        // Other kinds, and short names, read nothing from the name.
+        assert_eq!(
+            store_name_parts("evidence/x/y"),
+            ("evidence".to_string(), None, None)
+        );
+        assert_eq!(
+            store_name_parts("factor-bases/flat.json"),
+            ("factor-bases".to_string(), None, None)
+        );
+    }
+
+    #[test]
+    fn a_store_index_replaces_the_store_tables() {
+        let sha = "ab".repeat(32);
+        let v = serde_json::json!({
+            "schema": crate::store::index::SCHEMA,
+            "entries": {
+                "factor-bases/icv1-fp20-t727-cd198a38/FB1h4b3725c0aa92.json": {
+                    "sha256": sha, "bytes": 3992, "description": "it's a dump",
+                    "tags": ["fb"], "superseded": [{"sha256": "cd".repeat(32), "bytes": 7}]
+                }
+            }
+        });
+        let mut out = String::new();
+        store_rows(&mut out, v).unwrap();
+        assert!(out.starts_with("DELETE FROM store_superseded;"), "{out}");
+        assert!(out.contains("'it''s a dump'"), "{out}");
+        assert!(out.contains("INSERT INTO store_tags"), "{out}");
+        assert!(out.contains("INSERT INTO store_superseded"), "{out}");
+        assert!(out.contains("'FB1h4b3725c0aa92'"), "{out}");
+        // A forged digest or a hostile name is refused, not emitted.
+        let bad = serde_json::json!({"schema": crate::store::index::SCHEMA,
+            "entries": {"../x": {"sha256": sha, "bytes": 1}}});
+        assert!(store_rows(&mut String::new(), bad).is_err());
+    }
 
     #[test]
     fn literals_escape() {
