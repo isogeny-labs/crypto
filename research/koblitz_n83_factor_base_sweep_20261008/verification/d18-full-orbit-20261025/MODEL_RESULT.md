@@ -48,3 +48,6 @@ without a solver answer. It leaves the Linux positive-control gate open.
 The [shared-root opt-in model and planted control](shared-root-20261025/RESULT.md)
 remove 8,617,488 clauses exactly, but the latter is also censored at 300
 seconds. The Linux positive-control gate remains open.
+An [additional selector-and-phase pinned control](root-pinned-20261025/RESULT.md)
+returned a checked planted row with independent group replay; the original
+free-selector Linux positive-control and natural gates remain open.

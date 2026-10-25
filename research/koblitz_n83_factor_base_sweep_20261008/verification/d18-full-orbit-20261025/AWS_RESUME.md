@@ -87,6 +87,10 @@ does not replace the Linux control or justify a natural-yield estimate.
 The [opt-in shared-root comparison](shared-root-20261025/RESULT.md) reduced
 the full-base model by exactly 8,617,488 clauses, but its own planted
 control also reached the same 300-second cap without a solver answer.
+The [selector-and-phase pinned planted control](root-pinned-20261025/RESULT.md)
+subsequently passed with independent original-field group and row replay.
+It supplies a circuit correctness gate, not a free-selector or natural-yield
+result. Keep the Linux control and natural-query gates separate.
 That gate adds an opt-in `primary-full-d18-m4 positive|natural` worker with
 hard resource checks, durable phase/shape records, SAT-model verification,
 group lift, row replay and rank-one control. Its natural result requires a

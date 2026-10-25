@@ -89,4 +89,7 @@ Import plus model took 68.19 seconds process wall with a 5.31 GB peak memory
 footprint on an L0 local host. The [default planted control](l0-positive-20261025/RESULT.md)
 and [shared-root option](shared-root-20261025/RESULT.md) both constructed the
 complete model and ran bounded SAT search, but neither returned a solver
-answer. Natural relation yield and relation/rank stages remain unmeasured.
+answer. A further [root-choice pinned planted control](root-pinned-20261025/RESULT.md)
+returned a checked rank-one row with independent group replay; it supplied
+the choices to SAT and is excluded from natural useful-rank counts. Natural
+relation yield and full IC stages remain unmeasured.
