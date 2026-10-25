@@ -1215,8 +1215,12 @@ mod lock_and_capsule_tests {
     }
 
     fn options(d: &Path, lock: &str) -> GpuOptions {
+        let true_binary = ["/usr/bin/true", "/bin/true"]
+            .into_iter()
+            .find(|path| Path::new(path).is_file())
+            .expect("system true executable");
         GpuOptions {
-            binary: PathBuf::from("/bin/true"),
+            binary: PathBuf::from(true_binary),
             out: d.join("out"),
             mode: "rho".into(),
             args: vec![],
