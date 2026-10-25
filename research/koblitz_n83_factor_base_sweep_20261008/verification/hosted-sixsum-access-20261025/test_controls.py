@@ -8,6 +8,7 @@ from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
 from unittest import TestCase, main, mock
+from zipfile import ZipFile
 
 import blake3
 
@@ -17,6 +18,7 @@ import receipt_audit as pinned  # noqa: E402
 import audit  # noqa: E402
 import protocol  # noqa: E402
 import run  # noqa: E402
+import replay_artifact  # noqa: E402
 
 
 class SixSummandControls(TestCase):
@@ -88,6 +90,35 @@ class SixSummandControls(TestCase):
                          attempt["exporter_build_stderr_sha256"])
         self.assertIn(b"there are only 2 CPUs available", stderr)
         self.assertFalse(attempt["solver_search_executed"])
+        archive = HERE / "attempt-1.zip"
+        self.assertEqual(hashlib.sha256(archive.read_bytes()).hexdigest(),
+                         attempt["artifact_zip_sha256"])
+        files, _, size, _ = replay_artifact.members(archive)
+        self.assertEqual(size, attempt["artifact_size_bytes"])
+        self.assertEqual(len(files), attempt["artifact_zip_member_count"])
+
+    def test_artifact_replay_refuses_path_traversal(self) -> None:
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "artifact.zip"
+            with ZipFile(path, "w") as archive:
+                archive.writestr("../outside.json", "{}")
+            with self.assertRaisesRegex(ValueError, "unsafe or duplicate ZIP member"):
+                replay_artifact.members(path)
+
+    def test_artifact_replay_refuses_wrong_dispatch_head(self) -> None:
+        jobs = {"total_count": 1, "jobs": [{
+            "name": "six-summand-access", "run_id": replay_artifact.RUN_ID,
+            "run_attempt": 1, "head_sha": "0" * 40,
+            "status": "completed", "conclusion": "success", "id": 1,
+            "steps": [],
+        }]}
+        with TemporaryDirectory() as directory:
+            jobs_path = Path(directory) / "jobs.json"
+            metadata_path = Path(directory) / "metadata.json"
+            jobs_path.write_text(json.dumps(jobs))
+            metadata_path.write_text("{}")
+            with self.assertRaisesRegex(ValueError, "provider job head_sha changed"):
+                replay_artifact.provider(jobs_path, metadata_path, 0, "0" * 64)
 
     def test_hosted_build_cpu_limit_is_applied_to_pinned_command(self) -> None:
         supervisor = mock.Mock()

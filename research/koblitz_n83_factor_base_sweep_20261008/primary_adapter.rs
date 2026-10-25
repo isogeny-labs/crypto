@@ -1462,6 +1462,8 @@ mod tests {
         let mut opts = KoblitzIcOptions::default();
         opts.max_trials = 0;
         opts.allow_direct_relation = false;
+        // The 83-bit preflight does not require a native-word pair table.
+        opts.strategy = DecompositionStrategy::Enumerate;
         let report = koblitz_index_calculus_dlp_with_factor_base(
             &base.curve,
             base.curve.generator(),
