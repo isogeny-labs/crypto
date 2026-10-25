@@ -1160,7 +1160,7 @@ pub fn compare_loaded_weighted(
         wall,
         quality: Some(quality),
         verdict,
-        legacy_comparison_id: weight.is_none().then_some(legacy_id),
+        legacy_comparison_id: (weight.is_none() || weight == Some(0.0)).then_some(legacy_id),
         a_session_status: Some(sa.status.clone()),
         b_session_status: Some(sb.status.clone()),
         allow_interrupted: opts.allow_interrupted,
