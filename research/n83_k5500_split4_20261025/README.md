@@ -105,6 +105,9 @@ layout runs. Keep the split first and the monolithic layout second, with both
 stage caps fitting the remaining provider deadline; retain each incomplete
 stage and the provider deletion receipt.
 
+Install `python3` on the Pod after SSH is ready (`apt-get update -qq &&
+apt-get install -y -qq --no-install-recommends python3`); the frozen Rust
+image's startup command only installs the SSH and build dependencies.
 After the allocation receipt and the source bundle have been transferred to
 the Pod, [`pod_run.py`](pod_run.py) verifies the bundle and Rust source
 hashes, records cgroup CPU and memory limits, builds the release executable,
