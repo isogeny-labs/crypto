@@ -95,5 +95,5 @@ Hydrate and validate from the repository root:
 
 ```sh
 python3 tools/artifacts/artifacts.py pull research/kummer_differential_collector_20261022/n15-bounded-lift
-cargo run --offline --release --manifest-path research/kummer_differential_collector_20261022/n15-bounded-lift/Cargo.toml --bin validate
+cargo run --offline --locked --release --manifest-path research/kummer_differential_collector_20261022/n15-bounded-lift/Cargo.toml --bin validate
 ```
