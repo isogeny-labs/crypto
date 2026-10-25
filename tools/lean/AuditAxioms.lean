@@ -1,7 +1,7 @@
 /-
 Axiom audit for the repository's Lean proof gate (tools/lean/proof-gate.sh).
 
-Usage: lake env lean --run tools/lean/AuditAxioms.lean [--trusted FILE] <Module> [<Module> ...]
+Usage: lake env lean --run tools/lean/AuditAxioms.lean -- [--trusted FILE] <Module> [<Module> ...]
 
 Imports the named modules, then, for every theorem declared in them (including
 submodules sharing the prefix), collects the axioms it depends on transitively.

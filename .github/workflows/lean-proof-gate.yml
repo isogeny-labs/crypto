@@ -43,6 +43,10 @@ jobs:
     # exactly as expected, so it is exercised even with no proofs in the repo.
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|lean-proof-gate.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [pinned, 'leanprover/lean4:v4.19.0']
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,8 +54,11 @@ jobs:
           sparse-checkout: /tools/lean/**
       - name: Install elan
         run: |
-          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain "$(cat tools/lean/lean-toolchain)"
+          toolchain='${{ matrix.toolchain }}'
+          if [ "$toolchain" = pinned ]; then toolchain=$(cat tools/lean/lean-toolchain); fi
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain "$toolchain"
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+          echo "ELAN_TOOLCHAIN=$toolchain" >> "$GITHUB_ENV"
       - run: tools/lean/selftest/run.sh
 
   discover:
