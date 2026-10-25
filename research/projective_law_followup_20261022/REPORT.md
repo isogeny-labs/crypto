@@ -73,6 +73,19 @@ formulas; their agreement with the implementation is manually reviewed and
 sampled by the finite audit. A faithful mechanized theorem and independent
 mathematical peer review have not been recorded.
 
+The later [public author-source parity packet](public_source_parity/README.md)
+evaluated a strict translation of all 19 pinned author projective functions
+against compiled Rust and independent Cantor addition on the complete `F7`
+and `F11` valid-pair fixture under two weight assignments. All 34,704
+author/Rust comparisons and 34,704 Rust/Cantor comparisons matched; no
+undefined division or invalid author weight was recorded. The packet retains
+its [PDF](public_source_parity/REPORT.pdf), [graph](public_source_parity/GRAPH.svg),
+[standardized summary](public_source_parity/ROWS.csv), branch matrix, and
+[artifact manifest](public_source_parity/.artifacts.json) for the raw rows.
+Magma was unavailable, so the author program was source-translated rather
+than run in Magma. This finite check does not revise the 1,260-target cost
+ratios or prove universal projective-law correctness.
+
 The [protocol](PROTOCOL.md) defines the frozen input and accounting.
 [DATA_DICTIONARY.md](DATA_DICTIONARY.md) defines raw JSONL, per-target
 normalized records, cost grids, and failure fields. The independent Rust

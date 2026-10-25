@@ -338,3 +338,14 @@ replay, [PDF](../exceptional_source_bridge/REPORT.pdf),
 [graph](../exceptional_source_bridge/GRAPH.svg), and
 [CSV](../exceptional_source_bridge/ROWS.csv); it makes no cohort-cost or
 universal-law claim.
+
+The [public author-source parity packet](../public_source_parity/README.md)
+extends the source-evaluated comparison to all 34,704 weighted ordered-pair
+rows on the specified `F7` and `F11` fixtures. All author/Rust outputs and
+Rust/Cantor controls matched; the checker recorded no invalid weights or
+undefined divisions. Its [PDF](../public_source_parity/REPORT.pdf),
+[graph](../public_source_parity/GRAPH.svg),
+[summary CSV](../public_source_parity/ROWS.csv), branch matrix, and
+[raw artifact manifest](../public_source_parity/.artifacts.json) preserve the
+result. Magma was unavailable and was not executed; this remains a finite
+source-translation result, not a universal law or revised cost ratio.

@@ -117,6 +117,13 @@ for arbitrary inputs.
   the public inverse-first dispatcher. The [packet](../research/projective_law_followup_20261022/exceptional_source_bridge/README.md)
   preserves the initially failed assertion and corrected replay. No
   public-law discrepancy or cost change follows from this one input.
+- **Finite source-bound check, 2026-10-25 full small-field fixture:** The
+  [parity packet](../research/projective_law_followup_20261022/public_source_parity/README.md)
+  checks 34,704 weighted ordered pairs over the specified `F7` and `F11`
+  models. Source-evaluated author outputs match compiled Rust on all rows,
+  and Rust matches independent Cantor on all rows; undefined divisions,
+  invalid weights, and mismatches are zero. Magma itself was unavailable,
+  and these two fields do not prove universal formula or `Pic⁰` correctness.
 - **Suspected explanation:** None needed for the measured cost. Independent
   review of the written branch composition remains a proof obligation.
 - **Missing capability:** A mechanically derived or proved Rust-to-Lean
