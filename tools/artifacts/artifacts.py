@@ -620,7 +620,10 @@ def cmd_status(cfg: Config, args) -> int:
 
 def cmd_check(cfg: Config, args) -> int:
     """Fail when BASE..HEAD adds or grows a tracked file the policy assigns to the store."""
-    out = git(cfg.root, "diff", "--raw", "-z", "--no-renames", "--diff-filter=AM", args.base, args.head)
+    # Full object ids: the default 7-character ones cannot be looked up for a blob
+    # that is not in a blobless, sparse checkout (CI's), only a full id is fetched
+    # on demand, so `cat-file -s` below failed for any file outside the sparse set.
+    out = git(cfg.root, "diff", "--raw", "--no-abbrev", "-z", "--no-renames", "--diff-filter=AM", args.base, args.head)
     fields = out.decode(errors="surrogateescape").split("\0")
     offenders = []
     for meta, path in zip(fields[0::2], fields[1::2]):
