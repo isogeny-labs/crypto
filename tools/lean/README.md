@@ -15,13 +15,6 @@ collects each theorem's **transitive** axioms. Only `propext`,
 `Classical.choice` and `Quot.sound` are accepted. A grep cannot do this
 check, because a `sorry` or axiom can be several imports away.
 
-The gate supplies the trust-manifest path to the audit program through
-`LEAN_AUDIT_TRUSTED_FILE`. This keeps its command-line arguments as module
-names, including under Lean 4.19, whose CLI rejects a `--trusted` argument
-after `--run`. CI installs each target's pinned toolchain before the proof
-step and retries only transient installation failures; an axiom or build
-failure remains a failure.
-
 | outcome | meaning |
 |:--|:--|
 | `ok` | kernel-checked on the standard foundations |
@@ -47,8 +40,15 @@ tools/lean/proof-gate.sh --out receipts          # keep build and audit logs
 `Trusted.lean` is a listed `native_decide`), and `selftest/fail/` must fail
 (a transitive `sorry`, a user axiom, an unlisted `native_decide`, a file with
 no theorems, a build error). CI runs it on every trigger, so the gate stays
-exercised even in a repository with no Lean proofs yet. `LEAN_GATE_TRUSTED`
+exercised even in a repository with no Lean proofs yet. The CI matrix covers
+the repository's pinned toolchain and Lean 4.19, used by the SEA project.
+`LEAN_GATE_TRUSTED`
 points the gate at another trust manifest. The self-test uses its own one.
+
+The audit invocation separates compiler options from program arguments with
+`--`; the auditor accepts both toolchain conventions for forwarding that
+separator. Cache-download failures retain `cache.log` and an `INFRA_cache`
+status under `--out`, while still exiting with infrastructure status 3.
 
 ## What passing does not mean
 
