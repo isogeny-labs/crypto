@@ -428,6 +428,35 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "ic.hyperelliptic",
+            family: "ic",
+            summary: "Adleman–DeMarrais–Huang / Gaudry index calculus on a genus-2 Jacobian (genus2 workloads): factor base of degree-1 places, factor-base walk, smoothness by gcd, sparse elimination mod r; Jacobian group operations charged, field and row operations unpriced",
+            entry: "hyperelliptic_index_calculus::hec_index_calculus_dlp",
+            applies: Applies::Any,
+            params: &[
+                ParamDecl {
+                    name: "fb_size",
+                    default: Some("0"),
+                    help: "cap on the factor base (degree-1 places up to ±); 0 keeps every place",
+                },
+                ParamDecl {
+                    name: "extra_relations",
+                    default: Some("8"),
+                    help: "relations collected beyond the factor-base size",
+                },
+                ParamDecl {
+                    name: "max_trials",
+                    default: Some("2000000"),
+                    help: "relation-search trials before giving up",
+                },
+                ParamDecl {
+                    name: "large_primes",
+                    default: Some("0"),
+                    help: "1 keeps one-large-prime partials and combines pairs",
+                },
+            ],
+        },
+        MethodDecl {
             id: "claw.pair_table",
             family: "claw",
             summary: "four-point signed-Frobenius pair claw of aburan28/cryptanalysis#175: known-log orbit base, target-independent quotient pair table of M = c·√(r/n) classes, unique query pairs Q − (F_k + F_l); generic, mean S ≈ (c + 1/c)/√n, Koblitz curves only",
@@ -1337,6 +1366,7 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         ));
     }
     match inst {
+        Instance::Genus2(_) | Instance::Quartic(_) => jacobian_applicable(id, inst, curve),
         Instance::Wide(wi) => match id {
             "rho.signed_frobenius_strong"
             | "rho.signed_frobenius_strong_legacy"
@@ -1419,6 +1449,8 @@ pub fn solve(
     let mut rep = if let Instance::Wide(wi) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
         solve_wide(m, wi, tx, ty, seed)?
+    } else if matches!(inst, Instance::Genus2(_) | Instance::Quartic(_)) {
+        solve_jacobian(m, inst, curve, target, seed)?
     } else {
         let (tx, ty) = (parse_hex(&target[0])?, parse_hex(&target[1])?);
         solve_inner(m, inst, curve, run_d, tx, ty, seed)?
@@ -1624,10 +1656,186 @@ fn solve_inner(
             };
             solve_generic(m, &i.curve, i.generator, target, i.r, seed)
         }
-        (Instance::Wide(_), _) | (Instance::Fp4(_), _) | (Instance::Ext(_), _) => {
+        (Instance::Wide(_), _)
+        | (Instance::Fp4(_), _)
+        | (Instance::Ext(_), _)
+        | (Instance::Genus2(_), _)
+        | (Instance::Quartic(_), _) => {
             unreachable!("returned above")
         }
     }
+}
+
+/// The generic methods every Jacobian family runs, and those that need a
+/// free negation, which a plane-quartic Jacobian does not have (its
+/// negation costs about one group operation that the counted interface
+/// cannot charge).
+const JACOBIAN_GENERIC: &[&str] = &[
+    "rho.frozen_reference",
+    "rho.plain",
+    "rho.negation",
+    "bsgs.textbook",
+    "bsgs.interleaved",
+    "bsgs.negation",
+    "kangaroo.vow",
+];
+const NEEDS_FREE_NEGATION: &[&str] = &["rho.negation", "bsgs.negation"];
+
+/// Which methods run on a Jacobian (`ecbench::jacobian`,
+/// `ecbench::plane_quartic`), and why the others do not.
+fn jacobian_applicable(id: &str, inst: &Instance, curve: &CurveFacts) -> Result<(), String> {
+    let quartic = matches!(inst, Instance::Quartic(_));
+    if quartic && NEEDS_FREE_NEGATION.contains(&id) {
+        return Err(format!(
+            "`{id}` needs a free negation; on a plane-quartic Jacobian ({}) negation costs about one group operation, so run rho.plain or bsgs.textbook",
+            curve.slug
+        ));
+    }
+    if JACOBIAN_GENERIC.contains(&id) {
+        return Ok(());
+    }
+    if id == "ic.hyperelliptic" && matches!(inst, Instance::Genus2(_)) {
+        return Ok(());
+    }
+    Err(format!(
+        "`{id}` has no implementation on {} ({}); the generic methods {} run there",
+        curve.slug,
+        curve.family,
+        JACOBIAN_GENERIC
+            .iter()
+            .filter(|m| !(quartic && NEEDS_FREE_NEGATION.contains(m)))
+            .copied()
+            .collect::<Vec<_>>()
+            .join(", ")
+    ))
+}
+
+/// A Jacobian workload: decode the target class and run the method on
+/// the counted Jacobian group.
+fn solve_jacobian(
+    m: &ResolvedMethod,
+    inst: &Instance,
+    curve: &CurveFacts,
+    target: &[String; 2],
+    seed: u64,
+) -> Result<SolveReport, String> {
+    jacobian_applicable(&m.id, inst, curve)?;
+    match inst {
+        Instance::Genus2(i) => {
+            let t = i.decode(target)?;
+            if m.id == "ic.hyperelliptic" {
+                return solve_ic_hyperelliptic(m, i, t, seed);
+            }
+            solve_generic(m, &i.group(), i.generator, t, i.r, seed)
+        }
+        Instance::Quartic(i) => {
+            let t = crate::cryptanalysis::ecbench::plane_quartic::decode(&i.jac, target)?;
+            solve_generic(m, &i.group(), i.generator, t, i.r, seed)
+        }
+        _ => Err("not a Jacobian".into()),
+    }
+}
+
+/// `ic.hyperelliptic`: ADH/Gaudry index calculus on a genus-2 Jacobian.
+/// The relation search, its step precomputation and the verification are
+/// Jacobian group operations (charged, one GAE each, the workload's
+/// unit); the smoothness oracle's field multiplications and the
+/// elimination's row operations are native work, recorded and unpriced
+/// (AGENTS.md §5a prices them across the band).
+fn solve_ic_hyperelliptic(
+    m: &ResolvedMethod,
+    inst: &crate::cryptanalysis::ecbench::jacobian::Genus2Instance,
+    target: crate::cryptanalysis::genus2_fp::Divisor,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use crate::cryptanalysis::hyperelliptic_index_calculus::{
+        hec_index_calculus_dlp, HecIndexCalculusParams,
+    };
+    use crate::prime_hyperelliptic::{FpPoly, HyperellipticCurveP, MumfordDivisorP};
+    use num_bigint::BigUint;
+    let p = BigUint::from(inst.p());
+    let poly = |c: Vec<u64>| -> FpPoly {
+        FpPoly::from_coeffs(c.into_iter().map(BigUint::from).collect(), p.clone())
+    };
+    let curve = HyperellipticCurveP::try_new(p.clone(), poly(inst.curve.f().to_vec()), 2)
+        .map_err(|e| format!("{e:?}"))?;
+    let mumford = |d: &crate::cryptanalysis::genus2_fp::Divisor| MumfordDivisorP {
+        u: poly(d.u_coeffs()),
+        v: poly(d.v_coeffs()),
+    };
+    let fb = param_u64(m, "fb_size")?;
+    let params = HecIndexCalculusParams {
+        fb_size: if fb == 0 { usize::MAX } else { fb as usize },
+        extra_relations: param_u64(m, "extra_relations")? as usize,
+        max_trials: param_u64(m, "max_trials")? as usize,
+        seed,
+        large_primes: param_u64(m, "large_primes")? != 0,
+        ..HecIndexCalculusParams::default()
+    };
+    let t = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let (k, rep) = hec_index_calculus_dlp(
+        &curve,
+        &mumford(&inst.generator),
+        &mumford(&target),
+        &BigUint::from(inst.r),
+        &params,
+    );
+    measurement::end_online();
+    let wall = t.elapsed().as_nanos() as u64;
+    let recovered = k.and_then(|k| u128::try_from(k).ok());
+    let setup = GroupOps {
+        adds: rep.precompute_ops as u64,
+        ..GroupOps::default()
+    };
+    let search = GroupOps {
+        adds: (rep.jacobian_ops - rep.precompute_ops) as u64,
+        ..GroupOps::default()
+    };
+    let mut relations = ops_phase("relations", search);
+    relations
+        .native
+        .insert("smoothness_field_muls".into(), rep.smoothness_field_ops as u64);
+    let mut la = ops_phase("linear_algebra", GroupOps::default());
+    la.native.insert("row_ops".into(), rep.solve_row_ops as u64);
+    let mut counters = BTreeMap::new();
+    counters.insert("factor_base_size".into(), rep.factor_base_size as u64);
+    counters.insert("trials".into(), rep.trials as u64);
+    counters.insert("smooth_trials".into(), rep.smooth_trials as u64);
+    counters.insert("relations".into(), rep.relations as u64);
+    counters.insert("partial_relations".into(), rep.partial_relations as u64);
+    counters.insert("combined_relations".into(), rep.combined_relations as u64);
+    counters.insert(
+        "smoothness_field_muls_uncharged".into(),
+        rep.smoothness_field_ops as u64,
+    );
+    counters.insert("row_ops_uncharged".into(), rep.solve_row_ops as u64);
+    let total = setup.gae() + search.gae();
+    Ok(SolveReport {
+        recovered,
+        exhausted: recovered.is_none(),
+        phases: vec![ops_phase("setup", setup), relations, la],
+        total_gae: total,
+        automorphisms_used: 2,
+        unpriced: unpriced_of(&counters),
+        counters,
+        deterministic: true,
+        nondeterminism: vec![],
+        solve_wall_ns: wall,
+        factor_base: None,
+        detail: json!({
+            "smoothness_rate": rep.smoothness_rate(),
+            "walk_wall_ns": rep.walk_wall_ns,
+            "smoothness_wall_ns": rep.smoothness_wall_ns,
+            "solve_wall_ns": rep.solve_wall_ns,
+            "partial_wall_ns": rep.partial_wall_ns,
+            "discarded_off_base": rep.discarded_off_base,
+        }),
+        online: None,
+        online_error: None,
+        solver: None,
+        field_ops: None,
+    })
 }
 
 /// A GLS or subfield curve (`ecbench::ext`): the endomorphism-orbit rho
@@ -3237,6 +3445,9 @@ pub fn dump_factor_base(
     if let Instance::Fp4(_) = &inst {
         return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
     }
+    if let Instance::Genus2(_) | Instance::Quartic(_) = &inst {
+        return Err("no factor-base plug-in runs on a Jacobian; ic.hyperelliptic builds its own".into());
+    }
     if let Instance::Ext(_) = &inst {
         return Err("no factor-base plug-in runs on a gls_fp2 or subfield_fp3 curve".into());
     }
@@ -3343,7 +3554,9 @@ pub fn dump_factor_base(
         | Instance::Fp4(_)
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
-        | Instance::Ext(_) => unreachable!("returned above"),
+        | Instance::Ext(_)
+        | Instance::Genus2(_)
+        | Instance::Quartic(_) => unreachable!("returned above"),
     }
 }
 

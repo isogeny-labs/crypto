@@ -22,6 +22,8 @@ use crate::cryptanalysis::ecbench::canonical::{bare_id, compat_u128, derive_u128
 use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::Fp4Instance;
+use crate::cryptanalysis::ecbench::jacobian::Genus2Instance;
+use crate::cryptanalysis::ecbench::plane_quartic::QuarticInstance;
 use crate::cryptanalysis::ecbench_large_prime::binary_explicit_instance;
 use crate::cryptanalysis::gaudry_quartic::Pt4;
 use crate::cryptanalysis::gaudry_quartic_bin::{find_bin_curve, BinCurve, PtB, TowerBasis};
@@ -154,6 +156,46 @@ pub enum CurveSpec {
         p_bits: u32,
         seed: u64,
         max_cofactor_ratio: u64,
+    },
+    /// `jacobian::Genus2Instance::search(p_bits, seed, max_cofactor)`: the
+    /// Jacobian of an imaginary genus-2 curve `y² = f(x)`, `deg f = 5`,
+    /// over `F_p` (`5 ≤ p_bits ≤ 16`), `#J(F_p) = h·r`.  A class is
+    /// `[deg u·p² + u₁p + u₀, v₁p + v₀]`.  Unregistered: ICV1 names
+    /// elliptic curves only, so the slug is `jcv1-g2-…`.
+    Genus2Search {
+        p_bits: u32,
+        seed: u64,
+        max_cofactor: u64,
+    },
+    /// The same Jacobian given outright (what a measured child rebuilds):
+    /// `f` lowest degree first, `f[5] = 1`; the order is trusted, `G` is
+    /// checked to have order `r`.
+    Genus2Explicit {
+        p: u64,
+        f: [u64; 6],
+        group_order: u64,
+        r: u64,
+        gx: u64,
+        gy: u64,
+    },
+    /// `plane_quartic::QuarticInstance::search(p_bits, seed, max_cofactor)`:
+    /// the Jacobian of a smooth plane quartic (a non-hyperelliptic curve of
+    /// genus 3) over `F_p` (`5 ≤ p_bits ≤ 11`, `p ≥ 29`), `#J(F_p) = h·r`.
+    /// A class is two 60-digit hex strings (a canonical 3×10 echelon form).
+    PlaneQuarticSearch {
+        p_bits: u32,
+        seed: u64,
+        max_cofactor: u64,
+    },
+    /// The same Jacobian given outright: the 15 coefficients of `F` in the
+    /// order `X⁴, X³Y, X³Z, X²Y², …, Z⁴` (`X`-degree descending, then
+    /// `Y`), `X⁴` coefficient 1.
+    PlaneQuarticExplicit {
+        p: u64,
+        f: [u64; 15],
+        group_order: u64,
+        r: u64,
+        generator: [String; 2],
     },
 }
 
@@ -364,6 +406,35 @@ impl CurveSpec {
                 max_cofactor_ratio,
             } => ExtInstance::build_subfield(p_bits, seed, max_cofactor_ratio)
                 .map(|i| Instance::Ext(Box::new(i))),
+            CurveSpec::Genus2Search {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => Genus2Instance::search(p_bits, seed, max_cofactor)
+                .map(|i| Instance::Genus2(Box::new(i))),
+            CurveSpec::Genus2Explicit {
+                p,
+                f,
+                group_order,
+                r,
+                gx,
+                gy,
+            } => Genus2Instance::explicit(p, f, group_order, r, [gx, gy])
+                .map(|i| Instance::Genus2(Box::new(i))),
+            CurveSpec::PlaneQuarticSearch {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => QuarticInstance::search(p_bits, seed, max_cofactor)
+                .map(|i| Instance::Quartic(Box::new(i))),
+            CurveSpec::PlaneQuarticExplicit {
+                p,
+                f,
+                group_order,
+                r,
+                ref generator,
+            } => QuarticInstance::explicit(p, f, group_order, r, generator)
+                .map(|i| Instance::Quartic(Box::new(i))),
         }
     }
 
@@ -401,6 +472,24 @@ impl CurveSpec {
             // certified Frobenius action and endomorphism identity that a
             // generic explicit binary instance intentionally does not claim.
             // The search is the constructor (cheap and deterministic).
+            Instance::Genus2(i) => {
+                let (gx, gy) = super::jacobian::encode_g2(i.p(), &i.generator);
+                Some(CurveSpec::Genus2Explicit {
+                    p: i.p(),
+                    f: i.curve.f(),
+                    group_order: i.group_order,
+                    r: i.r,
+                    gx,
+                    gy,
+                })
+            }
+            Instance::Quartic(i) => Some(CurveSpec::PlaneQuarticExplicit {
+                p: i.jac.p,
+                f: i.jac.f,
+                group_order: i.group_order,
+                r: i.r,
+                generator: i.encode(&i.generator),
+            }),
             Instance::Binary(_)
             | Instance::Wide(_)
             | Instance::Fp4(_)
@@ -467,6 +556,22 @@ impl CurveSpec {
             } => format!(
                 "subfield_fp3::generate_subfield_instance({p_bits}, {seed}, false, {max_cofactor_ratio})"
             ),
+            CurveSpec::Genus2Search {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => format!("jacobian::Genus2Instance::search({p_bits}, {seed}, {max_cofactor})"),
+            CurveSpec::Genus2Explicit { p, f, .. } => {
+                format!("Genus2Curve::new({p}, {f:?}) (explicit)")
+            }
+            CurveSpec::PlaneQuarticSearch {
+                p_bits,
+                seed,
+                max_cofactor,
+            } => format!("plane_quartic::QuarticInstance::search({p_bits}, {seed}, {max_cofactor})"),
+            CurveSpec::PlaneQuarticExplicit { p, f, .. } => {
+                format!("QuarticJacobian::new({p}, {f:?}) (explicit)")
+            }
         }
     }
 }
@@ -487,6 +592,10 @@ pub enum Instance {
     /// A GLS curve over `F_{p²}` or a subfield curve on `E(F_{p³})`
     /// (`ecbench::ext`); a coordinate is one packed word.
     Ext(Box<ExtInstance>),
+    /// The Jacobian of a genus-2 curve (`ecbench::jacobian`).
+    Genus2(Box<Genus2Instance>),
+    /// The Jacobian of a smooth plane quartic (`ecbench::plane_quartic`).
+    Quartic(Box<QuarticInstance>),
 }
 
 /// A wide Koblitz curve and the strong reference's arithmetic on it, which
@@ -686,10 +795,53 @@ impl Instance {
             Instance::Fp4Torsion(i) => u128::from(i.r),
             Instance::F2m4(i) => u128::from(i.r),
             Instance::Ext(i) => u128::from(i.r()),
+            Instance::Genus2(i) => u128::from(i.r),
+            Instance::Quartic(i) => u128::from(i.r),
         }
     }
 
     pub fn facts(&self, spec: &CurveSpec) -> CurveFacts {
+        let jac = match self {
+            Instance::Genus2(i) => Some((
+                i.names(),
+                "genus2",
+                i.p(),
+                i.group_order,
+                i.r,
+                i.cofactor,
+                i.encode(&i.generator),
+            )),
+            Instance::Quartic(i) => Some((
+                i.names(),
+                "plane_quartic",
+                i.jac.p,
+                i.group_order,
+                i.r,
+                i.cofactor,
+                i.encode(&i.generator),
+            )),
+            _ => None,
+        };
+        if let Some(((icv1, slug), family, p, order, r, h, generator)) = jac {
+            // A Jacobian's model is not an elliptic curve: it has no ICV1
+            // identity or registry entry (`jacobian` module docs).
+            return CurveFacts {
+                slug,
+                icv1,
+                family: family.into(),
+                construction: spec.call(),
+                field_degree: None,
+                field_bits: Some(64 - p.leading_zeros()),
+                group_order: u128::from(order),
+                r: u128::from(r),
+                cofactor: u128::from(h),
+                generator,
+                automorphisms_available: 2,
+                registered: false,
+                ec1: None,
+                curve_uid: None,
+            };
+        }
         if let Instance::Ext(i) = self {
             let id = i.id();
             return CurveFacts {
@@ -758,7 +910,9 @@ impl Instance {
                 u128::from(i.generator.y),
                 if i.koblitz.is_some() { 2 * i.n } else { 2 },
             ),
-            Instance::Fp4(_) | Instance::Ext(_) => unreachable!("returned above"),
+            Instance::Fp4(_) | Instance::Ext(_) | Instance::Genus2(_) | Instance::Quartic(_) => {
+                unreachable!("returned above")
+            }
             Instance::Wide(i) => (
                 i.kc.curve_id(),
                 "koblitz",
@@ -867,6 +1021,12 @@ impl Instance {
         if let Instance::Ext(i) = self {
             return i.mul_generator_hex(k);
         }
+        if let Instance::Genus2(i) = self {
+            return i.mul_generator_hex(k);
+        }
+        if let Instance::Quartic(i) = self {
+            return i.mul_generator_hex(k);
+        }
         match self {
             Instance::Prime(i) => {
                 let p = i.curve.mul(&mut scratch, i.generator_point(), k);
@@ -898,7 +1058,11 @@ impl Instance {
                     ]
                 })
             }
-            Instance::Wide(_) | Instance::Fp4(_) | Instance::Ext(_) => {
+            Instance::Wide(_)
+            | Instance::Fp4(_)
+            | Instance::Ext(_)
+            | Instance::Genus2(_)
+            | Instance::Quartic(_) => {
                 unreachable!("returned above")
             }
         }
@@ -971,6 +1135,16 @@ impl Instance {
                 }
                 Instance::Wide(_) | Instance::Fp4(_) => unreachable!("handled above"),
                 Instance::Ext(i) => {
+                    if let Some(t) = i.hash_to_subgroup_hex(h) {
+                        return Some((t, counter));
+                    }
+                }
+                Instance::Genus2(i) => {
+                    if let Some(t) = i.hash_to_subgroup_hex(h) {
+                        return Some((t, counter));
+                    }
+                }
+                Instance::Quartic(i) => {
                     if let Some(t) = i.hash_to_subgroup_hex(h) {
                         return Some((t, counter));
                     }

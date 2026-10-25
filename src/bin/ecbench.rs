@@ -979,7 +979,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 let unregistered: Vec<_> = p
                     .workloads
                     .iter()
-                    .filter(|w| !w.curve.registered)
+                    // A Jacobian (`jcv1-…`) has no ICV1 identity and no
+                    // registry entry to make; only elliptic slugs count.
+                    .filter(|w| !w.curve.registered && w.curve.slug.starts_with("icv1-"))
                     .map(|w| &w.curve.slug)
                     .collect();
                 if !unregistered.is_empty() {
