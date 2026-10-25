@@ -177,3 +177,36 @@ seals. Its tightened auditor rejects duplicated physical tuples. The same
 actual p37 recovery and A/A controls pass again. The independent panel-tool
 build then starts under the next reservation. No full panel is launched
 until its build, frozen workload and current launcher controls pass.
+
+The standalone metadata build, full public/reference preparation and final
+launcher controls subsequently all pass. The controls reject nested outer
+busy with 64 before output creation and an existing phase with 65 without
+changing its marker. The prepared 85-configuration workload and all binary
+hashes are committed in `af66996a19` before any registered panel execution.
+The freeze refers to that full panel; earlier p37 test-build positive
+controls are separately preserved. Native reduction of those retained
+records gives 153 zero-plus-phi systems, 288 zero-plus-doubling systems and
+72 for each plain arm, all at one target query and rank 3/3.
+
+The launch first verifies no existing unit or output directory, both frozen
+binary hashes, workload seals and equality with the tested driver. The
+managed `twist-zero-pipeline-panel-v1.service` starts with one owner and the
+original resource/deadline envelope. Its receipt is in
+`results/phase2-panel-v1/`; the full comparison's terminal outcome remains
+pending. No old source-side waiting lane, Diem generator or EKS job restarts.
+
+The control report's first diagram inspection finds labels extending beyond
+two boxes. V1's original PDF/diagram/source remain, v2 corrects the layout
+and is actually inspected, and the final follow-up adds all four native
+p37 count rows. A queued v3 document-layout reservation is stopped before
+any renderer or output directory exists; its exit 143 remains. Lightweight
+v4 artifact rendering completes directly, from copied sources, with both
+actual PDF pages inspected and a 150 dpi graph PNG. No science process is
+stopped and no scientific computation is repeated for that layout repair.
+
+The source-reuse check confirms the root library/examples remain identical
+to the previously tested integration source. Its first protected-parent
+check uses the wrong relative working directory and returns 1; the separate
+correct-directory v2 returns 0 with both original hashes unchanged. Raw
+receipts keep their original whitespace. Full Phase 2 archive publication
+remains pending with the managed panel, as [recorded](phase2/ARTIFACTS.md).

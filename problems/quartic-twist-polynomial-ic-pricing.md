@@ -4,7 +4,7 @@
 - **Kind:** native solver failure; implementation and measurement gaps; external-tool availability
 - **Affected work:** [mixed polynomial report](../research/twist_index_calculus_20261020/MIXED_POLYNOMIAL_REPORT.md), [larger-curve scaling and occupancy report](../research/twist_index_calculus_20261020/K1_SCALING_REPORT.md), [peeled-orbit reuse report](../research/twist_index_calculus_20261020/K1_PEELED_ORBIT_REUSE.md), [frozen protocol](../research/twist_index_calculus_20261020/QUARTIC_TWIST_LINE_PROTOCOL.md)
 - **Next action owner:** quartic twist IC study
-- **Last updated:** 2026-10-24
+- **Last updated:** 2026-10-25
 
 ## Problem
 
@@ -56,6 +56,17 @@ audits pass for every case. This closes the polynomial implementation and
 complete-set replay obligation for that five-factor zero fiber. Charged
 target descent, the matched complete IC price and the full formal bridges
 remain open; zero-only rows cannot recover the target by themselves.
+
+The public-only Phase 2 pipeline is now implemented. Its tightened native
+gate passes 89 tests, including actual p37 zero/plain phi/doubling recovery,
+separate complete-physical-set/RREF replay and deterministic A/A. Duplicate
+physical tuples are explicitly rejected. These are small positive controls,
+not the full registered comparison. The frozen best admitted parent-family
+selection gives 85 distinct configurations and 255 first/A/A executions;
+the workload is frozen in `af66996a19` before its managed launch, and terminal
+panel results remain pending. Globally strongest IC/rho
+pricing remains separate and open. See the
+[current implementation evidence](../research/twist_index_calculus_20261020/zero_fiber_collector/IMPLEMENTATION_STATUS.md).
 
 ## Evidence and uncertainty
 
@@ -188,7 +199,8 @@ out higher-arity precomputation nor establishes a twist-specific gain.
 - [x] Reconcile all 21 joint external positions and audit every completed available basis's physical roots; retain nine external timeouts, one native-root timeout, and the stopped duplicate retry.
 - [x] Complete all 21 four-factor zero fibers, three full p37 populations, all 21 five-factor censuses and 63 independently enumerated public-point set/rank comparisons; count zero/projective rows separately.
 - [x] Implement a polynomial five-factor zero collector with the same orbit quotient for phi and doubling and independently preserve every complete physical set and factor-log rank on all 42 registered case-arms.
-- [ ] Implement and charge the corresponding stopped zero precomputation plus target descent, including setup, every failed system and matrix work, against matched plain phi/doubling and the strongest existing verified IC baseline; retain every loss and separate counters from admitted timing.
+- [x] Implement public-only stopped zero precomputation plus target descent and verify all four p37 zero/plain phi/doubling positive controls, separate replay and A/A in the tightened 89-test native gate.
+- [ ] Execute and charge the complete 85-configuration stopped-zero/target panel, including setup, every failed system and matrix work, against matched plain phi/doubling and the strongest existing verified IC baseline; retain every loss and separate counters from admitted timing.
 - [ ] For any priced leaderboard result, provide the replay certificate, validator report and strongest matched rho receipt in `VALIDATION.json` under `docs/VALIDATION_GATE.md`.
 
 The first item would establish a complete tagged-line-union polynomial
@@ -208,12 +220,18 @@ or asymptotic advantage. The other items address ranking and transfer.
   plain controls. Orbit copies add no independent folded rows. The completed
   189+21 panel, zero-fiber polynomial collection and physical censuses must
   not be repeated merely to produce new receipts.
+  The exact parent-family baseline is now frozen; execute all 85 distinct
+  configurations with 255 candidate runs, 85 independent first-run audits
+  and 170 A/A checks. A lower F4-system count alone does not close the
+  complete-price requirement.
 - **Inputs and controls:** The completed 297-construction workload, frozen
   p37/seed0/query2 regression, pure L0 with full permutation symmetry, and
   generic doubling with the same image size and represented logs. Keep
   original failures and scalar/group oracle separate from candidate inputs.
-- **Limits and stop:** Retain one thread, 8 GiB/1,200 s per executed system,
-  the busy reservation and separate timeout/OOM outcomes. Check managed
+- **Limits and stop:** Phase 2 retains one science worker, 8 GiB per case,
+  a 1,200-second outer watchdog and 1,180-second cooperative case deadline;
+  each S4 call receives the remaining budget. Keep the busy reservation and
+  separate timeout/OOM outcomes. Check managed
   owners and receipts before retrying after app/host recovery. Complete
   physical equality motivates full-stream collection and complete costing;
   a rank increase in zero-only rows motivates an actual invariant collector
@@ -222,6 +240,12 @@ or asymptotic advantage. The other items address ranking and transfer.
 - **Recheck trigger:** Completion of stopped target-descent execution and cost instrumentation, solver repair, or a new available external-solver comparison. The shared migrated host currently permits correctness/counter diagnostics, not new admitted timing.
 
 ## Resolution and history
+
+2026-10-25: The public-input stopped-precomputation/target pipeline passes
+the tightened 89-test gate and actual four-way p37 recovery/replay controls.
+The fixed 85-configuration comparison is frozen before its managed launch;
+its terminal results remain pending.
+No complete GAE price or newly admitted timing is inferred from these tests.
 
 2026-10-24: All 42 polynomial zero-fiber collectors and separate physical/
 rank audits complete successfully. The same quotient and full pair coverage

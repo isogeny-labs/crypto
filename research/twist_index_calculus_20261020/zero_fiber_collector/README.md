@@ -36,7 +36,7 @@ flowchart LR
 | Native correctness gate | Phase 1: 84/84; current Phase 2: 89/89, source checks pass; [current receipts](results/phase2-native-gate-v2/metadata/native-tests.stdout). Earlier passes/failures are retained separately. |
 | Complete physical enumeration on all 42 case-arms | Verified complete; 33,696 S4 systems per arm, no undetermined systems |
 | Independent complete-set and matrix comparison | All 42 pass, including pair coverage, work records, RREF and corruption controls |
-| Charged target descent and matched controls | Implemented; all four public p37 zero/plain phi/doubling positive controls, independent replay and A/A pass. Full 85-configuration panel is not yet started. |
+| Charged target descent and matched controls | Implemented; all four public p37 positive controls, independent replay and A/A pass. The 85-configuration panel is frozen and owned by `twist-zero-pipeline-panel-v1.service`; terminal results are pending. |
 | Calibrated complete IC price, strongest rho and external solver comparison | Open; this shared host admits correctness/counter diagnostics only |
 
 ## Reproduction
@@ -62,6 +62,14 @@ The [build-and-controls report](phase2/BUILD_AND_CONTROLS.md) preserves two
 failed compile checks, their corrected source binding, and the first
 89-test actual recovery gate. A fresh 89-test gate also passes after adding
 explicit duplicate-tuple rejection to the independent auditor.
+
+The registered full panel is frozen in commit `af66996a19` before its
+managed launch. Both final launcher controls pass, including protection of
+a pre-existing phase receipt. In the retained p37 positive control, zero
+plus phi uses 153 finite systems versus doubling's 288, while both plain
+controls use 72. That structural phi gain within precomputation does not
+reduce the matched target-query count and adds systems relative to plain.
+The [control PDF](phase2/BUILD_AND_CONTROLS.pdf) preserves the exact scope.
 
 Run `run-native-gate.sh OUT CARGO_TARGET` through the repository's common busy
 wrapper. The saved continuation `run-complete-native-gate.sh` reuses only
