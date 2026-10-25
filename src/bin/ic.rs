@@ -25,6 +25,8 @@ mod prime;
 mod progress;
 #[path = "ic/rho.rs"]
 mod rho;
+#[path = "ic/sweep/mod.rs"]
+mod sweep;
 #[path = "ic/workflow.rs"]
 mod workflow;
 
@@ -109,6 +111,15 @@ enum Action {
     /// Measure the exact pair-sum yield of a small-x factor base on a
     /// prime-field curve (NIST P-192, or toy primes where hits are common).
     Prime(prime::PrimeArgs),
+    /// Search index-calculus configurations with an Optuna-style sweeper: a
+    /// typed conditional space, a TPE sampler, median pruning over a ladder
+    /// of sizes, and an append-only resumable store.  The objective is the
+    /// §5a-banded S against a frozen baseline, projected to the target size.
+    Sweep(sweep::SweepArgs),
+    /// Run one pipeline configuration and print one scored, classified
+    /// record: the unit `ic sweep` optimises over.  The score is a function
+    /// of operation counts alone.
+    SweepTrial(sweep::trial::TrialArgs),
 }
 #[derive(Args)]
 #[group(required = true, multiple = false)]
@@ -164,6 +175,8 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::Price(args)) => price::run(args.clone(), cli.json),
         Some(Action::LargePrime(args)) => large_prime::run(args.clone()),
         Some(Action::Prime(args)) => prime::run(args.clone()),
+        Some(Action::Sweep(args)) => sweep::run_sweep(args.clone(), cli.json),
+        Some(Action::SweepTrial(args)) => sweep::trial::run(args.clone()),
         Some(Action::Run(args)) => experiment::run(args.clone(), cli.json),
         None => {
             if let Some(name) = &cli.profile {
