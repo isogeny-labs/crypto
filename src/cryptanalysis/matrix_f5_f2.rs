@@ -153,6 +153,10 @@ struct PrefixEchelon {
     /// `pivot[c]` is the index into `rows` of the row leading at column `c`.
     pivot: Vec<Option<usize>>,
     rows: Vec<Vec<u64>>,
+    /// `leads[k]` is the leading column of `rows[k]`, kept from its
+    /// insertion (rows are never modified after it) so that a prefix's
+    /// leading monomials are read without rescanning every row.
+    leads: Vec<usize>,
     /// Prefix (generator index, 1-based) whose insertion created the pivot.
     created_at: Vec<usize>,
     word_ops: u64,
@@ -177,6 +181,7 @@ impl PrefixEchelon {
             index,
             words,
             rows: Vec::new(),
+            leads: Vec::new(),
             created_at: Vec::new(),
             word_ops: 0,
             inserted: 0,
@@ -253,6 +258,7 @@ impl PrefixEchelon {
             Some(c) => {
                 self.pivot[c] = Some(self.rows.len());
                 self.rows.push(std::mem::take(row));
+                self.leads.push(c);
                 self.created_at.push(prefix);
             }
             None => self.zero_reductions += 1,
@@ -261,12 +267,11 @@ impl PrefixEchelon {
 
     /// Leading monomials of `V_j(e)` for `j = prefix`.
     fn leading_monomials(&self, prefix: usize) -> impl Iterator<Item = u64> + '_ {
-        self.rows
+        self.leads
             .iter()
             .zip(&self.created_at)
             .filter(move |(_, &created)| created <= prefix)
-            .filter_map(|(row, _)| leading_column(row))
-            .map(|c| self.columns[c])
+            .map(|(&c, _)| self.columns[c])
     }
 }
 
@@ -1146,6 +1151,127 @@ mod tests {
         assert_eq!(echelon.reduce_leading(&mut row, Some(&temp)), None);
         assert_eq!(row, vec![0; 5]);
         assert_eq!(echelon.word_ops, 18);
+    }
+
+    /// The leading column of `row`, scanned from word 0.
+    fn lead_by_scan(row: &[u64]) -> Option<usize> {
+        let k = row.iter().position(|&w| w != 0)?;
+        Some(k * 64 + row[k].trailing_zeros() as usize)
+    }
+
+    /// `PrefixEchelon::reduce_leading` as it was before the lead search
+    /// resumed at the current word: every lead rescanned from word 0.
+    /// Returns the lead and the word XORs the reduction costs.
+    fn reduce_leading_by_scan(
+        echelon: &PrefixEchelon,
+        row: &mut [u64],
+        extra: Option<&TempEchelon>,
+    ) -> (Option<usize>, u64) {
+        let mut ops = 0;
+        loop {
+            let Some(c) = lead_by_scan(row) else {
+                return (None, ops);
+            };
+            let pivot = match (echelon.pivot[c], extra.and_then(|e| e.pivot.get(&c))) {
+                (Some(r), _) => &echelon.rows[r],
+                (None, Some(&r)) => &extra.unwrap().rows[r],
+                (None, None) => return (Some(c), ops),
+            };
+            for (dst, &src) in row[c / 64..].iter_mut().zip(&pivot[c / 64..]) {
+                *dst ^= src;
+            }
+            ops += (echelon.words - c / 64) as u64;
+        }
+    }
+
+    /// Resuming the lead search at the word of the last lead, and caching
+    /// each inserted row's lead, change nothing a rescan from word 0 does:
+    /// the same leads, the same reduced rows, the same word XORs, with and
+    /// without a temporary echelon, on sparse rows whose leads sit in every
+    /// word and chain through many pivots; and `leading_monomials`, which
+    /// reads the cached leads, is the rescan's for every prefix.
+    #[test]
+    fn prefix_echelon_resumes_its_lead_search_where_the_last_lead_was() {
+        let mut seed = 0x51ed_270b_a1d5_c0deu64;
+        let mut next = move || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+        let (mut chained, mut zero) = (0, 0);
+        for &(cols, n_rows) in &[(1usize, 3usize), (63, 80), (64, 80), (130, 200), (300, 400)] {
+            let mut echelon = PrefixEchelon::new((0..cols as u64).map(|c| 3 * c + 1).collect());
+            let words = echelon.words;
+            let random_row = |next: &mut dyn FnMut() -> u64| {
+                let mut row = vec![0u64; words];
+                for _ in 0..1 + next() % 7 {
+                    let c = (next() % cols as u64) as usize;
+                    row[c / 64] ^= 1 << (c % 64);
+                }
+                row
+            };
+            for i in 0..n_rows {
+                // A temporary echelon over the current rows, as the criterion
+                // builds one for a generator's Frobenius span.
+                if i % 8 == 0 {
+                    let mut temp = TempEchelon::default();
+                    for _ in 0..12 {
+                        let mut row = random_row(&mut next);
+                        let mut want = row.clone();
+                        let before = echelon.word_ops;
+                        let (want_lead, want_ops) =
+                            reduce_leading_by_scan(&echelon, &mut want, Some(&temp));
+                        let got_lead = echelon.reduce_leading(&mut row, Some(&temp));
+                        assert_eq!((got_lead, &row), (want_lead, &want), "{cols} cols, temp");
+                        assert_eq!(echelon.word_ops - before, want_ops);
+                        if let Some(c) = got_lead {
+                            temp.pivot.insert(c, temp.rows.len());
+                            temp.rows.push(row);
+                        }
+                    }
+                }
+                let mut row = random_row(&mut next);
+                let mut want = row.clone();
+                let (want_lead, want_ops) = reduce_leading_by_scan(&echelon, &mut want, None);
+                let (before, rows_before) = (echelon.word_ops, echelon.rows.len());
+                echelon.insert(&mut row, 1 + i / 16);
+                assert_eq!(echelon.word_ops - before, want_ops);
+                match want_lead {
+                    Some(c) => {
+                        assert_eq!(echelon.rows.len(), rows_before + 1);
+                        assert_eq!(echelon.rows.last(), Some(&want));
+                        assert_eq!(echelon.leads.last(), Some(&c));
+                        chained += (want_ops > 2 * echelon.words as u64) as u32;
+                    }
+                    None => {
+                        assert_eq!(echelon.rows.len(), rows_before);
+                        zero += 1;
+                    }
+                }
+            }
+            // The cached leads are the rows' leads, and read back through
+            // `leading_monomials` they are the rescan's, for every prefix.
+            assert_eq!(echelon.leads.len(), echelon.rows.len());
+            for (k, row) in echelon.rows.iter().enumerate() {
+                assert_eq!(lead_by_scan(row), Some(echelon.leads[k]));
+                assert_eq!(echelon.pivot[echelon.leads[k]], Some(k));
+            }
+            for prefix in 0..=1 + n_rows / 16 {
+                let want: Vec<u64> = echelon
+                    .rows
+                    .iter()
+                    .zip(&echelon.created_at)
+                    .filter(|(_, &created)| created <= prefix)
+                    .map(|(row, _)| echelon.columns[lead_by_scan(row).unwrap()])
+                    .collect();
+                assert_eq!(echelon.leading_monomials(prefix).collect::<Vec<_>>(), want);
+            }
+        }
+        assert!(
+            chained > 50 && zero > 20,
+            "rows chained through several pivots: {chained}, rows reduced to zero: {zero}"
+        );
     }
 
     #[test]

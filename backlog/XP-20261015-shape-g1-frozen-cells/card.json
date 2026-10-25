@@ -5,15 +5,14 @@
   "created": "2026-10-15",
   "authors": ["backlog lane", "coordinator"],
   "status": "blocked",
-  "status_note": "Blocked on PR #1892 (the ladder binary is on an unmerged branch; the card becomes ready only on a merged commit) and on memory: the frozen cells did not fit the 2.5 GB cap of the run that killed G1 on its scaled cells.",
+  "status_note": "Blocked on memory (PR #1892 merged 2026-10-15 as 3c0646ba9; the ladder binary is pinned at that merge commit): the frozen cells did not fit the 2.5 GB cap of the run that killed G1 on its scaled cells.",
   "blocked_on": [
-    "pr:1892 factor_base_shape_ladder and the G1-G6 study (claude/leads-shape-search, open, unmerged); pin its merge commit",
     "hw:degree-7 matrices need 47-50 GB at (13, 5) and more at (17, 6) and (19, 7) (PROTOCOL.md §3 of research/shape_search_g1_g6_20261015); size a host per cell in this card's PROTOCOL.md"
   ],
   "links": {
     "lead": "research/notes/index-calculus/RESEARCH_FACTOR_BASE_SHAPE_SEARCH.md (G1: shape at m = 3)",
     "notes": [
-      "research/shape_search_g1_g6_20261015/README.md on branch claude/leads-shape-search (G1 killed on the scaled cells; 'not testable on the frozen cells (resource)')",
+      "research/shape_search_g1_g6_20261015/README.md (merged in PR #1892; G1 killed on the scaled cells; 'not testable on the frozen cells (resource)')",
       "research/shape_search_g1_g6_20261015/PROTOCOL.md §3 (frozen cells, budget derivation)",
       "research/notes/index-calculus/RESEARCH_DREG_MEASUREMENT.md Results 7-9 (earlier (13, 5) draws read >= 7 for random)"
     ],
@@ -24,8 +23,8 @@
   "protocol": {"path": null, "blob": null},
   "code": {
     "repo": "crypto",
-    "commit": "f12cb92c7f703487e98f482540b88e380591ee04",
-    "branch": "claude/leads-shape-search",
+    "commit": "3c0646ba91fc7aea4485024ab800be1f30acce2a",
+    "branch": "main",
     "build": [["cargo", "build", "--release", "--example", "factor_base_shape_ladder"]]
   },
   "resources": {
@@ -88,7 +87,7 @@
     "ttl_s": 86400,
     "env": {
       "name": "crypto-shape-f12cb92",
-      "recipe": "A rust:1.98 image built at the merge commit of PR #1892 (f12cb92 until then) with `cargo build --release --example factor_base_shape_ladder`, imported with `cairn lab env import crypto-shape-<sha> --docker <image>`"
+      "recipe": "A rust:1.98 image built at the merge commit of PR #1892 (3c0646ba9) with `cargo build --release --example factor_base_shape_ladder`, imported with `cairn lab env import crypto-shape-<sha> --docker <image>`"
     },
     "exec": {
       "cpus": 1,

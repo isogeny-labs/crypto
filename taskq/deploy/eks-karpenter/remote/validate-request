@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+[[ $# == 1 && -f "$1" ]] || { echo 'Usage: validate-request REQUEST.json' >&2; exit 2; }
+[[ $(wc -c < "$1") -le 65536 ]] || { echo 'Request exceeds 64 KiB' >&2; exit 2; }
+jq -e '
+  type=="object" and (keys-["schema","job","provenance"]|length)==0
+  and .schema=="isolab.eks.request/v1"
+  and (.job|type)=="object"
+  and (.job|keys-["job_name","spec","instance_type","memory","seconds"]|length)==0
+  and all(.job[]; .!=null and .!=false)
+  and (.job.job_name|type)=="string"
+  and (.job.job_name|test("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"))
+  and (.job.job_name|length)<=55
+  and ((.job.seconds // 900)|type)=="number"
+  and ((.job.seconds // 900)|floor)==(.job.seconds // 900)
+  and (.job.seconds // 900)>=1 and (.job.seconds // 900)<=3600
+  and ((.job.memory // "4Gi")|type)=="string"
+  and ((.job.memory // "4Gi")|test("^[1-9][0-9]*(Mi|Gi)$"))
+  and ((.job.instance_type // "c8a.2xlarge")|type)=="string"
+  and ((.job.instance_type // "c8a.2xlarge")|test("^[a-z][a-z0-9-]*\\.[a-z0-9]+$"))
+  and ((.job|has("spec")|not) or (.job.spec|type)=="object")
+  and ((has("provenance")|not) or (.provenance|type)=="object")
+  and ((.provenance // {}|keys-["harness","source_revision","run_url"]|length)==0)
+  and (all((.provenance // {})[]; type=="string" and length<=2048))
+' "$1" >/dev/null || { echo 'Invalid isolab.eks.request/v1 request' >&2; exit 2; }
+# Materialize defaults consistently for every client. Specs remain literal JSON.
+jq '.job.instance_type //= "c8a.2xlarge" | .job.seconds //= 900 | .job.memory //= "4Gi"' "$1"

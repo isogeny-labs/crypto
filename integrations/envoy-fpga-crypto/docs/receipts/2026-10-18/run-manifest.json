@@ -1,0 +1,846 @@
+{
+  "date": "2026-10-18",
+  "run_batch": "envoy-fpga-20261018-rtl-live",
+  "repository": "aburan28/crypto",
+  "pull_request": 2122,
+  "import_path": "integrations/envoy-fpga-crypto",
+  "parent_commit": "3c81607c87c4b896e78a49eb6b7f252c0131a96e",
+  "original_base_commit": "c6d64436a33359320ad9d5b42c4acebee2968b9a",
+  "source_identity": "Parent commit plus the final module/workflow SHA-256 records below; the output commit SHA is deliberately not self-referenced.",
+  "request": "Continue the Envoy extension for classical and post-quantum FPGA crypto offload on AWS F2, including ML-DSA, ML-KEM, FN-DSA and broader schemes.",
+  "implemented_this_iteration": [
+    "Keccak-f1600, SHAKE128/256 byte streams, canonical modular multiplication, and forward/inverse ML-KEM/ML-DSA NTT RTL",
+    "Native C++ independent RTL oracles and generic-synthesis replay",
+    "Distinct FpgaHttp/PqHttp protobuf factory configuration types and migrated examples",
+    "A fully linked minimal Envoy build profile and native live HTTP test harness",
+    "Scoped core/RTL CI, source-linked report, diagram, PDF and raw evidence"
+  ],
+  "validation": [
+    {
+      "name": "source RTL lint and functional suite",
+      "result": "passed",
+      "groups": 15,
+      "exit_code": 0,
+      "command": "VERILATOR_ROOT=/workspace/scratch/fpga-rtl-tools/root/usr/share/verilator make lint-rtl test-rtl test-rtl-synth VERILATOR=/workspace/scratch/fpga-rtl-tools/root/usr/bin/verilator SV2V=/workspace/scratch/fpga-rtl-tools/sv2v-Linux/sv2v YOSYS=/workspace/scratch/fpga-rtl-tools/root/usr/bin/yosys",
+      "working_directory": "/workspace/scratch/crypto-upload/integrations/envoy-fpga-crypto",
+      "log": "runs/rtl-functional-and-synthesis-replay.log",
+      "scope": "Fatal source -Wall and assertions; final harness additionally rejects invalid full-width values in either multiplier operand"
+    },
+    {
+      "name": "generic synthesis",
+      "result": "passed",
+      "exit_code": 0,
+      "command": "VERILATOR_ROOT=/workspace/scratch/fpga-rtl-tools/root/usr/share/verilator make lint-rtl test-rtl test-rtl-synth VERILATOR=/workspace/scratch/fpga-rtl-tools/root/usr/bin/verilator SV2V=/workspace/scratch/fpga-rtl-tools/sv2v-Linux/sv2v YOSYS=/workspace/scratch/fpga-rtl-tools/root/usr/bin/yosys",
+      "incremental_replay_note": "The final second-operand test update recompiled the harness and reused the unchanged, previously synthesized RTL netlist.",
+      "environment": {
+        "VERILATOR_ROOT": "/workspace/scratch/fpga-rtl-tools/root/usr/share/verilator"
+      },
+      "working_directory": "/workspace/scratch/crypto-upload/integrations/envoy-fpga-crypto",
+      "log": "runs/generic-synthesis.log",
+      "script": "tools/check_rtl_synth.ys",
+      "coarse_generic_cells": 14953,
+      "scope": "Zero structural problems/SCCs; no runtime div/mod/divfloor/modfloor/dlatch/adlatch cells. Writable arrays become registers. No vendor mapping or timing."
+    },
+    {
+      "name": "synthesized-Verilog functional replay",
+      "result": "passed",
+      "groups": 15,
+      "exit_code": 0,
+      "command": "VERILATOR_ROOT=/workspace/scratch/fpga-rtl-tools/root/usr/share/verilator make lint-rtl test-rtl test-rtl-synth VERILATOR=/workspace/scratch/fpga-rtl-tools/root/usr/bin/verilator SV2V=/workspace/scratch/fpga-rtl-tools/sv2v-Linux/sv2v YOSYS=/workspace/scratch/fpga-rtl-tools/root/usr/bin/yosys",
+      "working_directory": "/workspace/scratch/crypto-upload/integrations/envoy-fpga-crypto",
+      "log": "runs/rtl-functional-and-synthesis-replay.log",
+      "scope": "The same external groups as source simulation, not 15 additional specifications or formal equivalence"
+    },
+    {
+      "name": "existing host/TLS/PQ regression suites",
+      "result": "passed",
+      "groups": 36,
+      "exit_code": 0,
+      "command": "make test test-boringssl test-pq test-pq-boringssl OQS_BUILD=/workspace/scratch/liboqs-build BORINGSSL_SRC=/tmp/fpga-references/boringssl-0.20260929.0 BORINGSSL_BUILD=/tmp/fpga-boringssl-build",
+      "working_directory": "/workspace/scratch/crypto-upload/integrations/envoy-fpga-crypto",
+      "log": "runs/host-regression.log"
+    },
+    {
+      "name": "fully linked minimal Envoy",
+      "result": "passed",
+      "exit_code": 0,
+      "command": "LD_LIBRARY_PATH=/workspace/scratch/fpga-libs/lib/x86_64-linux-gnu /tmp/fpga-bazel --output_user_root=/workspace/scratch/fpga-bazel-cache build --workspace_status_command=/bin/true --config=clang --@io_bazel_rules_go//go/config:pure=true --action_env=LD_LIBRARY_PATH=/workspace/scratch/fpga-libs/lib/x86_64-linux-gnu --host_action_env=LD_LIBRARY_PATH=/workspace/scratch/fpga-libs/lib/x86_64-linux-gnu --override_repository=envoy_build_config=/workspace/scratch/crypto-upload/integrations/envoy-fpga-crypto/envoy/minimal_build_config --define=google_grpc=disabled --//bazel:http3=false --jobs=4 --color=no --curses=no //source/exe:envoy-static",
+      "working_directory": "/tmp/fpga-references/envoy-1.39.3",
+      "log": "runs/envoy-linked-build.log",
+      "scope": "Development fastbuild; pinned Clang/libc++; private-key and both HTTP factories linked, HTTP/3 and Google gRPC disabled"
+    },
+    {
+      "name": "installed production source identity",
+      "result": "passed",
+      "exit_code": 0,
+      "log": "runs/envoy-installed-source-check.log",
+      "scope": "diff -qr on include/src; cmp on BUILD, config.proto, envoy/extension.cc and envoy/pq_filter.cc against the installed Envoy extension"
+    },
+    {
+      "name": "actual Envoy HTTP listener",
+      "result": "passed",
+      "groups": 5,
+      "exit_code": 0,
+      "command": "make test-envoy ENVOY_BIN=/tmp/fpga-references/envoy-1.39.3/bazel-bin/source/exe/envoy-static OQS_BUILD=/workspace/scratch/liboqs-build BORINGSSL_SRC=/tmp/fpga-references/boringssl-0.20260929.0 BORINGSSL_BUILD=/tmp/fpga-boringssl-build",
+      "working_directory": "/workspace/scratch/crypto-upload/integrations/envoy-fpga-crypto",
+      "log": "runs/envoy-http-functional.log",
+      "scope": "Ephemeral loopback HTTP/admin listeners, explicit CPU liboqs backend. ML-DSA-65 independent BoringSSL verification; ML-KEM-768 interoperability both ways; contexts/256 KiB body, malformed requests, erasure. No live Envoy TLS/F2 listener."
+    },
+    {
+      "name": "new workflow syntax",
+      "result": "passed",
+      "exit_code": 0,
+      "command": "/workspace/scratch/fpga-rtl-tools/actionlint .github/workflows/envoy-fpga-crypto.yml",
+      "working_directory": "/workspace/scratch/crypto-upload",
+      "log": "runs/actionlint.log",
+      "scope": "Local syntax validation only; GitHub CI outcome is separate"
+    },
+    {
+      "name": "required root Rust library regression",
+      "result": "failed before tests",
+      "exit_code": 101,
+      "command": "PATH=/workspace/scratch/fpga-cargo/bin:$PATH RUSTUP_HOME=/workspace/scratch/fpga-rustup CARGO_HOME=/workspace/scratch/fpga-cargo CARGO_TARGET_DIR=/workspace/scratch/crypto-upload-target CARGO_BUILD_JOBS=4 cargo test --release --lib --locked",
+      "working_directory": "/workspace/scratch/crypto-upload",
+      "log": "runs/root-cargo-regression.log",
+      "errors": 26,
+      "classification": "Unchanged base source compilation errors; no existing Rust or workflow suppression",
+      "example_unchanged_file": "src/cryptanalysis/ecbench/workload.rs",
+      "unchanged_git_blob": "0433fa620596bd24cdf1dbfd06c1ae67e841b2e1"
+    }
+  ],
+  "failed_and_intermediate_attempts": [
+    {
+      "logs": [
+        "runs/envoy-rtl-initial-shake-lint.log",
+        "runs/envoy-rtl-initial-ntt-lint.log"
+      ],
+      "outcome": "Failed initial width/unused-signal lint; corrected",
+      "exit_code": null,
+      "exact_initial_argv": "Not retained; final invocation and final source hashes are recorded"
+    },
+    {
+      "log": "runs/envoy-rtl-first-test.log",
+      "outcome": "Generated vendor C++ failed under global pedantic/Werror settings; source RTL remains fatal -Wall",
+      "exit_code": 2
+    },
+    {
+      "log": "runs/rtl-intermediate-fourteen-groups.log",
+      "outcome": "Earlier 14-group direct suite passed before final reset test was added",
+      "exit_code": 0
+    },
+    {
+      "log": "runs/envoy-rtl-first-synth-test.log",
+      "outcome": "Generated Verilog warning failures",
+      "exit_code": 2
+    },
+    {
+      "log": "runs/envoy-rtl-second-synth-test.log",
+      "outcome": "Synthesis script was edited during a running attempt; final Make target copies script before running",
+      "exit_code": 2
+    },
+    {
+      "log": "runs/envoy-rtl-third-synth-test.log",
+      "outcome": "Bit-mapped generated netlist failed Verilator warnings",
+      "exit_code": 2
+    },
+    {
+      "log": "runs/envoy-rtl-fourth-synth-test.log",
+      "outcome": "Generated variable-write logic failed Verilator warnings",
+      "exit_code": 2
+    },
+    {
+      "log": "runs/envoy-rtl-final-test.log",
+      "outcome": "Direct suite passed, oversized generated replay model was killed by SIGKILL; OOM kill counter observed at 1",
+      "exit_code": 2
+    },
+    {
+      "log": "runs/rtl-byte-state-first-success.log",
+      "outcome": "Byte-addressed SHAKE RTL and generic replay passed 15/15 each before added second-operand negative cases",
+      "exit_code": 0
+    },
+    {
+      "log": "runs/envoy-initial-interrupted-build.log",
+      "outcome": "Intentionally interrupted with cache retained while correcting generic HTTP factory config types",
+      "exit_code": 8
+    },
+    {
+      "log": "runs/envoy-typed-config-interrupted-build.log",
+      "outcome": "Intentionally interrupted to select four build jobs",
+      "signal": "SIGINT",
+      "exit_code": null
+    },
+    {
+      "log": "runs/envoy-legacy-http3-flag-interrupted-build.log",
+      "outcome": "Intentionally interrupted after finding legacy --define=http3=disabled was ignored; final build uses --//bazel:http3=false",
+      "signal": "SIGINT",
+      "exit_code": null
+    },
+    {
+      "log": "runs/http-harness-missing-include-build.log",
+      "outcome": "Missing openssl/mem.h for OPENSSL_cleanse; corrected",
+      "exit_code": 2
+    },
+    {
+      "log": "runs/envoy-http-first-run.log",
+      "outcome": "2/5 groups passed: harness incorrectly required Content-Type on empty acknowledgments; corrected to Envoy local-reply contract, no production filter change",
+      "exit_code": 2,
+      "source": "runs/http-first-run-reconstructed-source.cc",
+      "source_note": "Reconstructed by reversing only the empty-reply header assertion fix from the final harness"
+    }
+  ],
+  "intermediate_source_limit": "Intermediate source snapshots were not frozen. Logs are retained, but failures cannot be exactly replayed from final sources; their hashes must not be inferred from the final snapshot.",
+  "environment": {
+    "host": "Linux x86_64 shared workspace, no benchmark isolation",
+    "cpu_quota_cores": 4,
+    "memory_limit_bytes": 17179869184,
+    "gcc": "14.2.0",
+    "openssl": "3.5.7",
+    "verilator": "5.032 Debian 5.032-1+b2",
+    "sv2v": "0.0.13",
+    "yosys": "0.52 fee39a3284c90249e1d9684cf6944ffbbcbb8f90",
+    "actionlint": "1.7.7",
+    "bazel": "8.7.0",
+    "envoy": "1.39.3",
+    "envoy_compiler": "Clang 18.1.8 / libc++",
+    "boringssl": "0.20260929.0",
+    "liboqs": "0.16.0, static PIC, OQS_USE_OPENSSL=OFF",
+    "public_fixture_seed": "0x4650433252544c",
+    "simulation_register_seed": "0x46504332",
+    "tool_packages": "Checksums in runs/tool-archives-sha256.txt; tools extracted into workspace, no system tool directories modified"
+  },
+  "historical_not_rerun": [
+    "Oct 17 exhaustive 262 liboqs modes",
+    "Oct 17 AddressSanitizer/UndefinedBehaviorSanitizer suites"
+  ],
+  "remaining": [
+    "Complete hardware ML-KEM/ML-DSA controllers, sampling, packing and polynomial products",
+    "Classical cryptographic RTL",
+    "Entropy, key custody, FPC1 dispatch and F2 shell/AFI",
+    "Physical FPGA resource/timing and F2 operation",
+    "Hardware/CPU workload measurements",
+    "TLS KEM key-share offload",
+    "Final FN-DSA, stateful LMS/XMSS and comprehensive FPGA scheme coverage",
+    "Full default Envoy build selection and actual Envoy TLS listener validation"
+  ],
+  "performance": "No algorithm runtime, speedup, FPGA timing or physical resource claim. Generic synthesis counts and build times are tooling diagnostics.",
+  "coordination": {
+    "command": "conductor check --summary 'Finalize Envoy FPGA kernel and HTTP validation evidence' --scope path:integrations/envoy-fpga-crypto",
+    "exit_code": 127,
+    "log": "runs/coordination-check.log",
+    "reason": "CLI absent; docs/CONDUCTOR.md documents non-blocking fallback"
+  },
+  "module_files": [
+    {
+      "path": ".gitignore",
+      "bytes": 30,
+      "sha256": "de5200857beacc0a3634e9cfedb0c2a52105ea4266c90d09356a0a070fef4629"
+    },
+    {
+      "path": "BUILD",
+      "bytes": 1708,
+      "sha256": "f95153fd74eb3584a553100ee2a1de97665286eb9d84c9a6ee09b5382058ce2e"
+    },
+    {
+      "path": "config.proto",
+      "bytes": 364,
+      "sha256": "0b880f06dc8599cc3b46a3b8d97f5383705b73f02eb8004caa527bd1ac01d1e4"
+    },
+    {
+      "path": "docs/fpga-abi.md",
+      "bytes": 11543,
+      "sha256": "2113573d70d3db2ac8400c9876adfcffe9abdda00eb2f715b61b2e6eb985dacb"
+    },
+    {
+      "path": "docs/post-quantum.md",
+      "bytes": 11659,
+      "sha256": "fc48d5d76ce68e61db12e12a51b6cad01ff55ae04d56b7434c46676968780d96"
+    },
+    {
+      "path": "docs/reports/2026-10-18/architecture.dot",
+      "bytes": 2130,
+      "sha256": "4a389ab6d84d0bfebc2e3a6bc58907246c90d3a2a5ff335b852476dba1883e06"
+    },
+    {
+      "path": "docs/reports/2026-10-18/architecture.pdf",
+      "bytes": 20352,
+      "sha256": "35034a846438712a8a74ad1961ac4bc58412e37de3d9f22919cab16e23537840"
+    },
+    {
+      "path": "docs/reports/2026-10-18/architecture.svg",
+      "bytes": 10890,
+      "sha256": "6d75b52886cafe2f6e810f60f8509dd3490f585dba0537fec5937ee81d6bb291"
+    },
+    {
+      "path": "docs/reports/2026-10-18/README.md",
+      "bytes": 7131,
+      "sha256": "ccdd9c08317b75180ac20b7fcfd2a988db3516cf34ec785d1b000f04056849cb"
+    },
+    {
+      "path": "docs/reports/2026-10-18/report.pdf",
+      "bytes": 159744,
+      "sha256": "f63f2459a6a03193a3b803f813a3ad8eaa42474c4a6ea74d4fdf745b8be2ba73"
+    },
+    {
+      "path": "docs/reports/2026-10-18/report.tex",
+      "bytes": 6217,
+      "sha256": "011e5b281b8a5cf1392b158c29b088f94df00285bf8e49946b0aa66fee3075f5"
+    },
+    {
+      "path": "docs/rtl-kernels.md",
+      "bytes": 7898,
+      "sha256": "202f6b86f7c3591590f5cb4dcaf3d76d313b5e6fe932103ba66df6d6102277dd"
+    },
+    {
+      "path": "docs/validation.md",
+      "bytes": 11031,
+      "sha256": "2656c801b6bc050061d55eb30bc9e8894a79ac8d6bd7c3cfbea5db72204270b7"
+    },
+    {
+      "path": "envoy/extension.cc",
+      "bytes": 15621,
+      "sha256": "6d8435751701baab4c0a432cceb3aa5b95c1bc7a743a81f65344cab4fdb394bf"
+    },
+    {
+      "path": "envoy/minimal_build_config/BUILD.bazel",
+      "bytes": 77,
+      "sha256": "8cdea94d8c7624c671139f0ea5ded589bae6eb1acd608b47157f3dbba7c9e6e4"
+    },
+    {
+      "path": "envoy/minimal_build_config/extensions_build_config.bzl",
+      "bytes": 1574,
+      "sha256": "756db18e1a314c442e90642d4265fdcd2c41e08154c4dda575d0f20889ab37ee"
+    },
+    {
+      "path": "envoy/minimal_build_config/WORKSPACE",
+      "bytes": 39,
+      "sha256": "857cc2887f8cef556b90e3d6371f245c85aa507c3bbb85d686e40937ba83de0b"
+    },
+    {
+      "path": "envoy/pq_filter.cc",
+      "bytes": 15092,
+      "sha256": "48d0cd15ed0adf84da8180a76491af9bfdd2bd040cf93eda6738d40ceefe2833"
+    },
+    {
+      "path": "examples/envoy.yaml",
+      "bytes": 3196,
+      "sha256": "04cf740636e3a6c8d168ef076e640aabb739370a3faecbc4a74567aa3b355b4f"
+    },
+    {
+      "path": "examples/pq-software.yaml",
+      "bytes": 2572,
+      "sha256": "9a72012286473118dfa7abb5260caecde8ed36d0f15b078f7664b3db0fefa7e0"
+    },
+    {
+      "path": "include/fpga/boringssl.h",
+      "bytes": 1676,
+      "sha256": "542f8b7d1f11a7fee2fc497c236894d3c6c6ff8def5043ffce2aef9c4c95a0f9"
+    },
+    {
+      "path": "include/fpga/crypto.h",
+      "bytes": 3976,
+      "sha256": "0cf59c54fbe226e7e2ef793a24ced85005e3336f45a2b03e343d30e543944831"
+    },
+    {
+      "path": "include/fpga/mailbox.h",
+      "bytes": 1949,
+      "sha256": "4e1c9795366e56b8daa48ce0424fef0b9f101a8f0d0698f58b1398c873bcaa1f"
+    },
+    {
+      "path": "include/fpga/pq_plugin.h",
+      "bytes": 819,
+      "sha256": "39492b53648d079ba7f324ddae808ebeedfc0788978623afff7722a9fd9e55c3"
+    },
+    {
+      "path": "include/fpga/pq.h",
+      "bytes": 1653,
+      "sha256": "e94817338ee4747b8122e75d30013327c3ba893dceebc8b2481742ad13d46c1f"
+    },
+    {
+      "path": "Makefile",
+      "bytes": 6850,
+      "sha256": "1aa1de0631263f023b3a37f6bc4ceec8ea212aa3d177141c92dfa564c0f7fc85"
+    },
+    {
+      "path": "pq/oqs_plugin.cc",
+      "bytes": 10481,
+      "sha256": "ddd2aa52e69fd2c3c4a16f6d7fe302b8bdfa652047e3d285dc1f37a1971e5948"
+    },
+    {
+      "path": "pq/plugin.map",
+      "bytes": 46,
+      "sha256": "2f2e8d6ff9e9f9a5f5b60e7f81cf50411ee63e7e992bda5e4030aca251eeb16f"
+    },
+    {
+      "path": "README.md",
+      "bytes": 11700,
+      "sha256": "0479597a3da32890eda01c78d526664a1c6b8ddfdc829dd8907ee72750fc4664"
+    },
+    {
+      "path": "rtl/keccak_f1600.sv",
+      "bytes": 3996,
+      "sha256": "ce07203e3b6748a8eb9f5649bd2605db5b655c90a9a9c92cd16de062b36ea6e3"
+    },
+    {
+      "path": "rtl/lattice_modmul.sv",
+      "bytes": 3131,
+      "sha256": "0901d6c40ddad128a8d7e6dd1ed0a191b4237cadfd330d6b9ba6a6a67367a6fc"
+    },
+    {
+      "path": "rtl/lattice_ntt.sv",
+      "bytes": 9685,
+      "sha256": "c3d31d61b2af22e74af6e32ea6f7cbd260b421a4a66e97e93125024a8ef396e8"
+    },
+    {
+      "path": "rtl/shake_stream.sv",
+      "bytes": 5452,
+      "sha256": "4088cd9382452830f27f996a55655007d1ebb055831a1b1181fb02891c512b8a"
+    },
+    {
+      "path": "src/aws_pci.cc",
+      "bytes": 3507,
+      "sha256": "e1767d6d18d3c75fb0161a1c875a2abb6184814c8b481e793647059ddad54c71"
+    },
+    {
+      "path": "src/boringssl_private_key.cc",
+      "bytes": 3634,
+      "sha256": "904254b9b23e9645dff28a88535bbd20ff4c846b80012a6bd10965ce00f23a9b"
+    },
+    {
+      "path": "src/boringssl_records.cc",
+      "bytes": 8176,
+      "sha256": "31ef524c98092ee81c410392faad7f4cd99a39ce80616b4ba627d1e815333182"
+    },
+    {
+      "path": "src/crypto.cc",
+      "bytes": 9089,
+      "sha256": "c55eb047045527c9fb25278fbc0e4e724edf156ed10653e22041d1cc8b1ab46c"
+    },
+    {
+      "path": "src/mailbox.cc",
+      "bytes": 9588,
+      "sha256": "0246445d3493aee8c199816ef37bcc9dedfc894975befb6298d74be8b3753e49"
+    },
+    {
+      "path": "src/pq_codec.cc",
+      "bytes": 7988,
+      "sha256": "cb271d501ce90962b99f890108dcbd68c8dd0d32d298f6f2b81489f073dd0c67"
+    },
+    {
+      "path": "src/pq_loader.cc",
+      "bytes": 3099,
+      "sha256": "1a83567525a3982a8099b8894bbbbd7f3036faa88d877ac9fcb5376222e6a19b"
+    },
+    {
+      "path": "tests/core_test.cc",
+      "bytes": 8773,
+      "sha256": "129d0f7b9861368a60ffc42f97b9b66cb5e000d56c7173502896696a12cf945f"
+    },
+    {
+      "path": "tests/emulated_registers.h",
+      "bytes": 5665,
+      "sha256": "0c2380261dc84bbd7cc39b5fb972d9edc30b701e94519c1f3a1bbd9b8047720e"
+    },
+    {
+      "path": "tests/envoy_http_test.cc",
+      "bytes": 15116,
+      "sha256": "9b4a9176d2baa120d55f5b3dfaac159cad7bb9e9b8e88c70a2224814e640acac"
+    },
+    {
+      "path": "tests/pq_test.cc",
+      "bytes": 11163,
+      "sha256": "7ef26209dfb6b221997f5ed5fba65ac389ac7b1231d6f88591734ef00d304255"
+    },
+    {
+      "path": "tests/pq_tls_test.cc",
+      "bytes": 7563,
+      "sha256": "14e3349a53971a9d98aea621ca1dc3ce982ca0048081d65834f4c70f4bc4580d"
+    },
+    {
+      "path": "tests/rtl/crypto_kernels_top.sv",
+      "bytes": 2480,
+      "sha256": "0c5fb169715ed7eb6d87e1c8400adfa9d7bf4bb8e98e757b7a9e4e538611fcb6"
+    },
+    {
+      "path": "tests/rtl_test.cc",
+      "bytes": 22631,
+      "sha256": "b51442d3f022ae8629bf5443ff76dc9a1289468f338e70d8fa9cdb8e93bf4796"
+    },
+    {
+      "path": "tests/software_backend.cc",
+      "bytes": 5134,
+      "sha256": "e8e0b1cdc14a0dabb8b44f79839f285127cc3b950600cfd70a88c65def77f8bb"
+    },
+    {
+      "path": "tests/software_backend.h",
+      "bytes": 682,
+      "sha256": "f214361d56ce36e89b02056ec981b27903e7996e25201c16c9f5f19bc9afcef0"
+    },
+    {
+      "path": "tests/test.h",
+      "bytes": 1029,
+      "sha256": "33ae848c5539d548c780151632ae5088a3494b21a8ea83186ec5a6c1b0c65426"
+    },
+    {
+      "path": "tests/tls_test.cc",
+      "bytes": 10123,
+      "sha256": "b66c9aef86df7e1e6a46382f66fc05b91e579f37b802f0377b8aaaee66ada0f6"
+    },
+    {
+      "path": "tools/build_pq.py",
+      "bytes": 2319,
+      "sha256": "ae869a37b91258341dcf730cb1815f051e94265fd871cd76e2969b0c46dcd1ae"
+    },
+    {
+      "path": "tools/check_rtl_synth.ys",
+      "bytes": 693,
+      "sha256": "dc2e10fed0e68bc60c5da19240446ab5faca13137a8c52d9d149470025c7909e"
+    },
+    {
+      "path": "tools/install_envoy.py",
+      "bytes": 1945,
+      "sha256": "d2a0714d422118d208e39da91790ed87d9e689ce6dfdac738f4c0188554515be"
+    },
+    {
+      "path": "tools/test_boringssl.py",
+      "bytes": 1877,
+      "sha256": "0ab0bc99e3911a7563c34b7d86cc624263097b68ddfb91ee103f824bff3635b4"
+    }
+  ],
+  "workflow": {
+    "path": ".github/workflows/envoy-fpga-crypto.yml",
+    "bytes": 1485,
+    "sha256": "cfc562c15d3aa6c6e959eba5719a2d67966cbb7ba66923185c50bfbe9a9feda4"
+  },
+  "raw_records": [
+    {
+      "path": "runs/actionlint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/coordination-check.log",
+      "bytes": 48,
+      "sha256": "8fcfd0a01eb89b2a59a6cdef933bebc784f60be1c4681c07d30969ce40cb2f67"
+    },
+    {
+      "path": "runs/environment.txt",
+      "bytes": 395,
+      "sha256": "7ce22383bb113a5e0a36bdac0e494cd300aa1f821aac684fae0c2e1ca2aa0229"
+    },
+    {
+      "path": "runs/envoy-http/run-4Txw25/admin-address.txt",
+      "bytes": 15,
+      "sha256": "580d0fb257900b25af4f7e5bc4a81be1197a5a5dacb5ffcfa77172ff2004c63a"
+    },
+    {
+      "path": "runs/envoy-http/run-4Txw25/envoy.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/envoy-http/run-4Txw25/envoy.yaml",
+      "bytes": 2701,
+      "sha256": "2d8ca30bb245d0a1018c5e6f597002ce68d5ff2db9c633caa3e718083b136c57"
+    },
+    {
+      "path": "runs/envoy-http/run-d7mOqn/admin-address.txt",
+      "bytes": 15,
+      "sha256": "159981856f5f8a11af6780f1caa2bdbcec20c3d3208d13ba5b9dc11367fbab40"
+    },
+    {
+      "path": "runs/envoy-http/run-d7mOqn/envoy.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/envoy-http/run-d7mOqn/envoy.yaml",
+      "bytes": 2701,
+      "sha256": "2d8ca30bb245d0a1018c5e6f597002ce68d5ff2db9c633caa3e718083b136c57"
+    },
+    {
+      "path": "runs/envoy-http/run-KNgnyO/admin-address.txt",
+      "bytes": 15,
+      "sha256": "39a4cbb8d667ed17462bf1ec67cc913b34aa9497c21b22ab4d498db2a5cfab22"
+    },
+    {
+      "path": "runs/envoy-http/run-KNgnyO/envoy.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/envoy-http/run-KNgnyO/envoy.yaml",
+      "bytes": 2701,
+      "sha256": "2d8ca30bb245d0a1018c5e6f597002ce68d5ff2db9c633caa3e718083b136c57"
+    },
+    {
+      "path": "runs/envoy-http/run-L1xRYl/admin-address.txt",
+      "bytes": 15,
+      "sha256": "e0175e2513c40de4ffbc863d7b7d56eb729d6be277bf3c2ef9ed3aee0b232e46"
+    },
+    {
+      "path": "runs/envoy-http/run-L1xRYl/envoy.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/envoy-http/run-L1xRYl/envoy.yaml",
+      "bytes": 2701,
+      "sha256": "2d8ca30bb245d0a1018c5e6f597002ce68d5ff2db9c633caa3e718083b136c57"
+    },
+    {
+      "path": "runs/envoy-http/run-LiImw0/admin-address.txt",
+      "bytes": 15,
+      "sha256": "5e4a9335a7bde2312eebd1b04c2e99016df77830a749650fcb417d8b11a55391"
+    },
+    {
+      "path": "runs/envoy-http/run-LiImw0/envoy.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/envoy-http/run-LiImw0/envoy.yaml",
+      "bytes": 2701,
+      "sha256": "2d8ca30bb245d0a1018c5e6f597002ce68d5ff2db9c633caa3e718083b136c57"
+    },
+    {
+      "path": "runs/envoy-http/run-lMOKZz/admin-address.txt",
+      "bytes": 15,
+      "sha256": "4995380898ff8249f7fdd9392d6c692e6eb30a950080a449eda20f94e18f7226"
+    },
+    {
+      "path": "runs/envoy-http/run-lMOKZz/envoy.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/envoy-http/run-lMOKZz/envoy.yaml",
+      "bytes": 2701,
+      "sha256": "2d8ca30bb245d0a1018c5e6f597002ce68d5ff2db9c633caa3e718083b136c57"
+    },
+    {
+      "path": "runs/envoy-http/run-nyM2XZ/admin-address.txt",
+      "bytes": 15,
+      "sha256": "11688bb8c673874b11bdd6247fdf05d4464a8f6dab36716a65cac0aee632ed15"
+    },
+    {
+      "path": "runs/envoy-http/run-nyM2XZ/envoy.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/envoy-http/run-nyM2XZ/envoy.yaml",
+      "bytes": 2701,
+      "sha256": "2d8ca30bb245d0a1018c5e6f597002ce68d5ff2db9c633caa3e718083b136c57"
+    },
+    {
+      "path": "runs/envoy-http/run-vi7x2s/admin-address.txt",
+      "bytes": 15,
+      "sha256": "2282a309ab590d7deaef3512d10a9c5d34b52fb4b204c0d4138b8e52631dfdd5"
+    },
+    {
+      "path": "runs/envoy-http/run-vi7x2s/envoy.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/envoy-http/run-vi7x2s/envoy.yaml",
+      "bytes": 2701,
+      "sha256": "2d8ca30bb245d0a1018c5e6f597002ce68d5ff2db9c633caa3e718083b136c57"
+    },
+    {
+      "path": "runs/envoy-http/run-wkj8XC/admin-address.txt",
+      "bytes": 15,
+      "sha256": "fbbefed553c4a28009e340948b95119ca3448568696d237148a3ddf112d8924d"
+    },
+    {
+      "path": "runs/envoy-http/run-wkj8XC/envoy.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/envoy-http/run-wkj8XC/envoy.yaml",
+      "bytes": 2701,
+      "sha256": "2d8ca30bb245d0a1018c5e6f597002ce68d5ff2db9c633caa3e718083b136c57"
+    },
+    {
+      "path": "runs/envoy-http/run-Zwwcrv/admin-address.txt",
+      "bytes": 15,
+      "sha256": "ef41b5e5ce111628ccfe2c3024136036c11ef2b5c25e4573efef95a166e4fac4"
+    },
+    {
+      "path": "runs/envoy-http/run-Zwwcrv/envoy.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/envoy-http/run-Zwwcrv/envoy.yaml",
+      "bytes": 2701,
+      "sha256": "2d8ca30bb245d0a1018c5e6f597002ce68d5ff2db9c633caa3e718083b136c57"
+    },
+    {
+      "path": "runs/envoy-http-first-run.log",
+      "bytes": 1274,
+      "sha256": "bbdd35439fc1546496ffb5868ccee7e85aa141860bd9a45605de9eac9ccf2c5f"
+    },
+    {
+      "path": "runs/envoy-http-functional.log",
+      "bytes": 1658,
+      "sha256": "ce0c653ce9085567d856e3bb3d97f4442feb88f4aa61bdbbf3c5f65ab8e29726"
+    },
+    {
+      "path": "runs/envoy-initial-interrupted-build.log",
+      "bytes": 68372,
+      "sha256": "5eb0770934d1d24eeb0e30550167c212dcea5af0174549d6d0d66a180e7eeb87"
+    },
+    {
+      "path": "runs/envoy-installed-source-check.log",
+      "bytes": 89,
+      "sha256": "51390b81241293a27536ea4cc3135f15f1ddbfd8ddd22da8013a3629834c181c"
+    },
+    {
+      "path": "runs/envoy-legacy-http3-flag-interrupted-build.log",
+      "bytes": 27406,
+      "sha256": "99b7756ead64821bdf672211d95302760a99050e87e683f46aee5f9690d75e75"
+    },
+    {
+      "path": "runs/envoy-linked-build.log",
+      "bytes": 153860,
+      "sha256": "af10757eaae8bd2de548fb076567e7c4daf49dc8c56b00738f33f542d1730f50"
+    },
+    {
+      "path": "runs/envoy-rtl-final-test.log",
+      "bytes": 14761,
+      "sha256": "6596a7648d24714bb56a6458e54d900f52d609140051452eac8f51c64a6bb981"
+    },
+    {
+      "path": "runs/envoy-rtl-first-synth-test.log",
+      "bytes": 564626,
+      "sha256": "3991d450c24c7e3dd2dd2a8b5adcfa22a07de286e8d767401188479e62e5eb3b"
+    },
+    {
+      "path": "runs/envoy-rtl-first-test.log",
+      "bytes": 6556,
+      "sha256": "6628fd0b995b1248baa36077d74a212c6f770bb5dc202e294c1b972544019405"
+    },
+    {
+      "path": "runs/envoy-rtl-fourth-synth-test.log",
+      "bytes": 18359,
+      "sha256": "6f7d5a3f37a041110b1724949c327a40b6d0192749dac9eaf7f3740924a7aeaa"
+    },
+    {
+      "path": "runs/envoy-rtl-initial-ntt-lint.log",
+      "bytes": 1767,
+      "sha256": "5f20322321bba01cb88d4bf9a6c1e172822673adb175fb67bb955eb851bfe86b"
+    },
+    {
+      "path": "runs/envoy-rtl-initial-shake-lint.log",
+      "bytes": 1111,
+      "sha256": "30db31aa83aba0b114bc544e6d659e842be7465c9a092bc7517ce0b1f847d48d"
+    },
+    {
+      "path": "runs/envoy-rtl-second-synth-test.log",
+      "bytes": 911,
+      "sha256": "4845f5499efd36a64edf52e7b9d561028446f722dab00190000bf739e4686186"
+    },
+    {
+      "path": "runs/envoy-rtl-third-synth-test.log",
+      "bytes": 2233375,
+      "sha256": "8d43315f1546dfdd6baf55d853335bf438ea2d55a766d0dd65542a60642ced6f"
+    },
+    {
+      "path": "runs/envoy-typed-config-interrupted-build.log",
+      "bytes": 38417,
+      "sha256": "10a1baa052e8b572af60d77a5d5244d59db7eddd707ba9960bf8b2c434f5b500"
+    },
+    {
+      "path": "runs/envoy-version.txt",
+      "bytes": 106,
+      "sha256": "47a6dd969b856dc143d49430b794e5c5f1eb10aa09be3f006c58bd6323925186"
+    },
+    {
+      "path": "runs/generated-artifacts-sha256.txt",
+      "bytes": 374,
+      "sha256": "4e69aa025a33f96049623806f8b0ef8e4c90cea18d158c2e82f0ae4fa2af4487"
+    },
+    {
+      "path": "runs/generic-synthesis.log",
+      "bytes": 507200,
+      "sha256": "2802ad1e14ecce4aa67497457785dd346a5cc61c36b35e7ff92e865cb5946a10"
+    },
+    {
+      "path": "runs/host-artifacts-sha256.txt",
+      "bytes": 628,
+      "sha256": "d387c47ccfd63d3c9e49c985bb0acef6e9b6f9250b7f373d04434c4c3138e3cb"
+    },
+    {
+      "path": "runs/host-regression.log",
+      "bytes": 2831,
+      "sha256": "216b1ece5cf19c8a5eae9b80238ebdd549b6cb31c86666ecded661aee5f058f0"
+    },
+    {
+      "path": "runs/http-first-run-reconstructed-source.cc",
+      "bytes": 14739,
+      "sha256": "4558cd9d8379b6509297f6845a3dea53863840395f33a045d0e9e53b79e77ef2"
+    },
+    {
+      "path": "runs/http-harness-missing-include-build.log",
+      "bytes": 809,
+      "sha256": "1ef2600e90bb6520ba9b1842be5ab07bd67f99e7e190172fe62ebd12c568bf61"
+    },
+    {
+      "path": "runs/http-harness-preflight-build.log",
+      "bytes": 456,
+      "sha256": "8230695048e8a9722cf43cfef4372c1d00a95483cda847b1d0b2bb2fa9871763"
+    },
+    {
+      "path": "runs/pq-plugin-dynamic-dependencies.txt",
+      "bytes": 374,
+      "sha256": "408063b83398dfbe8faa17c3816756e2068eac620cb0ff1fe034f6c956aefbe8"
+    },
+    {
+      "path": "runs/report-render.log",
+      "bytes": 4233,
+      "sha256": "780f486573aa0ea667a6ceb87e2f63cbbeffb32297d9fff644b2a952e78e58c3"
+    },
+    {
+      "path": "runs/report-review.txt",
+      "bytes": 443,
+      "sha256": "0ffc4e479a9e62683f71bb890c418d0b49e92d91abcf54fc8757b0218281fa77"
+    },
+    {
+      "path": "runs/root-cargo-regression.log",
+      "bytes": 13590,
+      "sha256": "b5ec737eac9cee92eed634dc7e6328ba7f474a7c7bf8d8b9222ecfb173b88be3"
+    },
+    {
+      "path": "runs/rtl-byte-state-first-success.log",
+      "bytes": 29158,
+      "sha256": "64a9a8081299afa2b2afb5e1c00f298e00e7dc872e1f27f6bbc5fbe16d994bdc"
+    },
+    {
+      "path": "runs/rtl-functional-and-synthesis-replay.log",
+      "bytes": 6218,
+      "sha256": "f395b9d0a63f59b1bd0b7c3d5765424b196230845b8c2bdc85d9246b672ec82b"
+    },
+    {
+      "path": "runs/rtl-intermediate-fourteen-groups.log",
+      "bytes": 12145,
+      "sha256": "9729a3d52de4767db2f869db9700ddd666957a3f9db674b9b158fd9a208919fd"
+    },
+    {
+      "path": "runs/rtl-source-sha256.txt",
+      "bytes": 618,
+      "sha256": "8950f1b76fc80e399fe509da1731efe65f3306573dbec2dc5988022c1a8b05e9"
+    },
+    {
+      "path": "runs/rtl-toolchain.txt",
+      "bytes": 141,
+      "sha256": "8ef38725e6edff7fb8f48114a61876cabfa263ce140a69a0ac0d05befe45f845"
+    },
+    {
+      "path": "runs/tool-archives-sha256.txt",
+      "bytes": 737,
+      "sha256": "f3dd2a3127bc4ec8f93c8ef3648992c9d7cf065e204230704afcc765e6b76de2"
+    }
+  ]
+}
