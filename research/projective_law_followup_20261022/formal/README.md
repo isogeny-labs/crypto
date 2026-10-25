@@ -270,10 +270,10 @@ presented** chart localizations, the resulting principal-open scheme
 isomorphism, projective gluing, and divisor/`Pic⁰` transport remain open.
 
 The [separate-chart map packet](SEPARATE_CHART_MAP.md) defines the affine
-quotient and both principal opens independently, then checks a candidate
-polynomial algebra map into the localized infinity chart, its generator
-images, the localized inverse, and the infinity-chart equation. Its
-[CSV](separate-chart-map.csv), [SVG](separate-chart-map.svg), and
-artifact-stored PDF record the result and the remaining gates. The affine
-equation's image has not yet been proved zero, so descent to the quotient,
-the reverse map, and an isomorphism of the separate chart rings remain open.
+quotient and both principal opens independently. Pinned Lean checks that each
+defining equation maps to zero and constructs algebra maps in both directions
+between the localized coordinate rings, including quotient and localization
+descent. Its [CSV](separate-chart-map.csv), [SVG](separate-chart-map.svg), and
+artifact-stored PDF record the result and the remaining gates. Neither
+composition has yet been proved the identity, so an isomorphism of the
+separate chart rings and the geometric bridges remain open.
