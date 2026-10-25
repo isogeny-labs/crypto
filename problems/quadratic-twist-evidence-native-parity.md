@@ -111,16 +111,15 @@ reproduced by an exact pulled-back factor base on the main curve.
   The library suite and native backend tests are recorded in the study validation
   directory. Conductor still exits 127; its shared workflow/configuration is absent.
   No shared reservation is claimed, and no replacement local coordinator was started.
-- **Artifact publication hold:** the user has now approved the exact four-file
-  manifest/destination, resolving the prior automatic review rejection. All
-  684,341 local bytes match their approved hashes. The authorized upload attempt
-  exits2 at S3 head-object with **Unable to locate credentials**; no file was
-  uploaded, no remote verification completed and no hydration manifest created.
-  The [current access record](../research/quadratic_twist_evidence_20261021/validation/artifact-upload-20261024/README.md)
-  records approval and the concrete credential failure. The original proposal
-  and payloads stay frozen. Configure an AWS connection, then finish the already
-  approved immutable upload and remote verification. Do not ask for the same
-  authorization again or treat this access blocker as a mathematical failure.
+- **Artifact publication resolved:** the four approved files,684,341 bytes,
+  were uploaded by the unchanged pinned repository tool. Two genuine hydration
+  manifests were generated, its remote verification reports zero problems, and
+  all four fresh downloads match the original byte counts and SHA-256 hashes.
+  The [publication record](../research/quadratic_twist_evidence_20261021/validation/artifact-upload-20261025/README.md)
+  retains the successful commands and preceding proxy-access failure. The old
+  missing-credential attempt remains historical. No credentials were persisted;
+  the original proposal, payloads and all frozen checksums remain unchanged.
+  This closes artifact publication only, not the remaining research/merge gates.
 - **Not established:** general ECDLP hardness, an asymptotic IC advantage, or a
   general GHS algorithm. The finite observations and proved conditional
   implications do not establish those conclusions.
@@ -161,8 +160,8 @@ reproduced by an exact pulled-back factor base on the main curve.
 - [ ] Run the actual shared Conductor check with its configured task state.
   Do not substitute a new local coordination instance.
 - [x] Obtain explicit approval for the exact four-file artifact manifest and S3 destination.
-- [ ] Configure actual AWS credentials for this execution environment, upload
-  those approved immutable bytes and verify remote hashes.
+- [x] Use actual AWS access to upload the four approved immutable files and
+  verify their remote hashes; credentials were used only for this operation.
 
 Satisfying these conditions would establish the stated formal parity. It would
 still not prove general ECDLP hardness or an asymptotic solver advantage.

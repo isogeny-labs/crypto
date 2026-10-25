@@ -1,12 +1,12 @@
 # Validation record
 
-Artifact publication update: [approved upload /missing AWS credentials](artifact-upload-20261024/README.md).
-User authorization for the exact four-file manifest/destination is granted and
-the payload hashes are unchanged. The actual authorized attempt exits2 at S3
-head-object with **Unable to locate credentials**; zero files uploaded, remote
-verification unperformed. The old pending proposal and all frozen validation
-records remain unchanged. No additional upload approval is needed for these
-same bytes; configuring an AWS connection is the remaining access requirement.
+Artifact publication update: [all four artifacts uploaded and remotely verified](artifact-upload-20261025/README.md).
+The approved immutable files total684,341 bytes. The repository tool reports
+four uploads, two hydration manifests and zero verification problems; fresh
+downloads match all four original hashes. The prior approval/credential records
+and every frozen INPUTS/OUTPUTS checksum remain unchanged. Credential values
+were not persisted. The research, Conductor, CI/review and integration holds
+remain separate and open.
 
 Current actual-system continuation: [s3-yield-20261024](s3-yield-20261024/README.md).
 The unmodified twelve-module gate passes144 named research theorems /185

@@ -37,7 +37,7 @@
 | Strictly lower homogeneous regularity in this S3 encoding | disproved at fixed size2/3 | actual leading ideal <x^2*y^2,x^b,y^b> is identical; first-zero degree b+1; a different encoding remains a construction obligation |
 | Twist gain beyond factor-base choice / complete work improvement | unestablished | inverse-transported base reproduces all coefficient rows and degree profiles on main; all-target mean closure5.2 in both F43 arms; no timings or complete work bounds |
 | New exact representation identity | explicit coordinates, not a registered EC1 | U=(24,26),r11 on existing twist model; never relabelled as prior generator(35,12); no registry or cross-repository performance claim |
-| Actual S3 continuation report and validation | source/compact evidence supplied; approved large-asset upload blocked by AWS credentials | `reports/s3-yield-20261024/`, `validation/s3-yield-20261024/`; four local PDF pages inspected; user approval resolves the old review block; authorized upload exits2: Unable to locate credentials; current record `validation/artifact-upload-20261024/` |
+| Actual S3 continuation report and validation | supplied; four approved large assets uploaded and remotely verified | `reports/s3-yield-20261024/`, `validation/s3-yield-20261024/`; all four fresh downloads match the original approved hashes,684,341 bytes; two genuine hydration manifests; current record `validation/artifact-upload-20261025/` |
 
 The fresh library suite after the current-main refresh passes 4,479 tests with
 119 existing ignores. The new isolated native auditor's backend suite passes
