@@ -378,6 +378,15 @@ fn polynomial_value(p: &Poly, e: [u64; 3], modulus: u64) -> u64 {
     out as u64
 }
 
+fn reference_complete(reference: &Value) -> R<()> {
+    need(
+        reference["schema"] == "twist-zero-five-polynomial/v1"
+            && reference["status"] == "complete-polynomial-enumeration"
+            && num(&reference["undetermined_systems"])? == 0
+            && reference["cooperative_deadline_hit"] == false,
+        "incomplete or wrong-kind reference",
+    )
+}
 fn prepare(workload_path: &Path, expected_sha: &str, out: &Path) -> R<()> {
     need(
         expected_sha == WORKLOAD_SHA && sha(workload_path)? == expected_sha,
@@ -422,12 +431,7 @@ fn prepare(workload_path: &Path, expected_sha: &str, out: &Path) -> R<()> {
                 && audit["public_input_sha256"] == task["public_sha256"],
             "independent reference audit binding",
         )?;
-        need(
-            reference["status"] == "pass"
-                && num(&reference["undetermined_systems"])? == 0
-                && reference["cooperative_deadline_hit"] == false,
-            "incomplete reference",
-        )?;
+        reference_complete(&reference)?;
         for key in ["p", "seed", "arm"] {
             need(reference[key] == task[key], "reference workload identity")?;
         }
@@ -629,6 +633,7 @@ fn audit(
     let base = arr(&public["base_coordinates"])?;
     let input = read(input_path)?;
     let reference = read(reference_path)?;
+    reference_complete(&reference)?;
     let path = candidate_dir.join("record.json");
     let candidate = read(&path)?;
     need(
@@ -968,6 +973,20 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn completed_phase1_schema_is_distinct_from_a_pipeline_pass() {
+        let reference = json!({"schema":"twist-zero-five-polynomial/v1","status":"complete-polynomial-enumeration","undetermined_systems":0,"cooperative_deadline_hit":false});
+        reference_complete(&reference).unwrap();
+        let mut bad = reference.clone();
+        bad["status"] = json!("pass");
+        assert!(reference_complete(&bad).is_err());
+        let mut bad = reference.clone();
+        bad["undetermined_systems"] = json!(1);
+        assert!(reference_complete(&bad).is_err());
+        let mut bad = reference;
+        bad["cooperative_deadline_hit"] = json!(true);
+        assert!(reference_complete(&bad).is_err());
+    }
     fn poly(terms: &[(M, u64)]) -> Poly {
         terms.iter().copied().collect()
     }
