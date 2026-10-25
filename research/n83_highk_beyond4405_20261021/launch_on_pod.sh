@@ -18,6 +18,23 @@ python3 -m research.n83_highk_beyond4405_20261021.verify_watchdog_ready \
   --ready "$fixed31_watchdog_ready" || exit 79
 cp "$fixed31_watchdog_ready" "$fixed31_root/watchdog_ready.json" || exit 80
 
+# The external watcher normally retires the Pod five minutes before the cap.
+# Arm a second, Pod-local deletion path before compiling or measuring.
+command -v runpodctl >/dev/null || exit 81
+nohup python3 -m research.n83_highk_beyond4405_20261021.pod_deadline_guard \
+  --allocation "$fixed31_allocation" --ready "$fixed31_watchdog_ready" \
+  --receipt "$fixed31_root/pod_deadline_guard.json" \
+  > "$fixed31_root/pod_deadline_guard.log" 2>&1 < /dev/null &
+fixed31_guard_pid=$!
+for fixed31_guard_attempt in 1 2 3 4 5; do
+  test -f "$fixed31_root/pod_deadline_guard.json" && break
+  kill -0 "$fixed31_guard_pid" 2>/dev/null || exit 81
+  sleep 1
+done
+test -f "$fixed31_root/pod_deadline_guard.json" || exit 81
+python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["schema"]=="n83.fixed31-pod-deadline-guard/v1" and r["status"]=="ARMED"' \
+  "$fixed31_root/pod_deadline_guard.json" || exit 81
+
 python3 -m research.n83_highk_beyond4405_20261021.run --fixture-preflight \
   > "$fixed31_root/fixture_preflight.log" 2>&1 || exit 71
 rustc -V > "$fixed31_root/rustc_version.txt"
@@ -83,7 +100,8 @@ if [ -d "$fixed31_root/results" ]; then
   fi
   fixed31_archive_items=(results fixture_preflight.log rustc_version.txt
     cargo_version.txt git_head.txt source_hashes.txt build.log screen_run.log
-    screen_verify.log watchdog_ready.json)
+    screen_verify.log watchdog_ready.json pod_deadline_guard.json
+    pod_deadline_guard.log)
   if [ -f "$fixed31_root/holdout_run.log" ]; then
     fixed31_archive_items+=(holdout_run.log)
   fi
