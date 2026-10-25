@@ -639,7 +639,7 @@ impl ChainedS3Encoding {
         let values: Vec<_> = self
             .blocks
             .iter()
-            .map(|block| self.decode_block(block, &model))
+            .map(|block| self.decode_block(block, model))
             .collect();
         if self.target_x.as_ref() != Some(&values[2 * self.m - 2])
             && !(self.target_x.is_none() && values[2 * self.m - 2].is_zero())
