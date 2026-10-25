@@ -1,6 +1,11 @@
 """Check provider SSH endpoint selection before any paid dispatch."""
 
 import unittest
+import json
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+import tempfile
+from unittest.mock import patch
 
 from research.n83_crossfamily_current_20261025 import dispatch_runpod
 
@@ -42,6 +47,25 @@ class EndpointTests(unittest.TestCase):
         changed[0]['runtime']['ports'][0]['isIpPublic'] = False
         with self.assertRaisesRegex(ValueError, 'public provider SSH'):
             dispatch_runpod.endpoints(changed, ALLOCATIONS)
+
+    def test_watch_records_complete_custody_and_failed_stage_separately(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            plan = {'schema': 'n83.crossfamily-current-allocation-plan/v1',
+                    'terminate_at_utc': (datetime.now(timezone.utc) +
+                                         timedelta(minutes=5)).isoformat()}
+            (root / 'allocation_plan.json').write_text(json.dumps(plan))
+            for status, expected in (
+                    ('RECOVERED', 'PASS_ARCHIVES_AND_POD_ABSENCE'),
+                    ('FAILED_BEFORE_RAW_ARCHIVE',
+                     'PODS_ABSENT_WITH_FAILED_STAGE')):
+                state = {'strata': [{'stratum': i, 'status': status}
+                                    for i in range(2)],
+                         'terminated_and_absent': {0: True, 1: True}}
+                with patch.object(dispatch_runpod, 'collect', return_value=state):
+                    dispatch_runpod.watch(root, root, root, 'fake', 0)
+                self.assertEqual(json.loads((root / 'watch.json').read_text())
+                                 ['status'], expected)
         changed = pods()
         changed[0]['runtime']['ports'].append(
             {'ip': '198.51.100.12', 'isIpPublic': True,

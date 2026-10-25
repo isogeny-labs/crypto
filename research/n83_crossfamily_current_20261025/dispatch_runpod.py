@@ -3,6 +3,7 @@
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
 import ipaddress
 import json
 from pathlib import Path
@@ -21,6 +22,8 @@ QUERY = ("query { myself { pods { id name machineId desiredStatus "
 REMOTE_BUNDLE = '/workspace/n83-crossfamily-bundle'
 REMOTE_SOURCE = '/workspace/crypto'
 SSH_OPTIONS = ('-o', 'BatchMode=yes', '-o', 'ConnectTimeout=15',
+               '-o', 'ServerAliveInterval=20',
+               '-o', 'ServerAliveCountMax=3',
                '-o', 'StrictHostKeyChecking=accept-new')
 
 
@@ -288,6 +291,37 @@ def collect(allocation_dir, bundle_dir, output, key):
     return {'strata': recovered, 'terminated_and_absent': terminations}
 
 
+def watch(allocation_dir, bundle_dir, output, key, poll_seconds=30):
+    plan = json.loads((allocation_dir / 'allocation_plan.json').read_text())
+    if plan.get('schema') != 'n83.crossfamily-current-allocation-plan/v1':
+        raise ValueError('allocation deadline plan differs')
+    deadline = datetime.fromisoformat(
+        plan['terminate_at_utc'].replace('Z', '+00:00'))
+    if deadline.tzinfo is None:
+        raise ValueError('allocation deadline has no timezone')
+    errors = []
+    while datetime.now(timezone.utc) < deadline:
+        try:
+            state = collect(allocation_dir, bundle_dir, output, key)
+            if state['terminated_and_absent'] == {0: True, 1: True}:
+                status = ('PASS_ARCHIVES_AND_POD_ABSENCE' if
+                          all(item['status'] == 'RECOVERED' for item in
+                              state['strata']) else
+                          'PODS_ABSENT_WITH_FAILED_STAGE')
+                write(output / 'watch.json',
+                      {'status': status,
+                       'strata': state['strata'], 'errors': errors})
+                return state
+        except Exception as error:
+            errors.append({'utc': datetime.now(timezone.utc).isoformat(),
+                           'error_type': type(error).__name__})
+            write(output / 'watch_errors.json', errors)
+        time.sleep(poll_seconds)
+    write(output / 'watch.json', {'status': 'DEADLINE_WITHOUT_COMPLETE_CUSTODY',
+                                 'errors': errors})
+    raise ValueError('RunPod deadline reached before complete custody')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--allocation-dir', type=Path, required=True)
@@ -296,10 +330,18 @@ def main():
     action = parser.add_mutually_exclusive_group(required=True)
     action.add_argument('--stage', action='store_true')
     action.add_argument('--collect', action='store_true')
+    action.add_argument('--watch', action='store_true')
+    action.add_argument('--stage-and-watch', action='store_true')
     args = parser.parse_args()
     key = allocate_runpod.configured_key()
-    if args.stage:
+    if args.stage or args.stage_and_watch:
         result = stage(args.allocation_dir.resolve(),
+                       args.source_bundle.resolve(), args.output.resolve(), key)
+        if args.stage_and_watch:
+            result = watch(args.allocation_dir.resolve(),
+                           args.source_bundle.resolve(), args.output.resolve(), key)
+    elif args.watch:
+        result = watch(args.allocation_dir.resolve(),
                        args.source_bundle.resolve(), args.output.resolve(), key)
     else:
         result = collect(args.allocation_dir.resolve(),

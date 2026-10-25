@@ -73,7 +73,9 @@ transfers the sealed source and allocation receipts to two public SSH
 endpoints, and repeatable `--collect` calls retrieve checksummed raw archives
 and logs, then terminate both Pods after both have finished. A failed stage
 attempt records cleanup; a failed transfer keeps both Pods available until
-the provider auto-termination deadline.
+the provider auto-termination deadline. `--stage-and-watch` combines dispatch
+with 30-second collection retries through that deadline and writes a final
+custody status. `--watch` resumes an interrupted watcher.
 `launch_on_pod.sh` installs the pinned Rust toolchain, tests and builds the
 two exact producers, runs one stratum with four exposed CPU IDs, verifies the
 raw receipts, and archives them even when a stage fails. The dispatch output
@@ -106,10 +108,10 @@ python3 -m research.n83_crossfamily_current_20261025.allocate_runpod \
 python3 -m research.n83_crossfamily_current_20261025.dispatch_runpod \
   --allocation-dir /absolute/path/outside/repository/n83-allocation \
   --source-bundle /absolute/path/outside/repository/n83-source-bundle \
-  --output /absolute/path/outside/repository/n83-dispatch --stage
-# Repeat --collect until both strata have a termination receipt.
+  --output /absolute/path/outside/repository/n83-dispatch --stage-and-watch
+# After an interrupted watcher, resume it against the same output directory.
 python3 -m research.n83_crossfamily_current_20261025.dispatch_runpod \
   --allocation-dir /absolute/path/outside/repository/n83-allocation \
   --source-bundle /absolute/path/outside/repository/n83-source-bundle \
-  --output /absolute/path/outside/repository/n83-dispatch --collect
+  --output /absolute/path/outside/repository/n83-dispatch --watch
 ```
