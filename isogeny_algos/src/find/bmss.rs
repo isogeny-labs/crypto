@@ -87,13 +87,18 @@ fn v_series<F: Field>(f: &F, e: &Curve<F::E>, n: usize) -> Vec<F::E> {
 /// Monic polynomial of degree d whose first d power sums are q[1..=d] (Newton identities).
 fn poly_from_power_sums<F: Field>(f: &F, q: &[F::E], d: usize) -> Poly<F> {
     let mut e = vec![f.one()];
+    let invs =
+        (d >= 8).then(|| f.batch_inv(&(1..=d).map(|k| f.from_u64(k as u64)).collect::<Vec<_>>()));
     for k in 1..=d {
         let mut s = f.zero();
         for i in 1..=k {
             let t = f.mul(e[k - i], q[i]);
             s = if i % 2 == 1 { f.add(s, t) } else { f.sub(s, t) };
         }
-        e.push(f.div(s, f.from_u64(k as u64)));
+        e.push(match &invs {
+            Some(inverses) => f.mul(s, inverses[k - 1]),
+            None => f.div(s, f.from_u64(k as u64)),
+        });
     }
     let mut g = vec![f.zero(); d + 1];
     for k in 0..=d {
@@ -454,7 +459,12 @@ pub fn s_ode_both<F: Field>(
 }
 
 /// U(w) = 1/T(w)^2 where S(x) = x T(x^2); N/D = x U(1/x) so h_i = U[i+1]; length m.
-fn u_from_ode<F: Field>(f: &F, e: &Curve<F::E>, et: &Curve<F::E>, m: usize) -> Vec<F::E> {
+pub(crate) fn u_from_ode<F: Field>(
+    f: &F,
+    e: &Curve<F::E>,
+    et: &Curve<F::E>,
+    m: usize,
+) -> Vec<F::E> {
     let s = s_ode(f, e, et, 2 * m + 2);
     let t: Vec<F::E> = (0..m).map(|i| s[2 * i + 1]).collect();
     let t2 = series::mul(f, &t, &t, m);
@@ -530,10 +540,6 @@ fn linear_algebra<F: Field>(
     let mut rhs = vec![f.zero(); unk];
     // residual coefficient of Z^t (t = 1..=2l-1) of: Z^0 V^l [n_l] - V~ V^{l-1} [d_{l-1}]  + sum unknown terms
     let vt_vl1 = series::mul(f, &vt, &vp[ell - 1], n);
-    // V~ V^i for the d_i columns (independent of the row t)
-    let vt_vp: Vec<Vec<F::E>> = (0..ell - 1)
-        .map(|i| series::mul(f, &vt, &vp[i], n))
-        .collect();
     for t in 1..=unk {
         let row = t - 1;
         // known part: V^l - V~ V^{l-1}
@@ -544,10 +550,16 @@ fn linear_algebra<F: Field>(
                 mat[row][i] = vp[i][t + i - ell];
             }
         }
-        for (i, prod) in vt_vp.iter().enumerate() {
+    }
+    // Each V~ V^i is independent of the matrix row. Build it once and
+    // scatter its coefficients down the corresponding denominator column.
+    // Keeping only this product avoids an additional O(ell^2) cache.
+    for i in 0..ell - 1 {
+        let prod = series::mul(f, &vt, &vp[i], n);
+        for t in 1..=unk {
             // - d_i V~ Z^{l-1-i} V^i
             if t + 1 + i >= ell {
-                mat[row][ell + i] = f.neg(prod[t + 1 + i - ell]);
+                mat[t - 1][ell + i] = f.neg(prod[t + 1 + i - ell]);
             }
         }
     }
@@ -646,10 +658,29 @@ pub fn isogeny<F: Field>(
     ell: usize,
     sigma: Option<F::E>,
 ) -> Option<RatIsogeny<F>> {
+    let g = kernel(f, m, e, et, ell, sigma)?;
+    let iso = kohel(f, e, &g, ell as u64);
+    if iso.cod != *et {
+        return None;
+    }
+    Some(iso)
+}
+
+/// The kernel polynomial an algorithm of the family returns, without the exact check that its
+/// Kohel codomain is `et` (over an inexact field such as `padic::PadicField` the two agree only
+/// to the working precision; callers verify after reduction).
+pub fn kernel<F: Field>(
+    f: &F,
+    m: Method,
+    e: &Curve<F::E>,
+    et: &Curve<F::E>,
+    ell: usize,
+    sigma: Option<F::E>,
+) -> Option<Poly<F>> {
     if ell < 3 || ell.is_multiple_of(2) {
         return None;
     }
-    let g = match m {
+    match m {
         Method::LinearAlgebra => linear_algebra(f, e, et, ell),
         Method::Stark1972 => stark(f, e, et, ell),
         Method::Atkin1992 => atkin1992(f, e, et, ell, sigma?),
@@ -658,12 +689,7 @@ pub fn isogeny<F: Field>(
         Method::Elkies1998 => elkies1998(f, e, et, ell, sigma?),
         Method::FastElkies => fast_elkies(f, e, et, ell, sigma?),
         Method::FastElkiesPrime => fast_elkies_prime(f, e, et, ell),
-    }?;
-    let iso = kohel(f, e, &g, ell as u64);
-    if iso.cod != *et {
-        return None;
     }
-    Some(iso)
 }
 
 /// sigma = sum of the abscissas of the non-zero kernel points, from the second-order relation of

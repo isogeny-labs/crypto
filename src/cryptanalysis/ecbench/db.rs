@@ -401,7 +401,13 @@ fn comparison_row(out: &mut String, c: &Comparison) {
         f(c.ops.ci95.map(|x| x.1)),
         b(c.ops.bounded),
         ts(&c.wall.status),
-        f(c.wall.median_ratio),
+        // `wall_ratio` is the statistic `wall_ci_*` bounds: the v2
+        // per-operation ratio, or the v1 median per-pair ratio.
+        f(if c.schema == crate::cryptanalysis::ecbench::compare::COMPARISON_SCHEMA {
+            c.wall.median_ratio
+        } else {
+            c.wall.ratio_b_over_a
+        }),
         f(c.wall.ci95.map(|x| x.0)),
         f(c.wall.ci95.map(|x| x.1)),
         ts(&c.verdict),
@@ -504,7 +510,8 @@ pub fn sql_for_path(path: &Path) -> Result<String, String> {
     if path.is_dir() {
         let session = read_session(path)?;
         let host: HostCapsule = serde_json::from_str(
-            &std::fs::read_to_string(path.join("host.json")).map_err(|e| e.to_string())?,
+            &std::fs::read_to_string(path.join("host.json"))
+                .map_err(|e| format!("{}: {e}", path.join("host.json").display()))?,
         )
         .map_err(|e| format!("host.json: {e}"))?;
         host_row(&mut out, &host);
@@ -532,7 +539,7 @@ pub fn sql_for_path(path: &Path) -> Result<String, String> {
     let text = std::fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
     let v: Value = serde_json::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))?;
     match v.get("schema").and_then(Value::as_str) {
-        Some(crate::cryptanalysis::ecbench::compare::COMPARISON_SCHEMA) => {
+        Some(s) if crate::cryptanalysis::ecbench::compare::is_comparison_schema(s) => {
             let c: Comparison = serde_json::from_value(v).map_err(|e| e.to_string())?;
             comparison_row(&mut out, &c);
         }
