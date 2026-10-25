@@ -29,7 +29,7 @@ jobs:
   overview:
     # Not routed to crypto-eks: the browser check needs Chrome and its system
     # libraries, and that runner image has no browser and no apt-get install.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
