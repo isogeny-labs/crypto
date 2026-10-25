@@ -37,10 +37,12 @@ PDF: [`report/report.pdf`](report/report.pdf).
   logarithms §23's rows did, for both arms, on the same targets.
 - **The pin held:** v6's outputs on `T01` at each size equal §23's
   ([`runs/pin/`](runs/pin/)).
-- **The reference check is admissible at every size.** The comparison's rho
-  runs at 0.70–0.85 times the strong walk's time a step (v6's own
+- **The reference check is admissible at every size.** By the protocol's
+  median over eight matched targets per size, the comparison's rho runs at
+  0.70–0.85 times the strong walk's time a step (v6's own
   `koblitz_rho_fixture strong`, 140–159 ns a step;
-  [`runs/reference/`](runs/reference/)).
+  [`runs/reference/`](runs/reference/)). Individual targets `k0n57/T05` and
+  `k0n41/T04` are slower than the strong walk; the size-median gate still passes.
 - **Four rows ran again.** Their first attempt was contended: the isolation
   tool saw other processes on the host, among them a compression check run
   during the comparison. Each re-ran clean, and only the clean attempt
@@ -54,6 +56,31 @@ re-timed.
   `n = 47, 57, 59`. It now takes the single-word walk's whole range. The
   refused attempts stay in
   [`runs/reference-refused-size-gate/`](runs/reference-refused-size-gate/).
+
+## Independent validation, 2026-10-24
+
+[`validate_independently.py`](validate_independently.py) replays the 408
+claim-selected reports without invoking the producer. Pure Python field and
+curve arithmetic checks all 816 `[d]G = Q` certificates and rejects 816
+altered-scalar controls. All 4,032 recorded repetition-arm answers match their
+certificates. The script checks the field polynomials, prime subgroup orders,
+clean retry selection, raw repetition medians, six cold and online point
+estimates, and the published bootstrap intervals. Its separate seeded
+bootstrap places all 24 interval endpoints within 1.9% of its own endpoints.
+The 48 strong-walk records match the public targets and source hashes; the
+six size-median reference ratios match `analysis.json` exactly. The two
+individual slower targets remain visible in the
+[rho-reference report](rho-reference.json).
+
+The [SHA-bound gate manifest](VALIDATION.json) points to the
+[replay](replay-certificate.json), [metric validator](validator-report.json),
+and reference report. The matching
+[historical benchmark entry](../../../../benchmarks/20261016-ic-rule-v6/VALIDATION.json)
+points to the same frozen reports. Reproduce the outputs with
+`python3 research/ic_tool_program/rule/v6/validate_independently.py --check`.
+This remains a six-size public-fixture measurement: rho is faster cold at every
+size, and neither the reference gate nor the scalar replay proves a general
+ECDLP speedup.
 
 ## Results
 

@@ -16,6 +16,7 @@ from pathlib import Path
 TOOL = Path(__file__).resolve().parent / "artifacts.py"
 sys.path.insert(0, str(TOOL.parent))
 import artifacts  # noqa: E402
+import wire_workflows  # noqa: E402
 
 
 def sh(cwd, *argv, check=True, env=None):
@@ -132,6 +133,26 @@ class RoundTrip(unittest.TestCase):
         self.assertEqual((self.repo / "research/r1/runs/a.jsonl").read_bytes(), self.big)
         self.assertEqual(self.git("status", "--porcelain"), "")
 
+    def test_check_asks_git_for_full_object_ids(self):
+        """A blobless sparse checkout can fetch a missing blob by full id, not by the
+        7-character one `git diff --raw` prints by default."""
+        shim = Path(self.tmp.name) / "shim"
+        shim.mkdir()
+        log = shim / "git.log"
+        real = subprocess.run(["which", "git"], capture_output=True, text=True, check=True).stdout.strip()
+        (shim / "git").write_text(f'#!/bin/sh\necho "$@" >> {log}\nexec {real} "$@"\n')
+        (shim / "git").chmod(0o755)
+        base = self.git("rev-parse", "HEAD").strip()
+        (self.repo / "small.txt").write_text("x\n")
+        self.git("add", "-A")
+        self.git("commit", "-qm", "small change")
+        env = {**self.env, "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}"}
+        r = sh(self.repo, sys.executable, str(TOOL), "check", base, env=env)
+        self.assertEqual(r.returncode, 0)
+        diffs = [line for line in log.read_text().splitlines() if " diff " in f" {line} " and "--raw" in line]
+        self.assertTrue(diffs, "check never ran git diff --raw")
+        self.assertTrue(all("--no-abbrev" in line for line in diffs), diffs)
+
     def test_check_gate(self):
         base = self.git("rev-parse", "HEAD").strip()
         (self.repo / "new.jsonl").write_bytes(os.urandom(100_000))
@@ -162,6 +183,28 @@ class Policy(unittest.TestCase):
         self.assertTrue(f("x/fb.tar.part-0001", 100_000, self.P))
         self.assertFalse(f("x/.artifacts.json", 5 << 20, self.P))
         self.assertFalse(f("docs/browser/data.json", 30 << 20, {**self.P, "keep": ["docs/browser/data.json"]}))
+
+
+class WorkflowWiringPaths(unittest.TestCase):
+    def setUp(self):
+        self.moved = {"research/scalar_mul_ct_timing_20261022/REPORT.pdf"}
+        self.dirs = wire_workflows.moved_dirs(self.moved)
+
+    def test_unrelated_research_path_does_not_pull_all_research_data(self):
+        paths = wire_workflows.needed(
+            "run: python research/notes/other_study/verify.py",
+            self.moved,
+            self.dirs,
+        )
+        self.assertEqual(paths, [])
+
+    def test_research_study_path_pulls_its_moved_data(self):
+        paths = wire_workflows.needed(
+            "run: python research/scalar_mul_ct_timing_20261022/verify.py",
+            self.moved,
+            self.dirs,
+        )
+        self.assertEqual(paths, ["research/scalar_mul_ct_timing_20261022"])
 
 
 class S3Argv(unittest.TestCase):

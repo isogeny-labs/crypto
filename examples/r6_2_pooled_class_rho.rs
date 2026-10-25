@@ -18,17 +18,30 @@
 //!     and verified on its own curve.
 //!   - **C** (control): `L` keys planted on `E₀`, the same pooled batch
 //!     with the same algorithm seed.
-//! * `--mode paths`: whole components of the rational `ℓ ∈ {2, 3, 5, 7}`
-//!   graph of toy curves, and for random pairs of curves in a component a
-//!   bidirectional breadth-first search that finds a path from scratch,
-//!   counting neighbour enumerations (one per (curve, ℓ): the rational roots
-//!   of the ℓ-division polynomial, the role `Φ_ℓ(j, Y)` root finding plays in
-//!   an Elkies walk).
+//! * `--mode paths` (schema `r6_2.paths/v2`, the corrected search): whole
+//!   components of the *certified-edge* graph of toy curves, and for random
+//!   pairs of curves in a component a bidirectional breadth-first search that
+//!   finds a path from scratch, counting neighbour enumerations (one per
+//!   (curve, ℓ): the rational roots of the ℓ-division polynomial, the role
+//!   `Φ_ℓ(j, Y)` root finding plays in an Elkies walk). An edge `u → v` is
+//!   in the graph only if `SmallIsogeny::dual` certifies the reverse edge
+//!   `v → u` (every ℓ = 2, 3 edge; ℓ = 5, 7 edges only when p ≡ ±1 mod ℓ), so
+//!   expanding outgoing edges from the target side really constructs
+//!   predecessors. Each certification is counted (`cert_by_ell`), and every
+//!   returned route is re-validated edge by edge in the forward direction
+//!   from `a` (re-enumerating the kernels on the chained curves, counted as
+//!   `validation_enumerations`). The pre-fix search (outgoing edges only on
+//!   both sides) runs alongside on the same pairs as the `legacy` control.
+//! * `--mode paths-legacy` (schema `r6_2.paths/v1`): the search as first
+//!   committed, kept so the frozen `paths.json` stays reproducible. Its
+//!   target-side expansion follows outgoing edges, which are not predecessors
+//!   for ℓ = 5, 7 with p ≢ ±1 mod ℓ; its lengths are not executable-route
+//!   lengths.
 //!
 //! Every number written is a count (group operations, field `M`/`I`,
 //! neighbour enumerations); wall times are recorded as contended notes.
 
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{hash_map::Entry, HashMap, HashSet, VecDeque};
 use std::time::Instant;
 
 use crypto_lib::cryptanalysis::ic_boundary::{
@@ -36,7 +49,7 @@ use crypto_lib::cryptanalysis::ic_boundary::{
     PrimePoint, RhoWalk,
 };
 use crypto_lib::cryptanalysis::isogeny_eval::counted_fp::is_prime_u64;
-use crypto_lib::cryptanalysis::isogeny_eval::small_degree::kernel_representatives;
+use crypto_lib::cryptanalysis::isogeny_eval::small_degree::{isomorphisms, kernel_representatives};
 use crypto_lib::cryptanalysis::isogeny_eval::{
     OpCounter, PrimeField, ShortWeierstrass, SmallIsogeny, WPoint,
 };
@@ -548,6 +561,10 @@ fn batch_mode(args: &[String]) {
 }
 
 // ------------------------------------------------------------ path finding ----
+//
+// `neighbour_js`, `component` and `bidirectional` below are the search as
+// first committed (schema v1, `--mode paths-legacy`); the corrected search
+// follows them in "certified path finding".
 
 /// One curve of a component, keyed by its j-invariant (the walk is on
 /// j-invariants; a model is kept to keep walking).
@@ -641,7 +658,7 @@ fn bidirectional(
     }
 }
 
-fn paths_mode(args: &[String]) {
+fn paths_legacy_mode(args: &[String]) {
     let pbits: Vec<u32> = arg(args, "--pbits", String::from("24,28,32"))
         .split(',')
         .map(|s| s.parse().unwrap())
@@ -734,12 +751,704 @@ fn paths_mode(args: &[String]) {
     eprintln!("wrote {out_path}");
 }
 
+// ------------------------------------------------- certified path finding ----
+
+/// Which edges a search follows out of a curve.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum EdgeSet {
+    /// Every outgoing edge `SmallIsogeny::new` realises (the pre-fix
+    /// search). Used on both sides it treats `u → v` as `v → u`.
+    Outgoing,
+    /// Only edges whose reverse edge `SmallIsogeny::dual` certifies, so the
+    /// edge set is symmetric and an outgoing edge of `b` is a real
+    /// predecessor edge into `b`.
+    Certified,
+}
+
+/// Counted work of one search, per ℓ in [`ELLS`] order.
+#[derive(Clone, Copy, Debug, Default)]
+struct Work {
+    /// Neighbour enumerations of the search (one per expanded (curve, ℓ)).
+    enumerations: [u64; 4],
+    /// `SmallIsogeny::dual` calls made to certify an edge: each re-enumerates
+    /// the kernels at the codomain and builds a certification point, so it
+    /// is at least one further (curve, ℓ) enumeration.
+    certifications: [u64; 4],
+}
+
+impl Work {
+    fn search(&self) -> u64 {
+        self.enumerations.iter().sum()
+    }
+    fn cert(&self) -> u64 {
+        self.certifications.iter().sum()
+    }
+}
+
+struct Edge {
+    cod: ShortWeierstrass,
+    j: u64,
+    ell: u64,
+}
+
+/// The edges out of `e` in `set`.
+fn edges_of(f: &PrimeField, e: &ShortWeierstrass, set: EdgeSet, w: &mut Work) -> Vec<Edge> {
+    let mut out = Vec::new();
+    for (li, &ell) in ELLS.iter().enumerate() {
+        w.enumerations[li] += 1;
+        for phi in neighbours(f, e, ell) {
+            if set == EdgeSet::Certified {
+                w.certifications[li] += 1;
+                if phi.dual(f).is_err() {
+                    continue;
+                }
+            }
+            let cod = *phi.codomain();
+            out.push(Edge {
+                cod,
+                j: cod.j_invariant(f),
+                ell,
+            });
+        }
+    }
+    out
+}
+
+/// The whole component of `e` under `set`, up to `cap` curves: j-invariants
+/// in discovery order and j → model.
+fn component_in(
+    f: &PrimeField,
+    e: ShortWeierstrass,
+    cap: usize,
+    set: EdgeSet,
+) -> Option<(Vec<u64>, HashMap<u64, ShortWeierstrass>)> {
+    let mut models = HashMap::new();
+    let j0 = e.j_invariant(f);
+    models.insert(j0, e);
+    let mut order = vec![j0];
+    let mut q = VecDeque::from([e]);
+    let mut w = Work::default();
+    while let Some(cur) = q.pop_front() {
+        for edge in edges_of(f, &cur, set, &mut w) {
+            if let Entry::Vacant(v) = models.entry(edge.j) {
+                v.insert(edge.cod);
+                order.push(edge.j);
+                q.push_back(edge.cod);
+                if order.len() > cap {
+                    return None;
+                }
+            }
+        }
+    }
+    Some((order, models))
+}
+
+struct TreeNode {
+    d: u32,
+    model: ShortWeierstrass,
+    /// `(parent j, ℓ)`: the edge `parent → this` that discovered it.
+    parent: Option<(u64, u64)>,
+}
+
+/// A route as `(ℓ, j of the codomain)` hops from `a` towards `b`.
+type Route = Vec<(u64, u64)>;
+
+struct Found {
+    len: u32,
+    route: Route,
+}
+
+/// Bidirectional breadth-first search from `a` to `b`, level by level,
+/// expanding the smaller frontier, over the edge set `set`, with the route
+/// that the meeting implies. The `a` side follows edges forward. The `b`
+/// side follows outgoing edges of `b`'s tree and *reads each as the reverse
+/// hop* (child → parent), which is a real forward hop only if the edge set
+/// is symmetric: [`EdgeSet::Certified`] makes that so (the reverse edge is
+/// constructed by `SmallIsogeny::dual`), [`EdgeSet::Outgoing`] does not.
+fn search(
+    f: &PrimeField,
+    a: ShortWeierstrass,
+    b: ShortWeierstrass,
+    set: EdgeSet,
+    w: &mut Work,
+) -> Option<Found> {
+    let (ja, jb) = (a.j_invariant(f), b.j_invariant(f));
+    if ja == jb {
+        return Some(Found {
+            len: 0,
+            route: Vec::new(),
+        });
+    }
+    let mut tree: [HashMap<u64, TreeNode>; 2] = [HashMap::new(), HashMap::new()];
+    tree[0].insert(
+        ja,
+        TreeNode {
+            d: 0,
+            model: a,
+            parent: None,
+        },
+    );
+    tree[1].insert(
+        jb,
+        TreeNode {
+            d: 0,
+            model: b,
+            parent: None,
+        },
+    );
+    let mut front: [Vec<u64>; 2] = [vec![ja], vec![jb]];
+    loop {
+        let side = if front[0].len() <= front[1].len() {
+            0
+        } else {
+            1
+        };
+        if front[side].is_empty() {
+            return None;
+        }
+        let mut next = Vec::new();
+        // (length, expanded j, edge ℓ, neighbour j)
+        let mut best: Option<(u32, u64, u64, u64)> = None;
+        for cur_j in std::mem::take(&mut front[side]) {
+            let (dc, cur) = {
+                let n = &tree[side][&cur_j];
+                (n.d, n.model)
+            };
+            for edge in edges_of(f, &cur, set, w) {
+                if let Some(o) = tree[1 - side].get(&edge.j) {
+                    let len = dc + 1 + o.d;
+                    if best.is_none_or(|b| len < b.0) {
+                        best = Some((len, cur_j, edge.ell, edge.j));
+                    }
+                }
+                if let Entry::Vacant(v) = tree[side].entry(edge.j) {
+                    v.insert(TreeNode {
+                        d: dc + 1,
+                        model: edge.cod,
+                        parent: Some((cur_j, edge.ell)),
+                    });
+                    next.push(edge.j);
+                }
+            }
+        }
+        if let Some((len, cur_j, ell, nb_j)) = best {
+            // Forward hops root(a) → x along the a tree.
+            let chain_a = |mut x: u64| {
+                let mut v = Vec::new();
+                while let Some((pj, l)) = tree[0][&x].parent {
+                    v.push((l, x));
+                    x = pj;
+                }
+                v.reverse();
+                v
+            };
+            // Forward hops x → root(b): each tree-1 edge `parent → child`
+            // is read as the hop `child → parent`.
+            let chain_b = |mut x: u64| {
+                let mut v = Vec::new();
+                while let Some((pj, l)) = tree[1][&x].parent {
+                    v.push((l, pj));
+                    x = pj;
+                }
+                v
+            };
+            let route: Route = if side == 0 {
+                let mut r = chain_a(cur_j);
+                r.push((ell, nb_j));
+                r.extend(chain_b(nb_j));
+                r
+            } else {
+                let mut r = chain_a(nb_j);
+                r.push((ell, cur_j));
+                r.extend(chain_b(cur_j));
+                r
+            };
+            debug_assert_eq!(route.len() as u32, len);
+            return Some(Found { len, route });
+        }
+        front[side] = next;
+    }
+}
+
+/// How a route failed forward validation.
+#[derive(Debug, PartialEq, Eq)]
+enum RouteError {
+    /// No degree-ℓ rational-kernel isogeny out of the chained curve reaches
+    /// the hop's j-invariant: the hop is not an executable edge.
+    NoForwardEdge { hop: usize },
+    /// The hops ended on a curve whose j-invariant is not `b`'s.
+    WrongEndpoint,
+}
+
+/// Re-validate `route` from `a` in the forward direction: at each hop
+/// re-enumerate the degree-ℓ kernels of the *chained* curve (the actual
+/// codomain of the previous hop, not a model remembered from the search) and
+/// take one whose codomain has the hop's j-invariant. Returns whether the
+/// route ends on `b` only up to quadratic twist (`j` equal, no
+/// `F_p`-isomorphism). The enumerations are added to `w.enumerations`.
+fn validate_route(
+    f: &PrimeField,
+    a: ShortWeierstrass,
+    b: ShortWeierstrass,
+    route: &[(u64, u64)],
+    w: &mut Work,
+) -> Result<bool, RouteError> {
+    let mut cur = a;
+    for (hop, &(ell, to_j)) in route.iter().enumerate() {
+        let li = ELLS.iter().position(|&l| l == ell).expect("ℓ in ELLS");
+        w.enumerations[li] += 1;
+        let step = neighbours(f, &cur, ell)
+            .into_iter()
+            .map(|phi| *phi.codomain())
+            .find(|c| c.j_invariant(f) == to_j)
+            .ok_or(RouteError::NoForwardEdge { hop })?;
+        cur = step;
+    }
+    if cur.j_invariant(f) != b.j_invariant(f) {
+        return Err(RouteError::WrongEndpoint);
+    }
+    Ok(isomorphisms(f, &cur, &b).is_empty())
+}
+
+fn work_json(w: &Work) -> serde_json::Value {
+    json!({"by_ell": w.enumerations, "cert_by_ell": w.certifications})
+}
+
+/// The curves of one component run: where they come from.
+struct PathClass {
+    pbits: u32,
+    p: u64,
+    e: ShortWeierstrass,
+    n: u64,
+    /// Component size of the pre-fix (outgoing-edge) enumeration when the
+    /// class is a replay of a frozen v1 record.
+    v1_component_size: Option<u64>,
+}
+
+/// Measure one class: the certified component, then `pairs` random pairs,
+/// each searched by the corrected search and by the pre-fix search.
+fn measure_class(
+    f: &PrimeField,
+    class: &PathClass,
+    order: &[u64],
+    models: &HashMap<u64, ShortWeierstrass>,
+    pairs: usize,
+    rng: &mut StdRng,
+) -> serde_json::Value {
+    let size = order.len();
+    let (h, r) = smooth_split(class.n).unwrap_or((class.n, 1));
+    let mut runs = Vec::new();
+    let (mut tot_search, mut tot_cert, mut tot_val) = (0u64, 0u64, 0u64);
+    let (mut legacy_bad, mut legacy_shorter) = (0u64, 0u64);
+    for _ in 0..pairs {
+        let a = models[&order[rng.gen_range(0..size)]];
+        let b = models[&order[rng.gen_range(0..size)]];
+        // Corrected search over the symmetric certified edges.
+        let mut w = Work::default();
+        let found = search(f, a, b, EdgeSet::Certified, &mut w)
+            .expect("a and b share a certified component");
+        let mut wv = Work::default();
+        let validated = validate_route(f, a, b, &found.route, &mut wv);
+        assert!(
+            validated.is_ok(),
+            "a returned route failed forward validation: {validated:?}"
+        );
+        // The pre-fix search on the same pair.
+        let mut wl = Work::default();
+        let legacy = search(f, a, b, EdgeSet::Outgoing, &mut wl);
+        let legacy_json = match &legacy {
+            Some(l) => {
+                let mut wlv = Work::default();
+                let v = validate_route(f, a, b, &l.route, &mut wlv);
+                if v.is_err() {
+                    legacy_bad += 1;
+                }
+                if l.len < found.len {
+                    legacy_shorter += 1;
+                }
+                json!({"length": l.len, "route_executable": v.is_ok(),
+                       "failure": v.as_ref().err().map(|e| format!("{e:?}")),
+                       "enumerations": wl.search(), "by_ell": wl.enumerations})
+            }
+            None => json!({"length": null, "enumerations": wl.search(), "by_ell": wl.enumerations}),
+        };
+        tot_search += w.search();
+        tot_cert += w.cert();
+        tot_val += wv.search();
+        runs.push(json!({
+            "length": found.len,
+            "route_validated_forward": true,
+            "ends_on_twist_of_b": validated.unwrap_or(false),
+            "enumerations": w.search(),
+            "certifications": w.cert(),
+            "validation_enumerations": wv.search(),
+            "total_enumerations": w.search() + w.cert() + wv.search(),
+            "work": work_json(&w),
+            "route": found.route.iter().map(|&(l, j)| json!([l, j])).collect::<Vec<_>>(),
+            "legacy": legacy_json,
+        }));
+    }
+    let pf = pairs as f64;
+    json!({
+        "pbits": class.pbits, "p": class.p, "a": class.e.a, "b": class.e.b,
+        "order": class.n, "r": r, "h": h,
+        "component_size": size,
+        "v1_component_size": class.v1_component_size,
+        "pairs": runs,
+        "mean_enumerations": tot_search as f64 / pf,
+        "mean_certifications": tot_cert as f64 / pf,
+        "mean_validation_enumerations": tot_val as f64 / pf,
+        "mean_total_enumerations": (tot_search + tot_cert + tot_val) as f64 / pf,
+        "legacy_routes_not_executable": legacy_bad,
+        "legacy_shorter_than_corrected": legacy_shorter,
+    })
+}
+
+/// `--mode paths`: the corrected search. Fresh classes follow the frozen
+/// run's protocol (`--pbits/--classes/--pairs/--cap/--seed`); with
+/// `--replay <paths.json>` the classes are exactly the curves recorded in
+/// that file (a v1 record), so the corrected result is paired with it.
+fn paths_mode(args: &[String]) {
+    let pbits: Vec<u32> = arg(args, "--pbits", String::from("24,28,32"))
+        .split(',')
+        .map(|s| s.parse().unwrap())
+        .collect();
+    let per_bits: usize = arg(args, "--classes", 6);
+    let pairs: usize = arg(args, "--pairs", 10);
+    let cap: usize = arg(args, "--cap", 3000);
+    let seed: u64 = arg(args, "--seed", 7);
+    let replay: String = arg(args, "--replay", String::new());
+    let out_path: String = arg(args, "--out", String::from("r6_2_paths_v2.json"));
+    let t0 = Instant::now();
+    let mut rng = StdRng::seed_from_u64(seed);
+    let mut classes = Vec::new();
+    if !replay.is_empty() {
+        let v1: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(&replay).expect("read --replay file"))
+                .expect("--replay is JSON");
+        let recorded = v1["classes"].as_array().expect("v1 classes");
+        for (idx, c) in recorded.iter().filter(|c| c.get("p").is_some()).enumerate() {
+            let p = c["p"].as_u64().unwrap();
+            let f = PrimeField::new(p).unwrap();
+            let e = ShortWeierstrass::new(&f, c["a"].as_u64().unwrap(), c["b"].as_u64().unwrap())
+                .unwrap();
+            let class = PathClass {
+                pbits: c["pbits"].as_u64().unwrap() as u32,
+                p,
+                e,
+                n: c["order"].as_u64().unwrap(),
+                v1_component_size: c["component_size"].as_u64(),
+            };
+            let mut crng = StdRng::seed_from_u64(splitmix(seed ^ splitmix(idx as u64)));
+            let Some((order, models)) = component_in(&f, e, usize::MAX, EdgeSet::Certified) else {
+                unreachable!()
+            };
+            let rec = measure_class(&f, &class, &order, &models, pairs, &mut crng);
+            eprintln!(
+                "replay pbits={} p={p} v1 component={:?} certified component={} mean enumerations/pair={:.1} (+{:.1} cert) ({:.0}s)",
+                class.pbits,
+                class.v1_component_size,
+                order.len(),
+                rec["mean_enumerations"].as_f64().unwrap(),
+                rec["mean_certifications"].as_f64().unwrap(),
+                t0.elapsed().as_secs_f64()
+            );
+            classes.push(rec);
+        }
+    } else {
+        for &bits in &pbits {
+            let mut done = 0;
+            let mut skipped_large = 0u64;
+            let mut skipped_small = 0u64;
+            while done < per_bits {
+                let p = loop {
+                    let c = rng.gen_range((1u64 << (bits - 1))..(1u64 << bits)) | 1;
+                    if is_prime_u64(c) {
+                        break c;
+                    }
+                };
+                let f = PrimeField::new(p).unwrap();
+                let Ok(e) = ShortWeierstrass::new(&f, rng.gen_range(1..p), rng.gen_range(1..p))
+                else {
+                    continue;
+                };
+                let j = e.j_invariant(&f);
+                if j == 0 || j == 1728 {
+                    continue;
+                }
+                let Some(n) = count_points(&f, &e, &mut rng) else {
+                    continue;
+                };
+                if smooth_split(n).is_none() {
+                    continue;
+                }
+                if ELLS
+                    .iter()
+                    .filter(|&&l| !kernel_representatives(&f, &e, l).unwrap().is_empty())
+                    .count()
+                    < 2
+                {
+                    continue;
+                }
+                let Some((order, models)) = component_in(&f, e, cap, EdgeSet::Certified) else {
+                    skipped_large += 1;
+                    continue;
+                };
+                if order.len() < 8 {
+                    skipped_small += 1;
+                    continue;
+                }
+                let class = PathClass {
+                    pbits: bits,
+                    p,
+                    e,
+                    n,
+                    v1_component_size: None,
+                };
+                let rec = measure_class(&f, &class, &order, &models, pairs, &mut rng);
+                eprintln!(
+                    "pbits={bits} p={p} component={} mean enumerations/pair={:.1} (+{:.1} cert) ({:.0}s)",
+                    order.len(),
+                    rec["mean_enumerations"].as_f64().unwrap(),
+                    rec["mean_certifications"].as_f64().unwrap(),
+                    t0.elapsed().as_secs_f64()
+                );
+                classes.push(rec);
+                done += 1;
+            }
+            eprintln!(
+                "pbits={bits}: {skipped_large} components over the cap {cap} skipped, {skipped_small} under 8 curves skipped"
+            );
+            classes.push(json!({"pbits": bits, "skipped_over_cap": skipped_large,
+                                "skipped_under_8": skipped_small}));
+        }
+    }
+    let out = json!({
+        "schema": "r6_2.paths/v2",
+        "args": args[1..].to_vec(),
+        "cap": cap,
+        "edge_set": "certified: u -> v kept only when SmallIsogeny::dual certifies v -> u",
+        "classes": classes,
+        "wall_seconds_contended": t0.elapsed().as_secs_f64(),
+    });
+    std::fs::write(&out_path, serde_json::to_string_pretty(&out).unwrap()).unwrap();
+    eprintln!("wrote {out_path}");
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let mode: String = arg(&args, "--mode", String::from("batch"));
     match mode.as_str() {
         "batch" => batch_mode(&args),
         "paths" => paths_mode(&args),
+        "paths-legacy" => paths_legacy_mode(&args),
         other => panic!("unknown mode {other}"),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Primes in `lo..hi` by residue class: `symmetric` selects
+    /// `p ≡ ±1 (mod 5)` and `(mod 7)` (every ℓ ∈ {2, 3, 5, 7} edge has a
+    /// dual), otherwise `p ≢ ±1 (mod 5)` and `(mod 7)` (no ℓ = 5, 7 edge has
+    /// one).
+    fn primes(lo: u64, hi: u64, symmetric: bool) -> Vec<u64> {
+        let pm1 = |p: u64, l: u64| p % l == 1 || p % l == l - 1;
+        (lo..hi)
+            .filter(|&p| is_prime_u64(p))
+            .filter(|&p| {
+                if symmetric {
+                    pm1(p, 5) && pm1(p, 7)
+                } else {
+                    !pm1(p, 5) && !pm1(p, 7)
+                }
+            })
+            .collect()
+    }
+
+    fn random_curve(f: &PrimeField, rng: &mut StdRng) -> Option<ShortWeierstrass> {
+        let p = f.p();
+        let e = ShortWeierstrass::new(f, rng.gen_range(1..p), rng.gen_range(1..p)).ok()?;
+        let j = e.j_invariant(f);
+        (j != 0 && j != 1728).then_some(e)
+    }
+
+    /// The asymmetric edge itself: for `p ≢ ±1 (mod 5)` a rational-kernel
+    /// degree-5 edge `e → c` exists, `SmallIsogeny::dual` fails, and the
+    /// enumerator at `c` has no degree-5 edge back to `j(e)`; the certified
+    /// edge set drops it and the outgoing edge set keeps it.
+    #[test]
+    fn a_degree_five_edge_without_a_reverse_edge_is_excluded_from_the_certified_set() {
+        let mut rng = StdRng::seed_from_u64(5);
+        let mut found = 0;
+        let mut returns_by_another_kernel = 0;
+        for p in primes(500, 3000, false).into_iter().take(6) {
+            let f = PrimeField::new(p).unwrap();
+            for _ in 0..40 {
+                let Some(e) = random_curve(&f, &mut rng) else {
+                    continue;
+                };
+                let je = e.j_invariant(&f);
+                let mut w = Work::default();
+                let certified = edges_of(&f, &e, EdgeSet::Certified, &mut w);
+                let outgoing = edges_of(&f, &e, EdgeSet::Outgoing, &mut w);
+                for phi in neighbours(&f, &e, 5) {
+                    let cod = *phi.codomain();
+                    let jc = cod.j_invariant(&f);
+                    let back_exists = neighbours(&f, &cod, 5)
+                        .iter()
+                        .any(|psi| psi.codomain().j_invariant(&f) == je);
+                    if phi.dual(&f).is_ok() {
+                        continue;
+                    }
+                    // `dual` failed. When the enumerator at `c` also has no
+                    // edge back to `j(e)`, the edge is one-way: the outgoing
+                    // set keeps it and the certified set must drop it (a
+                    // different dual-certified edge to the same j would
+                    // itself be a reverse edge). A cycle that returns to
+                    // `j(e)` through another kernel is a real reverse edge,
+                    // counted and set aside.
+                    if back_exists {
+                        returns_by_another_kernel += 1;
+                        continue;
+                    }
+                    assert!(outgoing.iter().any(|x| x.ell == 5 && x.j == jc));
+                    assert!(
+                        !certified.iter().any(|x| x.ell == 5 && x.j == jc),
+                        "certified set kept a one-way edge at p = {p}"
+                    );
+                    found += 1;
+                }
+                // Every certified edge has a forward reverse edge.
+                for edge in &certified {
+                    let back = neighbours(&f, &edge.cod, edge.ell)
+                        .iter()
+                        .any(|psi| psi.codomain().j_invariant(&f) == je);
+                    assert!(back, "certified edge without a reverse edge");
+                }
+            }
+        }
+        assert!(
+            found > 0,
+            "no one-way degree-5 edge found on the test primes \
+             ({returns_by_another_kernel} returned by another kernel)"
+        );
+    }
+
+    /// The control the pre-fix search fails: on primes with `p ≢ ±1`
+    /// (mod 5, 7) the outgoing-edge bidirectional search returns routes
+    /// that are not executable forward (a meeting `a → c ← b`, or a hop
+    /// read backwards), while every route of the corrected search validates
+    /// edge by edge.
+    #[test]
+    fn asymmetric_edges_break_the_outgoing_search_and_not_the_certified_one() {
+        let mut rng = StdRng::seed_from_u64(11);
+        let (mut legacy_total, mut legacy_bad, mut certified_total) = (0u32, 0u32, 0u32);
+        for p in primes(500, 4000, false).into_iter().take(3) {
+            let f = PrimeField::new(p).unwrap();
+            for _ in 0..8 {
+                let Some(e) = random_curve(&f, &mut rng) else {
+                    continue;
+                };
+                // Pairs from the outgoing-edge component, as the pre-fix run drew them.
+                let Some((order, models)) = component_in(&f, e, 150, EdgeSet::Outgoing) else {
+                    continue;
+                };
+                if order.len() < 4 {
+                    continue;
+                }
+                for _ in 0..4 {
+                    let a = models[&order[rng.gen_range(0..order.len())]];
+                    let b = models[&order[rng.gen_range(0..order.len())]];
+                    let mut w = Work::default();
+                    if let Some(l) = search(&f, a, b, EdgeSet::Outgoing, &mut w) {
+                        legacy_total += 1;
+                        if validate_route(&f, a, b, &l.route, &mut Work::default()).is_err() {
+                            legacy_bad += 1;
+                        }
+                    }
+                    let mut w = Work::default();
+                    if let Some(c) = search(&f, a, b, EdgeSet::Certified, &mut w) {
+                        certified_total += 1;
+                        assert_eq!(c.route.len() as u32, c.len);
+                        assert!(
+                            validate_route(&f, a, b, &c.route, &mut Work::default()).is_ok(),
+                            "certified route failed forward validation (p = {p})"
+                        );
+                    }
+                }
+            }
+        }
+        assert!(certified_total > 0 && legacy_total > 0);
+        assert!(
+            legacy_bad > 0,
+            "the pre-fix search returned only executable routes on {legacy_total} pairs; the asymmetric control has no force"
+        );
+    }
+
+    /// With `p ≡ ±1 (mod 5)` and `(mod 7)` every edge is symmetric, so the
+    /// two edge sets agree: outgoing routes validate too (the failures above
+    /// are the asymmetry, not the validator).
+    #[test]
+    fn symmetric_primes_validate_under_both_edge_sets() {
+        let mut rng = StdRng::seed_from_u64(13);
+        let mut pairs = 0;
+        for p in primes(3000, 8000, true).into_iter().take(2) {
+            let f = PrimeField::new(p).unwrap();
+            for _ in 0..5 {
+                let Some(e) = random_curve(&f, &mut rng) else {
+                    continue;
+                };
+                let Some((order, models)) = component_in(&f, e, 40, EdgeSet::Certified) else {
+                    continue;
+                };
+                if order.len() < 4 {
+                    continue;
+                }
+                for _ in 0..3 {
+                    let a = models[&order[rng.gen_range(0..order.len())]];
+                    let b = models[&order[rng.gen_range(0..order.len())]];
+                    for set in [EdgeSet::Certified, EdgeSet::Outgoing] {
+                        let mut w = Work::default();
+                        let r = search(&f, a, b, set, &mut w).expect("connected");
+                        validate_route(&f, a, b, &r.route, &mut Work::default())
+                            .unwrap_or_else(|e| panic!("{set:?} route invalid: {e:?} (p = {p})"));
+                    }
+                    pairs += 1;
+                }
+            }
+        }
+        assert!(pairs > 0);
+    }
+
+    /// The refactored outgoing search keeps the frozen lengths: it agrees
+    /// with the pre-fix `bidirectional` on its length.
+    #[test]
+    fn the_outgoing_control_reproduces_the_frozen_search_lengths() {
+        let mut rng = StdRng::seed_from_u64(17);
+        let mut checked = 0;
+        for p in primes(500, 2500, false).into_iter().take(3) {
+            let f = PrimeField::new(p).unwrap();
+            for _ in 0..8 {
+                let Some(e) = random_curve(&f, &mut rng) else {
+                    continue;
+                };
+                let Some((order, models)) = component_in(&f, e, 150, EdgeSet::Outgoing) else {
+                    continue;
+                };
+                for _ in 0..3 {
+                    let a = models[&order[rng.gen_range(0..order.len())]];
+                    let b = models[&order[rng.gen_range(0..order.len())]];
+                    let old = bidirectional(&f, a, b, &mut [0u64; 4]);
+                    let mut w = Work::default();
+                    let new = search(&f, a, b, EdgeSet::Outgoing, &mut w).map(|r| r.len);
+                    assert_eq!(old, new, "p = {p}");
+                    checked += 1;
+                }
+            }
+        }
+        assert!(checked > 0);
     }
 }

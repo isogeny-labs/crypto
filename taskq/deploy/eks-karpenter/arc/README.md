@@ -5,20 +5,15 @@ This installs the GitHub-supported Actions Runner Controller (ARC) chart version
 runner pod per job, and Karpenter supplies a Spot EC2 node when a pod cannot
 fit. Empty runner nodes are consolidated after five minutes. The runner NodePools are
 separate from the `cpu-spot` Iso Lab measurement pool.
-Both deployment scripts install the cluster-wide `spot-only-policy.yaml`, a
-ValidatingAdmissionPolicy that rejects creation or updates of Karpenter
-NodePools unless they explicitly require only `spot` capacity. This guards
-against an accidental On-Demand fallback when a new pool is added. It does
-not control standalone EC2 instances or Auto Scaling groups outside EKS.
 
 | Scale set / `runs-on` | Pod request | Pod memory limit | Maximum runners |
 | --- | --- | --- | --- |
 | `crypto-eks-linux` | 4 CPU, 24 GiB plus Docker sidecar | 28 GiB runner | 11 |
 | `crypto-eks-highmem` | 16 CPU, 112 GiB plus Docker sidecar | 120 GiB runner | 1 |
 
-The base NodePool admits x86-64 R-family instances with 8 or 16 vCPUs and caps
-aggregate provisioning at 16 vCPUs and 128 GiB. An additional R-family pool
-admits 16-vCPU nodes and caps at 16 vCPUs and 128 GiB. The pool names and the
+The base NodePool admits x86-64 M/R instances with 8, 16 or 32 vCPUs and caps
+aggregate provisioning at 128 vCPUs and 1 TiB. An additional R-family pool
+admits 16-vCPU nodes and caps at 32 vCPUs and 256 GiB. The pool names and the
 `gha.dev/pool=on-demand` scheduling label are legacy; the Karpenter
 `karpenter.sh/capacity-type=spot` requirement controls the actual EC2 capacity.
 Both ARC scale sets have `minRunners: 0`. With no queued or running jobs, ARC
@@ -33,9 +28,10 @@ ecbench jobs remain on their current runners.
 ## Required access and authentication
 
 The deploying IAM role needs `eks:DescribeCluster` and Kubernetes cluster-admin
-access on `isolab` while installing cluster-scoped resources. Remove broad
-administration access after deployment if ongoing administration uses a narrower
-role.
+access on `isolab`. The EKS access entry for this session's role,
+`arn:aws:iam::104186811093:role/spot-experiments-WorkerRole-G1FZ84yk3gS6`,
+has the cluster-scoped `AmazonEKSClusterAdminPolicy`. Remove this broad access
+after deployment if ongoing administration uses a narrower role.
 
 ARC needs a fine-grained GitHub PAT restricted to `aburan28/crypto` with
 Repository permissions → Administration: Read and write. Save it in a local
@@ -86,9 +82,10 @@ The high-memory list takes precedence. Remove a filename to roll that workflow
 back. The routing script is `route_workflows.py`; it prepares new direct x64
 `runs-on` lines and is idempotent.
 
-`first-wave-workflows.txt` records the 392 workflow filenames enabled in the
+`first-wave-workflows.txt` records the 391 workflow filenames enabled in the
 initial rollout. It excludes workloads requiring specialized GPU, Sage, Lean,
-perf, release or measurement hosts; the 38 deferred filenames are recorded in
+perf, release or measurement hosts, or a browser (`ic-dashboard.yml`, which
+needs Chrome); the 39 deferred filenames are recorded in
 `deferred-workflows.txt` for individual validation. To restore the rollout
 variable after an accidental reset:
 
