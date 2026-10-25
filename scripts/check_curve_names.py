@@ -74,6 +74,9 @@ ARCHIVED_LABELS = {
 ARCHIVED_UNREGISTERED_SLUGS = {
     "research/ext_endo_rho_20261023/sessions/subfield-fp3.table.md":
         "c7275bc7b32a9ea2facb598b0235c7cc7e0ff158a7836378511dffd3a08474d7",
+    # The original GLS run is retained under the frozen item-1 protocol.
+    "research/ext_endo_rho_20261023/sessions/gls-fp2.table.md":
+        "ed5cd55f79930f71095f1f0661d0236ec00bc6e85e1c6093a447db75619362b7",
 }
 
 
