@@ -6,6 +6,9 @@ cohort. New results use the existing standardized target rows, 36-cell cost
 grid, matched source-negation rho, independent replay, graphs, and neutral PDF
 format.
 
+PDFs, rendered PNGs and larger raw tables are hydrated from their adjacent
+artifact manifests using the [review packet retrieval guide](ARTIFACT_RETRIEVAL.md).
+
 ## Current evidence boundary
 
 | Lead | Current verified evidence | Remaining gap |
