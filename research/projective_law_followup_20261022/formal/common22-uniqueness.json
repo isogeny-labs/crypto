@@ -1,6 +1,8 @@
 {
   "schema": "projective-law-common22-uniqueness/v1",
   "theorems": [
+    "Common22Coprime.determinant_bezout",
+    "Common22Coprime.supports_coprime",
     "Common22Uniqueness.zero_of_coprime_supports",
     "Common22Uniqueness.residual_eq_curve"
   ],
@@ -13,7 +15,7 @@
     {
       "obligation": "support_coprime",
       "kind": "premise",
-      "status": "open_source_link",
+      "status": "kernel_checked_conditional",
       "statement": "B nonzero implies IsCoprime u1 u2"
     },
     {
@@ -47,6 +49,6 @@
       "statement": "residual curve equation yields the intended Pic0 class"
     }
   ],
-  "scope": "conditional polynomial uniqueness over a field; no source-to-premise or geometric proof",
+  "scope": "conditional coprimeness and polynomial uniqueness over a field; residue, degree, and geometric proofs remain open",
   "cost_ratio_change": null
 }

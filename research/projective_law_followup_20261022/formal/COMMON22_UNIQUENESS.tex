@@ -3,8 +3,10 @@
 \usepackage{booktabs}
 \begin{document}
 \section*{Common 2+2 coprime-support uniqueness}
-\texttt{projective-law-common22-uniqueness/v1}. A pinned Lean check proves:
-if $u_1,u_2$ are coprime, both divide $H$, and
+\texttt{projective-law-common22-uniqueness/v1}. A pinned Lean check first proves
+an explicit Bezout identity: the common-branch determinant $B$ is a linear
+combination of the two quadratic supports. Thus $B\ne0$ makes them coprime.
+If both then divide $H$, and
 $\deg H<\deg(u_1u_2)$, then $H=0$. Substituting
 $H=E-B^2F$ yields $E=B^2F$ under those same explicit premises.
 
@@ -13,7 +15,7 @@ $H=E-B^2F$ yields $E=B^2F$ under those same explicit premises.
 \toprule
 Obligation & Recorded status\\
 \midrule
-Support coprimeness from source & Open source link\\
+Support coprimeness from $B\ne0$ & Kernel checked, conditional\\
 First and second curve residues & Open source links\\
 Degree bound from source & Open source link\\
 Coprime low-degree implication & Kernel checked, conditional\\
