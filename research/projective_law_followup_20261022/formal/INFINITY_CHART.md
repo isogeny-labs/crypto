@@ -11,11 +11,15 @@ where `x≠0`. `Common22InfinityChart.curve_chart_equation` proves
 
 The Lean theorem `chart_factor_at_origin` proves `u(0)=1`. Thus the
 projective point represented by `(z,w)=(0,0)` has an algebraic chart equation
-whose `z`-derivative is `-1` there. The standard smooth-curve argument then
+whose `z`-derivative is `-1` there. The derivative and the simple-root
+statement for the `w=0` section are now kernel-checked in the
+[local-parameter packet](INFINITY_LOCAL_PARAMETER.md). The standard
+smooth-curve argument then
 makes `w` a local parameter, `u(z)` a unit, and `z=w²/u(z)`. The corresponding
 orders would be `ord∞(w)=1`, `ord∞(z)=2`, `ord∞(x)=-2`, and
-`ord∞(y)=-5`. This local-ring/DVR implication is **not** a Lean theorem in
-this packet.
+`ord∞(y)=-5`. The local-ring/DVR implication remains **unproved** in Lean;
+a separate conditional theorem shows that a supplied chart stalk with
+maximal ideal `(z,w)` has maximal ideal `(w)`.
 
 For the source-style interpolant
 `n(x)=-C·x³+n2·x²+n1·x+n0` and nonzero clearing factor `B`, put

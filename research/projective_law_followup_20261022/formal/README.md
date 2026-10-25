@@ -79,6 +79,11 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   cleared interpolant on that chart. It identifies the local-unit residue
   and the `C=0` linear `w` coefficient. A formal smooth local-ring/DVR
   construction and its valuation remain open.
+- The [local-parameter packet](INFINITY_LOCAL_PARAMETER.md) proves the
+  infinity-chart `z` partial derivative is `-1`, its `w=0` section has a
+  simple root at `z=0`, and, conditional on a supplied local ring whose
+  maximal ideal is `(z,w)`, the chart relation makes that ideal `(w)`.
+  It does not construct the actual projective infinity stalk or DVR.
 - The [conditional DVR valuation packet](LOCAL_VALUATION.md) proves
   `addVal(z)=2` and source-shape cleared-interpolant orders zero and one
   in an abstract DVR with the stated chart and unit hypotheses. The actual
