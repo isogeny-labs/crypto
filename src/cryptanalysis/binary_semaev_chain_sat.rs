@@ -78,6 +78,14 @@ pub enum FrobeniusOrbitRootEncoding {
     SharedBits,
 }
 
+/// The exact selector and phase wires allocated for one orbit-domain block.
+/// Selectors follow the sorted representative order used during installation.
+#[derive(Clone, Debug)]
+pub struct FrobeniusOrbitChoiceWires {
+    pub selectors: Vec<u32>,
+    pub phase: Vec<u32>,
+}
+
 pub fn frobenius_orbit_domain_size(
     n: u32,
     m: usize,
@@ -285,6 +293,7 @@ pub struct ChainedS3Encoding {
     b: F2mElement,
     irr: IrreduciblePoly,
     domain_installed: bool,
+    orbit_choice_wires: Vec<FrobeniusOrbitChoiceWires>,
     first_pair_exchangeable: bool,
     first_pair_ordered: bool,
 }
@@ -378,6 +387,7 @@ impl ChainedS3Encoding {
             b: b.clone(),
             irr: irr.clone(),
             domain_installed: false,
+            orbit_choice_wires: Vec::new(),
             first_pair_exchangeable: false,
             first_pair_ordered: false,
         })
@@ -469,13 +479,13 @@ impl ChainedS3Encoding {
         let shared = (encoding == FrobeniusOrbitRootEncoding::SharedBits)
             .then(|| shared_root_bits(self.n, &sorted));
         for block in &self.blocks[..self.m] {
-            add_frobenius_orbit_domain(
+            self.orbit_choice_wires.push(add_frobenius_orbit_domain(
                 &mut self.solver,
                 block,
                 &sorted,
                 &self.irr,
                 shared.as_deref(),
-            );
+            ));
         }
         self.domain_installed = true;
         self.first_pair_exchangeable = true;
@@ -544,10 +554,21 @@ impl ChainedS3Encoding {
         }
         self.first_pair_exchangeable = sorted_domains[0] == sorted_domains[1];
         for (block, representatives) in self.blocks[..self.m].iter().zip(&sorted_domains) {
-            add_frobenius_orbit_domain(&mut self.solver, block, representatives, &self.irr, None);
+            self.orbit_choice_wires.push(add_frobenius_orbit_domain(
+                &mut self.solver,
+                block,
+                representatives,
+                &self.irr,
+                None,
+            ));
         }
         self.domain_installed = true;
         Ok(required)
+    }
+
+    /// Available only after an exact Frobenius-orbit domain is installed.
+    pub fn orbit_choice_wires(&self) -> Option<&[FrobeniusOrbitChoiceWires]> {
+        (!self.orbit_choice_wires.is_empty()).then_some(&self.orbit_choice_wires)
     }
 
     /// Keep one representative of the first summand-pair swap. The first
@@ -661,7 +682,7 @@ fn add_frobenius_orbit_domain(
     representatives: &[BigUint],
     irr: &IrreduciblePoly,
     shared: Option<&[Option<bool>]>,
-) {
+) -> FrobeniusOrbitChoiceWires {
     fn take(next: &mut u32, count: usize) -> Vec<u32> {
         let start = *next;
         *next += count as u32;
@@ -764,6 +785,7 @@ fn add_frobenius_orbit_domain(
         solver.add_clause(vec![unit]);
     }
     debug_assert_eq!(next - 1, *allocated.end());
+    FrobeniusOrbitChoiceWires { selectors, phase }
 }
 
 /// Enforce unsigned `a <= b`, with the highest field bit most significant.
@@ -1185,6 +1207,42 @@ mod tests {
             FrobeniusOrbitRootEncoding::SharedBits
         )
         .is_none());
+    }
+
+    #[test]
+    fn orbit_choice_wires_pin_the_selected_root_and_phase() {
+        let irr = IrreduciblePoly {
+            degree: 3,
+            low_terms: vec![0, 1],
+        };
+        let representatives = [BigUint::from(1u8), BigUint::from(3u8)];
+        let shared = shared_root_bits(3, &representatives);
+        let expected = F2mElement::from_biguint(&representatives[1], 3)
+            .square(&irr)
+            .to_biguint();
+        for x in 0..8u8 {
+            let mut solver = Solver::new(3);
+            let wires = add_frobenius_orbit_domain(
+                &mut solver,
+                &[1, 2, 3],
+                &representatives,
+                &irr,
+                Some(&shared),
+            );
+            assert_eq!(wires.selectors.len(), 2);
+            assert_eq!(wires.phase.len(), 2);
+            solver.add_clause(vec![wires.selectors[1] as Lit]);
+            solver.add_clause(vec![wires.phase[0] as Lit]);
+            solver.add_clause(vec![-(wires.phase[1] as Lit)]);
+            for bit in 0..3u8 {
+                let wire = bit as Lit + 1;
+                solver.add_clause(vec![if x & (1 << bit) != 0 { wire } else { -wire }]);
+            }
+            assert_eq!(
+                solver.solve() == SolveResult::Sat,
+                expected == BigUint::from(x)
+            );
+        }
     }
 
     #[test]
