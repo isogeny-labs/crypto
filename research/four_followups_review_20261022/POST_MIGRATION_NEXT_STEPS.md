@@ -38,6 +38,12 @@ xADD calls matched the oracle; 62 signed lifts returned no divisor. This is a
 finite sample, so step 2's all-state and full cold-cost gates remain open and
 the rho ratio is null.
 
+The [N9 point-allocation packet](../projective_law_followup_20261022/formal/POINT_ALLOCATION.md)
+adds eight kernel-checked affine statements and corrects the earlier pole-order
+scope: a nonzero cubic coefficient gives order 6 at infinity, while the
+degree-drop case gives order 5 in the smooth monic-quintic model. The infinity
+valuations and resulting divisor-class equality have not been formalized.
+
 ## Ordered actions
 
 1. **Finish the two independent projective-law proof checks already in flight.**
