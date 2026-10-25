@@ -271,9 +271,11 @@ isomorphism, projective gluing, and divisor/`Pic⁰` transport remain open.
 
 The [separate-chart map packet](SEPARATE_CHART_MAP.md) defines the affine
 quotient and both principal opens independently. Pinned Lean checks that each
-defining equation maps to zero and constructs algebra maps in both directions
-between the localized coordinate rings, including quotient and localization
-descent. Its [CSV](separate-chart-map.csv), [SVG](separate-chart-map.svg), and
-artifact-stored PDF record the result and the remaining gates. Neither
-composition has yet been proved the identity, so an isomorphism of the
-separate chart rings and the geometric bridges remain open.
+defining equation maps to zero, constructs algebra maps in both directions
+between the localized coordinate rings, and proves both compositions are
+identities. This yields an algebra equivalence of the separately presented
+principal-open coordinate rings. Its [CSV](separate-chart-map.csv),
+[SVG](separate-chart-map.svg), and artifact-stored PDF record the result and
+remaining gates. The corresponding scheme-open identification, smooth
+projective gluing and infinity stalk, divisor/`Pic⁰` transport, and Rust-law
+semantics remain open.
