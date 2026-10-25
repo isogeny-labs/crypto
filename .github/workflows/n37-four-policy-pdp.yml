@@ -35,7 +35,7 @@ concurrency:
 
 jobs:
   replay:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n37-four-policy-pdp.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n37-four-policy-pdp.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
     timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     steps:
       - uses: actions/checkout@v4
@@ -56,16 +56,41 @@ jobs:
             docs/ic/calibration.json
             docs/ic/boundary_targets.json
             research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock
-            research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json
-            research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz
             research/notes/ecc2k130/n37_four_policy_support_20261003/SOURCE42.jsonl
             research/notes/ecc2k130/n37_four_policy_support_20261003/RESULT.json.gz
             research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b03.points.jsonl
             research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b04.points.jsonl
+            research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json
+            research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz
             research/notes/ecc2k130/n37_four_policy_pdp_20261003
+      # Check the byte-matching historical source snapshot separately from
+      # current-code checks, which use the PR checkout's own lock.
+      - uses: actions/checkout@v4
+        with:
+          ref: 944ab7023916142dd222bb72802ced12b6daf338
+          path: historical-pdp
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            Cargo.toml
+            src
+            examples/n37_four_policy_pdp.rs
+            examples/n37_four_policy_pdp_replay.rs
+            examples/support/n37_policy_common.rs
+            docs/curves/registry.json
+            docs/curves/standards/parameters.json
+            docs/ecbench/schema.sql
+            docs/ic/calibration.json
+            docs/ic/boundary_targets.json
+            research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock
+            research/notes/ecc2k130/n37_four_policy_support_20261003/SOURCE42.jsonl
+            research/notes/ecc2k130/n37_four_policy_support_20261003/RESULT.json.gz
+            research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b03.points.jsonl
+            research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b04.points.jsonl
+            research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json
+            research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz
       - uses: Swatinem/rust-cache@v2
-      - name: Use frozen lockfile
-        run: cp research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock Cargo.lock
+      - name: Install rustfmt (the runner toolchain ships without it)
+        run: rustup component add rustfmt
       - name: Check source hashes and Rust formatting
         run: |
           printf '%s  %s\n' \
@@ -108,6 +133,30 @@ jobs:
           cmp "$RUNNER_TEMP/final.replay.json" "$note/REPLAY.json"
           target/release/examples/n37_four_policy_pdp_replay "$RUNNER_TEMP/ci_fixed.json" "$RUNNER_TEMP/ci_fixed.replay.json"
           cmp "$RUNNER_TEMP/ci_fixed.replay.json" "$note/REPLAY_CI_FIXED.json"
+      - name: Build and replay with the original PDP source and lock
+        working-directory: historical-pdp
+        run: |
+          printf '%s  %s\n' \
+            'f1b3abc246c4971b48b377d5696bc96594deb729320348c4277307e42ed61721' Cargo.toml \
+            '35d8197555e5c1fcf58010ff54bc5fa8ed730febf1790c7ccf70ea7b8792d5dc' examples/n37_four_policy_pdp.rs \
+            'e6ce0814fe4444c6e4f9df86524fa9967ef2cbe4ec61b60225be270fb3258790' examples/n37_four_policy_pdp_replay.rs \
+            'b28d3c2d81146a40d00df85f45c6460d9e2bc5c26875307a06cfd15efff99365' research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock \
+            '0a32de24a5680ff46baf9543e8bf8e32447323491e2a2adedce2548c14a25f75' research/notes/ecc2k130/n37_four_policy_support_20261003/SOURCE42.jsonl \
+            '8eac2ae4b8d8f0fc452b7cd7c8edbd3183558e55454abbd67349665bd64610d5' research/notes/ecc2k130/n37_four_policy_support_20261003/RESULT.json.gz \
+            '84400a2914f06e4a001d0f113f0195952f692634d4ff8285e23ade2599e2bde2' research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b03.points.jsonl \
+            '72c5b5361a0b846c9626269ce3928820cb7d420aae479d31dc26f5cbf7e78aa6' research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b04.points.jsonl \
+            'bd4bd8af982bcc65234ae1fae1ad52eb0ed41a1c203bf4d2556fd8e87f788a4c' research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json \
+            'eb4773d556886672e8b80735fc486c16b73765fd5069ff81133100bfc3eafa90' research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz \
+            | sha256sum --check
+          cp research/notes/ecc2k130/n37_native_m6_mitm_20261002/Cargo.lock Cargo.lock
+          cargo build --release --locked --example n37_four_policy_pdp --example n37_four_policy_pdp_replay
+          note="$GITHUB_WORKSPACE/research/notes/ecc2k130/n37_four_policy_pdp_20261003"
+          target/release/examples/n37_four_policy_pdp_replay "$RUNNER_TEMP/initial.json" "$RUNNER_TEMP/historical-initial.replay.json"
+          cmp "$RUNNER_TEMP/historical-initial.replay.json" "$note/REPLAY_INITIAL.json"
+          target/release/examples/n37_four_policy_pdp_replay "$RUNNER_TEMP/final.json" "$RUNNER_TEMP/historical-final.replay.json"
+          cmp "$RUNNER_TEMP/historical-final.replay.json" "$note/REPLAY.json"
+          target/release/examples/n37_four_policy_pdp_replay "$RUNNER_TEMP/ci_fixed.json" "$RUNNER_TEMP/historical-ci-fixed.replay.json"
+          cmp "$RUNNER_TEMP/historical-ci-fixed.replay.json" "$note/REPLAY_CI_FIXED.json"
       - name: Retain Linux replay receipts
         if: always()
         uses: actions/upload-artifact@v4

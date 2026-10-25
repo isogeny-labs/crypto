@@ -353,9 +353,26 @@ fn count_m2(f: &Field, basis: &[u64], beta: Option<u64>, x3: u64, b: u64) -> u64
 /// fully built degree-`d_max` matrix (`censored`, degree is the lower bound
 /// `d_max + 1`), or the caps stopped it (`degree = None`).
 fn measure(eqs: &[F2BoolPoly], n_vars: usize, d_max: u32) -> (String, Option<u32>, bool) {
-    let (d, profs) = solving_degree_from(eqs, n_vars, 1, d_max);
+    use crypto_lib::cryptanalysis::koblitz_groebner::checkpoint::Store;
+    use std::sync::{Mutex, OnceLock};
+    static CHECKPOINT: OnceLock<Mutex<Option<Store>>> = OnceLock::new();
+    let mut store = CHECKPOINT
+        .get_or_init(|| {
+            Mutex::new(
+                Store::from_env()
+                    .unwrap_or_else(|e| panic!("checkpoint initialization failed: {e}")),
+            )
+        })
+        .lock()
+        .unwrap();
+    let (d, profs) = match store.as_mut() {
+        Some(store) => store
+            .solve(eqs, n_vars, 1, d_max)
+            .unwrap_or_else(|e| panic!("checkpoint save/restore failed: {e}")),
+        None => solving_degree_from(eqs, n_vars, 1, d_max),
+    };
     let built = profs.last().map(|p| p.degree);
-    match d {
+    let (mut json, degree, censored) = match d {
         Some(degree) => {
             let refuted = profs.last().map(|p| p.refuted).unwrap_or(false);
             (
@@ -377,7 +394,15 @@ fn measure(eqs: &[F2BoolPoly], n_vars: usize, d_max: u32) -> (String, Option<u32
             None,
             false,
         ),
+    };
+    if let Some(store) = store.as_ref() {
+        json.pop();
+        json.push_str(&format!(
+            ",\"checkpoint_enabled\":true,\"checkpoint_replayed\":{}}}",
+            store.replayed
+        ));
     }
+    (json, degree, censored)
 }
 
 fn seed_of(seed: u64, parts: &[u64]) -> u64 {
@@ -810,16 +835,68 @@ impl Group {
     }
 }
 
-fn score(files: &[String]) {
+/// A restored job re-emits deterministic target/summary records to its append
+/// log. Count each native record once, retaining the original observation.
+/// Conflicting replayed mathematics/counters are an error, never an average.
+fn score_records(text: &str) -> Vec<serde_json::Value> {
     use serde_json::Value;
+    use std::collections::BTreeMap;
+    let records: Vec<Value> = text
+        .lines()
+        .filter_map(|line| serde_json::from_str(line).ok())
+        .collect();
+    if !records
+        .iter()
+        .any(|v| v["outcome"]["checkpoint_enabled"] == true)
+    {
+        return records;
+    }
+    let mut seen = BTreeMap::new();
+    records
+        .into_iter()
+        .filter(|v| {
+            if !v["outcome"].is_object() && v["summary"] != true {
+                return true;
+            }
+            let mut normalized = v.clone();
+            let object = normalized.as_object_mut().expect("result object");
+            object.remove("secs");
+            if let Some(outcome) = object.get_mut("outcome").and_then(Value::as_object_mut) {
+                outcome.remove("checkpoint_enabled");
+                outcome.remove("checkpoint_replayed");
+            }
+            let mut identity = normalized.clone();
+            let object = identity.as_object_mut().unwrap();
+            for field in [
+                "outcome",
+                "drawn",
+                "class1_skipped",
+                "class0_satisfiable",
+                "measured",
+            ] {
+                object.remove(field);
+            }
+            let key = serde_json::to_string(&identity).unwrap();
+            if let Some(previous) = seen.get(&key) {
+                assert_eq!(
+                    previous, &normalized,
+                    "conflicting checkpoint replay record"
+                );
+                false
+            } else {
+                seen.insert(key, normalized);
+                true
+            }
+        })
+        .collect()
+}
+
+fn score(files: &[String]) {
     use std::collections::BTreeMap;
     let mut groups: BTreeMap<(String, String, String), Group> = BTreeMap::new();
     for path in files {
         let text = std::fs::read_to_string(path).expect("read");
-        for line in text.lines() {
-            let Ok(v) = serde_json::from_str::<Value>(line) else {
-                continue;
-            };
+        for v in score_records(&text) {
             let Some(goal) = v["goal"].as_str() else {
                 continue;
             };
@@ -1055,6 +1132,40 @@ fn score(files: &[String]) {
             "killed (flat in beta to 0.3)"
         }
     );
+}
+
+#[cfg(test)]
+mod checkpoint_log_tests {
+    use super::score_records;
+
+    #[test]
+    fn resumed_target_and_summary_records_count_once() {
+        let original = r#"{"goal":"G1","cell":"5:1:3","shape":"coord","instance":0,"x_r":4,"secs":12.0,"outcome":{"kind":"resolved","degree":3,"checkpoint_enabled":true,"checkpoint_replayed":false}}"#;
+        let replay = original.replace("12.0", "0.001").replace(
+            "\"checkpoint_replayed\":false",
+            "\"checkpoint_replayed\":true",
+        );
+        let summary = r#"{"goal":"G1","cell":"5:1:3","shape":"coord","instance":0,"summary":true,"drawn":2,"class1_skipped":1,"class0_satisfiable":0,"measured":1}"#;
+        let text = format!("{original}\n{summary}\n{replay}\n{summary}\n");
+        let records = score_records(&text);
+        assert_eq!(records.len(), 2);
+        assert_eq!(records[0]["secs"], 12.0);
+        let conflict = replay.replace("\"degree\":3", "\"degree\":4");
+        assert!(
+            std::panic::catch_unwind(|| score_records(&format!("{original}\n{conflict}"))).is_err()
+        );
+        let conflict = summary.replace("\"measured\":1", "\"measured\":2");
+        assert!(std::panic::catch_unwind(|| score_records(&format!(
+            "{original}\n{summary}\n{conflict}"
+        )))
+        .is_err());
+    }
+
+    #[test]
+    fn historical_logs_keep_their_existing_scoring_behavior() {
+        let record = r#"{"goal":"G1","x_r":4,"outcome":{"kind":"resolved","degree":3}}"#;
+        assert_eq!(score_records(&format!("{record}\n{record}")).len(), 2);
+    }
 }
 
 fn main() {

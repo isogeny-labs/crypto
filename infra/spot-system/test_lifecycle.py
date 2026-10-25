@@ -82,6 +82,29 @@ class LifecycleTests(unittest.TestCase):
         self.assertNotIn('StoppingAt', self.db.items['control'])
         self.asg.set_desired_capacity.assert_called_once_with(AutoScalingGroupName='group', DesiredCapacity=1, HonorCooldown=False)
 
+    def test_explicit_managed_work_clears_drain_without_moving_protected_source_ip(self):
+        self.db.items['control']={'Id':{'S':'control'},'StoppingAt':{'N':'1'}}
+        ec2=Mock();clients={'dynamodb':self.db,'autoscaling':self.asg,'ec2':ec2}
+        with patch.dict(os.environ,{'TABLE':'table','GROUP':'group','ENABLED':'true','PROTECTED_SOURCE':'i-original'}), \
+                patch.dict(sys.modules,{'boto3':SimpleNamespace(client=lambda name:clients[name])}):
+            result=handler({'action':'wake','managed_work':True},SimpleNamespace(aws_request_id='request'))
+        self.assertEqual(result['state'],'starting')
+        self.assertNotIn('StoppingAt',self.db.items['control'])
+        self.asg.set_desired_capacity.assert_called_once_with(AutoScalingGroupName='group',DesiredCapacity=1,HonorCooldown=False)
+        ec2.describe_addresses.assert_not_called();ec2.associate_address.assert_not_called()
+
+    def test_ordinary_prompt_keeps_protected_source_without_requesting_extra_worker(self):
+        self.group['Instances']=[]
+        ec2=Mock();ec2.describe_addresses.return_value={'Addresses':[{'InstanceId':'i-original'}]}
+        ec2.describe_instances.return_value={'Reservations':[{'Instances':[{'InstanceId':'i-original','State':{'Name':'running'}}]}]}
+        clients={'dynamodb':self.db,'autoscaling':self.asg,'ec2':ec2}
+        with patch.dict(os.environ,{'TABLE':'table','GROUP':'group','ALLOCATION':'eip','ENABLED':'true','PROTECTED_SOURCE':'i-original'}), \
+                patch.dict(sys.modules,{'boto3':SimpleNamespace(client=lambda name:clients[name])}):
+            result=handler({'action':'wake'},SimpleNamespace(aws_request_id='request'))
+        self.assertEqual(result['state'],'ready')
+        self.assertTrue(result['protected_source_active'])
+        self.asg.set_desired_capacity.assert_not_called();ec2.associate_address.assert_not_called()
+
     def test_exact_thirty_minutes_of_confirmed_idle(self):
         self.idle(2000)
         self.assertEqual(self.invoke(now=2000)['remaining_seconds'], 1800)
