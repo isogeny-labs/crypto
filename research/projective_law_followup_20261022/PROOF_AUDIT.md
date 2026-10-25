@@ -247,10 +247,11 @@ divisible by that product; therefore `E=B²F` exactly. Thus
 
 The separate [Lean uniqueness packet](formal/COMMON22_UNIQUENESS.md)
 mechanizes the explicit determinant Bézout identity, its `B≠0` coprimeness
-consequence, and the final coprime-divisibility-plus-degree implication in
-this paragraph. The residue and degree premises have not been connected
-mechanically to the source-derived expressions or to valid Mumford inputs.
-The divisor-class step remains written mathematics.
+consequence, both conditional residue bridges from interpolation and valid
+curve-input congruences, and the final coprime-divisibility-plus-degree
+implication in this paragraph. Runtime interpolation and the strict degree
+bound have not been connected mechanically to every source execution. The
+divisor-class step remains written mathematics.
 
 The checker also verifies the cleared identity
 `C⁵N+S*C²X+T = U*[-C⁴X+C³(-Cq1-A)+C²Q]`, where `S,T` are the

@@ -1,7 +1,7 @@
 obligation,kind,status,statement
 support_coprime,premise,kernel_checked_conditional,B nonzero implies IsCoprime u1 u2
-first_residue,premise,open_source_link,u1 divides residual minus scale times curve
-second_residue,premise,open_source_link,u2 divides residual minus scale times curve
+first_residue,premise,kernel_checked_conditional,interpolation and valid input imply first curve residue
+second_residue,premise,kernel_checked_conditional,interpolation and valid input imply second curve residue
 degree_bound,premise,open_source_link,difference degree is below degree of u1 times u2
 crt_uniqueness,implication,kernel_checked_conditional,the four premises imply residual equals scale times curve
 divisor_class,conclusion,open_geometry,residual curve equation yields the intended Pic0 class

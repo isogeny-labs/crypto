@@ -3,6 +3,9 @@
   "theorems": [
     "Common22Coprime.determinant_bezout",
     "Common22Coprime.supports_coprime",
+    "Common22Residues.first_residue",
+    "Common22Residues.second_residue",
+    "Common22Residues.residual_curve_eq",
     "Common22Uniqueness.zero_of_coprime_supports",
     "Common22Uniqueness.residual_eq_curve"
   ],
@@ -21,14 +24,14 @@
     {
       "obligation": "first_residue",
       "kind": "premise",
-      "status": "open_source_link",
-      "statement": "u1 divides residual minus scale times curve"
+      "status": "kernel_checked_conditional",
+      "statement": "interpolation and valid input imply first curve residue"
     },
     {
       "obligation": "second_residue",
       "kind": "premise",
-      "status": "open_source_link",
-      "statement": "u2 divides residual minus scale times curve"
+      "status": "kernel_checked_conditional",
+      "statement": "interpolation and valid input imply second curve residue"
     },
     {
       "obligation": "degree_bound",
@@ -49,6 +52,6 @@
       "statement": "residual curve equation yields the intended Pic0 class"
     }
   ],
-  "scope": "conditional coprimeness and polynomial uniqueness over a field; residue, degree, and geometric proofs remain open",
+  "scope": "conditional coprimeness and residual curve equation over a field; source interpolation, strict degree bound, and geometry remain open",
   "cost_ratio_change": null
 }

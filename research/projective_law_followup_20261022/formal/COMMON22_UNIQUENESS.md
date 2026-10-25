@@ -2,11 +2,13 @@
 
 Schema: `projective-law-common22-uniqueness/v1`. The pinned Lean build proves
 an explicit Bézout identity for the two source-style quadratics, then proves
-that nonzero `B` makes them coprime. It also proves that a polynomial of degree
-below `degree (u1*u2)` is zero if it is divisible
-by both coprime supports. Applied to `residual - scale*curve`, this gives the
-conditional equality `residual = scale*curve`. The [kernel log](common22-uniqueness-build.log)
-records all four theorem names and their foundational axioms.
+that nonzero `B` makes them coprime. Given interpolation and valid-input curve
+congruences, it proves both residual residues. It also proves that a polynomial
+below `degree (u1*u2)` is zero if divisible by both coprime supports. Applied
+to the cleared residual difference, this gives the conditional curve equation.
+The [coprime](common22-coprime-build.log), [residue](common22-residues-build.log),
+and [uniqueness](common22-uniqueness-build.log) kernel logs record all seven
+theorem names and their foundational axioms.
 
 The [CSV](common22-uniqueness.csv) and [JSON](common22-uniqueness.json) list
 each premise and conclusion, while the [graph](common22-uniqueness.svg) makes
@@ -15,6 +17,7 @@ printable copy for independent review. It is rendered from
 `COMMON22_UNIQUENESS.tex` with `pdflatex` and optimized with Ghostscript
 `pdfwrite`; the checksum manifest binds the final bytes.
 
-The two source-derived residues and the degree bound have not been mechanically
-connected to this theorem. The principal-divisor and `Pic^0` bridge also remain open. No new
-DLP experiment ran and the recorded cost ratios are unchanged.
+The source interpolation premises and strict degree bound have not been
+mechanically connected to the runtime formulas for all valid inputs. The
+principal-divisor and `Pic^0` bridge remain open. No new DLP experiment ran;
+the recorded cost ratios are unchanged.

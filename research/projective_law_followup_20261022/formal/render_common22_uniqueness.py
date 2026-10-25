@@ -9,8 +9,8 @@ ROOT = Path(__file__).resolve().parent
 SCHEMA = "projective-law-common22-uniqueness/v1"
 ROWS = [
     ("support_coprime", "premise", "kernel_checked_conditional", "B nonzero implies IsCoprime u1 u2"),
-    ("first_residue", "premise", "open_source_link", "u1 divides residual minus scale times curve"),
-    ("second_residue", "premise", "open_source_link", "u2 divides residual minus scale times curve"),
+    ("first_residue", "premise", "kernel_checked_conditional", "interpolation and valid input imply first curve residue"),
+    ("second_residue", "premise", "kernel_checked_conditional", "interpolation and valid input imply second curve residue"),
     ("degree_bound", "premise", "open_source_link", "difference degree is below degree of u1 times u2"),
     ("crt_uniqueness", "implication", "kernel_checked_conditional", "the four premises imply residual equals scale times curve"),
     ("divisor_class", "conclusion", "open_geometry", "residual curve equation yields the intended Pic0 class"),
@@ -21,6 +21,9 @@ packet = {
     "theorems": [
         "Common22Coprime.determinant_bezout",
         "Common22Coprime.supports_coprime",
+        "Common22Residues.first_residue",
+        "Common22Residues.second_residue",
+        "Common22Residues.residual_curve_eq",
         "Common22Uniqueness.zero_of_coprime_supports",
         "Common22Uniqueness.residual_eq_curve",
     ],
@@ -29,7 +32,7 @@ packet = {
         {"obligation": name, "kind": kind, "status": status, "statement": statement}
         for name, kind, status, statement in ROWS
     ],
-    "scope": "conditional coprimeness and polynomial uniqueness over a field; residue, degree, and geometric proofs remain open",
+    "scope": "conditional coprimeness and residual curve equation over a field; source interpolation, strict degree bound, and geometry remain open",
     "cost_ratio_change": None,
 }
 (ROOT / "common22-uniqueness.json").write_text(json.dumps(packet, indent=2) + "\n")
@@ -63,11 +66,13 @@ svg.extend([
 
 Schema: `projective-law-common22-uniqueness/v1`. The pinned Lean build proves
 an explicit Bézout identity for the two source-style quadratics, then proves
-that nonzero `B` makes them coprime. It also proves that a polynomial of degree
-below `degree (u1*u2)` is zero if it is divisible
-by both coprime supports. Applied to `residual - scale*curve`, this gives the
-conditional equality `residual = scale*curve`. The [kernel log](common22-uniqueness-build.log)
-records all four theorem names and their foundational axioms.
+that nonzero `B` makes them coprime. Given interpolation and valid-input curve
+congruences, it proves both residual residues. It also proves that a polynomial
+below `degree (u1*u2)` is zero if divisible by both coprime supports. Applied
+to the cleared residual difference, this gives the conditional curve equation.
+The [coprime](common22-coprime-build.log), [residue](common22-residues-build.log),
+and [uniqueness](common22-uniqueness-build.log) kernel logs record all seven
+theorem names and their foundational axioms.
 
 The [CSV](common22-uniqueness.csv) and [JSON](common22-uniqueness.json) list
 each premise and conclusion, while the [graph](common22-uniqueness.svg) makes
@@ -76,9 +81,10 @@ printable copy for independent review. It is rendered from
 `COMMON22_UNIQUENESS.tex` with `pdflatex` and optimized with Ghostscript
 `pdfwrite`; the checksum manifest binds the final bytes.
 
-The two source-derived residues and the degree bound have not been mechanically
-connected to this theorem. The principal-divisor and `Pic^0` bridge also remain open. No new
-DLP experiment ran and the recorded cost ratios are unchanged.
+The source interpolation premises and strict degree bound have not been
+mechanically connected to the runtime formulas for all valid inputs. The
+principal-divisor and `Pic^0` bridge remain open. No new DLP experiment ran;
+the recorded cost ratios are unchanged.
 """)
 
 (ROOT / "COMMON22_UNIQUENESS.tex").write_text(r"""\documentclass[11pt]{article}
@@ -89,9 +95,9 @@ DLP experiment ran and the recorded cost ratios are unchanged.
 \texttt{projective-law-common22-uniqueness/v1}. A pinned Lean check first proves
 an explicit Bezout identity: the common-branch determinant $B$ is a linear
 combination of the two quadratic supports. Thus $B\ne0$ makes them coprime.
-If both then divide $H$, and
-$\deg H<\deg(u_1u_2)$, then $H=0$. Substituting
-$H=E-B^2F$ yields $E=B^2F$ under those same explicit premises.
+Given interpolation and valid-input curve congruences, Lean proves that each
+support divides $H=E-B^2F$. If $\deg H<\deg(u_1u_2)$, then $H=0$ and
+$E=B^2F$. These are conditional polynomial statements.
 
 \begin{center}
 \begin{tabular}{ll}
@@ -99,7 +105,7 @@ $H=E-B^2F$ yields $E=B^2F$ under those same explicit premises.
 Obligation & Recorded status\\
 \midrule
 Support coprimeness from $B\ne0$ & Kernel checked, conditional\\
-First and second curve residues & Open source links\\
+First and second curve residues & Kernel checked, conditional\\
 Degree bound from source & Open source link\\
 Coprime low-degree implication & Kernel checked, conditional\\
 Divisor-class conclusion & Open geometry\\
@@ -108,7 +114,7 @@ Divisor-class conclusion & Open geometry\\
 \end{center}
 
 \noindent The CSV and JSON enumerate the obligations separately. This is a
-polynomial uniqueness lemma, not a universal group-law proof. No DLP run or
+polynomial equation bridge, not a universal group-law proof. No DLP run or
 price changed in this packet.
 \end{document}
 """)

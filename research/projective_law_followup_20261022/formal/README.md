@@ -44,8 +44,9 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   artifact-stored [PDF](COMMON22_SUPPORT_HEAD.pdf) retain the bounded result.
 - The [coprime-support uniqueness packet](COMMON22_UNIQUENESS.md) proves that
   nonzero source-style determinant `B` makes the two quadratic supports
-  coprime by an explicit Bézout identity. It then proves that two support
-  divisibilities and a strict degree bound force the cleared residual
+  coprime by an explicit Bézout identity. Conditional residue lemmas derive
+  the two support divisibilities from interpolation and valid-input curve
+  congruences. A strict degree bound then forces the cleared residual
   difference to vanish. The [CSV](common22-uniqueness.csv),
   [JSON](common22-uniqueness.json), [graph](common22-uniqueness.svg), and
   [PDF](COMMON22_UNIQUENESS.pdf) distinguish the kernel-checked implication
