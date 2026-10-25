@@ -4,6 +4,13 @@ This directory pins and builds a Lean packet for algebraic obligations used by
 the weighted genus-2 projective-law implementation.  It is a proof-boundary
 artifact.  It does not claim a complete formal proof of Jacobian addition.
 
+The [weighted-Proj head and chart packet](WEIGHTED_PROJ_HEAD_VERIFIED.md)
+checks homogeneity of the proposed sextic and its principal ideal, plus the
+two dehomogenized equations obtained at `Z=1` and `X=1`. Its [CSV](weighted-proj-head-verified.csv),
+[graph](weighted-proj-head-verified.svg), and [PDF](weighted-proj-head-verified.pdf)
+mark the quotient grading, chart isomorphisms, projective completion, and
+`Pic⁰` transport as open.
+
 ## Pinned environment
 
 - Lean `v4.34.1`, pinned by `lean-toolchain`.

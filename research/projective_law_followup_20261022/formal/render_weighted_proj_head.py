@@ -13,6 +13,8 @@ STEM = "weighted-proj-head-verified"
 ROWS = [
     ("degree-six sextic", "checked", "equation_weighted_homogeneous", "Lean exit 0; standard axioms"),
     ("homogeneous principal ideal", "checked", "relationIdeal_homogeneous", "Lean exit 0; standard axioms"),
+    ("Z=1 affine equation", "checked", "affine_equation", "substitution into the sextic only"),
+    ("X=1 infinity equation", "checked", "infinity_equation", "substitution into the sextic only"),
     ("graded quotient", "open", "none", "homogeneous-ideal quotient grading required"),
     ("D_+(Z) affine chart", "open", "none", "degree-zero localization identification required"),
     ("infinity chart and overlap", "open", "none", "chart isomorphism and gluing comparison required"),
@@ -56,7 +58,7 @@ def pdf_escape(value: str) -> str:
 
 def render_pdf() -> None:
     lines = [
-        "Weighted Proj bridge: checked homogeneity rung",
+        "Weighted Proj bridge: checked homogeneity and chart equations",
         "Pinned Lean 4.34.1; Mathlib d13f23b723b8a846827a245b89c10fc7d3f11612",
         "",
         "Weights: X=1, Y=3, Z=1. Coefficients a3,a2,a1,a0 are arbitrary in a field.",
@@ -65,8 +67,10 @@ def render_pdf() -> None:
         "",
         "CHECKED: equation_weighted_homogeneous, weighted degree six.",
         "CHECKED: relationIdeal_homogeneous, principal ideal homogeneous.",
-        "Compiler exit: 0. Both axiom audits: propext, Classical.choice, Quot.sound.",
-        "No sorryAx in either audit.",
+        "CHECKED: Z=1 gives y^2 - (x^5+a3*x^3+a2*x^2+a1*x+a0).",
+        "CHECKED: X=1 gives w^2-z(1+a3*z^2+a2*z^3+a1*z^4+a0*z^5).",
+        "Compiler exit: 0. Four axiom audits: propext, Classical.choice, Quot.sound.",
+        "No sorryAx in any audit.",
         "",
         "OPEN: grading on the quotient by the homogeneous ideal.",
         "OPEN: degree-zero localization at Z equals the affine coordinate ring.",
@@ -75,6 +79,7 @@ def render_pdf() -> None:
         "",
         "The graph and CSV enumerate these obligations without a ranking claim.",
         "Compiler receipt: weighted-proj-head-final-build.log",
+        "Chart receipt: weighted-proj-charts-build.log",
         "Copy timeout receipt: weighted-proj-head-copy.txt",
     ]
     stream = ["BT", "/F1 10 Tf", "50 748 Td", "14 TL"]

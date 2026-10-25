@@ -114,7 +114,10 @@ for arbitrary inputs.
   [pinned Lean packet](../research/projective_law_followup_20261022/formal/WEIGHTED_PROJ_HEAD_VERIFIED.md)
   proves the proposed weighted sextic has degree six and its principal ideal
   is homogeneous under weights `(1,3,1)`, with exit 0 and standard-axiom
-  audits. The earlier failed attempts remain preserved. A grading on the
+  audits. Two additional imported-source Lean theorems now check that the
+  `Z=1` and `X=1` substitutions yield the exact affine and infinity chart
+  equations, also with exit 0 and standard-axiom audits. The earlier failed
+  attempts remain preserved. A grading on the
   quotient, the `D₊(Z)` coordinate-ring isomorphism, completion and `Pic⁰`
   transport are still unproved.
 - **Finite source-bound check, 2026-10-25:** One smooth `F17` 2-torsion

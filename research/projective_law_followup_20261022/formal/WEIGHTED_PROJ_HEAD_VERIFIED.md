@@ -66,3 +66,45 @@ chart and agreement on overlap, and (d) projectivity, smoothness, and `Pic⁰`
 compatibility with the original curve. The availability of
 `Proj.basicOpenIsoSpec` addresses only the generic localization-to-`Spec`
 step after (a); it does not discharge (b).
+
+## Checked chart-equation substitutions
+
+`Common22WeightedProjCharts.lean` imports the exact weighted sextic above and
+kernel-checks two additional identities over any field and arbitrary
+`a3,a2,a1,a0`. With `(X,Y,Z)=(x,y,1)`, its equation evaluates to
+`y²-(x⁵+a3*x³+a2*x²+a1*x+a0)`. With `(X,Y,Z)=(1,w,z)`, it evaluates to
+`w²-z*(1+a3*z²+a2*z³+a1*z⁴+a0*z⁵)`. These are the two equations used by
+the separately constructed affine and infinity charts. They check the
+forward coordinate substitutions only: no quotient/localization
+isomorphism, chart cover, smoothness, projectivity, or `Pic⁰` transfer follows.
+
+The pinned Lean v4.34.1/Mathlib environment and prebuilt matching toolchain
+above were reused. From the repository root, the exact commands were:
+
+```sh
+proj_lean_path='/dev/shm'
+for package_dir in /dev/shm/crypto-pr2304-lake-packages/*; do
+  if test -d "$package_dir/.lake/build/lib/lean"; then
+    proj_lean_path="$proj_lean_path:$package_dir/.lake/build/lib/lean"
+  fi
+done
+TMPDIR=/dev/shm LEAN_SYSROOT=/dev/shm/lean434-toolchain-copy \
+  LEAN_PATH="$proj_lean_path" timeout 180s \
+  /dev/shm/lean434-toolchain-copy/bin/lean \
+  -o /dev/shm/Common22WeightedProjHead.olean \
+  research/projective_law_followup_20261022/formal/Common22WeightedProjHead.lean
+TMPDIR=/dev/shm LEAN_SYSROOT=/dev/shm/lean434-toolchain-copy \
+  LEAN_PATH="$proj_lean_path" timeout 180s \
+  /dev/shm/lean434-toolchain-copy/bin/lean \
+  research/projective_law_followup_20261022/formal/Common22WeightedProjCharts.lean
+```
+
+The chart compiler exited **0**; the exact
+output is retained in `weighted-proj-charts-build.log`. Both theorem audits
+report only `propext`, `Classical.choice`, and `Quot.sound`, with no `sorryAx`.
+The chart source SHA-256 is
+`a3a8f4adc679534f79de247934e89ddb2a4e423729e36e8ee319ca0cff38638b`;
+the log SHA-256 is
+`3e7d85fc137a0b47fa1cb5844e2776617c870f00d1076de78c22d282c8268f01`.
+The updated CSV, graph, and PDF distinguish these two checked equations from
+the still-open chart-isomorphism obligations.
