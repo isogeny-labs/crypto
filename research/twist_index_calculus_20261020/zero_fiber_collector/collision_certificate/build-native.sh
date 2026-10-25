@@ -30,6 +30,9 @@ cert_phase build timeout --signal=TERM --kill-after=10s 1200s cargo build --rele
 cp "$cert_target/release/twist-collision-certificate" "$cert_out/certificate"
 chmod 500 "$cert_out/certificate"
 sha256sum "$cert_out/certificate" > "$cert_out/metadata/certificate.sha256"
+cert_lean=/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/bin/lean
+"$cert_lean" --version > "$cert_out/metadata/lean-version.txt"
+cert_phase lean timeout --signal=TERM --kill-after=10s 1200s "$cert_lean" "$cert_root/proof/RepeatedFactor.lean"
 sha256sum -c "$cert_out/metadata/sources.sha256" > "$cert_out/metadata/sources-unchanged.txt"
 date -u +%FT%TZ > "$cert_out/metadata/finished-utc.txt"
 printf '0\n' > "$cert_out/metadata/exit"
