@@ -67,19 +67,26 @@ identity differs, stop before measuring a search.
 
 ## Solver admission for this larger base
 
-The current PR head has **no natural-query importer for this D18 archive**:
-`primary_adapter.rs` accepts the standard `n83.factor-base/v1` panel format,
-while this archive uses `n83.direct-subgroup-orbit-export/v1`. The earlier
-half-size D18 branch `codex/n83-d18-subgroup-orbit-census-20261018` contains
-the separate `check_d18_export` / `paired_orbit_cli` source and its frozen
-natural-query protocols under
-`research/n83_d18_subgroup_orbit_census_20261018/natural-v1/`. Port and
-review an explicitly policy-bound importer for all 32,643 columns; reject
-changed source CSV, archive, curve, point-set hash and labels. Do not relax
-the standard panel whitelist or silently truncate to the earlier 16,627
-classes. PR #2490 has a separate shared-root-bit encoding for the half-size
-base; test a reviewed integration against this full-base identity before
-using its capacity or timing claims.
+The opt-in `primary-full-d18-adapter-check` command imports this exact
+archive into the generic signed-Frobenius base and independently reconstructs
+its orbit maps and labels. It requires the committed producer manifest,
+generic replay and S3 audit, exact compressed SHA-256/BLAKE3 and point-set
+hash. Run it only after the fresh S3 fetch above:
+
+```sh
+cargo run --release --manifest-path ../../../../Cargo.toml \
+  --example koblitz_n83_factor_base_export -- \
+  primary-full-d18-adapter-check "$base_dir" "$base_dir/import.json"
+```
+
+Require a `PASS` receipt before the [frozen first access gate](NATURAL_PROTOCOL.md).
+That gate adds an opt-in `primary-full-d18-m4 positive|natural` worker with
+hard resource checks, durable phase/shape records, SAT-model verification,
+group lift, row replay and rank-one control. Its natural result requires a
+separate replay before interpretation. The standard panel policy whitelist
+and the previous 16,627-class D18 worker remain separate. PR #2490 has a
+shared-root-bit encoding for the half-size base; test a reviewed integration
+against this full-base identity before using its capacity or timing claims.
 
 For the existing per-representative signed-Frobenius circuit at `n=83`,
 `m=4`, `r=32,643`, the exact **preflight bound** from
@@ -93,10 +100,11 @@ total clauses, XOR rows, propagation, and search under a hard memory and wall
 cap before allocating a natural-query panel. An optimized shared-root-bit
 encoding needs its own exact size and equivalence controls.
 
-Freeze the next natural-query protocol **before** running it. Use the same
-public primary-curve fixture as the earlier U/D panel, retain distinct base
-identities, and run known-relation positive and changed-target negative
-controls through the exact importer and model. Then run same-target natural
+The [natural protocol](NATURAL_PROTOCOL.md) freezes the first positive and
+natural arms before execution. Use the same public primary-curve fixture as
+the earlier U/D panel and retain distinct base identities. Run known-relation
+positive and changed-target negative controls through the exact importer and
+model. Then run same-target natural
 queries with independent group and rank replay. Record import, construction,
 all failed/capped searches, useful-rank growth, sparse linear algebra,
 unseen-target descent and matched same-target rho as separate cold charges.

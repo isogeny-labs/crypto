@@ -1225,6 +1225,19 @@ fn main() -> Result<()> {
             write_new_json(output,&receipt)?;
             println!("{receipt}");
         },
+        Some("primary-full-d18-adapter-check")=>{
+            if args.len()!=4 { return Err("primary-full-d18-adapter-check EXPORT_DIR NEW_OUTPUT_JSON".into()); }
+            let receipt=primary_adapter::check_full_d18_export(Path::new(&args[2]))?;
+            write_new_json(Path::new(&args[3]),&receipt)?;
+            println!("{receipt}");
+        },
+        Some("primary-full-d18-m4")=>{
+            if args.len()!=6 { return Err("primary-full-d18-m4 positive|natural BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (requires hard 32-GiB cgroup and 1210-s outer cap)".into()); }
+            let receipt=primary_adapter::full_d18_m4_cli(
+                &args[2],Path::new(&args[3]),Path::new(&args[4]),Path::new(&args[5]),
+            )?;
+            println!("{receipt}");
+        },
         Some("primary-sat-build")=>{
             if args.len()!=6 { return Err("primary-sat-build PANEL_DIR K MEMORY_MIB NEW_OUTPUT_JSON (run through the bounded capacity supervisor)".into()); }
             let receipt=primary_adapter::build_capacity_cli(
