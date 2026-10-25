@@ -22,7 +22,10 @@ invalid intermediates. The [failure file](failures.csv) has only its header.
 The [branch matrix](branch-matrix.csv) contains 108 joint author-call-path /
 Rust-label cells, representing 28 observed author paths and 16 Rust labels.
 
-Every standardized pair row is retained in four compressed shards:
+Every standardized pair row is retained in four compressed shards in the
+repository artifact store. The tracked [.artifacts.json](.artifacts.json)
+records their SHA-256 digests and sizes; hydrate the shards before opening
+them or running the byte-for-byte replay:
 [F7 weight 0](F7-weight0.csv.xz), [F7 weight 1](F7-weight1.csv.xz),
 [F11 weight 0](F11-weight0.csv.xz), and [F11 weight 1](F11-weight1.csv.xz).
 Their compressed digests are in [RAW_SHA256SUMS](RAW_SHA256SUMS); the
@@ -46,6 +49,10 @@ From the repository root, retrieve the pinned author source and replay both
 the bounded and full runs without overwriting evidence:
 
 ```sh
+python3 tools/artifacts/artifacts.py pull \
+  research/projective_law_followup_20261022/public_source_parity
+python3 tools/artifacts/artifacts.py verify --remote \
+  research/projective_law_followup_20261022/public_source_parity
 curl --fail --location --silent --show-error \
   https://raw.githubusercontent.com/ozbayelif/jac-on-jac/ec98e115ed359c8b7facf559eb0d9f240703f6f5/jac-on-jac.m \
   --output /tmp/jac-on-jac-ec98.m
