@@ -73,10 +73,14 @@ def parity_status(stages: list[dict]) -> str:
             or any(reference.get(field) != row["summary"].get(field)
                    for row in completed[1:] for field in SHARED_FIELDS)
             or any(row["summary"].get("base_hash") != BASE_HASH
+                   or row["summary"].get("n") != 83
+                   or row["summary"].get("status") != "STAGE_DIAGNOSTIC_ONLY"
                    or row["summary"].get("factor_base_points") != 913_000
                    or row["summary"].get("orbit_columns") != 5500
                    or row["summary"].get("regular_states") != STATE_COUNT
                    or row["summary"].get("root_table_entries") != ROOT_ENTRIES
+                   or row["summary"].get("root_table_layout") != "indexed83_4byte_split_id30"
+                   or row["summary"].get("root_slot_state_id_bits") != 30
                    or row["summary"].get("state_digest_blake3") != STATE_DIGEST
                    or row["summary"].get("table_digest_blake3") != TABLE_DIGEST
                    or row["summary"].get("overflow_digest_blake3") != OVERFLOW_DIGEST
@@ -102,6 +106,7 @@ def run(allocation_path: Path, bundle: Path, bundle_sha256: str,
     output.mkdir(parents=True, exist_ok=False)
     final = {
         "schema": "n83.k5500-fp8-pod-run/v1", "status": "INCOMPLETE",
+        "candidate_id": None,
         "allocation_sha256": custody.digest(allocation_path),
         "bundle_sha256": custody.digest(bundle),
         "source_sha256": custody.digest(SOURCE),
