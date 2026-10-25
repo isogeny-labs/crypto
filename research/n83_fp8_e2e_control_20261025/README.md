@@ -26,8 +26,59 @@ python3 -m research.n83_fp8_e2e_control_20261025.run \
   --output /absolute/path/to/new-output
 python3 -m research.n83_fp8_e2e_control_20261025.verify \
   /absolute/path/to/new-output
+python3 -m research.n83_fp8_e2e_control_20261025.seal \
+  /absolute/path/to/new-output
 ```
 
 Each child has a 1,200-second process cap and a 16,374,562,816-byte sampled
 RSS cap. The run stops at the first failed child and records its partial data.
 The output directory must be new and outside the checkout.
+
+## Recorded full-process control
+
+The [archived ABBA output](runs/n83-fp8-e2e-abba-20261025-1) contains the
+executed binary, all four launch records, stdout, stderr, target records,
+resource receipts, independent replay, candidate/workload registration, and
+a 19-file SHA-256 archive manifest. Replay after relocation reports
+`PASS_EXACT_FULL_PROCESS_PARITY`; altering an archived stdout file fails its
+hash gate. The executed binary SHA-256 is
+`a768b71f8059f0cf9049213ebc5bd2ed7ff9eccc3ab4947cff822093b58ef706`.
+All four runs use 183,762 subgroup-usable base points, 1,107 folded columns,
+101,708,868 indexed roots, final rank 1,107, and independently replay the
+same scalar `2948503450338408` on the same public point. The sidecar adds
+167,772,160 bytes of index storage.
+
+The two exact candidate IDs are
+`IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0h3962da813c7d`
+for the packed-fingerprint baseline and
+`IC1N83Ckb1a1fb183762PDP4rootRCguidedLAgaussTDdirectISO0h384942920658`
+for the byte sidecar. The frozen single-point workload ID is `1b2e5e958684`;
+the [sealed result](runs/n83-fp8-e2e-abba-20261025-1/sealed_result.json)
+lists each candidate, workload, and run ID.
+
+| ABBA arm | Full process (ms) | Index build (ms) | Rank stage (ms) | One-target online (ms) | Sampled peak RSS (MiB) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Baseline 1 | 171,521.491 | 46,406.082 | 124,605.899 | 164.765 | 1,244.8 |
+| Fingerprint 1 | 91,371.190 | 29,634.597 | 61,283.081 | 61.233 | 1,414.0 |
+| Fingerprint 2 | 97,009.890 | 28,128.960 | 68,484.108 | 62.029 | 1,401.6 |
+| Baseline 2 | 145,300.836 | 43,622.289 | 101,235.381 | 107.266 | 1,244.7 |
+
+The geometric-mean baseline/fingerprint ratios are 1.677 for full-process
+time, 1.558 for index build, and 2.157 for one-target online time. These are
+descriptive local shared-host ratios. The baseline process time fell 15.3%
+between bookends, and its one-target interval fell 34.9%. The latter drift
+prevents a stable online timing aggregate under the Tier 1 gate. The raw
+target records preserve the exclusive query, PDP, relation-check, descent,
+and scalar-replay phases; their sums agree with each charged online interval
+within 1 ms. The rank stage attempted one guided relation per column in
+each run. The sidecar's next measurement is a calibrated Tier 1 same-point
+IC/rho pair with these complete candidate manifests.
+
+Replay the committed output directly:
+
+```sh
+python3 -m research.n83_fp8_e2e_control_20261025.verify \
+  research/n83_fp8_e2e_control_20261025/runs/n83-fp8-e2e-abba-20261025-1
+python3 -m research.n83_fp8_e2e_control_20261025.seal \
+  research/n83_fp8_e2e_control_20261025/runs/n83-fp8-e2e-abba-20261025-1
+```
