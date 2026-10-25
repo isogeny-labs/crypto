@@ -71,8 +71,8 @@ This comparison is now executed: [checked roots](reports/known-roots-20261025/RE
 80 paired setups/800 verified recoveries, exact certificates and9 rehashed
 controls. Each candidate cold record charges4 membership checks once at setup,
 with unchanged matrix and group requests. The first rejected ordering assumption
-is retained with its pre-rerun correction. The next concrete draft is a
-[setup-charged signed base cache](../../backlog/XP-20261025-signed-base-cache/README.md);
+is retained with its pre-rerun correction. The subsequent implementation is the
+[setup-charged signed base cache](../../backlog/XP-20261025-signed-base-cache/README.md).
 This round is now [executed](reports/signed-cache-20261025/README.md):80 paired
 setups/800 scalars, identical ordered lifts/certificates and7 rehashed controls.
 All400 cached cold records use fewer point-add requests than the binary
