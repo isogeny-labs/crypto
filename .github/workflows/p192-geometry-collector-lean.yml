@@ -13,7 +13,7 @@ on:
 
 jobs:
   pencil-and-four-cell:
-    runs-on: ubuntu-latest
+    runs-on: experiment
     timeout-minutes: ${{ github.event_name == 'workflow_dispatch' && 45 || 25 }}
     defaults:
       run:
