@@ -6,11 +6,12 @@ that nonzero `B` makes them coprime. Given interpolation and valid-input curve
 congruences, it proves both residual residues. It also proves that a polynomial
 below `degree (u1*u2)` is zero if divisible by both coprime supports. Applied
 to the cleared residual difference, this gives the conditional curve equation.
-A separate Lean lemma proves the strict degree bound from degree-at-most-five,
-matching head coefficients, and quadratic-support hypotheses.
+A separate Lean lemma proves the strict degree bound from matching head
+coefficients and quadratic-support hypotheses. It covers a degree-at-most-six
+residual whose sixth coefficient vanishes.
 The [coprime](common22-coprime-build.log), [residue](common22-residues-build.log),
 [degree](common22-degree-build.log), and
-[uniqueness](common22-uniqueness-build.log) kernel logs record all nine
+[uniqueness](common22-uniqueness-build.log) kernel logs record all eleven
 theorem names and their foundational axioms.
 
 The [CSV](common22-uniqueness.csv) and [JSON](common22-uniqueness.json) list

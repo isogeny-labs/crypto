@@ -28,6 +28,8 @@ packet = {
         "Common22Residues.residual_curve_eq",
         "Common22Degree.cleared_difference_degree_lt_four",
         "Common22Degree.cleared_difference_degree_lt_supports",
+        "Common22Degree.natDegree_le_five_of_sextic_head_zero",
+        "Common22Degree.cleared_difference_degree_lt_supports_of_sextic_head",
         "Common22Uniqueness.zero_of_coprime_supports",
         "Common22Uniqueness.residual_eq_curve",
     ],
@@ -74,11 +76,12 @@ that nonzero `B` makes them coprime. Given interpolation and valid-input curve
 congruences, it proves both residual residues. It also proves that a polynomial
 below `degree (u1*u2)` is zero if divisible by both coprime supports. Applied
 to the cleared residual difference, this gives the conditional curve equation.
-A separate Lean lemma proves the strict degree bound from degree-at-most-five,
-matching head coefficients, and quadratic-support hypotheses.
+A separate Lean lemma proves the strict degree bound from matching head
+coefficients and quadratic-support hypotheses. It covers a degree-at-most-six
+residual whose sixth coefficient vanishes.
 The [coprime](common22-coprime-build.log), [residue](common22-residues-build.log),
 [degree](common22-degree-build.log), and
-[uniqueness](common22-uniqueness-build.log) kernel logs record all nine
+[uniqueness](common22-uniqueness-build.log) kernel logs record all eleven
 theorem names and their foundational axioms.
 
 The [CSV](common22-uniqueness.csv) and [JSON](common22-uniqueness.json) list
@@ -104,10 +107,10 @@ an explicit Bezout identity: the common-branch determinant $B$ is a linear
 combination of the two quadratic supports. Thus $B\ne0$ makes them coprime.
 Given interpolation and valid-input curve congruences, Lean proves that each
 support divides $H=E-B^2F$. If $\deg H<\deg(u_1u_2)$, then $H=0$ and
-$E=B^2F$. A separate theorem derives this degree bound when $E$ and $F$
-have degree at most five and matching scaled coefficients in degrees five and
-four, while $u_1,u_2$ are nonzero quadratics. These are conditional polynomial
-statements.
+$E=B^2F$. A separate theorem derives this degree bound when $E$ has degree
+at most six with zero sixth coefficient, $F$ has degree at most five, their
+scaled coefficients match in degrees five and four, and $u_1,u_2$ are nonzero
+quadratics. These are conditional polynomial statements.
 
 \begin{center}
 \begin{tabular}{ll}

@@ -473,13 +473,16 @@ def main() -> None:
             "forbidden common residue proof token")
     degree_source = (ROOT / "Common22Degree.lean").read_text()
     degree_log = (ROOT / "common22-degree-build.log").read_text()
+    normalized_degree_log = " ".join(degree_log.split())
     for theorem in ("cleared_difference_degree_lt_four",
-                    "cleared_difference_degree_lt_supports"):
+                    "cleared_difference_degree_lt_supports",
+                    "natDegree_le_five_of_sextic_head_zero",
+                    "cleared_difference_degree_lt_supports_of_sextic_head"):
         require(re.search(r"(?m)^theorem " + theorem + r"\b", degree_source) is not None,
                 f"common degree theorem missing: {theorem}")
         require(
             f"'Common22Degree.{theorem}' depends on axioms: "
-            "[propext, Classical.choice, Quot.sound]" in degree_log,
+            "[propext, Classical.choice, Quot.sound]" in normalized_degree_log,
             f"common degree kernel/axiom receipt missing: {theorem}",
         )
     require(forbidden_proof_token.search(degree_source) is None,
@@ -508,6 +511,8 @@ def main() -> None:
         "Common22Residues.residual_curve_eq",
         "Common22Degree.cleared_difference_degree_lt_four",
         "Common22Degree.cleared_difference_degree_lt_supports",
+        "Common22Degree.natDegree_le_five_of_sextic_head_zero",
+        "Common22Degree.cleared_difference_degree_lt_supports_of_sextic_head",
         "Common22Uniqueness.zero_of_coprime_supports",
         "Common22Uniqueness.residual_eq_curve",
     ], "common uniqueness theorem inventory mismatch")

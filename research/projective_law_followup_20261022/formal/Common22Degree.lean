@@ -56,7 +56,42 @@ theorem cleared_difference_degree_lt_supports
   exact cleared_difference_degree_lt_four e f b e_degree f_degree
     e_five f_five e_four f_four
 
+/-- A sextic upper bound drops to a quintic upper bound when its sixth
+coefficient vanishes. This handles the zero polynomial explicitly. -/
+theorem natDegree_le_five_of_sextic_head_zero
+    (e : K[X]) (e_degree : e.natDegree ≤ 6) (e_six : e.coeff 6 = 0) :
+    e.natDegree ≤ 5 := by
+  by_cases he : e = 0
+  · simp [he]
+  have hlt : degree e < 6 :=
+    (degree_lt_iff_coeff_zero e 6).2 (by
+      intro m hm
+      by_cases hm6 : m = 6
+      · simpa [hm6] using e_six
+      have hm7 : 6 < m := by omega
+      exact coeff_eq_zero_of_natDegree_lt (lt_of_le_of_lt e_degree hm7))
+  have hnat : e.natDegree < 6 := (natDegree_lt_iff_degree_lt he).2 hlt
+  omega
+
+/-- The sextic head certificate supplies the same strict support-product
+degree bound, provided the two supports are nonzero quadratics. -/
+theorem cleared_difference_degree_lt_supports_of_sextic_head
+    (u1 u2 e f : K[X]) (b : K)
+    (u1_nonzero : u1 ≠ 0) (u2_nonzero : u2 ≠ 0)
+    (u1_degree : u1.natDegree = 2) (u2_degree : u2.natDegree = 2)
+    (e_degree : e.natDegree ≤ 6) (e_six : e.coeff 6 = 0)
+    (f_degree : f.natDegree ≤ 5)
+    (e_five : e.coeff 5 = b ^ 2) (f_five : f.coeff 5 = 1)
+    (e_four : e.coeff 4 = 0) (f_four : f.coeff 4 = 0) :
+    degree (e - C (b ^ 2) * f) < degree (u1 * u2) := by
+  exact cleared_difference_degree_lt_supports u1 u2 e f b
+    u1_nonzero u2_nonzero u1_degree u2_degree
+    (natDegree_le_five_of_sextic_head_zero e e_degree e_six)
+    f_degree e_five f_five e_four f_four
+
 end Common22Degree
 
 #print axioms Common22Degree.cleared_difference_degree_lt_four
 #print axioms Common22Degree.cleared_difference_degree_lt_supports
+#print axioms Common22Degree.natDegree_le_five_of_sextic_head_zero
+#print axioms Common22Degree.cleared_difference_degree_lt_supports_of_sextic_head
