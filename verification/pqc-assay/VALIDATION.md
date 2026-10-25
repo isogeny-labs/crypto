@@ -64,3 +64,27 @@ and summary, plus the replay output, are retained under `evidence/`. The full
 verbose library log is over the repository's Git data threshold and stays in
 the execution workspace; its digest and byte count are recorded alongside
 the compact result. This receipt does not claim a durable raw-log upload.
+
+## CI follow-up, 2026-10-25
+
+The native proof, Rust compilation/lint, workflow-syntax and ecbench checks
+passed on `bab2ff34690931cb260128d486f6d492d10b7763`.
+The artifact job's sparse checkout omitted the new proof directory. Its
+checker could not resolve the abbreviated object ID `59dae9f` for the new
+`.gitattributes` file. A fresh blobless sparse clone reproduced that failure;
+including `/verification/pqc-assay/` made the same checker pass. The workflow
+now includes that input directory. `evidence/artifact-sparse-before.txt` and
+`artifact-sparse-after.txt` preserve the two results. The gate and its storage
+policy are unchanged.
+
+Two initial-head gates report issues in unchanged research data:
+
+- [curve names](https://github.com/aburan28/crypto/actions/runs/40150544527):
+  unregistered curve slugs in existing research reports and dashboards;
+- [validation](https://github.com/aburan28/crypto/actions/runs/40150544471):
+  33 existing leaderboard/benchmark issues, starting with a missing
+  `VALIDATION.json` for `research/ic_tool_program/rule/v7/analysis.json`.
+
+Those gates remain merge requirements. No curve registration, frozen record
+or validation admission was changed to make this port pass. Merge is
+authorized, but remains pending successful applicable checks.
