@@ -16,7 +16,7 @@ concurrency:
 jobs:
   one-shot-cold-three-phase:
     if: github.event.label.name == 'ecc2k130-dag-linux-v2-measure-once'
-    runs-on: ubuntu-24.04
+    runs-on: main
     timeout-minutes: 50
     env:
       GH_TOKEN: ${{ github.token }}
