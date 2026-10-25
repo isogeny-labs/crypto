@@ -8,7 +8,7 @@ import typst
 
 here = Path(__file__).resolve().parent
 repo_path = here.relative_to(next(p for p in here.parents if (p / "AGENTS.md").exists()))
-repo = "https://github.com/aburan28/crypto/blob/codex/nist-r06-factorization-results-20261025/"
+repo = "https://github.com/aburan28/crypto/blob/f3feb82d368b202f834651a3117317b89f2ace6c/"
 
 def quoted(value):
     return json.dumps(value, ensure_ascii=False)

@@ -5,7 +5,7 @@
 #set table(stroke: 0.3pt + luma(80%), inset: 4pt)
 #heading(level: 1)[#text("R08 interim: longer local collection is running")]
 
-#text("At 2026-10-25 06:07:37 UTC, native PID 9409 and two lattice-sieving workers were running. The ")#link("https://github.com/aburan28/crypto/blob/codex/nist-r06-factorization-results-20261025/research/nist_skipped_curve_dissection_20261021/factorization/rounds/R08-20261025/OBSERVATION.json")[#text("observation")]#text(" records the actual command and process state. It reports 614,231 raw relations for this allocation only, excluding the inherited 4,592,399 lines. This is a dated observation, not a claim that the bounded worker remains alive indefinitely.")
+#text("At 2026-10-25 06:07:37 UTC, native PID 9409 and two lattice-sieving workers were running. The ")#link("https://github.com/aburan28/crypto/blob/f3feb82d368b202f834651a3117317b89f2ace6c/research/nist_skipped_curve_dissection_20261021/factorization/rounds/R08-20261025/OBSERVATION.json")[#text("observation")]#text(" records the actual command and process state. It reports 614,231 raw relations for this allocation only, excluding the inherited 4,592,399 lines. This is a dated observation, not a claim that the bounded worker remains alive indefinitely.")
 
 #image("resume.svg", width: 100%)
 
@@ -13,7 +13,7 @@
 
 #text("R07 completed filtering of the prior dataset and left 92 singleton survivors with no matrix prerequisite. R08 therefore continues R06's original state, not the filter-modified copy with appended free relations. The input relation SHA-256 remains 1c4926cfcb63c8821ef209ebad4d3b0562980f73807574a8e32b3201430cced9. The range ledger and both native polynomial formats match the predecessor. The quarantined old worker output stays outside active state.")
 
-#text("The exact skipped_256_876-twist2 residual remains the same 444-bit integer bound by the ")#link("https://github.com/aburan28/crypto/blob/codex/nist-r06-factorization-results-20261025/research/nist_skipped_curve_dissection_20261021/factorization/rounds/R08-20261025/PROTOCOL.md")[#text("protocol")]#text(". Fresh baseline certification and a separate whole-target prime/product replay pass. Fourteen copied runtime source blobs match immutable commit 5cb553810e5bbfbd8691ec614ffcaacefc625757. The validated patched executable matches its binary-bound native timeout control. Subsequent branch edits cannot alter this running source snapshot.")
+#text("The exact skipped_256_876-twist2 residual remains the same 444-bit integer bound by the ")#link("https://github.com/aburan28/crypto/blob/f3feb82d368b202f834651a3117317b89f2ace6c/research/nist_skipped_curve_dissection_20261021/factorization/rounds/R08-20261025/PROTOCOL.md")[#text("protocol")]#text(". Fresh baseline certification and a separate whole-target prime/product replay pass. Fourteen copied runtime source blobs match immutable commit 5cb553810e5bbfbd8691ec614ffcaacefc625757. The validated patched executable matches its binary-bound native timeout control. Subsequent branch edits cannot alter this running source snapshot.")
 
 #text("Production launched at 05:51:25 UTC; native sieving began at 05:52:08 UTC on October 25. Two workers use seed 20261022, -gnfs -xover 81 -pbatch 120, native limit 7200 seconds, outer 7260 seconds plus 30-second kill grace, 4 GiB virtual memory per native process, and 1 GiB per output file, with core dumps disabled. Host allocation is four CPUs and 16 GiB RAM, L0. At least 1 GiB free disk was required after state preparation. No R07 filter-dispatch override is applied to production.")
 
