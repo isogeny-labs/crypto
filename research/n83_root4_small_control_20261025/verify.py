@@ -2,6 +2,7 @@
 """Independently replay the bounded K1107 fixed-root4 control receipt."""
 
 import argparse
+import gzip
 import hashlib
 import json
 import math
@@ -21,17 +22,67 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def base_dump_sha(folder):
+    plain = folder / "base_dump.jsonl"
+    if plain.exists():
+        return sha(plain)
+    compressed = folder / "base_dump.jsonl.gz"
+    if compressed.exists():
+        with gzip.open(compressed, "rb") as stream:
+            return hashlib.sha256(stream.read()).hexdigest()
+    raise ValueError("base dump is absent")
+
+
+def recorded_paths(output, launch):
+    command = launch.get("command")
+    if not isinstance(command, list) or len(command) != 5:
+        raise ValueError("recorded launch command is incomplete")
+    binary = Path(command[0])
+    root = binary.parent.parent
+    target = Path(command[2])
+    relative_target = screen.TARGETS.relative_to(screen.ROOT)
+    if (not root.is_absolute() or ".." in root.parts or
+            root.name != output.name or
+            binary != root / "executed_bins/koblitz_orbit_dlp_fast" or
+            not target.is_absolute() or ".." in target.parts or
+            target.parts[-len(relative_target.parts):] !=
+            relative_target.parts):
+        raise ValueError("recorded launch paths differ")
+    return root, target
+
+
+def archive_gate(output, launch):
+    manifest_path = output / "archive_manifest.json"
+    if not manifest_path.exists():
+        return None
+    manifest = read(manifest_path)
+    actual = {str(path.relative_to(output)): {
+        "size_bytes": path.stat().st_size, "sha256": sha(path)}
+        for path in output.rglob("*") if path.is_file() and
+        path.name not in ("archive_manifest.json", "independent_replay.json")}
+    return (manifest.get("schema") == "n83.root4-small-control-archive/v1" and
+            manifest.get("recorded_output_basename") == output.name and
+            manifest.get("producer_git_head") == launch.get("git_head") and
+            manifest.get("base_dump_uncompressed_sha256") ==
+            producer.BASE_DUMP_SHA256 and
+            manifest.get("files") == actual)
+
+
 def verify(output):
     folder = output / "run"
     launch = read(folder / "launch.json")
     receipt = read(folder / "receipt.json")
-    expected_flags = wide_run.ic_environment(folder, "root4_standard",
+    archive_ok = archive_gate(output, launch)
+    recorded_root, recorded_target = recorded_paths(output, launch)
+    recorded_folder = recorded_root / "run"
+    expected_flags = wide_run.ic_environment(recorded_folder, "root4_standard",
                                              "k3500_root4")
     expected_flags = {k: v for k, v in expected_flags.items()
                       if k.startswith("KIC_")}
     binary = output / "executed_bins/koblitz_orbit_dlp_fast"
-    command = [str(binary), "construct:83:1:1107", str(screen.TARGETS),
-               "29", str(folder / "targets_result.jsonl")]
+    command = [str(recorded_root / "executed_bins/koblitz_orbit_dlp_fast"),
+               "construct:83:1:1107", str(recorded_target), "29",
+               str(recorded_folder / "targets_result.jsonl")]
     source_ok = (
         launch.get("schema") == "n83.root4-small-control-launch/v1" and
         launch.get("source_sha256") == producer.SOURCE_SHA256 and
@@ -57,7 +108,7 @@ def verify(output):
         receipt.get("stdout_sha256") == sha(folder / "stdout.jsonl") and
         receipt.get("stderr_sha256") == sha(folder / "stderr.log") and
         receipt.get("base_dump_sha256") ==
-        sha(folder / "base_dump.jsonl") == producer.BASE_DUMP_SHA256 and
+        base_dump_sha(folder) == producer.BASE_DUMP_SHA256 and
         receipt.get("target_output_sha256") ==
         sha(folder / "targets_result.jsonl"))
     summaries = [json.loads(line) for line in
@@ -104,9 +155,11 @@ def verify(output):
     result = {
         "schema": "n83.root4-small-control-independent-replay/v1",
         "status": "PASS_INDEPENDENT_REPLAY" if
-        source_ok and resources_ok and target_ok else "BOUNDED_UNKNOWN",
+        source_ok and resources_ok and target_ok and archive_ok is not False
+        else "BOUNDED_UNKNOWN",
         "source_verified": source_ok, "resources_verified": resources_ok,
         "target_verified": target_ok,
+        "archive_verified": archive_ok,
         "scope": "existing_public_point_shared_host_correctness_control",
         "candidate_id": None,
         "source_sha256": producer.SOURCE_SHA256,
