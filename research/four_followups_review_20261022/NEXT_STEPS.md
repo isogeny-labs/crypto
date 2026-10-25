@@ -28,13 +28,15 @@ format.
 | N6 | verified partial mechanization | pinned Lean checked seven algebraic/inventory theorems plus one explicit conditional bridge; the Rust semantic and smooth-curve/Mumford/`Pic^0` bridges remain unresolved; standardized graph and PDF included |
 | N7 | verified for the fixed-offset model | seven Lean declarations, zero trusted declarations, 336 exact orbit rows and 12,096 canonical price rows; arbitrary, compressed and label-free sidecars remain open |
 | N8 | verified fresh-cohort replication; packet partially complete | 6,300 candidate and 6,300 matched-rho records over 1,260 fresh public targets; five full-cohort ratios and every one of 1,440 pricing rows retained; independent-host replay and a model-cluster interval were not produced |
-| N9 | proposed | connect Rust branch semantics to the checked Lean formulas, then formalize the smooth-curve/Mumford/principal-divisor bridge without introducing a global correctness axiom |
+| N9 | verified partial manual abstraction | 742-job pinned Lean build and 13-theorem axiom audit; exact four-function binding inventory with four live substitution-rejection tests; a proved Rust translation and concrete smooth-curve/Mumford/principal-divisor/`Pic^0` instance remain open |
 | N10 | proposed | normalize source-specific phase counters and publish phase rows only where normalized sums reproduce the recorded cold totals |
 | N11 | proposed | specify compressed or label-free Kummer sidecars and prove label recovery/collision bounds before any cohort execution |
 | N12 | proposed | preregister a model-held-out factor-base tuning study, tune only on one cohort, and evaluate the frozen choice on the other cohort with all losses retained |
 
-N6, N7 and N8 have verified results within their stated narrower boundaries. The next local
-order is N9 and N10, followed by theorem-gated N11 and held-out N12. N3 remains
+N6, N7 and N8 have verified results within their stated narrower boundaries. N9 now
+has a verified manual executable abstraction, but its concrete source and geometric
+bridges remain open. Continue that bridge and N10, followed by theorem-gated N11
+and held-out N12. N3 remains
 a separate external execution lane. N4 starts only after an N3 bundle arrives,
 so proof and replication work cannot be mistaken for pencil cohort completion.
 
@@ -228,6 +230,17 @@ odd-characteristic quintic, reduced Mumford representatives, composition,
 reduction, principal divisors and `Pic^0` equality needed by the conditional
 bridge. Acceptance requires the existing algebraic theorems to feed a proved
 bridge; a caller-supplied implication does not close this step.
+
+Recorded partial result: the pinned environment completed 742 Lean jobs and
+audited 13 theorems without unexpected axioms. It now contains a manual
+executable abstraction of the 1+2 decision order, selected generic 1+2
+intermediates, a proof-side common 2+2 witness, and the abstract residual-class
+group step. Four exact Rust function fragments are hash-bound. The fail-closed
+verifier rejects duplicate functions, a hash-valid function substitution, an
+unexpected real Lean declaration, and a comment-only fake declaration under
+normal and optimized Python. These bindings identify source bytes but do not
+prove Rust-to-Lean equivalence. The concrete smooth-curve/Mumford/principal-
+divisor/`Pic^0` instance and exceptional compositions through it remain open.
 
 ### N10. Normalize phase counters
 

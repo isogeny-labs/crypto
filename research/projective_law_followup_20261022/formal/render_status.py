@@ -1,64 +1,54 @@
 #!/usr/bin/env python3
-"""Render the recorded N6 formal-boundary status table."""
+"""Render the recorded N9 formal-boundary status table without Python extras."""
 
 from __future__ import annotations
 
 import csv
+import html
+import subprocess
 from pathlib import Path
 
-import matplotlib.pyplot as plt
-
-
 ROOT = Path(__file__).resolve().parent
+WIDTH, HEIGHT = 1080, 620
+LEFT, RIGHT, TOP, ROW = 410, 70, 125, 52
+MAX_COUNT = 7
 
 
 def main() -> None:
     with (ROOT / "formal-status.csv").open(newline="") as handle:
         rows = list(csv.DictReader(handle))
-
-    labels = [row["item"] for row in rows][::-1]
-    values = [int(row["count"]) for row in rows][::-1]
-    colors = ["#2f855a" if row["class"] == "mechanized" else "#c05621" for row in rows][::-1]
-
-    fig, ax = plt.subplots(figsize=(10.8, 6.2))
-    bars = ax.barh(labels, values, color=colors, edgecolor="#243447", linewidth=0.6)
-    ax.bar_label(bars, labels=[str(value) for value in values], padding=4, fontsize=10)
-    ax.set_xlim(0, 3.45)
-    ax.set_xlabel("Named obligations in the packet")
-    fig.suptitle(
-        "N6 formal proof boundary",
-        x=0.39,
-        y=0.96,
-        ha="left",
-        fontsize=16,
-        weight="bold",
+    plot_width = WIDTH - LEFT - RIGHT
+    pieces = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}">',
+        '<rect width="100%" height="100%" fill="#ffffff"/>',
+        '<style>text{font-family:DejaVu Sans,Arial,sans-serif;fill:#243447}.title{font-size:25px;font-weight:700}.sub{font-size:13px;fill:#475569}.label{font-size:14px}.count{font-size:13px;font-weight:700}.axis{stroke:#cbd5e1;stroke-width:1}</style>',
+        '<text x="32" y="42" class="title">N9 formal proof boundary</text>',
+        '<text x="32" y="68" class="sub">Green: kernel checked at stated scope   Orange: explicitly not established</text>',
+    ]
+    for tick in range(MAX_COUNT + 1):
+        x = LEFT + plot_width * tick / MAX_COUNT
+        pieces.append(f'<line x1="{x:.1f}" y1="96" x2="{x:.1f}" y2="520" class="axis"/>')
+        pieces.append(f'<text x="{x:.1f}" y="544" text-anchor="middle" class="sub">{tick}</text>')
+    for index, row in enumerate(rows):
+        y = TOP + index * ROW
+        value = int(row["count"])
+        width = plot_width * value / MAX_COUNT
+        color = "#2f855a" if row["class"] == "mechanized" else "#c05621"
+        label = html.escape(row["item"])
+        pieces.append(f'<text x="{LEFT - 14}" y="{y + 18}" text-anchor="end" class="label">{label}</text>')
+        pieces.append(f'<rect x="{LEFT}" y="{y}" width="{width:.1f}" height="27" rx="2" fill="{color}" stroke="#243447" stroke-width="0.6"/>')
+        pieces.append(f'<text x="{LEFT + width + 8:.1f}" y="{y + 19}" class="count">{value}</text>')
+    pieces.extend([
+        '<text x="540" y="570" text-anchor="middle" class="sub">Named obligations in the packet</text>',
+        '<text x="32" y="602" class="sub">Counts describe the inventory only; they do not measure proof effort or universal completeness.</text>',
+        '</svg>',
+    ])
+    svg = ROOT / "formal-status.svg"
+    svg.write_text("\n".join(pieces) + "\n")
+    subprocess.run(
+        ["convert", "-background", "white", str(svg), str(ROOT / "formal-status.png")],
+        check=True,
     )
-    fig.text(
-        0.39,
-        0.905,
-        "Green: kernel checked at stated scope   Orange: explicitly not established",
-        fontsize=10,
-        color="#334155",
-    )
-    ax.text(
-        0,
-        -0.18,
-        "Counts describe the inventory only; they do not measure proof effort or universal completeness.",
-        transform=ax.transAxes,
-        fontsize=9,
-        color="#475569",
-    )
-    ax.grid(axis="x", color="#cbd5e1", linewidth=0.7, alpha=0.7)
-    ax.spines[["top", "right", "left"]].set_visible(False)
-    ax.tick_params(axis="y", length=0)
-    fig.subplots_adjust(left=0.39, right=0.96, top=0.82, bottom=0.2)
-    svg_path = ROOT / "formal-status.svg"
-    fig.savefig(svg_path, metadata={"Date": None})
-    svg_path.write_text(
-        "\n".join(line.rstrip() for line in svg_path.read_text().splitlines()) + "\n"
-    )
-    fig.savefig(ROOT / "formal-status.png", dpi=150, metadata={"Software": "matplotlib"})
-    plt.close(fig)
 
 
 if __name__ == "__main__":

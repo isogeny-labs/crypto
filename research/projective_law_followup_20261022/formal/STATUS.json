@@ -1,31 +1,37 @@
 {
   "schema": "projective-law-formal-boundary/v1",
-  "generated_utc": "2026-10-25T00:29:32Z",
-  "status": "partial_mechanization",
+  "generated_utc": "2026-10-25T01:15:00Z",
+  "status": "partial_mechanization_with_executable_abstractions",
   "environment": {
     "lean": "v4.34.1",
     "mathlib_revision": "d13f23b723b8a846827a245b89c10fc7d3f11612"
   },
   "build": {
     "command": "lake build",
-    "jobs_completed": 740,
+    "jobs_completed": 742,
     "exit_status": 0,
     "log": "build.log"
   },
   "proved": [
-    "equal_or_opposite_of_sq_eq_sq",
-    "same_u_zero_slope_delta_is_inverse",
-    "shared_zero_q_delta_unreachable",
-    "generic12_output_v_clearing",
-    "generic22_interpolates_first",
-    "generic22_interpolates_second",
-    "runtime_certificate_mapping_total"
+    "ProjectiveLawBoundary.equal_or_opposite_of_sq_eq_sq",
+    "ProjectiveLawBoundary.same_u_zero_slope_delta_is_inverse",
+    "ProjectiveLawBoundary.shared_zero_q_delta_unreachable",
+    "ProjectiveLawBoundary.generic12_output_v_clearing",
+    "ProjectiveLawBoundary.generic22_interpolates_first",
+    "ProjectiveLawBoundary.generic22_interpolates_second",
+    "ProjectiveLawBoundary.runtime_certificate_mapping_total",
+    "ProjectiveLawBoundary.formula_to_divisor_class",
+    "ProjectiveLawRuntime.classify12_ne_mismatch_of_valid",
+    "ProjectiveLawRuntime.generic12Runtime_cleared",
+    "ProjectiveLawRuntime.generic22Runtime_mod_first",
+    "ProjectiveLawRuntime.generic22Runtime_mod_second",
+    "ProjectiveLawRuntime.residual_represents_input"
   ],
-  "explicit_conditional_bridge": "formula_to_divisor_class",
+  "explicit_conditional_bridge": "formula_to_divisor_class and PrincipalClassInterface",
   "not_established": [
-    "Rust-to-Lean definitional equivalence",
-    "smooth genus-2 curve and Mumford representation in Lean",
-    "principal-divisor and Pic0 bridge for every branch",
+    "Rust-to-Lean semantic equivalence (fragment hashes associate source with manual abstractions but do not prove translation)",
+    "concrete smooth genus-2 curve and Mumford representation in Lean",
+    "concrete principal-divisor and Pic0 interface for every branch",
     "universal correctness of the complete runtime case split",
     "independent mathematical review"
   ],
@@ -45,5 +51,12 @@
     "graph_svg": "formal-status.svg",
     "graph_png": "formal-status.png",
     "graph_data": "formal-status.csv"
+  },
+  "runtime_fragment_bindings": {
+    "schema": "projective-law-runtime-fragment-bindings/v1",
+    "path": "runtime-bindings.json",
+    "function_count": 4,
+    "binding_kind": "manual_abstraction_hash_bound",
+    "semantic_equivalence": "not_established"
   }
 }

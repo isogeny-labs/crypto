@@ -85,10 +85,24 @@ for arbitrary inputs.
   implementation, and the smooth-curve/Mumford/principal-divisor/`Pic^0`
   bridge is deliberately an explicit unsupplied hypothesis.  This is partial
   mechanization and does not close universal correctness.
+- **Mechanized, 2026-10-25 N9:** The same pinned packet now includes a manual
+  executable abstraction of the 1+2 branch decision order and selected
+  proof-side intermediates associated with the generic 1+2/common 2+2 paths.
+  Five additional audited theorems exclude the valid-ordinate mismatch branch
+  under a supplied equal-square hypothesis, prove conditional identities for
+  the selected intermediates, and prove the final residual-class equality
+  through an explicit principal-divisor interface. The 2+2 `N` is a
+  constructed proof witness; no derivation from a Rust `N` variable is claimed.
+  `runtime-bindings.json` brace-scans and hashes the exact four Rust function
+  bodies named by these translations, and the verifier recomputes those
+  hashes. This is a narrower, reproducible manual abstraction boundary; it
+  does not prove Rust-to-Lean semantic equivalence or construct the required
+  smooth-curve/Mumford/principal-divisor instance.
 - **Suspected explanation:** None needed for the measured cost. Independent
   review of the written branch composition remains a proof obligation.
-- **Missing capability:** Faithful mechanization of the divisor-class bridge
-  and runtime semantic correspondence, or independent mathematical review of
+- **Missing capability:** A mechanically derived or proved Rust-to-Lean
+  translation and a concrete smooth-curve/Mumford/principal-divisor instance
+  for the abstract class interface, or independent mathematical review of
   the complete branch argument. Hardware speed additionally
   requires isolated timing and the applicable external arithmetic comparator.
 - **What this evidence does not establish:** Finite branch checks and successful
@@ -97,10 +111,11 @@ for arbitrary inputs.
 ## What would unblock it
 
 - [ ] Independently review and finish formalizing the now-complete written
-  addition/doubling case map, including Rust-to-theorem correspondence,
-  exceptional compositions, and the divisor-class bridge on the stated model
-  family.  The 2026-10-25 Lean packet proves the listed algebraic sublemmas but
-  leaves this geometric/semantic bridge explicit.
+  addition/doubling case map, including the remaining Rust-to-theorem
+  correspondence, exceptional compositions, and the concrete divisor-class
+  bridge on the stated model family. The 2026-10-25 N9 packet adds manual
+  executable abstractions and the abstract residual-class step but leaves the source
+  equivalence and geometric construction explicit.
 - [x] Replay the original 1,260 exact-order one-target workloads with unchanged identities/seeds and matched source rho; retain primitive/native counts and source-answer checks for both measured arms.
 - [ ] If claiming wall speed, run matched L2/A/A timing and the fastest available external arithmetic comparator.
 
@@ -189,3 +204,10 @@ and inventory theorems with no unexpected axioms.  It intentionally leaves
 the divisor-class bridge as a caller-supplied proposition and binds the manual
 Rust/certificate mapping by hashes rather than claiming source equivalence.
 The problem therefore remains open at the universal-correctness boundary.
+
+2026-10-25 (N9): The packet kernel-checked five additional conditional
+abstraction and abstract residual-class theorems, for 13 audited theorems total. Four exact
+Rust function fragments are independently brace-scanned and hash-bound. The
+remaining boundary is a proved source translation and a concrete
+smooth-curve/Mumford/principal-divisor class instance; neither is implied by
+the fragment hashes.

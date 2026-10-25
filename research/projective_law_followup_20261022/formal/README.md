@@ -11,6 +11,8 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   `lakefile.toml` and `lake-manifest.json`.
 - Runtime source and native certificate inputs are bound by SHA-256 in
   `source-bindings.json`.
+- Four exact Rust function fragments are brace-scanned and bound separately in
+  `runtime-bindings.json`; `verify.py` recomputes those fragment hashes.
 - `branch-coverage.json` gives the standardized runtime-label, Lean
   constructor, certificate-schema mapping and lists the five rejected or
   exceptional labels separately.
@@ -42,20 +44,44 @@ lines are copied verbatim to `axiom-audit.log`.
 6. a total, manual mapping from the reachable runtime label inventory to the
    eight native certificate schemas or the definitional inverse case.
 
-The first five items are algebraic theorems over abstract fields or
+`RuntimeSemantics.lean` adds a manual executable abstraction of the decision
+order in `add12_weighted_complete` and selected proof-side intermediates
+associated with the generic 1+2 and common 2+2 calculations. Its five
+kernel-checked theorems are conditional on their supplied hypotheses:
+
+1. a valid equal-square ordinate pair cannot select the 1+2 mismatch result;
+2. the selected 1+2 abstraction satisfies the proved cleared ordinate identity
+   when its two defining intermediate equations are supplied;
+3. the proof-side 2+2 polynomial witness has the stated exact remainders modulo
+   both input support polynomials; and
+4. through an explicit principal-divisor interface, a residual divisor has
+   the inverse class of the input whenever their sum is principal.
+
+The algebraic items are theorems over abstract fields or
 commutative rings.  They are not finite-field samples.  The runtime mapping is
 a manually transcribed finite inventory; `source-bindings.json` pins the Rust
-source it was read from, but Lean does not parse or compile that Rust source.
+source it was read from. The fragment bindings identify four exact function
+bodies associated with the manual abstractions, but Lean does not parse or
+compile Rust and no Rust-to-Lean derivation is proved. In particular, the 2+2
+`N` in `generic22Runtime` is a proof-side congruence witness; the Rust function
+does not expose that variable.
 
 `AxiomAudit.lean` rejects dependencies beyond `propext`,
 `Classical.choice`, and `Quot.sound`.  The actual audit found only subsets of
 those accepted Lean/Mathlib foundations.  The mapping theorem and the explicit
 bridge implication use no axioms.
 
+`verify.py` requires exactly four distinct Rust functions and their exact Lean
+declaration sets, parses declarations after removing nested comments and
+strings, and cross-checks the status count, schema, binding kind, and audited
+theorem set. Every verifier run also confirms rejection of a duplicate row, a
+hash-valid unexpected Rust function, an unexpected but real Lean declaration,
+and a name present only in a Lean comment.
+
 ## Remaining theorem bridge
 
 The packet does **not** define the smooth hyperelliptic curve, Mumford
-reduction, principal divisors, or `Pic^0`.  The structure
+reduction, concrete principal divisors, or `Pic^0`.  The structure
 `DivisorClassBridge` makes the missing implication visible:
 
 ```text
@@ -69,7 +95,10 @@ literal formula identities
 `formula_to_divisor_class` only applies a supplied bridge.  It does not
 construct or assume one globally.  Therefore this packet strengthens the
 mechanized algebraic boundary but does not close universal correctness of the
-Rust implementation.  The full remaining acceptance condition is tracked in
+Rust implementation. `PrincipalClassInterface` and
+`residual_represents_input` additionally prove the final abstract group step,
+but construction of that interface for the intended smooth curve remains
+open. The full remaining acceptance condition is tracked in
 `problems/genus2-projective-transfer-backend.md`.
 
 The standardized reviewer summary is available as [REPORT.md](REPORT.md),

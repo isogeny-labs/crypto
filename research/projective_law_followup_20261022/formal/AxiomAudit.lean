@@ -1,4 +1,5 @@
 import ProjectiveLawBoundary
+import RuntimeSemantics
 import Lean.Util.CollectAxioms
 
 open Lean Elab Command
@@ -11,7 +12,12 @@ private def audited : Array Name := #[
   `ProjectiveLawBoundary.generic22_interpolates_first,
   `ProjectiveLawBoundary.generic22_interpolates_second,
   `ProjectiveLawBoundary.runtime_certificate_mapping_total,
-  `ProjectiveLawBoundary.formula_to_divisor_class
+  `ProjectiveLawBoundary.formula_to_divisor_class,
+  `ProjectiveLawRuntime.classify12_ne_mismatch_of_valid,
+  `ProjectiveLawRuntime.generic12Runtime_cleared,
+  `ProjectiveLawRuntime.generic22Runtime_mod_first,
+  `ProjectiveLawRuntime.generic22Runtime_mod_second,
+  `ProjectiveLawRuntime.residual_represents_input
 ]
 
 run_cmd do
@@ -31,3 +37,8 @@ run_cmd do
 #print axioms ProjectiveLawBoundary.generic22_interpolates_second
 #print axioms ProjectiveLawBoundary.runtime_certificate_mapping_total
 #print axioms ProjectiveLawBoundary.formula_to_divisor_class
+#print axioms ProjectiveLawRuntime.classify12_ne_mismatch_of_valid
+#print axioms ProjectiveLawRuntime.generic12Runtime_cleared
+#print axioms ProjectiveLawRuntime.generic22Runtime_mod_first
+#print axioms ProjectiveLawRuntime.generic22Runtime_mod_second
+#print axioms ProjectiveLawRuntime.residual_represents_input
