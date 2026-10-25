@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   plan:
-    runs-on: ubuntu-24.04
+    runs-on: main
     timeout-minutes: 5
     outputs:
       jobs: ${{ steps.plan.outputs.jobs }}
@@ -30,7 +30,7 @@ jobs:
 
   dissect:
     needs: plan
-    runs-on: ubuntu-24.04
+    runs-on: main
     timeout-minutes: 75
     strategy:
       fail-fast: false
