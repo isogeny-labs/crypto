@@ -200,7 +200,7 @@ def verify_identity(candidate, reference, source, setup, archived, bits):
 def write_csv(path, header, body):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=header)
+        writer = csv.DictWriter(stream, fieldnames=header, lineterminator="\n")
         writer.writeheader()
         writer.writerows(body)
 
