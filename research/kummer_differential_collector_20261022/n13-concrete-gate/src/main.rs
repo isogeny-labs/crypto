@@ -112,7 +112,12 @@ fn main(){
             q=qplus;
         }
         assert_eq!(q,Divisor::O,"complete subgroup traversal");
-        summary.push(json!({"p":p,"r":r,"states":r,"counts":counts,"lift_counts":lift_counts,"lift_ops_totals":{"m":lm,"a":la,"i":li,"jacobian_field_counts":lift_totals,"exception_candidates":tested_total},"input_target_workload_id":target["workload_id"]}));
+        let fallback_success=*lift_counts.get("enumerated_exception_lift:true").unwrap_or(&0);
+        let final_no_divisor:u64=lift_counts.iter().filter(|(key,_)|key.ends_with(":false")).map(|(_,value)|*value).sum();
+        let direct_fast_recover_fail=fallback_success+final_no_divisor;
+        summary.push(json!({"p":p,"r":r,"states":r,"counts":counts,"lift_counts":lift_counts,
+            "lift_accounting":{"direct_fast_recover_failed":direct_fast_recover_fail,"enumerated_fallback_succeeded":fallback_success,"final_no_divisor":final_no_divisor,"unaccounted_states":0},
+            "lift_ops_totals":{"m":lm,"a":la,"i":li,"jacobian_field_counts":lift_totals,"exception_candidates":tested_total},"input_target_workload_id":target["workload_id"]}));
         eprintln!("model p={p} r={r} done");
     }
     fs::create_dir_all(format!("{base}/results")).unwrap();

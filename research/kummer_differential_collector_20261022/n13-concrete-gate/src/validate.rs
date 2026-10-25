@@ -39,6 +39,13 @@ fn main(){
   let (p,r)=(model["p"].as_u64().unwrap(),model["r"].as_u64().unwrap());assert_eq!(next[&p],r);
   for (key,value) in &counts[&p]{assert_eq!(model["counts"][key],*value,"count {p} {key}");}
   for (key,value) in &lift_counts[&p]{assert_eq!(model["lift_counts"][key],*value,"lift {p} {key}");}
+  let fallback=lift_counts[&p].get("enumerated_exception_lift:true").copied().unwrap_or(0);
+  let final_null:u64=lift_counts[&p].iter().filter(|(key,_)|key.ends_with(":false")).map(|(_,count)|*count).sum();
+  assert_eq!(model["lift_accounting"]["direct_fast_recover_failed"],fallback+final_null);
+  assert_eq!(model["lift_accounting"]["enumerated_fallback_succeeded"],fallback);
+  assert_eq!(model["lift_accounting"]["final_no_divisor"],final_null);
+  assert_eq!(model["lift_accounting"]["unaccounted_states"],0);
+  assert_eq!(fallback+final_null+lift_counts[&p].get("computed:true").copied().unwrap_or(0),r);
   let t=totals[&p];let l=&model["lift_ops_totals"];
   assert_eq!(l["m"],t[0]);assert_eq!(l["a"],t[1]);assert_eq!(l["i"],t[2]);
   for (key,i) in [("m",3),("s",4),("i",5),("jac_adds",6)]{assert_eq!(l["jacobian_field_counts"][key],t[i]);}

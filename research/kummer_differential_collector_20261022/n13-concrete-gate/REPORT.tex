@@ -29,8 +29,10 @@ Total & 119,573 & 358,719 & 0 & 119,004 & 569\\
 \end{tabular}
 \end{center}
 
-\noindent Among correct lifts, the source's enumerated exceptional branch
-returned 170, 190, and 134 results by model, respectively. The 569 failures
+\noindent The fast signed-recover branch failed on 1,063 states. Its
+enumerated fallback recovered 494 of them: 170, 190, and 134 by model.
+The final 569 no-divisor states are after this fallback; none are unaccounted
+for. The 569 failures
 split into 108 \texttt{Delta\_zero}, 108 \texttt{b1\_coefficient\_zero}, and
 353 \texttt{general\_conversion\_inapplicable}. These are current
 implementation branch failures. They do not contradict the abstract

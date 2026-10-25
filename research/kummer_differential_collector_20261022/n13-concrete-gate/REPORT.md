@@ -13,7 +13,10 @@ models or an end-to-end collector cost. The cohort gate remains open.
 | 1,187 | 44,027 | 132,081 | 0 | 43,892 | 135 | 134 |
 | **total** | **119,573 states** | **358,719** | **0** | **119,004** | **569** | **494** |
 
-The actual lift routine returned no divisor on 108 `Delta_zero`, 108
+The fast signed-recover branch failed on 1,063 states. The enumerated
+exception fallback recovered 494 of them; the final 569 no-divisor states
+are **after** that fallback. Thus no states are unaccounted for. The final
+routine returned no divisor on 108 `Delta_zero`, 108
 `b1_coefficient_zero`, and 353 `general_conversion_inapplicable` states.
 These are implementation branch failures, not ambiguity of the abstract
 pair-sign theorem. The raw [per-state CSV](results/states.csv) contains every
@@ -22,6 +25,10 @@ and operation count. The [summary](results/summary.json) binds source and
 input SHA-256 digests and the complete CSV digest. The independent native
 validator recomputes the counts, operation totals, state continuity, and
 digests from those rows.
+
+The CSV, PDF, and graph PNG live in the repository artifact store under the
+adjacent `.artifacts.json` manifests. Hydrate them before validation with
+`python3 tools/artifacts/artifacts.py pull research/kummer_differential_collector_20261022/n13-concrete-gate`.
 
 The 119,573 lift calls cost 41,887,801 M + 33,639,052 A + 2,268,451 I in
 the signed-recovery module after one-time theta inverse setup. Exceptional
@@ -38,6 +45,7 @@ abstract sign-safe sidecar is [N11](../n11-compressed-sidecar/REPORT.md).
 Regenerate and validate from the repository root:
 
 ```sh
+python3 tools/artifacts/artifacts.py pull research/kummer_differential_collector_20261022/n13-concrete-gate
 cargo run --offline --release --manifest-path research/kummer_differential_collector_20261022/n13-concrete-gate/Cargo.toml --bin enumerate
 cargo run --offline --release --manifest-path research/kummer_differential_collector_20261022/n13-concrete-gate/Cargo.toml --bin validate
 python3 research/kummer_differential_collector_20261022/n13-concrete-gate/render.py
