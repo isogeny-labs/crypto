@@ -24,12 +24,12 @@ format.
 | N2 | verified complete for synthetic intake | 49 negative mutations and the valid fabricated bundle pass the fail-closed test suite; this is not evidence that a real target ran |
 | N3 | blocked in this assisted session | the previously rejected exact sparse-nullspace execution remains outside the available assistance boundary; an independently authorized executor must return 717 primary and 717 fresh-process replay records |
 | N4 | waiting on N3 | admit only a returned checksum-bound bundle; preserve failures and publish a full aggregate ratio only if all 1,260 candidates verify |
-| N5 | partial | reporting-only appendix covers all 12,850 standardized rows and stores the two large CSVs through the artifact store; requested phase fractions remain unimplemented because the standardized inputs carry totals but no common phase-counter columns |
+| N5 | verified with later phase appendix | reporting-only appendix covers all 12,850 standardized rows; the later source-reconciled phase appendix checks 23,176 representative method rows and 6,120 aggregate method cells, with explicit nulls, graph and PDF |
 | N6 | verified partial mechanization | pinned Lean checked seven algebraic/inventory theorems plus one explicit conditional bridge; the Rust semantic and smooth-curve/Mumford/`Pic^0` bridges remain unresolved; standardized graph and PDF included |
 | N7 | verified for the fixed-offset model | seven Lean declarations, zero trusted declarations, 336 exact orbit rows and 12,096 canonical price rows; arbitrary, compressed and label-free sidecars remain open |
 | N8 | verified fresh-cohort replication; packet partially complete | 6,300 candidate and 6,300 matched-rho records over 1,260 fresh public targets; five full-cohort ratios and every one of 1,440 pricing rows retained; independent-host replay and a model-cluster interval were not produced |
 | N9 | verified partial manual abstraction | 742-job pinned Lean build and 13-theorem axiom audit; exact four-function binding inventory with four live substitution-rejection tests; a proved Rust translation and concrete smooth-curve/Mumford/principal-divisor/`Pic^0` instance remain open |
-| N10 | proposed | normalize source-specific phase counters and publish phase rows only where normalized sums reproduce the recorded cold totals |
+| N10 | verified derived appendix | source-specific counters map to a declared phase class and retain original phase names; 23,176 representative method rows and 6,120 aggregate method cells reconcile; 1,264 candidate nulls retained; graph, PDF, and artifact-store CSVs included |
 | N11 | proposed | specify compressed or label-free Kummer sidecars and prove label recovery/collision bounds before any cohort execution |
 | N12 | proposed | preregister a model-held-out factor-base tuning study, tune only on one cohort, and evaluate the frozen choice on the other cohort with all losses retained |
 
@@ -179,15 +179,15 @@ break-even surface is
 `dM + dS*S + dI*I + dL*N*(9 + 4S + I) = 0`; the generator must reproduce all
 36 source price cells before publishing that surface.
 
-Current status is partial. Paired deltas, right-continuous ECDFs with explicit
-missing-mass bounds, descriptive tails, model-cluster resampling, the 36-cell
-heatmap, break-even surfaces, graphs, and the PDF are generated. Phase
-fractions are not generated: the standardized cross-lead inputs contain total
-representative costs but no common phase-counter columns. Closing N5 requires
-a source-specific normalization that maps each source study's phase counters
-to one declared cross-lead phase schema, checks each normalized phase sum
-against its recorded cold total, and publishes the normalized phase rows. No
-phase split may be inferred from aggregate totals.
+The original reviewer-pattern generator covers paired deltas,
+right-continuous ECDFs with explicit missing-mass bounds, descriptive tails,
+model-cluster resampling, the 36-cell heatmap, break-even surfaces, graphs,
+and its PDF. The later [phase-accounting appendix](phase-accounting/README.md)
+joins raw source counters to the same frozen targets. It declares one broad
+phase class field while retaining exact source phase names and explicit
+unallocated counters; its sums are checked against recorded cold totals and
+all priced aggregate cells. The original reviewer-pattern summary retains
+its generation-time partial status.
 
 ### N6. Projective-law proof boundary: completed partial mechanization
 
@@ -244,11 +244,13 @@ divisor/`Pic^0` instance and exceptional compositions through it remain open.
 
 ### N10. Normalize phase counters
 
-Declare a cross-study phase schema and one source-specific mapping for every
-included collector. For each row, require the normalized phase sum to equal
-the recorded cold total under the same price cell. Publish explicit nulls when
-a source lacks sufficient counters. Regenerate the reviewer-pattern appendix,
-source CSV, graph and PDF from those checked rows.
+Completed as the [phase-accounting appendix](phase-accounting/README.md). The
+source-named phases and declared cross-study classes retain unallocated work
+without inferring a split. All 23,176 priced representative method rows and
+6,120 aggregate method cells reconcile with their recorded cold totals;
+1,264 candidate nulls remain explicit. The source CSVs, graph, PDF and
+checksum manifest are preserved there. This reporting step does not close
+the pencil cohort.
 
 ### N11. Test compressed and label-free Kummer sidecars
 

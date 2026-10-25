@@ -21,11 +21,13 @@ The coordinate-only Kummer arm remains present in `paired-deltas.csv` with a
 specific null reason. It is absent from every cost distribution, heatmap, and
 bootstrap calculation because it has no DLP candidate cost.
 
-N5 remains partial because phase-fraction output is not included. The
-standardized cross-lead target schema contains full representative costs but
-no common phase-counter columns. Producing comparable phase fractions would
-require a separate source-specific counter normalization; this reporting pass
-does not infer them from totals.
+The original appendix generator did not include phase fractions because its
+standardized inputs contain totals only. The later
+[phase-accounting appendix](phase-accounting/README.md) joins the frozen rows
+to their raw source counters, checks 23,176 representative method totals and
+6,120 aggregate price cells, and publishes source-named phases, a cross-study
+class, explicit nulls, a graph and a PDF. The original `summary.json` retains
+its generation-time status; the phase appendix is the current phase evidence.
 
 Regenerate from the repository root:
 
