@@ -74,6 +74,11 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   unramified norm root when `2,B≠0`, and show the interpolant and support
   degree drop when `C=0`. Zero-divisor multiplicities, infinity valuations,
   output Mumford reduction, and the `Pic⁰` equation remain open.
+- The [infinity-chart packet](INFINITY_CHART.md) proves the normalized
+  quintic chart equation after `z=1/x,w=y/x³` and the exact source-style
+  cleared interpolant on that chart. It identifies the local-unit residue
+  and the `C=0` linear `w` coefficient. A formal smooth local-ring/DVR
+  construction and its valuation remain open.
 - `branch-coverage.json` gives the standardized runtime-label, Lean
   constructor, certificate-schema mapping and lists the five rejected or
   exceptional labels separately.

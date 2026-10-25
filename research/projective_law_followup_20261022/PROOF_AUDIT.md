@@ -523,7 +523,14 @@ vanishes at a norm root; at `y=0`, both factors vanish. It also proves that
 `C=0` drops the interpolant degree to at most two and the residual support
 degree to at most one. Thus the infinity pole-order obligation is conditional:
 `6·∞` for `C≠0` and `5·∞` for `C=0` in the smooth monic-quintic model; these
-valuations are not yet formalized. These results do not prove compiled Rust
+valuations are not yet formalized. The [infinity-chart packet](formal/INFINITY_CHART.md)
+now proves the chart equation `w²=z(1+a3z²+a2z³+a1z⁴+a0z⁵)` for
+`z=1/x,w=y/x³` and the source-style identity
+`z³(N-B y)=-C+n2z+n1z²+n0z³-Bw`. The remaining local theorem is that the
+smooth projective completion has a DVR at infinity with `w` as uniformizer
+and the parenthesized chart factor as a unit. Only with that theorem do the
+written pole orders follow; zero-divisor multiplicities and output reduction
+remain separate obligations. These results do not prove compiled Rust
 field semantics, the returned coordinate formulas, principal-divisor
 zero/pole multiplicities, or the `Pic⁰` class equation; the full
 projective-law theorem remains open.
