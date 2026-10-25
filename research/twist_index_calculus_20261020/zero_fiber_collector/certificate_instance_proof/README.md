@@ -75,3 +75,12 @@ archive remains a separate prerequisite; this checkpoint does not repack it.
 Metadata copies under `../results/certificate-instance-proof-v1/` remain
 loose for source/protocol readers. The benchmark directory contains exact
 copies of the inspected PDF/SVG/PNG and is unlisted.
+
+## Subsequent explicit-normalization round
+
+[Version 3](PROOF-V3.md) preserves the same literal statement and resource
+bound while changing the generated instance tactics to explicit `grobner`.
+Its native gate actually passes 13 tests. Source freeze `bc818088c1af`
+precedes its unique managed launch at 07:10:27 UTC. Inspect that version's
+terminal receipts before reporting proof success or taking further action.
+The v1/v2 report and archive remain unchanged historical artifacts.

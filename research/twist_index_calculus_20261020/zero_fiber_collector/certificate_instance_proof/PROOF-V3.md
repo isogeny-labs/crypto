@@ -24,6 +24,13 @@ integer-lift IDC still require actual success; no result is prewritten.
 The raw path is reserved as `../runs/certificate-instance-proof-v3/`.
 Inspect native terminal receipts and the managed owner before any action.
 
+Source freeze: `bc818088c1afab64804dde156853df3e6ca3f3e9`, committed before
+the real export. One owner was accepted at **2026-10-25T07:10:27Z**:
+`twist-certificate-instance-proof-v3.service`, PID **3851339** at
+acceptance, `Restart=no`. Its static launch receipts are under
+`../results/certificate-instance-proof-v3/launch/`. Acceptance alone does
+not establish actual science admission, a theorem, an axiom audit or an IDC.
+
 Any successful formalization would establish this one literal polynomial
 instance and its stated characteristic/no-zero-divisor consequences. The
 native parser, field/group/decoder, parametric-family, relation-rank and

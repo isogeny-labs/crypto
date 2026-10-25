@@ -1,7 +1,7 @@
 # Quartic-twist mixed polynomial IC: S4/S5 completion and full cost
 
 - **Status:** `investigating`
-- **Kind:** native solver failure; implementation and measurement gaps; external-tool availability
+- **Kind:** native solver failure; proof-encoding resource failures; implementation and measurement gaps; external-tool availability
 - **Affected work:** [mixed polynomial report](../research/twist_index_calculus_20261020/MIXED_POLYNOMIAL_REPORT.md), [larger-curve scaling and occupancy report](../research/twist_index_calculus_20261020/K1_SCALING_REPORT.md), [peeled-orbit reuse report](../research/twist_index_calculus_20261020/K1_PEELED_ORBIT_REUSE.md), [frozen protocol](../research/twist_index_calculus_20261020/QUARTIC_TWIST_LINE_PROTOCOL.md)
 - **Next action owner:** quartic twist IC study
 - **Last updated:** 2026-10-25
@@ -118,6 +118,24 @@ literal coefficient, all final statements, ten axiom audits and the
 aggregate 1,200-second/8 GiB phase; its source/native gate must be committed
 before real export. Its outcome is not assumed. A successful instance proof would still leave the
 native parser, field/group/decoder and parametric-family bridges open.
+
+The [finite-residual census](../research/twist_index_calculus_20261020/zero_fiber_collector/fp_residual_audit/REPORT.md)
+now completes two native processes over all 42 original zero-fiber arms,
+with identical output trees and passing terminal/source seals. It checks
+33,696 systems per arm and identifies 300 phi versus 150 doubling finite
+Fp residuals. No accepted representative lies there; each exact physical
+set and independently rebuilt rank is preserved. The eligible systems
+contain 65,532 versus 32,766 saved symmetric roots and 18,166,512 versus
+9,083,256 historical F4 row multiplications. These are counterfactual
+partial counts, not a deployed filter or complete-cost gain. The prior
+component obstruction excludes three distinct ordinary roots, including
+when the residual abscissa repeats one of them; infinity is retained.
+Next implement and charge the public-only predicate in a separately
+frozen collector, with the identical doubling rule, physical-set/rank
+replay and complete cold/target costs. Any expanded multiset family needs
+its own replay; the distinct-factor pruning theorem must not silently
+discard those relations. Specific native discriminators are retained in
+the [next-step plan](../research/twist_index_calculus_20261020/zero_fiber_collector/fp_residual_audit/NEXT_STEPS.md).
 
 ## Evidence and uncertainty
 
