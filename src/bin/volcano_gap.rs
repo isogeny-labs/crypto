@@ -810,6 +810,10 @@ fn construct(argv: &[String]) {
     let d0: u64 = num(argv, "--d0", Some(11));
     let max_h: u64 = num(argv, "--max-cofactor", Some(64));
     let seed: u64 = num(argv, "--seed", Some(20261022));
+    // A separate kernel stream holds the source generator fixed across destinations.
+    // Omitting this option preserves the frozen constructor's random stream.
+    let kernel_seed = get(argv, "--kernel-seed").map(|v| v.parse::<u64>().expect("kernel seed"));
+    let mut kernel_rng = kernel_seed.map(SmallRng::seed_from_u64);
     let out = PathBuf::from(get(argv, "--out").unwrap_or_else(|| die("--out is required")));
     if !(20..=61).contains(&bits) || depth < 1 {
         die("--bits must be in 20..=61 and --depth at least 1");
@@ -882,7 +886,13 @@ fn construct(argv: &[String]) {
     let mut draws = 0u32;
     let (kt, phi) = loop {
         draws += 1;
-        let kt = point_of_order(&f, &e1t, order_t, big_n, &mut rng);
+        let kt = point_of_order(
+            &f,
+            &e1t,
+            order_t,
+            big_n,
+            kernel_rng.as_mut().unwrap_or(&mut rng),
+        );
         let xs = kernel_xs(&f, &e1t, kt, c, big_n, &mut construct_cost);
         let phi = Velu::new(&f, &e1, big_n, xs, &mut construct_cost);
         match phi.codomain.j(&f) {
@@ -964,7 +974,7 @@ fn construct(argv: &[String]) {
     let out_v = json!({
         "schema": "volcano-gap/pair/v1",
         "command": std::env::args().collect::<Vec<_>>().join(" "),
-        "params": {"bits": bits, "depth": depth, "d0": -(d0 as i64), "max_cofactor": max_h, "seed": seed},
+        "params": {"bits": bits, "depth": depth, "d0": -(d0 as i64), "max_cofactor": max_h, "seed": seed, "kernel_seed": kernel_seed},
         "class": {
             "p": p, "t": t, "disc": format!("{disc}"), "fundamental_disc": -(d0 as i64),
             "frobenius_conductor": fcond, "two_depth": depth, "gap_prime": big_n,
