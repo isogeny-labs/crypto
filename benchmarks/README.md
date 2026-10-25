@@ -37,6 +37,9 @@ in the [unvalidated benchmark archive](ARCHIVE.md), with their exact former row
 text, digest, reason, and source provenance. Archived rows are not measurements
 admitted by this table and cannot satisfy the validation gate.
 
+The [retained cross-layout screen](N83_CROSSLAYOUT_UNADMITTED_20261021.md)
+is preserved separately pending validation admission.
+
 The [retained adjacent-K screen](N83_FINEGRID_UNADMITTED_20261021.md)
 is preserved separately pending validation admission.
 
