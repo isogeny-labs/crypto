@@ -39,6 +39,13 @@ snapshots earlier import source commit
 `54cbef1a6ce834a77632c1867acc801a31268ca2`; use PR head and the
 frozen `43a422...` source commit to reproduce this phase-first pair.
 
+The [validation receipt](validation.json) retains compressed raw logs. The
+required two-thread release library run passed 4,165 tests with 117 ignored;
+the touched example passed 19 tests, the N83 Python suite passed 63, the
+boundary Python suite passed 52, and formatting passed. An initial four-thread
+library run had two unrelated JV-cover time-limit failures. Each passed alone
+and both passed in the complete lower-concurrency rerun.
+
 This is one bounded natural query, not a measured relation rate or a
 factor-base selection. Full rank growth, relation and log collection,
 unseen-target descent, complete cold one-target cost and matched same-target
