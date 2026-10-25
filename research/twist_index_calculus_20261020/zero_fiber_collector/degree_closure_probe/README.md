@@ -35,11 +35,13 @@ abscissa only; prior outcomes and costs belong to the later auditor.
   tests pass). V1's four-test build and report remain preserved; prelaunch
   review corrected a cap/actual-degree reporting error before any case ran.
 - Input preparation: `../runs/degree-closure-probe-inputs-v1/`.
-- Intended guarded production directory: `../runs/degree-closure-probe-panel-v1/`.
-  Launch and completion are reported only with their actual receipts.
+- Completed guarded production directory: `../runs/degree-closure-probe-panel-v1/`.
+  Native final status complete, terminal exit 0 at 2026-10-25T07:20:28Z.
 - [Managed launch](RUNNING.md): one owner started 2026-10-25T04:08:23Z,
   after source/input freeze `c30a3dc6068b9907681e46634df14c52a8a40f1e`.
-  A completed comparison verdict remains pending.
+  All 24 producers, twelve first audits, twelve parities and final seals
+  pass. See the [full result table](REPORT.md), [inspected three-page
+  PDF](REPORT.pdf) and [native summary](../results/degree-closure-probe-v1/final/summary.json).
 - [Existing rejection proof and IDC](../collision_certificate/BUILD_AND_PROOF.md).
   The native/field/group bridges remain open. No new general theorem is claimed.
 
@@ -58,3 +60,24 @@ novelty or atlas-saturation claim follows.
 Keep all failed, incomplete and censored outputs. Publish this round in a
 separate versioned archive after its production owner becomes terminal;
 never overwrite the prior zero-fiber or historical archives.
+
+## Complete versioned archive
+
+`runs.tar.xz` retains all ten degree/closure raw directories: both gates,
+both driver-control versions, prepared inputs, both prelaunch layouts,
+the complete production tree, the historical partial snapshot and the
+inspected final layout. It includes the earlier failures and quiescence.
+Its paths are rooted at the parent collector. From that parent:
+
+```sh
+(cd degree_closure_probe && sha256sum -c runs.tar.xz.sha256)
+tar -xJf degree_closure_probe/runs.tar.xz
+```
+
+Use `archive-results.sh FRESH_PATH` from the repository root to reproduce
+the deterministic options and exact closed-directory list. The prior
+original reference corpus remains a prerequisite. Compact final receipts
+and the native table remain loose under `../results/degree-closure-probe-v1/final/`.
+The final PDF/SVG/150 dpi PNG have identical unlisted benchmark copies.
+Prelaunch graphics and their PDFs remain unchanged. This records counted
+construction work for both maps; it makes no complete-cost or novelty claim.

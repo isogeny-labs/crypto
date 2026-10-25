@@ -35,3 +35,11 @@ The original full recovery and certificate panels retain their existing
 owners. Historical 189+21 execution, Diem generation, the quiesced legacy
 freeze followup and EKS submissions are not repeated. All original broader
 comparison and complete-price requirements remain open where not met.
+# Terminal continuation
+
+The original owner completed without a restart at **2026-10-25T07:20:28Z**,
+terminal exit **0**. All 24 registered producers, twelve audits, twelve
+parities, the native reducer and final input/source/execution seals pass.
+The [final report](REPORT.md) retains every result and the bounded failures.
+The original launch information below is historical; do not relaunch this
+completed workload.

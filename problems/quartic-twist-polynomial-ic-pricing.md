@@ -1,7 +1,7 @@
 # Quartic-twist mixed polynomial IC: S4/S5 completion and full cost
 
 - **Status:** `investigating`
-- **Kind:** native solver failure; proof-encoding resource failures; implementation and measurement gaps; external-tool availability
+- **Kind:** native solver failure; proof-encoding resource failures; implementation, identity-registration and measurement gaps; external-tool availability
 - **Affected work:** [mixed polynomial report](../research/twist_index_calculus_20261020/MIXED_POLYNOMIAL_REPORT.md), [larger-curve scaling and occupancy report](../research/twist_index_calculus_20261020/K1_SCALING_REPORT.md), [peeled-orbit reuse report](../research/twist_index_calculus_20261020/K1_PEELED_ORBIT_REUSE.md), [frozen protocol](../research/twist_index_calculus_20261020/QUARTIC_TWIST_LINE_PROTOCOL.md)
 - **Next action owner:** quartic twist IC study
 - **Last updated:** 2026-10-25
@@ -77,13 +77,14 @@ therefore fixes indices 0,1,2 from both arms of that same fixture, with
 raw16 versus closure8 and original-product cap 16: 12 configurations and
 24 producers. Five native algebraic controls pass, including a prelaunch
 regression for search cap versus actual original-product degree. Actual comparison
-production remains pending at this checkpoint. This supplements both full
+production was pending at that prelaunch checkpoint. This supplements both full
 panels; no new relation rank, target recovery or complete cost is measured
 by those controls. The existing full-price and proof exit criteria remain.
 The fixed diagnostic subsequently launched under
 [one managed owner](../research/twist_index_calculus_20261020/zero_fiber_collector/degree_closure_probe/RUNNING.md)
 at 2026-10-25T04:08:23Z, after its committed source/input freeze. Its
-complete comparison results remain pending; the full panels continue.
+complete comparison subsequently finished at 07:20:28 UTC; see the final
+twelve-row result below. The other two full panels continue.
 
 The first fixed p37 seed0 phi system now has passing first/audit/A/A
 records for both diagnostic methods. Raw16 finds q squared at degree 12
@@ -92,7 +93,8 @@ degree 7, actual original-product degree 12, with 916,980. Sparse checks
 use 15,211 and 15,983 multiplications respectively. These are one-system
 certificate counts, not a complete filter or DLP comparison; even closure
 search exceeds this system's partial old F4 row count of 125,327. The
-registered doubling cases and full diagnostic remain under their owner.
+registered doubling cases and full diagnostic have subsequently completed;
+their full table retains the bounded failures as well as the successes.
 
 The [concrete instance verification](../research/twist_index_calculus_20261020/zero_fiber_collector/certificate_instance_proof/REPORT.md)
 independently verifies all 2,197 dense integer coefficient positions of
@@ -138,6 +140,51 @@ discard those relations. Specific native discriminators are retained in
 the [next-step plan](../research/twist_index_calculus_20261020/zero_fiber_collector/fp_residual_audit/NEXT_STEPS.md).
 
 ## Evidence and uncertainty
+
+- **Curve-model registration gap:** the frozen fixture records bind their
+  prime, quartic modulus, model, subgroup and public-point presentation, but
+  this study has not yet completed and verified their mapping to registered
+  ICV1 models and exact EC1/UID representations. The native SDK supports
+  prime-extension identities; absence of a completed registration is not an
+  SDK limitation or a mathematical obstruction. Do not invent a slug or
+  alter frozen packet IDs. The exit criterion is a native catalog over all
+  21 original fixture records that checks field/model inputs, establishes
+  the full curve order rather than assuming it from a subgroup order,
+  computes identities through the documented native SDK, verifies the
+  subgroup/generator bindings, and registers every distinct model before
+  citing its slug in current prose. Add exact representation aliases for
+  any cross-repository join. Until then these reports remain fixture-keyed
+  diagnostics, not fully registered cross-model benchmark rows.
+- **CI resource failure:** the Lean gate selftest at head `59e732cff1c`
+  failed before proving its positive fixtures because the CI runner had
+  only 39 MB free and toolchain extraction returned `No space left on
+  device`. Its sanitized log is retained under
+  `../research/twist_index_calculus_20261020/zero_fiber_collector/results/lean-selftest-sparse-v1/`.
+  The proposed selftest-only sparse checkout retains the exact
+  `tools/lean/` input closure, pinned toolchain and all positive/negative
+  expectations. Local verification and new-head CI are separate gates;
+  a resource failure is not a proof verdict or permission to bypass them.
+- **Complete bounded degree/closure diagnostic:** all twelve rows and 24
+  producers, twelve audits/parities, native reducer and final seals pass,
+  terminal 0 at 2026-10-25T07:20:28Z. Systems 0 and 2 in both maps yield
+  certificates with original product degree 12; closure uses working
+  degree 7. Neither method finds a power-1/2/3 certificate for system 1
+  within the registered bounds. The construction-count reduction occurs
+  in both phi and doubling; full pipeline price remains null. See the
+  [complete table/report](../research/twist_index_calculus_20261020/zero_fiber_collector/degree_closure_probe/REPORT.md).
+- **Third literal-proof resource failure:** explicit `grobner` encoding
+  v3 passes its 13-test native gate and export, preserving statement SHA
+  e7dd6d7622171f18c1d80ea9c1d26d182b08dbf664c3a3046115eb6715e5eb45.
+  Lean exits 134, signal 6, `std::bad_alloc`; maximum RSS 3,772,392 KiB
+  under the same 8 GiB AS / 1,200-second aggregate envelope. GNU time's
+  signal report and misleading zero footer are retained; phase/terminal
+  134 is authoritative. No axiom audit or IDC runs after failure. The
+  [v3 report](../research/twist_index_calculus_20261020/zero_fiber_collector/certificate_instance_proof/PROOF-V3.md)
+  preserves the exact failure. Next independently check the serialized
+  integer statement and isolate definition/product blocks before another
+  large build. The logs do not locate elaboration versus normalization
+  failure and do not prove mathematical impossibility. All original
+  literal theorems, axiom audits, full statement and aggregate limit remain.
 
 - **Joint S5 construction, independently validated:** The
   [joint-image continuation](../research/twist_index_calculus_20261020/joint_image_elimination/README.md)

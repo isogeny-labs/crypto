@@ -84,3 +84,8 @@ Its native gate actually passes 13 tests. Source freeze `bc818088c1af`
 precedes its unique managed launch at 07:10:27 UTC. Inspect that version's
 terminal receipts before reporting proof success or taking further action.
 The v1/v2 report and archive remain unchanged historical artifacts.
+V3 is now also terminal: exit 134, signal 6, `std::bad_alloc`, maximum
+RSS 3,772,392 KiB under the unchanged address-space bound. No accepted
+instance theorem or IDC resulted. Its [actual outcome](PROOF-V3.md),
+inspected PDF and `runs-v3.tar.xz` retain this distinct version. The
+original concrete proof and all broader bridges remain open.
