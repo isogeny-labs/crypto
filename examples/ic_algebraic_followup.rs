@@ -538,11 +538,19 @@ fn guess(args: &BTreeMap<String, String>) {
         .map(|l| serde_json::from_str::<Value>(l).unwrap())
         .find(|v| v["draw"] == draw)
         .expect("draw");
-    assert_eq!(
-        input["solutions"].as_u64(),
-        Some(0),
-        "UNSAT input required; SAT controls use selftest"
-    );
+    let sat_control = args.get("--sat-control").map(String::as_str) == Some("true");
+    if sat_control {
+        assert!(input["solutions"].as_u64().unwrap() > 0);
+        assert!(input["point_decompositions"].as_u64().unwrap() > 0);
+        assert_eq!(input["schema"], "ic-qualified-query/v1");
+        assert_eq!(get("--vars"), "none");
+    } else {
+        assert_eq!(
+            input["solutions"].as_u64(),
+            Some(0),
+            "UNSAT required unless an explicit qualified SAT control is requested"
+        );
+    }
     let n = input["n"].as_u64().unwrap() as u32;
     let m = input["m"].as_u64().unwrap_or(3) as usize;
     let curve_b = input_curve_b(&input, n);
@@ -615,6 +623,7 @@ fn guess(args: &BTreeMap<String, String>) {
         if input.get("curve_b").is_some() {
             row["schema"] = json!("ic-algebraic-guess/v2");
             row["curve_b"] = json!(curve_b);
+            row["sat_control"] = json!(sat_control);
         }
         if engine == "sparse" {
             let limit: usize = get("--max-entries").parse().unwrap();
@@ -659,6 +668,10 @@ fn guess(args: &BTreeMap<String, String>) {
             }
             row["diagnostic_seconds"] = json!(start.elapsed().as_secs_f64());
         }
+        assert!(
+            !sat_control || row["status"] != "refuted",
+            "closure refuted a separately verified SAT control"
+        );
         emit(&row);
     }
 }
