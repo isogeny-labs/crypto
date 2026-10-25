@@ -1,0 +1,17 @@
+{
+  "cpuManagerPolicy": "static",
+  "cpuManagerPolicyOptions": {
+    "full-pcpus-only": "true"
+  },
+  "topologyManagerPolicy": "single-numa-node",
+  "kubeReserved": {
+    "cpu": "500m",
+    "ephemeral-storage": "1Gi",
+    "memory": "512Mi"
+  },
+  "systemReserved": {
+    "cpu": "500m",
+    "ephemeral-storage": "1Gi",
+    "memory": "512Mi"
+  }
+}

@@ -14,9 +14,12 @@ use std::env;
 use std::fs;
 
 use crypto_lib::cryptanalysis::jv_cover::{
-    run_cover_ccov, run_cover_dlp, run_rho_dp, CcovReport, CoverDlpReport, RhoDpReport,
+    run_cover_ccov_mode, run_cover_dlp, run_rho_dp, CcovReport, CoverDlpReport, RhoDpReport,
+    StopMode,
 };
+use crypto_lib::cryptanalysis::jv_rho_strong::{run_strong_rho, StrongOpts, StrongRun};
 use crypto_lib::cryptanalysis::jv_sieve::{run_cover_sieve_dlp, SieveDlpReport};
+use rayon::prelude::*;
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -27,6 +30,7 @@ enum Row {
     Dlp(CoverDlpReport),
     Sieve(SieveDlpReport),
     RhoDp(RhoDpReport),
+    Strong(StrongRun),
 }
 
 fn main() {
@@ -44,11 +48,17 @@ fn main() {
     let mut oracle_base = 40usize;
     let mut rho_ref = 1.3f64;
     let mut stop = 0usize;
+    // `--stop hilbert` or `--stop hilbert:N`: the Hilbert rule, N pairs per step (default 1)
+    let mut hilbert: Option<usize> = None;
     let mut margin = 1.25f64;
     let mut m_override = 0usize;
     let mut trace = false;
     let mut dp_bits = 16u32;
     let mut threads = 4usize;
+    let mut run_idx = 0u64;
+    let mut neg = true;
+    let mut batch = 16usize;
+    let mut rwalk = 64usize;
     let mut json: Option<String> = None;
     let mut i = 0;
     while i < args.len() {
@@ -73,11 +83,26 @@ fn main() {
             "--rho-runs" => rho_runs = next(&mut i).parse().expect("--rho-runs"),
             "--check-every" => check_every = next(&mut i).parse().expect("--check-every"),
             "--rho-ref" => rho_ref = next(&mut i).parse().expect("--rho-ref"),
-            "--stop" => stop = next(&mut i).parse().expect("--stop"),
+            "--stop" => {
+                let v = next(&mut i);
+                match v.strip_prefix("hilbert") {
+                    Some(rest) => {
+                        hilbert = Some(
+                            rest.strip_prefix(':')
+                                .map_or(1, |c| c.parse().expect("--stop hilbert:N")),
+                        )
+                    }
+                    None => stop = v.parse().expect("--stop"),
+                }
+            }
             "--margin" => margin = next(&mut i).parse().expect("--margin"),
             "--m" => m_override = next(&mut i).parse().expect("--m"),
             "--trace" => trace = true,
             "--dp-bits" => dp_bits = next(&mut i).parse().expect("--dp-bits"),
+            "--run" => run_idx = next(&mut i).parse().expect("--run"),
+            "--neg" => neg = next(&mut i) != "0",
+            "--batch" => batch = next(&mut i).parse().expect("--batch"),
+            "--r" => rwalk = next(&mut i).parse().expect("--r"),
             "--threads" => threads = next(&mut i).parse().expect("--threads"),
             "--oracle-base" => oracle_base = next(&mut i).parse().expect("--oracle-base"),
             "--json" => json = Some(next(&mut i)),
@@ -86,11 +111,47 @@ fn main() {
         i += 1;
     }
     let mut rows: Vec<Row> = Vec::new();
+    if exp == "rhostrong" {
+        // one single-threaded run per instance seed, instances in parallel
+        for &p in &sizes {
+            let opts = StrongOpts {
+                negation: neg,
+                batch,
+                dp_bits,
+                r: rwalk,
+            };
+            let mut rs: Vec<StrongRun> = (first_seed..first_seed + seeds)
+                .into_par_iter()
+                .map(|seed| run_strong_rho(p, seed, run_idx, opts))
+                .collect();
+            rs.sort_by_key(|r| r.seed);
+            for r in rs {
+                println!(
+                    "p={:>5} seed={} l=2^{:.1} neg {} batch {} | steps {:.4e} ({:.3} sqrt l) S harness {:.4} tuned {:.4} | S+ harness {:.4} tuned {:.4} | mul {} sq {} inv {} adds {} dbl {} setup {} | native {} fp_adds {} | restarts {} cycles {} selfcoll {} dps {} | correct {} capped {} | {:.0} s",
+                    r.p, r.seed, (r.l as f64).log2(), r.negation, r.batch, r.steps as f64,
+                    r.steps as f64 / (r.l as f64).sqrt(), r.s_harness, r.s_tuned, r.s_plus_harness, r.s_plus_tuned,
+                    r.ops.mul, r.ops.sq, r.ops.inv, r.ops.walk_adds, r.ops.dbl_adds, r.ops.setup_adds,
+                    r.ops.native(), r.ops.fp_adds, r.restarts, r.cycles_found, r.self_collisions, r.dps,
+                    r.correct, r.capped, r.wall_ms / 1e3
+                );
+                rows.push(Row::Strong(r));
+            }
+            if let Some(path) = &json {
+                fs::write(path, serde_json::to_string_pretty(&rows).unwrap()).expect("write json");
+            }
+        }
+        return;
+    }
     for &p in &sizes {
         for seed in first_seed..first_seed + seeds {
             match exp.as_str() {
                 "ccov" => {
-                    let r = run_cover_ccov(
+                    let mode = match (hilbert, stop) {
+                        (Some(c), _) => StopMode::Hilbert(c),
+                        (None, 0) => StopMode::Full,
+                        (None, k) => StopMode::Staircase(k),
+                    };
+                    let r = run_cover_ccov_mode(
                         p,
                         seed,
                         residuals,
@@ -98,12 +159,12 @@ fn main() {
                         max_degree,
                         budget,
                         oracle_base,
-                        (stop > 0).then_some(stop),
+                        mode,
                         trace,
                     );
                     println!(
-                        "p={:>5} seed={} l=2^{:.1} |F|={:>4} c_add E {:.0} J {:.0} stop {:?} ({} stopped) trace {} ({} replayed, {} mismatches) | random {} decomposable {} (1/720 = {:.5}) | planted {}/{} | oracle {} mismatches {} unverified {} incomplete {} timed out {} | C_cov {:.3e} [{:.2e}, {:.2e}] = weil {:.0} + f4 {:.3e} + lin {:.3e} + post {:.0} | delta {:.0} F4 degree {:.1} rows {:.0} cols {:.0} {:.1} ms + lin {:.1} ms = {:.1} ms | decomposable C_cov {:.3e} | {:.0} s",
-                        r.p, r.seed, r.bits, r.base, r.c_add_e, r.c_add_j, r.stop_staircase, r.stopped, r.trace, r.replayed, r.trace_mismatches, r.random_residuals, r.random_decomposable,
+                        "p={:>5} seed={} l=2^{:.1} |F|={:>4} c_add E {:.0} J {:.0} stop {:?} ({} stopped; hilbert {} applied, {} fallbacks) trace {} ({} replayed, {} mismatches) | random {} decomposable {} (1/720 = {:.5}) | planted {}/{} | oracle {} mismatches {} unverified {} incomplete {} timed out {} | C_cov {:.3e} [{:.2e}, {:.2e}] = weil {:.0} + f4 {:.3e} + lin {:.3e} + post {:.0} | delta {:.0} F4 degree {:.1} rows {:.0} cols {:.0} {:.1} ms + lin {:.1} ms = {:.1} ms | decomposable C_cov {:.3e} | {:.0} s",
+                        r.p, r.seed, r.bits, r.base, r.c_add_e, r.c_add_j, r.stop_staircase, r.stopped, r.hilbert_applied, r.hilbert_fallbacks, r.trace, r.replayed, r.trace_mismatches, r.random_residuals, r.random_decomposable,
                         r.expected_rate, r.planted_found, r.constructed_residuals, r.oracle_checked, r.mismatches,
                         r.unverified, r.incomplete, r.timed_out, r.c_cov.mean, r.c_cov.min as f64, r.c_cov.max as f64,
                         r.weil_muls.mean, r.f4_muls.mean, r.lin_muls.mean, r.post_muls.mean, r.delta.mean,

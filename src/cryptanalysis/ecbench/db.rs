@@ -196,6 +196,33 @@ fn run_rows(out: &mut String, r: &Record) {
             i(fb.dimension),
             ts(&fb.points_sha256),
         );
+        if let Some(fbm_id) = r.fbm_id.as_deref() {
+            let cfg = crate::cryptanalysis::ecbench::fbm::config_from_ic_method(
+                &r.workload.curve.slug,
+                fb,
+                m,
+                crate::cryptanalysis::ecbench::fbm::INSTRUMENT_IC_PIPELINE,
+            );
+            if let Ok(sealed) = cfg.seal() {
+                if sealed.fbm_id == fbm_id {
+                    let _ = writeln!(
+                        out,
+                        "INSERT INTO factor_base_measurements VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (fbm_id) DO NOTHING;",
+                        ts(&sealed.fbm_id),
+                        ts(&sealed.fbm_sha256),
+                        ts(&sealed.config.curve),
+                        ts(&sealed.config.fb_id),
+                        ts(&sealed.config.fb_sha256),
+                        ts(&sealed.config.family),
+                        json_text(&sealed.config.fb_params),
+                        ts(&sealed.config.oracle),
+                        ts(&sealed.config.solver),
+                        ts(&sealed.config.linalg),
+                        ts(&sealed.config.instrument),
+                    );
+                }
+            }
+        }
     }
     let _ = writeln!(
         out,
@@ -208,7 +235,7 @@ fn run_rows(out: &mut String, r: &Record) {
     let tm = &r.time;
     let _ = writeln!(
         out,
-        "INSERT INTO runs VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (record_id) DO NOTHING;",
+        "INSERT INTO runs (record_id, session_id, run_id, seq, round, warmup, arm, method_id, workload_id, fb_id, fbm_id, algorithm_seed, status, recovered, total_gae, s, ratio_to_floor, automorphisms_used, lower_bound, unpriced, deterministic, solve_wall_ns, process_wall_ns, user_ns, sys_ns, max_rss_kib, involuntary_switches, run_delay_ns, isolation_level, foreign_busy_ticks, steal_ticks, error) VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (record_id) DO NOTHING;",
         ts(&r.record_id),
         ts(&r.session_id),
         ts(&r.run_id),
@@ -219,6 +246,7 @@ fn run_rows(out: &mut String, r: &Record) {
         ts(&m.method_id),
         ts(&r.workload.workload_id),
         t(r.factor_base.as_ref().map(|fb| fb.fb_id.as_str())),
+        t(r.fbm_id.as_deref()),
         ts(&r.algorithm_seed),
         ts(&r.outcome.status),
         t(r.outcome.recovered.as_deref()),
@@ -293,6 +321,60 @@ fn run_rows(out: &mut String, r: &Record) {
             json_text(&sv.extra),
         );
     }
+    if let (Some(fbm_id), Some(fb)) = (r.fbm_id.as_deref(), r.factor_base.as_ref()) {
+        let trials = r
+            .phases
+            .iter()
+            .find(|p| p.name == "relations")
+            .and_then(|p| p.native.get("trials").copied());
+        let relations = r
+            .phases
+            .iter()
+            .find(|p| p.name == "relations")
+            .and_then(|p| {
+                p.native
+                    .get("relations")
+                    .or_else(|| p.native.get("hits"))
+                    .copied()
+            });
+        let yield_per_trial = match (relations, trials) {
+            (Some(rel), Some(t)) if t > 0 => Some(rel as f64 / t as f64),
+            _ => None,
+        };
+        let cell_id = format!("{fbm_id}:{}", r.record_id);
+        let _ = writeln!(
+            out,
+            "INSERT INTO factor_base_measurement_cells VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (cell_id) DO NOTHING;",
+            ts(&cell_id),
+            ts(fbm_id),
+            ts(&r.record_id),
+            ts(&r.session_id),
+            f(r.cost.s),
+            f(r.cost.total_gae),
+            i(trials.map(|v| v as i128)),
+            i(relations.map(|v| v as i128)),
+            f(yield_per_trial),
+            f(r.solver.as_ref().and_then(|s| s.solving_degree_mean)),
+            i(r.solver
+                .as_ref()
+                .and_then(|s| s.solving_degree_max)
+                .map(|v| v as i128)),
+            i(r.solver
+                .as_ref()
+                .and_then(|s| s.semi_regular_degree)
+                .map(|v| v as i128)),
+            i(r.solver
+                .as_ref()
+                .and_then(|s| s.macaulay_rows)
+                .map(|v| v as i128)),
+            i(r.solver
+                .as_ref()
+                .and_then(|s| s.macaulay_columns)
+                .map(|v| v as i128)),
+            ts(&r.outcome.status),
+            json_text(&serde_json::json!({"fb_family": fb.family, "arm": r.arm})),
+        );
+    }
     for (ord, bl) in r.isolation.blockers.iter().enumerate() {
         let _ = writeln!(
             out,
@@ -319,7 +401,13 @@ fn comparison_row(out: &mut String, c: &Comparison) {
         f(c.ops.ci95.map(|x| x.1)),
         b(c.ops.bounded),
         ts(&c.wall.status),
-        f(c.wall.median_ratio),
+        // `wall_ratio` is the statistic `wall_ci_*` bounds: the v2
+        // per-operation ratio, or the v1 median per-pair ratio.
+        f(if c.schema == crate::cryptanalysis::ecbench::compare::COMPARISON_SCHEMA {
+            c.wall.median_ratio
+        } else {
+            c.wall.ratio_b_over_a
+        }),
         f(c.wall.ci95.map(|x| x.0)),
         f(c.wall.ci95.map(|x| x.1)),
         ts(&c.verdict),
@@ -422,7 +510,8 @@ pub fn sql_for_path(path: &Path) -> Result<String, String> {
     if path.is_dir() {
         let session = read_session(path)?;
         let host: HostCapsule = serde_json::from_str(
-            &std::fs::read_to_string(path.join("host.json")).map_err(|e| e.to_string())?,
+            &std::fs::read_to_string(path.join("host.json"))
+                .map_err(|e| format!("{}: {e}", path.join("host.json").display()))?,
         )
         .map_err(|e| format!("host.json: {e}"))?;
         host_row(&mut out, &host);
@@ -450,7 +539,7 @@ pub fn sql_for_path(path: &Path) -> Result<String, String> {
     let text = std::fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
     let v: Value = serde_json::from_str(&text).map_err(|e| format!("{}: {e}", path.display()))?;
     match v.get("schema").and_then(Value::as_str) {
-        Some(crate::cryptanalysis::ecbench::compare::COMPARISON_SCHEMA) => {
+        Some(s) if crate::cryptanalysis::ecbench::compare::is_comparison_schema(s) => {
             let c: Comparison = serde_json::from_value(v).map_err(|e| e.to_string())?;
             comparison_row(&mut out, &c);
         }

@@ -3,13 +3,16 @@ name: n37 sparse four-policy PDP replay
 on:
   pull_request:
     paths:
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'build.rs'
+      - '.cargo/**'
+      - 'rust-toolchain*'
       - '.github/workflows/n37-four-policy-sparse16.yml'
       - 'examples/n37_four_policy_sparse16_*.rs'
       - 'examples/support/n37_policy_common.rs'
       - 'research/notes/ecc2k130/n37_four_policy_sparse16_20261004/**'
       - 'research/notes/ecc2k130/n37_four_policy_support_20261003/RESULT.json.gz'
-      - 'docs/index-calculus-scoreboard.html'
-      - 'docs/ic-current-state.html'
   workflow_dispatch:
 
 permissions:
@@ -23,14 +26,16 @@ concurrency:
 
 jobs:
   replay:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|n37-four-policy-sparse16.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|n37-four-policy-sparse16.yml|') && 'crypto-eks-linux' || 'ubuntu-24.04' }}
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 25 || 30 }}
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             Cargo.toml
+            tools/volcano-cli/
+            isogeny_algos/
             src
             examples/n37_four_policy_sparse16_prepare.rs
             examples/n37_four_policy_sparse16_inputs_replay.rs
@@ -38,6 +43,7 @@ jobs:
             examples/n37_four_policy_sparse16_pdp_replay.rs
             examples/support/n37_policy_common.rs
             docs/curves/registry.json
+            docs/curves/standards/parameters.json
             docs/ecbench/schema.sql
             docs/ic/calibration.json
             docs/ic/boundary_targets.json
@@ -48,6 +54,7 @@ jobs:
             research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b03.points.jsonl
             research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b04.points.jsonl
             research/notes/ecc2k130/n37_four_policy_sparse16_20261004
+      - uses: Swatinem/rust-cache@v2
       - name: Restore the measured Cargo manifest and lockfile
         run: |
           note=research/notes/ecc2k130/n37_four_policy_sparse16_20261004
@@ -68,9 +75,13 @@ jobs:
             docs/ic/calibration.json docs/ic/boundary_targets.json
           cmp Cargo.toml "$note/SOURCE_Cargo.toml"
           cp "$note/Cargo.lock" Cargo.lock
+      - name: Install rustfmt (the runner toolchain ships without it)
+        run: rustup component add rustfmt
       - name: Check source lock and formatting
         run: |
           note=research/notes/ecc2k130/n37_four_policy_sparse16_20261004
+          # The lock itself is frozen evidence: byte-identical to the one 7426ab0c1 committed with the result.
+          printf '%s  %s\n' '82851447484b8bc3f59671b4b1e08fb0027b2e4d375d56d000ebeb518079339c' "$note/SOURCE_LOCK.sha256" | sha256sum --check
           sha256sum --check "$note/SOURCE_LOCK.sha256"
           rustfmt --edition 2021 --check examples/n37_four_policy_sparse16_prepare.rs examples/n37_four_policy_sparse16_inputs_replay.rs examples/n37_four_policy_sparse16_pdp.rs examples/n37_four_policy_sparse16_pdp_replay.rs
       - name: Build native producers and independent replays

@@ -1,0 +1,137 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "log2_r": 10.41679752760606,
+      "arm": "f6-ic",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        1204.5220688957259,
+        22661.343380961884,
+        215772.73518955725
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "log2_r": 10.41679752760606,
+      "arm": "inherited-f4",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        18.445911361058165,
+        25526.583035374788,
+        255099.81715149834
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "log2_r": 10.41679752760606,
+      "arm": "matrix-f4",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        18.51690918704464,
+        6246202.99423007,
+        62461863.29011802
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "log2_r": 10.41679752760606,
+      "arm": "matrix-f5",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        18.51690918704464,
+        4008906.848241174,
+        40088901.83022906
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "log2_r": 10.41679752760606,
+      "arm": "rho-negation",
+      "runs": 8,
+      "verified": 8,
+      "mean_s": [
+        3.0934767036965214,
+        3.2388532045259755,
+        4.547241711991061
+      ],
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "a": "f6-ic",
+      "b": "inherited-f4",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "a": "f6-ic",
+      "b": "matrix-f4",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "a": "f6-ic",
+      "b": "matrix-f5",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "a": "f6-ic",
+      "b": "rho-negation",
+      "verdict": "rho-negation < f6-ic"
+    },
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "a": "inherited-f4",
+      "b": "matrix-f4",
+      "verdict": "inherited-f4 < matrix-f4"
+    },
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "a": "inherited-f4",
+      "b": "matrix-f5",
+      "verdict": "inherited-f4 < matrix-f5"
+    },
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "a": "inherited-f4",
+      "b": "rho-negation",
+      "verdict": "rho-negation < inherited-f4"
+    },
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "a": "matrix-f4",
+      "b": "matrix-f5",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "a": "matrix-f4",
+      "b": "rho-negation",
+      "verdict": "rho-negation < matrix-f4"
+    },
+    {
+      "curve": "icv1-f2m13-tm9-6863a838",
+      "a": "matrix-f5",
+      "b": "rho-negation",
+      "verdict": "rho-negation < matrix-f5"
+    }
+  ]
+}
