@@ -65,7 +65,7 @@ separate from any Cairn task reservation. Completed next accounting step:
 source recoveries with29 unpriced request components and an explicit
 shifted-relation recovery proof. Lower matrix demand coexists with higher
 point-lifting demand in the first fixture; matched-base controls retain the
-whole profile. The next concrete implementation is
+whole profile. The subsequent implementation is
 [checked factor-base roots as solver input](../../backlog/XP-20261025-known-factor-base-roots/README.md).
 This comparison is now executed: [checked roots](reports/known-roots-20261025/README.md),
 80 paired setups/800 verified recoveries, exact certificates and9 rehashed
