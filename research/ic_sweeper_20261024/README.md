@@ -421,8 +421,9 @@ branch), documented in [`docs/ic/SWEEPER.md`](../../docs/ic/SWEEPER.md):
 - **P1, the trial interface** — `ic sweep-trial`. Scores from operation counts
   alone, `S(w) = (adds + doubles + w · native operations) / √r`. This follows
   from §5a: the pinned calibration ratios cancel between `G − C` and `n_C`, so
-  no host timing or calibration enters. *Measured:* the n = 13 baseline scored
-  `S = [19.1, 143911.0, 1438937.6]` in both a debug and a release build.
+  no host timing or calibration enters. *Measured:* the n = 13 `m = 3` baseline
+  scored `S = [19.1, 143911.0, 1438937.6]` in both a debug and a release build
+  on one host (not checked across hosts).
   Failure classes `exhausted / invalid / refused / invalid_config / crashed`
   are never scored. Time and memory limits are enforced from inside the
   process (`ps` is unavailable in the sandbox; macOS ignores `RLIMIT_AS`);
@@ -457,14 +458,41 @@ branch), documented in [`docs/ic/SWEEPER.md`](../../docs/ic/SWEEPER.md):
    9, 11, 15, 17, 19, 23, 29, 43, 45, 47, 51, 57, 59, 61.
 
 **First study (a smoke run of the tool, not a result).** `koblitz-algebraic`,
-K_0, rungs 13/15/19/23, 18 trials, 3 workers, 90 s per trial: finished in
-4 min 16 s; 6 complete, 6 pruned, 6 failed. The n = 23 baseline hit the 90 s
-cap under load, so 3 rungs were usable, below `--min-fit 4`, and nothing was
-projected (reported as such). **No configuration beat the baseline**: the best
-trial is +2.41 in log2 (5.3× worse). All 6 failures were `exhausted`
-(Crossbred recovered no logarithm at these sizes; a SAT and an F4 run reached
-the cap). Eighteen trials on a small space says little; it shows the loop,
-the classes, the pruning and the store behave.
+K_0, rungs 13/15/19/23, 24 trials, 3 workers, 120 s per trial, run with the
+solver-unit guard. Records, graph and PDF:
+[`reports/run-20261024T2332Z/`](reports/run-20261024T2332Z/report.md). It
+finished in 5 min 31 s with all four baselines scored, so the objective is a
+projection to log2 r = 81. Outcomes: 6 complete, 8 pruned, 10 failed. The
+failures: 5 trials were not rankable because the solver counts in another unit
+(`crossbred-f2`, `sat-cdcl`, `buchberger-f2`), 3 hit the 120 s limit, and 2
+recovered no logarithm within the counted-trial cap. **No configuration beat
+the baseline at any rung**: every measured log2 ratio is positive (best
+completed trials +2.5 to +6 per rung), and the best projected objective is
++16.5 (slope 0.20 per bit), which §8 item 6 says to read with the per-rung
+ratios beside it. Twenty-four trials on a small space says little about which
+configuration is best; it shows the loop, the classes, the unit guard, the
+pruning and the store behave. An earlier run without the guard (18 trials,
+store not kept) is not cited.
+
+5. **The solver axis mixes operation units, and a search exploits that.**
+   Measured at n = 13: inherited F4, `f4-f2`, `matrix-f4`, `matrix-f5` and
+   Gray-code `fes-f2` count word XORs (one priced family in the repository);
+   `buchberger-f2` counts monomial operations, `sat-cdcl` conflicts, and
+   `crossbred-f2` partial word operations. A ratio across units rewards the
+   unit, which is AGENTS.md §6's "changing the unit". Trials whose solver unit
+   differs from the baseline's are now recorded in full and fail the trial;
+   a unit test shows a 100× cheaper-by-unit solver cannot win.
+6. **The projected objective amplifies rung-to-rung noise.** With four rungs
+   spanning about 10 bits and a target 60 bits away, rounding in the integer
+   descent dimension is multiplied roughly sixfold: in a synthetic test a
+   configuration better than the baseline at every measured rung scored worse
+   at the target. The per-rung ratios are stored and reported beside the
+   objective; a confidence interval on the slope is future work.
+7. **Rung constraint for the first real study.** K_0 at n = 15 has log2 r = 9.6
+   (cofactor about 42), so the F4-reachable K_0 rungs 13, 15, 19, 23 mix
+   cofactors; the cofactor-4 ones are 13, 19 and 23, which is below
+   `--min-fit 4`. A baseline that reaches n = 31 or 41, or an accepted
+   mixed-cofactor ladder, is needed before a projection means anything.
 
 **Not done:** widening the framework past n = 63 and `m ≥ 4` (plan P5, P6); the
 published-IC reference arm (P4b); prime and random-binary curve generation
