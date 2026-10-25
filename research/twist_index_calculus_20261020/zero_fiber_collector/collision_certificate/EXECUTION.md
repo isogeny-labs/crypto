@@ -44,3 +44,32 @@ preparation implementation error. A regression control accepts that exact
 completed schema and rejects a pipeline status, an undetermined system or
 a timeout. Gate v3 and fresh preparation v2 will check the corrected parser.
 No actual case certificate search or new F4 solve has occurred yet.
+
+## Corrected gate v3, identity certificate and preparation v2
+
+Gate v3 passes all five Rust tests, the build and all three Lean lemmas,
+with terminal exit 0 and unchanged source seals. The new regression check
+requires the actual completed Phase 1 schema and rejects censors/timeouts.
+Executable SHA-256:
+`4c49d77faa9b5ef3fd54459bd0ac0cf69ee077eef43ec84361753f7dbc3555f5`.
+
+The separate native IDC wrapper builds and issues/checks
+`IDC1h10810f17e0f6c8f6`, with 64 derived plus 64 extra points and a digest
+pointer to the already checked Lean source. Its false-identity control is
+refused. All source seals and phase exits pass. The initial dependency
+inspection found cached serde 1.0.229; the wrapper pins that exact version.
+
+Preparation v2 passes and produces all 42 equation-only input packs.
+Its workload SHA-256 is
+`17ecb4c302526bc58e592466071e1c2704eaaf43a0a0ca1efe563e1bd69b3c10`.
+The first two rows are p37 seed 0, phi then doubling. The actual driver
+controls pass: outer reservation 64 with no output; duplicate phase 65 with
+an unchanged marker and no candidate directory. The exact tested driver is
+unchanged before registration. No producer case has started at this freeze.
+
+The two actual pages of layout v1 were inspected: page 1 had labels extending
+outside diagram boxes. The original PDF/PNG and sources are retained.
+Layout v2 corrects the labels, and both actual pages are inspected with no
+observed clipping. PDF SHA-256:
+`be0b9802e20659424dad22381266edba708ef50a419e5187c03e62e4fbc7356d`.
+Matching PDF/SVG/150 dpi PNG copies remain unlisted in benchmarks.

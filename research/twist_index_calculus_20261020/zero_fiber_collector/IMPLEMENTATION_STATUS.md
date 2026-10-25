@@ -83,3 +83,19 @@ and the [report](postprocess/REPORT.md) expose the preprocessing charge
 behind the p37 seed-1 online rank effect. All complete-price fields remain
 null. Final full-panel analysis and native re-analysis in complete mode
 remain pending.
+
+## Repeated-factor certificate follow-up
+
+The new `collision_certificate/native` crate searches exact bounded-degree
+certificates that force an S4 solution to repeat its peeled abscissa.
+Five native tests, the build and conditional Lean rejection proof pass in
+gate v3. The standard cubic IDC passes, including refusal of a false
+identity. Native preparation v2 seals all 42 original zero case-arms;
+launcher controls 64/65 pass before the [production freeze](collision_certificate/FREEZE.json).
+All earlier failed proof/preparation/layout attempts remain preserved.
+
+This is a new certificate algorithm on retained inputs, not a repeat of any
+old solve or a completed integrated target/rank/cost comparison. Both the
+old 85-configuration owner and the new registered experiment keep their
+own source seals and case budgets. See the [proof/control report](collision_certificate/BUILD_AND_PROOF.md)
+and [scope of remaining formal bridges](collision_certificate/proof/PROOF_MAP.md).

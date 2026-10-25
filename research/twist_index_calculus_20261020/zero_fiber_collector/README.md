@@ -71,6 +71,16 @@ controls use 72. That structural phi gain within precomputation does not
 reduce the matched target-query count and adds systems relative to plain.
 The [control PDF](phase2/BUILD_AND_CONTROLS.pdf) preserves the exact scope.
 
+A separate [repeated-factor certificate experiment](collision_certificate/README.md)
+now targets solver work beyond the existing action quotient. Five native
+controls, a conditional Lean rejection proof and standard identity
+certificate `IDC1h10810f17e0f6c8f6` pass. All 42 phi/doubling case-arms are
+prepared from the complete retained polynomial inputs, with no repeated
+F4 or point-census execution. The [prerun freeze](collision_certificate/FREEZE.json)
+fixes degree/power caps, first/repeat checks, independent audits and full
+failed-search charges. Its complete pipeline effect remains untested;
+it changes neither frozen target-recovery producer.
+
 The separate [native accounting tool](postprocess/README.md) now checks the
 already committed 29-exit historical snapshot without another solve or a
 new live snapshot. All three tests pass, the actual partial-as-complete

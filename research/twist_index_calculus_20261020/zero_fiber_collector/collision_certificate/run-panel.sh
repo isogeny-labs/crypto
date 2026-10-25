@@ -41,11 +41,12 @@ cp "$cert_gate/metadata/sources.sha256" "$cert_out/metadata/sources.sha256"
 cp "$cert_prepared/metadata/workload-and-inputs.sha256" "$cert_out/metadata/workload-and-inputs.sha256"
 cp "$cert_prepared/prepared/workload.json" "$cert_out/metadata/workload.json"
 cp "$cert_prepared/prepared/workload.tsv" "$cert_out/metadata/workload.tsv"
+cp "$cert_repo/research/twist_index_calculus_20261020/zero_fiber_collector/collision_certificate/run-phase.sh" "$cert_out/metadata/run-phase.sh"
 git rev-parse HEAD > "$cert_out/metadata/source-commit.txt"
 date -u +%FT%TZ > "$cert_out/metadata/started-utc.txt"
 printf '%s\n' "$$" > "$cert_out/metadata/owner-pid.txt"
 printf '%s\n' '42 registered case-arms; first plus one AA repeat (84 producer calls); one worker; each phase has 8 GiB, 1200-second watchdog, producer 1180-second cooperative deadline; counts/diagnostics only.' > "$cert_out/metadata/resource-envelope.txt"
-sha256sum "$cert_out/runner" "$cert_out/metadata/workload.json" "$cert_out/metadata/workload.tsv" "$cert_out/metadata/executed-script.sh" > "$cert_out/metadata/frozen-execution.sha256"
+sha256sum "$cert_out/runner" "$cert_out/metadata/workload.json" "$cert_out/metadata/workload.tsv" "$cert_out/metadata/executed-script.sh" "$cert_out/metadata/run-phase.sh" > "$cert_out/metadata/frozen-execution.sha256"
 export LC_ALL=C RAYON_NUM_THREADS=1
 ulimit -c 0
 cert_phase() {
@@ -70,19 +71,19 @@ while IFS=$'\t' read -r cert_id cert_input cert_sha cert_reference cert_referenc
   cert_case="$cert_out/cases/$cert_id"
   mkdir -p "$cert_case"
   cert_phase "$cert_id-first" python3 "$cert_repo/tools/isolated_bench.py" busy -- \
-    /usr/bin/time -v -o "$cert_out/metadata/$cert_id-first.time.txt" prlimit --as=8589934592 -- timeout --signal=TERM --kill-after=10s 1200s \
+    bash "$cert_out/metadata/run-phase.sh" "$cert_out/metadata/$cert_id-first" \
     "$cert_out/runner" produce "$cert_input" "$cert_sha" "$cert_case/first" || true
   if test -f "$cert_case/first/record.json"; then
     cert_phase "$cert_id-audit" python3 "$cert_repo/tools/isolated_bench.py" busy -- \
-      /usr/bin/time -v -o "$cert_out/metadata/$cert_id-audit.time.txt" prlimit --as=8589934592 -- timeout --signal=TERM --kill-after=10s 1200s \
+      bash "$cert_out/metadata/run-phase.sh" "$cert_out/metadata/$cert_id-audit" \
       "$cert_out/runner" audit "$cert_out/metadata/workload.json" "$cert_workload_sha" "$cert_id" "$cert_case/first" "$cert_case/audit" || true
   fi
   cert_phase "$cert_id-aa" python3 "$cert_repo/tools/isolated_bench.py" busy -- \
-    /usr/bin/time -v -o "$cert_out/metadata/$cert_id-aa.time.txt" prlimit --as=8589934592 -- timeout --signal=TERM --kill-after=10s 1200s \
+    bash "$cert_out/metadata/run-phase.sh" "$cert_out/metadata/$cert_id-aa" \
     "$cert_out/runner" produce "$cert_input" "$cert_sha" "$cert_case/aa" || true
   if test -f "$cert_case/first/record.json" && test -f "$cert_case/aa/record.json"; then
     cert_phase "$cert_id-parity" python3 "$cert_repo/tools/isolated_bench.py" busy -- \
-      prlimit --as=8589934592 -- timeout --signal=TERM --kill-after=10s 1200s "$cert_out/runner" parity "$cert_case/first" "$cert_case/aa" "$cert_case/parity.json" || true
+      bash "$cert_out/metadata/run-phase.sh" "$cert_out/metadata/$cert_id-parity" "$cert_out/runner" parity "$cert_case/first" "$cert_case/aa" "$cert_case/parity.json" || true
   fi
   # The first two registered case-arms are also the actual implementation gate.
   # No extra p37 trial is repeated after this gate.
@@ -99,7 +100,7 @@ while IFS=$'\t' read -r cert_id cert_input cert_sha cert_reference cert_referenc
 done < "$cert_out/metadata/workload.tsv"
 cert_terminal=0
 cert_phase summarize python3 "$cert_repo/tools/isolated_bench.py" busy -- \
-  prlimit --as=8589934592 -- timeout --signal=TERM --kill-after=10s 1200s \
+  bash "$cert_out/metadata/run-phase.sh" "$cert_out/metadata/summarize" \
   "$cert_out/runner" summarize "$cert_out" "$cert_out/metadata/workload.json" "$cert_workload_sha" "$cert_out/analysis" || cert_terminal=$?
 sha256sum -c "$cert_out/metadata/sources.sha256" > "$cert_out/metadata/sources-unchanged-after.txt"
 cert_phase final-input-seals python3 "$cert_repo/tools/isolated_bench.py" busy -- \
