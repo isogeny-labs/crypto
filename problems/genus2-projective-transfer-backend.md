@@ -104,6 +104,12 @@ for arbitrary inputs.
   The [packet](../research/projective_law_followup_20261022/formal/COMMON22_COMPLETION_BRIDGE.md)
   records exit 0 and only standard axioms. It does not construct a chosen
   smooth projective completion or prove the divisor/`Pic⁰` bridge.
+- **Open compiler/API gap, 2026-10-25:** The
+  [weighted-Proj packet](../research/projective_law_followup_20261022/formal/WEIGHTED_PROJ_HEAD.md)
+  specifies the proposed degree-`(1,3,1)` quotient, the missing graded
+  quotient construction, and the required `D₊(Z)` chart isomorphism. Its
+  bounded compiler attempts returned two timeouts and one missing-import
+  error; no new theorem was checked.
 - **Finite source-bound check, 2026-10-25:** One smooth `F17` 2-torsion
   fixture makes both the pinned author public dispatcher and compiled Rust
   dispatcher return identity, matching Cantor. A direct author doubling

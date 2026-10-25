@@ -322,6 +322,11 @@ coefficients. Its [four-row CSV](common22-completion-bridge.csv),
 [PDF](COMMON22_COMPLETION_BRIDGE.pdf) carry the compiler and axiom audit.
 Projective completion, properness, smoothness, divisor/`Pic⁰` transport,
 and Rust semantics remain separate obligations.
+The [bounded weighted-Proj attempt](WEIGHTED_PROJ_HEAD.md) records the
+specific quotient-grading and `D₊(Z)` chart-isomorphism obligations, available
+pinned APIs, and three failed/timed-out compiler commands. Its
+[standardized API-gap rows](weighted-proj-head-api-gap.csv) are an open
+proof record; no additional theorem passed the compiler.
 
 The [source-bound F17 exceptional dispatch packet](../exceptional_source_bridge/README.md)
 checks one valid 2-torsion divisor against the pinned author expressions,
