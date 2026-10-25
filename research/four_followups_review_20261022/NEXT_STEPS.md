@@ -28,7 +28,7 @@ format.
 | N6 | verified partial mechanization | pinned Lean checked seven algebraic/inventory theorems plus one explicit conditional bridge; the later [N6 homogeneity packet](../projective_law_followup_20261022/n6-homogeneity/REPORT.md) proves the W-exponent scaling distinction; the Rust semantic and smooth-curve/Mumford/`Pic^0` bridges remain unresolved |
 | N7 | verified for the fixed-offset model | seven Lean declarations, zero trusted declarations, 336 exact orbit rows and 12,096 canonical price rows; arbitrary, compressed and label-free sidecars remain open |
 | N8 | verified fresh-cohort replication; packet partially complete | 6,300 candidate and 6,300 matched-rho records over 1,260 fresh public targets; five full-cohort ratios and every one of 1,440 pricing rows retained; independent-host replay and a model-cluster interval were not produced |
-| N9 | verified partial manual abstraction | 742-job pinned Lean build and 13-theorem axiom audit; later [weighted 2+2 scaling theorems](../projective_law_followup_20261022/formal/CROSS_SCALE22.md) add five kernel-checked declarations for B/A/C weights and B/C nonzero preservation; a proved Rust translation and concrete smooth-curve/Mumford/principal-divisor/`Pic^0` instance remain open |
+| N9 | verified partial source and affine bridge | 742-job pinned Lean build and 13-theorem axiom audit; [weighted 2+2 scaling](../projective_law_followup_20261022/formal/CROSS_SCALE22.md), [source-prefix guards](../projective_law_followup_20261022/formal/WEIGHTED_SOURCE22.md), and [affine coordinate-ring norm factorization](../projective_law_followup_20261022/formal/COORDINATE_RING_BRIDGE.md) are kernel-checked within their stated scopes; compiled Rust field semantics, output construction, principal divisors and `Pic⁰` remain open |
 | N10 | verified derived appendix | source-specific counters map to a declared phase class and retain original phase names; 23,176 representative method rows and 6,120 aggregate method cells reconcile; 1,264 candidate nulls retained; graph, PDF, and artifact-store CSVs included |
 | N11 | verified abstract derivation; cohort gate closed | native Rust packet checks 336 rows over 21 groups and small-group sign/recurrence cases; pair-state size is 72 bytes with external step count or 80 bytes with stored counter; concrete xADD exception and signed-lift cost bounds remain unknown, so no cohort ran |
 | N12 | verified frozen held-out packet | seven prespecified policies, 840 training targets per policy and seven unseen evaluation models with 420 targets; 420/420 candidate and rho solves verified, ratio 2.479905 at the representative price, 0 win/36 loss cells; independent-host and isolated wall checks not attempted |
@@ -46,7 +46,7 @@ N7 met its fixed-offset packet. N6 produced partial mechanization but did not
 meet the runtime/divisor-class bridge or independent-review gates. N8 produced
 the complete fresh public cohort and pricing grid but did not produce an
 independent-host replay or a model-cluster interval. N3 and N4 remain pending.
-N9 retains a source/geometric proof gap; N11 and N12 have the results linked above.
+N9 retains a compiled-source/geometric proof gap; N11 and N12 have the results linked above.
 
 1. **N6 proof packet (partially complete).** Freeze the theorem prover and dependency digests;
    encode reduced-divisor well-formedness, every runtime branch predicate,
@@ -246,8 +246,13 @@ group step. Four exact Rust function fragments are hash-bound. The fail-closed
 verifier rejects duplicate functions, a hash-valid function substitution, an
 unexpected real Lean declaration, and a comment-only fake declaration under
 normal and optimized Python. These bindings identify source bytes but do not
-prove Rust-to-Lean equivalence. The concrete smooth-curve/Mumford/principal-
-divisor/`Pic^0` instance and exceptional compositions through it remain open.
+prove Rust-to-Lean equivalence. Later native
+[source-prefix](../projective_law_followup_20261022/formal/WEIGHTED_SOURCE22.md)
+and [affine coordinate-ring](../projective_law_followup_20261022/formal/COORDINATE_RING_BRIDGE.md)
+packets check the weighted common-branch guard order and norm factorization.
+They do not establish compiled Rust field semantics, returned coordinates,
+principal-divisor multiplicities, infinity valuation, or the concrete
+smooth-curve/`Pic⁰` instance; exceptional compositions through it remain open.
 
 ### N10. Normalize phase counters
 

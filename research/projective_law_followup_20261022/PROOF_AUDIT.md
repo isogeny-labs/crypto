@@ -509,3 +509,14 @@ divisor-class and exceptional-branch composition arguments above are
 also written mathematics rather than mechanized declarations. This
 secondary agent audit is not an independent mathematical peer review
 or an exhaustive all-divisor enumeration.
+
+### Later bounded formal bridge
+
+The [weighted source-prefix packet](formal/WEIGHTED_SOURCE22.md) binds the
+ordered common 2+2 coefficient and B/C guard statements to a Lean field
+model, with three kernel-checked theorems and mutation checks. The
+[coordinate-ring packet](formal/COORDINATE_RING_BRIDGE.md) then proves the
+source-style norm factorization in the affine ring `K[X,Y]/(Y²-f(X))`.
+These results do not prove compiled Rust field semantics, the returned
+coordinate formulas, principal-divisor zero/pole multiplicities, or the
+`Pic⁰` class equation; the full projective-law theorem remains open.

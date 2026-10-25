@@ -159,6 +159,11 @@ mutations. Its [certificate](weighted-source22.json), [CSV](weighted-source22.cs
 boundary. This source-shape check does not prove compiled Rust field semantics,
 the output coordinate formulas, or the divisor-class map.
 
+The separate [affine coordinate-ring packet](COORDINATE_RING_BRIDGE.md)
+kernel-checks the source-style common 2+2 norm identity in
+`K[X,Y]/(Y²-f(X))`. Its geometric zero/pole divisor and `Pic⁰` class
+obligations remain open.
+
 ## Remaining theorem bridge
 
 The packet does **not** define the smooth hyperelliptic curve, Mumford
