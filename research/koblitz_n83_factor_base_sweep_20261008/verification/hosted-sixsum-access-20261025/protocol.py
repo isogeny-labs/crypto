@@ -78,7 +78,7 @@ def make() -> dict:
     require([arm["role"] for arm in arms] == ["gray_pool", "hash_pool"],
             "arm order changed")
     return {
-        "schema": "n83.hosted-sixsum-access-protocol/v1",
+        "schema": "n83.hosted-sixsum-access-protocol/v2",
         "status": "FROZEN_BOUNDED_ACCESS_PILOT",
         "purpose": "six_summand_natural_relation_access_before_runtime_selection",
         "source_commit": SOURCE_COMMIT,
@@ -97,6 +97,7 @@ def make() -> dict:
         "conservative_pair_charge_seconds": 2 * sum(STAGE_CAP.values()),
         "conservative_preparation_charge_seconds": PREPARATION_CAP,
         "conservative_full_charge_seconds": PREPARATION_CAP + 2 * sum(STAGE_CAP.values()),
+        "build_cpus": 2,
         "search_cpus": 1, "search_memory_bytes": 4294967296,
         "search_swap_bytes": 0,
         "arms": arms,

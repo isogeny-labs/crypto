@@ -128,6 +128,23 @@ def stage_issue(receipt: dict, name: str, run_dir: Path, worker_wall: int) -> st
     return None
 
 
+def bounded_stage_command(supervisor, name: str, arm: dict, source: Path,
+                          archives: Path, build: Path, run_dir: Path,
+                          binary: Path, registry: Path, image_id: str,
+                          token: str, build_cpus: int):
+    command, output, container = supervisor.stage_command(
+        name, arm, source, archives, build, run_dir, binary, registry,
+        image_id, token)
+    if name == "build":
+        if command.count("--cpus") != 1:
+            raise ValueError("pinned build CPU option changed")
+        index = command.index("--cpus") + 1
+        if command[index] != "4" or build_cpus != 2:
+            raise ValueError("pinned build CPU envelope changed")
+        command[index] = str(build_cpus)
+    return command, output, container
+
+
 def checked_preparation(path: Path, source_commit: str,
                         archive_sha256: dict[str, str], cap: int) -> dict:
     row = json.loads(path.read_text())
@@ -238,9 +255,10 @@ def run(source: Path, archives: Path, output: Path, scratch: Path,
             if frozen_changed():
                 status = "PRODUCER_FAILURE_frozen_input_changed"
                 break
-            command, stage_output, container = supervisor.stage_command(
+            command, stage_output, container = bounded_stage_command(
+                supervisor,
                 name, arm, source, archives, build, run_dir, binary, registry,
-                image_id, token)
+                image_id, token, protocol["build_cpus"])
             receipt = supervisor.PRIOR.stage(
                 name=name, command=command,
                 wall=protocol["stage_wall_caps_seconds"][name],

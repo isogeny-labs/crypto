@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
@@ -76,7 +77,33 @@ class SixSummandControls(TestCase):
 
     def test_frozen_protocol_and_six_summand_unknown_receipt(self) -> None:
         self.assertEqual(protocol.make(), self.plan)
+        self.assertEqual(self.plan["schema"], "n83.hosted-sixsum-access-protocol/v2")
+        self.assertEqual(self.plan["build_cpus"], 2)
         self.assertEqual(self.replay(), "UNKNOWN_search_cap")
+
+    def test_failed_host_admission_receipt_binds_raw_stderr(self) -> None:
+        attempt = json.loads((HERE / "attempt-1.json").read_text())
+        stderr = (HERE / "attempt-1-exporter-build.stderr").read_bytes()
+        self.assertEqual(hashlib.sha256(stderr).hexdigest(),
+                         attempt["exporter_build_stderr_sha256"])
+        self.assertIn(b"there are only 2 CPUs available", stderr)
+        self.assertFalse(attempt["solver_search_executed"])
+
+    def test_hosted_build_cpu_limit_is_applied_to_pinned_command(self) -> None:
+        supervisor = mock.Mock()
+        supervisor.stage_command.return_value = (
+            ["docker", "run", "--cpus", "4", "--network", "none"],
+            Path("/out"), "frozen-container")
+        args = (self.arm, HERE.parents[3], Path("/archives"), Path("/build"),
+                Path("/run"), Path("/worker"), Path("/registry"),
+                "sha256:" + "a" * 64, "token", 2)
+        command, _, _ = run.bounded_stage_command(supervisor, "build", *args)
+        self.assertEqual(command[command.index("--cpus") + 1], "2")
+        supervisor.stage_command.return_value = (
+            ["docker", "run", "--cpus", "1", "--network", "none"],
+            Path("/out"), "frozen-container")
+        command, _, _ = run.bounded_stage_command(supervisor, "search", *args)
+        self.assertEqual(command[command.index("--cpus") + 1], "1")
 
     def test_five_summand_config_is_rejected(self) -> None:
         self.config["base_summands"] = 3

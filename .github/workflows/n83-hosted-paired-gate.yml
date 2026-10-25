@@ -167,7 +167,7 @@ jobs:
           started=$(date +%s)
           mkdir -p "$RUNNER_TEMP/n83-exporter-target" "$RUNNER_TEMP/n83-pilot-parent"
           docker run --rm --pull never --platform linux/arm64 \
-            --network none --cpus 4 --memory 8192m --memory-swap 8192m \
+            --network none --cpus 2 --memory 8192m --memory-swap 8192m \
             --user "$(id -u):$(id -g)" \
             --mount "type=bind,src=$GITHUB_WORKSPACE/source,dst=/src,readonly" \
             --mount "type=bind,src=$CARGO_HOME,dst=/cargo" \
