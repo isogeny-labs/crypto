@@ -254,3 +254,13 @@ binary reference (first main125->47,twist136->42), with cache setup charged.
 Nine new public Lean theorems;191 public/249 audited total,0 extra trusted.
 The old loop includes unused doubling; [next draft](../../backlog/XP-20261025-direct-sign-reference/README.md)
 compares direct uncached signs before a cache-cost verdict. No speed claim.
+
+## Direct-sign reference continuation (2026-10-25)
+
+[Executed report](reports/direct-sign-20261025/README.md):120 setups/1200 source
+checks with equal complete operand/lift/certificate behavior. Direct uncached
+signs save two cold additions versus cache in all400 comparisons; cache saves
+negations. This exposes a component tradeoff, not a calibrated overall ranking.
+Existing191 public/249 audited theorems and16 identities are reused unchanged.
+[Next draft](../../backlog/XP-20261025-cm8-quadratic-transfer/README.md) constructs
+an actual registered F13 degree-two twist transfer before useful-yield/degree experiments.

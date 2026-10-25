@@ -1,24 +1,13 @@
-# Direct uncached signs as a stronger reference
+# Direct sign reference: executed local evidence
 
-Draft next experiment, **not executed**. The signed-cache round preserves all
-ordered lifts and reduces point-add requests against the frozen binary sign
-loop. That loop includes an identity addition and unused final doubling for
-plus/minus1. The request reduction must be compared with direct sign handling
-before attributing it to useful cache reuse or interpreting cost.
+[Executed report](../../research/quadratic_twist_evidence_20261021/reports/direct-sign-20261025/README.md):
+120 setups/1200 source scalars, all ordered operand tests/lifts/rows/certificates
+preserved;7 rehashed controls reject. Direct signs use two fewer cold point-add
+requests than cache in all400 comparisons; cache uses fewer negations in all400.
+First main additions125/45/47 and twist136/40/42 for binary/direct/cached.
 
-Preregister three arms: frozen binary signs, direct uncached signs (P or -P),
-and the setup-validated signed cache. Keep40 setups/400 separate source targets
-per arm, all ten policies and four roles:120 setups/1200 paired scalar checks.
-Name construction, sign/point validation, reads and target-dependent requests;
-include every setup/cold cost. Preserve every ordered lift, root, certificate,
-degree, row/rank, failed shift, base log and main-source scalar. Recovery receives
-Q only. Use the existing general group/list proof faithfully; independently
-replay actual points and counters. Keep false-sign/point, stale-source, missing
-failed-query and false-scalar controls. Retain ties/losses; a changed component
-profile is not an overall ranking or speedup. Nativecap600s/iteration3600s,
-existing local resources only, no paid compute/upload/credential reuse.
-
-The future run-direct-sign.sh does not yet exist. Draft status means implement
-and preregister, not stop the investigation. Main-ancestry/Cairn gates remain;
-no task lease, funding or publication is claimed. Broader encoding, useful-yield,
-geometry and fully calibrated reference obligations remain open.
+This refines reference quality, not a calibrated speed result. Existing faithful
+Lean group/list/recovery proofs are reused unchanged;191 public/249 audited,
+0 extra trusted. The card stays **draft** for main-ancestry/Cairn routing; no task
+lease/funding/publication claimed. Next return to an actual non-isomorphic
+degree-two twist transfer, model registration, and useful S3 rows/degrees.

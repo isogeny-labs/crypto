@@ -198,10 +198,31 @@ def twist_signed_cache(ref):
                  better="lower", label="F43 prefix/Q=P cold point requests; unpriced", source=path)
 
 
+def twist_direct_sign(ref):
+    """Emit exact component counts; no claim of an overall cost ranking."""
+    path = "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    text = show(ref, path)
+    if text is None:
+        return
+    d = json.loads(text)
+    if d.get("status") != "passed":
+        return
+    emit("ic.twist.direct_sign.verified_targets", d["verified"], date="2026-10-25",
+         problem=P_IC, unit="verified separate recoveries", better="higher", source=path)
+    for arm in ("binary", "cached", "direct"):
+        for role in ("main", "twist"):
+            for key in ("point_add_requests", "point_negations"):
+                value = d["first_policy_target"][arm][role]["cold"][key]
+                emit(f"ic.twist.direct_sign.{arm}.{role}.prefix_target1.{key}", value,
+                     date="2026-10-25", problem=P_IC, unit=key, better="lower",
+                     label="F43 prefix/Q=P cold component; unpriced", source=path)
+
+
 def main():
     a = args()
     twist_known_roots(a.ref)
     twist_signed_cache(a.ref)
+    twist_direct_sign(a.ref)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
     perf_history(a.since)

@@ -3,7 +3,7 @@
   "id": "XP-20261025-direct-sign-reference",
   "title": "Compare direct uncached signs against the charged signed cache",
   "status": "draft",
-  "status_note": "Next unexecuted draft. Preregister all three arms, exact sign semantics/reads/validation charges and coverage before execution. No Cairn lease or promotion claimed.",
+  "status_note": "Executed locally in PR2381:120 setups/1200 source checks, equal complete operand/lift traces, seven rehashed controls. Direct saves two cold additions versus cache, cache saves negations. Draft for main-ancestry/Cairn routing; no lease/publication claimed.",
   "created": "2026-10-25",
   "authors": [
     "research reasoning lane"
@@ -22,7 +22,7 @@
         "--release",
         "--locked",
         "--manifest-path",
-        "research/quadratic_twist_evidence_20261021/native/signed-cache-audit/Cargo.toml"
+        "research/quadratic_twist_evidence_20261021/native/direct-sign-audit/Cargo.toml"
       ]
     ]
   },
@@ -67,7 +67,7 @@
     ],
     "env": {
       "name": "crypto-rust",
-      "recipe": "Draft: preserve binary and cached references, add direct uncached signs with precise request charges and independent ordered-lift/scalar checks."
+      "recipe": "Executed local three-arm evidence linked in notes; draft routing only, no task lease/publication."
     },
     "exec": {
       "cpus": 2,
@@ -85,7 +85,9 @@
   },
   "outputs": {
     "result_schema": "quadratic-twist-direct-sign/v1",
-    "verify": [],
+    "verify": [
+      "bash research/quadratic_twist_evidence_20261021/run-direct-sign.sh {out}/replay"
+    ],
     "land": "research/quadratic_twist_evidence_20261021"
   },
   "links": {
@@ -95,7 +97,9 @@
     "lead": "crypto-autoresearcher:LEAD-ICE-charged-toy-ic-exponent-vs-rho",
     "notes": [
       "research/quadratic_twist_evidence_20261021/reports/signed-cache-20261025/README.md",
-      "research/quadratic_twist_evidence_20261021/CONTINUATION.md"
+      "research/quadratic_twist_evidence_20261021/CONTINUATION.md",
+      "research/quadratic_twist_evidence_20261021/DIRECT_SIGN_20261025_PROTOCOL.md",
+      "research/quadratic_twist_evidence_20261021/reports/direct-sign-20261025/README.md"
     ]
   },
   "blocked_on": []

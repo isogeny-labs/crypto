@@ -200,9 +200,14 @@ and certificates. All400 cached cold records reduce point-add requests relative
 to the frozen binary loop; first main125->47/twist136->42 including validation.
 Nine new public Lean theorems prove group/list/recovery implications and actual
 F43 cache/logs;191 public/249 audited declarations,0 extra trusted. This remains
-an unpriced request change. The old loop includes unused final doublings; the
-[next direct-sign draft](../backlog/XP-20261025-direct-sign-reference/README.md)
-adds a stronger uncached reference while preserving both old arms.
+an unpriced request change. The old loop includes unused final doublings. The
+[direct-sign comparison](../research/quadratic_twist_evidence_20261021/reports/direct-sign-20261025/README.md)
+is now executed:120 setups/1200 scalar checks with equal ordered operand/lift
+traces. Direct uses2 fewer cold additions than cache in all400 records; cache
+uses fewer negations, so no overall ranking is established. Existing191/249
+proofs/16 identities remain unchanged. The [next degree-two twist draft](../backlog/XP-20261025-cm8-quadratic-transfer/README.md)
+uses already registered F13 models, strict metadata preservation and actual
+exceptional-case/subgroup transfer before a non-isomorphic S3 comparison.
 
 The [executed adaptive-S3 round](../research/quadratic_twist_evidence_20261021/reports/adaptive-s3-20261025/README.md)
 checks the named row-reinsertion solver on all98 prior cases,188 comparisons

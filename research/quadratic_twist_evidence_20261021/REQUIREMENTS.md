@@ -55,9 +55,10 @@
 | Complete-work improvement from checked roots | not priced |32 differently weighted request components; sorting and other overhead unpriced; no speed/GAE/S claim |
 | Signed base point cache | executed and independently replayed |80 paired setups/800 scalars; all400 candidate cold point-add counts lower than binary reference; first main125->47/twist136->42, cache validation included; seven controls reject |
 | Cached-lift/source proof | kernel checked |9 new public theorems,191 public/249 audited total,0 extra trusted; actual F43 cache/logs and arbitrary/repeated column recovery |
-| Direct uncached sign reference | next unexecuted draft | `backlog/XP-20261025-direct-sign-reference`; old binary loop includes unused doublings, so complete-cache advantage remains open |
+| Direct uncached sign reference | executed and independently replayed |120 setups/1200 source checks, equal ordered operand/lift traces/certificates; direct saves2 cold adds in all400 comparisons, cache saves negations; no total ranking |
+| Non-isomorphic degree-two twist route | next unexecuted construction draft | `backlog/XP-20261025-cm8-quadratic-transfer`; already registered F13 models; exceptional point map, subgroup transport and actual S3 comparison required |
 
-The fresh library suite for the signed-cache continuation again passes 4,479
+The fresh library suite for the direct-sign continuation again passes 4,479
 tests with zero failures and 119 existing ignores; its 22 backend and four
 workflow metadata tests pass. Earlier library and 39/40 metadata-backend
 receipts remain historical records for their original source states.

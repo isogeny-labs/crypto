@@ -78,14 +78,19 @@ setups/800 scalars, identical ordered lifts/certificates and7 rehashed controls.
 All400 cached cold records use fewer point-add requests than the binary
 reference; first main125->47 and twist136->42, with setup included. The old
 loop includes unused doublings, so the next [direct-sign reference draft](../../backlog/XP-20261025-direct-sign-reference/README.md)
-keeps both old arms and adds uncached direct signs before a cache-cost verdict.
+keeps both old arms and adds uncached direct signs. That comparison is now
+[executed](reports/direct-sign-20261025/README.md):120 setups/1200 source checks,
+identical ordered operand/lift/certificate behavior; direct has two fewer cold
+additions than cache in all400 records, while cache has fewer negations. No
+overall cost ranking follows. The next [registered F13 degree-two transfer draft](../../backlog/XP-20261025-cm8-quadratic-transfer/README.md)
+returns to actual non-isomorphic transfer and useful S3 yield/degree, using already registered exact models and explicit exceptional-case/subgroup checks.
 A non-isomorphic twist comparison still needs an explicit scalar-preserving
 subgroup map or pairing-mediated route before claiming main-DLP benefit;
 base-field rational points must not be silently transported by a generic twist.
 
 | Work item | Next checkable deliverable | Evidence needed before promotion |
 | --- | --- | --- |
-| Solver relevance | Compare direct uncached signs with both frozen binary and cached arms | Preregister and independently verify120 setups/1200 separate recoveries, charge all sign/read/cache costs, preserve order and failures; complete pricing remains |
+| Solver relevance / actual transfer | Construct the standard degree-two twist map on an exact coprime subgroup, then compare actual S3 systems | Reuse exact registered models and preserve strict catalog/provenance; prove/check exceptional map and scalar transport, independent useful rank/degree and full source recovery; direct/cached costs remain unpriced |
 | Alternative encoding | Specify an actual descent/rationality encoding and test whether its leading ideal can differ | Exact field/subgroup/map, actual-point lifting, matched-base/pullback controls, bounded native comparison and faithful Lean statements |
 | Useful yield | Test or prove the yield of rank-increasing rows under an explicit candidate/target policy | Full rank progression, failed attempts and dependence assumptions; raw zeros and multiple rows per call remain distinct |
 | Main-DLP benefit | Combine a surviving candidate with a scalar-preserving reduction and complete work accounting | Setup, relation solving, linear algebra, descent, transfer, recovery and verification on the same public synthetic target; applicable external references for any speed claim |
