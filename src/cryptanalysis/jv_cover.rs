@@ -4015,7 +4015,12 @@ mod tests {
         let full = jv_options(24, 120.0);
         let hil = jv_options(24, 120.0).stopping_by_hilbert(1);
         let (mut applied, mut fallbacks, mut n) = (0, 0, 0);
-        for k in 0..40 {
+        // Some residuals are degenerate or exhaust a solver budget. Keep
+        // sampling until the comparison includes 30 completed residuals.
+        for k in 0..80 {
+            if n >= 30 {
+                break;
+            }
             let r = if k % 2 == 0 {
                 planted(&jac, &base, &mut rng).0
             } else {
