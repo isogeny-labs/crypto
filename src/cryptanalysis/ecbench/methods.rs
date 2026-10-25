@@ -471,6 +471,25 @@ pub fn registry() -> &'static [MethodDecl] {
             ],
         },
         MethodDecl {
+            id: "transfer.ghs_cover",
+            family: "rho",
+            summary: "carry the instance by the GHS conorm–norm map Φ : E(F_{q³}) → Jac_H(F_q), q = p², into the Jacobian of the genus-3 hyperelliptic cover (Joux–Vitse curves), solve it there with a generic inner method, check [k]G = Q on E; cover, transfers and solve counted in F_p multiplications and charged at c_E, one affine addition on E measured in the run; ghs_fp6 curves only",
+            entry: "ecbench::ghs_cover::transfer (jv_cover::Cover::transfer)",
+            applies: Applies::Any,
+            params: &[
+                ParamDecl {
+                    name: "inner",
+                    default: Some("rho.negation"),
+                    help: "the generic method run on Jac_H(F_q): rho.plain, rho.negation, bsgs.textbook, bsgs.interleaved, bsgs.negation or kangaroo.vow",
+                },
+                ParamDecl {
+                    name: "cap_multiple",
+                    default: Some("64"),
+                    help: "the inner rho or kangaroo's step cap, in multiples of √r",
+                },
+            ],
+        },
+        MethodDecl {
             id: "ic.hyperelliptic",
             family: "ic",
             summary: "Adleman–DeMarrais–Huang / Gaudry index calculus on a genus-2 Jacobian (genus2 workloads): factor base of degree-1 places, factor-base walk, smoothness by gcd, sparse elimination mod r; Jacobian group operations charged, field and row operations unpriced",
@@ -1409,7 +1428,9 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         ));
     }
     match inst {
-        Instance::Genus2(_) | Instance::Quartic(_) => jacobian_applicable(id, inst, curve),
+        Instance::Genus2(_) | Instance::Quartic(_) | Instance::Ghs(_) => {
+            jacobian_applicable(id, m.params.get("inner").map(String::as_str), inst, curve)
+        }
         Instance::Wide(wi) => match id {
             "rho.signed_frobenius_strong"
             | "rho.signed_frobenius_strong_legacy"
@@ -1448,6 +1469,10 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         Instance::Prime(i) if id == "transfer.quartic_cover" => {
             quartic_cover_applicable(m, i).map(|_| ())
         }
+        _ if id == "transfer.ghs_cover" => Err(format!(
+            "`transfer.ghs_cover` runs on ghs_fp6 curves only; {} is {}",
+            curve.slug, curve.family
+        )),
         _ if id == "transfer.quartic_cover" => Err(format!(
             "`transfer.quartic_cover` runs on prime-field curves only; {} is {}",
             curve.slug, curve.family
@@ -1510,7 +1535,7 @@ pub fn solve(
     let mut rep = if let Instance::Wide(wi) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
         solve_wide(m, wi, tx, ty, seed)?
-    } else if matches!(inst, Instance::Genus2(_) | Instance::Quartic(_)) {
+    } else if matches!(inst, Instance::Genus2(_) | Instance::Quartic(_) | Instance::Ghs(_)) {
         solve_jacobian(m, inst, curve, target, seed)?
     } else {
         let (tx, ty) = (parse_hex(&target[0])?, parse_hex(&target[1])?);
@@ -1735,7 +1760,8 @@ fn solve_inner(
         | (Instance::Fp4(_), _)
         | (Instance::Ext(_), _)
         | (Instance::Genus2(_), _)
-        | (Instance::Quartic(_), _) => {
+        | (Instance::Quartic(_), _)
+        | (Instance::Ghs(_), _) => {
             unreachable!("returned above")
         }
     }
@@ -1758,7 +1784,12 @@ const NEEDS_FREE_NEGATION: &[&str] = &["rho.negation", "bsgs.negation"];
 
 /// Which methods run on a Jacobian (`ecbench::jacobian`,
 /// `ecbench::plane_quartic`), and why the others do not.
-fn jacobian_applicable(id: &str, inst: &Instance, curve: &CurveFacts) -> Result<(), String> {
+fn jacobian_applicable(
+    id: &str,
+    m_inner: Option<&str>,
+    inst: &Instance,
+    curve: &CurveFacts,
+) -> Result<(), String> {
     let quartic = matches!(inst, Instance::Quartic(_));
     if quartic && NEEDS_FREE_NEGATION.contains(&id) {
         return Err(format!(
@@ -1770,6 +1801,13 @@ fn jacobian_applicable(id: &str, inst: &Instance, curve: &CurveFacts) -> Result<
         return Ok(());
     }
     if id == "ic.hyperelliptic" && matches!(inst, Instance::Genus2(_)) {
+        return Ok(());
+    }
+    if id == "transfer.ghs_cover" && matches!(inst, Instance::Ghs(_)) {
+        let inner = m_inner.unwrap_or("rho.negation");
+        if !JACOBIAN_GENERIC.contains(&inner) || inner == "rho.frozen_reference" {
+            return Err(format!("`inner` must be a generic method, not `{inner}`"));
+        }
         return Ok(());
     }
     Err(format!(
@@ -1794,7 +1832,7 @@ fn solve_jacobian(
     target: &[String; 2],
     seed: u64,
 ) -> Result<SolveReport, String> {
-    jacobian_applicable(&m.id, inst, curve)?;
+    jacobian_applicable(&m.id, m.params.get("inner").map(String::as_str), inst, curve)?;
     match inst {
         Instance::Genus2(i) => {
             let t = i.decode(target)?;
@@ -1806,6 +1844,15 @@ fn solve_jacobian(
         Instance::Quartic(i) => {
             let t = crate::cryptanalysis::ecbench::plane_quartic::decode(&i.jac, target)?;
             solve_generic(m, &i.group(), i.generator, t, i.r, seed)
+        }
+        Instance::Ghs(i) => {
+            let t = i.decode(target)?;
+            if m.id == "transfer.ghs_cover" {
+                return solve_ghs_cover(m, i, t, seed);
+            }
+            let f = i.field();
+            let g = crate::cryptanalysis::ecbench::ghs_cover::GhsCurveGroup(i.curve(&f));
+            solve_generic(m, &g, i.generator, t, i.l, seed)
         }
         _ => Err("not a Jacobian".into()),
     }
@@ -2026,6 +2073,89 @@ fn solve_quartic_cover(
             "c_e_field_muls_per_add": c_e,
             "base_point_b": [format!("{:#x}", b.x), format!("{:#x}", b.y)],
             "field_muls": {"cover_setup": setup_muls, "transfer": transfer_muls, "solve": solve_muls},
+            "e_adds_per_jacobian_op": if jac_ops > 0.0 { converted(solve_muls) / jac_ops } else { 0.0 },
+        },
+        "inner": inner_id,
+        "inner_detail": rep.detail,
+    });
+    rep.solve_wall_ns = t.elapsed().as_nanos() as u64;
+    Ok(rep)
+}
+
+/// `transfer.ghs_cover`: build the genus-3 cover of a `ghs_fp6` curve,
+/// carry `G` and `Q` by `Φ`, solve on `Jac_H(F_q)` with the inner generic
+/// method, check the answer on `E`.  The unit stays one affine addition
+/// on `E`: the tower's counter of `F_p` multiplications, divided by `c_E`
+/// measured here with the same counter.  Phases: `transfer` (the cover
+/// and `Φ(G)`, `Φ(Q)`), `target:solve` and `verify` (`[k]G` on `E`).
+fn solve_ghs_cover(
+    m: &ResolvedMethod,
+    inst: &crate::cryptanalysis::ecbench::ghs_cover::GhsInstance,
+    target: crate::cryptanalysis::jv_cover::PtE6,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use crate::cryptanalysis::ecbench::ghs_cover::{
+        affine_add_cost, transfer, GhsCurveGroup, GhsJacobianGroup,
+    };
+    use crate::cryptanalysis::jv_cover::Hyp;
+    let t = Instant::now();
+    let f = inst.field();
+    let ec = inst.curve(&f);
+    let h = ec.mul(&inst.generator, 7);
+    let c_e = affine_add_cost(&f, &ec, &inst.generator, &h);
+    if !(c_e > 0.0) {
+        return Err("c_E could not be measured".into());
+    }
+    let m0 = f.muls();
+    let (cov, gj, qj) = transfer(&f, inst, &target)?;
+    let transfer_muls = f.muls() - m0;
+    let inner_id = m.params["inner"].clone();
+    let mut inner_params = BTreeMap::new();
+    if inner_id.starts_with("rho.") || inner_id == "kangaroo.vow" {
+        inner_params.insert("cap_multiple".to_string(), m.params["cap_multiple"].clone());
+    }
+    let inner = ResolvedMethod {
+        id: inner_id.clone(),
+        params: inner_params,
+        ..m.clone()
+    };
+    let grp = GhsJacobianGroup(Hyp {
+        f: &f.f,
+        h: cov.hx.clone(),
+        g: 3,
+    });
+    let m1 = f.muls();
+    let mut rep = solve_generic(&inner, &grp, gj, qj, inst.l, seed)?;
+    let solve_muls = f.muls() - m1;
+    let jac_ops = rep.total_gae;
+    let mut verify = GroupOps::default();
+    if let Some(k) = rep.recovered {
+        let e = GhsCurveGroup(inst.curve(&f));
+        let kg = e.mul(&mut verify, inst.generator, (k % u128::from(inst.l)) as u64);
+        if kg != target {
+            rep.recovered = None;
+        }
+    }
+    let converted = |muls: u64| muls as f64 / c_e;
+    let mut tr = ops_phase("transfer", GroupOps::default());
+    tr.gae = converted(transfer_muls);
+    tr.native.insert("field_muls".into(), transfer_muls);
+    let mut solve = ops_phase("target:solve", GroupOps::default());
+    solve.gae = converted(solve_muls);
+    solve.native.insert("field_muls".into(), solve_muls);
+    solve.native.insert("jacobian_ops".into(), jac_ops as u64);
+    rep.phases = vec![tr, solve, ops_phase("verify", verify)];
+    rep.total_gae = rep.phases.iter().map(|p| p.gae).sum();
+    rep.counters.insert("jacobian_ops".into(), jac_ops as u64);
+    rep.counters
+        .insert("jacobian_field_muls".into(), transfer_muls + solve_muls);
+    rep.unpriced = unpriced_of(&rep.counters);
+    rep.field_ops = None;
+    rep.detail = json!({
+        "ghs_cover": {
+            "cover": "H : y^2 = F(x) N(x) over F_{p^2}, genus 3 (jv_cover::Cover)",
+            "c_e_field_muls_per_add": c_e,
+            "field_muls": {"transfer": transfer_muls, "solve": solve_muls},
             "e_adds_per_jacobian_op": if jac_ops > 0.0 { converted(solve_muls) / jac_ops } else { 0.0 },
         },
         "inner": inner_id,
@@ -3745,6 +3875,9 @@ pub fn dump_factor_base(
     if let Instance::Fp4(_) = &inst {
         return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
     }
+    if let Instance::Ghs(_) = &inst {
+        return Err("no factor-base plug-in runs on a ghs_fp6 curve".into());
+    }
     if let Instance::Genus2(_) | Instance::Quartic(_) = &inst {
         return Err(
             "no factor-base plug-in runs on a Jacobian; ic.hyperelliptic builds its own".into(),
@@ -3858,7 +3991,8 @@ pub fn dump_factor_base(
         | Instance::F2m4(_)
         | Instance::Ext(_)
         | Instance::Genus2(_)
-        | Instance::Quartic(_) => unreachable!("returned above"),
+        | Instance::Quartic(_)
+        | Instance::Ghs(_) => unreachable!("returned above"),
     }
 }
 

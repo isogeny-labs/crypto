@@ -56,6 +56,7 @@ pub mod fp4;
 pub mod frontier;
 pub mod full_price;
 pub mod generic;
+pub mod ghs_cover;
 pub mod gpu;
 pub mod host;
 pub mod isogeny;

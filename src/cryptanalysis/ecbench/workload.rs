@@ -23,6 +23,7 @@ use crate::cryptanalysis::ecbench::conductor_gap::{self, GapLevel};
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::Fp4Instance;
 use crate::cryptanalysis::ecbench::jacobian::Genus2Instance;
+use crate::cryptanalysis::ecbench::ghs_cover::GhsInstance;
 use crate::cryptanalysis::ecbench::plane_quartic::QuarticInstance;
 use crate::cryptanalysis::ecbench_large_prime::binary_explicit_instance;
 use crate::cryptanalysis::gaudry_quartic::Pt4;
@@ -195,6 +196,21 @@ pub enum CurveSpec {
         f: [u64; 15],
         group_order: u64,
         r: u64,
+        generator: [String; 2],
+    },
+    /// `ghs_cover::GhsInstance::search(p, seed)`: `E : y² = x(x − α)(x −
+    /// σα)` over `F_{q³}`, `q = p²`, `α ∉ F_q`, `#E = 4ℓ` with `ℓ` prime,
+    /// whose GHS cover is a genus-3 hyperelliptic curve over `F_q`
+    /// (`jv_cover::generate_spec`; prime `11 ≤ p ≤ 1,600`, `p ≠ 3`).  A
+    /// coordinate is its six base-`p` digits packed in one word.  Its own
+    /// `ghs-…` slug: the tower is not one `F_p`-modulus, so no ICV1 name.
+    GhsFp6Search { p: u64, seed: u64 },
+    /// The same curve given outright: `α`'s six digits (`F_q` coefficient
+    /// of `1, θ, θ²`, each `c₀ + c₁t`), `ℓ` trusted, `G` checked.
+    GhsFp6Explicit {
+        p: u64,
+        alpha: [u64; 6],
+        l: u64,
         generator: [String; 2],
     },
 }
@@ -435,6 +451,15 @@ impl CurveSpec {
                 ref generator,
             } => QuarticInstance::explicit(p, f, group_order, r, generator)
                 .map(|i| Instance::Quartic(Box::new(i))),
+            CurveSpec::GhsFp6Search { p, seed } => {
+                GhsInstance::search(p, seed).map(|i| Instance::Ghs(Box::new(i)))
+            }
+            CurveSpec::GhsFp6Explicit {
+                p,
+                alpha,
+                l,
+                ref generator,
+            } => GhsInstance::explicit(p, alpha, l, generator).map(|i| Instance::Ghs(Box::new(i))),
         }
     }
 
@@ -488,6 +513,12 @@ impl CurveSpec {
                 f: i.jac.f,
                 group_order: i.group_order,
                 r: i.r,
+                generator: i.encode(&i.generator),
+            }),
+            Instance::Ghs(i) => Some(CurveSpec::GhsFp6Explicit {
+                p: i.p,
+                alpha: i.alpha_digits(),
+                l: i.l,
                 generator: i.encode(&i.generator),
             }),
             Instance::Binary(_)
@@ -572,6 +603,10 @@ impl CurveSpec {
             CurveSpec::PlaneQuarticExplicit { p, f, .. } => {
                 format!("QuarticJacobian::new({p}, {f:?}) (explicit)")
             }
+            CurveSpec::GhsFp6Search { p, seed } => format!("ghs_cover::GhsInstance::search({p}, {seed})"),
+            CurveSpec::GhsFp6Explicit { p, alpha, .. } => {
+                format!("GHS curve over F_{{{p}^6}}, α = {alpha:?} (explicit)")
+            }
         }
     }
 }
@@ -596,6 +631,9 @@ pub enum Instance {
     Genus2(Box<Genus2Instance>),
     /// The Jacobian of a smooth plane quartic (`ecbench::plane_quartic`).
     Quartic(Box<QuarticInstance>),
+    /// An elliptic curve over `F_{p⁶}` with a genus-3 GHS cover
+    /// (`ecbench::ghs_cover`).
+    Ghs(Box<GhsInstance>),
 }
 
 /// A wide Koblitz curve and the strong reference's arithmetic on it, which
@@ -797,6 +835,7 @@ impl Instance {
             Instance::Ext(i) => u128::from(i.r()),
             Instance::Genus2(i) => u128::from(i.r),
             Instance::Quartic(i) => u128::from(i.r),
+            Instance::Ghs(i) => u128::from(i.l),
         }
     }
 
@@ -836,6 +875,25 @@ impl Instance {
                 r: u128::from(r),
                 cofactor: u128::from(h),
                 generator,
+                automorphisms_available: 2,
+                registered: false,
+                ec1: None,
+                curve_uid: None,
+            };
+        }
+        if let Instance::Ghs(i) = self {
+            let (icv1, slug) = i.names();
+            return CurveFacts {
+                slug,
+                icv1,
+                family: "ghs_fp6".into(),
+                construction: spec.call(),
+                field_degree: Some(6),
+                field_bits: Some(64 - i.p.leading_zeros()),
+                group_order: u128::from(i.group_order()),
+                r: u128::from(i.l),
+                cofactor: 4,
+                generator: i.encode(&i.generator),
                 automorphisms_available: 2,
                 registered: false,
                 ec1: None,
@@ -910,7 +968,11 @@ impl Instance {
                 u128::from(i.generator.y),
                 if i.koblitz.is_some() { 2 * i.n } else { 2 },
             ),
-            Instance::Fp4(_) | Instance::Ext(_) | Instance::Genus2(_) | Instance::Quartic(_) => {
+            Instance::Fp4(_)
+            | Instance::Ext(_)
+            | Instance::Genus2(_)
+            | Instance::Quartic(_)
+            | Instance::Ghs(_) => {
                 unreachable!("returned above")
             }
             Instance::Wide(i) => (
@@ -1027,6 +1089,9 @@ impl Instance {
         if let Instance::Quartic(i) = self {
             return i.mul_generator_hex(k);
         }
+        if let Instance::Ghs(i) = self {
+            return i.mul_generator_hex(k);
+        }
         match self {
             Instance::Prime(i) => {
                 let p = i.curve.mul(&mut scratch, i.generator_point(), k);
@@ -1062,7 +1127,8 @@ impl Instance {
             | Instance::Fp4(_)
             | Instance::Ext(_)
             | Instance::Genus2(_)
-            | Instance::Quartic(_) => {
+            | Instance::Quartic(_)
+            | Instance::Ghs(_) => {
                 unreachable!("returned above")
             }
         }
@@ -1145,6 +1211,11 @@ impl Instance {
                     }
                 }
                 Instance::Quartic(i) => {
+                    if let Some(t) = i.hash_to_subgroup_hex(h) {
+                        return Some((t, counter));
+                    }
+                }
+                Instance::Ghs(i) => {
                     if let Some(t) = i.hash_to_subgroup_hex(h) {
                         return Some((t, counter));
                     }

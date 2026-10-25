@@ -92,7 +92,8 @@ pub fn profile_of(inst: &Instance) -> CurveProfile {
         | Instance::Fp4(_)
         | Instance::Ext(_)
         | Instance::Genus2(_)
-        | Instance::Quartic(_) => {
+        | Instance::Quartic(_)
+        | Instance::Ghs(_) => {
             CurveProfile::other(0.0, 0.0, 0)
         }
     }
