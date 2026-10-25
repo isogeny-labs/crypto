@@ -1,0 +1,43 @@
+{
+  "arm": {
+    "autodisablegauss": 1,
+    "branchstr": "vmtf+vsids",
+    "id": "gray_A1",
+    "input": "gray_5_1"
+  },
+  "command": [
+    "/opt/homebrew/bin/cryptominisat5",
+    "--verb",
+    "1",
+    "--verbstat",
+    "1",
+    "--threads",
+    "1",
+    "--random",
+    "0",
+    "--maxtime",
+    "120",
+    "--maxconfl",
+    "1000000",
+    "--printsol",
+    "1",
+    "--branchstr",
+    "vmtf+vsids",
+    "--autodisablegauss",
+    "1",
+    "/private/tmp/n83-xcnf-20261025/gray_5_1/instance.xcnf"
+  ],
+  "conflicts": null,
+  "exit_code": -9,
+  "peak_child_rss_upper_bound_bytes_Darwin": 296910848,
+  "schema": "n83.external-xor-heuristic-arm/v1",
+  "selected_best_total_runtime": null,
+  "solver_binary_sha256": "a3f85c3709b5e2a040bf82a4a604d1c7b9f10219bbf180a9e0f72319a2e892ac",
+  "status": "WATCHDOG",
+  "stderr_bytes": 0,
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_bytes": 230129,
+  "stdout_sha256": "30f8d37d0eaebef2aa6a32385698e36c22dd0cfcd88c8af03a388db482f5275d",
+  "wall_seconds_L0": 140.0537719999993,
+  "xcnf_sha256": "220eaeb04a43ee8c853b637d6255420e2e341c6bb3e5f3588ca1295529b327e9"
+}
