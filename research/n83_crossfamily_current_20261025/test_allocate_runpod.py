@@ -1,5 +1,6 @@
 """Check budgeted allocation, provider identity and cleanup gates offline."""
 
+import io
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -17,11 +18,13 @@ BUNDLE = {"source_head_sha": HEAD,
 
 
 class FakeProvider:
-    def __init__(self, duplicate_machine=False, lose_second_response=False):
+    def __init__(self, duplicate_machine=False, lose_second_response=False,
+                 wrong_gpu=False):
         self.live = []
         self.terminated = []
         self.duplicate_machine = duplicate_machine
         self.lose_second_response = lose_second_response
+        self.wrong_gpu = wrong_gpu
 
     def pods(self, _key):
         return list(self.live)
@@ -33,13 +36,18 @@ class FakeProvider:
         name = f"n83-crossfamily-{HEAD[:12]}-s{stratum}"
         if name not in query:
             raise ValueError("unexpected Pod name")
+        if subject.GPU_TYPES[stratum] not in query:
+            raise ValueError("unexpected GPU type")
         pod = {
             "id": f"pod{stratum}", "name": name,
-            "desiredStatus": "RUNNING", "costPerHr": 0.27,
+            "desiredStatus": "RUNNING",
+            "costPerHr": 0.34,
             "createdAt": "2026-10-25T02:00:00Z",
             "machineId": "machine0" if self.duplicate_machine else f"machine{stratum}",
             "memoryInGb": 27, "vcpuCount": 4,
             "imageName": subject.IMAGE, "gpuCount": 1,
+            "machine": {"gpuTypeId": "wrong" if self.wrong_gpu else
+                        subject.GPU_TYPES[stratum]},
             "containerDiskInGb": 30, "volumeInGb": 0,
         }
         self.live.append(pod)
@@ -76,7 +84,9 @@ class AllocateTests(unittest.TestCase):
             snapshot = json.loads(snapshot_path.read_text())
             self.assertEqual(len({p["machine_id"] for p in snapshot["pods"]}), 2)
             self.assertEqual(snapshot['projected_compute_and_container_disk_usd'],
-                             '3.30')
+                             '4.14')
+            self.assertEqual([p['gpu_type_id'] for p in snapshot['pods']],
+                             list(subject.GPU_TYPES))
             for stratum in range(2):
                 allocation = json.loads((output / f"allocation_s{stratum}.json").read_text())
                 self.assertEqual(allocation["snapshot_sha256"],
@@ -110,6 +120,17 @@ class AllocateTests(unittest.TestCase):
             failure = json.loads((output / "allocation_failure.json").read_text())
             self.assertEqual(failure["status"], "FAILED_ALLOCATIONS_TERMINATED")
 
+    def test_wrong_gpu_is_retired(self):
+        provider = FakeProvider(wrong_gpu=True)
+        with tempfile.TemporaryDirectory() as temp, patch.object(
+                subject, "frozen_head", return_value=HEAD):
+            with self.assertRaisesRegex(ValueError, "host or price cap"):
+                subject.allocate(Path(temp) / "allocation", "fake", BUNDLE,
+                                 provider.api, provider.pods, provider.terminate,
+                                 guard=lambda _: SimpleNamespace(poll=lambda: None))
+            self.assertEqual(provider.terminated, ["pod0"])
+            self.assertEqual(provider.live, [])
+
     def test_lost_mutation_response_retains_uncertainty(self):
         provider = FakeProvider(lose_second_response=True)
         with tempfile.TemporaryDirectory() as temp, patch.object(
@@ -122,6 +143,16 @@ class AllocateTests(unittest.TestCase):
             self.assertEqual(set(provider.terminated), {"pod0", "pod1"})
             failure = json.loads((output / "allocation_failure.json").read_text())
             self.assertEqual(failure["status"], "UNRESOLVED_PROVIDER_MUTATION")
+            self.assertEqual(failure["error_detail"],
+                             "response lost after provider mutation")
+
+    def test_provider_error_retains_reason_without_api_key(self):
+        response = io.BytesIO(json.dumps({"errors": [{"message":
+            "No qualifying host for fixture-key"}]}).encode())
+        with patch.object(subject.url_request, "urlopen", return_value=response):
+            with self.assertRaisesRegex(ValueError, "No qualifying host") as caught:
+                subject.graphql("query { myself { id } }", "fixture-key")
+        self.assertNotIn("fixture-key", str(caught.exception))
 
 
 if __name__ == "__main__":

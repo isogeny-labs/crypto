@@ -53,19 +53,23 @@ the full historical exclusion inventory, and four manifests before any
 provider mutation. It requires a verified source bundle before `--execute`.
 The Pod runner checks sealed file hashes, canonical
 single-target workload IDs, subgroup membership, and all 16 scalar replays
-without needing the repository's historical Git objects. Its two 27 GiB, four-vCPU
-minimum allocations each require an observed rate at most $0.30/hour and a
-provider `terminateAfter` deadline of 360 minutes, a separate local
-termination watcher armed before allocation, and a Pod-side `runpodctl`
-self-termination task armed before computation. The provider setting alone is
-not an enforced expiry; the two watchers independently request deletion at
-the deadline and retain retry/absence receipts. If both watchers and provider
-access fail, the $5 projection is not a guaranteed account billing ceiling.
-Each Pod requests exactly
-30 GB of container disk and zero persistent volume. The conservative
-six-hour projection is at most $3.66, including $3.60 at the two observed
-rate ceilings and $0.06 of container disk rounded upward using a 28-day
-month. This is below the $5 campaign cap. It reads a configured
+without needing the repository's historical Git objects. Both allocations
+request NVIDIA GeForce RTX 4090 community Pods, each with
+at least 27 GiB of system memory and four vCPUs. The allocator verifies the
+returned machine GPU types, distinct machine IDs, and observed rates at most
+$0.34/hour per Pod. It requests a provider `terminateAfter` deadline of 360
+minutes, arms a separate local deletion watcher before allocation, and starts
+a Pod-side `runpodctl` deletion task before computation. RunPod's provider
+setting alone is not an enforced expiry; the two watchers independently
+request deletion at the deadline and retain retry/absence receipts. If both
+watchers and provider access fail, the $4.20 projection is not a guaranteed
+account billing ceiling. Each Pod requests exactly 30 GB of container disk
+and zero persistent volume. The conservative six-hour projection at both rate
+ceilings is $4.14, including $4.08 of compute and $0.06 of container disk
+rounded upward using a 28-day month. The earlier A5000 and 3080 Ti requests
+returned provider errors without Pod IDs; subsequent provider readbacks found
+zero matching N83 Pods. This allocation retains the same host requirements.
+It reads a configured
 RunPod key from the process environment or `~/.runpod/config.toml`, never
 copies it into the receipts, verifies provider readback and distinct machine
 IDs, and attempts to terminate every discovered Pod if allocation fails.
