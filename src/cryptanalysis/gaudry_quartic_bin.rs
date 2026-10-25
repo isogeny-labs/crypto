@@ -211,9 +211,14 @@ impl Fq4 {
             c: [0; 4],
             zq: [Eb::ONE; 4],
         };
-        // z⁴ + c₁z + c₀ is an affine linearised polynomial in characteristic
-        // 2, often reducible for every (c₁, c₀); the z³ term avoids that.
-        for (c3, c1) in (0..2u16).flat_map(|c3| (0..fq.f.q as u16).map(move |c1| (c3, c1))) {
+        // For even m the c3=0 family is reducible; c3=c1=0 is a fourth
+        // power for every m. Excluding them preserves the first field.
+        // Proof: research/ic_algebraic_crossover_20261023/CONSTRUCTOR_EXCLUSION.md.
+        let first_c3 = if m.is_multiple_of(2) { 1 } else { 0 };
+        for (c3, c1) in (first_c3..2u16)
+            .flat_map(|c3| (0..fq.f.q as u16).map(move |c1| (c3, c1)))
+            .filter(|&(c3, c1)| c3 != 0 || c1 != 0)
+        {
             for c0 in 1..fq.f.q as u16 {
                 fq.c = [c0, c1, 0, c3];
                 let z = Eb([0, 1, 0, 0]);
@@ -2849,6 +2854,25 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn constructor_exclusion_preserves_frozen_even_and_odd_models() {
+        // Independent baseline executable outputs frozen before the change.
+        for (m, modulus, coefficients) in [
+            (4, 19, [2, 1, 0, 1]),
+            (5, 37, [1, 1, 0, 0]),
+            (6, 67, [2, 1, 0, 1]),
+            (7, 137, [1, 1, 0, 0]),
+            (8, 285, [7, 1, 0, 1]),
+            (9, 529, [1, 1, 0, 0]),
+            (10, 1033, [2, 1, 0, 1]),
+        ] {
+            let f = Fq4::new(m);
+            assert_eq!(f.f.modulus, modulus);
+            assert_eq!(f.c, coefficients);
+            assert_eq!(f.f.muls(), 0);
+        }
+    }
 
     fn random_point(c: &CurveB, rng: &mut StdRng) -> PtB {
         loop {
