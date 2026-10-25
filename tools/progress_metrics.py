@@ -177,6 +177,42 @@ def algebraic_stage(ref, since):
                      source=f"{path}@{commit}")
 
 
+def algebraic_audits(ref, since):
+    """Recorded finite correctness/relevance counts, never a performance index."""
+    study = "research/ic_algebraic_crossover_20261023/pipeline-receipts/"
+    sources = [
+        ("fresh-target-relevance-20261025/receipt.json", "ic-fresh-target-relevance/v1",
+         "status", "all_target_roots_and_trace_criteria_agree", [
+             (("totals", field), f"ic.algebraic.fresh-target.{field}",
+              f"fresh Boolean fixtures: {label} on E0 reference; subgroup unknown")
+             for field, label in [
+                 ("sat_liftable", "SAT, target liftable"),
+                 ("sat_nonliftable", "SAT, target nonliftable"),
+                 ("unsat_liftable", "UNSAT, target liftable"),
+                 ("unsat_nonliftable", "UNSAT, target nonliftable"),
+             ]]),
+        ("quartic-smoke-20261025-02.json", "ecbench.audit/v1", "ok", True, [
+            (("verified_records",), "ic.algebraic.quartic-smoke.verified_records",
+             "quartic m6/8/10/12 smoke: verified records; counted L0 only")]),
+        ("external-cas-strengthened-20261025/replay.json", "ic-cas-correctness-replay/v1",
+         "status", "all_external_zero_sets_equal", [
+             (("cases",), "ic.algebraic.external-cas.correctness_cases",
+              "finite systems with equal Singular/native Boolean zero sets; no speed comparison")]),
+    ]
+    for relative, schema, key, expected, fields in sources:
+        path = study + relative
+        for date, commit, txt in file_history(ref, path, since):
+            data = json.loads(txt)
+            if data.get("schema") != schema or data.get(key) != expected:
+                continue
+            for keys, metric, label in fields:
+                value = data
+                for part in keys:
+                    value = value.get(part) if isinstance(value, dict) else None
+                emit(metric, value, date=date, problem=P_IC, unit="count", better="neutral",
+                     label=label, source=f"{path}@{commit}")
+
+
 def main():
     a = args()
     leaderboard(a.ref, a.since)
@@ -185,6 +221,7 @@ def main():
     benchmarks(a.ref, a.since)
     e2e_runs(a.ref)
     algebraic_stage(a.ref, a.since)
+    algebraic_audits(a.ref, a.since)
 
 
 if __name__ == "__main__":
