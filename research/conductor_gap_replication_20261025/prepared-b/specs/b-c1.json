@@ -1,0 +1,138 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation",
+        "params": {}
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "cm-scalar-orbit:columns=4,length=32,abs_d=19,mode=scalar",
+          "linalg": "incremental-gauss",
+          "max_trials": "1000000",
+          "oracle": "mitm:negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "ic-scalar",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "cm-scalar-orbit:columns=4,length=32,abs_d=19,mode=recurrence",
+          "linalg": "incremental-gauss",
+          "max_trials": "1000000",
+          "oracle": "mitm:negation_folded=1",
+          "targets": "walk"
+        }
+      },
+      "name": "ic-recurrence",
+      "role": "candidate"
+    }
+  ],
+  "description": "Frozen conductor-gap replication; independent one-target solves, no shared setup; see PROTOCOL.md",
+  "label": "B: harder-kernel-field CM collector",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "shuffle",
+    "rounds": 1,
+    "seed": 2026102512,
+    "timeout_seconds": 120,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 136723475,
+        "b": 99645764,
+        "group_order": 320091991,
+        "gx": 2,
+        "gy": 73685980,
+        "kind": "prime_explicit",
+        "p": 320092037,
+        "r": 320091991
+      },
+      {
+        "a": 178725550,
+        "b": 173725748,
+        "group_order": 320091991,
+        "gx": 98,
+        "gy": 307112254,
+        "kind": "prime_explicit",
+        "p": 320092037,
+        "r": 320091991
+      },
+      {
+        "a": 310061413,
+        "b": 209323628,
+        "group_order": 320091991,
+        "gx": 5,
+        "gy": 75963310,
+        "kind": "prime_explicit",
+        "p": 320092037,
+        "r": 320091991
+      },
+      {
+        "a": 243466588,
+        "b": 114551940,
+        "group_order": 320091991,
+        "gx": 245,
+        "gy": 127960333,
+        "kind": "prime_explicit",
+        "p": 320092037,
+        "r": 320091991
+      },
+      {
+        "a": 216808245,
+        "b": 13238759,
+        "group_order": 320091991,
+        "gx": 1,
+        "gy": 40640129,
+        "kind": "prime_explicit",
+        "p": 320092037,
+        "r": 320091991
+      },
+      {
+        "a": 86944083,
+        "b": 278997586,
+        "group_order": 320091991,
+        "gx": 49,
+        "gy": 175606656,
+        "kind": "prime_explicit",
+        "p": 320092037,
+        "r": 320091991
+      },
+      {
+        "a": 318150013,
+        "b": 9306234,
+        "group_order": 320091991,
+        "gx": 1,
+        "gy": 89926705,
+        "kind": "prime_explicit",
+        "p": 320092037,
+        "r": 320091991
+      },
+      {
+        "a": 138580931,
+        "b": 154357326,
+        "group_order": 320091991,
+        "gx": 49,
+        "gy": 116024263,
+        "kind": "prime_explicit",
+        "p": 320092037,
+        "r": 320091991
+      }
+    ],
+    "target_kind": "planted_shared",
+    "target_seed": 2026102511,
+    "targets_per_curve": 16
+  }
+}

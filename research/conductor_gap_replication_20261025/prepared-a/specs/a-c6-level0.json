@@ -1,0 +1,70 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation",
+        "params": {}
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    }
+  ],
+  "description": "Frozen conductor-gap replication; independent one-target solves, no shared setup; see PROTOCOL.md",
+  "label": "A: balanced targets per level",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "shuffle",
+    "rounds": 1,
+    "seed": 2026102502,
+    "timeout_seconds": 120,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 678688015,
+        "b": 1357376030,
+        "group_order": 4262310596,
+        "gx": 4010131128,
+        "gy": 1414035956,
+        "kind": "prime_explicit",
+        "p": 4262310593,
+        "r": 46329463
+      },
+      {
+        "a": 3722025463,
+        "b": 2094277108,
+        "group_order": 4262310596,
+        "gx": 2891435401,
+        "gy": 881443349,
+        "kind": "prime_explicit",
+        "p": 4262310593,
+        "r": 46329463
+      },
+      {
+        "a": 2986471308,
+        "b": 2573232553,
+        "group_order": 4262310596,
+        "gx": 656232327,
+        "gy": 1239085498,
+        "kind": "prime_explicit",
+        "p": 4262310593,
+        "r": 46329463
+      },
+      {
+        "a": 533969723,
+        "b": 2039527846,
+        "group_order": 4262310596,
+        "gx": 324913025,
+        "gy": 497494387,
+        "kind": "prime_explicit",
+        "p": 4262310593,
+        "r": 46329463
+      }
+    ],
+    "target_kind": "planted_shared",
+    "target_seed": 2026102501,
+    "targets_per_curve": 192
+  }
+}

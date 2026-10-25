@@ -1,0 +1,198 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation",
+        "params": {}
+      },
+      "name": "rho-neg-aa",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "rho.plain",
+        "params": {}
+      },
+      "name": "rho-plain",
+      "role": "baseline"
+    }
+  ],
+  "description": "Frozen conductor-gap replication; independent one-target solves, no shared setup; see PROTOCOL.md",
+  "label": "A: real rho positive control and coordinate/A-A controls",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "shuffle",
+    "rounds": 1,
+    "seed": 2026102503,
+    "timeout_seconds": 120,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 16294983619,
+        "b": 5138283759,
+        "group_order": 17175092048,
+        "gx": 8609570479,
+        "gy": 13866211258,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 1675294788,
+        "b": 7581777772,
+        "group_order": 17175092048,
+        "gx": 4041681659,
+        "gy": 12072457616,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 16252860631,
+        "b": 10212355022,
+        "group_order": 17175092048,
+        "gx": 13324496958,
+        "gy": 8925716260,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 16798300338,
+        "b": 8688199868,
+        "group_order": 17175092048,
+        "gx": 1902586601,
+        "gy": 14031400438,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 4557928513,
+        "b": 2491032867,
+        "group_order": 17175092048,
+        "gx": 5819123809,
+        "gy": 13125185868,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 157132615,
+        "b": 14478299261,
+        "group_order": 17175092048,
+        "gx": 2934005543,
+        "gy": 16613766487,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 9017829840,
+        "b": 5423347900,
+        "group_order": 17175092048,
+        "gx": 9024517123,
+        "gy": 4569977500,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 8424445882,
+        "b": 4538986944,
+        "group_order": 17175092048,
+        "gx": 6134127580,
+        "gy": 10365080404,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 1849843385,
+        "b": 5852189112,
+        "group_order": 17175092048,
+        "gx": 15595728586,
+        "gy": 12412591552,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 238657844,
+        "b": 992479328,
+        "group_order": 17175092048,
+        "gx": 3857030549,
+        "gy": 16093057474,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 3077590535,
+        "b": 15116026248,
+        "group_order": 17175092048,
+        "gx": 10444718614,
+        "gy": 3801236852,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 6260640694,
+        "b": 10616241544,
+        "group_order": 17175092048,
+        "gx": 13477460366,
+        "gy": 15221750864,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 13569895870,
+        "b": 4805499020,
+        "group_order": 17175092048,
+        "gx": 5953702638,
+        "gy": 2256450627,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 13455578784,
+        "b": 12803871294,
+        "group_order": 17175092048,
+        "gx": 16492965588,
+        "gy": 12928042799,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 16984930153,
+        "b": 11556953256,
+        "group_order": 17175092048,
+        "gx": 4235747635,
+        "gy": 8389295130,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      },
+      {
+        "a": 7622046301,
+        "b": 10744825663,
+        "group_order": 17175092048,
+        "gx": 11953631406,
+        "gy": 11716569340,
+        "kind": "prime_explicit",
+        "p": 17175115961,
+        "r": 1073443253
+      }
+    ],
+    "target_kind": "planted_shared",
+    "target_seed": 2026102501,
+    "targets_per_curve": 32
+  }
+}

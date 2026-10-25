@@ -1,7 +1,7 @@
 //! Frozen preparation, serial execution and analysis for the 2026-10-25 replication.
 use crypto_lib::cryptanalysis::{
     curve_id,
-    ecbench::canonical::sha256_hex,
+    ecbench::{band, canonical::sha256_hex, record::Record, resources},
     ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimeInstance, PrimePoint},
     ic_framework::{
         cm_orbit::CmOrbitBase,
@@ -772,9 +772,11 @@ fn execute(out: &Path, audit: bool, selection: &str) {
                 let r: Value = serde_json::from_str(&line.unwrap()).unwrap();
                 assert!(
                     r["outcome"]["status"] != "wrong_answer"
+                        && r["outcome"]["status"] != "crashed"
+                        && r["outcome"]["status"] != "error"
                         && !(r["outcome"]["recovered"].is_string()
                             && r["outcome"]["matches_target"] == false),
-                    "wrong answer; stop before admitting another session"
+                    "wrong answer or infrastructure failure; stop before admitting another session"
                 );
             }
         }
@@ -1060,6 +1062,57 @@ fn analyze(out: &Path) {
         serde_json::to_string_pretty(&result["statuses"]).unwrap()
     );
 }
+fn diagnostics(out: &Path) {
+    let manifest = load(out.join("manifest.json"));
+    let mut sessions = Vec::new();
+    for s in manifest["specs"].as_array().unwrap() {
+        let name = s["name"].as_str().unwrap();
+        let session = Path::new(ROOT).join("sessions").join(name);
+        let records: Vec<Record> =
+            BufReader::new(File::open(session.join("records.jsonl")).unwrap())
+                .lines()
+                .map(|l| serde_json::from_str(&l.unwrap()).unwrap())
+                .collect();
+        let priced = band::band(&records, &[0., 0.1, 1.]).unwrap();
+        let resource = resources::session(&session).unwrap();
+        let mut phase_native = BTreeMap::<String, u64>::new();
+        let mut top_counters = BTreeMap::<String, u64>::new();
+        let mut unpriced = BTreeMap::<String, Option<u64>>::new();
+        let mut wall = 0u64;
+        let mut process_wall = 0u64;
+        for r in &records {
+            wall += r.time.solve_wall_ns.unwrap_or(0);
+            process_wall += r.time.process_wall_ns;
+            for (k, v) in &r.counters {
+                *top_counters.entry(format!("{}:{k}", r.arm)).or_default() += v;
+            }
+            for p in &r.phases {
+                for (k, v) in &p.native {
+                    *phase_native
+                        .entry(format!("{}:{}:{k}", r.arm, p.name))
+                        .or_default() += v;
+                }
+            }
+            for (k, v) in band::unpriced_counts(r) {
+                let total = unpriced.entry(format!("{}:{k}", r.arm)).or_insert(Some(0));
+                *total = total.and_then(|x| v.map(|y| x + y));
+            }
+        }
+        sessions.push(
+            json!({"name":name,"session":session,"records":records.len(),
+            "band":priced,"resources":resource,"phase_native_totals":phase_native,
+            "top_counter_totals":top_counters,"unpriced_counter_totals":unpriced,
+            "descriptive_l0_solve_wall_ns":wall,"descriptive_l0_process_wall_ns":process_wall}),
+        );
+    }
+    let panel = manifest["panel"].as_str().unwrap_or("calibration");
+    save(
+        Path::new(ROOT)
+            .join("analysis")
+            .join(format!("diagnostics-{panel}.json")),
+        &json!({"panel":panel,"sessions":sessions}),
+    );
+}
 fn main() {
     let args = std::env::args().skip(1).collect::<Vec<_>>();
     assert!(args.len() >= 2, "prepare-a|prepare-b|run|audit|analyze OUT");
@@ -1077,6 +1130,7 @@ fn main() {
         "audit-primary" => execute(out, true, "primary"),
         "gate-a" => gate_a(out),
         "analyze" => analyze(out),
+        "diagnostics" => diagnostics(out),
         _ => panic!("unknown mode"),
     }
 }
