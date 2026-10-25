@@ -11,6 +11,8 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [N12 held-out paired wall isolation](n12-heldout-wall-isolation.md) | open | isolated A/A plus five-round candidate/rho wall ratio for the frozen 420 targets | authorized quiet host window, then complete uncontended 5,040-row source-verified schedule |
+| [N12 held-out original binary source binding](n12-heldout-original-binary-source-binding.md) | open | attributing the original EKS executable to an exact reviewed source build | original executable digest plus exact source, lock, toolchain and build receipt, or a matching reproducible build |
 | [Benchmark validation gate rejects post-freeze rows](benchmark-validation-gate-postfreeze-rows.md) | investigating | repository-wide validated benchmark dashboard; 24 benchmark rows remain after v6/v7 validation and exact archival cleanup | source-bound evidence or exact archival disposition per row, then green gate |
 | [NIST extension-twist composite cofactors](nist-extension-twist-composite-cofactors.md) | open | complete P-256 block-876 degree-2 extension-twist factorization; one timeout field | proper split of the exact remaining 444-bit residual followed by prime-certificate and exact-product replay |
 | [NIST factorization raw archive publication](nist-factorization-raw-archive-publication.md) | open | durable publication of completed NIST raw archives under the current data-artifact policy | observed-ready AWS connection, unchanged uploads through `tools/artifacts`, real manifest entries and verified remote readback |
