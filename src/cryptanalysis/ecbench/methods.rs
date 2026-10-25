@@ -452,6 +452,25 @@ pub fn registry() -> &'static [MethodDecl] {
             ],
         },
         MethodDecl {
+            id: "transfer.quartic_cover",
+            family: "rho",
+            summary: "pull the instance back along the double cover C : V⁴ = x³ + ax + b → E into the Jacobian of a smooth plane quartic (non-hyperelliptic genus 3), solve it there with a generic inner method, check [k]G = Q on E; Jacobian work counted in F_p multiplications and charged at c_E, the multiplications of one affine addition on E measured in the run; prime-field curves, 29 ≤ p < 2^31",
+            entry: "ecbench::cover_quartic::{QuarticCover, transfer}",
+            applies: Applies::Any,
+            params: &[
+                ParamDecl {
+                    name: "inner",
+                    default: Some("rho.plain"),
+                    help: "the generic method run in J(C): rho.plain, bsgs.textbook, bsgs.interleaved or kangaroo.vow (negation is not free on the quartic, so rho.negation and bsgs.negation are refused)",
+                },
+                ParamDecl {
+                    name: "cap_multiple",
+                    default: Some("64"),
+                    help: "the inner rho or kangaroo's step cap, in multiples of √r",
+                },
+            ],
+        },
+        MethodDecl {
             id: "ic.hyperelliptic",
             family: "ic",
             summary: "Adleman–DeMarrais–Huang / Gaudry index calculus on a genus-2 Jacobian (genus2 workloads): factor base of degree-1 places, factor-base walk, smoothness by gcd, sparse elimination mod r; Jacobian group operations charged, field and row operations unpriced",
@@ -1426,6 +1445,13 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
                 .map(|_| ())
                 .ok_or_else(|| format!("{} has no rational {ell}-isogeny", curve.slug))
         }
+        Instance::Prime(i) if id == "transfer.quartic_cover" => {
+            quartic_cover_applicable(m, i).map(|_| ())
+        }
+        _ if id == "transfer.quartic_cover" => Err(format!(
+            "`transfer.quartic_cover` runs on prime-field curves only; {} is {}",
+            curve.slug, curve.family
+        )),
         _ if id == "transfer.isogeny" => Err(format!(
             "`transfer.isogeny` runs on prime-field curves only; {} is {}",
             curve.slug, curve.family
@@ -1661,6 +1687,13 @@ fn solve_inner(
         (Instance::Prime(i), _) if m.id == "transfer.isogeny" => {
             solve_isogeny_transfer(m, i, PrimePoint::affine(tx, ty), seed)
         }
+        (Instance::Prime(i), _) if m.id == "transfer.quartic_cover" => {
+            solve_quartic_cover(m, i, PrimePoint::affine(tx, ty), seed)
+        }
+        (_, _) if m.id == "transfer.quartic_cover" => Err(format!(
+            "`transfer.quartic_cover` runs on prime-field curves only; {} is {}",
+            curve.slug, curve.family
+        )),
         (_, _) if m.id == "transfer.isogeny" => Err(format!(
             "`transfer.isogeny` runs on prime-field curves only; {} is {}",
             curve.slug, curve.family
@@ -1799,7 +1832,9 @@ fn solve_isogeny_transfer(
     }
     let inner_id = m.params["inner"].clone();
     if !JACOBIAN_GENERIC.contains(&inner_id.as_str()) || inner_id == "rho.frozen_reference" {
-        return Err(format!("`inner` must be a generic method, not `{inner_id}`"));
+        return Err(format!(
+            "`inner` must be a generic method, not `{inner_id}`"
+        ));
     }
     let t = Instant::now();
     let mut tally = FieldTally::default();
@@ -1826,7 +1861,11 @@ fn solve_isogeny_transfer(
     // check is what a careful attacker pays to know it.
     let mut verify = GroupOps::default();
     if let Some(k) = rep.recovered {
-        let kg = inst.curve.mul(&mut verify, inst.generator_point(), (k % u128::from(inst.r)) as u64);
+        let kg = inst.curve.mul(
+            &mut verify,
+            inst.generator_point(),
+            (k % u128::from(inst.r)) as u64,
+        );
         if kg != target {
             rep.recovered = None;
         }
@@ -1871,6 +1910,128 @@ fn solve_isogeny_transfer(
         f.sqrs += verify.field_ops.sqrs;
         f.invs += verify.field_ops.invs;
     }
+    Ok(rep)
+}
+
+/// The checks `transfer.quartic_cover` makes before it runs: the inner
+/// method, the field size and an odd subgroup order, and a certified
+/// smooth model of the cover.
+fn quartic_cover_applicable(
+    m: &ResolvedMethod,
+    inst: &PrimeInstance,
+) -> Result<crate::cryptanalysis::ecbench::cover_quartic::QuarticCover, String> {
+    let inner = m
+        .params
+        .get("inner")
+        .map(String::as_str)
+        .unwrap_or("rho.plain");
+    if !JACOBIAN_GENERIC.contains(&inner) || inner == "rho.frozen_reference" {
+        return Err(format!("`inner` must be a generic method, not `{inner}`"));
+    }
+    if NEEDS_FREE_NEGATION.contains(&inner) {
+        return Err(format!(
+            "`{inner}` needs a free negation, which the plane-quartic Jacobian does not have"
+        ));
+    }
+    if inst.r % 2 == 0 {
+        return Err("π* is injective on odd-order subgroups only; r is even".into());
+    }
+    crate::cryptanalysis::ecbench::cover_quartic::QuarticCover::new(&inst.curve)
+}
+
+/// `transfer.quartic_cover`: build the double cover `C → E` and its
+/// Jacobian, pull `G` and `Q` back, solve in `J(C)` with the inner
+/// generic method, check the answer on `E`.  The unit stays one group
+/// operation on `E`: Jacobian work is counted in `F_p` multiplications
+/// (the plane-quartic module's counter) and divided by `c_E`, measured
+/// here with the same counted arithmetic.  Phases: `cover_setup` (the
+/// model and its smoothness certificate), `transfer` (two additions on
+/// `E` plus the pullbacks), `target:solve` (the inner solve) and
+/// `verify` (`[k]G` on `E`).
+fn solve_quartic_cover(
+    m: &ResolvedMethod,
+    inst: &PrimeInstance,
+    target: PrimePoint,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use crate::cryptanalysis::ecbench::cover_quartic::{affine_add_cost, transfer};
+    use crate::cryptanalysis::ecbench::plane_quartic::{field_muls, QuarticGroup};
+    let t = Instant::now();
+    let g = inst.generator_point();
+    // c_E first: it prices everything after it.
+    let mut calib = GroupOps::default();
+    let h = inst.curve.mul(&mut calib, g, 7);
+    let c_e = affine_add_cost(&inst.curve, g, h);
+    if !(c_e > 0.0) {
+        return Err("c_E could not be measured".into());
+    }
+    let m0 = field_muls();
+    let cover = quartic_cover_applicable(m, inst)?;
+    let setup_muls = field_muls() - m0;
+    let m1 = field_muls();
+    let mut e_ops = GroupOps::default();
+    let (pg, pq, b) = transfer(&cover, &inst.curve, g, target, &mut e_ops)?;
+    let transfer_muls = field_muls() - m1;
+    let inner_id = m.params["inner"].clone();
+    let mut inner_params = BTreeMap::new();
+    if inner_id.starts_with("rho.") || inner_id == "kangaroo.vow" {
+        inner_params.insert("cap_multiple".to_string(), m.params["cap_multiple"].clone());
+    }
+    let inner = ResolvedMethod {
+        id: inner_id.clone(),
+        params: inner_params,
+        ..m.clone()
+    };
+    let grp = QuarticGroup(&cover.jac);
+    let m2 = field_muls();
+    let mut rep = solve_generic(&inner, &grp, pg, pq, inst.r, seed)?;
+    let solve_muls = field_muls() - m2;
+    let jac_ops = rep.total_gae;
+    let mut verify = GroupOps::default();
+    if let Some(k) = rep.recovered {
+        let kg = inst
+            .curve
+            .mul(&mut verify, g, (k % u128::from(inst.r)) as u64);
+        if kg != target {
+            rep.recovered = None;
+        }
+    }
+    let converted = |muls: u64| muls as f64 / c_e;
+    let mut setup = ops_phase("cover_setup", GroupOps::default());
+    setup.gae = converted(setup_muls);
+    setup.native.insert("field_muls".into(), setup_muls);
+    let mut tr = ops_phase("transfer", e_ops);
+    tr.gae += converted(transfer_muls);
+    tr.native.insert("field_muls".into(), transfer_muls);
+    let mut solve = ops_phase("target:solve", GroupOps::default());
+    solve.gae = converted(solve_muls);
+    solve.native.insert("field_muls".into(), solve_muls);
+    solve.native.insert("jacobian_ops".into(), jac_ops as u64);
+    let verify_phase = ops_phase("verify", verify);
+    rep.phases = vec![setup, tr, solve, verify_phase];
+    rep.total_gae = rep.phases.iter().map(|p| p.gae).sum();
+    rep.automorphisms_used = 1;
+    rep.counters.insert("cover_model_c".into(), cover.c);
+    rep.counters.insert("jacobian_ops".into(), jac_ops as u64);
+    rep.counters.insert(
+        "jacobian_field_muls".into(),
+        setup_muls + transfer_muls + solve_muls,
+    );
+    rep.unpriced = unpriced_of(&rep.counters);
+    rep.field_ops = None;
+    rep.detail = json!({
+        "quartic_cover": {
+            "model": "(X + cY)^4 - Y^3 Z - a Y Z^3 - b Z^4, X = V - c x, Y = x",
+            "c": cover.c,
+            "c_e_field_muls_per_add": c_e,
+            "base_point_b": [format!("{:#x}", b.x), format!("{:#x}", b.y)],
+            "field_muls": {"cover_setup": setup_muls, "transfer": transfer_muls, "solve": solve_muls},
+            "e_adds_per_jacobian_op": if jac_ops > 0.0 { converted(solve_muls) / jac_ops } else { 0.0 },
+        },
+        "inner": inner_id,
+        "inner_detail": rep.detail,
+    });
+    rep.solve_wall_ns = t.elapsed().as_nanos() as u64;
     Ok(rep)
 }
 
@@ -1931,9 +2092,10 @@ fn solve_ic_hyperelliptic(
         ..GroupOps::default()
     };
     let mut relations = ops_phase("relations", search);
-    relations
-        .native
-        .insert("smoothness_field_muls".into(), rep.smoothness_field_ops as u64);
+    relations.native.insert(
+        "smoothness_field_muls".into(),
+        rep.smoothness_field_ops as u64,
+    );
     let mut la = ops_phase("linear_algebra", GroupOps::default());
     la.native.insert("row_ops".into(), rep.solve_row_ops as u64);
     let mut counters = BTreeMap::new();
@@ -3584,7 +3746,9 @@ pub fn dump_factor_base(
         return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
     }
     if let Instance::Genus2(_) | Instance::Quartic(_) = &inst {
-        return Err("no factor-base plug-in runs on a Jacobian; ic.hyperelliptic builds its own".into());
+        return Err(
+            "no factor-base plug-in runs on a Jacobian; ic.hyperelliptic builds its own".into(),
+        );
     }
     if let Instance::Ext(_) = &inst {
         return Err("no factor-base plug-in runs on a gls_fp2 or subfield_fp3 curve".into());

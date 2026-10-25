@@ -156,7 +156,11 @@ impl Fp<'_> {
         }
         h[1] = self.sub(h[1], 1);
         Self::trim(&mut h);
-        let g = if h.is_empty() { f.clone() } else { self.gcd(&f, &h) };
+        let g = if h.is_empty() {
+            f.clone()
+        } else {
+            self.gcd(&f, &h)
+        };
         let mut out = Vec::new();
         self.split(g, &mut out, 0);
         out.sort_unstable();
@@ -340,11 +344,18 @@ mod tests {
             assert!(!pg.infinity);
             for k in [2u64, 3, 17, inst.r - 1, inst.r / 2 + 5] {
                 let kg = e.mul(&mut ops, g, k);
-                assert_eq!(phi.map(kg, &mut t), e1.mul(&mut ops, pg, k), "seed {seed}, k {k}");
+                assert_eq!(
+                    phi.map(kg, &mut t),
+                    e1.mul(&mut ops, pg, k),
+                    "seed {seed}, k {k}"
+                );
             }
             assert!(e1.mul(&mut ops, pg, inst.r).infinity);
         }
-        assert!(found >= 5, "only {found} curves of 60 had a rational 3-isogeny");
+        assert!(
+            found >= 5,
+            "only {found} curves of 60 had a rational 3-isogeny"
+        );
     }
 
     #[test]

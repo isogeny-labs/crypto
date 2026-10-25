@@ -91,7 +91,9 @@ pub fn decode_g2(c: &Genus2Curve, x: u64, y: u64) -> Result<Divisor, String> {
     let (u1, u0) = ((x / p) % p, x % p);
     let (v1, v0) = (y / p, y % p);
     if deg > 2 || v1 >= p {
-        return Err(format!("0x{x:x}, 0x{y:x} is not a genus-2 divisor encoding"));
+        return Err(format!(
+            "0x{x:x}, 0x{y:x} is not a genus-2 divisor encoding"
+        ));
     }
     let (u, v): (Vec<u64>, Vec<u64>) = match deg {
         0 => (vec![1], vec![]),
@@ -191,7 +193,9 @@ impl Genus2Instance {
         }
         let curve = Genus2Curve::new(p, f).map_err(|e| e.to_string())?;
         if r < 5 || !is_prime_u64(r) || group_order % r != 0 {
-            return Err(format!("r = {r} is not a prime divisor of #J = {group_order}"));
+            return Err(format!(
+                "r = {r} is not a prime divisor of #J = {group_order}"
+            ));
         }
         let generator = decode_g2(&curve, g[0], g[1])?;
         if generator.is_identity() || !curve.mul(&generator, r).is_identity() {

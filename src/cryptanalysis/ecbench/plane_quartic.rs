@@ -81,17 +81,35 @@ use crate::cryptanalysis::ecbench::jacobian::prime_part;
 use crate::cryptanalysis::ic_boundary::{CountedGroup, GroupOps};
 use crate::cryptanalysis::residual_walk::is_prime_u64;
 
-/// Smallest and largest primes the family accepts.  Below 29 a quartic can
-/// have too few rational points for `D∞` and `P₁`; above `2^11` the point
-/// count over `F_{p²}` (`p²` abscissae, each a root count) dominates a
-/// search.
+/// Smallest and largest primes the searched family accepts.  Below 29 a
+/// quartic can have too few rational points for `D∞` and `P₁`; above
+/// `2^11` the point count over `F_{p²}` (`p²` abscissae, each a root
+/// count) dominates a search.
 pub const QUARTIC_MIN_P: u64 = 29;
 pub const QUARTIC_MAX_P: u64 = 1 << 11;
 
+/// The largest prime the group law itself accepts (a curve whose points
+/// are supplied, [`QuarticJacobian::with_points`]): products of two
+/// residues fit a `u64`, and a class packs into 32-bit entries.
+pub const QUARTIC_LAW_MAX_P: u64 = 1 << 31;
+
 // ── F_p ──────────────────────────────────────────────────────────────
 
+thread_local! {
+    static MULS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+/// `F_p` multiplications this thread has performed in this module (an
+/// inversion is its Fermat exponentiation's multiplications).  A transfer
+/// reads differences of it to price Jacobian work in the source curve's
+/// field-multiplication unit.
+pub fn field_muls() -> u64 {
+    MULS.with(|m| m.get())
+}
+
 #[inline]
-fn mulm(a: u64, b: u64, p: u64) -> u64 {
+pub(crate) fn mulm(a: u64, b: u64, p: u64) -> u64 {
+    MULS.with(|m| m.set(m.get() + 1));
     a * b % p
 }
 
@@ -109,7 +127,7 @@ fn powm(mut a: u64, mut e: u64, p: u64) -> u64 {
 }
 
 #[inline]
-fn invm(a: u64, p: u64) -> u64 {
+pub(crate) fn invm(a: u64, p: u64) -> u64 {
     powm(a, p - 2, p)
 }
 
@@ -170,7 +188,7 @@ fn nullspace(m: Vec<Vec<u64>>, n: usize, p: u64) -> Vec<Vec<u64>> {
 
 /// The exponents `(a, b, c)` of `X^a Y^b Z^c`, `a + b + c = n`, in a fixed
 /// order: `a` descending, then `b` descending.
-fn monomials(n: usize) -> Vec<(u8, u8, u8)> {
+pub fn monomials(n: usize) -> Vec<(u8, u8, u8)> {
     let mut v = Vec::new();
     for a in (0..=n).rev() {
         for b in (0..=n - a).rev() {
@@ -181,7 +199,7 @@ fn monomials(n: usize) -> Vec<(u8, u8, u8)> {
 }
 
 /// The normal-form basis of `S_n`: monomials of degree `n`, `X`-degree ≤ 3.
-fn basis(n: usize) -> Vec<(u8, u8, u8)> {
+pub fn basis(n: usize) -> Vec<(u8, u8, u8)> {
     monomials(n).into_iter().filter(|m| m.0 <= 3).collect()
 }
 
@@ -307,7 +325,11 @@ impl Forms {
             for arow in ann {
                 let row: Vec<u64> = cols
                     .iter()
-                    .map(|c| c.iter().zip(arow).fold(0u64, |s, (&x, &y)| (s + mulm(x, y, p)) % p))
+                    .map(|c| {
+                        c.iter()
+                            .zip(arow)
+                            .fold(0u64, |s, (&x, &y)| (s + mulm(x, y, p)) % p)
+                    })
                     .collect();
                 rows.push(row);
             }
@@ -356,20 +378,17 @@ impl Forms {
 
 /// Evaluate a quartic form (coefficients in [`monomials`]`(4)` order).
 fn eval_form(f: &[u64], n: usize, pt: [u64; 3], p: u64) -> u64 {
-    monomials(n)
-        .iter()
-        .zip(f)
-        .fold(0, |s, (&(a, b, c), &k)| {
-            if k == 0 {
-                return s;
-            }
-            let t = mulm(
-                mulm(powm(pt[0], a.into(), p), powm(pt[1], b.into(), p), p),
-                powm(pt[2], c.into(), p),
-                p,
-            );
-            (s + mulm(k, t, p)) % p
-        })
+    monomials(n).iter().zip(f).fold(0, |s, (&(a, b, c), &k)| {
+        if k == 0 {
+            return s;
+        }
+        let t = mulm(
+            mulm(powm(pt[0], a.into(), p), powm(pt[1], b.into(), p), p),
+            powm(pt[2], c.into(), p),
+            p,
+        );
+        (s + mulm(k, t, p)) % p
+    })
 }
 
 /// The partial derivatives of a quartic form, as cubic forms.
@@ -682,7 +701,11 @@ fn ext_mulmod(e: &Ext, a: &[E], b: &[E], m: &[E]) -> Vec<E> {
 fn ext_rem(e: &Ext, a: Vec<E>, m: &[E]) -> Vec<E> {
     let mut r = ext_trim(e, a);
     let dm = m.len() - 1;
-    let inv = if m[dm] == e.one() { e.one() } else { e.inv(m[dm]) };
+    let inv = if m[dm] == e.one() {
+        e.one()
+    } else {
+        e.inv(m[dm])
+    };
     while r.len() > dm {
         let c = e.mul(*r.last().unwrap(), inv);
         let s = r.len() - 1 - dm;
@@ -781,7 +804,7 @@ pub fn count_points(f: &[u64; 15], p: u64, k: usize) -> u64 {
 /// A divisor class, stored as the annihilator of `H⁰(3K − E) ⊂ S_3` in
 /// reduced row-echelon form (3 rows of 10): a function of the class.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct QClass(pub [u16; 30]);
+pub struct QClass(pub [u32; 30]);
 
 /// The Jacobian of a smooth plane quartic, with everything the group law
 /// precomputes: `D∞`, `P₁`, `H⁰(3K − D∞)`, `H⁰(4K − D∞)`, `H⁰(3K − D∞ −
@@ -812,13 +835,34 @@ impl QuarticJacobian {
                 "plane quartics take a prime {QUARTIC_MIN_P} ≤ p < {QUARTIC_MAX_P}, not {p}"
             ));
         }
+        Self::with_points(p, f, rational_points(&f, p))
+    }
+
+    /// Build from a smooth quartic and a list of its rational points (at
+    /// least four, three of them not collinear), for a field too large to
+    /// enumerate.  Every point is checked to lie on the curve.
+    pub fn with_points(
+        p: u64,
+        f: [u64; 15],
+        points: Vec<[u64; 3]>,
+    ) -> Result<QuarticJacobian, String> {
+        if !(QUARTIC_MIN_P..QUARTIC_LAW_MAX_P).contains(&p) || !is_prime_u64(p) {
+            return Err(format!(
+                "the plane-quartic group law takes a prime {QUARTIC_MIN_P} ≤ p < 2^31, not {p}"
+            ));
+        }
         if f[0] != 1 || f.iter().any(|&c| c >= p) {
             return Err("the quartic must have X⁴ coefficient 1 and reduced coefficients".into());
         }
         if !is_smooth(&f, p) {
             return Err("the quartic is singular, or the smoothness test cannot certify it".into());
         }
-        let points = rational_points(&f, p);
+        if points
+            .iter()
+            .any(|&q| eval_form(&f, 4, q, p) != 0 || q == [0, 0, 0])
+        {
+            return Err("a supplied point is not on the curve".into());
+        }
         let collinear = |a: [u64; 3], b: [u64; 3], c: [u64; 3]| {
             det(vec![a.to_vec(), b.to_vec(), c.to_vec()], p) == 0
         };
@@ -851,11 +895,7 @@ impl QuarticJacobian {
         let t2 = forms.colon(&ann6, &s3, 3, 3);
         let c = r6x2[0].clone();
         let s4 = forms.full(4);
-        let zero_ann = rref(
-            d_inf.iter().map(|&q| forms.eval_row(q, 3)).collect(),
-            10,
-            p,
-        );
+        let zero_ann = rref(d_inf.iter().map(|&q| forms.eval_row(q, 3)).collect(), 10, p);
         let mut jac = QuarticJacobian {
             p,
             f,
@@ -878,7 +918,12 @@ impl QuarticJacobian {
     }
 
     fn check_dims(&self) -> Result<(), String> {
-        let want = [(self.r3.len(), 7), (self.r4.len(), 11), (self.r3_p1.len(), 6), (self.t2.len(), 4)];
+        let want = [
+            (self.r3.len(), 7),
+            (self.r4.len(), 11),
+            (self.r3_p1.len(), 6),
+            (self.t2.len(), 4),
+        ];
         if want.iter().any(|(a, b)| a != b) {
             return Err(format!(
                 "Riemann–Roch dimensions {want:?} are wrong: the curve is not a smooth quartic"
@@ -891,10 +936,10 @@ impl QuarticJacobian {
         if ann.len() != 3 {
             return Err(format!("a class needs codimension 3, got {}", ann.len()));
         }
-        let mut out = [0u16; 30];
+        let mut out = [0u32; 30];
         for (i, row) in ann.iter().enumerate() {
             for (j, &v) in row.iter().enumerate() {
-                out[10 * i + j] = v as u16;
+                out[10 * i + j] = v as u32;
             }
         }
         Ok(QClass(out))
@@ -913,6 +958,22 @@ impl QuarticJacobian {
 
     pub fn zero(&self) -> QClass {
         self.zero
+    }
+
+    /// The evaluation functional of `S_3` at a point (for transfers that
+    /// build a divisor's conditions themselves).
+    pub fn eval_row3(&self, pt: [u64; 3]) -> Vec<u64> {
+        self.forms.eval_row(pt, 3)
+    }
+
+    /// The class of `E − D∞` for an effective degree-3 divisor `E` given by
+    /// three linear conditions on `S_3` cutting out `H⁰(3K − E)` (for
+    /// example evaluations at its points, or the two `F_p`-conditions of a
+    /// conjugate pair).  Refused unless the conditions have rank 3.
+    pub fn class_from_conditions(&self, rows: Vec<Vec<u64>>) -> Result<QClass, String> {
+        let ann = rref(rows, 10, self.p);
+        let raw = self.pack(&ann)?;
+        Ok(self.add_raw(&raw, &self.zero))
     }
 
     /// The class of `P + Q + R − D∞` for three distinct rational points.
@@ -1000,7 +1061,11 @@ impl QuarticJacobian {
     pub fn random<R: Rng>(&self, rng: &mut R) -> QClass {
         let n = self.points.len();
         loop {
-            let (i, j, k) = (rng.gen_range(0..n), rng.gen_range(0..n), rng.gen_range(0..n));
+            let (i, j, k) = (
+                rng.gen_range(0..n),
+                rng.gen_range(0..n),
+                rng.gen_range(0..n),
+            );
             if i != j && i != k && j != k {
                 return self
                     .from_points([self.points[i], self.points[j], self.points[k]])
@@ -1160,7 +1225,12 @@ fn bsgs_in_window(jac: &QuarticJacobian, x: &QClass, lo: u64, hi: u64) -> Option
 }
 
 /// `#J(F_p)` from `N₁`, `N₂` and element orders, or why not.
-pub fn jacobian_order(jac: &QuarticJacobian, n1: u64, n2: u64, rng: &mut StdRng) -> Result<u64, String> {
+pub fn jacobian_order(
+    jac: &QuarticJacobian,
+    n1: u64,
+    n2: u64,
+    rng: &mut StdRng,
+) -> Result<u64, String> {
     let p = jac.p;
     let (a1, a2) = l_coefficients(p, n1, n2);
     let bound = (20.0 * (p as f64).powf(1.5)).ceil() as i128;
@@ -1173,7 +1243,8 @@ pub fn jacobian_order(jac: &QuarticJacobian, n1: u64, n2: u64, rng: &mut StdRng)
         if x == jac.zero {
             continue;
         }
-        let n = bsgs_in_window(jac, &x, lo, hi).ok_or("no multiple of an element order in the a₃ window")?;
+        let n = bsgs_in_window(jac, &x, lo, hi)
+            .ok_or("no multiple of an element order in the a₃ window")?;
         let o = order_from_multiple(jac, &x, n);
         lcm = lcm / gcd(lcm, o) * o;
         let first = lo.div_ceil(lcm) * lcm;
@@ -1209,7 +1280,9 @@ impl QuarticInstance {
     /// from `seed`, until `#J(F_p) = h·r` with `h ≤ max_cofactor`.
     pub fn search(p_bits: u32, seed: u64, max_cofactor: u64) -> Result<QuarticInstance, String> {
         if !(5..=11).contains(&p_bits) {
-            return Err(format!("plane_quartic_search takes 5 ≤ p_bits ≤ 11, not {p_bits}"));
+            return Err(format!(
+                "plane_quartic_search takes 5 ≤ p_bits ≤ 11, not {p_bits}"
+            ));
         }
         let mut rng = StdRng::seed_from_u64(seed ^ (u64::from(p_bits) << 40) ^ 0x7151);
         for _ in 0..2000 {
@@ -1262,10 +1335,18 @@ impl QuarticInstance {
 
     /// The same Jacobian given outright; the order is trusted, `r` prime,
     /// `r | #J`, `G ≠ 0` and `[r]G = 0` are checked.
-    pub fn explicit(p: u64, f: [u64; 15], group_order: u64, r: u64, g: &[String; 2]) -> Result<QuarticInstance, String> {
+    pub fn explicit(
+        p: u64,
+        f: [u64; 15],
+        group_order: u64,
+        r: u64,
+        g: &[String; 2],
+    ) -> Result<QuarticInstance, String> {
         let jac = QuarticJacobian::new(p, f)?;
         if r < 5 || !is_prime_u64(r) || group_order % r != 0 {
-            return Err(format!("r = {r} is not a prime divisor of #J = {group_order}"));
+            return Err(format!(
+                "r = {r} is not a prime divisor of #J = {group_order}"
+            ));
         }
         let generator = decode(&jac, g)?;
         if generator == jac.zero || jac.mul_raw(&generator, r) != jac.zero {
@@ -1318,10 +1399,10 @@ impl QuarticInstance {
 
 /// Two hex strings of 15 four-digit entries each.
 pub fn encode(x: &QClass) -> [String; 2] {
-    let half = |s: &[u16]| -> String {
+    let half = |s: &[u32]| -> String {
         let mut out = String::from("0x");
         for v in s {
-            out.push_str(&format!("{v:04x}"));
+            out.push_str(&format!("{v:08x}"));
         }
         out
     };
@@ -1329,14 +1410,14 @@ pub fn encode(x: &QClass) -> [String; 2] {
 }
 
 pub fn decode(jac: &QuarticJacobian, t: &[String; 2]) -> Result<QClass, String> {
-    let mut out = [0u16; 30];
+    let mut out = [0u32; 30];
     for (h, s) in t.iter().enumerate() {
         let digits = s.trim_start_matches("0x");
-        if digits.len() != 60 {
+        if digits.len() != 120 {
             return Err(format!("`{s}` is not a plane-quartic class encoding"));
         }
         for i in 0..15 {
-            out[15 * h + i] = u16::from_str_radix(&digits[4 * i..4 * i + 4], 16)
+            out[15 * h + i] = u32::from_str_radix(&digits[8 * i..8 * i + 8], 16)
                 .map_err(|_| format!("bad hex `{s}`"))?;
         }
     }
@@ -1390,7 +1471,11 @@ mod tests {
         let mut ops = GroupOps::default();
         let mut rng = StdRng::seed_from_u64(9);
         for _ in 0..6 {
-            let (x, y, z) = (jac.random(&mut rng), jac.random(&mut rng), jac.random(&mut rng));
+            let (x, y, z) = (
+                jac.random(&mut rng),
+                jac.random(&mut rng),
+                jac.random(&mut rng),
+            );
             assert_eq!(g.add(&mut ops, x, jac.zero), x, "identity");
             assert_eq!(g.add(&mut ops, x, y), g.add(&mut ops, y, x), "commutative");
             let xy = g.add(&mut ops, x, y);
@@ -1430,7 +1515,10 @@ mod tests {
                 Err(e) => assert!(e.contains("several"), "p = {p}: {e}"),
             }
         }
-        assert!(certified >= 2, "the order search certified {certified} of 3");
+        assert!(
+            certified >= 2,
+            "the order search certified {certified} of 3"
+        );
     }
 
     #[test]
@@ -1441,7 +1529,7 @@ mod tests {
         let again = QuarticInstance::explicit(i.jac.p, i.jac.f, i.group_order, i.r, &g).unwrap();
         assert_eq!(again.generator, i.generator);
         let mut bad = g.clone();
-        bad[0] = format!("0x{}", "0".repeat(60));
+        bad[0] = format!("0x{}", "0".repeat(120));
         assert!(decode(&i.jac, &bad).is_err());
     }
 

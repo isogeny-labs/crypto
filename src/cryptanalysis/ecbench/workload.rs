@@ -181,7 +181,7 @@ pub enum CurveSpec {
     /// `plane_quartic::QuarticInstance::search(p_bits, seed, max_cofactor)`:
     /// the Jacobian of a smooth plane quartic (a non-hyperelliptic curve of
     /// genus 3) over `F_p` (`5 ≤ p_bits ≤ 11`, `p ≥ 29`), `#J(F_p) = h·r`.
-    /// A class is two 60-digit hex strings (a canonical 3×10 echelon form).
+    /// A class is two 120-digit hex strings (a canonical 3×10 echelon form).
     PlaneQuarticSearch {
         p_bits: u32,
         seed: u64,
