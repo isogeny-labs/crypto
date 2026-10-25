@@ -46,11 +46,22 @@ three abscissae repeats the peeled abscissa.
 
 The original generic proof is copied verbatim as a dependency prefix, SHA-256
 `fe7fbef221b2d391f3793976fd3babbe14673ef08b0ddaa3b5ae74664764773c`.
-It is never edited in its live producer directory. Check all six theorem
+It is never edited in its live producer directory. Check all ten theorem
 axiom sets, permitting only the standard foundations propext,
 Classical.choice and Quot.sound. No sorry, admit, native_decide, custom
 axiom or kernel bypass is accepted. Preserve failed builds and resource
 limits. Use lean4checker --fresh if actually available.
+
+The first flat-expression proof attempt is terminal with exit 1:
+`INTERNAL PANIC: out of memory` under the original 8 GiB address-space
+bound. No theorem or IDC is accepted from it. Its dense integer expansion,
+candidate bytes and exported source remain preserved in proof-v1.
+Version 2 balances polynomial sum syntax and separately proves the four
+literal multiplier products before combining them. The same three final
+statements and coefficients remain unchanged. The four added product
+lemmas are proved, not assumed. All ten axioms are audited. The full Lean
+module still receives one 1,200-second/8 GiB phase; no per-lemma budget
+extension or weaker theorem is substituted.
 
 The theorem closes the explicit polynomial identity assumption for this
 one sealed instance in characteristic 37. It does not formalize the native

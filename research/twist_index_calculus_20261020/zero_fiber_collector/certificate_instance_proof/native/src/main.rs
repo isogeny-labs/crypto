@@ -164,7 +164,8 @@ fn expression(poly: &Poly) -> String {
     if poly.is_empty() {
         return "(0 : R)".into();
     }
-    poly.iter()
+    let mut terms = poly
+        .iter()
         .map(|(m, c)| {
             let mut pieces = vec![format!("({c} : R)")];
             for (i, &power) in m.iter().enumerate() {
@@ -174,8 +175,19 @@ fn expression(poly: &Poly) -> String {
             }
             format!("({})", pieces.join(" * "))
         })
-        .collect::<Vec<_>>()
-        .join(" + ")
+        .collect::<Vec<_>>();
+    // Bound expression-tree depth without changing any coefficient or monomial.
+    while terms.len() > 1 {
+        terms = terms
+            .chunks(2)
+            .map(|pair| match pair {
+                [left, right] => format!("({left} + {right})"),
+                [only] => only.clone(),
+                _ => unreachable!(),
+            })
+            .collect();
+    }
+    terms.pop().unwrap()
 }
 fn sdk_poly(poly: &Poly) -> E {
     E::sum(
@@ -208,6 +220,20 @@ fn lean(prefix: &str, f: &[Poly], h: &[Poly], rem: &Poly, a: u64) -> String {
             ));
         }
     }
+    for (i, (fi, hi)) in f.iter().zip(h).enumerate() {
+        let mut dense = vec![0; SIZE];
+        accumulate(&mut dense, hi, fi, 1).expect("product degree already checked before export");
+        let expanded: Poly = dense
+            .into_iter()
+            .enumerate()
+            .filter(|(_, c)| *c != 0)
+            .map(|(j, c)| (monomial(j), c))
+            .collect();
+        text.push_str(&format!(
+            "def expanded{i} (s1 s2 s3 : R) : R :=\n  {}\n",
+            expression(&expanded)
+        ));
+    }
     text.push_str(&format!(
         "def remainder (s1 s2 s3 : R) : R :=\n  {}\n",
         expression(rem)
@@ -219,7 +245,14 @@ fn lean(prefix: &str, f: &[Poly], h: &[Poly], rem: &Poly, a: u64) -> String {
         .map(|i| format!("h{i} s1 s2 s3 * f{i} s1 s2 s3"))
         .collect::<Vec<_>>()
         .join(" + ");
-    text.push_str(&format!("\ntheorem integer_lift (s1 s2 s3 : R) :\n    (q s1 s2 s3)^2 + 37 * remainder s1 s2 s3 =\n      {rhs} := by\n  unfold q remainder h0 h1 h2 h3 f0 f1 f2 f3\n  grind\n"));
+    for i in 0..4 {
+        text.push_str(&format!("\ntheorem product{i} (s1 s2 s3 : R) :\n    h{i} s1 s2 s3 * f{i} s1 s2 s3 = expanded{i} s1 s2 s3 := by\n  unfold h{i} f{i} expanded{i}\n  grind\n"));
+    }
+    let expanded = (0..4)
+        .map(|i| format!("expanded{i} s1 s2 s3"))
+        .collect::<Vec<_>>()
+        .join(" + ");
+    text.push_str(&format!("\ntheorem integer_lift (s1 s2 s3 : R) :\n    (q s1 s2 s3)^2 + 37 * remainder s1 s2 s3 =\n      {rhs} := by\n  calc\n    _ = {expanded} := by\n      unfold q remainder expanded0 expanded1 expanded2 expanded3\n      grind\n    _ = {rhs} := by\n      rw [product0, product1, product2, product3]\n"));
     text.push_str(&format!("\ntheorem certificate_identity [Lean.Grind.IsCharP R 37] (s1 s2 s3 : R) :\n    (q s1 s2 s3)^2 = {rhs} := by\n  have hlift := integer_lift s1 s2 s3\n  grind\n"));
     text.push_str("\ntheorem repeated_factor_of_roots [Lean.Grind.IsCharP R 37]\n    (noZero : ∀ u v : R, u*v=0 → u=0 ∨ v=0)\n    (x y z : R)\n    (roots : f0 (x+y+z) (x*y+x*z+y*z) (x*y*z)=0 ∧\n      f1 (x+y+z) (x*y+x*z+y*z) (x*y*z)=0 ∧\n      f2 (x+y+z) (x*y+x*z+y*z) (x*y*z)=0 ∧\n      f3 (x+y+z) (x*y+x*z+y*z) (x*y*z)=0) :\n");
     text.push_str(&format!(
@@ -236,7 +269,7 @@ fn lean(prefix: &str, f: &[Poly], h: &[Poly], rem: &Poly, a: u64) -> String {
             text.push_str(&format!("    ({name}{i} (x+y+z) (x*y+x*z+y*z) (x*y*z))\n"));
         }
     }
-    text.push_str("    2 roots hcert\n\n#print axioms integer_lift\n#print axioms certificate_identity\n#print axioms repeated_factor_of_roots\nend ConcreteCertificate\n");
+    text.push_str("    2 roots hcert\n\n#print axioms product0\n#print axioms product1\n#print axioms product2\n#print axioms product3\n#print axioms integer_lift\n#print axioms certificate_identity\n#print axioms repeated_factor_of_roots\nend ConcreteCertificate\n");
     text
 }
 
@@ -365,6 +398,10 @@ fn check_lean(stdout: &Path, proof: &Path, statement: &Path, out: &Path) -> Resu
         "RepeatedFactor.cubic_identity",
         "RepeatedFactor.power_zero",
         "RepeatedFactor.rejection_of_certificate",
+        "ConcreteCertificate.product0",
+        "ConcreteCertificate.product1",
+        "ConcreteCertificate.product2",
+        "ConcreteCertificate.product3",
         "ConcreteCertificate.integer_lift",
         "ConcreteCertificate.certificate_identity",
         "ConcreteCertificate.repeated_factor_of_roots",
