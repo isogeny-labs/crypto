@@ -1,0 +1,70 @@
+{
+  "schema": "projective-law-formal-source-bindings/v1",
+  "runtime": {
+    "path": "../src/bin/projective_law_gate.rs",
+    "sha256": "5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0"
+  },
+  "written_audit": {
+    "path": "../PROOF_AUDIT.md",
+    "sha256": "6cd0688dd329edd9a1fff2cf7baeca359d75f29c9062655bc8dd528ab7ae90ea"
+  },
+  "native_certificates": [
+    {
+      "schema": "projective-symbolic-1plus2/v1",
+      "source_sha256": "1322986422ad72165222619b552c0ab815b205b407bb29b38a8dd4b8bb837d6f",
+      "result_sha256": "1354ded974068d41611a34b6ea6aa0751476007eb5af6012940384f10065fcde",
+      "source_path": "../src/bin/projective_symbolic_12.rs",
+      "result_path": "../results/symbolic-1plus2.json"
+    },
+    {
+      "schema": "projective-symbolic-1plus2-exception/v1",
+      "source_sha256": "6ac3f42c5c9cdb4c447043d12a610cf1538300190b78671fb6d3de695e5e4206",
+      "result_sha256": "70e6bda72d921bf2639036a25a0563ed63823d953ec4db0e5b83408d56cac27a",
+      "source_path": "../src/bin/projective_symbolic_12_exception.rs",
+      "result_path": "../results/symbolic-1plus2-exception.json"
+    },
+    {
+      "schema": "projective-symbolic-triple/v1",
+      "source_sha256": "ca283247998fa6f06041c90395a9ce372bdd46d809ed5a5e2cbc1238a155f47d",
+      "result_sha256": "4a98dcfca48158d4818cbff668e511915fef17963af4ad1aa6bb71376761eeb8",
+      "source_path": "../src/bin/projective_symbolic_triple.rs",
+      "result_path": "../results/symbolic-tripling.json"
+    },
+    {
+      "schema": "projective-symbolic-22-common/v1",
+      "source_sha256": "db1f1b8c6727abe112b177b976e3abb31db5670df1c79dfac3fcf759a9c27645",
+      "result_sha256": "76c67f867ff5f4a0fcfa116d661700a7076dd1361f77de52fa0a2877062195d1",
+      "source_path": "../src/bin/projective_symbolic_22_common.rs",
+      "result_path": "../results/symbolic-2plus2-common.json"
+    },
+    {
+      "schema": "projective-symbolic-22-drop/v1",
+      "source_sha256": "90d3ceffa4361527a7bb9d15d2809a1610f0693fc0933554baf444e7cd9b62db",
+      "result_sha256": "a3aed2441704161880af5024c557611b9cedabaf23142268f7df96d98d87d6b5",
+      "source_path": "../src/bin/projective_symbolic_22_drop.rs",
+      "result_path": "../results/symbolic-2plus2-drop.json"
+    },
+    {
+      "schema": "projective-symbolic-22-mixed/v1",
+      "source_sha256": "c6b19b4b30482da71adf6a76cdb99bc23609626a8c293a9f1135e9b4f5346432",
+      "result_sha256": "b6f5ddf743a6c801f0288381bad208ed60e38d1af046e139cdc281b02983566a",
+      "source_path": "../src/bin/projective_symbolic_22_mixed.rs",
+      "result_path": "../results/symbolic-2plus2-mixed.json"
+    },
+    {
+      "schema": "projective-symbolic-22-double/v1",
+      "source_sha256": "1a35da6f440f77c35890c5cd31437886e6e8eeed72b842385b0261ce963e41a9",
+      "result_sha256": "462bf31718049891326ab33202bc719c6a68e5b9a793f38cba173970b4c0538f",
+      "source_path": "../src/bin/projective_symbolic_22_double.rs",
+      "result_path": "../results/symbolic-2plus2-double.json"
+    },
+    {
+      "schema": "projective-symbolic-22-shared/v1",
+      "source_sha256": "f0120ea6e262555e9139bfe1a896dfd4e7c535d8c239538db5fcdf11d29bd127",
+      "result_sha256": "a373aaaed0479c60e351b9ed4074a128e1304d8f1e31db4c5b2c3ac1345bdd57",
+      "source_path": "../src/bin/projective_symbolic_22_shared.rs",
+      "result_path": "../results/symbolic-2plus2-shared.json"
+    }
+  ],
+  "binding_limit": "Hashes bind the manually transcribed Lean inventory to source bytes; they do not prove Rust-to-Lean semantic equivalence."
+}

@@ -10,11 +10,11 @@ format.
 
 | Lead | Current verified evidence | Remaining gap |
 | --- | --- | --- |
-| factor-base/graph sweep | five arms over all 1,260 targets; 6,300 candidate and 6,300 matched-rho solves | replication is needed before interpreting the 0.999323 full8/full16 difference |
+| factor-base/graph sweep | five arms over all 1,260 fresh targets; 6,300 candidate and 6,300 matched-rho solves; independent replication complete | model-held-out tuning remains proposed; the deterministic cohorts do not support a sampling interval for the earlier 0.999323 difference |
 | projective law | wrapper and retained-state arms over all 1,260 targets; 1,224,000 checked additions; exact certificate equalities | a mechanized divisor-class theorem and independent mathematical review |
 | point-driven pencil | 543 distinct verified targets, one target with cap-only records, 716 targets without a pencil record; exact 717-row continuation inventory and synthetic-only intake gate verified | 717 primary and independent-replay target records; a complete aggregate ratio requires verified candidate solves |
 | sign-safe Kummer | fixed-difference collector over all 1,260 targets; 8,820 labels and 1,260 signed recoveries checked | an arbitrary-jump construction remains open; the fixed-difference result is complete for its frozen scope |
-| review packet | 19 checksum-bound files, 12,850 target-arm rows, 3,067 grid rows, three graphs, standardized CSVs, and a three-page PDF; reviewer-pattern appendix adds paired deltas, right-continuous bounded ECDFs, heatmaps, descriptive resampling, and exact grid-derived break-even surfaces | reviewer-pattern phase fractions remain absent because the standardized inputs have no common phase counters; source-specific counter normalization is required |
+| review packet | 18 checksum-bound artifacts plus the checksum manifest, 12,850 target-arm rows, 3,067 grid rows, three graphs, standardized CSVs, and a three-page PDF; reviewer-pattern appendix adds paired deltas, right-continuous bounded ECDFs, heatmaps, descriptive resampling, and exact grid-derived break-even surfaces | reviewer-pattern phase fractions remain absent because the standardized inputs have no common phase counters; source-specific counter normalization is required |
 
 ## Continuation state
 
@@ -25,31 +25,42 @@ format.
 | N3 | blocked in this assisted session | the previously rejected exact sparse-nullspace execution remains outside the available assistance boundary; an independently authorized executor must return 717 primary and 717 fresh-process replay records |
 | N4 | waiting on N3 | admit only a returned checksum-bound bundle; preserve failures and publish a full aggregate ratio only if all 1,260 candidates verify |
 | N5 | partial | reporting-only appendix covers all 12,850 standardized rows and stores the two large CSVs through the artifact store; requested phase fractions remain unimplemented because the standardized inputs carry totals but no common phase-counter columns |
-| N6 | ready | pin a proof environment, formalize the divisor-class bridge and exceptional branches, then obtain independent mathematical review |
-| N7 | ready | prove the fixed-offset orbit statement and emit all 336 frozen group/jump sidecar bounds without a DLP collection |
-| N8 | ready | preregister independent seeds, run full8/full16/full32 on the existing 1,260 public targets, and retain every loss and failure |
+| N6 | verified partial mechanization | pinned Lean checked seven algebraic/inventory theorems plus one explicit conditional bridge; the Rust semantic and smooth-curve/Mumford/`Pic^0` bridges remain unresolved; standardized graph and PDF included |
+| N7 | verified for the fixed-offset model | seven Lean declarations, zero trusted declarations, 336 exact orbit rows and 12,096 canonical price rows; arbitrary, compressed and label-free sidecars remain open |
+| N8 | verified fresh-cohort replication; packet partially complete | 6,300 candidate and 6,300 matched-rho records over 1,260 fresh public targets; five full-cohort ratios and every one of 1,440 pricing rows retained; independent-host replay and a model-cluster interval were not produced |
+| N9 | proposed | connect Rust branch semantics to the checked Lean formulas, then formalize the smooth-curve/Mumford/principal-divisor bridge without introducing a global correctness axiom |
+| N10 | proposed | normalize source-specific phase counters and publish phase rows only where normalized sums reproduce the recorded cold totals |
+| N11 | proposed | specify compressed or label-free Kummer sidecars and prove label recovery/collision bounds before any cohort execution |
+| N12 | proposed | preregister a model-held-out factor-base tuning study, tune only on one cohort, and evaluate the frozen choice on the other cohort with all losses retained |
 
-The next executable order is N6 and N7 in parallel with preregistration for
-N8. N3 remains a separate external execution lane. N4 starts only after an N3
-bundle arrives, so proof and replication work cannot be mistaken for pencil
-cohort completion.
+N6, N7 and N8 have verified results within their stated narrower boundaries. The next local
+order is N9 and N10, followed by theorem-gated N11 and held-out N12. N3 remains
+a separate external execution lane. N4 starts only after an N3 bundle arrives,
+so proof and replication work cannot be mistaken for pencil cohort completion.
 
-## Next execution packets
+## Execution packets and current disposition
 
-1. **N6 proof packet.** Freeze the theorem prover and dependency digests;
+The N6-N8 prescriptions below are retained as the original acceptance packets.
+N7 met its fixed-offset packet. N6 produced partial mechanization but did not
+meet the runtime/divisor-class bridge or independent-review gates. N8 produced
+the complete fresh public cohort and pricing grid but did not produce an
+independent-host replay or a model-cluster interval. N3 and N4 remain pending.
+N9-N12 are the proposed next gates.
+
+1. **N6 proof packet (partially complete).** Freeze the theorem prover and dependency digests;
    encode reduced-divisor well-formedness, every runtime branch predicate,
    exceptional composition, reduction, and equality in the Jacobian; connect
    the eight existing polynomial certificates to the runtime functions. The
    packet is accepted only when a clean replay checks the theorem files and an
    independent reviewer signs a scope statement distinguishing the general
    theorem from the small-field regression.
-2. **N7 obstruction packet.** State the group action and sidecar model without
+2. **N7 obstruction packet (completed for the fixed-offset model).** State the group action and sidecar model without
    using target scalars; prove the fixed-offset orbit bound; emit one row for
    each of 21 groups and 16 jumps with group order, jump, orbit size, minimum
    labels, bytes, and priced lower bound. The 336-row CSV, theorem source,
    checker receipt, graph, and PDF must agree by checksum. A failed proof keeps
    the arbitrary-jump route open and records the missing lemma.
-3. **N8 replication packet.** Freeze independent seeds before execution and
+3. **N8 replication packet (cohort complete; replay and interval gates unmet).** Freeze independent seeds before execution and
    run full8, full16, and full32 on all 1,260 public known-answer targets. Each
    arm retains 1,260 candidate records, 1,260 same-process matched-rho records,
    independent replay receipts, every failure, and all 36 price cells. Report
@@ -66,7 +77,7 @@ cohort completion.
    JSONL, graphs, neutral PDF, checksum manifest, and validation certificate;
    null candidate ratios remain null.
 
-## Ordered work
+## Ordered work and recorded outcomes
 
 ### N1. Freeze the exact open pencil inventory
 
@@ -176,7 +187,7 @@ to one declared cross-lead phase schema, checks each normalized phase sum
 against its recorded cold total, and publishes the normalized phase rows. No
 phase split may be inferred from aggregate totals.
 
-### N6. Close the projective-law proof boundary
+### N6. Projective-law proof boundary: completed partial mechanization
 
 Pin the proof environment and formalize reduced divisors, branch predicates,
 exceptional composition, and the divisor-class bridge used by the runtime law.
@@ -185,7 +196,7 @@ small-field reduced-divisor regression is a separate check and is not labeled a
 general proof. Independent mathematical review remains a separate acceptance
 item.
 
-### N7. Formalize the Kummer sidecar obstruction
+### N7. Kummer sidecar obstruction: completed fixed-offset theorem
 
 State and prove the fixed-offset orbit requirement as a finite group-action
 theorem. For each of the 21 frozen prime-order groups and 16 jumps, emit the
@@ -193,17 +204,62 @@ minimum offset-orbit sidecar size and its memory/cost lower bound. Label-free
 recurrence synthesis and branch checking may be tested separately; no DLP
 collection is part of this step.
 
-### N8. Replicate the factor-base comparison
+### N8. Factor-base comparison: completed independent replication
 
 Run preregistered seed-replication arms for full8, full16, and full32 on the
 same 1,260 public targets, with matched same-process rho and all 36 price cells.
 Report the distribution and interval for full8/full16 rather than treating the
 current 0.999323 point estimate as stable. Preserve losses and failed records.
 
+Completed result: the independent cohort contains 6,300 verified candidate
+records and 6,300 verified matched-rho records. Representative complete-cohort
+ratios are `2.522734` (full16), `2.513395` (full32), `2.549755` (full8),
+`2.995143` (half16), and `3.984298` (quarter16). Each complete-cohort arm has
+zero winning cells among the 36 prices. The full8 16-bit slice separately has
+23 winning and 13 losing cells with representative ratio `0.980993`; it is
+retained rather than averaged away. The report assigns no sampling interval to
+the two deterministic cohorts.
+
+### N9. Formalize the runtime and divisor-class bridges
+
+Translate or generate Lean branch definitions from a checksum-bound runtime
+schema, prove correspondence to the Rust return labels, and define the smooth
+odd-characteristic quintic, reduced Mumford representatives, composition,
+reduction, principal divisors and `Pic^0` equality needed by the conditional
+bridge. Acceptance requires the existing algebraic theorems to feed a proved
+bridge; a caller-supplied implication does not close this step.
+
+### N10. Normalize phase counters
+
+Declare a cross-study phase schema and one source-specific mapping for every
+included collector. For each row, require the normalized phase sum to equal
+the recorded cold total under the same price cell. Publish explicit nulls when
+a source lacks sufficient counters. Regenerate the reviewer-pattern appendix,
+source CSV, graph and PDF from those checked rows.
+
+### N11. Test compressed and label-free Kummer sidecars
+
+State the sidecar state machine independently of target scalars. Prove how a
+relation label and sign are recovered, bound collisions and exceptional
+states, and compare its stored state and per-step operations with the verified
+fixed-offset bounds. Only a construction passing those checks may proceed to a
+public known-answer cohort. A failed construction records the exact missing
+lemma or counterexample without a broad impossibility claim.
+
+### N12. Run held-out factor-base tuning
+
+Freeze a model-level train/evaluation split before tuning. Select base size,
+large-prime acceptance and jump count using only the training cohort, then run
+the frozen choice on every target in the evaluation cohort with matched rho
+and all 36 price cells. Report per-model and per-size outcomes, including the
+16-bit full8 mixed result, without pooling the held-out estimate back into the
+tuning data.
+
 ## Completion rule
 
-N1, N2, and N4 can be implemented without solving a new target. N5-N8 improve
-reviewability, proof scope, or robustness but do not close the pencil cohort.
+N1, N2, and N4 can be implemented without solving a new target. N5-N12 improve
+reviewability, proof scope, robustness, or held-out evaluation but do not close
+the pencil cohort.
 The original objective is complete only after N3 and N4 establish the required
 1,260-target pencil evidence, together with the already verified full-cohort
 factor-base, projective, and Kummer results.

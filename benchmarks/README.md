@@ -178,4 +178,9 @@ is preserved separately pending validation admission.
 
 ## Studies awaiting benchmark admission
 
+The [independent factor-base / graph replication](20261024-factor-base-graph-replication/README.md)
+retains five-arm operation-count evidence over 1,260 public targets, paired rho,
+and a native validator. It is not admitted to the results table because an
+independent-host replay certificate and isolated wall comparison are absent.
+
 The [Jacobian-cover cost breakdown and proposed leads](20261018-jv-cover-cost-breakdown-leads/README.md) retain component-count evidence and a corrected report. This study is not admitted to the results table: its component census has no matched end-to-end rho reference or complete validation-gate record.

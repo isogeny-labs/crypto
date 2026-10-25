@@ -1,0 +1,33 @@
+{
+  "schema": "projective-law-formal-branch-coverage/v1",
+  "runtime_source_sha256": "5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0",
+  "binding_kind": "manual_label_inventory_with_source_hash",
+  "rows": [
+    {"context":"add11","runtime_label":"inverse","lean_constructor":"add11Inverse","certificate_schema":"definitional-inverse/v1"},
+    {"context":"add11","runtime_label":"doubling","lean_constructor":"add11Doubling","certificate_schema":"projective-symbolic-1plus2-exception/v1"},
+    {"context":"add11","runtime_label":"distinct","lean_constructor":"add11Distinct","certificate_schema":"projective-symbolic-22-shared/v1"},
+    {"context":"add12_weighted_complete","runtime_label":"common","lean_constructor":"add12Common","certificate_schema":"projective-symbolic-1plus2/v1"},
+    {"context":"add12_weighted_complete","runtime_label":"cancellation","lean_constructor":"add12Cancellation","certificate_schema":"projective-symbolic-1plus2-exception/v1"},
+    {"context":"add12_weighted_complete","runtime_label":"tripling","lean_constructor":"add12Tripling","certificate_schema":"projective-symbolic-triple/v1"},
+    {"context":"add12_weighted_complete","runtime_label":"coincident_double_plus_other","lean_constructor":"add12CoincidentDoublePlusOther","certificate_schema":"projective-symbolic-1plus2-exception/v1"},
+    {"context":"add22_weighted","runtime_label":"same_u_inverse","lean_constructor":"add22SameUInverse","certificate_schema":"definitional-inverse/v1"},
+    {"context":"add22_weighted","runtime_label":"same_u_mixed","lean_constructor":"add22SameUMixed","certificate_schema":"projective-symbolic-22-mixed/v1"},
+    {"context":"add22_weighted","runtime_label":"shared_cancellation","lean_constructor":"add22SharedCancellation","certificate_schema":"projective-symbolic-22-shared/v1"},
+    {"context":"add22_weighted","runtime_label":"shared_positive","lean_constructor":"add22SharedPositive","certificate_schema":"projective-symbolic-22-shared/v1"},
+    {"context":"add22_weighted","runtime_label":"c_zero_degree_one","lean_constructor":"add22CZeroDegreeOne","certificate_schema":"projective-symbolic-22-drop/v1"},
+    {"context":"add22_weighted","runtime_label":"common_degree_two","lean_constructor":"add22CommonDegreeTwo","certificate_schema":"projective-symbolic-22-common/v1"},
+    {"context":"double22_weighted_variant","runtime_label":"b_zero_identity","lean_constructor":"double22Identity","certificate_schema":"projective-symbolic-22-double/v1"},
+    {"context":"double22_weighted_variant","runtime_label":"b_zero_point_double","lean_constructor":"double22PointDouble","certificate_schema":"projective-symbolic-22-double/v1"},
+    {"context":"double22_weighted_variant","runtime_label":"c_zero_degree_one","lean_constructor":"double22CZeroDegreeOne","certificate_schema":"projective-symbolic-22-double/v1"},
+    {"context":"double22_weighted_variant","runtime_label":"common_degree_two","lean_constructor":"double22CommonDegreeTwo","certificate_schema":"projective-symbolic-22-double/v1"}
+  ],
+  "unreachable_or_unresolved_labels": [
+    {"runtime_label":"coincident_y_mismatch","lean_status":"excluded_by_equal_or_opposite_of_sq_eq_sq"},
+    {"runtime_label":"same_u_mixed_zero_slope_delta","lean_status":"excluded_by_same_u_zero_slope_delta_is_inverse"},
+    {"runtime_label":"shared_zero_q_delta","lean_status":"excluded_by_shared_zero_q_delta_unreachable"},
+    {"runtime_label":"shared_y_mismatch","lean_status":"excluded_by_equal_or_opposite_of_sq_eq_sq"},
+    {"runtime_label":"shared_first_secondary_exception","lean_status":"written_branch_argument_only"}
+  ],
+  "all_rows_divisor_class_bridge": "unmechanized",
+  "semantic_correspondence": "not_established"
+}

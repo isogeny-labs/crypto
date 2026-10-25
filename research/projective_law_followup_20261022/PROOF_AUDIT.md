@@ -423,13 +423,14 @@ in `src/bin/projective_symbolic_triple.rs` and
 `src/bin/projective_symbolic_22_drop.rs` and
 `src/bin/projective_symbolic_22_mixed.rs` and
 `src/bin/projective_symbolic_22_double.rs` and
-`src/bin/projective_symbolic_22_shared.rs`. The
-divisor-class bridge and weighted identities have no Lean declaration yet.
-A core-only Lean 4.34.1 probe found neither
-`Field` nor `Polynomial` in `Std`; completing a faithful Lean version
-needs a pinned algebra library or local definitions and a verified
-divisor-class representation. No weakened conditional Lean theorem is
-claimed as the full group-law proof.
+`src/bin/projective_symbolic_22_shared.rs`. A later pinned
+[Lean boundary packet](formal/README.md) declares three branch-selection
+lemmas and three literal formula fragments, including both generic 2+2
+interpolation factorizations. It does not formalize the runtime semantics,
+exceptional-branch composition, smooth-curve/Mumford model, or the
+principal-divisor and `Pic^0` bridge. Its conditional bridge theorem only
+applies a caller-supplied implication and is not claimed as the full
+group-law proof.
 
 ### Remaining review boundary
 

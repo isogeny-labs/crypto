@@ -1,0 +1,97 @@
+{
+  "schema": "kummer-fixed-offset-orbit-manifest/v1",
+  "study_id": "KUMMER-FIXED-OFFSET-ORBIT-20261024",
+  "repository_revision": "42236745144c9ae1182b91392eaa7eed765e9abd",
+  "input_frozen_before_derivation": true,
+  "input_sha256": "b57fbb4c3be313842aa2d3024d1b3d221e8b380caf8fbb4c219c4222f55fe41a",
+  "source_model_records": "research/kummer_walk_20261022/results/model-exceptions-<bits>.jsonl",
+  "commands": [
+    "python3 research/kummer_differential_collector_20261022/orbit-proof/generate.py",
+    "python3 research/kummer_differential_collector_20261022/orbit-proof/validate.py",
+    "python3 research/kummer_differential_collector_20261022/orbit-proof/plot.py",
+    "ELAN_TOOLCHAIN=leanprover/lean4:v4.34.1 tools/lean/proof-gate.sh research/kummer_differential_collector_20261022/orbit-proof/lean/FixedOffsetOrbit.lean",
+    "(cd research/kummer_differential_collector_20261022/orbit-proof && tectonic REPORT.tex)"
+  ],
+  "population": {
+    "models": 21,
+    "jumps_per_model": 16,
+    "bound_rows": 336,
+    "price_rows": 12096
+  },
+  "outputs": {
+    "frozen-inputs.json": {
+      "sha256": "b57fbb4c3be313842aa2d3024d1b3d221e8b380caf8fbb4c219c4222f55fe41a",
+      "bytes": 27885
+    },
+    "results/bounds.csv": {
+      "sha256": "ef46702dfbe09549939041cffcee0aed67bdfd771cd2d30ed0a5e7302913ac01",
+      "bytes": 70918
+    },
+    "results/price-grid.csv": {
+      "sha256": "f0d0a191ce8376cd38eb91258c8460aa8b947950b047f56853e0bfe7db46d132",
+      "bytes": 1707681
+    },
+    "results/summary.json": {
+      "sha256": "22767fb6300cf9ca05f70f31ca0ba406d79587e88b60f5988f302a7143f2a454",
+      "bytes": 661
+    },
+    "results/validation.json": {
+      "sha256": "7eea4a254dc4b7d1688d193061955eba1cc8370b6a8e03e80f350053bb12cf57",
+      "bytes": 460
+    },
+    "results/.artifacts.json": {
+      "sha256": "10699548bd64ddb2a245152930552976ad88b5bd03022f89799105eaea9e928c",
+      "bytes": 284
+    },
+    "lean/FixedOffsetOrbit.lean": {
+      "sha256": "5339bb89b8090d24869e4ac00fc09dc98ac81752435c229e6d2cc004d8e80eb9",
+      "bytes": 1838
+    },
+    "evidence/native-validation.log": {
+      "sha256": "0b6b1f1525e12e6878dc0198dd569fe5533326baddb38ad7c44a234e7d6dce8f",
+      "bytes": 438
+    },
+    "evidence/proof-gate.log": {
+      "sha256": "f45e1635ce869df7968b7bcff16050d4f08421001b5acd538655a5214d5d0dfb",
+      "bytes": 132
+    },
+    "orbit-bounds.svg": {
+      "sha256": "8cec09fef87fe1c198e650a9bb09f23f181714455a0076396534a156164b41ba",
+      "bytes": 6872
+    },
+    "orbit-bounds.png": {
+      "sha256": "80155567b0aba9a0cefface2e05807de9139588d472403f4f74971bbda819a74",
+      "bytes": 55545
+    },
+    "REPORT.pdf": {
+      "sha256": "198b8cf6d06f7fc6594fe8aa409b7274ba73c0326e791852e877487ecaa1ced9",
+      "bytes": 71610
+    },
+    "evidence/proof-gate-rerun-blocker.log": {
+      "sha256": "89178bd96046f51a7f98888df0174748f892779030f60e471cb9a0515c365740",
+      "bytes": 620
+    }
+  },
+  "artifact_store": {
+    "remote": "s3://setec-astronomy-artifacts/store",
+    "manifest": "results/.artifacts.json",
+    "remote_verification": "passed_2_entries_2026-10-24"
+  },
+  "formal_gate": {
+    "declarations": 7,
+    "trusted_declarations": 0,
+    "status": "pass",
+    "rerun_note": "evidence/proof-gate-rerun-blocker.log"
+  },
+  "native_validation": {
+    "prime_checks": 21,
+    "gcd_checks": 336,
+    "bound_rows": 336,
+    "price_rows": 12096,
+    "failures": 0
+  },
+  "result_scope": "explicit_fixed_offset_one_xadd_per_entry_current_u64x4_representation",
+  "arbitrary_sidecar_status": "open",
+  "target_execution": false,
+  "scalar_recovery": false
+}

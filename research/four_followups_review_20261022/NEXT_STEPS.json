@@ -98,21 +98,98 @@
       "name": "projective_divisor_class_proof",
       "execution_class": "formal_verification",
       "closes_pencil_cohort": false,
-      "status": "ready"
+      "status": "verified_partial_mechanization",
+      "proved_obligations": 8,
+      "remaining_gap": "Rust-to-Lean semantic correspondence and the smooth-curve, Mumford, principal-divisor and Pic0 bridge remain unproved."
     },
     {
       "id": "N7",
       "name": "kummer_sidecar_obstruction_theorem",
       "execution_class": "formal_verification",
       "closes_pencil_cohort": false,
-      "status": "ready"
+      "status": "verified_fixed_offset_model",
+      "models": 21,
+      "jumps_per_model": 16,
+      "bound_rows": 336,
+      "pricing_rows": 12096,
+      "remaining_gap": "Arbitrary, compressed, label-free and alternate-recurrence sidecars remain open."
     },
     {
       "id": "N8",
       "name": "factor_base_seed_replication",
       "execution_class": "public_known_answer_experiment",
       "closes_pencil_cohort": false,
-      "status": "ready"
+      "status": "verified_complete",
+      "targets": 1260,
+      "candidate_records": 6300,
+      "matched_rho_records": 6300,
+      "pricing_rows": 1440,
+      "representative_ratios": {
+        "full16": 2.5227343832797264,
+        "full32": 2.5133951171884013,
+        "full8": 2.549755465312544,
+        "half16": 2.995142853999798,
+        "quarter16": 3.984297848745587
+      },
+      "mixed_slice": {
+        "arm": "full8",
+        "bits": 16,
+        "representative_ratio": 0.9809934052203441,
+        "winning_cells": 23,
+        "losing_cells": 13
+      }
+    },
+    {
+      "id": "N9",
+      "name": "projective_runtime_and_pic0_bridge",
+      "execution_class": "formal_verification",
+      "closes_pencil_cohort": false,
+      "status": "proposed",
+      "acceptance": [
+        "checksum-bound Rust-to-Lean branch semantics",
+        "formal smooth quintic and reduced Mumford representation",
+        "principal-divisor and Pic0 equality for every reachable branch",
+        "no caller-supplied global correctness implication"
+      ]
+    },
+    {
+      "id": "N10",
+      "name": "cross_study_phase_normalization",
+      "execution_class": "derived_existing_evidence",
+      "closes_pencil_cohort": false,
+      "status": "proposed",
+      "acceptance": [
+        "source-specific mappings to one declared phase schema",
+        "per-row normalized phase sum equals recorded cold total",
+        "explicit nulls for sources without sufficient counters",
+        "standard CSV graph PDF and checksums"
+      ]
+    },
+    {
+      "id": "N11",
+      "name": "compressed_or_label_free_kummer_sidecar",
+      "execution_class": "theorem_before_experiment",
+      "closes_pencil_cohort": false,
+      "status": "proposed",
+      "acceptance": [
+        "target-scalar-independent state machine",
+        "proved relation-label and sign recovery",
+        "collision and exceptional-state bounds",
+        "operation and storage comparison with the fixed-offset packet"
+      ]
+    },
+    {
+      "id": "N12",
+      "name": "held_out_factor_base_tuning",
+      "execution_class": "public_known_answer_experiment",
+      "closes_pencil_cohort": false,
+      "status": "proposed",
+      "acceptance": [
+        "model-level train and evaluation split frozen before tuning",
+        "parameter choice uses training cohort only",
+        "frozen choice runs on every held-out target with matched rho",
+        "all 36 price cells and every loss retained"
+      ]
     }
   ],
   "reporting": {

@@ -1,10 +1,10 @@
 # Sign-safe Kummer relation labels for a genus-2 collector
 
-- **Status:** `partly resolved`; fixed-difference full collector measured, arbitrary-jump sidecar open
+- **Status:** `partly resolved`; fixed-difference collector measured and fixed-offset orbit bound formalized, arbitrary-sidecar construction open
 - **Kind:** restricted implementation and proof gap, with a proved ordinary-addition obstruction
 - **Affected work:** [four-follow-up protocol](../research/four_followups_20261021/PROTOCOL.md), Kummer walk arithmetic
 - **Next action owner:** PR #2304 follow-up
-- **Last updated:** 2026-10-22
+- **Last updated:** 2026-10-24
 
 ## Problem
 
@@ -54,6 +54,13 @@ its distinct recurrence and cost claim remain open.
   If `J` has order `m`, every nonempty such `S` contains at least `m` offsets.
   This rules out a constant-size sidecar of that exact form for a large-order
   jump; it does not rule out other recurrences or walks.
+- **Formalized restricted obstruction:** The
+  [fixed-offset orbit packet](../research/kummer_differential_collector_20261022/orbit-proof/REPORT.md)
+  proves the closure-to-orbit step in Lean and checks 336 frozen cyclic
+  witnesses (21 prime-order groups by 16 nonzero jumps). Every exact orbit has
+  size `r`; the explicit current `[u64;4]` state bound ranges from 1,092,704 to
+  17,668,176,138,464 bytes. These are bounds for the stated explicit
+  one-xADD-per-entry model, not for compressed or different sidecars.
 - **Remaining gap:** The fixed-difference implementation supplies explicit
   coordinates, checked differential formulas, signed recovery and a full
   priced collector. It does not supply the sidecar recurrence for the frozen
@@ -67,6 +74,8 @@ its distinct recurrence and cost claim remain open.
   recovery, including negation, identity and two-torsion cases.
 - [ ] Specify and prove an efficiently updatable walk state with the needed
   difference/anchor sidecar under changing arbitrary jumps and cycle closure.
+- [x] Mechanize the fixed-offset closure theorem and instantiate all 336
+  frozen prime-order group/nonzero-jump orbit witnesses.
 - [x] Implement and cross-check Kummer formulas against the Jacobian on all
   21 models, then run and independently replay 1,260 frozen targets with
   complete cold pricing and matched source rho for a fixed-difference walk.
@@ -116,3 +125,9 @@ recovery passed; all 1,260 candidate and same-process rho controls were
 source-verified and independently replayed. Full-cold candidate/rho ratios
 were 8.959687–55.935424 across 36 cells. The arbitrary-jump sidecar remains
 unimplemented.
+
+2026-10-24 fixed-offset theorem: Lean checked the conditional closure-to-orbit
+theorem, and the native validator checked 336 exact cyclic instances with zero
+failures. This closes the proof obligation for the direct explicit
+fixed-offset state model. It does not establish an arbitrary-sidecar
+impossibility or provide the still-missing recurrence.

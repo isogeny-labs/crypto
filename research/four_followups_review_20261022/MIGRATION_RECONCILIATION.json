@@ -1,0 +1,55 @@
+{
+  "schema": "four-followups-spot-migration-reconciliation/v1",
+  "observed_utc": "2026-10-24T23:02:38Z",
+  "source_instance": "i-01f85a6c905181498",
+  "destination_instance": "i-09774109223fde89e",
+  "migration": {
+    "receipt_path": "/srv/experiments/agent-migration/handoff-receipt.json",
+    "receipt_sha256": "a16037f61139810dcb13bea313349a2f9d4f1a43471c7ffc04ea3e1828dac0c1",
+    "workspace_verified": true,
+    "source_codex_stopped": true
+  },
+  "diem": {
+    "runtime_receipt_path": "/run/spot-legacy/diem.json",
+    "runtime_receipt_sha256": "9e3315bf48e1145d46af310a62c66d56701b639e9f02a86bdec0e37afdf7f14c",
+    "native_config_sha256": "bac57870775ace9605769b2eeb11ebf5ba5eaf492f2a796c9fabe07ce2901b58",
+    "state": "deadline-expired",
+    "durable_records": 50,
+    "expected_records": 52,
+    "pending": false,
+    "managed_service": "spot-diem-recovery.service",
+    "managed_service_result": "inactive_after_successful_reconciliation",
+    "decision": "do_not_relaunch"
+  },
+  "source_freeze_followup": {
+    "snapshot_worktree": "/srv/experiments/agent-migration/home/crypto-pr2304-external",
+    "snapshot_head": "b5ca4fe417990d81c459f0f5d7ec6f6bae5ac183",
+    "runner_sha256": "cdea2612d60ff8941a8fff14fdc147b1abbfdaca0cad0aa53c75fc618a492199",
+    "replay_runner_sha256": "a372011575fac00ce70843d217a457ef166eb38458d3787332804a57ea8bb0bc",
+    "preserved_status_sha256": "9a373732f9f7ce61ab78abba3b9bce65a92142321bce87a70a0d50cb2fd1b3cd",
+    "preserved_jsonl_sha256": "1a1e59e22ea23c1824f57bcf626c7270c685039732ad31d164e6f576df616873",
+    "preserved_result": {
+      "p": 186379,
+      "target_index": 0,
+      "status": "complete",
+      "failure": "sparse_matrix_cap",
+      "candidate_verified": false,
+      "rho_verified": true
+    },
+    "decision": "preserve_without_repeat; exact sparse continuation remains outside this local lane"
+  },
+  "eks": {
+    "cluster": "isolab",
+    "cluster_state": "ACTIVE",
+    "caller_role": "spot-experiments-WorkerRole-G1FZ84yk3gS6",
+    "cluster_list_permission": "denied_by_scoped_rbac",
+    "launcher_project": "isolab-experiment-launcher",
+    "recent_launcher_builds_checked": 6,
+    "recent_launcher_builds_active": 0,
+    "recent_launcher_builds_succeeded": 5,
+    "recent_launcher_builds_failed": 1,
+    "latest_observed_run_object": "runs/boolean-f6-full-rank-index-results-fresh-20261024t174213z/report-evidence.tar.gz",
+    "latest_observed_run_object_utc": "2026-10-24T22:25:35Z",
+    "decision": "do_not_repeat_or_modify_existing_jobs; current N6-N8 work is local and receipt-driven"
+  }
+}

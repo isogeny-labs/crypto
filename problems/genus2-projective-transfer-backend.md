@@ -4,7 +4,7 @@
 - **Kind:** proof/generalization gap; frozen cohort measurement is complete
 - **Affected work:** [five-leads follow-up](../research/five_leads_e2e_20261019/STATUS.md), L5; [four follow-ups](../research/four_followups_20261021/REPORT.md)
 - **Next action owner:** PR #2304 follow-up
-- **Last updated:** 2026-10-22
+- **Last updated:** 2026-10-25
 
 ## Problem
 
@@ -75,19 +75,32 @@ for arbitrary inputs.
   implemented branch now has such a certificate/argument under
   the stated smooth-curve and valid-input assumptions. Faithful
   formalization and independent proof review remain outstanding.
+- **Mechanized, 2026-10-25:** The pinned Lean
+  [formal boundary](../research/projective_law_followup_20261022/formal/README.md)
+  kernel-checks three branch-selection obligations, the generic 1+2 cleared
+  output-ordinate identity, both generic 2+2 interpolation factorization
+  identities, and a total manual runtime-label-to-certificate inventory.  Its
+  axiom audit reports no unexpected axioms.  The runtime source and all eight
+  native certificate schemas are SHA-256 bound.  Lean does not parse the Rust
+  implementation, and the smooth-curve/Mumford/principal-divisor/`Pic^0`
+  bridge is deliberately an explicit unsupplied hypothesis.  This is partial
+  mechanization and does not close universal correctness.
 - **Suspected explanation:** None needed for the measured cost. Independent
   review of the written branch composition remains a proof obligation.
-- **Missing capability:** Faithful mechanization or independent mathematical
-  review of the complete branch argument. Hardware speed additionally
+- **Missing capability:** Faithful mechanization of the divisor-class bridge
+  and runtime semantic correspondence, or independent mathematical review of
+  the complete branch argument. Hardware speed additionally
   requires isolated timing and the applicable external arithmetic comparator.
 - **What this evidence does not establish:** Finite branch checks and successful
   cohort solves do not prove universal formula completeness or wall speed.
 
 ## What would unblock it
 
-- [ ] Independently review and faithfully formalize the now-complete written
-  addition/doubling case map, including exceptional compositions and the
-  divisor-class bridge, on the stated model family.
+- [ ] Independently review and finish formalizing the now-complete written
+  addition/doubling case map, including Rust-to-theorem correspondence,
+  exceptional compositions, and the divisor-class bridge on the stated model
+  family.  The 2026-10-25 Lean packet proves the listed algebraic sublemmas but
+  leaves this geometric/semantic bridge explicit.
 - [x] Replay the original 1,260 exact-order one-target workloads with unchanged identities/seeds and matched source rho; retain primitive/native counts and source-answer checks for both measured arms.
 - [ ] If claiming wall speed, run matched L2/A/A timing and the fastest available external arithmetic comparator.
 
@@ -170,3 +183,9 @@ composition through the previously certified helpers. This completes
 the branch-by-branch written proof map, but no faithful Lean theorem
 or independent mathematical review has been recorded. The problem
 remains open at that stronger proof boundary.
+
+2026-10-25: A pinned Lean/Mathlib packet kernel-checked seven named algebraic
+and inventory theorems with no unexpected axioms.  It intentionally leaves
+the divisor-class bridge as a caller-supplied proposition and binds the manual
+Rust/certificate mapping by hashes rather than claiming source equivalence.
+The problem therefore remains open at the universal-correctness boundary.
