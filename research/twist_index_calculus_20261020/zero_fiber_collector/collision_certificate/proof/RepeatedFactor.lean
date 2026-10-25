@@ -17,7 +17,13 @@ theorem power_zero (noZero : ∀ u v : R, u*v=0 → u=0 ∨ v=0)
   have aux : ∀ n : Nat, g^n=0 → g=0 := by
     intro n
     induction n with
-    | zero => intro hn; grind
+    | zero =>
+      intro hn
+      have ho : (1 : R)=0 := by simpa [Lean.Grind.Semiring.pow_zero] using hn
+      calc
+        g = g*1 := (Lean.Grind.Semiring.mul_one g).symm
+        _ = g*0 := congrArg (fun t : R => g*t) ho
+        _ = 0 := Lean.Grind.Semiring.mul_zero g
     | succ n ih =>
       intro hn
       have hp : g^n*g=0 := by simpa [Lean.Grind.Semiring.pow_succ] using hn
