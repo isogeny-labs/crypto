@@ -71,6 +71,20 @@ Main-branch rolling releases retain their existing full packaging behavior.
 The ecbench workflow also starts on every PR/merge group so dependency and
 embedded-data changes cannot disappear behind an incomplete trigger allowlist.
 
+### Result-page triggers
+
+AGENTS.md section 7a has every result PR edit
+`docs/index-calculus-scoreboard.html`, often with `docs/ic-current-state.html`,
+so a workflow whose `paths:` filter matches either page runs on every result
+PR. [check-result-page-triggers.py](scripts/check-result-page-triggers.py)
+allows that only for the workflows listed in its `ALLOWED` table, each with
+its reason: the dashboard renderer, the site build, the curve-name scan, and
+one frozen workflow whose own bytes are pinned by its evidence. A frozen-result
+replay that never opens the pages fails the check (#1952 and #2060 removed six
+such triggers). It follows GitHub's glob rules, so `docs/**` or `**/*.html`
+count, and it also fails on an `ALLOWED` entry that no longer matches.
+Workflows with no path filter run on every PR by design and are not checked.
+
 ## Budgets and evidence coverage
 
 Every job eligible for an ordinary PR or merge group has an explicit execution
@@ -167,6 +181,8 @@ node --test .github/scripts/test-frozen-workflow-check.mjs
 python3 -B scripts/test_workflows_parse.py -v
 python3 -B .github/scripts/test-pr-budgets.py -v
 python3 -B .github/scripts/check-pr-budgets.py
+python3 -B .github/scripts/test-result-page-triggers.py -v
+python3 -B .github/scripts/check-result-page-triggers.py
 actionlint .github/workflows/{codeql,ecbench,release,rust-all-targets,rust-lint,workflows-parse}.yml
 ```
 
