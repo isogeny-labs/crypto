@@ -138,7 +138,12 @@ fn main() -> Result<()> {
                 .collect::<Vec<_>>()
                 .join(";");
             rank_gp.push_str(&format!(
-                "if(matrank(Mod([{matrix}],{order}))!={rank},error(\"projected row rank\"));\n"
+                "if(matrank(Mod(1,{order})*Mat([{matrix}]))!={rank},error(\"projected row rank\"));\n"
+            ));
+        } else {
+            rank_gp.push_str(&format!(
+                "if(matrank(matrix(0,{}))!=0,error(\"empty projected rank\"));\n",
+                base.len() + 1
             ));
         }
         row_information.push(json!({"workload":id,"source_order":order,"canonical_tuple_witnesses":data["witnesses"].as_array().unwrap().len(),"distinct_projected_coefficient_rows":unique.len(),"rank_mod_source_order":rank,"row_columns":"B base-point coefficients followed by target coefficient -1","one_deterministic_sign_witness_per_canonical_tuple":true}));
@@ -326,7 +331,7 @@ fn main() -> Result<()> {
                 .unwrap()["rank_mod_source_order"]
                 .as_u64()
                 .unwrap();
-            comparisons.push(json!({"workload":id,"p":w["p"],"B":w["B"],"arity":w["arity"],"arm":arm,"paired_complete_affine_certificates":paired,"candidate_row_multiplications":count,"best_ordinary_row_multiplications":base,"candidate_to_ordinary_ratio":ratio,"verified_projected_row_rank":rank,"row_multiplications_per_rank_unit":if paired&&rank>0{Some(count as f64/rank as f64)}else{None},"all_other_phase_costs_missing":true}));
+            comparisons.push(json!({"workload":id,"p":w["p"],"B":w["B"],"arity":w["arity"],"arm":arm,"paired_complete_affine_certificates":paired,"candidate_row_multiplications":count,"best_ordinary_row_multiplications":base,"candidate_to_ordinary_ratio":ratio,"full_task_projected_row_rank":rank,"rank_is_not_an_affine_solver_cost_denominator":true,"all_other_phase_costs_missing":true}));
         }
     }
     let targets = workloads

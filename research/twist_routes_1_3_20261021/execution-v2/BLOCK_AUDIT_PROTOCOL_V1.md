@@ -30,8 +30,10 @@ measure different quantities. Use exactly the already retained deterministic
 sign witness per tuple; this is not a census of all possible sign witnesses.
 Generate a separate PARI input that independently recomputes every one of
 the 90 ranks. This analysis opens no new target labels and selects no
-candidate. Ratios per rank unit remain row-multiplication diagnostics with
-all other costs missing. The minimum ordinary count is a preregistered
+candidate. Report full-task rank separately from affine solver work:
+exceptional-prefix relations can contribute to that rank, so do not divide
+affine row-multiplication counts by it as though the solver produced every
+row. The minimum ordinary count is a preregistered
 hindsight comparator; it is not an executable selector or a frozen IC pipeline.
 
 Run only after the solver/checker phases, with fresh output, one worker,
