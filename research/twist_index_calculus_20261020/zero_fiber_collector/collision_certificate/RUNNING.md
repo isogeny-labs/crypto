@@ -1,8 +1,11 @@
 # Managed owner: reconcile before continuing
 
-The registered service name is `twist-collision-certificate-panel-v1.service`.
-Launch is pending at this registration checkpoint. A native result or live
-launch receipt, rather than this plan, establishes execution.
+The service `twist-collision-certificate-panel-v1.service` accepted its one
+launch with exit 0 at 2026-10-25T02:52:22Z. Its observed main PID is
+3540174, active/running, with `Restart=no`. The registration/source freeze
+is commit `221e34d57e5e052e0c3c0320e1748019d35235c1`, before launch.
+The copied runner matches the registered SHA-256. Both controller and
+native descendants have been inspected in the actual unit cgroup.
 
 - Frozen workload and code: [FREEZE.json](FREEZE.json).
 - Raw output: `../runs/collision-certificate-panel-v1`.
@@ -25,3 +28,10 @@ A partial matrix/certificate diagnostic does not close the complete-cost
 or broader twist-symmetry objective. Diem, the old cancelled waiting/freeze
 lane, existing EKS jobs and the original 85-configuration panel remain
 separate owners and are not restarted here.
+
+At the 2026-10-25T03:10:18Z checkpoint, the first p37 phi case has first,
+independent audit, repeat and parity exits 0. The paired doubling first
+execution exits 0, with its remaining gate phases pending. These are
+partial execution receipts; the 42-case experiment is not complete. Raw
+model numbers remain diagnostic, and final full-panel reduction/report and
+separate archive verification/publication remain pending.
