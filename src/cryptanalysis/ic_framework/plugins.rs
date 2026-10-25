@@ -14,6 +14,7 @@
 //! | `koblitz-orbit` | Koblitz | the same, each signed Frobenius orbit folded onto one column |
 //! | `compact-orbit-scan` | Koblitz | deterministic raw-abscissa scan, subgroup projection and signed Frobenius closure |
 //! | `cyclotomic` | Koblitz, `2n+1` prime | the γ-weight-`w` abscissae `Σ_{k∈S} γ^k` (lead A2), projected and folded like `compact-orbit-scan` |
+//! | `onb-weight` | Koblitz, `2n+1` prime | ONB Hamming-weight-`w` abscissae, projected and folded like `cyclotomic` (low-HW D\* hypothesis) |
 //! | `glv-orbit` | prime | the closure of the smallest abscissae under the curve's automorphism group, each orbit folded onto one column (`j = 0`: 6 points a column, `j = 1728`: 4, generic: 2) |
 //! | `gls-line` | GLS over `F_{p²}` | the `ψ`-stable line `x ∈ u·s·F_p`, each `⟨−1, ψ⟩`-orbit folded onto one column (4 points a column) |
 //!
@@ -31,6 +32,7 @@
 //! | `subtract` | 2 | test `R − P ∈ F` for every signed base point; no table |
 //! | `mitm` | 2 or 3 | a pair table probed once per target, or once per `R − P` |
 //! | `mitm-prime-batch` | 2 | the same folded prime pair table, built with one batched inversion per abscissa row and x-only sums |
+//! | `mitm-prime-blocked` | 2 | the same table and sums again, inserted in cache-sized pieces (many small maps, each block grouped by map) |
 //! | `mitm-frobenius` | 2 or 3 | the same on a Frobenius-folded table (Koblitz) |
 //! | `mitm-frobenius-counted` | 2 or 3 | the same table and probe, with native table setup counters |
 //! | `rootfind-subtract` | 2 or 3 | prime curves: `prime_fast`'s direct-subtraction root finding, every `x(R ∓ F_i)` of a target from one Montgomery batched inversion, then a lookup (`m = 2`) or a probe of the negation-folded pair table (`m = 3`) |
@@ -38,7 +40,7 @@
 //! The pair table is where memory buys time, and `mitm`'s
 //! `negation_folded` parameter halves the additions that build it.
 
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::time::{Duration, Instant};
 
 use num_traits::ToPrimitive;
@@ -132,6 +134,246 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeAbscissaBase<'_> {
     }
 }
 
+/// Scan rational points, project by the cofactor, and retain distinct signed
+/// subgroup points. This is a different base from `prime-abscissa`: the
+/// abscissae after projection need not be small.
+pub struct PrimeProjectedAbscissaBase<'i> {
+    pub instance: &'i PrimeInstance,
+}
+
+#[cfg(test)]
+mod projected_prime_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::Calibration;
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+
+    fn fixture() -> PrimeInstance {
+        let curve = PrimeCurve {
+            p: 113,
+            a: 19,
+            b: 2,
+        };
+        let mut ops = GroupOps::default();
+        for x in 1..113 {
+            if let Some(y) = curve.sqrt(curve.rhs(x)) {
+                let g = curve.mul(&mut ops, PrimePoint::affine(x, y), 16);
+                if !g.infinity && curve.mul(&mut ops, g, 7).infinity {
+                    return PrimeInstance {
+                        name: "projected-control".into(),
+                        curve,
+                        group_order: 112,
+                        r: 7,
+                        cofactor: 16,
+                        generator: (g.x, g.y),
+                    };
+                }
+            }
+        }
+        panic!("control generator missing")
+    }
+    #[test]
+    fn projected_base_checks_membership_and_counts_projection() {
+        let inst = fixture();
+        let ctx = InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target: inst.generator_point(),
+            r: 7,
+            cofactor: 16,
+            group_order: 112,
+            name: inst.name.clone(),
+            field_degree: None,
+        };
+        let (_, params) =
+            Params::parse_spec("prime-projected-abscissa:size=2,scan_cap=64").unwrap();
+        let mut ops = GroupOps::default();
+        let fb = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx, &params, &mut ops)
+            .unwrap();
+        assert_eq!(fb.columns, 2);
+        assert_eq!(fb.points.len(), 4);
+        assert!(ops.scalar_mults >= 4);
+        assert!(fb.cost.get("projected_base_membership_checks_uncharged") >= 2);
+        for p in &fb.points {
+            assert!(inst.curve.is_on_curve(*p));
+            assert!(!p.infinity);
+            assert!(inst.curve.mul(&mut ops, *p, 7).infinity);
+        }
+        let (_, bad) = Params::parse_spec("prime-projected-abscissa:size=4,scan_cap=64").unwrap();
+        assert!(PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx, &bad, &mut ops)
+            .is_err());
+    }
+    #[test]
+    fn projected_relations_recover_every_nonzero_control_log() {
+        let inst = fixture();
+        for k in 1..7 {
+            let mut scratch = GroupOps::default();
+            let q = inst.curve.mul(&mut scratch, inst.generator_point(), k);
+            let ctx = InstanceCtx {
+                group: &inst.curve,
+                generator: inst.generator_point(),
+                target: q,
+                r: 7,
+                cofactor: 16,
+                group_order: 112,
+                name: inst.name.clone(),
+                field_degree: None,
+            };
+            let (_, params) =
+                Params::parse_spec("prime-projected-abscissa:size=2,scan_cap=64").unwrap();
+            let spec = PipelineSpec {
+                factor_base: "prime-projected-abscissa".into(),
+                factor_base_params: params,
+                oracle: "mitm".into(),
+                oracle_params: Params::default(),
+                targets: Targets::Random,
+                linalg: "incremental-gauss-full-rank-checked".into(),
+                max_trials: 1000,
+                seed: 21,
+                ..Default::default()
+            };
+            let rep = run_pipeline(
+                &ctx,
+                &spec,
+                &PrimeProjectedAbscissaBase { instance: &inst },
+                &mut MitmOracle::new(2),
+                u64::MAX,
+                &Calibration {
+                    ns_per_add: 1.0,
+                    ns_per_double: 1.0,
+                    ..Default::default()
+                },
+                None,
+            )
+            .unwrap();
+            assert_eq!(rep.recovered, Some(k));
+            assert!(
+                inst.curve
+                    .mul(&mut scratch, inst.generator_point(), rep.recovered.unwrap())
+                    == q
+            );
+        }
+    }
+}
+
+impl FactorBaseBuilder<PrimeCurve> for PrimeProjectedAbscissaBase<'_> {
+    fn name(&self) -> &str {
+        "prime-projected-abscissa"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!("{} distinct signed subgroup columns from cofactor-projected raw abscissae; scan cap {}",
+            params.get("size").unwrap_or("?"), params.get("scan_cap").unwrap_or("?"))
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "size",
+                "distinct negation pairs in the selected prime subgroup",
+            ),
+            ("scan_cap", "maximum raw abscissae scanned; required"),
+        ]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        let inst = self.instance;
+        if ctx.r != inst.r || ctx.cofactor != inst.cofactor || ctx.group_order != inst.group_order {
+            return Err("projected base context does not match its instance".into());
+        }
+        let size = params.u64("size")?;
+        let cap = params.u64("scan_cap")?;
+        if inst.r < 5 || size == 0 || size > (inst.r - 1) / 2 || cap == 0 || cap >= inst.curve.p {
+            return Err("projected base needs 0<size<=(r-1)/2 and 0<scan_cap<p".into());
+        }
+        let start = Instant::now();
+        let curve = &inst.curve;
+        let mut seen = BTreeSet::new();
+        let mut points = Vec::new();
+        let mut columns = Vec::new();
+        let mut coefficients = Vec::new();
+        let mut scanned = 0;
+        let mut sqrts = 0;
+        let mut projected = 0;
+        let mut checked = 0;
+        let mut duplicates = 0;
+        for x in 1..=cap {
+            scanned += 1;
+            let rhs = curve.rhs(x);
+            if curve.legendre(rhs) < 0 {
+                continue;
+            }
+            sqrts += 1;
+            let Some(y) = curve.sqrt(rhs) else {
+                continue;
+            };
+            let point = curve.mul(ops, PrimePoint::affine(x, y), inst.cofactor);
+            projected += 1;
+            if point.infinity {
+                continue;
+            }
+            checked += 1;
+            if !curve.mul(ops, point, inst.r).infinity {
+                return Err(
+                    "cofactor projection produced a point outside the selected subgroup".into(),
+                );
+            }
+            if !seen.insert(point.x) {
+                duplicates += 1;
+                continue;
+            }
+            let point = if point.y <= curve.p - point.y {
+                point
+            } else {
+                curve.neg(point)
+            };
+            let col = seen.len() - 1;
+            points.extend([point, curve.neg(point)]);
+            columns.extend([col, col]);
+            coefficients.extend([1, inst.r - 1]);
+            if seen.len() as u64 == size {
+                break;
+            }
+        }
+        if seen.len() as u64 != size {
+            return Err(format!(
+                "projected base scan exhausted: {} of {size} columns after {scanned} abscissae",
+                seen.len()
+            ));
+        }
+        let mut fb = FactorBase::from_column_map(
+            self.describe(params),
+            points,
+            columns,
+            coefficients,
+            size as usize,
+            |p| curve.key(p),
+            |p| curve.key(&curve.neg(*p)),
+            |p| p.x,
+        )?;
+        fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+        fb.cost.count("abscissae_scanned", scanned);
+        fb.cost.count("legendre_symbols", scanned);
+        fb.cost.count("sqrt_solves", sqrts);
+        fb.cost.count("cofactor_projected_points", projected);
+        fb.cost
+            .count("projected_base_membership_checks_uncharged", checked);
+        fb.cost
+            .count("projected_base_dedup_probes_uncharged", checked);
+        fb.cost.count("projected_base_duplicate_points", duplicates);
+        fb.cost
+            .count("projected_base_column_map_entries_uncharged", 2 * size);
+        Ok(fb)
+    }
+}
+
 /// Points of a binary curve whose abscissa lies in an `F_2`-subspace
 /// of the field, one column per abscissa.
 pub struct BinarySubspaceBase<'i> {
@@ -144,6 +386,12 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
     }
 
     fn describe(&self, params: &Params) -> String {
+        if params.get("basis").is_some() {
+            return format!(
+                "points whose abscissa lies in the explicitly recorded {}-dimensional subspace",
+                params.get("dimension").unwrap_or("?")
+            );
+        }
         format!(
             "points whose abscissa lies in the {}-dimensional subspace spanned by {{1, z, …}}",
             params.get("dimension").unwrap_or("?")
@@ -151,10 +399,16 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[(
-            "dimension",
-            "F_2-dimension of the abscissa subspace; about 2^dimension abscissae",
-        )]
+        &[
+            (
+                "dimension",
+                "F_2-dimension of the abscissa subspace; about 2^dimension abscissae",
+            ),
+            (
+                "basis",
+                "optional explicit full-rank polynomial-basis words separated by semicolons",
+            ),
+        ]
     }
 
     fn build(
@@ -167,7 +421,42 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinarySubspaceBase<'_> {
         if dim == 0 || dim > 30 {
             return Err(format!("subspace dimension {dim} outside 1..=30"));
         }
-        let basis: Vec<u64> = (0..dim).map(|k| 1u64 << k).collect();
+        let basis: Vec<u64> = if let Some(text) = params.get("basis") {
+            let basis: Vec<u64> = text
+                .split(';')
+                .map(|word| {
+                    if let Some(word) = word.strip_prefix("0x") {
+                        u64::from_str_radix(word, 16)
+                    } else {
+                        word.parse()
+                    }
+                })
+                .collect::<Result<_, _>>()
+                .map_err(|e| format!("invalid explicit subspace basis: {e}"))?;
+            if basis.len() != dim as usize
+                || basis.iter().any(|x| *x == 0 || *x >> self.instance.n != 0)
+            {
+                return Err("explicit basis dimension or field word is invalid".into());
+            }
+            let mut pivots = [0u64; 64];
+            for &word in &basis {
+                let mut word = word;
+                while word != 0 {
+                    let k = 63 - word.leading_zeros() as usize;
+                    if pivots[k] == 0 {
+                        pivots[k] = word;
+                        break;
+                    }
+                    word ^= pivots[k];
+                }
+                if word == 0 {
+                    return Err("explicit subspace basis is linearly dependent".into());
+                }
+            }
+            basis
+        } else {
+            (0..dim).map(|k| 1u64 << k).collect()
+        };
         Ok(binary_subspace_factor_base(self.instance, &basis))
     }
 }
@@ -886,6 +1175,149 @@ impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for CyclotomicBase<'_> {
     }
 }
 
+/// Projected signed Frobenius orbits of the ONB Hamming-weight-`w`
+/// abscissae. Same fold as [`CyclotomicBase`]; the generator set is the
+/// normal basis rather than powers of γ. Spec: `onb-weight:w=W[,columns=N]`.
+pub struct OnbWeightBase<'i> {
+    pub instance: &'i BinaryInstance,
+}
+
+impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for OnbWeightBase<'_> {
+    fn name(&self) -> &str {
+        "onb-weight"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "projected signed Frobenius orbits of the ONB Hamming-weight-{} abscissae",
+            params.get("w").unwrap_or("?")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "w",
+                "ONB Hamming weight of the abscissae; the set has C(n, w) elements before curve filtering",
+            ),
+            (
+                "columns",
+                "optional cap on the number of distinct projected signed orbits, in canonical abscissa order; 0 or absent takes them all",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<FastPoint>, String> {
+        use crate::cryptanalysis::cyclotomic_factor_base::CyclotomicField;
+        let inst = self.instance;
+        let kc = inst
+            .koblitz
+            .as_ref()
+            .ok_or("onb-weight requires a Koblitz curve")?;
+        if ctx.r != inst.r || ctx.cofactor != inst.cofactor || ctx.field_degree != Some(inst.n) {
+            return Err("onb-weight context does not match its binary instance".into());
+        }
+        let w = usize::try_from(params.u64("w")?).map_err(|_| "w does not fit in usize")?;
+        let column_cap = match params.get("columns") {
+            None => 0usize,
+            Some(_) => usize::try_from(params.u64("columns")?)
+                .map_err(|_| "columns does not fit in usize")?,
+        };
+        if inst.n == 0 || inst.n >= 64 || inst.n.is_multiple_of(2) {
+            return Err("onb-weight requires an odd degree < 64".into());
+        }
+        let field = CyclotomicField::new(&inst.irreducible, inst.n)?;
+        let abscissae = field.onb_weight_set(w)?;
+        let lambda = kc
+            .lambda
+            .to_u64()
+            .ok_or("Frobenius eigenvalue does not fit in u64")?;
+        let g = ctx.group;
+        let mut seen = HashSet::new();
+        let mut points = Vec::new();
+        let mut col_of = Vec::new();
+        let mut coef_of = Vec::new();
+        let (mut lifts, mut projected, mut frobenius_maps) = (0u64, 0u64, 0u64);
+        'outer: for x in &abscissae {
+            let raw_x = x.raw_bits().first().copied().unwrap_or(0);
+            for point in inst.points_with_x(raw_x) {
+                lifts += 1;
+                let seed = g.mul(ops, point, ctx.cofactor);
+                if g.is_identity(&seed) {
+                    continue;
+                }
+                projected += 1;
+                let mut xk = seed.x;
+                let mut key = xk;
+                for _ in 1..inst.n {
+                    xk = inst.gf.sqr(xk);
+                    key = key.min(xk);
+                }
+                if !seen.insert(key) {
+                    continue;
+                }
+                if !g.is_identity(&g.mul(ops, seed, ctx.r)) {
+                    return Err(format!("projected point from x {raw_x} has wrong order"));
+                }
+                let column = seen.len() - 1;
+                let mut member = seed;
+                let mut coefficient = 1u64;
+                for _ in 0..inst.n {
+                    if !inst.fast.is_on_curve(member) {
+                        return Err(format!("Frobenius image from x {raw_x} is off curve"));
+                    }
+                    points.push(member);
+                    col_of.push(column);
+                    coef_of.push(coefficient);
+                    points.push(g.neg(member));
+                    col_of.push(column);
+                    coef_of.push((ctx.r - coefficient) % ctx.r);
+                    member = inst.fast.frobenius_k(member, 1);
+                    frobenius_maps += 1;
+                    coefficient = ((coefficient as u128 * lambda as u128) % ctx.r as u128) as u64;
+                }
+                if member != seed || coefficient != 1 {
+                    return Err(format!("Frobenius orbit from x {raw_x} is not closed"));
+                }
+                if column_cap > 0 && seen.len() == column_cap {
+                    break 'outer;
+                }
+            }
+        }
+        let columns = seen.len();
+        if columns == 0 {
+            return Err(format!(
+                "no ONB weight-{w} abscissa carries a subgroup point on {}",
+                inst.name
+            ));
+        }
+        let mut fb = FactorBase::from_column_map(
+            format!(
+                "{columns} projected signed Frobenius orbits of the {} ONB weight-{w} abscissae",
+                abscissae.len()
+            ),
+            points,
+            col_of,
+            coef_of,
+            columns,
+            |p| p.pack(),
+            |p| inst.fast.neg(*p).pack(),
+            |p| p.x,
+        )?;
+        fb.cost
+            .count("abscissae_enumerated_uncharged", abscissae.len() as u64);
+        fb.cost.count("point_lifts_uncharged", lifts);
+        fb.cost.count("cofactor_projected_points", projected);
+        fb.cost.count("frobenius_maps", frobenius_maps);
+        Ok(fb)
+    }
+}
+
 /// The prime-field analogue of `koblitz-orbit`: the `size` smallest
 /// abscissae, closed under the curve's automorphism group and folded
 /// one orbit to a column.  `group` picks the group (`auto` takes what
@@ -944,6 +1376,374 @@ impl FactorBaseBuilder<PrimeCurve> for GlvOrbitBase<'_> {
         let group = AutomorphismGroup::parse(params.get("group").unwrap_or("auto"))?;
         let (fb, _) = glv_orbit_base(self.instance, size, group, !params.flag("no_fold"))?;
         Ok(fb)
+    }
+}
+
+/// **Lead A1 on a prime-field CM curve**: the `Z[φ]` multiplier closure
+/// over the curve's small CM endomorphism (`D = −7, −8`: degree 2;
+/// `D = −11`: degree 3; or the free automorphism of a `j = 0` / `1728` curve), the prime-field twin of
+/// `compact-orbit-scan:norm=N`.  Every seed `P` contributes, for each
+/// `α = a + bφ` of norm `a² + t·ab + d·b² ≤ norm` (`φ² − tφ + d = 0`),
+/// the point `α(P) = [a]P + [b]φ(P)` on `P`'s column with weight
+/// `a + bλ`, so `K` seeds behave like `K·M` independent points for the
+/// pair table while the rank stage needs `K + 1` relations.  `norm = 0`
+/// takes the seeds alone (the control).  The endomorphism comes from
+/// `glv_invariant_base::velu_degree{2,3}_endomorphisms`; its evaluation
+/// is charged as one inversion-equivalent group addition per image.
+pub struct CmMultiplierBase<'i> {
+    pub instance: &'i PrimeInstance,
+}
+
+impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
+    fn name(&self) -> &str {
+        "cm-multiplier"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "{} smallest-abscissa seeds, each with its Z[phi] multiples of norm <= {} on its column",
+            params.get("size").unwrap_or("?"),
+            params.get("norm").unwrap_or("0")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("size", "seed abscissae (columns)"),
+            (
+                "norm",
+                "include alpha(P) for every alpha = a + b*phi of norm <= this; 0 or absent: seeds only",
+            ),
+            ("endo", "index of the curve's CM endomorphism; default 0"),
+            (
+                "mult",
+                "also include [m]P for m = 2..=mult with weight m (needs no endomorphism); default 1",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        use crate::cryptanalysis::glv_invariant_base::{
+            smallest_abscissa_points, velu_degree2_endomorphisms, velu_degree3_endomorphisms,
+            Endomorphism,
+        };
+        let inst = self.instance;
+        let g = ctx.group;
+        let r = ctx.r;
+        let size = params.u64("size")? as usize;
+        if size == 0 {
+            return Err("size must be positive".into());
+        }
+        let norm_cap = match params.get("norm") {
+            None => 0i64,
+            Some(_) => params.u64("norm")? as i64,
+        };
+        let which = match params.get("endo") {
+            None => 0usize,
+            Some(_) => params.u64("endo")? as usize,
+        };
+        let mut endos: Vec<Box<dyn Endomorphism<PrimeCurve>>> = Vec::new();
+        // The curve's own automorphism (`j = 0`: zeta_3, `j = 1728`: i) is
+        // free to evaluate; it comes first, after the leading negation.
+        if let Ok(gens) = crate::cryptanalysis::glv_invariant_base::automorphism_generators(
+            inst,
+            AutomorphismGroup::Auto,
+        ) {
+            endos.extend(gens.into_iter().skip(1));
+        }
+        for e in velu_degree2_endomorphisms(inst) {
+            endos.push(Box::new(e));
+        }
+        for e in velu_degree3_endomorphisms(inst) {
+            endos.push(Box::new(e));
+        }
+        let mult = match params.get("mult") {
+            None => 1i64,
+            Some(_) => params.u64("mult")?.max(1) as i64,
+        };
+        if norm_cap > 0 && endos.is_empty() {
+            return Err(
+                "cm-multiplier needs a curve with a rational degree-2 or degree-3 CM endomorphism (--family d7, d8 or d11)".into(),
+            );
+        }
+        let endo = endos.get(which);
+        let (lambda, degree, trace) = match endo {
+            Some(e) => {
+                let l = e.eigenvalue();
+                let d = e.degree() as i64;
+                let lm = l as i128;
+                let rm = r as i128;
+                let t = (-8i64..=8)
+                    .find(|&t| (lm * lm - t as i128 * lm + d as i128).rem_euclid(rm) == 0)
+                    .ok_or("eigenvalue does not satisfy a small characteristic polynomial")?;
+                (l, d, t)
+            }
+            None => (0, 0, 0),
+        };
+        let mut multipliers: Vec<(i64, i64)> = Vec::new();
+        if norm_cap > 0 {
+            let bound = ((4 * norm_cap) as f64).sqrt() as i64 + 2;
+            for a in -bound..=bound {
+                for b in -bound..=bound {
+                    if (a, b) != (0, 0) && a * a + trace * a * b + degree * b * b <= norm_cap {
+                        multipliers.push((a, b));
+                    }
+                }
+            }
+        }
+        for m in 2..=mult {
+            if !multipliers.contains(&(m, 0)) {
+                multipliers.push((m, 0));
+            }
+        }
+        let to_scalar = |v: i64| -> u64 { v.rem_euclid(r as i64) as u64 };
+        let mut points: Vec<PrimePoint> = Vec::new();
+        let mut col_of: Vec<usize> = Vec::new();
+        let mut coef_of: Vec<u64> = Vec::new();
+        let mut seen: HashSet<u64> = HashSet::new();
+        let mut columns = 0usize;
+        let mut endo_applies = 0u64;
+        let push_pair = |points: &mut Vec<PrimePoint>,
+                         col_of: &mut Vec<usize>,
+                         coef_of: &mut Vec<u64>,
+                         q: PrimePoint,
+                         column: usize,
+                         weight: u64| {
+            points.push(q);
+            col_of.push(column);
+            coef_of.push(weight);
+            let nq = g.neg(q);
+            if nq != q {
+                points.push(nq);
+                col_of.push(column);
+                coef_of.push((r - weight) % r);
+            }
+        };
+        // Seeds: the smallest abscissae (one per sign pair), projected into
+        // the order-r subgroup; a little slack covers projections that
+        // collide or vanish.
+        let candidates = smallest_abscissa_points(inst, 2 * size + 16);
+        let mut last_x = u64::MAX;
+        for cand in &candidates {
+            if cand.x == last_x {
+                continue;
+            }
+            last_x = cand.x;
+            let seed = if ctx.cofactor == 1 {
+                *cand
+            } else {
+                g.mul(ops, *cand, ctx.cofactor)
+            };
+            let nseed = g.neg(seed);
+            if g.is_identity(&seed) || seen.contains(&g.key(&seed)) || seen.contains(&g.key(&nseed))
+            {
+                continue;
+            }
+            seen.insert(g.key(&seed));
+            seen.insert(g.key(&nseed));
+            let column = columns;
+            columns += 1;
+            push_pair(&mut points, &mut col_of, &mut coef_of, seed, column, 1);
+            if !multipliers.is_empty() {
+                let phi_seed = match endo {
+                    Some(e) if multipliers.iter().any(|&(_, mb)| mb != 0) => {
+                        endo_applies += 1;
+                        if e.degree() > 1 {
+                            ops.adds += 1; // an inversion-equivalent evaluation of phi
+                        }
+                        e.apply(g, seed)
+                    }
+                    _ => g.identity(),
+                };
+                for &(ma, mb) in &multipliers {
+                    let sa = to_scalar(ma);
+                    let sb = to_scalar(mb);
+                    let pa = if sa == 0 {
+                        g.identity()
+                    } else {
+                        g.mul(ops, seed, sa)
+                    };
+                    let pb = if sb == 0 {
+                        g.identity()
+                    } else {
+                        g.mul(ops, phi_seed, sb)
+                    };
+                    let image = g.add(ops, pa, pb);
+                    if g.is_identity(&image) {
+                        continue;
+                    }
+                    let nimg = g.neg(image);
+                    if seen.contains(&g.key(&image)) || seen.contains(&g.key(&nimg)) {
+                        continue;
+                    }
+                    seen.insert(g.key(&image));
+                    seen.insert(g.key(&nimg));
+                    let weight = ((sa as u128 + (sb as u128 * lambda as u128) % r as u128)
+                        % r as u128) as u64;
+                    push_pair(
+                        &mut points,
+                        &mut col_of,
+                        &mut coef_of,
+                        image,
+                        column,
+                        weight,
+                    );
+                }
+            }
+            if columns == size {
+                break;
+            }
+        }
+        if columns < size {
+            return Err(format!("only {columns} of {size} seeds found"));
+        }
+        let curve = &inst.curve;
+        let mut fb = FactorBase::from_column_map(
+            format!(
+                "{columns} seeds with Z[phi] multiples of norm <= {norm_cap} ({} points)",
+                points.len()
+            ),
+            points,
+            col_of,
+            coef_of,
+            columns,
+            |p| curve.key(p),
+            |p| curve.key(&curve.neg(*p)),
+            |p| p.x,
+        )?;
+        fb.cost.count("endomorphism_applies", endo_applies);
+        Ok(fb)
+    }
+}
+
+/// **Integer-multiple closure on any binary curve** (lead A1 without an
+/// endomorphism): each seed `P` (a point with one of the smallest
+/// abscissae, projected into the order-`r` subgroup) contributes
+/// `[m]P` for `m = 1..=mult` on its own column with weight `m`, built by
+/// repeated addition (one group addition per multiple).  `K` seeds then
+/// behave like `K * mult` independent points for the pair table while
+/// the rank stage needs only `K + 1` relations.  Nothing here uses
+/// structure, so it applies to a random curve; as `K -> 1` it becomes a
+/// baby-step/giant-step table (the honest limit of the idea).
+pub struct BinaryMultiplierBase<'i> {
+    pub instance: &'i BinaryInstance,
+}
+
+impl<'a> FactorBaseBuilder<BinaryGroup<'a>> for BinaryMultiplierBase<'_> {
+    fn name(&self) -> &str {
+        "binary-multiplier"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "{} smallest-abscissa seeds, each with its multiples [1..{}]P on its column",
+            params.get("size").unwrap_or("?"),
+            params.get("mult").unwrap_or("1")
+        )
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("size", "seed abscissae (columns)"),
+            (
+                "mult",
+                "include [m]P for m = 2..=mult with weight m; 1 or absent: seeds only",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        ctx: &InstanceCtx<BinaryGroup<'a>>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<FastPoint>, String> {
+        let inst = self.instance;
+        let g = ctx.group;
+        let size = params.u64("size")? as usize;
+        if size == 0 {
+            return Err("size must be positive".into());
+        }
+        let mult = match params.get("mult") {
+            None => 1u64,
+            Some(_) => params.u64("mult")?.max(1),
+        };
+        let mut points: Vec<FastPoint> = Vec::new();
+        let mut col_of: Vec<usize> = Vec::new();
+        let mut coef_of: Vec<u64> = Vec::new();
+        let mut seen: HashSet<u64> = HashSet::new();
+        let mut columns = 0usize;
+        let mut x = 1u64;
+        let cap = (1u64 << inst.n.min(40)).min(1 << 24);
+        while columns < size {
+            if x >= cap {
+                return Err(format!("only {columns} of {size} seeds in {cap} abscissae"));
+            }
+            let candidates = inst.points_with_x(x);
+            x += 1;
+            let Some(&cand) = candidates.first() else {
+                continue;
+            };
+            let seed = if ctx.cofactor == 1 {
+                cand
+            } else {
+                g.mul(ops, cand, ctx.cofactor)
+            };
+            if g.is_identity(&seed) {
+                continue;
+            }
+            let column = columns;
+            let mut member = seed;
+            let mut added = 0usize;
+            for m in 1..=mult {
+                if m > 1 {
+                    member = g.add(ops, member, seed);
+                }
+                if g.is_identity(&member) {
+                    break;
+                }
+                let nm = g.neg(member);
+                if seen.contains(&g.key(&member)) || seen.contains(&g.key(&nm)) {
+                    continue;
+                }
+                seen.insert(g.key(&member));
+                seen.insert(g.key(&nm));
+                let weight = m % ctx.r;
+                points.push(member);
+                col_of.push(column);
+                coef_of.push(weight);
+                added += 1;
+                if nm != member {
+                    points.push(nm);
+                    col_of.push(column);
+                    coef_of.push((ctx.r - weight) % ctx.r);
+                }
+            }
+            if added > 0 {
+                columns += 1;
+            } else {
+                // Roll back nothing: no point of this seed was kept.
+                continue;
+            }
+        }
+        FactorBase::from_column_map(
+            format!(
+                "{columns} seeds with multiples [1..{mult}]P ({} points)",
+                points.len()
+            ),
+            points,
+            col_of,
+            coef_of,
+            columns,
+            |p| p.pack(),
+            |p| inst.fast.neg(*p).pack(),
+            |p| p.x,
+        )
     }
 }
 
@@ -1100,14 +1900,35 @@ impl<G: CountedGroup> DecompositionOracle<G> for MitmOracle {
 }
 
 /// The two-summand prime MITM search with the same probe and table keys as
-/// `mitm`, but a batched-inversion, x-only table construction.
+/// `mitm`, but a batched-inversion, x-only table construction.  The
+/// `blocked` form (`mitm-prime-blocked`) builds the same table in
+/// cache-sized pieces ([`PairTable::build_negation_folded_prime_blocked`]).
 pub struct PrimeBatchMitmOracle {
+    blocked: bool,
     table: Option<PairTable>,
 }
 
 impl PrimeBatchMitmOracle {
     pub fn new() -> Self {
-        Self { table: None }
+        Self {
+            blocked: false,
+            table: None,
+        }
+    }
+
+    pub fn blocked() -> Self {
+        Self {
+            blocked: true,
+            table: None,
+        }
+    }
+
+    fn name_str(&self) -> &'static str {
+        if self.blocked {
+            "mitm-prime-blocked"
+        } else {
+            "mitm-prime-batch"
+        }
     }
 }
 
@@ -1119,7 +1940,7 @@ impl Default for PrimeBatchMitmOracle {
 
 impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
     fn name(&self) -> &str {
-        "mitm-prime-batch"
+        self.name_str()
     }
 
     fn summands(&self) -> u32 {
@@ -1127,8 +1948,14 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
     }
 
     fn describe(&self, _params: &Params) -> String {
-        "negation-folded pair table built with batched prime-field inversions; identical MITM probe"
-            .into()
+        if self.blocked {
+            "negation-folded pair table built with batched prime-field inversions, \
+             inserted in cache-sized pieces; identical MITM probe"
+                .into()
+        } else {
+            "negation-folded pair table built with batched prime-field inversions; identical MITM probe"
+                .into()
+        }
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
@@ -1143,9 +1970,13 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
         ops: &mut GroupOps,
     ) -> Result<(), String> {
         if params.u64_or("m", 2)? != 2 || params.0.keys().any(|key| key != "m") {
-            return Err("mitm-prime-batch accepts only m=2".into());
+            return Err(format!("{} accepts only m=2", self.name_str()));
         }
-        let table = PairTable::build_negation_folded_prime_batch(ctx.group, fb)?;
+        let table = if self.blocked {
+            PairTable::build_negation_folded_prime_blocked(ctx.group, fb)?
+        } else {
+            PairTable::build_negation_folded_prime_batch(ctx.group, fb)?
+        };
         ops.merge(table.build_ops);
         self.table = Some(table);
         Ok(())
@@ -2365,6 +3196,91 @@ mod tests {
             .contains("`x` is not a number"));
     }
 
+    /// Every point of a `cm-multiplier` base is `[coefficient]` times its
+    /// column's seed (the first point of the column, weight 1), on `j = 0`
+    /// (free automorphism) and `D = -7` (degree-2 Velu endomorphism), so every
+    /// relation row over the base is a true logarithm identity.
+    #[test]
+    fn cm_multiplier_columns_are_scalar_multiples_of_their_seed() {
+        use crate::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
+        for (family, seed) in [(CmFamily::J0, 7u64), (CmFamily::D7, 31)] {
+            let inst = generate_cm_instance(family, 24, seed, 8).unwrap();
+            let curve = inst.curve.clone();
+            let ctx = InstanceCtx {
+                group: &curve,
+                generator: inst.generator_point(),
+                target: inst.generator_point(),
+                r: inst.r,
+                cofactor: inst.cofactor,
+                group_order: inst.group_order,
+                name: inst.name.clone(),
+                field_degree: None,
+            };
+            let mut ops = GroupOps::default();
+            let (_, params) = Params::parse_spec("cm-multiplier:size=5,norm=32").unwrap();
+            let fb = CmMultiplierBase { instance: &inst }
+                .build(&ctx, &params, &mut ops)
+                .unwrap();
+            assert_eq!(fb.columns, 5);
+            assert!(
+                fb.points.len() > 5 * 2 * 3,
+                "multiples add points ({family:?})"
+            );
+            let mut seeds: Vec<Option<PrimePoint>> = vec![None; fb.columns];
+            for (i, p) in fb.points.iter().enumerate() {
+                if fb.coef_of[i] == 1 && seeds[fb.col_of[i]].is_none() {
+                    seeds[fb.col_of[i]] = Some(*p);
+                }
+            }
+            let mut check = GroupOps::default();
+            for (i, p) in fb.points.iter().enumerate() {
+                let seed = seeds[fb.col_of[i]].expect("every column has a weight-1 seed");
+                assert_eq!(
+                    curve.mul(&mut check, seed, fb.coef_of[i]),
+                    *p,
+                    "{family:?} point {i}"
+                );
+            }
+        }
+    }
+
+    /// Every point of a `binary-multiplier` base is `[coefficient]` times
+    /// its column's seed (the weight-1 point), so each relation row over the
+    /// base is a true logarithm identity on a curve with no endomorphism use.
+    #[test]
+    fn binary_multiplier_columns_are_scalar_multiples_of_their_seed() {
+        let inst = koblitz_instance(1, 9).expect("registered n9 Koblitz instance");
+        let group = BinaryGroup(&inst.fast);
+        let ctx = InstanceCtx {
+            group: &group,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let mut ops = GroupOps::default();
+        let (_, params) = Params::parse_spec("binary-multiplier:size=3,mult=6").unwrap();
+        let fb = BinaryMultiplierBase { instance: &inst }
+            .build(&ctx, &params, &mut ops)
+            .unwrap();
+        assert_eq!(fb.columns, 3);
+        assert!(fb.points.len() > 3 * 2, "multiples add points");
+        let mut seeds: Vec<Option<FastPoint>> = vec![None; fb.columns];
+        for (i, p) in fb.points.iter().enumerate() {
+            if fb.coef_of[i] == 1 && seeds[fb.col_of[i]].is_none() {
+                seeds[fb.col_of[i]] = Some(*p);
+            }
+        }
+        let mut check = GroupOps::default();
+        for (i, p) in fb.points.iter().enumerate() {
+            let seed = seeds[fb.col_of[i]].expect("weight-1 seed per column");
+            assert_eq!(group.mul(&mut check, seed, fb.coef_of[i]), *p, "point {i}");
+        }
+    }
+
     #[test]
     fn trace_zero_factor_base_is_an_executable_policy() {
         let inst = koblitz_instance(1, 9).expect("registered n9 Koblitz instance");
@@ -2460,5 +3376,47 @@ mod tests {
         );
         assert!(ops.scalar_mults > 0 && fb.cost.get("inversions") > 0);
         assert!(fb.cost.get("min_key_field_squares_uncharged") > 0);
+    }
+}
+
+#[cfg(test)]
+mod explicit_subspace_tests {
+    use super::*;
+    #[test]
+    fn explicit_basis_preserves_the_legacy_points_and_rejects_bad_bases() {
+        let inst = crate::cryptanalysis::ic_boundary::koblitz_instance(1, 7).unwrap();
+        let g = BinaryGroup(&inst.fast);
+        let ctx = InstanceCtx {
+            group: &g,
+            generator: inst.generator,
+            target: inst.generator,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: Some(inst.n),
+        };
+        let builder = BinarySubspaceBase { instance: &inst };
+        let (_, plain) = Params::parse_spec("binary-subspace:dimension=3").unwrap();
+        let (_, explicit) =
+            Params::parse_spec("binary-subspace:dimension=3,basis=0x1;0x2;0x4").unwrap();
+        let a = builder
+            .build(&ctx, &plain, &mut GroupOps::default())
+            .unwrap();
+        let b = builder
+            .build(&ctx, &explicit, &mut GroupOps::default())
+            .unwrap();
+        assert_eq!(a.points, b.points);
+        assert_eq!(a.col_of, b.col_of);
+        assert_eq!(a.coef_of, b.coef_of);
+        assert_eq!(a.subspace_basis, b.subspace_basis);
+        for recipe in [
+            "binary-subspace:dimension=3,basis=1;2;3",
+            "binary-subspace:dimension=3,basis=1;2",
+            "binary-subspace:dimension=3,basis=1;2;128",
+        ] {
+            let (_, bad) = Params::parse_spec(recipe).unwrap();
+            assert!(builder.build(&ctx, &bad, &mut GroupOps::default()).is_err());
+        }
     }
 }

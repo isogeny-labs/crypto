@@ -28,6 +28,7 @@
 //! | [`claim`] | `vs_rho` claims: the IC1 identity, the claim report, the native checker |
 //! | [`audit`] | re-derive a session from its files; replay runs exactly |
 //! | [`db`] | SQL that loads sessions into the schema in `docs/ecbench/schema.sql` |
+//! | [`fbm`] | FBM1: factor-base measurement identity (curve × FB1 × oracle × solver × instrument) |
 //! | [`isolab`] | an `isolab.job/v1` that runs a spec on an independent lab worker |
 //! | [`bounds`] | bound records: the fitted cost of a method on a domain, sealed and re-derivable |
 //! | [`frontier`] | the Pareto frontier of a domain's bounds, and its page |
@@ -44,9 +45,12 @@ pub mod canonical;
 pub mod challenge;
 pub mod claim;
 pub mod claw;
+pub mod cm_folded;
 pub mod compare;
 pub mod conductor_gap;
 pub mod db;
+pub mod ext;
+pub mod fbm;
 pub mod fp4;
 pub mod frontier;
 pub mod full_price;
@@ -63,4 +67,5 @@ pub mod signals;
 pub mod spec;
 pub mod stats;
 pub mod trend;
+pub mod wordram_price;
 pub mod workload;

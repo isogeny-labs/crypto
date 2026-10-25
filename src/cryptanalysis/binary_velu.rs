@@ -88,9 +88,11 @@ use crate::cryptanalysis::semaev_decomp::Gf2;
 
 // ── field helpers ───────────────────────────────────────────────────
 
-/// `v` as an element of `F_{2^n}` in the polynomial basis.
+/// `v` as an element of `F_{2^n}` in the polynomial basis.  For `n > 64`
+/// the bits of `v` above 63 are zero (a shift by 64 or more overflows: it
+/// panics in a debug build and wraps to bit `i mod 64` in a release build).
 pub fn elt(v: u64, n: u32) -> F2mElement {
-    let bits: Vec<u32> = (0..n).filter(|i| (v >> i) & 1 == 1).collect();
+    let bits: Vec<u32> = (0..n.min(64)).filter(|i| (v >> i) & 1 == 1).collect();
     F2mElement::from_bit_positions(&bits, n)
 }
 
@@ -1283,6 +1285,66 @@ mod tests {
                 jroots.contains(&jp),
                 "j' = {jp} from Vélu is not a root of Φ₃(X, {j})"
             );
+        }
+    }
+
+    /// Vélu's codomain at ℓ = 5 and 7 against the exact-integer Φ_ℓ
+    /// (`modular_polynomial::phi_exact`): for a rational cyclic kernel of
+    /// order ℓ, j' = 1/a₆' is a root of Φ_ℓ(X, j) and the codomain has the
+    /// domain's order. Extends the ℓ = 3 oracle above.
+    #[test]
+    fn velu_codomain_matches_exact_phi_at_ell_5_and_7() {
+        for ell in [5u64, 7] {
+            let mut tested = 0;
+            'search: for n in 9u32..=13 {
+                let irr = field(n);
+                let gf = Gf2::new(&irr);
+                for a6v in 1u64..40 {
+                    let Some(curve) = Curve::new(n, &irr, 0, a6v) else { continue };
+                    if curve.order % ell != 0 || curve.order % (ell * ell) == 0 {
+                        continue;
+                    }
+                    // A point of exact order ell: multiply any point by order/ell.
+                    let cof = curve.order / ell;
+                    let mut kernel_pt = None;
+                    for x in 1u64..(1u64 << n) {
+                        for r in curve.points_with_x(x) {
+                            let q = curve.fast.mul_u64(r, cof);
+                            if !q.infinity {
+                                kernel_pt = Some(q);
+                                break;
+                            }
+                        }
+                        if kernel_pt.is_some() {
+                            break;
+                        }
+                    }
+                    let p = kernel_pt.expect("order divisible by ell has such a point");
+                    // h(X) = prod_{i=1}^{(ell-1)/2} (X + x(iP)).
+                    let mut h = F2mPoly::from_coeffs(vec![F2mElement::one(n)], n);
+                    let mut multiple = p;
+                    for _ in 0..(ell - 1) / 2 {
+                        let lin = F2mPoly::from_coeffs(vec![elt(multiple.x, n), F2mElement::one(n)], n);
+                        h = h.mul(&lin, &irr);
+                        multiple = curve.fast.add(multiple, p);
+                    }
+                    let a6 = elt(a6v, n);
+                    let a6p = velu_codomain(&a6, &h, n, &irr);
+                    let a6p_v = to_u64(&a6p);
+                    assert_ne!(a6p_v, 0, "ell={ell} n={n} a6={a6v}: singular codomain");
+                    let jp = gf.inv(a6p_v);
+                    let phi = phi_l_mod2_in_x(ell as u32, &elt(gf.inv(a6v), n), n, &irr);
+                    let jroots: Vec<u64> = find_roots_in_f2m(&phi, n, &irr).iter().map(to_u64).collect();
+                    assert!(jroots.contains(&jp), "ell={ell} n={n} a6={a6v}: j'={jp} not a root of Phi_ell");
+                    let codomain = Curve::new(n, &irr, 0, a6p_v).expect("codomain curve");
+                    assert_eq!(codomain.order, curve.order, "ell={ell} n={n} a6={a6v}: order changed");
+                    tested += 1;
+                    if tested >= 3 {
+                        break 'search;
+                    }
+                }
+            }
+            assert!(tested >= 1, "no rational order-{ell} kernel found in the search range");
         }
     }
 

@@ -102,6 +102,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 import datetime
 import hashlib
 import json
@@ -109,6 +110,7 @@ import math
 import os
 import queue
 import re
+import socket
 import struct
 import sys
 import threading
@@ -130,6 +132,9 @@ LEGACY_KEY_RE = re.compile(r"^dp/(slot-\d+)/(\d+)-(\d+)\.bin$")
 # ecc2k-seed-orbit-v1 naming.  It carries a content hash instead of a clock, so
 # found_at is the object's own LastModified.
 ORBIT_KEY_RE = re.compile(r"^dp/(slot-\d+)/([0-9a-f]{32})-(\d+)-([0-9a-f]{64})\.bin$")
+# An older uploader put the body digest first and bounded its byte span with
+# decimal offsets. Verify both claims before accepting any of its raw DP32 rows.
+HASH_SPAN_KEY_RE = re.compile(r"^dp/(slot-\d+)/([0-9a-f]{64})-(\d{16})-(\d{16})\.bin$")
 # Written beside a record object by the contract path; metadata, not points.
 ENVELOPE_SUFFIX = ".bin.json"
 # Objects one pass will take before it stops to publish what it knows. Sized
@@ -156,7 +161,7 @@ def workerId(key):
 def foundAt(key, lastModified=None):
     """Upload time of one dp object, or None if the key is not a dp object.
 
-    The two key shapes carry it differently and the difference is the whole
+    The key shapes carry it differently and the difference is the whole
     reason this function exists: the legacy name has the uploader's clock in
     it, the orbit name has a content hash instead, and reading only the first
     shape is how five hours of a 133-worker fleet went into `dp/` without a
@@ -165,9 +170,22 @@ def foundAt(key, lastModified=None):
     m = LEGACY_KEY_RE.match(key)
     if m:
         return int(m.group(2))
-    if ORBIT_KEY_RE.match(key) and lastModified is not None:
+    if (ORBIT_KEY_RE.match(key) or HASH_SPAN_KEY_RE.match(key)) and lastModified is not None:
         return int(lastModified.timestamp())
     return None
+
+
+def hashSpan(key, size, digest=None):
+    """Validate a hash-span object's declared byte extent and optional body digest."""
+    m = HASH_SPAN_KEY_RE.match(key)
+    if m is None:
+        return False
+    start, end = int(m.group(3)), int(m.group(4))
+    if end <= start or end - start != size or size % RECORD_BYTES:
+        raise ValueError("%s: hash-span extent does not match whole DP32 records" % key)
+    if digest is not None and digest != m.group(2):
+        raise ValueError("%s: body does not match hash-span sha256" % key)
+    return True
 
 
 def decode(record):
@@ -227,9 +245,18 @@ def s3Objects(s3, bucket, prefix="dp/"):
                 if not key.endswith(ENVELOPE_SUFFIX):
                     unrecognised.append(key)
                 continue
+            try:
+                hashSpan(key, item["Size"])
+            except ValueError:
+                unrecognised.append(key)
+                continue
             records = item["Size"] // RECORD_BYTES
             if records:
                 out.append((key, records, when))
+            else:
+                # A recognized name is not evidence of a complete upload.
+                # Report a short body so pending/status cannot look caught up.
+                unrecognised.append(key)
         if not page.get("IsTruncated"):
             break
         token = page["NextContinuationToken"]
@@ -256,12 +283,46 @@ CREATE TABLE IF NOT EXISTS dp_ingest_progress (
 PROGRESS_DUPLICATES_DDL = """
 ALTER TABLE dp_ingest_progress ADD COLUMN IF NOT EXISTS duplicates bigint NOT NULL DEFAULT 0
 """
+PROGRESS_REPLICA_DDL = """
+ALTER TABLE dp_ingest_progress
+    ADD COLUMN IF NOT EXISTS ingester_id text,
+    ADD COLUMN IF NOT EXISTS object_sha256 text,
+    ADD COLUMN IF NOT EXISTS object_version_id text,
+    ADD COLUMN IF NOT EXISTS object_bytes bigint
+"""
+POLL_DDL = """
+CREATE TABLE IF NOT EXISTS dp_ingest_polls (
+    campaign_id text NOT NULL,
+    ingester_id text NOT NULL,
+    completed_at timestamptz NOT NULL DEFAULT clock_timestamp(),
+    objects bigint NOT NULL,
+    rows_added bigint NOT NULL
+)
+"""
+POLL_INDEX_DDL = """
+CREATE INDEX IF NOT EXISTS dp_ingest_polls_period
+    ON dp_ingest_polls (campaign_id, ingester_id, completed_at)
+"""
 
 
 def ensureProgress(conn):
     with conn.cursor() as cur:
         cur.execute(PROGRESS_DDL)
         cur.execute(PROGRESS_DUPLICATES_DDL)
+        cur.execute(PROGRESS_REPLICA_DDL)
+        cur.execute(POLL_DDL)
+        cur.execute(POLL_INDEX_DDL)
+    conn.commit()
+
+
+def recordPoll(conn, replica_id, objects, rows_added):
+    """A completed pass is durable evidence even when the S3 corpus was idle."""
+    with conn.cursor() as cur:
+        cur.execute(
+            "INSERT INTO dp_ingest_polls "
+            "(campaign_id, ingester_id, objects, rows_added) "
+            "VALUES (%s, %s, %s, %s)",
+            (CAMPAIGN, replica_id, objects, rows_added))
     conn.commit()
 
 
@@ -616,19 +677,19 @@ def findCollisions(cur, key):
     the *same* seed by a different object is a re-report: harmless from a
     resumed worker, and the entire output of a run that is walking another
     run's seeds, so it is counted rather than dropped in silence. The
-    object's own rows are neither.
+    An object's newly inserted row matches itself and is neither; a second
+    seed in that same object can still meet it and is a collision.
     """
     cur.execute(
-        "SELECT i.point_key, i.a, i.walk_seed, d.a, d.walk_seed, d.worker_id "
+        "SELECT i.point_key, i.a, i.b, i.walk_seed, "
+        "d.a, d.b, d.walk_seed, d.worker_id "
         "FROM dp_in i JOIN distinguished_points d "
         "  ON d.campaign_id = %s AND d.point_key = i.point_key",
         (CAMPAIGN,))
     mine = workerId(key)
     out = []
     duplicates = 0
-    for point_key, mineA, mineSeed, theirsA, theirsSeed, worker in cur.fetchall():
-        if worker == mine:
-            continue
+    for point_key, mineA, mineB, mineSeed, theirsA, theirsB, theirsSeed, worker in cur.fetchall():
         if theirsA is None:
             # `a` is NOT NULL for everything this program writes, but the
             # corpus predates it. A stored point with no seed cannot be
@@ -642,16 +703,27 @@ def findCollisions(cur, key):
         # themselves is the question, and a width difference between eras is
         # not a collision.
         if seedOf(mineA) == seedOf(theirsA):
-            duplicates += 1
+            # A freshly inserted row joins to itself. A repeated row in the
+            # same object does too; only another object's replay is counted.
+            if worker != mine:
+                duplicates += 1
             continue
+        # Different seeds can meet within one object. Its first row was just
+        # inserted with this same worker_id, so the worker ID alone cannot
+        # distinguish that collision from a row joining to itself.
         out.append({
             "point_key": bytes(point_key),
+            # The live rho_collisions table requires both coefficient pairs.
             "a1": bytes(theirsA),
+            "b1": bytes(theirsB),
             "walk_seed1": bytes(theirsSeed) if theirsSeed is not None else None,
             "worker_id1": worker,
+            "worker1": worker,
             "a2": bytes(mineA),
+            "b2": bytes(mineB),
             "walk_seed2": bytes(mineSeed),
             "worker_id2": mine,
+            "worker2": mine,
             "object_key": key,
         })
     return out, duplicates
@@ -671,8 +743,9 @@ def recordCollisions(cur, found):
                seedOf(row["a2"]), row["worker_id2"]))
     if not found or not {"campaign_id", "point_key"} <= _collisionCols:
         return 0
-    cols = [c for c in ("point_key", "a1", "walk_seed1", "worker_id1",
-                        "a2", "walk_seed2", "worker_id2", "object_key")
+    cols = [c for c in ("point_key", "a1", "b1", "walk_seed1", "worker_id1",
+                        "worker1", "a2", "b2", "walk_seed2", "worker_id2",
+                        "worker2", "object_key")
             if c in _collisionCols]
     sql = ("INSERT INTO rho_collisions (campaign_id, %s) VALUES (%s) "
            "ON CONFLICT DO NOTHING"
@@ -697,10 +770,21 @@ def readEnvelope(s3, bucket, key):
     """
     try:
         raw = s3.get_object(Bucket=bucket, Key=key + ".json")["Body"].read()
+    except Exception as exc:
+        # Older objects have no marker. A timeout, AccessDenied, or other S3
+        # failure is not evidence of absence and must leave the object pending.
+        response = getattr(exc, "response", None)
+        code = response.get("Error", {}).get("Code") if isinstance(response, dict) else None
+        if code in ("NoSuchKey", "404", "NotFound"):
+            return None
+        raise
+    try:
         manifest = json.loads(raw.decode("utf-8"))
-        return manifest if isinstance(manifest, dict) else None
-    except Exception:
-        return None
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError("%s: invalid commit marker JSON" % key) from exc
+    if not isinstance(manifest, dict):
+        raise ValueError("%s: commit marker must be an object" % key)
+    return manifest
 
 
 def tableRecordBody(body):
@@ -721,26 +805,111 @@ def checkEnvelope(key, body, manifest):
     points once stored. Raising here leaves the object outstanding and logged
     rather than letting it into the corpus.
     """
-    if not manifest:
+    # Current orbit keys carry the producer's SHA-256 even when its optional
+    # .bin.json marker is absent. The live corpus has such markerless objects.
+    m = ORBIT_KEY_RE.match(key)
+    got = None
+    if m:
+        got = hashlib.sha256(body).hexdigest()
+        if got != m.group(4):
+            raise ValueError("%s: body does not match its object-key sha256" % key)
+    if manifest is None:
         return
     want = manifest.get("sha256")
-    if want:
-        got = hashlib.sha256(body).hexdigest()
-        if got != want:
-            raise ValueError("%s: body does not match its manifest sha256 "
-                             "(%s != %s)" % (key, got, want))
+    if not isinstance(want, str) or re.fullmatch(r"[0-9a-f]{64}", want) is None:
+        raise ValueError("%s: commit marker has no valid sha256" % key)
+    if (got or hashlib.sha256(body).hexdigest()) != want:
+        raise ValueError("%s: body does not match its manifest sha256" % key)
+    size = manifest.get("bytes")
+    if type(size) is not int or size != len(body):
+        raise ValueError("%s: commit marker byte count differs from body" % key)
     want = manifest.get("records")
-    if isinstance(want, int) and want != len(body) // RECORD_BYTES:
-        raise ValueError("%s: manifest says %d records, body carries %d"
+    if type(want) is not int or want != len(body) // RECORD_BYTES:
+        raise ValueError("%s: manifest says %r records, body carries %d"
                          % (key, want, len(body) // RECORD_BYTES))
+    if "producedAt" in manifest:
+        produced = manifest["producedAt"]
+        if type(produced) is not int or produced <= 0:
+            raise ValueError("%s: invalid commit marker producedAt" % key)
 
 
-def ingestObject(conn, s3, bucket, key, found_at):
+def objectLockKey(key):
+    """A stable two-int PostgreSQL advisory key; collisions only delay work."""
+    digest = hashlib.sha256(
+        b"ecc2k130/dp-ingest/object/v1\0" + CAMPAIGN.encode() + b"\0" + key.encode()
+    ).digest()
+    return struct.unpack(">ii", digest[:8])
+
+
+@contextmanager
+def startupLock(connect, enabled):
+    """Serialize one-time DDL, backfill, and counter seeding across replicas."""
+    if not enabled:
+        yield
+        return
+    held = connect()
+    key = objectLockKey("__bootstrap__")
+    try:
+        with held.cursor() as cur:
+            cur.execute("SELECT pg_advisory_lock(%s, %s)", key)
+        held.commit()
+        yield
+    finally:
+        try:
+            if not held.closed:
+                held.rollback()
+                with held.cursor() as cur:
+                    cur.execute("SELECT pg_advisory_unlock(%s, %s)", key)
+                held.commit()
+        finally:
+            held.close()
+
+
+def claimObject(conn, key, expected_records):
+    """Claim one object until commit, or skip a busy/completed one.
+
+    The lock and progress read occur in the same transaction as point insertion.
+    A crash releases the lock and rolls back both points and progress together.
+    Every replica must use this path; an old uncoordinated writer is unsafe.
+    """
+    with conn.cursor() as cur:
+        cur.execute("SELECT pg_try_advisory_xact_lock(%s, %s)", objectLockKey(key))
+        if not cur.fetchone()[0]:
+            conn.rollback()
+            return False
+        cur.execute(
+            "SELECT records FROM dp_ingest_progress "
+            "WHERE campaign_id = %s AND object_key = %s",
+            (CAMPAIGN, key),
+        )
+        row = cur.fetchone()
+        if row is not None and int(row[0]) >= expected_records:
+            conn.rollback()
+            return False
+    return True
+
+
+def ingestObject(conn, s3, bucket, key, found_at, *, replica_id=None,
+                 expected_records=None):
     """Insert every record of one object.
 
     Returns (rows added, records seen, collisions found).
     """
-    body = s3.get_object(Bucket=bucket, Key=key)["Body"].read()
+    if replica_id is not None:
+        if expected_records is None:
+            raise ValueError("replica ingestion requires the listed record count")
+        if not claimObject(conn, key, expected_records):
+            return None
+    response = s3.get_object(Bucket=bucket, Key=key)
+    stream = response["Body"]
+    try:
+        body = stream.read()
+    finally:
+        stream.close()
+    object_bytes = len(body)
+    object_sha256 = hashlib.sha256(body).hexdigest()
+    hashSpan(key, object_bytes, object_sha256)
+    object_version_id = response.get("VersionId")
     if body[:len(DP_MAGIC_V2)] == DP_MAGIC_V2:
         # Read as 32-byte records its header would be stored as a point and
         # every record after it as two and a quarter. Raising leaves the
@@ -752,12 +921,14 @@ def ingestObject(conn, s3, bucket, key, found_at):
     manifest = readEnvelope(s3, bucket, key)
     checkEnvelope(key, body, manifest)
     body = tableRecordBody(body)
+    if len(body) % RECORD_BYTES:
+        raise ValueError("%s: partial distinguished-point record" % key)
     # The producer's own clock, where it recorded one. found_at from the
     # caller is the object's S3 LastModified for the orbit key shape, and that
     # is storage metadata: a copy, a replication or a lifecycle transition
     # rewrites it and silently moves points between hourly buckets.
     produced = manifest.get("producedAt") if manifest else None
-    if isinstance(produced, int) and produced > 0:
+    if produced is not None:
         found_at = time.strftime("%Y-%m-%d %H:%M:%S+00", time.gmtime(produced))
     whole = len(body) - len(body) % RECORD_BYTES
     wid = workerId(key)
@@ -818,11 +989,18 @@ def ingestObject(conn, s3, bucket, key, found_at):
         # Same transaction as the points, so the record of having ingested an
         # object cannot outlive the insert that it describes.
         cur.execute(
-            "INSERT INTO dp_ingest_progress (campaign_id, object_key, records, duplicates) "
-            "VALUES (%s, %s, %s, %s) ON CONFLICT (campaign_id, object_key) "
+            "INSERT INTO dp_ingest_progress "
+            "(campaign_id, object_key, records, duplicates, ingester_id, "
+            " object_sha256, object_version_id, object_bytes) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s) "
+            "ON CONFLICT (campaign_id, object_key) "
             "DO UPDATE SET records = EXCLUDED.records, "
-            "  duplicates = EXCLUDED.duplicates, ingested_at = now()",
-            (CAMPAIGN, key, whole // RECORD_BYTES, duplicates))
+            "  duplicates = EXCLUDED.duplicates, ingester_id = EXCLUDED.ingester_id, "
+            "  object_sha256 = EXCLUDED.object_sha256, "
+            "  object_version_id = EXCLUDED.object_version_id, "
+            "  object_bytes = EXCLUDED.object_bytes, ingested_at = now()",
+            (CAMPAIGN, key, whole // RECORD_BYTES, duplicates, replica_id,
+             object_sha256, object_version_id, object_bytes))
         # Also this transaction, so the counters the snapshot reads cannot
         # drift from the rows they summarise. Last, because every ingest
         # thread contends on the one totals row and the lock it takes is held
@@ -1693,7 +1871,8 @@ def pending(conn, s3, bucket, prefix="dp/"):
 _failed = set()
 
 
-def onePass(connect, s3, bucket, threads=6, prefix="dp/", limit=PASS_OBJECTS):
+def onePass(connect, s3, bucket, threads=6, prefix="dp/", limit=PASS_OBJECTS,
+            replica_id=None):
     """Ingest the oldest outstanding objects, several at a time.
 
     Each thread owns a connection: psycopg connections are not shared, and the
@@ -1716,13 +1895,21 @@ def onePass(connect, s3, bucket, threads=6, prefix="dp/", limit=PASS_OBJECTS):
         return 0, 0, state
     if limit and limit > 0:
         rest = [item for item in todo if item[0] not in _failed]
-        slice_ = (rest or todo)[:limit]
+        window = (rest or todo)[:limit * 8 if replica_id else limit]
+        # Stable replica-specific ordering spreads dynamic replicas over the
+        # oldest bounded window without a fixed fleet roster or assignment.
+        # The database lock below still decides ownership and correctness.
+        if replica_id:
+            window.sort(key=lambda item: hashlib.sha256(
+                replica_id.encode() + b"\0" + item[0].encode()).digest())
+        slice_ = window[:limit]
     else:
         slice_ = todo
     work = queue.Queue()
     for item in slice_:
         work.put(item)
-    tally = {"rows": 0, "objects": 0, "failed": 0, "collisions": 0}
+    tally = {"rows": 0, "objects": 0, "failed": 0,
+             "skipped": 0, "collisions": 0}
     failed = set()
     lock = threading.Lock()
 
@@ -1744,9 +1931,19 @@ def onePass(connect, s3, bucket, threads=6, prefix="dp/", limit=PASS_OBJECTS):
                     try:
                         if conn is None or conn.closed:
                             conn = connect()
-                        n, seen, hits = ingestObject(
-                            conn, s3, bucket, key,
-                            time.strftime("%Y-%m-%d %H:%M:%S+00", time.gmtime(when)))
+                        found_at = time.strftime(
+                            "%Y-%m-%d %H:%M:%S+00", time.gmtime(when))
+                        if replica_id is None:
+                            result = ingestObject(conn, s3, bucket, key, found_at)
+                        else:
+                            result = ingestObject(
+                                conn, s3, bucket, key, found_at,
+                                replica_id=replica_id, expected_records=records)
+                        if result is None:
+                            with lock:
+                                tally["skipped"] += 1
+                            break
+                        n, seen, hits = result
                     except Exception as exc:
                         broken = conn is None or conn.closed
                         if not broken:
@@ -1796,9 +1993,9 @@ def onePass(connect, s3, bucket, threads=6, prefix="dp/", limit=PASS_OBJECTS):
     state["outstanding"] = len(todo) - tally["objects"]
     state["collisions"] = tally["collisions"]
     log("pass complete: %d of %d outstanding objects touched, %d rows added, "
-        "%d failed, %d still outstanding, %.0f rows/s%s"
+        "%d failed, %d claimed elsewhere/already done, %d still outstanding, %.0f rows/s%s"
         % (tally["objects"], len(todo), tally["rows"], tally["failed"],
-           state["outstanding"], tally["rows"] / elapsed,
+           tally["skipped"], state["outstanding"], tally["rows"] / elapsed,
            ", %d COLLISION(S) RECORDED" % tally["collisions"]
            if tally["collisions"] else ""))
     return tally["rows"], tally["objects"], state
@@ -1815,6 +2012,11 @@ def main(argv=None):
     ap.add_argument("--threads", type=int,
                     default=int(os.environ.get("RHO_INGEST_THREADS", "6")),
                     help="objects ingested concurrently, each on its own connection")
+    ap.add_argument("--replica-id", default=os.environ.get("RHO_INGEST_REPLICA_ID") or socket.gethostname(),
+                    help="stable unique id recorded on progress rows (default: hostname)")
+    ap.add_argument("--worker-only", action="store_true",
+                    default=os.environ.get("RHO_INGEST_WORKER_ONLY", "0") == "1",
+                    help="do not publish the shared status feed or metrics; designate one publisher")
     ap.add_argument("--metric-namespace", default=os.environ.get("RHO_METRIC_NAMESPACE"),
                     help="publish outstanding/lag/unrecognised here as CloudWatch metrics")
     ap.add_argument("--pass-objects", type=int,
@@ -1855,6 +2057,10 @@ def main(argv=None):
     args = ap.parse_args(argv)
     if not args.bucket:
         raise SystemExit("--bucket or RHO_BUCKET is required")
+    if not re.fullmatch(r"[A-Za-z0-9._-]{1,80}", args.replica_id):
+        ap.error("replica id must be 1-80 ASCII letters, digits, dot, underscore, or hyphen")
+    log("ingester replica %s (%s)" %
+        (args.replica_id, "worker only" if args.worker_only else "status publisher"))
 
     import boto3
 
@@ -1888,10 +2094,10 @@ def main(argv=None):
     recount_once = args.recount
     while True:
         try:
-            with connect() as conn:
-                ensureProgress(conn)
-                # --pending promises to write nothing, and the DDL is a write.
+            with startupLock(connect, not (args.verify or args.pending)), connect() as conn:
+                # Diagnostic paths read the existing schema without DDL.
                 if not (args.verify or args.pending):
+                    ensureProgress(conn)
                     ensureCollisions(conn)
                     backfillProgress(conn, s3, args.bucket, args.prefix)
                     with conn.cursor() as cur:
@@ -1922,7 +2128,7 @@ def main(argv=None):
                     return 0
 
             publisher = None
-            if args.status_bucket and not args.once:
+            if args.status_bucket and not args.once and not args.worker_only:
                 publisher = StatusPublisher(
                     connect, s3, args.bucket, args.status_bucket,
                     status_every=args.status_every,
@@ -1932,10 +2138,12 @@ def main(argv=None):
             wasBehind = False
             try:
                 while True:
-                    _, objects, ingest = onePass(
+                    rows_added, objects, ingest = onePass(
                         connect, s3, args.bucket, args.threads,
-                        args.prefix, args.pass_objects)
-                    if args.metric_namespace:
+                        args.prefix, args.pass_objects, args.replica_id)
+                    with connect() as poll_conn:
+                        recordPoll(poll_conn, args.replica_id, objects, rows_added)
+                    if args.metric_namespace and not args.worker_only:
                         publishMetrics(args.metric_namespace, ingest)
                     behind = bool(ingest.get("outstanding"))
                     caught_up = wasBehind and not behind
@@ -1947,7 +2155,7 @@ def main(argv=None):
                         # out the rest of status_every.
                         if caught_up or bool(ingest.get("collisions")):
                             publisher.kick()
-                    elif args.status_bucket:
+                    elif args.status_bucket and not args.worker_only:
                         # --once: one synchronous publish after the pass.
                         try:
                             with connect() as conn:

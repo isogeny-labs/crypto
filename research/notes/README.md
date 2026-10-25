@@ -15,6 +15,7 @@ its old name still identify it.
 
 | note | subject |
 |:--|:--|
+| [`RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md`](ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md) | Proposed eight-workstream charter for an authorized audit of elliptic-curve private-key recovery: exact units, five-lane taxonomy, E0–E7 evidence, complete cost accounting, literature/incidents, cover-transfer closure, and independent governance. Planning artifact; no completion or attack claim |
 | [`RESEARCH_ECDLP_STATE_OF_THE_ART.md`](ecdlp-general/RESEARCH_ECDLP_STATE_OF_THE_ART.md) | The ECDLP: state of the art, 2025–2026 |
 | [`RESEARCH_TORSION_AUXILIARY_INPUTS.md`](ecdlp-general/RESEARCH_TORSION_AUXILIARY_INPUTS.md) | Auxiliary inputs (Cheon) and torsion points against rho and index calculus |
 | [`RESEARCH_SRS_CHEON_CENSUS.md`](ecdlp-general/RESEARCH_SRS_CHEON_CENSUS.md) | Cheon's attack on deployed powers-of-tau setups: EIP-4844, Sapling, Filecoin, Ignition, PPoT |
@@ -22,6 +23,7 @@ its old name still identify it.
 | [`RESEARCH_BENCH_LOG.md`](ecdlp-general/RESEARCH_BENCH_LOG.md) | Cryptanalysis research bench: empirical log |
 | [`RESEARCH_P256_RHO_ARITHMETIC.md`](ecdlp-general/RESEARCH_P256_RHO_ARITHMETIC.md) | Pre-registered P-256 rho engineering matrix: fused Solinas reduction, weak reduction, invariant partitioning, table sweeps, batched affine inversion, DP batching, and CPU/GPU/FPGA ablations |
 | [`RESEARCH_NZMS_AMS_AUSTMS_2024_IDEAS.md`](ecdlp-general/RESEARCH_NZMS_AMS_AUSTMS_2024_IDEAS.md) | The 2024 NZMS–AMS–AustMS programme screened for ECDLP ideas under R1–R5: no new licensing datum; six closures derived (CM pairings keep `k`, `Z[τ]`-net zero lattice is 2-D BSGS, point counts carry nothing, character-sum certificates need `\|F\| > √r`, noncommutative relaxations are weaker than the linear certificate, far-from-uniform rotation-invariant matroids need a Singer degree); one live lever — support-complex (Stanley–Reisner) factor bases — preregistered as stage diagnostic `H_Δ` on the 2-primitive ladder 13/19/37/53 with a stop rule against the pair-table null. No measurement |
+| [`RESEARCH_LATTICE_ECDLP_ROUTES.md`](ecdlp-general/RESEARCH_LATTICE_ECDLP_ROUTES.md) | Lattice routes to the prime-field ECDLP, evaluated: the map of every lattice an instance carries (relation and witness lattices, Lenstra's `E(F_p) ≅ R/(π−1)R`, the GLV and `Z[τ]`-net lattices, Mordell–Weil lattices of lifts, Coppersmith lattices for `S_{m+1}`, HNP lattices) split by whether a basis can be written without the log; every writable one is `k`-independent (constant factor or a 2-D BSGS), every `k`-dependent one has a basis that is the log; the lift route is refuted (JKSST 2000) and exhausted here at toy scale; the small-`x` Coppersmith decomposition route is capped by a derived root-region ceiling `θ_m = 2/((m+1)·2^{m−1})` at `p^{5/6}` relation collection, rho parity needing `θ ≥ 1` at `m = 2`. Literature review plus derivations; no measurement, no campaign opened; one bounded toy falsifier proposed. Graph, diagram and PDF in `ecdlp-general/lattice_ecdlp_routes_20261023/` |
 
 ## index-calculus — Semaev decomposition, factor bases, Gröbner, first-fall degree
 
