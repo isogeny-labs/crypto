@@ -38,6 +38,22 @@ Python group arithmetic was pinned by SHA-256 and checked against public
 curve points; all target pair-hit counts were zero. The zero-hit result is
 specific to trials 0–2, the two stored pools and these splits.
 
+The [exact support screen](support-screen.json) counts at most one distinct
+target sum per unordered multiset of the remaining summands. Dividing by the
+nonidentity subgroup size bounds the fraction of targets covered by each
+pattern. For every trial, the upper bounds are:
+
+| Pool and split | Mask 0 | Mask 1 | Mask 2 |
+| --- | ---: | ---: | ---: |
+| hash 5+1 | 1 (vacuous) | 6.784×10⁻⁶ | 2.043×10⁻¹⁰ |
+| hash 4+2 | 1 (vacuous) | 1.018×10⁻⁵ | 2.043×10⁻¹⁰ |
+| Gray 5+1 | 1 (vacuous) | 1.097×10⁻⁶ | 3.303×10⁻¹¹ |
+| Gray 4+2 | 1 (vacuous) | 2.660×10⁻⁷ | 5.341×10⁻¹² |
+
+These are coverage ceilings over *all possible* nonidentity subgroup targets,
+not measured success probabilities for the three pinned deterministic targets.
+They make mask 2 a low-coverage candidate despite its smaller formula.
+
 For illustration, trial-1 Gray 4+2 mask 0 has 118,684 variables and 547,615
 original clauses; masks 1 and 2 each have 76,686 variables and 423,696
 clauses. Mask 5 is smaller (34,688 variables, 299,777 clauses), but its

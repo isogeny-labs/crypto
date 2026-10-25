@@ -9,6 +9,7 @@ from pathlib import Path
 import analyze
 import domain_screen
 import pair_screen
+import support_screen
 from run import HERE, MANIFEST, PARENT, require
 
 
@@ -66,6 +67,10 @@ def audit(inputs: Path) -> dict:
                     and row["residual_plus_residual_ordered_pair_hits"] == 0
                     for row in pair["results"]),
             "recomputed exact two-summand exclusion")
+    support = support_screen.screen(pair, sha(HERE / "pair-screen.json"))
+    require(support == json.loads((HERE / "support-screen.json").read_bytes())
+            and len(support["rows"]) == 36,
+            "recomputed complete unexcluded-mask support ceilings")
     return {"schema": "n83.full-identity-mask-census-replay/v1",
             "status": "PASS_TWO_COMPLETE_EXPORTS_AND_GROUP_SCREENS",
             "first_census_sha256": first_sha,
@@ -76,6 +81,7 @@ def audit(inputs: Path) -> dict:
             "structural_counts": structural["counts"],
             "domain_counts": domain["counts"],
             "zero_pair_gate_trials_and_pools": len(pair["results"]),
+            "support_ceiling_rows": len(support["rows"]),
             "unexcluded_masks_per_trial_pool_split": [0, 1, 2],
             "relation_search_executed": False,
             "selected_best_total_runtime": None}

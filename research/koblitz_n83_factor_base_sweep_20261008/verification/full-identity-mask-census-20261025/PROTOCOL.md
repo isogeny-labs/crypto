@@ -42,6 +42,12 @@ the final two must sum to the public trial target. It checks every signed
 base-plus-residual and residual-plus-residual pair by group subtraction and
 hash lookup against the exact archive sets. A zero-hit result excludes these
 masks for that trial and pool. It does not characterize masks 0, 1 or 2.
+The [support screen](support_screen.py) counts unordered multisets of the
+summands remaining after each cancellation. Dividing by the nonidentity
+subgroup size bounds the fraction of targets that the resulting sumset could
+cover. This is exact combinatorial accounting conditional on the factor-base
+sets, with possible collisions making the true coverage smaller. It is not a
+probability claim for the pinned deterministic trial targets.
 
 The source-pinned worker command for each row is
 `export-cross-xcnf-pattern BASE HASH MANIFEST ARCHIVE POOL HASH MANIFEST

@@ -22,6 +22,9 @@ pair_spec.loader.exec_module(pair)
 replay_spec = importlib.util.spec_from_file_location("n83_full_mask_replay", HERE / "audit_replay.py")
 replay = importlib.util.module_from_spec(replay_spec)
 replay_spec.loader.exec_module(replay)
+support_spec = importlib.util.spec_from_file_location("n83_full_mask_support", HERE / "support_screen.py")
+support = importlib.util.module_from_spec(support_spec)
+support_spec.loader.exec_module(support)
 
 
 class CensusTest(unittest.TestCase):
@@ -81,6 +84,12 @@ class CensusTest(unittest.TestCase):
         second["rows"][17]["sha256"] = "0" * 64
         with self.assertRaisesRegex(ValueError, "exact deterministic export replay"):
             replay.compare_rows(first, second)
+
+    def test_prefix_cancellation_reduces_the_exact_support_ceiling(self):
+        sizes = [support.count_sums(11, 7, 4, 2, mask) for mask in (0, 1, 2)]
+        self.assertEqual(sizes, [28028, 1848, 308])
+        self.assertGreater(sizes[0], sizes[1])
+        self.assertGreater(sizes[1], sizes[2])
 
 
 if __name__ == "__main__":
