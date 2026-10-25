@@ -104,3 +104,26 @@ The Pod must report its actual cgroup memory and CPU limits before either
 layout runs. Keep the split first and the monolithic layout second, with both
 stage caps fitting the remaining provider deadline; retain each incomplete
 stage and the provider deletion receipt.
+
+After the allocation receipt and the source bundle have been transferred to
+the Pod, [`pod_run.py`](pod_run.py) verifies the bundle and Rust source
+hashes, records cgroup CPU and memory limits, builds the release executable,
+then runs the split and monolithic K5500 index stages in that order on four
+fixed CPUs. It reserves twenty minutes before the provider deadline for
+evidence transfer and retirement, caps compilation at twenty minutes and
+each index stage at forty minutes, and archives successes, timeouts, build
+failures and host rejections. The controller retains its independent
+termination duty while this command runs:
+
+```sh
+python3 -m research.n83_k5500_split4_20261025.pod_run \
+  --allocation /workspace/n83_k5500/allocation.json \
+  --bundle /workspace/n83_k5500/source.tar.gz \
+  --bundle-sha256 EXPECTED_SOURCE_BUNDLE_SHA256 \
+  --output /workspace/n83_k5500/results \
+  --archive /workspace/n83_k5500/raw_results.tar.gz
+```
+
+The raw archive and its `.sha256` sidecar must be copied back before the
+controller verifies Pod deletion. The archive contains both index receipts,
+host telemetry, build log, binary hash and every stage status.
