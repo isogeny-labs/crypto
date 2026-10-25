@@ -43,7 +43,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          # The PR check reads both parents of its synthetic merge commit.
+          fetch-depth: 2
           filter: blob:none
           sparse-checkout-cone-mode: false
           # The linter reads every tracked Markdown/HTML file plus hashes in
