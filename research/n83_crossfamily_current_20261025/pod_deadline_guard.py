@@ -13,7 +13,7 @@ def guard(allocation_path, plan_path, receipt, clock=None, pause=time.sleep,
           remove=None):
     clock = clock or (lambda: datetime.now(timezone.utc))
     remove = remove or (lambda pod: subprocess.run(
-        ['runpodctl', 'pod', 'remove', pod], capture_output=True,
+        ['runpodctl', 'pod', 'delete', pod], capture_output=True,
         timeout=30, check=True))
     allocation = json.loads(allocation_path.read_text())
     plan = json.loads(plan_path.read_text())
