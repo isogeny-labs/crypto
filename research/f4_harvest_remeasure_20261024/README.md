@@ -135,6 +135,16 @@ produced and none touches session or audit content.
 
 ## Files
 
+Under the repository's data-store policy (`docs/artifacts.md`, 2026-10-24) the
+five `sessions/*/records.jsonl`, `REPORT.pdf` and `harvest_ratio.png` live in
+the artifact store, with their SHA-256 in the `.artifacts.json` manifest next
+to each. Fetch them with
+`python3 tools/artifacts/artifacts.py pull research/f4_harvest_remeasure_20261024`
+(every download is hashed against the manifest). `harvest_ratio.svg` stays in
+Git. If the owner prefers the PDF and PNG readable in Git, add them to
+`policy.keep` in `.artifacts/config.json`, as was done for
+`research/ic_oracle_setup_blocked_20261020/REPORT.pdf`.
+
 [`PROTOCOL.md`](PROTOCOL.md), `SPEC-*.json`, `SPEC.sha256`, `sessions/` (five
 sessions), `audits/` (five `--replay-all` receipts), `cards/` (six cards,
 receipts and stdout), `analysis/` (every `compare`, `table`, `band` output),
