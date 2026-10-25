@@ -76,6 +76,8 @@ def check_source(source, host, output, raw_screen, analysis, choice, stratum,
         "exclusion_audit_sha256": protocol.digest(protocol.HERE / "exclusion_audit.json"),
         "ic_source_sha256": screen.SOURCE_SHA256,
         "rho_source_sha256": screen.RHO_SOURCE_SHA256,
+        "cargo_lock_sha256": screen.LOCK_SHA256,
+        "rho_config_sha256": screen.RHO_CONFIG_SHA256,
         "binary_sha256": protocol.digest(
             output / "executed_bins/koblitz_orbit_dlp_fast"),
         "rho_binary_sha256": protocol.digest(

@@ -35,6 +35,7 @@ def screen_selection(raw_screen):
 
 def execute(binary, rho_binary, raw_screen, output, stratum):
     manifest, points = protocol.fixture()
+    screen_run.fixture()
     if output.exists():
         raise ValueError("confirmation output already exists")
     output.mkdir(parents=True)
@@ -86,6 +87,8 @@ def execute(binary, rho_binary, raw_screen, output, stratum):
         "exclusion_audit_sha256": protocol.digest(protocol.HERE / "exclusion_audit.json"),
         "ic_source_sha256": screen.SOURCE_SHA256,
         "rho_source_sha256": screen.RHO_SOURCE_SHA256,
+        "cargo_lock_sha256": protocol.digest(screen.ROOT / "Cargo.lock"),
+        "rho_config_sha256": protocol.digest(screen.RHO_CONFIG),
         "binary_sha256": protocol.digest(ic_copy),
         "rho_binary_sha256": protocol.digest(rho_copy),
         "selected_ks": selected_ks,
