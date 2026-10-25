@@ -1,0 +1,78 @@
+{
+  "artifacts": [
+    "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+    "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+    "/home/ec2-user/rho-tier0/rho-worker-source-ec2-64.tar.gz",
+    "/home/ec2-user/rho-tier0/aws-r2-allocation.json",
+    "/home/ec2-user/rho-tier0/worker-plan.json",
+    "/home/ec2-user/rho-tier0/worker_wrapper.py",
+    "/home/ec2-user/rho-tier0/isolated_bench.py",
+    "/home/ec2-user/rho-tier0/host-probe.json"
+  ],
+  "cases": [
+    {
+      "candidate": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "0",
+        "batch",
+        "128",
+        "12",
+        "8192",
+        "32",
+        "64"
+      ],
+      "id": "q00-comparison",
+      "reference": [
+        "/home/ec2-user/rho-tier0/worker_wrapper.py",
+        "/home/ec2-user/rho-tier0/source/target/release/examples/rho_worker_batch_benchmark",
+        "/home/ec2-user/rho-tier0/source/experiments/rho-worker-phase-profile-20261017/rho-closeout-q-manifest.json",
+        "0",
+        "serial",
+        "128",
+        "12",
+        "8192",
+        "1",
+        "64"
+      ]
+    }
+  ],
+  "claim_gate": {
+    "aa_ratio_max": 1.11,
+    "aa_ratio_min": 0.9,
+    "comparison_lower_95_gt": 1.05,
+    "failure_policy": "retain invalid arms and leave aggregate speedup unknown",
+    "host_gate": "all arms pass the frozen Tier 1 counter and topology checks",
+    "max_absolute_peak_rss_delta_kib": 65536,
+    "max_relative_peak_rss_ratio": 1.1
+  },
+  "isolation": {
+    "cgroup": "/sys/fs/cgroup/rho-tier0",
+    "cpus": "23,47",
+    "execution_cpu": 23,
+    "mem_nodes": "1"
+  },
+  "measurement_boundary": "Rust total_charged_ns/1e6: Q-dependent job construction plus full rho lane; fixture loading and independent DP replay outside, both retained in raw output",
+  "measurement_tier": "tier0_physical_host",
+  "pair_fields": [
+    "job_id",
+    "checkin_blake3_time_normalized",
+    "walkers_done",
+    "walk_steps",
+    "distinguished_points",
+    "dead_trails",
+    "units_completed",
+    "checkins",
+    "q_index",
+    "q_hex",
+    "dp_bits",
+    "step_cap",
+    "checkin_every"
+  ],
+  "repetitions": 1,
+  "schema": 1,
+  "timeout_s": 180,
+  "workdir": "/home/ec2-user/rho-tier0/source/target/release/examples",
+  "worker_plan": "/home/ec2-user/rho-tier0/worker-plan.json"
+}

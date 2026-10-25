@@ -269,22 +269,14 @@ coordinate/order adapter is unavailable explicitly report `not_evaluated`;
 Curve25519 is one such record. A complete catalogue entry does not by itself
 certify its coordinates or group order.
 
-In the current file (2572 registry curves and 176 from the sources: 175
+In the regenerated file (15,791 registry curves and 176 source curves: 175
 walked curves of the P-256 and P-224 isogeny classes and the ECC2K-130
-degree-263 descendant), `End(E)` is established for 2721 curves (1150
-maximal, 1571 non-maximal) and unresolved for 13; 14 have a `Δ` that did
-not factor. Of the 1324 curves over `GF(p^k)`, `k > 1`, 1319 have a
-certified order (9 by generator, 1310 by point orders: 484 proved, 826
-probable). The levels behind it: 1306 decided by the scalar test on `E[ℓ]`
-(787 floors, 519 craters at depth 1), 1265 by the prime-power tests (486 one
-above the floor, 370 craters, 409 in between), 74 by the depth-1 point test
-(58 floors, 16 craters; 6 of them on binary curves), 19 by stored level
-certificates (all floors), 390 by isogeny walks (205 craters, 167 floors,
-18 in between), 19 by `j(E) = j(O_K)` in a field of class number 1, 13
-walker certificates (each agreeing with the test), 111 from a certified
-`End(E)`, 243 where `f₀` is already prime to `ℓ`. What stays open: 13
-prime-power levels at `ℓ = 2, 3` on `GF(p^k)` curves that the tests only
-bound. P-256's `Δ` factors with
+degree-263 descendant), `End(E)` is proved for 15,045 curves and probable
+for 907; 14 remain unknown and one record is not applicable. Of the 1,324
+curves over `GF(p^k)`, `k > 1`, 1,319 have a certified order (9 by generator,
+1,310 by point orders: 493 proved, 826 probable); five are not evaluated.
+Per-prime level methods and bounds, and the individual `End(E)` statuses,
+remain recorded in `traits.json`. P-256's `Δ` factors with
 the committed hints as `−3·5·456597257999·p81·p136` (squarefree), so
 `v = 1`, `d_K = Δ` and `End(E) = O_K`, probable through its 136-bit prime
 (the 81-bit one is below the Miller–Rabin proof bound); every walked curve

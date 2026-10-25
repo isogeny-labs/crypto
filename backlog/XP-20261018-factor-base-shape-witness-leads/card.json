@@ -1,0 +1,101 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261018-factor-base-shape-witness-leads",
+  "title": "Cofactor-aware factor-base shapes and rank-aware witness selection",
+  "created": "2026-10-18",
+  "authors": [
+    "native factor-base lead search"
+  ],
+  "status": "draft",
+  "status_note": "Follow-up proposal only. This card has not been run, funded, published or leased. The preceding local diagnostic study is separate.",
+  "blocked_on": [],
+  "links": {
+    "lead": "research/factor_base_shape_leads_20261018/README.md",
+    "notes": [
+      "research/factor_base_shape_leads_20261018/PROTOCOL.md",
+      "research/factor_base_shape_leads_20261018/FOLLOWUP_PROTOCOL.md",
+      "research/factor_base_shape_leads_20261018/COVERAGE_PROTOCOL.md"
+    ],
+    "prs": [
+      2134
+    ]
+  },
+  "question": "Can cofactor-aware structured bases and rank-aware selection among already-valid decompositions improve complete native relation collection on matched target-subgroup workloads?",
+  "decision_value": "Use exact subgroup support and independent rank to choose the next native candidate, then admit an improvement only after full symmetric native-operation pricing on matched fresh workloads. A coverage-only or price-sensitive result does not replace the incumbent; degree of regularity remains unknown without a certificate.",
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": "19190df4a3d8b94b0d8ff69a0502e306a375cfea",
+    "branch": null,
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--bin",
+        "factor-base-sweep"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 1,
+    "ram_gb": 2,
+    "disk_gb": 4,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Proposed ceilings only; no costed protocol or funded dispatch. Freeze workload size, subgroup support and complete counters before ready."
+  },
+  "run": {
+    "argv": [
+      "TODO-freeze-cofactor-aware-shape-and-witness-protocol"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 1800
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "Draft: exact inventories, target-subgroup controls, matched successful decompositions, rank changes and complete native counters with independent replay",
+    "verify": [],
+    "land": "research/factor_base_shape_witness_followup"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "notes": "Not published, posted, funded or leased. No execution through this draft card.",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261018-factor-base-shape-witness-leads"
+    ],
+    "ttl_s": 86400,
+    "env": {
+      "name": "crypto-factor-base-shape-witness-draft",
+      "recipe": "TODO-freeze-native-protocol-and-environment"
+    },
+    "exec": {
+      "cpus": 1,
+      "memory_mb": 2048,
+      "timeout_s": 1800,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261018-factor-base-shape-witness-leads"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "No complete native pricing, costed workload, frozen protocol or runnable command yet."
+    }
+  },
+  "owner_hint": "Native factor-base and relation-collection lane"
+}
