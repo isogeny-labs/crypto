@@ -68,6 +68,19 @@ panel results remain pending. Globally strongest IC/rho
 pricing remains separate and open. See the
 [current implementation evidence](../research/twist_index_calculus_20261020/zero_fiber_collector/IMPLEMENTATION_STATUS.md).
 
+A separate exact repeated-factor certificate panel now runs on all 42
+registered phi/doubling zero-fiber arms. The first fully audited/repeated
+p37 seed0 pair returns no certificate within raw degrees 4..8 and powers
+1..3. That is a bounded search result, not an ideal-membership obstruction.
+The [degree/closure diagnostic](../research/twist_index_calculus_20261020/zero_fiber_collector/degree_closure_probe/PROTOCOL.md)
+therefore fixes indices 0,1,2 from both arms of that same fixture, with
+raw16 versus closure8 and original-product cap 16: 12 configurations and
+24 producers. Five native algebraic controls pass, including a prelaunch
+regression for search cap versus actual original-product degree. Actual comparison
+production remains pending at this checkpoint. This supplements both full
+panels; no new relation rank, target recovery or complete cost is measured
+by those controls. The existing full-price and proof exit criteria remain.
+
 ## Evidence and uncertainty
 
 - **Joint S5 construction, independently validated:** The
