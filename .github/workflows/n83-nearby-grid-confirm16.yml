@@ -79,6 +79,46 @@ jobs:
       PYTHONDONTWRITEBYTECODE: "1"
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          # This job needs the producers and sealed N83 inputs, while the full
+          # repository checkout exhausted the runner's 4 GiB disk preflight.
+          sparse-checkout: |
+            src
+            examples
+            docs/curves
+            docs/ic
+            docs/ecbench
+            docs/identity-certificates
+            tests/fixtures
+            research/n83_cold_factor_base_20261016
+            research/n83_compact4_crosslayout_20261016
+            research/n83_compact4_crosslayout_results_20261016
+            research/n83_e2e_factor_base_20261016
+            research/n83_e2e_final_holdout_20261016
+            research/n83_e2e_finegrid_20261016
+            research/n83_e2e_holdout_20261016
+            research/n83_factor_base_100_results_20261014
+            research/n83_final_extended_20261018
+            research/n83_nearby_grid_confirm16_20261024
+            research/n83_nearby_grid_tier1_20261024
+            research/n83_nearby_full_grid_20261024
+            research/n83_online_finalists_20261018
+            research/n83_dense_root_20261013
+            research/n83_nearby_k_github_tier1_20261021
+            research/n83_nearby_k_current_source_20261021
+            research/n83_indexed5_20261013
+            research/n83_k3072_current_source_20261017
+            research/n83_k3300_current_source_prefix_20261025
+            research/n83_k3596_current_source_full_20261025
+            research/n83_highk_beyond4405_20261021
+            research/n83_highk_online_distribution_20261020
+            research/n83_highk_online_tiebreak_20261020
+            research/n83_root11_dynamic_20261016
+            research/n83_root4_20261014
+            research/n83_root4_frontier_current_20261018
+            research/n83_root4_highk_tier1_retry_20261019
+            research/n83_smallk_challenge_20261017
 
       - name: Fetch and independently replay the admitted screen
         shell: bash
