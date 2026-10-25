@@ -650,6 +650,7 @@ pub(super) fn full_d18_m4_cli(
         1_200,
         false,
         false,
+        false,
     )
 }
 
@@ -672,6 +673,7 @@ pub(super) fn full_d18_m4_l0_positive_cli(
         300,
         false,
         false,
+        false,
     )
 }
 
@@ -690,6 +692,7 @@ pub(super) fn full_d18_m4_l0_shared_positive_cli(
         "none",
         false,
         300,
+        false,
         false,
         false,
     )
@@ -712,6 +715,7 @@ pub(super) fn full_d18_m4_l0_shared_root_pinned_cli(
         300,
         false,
         false,
+        false,
     )
 }
 
@@ -732,6 +736,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_pinned_cli(
         300,
         false,
         false,
+        false,
     )
 }
 
@@ -750,6 +755,7 @@ pub(super) fn full_d18_m4_l0_shared_selector_pinned_cli(
         "selector",
         false,
         300,
+        false,
         false,
         false,
     )
@@ -774,6 +780,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_cli(
         300,
         false,
         false,
+        false,
     )
 }
 
@@ -796,6 +803,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_natural_cli(
         300,
         false,
         false,
+        false,
     )
 }
 
@@ -816,6 +824,7 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_natural_1200_cli(
         "none",
         true,
         1_200,
+        false,
         false,
         false,
     )
@@ -841,6 +850,7 @@ pub(super) fn full_d18_m4_l0_xcnf_cli(
         300,
         true,
         false,
+        false,
     )
 }
 
@@ -863,6 +873,7 @@ pub(super) fn full_d18_m4_l0_xcnf_witness_cli(
         300,
         true,
         true,
+        false,
     )
 }
 
@@ -886,6 +897,33 @@ pub(super) fn full_d18_m4_linux_shared_phase_first_cli(
         1_200,
         false,
         false,
+        false,
+    )
+}
+
+/// Exact S3 first-pair symmetry arm. The first two summands share one domain
+/// and their S3 node is exchangeable; lex ordering removes one duplicate
+/// orientation without pinning an orbit selector or Frobenius phase.
+pub(super) fn full_d18_m4_l0_ordered_first_pair_cli(
+    mode: &str,
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    let budget = if mode == "natural" { 2_400 } else { 300 };
+    full_d18_m4_impl(
+        mode,
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+        budget,
+        false,
+        false,
+        true,
     )
 }
 
@@ -901,6 +939,7 @@ fn full_d18_m4_impl(
     budget_seconds: u64,
     export_xcnf: bool,
     native_xcnf_witness: bool,
+    ordered_first_pair: bool,
 ) -> Result<Value> {
     if !["positive", "natural"].contains(&mode) || output.exists() {
         return Err("full D18 m4 mode or fresh output differs from protocol".into());
@@ -921,13 +960,24 @@ fn full_d18_m4_impl(
     {
         return Err("phase-first policy requires the free-choice shared-root mode".into());
     }
+    if ordered_first_pair
+        && (!l0_diagnostic
+            || encoding != FrobeniusOrbitRootEncoding::SharedBits
+            || !phase_zero_first
+            || choice_pins != "none"
+            || export_xcnf
+            || native_xcnf_witness)
+    {
+        return Err("ordered first pair differs from the frozen symmetry arm".into());
+    }
     if (!l0_diagnostic && budget_seconds != 1_200)
         || (l0_diagnostic
             && budget_seconds != 300
             && !(budget_seconds == 1_200
                 && mode == "natural"
                 && encoding == FrobeniusOrbitRootEncoding::SharedBits
-                && phase_zero_first))
+                && phase_zero_first)
+            && !(budget_seconds == 2_400 && mode == "natural" && ordered_first_pair))
     {
         return Err("full D18 m4 wall budget differs from a frozen mode".into());
     }
@@ -947,7 +997,9 @@ fn full_d18_m4_impl(
         return Err("full D18 native XCNF witness differs from the frozen mode".into());
     }
     let root_choice_pinned = choice_pins == "selector_and_phase_zero";
-    let search_policy = if phase_zero_first {
+    let search_policy = if ordered_first_pair {
+        "phase_zero_first_ordered_first_pair"
+    } else if phase_zero_first {
         "phase_zero_first"
     } else {
         "default"
@@ -1074,6 +1126,10 @@ fn full_d18_m4_impl(
         12_000_000,
     )
     .map_err(|_| "full D18 m4 domain installation failed")?;
+    if ordered_first_pair {
+        enc.order_first_pair(400_000)
+            .map_err(|_| "full D18 first-pair ordering failed")?;
+    }
     if choice_pins != "none" {
         let (indices, _, _) = planted
             .as_ref()
@@ -1158,6 +1214,7 @@ fn full_d18_m4_impl(
     let shape = json!({
         "variables":enc.solver.n_vars(), "clauses":enc.solver.n_clauses(),
         "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy,
+        "ordered_first_pair":ordered_first_pair,
         "xor_rows":enc.solver.n_xors(), "model_ms":model_ms,
         "import_ms":import_ms, "object":row["object"],
         "point_set_blake3":FULL_D18_POINT_SET,
@@ -1369,6 +1426,7 @@ fn full_d18_m4_impl(
         "schema":if l0_diagnostic {if mode == "positive" {"n83.full-d18-m4-l0-positive/v1"} else {"n83.full-d18-m4-l0-natural/v1"}} else {"n83.full-d18-m4-worker/v1"}, "status":status,
         "mode":mode, "source_commit":source_commit,
         "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy,
+        "ordered_first_pair":ordered_first_pair,
         "isolation":isolation,
         "budget_seconds":budget_seconds,
         "source_attestation_mode":source_attestation_mode,
