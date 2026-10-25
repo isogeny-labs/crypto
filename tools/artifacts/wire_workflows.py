@@ -63,7 +63,13 @@ def needed(text: str, moved: set[str], dirs: set[str]) -> list[str]:
         head = raw.split("*", 1)[0]
         p = head.rstrip("/.")
         if "*" not in raw:
-            if p in moved or p in dirs:
+            if p not in moved and p not in dirs:
+                # A workflow can name a script or input nested in the same
+                # study directory as moved data. Pull that subtree, while
+                # leaving unrelated sibling research paths alone.
+                while p and p not in dirs:
+                    p = p.rsplit("/", 1)[0] if "/" in p else ""
+            if p:
                 found.add(p)
             continue
         # A glob names the files it matches: walk up to the directory holding
