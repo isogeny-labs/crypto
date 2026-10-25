@@ -1,6 +1,8 @@
 #set page(margin: 1.8cm)
 #set text(size: 10pt)
 #set par(justify: true)
+// one body font for code spans too: fewer embedded fonts, a smaller PDF
+#show raw: set text(font: "Libertinus Serif", size: 9pt)
 
 = Native checkpoints for the dense closure: stop, kill, resume
 

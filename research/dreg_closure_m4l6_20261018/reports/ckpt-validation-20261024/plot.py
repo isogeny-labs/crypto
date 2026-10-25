@@ -2,6 +2,9 @@
 import json, re, pathlib
 import matplotlib
 matplotlib.use("Agg")
+# Keep the committed files small (tools/artifacts moves any .png/.pdf over 64 KB to the
+# store): SVG text stays text, and the PNG is reduced to a 32-colour palette.
+matplotlib.rcParams["svg.fonttype"] = "none"
 import matplotlib.pyplot as plt
 
 here = pathlib.Path(__file__).parent
@@ -62,5 +65,8 @@ ax[2].set_title("(c) cost of one save", fontsize=9)
 fig.suptitle("Native closure checkpoints: stop, kill, resume (data/ in this directory)", fontsize=10)
 fig.tight_layout()
 fig.savefig(here / "ckpt-validation.svg")
-fig.savefig(here / "ckpt-validation.png", dpi=140)
+fig.savefig(here / "ckpt-validation.png", dpi=110)
+from PIL import Image
+img = Image.open(here / "ckpt-validation.png").convert("RGB").quantize(32)
+img.save(here / "ckpt-validation.png", optimize=True)
 print(len(pts), "save points;", f"plain secs {plain}")

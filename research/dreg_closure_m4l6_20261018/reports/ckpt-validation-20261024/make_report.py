@@ -2,7 +2,8 @@
 import re, typst, pathlib
 here = pathlib.Path(__file__).parent
 lines = (here / "README.md").read_text().split("\n")
-out = ['#set page(margin: 1.8cm)', '#set text(size: 10pt)', '#set par(justify: true)', '']
+out = ['#set page(margin: 1.8cm)', '#set text(size: 10pt)', '#set par(justify: true)',
+       '// one body font for code spans too: fewer embedded fonts, a smaller PDF', '#show raw: set text(font: "Libertinus Serif", size: 9pt)', '']
 def inline(t):
     t = re.sub(r'`([^`]*)`', lambda m: '#raw("' + m.group(1).replace('"', '\\"') + '")', t)
     t = re.sub(r'\*\*([^*]+)\*\*', r'*\1*', t)
