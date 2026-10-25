@@ -20,6 +20,29 @@ fsynced after each successful export. The complete `census.json` is written
 only after all 192 exports pass. A second invocation can reproduce and compare
 every exact row against the committed result.
 
+The pinned `ChainedS3Encoding::build` has an unconditional contradiction when
+two adjacent mask bits are set: an intermediate identity would have to remain
+the identity after adding an affine summand. The separate [structural analyzer](analyze.py)
+marks those eight masks per trial/pool/split as `UNSAT_BY_ADJACENT_IDENTITIES`.
+It reports formula-size minima only among the other eight masks, which still
+may be unsatisfiable for the particular target and domains. The census keeps
+all 16 masks so the finite Cartesian coverage and the source behavior remain
+auditable; small impossible formulas are never promoted as candidates.
+The [pool-domain screen](domain_screen.py) applies a second necessary
+condition to these exact public trials: if the final intermediate sum is the
+identity (mask bit 3), the sixth summand must have the target x-coordinate.
+The sixth summand is always drawn from the residual pool. Each target x is
+absent from both exact pool archives, excluding masks 8, 9 and 10 in addition
+to the adjacent-identity cases. The remaining masks 0, 1, 2, 4 and 5 have
+no proven contradiction from these two checks; this does not establish that
+they yield a relation.
+The [exact pair-sum screen](pair_screen.py) then applies the next necessary
+condition. In masks 4 and 5 the first four summands sum to the identity, so
+the final two must sum to the public trial target. It checks every signed
+base-plus-residual and residual-plus-residual pair by group subtraction and
+hash lookup against the exact archive sets. A zero-hit result excludes these
+masks for that trial and pool. It does not characterize masks 0, 1 or 2.
+
 The source-pinned worker command for each row is
 `export-cross-xcnf-pattern BASE HASH MANIFEST ARCHIVE POOL HASH MANIFEST
 ARCHIVE CORPUS BASE_SUMMANDS RESIDUAL_SUMMANDS TRIAL MASK OUTPUT` using the

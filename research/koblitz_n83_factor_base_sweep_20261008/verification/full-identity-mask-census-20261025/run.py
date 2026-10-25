@@ -171,7 +171,7 @@ def run(protocol: dict, parent: dict, inputs: Path, worker: Path, source: Path,
                 old = expected["rows"][len(rows)]
                 require(all(row[key] == old[key] for key in row
                             if key != "export_wall_seconds_L0"),
-                        f"{name}: independent full-census row replay")
+                        f"{name}: repeat full-census row replay")
             progress.write(json.dumps(row, sort_keys=True) + "\n")
             progress.flush()
             os.fsync(progress.fileno())
