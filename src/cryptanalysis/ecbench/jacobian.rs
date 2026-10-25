@@ -192,7 +192,7 @@ impl Genus2Instance {
             return Err(format!("genus2 takes p < 2^16, not {p}"));
         }
         let curve = Genus2Curve::new(p, f).map_err(|e| e.to_string())?;
-        if r < 5 || !is_prime_u64(r) || group_order % r != 0 {
+        if r < 5 || !is_prime_u64(r) || !group_order.is_multiple_of(r) {
             return Err(format!(
                 "r = {r} is not a prime divisor of #J = {group_order}"
             ));
@@ -273,7 +273,7 @@ pub fn prime_part(n: u64, max_cofactor: u64) -> Option<(u64, u64)> {
     let mut largest = 1;
     let mut d = 2u64;
     while d.saturating_mul(d) <= m {
-        while m % d == 0 {
+        while m.is_multiple_of(d) {
             largest = largest.max(d);
             m /= d;
         }
@@ -284,7 +284,7 @@ pub fn prime_part(n: u64, max_cofactor: u64) -> Option<(u64, u64)> {
     }
     let r = largest;
     let h = n / r;
-    (r >= 5 && h <= max_cofactor && h % r != 0).then_some((r, h))
+    (r >= 5 && h <= max_cofactor && !h.is_multiple_of(r)).then_some((r, h))
 }
 
 fn generator(c: &Genus2Curve, h: u64, r: u64, rng: &mut StdRng) -> Option<Divisor> {

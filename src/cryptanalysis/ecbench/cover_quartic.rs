@@ -97,7 +97,7 @@ impl QuarticCover {
     /// abscissae `x = 0, 1, 2, …` where `f(x)` is a fourth power.
     pub fn new(e: &PrimeCurve) -> Result<QuarticCover, String> {
         let p = e.p;
-        if p < 29 || p >= crate::cryptanalysis::ecbench::plane_quartic::QUARTIC_LAW_MAX_P {
+        if !(29..crate::cryptanalysis::ecbench::plane_quartic::QUARTIC_LAW_MAX_P).contains(&p) {
             return Err(format!("the quartic cover takes 29 ≤ p < 2^31, not {p}"));
         }
         // Rational points (V, x, 1) of V⁴ = f(x), V ≠ 0.

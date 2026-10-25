@@ -1535,7 +1535,10 @@ pub fn solve(
     let mut rep = if let Instance::Wide(wi) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
         solve_wide(m, wi, tx, ty, seed)?
-    } else if matches!(inst, Instance::Genus2(_) | Instance::Quartic(_) | Instance::Ghs(_)) {
+    } else if matches!(
+        inst,
+        Instance::Genus2(_) | Instance::Quartic(_) | Instance::Ghs(_)
+    ) {
         solve_jacobian(m, inst, curve, target, seed)?
     } else {
         let (tx, ty) = (parse_hex(&target[0])?, parse_hex(&target[1])?);
@@ -1832,7 +1835,12 @@ fn solve_jacobian(
     target: &[String; 2],
     seed: u64,
 ) -> Result<SolveReport, String> {
-    jacobian_applicable(&m.id, m.params.get("inner").map(String::as_str), inst, curve)?;
+    jacobian_applicable(
+        &m.id,
+        m.params.get("inner").map(String::as_str),
+        inst,
+        curve,
+    )?;
     match inst {
         Instance::Genus2(i) => {
             let t = i.decode(target)?;
@@ -1980,7 +1988,7 @@ fn quartic_cover_applicable(
             "`{inner}` needs a free negation, which the plane-quartic Jacobian does not have"
         ));
     }
-    if inst.r % 2 == 0 {
+    if inst.r.is_multiple_of(2) {
         return Err("π* is injective on odd-order subgroups only; r is even".into());
     }
     crate::cryptanalysis::ecbench::cover_quartic::QuarticCover::new(&inst.curve)
@@ -2009,7 +2017,7 @@ fn solve_quartic_cover(
     let mut calib = GroupOps::default();
     let h = inst.curve.mul(&mut calib, g, 7);
     let c_e = affine_add_cost(&inst.curve, g, h);
-    if !(c_e > 0.0) {
+    if c_e.is_nan() || c_e <= 0.0 {
         return Err("c_E could not be measured".into());
     }
     let m0 = field_muls();
@@ -2103,7 +2111,7 @@ fn solve_ghs_cover(
     let ec = inst.curve(&f);
     let h = ec.mul(&inst.generator, 7);
     let c_e = affine_add_cost(&f, &ec, &inst.generator, &h);
-    if !(c_e > 0.0) {
+    if c_e.is_nan() || c_e <= 0.0 {
         return Err("c_E could not be measured".into());
     }
     let m0 = f.muls();

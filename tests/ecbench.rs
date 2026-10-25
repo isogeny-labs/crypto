@@ -2230,7 +2230,10 @@ fn jacobians_and_transfers_verify_and_replay() {
         (
             "genus2",
             r#"{"kind": "genus2_search", "p_bits": 8, "seed": 3, "max_cofactor": 16}"#,
-            vec![("rho", "rho.negation", "{}"), ("ic-hec", "ic.hyperelliptic", "{}")],
+            vec![
+                ("rho", "rho.negation", "{}"),
+                ("ic-hec", "ic.hyperelliptic", "{}"),
+            ],
         ),
         (
             "plane_quartic",
@@ -2240,7 +2243,10 @@ fn jacobians_and_transfers_verify_and_replay() {
         (
             "ghs_fp6",
             r#"{"kind": "ghs_fp6_search", "p": 13, "seed": 1}"#,
-            vec![("rho", "rho.negation", "{}"), ("ghs", "transfer.ghs_cover", "{}")],
+            vec![
+                ("rho", "rho.negation", "{}"),
+                ("ghs", "transfer.ghs_cover", "{}"),
+            ],
         ),
         (
             "prime",

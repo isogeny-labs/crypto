@@ -49,7 +49,7 @@ pub struct GhsInstance {
 }
 
 fn check_p(p: u64) -> Result<(), String> {
-    if !(11..=GHS_MAX_P).contains(&p) || !is_prime_u64(p) || p % 3 == 0 {
+    if !(11..=GHS_MAX_P).contains(&p) || !is_prime_u64(p) || p.is_multiple_of(3) {
         return Err(format!(
             "a GHS workload takes a prime 11 ≤ p ≤ {GHS_MAX_P}, p ≠ 3, not {p}"
         ));

@@ -618,7 +618,7 @@ impl Ext {
     fn q(&self) -> u64 {
         self.p.pow(self.k as u32)
     }
-    fn from_index(&self, mut i: u64) -> E {
+    fn element(&self, mut i: u64) -> E {
         let mut e = [0u64; 3];
         for c in e.iter_mut().take(self.k) {
             *c = i % self.p;
@@ -775,7 +775,7 @@ pub fn count_points(f: &[u64; 15], p: u64, k: usize) -> u64 {
     };
     let mut total = 0u64;
     for xi in 0..q {
-        let x = e.from_index(xi);
+        let x = e.element(xi);
         let mut g = vec![[0u64; 3]; 5];
         for (kk, &(a, b, _)) in m4.iter().enumerate() {
             if f[kk] != 0 {
@@ -1003,10 +1003,10 @@ impl QuarticJacobian {
         let ann6 = fm.ann(&p6, 6);
         let t = fm.colon(&ann6, &self.s3, 3, 3);
         assert_eq!(t.len(), 4, "H⁰(3K − E_x − E_y) has dimension 4");
-        let ann_fr3 = fm.ann(&fm.product(&[f.clone()], 6, &self.r3, 3), 9);
+        let ann_fr3 = fm.ann(&fm.product(std::slice::from_ref(&f), 6, &self.r3, 3), 9);
         let mut q = fm.colon(&ann_fr3, &t, 6, 3);
         if q.len() >= 2 {
-            let ann_fr3p1 = fm.ann(&fm.product(&[f.clone()], 6, &self.r3_p1, 3), 9);
+            let ann_fr3p1 = fm.ann(&fm.product(std::slice::from_ref(&f), 6, &self.r3_p1, 3), 9);
             q = fm.colon(&ann_fr3p1, &t, 6, 3);
         }
         assert_eq!(q.len(), 1, "the canonical member is unique");
@@ -1027,7 +1027,7 @@ impl QuarticJacobian {
         let p = self.p;
         let wx = self.w3(x);
         // H⁰(6K − E_x − B) = {f ∈ S_6 : f·H⁰(3K − 2D∞) ⊂ c·H⁰(3K − E_x)}.
-        let ann_cw = fm.ann(&fm.product(&[self.c.clone()], 6, &wx, 3), 9);
+        let ann_cw = fm.ann(&fm.product(std::slice::from_ref(&self.c), 6, &wx, 3), 9);
         let n = fm.colon(&ann_cw, &self.t2, 6, 3);
         assert!(!n.is_empty(), "H⁰(6K − E_x − B) is not zero");
         let f = n[0].clone();
@@ -1035,7 +1035,7 @@ impl QuarticJacobian {
         let w7 = fm.product(&wx, 3, &self.s4, 4);
         let w4 = fm.colon(&fm.ann(&w7, 7), &self.s3, 4, 3);
         // H⁰(7K − E_x − B) = {u ∈ S_7 : u·H⁰(3K − 2D∞) ⊂ c·H⁰(4K − E_x)}.
-        let ann_cw4 = fm.ann(&fm.product(&[self.c.clone()], 6, &w4, 4), 10);
+        let ann_cw4 = fm.ann(&fm.product(std::slice::from_ref(&self.c), 6, &w4, 4), 10);
         let u = fm.colon(&ann_cw4, &self.t2, 7, 3);
         // H⁰(3K − G) = {t ∈ S_3 : t·U ⊂ f·S_4}.
         let ann_fs4 = fm.ann(&fm.product(&[f], 6, &self.s4, 4), 10);
@@ -1168,9 +1168,9 @@ fn factor(mut n: u64) -> Vec<u64> {
     let mut out = Vec::new();
     let mut d = 2;
     while d * d <= n {
-        if n % d == 0 {
+        if n.is_multiple_of(d) {
             out.push(d);
-            while n % d == 0 {
+            while n.is_multiple_of(d) {
                 n /= d;
             }
         }
@@ -1186,7 +1186,7 @@ fn factor(mut n: u64) -> Vec<u64> {
 fn order_from_multiple(jac: &QuarticJacobian, x: &QClass, n: u64) -> u64 {
     let mut o = n;
     for q in factor(n) {
-        while o % q == 0 && jac.mul_raw(x, o / q) == jac.zero {
+        while o.is_multiple_of(q) && jac.mul_raw(x, o / q) == jac.zero {
             o /= q;
         }
     }
@@ -1343,7 +1343,7 @@ impl QuarticInstance {
         g: &[String; 2],
     ) -> Result<QuarticInstance, String> {
         let jac = QuarticJacobian::new(p, f)?;
-        if r < 5 || !is_prime_u64(r) || group_order % r != 0 {
+        if r < 5 || !is_prime_u64(r) || !group_order.is_multiple_of(r) {
             return Err(format!(
                 "r = {r} is not a prime divisor of #J = {group_order}"
             ));
