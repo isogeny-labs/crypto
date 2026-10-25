@@ -92,8 +92,13 @@ pub fn sources(fixtures: &[Fixture]) -> Result<Vec<Source>> {
 }
 pub fn main(args: &[String]) -> Result<()> {
     let command = args.first().ok_or("missing follow-up command")?;
-    if command == "block-worker" {
-        return block::worker(
+    if command == "block-worker" || command == "block-batch-worker" {
+        let run = if command == "block-worker" {
+            block::worker
+        } else {
+            block::batch_worker
+        };
+        return run(
             Path::new(args.get(1).ok_or("input")?),
             Path::new(args.get(2).ok_or("output")?),
             args.get(3).ok_or("budget milliseconds")?.parse()?,

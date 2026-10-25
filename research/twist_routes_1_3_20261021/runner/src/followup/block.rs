@@ -432,17 +432,32 @@ pub fn matched_control(input: &Path, out: &Path) -> Result<Vec<Value>> {
 
 pub fn worker(input: &Path, out: &Path, budget_ms: u64) -> Result<()> {
     let job: Job = serde_json::from_slice(&fs::read(input)?)?;
+    write_json(out, &compute_job(&job, budget_ms))
+}
+fn compute_job(job: &Job, budget_ms: u64) -> Value {
     let c = &job.case;
     let mut options =
         f4::F4Options::new(f4::Ordering::Grevlex, 32).with_budget(Duration::from_millis(budget_ms));
     options.capture_run_log = true;
     let result = f4::f4(&c.equations, c.names.len(), c.p, &options);
     let log = f4::take_run_log();
-    write_json(
-        out,
-        &json!({"job":job.id,"basis":result.basis,"timed_out":result.timed_out,"pairs_above_bound":result.pairs_above_bound,"staircase_at_stop":result.staircase_at_stop,"field_multiplications_row_reduction":result.field_ops,"max_macaulay_rows":result.max_rows,"max_macaulay_cols":result.max_cols,"solving_degree":result.solving_degree,"degree_reached":result.degree_reached,"steps":result.steps,"step_log":log.steps.iter().map(|s|json!({"degree":s.degree,"pairs":s.pairs,"rows":s.rows,"all_rows":s.all_rows,"row_reduction_multiplications":s.ops,"new_polynomials":s.new_polys})).collect::<Vec<_>>(),"budget_ms":budget_ms,"wall_time_admitted":false,"complete_cost":false}),
-    )?;
-    Ok(())
+    json!({"job":job.id,"basis":result.basis,"timed_out":result.timed_out,"pairs_above_bound":result.pairs_above_bound,"staircase_at_stop":result.staircase_at_stop,"field_multiplications_row_reduction":result.field_ops,"max_macaulay_rows":result.max_rows,"max_macaulay_cols":result.max_cols,"solving_degree":result.solving_degree,"degree_reached":result.degree_reached,"steps":result.steps,"step_log":log.steps.iter().map(|s|json!({"degree":s.degree,"pairs":s.pairs,"rows":s.rows,"all_rows":s.all_rows,"row_reduction_multiplications":s.ops,"new_polynomials":s.new_polys})).collect::<Vec<_>>(),"budget_ms":budget_ms,"wall_time_admitted":false,"complete_cost":false})
+}
+pub fn batch_worker(input: &Path, out: &Path, budget_ms: u64) -> Result<()> {
+    let jobs: Vec<Job> = serde_json::from_slice(&fs::read(input)?)?;
+    let start = Instant::now();
+    let results = jobs
+        .iter()
+        .map(|job| {
+            compute_job(
+                job,
+                budget_ms
+                    .saturating_sub(start.elapsed().as_millis() as u64)
+                    .max(1),
+            )
+        })
+        .collect::<Vec<_>>();
+    write_json(out, &results)
 }
 fn suffix(p: &Path, s: &str) -> PathBuf {
     PathBuf::from(format!("{}.{s}", p.display()))

@@ -356,7 +356,8 @@ fn main() -> Result<()> {
                 r["engine"].as_str().unwrap().to_string(),
             );
             let total = totals.entry(key).or_default();
-            total.0 += 1;
+            let branch_count = r["branch_count"].as_u64().unwrap_or(1);
+            total.0 += branch_count;
             if r["status"] != "completed-and-output-matched" {
                 continue;
             }
@@ -379,7 +380,7 @@ fn main() -> Result<()> {
                 .parse::<u64>()?;
             assert_eq!(r["guest_instructions_Ir"], n);
             assert_eq!(r["basis_and_native_counters_match_prior_certificate"], true);
-            total.1 += 1;
+            total.1 += branch_count;
             total.2 += n;
         }
         for entry in cost["by_arm"].as_array().unwrap() {
