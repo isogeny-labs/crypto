@@ -36,6 +36,12 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   ```sh
   python3 tools/artifacts/artifacts.py pull research/projective_law_followup_20261022/formal
   ```
+- The [residual-support head packet](COMMON22_SUPPORT_HEAD.md) proves the
+  unit-weight common branch's `X⁶`, `X⁵`, and `X⁴` coefficients are `0`,
+  `B²`, and `0`. Its source checker binds `B,A,C,Q,Rbar` to Rust and rejects
+  both-side `Q` sign mutations. The [certificate](common22-support-head.json),
+  [CSV](common22-support-head.csv), [graph](common22-support-head.svg), and
+  artifact-stored [PDF](COMMON22_SUPPORT_HEAD.pdf) retain the bounded result.
 - `branch-coverage.json` gives the standardized runtime-label, Lean
   constructor, certificate-schema mapping and lists the five rejected or
   exceptional labels separately.
@@ -94,7 +100,7 @@ does not expose that variable.
 those accepted Lean/Mathlib foundations.  The mapping theorem and the explicit
 bridge implication use no axioms.
 
-`verify.py` also runs all three source-derived checkers in read-only mode; a stale
+`verify.py` also runs all four source-derived checkers in read-only mode; a stale
 or altered certificate fails verification. It requires exactly four distinct Rust functions and their exact Lean
 declaration sets, parses declarations after removing nested comments and
 strings, and cross-checks the status count, schema, binding kind, and audited

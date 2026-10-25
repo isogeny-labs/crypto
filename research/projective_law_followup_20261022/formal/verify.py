@@ -412,6 +412,37 @@ def main() -> None:
                 f"missing common residual artifact: {artifact}")
     require((ROOT / "COMMON22_RESIDUAL.pdf").read_bytes().startswith(b"%PDF-"),
             "invalid common residual PDF")
+    subprocess.run(
+        [sys.executable, str(ROOT / "check_common22_support_head.py"), "--check"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    support_source = (ROOT / "Common22SupportHead.lean").read_text()
+    require(
+        re.search(r"(?m)^theorem headCoefficients_eq\b", support_source) is not None,
+        "common support-head theorem missing",
+    )
+    require(forbidden_proof_token.search(support_source) is None,
+            "forbidden common support-head proof token")
+    support_log = (ROOT / "common22-support-head-build.log").read_text()
+    require(
+        "'Common22SupportHead.headCoefficients_eq' depends on axioms: [propext, Quot.sound]"
+        in support_log,
+        "common support-head kernel/axiom receipt missing",
+    )
+    support_cert = json.loads((ROOT / "common22-support-head.json").read_text())
+    require(support_cert["schema"] == "projective-law-common22-support-head/v1",
+            "common support-head schema mismatch")
+    require(len(support_cert["rows"]) == 8 and
+            all(row["equal"] is True for row in support_cert["rows"]),
+            "common support-head obligation mismatch")
+    for artifact in ("COMMON22_SUPPORT_HEAD.md", "COMMON22_SUPPORT_HEAD.pdf",
+                     "common22-support-head.csv", "common22-support-head.svg"):
+        require((ROOT / artifact).is_file() and (ROOT / artifact).stat().st_size > 0,
+                f"missing common support-head artifact: {artifact}")
+    require((ROOT / "COMMON22_SUPPORT_HEAD.pdf").read_bytes().startswith(b"%PDF-"),
+            "invalid common support-head PDF")
 
     for name, source in lean_sources.items():
         require(forbidden_proof_token.search(source) is None, f"forbidden proof token in {name}")
