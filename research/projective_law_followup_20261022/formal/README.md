@@ -276,6 +276,15 @@ between the localized coordinate rings, and proves both compositions are
 identities. This yields an algebra equivalence of the separately presented
 principal-open coordinate rings. Its [CSV](separate-chart-map.csv),
 [SVG](separate-chart-map.svg), and artifact-stored PDF record the result and
-remaining gates. The corresponding scheme-open identification, smooth
-projective gluing and infinity stalk, divisor/`Pic⁰` transport, and Rust-law
-semantics remain open.
+remaining gates. The following packet checks the corresponding
+scheme-open identification; smooth projective gluing and infinity stalk,
+divisor/`Pic⁰` transport, and Rust-law semantics remain open.
+
+The [principal-open scheme packet](PRINCIPAL_OPEN_SPEC.md) applies that
+coordinate-ring equivalence to `Spec`. Pinned Lean proves that both
+localization maps are open immersions onto the expected basic opens and that
+the spectra of the localized chart rings are isomorphic. Its
+[CSV](principal-open-spec.csv), [SVG](principal-open-spec.svg), and
+artifact-stored PDF record the result. Constructing and identifying a glued
+smooth projective curve, its infinity stalk, divisor/`Pic⁰` transport, and
+Rust-law semantics remain open.
