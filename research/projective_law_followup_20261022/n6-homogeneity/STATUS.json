@@ -1,0 +1,38 @@
+{
+  "schema": "n6-weighted-homogeneity/v1",
+  "date_utc": "2026-10-25",
+  "runtime_source_revision": "3f8f5d7198f782dce3a6e8d05e9971cc7cc6815b",
+  "runtime_source": "research/projective_law_followup_20261022/src/bin/projective_law_gate.rs",
+  "runtime_source_sha256": "5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0",
+  "regression_source": "research/projective_law_followup_20261022/results/n6-w-power-regression.json",
+  "regression_source_sha256": "3c58257325810f0d306222b5e7a69bf17536ed4595bf9dc966152e87a2e138fb",
+  "proof_environment": "Lean 4.34.1 with the pinned formal Mathlib project",
+  "lean_command": "cd research/projective_law_followup_20261022/formal && lake env lean ../n6-homogeneity/N6Homogeneity.lean",
+  "lean_exit": 0,
+  "theorems_checked": [
+    "ordinate_scale_invariant",
+    "aa_squared_w_is_homogeneous",
+    "cc_squared_w_is_homogeneous",
+    "aa_linear_w_defect",
+    "cc_linear_w_defect",
+    "literal_aa_counterexample"
+  ],
+  "identity_certificate_ids": [
+    "IDC1h92ee5de5110623fd",
+    "IDC1h7679e312ee733fcb",
+    "IDC1h87fbf5497ad4d6e0",
+    "IDC1he881917e142d1cb5"
+  ],
+  "identity_replay_points_per_certificate": 32,
+  "identity_extra_checker_points_per_certificate": 32,
+  "tampered_seed_rejected": true,
+  "tampered_seed_exit_code": 101,
+  "project_axioms": [],
+  "foundational_axioms": ["propext", "Classical.choice", "Quot.sound"],
+  "scope": "polynomial W-coordinate scaling for literal N6 intermediate",
+  "runtime_to_lean_semantics": "unproved",
+  "divisor_class_group_law": "unproved",
+  "representative_wrapper_over_rho": 3.793783,
+  "representative_retained_state_over_rho": 4.179297,
+  "cost_change": false
+}

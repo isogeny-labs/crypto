@@ -25,7 +25,7 @@ format.
 | N3 | blocked in this assisted session | the previously rejected exact sparse-nullspace execution remains outside the available assistance boundary; an independently authorized executor must return 717 primary and 717 fresh-process replay records |
 | N4 | waiting on N3 | admit only a returned checksum-bound bundle; preserve failures and publish a full aggregate ratio only if all 1,260 candidates verify |
 | N5 | verified with later phase appendix | reporting-only appendix covers all 12,850 standardized rows; the later source-reconciled phase appendix checks 23,176 representative method rows and 6,120 aggregate method cells, with explicit nulls, graph and PDF |
-| N6 | verified partial mechanization | pinned Lean checked seven algebraic/inventory theorems plus one explicit conditional bridge; the Rust semantic and smooth-curve/Mumford/`Pic^0` bridges remain unresolved; standardized graph and PDF included |
+| N6 | verified partial mechanization | pinned Lean checked seven algebraic/inventory theorems plus one explicit conditional bridge; the later [N6 homogeneity packet](../projective_law_followup_20261022/n6-homogeneity/REPORT.md) proves the W-exponent scaling distinction; the Rust semantic and smooth-curve/Mumford/`Pic^0` bridges remain unresolved |
 | N7 | verified for the fixed-offset model | seven Lean declarations, zero trusted declarations, 336 exact orbit rows and 12,096 canonical price rows; arbitrary, compressed and label-free sidecars remain open |
 | N8 | verified fresh-cohort replication; packet partially complete | 6,300 candidate and 6,300 matched-rho records over 1,260 fresh public targets; five full-cohort ratios and every one of 1,440 pricing rows retained; independent-host replay and a model-cluster interval were not produced |
 | N9 | verified partial manual abstraction | 742-job pinned Lean build and 13-theorem axiom audit; exact four-function binding inventory with four live substitution-rejection tests; a proved Rust translation and concrete smooth-curve/Mumford/principal-divisor/`Pic^0` instance remain open |
@@ -33,10 +33,10 @@ format.
 | N11 | proposed | specify compressed or label-free Kummer sidecars and prove label recovery/collision bounds before any cohort execution |
 | N12 | proposed | preregister a model-held-out factor-base tuning study, tune only on one cohort, and evaluate the frozen choice on the other cohort with all losses retained |
 
-N6, N7 and N8 have verified results within their stated narrower boundaries. N9 now
-has a verified manual executable abstraction, but its concrete source and geometric
-bridges remain open. Continue that bridge and N10, followed by theorem-gated N11
-and held-out N12. N3 remains
+N6, N7, N8 and N10 have verified results within their stated narrower
+boundaries. N9 has a verified manual executable abstraction, but its concrete
+source and geometric bridges remain open. Continue that bridge, followed by
+theorem-gated N11 and held-out N12. N3 remains
 a separate external execution lane. N4 starts only after an N3 bundle arrives,
 so proof and replication work cannot be mistaken for pencil cohort completion.
 
@@ -197,6 +197,14 @@ Connect the runtime formulas to the eight existing certificates. An exhaustive
 small-field reduced-divisor regression is a separate check and is not labeled a
 general proof. Independent mathematical review remains a separate acceptance
 item.
+
+The later [N6 homogeneity packet](../projective_law_followup_20261022/n6-homogeneity/REPORT.md)
+kernel-checks the affine ordinate scale invariance, the weight-three `AA` and
+`CC` formulas for `W²`, exact scaling defects for `W¹`, and an integer
+counterexample. It supports the runtime correction but does not prove that
+the corrected function implements the Jacobian sum. The four polynomial
+identities carry `IDC1h92ee5de5110623fd`, `IDC1h7679e312ee733fcb`,
+`IDC1h87fbf5497ad4d6e0`, and `IDC1he881917e142d1cb5` certificates.
 
 ### N7. Kummer sidecar obstruction: completed fixed-offset theorem
 
