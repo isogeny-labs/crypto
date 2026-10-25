@@ -150,6 +150,10 @@ reproduced by an exact pulled-back factor base on the main curve.
   reduced F43 systems, with independent original-input witnesses and a fresh
   eleven-target source-DLP recovery. Keep the original-input expanded degree,
   homogeneous cutoff and total-work questions separate.
+- [x] Execute a phase-request ledger for40 base setups and400 separate source
+  recoveries, with independently checked matrices, failed queries, log solves
+  and scalars. Prove the signed shifted-relation recovery using the explicit
+  source annihilator. The29 request components are not a calibrated total cost.
 - [ ] Establish a useful-yield improvement under an explicit candidate/target
   policy, a certified lower regularity or applicable solver-degree bound,
   and compatible complete work bounds before an actual speed claim.
@@ -173,6 +177,21 @@ Satisfying these conditions would establish the stated formal parity. It would
 still not prove general ECDLP hardness or an asymptotic solver advantage.
 
 ## Next discriminating step
+
+The [executed phase-demand round](../research/quadratic_twist_evidence_20261021/reports/phase-demand-20261025/README.md)
+accounts for40 setups and400 separate main-source recoveries, all independently
+verified. First F43 policy/target cold solver calls are5/2 and represented
+slots540/36, while group-add requests are125/136. All-policy aggregates tie;
+transported bases reproduce every component except the coordinate map.
+Five new Lean theorems prove actual shifted recovery and its modulo11 step;
+the scoped gate checks176 public theorems/231 declarations, zero extra trusted.
+This closes a finite demand-recording gap while retaining the unpriced field
+setup, allocation/sorting, primitive calibration and full-work obligations.
+The [validated next draft](../backlog/XP-20261025-known-factor-base-roots/README.md)
+tests the already verified factor-base roots as direct solver input instead of
+129 repeated membership evaluations per query. It is not yet executed. Freeze
+the new root-validation/coverage protocol and require independent equality of
+the constrained roots, rows, witnesses and source recoveries.
 
 The [executed adaptive-S3 round](../research/quadratic_twist_evidence_20261021/reports/adaptive-s3-20261025/README.md)
 checks the named row-reinsertion solver on all98 prior cases,188 comparisons

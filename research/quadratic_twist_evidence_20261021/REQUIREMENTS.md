@@ -11,7 +11,7 @@
 | Independent verification of saved/new IC data | verified | tuple-based auditor verifies three headline and 81 complete-log certificates |
 | Native controls | verified | false new relation, removed log certificate and false historical census count rejected |
 | Historical general readable arguments | preserved | archived report remains available with its original hypotheses |
-| Checked Lean implications and proof map | partial overall; finite S3/degree/source-reduction and named adaptive solver fixture verified |171 named theorems /226 audited declarations, zero extra trusted; actual point/group/eigenspace, finite Miller table, yield/rank/cost, S3 ideals/degree certificates, F43 reduction, row-adjunction, D2/D3 and exact twist quadratic vanishing space checked; general geometry and complete-work bridges remain open |
+| Checked Lean implications and proof map | partial overall; finite S3/degree/source-reduction, adaptive fixture and shifted recovery verified |176 public named theorems /231 audited declarations, zero extra trusted; actual point/group/eigenspace, finite Miller table, yield/rank/cost, S3 ideals/degree certificates, F43 reduction, row-adjunction, D2/D3, exact twist vanishing space and annihilator-aware shifted recovery checked; general geometry and complete-work bridges remain open |
 | Algebraic identity certificates | verified for fourteen stated study identities | all previous thirteen retained; adaptive degree3 cleared unit IDC1h9eea191ebc3a8def adds32+16 replay, arithmetic false-identity and false-source controls |
 | Exact curve/model/subgroup identities | verified within stated representations | 1,921 registered monic models, 27 EC1 representations; unused subgroup choices stay unknown |
 | Shared Conductor check | blocked by unavailable tool/configuration | CLI exits 127; shared workflow/state unavailable; no reservation claimed |
@@ -48,8 +48,12 @@
 | Named operational solver degree and source-DLP recovery | verified for F43 finite fixture | main reduced degree3/unit/rank0 versus twist reduced degree2/three roots/rank2; all11 main scalars recovered via actual point map, base logs and certified root sets; expanded original-input degree separately reported |
 | Intrinsic regularity or complete-work twist advantage | open | both reduced arms retain the same homogeneous cutoff2; no external-fastest or matched total cost measured |
 | Adaptive proof, identity and visual | supplied |12 new public Lean theorems/19 audited; total171/226,0 extra trusted; IDC1h9eea191ebc3a8def; `reports/adaptive-s3-20261025/`, `validation/adaptive-s3-20261025/` |
+| Setup/online/source-verification request accounting | executed and independently verified |40 setups,400 separate target recoveries,29 explicitly unpriced counters; all400 scalars verify;100 distinct solver certificates also batch-audited; six rehashed controls reject |
+| Demand advantage scope | finite mixed components, not calibrated total cost | first F43 policy/target cold solver calls5/2 and slots540/36, point-add requests125/136; all-policy cold aggregates tie; transported profiles differ only by explicit map multiplications |
+| Shifted-relation recovery proof | kernel checked on actual F43 map | five new public theorems; source annihilator is explicit for modulo reduction; total176/231, zero extra trusted |
+| Known-factor-base-root query optimization | draft next experiment, not executed | `backlog/XP-20261025-known-factor-base-roots`; implement independent paths and freeze its root-validation/coverage protocol before promotion |
 
-The fresh library suite for the adaptive-S3 continuation again passes 4,479
+The fresh library suite for the phase-demand continuation again passes 4,479
 tests with zero failures and 119 existing ignores; its 22 backend and four
 workflow metadata tests pass. Earlier library and 39/40 metadata-backend
 receipts remain historical records for their original source states.

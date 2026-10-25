@@ -1,5 +1,20 @@
 # Quadratic twists: native experiments and checked point/pairing transfers
 
+The [executed phase-demand continuation](reports/phase-demand-20261025/README.md)
+adds40 actual base setups and400 separate nonidentity main-source recoveries,
+all independently replayed and verified. For the first F43 policy/target,
+cold solver calls are5/2 and represented matrix slots540/36 (main/twist),
+while point-add requests are125/136. These distinct, unpriced request units
+expose the lifting tradeoff; they are not a speed ratio. Across all policies,
+the summed hypothetical cold call and slot counts are equal, and transported
+bases reproduce all components except the explicit coordinate map. Five new
+Lean recovery theorems bring the scoped total to **176 public research
+theorems /231 audited declarations**, zero extra trusted.
+[Protocol](PHASE_DEMAND_20261025_PROTOCOL.md),
+[counter contract](PHASE_DEMAND_20261025_COUNTERS.md),
+[validation](validation/phase-demand-20261025/README.md),
+[next draft implementation](../../backlog/XP-20261025-known-factor-base-roots/README.md).
+
 The [executed adaptive-S3 continuation](reports/adaptive-s3-20261025/README.md)
 checks a named row-reinsertion solver on the same98 cases,188 comparisons and
 1,384 targets. Independent Rust validates every matrix/promotion, exact input

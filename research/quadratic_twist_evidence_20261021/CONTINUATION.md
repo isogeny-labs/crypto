@@ -60,14 +60,21 @@ the same population with all solver witnesses independently checked,24 joint
 reduced-input useful-rank/operational-degree gains, and11 fresh main-source
 recoveries. Its [backlog card](../../backlog/XP-20261025-reduced-s3-mutant-reinsertion/README.md)
 still awaits the repository landing gate; the executed local evidence is
-separate from any Cairn task reservation. The next concrete work item is a
-source-matched, non-isomorphic twist/base-policy test with full solver work
-accounting, followed by a specified intrinsic-regularity computation if the
-candidate survives its pullback control.
+separate from any Cairn task reservation. Completed next accounting step:
+[phase demand](reports/phase-demand-20261025/README.md),40 setups/400 separate
+source recoveries with29 unpriced request components and an explicit
+shifted-relation recovery proof. Lower matrix demand coexists with higher
+point-lifting demand in the first fixture; matched-base controls retain the
+whole profile. The next concrete implementation is
+[checked factor-base roots as solver input](../../backlog/XP-20261025-known-factor-base-roots/README.md).
+Its draft runner/protocol must be implemented and frozen before executing.
+A non-isomorphic twist comparison still needs an explicit scalar-preserving
+subgroup map or pairing-mediated route before claiming main-DLP benefit;
+base-field rational points must not be silently transported by a generic twist.
 
 | Work item | Next checkable deliverable | Evidence needed before promotion |
 | --- | --- | --- |
-| Solver relevance | Extend the now certified finite solver to source-matched non-isomorphic curves and complete-work inputs | Retain actual polynomial/output bindings, witnesses, and all setup/target costs; do not equate its matrix degree with intrinsic regularity |
+| Solver relevance | Use the already checked factor-base roots directly, then re-run the fixed phase workload | Prove root-set equivalence, retain every solver witness and recovery, and charge root validation; calibrated full work still remains |
 | Alternative encoding | Specify an actual descent/rationality encoding and test whether its leading ideal can differ | Exact field/subgroup/map, actual-point lifting, matched-base/pullback controls, bounded native comparison and faithful Lean statements |
 | Useful yield | Test or prove the yield of rank-increasing rows under an explicit candidate/target policy | Full rank progression, failed attempts and dependence assumptions; raw zeros and multiple rows per call remain distinct |
 | Main-DLP benefit | Combine a surviving candidate with a scalar-preserving reduction and complete work accounting | Setup, relation solving, linear algebra, descent, transfer, recovery and verification on the same public synthetic target; applicable external references for any speed claim |
