@@ -20,6 +20,7 @@ Keep resolved and superseded records in the index.
 | [AES integration root-library baseline](aes-integration-root-library-baseline.md) | open | completing the required root-library regression check and root-linked follow-up drivers | repair the unchanged base ecbench/Gaudry declarations/imports, then complete the root suite and current-head CI/review |
 | [Running legacy Spot process recovery](legacy-spot-process-recovery.md) | implemented; client activation remains | enrolled legacy process recovery | private recurring backups, fenced two-hop recovery and Diem copy restore passed; laptop installation/trust needs client access |
 | [Rho worker confirmation after physical-host panel](rho-worker-tier1-host-access.md) | open | qualified 32-Q serial/batch worker throughput and default-routing decision | new independently verified targets, prospective A/A gate, dedicated host after AWS quota, complete audit |
+| [Photographed volcano strict two-sum IC recovery](photo-volcano-two-sum-ic-recovery.md) | open | genuine random-corpus IC recovery on the fixed 46-curve workload | useful independently checked relation rank and genuine target descent without generic-solver answers or private sampling coefficients |
 | [Current main-derived library build for N83 m=4](current-main-library-build-20261017.md) | open | current-head release validation after PR #2100's main merge | repair inherited ecbench/quartic compile errors, then rerun final-head library and m=4 tests |
 | [Photographed-volcano checkpoints unavailable](photo-volcano-checkpoints-unavailable.md) | open | resuming and independently auditing the original 46-curve, 100-problem-per-curve campaign | exact original archives, manifest and checkpoint verification, durable immutable readback, then resume-path validation |
 | [SQISign statistical root gate](sqisign-statistical-root-gate.md) | investigating | green complete release-library validation of source3ce9694 | controlled cause and a complete passing final-source root gate; no substitution by a focused pass |
@@ -101,5 +102,6 @@ Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
+
 
 
