@@ -271,6 +271,20 @@ In order:
   rho was run, so no cold ratio is admitted; the hosted single-target
   benchmark's $133.7\times$ is the nearest cold figure
   (\art{benchmarks/20261014-n71-n83-hosted-single-target/}).
+\item \emph{A second pipeline in \texttt{cryptanalysis}} (K600, $a=1$;
+  \S\ref{sec:companion}). A Tier~1 ratchet of rank-probe, closure,
+  index-build and rank-finder changes brought its latest row to $3.92\times$
+  a tuned rho end to end, cold, and $0.093\times$ online with set-up
+  excluded (\art{ca:experiments/koblitz-n83-rankfinder-20261021/README.md}).
+  The study's own limits apply: one run on one host class, a point estimate
+  with no interval, wall time, factor-base construction charged to no arm (so
+  the cold cost is a lower bound), no computable band, and gaps that are not
+  comparable across runs (the same producer read $4.42\times$ on another host).
+  Against Bernstein--Lange rho with equal advice its online time is
+  $22.55\times$ $[16.23,31.44]$ worse
+  (\art{ca:experiments/koblitz-n83-bl-rankprobe-20261019/}). It is the
+  closest cold Koblitz figure at $n=83$ and is still above rho; the two
+  pipelines' numbers are not comparable with each other.
 \end{itemize}
 The open pull requests at the time of writing include further $n=83$ work
 ($m=4$ queries on a retained 16{,}627-column base, AWS replays, shared-binary

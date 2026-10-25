@@ -91,6 +91,20 @@ over $\FF_{2^7}$ found non-subfield quasi-subfield polynomials below the
 HKPYY Lemma 4.1 bound, which answers a tightness question but moves no
 cost (\art{research/notes/index-calculus/RESEARCH_QUASI_SUBFIELD.md}).
 
+\paragraph{The same question in crypto-autoresearcher.} The companion
+repository measured it independently (\S\ref{sec:companion}). msolve's
+solving degree of the descended $m=3$ system is 7 at every $n$ from 11 to 23,
+a lower bound from $n=17$ on, where the run walls on matrix size
+(\art{ar:experiments/EXP-ALBIN-008/analysis.md}); the study reads this as
+evidence on the bounded side in a narrow range that cannot distinguish
+bounded from slowly growing. A degree-4 reuse closure refutes all 400
+unsatisfiable $\Sem3$ descents at $n=19$ that plain degree-4 Macaulay
+refutes none of (\art{ar:experiments/EXP-CERTBIN-060020/}), the same effect
+as the MutantXL closure above. A crossbred solver's total exponent is $0.891$
+$[0.869,0.914]$ against rho's $0.498$ over $n=10$--$24$
+(\art{ar:experiments/EXP-ICI-001/analysis.md}); on its older range,
+$n\le20$, the fit reproduces the repository's earlier $0.863$ as $0.864$.
+
 \paragraph{Reading.} On toy fields, the evidence says the solving degree of
 Weil-descended summation systems grows with $\ell$ and stays within one of
 the semi-regular prediction, while the first and last fall degrees stay
@@ -135,8 +149,13 @@ instances in 17.8\,s; SMT runs at $0.44$--$2.63\times$ the native CDCL+XOR
 solver (\art{research/pdp_smt_oracle_20261008/}); WDSat solves $n=5$
 ($47$ against $51{,}425$ conflicts with and without XOR-Gauss) and crashes
 at $n=9$ on a static allocation limit, where CryptoMiniSat takes
-0.4--2.6\,s (\art{research/wdsat_rr_20260920/}). The SAT route is closed
-as an exponent lead. Isogenous and random-$b$ neighbours give identical
+0.4--2.6\,s (\art{research/wdsat_rr_20260920/}). Run unmodified on the 60
+published $\Sem4$ instances of Trimoska et al., WDSat is the fastest solver,
+2.37\,s on the unsatisfiable $n=19$, $\ell=6$ cell against 124.6\,s for
+CryptoMiniSat with XOR clauses (\art{ar:experiments/EXP-ICPERF-66fd51/};
+\S\ref{sec:companion}); that is a solver comparison on toy instances, with
+no relation, linear-algebra or rho column. The SAT route is closed as an
+exponent lead. Isogenous and random-$b$ neighbours give identical
 Macaulay ranks and FFD 3 (\art{research/pdp_isogeny_probe_20261008/}).
 
 \paragraph{The PDP oracle programme.} The point-decomposition speed-up
