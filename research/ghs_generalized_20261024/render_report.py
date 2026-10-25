@@ -48,7 +48,7 @@ lines=['# Generalized binary GHS: explicit map and attack controls',
        '`screen-n10-a0-b20.json`, `screen-n12-a1-b200.json`. '
        'Marker area grows with the number of `c` values yielding a genus at that subfield degree, capped at 400 for legibility; read the exact histogram counts in JSON. '
        'The editable renderer is `render_screen.py`; the vector copy is `genus-profiles.svg`.',
-       '', 'For degree 12, `results/leads-n12-a1-b200-g2.json` contains 147 screened genus-at-most-two profiles, including 15 genus-one profiles over GF(2^4); the first is `c=0x1`. These are structural leads only: their individual maps and attacks were not run.',
+       '', 'For degree 12, `results/leads-n12-a1-b200-g2.json` contains 147 screened genus-at-most-two profiles, including 15 genus-one profiles over GF(2^4); the first is `c=0x1`. The independently replayed source subgroup has prime order 199. The integer Weil bound gives `#Jac(C)(GF(2^4)) <= (1+4)^2 = 25` for those 15 genus-one profiles, and `#Jac(C)(GF(2^2)) <= (1+2)^4 = 81` for the six genus-two profiles over GF(2^2). Every homomorphism from the order-199 subgroup to either target group is therefore zero, regardless of the as-yet-unconstructed coordinate map. `audit_subgroup_bounds.py` records the exact excluded `c` values and the same check across all four screens in `results/subgroup-weil-audit.json`: 21 low-genus profiles excluded, 232 retained by this necessary bound. The retained profiles are structural leads only; the bound does not establish a nonzero map or an attack.',
        '', '## Exact instances, subgroup maps, and measured work',
        '', 'All curves use `y²+xy=x³+a x²+b` in the indicated polynomial-basis field. '
        '`P`, `Q`, `phi(P)`, and `phi(Q)` are exact JSON coordinates; '
@@ -67,6 +67,7 @@ def operations(cost):
     return ', '.join(f'{k}={v}' for k,v in sorted(cost['field_operations'].items()))+f'; wall_ns={cost["wall_ns"]} (L0)'
 
 rows=[]
+cost_rows=[]
 for n,a,b,edges in specs:
     modulus={6:'0x43',8:'0x11b',10:'0x409',12:'0x1009'}[n]
     for edge in edges:
@@ -80,6 +81,17 @@ for n,a,b,edges in specs:
         relations='—' if g is None else f"{g['relation_counts']['smooth']} / {g['relation_counts']['attempts']}"
         lines.append(f"| {n} | {edge.replace('_isogeny','-isog')} | {src['group_order']} / {src['subgroup_order']} | {fb} | {relations} | {rho['elliptic_additions']} / {rho['elliptic_doublings']} / {rho['steps']} | {stat} |")
         rows.append((path,j))
+        if g:
+            ns=lambda value: f'{value / 1_000_000:.3f}'
+            setup=sum(cost['wall_ns'] for cost in j['setup_phases'].values() if isinstance(cost,dict) and 'wall_ns' in cost)
+            if iso:
+                setup+=iso['construction_and_validation_cost']['wall_ns']
+            pre=sum(g['phases'][phase]['wall_ns'] for phase in ('factor_base','relations_and_linear_algebra'))
+            online=sum(g['phases'][phase]['wall_ns'] for phase in ('map','target_descent_and_replay'))
+            cost_rows.append(f"| {n} | {edge.replace('_isogeny','-isog')} | {ns(setup)} | {ns(pre)} | {ns(online)} | {ns(j['rho']['cost']['wall_ns'])} |")
+lines+=['', '| n | edge | setup incl. audit | GHS precompute | GHS online | rho online |',
+        '|--:|:--|--:|--:|--:|--:|']+cost_rows+['',
+        'One-sample elapsed cost summary in milliseconds. Setup includes construction, source-order enumeration, exhaustive subgroup-map verification, and isogeny construction/validation where applicable. GHS precompute is factor-base construction plus relation collection and matrix work; online is the map plus target descent and replay. The rho column is its complete same-target run. These are unisolated L0 samples and do not establish a speedup.']
 lines+=['', 'The matched reference is deterministic `rho.negation` with a memory collision table and up to 12 partition reseeds; its counted additions/doublings and field operations include restarts. `results/MANIFEST.json` binds the executable SHA-256, source base, host and each receipt hash. Operation counts are phase-specific and preserve the field degree. '
         'Inverse-call counters are informational and include multiplications and squarings already tallied, so do not add inverses to those counts. The genus-two field operations, source-field rho operations, matrix entry operations, '
         'and hash/table work use different units. `wall_ns` is one unisolated L0 observation, '
@@ -105,11 +117,12 @@ for path,j in rows:
     lines.append('')
 lines+=['## Formal scope, prior work and limits','',
         'The Lean file `lean/SubgroupTransfer.lean` proves additive-map scalar transfer, '
-        'nonzero image plus prime subgroup injectivity, and push-pull injectivity under '
+        'nonzero image plus prime subgroup injectivity, vanishing when destination r-torsion is trivial, and push-pull injectivity under '
         'a coprimality hypothesis. `lean --run ../../../tools/lean/AuditAxioms.lean SubgroupTransfer` '
-        'audited nine declarations with zero failing and zero `native_decide` trusted; '
+        'audited ten declarations with zero failing and zero `native_decide` trusted; '
         '`propext` appears in generated constructor and injectivity declarations. '
-        'It does not prove that the coded trace-conorm and Vélu formulas satisfy those abstract hypotheses. '
+        'The finite-field Weil bound and its concrete arithmetic are checked by the audit script, not proved in Lean. '
+        'Lean does not prove that the coded trace-conorm and Vélu formulas satisfy those abstract hypotheses. '
         'That geometric proof and a characteristic-two identity certificate are open.',
         '', 'The 2002 isogeny extension and the 2004 generalization establish prior family coverage; '
         'see `PRIOR_WORK.md` for the per-instance searches. None of these rows is classified '

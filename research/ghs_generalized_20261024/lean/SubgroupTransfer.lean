@@ -60,6 +60,18 @@ theorem preserves_discrete_log (pull : AdditiveTransfer E J)
     pull.apply target = scalar • pull.apply generator := by
   rw [relation, pull.map_zsmul]
 
+/-- If the destination has no nonzero points killed by the source subgroup
+order, every additive transfer annihilates that subgroup.  The finite-field
+Weil bound and Lagrange's theorem establish `destination_torsion_trivial`
+for the excluded concrete profiles; this theorem isolates the map step. -/
+theorem image_zero_of_no_destination_torsion
+    (pull : AdditiveTransfer E J) (order : Int)
+    (annihilates : ∀ x : E, order • x = 0)
+    (destination_torsion_trivial : ∀ y : J, order • y = 0 → y = 0)
+    (x : E) : pull.apply x = 0 := by
+  apply destination_torsion_trivial
+  rw [← pull.map_zsmul, annihilates x, pull.map_zero]
+
 /-- A generator has a nonzero image once injectivity is certified. -/
 theorem image_nonzero
     (pull : AdditiveTransfer E J) (push : AdditiveTransfer J E)

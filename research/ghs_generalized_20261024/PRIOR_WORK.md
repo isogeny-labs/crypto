@@ -15,7 +15,7 @@ This audit addresses the precise tested examples in `results/`. It is not an exh
 | GF(2^8), modulus 0x11b, a=0, b=32, r=67 | direct quadratic GHS | known characteristic-two GHS/isogeny family [1–5] | exact publication match unresolved |
 | GF(2^8), modulus 0x11b, a=0, b=32, r=67 | degree 2, kernel [0, 197], quotient (a,b)=(0x0,0xc5) | known characteristic-two GHS/isogeny family [1–5] | exact publication match unresolved |
 
-The degree-12 `c=0x1`, base-degree-four genus-one profile (and 14 other such profiles in `results/leads-n12-a1-b200-g2.json`) is a Hess-parameter structural screen, not an executed map or an attack. Hess 2004 covers the generalized family; no exact-instance publication claim is made.
+The degree-12 `c=0x1`, base-degree-four genus-one profile (and 14 other such profiles in `results/leads-n12-a1-b200-g2.json`) is a Hess-parameter structural screen, not an executed map or an attack. For the exact order-199 source subgroup, all 15 are excluded by the Jacobian order bound 25; six base-degree-two genus-two profiles are likewise excluded by the bound 81. `results/subgroup-weil-audit.json` gives the exact parameters and all four screens' low-genus counts. Hess 2004 covers the generalized family; no exact-instance publication claim is made.
 
 The coefficients alone do not identify a curve: the field polynomial, subgroup generator and target coordinates in each receipt are part of the exact identity. The quotient receipts add the exact kernel and codomain coefficients.
 

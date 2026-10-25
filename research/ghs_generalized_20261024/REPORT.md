@@ -14,7 +14,7 @@ For each proper `GF(2^s)` in `GF(2^n)` and each nonzero Hess parameter `c` in th
 
 Screen population and exact counts: `results/screen-n6-a0-b20.json`, `screen-n8-a0-b20.json`, `screen-n10-a0-b20.json`, `screen-n12-a1-b200.json`. Marker area grows with the number of `c` values yielding a genus at that subfield degree, capped at 400 for legibility; read the exact histogram counts in JSON. The editable renderer is `render_screen.py`; the vector copy is `genus-profiles.svg`.
 
-For degree 12, `results/leads-n12-a1-b200-g2.json` contains 147 screened genus-at-most-two profiles, including 15 genus-one profiles over GF(2^4); the first is `c=0x1`. These are structural leads only: their individual maps and attacks were not run.
+For degree 12, `results/leads-n12-a1-b200-g2.json` contains 147 screened genus-at-most-two profiles, including 15 genus-one profiles over GF(2^4); the first is `c=0x1`. The independently replayed source subgroup has prime order 199. The integer Weil bound gives `#Jac(C)(GF(2^4)) <= (1+4)^2 = 25` for those 15 genus-one profiles, and `#Jac(C)(GF(2^2)) <= (1+2)^4 = 81` for the six genus-two profiles over GF(2^2). Every homomorphism from the order-199 subgroup to either target group is therefore zero, regardless of the as-yet-unconstructed coordinate map. `audit_subgroup_bounds.py` records the exact excluded `c` values and the same check across all four screens in `results/subgroup-weil-audit.json`: 21 low-genus profiles excluded, 232 retained by this necessary bound. The retained profiles are structural leads only; the bound does not establish a nonzero map or an attack.
 
 ## Exact instances, subgroup maps, and measured work
 
@@ -32,6 +32,21 @@ All curves use `y²+xy=x³+a x²+b` in the indicated polynomial-basis field. `P`
 | 12 | direct | 3980 / 199 | 64 / 56 | 132 / 198 | 33 / 9 / 9 | verified |
 | 12 | two-isog | 3980 / 199 | 64 / 56 | 132 / 198 | 33 / 9 / 9 | verified |
 | 12 | five-isog | 3980 / 199 | 64 / 56 | 132 / 198 | 33 / 9 / 9 | verified |
+
+| n | edge | setup incl. audit | GHS precompute | GHS online | rho online |
+|--:|:--|--:|--:|--:|--:|
+| 6 | direct | 2.067 | 3.758 | 0.156 | 0.056 |
+| 6 | two-isog | 10.516 | 1.192 | 0.157 | 0.021 |
+| 8 | direct | 17.486 | 24.064 | 0.244 | 0.050 |
+| 8 | two-isog | 18.431 | 11.754 | 0.897 | 0.026 |
+| 10 | direct | 25.501 | 24.328 | 0.267 | 0.061 |
+| 10 | two-isog | 27.865 | 10.188 | 1.613 | 0.128 |
+| 10 | three-isog | 33.400 | 16.653 | 0.237 | 0.313 |
+| 12 | direct | 74.308 | 144.882 | 0.253 | 0.190 |
+| 12 | two-isog | 148.731 | 111.973 | 0.791 | 0.175 |
+| 12 | five-isog | 185.539 | 108.527 | 0.353 | 0.176 |
+
+One-sample elapsed cost summary in milliseconds. Setup includes construction, source-order enumeration, exhaustive subgroup-map verification, and isogeny construction/validation where applicable. GHS precompute is factor-base construction plus relation collection and matrix work; online is the map plus target descent and replay. The rho column is its complete same-target run. These are unisolated L0 samples and do not establish a speedup.
 
 The matched reference is deterministic `rho.negation` with a memory collision table and up to 12 partition reseeds; its counted additions/doublings and field operations include restarts. `results/MANIFEST.json` binds the executable SHA-256, source base, host and each receipt hash. Operation counts are phase-specific and preserve the field degree. Inverse-call counters are informational and include multiplications and squarings already tallied, so do not add inverses to those counts. The genus-two field operations, source-field rho operations, matrix entry operations, and hash/table work use different units. `wall_ns` is one unisolated L0 observation, so no elapsed-time ratio or speedup is inferred; this rho has not been measured against the fastest external implementation. A calibrated GAE 0/0.1/1 band and an external implementation comparison remain outstanding.
 
@@ -195,7 +210,7 @@ The matched reference is deterministic `rho.negation` with a memory collision ta
 
 ## Formal scope, prior work and limits
 
-The Lean file `lean/SubgroupTransfer.lean` proves additive-map scalar transfer, nonzero image plus prime subgroup injectivity, and push-pull injectivity under a coprimality hypothesis. `lean --run ../../../tools/lean/AuditAxioms.lean SubgroupTransfer` audited nine declarations with zero failing and zero `native_decide` trusted; `propext` appears in generated constructor and injectivity declarations. It does not prove that the coded trace-conorm and Vélu formulas satisfy those abstract hypotheses. That geometric proof and a characteristic-two identity certificate are open.
+The Lean file `lean/SubgroupTransfer.lean` proves additive-map scalar transfer, nonzero image plus prime subgroup injectivity, vanishing when destination r-torsion is trivial, and push-pull injectivity under a coprimality hypothesis. `lean --run ../../../tools/lean/AuditAxioms.lean SubgroupTransfer` audited ten declarations with zero failing and zero `native_decide` trusted; `propext` appears in generated constructor and injectivity declarations. The finite-field Weil bound and its concrete arithmetic are checked by the audit script, not proved in Lean. Lean does not prove that the coded trace-conorm and Vélu formulas satisfy those abstract hypotheses. That geometric proof and a characteristic-two identity certificate are open.
 
 The 2002 isogeny extension and the 2004 generalization establish prior family coverage; see `PRIOR_WORK.md` for the per-instance searches. None of these rows is classified as potentially new vulnerable. The `c` screen, direct degree-two cover, and small rational-kernel isogenies are distinct capabilities: most screened profiles have no executable transfer and no index-calculus cost. Fields beyond degree 12, arbitrary isogeny chains, degree-7 end-to-end examples, higher-genus index calculus and odd characteristic are not covered. The provided target scalar is used to prepare and independently validate the instance; the attack and rho routines only receive source P and Q.
 
