@@ -100,6 +100,44 @@ fn supervisor(root: &Path) -> Child {
         .args(["--root", root.to_str().unwrap(), "--no-imds", "--once"])
         .env("SPOT_CHECKPOINT_DISCOVERY_BIN", discovery)
         .env("SPOT_CHECKPOINT_MANIFEST", "/must-not-be-inherited")
+        .env("CLAUDE_SESSION_ID", "old-launcher-session-do-not-save")
+        .env("SYNTHETIC_INHERITED_SECRET", "not-part-of-the-job")
+        .env_remove("SPOT_ACTIVITY_TABLE")
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap()
+}
+
+fn resume_from_another_harness(root: &Path, record: &Path) -> Child {
+    let runtime = std::env::var_os("SPOT_SELFTEST_RUNTIME").map(PathBuf::from);
+    let runner = runtime
+        .as_ref()
+        .map(|p| p.join("runner.py"))
+        .unwrap_or_else(|| {
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .parent()
+                .unwrap()
+                .join("runner.py")
+        });
+    let discovery = runtime
+        .as_ref()
+        .map(|p| p.join("bin/checkpoint-discovery"))
+        .unwrap_or_else(|| PathBuf::from(env!("CARGO_BIN_EXE_checkpoint-discovery")));
+    Command::new("python3")
+        .arg(runner)
+        .args([
+            "--root",
+            root.to_str().unwrap(),
+            "--resume",
+            record.to_str().unwrap(),
+            "--no-imds",
+            "--once",
+        ])
+        .env("SPOT_CHECKPOINT_DISCOVERY_BIN", discovery)
+        .env("CODEX_SESSION_ID", "new-launcher-session")
+        .env_remove("CLAUDE_SESSION_ID")
+        .env_remove("SYNTHETIC_INHERITED_SECRET")
         .env_remove("SPOT_ACTIVITY_TABLE")
         .stdout(Stdio::null())
         .stderr(Stdio::null())
@@ -168,6 +206,16 @@ fn supervisor_restores_a_discovered_generation_after_abrupt_worker_death() {
         .unwrap();
     assert_eq!(unsafe { libc::kill(pid, libc::SIGKILL) }, 0);
     assert!(!wait(&mut first).success());
+    let record = root.0.join("state/native/run.json");
+    let encoded = fs::read_to_string(&record).unwrap();
+    let handoff: Value = serde_json::from_str(&encoded).unwrap();
+    assert_eq!(handoff["schema"], "experiment.run/v1");
+    assert_eq!(handoff["status"]["phase"], "failed");
+    assert_eq!(handoff["paths"]["checkpoint"], "state/native/checkpoint");
+    assert_eq!(handoff["checkpoint"]["selection"], "latest-at-resume");
+    assert_eq!(handoff["resume"]["argv"][0], "experiment-runner");
+    assert!(!encoded.contains("old-launcher-session-do-not-save"));
+    assert!(!encoded.contains("not-part-of-the-job"));
     // Corrupt every generation newer than g1, requiring real fallback at resume.
     for entry in fs::read_dir(root.0.join("state/native/checkpoint")).unwrap() {
         let path = entry.unwrap().path();
@@ -186,7 +234,10 @@ fn supervisor_restores_a_discovered_generation_after_abrupt_worker_death() {
         discover(&options).unwrap()["jobs"][0]["selected"]["generation"],
         1
     );
-    assert!(wait(&mut supervisor(&root.0)).success());
+    // The exported run record carries the job specification. No original
+    // launcher or jobs manifest is needed to reconstruct admission.
+    fs::remove_file(root.0.join("jobs.json")).unwrap();
+    assert!(wait(&mut resume_from_another_harness(&root.0, &record)).success());
     let output = root.0.join("state/native/output");
     assert_eq!(
         fs::read_to_string(output.join("restored.json")).unwrap(),
@@ -197,4 +248,7 @@ fn supervisor_restores_a_discovered_generation_after_abrupt_worker_death() {
         "12"
     );
     assert!(root.0.join("state/native/complete.json").is_file());
+    let handoff: Value = serde_json::from_slice(&fs::read(record).unwrap()).unwrap();
+    assert_eq!(handoff["status"]["phase"], "complete");
+    assert_eq!(handoff["checkpoint"]["last_selected"]["generation"], 1);
 }

@@ -1,0 +1,26 @@
+{
+  "schema": "spot.criu-assessment/v1",
+  "kernel": "6.18.54-121.166.amzn2023.x86_64",
+  "probe_source": "empty-environment C counter, increments a uint64_t and flushes stdout every 10 ms",
+  "live_experiments_signaled": false,
+  "live_experiments_dumped": false,
+  "cross_host_restore_tested": false,
+  "packaged_version": "3.17.1-1.amzn2023.0.4",
+  "packaged_dump": "passed",
+  "packaged_restore": "failed sys_rseq -22",
+  "upstream_version": "4.2.1",
+  "upstream_source": "https://github.com/checkpoint-restore/criu/archive/refs/tags/v4.2.1.tar.gz",
+  "upstream_tar_sha256": "feffdf4638125ebb12d2434754f80a1d7bbba85a3e6bee98c216f88fb99a5d96",
+  "upstream_dump": "passed --leave-running",
+  "upstream_restore": "passed after killing disposable original",
+  "counter_after_restore": [
+    7271,
+    7272
+  ],
+  "limits": [
+    "same-host simple counter only",
+    "snapshot briefly freezes target",
+    "matching filesystem and CPU/kernel state required",
+    "process memory images excluded from public release"
+  ]
+}

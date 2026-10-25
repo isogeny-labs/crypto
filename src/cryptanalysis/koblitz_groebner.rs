@@ -4362,7 +4362,7 @@ pub fn first_fall_degree(
 /// A refutation or full pinning is sufficient to decide this diagnostic.
 /// Multi-solution SAT ideals may already have a complete Gröbner basis
 /// while remaining unresolved by this test.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct SolvingProfile {
     /// Degree the matrix was built at.
     pub degree: u32,
@@ -4613,6 +4613,23 @@ pub fn solving_profile_sparse(
         eliminate_high_columns(rows, n_cols, low_start)
     };
 
+    Some(finish_sparse_profile(
+        polys, degree, &cols, n_rows, low_start, elim,
+    ))
+}
+
+/// Durable checkpoints for the all-sparse bounded Macaulay diagnostic.
+pub mod checkpoint;
+
+fn finish_sparse_profile(
+    polys: &[F2BoolPoly],
+    degree: u32,
+    cols: &[u64],
+    n_rows: usize,
+    low_start: usize,
+    elim: crate::cryptanalysis::sparse_macaulay::SparseElimination,
+) -> SolvingProfile {
+    let n_cols = cols.len();
     // The surviving linear consequences span `cols[low_start..]` only.
     // Echelon form is not enough to read off a pinned variable — `{v+w,
     // w}` must reduce to `{v, w}` first — so reduce this block densely.
@@ -4663,7 +4680,7 @@ pub fn solving_profile_sparse(
         }
     }
 
-    Some(SolvingProfile {
+    SolvingProfile {
         degree,
         rows: n_rows,
         cols: n_cols,
@@ -4671,7 +4688,7 @@ pub fn solving_profile_sparse(
         vars_determined: (determined & occurring).count_ones() as usize,
         vars_occurring: occurring.count_ones() as usize,
         refuted,
-    })
+    }
 }
 
 /// Legacy name for the first **bounded-Macaulay resolution degree**:
