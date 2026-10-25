@@ -331,6 +331,24 @@ pub fn run_pipeline<G: CountedGroup>(
     calib: &Calibration,
     rho_s: Option<f64>,
 ) -> Result<RunReport, String> {
+    run_pipeline_with_base(ctx, spec, base_builder, oracle, planted, calib, rho_s)
+        .map(|(report, _)| report)
+}
+
+/// [`run_pipeline`], also returning the factor base it built and used,
+/// for a caller that describes the base afterwards (its point digest,
+/// column count): rebuilding it would repeat the whole build outside the
+/// measured run, and could describe a different base than the one used.
+#[allow(clippy::too_many_arguments)]
+pub fn run_pipeline_with_base<G: CountedGroup>(
+    ctx: &InstanceCtx<G>,
+    spec: &PipelineSpec,
+    base_builder: &dyn FactorBaseBuilder<G>,
+    oracle: &mut dyn DecompositionOracle<G>,
+    planted: u64,
+    calib: &Calibration,
+    rho_s: Option<f64>,
+) -> Result<(RunReport, FactorBase<G::Elt>), String> {
     let started = Instant::now();
 
     // ── Stage 1: the factor base ───────────────────────────────────
@@ -584,54 +602,57 @@ pub fn run_pipeline<G: CountedGroup>(
 
     let (work, work_unit) = matrix.work();
 
-    Ok(RunReport {
-        instance: ctx.name.clone(),
-        log2_r: (ctx.r as f64).log2(),
-        r: ctx.r,
-        group_order: ctx.group_order,
-        spec: spec.clone(),
-        label: spec.label(),
-        factor_base: FactorBaseReport {
-            name: base_builder.name().to_string(),
-            description: base_builder.describe(&spec.factor_base_params),
-            signed_points: fb.points.len(),
-            abscissae: fb.abscissae,
-            columns: fb.columns,
-            points_per_column: fb.points.len() as f64 / fb.columns.max(1) as f64,
-            cost: fb_phase,
+    Ok((
+        RunReport {
+            instance: ctx.name.clone(),
+            log2_r: (ctx.r as f64).log2(),
+            r: ctx.r,
+            group_order: ctx.group_order,
+            spec: spec.clone(),
+            label: spec.label(),
+            factor_base: FactorBaseReport {
+                name: base_builder.name().to_string(),
+                description: base_builder.describe(&spec.factor_base_params),
+                signed_points: fb.points.len(),
+                abscissae: fb.abscissae,
+                columns: fb.columns,
+                points_per_column: fb.points.len() as f64 / fb.columns.max(1) as f64,
+                cost: fb_phase,
+            },
+            decomposition: DecompositionReport {
+                name: oracle.name().to_string(),
+                summands: oracle.summands(),
+                description: oracle.describe(&spec.oracle_params),
+                targets_tried: outcome.trials,
+                relations_found: outcome.relations_found,
+                hit_rate: outcome.relations_found as f64 / outcome.trials.max(1) as f64,
+                setup: prep_cost,
+                cost: rel,
+                gae_before_solver,
+                system: oracle.last_system(),
+                solver: solver_report,
+            },
+            linear_algebra: LinearAlgebraReport {
+                name: linalg_name.into(),
+                rows: outcome.relations_found,
+                rank: outcome.rank,
+                dependent: outcome.dependent,
+                work,
+                work_unit: work_unit.into(),
+                cost: la,
+            },
+            verify: ver,
+            recovered: outcome.recovered,
+            verified: outcome.verified && outcome.recovered == Some(planted),
+            total_gae,
+            s,
+            rho_s,
+            s_over_rho: rho_s.map(|rho| s / rho),
+            wall_seconds: started.elapsed().as_secs_f64(),
+            exhausted: outcome.recovered.is_none(),
         },
-        decomposition: DecompositionReport {
-            name: oracle.name().to_string(),
-            summands: oracle.summands(),
-            description: oracle.describe(&spec.oracle_params),
-            targets_tried: outcome.trials,
-            relations_found: outcome.relations_found,
-            hit_rate: outcome.relations_found as f64 / outcome.trials.max(1) as f64,
-            setup: prep_cost,
-            cost: rel,
-            gae_before_solver,
-            system: oracle.last_system(),
-            solver: solver_report,
-        },
-        linear_algebra: LinearAlgebraReport {
-            name: linalg_name.into(),
-            rows: outcome.relations_found,
-            rank: outcome.rank,
-            dependent: outcome.dependent,
-            work,
-            work_unit: work_unit.into(),
-            cost: la,
-        },
-        verify: ver,
-        recovered: outcome.recovered,
-        verified: outcome.verified && outcome.recovered == Some(planted),
-        total_gae,
-        s,
-        rho_s,
-        s_over_rho: rho_s.map(|rho| s / rho),
-        wall_seconds: started.elapsed().as_secs_f64(),
-        exhausted: outcome.recovered.is_none(),
-    })
+        fb,
+    ))
 }
 
 /// The table a sweep prints.

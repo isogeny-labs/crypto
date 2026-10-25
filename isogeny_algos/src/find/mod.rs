@@ -3,5 +3,7 @@ pub mod divpoly;
 pub mod dual;
 pub mod elkies;
 pub mod modpoly;
+pub mod p_torsion;
 pub mod sea;
+pub mod small_char;
 pub mod sutherland;

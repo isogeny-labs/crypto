@@ -1,0 +1,388 @@
+{
+ "reference": {
+  "kind": "negation",
+  "protocol": "Matched Pollard rho on the same instance, one target: the negation-map r-adding walk (A = 2), counted in GAE, verified [d]G = Q (ledger section 18; leaderboard Table B 'Reference'). Negation is the only automorphism of prime-field and random-binary curves (re-pricing record 'exclusions': negation only).",
+  "unit": "group-addition equivalents (GAE) per sqrt(r)",
+  "binary_or_process": "current `ic boundary` run, one process per regime, writes the IC variants, the frozen plain walk and the matched negation walk into one ledger (replay binary blake3 98e06480a3d765992ae68a38dc8eca66fe23c8d7b040acfb47f48ec0e7b5df36). The archive recorded IC in binary ae6dd73f... and the matched rho by a later `ic rho --reprice` in another binary; the replay reproduces both exactly, and the unit is a count, so the binary identity does not enter the number.",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 15.153495939467295,
+    "rho": 2.854977431628913
+   },
+   "0.1": {
+    "ic": 15.805604053969944,
+    "rho": 3.0347748636091008
+   },
+   "1": {
+    "ic": 21.674577084493787,
+    "rho": 4.652951751430787
+   }
+  },
+  "gae_band_basis": "for each weight, the passing row with the smallest IC/rho ratio (its S_IC(w) and S_rho(w), GAE per sqrt r); all 13 rows are in rho-reference.json",
+  "gae_band_rows": "rho-reference.json",
+  "order_holds_across_band": true,
+  "band_formula": "S(w) = mean over runs of [G - C + w (U + n_C)] / sqrt r : G total GAE, C and n_C the GAE and count of calibration-priced native counters, U the arm's unpriced counts (rho: canonicalisations_uncharged). Conservative extension also charges IC pair-table inserts and rho one table operation per walk step.",
+  "smallest_ratio_in_extended_band": 4.053910644168524,
+  "caveats": [
+   "recipe = minimum over 9 recipes on the same 3 planted targets (selection in IC's favour; the gap to rho is the distance remaining)",
+   "one planted target per instance, 3 repetitions; 24 rho runs per instance"
+  ]
+ },
+ "per_row": {
+  "icv1-fp10-t5-192cb216": {
+   "S_IC_w": [
+    22.576240780201367,
+    23.47208646427421,
+    31.534697620929748
+   ],
+   "S_rho_w": [
+    3.6048783850012733,
+    3.760576597278524,
+    5.161860507773781
+   ],
+   "ratio_w": [
+    6.262691377921032,
+    6.241619032905918,
+    6.109172763083849
+   ],
+   "ratio_extended_w": [
+    6.262691377921032,
+    6.0532149121170296,
+    5.003812514016595
+   ],
+   "rho_unpriced_canonicalisations_per_run": 44.666666666666664,
+   "rho_walk_operations_per_run": 37.708333333333336,
+   "ic_priced_native_ops_per_run": 257.0,
+   "ic_unpriced_named_ops_per_run": 0.0,
+   "ic_pair_table_inserts_per_run": 25.0
+  },
+  "icv1-fp12-t19-d4a315df": {
+   "S_IC_w": [
+    15.153495939467295,
+    15.805604053969944,
+    21.674577084493787
+   ],
+   "S_rho_w": [
+    2.854977431628913,
+    3.0347748636091008,
+    4.652951751430787
+   ],
+   "ratio_w": [
+    5.30774631406506,
+    5.208163624755069,
+    4.658242389431361
+   ],
+   "ratio_extended_w": [
+    5.30774631406506,
+    5.060985797827903,
+    4.053910644168524
+   ],
+   "rho_unpriced_canonicalisations_per_run": 112.125,
+   "rho_walk_operations_per_run": 102.45833333333333,
+   "ic_priced_native_ops_per_run": 406.6666666666667,
+   "ic_unpriced_named_ops_per_run": 0.0,
+   "ic_pair_table_inserts_per_run": 240.0
+  },
+  "icv1-fp14-tm43-158b6914": {
+   "S_IC_w": [
+    12.757624150528247,
+    13.661856083756827,
+    21.79994348281406
+   ],
+   "S_rho_w": [
+    2.0336061056189663,
+    2.178293680582915,
+    3.48048185525845
+   ],
+   "ratio_w": [
+    6.273399807011901,
+    6.27181550657618,
+    6.263484307461003
+   ],
+   "ratio_extended_w": [
+    6.273399807011901,
+    5.968866749688668,
+    4.809685757039858
+   ],
+   "rho_unpriced_canonicalisations_per_run": 184.33333333333334,
+   "rho_walk_operations_per_run": 169.16666666666666,
+   "ic_priced_native_ops_per_run": 1152.0,
+   "ic_unpriced_named_ops_per_run": 0.0,
+   "ic_pair_table_inserts_per_run": 169.0
+  },
+  "icv1-fp16-t351-d433f24e": {
+   "S_IC_w": [
+    10.984864955581454,
+    12.022426111109832,
+    21.360476510865247
+   ],
+   "S_rho_w": [
+    1.740000255624788,
+    1.8533691085718074,
+    2.8736887850949815
+   ],
+   "ratio_w": [
+    6.31313985160139,
+    6.486795347729856,
+    7.433121019108281
+   ],
+   "ratio_extended_w": [
+    6.31313985160139,
+    6.21034824709794,
+    5.802961369840351
+   ],
+   "rho_unpriced_canonicalisations_per_run": 289.0416666666667,
+   "rho_walk_operations_per_run": 274.75,
+   "ic_priced_native_ops_per_run": 2645.3333333333335,
+   "ic_unpriced_named_ops_per_run": 0.0,
+   "ic_pair_table_inserts_per_run": 400.0
+  },
+  "icv1-fp18-t175-45770ebc": {
+   "S_IC_w": [
+    8.173361557079613,
+    8.9764922370685,
+    16.204668356968494
+   ],
+   "S_rho_w": [
+    1.4457981308116392,
+    1.5594093551978967,
+    2.5819103746742162
+   ],
+   "ratio_w": [
+    5.653183098591549,
+    5.756341147465631,
+    6.276231938923591
+   ],
+   "ratio_extended_w": [
+    5.653183098591549,
+    5.504194823534011,
+    4.9741911060636435
+   ],
+   "rho_unpriced_canonicalisations_per_run": 581.1666666666666,
+   "rho_walk_operations_per_run": 550.375,
+   "ic_priced_native_ops_per_run": 4108.333333333333,
+   "ic_unpriced_named_ops_per_run": 0.0,
+   "ic_pair_table_inserts_per_run": 1018.0
+  },
+  "icv1-fp20-t1293-3c2999ba": {
+   "S_IC_w": [
+    10.468486952309542,
+    11.725031152479088,
+    23.033928954005003
+   ],
+   "S_rho_w": [
+    1.2919060877896862,
+    1.4050527263679002,
+    2.4233724735718276
+   ],
+   "ratio_w": [
+    8.103133076971568,
+    8.34490473733937,
+    9.504906573464176
+   ],
+   "ratio_extended_w": [
+    8.103133076971568,
+    7.907403325609777,
+    7.261215428729997
+   ],
+   "rho_unpriced_canonicalisations_per_run": 1157.75,
+   "rho_walk_operations_per_run": 1124.0,
+   "ic_priced_native_ops_per_run": 12857.333333333334,
+   "ic_unpriced_named_ops_per_run": 0.0,
+   "ic_pair_table_inserts_per_run": 2598.0
+  },
+  "icv1-fp22-tm1267-a5acaf6d": {
+   "S_IC_w": [
+    12.452379525737204,
+    14.161377992923047,
+    29.54236419759564
+   ],
+   "S_rho_w": [
+    1.2160577118109954,
+    1.3281648621991917,
+    2.3371292156929573
+   ],
+   "ratio_w": [
+    10.239957696738493,
+    10.662364587385984,
+    12.640449659021677
+   ],
+   "ratio_extended_w": [
+    10.239957696738493,
+    10.062671270634365,
+    9.496697436996746
+   ],
+   "rho_unpriced_canonicalisations_per_run": 2033.9583333333333,
+   "rho_walk_operations_per_run": 1979.6666666666667,
+   "ic_priced_native_ops_per_run": 31006.333333333332,
+   "ic_unpriced_named_ops_per_run": 0.0,
+   "ic_pair_table_inserts_per_run": 5470.0
+  },
+  "icv1-fp24-t1577-77336155": {
+   "S_IC_w": [
+    13.516006747132025,
+    15.366797542530527,
+    32.02391470111706
+   ],
+   "S_rho_w": [
+    1.0379422605678685,
+    1.1305858843862615,
+    1.9643784987517976
+   ],
+   "ratio_w": [
+    13.021925458297924,
+    13.59188873198465,
+    16.3023137961781
+   ],
+   "ratio_extended_w": [
+    13.021925458297924,
+    12.880258138765056,
+    12.420402748039459
+   ],
+   "rho_unpriced_canonicalisations_per_run": 3063.375,
+   "rho_walk_operations_per_run": 3020.4166666666665,
+   "ic_priced_native_ops_per_run": 61198.666666666664,
+   "ic_unpriced_named_ops_per_run": 0.0,
+   "ic_pair_table_inserts_per_run": 12300.0
+  },
+  "icv1-f2m15-t131-ed7256f0": {
+   "S_IC_w": [
+    26.195242805141287,
+    27.11843006527267,
+    35.42711540645515
+   ],
+   "S_rho_w": [
+    2.013438014694406,
+    2.1567238270798352,
+    3.4462961385486954
+   ],
+   "ratio_w": [
+    13.010205734650901,
+    12.573900155770305,
+    10.279765284876017
+   ],
+   "ratio_extended_w": [
+    13.010205734650901,
+    11.92837591240876,
+    7.808048262151232
+   ],
+   "rho_unpriced_canonicalisations_per_run": 183.04166666666666,
+   "rho_walk_operations_per_run": 167.54166666666666,
+   "ic_priced_native_ops_per_run": 1179.3333333333333,
+   "ic_unpriced_named_ops_per_run": 0.0,
+   "ic_pair_table_inserts_per_run": 220.0
+  },
+  "icv1-f2m18-t393-d2c04152": {
+   "S_IC_w": [
+    21.07612936098254,
+    23.54935426396188,
+    45.808378390775914
+   ],
+   "S_rho_w": [
+    2.005890251764405,
+    2.164371245472939,
+    3.590700188849741
+   ],
+   "ratio_w": [
+    10.507119889756545,
+    10.88045977011494,
+    12.757505773672056
+   ],
+   "ratio_extended_w": [
+    10.507119889756545,
+    10.252366748800416,
+    9.339490649718806
+   ],
+   "rho_unpriced_canonicalisations_per_run": 286.6666666666667,
+   "rho_walk_operations_per_run": 261.7916666666667,
+   "ic_priced_native_ops_per_run": 4473.666666666667,
+   "ic_unpriced_named_ops_per_run": 0.0,
+   "ic_pair_table_inserts_per_run": 225.0
+  },
+  "icv1-f2m21-t2591-de54d72e": {
+   "S_IC_w": [
+    24.04024015858119,
+    28.296645360004863,
+    66.60429217281792
+   ],
+   "S_rho_w": [
+    1.3560622420970267,
+    1.4753090773415405,
+    2.5485305945421635
+   ],
+   "ratio_w": [
+    17.727976941091693,
+    19.18014726174837,
+    26.134389877624052
+   ],
+   "ratio_extended_w": [
+    17.727976941091693,
+    17.84025277916363,
+    18.20967936685657
+   ],
+   "rho_unpriced_canonicalisations_per_run": 1220.3333333333333,
+   "rho_walk_operations_per_run": 1187.7916666666667,
+   "ic_priced_native_ops_per_run": 43558.666666666664,
+   "ic_unpriced_named_ops_per_run": 0.0,
+   "ic_pair_table_inserts_per_run": 961.0
+  },
+  "icv1-f2m24-tm3047-2d0c0e8c": {
+   "S_IC_w": [
+    26.93183103540389,
+    31.4366495842203,
+    71.98001652356807
+   ],
+   "S_rho_w": [
+    1.1830649444920296,
+    1.2894608099100642,
+    2.2470235986723766
+   ],
+   "ratio_w": [
+    22.764456981664317,
+    24.3796859451765,
+    32.033493803134284
+   ],
+   "ratio_extended_w": [
+    22.764456981664317,
+    22.791643172124633,
+    22.879858316455806
+   ],
+   "rho_unpriced_canonicalisations_per_run": 1540.9166666666667,
+   "rho_walk_operations_per_run": 1498.0416666666667,
+   "ic_priced_native_ops_per_run": 65242.666666666664,
+   "ic_unpriced_named_ops_per_run": 0.0,
+   "ic_pair_table_inserts_per_run": 4486.0
+  },
+  "icv1-f2m27-t12543-569dca8b": {
+   "S_IC_w": [
+    36.46011855389264,
+    42.96522613236634,
+    101.51119433862969
+   ],
+   "S_rho_w": [
+    0.9664655140376079,
+    1.0551856386138425,
+    1.8536667597999528
+   ],
+   "ratio_w": [
+    37.72521422060164,
+    40.71816802663096,
+    54.762375061192095
+   ],
+   "ratio_extended_w": [
+    37.72521422060164,
+    37.90226216710952,
+    38.466863481030245
+   ],
+   "rho_unpriced_canonicalisations_per_run": 4195.958333333333,
+   "rho_walk_operations_per_run": 4133.125,
+   "ic_priced_native_ops_per_run": 307654.6666666667,
+   "ic_unpriced_named_ops_per_run": 0.0,
+   "ic_pair_table_inserts_per_run": 16129.0
+  }
+ }
+}

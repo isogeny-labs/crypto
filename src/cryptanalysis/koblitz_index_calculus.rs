@@ -3974,6 +3974,43 @@ pub struct FoldedRows {
     pub suffix: Vec<u32>,
 }
 
+/// Pairs of base points whose sums are one canonical key, as the
+/// partitioned fold build found them
+/// ([`PairSumTable::build_folded_within_harvest`]).  A place is
+/// `row << 20 | position in the row`; the rows are the plan the build used.
+#[derive(Clone, Debug)]
+pub struct FoldedDuplicates {
+    pairs: Vec<(u32, u32)>,
+    rows: FoldedRows,
+}
+
+impl FoldedDuplicates {
+    /// How many pairs of places share a key, before the same-row own-orbit
+    /// pairs (the conjugates of one sum, which say nothing new) are set
+    /// aside.
+    pub fn raw_pairs(&self) -> usize {
+        self.pairs.len()
+    }
+}
+
+/// What [`PairSumTable::free_relations`] made of a harvest.
+#[derive(Clone, Debug, Default)]
+pub struct FreeRelations {
+    /// Relations `0 = Σ P_i` (`a = 0`), four base points each.
+    pub relations: Vec<CollectedRelation>,
+    /// Harvested pairs of places, as given.
+    pub raw_pairs: usize,
+    /// Pairs set aside because both places are in one row's own orbit.
+    pub same_row_own_orbit: usize,
+    /// Pairs whose sum came out as `O`, or for which no second summand
+    /// was found in the base (a hash-equal pair whose keys differ cannot
+    /// happen on a bijective hash, so this counts only degenerate sums).
+    pub unresolved: usize,
+    /// Pairs that resolved to the same four points as an earlier one, or
+    /// to two equal sums.
+    pub trivial_or_repeated: usize,
+}
+
 /// A folded table's stored state ([`PairSumTable::folded_storage`]).
 #[doc(hidden)]
 #[derive(Clone, Copy, Debug)]
@@ -4358,12 +4395,13 @@ enum Targets {
     ///
     /// `doubled` is the subset concatenated with itself, so a window of
     /// any length up to the subset's is one contiguous slice and the
-    /// rotation needs no scratch of its own.
+    /// rotation needs no scratch of its own.  `doubled_x` and
+    /// `doubled_y` are the same summands' negated coordinates in the
+    /// same order, gathered once for the unit (empty when the table has
+    /// none), so a trial hands the folding kernel two slices instead of
+    /// gathering its window again.
     Subset {
         doubled: Vec<u32>,
-        /// `doubled`'s summands' coordinates, gathered once for the
-        /// unit, so a trial slices them instead of gathering its own
-        /// (empty when the table keeps no coordinate slices).
         doubled_x: Vec<u64>,
         doubled_y: Vec<u64>,
         len: usize,
@@ -4407,14 +4445,14 @@ impl Targets {
                 window,
                 ..
             } => {
-                let span = offset..offset + *window;
+                let idxs = &doubled[offset..offset + *window];
                 if doubled_x.is_empty() {
-                    Scan::Indices(&doubled[span])
+                    Scan::Indices(idxs)
                 } else {
                     Scan::Gathered {
-                        idxs: &doubled[span.clone()],
-                        xs: &doubled_x[span.clone()],
-                        ys: &doubled_y[span],
+                        idxs,
+                        xs: &doubled_x[offset..offset + *window],
+                        ys: &doubled_y[offset..offset + *window],
                     }
                 }
             }
@@ -4448,9 +4486,9 @@ pub enum Scan<'a> {
     Cyclic { start: usize, len: usize },
     /// Exactly these base indices, in this order.
     Indices(&'a [u32]),
-    /// [`Scan::Indices`] with the summands' coordinates already gathered
-    /// (`xs[i]`, `ys[i]` are index `idxs[i]`'s): the same scan, without a
-    /// per-trial gather.
+    /// [`Scan::Indices`] with the summands' negated coordinates already
+    /// gathered, in the same order: `xs[i]` and `ys[i]` are those of
+    /// `idxs[i]`.  The same scan, without its per-trial gather.
     Gathered {
         idxs: &'a [u32],
         xs: &'a [u64],
@@ -5237,13 +5275,22 @@ impl PairSumTable {
     /// lists.  Keying straight into the streams spares those lists: their
     /// growth, the count of their partitions and the scatter, about a
     /// third of the build at the suite's largest sizes.
+    ///
+    /// **Harvest.**  With `harvest` set, each stored pair also carries its
+    /// place (`row << 20 | position in the row`, from the row callback's
+    /// `start`) and its key's hash, and two pairs of one bucket with the
+    /// same hash are returned: the hash is a bijection of the key, so
+    /// that is two pairs whose sums are the same canonical key.  The
+    /// table built is the same bit for bit.  Past `2^12` rows or `2^20`
+    /// positions the places do not fit and nothing is harvested.
     #[allow(clippy::type_complexity)]
     fn fold_partitioned(
         row_lens: &[usize],
         bucket_bits: u32,
         tagged: bool,
-        each_row: &(dyn Fn(usize, &mut dyn FnMut(&[u64], u32)) + Sync),
-    ) -> (Vec<u32>, Vec<u32>, Vec<u64>, u64) {
+        harvest: bool,
+        each_row: &(dyn Fn(usize, &mut dyn FnMut(&[u64], u32, usize)) + Sync),
+    ) -> (Vec<u32>, Vec<u32>, Vec<u64>, u64, Vec<(u32, u32)>) {
         let rows = row_lens.len();
         let bucket_shift = 64 - bucket_bits;
         let buckets = 1usize << bucket_bits;
@@ -5253,7 +5300,8 @@ impl PairSumTable {
         // 1. Every row keyed once, straight into its run's streams.
         let runs = rayon::current_num_threads().clamp(1, rows.max(1));
         let per_run = rows.div_ceil(runs);
-        let streams: Vec<(Vec<Vec<u64>>, Vec<Vec<u32>>)> = (0..runs)
+        let harvest = harvest && rows <= 1 << 12 && row_lens.iter().all(|&len| len < 1 << 20);
+        let streams: Vec<(Vec<Vec<u64>>, Vec<Vec<u32>>, Vec<Vec<u32>>)> = (0..runs)
             .into_par_iter()
             .map(|run| {
                 let here = (run * per_run).min(rows)..((run + 1) * per_run).min(rows);
@@ -5263,9 +5311,12 @@ impl PairSumTable {
                 let room = mean + 6 * (mean as f64).sqrt() as usize + 16;
                 let mut hs: Vec<Vec<u64>> = (0..parts).map(|_| Vec::with_capacity(room)).collect();
                 let mut ws: Vec<Vec<u32>> = (0..parts).map(|_| Vec::with_capacity(room)).collect();
+                let mut ids: Vec<Vec<u32>> = (0..parts)
+                    .map(|_| Vec::with_capacity(if harvest { room } else { 0 }))
+                    .collect();
                 for r in here {
-                    each_row(r, &mut |keys, orbit| {
-                        for &key in keys {
+                    each_row(r, &mut |keys, orbit, start| {
+                        for (at, &key) in keys.iter().enumerate() {
                             let h = pair_filter_hash(key);
                             let p = (h >> part_shift) as usize;
                             hs[p].push(h);
@@ -5274,15 +5325,18 @@ impl PairSumTable {
                             } else {
                                 Self::compact_rest_from_hash(h)
                             });
+                            if harvest {
+                                ids[p].push((r as u32) << 20 | (start + at) as u32);
+                            }
                         }
                     });
                 }
-                (hs, ws)
+                (hs, ws, ids)
             })
             .collect();
         let mut part_start = vec![0usize; parts + 1];
         for p in 0..parts {
-            let len: usize = streams.iter().map(|(hs, _)| hs[p].len()).sum();
+            let len: usize = streams.iter().map(|(hs, _, _)| hs[p].len()).sum();
             part_start[p + 1] = part_start[p] + len;
         }
         let total = part_start[parts];
@@ -5311,11 +5365,12 @@ impl PairSumTable {
             * std::mem::size_of::<(Vec<Vec<u64>>, Vec<Vec<u32>>)>() as u128
             + streams
                 .iter()
-                .map(|(hs, ws)| {
+                .map(|(hs, ws, ids)| {
                     hs.capacity() as u128 * std::mem::size_of::<Vec<u64>>() as u128
                         + ws.capacity() as u128 * std::mem::size_of::<Vec<u32>>() as u128
                         + hs.iter().map(|v| v.capacity() as u128 * 8).sum::<u128>()
                         + ws.iter().map(|v| v.capacity() as u128 * 4).sum::<u128>()
+                        + ids.iter().map(|v| v.capacity() as u128 * 4).sum::<u128>()
                 })
                 .sum::<u128>();
         let fill_runs = Self::fold_filter_runs(
@@ -5328,6 +5383,13 @@ impl PairSumTable {
         let mut bucket_start = vec![0u32; buckets + 1];
         let mut rests = vec![0u32; total];
         let rp = rests.as_mut_ptr() as usize;
+        // The harvest's side arrays, in the order of `rests`.
+        let mut sorted_hash = vec![0u64; if harvest { total } else { 0 }];
+        let mut sorted_id = vec![0u32; if harvest { total } else { 0 }];
+        let (hp, ip) = (
+            sorted_hash.as_mut_ptr() as usize,
+            sorted_id.as_mut_ptr() as usize,
+        );
         let filters: Vec<Vec<u64>> = bucket_start[..buckets]
             .par_chunks_mut(per_part * parts_per_run)
             .enumerate()
@@ -5337,7 +5399,7 @@ impl PairSumTable {
                     let p = run * parts_per_run + k;
                     let first = p * per_part;
                     let mut at = vec![0usize; per_part];
-                    for (hs, _) in &streams {
+                    for (hs, _, _) in &streams {
                         for &h in &hs[p] {
                             at[(h >> bucket_shift) as usize - first] += 1;
                         }
@@ -5349,8 +5411,8 @@ impl PairSumTable {
                         *slot = next;
                         next += n;
                     }
-                    for (hs, ws) in &streams {
-                        let (hs, ws) = (&hs[p], &ws[p]);
+                    for (hs, ws, ids) in &streams {
+                        let (hs, ws, ids) = (&hs[p], &ws[p], &ids[p]);
                         for (i, (&h, &w)) in hs.iter().zip(ws).enumerate() {
                             if let Some(&ahead) = hs.get(i + FILL_AHEAD) {
                                 prefetch(&present[filter_slot(ahead, present_mask, 0).0]);
@@ -5360,6 +5422,14 @@ impl PairSumTable {
                             // `rests[part_start[p]..part_start[p + 1]]`, and
                             // its bucket cursors stay inside it.
                             unsafe { *(rp as *mut u32).add(at[b]) = w };
+                            if harvest {
+                                // SAFETY: the same slot, in arrays of the
+                                // same length.
+                                unsafe {
+                                    *(hp as *mut u64).add(at[b]) = h;
+                                    *(ip as *mut u32).add(at[b]) = ids[i];
+                                }
+                            }
                             at[b] += 1;
                             let (word, bits) = filter_slot(h, present_mask, FILTER_EXTRA);
                             present[word] |= bits;
@@ -5379,7 +5449,35 @@ impl PairSumTable {
                 all
             })
             .unwrap_or_else(|| vec![0u64; filter_words]);
-        (bucket_start, rests, present, present_mask)
+        // Two pairs of one bucket with one hash: one canonical key twice.
+        // The hash of key 0 (the point at infinity) is not a sum of two
+        // base points in any useful sense, and every row has one.
+        let dups: Vec<(u32, u32)> = if harvest {
+            let per_chunk = 4096usize;
+            (0..buckets.div_ceil(per_chunk))
+                .into_par_iter()
+                .flat_map_iter(|chunk| {
+                    let mut found = Vec::new();
+                    for b in chunk * per_chunk..((chunk + 1) * per_chunk).min(buckets) {
+                        let (lo, hi) = (bucket_start[b] as usize, bucket_start[b + 1] as usize);
+                        for x in lo..hi {
+                            if sorted_hash[x] == 0 {
+                                continue;
+                            }
+                            for y in x + 1..hi {
+                                if sorted_hash[y] == sorted_hash[x] {
+                                    found.push((sorted_id[x], sorted_id[y]));
+                                }
+                            }
+                        }
+                    }
+                    found
+                })
+                .collect()
+        } else {
+            Vec::new()
+        };
+        (bucket_start, rests, present, present_mask, dups)
     }
 
     pub fn build_folded_within(
@@ -5401,6 +5499,50 @@ impl PairSumTable {
         byte_budget: u128,
         bulk: bool,
     ) -> Option<Self> {
+        Self::build_folded_core(kc, fb, byte_budget, bulk, false).map(|(table, _)| table)
+    }
+
+    /// [`Self::build_folded_within`], and with it the pairs of base points
+    /// whose sums are one canonical key (see [`Self::free_relations`]).
+    /// The table is the one `build_folded_within` builds, bit for bit; the
+    /// harvest is `None` where the build is not the partitioned one (a
+    /// table too large for its transient, the scalar build) or its places
+    /// do not fit.
+    pub fn build_folded_within_harvest(
+        kc: &KoblitzCurve,
+        fb: &FrobeniusFactorBase,
+        byte_budget: u128,
+    ) -> Option<(Self, Option<FoldedDuplicates>)> {
+        let bulk = std::env::var("KIC_FOLD_BUILD").as_deref() != Ok("scalar");
+        Self::build_folded_core(kc, fb, byte_budget, bulk, true)
+    }
+
+    /// [`Self::build_within_for`] with the harvest of
+    /// [`Self::build_folded_within_harvest`] where the fold is the tier
+    /// chosen; the same tier, and the same table, as `build_within_for`.
+    pub fn build_within_for_harvest(
+        kc: &KoblitzCurve,
+        fb: &FrobeniusFactorBase,
+        byte_budget: u128,
+        probes: ProbeBudget,
+    ) -> Option<(Self, Option<FoldedDuplicates>)> {
+        let (points, orbits) = (fb.points.len(), fb.signed_orbits.len());
+        if Self::fold_is_cheaper(points, kc.n, orbits, probes) {
+            if let Some(folded) = Self::build_folded_within_harvest(kc, fb, byte_budget) {
+                return Some(folded);
+            }
+        }
+        Self::build_within_for(kc, fb, byte_budget, probes).map(|table| (table, None))
+    }
+
+    #[allow(clippy::type_complexity)]
+    fn build_folded_core(
+        kc: &KoblitzCurve,
+        fb: &FrobeniusFactorBase,
+        byte_budget: u128,
+        bulk: bool,
+        harvest: bool,
+    ) -> Option<(Self, Option<FoldedDuplicates>)> {
         if !kc.frobenius_is_endomorphism {
             return None;
         }
@@ -5483,7 +5625,7 @@ impl PairSumTable {
         };
         // A row hands its keys over in order, a slice at a time, with
         // its orbit.
-        let each_row = |r: usize, f: &mut dyn FnMut(&[u64], u32)| {
+        let each_row = |r: usize, f: &mut dyn FnMut(&[u64], u32, usize)| {
             let mut sums = Vec::with_capacity(n_points);
             let mut scratch = BatchScratch::default();
             let (orbit, rep) = reps[r];
@@ -5513,7 +5655,7 @@ impl PairSumTable {
                 for (key, p) in keys.iter_mut().zip(&sums) {
                     *key = if p.infinity { 0 } else { *key + 1 };
                 }
-                f(&keys, orbit);
+                f(&keys, orbit, 0);
                 if own_end == n_points {
                     return;
                 }
@@ -5528,7 +5670,7 @@ impl PairSumTable {
                     &mut scratch,
                 ) {
                     canon.x_keys(&x3s, &mut keys);
-                    f(&keys, orbit);
+                    f(&keys, orbit, own_end - from);
                     return;
                 }
                 sums.clear();
@@ -5546,7 +5688,7 @@ impl PairSumTable {
                 for (key, p) in keys.iter_mut().zip(&sums) {
                     *key = if p.infinity { 0 } else { *key + 1 };
                 }
-                f(&keys, orbit);
+                f(&keys, orbit, own_end - from);
                 return;
             }
             curve.add_many(points[rep], &by_orbit[from..], &mut sums, &mut scratch);
@@ -5554,21 +5696,21 @@ impl PairSumTable {
                 .iter()
                 .map(|&p| Self::canon_key_with(&curve, canon.as_ref(), p))
                 .collect();
-            f(&keys, orbit);
+            f(&keys, orbit, 0);
         };
         // Keyed once and partitioned (see [`Self::FOLD_PARTITION_BYTES`]),
         // or, past that transient budget, the two-pass count-then-fill.
         let partition = bulk && pairs * 12 <= Self::FOLD_PARTITION_BYTES;
-        let (bucket_start, rests, present, present_mask) = if partition {
+        let (bucket_start, rests, present, present_mask, dups) = if partition {
             let row_lens: Vec<usize> = reps
                 .iter()
                 .map(|&(orbit, _)| n_points - suffix[orbit as usize] as usize)
                 .collect();
-            Self::fold_partitioned(&row_lens, bucket_bits, tagged, &each_row)
+            Self::fold_partitioned(&row_lens, bucket_bits, tagged, harvest, &each_row)
         } else {
             let counts: Vec<AtomicU32> = (0..buckets + 1).map(|_| AtomicU32::new(0)).collect();
             (0..reps.len()).into_par_iter().for_each(|r| {
-                each_row(r, &mut |keys, _| {
+                each_row(r, &mut |keys, _, _| {
                     for &key in keys {
                         let bucket = (pair_filter_hash(key) >> bucket_shift) as usize;
                         counts[bucket + 1].fetch_add(1, Ordering::Relaxed);
@@ -5589,7 +5731,7 @@ impl PairSumTable {
             let present_atomic: Vec<AtomicU64> = (0..words).map(|_| AtomicU64::new(0)).collect();
             let slots = rests.as_mut_ptr() as usize;
             (0..reps.len()).into_par_iter().for_each(|r| {
-                each_row(r, &mut |keys, orbit| {
+                each_row(r, &mut |keys, orbit, _| {
                     for &key in keys {
                         let bucket = (pair_filter_hash(key) >> bucket_shift) as usize;
                         let slot = cursor[bucket].fetch_add(1, Ordering::Relaxed) as usize;
@@ -5613,9 +5755,9 @@ impl PairSumTable {
                 .iter()
                 .map(|w| w.load(Ordering::Relaxed))
                 .collect();
-            (bucket_start, rests, present, present_mask)
+            (bucket_start, rests, present, present_mask, Vec::new())
         };
-        Some(Self::assemble_folded(
+        let table = Self::assemble_folded(
             curve,
             points,
             fb,
@@ -5630,7 +5772,16 @@ impl PairSumTable {
                 canon_tables: Vec::new(),
             },
             tagged,
-        ))
+        );
+        let harvested = (harvest && partition).then(|| FoldedDuplicates {
+            pairs: dups,
+            rows: FoldedRows {
+                reps: reps.clone(),
+                order: order.clone(),
+                suffix: suffix.clone(),
+            },
+        });
+        Some((table, harvested))
     }
 }
 
@@ -5680,6 +5831,93 @@ impl PairSumTable {
             orbit_members,
             tagged,
         }
+    }
+
+    /// **Free relations**: the base-point identities the build has already
+    /// paid for.  Two stored pairs `P_a + P_b` and `P_c + P_d` with one
+    /// canonical key satisfy `P_a + P_b = g (P_c + P_d)` for some
+    /// `g ∈ ⟨π, −1⟩`; the base is closed under `g`, so `g P_c` is a base
+    /// point and `P_a + P_b − g P_c` is the base point `g P_d` when it
+    /// lies in the base.  That is `0 = P_a + P_b − g P_c − g P_d`, four
+    /// base points with no probe, no scalar multiplication and no scan.
+    ///
+    /// `g` is found by trying the `2n` members of `P_c`'s signed orbit.
+    /// Pairs from one row's own orbit are the conjugates of a single sum
+    /// and are set aside without a search.  Every relation is re-checked
+    /// in the group by [`verify_collected_relation`] before it enters a
+    /// system, so a wrong one cannot reach the linear algebra.
+    pub fn free_relations(&self, dups: &FoldedDuplicates) -> FreeRelations {
+        let rows = &dups.rows;
+        let mut out = FreeRelations {
+            raw_pairs: dups.pairs.len(),
+            ..FreeRelations::default()
+        };
+        let mut seen: std::collections::HashSet<Vec<usize>> = std::collections::HashSet::new();
+        for &(id1, id2) in &dups.pairs {
+            let place = |id: u32| {
+                let (row, k) = ((id >> 20) as usize, (id & 0xF_FFFF) as usize);
+                let (orbit, rep) = rows.reps[row];
+                let from = rows.suffix[orbit as usize] as usize;
+                let own_len = rows.suffix[orbit as usize + 1] as usize - from;
+                (row, orbit, rep, rows.order[from + k] as usize, k < own_len)
+            };
+            let (r1, _, a, b, own1) = place(id1);
+            let (r2, o2, c, d, own2) = place(id2);
+            if r1 == r2 && own1 && own2 {
+                out.same_row_own_orbit += 1;
+                continue;
+            }
+            let sum = self.curve.add(self.points[a], self.points[b]);
+            if sum.infinity {
+                out.unresolved += 1;
+                continue;
+            }
+            let (lo, hi) = (
+                self.orbit_start[o2 as usize] as usize,
+                self.orbit_start[o2 as usize + 1] as usize,
+            );
+            let mut found = None;
+            for &member in &self.orbit_members[lo..hi] {
+                let m = member as usize;
+                let rest = self.curve.add(sum, self.negated[m]);
+                if rest.infinity {
+                    continue;
+                }
+                let Some(j) = self.index_of_point.get(rest.pack()) else {
+                    continue;
+                };
+                let j = j as usize;
+                if (m == a && j == b) || (m == b && j == a) {
+                    continue;
+                }
+                found = Some((m, j));
+                break;
+            }
+            let _ = (c, d);
+            let Some((m, j)) = found else {
+                out.unresolved += 1;
+                continue;
+            };
+            // `0 = P_a + P_b − P_m − P_j`, the negatives being base points.
+            let neg_index = |i: usize| self.index_of_point.get(self.negated[i].pack());
+            let (Some(nm), Some(nj)) = (neg_index(m), neg_index(j)) else {
+                out.unresolved += 1;
+                continue;
+            };
+            let points = vec![a, b, nm as usize, nj as usize];
+            let mut key = points.clone();
+            key.sort_unstable();
+            if !seen.insert(key) {
+                out.trivial_or_repeated += 1;
+                continue;
+            }
+            out.relations.push(CollectedRelation {
+                trial: u64::MAX - out.relations.len() as u64,
+                a: 0,
+                points,
+            });
+        }
+        out
     }
 
     /// **A folded table built somewhere else**, taken over as stored.
@@ -12679,6 +12917,9 @@ impl<'a> RelationCollector<'a> {
         let mut doubled = Vec::with_capacity(len + window);
         doubled.extend_from_slice(&idxs);
         doubled.extend_from_slice(&idxs[..window]);
+        // The summands' coordinates, gathered once here rather than by
+        // every trial's scan (`Scan::Gathered`); empty when the table
+        // keeps none, and then the scan gathers as before.
         let (doubled_x, doubled_y) = match self.pair_table() {
             Some(pair) if !pair.negated_x.is_empty() => (
                 doubled
@@ -13058,7 +13299,22 @@ pub fn verify_collected_relation(
         .first()
         .copied()
         .unwrap_or(0);
-    if rel.points.len() != m || rel.a == 0 || rel.a >= r_u64 {
+    if rel.a == 0 {
+        // A free relation (`PairSumTable::free_relations`): `0 = Σ P_i`
+        // over two to eight base points, which no probe produces (a probe
+        // has `0 < a < r`), so no relation that was accepted before is
+        // read differently.  It is true or it is not, in the group.
+        if !(2..=8).contains(&rel.points.len()) || rel.points.iter().any(|&i| i >= fb.points.len())
+        {
+            return false;
+        }
+        let mut sum = BinaryPoint::Infinity;
+        for &i in &rel.points {
+            sum = kc.add(&sum, &fb.points[i]);
+        }
+        return sum == BinaryPoint::Infinity;
+    }
+    if rel.points.len() != m || rel.a >= r_u64 {
         return false;
     }
     if rel.points.iter().any(|&i| i >= fb.points.len()) {
@@ -18135,6 +18391,51 @@ mod tests {
     }
 
     #[test]
+    fn the_harvest_leaves_the_table_unchanged_and_its_relations_hold() {
+        // Small fields, where the sums collide often.
+        for (a, n, seed, points) in [
+            (0u8, 23u32, 5u64, 300usize),
+            (0, 31, 5, 400),
+            (0, 41, 3, 1500),
+        ] {
+            let kc = KoblitzCurve::new(a, n).unwrap();
+            let fb = build_subgroup_orbit_factor_base(&kc, seed, points).unwrap();
+            let plain =
+                PairSumTable::build_folded_within(&kc, &fb, PairSumTable::DEFAULT_BYTE_BUDGET)
+                    .unwrap();
+            let (table, dups) = PairSumTable::build_folded_within_harvest(
+                &kc,
+                &fb,
+                PairSumTable::DEFAULT_BYTE_BUDGET,
+            )
+            .unwrap();
+            let (x, y) = (
+                plain.folded_storage().unwrap().to_parts(),
+                table.folded_storage().unwrap().to_parts(),
+            );
+            assert_eq!(x.bucket_start, y.bucket_start, "K_{a}/2^{n}");
+            assert_eq!(x.present, y.present, "K_{a}/2^{n}");
+            assert_eq!(x.words, y.words, "K_{a}/2^{n}");
+            let dups = dups.expect("the partitioned build harvests");
+            let free = table.free_relations(&dups);
+            assert!(dups.raw_pairs() >= free.relations.len());
+            // Only the small fields collide enough to be sure of a relation.
+            assert!(
+                n > 31 || !free.relations.is_empty(),
+                "K_{a}/2^{n}: {} raw pairs, none resolved",
+                dups.raw_pairs()
+            );
+            for rel in &free.relations {
+                assert_eq!(rel.a, 0);
+                assert!(
+                    verify_collected_relation(&kc, &fb, 3, rel),
+                    "K_{a}/2^{n}: {rel:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
     fn the_partitioned_fold_build_stores_the_two_pass_table() {
         // 2^59 and 2^61 are past `n + deg t = 65`, where the bulk rows
         // take the folding kernel and the old one never ran.
@@ -19023,6 +19324,70 @@ mod tests {
                     assert_eq!(a, b, "degree {degree}, t = {t}: the scans disagree");
                     found += a.len();
                 }
+            }
+            assert!(
+                found > 0,
+                "degree {degree}: the scans found nothing to compare"
+            );
+        }
+    }
+
+    /// A [`Scan::Gathered`] scan is a [`Scan::Indices`] scan whose
+    /// coordinates were gathered beforehand: on a folded table, where the
+    /// folding kernel reads them, it must hand the sink exactly what the
+    /// index list hands it, in the same order.
+    #[test]
+    fn a_pre_gathered_scan_hands_the_sink_what_the_index_list_does() {
+        for (degree, points) in [(19u32, 300usize), (31, 400)] {
+            let kc = KoblitzCurve::new(0, degree).unwrap();
+            let fb = build_subgroup_orbit_factor_base(&kc, 3, points).unwrap();
+            let folded = PairSumTable::build_within(
+                &kc,
+                &fb,
+                PairSumTable::folded_byte_size(fb.signed_orbits.len(), fb.points.len(), kc.n),
+            )
+            .unwrap();
+            assert!(
+                folded.is_folded(),
+                "degree {degree}: expected the fold tier"
+            );
+            assert!(
+                !folded.negated_x.is_empty(),
+                "degree {degree}: the table kept no coordinates"
+            );
+            let fc = FastCurve::new(&kc.curve).unwrap();
+            let g = fc.lift(kc.generator());
+            let base = fb.points.len() as u32;
+            let idxs: Vec<u32> = (0..base).filter(|i| i % 3 != 1).rev().collect();
+            let xs: Vec<u64> = idxs.iter().map(|&i| folded.negated_x[i as usize]).collect();
+            let ys: Vec<u64> = idxs.iter().map(|&i| folded.negated_y[i as usize]).collect();
+            let (mut scratch_a, mut scratch_b) = (ScanScratch::default(), ScanScratch::default());
+            let mut found = 0usize;
+            for t in 1u64..300 {
+                let target = fc.mul_u64(g, t);
+                let mut a = Vec::new();
+                folded.witnesses_fast_scan(
+                    target,
+                    3,
+                    Scan::Indices(&idxs),
+                    &mut scratch_a,
+                    &mut |w| {
+                        a.push(w.to_vec());
+                        true
+                    },
+                );
+                let mut b = Vec::new();
+                let gathered = Scan::Gathered {
+                    idxs: &idxs,
+                    xs: &xs,
+                    ys: &ys,
+                };
+                folded.witnesses_fast_scan(target, 3, gathered, &mut scratch_b, &mut |w| {
+                    b.push(w.to_vec());
+                    true
+                });
+                assert_eq!(a, b, "degree {degree}, t = {t}: the scans disagree");
+                found += a.len();
             }
             assert!(
                 found > 0,

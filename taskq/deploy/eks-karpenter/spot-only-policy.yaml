@@ -1,0 +1,28 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: spot-only-nodepools.isolab.dev
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [karpenter.sh]
+        apiVersions: [v1]
+        operations: [CREATE, UPDATE]
+        resources: [nodepools]
+  validations:
+    - expression: >-
+        object.spec.template.spec.requirements.exists(r,
+          r.key == 'karpenter.sh/capacity-type' &&
+          r.operator == 'In' &&
+          r.values.size() == 1 &&
+          r.values[0] == 'spot')
+      message: Karpenter NodePools must explicitly require Spot capacity only.
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: spot-only-nodepools.isolab.dev
+spec:
+  policyName: spot-only-nodepools.isolab.dev
+  validationActions: [Deny]

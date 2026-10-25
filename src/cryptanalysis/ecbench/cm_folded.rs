@@ -169,8 +169,10 @@ pub fn solve(
     let raw: Value =
         serde_json::from_slice(&out.stdout).map_err(|e| format!("native result: {e}"))?;
     let replay_start = Instant::now();
-    let fb = fs::read_to_string(dir.0.join("factor-bases/job-0.csv")).map_err(|e| e.to_string())?;
-    let rel = fs::read_to_string(dir.0.join("relations/job-0.jsonl")).map_err(|e| e.to_string())?;
+    let fb = fs::read_to_string(dir.0.join("factor-bases/job-0.csv"))
+        .map_err(|e| format!("{}: {e}", dir.0.join("factor-bases/job-0.csv").display()))?;
+    let rel = fs::read_to_string(dir.0.join("relations/job-0.jsonl"))
+        .map_err(|e| format!("{}: {e}", dir.0.join("relations/job-0.jsonl").display()))?;
     let base: Vec<Vec<u64>> = fb
         .lines()
         .skip(1)

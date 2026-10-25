@@ -15,7 +15,9 @@
 
 use std::collections::BTreeMap;
 
-use crate::cryptanalysis::ic_boundary::{addmod, mulmod, CountedGroup, GroupOps};
+use crate::cryptanalysis::ic_boundary::{
+    addmod, fast_map, mulmod, CountedGroup, FastMap, GroupOps,
+};
 
 /// What one generic solve did.
 #[derive(Clone, Debug, Default)]
@@ -23,6 +25,9 @@ pub struct GenericOutcome {
     pub recovered: Option<u64>,
     pub setup: GroupOps,
     pub search: GroupOps,
+    /// The part of `search` spent re-placing a kangaroo after a same-kind
+    /// collision (zero for every other method).
+    pub restarts: GroupOps,
     /// Native work the group-operation unit does not charge, and the
     /// shape of the run (`baby_steps`, `giant_steps`, `restarts`, …).
     pub counters: BTreeMap<String, u64>,
@@ -31,14 +36,13 @@ pub struct GenericOutcome {
 }
 
 impl GenericOutcome {
-    /// Called several times per step, so the key is allocated only the
-    /// first time a counter is touched.
+    /// Called on every baby, giant or kangaroo step: the key is only
+    /// allocated the first time a counter is seen, not per step.
     fn count(&mut self, name: &str, by: u64) {
-        match self.counters.get_mut(name) {
-            Some(v) => *v += by,
-            None => {
-                self.counters.insert(name.to_string(), by);
-            }
+        if let Some(c) = self.counters.get_mut(name) {
+            *c += by;
+        } else {
+            self.counters.insert(name.to_string(), by);
         }
     }
 }
@@ -70,8 +74,7 @@ pub fn bsgs_textbook<G: CountedGroup>(
 ) -> GenericOutcome {
     let mut out = GenericOutcome::default();
     let m = ceil_sqrt(r);
-    let mut table: std::collections::HashMap<u64, u64> =
-        std::collections::HashMap::with_capacity(m as usize);
+    let mut table: FastMap<u64> = fast_map(m as usize);
     let mut p = g.identity();
     for j in 0..m {
         table.entry(g.key(&p)).or_insert(j);
@@ -111,8 +114,10 @@ pub fn bsgs_interleaved<G: CountedGroup>(
     let m = ceil_sqrt(r);
     let stride = g.mul(&mut out.setup, gen, m);
     let back = g.neg(stride);
-    let mut baby: std::collections::HashMap<u64, u64> = std::collections::HashMap::new();
-    let mut giant: std::collections::HashMap<u64, u64> = std::collections::HashMap::new();
+    // Each table holds at most the steps taken before the collision, on
+    // average about √r · 2/3; sized for the expectation, grown past it.
+    let mut baby: FastMap<u64> = fast_map((m as usize).div_ceil(3) * 2);
+    let mut giant: FastMap<u64> = fast_map((m as usize).div_ceil(3) * 2);
     let mut b = g.identity();
     let mut y = target;
     for t in 0..m {
@@ -159,8 +164,7 @@ pub fn bsgs_negation<G: CountedGroup>(
 ) -> GenericOutcome {
     let mut out = GenericOutcome::default();
     let m = ceil_sqrt(r).div_ceil(2).max(1);
-    let mut table: std::collections::HashMap<u64, (u64, u64)> =
-        std::collections::HashMap::with_capacity(m as usize + 1);
+    let mut table: FastMap<(u64, u64)> = fast_map(m as usize + 1);
     let mut p = g.identity();
     for j in 0..=m {
         table.entry(class_key(g, &p)).or_insert((j, g.key(&p)));
@@ -258,23 +262,32 @@ pub fn kangaroo<G: CountedGroup>(
         (1u64 << shape.dp_bits) - 1
     };
     // kind 0 = tame (position = distance), kind 1 = wild (position = k + distance).
-    let mut table: std::collections::HashMap<u64, (u8, u64)> = std::collections::HashMap::new();
+    let mut table: FastMap<(u8, u64)> = fast_map(64);
     let mut rng = seed;
     let mut next = || {
         rng = mix(rng);
         rng
     };
-    let start = |kind: u8, out: &mut GenericOutcome, off: u64| -> (G::Elt, u64) {
+    // The two initial placements are set-up; a placement after a same-kind
+    // collision is part of the search that produced the collision, and is
+    // charged there, so the `setup` / `search` split reflects where the
+    // work happened (the total is the same either way).
+    let start = |kind: u8, out: &mut GenericOutcome, off: u64, restart: bool| -> (G::Elt, u64) {
         out.count("starts", 1);
+        let ledger = if restart {
+            &mut out.search
+        } else {
+            &mut out.setup
+        };
         if kind == 0 {
             let d = addmod(r / 2, off, r);
-            (g.mul(&mut out.setup, gen, d), d)
+            (g.mul(ledger, gen, d), d)
         } else {
-            let z = g.mul(&mut out.setup, gen, off);
-            (g.add(&mut out.setup, target, z), off)
+            let z = g.mul(ledger, gen, off);
+            (g.add(ledger, target, z), off)
         }
     };
-    let mut roo = [start(0, &mut out, 0), start(1, &mut out, 0)];
+    let mut roo = [start(0, &mut out, 0, false), start(1, &mut out, 0, false)];
     let mut steps = 0u64;
     while steps < max_steps {
         for kind in 0..2u8 {
@@ -301,7 +314,11 @@ pub fn kangaroo<G: CountedGroup>(
                 Some(_) => {
                     out.count("same_kind_collisions", 1);
                     let off = next() % r.max(2);
-                    roo[kind as usize] = start(kind, &mut out, off);
+                    let before = out.search;
+                    roo[kind as usize] = start(kind, &mut out, off, true);
+                    out.restarts.adds += out.search.adds - before.adds;
+                    out.restarts.doubles += out.search.doubles - before.doubles;
+                    out.restarts.scalar_mults += out.search.scalar_mults - before.scalar_mults;
                 }
                 None => {
                     table.insert(g.key(&np), (kind, nd));
@@ -338,6 +355,35 @@ mod tests {
                 assert_eq!(out.recovered, Some(k), "{name} k={k} r={}", inst.r);
             }
         }
+    }
+
+    /// Kangaroo's set-up is the jump table and the two initial placements,
+    /// a function of `r` alone; any re-placement after a same-kind
+    /// collision is charged to `search`.  So the set-up charge is the same
+    /// on every seed.  (A same-kind collision needs a kangaroo to land on
+    /// its own trail; none occurs on these seeds, and the restart's
+    /// accounting is tested on a report in `audit::tests`.)
+    #[test]
+    fn kangaroo_setup_is_a_function_of_r_alone() {
+        let inst = find_prime_order_curve(14, 59297);
+        let g = &inst.curve;
+        let gen = inst.generator_point();
+        let mut setups = Vec::new();
+        for seed in 0..200u64 {
+            let k = 1 + (seed * 7919 + 13) % (inst.r - 1);
+            let q = g.mul(&mut GroupOps::default(), gen, k);
+            let out = kangaroo(g, gen, q, inst.r, seed, 64 * inst.r);
+            assert_eq!(out.recovered, Some(k), "seed {seed}");
+            assert_eq!(
+                out.setup.gae() + out.search.gae(),
+                (out.setup.adds + out.setup.doubles + out.search.adds + out.search.doubles) as f64
+            );
+            setups.push(out.setup.gae());
+        }
+        assert!(
+            setups.iter().all(|&s| s == setups[0]),
+            "set-up varies with the seed: {setups:?}"
+        );
     }
 
     #[test]

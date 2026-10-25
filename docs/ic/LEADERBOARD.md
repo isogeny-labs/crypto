@@ -46,19 +46,19 @@ This performance handoff is published beside the curve-by-curve tables. The stan
 
 | regime | curve | log₂ r | recipe | S, IC | S, reference | × reference | S, floor | × floor | ok | validation |
 |:--|:--|--:|:--|--:|--:|--:|--:|--:|:--|:--|
-| Prime field | `icv1-fp10-t5-192cb216` | 9.7 | folded, walked, base at the family optimum, m = 2 | 22.8 | 3.6 | **6.34×** | 0.886 | 25.8× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp12-t19-d4a315df` | 11.9 | folded table, walked targets, m = 2 | 15.6 | 2.85 | **5.47×** | 0.886 | 17.6× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp14-tm43-158b6914` | 14.0 | folded, walked, base at the family optimum, m = 2 | 13.1 | 2.03 | **6.43×** | 0.886 | 14.8× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp16-t351-d433f24e` | 16.0 | folded, walked, base at the family optimum, m = 2 | 11.7 | 1.74 | **6.71×** | 0.886 | 13.2× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp18-t175-45770ebc` | 18.0 | folded, walked, base at the family optimum, m = 2 | 8.41 | 1.45 | **5.82×** | 0.886 | 9.49× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp20-t1293-3c2999ba` | 20.0 | folded, walked, base at the family optimum, m = 2 | 10.7 | 1.29 | **8.3×** | 0.886 | 12.1× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp22-tm1267-a5acaf6d` | 21.7 | folded, walked, base at the family optimum, m = 2 | 12.8 | 1.22 | **10.5×** | 0.886 | 14.4× | ✓ | unvalidated (pre-gate) |
-| Prime field | `icv1-fp24-t1577-77336155` | 23.4 | folded, walked, base at the family optimum, m = 2 | 14 | 1.04 | **13.5×** | 0.886 | 15.8× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m15-t131-ed7256f0` | 14.0 | folded table, walked targets, m = 2 | 26.3 | 2.01 | **13.1×** | 0.886 | 29.7× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m18-t393-d2c04152` | 15.0 | folded, walked, base at the family optimum, m = 2 | 21.3 | 2.01 | **10.6×** | 0.886 | 24× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m21-t2591-de54d72e` | 20.0 | folded, walked, base at the family optimum, m = 2 | 24.4 | 1.36 | **18×** | 0.886 | 27.5× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m24-tm3047-2d0c0e8c` | 21.0 | folded, walked, base at the family optimum, m = 2 | 27.2 | 1.18 | **23×** | 0.886 | 30.7× | ✓ | unvalidated (pre-gate) |
-| Random binary | `icv1-f2m27-t12543-569dca8b` | 24.4 | folded, walked, base at the family optimum, m = 2 | 36.9 | 0.966 | **38.2×** | 0.886 | 41.7× | ✓ | unvalidated (pre-gate) |
+| Prime field | `icv1-fp10-t5-192cb216` | 9.7 | folded, walked, base at the family optimum, m = 2 | 22.8 | 3.6 | **6.34×** | 0.886 | 25.8× | ✓ | validated |
+| Prime field | `icv1-fp12-t19-d4a315df` | 11.9 | folded table, walked targets, m = 2 | 15.6 | 2.85 | **5.47×** | 0.886 | 17.6× | ✓ | validated |
+| Prime field | `icv1-fp14-tm43-158b6914` | 14.0 | folded, walked, base at the family optimum, m = 2 | 13.1 | 2.03 | **6.43×** | 0.886 | 14.8× | ✓ | validated |
+| Prime field | `icv1-fp16-t351-d433f24e` | 16.0 | folded, walked, base at the family optimum, m = 2 | 11.7 | 1.74 | **6.71×** | 0.886 | 13.2× | ✓ | validated |
+| Prime field | `icv1-fp18-t175-45770ebc` | 18.0 | folded, walked, base at the family optimum, m = 2 | 8.41 | 1.45 | **5.82×** | 0.886 | 9.49× | ✓ | validated |
+| Prime field | `icv1-fp20-t1293-3c2999ba` | 20.0 | folded, walked, base at the family optimum, m = 2 | 10.7 | 1.29 | **8.3×** | 0.886 | 12.1× | ✓ | validated |
+| Prime field | `icv1-fp22-tm1267-a5acaf6d` | 21.7 | folded, walked, base at the family optimum, m = 2 | 12.8 | 1.22 | **10.5×** | 0.886 | 14.4× | ✓ | validated |
+| Prime field | `icv1-fp24-t1577-77336155` | 23.4 | folded, walked, base at the family optimum, m = 2 | 14 | 1.04 | **13.5×** | 0.886 | 15.8× | ✓ | validated |
+| Random binary | `icv1-f2m15-t131-ed7256f0` | 14.0 | folded table, walked targets, m = 2 | 26.3 | 2.01 | **13.1×** | 0.886 | 29.7× | ✓ | validated |
+| Random binary | `icv1-f2m18-t393-d2c04152` | 15.0 | folded, walked, base at the family optimum, m = 2 | 21.3 | 2.01 | **10.6×** | 0.886 | 24× | ✓ | validated |
+| Random binary | `icv1-f2m21-t2591-de54d72e` | 20.0 | folded, walked, base at the family optimum, m = 2 | 24.4 | 1.36 | **18×** | 0.886 | 27.5× | ✓ | validated |
+| Random binary | `icv1-f2m24-tm3047-2d0c0e8c` | 21.0 | folded, walked, base at the family optimum, m = 2 | 27.2 | 1.18 | **23×** | 0.886 | 30.7× | ✓ | validated |
+| Random binary | `icv1-f2m27-t12543-569dca8b` | 24.4 | folded, walked, base at the family optimum, m = 2 | 36.9 | 0.966 | **38.2×** | 0.886 | 41.7× | ✓ | validated |
 
 ## Table C: Koblitz, 32-target batch (§19–§22)
 
@@ -343,6 +343,6 @@ K1120 saves 2.645 s against K1152 (paired 95% [2.085, 3.205] s). Its advantage o
 - `research/n83_e2e_holdout_20261016/ic1_rows_38955665283.json` — sha256 `4c296ed1a4e145cf…`
 - `research/ecbench_rho_optimized_20261014/RESULT.json` — sha256 `195f3c4e3565dc26…`
 - `research/jv_sieve_strong_rho_20261019/review-20261020/summary.json` — sha256 `8e4ff99df6a4ee53…`
-- `docs/curves/registry.json` — sha256 `584d070fbec7e21f…`
+- `docs/curves/registry.json` — sha256 `595b71600e1f471a…`
 - `docs/curves/ic/curves.schema.json` — sha256 `42cd9793dd299384…`
 - `docs/curves/ic/curves.yaml` — sha256 `d746982903f0f87a…`
