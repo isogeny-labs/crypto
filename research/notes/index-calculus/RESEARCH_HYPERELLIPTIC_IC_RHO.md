@@ -2156,3 +2156,29 @@ calculus and rho can share one session (§12) and be priced alike (§5a).
 
 Round sixteen (registered above) is built from this commit, so the same
 binary can run the IC arm in the following round.
+
+## Round sixteen: measured — ecbench's `rho.negation` folds as expected; it becomes the reference
+
+Registered run: card `CARD-HEIC-ROUND16-1` (commit `575fea48`, ecbench
+sha256 `a267fe64…823fef`, spec sha256 `60fb0a9e…35afa7f`), receipt
+`research/hyperelliptic_ecbench_20261024/round16/run1/receipt.json`
+(completed, 28 commands exit 0); session `sessions/r16`
+(`ECBS1h15dfd26783e9`), audit receipt sha256 `92d88c3c…f5b8e`. Full
+tables and per-curve intervals: `research/hyperelliptic_ecbench_20261024/README.md`.
+
+| | registered test | result |
+|--|--|--|
+| E1 | every run verifies; `--replay-all` identical | **holds**: 864/864; 576 replays reproduced, 0 problems |
+| E2 | median per-curve `S(rho.negation)/S(rho.plain)`, 7 instances with `r ≥ 10⁵`, ≤ 0.80 | **holds at w = 0**: 0.646 |
+| E3 | median `S(rho.negation)` there, beside round fifteen's 1.008 | descriptive: 1.273 (ecbench's `S` includes set-up) |
+
+§5a: `rho.negation` leaves `canonicalisations_uncharged = 166 244`
+unpriced, `rho.plain` none; pooled over the 18 curves the ratio is 0.840,
+0.895 and 1.394 at `w` = 0, 0.1 and 1, unresolved inside the band, so the
+arms are not ranked. E2 is the registered test at `w = 0`.
+
+As registered, ecbench's `rho.negation` becomes the thread's rho
+reference and the thread's own walk is retired as one (class
+**accounting**). The next round runs `ic.hyperelliptic` against it in one
+ecbench session, priced across the band (§5a), which is the first IC/rho
+comparison in this thread that the current rules can rank.
