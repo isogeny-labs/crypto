@@ -6,6 +6,8 @@
     "Common22Residues.first_residue",
     "Common22Residues.second_residue",
     "Common22Residues.residual_curve_eq",
+    "Common22Degree.cleared_difference_degree_lt_four",
+    "Common22Degree.cleared_difference_degree_lt_supports",
     "Common22Uniqueness.zero_of_coprime_supports",
     "Common22Uniqueness.residual_eq_curve"
   ],
@@ -22,6 +24,12 @@
       "statement": "B nonzero implies IsCoprime u1 u2"
     },
     {
+      "obligation": "runtime_interpolation",
+      "kind": "source_link",
+      "status": "open_source_link",
+      "statement": "runtime numerator satisfies both interpolation congruences"
+    },
+    {
       "obligation": "first_residue",
       "kind": "premise",
       "status": "kernel_checked_conditional",
@@ -34,10 +42,16 @@
       "statement": "interpolation and valid input imply second curve residue"
     },
     {
-      "obligation": "degree_bound",
-      "kind": "premise",
+      "obligation": "source_head",
+      "kind": "source_link",
       "status": "open_source_link",
-      "statement": "difference degree is below degree of u1 times u2"
+      "statement": "runtime residual has required degree-five and degree-four coefficients"
+    },
+    {
+      "obligation": "degree_bound",
+      "kind": "implication",
+      "status": "kernel_checked_conditional",
+      "statement": "matching quintic heads imply difference degree below support product"
     },
     {
       "obligation": "crt_uniqueness",
@@ -52,6 +66,6 @@
       "statement": "residual curve equation yields the intended Pic0 class"
     }
   ],
-  "scope": "conditional coprimeness and residual curve equation over a field; source interpolation, strict degree bound, and geometry remain open",
+  "scope": "conditional coprimeness, residues, degree implication, and curve equation over a field; runtime interpolation, source polynomial head, and geometry remain open",
   "cost_ratio_change": null
 }

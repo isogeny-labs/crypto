@@ -8,7 +8,10 @@ an explicit Bezout identity: the common-branch determinant $B$ is a linear
 combination of the two quadratic supports. Thus $B\ne0$ makes them coprime.
 Given interpolation and valid-input curve congruences, Lean proves that each
 support divides $H=E-B^2F$. If $\deg H<\deg(u_1u_2)$, then $H=0$ and
-$E=B^2F$. These are conditional polynomial statements.
+$E=B^2F$. A separate theorem derives this degree bound when $E$ and $F$
+have degree at most five and matching scaled coefficients in degrees five and
+four, while $u_1,u_2$ are nonzero quadratics. These are conditional polynomial
+statements.
 
 \begin{center}
 \begin{tabular}{ll}
@@ -16,8 +19,10 @@ $E=B^2F$. These are conditional polynomial statements.
 Obligation & Recorded status\\
 \midrule
 Support coprimeness from $B\ne0$ & Kernel checked, conditional\\
+Runtime interpolation link & Open source link\\
 First and second curve residues & Kernel checked, conditional\\
-Degree bound from source & Open source link\\
+Runtime residual head & Open source link\\
+Degree-bound implication & Kernel checked, conditional\\
 Coprime low-degree implication & Kernel checked, conditional\\
 Divisor-class conclusion & Open geometry\\
 \bottomrule

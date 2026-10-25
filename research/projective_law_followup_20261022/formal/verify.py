@@ -471,6 +471,19 @@ def main() -> None:
         )
     require(forbidden_proof_token.search(residues_source) is None,
             "forbidden common residue proof token")
+    degree_source = (ROOT / "Common22Degree.lean").read_text()
+    degree_log = (ROOT / "common22-degree-build.log").read_text()
+    for theorem in ("cleared_difference_degree_lt_four",
+                    "cleared_difference_degree_lt_supports"):
+        require(re.search(r"(?m)^theorem " + theorem + r"\b", degree_source) is not None,
+                f"common degree theorem missing: {theorem}")
+        require(
+            f"'Common22Degree.{theorem}' depends on axioms: "
+            "[propext, Classical.choice, Quot.sound]" in degree_log,
+            f"common degree kernel/axiom receipt missing: {theorem}",
+        )
+    require(forbidden_proof_token.search(degree_source) is None,
+            "forbidden common degree proof token")
     uniqueness_source = (ROOT / "Common22Uniqueness.lean").read_text()
     for theorem in ("zero_of_coprime_supports", "residual_eq_curve"):
         require(re.search(r"(?m)^theorem " + theorem + r"\b", uniqueness_source) is not None,
@@ -493,13 +506,17 @@ def main() -> None:
         "Common22Residues.first_residue",
         "Common22Residues.second_residue",
         "Common22Residues.residual_curve_eq",
+        "Common22Degree.cleared_difference_degree_lt_four",
+        "Common22Degree.cleared_difference_degree_lt_supports",
         "Common22Uniqueness.zero_of_coprime_supports",
         "Common22Uniqueness.residual_eq_curve",
     ], "common uniqueness theorem inventory mismatch")
-    require(len(uniqueness["rows"]) == 6, "common uniqueness obligation count mismatch")
+    require(len(uniqueness["rows"]) == 8, "common uniqueness obligation count mismatch")
     require([row["status"] for row in uniqueness["rows"]] ==
-            ["kernel_checked_conditional"] * 3 + ["open_source_link",
-            "kernel_checked_conditional", "open_geometry"],
+            ["kernel_checked_conditional", "open_source_link",
+             "kernel_checked_conditional", "kernel_checked_conditional",
+             "open_source_link", "kernel_checked_conditional",
+             "kernel_checked_conditional", "open_geometry"],
             "common uniqueness proof boundary mismatch")
     with (ROOT / "common22-uniqueness.csv").open(newline="") as handle:
         require(list(csv.DictReader(handle)) == uniqueness["rows"],

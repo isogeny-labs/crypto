@@ -46,8 +46,10 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   nonzero source-style determinant `B` makes the two quadratic supports
   coprime by an explicit Bézout identity. Conditional residue lemmas derive
   the two support divisibilities from interpolation and valid-input curve
-  congruences. A strict degree bound then forces the cleared residual
-  difference to vanish. The [CSV](common22-uniqueness.csv),
+  congruences. A separate theorem derives the strict degree bound from
+  matching quintic heads and nonzero quadratic supports; the bound then
+  forces the cleared residual difference to vanish. The source polynomial
+  head and runtime interpolation links remain open. The [CSV](common22-uniqueness.csv),
   [JSON](common22-uniqueness.json), [graph](common22-uniqueness.svg), and
   [PDF](COMMON22_UNIQUENESS.pdf) distinguish the kernel-checked implication
   from source and geometric premises still to establish.
