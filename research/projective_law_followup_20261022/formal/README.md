@@ -19,7 +19,10 @@ independently checks the underlying sextic factorization; the [PDF](weighted-pro
 keep the still-open graded-quotient and actual `Proj` cover steps visible.
 The separate [ordinary-quotient packet](WEIGHTED_PROJ_QUOTIENT.md) proves a
 surjective specialization map at `Z=1` and that `Z-1` lies in its kernel;
-it does not identify that kernel or a localized degree-zero chart ring.
+the [exact-kernel packet](WEIGHTED_PROJ_KERNEL.md) proves equality with that
+principal ideal and an ordinary affine-algebra equivalence. Its [PDF](WEIGHTED_PROJ_KERNEL.pdf),
+[graph](weighted-proj-kernel.svg), and [CSV](weighted-proj-kernel.csv) keep the
+graded quotient and localized degree-zero `Proj` chart open.
 
 ## Pinned environment
 
