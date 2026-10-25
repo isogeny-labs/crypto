@@ -98,3 +98,8 @@ two more independently replayed planted rows under separate phase-only and
 selector-only pins. Their SAT search times were 0.239 s and 16.589 s,
 respectively. They remain component controls; the cold one-target runtime
 and best-base selection are still open.
+An opt-in [phase-first free-choice search](phase-first-20261025/RESULT.md)
+passed the planted control with an independently replayed rank-one row and
+zero conflicts in two retained runs; the corrected supervisor measured 1.584 s
+of SAT search and 79.903 s worker wall. This is a constructed gate, not a
+natural-relation or complete-runtime measurement.

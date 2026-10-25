@@ -55,3 +55,8 @@ Two [single-dimension choice controls](choice-pins-20261025/RESULT.md) also
 returned the same checked row: phase pinned with selectors free took 0.239 s
 of SAT search; selectors pinned with phases free took 16.589 s. Both are
 constructed L0 runs, with full import and process costs retained separately.
+The [phase-first free-choice constructed control](phase-first-20261025/RESULT.md)
+subsequently returned the same independently replayed row with all selectors
+and phases admissible. Its resource-accounted repeat took 1.584 s of SAT
+search and 79.903 s worker wall; the earlier unrestricted shared-root policy
+was censored at 300 s. Natural yield and end-to-end IC cost remain open.

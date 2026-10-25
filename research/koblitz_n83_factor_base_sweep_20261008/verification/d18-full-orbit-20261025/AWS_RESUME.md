@@ -100,6 +100,15 @@ opt-in modes are `primary-full-d18-m4-l0-shared-phase-pinned` and
 `primary-full-d18-m4-l0-shared-selector-pinned`. Their source commit is
 `d775b18dc427188e0279f4189c3c63b570f780fc` and binary SHA-256 is
 `0826acbe6a3e55fc747be480453cd1bca9c053adb584ce7e55548e13985644e4`.
+The [phase-first free-choice constructed control](phase-first-20261025/RESULT.md)
+then kept every selector and phase admissible while prioritizing phase wires
+with initial zero polarity. Its corrected L0 supervisor run exited zero and
+returned the independently replayed planted row in 1.584 s of SAT search,
+after a 77.410 s full import. The first retained worker also passed but its
+macOS time wrapper failed; both raw runs and the correction are committed.
+This is an opt-in `primary-full-d18-m4-l0-shared-phase-first` mode from source
+`57c20963924ab0097111b08fc6cb157400e87e53`. Freeze and validate a
+Linux hard-cgroup natural extension before interpreting any yield.
 That gate adds an opt-in `primary-full-d18-m4 positive|natural` worker with
 hard resource checks, durable phase/shape records, SAT-model verification,
 group lift, row replay and rank-one control. Its natural result requires a
