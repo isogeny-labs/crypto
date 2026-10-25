@@ -2,19 +2,25 @@
 
 **Date.** 2026-10-24. **Protocol.** [PROTOCOL.md](PROTOCOL.md) (frozen in commit 8795a8e1fd; amendment 1 CPU-time cap and
 shared target dir, 01ebdd3f05; amendment 2 point cap for compute budget, fdfce25b61; all before any recorded run; the one
-abandoned 24-bit probe under the unamended grid is unrecorded and unused). **Status.** Unreviewed, unvalidated, local branch
+abandoned 24-bit probe under the unamended grid is unrecorded and unused). **Amendment 2 cut the admissible multiplier grid to three cells (prime: `cm-multiplier` size=256 norm=4 or 8, size=512 norm=4; binary: size=256 mult=2 or 4, size=512 mult=2; i.e. N <= 8, M <= 4) and dropped the 40-bit size, so `R_adm` cannot test larger-norm or larger-multiple bases and says nothing about them.** **Status.** Unreviewed, unvalidated, local branch
 `research/multiplier-closure-scaling-20261024`; not an admitted benchmark.
 **Raw.** `raw/*.jsonl` (3,768 lines: one per configuration x repeat), `analysis.md`/`analysis.json` from `analyze.py`.
 Run: `runall.sh` (calls `run.py`). Binary: `ic` sha256 59a70e5a...8c68b417 (shared target
 `cargo-target-ic-followthrough-20261024`, origin/main 5cb553810e). Metric: counted `S = total_gae / sqrt(r)`, mean of 4 targets;
-oracle `mitm:negation_folded=1,m=3`; every row verified (0 failures); wall time not used (load 25-150).
+oracle `mitm:negation_folded=1,m=3`; every row `verified` (0 failures; PROTOCOL.md rule also asks for `correct`, but the raw rows carry no `correct` field and `analyze.py` checks only `verified`, which is the bench's own end-to-end logarithm check); wall time not used (load 25-150).
 
 ## Result (frozen decision rule applied)
 
-Hypothesis H (gain is a toy-size constant that shrinks with r) is **falsified as stated in this range**: the fitted
-slope of `log2(S_mult/S_inc)` against `log2 r` is **negative** (the gain grows with r) for the prime regime and for
-random binary, with the 95% interval excluding 0 in the pooled prime fits and the binary all-rows fit. But the reading
-"the multiplier base scales better" is not supported, for three reasons the numbers show:
+**Frozen-rule outcome.** Slope of `log2(S_mult/S_inc)` against `log2 r` is negative in every primary fit. H is formally
+**falsified** (95% interval entirely below 0) for the prime regime (pooled per-instance R_all -0.47 [-0.56, -0.38], R_adm
+-0.24 [-0.31, -0.16]) **and for binary** (primary per-instance fit R_all -0.203 [-0.247, -0.158], R_adm -0.126 [-0.183, -0.069]).
+The only intervals that span 0 are secondary fits (binary R_adm size-means, n = 4; j0 R_adm size-means).
+
+**Reading.** No scaling or exponent claim. The slopes are grid-placement artefacts: the admissible multiplier minimiser is
+the single smallest admissible cell in 33 of 33 instances (`cm-multiplier` size=256 norm=4 on prime; `binary-multiplier`
+size=256 mult=2 on binary) and the admissible incumbent minimiser is on a grid edge in 29 of 33 (`glv-orbit` size=400 in 17 of
+21 prime instances, size=800 in the other 4; plain K=256 in all 12 binary), so `R_adm` is a fixed-cell ratio, not best-vs-best.
+"The multiplier base scales better" is not supported, for three reasons the numbers show:
 
 1. **Low-r rows are the other way round.** At r <= 2^26 the best multiplier base is *worse* than the incumbent on j0
    (0.25x at 24 bit, 1.5x at 28 bit) and the 10-20x of the READMEs appears only at 2^32..2^34 (6.3x, 12.8x on j0; 11.7x j1728).
@@ -84,9 +90,9 @@ Binary at r in 2^18..2^24 (degree 20..26): all-rows gain 1.4x, 2.3x, 2.6x, 3.8x 
 Admissible instance pairs (both sides >=256 cols): 33 of 33 instances; multiplier configurations with >=256 columns: 99 of 750 cells.
 
 ## Verdict
-Per the frozen rule (slope >= 0 => constant; interval wholly < 0 => H falsified): **H falsified in range for the
-prime regime** (pooled per-instance and size-mean fits, both R_all and R_adm, intervals < 0) **and for binary all-rows**;
-binary R_adm size-mean interval spans 0 (n = 4 sizes). Not a scaling claim: toy sizes (r <= 2^34 prime, 2^24 binary,
+Per the frozen rule (slope >= 0 => constant; interval wholly < 0 => H falsified): **H formally falsified for the
+prime regime** (pooled per-instance and size-mean fits, R_all and R_adm) **and for binary** (primary per-instance fits, R_all and R_adm);
+only secondary fits (binary R_adm size-means, n = 4) span 0. Reading: slopes are grid-placement artefacts, not scaling. Not a scaling claim: toy sizes (r <= 2^34 prime, 2^24 binary,
 3 seeds), grids capped at ~8,000 points, minimisers on grid edges, per-instance fits pseudo-replicate seeds within a
 size (use the size-mean rows as the conservative interval). The ratio is an internal pipeline comparison, not a comparison
 with rho or any published index calculus (rho reference S ~ 1 in the same unit).
@@ -102,8 +108,16 @@ with rho or any published index calculus (rho reference S ~ 1 in the same unit).
 * Sandbox note: the first worktree checkout was killed by the tool timeout and left a stale `index.lock`; the work uses a
   fresh worktree `crypto-worktrees/multiplier-closure-scaling-20261024-w` (the original directory is a partial leftover that could not be removed).
 
+## Figure
+[gain_vs_log2r.svg](gain_vs_log2r.svg) (from `plot.py`): gain vs log2 r, all rows (solid) and admissible rows (dashed). No PDF/PNG render or
+report PDF was produced (the study is unvalidated and not entering `benchmarks/`; omission recorded here).
+
+## Problem records
+[`problems/ic-bench-sweep-empty-matrix.md`](../../problems/ic-bench-sweep-empty-matrix.md),
+[`problems/ic-multiplier-base-silent-collision-drop.md`](../../problems/ic-multiplier-base-silent-collision-drop.md).
+
 ## Benchmarks row (not added to `benchmarks/README.md`)
 The validation gate (docs/VALIDATION_GATE.md) admits a row only with a replay certificate, a validator report and a matched
 rho reference; none exists for this study, so adding the row would be refused by CI. Row text for when it is validated:
 
-| 2026-10-24 | Counted-S scaling of cm-multiplier / binary-multiplier vs incumbent glv-orbit / binary-subspace+plain, `mitm:m=3`, 33 instances (j0 r 2^21..2^34, j1728 2^22..2^31, random binary 2^18..2^24, 3 seeds): gain grows with r in range (slope of log2 ratio -0.24 admissible / -0.47 all rows pooled prime); admissible (>=256 columns) gain only 0.26x..2.1x; unvalidated | counted ops, host-independent | [study](../research/multiplier_closure_scaling_20261024/README.md) |
+| 2026-10-24 | Counted-S scaling of cm-multiplier / binary-multiplier vs incumbent glv-orbit / binary-subspace+plain, `mitm:m=3`, 33 instances (j0 r 2^21..2^34, j1728 2^22..2^31, random binary 2^18..2^24, 3 seeds): frozen rule formally falsifies H; slopes are grid artefacts (admissible minimisers on grid edge 33/33); no scaling claim; admissible (>=256 columns) gain only 0.26x..2.1x; unvalidated | counted ops, host-independent | [study](../research/multiplier_closure_scaling_20261024/README.md) |

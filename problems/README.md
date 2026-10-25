@@ -49,6 +49,8 @@ Keep resolved and superseded records in the index.
 
 | [ECDLP portfolio exhaustive-reading coverage](ecdlp-portfolio-reading-coverage.md) | open | certifying the owner's request to read all six-month portfolio sources and artifacts | complete acknowledged source coverage, branch/history reconciliation and access to named missing raw evidence; indexing and hashing remain separate |
 | [claim-n13 replay fails on accounting-version drift](ecbench-claim-n13-replay-accounting-version-drift.md) | open | replaying the Apple-recorded `claim-n13` inherited-F4 arms on `main` (BMI2 and portable paths already agree) | owner decision on the specialisation accounting identity (lazy vs eager) plus a method-identity field for it |
+| [`ic bench --sweep` rejects a sweep that lists only `configurations`](ic-bench-sweep-empty-matrix.md) | open | `--sweep` files with explicit `configurations` and no `matrix`; worked around with the matrix form in `research/multiplier_closure_scaling_20261024/` | A guard so an empty matrix expands to no rows, with a test. |
+| [Multiplier factor bases silently drop colliding points](ic-multiplier-base-silent-collision-drop.md) | open | Auditing nominal vs actual `points` of `cm-multiplier` / `binary-multiplier` cells (reported `points` is counted after drops) | A counted `multiplier_collisions` native counter and a small-r re-check. |
 
 ## Add or update a problem
 
@@ -95,5 +97,3 @@ Preserve historical evidence and append dated updates explaining corrections.
 A resolution cites its evidence and the criteria met; a supersession cites its
 successor and the reason for replacing the record. Follow the repository's
 existing review, archival, and claim-promotion rules.
-
-

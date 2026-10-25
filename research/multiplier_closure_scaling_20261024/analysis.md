@@ -4,19 +4,19 @@ cells excluded for failed verification: 0; instances: 33
 
 ## Per-size table (geometric mean over seeds of R = S_mult/S_inc; lower R = bigger multiplier gain)
 
-| regime | size | seeds | log2 r | best inc S (cols,pts) | best mult S (cols,pts,rows) | R_all (gain x) | adm pairs | R_adm (gain x) | boundary-flagged |
-|:--|--:|--:|--:|:--|:--|--:|--:|--:|--:|
-| binary random | 20 | 3 | 18.0 | 18.6 (64,128) | 13.6 (8,128,8) | 1.38x | 3 | 0.26x | 3/3 (mult-lo:3) |
-| binary random | 22 | 3 | 19.0 | 21.8 (64,128) | 9.5 (4,128,5) | 2.29x | 3 | 0.26x | 3/3 (inc-lo:1 mult-lo:2) |
-| binary random | 24 | 3 | 22.0 | 27.8 (128,256) | 10.6 (4,256,5) | 2.63x | 3 | 0.29x | 0/3 (-) |
-| binary random | 26 | 3 | 24.0 | 32.8 (256,512) | 8.6 (4,256,5) | 3.80x | 3 | 0.49x | 0/3 (-) |
-| prime j0 | 24 | 3 | 20.9 | 36.7 (50,300) | 151.6 (32,960,25) | 0.25x | 3 | 0.27x | 3/3 (inc-lo:3 mult-lo:3) |
-| prime j0 | 28 | 3 | 25.7 | 52.1 (100,600) | 33.9 (16,960,16) | 1.54x | 3 | 0.27x | 3/3 (inc-lo:3 mult-lo:3) |
-| prime j0 | 32 | 3 | 31.9 | 68.4 (400,2400) | 10.5 (4,960,5) | 6.34x | 3 | 0.45x | 3/3 (inc-lo:1 mult-lo:3) |
-| prime j0 | 36 | 3 | 33.7 | 132.7 (800,4800) | 10.2 (4,960,5) | 12.82x | 3 | 2.07x | 2/3 (mult-lo:2) |
-| prime j1728 | 24 | 3 | 21.7 | 35.0 (100,400) | 75.9 (64,768,50) | 0.46x | 3 | 0.27x | 3/3 (inc-lo:1 mult-lo:3) |
-| prime j1728 | 28 | 3 | 26.9 | 78.6 (200,800) | 29.8 (16,768,16) | 2.67x | 3 | 0.31x | 3/3 (mult-lo:3) |
-| prime j1728 | 32 | 3 | 30.8 | 106.6 (400,1600) | 9.0 (4,784,5) | 11.73x | 3 | 1.39x | 0/3 (-) |
+| regime | size | seeds | log2 r | best inc S (cols,pts) | best mult S (cols,pts,rows) | R_all (gain x) | adm pairs | R_adm (gain x) | boundary-flagged (all rows) | admissible-row minimisers on grid edge (inc / mult) |
+|:--|--:|--:|--:|:--|:--|--:|--:|--:|--:|--:|
+| binary random | 20 | 3 | 18.0 | 18.6 (64,128) | 13.6 (8,128,8) | 1.38x | 3 | 0.26x | 3/3 (mult-lo:3) | 3/3 / 3/3 |
+| binary random | 22 | 3 | 19.0 | 21.8 (64,128) | 9.5 (4,128,5) | 2.29x | 3 | 0.26x | 3/3 (inc-lo:1 mult-lo:2) | 3/3 / 3/3 |
+| binary random | 24 | 3 | 22.0 | 27.8 (128,256) | 10.6 (4,256,5) | 2.63x | 3 | 0.29x | 0/3 (-) | 3/3 / 3/3 |
+| binary random | 26 | 3 | 24.0 | 32.8 (256,512) | 8.6 (4,256,5) | 3.80x | 3 | 0.49x | 0/3 (-) | 3/3 / 3/3 |
+| prime j0 | 24 | 3 | 20.9 | 36.7 (50,300) | 151.6 (32,960,25) | 0.25x | 3 | 0.27x | 3/3 (inc-lo:3 mult-lo:3) | 3/3 / 3/3 |
+| prime j0 | 28 | 3 | 25.7 | 52.1 (100,600) | 33.9 (16,960,16) | 1.54x | 3 | 0.27x | 3/3 (inc-lo:3 mult-lo:3) | 3/3 / 3/3 |
+| prime j0 | 32 | 3 | 31.9 | 68.4 (400,2400) | 10.5 (4,960,5) | 6.34x | 3 | 0.45x | 3/3 (inc-lo:1 mult-lo:3) | 3/3 / 3/3 |
+| prime j0 | 36 | 3 | 33.7 | 132.7 (800,4800) | 10.2 (4,960,5) | 12.82x | 3 | 2.07x | 2/3 (mult-lo:2) | 0/3 / 3/3 |
+| prime j1728 | 24 | 3 | 21.7 | 35.0 (100,400) | 75.9 (64,768,50) | 0.46x | 3 | 0.27x | 3/3 (inc-lo:1 mult-lo:3) | 3/3 / 3/3 |
+| prime j1728 | 28 | 3 | 26.9 | 78.6 (200,800) | 29.8 (16,768,16) | 2.67x | 3 | 0.31x | 3/3 (mult-lo:3) | 3/3 / 3/3 |
+| prime j1728 | 32 | 3 | 30.8 | 106.6 (400,1600) | 9.0 (4,784,5) | 11.73x | 3 | 1.39x | 0/3 (-) | 2/3 / 3/3 |
 
 ## Fits: log2(S_mult/S_inc) = a + slope * log2 r  (95% t-interval)
 
