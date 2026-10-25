@@ -77,3 +77,9 @@ transcript accounting traps: [`docs/token-efficiency.md`](docs/token-efficiency.
 Every cross-method ECDLP comparison prices the unpriced native work of
 every arm, rho references included, at 0, 0.1 and 1 GAE per operation and
 ranks two arms only where the order holds across that band (AGENTS.md §5a).
+
+**Resume checkpoints** (owner, 2026-10-24): before any experiment run, fill
+`.resume/RESUME.md` (`scripts/checkpoint.sh init`) so a fresh session could
+resume the effort from it alone. The hooks push it to S3 with the specs,
+leads and unpushed work, and refuse run launchers until that succeeds.
+AGENTS.md, "Resume checkpoints in S3 before every run".
