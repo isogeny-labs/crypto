@@ -2,7 +2,7 @@
 
 - **Status:** open
 - **Kind:** implementation and measurement gap; formal-proof gap for a regularity claim
-- **Affected work:** [chart-complement screen](../research/factor_base_chart_complements_20261019/README.md), [completed shape study](../research/factor_base_shape_leads_20261018/README.md)
+- **Affected work:** [three native oracle leads](../research/factor_base_oracle_leads_20261019/README.md), [chart-complement screen](../research/factor_base_chart_complements_20261019/README.md), [completed shape study](../research/factor_base_shape_leads_20261018/README.md)
 - **Next action owner:** native factor-base CLI lane; new follow-up remains draft/unfunded
 - **Last updated:** 2026-10-19
 
@@ -40,13 +40,26 @@ in the finite screen. Neither fixture establishes83/130-bit applicability.
 - **Not established:** significance, solver speed, an exponent change,
   complete one-target ECDLP cost, a rho win or a large-field mechanism.
 
+The separately authorized three-lead experiment now supplies successful
+native solver evidence: 472 bounded rows and 143 checked original point
+witnesses on the exact degree7/13 models. Asymmetric branching completes
+all four positive controls of the14-column graft while the product and
+selector arms hit resource caps. It has no random success in that case
+(12 training and12 holdout targets). The tested selectors cost more F4
+reduction work on completed controls. Quotient lifting works on deliberately
+tiny C={±G,±[2]G} controls; its useful inventory and complete cost remain
+open. Every total-cost ranking remains unknown under symmetric pricing.
+See the new study for the exact counter scope, negative cases and limits.
+
 ## What would unblock it
 
-- [ ] Freeze a new native protocol with exact inventories, matched fresh
+- [x] Freeze a new native protocol with exact inventories, matched fresh
   public targets, positive subgroup controls and a separate holdout.
-- [ ] Implement and verify main-main, mixed and auxiliary-only branches;
-  charge setup, failed attempts, point/membership operations, root/witness
-  enumeration and incremental rank. Compare against unchanged references.
+- [x] Implement and verify main-main, mixed and auxiliary-only branches,
+  selector membership and original-curve quotient lifting against fixed
+  references. Retain every attempted branch, root and witness.
+- [ ] Complete and calibrate accounting for setup, failed attempts,
+  point/membership operations, root enumeration and incremental rank.
 - [ ] Admit a cost improvement only with complete symmetric native pricing;
   include fastest matched external implementations for a speed claim.
 - [ ] For a regularity claim, provide the actual ideal/system/order and a
@@ -59,7 +72,10 @@ all phases, matched rho and independent replay under repository rules.
 
 ## Next discriminating step
 
-- **Action:** draft [chart-graft follow-up](../backlog/XP-20261019-factor-base-chart-grafts/card.json), not dispatched.
+- **Action:** complete the successful asymmetric path's native accounting
+  and evaluate a useful quotient inventory under a new frozen protocol.
+  The separate draft [chart-graft follow-up](../backlog/XP-20261019-factor-base-chart-grafts/card.json)
+  remains unchanged and was not dispatched.
 - **Controls:** the exact14-column graft,12-column main component,15-column
   GP17 reference and 16-column coordinate reference on the same exact model.
 - **Limits/stop:** no runnable protocol or funded execution envelope exists;
@@ -76,3 +92,8 @@ all phases, matched rho and independent replay under repository rules.
 2026-10-19: finite chart-union screen supplies a specific candidate and
 cofactor/rank diagnostics. Successful solver work and regularity remain
 unresolved. This record and its PR do not discharge those obligations.
+
+2026-10-19 follow-up: three new native encodings and checked quotient
+lifting establish bounded successful solver-component observations. Full
+cost, large useful quotient bases, complete pipeline performance and
+certified regularity remain unresolved. The draft backlog cards were not run.

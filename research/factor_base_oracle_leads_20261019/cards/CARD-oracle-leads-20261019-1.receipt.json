@@ -1,0 +1,179 @@
+{
+  "card_id": "CARD-oracle-leads-20261019-1",
+  "card_path": "research/factor_base_oracle_leads_20261019/cards/CARD-oracle-leads-20261019-1.yaml",
+  "card_sha256": "0b861eb6573f5c1e98a0ea792d6a5fcfa420ed15bec7d43bab315fe664768f5a",
+  "commands": [
+    {
+      "argv": [
+        "./research/factor_base_oracle_leads_20261019/factor-base-sweep",
+        "compare-leads",
+        "--plan",
+        "research/factor_base_oracle_leads_20261019/plan.json",
+        "--out",
+        "research/factor_base_oracle_leads_20261019/runs/experiment"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.193,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "run",
+      "index": 1,
+      "outputs": {
+        "research/factor_base_oracle_leads_20261019/runs/experiment/leads-manifest.json": "f2154165bbe261f95a38810e4c5fbdd76815f2b64297aa2820f584d70077fa4a",
+        "research/factor_base_oracle_leads_20261019/runs/experiment/summary.json": "c4f04fbcf985544963219770384381fc881fd066d93657a58beaec836c9c6d66"
+      },
+      "seconds": 9.193,
+      "stderr_sha256": "acc41c3624c42b407816f15bfb0cc4f527c6b1db25dbc7f8f1998912bfb92981",
+      "stderr_tail": [
+        "Info:Lead:Solver:torsion-quotient: branch=0 D=1 matrix=12x3 reduction_muls=0",
+        "Info:Lead:Solver:torsion-quotient: branch=0 D=2 matrix=28x15 reduction_muls=30",
+        "Info:Lead:n13-torsion:holdout:10:torsion-quotient: status=\"absent\" verified=false rank_gain=0",
+        "Info:Lead:n13-torsion:holdout:11:direct-lift-base: encoding and bounded F4; original target=(3c,134d)",
+        "Info:Lead:Solver:direct-lift-base: branch=0 D=2 matrix=39x37 reduction_muls=0",
+        "Info:Lead:Solver:direct-lift-base: branch=0 D=2 matrix=51x43 reduction_muls=3176",
+        "Info:Lead:Solver:direct-lift-base: branch=0 D=2 matrix=20x21 reduction_muls=4082",
+        "Info:Lead:Solver:direct-lift-base: branch=0 D=2 matrix=21x20 reduction_muls=4244",
+        "Info:Lead:Solver:direct-lift-base: branch=0 D=3 matrix=185x136 reduction_muls=4344",
+        "Info:Lead:Solver:direct-lift-base: branch=0 D=3 matrix=20x14 reduction_muls=0",
+        "Info:Lead:Solver:direct-lift-base: branch=0 D=3 matrix=20x14 reduction_muls=0",
+        "Info:Lead:Solver:direct-lift-base: branch=0 D=2 matrix=5x3 reduction_muls=0",
+        "Info:Lead:Solver:direct-lift-base: branch=0 D=2 matrix=5x5 reduction_muls=0",
+        "Info:Lead:n13-torsion:holdout:11:direct-lift-base: status=\"verified\" verified=true rank_gain=0",
+        "Info:Lead:n13-torsion:holdout:11:torsion-quotient: encoding and bounded F4; original target=(3c,134d)",
+        "Info:Lead:Solver:torsion-quotient: branch=0 D=1 matrix=12x3 reduction_muls=0",
+        "Info:Lead:Solver:torsion-quotient: branch=0 D=2 matrix=21x11 reduction_muls=30",
+        "Info:Lead:Solver:torsion-quotient: branch=0 D=2 matrix=8x8 reduction_muls=232",
+        "Info:Lead:Solver:torsion-quotient: branch=0 D=3 matrix=19x19 reduction_muls=256",
+        "Info:Lead:n13-torsion:holdout:11:torsion-quotient: status=\"verified\" verified=true rank_gain=0"
+      ],
+      "stdout_sha256": "607c776cb5c7eede2ac2890cd4c7ac54f186b85c94214f8da0cc893d182ac89d",
+      "stdout_tail": [
+        "{\"members\":2493,\"point_witnesses\":143,\"schema\":\"factor_base_sweep.leads-verification/v1\",\"verification\":\"all hashes and returned original-curve point witnesses; no F4 rerun\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./research/factor_base_oracle_leads_20261019/factor-base-sweep",
+        "verify",
+        "--run",
+        "research/factor_base_oracle_leads_20261019/runs/experiment"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.294,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify",
+      "index": 2,
+      "outputs": {
+        "research/factor_base_oracle_leads_20261019/runs/experiment/leads-manifest.json": "f2154165bbe261f95a38810e4c5fbdd76815f2b64297aa2820f584d70077fa4a",
+        "research/factor_base_oracle_leads_20261019/runs/experiment/summary.json": "c4f04fbcf985544963219770384381fc881fd066d93657a58beaec836c9c6d66"
+      },
+      "seconds": 0.294,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "607c776cb5c7eede2ac2890cd4c7ac54f186b85c94214f8da0cc893d182ac89d",
+      "stdout_tail": [
+        "{\"members\":2493,\"point_witnesses\":143,\"schema\":\"factor_base_sweep.leads-verification/v1\",\"verification\":\"all hashes and returned original-curve point witnesses; no F4 rerun\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "./research/factor_base_oracle_leads_20261019/audit/target/release/factor-base-oracle-audit",
+        "research/factor_base_oracle_leads_20261019/runs/experiment",
+        "research/factor_base_oracle_leads_20261019/inputs/models.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.265,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "audit",
+      "index": 3,
+      "outputs": {
+        "research/factor_base_oracle_leads_20261019/runs/independent-audit.json": "2df9a95258ad58c2ecca1f3d4377917df98206cb4dd34cfbd9967fa778f4a252"
+      },
+      "seconds": 0.265,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "2df9a95258ad58c2ecca1f3d4377917df98206cb4dd34cfbd9967fa778f4a252",
+      "stdout_tail": [
+        "      \"holdout_distinct\": 12,",
+        "      \"id\": \"n13-torsion\",",
+        "      \"left_points\": 8,",
+        "      \"quotient_points\": 4,",
+        "      \"right_points\": 8,",
+        "      \"signed_points\": 8,",
+        "      \"support\": 8,",
+        "      \"total_cost_winner\": null,",
+        "      \"train_distinct\": 12",
+        "    }",
+        "  ],",
+        "  \"lift_preimage_checks\": 16,",
+        "  \"members\": 2493,",
+        "  \"original_point_witnesses\": 143,",
+        "  \"schema\": \"factor-base-oracle-independent-audit/v1\",",
+        "  \"scope\": \"independent polynomial-field/group arithmetic and root evaluation on the same host; no independent-host certificate, F4 rerun, complete cost or regularity certificate\",",
+        "  \"trial_rows\": 472,",
+        "  \"unique_case_unordered_pair_checks\": 691,",
+        "  \"verified\": true",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 3,
+  "commit": "aaf9e246a3af4be371d7089dc86fc32c61c2f5ac",
+  "dirty_after": [
+    "research/factor_base_oracle_leads_20261019/FORMALIZATION.md",
+    "research/factor_base_oracle_leads_20261019/LITERATURE.md",
+    "research/factor_base_oracle_leads_20261019/PRICING.md",
+    "research/factor_base_oracle_leads_20261019/SETUP_OBSERVATIONS.md",
+    "research/factor_base_oracle_leads_20261019/cards/CARD-oracle-leads-20261019-1.yaml",
+    "research/factor_base_oracle_leads_20261019/cards/audit.stderr",
+    "research/factor_base_oracle_leads_20261019/cards/director-prompt.txt",
+    "research/factor_base_oracle_leads_20261019/cards/run.stderr",
+    "research/factor_base_oracle_leads_20261019/cards/run.stdout",
+    "research/factor_base_oracle_leads_20261019/cards/verify.stderr",
+    "research/factor_base_oracle_leads_20261019/cards/verify.stdout",
+    "research/factor_base_oracle_leads_20261019/render.py",
+    "research/factor_base_oracle_leads_20261019/report.typ",
+    "research/factor_base_oracle_leads_20261019/route.png",
+    "research/factor_base_oracle_leads_20261019/route.svg"
+  ],
+  "dirty_before": [
+    "research/factor_base_oracle_leads_20261019/FORMALIZATION.md",
+    "research/factor_base_oracle_leads_20261019/LITERATURE.md",
+    "research/factor_base_oracle_leads_20261019/PRICING.md",
+    "research/factor_base_oracle_leads_20261019/SETUP_OBSERVATIONS.md",
+    "research/factor_base_oracle_leads_20261019/cards/CARD-oracle-leads-20261019-1.yaml",
+    "research/factor_base_oracle_leads_20261019/cards/director-prompt.txt",
+    "research/factor_base_oracle_leads_20261019/render.py",
+    "research/factor_base_oracle_leads_20261019/report.typ",
+    "research/factor_base_oracle_leads_20261019/route.png",
+    "research/factor_base_oracle_leads_20261019/route.svg"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

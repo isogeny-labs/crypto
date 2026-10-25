@@ -1,0 +1,18 @@
+--- canonical-brief-from-sorted-receipt
++++ canonical-brief-in-runner-insertion-order
+@@ -26,13 +26,13 @@
+     Info:Lead:Solver:torsion-quotient: branch=0 D=2 matrix=8x8 reduction_muls=232
+     Info:Lead:Solver:torsion-quotient: branch=0 D=3 matrix=19x19 reduction_muls=256
+     Info:Lead:n13-torsion:holdout:11:torsion-quotient: status="verified" verified=true rank_gain=0
++  output research/factor_base_oracle_leads_20261019/runs/experiment/summary.json: c4f04fbcf985544963219770384381fc881fd066d93657a58beaec836c9c6d66
+   output research/factor_base_oracle_leads_20261019/runs/experiment/leads-manifest.json: f2154165bbe261f95a38810e4c5fbdd76815f2b64297aa2820f584d70077fa4a
+-  output research/factor_base_oracle_leads_20261019/runs/experiment/summary.json: c4f04fbcf985544963219770384381fc881fd066d93657a58beaec836c9c6d66
+ command 2 (verify): ["./research/factor_base_oracle_leads_20261019/factor-base-sweep", "verify", "--run", "research/factor_base_oracle_leads_20261019/runs/experiment"] exit 0 (0.294 s) succeeded
+   stdout sha256 607c776cb5c7eede2ac2890cd4c7ac54f186b85c94214f8da0cc893d182ac89d; last 1 lines:
+     {"members":2493,"point_witnesses":143,"schema":"factor_base_sweep.leads-verification/v1","verification":"all hashes and returned original-curve point witnesses; no F4 rerun"}
++  output research/factor_base_oracle_leads_20261019/runs/experiment/summary.json: c4f04fbcf985544963219770384381fc881fd066d93657a58beaec836c9c6d66
+   output research/factor_base_oracle_leads_20261019/runs/experiment/leads-manifest.json: f2154165bbe261f95a38810e4c5fbdd76815f2b64297aa2820f584d70077fa4a
+-  output research/factor_base_oracle_leads_20261019/runs/experiment/summary.json: c4f04fbcf985544963219770384381fc881fd066d93657a58beaec836c9c6d66
+ command 3 (audit): ["./research/factor_base_oracle_leads_20261019/audit/target/release/factor-base-oracle-audit", "research/factor_base_oracle_leads_20261019/runs/experiment", "research/factor_base_oracle_leads_20261019/inputs/models.json"] exit 0 (0.265 s) succeeded
+   stdout sha256 2df9a95258ad58c2ecca1f3d4377917df98206cb4dd34cfbd9967fa778f4a252; last 20 lines:
+           "holdout_distinct": 12,
