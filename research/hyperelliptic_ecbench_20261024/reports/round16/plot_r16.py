@@ -31,4 +31,4 @@ bx.axhline(1.2533, color="#c05621", ls="--", lw=1); bx.axhline(0.8862, color="#2
 bx.set_xlabel("log2 r"); bx.set_ylabel("mean S (all charged group operations / √r)")
 bx.set_title("ecbench S against the floors √(π/2), √(π/4)", fontsize=9); bx.legend(fontsize=7)
 fig.suptitle("Round sixteen, CARD-HEIC-ROUND16-1: the thread's instances through ecbench (counted operations)", fontsize=10)
-fig.tight_layout(); fig.savefig(sys.argv[3])
+fig.tight_layout(); fig.savefig(sys.argv[3], dpi=int(sys.argv[5]) if len(sys.argv) > 5 else None)
