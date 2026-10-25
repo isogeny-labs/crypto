@@ -1,0 +1,25 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-volcano-census-followup-20261023-3
+experiment_id: volcano_ecdlp_census_followup_20261023
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+receipt: research/volcano_ecdlp_census_followup_20261023/runs/cards/CARD-volcano-census-followup-20261023-3.receipt.json
+binds:
+  - {path: research/volcano_ecdlp_census_followup_20261023/scripts/card_instance.py, sha256: 4dc818625de0a8dd9b5263b93667c28ba8988789dd4401e1811c6398bfe60786}
+  - {path: research/volcano_ecdlp_census_followup_20261023/scripts/phase_b_status.sh, sha256: 20174274e337524e01b2c440f6206013f9882fb9bb6bb51a0aeb43f9810f1bc3}
+commands:
+  - id: status
+    argv: [bash, research/volcano_ecdlp_census_followup_20261023/scripts/phase_b_status.sh]
+    cwd: .
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/volcano_ecdlp_census_followup_20261023/runs/cards/CARD-volcano-census-followup-20261023-3.stdout
+bus_address: executor-mechanical-volcano-followup
+background: false
+write_scope:
+  - research/volcano_ecdlp_census_followup_20261023/
+stop_when:
+  - The command exits with a status other than 0.
+  - The tool exits with status 2 and prints an IMPEDIMENT line.
+notes: The command prints one JSON line at once. Run it with python3 research/volcano_ecdlp_census_followup_20261023/scripts/card_instance.py followed by the card path.
