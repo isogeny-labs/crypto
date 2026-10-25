@@ -10,10 +10,10 @@ format.
 
 | Lead | Current verified evidence | Remaining gap |
 | --- | --- | --- |
-| factor-base/graph sweep | five arms over all 1,260 fresh targets; 6,300 candidate and 6,300 matched-rho solves; independent replication complete | model-held-out tuning remains proposed; the deterministic cohorts do not support a sampling interval for the earlier 0.999323 difference |
+| factor-base/graph sweep | five arms over all 1,260 fresh targets; 6,300 candidate and 6,300 matched-rho solves; independent replication complete; [N12 model-held-out tuning](../factor_base_heldout_20261025/REPORT.md) selected `fb1-any-j32` on 14 training models and verified 420 candidate and 420 rho solves on seven unseen models, with representative ratio 2.479905 and 0 winning/36 losing price cells | independent-host replay and isolated wall comparison remain open; the deterministic cohorts do not support a sampling interval for the earlier 0.999323 difference |
 | projective law | wrapper and retained-state arms over all 1,260 targets; 1,224,000 checked additions; exact certificate equalities | a mechanized divisor-class theorem and independent mathematical review |
 | point-driven pencil | 543 distinct verified targets, one target with cap-only records, 716 targets without a pencil record; exact 717-row continuation inventory and synthetic-only intake gate verified | 717 primary and independent-replay target records; a complete aggregate ratio requires verified candidate solves |
-| sign-safe Kummer | fixed-difference collector over all 1,260 targets; 8,820 labels and 1,260 signed recoveries checked | an arbitrary-jump construction remains open; the fixed-difference result is complete for its frozen scope |
+| sign-safe Kummer | fixed-difference collector over all 1,260 targets; 8,820 labels and 1,260 signed recoveries checked; [N11 compressed sidecar](../kummer_differential_collector_20261022/n11-compressed-sidecar/REPORT.md) checks 336 model/jump rows and proves pair-sign uniqueness in an abstract odd-prime group | concrete theta xADD exception and signed-lift cost bounds remain open; N11 ran no cohort or timing comparison |
 | review packet | 18 checksum-bound artifacts plus the checksum manifest, 12,850 target-arm rows, 3,067 grid rows, three graphs, standardized CSVs, and a three-page PDF; reviewer-pattern appendix adds paired deltas, right-continuous bounded ECDFs, heatmaps, descriptive resampling, and exact grid-derived break-even surfaces | reviewer-pattern phase fractions remain absent because the standardized inputs have no common phase counters; source-specific counter normalization is required |
 
 ## Continuation state
@@ -28,15 +28,14 @@ format.
 | N6 | verified partial mechanization | pinned Lean checked seven algebraic/inventory theorems plus one explicit conditional bridge; the later [N6 homogeneity packet](../projective_law_followup_20261022/n6-homogeneity/REPORT.md) proves the W-exponent scaling distinction; the Rust semantic and smooth-curve/Mumford/`Pic^0` bridges remain unresolved |
 | N7 | verified for the fixed-offset model | seven Lean declarations, zero trusted declarations, 336 exact orbit rows and 12,096 canonical price rows; arbitrary, compressed and label-free sidecars remain open |
 | N8 | verified fresh-cohort replication; packet partially complete | 6,300 candidate and 6,300 matched-rho records over 1,260 fresh public targets; five full-cohort ratios and every one of 1,440 pricing rows retained; independent-host replay and a model-cluster interval were not produced |
-| N9 | verified partial manual abstraction | 742-job pinned Lean build and 13-theorem axiom audit; exact four-function binding inventory with four live substitution-rejection tests; a proved Rust translation and concrete smooth-curve/Mumford/principal-divisor/`Pic^0` instance remain open |
+| N9 | verified partial manual abstraction | 742-job pinned Lean build and 13-theorem axiom audit; later [weighted 2+2 scaling theorems](../projective_law_followup_20261022/formal/CROSS_SCALE22.md) add five kernel-checked declarations for B/A/C weights and B/C nonzero preservation; a proved Rust translation and concrete smooth-curve/Mumford/principal-divisor/`Pic^0` instance remain open |
 | N10 | verified derived appendix | source-specific counters map to a declared phase class and retain original phase names; 23,176 representative method rows and 6,120 aggregate method cells reconcile; 1,264 candidate nulls retained; graph, PDF, and artifact-store CSVs included |
-| N11 | proposed | specify compressed or label-free Kummer sidecars and prove label recovery/collision bounds before any cohort execution |
-| N12 | proposed | preregister a model-held-out factor-base tuning study, tune only on one cohort, and evaluate the frozen choice on the other cohort with all losses retained |
+| N11 | verified abstract derivation; cohort gate closed | native Rust packet checks 336 rows over 21 groups and small-group sign/recurrence cases; pair-state size is 72 bytes with external step count or 80 bytes with stored counter; concrete xADD exception and signed-lift cost bounds remain unknown, so no cohort ran |
+| N12 | verified frozen held-out packet | seven prespecified policies, 840 training targets per policy and seven unseen evaluation models with 420 targets; 420/420 candidate and rho solves verified, ratio 2.479905 at the representative price, 0 win/36 loss cells; independent-host and isolated wall checks not attempted |
 
-N6, N7, N8 and N10 have verified results within their stated narrower
-boundaries. N9 has a verified manual executable abstraction, but its concrete
-source and geometric bridges remain open. Continue that bridge, followed by
-theorem-gated N11 and held-out N12. N3 remains
+N6, N7, N8, N10, N11 and N12 have verified results within their stated narrower
+boundaries. N9 has a verified manual executable abstraction and weighted 2+2
+scaling theorems, but its concrete source and geometric bridges remain open. N3 remains
 a separate external execution lane. N4 starts only after an N3 bundle arrives,
 so proof and replication work cannot be mistaken for pencil cohort completion.
 
@@ -47,7 +46,7 @@ N7 met its fixed-offset packet. N6 produced partial mechanization but did not
 meet the runtime/divisor-class bridge or independent-review gates. N8 produced
 the complete fresh public cohort and pricing grid but did not produce an
 independent-host replay or a model-cluster interval. N3 and N4 remain pending.
-N9-N12 are the proposed next gates.
+N9 retains a source/geometric proof gap; N11 and N12 have the results linked above.
 
 1. **N6 proof packet (partially complete).** Freeze the theorem prover and dependency digests;
    encode reduced-divisor well-formedness, every runtime branch predicate,
