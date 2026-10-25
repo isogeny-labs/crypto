@@ -1231,6 +1231,13 @@ fn main() -> Result<()> {
             write_new_json(Path::new(&args[3]),&receipt)?;
             println!("{receipt}");
         },
+        Some("primary-full-d18-m4-model")=>{
+            if args.len()!=5 { return Err("primary-full-d18-m4-model BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (L0 construction only; no SAT search)".into()); }
+            let receipt=primary_adapter::full_d18_m4_model_cli(
+                Path::new(&args[2]),Path::new(&args[3]),Path::new(&args[4]),
+            )?;
+            println!("{receipt}");
+        },
         Some("primary-full-d18-m4")=>{
             if args.len()!=6 { return Err("primary-full-d18-m4 positive|natural BASE_DIR FIXTURE_DIR NEW_OUTPUT_JSON (requires hard 32-GiB cgroup and 1210-s outer cap)".into()); }
             let receipt=primary_adapter::full_d18_m4_cli(

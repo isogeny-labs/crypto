@@ -493,6 +493,101 @@ fn full_d18_four_x_lift(
     Ok(None)
 }
 
+/// Construct the exact first natural-query circuit from the archived full
+/// base without starting a SAT search. This L0 capacity diagnostic has no
+/// cgroup claim or relation/rank inference.
+pub(super) fn full_d18_m4_model_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    if output.exists() {
+        return Err("full D18 model output already exists".into());
+    }
+    let (source_commit, source_attestation_mode) = frozen_chain_source()?;
+    let binary_sha256 = sha256_hex(&fs::read(std::env::current_exe()?)?);
+    let started = Instant::now();
+    let (base, row) = full_d18_load(root)?;
+    let import_ms = started.elapsed().as_secs_f64() * 1000.0;
+    if sha256_hex(&fs::read(fixture_root.join("probe-corpus.json"))?)
+        != FULL_D18_PUBLIC_CORPUS_SHA256
+    {
+        return Err("full D18 model public corpus differs".into());
+    }
+    let (target, corpus_hash) = public_target(fixture_root, &base.curve)?;
+    if point_json(words(&target))
+        != json!(["1834913121178197242856238", "8797964190732846213981377"])
+    {
+        return Err("full D18 model target differs".into());
+    }
+    let BinaryPoint::Affine { x: target_x, .. } = &target else {
+        return Err("full D18 model target is identity".into());
+    };
+    let representatives: Vec<BigUint> = base
+        .factor_base
+        .signed_orbits
+        .iter()
+        .map(|orbit| match &base.factor_base.points[orbit[0]] {
+            BinaryPoint::Affine { x, .. } => Ok(x.to_biguint()),
+            BinaryPoint::Infinity => Err("full D18 model representative is infinity".into()),
+        })
+        .collect::<Result<_>>()?;
+    let size = frobenius_orbit_domain_size(83, 4, representatives.len())
+        .ok_or("full D18 model domain size overflow")?;
+    let required_variables = chain_s3_max_variables(83, 4)
+        .ok_or("full D18 model chain size overflow")?
+        .checked_add(size.variables)
+        .ok_or("full D18 model total size overflow")?;
+    if required_variables != 329_726 || size.clauses != 11_238_656 {
+        return Err("full D18 model preflight differs from frozen protocol".into());
+    }
+    let preflight = json!({
+        "schema":"n83.full-d18-m4-model-preflight/v1", "status":"PASS_INPUTS",
+        "source_commit":source_commit, "source_attestation_mode":source_attestation_mode,
+        "binary_sha256":binary_sha256, "object":row["object"],
+        "point_set_blake3":FULL_D18_POINT_SET,
+        "public_corpus_blake3":corpus_hash, "target":point_json(words(&target)),
+        "orbit_columns":representatives.len(),
+        "required_max_variables":required_variables,
+        "required_domain_clauses":size.clauses,
+        "import_ms":import_ms,
+        "isolation":"L0_shared_host_no_hard_cgroup",
+        "solver_search_executed":false,
+        "selected_best_total_runtime":Value::Null,
+    });
+    let preflight_path = std::path::PathBuf::from(format!("{}.preflight.json", output.display()));
+    write_new_json(&preflight_path, &preflight)?;
+    let model_start = Instant::now();
+    let mut enc = ChainedS3Encoding::build(
+        4,
+        &base.curve.curve.irreducible,
+        &base.curve.curve.b,
+        Some(target_x),
+        0,
+        400_000,
+    )
+    .map_err(|_| "full D18 model circuit construction failed")?;
+    enc.constrain_frobenius_orbit_summands(&representatives, 400_000, 12_000_000)
+        .map_err(|_| "full D18 model domain installation failed")?;
+    let result = json!({
+        "schema":"n83.full-d18-m4-model/v1", "status":"PASS_MODEL_CONSTRUCTION_ONLY",
+        "preflight":preflight,
+        "sat_variables":enc.solver.n_vars(),
+        "sat_clauses":enc.solver.n_clauses(),
+        "sat_xor_rows":enc.solver.n_xors(),
+        "sat_and_gates":enc.n_and_gates,
+        "sat_s3_nodes":enc.n_s3_nodes,
+        "model_ms":model_start.elapsed().as_secs_f64()*1000.0,
+        "process_wall_ms":started.elapsed().as_secs_f64()*1000.0,
+        "process_usage":process_usage(),
+        "solver_search_executed":false,
+        "total_index_calculus_runtime_ms":Value::Null,
+        "selected_best_total_runtime":Value::Null,
+    });
+    write_new_json(output, &result)?;
+    Ok(result)
+}
+
 /// One frozen four-summand D18 access gate. The supervisor owns an
 /// independent wall cap; this worker requires its hard 32-GiB, zero-swap
 /// cgroup before importing or constructing the full factor base.
