@@ -78,6 +78,15 @@ output and cap are retained in that receipt. These local controls establish
 index construction and sampled exact-root lookup behavior, with full K5500
 peak RSS and target measurements as the next gates.
 
+On the current release binary, a separate K128 split run with one and four
+root-construction threads reproduced the same base hash, all 680,000 states,
+1,359,488 table entries, and complete state and table digests. The respective
+index-build intervals were 345 ms and 280 ms on the shared local host; these
+are exploratory timing diagnostics. The [thread receipt](k128_root_threads_control.json)
+retains the raw output hashes. The bounded K5500 Pod runner uses four threads
+on its four selected CPUs; a local K5500 serial run retains its own launch
+flags and cap.
+
 ## Next measurement
 
 Use `run_index_stage.py --layout split` from the
