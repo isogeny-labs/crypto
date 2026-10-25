@@ -193,6 +193,15 @@ jobs:
         run: |
           python3 tools/artifacts/artifacts.py pull research/pencil_sparse_20261022/results
           python3 tools/artifacts/artifacts.py pull research/four_followups_20261021/results/pencil-pilot
+      - name: Hydrate matched Kummer validator inputs
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          python3 tools/artifacts/artifacts.py pull research/kummer_differential_collector_20261022/results
+          python3 tools/artifacts/artifacts.py pull research/kummer_coordinates_20261022/results
+          python3 tools/artifacts/artifacts.py pull research/five_leads_e2e_20261019/sessions_projective_chart_v2.tar.zst
       - name: The path check's own tests
         run: python3 scripts/test_check_ic_leaderboard_paths.py
       - name: This workflow's path filter covers every file the builder reads

@@ -97,7 +97,6 @@ struct Measured {
 #[allow(clippy::too_many_arguments)]
 fn measure(
     n: u32,
-    ell: usize,
     d_max: u32,
     ffd_max: u32,
     pair: bool,
@@ -212,19 +211,7 @@ fn main() {
                     continue;
                 }
             }
-            let m = measure(
-                n,
-                ell,
-                d_max,
-                ffd_max,
-                pair,
-                drawn - 1,
-                slug,
-                a,
-                b,
-                &basis,
-                &x_r,
-            );
+            let m = measure(n, d_max, ffd_max, pair, drawn - 1, slug, a, b, &basis, &x_r);
             print_json(n, ell, d_max, &m, semireg);
             eprintln!(
                 "n={n} ℓ={ell}: unsat draw {k} ({}) -> random-b {} ffd {} | b=1 {} ({:.1}s)",

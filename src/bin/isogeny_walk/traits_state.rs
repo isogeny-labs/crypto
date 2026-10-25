@@ -138,6 +138,7 @@ impl TraitsState {
         fs::create_dir_all(&dir).map_err(|e| format!("creating {}: {e}", dir.display()))?;
         let lock = OpenOptions::new()
             .create(true)
+            .truncate(false)
             .read(true)
             .write(true)
             .open(dir.join(".traits.lock"))
