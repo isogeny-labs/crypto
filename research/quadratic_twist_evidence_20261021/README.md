@@ -1,5 +1,7 @@
 # Quadratic twists: native experiments and checked point/pairing transfers
 
+Latest executed round: [registered F13 twist transfer and useful S3 comparison](reports/cm8-transfer-20261025/README.md). Native independent replay verifies12arms/72main-source scalar recoveries and196addition pairs;17new Lean theorems check actual subgroup transport and finite lift/log implications. All54canonical target comparisons are retained:3reduced joint useful-rank/degree gains,0original; matched relation conservation and4matched degree changes favoring the source remain explicit. Full scoped gate208public/269audited,0extra trusted. [Explicit dual](../../backlog/XP-20261025-cm8-explicit-dual/README.md) is next, unexecuted. No general regularity/speedup claim or merge-gate discharge.
+
 The [executed phase-demand continuation](reports/phase-demand-20261025/README.md)
 adds40 actual base setups and400 separate nonidentity main-source recoveries,
 all independently replayed and verified. For the first F43 policy/target,

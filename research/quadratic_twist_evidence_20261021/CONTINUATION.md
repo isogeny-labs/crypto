@@ -83,14 +83,14 @@ keeps both old arms and adds uncached direct signs. That comparison is now
 identical ordered operand/lift/certificate behavior; direct has two fewer cold
 additions than cache in all400 records, while cache has fewer negations. No
 overall cost ranking follows. The next [registered F13 degree-two transfer draft](../../backlog/XP-20261025-cm8-quadratic-transfer/README.md)
-returns to actual non-isomorphic transfer and useful S3 yield/degree, using already registered exact models and explicit exceptional-case/subgroup checks.
+is now [executed](reports/cm8-transfer-20261025/README.md):12arms/72source scalars/196actual addition pairs,3of54 reduced joint gains and0original. Matched rows/ranks are conserved;4matched degree changes favor the source. Actual F13 subgroup scalar transport is kernel checked. Next, the [explicit dual draft](../../backlog/XP-20261025-cm8-explicit-dual/README.md) checks doubling composition and an actual subgroup inverse before replacing enumerative base pullback.
 A non-isomorphic twist comparison still needs an explicit scalar-preserving
 subgroup map or pairing-mediated route before claiming main-DLP benefit;
 base-field rational points must not be silently transported by a generic twist.
 
 | Work item | Next checkable deliverable | Evidence needed before promotion |
 | --- | --- | --- |
-| Solver relevance / actual transfer | Construct the standard degree-two twist map on an exact coprime subgroup, then compare actual S3 systems | Reuse exact registered models and preserve strict catalog/provenance; prove/check exceptional map and scalar transport, independent useful rank/degree and full source recovery; direct/cached costs remain unpriced |
+| Solver relevance / actual transfer | Verify an explicit dual and odd-subgroup inverse of the now checked F13 forward map | Preregister exact coordinate/composition/kernel checks; replace only public-base pullback, preserve all checked useful ranks/degrees and source recoveries; complete transfer/cost/general geometry remains open |
 | Alternative encoding | Specify an actual descent/rationality encoding and test whether its leading ideal can differ | Exact field/subgroup/map, actual-point lifting, matched-base/pullback controls, bounded native comparison and faithful Lean statements |
 | Useful yield | Test or prove the yield of rank-increasing rows under an explicit candidate/target policy | Full rank progression, failed attempts and dependence assumptions; raw zeros and multiple rows per call remain distinct |
 | Main-DLP benefit | Combine a surviving candidate with a scalar-preserving reduction and complete work accounting | Setup, relation solving, linear algebra, descent, transfer, recovery and verification on the same public synthetic target; applicable external references for any speed claim |

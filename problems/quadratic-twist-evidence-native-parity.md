@@ -278,3 +278,9 @@ The 2026-10-24 continuation follows the user's positive pairing request and
 checks the explicit finite transfer, its native IC recoveries and degeneracy
 controls. It closes that bounded bridge, retaining the generic geometric,
 cost, coordination, review, CI/access and merge-conflict holds.
+
+## Registered F13 transfer continuation (2026-10-25)
+
+[Executed report](../research/quadratic_twist_evidence_20261021/reports/cm8-transfer-20261025/README.md): actual coordinate map,196rational addition pairs,12arms/72verified main-source scalars. Seventeen new actual-object/group/field theorems yield208public/269audited total,0extra trusted; IDC1h45f7f67f60c827c3 is polynomial-only,17identities total. All54paired target comparisons show3reduced joint gains/0original. Matched rows/ranks are conserved;4degree changes favor the source. Strongest-policy/stationary-yield, intrinsic regularity and complete cost remain unproved. General classification/normalization/geometric isogeny are not inferred from finite point checks.
+
+The [explicit dual draft](../backlog/XP-20261025-cm8-explicit-dual/README.md) must verify actual composition/doubling/odd-subgroup inverse before replacing finite public-base pullback. No new registry/catalog/benchmark record, upload/credential reuse or Conductor lease. All broader formal, coordination, CI/review and integration holds remain.

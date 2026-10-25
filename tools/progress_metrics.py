@@ -218,11 +218,29 @@ def twist_direct_sign(ref):
                      label="F43 prefix/Q=P cold component; unpriced", source=path)
 
 
+
+def twist_cm8_transfer(ref):
+    """Exact committed finite audit counts; no general or cost extrapolation."""
+    path = "research/quadratic_twist_evidence_20261021/native/cm8-transfer-20261025/audit.json"
+    text = show(ref, path)
+    if text is None:
+        return
+    d = json.loads(text)
+    if d.get("status") != "passed":
+        return
+    for key in ("verified", "addition_pairs", "joint_original", "joint_reduced",
+                "matched_degree_equal", "matched_degree_different"):
+        emit(f"ic.twist.cm8_transfer.{key}", d[key], date="2026-10-25",
+             problem=P_IC, unit="finite audit count", better="higher",
+             label="F13 finite audit; no cost or generalization", source=path)
+
+
 def main():
     a = args()
     twist_known_roots(a.ref)
     twist_signed_cache(a.ref)
     twist_direct_sign(a.ref)
+    twist_cm8_transfer(a.ref)
     leaderboard(a.ref, a.since)
     timeline(a.ref)
     perf_history(a.since)
