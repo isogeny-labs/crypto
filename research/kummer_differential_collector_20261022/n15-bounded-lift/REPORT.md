@@ -57,6 +57,18 @@ not depend on the scalar replay. The existing model actions were derived
 and checked on finite cases, not certified symbolically for every group
 state; this is the remaining all-state model certificate gap.
 
+The later [exact basis audit](../n17-mixed-zero-gate/REPORT.md) checked that
+the matrix inverted by `general()` is `C1`, while the direct cancelled
+degree-two formula uses `C2`. These are equivalent coordinate bases:
+with `sigma=1+lambda+mu+nu`,
+`C2(1,-a1,-a0,q3)=C1(1,-a1,a0,q3+sigma*a0)`.
+Thus `general()` recovers the alternate degree-two vector with `a0` in
+its third entry, as `degree_two_candidates()` expects. An interim concern
+that the distinct matrices invalidated this inversion is withdrawn. This
+basis audit changes none of the 138,095 replay rows or operation counters;
+the source-independent geometric projection and all-state mixed-xADD
+fallback remain separate gates.
+
 For cached theta xADD, let `z=H((H(x)⊙H(y))/t)` and
 `out_i=z_i²*product_{j≠i} d_j`. It returns the zero vector exactly when
 every `i` has `z_i=0` or some other `d_j=0`. With all four coordinates of

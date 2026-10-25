@@ -112,8 +112,10 @@ remain unproved/unmeasured.
 
 The earlier [chart note](CHART_NONVANISHING.md) incorrectly identified the
 degree-two direct chart matrix `C2` with the source degree-one
-`conversion_matrix` (`C1`). Their third columns differ, and the earlier
-N16 determinant in `results/summary.json` was for `C1`. The corrected
+`conversion_matrix` (`C1`). Their third columns differ, but
+`C2(1,-a1,-a0,q3)=C1(1,-a1,a0,q3+sigma*a0)` with
+`sigma=1+lambda+mu+nu=-f4`; N15 correctly inverts this alternate `C1`
+degree-two vector. The earlier N16 determinant in `results/summary.json` was for `C1`. The corrected
 [exceptional packet](EXCEPTIONAL_IDEAL.md) checks nonzero determinants of
 **both** matrices on all 21 fields and retains the
 [wrong-basis raw diagnostic](results/exceptional-ideal-wrong-basis.json):

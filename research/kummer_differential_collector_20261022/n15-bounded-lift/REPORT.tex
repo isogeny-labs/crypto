@@ -47,6 +47,15 @@ roots, and thirteen candidate checks, conditional on the frozen action and
 projection identities. Those identities have finite source checks but no
 all-state symbolic certificate in this packet.
 
+\noindent A later exact 21-model basis audit confirms that the direct
+degree-two matrix $C_2$ and the matrix $C_1$ inverted by \texttt{general()}
+encode the same chart. With $\sigma=1+\lambda+\mu+\nu$,
+$C_2(1,-a_1,-a_0,q_3)^T=C_1(1,-a_1,a_0,q_3+\sigma a_0)^T$.
+The third entry recovered by the source is therefore $a_0$ as expected.
+An interim inversion-mismatch concern is withdrawn; the finite rows and
+cost counters are unchanged. Geometric projection and the all-state
+mixed-xADD fallback remain unproved.
+
 \noindent After one-time inverse setup, the safe-path signed module counted
 50,592,561 M, 38,978,317 A and 2,627,310 I. Native Jacobian checks add
 9,834,278 M, 414,369 S, 147,036 I, 15,791,770 field additions and

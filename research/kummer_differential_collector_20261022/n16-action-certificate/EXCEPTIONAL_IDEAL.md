@@ -23,13 +23,17 @@ The degree-two row is `C2[i]=s_i*(c_i*d2_i,-c_i,d2_i,-1)`.
 The source degree-one `conversion_matrix` row is
 `C1[i]=s_i*(c_i*d2_i,-c_i,d1_i,-1)`. Exact finite-field determinants
 are nonzero for both on all 21 models and unequal for every model.
-The earlier N16 `general_conversion_determinant` was for `C1` only;
-it did not prove degree-two nonvanishing. The corrected `C2` determinant
-does: its input vector starts with 1. The `C1` input vector
+The earlier N16 `general_conversion_determinant` was for `C1` only.
+That determinant also proves degree-two nonvanishing after the exact basis
+change `C2(1,-a1,-a0,q3)=C1(1,-a1,a0,q3+sigma*a0)`, where
+`sigma=1+lambda+mu+nu=-f4`. In particular, the existing N15 `general()`
+inverts the correct alternate degree-two vector. The corrected `C2`
+determinant gives the direct check: its input vector starts with 1. The `C1` degree-one input vector
 `(0,1,x,x²)` has second coordinate 1, so it is nonzero for every x.
 
 The [retained wrong-basis diagnostic](results/exceptional-ideal-wrong-basis.json)
-reruns the initial, erroneous `C1=C2` assumption. All 105 model/root
+runs the initial, erroneous `C1=C2` assumption **without transforming the
+degree-one input vector**. All 105 model/root
 pairs have six nonzero exceptional cross-products, and 84 of 105 pairs
 have mismatching `O`/torsion checks. This is a failed diagnostic, not a
 counterexample to the corrected action. The original 27,470 finite

@@ -6,7 +6,7 @@
 \date{25 October 2026}
 \begin{document}
 \maketitle
-\noindent The source degree-one matrix $C_1$ differs from the cancelled degree-two matrix $C_2$ in its third column. The earlier N16 chart note claimed they were the same; that statement is retracted. The original finite replay already used $C_1$. The retained wrong-basis diagnostic reproduces the failed assumption, while the corrected exact packet uses $C_1$ for degree one and $C_2$ for degree two.
+\noindent The source matrix $C_1$ differs from the cancelled degree-two matrix $C_2$ in its third column. The earlier N16 chart note claimed they were the same; that statement is retracted. The difference is an exact degree-two basis change: for $\sigma=1+\lambda+\mu+\nu$, $C_2(1,-a_1,-a_0,q_3)^T=C_1(1,-a_1,a_0,q_3+\sigma a_0)^T$. Thus N15 correctly inverts $C_1$ for degree-two inputs. The retained wrong-basis diagnostic applies $C_2$ to the degree-one vector without this transformation; the corrected exceptional check uses $C_1$ for degree one and $C_2$ for the direct degree-two vector.
 
 \begin{center}\begin{tabular}{lr}\toprule Exact recorded quantity & Value\\\midrule
 Models / torsion roots per model & 21 / 5\\

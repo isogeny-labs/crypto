@@ -6,7 +6,12 @@ identified the degree-two chart matrix with
 `src/main.rs::conversion_matrix` and claimed that the degree-one candidate
 used the same matrix. That identification is false. The degree-two matrix
 `C2` and the source degree-one matrix `C1` have different third columns.
-The original finite replay used the actual source `C1`; its counts are
+The matrices are nevertheless equivalent **degree-two coordinate bases**.
+Put `sigma=1+lambda+mu+nu=-f4`. Their third columns satisfy
+`C2[:,2]=-C1[:,2]-sigma*C1[:,3]`, with all other columns equal. Hence
+`C2(1,-a1,-a0,q3)=C1(1,-a1,a0,q3+sigma*a0)` exactly. N15's `general()`
+inverts the valid `C1` representation; the different columns do not
+invalidate its candidate inversion. The original finite replay used the actual source `C1`; its counts are
 unchanged. A retained [wrong-basis diagnostic](results/exceptional-ideal-wrong-basis.json)
 gives nonzero exceptional cross-products in all 105 pairs when `C2` is
 incorrectly reused for degree one. The corrected [exact packet](EXCEPTIONAL_IDEAL.md)
@@ -41,8 +46,9 @@ C2[i,*] = s[i] * (c[i]*d[i], -c[i], d[i], -1).
 ```
 
 The distinct name `c_theta` avoids confusing a theta scale with the array
-`c`. `C2` differs from `src/main.rs::conversion_matrix`, which is the
-degree-one matrix `C1`; see the corrected proof packet for both exact rows.
+`c`. `C2` differs from `src/main.rs::conversion_matrix`, denoted `C1`;
+the latter is used for degree one and for the alternate degree-two
+coordinate vector above.
 The direct cancelled chart has coordinate
 
 ```text
@@ -59,7 +65,9 @@ No Mumford equation or division is required for (2). The first entry of the
 right-hand input is 1. The exact finite-field determinant checks in
 `results/exceptional-ideal.json` show `det(C2) != 0` in each of the 21
 fields. The older `results/summary.json` determinant refers to `C1`, not
-`C2`.
+`C2`. Since the equivalent `C1` vector also starts with 1, the older
+nonzero `C1` determinant does prove degree-two nonvanishing after the
+basis change. The direct `C2` determinant supplies a separate check.
 Consequently `K != 0` for **every** `a0,a1,b1` in each such field, including
 the source-zero locus `a0=b0=0`. In particular, the direct chart cannot fail
 by producing the zero vector on a valid degree-two Mumford divisor. This
