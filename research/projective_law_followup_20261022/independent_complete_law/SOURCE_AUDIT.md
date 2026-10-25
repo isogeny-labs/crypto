@@ -56,20 +56,11 @@ each of the wrapper and retained-state arms against same-process rho; its
 operation-cost ratios remain 3.7938 and 4.1793, respectively, at its stated
 representative price.
 
-## Specific discrepancy
+## Corrected N6 source attribution
 
-The previously inspected author Magma code has the doubling intermediate
-`N6=(2R-3Q²-a3 Z⁴)W`, whereas the Rust law uses the homogeneous `W²` variant.
-The exact `p=739, W=3` fixture in
-[n6-w-power-regression.json](../results/n6-w-power-regression.json) gives the
-author-code transcription a divisor different from independent Cantor and
-gives the `W²` variant the matching divisor. The paper does not print that
-particular `N6` expression, so this is a discrepancy with the inspected
-Magma code, **not** a demonstrated erratum in the article. The N6
-[homogeneity packet](../n6-homogeneity/REPORT.md) gives its bounded proof and
-counterexample. Any strict “literal author-code” implementation would
-reintroduce this known finite mismatch for non-unit `W`; the measured arm uses
-the verified homogeneous variant.
+The pinned [author Magma file](https://github.com/ozbayelif/jac-on-jac/blob/ec98e115ed359c8b7facf559eb0d9f240703f6f5/jac-on-jac.m#L2506-L2512), SHA-256 `7416a7fffaafff371738e7498a6795057372e1c477e0079297eebf2347c2e72a`, assigns `WW1 := W1^2` before `N6 := (2R1 - 3Q1^2 - a3 Z1^4)*WW1`. The prior audit mistook the alias `WW1` for `W1`. The author code and measured Rust both use the homogeneous `W²` factor in this intermediate. The 2024 article defines the same six-coordinate weights in §4 and gives the corresponding affine doubling coefficients in Eq. (7), but does not print this particular N6 line.
+
+The exact `p=739, W=3` [regression](../results/n6-w-power-regression.json) remains a valid **synthetic W¹ mutation control**: its historical field names `n6_transcribed_*` and `transcribed_*` denote the mistaken transcription, not the author code. It demonstrates the mutation's mismatch with independent Cantor and the W² branch's match. The [source-correction packet](../n6-homogeneity/source-correction/README.md) checks the pinned alias and the weighted-to-affine coefficient mapping. The earlier claim of an author-code discrepancy is withdrawn. No cost row or frozen raw evidence changed.
 
 ## Reproduction and limits
 
@@ -85,5 +76,5 @@ run. This audit deliberately adds no duplicate implementation or cost claim.
 | Published weighted complete-law implementation | Implemented and finite-tested | Branch map, dispatcher, arithmetic gate and proof audit |
 | Inversion-free weighted operation | Source-audited | Inversions are at setup/normalization boundaries; no separate all-call formal non-use proof |
 | Full 1,260-target cost against matched rho | Verified operation-price result | Existing frozen collector report and validator |
-| Literal author-code fidelity | Contradicted for `N6` at non-unit `W` | Pinned Magma hash and `p=739, W=3` regression |
+| Author-code N6 parity | Verified for the N6 exponent and affine coefficients only | Pinned Magma `WW1 := W1^2`, source-correction packet; full byte-for-byte law parity remains unverified |
 | Universal mathematical correctness | Partial | Exact branch certificates exist; formal source/Pic0 bridge and independent review remain open |

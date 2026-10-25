@@ -26,8 +26,8 @@ for row in rows:
     x = 90 + 150 * (int(row["mu"]) - 1)
     parts.append(f'<text x="{x-4}" y="431" font-family="sans-serif" font-size="13">{row["mu"]}</text>')
 for key, color, label, ylegend in [
-    ("aa_squared_w", "#1d6aa7", "implemented W²: |AA|=μ³", 455),
-    ("aa_linear_w", "#bd531e", "author-code W¹: |AA|=μ²", 477),
+    ("aa_squared_w", "#1d6aa7", "author/Rust W²: |AA|=μ³", 455),
+    ("aa_linear_w", "#bd531e", "synthetic W¹ mutation: |AA|=μ²", 477),
 ]:
     points = [xy(row, key) for row in rows]
     path = " ".join(("M" if i == 0 else "L") + f"{x:.1f},{y:.1f}" for i, (x, y) in enumerate(points))

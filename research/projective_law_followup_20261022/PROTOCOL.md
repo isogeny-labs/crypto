@@ -33,10 +33,12 @@ charged split-boundary inversions, not an inversion-free end-to-end collector.
 Before full execution, the arithmetic gate checks all supported branches on
 the 21 models, including non-unit projective `Z` and `W`, same-support,
 inverse, degree-drop, and exceptional doubling cases. The gate records
-uncaught branches explicitly. A separate regression records a non-unit-W
-counterexample to the author's Magma `N6` expression as transcribed and the
-homogeneous variant used here. No claim about the 2024 paper's omitted common
-doubling equation follows from that code comparison.
+uncaught branches explicitly. A separate regression records a non-unit-W counterexample to a synthetic
+W¹ mutation of the N6 factor and the matching homogeneous W² branch.
+The pinned author Magma source defines `WW1=W1²` and uses `WW1` in N6;
+the earlier author-code discrepancy attribution was a transcription error.
+No universal claim about the complete doubling equation follows from this
+finite comparison.
 
 Every candidate record retains the frozen workload id/hash, target index,
 seed, cap, recovered scalar, verification, phase counts, native logical counts,

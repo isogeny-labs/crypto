@@ -65,11 +65,11 @@ formula identities.
    force `f'(x_P)=0`.
 
 The [published complete law](https://doi.org/10.1007/s13389-024-00351-7)
-is for the mapped equation family. The implementation corrected the
-homogeneity of one `W` power in the doubling expression; the retained
-`p=739` regression demonstrates that the literal transcribed term gives
-a different result. The paper's completeness statement cannot by itself
-certify the modified implementation.
+is for the mapped equation family. The implementation and pinned author Magma both use `W²` in N6. The
+retained `p=739` regression instead demonstrates that a synthetic `W¹`
+mutation gives a different result; its historical `transcribed_*` fields
+are not author-code evidence. The paper's completeness statement cannot
+by itself certify the compiled implementation.
 
 ## Exact coefficient certificates and divisor arguments
 
@@ -390,7 +390,7 @@ has normalized `u₃=U/C²`, and the checker verifies the cleared
 congruence `C⁵N+S C²X+T≡0 (mod U)` for the literal `s3=S,t3=T`.
 With `z3=C,w3=B`, the returned `v₃=-L mod u₃`, so it is the
 divisor-class double. Thirteen scale identities check the literal
-weighted generic path, including the corrected `w²` factor in `n6`.
+weighted generic path, including the author-code-consistent `w²` factor in `n6`.
 
 When `B≠0,C=0`, the same exact identity gives
 `U=-B²X+Xnum` with `Xnum=2qB²+A²`, so

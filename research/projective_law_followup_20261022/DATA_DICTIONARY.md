@@ -57,6 +57,8 @@ are `weighted_1plus2_unchecked`, `weighted_all_2plus2_unchecked`, and
 `weighted_targeted_add22_unchecked`.
 The
 `n6_w_power_regression` field in the `p=739` row records exact affine and
-weighted input coordinates, the transcribed and homogeneous exponents, both
-output divisors, and the independently computed Cantor output. A standalone
-copy is in `results/n6-w-power-regression.json` for direct review.
+weighted input coordinates, the synthetic W¹ mutation and production W²
+exponents, both output divisors, and the independent Cantor output. The
+historical `transcribed_*` keys name the mistaken transcription, not the
+author Magma source. A standalone copy is in
+`results/n6-w-power-regression.json` for direct review.

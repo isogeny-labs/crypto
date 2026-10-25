@@ -41,5 +41,7 @@ under the specified two weight assignments. It does not establish a theorem
 that every compiled Rust branch agrees with the published formulas over all
 odd fields, nor the smooth-projective divisor/Pic⁰ class equation. The
 published-law source audit already identifies a specific non-unit-`W`
-discrepancy between author Magma's `N6` and the homogeneous Rust variant.
+historical misreading of author Magma's `WW1` alias. The author source
+sets `WW1=W1²` and uses it in `N6`, matching Rust; the W¹ alternative is a
+synthetic mutation control.
 The frozen 1,260-target collector operation-cost ratios are unchanged.

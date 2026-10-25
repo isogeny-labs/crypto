@@ -40,12 +40,7 @@ The projective-state hash uses raw weighted coordinates, so its deterministic
 walk differs from the wrapper despite shared workloads and seeds; the direct
 ratio includes this walk difference.
 
-The p=739 regression records the exact non-unit-W input and the outputs of
-the transcribed author-code `N6` expression and the homogeneous variant.
-The comparison establishes a mismatch for the transcribed code expression;
-it does not establish an error in any equation omitted from the published
-article. The paper and author-code references and source commit/hash are in
-`MANIFEST.md`.
+The p=739 regression records the exact non-unit-W input and outputs of a synthetic W¹ mutation and the production W² expression. Its historical `transcribed_*` field names are retained unchanged but do not denote the author code. The pinned Magma file assigns `WW1:=W1^2` before using `WW1` in N6; the prior claimed author-code mismatch was an alias-reading error. The W¹ mutation mismatches independent Cantor while the W² branch matches. This finite test does not prove the complete law. Source commit and hashes are in `MANIFEST.md`; the source-correction packet checks this alias explicitly.
 
 Crate-local verification commands: `cargo fmt --all -- --check`,
 `cargo check --release --locked --bins`, `cargo test --release --locked`,

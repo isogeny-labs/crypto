@@ -60,15 +60,7 @@ Cantor arithmetic: 24,192 weighted 1+2 cases, 26,880 sampled weighted 2+2
 pairs, 2,310 targeted weighted 2+2 exceptional cases, 1,680 weighted doubles,
 and 21,504 consecutive weighted-state additions. Its records explicitly
 include inverse, shared-support, coincident-support, degree-drop, and doubling
-branches, with zero unchecked weighted cases. The [exact p=739, W=3
-regression](results/n6-w-power-regression.json) retains the transcribed
-author-code `N6` expression, the homogeneous `W²` variant, both resulting
-divisors, and the independent Cantor divisor. The comparison is scoped to
-the transcribed Magma code at
-[ozbayelif/jac-on-jac](https://github.com/ozbayelif/jac-on-jac), rather than
-an unshown equation in the [published paper](https://link.springer.com/article/10.1007/s13389-024-00351-7).
-Finite branch checks do not establish universal correctness for every curve
-or input.
+branches, with zero unchecked weighted cases. The [exact p=739, W=3 regression](results/n6-w-power-regression.json) compares the production W² factor with a synthetic W¹ mutation. Its historical `transcribed_*` field names refer to that mistaken transcription, not the pinned author code. The [pinned Magma source](https://github.com/ozbayelif/jac-on-jac/blob/ec98e115ed359c8b7facf559eb0d9f240703f6f5/jac-on-jac.m#L2506-L2512) defines `WW1=W1²` and uses `WW1` in N6; the prior author-code discrepancy claim is withdrawn. Both source implementations use W² there. Finite branch checks do not establish universal correctness for every curve or input.
 
 The subsequent [proof audit](PROOF_AUDIT.md) compared another 1,224,000
 weighted additions on 42 models with independent Cantor arithmetic, with zero

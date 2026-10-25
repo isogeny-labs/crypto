@@ -44,15 +44,18 @@ verified all source scalars. At the report's representative operation price,
 wrapper/rho is 3.7938 and retained-state/rho is 4.1793. These are operation
 price ratios, not isolated wall-time ratios.
 
-\noindent\textbf{Discrepancy and remaining boundary.} The inspected author
-Magma code at commit\\\texttt{ec98e115ed359c8b7facf559eb0d9f240703f6f5}
-uses an $N_6$ term proportional to $W$ in its doubling path; the measured Rust
-path uses $W^2$. In the exact $p=739$, $W=3$ fixture, the latter matches
-independent Cantor and the former does not. The article does not print that
-specific $N_6$ expression, so this does not establish an erratum in the
-article. Universal machine-checked group-law correctness, the full
-projective-infinity/Pic$^0$ bridge, and isolated wall-time comparison remain
-open. The frozen cohort is unchanged.
+\noindent\textbf{Corrected N6 source attribution.} The pinned author
+Magma file at commit \texttt{ec98e115} (full hash in the companion audit)
+sets \texttt{WW1:=W1\string^2} before its \texttt{N6} assignment multiplies
+by \texttt{WW1}. The prior audit mistook this alias for \texttt{W1}.
+Thus the author code and Rust both use $W^2$ in this intermediate.
+The exact $p=739$, $W=3$ fixture tests a synthetic $W^1$ mutation,
+which disagrees with independent Cantor; its historical raw field names
+are retained. The article defines the same weighted coordinates in
+Section 4 and its affine doubling coefficients in Eq.~(7), but does not
+print this particular $N6$ line. Full compiled Rust-to-published-law
+semantics and the projective/Pic$^0$ bridge remain open. Frozen costs
+are unchanged.
 
 \noindent\textbf{Reproduction.} Read \texttt{SOURCE\_AUDIT.md} and
 \texttt{branch-map.csv} beside this PDF. The gate and reports are in the parent
