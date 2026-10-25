@@ -41,5 +41,27 @@ class ArchivedLabelTests(unittest.TestCase):
         self.assertIn("K_1 / 2^19", problems[0])
 
 
+SESSION_TABLE = "research/ext_endo_rho_20261023/sessions/subfield-fp3.table.md"
+
+
+class ArchivedUnregisteredSlugTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.text = (names.REPO / SESSION_TABLE).read_text()
+
+    def test_only_exact_frozen_session_table_is_allowlisted(self):
+        self.assertTrue(names.archived_unregistered_slug_file(SESSION_TABLE, self.text))
+        self.assertFalse(names.archived_unregistered_slug_file(SESSION_TABLE, self.text + "\n"))
+        self.assertFalse(names.archived_unregistered_slug_file("research/other.md", self.text))
+
+    def test_frozen_table_slugs_are_unregistered_and_the_normal_lint_uses_the_allowlist(self):
+        resolver = names.Resolver()
+        slugs = set(names.SLUG.findall(self.text))
+        self.assertTrue(slugs)
+        self.assertTrue(slugs.isdisjoint(resolver.slugs))
+        with patch.object(names, "tracked", return_value=[SESSION_TABLE]):
+            self.assertEqual(names.lint(resolver, {}, False), [])
+
+
 if __name__ == "__main__":
     unittest.main()
