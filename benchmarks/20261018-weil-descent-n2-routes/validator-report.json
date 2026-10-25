@@ -1,0 +1,722 @@
+{
+ "schema": "validator-report (validation-gate/v1 fields + validator detail)",
+ "status": "pass",
+ "independent": true,
+ "validator": "Validator subagent (claude-opus-5-5, crypto-autoresearcher agents/validator.md), launched by the producing session but with its own nonce, sampling rule, replay builds, verifier and comparison code; the producer's numbers were not used as inputs",
+ "date": "2026-10-24",
+ "commit": "d01c574a271dbf8d04b19636d4612cf9926915eb",
+ "commit_notes": [
+  "Pinned snapshot d01c574a271dbf8d04b19636d4612cf9926915eb (coordinator update). The brief named 3a1aaa916c8017d58b53f08e15f9a8726640323d; the only difference in examples/n2_routes.rs is inside gae_band (Arm D priced over 6 cells), not on any replay path (validator-checked git diff).",
+  "The replay binary was built from the d01c574a271dbf8d04b19636d4612cf9926915eb source (sha256 33f1411d384b85c2fe72979a215181c9ba9336e2aa4e778f369c4b9a0bb0f230); the 3a1aaa916c8017d58b53f08e15f9a8726640323d source has sha256 0937a69b77be0e0ecf3cbb864446c49b2d29922d2bd05d985786838b7255c8f9.",
+  "HEAD later moved to dc46011b90c4ab81a9127616539fbd69bf5a2153 (adds Erratum V text to PROTOCOL.md, REPORT.md, REPORT_ROUND4.md only); every file used here is byte-identical between d01c574a271dbf8d04b19636d4612cf9926915eb and dc46011b90c4ab81a9127616539fbd69bf5a2153 except those three documents, and claimed values were read from the d01c574a271dbf8d04b19636d4612cf9926915eb tree (git archive)."
+ ],
+ "raw_data": [
+  {
+   "path": "../../research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/routes.csv",
+   "repo_path": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/routes.csv",
+   "sha256": "d7102971de9056d085645030d35fae194f5ff64ce140409f747bb1cb559a8898"
+  },
+  {
+   "path": "../../research/weil_descent_angles_20261018/results/itemF-control-run-20261018T2128Z/control.csv",
+   "repo_path": "research/weil_descent_angles_20261018/results/itemF-control-run-20261018T2128Z/control.csv",
+   "sha256": "35f6863d19cce28d88215ae0775e8a028e5079eeb984be4f3afa824699537000"
+  }
+ ],
+ "recompute_tools": [
+  {
+   "path": "research/weil_descent_angles_20261018/validation/recompute.py",
+   "sha256": "4a6e02e94a41eadb856e2d60efee4851917245a1d828337c87b757a08e081d5a",
+   "invocation": "python3 -I research/weil_descent_angles_20261018/validation/recompute.py <tree of d01c574a271dbf8d04b19636d4612cf9926915eb> recompute.out.json"
+  },
+  {
+   "path": "research/weil_descent_angles_20261018/validation/headlines.py",
+   "sha256": "ed2b4783c4dcb9ffc4571a4fbe4b39351fe10ba805dfadbd1b650d64448645f9",
+   "invocation": "python3 -I research/weil_descent_angles_20261018/validation/headlines.py <tree of d01c574a271dbf8d04b19636d4612cf9926915eb> recompute.out.json headlines.out.json"
+  }
+ ],
+ "recompute_outputs": [
+  {
+   "path": "research/weil_descent_angles_20261018/validation/replay/recompute.out.json",
+   "sha256": "add99a117ba3905269b1aacfa099cd0e985f7001052607ef760ac8b8945c46ae"
+  },
+  {
+   "path": "research/weil_descent_angles_20261018/validation/replay/headlines.out.json",
+   "sha256": "924ac31f11c50be381987d04a8a122da64eea14c8afc3f71081f617e094427dc"
+  }
+ ],
+ "text_reproduction": [
+  {
+   "file": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt",
+   "lines_committed": 50,
+   "lines_recomputed": 50,
+   "identical": true,
+   "differing_lines": []
+  },
+  {
+   "file": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/routes_summary.csv",
+   "lines_committed": 325,
+   "lines_recomputed": 325,
+   "identical": true,
+   "differing_lines": []
+  },
+  {
+   "file": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/ranking.csv",
+   "lines_committed": 37,
+   "lines_recomputed": 37,
+   "identical": true,
+   "differing_lines": []
+  },
+  {
+   "file": "research/weil_descent_angles_20261018/results/itemF-control-run-20261018T2128Z/control_summary.txt",
+   "lines_committed": 17,
+   "lines_recomputed": 17,
+   "identical": true,
+   "differing_lines": []
+  },
+  {
+   "file": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt",
+   "lines_committed": 144,
+   "lines_recomputed": 144,
+   "identical": true,
+   "differing_lines": []
+  }
+ ],
+ "headline": [
+  {
+   "name": "itemOJ routes.csv rows with verified=1 (of 1260)",
+   "claimed": 1260,
+   "recomputed": 1260,
+   "rel_tol": 0.0,
+   "claimed_text": "1,260",
+   "claimed_at": "research/weil_descent_angles_20261018/REPORT.md:321"
+  },
+  {
+   "name": "itemF control.csv rows with verified=1 (of 108)",
+   "claimed": 108,
+   "recomputed": 108,
+   "rel_tol": 0.0,
+   "claimed_text": "sum of 'runs' over the 12 'F bits' lines = 108; 'F all answers verified: true'",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemF-control-run-20261018T2128Z/control_summary.txt:1-12,17"
+  },
+  {
+   "name": "K6 rho steps/p mean, 40 bits",
+   "claimed": 0.3882,
+   "recomputed": 0.3881916513990269,
+   "rel_tol": 0.00012879958784131891,
+   "claimed_text": "0.3882",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:49"
+  },
+  {
+   "name": "K6 rho steps/p s.e., 40 bits",
+   "claimed": 0.0341,
+   "recomputed": 0.034081734072488726,
+   "rel_tol": 0.0014662756598240471,
+   "claimed_text": "0.0341",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:49"
+  },
+  {
+   "name": "K6 theory 0.886*sqrt(ell)/p mean, 40 bits",
+   "claimed": 0.3997,
+   "recomputed": 0.3997491512426564,
+   "rel_tol": 0.00012509382036527395,
+   "claimed_text": "0.3997",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:49"
+  },
+  {
+   "name": "Arm J c=1 frozen band (M-native) min, 40 bits",
+   "claimed": 0.942,
+   "recomputed": 0.9420115774172988,
+   "rel_tol": 0.0005307855626326964,
+   "claimed_text": "0.942",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:31"
+  },
+  {
+   "name": "Arm J c=1 frozen band (M-native) max, 40 bits",
+   "claimed": 2.822,
+   "recomputed": 2.822496283627505,
+   "rel_tol": 0.00017717930545712261,
+   "claimed_text": "2.822",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:31"
+  },
+  {
+   "name": "Arm J c=1 steps/p, 40 bits",
+   "claimed": 0.337,
+   "recomputed": 0.3368217740913068,
+   "rel_tol": 0.0014836795252225518,
+   "claimed_text": "0.337",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:31"
+  },
+  {
+   "name": "Arm J c=1 GAE band (Erratum V) min, 40 bits",
+   "claimed": 0.942,
+   "recomputed": 0.9420115774172988,
+   "rel_tol": 0.0005307855626326964,
+   "claimed_text": "0.942",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:133"
+  },
+  {
+   "name": "Arm J c=1 GAE band (Erratum V) max, 40 bits",
+   "claimed": 2.979,
+   "recomputed": 2.9785583133986724,
+   "rel_tol": 0.00016784155756965425,
+   "claimed_text": "2.979",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:133"
+  },
+  {
+   "name": "Arm J c=2 frozen band (M-native) min, 40 bits",
+   "claimed": 0.945,
+   "recomputed": 0.9450560638869964,
+   "rel_tol": 0.0005291005291005291,
+   "claimed_text": "0.945",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:32"
+  },
+  {
+   "name": "Arm J c=2 frozen band (M-native) max, 40 bits",
+   "claimed": 2.826,
+   "recomputed": 2.8263198692226545,
+   "rel_tol": 0.00017692852087756547,
+   "claimed_text": "2.826",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:32"
+  },
+  {
+   "name": "Arm J c=2 steps/p, 40 bits",
+   "claimed": 0.339,
+   "recomputed": 0.33890670382919835,
+   "rel_tol": 0.0014749262536873156,
+   "claimed_text": "0.339",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:32"
+  },
+  {
+   "name": "Arm J c=2 GAE band (Erratum V) min, 40 bits",
+   "claimed": 0.945,
+   "recomputed": 0.9450560638869964,
+   "rel_tol": 0.0005291005291005291,
+   "claimed_text": "0.945",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:137"
+  },
+  {
+   "name": "Arm J c=2 GAE band (Erratum V) max, 40 bits",
+   "claimed": 2.954,
+   "recomputed": 2.954019097419966,
+   "rel_tol": 0.00016926201760324982,
+   "claimed_text": "2.954",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:137"
+  },
+  {
+   "name": "Arm J c=4 frozen band (M-native) min, 40 bits",
+   "claimed": 0.932,
+   "recomputed": 0.931665518430926,
+   "rel_tol": 0.000536480686695279,
+   "claimed_text": "0.932",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:33"
+  },
+  {
+   "name": "Arm J c=4 frozen band (M-native) max, 40 bits",
+   "claimed": 2.787,
+   "recomputed": 2.7871784124586902,
+   "rel_tol": 0.0001794043774668102,
+   "claimed_text": "2.787",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:33"
+  },
+  {
+   "name": "Arm J c=4 steps/p, 40 bits",
+   "claimed": 0.335,
+   "recomputed": 0.33450803857824757,
+   "rel_tol": 0.0014925373134328358,
+   "claimed_text": "0.335",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:33"
+  },
+  {
+   "name": "Arm J c=4 GAE band (Erratum V) min, 40 bits",
+   "claimed": 0.932,
+   "recomputed": 0.931665518430926,
+   "rel_tol": 0.000536480686695279,
+   "claimed_text": "0.932",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:141"
+  },
+  {
+   "name": "Arm J c=4 GAE band (Erratum V) max, 40 bits",
+   "claimed": 2.913,
+   "recomputed": 2.9131157077074215,
+   "rel_tol": 0.00017164435290078958,
+   "claimed_text": "2.913",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:141"
+  },
+  {
+   "name": "Arm D c=1 frozen band (M-native) min, 40 bits",
+   "claimed": 25.118,
+   "recomputed": 25.117987796365103,
+   "rel_tol": 1.990604347479895e-05,
+   "claimed_text": "25.118",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:34"
+  },
+  {
+   "name": "Arm D c=1 frozen band (M-native) max, 40 bits",
+   "claimed": 67.119,
+   "recomputed": 67.11922889232191,
+   "rel_tol": 7.4494554448069845e-06,
+   "claimed_text": "67.119",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:34"
+  },
+  {
+   "name": "Arm D c=1 steps/p, 40 bits",
+   "claimed": 0.368,
+   "recomputed": 0.3678893081081803,
+   "rel_tol": 0.001358695652173913,
+   "claimed_text": "0.368",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:34"
+  },
+  {
+   "name": "Arm D c=1 GAE band (Erratum V) min, 40 bits",
+   "claimed": 11.35,
+   "recomputed": 11.350104169168834,
+   "rel_tol": 4.405286343612335e-05,
+   "claimed_text": "11.350",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:121"
+  },
+  {
+   "name": "Arm D c=1 GAE band (Erratum V) max, 40 bits",
+   "claimed": 67.119,
+   "recomputed": 67.11922889232191,
+   "rel_tol": 7.4494554448069845e-06,
+   "claimed_text": "67.119",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:121"
+  },
+  {
+   "name": "Arm D c=2 frozen band (M-native) min, 40 bits",
+   "claimed": 24.775,
+   "recomputed": 24.77505681550054,
+   "rel_tol": 2.0181634712411707e-05,
+   "claimed_text": "24.775",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:35"
+  },
+  {
+   "name": "Arm D c=2 frozen band (M-native) max, 40 bits",
+   "claimed": 66.327,
+   "recomputed": 66.32672319404853,
+   "rel_tol": 7.538408189726657e-06,
+   "claimed_text": "66.327",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:35"
+  },
+  {
+   "name": "Arm D c=2 steps/p, 40 bits",
+   "claimed": 0.359,
+   "recomputed": 0.359401033101741,
+   "rel_tol": 0.001392757660167131,
+   "claimed_text": "0.359",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:35"
+  },
+  {
+   "name": "Arm D c=2 GAE band (Erratum V) min, 40 bits",
+   "claimed": 11.197,
+   "recomputed": 11.19686711231871,
+   "rel_tol": 4.4654818254889704e-05,
+   "claimed_text": "11.197",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:125"
+  },
+  {
+   "name": "Arm D c=2 GAE band (Erratum V) max, 40 bits",
+   "claimed": 66.327,
+   "recomputed": 66.32672319404853,
+   "rel_tol": 7.538408189726657e-06,
+   "claimed_text": "66.327",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:125"
+  },
+  {
+   "name": "Arm D c=4 frozen band (M-native) min, 40 bits",
+   "claimed": 26.269,
+   "recomputed": 26.269483211627982,
+   "rel_tol": 1.9033842171380717e-05,
+   "claimed_text": "26.269",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:36"
+  },
+  {
+   "name": "Arm D c=4 frozen band (M-native) max, 40 bits",
+   "claimed": 70.104,
+   "recomputed": 70.10448412036706,
+   "rel_tol": 7.132260641332877e-06,
+   "claimed_text": "70.104",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:36"
+  },
+  {
+   "name": "Arm D c=4 steps/p, 40 bits",
+   "claimed": 0.386,
+   "recomputed": 0.38564240387469695,
+   "rel_tol": 0.0012953367875647669,
+   "claimed_text": "0.386",
+   "claimed_at": "research/weil_descent_angles_20261018/results/itemOJ-run-20261018T2132Z/summary.txt:36"
+  },
+  {
+   "name": "Arm D c=4 GAE band (Erratum V) min, 40 bits",
+   "claimed": 11.898,
+   "recomputed": 11.89813906822843,
+   "rel_tol": 4.2023869557908894e-05,
+   "claimed_text": "11.898",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:129"
+  },
+  {
+   "name": "Arm D c=4 GAE band (Erratum V) max, 40 bits",
+   "claimed": 70.104,
+   "recomputed": 70.10448412036706,
+   "rel_tol": 7.132260641332877e-06,
+   "claimed_text": "70.104",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:129"
+  },
+  {
+   "name": "gate point J c=1 w=0 GAE: IC mean cost per solve (GAE), 40 bits",
+   "claimed": 1264882.0,
+   "recomputed": 1264882.2999999998,
+   "rel_tol": 3.952937902507902e-07,
+   "claimed_text": "1.264882e6",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:134"
+  },
+  {
+   "name": "gate point J c=1 w=0 GAE: rho mean cost per solve (GAE), 40 bits",
+   "claimed": 453373.2,
+   "recomputed": 453373.2000000001,
+   "rel_tol": 1.1028441910549632e-07,
+   "claimed_text": "4.533732e5",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:134"
+  },
+  {
+   "name": "gate point J c=1 w=0 GAE: IC/rho ratio, 40 bits",
+   "claimed": 2.7899,
+   "recomputed": 2.789936193846481,
+   "rel_tol": 1.7921789311444858e-05,
+   "claimed_text": "2.7899",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:134"
+  },
+  {
+   "name": "gate point J c=1 w=0.1 GAE: IC mean cost per solve (GAE), 40 bits",
+   "claimed": 1532832.0,
+   "recomputed": 1532831.6900000004,
+   "rel_tol": 3.261936076491096e-07,
+   "claimed_text": "1.532832e6",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:135"
+  },
+  {
+   "name": "gate point J c=1 w=0.1 GAE: rho mean cost per solve (GAE), 40 bits",
+   "claimed": 540461.6,
+   "recomputed": 540461.5633333334,
+   "rel_tol": 9.251351067309871e-08,
+   "claimed_text": "5.404616e5",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:135"
+  },
+  {
+   "name": "gate point J c=1 w=0.1 GAE: IC/rho ratio, 40 bits",
+   "claimed": 2.8362,
+   "recomputed": 2.8361530106713917,
+   "rel_tol": 1.7629222198716593e-05,
+   "claimed_text": "2.8362",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:135"
+  },
+  {
+   "name": "gate point J c=1 w=1 GAE: IC mean cost per solve (GAE), 40 bits",
+   "claimed": 3944376.0,
+   "recomputed": 3944376.2,
+   "rel_tol": 1.2676276298202807e-07,
+   "claimed_text": "3.944376e6",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:136"
+  },
+  {
+   "name": "gate point J c=1 w=1 GAE: rho mean cost per solve (GAE), 40 bits",
+   "claimed": 1324257.0,
+   "recomputed": 1324256.8333333335,
+   "rel_tol": 3.7757021484500366e-07,
+   "claimed_text": "1.324257e6",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:136"
+  },
+  {
+   "name": "gate point J c=1 w=1 GAE: IC/rho ratio, 40 bits",
+   "claimed": 2.9786,
+   "recomputed": 2.978558313398672,
+   "rel_tol": 1.678640972268851e-05,
+   "claimed_text": "2.9786",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:136"
+  },
+  {
+   "name": "gate point J c=2 w=0 GAE: IC mean cost per solve (GAE), 40 bits",
+   "claimed": 1269299.0,
+   "recomputed": 1269298.6422222222,
+   "rel_tol": 3.939182178509555e-07,
+   "claimed_text": "1.269299e6",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:138"
+  },
+  {
+   "name": "gate point J c=2 w=0 GAE: rho mean cost per solve (GAE), 40 bits",
+   "claimed": 453373.2,
+   "recomputed": 453373.2000000001,
+   "rel_tol": 1.1028441910549632e-07,
+   "claimed_text": "4.533732e5",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:138"
+  },
+  {
+   "name": "gate point J c=2 w=0 GAE: IC/rho ratio, 40 bits",
+   "claimed": 2.7997,
+   "recomputed": 2.7996772685774585,
+   "rel_tol": 1.785905632746366e-05,
+   "claimed_text": "2.7997",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:138"
+  },
+  {
+   "name": "gate point J c=2 w=0.1 GAE: IC mean cost per solve (GAE), 40 bits",
+   "claimed": 1533557.0,
+   "recomputed": 1533556.7755555555,
+   "rel_tol": 3.2603939729661173e-07,
+   "claimed_text": "1.533557e6",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:139"
+  },
+  {
+   "name": "gate point J c=2 w=0.1 GAE: rho mean cost per solve (GAE), 40 bits",
+   "claimed": 540461.6,
+   "recomputed": 540461.5633333334,
+   "rel_tol": 9.251351067309871e-08,
+   "claimed_text": "5.404616e5",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:139"
+  },
+  {
+   "name": "gate point J c=2 w=0.1 GAE: IC/rho ratio, 40 bits",
+   "claimed": 2.8375,
+   "recomputed": 2.8374946149680653,
+   "rel_tol": 1.7621145374449342e-05,
+   "claimed_text": "2.8375",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:139"
+  },
+  {
+   "name": "gate point J c=2 w=1 GAE: IC mean cost per solve (GAE), 40 bits",
+   "claimed": 3911880.0,
+   "recomputed": 3911879.9755555554,
+   "rel_tol": 1.2781578167019437e-07,
+   "claimed_text": "3.911880e6",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:140"
+  },
+  {
+   "name": "gate point J c=2 w=1 GAE: rho mean cost per solve (GAE), 40 bits",
+   "claimed": 1324257.0,
+   "recomputed": 1324256.8333333335,
+   "rel_tol": 3.7757021484500366e-07,
+   "claimed_text": "1.324257e6",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:140"
+  },
+  {
+   "name": "gate point J c=2 w=1 GAE: IC/rho ratio, 40 bits",
+   "claimed": 2.954,
+   "recomputed": 2.9540190974199656,
+   "rel_tol": 1.6926201760324983e-05,
+   "claimed_text": "2.9540",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:140"
+  },
+  {
+   "name": "gate point J c=4 w=0 GAE: IC mean cost per solve (GAE), 40 bits",
+   "claimed": 1251720.0,
+   "recomputed": 1251719.6155555553,
+   "rel_tol": 3.994503563097178e-07,
+   "claimed_text": "1.251720e6",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:142"
+  },
+  {
+   "name": "gate point J c=4 w=0 GAE: rho mean cost per solve (GAE), 40 bits",
+   "claimed": 453373.2,
+   "recomputed": 453373.2000000001,
+   "rel_tol": 1.1028441910549632e-07,
+   "claimed_text": "4.533732e5",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:142"
+  },
+  {
+   "name": "gate point J c=4 w=0 GAE: IC/rho ratio, 40 bits",
+   "claimed": 2.7609,
+   "recomputed": 2.760903413689991,
+   "rel_tol": 1.8110036582273897e-05,
+   "claimed_text": "2.7609",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:142"
+  },
+  {
+   "name": "gate point J c=4 w=0.1 GAE: IC mean cost per solve (GAE), 40 bits",
+   "claimed": 1512319.0,
+   "recomputed": 1512318.992222222,
+   "rel_tol": 3.3061807727073454e-07,
+   "claimed_text": "1.512319e6",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:143"
+  },
+  {
+   "name": "gate point J c=4 w=0.1 GAE: rho mean cost per solve (GAE), 40 bits",
+   "claimed": 540461.6,
+   "recomputed": 540461.5633333334,
+   "rel_tol": 9.251351067309871e-08,
+   "claimed_text": "5.404616e5",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:143"
+  },
+  {
+   "name": "gate point J c=4 w=0.1 GAE: IC/rho ratio, 40 bits",
+   "claimed": 2.7982,
+   "recomputed": 2.798198974400496,
+   "rel_tol": 1.786862983346437e-05,
+   "claimed_text": "2.7982",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:143"
+  },
+  {
+   "name": "gate point J c=4 w=1 GAE: IC mean cost per solve (GAE), 40 bits",
+   "claimed": 3857713.0,
+   "recomputed": 3857713.3822222217,
+   "rel_tol": 1.2961047128181905e-07,
+   "claimed_text": "3.857713e6",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:144"
+  },
+  {
+   "name": "gate point J c=4 w=1 GAE: rho mean cost per solve (GAE), 40 bits",
+   "claimed": 1324257.0,
+   "recomputed": 1324256.8333333335,
+   "rel_tol": 3.7757021484500366e-07,
+   "claimed_text": "1.324257e6",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:144"
+  },
+  {
+   "name": "gate point J c=4 w=1 GAE: IC/rho ratio, 40 bits",
+   "claimed": 2.9131,
+   "recomputed": 2.9131157077074206,
+   "rel_tol": 1.7163846074628403e-05,
+   "claimed_text": "2.9131",
+   "claimed_at": "research/weil_descent_angles_20261018/validation/gae-band/itemOJ-run-20261018T2132Z.txt:144"
+  }
+ ],
+ "gate_three_point_band": {
+  "definition": "mean over rows of (row cost / row GAE), 1 GAE = eadd_M + 3*eadd_I, I = 3M, measured Jacobian pricing, native weight w GAE per native op, IC and rho priced by the same function (H2 Jglue adds the Legendre test at one I per step)",
+  "values": {
+   "J c=1, 40 bits (30 IC rows, 30 rho rows)": {
+    "0": {
+     "ic": 1264882.2999999998,
+     "rho": 453373.2000000001,
+     "ratio": 2.789936193846481,
+     "ic_rows": 30,
+     "rho_rows": 30
+    },
+    "0.1": {
+     "ic": 1532831.6900000004,
+     "rho": 540461.5633333334,
+     "ratio": 2.8361530106713917,
+     "ic_rows": 30,
+     "rho_rows": 30
+    },
+    "1": {
+     "ic": 3944376.2,
+     "rho": 1324256.8333333335,
+     "ratio": 2.978558313398672,
+     "ic_rows": 30,
+     "rho_rows": 30
+    },
+    "order_holds_across_band": true,
+    "cheaper_at_all_three_points": "rho"
+   },
+   "J c=2, 40 bits (30 IC rows, 30 rho rows)": {
+    "0": {
+     "ic": 1269298.6422222222,
+     "rho": 453373.2000000001,
+     "ratio": 2.7996772685774585,
+     "ic_rows": 30,
+     "rho_rows": 30
+    },
+    "0.1": {
+     "ic": 1533556.7755555555,
+     "rho": 540461.5633333334,
+     "ratio": 2.8374946149680653,
+     "ic_rows": 30,
+     "rho_rows": 30
+    },
+    "1": {
+     "ic": 3911879.9755555554,
+     "rho": 1324256.8333333335,
+     "ratio": 2.9540190974199656,
+     "ic_rows": 30,
+     "rho_rows": 30
+    },
+    "order_holds_across_band": true,
+    "cheaper_at_all_three_points": "rho"
+   },
+   "J c=4, 40 bits (30 IC rows, 30 rho rows)": {
+    "0": {
+     "ic": 1251719.6155555553,
+     "rho": 453373.2000000001,
+     "ratio": 2.760903413689991,
+     "ic_rows": 30,
+     "rho_rows": 30
+    },
+    "0.1": {
+     "ic": 1512318.992222222,
+     "rho": 540461.5633333334,
+     "ratio": 2.798198974400496,
+     "ic_rows": 30,
+     "rho_rows": 30
+    },
+    "1": {
+     "ic": 3857713.3822222217,
+     "rho": 1324256.8333333335,
+     "ratio": 2.9131157077074206,
+     "ic_rows": 30,
+     "rho_rows": 30
+    },
+    "order_holds_across_band": true,
+    "cheaper_at_all_three_points": "rho"
+   }
+  }
+ },
+ "notes": [
+  "Every line of the committed summary texts and gae-band outputs was re-derived from the CSVs by the validator's own code and compared byte for byte: itemOJ-run-20261018T2132Z/summary.txt: 50 lines, identical True; itemOJ-run-20261018T2132Z/routes_summary.csv: 325 lines, identical True; itemOJ-run-20261018T2132Z/ranking.csv: 37 lines, identical True; itemF-control-run-20261018T2128Z/control_summary.txt: 17 lines, identical True; gae-band/itemOJ-run-20261018T2132Z.txt: 144 lines, identical True. No line of the CSVs contradicts a summary.",
+  "Symmetry: arm R is rho on E(F_{p^2}) with the negation map (r = 64 adding walk, distinguished points, Bos-Kleinjung-Lenstra fruitless-cycle handling). The verifier computed j(E) for every replayed instance: j is never in F_p and never 0 or 1728 (char p >= 1091). So Aut(E) over the algebraic closure is {+-1}: no small-order automorphism beyond negation exists; and since j^p != j, E is not isomorphic to its conjugate E^sigma, so no GLS-style twisted Frobenius of order 2 or 4 acts on E(F_{p^2}). A map psi = phi o Frobenius built from an isogeny phi: E^sigma -> E has degree p*deg(phi) > 1, so it is not an automorphism and does not give rho equivalence classes (reasoned, not measured). Negation is therefore the strongest symmetry available to rho on these curves. Same binary and unit: arms R and IC run in the same n2_routes process and thread, on the same instance, base point and target, with the same thread-local counters (F_p mult M; F_{p^2} mul 3M, sqr 2M, inv 1I + 4M; hashing / table lookups / LA mod ell as native ops), and are priced by the same cost function. Coverage of this check: 18 distinct curves in this study's replay dumps, against 18 distinct recorded instances (distinct (p, ell) in the CSVs).",
+  "Reference strength (K6): rho steps/p at 40 bits 0.3882 +- 0.0341 against 0.886*sqrt(ell)/p = 0.3997; the reference is not weak at the gate row.",
+  "Gate three points (I = 3M, measured Jacobian op, native 0 / 0.1 / 1 GAE; 1 GAE = the row's eadd_M + 3*eadd_I = 15 M in every row): rho is cheaper at all three points for J at c = 1, 2 and 4 (IC/rho 2.76-2.98x). Distance to the matched rho at measured cost: about 2.8-3.0x at 40 bits. The full Erratum V band (12 cells incl. the IC-favourable 'one Jacobian op = one E(F_{p^2}) addition' price and I = 2 log2 p M) is unresolved for J (min 0.932-0.945, IC cheaper in 1 of 12 cells) and rho-cheaper for D (6 cells).",
+  "The GAE re-pricing (Erratum V) was written after every run; it widens the band (upper ends rise, lower ends unchanged for J) and changes no verdict. At the pinned commit the GAE definition is in n2_routes.rs gae_band and validation/gae-band/*.txt; the PROTOCOL/REPORT erratum text was committed later in dc46011b90c4ab81a9127616539fbd69bf5a2153. Its aggregate claims (J 20-40 bits 0.51-2.98, J 40 bits 0.93-2.98, D 40 bits 11.2-70.1) also match the recomputation.",
+  "control.csv: Jind (independent trials) vs Jwalk steps/p by cofactor reproduce exactly (h=4: 0.3688 vs 0.3443; h=8: 0.2718 vs 0.2917); the Amendment F control is present and consistent with the report.",
+  "The best c per size is a post-hoc minimum (flagged by the protocol); all three c are reported here, none changes a verdict.",
+  "rel_tol for printed decimals = half a unit in the last printed digit / |claimed|; 0 for integer counts. 'claimed_at' cites the file and line in the pinned tree."
+ ],
+ "validation_report": {
+  "id": "VAL-20261024-wd3",
+  "task_id": "(subagent task from the producing session; no TASK card)",
+  "run_ids": [
+   "itemOJ-run-20261018T2132Z",
+   "itemF-control-run-20261018T2128Z"
+  ],
+  "artifact_checks": [
+   "all source-run artifacts tracked and clean at the pinned commit",
+   "pod-run tool sha256 re-derived from git and equal to the pinned hash in rusage.txt",
+   "replay-certificate.json in this directory: exact row replay and scalar verification"
+  ],
+  "metric_recomputations": "62 headline numbers within rel_tol; 573 committed summary/band lines reproduced byte for byte",
+  "control_checks": "K6 rho positive control at every size; Amendment F control (Jind vs Jwalk) reproduced",
+  "heuristic_validation_checks": "P8/P8b/P8c and the Amendment C ranking rule were frozen before the recorded run (Amendments C, E, F, G); the GAE re-pricing is post-hoc and only widens the band",
+  "cost_model_checks": "unit declared (F_p multiplications M, inversions I priced at 3M or 2 log2 p M, native ops at 0/0.1/1 GAE); IC-favourable price flagged; memory not part of these cost rows (H4 reports stored rows separately); total cost per solve is the mean over verified solves (success probability 1 for every recorded row)",
+  "proof_architecture_checks": "not applicable",
+  "verdict": "passed",
+  "limitations": [
+   "Recomputation follows the producer's definitions (PROTOCOL Amendment C / Addendum H / Erratum V and the n2_routes summarize functions, which the validator read); it is an independent implementation of the same definitions, not a blind re-derivation.",
+   "Operation counts are reproducible (exact replay) but were not re-derived by a separate implementation of the arms.",
+   "A passed report makes the receipts admissible evidence; it does not support an ECDLP claim, demonstrate a speedup over rho, or authorize promotion. At the gate's three points rho is cheaper in both studies."
+  ],
+  "artifact_paths": [
+   "benchmarks/20261018-weil-descent-n2-routes/replay-certificate.json",
+   "benchmarks/20261018-weil-descent-n2-routes/validator-report.json",
+   "research/weil_descent_angles_20261018/validation/validation_report.yaml"
+  ]
+ },
+ "review_attestation": {
+  "joints_owned": [
+   "replay",
+   "scalar verification",
+   "headline recomputation",
+   "rho-reference symmetry/unit check"
+  ],
+  "sources_read": [
+   "docs/VALIDATION_GATE.md",
+   "scripts/validation_gate.py (check_* functions)",
+   "scripts/fixtures/validation_gate/positive/*",
+   "research/weil_descent_angles_20261018/PROTOCOL.md (Parts O/J, Amendments C, E, F, G, Addendum H, H-a, H-b, Erratum V)",
+   "research/weil_descent_angles_20261018/REPORT.md and REPORT_ROUND4.md (claimed-value sections)",
+   "examples/n2_routes.rs (main, dump_run, run_job, control_job, hsweep_job, glue_job, row_cost, summarize*, gae_band, arm_rho, counters, xorshift/splitmix)",
+   "the six source run directories (env.txt, CSVs, summaries, rusage.txt)",
+   "research/weil_descent_angles_20261018/validation/gae-band/*.txt",
+   "crypto-autoresearcher docs/agent-runtime-core.md and agents/validator.md"
+  ],
+  "read_sibling_reports": false,
+  "verdict": "holds"
+ }
+}
