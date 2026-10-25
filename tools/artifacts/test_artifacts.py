@@ -134,8 +134,7 @@ class RoundTrip(unittest.TestCase):
 
     def test_check_asks_git_for_full_object_ids(self):
         """A blobless sparse checkout can fetch a missing blob by full id, not by the
-        7-character one `git diff --raw` prints by default (CI's artifacts job failed
-        with "Not a valid object name" on a file outside its sparse set)."""
+        7-character one `git diff --raw` prints by default."""
         shim = Path(self.tmp.name) / "shim"
         shim.mkdir()
         log = shim / "git.log"
@@ -149,9 +148,9 @@ class RoundTrip(unittest.TestCase):
         env = {**self.env, "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}"}
         r = sh(self.repo, sys.executable, str(TOOL), "check", base, env=env)
         self.assertEqual(r.returncode, 0)
-        diffs = [l for l in log.read_text().splitlines() if " diff " in f" {l} " and "--raw" in l]
+        diffs = [line for line in log.read_text().splitlines() if " diff " in f" {line} " and "--raw" in line]
         self.assertTrue(diffs, "check never ran git diff --raw")
-        self.assertTrue(all("--no-abbrev" in l for l in diffs), diffs)
+        self.assertTrue(all("--no-abbrev" in line for line in diffs), diffs)
 
     def test_check_gate(self):
         base = self.git("rev-parse", "HEAD").strip()
