@@ -1,6 +1,6 @@
 # Quartic binary IC lacks wide coefficients, point keys and subgroup scalars
 
-- **Status:** `open`
+- **Status:** `investigating`
 - **Kind:** implementation gap; larger-rung measurements outstanding
 - **Affected work:** [quartic ladder C1/C2](../research/ic_algebraic_crossover_20261023/PROTOCOL.md)
 - **Next action owner:** current IC campaign
@@ -31,7 +31,22 @@ nothing about prime-degree binary fields or prime fields.
   near subgroup size 2^68. Neither is a new campaign measurement.
 - **Suspected explanation:** none needed for the source width limit.
 - **Missing capability:** exact u32 coefficients and >=128-bit packing,
-  subgroup scalar/order arithmetic, complete integration and replay.
+  subgroup scalar/order arithmetic were absent in the original path. The
+  new standalone `gaudry_quartic_bin_wide` core supplies these, with
+  exhaustive/independent controls, high-bit encodings and exact order
+  certificates at m=16/17/18. All three independent audit replays are
+  byte-identical. The registered ecbench/stage/CountedGroup adapters remain
+  u64 and refuse wider specs; full method integration is still missing.
+- **New finite evidence:** [wide-core audit](../research/ic_algebraic_crossover_20261023/reports/run-wide-core-audit-20261025/report.pdf),
+  [protocol](../research/ic_algebraic_crossover_20261023/WIDE_GROUP_AUDIT_PROTOCOL.md),
+  [raw/binary archive reproduction](../research/ic_algebraic_crossover_20261023/verify-wide-core.sh).
+  Field/point/scalar/native-count parity passes old supported control rungs.
+  Full old-method generator/order parity and complete IC remain separate.
+- **Constructor qualification:** an excluded reducible family preserves
+  the returned field; the one before/after instruction profile is attribution,
+  not a native speedup. Six Lean algebraic dependencies are checked; their
+  finite-field/irreducibility bridge remains unformalized. See the
+  [proof map](../research/ic_algebraic_crossover_20261023/lean/README.md).
 - **What this evidence does not establish:** a measured crossover, cost at
   unsupported rungs, or advantage on fields without that intermediate field.
 
@@ -49,8 +64,11 @@ Wider arithmetic only enables measurements; it does not predict their cost.
 
 ## Next discriminating step
 
-- **Action:** execute the registered m=6/8/10/12 smoke and supported m=14/15
-  full panels while building the wider path as a separate method version.
+- **Action:** retain the completed 24-record smoke/replay, let the actual
+  queued additional capped L0 m14/15 runs execute after balanced guessing,
+  and integrate the verified wide core into a separately versioned full
+  factor-base/oracle/relation/linear-algebra path. Original L2 full panels
+  and eight-target wide IC/rho requirements remain open.
 - **Inputs and controls:** frozen `specs/quartic-*.json`, two-target smoke,
   eight-target full rungs, same-target negation rho and repeated rho controls.
 - **Execution limits:** native runner caps and the owner's USD 100 total
@@ -62,4 +80,6 @@ Wider arithmetic only enables measurements; it does not predict their cost.
 
 ## Resolution and history
 
-2026-10-25: source width audit and typed refusals recorded. Unresolved.
+2026-10-25: source width audit and typed refusals recorded. Standalone wider
+core, exact order/high-scalar controls, three independent replays and the
+4,634-pass full library gate completed. Full integration and ladder unresolved.

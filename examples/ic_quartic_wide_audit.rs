@@ -218,8 +218,12 @@ fn profile(study: &Path) -> Value {
         assert_eq!(manifest["status"], "ok");
         assert_eq!(manifest["hotspots_method"], "callgrind");
         let binary = manifest["binary"]["path"].as_str().unwrap();
+        let local_binary = std::env::var_os("IC_PROFILE_BINARY_DIR").map_or_else(
+            || Path::new(binary).to_path_buf(),
+            |d| Path::new(&d).join(Path::new(binary).file_name().unwrap()),
+        );
         assert_eq!(
-            digest(&std::fs::read(binary).unwrap()),
+            digest(&std::fs::read(local_binary).unwrap()),
             manifest["binary"]["sha256"].as_str().unwrap()
         );
         assert_eq!(manifest["command"], json!([binary, "wide", "6"]));

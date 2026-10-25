@@ -26,7 +26,12 @@ as established by the later subgroup relevance audit. A zero-guess Boolean
 refutation is not a complete IC relation or an algorithmic speed gain.
 The instruction profiles are attribution diagnostics, not benchmark timings.
 
-PENDING_ARTIFACTS.json records the two new oversized local PDF copies;
+The additional browsing copies show the qualified 158-attempt D2/D3
+panel, all independently rank/verdict checked and nonrefuting, and the
+one before/after quartic-constructor instruction attribution. Their scope
+is finite-stage counts; no native runtime or complete IC gain is admitted.
+
+PENDING_ARTIFACTS.json records the new oversized local PDF copies;
 it is not an uploaded manifest. Earlier tracked oversized copies and these
 new bytes must follow the artifact-store policy before publication. All
 existing PDFs and raw results remain unchanged.

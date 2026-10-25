@@ -6,6 +6,60 @@ bounded degree law, global guess minimum, complete-price IC improvement or
 measured rho crossover. [PROTOCOL.md](PROTOCOL.md) preserves the original
 scope, amendments, limits and deviations.
 
+## Additional qualified query and wide-core controls
+
+The [qualified-query report](reports/run-qualified-queries-20261025/report.pdf)
+adds all 2,048 draws at (m,n,ell)=(3,22,8),(3,25,9),(4,17,6),(4,18,6),
+four families and 128 draws each. Explicit a=0, full-degree-b curves have
+prime subgroups with cofactor 4,16,8,12. Public hash/lift/cofactor-clear
+targets are paired across families. All finite-chain counts replay; all
+ordered signed point counts, bases and witnesses agree with independent
+BinaryCurve arithmetic. There are 1,591 Boolean-SAT queries and 161 with
+actual subgroup decompositions, all within the Boolean-SAT class. These
+different contracts are retained; no population or full-price claim follows.
+[Native summary](pipeline-receipts/qualified-queries-20261025/summary.json).
+
+The predeclared selection yields 55 negative and 24 positive controls,
+retaining nine/eight quota shortages. All 158 zero-guess degree-two/three
+attempts reach nonrefuting fixed points; all ranks/verdicts agree with the
+separate HKY engine. [Report](reports/run-qualified-closures-20261025/report.pdf),
+[native accounting](pipeline-receipts/qualified-closure-replay-20261025/summary.json),
+[archive reproduction](verify-qualified.sh). Independent cost recount,
+degree four, complete guess minima and full query prices remain open.
+
+The [wide-core report](reports/run-wide-core-audit-20261025/report.pdf)
+checks standalone m=16/17/18 arithmetic, exact group orders, high scalar and
+coordinate bits, serialization and independent replays at extension degrees
+64/68/72. The full library suite passes 4,634 tests, zero failures, 119 ignored;
+later edits leave src/ identical to the frozen arithmetic controls. This is
+not full wider ecbench/IC support. [Protocol](WIDE_GROUP_AUDIT_PROTOCOL.md),
+[reproduction](verify-wide-core.sh), [remaining integration](../../problems/quartic-binary-ic-wide-scalars.md).
+
+The [constructor profile](reports/run-wide-constructor-profiles-20261025/report.pdf)
+records 9,130,856 versus 575,951 simulated whole-process instructions, with
+identical returned field. A/A, repeated A/B, external fastest-tool comparison,
+native runtime and complete-IC pricing remain missing. The
+[proof map](lean/README.md) has six checked Lean algebraic dependencies;
+the finite-field specialization/irreducibility bridge is not formalized.
+Identity IDC1h0e27b483c3989bcd certifies only the integer expansion.
+
+The [versioned curve-identity adapter](curve-identity-adapter.v1.json)
+binds all 18 reference/twist, four qualified-query and three wide-core models
+to canonical global aliases/full UIDs using the repository's metadata-only
+reference. Original EC1-shaped labels use producer-specific preimages and
+remain source/provisional labels; they must not be silently used as canonical
+global aliases. Exact records, hash-to-target inputs and measurements are
+unchanged. [Metadata reproduction](adapt-curve-identities.py).
+
+Both local experiment queues are real: the original 116-branch balanced
+campaign is active, and the separate capped L0 m14/15 quartic diagnostics
+wait for its identity-guarded completion. Original L2 full-panel specs and
+larger-host shards remain unchanged and unexecuted. The USD 100 extra-cloud
+ceiling includes replay; no additional VM has launched. Raw bundles and
+oversized inspected PDFs are local pending verified artifact-store upload.
+The [publication packet](PUBLISH_REVIEW.md) and pending plans distinguish
+these prepared bytes from uploaded or published evidence.
+
 ## Measured structural result
 
 The native symmetric formulation has fewer recorded solver word operations
@@ -193,8 +247,10 @@ fixtures over n=10 or 15, not curves with 58--100-bit subgroup security.
 Quartic IC remains separate over GF((2^m)^4), requiring its proper
 intermediate field. The historical single-target m=14 gap near 4.3 times
 measured rho and crossover extrapolation near subgroup size 2^68 remain
-historical, distinct claims. Current native arithmetic explicitly refuses
-m=16--18; wider coefficients, keys, order and scalars are required.
+historical, distinct claims. The registered native ecbench path still refuses
+m=16--18. A separate u32/u128 arithmetic core now passes independent field,
+group-order, scalar and encoding controls; full wide stage integration and
+the registered complete ladder remain outstanding.
 [Width problem](../../problems/quartic-binary-ic-wide-scalars.md).
 
 ## Same-input external correctness
@@ -224,10 +280,10 @@ preserves all generated scripts, package hashes, outputs and statuses.
 | A2: native structured bases and symmetric formulation | verified, finite pilot | Rust implementations, all four families, identity/splitting/repeated-root controls; limits in PIPELINE.md |
 | A3: combine formulations and closure | verified, finite stage panel | three matched panels above; no whole-query performance conclusion |
 | B1: ell=8 minimum guesses | partial | draw-6 zero-guess Boolean refutation and eight nonrefuting k=3 draw-0 branches; original models have subgroup-support gaps; remaining branches, alternative sets, ordinary-query controls and independent pilot replay remain |
-| B2: ell=9 and four summands | implemented, unverified | 1,152 fresh fixtures, reference/twist target subgroup audit and frozen remote shards; no larger-guess or ordinary-query-law result yet |
+| B2: ell=9 and four summands | partial | 2,048 additional qualified queries, independently recounted points and D2/D3 controls; original 1,152 fixtures preserved; larger guessing/degree-four shards unexecuted |
 | B3: N=58/60/100 continuation | partial | degree-two/three nonrefuting fixed points on three fixtures; all degree-four results resource-capped; independent large fixed-point certificates remain |
-| C1: quartic independent replay | partial | m=6/8/10/12 smoke has 24 verified and identically replayed records; m=14/15 full panels outstanding |
-| C2: m=14--18 ladder | blocked in part | supported rungs outstanding; m=16--18 need wider arithmetic |
+| C1: quartic independent replay | partial | m=6/8/10/12 smoke has 24 verified and identically replayed records; separate capped L0 m14/15 queue waits; original L2 full panels outstanding |
+| C2: m=14--18 ladder | partial, integration/compute blocked | standalone m16--18 core/order/encoding controls and independent replay pass; full wide stage adapters, eight-target IC/rho ladder and complete prices remain |
 | C3: complete method and full native price | partial | n13/n23 answer replay and ten n13 instruction profiles; construction/split counters, native allocator/physical costs and qualified comparison missing |
 | D1: external/hardware controls | partial | all 44 same-input Singular correctness checks agree on 22 cases; fastest-tool performance and actual hardware comparisons remain |
 | D2: durable evidence and PR | partial, publication blocked | earlier PR is ready/open; new local evidence and inspected PDFs prepared; broader publication approval and artifact-store upload/readback remain |

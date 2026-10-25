@@ -184,7 +184,7 @@ def algebraic_audits(ref, since):
         ("fresh-target-relevance-20261025/receipt.json", "ic-fresh-target-relevance/v1",
          "status", "all_target_roots_and_trace_criteria_agree", [
              (("totals", field), f"ic.algebraic.fresh-target.{field}",
-              f"fresh Boolean fixtures: {label} on E0 reference; subgroup unknown")
+              f"fresh Boolean fixtures: {label} on E0 reference; this audit checks lifts only")
              for field, label in [
                  ("sat_liftable", "SAT, target liftable"),
                  ("sat_nonliftable", "SAT, target nonliftable"),
@@ -198,6 +198,31 @@ def algebraic_audits(ref, since):
          "status", "all_external_zero_sets_equal", [
              (("cases",), "ic.algebraic.external-cas.correctness_cases",
               "finite systems with equal Singular/native Boolean zero sets; no speed comparison")]),
+        ("fixture-subgroups-enumerated-20261025/receipt.json", "ic-fixture-subgroups/v2",
+         "status", "all_lifts_trace_orders_and_membership_checks_agree", [
+             (("totals", field), f"ic.algebraic.fixture-subgroups.{field}", label)
+             for field, label in [
+                 ("in_generated_subgroup", "original/fresh targets inside declared reference/twist G"),
+                 ("outside_generated_subgroup", "original/fresh targets outside declared reference/twist G"),
+                 ("generated_subgroup_unknown", "original/fresh targets with unresolved declared subgroup membership"),
+             ]]),
+        ("qualified-queries-20261025/summary.json", "ic-qualified-query-summary/v1",
+         "status", "all_2048_finite_chain_counts_and_paired_targets_verified", [
+             ((field,), f"ic.algebraic.qualified-queries.{field}", label)
+             for field, label in [
+                 ("rows", "additional qualified a0/full-degree-b query draws"),
+                 ("boolean_sat", "additional qualified queries with finite-chain roots"),
+                 ("point_sat", "additional qualified queries with actual subgroup point decompositions"),
+                 ("independent_point_arithmetic_rows_verified", "qualified point counts checked by independent arithmetic"),
+                 ("paired_target_count", "underlying public targets paired across qualified basis families"),
+             ]]),
+        *[(f"wide-core-audit-20261025/m{m}/output.json", "ic-quartic-wide-core-audit/v1",
+           "status", "verified", [
+               ((field,), f"ic.algebraic.wide-core.m{m}.{field}", f"m{m} wide-core {label}; full IC unmeasured")
+               for field, label in [
+                   ("independent_field_products", "independent field-product controls"),
+                   ("independent_scalar_controls", "independent full-width scalar controls"),
+               ]]) for m in (16, 17, 18)],
     ]
     for relative, schema, key, expected, fields in sources:
         path = study + relative
@@ -211,6 +236,19 @@ def algebraic_audits(ref, since):
                     value = value.get(part) if isinstance(value, dict) else None
                 emit(metric, value, date=date, problem=P_IC, unit="count", better="neutral",
                      label=label, source=f"{path}@{commit}")
+    path = study + "qualified-closure-replay-20261025/summary.json"
+    for date, commit, txt in file_history(ref, path, since):
+        data = json.loads(txt)
+        if data.get("schema") != "ic-qualified-closure-summary/v1":
+            continue
+        for group in data.get("groups", []):
+            degree = group.get("degree")
+            kind = "positive" if group.get("sat_control") else "negative"
+            for field in ("nonrefuting", "independent_hky_verified"):
+                emit(f"ic.algebraic.qualified-closure.d{degree}.{kind}.{field}", group.get(field),
+                     date=date, problem=P_IC, unit="count", better="neutral",
+                     label=f"qualified {kind} D{degree} {field}; finite closure only",
+                     source=f"{path}@{commit}")
 
 
 def main():

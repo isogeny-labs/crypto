@@ -4,7 +4,7 @@ set -euo pipefail
 root=$(git rev-parse --show-toplevel)
 cd "$root"
 study=research/ic_algebraic_crossover_20261023
-cargo build --release --example ic_qualified_query_fixtures --example ic_qualified_closure_audit
+cargo build --release --example ic_qualified_query_fixtures --example ic_qualified_closure_audit --example ic_algebraic_followup
 bin_root=$(realpath "${CARGO_TARGET_DIR:-target}/release/examples")
 scratch=$(mktemp -d /tmp/ic-qualified-replay.XXXXXX)
 trap 'rm -rf "$scratch"' EXIT
@@ -26,6 +26,8 @@ for cell in '3 22 8' '3 25 9' '4 17 6' '4 18 6'; do
   for family in prefix geometric geomtraceu random; do
     unit="m$m-n$n-ell$ell-$family"
     input="$meta/$unit/output.jsonl"
+    (ulimit -v 2097152; timeout -k 30 900 "$bin_root/ic_algebraic_followup" verify-fixtures --input "$input") > finite-chain-replay.jsonl
+    cmp finite-chain-replay.jsonl "$meta/$unit/replay/output.jsonl"
     (ulimit -v 2097152; timeout -k 30 900 "$bin_root/ic_qualified_query_fixtures" audit "$meta/model-n$n/output.jsonl" "$input") > point-replay.jsonl
     cmp point-replay.jsonl "$meta/$unit/reference/output.jsonl"
     while read -r draw; do
@@ -36,4 +38,4 @@ for cell in '3 22 8' '3 25 9' '4 17 6' '4 18 6'; do
     done < <(jq -r 'select(.followup_selection != null) | .draw' "$input")
   done
 done
-printf '%s\n' 'PASS: all three archive hashes, raw-derived summaries, 2048 independent point-arithmetic recounts and 158 HKY rank/verdict replays reproduce byte for byte. Word totals are aggregated, not independently recounted by HKY. Finite-chain producer replays are validated by their input hashes and recorded complete streams.'
+printf '%s\n' 'PASS: all three archive hashes, raw-derived summaries, 2048 finite-chain/witness replays, 2048 independent point-arithmetic recounts and 158 HKY rank/verdict replays reproduce byte for byte. Word totals are aggregated, not independently recounted by HKY.'

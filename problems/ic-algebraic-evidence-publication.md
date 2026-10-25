@@ -20,8 +20,12 @@ publishing the additional results or their evidence.
 The merged base also adds the artifact-store policy: non-code files over
 1 MiB, and data-suffixed files over 64 KiB, must be uploaded unchanged to
 the configured store before manifests replace Git blobs. A scoped plan
-selects 34 current campaign files, approximately 3.6 MB, including raw
-records, archives, logs, plots and PDFs. Later profiles may add files.
+selects 34 earlier tracked campaign files, approximately 3.6 MB. The final
+explicit-file dry run includes those plus all 16 study and four benchmark
+pending files: 54 files, 8.4 MB, including unchanged constructor binaries,
+complete raw validation bundles, logs, plots and inspected PDFs. The
+[concrete packet](../research/ic_algebraic_crossover_20261023/PUBLISH_REVIEW.md)
+lists the exact proposed publication scope and current checks.
 The managed environment currently has no configured secrets, runtime
 credential bindings or outbound identity. The earlier CI identity's
 ephemeral configuration read was explicitly denied. No artifact upload
@@ -29,7 +33,10 @@ or successful remote readback is claimed. Lack of a local credential does
 not prove that the separate artifact-store identity lacks permission.
 
 This blocks durable delivery under current policy, not the validity of the
-retained local Boolean results. Never fabricate manifests, split or rename
+retained local finite results. The full 4,634-test library gate, qualified
+query/closure and wide-core archive replays, and six-theorem Lean gate pass;
+the browser checks pass. Known base-site and remote CI failures remain
+separate, and no green merge is claimed. Never fabricate manifests, split or rename
 data to avoid thresholds, change the policy, or rewrite frozen evidence.
 The related [NIST publication problem](nist-factorization-raw-archive-publication.md)
 records a different evidence set with the same need for verified remote bytes.

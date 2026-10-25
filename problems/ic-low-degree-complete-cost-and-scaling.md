@@ -36,16 +36,30 @@ rho and native-price band at 0, 0.1 and 1 GAE, remains the downstream test.
 - **Derived or proved:** summand exchange has an exact polynomial/permutation
   certificate, IDC1ha27a77e72057f9cb, scoped to degree verdicts, not costs.
 - **Observed relevance limit:** original UNSAT draw 5 and SAT draw 4 have no
-  y lift on E0; draw 0 does. Subgroup membership is unknown. The
+  y lift on E0; draw 0 does. The original lift audit did not check subgroups. The
   [finite curve audit](../research/ic_algebraic_crossover_20261023/reports/run-fixture-group-audit-20261025/report.pdf)
   qualifies these Boolean fixtures without changing their recorded counts.
+- **Completed relevance audit:** exact generated-subgroup enumeration
+  resolves every earlier null: 105 of 1,159 target x-values are in the
+  chosen reference/twist subgroups, 1,054 outside. All seven original E0
+  bases have no points in its largest prime subgroup; draw 6 has none on
+  either chosen model. This limits the original ECDLP interpretation.
+- **Additional qualified controls:** 2,048 explicit a0/full-degree-b public
+  subgroup queries retain every planned draw. Native finite-chain replay
+  and independent point arithmetic agree on all rows: 1,591 have Boolean
+  roots, 161 have actual signed subgroup decompositions. The frozen
+  selection's 55 negatives and 24 positives all saturate without refuting
+  at D2/D3; all 158 ranks/verdicts independently replay with HKY. The
+  [new reports](../research/ic_algebraic_crossover_20261023/reports/run-qualified-closures-20261025/report.pdf)
+  and [native reproduction](../research/ic_algebraic_crossover_20261023/verify-qualified.sh)
+  keep quota shortages, empty bases and contract differences explicit.
 - **Suspected explanation:** additional closure work can outweigh smaller
   product spaces. The fixed finite observations do not determine its growth.
 - **Missing capability:** complete native construction/split accounting,
   validated larger-cell closure and guess minima, same-input external CAS
   comparison, and measured hardware calibration. Local matrices have a
-  12-GiB/900-second envelope. The 116 remaining balanced ell=8 branches are
-  queued at a 200k outer column cap under that unchanged envelope. All 44
+  12-GiB/900-second envelope. The 116 additional balanced ell=8 attempts are
+  actively executing at a 200k outer column cap under that envelope. All 44
   same-input Singular correctness checks agree on 22 small cases; equal-output
   fastest-tool performance comparisons remain open. The prescribed paid launcher
   is blocked by an explicit identity-policy denial; no research VM launched.

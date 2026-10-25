@@ -18,6 +18,9 @@ const hash=createHash('sha256').update(raw).digest('hex');
 const zero=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/guess-zero-draw6-20261025/row.json')));
 const quartic=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/quartic-smoke-20261025-02.json')));
 const subgroup=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/fixture-subgroups-enumerated-20261025/receipt.json')));
+const qualified=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/qualified-queries-20261025/summary.json')));
+const closures=JSON.parse(readFileSync(resolve(root,study+'pipeline-receipts/qualified-closure-replay-20261025/summary.json')));
+const wide=[16,17,18].map(m=>JSON.parse(readFileSync(resolve(root,study+`pipeline-receipts/wide-core-audit-20261025/m${m}/output.json`))));
 assert.equal(zero.status,'refuted');
 assert.equal(zero.draw,6);
 assert.deepEqual(zero.guessed_variables,[]);
@@ -26,6 +29,11 @@ assert.equal(quartic.replays.length,24);
 assert.ok(quartic.replays.every(r=>r.reproduced));
 assert.equal(subgroup.schema,'ic-fixture-subgroups/v2');
 assert.equal(subgroup.status,'all_lifts_trace_orders_and_membership_checks_agree');
+assert.equal(qualified.rows,2048);
+assert.equal(qualified.independent_point_arithmetic_rows_verified,2048);
+assert.equal(closures.recorded_attempts,158);
+assert.ok(closures.groups.every(g=>g.independent_hky_verified===g.attempts && g.refuted===0 && g.unknown===0));
+assert.ok(wide.every(r=>r.status==='verified' && typeof r.r_decimal==='string' && typeof r.group_order_decimal==='string'));
 const fmt=n=>Number(n).toLocaleString('en-US',{maximumFractionDigits:8});
 const base='https://github.com/aburan28/crypto/blob/main/'+study;
 const begin='<!-- BEGIN IC ALGEBRAIC FOLLOWUP -->';
@@ -44,7 +52,9 @@ ${data.panels.map(p=>`<tr><td>${p.degree}</td><td>${fmt(p.complete_extractions)}
 <p>The x-only guessing fixtures do not specify a full curve or subgroup. A native audit checks explicit E0 and trace-one-a twist models in each exact field: ${fmt(subgroup.totals.in_generated_subgroup)} of ${fmt(subgroup.totals.lifted_target_models)} original/fresh target x-values lie in the declared cyclic subgroups, ${fmt(subgroup.totals.outside_generated_subgroup)} lie outside and ${fmt(subgroup.totals.generated_subgroup_unknown)} remain unknown. The initial 152 nulls are retained in a separate receipt; exact enumeration of an 11-point subgroup resolves them in the amended audit. This remains a uniform field-x fixture law, not an ordinary subgroup-query law.</p>
 <p>All seven original E0 factor bases have no points in its largest prime subgroup (r=991); draw 6 has none on either chosen model. The three selected SAT witnesses give signed curve relations, but none with every summand in the declared subgroup. This materially qualifies the ECDLP interpretation while preserving the finite Boolean results. <a href="${base}reports/run-fixture-subgroups-enumerated-20261025/report.pdf">Inspected subgroup report</a>.</p>
 <p>The larger-cap continuation observes a zero-guess degree-four refutation on original draw 6: ${fmt(zero.columns)} columns and ${fmt(zero.closure_word_ops)} solver word operations. Independent solver/cost replay is outstanding, and the remaining balanced-branch campaign is active. Larger N=58/60/100 probes saturate without refuting at degrees two and three; all degree-four outcomes remain unknown after allocation or entry caps.</p>
+<p>A separate qualified panel retains ${fmt(qualified.rows)} public hash-to-subgroup queries on four explicitly selected a=0, full-degree-b models. All finite-chain and independent point-arithmetic replays agree: ${fmt(qualified.boolean_sat)} have Boolean roots and ${fmt(qualified.point_sat)} have actual signed subgroup decompositions. These different contracts are preserved, including empty bases and quota shortages. The selected 55 negative and 24 positive controls give ${fmt(closures.recorded_attempts)} nonrefuting D2/D3 fixed points, all independently rank/verdict checked with HKY. Degree four, complete guessing minima and full prices remain open. <a href="${base}reports/run-qualified-queries-20261025/report.pdf">Qualified queries</a> · <a href="${base}reports/run-qualified-closures-20261025/report.pdf">Closure report</a>.</p>
 <p>The separate quartic smoke now has 24/24 verified records and 24/24 identical deterministic replays over base-field sizes 6/8/10/12. Its prices use deterministic count conventions; construction, physical conversion and the wider crossover ladder remain separate obligations.</p>
+<p>The standalone widened quartic core now passes independent arithmetic, exact group-order, high-scalar and encoding controls at extension degrees ${wide.map(r=>r.n).join('/')}, with identical replays. Full wide factor-base/oracle/relation/linear-algebra and ecbench adapters are still missing. The separate supported m14/15 capped L0 diagnostics are genuinely queued after balanced guessing; original L2 requirements remain unchanged. Neither core correctness nor the constructor instruction attribution establishes a measured crossover. <a href="${base}reports/run-wide-core-audit-20261025/report.pdf">Wide-core report</a>.</p>
 <p>No new complete-price IC/rho ratio is admitted. Completed n13/n23 solver charges use pinned word rates; the earlier wall-pricing explanation was incorrect and has an explicit native accounting audit. Construction/split costs remain incomplete in both raw S and the native bands. The progress ratio chart, leaderboard, best-of and exponent figures retain their existing values. Larger closure/guess panels and the quartic crossover ladder remain open.</p>
 <p class="dash-footnote"><a href="${base}README.md">Requirement statuses and evidence</a> · <a href="${base}reports/local-structural-20261025/report.pdf">Inspected results PDF</a> · <a href="${base}report-data.json">Native recomputation</a>. Dataset SHA-256 <code>${hash}</code>. Raw rows and failed attempts are in the hash-checked evidence archive; no fastest-CAS, GPU or asymptotic claim.</p>
 </section>

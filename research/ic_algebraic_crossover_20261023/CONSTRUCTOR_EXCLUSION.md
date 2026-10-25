@@ -32,3 +32,18 @@ old-backend field/model parity on the declared supported control rungs.
 The proof is a mathematical argument, not a formal proof-assistant
 certificate; controls establish their finite scope. Instruction attribution
 and full-pipeline/native-price measurements remain separate obligations.
+
+## Checked algebraic core
+
+The dependency-free [Lean proof map](lean/README.md) checks the root-difference
+identity and a stronger conditional algebraic core. For an additive/multiplicative
+f with f^4=id fixing c1 and all cube roots of unity, if alpha and f(alpha)
+are roots then f^2(alpha)=alpha. Write u=f(alpha)+alpha. If u!=0, u^3=c1,
+and k=f(u)/u has k^3=1. Since f fixes k, f^3(u)=u. Together with f^4(u)=u,
+this fixes u; the characteristic-two translation then has order at most two.
+The u=0 case is included. `quartic_root_two_cycle` is kernel checked with
+only the repository's allowed foundational axioms. The specialization to
+q-Frobenius, its cube-root property for even m, and the irreducibility bridge
+remain readable finite-field facts rather than checked Lean dependencies.
+The accompanying identity certificate certifies only the integer polynomial
+expansion, with a faithful Lean proof pointer; it does not certify that bridge.

@@ -257,9 +257,16 @@ pub fn closure(eqs: &[Vec<u128>], nv: usize, degree: u32, limit: usize) -> Spars
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        build_decomposition_system, element, find_irreducible_sparse, FieldStructure, ReducedBasis,
+    use crypto_lib::binary_ecc::F2mElement;
+    use crypto_lib::cryptanalysis::{
+        inherited_f4::ReducedBasis,
+        koblitz_groebner::{build_decomposition_system, FieldStructure},
+        koblitz_index_calculus::find_irreducible_sparse,
     };
+    use num_bigint::BigUint;
+    fn element(x: u64, n: u32) -> F2mElement {
+        F2mElement::from_biguint(&BigUint::from(x), n)
+    }
     #[test]
     fn wide_builder_matches_library_equations() {
         let n = 5;
