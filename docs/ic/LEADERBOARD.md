@@ -372,7 +372,7 @@ Instruction counts are a separate unit and favor some tiny subfield pipelines:
 - `research/kummer_differential_collector_20261022/VALIDATION.json` — sha256 `8f0f53f2aa7630c2…`
 - `research/kummer_differential_collector_20261022/results/paired/analysis/summary.json` — sha256 `97fe6496519b1b7e…`
 - `research/kummer_differential_collector_20261022/results/paired/analysis/price-grid.csv` — sha256 `f76aeb6758bbf4bc…`
-- `research/projective_law_followup_20261022/REPORT.md` — sha256 `db69c372aab161f7…`
+- `research/projective_law_followup_20261022/REPORT.md` — sha256 `60141b9887a2fd91…`
 - `research/projective_law_followup_20261022/VALIDATION.json` — sha256 `c681c8f5a8434395…`
 - `research/projective_law_followup_20261022/results/summary-projective.json` — sha256 `06d11a57882fae79…`
 - `research/projective_law_followup_20261022/results/summary-state.json` — sha256 `74623ead9cfd9e6c…`
