@@ -111,7 +111,7 @@ impl Gf2q {
         let mut log = vec![0u32; q as usize];
         let mut v = 1u32;
         for i in 0..(q - 1) {
-            exp[i as usize] = v as u32;
+            exp[i as usize] = v;
             assert!(i == 0 || v != 1, "x is primitive modulo {modulus:#x}");
             log[v as usize] = i;
             v <<= 1;
@@ -131,7 +131,7 @@ impl Gf2q {
             artin: vec![u32::MAX; q as usize],
             muls: Cell::new(0),
         };
-        for t in 0..q as u32 {
+        for t in 0..q {
             let w = f.mul_nc(t, t) ^ t;
             f.artin[w as usize] = t.min(t ^ 1);
         }
@@ -213,10 +213,16 @@ impl Fq4 {
             c: [0; 4],
             zq: [Eb::ONE; 4],
         };
-        // z⁴ + c₁z + c₀ is an affine linearised polynomial in characteristic
-        // 2, often reducible for every (c₁, c₀); the z³ term avoids that.
-        for (c3, c1) in (0..2u32).flat_map(|c3| (0..fq.f.q as u32).map(move |c1| (c3, c1))) {
-            for c0 in 1..fq.f.q as u32 {
+        // For even m the c3=0 family has no irreducible quartic; for
+        // c3=c1=0 it is inseparable for every m. Excluding them preserves
+        // the first successful polynomial of the inherited search.
+        // Proof and constructor attribution: CONSTRUCTOR_EXCLUSION.md.
+        let first_c3 = if m.is_multiple_of(2) { 1 } else { 0 };
+        for (c3, c1) in (first_c3..2u32)
+            .flat_map(|c3| (0..fq.f.q).map(move |c1| (c3, c1)))
+            .filter(|&(c3, c1)| c3 != 0 || c1 != 0)
+        {
+            for c0 in 1..fq.f.q {
                 fq.c = [c0, c1, 0, c3];
                 let z = Eb([0, 1, 0, 0]);
                 let d = fq.pow2k(&z, 2 * m).add(&z);
@@ -378,7 +384,7 @@ impl Fq4 {
         self.pow2k_counted(a, 4 * self.f.m - 1)
     }
     pub fn random(&self, rng: &mut StdRng) -> Eb {
-        Eb(core::array::from_fn(|_| rng.gen_range(0..self.f.q) as u32))
+        Eb(core::array::from_fn(|_| rng.gen_range(0..self.f.q)))
     }
     /// Pack into one word: coefficient `i` in bits `[im, (i + 1)m)`.
     pub fn pack(&self, a: &Eb) -> u128 {
@@ -568,6 +574,14 @@ impl CurveB {
     pub fn sub(&self, p: &PtB, q: &PtB) -> PtB {
         self.add(p, &self.neg(q))
     }
+    /// Exact key for valid points at every supported width, including
+    /// the ordinate choice. Infinity is outside the <=73-bit point range.
+    pub fn point_key(&self, p: &PtB) -> u128 {
+        if p.inf {
+            return u128::MAX;
+        }
+        self.f.pack(&p.x) * 2 + u128::from(self.f.pack(&p.y) > self.f.pack(&p.x.add(&p.y)))
+    }
     pub fn mul(&self, p: &PtB, mut k: u128) -> PtB {
         let mut acc = PtB::INF;
         let mut base = *p;
@@ -648,6 +662,9 @@ impl CurveB {
         det_e(f, m)
     }
 }
+
+#[cfg(test)]
+mod tests;
 
 /// The polynomial of degree `< n` through `(nodes[i], vals[i])`, ascending.
 fn interpolate(f: &Fq4, nodes: &[Eb], vals: &[Eb]) -> Vec<Eb> {
@@ -1038,7 +1055,7 @@ pub fn generate_instance(m: u32, seed: u64) -> CurveB {
 /// The base: one point per `t ∈ F_q \ {0, 1}` that lifts, with its `t`.
 pub fn t_base(curve: &CurveB, rng: &mut StdRng) -> Vec<(u32, PtB)> {
     let f = &curve.f;
-    (2..f.f.q as u32)
+    (2..f.f.q)
         .filter_map(|t| {
             let x = curve.x_of_t(&f.from_fq(t));
             curve.lift_x(&x, rng).map(|p| (t, p))
@@ -2304,7 +2321,7 @@ pub fn solve_d4_bin(
                 continue;
             };
             for flips in 0..16u32 {
-                let ts: [u32; 4] = core::array::from_fn(|i| base_t[i] ^ ((flips >> i & 1) as u32));
+                let ts: [u32; 4] = core::array::from_fn(|i| base_t[i] ^ (flips >> i & 1));
                 if ts.iter().fold(0u32, |a, &v| a ^ v) != s[4] {
                     continue;
                 }
@@ -2469,7 +2486,13 @@ pub struct BinCurve {
 /// The first instance seed from `seed` with `#E = h·r`, `r` prime,
 /// `h ≤ max_cofactor`.  Deterministic in `(m, seed, max_cofactor)`.
 pub fn find_bin_curve(m: u32, seed: u64, max_cofactor: u64) -> Result<BinCurve, String> {
-    for s in seed..seed + 2_000 {
+    if !(4..=18).contains(&m) || max_cofactor < 2 {
+        return Err("wide quartic core requires 4<=m<=18 and max_cofactor>=2".into());
+    }
+    let end = seed
+        .checked_add(2_000)
+        .ok_or("instance seed range overflows u64")?;
+    for s in seed..end {
         let curve = generate_instance(m, s);
         let mut rng = StdRng::seed_from_u64(s ^ 0x0c0f);
         let Some(order) = group_order_bin(&curve, &mut rng) else {
@@ -2505,7 +2528,7 @@ pub fn find_bin_curve(m: u32, seed: u64, max_cofactor: u64) -> Result<BinCurve, 
         });
     }
     Err(format!(
-        "no curve with cofactor ≤ {max_cofactor} over F_(2^{m})^4 from seed {seed}"
+        "no qualifying curve with cofactor ≤ {max_cofactor} over F_(2^{m})^4 among 2000 seeds from {seed}"
     ))
 }
 
@@ -2538,8 +2561,8 @@ pub struct TowerBasis {
 impl TowerBasis {
     pub fn new(f: &Fq4) -> TowerBasis {
         let n = 4 * f.f.m as usize;
-        for c0 in 0..f.f.q as u32 {
-            for c1 in 1..f.f.q as u32 {
+        for c0 in 0..f.f.q {
+            for c1 in 1..f.f.q {
                 let theta = Eb([c0, c1, 0, 0]);
                 // Powers θ⁰ … θⁿ packed; reduce θⁿ by the first n.
                 let mut pw = Vec::with_capacity(n + 1);
