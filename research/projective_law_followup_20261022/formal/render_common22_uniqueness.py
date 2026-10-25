@@ -23,6 +23,10 @@ packet = {
     "theorems": [
         "Common22Coprime.determinant_bezout",
         "Common22Coprime.supports_coprime",
+        "Common22Coprime.firstSupport_natDegree",
+        "Common22Coprime.secondSupport_natDegree",
+        "Common22Coprime.firstSupport_nonzero",
+        "Common22Coprime.secondSupport_nonzero",
         "Common22Residues.first_residue",
         "Common22Residues.second_residue",
         "Common22Residues.residual_curve_eq",
@@ -71,8 +75,9 @@ svg.extend([
 (ROOT / "COMMON22_UNIQUENESS.md").write_text("""# Common 2+2 coprime-support uniqueness
 
 Schema: `projective-law-common22-uniqueness/v1`. The pinned Lean build proves
-an explicit Bézout identity for the two source-style quadratics, then proves
-that nonzero `B` makes them coprime. Given interpolation and valid-input curve
+an explicit Bézout identity for the two source-style quadratics, proves their
+degree-two and nonzero properties, then proves that nonzero `B` makes them
+coprime. Given interpolation and valid-input curve
 congruences, it proves both residual residues. It also proves that a polynomial
 below `degree (u1*u2)` is zero if divisible by both coprime supports. Applied
 to the cleared residual difference, this gives the conditional curve equation.
@@ -81,7 +86,7 @@ coefficients and quadratic-support hypotheses. It covers a degree-at-most-six
 residual whose sixth coefficient vanishes.
 The [coprime](common22-coprime-build.log), [residue](common22-residues-build.log),
 [degree](common22-degree-build.log), and
-[uniqueness](common22-uniqueness-build.log) kernel logs record all eleven
+[uniqueness](common22-uniqueness-build.log) kernel logs record all fifteen
 theorem names and their foundational axioms.
 
 The [CSV](common22-uniqueness.csv) and [JSON](common22-uniqueness.json) list
@@ -104,7 +109,8 @@ the recorded cost ratios are unchanged.
 \section*{Common 2+2 coprime-support uniqueness}
 \texttt{projective-law-common22-uniqueness/v1}. A pinned Lean check first proves
 an explicit Bezout identity: the common-branch determinant $B$ is a linear
-combination of the two quadratic supports. Thus $B\ne0$ makes them coprime.
+combination of the two source-style supports. Lean also proves those supports
+have degree two and are nonzero. Thus $B\ne0$ makes them coprime.
 Given interpolation and valid-input curve congruences, Lean proves that each
 support divides $H=E-B^2F$. If $\deg H<\deg(u_1u_2)$, then $H=0$ and
 $E=B^2F$. A separate theorem derives this degree bound when $E$ has degree

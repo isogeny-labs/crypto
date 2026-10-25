@@ -247,7 +247,8 @@ divisible by that product; therefore `E=B²F` exactly. Thus
 
 The separate [Lean uniqueness packet](formal/COMMON22_UNIQUENESS.md)
 mechanizes the explicit determinant Bézout identity, its `B≠0` coprimeness
-consequence, both conditional residue bridges from interpolation and valid
+consequence, the degree-two and nonzero properties of both source-style
+supports, both conditional residue bridges from interpolation and valid
 curve-input congruences, the strict degree bound from a sextic upper bound
 with zero sixth coefficient, matching quintic heads, and quadratic supports,
 and the final coprime-divisibility-plus-degree

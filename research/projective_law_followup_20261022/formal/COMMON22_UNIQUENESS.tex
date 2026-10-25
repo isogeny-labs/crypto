@@ -5,7 +5,8 @@
 \section*{Common 2+2 coprime-support uniqueness}
 \texttt{projective-law-common22-uniqueness/v1}. A pinned Lean check first proves
 an explicit Bezout identity: the common-branch determinant $B$ is a linear
-combination of the two quadratic supports. Thus $B\ne0$ makes them coprime.
+combination of the two source-style supports. Lean also proves those supports
+have degree two and are nonzero. Thus $B\ne0$ makes them coprime.
 Given interpolation and valid-input curve congruences, Lean proves that each
 support divides $H=E-B^2F$. If $\deg H<\deg(u_1u_2)$, then $H=0$ and
 $E=B^2F$. A separate theorem derives this degree bound when $E$ has degree

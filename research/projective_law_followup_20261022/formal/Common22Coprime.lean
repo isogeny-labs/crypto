@@ -46,7 +46,42 @@ theorem supports_coprime (q1 r1 q2 r2 : K)
     _ = C (b⁻¹) * C b := by rw [hbez]
     _ = 1 := by simp [← map_mul, b, hb]
 
+/-- The first source-style support is a genuine monic quadratic by degree. -/
+theorem firstSupport_natDegree (q1 r1 : K) :
+    (firstSupport q1 r1).natDegree = 2 := by
+  have hlinear : (C q1 * X : K[X]).natDegree ≤ 1 := by
+    simpa only [pow_one] using natDegree_C_mul_X_pow_le q1 1
+  have hconstant : (C r1 : K[X]).natDegree ≤ 1 := by
+    simp [natDegree_C]
+  have hlow : (C q1 * X + C r1 : K[X]).natDegree ≤ 1 :=
+    natDegree_add_le_of_degree_le hlinear hconstant
+  have hlt : (C q1 * X + C r1 : K[X]).natDegree <
+      ((X : K[X]) ^ 2).natDegree := by
+    rw [natDegree_X_pow]
+    omega
+  unfold firstSupport
+  rw [add_assoc, natDegree_add_eq_left_of_natDegree_lt hlt, natDegree_X_pow]
+
+/-- The second source-style support has the same quadratic degree. -/
+theorem secondSupport_natDegree (q2 r2 : K) :
+    (secondSupport q2 r2).natDegree = 2 := by
+  simpa [firstSupport, secondSupport] using firstSupport_natDegree q2 r2
+
+theorem firstSupport_nonzero (q1 r1 : K) : firstSupport q1 r1 ≠ 0 := by
+  intro h
+  have hd := firstSupport_natDegree q1 r1
+  simp [h] at hd
+
+theorem secondSupport_nonzero (q2 r2 : K) : secondSupport q2 r2 ≠ 0 := by
+  intro h
+  have hd := secondSupport_natDegree q2 r2
+  simp [h] at hd
+
 end Common22Coprime
 
 #print axioms Common22Coprime.determinant_bezout
 #print axioms Common22Coprime.supports_coprime
+#print axioms Common22Coprime.firstSupport_natDegree
+#print axioms Common22Coprime.secondSupport_natDegree
+#print axioms Common22Coprime.firstSupport_nonzero
+#print axioms Common22Coprime.secondSupport_nonzero

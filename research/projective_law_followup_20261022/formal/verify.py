@@ -445,7 +445,9 @@ def main() -> None:
             "invalid common support-head PDF")
 
     coprime_source = (ROOT / "Common22Coprime.lean").read_text()
-    for theorem in ("determinant_bezout", "supports_coprime"):
+    for theorem in ("determinant_bezout", "supports_coprime",
+                    "firstSupport_natDegree", "secondSupport_natDegree",
+                    "firstSupport_nonzero", "secondSupport_nonzero"):
         require(re.search(r"(?m)^theorem " + theorem + r"\b", coprime_source) is not None,
                 f"common coprime theorem missing: {theorem}")
     require(forbidden_proof_token.search(coprime_source) is None,
@@ -453,7 +455,9 @@ def main() -> None:
     require("(q1 - q2) * (q2 * r1 - q1 * r2) - (r1 - r2) ^ 2" in coprime_source,
             "source-style determinant formula missing")
     coprime_log = (ROOT / "common22-coprime-build.log").read_text()
-    for theorem in ("determinant_bezout", "supports_coprime"):
+    for theorem in ("determinant_bezout", "supports_coprime",
+                    "firstSupport_natDegree", "secondSupport_natDegree",
+                    "firstSupport_nonzero", "secondSupport_nonzero"):
         require(
             f"'Common22Coprime.{theorem}' depends on axioms: "
             "[propext, Classical.choice, Quot.sound]" in coprime_log,
@@ -506,6 +510,10 @@ def main() -> None:
     require(uniqueness["theorems"] == [
         "Common22Coprime.determinant_bezout",
         "Common22Coprime.supports_coprime",
+        "Common22Coprime.firstSupport_natDegree",
+        "Common22Coprime.secondSupport_natDegree",
+        "Common22Coprime.firstSupport_nonzero",
+        "Common22Coprime.secondSupport_nonzero",
         "Common22Residues.first_residue",
         "Common22Residues.second_residue",
         "Common22Residues.residual_curve_eq",
