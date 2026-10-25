@@ -82,6 +82,15 @@ not evidence of present admission.
    done
    ```
 
+   After building and pinning the Linux worker binary, run
+   `verifier_gate.py --inputs-dir "$INPUT_DIR" --worker "$WORKER"
+   --worker-sha256 "$EXPECTED_WORKER_SHA256"` with the same Python
+   environment. The gate rebuilds the `hash_4_2` XCNF from the fetched
+   archives and metadata, then must reject a deliberately incomplete
+   synthetic SAT assignment at the model parser. The retained
+   [Darwin control](../linux-xor-complete-inputs-20261025/verifier-gate.json)
+   passed with the source-pinned worker; the Linux binary needs its own gate.
+
 3. Run the separately frozen, bounded Linux comparison on one isolated host.
    Keep per-arm raw stdout/stderr, exit status, solver terminal status,
    exact final conflict count when present, process and CPU time, peak
@@ -96,9 +105,8 @@ not evidence of present admission.
    worker's `verify-cross-xcnf` check against the byte-identical mirrored
    base/pool archives in `INPUT_DIR/archives/`, the checked-out public
    manifest and corpus, and `FORMULAS/<arm>/`. Its original CNF/XOR, field,
-   orbit-domain,
-   and curve-group checks are required. A rejected or incomplete model is
-   not useful relation yield.
+   orbit-domain, and curve-group checks are required. A rejected or
+   incomplete model is not useful relation yield.
 5. Continue only from verified natural partials to graph closure, useful
    rank, linear algebra, unseen-target descent, and a matched same-target
    rho control. Charge construction, S3 transfer, failed search, verification,

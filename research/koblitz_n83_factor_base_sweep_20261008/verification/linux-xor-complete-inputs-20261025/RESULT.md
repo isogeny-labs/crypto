@@ -18,6 +18,13 @@ of `exports/hash_4_2/export.json` was rejected at its SHA-256 and length.
 The [fetch command](fetch.py) was separately run against real S3 and returned
 the same 11-object pass. A replayed download shows object bytes at the
 observation time; this bucket has no asserted object-lock immutability.
+The [verifier input gate](verifier-gate.json) used the source-pinned Darwin
+worker to rebuild the exact `hash_4_2` XCNF from freshly downloaded
+archives and export metadata. It then rejected a deliberately incomplete
+synthetic SAT assignment at the model parser. This proves that the input
+bundle reaches that verifier stage; it is not a natural relation or a Linux
+solver observation. The [gate command](verifier_gate.py) requires each Linux
+worker's separately frozen binary SHA-256 before its search starts.
 
 This closes the *input custody* gap for the intended Linux external verifier.
 The original `a0/objects/` keys remain the canonical factor-base archive
