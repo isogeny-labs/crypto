@@ -37,7 +37,7 @@ The earlier independent replication's **full8 16-bit slice** had 23 winning and 
 
 ## Execution and validation
 
-The run used source commit `b2bd9f963b87f6919005067c810cba707b873f59`, Rust 1.99.1, and host `ip-172-31-3-58.us-east-2.compute.internal` (Intel Xeon 6975P-C, 32 visible CPUs). The host was shared; no isolation tier was earned. Elapsed time in `results/raw/*.time` is diagnostic only. Costs are cold single-target native operation counts, including construction, transfer, collection, elimination and source verification. Both candidate and rho ran in the same executable and process for each evaluation target.
+The input baseline was commit `b2bd9f963b87f6919005067c810cba707b873f59`, which does not track the study's `heldout.rs`. The saved study source files and dependency lock match the later commit `a5798517feaac879bce582ff1f0d864a91daa238` byte for byte. The frozen EKS bundle identifies its executable by SHA-256 `58a70ac65f088cf24948cfb77e6144e8727296fd1a908cb02a82e7cda2e0e86e`; the [independent-host replay packet](../factor_base_heldout_replay_20261025/REPORT.md) used that same executable and reproduced the seven evaluation raw files byte for byte. An independent build has not reproduced the EKS executable hash, so the exact source-to-binary link and completeness of low-level operation instrumentation remain unverified. The archived run reports Rust 1.99.1 and host `ip-172-31-3-58.us-east-2.compute.internal` (Intel Xeon 6975P-C, 32 visible CPUs). The host was shared; no isolation tier was earned. Elapsed time in `results/raw/*.time` is diagnostic only. Costs are recorded cold single-target native operation counts, including construction, transfer, collection, elimination and source verification. Both candidate and rho ran in the same executable and process for each evaluation target.
 
 The exact native commands were:
 
@@ -53,7 +53,7 @@ bash research/factor_base_heldout_20261025/build_report.sh
 
 The [native validator report](results/validator-report.json) is `ok: true`: 11,760 training candidate/rho source scalar replays, 420 evaluation candidate and 420 evaluation rho source scalar replays, zero train/evaluation model overlap, 252 training and 540 evaluation price cells independently recomputed, phase totals reconciled, prior raw artifact hashes checked, and standardized target JSONL/CSV reconciled. Every new training and evaluation raw file has its exit status and elapsed-time receipt. The [data dictionary](DATA_DICTIONARY.md) defines nulls, units and fields. The [PDF report](REPORT.pdf) contains both inspected graphs.
 
-The descriptive [run report](reports/run-20261025T0612Z/README.md) and its PDF sit beside the raw records. Copies of the PDF and both SVG/PNG graphs are in [benchmarks/20261025-factor-base-heldout](../../benchmarks/20261025-factor-base-heldout/). The canonical leaderboard and benchmark results table were checked and left unchanged because this packet has no independent replay certificate or isolated wall comparison.
+The descriptive [run report](reports/run-20261025T0612Z/README.md) and its PDF sit beside the raw records. Copies of the PDF and both SVG/PNG graphs are in [benchmarks/20261025-factor-base-heldout](../../benchmarks/20261025-factor-base-heldout/). The canonical leaderboard and benchmark results table remain unchanged: the independent-host operation-count replay is available, but the [paired-wall packet](../factor_base_heldout_wall_20261025/REPORT.md) records a blocked start gate, zero timed rows and null wall ratios. Source-to-binary provenance also remains open.
 
 ## Scope and remaining gates
 
@@ -65,7 +65,7 @@ The descriptive [run report](reports/run-20261025T0612Z/README.md) and its PDF s
 | Verify every source scalar and all prices | Verified complete | Native validator: 12,600 source scalar replays and 792 price cells across training and evaluation |
 | Preserve losses and failures | Verified complete for this run | Every policy/scope price cell retained; 0 failures occurred; no losing cell omitted |
 | Standardized raw CSV/JSON, graph, PDF | Verified complete | Linked data, two graphs, inspected report PDF and checksum manifest |
-| Independent-host replay and isolated wall comparison | Not attempted | No separate host or isolation receipt; no wall-speed claim |
+| Independent-host replay and isolated wall comparison | Operation-count replay verified; wall comparison unavailable | Separate-host replay reproduced all 420 evaluation records with the same executable; the paired-wall start gate was blocked, with zero timed rows and null ratios |
 | Leaderboard promotion | Not proposed | Validation-gate replay and isolated wall evidence are absent |
 
-This deterministic model-held-out result does not supply a sampling confidence interval or a claim beyond the fixed public Scholten models, policy set, seed derivation and operation-price contract. It does not change the canonical IC leaderboard.
+This deterministic model-held-out result does not supply a sampling confidence interval or a claim beyond the fixed public Scholten models, policy set, seed derivation and recorded operation-price contract. It does not establish a wall-speed claim or change the canonical IC leaderboard.
