@@ -2219,3 +2219,83 @@ fn a_current_record_undercharged_by_its_class_setup_fails_replay() {
     }
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+#[test]
+fn jacobians_and_transfers_verify_and_replay() {
+    // Genus-2 and plane-quartic Jacobians, a GHS curve over F_{p⁶}, and the
+    // isogeny, plane-quartic cover and GHS cover transfers, one session per
+    // family (every arm of a session runs on every curve): every run
+    // verifies, phases sum to the total, and every record replays exactly.
+    let sessions = [
+        (
+            "genus2",
+            r#"{"kind": "genus2_search", "p_bits": 8, "seed": 3, "max_cofactor": 16}"#,
+            vec![("rho", "rho.negation", "{}"), ("ic-hec", "ic.hyperelliptic", "{}")],
+        ),
+        (
+            "plane_quartic",
+            r#"{"kind": "plane_quartic_search", "p_bits": 6, "seed": 1, "max_cofactor": 64}"#,
+            vec![("rho", "rho.plain", "{}"), ("bsgs", "bsgs.textbook", "{}")],
+        ),
+        (
+            "ghs_fp6",
+            r#"{"kind": "ghs_fp6_search", "p": 13, "seed": 1}"#,
+            vec![("rho", "rho.negation", "{}"), ("ghs", "transfer.ghs_cover", "{}")],
+        ),
+        (
+            "prime",
+            r#"{"kind": "prime_search", "bits": 14, "seed": 5}"#,
+            vec![
+                ("rho", "rho.plain", "{}"),
+                ("iso", "transfer.isogeny", r#"{"ell": "3"}"#),
+                ("qcover", "transfer.quartic_cover", "{}"),
+            ],
+        ),
+    ];
+    for (family, curve, arms) in sessions {
+        let dir = scratch(&format!("jacobians-{family}"));
+        let arms: Vec<String> = arms
+            .iter()
+            .enumerate()
+            .map(|(k, (name, id, params))| {
+                let role = if k == 0 { "reference" } else { "candidate" };
+                format!(
+                    r#"{{"name": "{name}", "role": "{role}", "method": {{"id": "{id}", "params": {params}}}}}"#
+                )
+            })
+            .collect();
+        let spec = format!(
+            r#"{{"schema": "ecbench.spec/v1", "label": "{family} test",
+              "workloads": {{"curves": [{curve}], "targets_per_curve": 2, "target_seed": 7}},
+              "arms": [{}],
+              "measurement": {{"rounds": 1, "warmup": 0, "seed": 5, "isolation_required": "L0", "timeout_seconds": 120}}}}"#,
+            arms.join(",")
+        );
+        std::fs::write(dir.join("spec.json"), spec).unwrap();
+        let out = dir.join("s");
+        let (ok, err) = run_spec(&dir, &out, &[]);
+        assert!(ok, "{family}: {err}");
+        let text = std::fs::read_to_string(out.join("records.jsonl")).unwrap();
+        for line in text.lines() {
+            let r: Value = serde_json::from_str(line).unwrap();
+            assert_eq!(r["outcome"]["status"], "verified", "{line}");
+            assert_eq!(r["workload"]["curve"]["family"], family, "{line}");
+            let total = r["cost"]["total_gae"].as_f64().unwrap();
+            let sum: f64 = r["phases"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|p| p["gae"].as_f64().unwrap())
+                .sum();
+            assert!((total - sum).abs() <= 1e-9 * total.max(1.0), "{line}");
+        }
+        let (ok, _, err) = ecbench(&[
+            "verify",
+            "--dir",
+            out.to_str().unwrap(),
+            "--replay-all",
+            "--exit-code",
+        ]);
+        assert!(ok, "{family} replay: {err}");
+    }
+}

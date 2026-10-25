@@ -31,6 +31,7 @@ spec.json ──ecbench run──► session/                ──ecbench verif
 5. [Confounders, and how each one is controlled](#5-confounders-and-how-each-one-is-controlled)
 6. [Isolation levels](#6-isolation-levels)
 7. [The unit, and what each method is charged](#7-the-unit-and-what-each-method-is-charged)
+   - 7a. [Curves of higher genus and transfers](#7a-curves-of-higher-genus-and-transfers)
 8. [Statistics](#8-statistics)
 9. [Reproduction and the independent runner](#9-reproduction-and-the-independent-runner)
 10. [The database](#10-the-database)
@@ -400,6 +401,13 @@ default; the ids are:
 | `ic.large_prime`, `ic.shared_rank` | ic | the large-prime variation and the shared-rank adapter on binary curves |
 | `ic.k4_gaudry` | ic | Gaudry's k = 4 index calculus on `E(F_{p⁴})`, `fp4_translation` curves only |
 | `ic.cm_folded_native_v1`, `ic.cm_folded_recurrence_v1`, `ic.cm_folded_native_d43_v1` | ic | the CM scalar-orbit signed MITM2 controls with a native backend, prime curves only |
+| `ic.hyperelliptic` | ic | Adleman–DeMarrais–Huang / Gaudry index calculus on a genus-2 Jacobian (`genus2_*` workloads): factor base of degree-1 places, smoothness by gcd, sparse elimination mod r |
+| `transfer.isogeny` | rho | carry the instance across a rational ℓ-isogeny (ℓ = 2, 3; Vélu), solve on the isogenous curve with a generic inner method, check `[k]G = Q` on the source; prime curves |
+| `transfer.quartic_cover` | rho | pull the instance back along the double cover `V⁴ = x³ + ax + b → E` into the Jacobian of a smooth plane quartic (non-hyperelliptic, genus 3), solve there, check on `E`; prime curves, `29 ≤ p < 2³¹` |
+| `transfer.ghs_cover` | rho | carry a `ghs_fp6` instance by the GHS conorm–norm map into the Jacobian of its genus-3 hyperelliptic cover over `F_{p²}`, solve there, check on `E` |
+
+Curves of higher genus and the transfers are described in
+[§7a](#7a-curves-of-higher-genus-and-transfers).
 
 | family | charged | counted, not charged (`*_uncharged`) |
 |---|---|---|
@@ -413,6 +421,9 @@ default; the ids are:
 | `claw.pair_table` | the known-log base's seed scalar multiplications, every table addition `P_i + F_b`, both query additions `Q − (F_k + F_l)`, the addition that rebuilds a hit's table sum; phases `base`, `table`, `search`, `recover` | Frobenius maps, canonicalisations, table inserts and probes |
 | `ic.pipeline` | factor base, oracle set-up (pair tables), relation trials, linear algebra, verification, each a phase; native work (lookups, row operations, square roots, Artin–Schreier solves, …) at the pinned ratio where the repository has one | native work with no pinned ratio for this curve; algebraic-solver operations |
 | `ic.pipeline_counted` | the same pipeline with the relation phase charge rebuilt from counted work and pinned conversions for deterministic SAT/PDP replays | algebraic-solver operations without a pinned conversion, including SAT conflicts; these runs remain lower bounds |
+| `ic.hyperelliptic` | Jacobian operations: the factor-base walk's step precomputation (`setup`), every relation-search step (`relations`), verification | the smoothness oracle's `F_p` multiplications, elimination row operations (phase `linear_algebra`, 0 GAE); priced across the §5a band |
+| `transfer.isogeny` | the inner method's phases (`target:*`, on the isogenous curve, the same unit), the source check `[k]G` (`verify`) | the kernel search and the two point maps, `F_p` multiplications and inversions (`transfer`, 0 GAE) |
+| `transfer.quartic_cover`, `transfer.ghs_cover` | everything: the cover's construction (`cover_setup`, quartic only), the two pullbacks (`transfer`, with the two additions `G + B`, `Q + B` on `E` for the quartic), the inner solve (`target:solve`), the check on `E` (`verify`); Jacobian work counted in `F_p` multiplications and divided by `c_E`, measured in the run (§7a) | nothing |
 | `ic.large_prime` | cofactor projection, exact combination-table group additions, target probes, and relation witness checks; the external runner verifies the returned scalar | combination states, MITM lookups, large-prime merge operations, and modular row operations; the record is therefore a lower bound, not a speed claim |
 
 `rho.multitarget_pooled` is the one method whose run solves more than its
@@ -723,6 +734,80 @@ do not have universal GAE prices. The resource vector shows where the
 counted `S` is incomplete. A full runtime comparison still requires
 matched L2/L3 runs and the A/A noise gate in §8; the Mac's L0 timings
 remain descriptive.
+
+## 7a. Curves of higher genus and transfers
+
+Four workload kinds and four methods carry ecbench past elliptic curves
+over one field. Every one is charged in the same unit as rho, verified by
+`[k]G = Q` outside the method, and replayed exactly by `verify`.
+
+| `kind` | the group | element encoding | name |
+|---|---|---|---|
+| `genus2_search` `{p_bits 5–16, seed, max_cofactor}`, `genus2_explicit` | `J(F_p)` of an imaginary genus-2 curve `y² = f(x)`, `deg f = 5`; `#J = h·r` by point counts over `F_p`, `F_{p²}` | Mumford `(u, v)` as `[deg u·p² + u₁p + u₀, v₁p + v₀]` | `jcv1-g2-fp<bits>-<sha8>` |
+| `plane_quartic_search` `{p_bits 5–11, seed, max_cofactor}`, `plane_quartic_explicit` | `J(F_p)` of a smooth plane quartic (non-hyperelliptic genus 3), Khuri-Makdisi-style linear-algebra group law; `#J = L(1)` from point counts over `F_p`, `F_{p²}`, `F_{p³}` and a BSGS for `a₃` | a class as the 3×10 echelon basis of `H⁰(3K − E)`, two 120-digit hex strings | `jcv1-pq-fp<bits>-<sha8>` |
+| `ghs_fp6_search` `{p, seed}`, `ghs_fp6_explicit` | `E : y² = x(x − α)(x − σα)` over `F_{q³}`, `q = p²`, `α ∉ F_q`, `#E = 4ℓ` (Joux–Vitse curves, `jv_cover`); prime `11 ≤ p ≤ 1600`, `p ≠ 3` | six base-`p` digits per coordinate, one word | `ghs-fp<p>x6-<sha8>` |
+
+None of these is an ICV1 curve, so none is registered (`registered:
+false`, no EC1 alias); `ecbench run`'s note about unregistered slugs counts
+`icv1-` slugs only.
+
+**The unit on a Jacobian.** One Jacobian group operation (a Cantor or a
+linear-algebra addition, reduced) is one GAE, as one point addition is on
+a curve. A genus-2 or plane-quartic row's `S` is therefore in Jacobian
+operations. It is not in additions on some elliptic curve. Compare it with
+rho on the same Jacobian (the generic methods all run there), not with an
+elliptic-curve row. On a plane quartic, negation is a flip against a fixed
+section and costs about one group operation, so `rho.negation` and
+`bsgs.negation` are refused at plan time; use `rho.plain` or
+`bsgs.textbook`.
+
+**The unit in a transfer.** A transfer's row is a row of the *source*
+curve, in its unit:
+
+- `transfer.isogeny`: the isogenous curve is an elliptic curve over the
+  same field, so the inner solve's GAE are the source's GAE. The kernel
+  search and the maps are field work, recorded unpriced.
+- `transfer.quartic_cover` and `transfer.ghs_cover`: the Jacobian's
+  operations are not additions on `E`. The method counts every `F_p`
+  multiplication of the cover, the pullbacks and the inner solve with the
+  arithmetic's own counter, and divides by `c_E`. `c_E` is the
+  multiplications of one affine addition on `E`, measured in the same run
+  on 64 additions with the same counter (`jv_cover::unit_costs`'
+  convention). An inversion is counted as what it costs in that arithmetic
+  (Fermat on `F_p` for the quartic; one `F_p` inversion at 16 for the GHS
+  tower). `detail.{quartic_cover,ghs_cover}` records `c_E`, the
+  multiplications by phase and `e_adds_per_jacobian_op`.
+
+**What to expect.** These transfers move the problem into a group with
+the same `r`-part, so a generic inner method pays rho's `√r` times the
+cost of one Jacobian operation in `E`-additions. On the committed smoke
+sessions that factor was about 6.4 for the genus-3 GHS cover over
+`F_{19²}`, and about 13,000 for the plane-quartic cover at 16 bits, whose
+group law is dense linear algebra. A transfer pays off only when the
+target group admits an algorithm that is asymptotically better than rho:
+index calculus on the Jacobian. `ic.hyperelliptic` is that algorithm in
+genus 2. The Joux–Vitse decomposition index calculus on the genus-3 GHS
+cover is in `jv_cover` and its binaries, not yet an inner method here.
+No index calculus on a plane quartic (Diem's) is implemented. Until one
+is, a transfer row measures what the route costs today. It does not show
+the route is cheaper.
+
+```json
+{"schema": "ecbench.spec/v1", "label": "GHS cover vs rho on E(F_{p^6})",
+ "workloads": {"curves": [{"kind": "ghs_fp6_search", "p": 19, "seed": 1}],
+               "targets_per_curve": 3, "target_seed": 7},
+ "arms": [
+  {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+  {"name": "ghs", "role": "candidate", "method": {"id": "transfer.ghs_cover",
+                                                   "params": {"inner": "rho.negation"}}}],
+ "measurement": {"rounds": 2, "warmup": 0, "seed": 1, "isolation_required": "L0",
+                 "timeout_seconds": 300}}
+```
+
+Every arm of a session runs on every curve, so a session holds one
+family; `plan` refuses an arm its curve cannot run, with the reason (no
+rational ℓ-isogeny, a negation the Jacobian does not have, a family the
+method does not take).
 
 ## 8. Statistics
 
@@ -1099,6 +1184,13 @@ FROM method_by_curve ORDER BY curve_slug, mean_s;
 ## 12. Limits
 
 Stated so that nothing here is read as more than it is:
+
+- **The Jacobian and transfer rows are not speedups.** Each moves the
+  logarithm into a group with the same `r`-part and solves it there with
+  a generic method or, in genus 2, ADH/Gaudry index calculus (§7a). The
+  orders of genus-2 and plane-quartic Jacobians come from exact point
+  counts. A GHS curve's `ℓ` comes from `jv_cover`'s BSGS order search,
+  trusted the way an explicit curve's order is.
 
 - **A claim's identity covers Koblitz curves with `5 ≤ n ≤ 61`.** The IC1
   candidate identity is the tournament's (`identity.py`), whose adapter
