@@ -756,6 +756,25 @@ pub(super) fn full_d18_m4_l0_shared_phase_first_cli(
     )
 }
 
+/// Bounded local screening of the frozen public target, using the exact
+/// phase-priority policy that passed the free-choice planted control.
+pub(super) fn full_d18_m4_l0_shared_phase_first_natural_cli(
+    root: &Path,
+    fixture_root: &Path,
+    output: &Path,
+) -> Result<Value> {
+    full_d18_m4_impl(
+        "natural",
+        root,
+        fixture_root,
+        output,
+        true,
+        FrobeniusOrbitRootEncoding::SharedBits,
+        "none",
+        true,
+    )
+}
+
 fn full_d18_m4_impl(
     mode: &str,
     root: &Path,
@@ -769,8 +788,8 @@ fn full_d18_m4_impl(
     if !["positive", "natural"].contains(&mode) || output.exists() {
         return Err("full D18 m4 mode or fresh output differs from protocol".into());
     }
-    if l0_diagnostic && mode != "positive" {
-        return Err("L0 diagnostic permits only the constructed positive control".into());
+    if l0_diagnostic && mode != "positive" && !phase_zero_first {
+        return Err("L0 natural screening requires the phase-first policy".into());
     }
     if !["none", "phase_zero", "selector", "selector_and_phase_zero"].contains(&choice_pins) {
         return Err("unsupported planted choice-pin policy".into());
@@ -782,13 +801,10 @@ fn full_d18_m4_impl(
     }
     if phase_zero_first
         && (!l0_diagnostic
-            || mode != "positive"
             || encoding != FrobeniusOrbitRootEncoding::SharedBits
             || choice_pins != "none")
     {
-        return Err(
-            "phase-first policy requires the free-choice L0 shared-root planted control".into(),
-        );
+        return Err("phase-first policy requires the free-choice L0 shared-root mode".into());
     }
     let root_choice_pinned = choice_pins == "selector_and_phase_zero";
     let search_policy = if phase_zero_first {
@@ -1068,7 +1084,7 @@ fn full_d18_m4_impl(
         )
     };
     let result = json!({
-        "schema":if l0_diagnostic {"n83.full-d18-m4-l0-positive/v1"} else {"n83.full-d18-m4-worker/v1"}, "status":status,
+        "schema":if l0_diagnostic {if mode == "positive" {"n83.full-d18-m4-l0-positive/v1"} else {"n83.full-d18-m4-l0-natural/v1"}} else {"n83.full-d18-m4-worker/v1"}, "status":status,
         "mode":mode, "source_commit":source_commit,
         "root_encoding":encoding_name, "root_choice_pinned":root_choice_pinned, "choice_pin_policy":choice_pins, "search_policy":search_policy,
         "isolation":if l0_diagnostic {"L0_shared_host_no_hard_cgroup"} else {"hard_32GiB_cgroup_zero_swap"},
