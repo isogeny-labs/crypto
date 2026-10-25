@@ -2,6 +2,15 @@ name: N83 hosted K600 Gray/hash paired first trial
 
 on:
   workflow_dispatch:
+    inputs:
+      experiment:
+        description: Frozen N83 hosted experiment to execute
+        required: true
+        type: choice
+        options:
+          - five_sum
+          - six_sum_access
+        default: five_sum
 
 permissions:
   contents: read
@@ -12,7 +21,7 @@ concurrency:
 
 jobs:
   paired-first-trial:
-    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/main'
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/main' && inputs.experiment == 'five_sum'
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
     env:
@@ -92,5 +101,124 @@ jobs:
             ${{ runner.temp }}/n83-hosted-pair/
             ${{ runner.temp }}/n83-hosted-scratch/*/build/build.stdout
             ${{ runner.temp }}/n83-hosted-scratch/*/build/build.stderr
+          if-no-files-found: warn
+          retention-days: 90
+
+  six-summand-access:
+    if: github.repository == 'aburan28/crypto' && github.ref == 'refs/heads/codex/n83-aws-resume-20261024' && inputs.experiment == 'six_sum_access'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 150
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      RAYON_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      IMAGE_REF: rust:1.98.1-bookworm@sha256:93ce27a88655056a51dbdd8f5f2d7ddc071c7b0070fb288a37b5a285fc83971e
+    steps:
+      - name: Check out pinned mathematical source
+        uses: actions/checkout@v4
+        with:
+          ref: cb98e85d1c1c1afdd5000bc70eea00969ee86c6c
+          fetch-depth: 1
+          path: source
+      - name: Check out frozen six-summand protocol
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          path: protocol
+      - name: Set task-owned runner paths
+        run: |
+          printf 'CARGO_HOME=%s/n83-cargo\nARCHIVE_DIR=%s/n83-archives\nOUT_DIR=%s/n83-hosted-sixsum\nSCRATCH_DIR=%s/n83-sixsum-scratch\n' \
+            "$RUNNER_TEMP" "$RUNNER_TEMP" "$RUNNER_TEMP" "$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - name: Record runner and immutable image
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/n83-sixsum-setup"
+          {
+            uname -a
+            docker version
+            docker pull --platform linux/arm64 "$IMAGE_REF"
+            docker image inspect "$IMAGE_REF" --format '{{.Id}} {{.Architecture}} {{.Os}} {{json .RepoDigests}}'
+            git -C "$GITHUB_WORKSPACE/source" rev-parse HEAD
+            git -C "$GITHUB_WORKSPACE/protocol" rev-parse HEAD
+          } > "$RUNNER_TEMP/n83-sixsum-setup/image.stdout" \
+            2> "$RUNNER_TEMP/n83-sixsum-setup/image.stderr"
+      - name: Prepare pinned audit dependency and offline Cargo registry
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check --only-binary=:all: \
+            --target "$RUNNER_TEMP/n83-pydeps" 'blake3==1.0.8' \
+            > "$RUNNER_TEMP/n83-sixsum-setup/python.stdout" \
+            2> "$RUNNER_TEMP/n83-sixsum-setup/python.stderr"
+          mkdir -p "$CARGO_HOME"
+          docker run --rm --pull never --platform linux/arm64 \
+            --user "$(id -u):$(id -g)" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/source,dst=/src,readonly" \
+            --mount "type=bind,src=$CARGO_HOME,dst=/cargo" \
+            --env CARGO_HOME=/cargo --workdir /src "$IMAGE_REF" \
+            cargo fetch --locked --target aarch64-unknown-linux-gnu \
+            > "$RUNNER_TEMP/n83-sixsum-setup/cargo-fetch.stdout" \
+            2> "$RUNNER_TEMP/n83-sixsum-setup/cargo-fetch.stderr"
+      - name: Regenerate and hash frozen public factor bases
+        env:
+          PYTHONPATH: ${{ runner.temp }}/n83-pydeps
+        run: |
+          set -euo pipefail
+          started=$(date +%s)
+          mkdir -p "$RUNNER_TEMP/n83-exporter-target" "$RUNNER_TEMP/n83-pilot-parent"
+          docker run --rm --pull never --platform linux/arm64 \
+            --network none --cpus 4 --memory 8192m --memory-swap 8192m \
+            --user "$(id -u):$(id -g)" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/source,dst=/src,readonly" \
+            --mount "type=bind,src=$CARGO_HOME,dst=/cargo" \
+            --mount "type=bind,src=$RUNNER_TEMP/n83-exporter-target,dst=/target" \
+            --env CARGO_HOME=/cargo --env CARGO_TARGET_DIR=/target \
+            --workdir /src "$IMAGE_REF" \
+            cargo build --release --locked --offline --example koblitz_n83_factor_base_export \
+            > "$RUNNER_TEMP/n83-sixsum-setup/exporter-build.stdout" \
+            2> "$RUNNER_TEMP/n83-sixsum-setup/exporter-build.stderr"
+          docker run --rm --pull never --platform linux/arm64 \
+            --network none --cpus 1 --memory 4096m --memory-swap 4096m \
+            --user "$(id -u):$(id -g)" \
+            --mount "type=bind,src=$GITHUB_WORKSPACE/source,dst=/src,readonly" \
+            --mount "type=bind,src=$RUNNER_TEMP/n83-exporter-target,dst=/target,readonly" \
+            --mount "type=bind,src=$RUNNER_TEMP/n83-pilot-parent,dst=/pilot" \
+            --workdir /src "$IMAGE_REF" \
+            /target/release/examples/koblitz_n83_factor_base_export \
+            pilot /pilot/panel 1800 \
+            > "$RUNNER_TEMP/n83-sixsum-setup/pilot.stdout" \
+            2> "$RUNNER_TEMP/n83-sixsum-setup/pilot.stderr"
+          python3 "$GITHUB_WORKSPACE/source/research/koblitz_n83_factor_base_sweep_20261008/verification/hosted-paired-gate-20261015/prepare_archives.py" \
+            --panel "$RUNNER_TEMP/n83-pilot-parent/panel" \
+            --archives "$ARCHIVE_DIR" \
+            --receipt "$RUNNER_TEMP/n83-sixsum-setup/regeneration.json" \
+            --source-commit "$(git -C "$GITHUB_WORKSPACE/source" rev-parse HEAD)" \
+            --workflow-commit "$GITHUB_SHA" \
+            --started-unix-seconds "$started" \
+            > "$RUNNER_TEMP/n83-sixsum-setup/regeneration.stdout" \
+            2> "$RUNNER_TEMP/n83-sixsum-setup/regeneration.stderr"
+      - name: Run separately cold bounded 4+2 Gray and hash arms
+        env:
+          PYTHONPATH: ${{ runner.temp }}/n83-pydeps
+        run: |
+          set -euo pipefail
+          python3 "$GITHUB_WORKSPACE/protocol/research/koblitz_n83_factor_base_sweep_20261008/verification/hosted-sixsum-access-20261025/run.py" \
+            --source "$GITHUB_WORKSPACE/source" \
+            --archives "$ARCHIVE_DIR" --output "$OUT_DIR" --scratch "$SCRATCH_DIR" \
+            --preparation-receipt "$RUNNER_TEMP/n83-sixsum-setup/regeneration.json" \
+            > "$RUNNER_TEMP/n83-sixsum-setup/run.stdout" \
+            2> "$RUNNER_TEMP/n83-sixsum-setup/run.stderr"
+      - name: Preserve preparation, raw stages and audited outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n83-hosted-sixsum-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/n83-sixsum-setup/
+            ${{ runner.temp }}/n83-archives/*.jsonl.gz
+            ${{ runner.temp }}/n83-pilot-parent/panel/manifest.json
+            ${{ runner.temp }}/n83-hosted-sixsum/
+            ${{ runner.temp }}/n83-sixsum-scratch/*/build/build.stdout
+            ${{ runner.temp }}/n83-sixsum-scratch/*/build/build.stderr
           if-no-files-found: warn
           retention-days: 90
