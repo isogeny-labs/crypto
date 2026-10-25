@@ -39,6 +39,7 @@ class FakeProvider:
             "machineId": "machine0" if self.duplicate_machine else f"machine{stratum}",
             "memoryInGb": 27, "vcpuCount": 4,
             "imageName": subject.IMAGE, "gpuCount": 1,
+            "containerDiskInGb": 30, "volumeInGb": 0,
         }
         self.live.append(pod)
         if stratum == 1 and self.lose_second_response:
@@ -72,6 +73,8 @@ class AllocateTests(unittest.TestCase):
             snapshot_path = output / "provider_snapshot.json"
             snapshot = json.loads(snapshot_path.read_text())
             self.assertEqual(len({p["machine_id"] for p in snapshot["pods"]}), 2)
+            self.assertEqual(snapshot['projected_compute_and_container_disk_usd'],
+                             '3.30')
             for stratum in range(2):
                 allocation = json.loads((output / f"allocation_s{stratum}.json").read_text())
                 self.assertEqual(allocation["snapshot_sha256"],

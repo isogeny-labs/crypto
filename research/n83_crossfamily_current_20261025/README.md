@@ -55,14 +55,18 @@ The Pod runner checks sealed file hashes, canonical
 single-target workload IDs, subgroup membership, and all 16 scalar replays
 without needing the repository's historical Git objects. Its two 27 GiB, four-vCPU
 minimum allocations each require an observed rate at most $0.30/hour and a
-provider `terminateAfter` deadline of 360 minutes. The two-rate reservation
-estimate is at most $3.60, below its $5 campaign cap. It reads a configured
+provider `terminateAfter` deadline of 360 minutes. Each Pod requests exactly
+30 GB of container disk and zero persistent volume. The conservative
+six-hour projection is at most $3.66, including $3.60 at the two observed
+rate ceilings and $0.06 of container disk rounded upward using a 28-day
+month. This is below the $5 campaign cap. It reads a configured
 RunPod key from the process environment or `~/.runpod/config.toml`, never
 copies it into the receipts, verifies provider readback and distinct machine
 IDs, and attempts to terminate every discovered Pod if allocation fails.
-The $3.60 figure bounds the observed `costPerHr` field for both Pods over the
-360-minute window; any separately billed storage remains outside that field
-and must fit the remaining $1.40 allowance.
+The storage rate is pinned from [RunPod's Pod pricing documentation](https://docs.runpod.io/pods/pricing),
+which lists $0.10 per GB per month for running container disk and separate
+per-second compute and storage billing. The allocation receipt retains the
+rate, disk size, clock limit and observed Pod rates.
 The allocation output belongs outside the repository. Raw result transfer
 and termination receipts are handled by `dispatch_runpod.py`: `--stage`
 transfers the sealed source and allocation receipts to two public SSH

@@ -3,7 +3,7 @@
 
 import argparse
 from datetime import datetime, timedelta, timezone
-from decimal import Decimal
+from decimal import Decimal, ROUND_UP
 import hashlib
 import json
 import os
@@ -25,6 +25,9 @@ IMAGE = "runpod/base:1.0.2-ubuntu2404"
 CAP_SECONDS = 360 * 60
 PRICE_CAP_PER_HOUR = Decimal("0.30")
 TOTAL_CAP_USD = Decimal("5.00")
+CONTAINER_DISK_GB = 30
+CONTAINER_DISK_USD_PER_GB_MONTH = Decimal("0.10")
+MIN_BILLING_MONTH_HOURS = Decimal(28 * 24)
 READBACK_ATTEMPTS = 30
 READBACK_DELAY_SECONDS = 2
 
@@ -39,6 +42,15 @@ def iso(value):
 
 def sha(blob):
     return hashlib.sha256(blob).hexdigest()
+
+
+def projected_total(prices):
+    hours = Decimal(CAP_SECONDS) / Decimal(3600)
+    compute = sum(prices, Decimal(0)) * hours
+    disk = (Decimal(len(prices) * CONTAINER_DISK_GB) *
+            CONTAINER_DISK_USD_PER_GB_MONTH * hours /
+            MIN_BILLING_MONTH_HOURS)
+    return (compute + disk).quantize(Decimal("0.01"), rounding=ROUND_UP)
 
 
 def write(path, record):
@@ -74,6 +86,7 @@ def graphql(query, key):
 def provider_pods(key):
     query = ("query { myself { pods { id name desiredStatus costPerHr "
              "createdAt machineId memoryInGb vcpuCount imageName gpuCount "
+             "containerDiskInGb volumeInGb "
              "podType } } }")
     return graphql(query, key)["myself"]["pods"]
 
@@ -110,10 +123,12 @@ def mutation(name, terminate_at):
         ", gpuCount: 1, cloudType: COMMUNITY, minMemoryInGb: 27, "
         "minVcpuCount: 4, imageName: " + json.dumps(IMAGE) +
         ", templateId: \"runpod-ubuntu\", containerDiskInGb: 30, "
+        "volumeInGb: 0, "
         "startSsh: true, supportPublicIp: true, ports: \"22/tcp\", terminateAfter: " +
         json.dumps(terminate_at) +
         " }) { id name desiredStatus costPerHr machineId memoryInGb "
-        "vcpuCount imageName gpuCount createdAt podType } }")
+        "vcpuCount imageName gpuCount containerDiskInGb volumeInGb "
+        "createdAt podType } }")
 
 
 def valid_pod(pod, expected_name):
@@ -128,6 +143,8 @@ def valid_pod(pod, expected_name):
             int(pod.get("memoryInGb")) < 27 or
             int(pod.get("vcpuCount")) < 4 or
             int(pod.get("gpuCount")) != 1 or
+            int(pod.get("containerDiskInGb")) != CONTAINER_DISK_GB or
+            Decimal(str(pod.get("volumeInGb"))) != 0 or
             price <= 0 or price > PRICE_CAP_PER_HOUR or
             not pod.get("createdAt")):
         raise ValueError("RunPod allocation violates frozen host or price cap")
@@ -179,6 +196,10 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
         "image_name": IMAGE, "min_memory_gb": 27, "min_vcpus": 4,
         "cap_seconds": CAP_SECONDS, "terminate_at_utc": terminate_at,
         "price_cap_per_hour_usd": str(PRICE_CAP_PER_HOUR),
+        "container_disk_gb_per_pod": CONTAINER_DISK_GB,
+        "container_disk_usd_per_gb_month":
+        str(CONTAINER_DISK_USD_PER_GB_MONTH),
+        "minimum_billing_month_hours": int(MIN_BILLING_MONTH_HOURS),
         "total_reserved_cap_usd": str(TOTAL_CAP_USD),
         "existing_named_pods": [],
     })
@@ -206,8 +227,8 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
             price = valid_pod(pod, name)
             if pod["id"] != raw["id"]:
                 raise ValueError("RunPod mutation ID and readback differ")
-            projected = (sum((Decimal(str(p["costPerHr"])) for p in observed),
-                             Decimal(0)) + price) * Decimal(CAP_SECONDS) / Decimal(3600)
+            projected = projected_total(
+                [Decimal(str(p["costPerHr"])) for p in observed] + [price])
             if projected > TOTAL_CAP_USD:
                 raise ValueError("two-Pod reservation exceeds total cap")
             observed.append(pod)
@@ -225,6 +246,7 @@ def allocate(output, key, bundle_proof, api=graphql, pods=provider_pods,
                       "cost_per_hr": p["costPerHr"],
                       "image_name": p["imageName"]}
                      for i, p in enumerate(observed)],
+            "projected_compute_and_container_disk_usd": str(projected),
         }
         snapshot_path = output / "provider_snapshot.json"
         write(snapshot_path, snapshot)
@@ -281,9 +303,9 @@ def main():
         print(json.dumps({"status": "READY_FOR_CREDENTIAL_AND_DISPATCH",
                           "source_head_sha": head,
                           "source_bundle_verified": bundle_proof is not None,
-                          "projected_max_usd": str(2 * PRICE_CAP_PER_HOUR *
-                                                   Decimal(CAP_SECONDS) /
-                                                   Decimal(3600))}, sort_keys=True))
+                          "projected_max_usd": str(projected_total(
+                              [PRICE_CAP_PER_HOUR, PRICE_CAP_PER_HOUR]))},
+                         sort_keys=True))
         return
     if bundle_proof is None:
         raise ValueError("--source-bundle is required for allocation")
