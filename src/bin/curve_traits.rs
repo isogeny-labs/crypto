@@ -109,7 +109,7 @@ enum Cmd {
         name: String,
         #[arg(long, default_value_t = 15)]
         top: usize,
-        /// Leave out curves over a field of the same size.
+        /// Leave out curves with the target's field kind and bit length.
         #[arg(long)]
         other_sizes: bool,
         /// Comma-separated keys to compare, each weighted 1, instead of
