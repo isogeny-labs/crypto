@@ -17,6 +17,10 @@ presentation) has not run `N = 20`. The card's earlier text calling lead 1
 the `m = 3, N = 21` cell is still inconclusive there (`D ≥ 7`, stopped by the
 wall before any degree-8 round) and is what remains.
 
+*2026-10-24 update:* specialisation null (no specialised run reached degree 8; drops of 2-3 degrees at N = 15 and
+small degrees at N = 21), and target 1 unspecialised exceeds 16 GiB inside degree 7
+([`research/pkm_m3_specialise_20261024/`](../../research/pkm_m3_specialise_20261024/RESULTS.md)).
+
 Blocked on hardware (a 256 GB host for `m = 3`) or on a disk-backed `B'`
 reducer that is not built. PR #1893 merged on 2026-10-15, and the card pins
 its merge commit `3074507842`. Funding 1,000,000.

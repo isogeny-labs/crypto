@@ -47,9 +47,15 @@ ideal contains 1.
 - **Never run:** `m4_t5_x362838726` M1 (the cheap queue was stopped when the m4 runs were interrupted), N = 21 H-arms
   at a second root, and the m = 4 F0 (already recorded in the earlier study). The N = 15 control got both roots for
   H1 and M1 (H1b, M1b): identical degrees.
-- Process note: the first launch of `run_all.sh` hit a `make_systems.sh` shell-expansion bug on the F0 copies (no run
-  record was produced; fixed in the results commit 88735efd6c-era script, runs restarted from scratch). The n = 15 F0 and target-1 F0 wall
-  times are inflated by host load (CPU 1,112 s for 2,788 s wall at N = 15).
+- Process note: post-freeze script fix. The first `make_systems.sh` run produced F0 copies with wrong names
+  (lines 8 and 22 wrote `$C__F0` and `$T1__F0`, which the shell reads as unset variables `C__F0`, `T1__F0`).
+  The fix is the brace form `${C}__F0` / `${T1}__F0`. It was made before any recorded run: the runs launched with
+  the bad names exited at once with "Input file not found", their records were deleted, and every run was
+  restarted from scratch. Wall times are inflated by host load (CPU 1,112 s for 2,788 s wall at N = 15).
+- **Raw `.mem` files of the two m = 4 runs say `stop=exit exit=-15`.** They were SIGTERMed by me; `run_one.py`
+  (line 30) does not classify signals. `parse.py` relabels negative exits as "interrupted".
+- **Control (b) (m = 4, N = 20) produced no calibration.** Neither interrupted run finished, so the drop of a known
+  D >= 8 cell under specialisation is unmeasured; only control (a) (N = 15) calibrates the readings above.
 
 ## 3. Degree table by arm (completed runs; max productive degree)
 
@@ -75,8 +81,7 @@ no degree-8 round; M2 partial, productive degree 7, no degree-8 round; both inte
 3. **Within the specialised families the degree is not flat in N for the M arms:** 5 (N = 15) -> 6 (N = 21) -> 6
    (N = 24) for M1/M2, while H1 stays 5 and H2 stays 4. That is growth between N = 15 and N = 21 in the family that
    keeps coupled free chain levels, then a plateau at 6 through N = 24 (one target at N = 24, M2 only). It is a
-   statement about the specialised ideals; by the ring-map argument it is consistent with, but does not prove, a
-   rising unspecialised degree.
+   statement about the specialised ideals; no inference to I (frozen rule, PROTOCOL.md section 6).
 4. **Unit-ideal requirement.** The unit-ideal status of the two N = 21 targets is *not established*: target 0 had
    degree 7 exhausted without 1 in the basis (A1 run), target 1 stopped by memory inside degree 7. Even a >= 8
    specialised result would have been conditional on that. Specialised ideals all being the unit ideal does not
@@ -90,3 +95,9 @@ no degree-8 round; M2 partial, productive degree 7, no degree-8 round; both inte
    confirmation. What would discriminate next: a specialisation that keeps more levels free (fix a deeper
    chain variable at larger t, so the drop at N = 15 is 1 rather than 2), calibrated against N = 15 and the m = 4
    cell; the m = 4 M1/M2/H1 controls need a finished run (they were interrupted).
+
+## 5. Graph
+
+`plot.py` writes `degree_vs_N.svg`: max productive degree of the completed specialised runs against N for each
+arm (F0 at N = 15 shown for reference). The m = 4 and target-1 runs have no completed point and are omitted. No PDF
+is produced: the figure is the only graphic and the SVG is the artefact (omission recorded here).
