@@ -110,6 +110,13 @@ for arbitrary inputs.
   quotient construction, and the required `D₊(Z)` chart isomorphism. Its
   bounded compiler attempts returned two timeouts and one missing-import
   error; no new theorem was checked.
+- **Mechanized, 2026-10-25 weighted head:** A subsequent
+  [pinned Lean packet](../research/projective_law_followup_20261022/formal/WEIGHTED_PROJ_HEAD_VERIFIED.md)
+  proves the proposed weighted sextic has degree six and its principal ideal
+  is homogeneous under weights `(1,3,1)`, with exit 0 and standard-axiom
+  audits. The earlier failed attempts remain preserved. A grading on the
+  quotient, the `D₊(Z)` coordinate-ring isomorphism, completion and `Pic⁰`
+  transport are still unproved.
 - **Finite source-bound check, 2026-10-25:** One smooth `F17` 2-torsion
   fixture makes both the pinned author public dispatcher and compiled Rust
   dispatcher return identity, matching Cantor. A direct author doubling

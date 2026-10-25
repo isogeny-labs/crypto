@@ -327,6 +327,14 @@ specific quotient-grading and `D₊(Z)` chart-isomorphism obligations, available
 pinned APIs, and three failed/timed-out compiler commands. Its
 [standardized API-gap rows](weighted-proj-head-api-gap.csv) are an open
 proof record; no additional theorem passed the compiler.
+The later [weighted-head proof packet](WEIGHTED_PROJ_HEAD_VERIFIED.md) checks
+in pinned Lean that the proposed sextic has weighted degree six and that its
+principal ideal is homogeneous. Its compiler exited 0 with standard axioms;
+the [PDF](weighted-proj-head-verified.pdf),
+[graph](weighted-proj-head-verified.svg), and
+[seven-row CSV](weighted-proj-head-verified.csv) show the two checked and five
+open obligations. The graded quotient and chart isomorphism still have no
+checked proof, and the earlier compiler/copy failures remain recorded.
 
 The [source-bound F17 exceptional dispatch packet](../exceptional_source_bridge/README.md)
 checks one valid 2-torsion divisor against the pinned author expressions,
