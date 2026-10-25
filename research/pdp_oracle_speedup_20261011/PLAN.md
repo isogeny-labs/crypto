@@ -203,7 +203,10 @@ days (before PS-7).
 | Baseline recorded | **verified complete** by PS-0 ([`baseline_v1/`](baseline_v1/README.md)): corpus, digests, A/A, counts; supersedes §2 |
 | PS-1 | **partial**: bit-degree, exactness theorem, group-law formulation and gate counts done; identity certificates blocked (schema is `F_p`-only), two candidate formulations not attempted ([`ps1_algebra/`](ps1_algebra/README.md)) |
 | PS-2 | **partial**: scalar group-law kernel with identical digests, A/A-qualified timing (0.067–0.12 of the baseline per pair, 0.016–0.031 per target), gate count and hashed program; the library module and the incremental-update arm are **not** built ([`ps2_scalar/`](ps2_scalar/README.md)) |
-| PS-3 to PS-7, PS-3b | **not attempted** (each updates this row when it lands) |
+| PS-3 | **partial**: three widths (`bs64`, `bs256`, `bs512`) with identical digests and root sets on the whole corpus, on **two host classes** (never pooled); 17.5×–62.5× the baseline per target at `ℓ = 11` (A/A spread ≤ 9.8%) but **not distinguishable from, or slower than, PS-2's scalar kernel** per pair; the 4-thread isolated run is **blocked** (the isolation tool refuses to reserve all four vCPUs; 1/2/3 isolated cores and a non-isolated 4-thread diagnostic measured); host A `ℓ = 13` has 3 rounds; `bs512` instruction counts impossible under valgrind 3.22; the library module and PS-3b are not done ([`ps3_bitsliced/`](ps3_bitsliced/README.md)) |
+| PS-4, PS-5, PS-7 | **stopped early** (the authoring agents hit the organisation's API spend limit): partial work snapshotted on `exp/pdp-ps4-symmetry`, `exp/pdp-ps7-cdcl` and, in `cryptanalysis`, `exp/pdp-ps5-gpu-emulation`; no results, no READMEs ([`LEADS.md`](LEADS.md) L5-L7) |
+| PS-6, PS-3b | **not attempted** (each updates this row when it lands) |
+| PS-8 (added after the others were frozen) | protocol frozen ([`protocols/PS-8.md`](protocols/PS-8.md)); arm written, not yet built or measured ([`LEADS.md`](LEADS.md) L1) |
 | Any speedup claim | **none made** |
 
 ## 9. Graphs and canonical artifacts checked
