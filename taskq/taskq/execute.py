@@ -169,7 +169,8 @@ class Measured:
 def run_measured(argv: list[str], cwd: Path, env: dict[str, str],
                  timeout: float, stdout: Path, stderr: Path, stop: StopFn,
                  cpus: list[int] | None = None,
-                 memory_mb: int | None = None) -> Measured:
+                 memory_mb: int | None = None,
+                 shutdown_grace_seconds: float = 5.0) -> Measured:
     def preexec() -> None:
         if cpus:
             os.sched_setaffinity(0, cpus)
@@ -198,9 +199,12 @@ def run_measured(argv: list[str], cwd: Path, env: dict[str, str],
             else:
                 stopped = stop()
             if timed_out or stopped:
-                status, ru = _kill_group(proc.pid)
+                grace = shutdown_grace_seconds if stopped == "shutdown" else 5.0
+                status, ru = _kill_group(proc.pid, grace)
                 break
             time.sleep(0.05 if elapsed < 2 else 0.1)
+        if not timed_out and stopped is None and stop() == "shutdown":
+            stopped = "shutdown"
         wall = time.perf_counter() - t0
     proc.returncode = 0  # reaped by wait4; stop Popen from waiting again
     code = os.waitstatus_to_exitcode(status)
@@ -212,9 +216,9 @@ def run_measured(argv: list[str], cwd: Path, env: dict[str, str],
         timed_out=timed_out, stopped=stopped)
 
 
-def _kill_group(pid: int):
+def _kill_group(pid: int, grace_seconds: float = 5.0):
     """SIGTERM the process group, SIGKILL after a grace period; reap with rusage."""
-    for sig, grace in ((signal.SIGTERM, 5.0), (signal.SIGKILL, None)):
+    for sig, grace in ((signal.SIGTERM, grace_seconds), (signal.SIGKILL, None)):
         try:
             os.killpg(pid, sig)
         except ProcessLookupError:
@@ -243,6 +247,48 @@ def _sha256(path: Path) -> str:
         for chunk in iter(lambda: fh.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def _resume_checkpoint(root: Path, task_id: str, attempt: int,
+                       filename: str) -> Path | None:
+    """Copy and verify a prior checkpoint into this attempt before use.
+
+    Returning a prior worker's live path would allow it to replace the bytes
+    after verification. Hash the exact bytes copied to the new attempt instead.
+    Legacy payload/marker pairs are still readable through the same snapshot.
+    """
+    root = root.resolve()
+    current = root / task_id / f"attempt-{attempt}"
+    current.mkdir(parents=True, exist_ok=True)
+    for n in range(attempt - 1, 0, -1):
+        path = root / task_id / f"attempt-{n}" / filename
+        digest = path.with_name(path.name + ".sha256")
+        snapshot = None
+        try:
+            expected = digest.read_text().strip()
+            if len(expected) != 64 or any(c not in "0123456789abcdef" for c in expected):
+                continue
+            generation = path.with_name(f".{path.name}.{expected}.snapshot")
+            candidate = generation if generation.exists() else path
+            fd, name = tempfile.mkstemp(prefix=f".resume-{filename}.", dir=current)
+            snapshot = Path(name)
+            actual = hashlib.sha256()
+            with os.fdopen(fd, "wb") as out, candidate.open("rb") as inp:
+                for chunk in iter(lambda: inp.read(1 << 20), b""):
+                    out.write(chunk)
+                    actual.update(chunk)
+                out.flush()
+                os.fsync(out.fileno())
+            if actual.hexdigest() == expected:
+                verified = snapshot
+                snapshot = None
+                return verified
+        except (OSError, UnicodeError):
+            continue
+        finally:
+            if snapshot is not None:
+                snapshot.unlink(missing_ok=True)
+    return None
 
 
 def _cap_log(path: Path, cap: int) -> bool:
@@ -356,7 +402,8 @@ def _summary(runs: list[dict[str, Any]]) -> dict[str, Any] | None:
 
 def execute(spec: dict[str, Any], task_id: str, attempt: int,
             repos: RepoCache, artifact_root: Path | None, stop: StopFn,
-            worker_cpus: list[int] | None = None) -> dict[str, Any]:
+            worker_cpus: list[int] | None = None,
+            checkpoint_root: Path | None = None) -> dict[str, Any]:
     """Run a normalised spec. Raises InfraError (retry) or Fenced (abandon)."""
     src = spec["source"]
     body: dict[str, Any] = {
@@ -394,6 +441,18 @@ def execute(spec: dict[str, Any], task_id: str, attempt: int,
         base_env = {**_base_env(), **cmd["env"],
                     "TASKQ_TASK_ID": task_id, "TASKQ_ATTEMPT": str(attempt),
                     "TASKQ_SOURCE_DIR": str(tree)}
+        checkpoint = spec.get("checkpoint")
+        if checkpoint:
+            if checkpoint_root is None:
+                raise InfraError("checkpoint requested but no durable checkpoint directory is configured")
+            checkpoint_root = checkpoint_root.resolve()
+            filename = checkpoint["file"]
+            current_dir = checkpoint_root / task_id / f"attempt-{attempt}"
+            current_dir.mkdir(parents=True, exist_ok=True)
+            resume = _resume_checkpoint(checkpoint_root, task_id, attempt, filename)
+            base_env["TASKQ_CHECKPOINT_DIR"] = str(current_dir)
+            base_env["TASKQ_CHECKPOINT_FILE"] = str(current_dir / filename)
+            base_env["TASKQ_RESUME_FILE"] = str(resume) if resume else ""
 
         t_setup = 0.0
         for i, step in enumerate(cmd["setup"]):
@@ -426,7 +485,8 @@ def execute(spec: dict[str, Any], task_id: str, attempt: int,
                        "TASKQ_REPETITION": str(i), "TASKQ_WARMUP": "1" if warm else "0"}
                 m = run_measured(cmd["argv"], cwd, env, limits["timeout_seconds"],
                                  logs / "stdout.log", logs / "stderr.log",
-                                 stop, cpus, limits["memory_mb"])
+                                 stop, cpus, limits["memory_mb"],
+                                 shutdown_grace_seconds=90.0 if checkpoint else 5.0)
                 metrics = None
                 mfile = run_out / "metrics.json"
                 if mfile.exists():

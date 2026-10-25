@@ -42,6 +42,31 @@ Factor bases (build with `ecbench fb`, publish to Git/`store:`, run
 `ic.pipeline` with a matching plug-in string):
 [FACTOR_BASE_PROTOCOL.md](FACTOR_BASE_PROTOCOL.md).
 
+### Every subcommand, and where it is described
+
+| `ecbench …` | does | described in |
+|---|---|---|
+| `methods` | list every method with its parameters | §7, §11 |
+| `host` | print the host capsule | §5 |
+| `plan` | validate a spec and print what it expands to; an arm its curve cannot run is refused here | §1, §3 |
+| `run` | run a session | §1, §5, §6 |
+| `exec` | the measured child (`run` spawns it; not for hand use) | §3 |
+| `verify` | audit a session from its own files, with exact replays | §9 |
+| `compare` | compare arm B against arm A, paired bootstrap intervals | §8 |
+| `table` | every arm on every curve, mean `S`, ratio to the floor and to the reference arm | §3, §8 |
+| `band` | the pricing band of AGENTS.md §5a: unpriced native work charged at each weight | AGENTS.md §5a |
+| `resources` | resource vectors for all measured attempts | §7 |
+| `trend` | fit how a paired ratio moves across curves from `compare --save` files | §8 |
+| `calibrate` | A/A interval coverage and false admissions across quiet and contended sessions | §8 |
+| `price-units` | measure the full-pricing units on this host | §7 (`*_full` methods) |
+| `profile-input`, `callgrind-ir`, `callgrind-online-ir` | export one measured child's input; sum Callgrind instruction counts inside the solve markers | §9 |
+| `fb`, `fbm`, `store` | build a factor base; seal an FBM1 measurement identity; push, pull and index large files | [FACTOR_BASE_PROTOCOL.md](FACTOR_BASE_PROTOCOL.md) |
+| `claim` | a `vs_rho` claim: one IC run against the strong rho on a public target | §9 "Claims" |
+| `db` | the SQLite database | §10 |
+| `isolab-job` | an `isolab.job/v1` for an independent lab worker | §9 |
+| `bound`, `frontier`, `challenge` | sealed cost bounds, the frontier of unbeaten methods, and the frozen paired challenge that moves it | [../bounds/README.md](../bounds/README.md) |
+| `gpu-stage`, `gpu-match`, `gpu-match-verify` | the separately labelled GPU stage and its CPU recheck | §13 |
+
 ## 1. Quick start
 
 Rolling `main` release archives ship `ecbench` beside `ic` for Linux (glibc
@@ -357,17 +382,56 @@ An addition and a doubling are one each. A scalar multiplication is
 charged as the additions and doublings it performs. `S ≈ 1.25` is plain
 rho's expectation `√(π/2)`; the curve's floor is `√(π/2A)` (§3).
 
+### The registered methods
+
+`ecbench methods` prints the live registry with every parameter and its
+default; the ids are:
+
+| id | family | what it is |
+|---|---|---|
+| `rho.frozen_reference` | rho | the frozen r-adding walk every ledger row was priced against through §17 (A = 1); the historical "before" mark |
+| `rho.plain` | rho | tuned r-adding walk on points (A = 1), distinguished points, stride starts |
+| `rho.negation` | rho | tuned walk on `{P, −P}` (A = 2), Wiener–Zuccherato look-ahead and cycle escape; the matched reference on a prime curve |
+| `rho.quartic`, `rho.cubic` | rho | the same walk on `{±ι^i P}` (A = 4, j = 1728) and `{±ζ₃^i P}` (A = 6, j = 0); refused at plan time on a curve without the structure |
+| `rho.signed_frobenius` | rho | tuned walk on signed Frobenius orbits `{±φ^t P}` (A = 2n), Koblitz only; the matched reference there |
+| `rho.signed_frobenius_strong`, `…_legacy`, `…_escape` | rho | the strong single-target reference (lockstep walks, batched inversion), its trajectory-identical pre-2026-10-14 implementation control, and the variant that escapes fruitless cycles by doubling |
+| `rho.signed_frobenius_full`, `rho.signed_frobenius_strong_full`, `ic.pipeline_full` | — | the base method repriced with every native operation charged (`price-units`) |
+| `bsgs.textbook`, `bsgs.interleaved`, `bsgs.negation` | bsgs | baby table then giant steps (mean 1.5√r); Pollard's interleaving (mean 4√r/3); classes `{P, −P}` with stride 2m + 1 (mean about √r) |
+| `kangaroo.vow` | kangaroo | van Oorschot–Wiener tame/wild kangaroo on `[0, r)`, distinguished points |
+| `claw.pair_table` | claw | the four-point signed-Frobenius pair claw (cryptanalysis#175): known-log orbit base, target-independent quotient pair table |
+| `ic.pipeline`, `ic.pipeline_counted` | ic | the index-calculus pipeline (factor base, oracle, relations, linear algebra, verification), and the same with the relation charge rebuilt from counted work |
+| `ic.large_prime`, `ic.shared_rank` | ic | the large-prime variation and the shared-rank adapter on binary curves |
+| `ic.k4_gaudry` | ic | Gaudry's k = 4 index calculus on `E(F_{p⁴})`, `fp4_translation` curves only |
+| `ic.cm_folded_native_v1`, `ic.cm_folded_recurrence_v1`, `ic.cm_folded_native_d43_v1` | ic | the CM scalar-orbit signed MITM2 controls with a native backend, prime curves only |
+
 | family | charged | counted, not charged (`*_uncharged`) |
 |---|---|---|
 | `rho.*` | jump-table set-up, walk starts, every step, cycle escapes, look-ahead additions, internal verification | canonicalisations (negation, signed Frobenius), Frobenius maps |
+| `rho.quartic`, `rho.cubic` | as `rho.*`, plus the class set-up: the scalar multiplication that fixes ι (resp. ζ₃) on the subgroup, in the `setup` phase and in the total. Records written before 2026-10-18 carried it in the `setup` phase only, so their `total_gae` and `S` fall short of the phase sum by that set-up (21 GAE on the 17-bit crater curves of `research/prime_rho_automorphism_20261015`); the phase sum is the true total. `verify` replays such a record exactly, reporting it as reproduced under the pre-2026-10-18 accounting, with the set-up the replay itself measured subtracted from the total (`audit::legacy_class_setup`). | as `rho.*` |
 | `rho.signed_frobenius_strong` | group additions exactly; each scalar multiplication (jump table, walk start stride, candidate checks) at `1.5·log₂ r` additions, `ic_boundary::signed_frobenius_rho`'s convention | canonicalisations, partition hashes, distinguished-point table queries and inserts |
 | `rho.signed_frobenius_strong_legacy` | identical to `rho.signed_frobenius_strong`; comparison-only implementation control | identical to `rho.signed_frobenius_strong` |
+| `rho.multitarget_pooled` | the whole batch of `L = batch` targets: the shared jump table (full-size multiples of `G`), each target's `G + Q_i` and start stride, every walk start and step, look-ahead and escapes, and the internal `[d]G = Q_i` check of every recovered log; phases `setup`, `search`, `internal_verification` | canonicalisations; distinguished-point table inserts and probes |
 | `bsgs.*` | baby steps, the giant stride, giant steps | table inserts and lookups |
-| `kangaroo.vow` | jump-table set-up, starts and restarts, every jump | table inserts and lookups |
+| `kangaroo.vow` | jump-table set-up and the two starts (phase `setup`); every jump and any re-placement after a same-kind collision (phase `search`; before 2026-10-18 a re-placement was charged to `setup`, total unchanged, and `verify` reproduces those records through `audit::legacy_restart_phase`) | table inserts and lookups |
 | `claw.pair_table` | the known-log base's seed scalar multiplications, every table addition `P_i + F_b`, both query additions `Q − (F_k + F_l)`, the addition that rebuilds a hit's table sum; phases `base`, `table`, `search`, `recover` | Frobenius maps, canonicalisations, table inserts and probes |
 | `ic.pipeline` | factor base, oracle set-up (pair tables), relation trials, linear algebra, verification, each a phase; native work (lookups, row operations, square roots, Artin–Schreier solves, …) at the pinned ratio where the repository has one | native work with no pinned ratio for this curve; algebraic-solver operations |
 | `ic.pipeline_counted` | the same pipeline with the relation phase charge rebuilt from counted work and pinned conversions for deterministic SAT/PDP replays | algebraic-solver operations without a pinned conversion, including SAT conflicts; these runs remain lower bounds |
 | `ic.large_prime` | cofactor projection, exact combination-table group additions, target probes, and relation witness checks; the external runner verifies the returned scalar | combination states, MITM lookups, large-prime merge operations, and modular row operations; the record is therefore a lower bound, not a speed claim |
+
+`rho.multitarget_pooled` is registered `applies: prime_only` (single-word
+prime-field curves, the only instance family it implements): the planner
+refuses a binary or extension workload before a session starts, and `solve`
+refuses it again. It is the one method whose run solves more than its
+record's target. The record's target is solved last, after `L − 1` companion
+targets hashed to `⟨G⟩` by the public-target law (indices `2^40 + j`, the
+algorithm seed as the law's seed), whose logarithms nobody holds; the runner
+verifies the record's target as for every method, each companion's log is
+checked inside the run and written with its point under
+`detail.per_target` / `detail.companions`. `S` is the whole batch over `√r`,
+so it is compared with `L` single-target runs (`L·S_rho.negation`) or with the
+Kuhn–Struik reference `Σ_{i<L} C(2i,i)·4^{−i}·√(π/4)`; its `expected_s` is
+unset because it depends on `L`. A batch keeps one distinguished-point table
+for all targets (memory grows with `L`).
 
 The counted IC method has its own method identity so frozen SAT/PDP sessions
 retain their exact parameter and accounting contract. It removes solver wall
@@ -621,6 +685,39 @@ Two consequences to read every table with:
   ratio moves with `ln r` and `ln n` across curves. First use:
   `research/ecbench_frobenius_orbit_vs_rho_20261014/`.
 
+- **Word-RAM reference pricing is the host-independent alternative.**
+  `ic.pipeline_wordram`, `rho.signed_frobenius_wordram` and
+  `rho.signed_frobenius_strong_wordram` run the same base solvers and
+  charge the same counters by the same rules as the `*_full` methods.
+  They take each unit's price from fixed formulas, not from one host's
+  timings. The scheme is
+  [CurveSmash's](https://github.com/zac-williamson/curvesmash/blob/main/docs/COST_MODEL.md)
+  (after HashSmash). The curve's affine addition is the reference operation
+  and costs 1. Its budget `C`, in operations on a 256-bit word RAM, is fixed by
+  formula. Every other unit costs its own word-operation budget divided
+  by `C`. For a `k`-bit field in `s` words: `A = 128(s+1)`,
+  `M = k(2A+64) + 128(s+1)` and `C = I + 16M + 32A + 4096`.
+  Prime fields use CurveSmash's Fermat inversion,
+  `I = 2k(M+64) + 128(s+1)`, unchanged; at `k = 256` this gives its
+  secp256k1 price, `C = 78,037,248`, and a unit test holds both published
+  constants. In `GF(2^m)` a squaring is linear, so `S = 8k + 128(s+1)`
+  and `I = k(S+M+128) + 128(s+1)`. Frobenius maps, signed-Frobenius
+  canonicalisations, half-trace Artin–Schreier solves, hash probes,
+  row operations modulo `r` and word XORs are built from those budgets
+  (`src/cryptanalysis/ecbench/wordram_price.rs` documents each one).
+  The record's `detail.wordram_pricing` gives every budget, `C` and the
+  charge by counter. `ecbench wordram-prices --curve 0:31 …` prints the
+  table for any Koblitz curve; nothing is measured.
+  These are conservative portable allowances that define the unit, not
+  timings. The word RAM charges one operation per memory transfer
+  whatever the cache level, so a hash probe is much cheaper here than in
+  `full_prices.json`. Native work is priced in the same unit on every
+  host and needs no `price-units` run, but its rate is a modelling
+  choice: §5a's band (0, 0.1 and 1 GAE per native operation) still
+  decides any ranking, and a word-RAM total is one point to quote beside
+  it, not a replacement for it. A counter with no rule stays unpriced,
+  and the record stays marked as a lower bound.
+
 `ecbench resources --dir SESSION --out resources.json` reports, for every
 measured attempt including failures, the native integer counters by phase,
 charged GAE and clocks by phase, the target's exclusive online window,
@@ -641,17 +738,64 @@ remain descriptive.
   round). Within a session the two arms of a round share an algorithm
   seed; across two sessions of one spec (a baseline binary and a
   candidate) they do too, and `same_seeds` says so. The ratio is
-  `Σ S_B / Σ S_A` over the matched verified pairs, AGENTS.md §8's
+  `Σ S_B / Σ S_A` over the matched pairs, AGENTS.md §8's
   `baseline_total / candidate_total` in `S`. It is never a mean of
   ratios, which is biased whenever the arms spread differently (rho's
   cost varies with its seed, BSGS's does not).
-- **Two-stage (cluster) bootstrap.** Intervals resample *workloads*, then
-  pairs within each, and recompute the same ratio of totals. This
-  matters: BSGS's cost is fixed by its target, so all its variance is
-  between workloads, and an interval that held the workloads fixed would
-  be a point. With one workload only the within-workload interval exists,
-  and the comparison says `ci_method: within`. Runs without a partner
+- **The primary interval is linearised (`ecbench.comparison/v2`).** With
+  workloads as clusters, `A_k = Σ S_A` and `B_k = Σ S_B` over cluster `k`,
+  `R = ΣB/ΣA`, the influence values are `z_k = (B_k − R·A_k) / mean(A)`,
+  the standard error is `sd(z)/√K` and the interval
+  `R · exp(± t(K−1, 0.975) · se/R)`, the same linearisation read on the
+  log scale so that a ratio of costs never gets a non-positive end (on the
+  ratio scale, `R ± t·se`, the coverage is the same: 0.957, 0.948, 0.947
+  at K = 2, 4, 8 against 0.956, 0.946, 0.950; the quantile is computed in
+  `stats.rs` and tested against the published table). The reason is coverage: the percentile two-stage bootstrap of
+  the ratio of totals covers 85 % at two workloads and 92–93 % at three
+  or four (it over-covers at eight or more), where the linearised interval
+  covers 94–96 % at every `K`; `stats::tests` pins this with a seeded
+  Monte-Carlo (rho-like Rayleigh costs against BSGS-like per-target costs).
+  `ci_method` is `linearised_t`; the bootstrap interval of the same
+  statistic stays beside it as `ci95_bootstrap` (`cluster`, or `within`
+  with one workload).
+- **Few workloads are indicative.** Below five workloads `ops.indicative`
+  is true and the verdict says `INDICATIVE`: the t quantile at one or two
+  degrees of freedom is 12.7 or 4.3, so the interval is honest and wide.
+  With one workload the clusters are the pairs (`ci_method: within_t`,
+  `interval_scope: within_workload`): the interval covers seeds on that
+  target and says nothing about other targets. Runs without a partner
   make the comparison `partial`.
+- **Censored runs bound the ratio.** Ratios are not formed over verified
+  pairs alone: a timeout or an exhausted budget drops the arm's most
+  expensive draw and biases the survivors low. An exhausted run enters at
+  the cost it spent (its record carries it); a timed-out run carries no
+  cost, so it enters at the cost its wall time implies (process wall minus
+  the arm's largest fork-and-setup overhead, divided by the arm's largest
+  ns per GAE over its verified runs, so it is a lower bound; `0` when the
+  arm has no verified run to convert with). The pair is `censored`,
+  `ops.censored_pairs` counts them, and `ops.bound` says which way the
+  ratio is bounded: `lower` when only B is censored (Σ S_B is a lower
+  bound), `upper` when only A is, `indeterminate` when both are. The
+  verdict says `BOUND` whenever any pair is censored, the status stays
+  `incomplete` (not admissible), and `verified_only_ratio` keeps the old
+  figure. The interval of a bounded ratio is that of the bounded
+  statistic, not a coverage statement about the true ratio.
+- **Tail diagnostics.** Each arm reports max/median `S` and the largest
+  run's share of the arm's total (`tail`). Above 25 % the verdict adds
+  `heavy tail; more runs needed`: the mean is carried by one run.
+- **The pricing band (AGENTS.md §5a).** Each arm lists every unpriced
+  counter with its count (`unpriced_counts`, summed over verified runs;
+  `null` is a counter with no count). `ops.band` prices that native work,
+  and any pinned-calibration work, at 0, 0.1 and 1 GAE per operation on
+  every arm alike (the same function as `ecbench band`) and reports the
+  ratio of totals at each weight; `order` names a winner only when it
+  holds at every weight and otherwise says `unresolved inside the band`
+  (or `unrankable` when a counter is uncounted). It is over the verified
+  pairs, with censored pairs excluded.
+- **Sessions must be complete.** `compare` refuses a session whose status
+  is not `complete`. `--allow-interrupted` compares it anyway as
+  descriptive evidence: the comparison records the statuses and the flag,
+  sets `admissible: false` and the verdict says so.
 - **Per curve.** A ratio is reported per curve (one size each) as well as
   pooled. A claim about scaling reads the per-curve rows and fits
   exponents over at least four sizes (AGENTS.md §5).
@@ -659,18 +803,53 @@ remain descriptive.
   the same seeds do identical work, so the ops A/A is a check of
   determinism, not of noise. The noise in operations comes from targets
   and seeds, and the intervals above already carry it. The A/A arm is
-  for wall time, where its interval is the session's noise floor.
-- **Wall time is gated.** It is compared only within one session, only
-  over pairs where both runs reached `isolation_required`, only with at
-  least five such pairs. It is reported as the median per-pair ratio with
-  a bootstrap interval, set beside the A/A interval (which needs five
-  admitted pairs of its own), and marked `outside_noise` only when it
-  excludes 1 and does not overlap the A/A interval. Anything less prints
-  as `descriptive`, never as a result.
+  for wall time, where it estimates the session's position bias and noise.
+- **Wall time is gated, and is a cost per operation.** It is compared
+  only within one session, only over pairs where both runs reached
+  `isolation_required`, only with at least five such pairs; anything less
+  prints as `descriptive`, never as a result. The statistic is each arm's
+  `ns per GAE = Σ solve_wall / Σ total_gae` over the admitted pairs
+  (`ns_per_gae_a`, `ns_per_gae_b`) and its ratio B/A (`wall.ratio_b_over_a`),
+  with a linearised `t(n−1)` interval (log scale) whose clusters are the pairs (the
+  timing replicates). It answers what operation counts cannot, the constant
+  factor, and does not inherit the work variance of rho: in the deep dive's
+  simulation (5 workloads × 3 rounds, 3 % jitter, B truly 5 % slower per
+  operation) the per-pair median ratio spans [0.56, 1.54] and the ns/GAE
+  ratio [1.025, 1.075]. The v1 headline, the median of per-pair wall
+  ratios, is a different estimand from the ops ratio (biased about +6 % for
+  a deterministic arm against a random one) and stays only as
+  `median_ratio`. The ratio of total wall times (`total_wall_ratio`, with
+  `total_wall_ci95`) is the secondary "end-to-end wall" and keeps the work
+  variance. When an arm's GAE is a lower bound (unpriced work,
+  `ns_per_gae_upper_bound_arms`), its ns per GAE is an upper bound on its
+  cost per operation, and the verdict says so.
+- **The noise test corrects for bias.** The A/A pair is the pair of arms
+  running one method that includes arm A (else one including the
+  reference arm, else the first alphabetical; `aa_selection` and `aa_arms`
+  record the choice). Its ns/GAE ratio (`aa_ratio`, interval `aa_ci95`;
+  needs five admitted pairs) is the systematic bias between two identical
+  arms, positions included. `corrected_ratio` is `ratio_b_over_a /
+  aa_ratio`, with a `t` interval from the two standard errors combined as
+  independent on the log scale (conservative when the A/A shares arm A)
+  and Welch–Satterthwaite degrees of freedom; `outside_noise` is whether
+  the corrected interval excludes 1. A comparison of two arms that run one
+  method is itself an A/A (`self_aa`), with nothing to correct. The v1
+  rule (the median interval excludes 1 and does not overlap the A/A
+  median interval, roughly p < 0.005 and counting noise twice) is kept as
+  `legacy_outside_noise`, with `legacy_ci95`, `legacy_aa_arms` and
+  `legacy_aa_ci95`; `legacy_comparison_id` is the v1 id of the same inputs.
+  The measurement-quality score reads the A/A interval (the control's own
+  interval for a `self_aa` comparison) for its +10 bonus.
   This `compare` wall field uses the whole solve, including IC's reusable
   setup. For the primary one-target IC question, read the separate online
   windows and `ecbench claim`'s same-point interval; a cold wall ratio is
   never an online speedup.
+- **Schema.** New comparisons are `ecbench.comparison/v2`; v1 files are
+  still read (every added field is optional) and keep their meaning:
+  there `ci95` is the percentile bootstrap and `wall.ci95` is the median's.
+  `ecbench table` prints each arm's mean `S` with the same linearised
+  interval (marked `indicative` below five workloads), flags a mean that
+  leaves unverified runs out (`survivors only`) and a heavy tail.
 
 A speedup in the sense of AGENTS.md §8 is still
 `baseline_total_operations / candidate_total_operations`, over the whole
@@ -790,7 +969,19 @@ defines for the primary IC question: one index-calculus run against one
 strong-rho run (`rho.signed_frobenius_strong`) on one public target,
 compared on their one-target online windows (§3), keyed by
 `(candidate_id, workload_id, run_id)` in the repository's IC1 convention.
-The ledger calls its one-run ratio `online_speedup`; a checker `PASS`
+The ledger calls its one-run ratio `online_speedup`; it is the ratio of the
+one round the claim carries, and it stays under that name because the ledger
+(and `boundary_autolab.py`) require it. A claim built from this version on
+also carries `online_speedup_single_run` (the same number, named for what it
+is), `online_speedup_single_run_round`, and `paired_rounds`: **every** measured
+round of that workload in which both arms verified and recorded an online
+window, with how many (`n_pairs`), each pair's ratio, the aggregate
+`Σ rho ms / Σ IC ms`, and a percentile-bootstrap interval over the rounds
+only from five pairs (one target, so run-to-run variation only). The round the
+claim is built on must be among them. The checker adds `speedup_basis`
+(`single_run` below five pairs or without an interval, `paired_aggregate_with_interval`
+otherwise) and a note to its output for such a claim, and validates the block;
+a claim without it is checked, and answered, as before. A checker `PASS`
 certifies the report's pairing, timing fields and provenance conditions,
 not a statistically established runtime gain. That requires at least five
 admitted matched pairs, an A/A noise interval, and a paired 95% interval

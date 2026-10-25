@@ -52,7 +52,9 @@ use serde_json::json;
 
 use crate::cryptanalysis::ecbench::canonical::{sha256_hex, short_id, splitmix64};
 use crate::cryptanalysis::ecbench::host::{self, recompute_class, HostCapsule};
-use crate::cryptanalysis::ecbench::methods::{MethodSpec, PhaseRecord, ResolvedMethod};
+use crate::cryptanalysis::ecbench::methods::{
+    MethodSpec, PhaseRecord, ResolvedMethod, SolveReport,
+};
 use crate::cryptanalysis::ecbench::record::{
     check_line_seal, child_main, floor_s, from_str_legacy_floats, grade_for_version,
     json_roundtrip, ChildInput, Grade, GradeInput, Record, CHILD_INPUT_SCHEMA,
@@ -436,6 +438,46 @@ fn grade_v1_candidates(g: &GradeInput) -> Option<Vec<Grade>> {
 
 // ── The receipt ────────────────────────────────────────────────────
 
+/// Replay detail for a record written before an accounting correction,
+/// reproduced from the replay with the correction undone.
+pub const LEGACY_ACCOUNTING_IDENTICAL: &str =
+    "identical (pre-2026-10-18 phase accounting, reproduced from the replay)";
+
+/// The figures a `rho.quartic` / `rho.cubic` record written before
+/// 2026-10-18 carries.  Those binaries merged the class set-up into the
+/// ledger the phases are read from, but not into the total, so the total
+/// fell short of the phase sum by exactly the set-up.  The replay reports
+/// its own set-up (`detail.class_setup`, computed by the replay, never read
+/// from the record), so the record cannot choose the amount.
+pub fn legacy_class_setup(rep: &SolveReport) -> Option<(Vec<PhaseRecord>, f64)> {
+    let d = rep.detail.pointer("/class_setup/gae")?.as_f64()?;
+    (d > 0.0).then(|| (rep.phases.clone(), rep.total_gae - d))
+}
+
+/// The phases a `kangaroo.vow` record written before 2026-10-18 carries.
+/// Those binaries charged a kangaroo's re-placement after a same-kind
+/// collision to `setup`; it is search.  The total is unchanged.  The
+/// replay reports the re-placement work it moved (`detail.
+/// restarts_in_search`, computed by the replay), and this moves it back.
+pub fn legacy_restart_phase(rep: &SolveReport) -> Option<(Vec<PhaseRecord>, f64)> {
+    let moved = rep.detail.get("restarts_in_search")?;
+    let field = |k: &str| moved.get(k).and_then(serde_json::Value::as_u64);
+    let (adds, doubles, sm) = (field("adds")?, field("doubles")?, field("scalar_mults")?);
+    let mut phases = rep.phases.clone();
+    let si = phases.iter().position(|p| p.name == "setup")?;
+    let wi = phases.iter().position(|p| p.name == "search")?;
+    let w = &mut phases[wi];
+    w.adds = w.adds.checked_sub(adds)?;
+    w.doubles = w.doubles.checked_sub(doubles)?;
+    w.scalar_mults = w.scalar_mults.checked_sub(sm)?;
+    w.gae = (w.adds + w.doubles) as f64;
+    let s = &mut phases[si];
+    s.adds += adds;
+    s.doubles += doubles;
+    s.scalar_mults += sm;
+    s.gae = (s.adds + s.doubles) as f64;
+    Some((phases, rep.total_gae))
+}
 pub const AUDIT_SCHEMA: &str = "ecbench.audit/v1";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -973,9 +1015,6 @@ fn replay_one(p: &Plan, r: &Record, ex: &Execution) -> Result<(bool, String), St
                     }
                 }
             }
-            if !total_ok {
-                diffs.push("total_gae");
-            }
             let ints = |ps: &[PhaseRecord]| {
                 ps.iter()
                     .map(|p| {
@@ -989,7 +1028,24 @@ fn replay_one(p: &Plan, r: &Record, ex: &Execution) -> Result<(bool, String), St
                     })
                     .collect::<Vec<_>>()
             };
-            if ints(&rep.phases) != ints(&r.phases) {
+            let mut counts_ok = ints(&rep.phases) == ints(&r.phases);
+            let mut accounting = false;
+            if !(total_ok && phases_ok && counts_ok) {
+                for undo in [legacy_class_setup, legacy_restart_phase] {
+                    let Some((phases, total)) = undo(&rep) else {
+                        continue;
+                    };
+                    let gae: Vec<f64> = phases.iter().map(|p| p.gae).collect();
+                    if same_gae(&gae, total) == (true, true) && ints(&phases) == ints(&r.phases) {
+                        (total_ok, phases_ok, counts_ok, accounting) = (true, true, true, true);
+                        break;
+                    }
+                }
+            }
+            if !total_ok {
+                diffs.push("total_gae");
+            }
+            if !counts_ok {
                 diffs.push("phase counts");
             }
             if !phases_ok {
@@ -1017,7 +1073,9 @@ fn replay_one(p: &Plan, r: &Record, ex: &Execution) -> Result<(bool, String), St
             }
             (
                 diffs.is_empty(),
-                if diffs.is_empty() && legacy {
+                if diffs.is_empty() && accounting {
+                    LEGACY_ACCOUNTING_IDENTICAL.into()
+                } else if diffs.is_empty() && legacy {
                     LEGACY_IDENTICAL.into()
                 } else if diffs.is_empty() {
                     "identical".into()
@@ -1094,7 +1152,8 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
 
     // The host class.
     let host: HostCapsule = serde_json::from_str(
-        &std::fs::read_to_string(dir.join("host.json")).map_err(|e| e.to_string())?,
+        &std::fs::read_to_string(dir.join("host.json"))
+            .map_err(|e| format!("{}: {e}", dir.join("host.json").display()))?,
     )
     .map_err(|e| format!("host.json: {e}"))?;
     let class = recompute_class(&host)?;
@@ -1117,10 +1176,12 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
     );
 
     // The spec re-expands to the plan.
-    let spec_text = std::fs::read_to_string(dir.join("spec.json")).map_err(|e| e.to_string())?;
+    let spec_text = std::fs::read_to_string(dir.join("spec.json"))
+        .map_err(|e| format!("{}: {e}", dir.join("spec.json").display()))?;
     let p = plan(Spec::from_json(&spec_text)?)?;
     let doc: PlanDoc = serde_json::from_str(
-        &std::fs::read_to_string(dir.join("plan.json")).map_err(|e| e.to_string())?,
+        &std::fs::read_to_string(dir.join("plan.json"))
+            .map_err(|e| format!("{}: {e}", dir.join("plan.json").display()))?,
     )
     .map_err(|e| format!("plan.json: {e}"))?;
     led.check(
@@ -1562,6 +1623,66 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use crate::cryptanalysis::ecbench::methods::{PhaseRecord, SolveReport};
+
+    fn phase(name: &str, adds: u64, doubles: u64, sm: u64) -> PhaseRecord {
+        PhaseRecord {
+            name: name.into(),
+            adds,
+            doubles,
+            scalar_mults: sm,
+            gae: (adds + doubles) as f64,
+            ..Default::default()
+        }
+    }
+
+    /// A replay that moved `m` re-placement operations into `search`
+    /// reconstructs the old split exactly: the same total, `m` more in
+    /// `setup`, `m` fewer in `search`, scalar multiplications with them.
+    #[test]
+    fn legacy_restart_phase_moves_the_restart_back_to_setup() {
+        let rep = SolveReport {
+            phases: vec![phase("setup", 10, 40, 2), phase("search", 900, 3, 1)],
+            total_gae: 953.0,
+            detail: serde_json::json!({"restarts_in_search":
+                {"adds": 7, "doubles": 2, "scalar_mults": 1}}),
+            ..Default::default()
+        };
+        let (old, total) = legacy_restart_phase(&rep).unwrap();
+        assert_eq!(total, 953.0);
+        assert_eq!(old[0], phase("setup", 17, 42, 3));
+        assert_eq!(old[1], phase("search", 893, 1, 0));
+        // Nothing to undo without the replay's own report of it.
+        let plain = SolveReport {
+            detail: serde_json::Value::Null,
+            ..rep.clone()
+        };
+        assert!(legacy_restart_phase(&plain).is_none());
+        // More moved than the phase holds cannot be a reconstruction.
+        let bad = SolveReport {
+            detail: serde_json::json!({"restarts_in_search":
+                {"adds": 901, "doubles": 0, "scalar_mults": 0}}),
+            ..rep
+        };
+        assert!(legacy_restart_phase(&bad).is_none());
+    }
+
+    /// A `rho.quartic` / `rho.cubic` replay's class set-up is subtracted
+    /// from the total only; the phases stay as they are.
+    #[test]
+    fn legacy_class_setup_lowers_only_the_total() {
+        let rep = SolveReport {
+            phases: vec![phase("setup", 5, 16, 1), phase("search", 541, 0, 0)],
+            total_gae: 562.0,
+            detail: serde_json::json!({"class_setup":
+                {"adds": 5, "doubles": 16, "scalar_mults": 1, "gae": 21.0}}),
+            ..Default::default()
+        };
+        let (phases, total) = legacy_class_setup(&rep).unwrap();
+        assert_eq!(phases, rep.phases);
+        assert_eq!(total, 541.0);
+        assert!(legacy_class_setup(&SolveReport::default()).is_none());
+    }
     use super::*;
     use serde_json::json;
 
