@@ -509,6 +509,7 @@ def main() -> None:
     source_head_log = (ROOT / "common22-source-head-build.log").read_text()
     for theorem in ("sourceE_coeff_six", "sourceE_coeff_five",
                     "sourceE_coeff_four", "canonical_n_eq_interpolant",
+                    "canonical_n_interpolates_second",
                     "sourceE_natDegree_le_six", "sourceE_strict_degree"):
         require(re.search(r"(?m)^theorem " + theorem + r"\b", source_head_source) is not None,
                 f"common source-head theorem missing: {theorem}")
@@ -558,6 +559,7 @@ def main() -> None:
         "Common22SourceHead.sourceE_coeff_five",
         "Common22SourceHead.sourceE_coeff_four",
         "Common22SourceHead.canonical_n_eq_interpolant",
+        "Common22SourceHead.canonical_n_interpolates_second",
         "Common22SourceHead.sourceE_natDegree_le_six",
         "Common22SourceHead.sourceE_strict_degree",
         "Common22Uniqueness.zero_of_coprime_supports",

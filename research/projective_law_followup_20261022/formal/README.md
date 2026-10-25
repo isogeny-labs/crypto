@@ -55,7 +55,8 @@ artifact.  It does not claim a complete formal proof of Jacobian addition.
   theorems now expand `N²-u₁u₂U` and read its degree-six, five, and four
   coefficients. Four source-style theorems substitute the proof-side
   coefficient formulas and recover `0,B²,0`; they also equate the canonical
-  cubic with its interpolation form. The proof-side residual is at most
+  cubic with its interpolation form and prove its second-support
+  factorization. The proof-side residual is at most
   sextic, and its difference from a monic quintic with zero fourth
   coefficient has degree below the support product. Runtime semantic correspondence remains
   open. The [CSV](common22-uniqueness.csv),

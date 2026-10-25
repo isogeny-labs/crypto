@@ -23,6 +23,21 @@ theorem canonical_n_eq_interpolant (q1 r1 s1 t1 b a c : K) :
   simp only [map_add, map_sub, map_mul, map_neg]
   ring
 
+/-- The source-style cubic also agrees with the second input ordinate
+modulo the second quadratic support. -/
+theorem canonical_n_interpolates_second
+    (q1 r1 s1 t1 q2 r2 s2 t2 : K) :
+    let (b, a, c, _, _) :=
+      Common22SupportHead.coefficientData q1 r1 s1 t1 q2 r2 s2 t2
+    let n : K[X] := C (-c) * X ^ 3 + C (-(c * q1 + a)) * X ^ 2 +
+      C (b * s1 - c * r1 - a * q1) * X + C (b * t1 - a * r1)
+    n - C b * (C s2 * X + C t2) =
+      (C (-c) * X + C (-c * (q1 - q2) - a)) *
+        (X ^ 2 + C q2 * X + C r2) := by
+  dsimp [Common22SupportHead.coefficientData]
+  simp only [map_add, map_sub, map_mul, map_pow, map_neg]
+  ring
+
 noncomputable def sourceE (q1 r1 s1 t1 q2 r2 s2 t2 : K) : K[X] :=
   let (b, a, c, q, r) := Common22SupportHead.coefficientData q1 r1 s1 t1 q2 r2 s2 t2
   let u1 : K[X] := X ^ 2 + C q1 * X + C r1
@@ -96,5 +111,6 @@ end Common22SourceHead
 #print axioms Common22SourceHead.sourceE_coeff_five
 #print axioms Common22SourceHead.sourceE_coeff_four
 #print axioms Common22SourceHead.canonical_n_eq_interpolant
+#print axioms Common22SourceHead.canonical_n_interpolates_second
 #print axioms Common22SourceHead.sourceE_natDegree_le_six
 #print axioms Common22SourceHead.sourceE_strict_degree

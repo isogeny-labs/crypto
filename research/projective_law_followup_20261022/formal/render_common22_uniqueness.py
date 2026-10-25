@@ -44,6 +44,7 @@ packet = {
         "Common22SourceHead.sourceE_coeff_five",
         "Common22SourceHead.sourceE_coeff_four",
         "Common22SourceHead.canonical_n_eq_interpolant",
+        "Common22SourceHead.canonical_n_interpolates_second",
         "Common22SourceHead.sourceE_natDegree_le_six",
         "Common22SourceHead.sourceE_strict_degree",
         "Common22Uniqueness.zero_of_coprime_supports",
@@ -101,7 +102,8 @@ quadratic supports and a quadratic residual support, then read its coefficients
 at degrees six, five, and four. Four more substitute the proof-side
 source-style coefficients and show `0`, `B²`, `0`; they also equate the
 canonical numerator with its interpolation expression. The semantic link
-from Rust execution to that proof-side polynomial remains open.
+from Rust execution to that proof-side polynomial remains open. An exact
+second-support factorization is also proved for the same canonical cubic.
 The source-style residual is also proved at most sextic, and its cleared
 difference from a monic quintic with zero fourth coefficient has degree
 strictly below the two-support product.
@@ -109,7 +111,7 @@ The [coprime](common22-coprime-build.log), [residue](common22-residues-build.log
 [degree](common22-degree-build.log),
 [polynomial-head](common22-polynomial-head-build.log),
 [source-head](common22-source-head-build.log), and
-[uniqueness](common22-uniqueness-build.log) kernel logs record all twenty-six
+[uniqueness](common22-uniqueness-build.log) kernel logs record all twenty-seven
 theorem names and their foundational axioms.
 
 The [CSV](common22-uniqueness.csv) and [JSON](common22-uniqueness.json) list
@@ -143,7 +145,8 @@ quadratics. These are conditional polynomial statements.
 Four more theorems expand a generic cubic-minus-quadratic product and read its
 coefficients in degrees six, five, and four. Four source-style theorems show
 those coefficients are $0,B^2,0$ and equate the cubic's canonical and
-interpolation forms. Two further theorems prove the proof-side residual is
+interpolation forms; an additional theorem proves its second-support
+factorization. Two further theorems prove the proof-side residual is
 at most sextic and obtain the strict degree bound for a monic quintic with
 zero fourth coefficient. Rust execution is not translated into Lean here.
 
