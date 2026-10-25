@@ -265,9 +265,9 @@ It checks vanishing equivalence, principal-ideal equality, a same-ambient
 quotient-ring equivalence, and an instance in `Localization.Away X₀` of
 `K[X,Y]`. Its [CSV](principal-open-equation.csv),
 [SVG](principal-open-equation.svg), and artifact-stored PDF expose the
-checked and open gates. The ring equivalence between the **separately
-presented** chart localizations, the resulting principal-open scheme
-isomorphism, projective gluing, and divisor/`Pic⁰` transport remain open.
+checked and open gates. That packet alone does not construct maps between
+the **separately presented** chart localizations; the following packets
+address that ring and scheme overlap.
 
 The [separate-chart map packet](SEPARATE_CHART_MAP.md) defines the affine
 quotient and both principal opens independently. Pinned Lean checks that each
@@ -288,3 +288,10 @@ the spectra of the localized chart rings are isomorphic. Its
 artifact-stored PDF record the result. Constructing and identifying a glued
 smooth projective curve, its infinity stalk, divisor/`Pic⁰` transport, and
 Rust-law semantics remain open.
+
+The [gluing gate packet](GLUING_GATE.md) records the pinned Mathlib
+`Scheme.GlueData` requirements after the checked overlap. Its
+[CSV](gluing-gate.csv), [SVG](gluing-gate.svg), and artifact-stored PDF mark
+the full two-chart datum, glued scheme, and identification with a chosen
+smooth projective completion as open. The API replay constructs no curve and
+does not change the measured cost ratios.
