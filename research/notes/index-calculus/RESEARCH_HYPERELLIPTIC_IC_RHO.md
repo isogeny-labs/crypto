@@ -2123,3 +2123,36 @@ examined next.
 **Run.** Built from the commit that carries the IC adapter (once
 reviewed), so the same binary can later run the IC arm; card relay
 through `experiment-director` and `executor-mechanical`.
+
+## Lead: the IC arm in ecbench — built
+
+`ic.hyperelliptic` (`src/cryptanalysis/ecbench/hyper_ic.rs`) runs the
+thread's index calculus on ecbench's hyperelliptic family, so index
+calculus and rho can share one session (§12) and be priced alike (§5a).
+
+- **Same algorithm, exact counts.** Group arithmetic goes through
+  `HCurve`'s counted `add`: one counted operation per walk trial, the start
+  divisor charged to set-up. When a run solves in its first round, its
+  trials, relations, partials, combined relations, group operations and
+  recovered `k` equal the thread's `hec_index_calculus_dlp` for the same
+  seed (tested at genus 2, 3, 4 and on the truncated base with large
+  primes). One deliberate difference: when the rows do not pin `k`, this
+  arm keeps walking instead of restarting from the seed.
+- **Phases.** `factor_base`, `walk_setup`, `relations`, `linear_algebra`,
+  each with its own ledger. Native work is counted, not charged:
+  `oracle_fp_muls_uncharged` (every `F_p` multiplication in the
+  smoothness test, inversions and square roots included),
+  `factor_base_fp_muls_uncharged`, `factor_base_lookups_uncharged`,
+  `canonicalisations_uncharged`, `step_draws_uncharged`,
+  `large_prime_mulmods_uncharged`, `large_prime_lookups_uncharged`,
+  `linalg_mulmods_uncharged`, `linalg_inversions_uncharged`.
+- **Parameters** that change the search have no default: `fb_size`,
+  `large_primes`, `extra_relations`, `branches`, `d_step_in`. An instance
+  with `r² | #J` is refused (relations mod `r` need a cyclic `r`-part).
+- **Smoke test (not a measurement).** Genus 2 `p = 41`, genus 3 `p = 23`,
+  genus 4 `p = 17`, two targets each, `rho.negation` against
+  `ic.hyperelliptic` (thread defaults): 36 of 36 runs verified,
+  `audit OK: 36 records, 36 verified, 6 replays reproduced, 0 problems`.
+
+Round sixteen (registered above) is built from this commit, so the same
+binary can run the IC arm in the following round.

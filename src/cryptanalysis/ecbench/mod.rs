@@ -14,6 +14,7 @@
 //! | [`generic`] | counted BSGS (three forms) and the kangaroo on any [`CountedGroup`] |
 //! | [`fp4`] | `E(F_{p⁴})`: the curve, its counted group and `ic.k4_gaudry` (Gaudry `k = 4`) |
 //! | [`hyper`] | the hyperelliptic thread's Jacobians (genus 2–4, `p < 256`) for the generic arms |
+//! | [`hyper_ic`] | `ic.hyperelliptic`: the thread's index calculus on those Jacobians, counted |
 //! | [`claw`] | the four-point signed-Frobenius pair claw (aburan28/cryptanalysis#175) on a Koblitz curve |
 //! | [`conductor_gap`] | CM crater/floor curve pairs with a certified prime endomorphism-conductor gap |
 //! | [`spec`] | the experiment spec and its deterministic expansion |
@@ -59,6 +60,7 @@ pub mod generic;
 pub mod gpu;
 pub mod host;
 pub mod hyper;
+pub mod hyper_ic;
 pub mod isolab;
 pub mod isolation;
 pub mod methods;

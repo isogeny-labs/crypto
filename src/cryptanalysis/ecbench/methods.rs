@@ -29,6 +29,7 @@ use crate::cryptanalysis::ecbench::generic::{
     bsgs_interleaved, bsgs_negation, bsgs_textbook, kangaroo, GenericOutcome,
 };
 use crate::cryptanalysis::ecbench::hyper::HyperInstance;
+use crate::cryptanalysis::ecbench::hyper_ic::{self, HyperIcParams};
 use crate::cryptanalysis::ecbench::wordram_price;
 use crate::cryptanalysis::ecbench::workload::{CurveFacts, Instance, WideInstance};
 use crate::cryptanalysis::ecbench_large_prime::{
@@ -253,6 +254,39 @@ const IC_COUNTED_PARAMS: &[ParamDecl] = &[
         name: "solver_budget_seconds",
         default: Some("0"),
         help: "per-call solver wall budget",
+    },
+];
+
+const HYPER_IC_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "fb_size",
+        default: None,
+        help: "factor-base cap: `all` (every degree-1 place, m ≈ p/2 columns after the ± fold) or N (the first N places by x, Gaudry's reduced base)",
+    },
+    ParamDecl {
+        name: "large_primes",
+        default: None,
+        help: "0 (full relations only) or 1 (single large primes: keep a candidate with one place outside a truncated base and combine pairs sharing it)",
+    },
+    ParamDecl {
+        name: "extra_relations",
+        default: None,
+        help: "rows collected beyond the m + 1 unknowns before the first solve (the thread uses 8); each further round adds m/4 + 8",
+    },
+    ParamDecl {
+        name: "branches",
+        default: None,
+        help: "factor-base places the walk steps by, drawn by a seeded shuffle (the thread uses 64; capped at m)",
+    },
+    ParamDecl {
+        name: "d_step_in",
+        default: None,
+        help: "one step in d_step_in adds D₁, one adds D₂, the rest add a place (the thread uses 4; at least 2)",
+    },
+    ParamDecl {
+        name: "max_trials",
+        default: Some("200000"),
+        help: "relation trials before the run counts as exhausted",
     },
 ];
 
@@ -496,6 +530,14 @@ pub fn registry() -> &'static [MethodDecl] {
                 ParamDecl { name: "query_limit", default: Some("1000000000"), help: "injective point query cap below r" },
                 ParamDecl { name: "seconds", default: Some("1800"), help: "cold wall watchdog; failures are censored" },
             ],
+        },
+        MethodDecl {
+            id: "ic.hyperelliptic",
+            family: "ic",
+            summary: "the hyperelliptic thread's index calculus (ADH/Gaudry) on a genus 2-4 Jacobian (hyperelliptic_thread / hyperelliptic_explicit only): degree-1 places folded by ±, the factor-base walk (start D₁ + D₂, then one Cantor addition a trial), u split by gcd(u, x^p − x) and Cantor–Zassenhaus, Markowitz sparse elimination mod r, up to 4 solve rounds; expected ≈ (m + 1 + extra)·g! trials, so S ≈ (p/2)·g!/√r with the full base, plus uncharged F_p work O(g² log p) a trial and the elimination's mulmods mod r",
+            entry: "ecbench::hyper_ic::solve",
+            applies: Applies::Any,
+            params: HYPER_IC_PARAMS,
         },
         MethodDecl {
             id: "ic.pipeline",
@@ -1342,10 +1384,14 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         Instance::Hyper(h) => {
             if is_hyper_generic(m.id.as_str()) {
                 Ok(())
+            } else if m.id == HYPER_IC {
+                hyper_ic_params(m)?;
+                hyper_ic_cyclic(h)
             } else {
                 Err(hyper_refusal(m.id.as_str(), h))
             }
         }
+        _ if id == HYPER_IC => Err(hyper_ic_refusal(curve)),
         Instance::Wide(wi) => match id {
             "rho.signed_frobenius_strong"
             | "rho.signed_frobenius_strong_legacy"
@@ -1468,7 +1514,10 @@ fn solve_inner(
         return solve_ext(m, i, tx, ty, seed);
     }
     if let Instance::Hyper(i) = inst {
-        return solve_hyper(m, i, tx, ty, seed);
+        return solve_hyper(m, i, curve, tx, ty, seed);
+    }
+    if m.id == HYPER_IC {
+        return Err(hyper_ic_refusal(curve));
     }
     if m.id == "rho.frobenius_orbit" || m.id == "rho.gls" {
         return Err(format!(
@@ -1662,25 +1711,180 @@ fn is_hyper_generic(id: &str) -> bool {
 
 fn hyper_refusal(id: &str, h: &HyperInstance) -> String {
     format!(
-        "`{id}` has no hyperelliptic-Jacobian implementation; on a genus-{} Jacobian over F_{} only rho.plain, rho.negation, rho.frozen_reference, bsgs.* and kangaroo.vow run",
+        "`{id}` has no hyperelliptic-Jacobian implementation; on a genus-{} Jacobian over F_{} only rho.plain, rho.negation, rho.frozen_reference, bsgs.*, kangaroo.vow and ic.hyperelliptic run",
         h.genus, h.p
     )
 }
 
+/// The index calculus that runs on a hyperelliptic Jacobian, and only there.
+const HYPER_IC: &str = "ic.hyperelliptic";
+
+fn hyper_ic_refusal(curve: &CurveFacts) -> String {
+    format!(
+        "`{HYPER_IC}` runs on hyperelliptic Jacobians (hyperelliptic_thread, hyperelliptic_explicit) only; {} is {}",
+        curve.slug, curve.family
+    )
+}
+
+/// Relations mod `r` need a cyclic `r`-part (see `ecbench::hyper_ic`).
+fn hyper_ic_cyclic(h: &HyperInstance) -> Result<(), String> {
+    if (h.group_order / h.r).is_multiple_of(h.r) {
+        return Err(format!(
+            "`{HYPER_IC}` needs r ∥ #J; r² divides #J = {} (r = {})",
+            h.group_order, h.r
+        ));
+    }
+    Ok(())
+}
+
+fn hyper_ic_params(m: &ResolvedMethod) -> Result<HyperIcParams, String> {
+    let fb_size = match m.params["fb_size"].as_str() {
+        "all" => usize::MAX,
+        _ => match param_u64(m, "fb_size")? {
+            0 => return Err("parameter `fb_size` must be `all` or at least 1".into()),
+            n => usize::try_from(n).map_err(|_| "fb_size does not fit usize")?,
+        },
+    };
+    let large_primes = match m.params["large_primes"].as_str() {
+        "0" => false,
+        "1" => true,
+        other => return Err(format!("parameter `large_primes` is 0 or 1, not `{other}`")),
+    };
+    let branches = param_u64(m, "branches")?;
+    let d_step_in = param_u64(m, "d_step_in")?;
+    if branches == 0 || d_step_in < 2 {
+        return Err("`ic.hyperelliptic` needs branches ≥ 1 and d_step_in ≥ 2".into());
+    }
+    Ok(HyperIcParams {
+        fb_size,
+        large_primes,
+        extra_relations: usize::try_from(param_u64(m, "extra_relations")?)
+            .map_err(|_| "extra_relations does not fit usize")?,
+        branches: usize::try_from(branches).map_err(|_| "branches does not fit usize")?,
+        d_step_in,
+        max_trials: param_u64(m, "max_trials")?,
+    })
+}
+
 /// A hyperelliptic Jacobian (`ecbench::hyper`): a generic method on the
-/// Cantor group, one composition-and-reduction per group operation.
+/// Cantor group, one composition-and-reduction per group operation, or
+/// the thread's index calculus (`ic.hyperelliptic`).
 fn solve_hyper(
     m: &ResolvedMethod,
     i: &HyperInstance,
+    curve: &CurveFacts,
     w0: u64,
     w1: u64,
     seed: u64,
 ) -> Result<SolveReport, String> {
+    if m.id == HYPER_IC {
+        let target = i.decode(w0, w1)?;
+        return solve_hyper_ic(m, i, curve, target, seed);
+    }
     if !is_hyper_generic(m.id.as_str()) {
         return Err(hyper_refusal(m.id.as_str(), i));
     }
     let target = i.decode(w0, w1)?;
     solve_generic(m, &i.curve, i.generator, target, i.r, seed)
+}
+
+/// `ic.hyperelliptic`: phases `factor_base`, `walk_setup`, `relations`,
+/// `linear_algebra`, each with its group ledger (Cantor additions, the
+/// only charged work) and its exact native counts, all `*_uncharged`.
+fn solve_hyper_ic(
+    m: &ResolvedMethod,
+    i: &HyperInstance,
+    curve: &CurveFacts,
+    target: crate::cryptanalysis::hyperelliptic_word::HDiv,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    let params = hyper_ic_params(m)?;
+    hyper_ic_cyclic(i)?;
+    let t = Instant::now();
+    let out = hyper_ic::solve(
+        &i.curve,
+        i.generator,
+        target,
+        i.r,
+        i.group_order,
+        seed,
+        &params,
+    )?;
+    let wall = t.elapsed().as_nanos() as u64;
+    let phases: Vec<PhaseRecord> = out
+        .phases
+        .iter()
+        .map(|(name, ops, native, wall_ns)| PhaseRecord {
+            wall_ns: Some(*wall_ns),
+            native: native.clone(),
+            ..ops_phase(name, *ops)
+        })
+        .collect();
+    let total_gae = phases.iter().map(|p| p.gae).sum();
+    let mut keys: Vec<u64> = out.columns.iter().map(|d| i.curve.key_of(d)).collect();
+    keys.sort_unstable();
+    let bytes: Vec<u8> = keys.iter().flat_map(|k| k.to_be_bytes()).collect();
+    let points_sha256 = sha256_hex(&bytes);
+    let family = "hyperelliptic-degree1-places";
+    let columns = out.columns.len() as u64;
+    let (fb_id, fb_sha256) = short_id(
+        "FB1",
+        &json!({
+            "schema": "ecbench.factor_base/v1",
+            "curve": curve.slug,
+            "family": family,
+            "params": {"fb_size": m.params["fb_size"]},
+            "columns": columns,
+            "signed_points": out.signed_points,
+            "points_sha256": points_sha256,
+        }),
+    )?;
+    let factor_base = FactorBaseFacts {
+        fb_id,
+        fb_sha256,
+        family: family.into(),
+        params: [("fb_size".to_string(), m.params["fb_size"].clone())]
+            .into_iter()
+            .collect(),
+        description: format!(
+            "degree-1 places (x, y ≤ (p−1)/2) of y² = f(x) over F_{} in increasing x, one column per ± pair, cap {}",
+            i.p, m.params["fb_size"]
+        ),
+        signed_points: out.signed_points,
+        abscissae: columns,
+        columns,
+        dimension: None,
+        points_sha256,
+    };
+    let detail = json!({
+        "genus": i.genus,
+        "p": i.p,
+        "r": i.r,
+        "group_order": i.group_order,
+        "rounds_allowed": hyper_ic::ROUNDS,
+        "oracle": "deg ≤ 2 closed form; deg ≥ 3 gcd(u, x^p − x), Cantor–Zassenhaus shifts b = 0, 1, …",
+        "linear_algebra": "Markowitz sparse elimination mod r (the thread's sparse_solve_for_k)",
+    });
+    Ok(SolveReport {
+        recovered: out.recovered.map(u128::from),
+        exhausted: out.exhausted,
+        phases,
+        total_gae,
+        // The factor base is folded by the hyperelliptic involution.
+        automorphisms_used: 2,
+        unpriced: unpriced_of(&out.counters),
+        counters: out.counters,
+        deterministic: true,
+        nondeterminism: vec![],
+        solve_wall_ns: wall,
+        factor_base: Some(factor_base),
+        detail,
+        online: None,
+        online_error: None,
+        solver: None,
+        // HCurve does not tally the field work inside a Cantor step.
+        field_ops: None,
+    })
 }
 
 /// A GLS or subfield curve (`ecbench::ext`): the endomorphism-orbit rho
