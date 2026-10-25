@@ -17,7 +17,14 @@ The new executions are independent of the unlocated historical runs. The frozen 
 
 ## Extract and verify
 
-From this study directory:
+The immutable archive is stored through the adjacent `.artifacts.json`
+manifest. From the repository root, hydrate the exact bytes first:
+
+```sh
+python3 tools/artifacts/artifacts.py pull research/three_leads_e2e_20261018
+```
+
+Then, from this study directory:
 
 ```sh
 sha256sum -c runs.tar.xz.sha256

@@ -29,6 +29,10 @@ ranges are **8.492013–53.451983** uncached and **8.149964–51.610204** cached
 All seven size slices and all 36 price cells for both arms,
 including every loss, are in `results/price-grid.csv`; individual paired
 prices are in `results/target-price.csv`.
+The large per-target price CSV is stored through
+`results/.artifacts.json`; hydrate it with
+`python3 tools/artifacts/artifacts.py pull research/kummer_differential_collector_20261022/results`
+before reading or replaying those rows.
 
 Cold candidate cost charges each target the full fresh model root search,
 theta search and five two-torsion matrices, followed by that target's source
